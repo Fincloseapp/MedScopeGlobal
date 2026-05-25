@@ -1,0 +1,2 @@
+# MedScopeGlobal
+MedScopeGlobal medical platform
