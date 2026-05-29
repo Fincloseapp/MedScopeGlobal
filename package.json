@@ -1,0 +1,42 @@
+{
+  "name": "medscopeglobal",
+  "version": "1.0.0",
+  "description": "MedScopeGlobal medical platform",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "refresh:content": "node scripts/refresh-content.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fincloseapp/MedScopeGlobal.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Fincloseapp/MedScopeGlobal/issues"
+  },
+  "homepage": "https://github.com/Fincloseapp/MedScopeGlobal#readme",
+  "dependencies": {
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.16.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "jsdom": "^29.1.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.14",
+    "vitest": "^4.1.7"
+  }
+}
