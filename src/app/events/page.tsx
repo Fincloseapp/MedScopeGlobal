@@ -1,0 +1,7 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { EventFilter } from "@/components/event-filter";
+import { filterEvents, parseEventFilters } from "@/lib/content";
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+export const metadata: Metadata = { title: "Události", description: "Odborné medicínské události s filtry podle regionu, formátu a specializace." };
+export default async function EventsPage({ searchParams }: { searchParams: SearchParams }) { const filters = parseEventFilters(await searchParams); const results = filterEvents(filters); return <main className="section"><p className="eyebrow">Události</p><h1>Konference, workshopy a roundtables.</h1><p className="lead">Filtry opravují detailní dohledání podle regionu, formátu i odbornosti.</p><EventFilter />{results.length ? <div className="grid">{results.map((event) => <article className="card" key={event.id}><span className="tag">{event.format}</span><h2>{event.title}</h2><p>{event.description}</p><div className="meta"><span>{new Intl.DateTimeFormat("cs-CZ", { dateStyle: "medium", timeStyle: "short" }).format(new Date(event.startsAt))}</span><span>{event.region}</span><span>{event.specialization}</span></div><Link className="button" href={`/events/${event.slug}`}>Detail události</Link></article>)}</div> : <div className="empty"><h2>Žádné události neodpovídají filtru.</h2><p>Zkuste jiný region, formát nebo specializaci.</p></div>}</main>; }
