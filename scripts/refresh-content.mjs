@@ -109,6 +109,63 @@ async function fetchClinicalTrials(category, limit = 4) {
   });
 }
 
+function buildMedicalCongressCalendar() {
+  const baseDate = new Date();
+  const events = [
+    [
+      'conferences',
+      'ESC Congress: cardiovascular science and late-breaking trials',
+      'Official European Society of Cardiology congress listing for cardiovascular science, guidelines and late-breaking trial sessions.',
+      ['conferences', 'cme', 'cardiology'],
+      'https://www.escardio.org/Congresses-Events/ESC-Congress',
+    ],
+    [
+      'conferences',
+      'ASCO Annual Meeting: oncology abstracts and education sessions',
+      'Official American Society of Clinical Oncology annual meeting source for oncology abstracts, plenaries and education tracks.',
+      ['conferences', 'oncology', 'abstracts'],
+      'https://conferences.asco.org/am',
+    ],
+    [
+      'conferences',
+      'HIMSS Global Health Conference: digital health systems and interoperability',
+      'Official HIMSS global conference source for health IT, data systems, interoperability and digital transformation.',
+      ['conferences', 'digital health', 'systems'],
+      'https://www.himss.org/global-conference',
+    ],
+    [
+      'webinars',
+      'WHO Academy learning programmes and public-health webinars',
+      'WHO Academy education source for public-health learning, online programmes and implementation-focused training.',
+      ['webinars', 'who', 'public health'],
+      'https://www.who.int/about/who-academy',
+    ],
+    [
+      'reports',
+      'FDA drug safety communications and regulatory updates',
+      'Official FDA safety and regulatory update source used for post-event and policy report monitoring.',
+      ['reports', 'fda', 'drug safety'],
+      'https://www.fda.gov/drugs/drug-safety-and-availability/drug-safety-communications',
+    ],
+  ];
+
+  return events.map(([category, title, summary, tags, sourceUrl], index) => ({
+    id: `calendar-${category}-${index}`,
+    category,
+    title,
+    author: 'Official congress calendar',
+    authorTitle: 'Institutional source',
+    affiliation: 'Professional society / public institution',
+    summary,
+    citations: 0,
+    tags,
+    date: new Date(baseDate.getTime() + index * 1000 * 60 * 60 * 24 * 14).toISOString(),
+    source: 'Congress Calendar',
+    sourceUrl,
+    specialty: inferSpecialty(tags),
+  }));
+}
+
 async function main() {
   const jobs = [
     fetchPubMed('clinical insights medicine', 'clinical-insights'),
@@ -119,6 +176,7 @@ async function main() {
     fetchPubMed('healthcare cost DRG insurance', 'costs-drg'),
     fetchClinicalTrials('clinical-studies'),
     fetchClinicalTrials('clinical-trials'),
+    Promise.resolve(buildMedicalCongressCalendar()),
   ];
 
   const settled = await Promise.allSettled(jobs);

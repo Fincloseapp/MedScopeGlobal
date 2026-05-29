@@ -270,26 +270,64 @@ async function fetchWhoRss(category: ContentCategory, limit = 6): Promise<Medica
 
 function buildInternalEvents(): MedicalContentItem[] {
   const baseDate = new Date();
-  const events: Array<[ContentCategory, string, string, string[]]> = [
-    ['conferences', 'European Society Congress Calendar: late-breaking clinical sessions', 'International congress calendar with CME-relevant sessions and abstract deadlines.', ['conferences', 'cme', 'cardiology']],
-    ['webinars', 'Digital health webinar series: AI governance in clinical workflows', 'Expert webinar track for safe AI implementation, validation and auditability.', ['webinars', 'ai in medicine', 'governance']],
-    ['reports', 'Congress report: practice-changing abstracts to watch', 'Editorial synthesis format for congress highlights and post-meeting analysis.', ['reports', 'late-breaking', 'clinical practice']],
-    ['careers', 'Early-career medical editor fellowship', 'Structured editorial fellowship for students, residents and junior clinicians.', ['careers', 'fellowship', 'early career']],
+  const events: Array<[ContentCategory, string, string, string[], string]> = [
+    [
+      'conferences',
+      'ESC Congress: cardiovascular science and late-breaking trials',
+      'Official European Society of Cardiology congress listing for cardiovascular science, guidelines and late-breaking trial sessions.',
+      ['conferences', 'cme', 'cardiology'],
+      'https://www.escardio.org/Congresses-Events/ESC-Congress',
+    ],
+    [
+      'conferences',
+      'ASCO Annual Meeting: oncology abstracts and education sessions',
+      'Official American Society of Clinical Oncology annual meeting source for oncology abstracts, plenaries and education tracks.',
+      ['conferences', 'oncology', 'abstracts'],
+      'https://conferences.asco.org/am',
+    ],
+    [
+      'conferences',
+      'HIMSS Global Health Conference: digital health systems and interoperability',
+      'Official HIMSS global conference source for health IT, data systems, interoperability and digital transformation.',
+      ['conferences', 'digital health', 'systems'],
+      'https://www.himss.org/global-conference',
+    ],
+    [
+      'webinars',
+      'WHO Academy learning programmes and public-health webinars',
+      'WHO Academy education source for public-health learning, online programmes and implementation-focused training.',
+      ['webinars', 'who', 'public health'],
+      'https://www.who.int/about/who-academy',
+    ],
+    [
+      'reports',
+      'FDA drug safety communications and regulatory updates',
+      'Official FDA safety and regulatory update source used for post-event and policy report monitoring.',
+      ['reports', 'fda', 'drug safety'],
+      'https://www.fda.gov/drugs/drug-safety-and-availability/drug-safety-communications',
+    ],
+    [
+      'careers',
+      'Early-career medical editor fellowship',
+      'Structured editorial fellowship for students, residents and junior clinicians.',
+      ['careers', 'fellowship', 'early career'],
+      '/careers',
+    ],
   ];
 
-  return events.map(([category, title, summary, tags], index) => ({
+  return events.map(([category, title, summary, tags, sourceUrl], index) => ({
     id: `internal-${category}-${index}`,
     category,
     title,
-    author: 'MedScopeGlobal Editorial Team',
-    authorTitle: 'MD editors',
-    affiliation: 'MedScopeGlobal',
+    author: category === 'careers' ? 'MedScopeGlobal Editorial Team' : 'Official congress calendar',
+    authorTitle: category === 'careers' ? 'MD editors' : 'Institutional source',
+    affiliation: category === 'careers' ? 'MedScopeGlobal' : 'Professional society / public institution',
     summary,
     citations: 0,
     tags,
     date: new Date(baseDate.getTime() + index * 1000 * 60 * 60 * 24 * 14).toISOString(),
     source: 'Congress Calendar',
-    sourceUrl: category === 'careers' ? '/careers' : '/events/conferences',
+    sourceUrl,
     specialty: inferSpecialty(tags),
   }));
 }

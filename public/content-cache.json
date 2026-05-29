@@ -1,4 +1,328 @@
 {
-  "refreshedAt": "1970-01-01T00:00:00.000Z",
-  "items": []
+  "refreshedAt": "2026-05-29T22:20:18.457Z",
+  "items": [
+    {
+      "id": "pubmed-42213336",
+      "category": "ai",
+      "title": "Innovative strategies for early detection of cardiotoxicity: artificial intelligence and multi-modality collaborative models.",
+      "author": "Becker RC",
+      "authorTitle": "MD / PhD",
+      "affiliation": "Journal of thrombosis and thrombolysis",
+      "summary": "Indexed PubMed article selected for artificial intelligence medicine.",
+      "citations": 36,
+      "tags": [
+        "ai",
+        "artificial",
+        "J Thromb Thrombolysis"
+      ],
+      "date": "2026-05-29T00:00:00.000Z",
+      "source": "PubMed",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42213336/",
+      "specialty": "Digital Health"
+    },
+    {
+      "id": "pubmed-42213329",
+      "category": "ai",
+      "title": "Towards an accessible, centralised, searchable database for AI courses in Europe: the Artificial Intelligence in Medical Imaging and Radiation Oncology Education (AIMIROE) project.",
+      "author": "Decoster R",
+      "authorTitle": "MD / PhD",
+      "affiliation": "European radiology experimental",
+      "summary": "Indexed PubMed article selected for artificial intelligence medicine.",
+      "citations": 29,
+      "tags": [
+        "ai",
+        "artificial",
+        "Eur Radiol Exp"
+      ],
+      "date": "2026-05-29T00:00:00.000Z",
+      "source": "PubMed",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42213329/",
+      "specialty": "Digital Health"
+    },
+    {
+      "id": "pubmed-42213317",
+      "category": "ai",
+      "title": "Validation of an automated AI-based micro-CT organ segmentation workflow against expert annotations and its impact on fluorescence quantification.",
+      "author": "Rama E",
+      "authorTitle": "MD / PhD",
+      "affiliation": "European radiology experimental",
+      "summary": "Indexed PubMed article selected for artificial intelligence medicine.",
+      "citations": 17,
+      "tags": [
+        "ai",
+        "artificial",
+        "Eur Radiol Exp"
+      ],
+      "date": "2026-05-29T00:00:00.000Z",
+      "source": "PubMed",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42213317/",
+      "specialty": "Digital Health"
+    },
+    {
+      "id": "pubmed-42213219",
+      "category": "ai",
+      "title": "Turning failure into success: how artificial intelligence can help personalize therapies and re-use patient data.",
+      "author": "Abbracchio MP",
+      "authorTitle": "MD / PhD",
+      "affiliation": "Purinergic signalling",
+      "summary": "Indexed PubMed article selected for artificial intelligence medicine.",
+      "citations": 19,
+      "tags": [
+        "ai",
+        "artificial",
+        "Purinergic Signal"
+      ],
+      "date": "2026-05-29T00:00:00.000Z",
+      "source": "PubMed",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42213219/",
+      "specialty": "Digital Health"
+    },
+    {
+      "id": "clinicaltrials-NCT02582463",
+      "category": "clinical-studies",
+      "title": "Development of the Medicines Optimisation Assessment Tool",
+      "author": "University College, London",
+      "authorTitle": "Trial sponsor",
+      "affiliation": "University College, London",
+      "summary": "The purpose of this study is to develop a prediction-tool, the Medicines Optimisation Assessment Tool (MOAT), to assist hospital pharmacists identify patients at highest risk of preventable medication related problems (MRPs). This has the potential to permit pharmacists to identify and focus on the small number of patients (approximately 6%) who are likely to experience a significant MRP while in hospital.",
+      "citations": 0,
+      "tags": [
+        "clinical trials",
+        "Trial",
+        "Medicines Optimisation"
+      ],
+      "date": "2016-04-01T00:00:00.000Z",
+      "source": "ClinicalTrials.gov",
+      "sourceUrl": "https://clinicaltrials.gov/study/NCT02582463",
+      "specialty": "General Medicine"
+    },
+    {
+      "id": "clinicaltrials-NCT04588584",
+      "category": "clinical-studies",
+      "title": "Prescribing Practice of Medication - Patient View.",
+      "author": "Medical University of Graz",
+      "authorTitle": "Trial sponsor",
+      "affiliation": "Medical University of Graz",
+      "summary": "In the clinical routine of a hospital, there are often problems dealing with medication that has already been prescribed at the time of admission due to incomplete or missing medication lists from the family doctor. Often patients forget this list at home.\n\nThis pilot study focuses on the medication process from admission to discharge and patient health literacy.",
+      "citations": 0,
+      "tags": [
+        "clinical trials",
+        "Trial",
+        "Focus: Prescribing Practice"
+      ],
+      "date": "2018-02-19T00:00:00.000Z",
+      "source": "ClinicalTrials.gov",
+      "sourceUrl": "https://clinicaltrials.gov/study/NCT04588584",
+      "specialty": "General Medicine"
+    },
+    {
+      "id": "clinicaltrials-NCT00663988",
+      "category": "clinical-studies",
+      "title": "Human Partial Facial Allotransplantation",
+      "author": "Xijing Hospital",
+      "authorTitle": "Trial sponsor",
+      "affiliation": "Xijing Hospital",
+      "summary": "Progress in composite tissue allotransplantation provides a new remedy for severely disfigured patients. We plan to carry out allograft composite tissue transplantation after a careful systemic preparation.",
+      "citations": 0,
+      "tags": [
+        "clinical trials",
+        "PHASE3",
+        "Pharmaceutical Preparations"
+      ],
+      "date": "2006-04-01T00:00:00.000Z",
+      "source": "ClinicalTrials.gov",
+      "sourceUrl": "https://clinicaltrials.gov/study/NCT00663988",
+      "specialty": "Clinical Pharmacology"
+    },
+    {
+      "id": "clinicaltrials-NCT01149824",
+      "category": "clinical-studies",
+      "title": "Placebo Controlled Study of Sublingual Salvinorin A",
+      "author": "California Pacific Medical Center Research Institute",
+      "authorTitle": "Trial sponsor",
+      "affiliation": "California Pacific Medical Center Research Institute",
+      "summary": "In this study, our aim is to determine an active but tolerable sublingual dose (range 100 to 4000 µg) of Salvinorin A (SA) in experienced subjects. This study is an ascending-dose, placebo-controlled, single-site design in 8 Salvia-experienced subjects. Subjects will receive SA doses from 0-4000 µg. Doses will be separated by at least one day. The first two doses (0 and 100µg) will be double-blinded while the last four (250, 500, 1000, 2000 and 4000µg) will be single-blind.",
+      "citations": 0,
+      "tags": [
+        "clinical trials",
+        "NA",
+        "Pharmaceutical Preparations"
+      ],
+      "date": "2009-06-01T00:00:00.000Z",
+      "source": "ClinicalTrials.gov",
+      "sourceUrl": "https://clinicaltrials.gov/study/NCT01149824",
+      "specialty": "Clinical Pharmacology"
+    },
+    {
+      "id": "clinicaltrials-NCT02582463",
+      "category": "clinical-trials",
+      "title": "Development of the Medicines Optimisation Assessment Tool",
+      "author": "University College, London",
+      "authorTitle": "Trial sponsor",
+      "affiliation": "University College, London",
+      "summary": "The purpose of this study is to develop a prediction-tool, the Medicines Optimisation Assessment Tool (MOAT), to assist hospital pharmacists identify patients at highest risk of preventable medication related problems (MRPs). This has the potential to permit pharmacists to identify and focus on the small number of patients (approximately 6%) who are likely to experience a significant MRP while in hospital.",
+      "citations": 0,
+      "tags": [
+        "clinical trials",
+        "Trial",
+        "Medicines Optimisation"
+      ],
+      "date": "2016-04-01T00:00:00.000Z",
+      "source": "ClinicalTrials.gov",
+      "sourceUrl": "https://clinicaltrials.gov/study/NCT02582463",
+      "specialty": "General Medicine"
+    },
+    {
+      "id": "clinicaltrials-NCT04588584",
+      "category": "clinical-trials",
+      "title": "Prescribing Practice of Medication - Patient View.",
+      "author": "Medical University of Graz",
+      "authorTitle": "Trial sponsor",
+      "affiliation": "Medical University of Graz",
+      "summary": "In the clinical routine of a hospital, there are often problems dealing with medication that has already been prescribed at the time of admission due to incomplete or missing medication lists from the family doctor. Often patients forget this list at home.\n\nThis pilot study focuses on the medication process from admission to discharge and patient health literacy.",
+      "citations": 0,
+      "tags": [
+        "clinical trials",
+        "Trial",
+        "Focus: Prescribing Practice"
+      ],
+      "date": "2018-02-19T00:00:00.000Z",
+      "source": "ClinicalTrials.gov",
+      "sourceUrl": "https://clinicaltrials.gov/study/NCT04588584",
+      "specialty": "General Medicine"
+    },
+    {
+      "id": "clinicaltrials-NCT00663988",
+      "category": "clinical-trials",
+      "title": "Human Partial Facial Allotransplantation",
+      "author": "Xijing Hospital",
+      "authorTitle": "Trial sponsor",
+      "affiliation": "Xijing Hospital",
+      "summary": "Progress in composite tissue allotransplantation provides a new remedy for severely disfigured patients. We plan to carry out allograft composite tissue transplantation after a careful systemic preparation.",
+      "citations": 0,
+      "tags": [
+        "clinical trials",
+        "PHASE3",
+        "Pharmaceutical Preparations"
+      ],
+      "date": "2006-04-01T00:00:00.000Z",
+      "source": "ClinicalTrials.gov",
+      "sourceUrl": "https://clinicaltrials.gov/study/NCT00663988",
+      "specialty": "Clinical Pharmacology"
+    },
+    {
+      "id": "clinicaltrials-NCT01149824",
+      "category": "clinical-trials",
+      "title": "Placebo Controlled Study of Sublingual Salvinorin A",
+      "author": "California Pacific Medical Center Research Institute",
+      "authorTitle": "Trial sponsor",
+      "affiliation": "California Pacific Medical Center Research Institute",
+      "summary": "In this study, our aim is to determine an active but tolerable sublingual dose (range 100 to 4000 µg) of Salvinorin A (SA) in experienced subjects. This study is an ascending-dose, placebo-controlled, single-site design in 8 Salvia-experienced subjects. Subjects will receive SA doses from 0-4000 µg. Doses will be separated by at least one day. The first two doses (0 and 100µg) will be double-blinded while the last four (250, 500, 1000, 2000 and 4000µg) will be single-blind.",
+      "citations": 0,
+      "tags": [
+        "clinical trials",
+        "NA",
+        "Pharmaceutical Preparations"
+      ],
+      "date": "2009-06-01T00:00:00.000Z",
+      "source": "ClinicalTrials.gov",
+      "sourceUrl": "https://clinicaltrials.gov/study/NCT01149824",
+      "specialty": "Clinical Pharmacology"
+    },
+    {
+      "id": "calendar-conferences-0",
+      "category": "conferences",
+      "title": "ESC Congress: cardiovascular science and late-breaking trials",
+      "author": "Official congress calendar",
+      "authorTitle": "Institutional source",
+      "affiliation": "Professional society / public institution",
+      "summary": "Official European Society of Cardiology congress listing for cardiovascular science, guidelines and late-breaking trial sessions.",
+      "citations": 0,
+      "tags": [
+        "conferences",
+        "cme",
+        "cardiology"
+      ],
+      "date": "2026-05-29T22:20:17.889Z",
+      "source": "Congress Calendar",
+      "sourceUrl": "https://www.escardio.org/Congresses-Events/ESC-Congress",
+      "specialty": "Cardiology"
+    },
+    {
+      "id": "calendar-conferences-1",
+      "category": "conferences",
+      "title": "ASCO Annual Meeting: oncology abstracts and education sessions",
+      "author": "Official congress calendar",
+      "authorTitle": "Institutional source",
+      "affiliation": "Professional society / public institution",
+      "summary": "Official American Society of Clinical Oncology annual meeting source for oncology abstracts, plenaries and education tracks.",
+      "citations": 0,
+      "tags": [
+        "conferences",
+        "oncology",
+        "abstracts"
+      ],
+      "date": "2026-06-12T22:20:17.889Z",
+      "source": "Congress Calendar",
+      "sourceUrl": "https://conferences.asco.org/am",
+      "specialty": "Oncology"
+    },
+    {
+      "id": "calendar-conferences-2",
+      "category": "conferences",
+      "title": "HIMSS Global Health Conference: digital health systems and interoperability",
+      "author": "Official congress calendar",
+      "authorTitle": "Institutional source",
+      "affiliation": "Professional society / public institution",
+      "summary": "Official HIMSS global conference source for health IT, data systems, interoperability and digital transformation.",
+      "citations": 0,
+      "tags": [
+        "conferences",
+        "digital health",
+        "systems"
+      ],
+      "date": "2026-06-26T22:20:17.889Z",
+      "source": "Congress Calendar",
+      "sourceUrl": "https://www.himss.org/global-conference",
+      "specialty": "Digital Health"
+    },
+    {
+      "id": "calendar-webinars-3",
+      "category": "webinars",
+      "title": "WHO Academy learning programmes and public-health webinars",
+      "author": "Official congress calendar",
+      "authorTitle": "Institutional source",
+      "affiliation": "Professional society / public institution",
+      "summary": "WHO Academy education source for public-health learning, online programmes and implementation-focused training.",
+      "citations": 0,
+      "tags": [
+        "webinars",
+        "who",
+        "public health"
+      ],
+      "date": "2026-07-10T22:20:17.889Z",
+      "source": "Congress Calendar",
+      "sourceUrl": "https://www.who.int/about/who-academy",
+      "specialty": "General Medicine"
+    },
+    {
+      "id": "calendar-reports-4",
+      "category": "reports",
+      "title": "FDA drug safety communications and regulatory updates",
+      "author": "Official congress calendar",
+      "authorTitle": "Institutional source",
+      "affiliation": "Professional society / public institution",
+      "summary": "Official FDA safety and regulatory update source used for post-event and policy report monitoring.",
+      "citations": 0,
+      "tags": [
+        "reports",
+        "fda",
+        "drug safety"
+      ],
+      "date": "2026-07-24T22:20:17.889Z",
+      "source": "Congress Calendar",
+      "sourceUrl": "https://www.fda.gov/drugs/drug-safety-and-availability/drug-safety-communications",
+      "specialty": "Clinical Pharmacology"
+    }
+  ]
 }
