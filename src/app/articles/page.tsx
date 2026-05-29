@@ -1,0 +1,7 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArticleFilter } from "@/components/article-filter";
+import { filterArticles, parseArticleFilters } from "@/lib/content";
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+export const metadata: Metadata = { title: "Články", description: "Ověřené medicínské články s autorem, datem a zdrojem." };
+export default async function ArticlesPage({ searchParams }: { searchParams: SearchParams }) { const filters = parseArticleFilters(await searchParams); const results = filterArticles(filters); return <main className="section"><p className="eyebrow">Články</p><h1>Medicínské poznatky podle specializace.</h1><p className="lead">Filtrujte články podle tématu, regionu, autora nebo zdroje. Pokud nic nenajdeme, zobrazíme jasný prázdný stav.</p><ArticleFilter />{results.length ? <div className="grid">{results.map((article) => <article className="card" key={article.id}><span className="tag">{article.specialization}</span><h2>{article.title}</h2><p>{article.summary}</p><div className="meta"><span>{article.author}</span><span>{new Intl.DateTimeFormat("cs-CZ").format(new Date(article.date))}</span><span>{article.source}</span></div><Link className="button" href={`/articles/${article.slug}`}>Číst detail</Link></article>)}</div> : <div className="empty"><h2>Žádné články neodpovídají filtru.</h2><p>Zkuste zjednodušit vyhledávání nebo vybrat jinou specializaci.</p></div>}</main>; }
