@@ -5,6 +5,10 @@ export function assertSameOrigin(request: Request) {
   if (!origin) return true;
   const requestHost = request.headers.get("host");
   const expectedHosts = new Set([requestHost, new URL(siteConfig.url).host, "localhost:3000", "127.0.0.1:3000"].filter(Boolean));
-  return expectedHosts.has(new URL(origin).host);
+  try {
+    return expectedHosts.has(new URL(origin).host);
+  } catch {
+    return false;
+  }
 }
 export function sanitizeText(value: string) { return value.replace(/[<>]/g, "").replace(/\s+/g, " ").trim(); }

@@ -1,15 +1,15 @@
 import { articles, events } from "./data";
-import type { Article, EventFormat, MedicalEvent } from "./types";
+import type { Article, ArticleAudience, EventFormat, MedicalEvent } from "./types";
 
 type MaybeString = string | string[] | undefined;
 function first(value: MaybeString): string { return Array.isArray(value) ? value[0] ?? "" : value ?? ""; }
 function normalized(value: string) { return value.trim().toLocaleLowerCase("cs-CZ"); }
 
-export interface ArticleFilters { query?: string; specialization?: string; region?: string; }
+export interface ArticleFilters { query?: string; specialization?: string; region?: string; audience?: ArticleAudience | ""; }
 export interface EventFilters extends ArticleFilters { format?: EventFormat | ""; }
 
 export function parseArticleFilters(searchParams: Record<string, MaybeString>): ArticleFilters {
-  return { query: first(searchParams.q), specialization: first(searchParams.specialization), region: first(searchParams.region) };
+  return { query: first(searchParams.q), specialization: first(searchParams.specialization), region: first(searchParams.region), audience: first(searchParams.audience) as ArticleAudience | "" };
 }
 export function parseEventFilters(searchParams: Record<string, MaybeString>): EventFilters {
   const format = first(searchParams.format) as EventFormat | "";
@@ -18,8 +18,8 @@ export function parseEventFilters(searchParams: Record<string, MaybeString>): Ev
 export function filterArticles(filters: ArticleFilters): Article[] {
   const query = normalized(filters.query ?? "");
   return articles.filter((article) => {
-    const matchesQuery = !query || [article.title, article.summary, article.author, article.source, article.tags.join(" ")].some((value) => normalized(value).includes(query));
-    return matchesQuery && (!filters.specialization || article.specialization === filters.specialization) && (!filters.region || article.region === filters.region);
+    const matchesQuery = !query || [article.title, article.summary, article.content, article.author, article.source, article.sourceUrl ?? "", article.tags.join(" ")].some((value) => normalized(value).includes(query));
+    return matchesQuery && (!filters.specialization || article.specialization === filters.specialization) && (!filters.region || article.region === filters.region) && (!filters.audience || article.audience === filters.audience);
   });
 }
 export function filterEvents(filters: EventFilters): MedicalEvent[] {
