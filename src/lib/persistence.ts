@@ -24,11 +24,11 @@ export async function persistEventSubmission(submission: EventSubmission) {
 }
 export async function persistUserPreferences(payload: { email: string; name?: string; role: string; preferences: Record<string, unknown> }) {
   const prisma = getPrisma(); if (!prisma) return;
-  try { await prisma.user.upsert({ where: { email: payload.email }, update: { name: payload.name, role: roleToDb(payload.role) as never, preferences: payload.preferences }, create: { email: payload.email, name: payload.name, role: roleToDb(payload.role) as never, preferences: payload.preferences } }); }
+  try { await prisma.user.upsert({ where: { email: payload.email }, update: { name: payload.name, role: roleToDb(payload.role) as never, preferences: payload.preferences as never }, create: { email: payload.email, name: payload.name, role: roleToDb(payload.role) as never, preferences: payload.preferences as never } }); }
   catch (error) { logger.error("persist_user_preferences_failed", { error: error instanceof Error ? error.message : String(error) }); }
 }
 export async function persistAnalyticsEvent(payload: AnalyticsPayload) {
   const prisma = getPrisma(); if (!prisma) return;
-  try { await prisma.analyticsEvent.create({ data: { name: payload.name, role: roleToDb(payload.role) as never, segment: payload.segment, source: payload.source, value: payload.value } }); }
+  try { await prisma.analyticsEvent.create({ data: { name: payload.name, role: roleToDb(payload.role) as never, segment: payload.segment, source: payload.source, value: payload.value as never } }); }
   catch (error) { logger.error("persist_analytics_event_failed", { error: error instanceof Error ? error.message : String(error) }); }
 }
