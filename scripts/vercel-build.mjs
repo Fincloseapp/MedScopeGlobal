@@ -19,11 +19,11 @@ execSync("prisma generate", { stdio: "inherit" });
 if (process.env.VERCEL === "1" && hasDatabaseEnv()) {
   try {
     console.log("Supabase database detected – running migrations...");
-    execSync("prisma migrate deploy", { stdio: "inherit", env: process.env });
+    execSync("npx prisma migrate deploy", { stdio: "inherit", env: process.env });
     console.log("Running seed...");
     execSync("node prisma/seed.mjs", { stdio: "inherit", env: process.env });
   } catch (migrateError) {
-    console.warn("⚠️  Migrate/seed skipped:", migrateError.message);
+    console.warn("⚠️  Build-time migrate/seed failed (will retry at runtime):", migrateError.message);
   }
 } else if (process.env.VERCEL === "1") {
   console.warn("");
