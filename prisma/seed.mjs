@@ -54,7 +54,6 @@ const users = [
   }
 ];
 
-const expert = users[0];
 const now = new Date();
 
 const sections = [
@@ -77,6 +76,12 @@ async function main() {
       update: {},
       create: user
     });
+  }
+
+  const expert = await prisma.portalUser.findUnique({ where: { email: "expert@lf1.cuni.cz" } });
+  if (!expert) {
+    console.log("Seed skipped – expert user missing.");
+    return;
   }
 
   const existingArticles = await prisma.portalArticle.count();

@@ -28,7 +28,7 @@ export default async function PortalHomePage() {
             </a>
             , pak spusťte <code>npm run setup:production</code>.
           </p>
-          <Link className="button" href="/api/portal/health">
+          <Link className="button" href="/api/portal/status">
             Stav systému
           </Link>
         </div>

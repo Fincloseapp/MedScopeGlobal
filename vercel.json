@@ -5,5 +5,8 @@
   "redirects": [
     { "source": "/en", "destination": "/portal", "permanent": false },
     { "source": "/en/:path*", "destination": "/portal", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/api/portal/health", "destination": "/api/portal/status" }
   ]
 }

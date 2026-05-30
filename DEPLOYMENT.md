@@ -55,7 +55,8 @@ Skript:
 ### 4. Ověření
 
 ```bash
-curl https://medscopeglobal.com/api/portal/health
+curl https://medscopeglobal.com/api/portal/status
+# alternativně: /api/portal/health (rewrite) nebo /api/portal/sources?status=1
 ```
 
 Očekávaná odpověď:
@@ -79,4 +80,6 @@ Pak:
 
 ## Health endpoint
 
-`GET /api/portal/health` – stav databáze a počty záznamů
+- `GET /api/portal/status` – stav databáze a počty záznamů
+- `GET /api/portal/health` – alias (rewrite → status)
+- `GET /api/portal/sources?status=1` – stejná odpověď

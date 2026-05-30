@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import { seedDemoAdmin, seedDemoExpert, seedDemoReader, generateArticle } from "./article-generator";
 import { mapUserToDb, mapArticleToDb } from "./db-mapper";
 import { getPrisma } from "@/lib/persistence";
@@ -12,9 +13,22 @@ function toJson<T>(value: T): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 }
 
+function runMigrations() {
+  try {
+    execSync("npx prisma migrate deploy", {
+      stdio: "pipe",
+      env: process.env
+    });
+  } catch {
+    // Migrations may already be applied or run during build.
+  }
+}
+
 async function runSeed() {
   const prisma = getPrisma();
   if (!prisma) return;
+
+  runMigrations();
 
   const existingUsers = await prisma.portalUser.count();
   if (existingUsers > 0) return;
