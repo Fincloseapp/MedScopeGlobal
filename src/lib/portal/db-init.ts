@@ -1,4 +1,3 @@
-import { execSync } from "node:child_process";
 import { seedDemoAdmin, seedDemoExpert, seedDemoReader, generateArticle } from "./article-generator";
 import { mapUserToDb, mapArticleToDb } from "./db-mapper";
 import { getPrisma } from "@/lib/persistence";
@@ -11,13 +10,6 @@ declare global {
 
 function toJson<T>(value: T): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
-}
-
-async function runMigrations() {
-  execSync("npx prisma migrate deploy", {
-    stdio: "pipe",
-    env: process.env
-  });
 }
 
 async function runSeed() {
@@ -62,12 +54,10 @@ async function runSeed() {
 export function ensurePortalDatabaseReady() {
   if (!hasDatabaseBackend()) return Promise.resolve();
   if (!globalThis.__medscopePortalDbInit) {
-    globalThis.__medscopePortalDbInit = runMigrations()
-      .then(runSeed)
-      .catch((error) => {
-        console.error("[portal-db-init]", error);
-        globalThis.__medscopePortalDbInit = undefined;
-      });
+    globalThis.__medscopePortalDbInit = runSeed().catch((error) => {
+      console.error("[portal-db-init]", error);
+      globalThis.__medscopePortalDbInit = undefined;
+    });
   }
   return globalThis.__medscopePortalDbInit;
 }
