@@ -18,5 +18,11 @@ export function jsonResponse(data: unknown, init?: ResponseInit) {
 }
 
 export function errorResponse(message: string, status = 400) {
+  if (message === "DATABASE_REQUIRED") {
+    return Response.json(
+      { error: "Databáze není nakonfigurována. Nastavte DATABASE_URL a DIRECT_URL ve Vercel.", code: "DATABASE_REQUIRED" },
+      { status: 503 }
+    );
+  }
   return Response.json({ error: message }, { status });
 }

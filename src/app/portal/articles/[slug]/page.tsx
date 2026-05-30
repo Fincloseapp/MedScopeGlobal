@@ -1,13 +1,15 @@
 import { notFound } from "next/navigation";
 import { ArticleReader } from "@/components/portal/article-reader";
-import { isVerifiedExpert } from "@/lib/portal/rbac";
+import { isVerifiedExpert, canReadArticle } from "@/lib/portal/rbac";
 import { getSessionUser } from "@/lib/portal/request";
-import { canReadArticle } from "@/lib/portal/rbac";
 import { getArticleBySlugFromStore, getRelatedArticles } from "@/lib/portal/repository";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function PortalArticleDetailPage({ params }: PageProps) {
   const { slug } = await params;

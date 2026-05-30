@@ -1,43 +1,57 @@
 # Nasazení: Supabase + Vercel + GitHub
 
-## 1. Supabase
+## Rychlý setup (doporučeno)
 
-1. V [Supabase Dashboard](https://supabase.com/dashboard) vytvořte projekt (region **EU** doporučen).
+### 1. Supabase
+
+1. [Supabase Dashboard](https://supabase.com/dashboard) → **New project** (region EU)
 2. **Project Settings → Database → Connection string**
 3. Zkopírujte:
    - **Transaction pooler** (port `6543`) → `DATABASE_URL`
-   - **Session/Direct** (port `5432`) → `DIRECT_URL`
+   - **Direct connection** (port `5432`) → `DIRECT_URL`
 
-## 2. Vercel
+### 2. Automatická konfigurace
 
-1. Importujte repo [Fincloseapp/MedScopeGlobal](https://github.com/Fincloseapp/MedScopeGlobal)
-2. Branch: `cursor/medical-portal-complete-da00` (nebo `main` po merge PR #6)
-3. **Settings → Environment Variables** (Production + Preview):
+```bash
+cp .env.production.local.example .env.production.local
+# vyplňte DATABASE_URL a DIRECT_URL ze Supabase
+npm run setup:production
+```
+
+Skript:
+- ověří připojení k DB
+- spustí migrace + seed (demo účty + článek)
+- nastaví env vars ve Vercel (po `vercel login`)
+
+### 3. Ruční nastavení ve Vercel
+
+**Settings → Environment Variables** (Production):
 
 | Proměnná | Hodnota |
 |----------|---------|
-| `DATABASE_URL` | Supabase pooler URL (port 6543, `?pgbouncer=true`) |
-| `DIRECT_URL` | Supabase direct URL (port 5432) |
+| `DATABASE_URL` | Supabase pooler (6543, `?pgbouncer=true`) |
+| `DIRECT_URL` | Supabase direct (5432) |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
 | `NEXT_PUBLIC_SITE_URL` | `https://medscopeglobal.com` |
 
-4. Deploy – build script automaticky spustí:
-   - `prisma generate`
-   - `prisma migrate deploy`
-   - `node prisma/seed.mjs` (demo účty + ukázkový článek)
-   - `next build`
+→ **Redeploy** production branch `main`
 
-## 3. GitHub
+### 4. Ověření
 
-- CI běží na push/PR (`npm run ci`)
-- Po merge PR #6 nastavte Vercel production branch na `main`
+```bash
+curl https://medscopeglobal.com/api/portal/health
+```
 
-## 4. Ověření po deployi
+Očekávaná odpověď:
+```json
+{"ok":true,"database":"connected","configured":true,"articles":1,"users":3}
+```
 
-1. Otevřete `/portal`
-2. Přihlaste se: `expert@lf1.cuni.cz` / `Expert123!`
-3. Vytvořte nebo publikujte článek v `/portal/manage`
-4. Ověřte persistenci – refresh stránky, data zůstanou (Supabase)
+Pak:
+1. `/portal` – bez varování o DB
+2. Login `expert@lf1.cuni.cz` / `Expert123!`
+3. Generování + publikace článku
+4. Uložení + hodnocení – data přetrvávají po refreshi
 
 ## Demo účty (seed)
 
@@ -46,3 +60,7 @@
 | Reader | reader@example.com | Reader123! |
 | Expert | expert@lf1.cuni.cz | Expert123! |
 | Admin | admin@medscopeglobal.com | Admin123! |
+
+## Health endpoint
+
+`GET /api/portal/health` – stav databáze a počty záznamů

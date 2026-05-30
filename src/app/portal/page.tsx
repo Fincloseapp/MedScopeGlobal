@@ -1,15 +1,31 @@
 import Link from "next/link";
+import { getDatabaseStatus } from "@/lib/portal/runtime";
 import { getSessionUser } from "@/lib/portal/request";
 import { listArticles, listSavedArticles } from "@/lib/portal/repository";
 import { isVerifiedExpert } from "@/lib/portal/rbac";
 
 export default async function PortalHomePage() {
   const user = await getSessionUser();
+  const dbStatus = getDatabaseStatus();
   const published = (await listArticles({ status: "published", sort: "newest" })).slice(0, 6);
   const saved = user ? await listSavedArticles(user.id) : [];
 
   return (
     <main className="section">
+      {dbStatus === "missing_in_production" ? (
+        <div className="card db-warning">
+          <p className="eyebrow">Produkční režim</p>
+          <h2>Databáze Supabase není připojena</h2>
+          <p>
+            Pro trvalé ukládání článků, registrací a hodnocení nastavte <code>DATABASE_URL</code> a{" "}
+            <code>DIRECT_URL</code> ve Vercel. Spusťte <code>npm run setup:production</code>.
+          </p>
+          <Link className="button" href="/api/portal/health">
+            Stav systému
+          </Link>
+        </div>
+      ) : null}
+
       <section className="hero portal-hero">
         <div>
           <p className="eyebrow">MedScopeGlobal Portal</p>

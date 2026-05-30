@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:vercel": "prisma generate && sh -c 'if [ -n \"$DIRECT_URL\" ] || [ -n \"$DATABASE_URL\" ]; then prisma migrate deploy && node prisma/seed.mjs; else echo \"Skipping DB setup – no DATABASE_URL\"; fi' && next build",
+    "build:vercel": "node scripts/vercel-build.mjs && next build",
+    "setup:production": "node scripts/setup-production.mjs",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

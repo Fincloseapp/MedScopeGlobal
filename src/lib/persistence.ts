@@ -4,12 +4,21 @@ import type { ContactSubmission, EventSubmission } from "./contact";
 import { logger } from "./logger";
 
 type GlobalWithPrisma = typeof globalThis & { prisma?: PrismaClient };
-function roleToDb(role?: string) { return role ? role.toUpperCase() : undefined; }
-function formatToDb(format: string) { return format === "in-person" ? "IN_PERSON" : format.toUpperCase(); }
+
+function roleToDb(role?: string) {
+  return role ? role.toUpperCase() : undefined;
+}
+
+function formatToDb(format: string) {
+  return format === "in-person" ? "IN_PERSON" : format.toUpperCase();
+}
+
 export function getPrisma() {
   if (!process.env.DATABASE_URL) return null;
   const globalForPrisma = globalThis as GlobalWithPrisma;
-  globalForPrisma.prisma ??= new PrismaClient();
+  globalForPrisma.prisma ??= new PrismaClient({
+    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"]
+  });
   return globalForPrisma.prisma;
 }
 export async function persistContactSubmission(kind: "general" | "partner", targetEmail: string, submission: ContactSubmission) {
