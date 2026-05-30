@@ -1,9 +1,11 @@
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 import type { AnalyticsPayload } from "./analytics";
 import type { ContactSubmission, EventSubmission } from "./contact";
 import { logger } from "./logger";
 
-type GlobalWithPrisma = typeof globalThis & { prisma?: PrismaClient };
+type GlobalWithPrisma = typeof globalThis & { prisma?: PrismaClient | null; prismaPool?: Pool };
 
 function roleToDb(role?: string) {
   return role ? role.toUpperCase() : undefined;
@@ -13,14 +15,48 @@ function formatToDb(format: string) {
   return format === "in-person" ? "IN_PERSON" : format.toUpperCase();
 }
 
+function shouldUseSsl(connectionString: string) {
+  if (/sslmode=(require|verify-full|verify-ca)/i.test(connectionString)) return { rejectUnauthorized: false };
+  if (connectionString.includes("supabase.com") || process.env.VERCEL === "1") return { rejectUnauthorized: false };
+  return undefined;
+}
+
+function createPrismaClient(): PrismaClient | null {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) return null;
+
+  try {
+    const globalForPrisma = globalThis as GlobalWithPrisma;
+    globalForPrisma.prismaPool ??= new Pool({
+      connectionString,
+      max: 1,
+      idleTimeoutMillis: 20_000,
+      connectionTimeoutMillis: 10_000,
+      ssl: shouldUseSsl(connectionString)
+    });
+
+    const adapter = new PrismaPg(globalForPrisma.prismaPool);
+    return new PrismaClient({
+      adapter,
+      log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"]
+    });
+  } catch (error) {
+    logger.error("prisma_client_init_failed", {
+      error: error instanceof Error ? error.message : String(error)
+    });
+    return null;
+  }
+}
+
 export function getPrisma() {
   if (!process.env.DATABASE_URL) return null;
   const globalForPrisma = globalThis as GlobalWithPrisma;
-  globalForPrisma.prisma ??= new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"]
-  });
+  if (globalForPrisma.prisma === undefined) {
+    globalForPrisma.prisma = createPrismaClient();
+  }
   return globalForPrisma.prisma;
 }
+
 export async function persistContactSubmission(kind: "general" | "partner", targetEmail: string, submission: ContactSubmission) {
   const prisma = getPrisma(); if (!prisma) return;
   try { await prisma.contactSubmission.create({ data: { name: submission.name, email: submission.email, organization: submission.organization, role: roleToDb(submission.role) as never, topic: submission.topic, message: submission.message, targetEmail, leadSource: submission.leadSource, leadQuality: kind === "partner" ? "high-value" : "standard" } }); }

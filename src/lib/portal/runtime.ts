@@ -9,7 +9,12 @@ export function hasDatabaseConfigured() {
 }
 
 export function hasDatabaseBackend() {
-  return Boolean(process.env.DATABASE_URL && getPrisma());
+  if (!process.env.DATABASE_URL) return false;
+  try {
+    return Boolean(getPrisma());
+  } catch {
+    return false;
+  }
 }
 
 export function shouldUseMemoryStore() {
@@ -23,6 +28,10 @@ export function getDatabaseStatus() {
   if (!hasDatabaseConfigured()) {
     return isProductionRuntime() ? "missing_in_production" : "not_configured";
   }
-  if (!getPrisma()) return "client_unavailable";
-  return "connected";
+  try {
+    if (!getPrisma()) return "client_unavailable";
+    return "connected";
+  } catch {
+    return "client_unavailable";
+  }
 }

@@ -54,9 +54,8 @@ async function runSeed() {
 export function ensurePortalDatabaseReady() {
   if (!hasDatabaseBackend()) return Promise.resolve();
   if (!globalThis.__medscopePortalDbInit) {
-    globalThis.__medscopePortalDbInit = runSeed().catch((error) => {
+    globalThis.__medscopePortalDbInit = runSeed().catch(() => {
       globalThis.__medscopePortalDbInit = undefined;
-      throw error;
     });
   }
   return globalThis.__medscopePortalDbInit;
