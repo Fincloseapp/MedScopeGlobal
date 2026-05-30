@@ -17,8 +17,16 @@ export default async function PortalHomePage() {
           <p className="eyebrow">Produkční režim</p>
           <h2>Databáze Supabase není připojena</h2>
           <p>
-            Pro trvalé ukládání článků, registrací a hodnocení nastavte <code>DATABASE_URL</code> a{" "}
-            <code>DIRECT_URL</code> ve Vercel. Spusťte <code>npm run setup:production</code>.
+            Projekt Supabase <strong>medscopeglobal</strong> (<code>xcydgqnivxfhprbmdyym</code>) je
+            připraven — ve Vercel nastavte <code>DATABASE_URL</code> a <code>DIRECT_URL</code> z{" "}
+            <a
+              href="https://supabase.com/dashboard/project/xcydgqnivxfhprbmdyym/settings/database"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Supabase Database settings
+            </a>
+            , pak spusťte <code>npm run setup:production</code>.
           </p>
           <Link className="button" href="/api/portal/health">
             Stav systému

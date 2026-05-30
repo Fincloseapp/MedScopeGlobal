@@ -1,14 +1,30 @@
 # Nasazení: Supabase + Vercel + GitHub
 
+## Projekt Supabase (medscopeglobal)
+
+| | |
+|---|---|
+| **Název** | medscopeglobal |
+| **Project ref** | `xcydgqnivxfhprbmdyym` |
+| **Region** | eu-central-1 (Frankfurt) |
+| **Database settings** | [otevřít v dashboardu](https://supabase.com/dashboard/project/xcydgqnivxfhprbmdyym/settings/database) |
+
 ## Rychlý setup (doporučeno)
 
-### 1. Supabase
+### 1. Supabase — connection stringy
 
-1. [Supabase Dashboard](https://supabase.com/dashboard) → **New project** (region EU)
-2. **Project Settings → Database → Connection string**
-3. Zkopírujte:
-   - **Transaction pooler** (port `6543`) → `DATABASE_URL`
+1. Otevřete [Database settings](https://supabase.com/dashboard/project/xcydgqnivxfhprbmdyym/settings/database)
+2. Pokud neznáte heslo: **Reset database password** a uložte si ho
+3. Z **Connection string** zkopírujte:
+   - **Transaction pooler** (port `6543`, URI mode) → `DATABASE_URL`
    - **Direct connection** (port `5432`) → `DIRECT_URL`
+
+Předvyplněné šablony (nahraďte `[PASSWORD]`):
+
+```env
+DATABASE_URL=postgresql://postgres.xcydgqnivxfhprbmdyym:[PASSWORD]@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+DIRECT_URL=postgresql://postgres:[PASSWORD]@db.xcydgqnivxfhprbmdyym.supabase.co:5432/postgres
+```
 
 ### 2. Automatická konfigurace
 

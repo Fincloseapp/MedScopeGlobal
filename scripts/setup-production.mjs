@@ -14,6 +14,9 @@ import { execSync, spawnSync } from "node:child_process";
 
 const envFile = ".env.production.local";
 const exampleFile = ".env.production.local.example";
+const SUPABASE_PROJECT_REF = "xcydgqnivxfhprbmdyym";
+const SUPABASE_DB_SETTINGS =
+  `https://supabase.com/dashboard/project/${SUPABASE_PROJECT_REF}/settings/database`;
 
 function loadEnvFile(path) {
   if (!existsSync(path)) return {};
@@ -32,9 +35,10 @@ function ensureExample() {
   if (existsSync(exampleFile)) return;
   writeFileSync(
     exampleFile,
-    `# Supabase → Project Settings → Database → Connection string
-DATABASE_URL=postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true
-DIRECT_URL=postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-eu-central-1.pooler.supabase.com:5432/postgres
+    `# Supabase project medscopeglobal (${SUPABASE_PROJECT_REF})
+# ${SUPABASE_DB_SETTINGS}
+DATABASE_URL=postgresql://postgres.${SUPABASE_PROJECT_REF}:[PASSWORD]@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+DIRECT_URL=postgresql://postgres:[PASSWORD]@db.${SUPABASE_PROJECT_REF}.supabase.co:5432/postgres
 AUTH_SECRET=
 NEXT_PUBLIC_SITE_URL=https://medscopeglobal.com
 `
@@ -52,12 +56,13 @@ function main() {
 
   if (!env.DATABASE_URL || !env.DIRECT_URL) {
     console.log("");
-    console.log("Chybí Supabase connection stringy.");
-    console.log(`1. Otevřete Supabase Dashboard → Project Settings → Database`);
-    console.log(`2. Zkopírujte Transaction pooler (6543) → DATABASE_URL`);
-    console.log(`3. Zkopírujte Direct connection (5432) → DIRECT_URL`);
-    console.log(`4. Uložte do souboru ${envFile} (vzor: ${exampleFile})`);
-    console.log(`5. Spusťte znovu: npm run setup:production`);
+    console.log("Chybí Supabase connection stringy pro projekt medscopeglobal.");
+    console.log(`1. Otevřete: ${SUPABASE_DB_SETTINGS}`);
+    console.log(`2. Reset database password (pokud heslo neznáte)`);
+    console.log(`3. Zkopírujte Transaction pooler (6543) → DATABASE_URL`);
+    console.log(`4. Zkopírujte Direct connection (5432) → DIRECT_URL`);
+    console.log(`5. Uložte do ${envFile} (vzor: ${exampleFile})`);
+    console.log(`6. Spusťte znovu: npm run setup:production`);
     console.log("");
     process.exit(1);
   }
