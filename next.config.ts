@@ -30,7 +30,7 @@ const nextConfig: NextConfig = {
   compress: true,
   serverExternalPackages: ["@prisma/client", "@prisma/adapter-pg", "pg", "prisma"],
   outputFileTracingIncludes: {
-    "/api/portal/**": ["./prisma/**", "./node_modules/.prisma/**", "./node_modules/prisma/**"]
+    "/api/**/*": ["./prisma/**"]
   },
   experimental: { optimizePackageImports: ["@sentry/nextjs", "zod"] },
   async headers() { return [{ source: "/(.*)", headers: securityHeaders }]; }

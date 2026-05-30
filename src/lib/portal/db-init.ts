@@ -1,8 +1,8 @@
-import { execSync } from "node:child_process";
 import { seedDemoAdmin, seedDemoExpert, seedDemoReader, generateArticle } from "./article-generator";
 import { mapUserToDb, mapArticleToDb } from "./db-mapper";
 import { getPrisma } from "@/lib/persistence";
 import { hasDatabaseBackend } from "./runtime";
+import { ensureDatabaseSchema } from "./schema-bootstrap";
 import type { Prisma } from "@prisma/client";
 
 declare global {
@@ -11,27 +11,6 @@ declare global {
 
 function toJson<T>(value: T): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
-}
-
-async function ensureSchema() {
-  const prisma = getPrisma();
-  if (!prisma) return;
-
-  try {
-    await prisma.$queryRawUnsafe('SELECT 1 FROM "PortalUser" LIMIT 1');
-    return;
-  } catch {
-    // Schema not present yet – bootstrap below.
-  }
-
-  if (process.env.VERCEL === "1") {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-  }
-
-  execSync("npx prisma db push --accept-data-loss", {
-    stdio: "pipe",
-    env: process.env
-  });
 }
 
 async function runSeed() {
@@ -76,7 +55,7 @@ async function runSeed() {
 export function ensurePortalDatabaseReady() {
   if (!hasDatabaseBackend()) return Promise.resolve();
   if (!globalThis.__medscopePortalDbInit) {
-    globalThis.__medscopePortalDbInit = ensureSchema()
+    globalThis.__medscopePortalDbInit = ensureDatabaseSchema()
       .then(runSeed)
       .catch((error) => {
         console.error("[portal-db-init]", error);
