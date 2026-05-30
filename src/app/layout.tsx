@@ -9,4 +9,21 @@ import { siteConfig } from "@/lib/site";
 import "./globals.css";
 export const metadata: Metadata = { metadataBase: new URL(siteConfig.url), title: { default: "MedScopeGlobal", template: "%s | MedScopeGlobal" }, description: siteConfig.description, applicationName: "MedScopeGlobal", alternates: { canonical: "/" }, openGraph: { type: "website", locale: siteConfig.locale, url: siteConfig.url, title: "MedScopeGlobal", description: siteConfig.description, siteName: "MedScopeGlobal", emails: [siteConfig.contactEmail, siteConfig.adsEmail] }, robots: { index: true, follow: true } };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#087f8c" };
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="cs" data-scroll-behavior="smooth"><body><JsonLd data={organizationJsonLd()} /><Header />{children}<Footer /><Suspense fallback={null}><AnalyticsProvider /></Suspense></body></html>; }
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html lang="cs" data-scroll-behavior="smooth">
+      <body>
+        <a className="skip-link" href="#main-content">
+          Přeskočit na obsah
+        </a>
+        <JsonLd data={organizationJsonLd()} />
+        <Header />
+        <div id="main-content">{children}</div>
+        <Footer />
+        <Suspense fallback={null}>
+          <AnalyticsProvider />
+        </Suspense>
+      </body>
+    </html>
+  );
+}
