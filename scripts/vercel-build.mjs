@@ -4,13 +4,25 @@ import { randomBytes } from "node:crypto";
 
 const hasDatabase = Boolean(process.env.DIRECT_URL || process.env.DATABASE_URL);
 
+function runStep(label, command) {
+  try {
+    execSync(command, { stdio: "inherit", env: process.env });
+    console.log(`✓ ${label}`);
+    return true;
+  } catch (error) {
+    console.warn(`⚠️  ${label} failed – build continues (runtime will use existing schema).`);
+    if (error instanceof Error && error.message) console.warn(error.message);
+    return false;
+  }
+}
+
 console.log("MedScopeGlobal Vercel build");
 execSync("prisma generate", { stdio: "inherit" });
 
 if (hasDatabase) {
   console.log("Database detected – running migrations and seed...");
-  execSync("prisma migrate deploy", { stdio: "inherit", env: process.env });
-  execSync("node prisma/seed.mjs", { stdio: "inherit", env: process.env });
+  runStep("Prisma migrate deploy", "prisma migrate deploy");
+  runStep("Portal seed", "node prisma/seed.mjs");
 } else if (process.env.VERCEL === "1") {
   console.warn("");
   console.warn("⚠️  DATABASE_URL / DIRECT_URL not set on Vercel.");

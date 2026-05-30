@@ -79,6 +79,12 @@ async function main() {
     });
   }
 
+  const expert = await prisma.portalUser.findUnique({ where: { email: "expert@lf1.cuni.cz" } });
+  if (!expert) {
+    console.log("Seed skipped – expert user missing.");
+    return;
+  }
+
   const existingArticles = await prisma.portalArticle.count();
   if (existingArticles > 0) {
     console.log("Seed skipped – articles already exist.");
