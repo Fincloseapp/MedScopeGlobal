@@ -1,7 +1,7 @@
 import { generateArticle } from "@/lib/portal/article-generator";
 import { hasPermission } from "@/lib/portal/rbac";
 import { errorResponse, getSessionUserFromRequest, jsonResponse } from "@/lib/portal/request";
-import { createArticle } from "@/lib/portal/store";
+import { createArticle } from "@/lib/portal/repository";
 import { generateArticleSchema } from "@/lib/portal/validation";
 
 export async function POST(request: Request) {
@@ -15,6 +15,6 @@ export async function POST(request: Request) {
   if (!parsed.success) return errorResponse(parsed.error.issues[0]?.message ?? "Neplatná data");
 
   const generated = generateArticle(parsed.data, user.id, user.name);
-  const article = createArticle({ ...generated, ratingSum: 0, ratingCount: 0 });
+  const article = await createArticle({ ...generated, ratingSum: 0, ratingCount: 0 });
   return jsonResponse({ article }, { status: 201 });
 }

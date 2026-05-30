@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { getSessionUser } from "@/lib/portal/request";
-import { listArticles, listSavedArticles } from "@/lib/portal/store";
+import { listArticles, listSavedArticles } from "@/lib/portal/repository";
 import { isVerifiedExpert } from "@/lib/portal/rbac";
 
 export default async function PortalHomePage() {
   const user = await getSessionUser();
-  const published = listArticles({ status: "published", sort: "newest" }).slice(0, 6);
-  const saved = user ? listSavedArticles(user.id) : [];
+  const published = (await listArticles({ status: "published", sort: "newest" })).slice(0, 6);
+  const saved = user ? await listSavedArticles(user.id) : [];
 
   return (
     <main className="section">

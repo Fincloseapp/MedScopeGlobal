@@ -1,7 +1,7 @@
 import { createArticleId } from "@/lib/portal/auth";
 import { hasPermission } from "@/lib/portal/rbac";
 import { errorResponse, getSessionUserFromRequest, jsonResponse } from "@/lib/portal/request";
-import { createArticle, listArticles } from "@/lib/portal/store";
+import { createArticle, listArticles } from "@/lib/portal/repository";
 import { articleInputSchema } from "@/lib/portal/validation";
 import type { ArticleFilters, PortalArticle } from "@/lib/portal/types";
 
@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     from: searchParams.get("from") ?? undefined,
     to: searchParams.get("to") ?? undefined
   };
-  const articles = listArticles(filters, user?.id, user?.role);
+  const articles = await listArticles(filters, user?.id, user?.role);
   return jsonResponse({ articles, total: articles.length });
 }
 
@@ -53,5 +53,5 @@ export async function POST(request: Request) {
     ratingCount: 0
   };
 
-  return jsonResponse({ article: createArticle(article) }, { status: 201 });
+  return jsonResponse({ article: await createArticle(article) }, { status: 201 });
 }

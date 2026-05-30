@@ -1,7 +1,7 @@
 import { hashPassword, createSessionToken, createUserId, toSessionUser } from "@/lib/portal/auth";
 import { errorResponse, jsonResponse } from "@/lib/portal/request";
 import { resolveVerificationStatus } from "@/lib/portal/rbac";
-import { createUser, getUserByEmail } from "@/lib/portal/store";
+import { createUser, getUserByEmail } from "@/lib/portal/repository";
 import { registerSchema } from "@/lib/portal/validation";
 
 export async function POST(request: Request) {
@@ -9,10 +9,10 @@ export async function POST(request: Request) {
   const parsed = registerSchema.safeParse(body);
   if (!parsed.success) return errorResponse(parsed.error.issues[0]?.message ?? "Neplatná data");
 
-  if (getUserByEmail(parsed.data.email)) return errorResponse("Uživatel s tímto e-mailem již existuje", 409);
+  if (await getUserByEmail(parsed.data.email)) return errorResponse("Uživatel s tímto e-mailem již existuje", 409);
 
   const verificationStatus = resolveVerificationStatus(parsed.data.email, parsed.data.role);
-  const user = createUser({
+  const user = await createUser({
     id: createUserId(),
     email: parsed.data.email.toLowerCase(),
     passwordHash: hashPassword(parsed.data.password),

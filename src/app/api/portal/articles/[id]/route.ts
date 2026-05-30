@@ -1,6 +1,6 @@
 import { canEditArticle, canReadArticle, hasPermission } from "@/lib/portal/rbac";
 import { errorResponse, getSessionUserFromRequest, jsonResponse } from "@/lib/portal/request";
-import { deleteArticle, getArticleById, updateArticle } from "@/lib/portal/store";
+import { deleteArticle, getArticleById, updateArticle } from "@/lib/portal/repository";
 import { articleInputSchema } from "@/lib/portal/validation";
 
 interface RouteParams {
@@ -10,7 +10,7 @@ interface RouteParams {
 export async function GET(request: Request, { params }: RouteParams) {
   const { id } = await params;
   const user = getSessionUserFromRequest(request);
-  const article = getArticleById(id);
+  const article = await getArticleById(id);
   if (!article) return errorResponse("Článek nenalezen", 404);
   if (!canReadArticle(article.status, user)) return errorResponse("Článek není dostupný", 403);
   return jsonResponse({ article });
@@ -21,7 +21,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
   const user = getSessionUserFromRequest(request);
   if (!user || !hasPermission(user, "articles:edit")) return errorResponse("Nemáte oprávnění editovat články", 403);
 
-  const article = getArticleById(id);
+  const article = await getArticleById(id);
   if (!article) return errorResponse("Článek nenalezen", 404);
   if (!canEditArticle(article.authorId, user)) return errorResponse("Můžete editovat pouze vlastní články", 403);
 
@@ -29,7 +29,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
   const parsed = articleInputSchema.safeParse(body);
   if (!parsed.success) return errorResponse(parsed.error.issues[0]?.message ?? "Neplatná data");
 
-  const updated = updateArticle(id, {
+  const updated = await updateArticle(id, {
     title: parsed.data.title,
     summary: parsed.data.summary,
     sections: parsed.data.sections,
@@ -50,10 +50,10 @@ export async function DELETE(request: Request, { params }: RouteParams) {
   const user = getSessionUserFromRequest(request);
   if (!user || !hasPermission(user, "articles:delete")) return errorResponse("Nemáte oprávnění mazat články", 403);
 
-  const article = getArticleById(id);
+  const article = await getArticleById(id);
   if (!article) return errorResponse("Článek nenalezen", 404);
   if (!canEditArticle(article.authorId, user)) return errorResponse("Můžete mazat pouze vlastní články", 403);
 
-  deleteArticle(id);
+  await deleteArticle(id);
   return jsonResponse({ ok: true });
 }

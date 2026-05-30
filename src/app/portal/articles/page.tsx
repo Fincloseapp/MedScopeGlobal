@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { medicalSpecializations } from "@/lib/portal/specializations";
 import { getSessionUser } from "@/lib/portal/request";
-import { listArticles } from "@/lib/portal/store";
+import { listArticles } from "@/lib/portal/repository";
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -17,7 +17,7 @@ export default async function PortalArticlesPage({ searchParams }: PageProps) {
   const query = first(params.q);
   const specialization = first(params.specialization);
   const sort = first(params.sort) as "newest" | "oldest" | "relevance" | "rating" | "";
-  const articles = listArticles(
+  const articles = await listArticles(
     {
       query: query || undefined,
       specialization: specialization || undefined,

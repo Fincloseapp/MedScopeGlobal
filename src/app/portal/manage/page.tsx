@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { isVerifiedExpert } from "@/lib/portal/rbac";
 import { getSessionUser } from "@/lib/portal/request";
-import { listArticles } from "@/lib/portal/store";
+import { listArticles } from "@/lib/portal/repository";
 
 export default async function PortalManagePage() {
   const user = await getSessionUser();
@@ -21,7 +21,7 @@ export default async function PortalManagePage() {
     );
   }
 
-  const articles = listArticles({ authorId: user.role === "admin" ? undefined : user.id }, user.id, user.role);
+  const articles = await listArticles({ authorId: user.role === "admin" ? undefined : user.id }, user.id, user.role);
 
   return (
     <main className="section">

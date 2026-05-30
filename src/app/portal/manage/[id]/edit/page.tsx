@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { ArticleEditor } from "@/components/portal/article-editor";
 import { canEditArticle, isVerifiedExpert } from "@/lib/portal/rbac";
 import { getSessionUser } from "@/lib/portal/request";
-import { getArticleById } from "@/lib/portal/store";
+import { getArticleById } from "@/lib/portal/repository";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -14,7 +14,7 @@ export default async function EditArticlePage({ params }: PageProps) {
   if (!user) redirect("/auth/login");
   if (!isVerifiedExpert(user)) redirect("/portal/manage");
 
-  const article = getArticleById(id);
+  const article = await getArticleById(id);
   if (!article) notFound();
   if (!canEditArticle(article.authorId, user)) notFound();
 

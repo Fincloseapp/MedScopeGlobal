@@ -1,6 +1,6 @@
 import { hasPermission } from "@/lib/portal/rbac";
 import { errorResponse, getSessionUserFromRequest, jsonResponse } from "@/lib/portal/request";
-import { getArticleById, rateArticle, getUserRating } from "@/lib/portal/store";
+import { getArticleById, rateArticle, getUserRating } from "@/lib/portal/repository";
 import { ratingSchema } from "@/lib/portal/validation";
 
 interface RouteParams {
@@ -12,13 +12,13 @@ export async function POST(request: Request, { params }: RouteParams) {
   const user = getSessionUserFromRequest(request);
   if (!user || !hasPermission(user, "articles:rate")) return errorResponse("Pro hodnocení se přihlaste", 401);
 
-  const article = getArticleById(id);
+  const article = await getArticleById(id);
   if (!article || article.status !== "published") return errorResponse("Článek nenalezen", 404);
 
   const body = await request.json().catch(() => null);
   const parsed = ratingSchema.safeParse(body);
   if (!parsed.success) return errorResponse(parsed.error.issues[0]?.message ?? "Neplatné hodnocení");
 
-  const updated = rateArticle(user.id, id, parsed.data.score);
-  return jsonResponse({ article: updated, userRating: getUserRating(user.id, id) });
+  const updated = await rateArticle(user.id, id, parsed.data.score);
+  return jsonResponse({ article: updated, userRating: await getUserRating(user.id, id) });
 }
