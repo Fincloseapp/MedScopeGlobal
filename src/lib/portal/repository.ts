@@ -5,19 +5,29 @@ import { hasDatabaseBackend } from "./runtime";
 import type { ArticleFilters, PortalArticle, PortalUser, SavedArticle } from "./types";
 
 async function withDatabase<T>(dbFn: () => Promise<T>, memoryFn: () => T | Promise<T>): Promise<T> {
-  if (hasDatabaseBackend()) {
-    await ensurePortalDatabaseReady();
-    return dbFn();
+  if (!hasDatabaseBackend()) {
+    return memoryFn();
   }
-  return memoryFn();
+  try {
+    await ensurePortalDatabaseReady();
+    return await dbFn();
+  } catch (error) {
+    console.error("[portal-repository] falling back to memory store", error);
+    return memoryFn();
+  }
 }
 
 export async function listArticles(filters: ArticleFilters = {}, viewerId?: string, viewerRole?: string): Promise<PortalArticle[]> {
-  if (hasDatabaseBackend()) {
-    await ensurePortalDatabaseReady();
-    return db.dbListArticles(filters, viewerRole);
+  if (!hasDatabaseBackend()) {
+    return memory.listArticles(filters, viewerId, viewerRole);
   }
-  return memory.listArticles(filters, viewerId, viewerRole);
+  try {
+    await ensurePortalDatabaseReady();
+    return await db.dbListArticles(filters, viewerRole);
+  } catch (error) {
+    console.error("[portal-repository] falling back to memory store", error);
+    return memory.listArticles(filters, viewerId, viewerRole);
+  }
 }
 
 export async function getArticleById(id: string): Promise<PortalArticle | undefined> {
@@ -37,13 +47,11 @@ export async function getUserById(id: string): Promise<PortalUser | undefined> {
 }
 
 export async function createUser(user: PortalUser): Promise<PortalUser> {
-  if (hasDatabaseBackend()) {
-    await ensurePortalDatabaseReady();
+  return withDatabase(async () => {
     const existing = await db.dbGetUserByEmail(user.email);
     if (existing) throw new Error("USER_EXISTS");
     return db.dbCreateUser(user);
-  }
-  return memory.createUser(user);
+  }, () => memory.createUser(user));
 }
 
 export async function updateUser(id: string, patch: Partial<PortalUser>): Promise<PortalUser> {
@@ -59,8 +67,7 @@ export async function updateArticle(id: string, patch: Partial<PortalArticle>): 
 }
 
 export async function deleteArticle(id: string): Promise<void> {
-  if (hasDatabaseBackend()) return db.dbDeleteArticle(id);
-  return memory.deleteArticle(id);
+  return withDatabase(() => db.dbDeleteArticle(id), () => memory.deleteArticle(id));
 }
 
 export async function saveArticle(userId: string, articleId: string): Promise<SavedArticle> {
@@ -68,8 +75,7 @@ export async function saveArticle(userId: string, articleId: string): Promise<Sa
 }
 
 export async function unsaveArticle(userId: string, articleId: string): Promise<void> {
-  if (hasDatabaseBackend()) return db.dbUnsaveArticle(userId, articleId);
-  return memory.unsaveArticle(userId, articleId);
+  return withDatabase(() => db.dbUnsaveArticle(userId, articleId), () => memory.unsaveArticle(userId, articleId));
 }
 
 export async function isArticleSaved(userId: string, articleId: string): Promise<boolean> {

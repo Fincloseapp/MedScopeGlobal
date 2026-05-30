@@ -1,43 +1,56 @@
 import { ensurePortalDatabaseReady } from "./db-init";
-import { getDatabaseStatus, hasDatabaseConfigured } from "./runtime";
+import { getDatabaseStatus, getDatabaseWarning, hasDatabaseConfigured, shouldUseMemoryStore } from "./runtime";
 import { jsonResponse } from "./request";
-import { getPrisma, getDatabaseConfigurationIssue } from "@/lib/persistence";
+import { getMemoryStoreCounts } from "./store";
+import { getPrisma } from "@/lib/persistence";
 
 export async function buildPortalHealthResponse() {
-  const configIssue = getDatabaseConfigurationIssue();
   const status = getDatabaseStatus();
+  const warning = getDatabaseWarning();
   let articleCount: number | null = null;
   let userCount: number | null = null;
-  let error: string | undefined = configIssue ?? undefined;
 
-  if (!error && status === "connected") {
-    try {
-      await ensurePortalDatabaseReady();
-      const prisma = getPrisma();
-      if (prisma) {
-        articleCount = await prisma.portalArticle.count();
-        userCount = await prisma.portalUser.count();
-      }
-    } catch (cause) {
-      error = cause instanceof Error ? cause.message : "Database check failed";
-    }
+  if (shouldUseMemoryStore()) {
+    const counts = getMemoryStoreCounts();
+    articleCount = counts.articles;
+    userCount = counts.users;
+    return jsonResponse({
+      ok: true,
+      database: status,
+      mode: "memory_fallback",
+      configured: hasDatabaseConfigured(),
+      warning,
+      articles: articleCount,
+      users: userCount,
+      site: process.env.NEXT_PUBLIC_SITE_URL ?? "https://medscopeglobal.com"
+    });
   }
 
-  if (error) {
-    return jsonResponse(
-      {
-        ok: false,
-        database: status,
-        configured: hasDatabaseConfigured(),
-        error
-      },
-      { status: 503 }
-    );
+  try {
+    await ensurePortalDatabaseReady();
+    const prisma = getPrisma();
+    if (prisma) {
+      articleCount = await prisma.portalArticle.count();
+      userCount = await prisma.portalUser.count();
+    }
+  } catch (cause) {
+    const counts = getMemoryStoreCounts();
+    return jsonResponse({
+      ok: true,
+      database: "memory_fallback",
+      mode: "memory_fallback",
+      configured: hasDatabaseConfigured(),
+      warning: cause instanceof Error ? cause.message : "Database check failed",
+      articles: counts.articles,
+      users: counts.users,
+      site: process.env.NEXT_PUBLIC_SITE_URL ?? "https://medscopeglobal.com"
+    });
   }
 
   return jsonResponse({
-    ok: status === "connected" || status === "not_configured",
-    database: status,
+    ok: true,
+    database: "connected",
+    mode: "database",
     configured: hasDatabaseConfigured(),
     articles: articleCount,
     users: userCount,

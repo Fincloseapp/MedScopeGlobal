@@ -34,6 +34,14 @@ export function getPortalStore(): PortalStore {
   return globalThis.__medscopePortalStore;
 }
 
+export function getMemoryStoreCounts() {
+  const store = getPortalStore();
+  return {
+    articles: store.articles.size,
+    users: store.users.size
+  };
+}
+
 export function resetPortalStore() {
   globalThis.__medscopePortalStore = createStore();
   seedPortalStore(globalThis.__medscopePortalStore);

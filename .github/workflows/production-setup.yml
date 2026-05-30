@@ -1,0 +1,72 @@
+name: Production Setup
+
+on:
+  workflow_dispatch:
+
+jobs:
+  configure-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Validate database connection
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ] || [ -z "$DIRECT_URL" ]; then
+            echo "Missing DATABASE_URL or DIRECT_URL repository secrets."
+            exit 1
+          fi
+          if echo "$DATABASE_URL$DIRECT_URL" | grep -q '\[PASSWORD\]'; then
+            echo "Connection strings still contain [PASSWORD] placeholder."
+            exit 1
+          fi
+          npx prisma migrate deploy
+          node prisma/seed.mjs
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel settings
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Sync production environment variables
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+        run: |
+          for key in DATABASE_URL DIRECT_URL AUTH_SECRET NEXT_PUBLIC_SITE_URL; do
+            value="${!key}"
+            if [ "$key" = "NEXT_PUBLIC_SITE_URL" ] && [ -z "$value" ]; then
+              value="https://medscopeglobal.com"
+            fi
+            if [ -n "$value" ]; then
+              printf '%s' "$value" | vercel env add "$key" production --force --token="$VERCEL_TOKEN"
+            fi
+          done
+
+      - name: Deploy to production
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prod --token="$VERCEL_TOKEN"
+
+      - name: Verify health endpoint
+        run: |
+          sleep 30
+          curl --fail --retry 5 --retry-delay 10 https://medscopeglobal.com/api/portal/health

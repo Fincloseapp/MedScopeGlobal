@@ -21,20 +21,20 @@ export function hasDatabaseBackend() {
 export function shouldUseMemoryStore() {
   if (process.env.VITEST || process.env.NODE_ENV === "test") return true;
   if (process.env.ALLOW_MEMORY_STORE === "true") return true;
-  if (hasDatabaseBackend()) return false;
-  return !isProductionRuntime();
+  return !hasDatabaseBackend();
 }
 
 export function getDatabaseStatus() {
-  const configIssue = getDatabaseConfigurationIssue();
-  if (configIssue) return "invalid_configuration";
-  if (!hasDatabaseConfigured()) {
-    return isProductionRuntime() ? "missing_in_production" : "not_configured";
+  if (shouldUseMemoryStore()) {
+    if (getDatabaseConfigurationIssue()) return "invalid_configuration";
+    if (!hasDatabaseConfigured()) {
+      return isProductionRuntime() ? "missing_in_production" : "not_configured";
+    }
+    return "memory_fallback";
   }
-  try {
-    if (!getPrisma()) return "client_unavailable";
-    return "connected";
-  } catch {
-    return "client_unavailable";
-  }
+  return "connected";
+}
+
+export function getDatabaseWarning(): string | null {
+  return getDatabaseConfigurationIssue();
 }

@@ -12,13 +12,18 @@ export default async function PortalHomePage() {
 
   return (
     <main className="section">
-      {dbStatus === "missing_in_production" ? (
+      {(dbStatus === "missing_in_production" || dbStatus === "invalid_configuration" || dbStatus === "memory_fallback") ? (
         <div className="card db-warning">
           <p className="eyebrow">Produkční režim</p>
-          <h2>Databáze Supabase není připojena</h2>
+          <h2>{dbStatus === "invalid_configuration" ? "Supabase connection string není správně nastaven" : "Portál běží v demo režimu"}</h2>
           <p>
-            Projekt Supabase <strong>medscopeglobal</strong> (<code>xcydgqnivxfhprbmdyym</code>) je
-            připraven — ve Vercel nastavte <code>DATABASE_URL</code> a <code>DIRECT_URL</code> z{" "}
+            {dbStatus === "invalid_configuration" ? (
+              <>
+                Ve Vercel je stále placeholder <code>[PASSWORD]</code>. Nahraďte skutečným heslem ze{" "}
+              </>
+            ) : (
+              <>Pro plnou persistenci dat nastavte <code>DATABASE_URL</code> a <code>DIRECT_URL</code> z </>
+            )}
             <a
               href="https://supabase.com/dashboard/project/xcydgqnivxfhprbmdyym/settings/database"
               rel="noopener noreferrer"
@@ -26,7 +31,12 @@ export default async function PortalHomePage() {
             >
               Supabase Database settings
             </a>
-            , pak spusťte <code>npm run setup:production</code>.
+            {dbStatus === "invalid_configuration" ? (
+              <>, pak redeploy.</>
+            ) : (
+              <>, pak spusťte <code>npm run setup:production</code>.</>
+            )}
+            {" "}Do opravy portál funguje s demo daty v paměti (účty níže).
           </p>
           <Link className="button" href="/api/portal/health">
             Stav systému
