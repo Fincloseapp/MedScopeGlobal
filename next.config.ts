@@ -28,7 +28,10 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
-  serverExternalPackages: ["@prisma/client", "@prisma/adapter-pg", "pg"],
+  serverExternalPackages: ["@prisma/client", "@prisma/adapter-pg", "pg", "prisma"],
+  outputFileTracingIncludes: {
+    "/api/portal/**": ["./prisma/**", "./node_modules/.prisma/**", "./node_modules/prisma/**"]
+  },
   experimental: { optimizePackageImports: ["@sentry/nextjs", "zod"] },
   async headers() { return [{ source: "/(.*)", headers: securityHeaders }]; }
 };

@@ -23,12 +23,11 @@ execSync("prisma generate", { stdio: "inherit" });
 if (process.env.VERCEL === "1" && hasDatabaseEnv()) {
   try {
     console.log("Supabase database detected – syncing schema...");
-    execSync("npx prisma db push --skip-generate --accept-data-loss", { stdio: "inherit", env: process.env });
+    execSync("npx prisma db push --accept-data-loss", { stdio: "inherit", env: process.env });
     console.log("Running seed...");
     execSync("node prisma/seed.mjs", { stdio: "inherit", env: process.env });
   } catch (error) {
-    console.error("❌ Database setup failed during build:", error.message);
-    process.exitCode = 1;
+    console.warn("⚠️  Build-time database setup failed (runtime bootstrap will retry):", error.message);
   }
 } else if (process.env.VERCEL === "1") {
   console.warn("");
