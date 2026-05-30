@@ -1,12 +1,15 @@
-import { getPrisma, getDatabaseConfigurationIssue } from "@/lib/persistence";
+import { getDatabaseConfigurationIssue, getDatabaseEnvSource, hasDatabaseEnvConfigured } from "@/lib/database-env";
+import { getPrisma } from "@/lib/persistence";
 
 export function isProductionRuntime() {
   return process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production";
 }
 
 export function hasDatabaseConfigured() {
-  return Boolean(process.env.DATABASE_URL || process.env.DIRECT_URL);
+  return hasDatabaseEnvConfigured();
 }
+
+export { getDatabaseEnvSource };
 
 export function hasDatabaseBackend() {
   if (getDatabaseConfigurationIssue()) return false;

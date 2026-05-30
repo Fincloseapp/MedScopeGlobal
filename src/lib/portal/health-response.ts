@@ -1,5 +1,5 @@
 import { ensurePortalDatabaseReady } from "./db-init";
-import { getDatabaseStatus, getDatabaseWarning, hasDatabaseConfigured, shouldUseMemoryStore } from "./runtime";
+import { getDatabaseEnvSource, getDatabaseStatus, getDatabaseWarning, hasDatabaseConfigured, shouldUseMemoryStore } from "./runtime";
 import { jsonResponse } from "./request";
 import { getMemoryStoreCounts } from "./store";
 import { getPrisma } from "@/lib/persistence";
@@ -19,6 +19,7 @@ export async function buildPortalHealthResponse() {
       database: status,
       mode: "memory_fallback",
       configured: hasDatabaseConfigured(),
+      envSource: getDatabaseEnvSource(),
       warning,
       articles: articleCount,
       users: userCount,
@@ -52,6 +53,7 @@ export async function buildPortalHealthResponse() {
     database: "connected",
     mode: "database",
     configured: hasDatabaseConfigured(),
+    envSource: getDatabaseEnvSource(),
     articles: articleCount,
     users: userCount,
     site: process.env.NEXT_PUBLIC_SITE_URL ?? "https://medscopeglobal.com"

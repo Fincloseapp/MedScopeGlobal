@@ -3,11 +3,25 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 import type { AnalyticsPayload } from "./analytics";
 import type { ContactSubmission, EventSubmission } from "./contact";
+import {
+  getDatabaseConfigurationIssue,
+  hasDatabaseEnvConfigured,
+  hasPlaceholderConnectionString,
+  resolveRuntimeConnectionString
+} from "./database-env";
 import { logger } from "./logger";
 
-type GlobalWithPrisma = typeof globalThis & { prisma?: PrismaClient | null; prismaPool?: Pool };
+export {
+  getDatabaseConfigurationIssue,
+  getDatabaseEnvSource,
+  getResolvedDatabaseUrls,
+  hasDatabaseEnvConfigured,
+  hasPlaceholderConnectionString,
+  resolveMigrationConnectionString,
+  resolveRuntimeConnectionString
+} from "./database-env";
 
-const PLACEHOLDER_PATTERN = /\[(PASSWORD|REF|HESLO)\]/i;
+type GlobalWithPrisma = typeof globalThis & { prisma?: PrismaClient | null; prismaPool?: Pool };
 
 function roleToDb(role?: string) {
   return role ? role.toUpperCase() : undefined;
@@ -17,44 +31,14 @@ function formatToDb(format: string) {
   return format === "in-person" ? "IN_PERSON" : format.toUpperCase();
 }
 
-export function hasPlaceholderConnectionString(value?: string) {
-  return Boolean(value && PLACEHOLDER_PATTERN.test(value));
-}
-
-export function getDatabaseConfigurationIssue(): string | null {
-  const databaseUrl = process.env.DATABASE_URL;
-  const directUrl = process.env.DIRECT_URL;
-
-  if (!databaseUrl && !directUrl) {
-    return "DATABASE_URL a DIRECT_URL nejsou nastaveny ve Vercel.";
-  }
-  if (hasPlaceholderConnectionString(databaseUrl) || hasPlaceholderConnectionString(directUrl)) {
-    return "Connection string obsahuje placeholder [PASSWORD] – nahraďte skutečným heslem ze Supabase dashboardu.";
-  }
-  return null;
-}
-
 function shouldUseSsl(connectionString: string) {
   if (/sslmode=(require|verify-full|verify-ca)/i.test(connectionString)) return { rejectUnauthorized: false };
   if (connectionString.includes("supabase.com") || process.env.VERCEL === "1") return { rejectUnauthorized: false };
   return undefined;
 }
 
-function resolveConnectionString(): string | null {
-  const configIssue = getDatabaseConfigurationIssue();
-  if (configIssue) return null;
-
-  const direct = process.env.DIRECT_URL;
-  const pooled = process.env.DATABASE_URL;
-
-  // On Vercel, direct connection is more reliable with node-postgres than transaction pooler (6543).
-  if (process.env.VERCEL === "1" && direct) return direct;
-  if (pooled) return pooled;
-  return direct ?? null;
-}
-
 function createPrismaClient(): PrismaClient | null {
-  const connectionString = resolveConnectionString();
+  const connectionString = resolveRuntimeConnectionString();
   if (!connectionString) return null;
 
   try {
@@ -81,7 +65,7 @@ function createPrismaClient(): PrismaClient | null {
 }
 
 export function getPrisma() {
-  if (!process.env.DATABASE_URL && !process.env.DIRECT_URL) return null;
+  if (!hasDatabaseEnvConfigured()) return null;
   if (getDatabaseConfigurationIssue()) return null;
   const globalForPrisma = globalThis as GlobalWithPrisma;
   if (globalForPrisma.prisma === undefined) {
