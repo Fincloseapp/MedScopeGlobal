@@ -2,6 +2,10 @@ import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 
+if (process.env.VERCEL === "1") {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
+
 function resolveMigrationUrl() {
   return [
     process.env.POSTGRES_URL_NON_POOLING,

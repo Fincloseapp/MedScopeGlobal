@@ -11,6 +11,10 @@ import {
 } from "./database-env";
 import { logger } from "./logger";
 
+if (process.env.VERCEL === "1") {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
+
 export {
   getDatabaseConfigurationIssue,
   getDatabaseEnvSource,
