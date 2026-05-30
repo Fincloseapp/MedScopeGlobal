@@ -13,6 +13,25 @@ enum UserRole {
   PARTNER
 }
 
+enum PortalRole {
+  READER
+  EXPERT
+  ADMIN
+}
+
+enum VerificationStatus {
+  NOT_REQUIRED
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
 enum EventFormat {
   ONLINE
   HYBRID
@@ -44,6 +63,75 @@ model Article {
   @@index([publishedAt])
   @@index([specialization])
   @@index([audience])
+}
+
+model PortalUser {
+  id                 String             @id @default(cuid())
+  email              String             @unique
+  passwordHash       String
+  name               String
+  role               PortalRole         @default(READER)
+  verificationStatus VerificationStatus @default(NOT_REQUIRED)
+  institution        String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  articles           PortalArticle[]
+  ratings            ArticleRating[]
+  savedArticles      SavedArticle[]
+}
+
+model PortalArticle {
+  id                      String        @id @default(cuid())
+  slug                    String        @unique
+  title                   String
+  summary                 String
+  sections                Json
+  clinicalSignificance    String
+  practiceRecommendations String
+  citations               Json
+  tags                    String[]
+  icdCodes                String[]
+  specialization          String
+  status                  ArticleStatus @default(DRAFT)
+  authorId                String
+  author                  PortalUser    @relation(fields: [authorId], references: [id])
+  authorName              String
+  publishedAt             DateTime?
+  validatedById           String?
+  validatedAt             DateTime?
+  readingTime             Int           @default(5)
+  ratingSum               Int           @default(0)
+  ratingCount             Int           @default(0)
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+  ratings                 ArticleRating[]
+  savedBy                 SavedArticle[]
+
+  @@index([status])
+  @@index([specialization])
+  @@index([publishedAt])
+  @@index([authorId])
+}
+
+model ArticleRating {
+  userId    String
+  articleId String
+  score     Int
+  createdAt DateTime      @default(now())
+  user      PortalUser    @relation(fields: [userId], references: [id])
+  article   PortalArticle @relation(fields: [articleId], references: [id])
+
+  @@id([userId, articleId])
+}
+
+model SavedArticle {
+  userId    String
+  articleId String
+  savedAt   DateTime      @default(now())
+  user      PortalUser    @relation(fields: [userId], references: [id])
+  article   PortalArticle @relation(fields: [articleId], references: [id])
+
+  @@id([userId, articleId])
 }
 
 model Event {

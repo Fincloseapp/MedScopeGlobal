@@ -9,9 +9,10 @@ export const siteConfig = {
 
 export const navItems = [
   { href: "/", label: "Domů" },
-  { href: "/articles", label: "Články" },
+  { href: "/portal", label: "Portál" },
+  { href: "/portal/articles", label: "Články" },
+  { href: "/articles", label: "Monitoring" },
   { href: "/events", label: "Události" },
-  { href: "/b2b", label: "Pro B2B" },
-  { href: "/dashboard", label: "Growth" },
+  { href: "/auth/login", label: "Přihlášení" },
   { href: "/contact", label: "Kontakt" }
 ] as const;
