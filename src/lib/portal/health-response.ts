@@ -1,15 +1,16 @@
 import { ensurePortalDatabaseReady } from "./db-init";
 import { getDatabaseStatus, hasDatabaseConfigured } from "./runtime";
 import { jsonResponse } from "./request";
-import { getPrisma } from "@/lib/persistence";
+import { getPrisma, getDatabaseConfigurationIssue } from "@/lib/persistence";
 
 export async function buildPortalHealthResponse() {
+  const configIssue = getDatabaseConfigurationIssue();
   const status = getDatabaseStatus();
   let articleCount: number | null = null;
   let userCount: number | null = null;
-  let error: string | undefined;
+  let error: string | undefined = configIssue ?? undefined;
 
-  if (status === "connected") {
+  if (!error && status === "connected") {
     try {
       await ensurePortalDatabaseReady();
       const prisma = getPrisma();

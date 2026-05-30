@@ -1,15 +1,16 @@
-import { getPrisma } from "@/lib/persistence";
+import { getPrisma, getDatabaseConfigurationIssue } from "@/lib/persistence";
 
 export function isProductionRuntime() {
   return process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production";
 }
 
 export function hasDatabaseConfigured() {
-  return Boolean(process.env.DATABASE_URL);
+  return Boolean(process.env.DATABASE_URL || process.env.DIRECT_URL);
 }
 
 export function hasDatabaseBackend() {
-  if (!process.env.DATABASE_URL) return false;
+  if (getDatabaseConfigurationIssue()) return false;
+  if (!hasDatabaseConfigured()) return false;
   try {
     return Boolean(getPrisma());
   } catch {
@@ -25,6 +26,8 @@ export function shouldUseMemoryStore() {
 }
 
 export function getDatabaseStatus() {
+  const configIssue = getDatabaseConfigurationIssue();
+  if (configIssue) return "invalid_configuration";
   if (!hasDatabaseConfigured()) {
     return isProductionRuntime() ? "missing_in_production" : "not_configured";
   }
