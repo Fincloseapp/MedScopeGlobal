@@ -31,36 +31,34 @@ function formatToDb(format: string) {
   return format === "in-person" ? "IN_PERSON" : format.toUpperCase();
 }
 
-function normalizeConnectionString(connectionString: string) {
-  if (!connectionString.includes("supabase")) return connectionString;
-  if (/sslmode=/i.test(connectionString)) return connectionString;
-  const separator = connectionString.includes("?") ? "&" : "?";
-  return `${connectionString}${separator}sslmode=no-verify`;
+function sanitizeConnectionString(connectionString: string) {
+  try {
+    const url = new URL(connectionString);
+    url.searchParams.delete("sslmode");
+    url.searchParams.delete("sslaccept");
+    return url.toString();
+  } catch {
+    return connectionString.replace(/([?&])sslmode=[^&]*(&)?/g, (_, prefix, suffix) => (suffix ? prefix : ""));
+  }
 }
 
-function shouldUseSsl(connectionString: string) {
-  if (process.env.VERCEL === "1" || connectionString.includes("supabase")) {
-    return { rejectUnauthorized: false };
-  }
-  if (/sslmode=(require|verify-full|verify-ca|no-verify)/i.test(connectionString)) {
-    return { rejectUnauthorized: false };
-  }
-  return undefined;
+function normalizeConnectionString(connectionString: string) {
+  return sanitizeConnectionString(connectionString);
 }
 
 function createPrismaClient(): PrismaClient | null {
-  const rawConnectionString = resolveRuntimeConnectionString();
-  if (!rawConnectionString) return null;
-  const connectionString = normalizeConnectionString(rawConnectionString);
+  const connectionString = resolveRuntimeConnectionString();
+  if (!connectionString) return null;
 
   try {
     const globalForPrisma = globalThis as GlobalWithPrisma;
+    const useSsl = process.env.VERCEL === "1" || connectionString.includes("supabase");
     globalForPrisma.prismaPool ??= new Pool({
       connectionString,
       max: 1,
       idleTimeoutMillis: 20_000,
       connectionTimeoutMillis: 10_000,
-      ssl: shouldUseSsl(connectionString)
+      ...(useSsl ? { ssl: { rejectUnauthorized: false } } : {})
     });
 
     const adapter = new PrismaPg(globalForPrisma.prismaPool);

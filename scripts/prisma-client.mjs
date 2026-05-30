@@ -12,11 +12,19 @@ function resolveMigrationUrl() {
   ].find((value) => value && !/\[(PASSWORD|REF|HESLO)\]/i.test(value));
 }
 
+function sanitizeConnectionString(connectionString) {
+  try {
+    const url = new URL(connectionString);
+    url.searchParams.delete("sslmode");
+    url.searchParams.delete("sslaccept");
+    return url.toString();
+  } catch {
+    return connectionString.replace(/([?&])sslmode=[^&]*(&)?/g, (_, prefix, suffix) => (suffix ? prefix : ""));
+  }
+}
+
 function normalizeConnectionString(connectionString) {
-  if (!connectionString.includes("supabase")) return connectionString;
-  if (/sslmode=/i.test(connectionString)) return connectionString;
-  const separator = connectionString.includes("?") ? "&" : "?";
-  return `${connectionString}${separator}sslmode=no-verify`;
+  return sanitizeConnectionString(connectionString);
 }
 
 export function createSeedPrismaClient() {
@@ -24,10 +32,11 @@ export function createSeedPrismaClient() {
   if (!raw) return new PrismaClient();
 
   const connectionString = normalizeConnectionString(raw);
+  const useSsl = process.env.VERCEL === "1" || connectionString.includes("supabase");
   const pool = new Pool({
     connectionString,
     max: 1,
-    ssl: { rejectUnauthorized: false }
+    ...(useSsl ? { ssl: { rejectUnauthorized: false } } : {})
   });
 
   return new PrismaClient({ adapter: new PrismaPg(pool) });

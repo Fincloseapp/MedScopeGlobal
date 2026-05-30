@@ -73,6 +73,8 @@ export function getDatabaseConfigurationIssue(): string | null {
 export function resolveRuntimeConnectionString(): string | null {
   if (getDatabaseConfigurationIssue()) return null;
   const { pooled, direct } = getResolvedDatabaseUrls();
+  // Direct connection avoids some pooler TLS edge cases with node-postgres on Vercel.
+  if (process.env.VERCEL === "1" && direct) return direct;
   return pooled ?? direct ?? null;
 }
 
