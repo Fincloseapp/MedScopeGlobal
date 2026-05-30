@@ -1,7 +1,7 @@
 import { randomBytes, scryptSync } from "node:crypto";
-import { PrismaClient } from "@prisma/client";
+import { createSeedPrismaClient } from "../scripts/prisma-client.mjs";
 
-const prisma = new PrismaClient();
+const prisma = createSeedPrismaClient();
 
 function hashPassword(password) {
   const salt = randomBytes(16).toString("hex");

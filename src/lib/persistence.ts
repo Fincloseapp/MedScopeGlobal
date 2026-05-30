@@ -31,15 +31,27 @@ function formatToDb(format: string) {
   return format === "in-person" ? "IN_PERSON" : format.toUpperCase();
 }
 
+function normalizeConnectionString(connectionString: string) {
+  if (!connectionString.includes("supabase")) return connectionString;
+  if (/sslmode=/i.test(connectionString)) return connectionString;
+  const separator = connectionString.includes("?") ? "&" : "?";
+  return `${connectionString}${separator}sslmode=no-verify`;
+}
+
 function shouldUseSsl(connectionString: string) {
-  if (/sslmode=(require|verify-full|verify-ca)/i.test(connectionString)) return { rejectUnauthorized: false };
-  if (connectionString.includes("supabase.com") || process.env.VERCEL === "1") return { rejectUnauthorized: false };
+  if (process.env.VERCEL === "1" || connectionString.includes("supabase")) {
+    return { rejectUnauthorized: false };
+  }
+  if (/sslmode=(require|verify-full|verify-ca|no-verify)/i.test(connectionString)) {
+    return { rejectUnauthorized: false };
+  }
   return undefined;
 }
 
 function createPrismaClient(): PrismaClient | null {
-  const connectionString = resolveRuntimeConnectionString();
-  if (!connectionString) return null;
+  const rawConnectionString = resolveRuntimeConnectionString();
+  if (!rawConnectionString) return null;
+  const connectionString = normalizeConnectionString(rawConnectionString);
 
   try {
     const globalForPrisma = globalThis as GlobalWithPrisma;
