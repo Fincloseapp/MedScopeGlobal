@@ -23,6 +23,13 @@ test("public student article access panel expands on click", async ({ page }) =>
   await page.goto("/articles?audience=laik-student");
   await page.getByRole("link", { name: "Číst více / Read more" }).first().click();
 
+  const articleTrigger = page.getByRole("button", { name: "Rozbalit celý článek" });
+  await expect(articleTrigger).toHaveAttribute("aria-expanded", "false");
+  await articleTrigger.click();
+  await expect(page.getByRole("button", { name: "Sbalit celý článek" })).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByRole("heading", { name: "Proč je téma důležité" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Praktické využití pro čtenáře" })).toBeVisible();
+
   const trigger = page.getByRole("button", { name: /Volně dostupné/ });
   await expect(trigger).toHaveAttribute("aria-expanded", "false");
   await trigger.click();

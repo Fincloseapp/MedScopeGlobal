@@ -3,6 +3,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { ArticleAccessDisclosure } from "@/components/article-access-disclosure";
+import { ArticleBodyExpander } from "@/components/article-body-expander";
 import { JsonLd } from "@/components/json-ld";
 import { ViewTracker } from "@/components/view-tracker";
 import { articleAccessCookieName, publicExcerpt, readArticleAccessCookie, resolveArticleAccess } from "@/lib/article-access";
@@ -87,7 +88,15 @@ export default async function ArticleDetailPage({ params }: PageProps) {
           </span>
           <span>{article.readingTime} min čtení</span>
         </div>
-        <p>{access.hasFullAccess ? article.content : publicExcerpt(article.content)}</p>
+        <ArticleBodyExpander
+          content={access.hasFullAccess ? article.content : publicExcerpt(article.content)}
+          summary={article.summary}
+          specialization={article.specialization}
+          source={article.source}
+          sourceUrl={article.sourceUrl}
+          tags={article.tags}
+          hasFullAccess={access.hasFullAccess}
+        />
         <ArticleAccessDisclosure
           accessLabel={access.accessLabel}
           audienceLabel={audienceLabel}
