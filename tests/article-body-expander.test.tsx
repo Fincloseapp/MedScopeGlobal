@@ -17,8 +17,9 @@ describe("ArticleBodyExpander", () => {
     );
 
     expect(screen.queryByRole("button", { name: /celý článek/ })).not.toBeInTheDocument();
-    expect(screen.getByText("Proč je téma důležité")).toBeInTheDocument();
-    expect(screen.getByText("Praktické využití pro čtenáře")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Klinický význam" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Doporučení pro praxi" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Zdroje a citace" })).toBeInTheDocument();
     expect(screen.getByText(/Druhá věta s dalším kontextem/)).toBeInTheDocument();
   });
 });

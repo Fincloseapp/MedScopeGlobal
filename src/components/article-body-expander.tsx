@@ -20,6 +20,12 @@ type RichBlock =
   | { type: "paragraph"; text: string }
   | { type: "list"; items: string[] };
 
+type ArticleSection = {
+  heading: string;
+  paragraphs: string[];
+  highlights: string[];
+};
+
 function parseRichContent(content: string): RichBlock[] {
   const blocks: RichBlock[] = [];
   const lines = content.split(/\n+/).map((line) => line.trim()).filter(Boolean);
@@ -51,6 +57,29 @@ function parseRichContent(content: string): RichBlock[] {
   }
 
   return blocks;
+}
+
+function parseSections(content: string): ArticleSection[] {
+  const sections: ArticleSection[] = [];
+  let current: ArticleSection | null = null;
+
+  for (const block of parseRichContent(content)) {
+    if (block.type === "h2") {
+      current = { heading: block.text, paragraphs: [], highlights: [] };
+      sections.push(current);
+      continue;
+    }
+
+    if (!current) {
+      current = { heading: "Úvod", paragraphs: [], highlights: [] };
+      sections.push(current);
+    }
+
+    if (block.type === "paragraph") current.paragraphs.push(block.text);
+    if (block.type === "list") current.highlights.push(...block.items);
+  }
+
+  return sections;
 }
 
 export function ArticleBodyExpander({
@@ -92,39 +121,42 @@ export function ArticleFullBody({
   sourceUrl,
   tags
 }: Omit<ArticleBodyExpanderProps, "hasFullAccess"> & { id?: string }) {
-  const blocks = parseRichContent(content);
+  const sections = parseSections(content);
 
   return (
     <div className="article-full-body" id={id}>
       <span id={id ? `${id}-title` : undefined} className="sr-only">
         Celý článek
       </span>
-      {blocks.length
-        ? blocks.map((block, index) => {
-            if (block.type === "h2") return <h2 key={`${block.text}-${index}`}>{block.text}</h2>;
-            if (block.type === "h3") return <h3 key={`${block.text}-${index}`}>{block.text}</h3>;
-            if (block.type === "list") {
-              return (
-                <ul key={`list-${index}`}>
-                  {block.items.map((item) => (
-                    <li key={item}>{item}</li>
+      {sections.length
+        ? sections.map((section) => (
+            <section className="article-section" key={section.heading}>
+              <h2>{section.heading}</h2>
+              {section.paragraphs.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+              {section.highlights.length ? (
+                <ul className="highlights">
+                  {section.highlights.map((item) => (
+                    <li key={item}>
+                      <strong>{item}</strong>
+                    </li>
                   ))}
                 </ul>
-              );
-            }
-            return <p key={`${block.text}-${index}`}>{block.text}</p>;
-          })
+              ) : null}
+            </section>
+          ))
         : <p>{content}</p>}
-      <section>
-        <h3>Proč je téma důležité</h3>
+      <section className="article-section clinical-box">
+        <h2>Klinický význam</h2>
         <p>
           Téma spadá do oblasti <strong>{specialization}</strong>. MedScopeGlobal ho zobrazuje jako praktický
           rozcestník: co sledovat, proč je informace relevantní a jak ji bezpečně zasadit do kontextu veřejnosti,
           studentů nebo odborné přípravy.
         </p>
       </section>
-      <section>
-        <h3>Praktické využití pro čtenáře</h3>
+      <section className="article-section practice-box">
+        <h2>Doporučení pro praxi</h2>
         <p>{summary}</p>
         {tags.length ? (
           <p>
@@ -132,19 +164,21 @@ export function ArticleFullBody({
           </p>
         ) : null}
       </section>
-      <section>
-        <h3>Zdroj a metadata</h3>
-        <p>
-          Zdroj:{" "}
-          {sourceUrl ? (
-            <a href={sourceUrl} target="_blank" rel="noreferrer">
-              {source}
-            </a>
-          ) : (
-            <strong>{source}</strong>
-          )}
-          . Metadata článku pomáhají rozlišit veřejnou/studentskou úroveň od odborných nebo premium materiálů.
-        </p>
+      <section className="article-section references">
+        <h2>Zdroje a citace</h2>
+        <ol>
+          <li>
+            <em>Zdroj monitoringu a výchozí materiál.</em> {source}.{" "}
+            {sourceUrl ? (
+              <a href={sourceUrl} target="_blank" rel="noreferrer">
+                Odkaz
+              </a>
+            ) : null}
+          </li>
+          <li>
+            <em>Strukturovaný výtah pro veřejnost a studenty.</em> MedScopeGlobal Source Desk.
+          </li>
+        </ol>
       </section>
     </div>
   );

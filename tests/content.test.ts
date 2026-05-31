@@ -59,6 +59,9 @@ describe("content filtering", () => {
       for (const heading of ["Hlavní přínosy", "Rizika a omezení", "Příklady použití"]) {
         expect(sectionText(article.content, heading).split("\n").filter((line) => line.startsWith("- ")).length).toBeGreaterThanOrEqual(3);
       }
+      expect(article.readingTime).toBeGreaterThanOrEqual(10);
+      expect(article.summary).toContain("Rozšířený");
+      expect(article.sourceUrl).toMatch(/^https?:\/\//);
     }
   });
   it("filters events by region, format and specialization", () => { const results = filterEvents({ region: "Česko", format: "hybrid", specialization: "Digitální zdraví" }); expect(results).toHaveLength(1); expect(results[0]?.slug).toBe("digital-health-prague-2026"); });
