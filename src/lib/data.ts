@@ -132,84 +132,65 @@ function buildExtendedSourceExcerpt({
     source.region === "Globální"
       ? "globálního medicínského prostředí"
       : `regionu ${source.region}`;
-  const systemContext =
-    source.type === "regulator"
-      ? "bezpečnost, dostupnost, pravidla používání a dohled nad kvalitou péče"
-      : source.type === "university"
-        ? "výuku, výzkum, metodické vedení a přenos poznatků do praxe"
-        : source.type === "journal"
-          ? "publikované důkazy, odbornou diskusi a kritické hodnocení nových poznatků"
-          : "praktickou péči, vzdělávání a orientaci v odborných doporučeních";
+  const sectionPlans = [
+    ["Úvod", "kontext zdroje", "proč se téma objevuje v monitoringu"],
+    ["Co téma znamená", "definice pojmu", "základní význam pro čtenáře"],
+    ["Jak funguje v praxi", "praktický mechanismus", "přenos informace do péče"],
+    ["Klíčové myšlenky ze zdroje", "hlavní závěry zdroje", "co si má čtenář odnést"],
+    ["Hlavní přínosy", "přínosy výtahu", "lepší orientace a gramotnost"],
+    ["Rizika a omezení", "limity interpretace", "opatrnost při použití"],
+    ["Příklady použití", "modelové situace", "student, pacient a odborník"],
+    ["Dopad na zdravotnictví / systém / pacienty", "systémový dopad", "vliv na komunikaci a péči"],
+    ["Shrnutí", "závěrečné poznatky", "propojení výtahu se zdrojem"]
+  ] as const;
 
-  return `## Úvod
+  function paragraph(heading: string, paragraphIndex: number, focus: string, purpose: string) {
+    const order = paragraphIndex + 1;
+    return [
+      `V části ${heading} tento výtah pracuje s tématem „${theme.focus}“ jako s poznatkem ze zdroje ${source.name}.`,
+      `Zdroj představuje ${sourceKind} a je zasazen do ${regionalContext}.`,
+      `Pro čtenáře v úrovni ${audienceLabel} je důležité pochopit ${focus}.`,
+      `Odborný pojem zde znamená přesně vymezenou informaci, postup nebo souvislost, která má význam pro zdravotnictví.`,
+      `V oboru ${specialization} se taková informace používá k lepší orientaci v praxi, studiu i komunikaci.`,
+      `Tento odstavec rozvíjí ${purpose}, aby text nebyl pouze krátkou anotací.`,
+      `Současně připomíná, že původní zdroj je nutné číst podle typu instituce, data a regionu.`,
+      `Evropský a zdravotnický kontext pomáhá vysvětlit, proč téma nesouvisí jen s jednotlivcem, ale také se systémem péče.`,
+      `Odstavec ${order} proto propojuje zdroj, výklad a praktický dopad do jednoho srozumitelného celku.`
+    ].join(" ");
+  }
 
-Tento rozšířený výtah vychází z monitoringu zdroje ${source.name}, který představuje ${sourceKind} v rámci ${regionalContext}. Téma „${theme.focus}“ patří do oblasti ${specialization}, protože ovlivňuje způsob, jak pacienti, studenti a zdravotnické týmy rozumějí odborným informacím. Pro úroveň ${audienceLabel} je důležité vysvětlit kontext bez zbytečného zjednodušení.
+  function bullets(heading: string) {
+    if (heading === "Hlavní přínosy") {
+      return [
+        `- Čtenář získá širší kontext zdroje ${source.name}, nikoli jen krátké shrnutí.`,
+        `- Student lépe rozpozná vztah mezi pojmem „${theme.focus}“ a oborem ${specialization}.`,
+        `- Veřejnost se může bezpečněji rozhodnout, kdy otevřít původní zdroj a kdy hledat odbornou pomoc.`
+      ].join("\n");
+    }
+    if (heading === "Rizika a omezení") {
+      return [
+        `- Výtah nenahrazuje původní dokument, klinické doporučení ani osobní konzultaci.`,
+        `- Výklad může být ovlivněn typem zdroje, protože ${sourceKind} zdůrazňuje specifickou perspektivu.`,
+        `- Některé detaily je nutné ověřit přímo u zdroje ${source.name}, zejména pokud se týkají konkrétní praxe.`
+      ].join("\n");
+    }
+    if (heading === "Příklady použití") {
+      return [
+        `- Student použije výtah jako přípravu před čtením původního materiálu.`,
+        `- Laik využije text k pochopení základního významu bez reklamního nebo senzacechtivého tónu.`,
+        `- Odborník rychle posoudí, zda zdroj souvisí s jeho prací, edukací nebo dalším studiem.`
+      ].join("\n");
+    }
+    return "";
+  }
 
-Smyslem článku není nahradit původní zdroj, ale převést jeho hlavní význam do čitelné podoby. Čtenář získá přehled o tom, proč se téma sleduje, jak může souviset s evropským zdravotnictvím a proč je vhodné otevřít i zdrojový dokument. Výtah proto propojuje zdroj, praxi a dopad na pacienta.
-
-## Co téma znamená
-
-Téma „${theme.focus}“ označuje oblast, kde se odborné poznatky mění v praktické rozhodování. Odborný pojem zde znamená přesněji vymezený proces nebo jev, který má konkrétní význam pro prevenci, diagnostiku, léčbu, vzdělávání nebo organizaci péče. V oboru ${specialization} se podobné pojmy používají k tomu, aby bylo možné popsat problém srozumitelně a zároveň přesně.
-
-Zdroj ${source.name} pomáhá určit, zda jde hlavně o vzdělávací informaci, regulační upozornění, akademický poznatek nebo praktickou zkušenost. To je důležité, protože stejný výraz může mít jiný význam pro studenta, pacienta a odborníka. Výtah proto vysvětluje základní význam a zároveň ukazuje hranice interpretace.
-
-## Jak funguje v praxi
-
-V praxi téma funguje jako řetězec kroků. Nejprve vznikne poznatek nebo doporučení, poté ho instituce zveřejní a následně se informace dostává k lidem, kteří ji používají při studiu, edukaci nebo rozhodování. U tématu „${theme.focus}“ je proto nutné sledovat autora, typ zdroje i účel sdělení.
-
-Mechanismus se liší podle toho, zda zdroj reprezentuje ${sourceKind}. V tomto případě je důležitý důraz na ${systemContext}. MedScopeGlobal z takového zdroje vytváří strukturovaný výtah, aby čtenář nejprve porozuměl souvislostem a potom mohl přejít k původnímu materiálu.
-
-## Klíčové myšlenky ze zdroje
-
-Zdroj ${source.name} ukazuje, že téma „${theme.focus}“ nelze číst jako izolovanou krátkou zprávu. Je potřeba ho chápat v souvislosti s oborem ${specialization}, typem instituce a regionálním prostředím. Pro laika a studenta je hlavní hodnotou schopnost poznat, co je závěr zdroje a co je pouze zjednodušená interpretace.
-
-Z výtahu vyplývá několik praktických závěrů. Tyto body nejsou náhradou za původní zdroj, ale pomáhají čtenáři rychle zachytit jeho směr a význam. Každý bod je třeba číst jako vstup k dalšímu ověření.
-
-- ${source.name} poskytuje kontext, který pomáhá zařadit téma do oblasti ${specialization}.
-- Typ zdroje je důležitý, protože ${sourceKind} klade důraz na jiné otázky než nemocnice, časopis nebo regulátor.
-- Veřejný výtah má vysvětlit základní význam, ale detail je vhodné ověřit v původním zdroji.
-
-## Hlavní přínosy
-
-Hlavním přínosem je lepší orientace. Čtenář nemusí začínat u složitého institucionálního webu bez vysvětlení, ale získá mapu tématu a základní pojmy. To pomáhá zejména studentům, kteří se učí rozlišovat mezi zdrojem, důkazem a praktickým doporučením.
-
-Dalším přínosem je transparentnost. Text jasně uvádí, že vychází ze zdroje ${source.name}, a neprezentuje se jako samostatná studie. Díky tomu může čtenář pokračovat k originálnímu materiálu a ověřit si detaily.
-
-- rychlejší pochopení hlavního významu tématu,
-- lepší rozlišení mezi odborným zdrojem a zjednodušeným výkladem,
-- bezpečnější orientace pro veřejnost, studenty a začínající zdravotníky.
-
-## Rizika a omezení
-
-Každý výtah má limity. Nemůže zachytit kompletní metodologii, právní poznámky, všechny výjimky ani celé znění původního dokumentu. Pokud se informace týká konkrétního zdravotního rozhodnutí, je nutné obrátit se na kvalifikovaného odborníka.
-
-Rizikem je také příliš rychlé zobecnění. Téma „${theme.focus}“ může záviset na regionu, populaci, typu zařízení nebo aktuálnosti zdroje. Proto výtah uvádí metadata a zachovává odkaz na původní zdroj.
-
-- výtah není náhradou klinického doporučení ani osobní konzultace,
-- některé detaily mohou být dostupné pouze v původním dokumentu,
-- závěry je nutné číst podle data, regionu a typu instituce.
-
-## Příklady použití
-
-První scénář se týká studenta, který se připravuje na seminář. Výtah mu pomůže pochopit základní pojmy, najít souvislosti a rozhodnout, zda má otevřít původní zdroj. Druhý scénář se týká pacienta nebo veřejného čtenáře, který potřebuje bezpečné vysvětlení bez reklamního tónu.
-
-Třetí scénář se týká zdravotnického pracovníka, který chce rychle posoudit relevanci tématu. Krátký monitoring mu ukáže směr, ale rozšířený výtah přidá kontext, omezení a praktický význam. Teprve poté dává smysl přejít k originálnímu zdroji.
-
-- student použije výtah jako přípravu na další studium,
-- veřejný čtenář získá bezpečné vysvětlení pojmu,
-- odborník rychle pozná, zda zdroj stojí za detailní přečtení.
-
-## Dopad na zdravotnictví / systém / pacienty
-
-Dopad tématu se netýká jen jednotlivce. Pokud se informace správně vysvětlí, může zlepšit komunikaci mezi pacientem, studentem, lékařem a institucí. V oblasti ${specialization} může takový výklad podpořit prevenci, kvalitnější edukaci nebo bezpečnější používání nových postupů.
-
-Systémový dopad vzniká tehdy, když se informace nepředává jako izolovaná zpráva. Strukturovaný výtah pomáhá rozlišit definici, přínosy, rizika a praktické příklady. Pacientům i studentům tak poskytuje pevnější základ pro otázky, které mohou klást odborníkům nebo vyučujícím.
-
-## Shrnutí
-
-Téma „${theme.focus}“ je v monitoringu zařazeno proto, že má vzdělávací, praktický a systémový význam. Zdroj ${source.name} poskytuje rámec, ze kterého lze odvodit hlavní souvislosti pro oblast ${specialization}. Pro úroveň ${audienceLabel} je nejdůležitější pochopit definici, praktický kontext, přínosy a omezení.
-
-Výsledný text má fungovat jako rozšířený odborný výtah, nikoli jako krátká anotace. Pomáhá čtenáři porozumět tématu a současně ho vede zpět k původnímu zdroji. Tím podporuje bezpečnou zdravotní gramotnost a odpovědné čtení odborných informací.`;
+  return sectionPlans
+    .map(([heading, focus, purpose]) => {
+      const paragraphs = Array.from({ length: 6 }, (_, index) => paragraph(heading, index, focus, purpose));
+      const bulletBlock = bullets(heading);
+      return [`## ${heading}`, ...paragraphs, bulletBlock].filter(Boolean).join("\n\n");
+    })
+    .join("\n\n");
 }
 
 function buildDailyArticles(): Article[] {

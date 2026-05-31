@@ -49,14 +49,12 @@ describe("content filtering", () => {
     const publicArticles = articles.filter((article) => article.id.startsWith("daily-") && article.audience === "laik-student").slice(0, 3);
     expect(publicArticles).toHaveLength(3);
     for (const article of publicArticles) {
-      expect(wordCount(article.content)).toBeGreaterThanOrEqual(800);
-      expect(wordCount(article.content)).toBeLessThanOrEqual(1200);
+      expect(wordCount(article.content)).toBeGreaterThanOrEqual(3500);
       expect(h2Headings(article.content)).toEqual(requiredHeadings);
       for (const heading of requiredHeadings) {
         const paragraphs = paragraphsInSection(article.content, heading);
-        expect(paragraphs.length).toBeGreaterThanOrEqual(2);
-        expect(paragraphs.length).toBeLessThanOrEqual(4);
-        expect(paragraphs.every((paragraph) => sentenceCount(paragraph) >= 3)).toBe(true);
+        expect(paragraphs.length).toBeGreaterThanOrEqual(6);
+        expect(paragraphs.every((paragraph) => sentenceCount(paragraph) >= 9)).toBe(true);
       }
       for (const heading of ["Hlavní přínosy", "Rizika a omezení", "Příklady použití"]) {
         expect(sectionText(article.content, heading).split("\n").filter((line) => line.startsWith("- ")).length).toBeGreaterThanOrEqual(3);
