@@ -103,6 +103,18 @@ export default async function ArticleDetailPage({ params }: PageProps) {
           message={access.message}
           hasFullAccess={access.hasFullAccess}
           requiresSubscription={access.requiresSubscription}
+          article={
+            access.hasFullAccess
+              ? {
+                  content: article.content,
+                  summary: article.summary,
+                  specialization: article.specialization,
+                  source: article.source,
+                  sourceUrl: article.sourceUrl,
+                  tags: article.tags
+                }
+              : undefined
+          }
         />
       </article>
 

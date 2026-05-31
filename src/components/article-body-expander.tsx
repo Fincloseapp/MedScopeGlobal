@@ -32,7 +32,6 @@ export function ArticleBodyExpander({
   const bodyId = useId();
   const sentences = splitIntoSentences(content);
   const preview = sentences[0] ?? content;
-  const fullText = sentences.length > 1 ? sentences : [content];
 
   if (!hasFullAccess) {
     return <p className="article-preview">{preview}</p>;
@@ -54,46 +53,70 @@ export function ArticleBodyExpander({
         {isOpen ? "Sbalit celý článek" : "Rozbalit celý článek"}
       </button>
       {isOpen ? (
-        <div className="article-full-body" id={bodyId}>
-          <section>
-            <h3>Celý text</h3>
-            {fullText.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-          </section>
-          <section>
-            <h3>Proč je téma důležité</h3>
-            <p>
-              Téma spadá do oblasti <strong>{specialization}</strong>. MedScopeGlobal ho zobrazuje jako praktický
-              rozcestník: co sledovat, proč je informace relevantní a jak ji bezpečně zasadit do kontextu veřejnosti,
-              studentů nebo odborné přípravy.
-            </p>
-          </section>
-          <section>
-            <h3>Praktické využití pro čtenáře</h3>
-            <p>{summary}</p>
-            {tags.length ? (
-              <p>
-                Klíčové tagy: <strong>{tags.join(" / ")}</strong>.
-              </p>
-            ) : null}
-          </section>
-          <section>
-            <h3>Zdroj a metadata</h3>
-            <p>
-              Zdroj:{" "}
-              {sourceUrl ? (
-                <a href={sourceUrl} target="_blank" rel="noreferrer">
-                  {source}
-                </a>
-              ) : (
-                <strong>{source}</strong>
-              )}
-              . Metadata článku pomáhají rozlišit veřejnou/studentskou úroveň od odborných nebo premium materiálů.
-            </p>
-          </section>
-        </div>
+        <ArticleFullBody
+          id={bodyId}
+          content={content}
+          summary={summary}
+          specialization={specialization}
+          source={source}
+          sourceUrl={sourceUrl}
+          tags={tags}
+        />
       ) : null}
     </section>
+  );
+}
+
+export function ArticleFullBody({
+  id,
+  content,
+  summary,
+  specialization,
+  source,
+  sourceUrl,
+  tags
+}: Omit<ArticleBodyExpanderProps, "hasFullAccess"> & { id?: string }) {
+  const fullText = splitIntoSentences(content);
+
+  return (
+    <div className="article-full-body" id={id}>
+      <section>
+        <h3>Celý text</h3>
+        {(fullText.length ? fullText : [content]).map((paragraph) => (
+          <p key={paragraph}>{paragraph}</p>
+        ))}
+      </section>
+      <section>
+        <h3>Proč je téma důležité</h3>
+        <p>
+          Téma spadá do oblasti <strong>{specialization}</strong>. MedScopeGlobal ho zobrazuje jako praktický
+          rozcestník: co sledovat, proč je informace relevantní a jak ji bezpečně zasadit do kontextu veřejnosti,
+          studentů nebo odborné přípravy.
+        </p>
+      </section>
+      <section>
+        <h3>Praktické využití pro čtenáře</h3>
+        <p>{summary}</p>
+        {tags.length ? (
+          <p>
+            Klíčové tagy: <strong>{tags.join(" / ")}</strong>.
+          </p>
+        ) : null}
+      </section>
+      <section>
+        <h3>Zdroj a metadata</h3>
+        <p>
+          Zdroj:{" "}
+          {sourceUrl ? (
+            <a href={sourceUrl} target="_blank" rel="noreferrer">
+              {source}
+            </a>
+          ) : (
+            <strong>{source}</strong>
+          )}
+          . Metadata článku pomáhají rozlišit veřejnou/studentskou úroveň od odborných nebo premium materiálů.
+        </p>
+      </section>
+    </div>
   );
 }

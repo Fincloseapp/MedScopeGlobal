@@ -40,8 +40,40 @@ test("public student article access panel expands on click", async ({ page }) =>
 
   await expect(trigger).toHaveAttribute("aria-expanded", "true");
   await expect(page.getByText("Tento článek je otevřený bez přihlášení.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Celý článek dostupný z této úrovně" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Další veřejné a studentské články" })).toBeVisible();
 });
+
+for (const article of [
+  {
+    title: "Kardiologie veřejnost/student",
+    slug: "kardiologie-prevence-cesko-001",
+    expectedTag: "prevence"
+  },
+  {
+    title: "Digitální zdraví veřejnost/student",
+    slug: "digitalni-zdravi-ai-cesko-005",
+    expectedTag: "AI"
+  },
+  {
+    title: "Neurologie veřejnost/student",
+    slug: "neurologie-diagnostika-cesko-009",
+    expectedTag: "diagnostika"
+  }
+]) {
+  test(`lay reader can expand full article from access message: ${article.title}`, async ({ page }) => {
+    await page.goto(`/articles/${article.slug}`);
+
+    const trigger = page.getByRole("button", { name: /Článek je dostupný všem návštěvníkům/ });
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await trigger.click();
+
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByRole("heading", { name: "Celý článek dostupný z této úrovně" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Celý text" }).last()).toBeVisible();
+    await expect(page.locator(".access-article-body").getByText(new RegExp(article.expectedTag, "i")).first()).toBeVisible();
+  });
+}
 
 test("news route aliases resolve instead of 404", async ({ page }) => {
   await page.goto("/news");

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useId, useState } from "react";
+import { ArticleFullBody } from "@/components/article-body-expander";
 
 interface ArticleAccessDisclosureProps {
   accessLabel: string;
@@ -9,6 +10,14 @@ interface ArticleAccessDisclosureProps {
   message: string;
   hasFullAccess: boolean;
   requiresSubscription: boolean;
+  article?: {
+    content: string;
+    summary: string;
+    specialization: string;
+    source: string;
+    sourceUrl?: string;
+    tags: string[];
+  };
 }
 
 export function ArticleAccessDisclosure({
@@ -16,7 +25,8 @@ export function ArticleAccessDisclosure({
   audienceLabel,
   message,
   hasFullAccess,
-  requiresSubscription
+  requiresSubscription,
+  article
 }: ArticleAccessDisclosureProps) {
   const isPublicStudent = hasFullAccess && !requiresSubscription;
   const [isOpen, setIsOpen] = useState(false);
@@ -57,6 +67,19 @@ export function ArticleAccessDisclosure({
                   Nastavit preference
                 </Link>
               </div>
+              {article ? (
+                <div className="access-article-body">
+                  <h3>Celý článek dostupný z této úrovně</h3>
+                  <ArticleFullBody
+                    content={article.content}
+                    summary={article.summary}
+                    specialization={article.specialization}
+                    source={article.source}
+                    sourceUrl={article.sourceUrl}
+                    tags={article.tags}
+                  />
+                </div>
+              ) : null}
             </>
           ) : (
             <>

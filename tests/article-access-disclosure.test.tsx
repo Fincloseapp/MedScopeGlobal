@@ -11,6 +11,13 @@ describe("ArticleAccessDisclosure", () => {
         message="Článek je dostupný všem návštěvníkům v úrovni veřejnost / student."
         hasFullAccess
         requiresSubscription={false}
+        article={{
+          content: "Veřejný článek první věta. Veřejný článek druhá věta.",
+          summary: "Shrnutí veřejného článku.",
+          specialization: "Kardiologie",
+          source: "MedScopeGlobal",
+          tags: ["student", "veřejnost"]
+        }}
       />
     );
 
@@ -22,6 +29,8 @@ describe("ArticleAccessDisclosure", () => {
 
     expect(trigger).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByText(/Tento článek je otevřený bez přihlášení/)).toBeInTheDocument();
+    expect(screen.getByText("Celý článek dostupný z této úrovně")).toBeInTheDocument();
+    expect(screen.getByText(/Veřejný článek druhá věta/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Další veřejné a studentské články" })).toHaveAttribute(
       "href",
       "/articles?audience=laik-student"
