@@ -6,7 +6,6 @@ import type { ContactSubmission, EventSubmission } from "./contact";
 import {
   getDatabaseConfigurationIssue,
   hasDatabaseEnvConfigured,
-  hasPlaceholderConnectionString,
   resolveRuntimeConnectionString
 } from "./database-env";
 import { logger } from "./logger";
@@ -33,21 +32,6 @@ function roleToDb(role?: string) {
 
 function formatToDb(format: string) {
   return format === "in-person" ? "IN_PERSON" : format.toUpperCase();
-}
-
-function sanitizeConnectionString(connectionString: string) {
-  try {
-    const url = new URL(connectionString);
-    url.searchParams.delete("sslmode");
-    url.searchParams.delete("sslaccept");
-    return url.toString();
-  } catch {
-    return connectionString.replace(/([?&])sslmode=[^&]*(&)?/g, (_, prefix, suffix) => (suffix ? prefix : ""));
-  }
-}
-
-function normalizeConnectionString(connectionString: string) {
-  return sanitizeConnectionString(connectionString);
 }
 
 function createPrismaClient(): PrismaClient | null {

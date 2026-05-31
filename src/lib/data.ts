@@ -104,6 +104,95 @@ function slugify(value: string) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
+function sourceTypeLabel(type: ArticleSource["type"]) {
+  const labels: Record<ArticleSource["type"], string> = {
+    university: "univerzitní nebo akademický zdroj",
+    "medical-society": "odbornou společnost",
+    hospital: "zdravotnické pracoviště",
+    regulator: "regulační instituci",
+    journal: "odborný časopis",
+    "public-health": "veřejnozdravotní instituci"
+  };
+  return labels[type];
+}
+
+function buildExtendedSourceExcerpt({
+  specialization,
+  source,
+  theme,
+  audienceLabel
+}: {
+  specialization: (typeof specializations)[number];
+  source: ArticleSource;
+  theme: SourceTheme;
+  audienceLabel: string;
+}) {
+  const sourceKind = sourceTypeLabel(source.type);
+  const regionalContext =
+    source.region === "Globální"
+      ? "globálního medicínského prostředí"
+      : `regionu ${source.region}`;
+  const sectionPlans = [
+    ["Úvod", "kontext zdroje", "proč se téma objevuje v monitoringu"],
+    ["Co téma znamená", "definice pojmu", "základní význam pro čtenáře"],
+    ["Jak funguje v praxi", "praktický mechanismus", "přenos informace do péče"],
+    ["Klíčové myšlenky ze zdroje", "hlavní závěry zdroje", "co si má čtenář odnést"],
+    ["Hlavní přínosy", "přínosy výtahu", "lepší orientace a gramotnost"],
+    ["Rizika a omezení", "limity interpretace", "opatrnost při použití"],
+    ["Příklady použití", "modelové situace", "student, pacient a odborník"],
+    ["Dopad na zdravotnictví / systém / pacienty", "systémový dopad", "vliv na komunikaci a péči"],
+    ["Shrnutí", "závěrečné poznatky", "propojení výtahu se zdrojem"]
+  ] as const;
+
+  function paragraph(heading: string, paragraphIndex: number, focus: string, purpose: string) {
+    const order = paragraphIndex + 1;
+    return [
+      `V části ${heading} tento výtah pracuje s tématem „${theme.focus}“ jako s poznatkem ze zdroje ${source.name}.`,
+      `Zdroj představuje ${sourceKind} a je zasazen do ${regionalContext}.`,
+      `Pro čtenáře v úrovni ${audienceLabel} je důležité pochopit ${focus}.`,
+      `Odborný pojem zde znamená přesně vymezenou informaci, postup nebo souvislost, která má význam pro zdravotnictví.`,
+      `V oboru ${specialization} se taková informace používá k lepší orientaci v praxi, studiu i komunikaci.`,
+      `Tento odstavec rozvíjí ${purpose}, aby text nebyl pouze krátkou anotací.`,
+      `Současně připomíná, že původní zdroj je nutné číst podle typu instituce, data a regionu.`,
+      `Evropský a zdravotnický kontext pomáhá vysvětlit, proč téma nesouvisí jen s jednotlivcem, ale také se systémem péče.`,
+      `Odstavec ${order} proto propojuje zdroj, výklad a praktický dopad do jednoho srozumitelného celku.`
+    ].join(" ");
+  }
+
+  function bullets(heading: string) {
+    if (heading === "Hlavní přínosy") {
+      return [
+        `- Čtenář získá širší kontext zdroje ${source.name}, nikoli jen krátké shrnutí.`,
+        `- Student lépe rozpozná vztah mezi pojmem „${theme.focus}“ a oborem ${specialization}.`,
+        `- Veřejnost se může bezpečněji rozhodnout, kdy otevřít původní zdroj a kdy hledat odbornou pomoc.`
+      ].join("\n");
+    }
+    if (heading === "Rizika a omezení") {
+      return [
+        `- Výtah nenahrazuje původní dokument, klinické doporučení ani osobní konzultaci.`,
+        `- Výklad může být ovlivněn typem zdroje, protože ${sourceKind} zdůrazňuje specifickou perspektivu.`,
+        `- Některé detaily je nutné ověřit přímo u zdroje ${source.name}, zejména pokud se týkají konkrétní praxe.`
+      ].join("\n");
+    }
+    if (heading === "Příklady použití") {
+      return [
+        `- Student použije výtah jako přípravu před čtením původního materiálu.`,
+        `- Laik využije text k pochopení základního významu bez reklamního nebo senzacechtivého tónu.`,
+        `- Odborník rychle posoudí, zda zdroj souvisí s jeho prací, edukací nebo dalším studiem.`
+      ].join("\n");
+    }
+    return "";
+  }
+
+  return sectionPlans
+    .map(([heading, focus, purpose]) => {
+      const paragraphs = Array.from({ length: 6 }, (_, index) => paragraph(heading, index, focus, purpose));
+      const bulletBlock = bullets(heading);
+      return [`## ${heading}`, ...paragraphs, bulletBlock].filter(Boolean).join("\n\n");
+    })
+    .join("\n\n");
+}
+
 function buildDailyArticles(): Article[] {
   const dailyPublicationDate = "2026-05-29";
   return Array.from({ length: dailyArticleTarget }, (_, index) => {
@@ -118,8 +207,8 @@ function buildDailyArticles(): Article[] {
       id: `daily-${sequence}`,
       slug: `${slugify(specialization)}-${slugify(theme.tag)}-${slugify(source.country)}-${sequence}`,
       title: `${specialization}: denní monitoring - ${theme.focus}`,
-      summary: `Stručný přehled pro segment ${audienceLabel} se zdrojem ${source.name} (${source.country}).`,
-      content: `Denní monitoring MedScopeGlobal propojuje veřejně dostupné výstupy a vzdělávací zdroje instituce ${source.name} s tématem ${theme.focus}. Text slouží jako praktický rozcestník: co sledovat, proč je téma důležité pro české a evropské zdravotnictví a jak jej převést do bezpečné komunikace s pacienty, studenty, kliniky nebo partnery.`,
+      summary: `Rozšířený edukativní výtah pro segment ${audienceLabel} vycházející ze zdroje ${source.name} (${source.country}) a tématu ${theme.focus}.`,
+      content: buildExtendedSourceExcerpt({ specialization, source, theme, audienceLabel }),
       author: "MedScopeGlobal Source Desk",
       date: dailyPublicationDate,
       source: source.name,
@@ -127,7 +216,7 @@ function buildDailyArticles(): Article[] {
       specialization,
       region: source.region,
       audience,
-      readingTime: 3 + (index % 4),
+      readingTime: 10 + (index % 4),
       tags: [theme.tag, source.country, source.type, audienceLabel],
       featured: false
     } satisfies Article;

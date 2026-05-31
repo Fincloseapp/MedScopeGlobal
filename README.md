@@ -70,5 +70,5 @@ npm run ci
 
 ## Zdroje
 
-České: ČLS JEP, LF UK (1–3), LF MU, LF UPOL, SÚKL, ÚZIS, české časopisy  
+České: ČLS JEP, LF UK (1–3), LF MU, LF UPOL, SÚKL, ÚZIS, české časopisy
 Zahraniční: PubMed, WHO, ESC, EULAR, NEJM, Lancet, BMJ

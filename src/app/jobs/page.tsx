@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { JobFilter } from "@/components/job-filter";
-import { JsonLd } from "@/components/json-ld";
 import { filterJobs } from "@/lib/jobs";
 import type { JobType } from "@/lib/types";
 

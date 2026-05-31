@@ -24,6 +24,19 @@ describe("portal articles", () => {
       "Autor Test"
     );
     expect(generated.sections.length).toBeGreaterThanOrEqual(4);
+    expect(generated.sections.map((section) => section.heading)).toEqual(
+      expect.arrayContaining([
+        "Úvod",
+        "Co téma znamená",
+        "Jak funguje v praxi",
+        "Hlavní přínosy",
+        "Rizika a omezení",
+        "Příklady použití",
+        "Dopad na systém a pacienty",
+        "Shrnutí"
+      ])
+    );
+    expect(generated.sections.every((section) => section.content.split(/\s+/).length >= 60)).toBe(true);
     expect(generated.clinicalSignificance.length).toBeGreaterThan(10);
     expect(generated.practiceRecommendations.length).toBeGreaterThan(10);
     expect(generated.citations.length).toBeGreaterThanOrEqual(3);

@@ -54,7 +54,6 @@ const users = [
   }
 ];
 
-const expert = users[0];
 const now = new Date();
 
 const sections = [

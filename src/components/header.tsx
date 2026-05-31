@@ -3,20 +3,31 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { navItems } from "@/lib/site";
+import { medicalNavGroups } from "@/lib/medical-sections";
 
 export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
     return pathname === href || pathname.startsWith(`${href}/`);
   }
 
+  function isGroupActive(item: (typeof medicalNavGroups)[number]) {
+    if (item.href) return isActive(item.href);
+    return item.children?.some((child) => isActive(child.href)) ?? false;
+  }
+
+  function closeMenus() {
+    setOpen(false);
+    setOpenDropdown(null);
+  }
+
   return (
     <header className="site-header">
-      <Link href="/" className="brand" onClick={() => setOpen(false)}>
+      <Link href="/" className="brand" onClick={closeMenus}>
         <span className="brand-mark">M</span>
         <span>MedScopeGlobal</span>
       </Link>
@@ -33,17 +44,42 @@ export function Header() {
         <span />
       </button>
       <nav id="primary-nav" className={open ? "nav nav-open" : "nav"} aria-label="Hlavní navigace">
-        {navItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={isActive(item.href) ? "active" : ""}
-            onClick={() => setOpen(false)}
-          >
-            {item.label}
-          </Link>
-        ))}
-        <Link href="/auth/login" className={isActive("/auth/login") ? "active nav-cta" : "nav-cta"} onClick={() => setOpen(false)}>
+        {medicalNavGroups.map((item) =>
+          item.children ? (
+            <div className="nav-dropdown" key={item.label}>
+              <button
+                type="button"
+                className={isGroupActive(item) ? "active" : ""}
+                aria-expanded={openDropdown === item.label}
+                onClick={() => setOpenDropdown((value) => (value === item.label ? null : item.label))}
+              >
+                {item.label} <span aria-hidden="true">▼</span>
+              </button>
+              <div className={openDropdown === item.label ? "dropdown-menu open" : "dropdown-menu"}>
+                {item.children.map((child) => (
+                  <Link
+                    key={child.href}
+                    href={child.href}
+                    className={isActive(child.href) ? "active" : ""}
+                    onClick={closeMenus}
+                  >
+                    {child.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <Link
+              key={item.href}
+              href={item.href ?? "/"}
+              className={isGroupActive(item) ? "active" : ""}
+              onClick={closeMenus}
+            >
+              {item.label}
+            </Link>
+          )
+        )}
+        <Link href="/auth/login" className={isActive("/auth/login") ? "active nav-cta" : "nav-cta"} onClick={closeMenus}>
           Přihlášení
         </Link>
       </nav>

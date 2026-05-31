@@ -20,6 +20,12 @@ function makeCitation(sourceName: string, title: string, url: string, doi?: stri
   };
 }
 
+function expandedSection(heading: string, topic: string, specialization: string, sourceName: string, focus: string) {
+  return `${focus} V kontextu tématu „${topic}“ v oboru ${specialization} je důležité popsat nejen závěr, ale také cestu, kterou se k němu zdroj dostává. Zdroj ${sourceName} je použit jako odborný rámec, protože pomáhá rozlišit mezi obecným tvrzením, praktickým doporučením a oblastí, kde je nutné další ověření.
+
+Pro čtenáře má tato část fungovat jako rozšířený výtah, nikoli jako krátká anotace. Odborné pojmy jsou proto vysvětleny v přirozeném kontextu a navazují na praktické otázky: kdo informaci používá, v jaké situaci vzniká a jaké limity je nutné respektovat. Význam sekce „${heading}“ spočívá v tom, že převádí odborný zdroj do podoby použitelné pro studium, klinickou orientaci i další rešerši.`;
+}
+
 const topicTemplates: Record<string, { intro: string; epidemiology: string; diagnostics: string; therapy: string; clinical: string; practice: string; icd: string[]; tags: string[] }> = {
   Kardiologie: {
     intro: "Kardiovaskulární onemocnění zůstávají hlavní příčinou morbidity v ČR i EU. Moderní přístup kombinuje primární prevenci, strukturovanou triáž a evidence-based farmakoterapii.",
@@ -63,10 +69,14 @@ export function generateArticle(input: GenerateArticleInput, authorId: string, a
   const keywords = (input.keywords ?? []).length ? input.keywords!.join(", ") : input.topic;
 
   const sections: ArticleSection[] = [
-    makeSection("Úvod", `${template.intro} Téma: ${input.topic}. Klíčová slova: ${keywords}.`, [input.topic]),
-    makeSection("Epidemiologie a patogeneze", template.epidemiology, ["prevalence", "rizikové faktory"]),
-    makeSection("Diagnostický přístup", template.diagnostics, ["guidelines", "screening"]),
-    makeSection("Léčebné možnosti", template.therapy, ["evidence-based", "adherence"])
+    makeSection("Úvod", expandedSection("Úvod", input.topic, input.specialization, primary.name, `${template.intro} Klíčová slova: ${keywords}.`), [input.topic]),
+    makeSection("Co téma znamená", expandedSection("Co téma znamená", input.topic, input.specialization, primary.name, template.epidemiology), ["definice", "kontext"]),
+    makeSection("Jak funguje v praxi", expandedSection("Jak funguje v praxi", input.topic, input.specialization, secondary.name, template.diagnostics), ["proces", "mechanismus"]),
+    makeSection("Hlavní přínosy", expandedSection("Hlavní přínosy", input.topic, input.specialization, secondary.name, template.clinical), ["přínosy", "praxe"]),
+    makeSection("Rizika a omezení", expandedSection("Rizika a omezení", input.topic, input.specialization, tertiary.name, "Každý odborný závěr je nutné číst s ohledem na populaci, dostupnost dat, regionální doporučení a možné rozdíly mezi studií a každodenní praxí."), ["limity", "bezpečnost"]),
+    makeSection("Příklady použití", expandedSection("Příklady použití", input.topic, input.specialization, primary.name, template.practice), ["scénáře", "edukace"]),
+    makeSection("Dopad na systém a pacienty", expandedSection("Dopad na systém a pacienty", input.topic, input.specialization, secondary.name, "Dopad tématu se může projevit v organizaci péče, komunikaci s pacientem, vzdělávání studentů i prioritách zdravotnického systému."), ["dopad", "systém"]),
+    makeSection("Shrnutí", expandedSection("Shrnutí", input.topic, input.specialization, tertiary.name, "Klíčový poznatek spočívá v propojení zdroje, praktického kontextu a bezpečné interpretace pro další rozhodování."), ["shrnutí", "zdroje"])
   ];
 
   const citations: Citation[] = [
@@ -82,7 +92,7 @@ export function generateArticle(input: GenerateArticleInput, authorId: string, a
     id: createArticleId(),
     slug,
     title,
-    summary: `Odborný přehled k tématu „${input.topic}“ v oboru ${input.specialization}. Strukturovaný obsah s citacemi z validních českých i zahraničních zdrojů.`,
+    summary: `Rozšířený odborný výtah k tématu „${input.topic}“ v oboru ${input.specialization}. Text je strukturovaný podle zdrojů, praktického významu, přínosů, limitů a dopadu na péči.`,
     sections,
     clinicalSignificance: template.clinical,
     practiceRecommendations: template.practice,
@@ -95,7 +105,7 @@ export function generateArticle(input: GenerateArticleInput, authorId: string, a
     authorName,
     createdAt: now,
     updatedAt: now,
-    readingTime: 8
+    readingTime: 12
   };
 }
 
