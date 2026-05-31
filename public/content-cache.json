@@ -1,81 +1,233 @@
 {
-  "refreshedAt": "2026-05-29T22:20:18.457Z",
+  "refreshedAt": "2026-05-31T08:52:41.288Z",
   "items": [
     {
-      "id": "pubmed-42213336",
-      "category": "ai",
-      "title": "Innovative strategies for early detection of cardiotoxicity: artificial intelligence and multi-modality collaborative models.",
-      "author": "Becker RC",
+      "id": "pubmed-42216670",
+      "category": "clinical-insights",
+      "title": "Traumatic brain injury and post-traumatic stress disorder on brain imaging markers and cognition in a war veterans population.",
+      "author": "Sibilia F",
       "authorTitle": "MD / PhD",
-      "affiliation": "Journal of thrombosis and thrombolysis",
-      "summary": "Indexed PubMed article selected for artificial intelligence medicine.",
-      "citations": 36,
+      "affiliation": "Journal of Alzheimer's disease : JAD",
+      "summary": "Indexed PubMed article selected for clinical insights medicine.",
+      "citations": 70,
       "tags": [
-        "ai",
-        "artificial",
-        "J Thromb Thrombolysis"
+        "clinical insights",
+        "clinical",
+        "J Alzheimers Dis"
       ],
-      "date": "2026-05-29T00:00:00.000Z",
+      "date": "2026-05-30T00:00:00.000Z",
       "source": "PubMed",
-      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42213336/",
-      "specialty": "Digital Health"
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42216670/",
+      "specialty": "General Medicine"
     },
     {
-      "id": "pubmed-42213329",
-      "category": "ai",
-      "title": "Towards an accessible, centralised, searchable database for AI courses in Europe: the Artificial Intelligence in Medical Imaging and Radiation Oncology Education (AIMIROE) project.",
-      "author": "Decoster R",
+      "id": "pubmed-42216668",
+      "category": "clinical-insights",
+      "title": "Cannabinoids for Alzheimer's disease: A promising trial, although not yet ready for the prescription pad.",
+      "author": "Dos Santos Silva J",
       "authorTitle": "MD / PhD",
-      "affiliation": "European radiology experimental",
-      "summary": "Indexed PubMed article selected for artificial intelligence medicine.",
-      "citations": 29,
+      "affiliation": "Journal of Alzheimer's disease : JAD",
+      "summary": "Indexed PubMed article selected for clinical insights medicine.",
+      "citations": 68,
       "tags": [
-        "ai",
-        "artificial",
-        "Eur Radiol Exp"
+        "clinical insights",
+        "clinical",
+        "J Alzheimers Dis"
       ],
-      "date": "2026-05-29T00:00:00.000Z",
+      "date": "2026-05-30T00:00:00.000Z",
       "source": "PubMed",
-      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42213329/",
-      "specialty": "Digital Health"
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42216668/",
+      "specialty": "General Medicine"
     },
     {
-      "id": "pubmed-42213317",
-      "category": "ai",
-      "title": "Validation of an automated AI-based micro-CT organ segmentation workflow against expert annotations and its impact on fluorescence quantification.",
-      "author": "Rama E",
+      "id": "pubmed-42216648",
+      "category": "clinical-insights",
+      "title": "Metabolic Brain Network Reorganization in Temporal Lobe Epilepsy With Aware or Impaired Awareness Seizures.",
+      "author": "Xiao J",
       "authorTitle": "MD / PhD",
-      "affiliation": "European radiology experimental",
-      "summary": "Indexed PubMed article selected for artificial intelligence medicine.",
-      "citations": 17,
+      "affiliation": "Journal of integrative neuroscience",
+      "summary": "Indexed PubMed article selected for clinical insights medicine.",
+      "citations": 48,
       "tags": [
-        "ai",
-        "artificial",
-        "Eur Radiol Exp"
+        "clinical insights",
+        "clinical",
+        "J Integr Neurosci"
       ],
-      "date": "2026-05-29T00:00:00.000Z",
+      "date": "2026-05-09T00:00:00.000Z",
       "source": "PubMed",
-      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42213317/",
-      "specialty": "Digital Health"
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42216648/",
+      "specialty": "General Medicine"
     },
     {
-      "id": "pubmed-42213219",
-      "category": "ai",
-      "title": "Turning failure into success: how artificial intelligence can help personalize therapies and re-use patient data.",
-      "author": "Abbracchio MP",
+      "id": "pubmed-42216567",
+      "category": "clinical-insights",
+      "title": "Umbilical cord blood natural killer cells improve anti-GD2 antibody efficacy in neuroblastoma: from mouse to human.",
+      "author": "Song M",
       "authorTitle": "MD / PhD",
-      "affiliation": "Purinergic signalling",
-      "summary": "Indexed PubMed article selected for artificial intelligence medicine.",
-      "citations": 19,
+      "affiliation": "Oncoimmunology",
+      "summary": "Indexed PubMed article selected for clinical insights medicine.",
+      "citations": 67,
       "tags": [
-        "ai",
-        "artificial",
-        "Purinergic Signal"
+        "clinical insights",
+        "clinical",
+        "Oncoimmunology"
+      ],
+      "date": "2026-12-31T00:00:00.000Z",
+      "source": "PubMed",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42216567/",
+      "specialty": "General Medicine"
+    },
+    {
+      "id": "pubmed-42216676",
+      "category": "research-articles",
+      "title": "Current state of knowledge on medical cannabis use and risk for infections: A practical guide for clinicians.",
+      "author": "Hughes Kramer K",
+      "authorTitle": "MD / PhD",
+      "affiliation": "Clinical infectious diseases : an official publication of the Infectious Diseases Society of America",
+      "summary": "Indexed PubMed article selected for research articles clinical medicine.",
+      "citations": 76,
+      "tags": [
+        "research articles",
+        "research",
+        "Clin Infect Dis"
+      ],
+      "date": "2026-05-30T00:00:00.000Z",
+      "source": "PubMed",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42216676/",
+      "specialty": "General Medicine"
+    },
+    {
+      "id": "pubmed-42216675",
+      "category": "research-articles",
+      "title": "Weight Gain on Contemporary Integrase Strand Transfer Inhibitors and Tenofovir Alafenamide in Persons with HIV Starting Antiretroviral Therapy in the United States and Canada.",
+      "author": "Bourgi K",
+      "authorTitle": "MD / PhD",
+      "affiliation": "The Journal of infectious diseases",
+      "summary": "Indexed PubMed article selected for research articles clinical medicine.",
+      "citations": 75,
+      "tags": [
+        "research articles",
+        "research",
+        "J Infect Dis"
       ],
       "date": "2026-05-29T00:00:00.000Z",
       "source": "PubMed",
-      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42213219/",
-      "specialty": "Digital Health"
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42216675/",
+      "specialty": "General Medicine"
+    },
+    {
+      "id": "pubmed-42216673",
+      "category": "research-articles",
+      "title": "Multimodal machine learning for early risk stratification of post-stroke cognitive impairment.",
+      "author": "Zheng X",
+      "authorTitle": "MD / PhD",
+      "affiliation": "Journal of Alzheimer's disease : JAD",
+      "summary": "Indexed PubMed article selected for research articles clinical medicine.",
+      "citations": 73,
+      "tags": [
+        "research articles",
+        "research",
+        "J Alzheimers Dis"
+      ],
+      "date": "2026-05-30T00:00:00.000Z",
+      "source": "PubMed",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42216673/",
+      "specialty": "General Medicine"
+    },
+    {
+      "id": "pubmed-42216671",
+      "category": "research-articles",
+      "title": "Determination of the yearly distribution of the incidence of Allergic Bronchopulmonary Aspergillosis (ABPA) in patients registered in the cystic fibrosis patient registry system of Turkey and identification of risk factors for its development.",
+      "author": "Demir Hİ",
+      "authorTitle": "MD / PhD",
+      "affiliation": "Chronic illness",
+      "summary": "Indexed PubMed article selected for research articles clinical medicine.",
+      "citations": 71,
+      "tags": [
+        "research articles",
+        "research",
+        "Chronic Illn"
+      ],
+      "date": "2026-05-30T00:00:00.000Z",
+      "source": "PubMed",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42216671/",
+      "specialty": "General Medicine"
+    },
+    {
+      "id": "pubmed-42207269",
+      "category": "costs-drg",
+      "title": "Timely hospital discharge in TAVI patients: towards a patient-centered care pathway.",
+      "author": "Frank D",
+      "authorTitle": "MD / PhD",
+      "affiliation": "Clinical research in cardiology : official journal of the German Cardiac Society",
+      "summary": "Indexed PubMed article selected for healthcare cost DRG insurance.",
+      "citations": 69,
+      "tags": [
+        "costs drg",
+        "healthcare",
+        "Clin Res Cardiol"
+      ],
+      "date": "2026-05-28T00:00:00.000Z",
+      "source": "PubMed",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42207269/",
+      "specialty": "Cardiology"
+    },
+    {
+      "id": "pubmed-42170834",
+      "category": "costs-drg",
+      "title": "The substantial economic burden of rotator cuff pathology: A nationwide cost-of-illness study.",
+      "author": "Longo UG",
+      "authorTitle": "MD / PhD",
+      "affiliation": "Knee surgery, sports traumatology, arthroscopy : official journal of the ESSKA",
+      "summary": "Indexed PubMed article selected for healthcare cost DRG insurance.",
+      "citations": 34,
+      "tags": [
+        "costs drg",
+        "healthcare",
+        "Knee Surg Sports Traumatol Arthrosc"
+      ],
+      "date": "2026-05-22T00:00:00.000Z",
+      "source": "PubMed",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42170834/",
+      "specialty": "Healthcare Economics"
+    },
+    {
+      "id": "pubmed-42163927",
+      "category": "costs-drg",
+      "title": "Analysis of influencing factors and structural changes in hospitalization expenses for heart failure patients under the DRG payment system reform.",
+      "author": "Huang D",
+      "authorTitle": "MD / PhD",
+      "affiliation": "Frontiers in public health",
+      "summary": "Indexed PubMed article selected for healthcare cost DRG insurance.",
+      "citations": 27,
+      "tags": [
+        "costs drg",
+        "healthcare",
+        "Front Public Health"
+      ],
+      "date": "2026-01-01T00:00:00.000Z",
+      "source": "PubMed",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42163927/",
+      "specialty": "Healthcare Economics"
+    },
+    {
+      "id": "pubmed-42106710",
+      "category": "costs-drg",
+      "title": "Diagnosis-Related group payment and its impact on hospitalization costs and patient financial protection for neurointerventional stroke care in a Chinese tertiary hospital: a retrospective analysis.",
+      "author": "Chen Z",
+      "authorTitle": "MD / PhD",
+      "affiliation": "Cost effectiveness and resource allocation : C/E",
+      "summary": "Indexed PubMed article selected for healthcare cost DRG insurance.",
+      "citations": 10,
+      "tags": [
+        "costs drg",
+        "healthcare",
+        "Cost Eff Resour Alloc"
+      ],
+      "date": "2026-05-09T00:00:00.000Z",
+      "source": "PubMed",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/42106710/",
+      "specialty": "Healthcare Economics"
     },
     {
       "id": "clinicaltrials-NCT02582463",
@@ -243,7 +395,7 @@
         "cme",
         "cardiology"
       ],
-      "date": "2026-05-29T22:20:17.889Z",
+      "date": "2026-05-31T08:52:40.624Z",
       "source": "Congress Calendar",
       "sourceUrl": "https://www.escardio.org/Congresses-Events/ESC-Congress",
       "specialty": "Cardiology"
@@ -262,7 +414,7 @@
         "oncology",
         "abstracts"
       ],
-      "date": "2026-06-12T22:20:17.889Z",
+      "date": "2026-06-14T08:52:40.624Z",
       "source": "Congress Calendar",
       "sourceUrl": "https://conferences.asco.org/am",
       "specialty": "Oncology"
@@ -281,7 +433,7 @@
         "digital health",
         "systems"
       ],
-      "date": "2026-06-26T22:20:17.889Z",
+      "date": "2026-06-28T08:52:40.624Z",
       "source": "Congress Calendar",
       "sourceUrl": "https://www.himss.org/global-conference",
       "specialty": "Digital Health"
@@ -300,7 +452,7 @@
         "who",
         "public health"
       ],
-      "date": "2026-07-10T22:20:17.889Z",
+      "date": "2026-07-12T08:52:40.624Z",
       "source": "Congress Calendar",
       "sourceUrl": "https://www.who.int/about/who-academy",
       "specialty": "General Medicine"
@@ -319,7 +471,7 @@
         "fda",
         "drug safety"
       ],
-      "date": "2026-07-24T22:20:17.889Z",
+      "date": "2026-07-26T08:52:40.624Z",
       "source": "Congress Calendar",
       "sourceUrl": "https://www.fda.gov/drugs/drug-safety-and-availability/drug-safety-communications",
       "specialty": "Clinical Pharmacology"

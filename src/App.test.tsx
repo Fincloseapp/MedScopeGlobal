@@ -133,7 +133,7 @@ describe('MedScopeGlobal routing and navigation', () => {
     await user.type(screen.getByLabelText('Work email'), 'jane@example.org');
     await user.click(screen.getByRole('button', { name: 'Subscribe' }));
 
-    expect(await screen.findByRole('status')).toHaveTextContent('No CRM endpoint is configured');
+    expect(await screen.findByText(/No CRM endpoint is configured in this environment/)).toBeInTheDocument();
     expect(localStorage.getItem('medscope.leads.newsletter.v1')).toContain('Jane Clinician');
   });
 
