@@ -95,6 +95,8 @@ export default async function ArticleDetailPage({ params }: PageProps) {
           hasFullAccess={access.hasFullAccess}
           requiresSubscription={access.requiresSubscription}
           articleTargetId="full-article"
+          source={article.source}
+          sourceUrl={article.sourceUrl}
         />
         <ArticleBodyExpander
           content={access.hasFullAccess ? article.content : publicExcerpt(article.content)}

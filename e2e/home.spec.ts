@@ -28,9 +28,8 @@ test("public student article access panel expands on click", async ({ page }) =>
   await expect(page.getByRole("heading", { name: "Praktické využití pro čtenáře" })).toBeVisible();
 
   const trigger = page.getByRole("link", { name: /Článek je dostupný všem návštěvníkům/ });
-  await expect(trigger).toHaveAttribute("href", /#full-article$/);
-  await trigger.click();
-  await expect(page).toHaveURL(/#full-article$/);
+  await expect(trigger).toHaveAttribute("href", /^https?:\/\//);
+  await expect(trigger).toHaveAttribute("target", "_blank");
   await expect(page.getByText("Tento článek je otevřený bez přihlášení.")).toBeVisible();
 });
 
@@ -38,29 +37,34 @@ for (const article of [
   {
     title: "Kardiologie veřejnost/student",
     slug: "kardiologie-prevence-cesko-001",
-    expectedTag: "prevence"
+    expectedHref: "cls.cz",
+    expectedOpenedSource: "cls.cz"
   },
   {
     title: "Digitální zdraví veřejnost/student",
     slug: "digitalni-zdravi-ai-cesko-005",
-    expectedTag: "AI"
+    expectedHref: "med.muni.cz",
+    expectedOpenedSource: "med.muni.cz"
   },
   {
     title: "Neurologie veřejnost/student",
     slug: "neurologie-diagnostika-cesko-009",
-    expectedTag: "diagnostika"
+    expectedHref: "sukl.cz",
+    expectedOpenedSource: "sukl.gov.cz"
   }
 ]) {
-  test(`lay reader can expand full article from access message: ${article.title}`, async ({ page }) => {
+  test(`lay reader can open monitored source from access message: ${article.title}`, async ({ page }) => {
     await page.goto(`/articles/${article.slug}`);
 
     const trigger = page.getByRole("link", { name: /Článek je dostupný všem návštěvníkům/ });
-    await expect(trigger).toHaveAttribute("href", /#full-article$/);
-    await trigger.click();
+    await expect(trigger).toHaveAttribute("href", new RegExp(article.expectedHref.replace(".", "\\.")));
+    await expect(trigger).toHaveAttribute("target", "_blank");
 
-    await expect(page).toHaveURL(new RegExp(`${article.slug}#full-article$`));
-    await expect(page.locator("#full-article").getByRole("heading", { name: "Celý článek" })).toBeVisible();
-    await expect(page.locator("#full-article").getByText(new RegExp(article.expectedTag, "i")).first()).toBeVisible();
+    const popupPromise = page.waitForEvent("popup");
+    await trigger.click();
+    const popup = await popupPromise;
+    await expect(popup).toHaveURL(new RegExp(article.expectedOpenedSource.replace(".", "\\.")));
+    await popup.close();
   });
 }
 

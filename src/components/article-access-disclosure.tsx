@@ -7,6 +7,8 @@ interface ArticleAccessDisclosureProps {
   hasFullAccess: boolean;
   requiresSubscription: boolean;
   articleTargetId?: string;
+  source: string;
+  sourceUrl?: string;
 }
 
 export function ArticleAccessDisclosure({
@@ -15,24 +17,44 @@ export function ArticleAccessDisclosure({
   message,
   hasFullAccess,
   requiresSubscription,
-  articleTargetId = "full-article"
+  articleTargetId = "full-article",
+  source,
+  sourceUrl
 }: ArticleAccessDisclosureProps) {
   const isPublicStudent = hasFullAccess && !requiresSubscription;
+  const sourceHref = sourceUrl || `#${articleTargetId}`;
+  const isExternalSource = Boolean(sourceUrl?.startsWith("http"));
 
   if (isPublicStudent) {
     return (
       <section className="access-disclosure success-disclosure" aria-label="Dostupnost článku">
-        <a className="access-disclosure-trigger" href={`#${articleTargetId}`}>
+        <a
+          className="access-disclosure-trigger"
+          href={sourceHref}
+          target={isExternalSource ? "_blank" : undefined}
+          rel={isExternalSource ? "noreferrer" : undefined}
+        >
           <span>
             <strong>{accessLabel}</strong>
             <small>{message}</small>
           </span>
-          <span className="summary-action">Přejít na celý článek</span>
+          <span className="summary-action">{sourceUrl ? "Otevřít zdrojový článek" : "Přejít na celý článek"}</span>
         </a>
         <div className="access-disclosure-body">
           <p>
             Tento článek je otevřený bez přihlášení. Patří do úrovně <strong>{audienceLabel}</strong>, takže je určený
             pro veřejné návštěvníky, studenty a čtenáře, kteří se chtějí bezpečně zorientovat v tématu.
+          </p>
+          <p>
+            Kliknutím na horní řádek otevřete zdroj monitoringu:{" "}
+            {sourceUrl ? (
+              <a href={sourceUrl} target="_blank" rel="noreferrer">
+                {source}
+              </a>
+            ) : (
+              <a href={`#${articleTargetId}`}>celý text v MedScopeGlobal</a>
+            )}
+            .
           </p>
         </div>
       </section>
