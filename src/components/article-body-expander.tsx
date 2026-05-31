@@ -28,7 +28,7 @@ export function ArticleBodyExpander({
   tags,
   hasFullAccess
 }: ArticleBodyExpanderProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(hasFullAccess);
   const bodyId = useId();
   const sentences = splitIntoSentences(content);
   const preview = sentences[0] ?? content;
