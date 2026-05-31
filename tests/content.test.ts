@@ -6,6 +6,41 @@ function wordCount(value: string) {
   return value.trim().split(/\s+/).filter(Boolean).length;
 }
 
+const requiredHeadings = [
+  "Úvod",
+  "Co téma znamená",
+  "Jak funguje v praxi",
+  "Klíčové myšlenky ze zdroje",
+  "Hlavní přínosy",
+  "Rizika a omezení",
+  "Příklady použití",
+  "Dopad na zdravotnictví / systém / pacienty",
+  "Shrnutí"
+];
+
+function h2Headings(value: string) {
+  return value
+    .split("\n")
+    .filter((line) => line.startsWith("## "))
+    .map((line) => line.replace(/^##\s+/, "").trim());
+}
+
+function sectionText(value: string, heading: string) {
+  const pattern = new RegExp(`## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\n([\\s\\S]*?)(?=\\n## |$)`);
+  return value.match(pattern)?.[1] ?? "";
+}
+
+function paragraphsInSection(value: string, heading: string) {
+  return sectionText(value, heading)
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith("- "));
+}
+
+function sentenceCount(value: string) {
+  return value.split(/(?<=[.!?])\s+/).filter(Boolean).length;
+}
+
 describe("content filtering", () => {
   it("returns matching articles and supports empty state", () => { expect(filterArticles({ query: "AI" }).length).toBeGreaterThan(0); expect(filterArticles({ query: "definitely-not-present" })).toHaveLength(0); });
   it("publishes 100 daily source-monitoring articles with at least 15 per category", () => { expect(articles.filter((article) => article.id.startsWith("daily-"))).toHaveLength(dailyArticleTarget); for (const specialization of specializations) expect(filterArticles({ specialization }).length).toBeGreaterThanOrEqual(15); });
@@ -16,14 +51,16 @@ describe("content filtering", () => {
     for (const article of publicArticles) {
       expect(wordCount(article.content)).toBeGreaterThanOrEqual(800);
       expect(wordCount(article.content)).toBeLessThanOrEqual(1200);
-      expect(article.content).toContain("## Úvod");
-      expect(article.content).toContain("## Co téma znamená");
-      expect(article.content).toContain("## Jak funguje v praxi");
-      expect(article.content).toContain("## Hlavní přínosy");
-      expect(article.content).toContain("## Rizika a omezení");
-      expect(article.content).toContain("## Příklady použití");
-      expect(article.content).toContain("## Dopad na zdravotnictví");
-      expect(article.content).toContain("## Shrnutí");
+      expect(h2Headings(article.content)).toEqual(requiredHeadings);
+      for (const heading of requiredHeadings) {
+        const paragraphs = paragraphsInSection(article.content, heading);
+        expect(paragraphs.length).toBeGreaterThanOrEqual(2);
+        expect(paragraphs.length).toBeLessThanOrEqual(4);
+        expect(paragraphs.every((paragraph) => sentenceCount(paragraph) >= 3)).toBe(true);
+      }
+      for (const heading of ["Hlavní přínosy", "Rizika a omezení", "Příklady použití"]) {
+        expect(sectionText(article.content, heading).split("\n").filter((line) => line.startsWith("- ")).length).toBeGreaterThanOrEqual(3);
+      }
     }
   });
   it("filters events by region, format and specialization", () => { const results = filterEvents({ region: "Česko", format: "hybrid", specialization: "Digitální zdraví" }); expect(results).toHaveLength(1); expect(results[0]?.slug).toBe("digital-health-prague-2026"); });

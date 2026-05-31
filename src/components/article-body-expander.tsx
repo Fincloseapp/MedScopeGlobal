@@ -62,19 +62,14 @@ export function ArticleBodyExpander({
   tags,
   hasFullAccess
 }: ArticleBodyExpanderProps) {
-  const sentences = splitIntoSentences(content);
-  const preview = sentences[0] ?? content;
-
   if (!hasFullAccess) {
+    const sentences = splitIntoSentences(content);
+    const preview = sentences[0] ?? content;
     return <p className="article-preview">{preview}</p>;
   }
 
   return (
     <section className="article-body-expander is-open" aria-labelledby="full-article-title">
-      <div className="article-preview">
-        <h2>Úvod článku</h2>
-        <p>{preview}</p>
-      </div>
       <ArticleFullBody
         id="full-article"
         content={content}
@@ -101,7 +96,9 @@ export function ArticleFullBody({
 
   return (
     <div className="article-full-body" id={id}>
-      <h2 id={id ? `${id}-title` : undefined}>Celý článek</h2>
+      <span id={id ? `${id}-title` : undefined} className="sr-only">
+        Celý článek
+      </span>
       {blocks.length
         ? blocks.map((block, index) => {
             if (block.type === "h2") return <h2 key={`${block.text}-${index}`}>{block.text}</h2>;

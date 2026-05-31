@@ -23,9 +23,9 @@ test("public student article access panel expands on click", async ({ page }) =>
   await page.goto("/articles?audience=laik-student");
   await page.getByRole("link", { name: "Číst více / Read more" }).first().click();
 
-  await expect(page.getByRole("heading", { name: "Celý článek" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Proč je téma důležité", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Praktické využití pro čtenáře" })).toBeVisible();
+  await expect(page.locator("#full-article").getByRole("heading", { name: "Úvod" })).toBeVisible();
+  await expect(page.locator("#full-article").getByRole("heading", { name: "Klíčové myšlenky ze zdroje" })).toBeVisible();
+  await expect(page.locator("#full-article").getByRole("heading", { name: "Dopad na zdravotnictví / systém / pacienty" })).toBeVisible();
 
   const trigger = page.getByRole("link", { name: /Článek je dostupný všem návštěvníkům/ });
   await expect(trigger).toHaveAttribute("href", /^https?:\/\//);
