@@ -23,25 +23,15 @@ test("public student article access panel expands on click", async ({ page }) =>
   await page.goto("/articles?audience=laik-student");
   await page.getByRole("link", { name: "Číst více / Read more" }).first().click();
 
-  const collapseArticleTrigger = page.getByRole("button", { name: "Sbalit celý článek" });
-  await expect(collapseArticleTrigger).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByRole("heading", { name: "Celý článek" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Proč je téma důležité" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Praktické využití pro čtenáře" })).toBeVisible();
 
-  await collapseArticleTrigger.click();
-  const expandArticleTrigger = page.getByRole("button", { name: "Rozbalit celý článek" });
-  await expect(expandArticleTrigger).toHaveAttribute("aria-expanded", "false");
-  await expandArticleTrigger.click();
-  await expect(page.getByRole("button", { name: "Sbalit celý článek" })).toHaveAttribute("aria-expanded", "true");
-
-  const trigger = page.getByRole("button", { name: /Volně dostupné/ });
-  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  const trigger = page.getByRole("link", { name: /Článek je dostupný všem návštěvníkům/ });
+  await expect(trigger).toHaveAttribute("href", /#full-article$/);
   await trigger.click();
-
-  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  await expect(page).toHaveURL(/#full-article$/);
   await expect(page.getByText("Tento článek je otevřený bez přihlášení.")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Celý článek dostupný z této úrovně" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Další veřejné a studentské články" })).toBeVisible();
 });
 
 for (const article of [
@@ -64,14 +54,13 @@ for (const article of [
   test(`lay reader can expand full article from access message: ${article.title}`, async ({ page }) => {
     await page.goto(`/articles/${article.slug}`);
 
-    const trigger = page.getByRole("button", { name: /Článek je dostupný všem návštěvníkům/ });
-    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    const trigger = page.getByRole("link", { name: /Článek je dostupný všem návštěvníkům/ });
+    await expect(trigger).toHaveAttribute("href", /#full-article$/);
     await trigger.click();
 
-    await expect(trigger).toHaveAttribute("aria-expanded", "true");
-    await expect(page.getByRole("heading", { name: "Celý článek dostupný z této úrovně" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Celý text" }).last()).toBeVisible();
-    await expect(page.locator(".access-article-body").getByText(new RegExp(article.expectedTag, "i")).first()).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`${article.slug}#full-article$`));
+    await expect(page.locator("#full-article").getByRole("heading", { name: "Celý článek" })).toBeVisible();
+    await expect(page.locator("#full-article").getByText(new RegExp(article.expectedTag, "i")).first()).toBeVisible();
   });
 }
 

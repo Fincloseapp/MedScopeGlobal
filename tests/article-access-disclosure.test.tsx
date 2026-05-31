@@ -1,9 +1,9 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { ArticleAccessDisclosure } from "@/components/article-access-disclosure";
 
 describe("ArticleAccessDisclosure", () => {
-  it("expands and collapses the public/student access explanation on click", () => {
+  it("links public/student access message directly to the full article", () => {
     render(
       <ArticleAccessDisclosure
         accessLabel="Volně dostupné"
@@ -11,34 +11,12 @@ describe("ArticleAccessDisclosure", () => {
         message="Článek je dostupný všem návštěvníkům v úrovni veřejnost / student."
         hasFullAccess
         requiresSubscription={false}
-        article={{
-          content: "Veřejný článek první věta. Veřejný článek druhá věta.",
-          summary: "Shrnutí veřejného článku.",
-          specialization: "Kardiologie",
-          source: "MedScopeGlobal",
-          tags: ["student", "veřejnost"]
-        }}
+        articleTargetId="full-article"
       />
     );
 
-    const trigger = screen.getByRole("button", { name: /Volně dostupné/ });
-    expect(trigger).toHaveAttribute("aria-expanded", "false");
-    expect(screen.queryByText(/Tento článek je otevřený bez přihlášení/)).not.toBeInTheDocument();
-
-    fireEvent.click(trigger);
-
-    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    const link = screen.getByRole("link", { name: /Článek je dostupný všem návštěvníkům/ });
+    expect(link).toHaveAttribute("href", "#full-article");
     expect(screen.getByText(/Tento článek je otevřený bez přihlášení/)).toBeInTheDocument();
-    expect(screen.getByText("Celý článek dostupný z této úrovně")).toBeInTheDocument();
-    expect(screen.getByText(/Veřejný článek druhá věta/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Další veřejné a studentské články" })).toHaveAttribute(
-      "href",
-      "/articles?audience=laik-student"
-    );
-
-    fireEvent.click(trigger);
-
-    expect(trigger).toHaveAttribute("aria-expanded", "false");
-    expect(screen.queryByText(/Tento článek je otevřený bez přihlášení/)).not.toBeInTheDocument();
   });
 });

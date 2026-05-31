@@ -1,7 +1,3 @@
-"use client";
-
-import { useId, useState } from "react";
-
 interface ArticleBodyExpanderProps {
   content: string;
   summary: string;
@@ -28,8 +24,6 @@ export function ArticleBodyExpander({
   tags,
   hasFullAccess
 }: ArticleBodyExpanderProps) {
-  const [isOpen, setIsOpen] = useState(hasFullAccess);
-  const bodyId = useId();
   const sentences = splitIntoSentences(content);
   const preview = sentences[0] ?? content;
 
@@ -38,31 +32,20 @@ export function ArticleBodyExpander({
   }
 
   return (
-    <section className={isOpen ? "article-body-expander is-open" : "article-body-expander"} aria-labelledby={`${bodyId}-title`}>
+    <section className="article-body-expander is-open" aria-labelledby="full-article-title">
       <div className="article-preview">
-        <h2 id={`${bodyId}-title`}>Obsah článku</h2>
+        <h2>Úvod článku</h2>
         <p>{preview}</p>
       </div>
-      <button
-        className="button primary article-expand-button"
-        type="button"
-        aria-expanded={isOpen}
-        aria-controls={bodyId}
-        onClick={() => setIsOpen((value) => !value)}
-      >
-        {isOpen ? "Sbalit celý článek" : "Rozbalit celý článek"}
-      </button>
-      {isOpen ? (
-        <ArticleFullBody
-          id={bodyId}
-          content={content}
-          summary={summary}
-          specialization={specialization}
-          source={source}
-          sourceUrl={sourceUrl}
-          tags={tags}
-        />
-      ) : null}
+      <ArticleFullBody
+        id="full-article"
+        content={content}
+        summary={summary}
+        specialization={specialization}
+        source={source}
+        sourceUrl={sourceUrl}
+        tags={tags}
+      />
     </section>
   );
 }
@@ -81,7 +64,7 @@ export function ArticleFullBody({
   return (
     <div className="article-full-body" id={id}>
       <section>
-        <h3>Celý text</h3>
+        <h3 id={id ? `${id}-title` : undefined}>Celý článek</h3>
         {(fullText.length ? fullText : [content]).map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>
         ))}

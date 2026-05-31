@@ -88,6 +88,14 @@ export default async function ArticleDetailPage({ params }: PageProps) {
           </span>
           <span>{article.readingTime} min čtení</span>
         </div>
+        <ArticleAccessDisclosure
+          accessLabel={access.accessLabel}
+          audienceLabel={audienceLabel}
+          message={access.message}
+          hasFullAccess={access.hasFullAccess}
+          requiresSubscription={access.requiresSubscription}
+          articleTargetId="full-article"
+        />
         <ArticleBodyExpander
           content={access.hasFullAccess ? article.content : publicExcerpt(article.content)}
           summary={article.summary}
@@ -96,25 +104,6 @@ export default async function ArticleDetailPage({ params }: PageProps) {
           sourceUrl={article.sourceUrl}
           tags={article.tags}
           hasFullAccess={access.hasFullAccess}
-        />
-        <ArticleAccessDisclosure
-          accessLabel={access.accessLabel}
-          audienceLabel={audienceLabel}
-          message={access.message}
-          hasFullAccess={access.hasFullAccess}
-          requiresSubscription={access.requiresSubscription}
-          article={
-            access.hasFullAccess
-              ? {
-                  content: article.content,
-                  summary: article.summary,
-                  specialization: article.specialization,
-                  source: article.source,
-                  sourceUrl: article.sourceUrl,
-                  tags: article.tags
-                }
-              : undefined
-          }
         />
       </article>
 
