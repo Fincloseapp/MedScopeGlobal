@@ -1,34 +1,74 @@
-# MedScopeGlobal
+# MedScopeGlobal – Medicínský obsahový portál
 
-Professional medical portal built with React, Vite and TypeScript.
+Produkční platforma pro odborné medicínské články s RBAC, generováním obsahu, validací zdrojů a fulltextovým vyhledáváním.
 
-## Features
+## Architektura
 
-- Sticky click-based navigation with locale-aware routes.
-- Supported language prefixes: `/en/`, `/cs/`, `/de/`, `/pl/`.
-- Automatic language selection from `localStorage.language`, `navigator.languages`, `navigator.language` and server-provided `Accept-Language` metadata.
-- AI Content Engine with live source adapters, local caching, scheduled refresh and placeholder fallback.
-- Homepage sections for professional content, research, economics, digital health, pharma, news, congresses, careers, students, credibility and subscription.
-- Fulltext search and a research submission form.
+### Backend
+- **Next.js 16 App Router** – server-side rendering + Route Handlers (`/api/portal/*`)
+- **In-memory store** – výchozí persistence pro dev/test (seed demo dat)
+- **Prisma + PostgreSQL** – produkční schema (`PortalUser`, `PortalArticle`, `ArticleRating`, `SavedArticle`)
+- **Auth** – HMAC-signed session cookies, scrypt password hashing
+- **RBAC** – role `reader`, `expert`, `admin` s ověřením domény e-mailu
 
-## Development
+### Frontend
+- React 19 + TypeScript
+- Portálové stránky: `/portal`, `/portal/articles`, `/portal/manage`
+- Auth: `/auth/login`, `/auth/register`
+- Medical-grade UI s důrazem na čitelnost
+
+## Datový model
+
+| Entita | Klíčová pole |
+|--------|-------------|
+| **PortalUser** | email, passwordHash, role, verificationStatus, institution |
+| **PortalArticle** | title, sections[], clinicalSignificance, practiceRecommendations, citations[], tags[], icdCodes[], status |
+| **Citation** | title, sourceName, sourceUrl, doi, year |
+| **ArticleRating** | userId, articleId, score (1–5) |
+| **SavedArticle** | userId, articleId |
+
+## Role a oprávnění
+
+| Role | Oprávnění |
+|------|-----------|
+| **Reader** | čtení, ukládání, hodnocení |
+| **Expert** | + vytváření, editace, publikace, validace (po schválení) |
+| **Admin** | + schvalování expertů, správa všech článků |
+
+Ověření experta: automatické pro domény LF UK, LF MU, FN atd.; jinak manuální schválení adminem.
+
+## API
+
+| Endpoint | Metoda | Popis |
+|----------|--------|-------|
+| `/api/portal/auth/register` | POST | Registrace |
+| `/api/portal/auth/login` | POST | Přihlášení |
+| `/api/portal/auth/logout` | POST | Odhlášení |
+| `/api/portal/auth/me` | GET | Aktuální uživatel |
+| `/api/portal/articles` | GET/POST | Seznam / vytvoření |
+| `/api/portal/articles/generate` | POST | AI generování |
+| `/api/portal/articles/[id]` | GET/PUT/DELETE | Detail / editace / smazání |
+| `/api/portal/articles/[id]/publish` | POST | Publikace draft→published |
+| `/api/portal/articles/[id]/rate` | POST | Hodnocení |
+| `/api/portal/articles/[id]/save` | POST/DELETE | Uložení |
+| `/api/portal/sources` | GET | Katalog zdrojů |
+
+## Demo účty
+
+- Čtenář: `reader@example.com` / `Reader123!`
+- Odborník: `expert@lf1.cuni.cz` / `Expert123!`
+- Admin: `admin@medscopeglobal.com` / `Admin123!`
+
+## Spuštění
 
 ```bash
 npm install
 npm run dev
+npm run test
+npm run ci
 ```
 
-## Verification
+## Zdroje
 
-```bash
-npm test
-npm run build
-```
-
-## Content refresh
-
-The browser refreshes cached content on a schedule. The repository also includes a GitHub Actions workflow and script:
-
-```bash
-npm run refresh:content
-```
+České: ČLS JEP, LF UK (1–3), LF MU, LF UPOL, SÚKL, ÚZIS, české časopisy
+Zahraniční: PubMed, WHO, ESC, EULAR, NEJM, Lancet, BMJ

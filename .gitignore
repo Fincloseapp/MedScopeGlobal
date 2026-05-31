@@ -1,8 +1,14 @@
 node_modules/
 dist/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+.env*.local
+.env
 .DS_Store
 *.log
-coverage/
 *.tsbuildinfo
 vite.config.js
 vite.config.d.ts
