@@ -15,6 +15,44 @@ function splitIntoSentences(content: string) {
     .filter(Boolean);
 }
 
+type RichBlock =
+  | { type: "h2" | "h3"; text: string }
+  | { type: "paragraph"; text: string }
+  | { type: "list"; items: string[] };
+
+function parseRichContent(content: string): RichBlock[] {
+  const blocks: RichBlock[] = [];
+  const lines = content.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+
+    if (line.startsWith("### ")) {
+      blocks.push({ type: "h3", text: line.replace(/^###\s+/, "") });
+      continue;
+    }
+
+    if (line.startsWith("## ")) {
+      blocks.push({ type: "h2", text: line.replace(/^##\s+/, "") });
+      continue;
+    }
+
+    if (line.startsWith("- ")) {
+      const items = [line.replace(/^-\s+/, "")];
+      while (lines[index + 1]?.startsWith("- ")) {
+        index += 1;
+        items.push(lines[index].replace(/^-\s+/, ""));
+      }
+      blocks.push({ type: "list", items });
+      continue;
+    }
+
+    blocks.push({ type: "paragraph", text: line });
+  }
+
+  return blocks;
+}
+
 export function ArticleBodyExpander({
   content,
   summary,
@@ -59,16 +97,27 @@ export function ArticleFullBody({
   sourceUrl,
   tags
 }: Omit<ArticleBodyExpanderProps, "hasFullAccess"> & { id?: string }) {
-  const fullText = splitIntoSentences(content);
+  const blocks = parseRichContent(content);
 
   return (
     <div className="article-full-body" id={id}>
-      <section>
-        <h3 id={id ? `${id}-title` : undefined}>Celý článek</h3>
-        {(fullText.length ? fullText : [content]).map((paragraph) => (
-          <p key={paragraph}>{paragraph}</p>
-        ))}
-      </section>
+      <h2 id={id ? `${id}-title` : undefined}>Celý článek</h2>
+      {blocks.length
+        ? blocks.map((block, index) => {
+            if (block.type === "h2") return <h2 key={`${block.text}-${index}`}>{block.text}</h2>;
+            if (block.type === "h3") return <h3 key={`${block.text}-${index}`}>{block.text}</h3>;
+            if (block.type === "list") {
+              return (
+                <ul key={`list-${index}`}>
+                  {block.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              );
+            }
+            return <p key={`${block.text}-${index}`}>{block.text}</p>;
+          })
+        : <p>{content}</p>}
       <section>
         <h3>Proč je téma důležité</h3>
         <p>

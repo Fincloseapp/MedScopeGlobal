@@ -104,6 +104,99 @@ function slugify(value: string) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
+function sourceTypeLabel(type: ArticleSource["type"]) {
+  const labels: Record<ArticleSource["type"], string> = {
+    university: "univerzitní nebo akademický zdroj",
+    "medical-society": "odbornou společnost",
+    hospital: "zdravotnické pracoviště",
+    regulator: "regulační instituci",
+    journal: "odborný časopis",
+    "public-health": "veřejnozdravotní instituci"
+  };
+  return labels[type];
+}
+
+function buildExtendedSourceExcerpt({
+  specialization,
+  source,
+  theme,
+  audienceLabel
+}: {
+  specialization: (typeof specializations)[number];
+  source: ArticleSource;
+  theme: SourceTheme;
+  audienceLabel: string;
+}) {
+  const sourceKind = sourceTypeLabel(source.type);
+  const regionalContext =
+    source.region === "Globální"
+      ? "globálního medicínského prostředí"
+      : `regionu ${source.region}`;
+  const systemContext =
+    source.type === "regulator"
+      ? "bezpečnost, dostupnost, pravidla používání a dohled nad kvalitou péče"
+      : source.type === "university"
+        ? "výuku, výzkum, metodické vedení a přenos poznatků do praxe"
+        : source.type === "journal"
+          ? "publikované důkazy, odbornou diskusi a kritické hodnocení nových poznatků"
+          : "praktickou péči, vzdělávání a orientaci v odborných doporučeních";
+
+  return `## Úvod: kontext a proč je téma důležité
+
+Tento rozšířený výtah vychází z monitoringu zdroje ${source.name}, který reprezentuje ${sourceKind} v rámci ${regionalContext}. Téma „${theme.focus}“ je zařazeno do oblasti ${specialization}, protože se dotýká každodenního rozhodování pacientů, studentů i zdravotnických týmů. Pro úroveň ${audienceLabel} je důležité vysvětlit nejen samotný pojem, ale také to, jak se informace ze zdroje převádí do bezpečného porozumění. Cílem textu není nahradit původní dokument, ale vytvořit srozumitelný výtah, který pomůže čtenáři poznat hlavní směr, význam a praktické důsledky tématu.
+
+Zdroj ${source.name} je v tomto monitoringu použit jako výchozí orientační bod. V praxi to znamená, že MedScopeGlobal nesleduje pouze název tématu, ale také původ informace, odborný kontext a možné dopady na systém péče. U tématu „${theme.focus}“ je podstatné, že se nejedná o izolovanou novinku, ale o část širšího vývoje v medicíně. Čtenář by měl po přečtení rozumět tomu, proč se o tématu mluví, jak se může projevit v praxi a proč je vhodné sledovat původní zdroj.
+
+## Co téma znamená: definice a základní vysvětlení
+
+Pojem „${theme.focus}“ označuje oblast, ve které se odborné poznatky, organizační postupy a potřeby pacientů propojují do konkrétního rozhodování. V oblasti ${specialization} může jít o prevenci, diagnostiku, léčbu, sledování kvality nebo bezpečné používání nových metod. Pro laika a studenta je důležité nejprve odlišit odborný termín od běžného dojmu: odborný pojem obvykle popisuje přesně vymezený proces, soubor pravidel nebo měřitelný jev. Proto text používá jednoduchý jazyk, ale zachovává přesnost zdroje.
+
+Základní význam tématu se dá shrnout tak, že zdroj upozorňuje na vztah mezi znalostí a praktickým použitím. Pokud například ${source.name} zveřejňuje vzdělávací, regulační nebo odborné materiály, nejde pouze o informaci k přečtení, ale o návod, jak přemýšlet o kvalitě a bezpečnosti péče. Výtah proto zdůrazňuje definice, souvislosti a hranice platnosti. Čtenář by měl rozpoznat, co je pevný závěr zdroje, co je interpretace a kde je nutné vrátit se k původnímu dokumentu.
+
+## Jak funguje v praxi: mechanismy a procesy
+
+V praxi téma funguje jako součást řetězce rozhodnutí. Nejprve vzniká odborný poznatek nebo institucionální doporučení, poté se informace překládá do vzdělávání, klinické komunikace nebo organizačního postupu. U tématu „${theme.focus}“ je důležité sledovat, kdo je autorem zdroje, jaký typ instituce ho vydává a pro koho je informace určena. Právě proto monitoring uvádí zdroj, region, specializaci a tagy, aby čtenář nečetl informaci bez kontextu.
+
+Mechanismus použití se liší podle typu zdroje. U regulatorních institucí je důraz na ${systemContext}, zatímco u univerzit a odborných společností bývá důležitější výuka, metodika a schopnost vysvětlit téma budoucím zdravotníkům. U veřejných článků v MedScopeGlobal je proces záměrně zjednodušený: čtenář nejprve získá srozumitelný výtah, poté může přejít na původní zdroj a ověřit detail. Tento postup podporuje kritické čtení místo pasivního přejímání krátké anotace.
+
+### Klíčové myšlenky ze zdroje
+
+- ${source.name} poskytuje kontext, který pomáhá zařadit téma „${theme.focus}“ do oblasti ${specialization}.
+- Zdroj je nutné chápat podle typu instituce: ${sourceKind} klade důraz na jiné otázky než časopis, nemocnice nebo regulační autorita.
+- Veřejný a studentský výtah má vysvětlit základní smysl, nikoli nahradit kompletní odborný dokument.
+- Přechod na původní zdroj je důležitý pro ověření detailů, aktuálnosti a přesného znění závěrů.
+
+## Hlavní přínosy
+
+Hlavním přínosem strukturovaného výtahu je lepší orientace. Čtenář nemusí začínat od složitého institucionálního webu nebo odborného dokumentu bez kontextu, ale získá úvodní mapu tématu. U oblasti ${specialization} je taková orientace důležitá, protože stejný pojem může mít klinický, vzdělávací, systémový i pacientský význam. Přínosem je také transparentnost: text jasně uvádí, že vychází ze zdroje ${source.name}, a odkazuje čtenáře zpět na původní materiál.
+
+Dalším přínosem je schopnost propojit téma s praxí. Student může pochopit základní definice, laik získá bezpečné vysvětlení bez přehnaných slibů a odborník rychle pozná, zda má smysl otevřít původní zdroj. Výtah zároveň podporuje mediální a zdravotní gramotnost, tedy schopnost rozlišovat zdroj, důkaz, interpretaci a doporučení. To je zvlášť důležité u témat, která se týkají prevence, digitálních nástrojů, léčiv nebo veřejného zdraví.
+
+## Rizika a omezení
+
+Každý výtah má omezení. I když text aktivně pracuje se zdrojem, nemůže zachytit všechny detaily, metodologii, právní poznámky nebo kompletní seznam doporučení. Proto je u veřejné a studentské úrovně nutné zdůraznit, že výtah slouží jako vzdělávací orientace. Pokud se informace týká osobního zdravotního problému, rozhodnutí o léčbě nebo konkrétního pacienta, je potřeba obrátit se na kvalifikovaného zdravotníka.
+
+Dalším rizikem je příliš jednoduchá interpretace. Téma „${theme.focus}“ může vypadat srozumitelně, ale v praxi může záviset na populaci pacientů, regionu, typu zdravotnického zařízení nebo aktuálnosti doporučení. Zdroj ${source.name} může být velmi relevantní, ale čtenář musí zohlednit datum, typ instituce a účel publikace. Proto MedScopeGlobal uvádí metadata a zdrojové odkazy, aby bylo možné dohledat původní kontext.
+
+## Příklady použití v reálných scénářích
+
+První scénář se týká studenta, který se připravuje na seminář nebo praxi. Díky výtahu rychle pochopí, jak téma souvisí s oblastí ${specialization}, jaké pojmy si má vyjasnit a proč je vhodné přečíst původní zdroj. Druhý scénář se týká pacienta nebo veřejného čtenáře, který narazí na odborný termín a potřebuje bezpečné vysvětlení bez reklamního nebo senzacechtivého tónu. Třetí scénář se týká zdravotnického pracovníka, který chce rychle poznat, zda má zdroj význam pro jeho další studium.
+
+V praxi může čtenář postupovat ve třech krocích. Nejprve si přečte tento výtah, aby porozuměl hlavním pojmům a souvislostem. Poté otevře zdroj ${source.name}, kde najde přesnější dokument, aktualitu nebo institucionální informaci. Nakonec si vyhodnotí, zda je téma relevantní pro jeho studium, práci, komunikaci s pacientem nebo další rešerši.
+
+## Dopad na zdravotnictví, systém a pacienty
+
+Dopad tématu se neomezuje na jednotlivce. Pokud se informace ze zdroje správně vysvětlí a zasadí do kontextu, může zlepšit komunikaci mezi pacientem, studentem, lékařem a institucí. V oblasti ${specialization} to může znamenat lepší orientaci v prevenci, včasnější dotazy na správná témata, kvalitnější edukaci nebo bezpečnější používání digitálních a klinických postupů. Systémový dopad vzniká tehdy, když se informace nepředává jako izolovaná zpráva, ale jako součást širší znalostní infrastruktury.
+
+Pro pacienty a veřejnost je důležitá zejména srozumitelnost. Pokud je zdroj příliš odborný, může být obtížné rozpoznat, co je hlavní závěr a co je pouze detail. Strukturovaný výtah pomáhá oddělit definici, přínosy, rizika a praktické příklady. Pro zdravotnický systém je zase důležité, aby veřejné informace nepodporovaly zjednodušené závěry, ale vedly čtenáře k ověřování a odpovědnému rozhodování.
+
+## Shrnutí: klíčové poznatky ze zdroje
+
+Téma „${theme.focus}“ je v monitoringu zařazeno proto, že má vzdělávací, praktický a systémový význam. Zdroj ${source.name} poskytuje výchozí odborný nebo institucionální rámec, ze kterého lze odvodit hlavní souvislosti pro oblast ${specialization}. Pro úroveň ${audienceLabel} je nejdůležitější pochopit definici, praktický kontext, přínosy a omezení. Výtah proto zdůrazňuje, že zdroj je třeba číst aktivně a že kompletní informace je vhodné ověřit přímo v původním materiálu.
+
+Závěrem lze říci, že kvalitní edukativní výtah nemá být krátkou anotací. Má fungovat jako most mezi odborným zdrojem a čtenářem, který potřebuje porozumět tématu bez ztráty přesnosti. MedScopeGlobal proto propojuje veřejný text, metadata a odkaz na zdroj tak, aby čtenář mohl pokračovat od základního porozumění k hlubšímu studiu.`;
+}
+
 function buildDailyArticles(): Article[] {
   const dailyPublicationDate = "2026-05-29";
   return Array.from({ length: dailyArticleTarget }, (_, index) => {
@@ -118,8 +211,8 @@ function buildDailyArticles(): Article[] {
       id: `daily-${sequence}`,
       slug: `${slugify(specialization)}-${slugify(theme.tag)}-${slugify(source.country)}-${sequence}`,
       title: `${specialization}: denní monitoring - ${theme.focus}`,
-      summary: `Stručný přehled pro segment ${audienceLabel} se zdrojem ${source.name} (${source.country}).`,
-      content: `Denní monitoring MedScopeGlobal propojuje veřejně dostupné výstupy a vzdělávací zdroje instituce ${source.name} s tématem ${theme.focus}. Text slouží jako praktický rozcestník: co sledovat, proč je téma důležité pro české a evropské zdravotnictví a jak jej převést do bezpečné komunikace s pacienty, studenty, kliniky nebo partnery.`,
+      summary: `Rozšířený edukativní výtah pro segment ${audienceLabel} vycházející ze zdroje ${source.name} (${source.country}) a tématu ${theme.focus}.`,
+      content: buildExtendedSourceExcerpt({ specialization, source, theme, audienceLabel }),
       author: "MedScopeGlobal Source Desk",
       date: dailyPublicationDate,
       source: source.name,
@@ -127,7 +220,7 @@ function buildDailyArticles(): Article[] {
       specialization,
       region: source.region,
       audience,
-      readingTime: 3 + (index % 4),
+      readingTime: 10 + (index % 4),
       tags: [theme.tag, source.country, source.type, audienceLabel],
       featured: false
     } satisfies Article;
