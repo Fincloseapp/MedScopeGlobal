@@ -19,6 +19,19 @@ test("read more opens a corresponding article detail", async ({ page }) => {
   await expect(page.getByText("Volně dostupné")).toBeVisible();
 });
 
+test("public student article access panel expands on click", async ({ page }) => {
+  await page.goto("/articles?audience=laik-student");
+  await page.getByRole("link", { name: "Číst více / Read more" }).first().click();
+
+  const trigger = page.getByRole("button", { name: /Volně dostupné/ });
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await trigger.click();
+
+  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByText("Tento článek je otevřený bez přihlášení.")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Další veřejné a studentské články" })).toBeVisible();
+});
+
 test("news route aliases resolve instead of 404", async ({ page }) => {
   await page.goto("/news");
   await expect(page.getByRole("heading", { name: "Medicínské poznatky podle specializace." })).toBeVisible();

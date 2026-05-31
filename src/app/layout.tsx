@@ -16,7 +16,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{var s=['en','cs','de','pl'];var p=location.pathname.split('/').filter(Boolean)[0];var l=s.includes(p)?p:(navigator.languages||[navigator.language||'en']).map(function(x){return String(x).split('-')[0].toLowerCase()}).find(function(x){return s.includes(x)})||'en';localStorage.setItem('language',l);document.documentElement.lang=l;}catch(e){}"
+              "try{var s=['en','cs','de','pl'];var p=location.pathname.split('/').filter(Boolean)[0];var l=s.includes(p)?p:(navigator.languages||[navigator.language||'en']).map(function(x){return String(x).split('-')[0].toLowerCase()}).find(function(x){return s.includes(x)})||'en';localStorage.setItem('language',l);}catch(e){}"
           }}
         />
         <a className="skip-link" href="#main-content">
