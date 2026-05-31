@@ -1,4 +1,5 @@
 import { ArticleCard } from '../components/ArticleCard';
+import { HeadMeta } from '../components/HeadMeta';
 import { useContent } from '../hooks/useContent';
 import type { Locale } from '../types/content';
 
@@ -11,6 +12,12 @@ export function CareersPage({ locale }: CareersPageProps) {
 
   return (
     <main className="page-shell">
+      <HeadMeta
+        locale={locale}
+        title="Careers"
+        description="Medical careers, fellowships, editorial opportunities and early-career programmes from MedScopeGlobal."
+        path="/careers"
+      />
       <section className="page-hero">
         <div>
           <p className="eyebrow">Careers</p>

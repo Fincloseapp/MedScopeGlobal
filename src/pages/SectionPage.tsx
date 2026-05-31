@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArticleCard } from '../components/ArticleCard';
+import { HeadMeta } from '../components/HeadMeta';
 import { SearchPanel } from '../components/SearchPanel';
 import { useContent } from '../hooks/useContent';
 import type { Locale } from '../types/content';
@@ -16,6 +17,12 @@ export function SectionPage({ locale, page }: SectionPageProps) {
 
   return (
     <main className="page-shell">
+      <HeadMeta
+        locale={locale}
+        title={page.title}
+        description={page.description}
+        path={page.path}
+      />
       <section className="page-hero">
         <div>
           <p className="eyebrow">{page.eyebrow}</p>

@@ -1,7 +1,13 @@
 import { FormEvent, useState } from 'react';
+import { HeadMeta } from '../components/HeadMeta';
 import { submitResearch } from '../content/aiContentEngine';
+import type { Locale } from '../types/content';
 
-export function ResearchSubmissionPage() {
+interface ResearchSubmissionPageProps {
+  locale: Locale;
+}
+
+export function ResearchSubmissionPage({ locale }: ResearchSubmissionPageProps) {
   const [status, setStatus] = useState<string>();
 
   function onSubmit(event: FormEvent<HTMLFormElement>): void {
@@ -21,6 +27,12 @@ export function ResearchSubmissionPage() {
 
   return (
     <main className="page-shell">
+      <HeadMeta
+        locale={locale}
+        title="Submit research"
+        description="Structured research submission workflow for editorial screening and future backend integration."
+        path="/research/submit"
+      />
       <section className="subscription-page">
         <p className="eyebrow">Research submission system</p>
         <h1>Submit research to MedScopeGlobal</h1>

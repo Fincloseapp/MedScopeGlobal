@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import type { MedicalContentItem } from '../types/content';
 import { withLocale } from '../utils/locale';
 import type { Locale } from '../types/content';
@@ -11,6 +12,7 @@ interface ArticleCardProps {
 export function ArticleCard({ item, locale, compact = false }: ArticleCardProps) {
   const date = new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(new Date(item.date));
   const href = item.sourceUrl.startsWith('/') ? withLocale(locale, item.sourceUrl) : item.sourceUrl;
+  const sourceLabel = item.citations > 0 ? 'Indexed metadata' : 'Source metadata';
 
   return (
     <article className={`article-card ${compact ? 'article-card--compact' : ''}`}>
@@ -19,7 +21,13 @@ export function ArticleCard({ item, locale, compact = false }: ArticleCardProps)
         <span>{date}</span>
       </div>
       <h3>
-        <a href={href}>{item.title}</a>
+        {item.sourceUrl.startsWith('/') ? (
+          <Link to={href}>{item.title}</Link>
+        ) : (
+          <a href={href} target="_blank" rel="noreferrer">
+            {item.title}
+          </a>
+        )}
       </h3>
       <p>{item.summary}</p>
       <div className="article-card__byline">
@@ -33,7 +41,7 @@ export function ArticleCard({ item, locale, compact = false }: ArticleCardProps)
       </div>
       <div className="article-card__footer">
         <span>{item.specialty}</span>
-        <span>{item.citations} citations</span>
+        <span>{sourceLabel}</span>
       </div>
     </article>
   );

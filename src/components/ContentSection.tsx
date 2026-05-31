@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import type { ContentCategory, Locale, MedicalContentItem } from '../types/content';
 import { withLocale } from '../utils/locale';
 import { ArticleCard } from './ArticleCard';
@@ -31,9 +32,9 @@ export function ContentSection({
           <p>{description}</p>
         </div>
         {cta ? (
-          <a className="text-link" href={withLocale(locale, cta.href)}>
+          <Link className="text-link" to={withLocale(locale, cta.href)}>
             {cta.label}
-          </a>
+          </Link>
         ) : null}
       </div>
       <div className="content-grid">

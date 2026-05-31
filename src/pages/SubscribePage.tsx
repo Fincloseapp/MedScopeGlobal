@@ -1,6 +1,20 @@
-export function SubscribePage() {
+import { HeadMeta } from '../components/HeadMeta';
+import { LeadForm } from '../components/LeadForm';
+import type { Locale } from '../types/content';
+
+interface SubscribePageProps {
+  locale: Locale;
+}
+
+export function SubscribePage({ locale }: SubscribePageProps) {
   return (
     <main className="page-shell">
+      <HeadMeta
+        locale={locale}
+        title="Subscribe to MedScopeGlobal"
+        description="Newsletter and membership inquiry path for clinical summaries, evidence digests, congress alerts and premium education."
+        path="/subscribe"
+      />
       <section className="subscription-page">
         <p className="eyebrow">Subscribe</p>
         <h1>Professional medical intelligence briefing</h1>
@@ -8,30 +22,15 @@ export function SubscribePage() {
           Subscribe to receive weekly clinical insights, research updates, policy alerts, pharma intelligence,
           congress reports and early-career opportunities.
         </p>
-        <form className="subscribe-form">
-          <label>
-            Work email
-            <input type="email" placeholder="name@institution.org" required />
-          </label>
-          <label>
-            Specialty
-            <select defaultValue="">
-              <option value="" disabled>
-                Select specialty
-              </option>
-              <option>Internal Medicine</option>
-              <option>Cardiology</option>
-              <option>Oncology</option>
-              <option>Digital Health</option>
-              <option>Healthcare Economics</option>
-              <option>Clinical Pharmacology</option>
-            </select>
-          </label>
-          <button className="button button--primary" type="submit">
-            Subscribe
-          </button>
-        </form>
       </section>
+      <LeadForm
+        kind="newsletter"
+        title="Join the professional briefing"
+        description="Validated newsletter and membership intake. A configured endpoint can route this to CRM or email automation."
+        submitLabel="Subscribe"
+        context="subscribe"
+        analyticsEvent="subscription_cta_click"
+      />
     </main>
   );
 }

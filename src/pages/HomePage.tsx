@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { ContentSection } from '../components/ContentSection';
+import { HeadMeta } from '../components/HeadMeta';
 import { SearchPanel } from '../components/SearchPanel';
+import { specialtyLinks } from '../data/platform';
 import { useContent } from '../hooks/useContent';
 import type { ContentCategory, Locale, MedicalContentItem } from '../types/content';
 import { withLocale } from '../utils/locale';
@@ -109,6 +111,12 @@ export function HomePage({ locale }: HomePageProps) {
 
   return (
     <main>
+      <HeadMeta
+        locale={locale}
+        title="MedScopeGlobal medical knowledge platform"
+        description="Premium medical knowledge platform for clinical insights, research, institutions, events, jobs, pharma and digital health."
+        path="/"
+      />
       <section className="hero">
         <div className="hero__content">
           <p className="eyebrow">Professional medical portal</p>
@@ -118,11 +126,17 @@ export function HomePage({ locale }: HomePageProps) {
             congress calendars and early-career research into a multilingual portal for healthcare professionals.
           </p>
           <div className="hero__actions">
-            <Link className="button button--primary" to={withLocale(locale, '/professional/clinical-insights')}>
-              Explore clinical insights
+            <Link className="button button--primary" to={withLocale(locale, '/articles')}>
+              Explore knowledge
             </Link>
-            <Link className="button button--secondary" to={withLocale(locale, '/subscribe')}>
-              Subscribe
+            <Link className="button button--secondary" to={withLocale(locale, '/institutions')}>
+              For institutions
+            </Link>
+            <Link className="button button--secondary" to={withLocale(locale, '/events')}>
+              Events & education
+            </Link>
+            <Link className="button button--secondary" to={withLocale(locale, '/jobs')}>
+              Jobs
             </Link>
           </div>
         </div>
@@ -134,6 +148,14 @@ export function HomePage({ locale }: HomePageProps) {
           </p>
           {error ? <small>{error}</small> : null}
         </aside>
+      </section>
+
+      <section className="topic-strip topic-strip--home" aria-label="Specialty navigation">
+        {specialtyLinks.map((link) => (
+          <Link key={link.href} to={withLocale(locale, link.href)}>
+            {link.label}
+          </Link>
+        ))}
       </section>
 
       {sectionConfigs.map((section) => (

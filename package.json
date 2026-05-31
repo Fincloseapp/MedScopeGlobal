@@ -9,7 +9,8 @@
     "preview": "vite preview --host 0.0.0.0",
     "test": "vitest run",
     "test:watch": "vitest",
-    "refresh:content": "node scripts/refresh-content.mjs"
+    "refresh:content": "node scripts/refresh-content.mjs",
+    "generate:sitemap": "node scripts/generate-sitemap.mjs"
   },
   "repository": {
     "type": "git",

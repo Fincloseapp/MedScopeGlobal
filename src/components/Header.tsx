@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { navigation } from '../data/navigation';
+import { commercialPages } from '../data/platform';
 import type { Locale } from '../types/content';
 import { persistLocale, stripLocaleFromPath, supportedLocales, withLocale } from '../utils/locale';
 
@@ -76,6 +77,16 @@ export function Header({ locale }: HeaderProps) {
           </button>
         </div>
       </div>
+      <nav className="utility-nav" aria-label="Commercial navigation">
+        <Link to={withLocale(locale, '/articles')}>Articles</Link>
+        <Link to={withLocale(locale, '/premium')}>Premium</Link>
+        <Link to={withLocale(locale, '/institutions')}>For Institutions</Link>
+        <Link to={withLocale(locale, '/events')}>Events & Education</Link>
+        <Link to={withLocale(locale, '/jobs')}>Jobs</Link>
+        <Link to={withLocale(locale, commercialPages.find((page) => page.path === '/publish')?.path ?? '/publish')}>
+          Publish
+        </Link>
+      </nav>
       <nav className={`main-nav ${mobileOpen ? 'main-nav--open' : ''}`} aria-label="Primary navigation">
         {navigation.map((item) => {
           const active = isMainActive(item.path, item.section);
