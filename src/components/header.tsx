@@ -16,15 +16,22 @@ export function Header() {
 
   return (
     <header className="site-header">
-      <Link href="/" className="brand" onClick={() => setOpen(false)}>
-        <span className="brand-mark">M</span>
-        <span>MedScopeGlobal</span>
+      <Link className="brand" href="/" onClick={() => setOpen(false)}>
+        <span className="brand-mark" aria-hidden>
+          M
+        </span>
+        <span>
+          MedScopeGlobal
+          <small style={{ display: "block", fontSize: ".72rem", color: "var(--muted)" }}>
+            Odborný medicínský magazín
+          </small>
+        </span>
       </Link>
       <button
-        className="menu-button"
         type="button"
+        className="menu-button"
         aria-expanded={open}
-        aria-controls="primary-nav"
+        aria-controls="site-nav"
         onClick={() => setOpen((value) => !value)}
       >
         <span className="sr-only">Otevřít navigaci</span>
@@ -32,19 +39,22 @@ export function Header() {
         <span />
         <span />
       </button>
-      <nav id="primary-nav" className={open ? "nav nav-open" : "nav"} aria-label="Hlavní navigace">
+      <nav id="site-nav" className={`nav${open ? " nav-open" : ""}`}>
         {navItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className={isActive(item.href) ? "active" : ""}
+            className={isActive(item.href) ? "active" : undefined}
             onClick={() => setOpen(false)}
           >
             {item.label}
           </Link>
         ))}
-        <Link href="/auth/login" className={isActive("/auth/login") ? "active nav-cta" : "nav-cta"} onClick={() => setOpen(false)}>
+        <Link className="nav-cta" href="/auth/login" onClick={() => setOpen(false)}>
           Přihlášení
+        </Link>
+        <Link className="button primary nav-cta" href="/auth/register" onClick={() => setOpen(false)}>
+          Registrace
         </Link>
       </nav>
     </header>

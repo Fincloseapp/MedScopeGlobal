@@ -1,7 +1,8 @@
 export const siteConfig = {
   name: "MedScopeGlobal",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://medscopeglobal.com",
-  description: "Prémiová globální platforma pro medicínské znalosti, vzdělávání a institucionální spolupráci.",
+  description:
+    "Odborný medicínský magazín a monitoring pro studenty, lékaře a výzkumníky.",
   contactEmail: process.env.CONTACT_EMAIL || "info@medscopeglobal.com",
   adsEmail: process.env.ADS_EMAIL || "ads@medscopeglobal.com",
   locale: "cs_CZ"
@@ -9,40 +10,43 @@ export const siteConfig = {
 
 export const navItems = [
   { href: "/", label: "Domů" },
+  { href: "/articles", label: "Články" },
+  { href: "/pro-koho", label: "Pro koho" },
+  { href: "/medicina", label: "Medicína" },
   { href: "/portal", label: "Portál" },
-  { href: "/articles", label: "Monitoring" },
   { href: "/premium", label: "Premium" },
-  { href: "/institutions", label: "Instituce" },
-  { href: "/events", label: "Události" },
   { href: "/education", label: "Vzdělávání" },
+  { href: "/events", label: "Události" },
   { href: "/jobs", label: "Kariéra" },
   { href: "/contact", label: "Kontakt" }
 ] as const;
 
 export const footerSections = [
   {
-    title: "Znalosti",
+    title: "Čtenáři",
     links: [
-      { href: "/portal/articles", label: "Odborné články" },
-      { href: "/articles", label: "Monitoring" },
-      { href: "/knowledge", label: "Knowledge produkty" },
-      { href: "/premium", label: "Premium členství" }
+      { href: "/pro-koho/laik-student", label: "Laik a student" },
+      { href: "/pro-koho/lekar", label: "Lékař v praxi" },
+      { href: "/pro-koho/vedec", label: "Vědec a výzkum" },
+      { href: "/medicina/priprava", label: "Příprava na medicínu" },
+      { href: "/medicina/studium", label: "Studium medicíny" }
     ]
   },
   {
-    title: "Pro organizace",
+    title: "Obsah",
     links: [
-      { href: "/institutions", label: "Institucionální licence" },
-      { href: "/b2b", label: "B2B partnerství" },
-      { href: "/events", label: "Události" },
-      { href: "/jobs", label: "Kariéra / nábor" }
+      { href: "/articles", label: "Monitoring článků" },
+      { href: "/portal/articles", label: "Odborné články" },
+      { href: "/premium", label: "Premium" },
+      { href: "/knowledge", label: "Knowledge produkty" }
     ]
   },
   {
     title: "Platforma",
     links: [
+      { href: "/institutions", label: "Instituce" },
+      { href: "/b2b", label: "B2B partnerství" },
       { href: "/education", label: "Vzdělávání" },
-      { href: "/dashboard", label: "Preference / newsletter" },
       { href: "/auth/login", label: "Přihlášení" },
       { href: "/auth/register", label: "Registrace" },
       { href: "/about", label: "O platformě" }

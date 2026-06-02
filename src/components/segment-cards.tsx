@@ -2,39 +2,36 @@ import Link from "next/link";
 
 const segments = [
   {
-    title: "Klinici",
-    description: "Praktické články, evidence digesty a rozhodovací podpora pro každodenní praxi.",
-    href: "/portal/articles",
-    cta: "Odborný portál"
+    title: "Laik a student",
+    description:
+      "Srozumitelné vysvětlení, příprava na medicínu a studijní materiály bez zbytečného žargonu.",
+    href: "/pro-koho/laik-student",
+    cta: "Vstoupit jako student"
   },
   {
-    title: "Vědci & výzkum",
-    description: "Monitoring publikací, klinické studie a datové roundtable s citacemi.",
-    href: "/articles?audience=researcher",
+    title: "Lékař v praxi",
+    description:
+      "Praktické články, evidence digesty a rozhodovací podpora pro každodenní klinickou praxi.",
+    href: "/pro-koho/lekar",
+    cta: "Obsah pro praxi"
+  },
+  {
+    title: "Vědec a výzkum",
+    description:
+      "Monitoring publikací, klinické studie a výzkumné přehledy s citacemi a metadaty.",
+    href: "/pro-koho/vedec",
     cta: "Research monitoring"
-  },
-  {
-    title: "Instituce",
-    description: "Licence pro nemocnice, univerzity a výzkumné organizace s RBAC a reportingem.",
-    href: "/institutions",
-    cta: "Institucionální nabídka"
-  },
-  {
-    title: "Partneři & B2B",
-    description: "Měřitelné kampaně, eventy a lead generation s transparentním označením.",
-    href: "/b2b",
-    cta: "B2B partnerství"
   }
 ];
 
 export function SegmentCards() {
   return (
-    <div className="grid segment-grid">
+    <div className="segment-grid grid">
       {segments.map((segment) => (
-        <article className="card segment-card" key={segment.title}>
+        <article key={segment.href} className="card segment-card">
           <h3>{segment.title}</h3>
           <p>{segment.description}</p>
-          <Link className="button" href={segment.href}>
+          <Link className="button primary" href={segment.href}>
             {segment.cta}
           </Link>
         </article>

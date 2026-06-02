@@ -19,11 +19,12 @@ describe("navigation integrity", () => {
     }
   });
 
-  it("includes new platform sections in navigation", () => {
-    const labels = navItems.map((item) => item.href);
-    expect(labels).toContain("/premium");
-    expect(labels).toContain("/jobs");
-    expect(labels).toContain("/institutions");
-    expect(labels).toContain("/education");
+  it("includes reader-focused sections in navigation", () => {
+    const hrefs = navItems.map((item) => item.href);
+    expect(hrefs).toContain("/articles");
+    expect(hrefs).toContain("/pro-koho");
+    expect(hrefs).toContain("/medicina");
+    expect(hrefs).toContain("/premium");
+    expect(hrefs).toContain("/education");
   });
 });

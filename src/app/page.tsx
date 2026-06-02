@@ -4,7 +4,14 @@ import { AiRoadmapSection } from "@/components/ai-roadmap-section";
 import { Metrics } from "@/components/metrics";
 import { SegmentCards } from "@/components/segment-cards";
 import { TrustStrip } from "@/components/trust-strip";
-import { articleSources, articles, audienceLabels, dailyArticleTarget, events, funnelMetrics } from "@/lib/data";
+import {
+  articleSources,
+  articles,
+  audienceLabels,
+  dailyArticleTarget,
+  events,
+  funnelMetrics
+} from "@/lib/data";
 import { jobListings } from "@/lib/jobs";
 import { siteConfig } from "@/lib/site";
 
@@ -14,37 +21,38 @@ export default function HomePage() {
   const featuredJob = jobListings.find((job) => job.featured) ?? jobListings[0];
 
   return (
-    <main>
+    <>
       <section className="hero">
         <div>
-          <p className="eyebrow">Prémiová medicínská knowledge platforma</p>
-          <h1>Důvěryhodné znalosti, vzdělávání a institucionální spolupráce v jednom ekosystému.</h1>
+          <p className="eyebrow">MedScopeGlobal</p>
+          <h1>Odborný medicínský magazín pro každého čtenáře</h1>
           <p className="lead">
-            MedScopeGlobal propojuje kliniky, výzkum a partnery s kurátorovaným obsahem, eventy, kariérními
-            příležitostmi a připravenou premium vrstvou.
+            Srozumitelné články pro laiky a studenty, praktická podpora pro lékaře a výzkumný monitoring
+            s citacemi — vše v češtině na jednom místě.
           </p>
-          <TrustStrip />
+          <p>
+            Vyberte si profil čtenáře, prohlédněte denní monitoring z ověřených zdrojů nebo vstupte do
+            premium vrstvy s hlubšími analýzami.
+          </p>
           <div className="hero-actions">
-            <Link className="button primary" href="/portal">
-              Odborný portál
-            </Link>
-            <Link className="button" href="/premium">
-              Premium
-            </Link>
-            <Link className="button" href="/institutions">
-              Pro instituce
-            </Link>
-            <Link className="button" href="/auth/register">
-              Registrace
-            </Link>
             <AbTestHeroCta />
+            <Link className="button" href="/articles">
+              Články a monitoring
+            </Link>
+            <Link className="button" href="/pro-koho">
+              Pro koho je magazín
+            </Link>
+            <Link className="button" href="/medicina">
+              Medicína — příprava a studium
+            </Link>
+            <Link className="button primary" href="/auth/register">
+              Registrace zdarma
+            </Link>
           </div>
+          <TrustStrip />
         </div>
-        <aside className="card hero-card" aria-label="Doporučený obsah">
-          <div className="meta">
-            <span className="tag">Doporučeno</span>
-            <span className="tag">{audienceLabels[featuredArticle.audience]}</span>
-          </div>
+        <aside className="card hero-card">
+          <span className="tag">Doporučeno · {audienceLabels[featuredArticle.audience]}</span>
           <h2>{featuredArticle.title}</h2>
           <p>{featuredArticle.summary}</p>
           <div className="meta">
@@ -52,44 +60,60 @@ export default function HomePage() {
             <span>{new Intl.DateTimeFormat("cs-CZ").format(new Date(featuredArticle.date))}</span>
             <span>{featuredArticle.source}</span>
           </div>
-          <Link className="button" href={`/articles/${featuredArticle.slug}`}>
+          <Link className="button primary" href={`/articles/${featuredArticle.slug}`}>
             Číst více
           </Link>
         </aside>
       </section>
 
       <section className="section">
-        <p className="eyebrow">Pro koho</p>
-        <h2>Segmentace podle role a potřeb</h2>
+        <div className="section-head">
+          <div>
+            <p className="eyebrow">Pro koho</p>
+            <h2>Čtěte podle své role</h2>
+          </div>
+          <Link className="button" href="/pro-koho">
+            Všechny profily
+          </Link>
+        </div>
         <SegmentCards />
       </section>
 
       <section className="section">
-        <p className="eyebrow">Denní monitoring</p>
-        <h2>
-          {dailyArticleTarget} článků denně z {articleSources.length} medicínských zdrojů
-        </h2>
-        <p className="lead">
-          Pokrytí zahrnuje české, slovenské, evropské i globální instituce s metadata vrstvou pro každý výstup.
+        <div className="section-head">
+          <div>
+            <p className="eyebrow">Denní monitoring</p>
+            <h2>
+              {dailyArticleTarget} článků denně z {articleSources.length} medicínských zdrojů
+            </h2>
+          </div>
+          <Link className="button primary" href="/articles">
+            Procházet články
+          </Link>
+        </div>
+        <p>
+          Pokrytí zahrnuje české, slovenské, evropské i globální instituce s metadata vrstvou pro každý
+          výstup.
         </p>
-        <Link className="button primary" href="/articles">
-          Procházet monitoring
-        </Link>
       </section>
 
       <section className="section">
-        <p className="eyebrow">Platforma</p>
-        <h2>Obsah, vzdělávání, kariéra a B2B v jednom místě</h2>
+        <div className="section-head">
+          <div>
+            <p className="eyebrow">Platforma</p>
+            <h2>Obsah, vzdělávání, kariéra a spolupráce</h2>
+          </div>
+        </div>
         <div className="grid">
           <article className="card">
-            <h3>Články &amp; portál</h3>
+            <h3>Články a portál</h3>
             <p>Strukturované odborné články s citacemi, RBAC a validací expertů.</p>
             <Link className="button" href="/portal/articles">
               Odborné články
             </Link>
           </article>
           <article className="card">
-            <h3>Události &amp; vzdělávání</h3>
+            <h3>Události a vzdělávání</h3>
             <p>Konference, webináře, .ics export a edukační série.</p>
             <Link className="button" href="/education">
               Vzdělávání
@@ -105,9 +129,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section">
-        <p className="eyebrow">Nadcházející událost</p>
-        <div className="card">
+      <section className="section grid two">
+        <article className="card">
+          <p className="eyebrow">Nadcházející událost</p>
           <h2>{nextEvent.title}</h2>
           <p>{nextEvent.description}</p>
           <div className="meta">
@@ -115,17 +139,12 @@ export default function HomePage() {
             <span>{nextEvent.format}</span>
             <span>{nextEvent.specialization}</span>
           </div>
-          <div className="actions">
-            <Link className="button primary" href={`/events/${nextEvent.slug}`}>
-              Detail události
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <p className="eyebrow">Kariéra</p>
-        <div className="card">
+          <Link className="button primary" href={`/events/${nextEvent.slug}`}>
+            Detail události
+          </Link>
+        </article>
+        <article className="card">
+          <p className="eyebrow">Kariéra</p>
           <h2>{featuredJob.title}</h2>
           <p>{featuredJob.summary}</p>
           <div className="meta">
@@ -135,26 +154,33 @@ export default function HomePage() {
           <Link className="button primary" href={`/jobs/${featuredJob.slug}`}>
             Zobrazit pozici
           </Link>
-        </div>
+        </article>
       </section>
 
-      <AiRoadmapSection />
-
       <section className="section">
-        <p className="eyebrow">Growth dashboard</p>
-        <h2>Měříme funnel od návštěvy po konverzi</h2>
+        <div className="section-head">
+          <div>
+            <p className="eyebrow">Growth dashboard</p>
+            <h2>Měříme funnel od návštěvy po konverzi</h2>
+          </div>
+        </div>
         <Metrics items={funnelMetrics} />
       </section>
 
-      <section className="section card">
-        <h2>Kontakt</h2>
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <p className="eyebrow">Kontakt</p>
+            <h2>Máte dotaz nebo chcete spolupracovat?</h2>
+          </div>
+        </div>
         <p>
           Hlavní kontakt: <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>
         </p>
         <p>
           B2B / partnerství: <a href={`mailto:${siteConfig.adsEmail}`}>{siteConfig.adsEmail}</a>
         </p>
-        <div className="actions">
+        <div className="hero-actions">
           <Link className="button primary" href="/institutions">
             Institucionální demo
           </Link>
@@ -163,6 +189,6 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
-    </main>
+    </>
   );
 }
