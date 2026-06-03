@@ -257,6 +257,29 @@ async function pushToGitHub(token) {
     copyFileSync(abs, dest);
   }
 
+  /** Legacy repo paths not in D:\\medscopeglobal — must delete or Vercel build fails */
+  const legacyRemove = [
+    "src",
+    "prisma",
+    "next.config.ts",
+    "prisma.config.ts",
+    "instrumentation.ts",
+    "sentry.client.config.ts",
+    "sentry.server.config.ts",
+    "e2e",
+    "playwright.config.ts",
+    "vitest.config.ts",
+    "vitest.setup.ts",
+    "eslint.config.mjs",
+  ];
+  for (const rel of legacyRemove) {
+    const p = join(cloneDir, rel);
+    if (existsSync(p)) {
+      rmSync(p, { recursive: true, force: true });
+      log(`  removed legacy ${rel}`);
+    }
+  }
+
   runGit(git, ["config", "user.email", "deploy@medscopeglobal.com"], cloneDir);
   runGit(git, ["config", "user.name", "MedScopeGlobal Deploy"], cloneDir);
   runGit(git, ["add", "-A"], cloneDir);
