@@ -31,7 +31,7 @@ function filterForReader(
   return articles.filter((a) => {
     if (!isVip && a.vip_only) return false;
     const level = a.min_access_level ?? "public";
-    return allowed.has(level);
+    return (allowed as Set<string>).has(level);
   });
 }
 

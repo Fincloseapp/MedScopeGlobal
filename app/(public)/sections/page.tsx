@@ -5,7 +5,7 @@ import { AccessLevelsOverview } from "@/components/platform/access-levels-overvi
 import { normalizeLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
 import { getDictionary, t } from "@/lib/i18n/get-dictionary";
 import { cookies } from "next/headers";
-import type { AccessLevelId } from "@/lib/config/access-levels";
+import type { AccessLevelId, ContentAccessLevel } from "@/lib/config/access-levels";
 import { contentTypesForAccessLevel } from "@/lib/config/medical-sections";
 import { MEDICAL_SECTIONS } from "@/lib/config/medical-sections";
 
@@ -19,6 +19,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+type SectionFilter = "public" | "student" | "physician";
+
 type Props = { searchParams: Promise<{ level?: string }> };
 
 export default async function SectionsPage({ searchParams }: Props) {
@@ -26,11 +28,18 @@ export default async function SectionsPage({ searchParams }: Props) {
   const cookieStore = await cookies();
   const locale = normalizeLocale(cookieStore.get(LOCALE_COOKIE)?.value);
   const dict = await getDictionary(locale);
-  const level = ["public", "student", "physician"].includes(sp.level ?? "")
-    ? (sp.level as AccessLevelId)
+  const level: SectionFilter | null = (
+    ["public", "student", "physician"] as const
+  ).includes(sp.level as SectionFilter)
+    ? (sp.level as SectionFilter)
     : null;
 
-  const allowedTypes = level ? contentTypesForAccessLevel(level) : null;
+  const accessForContent: ContentAccessLevel | null =
+    level === "student" ? "student" : level;
+
+  const allowedTypes = accessForContent
+    ? contentTypesForAccessLevel(accessForContent)
+    : null;
   const sections = level
     ? MEDICAL_SECTIONS.filter((s) =>
         s.contentTypeSlugs.some((slug) =>

@@ -19,6 +19,7 @@ import { getDictionary, t } from "@/lib/i18n/get-dictionary";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { ContentRecommendations } from "@/components/recommendations/content-recommendations";
 import { PremiumCta } from "@/components/ux/premium-cta";
+import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
 
 type Props = { params: Promise<{ slug: string }> };
 

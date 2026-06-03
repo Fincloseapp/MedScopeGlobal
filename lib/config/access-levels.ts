@@ -15,9 +15,18 @@ export const ACCESS_LEVELS = [
 
 export type AccessLevelId = (typeof ACCESS_LEVELS)[number]["id"];
 
+/** UI / content tier including student (between public and physician) */
+export type ContentAccessLevel = AccessLevelId | "student";
+
 export const ACCESS_RANK: Record<AccessLevelId, number> = {
   public: 1,
   physician: 2,
+};
+
+export const CONTENT_ACCESS_RANK: Record<ContentAccessLevel, number> = {
+  public: 1,
+  student: 2,
+  physician: 3,
 };
 
 export function normalizeAccessLevel(level?: string | null): AccessLevelId {

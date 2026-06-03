@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -33,8 +34,8 @@ export default function GdprPage() {
       <h2>3. Cookies a analytika</h2>
       <p>
         Používáme nezbytné cookies pro přihlášení a jazykové preference. Analytické cookies
-        nasazujeme pouze s vaším souhlasem. Preference můžete spravovat na stránce{" "}
-        <a href="/cookies">Cookies</a>.
+        Preference můžete spravovat na stránce{" "}
+        <Link href="/cookies">Cookies</Link>.
       </p>
 
       <h2>4. Newsletter</h2>

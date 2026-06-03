@@ -1,4 +1,4 @@
-import type { AccessLevelId } from "@/lib/config/access-levels";
+import type { ContentAccessLevel } from "@/lib/config/access-levels";
 
 export type IngestionRubric =
   | "ai-study-summary"
@@ -12,7 +12,7 @@ export interface RssSource {
   /** Default category when AI mapping is uncertain */
   categorySlug: string;
   rubric: IngestionRubric;
-  minAccessLevel: AccessLevelId;
+  minAccessLevel: ContentAccessLevel;
   locale?: string;
 }
 
@@ -20,7 +20,7 @@ export interface PubMedCategoryQuery {
   categorySlug: string;
   query: string;
   rubric: IngestionRubric;
-  minAccessLevel: AccessLevelId;
+  minAccessLevel: ContentAccessLevel;
 }
 
 export const CZ_RSS_SOURCES: RssSource[] = [

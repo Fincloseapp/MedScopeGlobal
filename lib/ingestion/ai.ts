@@ -1,5 +1,5 @@
 import { CATEGORY_SLUGS_FOR_AI } from "@/lib/ingestion/sources";
-import type { AccessLevelId } from "@/lib/config/access-levels";
+import type { ContentAccessLevel } from "@/lib/config/access-levels";
 import type { IngestionRubric } from "@/lib/ingestion/sources";
 
 export interface ProcessedArticle {
@@ -8,7 +8,7 @@ export interface ProcessedArticle {
   content: string;
   categorySlug: string;
   rubricSlug: IngestionRubric;
-  minAccessLevel: AccessLevelId;
+  minAccessLevel: ContentAccessLevel;
   locale: string;
 }
 
@@ -33,7 +33,7 @@ export async function processWithAi(input: {
   sourceName: string;
   defaultCategorySlug: string;
   defaultRubric: IngestionRubric;
-  defaultAccessLevel: AccessLevelId;
+  defaultAccessLevel: ContentAccessLevel;
 }): Promise<ProcessedArticle> {
   const key = resolveOpenAiKey();
   if (!key) {
@@ -129,7 +129,7 @@ function fallbackProcess(input: {
   sourceName: string;
   defaultCategorySlug: string;
   defaultRubric: IngestionRubric;
-  defaultAccessLevel: AccessLevelId;
+  defaultAccessLevel: ContentAccessLevel;
 }): ProcessedArticle {
   const loc = ingestionTargetLocale();
   const isCs = loc === "cs" || loc.startsWith("cs");

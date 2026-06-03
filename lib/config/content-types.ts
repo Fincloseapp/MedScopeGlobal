@@ -1,4 +1,4 @@
-import type { AccessLevelId } from "@/lib/config/access-levels";
+import type { ContentAccessLevel } from "@/lib/config/access-levels";
 import type { MedicalSectionSlug } from "@/lib/config/medical-sections";
 
 /** Internal slug (DB column rubric_slug) — unchanged for ingestion compatibility */
@@ -22,7 +22,7 @@ export interface ContentTypeSpec {
   slug: ContentTypeSlug;
   sectionSlug: MedicalSectionSlug;
   nameKey: string;
-  minAccessLevel: AccessLevelId;
+  minAccessLevel: ContentAccessLevel;
 }
 
 export const CONTENT_TYPE_SPECS: ContentTypeSpec[] = [

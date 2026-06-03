@@ -3,7 +3,8 @@ import {
   rubricSlugsForSection,
   type ContentTypeSlug,
 } from "@/lib/config/content-types";
-import type { AccessLevelId } from "@/lib/config/access-levels";
+import type { AccessLevelId, ContentAccessLevel } from "@/lib/config/access-levels";
+import { CONTENT_ACCESS_RANK } from "@/lib/config/access-levels";
 
 export type MedicalSectionSlug =
   | "clinical-medicine"
@@ -94,9 +95,9 @@ export function rubricSlugsForSectionQuery(sectionSlug: MedicalSectionSlug): str
   return [];
 }
 
-export function contentTypesForAccessLevel(level: AccessLevelId) {
-  const rank = { public: 1, student: 2, physician: 3 }[level];
+export function contentTypesForAccessLevel(level: ContentAccessLevel) {
+  const rank = CONTENT_ACCESS_RANK[level];
   return CONTENT_TYPE_SPECS.filter(
-    (c) => rank >= { public: 1, student: 2, physician: 3 }[c.minAccessLevel]
+    (c) => rank >= CONTENT_ACCESS_RANK[c.minAccessLevel]
   );
 }

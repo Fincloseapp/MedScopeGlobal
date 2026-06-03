@@ -1,4 +1,4 @@
-import type { AccessLevelId } from "@/lib/config/access-levels";
+import type { ContentAccessLevel } from "@/lib/config/access-levels";
 import {
   CONTENT_TYPE_SPECS,
   type ContentTypeSlug,
@@ -16,7 +16,7 @@ export {
 } from "@/lib/config/medical-sections";
 
 export interface AccessLevelSpec {
-  id: AccessLevelId;
+  id: ContentAccessLevel;
   titleKey: string;
   labelKey: string;
   descriptionKey: string;
