@@ -1,9 +1,29 @@
 {
-  "buildCommand": "npm run build:vercel",
+  "buildCommand": "npm run build",
+  "installCommand": "npm ci",
   "framework": "nextjs",
-  "regions": ["fra1"],
-  "redirects": [
-    { "source": "/en", "destination": "/portal", "permanent": false },
-    { "source": "/en/:path*", "destination": "/portal", "permanent": false }
+  "outputDirectory": ".next",
+  
+  "env": {
+    "INGESTION_LOCALE": "cs",
+    "DEFAULT_SITE_LOCALE": "cs",
+    "OPENAI_MODEL": "gpt-4o-mini"
+  },
+  
+  "crons": [
+    {
+      "path": "/api/cron/ingest",
+      "schedule": "0 6 * * *"
+    }
+  ],
+  
+  "headers": [
+    {
+      "source": "/api/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    }
   ]
 }
+
