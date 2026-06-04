@@ -25,3 +25,4 @@ if (!isAutopilotJobSlug(job)) {
 console.log("Running", job, "…");
 const result = await runAutopilotJob(job);
 console.log(JSON.stringify(result, null, 2));
+process.exit(0);
