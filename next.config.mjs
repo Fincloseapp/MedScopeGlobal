@@ -69,12 +69,6 @@ const nextConfig = {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 31536000,
   },
-  
-  // Internationalization: Set default locale
-  i18n: {
-    locales: ["cs", "en", "de", "fr", "es", "it", "pt", "nl"],
-    defaultLocale: "cs",
-  },
 };
 
 export default nextConfig;
