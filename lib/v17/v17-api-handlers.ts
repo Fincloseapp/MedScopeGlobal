@@ -7,18 +7,15 @@ import summarizationJob from "@/jobs/v17/summarizationJob";
 
 export type V17JobSlug = "reason" | "summarize" | "clinical" | "graph" | "guideline";
 
-const READY_MESSAGE = "V17 endpoint ready. Use POST to run the job.";
+export const V17_JOB_SLUGS: V17JobSlug[] = [
+  "reason",
+  "summarize",
+  "clinical",
+  "graph",
+  "guideline",
+];
 
-export const V17_ROUTE_CONFIG: Record<
-  V17JobSlug,
-  { job: V17JobSlug; edgeModule: string }
-> = {
-  reason: { job: "reason", edgeModule: "reasoning-edge" },
-  summarize: { job: "summarize", edgeModule: "summarization-edge" },
-  clinical: { job: "clinical", edgeModule: "clinical-edge" },
-  graph: { job: "graph", edgeModule: "graph-edge" },
-  guideline: { job: "guideline", edgeModule: "guideline-edge" },
-};
+const READY_MESSAGE = "V17 endpoint ready. Use POST to run the job.";
 
 const JOB_RUNNERS: Record<V17JobSlug, () => Promise<void>> = {
   reason: reasoningJob,
@@ -40,13 +37,12 @@ function v17ErrorResponse(job: V17JobSlug, error: unknown, status = 500) {
 }
 
 export function createV17RouteHandlers(slug: V17JobSlug) {
-  const { job } = V17_ROUTE_CONFIG[slug];
   const runJob = JOB_RUNNERS[slug];
 
   async function GET() {
     return NextResponse.json({
       status: "ok",
-      job,
+      job: slug,
       message: READY_MESSAGE,
     });
   }
@@ -56,11 +52,11 @@ export function createV17RouteHandlers(slug: V17JobSlug) {
       await runJob();
       return NextResponse.json({
         status: "ok",
-        job,
+        job: slug,
         message: "Job completed (skeleton).",
       });
     } catch (error) {
-      return v17ErrorResponse(job, error);
+      return v17ErrorResponse(slug, error);
     }
   }
 
