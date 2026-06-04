@@ -20,6 +20,9 @@ for (const name of routes) {
   if (!src.includes("export async function POST")) {
     console.error("No POST export:", p);
     ok = false;
+  } else if (!src.includes("export async function GET")) {
+    console.error("No GET export:", p);
+    ok = false;
   } else {
     console.log("OK", path.relative(root, p));
   }
