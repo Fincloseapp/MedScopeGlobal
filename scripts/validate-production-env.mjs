@@ -34,6 +34,7 @@ const requiredVars = [
 ];
 
 const translationVars = [
+  'GROQ_API_KEY',
   'OPENAI_API_KEY',
   'OPEN_API_KEY',
   'GEMINI_API_KEY',
@@ -75,7 +76,7 @@ requiredVars.forEach(key => {
 console.log('\n🟡 TRANSLATION (at least one required):');
 const hasTranslation = translationVars.some(key => process.env[key]?.trim());
 if (!hasTranslation) {
-  console.log(`  ✗ Neither OPENAI_API_KEY, GEMINI_API_KEY, nor GOOGLE_TRANSLATE_KEY is set`);
+  console.log(`  ✗ Neither GROQ_API_KEY, OPENAI_API_KEY, GEMINI_API_KEY, nor GOOGLE_TRANSLATE_KEY is set`);
   console.log(`     Articles will NOT be translated for non-Czech users`);
   warnings.push('Translation engines not configured');
   success = false;

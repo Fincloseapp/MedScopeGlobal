@@ -24,7 +24,7 @@ export function resolveOpenAiKey(): string | undefined {
   if (invalid && process.env.NODE_ENV !== "test") {
     const preview = invalid.trim().slice(0, 6);
     console.warn(
-      `[MedScopeGlobal] OPENAI_API_KEY/OPEN_API_KEY ignored (invalid format "${preview}…"). Use sk-… from https://platform.openai.com/api-keys, or set GEMINI_API_KEY (AIza… / AQ.…) for Google AI Studio.`
+      `[MedScopeGlobal] OPENAI_API_KEY/OPEN_API_KEY ignored (invalid format "${preview}…"). Prefer GROQ_API_KEY (gsk_…) from https://console.groq.com — or Gemini/OpenAI sk-….`
     );
   }
 

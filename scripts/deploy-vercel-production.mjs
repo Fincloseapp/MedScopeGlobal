@@ -38,7 +38,7 @@ const repo = "MedScopeGlobal";
 const branch = "main";
 const commitMessage =
   process.env.DEPLOY_COMMIT_MESSAGE ??
-  "feat(ai-medical): AI Medical Intelligence — 7 asistentů, Supabase search, logging";
+  "feat(v5): Groq free AI engine — primary LLM for medical AI and V4d ingest";
 
 const SKIP_DIRS = new Set([
   "node_modules",
@@ -179,6 +179,10 @@ async function syncVercelEnv(env) {
     "NEXT_PUBLIC_SUPABASE_ANON_KEY",
     "SUPABASE_SERVICE_ROLE_KEY",
     "CRON_SECRET",
+    "GROQ_API_KEY",
+    "GROQ_MODEL_PRIMARY",
+    "GROQ_MODEL_FALLBACK",
+    "GROQ_MODEL_FALLBACK_2",
     "OPENAI_API_KEY",
     "OPENAI_MODEL",
     "GEMINI_API_KEY",

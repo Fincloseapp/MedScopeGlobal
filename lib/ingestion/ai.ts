@@ -113,7 +113,7 @@ function fallbackProcess(input: {
 <h2>Shrnutí</h2>
 <p>${escapeHtml(excerpt)}</p>
 <h2>Klinický význam</h2>
-<p>Tento článek byl automaticky zpracován ze zdroje <strong>${escapeHtml(input.sourceName)}</strong>. Pro plné redakční zpracování nastavte <code>OPENAI_API_KEY</code> (sk-…) nebo <code>GEMINI_API_KEY</code> (AI Studio).</p>
+<p>Tento článek byl automaticky zpracován ze zdroje <strong>${escapeHtml(input.sourceName)}</strong>. Pro plné redakční zpracování nastavte <code>GROQ_API_KEY</code> (zdarma).</p>
 <h2>Zdroj</h2>
 <p><a href="${escapeAttr(input.sourceUrl)}" rel="noopener noreferrer" target="_blank">Původní publikace</a></p>
 <p><em>MedScopeGlobal — ověřte vůči primární literatuře před klinickým použitím.</em></p>
@@ -122,7 +122,7 @@ function fallbackProcess(input: {
 <h2>Summary</h2>
 <p>${escapeHtml(excerpt)}</p>
 <h2>Clinical relevance</h2>
-<p>This dispatch was ingested automatically from <strong>${escapeHtml(input.sourceName)}</strong>. Enable <code>OPENAI_API_KEY</code> or <code>GEMINI_API_KEY</code> for full editorial synthesis.</p>
+<p>This dispatch was ingested automatically from <strong>${escapeHtml(input.sourceName)}</strong>. Enable <code>GROQ_API_KEY</code> for full editorial synthesis.</p>
 <h2>Source</h2>
 <p><a href="${escapeAttr(input.sourceUrl)}" rel="noopener noreferrer" target="_blank">Read original publication</a></p>
 <p><em>MedScopeGlobal — verify against primary literature before clinical application.</em></p>

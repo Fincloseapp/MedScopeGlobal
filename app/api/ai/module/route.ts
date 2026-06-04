@@ -5,7 +5,6 @@ import { withApiGuard } from "@/lib/security/api-guard";
 import { sanitizeText } from "@/lib/security/sanitize";
 import { checkAiDailyLimit, logAiAgentUsage } from "@/lib/security/ai-abuse";
 import { extractWithAi, type V4cModule } from "@/lib/v4c/ai-extract";
-import { resolveOpenAiKey } from "@/lib/ai/openai-key";
 import { generateJsonFromLlm } from "@/lib/ai/chat-json";
 import { categorizeMedicalText } from "@/lib/v4d/categorize";
 import { detectLanguage } from "@/lib/v4d/filters";
@@ -95,32 +94,9 @@ export async function POST(request: Request) {
   if (llmText) {
     try {
       const parsed = JSON.parse(llmText) as { reply?: string };
-      reply = parsed.reply ?? llmText;
+      reply = typeof parsed.reply === "string" ? parsed.reply : llmText;
     } catch {
       reply = llmText;
-    }
-  } else if (resolveOpenAiKey()) {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${resolveOpenAiKey()}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: process.env.OPENAI_MODEL ?? "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: `MedScopeGlobal AI asistent — modul ${mod}. ${MODULE_HINTS[mod]}`,
-          },
-          { role: "user", content: query },
-        ],
-        max_tokens: 1000,
-      }),
-    });
-    if (res.ok) {
-      const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-      reply = json.choices?.[0]?.message?.content ?? reply;
     }
   }
 

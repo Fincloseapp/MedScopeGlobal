@@ -1,4 +1,8 @@
-import { generateJsonFromLlm, isLlmConfigured } from "@/lib/ai/chat-json";
+import {
+  generateJsonFromLlm,
+  isLlmConfigured,
+  resolvePrimaryLlmProvider,
+} from "@/lib/ai/chat-json";
 import { searchSupabaseForAssistant } from "@/lib/ai-medical/search";
 import { logAiMedicalInteraction } from "@/lib/ai-medical/log";
 import {
@@ -40,13 +44,13 @@ function buildFallback(req: AiMedicalRequest, sourcesCount: number): AiMedicalRe
       : "Odborné shrnutí: ";
 
   return {
-    reply: `${tone}${req.query}\n\n(${label} — nalezeno ${sourcesCount} záznamů v databázi. Pro plné AI nastavte OPENAI_API_KEY nebo GEMINI_API_KEY.)`,
+    reply: `${tone}${req.query}\n\n(${label} — nalezeno ${sourcesCount} záznamů v databázi. Pro plné AI nastavte GROQ_API_KEY zdarma na https://console.groq.com.)`,
     summary: `Dotaz zpracován v režimu fallback. Jazyk: ${lang}.`,
     recommendations: [
       "Ověřte údaje vůči primárním zdrojům.",
-      "Konfigurujte LLM klíč pro hlubší syntézu.",
+      "Přidejte GROQ_API_KEY (gsk_…) — primární free engine V5.",
     ],
-    clinicalConclusions: ["Klinické závěry vyžadují aktivní AI klíč."],
+    clinicalConclusions: ["Klinické závěry vyžadují GROQ_API_KEY nebo záložní LLM."],
     graphicSummary: `[Přehled]\n• Dotaz: ${req.query.slice(0, 80)}…\n• Zdroje: ${sourcesCount}\n• Asistent: ${req.assistant}`,
     sources: [],
     metadata: { fallback: true },
@@ -138,6 +142,7 @@ JSON:
         language: req.language,
         outputType: req.outputType,
         sources_count: sources.length,
+        llm_provider: resolvePrimaryLlmProvider(),
       },
     };
 

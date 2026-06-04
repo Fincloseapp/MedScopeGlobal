@@ -19,7 +19,7 @@ export default function AiMedicalPage() {
     <ModulePageShell
       eyebrow="AI Medical Intelligence"
       title="AI Medical Intelligence"
-      description="Vyhledávání v Supabase, generování odborných textů, shrnutí, doporučení, klinických závěrů a textových přehledů. Překlady CZ/SK/EN."
+      description="Vyhledávání v Supabase, generování odborných textů přes Groq (V5, zdarma). Překlady CZ/SK/EN. Engine: Groq → Gemini → OpenAI."
     >
       <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {AI_MEDICAL_ASSISTANTS.map((a) => (
