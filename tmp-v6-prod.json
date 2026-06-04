@@ -1,0 +1,37 @@
+[
+  {
+    "u": "https://www.medscopeglobal.com/api/v6/pubmed",
+    "status": 404,
+    "ct": "text/html; charset=utf-8",
+    "isJson": false,
+    "preview": "<!DOCTYPE html><html id=\"__next_error__\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"script\" fetchPriority=\"low\" href=\"/_n"
+  },
+  {
+    "u": "https://www.medscopeglobal.com/api/v6/regulatory",
+    "status": 404,
+    "ct": "text/html; charset=utf-8",
+    "isJson": false,
+    "preview": "<!DOCTYPE html><html id=\"__next_error__\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"script\" fetchPriority=\"low\" href=\"/_n"
+  },
+  {
+    "u": "https://www.medscopeglobal.com/api/v6/autopublish",
+    "status": 404,
+    "ct": "text/html; charset=utf-8",
+    "isJson": false,
+    "preview": "<!DOCTYPE html><html id=\"__next_error__\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"script\" fetchPriority=\"low\" href=\"/_n"
+  },
+  {
+    "u": "https://www.medscopeglobal.com/api/v6/trends",
+    "status": 404,
+    "ct": "text/html; charset=utf-8",
+    "isJson": false,
+    "preview": "<!DOCTYPE html><html id=\"__next_error__\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"script\" fetchPriority=\"low\" href=\"/_n"
+  },
+  {
+    "u": "https://www.medscopeglobal.com/api/v6/guidelines",
+    "status": 404,
+    "ct": "text/html; charset=utf-8",
+    "isJson": false,
+    "preview": "<!DOCTYPE html><html id=\"__next_error__\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"script\" fetchPriority=\"low\" href=\"/_n"
+  }
+]

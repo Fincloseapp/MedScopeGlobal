@@ -1,0 +1,4 @@
+﻿2130a9fc failure Deployment failed. https://vercel.link/3Fpeeb1
+143fbfd failure Deployment failed. https://vercel.link/3Fpeeb1
+0e001665 failure Deployment failed. https://vercel.link/3Fpeeb1
+b6ff2625 failure Deployment failed. https://vercel.link/3Fpeeb1

@@ -350,20 +350,51 @@ async function triggerVercelDeploy(env) {
   }
 }
 
-async function verifySite() {
-  log("\nČekám na Vercel build (90 s)…");
-  await new Promise((r) => setTimeout(r, 90_000));
-  try {
-    const res = await fetch("https://www.medscopeglobal.com/vop", {
-      headers: { "User-Agent": "MedScopeGlobal-Deploy/1.0" },
-    });
-    const html = await res.text();
-    const ok = res.ok && (html.includes("obchodní podmínky") || html.includes("VOP"));
-    log(`HTTP ${res.status} /vop — ${ok ? "OK (V4a live)" : "ještě nebo starý build"}`);
-    log("URL: https://www.medscopeglobal.com");
-  } catch (e) {
-    log(`Kontrola webu selhala: ${e.message}`);
+async function verifySite(commitSha) {
+  log("\nČekám na Vercel build (max 6 min)…");
+  const base = "https://www.medscopeglobal.com";
+  const v6Url = `${base}/api/v6/pubmed`;
+  for (let i = 0; i < 12; i++) {
+    await new Promise((r) => setTimeout(r, 30_000));
+    if (commitSha) {
+      try {
+        const st = await fetch(
+          `https://api.github.com/repos/${owner}/${repo}/commits/${commitSha}/status`
+        );
+        const data = await st.json();
+        const vercel = data.statuses?.find((s) => s.context === "Vercel");
+        if (vercel?.state === "failure") {
+          log(`Vercel status: failure — ${vercel.description || ""}`);
+          log(vercel.target_url || "https://vercel.com/dashboard");
+          break;
+        }
+        if (vercel?.state === "success") log("Vercel status: success");
+      } catch {
+        /* ignore */
+      }
+    }
+    try {
+      const v6 = await fetch(v6Url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+      const body = await v6.text();
+      const json =
+        v6.headers.get("content-type")?.includes("json") ||
+        body.trim().startsWith("{");
+      if (v6.status !== 404 && json) {
+        log(`HTTP ${v6.status} POST /api/v6/pubmed — JSON OK`);
+        log(`URL: ${base}`);
+        return;
+      }
+      log(`Pokus ${i + 1}/12: /api/v6/pubmed → ${v6.status} (${json ? "json" : "html"})`);
+    } catch (e) {
+      log(`Pokus ${i + 1}/12: ${e.message}`);
+    }
   }
+  log("Varování: /api/v6/* ještě nevrací JSON — zkontrolujte Vercel deployment log.");
+  log(`URL: ${base}`);
 }
 
 async function main() {
@@ -382,11 +413,19 @@ async function main() {
     );
   }
 
+  const verifyV6 = spawnSync(process.execPath, [join(root, "scripts", "verify-v6-api-routes.mjs")], {
+    cwd: root,
+    encoding: "utf8",
+  });
+  if (verifyV6.status !== 0) {
+    throw new Error("Chybí nebo jsou neplatné soubory app/api/v6/*/route.ts");
+  }
+
   const sha = await pushToGitHub(ghToken);
   if (sha) log(`Commit: ${sha}`);
 
   await triggerVercelDeploy(env);
-  await verifySite();
+  await verifySite(sha);
 
   log("\n=== Hotovo ===");
 }
