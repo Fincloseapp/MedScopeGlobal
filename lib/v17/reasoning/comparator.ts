@@ -1,4 +1,5 @@
-/** V17 reasoning comparator — skeleton. */
-export async function compare(_left: unknown, _right: unknown): Promise<null> {
-  return null;
+/** V17 reasoning comparator — skeleton (no AI logic). */
+export async function compare(evidence: unknown[]): Promise<{ comparisons: unknown[] }> {
+  void evidence;
+  return { comparisons: [] };
 }

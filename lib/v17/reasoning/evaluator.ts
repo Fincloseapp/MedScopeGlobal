@@ -1,4 +1,5 @@
-/** V17 reasoning evaluator — skeleton. */
-export async function evaluate(_input: unknown): Promise<null> {
-  return null;
+/** V17 reasoning evaluator — skeleton (no AI logic). */
+export async function evaluate(facts: unknown[]): Promise<{ evidence: unknown[] }> {
+  void facts;
+  return { evidence: [] };
 }

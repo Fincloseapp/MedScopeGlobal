@@ -1,4 +1,5 @@
-/** V17 reasoning extractor — skeleton. */
-export async function extract(_input: unknown): Promise<null> {
-  return null;
+/** V17 reasoning extractor — skeleton (no AI logic). */
+export async function extract(input: string): Promise<{ facts: unknown[] }> {
+  void input;
+  return { facts: [] };
 }

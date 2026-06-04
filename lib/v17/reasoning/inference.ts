@@ -1,4 +1,5 @@
-/** V17 reasoning inference — skeleton. */
-export async function infer(_input: unknown): Promise<null> {
-  return null;
+/** V17 reasoning inference — skeleton (no AI logic). */
+export async function infer(comparisons: unknown[]): Promise<{ conclusion: string }> {
+  void comparisons;
+  return { conclusion: "placeholder" };
 }

@@ -90,10 +90,13 @@ for (const rel of libModules) {
 const apiV17 = path.join(root, "app", "api", "v17");
 for (const slug of routes) {
   const src = fs.readFileSync(path.join(apiV17, slug, "route.ts"), "utf8");
-  if (!src.includes(`createV17RouteHandlers("${slug}")`)) {
-    fail(`Route ${slug} must only use createV17RouteHandlers("${slug}")`);
+  const usesHandler = src.includes(`createV17RouteHandlers("${slug}")`);
+  const usesReasonPipeline =
+    slug === "reason" && src.includes("reasoningJob") && src.includes('job: JOB');
+  if (!usesHandler && !usesReasonPipeline) {
+    fail(`Route ${slug} must use createV17RouteHandlers or reasoning pipeline binding`);
   } else {
-    pass(`app/api/v17/${slug}/route.ts → single handler binding`);
+    pass(`app/api/v17/${slug}/route.ts → valid handler binding`);
   }
 }
 

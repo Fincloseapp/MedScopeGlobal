@@ -17,8 +17,8 @@ export const V17_JOB_SLUGS: V17JobSlug[] = [
 
 const READY_MESSAGE = "V17 endpoint ready. Use POST to run the job.";
 
-const JOB_RUNNERS: Record<V17JobSlug, () => Promise<void>> = {
-  reason: reasoningJob,
+const JOB_RUNNERS: Record<V17JobSlug, () => Promise<unknown>> = {
+  reason: () => reasoningJob(),
   summarize: summarizationJob,
   clinical: clinicalJob,
   graph: graphBuildJob,
@@ -49,11 +49,13 @@ export function createV17RouteHandlers(slug: V17JobSlug) {
 
   async function POST() {
     try {
-      await runJob();
+      const result = await runJob();
       return NextResponse.json({
         status: "ok",
         job: slug,
-        message: "Job completed (skeleton).",
+        ...(result != null && result !== undefined
+          ? { result }
+          : { message: "Job completed (skeleton)." }),
       });
     } catch (error) {
       return v17ErrorResponse(slug, error);
