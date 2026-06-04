@@ -27,6 +27,7 @@ const libModules = [
   "lib/v17/reasoning/evaluator.ts",
   "lib/v17/reasoning/comparator.ts",
   "lib/v17/reasoning/inference.ts",
+  "lib/v17/reasoning/types.ts",
   "lib/v17/summarization/abstractive.ts",
   "lib/v17/summarization/extractive.ts",
   "lib/v17/summarization/hybrid.ts",
