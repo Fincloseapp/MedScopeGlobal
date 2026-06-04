@@ -34,6 +34,26 @@
     {
       "path": "/api/cron/daily-regulatory-update",
       "schedule": "30 10 * * *"
+    },
+    {
+      "path": "/api/cron/hourly-pubmed-monitor",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/daily-regulatory-monitor",
+      "schedule": "0 11 * * *"
+    },
+    {
+      "path": "/api/cron/daily-autopublish",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/weekly-trend-analysis",
+      "schedule": "0 13 * * 1"
+    },
+    {
+      "path": "/api/cron/monthly-guideline-update",
+      "schedule": "0 14 1 * *"
     }
   ],
   
