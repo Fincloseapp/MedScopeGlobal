@@ -24,18 +24,17 @@ export async function runHourlyPubmedMonitor() {
         metadata: { errors: result.errors },
       });
     }
-    await finishAutopilotRun(runId, {
+    await finishAutopilotRun(runId, "hourly_pubmed_monitor", {
       status: result.errors.length ? "partial" : "ok",
       items_processed: result.sources + result.enriched,
       items_created: result.sources,
-      details: { job_slug: "hourly_pubmed_monitor", ...result },
+      details: { ...result },
     });
     return { ok: true, ...result };
   } catch (e) {
-    await finishAutopilotRun(runId, {
+    await finishAutopilotRun(runId, "hourly_pubmed_monitor", {
       status: "error",
       error_message: (e as Error).message,
-      details: { job_slug: "hourly_pubmed_monitor" },
     });
     throw e;
   }

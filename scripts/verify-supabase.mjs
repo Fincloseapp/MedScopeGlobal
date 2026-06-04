@@ -45,6 +45,11 @@ const recommendedTables = [
   ["medical_citations", "id"],
   ["medical_evidence", "id"],
   ["ai_medical_logs", "id"],
+  ["autopilot_runs", "id"],
+  ["autopilot_alerts", "id"],
+  ["autopilot_trends", "id"],
+  ["autopilot_settings", "id"],
+  ["autopilot_cron_jobs", "slug"],
 ];
 
 let ok = true;

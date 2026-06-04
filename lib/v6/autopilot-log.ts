@@ -20,6 +20,7 @@ export async function startAutopilotRun(jobSlug: AutopilotJobSlug) {
 
 export async function finishAutopilotRun(
   runId: string,
+  jobSlug: AutopilotJobSlug,
   payload: {
     status: "ok" | "partial" | "error";
     items_processed?: number;
@@ -29,6 +30,7 @@ export async function finishAutopilotRun(
   }
 ) {
   const admin = createServiceRoleClient();
+  const details = { ...(payload.details ?? {}), job_slug: jobSlug };
   await admin
     .from("autopilot_runs")
     .update({
@@ -36,7 +38,7 @@ export async function finishAutopilotRun(
       finished_at: new Date().toISOString(),
       items_processed: payload.items_processed ?? 0,
       items_created: payload.items_created ?? 0,
-      details: payload.details ?? {},
+      details,
       error_message: payload.error_message ?? null,
     })
     .eq("id", runId);
@@ -47,7 +49,7 @@ export async function finishAutopilotRun(
       last_run_at: new Date().toISOString(),
       last_status: payload.status,
     })
-    .eq("slug", payload.details?.job_slug as string);
+    .eq("slug", jobSlug);
 }
 
 export async function createAutopilotAlert(input: {

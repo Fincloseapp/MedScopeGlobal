@@ -87,11 +87,11 @@ export async function runWeeklyTrendAnalysis() {
     metadata: metric,
   });
 
-  await finishAutopilotRun(runId, {
+  await finishAutopilotRun(runId, "weekly_trend_analysis", {
     status: "ok",
     items_processed: articles?.length ?? 0,
     items_created: 1,
-    details: { job_slug: "weekly_trend_analysis", metric },
+    details: { metric },
   });
 
   return { ok: true, metric, narrative };

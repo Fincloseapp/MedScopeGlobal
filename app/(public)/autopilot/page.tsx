@@ -20,6 +20,12 @@ export default async function AutopilotPage() {
       ctaLabel="AI Dashboard"
     >
       <div className="flex flex-wrap gap-2 mb-8 text-sm">
+        <Link href="/dashboard" className="rounded-full bg-[#005B96] px-3 py-1 text-white">
+          Dashboard
+        </Link>
+        <Link href="/pro-me" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
+          Pro mě
+        </Link>
         <Link href="/autopilot/logs" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
           Logy
         </Link>

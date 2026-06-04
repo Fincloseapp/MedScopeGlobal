@@ -18,18 +18,17 @@ export async function runDailyAutopublishJob() {
   const runId = await startAutopilotRun("daily_autopublish");
   try {
     const result = await runDailyAutopublish();
-    await finishAutopilotRun(runId, {
+    await finishAutopilotRun(runId, "daily_autopublish", {
       status: result.errors.length ? "partial" : "ok",
       items_processed: result.published + result.errors.length,
       items_created: result.published,
-      details: { job_slug: "daily_autopublish", ...result },
+      details: { ...result },
     });
     return { ok: true, ...result };
   } catch (e) {
-    await finishAutopilotRun(runId, {
+    await finishAutopilotRun(runId, "daily_autopublish", {
       status: "error",
       error_message: (e as Error).message,
-      details: { job_slug: "daily_autopublish" },
     });
     throw e;
   }

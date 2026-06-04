@@ -48,18 +48,17 @@ export async function runDailyRegulatoryMonitor() {
       }
     }
 
-    await finishAutopilotRun(runId, {
+    await finishAutopilotRun(runId, "daily_regulatory_monitor", {
       status: errors.length ? "partial" : "ok",
       items_processed: WATCH.length,
       items_created: created,
-      details: { job_slug: "daily_regulatory_monitor", errors },
+      details: { errors },
     });
     return { ok: true, created, errors };
   } catch (e) {
-    await finishAutopilotRun(runId, {
+    await finishAutopilotRun(runId, "daily_regulatory_monitor", {
       status: "error",
       error_message: (e as Error).message,
-      details: { job_slug: "daily_regulatory_monitor" },
     });
     throw e;
   }

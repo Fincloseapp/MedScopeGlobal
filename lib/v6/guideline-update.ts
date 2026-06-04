@@ -74,11 +74,11 @@ export async function runMonthlyGuidelineUpdate() {
 
   await admin.from("autopilot_settings").update({ updated_at: new Date().toISOString() }).eq("id", "default");
 
-  await finishAutopilotRun(runId, {
+  await finishAutopilotRun(runId, "monthly_guideline_update", {
     status: errors.length ? "partial" : "ok",
     items_processed: topics.length,
     items_created: created,
-    details: { job_slug: "monthly_guideline_update", errors },
+    details: { errors },
   });
 
   return { ok: true, created, errors };

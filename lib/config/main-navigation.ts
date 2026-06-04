@@ -66,6 +66,17 @@ const menuCs: NavItem[] = [
       { label: "Univerzity", href: "/ai-medical/univerzity" },
     ],
   },
+  {
+    label: "V6 Autopilot",
+    href: "/autopilot",
+    children: [
+      { label: "Autopilot", href: "/autopilot", description: "Zero-touch monitoring & publish" },
+      { label: "AI Dashboard", href: "/dashboard", description: "Grafy, trendy, alerty" },
+      { label: "Pro mě — lékaři", href: "/pro-me/lekari" },
+      { label: "Pro mě — pacienti", href: "/pro-me/pacienti" },
+      { label: "Logy", href: "/autopilot/logs" },
+    ],
+  },
   { label: "Kongresy", href: "/kongresy" },
   { label: "Kariéra", href: "/kariera" },
   {
@@ -110,6 +121,16 @@ const menuEn: NavItem[] = [
       { label: "Digital Health", href: "/digital-health" },
       { label: "News", href: "/novinky" },
       { label: "Newsletter", href: "/newsletter" },
+    ],
+  },
+  {
+    label: "V6 Autopilot",
+    href: "/autopilot",
+    children: [
+      { label: "Autopilot", href: "/autopilot" },
+      { label: "AI Dashboard", href: "/dashboard" },
+      { label: "For clinicians", href: "/pro-me/lekari" },
+      { label: "Logs", href: "/autopilot/logs" },
     ],
   },
   { label: "Congresses", href: "/kongresy" },

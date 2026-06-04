@@ -61,6 +61,12 @@ export default async function OdbornePage() {
         <Link href="/odborne/evidence" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
           Evidence
         </Link>
+        <Link href="/dashboard" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
+          V6 Dashboard
+        </Link>
+        <Link href="/autopilot" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
+          Autopilot
+        </Link>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {texts.map((t) => (
