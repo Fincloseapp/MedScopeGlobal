@@ -8,9 +8,9 @@ export const GROQ_CHAT_COMPLETIONS_URL =
 
 /** Primary + fallbacks (override via GROQ_MODEL_* env). */
 export const GROQ_MODEL_CHAIN = [
-  process.env.GROQ_MODEL_PRIMARY ?? "llama3-70b-8192",
-  process.env.GROQ_MODEL_FALLBACK ?? "mixtral-8x7b-32768",
-  process.env.GROQ_MODEL_FALLBACK_2 ?? "gemma2-9b-it",
+  process.env.GROQ_MODEL_PRIMARY ?? "llama-3.3-70b-versatile",
+  process.env.GROQ_MODEL_FALLBACK ?? "llama-3.1-8b-instant",
+  process.env.GROQ_MODEL_FALLBACK_2 ?? "openai/gpt-oss-20b",
 ] as const;
 
 const DEFAULT_TIMEOUT_MS = 90_000;
