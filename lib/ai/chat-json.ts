@@ -1,4 +1,9 @@
-import { groqGenerateJson, isGroqConfigured } from "@/lib/ai/groq";
+import {
+  groqChatCompletion,
+  groqGenerateJson,
+  isGroqConfigured,
+  warnIfGroqKeyMissing,
+} from "@/lib/ai/groq";
 import { resolveGeminiKey } from "@/lib/ai/gemini-key";
 import { resolveOpenAiKey } from "@/lib/ai/openai-key";
 
@@ -30,6 +35,8 @@ export async function generateJsonFromLlm(input: {
   maxTokens?: number;
   temperature?: number;
 }): Promise<string | null> {
+  warnIfGroqKeyMissing();
+
   const groq = await groqGenerateJson(input);
   if (groq) return groq;
 
@@ -37,6 +44,71 @@ export async function generateJsonFromLlm(input: {
   if (gemini) return gemini;
 
   return generateJsonFromOpenAi(input);
+}
+
+/** Plain-text completion: Groq → Gemini → OpenAI. */
+export async function generateTextFromLlm(input: {
+  system: string;
+  user: string;
+  maxTokens?: number;
+  temperature?: number;
+}): Promise<string | null> {
+  warnIfGroqKeyMissing();
+
+  const groq = await groqChatCompletion({
+    messages: [
+      { role: "system", content: input.system },
+      { role: "user", content: input.user },
+    ],
+    maxTokens: input.maxTokens ?? 2000,
+    temperature: input.temperature ?? 0.3,
+    jsonMode: false,
+  });
+  if (groq?.content) return groq.content;
+
+  const geminiRaw = await generateJsonFromGemini({
+    ...input,
+    system: `${input.system}\nOdpověz pouze prostým textem, ne JSON.`,
+    user: input.user,
+  });
+  if (geminiRaw) {
+    try {
+      const p = JSON.parse(geminiRaw) as { text?: string; reply?: string };
+      return p.text ?? p.reply ?? geminiRaw;
+    } catch {
+      return geminiRaw;
+    }
+  }
+
+  const openaiKey = resolveOpenAiKey();
+  if (!openaiKey) return null;
+
+  try {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${openaiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: process.env.OPENAI_MODEL ?? "gpt-4o-mini",
+        temperature: input.temperature ?? 0.3,
+        max_tokens: input.maxTokens ?? 2000,
+        messages: [
+          { role: "system", content: input.system },
+          { role: "user", content: input.user },
+        ],
+      }),
+      signal: AbortSignal.timeout(60_000),
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as {
+      choices?: { message?: { content?: string } }[];
+    };
+    return json.choices?.[0]?.message?.content ?? null;
+  } catch {
+    return null;
+  }
 }
 
 async function generateJsonFromOpenAi(input: {

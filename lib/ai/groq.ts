@@ -6,11 +6,22 @@
 export const GROQ_CHAT_COMPLETIONS_URL =
   "https://api.groq.com/openai/v1/chat/completions";
 
-/** Primary + fallbacks (override via GROQ_MODEL_* env). */
+/**
+ * Primary + fallbacks (override via GROQ_MODEL_* env).
+ * V5 spec aliases (deprecated on Groq API): llama3-70b-8192 → use llama-3.3-70b-versatile,
+ * mixtral-8x7b-32768 → llama-3.1-8b-instant, gemma2-27b → openai/gpt-oss-20b.
+ */
 export const GROQ_MODEL_CHAIN = [
   process.env.GROQ_MODEL_PRIMARY ?? "llama-3.3-70b-versatile",
   process.env.GROQ_MODEL_FALLBACK ?? "llama-3.1-8b-instant",
   process.env.GROQ_MODEL_FALLBACK_2 ?? "openai/gpt-oss-20b",
+] as const;
+
+/** Documented V5 legacy IDs (for diagnostics only). */
+export const GROQ_LEGACY_MODEL_IDS = [
+  "llama3-70b-8192",
+  "mixtral-8x7b-32768",
+  "gemma2-27b",
 ] as const;
 
 const DEFAULT_TIMEOUT_MS = 90_000;
@@ -42,6 +53,17 @@ export function resolveGroqKey(): string | undefined {
 
 export function isGroqConfigured(): boolean {
   return Boolean(resolveGroqKey());
+}
+
+let groqKeyWarned = false;
+
+/** Logs once per process when GROQ_API_KEY is missing (server startup / first LLM call). */
+export function warnIfGroqKeyMissing(): void {
+  if (groqKeyWarned || isGroqConfigured()) return;
+  groqKeyWarned = true;
+  console.warn(
+    "[MedScopeGlobal] GROQ_API_KEY is not set — LLM will fall back to Gemini, OpenAI, or static text. Get a free key at https://console.groq.com/keys"
+  );
 }
 
 async function groqFetch(

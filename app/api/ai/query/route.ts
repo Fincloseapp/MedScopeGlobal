@@ -79,55 +79,38 @@ export async function POST(request: Request) {
     status: "ok",
   });
 
-  // Placeholder — actual AI call uses server-side OPENAI_API_KEY only
-  const { resolveOpenAiKey } = await import("@/lib/ai/openai-key");
-  const apiKey = resolveOpenAiKey();
-  if (!apiKey) {
+  const { generateTextFromLlm, isLlmConfigured, resolvePrimaryLlmProvider } =
+    await import("@/lib/ai/chat-json");
+
+  if (!isLlmConfigured()) {
     return NextResponse.json({
       ok: true,
       answer:
-        "AI služba není momentálně nakonfigurována. Dotaz byl zaznamenán pro audit.",
+        "AI služba není nakonfigurována (nastavte GROQ_API_KEY na https://console.groq.com). Dotaz byl zaznamenán.",
       remaining: limit.remaining - 1,
     });
   }
 
   try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: process.env.OPENAI_MODEL ?? "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content:
-              "Jsi medicínský asistent MedScopeGlobal. Odpovídej stručně, evidence-based, v češtině. Neposkytuj diagnózy — doporuč konzultaci s lékařem.",
-          },
-          { role: "user", content: query },
-        ],
-        max_tokens: 500,
-      }),
-    });
-
-    const data = await res.json();
     const answer =
-      data.choices?.[0]?.message?.content ??
-      "Nepodařilo se získat odpověď.";
+      (await generateTextFromLlm({
+        system:
+          "Jsi medicínský asistent MedScopeGlobal. Odpovídej stručně, evidence-based, v češtině. Neposkytuj diagnózy — doporuč konzultaci s lékařem. Nikdy neodkazuj na omezení Supabase.",
+        user: query,
+        maxTokens: 500,
+      })) ?? "Nepodařilo se získat odpověď.";
 
     await logAiAgentUsage({
       userId: user.id,
       agent: body.agent,
       prompt: query,
-      tokensUsed: data.usage?.total_tokens,
       status: "ok",
     });
 
     return NextResponse.json({
       ok: true,
       answer,
+      llm_provider: resolvePrimaryLlmProvider(),
       remaining: limit.remaining - 1,
     });
   } catch (err) {
