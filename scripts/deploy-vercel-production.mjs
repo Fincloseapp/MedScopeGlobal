@@ -38,7 +38,7 @@ const repo = "MedScopeGlobal";
 const branch = "main";
 const commitMessage =
   process.env.DEPLOY_COMMIT_MESSAGE ??
-  "feat(v4d): odborné AI texty, study_sources, kvalita, cron medical-ai-fetch";
+  "feat(ai-medical): AI Medical Intelligence — 7 asistentů, Supabase search, logging";
 
 const SKIP_DIRS = new Set([
   "node_modules",

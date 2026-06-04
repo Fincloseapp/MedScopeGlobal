@@ -52,6 +52,20 @@ const menuCs: NavItem[] = [
       { label: "Newsletter", href: "/newsletter" },
     ],
   },
+  {
+    label: "AI Medical",
+    href: "/ai-medical",
+    children: [
+      { label: "Přehled", href: "/ai-medical" },
+      { label: "Lékař", href: "/ai-medical/doctor" },
+      { label: "Pacient", href: "/ai-medical/patient" },
+      { label: "Výzkum", href: "/ai-medical/research" },
+      { label: "Legislativa", href: "/ai-medical/legislativa" },
+      { label: "Léky", href: "/ai-medical/leky" },
+      { label: "Studie", href: "/ai-medical/studie" },
+      { label: "Univerzity", href: "/ai-medical/univerzity" },
+    ],
+  },
   { label: "Kongresy", href: "/kongresy" },
   { label: "Kariéra", href: "/kariera" },
   {

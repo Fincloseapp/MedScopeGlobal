@@ -15,7 +15,7 @@ export default async function DokumentacePage() {
       description="Přehled verzí platformy a implementovaných modulů."
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {["v4a", "v4b", "v4c", "v4d"].map((v) => (
+        {["v4a", "v4b", "v4c", "v4d", "ai-medical"].map((v) => (
           <Link
             key={v}
             href={`/dokumentace/${v}`}
