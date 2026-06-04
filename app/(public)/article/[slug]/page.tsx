@@ -10,7 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { canAccessContent } from "@/lib/config/access-levels";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import { getReaderContext } from "@/lib/auth/reader-context";
-import { getActiveAds } from "@/lib/queries/ads";
+import { getActiveAds, getActiveAdsByPlacement } from "@/lib/queries/ads";
+import { AdPlacement } from "@/components/ads/ad-placement";
 import {
   getArticleBySlug,
   getRelatedArticles,
@@ -83,8 +84,13 @@ export default async function ArticlePage({ params }: Props) {
       locale
     ));
 
-  const adsRaw = await getActiveAds();
-  const ads = isVip ? [] : adsRaw;
+  let ads: Awaited<ReturnType<typeof getActiveAds>> = [];
+  let inlineAds: Awaited<ReturnType<typeof getActiveAds>> = [];
+  if (!isVip) {
+    const sidebar = await getActiveAdsByPlacement("article_sidebar", 3);
+    ads = sidebar.length ? sidebar : await getActiveAds();
+    inlineAds = await getActiveAdsByPlacement("article_inline", 1);
+  }
 
   const author = article.users;
   const category = article.categories;
@@ -227,6 +233,8 @@ export default async function ArticlePage({ params }: Props) {
                 </div>
               )}
             </div>
+
+            {inlineAds.length > 0 ? <AdPlacement ads={inlineAds} variant="inline" /> : null}
 
             <div className="prose-wrapper mt-10">
               <ArticleBody html={article.content} locked={locked} />

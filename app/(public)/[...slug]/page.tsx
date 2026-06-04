@@ -5,6 +5,8 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EngineCard } from "@/components/content/engine-card";
 import { loadSectionPageData } from "@/lib/content-engine/ai-content";
+import { AdPlacement } from "@/components/ads/ad-placement";
+import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 
 const breadcrumbCatalog: Record<string, string> = {
   "professional": "Professional",
@@ -99,6 +101,21 @@ export default async function SectionRoutePage({
 
   const breadcrumbs = buildBreadcrumbs(key);
 
+  const sectionAdMap: Record<string, { top: string; mid: string }> = {
+    "digital-health": { top: "digital_health_top", mid: "digital_health_mid" },
+    legislation: { top: "legislation_top", mid: "legislation_mid" },
+    pharma: { top: "drugs_under_title", mid: "drugs_sidebar" },
+    "clinical-studies": { top: "study_inline", mid: "study_sidebar" },
+    "new-drugs": { top: "drugs_under_title", mid: "drugs_sidebar" },
+  };
+  const adKeys = sectionAdMap[key];
+  const [sectionTopAds, sectionMidAds] = adKeys
+    ? await Promise.all([
+        getActiveAdsByPlacement(adKeys.top, 1),
+        getActiveAdsByPlacement(adKeys.mid, 1),
+      ])
+    : [[], []];
+
   return (
     <div className="bg-[#fafcff]">
       <section className="border-b border-[#d9e8f4] bg-[radial-gradient(circle_at_top,_rgba(0,91,150,0.12),transparent_30%),linear-gradient(180deg,#fff_0%,#f8fbff_45%,#f6fbff_100%)]">
@@ -155,7 +172,14 @@ export default async function SectionRoutePage({
         </div>
       </section>
 
+      {sectionTopAds.length > 0 ? (
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <AdPlacement ads={sectionTopAds} variant="banner" />
+        </div>
+      ) : null}
+
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+        {sectionMidAds.length > 0 ? <AdPlacement ads={sectionMidAds} variant="inline" /> : null}
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">Editorial feed</p>

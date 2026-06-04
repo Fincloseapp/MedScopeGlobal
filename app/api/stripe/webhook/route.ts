@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { logSecurityEvent } from "@/lib/security/security-log";
 import { getClientIp } from "@/lib/security/client-ip";
+import { activateAdFromCheckout } from "@/lib/ads/activate-from-payment";
 
 export const dynamic = "force-dynamic";
 
@@ -118,6 +119,17 @@ export async function POST(request: Request) {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.metadata?.user_id;
       const subscriptionId = session.subscription as string | null;
+      const adsRequestId = session.metadata?.ads_request_id;
+
+      if (adsRequestId && session.metadata?.kind === "ad_campaign") {
+        const result = await activateAdFromCheckout(session.id, adsRequestId);
+        await logSecurityEvent({
+          ip,
+          action: "stripe:ad_checkout_completed",
+          status: result.ok ? "ok" : "error",
+          details: { adsRequestId, sessionId: session.id, result },
+        });
+      }
 
       if (userId && subscriptionId) {
         await logSecurityEvent({

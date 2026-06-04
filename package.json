@@ -23,6 +23,7 @@
     "production:finalize": "node scripts/production-finalize.mjs",
     "production:validate": "node scripts/validate-production-env.mjs && npm run db:verify",
     "route:validate": "npx tsx scripts/validate-routes.ts",
+    "env:repair-openai": "node scripts/repair-openai-env.mjs",
     "vercel:env": "node scripts/sync-vercel-env.mjs",
     "deploy:vercel": "node scripts/deploy-vercel-production.mjs",
     "dns:cloudflare": "node scripts/cloudflare-point-vercel.mjs"

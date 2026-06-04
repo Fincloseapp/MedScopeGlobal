@@ -54,13 +54,6 @@ export const GLOBAL_RSS_SOURCES: RssSource[] = [
     minAccessLevel: "public",
   },
   {
-    name: "NIH News Releases",
-    url: "https://www.nih.gov/news-events/news-releases/feed",
-    categorySlug: "medical-education",
-    rubric: "ai-study-summary",
-    minAccessLevel: "student",
-  },
-  {
     name: "CDC Health News",
     url: "https://tools.cdc.gov/api/v2/resources/media/132608.rss",
     categorySlug: "infectious-disease",
@@ -79,13 +72,6 @@ export const GLOBAL_RSS_SOURCES: RssSource[] = [
     url: "https://www.thelancet.com/rssfeed/lancet_current.xml",
     categorySlug: "internal-medicine",
     rubric: "ai-study-summary",
-    minAccessLevel: "physician",
-  },
-  {
-    name: "EMA News",
-    url: "https://www.ema.europa.eu/en/rss/news.xml",
-    categorySlug: "general-practice",
-    rubric: "ai-guideline-summary",
     minAccessLevel: "physician",
   },
   ...CZ_RSS_SOURCES,

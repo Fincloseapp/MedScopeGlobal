@@ -11,7 +11,7 @@ export async function SiteFooter() {
 
   return (
     <footer className="border-t bg-medical-light">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-5">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 xl:grid-cols-7">
         <div>
           <p className="font-display text-lg font-semibold text-medical-navy">MedScopeGlobal</p>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -43,6 +43,52 @@ export async function SiteFooter() {
                 Medicína
               </Link>
             </li>
+            <li>
+              <Link href="/kongresy" className="hover:text-foreground">
+                {isCs ? "Kongresy" : "Congresses"}
+              </Link>
+            </li>
+            <li>
+              <Link href="/kariera" className="hover:text-foreground">
+                {isCs ? "Kariéra" : "Careers"}
+              </Link>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p className="font-medium text-foreground">{isCs ? "B2B" : "B2B"}</p>
+          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+            <li>
+              <Link href="/organizace" className="hover:text-foreground">
+                {isCs ? "Organizace" : "Organizations"}
+              </Link>
+            </li>
+            <li>
+              <Link href="/inzerce" className="hover:text-foreground">
+                {isCs ? "Inzerce" : "Advertising"}
+              </Link>
+            </li>
+            <li>
+              <Link href="/studijni-spoluprace" className="hover:text-foreground">
+                {isCs ? "Studijní spolupráce" : "Study collaboration"}
+              </Link>
+            </li>
+            <li>
+              <Link href="/dokumentace" className="hover:text-foreground">
+                {isCs ? "Dokumentace" : "Documentation"}
+              </Link>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p className="font-medium text-foreground">{isCs ? "Moduly V4c" : "V4c modules"}</p>
+          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+            <li><Link href="/studie" className="hover:text-foreground">Studie</Link></li>
+            <li><Link href="/leky/novinky" className="hover:text-foreground">{isCs ? "Léky" : "Drugs"}</Link></li>
+            <li><Link href="/legislativa" className="hover:text-foreground">Legislativa</Link></li>
+            <li><Link href="/digital-health" className="hover:text-foreground">Digital Health</Link></li>
+            <li><Link href="/novinky" className="hover:text-foreground">Novinky</Link></li>
+            <li><Link href="/newsletter" className="hover:text-foreground">Newsletter</Link></li>
           </ul>
         </div>
         <div>

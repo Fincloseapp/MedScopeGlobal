@@ -37,7 +37,8 @@ const owner = "Fincloseapp";
 const repo = "MedScopeGlobal";
 const branch = "main";
 const commitMessage =
-  "feat(v4a): security, legal, SEO and UX layers — MedScopeGlobal";
+  process.env.DEPLOY_COMMIT_MESSAGE ??
+  "feat(v4d): odborné AI texty, study_sources, kvalita, cron medical-ai-fetch";
 
 const SKIP_DIRS = new Set([
   "node_modules",
@@ -47,7 +48,12 @@ const SKIP_DIRS = new Set([
   ".vercel",
   "terminals",
 ]);
-const SKIP_FILES = new Set([".env.local", "tsconfig.tsbuildinfo"]);
+const SKIP_FILES = new Set([
+  ".env.local",
+  ".env.local.bak",
+  ".env.vercel.pull",
+  "tsconfig.tsbuildinfo",
+]);
 
 function log(msg) {
   console.log(msg);
@@ -175,6 +181,8 @@ async function syncVercelEnv(env) {
     "CRON_SECRET",
     "OPENAI_API_KEY",
     "OPENAI_MODEL",
+    "GEMINI_API_KEY",
+    "GEMINI_MODEL",
     "ADMIN_NOTIFY_EMAIL",
     "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
     "STRIPE_SECRET_KEY",

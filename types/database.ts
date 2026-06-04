@@ -71,6 +71,101 @@ export interface AdRow {
   active: boolean;
   placement: string | null;
   created_at: string;
+  client_name?: string | null;
+  client_email?: string | null;
+  company?: string | null;
+  ico?: string | null;
+  dic?: string | null;
+  type?: string | null;
+  position_newsletter?: string | null;
+  target_url?: string | null;
+  ad_text?: string | null;
+  price?: number | null;
+  start_date?: string | null;
+  end_date?: string | null;
+  ad_status?: string | null;
+  include_in_newsletter?: boolean;
+  request_id?: string | null;
+  campaign_id?: string | null;
+}
+
+export interface AdsRequestRow {
+  id: string;
+  company: string;
+  contact_person: string;
+  email: string;
+  phone: string | null;
+  ico: string | null;
+  dic: string | null;
+  type: string;
+  position: string | null;
+  position_newsletter: string | null;
+  duration: string | null;
+  price: number | null;
+  banner_url: string | null;
+  ad_text: string | null;
+  url: string | null;
+  status: string;
+  approval_token: string | null;
+  stripe_payment_link: string | null;
+  created_at: string;
+}
+
+export interface JobPostingRow {
+  id: string;
+  title: string;
+  slug: string;
+  company: string;
+  specialization: string | null;
+  region: string | null;
+  employment_type: string | null;
+  description: string;
+  requirements: string | null;
+  salary_hint: string | null;
+  contact_email: string | null;
+  apply_url: string | null;
+  published: boolean;
+  featured: boolean;
+  created_at: string;
+}
+
+export interface StudyCollaborationRow {
+  id: string;
+  title: string;
+  slug: string;
+  organization: string;
+  summary: string;
+  body: string | null;
+  specialty: string | null;
+  phase: string | null;
+  contact_email: string | null;
+  apply_url: string | null;
+  published: boolean;
+  featured: boolean;
+  created_at: string;
+}
+
+export interface CongressEventRow {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string | null;
+  body: string | null;
+  starts_at: string | null;
+  ends_at: string | null;
+  location: string | null;
+  venue: string | null;
+  price_hint: string | null;
+  registration_url: string | null;
+  image_url: string | null;
+  source_url: string | null;
+  organizer: string | null;
+  specialty: string | null;
+  region: string | null;
+  published: boolean;
+  featured: boolean;
+  ai_extracted: Record<string, unknown> | null;
+  created_at: string;
 }
 
 export interface VipSubscription {

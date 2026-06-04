@@ -80,7 +80,8 @@ export async function POST(request: Request) {
   });
 
   // Placeholder — actual AI call uses server-side OPENAI_API_KEY only
-  const apiKey = process.env.OPENAI_API_KEY;
+  const { resolveOpenAiKey } = await import("@/lib/ai/openai-key");
+  const apiKey = resolveOpenAiKey();
   if (!apiKey) {
     return NextResponse.json({
       ok: true,

@@ -24,7 +24,7 @@ export function B2bCta({ locale = "cs" }: { locale?: string }) {
               : "Licenses for hospitals, universities and pharma. Custom onboarding."}
           </p>
           <Button asChild variant="outline" className="mt-4">
-            <Link href="/contact">{isCs ? "Kontaktovat obchod" : "Contact sales"}</Link>
+            <Link href="/organizace">{isCs ? "B2B a licence" : "B2B & licenses"}</Link>
           </Button>
         </div>
       </div>

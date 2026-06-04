@@ -39,8 +39,30 @@ const menuCs: NavItem[] = [
     ],
   },
   { label: "Sekce", href: "/sections" },
-  { label: "Události", href: "/events/conferences" },
-  { label: "Kariéra", href: "/careers" },
+  {
+    label: "Obsah",
+    href: "/studie",
+    children: [
+      { label: "Studie", href: "/studie", description: "CZ, EU, SÚKL" },
+      { label: "Odborné AI texty", href: "/odborne", description: "V4d — univerzity, kvalita, překlady" },
+      { label: "Léky", href: "/leky/novinky" },
+      { label: "Legislativa", href: "/legislativa" },
+      { label: "Digital Health", href: "/digital-health" },
+      { label: "Novinky", href: "/novinky" },
+      { label: "Newsletter", href: "/newsletter" },
+    ],
+  },
+  { label: "Kongresy", href: "/kongresy" },
+  { label: "Kariéra", href: "/kariera" },
+  {
+    label: "B2B",
+    href: "/organizace",
+    children: [
+      { label: "Organizace", href: "/organizace", description: "Licence a instituce" },
+      { label: "Inzerce", href: "/inzerce", description: "Reklama a sponzorství" },
+      { label: "Partnerství", href: "/organizace/partnerstvi" },
+    ],
+  },
 ];
 
 const menuEn: NavItem[] = [
@@ -64,8 +86,29 @@ const menuEn: NavItem[] = [
     ],
   },
   { label: "Sections", href: "/sections" },
-  { label: "Events", href: "/events/conferences" },
-  { label: "Careers", href: "/careers" },
+  {
+    label: "Content",
+    href: "/studie",
+    children: [
+      { label: "Studies", href: "/studie" },
+      { label: "Drugs", href: "/leky/novinky" },
+      { label: "Legislation", href: "/legislativa" },
+      { label: "Digital Health", href: "/digital-health" },
+      { label: "News", href: "/novinky" },
+      { label: "Newsletter", href: "/newsletter" },
+    ],
+  },
+  { label: "Congresses", href: "/kongresy" },
+  { label: "Careers", href: "/kariera" },
+  {
+    label: "B2B",
+    href: "/organizace",
+    children: [
+      { label: "Organizations", href: "/organizace" },
+      { label: "Advertising", href: "/inzerce" },
+      { label: "Partnership", href: "/organizace/partnerstvi" },
+    ],
+  },
 ];
 
 export function getMainMenu(locale: LocaleCode): NavItem[] {

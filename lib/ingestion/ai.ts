@@ -1,3 +1,4 @@
+import { generateJsonFromLlm, isLlmConfigured } from "@/lib/ai/chat-json";
 import { CATEGORY_SLUGS_FOR_AI } from "@/lib/ingestion/sources";
 import type { ContentAccessLevel } from "@/lib/config/access-levels";
 import type { IngestionRubric } from "@/lib/ingestion/sources";
@@ -12,13 +13,8 @@ export interface ProcessedArticle {
   locale: string;
 }
 
-export function resolveOpenAiKey(): string | undefined {
-  return process.env.OPENAI_API_KEY?.trim() || process.env.OPEN_API_KEY?.trim();
-}
-
-export function isAiConfigured(): boolean {
-  return Boolean(resolveOpenAiKey());
-}
+export { resolveOpenAiKey } from "@/lib/ai/openai-key";
+export { isLlmConfigured as isAiConfigured } from "@/lib/ai/chat-json";
 
 function ingestionTargetLocale(): string {
   return (process.env.INGESTION_LOCALE ?? process.env.DEFAULT_SITE_LOCALE ?? "cs")
@@ -35,12 +31,10 @@ export async function processWithAi(input: {
   defaultRubric: IngestionRubric;
   defaultAccessLevel: ContentAccessLevel;
 }): Promise<ProcessedArticle> {
-  const key = resolveOpenAiKey();
-  if (!key) {
+  if (!isLlmConfigured()) {
     return fallbackProcess(input);
   }
 
-  const model = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
   const categories = CATEGORY_SLUGS_FOR_AI.join(", ");
 
   const system = `You are the MedScopeGlobal medical editorial AI. Produce evidence-based, accurate summaries for clinicians and students. Never invent study data. If the source is insufficient, state limitations clearly. Output valid JSON only.`;
@@ -69,33 +63,7 @@ Return JSON:
 Write the entire article (title, excerpt, content) in the language matching locale: ${ingestionTargetLocale()} (cs = Czech, en = English, de = German, etc.).`;
 
   try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.3,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
-      }),
-      signal: AbortSignal.timeout(60_000),
-    });
-
-    if (!res.ok) {
-      console.error("OpenAI error", await res.text());
-      return fallbackProcess(input);
-    }
-
-    const json = (await res.json()) as {
-      choices?: { message?: { content?: string } }[];
-    };
-    const raw = json.choices?.[0]?.message?.content;
+    const raw = await generateJsonFromLlm({ system, user });
     if (!raw) return fallbackProcess(input);
 
     const parsed = JSON.parse(raw) as ProcessedArticle;
@@ -145,7 +113,7 @@ function fallbackProcess(input: {
 <h2>Shrnutí</h2>
 <p>${escapeHtml(excerpt)}</p>
 <h2>Klinický význam</h2>
-<p>Tento článek byl automaticky zpracován ze zdroje <strong>${escapeHtml(input.sourceName)}</strong>. Pro plné redakční zpracování nastavte <code>OPENAI_API_KEY</code>.</p>
+<p>Tento článek byl automaticky zpracován ze zdroje <strong>${escapeHtml(input.sourceName)}</strong>. Pro plné redakční zpracování nastavte <code>OPENAI_API_KEY</code> (sk-…) nebo <code>GEMINI_API_KEY</code> (AI Studio).</p>
 <h2>Zdroj</h2>
 <p><a href="${escapeAttr(input.sourceUrl)}" rel="noopener noreferrer" target="_blank">Původní publikace</a></p>
 <p><em>MedScopeGlobal — ověřte vůči primární literatuře před klinickým použitím.</em></p>
@@ -154,7 +122,7 @@ function fallbackProcess(input: {
 <h2>Summary</h2>
 <p>${escapeHtml(excerpt)}</p>
 <h2>Clinical relevance</h2>
-<p>This dispatch was ingested automatically from <strong>${escapeHtml(input.sourceName)}</strong>. Enable <code>OPENAI_API_KEY</code> or <code>OPEN_API_KEY</code> for full editorial synthesis.</p>
+<p>This dispatch was ingested automatically from <strong>${escapeHtml(input.sourceName)}</strong>. Enable <code>OPENAI_API_KEY</code> or <code>GEMINI_API_KEY</code> for full editorial synthesis.</p>
 <h2>Source</h2>
 <p><a href="${escapeAttr(input.sourceUrl)}" rel="noopener noreferrer" target="_blank">Read original publication</a></p>
 <p><em>MedScopeGlobal — verify against primary literature before clinical application.</em></p>

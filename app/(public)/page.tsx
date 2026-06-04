@@ -7,9 +7,12 @@ import { Button } from "@/components/ui/button";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { SITE } from "@/lib/config/site";
 import { getLatestArticles } from "@/lib/queries/articles";
+import { AdPlacement } from "@/components/ads/ad-placement";
+import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { LOCALE_COOKIE, normalizeLocale } from "@/lib/i18n/config";
 import { getDictionary, t } from "@/lib/i18n/get-dictionary";
 import { cookies } from "next/headers";
+import { HomepageAutomation } from "@/components/home/homepage-automation";
 
 export async function generateMetadata(): Promise<Metadata> {
   const cookieStore = await cookies();
@@ -35,6 +38,14 @@ export default async function HomePage() {
   const isCs = locale === "cs";
   const { isVip, accessLevel } = await getReaderContext();
   const articles = await getLatestArticles(6, 0, isVip, accessLevel, locale);
+  const showAds = !isVip;
+  const [topAds, midAds, bottomAds] = showAds
+    ? await Promise.all([
+        getActiveAdsByPlacement("homepage_top", 1),
+        getActiveAdsByPlacement("homepage_mid", 1),
+        getActiveAdsByPlacement("homepage_bottom", 1),
+      ])
+    : [[], [], []];
 
   return (
     <div className="bg-[#fafcff]">
@@ -85,7 +96,13 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {showAds ? <div className="mx-auto max-w-7xl px-4 sm:px-6"><AdPlacement ads={topAds} variant="banner" /></div> : null}
+
       <AudienceHub locale={locale} />
+
+      <HomepageAutomation locale={locale} isVip={isVip} accessLevel={accessLevel} />
+
+      {showAds ? <div className="mx-auto max-w-7xl px-4 sm:px-6"><AdPlacement ads={midAds} variant="inline" /></div> : null}
 
       <section className="border-y border-[#dfeaf5] bg-white">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
@@ -143,6 +160,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {showAds ? <div className="mx-auto max-w-7xl px-4 sm:px-6"><AdPlacement ads={bottomAds} variant="banner" /></div> : null}
 
       <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6">
         <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">

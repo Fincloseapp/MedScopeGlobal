@@ -136,8 +136,9 @@ export async function runIngestionPipeline(options: {
   }
 
   for (const pm of PUBMED_BY_CATEGORY) {
+    await new Promise((r) => setTimeout(r, 500));
     try {
-      const items = await fetchPubMedItems(pm.query, pm.categorySlug, 6);
+      const items = await fetchPubMedItems(pm.query, pm.categorySlug, 4);
       for (const item of items) {
         queue.push({
           ...item,
