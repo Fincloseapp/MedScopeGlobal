@@ -29,7 +29,7 @@ export default async function OdbornePage() {
     <ModulePageShell
       eyebrow="V4d · Odborné texty"
       title="Odborné AI texty"
-      description="Denní ingest z lékařských fakult a center (CZ, SK, EU, svět). Jazyková filtrace CZ/SK/EN/DE/FR, medicínská relevance, kontrola duplicit a kvality, shrnutí pro lékaře i pacienty."
+      description="V5+: Groq AI, automatické citace (Vancouver/APA/Harvard), DOI, PubMed/FDA/EMA/SÚKL, evidence scoring A–D."
       ctaHref="/odborne/ai"
       ctaLabel="AI asistent"
     >
@@ -45,6 +45,21 @@ export default async function OdbornePage() {
           className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]"
         >
           Kategorie
+        </Link>
+        <Link href="/odborne/citace" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
+          Citace
+        </Link>
+        <Link href="/odborne/zdroje" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
+          Zdroje
+        </Link>
+        <Link href="/odborne/doi" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
+          DOI
+        </Link>
+        <Link href="/odborne/pubmed" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
+          PubMed
+        </Link>
+        <Link href="/odborne/evidence" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
+          Evidence
         </Link>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">

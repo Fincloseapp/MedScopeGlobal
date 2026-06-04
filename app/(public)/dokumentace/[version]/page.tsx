@@ -11,6 +11,8 @@ const FALLBACK: Record<string, string> = {
   "ai-medical":
     "AI Medical Intelligence: /ai-medical — 7 asistentů, Supabase search, shrnutí, doporučení, ai_medical_logs.",
   v5: "V5 Groq Engine: GROQ_API_KEY — bezplatný primární LLM (llama3/mixtral/gemma2), před Gemini a OpenAI.",
+  v5plus:
+    "V5+ Evidence Engine: medical_sources, citations, evidence A-D, DOI, PubMed/PMC, FDA/EMA/SÚKL, crons.",
 };
 
 type Props = { params: Promise<{ version: string }> };
@@ -22,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function DokumentaceVersionPage({ params }: Props) {
   const { version } = await params;
-  if (!["v4a", "v4b", "v4c", "v4d", "ai-medical", "v5"].includes(version)) notFound();
+  if (!["v4a", "v4b", "v4c", "v4d", "ai-medical", "v5", "v5plus"].includes(version)) notFound();
 
   const doc = await getDocumentation(version);
   const content = doc?.content ?? FALLBACK[version] ?? "";

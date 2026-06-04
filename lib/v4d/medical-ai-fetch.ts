@@ -14,6 +14,8 @@ import {
 } from "@/lib/v4d/filters";
 import { processMedicalTextWithAi } from "@/lib/v4d/medical-ai-process";
 import { evaluateQuality, persistQuality } from "@/lib/v4d/quality";
+import { enrichMedicalArticleWithEvidence } from "@/lib/v5plus/enrich-article";
+import { extractFirstDoi } from "@/lib/ai/doi";
 
 export type MedicalAiFetchResult = {
   runId: string;
@@ -193,6 +195,19 @@ export async function runMedicalAiFetch(): Promise<MedicalAiFetchResult> {
           originalLanguage: lang,
         });
         await persistQuality(inserted.id, finalQuality);
+
+        try {
+          const doiFromText = extractFirstDoi(`${item.title} ${desc}`);
+          if (doiFromText) {
+            await admin
+              .from("medical_ai_texts")
+              .update({ doi: doiFromText })
+              .eq("id", inserted.id);
+          }
+          await enrichMedicalArticleWithEvidence(inserted.id);
+        } catch (enrichErr) {
+          errors.push(`enrich: ${(enrichErr as Error).message}`);
+        }
 
         await logEvent(
           runId,
