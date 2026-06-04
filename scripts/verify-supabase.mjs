@@ -40,6 +40,11 @@ const recommendedTables = [
   ["saved_articles", "id"],
   ["ad_impressions", "id"],
   ["ad_clicks", "id"],
+  ["medical_ai_texts", "id"],
+  ["medical_sources", "id"],
+  ["medical_citations", "id"],
+  ["medical_evidence", "id"],
+  ["ai_medical_logs", "id"],
 ];
 
 let ok = true;
@@ -50,8 +55,12 @@ for (const k of required) {
   console.log(`${has ? "✓" : "✗"} ${k}`);
   if (!has) ok = false;
 }
+const groqConfigured = Boolean(
+  env.GROQ_API_KEY?.startsWith("gsk_") && env.GROQ_API_KEY.length > 20
+);
 const aiKeyConfigured = Boolean(env.OPENAI_API_KEY || env.OPEN_API_KEY);
-console.log(`${aiKeyConfigured ? "✓" : "○"} OPENAI_API_KEY / OPEN_API_KEY (optional, full AI)`);
+console.log(`${groqConfigured ? "✓" : "○"} GROQ_API_KEY (V5 primary AI)`);
+console.log(`${aiKeyConfigured ? "✓" : "○"} OPENAI_API_KEY / OPEN_API_KEY (optional fallback)`);
 
 console.log("\n=== Supabase tables (required) ===\n");
 for (const [t, col] of requiredTables) {

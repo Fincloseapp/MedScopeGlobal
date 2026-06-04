@@ -47,24 +47,54 @@ async function getAccessToken(env) {
   return null;
 }
 
-async function runQuery(token, ref, sql) {
-  const res = await fetch(
-    `https://api.supabase.com/v1/projects/${ref}/database/query`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ query: sql }),
-    }
-  );
+function isRetryableStatus(status) {
+  return status === 502 || status === 503 || status === 504 || status === 429;
+}
 
-  const text = await res.text();
-  if (!res.ok) {
-    throw new Error(`API ${res.status}: ${text.slice(0, 500)}`);
+async function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+async function runQuery(token, ref, sql, { retries = 4 } = {}) {
+  let lastErr;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(
+        `https://api.supabase.com/v1/projects/${ref}/database/query`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query: sql }),
+        }
+      );
+
+      const text = await res.text();
+      if (!res.ok) {
+        if (isRetryableStatus(res.status) && attempt < retries) {
+          const wait = 2000 * (attempt + 1);
+          console.warn(`  retry ${attempt + 1}/${retries} after ${res.status}, wait ${wait}ms`);
+          await sleep(wait);
+          continue;
+        }
+        throw new Error(`API ${res.status}: ${text.slice(0, 500)}`);
+      }
+      return text;
+    } catch (e) {
+      lastErr = e;
+      const msg = e instanceof Error ? e.message : String(e);
+      if (attempt < retries && /timeout|ECONNRESET|fetch failed/i.test(msg)) {
+        const wait = 2000 * (attempt + 1);
+        console.warn(`  retry ${attempt + 1}/${retries} (${msg.slice(0, 60)}…)`);
+        await sleep(wait);
+        continue;
+      }
+      throw e;
+    }
   }
-  return text;
+  throw lastErr;
 }
 
 async function main() {
