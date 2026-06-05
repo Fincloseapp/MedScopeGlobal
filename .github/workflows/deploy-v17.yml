@@ -20,6 +20,7 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       NEXT_PUBLIC_SITE_URL: https://medscopeglobal.com
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
       V17_HEALTH_URL: https://medscopeglobal.com/api/v17/health
       V17_MONITORING_URL: https://medscopeglobal.com/api/v17/monitoring
 
@@ -42,8 +43,6 @@ jobs:
 
       - name: Verify V17
         run: npm run verify-v17
-        env:
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
 
       - name: Local Healthcheck
         run: npm run healthcheck-local

@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const sha = process.argv[2] || process.env.COMMIT_SHA;
+const pollSeconds = Number(process.env.POLL_SECONDS || 0);
 
 function loadToken() {
   for (const file of [".env.local", ".env"]) {
@@ -43,10 +44,33 @@ if (!wfRes.ok) {
   process.exit(1);
 }
 
-const runs = wfData.workflow_runs ?? [];
-const match =
+let runs = wfData.workflow_runs ?? [];
+let match =
   (sha && runs.find((r) => r.head_sha === sha)) ||
   runs[0];
+
+if (pollSeconds > 0 && sha) {
+  const started = Date.now();
+  while (Date.now() - started < pollSeconds * 1000) {
+    if (match && match.status === "completed") break;
+    await new Promise((r) => setTimeout(r, 20_000));
+    const again = await fetch(
+      "https://api.github.com/repos/Fincloseapp/MedScopeGlobal/actions/workflows/deploy-v17.yml/runs?per_page=5",
+      { headers }
+    );
+    const againData = await again.json();
+    runs = againData.workflow_runs ?? [];
+    match = runs.find((r) => r.head_sha === sha) || runs[0];
+    console.error(
+      JSON.stringify({
+        polling: true,
+        runId: match?.id,
+        status: match?.status,
+        conclusion: match?.conclusion,
+      })
+    );
+  }
+}
 
 let commitMessage = null;
 if (sha) {
@@ -92,6 +116,8 @@ console.log(
 );
 
 if (!match) process.exit(1);
+
+process.exitCode = match.conclusion === "success" ? 0 : 1;
 
 const runId = match.id;
 const jobsRes = await fetch(

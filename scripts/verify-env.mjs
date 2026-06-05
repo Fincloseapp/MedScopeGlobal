@@ -26,7 +26,13 @@ export function validateCronSecret(env) {
 export function runEnvPreflight(options = {}) {
   const root =
     options.root ?? path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-  const env = options.env ?? loadProjectEnv(root);
+  const fileEnv = loadProjectEnv(root);
+  const env =
+    options.env ??
+    {
+      ...fileEnv,
+      ...(process.env.CRON_SECRET ? { CRON_SECRET: process.env.CRON_SECRET } : {}),
+    };
   const errors = [];
 
   const cron = validateCronSecret(env);
