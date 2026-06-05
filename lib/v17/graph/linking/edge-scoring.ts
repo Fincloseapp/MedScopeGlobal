@@ -33,7 +33,7 @@ export function computeFinalScore(metadata: GraphEdgeMetadata): number {
 
 /** Apply Edge Scoring Layer — finalScore, confidence, relevance, audit.meta. */
 export function applyEdgeScoring(edges: GraphEdgeInput[]): GraphEdge[] {
-  if (edges.length === 0) return edges;
+  if (edges.length === 0) return [];
 
   const finalScores = edges.map((edge) => computeFinalScore(edge.metadata));
   const maxFinalScore = Math.max(...finalScores, 0);
