@@ -286,6 +286,7 @@ async function pushToGitHub(token) {
   const legacyRemove = [
     "src",
     "prisma",
+    "tests",
     "next.config.ts",
     "prisma.config.ts",
     "instrumentation.ts",

@@ -36,6 +36,11 @@
   ],
   "exclude": [
     "node_modules",
-    "supabase/functions"
+    "supabase/functions",
+    "tests",
+    "e2e",
+    ".deploy-tmp",
+    ".build-tmp",
+    ".tools"
   ]
 }
