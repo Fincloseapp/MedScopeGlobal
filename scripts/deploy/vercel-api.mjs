@@ -124,11 +124,19 @@ export async function waitForDeploymentReady(deploymentId, env = loadDeployEnv()
 /** Assign production alias to a deployment. */
 export async function assignProductionAlias(deploymentId, env = loadDeployEnv()) {
   const { productionDomain } = getVercelConfig(env);
-  await vercelFetch(`/v2/deployments/${deploymentId}/aliases`, {
-    method: "POST",
-    body: { alias: productionDomain },
-    env,
-  });
+  try {
+    await vercelFetch(`/v2/deployments/${deploymentId}/aliases`, {
+      method: "POST",
+      body: { alias: productionDomain },
+      env,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    // Domain already points at this deployment — treat as success.
+    if (!message.includes("not_modified") && !message.includes("409")) {
+      throw error;
+    }
+  }
   return {
     alias: productionDomain,
     url: `https://${productionDomain}`,
