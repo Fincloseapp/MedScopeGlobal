@@ -15,7 +15,7 @@ if (!envPreflight.ok) {
 }
 console.log("✓ env preflight (CRON_SECRET)");
 
-const routes = ["reason", "summarize", "clinical", "graph", "guideline", "acp", "deploy"];
+const routes = ["reason", "summarize", "clinical", "graph", "guideline", "acp", "deploy", "health", "monitoring", "rollback"];
 const jobs = [
   "reasoningJob.ts",
   "summarizationJob.ts",
@@ -70,6 +70,9 @@ const libModules = [
   "lib/v17/monitoring/hooks.ts",
   "lib/v17/versioning/version.ts",
   "lib/v17/production/run-production-acp.ts",
+  "lib/v17/output/formatter.ts",
+  "lib/v17/health/healthcheck.ts",
+  "lib/v17/monitoring/dashboard.ts",
   "lib/v17/v17-api-handlers.ts",
 ];
 
@@ -133,8 +136,27 @@ for (const slug of routes) {
   const usesAcpPipeline =
     slug === "acp" && src.includes("runProductionAcp") && src.includes('job: JOB');
   const usesDeployPipeline =
-    slug === "deploy" && src.includes("preDeployCheck") && src.includes("getVersion");
-  if (!usesHandler && !usesReasonPipeline && !usesGraphPipeline && !usesClinicalPipeline && !usesAcpPipeline && !usesDeployPipeline) {
+    slug === "deploy" && src.includes("preDeployCheck");
+  const usesHealthPipeline =
+    slug === "health" && src.includes("runHealthcheck");
+  const usesMonitoringPipeline =
+    slug === "monitoring" && src.includes("getMonitoringSnapshot");
+  const usesRollbackPipeline =
+    slug === "rollback" && src.includes("vercel_rollback");
+  const usesDeployPostPipeline =
+    slug === "deploy" && src.includes("vercel_production") && src.includes("getVersion");
+  if (
+    !usesHandler &&
+    !usesReasonPipeline &&
+    !usesGraphPipeline &&
+    !usesClinicalPipeline &&
+    !usesAcpPipeline &&
+    !usesDeployPipeline &&
+    !usesDeployPostPipeline &&
+    !usesHealthPipeline &&
+    !usesMonitoringPipeline &&
+    !usesRollbackPipeline
+  ) {
     fail(`Route ${slug} must use createV17RouteHandlers or dedicated pipeline binding`);
   } else {
     pass(`app/api/v17/${slug}/route.ts → valid handler binding`);

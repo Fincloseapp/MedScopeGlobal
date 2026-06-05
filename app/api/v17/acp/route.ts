@@ -58,6 +58,7 @@ export async function POST(request: Request) {
           job: JOB,
           code: production.code,
           issues: production.issues,
+          formatted: production.formatted,
         },
         { status }
       );
@@ -70,6 +71,7 @@ export async function POST(request: Request) {
       fallbackApplied: production.fallbackApplied ?? false,
       safetyIssues: production.safetyIssues,
       result: production.result,
+      formatted: production.formatted,
     });
   } catch (error) {
     return NextResponse.json(

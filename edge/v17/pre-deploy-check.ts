@@ -52,6 +52,10 @@ export async function preDeployCheck(): Promise<PreDeployCheckResult> {
     "lib/v17/fallback/fallback.ts",
     "lib/v17/monitoring/hooks.ts",
     "lib/v17/versioning/version.ts",
+    "lib/v17/output/formatter.ts",
+    "lib/v17/health/healthcheck.ts",
+    "lib/v17/production/run-production-acp.ts",
+    "app/api/v17/health/route.ts",
   ];
   for (const rel of blueprintFiles) {
     if (!fileExists(rel)) issues.push(`Missing blueprint module: ${rel}`);

@@ -71,10 +71,19 @@ function loadEnvFile(path) {
 }
 
 function loadEnv() {
-  return {
+  const fileEnv = {
     ...loadEnvFile(join(root, ".env.local")),
     ...loadEnvFile(join(root, ".env")),
-    ...(process.env.GITHUB_TOKEN ? { GITHUB_TOKEN: process.env.GITHUB_TOKEN } : {}),
+  };
+  const ghToken =
+    process.env.GH_TOKEN ||
+    process.env.GITHUB_TOKEN ||
+    fileEnv.GH_TOKEN ||
+    fileEnv.GITHUB_TOKEN ||
+    fileEnv.GITHUB_PAT;
+  return {
+    ...fileEnv,
+    ...(ghToken ? { GITHUB_TOKEN: ghToken, GH_TOKEN: ghToken } : {}),
     ...(process.env.VERCEL_ORG_ID ? { VERCEL_ORG_ID: process.env.VERCEL_ORG_ID } : {}),
     ...(process.env.VERCEL_PROJECT_ID ? { VERCEL_PROJECT_ID: process.env.VERCEL_PROJECT_ID } : {}),
     ...(process.env.VERCEL_TOKEN ? { VERCEL_TOKEN: process.env.VERCEL_TOKEN } : {}),
@@ -307,8 +316,15 @@ async function pushToGitHub(token) {
   }
 
   runGit(git, ["commit", "-m", commitMessage], cloneDir);
-  runGit(git, ["push", "origin", branch], cloneDir);
   const sha = runGit(git, ["rev-parse", "HEAD"], cloneDir);
+
+  if (process.env.COMMIT_ONLY === "1") {
+    log(`Commit připraven v: ${cloneDir}`);
+    log(`Push ručně: cd "${cloneDir}" && git push origin ${branch}`);
+    return sha;
+  }
+
+  runGit(git, ["push", "origin", branch], cloneDir);
 
   try {
     rmSync(cloneDir, { recursive: true, force: true, maxRetries: 2, retryDelay: 300 });
@@ -402,31 +418,49 @@ async function verifySite(commitSha) {
 }
 
 async function main() {
-  log("=== MedScopeGlobal V4a → Vercel Production ===");
+  const commitOnly = process.env.COMMIT_ONLY === "1";
+  log(commitOnly ? "=== MedScopeGlobal — commit only ===" : "=== MedScopeGlobal V4a → Vercel Production ===");
   const env = loadEnv();
 
-  await applyMigrations();
-  await syncVercelEnv(env);
+  if (!commitOnly) {
+    await applyMigrations();
+    await syncVercelEnv(env);
+  }
 
   const ghToken =
     env.GITHUB_TOKEN || env.GH_TOKEN || env.GITHUB_PAT || process.env.GITHUB_TOKEN;
 
   if (!ghToken) {
     throw new Error(
-      "Chybí GITHUB_TOKEN v .env.local. Vytvořte PAT na https://github.com/settings/tokens (scope: repo Contents write) a spusťte znovu: node scripts/deploy-vercel-production.mjs"
+      "Chybí GH_TOKEN / GITHUB_TOKEN v .env.local (scope: repo + workflow). Spusťte znovu: node scripts/deploy-vercel-production.mjs"
     );
   }
 
-  const verifyV6 = spawnSync(process.execPath, [join(root, "scripts", "verify-v6-api-routes.mjs")], {
-    cwd: root,
-    encoding: "utf8",
-  });
-  if (verifyV6.status !== 0) {
-    throw new Error("Chybí nebo jsou neplatné soubory app/api/v6/*/route.ts");
+  if (!commitOnly) {
+    const verifyV6 = spawnSync(process.execPath, [join(root, "scripts", "verify-v6-api-routes.mjs")], {
+      cwd: root,
+      encoding: "utf8",
+    });
+    if (verifyV6.status !== 0) {
+      throw new Error("Chybí nebo jsou neplatné soubory app/api/v6/*/route.ts");
+    }
+  } else {
+    const verifyV17 = spawnSync(process.execPath, [join(root, "scripts", "verify-v17-skeleton.mjs")], {
+      cwd: root,
+      encoding: "utf8",
+    });
+    if (verifyV17.status !== 0) {
+      throw new Error("verify-v17-skeleton selhal — commit zrušen");
+    }
   }
 
   const sha = await pushToGitHub(ghToken);
   if (sha) log(`Commit: ${sha}`);
+
+  if (commitOnly) {
+    log("\n=== Commit připraven — proveďte push na main ===");
+    return;
+  }
 
   await triggerVercelDeploy(env);
   await verifySite(sha);
