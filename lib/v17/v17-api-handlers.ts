@@ -20,8 +20,8 @@ const READY_MESSAGE = "V17 endpoint ready. Use POST to run the job.";
 const JOB_RUNNERS: Record<V17JobSlug, () => Promise<unknown>> = {
   reason: () => reasoningJob(),
   summarize: summarizationJob,
-  clinical: clinicalJob,
-  graph: graphBuildJob,
+  clinical: () => clinicalJob(),
+  graph: () => graphBuildJob(),
   guideline: guidelineJob,
 };
 

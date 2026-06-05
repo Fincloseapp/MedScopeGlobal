@@ -31,6 +31,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local build/deploy staging (D: only)
+.build-tmp/
+.deploy-tmp/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

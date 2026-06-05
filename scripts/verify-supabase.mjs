@@ -1,14 +1,11 @@
-import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { createClient } from "@supabase/supabase-js";
+import { loadProjectEnv } from "./load-env.mjs";
+import { validateCronSecret } from "./verify-env.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const env = {};
-for (const line of fs.readFileSync(path.join(root, ".env.local"), "utf8").split(/\r?\n/)) {
-  const m = line.match(/^([^#=]+)=(.*)$/);
-  if (m) env[m[1].trim()] = m[2].trim();
-}
+const env = loadProjectEnv(root);
 
 const required = [
   "NEXT_PUBLIC_SUPABASE_URL",
@@ -56,7 +53,8 @@ let ok = true;
 
 console.log("=== .env.local ===\n");
 for (const k of required) {
-  const has = Boolean(env[k]?.length);
+  const has =
+    k === "CRON_SECRET" ? validateCronSecret(env).ok : Boolean(env[k]?.length);
   console.log(`${has ? "✓" : "✗"} ${k}`);
   if (!has) ok = false;
 }

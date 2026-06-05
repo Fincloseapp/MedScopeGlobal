@@ -10,6 +10,7 @@
     "lint": "next lint",
     "env:setup": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-env.ps1",
     "env:validate": "node scripts/validate-production-env.mjs",
+    "env:verify": "node scripts/verify-env.mjs",
     "db:setup": "node scripts/apply-migrations.mjs",
     "db:migrate": "node scripts/apply-migrations.mjs",
     "db:apply-translations": "node scripts/apply-article-translations-table.mjs",

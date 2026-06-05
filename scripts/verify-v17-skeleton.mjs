@@ -4,16 +4,25 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { runEnvPreflight } from "./verify-env.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-const routes = ["reason", "summarize", "clinical", "graph", "guideline"];
+const envPreflight = runEnvPreflight({ root });
+if (!envPreflight.ok) {
+  for (const msg of envPreflight.errors) console.error("✗", msg);
+  process.exit(1);
+}
+console.log("✓ env preflight (CRON_SECRET)");
+
+const routes = ["reason", "summarize", "clinical", "graph", "guideline", "acp", "deploy"];
 const jobs = [
   "reasoningJob.ts",
   "summarizationJob.ts",
   "clinicalJob.ts",
   "graphBuildJob.ts",
   "guidelineJob.ts",
+  "acpJob.ts",
 ];
 const edges = [
   "reasoning-edge.ts",
@@ -21,6 +30,8 @@ const edges = [
   "clinical-edge.ts",
   "graph-edge.ts",
   "guideline-edge.ts",
+  "acp-edge.ts",
+  "pre-deploy-check.ts",
 ];
 const libModules = [
   "lib/v17/reasoning/extractor.ts",
@@ -34,10 +45,31 @@ const libModules = [
   "lib/v17/graph/builder.ts",
   "lib/v17/graph/linker.ts",
   "lib/v17/graph/normalizer.ts",
+  "lib/v17/graph/types.ts",
+  "lib/v17/graph/linking/text-match.ts",
+  "lib/v17/graph/linking/edge-metadata.ts",
+  "lib/v17/graph/linking/edge-scoring.ts",
+  "lib/v17/clinical/types.ts",
+  "lib/v17/clinical/graph-context.ts",
   "lib/v17/clinical/diagnosis.ts",
   "lib/v17/clinical/treatment.ts",
   "lib/v17/clinical/risk.ts",
   "lib/v17/clinical/evidence.ts",
+  "lib/v17/acp/types.ts",
+  "lib/v17/acp/validator.ts",
+  "lib/v17/acp/aggregator.ts",
+  "lib/v17/acp/summarizer.ts",
+  "lib/v17/acp/compliance.ts",
+  "lib/v17/acp/audit.ts",
+  "lib/v17/acp/orchestrator.ts",
+  "lib/v17/security/sanitize.ts",
+  "lib/v17/security/clinical-guardrails.ts",
+  "lib/v17/security/rate-limit.ts",
+  "lib/v17/audit/logger.ts",
+  "lib/v17/fallback/fallback.ts",
+  "lib/v17/monitoring/hooks.ts",
+  "lib/v17/versioning/version.ts",
+  "lib/v17/production/run-production-acp.ts",
   "lib/v17/v17-api-handlers.ts",
 ];
 
@@ -94,8 +126,16 @@ for (const slug of routes) {
   const usesHandler = src.includes(`createV17RouteHandlers("${slug}")`);
   const usesReasonPipeline =
     slug === "reason" && src.includes("reasoningJob") && src.includes('job: JOB');
-  if (!usesHandler && !usesReasonPipeline) {
-    fail(`Route ${slug} must use createV17RouteHandlers or reasoning pipeline binding`);
+  const usesGraphPipeline =
+    slug === "graph" && src.includes("graphBuildJob") && src.includes('job: JOB');
+  const usesClinicalPipeline =
+    slug === "clinical" && src.includes("clinicalJob") && src.includes('job: JOB');
+  const usesAcpPipeline =
+    slug === "acp" && src.includes("runProductionAcp") && src.includes('job: JOB');
+  const usesDeployPipeline =
+    slug === "deploy" && src.includes("preDeployCheck") && src.includes("getVersion");
+  if (!usesHandler && !usesReasonPipeline && !usesGraphPipeline && !usesClinicalPipeline && !usesAcpPipeline && !usesDeployPipeline) {
+    fail(`Route ${slug} must use createV17RouteHandlers or dedicated pipeline binding`);
   } else {
     pass(`app/api/v17/${slug}/route.ts → valid handler binding`);
   }

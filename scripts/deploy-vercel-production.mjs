@@ -29,10 +29,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const tools = join(root, ".tools");
 const mingitZip = join(tools, "MinGit.zip");
 const mingitRoot = join(tools, "mingit");
-const cloneDir = join(
-  process.env.TEMP || tools,
-  `msg-deploy-${Date.now()}`
-);
+const deployTmp = join(root, ".deploy-tmp");
+mkdirSync(deployTmp, { recursive: true });
+const cloneDir = join(deployTmp, `msg-deploy-${Date.now()}`);
 const owner = "Fincloseapp";
 const repo = "MedScopeGlobal";
 const branch = "main";
@@ -46,6 +45,8 @@ const SKIP_DIRS = new Set([
   ".git",
   ".tools",
   ".vercel",
+  ".build-tmp",
+  ".deploy-tmp",
   "terminals",
 ]);
 const SKIP_FILES = new Set([
@@ -260,6 +261,9 @@ async function pushToGitHub(token) {
   if (!existsSync(join(cloneDir, ".git"))) {
     throw new Error("Git clone failed — .git missing in " + cloneDir);
   }
+
+  // Re-apply token on origin — Git strips credentials from remote after clone.
+  runGit(git, ["remote", "set-url", "origin", url], cloneDir);
 
   const projectFiles = walkProject(root);
   log(`Kopíruji ${projectFiles.length} souborů do repozitáře…`);

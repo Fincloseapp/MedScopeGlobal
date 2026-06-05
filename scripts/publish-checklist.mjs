@@ -1,17 +1,14 @@
 /**
  * Pre-flight checklist for medscopeglobal.com (no secrets printed).
  */
-import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { createClient } from "@supabase/supabase-js";
+import { loadProjectEnv } from "./load-env.mjs";
+import { validateCronSecret } from "./verify-env.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const env = {};
-for (const line of fs.readFileSync(path.join(root, ".env.local"), "utf8").split(/\r?\n/)) {
-  const m = line.match(/^([^#=]+)=(.*)$/);
-  if (m) env[m[1].trim()] = m[2].trim();
-}
+const env = loadProjectEnv(root);
 
 const admin = createClient(
   env.NEXT_PUBLIC_SUPABASE_URL,
@@ -22,7 +19,7 @@ const checks = [];
 const aiKeyValid = Boolean(env.OPENAI_API_KEY?.startsWith("sk-") || env.OPEN_API_KEY?.startsWith("sk-"));
 
 checks.push(["NEXT_PUBLIC_SITE_URL", env.NEXT_PUBLIC_SITE_URL?.includes("medscopeglobal.com")]);
-checks.push(["CRON_SECRET", Boolean(env.CRON_SECRET?.length > 20)]);
+checks.push(["CRON_SECRET", validateCronSecret(env).ok]);
 checks.push(["OPENAI_API_KEY / OPEN_API_KEY", aiKeyValid]);
 checks.push(["INGESTION_LOCALE", env.INGESTION_LOCALE || "cs"]);
 
