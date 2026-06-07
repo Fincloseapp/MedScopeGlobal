@@ -35,6 +35,9 @@ yarn-error.log*
 .build-tmp/
 .deploy-tmp/
 
+# V17 audit logs (local only)
+.data/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

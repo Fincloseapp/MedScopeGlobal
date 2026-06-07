@@ -7,6 +7,7 @@
  *   GITHUB_TOKEN — push to Fincloseapp/MedScopeGlobal (triggers Vercel)
  *   VERCEL_TOKEN — optional redeploy hook (+ VERCEL_PROJECT_ID from .vercel/project.json)
  */
+import { VERCEL_SYNC_KEYS } from "./env-keys.mjs";
 import {
   copyFileSync,
   cpSync,
@@ -183,29 +184,7 @@ async function syncVercelEnv(env) {
   }
 
   log("\n=== 2/3 Vercel env sync ===");
-  const keys = [
-    "NEXT_PUBLIC_SITE_URL",
-    "NEXT_PUBLIC_SUPABASE_URL",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-    "SUPABASE_SERVICE_ROLE_KEY",
-    "CRON_SECRET",
-    "GROQ_API_KEY",
-    "GROQ_MODEL_PRIMARY",
-    "GROQ_MODEL_FALLBACK",
-    "GROQ_MODEL_FALLBACK_2",
-    "OPENAI_API_KEY",
-    "OPENAI_MODEL",
-    "GEMINI_API_KEY",
-    "GEMINI_MODEL",
-    "ADMIN_NOTIFY_EMAIL",
-    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
-    "STRIPE_SECRET_KEY",
-    "STRIPE_WEBHOOK_SECRET",
-    "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
-    "TURNSTILE_SECRET_KEY",
-    "INGESTION_LOCALE",
-    "DEFAULT_SITE_LOCALE",
-  ];
+  const keys = VERCEL_SYNC_KEYS;
 
   for (const key of keys) {
     const value = env[key];
@@ -437,22 +416,14 @@ async function main() {
     );
   }
 
-  if (!commitOnly) {
-    const verifyV6 = spawnSync(process.execPath, [join(root, "scripts", "verify-v6-api-routes.mjs")], {
-      cwd: root,
-      encoding: "utf8",
-    });
-    if (verifyV6.status !== 0) {
-      throw new Error("Chybí nebo jsou neplatné soubory app/api/v6/*/route.ts");
-    }
-  } else {
-    const verifyV17 = spawnSync(process.execPath, [join(root, "scripts", "verify-v17-skeleton.mjs")], {
-      cwd: root,
-      encoding: "utf8",
-    });
-    if (verifyV17.status !== 0) {
-      throw new Error("verify-v17-skeleton selhal — commit zrušen");
-    }
+  log("\n=== Pre-deploy gates ===");
+  const predeploy = spawnSync(
+    process.execPath,
+    [join(root, "scripts", "run-predeploy-gates.mjs")],
+    { cwd: root, encoding: "utf8", stdio: "inherit" }
+  );
+  if (predeploy.status !== 0) {
+    throw new Error("Pre-deploy gates selhaly — push/deploy zrušen");
   }
 
   const sha = await pushToGitHub(ghToken);

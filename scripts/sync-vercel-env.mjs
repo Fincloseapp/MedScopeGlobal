@@ -5,6 +5,7 @@ import fs from "fs";
 import path from "path";
 import { spawn } from "child_process";
 import { fileURLToPath } from "url";
+import { VERCEL_SYNC_KEYS } from "./env-keys.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const env = {};
@@ -13,29 +14,7 @@ for (const line of fs.readFileSync(path.join(root, ".env.local"), "utf8").split(
   if (m) env[m[1].trim()] = m[2].trim();
 }
 
-const keys = [
-  "NEXT_PUBLIC_SITE_URL",
-  "INGESTION_LOCALE",
-  "DEFAULT_SITE_LOCALE",
-  "NEXT_PUBLIC_SUPABASE_URL",
-  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-  "SUPABASE_SERVICE_ROLE_KEY",
-  "CRON_SECRET",
-  "GROQ_API_KEY",
-  "GROQ_MODEL_PRIMARY",
-  "GROQ_MODEL_FALLBACK",
-  "GROQ_MODEL_FALLBACK_2",
-  "OPENAI_API_KEY",
-  "OPENAI_MODEL",
-  "GEMINI_API_KEY",
-  "GEMINI_MODEL",
-  "ADMIN_NOTIFY_EMAIL",
-  "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
-  "STRIPE_SECRET_KEY",
-  "STRIPE_WEBHOOK_SECRET",
-  "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
-  "TURNSTILE_SECRET_KEY",
-];
+const keys = VERCEL_SYNC_KEYS;
 
 const targets = ["production"];
 

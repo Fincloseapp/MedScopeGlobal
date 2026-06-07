@@ -124,19 +124,22 @@ export async function runProductionDeploy() {
   const env = loadDeployEnv();
 
   if (!skipGates) {
-    for (const [label, fn] of [
-      ["tsc --noEmit", runTsc],
-      ["verify-v17-skeleton", () => runNodeScript("scripts/verify-v17-skeleton.mjs")],
-      ["verify-acp", () => runNodeScript("scripts/verify-acp.mjs")],
-    ]) {
-      log(`→ ${label}`);
-      const step = fn();
-      if (!step.ok) {
-        log(`✗ ${label}`);
-        return { deployed: false, status: "aborted", phase: "validation", error: step.error };
-      }
-      log(`✓ ${label}`);
+    log("→ run-predeploy-gates");
+    const gates = spawnSync(process.execPath, [join(root, "scripts", "run-predeploy-gates.mjs")], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: "inherit",
+    });
+    if (gates.status !== 0) {
+      log("✗ run-predeploy-gates");
+      return {
+        deployed: false,
+        status: "aborted",
+        phase: "validation",
+        error: "Pre-deploy gates failed",
+      };
     }
+    log("✓ run-predeploy-gates");
   }
 
   const health = runLocalHealthcheck();
