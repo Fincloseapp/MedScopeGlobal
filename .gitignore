@@ -6,6 +6,7 @@
 
 # testing
 /coverage
+/loadtests/v18/results-*.json
 
 # next.js
 /.next/
