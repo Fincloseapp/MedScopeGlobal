@@ -230,3 +230,92 @@ export async function groqChatCompletionStream(
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
+
+export type RunGroqOptions = {
+  system?: string;
+  maxTokens?: number;
+  temperature?: number;
+  retries?: number;
+  timeoutMs?: number;
+};
+
+export type RunGroqResult = {
+  content: string;
+  model: string;
+};
+
+/**
+ * AI Engine v18 — single-model completion with retry (429/5xx).
+ */
+export async function runGroq(
+  model: string,
+  prompt: string,
+  options: RunGroqOptions = {}
+): Promise<RunGroqResult> {
+  const apiKey = resolveGroqKey();
+  if (!apiKey) {
+    throw new Error("GROQ_API_KEY is not configured");
+  }
+
+  const retries = options.retries ?? 3;
+  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const messages: GroqMessage[] = [];
+
+  if (options.system?.trim()) {
+    messages.push({ role: "system", content: options.system.trim() });
+  }
+  messages.push({ role: "user", content: prompt });
+
+  let lastError = "Groq request failed";
+
+  for (let attempt = 0; attempt < retries; attempt++) {
+    const body: Record<string, unknown> = {
+      model,
+      messages,
+      temperature: options.temperature ?? 0.3,
+      max_tokens: options.maxTokens ?? 4096,
+    };
+
+    try {
+      const res = await groqFetch(apiKey, body, timeoutMs);
+      if (res.ok) {
+        const json = (await res.json()) as {
+          choices?: { message?: { content?: string } }[];
+        };
+        const parsed = parseChatResponse(json, model);
+        if (parsed) return parsed;
+        lastError = "Empty Groq response";
+      } else {
+        lastError = await res.text();
+        if (res.status === 429 || res.status >= 500) {
+          await sleep(1000 * (attempt + 1));
+          continue;
+        }
+        break;
+      }
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : String(error);
+      await sleep(800 * (attempt + 1));
+    }
+  }
+
+  throw new Error(`[Groq] ${model}: ${lastError.slice(0, 300)}`);
+}
+
+/** Try models in order until one succeeds (v18 fallback chain). */
+export async function runGroqChain(
+  models: string[],
+  prompt: string,
+  options: RunGroqOptions = {}
+): Promise<RunGroqResult> {
+  let lastError: Error | null = null;
+  for (const model of models) {
+    try {
+      return await runGroq(model, prompt, { ...options, retries: 2 });
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      console.warn(`[Groq chain] ${model} failed:`, lastError.message.slice(0, 120));
+    }
+  }
+  throw lastError ?? new Error("All Groq models failed");
+}
