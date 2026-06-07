@@ -1,6 +1,7 @@
 import { V18_VERSION } from "@/lib/v18/health";
 
 export type V18MonitoringSnapshot = {
+  status: "ok";
   timestamp: string;
   version: string;
   engine: "v18";
@@ -15,6 +16,7 @@ export type V18MonitoringSnapshot = {
 
 export function getV18MonitoringSnapshot(): V18MonitoringSnapshot {
   return {
+    status: "ok",
     timestamp: new Date().toISOString(),
     version: V18_VERSION,
     engine: "v18",

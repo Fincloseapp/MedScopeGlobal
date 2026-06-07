@@ -11,6 +11,7 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "node scripts/test-v18-placeholder.mjs",
+    "test:v18": "node scripts/run-v18-e2e.mjs",
     "verify-v18": "node scripts/verify-v18.mjs",
     "env:setup": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-env.ps1",
     "env:validate": "node scripts/validate-production-env.mjs",

@@ -52,6 +52,23 @@ const FORBIDDEN_OUTPUT_PATTERNS: Array<{ pattern: RegExp; issue: string }> = [
   { pattern: /\b(nepotřebujete\s+lékaře|no\s+doctor\s+needed)\b/i, issue: "Anti-clinical guidance removed" },
 ];
 
+const DRUG_DOSING_LINE_PATTERN =
+  /\b\d+\s*(mg|g|ml|mcg|µg|iu|iu\/ml)\b|\b\d+\s*(tablety|tablet|kapky|dávky?)\s*(denně|daily|\/den|každých)\b|\bdávka\s*\d+/i;
+
+/** Detect explicit medication dosing (safety layer for guideline output). */
+export function containsDrugDosing(text: string): boolean {
+  return DRUG_DOSING_LINE_PATTERN.test(text);
+}
+
+function stripDrugDosingLines(text: string): string {
+  return text
+    .split("\n")
+    .filter((line) => !DRUG_DOSING_LINE_PATTERN.test(line))
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 function assessOutputRisk(text: string): SafetyRisk {
   if (/\b(vysoké\s+riziko|urgent|emergency|okamžitě\s+vyhledejte|call\s+911)\b/i.test(text)) {
     return "high";
@@ -87,7 +104,11 @@ export function scanInputSafety(text: string): {
   return { safe: issues.length === 0, blocked, risk, issues };
 }
 
-export function applySafetyLayer(input: string, rawOutput: string): SafetyResult {
+export function applySafetyLayer(
+  input: string,
+  rawOutput: string,
+  options?: { stripDrugDosing?: boolean }
+): SafetyResult {
   const inputScan = scanInputSafety(`${input}\n${rawOutput}`);
 
   if (inputScan.blocked) {
@@ -109,6 +130,11 @@ export function applySafetyLayer(input: string, rawOutput: string): SafetyResult
       output = output.replace(rule.pattern, "[odstraněno — bezpečnostní filtr]");
       issues.push(rule.issue);
     }
+  }
+
+  if (options?.stripDrugDosing && containsDrugDosing(output)) {
+    output = stripDrugDosingLines(output);
+    issues.push("Drug dosing lines removed (guideline safety)");
   }
 
   const risk = inputScan.risk === "low" ? assessOutputRisk(output) : inputScan.risk;

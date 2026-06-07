@@ -107,7 +107,7 @@ jobs:
             .then(async (res) => {
               const body = await res.json();
               if (res.status !== 200) throw new Error('expected HTTP 200, got ' + res.status);
-              if (!body.version || body.engine !== 'v18') throw new Error('invalid v18 monitoring payload');
+              if (body.status !== 'ok' || !body.version || body.engine !== 'v18') throw new Error('invalid v18 monitoring payload');
               console.log(JSON.stringify({ ok: true, version: body.version, engine: body.engine }));
             })
             .catch((err) => { console.error(err.message || err); process.exit(1); });

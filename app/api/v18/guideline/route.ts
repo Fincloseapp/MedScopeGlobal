@@ -15,7 +15,8 @@ export async function GET() {
 export async function POST(request: Request) {
   return handleV18Inference(
     "guideline",
-    (query) => `Vytvoř klinické doporučení na základě dotazu: ${query}`,
+    (query) =>
+      `Vytvoř strukturované klinické doporučení (body, kroky, kdy vyhledat pomoc) bez konkrétního dávkování léků: ${query}`,
     request
   );
 }

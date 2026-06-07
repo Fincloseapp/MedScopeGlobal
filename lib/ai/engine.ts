@@ -134,7 +134,9 @@ export async function runAI(input: RunAIInput): Promise<RunAIResult> {
     });
   }
 
-  const safety = applySafetyLayer(combinedInput, groqResult.content);
+  const safety = applySafetyLayer(combinedInput, groqResult.content, {
+    stripDrugDosing: input.endpoint === "guideline",
+  });
 
   await writeAiAuditLog({
     userId: input.userId,
