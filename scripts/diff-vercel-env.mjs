@@ -34,7 +34,11 @@ async function fetchVercelEnvKeys() {
     const body = await res.text();
     throw new Error(`Vercel API ${res.status}: ${body.slice(0, 200)}`);
   }
-  const rows = await res.json();
+  const data = await res.json();
+  const rows = Array.isArray(data) ? data : data?.envs ?? data?.environment ?? [];
+  if (!Array.isArray(rows)) {
+    throw new Error("Unexpected Vercel env API response shape");
+  }
   const productionKeys = new Set();
   for (const row of rows) {
     const targets = row.target ?? [];

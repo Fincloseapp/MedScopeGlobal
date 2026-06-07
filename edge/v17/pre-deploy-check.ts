@@ -1,7 +1,15 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
+import { writeAuditLog } from "@/lib/v17/audit/logger";
+import { applyFallbackChain } from "@/lib/v17/fallback/fallback";
+import { runHealthcheck } from "@/lib/v17/health/healthcheck";
+import { monitor } from "@/lib/v17/monitoring/hooks";
+import { formatProductionOutput } from "@/lib/v17/output/formatter";
+import { runProductionAcp } from "@/lib/v17/production/run-production-acp";
 import { validateClinicalSafety } from "@/lib/v17/security/clinical-guardrails";
+import { checkRateLimit } from "@/lib/v17/security/rate-limit";
+import { sanitizeInput } from "@/lib/v17/security/sanitize";
 import { getVersion } from "@/lib/v17/versioning/version";
 
 export type PreDeployCheckResult = {
@@ -80,35 +88,33 @@ function checkClinicalSafetyFixture(issues: string[]): void {
   }
 }
 
-async function checkBundledModules(issues: string[]): Promise<void> {
-  const modules = [
-    "@/lib/v17/security/sanitize",
-    "@/lib/v17/security/clinical-guardrails",
-    "@/lib/v17/security/rate-limit",
-    "@/lib/v17/audit/logger",
-    "@/lib/v17/fallback/fallback",
-    "@/lib/v17/monitoring/hooks",
-    "@/lib/v17/versioning/version",
-    "@/lib/v17/output/formatter",
-    "@/lib/v17/health/healthcheck",
-    "@/lib/v17/production/run-production-acp",
+/** Verify bundled blueprint exports (static imports — safe on Vercel). */
+function verifyBundledExports(issues: string[]): void {
+  const required: Array<[string, unknown]> = [
+    ["sanitizeInput", sanitizeInput],
+    ["validateClinicalSafety", validateClinicalSafety],
+    ["checkRateLimit", checkRateLimit],
+    ["writeAuditLog", writeAuditLog],
+    ["applyFallbackChain", applyFallbackChain],
+    ["monitor", monitor],
+    ["getVersion", getVersion],
+    ["formatProductionOutput", formatProductionOutput],
+    ["runHealthcheck", runHealthcheck],
+    ["runProductionAcp", runProductionAcp],
   ];
-  for (const specifier of modules) {
-    try {
-      await import(specifier);
-    } catch (error) {
-      issues.push(
-        `Missing bundled module ${specifier}: ${error instanceof Error ? error.message : String(error)}`
-      );
+  for (const [name, fn] of required) {
+    if (typeof fn !== "function") {
+      issues.push(`Missing bundled export: ${name}`);
     }
   }
 }
 
-async function runServerlessChecks(issues: string[]): Promise<void> {
-  if (!getVersion()) {
+function runServerlessChecks(issues: string[]): void {
+  const version = getVersion();
+  if (!version) {
     issues.push("getVersion() returned empty value");
   }
-  await checkBundledModules(issues);
+  verifyBundledExports(issues);
   checkClinicalSafetyFixture(issues);
 }
 
@@ -128,7 +134,7 @@ export async function preDeployCheck(): Promise<PreDeployCheckResult> {
   const mode = isServerlessRuntime() ? "serverless" : "local";
 
   if (mode === "serverless") {
-    await runServerlessChecks(issues);
+    runServerlessChecks(issues);
   } else {
     runLocalChecks(issues);
   }
