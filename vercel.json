@@ -52,6 +52,10 @@
     {
       "path": "/api/cron/monthly-guideline-update",
       "schedule": "0 14 1 * *"
+    },
+    {
+      "path": "/api/cron/v19-daily-briefs",
+      "schedule": "0 8 * * *"
     }
   ],
   

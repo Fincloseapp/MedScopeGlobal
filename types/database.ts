@@ -45,6 +45,9 @@ export interface Article {
   rubric_slug?: string | null;
   min_access_level?: AccessLevel;
   locale?: string;
+  source_url?: string | null;
+  source_name?: string | null;
+  quiz_json?: Record<string, unknown> | null;
   created_at: string;
   updated_at: string | null;
 }

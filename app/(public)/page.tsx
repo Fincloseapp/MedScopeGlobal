@@ -13,6 +13,7 @@ import { LOCALE_COOKIE, normalizeLocale } from "@/lib/i18n/config";
 import { getDictionary, t } from "@/lib/i18n/get-dictionary";
 import { cookies } from "next/headers";
 import { HomepageAutomation } from "@/components/home/homepage-automation";
+import { V19ArticleBriefFeedLazy } from "@/components/v19/article-brief-feed";
 
 export async function generateMetadata(): Promise<Metadata> {
   const cookieStore = await cookies();
@@ -99,6 +100,12 @@ export default async function HomePage() {
       {showAds ? <div className="mx-auto max-w-7xl px-4 sm:px-6"><AdPlacement ads={topAds} variant="banner" /></div> : null}
 
       <AudienceHub locale={locale} />
+
+      <V19ArticleBriefFeedLazy
+        title={isCs ? "Odborné medicínské briefy" : "Medical expert briefs"}
+        limit={4}
+        locale="auto"
+      />
 
       <HomepageAutomation locale={locale} isVip={isVip} accessLevel={accessLevel} />
 

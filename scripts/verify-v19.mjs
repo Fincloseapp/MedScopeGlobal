@@ -14,7 +14,12 @@ const required = [
   "lib/v19/monitoring.ts",
   "app/api/v19/articles/route.ts",
   "app/api/v19/monitoring/route.ts",
+  "app/api/v19/health/route.ts",
+  "app/api/cron/v19-daily-briefs/route.ts",
   "components/v19/article-brief-card.tsx",
+  "components/v19/article-brief-skeleton.tsx",
+  "components/v19/article-brief-feed-client.tsx",
+  "app/(public)/odborne/briefy/page.tsx",
   "supabase/migrations/20260612120000_v19_content_engine.sql",
 ];
 

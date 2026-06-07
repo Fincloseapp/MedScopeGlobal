@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { specialtyLabel } from "@/lib/v19/specialties";
+import type { V19Specialty } from "@/lib/v19/types";
 
 export type V19BriefArticle = {
   id?: string;
@@ -13,17 +15,26 @@ export type V19BriefArticle = {
   sourceName?: string;
 };
 
-export function V19ArticleBriefCard({ article }: { article: V19BriefArticle }) {
+export function V19ArticleBriefCard({
+  article,
+  locale = "cs",
+}: {
+  article: V19BriefArticle;
+  locale?: string;
+}) {
   const href = article.slug ? `/article/${article.slug}` : "#";
   const points = (article.keyPoints ?? []).slice(0, 6);
   const dateLabel = article.date?.slice(0, 10) ?? "";
+  const specLabel =
+    article.specialty &&
+    specialtyLabel(article.specialty as V19Specialty, locale);
 
   return (
     <article className="v19-brief-card rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm sm:p-5">
       <header className="mb-3 space-y-1">
-        {article.specialty && (
+        {specLabel && (
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">
-            {article.specialty}
+            {specLabel}
           </p>
         )}
         <h3 className="font-display text-lg font-semibold leading-snug text-medical-navy sm:text-xl">

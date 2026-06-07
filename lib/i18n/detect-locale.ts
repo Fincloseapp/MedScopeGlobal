@@ -4,7 +4,7 @@ import { DEFAULT_LOCALE, LOCALES, type LocaleCode } from "@/lib/i18n/config";
 export function detectLocaleFromAcceptLanguage(
   acceptLanguage: string | null | undefined
 ): LocaleCode {
-  if (!acceptLanguage?.trim()) return DEFAULT_LOCALE;
+  if (!acceptLanguage?.trim()) return "en";
 
   const preferences = acceptLanguage
     .split(",")

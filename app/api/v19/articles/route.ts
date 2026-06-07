@@ -50,7 +50,8 @@ export async function GET(request: Request) {
 
   const locale = await resolveV19LocaleFromRequest(url.searchParams.get("locale"));
   const limit = Math.min(30, Number(url.searchParams.get("limit") ?? 20));
-  const articles = await getV19Articles(locale, limit);
+  const offset = Math.max(0, Number(url.searchParams.get("offset") ?? 0));
+  const articles = await getV19Articles(locale, limit, offset);
 
   return NextResponse.json({
     status: "ok",

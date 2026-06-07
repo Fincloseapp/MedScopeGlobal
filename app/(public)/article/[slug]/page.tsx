@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleBody } from "@/components/article/article-body";
+import { V19ArticleBody } from "@/components/v19/v19-article-body";
+import { V19_RUBRIC_SLUG } from "@/lib/v19/dedup";
 import { ArticleCard } from "@/components/article/article-card";
 import { AdSlot } from "@/components/ads/ad-slot";
 import { VipBadge } from "@/components/vip/vip-badge";
@@ -236,8 +238,24 @@ export default async function ArticlePage({ params }: Props) {
 
             {inlineAds.length > 0 ? <AdPlacement ads={inlineAds} variant="inline" /> : null}
 
-            <div className="prose-wrapper mt-10">
-              <ArticleBody html={article.content} locked={locked} />
+            <div className="prose-wrapper mt-10 overflow-x-hidden">
+              {article.rubric_slug === V19_RUBRIC_SLUG && !locked ? (
+                <V19ArticleBody
+                  locale={locale}
+                  article={{
+                    title: article.title,
+                    date: article.published_at ?? new Date().toISOString(),
+                    summary: article.excerpt ?? "",
+                    keyPoints: (article.quiz_json?.keyPoints as string[]) ?? [],
+                    clinicalImpact: (article.quiz_json?.clinicalImpact as string) ?? "",
+                    specialty: article.quiz_json?.specialty as string | undefined,
+                    sourceUrl: article.source_url ?? undefined,
+                    sourceName: article.source_name ?? undefined,
+                  }}
+                />
+              ) : (
+                <ArticleBody html={article.content} locked={locked} />
+              )}
             </div>
 
             {related && related.length > 0 && (

@@ -106,8 +106,8 @@ export async function runV19GenerateBatch(params: {
   return result;
 }
 
-export async function getV19Articles(locale: string, limit = 20) {
-  return listV19ArticlesFromDb(locale, limit);
+export async function getV19Articles(locale: string, limit = 20, offset = 0) {
+  return listV19ArticlesFromDb(locale, limit, offset);
 }
 
 export async function startV19AsyncJob(params: {
