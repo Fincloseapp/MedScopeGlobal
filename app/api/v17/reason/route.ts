@@ -1,41 +1,10 @@
-import { NextResponse } from "next/server";
 import reasoningJob from "@/jobs/v17/reasoningJob";
+import { createV17ProductionRoute } from "@/lib/v17/production/create-v17-production-route";
 
-const JOB = "reason" as const;
-const READY_MESSAGE = "V17 endpoint ready. Use POST to run the job.";
+const { GET, POST } = createV17ProductionRoute(
+  "reason",
+  (input) => reasoningJob(input),
+  "V17 reasoning endpoint ready. Use POST with { input }."
+);
 
-export async function GET() {
-  return NextResponse.json({
-    status: "ok",
-    job: JOB,
-    message: READY_MESSAGE,
-  });
-}
-
-export async function POST(request: Request) {
-  try {
-    let input = "";
-    try {
-      const body = await request.json();
-      if (typeof body?.input === "string") input = body.input;
-    } catch {
-      /* optional JSON body */
-    }
-
-    const result = await reasoningJob(input);
-    return NextResponse.json({
-      status: "ok",
-      job: JOB,
-      result,
-    });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        status: "error",
-        job: JOB,
-        message: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 }
-    );
-  }
-}
+export { GET, POST };

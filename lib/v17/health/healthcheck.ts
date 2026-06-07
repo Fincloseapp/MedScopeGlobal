@@ -105,7 +105,7 @@ export async function runHealthcheck(): Promise<HealthcheckResult> {
     storageDetails = error instanceof Error ? error.message : "storage not writable";
   }
 
-  const rate = checkRateLimit("healthcheck-probe");
+  const rate = await checkRateLimit("healthcheck-probe", "health");
   const rateOk = rate.allowed;
 
   const latencyMs = Date.now() - started;

@@ -72,6 +72,9 @@ const libModules = [
   "lib/v17/production/run-production-acp.ts",
   "lib/v17/output/formatter.ts",
   "lib/v17/health/healthcheck.ts",
+  "lib/v17/production/run-production-job.ts",
+  "lib/v17/production/create-v17-production-route.ts",
+  "lib/v17/guideline/parser.ts",
   "lib/v17/monitoring/dashboard.ts",
   "lib/v17/v17-api-handlers.ts",
 ];
@@ -127,6 +130,9 @@ const apiV17 = path.join(root, "app", "api", "v17");
 for (const slug of routes) {
   const src = fs.readFileSync(path.join(apiV17, slug, "route.ts"), "utf8");
   const usesHandler = src.includes(`createV17RouteHandlers("${slug}")`);
+  const usesProductionJob =
+    ["reason", "clinical", "graph", "summarize", "guideline"].includes(slug) &&
+    src.includes("createV17ProductionRoute");
   const usesReasonPipeline =
     slug === "reason" && src.includes("reasoningJob") && src.includes('job: JOB');
   const usesGraphPipeline =
@@ -147,6 +153,7 @@ for (const slug of routes) {
     slug === "deploy" && src.includes("vercel_production") && src.includes("getVersion");
   if (
     !usesHandler &&
+    !usesProductionJob &&
     !usesReasonPipeline &&
     !usesGraphPipeline &&
     !usesClinicalPipeline &&

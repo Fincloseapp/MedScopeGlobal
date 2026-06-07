@@ -1,4 +1,8 @@
-/** V17 guideline edge handler — skeleton placeholder. */
-export default async function guidelineEdge(): Promise<void> {
-  // TODO: wire Supabase edge / external inference when implemented
+import { parseGuidelineQuery } from "@/lib/v17/guideline/parser";
+
+export type GuidelinePipelineResult = ReturnType<typeof parseGuidelineQuery>;
+
+/** V17 guideline edge — structured query parse (skeleton). */
+export default async function guidelineEdge(input = ""): Promise<GuidelinePipelineResult> {
+  return parseGuidelineQuery(input);
 }

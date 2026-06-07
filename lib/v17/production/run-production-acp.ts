@@ -42,7 +42,7 @@ export async function runProductionAcp(
   const requestId = options.requestId ?? request.metadata?.requestId ?? `v17-${started}`;
   monitor("job_start", { requestId, job: "acp" });
 
-  const rate = checkRateLimit(options.ip ?? "unknown");
+  const rate = await checkRateLimit(options.ip ?? "unknown", "acp");
   if (!rate.allowed) {
     monitor("rate_limited", { requestId, ip: options.ip });
     return {
@@ -116,6 +116,7 @@ export async function runProductionAcp(
 
   await writeAuditLog({
     requestId,
+    jobSlug: "acp",
     nodesUsed: finalResult.acp.audit.nodesUsed,
     edgesUsed: finalResult.acp.audit.edgesUsed,
     edgeScores: finalResult.acp.graph.edges.map((edge) => edge.finalScore),

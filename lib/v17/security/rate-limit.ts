@@ -1,25 +1,38 @@
+import { memoryRateLimit, persistentRateLimit } from "@/lib/security/rate-limit";
+
 const WINDOW_MS = 60_000;
 const MAX_REQUESTS = 60;
 
-type RateBucket = { count: number; windowStart: number };
+export type V17RateLimitResult = {
+  allowed: boolean;
+  retryAfter?: number;
+};
 
-const buckets = new Map<string, RateBucket>();
+function rateLimitKey(job: string, ip: string): string {
+  return `v17:${job}:${ip || "unknown"}`;
+}
 
-/** In-memory placeholder rate limiter. */
-export function checkRateLimit(ip: string): { allowed: boolean } {
-  const key = ip || "unknown";
-  const now = Date.now();
-  const bucket = buckets.get(key);
+/** V17 rate limit — Supabase-backed with in-memory fallback. */
+export async function checkRateLimit(
+  ip: string,
+  job = "v17"
+): Promise<V17RateLimitResult> {
+  const result = await persistentRateLimit(rateLimitKey(job, ip), MAX_REQUESTS, WINDOW_MS);
+  return {
+    allowed: result.ok,
+    retryAfter: result.retryAfter,
+  };
+}
 
-  if (!bucket || now - bucket.windowStart >= WINDOW_MS) {
-    buckets.set(key, { count: 1, windowStart: now });
-    return { allowed: true };
-  }
-
-  bucket.count += 1;
-  return { allowed: bucket.count <= MAX_REQUESTS };
+/** Sync in-memory check for tests / local-only callers. */
+export function checkRateLimitMemory(ip: string, job = "v17"): V17RateLimitResult {
+  const result = memoryRateLimit(rateLimitKey(job, ip), MAX_REQUESTS, WINDOW_MS);
+  return {
+    allowed: result.ok,
+    retryAfter: result.retryAfter,
+  };
 }
 
 export function resetRateLimits(): void {
-  buckets.clear();
+  // persistent store is shared — tests use memory path via checkRateLimitMemory
 }

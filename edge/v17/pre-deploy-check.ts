@@ -7,6 +7,7 @@ import { runHealthcheck } from "@/lib/v17/health/healthcheck";
 import { monitor } from "@/lib/v17/monitoring/hooks";
 import { formatProductionOutput } from "@/lib/v17/output/formatter";
 import { runProductionAcp } from "@/lib/v17/production/run-production-acp";
+import { runProductionJob } from "@/lib/v17/production/run-production-job";
 import { validateClinicalSafety } from "@/lib/v17/security/clinical-guardrails";
 import { checkRateLimit } from "@/lib/v17/security/rate-limit";
 import { sanitizeInput } from "@/lib/v17/security/sanitize";
@@ -101,6 +102,7 @@ function verifyBundledExports(issues: string[]): void {
     ["formatProductionOutput", formatProductionOutput],
     ["runHealthcheck", runHealthcheck],
     ["runProductionAcp", runProductionAcp],
+    ["runProductionJob", runProductionJob],
   ];
   for (const [name, fn] of required) {
     if (typeof fn !== "function") {
