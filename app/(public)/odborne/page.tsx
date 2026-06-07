@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
+import { V19ArticleBriefFeed } from "@/components/v19/article-brief-feed";
 import { V4cContentCard } from "@/components/v4c/content-card";
 import { getMedicalAiTexts, getStudySources } from "@/lib/queries/v4d/medical-ai";
 import { SPECIALTY_LABELS_CS } from "@/lib/v4d/constants";
@@ -68,6 +69,7 @@ export default async function OdbornePage() {
           Autopilot
         </Link>
       </div>
+      <V19ArticleBriefFeed title="MedScope v19 — odborné briefy" limit={6} />
       <div className="grid gap-4 sm:grid-cols-2">
         {texts.map((t) => (
           <V4cContentCard

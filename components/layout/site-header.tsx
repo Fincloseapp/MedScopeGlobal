@@ -9,7 +9,6 @@ import type { AppUser, Category } from "@/types/database";
 import { NotificationBell } from "@/components/layout/notification-bell";
 import { SearchCommand } from "@/components/layout/search-command";
 import { UserMenu } from "@/components/layout/user-menu";
-import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import { getHeaderTagline, getMainMenu } from "@/lib/config/main-navigation";
@@ -18,7 +17,7 @@ import { normalizeLocale, type LocaleCode } from "@/lib/i18n/config";
 export function SiteHeader({
   categories: _categories,
   locale,
-  region,
+  region: _region,
   user,
   profile,
   isVip,
@@ -95,10 +94,6 @@ export function SiteHeader({
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <div className="hidden lg:block">
-            <LocaleSwitcher currentLocale={locale} currentRegion={region} />
-          </div>
-
           <SearchCommand isVip={isVip} accessLevel={accessLevel} />
 
           <ThemeToggle />

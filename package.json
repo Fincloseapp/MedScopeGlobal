@@ -13,6 +13,7 @@
     "test": "node scripts/test-v18-placeholder.mjs",
     "test:v18": "node scripts/run-v18-e2e.mjs",
     "load:v18": "node loadtests/v18/run-all.mjs",
+    "verify-v19": "node scripts/verify-v19.mjs",
     "verify-v18": "node scripts/verify-v18.mjs",
     "env:setup": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-env.ps1",
     "env:validate": "node scripts/validate-production-env.mjs",
