@@ -42,7 +42,8 @@
     "deploy:v17": "node scripts/deploy/vercel_production.mjs",
     "rollback:v17": "node scripts/deploy/vercel_rollback.mjs",
     "commit:v17": "node scripts/commit-v17-pipeline.mjs",
-    "dns:cloudflare": "node scripts/cloudflare-point-vercel.mjs"
+    "dns:cloudflare": "node scripts/cloudflare-point-vercel.mjs",
+    "domain:connect": "node scripts/connect-domain-vercel.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

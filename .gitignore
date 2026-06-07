@@ -7,6 +7,7 @@
 # testing
 /coverage
 /loadtests/v18/results-*.json
+/scripts/domain-connect-report.json
 
 # next.js
 /.next/
