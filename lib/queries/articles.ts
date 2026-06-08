@@ -12,6 +12,10 @@ import {
 } from "@/lib/articles/prepare-for-display";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/server";
+import {
+  filterActiveArticles,
+  filterCzechContent,
+} from "@/lib/v20/content-rules";
 import type { ArticleWithRelations } from "@/types/database";
 
 export type { DisplayArticle };
@@ -25,10 +29,13 @@ const articleSelect = `
 function filterForReader(
   articles: ArticleWithRelations[],
   isVip: boolean,
-  accessLevel: AccessLevelId
+  accessLevel: AccessLevelId,
+  locale: LocaleCode = "cs"
 ): ArticleWithRelations[] {
   const allowed = new Set(allowedAccessLevels(accessLevel));
-  return articles.filter((a) => {
+  const active = filterActiveArticles(articles);
+  const localized = filterCzechContent(active, locale);
+  return localized.filter((a) => {
     if (!isVip && a.vip_only) return false;
     const level = a.min_access_level ?? "public";
     return (allowed as Set<string>).has(level);
@@ -56,7 +63,8 @@ export async function getFeaturedArticles(
   const filtered = filterForReader(
     mapArticleList(data as Record<string, unknown>[] | null),
     isVip,
-    accessLevel
+    accessLevel,
+    locale
   );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
@@ -87,7 +95,8 @@ export async function getLatestArticles(
   const filtered = filterForReader(
     mapArticleList(data as Record<string, unknown>[] | null),
     isVip,
-    accessLevel
+    accessLevel,
+    locale
   );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
@@ -145,7 +154,8 @@ export async function getArticlesBySection(
   const filtered = filterForReader(
     mapArticleList(data as Record<string, unknown>[] | null),
     isVip,
-    accessLevel
+    accessLevel,
+    locale
   );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
@@ -189,7 +199,8 @@ export async function getArticlesByRubric(
   const filtered = filterForReader(
     mapArticleList(data as Record<string, unknown>[] | null),
     isVip,
-    accessLevel
+    accessLevel,
+    locale
   );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
@@ -233,7 +244,8 @@ export async function getArticlesByCategory(
   const filtered = filterForReader(
     mapArticleList(data as Record<string, unknown>[] | null),
     isVip,
-    accessLevel
+    accessLevel,
+    locale
   );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
@@ -294,7 +306,8 @@ export async function getRelatedArticles(
   const filtered = filterForReader(
     mapArticleList(data as Record<string, unknown>[] | null),
     isVip,
-    accessLevel
+    accessLevel,
+    locale
   );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",

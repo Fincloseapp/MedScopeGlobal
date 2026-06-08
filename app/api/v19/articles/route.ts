@@ -9,6 +9,8 @@ import { resolveV19LocaleFromRequest } from "@/lib/v19/localize";
 import { resolveV19Mode } from "@/lib/v19/modes";
 import { checkV19GenerateRateLimit, checkV19ListRateLimit } from "@/lib/v19/rate-limit";
 import { getV19MonitoringSnapshot } from "@/lib/v19/monitoring";
+import { enrichArticleMeta } from "@/lib/v20/content-rules";
+import { V20_BACKEND_VERSION, V20_UI_VERSION } from "@/lib/v20/version";
 import { V19_ENGINE_VERSION } from "@/lib/v19/version";
 import type { V19ContentMode } from "@/lib/v19/types";
 
@@ -72,21 +74,38 @@ export async function GET(request: Request) {
 
   const deepLink = url.searchParams.get("deepLink") === "1";
 
-  return NextResponse.json({
+  const enriched = articles.map((a) => {
+    const meta = enrichArticleMeta({
+      title: a.title,
+      excerpt: a.summary,
+      summary: a.summary,
+    });
+    return {
+      ...a,
+      uiVersion: V20_UI_VERSION,
+      metaTitle: meta.metaTitle,
+      metaDescription: meta.metaDescription,
+      professionalSummary: meta.professionalSummary,
+      ...(deepLink
+        ? { nzipDeepLinking: Boolean(a.nzipRegistryId || a.nzipTopicTags?.length) }
+        : {}),
+    };
+  });
+
+  const res = NextResponse.json({
     status: "ok",
     engine: "v19",
     engineVersion: V19_ENGINE_VERSION,
+    uiVersion: V20_UI_VERSION,
+    backendVersion: V20_BACKEND_VERSION,
     locale,
     mode,
-    count: articles.length,
-    articles: deepLink
-      ? articles.map((a) => ({
-          ...a,
-          nzipDeepLinking: Boolean(a.nzipRegistryId || a.nzipTopicTags?.length),
-        }))
-      : articles,
+    count: enriched.length,
+    articles: enriched,
     monitoring: getV19MonitoringSnapshot().metrics,
   });
+  res.headers.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
+  return res;
 }
 
 export async function POST(request: Request) {

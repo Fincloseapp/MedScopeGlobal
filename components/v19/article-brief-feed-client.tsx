@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { V19ArticleBriefCard, type V19BriefArticle } from "@/components/v19/article-brief-card";
 import { V19ArticleBriefSkeleton } from "@/components/v19/article-brief-skeleton";
-import { V19_ENGINE_VERSION, V19_UI_BUILD_STAMP } from "@/lib/v19/version";
+import { fetchV20Json } from "@/lib/v20/api-client";
+import { V20_UI_BUILD_STAMP, V20_UI_VERSION } from "@/lib/v20/version";
 
 type ApiArticle = V19BriefArticle & { id: string };
 
@@ -34,11 +35,10 @@ export function V19ArticleBriefFeedClient({
         mode,
         deepLink: "1",
       });
-      const res = await fetch(`/api/v19/articles?${params}`);
-      const json = (await res.json()) as {
+      const json = await fetchV20Json<{
         articles?: ApiArticle[];
         count?: number;
-      };
+      }>(`/api/v19/articles?${params}`, { ttlMs: 45_000, retries: 2 });
       const batch = json.articles ?? [];
       setArticles((prev) => (append ? [...prev, ...batch] : batch));
       setHasMore(batch.length >= initialLimit);
@@ -77,8 +77,8 @@ export function V19ArticleBriefFeedClient({
   return (
     <section
       className="mx-auto max-w-3xl overflow-x-hidden px-4 py-8 sm:px-6"
-      data-v19-ui={V19_ENGINE_VERSION}
-      data-v19-ui-build={V19_UI_BUILD_STAMP}
+      data-v20-ui={V20_UI_VERSION}
+      data-v20-ui-build={V20_UI_BUILD_STAMP}
       data-v19-deep-link="1"
     >
       <h2 className="mb-4 font-display text-2xl font-semibold text-medical-navy">{title}</h2>

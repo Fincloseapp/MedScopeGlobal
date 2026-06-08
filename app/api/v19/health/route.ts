@@ -3,7 +3,8 @@ import { isGroqConfigured } from "@/lib/ai/groq";
 import { getNzipIndexMap } from "@/lib/v19/nzip-index";
 import { buildNzipDeepRegistries } from "@/lib/v19/nzip-registries";
 import { V19_SOURCE_TOPICS } from "@/lib/v19/sources";
-import { V19_ENGINE_VERSION, V19_UI_BUILD_STAMP } from "@/lib/v19/version";
+import { V19_ENGINE_VERSION } from "@/lib/v19/version";
+import { V20_UI_BUILD_STAMP, V20_UI_VERSION } from "@/lib/v20/version";
 
 export const runtime = "nodejs";
 
@@ -15,8 +16,10 @@ export async function GET() {
     status: "ok",
     engine: "v19",
     version: V19_ENGINE_VERSION,
-    uiBuild: V19_UI_BUILD_STAMP,
+    uiVersion: V20_UI_VERSION,
+    uiBuild: V20_UI_BUILD_STAMP,
     features: [
+      "v20-ui-rebuild",
       "nzip-deep-integration",
       "nzip-deep-registries",
       "nzip-auto-linking",

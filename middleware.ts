@@ -17,10 +17,9 @@ export async function middleware(request: NextRequest) {
 
   const manual = request.cookies.get(LOCALE_MANUAL_COOKIE)?.value === "1";
   const acceptLanguage = request.headers.get("accept-language");
-  const deviceLocale = detectLocaleFromAcceptLanguage(acceptLanguage);
-  // Primární jazyk webu je čeština; angličtina jen pokud ji prohlížeč výslovně preferuje
-  const autoLocale =
-    deviceLocale === "en" || deviceLocale.startsWith("en-") ? deviceLocale : DEFAULT_LOCALE;
+  // v20: web je výhradně v češtině (bez automatického přepnutí na EN)
+  const autoLocale = DEFAULT_LOCALE;
+  void detectLocaleFromAcceptLanguage(acceptLanguage);
 
   if (!manual) {
     const current = request.cookies.get(LOCALE_COOKIE)?.value;

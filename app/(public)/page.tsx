@@ -1,180 +1,150 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, ShieldCheck } from "lucide-react";
 import { AudienceHub } from "@/components/home/audience-hub";
-import { ArticleCard } from "@/components/article/article-card";
+import { HomepageAutomation } from "@/components/home/homepage-automation";
+import { AdPlacement } from "@/components/ads/ad-placement";
+import { V19ArticleBriefFeedLazy } from "@/components/v19/article-brief-feed";
+import { V20ArticleCard } from "@/components/v20/article-card";
+import { V20CategoryGrid } from "@/components/v20/category-grid";
+import { V20HomeHero } from "@/components/v20/home-hero";
 import { Button } from "@/components/ui/button";
 import { getReaderContext } from "@/lib/auth/reader-context";
-import { SITE } from "@/lib/config/site";
-import { getLatestArticles } from "@/lib/queries/articles";
-import { AdPlacement } from "@/components/ads/ad-placement";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
-import { LOCALE_COOKIE, normalizeLocale } from "@/lib/i18n/config";
-import { getDictionary, t } from "@/lib/i18n/get-dictionary";
-import { cookies } from "next/headers";
-import { HomepageAutomation } from "@/components/home/homepage-automation";
-import { V19ArticleBriefFeedLazy } from "@/components/v19/article-brief-feed";
+import { getLatestArticles } from "@/lib/queries/articles";
+import { getV20CategoriesWithCounts } from "@/lib/queries/categories";
+import { buildV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const cookieStore = await cookies();
-  const locale = normalizeLocale(cookieStore.get(LOCALE_COOKIE)?.value);
-  const isCs = locale === "cs";
-  return {
-    title: isCs ? "Odborný medicínský magazín" : "Medical intelligence platform",
-    description: isCs
-      ? "MedScopeGlobal propojuje odbornou praxi s cestou k medicíně — od přijímaček po šestý ročník LF. Pro laiky, studenty, lékaře a výzkumníky."
-      : SITE.description,
-    openGraph: {
-      locale: isCs ? "cs_CZ" : "en_US",
-      title: "MedScopeGlobal",
-      description: SITE.description,
-    },
-  };
+  return buildV20PageMetadata({
+    title: "MedScopeGlobal — Odborný medicínský portál",
+    description:
+      "Český odborný medicínský magazín pro lékaře, studenty a pacienty. Evidence-based obsah, NZIP registrace, profesionální briefy.",
+    path: "/",
+  });
 }
 
 export default async function HomePage() {
-  const cookieStore = await cookies();
-  const locale = normalizeLocale(cookieStore.get(LOCALE_COOKIE)?.value);
-  const dict = await getDictionary(locale);
-  const isCs = locale === "cs";
+  const locale = "cs" as const;
   const { isVip, accessLevel } = await getReaderContext();
-  const articles = await getLatestArticles(6, 0, isVip, accessLevel, locale);
+  const [articles, categories, showAdsAds] = await Promise.all([
+    getLatestArticles(6, 0, isVip, accessLevel, locale),
+    getV20CategoriesWithCounts(locale),
+    !isVip
+      ? Promise.all([
+          getActiveAdsByPlacement("homepage_top", 1),
+          getActiveAdsByPlacement("homepage_mid", 1),
+          getActiveAdsByPlacement("homepage_bottom", 1),
+        ])
+      : Promise.resolve([[], [], []] as const),
+  ]);
+  const topAds = [...showAdsAds[0]];
+  const midAds = [...showAdsAds[1]];
+  const bottomAds = [...showAdsAds[2]];
   const showAds = !isVip;
-  const [topAds, midAds, bottomAds] = showAds
-    ? await Promise.all([
-        getActiveAdsByPlacement("homepage_top", 1),
-        getActiveAdsByPlacement("homepage_mid", 1),
-        getActiveAdsByPlacement("homepage_bottom", 1),
-      ])
-    : [[], [], []];
 
   return (
-    <div className="bg-[#fafcff]">
-      <section className="relative overflow-hidden border-b border-[#d9e8f4] bg-[radial-gradient(circle_at_top,_rgba(0,91,150,0.12),transparent_28%),linear-gradient(180deg,#fff_0%,#f8fbff_100%)]">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-20">
-          <div className="max-w-3xl">
-            <p className="inline-flex items-center gap-2 rounded-full border border-[#005B96]/15 bg-white/85 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
-              {isCs ? "Český odborný magazín" : "Medical intelligence"}
-            </p>
-            <h1 className="mt-5 font-display text-4xl font-bold tracking-tight text-[#021d33] sm:text-5xl">
-              {isCs
-                ? "Od přijímaček na LF po klinickou praxi a výzkum"
-                : "From pre-med to clinical practice and research"}
-            </h1>
-            <p className="mt-4 text-lg leading-8 text-slate-600">
-              {isCs
-                ? "MedScopeGlobal propojuje odbornou praxi s cestou k medicíně. Obsah je přehledně rozdělen pro laiky a studenty, lékaře ve službě i vědce — s citacemi, metadaty a respektem k odborné hloubce."
-                : SITE.description}
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="rounded-full bg-[#005B96] px-5 text-white hover:bg-[#004874]">
-                <Link href="/articles">
-                  {isCs ? "Prohlédnout články" : "Browse articles"}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="rounded-full border-[#8dc4ea] bg-white text-[#005B96]">
-                <Link href="/medicina">{isCs ? "Medicína — příprava a studium" : "Medicine track"}</Link>
-              </Button>
-              <Button asChild variant="secondary" size="lg" className="rounded-full bg-[#0A3D5C] text-white hover:bg-[#07283e]">
-                <Link href="/signup">{t(dict, "nav.signup", "Registrace")}</Link>
-              </Button>
-            </div>
-            <ul className="mt-8 flex flex-wrap gap-3 text-xs text-slate-600">
-              {[
-                isCs ? "Editorial review workflow" : "Editorial review",
-                isCs ? "Citace u každého článku" : "Source citations",
-                isCs ? "RBAC pro odborníky" : "Role-based access",
-                isCs ? "GDPR-ready formuláře" : "GDPR-ready forms",
-              ].map((item) => (
-                <li key={item} className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 shadow-sm">
-                  <ShieldCheck className="h-3.5 w-3.5 text-[#005B96]" aria-hidden />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
+    <div className="v20-home bg-background">
+      <V20HomeHero />
 
-      {showAds ? <div className="mx-auto max-w-7xl px-4 sm:px-6"><AdPlacement ads={topAds} variant="banner" /></div> : null}
+      {showAds ? (
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <AdPlacement ads={topAds} variant="banner" />
+        </div>
+      ) : null}
 
       <AudienceHub locale={locale} />
 
-      <V19ArticleBriefFeedLazy
-        title={isCs ? "Odborné medicínské briefy" : "Medical expert briefs"}
-        limit={4}
-        locale="auto"
-      />
+      <V19ArticleBriefFeedLazy title="Odborné medicínské briefy" limit={4} locale="cs" />
 
       <HomepageAutomation locale={locale} isVip={isVip} accessLevel={accessLevel} />
 
-      {showAds ? <div className="mx-auto max-w-7xl px-4 sm:px-6"><AdPlacement ads={midAds} variant="inline" /></div> : null}
+      {showAds ? (
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <AdPlacement ads={midAds} variant="inline" />
+        </div>
+      ) : null}
 
-      <section className="border-y border-[#dfeaf5] bg-white">
+      <section className="border-y border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-          <div className="flex items-end justify-between gap-4">
+          <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
-                {isCs ? "Nejnovější" : "Latest"}
+              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
+                Nejnovější články
               </p>
-              <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
-                {t(dict, "nav.articles", "Články")}
-              </h2>
-              <p className="mt-2 max-w-2xl text-sm text-slate-600">{t(dict, "alerts.localeArticles")}</p>
+              <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">Články</h2>
+              <p className="mt-2 max-w-2xl text-sm text-slate-600">
+                Aktuální odborný obsah seřazený od nejnovějších. Starší články jsou archivovány.
+              </p>
             </div>
-            <Link href="/articles" className="text-sm font-medium text-[#005B96] hover:underline">
-              {isCs ? "Všechny články →" : "All articles →"}
+            <Link href="/articles" className="text-sm font-medium text-primary hover:underline">
+              Všechny články →
             </Link>
           </div>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {articles.map((article) => (
-              <ArticleCard key={article.id} article={article} />
+              <V20ArticleCard key={article.id} article={article} />
             ))}
           </div>
           {articles.length === 0 && (
             <p className="mt-6 text-sm text-muted-foreground">
-              {isCs ? "Články se načítají z databáze. Spusťte ingest nebo seed v administraci." : "No articles yet."}
+              Zatím žádné aktivní články — nový obsah se generuje automaticky.
             </p>
           )}
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <div className="rounded-[32px] border border-[#005B96]/10 bg-[linear-gradient(180deg,#0A3D5C,#004874)] px-6 py-8 text-white">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
+          Odborné obory
+        </p>
+        <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
+          Kategorie podle NZIP
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm text-slate-600">
+          Prázdné kategorie nejsou zobrazeny. Struktura odpovídá NZIP topic registry.
+        </p>
+        <div className="mt-6">
+          <V20CategoryGrid categories={categories} />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+        <div className="rounded-3xl border border-primary/10 bg-gradient-to-b from-[#0A3D5C] to-[#004874] px-6 py-8 text-white">
           <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#ace0ff]">
-                {isCs ? "Medicína pouze" : "Medicine only"}
+              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200">
+                Medicína
               </p>
               <h2 className="mt-2 font-display text-3xl font-semibold">
-                {isCs ? "Příprava na LF a studium 1.–6. ročníku" : "Pre-med and years 1–6"}
+                Příprava na LF a studium 1.–6. ročníku
               </h2>
-              <p className="mt-3 max-w-2xl text-sm text-white/80">
-                {isCs
-                  ? "Samostatná větev pro budoucí a současné studenty medicíny — bez obecných VŠ oborů. Zjednodušené přehledy s disclaimerem, že nejde o oficiální učebnici LF."
-                  : "Dedicated track for medical students only."}
+              <p className="mt-3 max-w-2xl text-sm text-white/85">
+                Samostatná větev pro budoucí a současné studenty medicíny — zjednodušené přehledy
+                s disclaimerem, že nejde o oficiální učebnici LF.
               </p>
             </div>
             <div className="flex flex-wrap gap-3 lg:justify-end">
-              <Button asChild size="lg" className="rounded-full bg-white text-[#004874] hover:bg-[#f1f8ff]">
-                <Link href="/medicina/priprava">{isCs ? "Příprava na medicínu" : "Pre-med"}</Link>
+              <Button asChild size="lg" className="rounded-full bg-white text-[#004874] hover:bg-sky-50">
+                <Link href="/medicina/priprava">Příprava na medicínu</Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-full border-white/40 text-white hover:bg-white/10">
-                <Link href="/medicina/studium">{isCs ? "Studium medicíny" : "Med school"}</Link>
+                <Link href="/medicina/studium">Studium medicíny</Link>
               </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {showAds ? <div className="mx-auto max-w-7xl px-4 sm:px-6"><AdPlacement ads={bottomAds} variant="banner" /></div> : null}
+      {showAds ? (
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <AdPlacement ads={bottomAds} variant="banner" />
+        </div>
+      ) : null}
 
       <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6">
         <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
-          {isCs
-            ? "MedScopeGlobal není přijímací komise ani oficiální učebnice LF. Obsah slouží ke vzdělávání a nenahrazuje individuální lékařskou radu konkrétnímu pacientovi."
-            : "MedScopeGlobal is for education only and does not replace individual medical advice."}
+          MedScopeGlobal není přijímací komise ani oficiální učebnice LF. Obsah slouží ke
+          vzdělávání a nenahrazuje individuální lékařskou radu konkrétnímu pacientovi.
         </p>
       </section>
     </div>
