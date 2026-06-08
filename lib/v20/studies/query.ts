@@ -35,19 +35,27 @@ export async function getV20StudiesList(limit = 12): Promise<V20StudyDisplay[]> 
 
   const seen = new Set<string>();
   const merged: V20StudyDisplay[] = [];
+
+  for (const c of V20_CURATED_STUDIES) {
+    if (seen.has(c.slug)) continue;
+    seen.add(c.slug);
+    merged.push(c);
+  }
+
   for (const s of enriched) {
+    if (merged.length >= limit) break;
     if (seen.has(s.slug)) continue;
     seen.add(s.slug);
     merged.push(s);
   }
 
-  for (const c of V20_CURATED_STUDIES) {
-    if (merged.length >= limit) break;
-    if (!seen.has(c.slug)) merged.push(c);
-  }
-
   return merged
-    .sort((a, b) => b.publishedDate.localeCompare(a.publishedDate))
+    .sort((a, b) => {
+      const aCurated = a.id.startsWith("curated-") ? 1 : 0;
+      const bCurated = b.id.startsWith("curated-") ? 1 : 0;
+      if (aCurated !== bCurated) return bCurated - aCurated;
+      return b.publishedDate.localeCompare(a.publishedDate);
+    })
     .slice(0, limit);
 }
 

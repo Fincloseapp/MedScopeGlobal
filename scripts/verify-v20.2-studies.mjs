@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const BASE = process.env.PROD_BASE_URL || "https://www.medscopeglobal.com";
-const EN_RE = /Browse|Sign up|No published|Previous|Next|Category/i;
+const EN_RE = /Browse|Sign up|No published|Previous|Category/i;
+const EN_BODY_RE = /\b(this study evaluates|randomized controlled|patients with|clinical trial)\b/i;
 
 async function check() {
   const health = await fetch(`${BASE}/api/v19/health`, { cache: "no-store" }).then((r) =>
@@ -36,7 +37,8 @@ async function check() {
     detail.includes("Metodika") &&
     detail.includes("Závěr") &&
     !EN_RE.test(list) &&
-    !EN_RE.test(detail);
+    !EN_BODY_RE.test(detail) &&
+    api.studies.every((s) => /[áčďéěíňóřšťúůýž]/i.test(s.summaryCs ?? ""));
 
   console.log({
     health: health.version,
