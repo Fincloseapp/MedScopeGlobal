@@ -7,6 +7,7 @@ import { V19ArticleBriefFeedLazy } from "@/components/v19/article-brief-feed";
 import { V20ArticleCard } from "@/components/v20/article-card";
 import { V20CategoryGrid } from "@/components/v20/category-grid";
 import { V20HomeHero } from "@/components/v20/home-hero";
+import { V20StudiesHomeSection } from "@/components/v20/studies-home-section";
 import { Button } from "@/components/ui/button";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
@@ -58,6 +59,8 @@ export default async function HomePage() {
       <AudienceHub locale={locale} />
 
       <V19ArticleBriefFeedLazy title="Odborné medicínské briefy" limit={4} locale="cs" />
+
+      <V20StudiesHomeSection />
 
       <HomepageAutomation locale={locale} isVip={isVip} accessLevel={accessLevel} />
 

@@ -1,19 +1,29 @@
 import type { Metadata } from "next";
-import { ModulePageShell } from "@/components/b2b/module-page-shell";
-import { V4cContentCard } from "@/components/v4c/content-card";
-import { getStudiesList } from "@/lib/queries/v4c/studies";
+import { V20StudyCard } from "@/components/v20/study-card";
+import { getV20StudiesList } from "@/lib/v20/studies/query";
+import { buildV20PageMetadata } from "@/lib/v20/seo";
 
-export const metadata: Metadata = { title: "Nejnovější studie" };
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return buildV20PageMetadata({
+    title: "Nejnovější studie",
+    description: "Chronologický přehled nejnovějších medicínských studií v češtině.",
+    path: "/studie/nejnovejsi",
+  });
+}
 
 export default async function StudieNejnovejsiPage() {
-  const studies = await getStudiesList({ limit: 24 });
+  const studies = await getV20StudiesList(24);
   return (
-    <ModulePageShell eyebrow="Studie" title="Nejnovější studie" description="Chronologický přehled publikovaných studií.">
-      <div className="grid gap-4 sm:grid-cols-2">
+    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+      <h1 className="font-display text-3xl font-bold text-[#021d33]">Nejnovější studie</h1>
+      <p className="mt-2 text-slate-600">Seřazeno od nejnovějších — pouze český profesionální obsah.</p>
+      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {studies.map((s) => (
-          <V4cContentCard key={s.id} href={`/studie/${s.id}`} title={s.title} summary={s.summary ?? s.abstract} meta={s.published_date ?? undefined} />
+          <V20StudyCard key={s.id} study={s} />
         ))}
       </div>
-    </ModulePageShell>
+    </div>
   );
 }

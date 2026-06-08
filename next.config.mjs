@@ -68,7 +68,10 @@ const nextConfig = {
   },
   
   images: {
-    remotePatterns: supabasePatterns,
+    remotePatterns: [
+      ...supabasePatterns,
+      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+    ],
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 31536000,
   },
