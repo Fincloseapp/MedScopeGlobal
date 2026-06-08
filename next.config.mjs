@@ -42,6 +42,7 @@ const nextConfig = {
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "X-XSS-Protection", value: "1; mode=block" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Vercel-Cache-Tag", value: "medscope-ui-v19.9,medscope-pages" },
         ],
       },
       {

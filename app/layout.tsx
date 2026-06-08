@@ -5,6 +5,7 @@ import { getServerLocale } from "@/lib/i18n/server-locale";
 import { HREFLANG_LOCALES } from "@/lib/seo/metadata";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { organizationJsonLd, newsletterJsonLd } from "@/lib/seo/json-ld";
+import { V19_ENGINE_VERSION, V19_UI_BUILD_STAMP } from "@/lib/v19/version";
 import "./globals.css";
 
 const inter = Inter({
@@ -60,7 +61,12 @@ export default async function RootLayout({
   const htmlLang = locale.startsWith("en") ? "en" : locale.split("-")[0];
 
   return (
-    <html lang={htmlLang} suppressHydrationWarning>
+    <html
+      lang={htmlLang}
+      suppressHydrationWarning
+      data-ui-version={V19_ENGINE_VERSION}
+      data-ui-build={V19_UI_BUILD_STAMP}
+    >
       <body
         className={`${inter.variable} ${display.variable} min-h-screen font-sans antialiased`}
       >
