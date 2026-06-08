@@ -40,7 +40,7 @@ export default async function LegislatiavaPage() {
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {latest.map((item) => (
-          <V4cContentCard key={item.id} href="/legislativa/novinky" title={item.title} meta={item.source} summary={item.summary} badge={item.category} />
+          <V4cContentCard key={item.id} href={`/legislativa/${item.slug}`} title={item.title} meta={item.source} summary={item.summary} badge={item.category} />
         ))}
       </div>
       <p className="mt-8 text-xs text-slate-500">{LEGISLATION_SOURCES.map((s) => s.name).join(" · ")}</p>

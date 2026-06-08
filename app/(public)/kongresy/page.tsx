@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
-import { getUpcomingCongresses } from "@/lib/queries/congresses";
+import { getV21UpcomingCongresses } from "@/lib/v21/congresses";
 import { AdPlacement } from "@/components/ads/ad-placement";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function KongresyPage() {
-  const events = await getUpcomingCongresses(12);
+  const events = await getV21UpcomingCongresses(12);
   const topAds = await getActiveAdsByPlacement("congress_top", 1);
 
   return (

@@ -8,7 +8,7 @@ function study(p: Omit<V20StudyDisplay, "uiVersion" | "locale" | "studyTypeLabel
   return {
     ...p,
     locale: "cs",
-    uiVersion: "v20.2",
+    uiVersion: "v21.0",
     studyTypeLabel: V20_STUDY_TYPE_LABELS[p.studyType] ?? p.studyType,
   };
 }

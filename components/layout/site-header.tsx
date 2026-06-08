@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Activity, ChevronDown } from "lucide-react";
+import { Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { AppUser, Category } from "@/types/database";
 import { NotificationBell } from "@/components/layout/notification-bell";
@@ -10,6 +9,7 @@ import { SearchCommand } from "@/components/layout/search-command";
 import { UserMenu } from "@/components/layout/user-menu";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { V20MobileNav } from "@/components/v20/mobile-nav";
+import { V21DesktopNav } from "@/components/v21/desktop-nav";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import { getHeaderTagline, getMainMenu } from "@/lib/config/main-navigation";
 
@@ -30,14 +30,8 @@ export function SiteHeader({
   isVip: boolean;
   accessLevel: AccessLevelId;
 }) {
-  const pathname = usePathname();
   const mainMenu = getMainMenu("cs");
   const tagline = getHeaderTagline("cs");
-
-  const hasActiveParent = (href: string) =>
-    href === "/" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
-
-  const isActiveChild = (href: string) => pathname === href;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/95 backdrop-blur supports-[padding:max(0px)]:pt-[env(safe-area-inset-top)]">
@@ -56,48 +50,7 @@ export function SiteHeader({
           </span>
         </Link>
 
-        <nav
-          className="hidden flex-1 items-center justify-center xl:flex"
-          aria-label="Hlavní navigace"
-        >
-          {mainMenu.map((item) => (
-            <div key={item.label} className="relative px-1">
-              {item.children ? (
-                <details className="group/details relative">
-                  <summary
-                    className={`flex cursor-pointer list-none items-center gap-1 rounded-full px-2.5 py-2 text-[11px] font-semibold transition hover:bg-slate-50 hover:text-primary ${hasActiveParent(item.href) ? "bg-slate-50 text-primary" : "text-slate-700"}`}
-                  >
-                    {item.label}
-                    <ChevronDown className="h-3.5 w-3.5 text-slate-500" aria-hidden />
-                  </summary>
-                  <div className="absolute left-0 top-full z-50 mt-2 min-w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg">
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.href}
-                        href={child.href}
-                        className={`block rounded-xl px-3 py-2 transition hover:bg-slate-50 hover:text-primary ${isActiveChild(child.href) ? "bg-slate-50 font-semibold text-primary" : "text-slate-700"}`}
-                      >
-                        <span className="text-sm">{child.label}</span>
-                        {child.description && (
-                          <span className="mt-0.5 block text-xs text-muted-foreground">
-                            {child.description}
-                          </span>
-                        )}
-                      </Link>
-                    ))}
-                  </div>
-                </details>
-              ) : (
-                <Link
-                  href={item.href}
-                  className={`rounded-full px-2.5 py-2 text-[11px] font-semibold transition hover:bg-slate-50 hover:text-primary ${hasActiveParent(item.href) ? "bg-slate-50 text-primary" : "text-slate-700"}`}
-                >
-                  {item.label}
-                </Link>
-              )}
-            </div>
-          ))}
-        </nav>
+        <V21DesktopNav mainMenu={mainMenu} />
 
         <div className="ml-auto flex items-center gap-2">
           <SearchCommand isVip={isVip} accessLevel={accessLevel} />

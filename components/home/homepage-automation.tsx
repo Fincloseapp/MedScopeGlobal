@@ -4,7 +4,7 @@ import { getHomepageCurated } from "@/lib/queries/v4c/homepage";
 import { getLatestArticles } from "@/lib/queries/articles";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import type { LocaleCode } from "@/lib/i18n/config";
-import { getUpcomingCongresses } from "@/lib/queries/congresses";
+import { getV21UpcomingCongresses } from "@/lib/v21/congresses";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { AdPlacement } from "@/components/ads/ad-placement";
 import { ArticleCard } from "@/components/article/article-card";
@@ -30,14 +30,14 @@ export async function HomepageAutomation({
   ]);
   const [studie, leky, legislativa, digitalHealth, novinky] = slots;
   const articles = await getLatestArticles(3, 0, isVip, accessLevel, locale);
-  const congresses = await getUpcomingCongresses(3);
+  const congresses = await getV21UpcomingCongresses(3);
   const sponsoredAds = isVip ? [] : await getActiveAdsByPlacement("homepage_sponsored", 2);
 
   const sections = [
     { title: isCs ? "Studie" : "Studies", href: "/studie", items: studie },
     { title: isCs ? "Léky" : "Drugs", href: "/leky/novinky", items: leky },
     { title: isCs ? "Legislativa" : "Legislation", href: "/legislativa", items: legislativa },
-    { title: "Digital Health", href: "/digital-health", items: digitalHealth },
+    { title: isCs ? "Digitální zdravotnictví" : "Digital Health", href: "/digital-health", items: digitalHealth },
     { title: isCs ? "Novinky z univerzit" : "University news", href: "/novinky", items: novinky },
   ];
 

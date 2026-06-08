@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCongressBySlug } from "@/lib/queries/congresses";
+import { getV21CongressBySlug } from "@/lib/v21/congresses";
 import { AdPlacement } from "@/components/ads/ad-placement";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 
@@ -10,13 +10,13 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const ev = await getCongressBySlug(slug);
+  const ev = await getV21CongressBySlug(slug);
   return { title: ev?.title ?? "Kongres" };
 }
 
 export default async function KongresDetailPage({ params }: Props) {
   const { slug } = await params;
-  const ev = await getCongressBySlug(slug);
+  const ev = await getV21CongressBySlug(slug);
   if (!ev) notFound();
 
   const detailAds = await getActiveAdsByPlacement("congress_detail", 1);
@@ -39,8 +39,9 @@ export default async function KongresDetailPage({ params }: Props) {
             .filter(Boolean)
             .join(" · ")}
         </p>
-        {ev.summary ? <p className="mt-6 text-slate-700">{ev.summary}</p> : null}
-        {ev.body ? <div className="mt-4 prose prose-slate whitespace-pre-wrap">{ev.body}</div> : null}
+        {ev.summary ? <p className="mt-6 text-lg text-slate-700">{ev.summary}</p> : null}
+        {ev.body ? <div className="mt-4 prose prose-slate max-w-none whitespace-pre-wrap">{ev.body}</div> : null}
+        {ev.organizer ? <p className="mt-4 text-sm text-slate-500">Pořadatel: {ev.organizer}</p> : null}
         {ev.registration_url ? (
           <a
             href={ev.registration_url}

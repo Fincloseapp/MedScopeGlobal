@@ -31,11 +31,13 @@ const menuCs: NavItem[] = [
     ],
   },
   {
-    label: "Medicína",
+    label: "Studium medicíny",
     href: "/medicina",
     children: [
+      { label: "Přehled oborů", href: "/medicina" },
       { label: "Příprava na LF", href: "/medicina/priprava" },
       { label: "Studium 1.–6. ročník", href: "/medicina/studium" },
+      { label: "Anatomie a fyziologie", href: "/medicina/studium?obor=anatomie" },
     ],
   },
   { label: "Sekce", href: "/sections" },
@@ -47,7 +49,7 @@ const menuCs: NavItem[] = [
       { label: "Odborné AI texty", href: "/odborne", description: "V4d — univerzity, kvalita, překlady" },
       { label: "Léky", href: "/leky/novinky" },
       { label: "Legislativa", href: "/legislativa" },
-      { label: "Digital Health", href: "/digital-health" },
+      { label: "Digitální zdravotnictví", href: "/digital-health" },
       { label: "Novinky", href: "/novinky" },
       { label: "Newsletter", href: "/newsletter" },
     ],

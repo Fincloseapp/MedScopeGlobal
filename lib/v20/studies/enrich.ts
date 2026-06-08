@@ -218,7 +218,7 @@ export function enrichStudy(row: StudyRow): V20StudyDisplay {
     relevance: (meta.relevance as V20StudyDisplay["relevance"]) ?? "střední",
     imageUrl: row.image_url ?? placeholderImageUrl(titleCs),
     locale: "cs",
-    uiVersion: "v20.2",
+    uiVersion: "v21.0",
   };
 }
 

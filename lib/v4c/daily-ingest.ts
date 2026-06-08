@@ -195,8 +195,16 @@ async function refreshHomepageCurated(admin: ReturnType<typeof createServiceRole
       const r = row as { id: string; title: string; summary?: string; image_url?: string; slug?: string };
       const href =
         pick.table === "studies"
-          ? `${pick.hrefPrefix}/${r.id}`
-          : `${pick.hrefPrefix}/${r.slug ?? r.id}`;
+          ? `${pick.hrefPrefix}/${r.slug ?? r.id}`
+          : pick.table === "legislation_items"
+            ? `/legislativa/${r.slug ?? r.id}`
+            : pick.table === "digital_health_items"
+              ? `/digital-health/${r.slug ?? r.id}`
+              : pick.table === "university_news"
+                ? `/novinky/univerzity/${r.slug ?? r.id}`
+                : pick.table === "drug_news"
+                  ? `/leky/novinky/${r.slug ?? r.id}`
+                  : `${pick.hrefPrefix}/${r.slug ?? r.id}`;
       await admin.from("homepage_curated").insert({
         slot: pick.slot,
         entity_type: pick.type,

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { V21ModuleDetailView } from "@/components/v21/module-detail-view";
+import { buildModuleSections, ensureCzechText, formatCsDate } from "@/lib/v21/enrich";
+import { v21ImageForModule } from "@/lib/v21/images";
 import { getDrugNewsBySlug } from "@/lib/queries/v4c/drug-news";
 import { AdPlacement } from "@/components/ads/ad-placement";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
@@ -20,19 +21,31 @@ export default async function LekyDetailPage({ params }: Props) {
   if (!drug) notFound();
   const ads = await getActiveAdsByPlacement("drugs_under_title", 1);
 
+  const title = ensureCzechText(drug.title, "Léková novinka");
+  const sections = buildModuleSections({
+    topic: drug.drug_name ?? title,
+    summary: drug.summary,
+    body: drug.body,
+    source: drug.agency ?? "SÚKL",
+    moduleLabel: "Lékové novinky",
+  });
+
   return (
-    <div className="bg-[#fafcff] mx-auto max-w-4xl px-4 py-14 sm:px-6">
-      <Link href="/leky/novinky" className="text-sm text-[#005B96]">← Lékové novinky</Link>
+    <>
       <AdPlacement ads={ads} variant="banner" />
-      <h1 className="mt-4 font-display text-3xl font-bold">{drug.title}</h1>
-      <p className="text-sm text-slate-500 mt-2">{drug.agency} · {drug.status}</p>
-      {drug.image_url ? (
-        <div className="relative mt-6 aspect-video rounded-2xl overflow-hidden bg-slate-100">
-          <Image src={drug.image_url} alt="" fill className="object-cover" sizes="800px" />
-        </div>
-      ) : null}
-      <p className="mt-6 text-slate-700">{drug.summary}</p>
-      {drug.body ? <div className="mt-4 prose prose-slate">{drug.body}</div> : null}
-    </div>
+      <V21ModuleDetailView
+        backHref="/leky/novinky"
+        backLabel="Lékové novinky"
+        eyebrow="Léky · SÚKL / EMA"
+        title={title}
+        subtitle={[drug.drug_name, drug.status].filter(Boolean).join(" · ")}
+        dateLabel={formatCsDate(drug.published_date)}
+        imageUrl={drug.image_url ?? v21ImageForModule("drug", drug.slug)}
+        sections={sections}
+        source={drug.agency ?? "SÚKL"}
+        sourceUrl={drug.source_url}
+        badge={drug.status}
+      />
+    </>
   );
 }

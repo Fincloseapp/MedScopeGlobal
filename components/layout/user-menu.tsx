@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LogOut, Shield, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,10 +31,10 @@ export function UserMenu({ user, profile }: Props) {
     return (
       <div className="hidden items-center gap-2 sm:flex">
         <Button variant="ghost" size="sm" asChild>
-          <Link href="/login">Sign in</Link>
+          <Link href="/login">Přihlášení</Link>
         </Button>
         <Button size="sm" asChild>
-          <Link href="/signup">Join</Link>
+          <Link href="/signup">Registrace</Link>
         </Button>
       </div>
     );
@@ -66,14 +66,6 @@ export function UserMenu({ user, profile }: Props) {
           <p className="truncate text-xs text-muted-foreground">{user.email}</p>
         </div>
         <DropdownMenuSeparator />
-        {profile?.role === "admin" && (
-          <DropdownMenuItem asChild>
-            <Link href="/admin" className="cursor-pointer">
-              <Shield className="mr-2 h-4 w-4" />
-              Admin
-            </Link>
-          </DropdownMenuItem>
-        )}
         <DropdownMenuItem asChild>
           <Link href="/account" className="cursor-pointer">
             <User className="mr-2 h-4 w-4" />

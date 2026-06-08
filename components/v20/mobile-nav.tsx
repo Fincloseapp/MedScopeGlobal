@@ -63,13 +63,24 @@ export function V20MobileNav({
             return (
               <div key={item.label} className="rounded-xl border border-slate-200 p-3">
                 <div className="flex items-center justify-between gap-2">
-                  <Link
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className={`flex-1 text-sm font-semibold ${isActive(item.href) ? "text-primary" : "text-[#021d33]"}`}
-                  >
-                    {item.label}
-                  </Link>
+                  {hasChildren ? (
+                    <button
+                      type="button"
+                      aria-expanded={isExpanded}
+                      className={`flex-1 text-left text-sm font-semibold ${isActive(item.href) ? "text-primary" : "text-[#021d33]"}`}
+                      onClick={() => setExpanded(isExpanded ? null : item.label)}
+                    >
+                      {item.label}
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      className={`flex-1 text-sm font-semibold ${isActive(item.href) ? "text-primary" : "text-[#021d33]"}`}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
                   {hasChildren && (
                     <button
                       type="button"

@@ -39,14 +39,10 @@ export async function middleware(request: NextRequest) {
     });
   }
 
-  if (supabase) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (request.nextUrl.pathname.startsWith("/admin") && !user) {
-      const login = new URL("/login", request.url);
-      login.searchParams.set("next", request.nextUrl.pathname);
+  if (request.nextUrl.pathname.startsWith("/admin") && !request.nextUrl.pathname.startsWith("/admin/login")) {
+    const gate = request.cookies.get("ms_admin_gate")?.value;
+    if (gate !== "David3") {
+      const login = new URL("/admin/login", request.url);
       return NextResponse.redirect(login);
     }
   }

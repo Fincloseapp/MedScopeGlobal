@@ -34,5 +34,5 @@ export type V20StudyDisplay = {
   relevance: "vysoká" | "střední" | "kontextová";
   imageUrl: string;
   locale: "cs";
-  uiVersion: "v20.2";
+  uiVersion: "v21.0";
 };

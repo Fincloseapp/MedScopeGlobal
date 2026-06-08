@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AdminMobileNav } from "@/components/admin/admin-mobile-nav";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
-import { requireAdmin } from "@/lib/auth/admin";
+import { isAdminGateOpen } from "@/lib/auth/admin-gate";
 import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
@@ -12,12 +12,9 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const gate = await requireAdmin();
-  if (!gate.ok) {
-    if (gate.user) {
-      redirect("/account?error=admin_required");
-    }
-    redirect("/login?next=/admin");
+  const gateOpen = await isAdminGateOpen();
+  if (!gateOpen) {
+    redirect("/admin/login");
   }
 
   return (

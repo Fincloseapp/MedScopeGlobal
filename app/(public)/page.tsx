@@ -8,6 +8,7 @@ import { V20ArticleCard } from "@/components/v20/article-card";
 import { V20CategoryGrid } from "@/components/v20/category-grid";
 import { V20HomeHero } from "@/components/v20/home-hero";
 import { V20StudiesHomeSection } from "@/components/v20/studies-home-section";
+import { V21HomepageSections } from "@/components/v21/homepage-sections";
 import { Button } from "@/components/ui/button";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
@@ -62,6 +63,8 @@ export default async function HomePage() {
 
       <V20StudiesHomeSection />
 
+      <V21HomepageSections />
+
       <HomepageAutomation locale={locale} isVip={isVip} accessLevel={accessLevel} />
 
       {showAds ? (
@@ -104,10 +107,10 @@ export default async function HomePage() {
           Odborné obory
         </p>
         <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
-          Kategorie podle NZIP
+          Odborné kategorie
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-slate-600">
-          Prázdné kategorie nejsou zobrazeny. Struktura odpovídá NZIP topic registry.
+          Struktura odpovídá českému vzdělávacímu registru odborných témat. Prázdné kategorie nejsou zobrazeny.
         </p>
         <div className="mt-6">
           <V20CategoryGrid categories={categories} />
@@ -119,10 +122,10 @@ export default async function HomePage() {
           <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200">
-                Medicína
+                Studium medicíny
               </p>
               <h2 className="mt-2 font-display text-3xl font-semibold">
-                Příprava na LF a studium 1.–6. ročníku
+                Příprava na LF, anatomie, fyziologie a klinické obory
               </h2>
               <p className="mt-3 max-w-2xl text-sm text-white/85">
                 Samostatná větev pro budoucí a současné studenty medicíny — zjednodušené přehledy

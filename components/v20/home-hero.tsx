@@ -16,7 +16,7 @@ export function V20HomeHero() {
           </h1>
           <p className="mt-4 text-lg leading-8 text-slate-600">
             MedScopeGlobal propojuje klinickou praxi, výzkum a vzdělávání. Obsah je v češtině,
-            strukturovaný podle NZIP registrů a připravený pro lékaře, studenty i pacienty.
+            strukturovaný podle odborných registrů a připravený pro lékaře, studenty i pacienty.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg" className="rounded-full px-5">
