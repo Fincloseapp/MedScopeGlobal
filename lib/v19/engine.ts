@@ -1,5 +1,5 @@
 /**
- * MedScope Content Engine v19 — orchestrator
+ * MedScope Content Engine v19.9 — orchestrator
  */
 import { writeAiAuditLog } from "@/lib/ai/audit";
 import { v19CacheGet, v19CacheSet } from "@/lib/v19/cache";
@@ -9,15 +9,19 @@ import { recordV19Request } from "@/lib/v19/monitoring";
 import { persistV19Article, listV19ArticlesFromDb } from "@/lib/v19/persist";
 import { planSpecialtyBatch } from "@/lib/v19/specialties";
 import { enqueueV19Job, getV19Job, updateV19Job } from "@/lib/v19/queue";
-import type { V19GenerateResult, V19GeneratedArticle } from "@/lib/v19/types";
+import type { V19ContentMode, V19GenerateResult, V19GeneratedArticle } from "@/lib/v19/types";
+import { V19_DEFAULT_MODE } from "@/lib/v19/modes";
+import { V19_ENGINE_VERSION } from "@/lib/v19/version";
 
 export async function runV19GenerateBatch(params: {
   count?: number;
   locale: string;
+  mode?: V19ContentMode;
 }): Promise<V19GenerateResult> {
   const t0 = Date.now();
+  const mode = params.mode ?? V19_DEFAULT_MODE;
   const count = Math.min(10, Math.max(5, params.count ?? 7));
-  const cacheKey = `v19:batch:${params.locale}:${new Date().toISOString().slice(0, 10)}:${count}`;
+  const cacheKey = `v19.9:batch:${params.locale}:${mode}:${new Date().toISOString().slice(0, 10)}:${count}`;
 
   const cached = v19CacheGet<V19GenerateResult>(cacheKey);
   if (cached) {
@@ -46,11 +50,12 @@ export async function runV19GenerateBatch(params: {
         topic,
         existingTitles: [...existingTitles, ...articles.map((a) => a.title)],
         angleHint,
+        mode,
       });
 
       if (!article) {
         attempts += 1;
-        angleHint = "alternativní klinický úhel — edukace a prevence";
+        angleHint = "alternativní klinický úhel — edukace a prevence (NZIP kontext)";
         continue;
       }
 
@@ -59,6 +64,16 @@ export async function runV19GenerateBatch(params: {
         title: article.title,
         topic: article.topic,
         sourceUrl: article.sourceUrl,
+        sourceName: article.sourceName,
+        keywords: article.keywords,
+        scientificTerms: topic.scientificTerms,
+        specialty: article.specialty,
+        nzipCategory: topic.nzipCategory,
+        nzipRegistryId: article.nzipRegistryId ?? (topic.isNzip ? topic.id : undefined),
+        nzipGlossaryTerms: article.nzipGlossaryTerms,
+        nzipRegistryRefs: article.nzipRegistryRefs,
+        publicationRef: topic.publicationRef,
+        sourceTier: topic.tier,
       });
 
       if (dup.duplicate) {
@@ -75,7 +90,7 @@ export async function runV19GenerateBatch(params: {
       }
 
       await writeAiAuditLog({
-        model: model ?? "v19-content",
+        model: model ?? "v19.9-content",
         inputLength: topic.briefingHint.length,
         outputLength: article.summary.length,
         risk: "low",
@@ -94,8 +109,10 @@ export async function runV19GenerateBatch(params: {
   const result: V19GenerateResult = {
     articles,
     locale: params.locale,
+    mode,
     generated: articles.length,
     skippedDuplicates,
+    engineVersion: V19_ENGINE_VERSION,
   };
 
   if (articles.length > 0) {
@@ -106,18 +123,25 @@ export async function runV19GenerateBatch(params: {
   return result;
 }
 
-export async function getV19Articles(locale: string, limit = 20, offset = 0) {
-  return listV19ArticlesFromDb(locale, limit, offset);
+export async function getV19Articles(
+  locale: string,
+  limit = 20,
+  offset = 0,
+  mode: V19ContentMode = V19_DEFAULT_MODE
+) {
+  return listV19ArticlesFromDb(locale, limit, offset, mode);
 }
 
 export async function startV19AsyncJob(params: {
   count?: number;
   locale: string;
+  mode?: V19ContentMode;
   ip?: string;
 }): Promise<{ jobId: string }> {
   const jobId = await enqueueV19Job({
     count: params.count ?? 7,
     locale: params.locale,
+    mode: params.mode ?? V19_DEFAULT_MODE,
     ip: params.ip,
   });
   void processV19Job(jobId);
@@ -133,6 +157,7 @@ export async function processV19Job(jobId: string) {
     const result = await runV19GenerateBatch({
       count: job.payload.count,
       locale: job.payload.locale,
+      mode: job.payload.mode,
     });
     await updateV19Job(jobId, { status: "completed", result });
   } catch (error) {

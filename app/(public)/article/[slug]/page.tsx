@@ -4,7 +4,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleBody } from "@/components/article/article-body";
 import { V19ArticleBody } from "@/components/v19/v19-article-body";
+import { V19ArticleJsonLd } from "@/components/v19/v19-article-jsonld";
 import { V19_RUBRIC_SLUG } from "@/lib/v19/dedup";
+import { buildV19SeoMeta } from "@/lib/v19/seo";
+import { specialtyLabel } from "@/lib/v19/specialties";
+import type { V19Specialty } from "@/lib/v19/types";
 import { ArticleCard } from "@/components/article/article-card";
 import { AdSlot } from "@/components/ads/ad-slot";
 import { VipBadge } from "@/components/vip/vip-badge";
@@ -32,13 +36,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const article = await getArticleBySlug(slug, locale);
   if (!article) return { title: "Article" };
 
+  const isV19 = article.rubric_slug === V19_RUBRIC_SLUG;
+  const v19Meta = isV19
+    ? (article.quiz_json as { seo?: { metaDescription?: string; keywords?: string[] } } | null)
+        ?.seo
+    : null;
+
   const description =
+    v19Meta?.metaDescription ??
     article.excerpt ??
     article.title.slice(0, 155) + (article.title.length > 155 ? "…" : "");
+
+  const keywords = v19Meta?.keywords;
 
   return {
     title: article.title,
     description,
+    keywords,
     alternates: {
       canonical: `/article/${article.slug}`,
     },
@@ -97,34 +111,68 @@ export default async function ArticlePage({ params }: Props) {
   const author = article.users;
   const category = article.categories;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "MedicalWebPage",
-    headline: article.title,
-    datePublished: article.published_at,
-    author: author?.full_name
-      ? {
-          "@type": "Person",
-          name: author.full_name,
-        }
-      : undefined,
-    image: article.cover_image_url ? [article.cover_image_url] : undefined,
-    publisher: {
-      "@type": "Organization",
-      name: "MedScopeGlobal",
-    },
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": `/article/${article.slug}`,
-    },
-  };
+  const isV19Article = article.rubric_slug === V19_RUBRIC_SLUG;
+  const v19Quiz = (article.quiz_json ?? {}) as Record<string, unknown>;
+
+  const jsonLd = isV19Article
+    ? buildV19SeoMeta(
+        {
+          title: article.title,
+          date: article.published_at ?? new Date().toISOString(),
+          specialty: (v19Quiz.specialty as V19Specialty) ?? "internal-medicine",
+          specialtyLabel: specialtyLabel(
+            (v19Quiz.specialty as V19Specialty) ?? "internal-medicine",
+            locale
+          ),
+          summary: article.excerpt ?? "",
+          keyPoints: (v19Quiz.keyPoints as string[]) ?? [],
+          clinicalImpact: (v19Quiz.clinicalImpact as string) ?? "",
+          scientificContext: (v19Quiz.scientificContext as string) ?? "",
+          patientEducation: (v19Quiz.patientEducation as string) ?? "",
+          sourceUrl: article.source_url ?? "",
+          sourceName: article.source_name ?? "",
+          sourceTier: (v19Quiz.sourceTier as "cz") ?? "cz",
+          topic: (v19Quiz.topic as string) ?? "",
+          locale,
+          keywords: (v19Quiz.keywords as string[]) ?? [],
+          articleType: (v19Quiz.articleType as "brief") ?? "brief",
+          relevance: (v19Quiz.relevance as "high") ?? "high",
+          slug: article.slug,
+        },
+        locale
+      ).jsonLd
+    : {
+        "@context": "https://schema.org",
+        "@type": "MedicalWebPage",
+        headline: article.title,
+        datePublished: article.published_at,
+        author: author?.full_name
+          ? {
+              "@type": "Person",
+              name: author.full_name,
+            }
+          : undefined,
+        image: article.cover_image_url ? [article.cover_image_url] : undefined,
+        publisher: {
+          "@type": "Organization",
+          name: "MedScopeGlobal",
+        },
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": `/article/${article.slug}`,
+        },
+      };
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {isV19Article ? (
+        <V19ArticleJsonLd data={jsonLd} />
+      ) : (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <article className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="flex flex-col gap-10 lg:flex-row">
           <div className="flex-1">
@@ -246,9 +294,12 @@ export default async function ArticlePage({ params }: Props) {
                     title: article.title,
                     date: article.published_at ?? new Date().toISOString(),
                     summary: article.excerpt ?? "",
-                    keyPoints: (article.quiz_json?.keyPoints as string[]) ?? [],
-                    clinicalImpact: (article.quiz_json?.clinicalImpact as string) ?? "",
-                    specialty: article.quiz_json?.specialty as string | undefined,
+                    keyPoints: (v19Quiz.keyPoints as string[]) ?? [],
+                    clinicalImpact: (v19Quiz.clinicalImpact as string) ?? "",
+                    scientificContext: (v19Quiz.scientificContext as string) ?? "",
+                    patientEducation: (v19Quiz.patientEducation as string) ?? "",
+                    nzipContext: (v19Quiz.nzipContext as string) ?? undefined,
+                    specialty: v19Quiz.specialty as string | undefined,
                     sourceUrl: article.source_url ?? undefined,
                     sourceName: article.source_name ?? undefined,
                   }}

@@ -6,8 +6,11 @@ import {
   startV19AsyncJob,
 } from "@/lib/v19/engine";
 import { resolveV19LocaleFromRequest } from "@/lib/v19/localize";
+import { resolveV19Mode } from "@/lib/v19/modes";
 import { checkV19GenerateRateLimit, checkV19ListRateLimit } from "@/lib/v19/rate-limit";
 import { getV19MonitoringSnapshot } from "@/lib/v19/monitoring";
+import { V19_ENGINE_VERSION } from "@/lib/v19/version";
+import type { V19ContentMode } from "@/lib/v19/types";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -40,6 +43,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       status: "ok",
       engine: "v19",
+      engineVersion: V19_ENGINE_VERSION,
       job,
     });
   }
@@ -48,17 +52,39 @@ export async function GET(request: Request) {
     return NextResponse.json(getV19MonitoringSnapshot());
   }
 
+  if (url.searchParams.get("nzipIndex") === "1") {
+    const { getNzipIndexMap } = await import("@/lib/v19/nzip-index");
+    const index = getNzipIndexMap();
+    return NextResponse.json({
+      status: "ok",
+      engineVersion: V19_ENGINE_VERSION,
+      pageCount: index.pageCount,
+      builtAt: index.builtAt,
+      source: index.source,
+    });
+  }
+
   const locale = await resolveV19LocaleFromRequest(url.searchParams.get("locale"));
+  const mode = resolveV19Mode(url.searchParams.get("mode"));
   const limit = Math.min(30, Number(url.searchParams.get("limit") ?? 20));
   const offset = Math.max(0, Number(url.searchParams.get("offset") ?? 0));
-  const articles = await getV19Articles(locale, limit, offset);
+  const articles = await getV19Articles(locale, limit, offset, mode);
+
+  const deepLink = url.searchParams.get("deepLink") === "1";
 
   return NextResponse.json({
     status: "ok",
     engine: "v19",
+    engineVersion: V19_ENGINE_VERSION,
     locale,
+    mode,
     count: articles.length,
-    articles,
+    articles: deepLink
+      ? articles.map((a) => ({
+          ...a,
+          nzipDeepLinking: Boolean(a.nzipRegistryId || a.nzipTopicTags?.length),
+        }))
+      : articles,
     monitoring: getV19MonitoringSnapshot().metrics,
   });
 }
@@ -73,7 +99,7 @@ export async function POST(request: Request) {
     );
   }
 
-  let body: { count?: number; locale?: string; async?: boolean } = {};
+  let body: { count?: number; locale?: string; async?: boolean; mode?: V19ContentMode } = {};
   try {
     body = (await request.json()) as typeof body;
   } catch {
@@ -81,20 +107,23 @@ export async function POST(request: Request) {
   }
 
   const locale = await resolveV19LocaleFromRequest(body.locale);
+  const mode = resolveV19Mode(body.mode);
   const count = body.count;
 
   if (body.async) {
-    const { jobId } = await startV19AsyncJob({ count, locale, ip });
+    const { jobId } = await startV19AsyncJob({ count, locale, mode, ip });
     return NextResponse.json({
       status: "ok",
       engine: "v19",
+      engineVersion: V19_ENGINE_VERSION,
+      mode,
       jobId,
       message: "Poll GET /api/v19/articles?jobId=...",
     });
   }
 
   try {
-    const result = await runV19GenerateBatch({ count, locale });
+    const result = await runV19GenerateBatch({ count, locale, mode });
     return NextResponse.json({
       status: "ok",
       engine: "v19",

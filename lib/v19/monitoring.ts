@@ -1,5 +1,6 @@
 import { v19CacheStats } from "@/lib/v19/cache";
 import { v19ConcurrencyStats } from "@/lib/v19/concurrency";
+import { V19_ENGINE_VERSION } from "@/lib/v19/version";
 
 export type V19MetricsSnapshot = {
   status: "ok";
@@ -101,7 +102,7 @@ export function getV19MonitoringSnapshot(): V19MetricsSnapshot {
   return {
     status: "ok",
     engine: "v19",
-    version: "V19.0.0",
+    version: V19_ENGINE_VERSION,
     timestamp: new Date().toISOString(),
     metrics: {
       requestsTotal: state.requestsTotal,

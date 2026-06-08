@@ -10,10 +10,12 @@ export function V19ArticleBriefFeedClient({
   title,
   initialLimit = 6,
   locale = "auto",
+  mode = "doctor",
 }: {
   title: string;
   initialLimit?: number;
   locale?: string;
+  mode?: "doctor" | "patient" | "scientist";
 }) {
   const [articles, setArticles] = useState<ApiArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,6 +30,7 @@ export function V19ArticleBriefFeedClient({
         limit: String(initialLimit),
         offset: String(nextOffset),
         locale,
+        mode,
       });
       const res = await fetch(`/api/v19/articles?${params}`);
       const json = (await res.json()) as {
@@ -39,7 +42,7 @@ export function V19ArticleBriefFeedClient({
       setHasMore(batch.length >= initialLimit);
       setOffset(nextOffset + batch.length);
     },
-    [initialLimit, locale]
+    [initialLimit, locale, mode]
   );
 
   useEffect(() => {

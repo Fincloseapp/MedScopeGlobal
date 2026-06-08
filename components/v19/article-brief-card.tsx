@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { specialtyLabel } from "@/lib/v19/specialties";
-import type { V19Specialty } from "@/lib/v19/types";
+import type { V19ContentMode, V19Specialty } from "@/lib/v19/types";
+import { V19NzipTagChips } from "@/components/v19/nzip-topic-card";
+import {
+  V19NzipEducationalLinks,
+  V19NzipGlossaryTooltip,
+} from "@/components/v19/nzip-glossary-tooltip";
 
 export type V19BriefArticle = {
   id?: string;
@@ -10,9 +15,19 @@ export type V19BriefArticle = {
   summary: string;
   keyPoints?: string[];
   clinicalImpact?: string;
+  scientificContext?: string;
+  patientEducation?: string;
+  nzipContext?: string;
+  nzipTopicTags?: string[];
+  nzipCategoryTags?: string[];
+  nzipGlossaryTerms?: string[];
+  nzipEducationalLinks?: { label: string; url: string; type?: string }[];
   specialty?: string;
   sourceUrl?: string;
   sourceName?: string;
+  mode?: V19ContentMode;
+  articleType?: string;
+  keywords?: string[];
 };
 
 export function V19ArticleBriefCard({
@@ -28,6 +43,7 @@ export function V19ArticleBriefCard({
   const specLabel =
     article.specialty &&
     specialtyLabel(article.specialty as V19Specialty, locale);
+  const isPatient = article.mode === "patient";
 
   return (
     <article className="v19-brief-card rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm sm:p-5">
@@ -59,10 +75,53 @@ export function V19ArticleBriefCard({
         </ul>
       )}
 
-      {article.clinicalImpact && (
+      {article.clinicalImpact && !isPatient && (
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          <span className="font-semibold text-slate-800">Dopad: </span>
+          <span className="font-semibold text-slate-800">
+            {locale === "cs" ? "Dopad: " : "Impact: "}
+          </span>
           {article.clinicalImpact}
+        </p>
+      )}
+
+      {article.patientEducation && isPatient && (
+        <p className="mt-3 text-sm leading-6 text-slate-600">
+          <span className="font-semibold text-slate-800">
+            {locale === "cs" ? "Pro pacienty: " : "For patients: "}
+          </span>
+          {article.patientEducation}
+        </p>
+      )}
+
+      {article.scientificContext && article.mode === "scientist" && (
+        <p className="mt-3 text-sm leading-6 text-slate-600">
+          <span className="font-semibold text-slate-800">
+            {locale === "cs" ? "Věda: " : "Science: "}
+          </span>
+          {article.scientificContext}
+        </p>
+      )}
+
+      <V19NzipTagChips
+        tags={[...(article.nzipTopicTags ?? []), ...(article.nzipCategoryTags ?? [])]}
+      />
+
+      {article.nzipGlossaryTerms && article.nzipGlossaryTerms.length > 0 && (
+        <p className="mt-2 flex flex-wrap gap-2 text-sm">
+          {article.nzipGlossaryTerms.slice(0, 4).map((term) => (
+            <V19NzipGlossaryTooltip key={term} term={term} locale={locale} />
+          ))}
+        </p>
+      )}
+
+      {article.nzipEducationalLinks && article.nzipEducationalLinks.length > 0 && (
+        <V19NzipEducationalLinks links={article.nzipEducationalLinks} locale={locale} />
+      )}
+
+      {article.nzipContext && (
+        <p className="mt-3 text-sm leading-6 text-slate-600">
+          <span className="font-semibold text-slate-800">NZIP: </span>
+          {article.nzipContext}
         </p>
       )}
 

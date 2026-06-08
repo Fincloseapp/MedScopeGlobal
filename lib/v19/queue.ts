@@ -2,11 +2,12 @@
  * v19 async job queue — Supabase-backed with in-process drain fallback.
  */
 import { createServiceRoleClient } from "@/lib/supabase/service";
-import type { V19JobStatus } from "@/lib/v19/types";
+import type { V19ContentMode, V19JobStatus } from "@/lib/v19/types";
 
 export type V19JobPayload = {
   count: number;
   locale: string;
+  mode?: V19ContentMode;
   ip?: string;
 };
 
