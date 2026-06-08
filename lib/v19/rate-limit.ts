@@ -5,7 +5,7 @@ export async function checkV19GenerateRateLimit(ip: string) {
   return persistentRateLimit(`v19:gen:${ip}`, 10, 15 * 60_000);
 }
 
-/** v20 list: 120 req / min per IP (cached responses reduce load) */
+/** v20.1 list: 200 req / min per IP (server + client cache) */
 export async function checkV19ListRateLimit(ip: string) {
-  return persistentRateLimit(`v19:list:${ip}`, 120, 60_000);
+  return persistentRateLimit(`v19:list:${ip}`, 200, 60_000);
 }

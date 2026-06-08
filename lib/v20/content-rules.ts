@@ -1,13 +1,17 @@
 /**
- * v20 content governance — Czech-first, archive stale, newest-first.
+ * v20.1 content governance — Czech-only, no legacy 2026 seed, v19 briefs only.
  */
+import { V19_RUBRIC_SLUG } from "@/lib/v19/dedup";
 import type { ArticleWithRelations } from "@/types/database";
 
-/** Articles published before this date are hidden from public listings (archived). */
+/** Legacy articles before this date are archived. */
 export const V20_ARCHIVE_CUTOFF = "2026-01-01T00:00:00.000Z";
 
-/** Max age for listing in days (legacy articles without recent updates). */
-export const V20_MAX_LIST_AGE_DAYS = 365;
+/** v19 briefs visible max age (days). */
+export const V20_V19_MAX_AGE_DAYS = 45;
+
+const EN_TITLE_RE =
+  /\b(the|and|for|with|study|clinical|trial|patients|treatment|review|analysis|healthcare)\b/i;
 
 export function isArchivedArticle(article: {
   published_at?: string | null;
@@ -16,19 +20,25 @@ export function isArchivedArticle(article: {
 }): boolean {
   const date = article.published_at ?? article.created_at;
   if (!date) return true;
+
   const ts = new Date(date).getTime();
   if (Number.isNaN(ts)) return true;
-  if (ts < new Date(V20_ARCHIVE_CUTOFF).getTime()) return true;
-  const ageMs = Date.now() - ts;
-  if (ageMs > V20_MAX_LIST_AGE_DAYS * 86_400_000) return true;
-  return false;
+
+  // v19 briefs — keep recent only
+  if (article.rubric_slug === V19_RUBRIC_SLUG) {
+    const ageMs = Date.now() - ts;
+    return ageMs > V20_V19_MAX_AGE_DAYS * 86_400_000;
+  }
+
+  // Legacy DB articles (incl. 2026 seed) — hidden from public feeds
+  return true;
 }
 
 export function filterActiveArticles<T extends ArticleWithRelations>(articles: T[]): T[] {
   return articles.filter((a) => !isArchivedArticle(a));
 }
 
-/** Prefer Czech content; drop obvious EN-only legacy rows in CS mode. */
+/** Czech-only: drop EN locale and English-looking titles. */
 export function filterCzechContent<T extends { title?: string; locale?: string | null }>(
   articles: T[],
   locale: string
@@ -36,7 +46,10 @@ export function filterCzechContent<T extends { title?: string; locale?: string |
   if (locale !== "cs") return articles;
   return articles.filter((a) => {
     if (a.locale === "en") return false;
-    return Boolean(a.title?.trim());
+    const title = a.title?.trim() ?? "";
+    if (!title) return false;
+    if (EN_TITLE_RE.test(title) && !/[áčďéěíňóřšťúůýž]/i.test(title)) return false;
+    return true;
   });
 }
 

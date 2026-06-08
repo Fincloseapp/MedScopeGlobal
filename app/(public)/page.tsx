@@ -14,6 +14,9 @@ import { getLatestArticles } from "@/lib/queries/articles";
 import { getV20CategoriesWithCounts } from "@/lib/queries/categories";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({
     title: "MedScopeGlobal — Odborný medicínský portál",

@@ -2,10 +2,12 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { REGIONS, REGION_COOKIE } from "@/lib/i18n/config";
-import { getServerLocale } from "@/lib/i18n/server-locale";
-import { getCategories } from "@/lib/queries/categories";
+import { getCategories, getV20CategoriesWithCounts } from "@/lib/queries/categories";
 import { ensureContentTypes } from "@/lib/setup/ensure-medical-data";
 import { cookies } from "next/headers";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function PublicLayout({
   children,
@@ -14,11 +16,14 @@ export default async function PublicLayout({
 }) {
   await ensureContentTypes();
   const cookieStore = await cookies();
-  const [categories, locale, readerContext] = await Promise.all([
+  const locale = "cs";
+  const [allCategories, nonEmpty, readerContext] = await Promise.all([
     getCategories(),
-    getServerLocale(),
+    getV20CategoriesWithCounts("cs"),
     getReaderContext(),
   ]);
+  const activeSlugs = new Set(nonEmpty.map((c) => c.slug));
+  const categories = allCategories.filter((c) => activeSlugs.has(c.slug));
   const region = cookieStore.get(REGION_COOKIE)?.value ?? REGIONS[0];
 
   return (
@@ -32,7 +37,7 @@ export default async function PublicLayout({
         isVip={readerContext.isVip}
         accessLevel={readerContext.accessLevel}
       />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 overflow-x-hidden">{children}</main>
       <SiteFooter />
     </div>
   );

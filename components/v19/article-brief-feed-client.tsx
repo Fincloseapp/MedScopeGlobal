@@ -24,7 +24,9 @@ export function V19ArticleBriefFeedClient({
   const [loadingMore, setLoadingMore] = useState(false);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [pagesLoaded, setPagesLoaded] = useState(0);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const MAX_PAGES = 2;
 
   const fetchPage = useCallback(
     async (nextOffset: number, append: boolean) => {
@@ -41,6 +43,7 @@ export function V19ArticleBriefFeedClient({
       }>(`/api/v19/articles?${params}`, { ttlMs: 45_000, retries: 2 });
       const batch = json.articles ?? [];
       setArticles((prev) => (append ? [...prev, ...batch] : batch));
+      setPagesLoaded((p) => (append ? p + 1 : 1));
       setHasMore(batch.length >= initialLimit);
       setOffset(nextOffset + batch.length);
     },
@@ -60,7 +63,7 @@ export function V19ArticleBriefFeedClient({
 
   useEffect(() => {
     const el = sentinelRef.current;
-    if (!el || !hasMore || loading || loadingMore) return;
+    if (!el || !hasMore || loading || loadingMore || pagesLoaded >= MAX_PAGES) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -72,7 +75,7 @@ export function V19ArticleBriefFeedClient({
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [fetchPage, hasMore, loading, loadingMore, offset]);
+  }, [fetchPage, hasMore, loading, loadingMore, offset, pagesLoaded]);
 
   return (
     <section
