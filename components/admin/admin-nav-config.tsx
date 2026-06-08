@@ -18,6 +18,7 @@ export const ADMIN_NAV_ITEMS: {
 }[] = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/articles", label: "Articles", icon: Newspaper },
+  { href: "/admin/autopilot", label: "V6 Autopilot", icon: Bot },
   { href: "/admin/ingestion", label: "AI ingestion", icon: Bot },
   { href: "/admin/verification", label: "Verification", icon: ShieldCheck },
   { href: "/admin/categories", label: "Categories", icon: Tags },

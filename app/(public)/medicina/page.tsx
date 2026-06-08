@@ -39,7 +39,17 @@ export default function MedicinaHubPage() {
         ))}
       </div>
 
-      <div className="mt-10 rounded-2xl border bg-[#f7fbff] p-6">
+      <div className="mt-10 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 to-white p-6">
+        <h2 className="font-display text-2xl font-semibold text-[#021d33]">Kvízy a studijní hry</h2>
+        <p className="mt-2 text-sm text-slate-600">
+          Procvičte anatomii, fyziologii, patologii a přípravu na přijímačky v interaktivních kvízech.
+        </p>
+        <Link href="/medicina/hry" className="mt-4 inline-flex rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground">
+          Spustit kvízy →
+        </Link>
+      </div>
+
+      <div className="mt-6 rounded-2xl border bg-[#f7fbff] p-6">
         <h2 className="font-display text-2xl font-semibold text-[#021d33]">Důležité upozornění</h2>
         <p className="mt-3 text-sm text-slate-600">
           MedScopeGlobal není oficiální učebnice LF ani přijímací komise. Obsah slouží ke studijní

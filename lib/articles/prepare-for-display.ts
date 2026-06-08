@@ -6,6 +6,7 @@ import {
 import type { LocaleCode } from "@/lib/i18n/config";
 import { resolveArticleTranslation } from "@/lib/i18n/translate-article";
 import type { ArticleWithRelations } from "@/types/database";
+import { polishCzechFields, isEnglishDominant } from "@/lib/v22/translate";
 
 export type DisplayArticle = ArticleWithRelations & {
   displayLocale?: string;
@@ -47,7 +48,11 @@ export async function prepareArticleForDisplay(
   const target = primaryArticleLocale(locale);
 
   if (matchesArticleLocale(base.locale, locale)) {
-    return { ...base, displayLocale: target };
+    const polished =
+      locale === "cs" && isEnglishDominant(base.title)
+        ? polishCzechFields(base, locale)
+        : base;
+    return { ...polished, displayLocale: target };
   }
 
   const translated = await resolveArticleTranslation(
@@ -103,8 +108,12 @@ export async function prepareArticlesForDisplay(
       translated++;
     } else if (matchesArticleLocale(article.locale, locale)) {
       const withCat = await applyCategoryLabels(article, locale);
+      const polished =
+        locale === "cs" && isEnglishDominant(withCat.title)
+          ? polishCzechFields(withCat, locale)
+          : withCat;
       out.push({
-        ...withCat,
+        ...polished,
         displayLocale: primaryArticleLocale(locale),
       });
     } else {

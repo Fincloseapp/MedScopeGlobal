@@ -28,10 +28,10 @@ async function check() {
     detail.includes("Metodika") &&
     dh.includes("Digitální zdravotnictví") &&
     !dh.includes("Digital Health</h1>") &&
-    kongresy.includes("EULAR") || kongresy.includes("kongres") &&
+    (kongresy.includes("EULAR") || kongresy.includes("Kongres")) &&
     medicina.includes("Studium medicíny") &&
     (leky.status === 307 || leky.status === 308 || leky.status === 200) &&
-    legis.includes("legislativa");
+    legis.includes("Legislativa");
 
   console.log({
     uiVersion: health.uiVersion,
