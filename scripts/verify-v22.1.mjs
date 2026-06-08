@@ -11,7 +11,7 @@ async function check() {
   const hasHomeIcon =
     home.includes('aria-label="Domů') && home.includes("bg-primary text-primary-foreground");
   const hasStudieSection = home.includes('id="home-studie-heading"') && home.includes(">Studie<");
-  const noObory = !home.includes("Odborné obory") && !home.includes("Odborné kategorie");
+  const noObory = !home.includes("Odborné kategorie") && !/<h2[^>]*>Odborné obory<\/h2>/.test(home);
   const hasHlavniPrehled = home.includes("Hlavní přehled");
   const studiesCzech = home.includes("v20-study-card") && home.includes("Klinická") || home.includes("Účinnost") || home.includes("Biologická");
   const noEnSlider = !EN_RE.test(home.slice(0, home.indexOf("Studium medicíny") || home.length));

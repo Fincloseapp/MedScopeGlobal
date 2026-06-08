@@ -116,7 +116,7 @@ export function V20MobileNav({
           {topCategories.length > 0 && (
             <div className="rounded-xl border border-slate-200 p-3">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-                Odborné obory
+                Obory
               </p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {topCategories.map((cat) => (

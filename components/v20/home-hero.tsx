@@ -29,12 +29,12 @@ export function V20HomeHero() {
               <Link href="/odborne/briefy">Odborné briefy</Link>
             </Button>
             <Button asChild variant="secondary" size="lg" className="rounded-full">
-              <Link href="/categories">Odborné obory</Link>
+              <Link href="/studie" prefetch>Studie</Link>
             </Button>
           </div>
           <ul className="mt-8 flex flex-wrap gap-2 text-xs text-slate-600">
             {[
-              "Editorial review",
+              "Odborná redakce",
               "Citace u každého článku",
               "NZIP deep linking",
               "GDPR-ready",
