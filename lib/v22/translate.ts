@@ -10,7 +10,10 @@ export function toCzechTitle(title: string, context = "medicínský obsah"): str
     .replace(/[^a-zA-ZáčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ0-9\s]/g, " ")
     .trim()
     .slice(0, 100);
-  return `Odborný přehled: ${topic || context}`;
+  if (context.includes("studie")) {
+    return `Klinická studie: ${topic || "revmatologie"}`;
+  }
+  return `Odborný přehled — ${context}: ${topic || context}`;
 }
 
 export function toCzechExcerpt(excerpt: string | null | undefined, title: string): string {

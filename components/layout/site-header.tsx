@@ -39,10 +39,10 @@ export function SiteHeader({
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-4 sm:gap-3 sm:px-6">
         <V22HomeLink />
         <Link href="/" prefetch className="flex min-w-0 items-center gap-2">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <span className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground sm:flex">
             <Activity className="h-5 w-5" aria-hidden />
           </span>
-          <span className="hidden min-w-0 flex-col sm:flex">
+          <span className="flex min-w-0 flex-col">
             <span className="truncate font-display text-base font-semibold text-[#021d33]">
               MedScopeGlobal
             </span>

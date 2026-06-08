@@ -5,7 +5,6 @@ import { HomepageAutomation } from "@/components/home/homepage-automation";
 import { AdPlacement } from "@/components/ads/ad-placement";
 import { V19ArticleBriefFeedLazy } from "@/components/v19/article-brief-feed";
 import { V20ArticleCard } from "@/components/v20/article-card";
-import { V20CategoryGrid } from "@/components/v20/category-grid";
 import { V20HomeHero } from "@/components/v20/home-hero";
 import { V20StudiesHomeSection } from "@/components/v20/studies-home-section";
 import { V21HomepageSections } from "@/components/v21/homepage-sections";
@@ -13,17 +12,16 @@ import { Button } from "@/components/ui/button";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { getLatestArticles } from "@/lib/queries/articles";
-import { getV20CategoriesWithCounts } from "@/lib/queries/categories";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+/** ISR — homepage refresh každých 120 s */
+export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({
     title: "MedScopeGlobal — Odborný medicínský portál",
     description:
-      "Český odborný medicínský magazín pro lékaře, studenty a pacienty. Evidence-based obsah, NZIP registrace, profesionální briefy.",
+      "Český odborný medicínský magazín pro lékaře, studenty a pacienty. Evidence-based obsah a profesionální briefy.",
     path: "/",
   });
 }
@@ -31,9 +29,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const locale = "cs" as const;
   const { isVip, accessLevel } = await getReaderContext();
-  const [articles, categories, showAdsAds] = await Promise.all([
+  const [articles, showAdsAds] = await Promise.all([
     getLatestArticles(6, 0, isVip, accessLevel, locale),
-    getV20CategoriesWithCounts(locale),
     !isVip
       ? Promise.all([
           getActiveAdsByPlacement("homepage_top", 1),
@@ -61,8 +58,6 @@ export default async function HomePage() {
 
       <V19ArticleBriefFeedLazy title="Odborné medicínské briefy" limit={4} locale="cs" />
 
-      <V20StudiesHomeSection />
-
       <V21HomepageSections />
 
       <HomepageAutomation locale={locale} isVip={isVip} accessLevel={accessLevel} />
@@ -82,10 +77,10 @@ export default async function HomePage() {
               </p>
               <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">Články</h2>
               <p className="mt-2 max-w-2xl text-sm text-slate-600">
-                Aktuální odborný obsah seřazený od nejnovějších. Starší články jsou archivovány.
+                Aktuální odborný obsah seřazený od nejnovějších.
               </p>
             </div>
-            <Link href="/articles" className="text-sm font-medium text-primary hover:underline">
+            <Link href="/articles" prefetch className="text-sm font-medium text-primary hover:underline">
               Všechny články →
             </Link>
           </div>
@@ -95,27 +90,12 @@ export default async function HomePage() {
             ))}
           </div>
           {articles.length === 0 && (
-            <p className="mt-6 text-sm text-muted-foreground">
-              Zatím žádné aktivní články — nový obsah se generuje automaticky.
-            </p>
+            <p className="mt-6 text-sm text-muted-foreground">Zatím žádné aktivní články.</p>
           )}
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-          Odborné obory
-        </p>
-        <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
-          Odborné kategorie
-        </h2>
-        <p className="mt-2 max-w-2xl text-sm text-slate-600">
-          Struktura odpovídá českému vzdělávacímu registru odborných témat. Prázdné kategorie nejsou zobrazeny.
-        </p>
-        <div className="mt-6">
-          <V20CategoryGrid categories={categories} />
-        </div>
-      </section>
+      <V20StudiesHomeSection />
 
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <div className="rounded-3xl border border-primary/10 bg-gradient-to-b from-[#0A3D5C] to-[#004874] px-6 py-8 text-white">
@@ -128,16 +108,19 @@ export default async function HomePage() {
                 Příprava na LF, anatomie, fyziologie a klinické obory
               </h2>
               <p className="mt-3 max-w-2xl text-sm text-white/85">
-                Samostatná větev pro budoucí a současné studenty medicíny — zjednodušené přehledy
-                s disclaimerem, že nejde o oficiální učebnici LF.
+                Samostatná větev pro budoucí a současné studenty medicíny.
               </p>
             </div>
             <div className="flex flex-wrap gap-3 lg:justify-end">
               <Button asChild size="lg" className="rounded-full bg-white text-[#004874] hover:bg-sky-50">
-                <Link href="/medicina/priprava">Příprava na medicínu</Link>
+                <Link href="/medicina/priprava" prefetch>
+                  Příprava na medicínu
+                </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-full border-white/40 text-white hover:bg-white/10">
-                <Link href="/medicina/studium">Studium medicíny</Link>
+                <Link href="/medicina/studium" prefetch>
+                  Studium medicíny
+                </Link>
               </Button>
             </div>
           </div>
@@ -152,8 +135,8 @@ export default async function HomePage() {
 
       <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6">
         <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
-          MedScopeGlobal není přijímací komise ani oficiální učebnice LF. Obsah slouží ke
-          vzdělávání a nenahrazuje individuální lékařskou radu konkrétnímu pacientovi.
+          MedScopeGlobal není přijímací komise ani oficiální učebnice LF. Obsah slouží ke vzdělávání a
+          nenahrazuje individuální lékařskou radu.
         </p>
       </section>
     </div>
