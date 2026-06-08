@@ -84,15 +84,16 @@ function extractTopicCs(title: string): string {
 }
 
 function isEnglishDominant(text: string): boolean {
-  if (!text || text.trim().length < 20) return false;
-  if (CS_RE.test(text)) {
+  if (!text || text.trim().length < 12) return false;
+  const hasCzech = CS_RE.test(text);
+  if (!hasCzech) {
     const words = text.split(/\s+/).filter(Boolean);
     const enHits = words.filter((w) => EN_WORD_RE.test(w)).length;
-    return enHits > words.length * 0.15 && !/[áčďéěíňóřšťúůýž]{3,}/i.test(text);
+    return words.length >= 4 || enHits >= 1;
   }
   const words = text.split(/\s+/).filter(Boolean);
   const enHits = words.filter((w) => EN_WORD_RE.test(w)).length;
-  return enHits >= 3 || (enHits >= 2 && words.length < 12);
+  return enHits > words.length * 0.2 && !/[áčďéěíňóřšťúůýž]{4,}/i.test(text);
 }
 
 function synthesizeCzechSections(topic: string, studyType: V20StudyType, specialtyCs: string) {
@@ -223,13 +224,12 @@ export function enrichStudy(row: StudyRow): V20StudyDisplay {
 
 export function isValidV20Study(s: V20StudyDisplay): boolean {
   const fields = [s.titleCs, s.summaryCs, s.methodologyCs, s.resultsCs, s.conclusionCs];
-  const hasCzech = fields.some((f) => CS_RE.test(f));
   const noEnglish = fields.every((f) => !isEnglishDominant(f));
   return (
     s.titleCs.length > 10 &&
     s.summaryCs.length > 40 &&
+    CS_RE.test(s.summaryCs) &&
     s.locale === "cs" &&
-    hasCzech &&
     noEnglish
   );
 }
