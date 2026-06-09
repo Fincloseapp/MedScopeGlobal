@@ -25,7 +25,7 @@ export function V23NewsletterCta() {
               Newsletter
             </p>
             <h2 id="v23-nl-cta" className="mt-2 font-display text-2xl font-bold text-[#021d33] sm:text-3xl">
-              Odborný přehled 2× měsíčně
+              Odborný přehled týdně
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-slate-600">
               Studie, legislativa, léky a digitální zdravotnictví v profesionálním layoutu — česky,

@@ -23,7 +23,7 @@ export function V22NewsletterHub() {
               Odborný newsletter
             </p>
             <h2 className="mt-2 max-w-xl font-display text-2xl font-bold text-white sm:text-3xl">
-              Medicínský přehled 2× měsíčně
+              Medicínský přehled týdně
             </h2>
             <p className="mt-2 max-w-lg text-sm text-white/85">
               Studie, legislativa, léky, digitální zdravotnictví a univerzitní novinky — v češtině,
@@ -35,6 +35,9 @@ export function V22NewsletterHub() {
               </Button>
               <Button asChild variant="outline" className="rounded-full border-white/40 text-white hover:bg-white/10">
                 <Link href="/newsletter/posledni">Poslední vydání</Link>
+              </Button>
+              <Button asChild variant="outline" className="rounded-full border-white/40 text-white hover:bg-white/10">
+                <Link href="/newsletter/archiv">Archiv</Link>
               </Button>
             </div>
           </div>

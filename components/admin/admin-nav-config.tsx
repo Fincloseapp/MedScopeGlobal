@@ -3,6 +3,7 @@ import {
   Bell,
   Bot,
   Crown,
+  Mail,
   ShieldCheck,
   ImageIcon,
   LayoutDashboard,
@@ -18,6 +19,7 @@ export const ADMIN_NAV_ITEMS: {
 }[] = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/articles", label: "Articles", icon: Newspaper },
+  { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
   { href: "/admin/autopilot", label: "V6 Autopilot", icon: Bot },
   { href: "/admin/ingestion", label: "AI ingestion", icon: Bot },
   { href: "/admin/verification", label: "Verification", icon: ShieldCheck },
