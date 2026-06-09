@@ -5,9 +5,15 @@ export function newsletterHeadline(issueDate: string): string {
   return `MedScopeGlobal Newsletter — ${formatIssueDateCs(issueDate)}`;
 }
 
-export function normalizeNewsletterHeadline(issueDate: string, existing?: string | null): string {
-  const canonical = newsletterHeadline(issueDate);
-  if (!existing?.trim()) return canonical;
-  if (existing.includes("MedScopeGlobal Newsletter")) return canonical;
-  return canonical;
+const LEGACY_TITLE =
+  /MedScope\s+Newsletter|MedScope\s+Odborný|MedScopeGlobal\s+Newsletter/i;
+
+export function normalizeNewsletterHeadline(issueDate: string, _existing?: string | null): string {
+  return newsletterHeadline(issueDate);
+}
+
+export function isLegacyNewsletterTitle(title: string | null | undefined): boolean {
+  if (!title?.trim()) return true;
+  if (title.includes("MedScopeGlobal Newsletter")) return false;
+  return LEGACY_TITLE.test(title) || !title.includes("MedScopeGlobal");
 }
