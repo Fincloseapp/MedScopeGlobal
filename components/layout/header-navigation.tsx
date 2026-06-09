@@ -6,16 +6,22 @@ import { useEffect, useRef, useState } from "react";
 import type { NavItem } from "@/lib/config/main-navigation";
 import { cn } from "@/lib/utils";
 
-const NAV_LINK =
-  "inline-flex items-center px-5 py-2.5 text-[15.5px] font-normal leading-none tracking-[0.2px] text-slate-800 underline-offset-[3px] transition-colors hover:text-[#0055CC] hover:underline dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF]";
+const NAV_BASE =
+  "inline-flex shrink-0 items-center whitespace-nowrap px-3.5 py-2 text-[14px] font-normal leading-none tracking-[0.2px] md:px-4 md:text-[14.5px] lg:px-5 lg:text-[15.5px] lg:font-normal xl:font-medium";
 
-const NAV_LINK_ACTIVE =
-  "font-medium text-[#0055CC] underline dark:text-[#7CC4FF]";
+const NAV_LINK = cn(
+  NAV_BASE,
+  "text-slate-800 underline-offset-[3px] transition-colors hover:text-[#0055CC] hover:underline dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF]"
+);
 
-const NAV_BUTTON =
-  "inline-flex items-center px-5 py-2.5 text-[15.5px] font-normal leading-none tracking-[0.2px] text-slate-800 underline-offset-[3px] transition-colors hover:text-[#0055CC] hover:underline after:ml-1 after:text-[11px] after:font-normal after:opacity-65 after:content-['▾'] dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF]";
+const NAV_LINK_ACTIVE = "font-medium text-[#0055CC] underline dark:text-[#7CC4FF]";
 
-/** NEJM-plus navigation — v23.2.8 logo ratio tuning */
+const NAV_BUTTON = cn(
+  NAV_BASE,
+  "text-slate-800 underline-offset-[3px] transition-colors hover:text-[#0055CC] hover:underline after:ml-0.5 after:text-[10px] after:opacity-60 after:content-['▾'] dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF]"
+);
+
+/** v23.2.9 — full menu visibility, no wrap, no hidden items on desktop */
 export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
   const pathname = usePathname();
   const [openLabel, setOpenLabel] = useState<string | null>(null);
@@ -41,7 +47,11 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
   const isActiveChild = (href: string) => pathname === href;
 
   return (
-    <nav ref={navRef} className="hidden items-center md:flex" aria-label="Hlavní navigace">
+    <nav
+      ref={navRef}
+      className="hidden min-w-0 flex-1 flex-nowrap items-center justify-end gap-0 overflow-visible md:flex lg:justify-center"
+      aria-label="Hlavní navigace"
+    >
       {mainMenu.map((item) => {
         const isOpen = openLabel === item.label;
         const hasChildren = Boolean(item.children?.length);
@@ -56,7 +66,7 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
         }
 
         return (
-          <div key={item.label} className="relative">
+          <div key={item.label} className="relative shrink-0">
             <button
               type="button"
               aria-expanded={isOpen}
@@ -73,7 +83,7 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
                     href={child.href}
                     onClick={() => setOpenLabel(null)}
                     className={cn(
-                      "block px-5 py-2.5 text-[15px] tracking-[0.2px] transition-colors hover:text-[#0055CC] dark:hover:text-[#7CC4FF]",
+                      "block whitespace-normal px-5 py-2.5 text-[15px] tracking-[0.2px] transition-colors hover:text-[#0055CC] dark:hover:text-[#7CC4FF]",
                       isActiveChild(child.href)
                         ? "font-medium text-[#0055CC] dark:text-[#7CC4FF]"
                         : "text-slate-700 dark:text-[#E0E0E0]"
@@ -96,7 +106,6 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
   );
 }
 
-/** @deprecated Use HeaderNavigation */
 export function V21DesktopNav({ mainMenu }: { mainMenu: NavItem[] }) {
   return <HeaderNavigation mainMenu={mainMenu} />;
 }
