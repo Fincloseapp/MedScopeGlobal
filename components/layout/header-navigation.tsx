@@ -6,22 +6,22 @@ import { useEffect, useRef, useState } from "react";
 import type { NavItem } from "@/lib/config/main-navigation";
 import { cn } from "@/lib/utils";
 
-const NAV_BASE =
-  "inline-flex shrink-0 items-center whitespace-nowrap px-3.5 py-2 text-[14px] font-normal leading-none tracking-[0.2px] md:px-4 md:text-[14.5px] lg:px-5 lg:text-[15.5px] lg:font-normal xl:font-medium";
+const NAV_ITEM =
+  "inline-flex shrink-0 items-center whitespace-nowrap py-1 text-[15.5px] font-normal leading-none tracking-[0.2px] lg:font-medium";
 
 const NAV_LINK = cn(
-  NAV_BASE,
+  NAV_ITEM,
   "text-slate-800 underline-offset-[3px] transition-colors hover:text-[#0055CC] hover:underline dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF]"
 );
 
 const NAV_LINK_ACTIVE = "font-medium text-[#0055CC] underline dark:text-[#7CC4FF]";
 
 const NAV_BUTTON = cn(
-  NAV_BASE,
+  NAV_ITEM,
   "text-slate-800 underline-offset-[3px] transition-colors hover:text-[#0055CC] hover:underline after:ml-0.5 after:text-[10px] after:opacity-60 after:content-['▾'] dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF]"
 );
 
-/** v23.2.9 — full menu visibility, no wrap, no hidden items on desktop */
+/** v23.3.0 — stabilized full-width nav, gap-based spacing, no wrap */
 export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
   const pathname = usePathname();
   const [openLabel, setOpenLabel] = useState<string | null>(null);
@@ -49,7 +49,7 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
   return (
     <nav
       ref={navRef}
-      className="hidden min-w-0 flex-1 flex-nowrap items-center justify-end gap-0 overflow-visible md:flex lg:justify-center"
+      className="hidden min-w-0 flex-1 flex-nowrap items-center justify-end gap-4 overflow-visible md:flex lg:gap-[17px] xl:gap-[18px]"
       aria-label="Hlavní navigace"
     >
       {mainMenu.map((item) => {
@@ -76,7 +76,7 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
               {item.label}
             </button>
             {isOpen ? (
-              <div className="absolute left-0 top-full z-50 mt-1.5 min-w-64 rounded-md border border-black/[0.06] bg-white py-1.5 shadow-md dark:border-white/10 dark:bg-slate-900">
+              <div className="absolute right-0 top-full z-50 mt-1.5 min-w-64 rounded-md border border-black/[0.06] bg-white py-1.5 shadow-md dark:border-white/10 dark:bg-slate-900 lg:left-auto lg:right-0">
                 {item.children!.map((child) => (
                   <Link
                     key={child.href}

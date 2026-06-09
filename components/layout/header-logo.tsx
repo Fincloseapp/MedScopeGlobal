@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 export const HEADER_TAGLINE = "Medical Intelligence Network";
 
-export const HEADER_LOGO_HEIGHT = { mobile: 48, tablet: 56, desktop: 68 } as const;
+export const HEADER_LOGO_HEIGHT = { mobile: 48, tablet: 56, desktop: 70 } as const;
 
 type Props = {
   centered?: boolean;
@@ -12,14 +12,14 @@ type Props = {
   priority?: boolean;
 };
 
-/** v23.2.9 — max visibility logo block, WebP + retina */
+/** v23.3.0 — stabilized logo block, 48 / 56 / 70 px */
 export function HeaderLogo({ centered = false, className, priority = true }: Props) {
   return (
     <Link
       href="/"
       prefetch
       className={cn(
-        "logo-block group flex shrink-0 flex-col pr-3 transition-opacity hover:opacity-[0.97] lg:pr-4",
+        "logo-block group flex shrink-0 flex-col pr-2 transition-opacity hover:opacity-[0.97] lg:pr-3",
         centered ? "items-center text-center" : "items-start text-left",
         className
       )}
@@ -33,9 +33,9 @@ export function HeaderLogo({ centered = false, className, priority = true }: Pro
           className="p-0"
           imageClassName={cn(
             "w-auto object-contain [letter-spacing:0.12px]",
-            "h-12 min-w-[150px] max-w-[210px]",
-            "md:h-14 md:min-w-[168px] md:max-w-[230px]",
-            "lg:h-[68px] lg:min-w-[190px] lg:max-w-[290px]"
+            "h-12 min-w-[152px] max-w-[212px]",
+            "md:h-14 md:min-w-[170px] md:max-w-[232px]",
+            "lg:h-[70px] lg:min-w-[196px] lg:max-w-[300px]"
           )}
         />
       </span>
@@ -43,7 +43,7 @@ export function HeaderLogo({ centered = false, className, priority = true }: Pro
         className={cn(
           "tagline mt-1 font-extralight leading-tight",
           "text-[11px] tracking-[0.35px] opacity-75 sm:text-xs",
-          "md:text-[11px] lg:text-[13px]",
+          "lg:text-[13px]",
           "text-[#6A6A6A] dark:text-[#A0A0A0] dark:opacity-85"
         )}
       >
