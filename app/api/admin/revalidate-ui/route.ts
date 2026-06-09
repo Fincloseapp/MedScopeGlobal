@@ -4,24 +4,35 @@ import { V19_ENGINE_VERSION } from "@/lib/v19/version";
 import { V20_UI_BUILD_STAMP, V20_UI_VERSION } from "@/lib/v20/version";
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 
 const PATHS = [
   "/",
   "/articles",
-  "/categories",
+  "/studie",
+  "/studie/nejnovejsi",
+  "/studie/archiv",
+  "/leky",
+  "/leky/novinky",
+  "/leky/schvalene",
+  "/leky/pipeline",
+  "/legislativa",
+  "/digital-health",
+  "/digital-health/novinky",
+  "/novinky",
+  "/novinky/univerzity",
+  "/newsletter",
+  "/newsletter/posledni",
+  "/medicina",
+  "/medicina/hry",
   "/odborne/briefy",
   "/odborne",
-  "/category/revmatologie",
-  "/category/kardiologie",
 ] as const;
 
 const TAGS = [
-  "medscope-ui-v20.1",
-  "medscope-ui-v20.0",
-  "medscope-ui-v19.9",
+  "medscope-ui-v22.4",
+  "medscope-ui-v22.3",
   "medscope-pages",
-  "v19-articles",
+  "v22-content",
   "v20-articles",
 ] as const;
 

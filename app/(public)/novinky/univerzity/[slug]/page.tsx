@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: item?.title ?? "Univerzitní novinky" };
 }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 120;
 
 export default async function UniversityNewsDetailPage({ params }: Props) {
   const { slug } = await params;

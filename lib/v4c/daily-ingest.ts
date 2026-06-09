@@ -2,6 +2,7 @@ import { fetchPubMedItems } from "@/lib/ingestion/pubmed";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { extractWithAi, placeholderImageUrl, slugifyV4c } from "@/lib/v4c/ai-extract";
 import { CZ_UNIVERSITIES, DRUG_AGENCIES, LEGISLATION_SOURCES } from "@/lib/v4c/sources";
+import { V22_DIGITAL_HEALTH_SOURCES } from "@/lib/v22/digital-health/sources";
 
 export async function runV4cDailyIngest() {
   const admin = createServiceRoleClient();
@@ -108,25 +109,43 @@ export async function runV4cDailyIngest() {
   }
   results.legislation = legAdded;
 
-  // Digital health
+  // Digital health — multi-source AI articles (CZ priority)
   let dhAdded = 0;
-  const dhTitle = "Digital health — denní přehled";
-  const dhAi = await extractWithAi("digital-health", {
-    title: dhTitle,
-    raw: "telemedicína, wearables, AI diagnostika",
-  });
-  const { error: dhErr } = await admin.from("digital_health_items").insert({
-    title: (dhAi.title as string) ?? dhTitle,
-    slug: slugifyV4c(dhTitle),
-    topic: (dhAi.topic as string) ?? "AI diagnostika",
-    summary: (dhAi.summary as string) ?? "Přehled digital health",
-    source_name: "MedScopeGlobal V4c",
-    image_url: placeholderImageUrl("digital-health"),
-    ai_metadata: dhAi,
-    published: true,
-    published_date: new Date().toISOString().slice(0, 10),
-  });
-  if (!dhErr) dhAdded++;
+  const dhSources = V22_DIGITAL_HEALTH_SOURCES.filter((s) => s.tier === "cz").slice(0, 4);
+  for (const src of dhSources) {
+    const topic = src.topics[0] ?? "eHealth";
+    const dhTitle = `${src.name} — ${topic}`;
+    const slug = slugifyV4c(`dh-${src.id}-${topic}`);
+    const { data: ex } = await admin.from("digital_health_items").select("id").eq("slug", slug).maybeSingle();
+    if (ex) continue;
+
+    const dhAi = await extractWithAi("digital-health", {
+      title: dhTitle,
+      raw: `Téma: ${topic}. Zdroje: ${src.name} ${src.url}. Kontext: telemedicína, NZIS, AI, eZdraví, regulace SÚKL.`,
+      sourceUrl: src.url,
+      sourceName: src.name,
+    });
+    const { error: dhErr } = await admin.from("digital_health_items").insert({
+      title: (dhAi.title as string) ?? dhTitle,
+      slug,
+      topic: (dhAi.topic as string) ?? topic,
+      summary: (dhAi.summary as string) ?? `Odborný přehled: ${topic}`,
+      body: [
+        dhAi.whatIsCs,
+        dhAi.trendsCs,
+        dhAi.clinicalImpactCs,
+      ]
+        .filter(Boolean)
+        .join("\n\n"),
+      source_url: src.url,
+      source_name: src.name,
+      image_url: placeholderImageUrl(`dh-${src.id}`),
+      ai_metadata: { ...dhAi, sources: dhAi.sources ?? [{ name: src.name, url: src.url, tier: src.tier }] },
+      published: true,
+      published_date: new Date().toISOString().slice(0, 10),
+    });
+    if (!dhErr) dhAdded++;
+  }
   results.digital_health = dhAdded;
 
   // University news

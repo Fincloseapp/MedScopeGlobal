@@ -154,6 +154,55 @@ export const V22_STUDY_GAMES: V22StudyGame[] = [
       },
     ],
   },
+  {
+    slug: "klinicke-obory",
+    title: "Klinické obory: základy",
+    topic: "Klinika",
+    description:
+      "Kvíz z interny, chirurgie a pediatrie — diferenciální diagnostika a základní postupy pro 3.–4. ročník.",
+    imageUrl: V21_MEDICAL_IMAGES.study,
+    updatedAt: "2026-06-03",
+    questions: [
+      {
+        id: "k1",
+        prompt: "U akutního infarktu myokardu je první linií reperfúze obvykle:",
+        options: ["Perkutánní koronární intervence", "Pouze antikoagulace", "Výhradně beta-blokátor", "Plazmaferéza"],
+        correctIndex: 0,
+        explanation: "PCI v časovém okně je standard reperfúze při STEMI dle současných guidelines.",
+      },
+      {
+        id: "k2",
+        prompt: "Klasická triáda appendicitidy zahrnuje:",
+        options: [
+          "Bolest v pravém podbřišku, nechutenství, nauzeu",
+          "Bolest v levém podbřišku, průjem, horečku",
+          "Žloutenku, ascites, splenomegalii",
+          "Kopřivku, angioedém, bronchospasmus",
+        ],
+        correctIndex: 0,
+        explanation: "Migrace bolesti, anorexie a nauzea jsou typické pro akutní appendicitidu.",
+      },
+      {
+        id: "k3",
+        prompt: "U dětské febrilní křeče je prioritou:",
+        options: [
+          "Okamžitá stabilizace dýchacích cest a prevence úrazu",
+          "Rutinní antiepileptika doživotně",
+          "Lumbální punkce u každého záchvatu",
+          "Pouze antipyretika bez sledování",
+        ],
+        correctIndex: 0,
+        explanation: "Febrilní křeče jsou většinou benigní — zajištění bezpečí a vyšetření příčiny horečky.",
+      },
+      {
+        id: "k4",
+        prompt: "Zlatým standardem diagnostiky pneumonie na rentgenu hrudníku je:",
+        options: ["Infiltrát na snímku + klinická prezentace", "Pouze leukocytóza", "EKG změny", "Urinální sediment"],
+        correctIndex: 0,
+        explanation: "Kombinace kliniky a zobrazování je základ; laboratorní markery doplňují obraz.",
+      },
+    ],
+  },
 ];
 
 export function getStudyGameBySlug(slug: string): V22StudyGame | null {

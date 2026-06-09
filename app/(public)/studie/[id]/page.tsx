@@ -6,8 +6,7 @@ import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { AdPlacement } from "@/components/ads/ad-placement";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 120;
 
 type Props = { params: Promise<{ id: string }> };
 

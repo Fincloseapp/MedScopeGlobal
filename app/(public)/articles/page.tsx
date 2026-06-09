@@ -6,8 +6,7 @@ import { getMedicalArticles } from "@/lib/queries/medicina";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({

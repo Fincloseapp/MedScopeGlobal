@@ -4,6 +4,9 @@ import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V4cContentCard } from "@/components/v4c/content-card";
 import { getDrugNewsList } from "@/lib/queries/v4c/drug-news";
 import { DRUG_AGENCIES } from "@/lib/v4c/sources";
+import { v21ImageForModule } from "@/lib/v21/images";
+
+export const revalidate = 120;
 
 export const metadata: Metadata = {
   title: "Lékové novinky",
@@ -18,12 +21,15 @@ export default async function LekyNovinkyPage() {
       eyebrow="Léky"
       title="Novinky o lécích"
       description="Monitoring EMA, FDA, SÚKL — registrace, SPC, úhrady, klinické studie."
-      ctaHref="/ai/leky"
-      ctaLabel="AI léky"
+      ctaHref="/leky"
+      ctaLabel="Přehled léků"
     >
-      <div className="flex gap-2 text-sm mb-6">
+      <div className="mb-6 flex gap-2 text-sm">
+        <Link href="/leky" prefetch className="rounded-full border border-primary/30 px-3 py-1 text-primary">
+          ← Hub léky
+        </Link>
         {["new", "approved", "pipeline"].map((st) => (
-          <span key={st} className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96] capitalize">
+          <span key={st} className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
             {st === "new" ? "Nové" : st === "approved" ? "Schválené" : "Připravované"}
           </span>
         ))}
@@ -37,6 +43,8 @@ export default async function LekyNovinkyPage() {
             meta={[d.agency, d.drug_name, d.published_date].filter(Boolean).join(" · ")}
             summary={d.summary}
             badge={d.status}
+            imageUrl={d.image_url ?? v21ImageForModule("drug", d.slug)}
+            imageAlt={d.drug_name ?? d.title}
           />
         ))}
       </div>

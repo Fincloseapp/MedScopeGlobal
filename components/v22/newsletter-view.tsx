@@ -9,7 +9,14 @@ export function V22NewsletterHub() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white">
         <div className="relative aspect-[21/9] min-h-[180px] bg-slate-100 sm:aspect-[3/1]">
-          <Image src={V22_NEWSLETTER_HERO} alt="" fill className="object-cover" sizes="100vw" priority />
+          <Image
+            src={V22_NEWSLETTER_HERO}
+            alt="Odborný medicínský newsletter MedScopeGlobal"
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+          />
           <div className="absolute inset-0 bg-gradient-to-r from-[#021d33]/90 via-[#021d33]/70 to-transparent" />
           <div className="absolute inset-0 flex flex-col justify-center px-6 py-8 sm:px-10">
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200">
@@ -54,7 +61,13 @@ export function V22NewsletterIssue({ issue }: { issue: NewsletterRow }) {
   return (
     <article className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
       <div className="relative aspect-[3/1] bg-slate-100">
-        <Image src={V22_NEWSLETTER_HERO} alt="" fill className="object-cover opacity-90" sizes="896px" />
+        <Image
+          src={V22_NEWSLETTER_HERO}
+          alt={issue.title}
+          fill
+          className="object-cover opacity-90"
+          sizes="896px"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-[#021d33]/80 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
           <p className="text-xs uppercase tracking-wider text-sky-200">Vydání</p>

@@ -7,7 +7,6 @@ export type NavItem = {
 };
 
 const menuCs: NavItem[] = [
-  { label: "Domů", href: "/" },
   { label: "Články", href: "/articles" },
   {
     label: "Pro koho",
@@ -48,7 +47,7 @@ const menuCs: NavItem[] = [
     children: [
       { label: "Studie", href: "/studie", description: "CZ, EU, SÚKL" },
       { label: "Odborné AI texty", href: "/odborne", description: "V4d — univerzity, kvalita, překlady" },
-      { label: "Léky", href: "/leky/novinky" },
+      { label: "Léky", href: "/leky" },
       { label: "Legislativa", href: "/legislativa" },
       { label: "Digitální zdravotnictví", href: "/digital-health" },
       { label: "Novinky", href: "/novinky" },
@@ -83,7 +82,6 @@ const menuCs: NavItem[] = [
 ];
 
 const menuEn: NavItem[] = [
-  { label: "Home", href: "/" },
   { label: "Articles", href: "/articles" },
   {
     label: "Audiences",
@@ -108,7 +106,7 @@ const menuEn: NavItem[] = [
     href: "/studie",
     children: [
       { label: "Studies", href: "/studie" },
-      { label: "Drugs", href: "/leky/novinky" },
+      { label: "Drugs", href: "/leky" },
       { label: "Legislation", href: "/legislativa" },
       { label: "Digital Health", href: "/digital-health" },
       { label: "News", href: "/novinky" },

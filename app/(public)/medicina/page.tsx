@@ -2,6 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { V21_STUDIUM_TOPICS } from "@/lib/v21/curated/medicina";
 
+export const revalidate = 120;
+
 export default function MedicinaHubPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">

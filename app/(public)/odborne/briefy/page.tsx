@@ -3,8 +3,7 @@ import { V19ArticleBriefFeedLazy } from "@/components/v19/article-brief-feed";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { V20_UI_VERSION } from "@/lib/v20/version";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({

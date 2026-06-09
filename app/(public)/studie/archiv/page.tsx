@@ -6,7 +6,7 @@ import { enrichStudy, isValidV20Study } from "@/lib/v20/studies/enrich";
 
 export const metadata: Metadata = { title: "Archiv studií" };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 120;
 
 export default async function StudieArchivPage() {
   const rows = await getStudiesList({ archived: true, limit: 50 });

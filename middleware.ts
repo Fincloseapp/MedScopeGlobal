@@ -8,6 +8,7 @@ import {
   normalizeLocale,
 } from "@/lib/i18n/config";
 import { detectLocaleFromAcceptLanguage } from "@/lib/i18n/detect-locale";
+import { getAdminGatePassword } from "@/lib/auth/admin-gate-config";
 
 export async function middleware(request: NextRequest) {
   const securityBlock = await applySecurityMiddleware(request);
@@ -41,7 +42,7 @@ export async function middleware(request: NextRequest) {
 
   if (request.nextUrl.pathname.startsWith("/admin") && !request.nextUrl.pathname.startsWith("/admin/login")) {
     const gate = request.cookies.get("ms_admin_gate")?.value;
-    if (gate !== "David3") {
+    if (gate !== getAdminGatePassword()) {
       const login = new URL("/admin/login", request.url);
       return NextResponse.redirect(login);
     }

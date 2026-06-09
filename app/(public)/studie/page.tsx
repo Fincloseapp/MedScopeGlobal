@@ -5,8 +5,7 @@ import { getV20StudiesList } from "@/lib/v20/studies/query";
 import { V20_STUDY_SOURCES } from "@/lib/v20/studies/sources";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({

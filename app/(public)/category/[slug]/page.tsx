@@ -10,8 +10,7 @@ import { getV20CategoryBySlug } from "@/lib/v20/categories";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { SITE } from "@/lib/config/site";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 120;
 
 const PAGE_SIZE = 9;
 

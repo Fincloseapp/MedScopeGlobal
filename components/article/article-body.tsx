@@ -18,19 +18,16 @@ export function ArticleBody({
             <Lock className="h-7 w-7" />
           </span>
           <div>
-            <p className="font-display text-xl font-semibold text-medical-navy">
-              MedScope VIP
-            </p>
+            <p className="font-display text-xl font-semibold text-medical-navy">MedScope VIP</p>
             <p className="mt-2 max-w-md text-sm text-muted-foreground">
-              This article is reserved for VIP subscribers. Upgrade for full
-              access, an ad-free reading experience, and priority clinical
-              alerts.
+              Tento článek je dostupný předplatitelům VIP. Získejte plný přístup, čtení bez reklam a
+              prioritní klinické alerty.
             </p>
           </div>
           <Button asChild>
             <Link href="/account">
               <Crown className="mr-2 h-4 w-4" />
-              View membership options
+              Možnosti předplatného
             </Link>
           </Button>
         </CardContent>

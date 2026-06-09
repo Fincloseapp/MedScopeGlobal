@@ -3,6 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { V22_STUDY_GAMES } from "@/lib/v22/games";
 
+export const revalidate = 120;
+
 export const metadata: Metadata = {
   title: "Studijní hry a kvízy",
   description: "Vzdělávací kvízy pro studenty medicíny — anatomie, fyziologie, patologie a přijímačky.",

@@ -13,7 +13,8 @@ const SYSTEM: Record<V4cModule, string> = {
     "Extrahuj revmatologické studie. Vrať JSON v češtině: titleCs, subtitle, summary, methodology, results, conclusion, clinicalImpact, keyPoints[], studyType (rct|meta-analysis|cohort|pilot|review), specialty, region, image_description, metadata.",
   leky: "Extrahuj novinku o léku. Vrať JSON: title, summary, drug_name, status (new|approved|pipeline), agency, image_description.",
   legislativa: "Shrň legislativní položku. Vrať JSON: title, summary, category, source, image_description.",
-  "digital-health": "Shrň digital health novinku. Vrať JSON: title, summary, topic, image_description.",
+  "digital-health":
+    "Vytvoř odborný článek o digitálním zdravotnictví v češtině. Vrať JSON: title, summary, topic, whatIsCs, trendsCs, risksCs, legislationCs, clinicalImpactCs, examplesCs, keyPointsCs[], image_description, sources[{name,url,tier}]. Použij zdroje MZČR, eZdraví, SÚKL, WHO, EMA, NIH. Profesionální styl magazínu.",
   novinky: "Shrň univerzitní/výzkumnou novinku. Vrať JSON: title, summary, university, tag, image_description.",
   newsletter: "Vytvoř newsletter sekce. Vrať JSON: title, sections[], pdf_text_outline, layout_notes.",
 };

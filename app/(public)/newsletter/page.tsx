@@ -3,6 +3,8 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V22NewsletterHub } from "@/components/v22/newsletter-view";
 
+export const revalidate = 120;
+
 export const metadata: Metadata = {
   title: "Newsletter",
   description: "Odborný medicínský newsletter 2× měsíčně v češtině.",
