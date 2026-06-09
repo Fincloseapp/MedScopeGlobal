@@ -1,3 +1,4 @@
+import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { Newspaper, Tags, Megaphone, Crown } from "lucide-react";
 import {
   Card,
@@ -56,6 +57,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-8">
+      <MedScopeLogo href="/admin" width={160} height={40} className="mb-2" />
       <div>
         <h1 className="font-display text-3xl font-bold text-medical-navy">
           Operations overview

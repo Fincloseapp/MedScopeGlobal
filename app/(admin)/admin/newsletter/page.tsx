@@ -14,7 +14,7 @@ export default async function AdminNewsletterPage() {
     <div className="space-y-6">
       <div>
         <MedScopeLogo href="/admin/newsletter" width={160} height={40} className="mb-3" imageClassName="max-h-10" />
-        <h1 className="font-display text-2xl font-bold text-[#021d33]">Newsletter engine v23.1.7</h1>
+        <h1 className="font-display text-2xl font-bold text-[#021d33]">Newsletter engine v23.1.9</h1>
         <p className="mt-1 text-sm text-slate-600">
           Profesionální český obsah, reálné zdroje a náhled příštího vydání.
         </p>

@@ -108,6 +108,7 @@ function NewsletterItemCard({
             className="object-cover"
             sizes="(max-width: 640px) 100vw, 320px"
             loading="lazy"
+            unoptimized={img.isLocal}
           />
         </div>
       ) : null}

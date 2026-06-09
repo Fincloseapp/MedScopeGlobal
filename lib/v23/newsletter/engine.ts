@@ -82,7 +82,7 @@ function finalizeLayout(layout: V23NewsletterLayout, issueDate: string): V23News
   const withImages = ensureLayoutImages(layout, issueDate);
   return {
     ...withImages,
-    version: "v23.1.7",
+    version: "v23.1.9",
     headline: normalizeNewsletterHeadline(issueDate, withImages.headline),
   };
 }

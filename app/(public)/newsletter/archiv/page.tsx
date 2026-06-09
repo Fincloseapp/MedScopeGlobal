@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { getNewsletterArchive } from "@/lib/queries/v4c/newsletters";
 
@@ -14,9 +13,6 @@ export default async function NewsletterArchivPage() {
       title="Archiv vydání"
       description="Všechna publikovaná vydání odborného přehledu MedScopeGlobal."
     >
-      <div className="mb-6">
-        <MedScopeLogo href="/" width={160} height={40} imageClassName="max-h-10" />
-      </div>
       <ul className="space-y-3">
         {issues.length === 0 ? (
           <li className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-600">

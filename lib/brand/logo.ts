@@ -1,20 +1,29 @@
+import { LOGO_FILES } from "@/lib/brand/logo-paths.generated";
+
 /**
- * Oficiální logo MedScopeGlobal — zdroj na disku D:
- *   D:\MedScopeGlobal\logo\Logo1_1781011732671.jpeg  → Logo_Transparent.png (PNG)
- *   D:\MedScopeGlobal\logo\Logo2_1781012016912.jpg   → Logo_Print.jpg
- *   D:\MedScopeGlobal\logo\Logo4_1781012021235.jpg   → Logo_Negative.jpg
+ * Oficiální logo MedScopeGlobal
  *
- * V projektu: public/assets/logo/
+ * Zdroj na disku D: D:\MedScopeGlobal\logo\
+ *   Logo_Transparent.png | Logo_Print.png | Logo_Negative.png
+ *   (fallback: Logo1_*, Logo2_*, Logo4_*)
+ *
+ * Sync: node scripts/sync-logos-from-d.mjs
+ * Cíl v projektu: public/assets/logo/
  */
+export const MEDSCOPE_LOGO_SOURCE_DIR = "D:\\MedScopeGlobal\\logo";
+
 export const MEDSCOPE_LOGO = {
-  /** Hlavní logo — světlé pozadí (header, footer, newsletter, admin) */
-  transparent: "/assets/logo/Logo_Transparent.png",
-  /** Tisk / PDF exporty */
-  print: "/assets/logo/Logo_Print.jpg",
-  /** Dark mode (header, footer, admin, newsletter) */
-  negative: "/assets/logo/Logo_Negative.jpg",
+  transparent: `/assets/logo/${LOGO_FILES.transparent}`,
+  print: `/assets/logo/${LOGO_FILES.print}`,
+  negative: `/assets/logo/${LOGO_FILES.negative}`,
 } as const;
 
 export type MedScopeLogoVariant = keyof typeof MEDSCOPE_LOGO;
 
 export const MEDSCOPE_LOGO_ALT = "MedScopeGlobal — odborný medicínský magazín";
+
+export const MEDSCOPE_LOGO_CANONICAL_NAMES = [
+  "Logo_Transparent.png",
+  "Logo_Print.png",
+  "Logo_Negative.png",
+] as const;
