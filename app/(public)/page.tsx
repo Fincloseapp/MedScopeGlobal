@@ -9,9 +9,8 @@ import { V20HomeHero } from "@/components/v20/home-hero";
 import { V20StudiesHomeSection } from "@/components/v20/studies-home-section";
 import { V21HomepageSections } from "@/components/v21/homepage-sections";
 import { Button } from "@/components/ui/button";
-import { getActiveAdsByPlacement } from "@/lib/queries/ads";
-import { getLatestArticles } from "@/lib/queries/articles";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { getHomepageCachedData } from "@/lib/v22/homepage-cache";
 
 export const revalidate = 120;
 
@@ -26,12 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomePage() {
   const locale = "cs" as const;
-  const [articles, topAds, midAds, bottomAds] = await Promise.all([
-    getLatestArticles(6, 0, false, "public", locale),
-    getActiveAdsByPlacement("homepage_top", 1),
-    getActiveAdsByPlacement("homepage_mid", 1),
-    getActiveAdsByPlacement("homepage_bottom", 1),
-  ]);
+  const { articles, topAds, midAds, bottomAds } = await getHomepageCachedData();
 
   return (
     <div className="v20-home bg-background">
