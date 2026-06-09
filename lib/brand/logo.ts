@@ -1,16 +1,17 @@
 import { LOGO_FILES } from "@/lib/brand/logo-paths.generated";
+import {
+  LOGO_DEST_DIR,
+  LOGO_MAPPING,
+  LOGO_SOURCE_DIR,
+  LOGO_SYNC_COMMAND,
+} from "@/lib/brand/brand-system";
 
 /**
- * Oficiální logo MedScopeGlobal
- *
- * Zdroj na disku D: D:\MedScopeGlobal\logo\
- *   Logo_Transparent.png | Logo_Print.png | Logo_Negative.png
- *   (fallback: Logo1_*, Logo2_*, Logo4_*)
- *
- * Sync: node scripts/sync-logos-from-d.mjs
- * Cíl v projektu: public/assets/logo/
+ * Oficiální logo MedScopeGlobal — runtime cesty (v23.2.0)
+ * Sync: node scripts/sync-logos.mjs | Admin: /admin/brand
  */
-export const MEDSCOPE_LOGO_SOURCE_DIR = "D:\\MedScopeGlobal\\logo";
+export const MEDSCOPE_LOGO_SOURCE_DIR = LOGO_SOURCE_DIR;
+export { LOGO_MAPPING, LOGO_DEST_DIR, LOGO_SYNC_COMMAND };
 
 export const MEDSCOPE_LOGO = {
   transparent: `/assets/logo/${LOGO_FILES.transparent}`,
