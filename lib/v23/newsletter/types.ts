@@ -26,7 +26,7 @@ export type V23NewsletterSourcesSnapshot = {
 };
 
 export type V23NewsletterLayout = {
-  version: "v23.1" | "v23.1.1" | "v23.1.2" | "v23.1.3";
+  version: "v23.1" | "v23.1.1" | "v23.1.2" | "v23.1.3" | "v23.1.7";
   heroImageUrl: string;
   heroImageAlt: string;
   headline: string;

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { AdminMobileNav } from "@/components/admin/admin-mobile-nav";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { isAdminGateOpen } from "@/lib/auth/admin-gate";
@@ -24,7 +25,7 @@ export default async function AdminLayout({
         <header className="flex h-14 items-center justify-between gap-3 border-b bg-white px-4 lg:hidden">
           <div className="flex items-center gap-2">
             <AdminMobileNav />
-            <span className="font-semibold text-medical-navy">Admin</span>
+            <MedScopeLogo href="/admin" width={120} height={30} imageClassName="max-h-8" />
           </div>
           <Button variant="outline" size="sm" asChild>
             <Link href="/">View site</Link>

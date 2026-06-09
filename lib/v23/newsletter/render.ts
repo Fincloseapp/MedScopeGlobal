@@ -1,3 +1,4 @@
+import { MEDSCOPE_LOGO } from "@/lib/brand/logo";
 import type { V23NewsletterLayout } from "@/lib/v23/newsletter/types";
 
 function escapeHtml(s: string): string {
@@ -42,6 +43,7 @@ export function renderNewsletterHtml(layout: V23NewsletterLayout): string {
 
   return `
 <article class="v23-newsletter-html">
+  <header class="nl-brand"><img src="${MEDSCOPE_LOGO.print}" alt="MedScopeGlobal" width="180" height="44" /></header>
   <p class="nl-lead">${escapeHtml(layout.intro)}</p>
   ${sectionsHtml}
   <section class="nl-section nl-cta">

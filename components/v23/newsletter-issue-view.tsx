@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { NewsletterRow } from "@/lib/queries/v4c/newsletters";
+import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import {
   ensureLayoutImages,
-  itemImageAlt,
-  itemImageUrl,
+  resolveNewsletterItemImage,
   sectionImageUrl,
   V23_ITEM_IMAGE_SECTIONS,
 } from "@/lib/v23/newsletter/images";
@@ -19,14 +19,15 @@ function resolveItemImage(
   sectionTitle: string,
   item: V23NewsletterSection["items"][number],
   index: number
-): { url: string; alt: string } | null {
+): { url: string; alt: string; isLocal: boolean } | null {
   if (!V23_ITEM_IMAGE_SECTIONS.has(sectionId)) return null;
-  const url =
-    item.imageUrl?.startsWith("http") ? item.imageUrl : itemImageUrl(sectionId, item.title, index);
-  return {
-    url,
-    alt: item.imageAlt ?? itemImageAlt(sectionTitle, item.title),
-  };
+  return resolveNewsletterItemImage({
+    sectionId,
+    sectionTitle,
+    itemTitle: item.title,
+    existingUrl: item.imageUrl,
+    index,
+  });
 }
 
 function resolveSectionImage(
@@ -145,8 +146,11 @@ export function V23NewsletterIssueView({ issue }: { issue: NewsletterRow }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#021d33]/90 via-[#021d33]/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-6 text-white sm:p-8">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200">MedScopeGlobal Newsletter</p>
-          <p className="mt-2 font-display text-2xl font-bold sm:text-3xl">{dateLabel}</p>
+          <MedScopeLogo href="" variant="negative" width={180} height={44} imageClassName="max-h-11 brightness-110" />
+          <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200">
+            MedScopeGlobal Newsletter
+          </p>
+          <p className="mt-1 font-display text-2xl font-bold sm:text-3xl">{dateLabel}</p>
         </div>
       </div>
 

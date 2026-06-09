@@ -150,7 +150,7 @@ export function buildNewsletterLayout(
   const headline = newsletterHeadline(issueDate);
 
   return {
-    version: "v23.1.3",
+    version: "v23.1.7",
     heroImageUrl: heroNewsletterImage(issueDate),
     heroImageAlt: "MedScopeGlobal Newsletter — odborný medicínský přehled",
     headline,

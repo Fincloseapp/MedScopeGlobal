@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu } from "lucide-react";
+import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { ADMIN_NAV_ITEMS } from "@/components/admin/admin-nav-config";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,9 +34,8 @@ export function AdminMobileNav() {
       </SheetTrigger>
       <SheetContent side="left" className="w-72">
         <SheetHeader>
-          <SheetTitle className="font-display text-left text-medical-navy">
-            MedScope Admin
-          </SheetTitle>
+          <MedScopeLogo href="/admin" width={140} height={34} className="mb-2" imageClassName="max-h-8" />
+          <SheetTitle className="font-display text-left text-medical-navy">Admin</SheetTitle>
         </SheetHeader>
         <nav className="mt-8 space-y-1">
           {ADMIN_NAV_ITEMS.map((link) => {

@@ -1,3 +1,4 @@
+import { MEDSCOPE_LOGO } from "@/lib/brand/logo";
 import { SITE } from "@/lib/config/site";
 
 export function organizationJsonLd() {
@@ -8,7 +9,7 @@ export function organizationJsonLd() {
     url: SITE.url,
     description: SITE.description,
     email: SITE.supportEmail,
-    logo: `${SITE.url}/og-default.png`,
+    logo: `${SITE.url}${MEDSCOPE_LOGO.transparent}`,
     contactPoint: [
       {
         "@type": "ContactPoint",

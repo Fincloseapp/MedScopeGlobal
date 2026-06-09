@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { NewsletterRow } from "@/lib/queries/v4c/newsletters";
+import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { V22_NEWSLETTER_HERO } from "@/lib/v22/newsletter";
 import { Button } from "@/components/ui/button";
 
@@ -19,8 +20,9 @@ export function V22NewsletterHub() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#021d33]/90 via-[#021d33]/70 to-transparent" />
           <div className="absolute inset-0 flex flex-col justify-center px-6 py-8 sm:px-10">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200">
-              Odborný newsletter
+            <MedScopeLogo href="/newsletter" variant="negative" width={160} height={40} imageClassName="max-h-10 brightness-110" />
+            <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200">
+              MedScopeGlobal Newsletter
             </p>
             <h2 className="mt-2 max-w-xl font-display text-2xl font-bold text-white sm:text-3xl">
               Medicínský přehled týdně
