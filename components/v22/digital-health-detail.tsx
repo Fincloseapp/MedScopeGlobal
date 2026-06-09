@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ExternalLink, Calendar } from "lucide-react";
 import type { V22DigitalHealthArticle } from "@/lib/v22/digital-health/types";
 import { TIER_LABELS } from "@/lib/v22/digital-health/sources";
+import { V23TakeawaysBox } from "@/components/v23/takeaways-box";
 
 export function V22DigitalHealthDetail({ article }: { article: V22DigitalHealthArticle }) {
   const sections = [
@@ -54,18 +55,7 @@ export function V22DigitalHealthDetail({ article }: { article: V22DigitalHealthA
         />
       </div>
 
-      {article.keyPointsCs.length > 0 && (
-        <ul className="mt-6 flex flex-wrap gap-2">
-          {article.keyPointsCs.map((kp) => (
-            <li
-              key={kp}
-              className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
-            >
-              {kp}
-            </li>
-          ))}
-        </ul>
-      )}
+      <V23TakeawaysBox points={article.keyPointsCs} />
 
       <div className="mt-8 space-y-8">
         {sections.map((s) => (

@@ -1,24 +1,29 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AudienceHub } from "@/components/home/audience-hub";
 import { HomepageAds } from "@/components/home/homepage-ads";
 import { HomepageAutomation } from "@/components/home/homepage-automation";
 import { V19ArticleBriefFeedLazy } from "@/components/v19/article-brief-feed";
 import { V20ArticleCard } from "@/components/v20/article-card";
-import { V20HomeHero } from "@/components/v20/home-hero";
 import { V20StudiesHomeSection } from "@/components/v20/studies-home-section";
 import { V21HomepageSections } from "@/components/v21/homepage-sections";
+import { V23AudiencePriorities } from "@/components/v23/audience-priorities";
+import { V23HomeHero } from "@/components/v23/home-hero";
+import { V23NewsletterCta } from "@/components/v23/newsletter-cta";
+import { V23PersonalizedFeed } from "@/components/v23/personalized-feed";
 import { Button } from "@/components/ui/button";
+import { JsonLdScript } from "@/components/seo/json-ld-script";
+import { medicalWebPageJsonLd, webSiteJsonLd } from "@/lib/seo/json-ld";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { getHomepageCachedData } from "@/lib/v22/homepage-cache";
+import { V23_VALUE_PROPOSITION } from "@/lib/v23/homepage";
 
 export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({
-    title: "MedScopeGlobal — Odborný medicínský portál",
+    title: "MedScopeGlobal — Odborný zdravotnický magazín",
     description:
-      "Český odborný medicínský magazín pro lékaře, studenty a pacienty. Evidence-based obsah a profesionální briefy.",
+      "Studie, léky, legislativa a digitální zdravotnictví v češtině. Evidence-based magazín pro lékaře, studenty LF a odbornou veřejnost. Klinický dopad, PubMed, SÚKL, EMA.",
     path: "/",
   });
 }
@@ -27,13 +32,24 @@ export default async function HomePage() {
   const locale = "cs" as const;
   const { articles, topAds, midAds, bottomAds } = await getHomepageCachedData();
 
+  const homeLd = medicalWebPageJsonLd({
+    title: V23_VALUE_PROPOSITION.title,
+    description: V23_VALUE_PROPOSITION.subtitle,
+    path: "/",
+  });
+
   return (
-    <div className="v20-home bg-background">
-      <V20HomeHero />
+    <div className="v23-home bg-background">
+      <JsonLdScript data={webSiteJsonLd()} />
+      <JsonLdScript data={homeLd} />
+
+      <V23HomeHero />
 
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
 
-      <AudienceHub locale={locale} />
+      <V23AudiencePriorities />
+
+      <V23PersonalizedFeed />
 
       <V19ArticleBriefFeedLazy title="Odborné medicínské briefy" limit={4} locale="cs" />
 
@@ -46,11 +62,11 @@ export default async function HomePage() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-                Nejnovější články
+                Doporučené články
               </p>
-              <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">Články</h2>
+              <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">Nejnovější články</h2>
               <p className="mt-2 max-w-2xl text-sm text-slate-600">
-                Aktuální odborný obsah seřazený od nejnovějších.
+                Odborný obsah s českým shrnutím a strukturou pro rychlou orientaci v praxi.
               </p>
             </div>
             <Link href="/articles" prefetch className="text-sm font-medium text-primary hover:underline">
@@ -70,6 +86,8 @@ export default async function HomePage() {
 
       <V20StudiesHomeSection />
 
+      <V23NewsletterCta />
+
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <div className="rounded-3xl border border-primary/10 bg-gradient-to-b from-[#0A3D5C] to-[#004874] px-6 py-8 text-white">
           <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
@@ -78,10 +96,11 @@ export default async function HomePage() {
                 Studium medicíny
               </p>
               <h2 className="mt-2 font-display text-3xl font-semibold">
-                Příprava na LF, anatomie, fyziologie a klinické obory
+                Kvízy, studijní plány a příprava na přijímačky
               </h2>
               <p className="mt-3 max-w-2xl text-sm text-white/85">
-                Samostatná větev pro budoucí a současné studenty medicíny — kvízy, hry a studijní tipy.
+                Anatomie, fyziologie, patologie a klinické obory — interaktivní procvičení a týdenní
+                harmonogramy pro studenty LF.
               </p>
             </div>
             <div className="flex flex-wrap gap-3 lg:justify-end">
@@ -91,8 +110,13 @@ export default async function HomePage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-full border-white/40 text-white hover:bg-white/10">
+                <Link href="/medicina/plany" prefetch>
+                  Studijní plány
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="rounded-full border-white/40 text-white hover:bg-white/10">
                 <Link href="/medicina/studium" prefetch>
-                  Studium medicíny
+                  Přehled oborů
                 </Link>
               </Button>
             </div>

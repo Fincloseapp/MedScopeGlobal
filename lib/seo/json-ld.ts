@@ -151,6 +151,45 @@ export function newsletterJsonLd() {
   };
 }
 
+export function medicalWebPageJsonLd(page: {
+  title: string;
+  description: string;
+  path: string;
+  dateModified?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "MedicalWebPage",
+    name: page.title,
+    description: page.description,
+    url: `${SITE.url}${page.path}`,
+    inLanguage: "cs-CZ",
+    isPartOf: webSiteJsonLd(),
+    dateModified: page.dateModified,
+    publisher: organizationJsonLd(),
+    audience: {
+      "@type": "MedicalAudience",
+      audienceType: "Physician, MedicalStudent, Researcher",
+    },
+  };
+}
+
+export function webSiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE.name,
+    url: SITE.url,
+    description: SITE.description,
+    inLanguage: "cs-CZ",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${SITE.url}/articles?q={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
+  };
+}
+
 export function breadcrumbJsonLd(items: { name: string; href?: string }[]) {
   return {
     "@context": "https://schema.org",

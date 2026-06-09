@@ -3,7 +3,9 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import type { V20StudyDisplay } from "@/lib/v20/studies/types";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
+import { V23TakeawaysBox } from "@/components/v23/takeaways-box";
 import { SITE } from "@/lib/config/site";
+import { medicalWebPageJsonLd } from "@/lib/seo/json-ld";
 
 export function V20StudyDetailView({ study }: { study: V20StudyDisplay }) {
   const jsonLd = {
@@ -33,9 +35,17 @@ export function V20StudyDetailView({ study }: { study: V20StudyDisplay }) {
     { title: "Klinický dopad", body: study.clinicalImpactCs },
   ];
 
+  const webPageLd = medicalWebPageJsonLd({
+    title: study.titleCs,
+    description: study.summaryCs.slice(0, 200),
+    path: `/studie/${study.slug}`,
+    dateModified: study.publishedDate,
+  });
+
   return (
     <article className="v20-study-detail">
       <JsonLdScript data={jsonLd} />
+      <JsonLdScript data={webPageLd} />
       <Link href="/studie" className="text-sm font-medium text-primary hover:underline">
         ← Zpět na studie
       </Link>
@@ -64,16 +74,7 @@ export function V20StudyDetailView({ study }: { study: V20StudyDisplay }) {
         />
       </div>
 
-      <ul className="mt-6 flex flex-wrap gap-2">
-        {study.keyPointsCs.map((point) => (
-          <li
-            key={point.slice(0, 30)}
-            className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700"
-          >
-            {point}
-          </li>
-        ))}
-      </ul>
+      <V23TakeawaysBox points={study.keyPointsCs} />
 
       <div className="mt-8 space-y-8">
         {sections.map((sec) => (

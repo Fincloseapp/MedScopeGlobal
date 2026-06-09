@@ -30,7 +30,7 @@ try {
 
 
 
-const CACHE_TAGS = "medscope-ui-v22.4,medscope-pages,v22-content";
+const CACHE_TAGS = "medscope-ui-v23.0,medscope-pages,v23-content";
 
 
 

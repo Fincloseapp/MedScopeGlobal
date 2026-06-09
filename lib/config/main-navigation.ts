@@ -38,6 +38,7 @@ const menuCs: NavItem[] = [
       { label: "Studium 1.–6. ročník", href: "/medicina/studium" },
       { label: "Anatomie a fyziologie", href: "/medicina/studium?obor=anatomie" },
       { label: "Kvízy a hry", href: "/medicina/hry" },
+      { label: "Studijní plány", href: "/medicina/plany" },
     ],
   },
   { label: "Sekce", href: "/sections" },

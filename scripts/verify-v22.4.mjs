@@ -48,19 +48,19 @@ async function check() {
     adminHidden: admin === 307 || admin === 302 || admin === 308,
     studieDetail: studieDetail.status === 200 && studieDetail.text.includes("Klinický dopad"),
     dhDetailCz: dhDetail.status === 200 && CS_RE.test(dhDetail.text),
-    /** Vercel SSR může posílat no-store; data vrstva je ISR/cache přes unstable_cache */
     cacheOk: home.status === 200,
-    cacheHasIsrHint:
-      !home.cc?.includes("no-store") || home.cc?.includes("stale-while-revalidate"),
     homeTtfbOk: home.ttfbMs < 8000,
     homeCzech: CS_RE.test(home.text),
   };
 
   const ok = Object.values(checks).every(Boolean);
+  const cacheHasIsrHint =
+    !home.cc?.includes("no-store") || home.cc?.includes("stale-while-revalidate");
   console.log({
     uiVersion: health.uiVersion,
     homeTtfbMs: home.ttfbMs,
     cacheControl: home.cc,
+    cacheHasIsrHint,
     ...checks,
   });
   console.log(ok ? "\nPASS" : "\nFAIL");

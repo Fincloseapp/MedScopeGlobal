@@ -1,5 +1,7 @@
 import { getLatestNewsletter, type NewsletterRow } from "@/lib/queries/v4c/newsletters";
-import { V21_MEDICAL_IMAGES } from "@/lib/v21/images";
+import { V23_NEWSLETTER_IMAGE } from "@/lib/v23/images";
+
+export const V22_NEWSLETTER_HERO = V23_NEWSLETTER_IMAGE;
 
 export const V22_FALLBACK_NEWSLETTER: NewsletterRow = {
   id: "curated-newsletter-2026-06",
@@ -33,5 +35,3 @@ export async function getV22LatestNewsletter(): Promise<NewsletterRow> {
   const db = await getLatestNewsletter();
   return db ?? V22_FALLBACK_NEWSLETTER;
 }
-
-export const V22_NEWSLETTER_HERO = V21_MEDICAL_IMAGES.hero;

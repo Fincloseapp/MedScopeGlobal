@@ -24,11 +24,13 @@ const PATHS = [
   "/newsletter/posledni",
   "/medicina",
   "/medicina/hry",
+  "/medicina/plany",
   "/odborne/briefy",
   "/odborne",
 ] as const;
 
 const TAGS = [
+  "medscope-ui-v23.0",
   "medscope-ui-v22.4",
   "medscope-ui-v22.3",
   "medscope-pages",
