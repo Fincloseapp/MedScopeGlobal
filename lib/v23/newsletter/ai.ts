@@ -1,108 +1,72 @@
 import { generateJsonFromLlm, isLlmConfigured } from "@/lib/ai/chat-json";
+import { buildNewsletterLayout, type LayoutPolish } from "@/lib/v23/newsletter/build-layout";
 import type { V23NewsletterSources } from "@/lib/v23/newsletter/sources";
 import type { V23NewsletterLayout } from "@/lib/v23/newsletter/types";
-import { attachSectionImages, heroNewsletterImage } from "@/lib/v23/newsletter/images";
+import { isJsonLikeText, sanitizeNewsletterText } from "@/lib/v23/newsletter/sanitize";
 
-type AiNewsletterResponse = {
+type AiPolishResponse = {
   headline?: string;
   intro?: string;
-  sections?: { id: string; title: string; intro: string; items: { title: string; summary: string; href?: string }[] }[];
-  recommended?: { title: string; summary: string; href?: string }[];
+  sectionIntros?: Record<string, string>;
+  topicSummaries?: Record<string, string>;
 };
 
-function fallbackLayout(sources: V23NewsletterSources, issueDate: string): V23NewsletterLayout {
-  const sections = attachSectionImages([
-    { id: "studie", title: "Nejnovější studie", intro: "Klinický výzkum v češtině.", items: sources.studies },
-    { id: "clanky", title: "Nejnovější články", intro: "Odborné články z redakce MedScope.", items: sources.articles },
-    { id: "legislativa", title: "Legislativa", intro: "Regulace a metodiky pro praxi.", items: sources.legislation },
-    { id: "digital-health", title: "Digitální zdravotnictví", intro: "eHealth, AI a telemedicína.", items: sources.digitalHealth },
-    { id: "leky", title: "Léky", intro: "Novinky z EMA, FDA a SÚKL.", items: sources.drugs },
-    { id: "univerzity", title: "Novinky z univerzit", intro: "Výzkum a vzdělávání.", items: sources.universities },
-    {
-      id: "doporucujeme",
-      title: "Doporučujeme",
-      intro: "Kurátorský výběr týdne.",
-      items: [...sources.studies.slice(0, 1), ...sources.articles.slice(0, 1)],
-    },
-  ]);
-
-  if (sources.pendingTopics.length) {
-    sections.push(
-      attachSectionImages([
-        {
-          id: "doporucujeme",
-          title: "Témata od redakce",
-          intro: "Ručně zadaná témata zapracovaná do přehledu.",
-          items: sources.pendingTopics.map((t) => ({ title: t, summary: "Odborný komentář a souvislosti v plném vydání." })),
-        },
-      ])[0]!
-    );
+function cleanPolish(raw: AiPolishResponse): LayoutPolish {
+  const polish: LayoutPolish = {};
+  if (raw.headline && !isJsonLikeText(raw.headline)) {
+    polish.headline = sanitizeNewsletterText(raw.headline);
   }
-
-  return {
-    version: "v23.1",
-    heroImageUrl: heroNewsletterImage(issueDate),
-    heroImageAlt: "MedScopeGlobal odborný medicínský newsletter",
-    headline: `MedScope Odborný přehled — ${issueDate}`,
-    intro:
-      "Týdenní souhrn evidence-based medicíny pro českou klinickou praxi, výzkum a studium. Obsah vychází z ověřených zdrojů PubMed, SÚKL, MZČR a partnerských portálů.",
-    sections,
-    recommended: sources.studies.slice(0, 2),
-    manualTopics: sources.pendingTopics,
-    generatedAt: new Date().toISOString(),
-  };
+  if (raw.intro && !isJsonLikeText(raw.intro)) {
+    polish.intro = sanitizeNewsletterText(raw.intro);
+  }
+  if (raw.sectionIntros && typeof raw.sectionIntros === "object") {
+    polish.sectionIntros = {};
+    for (const [k, v] of Object.entries(raw.sectionIntros)) {
+      if (typeof v === "string" && !isJsonLikeText(v)) {
+        polish.sectionIntros[k] = sanitizeNewsletterText(v);
+      }
+    }
+  }
+  if (raw.topicSummaries && typeof raw.topicSummaries === "object") {
+    polish.topicSummaries = {};
+    for (const [k, v] of Object.entries(raw.topicSummaries)) {
+      if (typeof v === "string" && !isJsonLikeText(v)) {
+        polish.topicSummaries[k] = sanitizeNewsletterText(v);
+      }
+    }
+  }
+  return polish;
 }
 
 export async function generateNewsletterLayoutWithAi(
   sources: V23NewsletterSources,
   issueDate: string
 ): Promise<V23NewsletterLayout> {
-  if (!isLlmConfigured()) return fallbackLayout(sources, issueDate);
+  const base = buildNewsletterLayout(sources, issueDate);
+
+  if (!isLlmConfigured()) return base;
+
+  const titlesPreview = {
+    studies: sources.studies.map((s) => s.title),
+    articles: sources.articles.map((a) => a.title),
+    manualTopics: sources.pendingTopics,
+  };
 
   const system = `Jsi editor českého odborného medicínského newsletteru MedScopeGlobal.
-Vrať JSON: headline, intro (2-3 věty), sections[{id, title, intro, items[{title, summary, href}]}], recommended[{title, summary, href}].
-Sekce id musí být: studie, clanky, legislativa, digital-health, leky, univerzity, doporucujeme.
-Profesionální styl magazínu, čeština, bez anglicismů. Zachovej href z vstupních dat.`;
+Vrať POUZE JSON objekt s klíči: headline (string), intro (string, 2-3 věty), sectionIntros (objekt id→text), topicSummaries (objekt téma→krátké shrnutí).
+NEVRACEJ seznam článků, studií ani položek — pouze texty úvodů.
+Čeština, profesionální medicínský styl, bez anglicismů a bez JSON v hodnotách.
+Povolená id sekcí v sectionIntros: studie, clanky, legislativa, digital-health, leky, univerzity, doporucujeme.`;
 
-  const user = JSON.stringify({ issueDate, manualTopics: sources.pendingTopics, sources }).slice(0, 12000);
+  const user = `Datum vydání: ${issueDate}\nTémata k zapracování: ${sources.pendingTopics.join("; ") || "žádná"}\nNáhled titulků: ${JSON.stringify(titlesPreview)}`;
 
   try {
-    const raw = await generateJsonFromLlm({ system, user, maxTokens: 2000 });
-    if (!raw) return fallbackLayout(sources, issueDate);
-    const ai = JSON.parse(raw) as AiNewsletterResponse;
-
-    const merged = (ai.sections ?? []).map((s) => {
-      const sourceMap: Record<string, V23NewsletterSources[keyof V23NewsletterSources]> = {
-        studie: sources.studies,
-        clanky: sources.articles,
-        legislativa: sources.legislation,
-        "digital-health": sources.digitalHealth,
-        leky: sources.drugs,
-        univerzity: sources.universities,
-      };
-      const fallbackItems = Array.isArray(sourceMap[s.id]) ? (sourceMap[s.id] as { title: string; summary: string; href?: string }[]) : [];
-      return {
-        id: s.id,
-        title: s.title,
-        intro: s.intro,
-        items: (s.items?.length ? s.items : fallbackItems).slice(0, 4),
-      };
-    });
-
-    if (!merged.length) return fallbackLayout(sources, issueDate);
-
-    return {
-      version: "v23.1",
-      heroImageUrl: heroNewsletterImage(issueDate),
-      heroImageAlt: "MedScopeGlobal odborný medicínský newsletter",
-      headline: ai.headline ?? `MedScope Odborný přehled — ${issueDate}`,
-      intro: ai.intro ?? fallbackLayout(sources, issueDate).intro,
-      sections: attachSectionImages(merged),
-      recommended: ai.recommended?.length ? ai.recommended : sources.studies.slice(0, 2),
-      manualTopics: sources.pendingTopics,
-      generatedAt: new Date().toISOString(),
-    };
+    const raw = await generateJsonFromLlm({ system, user, maxTokens: 900 });
+    if (!raw || isJsonLikeText(raw)) return base;
+    const parsed = JSON.parse(raw) as AiPolishResponse;
+    const polish = cleanPolish(parsed);
+    return buildNewsletterLayout(sources, issueDate, polish);
   } catch {
-    return fallbackLayout(sources, issueDate);
+    return base;
   }
 }

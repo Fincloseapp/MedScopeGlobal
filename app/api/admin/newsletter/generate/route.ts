@@ -17,13 +17,14 @@ export async function POST(request: Request) {
     const admin = createServiceRoleClient();
     const { data: draft } = await admin.from("newsletters").select("*").eq("id", result.id).maybeSingle();
 
+    revalidatePath("/admin/newsletter");
     revalidatePath("/newsletter");
     revalidatePath("/newsletter/posledni");
     revalidatePath("/newsletter/archiv");
     revalidatePath(`/newsletter/${result.slug}`);
     revalidatePath("/");
 
-    return NextResponse.json({ ok: true, slug: result.slug, draft });
+    return NextResponse.json({ ok: true, slug: result.slug, draft, sources: result.sources });
   } catch (e) {
     return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });
   }

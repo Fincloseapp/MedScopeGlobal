@@ -13,8 +13,18 @@ export type V23NewsletterSection = {
   items: V23NewsletterItem[];
 };
 
+export type V23NewsletterSourcesSnapshot = {
+  studies: number;
+  articles: number;
+  legislation: number;
+  digitalHealth: number;
+  drugs: number;
+  universities: number;
+  pendingTopics: number;
+};
+
 export type V23NewsletterLayout = {
-  version: "v23.1";
+  version: "v23.1" | "v23.1.1";
   heroImageUrl: string;
   heroImageAlt: string;
   headline: string;
@@ -22,6 +32,7 @@ export type V23NewsletterLayout = {
   sections: V23NewsletterSection[];
   recommended: V23NewsletterItem[];
   manualTopics: string[];
+  sourcesSnapshot?: V23NewsletterSourcesSnapshot;
   generatedAt: string;
 };
 

@@ -3,8 +3,10 @@
 import { useCallback, useState } from "react";
 import { Loader2, RefreshCw, Send, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NewsletterSourcesPanel } from "@/components/admin/newsletter-sources-panel";
 import { V23NewsletterIssueView } from "@/components/v23/newsletter-issue-view";
 import type { NewsletterRow } from "@/lib/queries/v4c/newsletters";
+import type { V23NewsletterSources } from "@/lib/v23/newsletter/sources";
 import type { V23NewsletterLayout } from "@/lib/v23/newsletter/types";
 
 type Topic = { id: string; topic_text: string; created_at: string };
@@ -12,11 +14,14 @@ type Topic = { id: string; topic_text: string; created_at: string };
 export function NewsletterAdminPanel({
   initialDraft,
   initialTopics,
+  initialSources,
 }: {
   initialDraft: NewsletterRow | null;
   initialTopics: Topic[];
+  initialSources: V23NewsletterSources;
 }) {
   const [draft, setDraft] = useState(initialDraft);
+  const [sources, setSources] = useState(initialSources);
   const [topics, setTopics] = useState(initialTopics);
   const [topicText, setTopicText] = useState("");
   const [loading, setLoading] = useState<"preview" | "publish" | "topic" | null>(null);
@@ -30,6 +35,7 @@ export function NewsletterAdminPanel({
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Chyba náhledu");
       if (json.draft) setDraft(json.draft);
+      if (json.sources) setSources(json.sources);
       setMessage("Náhled příštího vydání byl aktualizován.");
     } catch (e) {
       setMessage((e as Error).message);
@@ -47,6 +53,7 @@ export function NewsletterAdminPanel({
       if (!res.ok) throw new Error(json.error ?? "Chyba publikace");
       setMessage(`Newsletter publikován: /newsletter/${json.slug}`);
       if (json.draft) setDraft(json.draft);
+      if (json.sources) setSources(json.sources);
     } catch (e) {
       setMessage((e as Error).message);
     } finally {
@@ -68,7 +75,7 @@ export function NewsletterAdminPanel({
       if (!res.ok) throw new Error(json.error ?? "Chyba");
       setTopics((t) => [...t, json.topic]);
       setTopicText("");
-      setMessage("Téma přidáno — AI jej zapracuje do dalšího náhledu.");
+      setMessage("Téma přidáno — obnovte náhled pro zapracování.");
     } catch (e) {
       setMessage((e as Error).message);
     } finally {
@@ -80,21 +87,36 @@ export function NewsletterAdminPanel({
 
   return (
     <div className="space-y-8">
+      <NewsletterSourcesPanel sources={sources} />
+
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6">
           <h2 className="font-display text-lg font-bold text-[#021d33]">Příští newsletter</h2>
           <p className="text-sm text-slate-600">
-            AI navrhne témata ze studií, článků, legislativy, digital health, léků a univerzit. Ruční témata
-            zapracuje automaticky.
+            AI doplní úvodní texty a zapracuje ruční témata. Obsah sekcí vždy vychází z reálných zdrojů výše.
           </p>
 
           <div className="flex flex-wrap gap-2">
             <Button type="button" onClick={refreshPreview} disabled={loading !== null} className="rounded-full">
-              {loading === "preview" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+              {loading === "preview" ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="mr-2 h-4 w-4" />
+              )}
               Obnovit náhled
             </Button>
-            <Button type="button" variant="default" onClick={publish} disabled={loading !== null} className="rounded-full bg-[#021d33]">
-              {loading === "publish" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+            <Button
+              type="button"
+              variant="default"
+              onClick={publish}
+              disabled={loading !== null}
+              className="rounded-full bg-[#021d33]"
+            >
+              {loading === "publish" ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-2 h-4 w-4" />
+              )}
               Vytvořit newsletter
             </Button>
           </div>
@@ -103,7 +125,7 @@ export function NewsletterAdminPanel({
 
           {layout ? (
             <div className="rounded-xl bg-slate-50 p-4 text-sm">
-              <p className="font-semibold">{layout.headline}</p>
+              <p className="font-semibold text-[#021d33]">{layout.headline}</p>
               <p className="mt-1 text-slate-600">{layout.intro}</p>
               <ul className="mt-3 space-y-1 text-slate-600">
                 {layout.sections.map((s) => (
@@ -128,7 +150,12 @@ export function NewsletterAdminPanel({
               placeholder="Např. nová metodika DRG 2026"
               className="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm"
             />
-            <Button type="button" onClick={addTopic} disabled={loading !== null || !topicText.trim()} className="rounded-full">
+            <Button
+              type="button"
+              onClick={addTopic}
+              disabled={loading !== null || !topicText.trim()}
+              className="rounded-full"
+            >
               {loading === "topic" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
             </Button>
           </div>

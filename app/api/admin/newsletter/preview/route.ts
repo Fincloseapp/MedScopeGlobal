@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    await buildNewsletterDraft();
+    const result = await buildNewsletterDraft();
     const admin = createServiceRoleClient();
     const issueDate = new Date().toISOString().slice(0, 10);
     const { data: draft } = await admin.from("newsletters").select("*").eq("slug", issueDate).maybeSingle();
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     revalidatePath("/admin/newsletter");
     revalidatePath("/newsletter");
 
-    return NextResponse.json({ ok: true, draft });
+    return NextResponse.json({ ok: true, draft, sources: result.sources });
   } catch (e) {
     return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });
   }

@@ -1,6 +1,17 @@
+import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
+import { mapArticleList } from "@/lib/db/map-article";
 import { createServiceRoleClient } from "@/lib/supabase/service";
+import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rules";
 import { getV20LatestStudies } from "@/lib/v20/studies/query";
 import { getV22DigitalHealthList } from "@/lib/v22/digital-health/query";
+import {
+  V23_FALLBACK_ARTICLES,
+  V23_FALLBACK_DRUGS,
+  V23_FALLBACK_LEGISLATION,
+  V23_FALLBACK_UNIVERSITIES,
+  V23_NEWSLETTER_FALLBACKS,
+} from "@/lib/v23/newsletter/fallbacks";
+import { sanitizeNewsletterText } from "@/lib/v23/newsletter/sanitize";
 import type { V23NewsletterItem } from "@/lib/v23/newsletter/types";
 
 export type V23NewsletterSources = {
@@ -13,77 +24,139 @@ export type V23NewsletterSources = {
   pendingTopics: string[];
 };
 
-export async function gatherNewsletterSources(): Promise<V23NewsletterSources> {
-  const admin = createServiceRoleClient();
+const articleSelect = `*, categories ( id, name, slug )`;
 
-  const [studies, dhList, articlesRes, legRes, drugRes, uniRes, topicsRes] = await Promise.all([
+function toItem(title: string, summary: string, href: string): V23NewsletterItem {
+  return {
+    title: sanitizeNewsletterText(title),
+    summary: sanitizeNewsletterText(summary, V23_NEWSLETTER_FALLBACKS.articleSummary),
+    href,
+  };
+}
+
+async function loadArticlesForNewsletter(limit = 4): Promise<V23NewsletterItem[]> {
+  const admin = createServiceRoleClient();
+  const { data, error } = await admin
+    .from("articles")
+    .select(articleSelect)
+    .eq("published", true)
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .limit(32);
+
+  if (error || !data?.length) return V23_FALLBACK_ARTICLES;
+
+  const mapped = mapArticleList(data as Record<string, unknown>[]);
+  const active = filterCzechContent(filterActiveArticles(mapped), "cs");
+  const publicOnly = active.filter((a) => !a.vip_only);
+  const prepared = await prepareArticlesForDisplay(publicOnly, "cs", {
+    mode: "card",
+    maxTranslate: limit + 4,
+  });
+
+  const items = prepared.slice(0, limit).map((a) =>
+    toItem(
+      a.title,
+      a.excerpt ?? a.content?.replace(/<[^>]+>/g, " ").slice(0, 220) ?? "",
+      `/article/${a.slug}`
+    )
+  );
+
+  return items.length ? items : V23_FALLBACK_ARTICLES;
+}
+
+async function loadLegislation(limit = 3): Promise<V23NewsletterItem[]> {
+  const admin = createServiceRoleClient();
+  const { data, error } = await admin
+    .from("legislation_items")
+    .select("title, slug, summary, body")
+    .eq("published", true)
+    .order("published_date", { ascending: false, nullsFirst: false })
+    .limit(limit);
+
+  if (error || !data?.length) return V23_FALLBACK_LEGISLATION;
+
+  const items = data.map((l) =>
+    toItem(l.title, l.summary ?? l.body?.replace(/<[^>]+>/g, " ").slice(0, 220) ?? "", `/legislativa/${l.slug}`)
+  );
+  return items.length ? items : V23_FALLBACK_LEGISLATION;
+}
+
+async function loadDrugNews(limit = 3): Promise<V23NewsletterItem[]> {
+  const admin = createServiceRoleClient();
+  const { data, error } = await admin
+    .from("drug_news")
+    .select("title, slug, summary, body")
+    .eq("published", true)
+    .order("published_date", { ascending: false, nullsFirst: false })
+    .limit(limit);
+
+  if (error || !data?.length) return V23_FALLBACK_DRUGS;
+
+  const items = data.map((d) =>
+    toItem(d.title, d.summary ?? d.body?.replace(/<[^>]+>/g, " ").slice(0, 220) ?? "", `/leky/novinky/${d.slug}`)
+  );
+  return items.length ? items : V23_FALLBACK_DRUGS;
+}
+
+async function loadUniversityNews(limit = 3): Promise<V23NewsletterItem[]> {
+  const admin = createServiceRoleClient();
+  const { data, error } = await admin
+    .from("university_news")
+    .select("title, slug, summary, body")
+    .eq("published", true)
+    .order("published_date", { ascending: false, nullsFirst: false })
+    .limit(limit);
+
+  if (error || !data?.length) return V23_FALLBACK_UNIVERSITIES;
+
+  const items = data.map((u) =>
+    toItem(
+      u.title,
+      u.summary ?? u.body?.replace(/<[^>]+>/g, " ").slice(0, 220) ?? "",
+      `/novinky/univerzity/${u.slug}`
+    )
+  );
+  return items.length ? items : V23_FALLBACK_UNIVERSITIES;
+}
+
+async function loadPendingTopics(): Promise<string[]> {
+  const admin = createServiceRoleClient();
+  const { data, error } = await admin
+    .from("newsletter_topics")
+    .select("topic_text")
+    .eq("status", "pending")
+    .order("created_at", { ascending: true });
+
+  if (error || !data?.length) return [];
+  return data.map((t) => sanitizeNewsletterText(t.topic_text)).filter(Boolean);
+}
+
+export async function gatherNewsletterSources(): Promise<V23NewsletterSources> {
+  const [studiesRaw, dhList, articles, legislation, drugs, universities, pendingTopics] = await Promise.all([
     getV20LatestStudies(4),
-    getV22DigitalHealthList(3),
-    admin
-      .from("articles")
-      .select("title, slug, excerpt")
-      .eq("published", true)
-      .order("published_at", { ascending: false })
-      .limit(4),
-    admin
-      .from("legislation_items")
-      .select("title, slug, summary")
-      .eq("published", true)
-      .order("published_date", { ascending: false })
-      .limit(3),
-    admin
-      .from("drug_news")
-      .select("title, slug, summary")
-      .eq("published", true)
-      .order("published_date", { ascending: false })
-      .limit(3),
-    admin
-      .from("university_news")
-      .select("title, slug, summary")
-      .eq("published", true)
-      .order("published_date", { ascending: false })
-      .limit(3),
-    admin
-      .from("newsletter_topics")
-      .select("topic_text")
-      .eq("status", "pending")
-      .order("created_at", { ascending: true }),
+    getV22DigitalHealthList(4),
+    loadArticlesForNewsletter(4),
+    loadLegislation(3),
+    loadDrugNews(3),
+    loadUniversityNews(3),
+    loadPendingTopics(),
   ]);
 
-  const pendingTopics =
-    topicsRes.error || !topicsRes.data ? [] : topicsRes.data.map((t) => t.topic_text);
+  const studies = studiesRaw.map((s) =>
+    toItem(s.titleCs, s.summaryCs, `/studie/${s.slug}`)
+  );
+
+  const digitalHealth = dhList.map((d) =>
+    toItem(d.title, d.summaryCs, `/digital-health/${d.slug}`)
+  );
 
   return {
-    studies: studies.map((s) => ({
-      title: s.titleCs,
-      summary: s.summaryCs.slice(0, 200),
-      href: `/studie/${s.slug}`,
-    })),
-    articles: (articlesRes.data ?? []).map((a) => ({
-      title: a.title,
-      summary: (a.excerpt ?? "").slice(0, 200),
-      href: `/article/${a.slug}`,
-    })),
-    legislation: (legRes.data ?? []).map((l) => ({
-      title: l.title,
-      summary: (l.summary ?? "").slice(0, 200),
-      href: `/legislativa/${l.slug}`,
-    })),
-    digitalHealth: dhList.map((d) => ({
-      title: d.title,
-      summary: d.summaryCs.slice(0, 200),
-      href: `/digital-health/${d.slug}`,
-    })),
-    drugs: (drugRes.data ?? []).map((d) => ({
-      title: d.title,
-      summary: (d.summary ?? "").slice(0, 200),
-      href: `/leky/novinky/${d.slug}`,
-    })),
-    universities: (uniRes.data ?? []).map((u) => ({
-      title: u.title,
-      summary: (u.summary ?? "").slice(0, 200),
-      href: `/novinky/univerzity/${u.slug}`,
-    })),
+    studies: studies.length ? studies : [],
+    articles,
+    legislation,
+    digitalHealth: digitalHealth.length ? digitalHealth : [],
+    drugs,
+    universities,
     pendingTopics,
   };
 }
