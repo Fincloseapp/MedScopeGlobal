@@ -47,8 +47,12 @@ function runTsc() {
   return true;
 }
 
+console.log("\n=== Pre-deploy gates ===\n");
+
+const isVercel = process.env.VERCEL === "1";
+
 const steps = [
-  ["sync-logos", "scripts/sync-logos.mjs"],
+  ...(isVercel ? [] : [["sync-logos", "scripts/sync-logos.mjs"]]),
   ["validate-logos", "scripts/validate-logos.mjs"],
   ["env:verify", "scripts/verify-env.mjs"],
   ["verify-v17-skeleton", "scripts/verify-v17-skeleton.mjs"],
@@ -57,7 +61,9 @@ const steps = [
   ["verify-v6-api-routes", "scripts/verify-v6-api-routes.mjs"],
 ];
 
-console.log("\n=== Pre-deploy gates ===\n");
+if (isVercel) {
+  console.log("(Vercel) skipping sync-logos — using committed assets in public/assets/logo/\n");
+}
 
 let ok = runTsc();
 for (const [label, script] of steps) {

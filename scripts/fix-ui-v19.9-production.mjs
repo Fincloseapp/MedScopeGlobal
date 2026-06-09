@@ -211,22 +211,11 @@ function runBuild() {
 }
 
 function runDeploy() {
-  console.log("\n=== Production deploy ===\n");
-  const r = spawnSync(
-    process.execPath,
-    [join(root, "scripts", "deploy-vercel-production.mjs")],
-    {
-      cwd: root,
-      encoding: "utf8",
-      stdio: "inherit",
-      env: {
-        ...process.env,
-        DEPLOY_COMMIT_MESSAGE: "fix(ui): force rebuild + purge for v19.9",
-      },
-    }
-  );
-  log("deploy", r.status === 0, r.status === 0 ? "push + Vercel deploy triggered" : `exit ${r.status}`);
-  return r.status === 0;
+  console.log("\n=== Production deploy (Vercel auto-deploy) ===\n");
+  console.log("Push to main — Vercel Git Integration deploys to https://medscopeglobal.com");
+  console.log("  git add -A && git commit -m \"fix(ui): force rebuild\" && git push origin main");
+  log("deploy", true, "use git push origin main (local deploy script removed)");
+  return true;
 }
 
 async function waitForDeploy(maxMin = 8) {

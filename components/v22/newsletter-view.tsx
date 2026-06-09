@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { NewsletterRow } from "@/lib/queries/v4c/newsletters";
-import { MedScopeLogo } from "@/components/brand/medscope-logo";
+import { NewsletterHero } from "@/components/newsletter/Hero";
 import { V22_NEWSLETTER_HERO } from "@/lib/v22/newsletter";
 import { Button } from "@/components/ui/button";
 
@@ -9,29 +9,24 @@ export function V22NewsletterHub() {
   return (
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white">
-        <div className="relative aspect-[21/9] min-h-[180px] bg-slate-100 sm:aspect-[3/1]">
+        <div className="relative min-h-[380px] bg-[#021d33] sm:min-h-[420px]">
           <Image
             src={V22_NEWSLETTER_HERO}
             alt="Odborný medicínský newsletter MedScopeGlobal"
             fill
-            className="object-cover"
+            className="object-cover opacity-35"
             sizes="100vw"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#021d33]/90 via-[#021d33]/70 to-transparent" />
-          <div className="absolute inset-0 flex flex-col justify-center px-6 py-8 sm:px-10">
-            <MedScopeLogo href="/newsletter" preset="newsletter-hero" />
-            <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200">
-              MedScopeGlobal Newsletter
-            </p>
-            <h2 className="mt-2 max-w-xl font-display text-2xl font-bold text-white sm:text-3xl">
-              Medicínský přehled týdně
-            </h2>
-            <p className="mt-2 max-w-lg text-sm text-white/85">
-              Studie, legislativa, léky, digitální zdravotnictví a univerzitní novinky — v češtině,
-              s odborným layoutem.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
+          <div className="absolute inset-0 bg-gradient-to-b from-[#021d33]/80 via-[#021d33]/88 to-[#021d33]/95" />
+          <div className="relative flex min-h-[380px] flex-col items-center justify-center sm:min-h-[420px]">
+            <NewsletterHero
+              href="/newsletter"
+              title="Medicínský přehled týdně"
+              subhead="Studie, legislativa, léky, digitální zdravotnictví a univerzitní novinky — v češtině, s odborným layoutem."
+              className="w-full text-white"
+            />
+            <div className="mt-2 flex flex-wrap justify-center gap-2 px-6 pb-10 sm:px-8">
               <Button asChild className="rounded-full bg-white text-[#021d33] hover:bg-sky-50">
                 <Link href="/subscribe">Přihlásit k odběru</Link>
               </Button>

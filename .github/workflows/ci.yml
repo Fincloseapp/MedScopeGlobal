@@ -39,5 +39,5 @@ jobs:
       - name: Verify V18
         run: pnpm run verify-v18
 
-      - name: Build
+      - name: Build (Vercel pipeline mirror)
         run: pnpm run build

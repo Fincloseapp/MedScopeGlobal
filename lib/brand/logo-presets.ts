@@ -24,7 +24,7 @@ export const LOGO_PRESETS: Record<LogoPreset, LogoPresetConfig> = {
     height: 70,
     variant: "auto",
     imageClassName:
-      "h-12 w-auto min-w-[152px] max-w-[212px] object-contain md:h-14 md:min-w-[170px] md:max-w-[232px] lg:h-[70px] lg:min-w-[196px] lg:max-w-[300px]",
+      "h-14 w-auto min-w-[168px] max-w-[240px] object-contain md:h-14 md:min-w-[170px] md:max-w-[232px] lg:h-[70px] lg:min-w-[196px] lg:max-w-[300px]",
     className: "p-0",
   },
   footer: {
@@ -35,18 +35,19 @@ export const LOGO_PRESETS: Record<LogoPreset, LogoPresetConfig> = {
     className: "p-2 align-middle",
   },
   "newsletter-hero": {
-    width: 300,
-    height: 80,
+    width: 390,
+    height: 104,
     variant: "negative",
-    imageClassName: "h-20 w-auto min-w-[140px] object-contain brightness-110",
-    className: "pb-6",
+    imageClassName:
+      "mx-auto h-[104px] w-auto min-w-[200px] max-w-[380px] object-contain brightness-110",
+    className: "flex justify-center",
   },
   "newsletter-footer": {
-    width: 200,
-    height: 48,
+    width: 240,
+    height: 60,
     variant: "transparent",
-    imageClassName: "h-12 w-auto min-w-[140px] object-contain",
-    className: "pt-2",
+    imageClassName: "mx-auto h-[60px] w-auto min-w-[170px] max-w-[280px] object-contain",
+    className: "flex justify-center",
   },
   "admin-login": {
     width: 320,
@@ -63,10 +64,10 @@ export const LOGO_PRESETS: Record<LogoPreset, LogoPresetConfig> = {
     className: "align-middle",
   },
   mobile: {
-    width: 160,
-    height: 44,
+    width: 200,
+    height: 56,
     variant: "auto",
-    imageClassName: "h-11 w-auto max-w-[160px] object-contain",
-    className: "p-1.5 sm:p-2",
+    imageClassName: "h-14 w-auto min-w-[168px] max-w-[240px] object-contain",
+    className: "p-0",
   },
 };

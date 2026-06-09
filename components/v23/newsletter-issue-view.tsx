@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { NewsletterRow } from "@/lib/queries/v4c/newsletters";
-import { MedScopeLogo } from "@/components/brand/medscope-logo";
+import { NewsletterHero } from "@/components/newsletter/Hero";
+import { NewsletterFooterLogo } from "@/components/newsletter/Footer";
 import {
   ensureLayoutImages,
   resolveNewsletterItemImage,
@@ -136,30 +137,29 @@ export function V23NewsletterIssueView({ issue }: { issue: NewsletterRow }) {
 
   return (
     <article className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-      <div className="relative aspect-[21/9] min-h-[200px] bg-slate-100 sm:aspect-[3/1]">
+      <div className="relative min-h-[360px] bg-[#021d33] sm:min-h-[400px]">
         <Image
           src={heroUrl}
           alt={heroAlt}
           fill
-          className="object-cover"
+          className="object-cover opacity-35"
           sizes="(max-width: 896px) 100vw, 896px"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#021d33]/90 via-[#021d33]/40 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-6 text-white sm:p-8">
-          <MedScopeLogo href="" preset="newsletter-hero" />
-          <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200">
-            MedScopeGlobal Newsletter
-          </p>
-          <p className="mt-1 font-display text-2xl font-bold sm:text-3xl">{dateLabel}</p>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#021d33]/80 via-[#021d33]/88 to-[#021d33]/95" />
+        <div className="relative flex min-h-[360px] items-center justify-center sm:min-h-[400px]">
+          <NewsletterHero
+            title={layout?.headline ?? `MedScopeGlobal Newsletter — ${dateLabel}`}
+            subhead={
+              layout?.intro ??
+              `Týdenní odborný přehled studií, legislativy a novinek ve zdravotnictví — ${dateLabel}`
+            }
+            className="w-full text-white"
+          />
         </div>
       </div>
 
       <div className="p-6 sm:p-8">
-        {layout?.intro ? (
-          <p className="text-base leading-relaxed text-slate-700">{layout.intro}</p>
-        ) : null}
-
         {layout?.sections?.length ? (
           <div className="mt-8 space-y-10">
             {layout.sections.map((sec) => {
@@ -233,10 +233,7 @@ export function V23NewsletterIssueView({ issue }: { issue: NewsletterRow }) {
         </div>
 
         <div className="mt-10 flex flex-col items-center border-t border-slate-100 pt-8">
-          <MedScopeLogo href="/" preset="newsletter-footer" />
-          <p className="mt-3 text-center text-xs text-slate-500">
-            MedScopeGlobal — odborný medicínský magazín
-          </p>
+          <NewsletterFooterLogo href="/" />
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Button asChild variant="outline" className="rounded-full">
               <Link href="/newsletter/archiv">Archiv vydání</Link>

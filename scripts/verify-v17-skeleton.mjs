@@ -147,10 +147,11 @@ for (const slug of routes) {
     slug === "health" && src.includes("runHealthcheck");
   const usesMonitoringPipeline =
     slug === "monitoring" && src.includes("getMonitoringSnapshot");
-  const usesRollbackPipeline =
-    slug === "rollback" && src.includes("vercel_rollback");
   const usesDeployPostPipeline =
-    slug === "deploy" && src.includes("vercel_production") && src.includes("getVersion");
+    slug === "deploy" &&
+    (src.includes("vercel_production") || src.includes("auto_deploy") || src.includes("AUTO_DEPLOY"));
+  const usesRollbackPipeline =
+    slug === "rollback" && (src.includes("vercel_rollback") || src.includes("use_vercel_dashboard"));
   if (
     !usesHandler &&
     !usesProductionJob &&

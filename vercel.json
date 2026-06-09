@@ -1,6 +1,6 @@
 {
   "buildCommand": "npm run build",
-  "installCommand": "npm ci",
+  "installCommand": "npm install",
   "framework": "nextjs",
   "env": {
     "INGESTION_LOCALE": "cs",
@@ -73,6 +73,15 @@
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
       ]
+    }
+  ],
+
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.medscopeglobal.com" }],
+      "destination": "https://medscopeglobal.com/:path*",
+      "permanent": true
     }
   ]
 }

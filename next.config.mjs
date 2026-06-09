@@ -60,6 +60,18 @@ const nextConfig = {
 
       { source: "/categories/:path*", destination: "/studie", permanent: true },
 
+      {
+
+        source: "/:path*",
+
+        has: [{ type: "host", value: "www.medscopeglobal.com" }],
+
+        destination: "https://medscopeglobal.com/:path*",
+
+        permanent: true,
+
+      },
+
     ];
 
   },

@@ -1,0 +1,11 @@
+# MedScopeGlobal — plná automatizace (FINAL)
+#
+# 1. První aktivace:
+#      npm run autogit
+# 2. Restart Cursor → Settings → Hooks → Reload
+#
+# Při každém uložení:
+#   git add -A → auto commit → push main → Vercel → medscopeglobal.com
+#
+# Konfigurace: .cursor/hooks/auto-git.json
+# Log:         .cursor/hooks/auto-git.log
