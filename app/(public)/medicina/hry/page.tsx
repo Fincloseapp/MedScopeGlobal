@@ -33,7 +33,14 @@ export default function MedicinaHryPage() {
             className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <div className="relative aspect-[16/10] bg-slate-100">
-              <Image src={game.imageUrl} alt="" fill className="object-cover" sizes="33vw" />
+              <Image
+                src={game.imageUrl}
+                alt={game.title}
+                fill
+                className="object-cover"
+                sizes="33vw"
+                loading="lazy"
+              />
             </div>
             <div className="p-5">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">{game.topic}</p>

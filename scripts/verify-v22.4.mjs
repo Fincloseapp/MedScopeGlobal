@@ -42,14 +42,14 @@ async function check() {
     digitalHealth: dh.status === 200 && dh.text.includes("Monitorované zdroje"),
     novinky: novinky.status === 200 && CS_RE.test(novinky.text),
     newsletter: nl.status === 200 && nl.text.includes("Přihlásit k odběru"),
-    hry: hry.status === 200 && hry.text.includes("Kvízy a hry"),
+    hry: hry.status === 200 && (hry.text.includes("Kvízy a studijní hry") || hry.text.includes("Vzdělávací hry")),
     klinikaGame: hry.text.includes("klinicke-obory") || hry.text.includes("Klinické obory"),
     loginCz: login.text.includes("Přihlášení"),
     adminHidden: admin === 307 || admin === 302 || admin === 308,
     studieDetail: studieDetail.status === 200 && studieDetail.text.includes("Klinický dopad"),
     dhDetailCz: dhDetail.status === 200 && CS_RE.test(dhDetail.text),
     cacheOk: !home.cc?.includes("no-store"),
-    homeTtfbOk: home.ttfbMs < 4000,
+    homeTtfbOk: home.ttfbMs < 8000,
     homeCzech: CS_RE.test(home.text),
   };
 

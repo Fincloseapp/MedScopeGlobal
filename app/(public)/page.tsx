@@ -1,20 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AudienceHub } from "@/components/home/audience-hub";
+import { HomepageAds } from "@/components/home/homepage-ads";
 import { HomepageAutomation } from "@/components/home/homepage-automation";
-import { AdPlacement } from "@/components/ads/ad-placement";
 import { V19ArticleBriefFeedLazy } from "@/components/v19/article-brief-feed";
 import { V20ArticleCard } from "@/components/v20/article-card";
 import { V20HomeHero } from "@/components/v20/home-hero";
 import { V20StudiesHomeSection } from "@/components/v20/studies-home-section";
 import { V21HomepageSections } from "@/components/v21/homepage-sections";
 import { Button } from "@/components/ui/button";
-import { getReaderContext } from "@/lib/auth/reader-context";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { getLatestArticles } from "@/lib/queries/articles";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
-/** ISR — homepage refresh každých 120 s */
 export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,31 +26,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomePage() {
   const locale = "cs" as const;
-  const { isVip, accessLevel } = await getReaderContext();
-  const [articles, showAdsAds] = await Promise.all([
-    getLatestArticles(6, 0, isVip, accessLevel, locale),
-    !isVip
-      ? Promise.all([
-          getActiveAdsByPlacement("homepage_top", 1),
-          getActiveAdsByPlacement("homepage_mid", 1),
-          getActiveAdsByPlacement("homepage_bottom", 1),
-        ])
-      : Promise.resolve([[], [], []] as const),
+  const [articles, topAds, midAds, bottomAds] = await Promise.all([
+    getLatestArticles(6, 0, false, "public", locale),
+    getActiveAdsByPlacement("homepage_top", 1),
+    getActiveAdsByPlacement("homepage_mid", 1),
+    getActiveAdsByPlacement("homepage_bottom", 1),
   ]);
-  const topAds = [...showAdsAds[0]];
-  const midAds = [...showAdsAds[1]];
-  const bottomAds = [...showAdsAds[2]];
-  const showAds = !isVip;
 
   return (
     <div className="v20-home bg-background">
       <V20HomeHero />
 
-      {showAds ? (
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <AdPlacement ads={topAds} variant="banner" />
-        </div>
-      ) : null}
+      <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
 
       <AudienceHub locale={locale} />
 
@@ -60,13 +45,7 @@ export default async function HomePage() {
 
       <V21HomepageSections />
 
-      <HomepageAutomation locale={locale} isVip={isVip} accessLevel={accessLevel} />
-
-      {showAds ? (
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <AdPlacement ads={midAds} variant="inline" />
-        </div>
-      ) : null}
+      <HomepageAutomation locale={locale} isVip={false} accessLevel="public" />
 
       <section className="border-y border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
@@ -108,13 +87,13 @@ export default async function HomePage() {
                 Příprava na LF, anatomie, fyziologie a klinické obory
               </h2>
               <p className="mt-3 max-w-2xl text-sm text-white/85">
-                Samostatná větev pro budoucí a současné studenty medicíny.
+                Samostatná větev pro budoucí a současné studenty medicíny — kvízy, hry a studijní tipy.
               </p>
             </div>
             <div className="flex flex-wrap gap-3 lg:justify-end">
               <Button asChild size="lg" className="rounded-full bg-white text-[#004874] hover:bg-sky-50">
-                <Link href="/medicina/priprava" prefetch>
-                  Příprava na medicínu
+                <Link href="/medicina/hry" prefetch>
+                  Kvízy a hry
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-full border-white/40 text-white hover:bg-white/10">
@@ -126,12 +105,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      {showAds ? (
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <AdPlacement ads={bottomAds} variant="banner" />
-        </div>
-      ) : null}
 
       <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6">
         <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
