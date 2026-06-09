@@ -43,7 +43,7 @@ export function V20MobileNav({
         <Button
           variant="outline"
           size="icon"
-          className="lg:hidden touch-manipulation"
+          className="md:hidden touch-manipulation border-black/[0.06] dark:border-white/10"
           aria-label="Otevřít menu"
         >
           <Menu className="h-5 w-5" />

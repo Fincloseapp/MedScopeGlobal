@@ -20,11 +20,11 @@ export type LogoPresetConfig = {
 /** Premium sizing — NEJM / Lancet / BMJ inspired */
 export const LOGO_PRESETS: Record<LogoPreset, LogoPresetConfig> = {
   header: {
-    width: 240,
-    height: 56,
+    width: 264,
+    height: 62,
     variant: "auto",
     imageClassName:
-      "h-11 w-auto min-w-[140px] max-w-[180px] object-contain sm:h-14 sm:max-w-[220px]",
+      "h-12 w-auto min-w-[154px] max-w-[198px] object-contain sm:h-[3.85rem] sm:max-w-[242px]",
     className: "p-0",
   },
   footer: {

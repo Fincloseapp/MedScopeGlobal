@@ -12,8 +12,7 @@ type Props = {
 };
 
 /**
- * NEJM-level logo block — dominant logo + tagline
- * WebP + retina via MedScopeLogo / resolveLogoSources
+ * NEJM-plus logo block — optical dominance, WebP + retina (v23.2.7)
  */
 export function HeaderLogo({ centered = false, className, priority = true }: Props) {
   return (
@@ -21,24 +20,27 @@ export function HeaderLogo({ centered = false, className, priority = true }: Pro
       href="/"
       prefetch
       className={cn(
-        "logo-block flex shrink-0 flex-col gap-0.5 pr-4 transition-opacity hover:opacity-95",
+        "logo-block group flex shrink-0 flex-col pr-4 transition-opacity hover:opacity-[0.97]",
         centered ? "items-center text-center" : "items-start text-left",
         className
       )}
       aria-label="MedScopeGlobal — domů"
     >
-      <MedScopeLogo
-        href=""
-        preset="header"
-        priority={priority}
-        className="p-0"
-        imageClassName="h-11 w-auto min-w-[140px] max-w-[180px] object-contain sm:h-14 sm:max-w-[220px]"
-      />
+      <span className="logo-mark inline-block origin-left translate-y-[1.5px] scale-[1.1] max-md:origin-center md:origin-left">
+        <MedScopeLogo
+          href=""
+          preset="header"
+          priority={priority}
+          className="p-0"
+          imageClassName="h-12 w-auto min-w-[154px] max-w-[198px] object-contain [letter-spacing:0.12px] sm:h-[3.85rem] sm:max-w-[242px] md:max-w-[248px]"
+        />
+      </span>
       <p
         className={cn(
-          "tagline -mt-0.5 font-light leading-tight tracking-[0.3px]",
-          "text-[11px] opacity-85 sm:text-xs md:text-[11px] lg:text-[13px] xl:text-sm",
-          "text-slate-600 dark:text-[#A0A0A0]"
+          "tagline mt-1 font-extralight leading-snug",
+          "text-[11px] tracking-[0.35px] opacity-75",
+          "sm:text-xs md:text-[11px] lg:text-[13px] xl:text-[14px]",
+          "text-[#6A6A6A] dark:text-[#A0A0A0] dark:opacity-85"
         )}
       >
         {HEADER_TAGLINE}
@@ -47,5 +49,5 @@ export function HeaderLogo({ centered = false, className, priority = true }: Pro
   );
 }
 
-/** Alias per v23.2.6 spec */
+/** Alias per spec */
 export { HeaderLogo as HeaderLogoBlock };

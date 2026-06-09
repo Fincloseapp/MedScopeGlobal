@@ -2,21 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { NavItem } from "@/lib/config/main-navigation";
 import { cn } from "@/lib/utils";
 
 const NAV_LINK =
-  "inline-flex items-center px-[14px] py-2 text-[15px] font-normal tracking-[0.2px] text-slate-800 transition-colors hover:text-[#0055CC] hover:underline dark:text-[#E0E0E0] dark:hover:text-sky-300 lg:px-[18px] lg:text-base lg:font-medium";
+  "inline-flex items-center px-[18px] py-2.5 text-[15.5px] font-normal tracking-[0.2px] text-slate-800 underline-offset-[3px] transition-colors hover:text-[#0055CC] hover:underline dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF] xl:px-[22px]";
 
 const NAV_LINK_ACTIVE =
-  "font-medium text-[#0055CC] underline underline-offset-4 dark:text-sky-300";
+  "font-medium text-[#0055CC] underline dark:text-[#7CC4FF]";
 
 const NAV_BUTTON =
-  "inline-flex items-center gap-1 px-[14px] py-2 text-[15px] font-normal tracking-[0.2px] text-slate-800 transition-colors hover:text-[#0055CC] dark:text-[#E0E0E0] dark:hover:text-sky-300 lg:px-[18px] lg:text-base lg:font-medium";
+  "inline-flex items-center px-[18px] py-2.5 text-[15.5px] font-normal tracking-[0.2px] text-slate-800 underline-offset-[3px] transition-colors hover:text-[#0055CC] hover:underline after:ml-1 after:text-[11px] after:font-normal after:opacity-65 after:content-['▾'] dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF] xl:px-[22px]";
 
-/** NEJM-level desktop navigation — clean typography, no leftover nodes */
+/** NEJM-plus navigation — no icons, pure typography (v23.2.7) */
 export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
   const pathname = usePathname();
   const [openLabel, setOpenLabel] = useState<string | null>(null);
@@ -42,11 +41,7 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
   const isActiveChild = (href: string) => pathname === href;
 
   return (
-    <nav
-      ref={navRef}
-      className="hidden items-center lg:flex"
-      aria-label="Hlavní navigace"
-    >
+    <nav ref={navRef} className="hidden items-center md:flex" aria-label="Hlavní navigace">
       {mainMenu.map((item) => {
         const isOpen = openLabel === item.label;
         const hasChildren = Boolean(item.children?.length);
@@ -54,11 +49,7 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
 
         if (!hasChildren) {
           return (
-            <Link
-              key={item.label}
-              href={item.href}
-              className={cn(NAV_LINK, active && NAV_LINK_ACTIVE)}
-            >
+            <Link key={item.label} href={item.href} className={cn(NAV_LINK, active && NAV_LINK_ACTIVE)}>
               {item.label}
             </Link>
           );
@@ -70,25 +61,21 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
               type="button"
               aria-expanded={isOpen}
               onClick={() => setOpenLabel(isOpen ? null : item.label)}
-              className={cn(NAV_BUTTON, active && NAV_LINK_ACTIVE)}
+              className={cn(NAV_BUTTON, active && NAV_LINK_ACTIVE, isOpen && "text-[#0055CC] dark:text-[#7CC4FF]")}
             >
               {item.label}
-              <ChevronDown
-                className={cn("h-4 w-4 opacity-60 transition-transform", isOpen && "rotate-180")}
-                aria-hidden
-              />
             </button>
             {isOpen ? (
-              <div className="absolute left-0 top-full z-50 mt-1 min-w-64 rounded-lg border border-black/[0.08] bg-white py-2 shadow-lg dark:border-white/10 dark:bg-slate-900">
+              <div className="absolute left-0 top-full z-50 mt-1.5 min-w-64 rounded-md border border-black/[0.06] bg-white py-1.5 shadow-md dark:border-white/10 dark:bg-slate-900">
                 {item.children!.map((child) => (
                   <Link
                     key={child.href}
                     href={child.href}
                     onClick={() => setOpenLabel(null)}
                     className={cn(
-                      "block px-4 py-2.5 text-[15px] tracking-[0.2px] transition-colors hover:bg-slate-50 hover:text-[#0055CC] dark:hover:bg-slate-800 dark:hover:text-sky-300",
+                      "block px-5 py-2.5 text-[15px] tracking-[0.2px] transition-colors hover:text-[#0055CC] dark:hover:text-[#7CC4FF]",
                       isActiveChild(child.href)
-                        ? "font-medium text-[#0055CC] dark:text-sky-300"
+                        ? "font-medium text-[#0055CC] dark:text-[#7CC4FF]"
                         : "text-slate-700 dark:text-[#E0E0E0]"
                     )}
                   >
@@ -109,7 +96,7 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
   );
 }
 
-/** @deprecated Use HeaderNavigation — kept for backward compatibility */
+/** @deprecated Use HeaderNavigation */
 export function V21DesktopNav({ mainMenu }: { mainMenu: NavItem[] }) {
   return <HeaderNavigation mainMenu={mainMenu} />;
 }
