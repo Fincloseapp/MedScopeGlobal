@@ -11,7 +11,7 @@ export async function SiteFooter() {
 
         <div>
 
-          <MedScopeLogo href="/" width={160} height={40} imageClassName="max-h-10" />
+          <MedScopeLogo href="/" preset="footer" />
 
           <p className="mt-2 text-sm text-muted-foreground">
 

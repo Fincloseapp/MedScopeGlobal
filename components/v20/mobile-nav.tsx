@@ -54,7 +54,7 @@ export function V20MobileNav({
         className="flex w-[min(100vw-1rem,380px)] flex-col overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]"
       >
         <SheetHeader className="shrink-0 text-left">
-          <MedScopeLogo href="/" width={140} height={34} className="mb-2" imageClassName="max-h-8" />
+          <MedScopeLogo href="/" preset="mobile" className="mb-2" />
           <SheetTitle className="font-display text-lg text-[#021d33]">Navigace</SheetTitle>
         </SheetHeader>
 

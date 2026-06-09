@@ -20,7 +20,7 @@ export function V22NewsletterHub() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#021d33]/90 via-[#021d33]/70 to-transparent" />
           <div className="absolute inset-0 flex flex-col justify-center px-6 py-8 sm:px-10">
-            <MedScopeLogo href="/newsletter" variant="negative" width={160} height={40} imageClassName="max-h-10 brightness-110" />
+            <MedScopeLogo href="/newsletter" preset="newsletter-hero" />
             <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200">
               MedScopeGlobal Newsletter
             </p>

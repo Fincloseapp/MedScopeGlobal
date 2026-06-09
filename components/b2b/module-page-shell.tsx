@@ -25,7 +25,7 @@ export function ModulePageShell({
       <section className="border-b border-[#d9e8f4] bg-[radial-gradient(circle_at_top,_rgba(0,91,150,0.1),transparent_30%),linear-gradient(180deg,#fff_0%,#f8fbff_100%)]">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
           {showBrandLogo ? (
-            <MedScopeLogo href="/" width={150} height={38} className="mb-4" imageClassName="max-h-10" />
+            <MedScopeLogo href="/" preset="header" className="mb-4" />
           ) : null}
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">{eyebrow}</p>
           <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-[#021d33]">{title}</h1>

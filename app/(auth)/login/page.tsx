@@ -206,7 +206,7 @@ export default function LoginPage() {
 
       <CardHeader>
 
-        <MedScopeLogo href="/" width={180} height={44} className="mb-4 mx-auto" imageClassName="max-h-11" />
+        <MedScopeLogo href="/" preset="admin-login" />
 
         <CardTitle className="font-display text-2xl">Přihlášení</CardTitle>
 

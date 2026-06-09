@@ -147,7 +147,7 @@ export function V23NewsletterIssueView({ issue }: { issue: NewsletterRow }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#021d33]/90 via-[#021d33]/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-6 text-white sm:p-8">
-          <MedScopeLogo href="" variant="negative" width={180} height={44} imageClassName="max-h-11 brightness-110" />
+          <MedScopeLogo href="" preset="newsletter-hero" />
           <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200">
             MedScopeGlobal Newsletter
           </p>
@@ -232,13 +232,19 @@ export function V23NewsletterIssueView({ issue }: { issue: NewsletterRow }) {
           </Button>
         </div>
 
-        <div className="mt-8 flex flex-wrap gap-3 border-t border-slate-100 pt-6">
-          <Button asChild variant="outline" className="rounded-full">
-            <Link href="/newsletter/archiv">Archiv vydání</Link>
-          </Button>
-          <Button asChild variant="outline" className="rounded-full">
-            <Link href="/newsletter">← Přehled</Link>
-          </Button>
+        <div className="mt-10 flex flex-col items-center border-t border-slate-100 pt-8">
+          <MedScopeLogo href="/" preset="newsletter-footer" />
+          <p className="mt-3 text-center text-xs text-slate-500">
+            MedScopeGlobal — odborný medicínský magazín
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Button asChild variant="outline" className="rounded-full">
+              <Link href="/newsletter/archiv">Archiv vydání</Link>
+            </Button>
+            <Button asChild variant="outline" className="rounded-full">
+              <Link href="/newsletter">← Přehled</Link>
+            </Button>
+          </div>
         </div>
       </div>
     </article>

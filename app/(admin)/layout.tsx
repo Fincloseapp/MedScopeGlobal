@@ -25,7 +25,7 @@ export default async function AdminLayout({
         <header className="flex h-14 items-center justify-between gap-3 border-b bg-white px-4 lg:hidden">
           <div className="flex items-center gap-2">
             <AdminMobileNav />
-            <MedScopeLogo href="/admin" width={120} height={30} imageClassName="max-h-8" />
+            <MedScopeLogo href="/admin" preset="admin-sidebar" />
           </div>
           <Button variant="outline" size="sm" asChild>
             <Link href="/">View site</Link>

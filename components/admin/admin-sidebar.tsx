@@ -11,8 +11,8 @@ export function AdminSidebar() {
 
   return (
     <aside className="hidden w-64 shrink-0 border-r bg-white lg:block">
-      <div className="flex h-16 items-center border-b px-4">
-        <MedScopeLogo href="/admin" width={150} height={36} imageClassName="max-h-9" />
+      <div className="flex h-[4.5rem] items-center border-b px-4">
+        <MedScopeLogo href="/admin" preset="admin-sidebar" />
       </div>
       <nav className="space-y-1 p-4">
         {ADMIN_NAV_ITEMS.map((link) => {

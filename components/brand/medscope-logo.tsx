@@ -1,9 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MEDSCOPE_LOGO, MEDSCOPE_LOGO_ALT } from "@/lib/brand/logo";
+import { LOGO_PRESETS, type LogoPreset } from "@/lib/brand/logo-presets";
 import { cn } from "@/lib/utils";
 
 type Props = {
+  preset?: LogoPreset;
   variant?: "auto" | "transparent" | "negative" | "print";
   href?: string;
   className?: string;
@@ -14,14 +16,22 @@ type Props = {
 };
 
 export function MedScopeLogo({
-  variant = "auto",
+  preset,
+  variant: variantProp,
   href = "/",
   className,
   imageClassName,
-  width = 160,
-  height = 40,
+  width: widthProp,
+  height: heightProp,
   priority = false,
 }: Props) {
+  const cfg = preset ? LOGO_PRESETS[preset] : null;
+  const variant = variantProp ?? cfg?.variant ?? "auto";
+  const width = widthProp ?? cfg?.width ?? 160;
+  const height = heightProp ?? cfg?.height ?? 40;
+  const imgClass = cn(cfg?.imageClassName, imageClassName);
+  const wrapClass = cn(cfg?.className, className);
+
   const inner =
     variant === "auto" ? (
       <>
@@ -30,7 +40,7 @@ export function MedScopeLogo({
           alt={MEDSCOPE_LOGO_ALT}
           width={width}
           height={height}
-          className={cn("h-auto w-auto max-h-10 object-contain dark:hidden", imageClassName)}
+          className={cn("object-contain dark:hidden", imgClass || "h-auto w-auto max-h-10")}
           priority={priority}
         />
         <Image
@@ -38,7 +48,7 @@ export function MedScopeLogo({
           alt={MEDSCOPE_LOGO_ALT}
           width={width}
           height={height}
-          className={cn("hidden h-auto w-auto max-h-10 object-contain dark:block", imageClassName)}
+          className={cn("hidden object-contain dark:block", imgClass || "h-auto w-auto max-h-10")}
           priority={priority}
         />
       </>
@@ -48,17 +58,17 @@ export function MedScopeLogo({
         alt={MEDSCOPE_LOGO_ALT}
         width={width}
         height={height}
-        className={cn("h-auto w-auto max-h-10 object-contain", imageClassName)}
+        className={cn("object-contain", imgClass || "h-auto w-auto max-h-10")}
         priority={priority}
       />
     );
 
   if (!href) {
-    return <span className={cn("inline-flex shrink-0 items-center", className)}>{inner}</span>;
+    return <span className={cn("inline-flex shrink-0 items-center", wrapClass)}>{inner}</span>;
   }
 
   return (
-    <Link href={href} prefetch className={cn("inline-flex shrink-0 items-center", className)}>
+    <Link href={href} prefetch className={cn("inline-flex shrink-0 items-center", wrapClass)}>
       {inner}
     </Link>
   );
