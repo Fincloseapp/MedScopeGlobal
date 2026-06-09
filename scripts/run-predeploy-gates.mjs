@@ -49,6 +49,7 @@ function runTsc() {
 
 const steps = [
   ["sync-logos", "scripts/sync-logos.mjs"],
+  ["validate-logos", "scripts/validate-logos.mjs"],
   ["env:verify", "scripts/verify-env.mjs"],
   ["verify-v17-skeleton", "scripts/verify-v17-skeleton.mjs"],
   ["verify-acp", "scripts/verify-acp.mjs"],
