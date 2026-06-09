@@ -14,7 +14,7 @@ import type { AccessLevelId } from "@/lib/config/access-levels";
 import { getMainMenu } from "@/lib/config/main-navigation";
 
 /**
- * NEJM-plus site header — ultra-refined (v23.2.7)
+ * NEJM-plus site header — logo scaling v23.2.8
  */
 export function SiteHeader({
   categories,
@@ -37,7 +37,7 @@ export function SiteHeader({
 
   return (
     <header className="site-header sticky top-0 z-50 w-full border-b border-black/[0.06] bg-white/[0.98] backdrop-blur supports-[padding:max(0px)]:pt-[env(safe-area-inset-top)] dark:border-white/[0.08] dark:bg-slate-950/[0.98]">
-      <div className="mx-auto flex max-w-[1440px] flex-col px-4 py-[14px] sm:px-6 sm:py-4 md:flex-row md:items-center md:justify-between md:px-8 lg:min-h-[90px] lg:px-10 lg:py-0 xl:min-h-[100px] xl:px-10">
+      <div className="mx-auto flex max-w-[1440px] flex-col px-4 py-[14px] sm:px-6 sm:py-4 md:flex-row md:items-center md:justify-between md:px-8 lg:min-h-[96px] lg:px-10 lg:py-0 xl:min-h-[100px] xl:px-10">
         {/* Mobile: 3-col grid — empty | logo center | hamburger */}
         <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center md:w-auto md:flex md:shrink-0">
           <div className="md:hidden" aria-hidden />

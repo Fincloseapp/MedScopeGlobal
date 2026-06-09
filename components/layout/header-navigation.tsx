@@ -7,15 +7,15 @@ import type { NavItem } from "@/lib/config/main-navigation";
 import { cn } from "@/lib/utils";
 
 const NAV_LINK =
-  "inline-flex items-center px-[18px] py-2.5 text-[15.5px] font-normal tracking-[0.2px] text-slate-800 underline-offset-[3px] transition-colors hover:text-[#0055CC] hover:underline dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF] xl:px-[22px]";
+  "inline-flex items-center px-5 py-2.5 text-[15.5px] font-normal leading-none tracking-[0.2px] text-slate-800 underline-offset-[3px] transition-colors hover:text-[#0055CC] hover:underline dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF]";
 
 const NAV_LINK_ACTIVE =
   "font-medium text-[#0055CC] underline dark:text-[#7CC4FF]";
 
 const NAV_BUTTON =
-  "inline-flex items-center px-[18px] py-2.5 text-[15.5px] font-normal tracking-[0.2px] text-slate-800 underline-offset-[3px] transition-colors hover:text-[#0055CC] hover:underline after:ml-1 after:text-[11px] after:font-normal after:opacity-65 after:content-['▾'] dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF] xl:px-[22px]";
+  "inline-flex items-center px-5 py-2.5 text-[15.5px] font-normal leading-none tracking-[0.2px] text-slate-800 underline-offset-[3px] transition-colors hover:text-[#0055CC] hover:underline after:ml-1 after:text-[11px] after:font-normal after:opacity-65 after:content-['▾'] dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF]";
 
-/** NEJM-plus navigation — no icons, pure typography (v23.2.7) */
+/** NEJM-plus navigation — v23.2.8 logo ratio tuning */
 export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
   const pathname = usePathname();
   const [openLabel, setOpenLabel] = useState<string | null>(null);

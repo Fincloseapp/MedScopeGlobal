@@ -4,15 +4,17 @@ import { cn } from "@/lib/utils";
 
 export const HEADER_TAGLINE = "Medical Intelligence Network";
 
+/** v23.2.8 — logo : nav text ratio target (~2.2× cap-height feel at 64px / 15.5px) */
+export const HEADER_LOGO_HEIGHT = { mobile: 48, tablet: 56, desktop: 64 } as const;
+
 type Props = {
-  /** Center logo + tagline (mobile layout) */
   centered?: boolean;
   className?: string;
   priority?: boolean;
 };
 
 /**
- * NEJM-plus logo block — optical dominance, WebP + retina (v23.2.7)
+ * Premium logo block — 48 / 56 / 64 px, WebP + retina (v23.2.8)
  */
 export function HeaderLogo({ centered = false, className, priority = true }: Props) {
   return (
@@ -20,26 +22,31 @@ export function HeaderLogo({ centered = false, className, priority = true }: Pro
       href="/"
       prefetch
       className={cn(
-        "logo-block group flex shrink-0 flex-col pr-4 transition-opacity hover:opacity-[0.97]",
+        "logo-block group flex shrink-0 flex-col gap-1.5 pr-4 transition-opacity hover:opacity-[0.97]",
         centered ? "items-center text-center" : "items-start text-left",
         className
       )}
       aria-label="MedScopeGlobal — domů"
     >
-      <span className="logo-mark inline-block origin-left translate-y-[1.5px] scale-[1.1] max-md:origin-center md:origin-left">
+      <span className="logo-mark inline-block origin-left translate-y-[2px] max-md:origin-center md:origin-left">
         <MedScopeLogo
           href=""
           preset="header"
           priority={priority}
           className="p-0"
-          imageClassName="h-12 w-auto min-w-[154px] max-w-[198px] object-contain [letter-spacing:0.12px] sm:h-[3.85rem] sm:max-w-[242px] md:max-w-[248px]"
+          imageClassName={cn(
+            "w-auto object-contain [letter-spacing:0.12px]",
+            "h-12 min-w-[148px] max-w-[200px]",
+            "md:h-14 md:min-w-[168px] md:max-w-[228px]",
+            "lg:h-16 lg:min-w-[186px] lg:max-w-[272px]"
+          )}
         />
       </span>
       <p
         className={cn(
-          "tagline mt-1 font-extralight leading-snug",
-          "text-[11px] tracking-[0.35px] opacity-75",
-          "sm:text-xs md:text-[11px] lg:text-[13px] xl:text-[14px]",
+          "tagline mt-0.5 font-extralight leading-snug",
+          "text-[11px] tracking-[0.35px] opacity-75 sm:text-xs",
+          "md:text-[11px] lg:text-[13px] xl:text-sm",
           "text-[#6A6A6A] dark:text-[#A0A0A0] dark:opacity-85"
         )}
       >
@@ -49,5 +56,4 @@ export function HeaderLogo({ centered = false, className, priority = true }: Pro
   );
 }
 
-/** Alias per spec */
 export { HeaderLogo as HeaderLogoBlock };

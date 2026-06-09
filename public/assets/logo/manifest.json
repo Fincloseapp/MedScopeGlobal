@@ -1,9 +1,9 @@
 {
   "sourceDir": "D:\\MedScopeGlobal\\logo",
-  "syncedAt": "2026-06-09T20:26:41.719Z",
+  "syncedAt": "2026-06-09T20:54:54.442Z",
   "version": "v23.2.3",
   "files": {
-    "transparent": "Logo_Transparent.png",
+    "transparent": "Logo_Transparent.jpg",
     "print": "Logo_Print.jpg",
     "negative": "Logo_Negative.jpg"
   },
@@ -29,32 +29,32 @@
   "derivatives": {
     "transparent": {
       "webp": "Logo_Transparent.webp",
-      "webpSize": 50050,
+      "webpSize": 48142,
       "retinaPng": "Logo_Transparent@2x.png",
       "retinaWebp": "Logo_Transparent@2x.webp",
-      "retinaWebpSize": 65528,
-      "width": 1536,
-      "height": 1024,
+      "retinaWebpSize": 90132,
+      "width": 788,
+      "height": 503,
       "hasAlpha": false
     },
     "print": {
       "webp": "Logo_Print.webp",
-      "webpSize": 23900,
+      "webpSize": 24304,
       "retinaPng": "Logo_Print@2x.png",
       "retinaWebp": "Logo_Print@2x.webp",
-      "retinaWebpSize": 51846,
-      "width": 768,
-      "height": 512,
+      "retinaWebpSize": 51550,
+      "width": 378,
+      "height": 269,
       "hasAlpha": false
     },
     "negative": {
       "webp": "Logo_Negative.webp",
-      "webpSize": 26692,
+      "webpSize": 26882,
       "retinaPng": "Logo_Negative@2x.png",
       "retinaWebp": "Logo_Negative@2x.webp",
-      "retinaWebpSize": 56790,
-      "width": 768,
-      "height": 512,
+      "retinaWebpSize": 56260,
+      "width": 393,
+      "height": 283,
       "hasAlpha": false
     }
   }
