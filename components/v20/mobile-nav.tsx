@@ -13,7 +13,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import type { Category } from "@/types/database";
-import { MedScopeLogo } from "@/components/brand/medscope-logo";
+import { HeaderLogo, HEADER_TAGLINE } from "@/components/layout/header-logo";
 import type { NavItem } from "@/lib/config/main-navigation";
 
 export function V20MobileNav({
@@ -43,7 +43,7 @@ export function V20MobileNav({
         <Button
           variant="outline"
           size="icon"
-          className="xl:hidden touch-manipulation"
+          className="lg:hidden touch-manipulation"
           aria-label="Otevřít menu"
         >
           <Menu className="h-5 w-5" />
@@ -54,8 +54,10 @@ export function V20MobileNav({
         className="flex w-[min(100vw-1rem,380px)] flex-col overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]"
       >
         <SheetHeader className="shrink-0 text-left">
-          <MedScopeLogo href="/" preset="mobile" className="mb-2" />
-          <SheetTitle className="font-display text-lg text-[#021d33]">Navigace</SheetTitle>
+          <HeaderLogo className="mb-2 items-start" />
+          <SheetTitle className="font-display text-lg text-[#021d33] dark:text-[#E0E0E0]">
+            {HEADER_TAGLINE}
+          </SheetTitle>
         </SheetHeader>
 
         <nav className="mt-4 flex-1 space-y-2" aria-label="Mobilní navigace">
