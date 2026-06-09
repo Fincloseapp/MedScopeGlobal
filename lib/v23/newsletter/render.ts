@@ -15,10 +15,13 @@ export function renderNewsletterHtml(layout: V23NewsletterLayout): string {
         .map((item) => {
           const title = escapeHtml(item.title);
           const summary = escapeHtml(item.summary);
-          if (item.href) {
-            return `<li class="nl-item"><a href="${escapeHtml(item.href)}"><strong>${title}</strong></a><p>${summary}</p></li>`;
-          }
-          return `<li class="nl-item"><strong>${title}</strong><p>${summary}</p></li>`;
+          const thumb = item.imageUrl
+            ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.imageAlt ?? item.title)}" loading="lazy" width="120" height="80" class="nl-item-img" />`
+            : "";
+          const body = item.href
+            ? `<a href="${escapeHtml(item.href)}"><strong>${title}</strong></a><p>${summary}</p>`
+            : `<strong>${title}</strong><p>${summary}</p>`;
+          return `<li class="nl-item">${thumb}<div class="nl-item-body">${body}</div></li>`;
         })
         .join("");
       return `

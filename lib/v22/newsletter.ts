@@ -5,7 +5,7 @@ export const V22_NEWSLETTER_HERO = V23_NEWSLETTER_IMAGE;
 
 export const V22_FALLBACK_NEWSLETTER: NewsletterRow = {
   id: "curated-newsletter-2026-06",
-  title: "MedScope Odborný přehled — červen 2026",
+  title: "MedScopeGlobal Newsletter — 10. června 2026",
   slug: "medscope-prehled-cerven-2026",
   issue_date: "2026-06-10",
   html_content: `
@@ -24,7 +24,7 @@ export const V22_FALLBACK_NEWSLETTER: NewsletterRow = {
     </article>
   `,
   pdf_text:
-    "MedScope Odborný přehled — červen 2026\n\nStudie, legislativa, léky, digital health.\nPřihlášení k odběru: medscopeglobal.com/subscribe",
+    "MedScopeGlobal Newsletter — 10. června 2026\n\nStudie, legislativa, léky, digital health.\nPřihlášení k odběru: medscopeglobal.com/subscribe",
   pdf_url: null,
   layout_json: null,
   published: true,

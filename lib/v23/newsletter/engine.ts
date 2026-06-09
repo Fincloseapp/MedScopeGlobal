@@ -3,7 +3,9 @@ import { generateNewsletterLayoutWithAi } from "@/lib/v23/newsletter/ai";
 import { renderNewsletterHtml, renderNewsletterPdfText } from "@/lib/v23/newsletter/render";
 import { gatherNewsletterSources, type V23NewsletterSources } from "@/lib/v23/newsletter/sources";
 import type { V23NewsletterLayout } from "@/lib/v23/newsletter/types";
+import { ensureLayoutImages } from "@/lib/v23/newsletter/images";
 import { isJsonLikeText } from "@/lib/v23/newsletter/sanitize";
+import { newsletterHeadline, normalizeNewsletterHeadline } from "@/lib/v23/newsletter/title";
 
 export type NewsletterGenerateResult = {
   id: string;
@@ -76,6 +78,15 @@ async function saveNewsletterRow(opts: {
   return data!.id;
 }
 
+function finalizeLayout(layout: V23NewsletterLayout, issueDate: string): V23NewsletterLayout {
+  const withImages = ensureLayoutImages(layout, issueDate);
+  return {
+    ...withImages,
+    version: "v23.1.2",
+    headline: normalizeNewsletterHeadline(issueDate, withImages.headline),
+  };
+}
+
 async function generateFresh(issueDate: string): Promise<{
   layout: V23NewsletterLayout;
   sources: V23NewsletterSources;
@@ -83,7 +94,8 @@ async function generateFresh(issueDate: string): Promise<{
   pdf_text: string;
 }> {
   const sources = await gatherNewsletterSources();
-  const layout = await generateNewsletterLayoutWithAi(sources, issueDate);
+  const raw = await generateNewsletterLayoutWithAi(sources, issueDate);
+  const layout = finalizeLayout(raw, issueDate);
   return {
     layout,
     sources,
@@ -100,7 +112,7 @@ export async function buildNewsletterDraft(): Promise<NewsletterGenerateResult> 
   const id = await saveNewsletterRow({
     slug,
     issueDate,
-    title: layout.headline,
+    title: newsletterHeadline(issueDate),
     html_content,
     pdf_text,
     layout,
@@ -119,7 +131,7 @@ export async function publishNewsletterIssue(): Promise<NewsletterGenerateResult
   const id = await saveNewsletterRow({
     slug,
     issueDate,
-    title: layout.headline,
+    title: newsletterHeadline(issueDate),
     html_content,
     pdf_text,
     layout,

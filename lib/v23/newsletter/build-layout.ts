@@ -1,4 +1,5 @@
 import { attachSectionImages, heroNewsletterImage } from "@/lib/v23/newsletter/images";
+import { newsletterHeadline } from "@/lib/v23/newsletter/title";
 import { formatIssueDateCs, sanitizeNewsletterText } from "@/lib/v23/newsletter/sanitize";
 import type { V23NewsletterSources } from "@/lib/v23/newsletter/sources";
 import type { V23NewsletterItem, V23NewsletterLayout, V23NewsletterSection } from "@/lib/v23/newsletter/types";
@@ -18,6 +19,8 @@ function cleanItems(items: V23NewsletterItem[], min = 1): V23NewsletterItem[] {
       title: sanitizeNewsletterText(item.title),
       summary: sanitizeNewsletterText(item.summary, V23_NEWSLETTER_FALLBACKS.articleSummary),
       href: item.href,
+      imageUrl: item.imageUrl,
+      imageAlt: item.imageAlt,
     }))
     .filter((item) => item.title.length > 2);
 
@@ -139,16 +142,18 @@ export function buildNewsletterLayout(
       ...sec,
       intro: polish?.sectionIntros?.[sec.id] ?? sec.intro,
       items: itemsBySection[sec.id] ?? [],
-    }))
+    })),
+    issueDate
   );
 
   const dateLabel = formatIssueDateCs(issueDate);
+  const headline = newsletterHeadline(issueDate);
 
   return {
-    version: "v23.1.1",
+    version: "v23.1.2",
     heroImageUrl: heroNewsletterImage(issueDate),
-    heroImageAlt: "MedScopeGlobal — odborný medicínský newsletter",
-    headline: polish?.headline ?? `MedScope Odborný přehled — ${dateLabel}`,
+    heroImageAlt: "MedScopeGlobal Newsletter — odborný medicínský přehled",
+    headline,
     intro:
       polish?.intro ??
       `Týdenní souhrn evidence-based medicíny pro českou klinickou praxi, výzkum a studium medicíny. Vydání ze dne ${dateLabel} vychází z ověřených zdrojů PubMed, SÚKL, MZČR a partnerských portálů.`,

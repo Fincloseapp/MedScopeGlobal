@@ -26,11 +26,12 @@ export type V23NewsletterSources = {
 
 const articleSelect = `*, categories ( id, name, slug )`;
 
-function toItem(title: string, summary: string, href: string): V23NewsletterItem {
+function toItem(title: string, summary: string, href: string, imageUrl?: string | null): V23NewsletterItem {
   return {
     title: sanitizeNewsletterText(title),
     summary: sanitizeNewsletterText(summary, V23_NEWSLETTER_FALLBACKS.articleSummary),
     href,
+    imageUrl: imageUrl?.startsWith("http") ? imageUrl : undefined,
   };
 }
 
@@ -68,7 +69,7 @@ async function loadLegislation(limit = 3): Promise<V23NewsletterItem[]> {
   const admin = createServiceRoleClient();
   const { data, error } = await admin
     .from("legislation_items")
-    .select("title, slug, summary, body")
+    .select("title, slug, summary, body, image_url")
     .eq("published", true)
     .order("published_date", { ascending: false, nullsFirst: false })
     .limit(limit);
@@ -76,7 +77,12 @@ async function loadLegislation(limit = 3): Promise<V23NewsletterItem[]> {
   if (error || !data?.length) return V23_FALLBACK_LEGISLATION;
 
   const items = data.map((l) =>
-    toItem(l.title, l.summary ?? l.body?.replace(/<[^>]+>/g, " ").slice(0, 220) ?? "", `/legislativa/${l.slug}`)
+    toItem(
+      l.title,
+      l.summary ?? l.body?.replace(/<[^>]+>/g, " ").slice(0, 220) ?? "",
+      `/legislativa/${l.slug}`,
+      l.image_url
+    )
   );
   return items.length ? items : V23_FALLBACK_LEGISLATION;
 }
@@ -85,7 +91,7 @@ async function loadDrugNews(limit = 3): Promise<V23NewsletterItem[]> {
   const admin = createServiceRoleClient();
   const { data, error } = await admin
     .from("drug_news")
-    .select("title, slug, summary, body")
+    .select("title, slug, summary, body, image_url")
     .eq("published", true)
     .order("published_date", { ascending: false, nullsFirst: false })
     .limit(limit);
@@ -93,7 +99,12 @@ async function loadDrugNews(limit = 3): Promise<V23NewsletterItem[]> {
   if (error || !data?.length) return V23_FALLBACK_DRUGS;
 
   const items = data.map((d) =>
-    toItem(d.title, d.summary ?? d.body?.replace(/<[^>]+>/g, " ").slice(0, 220) ?? "", `/leky/novinky/${d.slug}`)
+    toItem(
+      d.title,
+      d.summary ?? d.body?.replace(/<[^>]+>/g, " ").slice(0, 220) ?? "",
+      `/leky/novinky/${d.slug}`,
+      d.image_url
+    )
   );
   return items.length ? items : V23_FALLBACK_DRUGS;
 }
@@ -102,7 +113,7 @@ async function loadUniversityNews(limit = 3): Promise<V23NewsletterItem[]> {
   const admin = createServiceRoleClient();
   const { data, error } = await admin
     .from("university_news")
-    .select("title, slug, summary, body")
+    .select("title, slug, summary, body, image_url")
     .eq("published", true)
     .order("published_date", { ascending: false, nullsFirst: false })
     .limit(limit);
@@ -113,7 +124,8 @@ async function loadUniversityNews(limit = 3): Promise<V23NewsletterItem[]> {
     toItem(
       u.title,
       u.summary ?? u.body?.replace(/<[^>]+>/g, " ").slice(0, 220) ?? "",
-      `/novinky/univerzity/${u.slug}`
+      `/novinky/univerzity/${u.slug}`,
+      u.image_url
     )
   );
   return items.length ? items : V23_FALLBACK_UNIVERSITIES;

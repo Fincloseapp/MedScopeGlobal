@@ -2,6 +2,8 @@ export type V23NewsletterItem = {
   title: string;
   summary: string;
   href?: string;
+  imageUrl?: string;
+  imageAlt?: string;
 };
 
 export type V23NewsletterSection = {
@@ -24,7 +26,7 @@ export type V23NewsletterSourcesSnapshot = {
 };
 
 export type V23NewsletterLayout = {
-  version: "v23.1" | "v23.1.1";
+  version: "v23.1" | "v23.1.1" | "v23.1.2";
   heroImageUrl: string;
   heroImageAlt: string;
   headline: string;

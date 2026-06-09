@@ -13,9 +13,6 @@ type AiPolishResponse = {
 
 function cleanPolish(raw: AiPolishResponse): LayoutPolish {
   const polish: LayoutPolish = {};
-  if (raw.headline && !isJsonLikeText(raw.headline)) {
-    polish.headline = sanitizeNewsletterText(raw.headline);
-  }
   if (raw.intro && !isJsonLikeText(raw.intro)) {
     polish.intro = sanitizeNewsletterText(raw.intro);
   }
@@ -53,7 +50,8 @@ export async function generateNewsletterLayoutWithAi(
   };
 
   const system = `Jsi editor českého odborného medicínského newsletteru MedScopeGlobal.
-Vrať POUZE JSON objekt s klíči: headline (string), intro (string, 2-3 věty), sectionIntros (objekt id→text), topicSummaries (objekt téma→krátké shrnutí).
+Vrať POUZE JSON objekt s klíči: intro (string, 2-3 věty), sectionIntros (objekt id→text), topicSummaries (objekt téma→krátké shrnutí).
+NEVRACEJ headline — název vydání je fixní.
 NEVRACEJ seznam článků, studií ani položek — pouze texty úvodů.
 Čeština, profesionální medicínský styl, bez anglicismů a bez JSON v hodnotách.
 Povolená id sekcí v sectionIntros: studie, clanky, legislativa, digital-health, leky, univerzity, doporucujeme.`;
