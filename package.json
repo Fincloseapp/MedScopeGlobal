@@ -40,6 +40,7 @@
     "sync-logos": "node scripts/sync-logos.mjs",
     "autogit": "node scripts/auto-git-commit-push.js --watch",
     "push:github": "powershell -ExecutionPolicy Bypass -File ./scripts/push-d-to-github.ps1",
+    "verify-v24": "node scripts/verify-v24.0.mjs",
     "auto:git": "node scripts/auto-git-commit-push.js",
     "auto:git:push": "node scripts/auto-git-commit-push.js --push-only",
     "healthcheck-local": "node node_modules/tsx/dist/cli.mjs scripts/deploy/health-runner.ts",

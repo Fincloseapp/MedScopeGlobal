@@ -59,5 +59,12 @@ else pass("newsletter Hero component");
 if (!existsSync(footerPath)) fail("components/newsletter/Footer.tsx missing");
 else pass("newsletter Footer component");
 
+const v24Orchestrator = join(root, "lib/v24/orchestrator.ts");
+const v24Hub = join(root, "components/v24/ai-medical-hub.tsx");
+if (!existsSync(v24Orchestrator)) fail("lib/v24/orchestrator.ts missing");
+else pass("v24 orchestrator");
+if (!existsSync(v24Hub)) fail("components/v24/ai-medical-hub.tsx missing");
+else pass("v24 AI Medical hub");
+
 if (!ok) process.exit(1);
 console.log("\nBuild version verification PASSED");
