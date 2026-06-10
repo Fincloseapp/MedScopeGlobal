@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { listUniversitiesForUi } from "@/lib/v25/universities";
+import { listUniversitiesForUiAsync } from "@/lib/v25/universities";
 import { CZ_MEDICAL_FACULTIES } from "@/lib/v25/universities-data";
 
-export function V25UniversitiesHomeSection() {
-  const faculties = listUniversitiesForUi();
+export async function V25UniversitiesHomeSection() {
+  const faculties = await listUniversitiesForUiAsync();
   const shortBySlug = new Map(CZ_MEDICAL_FACULTIES.map((f) => [f.slug, f.shortName]));
 
   return (

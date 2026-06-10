@@ -21,6 +21,7 @@ const V25_TABLES = [
   "v25_fix_log",
   "v25_university_runs",
   "v25_system_snapshot",
+  "v25_universities_snapshot",
 ];
 
 async function main() {

@@ -76,6 +76,9 @@ const v24Required = [
   "app/(admin)/admin/system/components/UniversitySources.tsx",
   "supabase/migrations/20260610150000_v25_universities.sql",
   "supabase/migrations/20260610163000_v25_system_snapshot.sql",
+  "supabase/migrations/20260610170000_v25_universities_snapshot.sql",
+  "lib/v25/universities-persist.ts",
+  "lib/v25/universities-fetch.ts",
   "lib/v25/system-state-persist.ts",
   "scripts/verify-v25-supabase.mjs",
 ];

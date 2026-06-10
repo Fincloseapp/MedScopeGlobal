@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getFacultyBySlug, listUniversitiesForUi } from "@/lib/v25/universities";
+import { getFacultyBySlug, getFacultyForPublicUi } from "@/lib/v25/universities";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +10,7 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const staticFaculty = getFacultyBySlug(slug);
-  const live = listUniversitiesForUi().find((f) => f.slug === slug);
+  const live = await getFacultyForPublicUi(slug);
   const name = live?.name ?? staticFaculty?.name ?? "Fakulta";
   return { title: `${name} — studium medicíny` };
 }
@@ -20,8 +20,7 @@ export default async function FacultyDetailPage({ params }: Props) {
   const staticFaculty = getFacultyBySlug(slug);
   if (!staticFaculty) notFound();
 
-  const live = listUniversitiesForUi().find((f) => f.slug === slug);
-  const faculty = { ...staticFaculty, ...live };
+  const faculty = (await getFacultyForPublicUi(slug))!;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
@@ -53,8 +52,10 @@ export default async function FacultyDetailPage({ params }: Props) {
           </dd>
         </div>
         <div>
-          <dt className="text-xs font-medium uppercase text-muted-foreground">Stav sběru</dt>
-          <dd className="mt-1">{faculty.ok === false ? "Nedostupné" : faculty.ok ? "OK" : "Čeká na sběr"}</dd>
+          <dt className="text-xs font-medium uppercase text-muted-foreground">Dostupnost webu</dt>
+          <dd className="mt-1">
+            {faculty.ok === false ? "Web momentálně nedostupný" : faculty.ok ? "Web fakulty dostupný" : "—"}
+          </dd>
         </div>
         {faculty.fetchedAt ? (
           <div>

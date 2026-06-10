@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { listUniversitiesForUi } from "@/lib/v25/universities";
+import { listUniversitiesForUiAsync } from "@/lib/v25/universities";
 
 export const metadata: Metadata = {
   title: "Lékařské fakulty v ČR",
@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default function UniverzityPage() {
-  const faculties = listUniversitiesForUi();
+export default async function UniverzityPage() {
+  const faculties = await listUniversitiesForUiAsync();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
@@ -53,7 +53,11 @@ export default function UniverzityPage() {
                 <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
                   Nedostupné
                 </span>
-              ) : null}
+              ) : (
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                  Katalog
+                </span>
+              )}
             </div>
             {f.description ? (
               <p className="mt-3 line-clamp-2 text-sm text-slate-600">{f.description}</p>

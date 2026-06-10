@@ -1,28 +1,51 @@
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
-import { loadUniversitiesReport } from "@/lib/v25/universities";
+import { fetchAllFacultiesLive } from "@/lib/v25/universities-fetch";
+import {
+  loadUniversitiesReportAsync,
+  persistUniversitiesReport,
+} from "@/lib/v25/universities";
+import { mergeV25SystemState, setCronStatus } from "@/lib/v25/system-state";
 
 export async function runUniversitiesFetch() {
   if (process.env.VERCEL === "1") {
-    const faculties = [
-      { slug: "lf-uk-1", url: "https://www.lf1.cuni.cz" },
-      { slug: "lf-mu", url: "https://www.med.muni.cz" },
-    ];
-    let ok = 0;
-    for (const f of faculties) {
-      try {
-        const res = await fetch(f.url, { signal: AbortSignal.timeout(15000) });
-        if (res.ok) ok += 1;
-      } catch {
-        /* */
-      }
-    }
-    return { ok: ok > 0, fetched: faculties.length, detail: "vercel-lite" };
+    const previous = await loadUniversitiesReportAsync();
+    const report = await fetchAllFacultiesLive(previous);
+    const persisted = await persistUniversitiesReport(report);
+
+    setCronStatus(
+      "v25-universities",
+      report.totals.failed === 0 ? "ok" : "fail",
+      undefined,
+      report.totals.failed ? `${report.totals.failed} faculties failed` : undefined,
+      report.totals
+    );
+    mergeV25SystemState({
+      universities: report,
+      providers: [
+        {
+          id: "universities",
+          name: "České LF",
+          status: report.totals.failed === 0 ? "ok" : "partial",
+          lastRunAt: report.at,
+          newItems: report.totals.newArticles,
+          updates: report.totals.updates,
+          errors: report.totals.failed,
+        },
+      ],
+    });
+
+    return {
+      ok: report.totals.ok > 0 && persisted,
+      fetched: report.totals.fetched,
+      detail: `${report.totals.ok}/${report.totals.fetched} OK`,
+    };
   }
 
   const script = join(process.cwd(), "lib/v25/providers/universities-provider.mjs");
   const result = spawnSync(process.execPath, [script], { encoding: "utf8", timeout: 180000 });
-  const report = loadUniversitiesReport();
+  const report = await loadUniversitiesReportAsync();
+  if (report) await persistUniversitiesReport(report);
   return {
     ok: result.status === 0,
     fetched: report?.totals.fetched ?? 0,

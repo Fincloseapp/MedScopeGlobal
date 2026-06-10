@@ -1,5 +1,10 @@
-import { readV25Json, V25_DATA_PATHS } from "@/lib/v25/data-store";
+import { readV25Json } from "@/lib/v25/data-store";
 import { CZ_MEDICAL_FACULTIES, getFacultyBySlug } from "@/lib/v25/universities-data";
+import { fetchFacultyLive } from "@/lib/v25/universities-fetch";
+import {
+  loadUniversitiesReportFromDb,
+  persistUniversitiesReport,
+} from "@/lib/v25/universities-persist";
 
 export type V25UniversityFaculty = {
   slug: string;
@@ -34,6 +39,39 @@ export function loadUniversitiesReport(): V25UniversitiesReport | null {
   return readV25Json<V25UniversitiesReport>("v25/universities/index.json");
 }
 
+export async function loadUniversitiesReportAsync(): Promise<V25UniversitiesReport | null> {
+  const fromDb = await loadUniversitiesReportFromDb();
+  if (fromDb?.faculties?.length) return fromDb;
+  return loadUniversitiesReport();
+}
+
+export async function listUniversitiesForUiAsync(): Promise<V25UniversityFaculty[]> {
+  const report = await loadUniversitiesReportAsync();
+  if (report?.faculties?.length) return report.faculties;
+  return CZ_MEDICAL_FACULTIES.map((f) => ({
+    slug: f.slug,
+    name: f.name,
+    url: f.url,
+    city: f.city,
+    ok: undefined,
+  }));
+}
+
+/** Veřejná stránka — pokud chybí uložený sběr, ověří web fakulty naživo. */
+export async function getFacultyForPublicUi(slug: string): Promise<V25UniversityFaculty | null> {
+  const staticFaculty = getFacultyBySlug(slug);
+  if (!staticFaculty) return null;
+
+  const report = await loadUniversitiesReportAsync();
+  const cached = report?.faculties?.find((f) => f.slug === slug);
+  if (cached?.fetchedAt) {
+    return { ...staticFaculty, ...cached, name: staticFaculty.name };
+  }
+
+  const live = await fetchFacultyLive(staticFaculty);
+  return { ...staticFaculty, ...live, name: staticFaculty.name };
+}
+
 export function listUniversitiesForUi(): V25UniversityFaculty[] {
   const report = loadUniversitiesReport();
   if (report?.faculties?.length) return report.faculties;
@@ -46,4 +84,4 @@ export function listUniversitiesForUi(): V25UniversityFaculty[] {
   }));
 }
 
-export { CZ_MEDICAL_FACULTIES, getFacultyBySlug };
+export { CZ_MEDICAL_FACULTIES, getFacultyBySlug, persistUniversitiesReport };
