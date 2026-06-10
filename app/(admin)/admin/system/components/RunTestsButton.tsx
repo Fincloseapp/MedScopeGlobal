@@ -11,7 +11,10 @@ export function RunTestsButton() {
     setLoading(true);
     setStatus("Spouštím v25 enterprise pipeline…");
     try {
-      const res = await fetch("/api/v25/system/run", { method: "POST" });
+      const res = await fetch("/api/v25/system/run", {
+        method: "POST",
+        credentials: "same-origin",
+      });
       const data = await res.json();
       setStatus(res.ok ? `Hotovo — ${data.ok ? "PASS" : "FAIL"}` : data.error ?? "Chyba");
       if (res.ok) window.location.reload();
