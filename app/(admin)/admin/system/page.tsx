@@ -10,7 +10,7 @@ import { loadV25SystemStateAsync } from "@/lib/v25/system-state";
 
 import { loadUniversitiesReport } from "@/lib/v25/universities";
 
-import type { V25LinkTestReport } from "@/lib/v25/types";
+import type { V25LinkTestReport, V25ImageTestReport } from "@/lib/v25/types";
 
 import { verifyV25Apis } from "@/lib/v25/verify";
 
@@ -35,6 +35,8 @@ import { Screenshots } from "./components/Screenshots";
 import { NavigationTests } from "./components/NavigationTests";
 
 import { LinkTests } from "./components/LinkTests";
+
+import { ImageTests } from "./components/ImageTests";
 
 import { ApiTable } from "./components/TestTable";
 
@@ -62,11 +64,15 @@ export default async function AdminSystemPage() {
 
   const linkReport = readV25Json<V25LinkTestReport>("v25/link-report.json");
 
+  const imageTestReportFromFile = readV25Json<V25ImageTestReport>("v25/image-test-report.json");
+
 
 
   const merged = {
 
     ...state,
+
+    imageTestReport: state.imageTestReport ?? imageTestReportFromFile ?? undefined,
 
     apis: live.apis.length ? live.apis : state.apis,
 
@@ -120,9 +126,9 @@ export default async function AdminSystemPage() {
 
         <p className="mt-1 text-sm text-muted-foreground">
 
-          QA · SEO · Legal · Universities · LinkTest · Screenshots · NavMonitor · Autofix · Redeploy ·
+          QA · SEO · Legal · Universities · ImageTest · LinkTest · Screenshots · NavMonitor · Autofix ·
 
-          Rollback
+          Redeploy · Rollback
 
         </p>
 
@@ -213,6 +219,14 @@ export default async function AdminSystemPage() {
           <h3 className="mb-2 text-sm font-medium text-muted-foreground">Screenshot-test</h3>
 
           <Screenshots shots={merged.screenshots} />
+
+        </div>
+
+        <div>
+
+          <h3 className="mb-2 text-sm font-medium text-muted-foreground">Image-test</h3>
+
+          <ImageTests status={merged.tests.imageTest} report={merged.imageTestReport} />
 
         </div>
 

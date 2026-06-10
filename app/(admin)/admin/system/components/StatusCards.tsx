@@ -19,6 +19,7 @@ const LABELS: { key: keyof V25TestSuite; label: string }[] = [
   { key: "screenshotTest", label: "ScreenshotTest" },
   { key: "navigationMonitor", label: "NavigationMonitor" },
   { key: "imagePipeline", label: "ImagePipeline" },
+  { key: "imageTest", label: "ImageTest" },
   { key: "verifyEngine", label: "VerifyEngine" },
   { key: "buildStatus", label: "BuildStatus" },
   { key: "ciStatus", label: "CI Status" },

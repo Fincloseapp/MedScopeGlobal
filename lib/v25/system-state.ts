@@ -17,6 +17,7 @@ function defaultTests(): V25TestSuite {
     screenshotTest: "pending",
     navigationMonitor: "pending",
     imagePipeline: "pending",
+    imageTest: "pending",
     verifyEngine: "pending",
     buildStatus: "ok",
     ciStatus: "ok",

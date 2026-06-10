@@ -20,7 +20,7 @@ export function runV25Autofix(ctx: V25AutofixContext): { ok: boolean; action: st
     nav: "re-fetch navigation routes",
     screenshot: "fallback to HTML snapshot manifest",
     images: "run v25 image pipeline — generate and assign missing covers",
-    image: "run v25 image pipeline — generate and assign missing covers",
+    imagetest: "re-run image URL + page visual checks",
   };
 
   const action = fixes[ctx.errorType] ?? "log and alert ops";

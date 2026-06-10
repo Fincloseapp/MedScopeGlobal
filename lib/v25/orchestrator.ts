@@ -19,6 +19,7 @@ import {
   runInlineNavMonitor,
   runInlineScreenshotManifest,
 } from "@/lib/v25/runners/post-pipeline";
+import { runInlineImageTest } from "@/lib/v25/images/image-test";
 import { runUniversitiesFetch } from "@/lib/v25/runners/universities";
 import { runImagesFetch } from "@/lib/v25/runners/images";
 
@@ -68,6 +69,13 @@ export async function runV25PostPipeline(): Promise<V25EnterpriseResult> {
       phases.image = { ok: true, detail: retry.detail };
     }
   }
+
+  const imageTest = await runInlineImageTest();
+  phases.imageTest = {
+    ok: imageTest.ok,
+    detail: `${imageTest.report.urlsOk}/${imageTest.report.urlsChecked} URL · ${imageTest.report.pagesOk}/${imageTest.report.pagesChecked.length} stránek`,
+  };
+  if (!imageTest.ok) errors.push(`imagetest: ${imageTest.report.urlsBroken.length} broken urls`);
 
   if (errors.length > 0) {
     autofixAttempted = true;

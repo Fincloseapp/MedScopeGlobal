@@ -5,6 +5,7 @@ export type V25TestSuite = {
   screenshotTest: V25TestStatus;
   navigationMonitor: V25TestStatus;
   imagePipeline: V25TestStatus;
+  imageTest: V25TestStatus;
   verifyEngine: V25TestStatus;
   buildStatus: V25TestStatus;
   ciStatus: V25TestStatus;
@@ -86,6 +87,21 @@ export type V25LinkTestReport = {
   working: number;
   broken: number;
   brokenUrls: string[];
+  brokenImages?: string[];
+};
+
+export type V25ImageTestReport = {
+  at: string;
+  ok: boolean;
+  registryTotal: number;
+  urlsChecked: number;
+  urlsOk: number;
+  urlsBroken: string[];
+  pagesChecked: Array<{ path: string; ok: boolean; hasVisual: boolean; detail?: string }>;
+  pagesOk: number;
+  assetApiOk: boolean;
+  missingBefore?: number;
+  assigned?: number;
 };
 
 export type V25SystemOverview = {
@@ -154,6 +170,7 @@ export type V25SystemState = {
   };
   overview?: V25SystemOverview;
   images?: V25ImagesOverview;
+  imageTestReport?: V25ImageTestReport;
 };
 
 export type V25PipelinePhase =

@@ -17,6 +17,7 @@ export const V25_DATA_PATHS = {
   imageReport: "v25/images/report.json",
   imageRegistry: "images/registry.json",
   imageFixLog: "images/fix-log.json",
+  imageTestReport: "v25/image-test-report.json",
 } as const;
 
 export const V25_LOG_PATHS = {
