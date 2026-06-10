@@ -28,7 +28,9 @@ export function defaultV25SystemState(): V25SystemState {
       { cronId: "v24-ultra", lastRunAt: null, durationMs: null, status: "pending" },
       { cronId: "v25-enterprise", lastRunAt: null, durationMs: null, status: "pending" },
       { cronId: "v25-nav-monitor", lastRunAt: null, durationMs: null, status: "pending" },
+      { cronId: "v25-universities", lastRunAt: null, durationMs: null, status: "pending" },
     ],
+    providers: [],
     apis: [],
     navigation: {
       totalLinks: 0,

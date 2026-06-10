@@ -26,6 +26,39 @@ export type V25CronStatus = {
   durationMs: number | null;
   status: V25TestStatus;
   error?: string;
+  metrics?: {
+    generated?: number;
+    failed?: number;
+    newArticles?: number;
+    updates?: number;
+    fetched?: number;
+    ok?: number;
+  };
+};
+
+export type V25ProviderStatus = {
+  id: string;
+  name: string;
+  status: V25TestStatus | "partial";
+  lastRunAt: string;
+  newItems: number;
+  updates: number;
+  errors: number;
+};
+
+export type V25LinkTestReport = {
+  at: string;
+  total: number;
+  working: number;
+  broken: number;
+  brokenUrls: string[];
+};
+
+export type V25SystemOverview = {
+  orchestrator: V25TestStatus;
+  lastAutofix: V25FixRecord | null;
+  lastRollback: V25FixRecord | null;
+  lastRedeploy: V25FixRecord | null;
 };
 
 export type V25ApiStatus = {
@@ -69,6 +102,23 @@ export type V25SystemState = {
   navigation: V25NavStatus;
   screenshots: V25ScreenshotEntry[];
   alerts: V25Alert[];
+  providers?: V25ProviderStatus[];
+  universities?: {
+    at: string;
+    totals: { fetched: number; ok: number; failed: number; newArticles: number; updates: number };
+    faculties: Array<{
+      slug: string;
+      name: string;
+      url: string;
+      city: string;
+      ok?: boolean;
+      fetchedAt?: string;
+      newArticles?: number;
+      updates?: number;
+      error?: string | null;
+    }>;
+  };
+  overview?: V25SystemOverview;
 };
 
 export type V25PipelinePhase =

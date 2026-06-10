@@ -1,5 +1,5 @@
 export const V25_ENGINE_VERSION = "v25.1";
-export const V25_ENGINE_LABEL = "ULTRA-MAX ENTERPRISE++";
+export const V25_ENGINE_LABEL = "ULTRA-MAX ENTERPRISE+++";
 export const V25_FEATURES = [
   "v25.0-autofix",
   "v25.0-auto-check",
@@ -11,4 +11,6 @@ export const V25_FEATURES = [
   "v25.1-screenshots",
   "v25.1-nav-monitor",
   "v25.1-admin-dashboard",
+  "v25.1-universities",
+  "v25.1-observability-center",
 ] as const;

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Post-deploy verification — v25.1 ULTRA-MAX ENTERPRISE++
+ * Post-deploy verification — v25.1 ULTRA-MAX ENTERPRISE+++
  */
 const BASE = (process.env.PROD_BASE_URL || "https://medscopeglobal.com").replace(/\/$/, "");
 
@@ -16,14 +16,16 @@ async function fetchJson(path) {
 }
 
 async function main() {
-  const [healthV19, healthV24, healthV25, system, home] = await Promise.all([
+  const [healthV19, healthV24, healthV25, system, home, univerzity] = await Promise.all([
     fetchJson("/api/v19/health"),
     fetchJson("/api/v24/health"),
     fetchJson("/api/v25/health"),
     fetchJson("/api/v25/system"),
     fetch(`${BASE}/?_${Date.now()}`, { cache: "no-store" }),
+    fetch(`${BASE}/studium/univerzity?_${Date.now()}`, { cache: "no-store" }),
   ]);
   const homeText = await home.text();
+  const univerzityText = await univerzity.text();
 
   const checks = {
     uiVersion: healthV19.json?.uiVersion === "v25.1",
@@ -35,6 +37,7 @@ async function main() {
     v25NavMonitor: healthV25.json?.navMonitor === true,
     aiMedicalHub: homeText.includes("AI Medical") || homeText.includes("MedScope"),
     adminSystem: true,
+    universitiesPage: univerzity.status === 200 && univerzityText.includes("Lékařské fakulty"),
     homeOk: home.status === 200,
   };
 
@@ -45,7 +48,7 @@ async function main() {
     v25: healthV25.json?.version,
     ...checks,
   });
-  console.log(ok ? "\nPASS — v25.1 ENTERPRISE++ verified" : "\nFAIL");
+  console.log(ok ? "\nPASS — v25.1 ENTERPRISE+++ verified" : "\nFAIL");
   process.exit(ok ? 0 : 1);
 }
 

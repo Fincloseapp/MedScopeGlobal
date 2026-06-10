@@ -13,6 +13,7 @@ import {
   runInlineNavMonitor,
   runInlineScreenshotManifest,
 } from "@/lib/v25/runners/post-pipeline";
+import { runUniversitiesFetch } from "@/lib/v25/runners/universities";
 
 export async function runV25PostPipeline(): Promise<V25EnterpriseResult> {
   const t0 = Date.now();
@@ -43,6 +44,10 @@ export async function runV25PostPipeline(): Promise<V25EnterpriseResult> {
   const nav = await runInlineNavMonitor();
   phases.navmonitor = { ok: nav.ok, detail: nav.broken ? `${nav.broken} broken` : undefined };
   if (!nav.ok) errors.push(`navmonitor: ${nav.broken} nav failures`);
+
+  const universities = await runUniversitiesFetch();
+  phases.universities = { ok: universities.ok, detail: universities.detail };
+  if (!universities.ok) errors.push("universities: provider fetch failed");
 
   if (errors.length > 0) {
     autofixAttempted = true;

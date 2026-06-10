@@ -66,6 +66,15 @@ const v24Required = [
   "app/(admin)/admin/system/page.tsx",
   "scripts/verify-v25.0.mjs",
   "supabase/migrations/20260610140000_v25_enterprise.sql",
+  "lib/v25/providers/universities-provider.mjs",
+  "lib/v25/universities-data.ts",
+  "lib/v25/universities.ts",
+  "scripts/cron/universities/fetch-universities.mjs",
+  "app/api/cron/v25-universities/route.ts",
+  "app/(public)/studium/univerzity/page.tsx",
+  "app/(admin)/admin/system/components/SystemStatus.tsx",
+  "app/(admin)/admin/system/components/UniversitySources.tsx",
+  "supabase/migrations/20260610150000_v25_universities.sql",
 ];
 
 for (const p of v24Required) checkPath(p);
