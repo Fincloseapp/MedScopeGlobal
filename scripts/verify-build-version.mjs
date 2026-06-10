@@ -69,12 +69,18 @@ else pass("v24 AI Medical hub");
 const v25Orchestrator = join(root, "lib/v25/orchestrator.ts");
 const v25Admin = join(root, "app/(admin)/admin/system/page.tsx");
 const v25Link = join(root, "lib/v25/linktest/link-checker.mjs");
+const v25ImageTest = join(root, "lib/v25/images/image-test.ts");
+const v25ImageAdmin = join(root, "app/(admin)/admin/images/page.tsx");
 if (!existsSync(v25Orchestrator)) fail("lib/v25/orchestrator.ts missing");
 else pass("v25.1 orchestrator");
 if (!existsSync(v25Admin)) fail("admin/system dashboard missing");
 else pass("v25.1 admin system dashboard");
 if (!existsSync(v25Link)) fail("lib/v25/linktest/link-checker.mjs missing");
 else pass("v25.1 link checker");
+if (!existsSync(v25ImageTest)) fail("lib/v25/images/image-test.ts missing");
+else pass("v25.1 image test");
+if (!existsSync(v25ImageAdmin)) fail("admin/images dashboard missing");
+else pass("v25.1 admin image center");
 
 if (!ok) process.exit(1);
 console.log("\nBuild version verification PASSED");

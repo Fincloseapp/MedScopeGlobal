@@ -81,6 +81,17 @@ const v24Required = [
   "lib/v25/universities-fetch.ts",
   "lib/v25/system-state-persist.ts",
   "scripts/verify-v25-supabase.mjs",
+  "lib/v25/images/selector-engine.mjs",
+  "lib/v25/images/generator-engine.mjs",
+  "lib/v25/images/style-filter.mjs",
+  "lib/v25/images/missing-detector.mjs",
+  "lib/v25/images/pipeline.ts",
+  "lib/v25/images/image-test.ts",
+  "app/(admin)/admin/images/page.tsx",
+  "app/(admin)/admin/system/components/ImageTests.tsx",
+  "app/api/cron/v25-images/route.ts",
+  "app/api/v25/images/run/route.ts",
+  "supabase/migrations/20260613120000_v25_images.sql",
 ];
 
 for (const p of v24Required) checkPath(p);
