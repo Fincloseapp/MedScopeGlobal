@@ -68,6 +68,14 @@
     {
       "path": "/api/cron/v24-ultra",
       "schedule": "0 15 * * *"
+    },
+    {
+      "path": "/api/cron/v25-enterprise",
+      "schedule": "0 16 * * *"
+    },
+    {
+      "path": "/api/cron/v25-nav-monitor",
+      "schedule": "*/5 * * * *"
     }
   ],
   

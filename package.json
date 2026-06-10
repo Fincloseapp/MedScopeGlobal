@@ -42,6 +42,7 @@
     "push:github": "powershell -ExecutionPolicy Bypass -File ./scripts/push-d-to-github.ps1",
     "validate": "node scripts/validate.mjs",
     "verify-v24": "node scripts/verify-v24.0.mjs",
+    "verify-v25": "node scripts/verify-v25.0.mjs",
     "auto:git": "node scripts/auto-git-commit-push.js",
     "auto:git:push": "node scripts/auto-git-commit-push.js --push-only",
     "healthcheck-local": "node node_modules/tsx/dist/cli.mjs scripts/deploy/health-runner.ts",

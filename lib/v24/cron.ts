@@ -3,6 +3,7 @@ import { runV24SectionBatch } from "@/lib/v24/orchestrator";
 import { recordCronHealth } from "@/lib/v24/engines/monitoring";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { V24_ENGINE_VERSION } from "@/lib/v24/version";
+import { runV25PostPipeline } from "@/lib/v25/orchestrator";
 
 export async function runV24UltraCron(sectionFilter?: string) {
   const t0 = Date.now();
@@ -52,10 +53,18 @@ export async function runV24UltraCron(sectionFilter?: string) {
     /* table may not exist yet */
   }
 
+  let enterprise;
+  try {
+    enterprise = await runV25PostPipeline();
+  } catch {
+    /* optional v25 layer */
+  }
+
   return {
     version: V24_ENGINE_VERSION,
     sections: summary,
     errors,
     durationMs: Date.now() - t0,
+    enterprise,
   };
 }

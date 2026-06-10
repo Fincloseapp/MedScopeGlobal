@@ -66,5 +66,15 @@ else pass("v24 orchestrator");
 if (!existsSync(v24Hub)) fail("components/v24/ai-medical-hub.tsx missing");
 else pass("v24 AI Medical hub");
 
+const v25Orchestrator = join(root, "lib/v25/orchestrator.ts");
+const v25Admin = join(root, "app/(admin)/admin/system/page.tsx");
+const v25Link = join(root, "lib/v25/linktest/link-checker.mjs");
+if (!existsSync(v25Orchestrator)) fail("lib/v25/orchestrator.ts missing");
+else pass("v25.1 orchestrator");
+if (!existsSync(v25Admin)) fail("admin/system dashboard missing");
+else pass("v25.1 admin system dashboard");
+if (!existsSync(v25Link)) fail("lib/v25/linktest/link-checker.mjs missing");
+else pass("v25.1 link checker");
+
 if (!ok) process.exit(1);
 console.log("\nBuild version verification PASSED");

@@ -57,6 +57,15 @@ const v24Required = [
   "app/api/v24/quizzes/seed/route.ts",
   "app/api/cron/v24-ultra/route.ts",
   "supabase/migrations/20260610010000_v24_ultra_engine.sql",
+  "lib/v25/orchestrator.ts",
+  "lib/v25/linktest/link-checker.mjs",
+  "lib/v25/screenshots/screenshot-engine.mjs",
+  "lib/v25/navmonitor/nav-monitor.mjs",
+  "app/api/v25/health/route.ts",
+  "app/api/v25/system/route.ts",
+  "app/(admin)/admin/system/page.tsx",
+  "scripts/verify-v25.0.mjs",
+  "supabase/migrations/20260610140000_v25_enterprise.sql",
 ];
 
 for (const p of v24Required) checkPath(p);
