@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { listV24Quizzes } from "@/lib/v24/quizzes";
+import { listV24Quizzes } from "@/lib/v24/quizzes-data";
 import { Button } from "@/components/ui/button";
 
 export function QuizBuilderPanel() {

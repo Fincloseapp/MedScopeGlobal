@@ -36,8 +36,8 @@ jobs:
       - name: Test
         run: pnpm run test
 
-      - name: Verify V18
-        run: pnpm run verify-v18
+      - name: Validate (v24 structure + gates)
+        run: pnpm run validate
 
       - name: Build (Vercel pipeline mirror)
         run: pnpm run build
