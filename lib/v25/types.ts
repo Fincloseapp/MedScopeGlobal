@@ -1,4 +1,4 @@
-export type V25TestStatus = "ok" | "fail" | "pending" | "skipped";
+export type V25TestStatus = "ok" | "fail" | "pending" | "skipped" | "partial";
 
 export type V25TestSuite = {
   linkTest: V25TestStatus;

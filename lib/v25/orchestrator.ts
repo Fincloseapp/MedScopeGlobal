@@ -5,7 +5,13 @@ import { emitV25Alert } from "@/lib/v25/alert";
 import { runV25Redeploy } from "@/lib/v25/redeploy";
 import { runV25Rollback } from "@/lib/v25/rollback";
 import { verifyV25Apis, verifyV25Homepage } from "@/lib/v25/verify";
-import { setCronStatus, updateV25TestStatus } from "@/lib/v25/system-state";
+import {
+  recordV25PipelineSkippedFixes,
+  saveV25SystemStateAsync,
+  setCronStatus,
+  updateV25TestStatus,
+  loadV25SystemState,
+} from "@/lib/v25/system-state";
 import { V25_ENGINE_VERSION } from "@/lib/v25/version";
 import type { V25EnterpriseResult } from "@/lib/v25/types";
 import {
@@ -69,6 +75,12 @@ export async function runV25PostPipeline(): Promise<V25EnterpriseResult> {
 
   const ok = errors.length === 0;
   setCronStatus("v25-enterprise", ok ? "ok" : "fail", Date.now() - t0, errors.join("; ") || undefined);
+
+  if (ok) {
+    recordV25PipelineSkippedFixes();
+  }
+
+  await saveV25SystemStateAsync(loadV25SystemState());
 
   return {
     ok,

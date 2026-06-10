@@ -31,12 +31,28 @@ export function SystemStatus({
   const apiOk = apis.length > 0 ? apis.every((a) => a.ok) : false;
   const cronOk = crons.every((c) => c.status === "ok" || c.status === "pending");
   const orchestratorCron = crons.find((c) => c.cronId === "v25-enterprise");
+  const pipelineRan = Boolean(orchestratorCron?.lastRunAt);
   const orchestratorStatus =
     orchestratorCron?.status === "ok"
       ? "ok"
       : orchestratorCron?.status === "fail"
         ? "fail"
-        : tests.verifyEngine;
+        : pipelineRan
+          ? tests.verifyEngine
+          : "pending";
+
+  function fixStatus(action: V25FixRecord["action"]) {
+    const row = lastByAction(fixHistory, action);
+    if (row) return { status: row.result, detail: row.at, note: row.detail };
+    if (pipelineRan && orchestratorCron?.status === "ok") {
+      return { status: "skipped", detail: orchestratorCron.lastRunAt, note: "není potřeba" };
+    }
+    return { status: "pending", detail: undefined, note: undefined };
+  }
+
+  const autofix = fixStatus("autofix");
+  const rollback = fixStatus("rollback");
+  const redeploy = fixStatus("redeploy");
 
   const items = [
     { label: "Build", status: tests.buildStatus },
@@ -44,21 +60,9 @@ export function SystemStatus({
     { label: "Orchestrátor", status: orchestratorStatus },
     { label: "API", status: apiOk ? "ok" : apis.length ? "fail" : "pending" },
     { label: "CRON", status: cronOk ? "ok" : "fail" },
-    {
-      label: "Poslední auto-fix",
-      status: lastByAction(fixHistory, "autofix")?.result ?? "pending",
-      detail: lastByAction(fixHistory, "autofix")?.at,
-    },
-    {
-      label: "Poslední rollback",
-      status: lastByAction(fixHistory, "rollback")?.result ?? "pending",
-      detail: lastByAction(fixHistory, "rollback")?.at,
-    },
-    {
-      label: "Poslední redeploy",
-      status: lastByAction(fixHistory, "redeploy")?.result ?? "pending",
-      detail: lastByAction(fixHistory, "redeploy")?.at,
-    },
+    { label: "Poslední auto-fix", status: autofix.status, detail: autofix.detail, note: autofix.note },
+    { label: "Poslední rollback", status: rollback.status, detail: rollback.detail, note: rollback.note },
+    { label: "Poslední redeploy", status: redeploy.status, detail: redeploy.detail, note: redeploy.note },
   ];
 
   return (
@@ -81,6 +85,9 @@ export function SystemStatus({
               <p className="mt-2 text-xs text-muted-foreground">
                 {new Date(item.detail).toLocaleString("cs-CZ")}
               </p>
+            ) : null}
+            {"note" in item && item.note ? (
+              <p className="mt-1 text-xs text-muted-foreground">{item.note}</p>
             ) : null}
           </CardContent>
         </Card>

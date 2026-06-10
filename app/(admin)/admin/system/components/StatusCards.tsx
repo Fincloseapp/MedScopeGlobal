@@ -8,6 +8,7 @@ function badge(status: string) {
     fail: "bg-red-100 text-red-800",
     pending: "bg-amber-100 text-amber-800",
     skipped: "bg-slate-100 text-slate-600",
+    none: "bg-slate-100 text-slate-600",
   };
   return map[status] ?? map.pending;
 }

@@ -6,7 +6,7 @@ import { MedScopeLogo } from "@/components/brand/medscope-logo";
 
 import { readV25Json } from "@/lib/v25/data-store";
 
-import { loadV25SystemState } from "@/lib/v25/system-state";
+import { loadV25SystemStateAsync } from "@/lib/v25/system-state";
 
 import { loadUniversitiesReport } from "@/lib/v25/universities";
 
@@ -54,7 +54,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminSystemPage() {
 
-  const state = loadV25SystemState();
+  const state = await loadV25SystemStateAsync();
 
   const live = await verifyV25Apis();
 

@@ -19,7 +19,14 @@ async function fetchRoute(path: string) {
 }
 
 export async function runInlineLinkTest() {
-  const paths = ["/", "/studie", "/kvizy", "/kvizy/farmakologie-antihypertenziva", "/admin"];
+  const paths = [
+    "/",
+    "/studie",
+    "/kvizy",
+    "/kvizy/farmakologie-antihypertenziva",
+    "/studium/univerzity",
+    "/studium/prijimacky",
+  ];
   const results = await Promise.all(paths.map((p) => fetchRoute(p)));
   const broken = results.filter((r) => !r.ok);
   const ok = broken.length === 0;

@@ -1,4 +1,8 @@
 import { readV25Json, writeV25Json, V25_DATA_PATHS } from "@/lib/v25/data-store";
+import {
+  loadV25SystemStateFromDb,
+  persistV25SystemStateToDb,
+} from "@/lib/v25/system-state-persist";
 import type {
   V25FixRecord,
   V25SystemState,
@@ -48,8 +52,20 @@ export function loadV25SystemState(): V25SystemState {
   return readV25Json<V25SystemState>(V25_DATA_PATHS.systemState) ?? defaultV25SystemState();
 }
 
+export async function loadV25SystemStateAsync(): Promise<V25SystemState> {
+  const fromDb = await loadV25SystemStateFromDb();
+  if (fromDb) return fromDb;
+  return loadV25SystemState();
+}
+
 export function saveV25SystemState(state: V25SystemState) {
   writeV25Json(V25_DATA_PATHS.systemState, state);
+  void persistV25SystemStateToDb(state);
+}
+
+export async function saveV25SystemStateAsync(state: V25SystemState) {
+  writeV25Json(V25_DATA_PATHS.systemState, state);
+  await persistV25SystemStateToDb(state);
 }
 
 export function updateV25TestStatus(partial: Partial<V25TestSuite>) {
@@ -61,7 +77,7 @@ export function updateV25TestStatus(partial: Partial<V25TestSuite>) {
 export function recordV25Fix(input: Omit<V25FixRecord, "id" | "at">) {
   const state = loadV25SystemState();
   const record: V25FixRecord = {
-    id: `fix-${Date.now()}`,
+    id: `fix-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     at: new Date().toISOString(),
     ...input,
   };
@@ -80,7 +96,8 @@ export function setCronStatus(
   cronId: string,
   status: V25TestStatus,
   durationMs?: number,
-  error?: string
+  error?: string,
+  metrics?: V25SystemState["crons"][0]["metrics"]
 ) {
   const state = loadV25SystemState();
   const idx = state.crons.findIndex((c) => c.cronId === cronId);
@@ -90,8 +107,32 @@ export function setCronStatus(
     durationMs: durationMs ?? null,
     status,
     error,
+    metrics,
   };
   if (idx >= 0) state.crons[idx] = entry;
   else state.crons.push(entry);
+  saveV25SystemState(state);
+}
+
+/** Záznam že autofix/redeploy/rollback nebyl potřeba (vše prošlo). */
+export function recordV25PipelineSkippedFixes() {
+  const stamp = new Date().toISOString();
+  const state = loadV25SystemState();
+  const rows: V25FixRecord[] = (
+    [
+      ["autofix", "není potřeba — testy prošly"],
+      ["redeploy", "není potřeba — bez chyb"],
+      ["rollback", "není potřeba — bez chyb"],
+    ] as const
+  ).map(([action, detail]) => ({
+    id: `fix-skip-${action}-${Date.now()}`,
+    at: stamp,
+    errorType: "none",
+    module: "v25-pipeline",
+    action,
+    result: "ok" as const,
+    detail,
+  }));
+  state.fixHistory = [...rows, ...state.fixHistory].slice(0, 200);
   saveV25SystemState(state);
 }
