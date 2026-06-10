@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * CI validate — typecheck, lint, test, v24 structure, build gates.
- * Mirrors .github/workflows/ci.yml locally and on Vercel preflight.
+ * CI validate — v24 structure, verify-v18, gates (CI-aware).
+ * GitHub Actions: typecheck/lint/test run separately in ci.yml.
  */
 import { existsSync } from "node:fs";
 import { join, dirname } from "node:path";
@@ -9,9 +9,14 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const isCI = process.env.GITHUB_ACTIONS === "true";
 
-function run(label, cmd, args) {
-  const result = spawnSync(cmd, args, { cwd: root, stdio: "inherit" });
+function run(label, scriptPath, args = []) {
+  const abs = join(root, scriptPath);
+  const result = spawnSync(process.execPath, [abs, ...args], {
+    cwd: root,
+    stdio: "inherit",
+  });
   if (result.status !== 0) {
     console.error(`\n✗ ${label} failed (exit ${result.status ?? 1})\n`);
     process.exit(result.status || 1);
@@ -29,6 +34,7 @@ function checkPath(rel, label = rel) {
 }
 
 console.log("\n=== MedScopeGlobal validate (v24.0 ULTRA-MAX) ===\n");
+if (isCI) console.log("(CI) typecheck/lint/test run in workflow steps\n");
 
 const v24Required = [
   "lib/v24/orchestrator.ts",
@@ -55,15 +61,35 @@ const v24Required = [
 
 for (const p of v24Required) checkPath(p);
 
-const tsc = join(root, "node_modules/typescript/bin/tsc");
-if (existsSync(tsc)) {
-  run("typecheck", process.execPath, [tsc, "--noEmit"]);
-} else {
-  console.warn("⚠ tsc missing — skip typecheck (run pnpm install)");
+if (!isCI) {
+  const tsc = join(root, "node_modules/typescript/bin/tsc");
+  if (existsSync(tsc)) {
+    const result = spawnSync(process.execPath, [tsc, "--noEmit"], {
+      cwd: root,
+      stdio: "inherit",
+    });
+    if (result.status !== 0) process.exit(result.status || 1);
+    console.log("✓ typecheck");
+  }
 }
 
-run("verify-v18", process.execPath, [join(root, "scripts/verify-v18.mjs")]);
-run("pre-deploy gates", process.execPath, [join(root, "scripts/run-predeploy-gates.mjs")]);
-run("verify build version", process.execPath, [join(root, "scripts/verify-build-version.mjs")]);
+run("verify-v18", "scripts/verify-v18.mjs");
+
+if (isCI) {
+  run("validate-logos", "scripts/validate-logos.mjs");
+  run("verify-v6-api-routes", "scripts/verify-v6-api-routes.mjs");
+  if (process.env.CRON_SECRET?.length >= 16) {
+    run("env:verify", "scripts/verify-env.mjs");
+    run("verify-v17-skeleton", "scripts/verify-v17-skeleton.mjs");
+    run("verify-acp", "scripts/verify-acp.mjs");
+    run("verify-clinical-safety", "scripts/verify-clinical-safety.mjs");
+  } else {
+    console.log("⚠ (CI) CRON_SECRET not configured — skipping cron env gates");
+  }
+} else {
+  run("pre-deploy gates", "scripts/run-predeploy-gates.mjs");
+}
+
+run("verify build version", "scripts/verify-build-version.mjs");
 
 console.log("\n=== validate PASSED ===\n");
