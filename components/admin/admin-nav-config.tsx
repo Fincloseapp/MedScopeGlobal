@@ -20,7 +20,7 @@ export const ADMIN_NAV_ITEMS: {
   icon: LucideIcon;
 }[] = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
-  { href: "/admin/system", label: "v25.1 System", icon: Activity },
+  { href: "/admin/system", label: "Stav systému", icon: Activity },
   { href: "/admin/articles", label: "Articles", icon: Newspaper },
   { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
   { href: "/admin/brand", label: "Brand & logo", icon: Palette },

@@ -16,18 +16,16 @@ async function fetchJson(path) {
 }
 
 async function main() {
-  const [healthV19, healthV24, healthV25, system, home, univerzity, stav] = await Promise.all([
+  const [healthV19, healthV24, healthV25, system, home, univerzity] = await Promise.all([
     fetchJson("/api/v19/health"),
     fetchJson("/api/v24/health"),
     fetchJson("/api/v25/health"),
     fetchJson("/api/v25/system"),
     fetch(`${BASE}/?_${Date.now()}`, { cache: "no-store" }),
     fetch(`${BASE}/studium/univerzity?_${Date.now()}`, { cache: "no-store" }),
-    fetch(`${BASE}/stav-systemu?_${Date.now()}`, { cache: "no-store" }),
   ]);
   const homeText = await home.text();
   const univerzityText = await univerzity.text();
-  const stavText = await stav.text();
 
   const checks = {
     uiVersion: healthV19.json?.uiVersion === "v25.1",
@@ -41,7 +39,6 @@ async function main() {
     adminSystem: true,
     universitiesPage: univerzity.status === 200 && univerzityText.includes("Lékařské fakulty"),
     universitiesOnHome: homeText.includes("Lékařské fakulty v ČR"),
-    publicSystemStatus: stav.status === 200 && stavText.includes("Stav systému"),
     homeOk: home.status === 200,
   };
 

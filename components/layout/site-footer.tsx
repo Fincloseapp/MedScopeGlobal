@@ -41,8 +41,6 @@ export async function SiteFooter() {
 
             <li><Link href="/studium/prijimacky" className="hover:text-foreground">Přijímačky</Link></li>
 
-            <li><Link href="/stav-systemu" className="hover:text-foreground">Stav systému</Link></li>
-
           </ul>
 
         </div>
