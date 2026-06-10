@@ -36,6 +36,7 @@ export const V25_SCREENSHOT_PAGES = [
 
 export const V25_NAV_ROUTES = [
   "/",
+  "/ai",
   "/studie",
   "/leky/novinky",
   "/legislativa",
