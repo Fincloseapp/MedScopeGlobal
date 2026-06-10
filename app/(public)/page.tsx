@@ -11,6 +11,7 @@ import { V23HomeHero } from "@/components/v23/home-hero";
 import { V23NewsletterCta } from "@/components/v23/newsletter-cta";
 import { V23PersonalizedFeed } from "@/components/v23/personalized-feed";
 import { V24AiMedicalHub } from "@/components/v24/ai-medical-hub";
+import { V25UniversitiesHomeSection } from "@/components/v25/universities-home-section";
 import { Button } from "@/components/ui/button";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { medicalWebPageJsonLd, webSiteJsonLd } from "@/lib/seo/json-ld";
@@ -51,6 +52,8 @@ export default async function HomePage() {
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
 
       <V23AudiencePriorities />
+
+      <V25UniversitiesHomeSection />
 
       <V23PersonalizedFeed />
 
@@ -118,8 +121,13 @@ export default async function HomePage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-full border-white/40 text-white hover:bg-white/10">
-                <Link href="/medicina/studium" prefetch>
-                  Přehled oborů
+                <Link href="/studium/univerzity" prefetch>
+                  Lékařské fakulty
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="rounded-full border-white/40 text-white hover:bg-white/10">
+                <Link href="/studium/prijimacky" prefetch>
+                  Přijímačky
                 </Link>
               </Button>
             </div>

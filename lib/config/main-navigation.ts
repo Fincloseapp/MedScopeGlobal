@@ -33,6 +33,9 @@ const menuCs: NavItem[] = [
     label: "Studium medicíny",
     href: "/medicina",
     children: [
+      { label: "Přehled studia", href: "/studium", description: "Fakulty, přijímačky a studijní obsah" },
+      { label: "Lékařské fakulty", href: "/studium/univerzity", description: "8 českých LF — přehled a odkazy" },
+      { label: "Přijímačky", href: "/studium/prijimacky", description: "Termíny a požadavky fakult" },
       { label: "Přehled oborů", href: "/medicina" },
       { label: "Příprava na LF", href: "/medicina/priprava" },
       { label: "Studium 1.–6. ročník", href: "/medicina/studium" },
@@ -97,6 +100,9 @@ const menuEn: NavItem[] = [
     label: "Medicine track",
     href: "/medicina",
     children: [
+      { label: "Study hub", href: "/studium" },
+      { label: "Medical faculties (CZ)", href: "/studium/univerzity" },
+      { label: "Admissions", href: "/studium/prijimacky" },
       { label: "Pre-med prep", href: "/medicina/priprava" },
       { label: "Med school years 1–6", href: "/medicina/studium" },
     ],

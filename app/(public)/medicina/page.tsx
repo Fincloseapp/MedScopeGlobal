@@ -41,6 +41,27 @@ export default function MedicinaHubPage() {
         ))}
       </div>
 
+      <div className="mt-10 flex flex-wrap gap-3">
+        <Link
+          href="/studium/univerzity"
+          className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground"
+        >
+          Lékařské fakulty v ČR →
+        </Link>
+        <Link
+          href="/studium/prijimacky"
+          className="rounded-full border px-5 py-2 text-sm font-medium text-[#021d33] hover:bg-slate-50"
+        >
+          Přijímačky
+        </Link>
+        <Link
+          href="/studium"
+          className="rounded-full border px-5 py-2 text-sm font-medium text-[#021d33] hover:bg-slate-50"
+        >
+          Přehled studia
+        </Link>
+      </div>
+
       <div className="mt-10 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 to-white p-6">
         <h2 className="font-display text-2xl font-semibold text-[#021d33]">Kvízy a studijní hry</h2>
         <p className="mt-2 text-sm text-slate-600">

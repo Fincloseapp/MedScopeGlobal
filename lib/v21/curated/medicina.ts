@@ -11,6 +11,15 @@ export type V21StudiumTopic = {
 
 export const V21_STUDIUM_TOPICS: V21StudiumTopic[] = [
   {
+    slug: "univerzity",
+    title: "Lékařské fakulty v ČR",
+    description:
+      "Přehled všech 8 českých LF — Praha, Brno, Olomouc, Ostrava, Plzeň, Hradec Králové. Odkazy na oficiální weby a přijímačky.",
+    href: "/studium/univerzity",
+    imageUrl: V21_MEDICAL_IMAGES.university,
+    tips: ["Porovnat fakulty a města", "Sledovat termíny přijímaček", "Oficiální požadavky na webu LF"],
+  },
+  {
     slug: "priprava",
     title: "Příprava na studium medicíny",
     description:
@@ -69,7 +78,7 @@ export const V21_STUDIUM_TOPICS: V21StudiumTopic[] = [
     title: "Přijímačky na LF",
     description:
       "Termíny, struktura testů, bodování a tipy pro uchazeče o studium medicíny v ČR. Přehled fakult a požadavků.",
-    href: "/medicina/priprava",
+    href: "/studium/prijimacky",
     imageUrl: V21_MEDICAL_IMAGES.university,
     tips: ["Sledovat termíny fakult", "Modelové testy", "Praxe v nemocnici / dobrovolnictví"],
   },

@@ -75,9 +75,14 @@ export async function V21HomepageSections() {
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <div className="flex items-end justify-between gap-4">
           <h2 className="font-display text-2xl font-semibold text-[#021d33]">Novinky z univerzit</h2>
-          <Link href="/novinky/univerzity" className="text-sm font-medium text-primary">
-            Vše →
-          </Link>
+          <div className="flex gap-3 text-sm font-medium">
+            <Link href="/studium/univerzity" className="text-primary">
+              Fakulty LF →
+            </Link>
+            <Link href="/novinky/univerzity" className="text-primary">
+              Novinky →
+            </Link>
+          </div>
         </div>
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           {uniLatest.map((item) => (
