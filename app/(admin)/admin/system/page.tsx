@@ -43,9 +43,7 @@ import { RunTestsButton } from "./components/RunTestsButton";
 
 
 export const metadata: Metadata = {
-
-  title: "System Observability — v25.1",
-
+  title: "Stav systému — Admin",
 };
 
 
@@ -117,9 +115,7 @@ export default async function AdminSystemPage() {
         <MedScopeLogo href="/admin" width={140} height={36} className="mb-4" />
 
         <h1 className="text-2xl font-semibold text-[#021d33]">
-
-          Observability Center — {V25_ENGINE_VERSION} {V25_ENGINE_LABEL}
-
+          Stav systému — {V25_ENGINE_VERSION} {V25_ENGINE_LABEL}
         </h1>
 
         <p className="mt-1 text-sm text-muted-foreground">

@@ -11,6 +11,10 @@ import { detectLocaleFromAcceptLanguage } from "@/lib/i18n/detect-locale";
 import { getAdminGatePassword } from "@/lib/auth/admin-gate-config";
 
 export async function middleware(request: NextRequest) {
+  if (request.nextUrl.pathname === "/stav-systemu") {
+    return NextResponse.redirect(new URL("/admin/system", request.url));
+  }
+
   const securityBlock = await applySecurityMiddleware(request);
   if (securityBlock) return securityBlock;
 
