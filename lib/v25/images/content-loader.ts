@@ -94,7 +94,7 @@ export async function loadContentRowsForImages(): Promise<V25ContentImageRow[]> 
 
     if (error || !data) continue;
 
-    for (const row of data as Record<string, unknown>[]) {
+    for (const row of data as unknown as Record<string, unknown>[]) {
       rows.push({
         id: String(row.id),
         slug: String(row[cfg.slugColumn] ?? row.id),
