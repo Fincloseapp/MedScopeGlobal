@@ -2,7 +2,7 @@
 /**
  * Post-deploy verification — v25.1 ULTRA-MAX ENTERPRISE++
  */
-const BASE = (process.env.PROD_BASE_URL || "https://www.medscopeglobal.com").replace(/\/$/, "");
+const BASE = (process.env.PROD_BASE_URL || "https://medscopeglobal.com").replace(/\/$/, "");
 
 async function fetchJson(path) {
   const res = await fetch(`${BASE}${path}`, { cache: "no-store" });
