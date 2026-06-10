@@ -5,6 +5,8 @@ import {
   updateV25TestStatus,
 } from "@/lib/v25/system-state";
 import type { V25ScreenshotEntry } from "@/lib/v25/types";
+import { loadImageRegistryLocal } from "@/lib/v25/images/persist";
+import { verifyImageUrls, checkPageImagesLoaded } from "@/lib/v25/images/pipeline";
 
 const BASE = V25_PROD_BASE.replace(/\/$/, "");
 
@@ -29,13 +31,20 @@ export async function runInlineLinkTest() {
   ];
   const results = await Promise.all(paths.map((p) => fetchRoute(p)));
   const broken = results.filter((r) => !r.ok);
-  const ok = broken.length === 0;
+  const registry = loadImageRegistryLocal();
+  const imageUrls = registry.map((i) => i.publicUrl).filter(Boolean);
+  const imageCheck = imageUrls.length ? await verifyImageUrls(imageUrls) : { ok: true, broken: [] as string[] };
+  if (!imageCheck.ok) {
+    imageCheck.broken.forEach((u) => appendV25Log("brokenLinks", `BROKEN IMAGE 404 ${u}`));
+  }
+  const ok = broken.length === 0 && imageCheck.ok;
   if (!ok) broken.forEach((b) => appendV25Log("brokenLinks", `BROKEN ${b.status} ${b.url}`));
   writeV25Json(V25_DATA_PATHS.linkReport, {
     at: new Date().toISOString(),
     total: results.length,
     broken: broken.length,
     brokenUrls: broken.map((b) => b.url),
+    brokenImages: imageCheck.broken,
   });
   updateV25TestStatus({ linkTest: ok ? "ok" : "fail" });
   mergeV25SystemState({
@@ -47,25 +56,30 @@ export async function runInlineLinkTest() {
       lastCheckAt: new Date().toISOString(),
     },
   });
-  return { ok, broken: broken.length };
+  return { ok, broken: broken.length, brokenImages: imageCheck.broken.length };
 }
 
 export async function runInlineNavMonitor() {
   const results = await Promise.all(V25_NAV_ROUTES.map((p) => fetchRoute(p)));
+  const imageRoutes = ["/studie", "/legislativa", "/leky/novinky", "/studium/univerzity"];
+  const imageLoaded = await Promise.all(imageRoutes.map((p) => checkPageImagesLoaded(p)));
+  const imagesOk = imageLoaded.every(Boolean);
+
   const broken = results.filter(
     (r) => !r.ok || /404|not found|stránka nenalezena/i.test(r.text.slice(0, 1500))
   );
-  const ok = broken.length === 0;
+  const ok = broken.length === 0 && imagesOk;
   results.forEach((r) =>
     appendV25Log("navigation", `${r.ok ? "OK" : "FAIL"} ${r.url} ${r.status}`)
   );
   writeV25Json(V25_DATA_PATHS.navReport, {
     at: new Date().toISOString(),
     broken: broken.length,
+    imagesOk,
     results: results.map((r) => ({ url: r.url, status: r.status, ok: r.ok })),
   });
   updateV25TestStatus({ navigationMonitor: ok ? "ok" : "fail" });
-  return { ok, broken: broken.length };
+  return { ok, broken: broken.length, imagesOk };
 }
 
 export async function runInlineScreenshotManifest() {
@@ -73,12 +87,13 @@ export async function runInlineScreenshotManifest() {
   for (const page of V25_SCREENSHOT_PAGES) {
     const r = await fetchRoute(page.path);
     const title = r.text.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim();
+    const hasVisual = /<img[^>]+src/i.test(r.text) || /article-cover|content-card|background.*gradient/i.test(r.text);
     entries.push({
       id: page.id,
       path: page.path,
-      ok: r.ok,
+      ok: r.ok && hasVisual,
       timestamp: new Date().toISOString(),
-      title,
+      title: title ? `${title}${hasVisual ? "" : " (no image)"}` : undefined,
     });
   }
   const ok = entries.every((e) => e.ok);

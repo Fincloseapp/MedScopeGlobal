@@ -4,10 +4,44 @@ export type V25TestSuite = {
   linkTest: V25TestStatus;
   screenshotTest: V25TestStatus;
   navigationMonitor: V25TestStatus;
+  imagePipeline: V25TestStatus;
   verifyEngine: V25TestStatus;
   buildStatus: V25TestStatus;
   ciStatus: V25TestStatus;
   updatedAt: string;
+};
+
+export type V25ImageRegistryEntry = {
+  id: string;
+  section: string;
+  slug: string;
+  title: string;
+  imageType: string;
+  source: string;
+  publicUrl: string;
+  stylePassed: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type V25ImagesOverview = {
+  at: string;
+  total: number;
+  generated: number;
+  assigned: number;
+  failed: number;
+  skipped: number;
+  missingBefore: number;
+  images: V25ImageRegistryEntry[];
+  fixLog?: Array<{
+    id: string;
+    at: string;
+    section: string;
+    slug: string;
+    action: string;
+    result: string;
+    detail?: string;
+  }>;
 };
 
 export type V25FixRecord = {
@@ -119,6 +153,7 @@ export type V25SystemState = {
     }>;
   };
   overview?: V25SystemOverview;
+  images?: V25ImagesOverview;
 };
 
 export type V25PipelinePhase =

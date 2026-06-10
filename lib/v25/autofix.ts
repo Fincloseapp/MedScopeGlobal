@@ -19,6 +19,8 @@ export function runV25Autofix(ctx: V25AutofixContext): { ok: boolean; action: st
     link: "mark broken URLs for manual review",
     nav: "re-fetch navigation routes",
     screenshot: "fallback to HTML snapshot manifest",
+    images: "run v25 image pipeline — generate and assign missing covers",
+    image: "run v25 image pipeline — generate and assign missing covers",
   };
 
   const action = fixes[ctx.errorType] ?? "log and alert ops";

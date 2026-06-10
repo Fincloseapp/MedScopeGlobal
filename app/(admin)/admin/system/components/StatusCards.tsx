@@ -8,6 +8,7 @@ function badge(status: string) {
     fail: "bg-red-100 text-red-800",
     pending: "bg-amber-100 text-amber-800",
     skipped: "bg-slate-100 text-slate-600",
+    partial: "bg-orange-100 text-orange-800",
     none: "bg-slate-100 text-slate-600",
   };
   return map[status] ?? map.pending;
@@ -17,6 +18,7 @@ const LABELS: { key: keyof V25TestSuite; label: string }[] = [
   { key: "linkTest", label: "LinkTest" },
   { key: "screenshotTest", label: "ScreenshotTest" },
   { key: "navigationMonitor", label: "NavigationMonitor" },
+  { key: "imagePipeline", label: "ImagePipeline" },
   { key: "verifyEngine", label: "VerifyEngine" },
   { key: "buildStatus", label: "BuildStatus" },
   { key: "ciStatus", label: "CI Status" },

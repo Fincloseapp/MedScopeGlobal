@@ -80,6 +80,10 @@
     {
       "path": "/api/cron/v25-universities",
       "schedule": "30 17 * * *"
+    },
+    {
+      "path": "/api/cron/v25-images",
+      "schedule": "0 18 * * *"
     }
   ],
   

@@ -34,7 +34,7 @@ export function persistV24Artifact(
   return rel;
 }
 
-export async function publishV24ToWeb(draft: V24ContentDraft, seo: V24SeoMeta) {
+export async function publishV24ToWeb(draft: V24ContentDraft, seo: V24SeoMeta, coverImageUrl?: string | null) {
   const admin = createServiceRoleClient();
   const authorId = await ensureIngestionAuthor();
   const categoryId = await resolveCategoryId();
@@ -58,6 +58,7 @@ export async function publishV24ToWeb(draft: V24ContentDraft, seo: V24SeoMeta) {
     locale: draft.locale,
     source_url: draft.sourceUrl ?? null,
     source_name: draft.sourceName ?? "MedScopeGlobal v24",
+    cover_image_url: coverImageUrl ?? null,
     quiz_json: {
       v24: true,
       engineVersion: V24_ENGINE_VERSION,

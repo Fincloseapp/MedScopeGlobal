@@ -29,6 +29,7 @@ export const ADMIN_NAV_ITEMS: {
   { href: "/admin/verification", label: "Verification", icon: ShieldCheck },
   { href: "/admin/categories", label: "Categories", icon: Tags },
   { href: "/admin/media", label: "Media", icon: ImageIcon },
+  { href: "/admin/images", label: "Image Center", icon: ImageIcon },
   { href: "/admin/ads", label: "Ads", icon: Megaphone },
   { href: "/admin/vip", label: "VIP members", icon: Crown },
   { href: "/admin/notifications", label: "Notifications", icon: Bell },

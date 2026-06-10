@@ -45,6 +45,29 @@ export async function runV24Pipeline(
   if (!legal.passed) errors.push(...legal.issues);
 
   const image = runV24ImagePipeline(current);
+
+  let coverImageUrl: string | null = null;
+  try {
+    const gen = await import("@/lib/v25/images/generator-engine.mjs");
+    const saved = gen.saveGeneratedImage({
+      section: current.section,
+      slug: current.topicHash,
+      title: current.title,
+      keywords: current.keywords?.slice(0, 6),
+    });
+    if (saved.ok && saved.relativePath) {
+      const { publicImageUrl } = await import("@/lib/v25/images/storage");
+      const { uploadImageToMediaBucket } = await import("@/lib/v25/images/content-loader");
+      const { readLocalImage } = await import("@/lib/v25/images/storage");
+      const buf = readLocalImage(saved.relativePath);
+      coverImageUrl =
+        (buf ? await uploadImageToMediaBucket(saved.relativePath, buf) : null) ??
+        publicImageUrl(saved.relativePath);
+    }
+  } catch {
+    /* v25 image optional */
+  }
+
   const disclaimerBlock = `<aside class="v24-disclaimer"><p>${legal.disclaimer}</p></aside>`;
   current.bodyHtml = `${current.bodyHtml}\n${disclaimerBlock}`;
 
@@ -53,7 +76,7 @@ export async function runV24Pipeline(
 
   if (qa.passed && !dedupe.duplicate && legal.passed) {
     try {
-      await publishV24ToWeb(current, seo);
+      await publishV24ToWeb(current, seo, coverImageUrl);
       registerTopic(current);
       published = true;
       recordContentHealth(current.section, qa.score, 1);

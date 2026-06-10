@@ -14,6 +14,9 @@ export const V25_DATA_PATHS = {
   linkReport: "v25/link-report.json",
   navReport: "v25/nav-report.json",
   screenshotManifest: "v25/screenshot-manifest.json",
+  imageReport: "v25/images/report.json",
+  imageRegistry: "images/registry.json",
+  imageFixLog: "images/fix-log.json",
 } as const;
 
 export const V25_LOG_PATHS = {
@@ -21,6 +24,7 @@ export const V25_LOG_PATHS = {
   navigation: "navigation.log",
   alerts: "v25-alerts.log",
   autofix: "v25-autofix.log",
+  images: "v25-images.log",
   rollback: "v25-rollback.log",
   verify: "v25-verify.log",
 } as const;

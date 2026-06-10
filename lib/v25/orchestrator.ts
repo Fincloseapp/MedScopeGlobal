@@ -20,6 +20,7 @@ import {
   runInlineScreenshotManifest,
 } from "@/lib/v25/runners/post-pipeline";
 import { runUniversitiesFetch } from "@/lib/v25/runners/universities";
+import { runImagesFetch } from "@/lib/v25/runners/images";
 
 export async function runV25PostPipeline(): Promise<V25EnterpriseResult> {
   const t0 = Date.now();
@@ -54,6 +55,19 @@ export async function runV25PostPipeline(): Promise<V25EnterpriseResult> {
   const universities = await runUniversitiesFetch();
   phases.universities = { ok: universities.ok, detail: universities.detail };
   if (!universities.ok) errors.push("universities: provider fetch failed");
+
+  const images = await runImagesFetch({ maxGenerate: 16 });
+  phases.image = { ok: images.ok, detail: images.detail };
+  if (!images.ok) {
+    errors.push(`images: ${images.detail ?? "pipeline failed"}`);
+    runV25Autofix({ module: "images", errorType: "images", detail: images.detail ?? "missing images" });
+    const retry = await runImagesFetch({ maxGenerate: 8 });
+    phases.imageRetry = { ok: retry.ok, detail: retry.detail };
+    if (retry.ok) {
+      errors.pop();
+      phases.image = { ok: true, detail: retry.detail };
+    }
+  }
 
   if (errors.length > 0) {
     autofixAttempted = true;
