@@ -63,9 +63,9 @@ export function saveV25SystemState(state: V25SystemState) {
   void persistV25SystemStateToDb(state);
 }
 
-export async function saveV25SystemStateAsync(state: V25SystemState) {
+export async function saveV25SystemStateAsync(state: V25SystemState): Promise<boolean> {
   writeV25Json(V25_DATA_PATHS.systemState, state);
-  await persistV25SystemStateToDb(state);
+  return persistV25SystemStateToDb(state);
 }
 
 export function updateV25TestStatus(partial: Partial<V25TestSuite>) {

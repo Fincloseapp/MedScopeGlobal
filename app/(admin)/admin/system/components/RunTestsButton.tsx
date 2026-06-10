@@ -16,7 +16,11 @@ export function RunTestsButton() {
         credentials: "same-origin",
       });
       const data = await res.json();
-      setStatus(res.ok ? `Hotovo — ${data.ok ? "PASS" : "FAIL"}` : data.error ?? "Chyba");
+      if (res.ok && data.persisted === false) {
+        setStatus("Testy doběhly, ale stav se neuložil do Supabase — spusťte npm run db:setup");
+      } else {
+        setStatus(res.ok ? `Hotovo — ${data.ok ? "PASS" : "FAIL"}` : data.error ?? "Chyba");
+      }
       if (res.ok) window.location.reload();
     } catch {
       setStatus("Síťová chyba");

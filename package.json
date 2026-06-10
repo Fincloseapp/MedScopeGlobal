@@ -24,6 +24,7 @@
     "db:apply-translations": "node scripts/apply-article-translations-table.mjs",
     "db:apply-pg": "node scripts/apply-migration-pg.mjs",
     "db:verify": "node scripts/verify-supabase.mjs",
+    "db:v25-verify": "node scripts/verify-v25-supabase.mjs",
     "content:bootstrap": "node scripts/seed-categories.mjs && node scripts/run-ingestion.mjs",
     "content:seed": "node scripts/seed-categories.mjs",
     "content:ingest": "node scripts/run-ingestion.mjs",

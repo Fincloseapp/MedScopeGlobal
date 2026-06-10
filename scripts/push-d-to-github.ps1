@@ -14,6 +14,16 @@ if (Test-Path $envLocal) {
 }
 if (-not $token) { throw "GITHUB_TOKEN missing in .env.local" }
 
+$node = $env:NODE_BIN
+if (-not $node) {
+  $nodeCandidate = Join-Path $env:TEMP "node-v22.22.0-win-x64\node.exe"
+  if (Test-Path $nodeCandidate) { $node = $nodeCandidate } else { $node = "node" }
+}
+
+Write-Host "=== Supabase migrations ==="
+& $node (Join-Path $root "scripts\apply-migrations.mjs")
+if ($LASTEXITCODE -ne 0) { throw "Supabase migrations failed (npm run db:setup)" }
+
 $msg = if ($env:DEPLOY_COMMIT_MESSAGE) { $env:DEPLOY_COMMIT_MESSAGE } else {
   "feat(v23.3.2): newsletter hero BMJ style, mobile logo, auto-git, Vercel pipeline"
 }

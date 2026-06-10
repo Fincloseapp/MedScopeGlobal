@@ -144,4 +144,5 @@ export type V25EnterpriseResult = {
   redeployTriggered: boolean;
   rollbackTriggered: boolean;
   errors: string[];
+  persisted?: boolean;
 };

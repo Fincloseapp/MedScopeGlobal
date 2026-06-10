@@ -80,16 +80,20 @@ export async function runV25PostPipeline(): Promise<V25EnterpriseResult> {
     recordV25PipelineSkippedFixes();
   }
 
-  await saveV25SystemStateAsync(loadV25SystemState());
+  const persisted = await saveV25SystemStateAsync(loadV25SystemState());
+  if (!persisted) {
+    errors.push("persist: v25_system_snapshot — spusťte npm run db:setup");
+  }
 
   return {
-    ok,
+    ok: ok && persisted,
     version: V25_ENGINE_VERSION,
-    phases,
+    phases: { ...phases, persist: { ok: persisted } },
     autofixAttempted,
     redeployTriggered,
     rollbackTriggered,
     errors,
+    persisted,
   };
 }
 

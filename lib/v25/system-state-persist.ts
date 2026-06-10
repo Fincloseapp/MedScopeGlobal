@@ -3,7 +3,7 @@ import type { V25SystemState } from "@/lib/v25/types";
 
 const SNAPSHOT_ID = "production";
 
-export async function persistV25SystemStateToDb(state: V25SystemState): Promise<void> {
+export async function persistV25SystemStateToDb(state: V25SystemState): Promise<boolean> {
   try {
     const supabase = createServiceRoleClient();
     const { error } = await supabase.from("v25_system_snapshot").upsert({
@@ -11,9 +11,14 @@ export async function persistV25SystemStateToDb(state: V25SystemState): Promise<
       state,
       updated_at: new Date().toISOString(),
     });
-    if (error) console.error("[v25] persist state:", error.message);
+    if (error) {
+      console.error("[v25] persist state:", error.message);
+      return false;
+    }
+    return true;
   } catch (e) {
     console.error("[v25] persist state failed", e);
+    return false;
   }
 }
 

@@ -75,6 +75,9 @@ const v24Required = [
   "app/(admin)/admin/system/components/SystemStatus.tsx",
   "app/(admin)/admin/system/components/UniversitySources.tsx",
   "supabase/migrations/20260610150000_v25_universities.sql",
+  "supabase/migrations/20260610163000_v25_system_snapshot.sql",
+  "lib/v25/system-state-persist.ts",
+  "scripts/verify-v25-supabase.mjs",
 ];
 
 for (const p of v24Required) checkPath(p);
