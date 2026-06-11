@@ -6,6 +6,8 @@ import {
 import type { LocaleCode } from "@/lib/i18n/config";
 import { resolveArticleTranslation } from "@/lib/i18n/translate-article";
 import type { ArticleWithRelations } from "@/types/database";
+import { dedupeArticlesByTitle } from "@/lib/articles/dedupe";
+import { enrichArticleBodyForDisplay } from "@/lib/articles/enrich-body";
 import { polishCzechFields, isEnglishDominant } from "@/lib/v22/translate";
 
 export type DisplayArticle = ArticleWithRelations & {
@@ -52,7 +54,11 @@ export async function prepareArticleForDisplay(
       locale === "cs" && isEnglishDominant(base.title)
         ? polishCzechFields(base, locale)
         : base;
-    return { ...polished, displayLocale: target };
+    const display = { ...polished, displayLocale: target };
+    if (mode === "full") {
+      return { ...display, content: enrichArticleBodyForDisplay(display) };
+    }
+    return display;
   }
 
   const translated = await resolveArticleTranslation(
@@ -75,11 +81,22 @@ export async function prepareArticleForDisplay(
     };
   }
 
+  const content = translated.content ?? base.content;
+  const enriched =
+    mode === "full"
+      ? enrichArticleBodyForDisplay({
+          ...base,
+          title: translated.title,
+          excerpt: translated.excerpt ?? base.excerpt,
+          content,
+        })
+      : content;
+
   return {
     ...base,
     title: translated.title,
     excerpt: translated.excerpt ?? base.excerpt,
-    content: translated.content ?? base.content,
+    content: enriched,
     displayLocale: target,
     translatedFrom: base.locale ?? null,
     translation_provider: translated.translation_provider,
@@ -93,7 +110,7 @@ export async function prepareArticlesForDisplay(
   locale: LocaleCode,
   options?: { mode?: "card" | "full"; maxTranslate?: number }
 ): Promise<DisplayArticle[]> {
-  const sorted = sortByLocalePreference(articles, locale);
+  const sorted = sortByLocalePreference(dedupeArticlesByTitle(articles), locale);
   const mode = options?.mode ?? "card";
   const maxTranslate = options?.maxTranslate ?? 8;
   let translated = 0;

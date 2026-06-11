@@ -319,8 +319,20 @@ async function upsertGeneratedArticle({
   categoryMap: Map<string, string>;
   template: (typeof INTERNAL_EDITORIAL_TEMPLATES)[number];
 }): Promise<"created" | "skipped"> {
-  const sourceUrl = `medscopeglobal://internal/${slugify(template.title)}-${Date.now().toString(36)}`;
+  const sourceUrl = `medscopeglobal://internal/${slugify(template.title)}`;
   const hash = buildHash(template.title, sourceUrl, template.body);
+
+  let existingQuery = admin.from("articles").select("id").eq("title", template.title);
+  if (template.medTrack) {
+    existingQuery = existingQuery.eq("med_track", template.medTrack);
+  } else {
+    existingQuery = existingQuery.is("med_track", null);
+  }
+  const { data: existingByTitle } = await existingQuery.maybeSingle();
+
+  if (existingByTitle?.id) {
+    return "skipped";
+  }
 
   const { data: existing } = await admin
     .from("articles")
@@ -337,7 +349,15 @@ async function upsertGeneratedArticle({
     return "skipped";
   }
 
-  const slug = `${slugify(template.title)}-${Date.now().toString(36)}`;
+  const slug = slugify(template.title);
+  const { data: slugClash } = await admin
+    .from("articles")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (slugClash?.id) {
+    return "skipped";
+  }
   const payload = {
     title: template.title,
     slug,

@@ -11,7 +11,7 @@ export const revalidate = 120;
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({
     title: "Články — MedScopeGlobal",
-    description: "Aktuální odborné články v češtině. Starší a legacy obsah je archivován.",
+    description: "Aktuální odborné články v češtině pro praxi a studium medicíny.",
     path: "/articles",
   });
 }
@@ -50,9 +50,6 @@ export default async function ArticlesPage({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-4xl font-bold text-[#021d33]">Články</h1>
-          <p className="mt-2 text-slate-600">
-            Pouze aktuální články v češtině. Legacy obsah a staré záznamy jsou skryté.
-          </p>
         </div>
         <Link href="/medicina" className="text-sm font-medium text-primary hover:underline">
           Medicínská větev →
@@ -82,7 +79,7 @@ export default async function ArticlesPage({
 
       <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {articles.map((a) => (
-          <V20ArticleCard key={a.id} article={a} />
+          <V20ArticleCard key={a.slug} article={a} />
         ))}
       </div>
       {articles.length === 0 && (
