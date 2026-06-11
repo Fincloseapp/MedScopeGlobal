@@ -1,6 +1,5 @@
-import Image from "next/image";
-
 import Link from "next/link";
+import { PublicModuleImage } from "@/components/v25/public-module-image";
 
 
 
@@ -54,19 +53,15 @@ export function V4cContentCard({
 
         <div className="relative aspect-[16/9] bg-slate-100">
 
-          <Image
+          <PublicModuleImage
 
             src={imageUrl}
 
             alt={imageAlt ?? title}
 
-            fill
-
             className="object-cover transition group-hover:scale-[1.02]"
 
             sizes="(max-width: 640px) 100vw, 50vw"
-
-            loading="lazy"
 
           />
 

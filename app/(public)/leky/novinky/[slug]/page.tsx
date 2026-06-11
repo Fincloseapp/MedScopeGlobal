@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { V21ModuleDetailView } from "@/components/v21/module-detail-view";
 import { buildModuleSections, ensureCzechText, formatCsDate } from "@/lib/v21/enrich";
-import { v21ImageForModule } from "@/lib/v21/images";
+import { resolvePublicImageUrl } from "@/lib/v25/images/resolve-public";
 import { getDrugNewsBySlug } from "@/lib/queries/v4c/drug-news";
 import { AdPlacement } from "@/components/ads/ad-placement";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
@@ -30,6 +30,12 @@ export default async function LekyDetailPage({ params }: Props) {
     moduleLabel: "Lékové novinky",
   });
 
+  const imageUrl = await resolvePublicImageUrl({
+    section: "drug_news",
+    slug: drug.slug,
+    dbUrl: drug.image_url,
+  });
+
   return (
     <>
       <AdPlacement ads={ads} variant="banner" />
@@ -40,7 +46,7 @@ export default async function LekyDetailPage({ params }: Props) {
         title={title}
         subtitle={[drug.drug_name, drug.status].filter(Boolean).join(" · ")}
         dateLabel={formatCsDate(drug.published_date)}
-        imageUrl={drug.image_url ?? v21ImageForModule("drug", drug.slug)}
+        imageUrl={imageUrl}
         sections={sections}
         source={drug.agency ?? "SÚKL"}
         sourceUrl={drug.source_url}

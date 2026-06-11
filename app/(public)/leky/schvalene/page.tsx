@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V4cContentCard } from "@/components/v4c/content-card";
 import { getDrugNewsList } from "@/lib/queries/v4c/drug-news";
-import { v21ImageForModule } from "@/lib/v21/images";
+import { resolveManyImages } from "@/lib/v25/images/resolve-many";
 
 export const revalidate = 120;
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function LekySchvalenePage() {
-  const items = await getDrugNewsList("approved");
+  const items = await resolveManyImages(await getDrugNewsList("approved"), "drug_news");
 
   return (
     <ModulePageShell
@@ -35,7 +35,7 @@ export default async function LekySchvalenePage() {
             meta={[d.agency, d.drug_name].filter(Boolean).join(" · ")}
             summary={d.summary}
             badge="Schválené"
-            imageUrl={d.image_url ?? v21ImageForModule("drug", d.slug)}
+            imageUrl={d.resolvedImageUrl}
             imageAlt={d.drug_name ?? d.title}
           />
         ))}

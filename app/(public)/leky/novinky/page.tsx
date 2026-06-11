@@ -4,7 +4,7 @@ import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V4cContentCard } from "@/components/v4c/content-card";
 import { getDrugNewsList } from "@/lib/queries/v4c/drug-news";
 import { DRUG_AGENCIES } from "@/lib/v4c/sources";
-import { v21ImageForModule } from "@/lib/v21/images";
+import { resolveManyImages } from "@/lib/v25/images/resolve-many";
 
 export const revalidate = 120;
 
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function LekyNovinkyPage() {
-  const all = await getDrugNewsList();
+  const all = await resolveManyImages(await getDrugNewsList(), "drug_news");
 
   return (
     <ModulePageShell
@@ -43,7 +43,7 @@ export default async function LekyNovinkyPage() {
             meta={[d.agency, d.drug_name, d.published_date].filter(Boolean).join(" · ")}
             summary={d.summary}
             badge={d.status}
-            imageUrl={d.image_url ?? v21ImageForModule("drug", d.slug)}
+            imageUrl={d.resolvedImageUrl}
             imageAlt={d.drug_name ?? d.title}
           />
         ))}

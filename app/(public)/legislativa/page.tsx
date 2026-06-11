@@ -7,10 +7,8 @@ import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V4cContentCard } from "@/components/v4c/content-card";
 
 import { getLegislationList } from "@/lib/queries/v4c/legislation";
-
+import { resolvePublicImageUrl } from "@/lib/v25/images/resolve-public";
 import { LEGISLATION_SOURCES } from "@/lib/v4c/sources";
-
-import { v21ImageForModule } from "@/lib/v21/images";
 
 
 
@@ -49,10 +47,17 @@ const LINKS = [
 
 
 export default async function LegislativaPage() {
-
   const latest = await getLegislationList(undefined, 8);
-
-
+  const withImages = await Promise.all(
+    latest.map(async (item) => ({
+      ...item,
+      resolvedImageUrl: await resolvePublicImageUrl({
+        section: "legislation",
+        slug: item.slug,
+        dbUrl: item.image_url,
+      }),
+    }))
+  );
 
   return (
 
@@ -96,28 +101,17 @@ export default async function LegislativaPage() {
 
       <div className="grid gap-4 sm:grid-cols-2">
 
-        {latest.map((item) => (
-
+        {withImages.map((item) => (
           <V4cContentCard
-
             key={item.id}
-
             href={`/legislativa/${item.slug}`}
-
             title={item.title}
-
             meta={item.source}
-
             summary={item.summary}
-
             badge={item.category}
-
-            imageUrl={v21ImageForModule("legislation", item.slug)}
-
+            imageUrl={item.resolvedImageUrl}
             imageAlt={item.title}
-
           />
-
         ))}
 
       </div>

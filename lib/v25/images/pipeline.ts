@@ -54,7 +54,7 @@ export async function runV25ImagePipeline(options?: {
   maxGenerate?: number;
   skipDb?: boolean;
 }): Promise<V25ImagePipelineResult> {
-  const maxGenerate = options?.maxGenerate ?? 24;
+  const maxGenerate = options?.maxGenerate ?? 48;
   const { detector, generator } = await importEngines();
 
   const contentRows = options?.skipDb ? [] : await loadContentRowsForImages();

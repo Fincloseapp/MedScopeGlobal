@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { PublicModuleImage } from "@/components/v25/public-module-image";
 import { ExternalLink, Calendar } from "lucide-react";
 import type { V21ModuleSection } from "@/lib/v21/enrich";
 
@@ -57,7 +57,7 @@ export function V21ModuleDetailView({
       </header>
 
       <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-2xl bg-slate-100">
-        <Image src={imageUrl} alt={title} fill className="object-cover" sizes="(max-width: 896px) 100vw, 896px" priority />
+        <PublicModuleImage src={imageUrl} alt={title} priority />
       </div>
 
       <div className="mt-8 space-y-8">

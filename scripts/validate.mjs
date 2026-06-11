@@ -91,6 +91,11 @@ const v24Required = [
   "app/(admin)/admin/system/components/ImageTests.tsx",
   "app/api/cron/v25-images/route.ts",
   "app/api/v25/images/run/route.ts",
+  "app/api/v25/images/render/route.ts",
+  "lib/v25/images/resolve-public.ts",
+  "lib/v25/images/legacy-images.ts",
+  "lib/v25/images/backfill-legacy.ts",
+  "components/v25/public-module-image.tsx",
   "supabase/migrations/20260613120000_v25_images.sql",
 ];
 

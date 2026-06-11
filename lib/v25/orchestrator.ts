@@ -57,7 +57,7 @@ export async function runV25PostPipeline(): Promise<V25EnterpriseResult> {
   phases.universities = { ok: universities.ok, detail: universities.detail };
   if (!universities.ok) errors.push("universities: provider fetch failed");
 
-  const images = await runImagesFetch({ maxGenerate: 16 });
+  const images = await runImagesFetch({ maxGenerate: 48 });
   phases.image = { ok: images.ok, detail: images.detail };
   if (!images.ok) {
     errors.push(`images: ${images.detail ?? "pipeline failed"}`);

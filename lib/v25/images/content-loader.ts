@@ -21,7 +21,7 @@ const TABLES: TableConfig[] = [
     titleColumn: "title",
     excerptColumn: "excerpt",
     bodyColumn: "content",
-    limit: 80,
+    limit: 120,
   },
   {
     table: "legislation_items",
@@ -30,7 +30,7 @@ const TABLES: TableConfig[] = [
     slugColumn: "slug",
     titleColumn: "title",
     excerptColumn: "summary",
-    limit: 60,
+    limit: 120,
   },
   {
     table: "drug_news",
@@ -39,7 +39,7 @@ const TABLES: TableConfig[] = [
     slugColumn: "slug",
     titleColumn: "title",
     excerptColumn: "summary",
-    limit: 60,
+    limit: 120,
   },
   {
     table: "university_news",

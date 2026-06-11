@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V4cContentCard } from "@/components/v4c/content-card";
 import { getLegislationList } from "@/lib/queries/v4c/legislation";
+import { resolveManyImages } from "@/lib/v25/images/resolve-many";
 
 const CATEGORY_LABELS: Record<string, string> = {
   zakony: "Zákony",
@@ -22,7 +23,7 @@ export async function LegislationCategoryPage({
   title: string;
   description: string;
 }) {
-  const items = await getLegislationList(category);
+  const items = await resolveManyImages(await getLegislationList(category), "legislation");
 
   return (
     <ModulePageShell
@@ -52,11 +53,12 @@ export async function LegislationCategoryPage({
           items.map((item) => (
             <V4cContentCard
               key={item.id}
-              href={`/legislativa/novinky#${item.slug}`}
+              href={`/legislativa/${item.slug}`}
               title={item.title}
               meta={`${item.source} · ${item.published_date ?? ""}`}
               summary={item.summary}
               badge={CATEGORY_LABELS[item.category] ?? item.category}
+              imageUrl={item.resolvedImageUrl}
             />
           ))
         )}

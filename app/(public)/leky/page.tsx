@@ -12,7 +12,8 @@ import { getDrugNewsList } from "@/lib/queries/v4c/drug-news";
 
 import { DRUG_AGENCIES } from "@/lib/v4c/sources";
 
-import { V21_MEDICAL_IMAGES, v21ImageForModule } from "@/lib/v21/images";
+import { V21_MEDICAL_IMAGES } from "@/lib/v21/images";
+import { resolveManyImages } from "@/lib/v25/images/resolve-many";
 
 
 
@@ -47,8 +48,7 @@ const HUB_LINKS = [
 export default async function LekyHubPage() {
 
   const latest = await getDrugNewsList();
-
-  const preview = latest.slice(0, 6);
+  const preview = await resolveManyImages(latest.slice(0, 6), "drug_news");
 
 
 
@@ -146,7 +146,7 @@ export default async function LekyHubPage() {
 
             badge={d.status}
 
-            imageUrl={d.image_url ?? v21ImageForModule("drug", d.slug)}
+            imageUrl={d.resolvedImageUrl}
 
             imageAlt={d.drug_name ?? d.title}
 

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V4cContentCard } from "@/components/v4c/content-card";
 import { getUniversityNewsList } from "@/lib/queries/v4c/university-news";
-import { v21ImageForModule } from "@/lib/v21/images";
+import { resolveManyImages } from "@/lib/v25/images/resolve-many";
 
 export const revalidate = 120;
 
@@ -26,7 +26,7 @@ function hrefForItem(tag: string, slug: string) {
 }
 
 export default async function NovinkyPage() {
-  const news = await getUniversityNewsList();
+  const news = await resolveManyImages(await getUniversityNewsList(), "university_news");
 
   return (
     <ModulePageShell
@@ -57,7 +57,7 @@ export default async function NovinkyPage() {
             meta={n.university ?? n.region ?? undefined}
             summary={n.summary}
             badge={n.tag}
-            imageUrl={n.image_url ?? v21ImageForModule("university", n.slug)}
+            imageUrl={n.resolvedImageUrl}
             imageAlt={n.university ?? n.title}
           />
         ))}
