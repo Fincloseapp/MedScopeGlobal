@@ -134,11 +134,7 @@ export async function fetchAllDrugFeedItems(perSource = 5): Promise<DrugFeedItem
     }
   }
 
-  return all.sort((a, b) => {
-    const da = parsePubDate(a.pubDate)?.valueOf() ?? 0;
-    const db = parsePubDate(b.pubDate)?.valueOf() ?? 0;
-    return db - da;
-  });
+  return all.sort((a, b) => pubDateToMs(b.pubDate) - pubDateToMs(a.pubDate));
 }
 
 export function czechDrugSummary(item: DrugFeedItem): string {
@@ -148,6 +144,13 @@ export function czechDrugSummary(item: DrugFeedItem): string {
     return `${excerpt}${excerpt.length >= 400 ? "…" : ""}`;
   }
   return `Aktualizace z oficiálního zdroje ${agency}. MedScopeGlobal přináší strukturovaný přehled pro českou odbornou praxi s odkazem na primární dokument.`;
+}
+
+function pubDateToMs(pubDate: string | null): number {
+  const iso = parsePubDate(pubDate);
+  if (!iso) return 0;
+  const t = new Date(iso).getTime();
+  return Number.isNaN(t) ? 0 : t;
 }
 
 export { parsePubDate };
