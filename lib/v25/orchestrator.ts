@@ -11,6 +11,7 @@ import {
   setCronStatus,
   updateV25TestStatus,
   loadV25SystemState,
+  hydrateV25SystemStateFromDb,
 } from "@/lib/v25/system-state";
 import { V25_ENGINE_VERSION } from "@/lib/v25/version";
 import type { V25EnterpriseResult } from "@/lib/v25/types";
@@ -23,7 +24,76 @@ import { runInlineImageTest } from "@/lib/v25/images/image-test";
 import { runUniversitiesFetch } from "@/lib/v25/runners/universities";
 import { runImagesFetch } from "@/lib/v25/runners/images";
 
-export async function runV25PostPipeline(): Promise<V25EnterpriseResult> {
+export type V25PipelineMode = "full" | "quick";
+
+/** Rychlé QA testy pro admin — bez backfillu obrázků a sběru univerzit. */
+export async function runV25QuickPipeline(): Promise<V25EnterpriseResult> {
+  await hydrateV25SystemStateFromDb();
+  const t0 = Date.now();
+  const phases: V25EnterpriseResult["phases"] = {};
+  const errors: string[] = [];
+
+  const verifyApi = await verifyV25Apis();
+  phases.verify = { ok: verifyApi.ok };
+  if (!verifyApi.ok) errors.push("verify: api health fail");
+
+  const homeOk = await verifyV25Homepage();
+  phases.homepage = { ok: homeOk };
+  if (!homeOk) errors.push("verify: homepage fail");
+
+  updateV25TestStatus({ verifyEngine: verifyApi.ok && homeOk ? "ok" : "fail" });
+
+  const link = await runInlineLinkTest({ skipImageUrls: true });
+  phases.linktest = { ok: link.ok, detail: link.broken ? `${link.broken} broken` : undefined };
+  if (!link.ok) errors.push(`linktest: ${link.broken} broken links`);
+
+  const shots = await runInlineScreenshotManifest();
+  phases.screenshots = { ok: shots.ok, detail: `${shots.count} pages` };
+  if (!shots.ok) errors.push("screenshots: manifest capture fail");
+
+  const nav = await runInlineNavMonitor();
+  phases.navmonitor = { ok: nav.ok, detail: nav.broken ? `${nav.broken} broken` : undefined };
+  if (!nav.ok) errors.push(`navmonitor: ${nav.broken} nav failures`);
+
+  updateV25TestStatus({ imagePipeline: "skipped" });
+
+  const imageTest = await runInlineImageTest();
+  phases.imageTest = {
+    ok: imageTest.ok,
+    detail: `${imageTest.report.urlsOk}/${imageTest.report.urlsChecked} URL · ${imageTest.report.pagesOk}/${imageTest.report.pagesChecked.length} stránek`,
+  };
+  if (!imageTest.ok) errors.push(`imagetest: ${imageTest.report.urlsBroken.length} broken urls`);
+
+  const ok = errors.length === 0;
+  setCronStatus("v25-enterprise", ok ? "ok" : "fail", Date.now() - t0, errors.join("; ") || undefined);
+
+  if (ok) {
+    recordV25PipelineSkippedFixes();
+  }
+
+  const persisted = await saveV25SystemStateAsync(loadV25SystemState());
+  if (!persisted) {
+    errors.push("persist: v25_system_snapshot — spusťte npm run db:setup");
+  }
+
+  return {
+    ok: ok && persisted,
+    version: V25_ENGINE_VERSION,
+    phases: { ...phases, persist: { ok: persisted } },
+    autofixAttempted: false,
+    redeployTriggered: false,
+    rollbackTriggered: false,
+    errors,
+    persisted,
+  };
+}
+
+export async function runV25PostPipeline(options?: { mode?: V25PipelineMode }): Promise<V25EnterpriseResult> {
+  if (options?.mode === "quick") {
+    return runV25QuickPipeline();
+  }
+
+  await hydrateV25SystemStateFromDb();
   const t0 = Date.now();
   const phases: V25EnterpriseResult["phases"] = {};
   const errors: string[] = [];

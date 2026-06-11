@@ -3,13 +3,21 @@ import { isAdminApiAuthorized } from "@/lib/auth/admin-api";
 import { runV25PostPipeline } from "@/lib/v25/orchestrator";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 120;
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   if (!(await isAdminApiAuthorized(request))) {
     return NextResponse.json({ error: "Unauthorized — přihlaste se v /admin/login" }, { status: 401 });
   }
 
-  const result = await runV25PostPipeline();
-  return NextResponse.json(result);
+  const url = new URL(request.url);
+  const mode = url.searchParams.get("mode") === "full" ? "full" : "quick";
+
+  try {
+    const result = await runV25PostPipeline({ mode });
+    return NextResponse.json({ ...result, mode });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Pipeline selhala";
+    return NextResponse.json({ error: message, ok: false }, { status: 500 });
+  }
 }

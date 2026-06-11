@@ -15,12 +15,13 @@ async function fetchRoute(path: string) {
   const res = await fetch(url, {
     cache: "no-store",
     headers: { "User-Agent": "MedScopeGlobal-v25.1-enterprise" },
+    signal: AbortSignal.timeout(15000),
   });
   const text = await res.text();
   return { url, status: res.status, ok: res.ok && res.status < 400, text };
 }
 
-export async function runInlineLinkTest() {
+export async function runInlineLinkTest(options?: { skipImageUrls?: boolean }) {
   const paths = [
     "/",
     "/studie",
@@ -33,7 +34,10 @@ export async function runInlineLinkTest() {
   const broken = results.filter((r) => !r.ok);
   const registry = loadImageRegistryLocal();
   const imageUrls = registry.map((i) => i.publicUrl).filter(Boolean);
-  const imageCheck = imageUrls.length ? await verifyImageUrls(imageUrls) : { ok: true, broken: [] as string[] };
+  const imageCheck =
+    options?.skipImageUrls || !imageUrls.length
+      ? { ok: true, broken: [] as string[] }
+      : await verifyImageUrls(imageUrls);
   if (!imageCheck.ok) {
     imageCheck.broken.forEach((u) => appendV25Log("brokenLinks", `BROKEN IMAGE 404 ${u}`));
   }
@@ -83,19 +87,21 @@ export async function runInlineNavMonitor() {
 }
 
 export async function runInlineScreenshotManifest() {
-  const entries: V25ScreenshotEntry[] = [];
-  for (const page of V25_SCREENSHOT_PAGES) {
-    const r = await fetchRoute(page.path);
-    const title = r.text.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim();
-    const hasVisual = /<img[^>]+src/i.test(r.text) || /article-cover|content-card|background.*gradient/i.test(r.text);
-    entries.push({
-      id: page.id,
-      path: page.path,
-      ok: r.ok && hasVisual,
-      timestamp: new Date().toISOString(),
-      title: title ? `${title}${hasVisual ? "" : " (no image)"}` : undefined,
-    });
-  }
+  const entries: V25ScreenshotEntry[] = await Promise.all(
+    V25_SCREENSHOT_PAGES.map(async (page) => {
+      const r = await fetchRoute(page.path);
+      const title = r.text.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim();
+      const hasVisual =
+        /<img[^>]+src/i.test(r.text) || /article-cover|content-card|background.*gradient/i.test(r.text);
+      return {
+        id: page.id,
+        path: page.path,
+        ok: r.ok && hasVisual,
+        timestamp: new Date().toISOString(),
+        title: title ? `${title}${hasVisual ? "" : " (no image)"}` : undefined,
+      };
+    })
+  );
   const ok = entries.every((e) => e.ok);
   writeV25Json(V25_DATA_PATHS.screenshotManifest, { at: new Date().toISOString(), entries });
   updateV25TestStatus({ screenshotTest: ok ? "ok" : "fail" });

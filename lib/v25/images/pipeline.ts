@@ -218,20 +218,30 @@ export async function runV25ImagePipeline(options?: {
 }
 
 /** Verify image URLs from registry — used by link/monitor tests. */
-export async function verifyImageUrls(urls: string[]): Promise<{ ok: boolean; broken: string[] }> {
-  const broken: string[] = [];
-  for (const url of urls.slice(0, 40)) {
-    try {
-      const res = await fetch(url, {
-        method: "HEAD",
-        signal: AbortSignal.timeout(12000),
-        headers: { "User-Agent": "MedScopeGlobal-v25.1-image-check" },
-      });
-      if (!res.ok) broken.push(url);
-    } catch {
-      broken.push(url);
-    }
+async function headCheckUrl(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url, {
+      method: "HEAD",
+      signal: AbortSignal.timeout(8000),
+      headers: { "User-Agent": "MedScopeGlobal-v25.1-image-check" },
+    });
+    return res.ok ? null : url;
+  } catch {
+    return url;
   }
+}
+
+export async function verifyImageUrls(urls: string[]): Promise<{ ok: boolean; broken: string[] }> {
+  const sample = urls.slice(0, 40);
+  const concurrency = 8;
+  const broken: string[] = [];
+
+  for (let i = 0; i < sample.length; i += concurrency) {
+    const batch = sample.slice(i, i + concurrency);
+    const results = await Promise.all(batch.map((url) => headCheckUrl(url)));
+    broken.push(...results.filter((u): u is string => u !== null));
+  }
+
   return { ok: broken.length === 0, broken };
 }
 

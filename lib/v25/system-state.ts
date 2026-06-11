@@ -61,6 +61,16 @@ export async function loadV25SystemStateAsync(): Promise<V25SystemState> {
   return loadV25SystemState();
 }
 
+/** Na Vercelu načte DB snapshot do /tmp před zápisem — zabrání resetu na default pending. */
+export async function hydrateV25SystemStateFromDb(): Promise<V25SystemState> {
+  const fromDb = await loadV25SystemStateFromDb();
+  if (fromDb) {
+    writeV25Json(V25_DATA_PATHS.systemState, fromDb);
+    return fromDb;
+  }
+  return loadV25SystemState();
+}
+
 export function saveV25SystemState(state: V25SystemState) {
   writeV25Json(V25_DATA_PATHS.systemState, state);
   void persistV25SystemStateToDb(state);
