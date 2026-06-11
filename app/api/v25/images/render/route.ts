@@ -55,7 +55,10 @@ export async function GET(request: Request) {
       section.includes("univer") ? "university" :
       section.includes("digital") ? "digitalHealth" :
       section.includes("stud") ? "study" : "medicina",
-    keywords: row?.excerpt?.split(/\s+/).slice(0, 6) ?? [],
+    keywords:
+      section.includes("drug")
+        ? ["léčivo", "regulace", "bezpečnost"]
+        : (row?.excerpt?.split(/\s+/).slice(0, 6) ?? []),
   });
 
   if (!saved.ok || !saved.relativePath) {

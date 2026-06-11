@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { runDrugFeedIngest } from "@/lib/v4c/drug-feed-ingest";
+import { runDrugBodyBackfill, runDrugFeedIngest } from "@/lib/v4c/drug-feed-ingest";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
@@ -14,8 +14,9 @@ export async function GET(request: Request) {
   }
 
   try {
-    const result = await runDrugFeedIngest({ maxItems: 48 });
-    return NextResponse.json({ ok: true, ...result });
+    const result = await runDrugFeedIngest({ maxItems: 48, refreshExisting: true });
+    const backfill = await runDrugBodyBackfill();
+    return NextResponse.json({ ok: true, ...result, backfill });
   } catch (e) {
     return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });
   }

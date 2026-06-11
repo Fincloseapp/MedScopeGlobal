@@ -11,6 +11,7 @@ export type DrugFeedItem = RawFeedItem & {
   agency: DrugAgencyId;
   sourceId: string;
   portalUrl: string;
+  bodyHtml?: string;
 };
 
 const UA = "MedScopeGlobal-DrugMonitor/1.0 (+https://medscopeglobal.com)";
@@ -85,15 +86,22 @@ async function fetchWpJsonPosts(source: DrugMonitorSource, limit = 8): Promise<R
     date?: string;
     title?: { rendered?: string };
     excerpt?: { rendered?: string };
+    content?: { rendered?: string };
   }[];
 
-  return posts.slice(0, limit).map((p) => ({
-    title: stripHtml(p.title?.rendered ?? "SÚKL — informace"),
-    link: p.link ?? source.url,
-    description: stripHtml(p.excerpt?.rendered ?? "").slice(0, 3000),
-    pubDate: p.date ?? null,
-    sourceName: DRUG_AGENCY_META.sukl.short,
-  }));
+  return posts.slice(0, limit).map((p) => {
+    const bodyHtml = p.content?.rendered ?? "";
+    const excerpt = stripHtml(p.excerpt?.rendered ?? "");
+    const bodyText = stripHtml(bodyHtml);
+    return {
+      title: stripHtml(p.title?.rendered ?? "SÚKL — informace"),
+      link: p.link ?? source.url,
+      description: (bodyText.length > excerpt.length ? bodyText : excerpt).slice(0, 12000),
+      pubDate: p.date ?? null,
+      sourceName: DRUG_AGENCY_META.sukl.short,
+      bodyHtml: bodyHtml || undefined,
+    };
+  });
 }
 
 async function fetchSourceItems(source: DrugMonitorSource, limit = 6): Promise<DrugFeedItem[]> {
@@ -112,7 +120,27 @@ async function fetchSourceItems(source: DrugMonitorSource, limit = 6): Promise<D
     agency: source.agency,
     sourceId: source.id,
     portalUrl: source.url,
+    bodyHtml: "bodyHtml" in item ? (item as { bodyHtml?: string }).bodyHtml : undefined,
   }));
+}
+
+/** Doplní plné znění článku SÚKL z WordPress API podle URL. */
+export async function fetchSuklArticleBody(sourceUrl: string): Promise<string | null> {
+  try {
+    const slug = sourceUrl.replace(/\/$/, "").split("/").pop();
+    if (!slug || !sourceUrl.includes("sukl.gov.cz")) return null;
+    const api = `https://sukl.gov.cz/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}`;
+    const res = await fetch(api, {
+      headers: { "User-Agent": UA, Accept: "application/json" },
+      signal: AbortSignal.timeout(20_000),
+      next: { revalidate: 0 },
+    });
+    if (!res.ok) return null;
+    const posts = (await res.json()) as { content?: { rendered?: string } }[];
+    return posts[0]?.content?.rendered ?? null;
+  } catch {
+    return null;
+  }
 }
 
 /** Načte položky ze všech RSS/API zdrojů (portály jen jako odkaz na UI). */
