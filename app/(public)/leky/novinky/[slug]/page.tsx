@@ -42,7 +42,7 @@ export default async function LekyDetailPage({ params }: Props) {
       <V21ModuleDetailView
         backHref="/leky/novinky"
         backLabel="Lékové novinky"
-        eyebrow="Léky · SÚKL / EMA"
+        eyebrow={`Léky · ${(drug.agency ?? "sukl").toUpperCase()}`}
         title={title}
         subtitle={[drug.drug_name, drug.status].filter(Boolean).join(" · ")}
         dateLabel={formatCsDate(drug.published_date)}

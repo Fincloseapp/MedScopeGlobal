@@ -1,7 +1,7 @@
 import { fetchPubMedItems } from "@/lib/ingestion/pubmed";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { extractWithAi, placeholderImageUrl, slugifyV4c } from "@/lib/v4c/ai-extract";
-import { CZ_UNIVERSITIES, DRUG_AGENCIES, LEGISLATION_SOURCES } from "@/lib/v4c/sources";
+import { CZ_UNIVERSITIES, LEGISLATION_SOURCES } from "@/lib/v4c/sources";
 import { V22_DIGITAL_HEALTH_SOURCES } from "@/lib/v22/digital-health/sources";
 
 export async function runV4cDailyIngest() {
@@ -51,34 +51,17 @@ export async function runV4cDailyIngest() {
   }
   results.studies = studiesAdded;
 
-  // Drug news — agency placeholders + AI
+  // Drug news — SÚKL / EMA / FDA živé feedy
   let drugsAdded = 0;
-  for (const agency of DRUG_AGENCIES) {
-    const title = `${agency.name} — denní přehled registrací`;
-    const slug = slugifyV4c(`${agency.agency}-${title}`);
-    const { data: ex } = await admin.from("drug_news").select("id").eq("slug", slug).maybeSingle();
-    if (ex) continue;
-    const ai = await extractWithAi("leky", {
-      title,
-      raw: `Automatický monitoring ${agency.url}`,
-      sourceUrl: agency.url,
-      sourceName: agency.name,
-    });
-    const { error } = await admin.from("drug_news").insert({
-      title: (ai.title as string) ?? title,
-      slug,
-      drug_name: (ai.drug_name as string) ?? null,
-      status: (ai.status as string) ?? "new",
-      agency: agency.agency,
-      source_url: agency.url,
-      source_name: agency.name,
-      summary: (ai.summary as string) ?? `Monitoring ${agency.name}`,
-      image_url: placeholderImageUrl(agency.agency),
-      ai_metadata: ai,
-      published: true,
-      published_date: new Date().toISOString().slice(0, 10),
-    });
-    if (!error) drugsAdded++;
+  try {
+    const { runDrugFeedIngest } = await import("@/lib/v4c/drug-feed-ingest");
+    const drugResult = await runDrugFeedIngest({ maxItems: 36 });
+    drugsAdded = drugResult.inserted;
+    if (drugResult.errors.length) {
+      console.error("v4c drug feed ingest", drugResult.errors.slice(0, 5));
+    }
+  } catch (e) {
+    console.error("v4c drug feed ingest", e);
   }
   results.drug_news = drugsAdded;
 

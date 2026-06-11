@@ -33,6 +33,18 @@ export async function getDrugNewsList(status?: string) {
   return (data ?? []) as DrugNewsRow[];
 }
 
+export async function getDrugNewsGroupedByAgency(limitPerAgency = 6) {
+  const all = await getDrugNewsList();
+  const groups = { sukl: [] as DrugNewsRow[], ema: [] as DrugNewsRow[], fda: [] as DrugNewsRow[] };
+  for (const row of all) {
+    const key = row.agency as keyof typeof groups;
+    if (key in groups && groups[key].length < limitPerAgency) {
+      groups[key].push(row);
+    }
+  }
+  return groups;
+}
+
 export async function getDrugNewsBySlug(slug: string) {
   const supabase = await createClient();
   const { data, error } = await supabase

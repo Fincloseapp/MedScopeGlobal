@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V4cContentCard } from "@/components/v4c/content-card";
 import { getDrugNewsList } from "@/lib/queries/v4c/drug-news";
+import { DrugSourceAttribution } from "@/components/v4c/drug-source-attribution";
 import { resolveManyImages } from "@/lib/v25/images/resolve-many";
 
 export const revalidate = 120;
@@ -40,6 +41,7 @@ export default async function LekyPipelinePage() {
           />
         ))}
       </div>
+      <DrugSourceAttribution className="mt-8" />
     </ModulePageShell>
   );
 }

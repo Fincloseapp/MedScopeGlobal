@@ -3,7 +3,8 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V4cContentCard } from "@/components/v4c/content-card";
 import { getDrugNewsList } from "@/lib/queries/v4c/drug-news";
-import { DRUG_AGENCIES } from "@/lib/v4c/sources";
+import { DrugSourceAttribution } from "@/components/v4c/drug-source-attribution";
+import { DRUG_STATUS_LABELS } from "@/lib/v4c/drug-sources";
 import { resolveManyImages } from "@/lib/v25/images/resolve-many";
 
 export const revalidate = 120;
@@ -42,13 +43,13 @@ export default async function LekyNovinkyPage() {
             title={d.title}
             meta={[d.agency, d.drug_name, d.published_date].filter(Boolean).join(" · ")}
             summary={d.summary}
-            badge={d.status}
+            badge={DRUG_STATUS_LABELS[d.status] ?? d.status}
             imageUrl={d.resolvedImageUrl}
             imageAlt={d.drug_name ?? d.title}
           />
         ))}
       </div>
-      <p className="mt-8 text-xs text-slate-500">{DRUG_AGENCIES.map((a) => a.name).join(" · ")}</p>
+      <DrugSourceAttribution className="mt-8" />
     </ModulePageShell>
   );
 }
