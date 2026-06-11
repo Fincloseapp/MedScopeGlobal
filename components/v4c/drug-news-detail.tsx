@@ -1,17 +1,19 @@
 import Link from "next/link";
 import { Calendar } from "lucide-react";
 import { buildDrugNewsArticle } from "@/lib/v4c/drug-content";
+import { getDrugNewsBackLink } from "@/lib/v4c/drug-sources";
 import { formatCsDate } from "@/lib/v21/enrich";
 import type { DrugNewsRow } from "@/lib/queries/v4c/drug-news";
 
 export function DrugNewsDetail({ drug }: { drug: DrugNewsRow }) {
   const dateLabel = formatCsDate(drug.published_date);
   const article = buildDrugNewsArticle(drug, dateLabel);
+  const back = getDrugNewsBackLink(drug);
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <Link href="/leky/novinky" className="text-sm font-medium text-[#005B96] hover:underline">
-        ← Lékové novinky
+      <Link href={back.href} className="text-sm font-medium text-[#005B96] hover:underline">
+        ← {back.label}
       </Link>
 
       <header className="mt-5 border-b border-slate-200 pb-6">

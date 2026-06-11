@@ -1,31 +1,16 @@
 import type { Metadata } from "next";
-
 import Link from "next/link";
-
-import { ModulePageShell } from "@/components/b2b/module-page-shell";
-
-import { V4cContentCard } from "@/components/v4c/content-card";
-
 import { DrugAgencyOverview } from "@/components/v4c/drug-agency-overview";
-
+import { DrugNewsListCard } from "@/components/v4c/drug-news-list-card";
 import { DrugSourceAttribution } from "@/components/v4c/drug-source-attribution";
-
-import { PublicModuleImage } from "@/components/v25/public-module-image";
-
 import { getDrugNewsGroupedByAgency, getDrugNewsList } from "@/lib/queries/v4c/drug-news";
-
-import { DRUG_STATUS_LABELS } from "@/lib/v4c/drug-sources";
-
-import { resolveManyImages } from "@/lib/v25/images/resolve-many";
-
-import { resolvePublicImageUrl } from "@/lib/v25/images/resolve-public";
 
 export const revalidate = 120;
 
 export const metadata: Metadata = {
-  title: "Léky — MedScopeGlobal",
+  title: "Léky a farmakoterapie | MedScopeGlobal",
   description:
-    "Lékové novinky, schválení a pipeline — automatický monitoring SÚKL, EMA a FDA v češtině.",
+    "Lékové novinky z SÚKL, EMA a FDA — schválení, bezpečnostní upozornění a pipeline. Automatická aktualizace z oficiálních zdrojů.",
 };
 
 const HUB_LINKS = [
@@ -36,15 +21,12 @@ const HUB_LINKS = [
 ];
 
 export default async function LekyHubPage() {
-  const [latest, byAgency] = await Promise.all([getDrugNewsList(), getDrugNewsGroupedByAgency(8)]);
-  const preview = await resolveManyImages(latest.slice(0, 6), "drug_news");
+  const [latest, grouped] = await Promise.all([
+    getDrugNewsList(),
+    getDrugNewsGroupedByAgency(4),
+  ]);
 
-  const heroImage = await resolvePublicImageUrl({
-    section: "drug_news",
-    slug: "leky-hub",
-    dbUrl: null,
-  });
-
+  const preview = latest.slice(0, 6);
   const lastUpdate = latest[0]?.published_date ?? latest[0]?.created_at ?? null;
   const lastUpdateLabel = lastUpdate
     ? new Date(lastUpdate).toLocaleString("cs-CZ", {
@@ -57,85 +39,90 @@ export default async function LekyHubPage() {
     : null;
 
   return (
-    <ModulePageShell
-      eyebrow="Léky"
-      title="Léky a farmakoterapie"
-      description="Profesionální monitoring SÚKL, EMA a FDA — novinky, schválení a vývojové pipeline. Automatická aktualizace z oficiálních zdrojů."
-      ctaHref="/leky/novinky"
-      ctaLabel="Všechny novinky"
-    >
-      <div className="relative mb-8 aspect-[21/9] overflow-hidden rounded-2xl bg-gradient-to-br from-[#005B96]/20 via-slate-100 to-[#021d33]/10">
-        <PublicModuleImage
-          src={heroImage}
-          alt="Farmakoterapie a léková bezpečnost — MedScopeGlobal"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#021d33]/85 via-[#021d33]/25 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
-          <p className="text-sm font-medium text-white/95">
-            Evidence-based přehled pro klinickou praxi
+    <div className="min-h-screen bg-[#f4f8fc]">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#021d33] via-[#003d6b] to-[#005B96] px-4 py-14 sm:px-6 sm:py-20">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.08)_0%,_transparent_60%)]" />
+        <div className="relative mx-auto max-w-4xl">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/60">
+            medscopeglobal.com · Léky
           </p>
-          <p className="mt-1 max-w-2xl text-xs text-white/75">
-            SÚKL · EMA · FDA — strukturované shrnutí v češtině s odkazem na primární dokument u každé
-            položky.
+          <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
+            Léky a farmakoterapie
+          </h1>
+          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/85">
+            Schválení, bezpečnostní upozornění a pipeline z oficiálních registrů SÚKL, EMA a FDA.
+            Obsah se automaticky aktualizuje a zobrazuje v češtině.
           </p>
           {lastUpdateLabel ? (
-            <p className="mt-3 text-[11px] text-white/60">Poslední synchronizace: {lastUpdateLabel}</p>
+            <p className="mt-4 text-xs text-white/50">Poslední synchronizace: {lastUpdateLabel}</p>
           ) : null}
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/leky/novinky"
+              className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#005B96] shadow-sm transition hover:bg-white/90"
+            >
+              Všechny novinky
+            </Link>
+            <Link
+              href="/leky/schvalene"
+              className="rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              Schválené přípravky
+            </Link>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <DrugAgencyOverview byAgency={byAgency} />
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <DrugAgencyOverview byAgency={grouped} />
 
-      <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {HUB_LINKS.map((l) => (
-          <Link
-            key={l.href}
-            href={l.href}
-            prefetch
-            className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-primary/40 hover:shadow-md"
-          >
-            <p className="font-semibold text-[#021d33]">{l.label}</p>
-            <p className="mt-1 text-xs text-slate-500">{l.desc}</p>
-          </Link>
-        ))}
-      </div>
-
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <h2 className="font-display text-xl font-semibold text-[#021d33]">Nejnovější lékové novinky</h2>
-        <Link href="/leky/novinky" className="text-sm text-[#005B96] hover:underline">
-          Zobrazit vše →
-        </Link>
-      </div>
-
-      {preview.length ? (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {preview.map((d) => (
-            <V4cContentCard
-              key={d.id}
-              href={`/leky/novinky/${d.slug}`}
-              title={d.title}
-              meta={[d.agency?.toUpperCase(), d.drug_name, d.published_date]
-                .filter(Boolean)
-                .join(" · ")}
-              summary={d.summary}
-              badge={DRUG_STATUS_LABELS[d.status] ?? d.status}
-              imageUrl={d.resolvedImageUrl}
-              imageAlt={d.drug_name ?? d.title}
-            />
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {HUB_LINKS.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              prefetch
+              className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-[#005B96]/40 hover:shadow-md"
+            >
+              <p className="font-semibold text-[#021d33]">{l.label}</p>
+              <p className="mt-1 text-xs text-slate-500">{l.desc}</p>
+            </Link>
           ))}
         </div>
-      ) : (
-        <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
-          <p>První synchronizace z oficiálních zdrojů proběhne automaticky během dne.</p>
-          <p className="mt-2 text-xs">
-            SÚKL, EMA a FDA — monitoring přes denní CRON MedScopeGlobal.
-          </p>
-        </div>
-      )}
 
-      <DrugSourceAttribution className="mt-10" />
-    </ModulePageShell>
+        <section className="mt-12">
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+                medscopeglobal.com
+              </p>
+              <h2 className="font-display text-2xl font-bold text-[#021d33]">
+                Nejnovější lékové novinky
+              </h2>
+            </div>
+            <Link href="/leky/novinky" className="shrink-0 text-sm font-medium text-[#005B96] hover:underline">
+              Zobrazit vše →
+            </Link>
+          </div>
+
+          {preview.length ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {preview.map((item) => (
+                <DrugNewsListCard key={item.id} item={item} variant="text-only" />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+              <p>První synchronizace z oficiálních zdrojů proběhne automaticky během dne.</p>
+              <p className="mt-2 text-xs">
+                SÚKL, EMA a FDA — monitoring přes denní CRON medscopeglobal.com.
+              </p>
+            </div>
+          )}
+        </section>
+
+        <DrugSourceAttribution className="mt-14" />
+      </div>
+    </div>
   );
 }
