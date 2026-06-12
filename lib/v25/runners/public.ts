@@ -12,6 +12,20 @@ export type PublicArticlesFetchResult = {
 
 export type AdEngineStepResult = { ok: boolean; detail?: string; updated?: number };
 
+type PublicWritersReport = {
+  ok: boolean;
+  articles?: { length: number };
+  persisted?: { files?: number; db?: number; failed?: number };
+};
+
+type PublicWritersModule = {
+  runPublicWriters: (opts?: object) => Promise<PublicWritersReport>;
+};
+
+type PublicAdEngineModule = {
+  runPublicAdEngine: (opts?: object) => Promise<AdEngineStepResult | undefined>;
+};
+
 export async function runPublicArticlesFetch(options?: {
   limitPerWriter?: number;
   skipAds?: boolean;
@@ -19,7 +33,7 @@ export async function runPublicArticlesFetch(options?: {
   const t0 = Date.now();
 
   if (process.env.VERCEL === "1") {
-    const writersMod = await import("../writers/run-public-writers.mjs");
+    const writersMod = (await import("../writers/run-public-writers.mjs")) as unknown as PublicWritersModule;
     const report = await writersMod.runPublicWriters({
       limitPerWriter: options?.limitPerWriter ?? 1,
       skipAds: options?.skipAds ?? false,
@@ -27,7 +41,7 @@ export async function runPublicArticlesFetch(options?: {
 
     let adEngine: PublicArticlesFetchResult["adEngine"];
     if (!options?.skipAds) {
-      const adsMod = await import("../ads/public-ad-engine.mjs");
+      const adsMod = (await import("../ads/public-ad-engine.mjs")) as unknown as PublicAdEngineModule;
       adEngine = await adsMod.runPublicAdEngine({ limit: 24 });
     }
 
@@ -63,7 +77,7 @@ export async function runPublicArticlesFetch(options?: {
 }
 
 export async function runPublicAdEngineStep(options?: { limit?: number }): Promise<AdEngineStepResult> {
-  const adsMod = await import("../ads/public-ad-engine.mjs");
+  const adsMod = (await import("../ads/public-ad-engine.mjs")) as unknown as PublicAdEngineModule;
   const result = await adsMod.runPublicAdEngine(options);
   return result ?? { ok: false, detail: "public-ad-engine returned no result" };
 }

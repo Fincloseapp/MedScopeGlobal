@@ -130,5 +130,5 @@ export async function runProAdEngineStep(options?: { limit?: number }): Promise<
 
 export async function runMarketingCoordinatorStep(options?: { forceReport?: boolean }): Promise<CoordinatorRunResult> {
   const mod = await import("../marketers/marketing-coordinator.mjs");
-  return mod.runMarketingCoordinator(options);
+  return mod.runMarketingCoordinator(options) as Promise<CoordinatorRunResult>;
 }
