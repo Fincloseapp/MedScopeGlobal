@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
-import { pathToFileURL } from "node:url";
+import { importMjs } from "@/lib/v25/import-mjs";
 import { setCronStatus } from "@/lib/v25/system-state";
 
 export type PublicArticlesFetchResult = {
@@ -18,9 +18,11 @@ export async function runPublicArticlesFetch(options?: {
   const t0 = Date.now();
 
   if (process.env.VERCEL === "1") {
-    const writersMod = await import(
-      pathToFileURL(join(process.cwd(), "lib/v25/writers/run-public-writers.mjs")).href
-    );
+    const writersMod = await importMjs<{ runPublicWriters: (opts?: object) => Promise<{
+      ok: boolean;
+      articles?: { length: number } & unknown[];
+      persisted?: { db?: number };
+    }> }>("lib/v25/writers/run-public-writers.mjs");
     const report = await writersMod.runPublicWriters({
       limitPerWriter: options?.limitPerWriter ?? 1,
       skipAds: options?.skipAds ?? false,
@@ -28,8 +30,8 @@ export async function runPublicArticlesFetch(options?: {
 
     let adEngine: PublicArticlesFetchResult["adEngine"];
     if (!options?.skipAds) {
-      const adsMod = await import(
-        pathToFileURL(join(process.cwd(), "lib/v25/ads/public-ad-engine.mjs")).href
+      const adsMod = await importMjs<{ runPublicAdEngine: (opts?: object) => Promise<PublicArticlesFetchResult["adEngine"]> }>(
+        "lib/v25/ads/public-ad-engine.mjs"
       );
       adEngine = await adsMod.runPublicAdEngine({ limit: 24 });
     }
@@ -60,8 +62,8 @@ export async function runPublicArticlesFetch(options?: {
 }
 
 export async function runPublicAdEngineStep(options?: { limit?: number }) {
-  const adsMod = await import(
-    pathToFileURL(join(process.cwd(), "lib/v25/ads/public-ad-engine.mjs")).href
+  const adsMod = await importMjs<{ runPublicAdEngine: (opts?: object) => Promise<PublicArticlesFetchResult["adEngine"]> }>(
+    "lib/v25/ads/public-ad-engine.mjs"
   );
   return adsMod.runPublicAdEngine(options);
 }

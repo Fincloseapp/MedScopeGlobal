@@ -1,5 +1,4 @@
-import { join } from "node:path";
-import { pathToFileURL } from "node:url";
+import { importMjs } from "@/lib/v25/import-mjs";
 import { setCronStatus } from "@/lib/v25/system-state";
 
 export type MarketingPipelineResult = {
@@ -12,10 +11,6 @@ export type MarketingPipelineResult = {
   studentAds?: { ok: boolean; detail?: string; updated?: number };
   proAds?: { ok: boolean; detail?: string; updated?: number };
 };
-
-async function importMjs(relativePath: string) {
-  return import(pathToFileURL(join(process.cwd(), relativePath)).href);
-}
 
 export async function runMarketingPipeline(options?: {
   skipMarketers?: boolean;

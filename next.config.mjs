@@ -36,9 +36,19 @@ const CACHE_TAGS = "medscope-ui-v23.0,medscope-pages,v23-content";
 
 /** @type {import('next').NextConfig} */
 
+/** v25 cron/runners load .mjs via runtime path — must ship in serverless bundles */
+const V25_MJS_TRACE = ["./lib/v25/**/*.mjs"];
+
 const nextConfig = {
 
   serverExternalPackages: ["pdf-parse", "mammoth", "tesseract.js"],
+
+  outputFileTracingIncludes: {
+    "/api/v25/system/run": V25_MJS_TRACE,
+    "/api/cron/public-articles": V25_MJS_TRACE,
+    "/api/cron/v25-enterprise": V25_MJS_TRACE,
+    "/api/cron/marketing": V25_MJS_TRACE,
+  },
 
   compress: true,
 
