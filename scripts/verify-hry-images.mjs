@@ -18,6 +18,13 @@ const PAGES = [
 
 const LEGACY_BAD = /9c0d0b0b0b0b|images\.unsplash\.com/i;
 
+/** Bare /v25/images/render (no /api) is a substring of the correct path — count both. */
+function hasWrongV25RenderPath(html) {
+  const bare = (html.match(/\/v25\/images\/render/g) || []).length;
+  const api = (html.match(/\/api\/v25\/images\/render/g) || []).length;
+  return bare > api;
+}
+
 let failed = 0;
 
 for (const path of PAGES) {
@@ -25,9 +32,17 @@ for (const path of PAGES) {
   const res = await fetch(url, { headers: { "User-Agent": UA } });
   const html = await res.text();
   const hasV25 = html.includes("/api/v25/images/render");
+  const hasWrongV25 = hasWrongV25RenderPath(html);
   const hasLegacy = LEGACY_BAD.test(html);
-  const ok = res.status === 200 && hasV25 && !hasLegacy;
-  console.log(ok ? "✓" : "✗", path, `status=${res.status}`, hasV25 ? "v25" : "NO-v25", hasLegacy ? "LEGACY" : "");
+  const ok = res.status === 200 && hasV25 && !hasWrongV25 && !hasLegacy;
+  console.log(
+    ok ? "✓" : "✗",
+    path,
+    `status=${res.status}`,
+    hasV25 ? "v25" : "NO-v25",
+    hasWrongV25 ? "WRONG-PATH" : "",
+    hasLegacy ? "LEGACY" : ""
+  );
   if (!ok) failed++;
 }
 

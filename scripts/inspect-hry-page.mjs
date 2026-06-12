@@ -5,6 +5,9 @@ const r = await fetch(url, {
 const t = await r.text();
 console.log("status", r.status);
 console.log("unsplash", t.includes("unsplash"));
-console.log("v25 render", t.includes("/api/v25/images/render"));
+const bare = (t.match(/\/v25\/images\/render/g) || []).length;
+const api = (t.match(/\/api\/v25\/images\/render/g) || []).length;
+console.log("v25 render api", api > 0);
+console.log("wrong bare /v25 path", bare > api);
 const imgs = [...t.matchAll(/<img[^>]+>/g)].filter((m) => !m[0].includes("Logo_"));
 console.log("non-logo imgs:", imgs.map((m) => m[0].slice(0, 250)).join("\n---\n"));
