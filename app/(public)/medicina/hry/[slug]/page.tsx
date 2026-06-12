@@ -6,6 +6,8 @@ import { V22QuizRunner } from "@/components/v22/quiz-runner";
 import { resolveStudyGameImageUrl } from "@/lib/v22/game-images";
 import { getStudyGameBySlug } from "@/lib/v22/games";
 
+export const revalidate = 120;
+
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

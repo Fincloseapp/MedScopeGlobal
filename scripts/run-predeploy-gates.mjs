@@ -52,9 +52,11 @@ console.log("\n=== Pre-deploy gates ===\n");
 const isVercel = process.env.VERCEL === "1";
 const isCI = process.env.GITHUB_ACTIONS === "true";
 const hasCronSecret = (process.env.CRON_SECRET ?? "").length >= 16;
+const logoSource = process.env.MEDSCOPE_LOGO_SOURCE ?? "D:\\MedScopeGlobal\\logo";
+const canSyncLogos = existsSync(logoSource) || (!isVercel && !isCI);
 
 const steps = [
-  ...(isVercel || isCI ? [] : [["sync-logos", "scripts/sync-logos.mjs"]]),
+  ...(canSyncLogos ? [["sync-logos", "scripts/sync-logos.mjs"]] : []),
   ["validate-logos", "scripts/validate-logos.mjs"],
   ...(hasCronSecret
     ? [
@@ -67,8 +69,8 @@ const steps = [
   ["verify-v6-api-routes", "scripts/verify-v6-api-routes.mjs"],
 ];
 
-if (isVercel) {
-  console.log("(Vercel) skipping sync-logos — using committed assets in public/assets/logo/\n");
+if (isVercel && !canSyncLogos) {
+  console.log("(Vercel) logo source unavailable — using committed assets in public/assets/logo/\n");
 }
 if (isCI && !hasCronSecret) {
   console.log("(CI) CRON_SECRET not set — skipping cron env gates\n");

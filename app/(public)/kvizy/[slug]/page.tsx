@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+
+export const revalidate = 120;
 import { PublicModuleImage } from "@/components/v25/public-module-image";
 import { V22QuizRunner } from "@/components/v22/quiz-runner";
 import { resolveStudyGameImageUrl } from "@/lib/v22/game-images";

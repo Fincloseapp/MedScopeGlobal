@@ -5,6 +5,8 @@ import { resolveStudyGameImageUrl } from "@/lib/v22/game-images";
 import { listV24Quizzes } from "@/lib/v24/quizzes";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
+export const revalidate = 120;
+
 export const metadata: Metadata = buildV20PageMetadata({
   title: "Kvízy a studijní hry",
   description: "Medicínské kvízy — farmakologie, anatomie, klinické scénáře. Česká verze MedScopeGlobal v24.",

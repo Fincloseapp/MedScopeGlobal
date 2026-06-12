@@ -1,10 +1,18 @@
+import { MEDSCOPE_LOGO } from "@/lib/brand/logo";
 import { resolvePublicImageUrl, resolvePublicImageUrlSync } from "@/lib/v25/images/resolve-public";
 
 /** v25 image section for study games and medicina/hry quizzes. */
 export const STUDY_GAME_IMAGE_SECTION = "quizzes";
 
-/** Static fallback when v25 render or remote image fails. */
-export const STUDY_GAME_IMAGE_FALLBACK = "/assets/logo/Logo_Transparent.webp";
+/** Static fallback — JPG in public/assets/logo (committed, no next/image optimizer required). */
+export const STUDY_GAME_IMAGE_FALLBACK = MEDSCOPE_LOGO.transparent;
+
+export function studyGameRenderUrl(slug: string): string {
+  return resolvePublicImageUrlSync({
+    section: STUDY_GAME_IMAGE_SECTION,
+    slug,
+  });
+}
 
 export async function resolveStudyGameImageUrl(
   slug: string,
