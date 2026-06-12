@@ -38,8 +38,10 @@ function matchesSourceId(row: DrugNewsRow, sourceId: string): boolean {
   if (sourceId === "sukl-dulezite" && row.agency === "sukl" && row.source_url?.includes("sukl.gov.cz")) {
     return !sid || sid === "sukl-dulezite";
   }
-  if (sourceId === "sukl-prehled-leciv" && row.agency === "sukl") {
-    return sid === "sukl-prehled-leciv" || row.status === "approved";
+  if (sourceId === "sukl-prehled-leciv") {
+    if (sid === "sukl-dulezite") return false;
+    if (sid === "sukl-prehled-leciv") return true;
+    return row.agency === "sukl" && !!row.source_url?.includes("prehledy.sukl.cz");
   }
   if (sourceId === "ema-whats-new" && row.agency === "ema") {
     return !sid || sid === "ema-whats-new" || sid === sourceId;
