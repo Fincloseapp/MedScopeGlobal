@@ -1,20 +1,19 @@
 import { cookies } from "next/headers";
 
-import { getAdminGatePassword } from "@/lib/auth/admin-gate-config";
+import {
+  ADMIN_GATE_COOKIE,
+  getAdminGatePassword,
+  isValidAdminGateCookie,
+} from "@/lib/auth/admin-gate-config";
 
-
-
-const COOKIE = "ms_admin_gate";
-
-
+const COOKIE = ADMIN_GATE_COOKIE;
 
 export async function isAdminGateOpen(): Promise<boolean> {
-
   const jar = await cookies();
-
-  return jar.get(COOKIE)?.value === getAdminGatePassword();
-
+  return isValidAdminGateCookie(jar.get(COOKIE)?.value);
 }
+
+export { isValidAdminGateCookie } from "@/lib/auth/admin-gate-config";
 
 
 

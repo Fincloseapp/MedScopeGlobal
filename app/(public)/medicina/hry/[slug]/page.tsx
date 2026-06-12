@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PublicModuleImage } from "@/components/v25/public-module-image";
 import { V22QuizRunner } from "@/components/v22/quiz-runner";
+import { resolveStudyGameImageUrl } from "@/lib/v22/game-images";
 import { getStudyGameBySlug } from "@/lib/v22/games";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -18,13 +19,15 @@ export default async function MedicinaHraDetailPage({ params }: Props) {
   const game = getStudyGameBySlug(slug);
   if (!game) notFound();
 
+  const imageUrl = await resolveStudyGameImageUrl(slug);
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
       <Link href="/medicina/hry" className="text-sm font-medium text-primary hover:underline">
         ← Všechny hry
       </Link>
       <div className="relative mt-4 aspect-[16/9] overflow-hidden rounded-2xl bg-slate-100">
-        <Image src={game.imageUrl} alt="" fill className="object-cover" sizes="768px" priority />
+        <PublicModuleImage src={imageUrl} alt={game.title} sizes="768px" priority />
       </div>
       <header className="mt-4">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">{game.topic}</p>

@@ -1,5 +1,3 @@
-import { V21_MEDICAL_IMAGES } from "@/lib/v21/images";
-
 export type V22QuizQuestion = {
   id: string;
   prompt: string;
@@ -13,7 +11,6 @@ export type V22StudyGame = {
   title: string;
   topic: string;
   description: string;
-  imageUrl: string;
   questions: V22QuizQuestion[];
   updatedAt: string;
 };
@@ -25,7 +22,6 @@ export const V22_STUDY_GAMES: V22StudyGame[] = [
     title: "Anatomie: lidské systémy",
     topic: "Anatomie",
     description: "Kvíz o kosterním, svalovém, nervovém a cévním systému pro studenty 1.–2. ročníku.",
-    imageUrl: V21_MEDICAL_IMAGES.anatomy,
     updatedAt: "2026-06-10",
     questions: [
       {
@@ -56,7 +52,6 @@ export const V22_STUDY_GAMES: V22StudyGame[] = [
     title: "Fyziologie: homeostáza",
     topic: "Fyziologie",
     description: "Test základních fyziologických principů — acidobazická rovnováha, regulace TK a glukózy.",
-    imageUrl: V21_MEDICAL_IMAGES.medicina,
     updatedAt: "2026-06-10",
     questions: [
       {
@@ -87,7 +82,6 @@ export const V22_STUDY_GAMES: V22StudyGame[] = [
     title: "Patologie: základy",
     topic: "Patologie",
     description: "Kvíz o zánětu, nekróze a základních patogenetických mechanismech.",
-    imageUrl: V21_MEDICAL_IMAGES.study,
     updatedAt: "2026-06-10",
     questions: [
       {
@@ -111,7 +105,6 @@ export const V22_STUDY_GAMES: V22StudyGame[] = [
     title: "Přijímačky: biologie",
     topic: "Přijímačky",
     description: "Modelové otázky z biologie pro uchazeče o studium medicíny.",
-    imageUrl: V21_MEDICAL_IMAGES.university,
     updatedAt: "2026-06-10",
     questions: [
       {
@@ -135,7 +128,6 @@ export const V22_STUDY_GAMES: V22StudyGame[] = [
     title: "Lékařská terminologie",
     topic: "Terminologie",
     description: "Procvičení latinských a řeckých kořenů běžně používaných v medicíně.",
-    imageUrl: V21_MEDICAL_IMAGES.medicina,
     updatedAt: "2026-06-10",
     questions: [
       {
@@ -160,7 +152,6 @@ export const V22_STUDY_GAMES: V22StudyGame[] = [
     topic: "Klinika",
     description:
       "Kvíz z interny, chirurgie a pediatrie — diferenciální diagnostika a základní postupy pro 3.–4. ročník.",
-    imageUrl: V21_MEDICAL_IMAGES.study,
     updatedAt: "2026-06-03",
     questions: [
       {

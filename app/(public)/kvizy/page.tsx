@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { PublicModuleImage } from "@/components/v25/public-module-image";
+import { resolveStudyGameImageUrl } from "@/lib/v22/game-images";
 import { listV24Quizzes } from "@/lib/v24/quizzes";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
@@ -9,8 +11,13 @@ export const metadata: Metadata = buildV20PageMetadata({
   path: "/kvizy",
 });
 
-export default function KvizyPage() {
-  const quizzes = listV24Quizzes();
+export default async function KvizyPage() {
+  const quizzes = await Promise.all(
+    listV24Quizzes().map(async (q) => ({
+      ...q,
+      imageUrl: await resolveStudyGameImageUrl(q.slug),
+    }))
+  );
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
@@ -21,10 +28,15 @@ export default function KvizyPage() {
           <li key={q.slug}>
             <Link
               href={`/kvizy/${q.slug}`}
-              className="block rounded-xl border border-slate-200 bg-white p-5 hover:border-sky-200"
+              className="group block overflow-hidden rounded-xl border border-slate-200 bg-white hover:border-sky-200"
             >
-              <span className="font-semibold text-[#005B96]">{q.title}</span>
-              <span className="mt-1 block text-xs text-slate-500">{q.type}</span>
+              <div className="relative aspect-[16/9] bg-slate-100">
+                <PublicModuleImage src={q.imageUrl} alt={q.title} sizes="768px" />
+              </div>
+              <div className="p-5">
+                <span className="font-semibold text-[#005B96]">{q.title}</span>
+                <span className="mt-1 block text-xs text-slate-500">{q.type}</span>
+              </div>
             </Link>
           </li>
         ))}

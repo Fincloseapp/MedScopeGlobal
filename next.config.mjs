@@ -94,6 +94,22 @@ const nextConfig = {
 
       {
 
+        source: "/admin",
+
+        headers: [
+
+          { key: "X-Content-Type-Options", value: "nosniff" },
+
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+
+        ],
+
+      },
+
+      {
+
         source: "/admin/:path*",
 
         headers: [

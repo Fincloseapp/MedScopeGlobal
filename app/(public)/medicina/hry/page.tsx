@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+import { PublicModuleImage } from "@/components/v25/public-module-image";
+import { resolveStudyGameImageUrl } from "@/lib/v22/game-images";
 import { V22_STUDY_GAMES } from "@/lib/v22/games";
 
 export const revalidate = 120;
@@ -10,7 +11,14 @@ export const metadata: Metadata = {
   description: "Vzdělávací kvízy pro studenty medicíny — anatomie, fyziologie, patologie a přijímačky.",
 };
 
-export default function MedicinaHryPage() {
+export default async function MedicinaHryPage() {
+  const games = await Promise.all(
+    V22_STUDY_GAMES.map(async (game) => ({
+      ...game,
+      imageUrl: await resolveStudyGameImageUrl(game.slug),
+    }))
+  );
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
       <Link href="/medicina" className="text-sm font-medium text-primary hover:underline">
@@ -26,20 +34,18 @@ export default function MedicinaHryPage() {
       </header>
 
       <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {V22_STUDY_GAMES.map((game) => (
+        {games.map((game) => (
           <Link
             key={game.slug}
             href={`/medicina/hry/${game.slug}`}
             className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <div className="relative aspect-[16/10] bg-slate-100">
-              <Image
+              <PublicModuleImage
                 src={game.imageUrl}
                 alt={game.title}
-                fill
-                className="object-cover"
                 sizes="33vw"
-                loading="lazy"
+                priority={game.slug === "anatomie-systemy"}
               />
             </div>
             <div className="p-5">

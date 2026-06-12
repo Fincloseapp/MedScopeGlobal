@@ -8,15 +8,38 @@ import {
   normalizeLocale,
 } from "@/lib/i18n/config";
 import { detectLocaleFromAcceptLanguage } from "@/lib/i18n/detect-locale";
-import { getAdminGatePassword } from "@/lib/auth/admin-gate-config";
+import { isValidAdminGateCookie, ADMIN_GATE_COOKIE } from "@/lib/auth/admin-gate-config";
+
+function adminGateRedirect(request: NextRequest): NextResponse {
+  const login = new URL("/admin/login", request.url);
+  const redirect = NextResponse.redirect(login);
+  redirect.headers.set(
+    "Cache-Control",
+    "private, no-cache, no-store, must-revalidate"
+  );
+  return redirect;
+}
+
+function requiresAdminGate(pathname: string): boolean {
+  return pathname.startsWith("/admin") && !pathname.startsWith("/admin/login");
+}
 
 export async function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname === "/stav-systemu") {
-    return NextResponse.redirect(new URL("/admin/system", request.url));
-  }
+  const { pathname } = request.nextUrl;
 
   const securityBlock = await applySecurityMiddleware(request);
   if (securityBlock) return securityBlock;
+
+  if (requiresAdminGate(pathname)) {
+    const gate = request.cookies.get(ADMIN_GATE_COOKIE)?.value;
+    if (!isValidAdminGateCookie(gate)) {
+      return adminGateRedirect(request);
+    }
+  }
+
+  if (pathname === "/stav-systemu") {
+    return NextResponse.redirect(new URL("/admin/system", request.url));
+  }
 
   const { supabase, response } = createMiddlewareClient(request);
 
@@ -44,19 +67,14 @@ export async function middleware(request: NextRequest) {
     });
   }
 
-  if (request.nextUrl.pathname.startsWith("/admin") && !request.nextUrl.pathname.startsWith("/admin/login")) {
-    const gate = request.cookies.get("ms_admin_gate")?.value;
-    if (gate !== getAdminGatePassword()) {
-      const login = new URL("/admin/login", request.url);
-      return NextResponse.redirect(login);
-    }
-  }
-
   return response;
 }
 
 export const config = {
   matcher: [
+    "/admin",
+    "/admin/:path*",
+    "/stav-systemu",
     "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

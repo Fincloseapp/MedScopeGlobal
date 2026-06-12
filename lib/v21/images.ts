@@ -9,7 +9,7 @@ export const V21_MEDICAL_IMAGES = {
   university: `${BASE}/photo-1523050854058-8df90110c9f1?w=800&h=450&fit=crop&q=80&auto=format&fm=webp`,
   congress: `${BASE}/photo-1540575467063-178a50c2df87?w=800&h=450&fit=crop&q=80&auto=format&fm=webp`,
   medicina: `${BASE}/photo-1532012197268-da39f06e7038?w=800&h=450&fit=crop&q=80&auto=format&fm=webp`,
-  anatomy: `${BASE}/photo-1530026408846-9c0d0b0b0b0b?w=800&h=450&fit=crop&q=80&auto=format&fm=webp`,
+  anatomy: `${BASE}/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format&fm=webp`,
   hero: `${BASE}/photo-1559757148-5c350d0d3c56?w=1200&h=600&fit=crop&q=80&auto=format&fm=webp`,
 } as const;
 
