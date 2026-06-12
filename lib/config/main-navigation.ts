@@ -7,7 +7,43 @@ export type NavItem = {
 };
 
 const menuCs: NavItem[] = [
-  { label: "Články", href: "/articles" },
+  {
+    label: "Články",
+    href: "/articles",
+    children: [
+      { label: "Všechny články", href: "/articles", description: "Odborný obsah pro praxi a studium" },
+      {
+        label: "Příprava LF",
+        href: "/articles?med_track=priprava",
+        description: "Přijímačky a příprava na lékařskou fakultu",
+      },
+      {
+        label: "Studium medicíny",
+        href: "/articles?med_track=studium",
+        description: "Ročníky 1.–6. a klinické obory",
+      },
+    ],
+  },
+  {
+    label: "Veřejnost",
+    href: "/verejnost",
+    children: [
+      { label: "Přehled", href: "/verejnost", description: "Veřejné zdraví — prevence a životní styl" },
+      { label: "Články", href: "/verejnost/clanky", description: "Srozumitelné články pro každého" },
+      { label: "Témata", href: "/verejnost/temata", description: "Kategorie podle oblasti zdraví" },
+      { label: "Rozhovory", href: "/verejnost/rozhovory", description: "Rozhovory s lékaři a odborníky" },
+    ],
+  },
+  {
+    label: "Odborníci",
+    href: "/odborna",
+    children: [
+      { label: "Odborná sekce", href: "/odborna", description: "AI texty a přehled pro odborníky" },
+      { label: "Studie", href: "/studie", description: "RCT, meta-analýzy, CZ souhrn" },
+      { label: "Odborné briefy", href: "/odborne/briefy", description: "Strukturované medicínské briefy" },
+      { label: "Léky", href: "/leky", description: "SÚKL, EMA, schválené přípravky" },
+    ],
+  },
   {
     label: "Pro koho",
     href: "/pro-koho",
@@ -87,7 +123,34 @@ const menuCs: NavItem[] = [
 ];
 
 const menuEn: NavItem[] = [
-  { label: "Articles", href: "/articles" },
+  {
+    label: "Articles",
+    href: "/articles",
+    children: [
+      { label: "All articles", href: "/articles" },
+      { label: "Pre-med prep", href: "/articles?med_track=priprava" },
+      { label: "Med school track", href: "/articles?med_track=studium" },
+    ],
+  },
+  {
+    label: "Public",
+    href: "/verejnost",
+    children: [
+      { label: "Overview", href: "/verejnost" },
+      { label: "Articles", href: "/verejnost/clanky" },
+      { label: "Topics", href: "/verejnost/temata" },
+      { label: "Interviews", href: "/verejnost/rozhovory" },
+    ],
+  },
+  {
+    label: "Professionals",
+    href: "/odborna",
+    children: [
+      { label: "Professional hub", href: "/odborna" },
+      { label: "Studies", href: "/studie" },
+      { label: "Drugs", href: "/leky" },
+    ],
+  },
   {
     label: "Audiences",
     href: "/pro-koho",

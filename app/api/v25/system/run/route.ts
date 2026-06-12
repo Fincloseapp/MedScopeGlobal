@@ -11,7 +11,9 @@ export async function POST(request: Request) {
   }
 
   const url = new URL(request.url);
-  const mode = url.searchParams.get("mode") === "full" ? "full" : "quick";
+  const modeParam = url.searchParams.get("mode");
+  const mode =
+    modeParam === "full" ? "full" : modeParam === "suite" ? "suite" : "quick";
 
   try {
     const result = await runV25PostPipeline({ mode });

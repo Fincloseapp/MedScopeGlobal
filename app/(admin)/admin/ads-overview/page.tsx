@@ -71,7 +71,7 @@ export default function AdminAdsOverviewPage() {
     <div className="space-y-8">
       <div>
         <MedScopeLogo href="/admin/ads-overview" width={160} height={40} className="mb-3" />
-        <h1 className="font-display text-2xl font-bold text-[#021d33]">Ads Overview v25.3</h1>
+        <h1 className="font-display text-2xl font-bold text-[#021d33]">Ads Overview v25.4</h1>
         <p className="mt-1 text-sm text-slate-600">
           Koordinátor marketingu, 3 AI marketéři, výkon kampaní a ruční vkládání reklam.
         </p>

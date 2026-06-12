@@ -29,8 +29,9 @@ import {
   runProAdEngineStep,
   runMarketingCoordinatorStep,
 } from "@/lib/v25/runners/marketing";
+import { runV25TestSuite } from "@/lib/v25/tests/run-suite";
 
-export type V25PipelineMode = "full" | "quick";
+export type V25PipelineMode = "full" | "quick" | "suite";
 
 /** Rychlé QA testy pro admin — bez backfillu obrázků a sběru univerzit. */
 export async function runV25QuickPipeline(): Promise<V25EnterpriseResult> {
@@ -130,6 +131,22 @@ export async function runV25QuickPipeline(): Promise<V25EnterpriseResult> {
 }
 
 export async function runV25PostPipeline(options?: { mode?: V25PipelineMode }): Promise<V25EnterpriseResult> {
+  if (options?.mode === "suite") {
+    const suite = await runV25TestSuite();
+    return {
+      ok: suite.ok && suite.persisted !== false,
+      version: V25_ENGINE_VERSION,
+      phases: Object.fromEntries(
+        suite.cases.map((c) => [c.id, { ok: c.ok, detail: c.detail }])
+      ),
+      autofixAttempted: false,
+      redeployTriggered: false,
+      rollbackTriggered: false,
+      errors: suite.cases.filter((c) => !c.ok).map((c) => `${c.id}: ${c.detail ?? "fail"}`),
+      persisted: suite.persisted,
+    };
+  }
+
   if (options?.mode === "quick") {
     return runV25QuickPipeline();
   }

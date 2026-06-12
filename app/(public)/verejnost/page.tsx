@@ -3,6 +3,7 @@ import Link from "next/link";
 import { VerejnostArticleCard } from "@/components/verejnost/verejnost-article-card";
 import { VEREJNOST_HUB_TOPICS } from "@/lib/config/verejnost-topics";
 import { listPublicArticles } from "@/lib/queries/verejnost";
+import { ensurePublicArticleSeed } from "@/lib/verejnost/seed-articles";
 
 export const revalidate = 120;
 
@@ -19,6 +20,7 @@ const QUICK_LINKS = [
 ];
 
 export default async function VerejnostHubPage() {
+  await ensurePublicArticleSeed();
   const latest = await listPublicArticles({ limit: 6 });
   const topics = VEREJNOST_HUB_TOPICS;
 

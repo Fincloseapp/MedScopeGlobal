@@ -73,6 +73,14 @@ export default async function AdminDashboardPage() {
       </div>
 
       <Link
+        href="/admin/tests"
+        className="inline-flex items-center gap-2 rounded-xl border border-[#005B96]/30 bg-[#005B96]/5 px-4 py-3 text-sm font-medium text-[#021d33] hover:bg-[#005B96]/10"
+      >
+        <Activity className="h-4 w-4 text-[#005B96]" />
+        v25.4 Test suite — routing, ads, veřejnost, CLK
+      </Link>
+
+      <Link
         href="/admin/system"
         className="inline-flex items-center gap-2 rounded-xl border border-[#005B96]/30 bg-[#005B96]/5 px-4 py-3 text-sm font-medium text-[#021d33] hover:bg-[#005B96]/10"
       >

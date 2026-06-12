@@ -171,6 +171,8 @@ export type V25SystemState = {
   overview?: V25SystemOverview;
   images?: V25ImagesOverview;
   imageTestReport?: V25ImageTestReport;
+  testRuns?: V25TestRunRecord[];
+  lastTestSuite?: V25TestRunRecord;
 };
 
 export type V25PipelinePhase =
@@ -197,4 +199,33 @@ export type V25EnterpriseResult = {
   rollbackTriggered: boolean;
   errors: string[];
   persisted?: boolean;
+};
+
+export type V25TestCaseId =
+  | "routing"
+  | "links"
+  | "navigation"
+  | "apiHealth"
+  | "adEngines"
+  | "verejnost"
+  | "odborna"
+  | "clkStub";
+
+export type V25TestCaseResult = {
+  id: V25TestCaseId;
+  label: string;
+  ok: boolean;
+  detail?: string;
+  durationMs?: number;
+  broken?: string[];
+};
+
+export type V25TestRunRecord = {
+  id: string;
+  at: string;
+  mode: "suite" | "quick" | "full";
+  ok: boolean;
+  cases: V25TestCaseResult[];
+  durationMs: number;
+  base?: string;
 };

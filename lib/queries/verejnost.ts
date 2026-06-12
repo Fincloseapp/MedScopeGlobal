@@ -38,7 +38,14 @@ export async function listPublicArticles(options?: {
   limit?: number;
   offset?: number;
   locale?: LocaleCode;
+  /** Spustí seed/cron pokud je DB prázdná (default true u hubu). */
+  ensureContent?: boolean;
 }): Promise<DisplayArticle[]> {
+  if (options?.ensureContent !== false) {
+    const { ensurePublicArticlesSeeded } = await import("@/lib/verejnost/ensure-content");
+    await ensurePublicArticlesSeeded();
+  }
+
   const limit = options?.limit ?? 12;
   const offset = options?.offset ?? 0;
   const locale = options?.locale ?? "cs";

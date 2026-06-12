@@ -11,6 +11,7 @@ import { V23HomeHero } from "@/components/v23/home-hero";
 import { V23NewsletterCta } from "@/components/v23/newsletter-cta";
 import { V23PersonalizedFeed } from "@/components/v23/personalized-feed";
 import { V24AiMedicalHub } from "@/components/v24/ai-medical-hub";
+import { V25HomeHubSections } from "@/components/v25/home-hub-sections";
 import { V25UniversitiesHomeSection } from "@/components/v25/universities-home-section";
 import { Button } from "@/components/ui/button";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
@@ -50,6 +51,8 @@ export default async function HomePage() {
       <V24AiMedicalHub />
 
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
+
+      <V25HomeHubSections />
 
       <V23AudiencePriorities />
 
