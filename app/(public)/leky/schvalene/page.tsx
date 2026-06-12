@@ -4,13 +4,15 @@ import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { DrugNewsListCard } from "@/components/v4c/drug-news-list-card";
 import { getDrugNewsList } from "@/lib/queries/v4c/drug-news";
 import { DrugSourceAttribution } from "@/components/v4c/drug-source-attribution";
+import { buildV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
 
-export const metadata: Metadata = {
-  title: "Schválené léky",
+export const metadata: Metadata = buildV20PageMetadata({
+  title: "Schválené léky — MedScopeGlobal",
   description: "Nově schválené a registrované léčivé přípravky — EMA, FDA, SÚKL.",
-};
+  path: "/leky/schvalene",
+});
 
 export default async function LekySchvalenePage() {
   const items = await getDrugNewsList("approved");
@@ -23,14 +25,40 @@ export default async function LekySchvalenePage() {
       ctaHref="/leky"
       ctaLabel="Hub léky"
     >
-      <Link href="/leky" className="mb-6 inline-block text-sm text-primary hover:underline">
-        ← Zpět na přehled léků
-      </Link>
-      <div className="grid gap-4 sm:grid-cols-2">
-        {items.map((d) => (
-          <DrugNewsListCard key={d.id} item={d} />
-        ))}
+      <div className="mb-6 flex flex-wrap gap-2 text-sm">
+        <Link href="/leky" prefetch className="rounded-full border border-primary/30 px-3 py-1 text-primary">
+          ← Hub léky
+        </Link>
+        <Link
+          href="/leky/novinky"
+          prefetch
+          className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96] hover:bg-[#005B96]/5"
+        >
+          Novinky
+        </Link>
+        <span className="rounded-full bg-[#005B96] px-3 py-1 text-white">Schválené</span>
+        <Link
+          href="/leky/pipeline"
+          prefetch
+          className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96] hover:bg-[#005B96]/5"
+        >
+          Pipeline
+        </Link>
       </div>
+      {items.length ? (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {items.map((d) => (
+            <DrugNewsListCard key={d.id} item={d} />
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+          <p>První synchronizace z oficiálních zdrojů proběhne automaticky během dne.</p>
+          <p className="mt-2 text-xs">
+            SÚKL, EMA a FDA — monitoring přes denní CRON medscopeglobal.com.
+          </p>
+        </div>
+      )}
       <DrugSourceAttribution className="mt-8" />
     </ModulePageShell>
   );
