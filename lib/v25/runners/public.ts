@@ -11,6 +11,8 @@ export type PublicArticlesFetchResult = {
   adEngine?: { ok: boolean; detail?: string; updated?: number };
 };
 
+export type AdEngineStepResult = { ok: boolean; detail?: string; updated?: number };
+
 export async function runPublicArticlesFetch(options?: {
   limitPerWriter?: number;
   skipAds?: boolean;
@@ -18,11 +20,13 @@ export async function runPublicArticlesFetch(options?: {
   const t0 = Date.now();
 
   if (process.env.VERCEL === "1") {
-    const writersMod = await importMjs<{ runPublicWriters: (opts?: object) => Promise<{
-      ok: boolean;
-      articles?: { length: number } & unknown[];
-      persisted?: { db?: number };
-    }> }>("lib/v25/writers/run-public-writers.mjs");
+    const writersMod = await importMjs<{
+      runPublicWriters: (opts?: object) => Promise<{
+        ok: boolean;
+        articles?: { length: number } & unknown[];
+        persisted?: { files?: number; db?: number; failed?: number };
+      }>;
+    }>("lib/v25/writers/run-public-writers.mjs");
     const report = await writersMod.runPublicWriters({
       limitPerWriter: options?.limitPerWriter ?? 1,
       skipAds: options?.skipAds ?? false,
@@ -30,7 +34,7 @@ export async function runPublicArticlesFetch(options?: {
 
     let adEngine: PublicArticlesFetchResult["adEngine"];
     if (!options?.skipAds) {
-      const adsMod = await importMjs<{ runPublicAdEngine: (opts?: object) => Promise<PublicArticlesFetchResult["adEngine"]> }>(
+      const adsMod = await importMjs<{ runPublicAdEngine: (opts?: object) => Promise<AdEngineStepResult | undefined> }>(
         "lib/v25/ads/public-ad-engine.mjs"
       );
       adEngine = await adsMod.runPublicAdEngine({ limit: 24 });
@@ -49,7 +53,13 @@ export async function runPublicArticlesFetch(options?: {
       ok,
       detail: `${report.articles?.length ?? 0} článků`,
       generated: report.articles?.length,
-      persisted: report.persisted,
+      persisted: report.persisted
+        ? {
+            files: report.persisted.files ?? 0,
+            db: report.persisted.db ?? 0,
+            failed: report.persisted.failed ?? 0,
+          }
+        : undefined,
       adEngine,
     };
   }
@@ -61,9 +71,10 @@ export async function runPublicArticlesFetch(options?: {
   return { ok, detail: ok ? "local run complete" : result.stderr?.slice(0, 200) };
 }
 
-export async function runPublicAdEngineStep(options?: { limit?: number }) {
-  const adsMod = await importMjs<{ runPublicAdEngine: (opts?: object) => Promise<PublicArticlesFetchResult["adEngine"]> }>(
+export async function runPublicAdEngineStep(options?: { limit?: number }): Promise<AdEngineStepResult> {
+  const adsMod = await importMjs<{ runPublicAdEngine: (opts?: object) => Promise<AdEngineStepResult | undefined> }>(
     "lib/v25/ads/public-ad-engine.mjs"
   );
-  return adsMod.runPublicAdEngine(options);
+  const result = await adsMod.runPublicAdEngine(options);
+  return result ?? { ok: false, detail: "public-ad-engine returned no result" };
 }

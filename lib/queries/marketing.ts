@@ -387,14 +387,17 @@ export async function listMarketerActivityLog(options?: {
   return (data ?? []) as MarketerActivityLog[];
 }
 
-function sumMetrics(rows: Array<{ impressions?: number; clicks?: number }>) {
-  return rows.reduce(
-    (acc, r) => ({
-      impressions: acc.impressions + (r.impressions ?? 0),
-      clicks: acc.clicks + (r.clicks ?? 0),
-    }),
-    { impressions: 0, clicks: 0 }
-  );
+function sumMetrics(rows: Array<{ impressions?: number; clicks?: number }>): {
+  impressions: number;
+  clicks: number;
+} {
+  let impressions = 0;
+  let clicks = 0;
+  for (const r of rows) {
+    impressions += r.impressions ?? 0;
+    clicks += r.clicks ?? 0;
+  }
+  return { impressions, clicks };
 }
 
 export async function getCategoryPerformanceBreakdown(): Promise<CategoryPerformance[]> {
