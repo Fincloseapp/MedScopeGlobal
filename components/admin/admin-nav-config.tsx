@@ -34,7 +34,6 @@ export const ADMIN_NAV_ITEMS: {
   { href: "/admin/autopilot", label: "V6 Autopilot", icon: Bot },
   { href: "/admin/ingestion", label: "AI ingestion", icon: Bot },
   { href: "/admin/verification", label: "Verification", icon: ShieldCheck },
-  { href: "/admin/clk-verifications", label: "Ověření ČLK", icon: ShieldCheck },
   { href: "/admin/clk-verifications", label: "ČLK ověření", icon: IdCard },
   { href: "/admin/categories", label: "Categories", icon: Tags },
   { href: "/admin/media", label: "Media", icon: ImageIcon },

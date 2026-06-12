@@ -95,9 +95,9 @@ export default async function OdbornaSlugPage({ params }: Props) {
         <h2>Co zde najdete</h2>
         <p>{section.description}</p>
         <ul>
-          <li>Strukturované klinické poznámky a algoritmy</li>
-          <li>Odkazy na primární zdroje (SÚKL, MZČR, odborné společnosti)</li>
-          <li>Verze obsahu s datem revize a auditní stopou</li>
+          {section.highlights.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
         </ul>
         <p className="text-sm text-muted-foreground">
           Plný katalog článků v této rubrice bude dostupný po napojení na

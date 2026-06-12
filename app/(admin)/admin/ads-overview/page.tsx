@@ -85,6 +85,12 @@ export default function AdminAdsOverviewPage() {
           <Link href="/admin/ads-students" className="rounded-lg border px-3 py-1.5 hover:bg-muted">
             Studentské reklamy
           </Link>
+          <Link href="/admin/tests" className="rounded-lg border px-3 py-1.5 hover:bg-muted">
+            Testy
+          </Link>
+          <Link href="/admin/clk-verifications" className="rounded-lg border px-3 py-1.5 hover:bg-muted">
+            ČLK ověření
+          </Link>
         </div>
       </div>
 

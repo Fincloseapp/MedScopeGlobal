@@ -13,8 +13,8 @@ const TOPIC_IMAGES: Record<string, string> = {
   rozhovory: V21_MEDICAL_IMAGES.university,
   "zivotni-styl-backend": V21_MEDICAL_IMAGES.medicina,
   nemoci: V21_MEDICAL_IMAGES.study,
-  prevence-backend: V21_MEDICAL_IMAGES.hero,
-  rozhovory-backend: V21_MEDICAL_IMAGES.university,
+  "prevence-backend": V21_MEDICAL_IMAGES.hero,
+  "rozhovory-backend": V21_MEDICAL_IMAGES.university,
 };
 
 export function getPublicTopicImage(slug: string): string | null {

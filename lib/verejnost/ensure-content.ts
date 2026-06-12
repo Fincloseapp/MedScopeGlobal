@@ -37,9 +37,17 @@ export async function ensurePublicArticlesSeeded(): Promise<{ seeded: boolean }>
 
     try {
       const { seeded } = await seedPublicArticlesIfEmpty();
-      return { seeded: seeded > 0 };
+      if (seeded > 0) return { seeded: true };
     } catch (error) {
       console.error("ensurePublicArticlesSeeded:seed", error);
+    }
+
+    try {
+      const { ensurePublicArticleSeed } = await import("@/lib/verejnost/seed-articles");
+      const { seeded, skipped } = await ensurePublicArticleSeed();
+      return { seeded: seeded > 0 && !skipped };
+    } catch (error) {
+      console.error("ensurePublicArticlesSeeded:seed-articles", error);
       return { seeded: false };
     }
   })();

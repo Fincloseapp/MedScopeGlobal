@@ -38,7 +38,7 @@ const menuCs: NavItem[] = [
     label: "Odborníci",
     href: "/odborna",
     children: [
-      { label: "Odborná sekce", href: "/odborna", description: "AI texty a přehled pro odborníky" },
+      { label: "Odborná sekce (ČLK)", href: "/odborna", description: "Ověřený obsah pro lékaře" },
       { label: "Studie", href: "/studie", description: "RCT, meta-analýzy, CZ souhrn" },
       { label: "Odborné briefy", href: "/odborne/briefy", description: "Strukturované medicínské briefy" },
       { label: "Léky", href: "/leky", description: "SÚKL, EMA, schválené přípravky" },
@@ -66,8 +66,8 @@ const menuCs: NavItem[] = [
     ],
   },
   {
-    label: "Studium medicíny",
-    href: "/medicina",
+    label: "Studenti",
+    href: "/studium",
     children: [
       { label: "Přehled studia", href: "/studium", description: "Fakulty, přijímačky a studijní obsah" },
       { label: "Lékařské fakulty", href: "/studium/univerzity", description: "8 českých LF — přehled a odkazy" },
@@ -87,6 +87,7 @@ const menuCs: NavItem[] = [
     children: [
       { label: "Studie", href: "/studie", description: "CZ, EU, SÚKL" },
       { label: "Veřejné zdraví", href: "/verejnost", description: "Prevence, výživa, spánek a rozhovory" },
+      { label: "Odborná sekce", href: "/odborna", description: "Ověření ČLK pro lékaře" },
       { label: "Odborné AI texty", href: "/odborne", description: "V4d — univerzity, kvalita, překlady" },
       { label: "Léky", href: "/leky" },
       { label: "Legislativa", href: "/legislativa" },

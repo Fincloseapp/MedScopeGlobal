@@ -20,7 +20,7 @@ const HUB_SECTIONS = [
     eyebrow: "Studenti",
     title: "Studium medicíny",
     description: "Kvízy, studijní plány, přijímačky a přehled lékařských fakult.",
-    href: "/medicina",
+    href: "/studium",
     cta: "Studijní sekce",
     accent: "from-emerald-50 to-slate-50",
   },

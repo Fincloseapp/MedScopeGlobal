@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
-import { adminReviewClkForm } from "@/lib/actions/clk-verification";
+import { adminReviewClkFormAction } from "@/lib/actions/clk-verification";
 import { readClkStore } from "@/lib/auth/clk-data-store";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { Button } from "@/components/ui/button";
@@ -129,14 +129,14 @@ export default async function AdminClkVerificationsPage() {
                     {row.email ? (
                       <span className="text-sm text-muted-foreground">{row.email}</span>
                     ) : null}
-                    <form action={adminReviewClkForm}>
+                    <form action={adminReviewClkFormAction}>
                       <input type="hidden" name="id" value={row.id} />
                       <input type="hidden" name="decision" value="verified" />
                       <Button type="submit" size="sm">
                         Schválit
                       </Button>
                     </form>
-                    <form action={adminReviewClkForm}>
+                    <form action={adminReviewClkFormAction}>
                       <input type="hidden" name="id" value={row.id} />
                       <input type="hidden" name="decision" value="rejected" />
                       <Button type="submit" size="sm" variant="outline">

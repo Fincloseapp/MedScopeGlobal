@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { isAdminGateOpen } from "@/lib/auth/admin-gate";
 import { reviewClkVerification, submitClkVerification } from "@/lib/auth/clk-verify";
 import { getSessionProfile } from "@/lib/auth/session";
@@ -46,6 +47,10 @@ export async function submitClkVerificationForm(formData: FormData) {
   }
 }
 
+export async function adminReviewClkFormAction(formData: FormData): Promise<void> {
+  await adminReviewClkForm(formData);
+}
+
 export async function adminReviewClkForm(formData: FormData) {
   const gateOpen = await isAdminGateOpen();
   if (!gateOpen) return { error: "Admin gate required" };
@@ -64,7 +69,7 @@ export async function adminReviewClkForm(formData: FormData) {
     });
     revalidatePath("/admin/clk-verifications");
     revalidatePath("/odborna");
-    return { ok: true };
+    redirect("/admin/clk-verifications");
   } catch (e) {
     return {
       error: e instanceof Error ? e.message : "Schválení se nezdařilo.",
