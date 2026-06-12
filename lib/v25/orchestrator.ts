@@ -24,6 +24,11 @@ import { runInlineImageTest } from "@/lib/v25/images/image-test";
 import { runUniversitiesFetch } from "@/lib/v25/runners/universities";
 import { runImagesFetch } from "@/lib/v25/runners/images";
 import { runPublicArticlesFetch, runPublicAdEngineStep } from "@/lib/v25/runners/public";
+import {
+  runStudentAdEngineStep,
+  runProAdEngineStep,
+  runMarketingCoordinatorStep,
+} from "@/lib/v25/runners/marketing";
 
 export type V25PipelineMode = "full" | "quick";
 
@@ -78,6 +83,27 @@ export async function runV25QuickPipeline(): Promise<V25EnterpriseResult> {
     detail: publicAds.detail ?? `${publicAds.updated ?? 0} patched`,
   };
   if (!publicAds.ok) errors.push(`public-ad-engine: ${publicAds.detail ?? "failed"}`);
+
+  const studentAds = await runStudentAdEngineStep({ limit: 24 });
+  phases.studentAdEngine = {
+    ok: studentAds.ok,
+    detail: studentAds.detail ?? `${studentAds.updated ?? 0} patched`,
+  };
+  if (!studentAds.ok) errors.push(`student-ad-engine: ${studentAds.detail ?? "failed"}`);
+
+  const proAds = await runProAdEngineStep({ limit: 24 });
+  phases.proAdEngine = {
+    ok: proAds.ok,
+    detail: proAds.detail ?? `${proAds.updated ?? 0} patched`,
+  };
+  if (!proAds.ok) errors.push(`pro-ad-engine: ${proAds.detail ?? "failed"}`);
+
+  const marketing = await runMarketingCoordinatorStep();
+  phases.marketingCoordinator = {
+    ok: marketing.ok,
+    detail: `approved ${marketing.coordination?.approved ?? 0}, pending ${marketing.coordination?.leftPending ?? 0}`,
+  };
+  if (!marketing.ok) errors.push("marketing-coordinator: failed");
 
   const ok = errors.length === 0;
   setCronStatus("v25-enterprise", ok ? "ok" : "fail", Date.now() - t0, errors.join("; ") || undefined);
@@ -175,6 +201,27 @@ export async function runV25PostPipeline(options?: { mode?: V25PipelineMode }): 
     detail: publicAds.detail ?? `${publicAds.updated ?? 0} patched`,
   };
   if (!publicAds.ok) errors.push(`public-ad-engine: ${publicAds.detail ?? "failed"}`);
+
+  const studentAds = await runStudentAdEngineStep({ limit: 24 });
+  phases.studentAdEngine = {
+    ok: studentAds.ok,
+    detail: studentAds.detail ?? `${studentAds.updated ?? 0} patched`,
+  };
+  if (!studentAds.ok) errors.push(`student-ad-engine: ${studentAds.detail ?? "failed"}`);
+
+  const proAds = await runProAdEngineStep({ limit: 24 });
+  phases.proAdEngine = {
+    ok: proAds.ok,
+    detail: proAds.detail ?? `${proAds.updated ?? 0} patched`,
+  };
+  if (!proAds.ok) errors.push(`pro-ad-engine: ${proAds.detail ?? "failed"}`);
+
+  const marketing = await runMarketingCoordinatorStep();
+  phases.marketingCoordinator = {
+    ok: marketing.ok,
+    detail: `approved ${marketing.coordination?.approved ?? 0}, pending ${marketing.coordination?.leftPending ?? 0}`,
+  };
+  if (!marketing.ok) errors.push("marketing-coordinator: failed");
 
   if (errors.length > 0) {
     autofixAttempted = true;

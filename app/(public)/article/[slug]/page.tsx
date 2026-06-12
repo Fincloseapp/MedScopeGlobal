@@ -27,6 +27,8 @@ import { getServerLocale } from "@/lib/i18n/server-locale";
 import { ContentRecommendations } from "@/components/recommendations/content-recommendations";
 import { PremiumCta } from "@/components/ux/premium-cta";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
+import { listStudentAdCampaignsForArticle } from "@/lib/queries/marketing";
+import { StudentAdBlocks } from "@/components/student/student-ad-blocks";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -100,13 +102,35 @@ export default async function ArticlePage({ params }: Props) {
       locale
     ));
 
+  const articleMeta = article as {
+    med_track?: string | null;
+    study_year?: number | null;
+    student_topic?: string | null;
+  };
+  const isStudentArticle =
+    articleMeta.med_track === "priprava" || articleMeta.med_track === "studium";
+
   let ads: Awaited<ReturnType<typeof getActiveAds>> = [];
   let inlineAds: Awaited<ReturnType<typeof getActiveAds>> = [];
+  let studentCampaigns: Awaited<ReturnType<typeof listStudentAdCampaignsForArticle>> = [];
+
   if (!isVip) {
-    const sidebar = await getActiveAdsByPlacement("article_sidebar", 3);
-    ads = sidebar.length ? sidebar : await getActiveAds();
-    inlineAds = await getActiveAdsByPlacement("article_inline", 1);
+    if (isStudentArticle) {
+      studentCampaigns = await listStudentAdCampaignsForArticle({
+        med_track: articleMeta.med_track,
+        study_year: articleMeta.study_year,
+        student_topic: articleMeta.student_topic,
+      });
+    } else {
+      const sidebar = await getActiveAdsByPlacement("article_sidebar", 3);
+      ads = sidebar.length ? sidebar : await getActiveAds();
+      inlineAds = await getActiveAdsByPlacement("article_inline", 1);
+    }
   }
+
+  const studentBannerAds = studentCampaigns.filter((c) => c.type === "banner").slice(0, 1);
+  const studentInlineAds = studentCampaigns.filter((c) => c.type === "inline").slice(0, 1);
+  const studentSidebarAds = studentCampaigns.filter((c) => c.type === "sidebar").slice(0, 3);
 
   const author = article.users;
   const category = article.categories;
@@ -284,7 +308,13 @@ export default async function ArticlePage({ params }: Props) {
               )}
             </div>
 
+            {studentBannerAds.length > 0 ? (
+              <StudentAdBlocks campaigns={studentBannerAds} variant="banner" />
+            ) : null}
             {inlineAds.length > 0 ? <AdPlacement ads={inlineAds} variant="inline" /> : null}
+            {studentInlineAds.length > 0 ? (
+              <StudentAdBlocks campaigns={studentInlineAds} variant="inline" />
+            ) : null}
 
             <div className="prose-wrapper mt-10 overflow-x-hidden">
               {article.rubric_slug === V19_RUBRIC_SLUG && !locked ? (
@@ -327,7 +357,11 @@ export default async function ArticlePage({ params }: Props) {
 
           <aside className="w-full shrink-0 space-y-6 lg:w-80">
             <PremiumCta locale={locale} />
-            <AdSlot ads={ads} />
+            {studentSidebarAds.length > 0 ? (
+              <StudentAdBlocks campaigns={studentSidebarAds} variant="sidebar" />
+            ) : (
+              <AdSlot ads={ads} />
+            )}
           </aside>
         </div>
       </article>
