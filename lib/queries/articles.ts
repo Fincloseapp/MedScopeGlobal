@@ -8,6 +8,8 @@ import {
   isLayAudienceArticle,
   rubricSlugsForSectionFetch,
   sectionShowsLayContent,
+  V19_RUBRIC_SLUG,
+  V24_RUBRIC_SLUG,
 } from "@/lib/config/section-article-map";
 import { mapArticleList } from "@/lib/db/map-article";
 import {
@@ -31,6 +33,14 @@ const articleSelect = `
   users!author_id ( id, full_name, avatar_url )
 `;
 
+function allowedLevelsForSection(accessLevel: AccessLevelId): Set<string> {
+  const levels = new Set<string>(allowedAccessLevels(accessLevel));
+  if (accessLevel === "physician") {
+    levels.add("student");
+  }
+  return levels;
+}
+
 function filterForReader(
   articles: ArticleWithRelations[],
   isVip: boolean,
@@ -44,6 +54,22 @@ function filterForReader(
     if (!isVip && a.vip_only) return false;
     const level = a.min_access_level ?? "public";
     return (allowed as Set<string>).has(level);
+  });
+}
+
+function filterForSectionReader(
+  articles: ArticleWithRelations[],
+  isVip: boolean,
+  accessLevel: AccessLevelId,
+  locale: LocaleCode = "cs"
+): ArticleWithRelations[] {
+  const allowed = allowedLevelsForSection(accessLevel);
+  const active = filterActiveArticles(articles);
+  const localized = filterCzechContent(active, locale);
+  return localized.filter((a) => {
+    if (!isVip && a.vip_only) return false;
+    const level = a.min_access_level ?? "public";
+    return allowed.has(level);
   });
 }
 
@@ -161,15 +187,17 @@ export async function getArticlesBySection(
   let candidates = sectionMatched;
   if (candidates.length < limit) {
     const seen = new Set(candidates.map((a) => a.id));
-    const supplemental = rows.filter((article) => {
+    const professionalPool = rows.filter((article) => {
       if (seen.has(article.id)) return false;
       if (!allowLay && isLayAudienceArticle(article)) return false;
-      return true;
+      return (
+        article.rubric_slug === V19_RUBRIC_SLUG || article.rubric_slug === V24_RUBRIC_SLUG
+      );
     });
-    candidates = [...candidates, ...supplemental];
+    candidates = [...candidates, ...professionalPool];
   }
 
-  const filtered = filterForReader(candidates, isVip, accessLevel, locale);
+  const filtered = filterForSectionReader(candidates, isVip, accessLevel, locale);
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
     maxTranslate: limit,
