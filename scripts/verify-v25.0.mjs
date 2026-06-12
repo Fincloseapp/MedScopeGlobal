@@ -1,6 +1,6 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
- * Post-deploy verification — v25.1 ULTRA-MAX ENTERPRISE+++
+ * Post-deploy verification — v25.4 ULTRA-MAX ENTERPRISE+++
  */
 const BASE = (process.env.PROD_BASE_URL || "https://medscopeglobal.com").replace(/\/$/, "");
 
@@ -28,9 +28,9 @@ async function main() {
   const univerzityText = await univerzity.text();
 
   const checks = {
-    uiVersion: healthV19.json?.uiVersion === "v25.1",
+    uiVersion: healthV19.json?.uiVersion === "v25.4",
     v24Health: healthV24.json?.version === "v24.0",
-    v25Health: healthV25.res.status === 200 && healthV25.json?.version === "v25.1",
+    v25Health: healthV25.res.status === 200 && healthV25.json?.version === "v25.4",
     v25System: system.res.status === 200,
     v25Orchestrator: healthV25.json?.orchestrator === true,
     v25LinkTest: healthV25.json?.linkTest === true,
@@ -49,7 +49,7 @@ async function main() {
     v25: healthV25.json?.version,
     ...checks,
   });
-  console.log(ok ? "\nPASS — v25.1 ENTERPRISE+++ verified" : "\nFAIL");
+  console.log(ok ? "\nPASS — v25.4 ENTERPRISE+++ verified" : "\nFAIL");
   process.exit(ok ? 0 : 1);
 }
 

@@ -1,4 +1,4 @@
-import { CZ_MEDICAL_FACULTIES } from "@/lib/v25/universities-data";
+﻿import { CZ_MEDICAL_FACULTIES } from "@/lib/v25/universities-data";
 import type { V25UniversitiesReport, V25UniversityFaculty } from "@/lib/v25/universities";
 
 function parseMeta(html: string) {
@@ -18,7 +18,7 @@ export async function fetchFacultyLive(
   try {
     const res = await fetch(faculty.url, {
       redirect: "follow",
-      headers: { "User-Agent": "MedScopeGlobal-v25.1-universities" },
+      headers: { "User-Agent": "MedScopeGlobal-v25.4-universities" },
       signal: AbortSignal.timeout(20000),
       cache: "no-store",
     });

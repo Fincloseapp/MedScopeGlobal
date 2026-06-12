@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * Static build-time checks — version stamp + logo presets (no production HTTP).
  * Post-deploy smoke: node scripts/verify-v23.3.2.mjs (or latest verify-v*.mjs)
@@ -72,15 +72,15 @@ const v25Link = join(root, "lib/v25/linktest/link-checker.mjs");
 const v25ImageTest = join(root, "lib/v25/images/image-test.ts");
 const v25ImageAdmin = join(root, "app/(admin)/admin/images/page.tsx");
 if (!existsSync(v25Orchestrator)) fail("lib/v25/orchestrator.ts missing");
-else pass("v25.1 orchestrator");
+else pass("v25.4 orchestrator");
 if (!existsSync(v25Admin)) fail("admin/system dashboard missing");
-else pass("v25.1 admin system dashboard");
+else pass("v25.4 admin system dashboard");
 if (!existsSync(v25Link)) fail("lib/v25/linktest/link-checker.mjs missing");
-else pass("v25.1 link checker");
+else pass("v25.4 link checker");
 if (!existsSync(v25ImageTest)) fail("lib/v25/images/image-test.ts missing");
-else pass("v25.1 image test");
+else pass("v25.4 image test");
 if (!existsSync(v25ImageAdmin)) fail("admin/images dashboard missing");
-else pass("v25.1 admin image center");
+else pass("v25.4 admin image center");
 
 if (!ok) process.exit(1);
 console.log("\nBuild version verification PASSED");

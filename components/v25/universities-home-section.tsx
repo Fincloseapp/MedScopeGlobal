@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { listUniversitiesForUiAsync } from "@/lib/v25/universities";
 import { CZ_MEDICAL_FACULTIES } from "@/lib/v25/universities-data";
 
@@ -12,7 +12,7 @@ export async function V25UniversitiesHomeSection() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-              v25.1 — české LF
+              v25.4 — české LF
             </p>
             <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
               Lékařské fakulty v ČR

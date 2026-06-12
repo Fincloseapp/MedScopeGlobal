@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * Verify v25 Supabase tables + snapshot read/write.
  */
@@ -38,7 +38,7 @@ async function main() {
   const probe = {
     id: "production",
     state: {
-      version: "v25.1",
+      version: "v25.4",
       tests: { linkTest: "ok", probe: true },
       probeAt: new Date().toISOString(),
     },

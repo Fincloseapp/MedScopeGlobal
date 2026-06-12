@@ -1,4 +1,4 @@
-/** v25.1 ULTRA-MAX ENTERPRISE++ — filesystem + runtime config */
+﻿/** v25.4 ULTRA-MAX ENTERPRISE++ — filesystem + runtime config */
 const isVercel = process.env.VERCEL === "1";
 export const V25_DATA_ROOT =
   process.env.MEDSCOPE_DATA_ROOT ?? (isVercel ? "/tmp/medscope.data" : "D:\\medscope.data");

@@ -1,4 +1,4 @@
-import { V25_PROD_BASE } from "@/lib/v25/config";
+﻿import { V25_PROD_BASE } from "@/lib/v25/config";
 import { appendV25Log } from "@/lib/v25/data-store";
 import { V25_ENGINE_VERSION } from "@/lib/v25/version";
 import type { V25ApiStatus } from "@/lib/v25/types";
@@ -50,5 +50,5 @@ export async function verifyV25Homepage(base = V25_PROD_BASE): Promise<boolean> 
 }
 
 export function getV25VerifyMeta() {
-  return { version: V25_ENGINE_VERSION, engine: "v25.1-enterprise" };
+  return { version: V25_ENGINE_VERSION, engine: "v25.4-enterprise" };
 }

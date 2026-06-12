@@ -57,13 +57,29 @@ export async function getV20CategoriesWithCounts(locale?: LocaleCode) {
 
   for (const cat of categories) {
     dbNames[cat.slug] = cat.name;
-    const { count } = await supabase
+    counts[cat.slug] = 0;
+  }
+
+  if (categories.length > 0) {
+    const idToSlug = Object.fromEntries(categories.map((c) => [c.id, c.slug]));
+    const { data, error } = await supabase
       .from("articles")
-      .select("id", { count: "exact", head: true })
+      .select("category_id")
       .eq("published", true)
-      .eq("category_id", cat.id)
-      .gte("published_at", V20_ARCHIVE_CUTOFF);
-    counts[cat.slug] = count ?? 0;
+      .gte("published_at", V20_ARCHIVE_CUTOFF)
+      .in(
+        "category_id",
+        categories.map((c) => c.id)
+      );
+
+    if (error) {
+      console.error("getV20CategoriesWithCounts", error);
+    } else {
+      for (const row of data ?? []) {
+        const slug = idToSlug[row.category_id as string];
+        if (slug) counts[slug] = (counts[slug] ?? 0) + 1;
+      }
+    }
   }
 
   const loc = locale ?? (await getServerLocale());
