@@ -1,4 +1,3 @@
-import { importMjs } from "@/lib/v25/import-mjs";
 import { setCronStatus } from "@/lib/v25/system-state";
 
 export type MarketingPipelineResult = {
@@ -37,18 +36,10 @@ export async function runMarketingPipeline(options?: {
 
   if (!options?.skipMarketers) {
     try {
-      const publicMod = await importMjs<{ runPublicMarketer: () => Promise<MarketerRunResult> }>(
-        "lib/v25/marketers/marketer-public.mjs"
-      );
-      const studentMod = await importMjs<{ runStudentMarketer: () => Promise<MarketerRunResult> }>(
-        "lib/v25/marketers/marketer-students.mjs"
-      );
-      const proMod = await importMjs<{ runProMarketer: () => Promise<MarketerRunResult> }>(
-        "lib/v25/marketers/marketer-pro.mjs"
-      );
-      const coordMod = await importMjs<{
-        runMarketingCoordinator: (opts?: { forceReport?: boolean }) => Promise<CoordinatorRunResult>;
-      }>("lib/v25/marketers/marketing-coordinator.mjs");
+      const publicMod = await import("../marketers/marketer-public.mjs");
+      const studentMod = await import("../marketers/marketer-students.mjs");
+      const proMod = await import("../marketers/marketer-pro.mjs");
+      const coordMod = await import("../marketers/marketing-coordinator.mjs");
 
       const [pub, stu, pro] = await Promise.all([
         publicMod.runPublicMarketer(),
@@ -67,9 +58,7 @@ export async function runMarketingPipeline(options?: {
       report = coord.report ?? undefined;
 
       if (!options?.skipAds) {
-        const manualMod = await importMjs<{
-          runManualAdInserter: (opts?: { limit?: number }) => Promise<AdEngineRunResult>;
-        }>("lib/v25/ads/manual-ad-inserter.mjs");
+        const manualMod = await import("../ads/manual-ad-inserter.mjs");
         manualAds = await manualMod.runManualAdInserter({ limit: options?.adLimit ?? 24 });
         if (!manualAds.ok) errors.push(`manual-ads: ${manualAds.detail}`);
       }
@@ -83,19 +72,13 @@ export async function runMarketingPipeline(options?: {
   if (!options?.skipAds) {
     try {
       if (!manualAds) {
-        const manualMod = await importMjs<{
-          runManualAdInserter: (opts?: { limit?: number }) => Promise<AdEngineRunResult>;
-        }>("lib/v25/ads/manual-ad-inserter.mjs");
+        const manualMod = await import("../ads/manual-ad-inserter.mjs");
         manualAds = await manualMod.runManualAdInserter({ limit: options?.adLimit ?? 24 });
         if (!manualAds.ok) errors.push(`manual-ads: ${manualAds.detail}`);
       }
 
-      const studentMod = await importMjs<{
-        runStudentAdEngine: (opts?: { limit?: number }) => Promise<AdEngineRunResult>;
-      }>("lib/v25/ads/student-ad-engine.mjs");
-      const proMod = await importMjs<{
-        runProAdEngine: (opts?: { limit?: number }) => Promise<AdEngineRunResult>;
-      }>("lib/v25/ads/pro-ad-engine.mjs");
+      const studentMod = await import("../ads/student-ad-engine.mjs");
+      const proMod = await import("../ads/pro-ad-engine.mjs");
       studentAds = await studentMod.runStudentAdEngine({ limit: options?.adLimit ?? 24 });
       proAds = await proMod.runProAdEngine({ limit: options?.adLimit ?? 24 });
       if (!studentAds.ok) errors.push(`student-ads: ${studentAds.detail}`);
@@ -131,29 +114,21 @@ export async function runMarketingPipeline(options?: {
 }
 
 export async function runManualAdInserterStep(options?: { limit?: number }): Promise<AdEngineRunResult> {
-  const mod = await importMjs<{ runManualAdInserter: (opts?: { limit?: number }) => Promise<AdEngineRunResult> }>(
-    "lib/v25/ads/manual-ad-inserter.mjs"
-  );
+  const mod = await import("../ads/manual-ad-inserter.mjs");
   return mod.runManualAdInserter(options);
 }
 
 export async function runStudentAdEngineStep(options?: { limit?: number }): Promise<AdEngineRunResult> {
-  const mod = await importMjs<{ runStudentAdEngine: (opts?: { limit?: number }) => Promise<AdEngineRunResult> }>(
-    "lib/v25/ads/student-ad-engine.mjs"
-  );
+  const mod = await import("../ads/student-ad-engine.mjs");
   return mod.runStudentAdEngine(options);
 }
 
 export async function runProAdEngineStep(options?: { limit?: number }): Promise<AdEngineRunResult> {
-  const mod = await importMjs<{ runProAdEngine: (opts?: { limit?: number }) => Promise<AdEngineRunResult> }>(
-    "lib/v25/ads/pro-ad-engine.mjs"
-  );
+  const mod = await import("../ads/pro-ad-engine.mjs");
   return mod.runProAdEngine(options);
 }
 
 export async function runMarketingCoordinatorStep(options?: { forceReport?: boolean }): Promise<CoordinatorRunResult> {
-  const mod = await importMjs<{
-    runMarketingCoordinator: (opts?: { forceReport?: boolean }) => Promise<CoordinatorRunResult>;
-  }>("lib/v25/marketers/marketing-coordinator.mjs");
+  const mod = await import("../marketers/marketing-coordinator.mjs");
   return mod.runMarketingCoordinator(options);
 }

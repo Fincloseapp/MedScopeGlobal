@@ -1,6 +1,5 @@
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
-import { importMjs } from "@/lib/v25/import-mjs";
 import { setCronStatus } from "@/lib/v25/system-state";
 
 export type PublicArticlesFetchResult = {
@@ -20,13 +19,7 @@ export async function runPublicArticlesFetch(options?: {
   const t0 = Date.now();
 
   if (process.env.VERCEL === "1") {
-    const writersMod = await importMjs<{
-      runPublicWriters: (opts?: object) => Promise<{
-        ok: boolean;
-        articles?: { length: number } & unknown[];
-        persisted?: { files?: number; db?: number; failed?: number };
-      }>;
-    }>("lib/v25/writers/run-public-writers.mjs");
+    const writersMod = await import("../writers/run-public-writers.mjs");
     const report = await writersMod.runPublicWriters({
       limitPerWriter: options?.limitPerWriter ?? 1,
       skipAds: options?.skipAds ?? false,
@@ -34,9 +27,7 @@ export async function runPublicArticlesFetch(options?: {
 
     let adEngine: PublicArticlesFetchResult["adEngine"];
     if (!options?.skipAds) {
-      const adsMod = await importMjs<{ runPublicAdEngine: (opts?: object) => Promise<AdEngineStepResult | undefined> }>(
-        "lib/v25/ads/public-ad-engine.mjs"
-      );
+      const adsMod = await import("../ads/public-ad-engine.mjs");
       adEngine = await adsMod.runPublicAdEngine({ limit: 24 });
     }
 
@@ -72,9 +63,7 @@ export async function runPublicArticlesFetch(options?: {
 }
 
 export async function runPublicAdEngineStep(options?: { limit?: number }): Promise<AdEngineStepResult> {
-  const adsMod = await importMjs<{ runPublicAdEngine: (opts?: object) => Promise<AdEngineStepResult | undefined> }>(
-    "lib/v25/ads/public-ad-engine.mjs"
-  );
+  const adsMod = await import("../ads/public-ad-engine.mjs");
   const result = await adsMod.runPublicAdEngine(options);
   return result ?? { ok: false, detail: "public-ad-engine returned no result" };
 }
