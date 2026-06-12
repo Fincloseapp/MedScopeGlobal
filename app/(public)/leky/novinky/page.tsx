@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { DrugNewsListCard } from "@/components/v4c/drug-news-list-card";
+import { LekySubpageNav } from "@/components/v4c/leky-subpage-nav";
 import { getDrugNewsList } from "@/lib/queries/v4c/drug-news";
 import { DrugSourceAttribution } from "@/components/v4c/drug-source-attribution";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
@@ -25,26 +25,7 @@ export default async function LekyNovinkyPage() {
       ctaHref="/leky"
       ctaLabel="Hub léky"
     >
-      <div className="mb-6 flex flex-wrap gap-2 text-sm">
-        <Link href="/leky" prefetch className="rounded-full border border-primary/30 px-3 py-1 text-primary">
-          ← Hub léky
-        </Link>
-        <span className="rounded-full bg-[#005B96] px-3 py-1 text-white">Novinky</span>
-        <Link
-          href="/leky/schvalene"
-          prefetch
-          className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96] hover:bg-[#005B96]/5"
-        >
-          Schválené
-        </Link>
-        <Link
-          href="/leky/pipeline"
-          prefetch
-          className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96] hover:bg-[#005B96]/5"
-        >
-          Pipeline
-        </Link>
-      </div>
+      <LekySubpageNav current="novinky" />
       {all.length ? (
         <div className="grid gap-4 sm:grid-cols-2">
           {all.map((d) => (
