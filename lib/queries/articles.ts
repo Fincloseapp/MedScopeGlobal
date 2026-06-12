@@ -2,8 +2,13 @@ import {
   allowedAccessLevels,
   type AccessLevelId,
 } from "@/lib/config/access-levels";
-import { rubricSlugsForSectionQuery } from "@/lib/config/medical-sections";
 import type { MedicalSectionSlug } from "@/lib/config/medical-sections";
+import {
+  articleMatchesSection,
+  isLayAudienceArticle,
+  rubricSlugsForSectionFetch,
+  sectionShowsLayContent,
+} from "@/lib/config/section-article-map";
 import { mapArticleList } from "@/lib/db/map-article";
 import {
   prepareArticleForDisplay,
@@ -109,39 +114,33 @@ export async function getArticlesBySection(
   sectionSlug: MedicalSectionSlug,
   limit = 12,
   isVip = false,
-  accessLevel: AccessLevelId = "public",
+  accessLevel: AccessLevelId = "physician",
   locale: LocaleCode = "cs",
   contentTypeSlug?: string | null
 ) {
   const rubricSlugs = contentTypeSlug
     ? [contentTypeSlug]
-    : rubricSlugsForSectionQuery(sectionSlug);
+    : rubricSlugsForSectionFetch(sectionSlug);
 
   const supabase = await createClient();
 
   let q = supabase
     .from("articles")
     .select(articleSelect)
-    .eq("published", true);
-
-  if (rubricSlugs.length > 0) {
-    q = q.in("rubric_slug", rubricSlugs);
-  } else if (sectionSlug === "healthcare-technology") {
-    q = q.is("rubric_slug", null);
-  }
+    .eq("published", true)
+    .in("rubric_slug", rubricSlugs);
 
   let { data, error } = await q
     .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(limit * 4);
+    .limit(limit * 8);
 
   if (error?.message?.includes("rubric_slug")) {
-    let q2 = supabase.from("articles").select(articleSelect).eq("published", true);
-    if (rubricSlugs.length > 0) {
-      q2 = q2.in("rubric_slug", rubricSlugs);
-    }
-    const res = await q2
+    const res = await supabase
+      .from("articles")
+      .select(articleSelect)
+      .eq("published", true)
       .order("published_at", { ascending: false, nullsFirst: false })
-      .limit(limit * 4);
+      .limit(limit * 12);
     data = res.data;
     error = res.error;
   }
@@ -151,12 +150,26 @@ export async function getArticlesBySection(
     return [];
   }
 
-  const filtered = filterForReader(
-    mapArticleList(data as Record<string, unknown>[] | null),
-    isVip,
-    accessLevel,
-    locale
-  );
+  const rows = mapArticleList(data as Record<string, unknown>[] | null);
+  const allowLay = sectionShowsLayContent(sectionSlug);
+
+  const sectionMatched = rows.filter((article) => {
+    if (!allowLay && isLayAudienceArticle(article)) return false;
+    return articleMatchesSection(article, sectionSlug, contentTypeSlug);
+  });
+
+  let candidates = sectionMatched;
+  if (candidates.length < limit) {
+    const seen = new Set(candidates.map((a) => a.id));
+    const supplemental = rows.filter((article) => {
+      if (seen.has(article.id)) return false;
+      if (!allowLay && isLayAudienceArticle(article)) return false;
+      return true;
+    });
+    candidates = [...candidates, ...supplemental];
+  }
+
+  const filtered = filterForReader(candidates, isVip, accessLevel, locale);
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
     maxTranslate: limit,
