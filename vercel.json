@@ -84,6 +84,10 @@
     {
       "path": "/api/cron/v25-images",
       "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/cron/public-articles",
+      "schedule": "30 6 * * *"
     }
   ],
   

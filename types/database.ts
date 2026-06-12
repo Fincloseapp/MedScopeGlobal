@@ -44,6 +44,8 @@ export interface Article {
   vip_only: boolean;
   rubric_slug?: string | null;
   min_access_level?: AccessLevel;
+  audience?: "professional" | "public";
+  public_topic?: "zivotni-styl" | "nemoci" | "prevence" | "rozhovory" | null;
   locale?: string;
   source_url?: string | null;
   source_name?: string | null;
@@ -90,6 +92,22 @@ export interface AdRow {
   include_in_newsletter?: boolean;
   request_id?: string | null;
   campaign_id?: string | null;
+}
+
+export interface PublicAdCampaignRow {
+  id: string;
+  title: string;
+  body_html: string;
+  type: "inline" | "banner" | "sidebar" | "footer";
+  target_topics: string[];
+  affiliate_url: string | null;
+  cta_text: string | null;
+  frequency: number;
+  active: boolean;
+  impressions: number;
+  clicks: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface AdsRequestRow {

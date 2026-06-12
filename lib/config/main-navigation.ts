@@ -50,6 +50,7 @@ const menuCs: NavItem[] = [
     href: "/studie",
     children: [
       { label: "Studie", href: "/studie", description: "CZ, EU, SÚKL" },
+      { label: "Veřejné zdraví", href: "/verejnost", description: "Prevence, výživa, spánek a rozhovory" },
       { label: "Odborné AI texty", href: "/odborne", description: "V4d — univerzity, kvalita, překlady" },
       { label: "Léky", href: "/leky" },
       { label: "Legislativa", href: "/legislativa" },
@@ -113,6 +114,7 @@ const menuEn: NavItem[] = [
     href: "/studie",
     children: [
       { label: "Studies", href: "/studie" },
+      { label: "Public health", href: "/verejnost" },
       { label: "Drugs", href: "/leky" },
       { label: "Legislation", href: "/legislativa" },
       { label: "Digital Health", href: "/digital-health" },

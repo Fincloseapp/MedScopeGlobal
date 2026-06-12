@@ -12,6 +12,7 @@ import {
   Newspaper,
   Tags,
   Activity,
+  Heart,
 } from "lucide-react";
 
 export const ADMIN_NAV_ITEMS: {
@@ -31,6 +32,8 @@ export const ADMIN_NAV_ITEMS: {
   { href: "/admin/media", label: "Media", icon: ImageIcon },
   { href: "/admin/images", label: "Image Center", icon: ImageIcon },
   { href: "/admin/ads", label: "Ads", icon: Megaphone },
+  { href: "/admin/ads-public", label: "Veřejné reklamy", icon: Megaphone },
+  { href: "/admin/verejnost", label: "Veřejnost", icon: Heart },
   { href: "/admin/vip", label: "VIP members", icon: Crown },
   { href: "/admin/notifications", label: "Notifications", icon: Bell },
 ];

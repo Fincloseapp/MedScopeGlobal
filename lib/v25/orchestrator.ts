@@ -23,6 +23,7 @@ import {
 import { runInlineImageTest } from "@/lib/v25/images/image-test";
 import { runUniversitiesFetch } from "@/lib/v25/runners/universities";
 import { runImagesFetch } from "@/lib/v25/runners/images";
+import { runPublicArticlesFetch, runPublicAdEngineStep } from "@/lib/v25/runners/public";
 
 export type V25PipelineMode = "full" | "quick";
 
@@ -63,6 +64,20 @@ export async function runV25QuickPipeline(): Promise<V25EnterpriseResult> {
     detail: `${imageTest.report.urlsOk}/${imageTest.report.urlsChecked} URL · ${imageTest.report.pagesOk}/${imageTest.report.pagesChecked.length} stránek`,
   };
   if (!imageTest.ok) errors.push(`imagetest: ${imageTest.report.urlsBroken.length} broken urls`);
+
+  const publicArticles = await runPublicArticlesFetch({ limitPerWriter: 1 });
+  phases.publicArticles = {
+    ok: publicArticles.ok,
+    detail: publicArticles.detail ?? `${publicArticles.generated ?? 0} článků`,
+  };
+  if (!publicArticles.ok) errors.push(`public-articles: ${publicArticles.detail ?? "fetch failed"}`);
+
+  const publicAds = await runPublicAdEngineStep({ limit: 24 });
+  phases.publicAdEngine = {
+    ok: publicAds.ok,
+    detail: publicAds.detail ?? `${publicAds.updated ?? 0} patched`,
+  };
+  if (!publicAds.ok) errors.push(`public-ad-engine: ${publicAds.detail ?? "failed"}`);
 
   const ok = errors.length === 0;
   setCronStatus("v25-enterprise", ok ? "ok" : "fail", Date.now() - t0, errors.join("; ") || undefined);
@@ -146,6 +161,20 @@ export async function runV25PostPipeline(options?: { mode?: V25PipelineMode }): 
     detail: `${imageTest.report.urlsOk}/${imageTest.report.urlsChecked} URL · ${imageTest.report.pagesOk}/${imageTest.report.pagesChecked.length} stránek`,
   };
   if (!imageTest.ok) errors.push(`imagetest: ${imageTest.report.urlsBroken.length} broken urls`);
+
+  const publicArticles = await runPublicArticlesFetch({ limitPerWriter: 1 });
+  phases.publicArticles = {
+    ok: publicArticles.ok,
+    detail: publicArticles.detail ?? `${publicArticles.generated ?? 0} článků`,
+  };
+  if (!publicArticles.ok) errors.push(`public-articles: ${publicArticles.detail ?? "fetch failed"}`);
+
+  const publicAds = await runPublicAdEngineStep({ limit: 24 });
+  phases.publicAdEngine = {
+    ok: publicAds.ok,
+    detail: publicAds.detail ?? `${publicAds.updated ?? 0} patched`,
+  };
+  if (!publicAds.ok) errors.push(`public-ad-engine: ${publicAds.detail ?? "failed"}`);
 
   if (errors.length > 0) {
     autofixAttempted = true;
