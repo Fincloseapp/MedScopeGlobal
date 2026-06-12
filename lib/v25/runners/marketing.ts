@@ -8,6 +8,7 @@ export type MarketingPipelineResult = {
   marketers?: Record<string, { ok: boolean; proposals?: number }>;
   coordination?: { ok: boolean; approved?: number; rejected?: number; leftPending?: number };
   report?: { ok: boolean; report?: unknown };
+  manualAds?: { ok: boolean; detail?: string; updated?: number };
   studentAds?: { ok: boolean; detail?: string; updated?: number };
   proAds?: { ok: boolean; detail?: string; updated?: number };
 };
@@ -27,6 +28,7 @@ export async function runMarketingPipeline(options?: {
   let marketers: MarketingPipelineResult["marketers"];
   let coordination: MarketingPipelineResult["coordination"];
   let report: MarketingPipelineResult["report"];
+  let manualAds: MarketingPipelineResult["manualAds"];
   let studentAds: MarketingPipelineResult["studentAds"];
   let proAds: MarketingPipelineResult["proAds"];
 
@@ -53,6 +55,12 @@ export async function runMarketingPipeline(options?: {
       coordination = coord.coordination;
       report = coord.report ?? undefined;
 
+      if (!options?.skipAds) {
+        const manualMod = await importMjs("lib/v25/ads/manual-ad-inserter.mjs");
+        manualAds = await manualMod.runManualAdInserter({ limit: options?.adLimit ?? 24 });
+        if (!manualAds.ok) errors.push(`manual-ads: ${manualAds.detail}`);
+      }
+
       if (!coord.ok) errors.push("marketing-coordinator failed");
     } catch (e) {
       errors.push(`marketers: ${(e as Error).message}`);
@@ -61,6 +69,12 @@ export async function runMarketingPipeline(options?: {
 
   if (!options?.skipAds) {
     try {
+      if (!manualAds) {
+        const manualMod = await importMjs("lib/v25/ads/manual-ad-inserter.mjs");
+        manualAds = await manualMod.runManualAdInserter({ limit: options?.adLimit ?? 24 });
+        if (!manualAds.ok) errors.push(`manual-ads: ${manualAds.detail}`);
+      }
+
       const studentMod = await importMjs("lib/v25/ads/student-ad-engine.mjs");
       const proMod = await importMjs("lib/v25/ads/pro-ad-engine.mjs");
       studentAds = await studentMod.runStudentAdEngine({ limit: options?.adLimit ?? 24 });
@@ -80,7 +94,7 @@ export async function runMarketingPipeline(options?: {
     errors.join("; ") || `marketers + ads complete`,
     {
       fetched: (marketers?.public?.proposals ?? 0) + (marketers?.students?.proposals ?? 0) + (marketers?.pro?.proposals ?? 0),
-      updates: (studentAds?.updated ?? 0) + (proAds?.updated ?? 0),
+      updates: (manualAds?.updated ?? 0) + (studentAds?.updated ?? 0) + (proAds?.updated ?? 0),
     }
   );
 
@@ -90,9 +104,15 @@ export async function runMarketingPipeline(options?: {
     marketers,
     coordination,
     report,
+    manualAds,
     studentAds,
     proAds,
   };
+}
+
+export async function runManualAdInserterStep(options?: { limit?: number }) {
+  const mod = await importMjs("lib/v25/ads/manual-ad-inserter.mjs");
+  return mod.runManualAdInserter(options);
 }
 
 export async function runStudentAdEngineStep(options?: { limit?: number }) {

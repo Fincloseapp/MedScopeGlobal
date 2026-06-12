@@ -15,6 +15,7 @@ import {
   Heart,
   BarChart3,
   GraduationCap,
+  TrendingUp,
 } from "lucide-react";
 
 export const ADMIN_NAV_ITEMS: {
@@ -37,6 +38,7 @@ export const ADMIN_NAV_ITEMS: {
   { href: "/admin/ads-public", label: "Veřejné reklamy", icon: Megaphone },
   { href: "/admin/ads-students", label: "Studentské reklamy", icon: GraduationCap },
   { href: "/admin/marketing-hub", label: "Marketing hub", icon: BarChart3 },
+  { href: "/admin/ads-overview", label: "Ads overview", icon: TrendingUp },
   { href: "/admin/verejnost", label: "Veřejnost", icon: Heart },
   { href: "/admin/vip", label: "VIP members", icon: Crown },
   { href: "/admin/notifications", label: "Notifications", icon: Bell },
