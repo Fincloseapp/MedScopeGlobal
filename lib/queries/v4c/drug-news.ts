@@ -1,5 +1,11 @@
+import { unstable_cache } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service";
 import type { DrugAgencyId } from "@/lib/v4c/drug-sources";
+
+/** List/card views — exclude `body` (full HTML) to keep payloads small. */
+const DRUG_NEWS_LIST_COLUMNS =
+  "id, title, slug, drug_name, status, agency, summary, image_url, published_date, source_url, source_name, ai_metadata, created_at";
 
 export type DrugNewsRow = {
   id: string;
@@ -50,15 +56,16 @@ function matchesSourceId(row: DrugNewsRow, sourceId: string): boolean {
   return false;
 }
 
-export async function getDrugNewsList(status?: string) {
-  const supabase = await createClient();
+async function fetchDrugNewsList(status?: string, limit?: number): Promise<DrugNewsRow[]> {
+  const supabase = createServiceRoleClient();
   let q = supabase
     .from("drug_news")
-    .select("*")
+    .select(DRUG_NEWS_LIST_COLUMNS)
     .eq("published", true)
     .order("published_date", { ascending: false, nullsFirst: false });
 
   if (status) q = q.eq("status", status);
+  if (limit) q = q.limit(limit);
 
   const { data, error } = await q;
   if (error) {
@@ -66,6 +73,17 @@ export async function getDrugNewsList(status?: string) {
     return [];
   }
   return (data ?? []) as DrugNewsRow[];
+}
+
+const getDrugNewsListCached = unstable_cache(
+  async (status: string | null, limit: number | null) =>
+    fetchDrugNewsList(status ?? undefined, limit ?? undefined),
+  ["v4c-drug-news-list"],
+  { revalidate: 120, tags: ["drug-news"] }
+);
+
+export async function getDrugNewsList(status?: string, limit?: number) {
+  return getDrugNewsListCached(status ?? null, limit ?? null);
 }
 
 export async function getDrugNewsGroupedByAgency(limitPerAgency = 6) {
@@ -86,8 +104,23 @@ export async function getDrugNewsFiltered(opts?: {
   status?: string;
   limit?: number;
 }) {
-  let rows = await getDrugNewsList(opts?.status);
-  if (opts?.agency) rows = rows.filter((r) => r.agency === opts.agency);
+  const supabase = createServiceRoleClient();
+  let q = supabase
+    .from("drug_news")
+    .select(DRUG_NEWS_LIST_COLUMNS)
+    .eq("published", true)
+    .order("published_date", { ascending: false, nullsFirst: false });
+
+  if (opts?.status) q = q.eq("status", opts.status);
+  if (opts?.agency) q = q.eq("agency", opts.agency);
+
+  const { data, error } = await q;
+  if (error) {
+    console.error("getDrugNewsFiltered", error);
+    return [];
+  }
+
+  let rows = (data ?? []) as DrugNewsRow[];
   if (opts?.sourceId) rows = rows.filter((r) => matchesSourceId(r, opts.sourceId!));
   if (opts?.limit) rows = rows.slice(0, opts.limit);
   return rows;
