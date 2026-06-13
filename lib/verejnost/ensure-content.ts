@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import { seedPublicArticlesIfEmpty } from "@/lib/verejnost/seed-public-articles";
-import { DEFAULT_PUBLIC_WRITER_LIMIT } from "@/lib/v25/config/public-writers";
 
 let ensureDateKey: string | null = null;
 let ensurePromise: Promise<{ seeded: boolean }> | null = null;
@@ -44,8 +43,8 @@ export async function countPublicArticlesToday(): Promise<number> {
 }
 
 /**
- * Ensures public articles exist and refreshes when none were published today.
- * Falls back to static seed only when DB is completely empty.
+ * Ensures public articles exist when DB is empty (static seed only).
+ * Daily generation is handled exclusively by /api/cron/public-articles at 06:30 UTC.
  */
 export async function ensurePublicArticlesSeeded(): Promise<{ seeded: boolean }> {
   const key = todayKey();
@@ -54,21 +53,6 @@ export async function ensurePublicArticlesSeeded(): Promise<{ seeded: boolean }>
   ensureDateKey = key;
   ensurePromise = (async () => {
     const existing = await countPublicArticles();
-    const todayCount = existing > 0 ? await countPublicArticlesToday() : 0;
-    if (existing > 0 && todayCount > 0) return { seeded: false };
-
-    try {
-      const { runPublicArticlesFetch } = await import("@/lib/v25/runners/public");
-      const result = await runPublicArticlesFetch({
-        limitPerWriter: DEFAULT_PUBLIC_WRITER_LIMIT,
-        skipAds: true,
-      });
-      const afterCron = await countPublicArticlesToday();
-      if (result.ok && afterCron > 0) return { seeded: true };
-    } catch (error) {
-      console.error("ensurePublicArticlesSeeded:cron", error);
-    }
-
     if (existing > 0) return { seeded: false };
 
     try {

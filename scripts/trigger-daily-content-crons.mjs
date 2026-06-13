@@ -30,6 +30,7 @@ const writerLimit = env.PUBLIC_WRITER_LIMIT ?? "4";
 
 const jobs = [
   { name: "ingest", path: "/api/cron/ingest" },
+  { name: "v4c-drugs", path: "/api/cron/v4c-drugs" },
   { name: "public-articles", path: `/api/cron/public-articles?limit=${writerLimit}` },
   { name: "v19-daily-briefs", path: "/api/cron/v19-daily-briefs" },
   { name: "daily-pubmed-update", path: "/api/cron/daily-pubmed-update" },
