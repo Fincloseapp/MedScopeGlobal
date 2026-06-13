@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 import { setCronStatus } from "@/lib/v25/system-state";
+import { DEFAULT_PUBLIC_WRITER_LIMIT } from "@/lib/v25/config/public-writers";
 
 export type PublicArticlesFetchResult = {
   ok: boolean;
@@ -35,7 +36,7 @@ export async function runPublicArticlesFetch(options?: {
   if (process.env.VERCEL === "1") {
     const writersMod = (await import("../writers/run-public-writers.mjs")) as unknown as PublicWritersModule;
     const report = await writersMod.runPublicWriters({
-      limitPerWriter: options?.limitPerWriter ?? 1,
+      limitPerWriter: options?.limitPerWriter ?? DEFAULT_PUBLIC_WRITER_LIMIT,
       skipAds: options?.skipAds ?? false,
     });
 

@@ -23,7 +23,7 @@ import {
 import { runInlineImageTest } from "@/lib/v25/images/image-test";
 import { runUniversitiesFetch } from "@/lib/v25/runners/universities";
 import { runImagesFetch } from "@/lib/v25/runners/images";
-import { runPublicArticlesFetch, runPublicAdEngineStep } from "@/lib/v25/runners/public";
+import { runPublicAdEngineStep } from "@/lib/v25/runners/public";
 import {
   runStudentAdEngineStep,
   runProAdEngineStep,
@@ -71,12 +71,10 @@ export async function runV25QuickPipeline(): Promise<V25EnterpriseResult> {
   };
   if (!imageTest.ok) errors.push(`imagetest: ${imageTest.report.urlsBroken.length} broken urls`);
 
-  const publicArticles = await runPublicArticlesFetch({ limitPerWriter: 1 });
   phases.publicArticles = {
-    ok: publicArticles.ok,
-    detail: publicArticles.detail ?? `${publicArticles.generated ?? 0} článků`,
+    ok: true,
+    detail: "skipped — dedicated /api/cron/public-articles runs daily",
   };
-  if (!publicArticles.ok) errors.push(`public-articles: ${publicArticles.detail ?? "fetch failed"}`);
 
   const publicAds = await runPublicAdEngineStep({ limit: 24 });
   phases.publicAdEngine = {
@@ -205,12 +203,10 @@ export async function runV25PostPipeline(options?: { mode?: V25PipelineMode }): 
   };
   if (!imageTest.ok) errors.push(`imagetest: ${imageTest.report.urlsBroken.length} broken urls`);
 
-  const publicArticles = await runPublicArticlesFetch({ limitPerWriter: 1 });
   phases.publicArticles = {
-    ok: publicArticles.ok,
-    detail: publicArticles.detail ?? `${publicArticles.generated ?? 0} článků`,
+    ok: true,
+    detail: "skipped — dedicated /api/cron/public-articles runs daily",
   };
-  if (!publicArticles.ok) errors.push(`public-articles: ${publicArticles.detail ?? "fetch failed"}`);
 
   const publicAds = await runPublicAdEngineStep({ limit: 24 });
   phases.publicAdEngine = {

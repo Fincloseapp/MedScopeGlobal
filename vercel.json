@@ -5,7 +5,9 @@
   "env": {
     "INGESTION_LOCALE": "cs",
     "DEFAULT_SITE_LOCALE": "cs",
-    "OPENAI_MODEL": "gpt-4o-mini"
+    "OPENAI_MODEL": "gpt-4o-mini",
+    "PUBLIC_WRITER_LIMIT": "4",
+    "INGEST_MAX_ARTICLES": "80"
   },
   
   "crons": [
@@ -91,7 +93,7 @@
     },
     {
       "path": "/api/cron/marketing",
-      "schedule": "0 19 * * 1"
+      "schedule": "0 19 * * *"
     }
   ],
   

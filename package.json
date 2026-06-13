@@ -50,7 +50,8 @@
     "healthcheck-local": "node node_modules/tsx/dist/cli.mjs scripts/deploy/health-runner.ts",
     "dns:cloudflare": "node scripts/cloudflare-point-vercel.mjs",
     "domain:connect": "node scripts/connect-domain-vercel.mjs",
-    "test:prod": "node tests/production/run-prod-tests.mjs"
+    "test:prod": "node tests/production/run-prod-tests.mjs",
+    "cron:trigger-daily": "node scripts/trigger-daily-content-crons.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
