@@ -124,15 +124,7 @@ export async function prepareArticlesForDisplay(
       out.push(await prepareArticleForDisplay(article, locale, mode));
       translated++;
     } else if (matchesArticleLocale(article.locale, locale)) {
-      const withCat = await applyCategoryLabels(article, locale);
-      const polished =
-        locale === "cs" && isEnglishDominant(withCat.title)
-          ? polishCzechFields(withCat, locale)
-          : withCat;
-      out.push({
-        ...polished,
-        displayLocale: primaryArticleLocale(locale),
-      });
+      out.push(await prepareArticleForDisplay(article, locale, mode));
     } else {
       const withCat = await applyCategoryLabels(article, locale);
       out.push({

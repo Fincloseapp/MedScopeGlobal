@@ -1,0 +1,43 @@
+import { isLegacyImageUrl, isPlaceholderImageUrl } from "@/lib/v25/images/legacy-images";
+
+/** Curated European medical stock — fair-skinned hands, clinical settings (v25.1). */
+const CURATED_PHOTOS: Record<string, string> = {
+  medicina:
+    "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp",
+  study:
+    "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp",
+  hero:
+    "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp",
+  university:
+    "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp",
+  digitalHealth:
+    "https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp",
+  verejnost:
+    "https://images.unsplash.com/photo-1559839734-2ee710d67ef2?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp",
+};
+
+const TOPIC_MODULE: Record<string, keyof typeof CURATED_PHOTOS> = {
+  "zivotni-styl": "medicina",
+  nemoci: "study",
+  prevence: "hero",
+  rozhovory: "university",
+};
+
+function sigForSlug(slug: string): string {
+  const n = Math.abs(slug.split("").reduce((a, c) => a + c.charCodeAt(0), 0) % 999);
+  return `&sig=${n}`;
+}
+
+export function resolveVerejnostCoverUrl(article: {
+  slug: string;
+  cover_image_url?: string | null;
+  public_topic?: string | null;
+}): string {
+  const url = article.cover_image_url?.trim();
+  if (url && !isLegacyImageUrl(url) && !isPlaceholderImageUrl(url)) return url;
+
+  const topic = article.public_topic ?? "zivotni-styl";
+  const module = TOPIC_MODULE[topic] ?? "verejnost";
+  const base = CURATED_PHOTOS[module] ?? CURATED_PHOTOS.verejnost;
+  return `${base}${sigForSlug(article.slug)}`;
+}

@@ -90,7 +90,7 @@ export async function runV25ImagePipeline(options?: {
         publicUrl = item.registered.publicUrl;
         source = "selector";
       } else {
-        const saved = generator.saveGeneratedImage({
+        const saved = await generator.saveGeneratedImageAsync({
           section: item.section,
           slug: item.slug,
           title: item.title,
@@ -107,7 +107,7 @@ export async function runV25ImagePipeline(options?: {
             slug: item.slug,
             action: "style-reject",
             result: "fail",
-            detail: String(saved.error),
+            detail: String("error" in saved ? saved.error : "generate-failed"),
           });
           fixLog.push(fix);
           continue;
@@ -115,12 +115,15 @@ export async function runV25ImagePipeline(options?: {
 
         generated += 1;
         relativePath = saved.relativePath ?? "";
-        localPath = saved.meta?.localPath ?? "";
+        localPath = "meta" in saved && saved.meta?.localPath ? String(saved.meta.localPath) : "";
         source = "generator";
 
         const buf = readLocalImage(relativePath);
         if (buf) {
-          publicUrl = await uploadImageToMediaBucket(relativePath, buf);
+          const ct =
+            ("contentType" in saved && saved.contentType) ||
+            (relativePath.endsWith(".png") ? "image/png" : relativePath.endsWith(".webp") ? "image/webp" : "image/jpeg");
+          publicUrl = await uploadImageToMediaBucket(relativePath, buf, ct);
         }
         if (!publicUrl) {
           publicUrl = publicImageUrl(relativePath, V25_PROD_BASE);

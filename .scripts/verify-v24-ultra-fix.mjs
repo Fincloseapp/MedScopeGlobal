@@ -38,10 +38,10 @@ async function triggerV24Ultra() {
 async function checkSections() {
   const slugs = [
     "clinical-medicine",
-    "public-health",
-    "digital-health",
-    "medical-studies",
-    "pharmacology",
+    "public-health-prevention",
+    "healthcare-technology",
+    "medical-science-research",
+    "pharma-therapeutics",
   ];
   const results = [];
   for (const slug of slugs) {

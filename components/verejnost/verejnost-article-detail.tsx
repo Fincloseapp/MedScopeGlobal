@@ -5,9 +5,7 @@ import { PublicAdBlocks } from "@/components/verejnost/public-ad-block";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import type { PublicAdCampaign } from "@/lib/queries/verejnost";
 import { articleTopicLabel, verejnostDateLabel } from "@/lib/verejnost/helpers";
-
-const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&q=80&auto=format&fit=crop";
+import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 
 export function VerejnostArticleDetail({
   article,
@@ -23,6 +21,7 @@ export function VerejnostArticleDetail({
   const dateLabel = verejnostDateLabel(article);
   const topicLabel = articleTopicLabel(article);
   const isInterview = article.public_topic === "rozhovory";
+  const coverUrl = resolveVerejnostCoverUrl(article);
 
   return (
     <div className="min-h-screen bg-[#f4f8fc]">
@@ -53,7 +52,7 @@ export function VerejnostArticleDetail({
 
             <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-2xl bg-slate-100">
               <Image
-                src={article.cover_image_url || FALLBACK_IMAGE}
+                src={coverUrl}
                 alt={article.title}
                 fill
                 className="object-cover"

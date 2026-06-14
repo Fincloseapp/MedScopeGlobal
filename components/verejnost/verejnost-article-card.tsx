@@ -1,10 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
+import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 import { articleTopicLabel, verejnostDateLabel } from "@/lib/verejnost/helpers";
-
-const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80&auto=format&fit=crop";
 
 export function VerejnostArticleCard({
   article,
@@ -14,7 +12,7 @@ export function VerejnostArticleCard({
   variant?: "default" | "compact" | "interview";
 }) {
   const href = `/verejnost/clanky/${article.slug}`;
-  const image = article.cover_image_url || FALLBACK_IMAGE;
+  const image = resolveVerejnostCoverUrl(article);
   const dateLabel = verejnostDateLabel(article);
   const topicLabel = articleTopicLabel(article);
   const isInterview = article.public_topic === "rozhovory";

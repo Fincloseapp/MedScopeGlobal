@@ -63,6 +63,7 @@ export type V25ContentImageRow = {
   imageUrl?: string | null;
   table: string;
   imageColumn: string;
+  metadata?: Record<string, unknown>;
 };
 
 export type V25ImagePipelineResult = {

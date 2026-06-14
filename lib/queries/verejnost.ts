@@ -40,6 +40,8 @@ export async function listPublicArticles(options?: {
   locale?: LocaleCode;
   /** Spustí seed/cron pokud je DB prázdná (default true u hubu). */
   ensureContent?: boolean;
+  /** full = načte celý obsah článku (pro expand-on-click). */
+  mode?: "card" | "full";
 }): Promise<DisplayArticle[]> {
   if (options?.ensureContent !== false) {
     const { ensurePublicArticlesSeeded } = await import("@/lib/verejnost/ensure-content");
@@ -70,7 +72,10 @@ export async function listPublicArticles(options?: {
   }
 
   const rows = mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[];
-  return prepareArticlesForDisplay(rows, locale, { mode: "card", maxTranslate: limit });
+  const mode = options?.mode ?? "card";
+  const prepared = await prepareArticlesForDisplay(rows, locale, { mode, maxTranslate: limit });
+  const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
+  return prepared.map((a) => ({ ...a, cover_image_url: resolveVerejnostCoverUrl(a) }));
 }
 
 export async function getPublicArticleBySlug(
@@ -93,7 +98,9 @@ export async function getPublicArticleBySlug(
 
   const row = data ? (mapArticleList([data as Record<string, unknown>])[0] ?? null) : null;
   if (!row) return null;
-  return prepareArticleForDisplay(row, locale, "full");
+  const article = await prepareArticleForDisplay(row, locale, "full");
+  const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
+  return { ...article, cover_image_url: resolveVerejnostCoverUrl(article) };
 }
 
 export async function listPublicAdCampaigns(options?: {

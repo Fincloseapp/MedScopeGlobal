@@ -10,9 +10,21 @@ type TableConfig = {
   excerptColumn?: string;
   bodyColumn?: string;
   limit: number;
+  audience?: string;
 };
 
 const TABLES: TableConfig[] = [
+  {
+    table: "articles",
+    section: "verejnost",
+    imageColumn: "cover_image_url",
+    slugColumn: "slug",
+    titleColumn: "title",
+    excerptColumn: "excerpt",
+    bodyColumn: "content",
+    limit: 80,
+    audience: "public",
+  },
   {
     table: "articles",
     section: "articles",
@@ -82,29 +94,47 @@ export async function loadContentRowsForImages(): Promise<V25ContentImageRow[]> 
       cfg.imageColumn,
       cfg.excerptColumn,
       cfg.bodyColumn,
+      cfg.table === "articles" ? "audience" : null,
+      cfg.table === "articles" ? "rubric_slug" : null,
+      cfg.table === "articles" ? "public_topic" : null,
     ]
       .filter(Boolean)
       .join(", ");
 
-    const { data, error } = await admin
+    let q = admin
       .from(cfg.table)
       .select(cols)
       .order("created_at", { ascending: false })
       .limit(cfg.limit);
 
+    if (cfg.audience) {
+      q = q.eq("audience", cfg.audience);
+    }
+
+    const { data, error } = await q;
+
     if (error || !data) continue;
 
     for (const row of data as unknown as Record<string, unknown>[]) {
+      const slug = String(row[cfg.slugColumn] ?? row.id);
+      const isPublicArticle =
+        cfg.table === "articles" &&
+        (row.audience === "public" ||
+          row.rubric_slug === "verejnost" ||
+          slug.startsWith("verejnost-"));
       rows.push({
         id: String(row.id),
-        slug: String(row[cfg.slugColumn] ?? row.id),
-        section: cfg.section,
+        slug,
+        section: isPublicArticle ? "verejnost" : cfg.section,
         title: String(row[cfg.titleColumn] ?? "Bez názvu"),
         excerpt: cfg.excerptColumn ? String(row[cfg.excerptColumn] ?? "") : undefined,
         body: cfg.bodyColumn ? String(row[cfg.bodyColumn] ?? "") : undefined,
         imageUrl: row[cfg.imageColumn] ? String(row[cfg.imageColumn]) : null,
         table: cfg.table,
         imageColumn: cfg.imageColumn,
+        metadata: isPublicArticle
+          ? { publicTopic: row.public_topic, module: "verejnost" }
+          : undefined,
       });
     }
   }

@@ -4,7 +4,8 @@ import Link from "next/link";
 
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 
-import { VerejnostArticleCard } from "@/components/verejnost/verejnost-article-card";
+import { VerejnostArticleExpandable } from "@/components/verejnost/verejnost-article-expandable";
+import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 
 import {
 
@@ -63,6 +64,8 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
     topic: backendTopic,
 
     ensureContent: true,
+
+    mode: "full",
 
   });
 
@@ -154,7 +157,15 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
 
           {articles.map((item) => (
 
-            <VerejnostArticleCard key={item.id} article={item} />
+            <VerejnostArticleExpandable
+
+              key={item.id}
+
+              article={item}
+
+              coverUrl={item.cover_image_url ?? resolveVerejnostCoverUrl(item)}
+
+            />
 
           ))}
 
