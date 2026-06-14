@@ -44,7 +44,7 @@ export function resolveVerejnostCoverUrl(article: {
   if (url && isProductionCover(url)) return url;
 
   const topic = article.public_topic ?? "zivotni-styl";
-  const module = TOPIC_MODULE[topic] ?? "verejnost";
-  const base = CURATED_PHOTOS[module] ?? CURATED_PHOTOS.verejnost;
+  const coverModule = TOPIC_MODULE[topic] ?? "verejnost";
+  const base = CURATED_PHOTOS[coverModule] ?? CURATED_PHOTOS.verejnost;
   return `${base}${sigForSlug(article.slug)}`;
 }

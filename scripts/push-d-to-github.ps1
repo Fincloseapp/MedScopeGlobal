@@ -44,6 +44,18 @@ Write-Host "=== Sync D: project to clone ==="
 robocopy $root $cloneDir /E /XD node_modules .next .git .deploy-tmp .build-tmp .tools .vercel terminals /XF .env.local .env.local.bak .env.vercel.pull tsconfig.tsbuildinfo /NFL /NDL /NJH /NJS /nc /ns /np
 if ($LASTEXITCODE -ge 8) { throw "robocopy failed exit $LASTEXITCODE" }
 
+# Remove stale paths no longer in D: (robocopy /E does not delete extras in clone)
+$stalePaths = @(
+  "lib\v25\tests\run-suite.mjs"
+)
+foreach ($rel in $stalePaths) {
+  $stale = Join-Path $cloneDir $rel
+  if (Test-Path $stale) {
+    Remove-Item $stale -Force
+    Write-Host "Removed stale: $rel"
+  }
+}
+
 Write-Host "=== Commit and push ==="
 Push-Location $cloneDir
 try {

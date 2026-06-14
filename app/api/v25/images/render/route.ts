@@ -67,14 +67,14 @@ export async function GET(request: Request) {
 
   const row = await findContentRow(section, slug);
   const title = row?.title ?? slug;
-  const module = moduleForSection(section, slug);
+  const imageModule = moduleForSection(section, slug);
 
   const gen = (await import("@/lib/v25/images/generator-engine.mjs")) as GenModule;
   const saved = await gen.saveGeneratedImageAsync({
     section,
     slug,
     title,
-    module,
+    module: imageModule,
     keywords:
       section.includes("drug")
         ? ["léčivo", "regulace", "bezpečnost"]
