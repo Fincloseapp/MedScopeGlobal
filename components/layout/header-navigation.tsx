@@ -53,14 +53,17 @@ function NavDropdownPanel({
       const vh = window.innerHeight;
       const panelW = panel.offsetWidth || 256;
       const panelH = panel.offsetHeight || 320;
+      const maxTop = Math.max(margin, vh - panelH - margin);
 
       let top = anchor.bottom + gap;
       let left = anchor.right - panelW;
 
       if (top + panelH > vh - margin) {
-        const above = anchor.top - panelH - gap;
-        top = above >= margin ? above : Math.max(margin, vh - panelH - margin);
+        const topAbove = anchor.top - panelH - gap;
+        top = topAbove >= margin ? topAbove : margin;
       }
+
+      top = Math.max(margin, Math.min(top, maxTop));
 
       if (left < margin) left = margin;
       if (left + panelW > vw - margin) left = Math.max(margin, vw - panelW - margin);
@@ -69,11 +72,13 @@ function NavDropdownPanel({
         position: "fixed",
         top: Math.round(top),
         left: Math.round(left),
+        maxHeight: `min(70dvh, calc(100dvh - ${margin * 2}px))`,
         visibility: "visible",
       });
     };
 
     update();
+    requestAnimationFrame(update);
     window.addEventListener("resize", update);
     window.addEventListener("scroll", update, true);
     return () => {
