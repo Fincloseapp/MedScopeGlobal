@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
+import { getSiteVersionLabel } from "@/lib/v26/version";
 
 export async function SiteFooter() {
 
@@ -31,7 +32,13 @@ export async function SiteFooter() {
 
             <li><Link href="/articles" className="hover:text-foreground">Články</Link></li>
 
+            <li><Link href="/verejnost" className="hover:text-foreground">Veřejnost</Link></li>
+
+            <li><Link href="/studium" className="hover:text-foreground">Studenti</Link></li>
+
             <li><Link href="/studie" className="hover:text-foreground">Studie</Link></li>
+
+            <li><Link href="/odborna" className="hover:text-foreground">Odborníci (ČLK)</Link></li>
 
             <li><Link href="/odborne/briefy" className="hover:text-foreground">Odborné briefy</Link></li>
 
@@ -83,7 +90,7 @@ export async function SiteFooter() {
 
       <div className="border-t py-6 text-center text-xs text-muted-foreground">
 
-        © {new Date().getFullYear()} MedScopeGlobal — obsah pro vzdělávání, nenahrazuje lékařskou radu.
+        © {new Date().getFullYear()} MedScopeGlobal — obsah pro vzdělávání, nenahrazuje lékařskou radu. · {getSiteVersionLabel()}
 
       </div>
 

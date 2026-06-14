@@ -355,3 +355,38 @@ export async function getRelatedArticles(
   });
   return prepared.slice(0, limit);
 }
+
+/** Articles tagged with metadata.section (e.g. v26 foreign news rubric). */
+export async function getArticlesByMetadataSection(
+  section: string,
+  limit = 24,
+  isVip = false,
+  accessLevel: AccessLevelId = "public",
+  locale: LocaleCode = "cs"
+) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("articles")
+    .select(articleSelect)
+    .eq("published", true)
+    .eq("metadata->>section", section)
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("getArticlesByMetadataSection", error);
+    return [];
+  }
+
+  const filtered = filterForReader(
+    mapArticleList(data as Record<string, unknown>[] | null),
+    isVip,
+    accessLevel,
+    locale
+  );
+  const prepared = await prepareArticlesForDisplay(filtered, locale, {
+    mode: "card",
+    maxTranslate: limit,
+  });
+  return prepared.slice(0, limit);
+}

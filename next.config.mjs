@@ -70,6 +70,14 @@ const nextConfig = {
 
       { source: "/categories/:path*", destination: "/studie", permanent: true },
 
+      { source: "/studenti", destination: "/studium", permanent: true },
+
+      { source: "/studenti/:path*", destination: "/studium/:path*", permanent: true },
+
+      { source: "/odbornici", destination: "/odborna", permanent: true },
+
+      { source: "/odbornici/:path*", destination: "/odborna/:path*", permanent: true },
+
       {
 
         source: "/:path*",

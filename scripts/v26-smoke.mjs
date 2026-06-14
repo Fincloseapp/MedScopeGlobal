@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * v26 production smoke tests — homepage, articles, verejnost, API, images, routing.
+ * v26 production smoke tests — homepage, articles, verejnost, studenti, odbornici, API, routing.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -18,6 +18,10 @@ for (const name of [".env.local", ".env"]) {
   }
 }
 
+const versionConfig = JSON.parse(
+  fs.readFileSync(path.join(root, "lib/v26/config/version.json"), "utf8")
+);
+
 const base = (env.PRODUCTION_URL ?? env.PROD_BASE_URL ?? "https://medscopeglobal.com").replace(/\/$/, "");
 
 const ROUTES = [
@@ -25,8 +29,14 @@ const ROUTES = [
   "/articles",
   "/verejnost",
   "/verejnost/clanky",
+  "/verejnost/temata",
+  "/studium",
+  "/studium/univerzity",
+  "/odborna",
   "/studie",
   "/novinky",
+  "/leky",
+  "/sections",
   "/api/v26/health",
   "/api/v25/health",
 ];
@@ -38,9 +48,9 @@ async function checkRoute(route) {
     const text = await res.text();
     const appErr = /Application error|Internal Server Error/i.test(text.slice(0, 3000));
     const ok = res.status >= 200 && res.status < 400 && !appErr;
-    return { route, url, status: res.status, ok, appErr };
+    return { route, url, status: res.status, ok, appErr, text: text.slice(0, 5000) };
   } catch (e) {
-    return { route, url, status: 0, ok: false, error: e.message };
+    return { route, url, status: 0, ok: false, error: e.message, text: "" };
   }
 }
 
@@ -66,8 +76,12 @@ for (const route of ROUTES) {
   console.log(r.ok ? `OK ${r.status}` : `FAIL ${r.status ?? "err"} ${r.error ?? ""}`);
 }
 
-const articlePage = await checkRoute("/verejnost/clanky");
-results.push(articlePage);
+// Homepage version check
+const home = results.find((r) => r.route === "/");
+if (home?.text && !home.text.includes(versionConfig.ui)) {
+  home.ok = false;
+  console.log(`✗ Homepage missing expected version ${versionConfig.ui}`);
+}
 
 const failed = results.filter((r) => !r.ok);
 console.log(failed.length ? `\n✗ ${failed.length} failed` : "\n✓ All v26 smoke tests passed");

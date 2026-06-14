@@ -8,6 +8,7 @@ export const runtime = "nodejs";
 const PATHS = [
   "/",
   "/articles",
+  "/aktualni-zpravy",
   "/studie",
   "/studie/nejnovejsi",
   "/studie/archiv",

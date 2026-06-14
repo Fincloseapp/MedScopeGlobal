@@ -4,7 +4,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { V23_EDITORIAL_PILLARS, V23_VALUE_PROPOSITION } from "@/lib/v23/homepage";
 import { V23_HERO_IMAGE } from "@/lib/v23/images";
-import { V23_UI_VERSION } from "@/lib/v23/version";
+import { getSiteVersionLabel } from "@/lib/v26/version";
 
 export function V23HomeHero() {
   const vp = V23_VALUE_PROPOSITION;
@@ -28,7 +28,7 @@ export function V23HomeHero() {
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200 backdrop-blur">
               <Sparkles className="h-3.5 w-3.5" aria-hidden />
-              {vp.eyebrow} · {V23_UI_VERSION}
+              {vp.eyebrow} · {getSiteVersionLabel()}
             </p>
             <h1 className="mt-5 font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-[3.25rem]">
               {vp.title}
