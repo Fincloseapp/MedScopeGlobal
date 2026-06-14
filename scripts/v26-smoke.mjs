@@ -48,7 +48,7 @@ async function checkRoute(route) {
     const text = await res.text();
     const appErr = /Application error|Internal Server Error/i.test(text.slice(0, 3000));
     const ok = res.status >= 200 && res.status < 400 && !appErr;
-    return { route, url, status: res.status, ok, appErr, text: text.slice(0, 5000) };
+    return { route, url, status: res.status, ok, appErr, text };
   } catch (e) {
     return { route, url, status: 0, ok: false, error: e.message, text: "" };
   }
