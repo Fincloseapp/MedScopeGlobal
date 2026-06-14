@@ -112,23 +112,22 @@ export async function getLatestArticles(
   locale: LocaleCode = "cs"
 ) {
   const supabase = await createClient();
+  const fetchLimit = limit * 8;
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
     .eq("published", true)
     .order("published_at", { ascending: false, nullsFirst: false })
-    .range(offset, offset + limit * 4 - 1);
+    .range(offset, offset + fetchLimit - 1);
 
   if (error) {
     console.error("getLatestArticles", error);
     return [];
   }
-  const filtered = filterForReader(
-    mapArticleList(data as Record<string, unknown>[] | null),
-    isVip,
-    accessLevel,
-    locale
+  const rows = mapArticleList(data as Record<string, unknown>[] | null).filter(
+    (a) => !isLayAudienceArticle(a)
   );
+  const filtered = filterForReader(rows, isVip, accessLevel, locale);
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
     maxTranslate: limit,

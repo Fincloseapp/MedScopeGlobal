@@ -1,5 +1,5 @@
 /**
- * v20.1 content governance — Czech-only, no legacy 2026 seed, v19 briefs only.
+ * v20.1 content governance — Czech-only, archive pre-2026 legacy, v19 brief TTL.
  */
 import { V19_RUBRIC_SLUG } from "@/lib/v19/dedup";
 import type { ArticleWithRelations } from "@/types/database";
@@ -30,8 +30,8 @@ export function isArchivedArticle(article: {
     return ageMs > V20_V19_MAX_AGE_DAYS * 86_400_000;
   }
 
-  // Legacy DB articles (incl. 2026 seed) — hidden from public feeds
-  return true;
+  // Pre-cutoff legacy DB rows stay archived; v24+ pipeline content after cutoff stays live
+  return ts < new Date(V20_ARCHIVE_CUTOFF).getTime();
 }
 
 export function filterActiveArticles<T extends ArticleWithRelations>(articles: T[]): T[] {
