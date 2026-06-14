@@ -7,8 +7,16 @@ export interface V26BackfillResult {
   processed: number;
   updated: number;
   skipped: number;
+  scanned: number;
   errors: string[];
   samples: { id: string; slug: string; title: string }[];
+}
+
+const BACKFILL_PAGE_SIZE = 100;
+
+function needsV26Rewrite(metadata: unknown): boolean {
+  const meta = (metadata ?? {}) as Record<string, unknown>;
+  return meta.editorial_version !== V26_EDITORIAL_VERSION;
 }
 
 export async function runV26RewriteBackfill(options?: {
@@ -21,24 +29,56 @@ export async function runV26RewriteBackfill(options?: {
   let updated = 0;
   let skipped = 0;
 
-  let query = admin
-    .from("articles")
-    .select("id, title, slug, excerpt, content, metadata, min_access_level, source_url, source_name")
-    .eq("published", true)
-    .order("published_at", { ascending: false })
-    .limit(batchSize * 3);
+  type ArticleRow = {
+    id: string;
+    title: string;
+    slug: string;
+    excerpt: string | null;
+    content: string | null;
+    metadata: unknown;
+    min_access_level: string | null;
+    source_url: string | null;
+    source_name: string | null;
+  };
 
-  const { data: candidates, error: fetchErr } = await query;
-  if (fetchErr) {
-    return { processed: 0, updated: 0, skipped: 0, errors: [fetchErr.message], samples: [] };
+  const batch: ArticleRow[] = [];
+  let scanned = 0;
+  let offset = 0;
+
+  while (batch.length < batchSize) {
+    const { data: page, error: fetchErr } = await admin
+      .from("articles")
+      .select(
+        "id, title, slug, excerpt, content, metadata, min_access_level, source_url, source_name"
+      )
+      .eq("published", true)
+      .order("published_at", { ascending: false })
+      .range(offset, offset + BACKFILL_PAGE_SIZE - 1);
+
+    if (fetchErr) {
+      return {
+        processed: 0,
+        updated: 0,
+        skipped: 0,
+        scanned,
+        errors: [fetchErr.message],
+        samples: [],
+      };
+    }
+
+    if (!page?.length) break;
+
+    scanned += page.length;
+    for (const article of page as ArticleRow[]) {
+      if (needsV26Rewrite(article.metadata)) {
+        batch.push(article);
+        if (batch.length >= batchSize) break;
+      }
+    }
+
+    if (page.length < BACKFILL_PAGE_SIZE) break;
+    offset += BACKFILL_PAGE_SIZE;
   }
-
-  const needsRewrite = (candidates ?? []).filter((a) => {
-    const meta = (a.metadata ?? {}) as Record<string, unknown>;
-    return meta.editorial_version !== V26_EDITORIAL_VERSION;
-  });
-
-  const batch = needsRewrite.slice(0, batchSize);
   const samples: V26BackfillResult["samples"] = [];
 
   for (const article of batch) {
@@ -52,8 +92,8 @@ export async function runV26RewriteBackfill(options?: {
 
       const rewritten = await rewriteToV26Standard({
         title: article.title,
-        excerpt: article.excerpt,
-        content: article.content,
+        excerpt: article.excerpt ?? "",
+        content: article.content ?? "",
         audience,
         sourceCitation: article.source_url
           ? {
@@ -101,6 +141,7 @@ export async function runV26RewriteBackfill(options?: {
     processed: batch.length,
     updated,
     skipped,
+    scanned,
     errors,
     samples,
   };

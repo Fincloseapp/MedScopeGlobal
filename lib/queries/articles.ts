@@ -73,6 +73,16 @@ function filterForSectionReader(
   });
 }
 
+/** Metadata rubric listings (e.g. aktuální-zprávy) — show all tagged articles; detail page gates access. */
+function filterForMetadataRubricListing(
+  articles: ArticleWithRelations[],
+  locale: LocaleCode = "cs"
+): ArticleWithRelations[] {
+  const active = filterActiveArticles(articles);
+  if (locale !== "cs") return active;
+  return active.filter((a) => a.locale !== "en" && Boolean(a.title?.trim()));
+}
+
 export async function getFeaturedArticles(
   limit = 4,
   isVip = false,
@@ -378,10 +388,8 @@ export async function getArticlesByMetadataSection(
     return [];
   }
 
-  const filtered = filterForReader(
+  const filtered = filterForMetadataRubricListing(
     mapArticleList(data as Record<string, unknown>[] | null),
-    isVip,
-    accessLevel,
     locale
   );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
