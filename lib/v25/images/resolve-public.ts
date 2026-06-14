@@ -1,7 +1,5 @@
 import { V25_PROD_BASE } from "@/lib/v25/config";
-import { loadImageReportAsync } from "@/lib/v25/images/persist";
 import { isLegacyImageUrl } from "@/lib/v25/images/legacy-images";
-import { publicImageUrl } from "@/lib/v25/images/storage";
 
 type ResolveInput = {
   section: string;
@@ -16,6 +14,7 @@ export async function resolvePublicImageUrl(input: ResolveInput): Promise<string
 
   if (dbUrl && !isLegacyImageUrl(dbUrl)) return dbUrl;
 
+  const { loadImageReportAsync } = await import("@/lib/v25/images/persist");
   const report = await loadImageReportAsync();
   const reg = report?.images?.find((i) => i.section === section && i.slug === slug);
   if (reg?.publicUrl && !isLegacyImageUrl(reg.publicUrl)) return reg.publicUrl;

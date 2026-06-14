@@ -16,7 +16,7 @@ type SuiteModule = {
 export async function runV25TestSuite(base = V25_PROD_BASE): Promise<V25TestRunRecord & { persisted?: boolean }> {
   await hydrateV25SystemStateFromDb();
 
-  const mod = (await import("./run-suite.mjs")) as unknown as SuiteModule;
+  const mod = (await import("./test-suite-runner.mjs")) as unknown as SuiteModule;
   const run = await mod.runTestSuite({ base });
 
   updateV25TestStatus({

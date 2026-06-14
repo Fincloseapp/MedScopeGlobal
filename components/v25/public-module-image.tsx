@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { STUDY_GAME_IMAGE_FALLBACK } from "@/lib/v22/study-game-image-constants";
 import { isV25ImageUrl } from "@/lib/v25/images/legacy-images";
-import { STUDY_GAME_IMAGE_FALLBACK } from "@/lib/v22/game-images";
 
 type Props = {
   src: string;
