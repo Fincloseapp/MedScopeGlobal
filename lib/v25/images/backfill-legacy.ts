@@ -16,43 +16,33 @@ import type { V25ImageRecord } from "@/lib/v25/images/types";
 
 
 type GenModule = {
-
   saveGeneratedImageAsync: (input: {
-
     section: string;
-
     slug: string;
-
     title: string;
-
     module?: string;
-
     keywords?: string[];
-
+    category?: string;
+    metadata?: Record<string, unknown>;
   }) => Promise<{ ok: boolean; relativePath?: string; error?: string; contentType?: string }>;
-
 };
 
-
-
-function moduleForSection(section: string) {
-
-  if (section.includes("legislat")) return "legislation";
-
-  if (section.includes("drug")) return "drug";
-
-  if (section.includes("univer")) return "university";
-
-  if (section.includes("digital")) return "digitalHealth";
-
-  if (section.includes("stud")) return "study";
-
-  if (section.includes("quiz")) return "study";
-
-  if (section.includes("verejnost")) return "verejnost";
-
-  return "medicina";
-
+async function moduleForRow(row: {
+  section: string;
+  title: string;
+  excerpt?: string;
+  slug?: string;
+  metadata?: Record<string, unknown>;
+}) {
+  const { analyzeContent } = await import("@/lib/v25/images/selector-engine.mjs");
+  const analysis = analyzeContent({
+    title: row.title,
+    excerpt: row.excerpt,
+    body: row.slug ? `slug:${row.slug}` : undefined,
+    section: row.section,
+    metadata: row.metadata,
+  });
+  return analysis.module ?? "medicina";
 }
 
 
@@ -105,18 +95,15 @@ export async function runLegacyImageBackfill(maxItems = 64) {
 
       if (!publicUrl) {
 
+        const mod = await moduleForRow(row);
         const saved = await gen.saveGeneratedImageAsync({
-
           section: row.section,
-
           slug: row.slug,
-
           title: row.title,
-
-          module: moduleForSection(row.section),
-
+          module: mod,
           keywords: row.excerpt?.split(/\s+/).slice(0, 6) ?? [],
-
+          category: row.metadata?.publicTopic as string | undefined,
+          metadata: row.metadata,
         });
 
         if (!saved.ok || !saved.relativePath) {

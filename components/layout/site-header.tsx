@@ -35,7 +35,7 @@ export function SiteHeader({
   const mainMenu = getMainMenu("cs");
 
   return (
-    <header className="site-header sticky top-0 z-50 w-full border-b border-black/[0.06] bg-white/[0.98] backdrop-blur supports-[padding:max(0px)]:pt-[env(safe-area-inset-top)] dark:border-white/[0.08] dark:bg-slate-950/[0.98]">
+    <header className="site-header sticky top-0 z-50 w-full overflow-visible border-b border-black/[0.06] bg-white/[0.98] backdrop-blur supports-[padding:max(0px)]:pt-[env(safe-area-inset-top)] dark:border-white/[0.08] dark:bg-slate-950/[0.98]">
       {/* Mobile — logo 56px centered, hamburger right */}
       <div className="mx-auto grid max-w-[1680px] grid-cols-[1fr_auto_1fr] items-center px-4 py-4 md:hidden">
         <div aria-hidden />

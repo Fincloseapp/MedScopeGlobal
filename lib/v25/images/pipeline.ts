@@ -29,17 +29,20 @@ type MissingItem = {
   body?: string;
   table?: string;
   imageColumn?: string;
+  metadata?: Record<string, unknown>;
   needsGeneration?: boolean;
   analysis?: {
     imageType?: string;
     module?: string;
+    category?: string;
     keywords?: string[];
     prompt?: string;
   };
   imageType?: string;
   module?: string;
+  category?: string;
   prompt?: string;
-  registered?: { publicUrl?: string; imageType?: string; alt?: string };
+  registered?: { publicUrl?: string; imageType?: string; alt?: string; module?: string };
 };
 
 async function importEngines() {
@@ -100,6 +103,9 @@ export async function runV25ImagePipeline(options?: {
           module: item.module ?? item.analysis?.module ?? "medicina",
           keywords: item.analysis?.keywords ?? [],
           prompt: item.prompt ?? item.analysis?.prompt,
+          category: item.category ?? item.analysis?.category,
+          excerpt: item.excerpt,
+          metadata: item.metadata,
         });
 
         if (!saved.ok) {

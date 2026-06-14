@@ -149,8 +149,14 @@ export async function loadContentRowsForImages(): Promise<V25ContentImageRow[]> 
         table: cfg.table,
         imageColumn: cfg.imageColumn,
         metadata: isPublicArticle
-          ? { publicTopic: row.public_topic, module: "verejnost" }
-          : undefined,
+          ? {
+              publicTopic: row.public_topic,
+              rubricSlug: row.rubric_slug,
+              module: "verejnost",
+            }
+          : row.rubric_slug
+            ? { rubricSlug: row.rubric_slug }
+            : undefined,
       });
     }
   }

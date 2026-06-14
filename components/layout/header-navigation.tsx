@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import type { NavItem } from "@/lib/config/main-navigation";
 import { cn } from "@/lib/utils";
 
@@ -21,11 +21,82 @@ const NAV_BUTTON = cn(
   "text-slate-800 underline-offset-[3px] transition-colors hover:text-[#0055CC] hover:underline after:ml-0.5 after:text-[10px] after:opacity-60 after:content-['▾'] dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF]"
 );
 
-/** v23.3.0 — stabilized full-width nav, gap-based spacing, no wrap */
+const DROPDOWN_PANEL = cn(
+  "z-[60] min-w-64 max-w-[min(20rem,calc(100vw-1rem))] rounded-md border border-black/[0.06] bg-white py-1.5 shadow-lg",
+  "max-h-[min(70dvh,28rem)] overflow-y-auto overscroll-contain",
+  "dark:border-white/10 dark:bg-slate-900"
+);
+
+function NavDropdownPanel({
+  open,
+  anchorEl,
+  children,
+}: {
+  open: boolean;
+  anchorEl: HTMLButtonElement | null;
+  children: React.ReactNode;
+}) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [style, setStyle] = useState<CSSProperties>({ visibility: "hidden" });
+
+  useLayoutEffect(() => {
+    if (!open || !anchorEl) return;
+
+    const update = () => {
+      const anchor = anchorEl.getBoundingClientRect();
+      const panel = panelRef.current;
+      if (!panel) return;
+
+      const margin = 8;
+      const gap = 6;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const panelW = panel.offsetWidth || 256;
+      const panelH = panel.offsetHeight || 320;
+
+      let top = anchor.bottom + gap;
+      let left = anchor.right - panelW;
+
+      if (top + panelH > vh - margin) {
+        const above = anchor.top - panelH - gap;
+        top = above >= margin ? above : Math.max(margin, vh - panelH - margin);
+      }
+
+      if (left < margin) left = margin;
+      if (left + panelW > vw - margin) left = Math.max(margin, vw - panelW - margin);
+
+      setStyle({
+        position: "fixed",
+        top: Math.round(top),
+        left: Math.round(left),
+        visibility: "visible",
+      });
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [open, anchorEl, children]);
+
+  if (!open) return null;
+
+  return (
+    <div ref={panelRef} style={style} className={DROPDOWN_PANEL} role="menu">
+      {children}
+    </div>
+  );
+}
+
+/** v26.1 — viewport-safe dropdowns (fixed anchor, scroll, flip) */
 export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
   const pathname = usePathname();
   const [openLabel, setOpenLabel] = useState<string | null>(null);
   const navRef = useRef<HTMLElement>(null);
+  const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   useEffect(() => {
     setOpenLabel(null);
@@ -37,8 +108,15 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
         setOpenLabel(null);
       }
     }
+    function onEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpenLabel(null);
+    }
     document.addEventListener("click", onDocClick);
-    return () => document.removeEventListener("click", onDocClick);
+    document.addEventListener("keydown", onEscape);
+    return () => {
+      document.removeEventListener("click", onDocClick);
+      document.removeEventListener("keydown", onEscape);
+    };
   }, []);
 
   const hasActiveParent = (href: string) =>
@@ -68,37 +146,40 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
         return (
           <div key={item.label} className="relative shrink-0">
             <button
+              ref={(el) => {
+                buttonRefs.current[item.label] = el;
+              }}
               type="button"
               aria-expanded={isOpen}
+              aria-haspopup="menu"
               onClick={() => setOpenLabel(isOpen ? null : item.label)}
               className={cn(NAV_BUTTON, active && NAV_LINK_ACTIVE, isOpen && "text-[#0055CC] dark:text-[#7CC4FF]")}
             >
               {item.label}
             </button>
-            {isOpen ? (
-              <div className="absolute right-0 top-full z-50 mt-1.5 min-w-64 rounded-md border border-black/[0.06] bg-white py-1.5 shadow-md dark:border-white/10 dark:bg-slate-900 lg:left-auto lg:right-0">
-                {item.children!.map((child) => (
-                  <Link
-                    key={child.href}
-                    href={child.href}
-                    onClick={() => setOpenLabel(null)}
-                    className={cn(
-                      "block whitespace-normal px-5 py-2.5 text-[15px] tracking-[0.2px] transition-colors hover:text-[#0055CC] dark:hover:text-[#7CC4FF]",
-                      isActiveChild(child.href)
-                        ? "font-medium text-[#0055CC] dark:text-[#7CC4FF]"
-                        : "text-slate-700 dark:text-[#E0E0E0]"
-                    )}
-                  >
-                    {child.label}
-                    {child.description ? (
-                      <span className="mt-0.5 block text-xs font-normal text-slate-500 dark:text-slate-400">
-                        {child.description}
-                      </span>
-                    ) : null}
-                  </Link>
-                ))}
-              </div>
-            ) : null}
+            <NavDropdownPanel open={isOpen} anchorEl={buttonRefs.current[item.label]}>
+              {item.children!.map((child) => (
+                <Link
+                  key={child.href}
+                  href={child.href}
+                  role="menuitem"
+                  onClick={() => setOpenLabel(null)}
+                  className={cn(
+                    "block whitespace-normal px-5 py-2.5 text-[15px] tracking-[0.2px] transition-colors hover:text-[#0055CC] dark:hover:text-[#7CC4FF]",
+                    isActiveChild(child.href)
+                      ? "font-medium text-[#0055CC] dark:text-[#7CC4FF]"
+                      : "text-slate-700 dark:text-[#E0E0E0]"
+                  )}
+                >
+                  {child.label}
+                  {child.description ? (
+                    <span className="mt-0.5 block text-xs font-normal text-slate-500 dark:text-slate-400">
+                      {child.description}
+                    </span>
+                  ) : null}
+                </Link>
+              ))}
+            </NavDropdownPanel>
           </div>
         );
       })}
