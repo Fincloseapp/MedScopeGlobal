@@ -1,4 +1,5 @@
 import { createServiceRoleClient } from "@/lib/supabase/service";
+import { V22_STUDY_GAMES } from "@/lib/v22/games";
 import type { V25ContentImageRow } from "@/lib/v25/images/types";
 
 type TableConfig = {
@@ -81,6 +82,21 @@ const TABLES: TableConfig[] = [
     limit: 40,
   },
 ];
+
+/** Static kvizy / study games (no DB image column) — included in v25 image cron backfill. */
+export function loadStaticQuizImageRows(): V25ContentImageRow[] {
+  return V22_STUDY_GAMES.map((g) => ({
+    id: `quiz-${g.slug}`,
+    slug: g.slug,
+    section: "quizzes",
+    title: g.title,
+    excerpt: g.description,
+    imageUrl: null,
+    table: "",
+    imageColumn: "",
+    metadata: { module: "study", topic: g.topic },
+  }));
+}
 
 export async function loadContentRowsForImages(): Promise<V25ContentImageRow[]> {
   const admin = createServiceRoleClient();

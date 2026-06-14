@@ -2,6 +2,7 @@ import { appendV25Log } from "@/lib/v25/data-store";
 import { mergeV25SystemState, updateV25TestStatus } from "@/lib/v25/system-state";
 import {
   loadContentRowsForImages,
+  loadStaticQuizImageRows,
   updateContentImageUrl,
   uploadImageToMediaBucket,
 } from "@/lib/v25/images/content-loader";
@@ -60,7 +61,8 @@ export async function runV25ImagePipeline(options?: {
   const contentRows = options?.skipDb ? [] : await loadContentRowsForImages();
   const registry = loadImageRegistryLocal();
   const facultyRows = detector.buildStaticMissingFaculties(registry);
-  const allRows = [...contentRows, ...facultyRows];
+  const quizRows = loadStaticQuizImageRows();
+  const allRows = [...contentRows, ...facultyRows, ...quizRows];
 
   const detection = detector.detectMissingImages(allRows) as {
     missing: number;
@@ -141,7 +143,13 @@ export async function runV25ImagePipeline(options?: {
         continue;
       }
 
-      if (item.table && item.imageColumn && item.id && !item.id.startsWith("faculty-")) {
+      if (
+        item.table &&
+        item.imageColumn &&
+        item.id &&
+        !item.id.startsWith("faculty-") &&
+        !item.id.startsWith("quiz-")
+      ) {
         const updated = await updateContentImageUrl(item.table, item.imageColumn, item.id, publicUrl);
         if (!updated) {
           appendV25Log("autofix", `image db update fail ${item.table}/${item.id}`);

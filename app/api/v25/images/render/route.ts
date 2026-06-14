@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   loadContentRowsForImages,
+  loadStaticQuizImageRows,
   updateContentImageUrl,
   uploadImageToMediaBucket,
 } from "@/lib/v25/images/content-loader";
@@ -46,7 +47,7 @@ function contentTypeForPath(path: string, fallback?: string) {
 }
 
 async function findContentRow(section: string, slug: string) {
-  const rows = await loadContentRowsForImages();
+  const rows = [...(await loadContentRowsForImages()), ...loadStaticQuizImageRows()];
   return rows.find((r) => r.section === section && r.slug === slug);
 }
 

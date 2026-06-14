@@ -1,11 +1,8 @@
 import {
-
   loadContentRowsForImages,
-
+  loadStaticQuizImageRows,
   updateContentImageUrl,
-
   uploadImageToMediaBucket,
-
 } from "@/lib/v25/images/content-loader";
 
 import { isLegacyImageUrl } from "@/lib/v25/images/legacy-images";
@@ -50,6 +47,8 @@ function moduleForSection(section: string) {
 
   if (section.includes("stud")) return "study";
 
+  if (section.includes("quiz")) return "study";
+
   if (section.includes("verejnost")) return "verejnost";
 
   return "medicina";
@@ -78,7 +77,9 @@ function contentTypeForPath(path: string, fallback?: string) {
 
 export async function runLegacyImageBackfill(maxItems = 64) {
 
-  const rows = (await loadContentRowsForImages()).filter((r) => isLegacyImageUrl(r.imageUrl));
+  const rows = [...(await loadContentRowsForImages()), ...loadStaticQuizImageRows()].filter((r) =>
+    isLegacyImageUrl(r.imageUrl)
+  );
 
   const gen = (await import("@/lib/v25/images/generator-engine.mjs")) as GenModule;
 

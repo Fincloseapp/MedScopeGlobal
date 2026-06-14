@@ -11,6 +11,7 @@ export type V25ImageSection =
   | "digital_health"
   | "university-faculty"
   | "quizzes"
+  | "verejnost"
   | "specialty";
 
 export type V25ImageRecord = {
