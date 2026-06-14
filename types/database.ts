@@ -50,6 +50,8 @@ export interface Article {
   source_url?: string | null;
   source_name?: string | null;
   quiz_json?: Record<string, unknown> | null;
+  meta_description?: string | null;
+  metadata?: Record<string, unknown> | null;
   created_at: string;
   updated_at: string | null;
 }

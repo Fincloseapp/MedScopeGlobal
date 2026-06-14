@@ -37,6 +37,8 @@ const jobs = [
   { name: "daily-autopublish", path: "/api/cron/daily-autopublish" },
   { name: "v24-ultra", path: "/api/cron/v24-ultra" },
   { name: "v25-enterprise", path: "/api/cron/v25-enterprise" },
+  { name: "v26-rewrite", path: "/api/cron/v26-rewrite?batch=6" },
+  { name: "v26-autonomous", path: "/api/cron/v26-autonomous?skipDeploy=1" },
   { name: "marketing", path: "/api/cron/marketing" },
 ];
 

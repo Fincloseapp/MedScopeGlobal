@@ -7,12 +7,15 @@ import { ensureIngestionAuthor } from "@/lib/setup/ensure-ingestion-author";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { slugify } from "@/lib/utils";
 import type { RawFeedItem } from "@/lib/ingestion/rss";
+import { runV26ForeignNewsIngest } from "@/lib/v26/foreign-news-ingest";
+import { V26_EDITORIAL_VERSION } from "@/lib/v26/version";
 
 export interface IngestionResult {
   runId: string;
   created: number;
   skipped: number;
   errors: string[];
+  v26Foreign?: { created: number; skipped: number; errors: string[] };
 }
 
 interface QueueItem extends RawFeedItem {
@@ -197,7 +200,19 @@ export async function runIngestionPipeline(options: {
     data: { run_id: runId, created, skipped, errors: errors.length },
   });
 
-  return { runId, created, skipped, errors };
+  let v26Foreign: IngestionResult["v26Foreign"];
+  try {
+    v26Foreign = await runV26ForeignNewsIngest({
+      maxArticles: Math.min(8, Math.max(maxArticles - created, 0) || 6),
+    });
+    created += v26Foreign.created;
+    skipped += v26Foreign.skipped;
+    errors.push(...v26Foreign.errors);
+  } catch (e) {
+    errors.push(`v26 foreign: ${(e as Error).message}`);
+  }
+
+  return { runId, created, skipped, errors, v26Foreign };
 }
 
 async function upsertIngestedArticle({
@@ -295,6 +310,14 @@ async function upsertIngestedArticle({
       license: "source",
       hash_dedup: hash,
       meta_description: processed.excerpt,
+      metadata: {
+        editorial_version: V26_EDITORIAL_VERSION,
+        source_citation: {
+          name: item.sourceName,
+          url: item.link,
+          originalTitle: item.title,
+        },
+      },
       updated_at: new Date().toISOString(),
     };
 

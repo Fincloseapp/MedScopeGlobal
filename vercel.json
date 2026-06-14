@@ -98,6 +98,14 @@
     {
       "path": "/api/cron/marketing",
       "schedule": "0 19 * * *"
+    },
+    {
+      "path": "/api/cron/v26-rewrite",
+      "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/cron/v26-autonomous",
+      "schedule": "30 4 * * *"
     }
   ],
   
