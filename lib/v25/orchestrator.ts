@@ -29,7 +29,7 @@ import {
   runProAdEngineStep,
   runMarketingCoordinatorStep,
 } from "@/lib/v25/runners/marketing";
-import { runV25TestSuite } from "@/lib/v25/tests/run-suite.ts";
+import { runV25TestSuite } from "@/lib/v25/tests/run-suite";
 
 export type V25PipelineMode = "full" | "quick" | "suite";
 
