@@ -3,7 +3,7 @@ import { isLegacyImageUrl, isPlaceholderImageUrl } from "@/lib/v25/images/legacy
 /** Curated European medical stock — fair-skinned hands, clinical settings (v25.1). */
 const CURATED_PHOTOS: Record<string, string> = {
   medicina:
-    "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp",
+    "https://images.unsplash.com/photo-1584515930387-285e4804f4cb?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp",
   study:
     "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp",
   hero:
@@ -13,7 +13,7 @@ const CURATED_PHOTOS: Record<string, string> = {
   digitalHealth:
     "https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp",
   verejnost:
-    "https://images.unsplash.com/photo-1559839734-2ee710d67ef2?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp",
+    "https://images.unsplash.com/photo-1584515930387-285e4804f4cb?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp",
 };
 
 const TOPIC_MODULE: Record<string, keyof typeof CURATED_PHOTOS> = {
@@ -34,7 +34,11 @@ export function resolveVerejnostCoverUrl(article: {
   public_topic?: string | null;
 }): string {
   const url = article.cover_image_url?.trim();
-  if (url && !isLegacyImageUrl(url) && !isPlaceholderImageUrl(url)) return url;
+  const isRasterV25 =
+    url &&
+    /supabase\.co\/storage\/v1\/object\/public\/media\/v25-images\/.*\.(jpg|jpeg|png|webp)(\?|$)/i.test(url);
+  if (url && isRasterV25) return url;
+  if (url && !isLegacyImageUrl(url) && !isPlaceholderImageUrl(url) && !/\.svg/i.test(url)) return url;
 
   const topic = article.public_topic ?? "zivotni-styl";
   const module = TOPIC_MODULE[topic] ?? "verejnost";

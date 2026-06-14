@@ -5,17 +5,17 @@ import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
+import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 import { articleTopicLabel, verejnostDateLabel } from "@/lib/verejnost/helpers";
 import { cn } from "@/lib/utils";
 
 export function VerejnostArticleExpandable({
   article,
-  coverUrl,
 }: {
   article: DisplayArticle;
-  coverUrl: string;
 }) {
   const [open, setOpen] = useState(false);
+  const image = resolveVerejnostCoverUrl(article);
   const dateLabel = verejnostDateLabel(article);
   const topicLabel = articleTopicLabel(article);
   const isInterview = article.public_topic === "rozhovory";
@@ -36,7 +36,7 @@ export function VerejnostArticleExpandable({
         aria-expanded={open}
       >
         <div className="relative aspect-[16/10] bg-slate-100">
-          <Image src={coverUrl} alt="" fill className="object-cover" sizes="50vw" loading="lazy" />
+          <Image src={image} alt="" fill className="object-cover" sizes="50vw" loading="lazy" />
           {isInterview ? (
             <span className="absolute bottom-3 left-3 rounded-full bg-[#021d33]/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
               Rozhovor
