@@ -15,10 +15,14 @@ export function v24LogPath(...parts: string[]) {
 }
 
 export function writeV24Json(relativePath: string, data: unknown) {
-  const full = v24DataPath(relativePath);
-  ensureDir(join(full, ".."));
-  writeFileSync(full, JSON.stringify(data, null, 2), "utf8");
-  return full;
+  try {
+    const full = v24DataPath(relativePath);
+    ensureDir(join(full, ".."));
+    writeFileSync(full, JSON.stringify(data, null, 2), "utf8");
+    return full;
+  } catch {
+    return null;
+  }
 }
 
 export function readV24Json<T>(relativePath: string): T | null {
@@ -32,11 +36,15 @@ export function readV24Json<T>(relativePath: string): T | null {
 }
 
 export function appendV24Log(category: keyof typeof V24_LOG_PATHS, line: string) {
-  const dir = v24LogPath(V24_LOG_PATHS[category]);
-  ensureDir(dir);
-  const file = join(dir, `${new Date().toISOString().slice(0, 10)}.log`);
-  appendFileSync(file, `[${new Date().toISOString()}] ${line}\n`, "utf8");
-  return file;
+  try {
+    const dir = v24LogPath(V24_LOG_PATHS[category]);
+    ensureDir(dir);
+    const file = join(dir, `${new Date().toISOString().slice(0, 10)}.log`);
+    appendFileSync(file, `[${new Date().toISOString()}] ${line}\n`, "utf8");
+    return file;
+  } catch {
+    return null;
+  }
 }
 
 export function artifactPath(section: string, topicHash: string) {
