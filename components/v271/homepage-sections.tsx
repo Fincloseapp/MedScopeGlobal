@@ -129,19 +129,18 @@ export async function V272AktualniBlock() {
               <V20ArticleCard key={article.slug} article={article} />
             ))}
           </div>
-        ) : (
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {V271_AKTUALNI.links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-2xl border border-slate-200 bg-white p-4 text-sm font-medium text-[#021d33] transition hover:border-[#005B96]/40 hover:shadow-sm"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        )}
+        ) : null}
+        <div className={articles.length > 0 ? "mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" : "mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"}>
+          {V271_AKTUALNI.links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-2xl border border-slate-200 bg-white p-4 text-sm font-medium text-[#021d33] transition hover:border-[#005B96]/40 hover:shadow-sm"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );

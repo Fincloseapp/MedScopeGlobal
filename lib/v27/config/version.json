@@ -1,6 +1,6 @@
 {
-  "engine": "27.2",
-  "ui": "v27.2",
+  "engine": "27.3",
+  "ui": "v27.3",
   "editorial": "27",
-  "buildStamp": "v27.2-homepage-ui-images-subscription-20260615"
+  "buildStamp": "v27.3-image-purge-homepage-ui-20260615"
 }
