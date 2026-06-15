@@ -46,6 +46,7 @@
     "verify-v25": "node scripts/verify-v25.0.mjs",
     "smoke:v26": "node scripts/v26-smoke.mjs",
     "smoke:v26.1": "node scripts/v26.1-homepage-smoke.mjs",
+    "smoke:v27": "node scripts/v27-smoke.mjs",
     "images:backfill": "node scripts/run-v25-image-backfill.mjs",
     "auto:git": "node scripts/auto-git-commit-push.js",
     "auto:git:push": "node scripts/auto-git-commit-push.js --push-only",

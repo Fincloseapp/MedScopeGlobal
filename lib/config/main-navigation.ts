@@ -8,6 +8,41 @@ export type NavItem = {
 
 const menuCs: NavItem[] = [
   {
+    label: "Pro veřejnost",
+    href: "/verejnost",
+    children: [
+      { label: "Přehled", href: "/verejnost", description: "Prevence, výživa, spánek a fitness" },
+      { label: "Články", href: "/verejnost/clanky", description: "Krátké srozumitelné články" },
+      { label: "Témata", href: "/verejnost/temata", description: "Najdi svůj problém" },
+      { label: "Rozhovory", href: "/verejnost/rozhovory", description: "Rozhovory s odborníky" },
+      { label: "Zeptej se AI", href: "/ai-asistent/verejnost", description: "Veřejný AI asistent" },
+    ],
+  },
+  {
+    label: "Pro studenty",
+    href: "/studium",
+    children: [
+      { label: "Přehled studia", href: "/studium", description: "Anatomie, farmakologie, zkoušky" },
+      { label: "Chci studovat medicínu", href: "/studium/prijimacky", description: "Přijímačky a příprava" },
+      { label: "Lékařské fakulty", href: "/studium/univerzity", description: "8 českých LF" },
+      { label: "Kvízy a hry", href: "/medicina/hry", description: "Modelové otázky" },
+      { label: "Studijní plány", href: "/medicina/plany", description: "Harmonogramy 1.–6. ročník" },
+      { label: "AI tutor", href: "/ai-asistent/student", description: "Studentský AI asistent" },
+    ],
+  },
+  {
+    label: "Pro lékaře",
+    href: "/pro-lekare",
+    children: [
+      { label: "Přehled pro lékaře", href: "/pro-lekare", description: "Guidelines, CME, Research Hub" },
+      { label: "Odborná sekce (ČLK)", href: "/odborna", description: "Ověřený obsah pro lékaře" },
+      { label: "Studie", href: "/studie", description: "RCT, meta-analýzy, CZ souhrn" },
+      { label: "Odborné briefy", href: "/odborne/briefy", description: "Strukturované medicínské briefy" },
+      { label: "Léky", href: "/leky", description: "SÚKL, EMA, schválené přípravky" },
+      { label: "Klinický AI", href: "/ai-asistent/lekar", description: "AI asistent pro praxi" },
+    ],
+  },
+  {
     label: "Články",
     href: "/articles",
     children: [
@@ -22,26 +57,6 @@ const menuCs: NavItem[] = [
         href: "/articles?med_track=studium",
         description: "Ročníky 1.–6. a klinické obory",
       },
-    ],
-  },
-  {
-    label: "Veřejnost",
-    href: "/verejnost",
-    children: [
-      { label: "Přehled", href: "/verejnost", description: "Veřejné zdraví — prevence a životní styl" },
-      { label: "Články", href: "/verejnost/clanky", description: "Srozumitelné články pro každého" },
-      { label: "Témata", href: "/verejnost/temata", description: "Kategorie podle oblasti zdraví" },
-      { label: "Rozhovory", href: "/verejnost/rozhovory", description: "Rozhovory s lékaři a odborníky" },
-    ],
-  },
-  {
-    label: "Odborníci",
-    href: "/odborna",
-    children: [
-      { label: "Odborná sekce (ČLK)", href: "/odborna", description: "Ověřený obsah pro lékaře" },
-      { label: "Studie", href: "/studie", description: "RCT, meta-analýzy, CZ souhrn" },
-      { label: "Odborné briefy", href: "/odborne/briefy", description: "Strukturované medicínské briefy" },
-      { label: "Léky", href: "/leky", description: "SÚKL, EMA, schválené přípravky" },
     ],
   },
   {
@@ -63,21 +78,6 @@ const menuCs: NavItem[] = [
         href: "/pro-koho/vedec",
         description: "Studie, evidence a výzkumné přehledy",
       },
-    ],
-  },
-  {
-    label: "Studenti",
-    href: "/studium",
-    children: [
-      { label: "Přehled studia", href: "/studium", description: "Fakulty, přijímačky a studijní obsah" },
-      { label: "Lékařské fakulty", href: "/studium/univerzity", description: "8 českých LF — přehled a odkazy" },
-      { label: "Přijímačky", href: "/studium/prijimacky", description: "Termíny a požadavky fakult" },
-      { label: "Přehled oborů", href: "/medicina" },
-      { label: "Příprava na LF", href: "/medicina/priprava" },
-      { label: "Studium 1.–6. ročník", href: "/medicina/studium" },
-      { label: "Anatomie a fyziologie", href: "/medicina/studium?obor=anatomie" },
-      { label: "Kvízy a hry", href: "/medicina/hry" },
-      { label: "Studijní plány", href: "/medicina/plany" },
     ],
   },
   { label: "Sekce", href: "/sections" },
@@ -113,13 +113,19 @@ const menuCs: NavItem[] = [
   { label: "Kongresy", href: "/kongresy" },
   { label: "Kariéra", href: "/kariera" },
   {
-    label: "B2B",
-    href: "/organizace",
+    label: "Pro firmy",
+    href: "/pro-firmy",
     children: [
+      { label: "B2B přehled", href: "/pro-firmy", description: "Pharma, kliniky, univerzity" },
+      { label: "Ceník inzerce", href: "/pro-firmy#ceny", description: "Reklamní balíčky" },
+      { label: "Inzerce", href: "/inzerce", description: "Formulář a sponzorství" },
       { label: "Organizace", href: "/organizace", description: "Licence a instituce" },
-      { label: "Inzerce", href: "/inzerce", description: "Reklama a sponzorství" },
-      { label: "Partnerství", href: "/organizace/partnerstvi" },
+      { label: "Partnerství", href: "/organizace/partnerstvi", description: "Univerzitní spolupráce" },
     ],
+  },
+  {
+    label: "Předplatné",
+    href: "/predplatne",
   },
 ];
 

@@ -131,6 +131,27 @@ export async function POST(request: Request) {
         });
       }
 
+      if (session.metadata?.v27_checkout === "true" && session.id) {
+        await admin
+          .from("v27_orders")
+          .update({
+            status: "paid",
+            stripe_payment_intent_id: (session.payment_intent as string) ?? null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("stripe_session_id", session.id);
+        await logSecurityEvent({
+          ip,
+          action: "stripe:v27_checkout_completed",
+          status: "ok",
+          details: {
+            sessionId: session.id,
+            kind: session.metadata?.kind,
+            productId: session.metadata?.product_id,
+          },
+        });
+      }
+
       if (userId && subscriptionId) {
         await logSecurityEvent({
           ip,

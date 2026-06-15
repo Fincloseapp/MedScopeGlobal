@@ -1,10 +1,9 @@
-/** MedScope v26 — editorial engine + site version (single source of truth) */
+/** MedScope v26 — editorial engine (v27 extends UI version) */
 export const V26_ENGINE_VERSION = "26.1";
 export const V26_EDITORIAL_VERSION = "26";
-export const V26_UI_VERSION = "v26.1";
-export const V26_UI_BUILD_STAMP = "v26.1-nav-clamp-20260614";
 
-/** Display label for homepage hero and UI badges */
-export function getSiteVersionLabel(): string {
-  return V26_UI_VERSION;
-}
+export {
+  V27_UI_VERSION as V26_UI_VERSION,
+  V27_UI_BUILD_STAMP as V26_UI_BUILD_STAMP,
+  getSiteVersionLabel,
+} from "@/lib/v27/version";
