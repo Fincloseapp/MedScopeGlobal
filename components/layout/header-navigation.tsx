@@ -7,7 +7,7 @@ import type { NavItem } from "@/lib/config/main-navigation";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEM =
-  "inline-flex shrink-0 items-center whitespace-nowrap py-1 text-[15.5px] font-normal leading-none tracking-[0.2px] lg:font-medium";
+  "inline-flex shrink-0 items-center whitespace-nowrap py-1 text-[14px] font-normal leading-none tracking-[0.15px] lg:text-[14.5px] lg:font-medium xl:text-[15.5px]";
 
 const NAV_LINK = cn(
   NAV_ITEM,
@@ -96,7 +96,7 @@ function NavDropdownPanel({
   );
 }
 
-/** v26.1 — viewport-safe dropdowns (fixed anchor, scroll, flip) */
+/** v27.2 — viewport-safe dropdowns + horizontal scroll for overflow */
 export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
   const pathname = usePathname();
   const [openLabel, setOpenLabel] = useState<string | null>(null);
@@ -132,7 +132,7 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
   return (
     <nav
       ref={navRef}
-      className="hidden min-w-0 flex-1 flex-nowrap items-center justify-end gap-4 overflow-visible md:flex lg:gap-[17px] xl:gap-[18px]"
+      className="header-nav-scroll hidden min-w-0 flex-1 flex-nowrap items-center justify-end gap-2 overflow-x-auto overflow-y-visible md:flex lg:gap-3 xl:gap-4"
       aria-label="Hlavní navigace"
     >
       {mainMenu.map((item) => {

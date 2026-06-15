@@ -2,6 +2,10 @@
 
 export type V27Audience = "public" | "student" | "physician" | "b2b";
 
+export type V27SubscriptionTier = "public" | "student" | "physician";
+
+export type V27BillingInterval = "month" | "year";
+
 export const V27_AUDIENCES = {
   public: {
     id: "public" as const,
@@ -49,20 +53,42 @@ export const V27_AUDIENCES = {
   },
 } as const;
 
-/** Digital mini-products (public) */
-export const V27_MINI_PRODUCTS = [
-  { id: "sleep-guide", name: "Průvodce spánkem", priceCzk: 149, slug: "spankovy-pruvodce" },
-  { id: "nutrition-plan", name: "Výživový plán na míru", priceCzk: 199, slug: "vyzivovy-plan" },
-  { id: "stress-toolkit", name: "Stres a regenerace", priceCzk: 249, slug: "stres-regenerace" },
+/** Permanent subscription tiers — monthly + annual */
+export const V27_SUBSCRIPTION_PLANS = [
+  {
+    tier: "public" as const,
+    name: "Veřejnost",
+    monthlyCzk: 99,
+    annualCzk: 990,
+    features: ["Prevence a životní styl", "AI asistent pro veřejnost", "Bez reklam v článcích"],
+  },
+  {
+    tier: "student" as const,
+    name: "Student LF",
+    monthlyCzk: 149,
+    annualCzk: 1490,
+    features: ["Kvízy a studijní plány", "AI tutor", "Modelové otázky"],
+  },
+  {
+    tier: "physician" as const,
+    name: "Lékař v praxi",
+    monthlyCzk: 490,
+    annualCzk: 4900,
+    features: ["Odborná sekce a guidelines", "CME přehledy", "Klinický AI asistent"],
+  },
 ] as const;
 
-/** Subscription tiers */
+/** @deprecated Use V27_SUBSCRIPTION_PLANS — kept for legacy checkout IDs */
+export const V27_MINI_PRODUCTS = [] as const;
+
+/** Legacy monthly-only map for smoke tests */
 export const V27_SUBSCRIPTIONS = {
+  public: { id: "public", name: "Veřejnost", priceCzk: 99, interval: "month" as const },
   student: { id: "student", name: "Student LF", priceCzk: 149, interval: "month" as const },
   physician: { id: "physician", name: "Lékař v praxi", priceCzk: 490, interval: "month" as const },
 } as const;
 
-/** Expert PDFs for professionals */
+/** Expert PDFs — secondary, not primary monetization */
 export const V27_EXPERT_PDFS = [
   { id: "guidelines-pack", name: "Souhrn guidelines 2026", priceCzk: 199 },
   { id: "diagnostics-algo", name: "Diagnostické algoritmy", priceCzk: 299 },
@@ -75,3 +101,18 @@ export const V27_B2B_PACKAGES = [
   { id: "clinic-pro", name: "Klinika / Lab Pro", priceCzk: 25000, desc: "Segmentace + kampaň na 3 měsíce" },
   { id: "university", name: "Univerzitní partnerství", priceCzk: 45000, desc: "Studijní obsah + branding LF" },
 ] as const;
+
+export function parseSubscriptionProductId(productId: string): {
+  tier: V27SubscriptionTier;
+  interval: V27BillingInterval;
+} | null {
+  const [tier, interval] = productId.split("-") as [string, string | undefined];
+  const validTiers: V27SubscriptionTier[] = ["public", "student", "physician"];
+  if (!validTiers.includes(tier as V27SubscriptionTier)) return null;
+  const billing: V27BillingInterval = interval === "year" ? "year" : "month";
+  return { tier: tier as V27SubscriptionTier, interval: billing };
+}
+
+export function subscriptionProductId(tier: V27SubscriptionTier, interval: V27BillingInterval): string {
+  return interval === "year" ? `${tier}-year` : `${tier}-month`;
+}

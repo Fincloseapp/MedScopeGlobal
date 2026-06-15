@@ -40,9 +40,9 @@ export function HeaderLogo({ centered = false, className, priority = true }: Pro
           className="p-0"
           imageClassName={cn(
             "w-auto object-contain [letter-spacing:0.12px]",
-            "h-14 min-w-[168px] max-w-[240px]",
-            "md:h-14 md:min-w-[170px] md:max-w-[232px]",
-            "lg:h-[70px] lg:min-w-[196px] lg:max-w-[300px]"
+            "h-14 min-w-[148px] max-w-[200px]",
+            "md:h-14 md:min-w-[150px] md:max-w-[210px]",
+            "lg:h-[64px] lg:min-w-[168px] lg:max-w-[240px]"
           )}
         />
       </span>
@@ -51,7 +51,7 @@ export function HeaderLogo({ centered = false, className, priority = true }: Pro
           "tagline font-extralight leading-tight",
           "text-xs tracking-[0.35px] opacity-80",
           "lg:mt-1 lg:text-[13px] lg:opacity-75",
-          centered ? "text-center" : "text-left",
+          centered ? "text-center" : "hidden text-left xl:block",
           "text-[#6A6A6A] dark:text-[#A0A0A0] dark:opacity-85"
         )}
       >

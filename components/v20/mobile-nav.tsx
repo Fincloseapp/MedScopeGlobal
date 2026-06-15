@@ -140,7 +140,7 @@ export function V20MobileNav({
 
         <div className="mt-4 shrink-0 flex flex-col gap-2 border-t border-slate-200 pt-4">
           <Button asChild className="rounded-full bg-primary touch-manipulation">
-            <Link href="/subscribe" onClick={() => setOpen(false)}>
+            <Link href="/predplatne" onClick={() => setOpen(false)}>
               Předplatné
             </Link>
           </Button>

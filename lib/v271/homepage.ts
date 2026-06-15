@@ -1,8 +1,11 @@
-/** MedScope v27.1 — homepage copy and CTA wiring */
-import { V27_MINI_PRODUCTS, V27_SUBSCRIPTIONS } from "@/lib/v27/config";
+/** MedScope v27.2 — homepage copy and CTA wiring */
+import { V27_SUBSCRIPTION_PLANS } from "@/lib/v27/config";
+import { getSiteVersionLabel } from "@/lib/v27/version";
 
 export const V271_HERO = {
-  eyebrow: "MedScope v27.1",
+  get eyebrow() {
+    return `MedScope ${getSiteVersionLabel()}`;
+  },
   claim: "Nejmodernější zdravotnický magazín pro veřejnost, studenty a lékaře",
   subtitle:
     "Prevence a životní styl pro veřejnost, studijní nástroje pro budoucí lékaře a evidence-based obsah pro praxi — na jedné platformě.",
@@ -53,8 +56,9 @@ export const V271_B2B = {
 } as const;
 
 export const V271_AKTUALNI = {
-  title: "Aktuální medicína",
-  description: "Zahraniční a domácí zprávy, studie a lékové novinky v češtině.",
+  title: "Aktuální zprávy",
+  description:
+    "Zahraniční a domácí zdravotnické zprávy — přepsané podle redakčního standardu MedScopeGlobal v27.",
   href: "/aktualni-zpravy",
   cta: "Číst zprávy",
   links: [
@@ -65,5 +69,4 @@ export const V271_AKTUALNI = {
   ],
 } as const;
 
-export const V271_MINI_PRODUCTS = V27_MINI_PRODUCTS;
-export const V271_SUBSCRIPTIONS = V27_SUBSCRIPTIONS;
+export const V271_SUBSCRIPTION_PLANS = V27_SUBSCRIPTION_PLANS;

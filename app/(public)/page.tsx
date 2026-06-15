@@ -3,7 +3,7 @@ import Link from "next/link";
 import { HomepageAds } from "@/components/home/homepage-ads";
 import { V20ArticleCard } from "@/components/v20/article-card";
 import { V271HomeHero } from "@/components/v271/home-hero";
-import { V271HomepageSections } from "@/components/v271/homepage-sections";
+import { V272HomepageSections } from "@/components/v271/homepage-sections";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { medicalWebPageJsonLd, webSiteJsonLd } from "@/lib/seo/json-ld";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
@@ -36,7 +36,7 @@ export default async function HomePage() {
       <JsonLdScript data={homeLd} />
 
       <V271HomeHero />
-      <V271HomepageSections />
+      <V272HomepageSections />
 
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
 

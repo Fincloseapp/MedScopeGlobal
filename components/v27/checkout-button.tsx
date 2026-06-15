@@ -11,7 +11,7 @@ type Props = {
   className?: string;
 };
 
-export function V27CheckoutButton({ kind, productId, label = "Koupit", className }: Props) {
+export function V27CheckoutButton({ kind, productId, label = "Předplatit", className }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

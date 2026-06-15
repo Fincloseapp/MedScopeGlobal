@@ -45,20 +45,20 @@ export function SiteHeader({
         </div>
       </div>
 
-      {/* Tablet + Desktop — 92px stabilized row */}
-      <div className="mx-auto hidden h-[92px] max-w-[1680px] items-center justify-between gap-3 px-7 md:flex">
-        <HeaderLogo className="shrink-0" />
+      {/* Tablet + Desktop — stabilized row, logo + scrollable nav */}
+      <div className="mx-auto hidden h-[92px] max-w-[1680px] items-center gap-2 px-4 md:flex lg:gap-3 lg:px-7">
+        <HeaderLogo className="max-w-[min(38vw,220px)] shrink-0 lg:max-w-[260px]" />
 
-        <div className="flex min-w-0 flex-1 items-center justify-end gap-3 lg:gap-4">
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-2 lg:gap-3">
           <HeaderNavigation mainMenu={mainMenu} />
 
-          <div className="flex shrink-0 items-center gap-1.5 border-l border-black/[0.06] pl-3 dark:border-white/10 lg:pl-4">
+          <div className="flex shrink-0 items-center gap-1 border-l border-black/[0.06] pl-2 dark:border-white/10 lg:gap-1.5 lg:pl-3">
             <SearchCommand isVip={isVip} accessLevel={accessLevel} />
             <ThemeToggle />
             <Link
-              href="/subscribe"
+              href="/predplatne"
               prefetch
-              className="hidden whitespace-nowrap text-[15.5px] font-normal tracking-[0.2px] text-slate-800 transition-colors hover:text-[#0055CC] hover:underline xl:inline dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF]"
+              className="hidden whitespace-nowrap text-[14px] font-normal tracking-[0.15px] text-slate-800 transition-colors hover:text-[#0055CC] hover:underline xl:inline dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF]"
             >
               Předplatné
             </Link>

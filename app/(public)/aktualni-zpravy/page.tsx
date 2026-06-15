@@ -5,6 +5,7 @@ import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getArticlesByMetadataSection } from "@/lib/queries/articles";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { V27_EDITORIAL_COPY_LABEL } from "@/lib/v27/version";
 
 export const revalidate = 120;
 
@@ -13,8 +14,7 @@ const SECTION_SLUG = "aktuální-zprávy";
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({
     title: "Aktuální zprávy — MedScopeGlobal",
-    description:
-      "Zahraniční a domácí zdravotnické zprávy v redakčním standardu v26 — srozumitelně pro praxi i veřejnost.",
+    description: `Zahraniční a domácí zdravotnické zprávy ${V27_EDITORIAL_COPY_LABEL} — srozumitelně pro praxi i veřejnost.`,
     path: "/aktualni-zpravy",
   });
 }
@@ -34,7 +34,7 @@ export default async function AktualniZpravyPage() {
     <ModulePageShell
       eyebrow="Zpravodajství"
       title="Aktuální zprávy"
-      description="Vybrané zdravotnické zprávy ze světových zdrojů — přepsané do češtiny podle redakčního standardu MedScopeGlobal v26."
+      description={`Vybrané zdravotnické zprávy ze světových zdrojů — ${V27_EDITORIAL_COPY_LABEL}.`}
       ctaHref="/articles"
       ctaLabel="Všechny články"
     >

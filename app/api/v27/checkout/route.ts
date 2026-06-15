@@ -34,6 +34,7 @@ export async function POST(request: Request) {
 
   const stripe = new Stripe(secret);
   const amount = Math.round(item.priceCzk * 100);
+  const recurringInterval = item.billingInterval === "year" ? "year" : "month";
 
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode: item.mode,
@@ -44,6 +45,7 @@ export async function POST(request: Request) {
       kind: `v27_${kind}`,
       product_id: productId,
       v27_checkout: "true",
+      billing_interval: item.billingInterval ?? "month",
       ...(userId ? { user_id: userId } : {}),
     },
     line_items: [
@@ -56,7 +58,9 @@ export async function POST(request: Request) {
             name: item.name,
             description: `MedScopeGlobal — ${item.name}`,
           },
-          ...(item.mode === "subscription" ? { recurring: { interval: "month" } } : {}),
+          ...(item.mode === "subscription"
+            ? { recurring: { interval: recurringInterval } }
+            : {}),
         },
       },
     ],
@@ -72,6 +76,8 @@ export async function POST(request: Request) {
     amount_czk: item.priceCzk,
     status: "pending",
     user_id: userId ?? null,
+    billing_interval: item.billingInterval ?? null,
+    metadata: { billing_interval: item.billingInterval ?? "month" },
   });
 
   return NextResponse.json({ url: session.url, sessionId: session.id });

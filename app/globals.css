@@ -69,4 +69,18 @@
   .v20-category-card {
     @apply overflow-hidden;
   }
+
+  /* v27.2 — header nav horizontal scroll, no logo overlap */
+  .header-nav-scroll {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .header-nav-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .site-header .logo-block {
+    @apply relative z-10;
+  }
 }

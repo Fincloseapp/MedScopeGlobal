@@ -39,7 +39,7 @@ const jobs = [
   { name: "v25-enterprise", path: "/api/cron/v25-enterprise" },
   { name: "v26-rewrite", path: "/api/cron/v26-rewrite?batch=6" },
   { name: "v26-autonomous", path: "/api/cron/v26-autonomous?skipDeploy=1" },
-  { name: "marketing", path: "/api/cron/marketing" },
+  { name: "v25-images", path: "/api/cron/v25-images" },
 ];
 
 async function runJob(job) {
