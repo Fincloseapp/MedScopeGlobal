@@ -34,6 +34,13 @@ export const V27_AI_WRITERS: V27AiWriter[] = [
     role: "Guidelines, studie, klinické algoritmy",
     systemPrompt: `${BASE_RULES} Cílová skupina: lékaři. Evidence-based, citace PubMed/guidelines, klinický dopad.`,
   },
+  {
+    id: "b2b-writer",
+    audience: "b2b",
+    name: "B2B redakce",
+    role: "Sponzorovaný obsah a pharma komunikace",
+    systemPrompt: `${BASE_RULES} Cílová skupina: firmy a instituce. Profesionální tón, compliance, transparentní označení sponzorství.`,
+  },
 ];
 
 export function getV27WriterForAudience(audience: V27Audience): V27AiWriter | undefined {

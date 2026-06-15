@@ -28,10 +28,12 @@ const ROUTES = [
   "/",
   "/verejnost",
   "/verejnost/clanky",
-  "/studium",
-  "/studium/prijimacky",
-  "/pro-lekare",
-  "/pro-firmy",
+  "/studenti",
+  "/studenti/anatomie",
+  "/lekari",
+  "/lekari/guidelines",
+  "/firmy",
+  "/firmy/cenik",
   "/predplatne",
   "/ai-asistent",
   "/ai-asistent/verejnost",
@@ -85,7 +87,7 @@ if (home?.text && !home.text.includes(versionConfig.ui)) {
   console.log(`✗ Homepage missing expected version ${versionConfig.ui}`);
 }
 
-const audienceChecks = ["/verejnost", "/studium", "/pro-lekare"];
+const audienceChecks = ["/verejnost", "/studenti", "/lekari"];
 for (const route of audienceChecks) {
   const r = results.find((x) => x.route === route);
   if (r?.ok) console.log(`✓ Audience section ${route} OK`);

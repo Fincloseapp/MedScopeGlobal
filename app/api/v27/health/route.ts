@@ -15,6 +15,8 @@ export async function GET() {
       "editorial-v27",
       "b2b-hub",
       "admin-revenue",
+      "homepage-v271",
+      "routes-studenti-lekari-firmy",
     ],
     audiences: ["public", "student", "physician", "b2b"],
     ts: new Date().toISOString(),

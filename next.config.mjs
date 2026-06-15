@@ -70,9 +70,11 @@ const nextConfig = {
 
       { source: "/categories/:path*", destination: "/studie", permanent: true },
 
-      { source: "/studenti", destination: "/studium", permanent: true },
+      { source: "/studium", destination: "/studenti", permanent: true },
 
-      { source: "/studenti/:path*", destination: "/studium/:path*", permanent: true },
+      { source: "/pro-lekare", destination: "/lekari", permanent: true },
+
+      { source: "/pro-firmy", destination: "/firmy", permanent: true },
 
       { source: "/odbornici", destination: "/odborna", permanent: true },
 
