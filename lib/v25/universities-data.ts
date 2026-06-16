@@ -13,7 +13,7 @@ export const CZ_MEDICAL_FACULTIES: CzMedicalFaculty[] = [
   { slug: "lf-uk-3", name: "3. lékařská fakulta UK", shortName: "3. LF UK", url: "https://www.lf3.cuni.cz", city: "Plzeň" },
   { slug: "lf-mu", name: "Lékařská fakulta MU", shortName: "LF MU", url: "https://www.med.muni.cz", city: "Brno" },
   { slug: "lf-up", name: "Lékařská fakulta UP", shortName: "LF UP", url: "https://www.lf.upol.cz", city: "Olomouc" },
-  { slug: "lf-os", name: "Lékařská fakulta Ostravské univerzity", shortName: "LF OU", url: "https://www.osu.cz/lf", city: "Ostrava" },
+  { slug: "lf-os", name: "Lékařská fakulta Ostravské univerzity", shortName: "LF OU", url: "https://lf.osu.cz/", city: "Ostrava" },
   { slug: "lf-plzen", name: "Lékařská fakulta v Plzni UK", shortName: "LF Plzeň", url: "https://www.lfp.cuni.cz", city: "Plzeň" },
   { slug: "lf-hk", name: "Lékařská fakulta v Hradci Králové UK", shortName: "LF HK", url: "https://www.lfhk.cuni.cz", city: "Hradec Králové" },
 ];
