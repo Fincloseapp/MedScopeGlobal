@@ -1,6 +1,4 @@
-import Link from "next/link";
 import { BookOpen, Brain, GraduationCap, Trophy } from "lucide-react";
-import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAcademyCounts } from "@/lib/academy/db";
 
@@ -17,10 +15,10 @@ export default async function AdminAcademyDashboardPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-5xl p-6">
-      <MedScopeLogo href="/admin" preset="admin-sidebar" />
-      <h1 className="mt-4 font-display text-2xl font-semibold text-[#021d33]">MedScope Academy</h1>
-      <p className="mt-2 text-sm text-slate-600">v35.0 — administrace kurzů a AI pipeline (fáze 1).</p>
+    <>
+      <p className="text-sm text-slate-600">
+        Přehled Academy v35 — API, admin sekce a homepage integrace (fáze 2).
+      </p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat) => (
@@ -35,21 +33,6 @@ export default async function AdminAcademyDashboardPage() {
           </Card>
         ))}
       </div>
-
-      <div className="mt-8 flex flex-wrap gap-3">
-        <Link
-          href="/admin/academy/courses"
-          className="rounded-full bg-[#005B96] px-5 py-2 text-sm font-medium text-white hover:bg-[#004a7a]"
-        >
-          Správa kurzů
-        </Link>
-        <Link
-          href="/academy"
-          className="rounded-full border border-[#cfe1f3] px-5 py-2 text-sm font-medium text-[#005B96] hover:bg-[#f0f7fc]"
-        >
-          Veřejný náhled
-        </Link>
-      </div>
-    </div>
+    </>
   );
 }

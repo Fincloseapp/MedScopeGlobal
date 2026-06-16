@@ -110,6 +110,14 @@
     {
       "path": "/api/cron/academy-daily",
       "schedule": "0 20 * * *"
+    },
+    {
+      "path": "/api/cron/academy-weekly",
+      "schedule": "0 21 * * 0"
+    },
+    {
+      "path": "/api/cron/academy-monthly",
+      "schedule": "0 22 1 * *"
     }
   ],
   

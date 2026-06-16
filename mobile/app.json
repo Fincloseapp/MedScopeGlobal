@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "MedScope Academy",
+    "slug": "medscope-academy",
+    "version": "35.0.0",
+    "scheme": "medscope-academy",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"],
+    "plugins": ["expo-router"]
+  }
+}

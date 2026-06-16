@@ -255,7 +255,22 @@ export async function getAcademyCounts(): Promise<Record<string, number>> {
 
 export async function checkAcademyTables(): Promise<Record<string, boolean>> {
   const admin = adminClient();
-  const tables = ["courses", "lessons", "quizzes", "ai_tasks", "leaderboard", "user_progress"];
+  const tables = [
+    "courses",
+    "lessons",
+    "quizzes",
+    "ai_tasks",
+    "leaderboard",
+    "user_progress",
+    "marketplace_courses",
+    "mentoring_sessions",
+    "video_assets",
+    "clinical_simulations",
+    "textbooks",
+    "study_games",
+    "ai_scenarios",
+    "marketing_events",
+  ];
   const result: Record<string, boolean> = {};
 
   for (const table of tables) {
@@ -264,4 +279,247 @@ export async function checkAcademyTables(): Promise<Record<string, boolean>> {
   }
 
   return result;
+}
+
+export async function listPublishedLessons(courseId?: string, limit = 100): Promise<AcademyLesson[]> {
+  const supabase = await createClient();
+  let query = supabase
+    .from("lessons")
+    .select("*")
+    .eq("status", "published")
+    .order("sort_order", { ascending: true })
+    .limit(limit);
+  if (courseId) query = query.eq("course_id", courseId);
+  const { data, error } = await query;
+  if (error) {
+    console.error("[academy] listPublishedLessons", error.message);
+    return [];
+  }
+  return (data ?? []) as AcademyLesson[];
+}
+
+export async function listPublishedQuizzes(limit = 50) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("quizzes")
+    .select("*")
+    .eq("status", "published")
+    .order("updated_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("[academy] listPublishedQuizzes", error.message);
+    return [];
+  }
+  return data ?? [];
+}
+
+export async function listMarketplaceListings(limit = 20) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("marketplace_courses")
+    .select("*")
+    .eq("status", "listed")
+    .order("updated_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("[academy] listMarketplaceListings", error.message);
+    return [];
+  }
+  return data ?? [];
+}
+
+export async function listMentoringSessions(userId?: string, limit = 20) {
+  const supabase = await createClient();
+  let query = supabase.from("mentoring_sessions").select("*").order("scheduled_at", { ascending: true }).limit(limit);
+
+  if (userId) {
+    query = query.or(`mentor_id.eq.${userId},mentee_id.eq.${userId}`);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error("[academy] listMentoringSessions", error.message);
+    return [];
+  }
+  return data ?? [];
+}
+
+export async function listVideoAssets(limit = 20) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("video_assets")
+    .select("*")
+    .eq("status", "ready")
+    .order("updated_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("[academy] listVideoAssets", error.message);
+    return [];
+  }
+  return data ?? [];
+}
+
+export async function listClinicalSimulations(limit = 20) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("clinical_simulations")
+    .select("*")
+    .eq("status", "published")
+    .order("updated_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("[academy] listClinicalSimulations", error.message);
+    return [];
+  }
+  return data ?? [];
+}
+
+export async function getSimulationBySlug(slug: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("clinical_simulations")
+    .select("*")
+    .eq("slug", slug)
+    .eq("status", "published")
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data;
+}
+
+export async function listTextbooks(limit = 20) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("textbooks")
+    .select("*")
+    .eq("status", "published")
+    .order("updated_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("[academy] listTextbooks", error.message);
+    return [];
+  }
+  return data ?? [];
+}
+
+export async function getTextbookBySlug(slug: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("textbooks")
+    .select("*")
+    .eq("slug", slug)
+    .eq("status", "published")
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data;
+}
+
+export async function listStudyGames(limit = 20) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("study_games")
+    .select("*")
+    .eq("status", "published")
+    .order("updated_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("[academy] listStudyGames", error.message);
+    return [];
+  }
+  return data ?? [];
+}
+
+export async function listAiScenarios(limit = 20) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("ai_scenarios")
+    .select("*")
+    .eq("status", "published")
+    .order("updated_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("[academy] listAiScenarios", error.message);
+    return [];
+  }
+  return data ?? [];
+}
+
+export async function listAiLogs(limit = 50) {
+  const admin = adminClient();
+  const { data, error } = await admin
+    .from("ai_logs")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function awardXp(
+  userId: string,
+  opts: { eventType: string; points: number; sourceType?: string; sourceId?: string }
+) {
+  const admin = adminClient();
+  const { data, error } = await admin
+    .from("xp_events")
+    .insert({
+      user_id: userId,
+      event_type: opts.eventType,
+      points: opts.points,
+      source_type: opts.sourceType ?? null,
+      source_id: opts.sourceId ?? null,
+    })
+    .select("*")
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function getUserProgress(userId: string, courseId?: string) {
+  const supabase = await createClient();
+  let query = supabase.from("user_progress").select("*").eq("user_id", userId);
+  if (courseId) query = query.eq("course_id", courseId);
+
+  const { data, error } = await query.order("updated_at", { ascending: false });
+  if (error) {
+    console.error("[academy] getUserProgress", error.message);
+    return [];
+  }
+  return data ?? [];
+}
+
+export async function runSystemTest(name: string) {
+  const admin = adminClient();
+  const tables = await checkAcademyTables();
+  const passed = Object.values(tables).every(Boolean);
+  const result = { tables, passed, checkedAt: new Date().toISOString() };
+
+  const { data: existing } = await admin.from("system_tests").select("id").eq("name", name).maybeSingle();
+
+  const row = {
+    name,
+    status: passed ? "passed" : "failed",
+    last_run_at: new Date().toISOString(),
+    result,
+  };
+
+  if (existing?.id) {
+    const { data, error } = await admin.from("system_tests").update(row).eq("id", existing.id).select("*").single();
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
+  const { data, error } = await admin.from("system_tests").insert(row).select("*").single();
+  if (error) throw new Error(error.message);
+  return data;
 }

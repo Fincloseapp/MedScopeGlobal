@@ -36,7 +36,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     ok: Object.values(tables).every(Boolean),
-    phase: "v35.0-phase1",
+    phase: "v35.0-phase2",
     tables,
     counts,
     dispatched,

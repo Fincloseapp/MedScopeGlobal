@@ -23,7 +23,26 @@ const base = (env.PRODUCTION_URL ?? env.PROD_BASE_URL ?? "https://medscopeglobal
   ""
 );
 
-const ROUTES = ["/academy", "/academy/courses", "/api/academy/health"];
+const ROUTES = [
+  "/academy",
+  "/academy/courses",
+  "/academy/quizzes",
+  "/academy/leaderboard",
+  "/academy/marketplace",
+  "/academy/mentoring",
+  "/academy/textbooks",
+  "/academy/ai-simulations",
+  "/academy/games",
+  "/api/academy/health",
+  "/api/academy/courses",
+  "/api/academy/quizzes",
+  "/api/academy/leaderboard",
+  "/api/academy/marketplace",
+  "/api/academy/mentoring",
+  "/api/academy/simulations",
+  "/api/academy/textbooks",
+  "/api/mobile/sync",
+];
 
 async function checkRoute(route) {
   const url = `${base}${route}`;

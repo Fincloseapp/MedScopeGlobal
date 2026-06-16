@@ -39,6 +39,13 @@ const menuCs: NavItem[] = [
     children: [
       { label: "Přehled", href: "/academy", description: "MedScope Academy v35" },
       { label: "Kurzy", href: "/academy/courses", description: "Publikované kurzy" },
+      { label: "Kvízy", href: "/academy/quizzes", description: "Testy znalostí" },
+      { label: "Simulace", href: "/academy/ai-simulations", description: "Klinické AI scénáře" },
+      { label: "Mentoring", href: "/academy/mentoring", description: "Mentoring sessions" },
+      { label: "Marketplace", href: "/academy/marketplace", description: "Prémiové kurzy" },
+      { label: "Učebnice", href: "/academy/textbooks", description: "Digitální učebnice" },
+      { label: "Žebříček", href: "/academy/leaderboard", description: "XP leaderboard" },
+      { label: "Hry", href: "/academy/games", description: "Studijní hry" },
     ],
   },
   {

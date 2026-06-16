@@ -164,3 +164,101 @@ export interface QuizSubmitResult {
   correct_count: number;
   total_count: number;
 }
+
+export interface MarketplaceListing {
+  id: string;
+  course_id: string;
+  seller_id: string | null;
+  price_czk: number;
+  status: "draft" | "listed" | "sold_out" | "archived";
+  listing_metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MentoringSession {
+  id: string;
+  mentor_id: string | null;
+  mentee_id: string | null;
+  course_id: string | null;
+  scheduled_at: string | null;
+  status: "requested" | "confirmed" | "completed" | "cancelled";
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VideoAsset {
+  id: string;
+  title: string;
+  storage_path: string | null;
+  duration_seconds: number;
+  status: "pending" | "processing" | "ready" | "failed";
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ClinicalSimulation {
+  id: string;
+  title: string;
+  slug: string;
+  scenario_json: Record<string, unknown>;
+  difficulty: string;
+  status: AcademyCourseStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Textbook {
+  id: string;
+  title: string;
+  slug: string;
+  content_ref: string | null;
+  status: AcademyCourseStatus;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StudyGame {
+  id: string;
+  title: string;
+  slug: string;
+  game_type: string;
+  config: Record<string, unknown>;
+  status: AcademyCourseStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AiScenario {
+  id: string;
+  title: string;
+  slug: string;
+  prompt_template: string;
+  status: AcademyCourseStatus;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MarketingEvent {
+  id: string;
+  event_type: string;
+  payload: Record<string, unknown>;
+  scheduled_at: string | null;
+  status: "pending" | "sent" | "failed" | "cancelled";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SystemTest {
+  id: string;
+  name: string;
+  status: "idle" | "running" | "passed" | "failed";
+  last_run_at: string | null;
+  result: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}

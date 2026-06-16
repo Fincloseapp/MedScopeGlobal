@@ -68,18 +68,55 @@ export async function dispatchAiTask(taskId: string): Promise<{ ok: boolean; mes
   });
 
   try {
-    const { runCourseCreatorStub } = await import("@/lib/academy/ai/workers/course-creator");
-    const { runLessonGeneratorStub } = await import("@/lib/academy/ai/workers/lesson-generator");
-
+    const payload = task.payload as Record<string, unknown>;
     let result: Record<string, unknown> = { stub: true };
 
     switch (task.task_type) {
-      case "course-creator":
-        result = await runCourseCreatorStub(task.payload as Record<string, unknown>, taskId);
+      case "course-creator": {
+        const { runCourseCreatorStub } = await import("@/lib/academy/ai/workers/course-creator");
+        result = await runCourseCreatorStub(payload, taskId);
         break;
-      case "lesson-generator":
-        result = await runLessonGeneratorStub(task.payload as Record<string, unknown>, taskId);
+      }
+      case "lesson-generator": {
+        const { runLessonGeneratorStub } = await import("@/lib/academy/ai/workers/lesson-generator");
+        result = await runLessonGeneratorStub(payload, taskId);
         break;
+      }
+      case "quiz-builder": {
+        const { runQuizBuilderStub } = await import("@/lib/academy/ai/workers/quiz-builder");
+        result = await runQuizBuilderStub(payload, taskId);
+        break;
+      }
+      case "video-producer": {
+        const { runVideoProducerStub } = await import("@/lib/academy/ai/workers/video-producer");
+        result = await runVideoProducerStub(payload, taskId);
+        break;
+      }
+      case "simulation-builder": {
+        const { runSimulationBuilderStub } = await import("@/lib/academy/ai/workers/simulation-builder");
+        result = await runSimulationBuilderStub(payload, taskId);
+        break;
+      }
+      case "textbook-writer": {
+        const { runTextbookWriterStub } = await import("@/lib/academy/ai/workers/textbook-writer");
+        result = await runTextbookWriterStub(payload, taskId);
+        break;
+      }
+      case "mentoring-coordinator": {
+        const { runMentoringCoordinatorStub } = await import("@/lib/academy/ai/workers/mentoring-coordinator");
+        result = await runMentoringCoordinatorStub(payload, taskId);
+        break;
+      }
+      case "marketplace-publisher": {
+        const { runMarketplacePublisherStub } = await import("@/lib/academy/ai/workers/marketplace-publisher");
+        result = await runMarketplacePublisherStub(payload, taskId);
+        break;
+      }
+      case "testing-runner": {
+        const { runTestingRunnerStub } = await import("@/lib/academy/ai/workers/testing-runner");
+        result = await runTestingRunnerStub(payload, taskId);
+        break;
+      }
       default:
         result = { stub: true, task_type: task.task_type };
     }
