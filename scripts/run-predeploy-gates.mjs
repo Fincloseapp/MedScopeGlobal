@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { MEDSCOPE_LOGO_SOURCE } from "../lib/config/paths.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -52,7 +53,7 @@ console.log("\n=== Pre-deploy gates ===\n");
 const isVercel = process.env.VERCEL === "1";
 const isCI = process.env.GITHUB_ACTIONS === "true";
 const hasCronSecret = (process.env.CRON_SECRET ?? "").length >= 16;
-const logoSource = process.env.MEDSCOPE_LOGO_SOURCE ?? "D:\\MedScopeGlobal\\logo";
+const logoSource = MEDSCOPE_LOGO_SOURCE;
 const canSyncLogos = existsSync(logoSource) || (!isVercel && !isCI);
 
 const steps = [

@@ -1,9 +1,8 @@
 /** v24.0 ULTRA-MAX — filesystem + runtime config */
-const isVercel = process.env.VERCEL === "1";
-export const V24_DATA_ROOT =
-  process.env.MEDSCOPE_DATA_ROOT ?? (isVercel ? "/tmp/medscope.data" : "D:\\medscope.data");
-export const V24_LOGS_ROOT =
-  process.env.MEDSCOPE_LOGS_ROOT ?? (isVercel ? "/tmp/medscope.logs" : "D:\\medscope.logs");
+import { MEDSCOPE_DATA_ROOT, MEDSCOPE_LOGS_ROOT } from "@/lib/config/paths";
+
+export const V24_DATA_ROOT = MEDSCOPE_DATA_ROOT;
+export const V24_LOGS_ROOT = MEDSCOPE_LOGS_ROOT;
 
 export const V24_DATA_PATHS = {
   articles: "articles",

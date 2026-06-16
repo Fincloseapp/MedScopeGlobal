@@ -1,8 +1,11 @@
 # Push D:\medscope.local to GitHub main (Vercel auto-deploy)
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
-$git = "C:\Users\zegzulka\AppData\Local\Programs\Git\cmd\git.exe"
-if (-not (Test-Path $git)) { $git = "git" }
+$git = $env:GIT_BIN
+if (-not $git) {
+  $gitCmd = Get-Command git -ErrorAction SilentlyContinue
+  if ($gitCmd) { $git = $gitCmd.Source } else { $git = "git" }
+}
 
 $token = $null
 $envLocal = Join-Path $root ".env.local"
@@ -16,6 +19,7 @@ if (-not $token) { throw "GITHUB_TOKEN missing in .env.local" }
 
 $node = $env:NODE_BIN
 if (-not $node) {
+  # System TEMP only (%TEMP% may be on C:) — ephemeral node binary, not project data
   $nodeCandidate = Join-Path $env:TEMP "node-v22.22.0-win-x64\node.exe"
   if (Test-Path $nodeCandidate) { $node = $nodeCandidate } else { $node = "node" }
 }

@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { join } from "node:path";
+import { MEDSCOPE_PROJECT_ROOT, projectPath } from "@/lib/config/paths";
 import { runV26RewriteBackfill } from "@/lib/v26/backfill";
 import { runV26ForeignNewsIngest } from "@/lib/v26/foreign-news-ingest";
 import { runImagesFetch } from "@/lib/v25/runners/images";
@@ -40,11 +40,11 @@ function runLocalPredeploy(): V26AutonomousPhase {
   if (process.env.VERCEL === "1") {
     return { ok: true, detail: "skipped on Vercel" };
   }
-  const script = join(process.cwd(), "scripts/run-predeploy-gates.mjs");
+  const script = projectPath("scripts/run-predeploy-gates.mjs");
   const result = spawnSync(process.execPath, [script], {
     encoding: "utf8",
     timeout: 600_000,
-    cwd: process.cwd(),
+    cwd: MEDSCOPE_PROJECT_ROOT,
   });
   return {
     ok: result.status === 0,
@@ -57,14 +57,14 @@ function runLocalPush(): V26AutonomousPhase & { sha?: string } {
     return { ok: true, detail: "push via CI only" };
   }
   const msg = process.env.DEPLOY_COMMIT_MESSAGE ?? "feat: MedScope v26 autonomous deploy";
-  const ps1 = join(process.cwd(), "scripts/push-d-to-github.ps1");
+  const ps1 = projectPath("scripts/push-d-to-github.ps1");
   const result = spawnSync(
     "powershell",
     ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ps1],
     {
       encoding: "utf8",
       timeout: 600_000,
-      cwd: process.cwd(),
+      cwd: MEDSCOPE_PROJECT_ROOT,
       env: { ...process.env, DEPLOY_COMMIT_MESSAGE: msg },
     }
   );
@@ -81,11 +81,11 @@ async function pollVercelReady(): Promise<V26AutonomousPhase> {
     return { ok: true, detail: "running on Vercel" };
   }
   try {
-    const script = join(process.cwd(), "scripts/trigger-vercel-production.mjs");
+    const script = projectPath("scripts/trigger-vercel-production.mjs");
     const result = spawnSync(process.execPath, [script], {
       encoding: "utf8",
       timeout: 900_000,
-      cwd: process.cwd(),
+      cwd: MEDSCOPE_PROJECT_ROOT,
     });
     return {
       ok: result.status === 0,

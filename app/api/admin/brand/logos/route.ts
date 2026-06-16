@@ -9,6 +9,7 @@ import { pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
 
 import { isAdminApiAuthorized } from "@/lib/auth/admin-api";
+import { MEDSCOPE_PROJECT_ROOT, projectPath } from "@/lib/config/paths";
 
 import {
 
@@ -34,9 +35,9 @@ export const dynamic = "force-dynamic";
 
 
 
-const DEST = join(process.cwd(), "public", "assets", "logo");
+const DEST = projectPath("public", "assets", "logo");
 
-const ROOT = process.cwd();
+const ROOT = MEDSCOPE_PROJECT_ROOT;
 
 
 

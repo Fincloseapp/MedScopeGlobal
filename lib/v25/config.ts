@@ -1,9 +1,8 @@
 ﻿/** v25.4 ULTRA-MAX ENTERPRISE++ — filesystem + runtime config */
-const isVercel = process.env.VERCEL === "1";
-export const V25_DATA_ROOT =
-  process.env.MEDSCOPE_DATA_ROOT ?? (isVercel ? "/tmp/medscope.data" : "D:\\medscope.data");
-export const V25_LOGS_ROOT =
-  process.env.MEDSCOPE_LOGS_ROOT ?? (isVercel ? "/tmp/medscope.logs" : "D:\\medscope.logs");
+import { MEDSCOPE_DATA_ROOT, MEDSCOPE_LOGS_ROOT } from "@/lib/config/paths";
+
+export const V25_DATA_ROOT = MEDSCOPE_DATA_ROOT;
+export const V25_LOGS_ROOT = MEDSCOPE_LOGS_ROOT;
 export const V25_PROD_BASE =
   process.env.PROD_BASE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "https://medscopeglobal.com";
 

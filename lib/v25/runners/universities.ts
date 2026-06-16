@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { join } from "node:path";
+import { projectPath } from "@/lib/config/paths";
 import { fetchAllFacultiesLive } from "@/lib/v25/universities-fetch";
 import {
   loadUniversitiesReportAsync,
@@ -42,7 +42,7 @@ export async function runUniversitiesFetch() {
     };
   }
 
-  const script = join(process.cwd(), "lib/v25/providers/universities-provider.mjs");
+  const script = projectPath("lib/v25/providers/universities-provider.mjs");
   const result = spawnSync(process.execPath, [script], { encoding: "utf8", timeout: 180000 });
   const report = await loadUniversitiesReportAsync();
   if (report) await persistUniversitiesReport(report);

@@ -5,9 +5,10 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
+import { MEDSCOPE_PROJECT_ROOT } from "@/lib/config/paths";
 
 export async function importMjs<T = Record<string, unknown>>(relativePath: string): Promise<T> {
-  const absolute = join(process.cwd(), relativePath);
+  const absolute = join(MEDSCOPE_PROJECT_ROOT, relativePath);
   if (!existsSync(absolute)) {
     throw new Error(`Cannot find module '${pathToFileURL(absolute).href}'`);
   }

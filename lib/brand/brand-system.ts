@@ -7,7 +7,9 @@
  * Admin:             /admin/brand
  */
 
-export const LOGO_SOURCE_DIR = "D:\\MedScopeGlobal\\logo";
+import { MEDSCOPE_LOGO_SOURCE } from "@/lib/config/paths";
+
+export const LOGO_SOURCE_DIR = MEDSCOPE_LOGO_SOURCE;
 export const LOGO_DEST_DIR = "public/assets/logo";
 
 export type LogoVariant = "transparent" | "print" | "negative";

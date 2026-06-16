@@ -6,7 +6,7 @@ export const CZ_UNIVERSITIES = [
   { name: "3. LF UK", url: "https://www.lf3.cuni.cz/" },
   { name: "LF MU", url: "https://www.med.muni.cz/" },
   { name: "LF UPOL", url: "https://www.lf.upol.cz/" },
-  { name: "LF OU", url: "https://www.lf.osu.cz/" },
+  { name: "LF OU", url: "https://lf.osu.cz/" },
   { name: "LF UHK", url: "https://www.lfhk.cuni.cz/" },
   { name: "LF Plzeň", url: "https://www.lfp.cuni.cz/" },
 ] as const;

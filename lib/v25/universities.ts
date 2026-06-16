@@ -35,6 +35,18 @@ export type V25UniversitiesReport = {
   };
 };
 
+/** Cached scrape rows keep stale URLs — always prefer the static faculty catalog. */
+function mergeWithStaticCatalog(faculty: V25UniversityFaculty): V25UniversityFaculty {
+  const staticFaculty = getFacultyBySlug(faculty.slug);
+  if (!staticFaculty) return faculty;
+  return {
+    ...faculty,
+    name: staticFaculty.name,
+    url: staticFaculty.url,
+    city: staticFaculty.city,
+  };
+}
+
 export function loadUniversitiesReport(): V25UniversitiesReport | null {
   return readV25Json<V25UniversitiesReport>("v25/universities/index.json");
 }
@@ -47,7 +59,7 @@ export async function loadUniversitiesReportAsync(): Promise<V25UniversitiesRepo
 
 export async function listUniversitiesForUiAsync(): Promise<V25UniversityFaculty[]> {
   const report = await loadUniversitiesReportAsync();
-  if (report?.faculties?.length) return report.faculties;
+  if (report?.faculties?.length) return report.faculties.map(mergeWithStaticCatalog);
   return CZ_MEDICAL_FACULTIES.map((f) => ({
     slug: f.slug,
     name: f.name,
@@ -65,16 +77,16 @@ export async function getFacultyForPublicUi(slug: string): Promise<V25University
   const report = await loadUniversitiesReportAsync();
   const cached = report?.faculties?.find((f) => f.slug === slug);
   if (cached?.fetchedAt) {
-    return { ...staticFaculty, ...cached, name: staticFaculty.name };
+    return mergeWithStaticCatalog({ ...staticFaculty, ...cached });
   }
 
   const live = await fetchFacultyLive(staticFaculty);
-  return { ...staticFaculty, ...live, name: staticFaculty.name };
+  return mergeWithStaticCatalog({ ...staticFaculty, ...live });
 }
 
 export function listUniversitiesForUi(): V25UniversityFaculty[] {
   const report = loadUniversitiesReport();
-  if (report?.faculties?.length) return report.faculties;
+  if (report?.faculties?.length) return report.faculties.map(mergeWithStaticCatalog);
   return CZ_MEDICAL_FACULTIES.map((f) => ({
     slug: f.slug,
     name: f.name,

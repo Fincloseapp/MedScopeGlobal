@@ -554,7 +554,8 @@ export async function getAdsOverview(options?: { includePartners?: boolean }): P
     try {
       const { readFileSync } = await import("node:fs");
       const { join } = await import("node:path");
-      const dataRoot = process.env.MEDSCOPE_DATA_ROOT ?? "D:\\medscope.data";
+      const { MEDSCOPE_DATA_ROOT } = await import("@/lib/config/paths");
+      const dataRoot = MEDSCOPE_DATA_ROOT;
       const raw = readFileSync(join(dataRoot, "ads", "partners.json"), "utf8");
       const parsed = JSON.parse(raw) as { partners?: Array<{ id: string; name: string; score?: number }> };
       const partners = parsed.partners ?? [];

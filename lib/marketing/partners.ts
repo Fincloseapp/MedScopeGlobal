@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { MEDSCOPE_DATA_ROOT } from "@/lib/config/paths";
 
 export type MarketingPartner = {
   id: string;
@@ -13,7 +14,7 @@ export type MarketingPartner = {
 };
 
 export function loadMarketingPartners(): MarketingPartner[] {
-  const dataRoot = process.env.MEDSCOPE_DATA_ROOT ?? "D:\\medscope.data";
+  const dataRoot = MEDSCOPE_DATA_ROOT;
   const file = join(dataRoot, "ads", "partners.json");
   if (!existsSync(file)) return [];
   try {

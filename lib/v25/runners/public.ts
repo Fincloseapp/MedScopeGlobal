@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { join } from "node:path";
+import { projectPath } from "@/lib/config/paths";
 import { setCronStatus } from "@/lib/v25/system-state";
 import { DEFAULT_PUBLIC_WRITER_LIMIT } from "@/lib/v25/config/public-writers";
 
@@ -70,7 +70,7 @@ export async function runPublicArticlesFetch(options?: {
     };
   }
 
-  const script = join(process.cwd(), "lib/v25/writers/run-public-writers.mjs");
+  const script = projectPath("lib/v25/writers/run-public-writers.mjs");
   const result = spawnSync(process.execPath, [script], { encoding: "utf8", timeout: 300000 });
   const ok = result.status === 0;
   setCronStatus("public-articles", ok ? "ok" : "fail", Date.now() - t0, result.stderr || undefined);
