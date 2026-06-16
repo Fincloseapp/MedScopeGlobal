@@ -7,9 +7,9 @@
  * Admin:             /admin/brand
  */
 
-import { MEDSCOPE_LOGO_SOURCE } from "@/lib/config/paths";
-
-export const LOGO_SOURCE_DIR = MEDSCOPE_LOGO_SOURCE;
+/** Client-safe — do not import node:path config into brand-system (used by admin client components). */
+export const LOGO_SOURCE_DIR =
+  process.env.MEDSCOPE_LOGO_SOURCE ?? "D:\\MedScopeGlobal\\logo";
 export const LOGO_DEST_DIR = "public/assets/logo";
 
 export type LogoVariant = "transparent" | "print" | "negative";

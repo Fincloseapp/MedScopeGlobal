@@ -1,66 +1,54 @@
 import Link from "next/link";
-import { Activity, BookOpen, GraduationCap, Sparkles } from "lucide-react";
+import { BookOpen, Brain, GraduationCap, Trophy } from "lucide-react";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAcademyCounts } from "@/lib/academy/db";
 
-export const dynamic = "force-dynamic";
-
 export default async function AdminAcademyDashboardPage() {
-  let counts: Record<string, number> = {};
-  let error: string | null = null;
-
-  try {
-    counts = await getAcademyCounts();
-  } catch (e) {
-    error = (e as Error).message;
-  }
+  const counts = await getAcademyCounts();
 
   const stats = [
-    { label: "Kurzy", value: counts.courses ?? 0, icon: BookOpen },
-    { label: "Lekce", value: counts.lessons ?? 0, icon: GraduationCap },
-    { label: "Kvízy", value: counts.quizzes ?? 0, icon: Activity },
-    { label: "AI úlohy", value: counts.ai_tasks ?? 0, icon: Sparkles },
-    { label: "Pokrok uživatelů", value: counts.user_progress ?? 0, icon: Activity },
-    { label: "Certifikáty", value: counts.certificates ?? 0, icon: GraduationCap },
+    { label: "Kurzy", value: counts.courses ?? 0, icon: GraduationCap },
+    { label: "Lekce", value: counts.lessons ?? 0, icon: BookOpen },
+    { label: "Kvízy", value: counts.quizzes ?? 0, icon: Brain },
+    { label: "AI úlohy", value: counts.ai_tasks ?? 0, icon: Brain },
+    { label: "Postup uživatelů", value: counts.user_progress ?? 0, icon: Trophy },
+    { label: "Certifikáty", value: counts.certificates ?? 0, icon: Trophy },
   ];
 
   return (
-    <div className="space-y-8">
-      <MedScopeLogo href="/admin" width={160} height={40} className="mb-2" />
-      <div>
-        <h1 className="font-display text-3xl font-bold text-medical-navy">MedScope Academy v35</h1>
-        <p className="text-muted-foreground">Přehled tabulek Academy — fáze 1 foundation.</p>
-        {error ? (
-          <p className="mt-2 text-sm text-amber-700">
-            Tabulky možná ještě nejsou migrovány: {error}
-          </p>
-        ) : null}
+    <div className="mx-auto max-w-5xl p-6">
+      <MedScopeLogo href="/admin" preset="admin-sidebar" />
+      <h1 className="mt-4 font-display text-2xl font-semibold text-[#021d33]">MedScope Academy</h1>
+      <p className="mt-2 text-sm text-slate-600">v35.0 — administrace kurzů a AI pipeline (fáze 1).</p>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {stats.map((stat) => (
+          <Card key={stat.label}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-slate-600">{stat.label}</CardTitle>
+              <stat.icon className="h-4 w-4 text-[#005B96]" />
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold text-[#021d33]">{stat.value}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      <Link
-        href="/admin/academy/courses"
-        className="inline-flex items-center gap-2 rounded-xl border border-[#005B96]/30 bg-[#005B96]/5 px-4 py-3 text-sm font-medium text-[#021d33] hover:bg-[#005B96]/10"
-      >
-        <BookOpen className="h-4 w-4 text-[#005B96]" />
-        Správa kurzů
-      </Link>
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {stats.map((s) => {
-          const Icon = s.icon;
-          return (
-            <Card key={s.label}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{s.label}</CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{s.value}</div>
-              </CardContent>
-            </Card>
-          );
-        })}
+      <div className="mt-8 flex flex-wrap gap-3">
+        <Link
+          href="/admin/academy/courses"
+          className="rounded-full bg-[#005B96] px-5 py-2 text-sm font-medium text-white hover:bg-[#004a7a]"
+        >
+          Správa kurzů
+        </Link>
+        <Link
+          href="/academy"
+          className="rounded-full border border-[#cfe1f3] px-5 py-2 text-sm font-medium text-[#005B96] hover:bg-[#f0f7fc]"
+        >
+          Veřejný náhled
+        </Link>
       </div>
     </div>
   );
