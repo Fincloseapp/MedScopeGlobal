@@ -1,5 +1,3 @@
-import "server-only";
-
 import { logAiEvent } from "@/lib/academy/ai/controller";
 
 /** Phase 1 stub — logs intent; Phase 2 wires OpenAI course generation */

@@ -30,6 +30,15 @@ const menuCs: NavItem[] = [
       { label: "Zkoušky", href: "/studenti/zkousky", description: "Příprava na zkoušky LF" },
       { label: "AI tutor", href: "/studenti/ai-tutor", description: "Studentský AI asistent" },
       { label: "Lékařské fakulty", href: "/studium/univerzity", description: "8 českých LF" },
+      { label: "MedScope Academy", href: "/academy", description: "Kurzy, lekce a kvízy" },
+    ],
+  },
+  {
+    label: "Academy",
+    href: "/academy",
+    children: [
+      { label: "Přehled", href: "/academy", description: "MedScope Academy v35" },
+      { label: "Kurzy", href: "/academy/courses", description: "Publikované kurzy" },
     ],
   },
   {
@@ -170,6 +179,14 @@ const menuEn: NavItem[] = [
       { label: "Public & students", href: "/pro-koho/laik-student" },
       { label: "Clinicians", href: "/pro-koho/lekar" },
       { label: "Researchers", href: "/pro-koho/vedec" },
+    ],
+  },
+  {
+    label: "Academy",
+    href: "/academy",
+    children: [
+      { label: "Overview", href: "/academy" },
+      { label: "Courses", href: "/academy/courses" },
     ],
   },
   {

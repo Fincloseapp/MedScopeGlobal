@@ -50,6 +50,7 @@
     "smoke:v27.1": "node scripts/v27.1-homepage-smoke.mjs",
     "smoke:v27.2": "node scripts/v27.2-smoke.mjs",
     "smoke:v27.3": "node scripts/v27.3-smoke.mjs",
+    "smoke:academy-v35": "node scripts/academy-v35-smoke.mjs",
     "images:backfill": "node scripts/run-v25-image-backfill.mjs",
     "images:v27.2": "node scripts/v27.2-image-backfill.mjs",
     "images:v27.3": "node scripts/v27.3-purge-images.mjs",

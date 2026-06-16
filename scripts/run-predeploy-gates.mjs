@@ -68,6 +68,7 @@ const steps = [
       ]
     : []),
   ["verify-v6-api-routes", "scripts/verify-v6-api-routes.mjs"],
+  ["verify-academy-v35-skeleton", "scripts/verify-academy-v35-skeleton.mjs"],
 ];
 
 if (isVercel && !canSyncLogos) {

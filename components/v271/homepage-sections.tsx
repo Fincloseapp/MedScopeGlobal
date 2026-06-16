@@ -223,10 +223,37 @@ export function V272SubscriptionHeroBlock() {
   );
 }
 
+export function V272AcademyCtaBlock() {
+  return (
+    <section className="border-y border-[#005B96]/15 bg-gradient-to-r from-[#005B96]/5 to-[#0A3D5C]/10">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-6 px-4 py-10 sm:px-6">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
+            MedScope Academy
+          </p>
+          <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">
+            Kurzy, lekce a kvízy pro studenty i lékaře
+          </h2>
+          <p className="mt-2 max-w-xl text-sm text-slate-600">
+            Gamifikace, certifikáty a AI asistovaná tvorba obsahu — nová vzdělávací platforma v35.
+          </p>
+        </div>
+        <Link
+          href="/academy"
+          className="inline-flex rounded-full bg-[#005B96] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
+        >
+          Vstoupit do Academy
+        </Link>
+      </div>
+    </section>
+  );
+}
+
 export async function V272HomepageSections() {
   return (
     <>
       <V271AudienceSections />
+      <V272AcademyCtaBlock />
       <V271B2bBlock />
       <V272AktualniBlock />
       <V272SubscriptionPlansBlock />

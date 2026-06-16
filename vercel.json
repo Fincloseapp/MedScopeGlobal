@@ -106,6 +106,10 @@
     {
       "path": "/api/cron/v26-autonomous",
       "schedule": "30 4 * * *"
+    },
+    {
+      "path": "/api/cron/academy-daily",
+      "schedule": "0 20 * * *"
     }
   ],
   

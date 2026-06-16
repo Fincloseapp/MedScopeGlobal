@@ -1,5 +1,3 @@
-import "server-only";
-
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import type { AiTask } from "@/types/academy";
 
