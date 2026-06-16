@@ -1,46 +1,32 @@
-﻿const fs = require("fs");
-const path = "D:/medscope.local/.env.local";
+﻿import fs from "node:fs";
 const env = {};
-for (const line of fs.readFileSync(path, "utf8").split(/\r?\n/)) {
+for (const line of fs.readFileSync("D:/medscope.local/.env.local", "utf8").split(/\r?\n/)) {
   const m = line.match(/^([^#=]+)=(.*)$/);
-  if (m) env[m[1].trim()] = m[2].trim().replace(/^["']|["']$/g, "");
+  if (m) env[m[1].trim()] = m[2].trim();
 }
-(async () => {
-  const { VERCEL_TOKEN, VERCEL_PROJECT_ID } = env;
-  const gh = env.GH_TOKEN || env.GITHUB_TOKEN;
-  if (VERCEL_TOKEN && VERCEL_PROJECT_ID) {
-    const url = "https://api.vercel.com/v6/deployments?projectId=" + VERCEL_PROJECT_ID + "&limit=5";
-    const r = await fetch(url, { headers: { Authorization: "Bearer " + VERCEL_TOKEN } });
-    const j = await r.json();
-    for (const d of j.deployments || []) {
-      const msg = (d.meta && (d.meta.githubCommitMessage || d.meta.gitlabCommitMessage)) || "";
-      console.log("VERCEL", d.state, d.readyState, msg.split("\n")[0], d.url, d.created);
-    }
+const team = env.VERCEL_TEAM_ID || env.VERCEL_ORG_ID;
+const qs = team ? `?teamId=${team}` : "";
+const pid = env.VERCEL_PROJECT_ID;
+const targetSha = process.argv[2] ?? "930a501";
+for (let i = 0; i < 60; i++) {
+  const r = await fetch(`https://api.vercel.com/v6/deployments${qs}&projectId=${pid}&target=production&limit=3`, {
+    headers: { Authorization: `Bearer ${env.VERCEL_TOKEN}` },
+  });
+  const d = await r.json();
+  const dep = d.deployments?.find((x) => x.meta?.githubCommitSha?.startsWith(targetSha)) ?? d.deployments?.[0];
+  const sha = dep?.meta?.githubCommitSha?.slice(0, 7);
+  const state = dep?.readyState;
+  const msg = dep?.meta?.githubCommitMessage?.split("\n")[0];
+  console.log(new Date().toISOString(), state, sha, msg);
+  if (state === "READY" && sha?.startsWith(targetSha.slice(0, 7))) {
+    console.log("DEPLOY_READY");
+    process.exit(0);
   }
-  if (gh) {
-    const repo = env.GITHUB_REPOSITORY || env.GITHUB_REPO || "";
-    let repoPath = repo.includes("/") ? repo : null;
-    if (!repoPath && env.GITHUB_REPO_ID) repoPath = env.GITHUB_REPO_ID;
-    const urls = [];
-    if (repoPath && repoPath.includes("/")) urls.push("https://api.github.com/repos/" + repoPath + "/commits?sha=main&per_page=8");
-    urls.push("https://api.github.com/user/repos?per_page=100");
-    for (const u of urls.slice(0, 1)) {
-      const r2 = await fetch(u, { headers: { Authorization: "Bearer " + gh, Accept: "application/vnd.github+json", "User-Agent": "medscope-check" } });
-      console.log("GH fetch", u, r2.status);
-      if (r2.ok) {
-        const data = await r2.json();
-        const commits = Array.isArray(data) ? data : [data];
-        if (Array.isArray(data) && data[0] && data[0].full_name) {
-          console.log("repos sample", data.filter(x => /medscope/i.test(x.full_name)).slice(0,3).map(x => x.full_name).join(", "));
-        } else {
-          for (const c of (Array.isArray(data) ? data : [])) {
-            console.log("GH", c.sha.slice(0, 8), (c.commit.message || "").split("\n")[0]);
-          }
-        }
-      } else console.log(await r2.text());
-    }
-  } else {
-    console.log("no GH token");
-    console.log(Object.keys(env).filter(k => /GITHUB|REPO|GH_/.test(k)).join(", "));
+  if (state === "ERROR" || state === "CANCELED") {
+    console.log("DEPLOY_FAILED");
+    process.exit(1);
   }
-})();
+  await new Promise((r) => setTimeout(r, 15000));
+}
+console.log("TIMEOUT");
+process.exit(1);
