@@ -23,7 +23,11 @@ function loadEnv() {
   return env;
 }
 
-const WEBHOOK_URL = "https://medscopeglobal.com/api/stripe/webhook";
+const WEBHOOK_URL = "https://www.medscopeglobal.com/api/stripe/webhook";
+const WEBHOOK_URL_ALIASES = [
+  WEBHOOK_URL,
+  "https://medscopeglobal.com/api/stripe/webhook",
+];
 const EVENTS = [
   "checkout.session.completed",
   "invoice.paid",
@@ -55,7 +59,7 @@ async function main() {
   const listRes = await fetch("https://api.stripe.com/v1/webhook_endpoints?limit=20", { headers });
   const listJson = await listRes.json();
 
-  let     endpoint = (listJson.data ?? []).find((e) => e.url === WEBHOOK_URL);
+  let     endpoint = (listJson.data ?? []).find((e) => WEBHOOK_URL_ALIASES.includes(e.url));
   let signingSecret;
 
   if (endpoint) {
@@ -69,7 +73,7 @@ async function main() {
     for (let i = 1; i < EVENTS.length; i++) {
       body.append("enabled_events[]", EVENTS[i]);
     }
-    body.set("description", "MedScopeGlobal v28.2 production webhook");
+    body.set("description", "MedScopeGlobal v29.0 production webhook");
 
     const createRes = await fetch("https://api.stripe.com/v1/webhook_endpoints", {
       method: "POST",
@@ -96,7 +100,7 @@ async function main() {
   } else {
     console.log(`Signing secret: ${signingSecret.slice(0, 12)}… (not logged in full)`);
 
-    const docPath = "D:\\medscope.data\\docs\\v28.2-stripe-setup.md";
+    const docPath = "D:\\medscope.data\\docs\\v29-stripe-setup.md";
     let doc = fs.existsSync(docPath) ? fs.readFileSync(docPath, "utf8") : "";
     if (!doc.includes(endpoint.id)) {
       doc += `\n\n## Auto-setup ${new Date().toISOString()}\n- Webhook ID: \`${endpoint.id}\`\n- URL: \`${WEBHOOK_URL}\`\n`;

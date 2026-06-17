@@ -16,9 +16,9 @@ export async function POST(request: Request) {
   const configured = isSmtpConfigured();
   const result = await sendViaSmtp({
     to,
-    subject: "[v28 test] SMTP health check",
-    html: "<p>MedScope v28 SMTP test — OK.</p>",
-    text: "MedScope v28 SMTP test — OK.",
+    subject: "[v29 test] SMTP health check",
+    html: "<p>MedScope v29 SMTP test — OK.</p>",
+    text: "MedScope v29 SMTP test — OK.",
     category: "system",
     metadata: { test: "smtp" },
   });
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     sent_at: new Date().toISOString(),
     email_type: "system",
     recipient: to,
-    subject: "[v28 test] SMTP health check",
+    subject: "[v29 test] SMTP health check",
     status: result.ok ? "sent" : "failed",
     response_code: result.statusCode || null,
     provider: "smtp",

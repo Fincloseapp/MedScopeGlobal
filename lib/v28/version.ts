@@ -1,18 +1,26 @@
-/** MedScope v28.2 — site version (single source of truth for UI) */
+/** MedScope v28 — backward-compat layer; site UI delegates to v29 */
+
+import {
+  V29_EDITORIAL_COPY_LABEL,
+  V29_UI_VERSION,
+  getSiteVersionLabel as getV29SiteVersionLabel,
+} from "@/lib/v29/version";
 
 export const V28_ENGINE_VERSION = "28.2";
 
 export const V28_EDITORIAL_VERSION = "28";
 
+/** Compat label for /api/v28/health */
 export const V28_UI_VERSION = "v28.2";
 
-export const V28_UI_BUILD_STAMP = "v28.2-stripe-webhook-health-20260617";
+export const V28_UI_BUILD_STAMP = "v28.2-v29-delegation-20260617";
 
-/** Display label for homepage hero and UI badges */
+/** Display label for homepage hero and UI badges — v29.0 */
 export function getSiteVersionLabel(): string {
-  return V28_UI_VERSION;
+  return getV29SiteVersionLabel();
 }
 
-/** Editorial copy label — v28 standard */
-export const V28_EDITORIAL_COPY_LABEL =
-  "přepsané podle redakčního standardu MedScopeGlobal v28";
+export const V28_EDITORIAL_COPY_LABEL = V29_EDITORIAL_COPY_LABEL;
+
+/** Current site UI version (v29) for callers that need the live label */
+export const V28_SITE_UI_VERSION = V29_UI_VERSION;

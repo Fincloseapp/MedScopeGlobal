@@ -58,7 +58,7 @@ export const V271_B2B = {
 export const V271_AKTUALNI = {
   title: "Aktuální zprávy",
   description:
-    "Zahraniční a domácí zdravotnické zprávy — přepsané podle redakčního standardu MedScopeGlobal v28.",
+    "Zahraniční a domácí zdravotnické zprávy — přepsané podle redakčního standardu MedScopeGlobal v29.",
   href: "/aktualni-zpravy",
   cta: "Číst zprávy",
   links: [

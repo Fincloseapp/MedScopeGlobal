@@ -16,9 +16,9 @@ export async function POST(request: Request) {
   const configured = isSendGridConfigured();
   const result = await sendViaSendGrid({
     to,
-    subject: "[v28 test] SendGrid health check",
-    html: "<p>MedScope v28 SendGrid test — OK.</p>",
-    text: "MedScope v28 SendGrid test — OK.",
+    subject: "[v29 test] SendGrid health check",
+    html: "<p>MedScope v29 SendGrid test — OK.</p>",
+    text: "MedScope v29 SendGrid test — OK.",
     category: "system",
     metadata: { test: "sendgrid" },
   });
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     sent_at: new Date().toISOString(),
     email_type: "system",
     recipient: to,
-    subject: "[v28 test] SendGrid health check",
+    subject: "[v29 test] SendGrid health check",
     status: result.ok ? "sent" : "failed",
     response_code: result.statusCode || null,
     provider: "sendgrid",

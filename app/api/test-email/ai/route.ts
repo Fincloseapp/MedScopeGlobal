@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   const content = await generateEmailContent({
     kind: "marketing",
     audience: "public",
-    subjectHint: "v28 AI email test",
+    subjectHint: "v29 AI email test",
     context: { test: true },
   });
 

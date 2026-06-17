@@ -20,7 +20,21 @@ const HANDLED_EVENTS = new Set([
   "customer.subscription.deleted",
   "payment_intent.succeeded",
   "payment_intent.payment_failed",
+  "account.updated",
+  "v2.core.account.updated",
 ]);
+
+/** Normalize event object for Stripe snapshot (v1) and thin (v2) account payloads */
+function resolveEventObject(event: Stripe.Event): unknown {
+  const raw = event.data.object as Record<string, unknown>;
+  if (raw && typeof raw === "object") {
+    if (raw.related_object && typeof raw.related_object === "object") {
+      return raw.related_object;
+    }
+    if (raw.object === "account" && raw.id) return raw;
+  }
+  return event.data.object;
+}
 
 function extractCustomerId(obj: unknown): string | undefined {
   if (!obj || typeof obj !== "object") return undefined;
@@ -86,21 +100,6 @@ async function upsertSubscription(admin: ReturnType<typeof createServiceRoleClie
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
-  const secret = process.env.STRIPE_SECRET_KEY?.trim();
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
-
-  if (!secret) {
-    return NextResponse.json({ error: "Stripe secret key not configured" }, { status: 503 });
-  }
-
-  if (!webhookSecret) {
-    return NextResponse.json(
-      { error: "STRIPE_WEBHOOK_SECRET not configured — see D:\\medscope.data\\docs\\v28.2-stripe-setup.md" },
-      { status: 503 }
-    );
-  }
-
-  const stripe = new Stripe(secret);
   const signature = request.headers.get("stripe-signature");
 
   if (!signature) {
@@ -113,6 +112,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing signature" }, { status: 400 });
   }
 
+  const secret = process.env.STRIPE_SECRET_KEY?.trim();
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
+
+  if (!secret) {
+    return NextResponse.json({ error: "Stripe secret key not configured" }, { status: 503 });
+  }
+
+  if (!webhookSecret) {
+    return NextResponse.json(
+      { error: "STRIPE_WEBHOOK_SECRET not configured — see D:\\medscope.data\\docs\\v29-stripe-setup.md" },
+      { status: 503 }
+    );
+  }
+
+  const stripe = new Stripe(secret);
   const rawBody = await request.text();
   let event: Stripe.Event;
 
@@ -134,7 +148,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  const obj = event.data.object;
+  const obj = resolveEventObject(event);
   await persistStripeWebhookLog({
     eventId: event.id,
     eventType: event.type,
@@ -153,6 +167,16 @@ export async function POST(request: Request) {
   const admin = createServiceRoleClient();
 
   try {
+    if (event.type === "account.updated" || event.type === "v2.core.account.updated") {
+      const accountId = extractObjectId(obj);
+      await logSecurityEvent({
+        ip,
+        action: `stripe:${event.type}`,
+        status: "ok",
+        details: { accountId },
+      });
+    }
+
     if (event.type.startsWith("customer.subscription")) {
       const sub = event.data.object as Stripe.Subscription;
       await upsertSubscription(admin, sub, ip);

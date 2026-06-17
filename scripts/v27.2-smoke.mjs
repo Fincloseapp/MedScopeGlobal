@@ -23,7 +23,7 @@ const versionConfig = JSON.parse(
 );
 const expectedUi = versionConfig.ui;
 const heroClaim = "Nejmodernější zdravotnický magazín pro veřejnost, studenty a lékaře";
-const editorialV27 = "redakčního standardu MedScopeGlobal v27";
+const editorialV27 = "redakčního standardu MedScopeGlobal v29";
 
 const base = (env.PRODUCTION_URL ?? env.PROD_BASE_URL ?? "https://medscopeglobal.com").replace(
   /\/$/,
@@ -124,14 +124,20 @@ if (health?.ok) {
   try {
     const res = await fetch(`${base}/api/v27/health`, { signal: AbortSignal.timeout(15_000) });
     const json = await res.json();
-    if (!String(json.version).startsWith("27.2")) {
+    const ver = String(json.version ?? json.engine ?? "");
+    const okVer = /^(27\.2|28|29)/.test(ver) || ver.startsWith("29.0");
+    if (!okVer) {
       health.ok = false;
-      console.log(`✗ Health version ${json.version} !== 27.2`);
+      console.log(`✗ Health version ${ver} not in legacy compat set (27.2 / 28.x / 29.0)`);
+    } else {
+      console.log(`✓ Health version ${ver} (legacy compat)`);
     }
   } catch (e) {
     health.ok = false;
     console.log(`✗ Health parse: ${e.message}`);
   }
+} else {
+  console.log("⊘ v27.2 health check skipped (endpoint unreachable)");
 }
 
 const failed = results.filter((r) => !r.ok);

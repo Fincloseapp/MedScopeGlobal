@@ -47,7 +47,7 @@ export function SiteHeader({
 
       {/* Tablet + Desktop — stabilized row, logo + scrollable nav */}
       <div className="mx-auto hidden h-[92px] max-w-[1680px] items-center gap-2 px-4 md:flex lg:gap-3 lg:px-7">
-        <HeaderLogo className="max-w-[min(38vw,220px)] shrink-0 lg:max-w-[260px]" />
+        <HeaderLogo className="max-w-[min(32vw,200px)] shrink-0 lg:max-w-[240px]" />
 
         <div className="flex min-w-0 flex-1 items-center justify-end gap-2 lg:gap-3">
           <HeaderNavigation mainMenu={mainMenu} />

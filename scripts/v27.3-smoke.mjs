@@ -24,7 +24,7 @@ const versionConfig = JSON.parse(
 const expectedUi = versionConfig.ui;
 const expectedEngine = versionConfig.engine;
 const heroClaim = "Nejmodernější zdravotnický magazín pro veřejnost, studenty a lékaře";
-const editorialV27 = "redakčního standardu MedScopeGlobal v28";
+const editorialV27 = "redakčního standardu MedScopeGlobal v29";
 
 const BAD_IMAGE_PATTERNS = [
   /black-hands/i,
@@ -81,9 +81,9 @@ if (home?.text) {
     home.ok = false;
     homeChecks.push(`missing version ${expectedUi}`);
   }
-  if (home.text.includes("v27.2") || home.text.includes("v27.3") || home.text.includes("v28.0")) {
+  if (home.text.includes("v27.2") || home.text.includes("v27.3") || home.text.includes("v28.0") || home.text.includes("v28.2")) {
     home.ok = false;
-    homeChecks.push("stale pre-v28.2 label on homepage");
+    homeChecks.push("stale pre-v29 label on homepage");
   }
   if (!home.text.includes(heroClaim)) {
     home.ok = false;
@@ -155,13 +155,14 @@ if (health?.ok) {
   try {
     const res = await fetch(`${base}/api/v27/health`, { signal: AbortSignal.timeout(15_000) });
     const json = await res.json();
-    if (!String(json.version).startsWith("28") && !String(json.version).startsWith("27.3")) {
+    const ver = String(json.version ?? json.engine ?? "");
+    if (!ver.startsWith("29") && !ver.startsWith("28") && !ver.startsWith("27.3")) {
       health.ok = false;
-      console.log(`✗ Health version ${json.version} !== 28.x / 27.3`);
+      console.log(`✗ Health version ${ver} !== 29.x / 28.x / 27.3`);
     }
-    if (!json.features?.includes("image-purge-v273")) {
+    if (!json.features?.includes("image-purge-v29") && !json.features?.includes("image-purge-v273")) {
       health.ok = false;
-      console.log("✗ Health missing image-purge-v273 feature flag");
+      console.log("✗ Health missing image-purge feature flag");
     }
   } catch (e) {
     health.ok = false;

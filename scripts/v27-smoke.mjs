@@ -65,7 +65,9 @@ async function checkV27Health() {
   try {
     const res = await fetch(`${base}/api/v27/health`, { signal: AbortSignal.timeout(15_000) });
     const json = await res.json();
-    return { ...r, ok: json.ok === true && String(json.version).startsWith("27"), version: json.version };
+    const ver = String(json.version ?? json.engine ?? "");
+    const okVer = json.ok === true && (/^27/.test(ver) || /^28/.test(ver) || /^29/.test(ver));
+    return { ...r, ok: okVer, version: ver };
   } catch (e) {
     return { ...r, ok: false, error: e.message };
   }
