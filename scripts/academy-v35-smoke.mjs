@@ -35,6 +35,7 @@ const ROUTES = [
   "/api/academy/simulations",
   "/api/academy/textbooks",
   "/api/academy/marketplace",
+  { path: "/api/academy/marketplace/checkout", method: "POST", expectStatus: 401 },
   "/api/academy/leaderboard",
   "/api/mobile/sync",
   "/api/mobile/health",
@@ -44,11 +45,18 @@ const ROUTES = [
 async function checkRoute(route, opts = {}) {
   const url = `${base}${route}`;
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(30_000), redirect: "follow" });
+    const init = { signal: AbortSignal.timeout(30_000), redirect: "follow" };
+    if (opts.method === "POST") {
+      init.method = "POST";
+      init.headers = { "Content-Type": "application/json" };
+      init.body = opts.body ?? "{}";
+    }
+    const res = await fetch(url, init);
     const text = await res.text();
     const appErr = /Application error|Internal Server Error/i.test(text.slice(0, 4000));
     const authOk = opts.expectAuth && res.status === 401;
-    const ok = authOk || (res.status >= 200 && res.status < 400 && !appErr);
+    const statusOk = opts.expectStatus != null && res.status === opts.expectStatus;
+    const ok = statusOk || authOk || (res.status >= 200 && res.status < 400 && !appErr);
     return { route, url, status: res.status, ok, appErr, text };
   } catch (e) {
     return { route, url, status: 0, ok: false, error: e.message, text: "" };
@@ -63,8 +71,10 @@ const results = [];
 for (const route of ROUTES) {
   const path = typeof route === "string" ? route : route.path;
   const expectAuth = typeof route === "object" && route.expectAuth;
+  const expectStatus = typeof route === "object" ? route.expectStatus : undefined;
+  const method = typeof route === "object" ? route.method : undefined;
   process.stdout.write(`→ ${path} … `);
-  const r = await checkRoute(path, { expectAuth });
+  const r = await checkRoute(path, { expectAuth, expectStatus, method });
   results.push(r);
   if (!r.ok) {
     failed += 1;

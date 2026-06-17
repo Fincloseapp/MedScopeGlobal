@@ -3,6 +3,12 @@
     "version": ">= 12.0.0",
     "appVersionSource": "remote"
   },
+  "runtimeVersion": {
+    "policy": "appVersion"
+  },
+  "update": {
+    "url": "https://u.expo.dev/REPLACE_WITH_EAS_PROJECT_ID"
+  },
   "build": {
     "development": {
       "developmentClient": true,

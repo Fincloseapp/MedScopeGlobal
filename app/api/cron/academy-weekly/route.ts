@@ -36,7 +36,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     ok: true,
-    phase: "v35.0-weekly-phase8",
+    phase: "v35.0-weekly-phase9",
     tasksProcessed: processed,
     taskResults: results,
     digestId,

@@ -443,6 +443,21 @@ export async function listMarketplaceListings(limit = 20) {
   return data ?? [];
 }
 
+export async function getMarketplaceListingById(listingId: string) {
+  const admin = adminClient();
+  const { data, error } = await admin
+    .from("marketplace_courses")
+    .select("*, courses(id, title, slug, summary)")
+    .eq("id", listingId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("[academy] getMarketplaceListingById", error.message);
+    return null;
+  }
+  return data;
+}
+
 export async function listMentoringSessions(userId?: string, limit = 20) {
   const supabase = await createClient();
   let query = supabase.from("mentoring_sessions").select("*").order("scheduled_at", { ascending: true }).limit(limit);

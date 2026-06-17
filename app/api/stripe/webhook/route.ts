@@ -6,6 +6,7 @@ import { getClientIp } from "@/lib/security/client-ip";
 import { activateAdFromCheckout } from "@/lib/ads/activate-from-payment";
 import { persistStripeWebhookLog } from "@/lib/billing/stripe-webhook-log";
 import { notifySubscriptionConfirmed } from "@/lib/notifications/engine";
+import { updateUserProgress } from "@/lib/academy/db";
 
 export const dynamic = "force-dynamic";
 
@@ -205,6 +206,56 @@ export async function POST(request: Request) {
             sessionId: session.id,
             kind: session.metadata?.kind,
             productId: session.metadata?.product_id,
+          },
+        });
+      }
+
+      if (session.metadata?.academy_marketplace === "true" && session.id) {
+        const buyerId = session.metadata.user_id;
+        const courseId = session.metadata.course_id;
+        const listingId = session.metadata.listing_id;
+
+        if (buyerId && courseId) {
+          await updateUserProgress(buyerId, {
+            course_id: courseId,
+            status: "in_progress",
+            progress_pct: 0,
+          });
+
+          if (listingId) {
+            const { data: listing } = await admin
+              .from("marketplace_courses")
+              .select("listing_metadata")
+              .eq("id", listingId)
+              .maybeSingle();
+
+            const prevMeta = (listing?.listing_metadata ?? {}) as Record<string, unknown>;
+            const purchases = Array.isArray(prevMeta.purchases) ? prevMeta.purchases : [];
+            purchases.push({
+              user_id: buyerId,
+              session_id: session.id,
+              purchased_at: new Date().toISOString(),
+            });
+
+            await admin
+              .from("marketplace_courses")
+              .update({
+                listing_metadata: { ...prevMeta, purchases },
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", listingId);
+          }
+        }
+
+        await logSecurityEvent({
+          ip,
+          userId: buyerId,
+          action: "stripe:academy_marketplace_completed",
+          status: "ok",
+          details: {
+            sessionId: session.id,
+            courseId,
+            listingId,
           },
         });
       }

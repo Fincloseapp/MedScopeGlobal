@@ -13,6 +13,34 @@ export interface StripeWebhookLogInput {
   payload?: Record<string, unknown>;
 }
 
+export interface StripeWebhookLogRow {
+  id?: string;
+  received_at: string;
+  event_id: string | null;
+  event_type: string;
+  livemode: boolean;
+  api_version: string | null;
+  status: StripeWebhookLogInput["status"];
+  object_id: string | null;
+  customer_id: string | null;
+  error: string | null;
+  payload: Record<string, unknown>;
+}
+
+export async function listStripeWebhookLogs(limit = 100): Promise<StripeWebhookLogRow[]> {
+  const admin = createServiceRoleClient();
+  const { data, error } = await admin
+    .from("stripe_webhook_logs")
+    .select("*")
+    .order("received_at", { ascending: false })
+    .limit(limit);
+  if (error) {
+    console.error("listStripeWebhookLogs", error.message);
+    return [];
+  }
+  return (data ?? []) as StripeWebhookLogRow[];
+}
+
 export async function persistStripeWebhookLog(input: StripeWebhookLogInput): Promise<void> {
   try {
     const admin = createServiceRoleClient();

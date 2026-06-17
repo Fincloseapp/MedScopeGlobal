@@ -31,6 +31,7 @@ export const ADMIN_NAV_ITEMS: {
   { href: "/admin/articles", label: "Articles", icon: Newspaper },
   { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
   { href: "/admin/email-logs", label: "Email logs", icon: Mail },
+  { href: "/admin/stripe-webhook-logs", label: "Stripe webhooks", icon: ShieldCheck },
   { href: "/admin/brand", label: "Brand & logo", icon: Palette },
   { href: "/admin/autopilot", label: "V6 Autopilot", icon: Bot },
   { href: "/admin/ingestion", label: "AI ingestion", icon: Bot },
