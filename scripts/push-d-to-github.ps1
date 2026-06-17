@@ -74,6 +74,8 @@ try {
     if (-not $status) { Write-Host "No changes to commit"; exit 0 }
     throw "git commit failed"
   }
+  & $git pull --rebase origin main
+  if ($LASTEXITCODE -ne 0) { throw "git pull --rebase failed" }
   & $git push origin main
   if ($LASTEXITCODE -ne 0) { throw "git push failed" }
   Write-Host "=== PUSH OK - Vercel deploy triggered ==="
