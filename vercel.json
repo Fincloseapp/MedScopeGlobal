@@ -113,14 +113,6 @@
     },
     {
       "path": "/api/cron/academy-weekly",
-      "schedule": "0 21 * * 1"
-    },
-    {
-      "path": "/api/cron/academy-monthly",
-      "schedule": "0 22 1 * *"
-    },
-    {
-      "path": "/api/cron/academy-weekly",
       "schedule": "0 21 * * 0"
     },
     {
