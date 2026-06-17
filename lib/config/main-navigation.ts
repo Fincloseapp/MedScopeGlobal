@@ -12,6 +12,8 @@ const menuCs: NavItem[] = [
     href: "/verejnost",
     children: [
       { label: "Přehled", href: "/verejnost", description: "Prevence, výživa, spánek a fitness" },
+      { label: "Denní videa", href: "/verejnost/osveta", description: "Zdravotní tipy s avatary" },
+      { label: "Žebříček", href: "/verejnost/zebricek", description: "XP za sledování a kvízy" },
       { label: "Články", href: "/verejnost/clanky", description: "Krátké srozumitelné články" },
       { label: "Témata", href: "/verejnost/temata", description: "Najdi svůj problém" },
       { label: "Rozhovory", href: "/verejnost/rozhovory", description: "Rozhovory s odborníky" },
@@ -176,6 +178,8 @@ const menuEn: NavItem[] = [
     href: "/verejnost",
     children: [
       { label: "Overview", href: "/verejnost" },
+      { label: "Daily videos", href: "/verejnost/osveta" },
+      { label: "Leaderboard", href: "/verejnost/zebricek" },
       { label: "Articles", href: "/verejnost/clanky" },
       { label: "Topics", href: "/verejnost/temata" },
       { label: "Interviews", href: "/verejnost/rozhovory" },

@@ -118,6 +118,10 @@
     {
       "path": "/api/cron/academy-monthly",
       "schedule": "0 22 1 * *"
+    },
+    {
+      "path": "/api/cron/public-osveta-daily",
+      "schedule": "0 7 * * *"
     }
   ],
   

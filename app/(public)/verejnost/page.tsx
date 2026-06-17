@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { DailyTipBanner } from "@/components/verejnost/daily-tip-banner";
 import { VerejnostArticleCard } from "@/components/verejnost/verejnost-article-card";
 import { VEREJNOST_HUB_TOPICS } from "@/lib/config/verejnost-topics";
 import { listPublicArticles } from "@/lib/queries/verejnost";
@@ -13,6 +14,8 @@ export const metadata: Metadata = {
 };
 
 const QUICK_LINKS = [
+  { href: "/verejnost/osveta", label: "Denní videa", desc: "Zdravotní tipy s avatary a kvízy" },
+  { href: "/verejnost/zebricek", label: "Žebříček XP", desc: "Soutěžte s ostatními veřejnými uživateli" },
   { href: "/verejnost/clanky", label: "Všechny články", desc: "Aktuální články pro veřejnost" },
   { href: "/verejnost/temata", label: "Témata", desc: "Kategorie podle oblasti zdraví" },
   { href: "/verejnost/rozhovory", label: "Rozhovory", desc: "Rozhovory s lékaři a odborníky" },
@@ -53,8 +56,14 @@ export default async function VerejnostHubPage() {
           ) : null}
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/verejnost/clanky"
+              href="/verejnost/osveta"
               className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#005B96] shadow-sm transition hover:bg-white/90"
+            >
+              Dnešní zdravotní tip
+            </Link>
+            <Link
+              href="/verejnost/clanky"
+              className="rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
             >
               Prohlédnout články
             </Link>
@@ -74,8 +83,10 @@ export default async function VerejnostHubPage() {
         </div>
       </section>
 
+      <DailyTipBanner />
+
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {QUICK_LINKS.map((l) => (
             <Link
               key={l.href}
