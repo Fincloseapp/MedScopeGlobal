@@ -8,9 +8,11 @@
 
 1. [Expo account](https://expo.dev/signup)
 
-2. EAS CLI: `npm install -g eas-cli`
+2. EAS CLI: `npm install -g eas-cli` (requires Node.js + npm on PATH)
 
 3. Apple Developer + Google Play Console accounts (for store submission)
+
+> **CI / Windows note:** If `eas` or `npx` is unavailable, use Option B below or run `eas init` from a machine with Node 20+ and Expo CLI. After init, copy the project UUID into `app.json` and `eas.json` `update.url`.
 
 
 
@@ -50,9 +52,13 @@ eas init
 
 
 
-`eas init` writes a real UUID into `expo.extra.eas.projectId`.  
+`eas init` writes a real UUID into `expo.extra.eas.projectId` and updates `eas.json`:
 
-Commit the project ID if your team policy allows (no secrets in that field).
+```json
+"update": { "url": "https://u.expo.dev/<your-project-id>" }
+```
+
+Commit the project ID if your team policy allows (no secrets in that field). Replace `REPLACE_WITH_EAS_PROJECT_ID` in both `app.json` and `eas.json` until init completes.
 
 
 

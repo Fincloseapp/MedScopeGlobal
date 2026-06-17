@@ -19,6 +19,7 @@ CREATE INDEX IF NOT EXISTS idx_v27_orders_created ON v27_orders(created_at DESC)
 
 ALTER TABLE v27_orders ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access v27_orders" ON v27_orders;
 CREATE POLICY "Service role full access v27_orders"
   ON v27_orders FOR ALL
   USING (true)

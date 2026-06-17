@@ -35,7 +35,12 @@ const ROUTES = [
   "/api/academy/simulations",
   "/api/academy/textbooks",
   "/api/academy/marketplace",
-  { path: "/api/academy/marketplace/checkout", method: "POST", expectStatus: 401, body: '{"listingId":"00000000-0000-0000-0000-000000000001"}' },
+  {
+    path: "/api/academy/marketplace/checkout",
+    method: "POST",
+    expectStatus: 401,
+    body: '{"listingId":"e2e00001-0000-4000-8000-000000000001"}',
+  },
   "/api/academy/leaderboard",
   "/api/mobile/sync",
   "/api/mobile/health",
@@ -130,6 +135,27 @@ if (health?.text) {
     console.log("✗ health response not JSON");
     failed += 1;
   }
+}
+
+const marketplace = results.find((r) => r.route === "/api/academy/marketplace");
+if (marketplace?.text) {
+  try {
+    const json = JSON.parse(marketplace.text);
+    const listings = json.listings ?? [];
+    const priced = listings.filter((l) => Number(l.price_czk) > 0 && l.status === "listed");
+    if (priced.length < 1) {
+      console.log("✗ marketplace: no listed listing with price > 0 (run db:setup seed)");
+      failed += 1;
+    } else {
+      console.log(`✓ marketplace: ${priced.length} listed listing(s), top price ${priced[0].price_czk} Kč`);
+    }
+  } catch {
+    console.log("✗ marketplace response not JSON");
+    failed += 1;
+  }
+} else {
+  console.log("✗ marketplace API unreachable");
+  failed += 1;
 }
 
 console.log(failed ? `\nAcademy v35 smoke FAILED (${failed} checks)\n` : "\nAcademy v35 smoke PASSED\n");
