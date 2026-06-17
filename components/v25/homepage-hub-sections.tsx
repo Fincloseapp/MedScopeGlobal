@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { DailyTipBanner } from "@/components/verejnost/daily-tip-banner";
 import { VerejnostArticleCard } from "@/components/verejnost/verejnost-article-card";
 import { V20ArticleCard } from "@/components/v20/article-card";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
@@ -62,6 +63,8 @@ export async function V25HomepageHubSections({
 
   return (
     <>
+      <DailyTipBanner />
+
       <section className="border-b border-slate-200 bg-white" aria-labelledby="v25-hub-heading">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
           <div className="max-w-2xl">

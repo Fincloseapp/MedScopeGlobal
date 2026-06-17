@@ -24,7 +24,11 @@ export async function listPublicHealthVideos(opts?: {
   const supabase = await createClient();
   let query = supabase
     .from("public_health_videos")
-    .select("*, topic:public_health_topics(*)")
+    .select(
+      opts?.category
+        ? "*, topic:public_health_topics!inner(*)"
+        : "*, topic:public_health_topics(*)"
+    )
     .eq("status", "published")
     .order("published_at", { ascending: false });
 
@@ -136,13 +140,14 @@ export async function getPublicOsvetaLeaderboard(limit = 20): Promise<PublicHeal
 
   const userIds = entries.map((e) => e.user_id);
   const { data: profiles } = await admin
-    .from("user_profiles")
-    .select("id, display_name, full_name")
+    .from("users")
+    .select("id, full_name, email")
     .in("id", userIds);
 
   const nameMap = new Map<string, string | null>();
   for (const p of profiles ?? []) {
-    nameMap.set(p.id, p.display_name ?? p.full_name ?? null);
+    const label = p.full_name ?? (p.email ? p.email.split("@")[0] : null);
+    nameMap.set(p.id, label);
   }
 
   return entries.map((e) => ({

@@ -64,6 +64,8 @@ WHERE e.event_type IN ('public_osveta_watch', 'public_osveta_quiz')
 GROUP BY e.user_id
 ORDER BY total_xp DESC;
 
+GRANT SELECT ON public.public_health_leaderboard TO anon, authenticated;
+
 COMMENT ON VIEW public.public_health_leaderboard IS
   'Veřejnost XP žebříček — pouze události public_osveta_watch a public_osveta_quiz';
 
@@ -110,7 +112,7 @@ SELECT v.slug, v.title, v.description, v.category, v.popularity_score
 FROM (VALUES
   ('prevence-infarktu', 'Prevence infarktu', 'Jak snížit riziko srdečních příhod jednoduchými kroky.', 'prevence', 95),
   ('cukrovka-typ-2', 'Cukrovka typ 2', 'Co je diabetes 2. typu a jak mu předcházet.', 'nemoc', 92),
-  ('spánek-a-zdraví', 'Spánek a zdraví', 'Proč kvalitní spánek chrání srdce, mozek i imunitu.', 'zivotni-styl', 88),
+  ('spanek-a-zdravi', 'Spánek a zdraví', 'Proč kvalitní spánek chrání srdce, mozek i imunitu.', 'zivotni-styl', 88),
   ('ockovani', 'Očkování', 'Jak očkování chrání vás i okolí — srozumitelně a bez paniky.', 'prevence', 85),
   ('dlouhovekost', 'Dlouhověkost', 'Návyky modrých zón: pohyb, strava, smysl života.', 'dlouhovekost', 80),
   ('stres', 'Stres a zdraví', 'Jak poznat chronický stres a co s ním dělat.', 'zivotni-styl', 78),
@@ -154,7 +156,7 @@ FROM (VALUES
     (now() - interval '5 days')::date + time '08:00'
   ),
   (
-    'spánek-a-zdraví',
+    'spanek-a-zdravi',
     'Spánek: proč je klíčový pro vaše zdraví',
     'Dobrý den! Jsem wellness kouč Petra. Spánek není luxus — je to medicína zdarma. Dospělý potřebuje sedm až devět hodin. Špatný spánek zvyšuje riziko obezity, cukrovky i deprese. Jak na to? Pravidelná doba usínání, tmu v ložnici, žádné obrazovky hodinu před spaním. Kofein po druhé odpoledne? Raději ne. A pohyb ano — ale ne těsně před spaním. Zkuste dnes večer jednu věc jinak — třeba knihu místo telefonu. Vaše tělo vám poděkuje!',
     'wellness_coach',
@@ -221,7 +223,7 @@ JOIN (VALUES
     {"question_text":"Co pomáhá prevenci?","options":["Slazené nápoje","Pravidelná chůze","Méně spánku"],"correct_answer":"Pravidelná chůze","explanation":"Pohyb zlepšuje citlivost na inzulín."},
     {"question_text":"Kdy kontrolovat glykémii?","options":["Nikdy","Po 40 letech u praktika","Jen při horečce"],"correct_answer":"Po 40 letech u praktika","explanation":"Screening glykémie je součástí preventivních prohlídek."}
   ]'::jsonb),
-  ('spánek-a-zdraví', '[
+  ('spanek-a-zdravi', '[
     {"question_text":"Kolik hodin spánku potřebuje dospělý?","options":["4–5","7–9","12+"],"correct_answer":"7–9","explanation":"Dospělí potřebují zhruba 7–9 hodin kvalitního spánku."},
     {"question_text":"Co zhoršuje spánek?","options":["Tma v ložnici","Obrazovky před spaním","Pravidelný režim"],"correct_answer":"Obrazovky před spaním","explanation":"Modré světlo ruší produkci melatoninu."},
     {"question_text":"Kdy omezit kofein?","options":["Po 14. hodině","V noci jen","Nikdy"],"correct_answer":"Po 14. hodině","explanation":"Kofein má dlouhý poločas — odpolední káva může rušit spánek."}
