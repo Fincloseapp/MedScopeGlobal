@@ -35,7 +35,7 @@ const ROUTES = [
   "/api/academy/simulations",
   "/api/academy/textbooks",
   "/api/academy/marketplace",
-  { path: "/api/academy/marketplace/checkout", method: "POST", expectStatus: 401 },
+  { path: "/api/academy/marketplace/checkout", method: "POST", expectStatus: 401, body: '{"listingId":"00000000-0000-0000-0000-000000000001"}' },
   "/api/academy/leaderboard",
   "/api/mobile/sync",
   "/api/mobile/health",
@@ -73,8 +73,9 @@ for (const route of ROUTES) {
   const expectAuth = typeof route === "object" && route.expectAuth;
   const expectStatus = typeof route === "object" ? route.expectStatus : undefined;
   const method = typeof route === "object" ? route.method : undefined;
+  const body = typeof route === "object" ? route.body : undefined;
   process.stdout.write(`→ ${path} … `);
-  const r = await checkRoute(path, { expectAuth, expectStatus, method });
+  const r = await checkRoute(path, { expectAuth, expectStatus, method, body });
   results.push(r);
   if (!r.ok) {
     failed += 1;
