@@ -1,32 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 export function AdminVideoForm() {
+  const fileRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
-  const [form, setForm] = useState({ title: "", storage_path: "" });
+  const [title, setTitle] = useState("");
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    const file = fileRef.current?.files?.[0];
+    if (!file) {
+      setStatus("Vyberte video soubor.");
+      return;
+    }
+
     setLoading(true);
     setStatus(null);
     try {
-      const res = await fetch("/api/academy/video", {
+      const form = new FormData();
+      form.append("title", title.trim());
+      form.append("file", file);
+
+      const res = await fetch("/api/academy/video/upload", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         credentials: "same-origin",
-        body: JSON.stringify(form),
+        body: form,
       });
       const data = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) {
         setStatus(data.error ?? `Chyba (${res.status})`);
         return;
       }
-      setStatus("Video záznam vytvořen (pending upload).");
-      setForm({ title: "", storage_path: "" });
+      setStatus("Video nahráno do Supabase Storage.");
+      setTitle("");
+      if (fileRef.current) fileRef.current.value = "";
       window.location.reload();
     } catch {
       setStatus("Síťová chyba");
@@ -38,33 +49,34 @@ export function AdminVideoForm() {
   if (!open) {
     return (
       <Button type="button" onClick={() => setOpen(true)}>
-        + Nové video
+        + Nahrát video
       </Button>
     );
   }
 
   return (
     <form onSubmit={submit} className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
-      <p className="text-sm font-medium text-[#021d33]">Registrovat video asset</p>
+      <p className="text-sm font-medium text-[#021d33]">Nahrát video do Supabase Storage</p>
       <input
         required
         placeholder="Název videa"
-        value={form.title}
-        onChange={(e) => setForm({ ...form, title: e.target.value })}
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
         className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
       />
       <input
-        placeholder="Storage path (např. academy/videos/lekce-1.mp4)"
-        value={form.storage_path}
-        onChange={(e) => setForm({ ...form, storage_path: e.target.value })}
-        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+        ref={fileRef}
+        type="file"
+        accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov,.m4v"
+        required
+        className="w-full text-sm"
       />
       <p className="text-xs text-slate-500">
-        Upload do Supabase Storage bude doplněn ve fázi 6 — zatím stub záznamu.
+        Bucket <code>media</code> · cesta <code>academy/videos/</code> · max 100 MB
       </p>
       <div className="flex flex-wrap gap-2">
         <Button type="submit" disabled={loading}>
-          {loading ? "Ukládám…" : "Vytvořit"}
+          {loading ? "Nahrávám…" : "Nahrát"}
         </Button>
         <Button type="button" variant="outline" onClick={() => setOpen(false)}>
           Zrušit

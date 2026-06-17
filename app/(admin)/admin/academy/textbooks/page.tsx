@@ -1,5 +1,6 @@
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { AdminTextbookForm } from "@/components/academy/admin-textbook-form";
+import { AdminTextbookEditor } from "@/components/academy/admin-textbook-editor";
 
 export default async function AdminAcademyTextbooksPage() {
   const admin = createServiceRoleClient();
@@ -12,34 +13,29 @@ export default async function AdminAcademyTextbooksPage() {
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-slate-600">Digitální učebnice Academy — kapitoly v metadata.</p>
+        <p className="text-sm text-slate-600">
+          Digitální učebnice — WYSIWYG editor kapitol s publikací.
+        </p>
         <AdminTextbookForm />
       </div>
-      <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b bg-slate-50 text-xs uppercase text-slate-500">
-            <tr>
-              <th className="px-4 py-3">Název</th>
-              <th className="px-4 py-3">Slug</th>
-              <th className="px-4 py-3">Stav</th>
-              <th className="px-4 py-3">Kapitoly</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(rows ?? []).map((row) => {
-              const meta = (row.metadata ?? {}) as { chapters?: unknown[] };
-              const chapterCount = Array.isArray(meta.chapters) ? meta.chapters.length : 0;
-              return (
-                <tr key={row.id} className="border-b last:border-0">
-                  <td className="px-4 py-3 font-medium">{row.title}</td>
-                  <td className="px-4 py-3">{row.slug}</td>
-                  <td className="px-4 py-3">{row.status}</td>
-                  <td className="px-4 py-3">{chapterCount || "—"}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div className="mt-4 space-y-4">
+        {(rows ?? []).map((row) => {
+          const meta = (row.metadata ?? {}) as { chapters?: unknown[] };
+          const chapterCount = Array.isArray(meta.chapters) ? meta.chapters.length : 0;
+          return (
+            <div key={row.id} className="overflow-hidden rounded-xl border border-slate-200 bg-white p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="font-medium text-[#021d33]">{row.title}</p>
+                  <p className="text-xs text-slate-500">
+                    {row.slug} · {row.status} · {chapterCount || 0} kapitol
+                  </p>
+                </div>
+                <AdminTextbookEditor textbook={row} />
+              </div>
+            </div>
+          );
+        })}
       </div>
     </>
   );

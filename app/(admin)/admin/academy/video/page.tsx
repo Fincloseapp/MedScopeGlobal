@@ -12,7 +12,9 @@ export default async function AdminAcademyVideoPage() {
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-slate-600">Video assets pro lekce Academy.</p>
+        <p className="text-sm text-slate-600">
+          Video assets — upload do Supabase Storage (<code className="text-xs">media/academy/videos</code>).
+        </p>
         <AdminVideoForm />
       </div>
       <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
@@ -26,14 +28,25 @@ export default async function AdminAcademyVideoPage() {
             </tr>
           </thead>
           <tbody>
-            {(videos ?? []).map((row) => (
-              <tr key={row.id} className="border-b last:border-0">
-                <td className="px-4 py-3 font-medium">{row.title}</td>
-                <td className="px-4 py-3">{row.status}</td>
-                <td className="px-4 py-3 text-xs text-slate-500">{row.storage_path ?? "—"}</td>
-                <td className="px-4 py-3">{row.duration_seconds ?? 0}s</td>
-              </tr>
-            ))}
+            {(videos ?? []).map((row) => {
+              const meta = (row.metadata ?? {}) as { public_url?: string };
+              return (
+                <tr key={row.id} className="border-b last:border-0">
+                  <td className="px-4 py-3 font-medium">{row.title}</td>
+                  <td className="px-4 py-3">{row.status}</td>
+                  <td className="px-4 py-3 text-xs text-slate-500">
+                    {meta.public_url ? (
+                      <a href={meta.public_url} className="text-[#005B96] hover:underline" target="_blank" rel="noreferrer">
+                        {row.storage_path ?? "soubor"}
+                      </a>
+                    ) : (
+                      row.storage_path ?? "—"
+                    )}
+                  </td>
+                  <td className="px-4 py-3">{row.duration_seconds ?? 0}s</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
