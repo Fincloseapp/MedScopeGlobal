@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdminApiAuthorized } from "@/lib/auth/admin-api";
 import { getQuizById, submitQuizAnswers, updateQuiz } from "@/lib/academy/db";
+import { createClient } from "@/lib/supabase/server";
 import type { QuizSubmitAnswer, UpdateQuizInput } from "@/types/academy";
 
 export const dynamic = "force-dynamic";
@@ -40,7 +41,9 @@ export async function POST(request: Request, { params }: Params) {
   try {
     const body = (await request.json()) as { answers?: QuizSubmitAnswer[] };
     const answers = body.answers ?? [];
-    const result = await submitQuizAnswers(id, answers);
+    const supabase = await createClient();
+    const { data: auth } = await supabase.auth.getUser();
+    const result = await submitQuizAnswers(id, answers, auth.user?.id ?? null);
     return NextResponse.json({ ok: true, result });
   } catch (e) {
     return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });

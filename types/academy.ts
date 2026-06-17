@@ -226,6 +226,7 @@ export interface QuizSubmitResult {
   passing_score: number;
   correct_count: number;
   total_count: number;
+  xp_awarded?: number;
 }
 
 export interface MarketplaceListing {

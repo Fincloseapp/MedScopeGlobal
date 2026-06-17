@@ -16,6 +16,7 @@ function newId(prefix: string) {
 
 export function AdminSimulationGraphEditor({ decisions, startNode, onChange }: Props) {
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
 
   function updateDecision(index: number, patch: Partial<SimulationDecision>) {
     const next = decisions.map((d, i) => (i === index ? { ...d, ...patch } : d));
@@ -81,7 +82,29 @@ export function AdminSimulationGraphEditor({ decisions, startNode, onChange }: P
     setCollapsed((prev) => ({ ...prev, [id]: !prev[id] }));
   }
 
+  function onDragStart(index: number) {
+    setDragIndex(index);
+  }
+
+  function onDrop(targetIndex: number) {
+    if (dragIndex === null || dragIndex === targetIndex) {
+      setDragIndex(null);
+      return;
+    }
+    const next = [...decisions];
+    const [item] = next.splice(dragIndex, 1);
+    next.splice(targetIndex, 0, item);
+    onChange({ decisions: next, start_node: startNode });
+    setDragIndex(null);
+  }
+
   const nodeIds = decisions.map((d) => d.id);
+
+  const branchEdges = decisions.flatMap((d) =>
+    d.options
+      .filter((o) => o.next)
+      .map((o) => ({ from: d.id, to: o.next as string, label: o.label }))
+  );
 
   return (
     <div className="space-y-4">
@@ -107,14 +130,21 @@ export function AdminSimulationGraphEditor({ decisions, startNode, onChange }: P
 
       {decisions.length > 0 ? (
         <div className="rounded-lg border border-dashed border-slate-300 bg-white p-3">
-          <p className="text-xs font-medium uppercase text-slate-500">Přehled toku</p>
+          <p className="text-xs font-medium uppercase text-slate-500">Přehled toku (drag uzly pro přeuspořádání)</p>
           <div className="mt-2 flex flex-wrap items-center gap-1 text-xs">
             {decisions.map((d, i) => (
-              <span key={d.id} className="inline-flex items-center gap-1">
+              <span
+                key={d.id}
+                className="inline-flex items-center gap-1"
+                draggable
+                onDragStart={() => onDragStart(i)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => onDrop(i)}
+              >
                 <button
                   type="button"
                   onClick={() => toggleCollapse(d.id)}
-                  className={`rounded-full px-2 py-0.5 ${
+                  className={`cursor-grab rounded-full px-2 py-0.5 active:cursor-grabbing ${
                     d.id === startNode
                       ? "bg-[#005B96] text-white"
                       : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -126,6 +156,22 @@ export function AdminSimulationGraphEditor({ decisions, startNode, onChange }: P
               </span>
             ))}
           </div>
+          {branchEdges.length > 0 ? (
+            <div className="mt-3 border-t border-slate-100 pt-3">
+              <p className="text-xs font-medium uppercase text-slate-500">Větvení</p>
+              <ul className="mt-1 space-y-1 text-xs text-slate-600">
+                {branchEdges.map((edge, i) => (
+                  <li key={`${edge.from}-${edge.to}-${i}`}>
+                    <span className="font-mono text-[#005B96]">{edge.from}</span>
+                    {" — "}
+                    {edge.label}
+                    {" → "}
+                    <span className="font-mono">{edge.to}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -136,7 +182,16 @@ export function AdminSimulationGraphEditor({ decisions, startNode, onChange }: P
       {decisions.map((decision, di) => {
         const isCollapsed = collapsed[decision.id];
         return (
-          <div key={decision.id} className="rounded-lg border border-slate-200 bg-white p-4">
+          <div
+            key={decision.id}
+            className={`rounded-lg border bg-white p-4 ${
+              dragIndex === di ? "border-[#005B96] ring-1 ring-[#005B96]/30" : "border-slate-200"
+            }`}
+            draggable
+            onDragStart={() => onDragStart(di)}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={() => onDrop(di)}
+          >
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div className="flex flex-1 flex-wrap items-start gap-2">
                 <div className="flex flex-col gap-1">

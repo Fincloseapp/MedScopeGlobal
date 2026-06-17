@@ -128,6 +128,11 @@ export function QuizPlayer({ quizId, questions, passingScore }: Props) {
           <p className={`mt-2 font-medium ${result.passed ? "text-green-700" : "text-amber-700"}`}>
             {result.passed ? "Gratulujeme, kvíz jste splnili!" : "Zkuste to znovu po prostudování lekce."}
           </p>
+          {result.passed && result.xp_awarded && result.xp_awarded > 0 ? (
+            <p className="mt-2 text-sm font-medium text-[#005B96]">+{result.xp_awarded} XP na žebříček</p>
+          ) : result.passed ? (
+            <p className="mt-2 text-xs text-slate-500">Přihlaste se pro získání XP na žebříčku.</p>
+          ) : null}
           <Button
             variant="outline"
             className="mt-4"

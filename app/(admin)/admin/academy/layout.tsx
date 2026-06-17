@@ -10,7 +10,7 @@ export default function AcademyAdminLayout({ children }: { children: React.React
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="font-display text-xl font-semibold text-[#021d33]">MedScope Academy Admin</h1>
-            <p className="text-xs text-slate-500">v35.0 phase 7</p>
+            <p className="text-xs text-slate-500">v35.0 phase 8</p>
           </div>
           <Link
             href="/academy"

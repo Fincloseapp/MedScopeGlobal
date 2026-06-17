@@ -37,6 +37,7 @@ const ROUTES = [
   "/api/academy/marketplace",
   "/api/academy/leaderboard",
   "/api/mobile/sync",
+  "/api/mobile/health",
   { path: "/api/academy/testing/run", expectAuth: true },
 ];
 
@@ -88,6 +89,21 @@ const sectionsOk =
 console.log(`→ / homepage Academy sections … ${sectionsOk ? "OK" : "WARN (may be empty DB)"}`);
 
 const health = results.find((r) => r.route === "/api/academy/health");
+const mobileHealth = results.find((r) => r.route === "/api/mobile/health");
+if (mobileHealth?.text) {
+  try {
+    const json = JSON.parse(mobileHealth.text);
+    if (!json.ok || json.service !== "medscope-academy-mobile") {
+      console.log("✗ mobile health unexpected payload");
+      failed += 1;
+    } else {
+      console.log(`✓ mobile health ok, sync=${json.syncEndpoint}`);
+    }
+  } catch {
+    console.log("✗ mobile health not JSON");
+    failed += 1;
+  }
+}
 if (health?.text) {
   try {
     const json = JSON.parse(health.text);
@@ -95,7 +111,9 @@ if (health?.text) {
       console.log(`✗ health version expected v35.0, got ${json.version}`);
       failed += 1;
     } else {
-      console.log(`✓ health version ${json.version}, ok=${json.ok}`);
+      console.log(
+        `✓ health version ${json.version}, ok=${json.ok}, digest=${json.digestDeliveryMode}, llm=${json.llmConfigured}`
+      );
     }
   } catch {
     console.log("✗ health response not JSON");

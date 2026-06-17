@@ -231,7 +231,8 @@ export async function getQuizById(id: string, includeAnswers = false): Promise<A
 
 export async function submitQuizAnswers(
   quizId: string,
-  answers: QuizSubmitAnswer[]
+  answers: QuizSubmitAnswer[],
+  userId?: string | null
 ): Promise<QuizSubmitResult> {
   const admin = adminClient();
   const { data: quiz } = await admin.from("quizzes").select("*").eq("id", quizId).maybeSingle();
@@ -257,14 +258,47 @@ export async function submitQuizAnswers(
   const total = qList.length || 1;
   const score = Math.round((correct / total) * 100);
   const passing = (quiz as { passing_score: number }).passing_score ?? 70;
+  const passed = score >= passing;
+
+  let xp_awarded = 0;
+  if (passed && userId) {
+    const { data: existing } = await admin
+      .from("xp_events")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("event_type", "quiz_pass")
+      .eq("source_id", quizId)
+      .maybeSingle();
+
+    if (!existing?.id) {
+      xp_awarded = Math.max(25, Math.round(score * 0.5));
+      await awardXp(userId, {
+        eventType: "quiz_pass",
+        points: xp_awarded,
+        sourceType: "quiz",
+        sourceId: quizId,
+      });
+
+      const courseId = (quiz as { course_id: string | null }).course_id;
+      if (courseId) {
+        await updateUserProgress(userId, {
+          course_id: courseId,
+          status: "completed",
+          progress_pct: 100,
+          quiz_score: score,
+        });
+      }
+    }
+  }
 
   return {
     quiz_id: quizId,
     score,
-    passed: score >= passing,
+    passed,
     passing_score: passing,
     correct_count: correct,
     total_count: total,
+    xp_awarded,
   };
 }
 

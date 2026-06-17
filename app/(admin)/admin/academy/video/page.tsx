@@ -20,7 +20,7 @@ export default async function AdminAcademyVideoPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-slate-600">
           Video assets — upload do Supabase Storage (<code className="text-xs">media/academy/videos</code>
-          ). Délka se extrahuje z MP4 nebo odhaduje ze velikosti.
+          ). Délka + SVG náhled (Phase 8 transcoding stub).
         </p>
         <AdminVideoForm />
       </div>
@@ -29,6 +29,7 @@ export default async function AdminAcademyVideoPage() {
           const meta = (row.metadata ?? {}) as {
             public_url?: string;
             duration_source?: string;
+            thumbnail_url?: string;
           };
           const linkedLesson = lessonList.find((l) => l.video_asset_id === row.id) ?? null;
           return (
@@ -37,7 +38,14 @@ export default async function AdminAcademyVideoPage() {
               className="overflow-hidden rounded-xl border border-slate-200 bg-white p-4"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
+                {meta.thumbnail_url ? (
+                  <img
+                    src={meta.thumbnail_url}
+                    alt={`Náhled: ${row.title}`}
+                    className="h-20 w-36 shrink-0 rounded-lg border border-slate-100 object-cover"
+                  />
+                ) : null}
+                <div className="min-w-0 flex-1">
                   <p className="font-medium text-[#021d33]">{row.title}</p>
                   <p className="text-xs text-slate-500">
                     {row.status} · {row.duration_seconds ?? 0}s
