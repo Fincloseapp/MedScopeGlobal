@@ -1,5 +1,6 @@
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { AdminVideoForm } from "@/components/academy/admin-video-form";
+import { AdminVideoGenerateButton } from "@/components/academy/admin-video-generate-button";
 import { AdminVideoLessonLink } from "@/components/academy/admin-video-lesson-link";
 
 export default async function AdminAcademyVideoPage() {
@@ -19,10 +20,12 @@ export default async function AdminAcademyVideoPage() {
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-slate-600">
-          Video assets — upload do Supabase Storage (<code className="text-xs">media/academy/videos</code>
-          ). Délka + SVG náhled (Phase 8 transcoding stub).
+          Video assets — upload nebo AI generování (script + placeholder asset). HeyGen/Synthesia připraveno.
         </p>
-        <AdminVideoForm />
+        <div className="flex flex-wrap items-end gap-3">
+          <AdminVideoGenerateButton lessons={lessonList} />
+          <AdminVideoForm />
+        </div>
       </div>
       <div className="mt-4 space-y-4">
         {(videos ?? []).map((row) => {

@@ -192,3 +192,14 @@ export async function queueExpertReview(payload: {
     priority: 2,
   });
 }
+
+export async function queueGenerateVideo(payload: {
+  lesson_id: string;
+  title?: string;
+}): Promise<AiTask> {
+  return enqueueAiTask({
+    taskType: "video-producer",
+    payload,
+    priority: 2,
+  });
+}

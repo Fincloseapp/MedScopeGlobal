@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PlayCircle } from "lucide-react";
 import { AcademyPageHeader } from "@/components/academy/page-header";
 import { getCourseBySlug } from "@/lib/academy/db";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
@@ -53,20 +54,35 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
           <span>{course.title}</span>
         </nav>
 
+        {(course.video_lesson_count ?? 0) > 0 ? (
+          <p className="mb-4 inline-flex items-center gap-1 rounded-full bg-[#e8f4fc] px-3 py-1 text-xs font-medium text-[#005B96]">
+            <PlayCircle className="h-3.5 w-3.5" />
+            Videokurz · {course.video_lesson_count} video lekcí
+          </p>
+        ) : null}
+
         {course.lessons.length > 0 ? (
           <ol className="space-y-3">
             {course.lessons.map((lesson, i) => (
-              <li
-                key={lesson.id}
-                className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3"
-              >
-                <div>
-                  <p className="text-xs text-slate-500">Lekce {i + 1}</p>
-                  <p className="font-medium text-[#021d33]">{lesson.title}</p>
-                </div>
-                {lesson.duration_minutes > 0 ? (
-                  <span className="text-xs text-slate-500">{lesson.duration_minutes} min</span>
-                ) : null}
+              <li key={lesson.id}>
+                <Link
+                  href={`/academy/courses/${slug}/lessons/${lesson.slug}`}
+                  className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 transition hover:border-[#005B96]/40 hover:shadow-sm"
+                >
+                  <div>
+                    <p className="text-xs text-slate-500">Lekce {i + 1}</p>
+                    <p className="font-medium text-[#021d33]">{lesson.title}</p>
+                    {lesson.video_asset_id ? (
+                      <span className="mt-1 inline-flex items-center gap-1 text-xs text-[#005B96]">
+                        <PlayCircle className="h-3 w-3" />
+                        Video + AI lektor
+                      </span>
+                    ) : null}
+                  </div>
+                  {lesson.duration_minutes > 0 ? (
+                    <span className="text-xs text-slate-500">{lesson.duration_minutes} min</span>
+                  ) : null}
+                </Link>
               </li>
             ))}
           </ol>

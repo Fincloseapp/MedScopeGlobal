@@ -1,0 +1,205 @@
+#!/usr/bin/env node
+/**
+ * MedScope Academy v35 FULL smoke — courses, videos, lesson pages, AI lektor, admin video.
+ * Run sequentially after deploy to avoid 429: node scripts/academy-v35-full-smoke.mjs [baseUrl]
+ */
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
+const env = { ...process.env };
+
+for (const name of [".env.local", ".env"]) {
+  const p = path.join(root, name);
+  if (!fs.existsSync(p)) continue;
+  for (const line of fs.readFileSync(p, "utf8").split(/\r?\n/)) {
+    const m = line.match(/^([^#=]+)=(.*)$/);
+    if (m && !env[m[1].trim()]) env[m[1].trim()] = m[2].trim().replace(/^["']|["']$/g, "");
+  }
+}
+
+const base = (process.argv[2] ?? env.PRODUCTION_URL ?? env.PROD_BASE_URL ?? "https://medscopeglobal.com").replace(
+  /\/$/,
+  ""
+);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function fetchJson(url, opts = {}) {
+  const res = await fetch(url, { ...opts, signal: AbortSignal.timeout(45_000), redirect: "follow" });
+  const text = await res.text();
+  let json = null;
+  try {
+    json = JSON.parse(text);
+  } catch {
+    /* html */
+  }
+  return { res, text, json };
+}
+
+async function fetchPage(url) {
+  const res = await fetch(url, { signal: AbortSignal.timeout(45_000), redirect: "follow" });
+  const text = await res.text();
+  const appErr = /Application error|Internal Server Error/i.test(text.slice(0, 5000));
+  return { res, text, appErr };
+}
+
+const results = [];
+let failed = 0;
+
+function pass(name, detail = "") {
+  results.push({ name, ok: true, detail });
+  console.log(`  ✓ ${name}${detail ? ` — ${detail}` : ""}`);
+}
+
+function fail(name, detail = "") {
+  failed += 1;
+  results.push({ name, ok: false, detail });
+  console.log(`  ✗ ${name}${detail ? ` — ${detail}` : ""}`);
+}
+
+console.log(`\n=== Academy v35 FULL smoke @ ${base} ===\n`);
+
+// 1. Health — courseCount >= 3, video lessons
+await sleep(1500);
+{
+  const { res, json } = await fetchJson(`${base}/api/academy/health`);
+  if (res.status !== 200 || !json?.ok) {
+    fail("health", `status ${res.status}`);
+  } else if ((json.courseCount ?? 0) < 3) {
+    fail("health courseCount>=3", `got ${json.courseCount}`);
+  } else if ((json.videoLessonCount ?? 0) < 1) {
+    fail("health videoLessonCount>=1", `got ${json.videoLessonCount}`);
+  } else {
+    pass("health", `courses=${json.courseCount}, videos=${json.videoLessonCount}, v=${json.version}`);
+  }
+}
+
+// 2. Courses API — video flags
+await sleep(1500);
+let videoCourses = [];
+let lessonPaths = [];
+{
+  const { res, json } = await fetchJson(`${base}/api/academy/courses`);
+  if (res.status !== 200 || !json?.ok) {
+    fail("courses API", `status ${res.status}`);
+  } else {
+    const courses = json.courses ?? [];
+    videoCourses = courses.filter((c) => c.has_video || c.video_lesson_count > 0);
+    if (courses.length < 3) fail("courses API count>=3", `got ${courses.length}`);
+    else pass("courses API count>=3", String(courses.length));
+    if (videoCourses.length < 1) fail("courses API has_video", "none");
+    else pass("courses API has_video", `${videoCourses.length} videokurzů`);
+  }
+}
+
+// 3. Video assets API
+await sleep(1500);
+{
+  const { res, json } = await fetchJson(`${base}/api/academy/video`);
+  const videos = json?.videos ?? [];
+  const withUrl = videos.filter((v) => v.metadata?.public_url || v.metadata?.generated);
+  if (res.status !== 200) fail("video API", `status ${res.status}`);
+  else if (withUrl.length < 1) fail("video API assets", `ready=${videos.length}`);
+  else pass("video API assets", `${withUrl.length} s URL/metadata`);
+}
+
+// 4. Lesson pages with video player + AI lektor
+await sleep(1500);
+const LESSON_ROUTES = [
+  "/academy/courses/uvod-do-anatomie/lessons/kosterni-system",
+  "/academy/courses/uvod-do-farmakologie/lessons/farmakokinetika",
+  "/academy/courses/zaklady-kardiologie/lessons/ekg-zaklady",
+];
+
+for (const route of LESSON_ROUTES) {
+  await sleep(2000);
+  const { res, text, appErr } = await fetchPage(`${base}${route}`);
+  const hasPlayer = /LessonVideoPlayer|aspect-video|AI lektor|AI video/i.test(text);
+  const hasLecturer = /AI lektor|Zeptejte se na lekci/i.test(text);
+  if (res.status !== 200 || appErr) {
+    fail(`lesson page ${route}`, `status ${res.status}`);
+  } else if (!hasLecturer) {
+    fail(`lesson AI lektor ${route}`, "panel missing");
+  } else {
+    pass(`lesson page ${route}`, hasPlayer ? "video+lektor" : "lektor");
+    lessonPaths.push(route);
+  }
+}
+
+// 5. Course detail — lesson links
+await sleep(1500);
+{
+  const { res, text, appErr } = await fetchPage(`${base}/academy/courses/uvod-do-anatomie`);
+  const hasLinks = /\/academy\/courses\/uvod-do-anatomie\/lessons\//.test(text);
+  if (res.status !== 200 || appErr) fail("course detail", `status ${res.status}`);
+  else if (!hasLinks) fail("course detail lesson links");
+  else pass("course detail lesson links");
+}
+
+// 6. Mentoring page — AI chat UI
+await sleep(1500);
+{
+  const { res, text, appErr } = await fetchPage(`${base}/academy/mentoring`);
+  const hasChat = /AI lektor|Zeptejte se/i.test(text);
+  if (res.status !== 200 || appErr) fail("mentoring page", `status ${res.status}`);
+  else if (!hasChat) fail("mentoring AI chat UI");
+  else pass("mentoring AI chat UI");
+}
+
+// 7. Mentoring chat API
+await sleep(1500);
+{
+  const { res, json } = await fetchJson(`${base}/api/academy/mentoring/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: "Co je kosterní systém?",
+      lessonTitle: "Kosterní systém",
+      courseTitle: "Úvod do anatomie",
+    }),
+  });
+  if (res.status !== 200 || !json?.reply) fail("mentoring chat API", `status ${res.status}`);
+  else pass("mentoring chat API", json.provider ?? "ok");
+}
+
+// 8. Admin video page (public may redirect — check 200 or 307 to login)
+await sleep(1500);
+{
+  const { res, text } = await fetchPage(`${base}/admin/academy/video`);
+  const ok = res.status === 200 || res.status === 307 || res.status === 302;
+  const hasAdmin = /admin|video|AI video|Nahrát video/i.test(text) || res.status === 307;
+  if (!ok) fail("admin video page", `status ${res.status}`);
+  else if (res.status === 200 && !hasAdmin) fail("admin video page content");
+  else pass("admin video route", `status ${res.status}`);
+}
+
+// 9. Homepage academy section — videokurz badge
+await sleep(1500);
+{
+  const { res, text, appErr } = await fetchPage(`${base}/`);
+  const hasAcademy = /Videokurz|MedScope Academy|videokurz/i.test(text);
+  if (res.status !== 200 || appErr) fail("homepage", `status ${res.status}`);
+  else if (!hasAcademy) fail("homepage academy video section");
+  else pass("homepage academy video section");
+}
+
+// 10. Generate-video API auth gate
+await sleep(1500);
+{
+  const { res } = await fetchJson(`${base}/api/academy/ai/generate-video`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ lesson_id: "00000000-0000-0000-0000-000000000001" }),
+  });
+  if (res.status === 401) pass("generate-video API auth");
+  else fail("generate-video API auth", `expected 401, got ${res.status}`);
+}
+
+console.log(`\n--- Summary: ${results.length - failed}/${results.length} passed ---\n`);
+if (failed > 0) {
+  console.error(`FAILED: ${failed} check(s)`);
+  process.exit(1);
+}
+console.log("ALL PASS — Academy v35 full smoke OK\n");

@@ -4,6 +4,8 @@ import type {
   AcademyCourse,
   AcademyCourseWithLessons,
   AcademyLesson,
+  AcademyLessonWithVideo,
+  VideoAsset,
   AcademyQuiz,
   AcademyQuizWithQuestions,
   CreateCourseInput,
@@ -45,6 +47,48 @@ export async function listPublishedCourses(limit = 50): Promise<AcademyCourse[]>
   return (data ?? []) as AcademyCourse[];
 }
 
+export async function countPublishedCourses(): Promise<number> {
+  const admin = adminClient();
+  const { count, error } = await admin
+    .from("courses")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "published")
+    .eq("is_public", true);
+
+  if (error) {
+    console.error("[academy] countPublishedCourses", error.message);
+    return 0;
+  }
+  return count ?? 0;
+}
+
+export async function getCourseVideoFlags(
+  courseIds: string[]
+): Promise<Record<string, { hasVideo: boolean; videoLessonCount: number }>> {
+  if (!courseIds.length) return {};
+
+  const admin = adminClient();
+  const { data: lessons } = await admin
+    .from("lessons")
+    .select("course_id, video_asset_id")
+    .in("course_id", courseIds)
+    .eq("status", "published");
+
+  const flags: Record<string, { hasVideo: boolean; videoLessonCount: number }> = {};
+  for (const id of courseIds) {
+    flags[id] = { hasVideo: false, videoLessonCount: 0 };
+  }
+  for (const row of lessons ?? []) {
+    if (!row.video_asset_id) continue;
+    const entry = flags[row.course_id];
+    if (entry) {
+      entry.hasVideo = true;
+      entry.videoLessonCount += 1;
+    }
+  }
+  return flags;
+}
+
 export async function listAllCoursesAdmin(limit = 100): Promise<AcademyCourse[]> {
   const admin = adminClient();
   const { data, error } = await admin
@@ -62,6 +106,33 @@ export async function getCourseById(id: string): Promise<AcademyCourse | null> {
   const { data, error } = await supabase.from("courses").select("*").eq("id", id).maybeSingle();
   if (error || !data) return null;
   return data as AcademyCourse;
+}
+
+async function attachVideosToLessons(lessons: AcademyLesson[]): Promise<AcademyLessonWithVideo[]> {
+  if (!lessons.length) return [];
+
+  const videoIds = [...new Set(lessons.map((l) => l.video_asset_id).filter(Boolean))] as string[];
+  const videoMap = new Map<string, VideoAsset>();
+
+  if (videoIds.length) {
+    const supabase = await createClient();
+    const { data: videos } = await supabase.from("video_assets").select("*").in("id", videoIds);
+    for (const v of videos ?? []) {
+      videoMap.set(v.id, v as VideoAsset);
+    }
+  }
+
+  return lessons.map((lesson) => ({
+    ...lesson,
+    video: lesson.video_asset_id ? (videoMap.get(lesson.video_asset_id) ?? null) : null,
+  }));
+}
+
+export async function getVideoAssetById(id: string): Promise<VideoAsset | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("video_assets").select("*").eq("id", id).maybeSingle();
+  if (error || !data) return null;
+  return data as VideoAsset;
 }
 
 export async function getCourseBySlug(slug: string): Promise<AcademyCourseWithLessons | null> {
@@ -82,10 +153,57 @@ export async function getCourseBySlug(slug: string): Promise<AcademyCourseWithLe
     .eq("status", "published")
     .order("sort_order", { ascending: true });
 
+  const lessonsWithVideo = await attachVideosToLessons((lessons ?? []) as AcademyLesson[]);
+
   return {
     ...(course as AcademyCourse),
-    lessons: (lessons ?? []) as AcademyLesson[],
+    lessons: lessonsWithVideo,
+    video_lesson_count: lessonsWithVideo.filter((l) => l.video_asset_id).length,
   };
+}
+
+export async function getLessonBySlug(
+  courseSlug: string,
+  lessonSlug: string
+): Promise<(AcademyLessonWithVideo & { course: AcademyCourse }) | null> {
+  const course = await getCourseBySlug(courseSlug);
+  if (!course) return null;
+
+  const lesson = course.lessons.find((l) => l.slug === lessonSlug);
+  if (!lesson) return null;
+
+  return { ...lesson, course };
+}
+
+export async function getLessonByIdOrSlug(
+  courseSlug: string,
+  lessonIdOrSlug: string
+): Promise<(AcademyLessonWithVideo & { course: AcademyCourse }) | null> {
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(lessonIdOrSlug);
+  const course = await getCourseBySlug(courseSlug);
+  if (!course) return null;
+
+  const lesson = course.lessons.find((l) =>
+    isUuid ? l.id === lessonIdOrSlug : l.slug === lessonIdOrSlug
+  );
+  if (!lesson) return null;
+
+  return { ...lesson, course };
+}
+
+export async function countVideoLessons(): Promise<number> {
+  const admin = adminClient();
+  const { count, error } = await admin
+    .from("lessons")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "published")
+    .not("video_asset_id", "is", null);
+
+  if (error) {
+    console.error("[academy] countVideoLessons", error.message);
+    return 0;
+  }
+  return count ?? 0;
 }
 
 export async function getCourseByIdOrSlug(idOrSlug: string): Promise<AcademyCourseWithLessons | null> {

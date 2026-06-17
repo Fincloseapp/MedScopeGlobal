@@ -68,8 +68,13 @@ export interface AcademyQuizWithQuestions extends AcademyQuiz {
   questions: AcademyQuizQuestion[];
 }
 
+export interface AcademyLessonWithVideo extends AcademyLesson {
+  video?: VideoAsset | null;
+}
+
 export interface AcademyCourseWithLessons extends AcademyCourse {
-  lessons: AcademyLesson[];
+  lessons: AcademyLessonWithVideo[];
+  video_lesson_count?: number;
 }
 
 export interface AiTask {

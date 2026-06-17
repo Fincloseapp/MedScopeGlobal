@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Clock, GraduationCap } from "lucide-react";
+import { Clock, GraduationCap, PlayCircle } from "lucide-react";
 import type { AcademyCourse } from "@/types/academy";
 
 const LEVEL_LABELS: Record<string, string> = {
@@ -8,7 +8,17 @@ const LEVEL_LABELS: Record<string, string> = {
   advanced: "Pokročilý",
 };
 
-export function CourseCard({ course }: { course: AcademyCourse }) {
+export function CourseCard({
+  course,
+  hasVideo,
+  videoLessonCount,
+}: {
+  course: AcademyCourse;
+  hasVideo?: boolean;
+  videoLessonCount?: number;
+}) {
+  const meta = (course.metadata ?? {}) as { has_video?: boolean };
+  const showVideo = hasVideo ?? meta.has_video ?? false;
   return (
     <Link
       href={`/academy/courses/${course.slug}`}
@@ -37,6 +47,12 @@ export function CourseCard({ course }: { course: AcademyCourse }) {
           </span>
         ) : null}
         {course.xp_reward > 0 ? <span>{course.xp_reward} XP</span> : null}
+        {showVideo ? (
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#e8f4fc] px-2 py-0.5 font-medium text-[#005B96]">
+            <PlayCircle className="h-3 w-3" />
+            Videokurz{videoLessonCount ? ` (${videoLessonCount})` : ""}
+          </span>
+        ) : null}
       </div>
     </Link>
   );

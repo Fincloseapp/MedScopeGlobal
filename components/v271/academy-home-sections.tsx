@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, BookOpen, Brain, ShoppingBag, Stethoscope, Trophy, Users } from "lucide-react";
 import { CourseCard } from "@/components/academy/course-card";
 import {
+  getCourseVideoFlags,
   getLeaderboard,
   listClinicalSimulations,
   listMarketplaceListings,
@@ -17,6 +18,7 @@ export async function V272AcademyHomeSections() {
     listMarketplaceListings(2),
     getLeaderboard("all_time", 5),
   ]);
+  const flags = await getCourseVideoFlags(courses.map((c) => c.id));
 
   return (
     <>
@@ -28,7 +30,7 @@ export async function V272AcademyHomeSections() {
                 <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
                   MedScope Academy
                 </p>
-                <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">Doporučené kurzy</h2>
+                <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">Videokurzy s AI lektorem</h2>
               </div>
               <Link href="/academy/courses" className="text-sm font-medium text-[#005B96] hover:underline">
                 Všechny kurzy →
@@ -36,7 +38,12 @@ export async function V272AcademyHomeSections() {
             </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {courses.map((course) => (
-                <CourseCard key={course.id} course={course} />
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  hasVideo={flags[course.id]?.hasVideo}
+                  videoLessonCount={flags[course.id]?.videoLessonCount}
+                />
               ))}
             </div>
           </div>

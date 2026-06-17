@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdminApiAuthorized } from "@/lib/auth/admin-api";
-import { createCourse, listPublishedCourses } from "@/lib/academy/db";
+import { createCourse, getCourseVideoFlags, listPublishedCourses } from "@/lib/academy/db";
 import type { CreateCourseInput } from "@/types/academy";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +8,13 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const courses = await listPublishedCourses();
-    return NextResponse.json({ ok: true, courses });
+    const flags = await getCourseVideoFlags(courses.map((c) => c.id));
+    const enriched = courses.map((c) => ({
+      ...c,
+      has_video: flags[c.id]?.hasVideo ?? false,
+      video_lesson_count: flags[c.id]?.videoLessonCount ?? 0,
+    }));
+    return NextResponse.json({ ok: true, courses: enriched, count: enriched.length });
   } catch (e) {
     return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });
   }
