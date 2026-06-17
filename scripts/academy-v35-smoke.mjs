@@ -36,17 +36,18 @@ const ROUTES = [
   "/api/academy/textbooks",
   "/api/academy/marketplace",
   "/api/academy/leaderboard",
-  "/api/academy/mobile/sync",
-  "/api/academy/testing/run",
+  "/api/mobile/sync",
+  { path: "/api/academy/testing/run", expectAuth: true },
 ];
 
-async function checkRoute(route) {
+async function checkRoute(route, opts = {}) {
   const url = `${base}${route}`;
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(30_000), redirect: "follow" });
     const text = await res.text();
     const appErr = /Application error|Internal Server Error/i.test(text.slice(0, 4000));
-    const ok = res.status >= 200 && res.status < 400 && !appErr;
+    const authOk = opts.expectAuth && res.status === 401;
+    const ok = authOk || (res.status >= 200 && res.status < 400 && !appErr);
     return { route, url, status: res.status, ok, appErr, text };
   } catch (e) {
     return { route, url, status: 0, ok: false, error: e.message, text: "" };
@@ -59,8 +60,10 @@ let failed = 0;
 const results = [];
 
 for (const route of ROUTES) {
-  process.stdout.write(`→ ${route} … `);
-  const r = await checkRoute(route);
+  const path = typeof route === "string" ? route : route.path;
+  const expectAuth = typeof route === "object" && route.expectAuth;
+  process.stdout.write(`→ ${path} … `);
+  const r = await checkRoute(path, { expectAuth });
   results.push(r);
   if (!r.ok) {
     failed += 1;
