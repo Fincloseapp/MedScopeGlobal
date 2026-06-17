@@ -1,11 +1,14 @@
 import type { WeeklyDigest } from "@/lib/academy/marketing/weekly-digest";
 import { getDigestDeliveryStatus } from "@/lib/academy/marketing/digest-config";
+import { sendEmail } from "@/lib/email/engine";
+import { isSendGridConfigured } from "@/lib/email/sendgrid";
 
 export type DigestDeliveryResult = {
   sent: boolean;
-  mode: "sendgrid" | "log";
+  mode: "sendgrid" | "smtp" | "log";
   messageId?: string;
   error?: string;
+  fallbackUsed?: boolean;
 };
 
 function buildDigestHtml(digest: WeeklyDigest): string {
@@ -28,7 +31,7 @@ function buildDigestText(digest: WeeklyDigest): string {
   return `${digest.intro}\n\n${lines.join("\n") || "Žádné novinky tento týden."}\n\nhttps://medscopeglobal.com/academy`;
 }
 
-/** Sends weekly digest via SendGrid when configured; otherwise logs only. */
+/** Sends weekly digest via v28 email engine (SendGrid → SMTP fallback) or SendGrid list API. */
 export async function deliverWeeklyDigest(
   digest: WeeklyDigest,
   eventId: string
@@ -38,7 +41,7 @@ export async function deliverWeeklyDigest(
   const listId = process.env.SENDGRID_ACADEMY_LIST_ID?.trim();
   const toEmail = process.env.ACADEMY_NEWSLETTER_TO?.trim();
 
-  if (!configured || !apiKey) {
+  if (!configured || (!apiKey && !process.env.SMTP_HOST)) {
     console.info("[academy] weekly digest (log-only)", {
       eventId,
       subject: digest.subject,
@@ -50,42 +53,63 @@ export async function deliverWeeklyDigest(
     return { sent: false, mode: "log" };
   }
 
-  try {
-    const body: Record<string, unknown> = {
-      personalizations: [
-        listId
-          ? { list_ids: [listId] }
-          : { to: [{ email: toEmail ?? fromEmail }] },
-      ],
-      from: { email: fromEmail, name: "MedScope Academy" },
-      subject: digest.subject,
-      content: [
-        { type: "text/plain", value: buildDigestText(digest) },
-        { type: "text/html", value: buildDigestHtml(digest) },
-      ],
-    };
+  if (listId && apiKey) {
+    try {
+      const body: Record<string, unknown> = {
+        personalizations: [{ list_ids: [listId] }],
+        from: { email: fromEmail, name: "MedScope Academy" },
+        subject: digest.subject,
+        content: [
+          { type: "text/plain", value: buildDigestText(digest) },
+          { type: "text/html", value: buildDigestHtml(digest) },
+        ],
+      };
 
-    const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+      const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
 
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("[academy] SendGrid error", res.status, text.slice(0, 300));
-      return { sent: false, mode: "sendgrid", error: `SendGrid ${res.status}` };
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("[academy] SendGrid list error", res.status, text.slice(0, 300));
+        return { sent: false, mode: "sendgrid", error: `SendGrid ${res.status}` };
+      }
+
+      const messageId = res.headers.get("x-message-id") ?? undefined;
+      console.info("[academy] weekly digest sent (list)", { eventId, messageId });
+      return { sent: true, mode: "sendgrid", messageId };
+    } catch (e) {
+      return { sent: false, mode: "sendgrid", error: (e as Error).message };
     }
-
-    const messageId = res.headers.get("x-message-id") ?? undefined;
-    console.info("[academy] weekly digest sent", { eventId, messageId, items: digest.items.length });
-    return { sent: true, mode: "sendgrid", messageId };
-  } catch (e) {
-    const error = (e as Error).message;
-    console.error("[academy] deliverWeeklyDigest", error);
-    return { sent: false, mode: "sendgrid", error };
   }
+
+  const recipient = toEmail ?? fromEmail;
+  const result = await sendEmail({
+    to: recipient,
+    subject: digest.subject,
+    html: buildDigestHtml(digest),
+    text: buildDigestText(digest),
+    category: "marketing",
+    fromEmail,
+    fromName: "MedScope Academy",
+    metadata: { eventId, academyDigest: true },
+  });
+
+  const mode = result.provider === "smtp" ? "smtp" : result.provider === "sendgrid" ? "sendgrid" : "log";
+  if (result.ok) {
+    console.info("[academy] weekly digest sent", { eventId, messageId: result.messageId, mode });
+  }
+
+  return {
+    sent: result.ok,
+    mode: result.ok ? mode : isSendGridConfigured() ? "sendgrid" : "log",
+    messageId: result.messageId,
+    error: result.error,
+    fallbackUsed: result.fallbackUsed,
+  };
 }

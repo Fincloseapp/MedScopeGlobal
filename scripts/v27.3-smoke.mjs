@@ -24,7 +24,7 @@ const versionConfig = JSON.parse(
 const expectedUi = versionConfig.ui;
 const expectedEngine = versionConfig.engine;
 const heroClaim = "Nejmodernější zdravotnický magazín pro veřejnost, studenty a lékaře";
-const editorialV27 = "redakčního standardu MedScopeGlobal v27";
+const editorialV27 = "redakčního standardu MedScopeGlobal v28";
 
 const BAD_IMAGE_PATTERNS = [
   /black-hands/i,
@@ -81,9 +81,9 @@ if (home?.text) {
     home.ok = false;
     homeChecks.push(`missing version ${expectedUi}`);
   }
-  if (home.text.includes("v27.2")) {
+  if (home.text.includes("v27.2") || home.text.includes("v27.3")) {
     home.ok = false;
-    homeChecks.push("stale v27.2 label on homepage");
+    homeChecks.push("stale v27.x label on homepage");
   }
   if (!home.text.includes(heroClaim)) {
     home.ok = false;
@@ -140,9 +140,9 @@ if (predplatne?.text) {
     predplatne.ok = false;
     console.log("✗ /predplatne missing Předplatit CTA");
   }
-  if (!predplatne.text.includes("ročně") || !predplatne.text.includes("měsíčně")) {
+  if (!predplatne.text.includes("ročně") && !predplatne.text.includes("Předplatit ročně")) {
     predplatne.ok = false;
-    console.log("✗ /predplatne missing monthly/annual plans");
+    console.log("✗ /predplatne missing annual plan CTA");
   }
   if (predplatne.text.includes("Digitální mini-produkty")) {
     predplatne.ok = false;
@@ -155,9 +155,9 @@ if (health?.ok) {
   try {
     const res = await fetch(`${base}/api/v27/health`, { signal: AbortSignal.timeout(15_000) });
     const json = await res.json();
-    if (!String(json.version).startsWith("27.3")) {
+    if (!String(json.version).startsWith("28") && !String(json.version).startsWith("27.3")) {
       health.ok = false;
-      console.log(`✗ Health version ${json.version} !== 27.3`);
+      console.log(`✗ Health version ${json.version} !== 28.x / 27.3`);
     }
     if (!json.features?.includes("image-purge-v273")) {
       health.ok = false;

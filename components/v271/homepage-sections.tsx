@@ -178,7 +178,7 @@ export function V272SubscriptionPlansBlock() {
               <V27CheckoutButton
                 kind="subscription"
                 productId={subscriptionProductId(plan.tier, "month")}
-                label="Předplatit měsíčně"
+                label="Předplatit"
               />
               <V27CheckoutButton
                 kind="subscription"

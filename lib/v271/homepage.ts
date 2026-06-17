@@ -1,4 +1,4 @@
-/** MedScope v27.2 — homepage copy and CTA wiring */
+/** MedScope v28 — homepage copy and CTA wiring */
 import { V27_SUBSCRIPTION_PLANS } from "@/lib/v27/config";
 import { getSiteVersionLabel } from "@/lib/v27/version";
 
@@ -58,7 +58,7 @@ export const V271_B2B = {
 export const V271_AKTUALNI = {
   title: "Aktuální zprávy",
   description:
-    "Zahraniční a domácí zdravotnické zprávy — přepsané podle redakčního standardu MedScopeGlobal v27.",
+    "Zahraniční a domácí zdravotnické zprávy — přepsané podle redakčního standardu MedScopeGlobal v28.",
   href: "/aktualni-zpravy",
   cta: "Číst zprávy",
   links: [

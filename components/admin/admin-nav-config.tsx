@@ -30,6 +30,7 @@ export const ADMIN_NAV_ITEMS: {
   { href: "/admin/tests", label: "Testy", icon: FlaskConical },
   { href: "/admin/articles", label: "Articles", icon: Newspaper },
   { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
+  { href: "/admin/email-logs", label: "Email logs", icon: Mail },
   { href: "/admin/brand", label: "Brand & logo", icon: Palette },
   { href: "/admin/autopilot", label: "V6 Autopilot", icon: Bot },
   { href: "/admin/ingestion", label: "AI ingestion", icon: Bot },
