@@ -31,7 +31,6 @@ export async function GET() {
     features: [
       "stripe-webhook-v28.2",
       "email-engine-v28",
-      "stripe-webhook-v28.2",
       "sendgrid-smtp-fallback",
       "ai-email-generator",
       "invoice-generator",

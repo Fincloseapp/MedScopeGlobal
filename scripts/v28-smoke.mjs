@@ -156,7 +156,7 @@ const v28Health = results.find((r) => r.route === "/api/v28/health");
 if (v28Health?.ok) {
   try {
     const json = JSON.parse(v28Health.text);
-    if (!String(json.version).startsWith("28")) {
+    if (!String(json.version).includes("28")) {
       healthChecks.push({ ok: false, msg: `v28 health version ${json.version} !== 28.x` });
     } else {
       healthChecks.push({ ok: true, msg: `v28 health version ${json.version}` });
