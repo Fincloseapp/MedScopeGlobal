@@ -30,7 +30,12 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = (await request.json()) as { title?: string; slug?: string; content_ref?: string };
+    const body = (await request.json()) as {
+      title?: string;
+      slug?: string;
+      content_ref?: string;
+      metadata?: Record<string, unknown>;
+    };
     if (!body.title?.trim() || !body.slug?.trim()) {
       return NextResponse.json({ error: "title a slug jsou povinné" }, { status: 400 });
     }
@@ -42,6 +47,7 @@ export async function POST(request: Request) {
         title: body.title.trim(),
         slug: body.slug.trim(),
         content_ref: body.content_ref ?? null,
+        metadata: body.metadata ?? {},
         status: "draft",
       })
       .select("*")

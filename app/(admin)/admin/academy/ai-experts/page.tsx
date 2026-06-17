@@ -12,6 +12,7 @@ export default async function AdminAcademyAiExpertsPage() {
     <>
       <p className="text-sm text-slate-600">
         Expert review pipeline — výsledky z workeru <code className="text-xs">expert-review</code> (LLM + DB).
+        Auto-publikace: zaškrtněte u tlačítka „AI revize“ na kurzech.
       </p>
       <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
         <table className="w-full text-left text-sm">

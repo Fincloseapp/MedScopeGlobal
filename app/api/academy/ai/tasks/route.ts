@@ -58,7 +58,7 @@ export async function PATCH(request: Request) {
     }
 
     const result = await dispatchAiTask(body.task_id);
-    return NextResponse.json({ ok: result.ok, message: result.message });
+    return NextResponse.json({ ok: result.ok, message: result.message, result: result.result });
   } catch (e) {
     return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });
   }

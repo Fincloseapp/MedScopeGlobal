@@ -51,7 +51,9 @@ export async function enqueueAiTask(opts: {
   return data as AiTask;
 }
 
-export async function dispatchAiTask(taskId: string): Promise<{ ok: boolean; message: string }> {
+export async function dispatchAiTask(
+  taskId: string
+): Promise<{ ok: boolean; message: string; result?: Record<string, unknown> }> {
   const admin = createServiceRoleClient();
   const { data: task, error } = await admin.from("ai_tasks").select("*").eq("id", taskId).single();
   if (error || !task) return { ok: false, message: "Task not found" };
@@ -142,7 +144,7 @@ export async function dispatchAiTask(taskId: string): Promise<{ ok: boolean; mes
       payload: result,
     });
 
-    return { ok: true, message: "completed" };
+    return { ok: true, message: "completed", result };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Unknown error";
     await admin
