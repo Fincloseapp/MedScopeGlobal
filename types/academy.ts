@@ -1,5 +1,5 @@
 export type AcademyCourseStatus = "draft" | "published" | "archived";
-export type AcademyLevel = "beginner" | "intermediate" | "advanced";
+export type AcademyLevel = "beginner" | "intermediate" | "advanced" | "priprava";
 export type AcademyLessonStatus = AcademyCourseStatus;
 export type AcademyQuizStatus = AcademyCourseStatus;
 export type AiTaskStatus = "queued" | "running" | "completed" | "failed" | "cancelled";

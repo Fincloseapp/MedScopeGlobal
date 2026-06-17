@@ -72,7 +72,13 @@ await sleep(1500);
   } else if ((json.videoLessonCount ?? 0) < 1) {
     fail("health videoLessonCount>=1", `got ${json.videoLessonCount}`);
   } else {
-    pass("health", `courses=${json.courseCount}, videos=${json.videoLessonCount}, v=${json.version}`);
+    const vp = json.videoProvider ?? "?";
+    const chain = (json.videoProviderChain ?? []).join("→") || vp;
+    if (!json.videoProvider) {
+      fail("health videoProvider", "missing");
+    } else {
+      pass("health", `courses=${json.courseCount}, videos=${json.videoLessonCount}, provider=${vp} (${chain})`);
+    }
   }
 }
 
@@ -197,12 +203,34 @@ await sleep(1500);
   else fail("generate-video API auth", `expected 401, got ${res.status}`);
 }
 
-// 11. Video webhook probe (GET status)
+// 11. Video webhook probe (GET status + POST auth gate)
 await sleep(1500);
 {
   const { res, json } = await fetchJson(`${base}/api/academy/video/webhook`);
-  if (res.status === 200 && json?.ok) pass("video webhook status", json.provider ?? "ok");
-  else fail("video webhook status", `status ${res.status}`);
+  if (res.status === 200 && json?.ok) {
+    pass("video webhook status", `${json.provider ?? "ok"} chain=${(json.providerChain ?? []).join("→")}`);
+  } else {
+    fail("video webhook status", `status ${res.status}`);
+  }
+
+  const postRes = await fetchJson(`${base}/api/academy/video/webhook`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ event_type: "test" }),
+  });
+  if (postRes.res.status === 401 || postRes.res.status === 400) {
+    pass("video webhook POST auth", `status ${postRes.res.status}`);
+  } else {
+    fail("video webhook POST auth", `expected 401/400, got ${postRes.res.status}`);
+  }
+}
+
+// 11b. Mux webhook route exists
+await sleep(1500);
+{
+  const { res, json } = await fetchJson(`${base}/api/academy/video/mux-webhook`);
+  if (res.status === 200 && json?.ok) pass("mux webhook route", json.endpoint ?? "ok");
+  else fail("mux webhook route", `status ${res.status}`);
 }
 
 // 12. Profile page (XP/badges shell)
@@ -223,6 +251,36 @@ await sleep(1500);
   if (res.status !== 200 || !json?.ok) fail("mobile sync", `status ${res.status}`);
   else if (!hasVideo) fail("mobile sync video metadata");
   else pass("mobile sync video metadata", `videoCourses=${json.videoCourseCount ?? "?"}`);
+}
+
+// 14. Prep courses — prijimacky category >= 10
+await sleep(1500);
+{
+  const { res, json } = await fetchJson(`${base}/api/academy/courses?category=prijimacky`);
+  const prep = json?.courses ?? [];
+  if (res.status !== 200 || !json?.ok) fail("prep courses API", `status ${res.status}`);
+  else if (prep.length < 10) fail("prep courses count>=10", `got ${prep.length}`);
+  else pass("prep courses count>=10", String(prep.length));
+}
+
+// 15. Health prepCourseCount >= 10
+await sleep(1500);
+{
+  const { res, json } = await fetchJson(`${base}/api/academy/health`);
+  const prepCount = json?.prepCourseCount ?? 0;
+  if (res.status !== 200 || !json?.ok) fail("health prepCourseCount", `status ${res.status}`);
+  else if (prepCount < 10) fail("health prepCourseCount>=10", `got ${prepCount}`);
+  else pass("health prepCourseCount>=10", String(prepCount));
+}
+
+// 16. Prijimacky page — prep CTA
+await sleep(1500);
+{
+  const { res, text, appErr } = await fetchPage(`${base}/studium/prijimacky`);
+  const hasCta = /Přípravné kurzy MedScope Academy|prijimacky/i.test(text);
+  if (res.status !== 200 || appErr) fail("prijimacky page", `status ${res.status}`);
+  else if (!hasCta) fail("prijimacky prep CTA");
+  else pass("prijimacky prep CTA");
 }
 
 console.log(`\n--- Summary: ${results.length - failed}/${results.length} passed ---\n`);

@@ -6,6 +6,11 @@ const LEVEL_LABELS: Record<string, string> = {
   beginner: "Začátečník",
   intermediate: "Středně pokročilý",
   advanced: "Pokročilý",
+  priprava: "Příprava na přijímačky",
+};
+
+const CATEGORY_LABELS: Record<string, string> = {
+  prijimacky: "Přijímačky LF",
 };
 
 export function CourseCard({
@@ -28,7 +33,7 @@ export function CourseCard({
         <div>
           {course.category ? (
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">
-              {course.category}
+              {CATEGORY_LABELS[course.category] ?? course.category}
             </p>
           ) : null}
           <h3 className="mt-1 font-display text-lg font-semibold text-[#021d33]">{course.title}</h3>

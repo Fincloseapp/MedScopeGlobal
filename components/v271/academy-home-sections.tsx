@@ -11,17 +11,56 @@ import {
 } from "@/lib/academy/db";
 
 export async function V272AcademyHomeSections() {
-  const [courses, simulations, textbooks, listings, leaderboard] = await Promise.all([
+  const [courses, prepCourses, simulations, textbooks, listings, leaderboard] = await Promise.all([
     listPublishedCourses(3),
+    listPublishedCourses(6, { prepOnly: true }),
     listClinicalSimulations(2),
     listTextbooks(2),
     listMarketplaceListings(2),
     getLeaderboard("all_time", 5),
   ]);
   const flags = await getCourseVideoFlags(courses.map((c) => c.id));
+  const prepFlags = await getCourseVideoFlags(prepCourses.map((c) => c.id));
 
   return (
     <>
+      {prepCourses.length > 0 ? (
+        <section className="border-b border-slate-200 bg-[#f0f7ff]">
+          <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
+                  MedScope Academy
+                </p>
+                <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
+                  Příprava na přijímačky LF
+                </h2>
+                <p className="mt-2 max-w-2xl text-sm text-slate-600">
+                  Kurzy pro zájemce o studium medicíny — biologie, chemie, fyzika, strategie testu a pohovor.
+                </p>
+              </div>
+              <Link
+                href="/academy/courses?category=prijimacky"
+                className="text-sm font-medium text-[#005B96] hover:underline"
+              >
+                Všechny přípravné kurzy →
+              </Link>
+            </div>
+            <div className="mt-6 flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory">
+              {prepCourses.map((course) => (
+                <div key={course.id} className="min-w-[280px] max-w-[320px] shrink-0 snap-start">
+                  <CourseCard
+                    course={course}
+                    hasVideo={prepFlags[course.id]?.hasVideo}
+                    videoLessonCount={prepFlags[course.id]?.videoLessonCount}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       {courses.length > 0 ? (
         <section className="border-b border-slate-200 bg-white">
           <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">

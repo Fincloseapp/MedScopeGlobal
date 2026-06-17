@@ -31,9 +31,19 @@ function adminClient() {
   return createServiceRoleClient();
 }
 
-export async function listPublishedCourses(limit = 50): Promise<AcademyCourse[]> {
+export type ListPublishedCoursesFilter = {
+  category?: string;
+  audience?: string;
+  prepOnly?: boolean;
+  level?: string;
+};
+
+export async function listPublishedCourses(
+  limit = 50,
+  filter?: ListPublishedCoursesFilter
+): Promise<AcademyCourse[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("courses")
     .select("*")
     .eq("status", "published")
@@ -41,11 +51,34 @@ export async function listPublishedCourses(limit = 50): Promise<AcademyCourse[]>
     .order("updated_at", { ascending: false })
     .limit(limit);
 
+  if (filter?.category) query = query.eq("category", filter.category);
+  if (filter?.level) query = query.eq("level", filter.level);
+  if (filter?.audience) query = query.contains("metadata", { audience: filter.audience });
+  if (filter?.prepOnly) query = query.contains("metadata", { prep_course: true });
+
+  const { data, error } = await query;
+
   if (error) {
     console.error("[academy] listPublishedCourses", error.message);
     return [];
   }
   return (data ?? []) as AcademyCourse[];
+}
+
+export async function countPrepCourses(): Promise<number> {
+  const admin = adminClient();
+  const { count, error } = await admin
+    .from("courses")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "published")
+    .eq("is_public", true)
+    .contains("metadata", { prep_course: true });
+
+  if (error) {
+    console.error("[academy] countPrepCourses", error.message);
+    return 0;
+  }
+  return count ?? 0;
 }
 
 export async function countPublishedCourses(): Promise<number> {
@@ -116,8 +149,15 @@ async function attachVideosToLessons(lessons: AcademyLesson[]): Promise<AcademyL
   const videoMap = new Map<string, VideoAsset>();
 
   if (videoIds.length) {
-    const supabase = await createClient();
-    const { data: videos } = await supabase.from("video_assets").select("*").in("id", videoIds);
+    const admin = adminClient();
+    const { data: videos, error } = await admin
+      .from("video_assets")
+      .select("*")
+      .in("id", videoIds)
+      .eq("status", "ready");
+    if (error) {
+      console.error("[academy] attachVideosToLessons", error.message);
+    }
     for (const v of videos ?? []) {
       videoMap.set(v.id, v as VideoAsset);
     }
@@ -130,8 +170,13 @@ async function attachVideosToLessons(lessons: AcademyLesson[]): Promise<AcademyL
 }
 
 export async function getVideoAssetById(id: string): Promise<VideoAsset | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.from("video_assets").select("*").eq("id", id).maybeSingle();
+  const admin = adminClient();
+  const { data, error } = await admin
+    .from("video_assets")
+    .select("*")
+    .eq("id", id)
+    .eq("status", "ready")
+    .maybeSingle();
   if (error || !data) return null;
   return data as VideoAsset;
 }
@@ -202,6 +247,20 @@ export async function countVideoLessons(): Promise<number> {
 
   if (error) {
     console.error("[academy] countVideoLessons", error.message);
+    return 0;
+  }
+  return count ?? 0;
+}
+
+export async function countClinicalSimulations(): Promise<number> {
+  const admin = adminClient();
+  const { count, error } = await admin
+    .from("clinical_simulations")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "published");
+
+  if (error) {
+    console.error("[academy] countClinicalSimulations", error.message);
     return 0;
   }
   return count ?? 0;
@@ -316,11 +375,12 @@ export async function updateQuiz(id: string, input: UpdateQuizInput): Promise<Ac
   return data as AcademyQuiz;
 }
 
-export async function getLessonById(id: string): Promise<AcademyLesson | null> {
+export async function getLessonById(id: string): Promise<AcademyLessonWithVideo | null> {
   const supabase = await createClient();
   const { data, error } = await supabase.from("lessons").select("*").eq("id", id).maybeSingle();
   if (error || !data) return null;
-  return data as AcademyLesson;
+  const [withVideo] = await attachVideosToLessons([data as AcademyLesson]);
+  return withVideo ?? null;
 }
 
 export async function getQuizById(id: string, includeAnswers = false): Promise<AcademyQuizWithQuestions | null> {
@@ -605,8 +665,8 @@ export async function listMentoringSessions(userId?: string, limit = 20) {
 }
 
 export async function listVideoAssets(limit = 20) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
+  const admin = adminClient();
+  const { data, error } = await admin
     .from("video_assets")
     .select("*")
     .eq("status", "ready")

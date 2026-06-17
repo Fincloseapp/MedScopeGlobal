@@ -63,6 +63,9 @@ export default async function AcademyHubPage() {
           <Link href="/academy/leaderboard" className="rounded-full border border-[#cfe1f3] px-4 py-2 text-sm text-[#005B96] hover:bg-[#f0f7fc]">
             Žebříček
           </Link>
+          <Link href="/academy/certificates" className="rounded-full border border-[#cfe1f3] px-4 py-2 text-sm text-[#005B96] hover:bg-[#f0f7fc]">
+            Certifikáty
+          </Link>
         </div>
 
         <section className="mt-12">

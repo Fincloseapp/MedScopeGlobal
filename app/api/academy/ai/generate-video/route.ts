@@ -29,7 +29,7 @@ export async function POST(request: Request) {
           task,
           result: result.result,
           message: result.ok
-            ? "Video script vygenerován a video asset vytvořen."
+            ? "Video pipeline dokončen (script + render zařazen/ready)."
             : result.message,
         },
         { status: result.ok ? 200 : 500 }
