@@ -133,7 +133,7 @@ export async function dispatchAiTask(taskId: string): Promise<{ ok: boolean; mes
     await logAiEvent({
       taskId,
       worker: "controller",
-      message: "Task completed (stub)",
+      message: result.stub ? "Task completed (fallback)" : "Task completed",
       payload: result,
     });
 

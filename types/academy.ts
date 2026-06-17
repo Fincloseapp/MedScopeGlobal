@@ -143,6 +143,44 @@ export interface CreateCourseInput {
   metadata?: Record<string, unknown>;
 }
 
+export interface UpdateCourseInput {
+  title?: string;
+  description?: string;
+  summary?: string;
+  level?: AcademyLevel;
+  category?: string;
+  status?: AcademyCourseStatus;
+  is_public?: boolean;
+  duration_minutes?: number;
+  xp_reward?: number;
+}
+
+export interface CreateLessonInput {
+  course_id: string;
+  slug: string;
+  title: string;
+  content?: string;
+  sort_order?: number;
+  duration_minutes?: number;
+  status?: AcademyLessonStatus;
+}
+
+export interface CreateQuizInput {
+  course_id: string;
+  title: string;
+  passing_score?: number;
+  lesson_id?: string | null;
+  status?: AcademyQuizStatus;
+  questions?: {
+    question_text: string;
+    question_type?: AcademyQuizQuestion["question_type"];
+    options?: { label: string; value: string }[];
+    correct_answer: Record<string, unknown>;
+    sort_order?: number;
+    explanation?: string | null;
+  }[];
+}
+
 export interface UpdateProgressInput {
   course_id: string;
   lesson_id?: string | null;

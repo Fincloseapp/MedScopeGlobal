@@ -4,12 +4,16 @@ import type {
   AcademyCourse,
   AcademyCourseWithLessons,
   AcademyLesson,
+  AcademyQuiz,
   AcademyQuizWithQuestions,
   CreateCourseInput,
+  CreateLessonInput,
+  CreateQuizInput,
   LeaderboardEntry,
   LeaderboardPeriod,
   QuizSubmitAnswer,
   QuizSubmitResult,
+  UpdateCourseInput,
   UpdateProgressInput,
   UserProgress,
 } from "@/types/academy";
@@ -116,6 +120,65 @@ export async function createCourse(
   const { data, error } = await admin.from("courses").insert(row).select("*").single();
   if (error) throw new Error(error.message);
   return data as AcademyCourse;
+}
+
+export async function updateCourse(id: string, input: UpdateCourseInput): Promise<AcademyCourse> {
+  const admin = adminClient();
+  const { data, error } = await admin.from("courses").update(input).eq("id", id).select("*").single();
+  if (error) throw new Error(error.message);
+  return data as AcademyCourse;
+}
+
+export async function createLesson(input: CreateLessonInput): Promise<AcademyLesson> {
+  const admin = adminClient();
+  const row = {
+    course_id: input.course_id,
+    slug: input.slug,
+    title: input.title,
+    content: input.content ?? "",
+    content_json: {},
+    sort_order: input.sort_order ?? 0,
+    duration_minutes: input.duration_minutes ?? 0,
+    status: input.status ?? "draft",
+  };
+
+  const { data, error } = await admin.from("lessons").insert(row).select("*").single();
+  if (error) throw new Error(error.message);
+  return data as AcademyLesson;
+}
+
+export async function createQuizWithQuestions(input: CreateQuizInput): Promise<AcademyQuiz> {
+  const admin = adminClient();
+  const { data: quiz, error } = await admin
+    .from("quizzes")
+    .insert({
+      course_id: input.course_id,
+      lesson_id: input.lesson_id ?? null,
+      title: input.title,
+      passing_score: input.passing_score ?? 70,
+      status: input.status ?? "draft",
+    })
+    .select("*")
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  if (input.questions?.length) {
+    const rows = input.questions.map((q, i) => ({
+      quiz_id: quiz.id,
+      question_text: q.question_text,
+      question_type: q.question_type ?? "multiple_choice",
+      options: q.options ?? [],
+      correct_answer: q.correct_answer,
+      sort_order: q.sort_order ?? i + 1,
+      explanation: q.explanation ?? null,
+    }));
+
+    const { error: qErr } = await admin.from("quiz_questions").insert(rows);
+    if (qErr) throw new Error(qErr.message);
+  }
+
+  return quiz as AcademyQuiz;
 }
 
 export async function getLessonById(id: string): Promise<AcademyLesson | null> {
