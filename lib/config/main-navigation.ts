@@ -194,6 +194,12 @@ const menuEn: NavItem[] = [
     children: [
       { label: "Overview", href: "/academy" },
       { label: "Courses", href: "/academy/courses" },
+      { label: "Quizzes", href: "/academy/quizzes" },
+      { label: "Simulations", href: "/academy/ai-simulations" },
+      { label: "Mentoring", href: "/academy/mentoring" },
+      { label: "Marketplace", href: "/academy/marketplace" },
+      { label: "Textbooks", href: "/academy/textbooks" },
+      { label: "Leaderboard", href: "/academy/leaderboard" },
     ],
   },
   {

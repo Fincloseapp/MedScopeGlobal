@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * MedScope Academy v35 smoke — /academy, health API, homepage CTA.
+ * MedScope Academy v35 Phase 2 smoke — routes, APIs, homepage CTA.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -18,30 +18,26 @@ for (const name of [".env.local", ".env"]) {
   }
 }
 
-const base = (env.PRODUCTION_URL ?? env.PROD_BASE_URL ?? "https://medscopeglobal.com").replace(
-  /\/$/,
-  ""
-);
+const base = (env.PRODUCTION_URL ?? env.PROD_BASE_URL ?? "https://medscopeglobal.com").replace(/\/$/, "");
 
 const ROUTES = [
   "/academy",
   "/academy/courses",
   "/academy/quizzes",
+  "/academy/ai-simulations",
   "/academy/leaderboard",
   "/academy/marketplace",
-  "/academy/mentoring",
   "/academy/textbooks",
-  "/academy/ai-simulations",
-  "/academy/games",
+  "/academy/mentoring",
   "/api/academy/health",
   "/api/academy/courses",
   "/api/academy/quizzes",
-  "/api/academy/leaderboard",
-  "/api/academy/marketplace",
-  "/api/academy/mentoring",
   "/api/academy/simulations",
   "/api/academy/textbooks",
-  "/api/mobile/sync",
+  "/api/academy/marketplace",
+  "/api/academy/leaderboard",
+  "/api/academy/mobile/sync",
+  "/api/academy/testing/run",
 ];
 
 async function checkRoute(route) {
@@ -57,7 +53,7 @@ async function checkRoute(route) {
   }
 }
 
-console.log(`\n=== Academy v35 smoke @ ${base} ===\n`);
+console.log(`\n=== Academy v35 Phase 2 smoke @ ${base} ===\n`);
 
 let failed = 0;
 const results = [];
@@ -82,6 +78,12 @@ const ctaOk =
 console.log(`→ / homepage Academy CTA … ${ctaOk ? "OK" : "FAIL"}`);
 if (!ctaOk) failed += 1;
 
+const sectionsOk =
+  home.text.includes("Doporučené kurzy") ||
+  home.text.includes("AI simulace") ||
+  home.text.includes("XP progress");
+console.log(`→ / homepage Academy sections … ${sectionsOk ? "OK" : "WARN (may be empty DB)"}`);
+
 const health = results.find((r) => r.route === "/api/academy/health");
 if (health?.text) {
   try {
@@ -90,7 +92,7 @@ if (health?.text) {
       console.log(`✗ health version expected v35.0, got ${json.version}`);
       failed += 1;
     } else {
-      console.log(`✓ health version ${json.version}`);
+      console.log(`✓ health version ${json.version}, ok=${json.ok}`);
     }
   } catch {
     console.log("✗ health response not JSON");

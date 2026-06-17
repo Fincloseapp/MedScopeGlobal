@@ -38,6 +38,24 @@ export default async function AcademyHubPage() {
           </div>
         </div>
 
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/academy/courses" className="rounded-full border border-[#cfe1f3] px-4 py-2 text-sm text-[#005B96] hover:bg-[#f0f7fc]">
+            Kurzy
+          </Link>
+          <Link href="/academy/quizzes" className="rounded-full border border-[#cfe1f3] px-4 py-2 text-sm text-[#005B96] hover:bg-[#f0f7fc]">
+            Kvízy
+          </Link>
+          <Link href="/academy/ai-simulations" className="rounded-full border border-[#cfe1f3] px-4 py-2 text-sm text-[#005B96] hover:bg-[#f0f7fc]">
+            Simulace
+          </Link>
+          <Link href="/academy/marketplace" className="rounded-full border border-[#cfe1f3] px-4 py-2 text-sm text-[#005B96] hover:bg-[#f0f7fc]">
+            Marketplace
+          </Link>
+          <Link href="/academy/leaderboard" className="rounded-full border border-[#cfe1f3] px-4 py-2 text-sm text-[#005B96] hover:bg-[#f0f7fc]">
+            Žebříček
+          </Link>
+        </div>
+
         <section className="mt-12">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>

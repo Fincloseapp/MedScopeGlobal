@@ -3,6 +3,7 @@ import Link from "next/link";
 import { HomepageAds } from "@/components/home/homepage-ads";
 import { V20ArticleCard } from "@/components/v20/article-card";
 import { V271HomeHero } from "@/components/v271/home-hero";
+import { V272AcademyHomeSections } from "@/components/v271/academy-home-sections";
 import { V272HomepageSections } from "@/components/v271/homepage-sections";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { medicalWebPageJsonLd, webSiteJsonLd } from "@/lib/seo/json-ld";
@@ -37,6 +38,7 @@ export default async function HomePage() {
 
       <V271HomeHero />
       <V272HomepageSections />
+      <V272AcademyHomeSections />
 
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
 

@@ -39,6 +39,7 @@
     "supabase/functions",
     "tests",
     "e2e",
+    "mobile",
     ".deploy-tmp",
     ".build-tmp",
     ".tools"

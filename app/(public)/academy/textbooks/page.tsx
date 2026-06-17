@@ -5,31 +5,29 @@ import { listTextbooks } from "@/lib/academy/db";
 export const revalidate = 120;
 
 export default async function AcademyTextbooksPage() {
-  const books = await listTextbooks(30);
+  const textbooks = await listTextbooks();
 
   return (
     <>
       <AcademyPageHeader
         eyebrow="Učebnice"
         title="Digitální učebnice"
-        description="Strukturované učební materiály pro medicínu."
+        description="Strukturované učební texty pro LF a klinickou praxi."
       />
-      <div className="mx-auto max-w-4xl px-4 py-10">
-        {books.length > 0 ? (
+      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+        {textbooks.length > 0 ? (
           <ul className="space-y-3">
-            {books.map((b) => (
-              <li key={b.id}>
-                <Link
-                  href={`/academy/textbooks/${b.slug}`}
-                  className="block rounded-xl border border-[#cfe1f3] bg-white px-5 py-4 hover:border-[#005B96]"
-                >
-                  <h2 className="font-semibold text-[#021d33]">{b.title}</h2>
+            {textbooks.map((book) => (
+              <li key={book.id} className="rounded-xl border border-slate-200 bg-white p-4">
+                <h2 className="font-display text-lg font-semibold">{book.title}</h2>
+                <Link href={`/academy/textbooks/${book.slug}`} className="mt-2 inline-block text-sm text-[#005B96] hover:underline">
+                  Číst →
                 </Link>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-center text-sm text-slate-500">Učebnice budou brzy publikovány.</p>
+          <p className="text-center text-sm text-slate-500">Učebnice se generují AI pipeline.</p>
         )}
       </div>
     </>

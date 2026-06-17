@@ -1,7 +1,7 @@
 import { AcademyPageHeader } from "@/components/academy/page-header";
 import { listMentoringSessions } from "@/lib/academy/db";
 
-export const revalidate = 120;
+export const dynamic = "force-dynamic";
 
 export default async function AcademyMentoringPage() {
   const sessions = await listMentoringSessions(undefined, 20);
@@ -11,22 +11,26 @@ export default async function AcademyMentoringPage() {
       <AcademyPageHeader
         eyebrow="Mentoring"
         title="AI a lidský mentoring"
-        description="Spojte se s mentory pro klinickou praxi a studium."
+        description="Rezervujte si konzultaci s mentorem nebo AI tutorem k libovolnému kurzu."
+        ctaHref="/login"
+        ctaLabel="Požádat o mentoring"
       />
-      <div className="mx-auto max-w-4xl px-4 py-10">
+      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+        <p className="text-sm text-slate-600">
+          Po přihlášení můžete vytvořit požadavek přes POST /api/academy/mentoring.
+        </p>
         {sessions.length > 0 ? (
-          <ul className="space-y-3">
+          <ul className="mt-6 space-y-3">
             {sessions.map((s) => (
-              <li key={s.id} className="rounded-xl border border-[#cfe1f3] bg-white px-5 py-4 text-sm">
-                {s.status} — {s.scheduled_at?.slice(0, 16) ?? "Na vyžádání"}
+              <li key={s.id} className="rounded-xl border border-slate-200 bg-white p-4 text-sm">
+                <span className="font-medium">{s.status}</span>
+                {s.scheduled_at ? (
+                  <span className="ml-2 text-slate-600">{new Date(s.scheduled_at).toLocaleString("cs-CZ")}</span>
+                ) : null}
               </li>
             ))}
           </ul>
-        ) : (
-          <p className="text-center text-sm text-slate-500">
-            Mentoring sessions budou brzy k dispozici. Sledujte Academy.
-          </p>
-        )}
+        ) : null}
       </div>
     </>
   );
