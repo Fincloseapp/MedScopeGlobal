@@ -232,6 +232,18 @@ export interface QuizSubmitResult {
   correct_count: number;
   total_count: number;
   xp_awarded?: number;
+  certificate_id?: string;
+  certificate_code?: string;
+}
+
+export interface AcademyCertificate {
+  id: string;
+  user_id: string;
+  course_id: string;
+  certificate_code: string;
+  issued_at: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
 }
 
 export interface MarketplaceListing {

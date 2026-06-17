@@ -2,7 +2,7 @@ import { createServiceRoleClient } from "@/lib/supabase/service";
 import { listAllCoursesAdmin } from "@/lib/academy/db";
 
 export type WeeklyDigestItem = {
-  type: "course" | "lesson" | "simulation";
+  type: "course" | "lesson" | "simulation" | "videokurz";
   title: string;
   slug: string;
   url: string;
@@ -39,12 +39,16 @@ export async function generateWeeklyDigest(): Promise<WeeklyDigest> {
   ]);
 
   const items: WeeklyDigestItem[] = [
-    ...courses.map((c) => ({
-      type: "course" as const,
-      title: c.title,
-      slug: c.slug,
-      url: `${baseUrl}/academy/courses/${c.slug}`,
-    })),
+    ...courses.map((c) => {
+      const meta = (c.metadata ?? {}) as { has_video?: boolean };
+      const isVideo = meta.has_video === true;
+      return {
+        type: isVideo ? ("videokurz" as const) : ("course" as const),
+        title: isVideo ? `${c.title} (videokurz)` : c.title,
+        slug: c.slug,
+        url: `${baseUrl}/academy/courses/${c.slug}`,
+      };
+    }),
     ...lessons.map((l) => ({
       type: "lesson" as const,
       title: l.title,
@@ -61,7 +65,7 @@ export async function generateWeeklyDigest(): Promise<WeeklyDigest> {
 
   return {
     subject: "MedScope Academy — týdenní přehled",
-    intro: "Novinky z Academy za poslední týden: kurzy, lekce a klinické simulace.",
+    intro: "Novinky z Academy za poslední týden: videokurzy, kurzy, lekce a klinické simulace.",
     items,
     generatedAt: new Date().toISOString(),
   };

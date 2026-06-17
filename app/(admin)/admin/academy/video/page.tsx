@@ -33,8 +33,20 @@ export default async function AdminAcademyVideoPage() {
             public_url?: string;
             duration_source?: string;
             thumbnail_url?: string;
+            render_status?: string;
+            render_provider?: string;
+            external_job_id?: string;
+            pending_external_render?: boolean;
           };
           const linkedLesson = lessonList.find((l) => l.video_asset_id === row.id) ?? null;
+          const renderLabel =
+            meta.render_status === "processing" || row.status === "processing"
+              ? "Renderuje se…"
+              : meta.pending_external_render
+                ? "Čeká na provider"
+                : meta.render_provider
+                  ? `Hotovo (${meta.render_provider})`
+                  : row.status;
           return (
             <div
               key={row.id}
@@ -54,6 +66,10 @@ export default async function AdminAcademyVideoPage() {
                     {row.status} · {row.duration_seconds ?? 0}s
                     {meta.duration_source ? ` (${meta.duration_source})` : ""}
                   </p>
+                  <p className="mt-1 text-xs font-medium text-[#005B96]">Render: {renderLabel}</p>
+                  {meta.external_job_id ? (
+                    <p className="text-xs text-slate-400">Job: {meta.external_job_id}</p>
+                  ) : null}
                   <p className="mt-1 text-xs text-slate-500">
                     {meta.public_url ? (
                       <a

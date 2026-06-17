@@ -70,10 +70,12 @@ export async function runVideoProducerStub(
 
   return {
     stub: fallback,
-    status: "ready",
+    status: asset.status,
     title: lessonTitle,
     video_asset_id: asset.video_asset_id,
     public_url: asset.public_url,
+    render_provider: asset.render_provider,
+    external_job_id: asset.external_job_id,
     script_provider: provider,
     avatar_type: script.avatar_type,
     voice_type: script.voice_type,

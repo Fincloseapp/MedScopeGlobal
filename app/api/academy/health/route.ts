@@ -7,6 +7,7 @@ import {
 } from "@/lib/academy/db";
 import { getDigestDeliveryStatus } from "@/lib/academy/marketing/digest-config";
 import { isLlmConfigured } from "@/lib/ai/chat-json";
+import { getPreferredVideoProvider, isHeyGenConfigured, isSynthesiaConfigured } from "@/lib/academy/ai/video-providers";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,9 @@ export async function GET() {
       videoLessonCount,
       digestDeliveryMode: digest.mode,
       llmConfigured: isLlmConfigured(),
+      videoProvider: getPreferredVideoProvider(),
+      heygenConfigured: isHeyGenConfigured(),
+      synthesiaConfigured: isSynthesiaConfigured(),
       generatedAt: new Date().toISOString(),
     });
   } catch (e) {

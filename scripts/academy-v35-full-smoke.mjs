@@ -197,6 +197,34 @@ await sleep(1500);
   else fail("generate-video API auth", `expected 401, got ${res.status}`);
 }
 
+// 11. Video webhook probe (GET status)
+await sleep(1500);
+{
+  const { res, json } = await fetchJson(`${base}/api/academy/video/webhook`);
+  if (res.status === 200 && json?.ok) pass("video webhook status", json.provider ?? "ok");
+  else fail("video webhook status", `status ${res.status}`);
+}
+
+// 12. Profile page (XP/badges shell)
+await sleep(1500);
+{
+  const { res, text, appErr } = await fetchPage(`${base}/academy/profile`);
+  const hasProfile = /Academy profil|XP|Odznaky/i.test(text);
+  if (res.status !== 200 || appErr) fail("profile page", `status ${res.status}`);
+  else if (!hasProfile) fail("profile page content");
+  else pass("profile page XP/badges");
+}
+
+// 13. Mobile sync video metadata
+await sleep(1500);
+{
+  const { res, json } = await fetchJson(`${base}/api/mobile/sync`);
+  const hasVideo = (json?.videoCourseCount ?? 0) >= 1 || json?.courses?.some((c) => c.video_lessons?.length);
+  if (res.status !== 200 || !json?.ok) fail("mobile sync", `status ${res.status}`);
+  else if (!hasVideo) fail("mobile sync video metadata");
+  else pass("mobile sync video metadata", `videoCourses=${json.videoCourseCount ?? "?"}`);
+}
+
 console.log(`\n--- Summary: ${results.length - failed}/${results.length} passed ---\n`);
 if (failed > 0) {
   console.error(`FAILED: ${failed} check(s)`);

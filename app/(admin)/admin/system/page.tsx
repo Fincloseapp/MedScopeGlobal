@@ -146,6 +146,18 @@ export default async function AdminSystemPage() {
 
           </Link>
 
+          <Link href="/api/academy/health" className="rounded-lg border px-3 py-1.5 hover:bg-muted">
+
+            Academy health
+
+          </Link>
+
+          <Link href="/admin/academy/video" className="rounded-lg border px-3 py-1.5 hover:bg-muted">
+
+            Academy video
+
+          </Link>
+
           <Link href="/studium/univerzity" className="rounded-lg border px-3 py-1.5 hover:bg-muted">
 
             Univerzity

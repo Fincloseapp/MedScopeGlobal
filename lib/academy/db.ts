@@ -20,6 +20,7 @@ import type {
   UpdateProgressInput,
   UpdateQuizInput,
   UserProgress,
+  AcademyCertificate,
 } from "@/types/academy";
 
 const ACADEMY_VERSION = "v35.0";
@@ -379,6 +380,9 @@ export async function submitQuizAnswers(
   const passed = score >= passing;
 
   let xp_awarded = 0;
+  let certificate_id: string | undefined;
+  let certificate_code: string | undefined;
+
   if (passed && userId) {
     const { data: existing } = await admin
       .from("xp_events")
@@ -405,6 +409,12 @@ export async function submitQuizAnswers(
           progress_pct: 100,
           quiz_score: score,
         });
+
+        const cert = await issueCourseCertificate(userId, courseId, { score, quizId });
+        if (cert) {
+          certificate_id = cert.id;
+          certificate_code = cert.certificate_code;
+        }
       }
     }
   }
@@ -417,6 +427,8 @@ export async function submitQuizAnswers(
     correct_count: correct,
     total_count: total,
     xp_awarded,
+    certificate_id,
+    certificate_code,
   };
 }
 
@@ -742,6 +754,121 @@ export async function getUserProgress(userId: string, courseId?: string) {
     return [];
   }
   return data ?? [];
+}
+
+export async function listUserCertificates(userId: string): Promise<AcademyCertificate[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("certificates")
+    .select("*")
+    .eq("user_id", userId)
+    .order("issued_at", { ascending: false });
+
+  if (error) {
+    console.error("[academy] listUserCertificates", error.message);
+    return [];
+  }
+  return (data ?? []) as AcademyCertificate[];
+}
+
+export async function getCertificateById(id: string): Promise<AcademyCertificate | null> {
+  const admin = adminClient();
+  const { data, error } = await admin.from("certificates").select("*").eq("id", id).maybeSingle();
+  if (error || !data) return null;
+  return data as AcademyCertificate;
+}
+
+export async function issueCourseCertificate(
+  userId: string,
+  courseId: string,
+  opts: { score?: number; quizId?: string }
+): Promise<AcademyCertificate | null> {
+  const admin = adminClient();
+
+  const { data: existing } = await admin
+    .from("certificates")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("course_id", courseId)
+    .maybeSingle();
+
+  if (existing) return existing as AcademyCertificate;
+
+  const { generateCertificateCode } = await import("@/lib/academy/certificates/generator");
+  const code = generateCertificateCode();
+
+  const { data, error } = await admin
+    .from("certificates")
+    .insert({
+      user_id: userId,
+      course_id: courseId,
+      certificate_code: code,
+      metadata: { score: opts.score ?? null, quiz_id: opts.quizId ?? null },
+    })
+    .select("*")
+    .single();
+
+  if (error) {
+    console.error("[academy] issueCourseCertificate", error.message);
+    return null;
+  }
+  return data as AcademyCertificate;
+}
+
+export async function getCoursesWithVideoMetadata(limit = 50) {
+  const courses = await listPublishedCourses(limit);
+  const flags = await getCourseVideoFlags(courses.map((c) => c.id));
+  const admin = adminClient();
+
+  const { data: lessons } = await admin
+    .from("lessons")
+    .select("id, course_id, slug, title, video_asset_id")
+    .eq("status", "published")
+    .not("video_asset_id", "is", null);
+
+  const videoIds = [...new Set((lessons ?? []).map((l) => l.video_asset_id).filter(Boolean))] as string[];
+  const { data: videos } = videoIds.length
+    ? await admin.from("video_assets").select("id, title, duration_seconds, status, metadata").in("id", videoIds)
+    : { data: [] };
+
+  const videoMap = new Map((videos ?? []).map((v) => [v.id, v]));
+
+  return courses.map((course) => {
+    const courseLessons = (lessons ?? []).filter((l) => l.course_id === course.id);
+    const videoLessons = courseLessons
+      .map((l) => {
+        const asset = l.video_asset_id ? videoMap.get(l.video_asset_id) : null;
+        const meta = (asset?.metadata ?? {}) as Record<string, unknown>;
+        return {
+          lesson_id: l.id,
+          slug: l.slug,
+          title: l.title,
+          video_asset_id: l.video_asset_id,
+          public_url: meta.public_url ?? null,
+          thumbnail_url: meta.thumbnail_url ?? null,
+          render_status: meta.render_status ?? asset?.status ?? null,
+          duration_seconds: asset?.duration_seconds ?? null,
+        };
+      })
+      .filter((v) => v.video_asset_id);
+
+    return {
+      ...course,
+      has_video: flags[course.id]?.hasVideo ?? false,
+      video_lesson_count: flags[course.id]?.videoLessonCount ?? 0,
+      video_lessons: videoLessons,
+    };
+  });
+}
+
+export async function countUserQuizPasses(userId: string): Promise<number> {
+  const admin = adminClient();
+  const { count } = await admin
+    .from("xp_events")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .eq("event_type", "quiz_pass");
+  return count ?? 0;
 }
 
 export async function runSystemTest(name: string) {
