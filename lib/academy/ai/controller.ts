@@ -87,6 +87,11 @@ export async function dispatchAiTask(taskId: string): Promise<{ ok: boolean; mes
         result = await runQuizBuilderStub(payload, taskId);
         break;
       }
+      case "expert-review": {
+        const { runExpertReview } = await import("@/lib/academy/ai/workers/expert-review");
+        result = (await runExpertReview(payload, taskId)) as unknown as Record<string, unknown>;
+        break;
+      }
       case "video-producer": {
         const { runVideoProducerStub } = await import("@/lib/academy/ai/workers/video-producer");
         result = await runVideoProducerStub(payload, taskId);
@@ -169,5 +174,19 @@ export async function queueGenerateCourse(payload: {
     taskType: "course-creator",
     payload,
     priority: 1,
+  });
+}
+
+export async function queueExpertReview(payload: {
+  course_id?: string;
+  lesson_id?: string;
+  quiz_id?: string;
+  auto_publish?: boolean;
+  min_score?: number;
+}): Promise<AiTask> {
+  return enqueueAiTask({
+    taskType: "expert-review",
+    payload,
+    priority: 2,
   });
 }

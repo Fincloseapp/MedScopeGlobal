@@ -181,6 +181,30 @@ export interface CreateQuizInput {
   }[];
 }
 
+export interface UpdateLessonInput {
+  title?: string;
+  content?: string;
+  sort_order?: number;
+  duration_minutes?: number;
+  status?: AcademyLessonStatus;
+}
+
+export interface UpdateQuizInput {
+  title?: string;
+  passing_score?: number;
+  status?: AcademyQuizStatus;
+}
+
+export interface ExpertReviewResult {
+  target_type: "course" | "lesson" | "quiz";
+  target_id: string;
+  score: number;
+  approved: boolean;
+  issues: string[];
+  recommendations: string[];
+  provider: string;
+}
+
 export interface UpdateProgressInput {
   course_id: string;
   lesson_id?: string | null;

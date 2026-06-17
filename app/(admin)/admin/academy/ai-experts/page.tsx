@@ -10,7 +10,9 @@ export default async function AdminAcademyAiExpertsPage() {
 
   return (
     <>
-      <p className="text-sm text-slate-600">Expert review fronta (stub auto-approve ve fázi 1–2).</p>
+      <p className="text-sm text-slate-600">
+        Expert review pipeline — výsledky z workeru <code className="text-xs">expert-review</code> (LLM + DB).
+      </p>
       <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
         <table className="w-full text-left text-sm">
           <thead className="border-b bg-slate-50 text-xs uppercase text-slate-500">

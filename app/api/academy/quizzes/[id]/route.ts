@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { getQuizById, submitQuizAnswers } from "@/lib/academy/db";
-import type { QuizSubmitAnswer } from "@/types/academy";
+import { isAdminApiAuthorized } from "@/lib/auth/admin-api";
+import { getQuizById, submitQuizAnswers, updateQuiz } from "@/lib/academy/db";
+import type { QuizSubmitAnswer, UpdateQuizInput } from "@/types/academy";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,21 @@ export async function GET(_request: Request, { params }: Params) {
     if (!quiz) {
       return NextResponse.json({ error: "Kvíz nenalezen" }, { status: 404 });
     }
+    return NextResponse.json({ ok: true, quiz });
+  } catch (e) {
+    return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: Request, { params }: Params) {
+  if (!(await isAdminApiAuthorized(request))) {
+    return NextResponse.json({ error: "Neautorizováno" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  try {
+    const body = (await request.json()) as UpdateQuizInput;
+    const quiz = await updateQuiz(id, body);
     return NextResponse.json({ ok: true, quiz });
   } catch (e) {
     return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });

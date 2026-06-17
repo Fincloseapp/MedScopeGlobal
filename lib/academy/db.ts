@@ -14,7 +14,9 @@ import type {
   QuizSubmitAnswer,
   QuizSubmitResult,
   UpdateCourseInput,
+  UpdateLessonInput,
   UpdateProgressInput,
+  UpdateQuizInput,
   UserProgress,
 } from "@/types/academy";
 
@@ -179,6 +181,20 @@ export async function createQuizWithQuestions(input: CreateQuizInput): Promise<A
   }
 
   return quiz as AcademyQuiz;
+}
+
+export async function updateLesson(id: string, input: UpdateLessonInput): Promise<AcademyLesson> {
+  const admin = adminClient();
+  const { data, error } = await admin.from("lessons").update(input).eq("id", id).select("*").single();
+  if (error) throw new Error(error.message);
+  return data as AcademyLesson;
+}
+
+export async function updateQuiz(id: string, input: UpdateQuizInput): Promise<AcademyQuiz> {
+  const admin = adminClient();
+  const { data, error } = await admin.from("quizzes").update(input).eq("id", id).select("*").single();
+  if (error) throw new Error(error.message);
+  return data as AcademyQuiz;
 }
 
 export async function getLessonById(id: string): Promise<AcademyLesson | null> {
