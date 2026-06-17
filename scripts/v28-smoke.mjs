@@ -50,6 +50,7 @@ const ROUTES = [
   "/aktualni-zpravy",
   "/academy",
   "/api/v27/health",
+  "/api/v28/health",
 ];
 
 async function checkRoute(route) {
@@ -151,6 +152,28 @@ if (lfRes.ok) {
   lfOuChecks.push({ ok: false, msg: "LF univerzity route failed" });
 }
 
+const healthChecks = [];
+const v28Health = results.find((r) => r.route === "/api/v28/health");
+if (v28Health?.ok) {
+  try {
+    const json = JSON.parse(v28Health.text);
+    if (!String(json.version).startsWith("28")) {
+      healthChecks.push({ ok: false, msg: `v28 health version ${json.version} !== 28.x` });
+    } else {
+      healthChecks.push({ ok: true, msg: `v28 health version ${json.version}` });
+    }
+    if (!json.features?.includes("email-engine-v28")) {
+      healthChecks.push({ ok: false, msg: "v28 health missing email-engine-v28" });
+    } else {
+      healthChecks.push({ ok: true, msg: "email-engine-v28 feature flag" });
+    }
+  } catch (e) {
+    healthChecks.push({ ok: false, msg: `v28 health parse error: ${e.message}` });
+  }
+} else {
+  healthChecks.push({ ok: false, msg: "v28 health endpoint unreachable" });
+}
+
 console.log("\n--- Homepage checks ---");
 for (const c of homeChecks) console.log(c.ok ? `✓ ${c.msg}` : `✗ ${c.msg}`);
 
@@ -166,8 +189,11 @@ for (const c of emailModuleChecks) console.log(c.ok ? `✓ ${c.msg}` : `✗ ${c.
 console.log("\n--- LF OU ---");
 for (const c of lfOuChecks) console.log(c.ok ? `✓ ${c.msg}` : `✗ ${c.msg}`);
 
+console.log("\n--- v28 health ---");
+for (const c of healthChecks) console.log(c.ok ? `✓ ${c.msg}` : `✗ ${c.msg}`);
+
 const routeFails = results.filter((r) => !r.ok).length;
-const checkFails = [...homeChecks, ...subChecks, ...navChecks, ...emailModuleChecks, ...lfOuChecks].filter(
+const checkFails = [...homeChecks, ...subChecks, ...navChecks, ...emailModuleChecks, ...lfOuChecks, ...healthChecks].filter(
   (c) => !c.ok
 ).length;
 
