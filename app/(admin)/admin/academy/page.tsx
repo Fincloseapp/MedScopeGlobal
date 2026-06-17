@@ -1,9 +1,12 @@
 import { BookOpen, Brain, GraduationCap, Trophy } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DigestDeliveryBadge } from "@/components/academy/digest-delivery-badge";
 import { getAcademyCounts } from "@/lib/academy/db";
+import { isLlmConfigured } from "@/lib/ai/chat-json";
 
 export default async function AdminAcademyDashboardPage() {
   const counts = await getAcademyCounts();
+  const llmReady = isLlmConfigured();
 
   const stats = [
     { label: "Kurzy", value: counts.courses ?? 0, icon: GraduationCap },
@@ -17,8 +20,27 @@ export default async function AdminAcademyDashboardPage() {
   return (
     <>
       <p className="text-sm text-slate-600">
-        Přehled Academy v35 — API, admin sekce a homepage integrace (fáze 2).
+        Přehled Academy v35 — fáze 7 (SendGrid, video metadata, denní AI cron).
       </p>
+
+      <div className="mt-4 space-y-3">
+        <DigestDeliveryBadge />
+        <div
+          className={`rounded-xl border px-4 py-3 text-sm ${
+            llmReady
+              ? "border-green-200 bg-green-50 text-green-800"
+              : "border-slate-200 bg-white text-slate-600"
+          }`}
+        >
+          <p className="font-medium">
+            Denní AI generování: {llmReady ? "LLM klíč aktivní" : "čeká na OPENAI/GROQ klíč"}
+          </p>
+          <p className="mt-1 text-xs opacity-90">
+            Cron <code>/api/cron/academy-daily</code> generuje 1 lekci + 1 kvíz pro demo kurz{" "}
+            <code>uvod-do-anatomie</code>.
+          </p>
+        </div>
+      </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat) => (

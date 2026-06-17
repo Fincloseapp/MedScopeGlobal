@@ -1,7 +1,14 @@
 import * as Linking from "expo-linking";
 import { getSupabase } from "./supabase";
 
-const redirectUrl = Linking.createURL("auth/callback");
+/**
+ * Supabase Auth redirect for mobile deep links.
+ * Register in Supabase Dashboard → Auth → Redirect URLs:
+ *   medscope-academy://auth/callback
+ * See mobile/GOOGLE-OAUTH.md for Google Cloud client setup.
+ */
+export const AUTH_CALLBACK_PATH = "auth/callback";
+export const authRedirectUrl = Linking.createURL(AUTH_CALLBACK_PATH);
 
 /** Sends a Supabase magic-link OTP to the given email. */
 export async function signInWithMagicLink(email: string): Promise<{ error: string | null }> {
@@ -10,7 +17,7 @@ export async function signInWithMagicLink(email: string): Promise<{ error: strin
 
   const { error } = await supabase.auth.signInWithOtp({
     email: email.trim(),
-    options: { emailRedirectTo: redirectUrl },
+    options: { emailRedirectTo: authRedirectUrl },
   });
 
   return { error: error?.message ?? null };
@@ -23,7 +30,7 @@ export async function signInWithGoogle(): Promise<{ error: string | null }> {
 
   const { error } = await supabase.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: redirectUrl },
+    options: { redirectTo: authRedirectUrl },
   });
 
   return { error: error?.message ?? null };

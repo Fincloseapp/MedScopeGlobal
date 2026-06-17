@@ -187,6 +187,7 @@ export interface UpdateLessonInput {
   sort_order?: number;
   duration_minutes?: number;
   status?: AcademyLessonStatus;
+  video_asset_id?: string | null;
 }
 
 export interface UpdateQuizInput {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyCronRequest } from "@/lib/v6/cron-auth";
+import { runDailyDemoContentGeneration } from "@/lib/academy/ai/daily-content";
 import { checkAcademyTables, getAcademyCounts } from "@/lib/academy/db";
 import { dispatchAiTask } from "@/lib/academy/ai/controller";
 import { createServiceRoleClient } from "@/lib/supabase/service";
@@ -18,6 +19,7 @@ export async function GET(request: Request) {
   const counts = await getAcademyCounts();
 
   let dispatched: { taskId: string; ok: boolean }[] = [];
+  let dailyContent: Awaited<ReturnType<typeof runDailyDemoContentGeneration>> | null = null;
 
   if (runContentGen) {
     const admin = createServiceRoleClient();
@@ -32,14 +34,17 @@ export async function GET(request: Request) {
       const result = await dispatchAiTask(task.id);
       dispatched.push({ taskId: task.id, ok: result.ok });
     }
+  } else {
+    dailyContent = await runDailyDemoContentGeneration();
   }
 
   return NextResponse.json({
     ok: Object.values(tables).every(Boolean),
-    phase: "v35.0-phase2",
+    phase: "v35.0-daily-phase7",
     tables,
     counts,
     dispatched,
+    dailyContent,
     generatedAt: new Date().toISOString(),
   });
 }

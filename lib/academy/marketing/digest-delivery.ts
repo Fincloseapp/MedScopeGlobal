@@ -1,4 +1,5 @@
 import type { WeeklyDigest } from "@/lib/academy/marketing/weekly-digest";
+import { getDigestDeliveryStatus } from "@/lib/academy/marketing/digest-config";
 
 export type DigestDeliveryResult = {
   sent: boolean;
@@ -32,17 +33,19 @@ export async function deliverWeeklyDigest(
   digest: WeeklyDigest,
   eventId: string
 ): Promise<DigestDeliveryResult> {
+  const { configured, fromEmail, hasListId, hasNewsletterTo } = getDigestDeliveryStatus();
   const apiKey = process.env.SENDGRID_API_KEY?.trim();
-  const fromEmail = process.env.SENDGRID_FROM_EMAIL?.trim() ?? "academy@medscopeglobal.com";
   const listId = process.env.SENDGRID_ACADEMY_LIST_ID?.trim();
   const toEmail = process.env.ACADEMY_NEWSLETTER_TO?.trim();
 
-  if (!apiKey) {
+  if (!configured || !apiKey) {
     console.info("[academy] weekly digest (log-only)", {
       eventId,
       subject: digest.subject,
       items: digest.items.length,
       generatedAt: digest.generatedAt,
+      hasListId,
+      hasNewsletterTo,
     });
     return { sent: false, mode: "log" };
   }
