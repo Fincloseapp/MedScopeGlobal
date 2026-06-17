@@ -117,6 +117,7 @@ const LESSON_ROUTES = [
   "/academy/courses/uvod-do-anatomie/lessons/kosterni-system",
   "/academy/courses/uvod-do-farmakologie/lessons/farmakokinetika",
   "/academy/courses/zaklady-kardiologie/lessons/ekg-zaklady",
+  "/academy/courses/biologie-prijimacky-bunka-genetika/lessons/bunka-struktura",
 ];
 
 for (const route of LESSON_ROUTES) {
@@ -281,6 +282,61 @@ await sleep(1500);
   if (res.status !== 200 || appErr) fail("prijimacky page", `status ${res.status}`);
   else if (!hasCta) fail("prijimacky prep CTA");
   else pass("prijimacky prep CTA");
+}
+
+// 17. Simulations count >= 3
+await sleep(1500);
+{
+  const { res, json } = await fetchJson(`${base}/api/academy/simulations`);
+  const count = (json?.simulations ?? []).length;
+  if (res.status !== 200) fail("simulations API", `status ${res.status}`);
+  else if (count < 3) fail("simulations count>=3", `got ${count}`);
+  else pass("simulations count>=3", String(count));
+}
+
+// 18. Simulation detail page
+await sleep(1500);
+{
+  const { res, text, appErr } = await fetchPage(`${base}/academy/ai-simulations/akutni-bricho-triaz`);
+  const hasPlayer = /Zpětná vazba|Simulace dokončena|Obtížnost/i.test(text);
+  if (res.status !== 200 || appErr) fail("simulation detail page", `status ${res.status}`);
+  else if (!hasPlayer) fail("simulation player UI");
+  else pass("simulation detail page");
+}
+
+// 19. Textbook reader
+await sleep(1500);
+{
+  const { res, text, appErr } = await fetchPage(`${base}/academy/textbooks/anatomie-zaklady`);
+  const hasReader = /Úvod do anatomie|Kosterní systém|kapitola/i.test(text);
+  if (res.status !== 200 || appErr) fail("textbook reader", `status ${res.status}`);
+  else if (!hasReader) fail("textbook reader content");
+  else pass("textbook reader");
+}
+
+// 20. Certificates gallery
+await sleep(1500);
+{
+  const { res, text, appErr } = await fetchPage(`${base}/academy/certificates`);
+  const ok = res.status === 200 && !appErr && /Certifikát|Galerie certifikátů|Demo/i.test(text);
+  if (!ok) fail("certificates page", `status ${res.status}`);
+  else pass("certificates page", `status ${res.status}`);
+}
+
+// 21. Health — expert review cron + simulationCount
+await sleep(1500);
+{
+  const { res, json } = await fetchJson(`${base}/api/academy/health`);
+  if (res.status !== 200 || !json?.expertReviewCron?.enabled) {
+    fail("health expertReviewCron", `status ${res.status}`);
+  } else if ((json.simulationCount ?? 0) < 3) {
+    fail("health simulationCount>=3", `got ${json.simulationCount}`);
+  } else {
+    pass(
+      "health phase13 markers",
+      `sims=${json.simulationCount}, cron=${json.expertReviewCron.schedule}`
+    );
+  }
 }
 
 console.log(`\n--- Summary: ${results.length - failed}/${results.length} passed ---\n`);
