@@ -95,6 +95,12 @@ export default async function SectionRoutePage({
 }) {
   const resolvedParams = await params;
   const key = resolvedParams.slug?.join("/") ?? "";
+
+  // Never treat API paths as content sections (safety if route precedence changes)
+  if (key.startsWith("api/") || key === "api") {
+    notFound();
+  }
+
   const data = await loadSectionPageData(key);
 
   if (!data) notFound();

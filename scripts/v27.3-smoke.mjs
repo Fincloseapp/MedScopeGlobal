@@ -81,9 +81,9 @@ if (home?.text) {
     home.ok = false;
     homeChecks.push(`missing version ${expectedUi}`);
   }
-  if (home.text.includes("v27.2") || home.text.includes("v27.3")) {
+  if (home.text.includes("v27.2") || home.text.includes("v27.3") || home.text.includes("v28.0")) {
     home.ok = false;
-    homeChecks.push("stale v27.x label on homepage");
+    homeChecks.push("stale pre-v28.2 label on homepage");
   }
   if (!home.text.includes(heroClaim)) {
     home.ok = false;

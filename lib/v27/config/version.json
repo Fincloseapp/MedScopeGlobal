@@ -1,6 +1,6 @@
 {
-  "engine": "28.0",
-  "ui": "v28.0",
+  "engine": "28.2",
+  "ui": "v28.2",
   "editorial": "28",
-  "buildStamp": "v28-email-engine-homepage-20260617"
+  "buildStamp": "v28.2-stripe-webhook-health-20260617"
 }

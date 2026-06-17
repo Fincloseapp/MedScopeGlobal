@@ -1,12 +1,12 @@
-/** MedScope v28 — site version (single source of truth for UI) */
+/** MedScope v28.2 — site version (single source of truth for UI) */
 
-export const V28_ENGINE_VERSION = "28.0";
+export const V28_ENGINE_VERSION = "28.2";
 
 export const V28_EDITORIAL_VERSION = "28";
 
-export const V28_UI_VERSION = "v28.0";
+export const V28_UI_VERSION = "v28.2";
 
-export const V28_UI_BUILD_STAMP = "v28-email-engine-homepage-20260617";
+export const V28_UI_BUILD_STAMP = "v28.2-stripe-webhook-health-20260617";
 
 /** Display label for homepage hero and UI badges */
 export function getSiteVersionLabel(): string {

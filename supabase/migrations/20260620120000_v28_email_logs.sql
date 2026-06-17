@@ -22,7 +22,15 @@ CREATE INDEX IF NOT EXISTS idx_email_logs_status ON public.email_logs(status);
 
 ALTER TABLE public.email_logs ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY email_logs_service_role ON public.email_logs
-  FOR ALL
-  USING (auth.role() = 'service_role')
-  WITH CHECK (auth.role() = 'service_role');
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public' AND tablename = 'email_logs' AND policyname = 'email_logs_service_role'
+  ) THEN
+    CREATE POLICY email_logs_service_role ON public.email_logs
+      FOR ALL
+      USING (auth.role() = 'service_role')
+      WITH CHECK (auth.role() = 'service_role');
+  END IF;
+END $$;

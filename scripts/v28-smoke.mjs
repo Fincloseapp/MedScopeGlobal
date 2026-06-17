@@ -24,7 +24,6 @@ const versionConfig = JSON.parse(
 const expectedUi = versionConfig.ui;
 const expectedEngine = versionConfig.engine;
 const heroClaim = "Nejmodernější zdravotnický magazín pro veřejnost, studenty a lékaře";
-const editorialV28 = "redakčního standardu MedScopeGlobal v28";
 
 const BAD_IMAGE_PATTERNS = [
   /black-hands/i,
@@ -162,16 +161,35 @@ if (v28Health?.ok) {
     } else {
       healthChecks.push({ ok: true, msg: `v28 health version ${json.version}` });
     }
-    if (!json.features?.includes("email-engine-v28")) {
-      healthChecks.push({ ok: false, msg: "v28 health missing email-engine-v28" });
+    if (json.status !== "ok") {
+      healthChecks.push({ ok: false, msg: "v28 health status !== ok" });
     } else {
-      healthChecks.push({ ok: true, msg: "email-engine-v28 feature flag" });
+      healthChecks.push({ ok: true, msg: "v28 health status ok" });
+    }
+    if (!json.features?.includes("stripe-webhook-v28.2")) {
+      healthChecks.push({ ok: false, msg: "v28 health missing stripe-webhook-v28.2" });
+    } else {
+      healthChecks.push({ ok: true, msg: "stripe-webhook-v28.2 feature flag" });
     }
   } catch (e) {
     healthChecks.push({ ok: false, msg: `v28 health parse error: ${e.message}` });
   }
 } else {
   healthChecks.push({ ok: false, msg: "v28 health endpoint unreachable" });
+}
+
+const webhookChecks = [];
+const webhookProbe = await fetch(`${base}/api/stripe/webhook`, {
+  method: "POST",
+  signal: AbortSignal.timeout(15_000),
+});
+const webhookStatus = webhookProbe.status;
+if (webhookStatus === 400) {
+  webhookChecks.push({ ok: true, msg: "webhook returns 400 without signature (configured)" });
+} else if (webhookStatus === 503) {
+  webhookChecks.push({ ok: true, msg: "webhook returns 503 (secret not yet on Vercel)" });
+} else {
+  webhookChecks.push({ ok: false, msg: `webhook unexpected status ${webhookStatus}` });
 }
 
 console.log("\n--- Homepage checks ---");
@@ -192,8 +210,11 @@ for (const c of lfOuChecks) console.log(c.ok ? `✓ ${c.msg}` : `✗ ${c.msg}`);
 console.log("\n--- v28 health ---");
 for (const c of healthChecks) console.log(c.ok ? `✓ ${c.msg}` : `✗ ${c.msg}`);
 
+console.log("\n--- Stripe webhook ---");
+for (const c of webhookChecks) console.log(c.ok ? `✓ ${c.msg}` : `✗ ${c.msg}`);
+
 const routeFails = results.filter((r) => !r.ok).length;
-const checkFails = [...homeChecks, ...subChecks, ...navChecks, ...emailModuleChecks, ...lfOuChecks, ...healthChecks].filter(
+const checkFails = [...homeChecks, ...subChecks, ...navChecks, ...emailModuleChecks, ...lfOuChecks, ...healthChecks, ...webhookChecks].filter(
   (c) => !c.ok
 ).length;
 
