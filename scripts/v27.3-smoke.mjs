@@ -81,9 +81,18 @@ if (home?.text) {
     home.ok = false;
     homeChecks.push(`missing version ${expectedUi}`);
   }
-  if (home.text.includes("v27.2") || home.text.includes("v27.3") || home.text.includes("v28.0") || home.text.includes("v28.2")) {
-    home.ok = false;
-    homeChecks.push("stale pre-v29 label on homepage");
+  const staleHeroPatterns = [
+    /MedScope\s+v27\.2/i,
+    /MedScope\s+v27\.3/i,
+    /MedScope\s+v28\.0/i,
+    /MedScope\s+v28\.2/i,
+    /MedScopeGlobal\s+v26/i,
+  ];
+  for (const re of staleHeroPatterns) {
+    if (re.test(home.text.slice(0, 12000))) {
+      home.ok = false;
+      homeChecks.push(`stale pre-v29 hero label: ${re}`);
+    }
   }
   if (!home.text.includes(heroClaim)) {
     home.ok = false;
