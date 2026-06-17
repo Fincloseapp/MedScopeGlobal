@@ -26,14 +26,19 @@ const HANDLED_EVENTS = new Set([
 
 /** Normalize event object for Stripe snapshot (v1) and thin (v2) account payloads */
 function resolveEventObject(event: Stripe.Event): unknown {
-  const raw = event.data.object as Record<string, unknown>;
+  const raw = event.data.object as unknown;
   if (raw && typeof raw === "object") {
-    if (raw.related_object && typeof raw.related_object === "object") {
-      return raw.related_object;
+    const row = raw as Record<string, unknown>;
+    if (row.related_object && typeof row.related_object === "object") {
+      return row.related_object;
     }
-    if (raw.object === "account" && raw.id) return raw;
+    if (row.object === "account" && row.id) return raw;
   }
   return event.data.object;
+}
+
+function isHandledEventType(type: string): boolean {
+  return HANDLED_EVENTS.has(type);
 }
 
 function extractCustomerId(obj: unknown): string | undefined {
@@ -154,20 +159,21 @@ export async function POST(request: Request) {
     eventType: event.type,
     livemode: event.livemode,
     apiVersion: event.api_version ?? undefined,
-    status: HANDLED_EVENTS.has(event.type) ? "received" : "ignored",
+    status: isHandledEventType(event.type) ? "received" : "ignored",
     objectId: extractObjectId(obj),
     customerId: extractCustomerId(obj),
     payload: { type: event.type, id: event.id },
   });
 
-  if (!HANDLED_EVENTS.has(event.type)) {
+  if (!isHandledEventType(event.type)) {
     return NextResponse.json({ received: true, ignored: true, type: event.type });
   }
 
   const admin = createServiceRoleClient();
 
   try {
-    if (event.type === "account.updated" || event.type === "v2.core.account.updated") {
+    const eventType = event.type as string;
+    if (eventType === "account.updated" || eventType === "v2.core.account.updated") {
       const accountId = extractObjectId(obj);
       await logSecurityEvent({
         ip,
