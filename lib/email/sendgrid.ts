@@ -34,15 +34,19 @@ export async function sendViaSendGrid(
     return { ok: false, statusCode: 0, error: "SENDGRID_API_KEY not configured" };
   }
 
-  const fromEmail = request.fromEmail ?? getSendGridFromEmail();
-  const fromName = request.fromName ?? "MedScopeGlobal";
-  const recipients = toRecipients(request.to);
-  if (recipients.length === 0) {
-    return { ok: false, statusCode: 400, error: "No recipients" };
+  const listId = request.sendGridListId?.trim();
+  if (!listId) {
+    const recipients = toRecipients(request.to);
+    if (recipients.length === 0) {
+      return { ok: false, statusCode: 400, error: "No recipients" };
+    }
   }
 
+  const fromEmail = request.fromEmail ?? getSendGridFromEmail();
+  const fromName = request.fromName ?? "MedScopeGlobal";
+
   const body: Record<string, unknown> = {
-    personalizations: [{ to: recipients }],
+    personalizations: listId ? [{ list_ids: [listId] }] : [{ to: toRecipients(request.to) }],
     from: { email: fromEmail, name: fromName },
     subject: request.subject,
     content: [

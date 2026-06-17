@@ -58,7 +58,10 @@ export default function AuthCallbackScreen() {
       router.replace("/");
     }
 
-    Linking.getInitialURL().then(handle);
+    Linking.getInitialURL().then((url) => {
+      if (url) return handle(url);
+      setError("Chybí callback URL — otevřete odkaz z e-mailu nebo OAuth znovu.");
+    });
 
     const sub = Linking.addEventListener("url", ({ url }) => handle(url));
     return () => {

@@ -22,6 +22,8 @@ export interface EmailSendRequest {
   replyTo?: string;
   attachments?: EmailAttachment[];
   metadata?: Record<string, unknown>;
+  /** SendGrid marketing list — uses list_ids instead of to[] when set. */
+  sendGridListId?: string;
 }
 
 export interface EmailSendResponse {

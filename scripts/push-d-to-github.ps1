@@ -50,7 +50,10 @@ if ($LASTEXITCODE -ge 8) { throw "robocopy failed exit $LASTEXITCODE" }
 
 # Remove stale paths no longer in D: (robocopy /E does not delete extras in clone)
 $stalePaths = @(
-  "lib\v25\tests\run-suite.mjs"
+  "lib\v25\tests\run-suite.mjs",
+  "_coord-audit.mjs",
+  "_coord-links.cjs",
+  "_coord-links.mjs"
 )
 foreach ($rel in $stalePaths) {
   $stale = Join-Path $cloneDir $rel

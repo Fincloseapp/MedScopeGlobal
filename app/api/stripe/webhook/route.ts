@@ -256,6 +256,24 @@ export async function POST(request: Request) {
             sessionId: session.id,
             courseId,
             listingId,
+            amountTotal: session.amount_total,
+            currency: session.currency,
+          },
+        });
+
+        await persistStripeWebhookLog({
+          eventId: event.id,
+          eventType: "academy_marketplace.purchase",
+          livemode: event.livemode,
+          status: "processed",
+          objectId: session.id,
+          payload: {
+            sessionId: session.id,
+            courseId,
+            listingId,
+            userId: buyerId,
+            amountTotal: session.amount_total,
+            currency: session.currency,
           },
         });
       }

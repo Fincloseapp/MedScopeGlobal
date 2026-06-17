@@ -44,7 +44,7 @@ export default async function AdminAcademyDashboardPage() {
 
       <p className="text-sm text-slate-600">
 
-        Přehled Academy v35 — fáze 9 (marketplace Stripe checkout, webhook logs admin).
+        Přehled Academy v35 — fáze 10 (marketplace success, enrollment admin, digest v28 engine).
 
       </p>
 

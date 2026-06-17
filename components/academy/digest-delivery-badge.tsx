@@ -5,11 +5,13 @@ export function DigestDeliveryBadge() {
 
   const label =
     status.mode === "sendgrid"
-      ? "SendGrid — živé doručování digestu"
-      : "Log-only — digest se ukládá, e-mail se neodesílá";
+      ? "v28 email engine — SendGrid (list nebo single)"
+      : status.mode === "smtp"
+        ? "v28 email engine — SMTP"
+        : "Log-only — digest se ukládá, e-mail se neodesílá";
 
   const tone =
-    status.mode === "sendgrid"
+    status.mode === "sendgrid" || status.mode === "smtp"
       ? "border-green-200 bg-green-50 text-green-800"
       : "border-amber-200 bg-amber-50 text-amber-900";
 
