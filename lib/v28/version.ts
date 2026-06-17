@@ -2,6 +2,7 @@
 
 import {
   V29_EDITORIAL_COPY_LABEL,
+  V29_UI_BUILD_STAMP,
   V29_UI_VERSION,
   getSiteVersionLabel as getV29SiteVersionLabel,
 } from "@/lib/v29/version";
@@ -10,10 +11,10 @@ export const V28_ENGINE_VERSION = "28.2";
 
 export const V28_EDITORIAL_VERSION = "28";
 
-/** Compat label for /api/v28/health */
-export const V28_UI_VERSION = "v28.2";
+/** Live site UI label — delegates to v29 (no stale v28.2 in HTML) */
+export const V28_UI_VERSION = V29_UI_VERSION;
 
-export const V28_UI_BUILD_STAMP = "v28.2-v29-delegation-20260617";
+export const V28_UI_BUILD_STAMP = V29_UI_BUILD_STAMP;
 
 /** Display label for homepage hero and UI badges — v29.0 */
 export function getSiteVersionLabel(): string {

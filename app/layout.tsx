@@ -5,7 +5,7 @@ import { getServerLocale } from "@/lib/i18n/server-locale";
 import { HREFLANG_LOCALES } from "@/lib/seo/metadata";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { organizationJsonLd, newsletterJsonLd } from "@/lib/seo/json-ld";
-import { V26_UI_BUILD_STAMP, V26_UI_VERSION } from "@/lib/v26/version";
+import { V29_UI_BUILD_STAMP, V29_UI_VERSION } from "@/lib/v29/version";
 import "./globals.css";
 
 const inter = Inter({
@@ -64,8 +64,8 @@ export default async function RootLayout({
     <html
       lang={htmlLang}
       suppressHydrationWarning
-      data-ui-version={V26_UI_VERSION}
-      data-ui-build={V26_UI_BUILD_STAMP}
+      data-ui-version={V29_UI_VERSION}
+      data-ui-build={V29_UI_BUILD_STAMP}
     >
       <body
         className={`${inter.variable} ${display.variable} min-h-screen font-sans antialiased`}
