@@ -11,7 +11,7 @@ export const V32_UI_VERSION = "v32.0";
 export const V32_SITE_UI_VERSION = V33_UI_VERSION;
 
 /** Composite label for homepage/footer */
-export const V32_COMPOSITE_LABEL = "v30·31·32·33";
+export const V32_COMPOSITE_LABEL = "v33·34·35·36·37";
 
 export function getSiteVersionLabel(): string {
   return getV33SiteVersionLabel();

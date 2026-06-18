@@ -120,6 +120,10 @@
       "schedule": "0 22 1 * *"
     },
     {
+      "path": "/api/cron/academy-quality-weekly",
+      "schedule": "0 23 * * 0"
+    },
+    {
       "path": "/api/cron/public-osveta-daily",
       "schedule": "0 7 * * *"
     }

@@ -81,7 +81,7 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
         {course.lessons.length > 0 ? (
           <div className="grid gap-3 sm:grid-cols-2">
             {course.lessons.map((lesson, i) => (
-              <li key={lesson.id}>
+              <div key={lesson.id}>
                 <Link
                   href={`/academy/courses/${slug}/lessons/${lesson.slug}`}
                   className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 transition hover:border-[#005B96]/40 hover:shadow-sm"
@@ -100,7 +100,7 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
                     <span className="text-xs text-slate-500">{lesson.duration_minutes} min</span>
                   ) : null}
                 </Link>
-              </li>
+              </div>
             ))}
           </div>
         ) : (

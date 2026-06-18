@@ -379,6 +379,19 @@ await sleep(1500);
   }
 }
 
+// 22. v37 composite health (v34–v37 subsystems)
+await sleep(2000);
+{
+  const { res, json } = await fetchJson(`${base}/api/v37/health`);
+  if (res.status !== 200 || json?.version !== "v37.0") {
+    fail("v37 health", `status ${res.status} version=${json?.version}`);
+  } else if (!json.subsystems?.v34?.videoEngine) {
+    fail("v37 v34 subsystem");
+  } else {
+    pass("v37 composite health", json.composite ?? "v37.0");
+  }
+}
+
 console.log(`\n--- Summary: ${results.length - failed}/${results.length} passed ---\n`);
 if (failed > 0) {
   console.error(`FAILED: ${failed} check(s)`);
