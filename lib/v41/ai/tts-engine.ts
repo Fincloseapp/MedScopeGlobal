@@ -3,6 +3,7 @@ import {
   generateVoice,
   isElevenLabsConfigured,
   validateElevenLabsKey,
+  type ElevenLabsValidation,
 } from "@/lib/v40/ai/voice-elevenlabs";
 
 export type TtsRequest = {
@@ -96,7 +97,9 @@ export async function synthesizeTts(input: TtsRequest): Promise<TtsResult> {
   const text = input.text?.trim();
   if (!text) return { ok: false, provider: "none", message: "text required" };
 
-  const elevenHealth = isElevenLabsConfigured() ? await validateElevenLabsKey() : { valid: false, status: 0 };
+  const elevenHealth: ElevenLabsValidation = isElevenLabsConfigured()
+    ? await validateElevenLabsKey()
+    : { valid: false, status: 0, method: "none", detail: "not configured" };
 
   if (elevenHealth.valid) {
     return { ok: true, provider: "elevenlabs", message: "ElevenLabs available", elevenlabsValid: true };

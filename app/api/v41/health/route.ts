@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { V41_UI_VERSION, V41_UI_BUILD_STAMP, V41_COMPOSITE_LABEL } from "@/lib/v41/version";
 import { getTtsEngineStatus, checkElevenLabsHealth } from "@/lib/v41/ai/tts-engine";
-import { validateElevenLabsKey } from "@/lib/v40/ai/voice-elevenlabs";
 
 export const dynamic = "force-dynamic";
 
