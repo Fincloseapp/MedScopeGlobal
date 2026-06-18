@@ -7,11 +7,13 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
+import { dataPath, projectPath } from "../lib/config/paths.mjs";
 
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const envPath = path.join(root, ".env.local");
+const root = projectPath();
+const envPath = projectPath(".env.local");
+const secretFile = dataPath("secrets", "stripe-webhook-secret.txt");
+const stripeDocPath = dataPath("docs", "v29-stripe-setup.md");
 
 function loadEnv() {
   const env = {};
@@ -64,7 +66,7 @@ async function main() {
 
   if (endpoint) {
     console.log(`Existing webhook: ${endpoint.id} → ${endpoint.url}`);
-    const secretPath = "D:\\medscope.data\\secrets\\stripe-webhook-secret.txt";
+    const secretPath = secretFile;
     signingSecret = fs.existsSync(secretPath) ? fs.readFileSync(secretPath, "utf8").trim() : endpoint.secret;
   } else {
     const body = new URLSearchParams();
@@ -89,10 +91,10 @@ async function main() {
     signingSecret = created.secret;
     console.log(`Created webhook: ${created.id}`);
 
-    const secretDir = "D:\\medscope.data\\secrets";
+    const secretDir = dataPath("secrets");
     fs.mkdirSync(secretDir, { recursive: true });
-    fs.writeFileSync(path.join(secretDir, "stripe-webhook-secret.txt"), signingSecret);
-    console.log(`Secret saved to D:\\medscope.data\\secrets\\stripe-webhook-secret.txt`);
+    fs.writeFileSync(secretFile, signingSecret);
+    console.log(`Secret saved to ${secretFile}`);
   }
 
   if (!signingSecret) {
@@ -100,7 +102,7 @@ async function main() {
   } else {
     console.log(`Signing secret: ${signingSecret.slice(0, 12)}… (not logged in full)`);
 
-    const docPath = "D:\\medscope.data\\docs\\v29-stripe-setup.md";
+    const docPath = stripeDocPath;
     let doc = fs.existsSync(docPath) ? fs.readFileSync(docPath, "utf8") : "";
     if (!doc.includes(endpoint.id)) {
       doc += `\n\n## Auto-setup ${new Date().toISOString()}\n- Webhook ID: \`${endpoint.id}\`\n- URL: \`${WEBHOOK_URL}\`\n`;

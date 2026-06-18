@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import path from "node:path";
+import { projectPath } from "@/lib/config/paths";
 import { generateTextFromLlm, isLlmConfigured } from "@/lib/ai/chat-json";
 
 export type EmailAiKind =
@@ -137,7 +137,7 @@ Jazyk: ${input.locale ?? "cs"}`;
 }
 
 export function loadEmailTemplate(name: string, vars: Record<string, string> = {}): string {
-  const file = path.join(process.cwd(), "app", "email-templates", `${name}.html`);
+  const file = projectPath("app", "email-templates", `${name}.html`);
   if (!fs.existsSync(file)) {
     return `<html><body><p>Šablona ${name} nenalezena.</p></body></html>`;
   }

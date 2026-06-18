@@ -1,6 +1,13 @@
 # Push D:\medscope.local to GitHub main (Vercel auto-deploy)
 $ErrorActionPreference = "Stop"
-$root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
+$root = "D:\medscope.local"
+if (-not (Test-Path $root)) {
+  throw "D:\medscope.local not found - project code must live on D: drive only"
+}
+$scriptRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
+if ($scriptRoot -ne $root) {
+  Write-Warning "Script path is $scriptRoot - robocopy source locked to $root"
+}
 $git = $env:GIT_BIN
 if (-not $git) {
   $gitCmd = Get-Command git -ErrorAction SilentlyContinue

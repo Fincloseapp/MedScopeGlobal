@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { DATA_ROOT } from "../v24/_paths.mjs";
+import { MEDSCOPE_DATA_ROOT as DATA_ROOT } from "../../lib/config/paths.mjs";
 
 const MAP = join(DATA_ROOT, "topic-map", "index.json");
 

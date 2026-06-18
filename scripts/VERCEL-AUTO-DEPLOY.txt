@@ -8,4 +8,4 @@
 #   git add -A → auto commit → push main → Vercel → medscopeglobal.com
 #
 # Konfigurace: .cursor/hooks/auto-git.json
-# Log:         .cursor/hooks/auto-git.log
+# Log:         D:\medscope.logs\autogit\auto-git.log

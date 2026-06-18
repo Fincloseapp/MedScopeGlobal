@@ -32,10 +32,10 @@ const NAV_LABELS = ["Veřejnost", "Studenti", "Lékaři", "Academy", "Články",
 
 const LESSON_PATHS = [
   "/academy/courses/fyziologie-zaklady-uchazece/lessons/krevni-obeh",
-  "/academy/courses/biologie-prijimacky/lessons/bunka-zaklady",
-  "/academy/courses/chemie-prijimacky/lessons/atomova-stavba",
-  "/academy/courses/anatomie-prijimacky/lessons/kosterni-system",
-  "/academy/courses/fyzika-prijimacky/lessons/mechanika-zaklady",
+  "/academy/courses/biologie-prijimacky-bunka-genetika/lessons/bunka-struktura",
+  "/academy/courses/matematika-prijimacky-medicina/lessons/procenta-pomer",
+  "/academy/courses/ustni-pohovor-lf-priprava/lessons/struktura-pohovoru",
+  "/academy/courses/testove-strategie-time-management/lessons/cermat-format",
 ];
 
 async function fetchPage(route) {

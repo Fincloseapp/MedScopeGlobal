@@ -13,17 +13,19 @@ const { existsSync, mkdirSync, readFileSync, appendFileSync, unlinkSync, writeFi
 const { join } = require("node:path");
 const { parsePorcelain, generateCommitMessage } = require("./lib/auto-commit-message.js");
 
-const root = join(__dirname, "..");
+const root = process.env.MEDSCOPE_PROJECT_ROOT ?? "D:\\medscope.local";
+const logsRoot = process.env.MEDSCOPE_LOGS_ROOT ?? "D:\\medscope.logs";
 const stateDir = join(root, ".cursor/hooks");
 const LOCK_FILE = join(stateDir, ".auto-git.lock");
 const PENDING_PUSH_FILE = join(stateDir, ".auto-git-pending-push");
-const LOG_FILE = join(stateDir, "auto-git.log");
+const LOG_FILE = join(logsRoot, "autogit", "auto-git.log");
 const pushOnly = process.argv.includes("--push-only");
 const watchMode = process.argv.includes("--watch");
 const PUSH_RETRIES = 3;
 const PUSH_RETRY_DELAY_MS = 10_000;
 
 mkdirSync(stateDir, { recursive: true });
+mkdirSync(join(logsRoot, "autogit"), { recursive: true });
 
 function timestamp() {
   return new Date().toISOString();

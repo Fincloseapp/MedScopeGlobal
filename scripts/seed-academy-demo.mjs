@@ -5,10 +5,10 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { createClient } from "@supabase/supabase-js";
+import { MEDSCOPE_PROJECT_ROOT } from "../lib/config/paths.mjs";
 
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
+const root = MEDSCOPE_PROJECT_ROOT;
 const env = {};
 
 for (const name of [".env.local", ".env"]) {
