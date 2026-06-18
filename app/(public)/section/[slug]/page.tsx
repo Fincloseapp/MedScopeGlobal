@@ -13,9 +13,9 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  return generateSectionDetailMetadata({ params, basePath: "/sections" });
+  return generateSectionDetailMetadata({ params, basePath: "/section" });
 }
 
-export default function SectionsSlugPage(props: Props) {
-  return SectionDetailPage({ ...props, basePath: "/sections" });
+export default function SectionSlugPage(props: Props) {
+  return SectionDetailPage({ ...props, basePath: "/section" });
 }

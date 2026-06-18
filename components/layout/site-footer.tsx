@@ -64,7 +64,7 @@ export async function SiteFooter() {
 
             <li><Link href="/cookies" className="hover:text-foreground">Cookies</Link></li>
 
-            <li><Link href="/contact" className="hover:text-foreground">Kontakt</Link></li>
+            <li><Link href="/kontakt" className="hover:text-foreground">Kontakt</Link></li>
 
           </ul>
 
