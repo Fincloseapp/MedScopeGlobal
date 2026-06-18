@@ -62,7 +62,24 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
         ) : null}
 
         {course.lessons.length > 0 ? (
-          <ol className="space-y-3">
+          <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4">
+            <div className="mb-2 flex items-center justify-between text-xs text-slate-600">
+              <span>Průběh kurzu</span>
+              <span>
+                0 / {course.lessons.length} lekcí
+              </span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+              <div className="h-full w-0 rounded-full bg-[#005B96] transition-all" />
+            </div>
+            <p className="mt-2 text-xs text-slate-500">
+              Přihlaste se pro sledování postupu a získávání XP.
+            </p>
+          </div>
+        ) : null}
+
+        {course.lessons.length > 0 ? (
+          <div className="grid gap-3 sm:grid-cols-2">
             {course.lessons.map((lesson, i) => (
               <li key={lesson.id}>
                 <Link
@@ -85,7 +102,7 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
                 </Link>
               </li>
             ))}
-          </ol>
+          </div>
         ) : (
           <p className="rounded-2xl border border-dashed border-slate-200 bg-white p-6 text-sm text-slate-500">
             Tento kurz zatím nemá publikované lekce.

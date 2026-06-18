@@ -13,6 +13,8 @@ const SECTIONS = [
   { href: "/admin/academy/marketplace", label: "Marketplace" },
   { href: "/admin/academy/mentoring", label: "Mentoring" },
   { href: "/admin/academy/video", label: "Video" },
+  { href: "/admin/academy/video-analytics", label: "Video analytics" },
+  { href: "/admin/academy/quality", label: "Kvalita obsahu" },
   { href: "/admin/academy/simulations", label: "Simulace" },
   { href: "/admin/academy/textbooks", label: "Učebnice" },
   { href: "/admin/academy/testing", label: "Testování" },

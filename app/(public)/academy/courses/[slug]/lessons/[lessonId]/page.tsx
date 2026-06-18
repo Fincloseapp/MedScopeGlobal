@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { PlayCircle } from "lucide-react";
 import { AcademyPageHeader } from "@/components/academy/page-header";
 import { AiLecturerPanel } from "@/components/academy/ai-lecturer-panel";
-import { LessonVideoPlayer } from "@/components/academy/lesson-video-player";
+import { LessonMetadataBlock } from "@/components/academy/lesson-metadata-block";
+import { LessonVideoPlayerV34 } from "@/components/academy/lesson-video-player-v34";
 import { getCourseBySlug, getLessonByIdOrSlug } from "@/lib/academy/db";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
@@ -132,7 +133,16 @@ export default async function AcademyLessonPage({ params }: Props) {
           ) : null}
 
           <div className="min-w-0 space-y-6">
-            <LessonVideoPlayer video={lesson.video} lessonTitle={lesson.title} />
+            <LessonVideoPlayerV34 video={lesson.video} lessonTitle={lesson.title} />
+            <LessonMetadataBlock
+              title={lesson.title}
+              content={lesson.content}
+              contentJson={(lesson.content_json ?? {}) as Record<string, unknown>}
+              videoTitle={lesson.video?.title}
+              videoDescription={String(
+                (lesson.video?.metadata as Record<string, unknown> | undefined)?.description ?? ""
+              )}
+            />
             <article className="prose prose-slate max-w-none space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               {renderContent(lesson.content)}
             </article>

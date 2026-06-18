@@ -3,11 +3,10 @@
  * MedScopeGlobal logo sync + WebP/@2x pipeline (v23.2.3)
  * D:\MedScopeGlobal\logo → public/assets/logo/
  */
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { syncLogosFromSource } from "./lib/logo-sync-core.mjs";
+import { projectPath } from "../lib/config/paths.mjs";
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const root = projectPath();
 
 try {
   const { log } = await syncLogosFromSource({ root });

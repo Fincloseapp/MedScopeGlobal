@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
-import { getSiteVersionLabel } from "@/lib/v27/version";
+import { getSiteVersionLabel } from "@/lib/v37/version";
 
 export async function SiteFooter() {
 

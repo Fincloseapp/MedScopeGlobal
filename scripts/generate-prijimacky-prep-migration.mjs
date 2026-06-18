@@ -3,11 +3,10 @@
  * Generates supabase/migrations/20260618180000_academy_prijimacky_prep_courses.sql
  */
 import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { projectPath } from "../lib/config/paths.mjs";
 
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const outPath = path.join(root, "supabase/migrations/20260618180000_academy_prijimacky_prep_courses.sql");
+const root = projectPath();
+const outPath = projectPath("supabase/migrations/20260618180000_academy_prijimacky_prep_courses.sql");
 
 const THUMBS = [
   "https://images.unsplash.com/photo-1532094349884-54311bbfaa67?w=640&q=80",

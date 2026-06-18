@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
+import { projectPath } from "../lib/config/paths.mjs";
 
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
+const root = projectPath();
 const env = {};
 for (const line of fs.readFileSync(path.join(root, ".env.local"), "utf8").split(/\r?\n/)) {
   const m = line.match(/^([^#=]+)=(.*)$/);

@@ -2,11 +2,9 @@
  * Moves misconfigured AQ.* / AIza* keys from OPENAI_* to GEMINI_API_KEY in .env.local.
  */
 import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import { projectPath } from "../lib/config/paths.mjs";
 
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const envPath = path.join(root, ".env.local");
+const envPath = projectPath(".env.local");
 const backupPath = envPath + ".bak";
 
 function isGeminiKey(v) {

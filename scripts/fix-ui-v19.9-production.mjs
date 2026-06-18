@@ -4,11 +4,11 @@
  * Run: node scripts/fix-ui-v19.9-production.mjs
  */
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import { spawnSync } from "node:child_process";
+import { projectPath } from "../lib/config/paths.mjs";
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const root = projectPath();
 const BASE = process.env.PROD_BASE_URL || "https://www.medscopeglobal.com";
 const EXPECTED = "v19.9";
 const UI_BUILD = "v19.9-ui-20260608";

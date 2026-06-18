@@ -62,7 +62,8 @@
     "dns:cloudflare": "node scripts/cloudflare-point-vercel.mjs",
     "domain:connect": "node scripts/connect-domain-vercel.mjs",
     "test:prod": "node tests/production/run-prod-tests.mjs",
-    "cron:trigger-daily": "node scripts/trigger-daily-content-crons.mjs"
+    "cron:trigger-daily": "node scripts/trigger-daily-content-crons.mjs",
+    "verify:d-drive": "node scripts/verify-d-drive-only.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

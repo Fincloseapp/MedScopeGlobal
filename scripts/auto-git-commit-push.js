@@ -15,6 +15,21 @@ const { parsePorcelain, generateCommitMessage } = require("./lib/auto-commit-mes
 
 const root = process.env.MEDSCOPE_PROJECT_ROOT ?? "D:\\medscope.local";
 const logsRoot = process.env.MEDSCOPE_LOGS_ROOT ?? "D:\\medscope.logs";
+
+if (process.platform === "win32" && process.env.MEDSCOPE_ALLOW_C_DRIVE !== "1") {
+  const { resolve } = require("node:path");
+  for (const [label, p] of [
+    ["MEDSCOPE_PROJECT_ROOT", root],
+    ["MEDSCOPE_LOGS_ROOT", logsRoot],
+  ]) {
+    const normalized = resolve(p).replace(/\//g, "\\");
+    if (/^C:\\/i.test(normalized)) {
+      throw new Error(
+        `[autogit] ${label} resolves to C: (${normalized}). Use lib/config/paths.mjs — D: drive only.`
+      );
+    }
+  }
+}
 const stateDir = join(root, ".cursor/hooks");
 const LOCK_FILE = join(stateDir, ".auto-git.lock");
 const PENDING_PUSH_FILE = join(stateDir, ".auto-git-pending-push");

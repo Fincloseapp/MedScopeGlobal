@@ -2,13 +2,12 @@
  * Applies Supabase SQL migrations via Management API.
  * Requires: npx supabase login  OR  SUPABASE_ACCESS_TOKEN in .env.local
  */
-import fs from "fs";
-import path from "path";
-import crypto from "crypto";
-import { fileURLToPath } from "url";
+import fs from "node:fs";
+import path from "node:path";
+import crypto from "node:crypto";
+import { projectPath } from "../lib/config/paths.mjs";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const root = path.join(__dirname, "..");
+const root = projectPath();
 
 function loadEnv() {
   const envPath = path.join(root, ".env.local");

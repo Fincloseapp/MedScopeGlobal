@@ -7,7 +7,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join, parse as pathParse } from "node:path";
-import { MEDSCOPE_LOGO_SOURCE } from "../../lib/config/paths.mjs";
+import { MEDSCOPE_LOGO_SOURCE, projectPath } from "../../lib/config/paths.mjs";
 
 export const DEFAULT_SOURCE_DIR = MEDSCOPE_LOGO_SOURCE;
 const MAX_WEBP_BYTES = 500 * 1024;
