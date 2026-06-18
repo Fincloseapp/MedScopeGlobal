@@ -4,10 +4,22 @@ import {
   streamOpenAiAudio,
   synthesizeTts,
   ttsResponseHeaders,
+  type TtsResult,
 } from "@/lib/v41/ai/tts-engine";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
+
+/** Never silent-skip: after stream failures return text-only JSON with script */
+function textOnlyFallback(text: string, message: string): NextResponse {
+  const body: TtsResult = {
+    ok: true,
+    provider: "text_only",
+    text,
+    message,
+  };
+  return NextResponse.json(body, { status: 200, headers: ttsResponseHeaders() });
+}
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: ttsResponseHeaders() });
@@ -36,6 +48,7 @@ export async function GET(request: Request) {
         headers: { ...ttsResponseHeaders("audio/mpeg"), "Content-Type": "audio/mpeg" },
       });
     }
+    return textOnlyFallback(text, "ElevenLabs and OpenAI streaming failed — text-only fallback");
   }
 
   const result = await synthesizeTts({ text, stream });
@@ -70,6 +83,7 @@ export async function POST(request: Request) {
         headers: { ...ttsResponseHeaders("audio/mpeg"), "Content-Type": "audio/mpeg" },
       });
     }
+    return textOnlyFallback(text, "ElevenLabs and OpenAI streaming failed — text-only fallback");
   }
 
   const result = await synthesizeTts({ text, title: body.title, stream: body.stream });

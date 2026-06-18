@@ -14,6 +14,9 @@ type Props = {
 
 type VideoMeta = {
   public_url?: string;
+  mp4_url?: string;
+  hls_url?: string;
+  url_chain?: string[];
   thumbnail_url?: string;
   generated?: boolean;
   avatar_type?: string;
@@ -33,11 +36,26 @@ function isUnreliableVideoUrl(url: string | null | undefined): boolean {
   return url.includes(GTV_HOST);
 }
 
-function resolveVideoUrl(meta: VideoMeta): string | null {
-  if (meta.lesson_format === "audio_lesson") return null;
-  const raw = meta.public_url ?? null;
-  if (isUnreliableVideoUrl(raw)) return V33_FALLBACK_MP4_URL;
-  return raw;
+/** Build playback URL chain: reliable sources first, w3schools fallback last */
+function buildVideoUrlChain(meta: VideoMeta): string[] {
+  if (meta.lesson_format === "audio_lesson") return [];
+  if (Array.isArray(meta.url_chain) && meta.url_chain.length) {
+    const chain = meta.url_chain.filter(Boolean);
+    if (chain.length && !chain.includes(V33_FALLBACK_MP4_URL)) chain.push(V33_FALLBACK_MP4_URL);
+    return chain.slice(0, 4);
+  }
+  const chain: string[] = [];
+  const push = (u: string | null | undefined) => {
+    if (u && !chain.includes(u)) chain.push(u);
+  };
+  push(meta.mp4_url);
+  push(meta.public_url);
+  push(meta.hls_url);
+  if (!chain.length || chain.every(isUnreliableVideoUrl)) return [V33_FALLBACK_MP4_URL];
+  const reliable = chain.filter((u) => !isUnreliableVideoUrl(u));
+  if (!reliable.length) return [V33_FALLBACK_MP4_URL, ...chain];
+  if (!reliable.includes(V33_FALLBACK_MP4_URL)) reliable.push(V33_FALLBACK_MP4_URL);
+  return reliable.slice(0, 4);
 }
 
 function resolveAudioUrl(meta: VideoMeta): string | null {
@@ -137,6 +155,7 @@ export function LessonVideoPlayer({ video, lessonTitle, className }: Props) {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [retryKey, setRetryKey] = useState(0);
+  const [urlIndex, setUrlIndex] = useState(0);
   const [forceAudio, setForceAudio] = useState(false);
   const [buffering, setBuffering] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -144,7 +163,8 @@ export function LessonVideoPlayer({ video, lessonTitle, className }: Props) {
   const meta = resolveMeta(video);
   const isAudioLesson = meta.lesson_format === "audio_lesson" || Boolean(meta.tts_audio_url);
   const audioUrl = resolveAudioUrl(meta);
-  const url = resolveVideoUrl(meta);
+  const urlChain = buildVideoUrlChain(meta);
+  const url = urlChain[urlIndex] ?? urlChain[0] ?? null;
   const thumbnail = resolveThumbnail(meta);
 
   const handleRetry = useCallback(() => {
@@ -153,6 +173,7 @@ export function LessonVideoPlayer({ video, lessonTitle, className }: Props) {
     setLoading(true);
     setBuffering(false);
     setForceAudio(false);
+    setUrlIndex(0);
     setRetryKey((k) => k + 1);
   }, []);
 
@@ -171,7 +192,8 @@ export function LessonVideoPlayer({ video, lessonTitle, className }: Props) {
     setErrorMsg(null);
     setLoading(Boolean(url));
     setForceAudio(false);
-  }, [url, lessonTitle]);
+    setUrlIndex(0);
+  }, [urlChain.join("|"), lessonTitle]);
 
   if (!video || (!url && !audioUrl)) {
     return (
@@ -264,13 +286,12 @@ export function LessonVideoPlayer({ video, lessonTitle, className }: Props) {
           </div>
         ) : null}
         <video
-          key={`${url}-${retryKey}`}
+          key={`${url}-${urlIndex}-${retryKey}`}
           ref={videoRef}
           src={url}
           controls
           playsInline
           preload="metadata"
-          crossOrigin="anonymous"
           poster={thumbnail ?? undefined}
           className="aspect-video w-full bg-black"
           title={lessonTitle}
@@ -289,6 +310,12 @@ export function LessonVideoPlayer({ video, lessonTitle, className }: Props) {
           onError={() => {
             setLoading(false);
             setBuffering(false);
+            if (urlIndex < urlChain.length - 1) {
+              setUrlIndex((i) => i + 1);
+              setLoading(true);
+              setErrorMsg(null);
+              return;
+            }
             if (audioUrl) {
               setVideoFailed(true);
               return;
@@ -296,7 +323,7 @@ export function LessonVideoPlayer({ video, lessonTitle, className }: Props) {
             setErrorMsg("Video se nepodařilo načíst. Zkuste obnovit stránku nebo použijte audio verzi.");
           }}
         >
-          <source src={url} type="video/mp4" />
+          {!url.includes(".m3u8") ? <source src={url} type="video/mp4" /> : null}
           Váš prohlížeč nepodporuje přehrávání videa.
         </video>
         <button

@@ -137,7 +137,7 @@
     },
     {
       "path": "/api/cron/v43-health-monitor",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 1 * * *"
     },
     {
       "path": "/api/cron/v45-performance-audit",

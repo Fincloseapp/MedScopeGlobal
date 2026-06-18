@@ -22,6 +22,7 @@ export function AcademyVideoPlayer({ metadata, lessonTitle, className, onWatchEv
   const hlsRef = useRef<{ destroy: () => void } | null>(null);
   const [urlIndex, setUrlIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [buffering, setBuffering] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryKey, setRetryKey] = useState(0);
 
@@ -124,9 +125,12 @@ export function AcademyVideoPlayer({ metadata, lessonTitle, className, onWatchEv
   return (
     <div className={className}>
       <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-lg">
-        {loading ? (
+        {loading || buffering ? (
           <div className="absolute inset-0 z-10 flex aspect-video items-center justify-center bg-slate-900/80">
             <Loader2 className="h-8 w-8 animate-spin text-white/70" aria-label="Načítání videa" />
+            {buffering && !loading ? (
+              <span className="sr-only">Buffering…</span>
+            ) : null}
           </div>
         ) : null}
         {error ? (
@@ -165,7 +169,15 @@ export function AcademyVideoPlayer({ metadata, lessonTitle, className, onWatchEv
           onEnded={() => emitWatch("ended")}
           onSeeked={() => emitWatch("seek")}
           onLoadedMetadata={() => setLoading(false)}
-          onCanPlay={() => setLoading(false)}
+          onCanPlay={() => {
+            setLoading(false);
+            setBuffering(false);
+          }}
+          onWaiting={() => setBuffering(true)}
+          onPlaying={() => {
+            setLoading(false);
+            setBuffering(false);
+          }}
           onError={() => {
             if (urlIndex < urls.length - 1) {
               setUrlIndex((i) => i + 1);
@@ -177,6 +189,7 @@ export function AcademyVideoPlayer({ metadata, lessonTitle, className, onWatchEv
             }
           }}
         >
+          {!isHlsUrl(currentUrl) ? <source src={currentUrl} type="video/mp4" /> : null}
           Váš prohlížeč nepodporuje přehrávání videa.
         </video>
       </div>
