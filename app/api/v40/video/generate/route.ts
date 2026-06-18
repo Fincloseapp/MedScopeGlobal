@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       useAvatar: body.useAvatar,
     });
 
-    return NextResponse.json({ ok: result.ok, version: "v40.0", ...result }, { status: result.ok ? 200 : 500 });
+    return NextResponse.json({ version: "v40.0", ...result }, { status: result.ok ? 200 : 500 });
   } catch (e) {
     return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });
   }

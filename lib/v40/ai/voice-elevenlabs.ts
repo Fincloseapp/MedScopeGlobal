@@ -1,5 +1,6 @@
 import { queueOpenAiTtsRender, isOpenAiTtsConfigured } from "@/lib/academy/ai/video-providers/openai-tts-video";
 import type { QueueRenderInput, QueueRenderResult } from "@/lib/academy/ai/video-providers/types";
+import { randomUUID } from "crypto";
 
 export type VoiceResult = QueueRenderResult & { voice_provider: "elevenlabs" | "openai_tts" | "silent" };
 
@@ -60,6 +61,7 @@ export async function generateVoice(input: {
 }): Promise<VoiceResult> {
   const renderInput: QueueRenderInput = {
     title: input.title,
+    videoAssetId: randomUUID(),
     script: {
       script: input.script,
       storyboard: input.storyboard ?? [],
