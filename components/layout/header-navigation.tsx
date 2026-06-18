@@ -7,7 +7,7 @@ import type { NavItem } from "@/lib/config/main-navigation";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEM =
-  "inline-flex shrink-0 items-center whitespace-nowrap py-1 text-[14px] font-normal leading-none tracking-[0.15px] lg:text-[14.5px] lg:font-medium xl:text-[15.5px]";
+  "inline-flex shrink-0 items-center whitespace-nowrap py-1 text-sm font-medium leading-none tracking-[0.1px]";
 
 const NAV_LINK = cn(
   NAV_ITEM,
@@ -132,7 +132,7 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
   return (
     <nav
       ref={navRef}
-      className="header-nav-scroll hidden min-w-0 flex-1 flex-nowrap items-center justify-end gap-2 overflow-x-auto overflow-y-visible md:flex lg:gap-3 xl:gap-4"
+      className="header-nav-scroll hidden min-w-0 flex-1 flex-nowrap items-center justify-end gap-1 overflow-x-auto overflow-y-visible md:flex lg:gap-2 xl:gap-3"
       aria-label="Hlavní navigace"
     >
       {mainMenu.map((item) => {

@@ -1,6 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createMiddlewareClient } from "@/lib/supabase/middleware";
-import { applySecurityMiddleware } from "@/lib/security/middleware-security";
+import {
+  applyV30SecurityMiddleware,
+  wrapWithSecurityHeaders,
+} from "@/lib/v30/security/middleware";
 import {
   DEFAULT_LOCALE,
   LOCALE_COOKIE,
@@ -27,7 +30,7 @@ function requiresAdminGate(pathname: string): boolean {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const securityBlock = await applySecurityMiddleware(request);
+  const securityBlock = await applyV30SecurityMiddleware(request);
   if (securityBlock) return securityBlock;
 
   if (requiresAdminGate(pathname)) {
@@ -67,14 +70,15 @@ export async function middleware(request: NextRequest) {
     });
   }
 
-  return response;
+  return wrapWithSecurityHeaders(response);
 }
 
 export const config = {
   matcher: [
+    "/api/:path*",
     "/admin",
     "/admin/:path*",
     "/stav-systemu",
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

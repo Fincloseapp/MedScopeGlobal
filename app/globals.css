@@ -81,13 +81,18 @@
   }
 
   .site-header .logo-block {
-    @apply relative z-10 max-w-[min(52vw,200px)];
+    @apply relative z-10 shrink-0;
   }
 
-  /* v27.3 — prevent logo/nav overlap at 375–768px */
+  /* v33 — compact header, prevent logo/nav overlap */
   @media (min-width: 768px) and (max-width: 1279px) {
     .site-header .header-nav-scroll {
-      @apply max-w-[calc(100vw-280px)];
+      @apply max-w-[calc(100vw-240px)];
     }
+  }
+
+  /* v33 — primary CTA buttons */
+  .btn-primary-v33 {
+    @apply rounded-lg bg-[#005B96] text-white hover:bg-[#004a7a];
   }
 }

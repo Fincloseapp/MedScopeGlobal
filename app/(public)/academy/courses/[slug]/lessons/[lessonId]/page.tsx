@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PlayCircle } from "lucide-react";
 import { AcademyPageHeader } from "@/components/academy/page-header";
 import { AiLecturerPanel } from "@/components/academy/ai-lecturer-panel";
 import { LessonVideoPlayer } from "@/components/academy/lesson-video-player";
-import { getLessonByIdOrSlug } from "@/lib/academy/db";
+import { getCourseBySlug, getLessonByIdOrSlug } from "@/lib/academy/db";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
@@ -45,7 +46,7 @@ function renderContent(content: string) {
       );
     }
     return (
-      <p key={i} className="text-slate-700">
+      <p key={i} className="leading-7 text-slate-700">
         {block.replace(/\*\*/g, "")}
       </p>
     );
@@ -57,6 +58,9 @@ export default async function AcademyLessonPage({ params }: Props) {
   const lesson = await getLessonByIdOrSlug(slug, lessonId);
   if (!lesson) notFound();
 
+  const course = await getCourseBySlug(slug);
+  const lessons = course?.lessons ?? [];
+
   return (
     <>
       <AcademyPageHeader
@@ -66,8 +70,8 @@ export default async function AcademyLessonPage({ params }: Props) {
         ctaHref={`/academy/courses/${slug}`}
         ctaLabel="Zpět na kurz"
       />
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <nav className="mb-6 text-sm text-muted-foreground">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+        <nav className="mb-4 text-sm text-muted-foreground" aria-label="Drobečková navigace">
           <Link href="/academy" className="hover:text-foreground">
             Academy
           </Link>
@@ -80,17 +84,61 @@ export default async function AcademyLessonPage({ params }: Props) {
             {lesson.course.title}
           </Link>
           <span className="mx-2">/</span>
-          <span>{lesson.title}</span>
+          <span className="text-foreground">{lesson.title}</span>
         </nav>
 
-        <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
-          <div className="space-y-6">
+        <div className="mb-6 flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+            {lesson.duration_minutes} min
+          </span>
+          {lesson.video ? (
+            <>
+              <span className="rounded-full bg-[#e8f4fc] px-3 py-1 text-xs font-medium text-[#005B96]">
+                AI video
+              </span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                AI lektor
+              </span>
+            </>
+          ) : null}
+        </div>
+
+        <div className="grid gap-8 xl:grid-cols-[220px_1fr_320px]">
+          {lessons.length > 0 ? (
+            <aside className="hidden xl:block">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#005B96]">
+                Lekce kurzu
+              </p>
+              <ol className="space-y-1">
+                {lessons.map((l, i) => {
+                  const active = l.slug === lesson.slug || l.id === lesson.id;
+                  return (
+                    <li key={l.id}>
+                      <Link
+                        href={`/academy/courses/${slug}/lessons/${l.slug}`}
+                        className={`block rounded-lg px-3 py-2 text-sm transition ${
+                          active
+                            ? "bg-[#e8f4fc] font-medium text-[#005B96]"
+                            : "text-slate-600 hover:bg-slate-50 hover:text-[#021d33]"
+                        }`}
+                      >
+                        <span className="text-xs text-slate-400">{i + 1}.</span> {l.title}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ol>
+            </aside>
+          ) : null}
+
+          <div className="min-w-0 space-y-6">
             <LessonVideoPlayer video={lesson.video} lessonTitle={lesson.title} />
-            <article className="prose prose-slate max-w-none rounded-2xl border border-slate-200 bg-white p-6">
+            <article className="prose prose-slate max-w-none space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               {renderContent(lesson.content)}
             </article>
           </div>
-          <aside className="lg:sticky lg:top-6 lg:self-start">
+
+          <aside className="xl:sticky xl:top-20 xl:self-start">
             <AiLecturerPanel
               lessonTitle={lesson.title}
               lessonContent={lesson.content}
@@ -98,6 +146,30 @@ export default async function AcademyLessonPage({ params }: Props) {
             />
           </aside>
         </div>
+
+        {lessons.length > 1 ? (
+          <nav className="mt-8 xl:hidden" aria-label="Lekce kurzu">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#005B96]">
+              Další lekce
+            </p>
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {lessons.map((l) => (
+                <Link
+                  key={l.id}
+                  href={`/academy/courses/${slug}/lessons/${l.slug}`}
+                  className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-medium ${
+                    l.slug === lesson.slug
+                      ? "border-[#005B96] bg-[#e8f4fc] text-[#005B96]"
+                      : "border-slate-200 text-slate-600"
+                  }`}
+                >
+                  {l.video_asset_id ? <PlayCircle className="h-3 w-3" /> : null}
+                  {l.title}
+                </Link>
+              ))}
+            </div>
+          </nav>
+        ) : null}
       </div>
     </>
   );

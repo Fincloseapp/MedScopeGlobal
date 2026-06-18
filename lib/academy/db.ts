@@ -221,6 +221,23 @@ export async function getLessonBySlug(
   return { ...lesson, course };
 }
 
+const LEGACY_LESSON_SLUG_ALIASES: Record<string, string> = {
+  "bunkove-delení": "bunkove-deleni",
+  "homologické-rady": "homologicke-rady",
+  "orientace-v-těle": "orientace-v-tele",
+  "latinske-kořeny": "latinske-koreny",
+};
+
+function resolveLessonSlugParam(raw: string): string {
+  let slug = raw;
+  try {
+    slug = decodeURIComponent(raw);
+  } catch {
+    /* keep raw */
+  }
+  return LEGACY_LESSON_SLUG_ALIASES[slug] ?? slug;
+}
+
 export async function getLessonByIdOrSlug(
   courseSlug: string,
   lessonIdOrSlug: string
@@ -229,8 +246,9 @@ export async function getLessonByIdOrSlug(
   const course = await getCourseBySlug(courseSlug);
   if (!course) return null;
 
+  const resolvedSlug = resolveLessonSlugParam(lessonIdOrSlug);
   const lesson = course.lessons.find((l) =>
-    isUuid ? l.id === lessonIdOrSlug : l.slug === lessonIdOrSlug
+    isUuid ? l.id === lessonIdOrSlug : l.slug === resolvedSlug || l.slug === lessonIdOrSlug
   );
   if (!lesson) return null;
 

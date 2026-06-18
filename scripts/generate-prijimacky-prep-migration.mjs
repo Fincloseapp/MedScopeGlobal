@@ -51,7 +51,7 @@ Rozlišení organel podle funkce, směr toku bílkovin ER→Golgi, vliv koncentr
         minutes: 25,
       },
       {
-        slug: "bunkove-delení",
+        slug: "bunkove-deleni",
         title: "Buněčné dělení — mitóza a meióza",
         content: `## A) Mitóza
 Zachovává počet chromozomů (2n→2n). Fáze: profáze, metafáze, anafáze, telofáze. Výsledek: dvě identické dcery.
@@ -143,7 +143,7 @@ Rozpoznat sp² u alkenů a aromatických sloučenin.`,
         minutes: 28,
       },
       {
-        slug: "homologické-rady",
+        slug: "homologicke-rady",
         title: "Homologické řady — alkany a alkeny",
         content: `## A) Alkany CₙH₂ₙ₊₂
 Nasycené uhlovodíky, substituční reakce (halogenace).
@@ -310,7 +310,7 @@ P = U·I = I²R = U²/R.`,
     xp: 100,
     lessons: [
       {
-        slug: "orientace-v-těle",
+        slug: "orientace-v-tele",
         title: "Anatomické polohy a roviny",
         content: `## A) Polohové termíny
 Superior/inferior, anterior/posterior, medial/lateral, proximal/distal.
@@ -765,7 +765,7 @@ Vyloučení nesmyslných odpovědí v testu.`,
     xp: 85,
     lessons: [
       {
-        slug: "latinske-kořeny",
+        slug: "latinske-koreny",
         title: "Latinské kořeny, prefixy a sufixy",
         content: `## A) Prefixy
 hyper-, hypo-, intra-, extra-, sub-, supra-.

@@ -259,6 +259,33 @@ export function getMainMenu(locale: LocaleCode): NavItem[] {
   return locale === "cs" ? menuCs : menuEn;
 }
 
+/** v33 — compact desktop header: 6 primary items, all visible without overflow */
+export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
+  if (locale !== "cs") {
+    return getMainMenu(locale).slice(0, 6);
+  }
+  const find = (label: string) => menuCs.find((item) => item.label === label);
+  const verejnost = find("Pro veřejnost");
+  const studenti = find("Pro studenty");
+  const lekari = find("Pro lékaře");
+  const academy = find("Academy");
+  const clanky = find("Články");
+  const predplatne = find("Předplatné");
+  return [
+    verejnost ? { ...verejnost, label: "Veřejnost" } : { label: "Veřejnost", href: "/verejnost" },
+    studenti ? { ...studenti, label: "Studenti" } : { label: "Studenti", href: "/studenti" },
+    lekari ? { ...lekari, label: "Lékaři" } : { label: "Lékaři", href: "/lekari" },
+    academy ?? { label: "Academy", href: "/academy" },
+    clanky ?? { label: "Články", href: "/articles" },
+    predplatne ?? { label: "Předplatné", href: "/predplatne" },
+  ];
+}
+
+/** v33 — mobile drawer shows full menu */
+export function getMobileMenu(locale: LocaleCode): NavItem[] {
+  return getMainMenu(locale);
+}
+
 export function getHeaderTagline(locale: LocaleCode): string {
   return locale === "cs"
     ? "Odborný medicínský magazín"

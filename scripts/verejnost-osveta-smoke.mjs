@@ -45,6 +45,18 @@ async function fetchPage(url) {
   return { res, text, appErr };
 }
 
+/** Extract video slugs from hub page hrefs — ignore Next.js RSC page-* internal IDs. */
+function extractOsvetaSlugs(html) {
+  const slugs = new Set();
+  const hrefRe = /href=["'](?:https?:\/\/[^"']+)?(\/verejnost\/osveta\/([^"'#?]+))["']/gi;
+  for (const m of html.matchAll(hrefRe)) {
+    const slug = decodeURIComponent(m[2]).replace(/\/$/, "");
+    if (!slug || slug.startsWith("page-")) continue;
+    slugs.add(slug);
+  }
+  return [...slugs];
+}
+
 const results = [];
 let failed = 0;
 
@@ -122,8 +134,8 @@ for (const p of pages) {
     pass(`page ${p}`, `${res.status}`);
   }
   if (p === "/verejnost/osveta") {
-    const m = text.match(/\/verejnost\/osveta\/([a-z0-9-]+)/);
-    if (m) sampleSlug = m[1];
+    const slugs = extractOsvetaSlugs(text);
+    if (slugs.length) sampleSlug = slugs[0];
   }
 }
 

@@ -284,6 +284,46 @@ await sleep(1500);
   else pass("prijimacky prep CTA");
 }
 
+// 16b. Prep course video lessons — sample 5 courses (first lesson + video marker)
+await sleep(1500);
+{
+  const { json } = await fetchJson(`${base}/api/academy/courses?category=prijimacky`);
+  const prep = (json?.courses ?? []).filter((c) => c.has_video || c.video_lesson_count > 0);
+  const sample = prep.slice(0, Math.max(5, Math.min(5, prep.length)));
+  let prepVideoOk = 0;
+  for (const course of sample) {
+    await sleep(2000);
+    const { res, text, appErr } = await fetchPage(`${base}/academy/courses/${course.slug}`);
+    const lessonRe = new RegExp(
+      `/academy/courses/${course.slug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/lessons/([^"'\\s>]+)`,
+      "i"
+    );
+    const lessonMatch = text.match(lessonRe);
+    if (res.status !== 200 || appErr || !lessonMatch) {
+      fail(`prep video ${course.slug}`, "course/lesson link");
+      continue;
+    }
+    const lessonPath = `/academy/courses/${course.slug}/lessons/${lessonMatch[1]}`;
+    await sleep(2000);
+    const lesson = await fetchPage(`${base}${lessonPath}`);
+    const hasVideo =
+      /<video[\s>]/i.test(lesson.text) ||
+      /aspect-video/i.test(lesson.text) ||
+      /"public_url"/i.test(lesson.text);
+    if (lesson.res.status === 200 && !lesson.appErr && hasVideo) {
+      prepVideoOk += 1;
+      pass(`prep video ${course.slug}`, lessonMatch[1]);
+    } else {
+      fail(`prep video ${course.slug}`, `status ${lesson.res.status} video=${hasVideo}`);
+    }
+  }
+  if (prepVideoOk < Math.min(5, prep.length)) {
+    fail("prep video sample>=5", `${prepVideoOk}/${sample.length}`);
+  } else {
+    pass("prep video sample>=5", `${prepVideoOk}/${sample.length}`);
+  }
+}
+
 // 17. Simulations count >= 3
 await sleep(1500);
 {

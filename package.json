@@ -52,6 +52,7 @@
     "smoke:v27.3": "node scripts/v27.3-smoke.mjs",
     "smoke:v28": "node scripts/v28-smoke.mjs",
     "smoke:academy-v35": "node scripts/academy-v35-smoke.mjs",
+    "smoke:academy-prijimacky-video": "node scripts/academy-prijimacky-video-smoke.mjs",
     "images:backfill": "node scripts/run-v25-image-backfill.mjs",
     "images:v27.2": "node scripts/v27.2-image-backfill.mjs",
     "images:v27.3": "node scripts/v27.3-purge-images.mjs",
