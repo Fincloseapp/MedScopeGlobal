@@ -10,5 +10,5 @@ export async function GET(request: Request) {
   if (denied) return denied;
 
   const result = await runAutopilot("daily");
-  return NextResponse.json({ ok: result.ok, mode: "daily", ...result });
+  return NextResponse.json(result);
 }
