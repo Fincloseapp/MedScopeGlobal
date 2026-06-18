@@ -84,11 +84,21 @@
     @apply relative z-10 shrink-0;
   }
 
-  /* v33 — compact header, prevent logo/nav overlap */
+  /* v38 — header nav: no overlap, safe-area, subscribe CTA spacing */
   @media (min-width: 768px) and (max-width: 1279px) {
     .site-header .header-nav-scroll {
-      @apply max-w-[calc(100vw-240px)];
+      @apply max-w-[min(100%,calc(100vw-280px))];
     }
+  }
+
+  @media (min-width: 1280px) {
+    .site-header .header-nav-scroll {
+      @apply max-w-none;
+    }
+  }
+
+  .site-header {
+    @apply isolate;
   }
 
   /* v33 — primary CTA buttons */

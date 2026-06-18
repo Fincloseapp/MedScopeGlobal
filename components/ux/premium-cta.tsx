@@ -25,7 +25,7 @@ export function PremiumCta({ locale = "cs" }: { locale?: string }) {
               : `VIP content, AI assistant from ${PRICING.vipMonthlyCzk} CZK/month.`}
           </p>
           <Button asChild className="mt-4 bg-[#005B96] hover:bg-[#004874]">
-            <Link href="/pricing">{isCs ? "Zobrazit tarify" : "View plans"}</Link>
+            <Link href="/predplatne">{isCs ? "Zobrazit tarify" : "View plans"}</Link>
           </Button>
         </div>
       </div>

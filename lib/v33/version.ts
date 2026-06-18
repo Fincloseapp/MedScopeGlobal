@@ -14,5 +14,5 @@ export function getSiteVersionLabel(): string {
 }
 
 export function getCompositeVersionLabel(): string {
-  return "v33·34·35·36·37";
+  return "v33·34·35·36·37·38";
 }

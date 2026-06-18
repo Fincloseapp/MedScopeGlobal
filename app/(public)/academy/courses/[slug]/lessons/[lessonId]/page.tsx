@@ -5,7 +5,8 @@ import { PlayCircle } from "lucide-react";
 import { AcademyPageHeader } from "@/components/academy/page-header";
 import { AiLecturerPanel } from "@/components/academy/ai-lecturer-panel";
 import { LessonMetadataBlock } from "@/components/academy/lesson-metadata-block";
-import { LessonVideoPlayerV34 } from "@/components/academy/lesson-video-player-v34";
+import { LessonVideoWithConversion } from "@/components/v38/lesson-video-with-conversion";
+import { getReaderContext } from "@/lib/auth/reader-context";
 import { getCourseBySlug, getLessonByIdOrSlug } from "@/lib/academy/db";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
@@ -61,6 +62,8 @@ export default async function AcademyLessonPage({ params }: Props) {
 
   const course = await getCourseBySlug(slug);
   const lessons = course?.lessons ?? [];
+  const { isVip } = await getReaderContext();
+  const lessonIndex = lessons.findIndex((l) => l.slug === lesson.slug || l.id === lesson.id);
 
   return (
     <>
@@ -133,7 +136,12 @@ export default async function AcademyLessonPage({ params }: Props) {
           ) : null}
 
           <div className="min-w-0 space-y-6">
-            <LessonVideoPlayerV34 video={lesson.video} lessonTitle={lesson.title} />
+            <LessonVideoWithConversion
+              video={lesson.video}
+              lessonTitle={lesson.title}
+              isVip={isVip}
+              lessonIndex={lessonIndex >= 0 ? lessonIndex : 0}
+            />
             <LessonMetadataBlock
               title={lesson.title}
               content={lesson.content}

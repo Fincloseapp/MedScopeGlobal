@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { OsvetaVideoPlayer } from "@/components/verejnost/osveta-video-player";
+import { OsvetaVideoWithConversion } from "@/components/v38/osveta-video-with-conversion";
+import { getReaderContext } from "@/lib/auth/reader-context";
 import { getPublicAvatar } from "@/lib/verejnost/osveta/avatars";
 import {
   getPublicHealthQuizByVideoId,
@@ -40,6 +41,7 @@ export default async function OsvetaVideoPage({ params }: Props) {
 
   const avatar = getPublicAvatar(video.avatar_type);
   const relatedFiltered = related.filter((v) => v.slug !== slug).slice(0, 3);
+  const { isVip } = await getReaderContext();
 
   const shareUrl = `https://medscopeglobal.com/verejnost/osveta/${slug}`;
 
@@ -64,7 +66,7 @@ export default async function OsvetaVideoPage({ params }: Props) {
         </header>
 
         <div className="mt-6">
-          <OsvetaVideoPlayer video={video} quiz={quiz} />
+          <OsvetaVideoWithConversion video={video} quiz={quiz} isVip={isVip} />
         </div>
 
         <details className="mt-6 rounded-xl border border-slate-200 bg-white p-4">

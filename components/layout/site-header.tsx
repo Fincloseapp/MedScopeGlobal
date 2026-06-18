@@ -9,10 +9,11 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { V20MobileNav } from "@/components/v20/mobile-nav";
 import { HeaderLogo } from "@/components/layout/header-logo";
 import { HeaderNavigation } from "@/components/layout/header-navigation";
+import { NavSubscribeCta } from "@/components/v38/nav-subscribe-cta";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import { getDesktopHeaderMenu, getMobileMenu } from "@/lib/config/main-navigation";
 
-/** v33 — sticky h-16 header, compact desktop nav, full mobile drawer */
+/** v38 — sticky header, compact nav, subscribe CTA for non-VIP */
 export function SiteHeader({
   categories,
   locale: _locale,
@@ -50,6 +51,7 @@ export function SiteHeader({
           <HeaderNavigation mainMenu={desktopMenu} />
 
           <div className="flex shrink-0 items-center gap-1 border-l border-black/[0.06] pl-2 dark:border-white/10 lg:gap-1.5 lg:pl-3">
+            {!isVip ? <NavSubscribeCta compact className="hidden lg:inline-flex" /> : null}
             <SearchCommand isVip={isVip} accessLevel={accessLevel} />
             <ThemeToggle />
             {user ? <NotificationBell /> : null}

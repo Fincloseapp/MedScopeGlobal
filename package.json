@@ -57,6 +57,7 @@
     "smoke:v35": "node scripts/v35-course-smoke.mjs",
     "smoke:v36": "node scripts/v36-analytics-smoke.mjs",
     "smoke:v37": "node scripts/v37-quality-smoke.mjs",
+    "smoke:v38": "node scripts/v38-conversion-smoke.mjs",
     "smoke:academy-all": "node scripts/run-academy-smoke-all.mjs",
     "smoke:academy-prijimacky-video": "node scripts/academy-prijimacky-video-smoke.mjs",
     "images:backfill": "node scripts/run-v25-image-backfill.mjs",
