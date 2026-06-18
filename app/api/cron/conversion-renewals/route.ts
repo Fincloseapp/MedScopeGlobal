@@ -11,7 +11,6 @@ export async function GET(request: Request) {
 
   const result = await runConversionRenewals();
   return NextResponse.json({
-    ok: result.ok,
     phase: "v38.0-conversion-renewals",
     ...result,
     generatedAt: new Date().toISOString(),

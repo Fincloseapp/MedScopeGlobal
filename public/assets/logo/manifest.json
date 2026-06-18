@@ -1,6 +1,6 @@
 {
   "sourceDir": "D:\\MedScopeGlobal\\logo",
-  "syncedAt": "2026-06-18T10:25:16.359Z",
+  "syncedAt": "2026-06-18T18:33:44.170Z",
   "version": "v23.2.3",
   "files": {
     "transparent": "Logo_Transparent.jpg",
@@ -26,36 +26,5 @@
       "webp": "Logo_Negative@2x.webp"
     }
   },
-  "derivatives": {
-    "transparent": {
-      "webp": "Logo_Transparent.webp",
-      "webpSize": 48142,
-      "retinaPng": "Logo_Transparent@2x.png",
-      "retinaWebp": "Logo_Transparent@2x.webp",
-      "retinaWebpSize": 90132,
-      "width": 788,
-      "height": 503,
-      "hasAlpha": false
-    },
-    "print": {
-      "webp": "Logo_Print.webp",
-      "webpSize": 24304,
-      "retinaPng": "Logo_Print@2x.png",
-      "retinaWebp": "Logo_Print@2x.webp",
-      "retinaWebpSize": 51550,
-      "width": 378,
-      "height": 269,
-      "hasAlpha": false
-    },
-    "negative": {
-      "webp": "Logo_Negative.webp",
-      "webpSize": 26882,
-      "retinaPng": "Logo_Negative@2x.png",
-      "retinaWebp": "Logo_Negative@2x.webp",
-      "retinaWebpSize": 56260,
-      "width": 393,
-      "height": 283,
-      "hasAlpha": false
-    }
-  }
+  "derivatives": {}
 }
