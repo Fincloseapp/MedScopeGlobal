@@ -15,6 +15,8 @@ const SECTIONS = [
   { href: "/admin/academy/video", label: "Video" },
   { href: "/admin/academy/video-analytics", label: "Video analytics" },
   { href: "/admin/academy/quality", label: "Kvalita obsahu" },
+  { href: "/admin/academy/medical-review", label: "Medicínská kontrola" },
+  { href: "/admin/academy/audit", label: "Audit" },
   { href: "/admin/academy/simulations", label: "Simulace" },
   { href: "/admin/academy/textbooks", label: "Učebnice" },
   { href: "/admin/academy/testing", label: "Testování" },

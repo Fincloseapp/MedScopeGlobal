@@ -16,6 +16,8 @@ import {
   V38_UI_BUILD_STAMP,
   V38_COMPOSITE_LABEL,
 } from "@/lib/v38/version";
+import { V39_UI_VERSION } from "@/lib/v39/version";
+import { V40_UI_VERSION, V40_COMPOSITE_LABEL } from "@/lib/v40/version";
 import { countPublishedCourses, countVideoLessons } from "@/lib/academy/db";
 import { isLlmConfigured } from "@/lib/ai/chat-json";
 import { createServiceRoleClient } from "@/lib/supabase/service";
@@ -58,8 +60,8 @@ export async function GET() {
   return NextResponse.json({
     status: "ok",
     ok: true,
-    version: V38_UI_VERSION,
-    composite: V38_COMPOSITE_LABEL,
+    version: V40_UI_VERSION,
+    composite: V40_COMPOSITE_LABEL,
     buildStamp: V38_UI_BUILD_STAMP,
     subsystems: {
       v33: { version: V33_UI_VERSION, buildStamp: V33_UI_BUILD_STAMP, navbar: "ok", videoProvider },
@@ -74,6 +76,8 @@ export async function GET() {
         navUx: "ok",
         llm: isLlmConfigured(),
       },
+      v39: { version: V39_UI_VERSION, medicalReview: true },
+      v40: { version: V40_UI_VERSION, videoEngine: true, courseGeneration: true, audit: true },
     },
     features: [
       "navbar-v33",
@@ -83,9 +87,13 @@ export async function GET() {
       "course-validation-v35",
       "video-analytics-v36",
       "quality-engine-v37",
+      "medical-review-v39",
+      "ai-video-engine-v40",
       "media-src-csp",
     ],
     compat: {
+      v40: "/api/v40/health",
+      v39: "/api/v39/health",
       v37: "/api/v37/health",
       v33: "/api/v33/health",
       academy: "/api/academy/health",

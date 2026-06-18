@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AlertCircle, Headphones, Loader2, RefreshCw, Video } from "lucide-react";
+import { AlertCircle, Headphones, Loader2, Maximize2, RefreshCw, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { V33_FALLBACK_MP4_URL } from "@/lib/v33/version";
 import type { VideoAsset } from "@/types/academy";
@@ -138,6 +138,8 @@ export function LessonVideoPlayer({ video, lessonTitle, className }: Props) {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [retryKey, setRetryKey] = useState(0);
   const [forceAudio, setForceAudio] = useState(false);
+  const [buffering, setBuffering] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const meta = resolveMeta(video);
   const isAudioLesson = meta.lesson_format === "audio_lesson" || Boolean(meta.tts_audio_url);
@@ -149,8 +151,19 @@ export function LessonVideoPlayer({ video, lessonTitle, className }: Props) {
     setVideoFailed(false);
     setErrorMsg(null);
     setLoading(true);
+    setBuffering(false);
     setForceAudio(false);
     setRetryKey((k) => k + 1);
+  }, []);
+
+  const handleFullscreen = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    if (document.fullscreenElement) {
+      void document.exitFullscreen();
+    } else {
+      void el.requestFullscreen?.().catch(() => {});
+    }
   }, []);
 
   useEffect(() => {
@@ -204,10 +217,18 @@ export function LessonVideoPlayer({ video, lessonTitle, className }: Props) {
 
   return (
     <div className={className}>
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-lg">
-        {loading ? (
+      <div
+        ref={containerRef}
+        className="relative overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-lg"
+      >
+        {loading || buffering ? (
           <div className="absolute inset-0 z-10 flex aspect-video items-center justify-center bg-slate-900/80">
-            <Loader2 className="h-8 w-8 animate-spin text-white/70" aria-label="Načítání videa" />
+            <div className="flex flex-col items-center gap-2">
+              <Loader2 className="h-8 w-8 animate-spin text-white/70" aria-label="Načítání videa" />
+              {buffering && !loading ? (
+                <span className="text-xs text-white/60">Buffering…</span>
+              ) : null}
+            </div>
           </div>
         ) : null}
         {errorMsg ? (
@@ -249,17 +270,25 @@ export function LessonVideoPlayer({ video, lessonTitle, className }: Props) {
           controls
           playsInline
           preload="metadata"
+          crossOrigin="anonymous"
           poster={thumbnail ?? undefined}
           className="aspect-video w-full bg-black"
           title={lessonTitle}
           onLoadStart={() => {
             setLoading(true);
+            setBuffering(false);
             setErrorMsg(null);
           }}
           onLoadedMetadata={() => setLoading(false)}
-          onCanPlay={() => setLoading(false)}
+          onCanPlay={() => {
+            setLoading(false);
+            setBuffering(false);
+          }}
+          onWaiting={() => setBuffering(true)}
+          onPlaying={() => setBuffering(false)}
           onError={() => {
             setLoading(false);
+            setBuffering(false);
             if (audioUrl) {
               setVideoFailed(true);
               return;
@@ -267,8 +296,17 @@ export function LessonVideoPlayer({ video, lessonTitle, className }: Props) {
             setErrorMsg("Video se nepodařilo načíst. Zkuste obnovit stránku nebo použijte audio verzi.");
           }}
         >
+          <source src={url} type="video/mp4" />
           Váš prohlížeč nepodporuje přehrávání videa.
         </video>
+        <button
+          type="button"
+          onClick={handleFullscreen}
+          className="absolute bottom-3 right-3 z-10 rounded-lg bg-black/60 p-2 text-white/90 transition hover:bg-black/80 md:hidden"
+          aria-label="Celá obrazovka"
+        >
+          <Maximize2 className="h-4 w-4" />
+        </button>
       </div>
       <LessonTags video={video} meta={meta} />
     </div>

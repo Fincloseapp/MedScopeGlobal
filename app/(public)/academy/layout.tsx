@@ -11,5 +11,9 @@ export const metadata: Metadata = buildV20PageMetadata({
 });
 
 export default function AcademyLayout({ children }: { children: React.ReactNode }) {
-  return <div className="academy-v35 min-h-full bg-[#fafcff]">{children}</div>;
+  return (
+    <div className="academy-v40 min-h-full bg-[#fafcff]">
+      {children}
+    </div>
+  );
 }
