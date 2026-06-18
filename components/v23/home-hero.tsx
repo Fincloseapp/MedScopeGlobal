@@ -4,7 +4,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { V23_EDITORIAL_PILLARS, V23_VALUE_PROPOSITION } from "@/lib/v23/homepage";
 import { V23_HERO_IMAGE } from "@/lib/v23/images";
-import { getSiteVersionLabel } from "@/lib/v27/version";
+import { getSiteVersionLabel } from "@/lib/v37/version";
 
 export function V23HomeHero() {
   const vp = V23_VALUE_PROPOSITION;

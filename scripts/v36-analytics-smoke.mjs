@@ -1,5 +1,8 @@
 #!/usr/bin/env node
-/** MedScope v36 — video analytics smoke */
+/**
+ * MedScope v36 video analytics smoke.
+ * Usage: node scripts/v36-analytics-smoke.mjs [baseUrl]
+ */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,38 +19,66 @@ for (const name of [".env.local", ".env"]) {
 }
 
 const base = (process.argv[2] ?? env.PRODUCTION_URL ?? "https://medscopeglobal.com").replace(/\/$/, "");
+const DELAY_MS = 2000;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const DELAY = 2000;
 
 console.log(`\n=== v36 analytics smoke @ ${base} ===\n`);
-const failed = [];
+const results = [];
 
-async function check(name, fn) {
-  await sleep(DELAY);
-  try {
-    const ok = await fn();
-    console.log(`${ok ? "✓" : "✗"} ${name}`);
-    if (!ok) failed.push(name);
-  } catch (e) {
-    console.log(`✗ ${name} — ${e.message}`);
-    failed.push(name);
+await sleep(DELAY_MS);
+{
+  const res = await fetch(`${base}/api/v37/health`, { signal: AbortSignal.timeout(45000) });
+  let ok = false;
+  if (res.ok) {
+    const json = await res.json();
+    ok = json.subsystems?.v36?.analytics === true;
+    console.log(`health v36: ${ok ? "OK" : "FAIL"}`);
   }
+  results.push({ name: "health-v36", ok });
 }
 
-await check("v37 health v36 subsystem", async () => {
-  const res = await fetch(`${base}/api/v37/health`, { signal: AbortSignal.timeout(30000) });
-  const json = await res.json();
-  return res.ok && json.subsystems?.v36?.analytics === true;
-});
+await sleep(DELAY_MS);
+{
+  const res = await fetch(`${base}/api/academy/analytics/dashboard`, { signal: AbortSignal.timeout(45000) });
+  let ok = false;
+  if (res.ok) {
+    const json = await res.json();
+    ok = json.ok === true || Array.isArray(json.videos) || typeof json.summary === "object";
+    console.log(`dashboard API: ${ok ? "OK" : "FAIL"}`);
+  } else {
+    console.log(`dashboard API: FAIL ${res.status}`);
+  }
+  results.push({ name: "dashboard-api", ok });
+}
 
-await check("admin video analytics page", async () => {
-  const res = await fetch(`${base}/admin/academy/video-analytics`, {
-    signal: AbortSignal.timeout(45000),
-    redirect: "follow",
-  });
-  const text = await res.text();
-  return res.status < 500 && (/Video Analytics|v36/i.test(text) || /admin\/login/i.test(text));
-});
+await sleep(DELAY_MS);
+{
+  const coursesRes = await fetch(`${base}/api/academy/courses?limit=5`, { signal: AbortSignal.timeout(45000) });
+  let videoOk = false;
+  if (coursesRes.ok) {
+    const courses = (await coursesRes.json())?.courses ?? [];
+    outer: for (const c of courses) {
+      const dRes = await fetch(`${base}/api/academy/courses/${c.slug}`, { signal: AbortSignal.timeout(45000) });
+      if (!dRes.ok) continue;
+      const lessons = (await dRes.json())?.course?.lessons ?? [];
+      for (const l of lessons) {
+        if (!l.video?.id) continue;
+        const aRes = await fetch(`${base}/api/academy/analytics/video/${l.video.id}`, {
+          signal: AbortSignal.timeout(45000),
+        });
+        if (aRes.ok) {
+          const aJson = await aRes.json();
+          videoOk = aJson.ok === true || typeof aJson.stats === "object";
+          console.log(`video analytics: ${videoOk ? "OK" : "FAIL"}`);
+          break outer;
+        }
+      }
+    }
+  }
+  if (!videoOk) console.log("video analytics: no asset tested");
+  results.push({ name: "video-analytics", ok: videoOk });
+}
 
-console.log(failed.length ? `\n✗ Failed: ${failed.join(", ")}` : "\n✓ v36 smoke passed");
+const failed = results.filter((r) => !r.ok);
+console.log(failed.length ? `\n✗ ${failed.length} failed` : "\n✓ v36 smoke passed");
 process.exit(failed.length ? 1 : 0);

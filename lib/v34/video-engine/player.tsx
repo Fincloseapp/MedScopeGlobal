@@ -58,6 +58,7 @@ export function AcademyVideoPlayer({ metadata, lessonTitle, className, onWatchEv
     if (!video || !currentUrl) return;
 
     let cancelled = false;
+    const el = video;
 
     async function attach() {
       hlsRef.current?.destroy();
@@ -71,7 +72,7 @@ export function AcademyVideoPlayer({ metadata, lessonTitle, className, onWatchEv
             const hls = new Hls({ enableWorker: true });
             hlsRef.current = hls;
             hls.loadSource(currentUrl);
-            hls.attachMedia(video);
+            hls.attachMedia(el);
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
               if (!cancelled) setLoading(false);
             });
@@ -85,8 +86,8 @@ export function AcademyVideoPlayer({ metadata, lessonTitle, className, onWatchEv
         }
       }
 
-      video.src = currentUrl;
-      video.load();
+      el.src = currentUrl;
+      el.load();
     }
 
     function tryNextUrl() {

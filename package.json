@@ -69,7 +69,12 @@
     "domain:connect": "node scripts/connect-domain-vercel.mjs",
     "test:prod": "node tests/production/run-prod-tests.mjs",
     "cron:trigger-daily": "node scripts/trigger-daily-content-crons.mjs",
-    "verify:d-drive": "node scripts/verify-d-drive-only.mjs"
+    "verify:d-drive": "node scripts/verify-d-drive-only.mjs",
+    "smoke:v33": "node scripts/v33-ui-smoke.mjs",
+    "smoke:v34": "node scripts/v34-video-engine-smoke.mjs",
+    "smoke:v35": "node scripts/v35-course-smoke.mjs",
+    "smoke:v36": "node scripts/v36-analytics-smoke.mjs",
+    "smoke:v37": "node scripts/v37-quality-smoke.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
