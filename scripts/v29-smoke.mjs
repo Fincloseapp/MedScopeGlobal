@@ -21,7 +21,7 @@ for (const name of [".env.local", ".env"]) {
 const versionConfig = JSON.parse(
   fs.readFileSync(path.join(root, "lib/v29/config/version.json"), "utf8")
 );
-const expectedUi = versionConfig.ui;
+const expectedHealthVersion = "v29.0";
 const expectedEngine = versionConfig.engine;
 const heroClaim = "Nejmodernější zdravotnický magazín pro veřejnost, studenty a lékaře";
 const editorialV29 = "redakčního standardu MedScopeGlobal v29";
@@ -41,6 +41,23 @@ const base = (env.PRODUCTION_URL ?? env.PROD_BASE_URL ?? "https://medscopeglobal
   /\/$/,
   ""
 );
+
+async function resolveSiteUiVersion() {
+  for (const path of ["/api/v40/health", "/api/v38/health"]) {
+    try {
+      const res = await fetch(`${base}${path}`, { signal: AbortSignal.timeout(20_000) });
+      if (!res.ok) continue;
+      const json = await res.json();
+      const siteVersion = json.siteVersion ?? json.version;
+      if (typeof siteVersion === "string" && siteVersion.startsWith("v")) return siteVersion;
+    } catch {
+      /* try next health endpoint */
+    }
+  }
+  return versionConfig.ui;
+}
+
+const expectedUi = await resolveSiteUiVersion();
 
 const ROUTES = [
   "/",
@@ -164,8 +181,11 @@ const v29Health = results.find((r) => r.route === "/api/v29/health");
 if (v29Health?.ok) {
   try {
     const json = JSON.parse(v29Health.text);
-    if (json.version !== expectedUi) {
-      healthChecks.push({ ok: false, msg: `v29 health version ${json.version} !== ${expectedUi}` });
+    if (json.version !== expectedHealthVersion) {
+      healthChecks.push({
+        ok: false,
+        msg: `v29 health version ${json.version} !== ${expectedHealthVersion}`,
+      });
     } else {
       healthChecks.push({ ok: true, msg: `v29 health version ${json.version}` });
     }

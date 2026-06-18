@@ -121,6 +121,7 @@ export const ENDPOINT_LIMITS: Record<string, { limit: number; windowMs: number }
   auth: { limit: 20, windowMs: 60_000 },
   academy: { limit: 90, windowMs: 60_000 },
   admin: { limit: 40, windowMs: 60_000 },
+  tts: { limit: 30, windowMs: 60_000 },
 };
 
 export function resolveEndpointBucket(pathname: string): keyof typeof ENDPOINT_LIMITS {
@@ -129,6 +130,7 @@ export function resolveEndpointBucket(pathname: string): keyof typeof ENDPOINT_L
   if (pathname.includes("/auth") || pathname.includes("login")) return "auth";
   if (pathname.startsWith("/api/academy")) return "academy";
   if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) return "admin";
+  if (pathname.startsWith("/api/tts") || pathname.startsWith("/api/voice") || pathname.includes("/video/voice")) return "tts";
   return "default";
 }
 

@@ -130,6 +130,22 @@
     {
       "path": "/api/cron/conversion-renewals",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/v42-key-rotation-check",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/v43-health-monitor",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/v45-performance-audit",
+      "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/cron/v46-security-weekly",
+      "schedule": "0 2 * * 0"
     }
   ],
   

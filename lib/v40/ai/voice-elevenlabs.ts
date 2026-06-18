@@ -2,10 +2,28 @@ import { queueOpenAiTtsRender, isOpenAiTtsConfigured } from "@/lib/academy/ai/vi
 import type { QueueRenderInput, QueueRenderResult } from "@/lib/academy/ai/video-providers/types";
 import { randomUUID } from "crypto";
 
-export type VoiceResult = QueueRenderResult & { voice_provider: "elevenlabs" | "openai_tts" | "silent" };
+export type VoiceResult = QueueRenderResult & {
+  voice_provider: "elevenlabs" | "openai_tts" | "text_only";
+};
 
 export function isElevenLabsConfigured(): boolean {
   return Boolean(process.env.ELEVENLABS_API_KEY?.trim());
+}
+
+/** GET /v1/user — returns { valid, status } */
+export async function validateElevenLabsKey(): Promise<{ valid: boolean; status: number }> {
+  const apiKey = process.env.ELEVENLABS_API_KEY?.trim();
+  if (!apiKey) return { valid: false, status: 0 };
+
+  try {
+    const res = await fetch("https://api.elevenlabs.io/v1/user", {
+      headers: { "xi-api-key": apiKey },
+      signal: AbortSignal.timeout(10000),
+    });
+    return { valid: res.status === 200, status: res.status };
+  } catch {
+    return { valid: false, status: 0 };
+  }
 }
 
 function estimateDuration(script: string): number {
@@ -19,6 +37,11 @@ async function generateElevenLabsVoice(input: {
 }): Promise<{ ok: boolean; buffer?: Buffer; message?: string; limitExceeded?: boolean }> {
   const apiKey = process.env.ELEVENLABS_API_KEY?.trim();
   if (!apiKey) return { ok: false, message: "ELEVENLABS_API_KEY not set" };
+
+  const health = await validateElevenLabsKey();
+  if (!health.valid) {
+    return { ok: false, message: `ElevenLabs key invalid (HTTP ${health.status}) — regenerate at elevenlabs.io` };
+  }
 
   const voiceId = process.env.ELEVENLABS_VOICE_ID?.trim() || "21m00Tcm4TlvDq8ikWAM";
   const modelId = process.env.ELEVENLABS_MODEL_ID?.trim() || "eleven_multilingual_v2";
@@ -53,7 +76,7 @@ async function generateElevenLabsVoice(input: {
   }
 }
 
-/** Fallback chain: ElevenLabs FREE → OpenAI TTS → silent skip */
+/** Fallback chain: ElevenLabs → OpenAI TTS → text-only (never silent) */
 export async function generateVoice(input: {
   script: string;
   title: string;
@@ -109,14 +132,16 @@ export async function generateVoice(input: {
 
   return {
     provider: "placeholder",
-    voice_provider: "silent",
+    voice_provider: "text_only",
     status: "ready",
-    message: "No TTS provider available — silent skip (script-only assets)",
+    message: "No TTS provider — text-only lesson (script preserved, not silent)",
     metadata_patch: {
-      lesson_format: "script_only",
+      lesson_format: "text_only",
       tts_provider: "none",
+      script_text: input.script,
       render_status: "ready",
       generated: true,
+      duration_seconds: estimateDuration(input.script),
     },
   };
 }

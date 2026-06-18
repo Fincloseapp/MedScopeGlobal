@@ -7,6 +7,7 @@ import { checkApiRateLimit } from "@/lib/v30/security/rate-limit";
 import { applySecurityHeaders } from "@/lib/v30/security/headers";
 import { scanQueryString } from "@/lib/v30/security/waf";
 import { isAdminIpAllowed } from "@/lib/v30/security/admin-guard";
+import { checkIpBan, recordThreatStrike, scanForThreats } from "@/lib/v46/security/threat-detector";
 
 /** v30 security layer — runs before legacy security + locale middleware. */
 export async function applyV30SecurityMiddleware(
@@ -16,14 +17,36 @@ export async function applyV30SecurityMiddleware(
   const ua = request.headers.get("user-agent");
   const { pathname, search } = request.nextUrl;
 
+  const ipBan = checkIpBan(ip);
+  if (ipBan.banned) {
+    return new NextResponse("Forbidden", {
+      status: 403,
+      headers: { "Retry-After": String(ipBan.retryAfter ?? 900) },
+    });
+  }
+
   const waf = scanQueryString(search);
   if (waf.blocked) {
+    recordThreatStrike(ip);
     await writeAuditLog({
       type: "waf:blocked",
       ip,
       endpoint: pathname,
       severity: "warning",
       details: { reason: waf.reason, pattern: waf.pattern },
+    });
+    return new NextResponse("Bad Request", { status: 400 });
+  }
+
+  const threatScan = scanForThreats(`${pathname}${search}`);
+  if (threatScan.blocked) {
+    recordThreatStrike(ip);
+    await writeAuditLog({
+      type: "v46:threat_blocked",
+      ip,
+      endpoint: pathname,
+      severity: "warning",
+      details: { reason: threatScan.reason, pattern: threatScan.pattern },
     });
     return new NextResponse("Bad Request", { status: 400 });
   }
