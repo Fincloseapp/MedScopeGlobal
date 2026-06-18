@@ -38,7 +38,9 @@ export async function checkElevenLabsKeyHealth(): Promise<KeyHealth> {
   const age_days = estimateKeyAgeDays("ELEVENLABS_API_KEY");
 
   let keyStatus: KeyHealth["status"] = valid ? "ok" : "critical";
-  let message = valid ? "ElevenLabs key valid" : `ElevenLabs key invalid (HTTP ${status}) — regenerate at elevenlabs.io`;
+  let message = valid
+    ? `ElevenLabs TTS probe OK (HTTP ${status})`
+    : `ElevenLabs TTS probe failed (HTTP ${status}) — check key or account`;
 
   if (valid && age_days !== null && age_days > KEY_ROTATION_WARN_DAYS) {
     keyStatus = "warning";

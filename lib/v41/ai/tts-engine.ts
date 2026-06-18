@@ -32,18 +32,16 @@ export function ttsResponseHeaders(contentType = "application/json"): Record<str
   return { ...TTS_CORS_HEADERS, "Content-Type": contentType };
 }
 
-/** Validate ElevenLabs key via GET /v1/user */
-export async function checkElevenLabsHealth(): Promise<{ valid: boolean; status: number }> {
-  return validateElevenLabsKey();
+/** Validate ElevenLabs via TTS probe (not /v1/user — no user_read required) */
+export async function checkElevenLabsHealth(): Promise<{ valid: boolean; status: number; detail?: string }> {
+  const r = await validateElevenLabsKey();
+  return { valid: r.valid, status: r.status, detail: r.detail };
 }
 
 /** Stream ElevenLabs audio directly (returns Response body stream or null) */
 export async function streamElevenLabsAudio(text: string): Promise<Response | null> {
   const apiKey = process.env.ELEVENLABS_API_KEY?.trim();
   if (!apiKey) return null;
-
-  const health = await validateElevenLabsKey();
-  if (!health.valid) return null;
 
   const voiceId = process.env.ELEVENLABS_VOICE_ID?.trim() || "21m00Tcm4TlvDq8ikWAM";
   const modelId = process.env.ELEVENLABS_MODEL_ID?.trim() || "eleven_multilingual_v2";
@@ -112,10 +110,10 @@ export async function synthesizeTts(input: TtsRequest): Promise<TtsResult> {
     ok: true,
     provider: "text_only",
     text,
-    message: elevenHealth.status === 401
-      ? "ElevenLabs key invalid (401) — text-only mode. Regenerate key at elevenlabs.io."
+    message: !elevenHealth.valid
+      ? `ElevenLabs unavailable (${elevenHealth.detail ?? elevenHealth.status}) — text-only mode`
       : "No TTS provider — text-only mode",
-    elevenlabsValid: false,
+    elevenlabsValid: elevenHealth.valid,
   };
 }
 

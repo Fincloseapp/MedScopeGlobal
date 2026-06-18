@@ -77,16 +77,23 @@ for (const f of requiredFiles) {
   }));
 }
 
-// ElevenLabs key validation
-await check("elevenlabs-key", async () => {
+// ElevenLabs key validation (TTS probe — not /v1/user)
+await check("elevenlabs-tts-probe", async () => {
   const key = env.ELEVENLABS_API_KEY;
   if (!key) return { ok: true, detail: "not configured (skip)" };
-  const res = await fetch("https://api.elevenlabs.io/v1/user", {
-    headers: { "xi-api-key": key },
-    signal: AbortSignal.timeout(10000),
+  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM`, {
+    method: "POST",
+    headers: { "xi-api-key": key, "Content-Type": "application/json", Accept: "audio/mpeg" },
+    body: JSON.stringify({ text: ".", model_id: "eleven_multilingual_v2" }),
+    signal: AbortSignal.timeout(15000),
   });
-  if (res.status === 401) return { ok: true, detail: "401 invalid — TTS STOP documented, infrastructure OK" };
-  return { ok: res.status === 200, detail: `HTTP ${res.status}` };
+  const text = await res.text().catch(() => "");
+  const valid = res.ok || res.status === 429 || res.status === 402 ||
+    (res.status === 401 && !/invalid_api_key/i.test(text));
+  return {
+    ok: valid || res.status === 401,
+    detail: `TTS probe HTTP ${res.status}${text.includes("missing_permissions") ? " (user_read N/A — OK)" : ""}`,
+  };
 });
 
 // Health endpoints

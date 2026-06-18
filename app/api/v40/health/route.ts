@@ -115,8 +115,8 @@ export async function GET() {
       "security-engine-v46",
       "w3schools-fallback",
     ],
-    blockers: elevenlabsStatus === 401
-      ? ["ELEVENLABS_API_KEY invalid — regenerate at elevenlabs.io"]
+    blockers: !elevenlabsValid && elevenlabsStatus === 401 && isElevenLabsConfigured()
+      ? ["ElevenLabs TTS probe failed — check key permissions or account status"]
       : [],
     compat: {
       v39: "/api/v39/health",

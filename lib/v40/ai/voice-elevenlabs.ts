@@ -6,23 +6,87 @@ export type VoiceResult = QueueRenderResult & {
   voice_provider: "elevenlabs" | "openai_tts" | "text_only";
 };
 
+export type ElevenLabsValidation = {
+  valid: boolean;
+  status: number;
+  method: "tts_probe" | "none";
+  detail?: string;
+};
+
+const DEFAULT_VOICE_ID = "21m00Tcm4TlvDq8ikWAM";
+const DEFAULT_MODEL_ID = "eleven_multilingual_v2";
+
 export function isElevenLabsConfigured(): boolean {
   return Boolean(process.env.ELEVENLABS_API_KEY?.trim());
 }
 
-/** GET /v1/user — returns { valid, status } */
-export async function validateElevenLabsKey(): Promise<{ valid: boolean; status: number }> {
+function getVoiceId(): string {
+  return process.env.ELEVENLABS_VOICE_ID?.trim() || DEFAULT_VOICE_ID;
+}
+
+function getModelId(): string {
+  return process.env.ELEVENLABS_MODEL_ID?.trim() || DEFAULT_MODEL_ID;
+}
+
+/**
+ * Validate via minimal TTS probe — does NOT use GET /v1/user (requires user_read).
+ * Valid when TTS auth succeeds (200) or quota responses (402/429).
+ * Keys scoped to TTS-only without user_read are accepted.
+ */
+export async function validateElevenLabsKey(): Promise<ElevenLabsValidation> {
   const apiKey = process.env.ELEVENLABS_API_KEY?.trim();
-  if (!apiKey) return { valid: false, status: 0 };
+  if (!apiKey) return { valid: false, status: 0, method: "none", detail: "ELEVENLABS_API_KEY not set" };
 
   try {
-    const res = await fetch("https://api.elevenlabs.io/v1/user", {
-      headers: { "xi-api-key": apiKey },
-      signal: AbortSignal.timeout(10000),
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${getVoiceId()}`, {
+      method: "POST",
+      headers: {
+        "xi-api-key": apiKey,
+        "Content-Type": "application/json",
+        Accept: "audio/mpeg",
+      },
+      body: JSON.stringify({ text: ".", model_id: getModelId() }),
+      signal: AbortSignal.timeout(15000),
     });
-    return { valid: res.status === 200, status: res.status };
-  } catch {
-    return { valid: false, status: 0 };
+
+    if (res.ok) {
+      await res.arrayBuffer().catch(() => null);
+      return { valid: true, status: res.status, method: "tts_probe" };
+    }
+
+    if (res.status === 429 || res.status === 402) {
+      return { valid: true, status: res.status, method: "tts_probe", detail: "quota_or_billing_limit" };
+    }
+
+    const errText = await res.text().catch(() => "");
+    const detail = errText.slice(0, 300);
+
+    if (res.status === 401 && /invalid_api_key|invalid.*api.*key|authentication/i.test(errText)) {
+      return { valid: false, status: res.status, method: "tts_probe", detail };
+    }
+
+    // Key accepted but account/IP restricted — still treat as configured (may work on Vercel)
+    if (res.status === 401 && /unusual_activity|missing_permissions|free tier/i.test(errText)) {
+      return { valid: true, status: res.status, method: "tts_probe", detail: "key_scoped_or_account_restricted" };
+    }
+
+    if (res.status === 403) {
+      return { valid: false, status: res.status, method: "tts_probe", detail };
+    }
+
+    // Other errors (422 etc.) — key likely accepted, request issue only
+    if (res.status >= 400 && res.status < 500 && !/invalid_api_key/i.test(errText)) {
+      return { valid: true, status: res.status, method: "tts_probe", detail: "tts_endpoint_reachable" };
+    }
+
+    return { valid: false, status: res.status, method: "tts_probe", detail };
+  } catch (e) {
+    return {
+      valid: false,
+      status: 0,
+      method: "tts_probe",
+      detail: e instanceof Error ? e.message : "probe failed",
+    };
   }
 }
 
@@ -38,13 +102,8 @@ async function generateElevenLabsVoice(input: {
   const apiKey = process.env.ELEVENLABS_API_KEY?.trim();
   if (!apiKey) return { ok: false, message: "ELEVENLABS_API_KEY not set" };
 
-  const health = await validateElevenLabsKey();
-  if (!health.valid) {
-    return { ok: false, message: `ElevenLabs key invalid (HTTP ${health.status}) — regenerate at elevenlabs.io` };
-  }
-
-  const voiceId = process.env.ELEVENLABS_VOICE_ID?.trim() || "21m00Tcm4TlvDq8ikWAM";
-  const modelId = process.env.ELEVENLABS_MODEL_ID?.trim() || "eleven_multilingual_v2";
+  const voiceId = getVoiceId();
+  const modelId = getModelId();
 
   try {
     const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {

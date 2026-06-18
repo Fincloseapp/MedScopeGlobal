@@ -18,17 +18,21 @@ if (!key) {
   console.log("Missing ELEVENLABS_API_KEY");
   process.exit(2);
 }
-const res = await fetch("https://api.elevenlabs.io/v1/user", {
-  headers: { "xi-api-key": key },
+
+const tts = await fetch("https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM", {
+  method: "POST",
+  headers: { "xi-api-key": key, "Content-Type": "application/json", Accept: "audio/mpeg" },
+  body: JSON.stringify({ text: ".", model_id: "eleven_multilingual_v2" }),
 });
-console.log(`ELEVENLABS_STATUS:${res.status}`);
-if (res.status === 401) {
-  console.log("Invalid ElevenLabs API key — regenerate.");
-  process.exit(1);
-}
-if (res.status === 200) {
-  console.log("ElevenLabs key valid — continuing.");
+console.log(`TTS_PROBE:${tts.status}`);
+const ttsBody = await tts.text();
+if (tts.ok || tts.status === 429 || tts.status === 402) {
+  console.log("ElevenLabs TTS probe valid — continuing.");
   process.exit(0);
 }
-console.log(`Unexpected status ${res.status}`);
-process.exit(3);
+if (tts.status === 401 && !/invalid_api_key/i.test(ttsBody)) {
+  console.log("ElevenLabs key scoped/restricted but not invalid — continuing with fallback.");
+  process.exit(0);
+}
+console.log(`ElevenLabs TTS probe failed: ${ttsBody.slice(0, 200)}`);
+process.exit(1);

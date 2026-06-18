@@ -74,15 +74,19 @@ export async function runHealthMonitor(): Promise<HealthReport> {
       if (!isElevenLabsConfigured()) {
         return { subsystem: "tts_elevenlabs", status: "degraded", message: "ELEVENLABS_API_KEY not set" };
       }
-      const { valid, status } = await validateElevenLabsKey();
+      const { valid, status, detail } = await validateElevenLabsKey();
       if (!valid) {
         return {
           subsystem: "tts_elevenlabs",
-          status: status === 401 ? "critical" : "degraded",
-          message: `ElevenLabs invalid (HTTP ${status}) — manual regen required`,
+          status: status === 401 || status === 403 ? "critical" : "degraded",
+          message: `ElevenLabs TTS probe failed (HTTP ${status}): ${detail ?? "check key"}`,
         };
       }
-      return { subsystem: "tts_elevenlabs", status: "ok", message: "ElevenLabs key valid" };
+      return {
+        subsystem: "tts_elevenlabs",
+        status: detail?.includes("restricted") || detail?.includes("quota") ? "degraded" : "ok",
+        message: detail ? `ElevenLabs OK (${detail})` : "ElevenLabs TTS probe OK",
+      };
     })
   );
 

@@ -22,8 +22,8 @@ export async function GET() {
       fallbackActive: !elevenHealth.valid,
       routes: ["/api/tts", "/api/voice", "/api/video/voice"],
     },
-    blockers: elevenHealth.status === 401
-      ? ["ELEVENLABS_API_KEY invalid (401) — regenerate at elevenlabs.io; OpenAI TTS or text-only active"]
+    blockers: !elevenHealth.valid
+      ? [`ElevenLabs TTS probe: HTTP ${elevenHealth.status} — ${elevenHealth.detail ?? "fallback active"}`]
       : [],
     generatedAt: new Date().toISOString(),
   });
