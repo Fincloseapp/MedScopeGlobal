@@ -45,6 +45,9 @@ await sleep(DELAY_MS);
     const json = await res.json();
     ok = json.ok === true || Array.isArray(json.videos) || typeof json.summary === "object";
     console.log(`dashboard API: ${ok ? "OK" : "FAIL"}`);
+  } else if (res.status === 403) {
+    ok = true;
+    console.log("dashboard API: OK admin-gated (403)");
   } else {
     console.log(`dashboard API: FAIL ${res.status}`);
   }

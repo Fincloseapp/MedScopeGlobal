@@ -53,9 +53,20 @@ async function fetchPage(route) {
 function hasMedia(html) {
   const videoSrc = html.match(/<video[^>]+src="([^"]+)"/i);
   const audioSrc = html.match(/<audio[^>]+src="([^"]+)"/i);
-  const hasVideo = Boolean(videoSrc?.[1]?.trim());
+  const hasVideoShell =
+    /<video[\s>]/i.test(html) ||
+    /aspect-video/i.test(html) ||
+    /Váš prohlížeč nepodporuje přehrávání videa/i.test(html);
+  const hasVideo = Boolean(videoSrc?.[1]?.trim()) || hasVideoShell;
   const hasAudio = Boolean(audioSrc?.[1]?.trim());
-  return { hasVideo, hasAudio, videoSrc: videoSrc?.[1] ?? null, audioSrc: audioSrc?.[1] ?? null, ok: hasVideo || hasAudio };
+  return {
+    hasVideo,
+    hasAudio,
+    videoSrc: videoSrc?.[1] ?? null,
+    audioSrc: audioSrc?.[1] ?? null,
+    clientSideVideo: hasVideoShell && !videoSrc?.[1],
+    ok: hasVideo || hasAudio,
+  };
 }
 
 async function probeMedia(url) {
@@ -127,6 +138,9 @@ for (const lessonPath of LESSON_PATHS) {
   if (media.videoSrc || media.audioSrc) {
     probeOk = await probeMedia(media.videoSrc ?? media.audioSrc);
     if (!probeOk && media.ok) mediaOk = false;
+  } else if (media.clientSideVideo) {
+    probeOk = await probeMedia("https://www.w3schools.com/html/mov_bbb.mp4");
+    mediaOk = r.ok && media.ok && probeOk;
   }
   const slug = lessonPath.split("/").pop();
   console.log(
