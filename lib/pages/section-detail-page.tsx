@@ -17,8 +17,6 @@ import { normalizeLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { cookies } from "next/headers";
 
-export const sectionDetailRevalidate = 120;
-
 type SectionDetailProps = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ format?: string }>;
