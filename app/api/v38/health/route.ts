@@ -60,7 +60,8 @@ export async function GET() {
   return NextResponse.json({
     status: "ok",
     ok: true,
-    version: V40_UI_VERSION,
+    version: V38_UI_VERSION,
+    siteVersion: V40_UI_VERSION,
     composite: V40_COMPOSITE_LABEL,
     buildStamp: V38_UI_BUILD_STAMP,
     subsystems: {
