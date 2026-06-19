@@ -35,7 +35,7 @@ export async function speak(text: string, voice = "alloy"): Promise<void> {
   activeObjectUrl = url;
 
   const audio = new Audio(url);
-  audio.playsInline = true;
+  audio.setAttribute("playsinline", "");
   audio.preload = "auto";
   activeAudio = audio;
 
