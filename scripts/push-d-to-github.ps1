@@ -70,6 +70,8 @@ if ($LASTEXITCODE -ge 8) { throw "robocopy failed exit $LASTEXITCODE" }
 # Remove stale paths no longer in D: (robocopy /E does not delete extras in clone)
 $stalePaths = @(
   "lib\v25\tests\run-suite.mjs",
+  "lib\v40\ai\voice-elevenlabs.ts",
+  "scripts\validate-elevenlabs.mjs",
   "_coord-audit.mjs",
   "_coord-links.cjs",
   "_coord-links.mjs"

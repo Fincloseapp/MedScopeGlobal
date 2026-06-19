@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { PlayCircle } from "lucide-react";
 import { AcademyPageHeader } from "@/components/academy/page-header";
 import { AiLecturerPanel } from "@/components/academy/ai-lecturer-panel";
+import { TtsListenButton } from "@/components/tts/tts-listen-button";
 import { LessonMetadataBlock } from "@/components/academy/lesson-metadata-block";
 import { LessonVideoWithConversion } from "@/components/v38/lesson-video-with-conversion";
 import { getReaderContext } from "@/lib/auth/reader-context";
@@ -152,6 +153,9 @@ export default async function AcademyLessonPage({ params }: Props) {
               )}
             />
             <article className="prose prose-slate max-w-none space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="not-prose mb-4 flex flex-wrap items-center gap-3">
+                <TtsListenButton text={lesson.content} label="Poslechnout lekci" />
+              </div>
               {renderContent(lesson.content)}
             </article>
           </div>

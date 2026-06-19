@@ -1,4 +1,4 @@
-/** MedScope v41 — TTS engine repair, ElevenLabs validation, streaming routes */
+/** MedScope v41 — OpenAI TTS engine, streaming routes */
 
 import {
   getSiteVersionLabel as getV42SiteVersionLabel,

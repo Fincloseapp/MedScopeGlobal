@@ -20,6 +20,11 @@ export function buildV20PageMetadata(opts: {
       siteName: "MedScopeGlobal",
       type: "website",
     },
+    twitter: {
+      card: "summary_large_image",
+      title: opts.title,
+      description: opts.description.slice(0, 160),
+    },
     other: { "medscope-ui-version": V20_UI_VERSION },
   };
 }

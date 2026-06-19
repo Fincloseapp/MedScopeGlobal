@@ -4,7 +4,7 @@ import { localDataPath } from "@/lib/config/paths";
 import { V33_FALLBACK_MP4_URL } from "@/lib/v33/version";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import type { VideoScriptOutput } from "@/lib/v40/ai/script-generator";
-import type { VoiceResult } from "@/lib/v40/ai/voice-elevenlabs";
+import type { VoiceResult } from "@/lib/v40/ai/voice-openai";
 import type { DidAvatarResult } from "@/lib/v40/ai/avatar-did";
 
 export type ComposeInput = {
@@ -177,3 +177,5 @@ export async function uploadComposedMp4(buffer: Buffer, title: string): Promise<
   const { data } = admin.storage.from(BUCKET).getPublicUrl(storagePath);
   return { publicUrl: data.publicUrl, storagePath };
 }
+
+export { generateVideoWithAudio, isFfmpegAvailable } from "@/lib/v40/video/ffmpeg-merge";

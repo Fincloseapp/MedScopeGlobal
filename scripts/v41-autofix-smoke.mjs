@@ -77,22 +77,27 @@ for (const f of requiredFiles) {
   }));
 }
 
-// ElevenLabs key validation (TTS probe — not /v1/user)
-await check("elevenlabs-tts-probe", async () => {
-  const key = env.ELEVENLABS_API_KEY;
+// OpenAI TTS probe (gpt-4o-mini-tts)
+await check("openai-tts-probe", async () => {
+  const key = env.OPENAI_API_KEY;
   if (!key) return { ok: true, detail: "not configured (skip)" };
-  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM`, {
+  const res = await fetch("https://api.openai.com/v1/audio/speech", {
     method: "POST",
-    headers: { "xi-api-key": key, "Content-Type": "application/json", Accept: "audio/mpeg" },
-    body: JSON.stringify({ text: ".", model_id: "eleven_multilingual_v2" }),
+    headers: {
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini-tts",
+      input: ".",
+      voice: "alloy",
+      response_format: "mp3",
+    }),
     signal: AbortSignal.timeout(15000),
   });
-  const text = await res.text().catch(() => "");
-  const valid = res.ok || res.status === 429 || res.status === 402 ||
-    (res.status === 401 && !/invalid_api_key/i.test(text));
   return {
-    ok: valid || res.status === 401,
-    detail: `TTS probe HTTP ${res.status}${text.includes("missing_permissions") ? " (user_read N/A — OK)" : ""}`,
+    ok: res.ok || res.status === 429,
+    detail: `OpenAI TTS probe HTTP ${res.status}`,
   };
 });
 
@@ -118,12 +123,18 @@ for (const route of healthRoutes) {
   });
 }
 
-// TTS route (text-only mode acceptable)
+// TTS route (POST mp3)
 await check("api/tts", async () => {
-  const { status, json } = await fetchJson("/api/tts?text=MedScope+test&stream=false");
+  const res = await fetch(`${target}/api/tts`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: "MedScope test" }),
+    signal: AbortSignal.timeout(30000),
+  });
+  const ct = res.headers.get("content-type") ?? "";
   return {
-    ok: status === 200 && json?.provider,
-    detail: `provider=${json?.provider ?? "?"} HTTP ${status}`,
+    ok: res.status === 200 && ct.includes("audio"),
+    detail: `HTTP ${res.status} content-type=${ct}`,
   };
 });
 

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleBody } from "@/components/article/article-body";
+import { ArticleTtsButton } from "@/components/article/article-tts-button";
 import { V19ArticleBody } from "@/components/v19/v19-article-body";
 import { V19ArticleJsonLd } from "@/components/v19/v19-article-jsonld";
 import { V19_RUBRIC_SLUG } from "@/lib/v19/dedup";
@@ -344,12 +345,20 @@ export default async function ArticlePage({ params }: Props) {
                   }}
                 />
               ) : (
-                <ArticleBody
-                  html={article.content}
-                  locked={locked}
-                  title={article.title}
-                  gateCopy={articleGateCopy ?? undefined}
-                />
+                <>
+                  {!locked ? (
+                    <ArticleTtsButton
+                      title={article.title}
+                      excerpt={article.excerpt ?? article.content.replace(/<[^>]+>/g, " ").slice(0, 2000)}
+                    />
+                  ) : null}
+                  <ArticleBody
+                    html={article.content}
+                    locked={locked}
+                    title={article.title}
+                    gateCopy={articleGateCopy ?? undefined}
+                  />
+                </>
               )}
             </div>
 

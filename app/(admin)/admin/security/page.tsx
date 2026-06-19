@@ -52,12 +52,8 @@ export default async function AdminSecurityLogsPage() {
       <div className="rounded-lg border p-4 text-sm">
         <p className="font-medium mb-2">v42 Key Rotation Note</p>
         <p className="text-muted-foreground">
-          ElevenLabs API keys must be regenerated manually at{" "}
-          <a href="https://elevenlabs.io" className="underline" target="_blank" rel="noreferrer">
-            elevenlabs.io
-          </a>
-          . No public API exists for auto-creation. Monitor:{" "}
-          <code className="text-xs">/api/v42/health</code>
+          Rotate <code className="text-xs">OPENAI_API_KEY</code> via the OpenAI dashboard when the v42 monitor
+          warns. Monitor: <code className="text-xs">/api/v42/health</code>
         </p>
       </div>
 

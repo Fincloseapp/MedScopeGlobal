@@ -83,6 +83,8 @@ export function OsvetaVideoPlayer({
                 ref={mediaRef as React.RefObject<HTMLAudioElement>}
                 src={mediaUrl}
                 controls
+                playsInline
+                preload="metadata"
                 className="mt-4 w-full"
                 onTimeUpdate={onTimeUpdate}
                 onEnded={awardWatch}
@@ -95,6 +97,8 @@ export function OsvetaVideoPlayer({
             src={mediaUrl}
             poster={video.thumbnail_url ?? avatar.imageUrl}
             controls
+            playsInline
+            preload="metadata"
             className="aspect-video w-full"
             onTimeUpdate={onTimeUpdate}
             onEnded={awardWatch}

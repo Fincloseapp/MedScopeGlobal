@@ -1,31 +1,38 @@
 import { isOpenAiTtsConfigured } from "@/lib/academy/ai/video-providers/openai-tts-video";
-import {
-  generateVoice,
-  isElevenLabsConfigured,
-  validateElevenLabsKey,
-  type ElevenLabsValidation,
-} from "@/lib/v40/ai/voice-elevenlabs";
+import { generateVoice } from "@/lib/v40/ai/voice-openai";
+import { resolveOpenAiKey } from "@/lib/ai/openai-key";
 
 export type TtsRequest = {
   text: string;
   title?: string;
   stream?: boolean;
+  voice?: string;
 };
 
 export type TtsResult = {
   ok: boolean;
-  provider: "elevenlabs" | "openai_tts" | "text_only" | "none";
+  provider: "openai_tts" | "text_only" | "none";
   audioUrl?: string;
   text?: string;
   message?: string;
-  elevenlabsValid?: boolean;
+  openaiConfigured?: boolean;
 };
 
+const PROD_ORIGIN = "https://medscopeglobal.com";
+
+function resolveCorsOrigin(): string {
+  const site = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (process.env.NODE_ENV === "production") {
+    return site && site.includes("medscopeglobal.com") ? site.replace(/\/$/, "") : PROD_ORIGIN;
+  }
+  return site?.replace(/\/$/, "") || "*";
+}
+
 export const TTS_CORS_HEADERS: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": resolveCorsOrigin(),
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
-  "Cache-Control": "no-store, no-cache, must-revalidate",
+  "Cache-Control": "public, max-age=3600",
   "X-Content-Type-Options": "nosniff",
 };
 
@@ -33,46 +40,53 @@ export function ttsResponseHeaders(contentType = "application/json"): Record<str
   return { ...TTS_CORS_HEADERS, "Content-Type": contentType };
 }
 
-/** Validate ElevenLabs via TTS probe (not /v1/user — no user_read required) */
-export async function checkElevenLabsHealth(): Promise<{ valid: boolean; status: number; detail?: string }> {
-  const r = await validateElevenLabsKey();
-  return { valid: r.valid, status: r.status, detail: r.detail };
+export async function checkOpenAiTtsHealth(): Promise<{ valid: boolean; status: number; detail?: string }> {
+  const apiKey = resolveOpenAiKey();
+  if (!apiKey) {
+    return { valid: false, status: 0, detail: "OPENAI_API_KEY not set" };
+  }
+
+  try {
+    const res = await fetch("https://api.openai.com/v1/audio/speech", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: process.env.OPENAI_TTS_MODEL?.trim() || "gpt-4o-mini-tts",
+        input: ".",
+        voice: process.env.OPENAI_TTS_VOICE?.trim() || "alloy",
+        response_format: "mp3",
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+
+    if (res.ok) {
+      await res.arrayBuffer().catch(() => null);
+      return { valid: true, status: res.status };
+    }
+
+    if (res.status === 429) {
+      return { valid: true, status: res.status, detail: "rate_limited" };
+    }
+
+    const errText = await res.text().catch(() => "");
+    return { valid: false, status: res.status, detail: errText.slice(0, 200) };
+  } catch (e) {
+    return {
+      valid: false,
+      status: 0,
+      detail: e instanceof Error ? e.message : "probe failed",
+    };
+  }
 }
 
-/** Stream ElevenLabs audio directly (returns Response body stream or null) */
-export async function streamElevenLabsAudio(text: string): Promise<Response | null> {
-  const apiKey = process.env.ELEVENLABS_API_KEY?.trim();
-  if (!apiKey) return null;
-
-  const voiceId = process.env.ELEVENLABS_VOICE_ID?.trim() || "21m00Tcm4TlvDq8ikWAM";
-  const modelId = process.env.ELEVENLABS_MODEL_ID?.trim() || "eleven_multilingual_v2";
-
-  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream`, {
-    method: "POST",
-    headers: {
-      "xi-api-key": apiKey,
-      "Content-Type": "application/json",
-      Accept: "audio/mpeg",
-    },
-    body: JSON.stringify({
-      text: text.slice(0, 5000),
-      model_id: modelId,
-      voice_settings: { stability: 0.5, similarity_boost: 0.75 },
-    }),
-    signal: AbortSignal.timeout(120_000),
-  });
-
-  if (!res.ok || !res.body) return null;
-  return res;
-}
-
-/** OpenAI TTS streaming fallback */
-export async function streamOpenAiAudio(text: string): Promise<Response | null> {
-  const { resolveOpenAiKey } = await import("@/lib/ai/openai-key");
+/** Stream OpenAI TTS audio (gpt-4o-mini-tts) */
+export async function streamOpenAiAudio(text: string, voice?: string): Promise<Response | null> {
   const apiKey = resolveOpenAiKey();
   if (!apiKey) return null;
 
-  const voice = process.env.OPENAI_TTS_VOICE?.trim() || "nova";
   const res = await fetch("https://api.openai.com/v1/audio/speech", {
     method: "POST",
     headers: {
@@ -80,9 +94,9 @@ export async function streamOpenAiAudio(text: string): Promise<Response | null> 
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "tts-1",
+      model: process.env.OPENAI_TTS_MODEL?.trim() || "gpt-4o-mini-tts",
       input: text.slice(0, 4096),
-      voice,
+      voice: voice ?? (process.env.OPENAI_TTS_VOICE?.trim() || "alloy"),
       response_format: "mp3",
     }),
     signal: AbortSignal.timeout(120_000),
@@ -92,43 +106,32 @@ export async function streamOpenAiAudio(text: string): Promise<Response | null> 
   return res;
 }
 
-/** Full fallback chain: ElevenLabs stream → OpenAI stream → text-only JSON */
 export async function synthesizeTts(input: TtsRequest): Promise<TtsResult> {
   const text = input.text?.trim();
   if (!text) return { ok: false, provider: "none", message: "text required" };
 
-  const elevenHealth: ElevenLabsValidation = isElevenLabsConfigured()
-    ? await validateElevenLabsKey()
-    : { valid: false, status: 0, method: "none", detail: "not configured" };
-
-  if (elevenHealth.valid) {
-    return { ok: true, provider: "elevenlabs", message: "ElevenLabs available", elevenlabsValid: true };
-  }
-
   if (isOpenAiTtsConfigured()) {
-    return { ok: true, provider: "openai_tts", message: "OpenAI TTS fallback available", elevenlabsValid: false };
+    return { ok: true, provider: "openai_tts", message: "OpenAI TTS available", openaiConfigured: true };
   }
 
   return {
     ok: true,
     provider: "text_only",
     text,
-    message: !elevenHealth.valid
-      ? `ElevenLabs unavailable (${elevenHealth.detail ?? elevenHealth.status}) — text-only mode`
-      : "No TTS provider — text-only mode",
-    elevenlabsValid: elevenHealth.valid,
+    message: "No TTS provider — text-only mode",
+    openaiConfigured: false,
   };
 }
 
-/** Non-streaming voice generation for video pipeline reuse */
 export async function generateTtsForVideo(text: string, title: string) {
   return generateVoice({ script: text, title });
 }
 
 export function getTtsEngineStatus() {
   return {
-    elevenlabsConfigured: isElevenLabsConfigured(),
     openaiTtsConfigured: isOpenAiTtsConfigured(),
-    fallbackChain: ["elevenlabs", "openai_tts", "text_only"],
+    model: process.env.OPENAI_TTS_MODEL?.trim() || "gpt-4o-mini-tts",
+    voice: process.env.OPENAI_TTS_VOICE?.trim() || "alloy",
+    fallbackChain: ["openai_tts", "text_only"],
   };
 }

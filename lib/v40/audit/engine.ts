@@ -2,7 +2,7 @@ import { generateTextFromLlm, isLlmConfigured } from "@/lib/ai/chat-json";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { countPublishedCourses, countVideoLessons } from "@/lib/academy/db";
 import { V33_FALLBACK_MP4_URL } from "@/lib/v33/version";
-import { isElevenLabsConfigured } from "@/lib/v40/ai/voice-elevenlabs";
+import { isOpenAiTtsConfigured } from "@/lib/academy/ai/video-providers/openai-tts-video";
 import { isDidConfigured } from "@/lib/v40/ai/avatar-did";
 
 export type AuditReport = {
@@ -17,7 +17,7 @@ export type AuditReport = {
   playback: { fallback_url_ok: boolean; fallback_url: string };
   engines: {
     llm: boolean;
-    elevenlabs: boolean;
+    openai_tts: boolean;
     did: boolean;
     v40_jobs: number;
   };
@@ -109,7 +109,7 @@ export async function generateAuditReport(): Promise<AuditReport> {
     playback: { fallback_url_ok: fallbackOk, fallback_url: V33_FALLBACK_MP4_URL },
     engines: {
       llm: isLlmConfigured(),
-      elevenlabs: isElevenLabsConfigured(),
+      openai_tts: isOpenAiTtsConfigured(),
       did: isDidConfigured(),
       v40_jobs: v40Jobs,
     },

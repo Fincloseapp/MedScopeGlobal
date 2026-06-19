@@ -1,6 +1,6 @@
 import { createServiceRoleClient } from "@/lib/supabase/service";
-import { validateElevenLabsKey, isElevenLabsConfigured } from "@/lib/v40/ai/voice-elevenlabs";
 import { isOpenAiTtsConfigured } from "@/lib/academy/ai/video-providers/openai-tts-video";
+import { checkOpenAiTtsHealth } from "@/lib/v41/ai/tts-engine";
 import { V33_FALLBACK_MP4_URL } from "@/lib/v33/version";
 import { V46_LAST_STABLE_SHA } from "@/lib/v46/version";
 
@@ -70,31 +70,25 @@ export async function runHealthMonitor(): Promise<HealthReport> {
   );
 
   checks.push(
-    await timedCheck("tts_elevenlabs", async () => {
-      if (!isElevenLabsConfigured()) {
-        return { subsystem: "tts_elevenlabs", status: "degraded", message: "ELEVENLABS_API_KEY not set" };
+    await timedCheck("tts_openai", async () => {
+      if (!isOpenAiTtsConfigured()) {
+        return { subsystem: "tts_openai", status: "degraded", message: "OPENAI_API_KEY not set" };
       }
-      const { valid, status, detail } = await validateElevenLabsKey();
+      const { valid, status, detail } = await checkOpenAiTtsHealth();
       if (!valid) {
         return {
-          subsystem: "tts_elevenlabs",
+          subsystem: "tts_openai",
           status: status === 401 || status === 403 ? "critical" : "degraded",
-          message: `ElevenLabs TTS probe failed (HTTP ${status}): ${detail ?? "check key"}`,
+          message: `OpenAI TTS probe failed (HTTP ${status}): ${detail ?? "check key"}`,
         };
       }
       return {
-        subsystem: "tts_elevenlabs",
-        status: detail?.includes("restricted") || detail?.includes("quota") ? "degraded" : "ok",
-        message: detail ? `ElevenLabs OK (${detail})` : "ElevenLabs TTS probe OK",
+        subsystem: "tts_openai",
+        status: detail?.includes("rate_limited") ? "degraded" : "ok",
+        message: detail ? `OpenAI TTS OK (${detail})` : "OpenAI TTS probe OK (gpt-4o-mini-tts)",
       };
     })
   );
-
-  checks.push({
-    subsystem: "tts_openai",
-    status: isOpenAiTtsConfigured() ? "ok" : "degraded",
-    message: isOpenAiTtsConfigured() ? "OpenAI TTS fallback available" : "OpenAI TTS not configured",
-  });
 
   checks.push(
     await timedCheck("video_fallback", async () => {
@@ -127,8 +121,8 @@ export async function runHealthMonitor(): Promise<HealthReport> {
     critical > 0 ? "critical" : degraded > 0 ? "degraded" : "ok";
 
   const auto_heal: string[] = [];
-  if (checks.some((c) => c.subsystem === "tts_elevenlabs" && c.status === "critical")) {
-    auto_heal.push("TTS: ElevenLabs invalid — using OpenAI TTS or text-only fallback (no auto key regen)");
+  if (checks.some((c) => c.subsystem === "tts_openai" && c.status === "critical")) {
+    auto_heal.push("TTS: OpenAI invalid — verify OPENAI_API_KEY on Vercel");
   }
   if (degraded > 0) {
     auto_heal.push(`Logged ${degraded} degraded subsystem(s) for review`);

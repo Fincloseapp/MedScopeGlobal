@@ -203,3 +203,46 @@ export function breadcrumbJsonLd(items: { name: string; href?: string }[]) {
     })),
   };
 }
+
+export function courseJsonLd(course: {
+  title: string;
+  slug: string;
+  description?: string | null;
+  lessonCount?: number;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: course.title,
+    description: course.description ?? course.title,
+    url: `${SITE.url}/academy/courses/${course.slug}`,
+    provider: organizationJsonLd(),
+    inLanguage: "cs-CZ",
+    hasCourseInstance: {
+      "@type": "CourseInstance",
+      courseMode: "online",
+      courseWorkload: course.lessonCount ? `PT${course.lessonCount}H` : undefined,
+    },
+  };
+}
+
+export function videoObjectJsonLd(video: {
+  title: string;
+  description?: string | null;
+  url: string;
+  thumbnailUrl?: string | null;
+  durationSeconds?: number;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: video.title,
+    description: video.description ?? video.title,
+    contentUrl: video.url,
+    thumbnailUrl: video.thumbnailUrl ?? `${SITE.url}/og-default.png`,
+    duration: video.durationSeconds ? `PT${Math.max(1, video.durationSeconds)}S` : undefined,
+    uploadDate: new Date().toISOString(),
+    inLanguage: "cs-CZ",
+    publisher: organizationJsonLd(),
+  };
+}

@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { generateVideoScript } from "@/lib/v40/ai/script-generator";
-import { generateVoice, isElevenLabsConfigured } from "@/lib/v40/ai/voice-elevenlabs";
+import { generateVoice } from "@/lib/v40/ai/voice-openai";
+import { isOpenAiTtsConfigured } from "@/lib/academy/ai/video-providers/openai-tts-video";
 import { generateDidAvatar, isDidConfigured, pollDidTalk } from "@/lib/v40/ai/avatar-did";
 import { composeVideo } from "@/lib/v40/video/composer";
 import { createServiceRoleClient } from "@/lib/supabase/service";
@@ -78,7 +79,7 @@ export async function runVideoPipeline(input: VideoGenerateInput): Promise<Video
         script_provider: scriptProvider,
         script_fallback: fallback,
         voice_provider: voice.voice_provider,
-        elevenlabs: isElevenLabsConfigured(),
+        openai_tts: isOpenAiTtsConfigured(),
         did: isDidConfigured(),
       },
       updated_at: new Date().toISOString(),

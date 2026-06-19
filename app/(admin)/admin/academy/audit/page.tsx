@@ -48,7 +48,7 @@ export default async function AdminAcademyAuditPage() {
           </CardHeader>
           <CardContent className="text-xs space-y-1">
             <p>LLM: {report.engines.llm ? "✓" : "✗"}</p>
-            <p>ElevenLabs: {report.engines.elevenlabs ? "✓" : "✗"}</p>
+            <p>OpenAI TTS: {report.engines.openai_tts ? "✓" : "✗"}</p>
             <p>D-ID: {report.engines.did ? "✓" : "✗"}</p>
           </CardContent>
         </Card>

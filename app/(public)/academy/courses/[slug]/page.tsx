@@ -5,6 +5,7 @@ import { PlayCircle } from "lucide-react";
 import { AcademyPageHeader } from "@/components/academy/page-header";
 import { getCourseBySlug } from "@/lib/academy/db";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { TtsListenButton } from "@/components/tts/tts-listen-button";
 
 export const revalidate = 120;
 
@@ -59,6 +60,15 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
             <PlayCircle className="h-3.5 w-3.5" />
             Videokurz · {course.video_lesson_count} video lekcí
           </p>
+        ) : null}
+
+        {(course.summary ?? course.description) ? (
+          <div className="mb-6">
+            <TtsListenButton
+              text={[course.title, course.summary ?? course.description].filter(Boolean).join(". ")}
+              label="Poslechnout úvod kurzu"
+            />
+          </div>
         ) : null}
 
         {course.lessons.length > 0 ? (
