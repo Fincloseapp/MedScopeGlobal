@@ -22,8 +22,9 @@ type VideoMeta = {
   avatar_type?: string;
   lesson_format?: string;
   tts_audio_url?: string;
-  avatar_image_url?: string;
-};
+  slideshow_manifest_url?: string;
+  voiceover_text?: string;
+  video_mode?: string;
 
 const GTV_HOST = "storage.googleapis.com/gtv-videos-bucket";
 
@@ -37,25 +38,53 @@ function isUnreliableVideoUrl(url: string | null | undefined): boolean {
 }
 
 /** Build playback URL chain: reliable sources first, w3schools fallback last */
+function toStreamProxy(rawUrl: string): string {
+  if (!rawUrl) return rawUrl;
+  if (rawUrl.startsWith("/api/video/stream")) return rawUrl;
+  if (rawUrl.startsWith("/")) return rawUrl;
+  try {
+    const parsed = new URL(rawUrl);
+    if (parsed.origin === (typeof window !== "undefined" ? window.location.origin : "")) {
+      return rawUrl;
+    }
+    return `/api/video/stream?url=${encodeURIComponent(rawUrl)}`;
+  } catch {
+    return rawUrl;
+  }
+}
+
 function buildVideoUrlChain(meta: VideoMeta): string[] {
   if (meta.lesson_format === "audio_lesson") return [];
   if (Array.isArray(meta.url_chain) && meta.url_chain.length) {
-    const chain = meta.url_chain.filter(Boolean);
-    if (chain.length && !chain.includes(V33_FALLBACK_MP4_URL)) chain.push(V33_FALLBACK_MP4_URL);
-    return chain.slice(0, 4);
+    const chain = meta.url_chain.filter(Boolean).map(toStreamProxy);
+    if (chain.length && !chain.some((u) => u.includes("mov_bbb.mp4"))) {
+      chain.push(toStreamProxy(V33_FALLBACK_MP4_URL));
+    }
+    return chain.slice(0, 5);
   }
   const chain: string[] = [];
   const push = (u: string | null | undefined) => {
-    if (u && !chain.includes(u)) chain.push(u);
+    if (!u) return;
+    const proxied = toStreamProxy(u);
+    if (!chain.includes(proxied)) chain.push(proxied);
   };
   push(meta.mp4_url);
   push(meta.public_url);
   push(meta.hls_url);
-  if (!chain.length || chain.every(isUnreliableVideoUrl)) return [V33_FALLBACK_MP4_URL];
-  const reliable = chain.filter((u) => !isUnreliableVideoUrl(u));
-  if (!reliable.length) return [V33_FALLBACK_MP4_URL, ...chain];
-  if (!reliable.includes(V33_FALLBACK_MP4_URL)) reliable.push(V33_FALLBACK_MP4_URL);
-  return reliable.slice(0, 4);
+  if (!chain.length || chain.every((u) => isUnreliableVideoUrl(u.replace(/^\/api\/video\/stream\?url=/, "")))) {
+    return [toStreamProxy(V33_FALLBACK_MP4_URL)];
+  }
+  const reliable = chain.filter((u) => {
+    const raw = u.startsWith("/api/video/stream?url=")
+      ? decodeURIComponent(u.split("url=")[1] ?? "")
+      : u;
+    return !isUnreliableVideoUrl(raw);
+  });
+  if (!reliable.length) return [toStreamProxy(V33_FALLBACK_MP4_URL), ...chain];
+  if (!reliable.some((u) => u.includes("mov_bbb.mp4"))) {
+    reliable.push(toStreamProxy(V33_FALLBACK_MP4_URL));
+  }
+  return reliable.slice(0, 5);
 }
 
 function resolveAudioUrl(meta: VideoMeta): string | null {

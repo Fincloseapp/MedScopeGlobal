@@ -1,6 +1,6 @@
 import { createServiceRoleClient } from "@/lib/supabase/service";
-import { isOpenAiTtsConfigured } from "@/lib/academy/ai/video-providers/openai-tts-video";
-import { checkOpenAiTtsHealth } from "@/lib/v41/ai/tts-engine";
+import { checkTtsHealth } from "@/lib/v41/ai/tts-engine";
+import { isGroqConfigured } from "@/lib/ai/groq-client";
 import { V33_FALLBACK_MP4_URL } from "@/lib/v33/version";
 import { V46_LAST_STABLE_SHA } from "@/lib/v46/version";
 
@@ -70,23 +70,22 @@ export async function runHealthMonitor(): Promise<HealthReport> {
   );
 
   checks.push(
-    await timedCheck("tts_openai", async () => {
-      if (!isOpenAiTtsConfigured()) {
-        return { subsystem: "tts_openai", status: "degraded", message: "OPENAI_API_KEY not set" };
-      }
-      const { valid, status, detail } = await checkOpenAiTtsHealth();
-      if (!valid) {
-        return {
-          subsystem: "tts_openai",
-          status: status === 401 || status === 403 ? "critical" : "degraded",
-          message: `OpenAI TTS probe failed (HTTP ${status}): ${detail ?? "check key"}`,
-        };
-      }
+    await timedCheck("tts_web_speech", async () => {
+      const health = await checkTtsHealth();
       return {
-        subsystem: "tts_openai",
-        status: detail?.includes("rate_limited") ? "degraded" : "ok",
-        message: detail ? `OpenAI TTS OK (${detail})` : "OpenAI TTS probe OK (gpt-4o-mini-tts)",
+        subsystem: "tts_web_speech",
+        status: health.valid ? "ok" : "degraded",
+        message: health.detail ?? "Web Speech API (free, client-side)",
       };
+    })
+  );
+
+  checks.push(
+    await timedCheck("groq_llm", async () => {
+      if (!isGroqConfigured()) {
+        return { subsystem: "groq_llm", status: "degraded", message: "GROQ_API_KEY not set" };
+      }
+      return { subsystem: "groq_llm", status: "ok", message: "GROQ configured" };
     })
   );
 
@@ -121,8 +120,8 @@ export async function runHealthMonitor(): Promise<HealthReport> {
     critical > 0 ? "critical" : degraded > 0 ? "degraded" : "ok";
 
   const auto_heal: string[] = [];
-  if (checks.some((c) => c.subsystem === "tts_openai" && c.status === "critical")) {
-    auto_heal.push("TTS: OpenAI invalid — verify OPENAI_API_KEY on Vercel");
+  if (checks.some((c) => c.subsystem === "groq_llm" && c.status === "degraded")) {
+    auto_heal.push("LLM: set GROQ_API_KEY on Vercel");
   }
   if (degraded > 0) {
     auto_heal.push(`Logged ${degraded} degraded subsystem(s) for review`);

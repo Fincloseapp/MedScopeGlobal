@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { resolveOpenAiKey } from "@/lib/ai/openai-key";
-import { ttsResponseHeaders } from "@/lib/v41/ai/tts-engine";
+import { synthesizeTts, ttsResponseHeaders } from "@/lib/v41/ai/tts-engine";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
@@ -14,9 +13,9 @@ function sanitizeText(raw: unknown): string | null {
 }
 
 function sanitizeVoice(raw: unknown): string {
-  if (typeof raw !== "string") return "alloy";
+  if (typeof raw !== "string") return "cs-CZ";
   const voice = raw.trim().slice(0, 32);
-  return /^[a-z0-9_-]+$/i.test(voice) ? voice : "alloy";
+  return voice.length > 0 ? voice : "cs-CZ";
 }
 
 export async function OPTIONS() {
@@ -25,19 +24,19 @@ export async function OPTIONS() {
 
 export async function GET() {
   return NextResponse.json(
-    { error: "Method not allowed — use POST with JSON body { text, voice? }" },
-    { status: 405, headers: ttsResponseHeaders() }
+    {
+      ok: true,
+      provider: "web_speech_api",
+      mode: "browser",
+      message: "POST { text } — returns browser TTS instructions (no server audio)",
+    },
+    { headers: ttsResponseHeaders() }
   );
 }
 
 export async function POST(req: Request) {
   try {
-    const apiKey = resolveOpenAiKey();
-    if (!apiKey) {
-      return NextResponse.json({ error: "TTS failed" }, { status: 500, headers: ttsResponseHeaders() });
-    }
-
-    let body: { text?: unknown; voice?: unknown } = {};
+    let body: { text?: unknown; voice?: unknown; lang?: unknown } = {};
     try {
       body = await req.json();
     } catch {
@@ -49,38 +48,36 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing text" }, { status: 400, headers: ttsResponseHeaders() });
     }
 
-    const voice = sanitizeVoice(body.voice ?? "alloy");
+    const lang = typeof body.lang === "string" ? body.lang.trim().slice(0, 16) : sanitizeVoice(body.voice);
+    const result = await synthesizeTts({ text, voice: lang });
 
-    const response = await fetch("https://api.openai.com/v1/audio/speech", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini-tts",
-        voice,
-        input: text,
-        response_format: "mp3",
-      }),
-      signal: AbortSignal.timeout(120_000),
-    });
-
-    if (!response.ok) {
-      return NextResponse.json({ error: "TTS failed" }, { status: 500, headers: ttsResponseHeaders() });
+    if (result.provider === "edge_tts" && result.audioUrl) {
+      const upstream = await fetch(result.audioUrl, { signal: AbortSignal.timeout(60_000) });
+      if (upstream.ok) {
+        const buffer = Buffer.from(await upstream.arrayBuffer());
+        return new NextResponse(buffer, {
+          status: 200,
+          headers: {
+            ...ttsResponseHeaders("audio/mpeg"),
+            "Content-Type": upstream.headers.get("content-type") ?? "audio/mpeg",
+            "Content-Length": buffer.length.toString(),
+            "Cache-Control": "public, max-age=3600",
+          },
+        });
+      }
     }
 
-    const buffer = Buffer.from(await response.arrayBuffer());
-
-    return new NextResponse(buffer, {
-      status: 200,
-      headers: {
-        ...ttsResponseHeaders("audio/mpeg"),
-        "Content-Type": "audio/mpeg",
-        "Content-Length": buffer.length.toString(),
-        "Cache-Control": "public, max-age=3600",
+    return NextResponse.json(
+      {
+        ok: true,
+        mode: "browser",
+        provider: result.provider,
+        text,
+        lang,
+        message: result.message ?? "Use Web Speech API on client",
       },
-    });
+      { status: 200, headers: ttsResponseHeaders() }
+    );
   } catch {
     return NextResponse.json({ error: "TTS failed" }, { status: 500, headers: ttsResponseHeaders() });
   }

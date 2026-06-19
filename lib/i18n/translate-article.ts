@@ -1,4 +1,5 @@
-import { isAiConfigured, resolveOpenAiKey } from "@/lib/ingestion/ai";
+import { isAiConfigured } from "@/lib/ingestion/ai";
+import { generateJsonFromLlm } from "@/lib/ai/chat-json";
 import {
   matchesArticleLocale,
   primaryArticleLocale,
@@ -85,10 +86,6 @@ export async function translateArticleFields(input: {
     return null;
   }
 
-  const model = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
-  const key = resolveOpenAiKey();
-  if (!key) return null;
-
   const body =
     input.mode === "card"
       ? `Translate to ${target} (medical journalism, accurate terminology). Return JSON: {"title":"...","excerpt":"..."}
@@ -100,40 +97,19 @@ Excerpt: ${input.excerpt ?? ""}
 Content HTML: ${(input.content ?? "").slice(0, 12000)}`;
 
   try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.2,
-        response_format: { type: "json_object" },
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a medical translator. Output valid JSON only. Do not invent clinical facts.",
-          },
-          { role: "user", content: body },
-        ],
-      }),
-      signal: AbortSignal.timeout(90_000),
+    const raw = await generateJsonFromLlm({
+      system: "You are a medical translator. Output valid JSON only. Do not invent clinical facts.",
+      user: body,
+      temperature: 0.2,
+      maxTokens: 4096,
     });
-
-    if (!res.ok) return null;
-    const json = (await res.json()) as {
-      choices?: { message?: { content?: string } }[];
-    };
-    const raw = json.choices?.[0]?.message?.content;
     if (!raw) return null;
     const parsed = JSON.parse(raw) as TranslatedFields;
     return {
       title: parsed.title?.slice(0, 300) ?? input.title,
       excerpt: parsed.excerpt?.slice(0, 500) ?? input.excerpt,
       content: parsed.content ?? input.content,
-      translation_provider: "openai",
+      translation_provider: "groq",
       machine_translated: true,
       reviewed: false,
     };
@@ -216,7 +192,7 @@ export async function resolveArticleTranslation(
 
   let translated: TranslatedFields | null = null;
 
-  // Try OpenAI first
+  // Try Groq LLM first
   translated = await translateArticleFields({
     title: fields.title,
     excerpt: fields.excerpt,
@@ -226,7 +202,7 @@ export async function resolveArticleTranslation(
     mode,
   }).catch(() => null);
 
-  // If OpenAI not available or returned null, try Google Translate fallback
+  // If Groq not available or returned null, try Google Translate fallback
   if (!translated && process.env.GOOGLE_TRANSLATE_KEY) {
     const target = primaryArticleLocale(uiLocale);
     try {

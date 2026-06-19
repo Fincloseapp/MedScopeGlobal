@@ -57,6 +57,7 @@
     "smoke:v35": "node scripts/v35-course-smoke.mjs",
     "smoke:v36": "node scripts/v36-analytics-smoke.mjs",
     "smoke:v37": "node scripts/v37-quality-smoke.mjs",
+    "smoke:v25": "node scripts/v25-master-smoke.mjs",
     "smoke:v38": "node scripts/v38-conversion-smoke.mjs",
     "smoke:v39": "node scripts/v39-medical-smoke.mjs",
     "smoke:v40": "node scripts/v40-video-course-smoke.mjs",
@@ -77,7 +78,8 @@
     "smoke:v34": "node scripts/v34-video-engine-smoke.mjs",
     "smoke:v35": "node scripts/v35-course-smoke.mjs",
     "smoke:v36": "node scripts/v36-analytics-smoke.mjs",
-    "smoke:v37": "node scripts/v37-quality-smoke.mjs"
+    "smoke:v37": "node scripts/v37-quality-smoke.mjs",
+    "smoke:v25": "node scripts/v25-master-smoke.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -103,7 +105,7 @@
     "@tiptap/starter-kit": "^2.9.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "date-fns": "^4.1.0",
+    "groq-sdk": "^0.9.1",
     "hls.js": "^1.5.20",
     "lucide-react": "^0.454.0",
     "mammoth": "^1.12.0",

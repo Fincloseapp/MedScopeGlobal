@@ -31,7 +31,7 @@ import { ArticleInlineNudge } from "@/components/v38/article-inline-nudge";
 import { resolveConversionCopy } from "@/lib/v38/conversion-engine";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
 import { listStudentAdCampaignsForArticle } from "@/lib/queries/marketing";
-import { StudentAdBlocks } from "@/components/student/student-ad-blocks";
+import { ArticleCtaBlocks } from "@/components/articles/article-cta-blocks";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -364,6 +364,10 @@ export default async function ArticlePage({ params }: Props) {
 
             {!isVip && !locked && articleInlineCopy ? (
               <ArticleInlineNudge copy={articleInlineCopy} />
+            ) : null}
+
+            {!locked ? (
+              <ArticleCtaBlocks articleSlug={article.slug} articleTitle={article.title} />
             ) : null}
 
             {related && related.length > 0 && (

@@ -20,7 +20,7 @@ import { getDigestDeliveryStatus } from "@/lib/academy/marketing/digest-config";
 
 import { isExpertReviewAutoPublishEnabled, getVideoWebhookUrl } from "@/lib/academy/settings";
 
-import { isLlmConfigured } from "@/lib/ai/chat-json";
+import { isLlmConfigured, resolvePrimaryLlmProvider, resolveAiModel, AI_MODEL_PROVIDER } from "@/lib/ai/chat-json";
 
 import {
 
@@ -85,6 +85,9 @@ export async function GET() {
       digestDeliveryMode: digest.mode,
 
       llmConfigured: isLlmConfigured(),
+      llmProvider: resolvePrimaryLlmProvider(),
+      aiModel: resolveAiModel(),
+      aiModelProvider: AI_MODEL_PROVIDER,
 
       videoProvider: getPreferredVideoProvider(),
 

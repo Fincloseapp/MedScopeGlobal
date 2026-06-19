@@ -15,7 +15,6 @@ export interface ProcessedArticle {
   locale: string;
 }
 
-export { resolveOpenAiKey } from "@/lib/ai/openai-key";
 export { isLlmConfigured as isAiConfigured } from "@/lib/ai/chat-json";
 
 function defaultAccessLevelFromInput(level: ContentAccessLevel): "public" | "student" | "physician" {

@@ -7,7 +7,7 @@ type Props = {
   title?: string;
 };
 
-/** Article audio preview via OpenAI /api/tts */
+/** Article audio preview via Web Speech API (/api/tts browser mode) */
 export function ArticleTtsButton({ excerpt, title }: Props) {
   const text = excerpt.trim();
   if (!text) return null;

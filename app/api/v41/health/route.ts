@@ -1,29 +1,25 @@
-import { NextResponse } from "next/server";
-import { V41_UI_VERSION, V41_UI_BUILD_STAMP, V41_COMPOSITE_LABEL } from "@/lib/v41/version";
-import { getTtsEngineStatus, checkOpenAiTtsHealth } from "@/lib/v41/ai/tts-engine";
-
-export const dynamic = "force-dynamic";
-
-export async function GET() {
-  const openaiHealth = await checkOpenAiTtsHealth();
-  const tts = getTtsEngineStatus();
-
-  return NextResponse.json({
-    status: openaiHealth.valid ? "ok" : "degraded",
-    ok: true,
-    version: V41_UI_VERSION,
-    composite: V41_COMPOSITE_LABEL,
-    buildStamp: V41_UI_BUILD_STAMP,
-    tts: {
-      ...tts,
-      openaiValid: openaiHealth.valid,
-      openaiStatus: openaiHealth.status,
-      fallbackActive: !openaiHealth.valid,
-      routes: ["/api/tts", "/api/voice", "/api/video/voice"],
-    },
-    blockers: !openaiHealth.valid
-      ? [`OpenAI TTS probe: HTTP ${openaiHealth.status} — ${openaiHealth.detail ?? "check OPENAI_API_KEY"}`]
-      : [],
-    generatedAt: new Date().toISOString(),
-  });
-}
+import { NextResponse } from "next/server";
+import { getTtsEngineStatus, checkTtsHealth } from "@/lib/v41/ai/tts-engine";
+import { isGroqConfigured, resolveAiModel, AI_MODEL_PROVIDER } from "@/lib/ai/groq-client";
+
+export const dynamic = "force-dynamic";
+
+export async function GET() {
+  const ttsHealth = await checkTtsHealth();
+  const tts = getTtsEngineStatus();
+
+  return NextResponse.json({
+    status: isGroqConfigured() ? "ok" : "degraded",
+    ok: true,
+    version: "v41.0",
+    llm: { provider: AI_MODEL_PROVIDER, model: resolveAiModel(), configured: isGroqConfigured() },
+    tts: {
+      ...tts,
+      ...ttsHealth,
+      freeOnly: true,
+      routes: ["/api/tts", "/api/voice", "/api/video/voice"],
+    },
+    blockers: !isGroqConfigured() ? ["GROQ_API_KEY not set on Vercel"] : [],
+    generatedAt: new Date().toISOString(),
+  });
+}

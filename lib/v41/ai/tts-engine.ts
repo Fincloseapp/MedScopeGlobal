@@ -1,6 +1,4 @@
-import { isOpenAiTtsConfigured } from "@/lib/academy/ai/video-providers/openai-tts-video";
 import { generateVoice } from "@/lib/v40/ai/voice-openai";
-import { resolveOpenAiKey } from "@/lib/ai/openai-key";
 
 export type TtsRequest = {
   text: string;
@@ -9,13 +7,14 @@ export type TtsRequest = {
   voice?: string;
 };
 
+export type TtsProvider = "web_speech_api" | "edge_tts" | "text_only" | "none";
+
 export type TtsResult = {
   ok: boolean;
-  provider: "openai_tts" | "text_only" | "none";
+  provider: TtsProvider;
   audioUrl?: string;
   text?: string;
   message?: string;
-  openaiConfigured?: boolean;
 };
 
 const PROD_ORIGIN = "https://medscopeglobal.com";
@@ -40,86 +39,41 @@ export function ttsResponseHeaders(contentType = "application/json"): Record<str
   return { ...TTS_CORS_HEADERS, "Content-Type": contentType };
 }
 
-export async function checkOpenAiTtsHealth(): Promise<{ valid: boolean; status: number; detail?: string }> {
-  const apiKey = resolveOpenAiKey();
-  if (!apiKey) {
-    return { valid: false, status: 0, detail: "OPENAI_API_KEY not set" };
-  }
-
-  try {
-    const res = await fetch("https://api.openai.com/v1/audio/speech", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: process.env.OPENAI_TTS_MODEL?.trim() || "gpt-4o-mini-tts",
-        input: ".",
-        voice: process.env.OPENAI_TTS_VOICE?.trim() || "alloy",
-        response_format: "mp3",
-      }),
-      signal: AbortSignal.timeout(15000),
-    });
-
-    if (res.ok) {
-      await res.arrayBuffer().catch(() => null);
-      return { valid: true, status: res.status };
-    }
-
-    if (res.status === 429) {
-      return { valid: true, status: res.status, detail: "rate_limited" };
-    }
-
-    const errText = await res.text().catch(() => "");
-    return { valid: false, status: res.status, detail: errText.slice(0, 200) };
-  } catch (e) {
-    return {
-      valid: false,
-      status: 0,
-      detail: e instanceof Error ? e.message : "probe failed",
-    };
-  }
+/** Optional edge TTS stub — set EDGE_TTS_URL template with {text} placeholder. */
+function resolveEdgeTtsUrl(text: string): string | null {
+  const template = process.env.EDGE_TTS_URL?.trim();
+  if (!template || !template.includes("{text}")) return null;
+  return template.replace("{text}", encodeURIComponent(text.slice(0, 4096)));
 }
 
-/** Stream OpenAI TTS audio (gpt-4o-mini-tts) */
-export async function streamOpenAiAudio(text: string, voice?: string): Promise<Response | null> {
-  const apiKey = resolveOpenAiKey();
-  if (!apiKey) return null;
+export async function checkTtsHealth(): Promise<{ valid: boolean; provider: TtsProvider; detail?: string }> {
+  return {
+    valid: true,
+    provider: "web_speech_api",
+    detail: "Browser Web Speech API — no server-side TTS key required",
+  };
+}
 
-  const res = await fetch("https://api.openai.com/v1/audio/speech", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: process.env.OPENAI_TTS_MODEL?.trim() || "gpt-4o-mini-tts",
-      input: text.slice(0, 4096),
-      voice: voice ?? (process.env.OPENAI_TTS_VOICE?.trim() || "alloy"),
-      response_format: "mp3",
-    }),
-    signal: AbortSignal.timeout(120_000),
-  });
-
-  if (!res.ok || !res.body) return null;
-  return res;
+/** @deprecated use checkTtsHealth */
+export async function checkOpenAiTtsHealth(): Promise<{ valid: boolean; status: number; detail?: string }> {
+  const health = await checkTtsHealth();
+  return { valid: health.valid, status: health.valid ? 200 : 503, detail: health.detail };
 }
 
 export async function synthesizeTts(input: TtsRequest): Promise<TtsResult> {
   const text = input.text?.trim();
   if (!text) return { ok: false, provider: "none", message: "text required" };
 
-  if (isOpenAiTtsConfigured()) {
-    return { ok: true, provider: "openai_tts", message: "OpenAI TTS available", openaiConfigured: true };
+  const edgeUrl = resolveEdgeTtsUrl(text);
+  if (edgeUrl) {
+    return { ok: true, provider: "edge_tts", audioUrl: edgeUrl, message: "Edge TTS stub" };
   }
 
   return {
     ok: true,
-    provider: "text_only",
+    provider: "web_speech_api",
     text,
-    message: "No TTS provider — text-only mode",
-    openaiConfigured: false,
+    message: "Web Speech API fallback — client synthesizes audio",
   };
 }
 
@@ -129,9 +83,8 @@ export async function generateTtsForVideo(text: string, title: string) {
 
 export function getTtsEngineStatus() {
   return {
-    openaiTtsConfigured: isOpenAiTtsConfigured(),
-    model: process.env.OPENAI_TTS_MODEL?.trim() || "gpt-4o-mini-tts",
-    voice: process.env.OPENAI_TTS_VOICE?.trim() || "alloy",
-    fallbackChain: ["openai_tts", "text_only"],
+    provider: "web_speech_api" as const,
+    edgeTtsConfigured: Boolean(process.env.EDGE_TTS_URL?.trim()),
+    fallbackChain: ["edge_tts", "web_speech_api", "text_only"],
   };
 }
