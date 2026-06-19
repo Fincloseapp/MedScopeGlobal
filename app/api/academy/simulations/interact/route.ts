@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         ok: true,
         provider: "fallback",
-        patientReply: "Pacient: „Dobrý den, doktore. Bolí mě na hrudi už od rána."",
+        patientReply: 'Pacient: „Dobrý den, doktore. Bolí mě na hrudi už od rána."',
         scoreDelta: 5,
         xpEarned: 10,
         nextChoices: [

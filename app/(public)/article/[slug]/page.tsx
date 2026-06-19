@@ -32,6 +32,7 @@ import { resolveConversionCopy } from "@/lib/v38/conversion-engine";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
 import { listStudentAdCampaignsForArticle } from "@/lib/queries/marketing";
 import { ArticleCtaBlocks } from "@/components/articles/article-cta-blocks";
+import { StudentAdBlocks } from "@/components/student/student-ad-blocks";
 
 type Props = { params: Promise<{ slug: string }> };
 

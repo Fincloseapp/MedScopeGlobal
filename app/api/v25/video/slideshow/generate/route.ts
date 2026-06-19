@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { runSlideshowPipeline } from "@/lib/v25/video/slideshow-pipeline";
-import { isGroqConfigured, resolveAiModel, AI_MODEL_PROVIDER } from "@/lib/ai/groq-client";
+import { isGroqConfigured, resolveAiModel } from "@/lib/ai/groq-client";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
@@ -18,11 +18,9 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({
-      ok: result.ok,
-      provider: AI_MODEL_PROVIDER,
+      ...result,
       model: resolveAiModel(),
       groqConfigured: isGroqConfigured(),
-      ...result,
     });
   } catch (e) {
     return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });

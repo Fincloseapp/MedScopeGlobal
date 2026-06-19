@@ -15,6 +15,10 @@ import {
 
 export const AI_MODEL_PROVIDER = "groq" as const;
 
+export function resolvePrimaryLlmProvider(): typeof AI_MODEL_PROVIDER | "none" {
+  return isGroqConfigured() ? AI_MODEL_PROVIDER : "none";
+}
+
 export function resolveAiModel(): string {
   return (
     process.env.AI_MODEL?.trim() ||

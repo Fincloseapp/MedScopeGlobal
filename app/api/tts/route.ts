@@ -7,7 +7,11 @@ export async function OPTIONS() {
 }
 
 export async function GET() {
-  return new Response(null, { status: 200 });
+  return NextResponse.json({
+    ok: true,
+    provider: "web_speech",
+    message: "Use client Web Speech API",
+  });
 }
 
 /** Server TTS disabled — returns 200 immediately (unblocks video engine). */
