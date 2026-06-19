@@ -95,6 +95,9 @@ for (const row of assets ?? []) {
   const patch = {
     ...meta,
     public_url: RELIABLE_MP4,
+    mp4_url: RELIABLE_MP4,
+    url_chain: [RELIABLE_MP4],
+    lesson_format: "video",
     generated: meta.generated ?? true,
     render_status: "ready",
     generation_provider: meta.generation_provider ?? "v33-fallback",

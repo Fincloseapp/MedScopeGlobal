@@ -28,8 +28,14 @@ CREATE INDEX IF NOT EXISTS idx_v47_content_generations_kind ON v47_content_gener
 ALTER TABLE v47_translation_jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE v47_content_generations ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS v47_translation_jobs_service ON v47_translation_jobs
-  FOR ALL USING (auth.role() = 'service_role');
+DO $$ BEGIN
+  CREATE POLICY v47_translation_jobs_service ON v47_translation_jobs
+    FOR ALL USING (auth.role() = 'service_role');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE POLICY IF NOT EXISTS v47_content_generations_service ON v47_content_generations
-  FOR ALL USING (auth.role() = 'service_role');
+DO $$ BEGIN
+  CREATE POLICY v47_content_generations_service ON v47_content_generations
+    FOR ALL USING (auth.role() = 'service_role');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;

@@ -107,7 +107,7 @@ export async function groqSdkStream(input: {
   const client = groq ?? createGroqSdk();
   if (!client) return null;
 
-  const messages: Groq.Chat.ChatCompletionMessageParam[] = [];
+  const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [];
   if (input.system?.trim()) {
     messages.push({ role: "system", content: input.system.trim() });
   }

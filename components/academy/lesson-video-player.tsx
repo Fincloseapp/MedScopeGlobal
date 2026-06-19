@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { Video } from "lucide-react";
 import { V33_FALLBACK_MP4_URL } from "@/lib/v33/version";
 import type { VideoAsset } from "@/types/academy";
@@ -17,46 +16,25 @@ type VideoMeta = {
   hls_url?: string;
   url_chain?: string[];
   thumbnail_url?: string;
-  generated?: boolean;
 };
 
 const GTV_HOST = "storage.googleapis.com/gtv-videos-bucket";
 
-function isUnreliable(url: string): boolean {
-  return url.includes(GTV_HOST);
-}
-
-function resolveVideoUrl(video: VideoAsset | null | undefined): string {
-  const meta = (video?.metadata ?? {}) as VideoMeta;
-
+function pickUrl(meta: VideoMeta): string {
   if (Array.isArray(meta.url_chain)) {
     for (const raw of meta.url_chain) {
-      if (raw && !isUnreliable(raw)) return raw;
+      if (raw && !raw.includes(GTV_HOST)) return raw;
     }
   }
-
   for (const candidate of [meta.mp4_url, meta.public_url, meta.hls_url]) {
-    if (candidate && !isUnreliable(candidate)) return candidate;
+    if (candidate && !candidate.includes(GTV_HOST)) return candidate;
   }
-
   return V33_FALLBACK_MP4_URL;
 }
 
 export function LessonVideoPlayer({ video, lessonTitle, className }: Props) {
-  const videoUrl = useMemo(() => resolveVideoUrl(video), [video]);
-
-  if (!video) {
-    return (
-      <div
-        className={`flex aspect-video items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 ${className ?? ""}`}
-      >
-        <div className="text-center text-sm text-slate-500">
-          <Video className="mx-auto mb-2 h-8 w-8 text-slate-300" />
-          <p>Video k této lekci zatím není k dispozici.</p>
-        </div>
-      </div>
-    );
-  }
+  const meta = (video?.metadata ?? {}) as VideoMeta;
+  const videoUrl = pickUrl(meta);
 
   return (
     <div className={className}>
@@ -65,7 +43,7 @@ export function LessonVideoPlayer({ video, lessonTitle, className }: Props) {
           controls
           playsInline
           preload="auto"
-          poster={(video.metadata as VideoMeta)?.thumbnail_url}
+          poster={meta.thumbnail_url}
           title={lessonTitle}
           style={{ width: "100%", height: "auto" }}
         >
@@ -73,7 +51,12 @@ export function LessonVideoPlayer({ video, lessonTitle, className }: Props) {
           Váš prohlížeč nepodporuje přehrávání videa.
         </video>
       </div>
-      {video.duration_seconds > 0 ? (
+      {!video ? (
+        <p className="mt-2 flex items-center gap-1 text-xs text-amber-700">
+          <Video className="h-3.5 w-3.5" />
+          Záložní video — lekce se načítá z w3schools MP4
+        </p>
+      ) : video.duration_seconds > 0 ? (
         <p className="mt-2 text-xs text-slate-500">
           {Math.max(1, Math.round(video.duration_seconds / 60))} min
         </p>
