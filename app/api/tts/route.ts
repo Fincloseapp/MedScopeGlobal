@@ -1,13 +1,9 @@
-import OpenAI from "openai";
 import { NextResponse } from "next/server";
+import { resolveOpenAiKey } from "@/lib/ai/openai-key";
 import { ttsResponseHeaders } from "@/lib/v41/ai/tts-engine";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
-
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 const MAX_TEXT_LENGTH = 4096;
 
@@ -36,6 +32,11 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    const apiKey = resolveOpenAiKey();
+    if (!apiKey) {
+      return NextResponse.json({ error: "TTS failed" }, { status: 500, headers: ttsResponseHeaders() });
+    }
+
     let body: { text?: unknown; voice?: unknown } = {};
     try {
       body = await req.json();
@@ -50,12 +51,24 @@ export async function POST(req: Request) {
 
     const voice = sanitizeVoice(body.voice ?? "alloy");
 
-    const response = await client.audio.speech.create({
-      model: "gpt-4o-mini-tts",
-      voice,
-      input: text,
-      format: "mp3",
+    const response = await fetch("https://api.openai.com/v1/audio/speech", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini-tts",
+        voice,
+        input: text,
+        response_format: "mp3",
+      }),
+      signal: AbortSignal.timeout(120_000),
     });
+
+    if (!response.ok) {
+      return NextResponse.json({ error: "TTS failed" }, { status: 500, headers: ttsResponseHeaders() });
+    }
 
     const buffer = Buffer.from(await response.arrayBuffer());
 
