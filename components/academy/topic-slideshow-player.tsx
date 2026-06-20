@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Pause, Play, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { speak, stopSpeaking } from "@/lib/tts/speak";
+import { VoicePicker } from "@/components/tts/voice-picker";
+import { speakSlideText, stopSpeaking } from "@/lib/tts/speak";
+import { resolveSlideImageUrl } from "@/lib/v25/video/slide-images";
 import type { ContentSlideshowManifest } from "@/lib/v25/video/content-slideshow";
 
 type Props = {
@@ -17,34 +19,64 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className }: Props
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [speaking, setSpeaking] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const playingRef = useRef(false);
+  const indexRef = useRef(0);
   const slide = slides[index];
 
-  const clearTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-  }, []);
-
-  const advance = useCallback(() => {
-    setIndex((i) => (i < slides.length - 1 ? i + 1 : i));
-  }, [slides.length]);
+  const imageUrl =
+    slide?.imageUrl ??
+    resolveSlideImageUrl({
+      title: slide?.title,
+      body: slide?.body,
+      imageDescription: slide?.imageDescription,
+      topic: manifest.topic,
+      index,
+    });
 
   useEffect(() => {
-    if (!playing) {
-      clearTimer();
-      return;
-    }
-    clearTimer();
-    timerRef.current = setTimeout(advance, (slide?.durationSeconds ?? 10) * 1000);
-    return clearTimer;
-  }, [playing, index, slide?.durationSeconds, advance, clearTimer]);
+    playingRef.current = playing;
+  }, [playing]);
 
-  useEffect(() => () => {
-    clearTimer();
-    stopSpeaking();
-  }, [clearTimer]);
+  useEffect(() => {
+    indexRef.current = index;
+  }, [index]);
+
+  const readSlide = useCallback(async (i: number) => {
+    const s = slides[i];
+    if (!s) return;
+    setSpeaking(true);
+    try {
+      await speakSlideText(s.title, s.body);
+    } catch {
+      /* ignore */
+    } finally {
+      setSpeaking(false);
+    }
+  }, [slides]);
+
+  const runPlayback = useCallback(async () => {
+    let i = indexRef.current;
+    while (playingRef.current && i < slides.length) {
+      setIndex(i);
+      indexRef.current = i;
+      await readSlide(i);
+      if (!playingRef.current) break;
+      await new Promise((r) => setTimeout(r, 800));
+      i += 1;
+      if (i >= slides.length) {
+        playingRef.current = false;
+        setPlaying(false);
+        break;
+      }
+    }
+  }, [slides.length, readSlide]);
+
+  useEffect(() => {
+    if (playing) void runPlayback();
+    else stopSpeaking();
+  }, [playing, runPlayback]);
+
+  useEffect(() => () => stopSpeaking(), []);
 
   async function toggleSpeech() {
     if (speaking) {
@@ -52,14 +84,17 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className }: Props
       setSpeaking(false);
       return;
     }
-    const text = slide ? `${slide.title}. ${slide.body}` : manifest.voiceoverText;
-    setSpeaking(true);
-    try {
-      await speak(text.slice(0, 4096), "cs-CZ");
-    } catch {
-      /* ignore */
-    } finally {
-      setSpeaking(false);
+    await readSlide(index);
+  }
+
+  function togglePlay() {
+    if (playing) {
+      playingRef.current = false;
+      setPlaying(false);
+      stopSpeaking();
+    } else {
+      playingRef.current = true;
+      setPlaying(true);
     }
   }
 
@@ -67,66 +102,85 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className }: Props
 
   return (
     <div className={className} role="region" aria-label={`Prezentace lekce: ${lessonTitle}`}>
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <VoicePicker compact />
+      </div>
       <div
-        className="overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-[#021d33] via-[#003d66] to-[#005B96] shadow-lg"
+        className="overflow-hidden rounded-2xl border border-slate-200 bg-[#021d33] shadow-lg"
         aria-roledescription="slideshow"
       >
-        <div className="flex min-h-[280px] flex-col justify-between p-6 text-white sm:min-h-[320px] sm:p-8">
-          <div>
+        <div className="relative aspect-video w-full bg-black">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={imageUrl}
+            alt={slide.imageDescription || slide.title}
+            className="h-full w-full object-cover opacity-90"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#021d33] via-[#021d33]/70 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-6">
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#7CC4FF]">
               Prezentace k tématu lekce
             </p>
-            <h3 className="mt-2 font-display text-xl font-semibold sm:text-2xl">{slide.title}</h3>
-            <p className="mt-4 text-sm leading-relaxed text-slate-100 sm:text-base">{slide.body}</p>
+            <h3 className="mt-1 font-display text-lg font-semibold sm:text-xl">{slide.title}</h3>
+            <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-100">{slide.body}</p>
           </div>
-          <div className="mt-6 flex items-center justify-between gap-2">
-            <span className="text-xs text-slate-300">
-              {index + 1} / {slides.length} · {manifest.topic || lessonTitle}
-            </span>
-            <div className="flex gap-1">
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 text-white hover:bg-white/10"
-                onClick={() => setIndex((i) => Math.max(0, i - 1))}
-                disabled={index === 0}
-                aria-label="Předchozí slide"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 text-white hover:bg-white/10"
-                onClick={() => setPlaying((p) => !p)}
-                aria-label={playing ? "Pozastavit" : "Přehrát slideshow"}
-              >
-                {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-              </Button>
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 text-white hover:bg-white/10"
-                onClick={() => setIndex((i) => Math.min(slides.length - 1, i + 1))}
-                disabled={index >= slides.length - 1}
-                aria-label="Další slide"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 text-white hover:bg-white/10"
-                onClick={() => void toggleSpeech()}
-                aria-label="Přečíst slide"
-              >
-                <Volume2 className="h-4 w-4" />
-              </Button>
-            </div>
+        </div>
+        <div className="flex items-center justify-between gap-2 bg-[#003d66] px-4 py-3">
+          <span className="text-xs text-slate-300">
+            {index + 1} / {slides.length} · {manifest.topic || lessonTitle}
+          </span>
+          <div className="flex gap-1">
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 text-white hover:bg-white/10"
+              onClick={() => {
+                setPlaying(false);
+                playingRef.current = false;
+                stopSpeaking();
+                setIndex((i) => Math.max(0, i - 1));
+              }}
+              disabled={index === 0}
+              aria-label="Předchozí slide"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 text-white hover:bg-white/10"
+              onClick={togglePlay}
+              aria-label={playing ? "Pozastavit" : "Přehrát slideshow"}
+            >
+              {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            </Button>
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 text-white hover:bg-white/10"
+              onClick={() => {
+                setPlaying(false);
+                playingRef.current = false;
+                setIndex((i) => Math.min(slides.length - 1, i + 1));
+              }}
+              disabled={index >= slides.length - 1}
+              aria-label="Další slide"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 text-white hover:bg-white/10"
+              onClick={() => void toggleSpeech()}
+              aria-label="Přečíst slide"
+            >
+              <Volume2 className="h-4 w-4" />
+            </Button>
           </div>
         </div>
         <div className="flex gap-1 bg-black/20 px-4 py-2">
@@ -135,7 +189,12 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className }: Props
               key={i}
               type="button"
               className={`h-1.5 flex-1 rounded-full transition ${i === index ? "bg-[#7CC4FF]" : "bg-white/25"}`}
-              onClick={() => setIndex(i)}
+              onClick={() => {
+                setPlaying(false);
+                playingRef.current = false;
+                stopSpeaking();
+                setIndex(i);
+              }}
               aria-label={`Slide ${i + 1}`}
             />
           ))}

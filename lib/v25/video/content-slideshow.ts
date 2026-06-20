@@ -6,6 +6,7 @@ import { groqCompleteJson, isGroqConfigured, resolveAiModel } from "@/lib/ai/gro
 import { V33_FALLBACK_MP4_URL } from "@/lib/v33/version";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import type { SlideItem } from "@/lib/v25/video/slideshow-pipeline";
+import { attachSlideImages } from "@/lib/v25/video/slide-images";
 
 export type ContentSlideshowManifest = {
   title: string;
@@ -80,12 +81,15 @@ export async function generateContentSlideshow(
       topic: parsed.topic || topic,
       script: parsed.script || parsed.voiceoverText || input.lessonTitle,
       voiceoverText: parsed.voiceoverText || parsed.script || input.lessonTitle,
-      slides: parsed.slides.map((s) => ({
-        title: s.title,
-        body: s.body,
-        imageDescription: s.imageDescription || s.title,
-        durationSeconds: Math.max(6, Math.min(20, s.durationSeconds ?? 10)),
-      })),
+      slides: attachSlideImages(
+        parsed.slides.map((s) => ({
+          title: s.title,
+          body: s.body,
+          imageDescription: s.imageDescription || s.title,
+          durationSeconds: Math.max(6, Math.min(20, s.durationSeconds ?? 10)),
+        })),
+        parsed.topic || topic
+      ),
       alignmentScore: clampScore(parsed.alignmentScore),
       ttsMode: "web_speech_api",
       generatedAt: new Date().toISOString(),
@@ -135,7 +139,7 @@ function buildStaticSlideshow(
     topic,
     script: slides.map((s) => `${s.title}. ${s.body}`).join(" "),
     voiceoverText: slides.map((s) => s.body).join(" "),
-    slides,
+    slides: attachSlideImages(slides, topic),
     alignmentScore: 0.7,
     ttsMode: "web_speech_api",
     generatedAt: new Date().toISOString(),
@@ -152,6 +156,23 @@ export function extractSlideshowManifest(
 
   const fromMeta = videoMeta?.slideshow as ContentSlideshowManifest | undefined;
   if (fromMeta?.slides?.length) return fromMeta;
+
+  const legacyMetaSlides = videoMeta?.slides;
+  if (Array.isArray(legacyMetaSlides) && legacyMetaSlides.length) {
+    return {
+      title: String(videoMeta?.slideshow_title ?? contentJson?.slideshow_title ?? "Lekce"),
+      topic: String(videoMeta?.topic ?? contentJson?.topic ?? ""),
+      script: String(videoMeta?.voiceover_text ?? contentJson?.voiceover_text ?? ""),
+      voiceoverText: String(videoMeta?.voiceover_text ?? contentJson?.voiceover_text ?? ""),
+      slides: legacyMetaSlides as SlideItem[],
+      alignmentScore: Number(videoMeta?.alignment_score ?? contentJson?.alignment_score ?? 0.8),
+      ttsMode: "web_speech_api",
+      generatedAt: String(
+        videoMeta?.slideshow_generated_at ?? contentJson?.slideshow_generated_at ?? new Date().toISOString()
+      ),
+      provider: "static",
+    };
+  }
 
   const legacySlides = contentJson?.slides;
   if (Array.isArray(legacySlides) && legacySlides.length) {

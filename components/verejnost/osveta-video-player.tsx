@@ -5,6 +5,7 @@ import { VideoLegalNotice, detectVideoSource } from "@/components/academy/video-
 import { TopicSlideshowPlayer } from "@/components/academy/topic-slideshow-player";
 import { TtsListenButton } from "@/components/tts/tts-listen-button";
 import { V33_FALLBACK_MP4_URL } from "@/lib/v33/version";
+import { attachSlideImages } from "@/lib/v25/video/slide-images";
 import {
   isPlaceholderVideoUrl,
   type ContentSlideshowManifest,
@@ -56,7 +57,7 @@ function buildOsvetaSlideshow(video: PublicHealthVideoWithTopic): ContentSlidesh
     topic,
     script: video.script || slides.map((s) => s.body).join(" "),
     voiceoverText: video.script || slides.map((s) => s.body).join(" "),
-    slides,
+    slides: attachSlideImages(slides, topic),
     alignmentScore: 0.85,
     ttsMode: "web_speech_api",
     generatedAt: new Date().toISOString(),

@@ -11,7 +11,22 @@ import { getReaderContext } from "@/lib/auth/reader-context";
 import { getCourseBySlug, getLessonByIdOrSlug } from "@/lib/academy/db";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
-export const revalidate = 120;
+import { extractSlideshowManifest } from "@/lib/v25/video/content-slideshow";
+
+function buildLessonListenText(
+  title: string,
+  content: string,
+  contentJson: Record<string, unknown>
+): string {
+  const manifest = extractSlideshowManifest(contentJson, null);
+  const parts = [title, content];
+  if (manifest?.slides?.length) {
+    parts.push(...manifest.slides.map((s) => `${s.title}. ${s.body}`));
+  } else if (typeof contentJson.voiceover_text === "string") {
+    parts.push(contentJson.voiceover_text);
+  }
+  return parts.filter(Boolean).join("\n\n");
+}
 
 type Props = { params: Promise<{ slug: string; lessonId: string }> };
 
@@ -65,6 +80,11 @@ export default async function AcademyLessonPage({ params }: Props) {
   const lessons = course?.lessons ?? [];
   const { isVip } = await getReaderContext();
   const lessonIndex = lessons.findIndex((l) => l.slug === lesson.slug || l.id === lesson.id);
+  const listenText = buildLessonListenText(
+    lesson.title,
+    lesson.content,
+    (lesson.content_json ?? {}) as Record<string, unknown>
+  );
 
   return (
     <>
@@ -150,6 +170,7 @@ export default async function AcademyLessonPage({ params }: Props) {
               title={lesson.title}
               content={lesson.content}
               contentJson={(lesson.content_json ?? {}) as Record<string, unknown>}
+              videoMetadata={(lesson.video?.metadata ?? null) as Record<string, unknown> | null}
               videoTitle={lesson.video?.title}
               videoDescription={String(
                 (lesson.video?.metadata as Record<string, unknown> | undefined)?.description ?? ""
@@ -169,7 +190,7 @@ export default async function AcademyLessonPage({ params }: Props) {
             />
             <article className="prose prose-slate max-w-none space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="not-prose mb-4 flex flex-wrap items-center gap-3">
-                <TtsListenButton text={lesson.content} label="Poslechnout lekci" />
+                <TtsListenButton text={listenText} label="Poslech celé lekce" />
               </div>
               {renderContent(lesson.content)}
             </article>

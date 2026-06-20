@@ -19,6 +19,7 @@ export type SlideItem = {
   body: string;
   imageDescription: string;
   durationSeconds: number;
+  imageUrl?: string;
 };
 
 export type SlideshowPlan = {

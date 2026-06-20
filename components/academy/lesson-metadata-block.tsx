@@ -7,6 +7,7 @@ type Props = {
   title: string;
   content: string;
   contentJson: Record<string, unknown>;
+  videoMetadata?: Record<string, unknown> | null;
   videoTitle?: string;
   videoDescription?: string;
   slideshowTopic?: string;
@@ -16,14 +17,17 @@ export async function LessonMetadataBlock({
   title,
   content,
   contentJson,
+  videoMetadata,
   videoTitle,
   videoDescription,
   slideshowTopic,
 }: Props) {
   const existing = extractLessonMetadata(contentJson);
   const enrichment = await enrichLessonContent({ title, content, existing });
-  const slideshow = extractSlideshowManifest(contentJson, null);
-  const storedAlignment = Number(contentJson?.alignment_score ?? slideshow?.alignmentScore ?? 0);
+  const slideshow = extractSlideshowManifest(contentJson, videoMetadata ?? null);
+  const storedAlignment = Number(
+    contentJson?.alignment_score ?? videoMetadata?.alignment_score ?? slideshow?.alignmentScore ?? 0
+  );
   const computedAlignment = slideshow ? scoreTopicAlignment(title, slideshow) : 0;
   const alignmentScore = slideshow ? Math.max(storedAlignment, computedAlignment) : undefined;
   const slideshowAligned = alignmentScore !== undefined && alignmentScore >= 0.65;

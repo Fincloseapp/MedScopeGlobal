@@ -33,12 +33,23 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
   const course = await getCourseBySlug(slug);
   if (!course) notFound();
 
+  const totalMinutes =
+    course.duration_minutes > 0
+      ? course.duration_minutes
+      : course.lessons.reduce((sum, l) => sum + (l.duration_minutes || 5), 0);
+
+  const fullCourseListenText = [
+    course.title,
+    course.summary ?? course.description,
+    ...course.lessons.map((l) => `${l.title}. ${l.content?.slice(0, 500) ?? ""}`),
+  ].join("\n\n");
+
   return (
     <>
       <AcademyPageHeader
         eyebrow="Kurz"
         title={course.title}
-        description={course.summary ?? course.description}
+        description={`${course.summary ?? course.description}${totalMinutes ? ` · ${totalMinutes} min celkem` : ""}`}
         ctaHref="/academy/courses"
         ctaLabel="Zpět na kurzy"
       />
@@ -64,11 +75,14 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
 
         {(course.summary ?? course.description) ? (
           <div className="mb-6">
-            <TtsListenButton
-              text={[course.title, course.summary ?? course.description].filter(Boolean).join(". ")}
-              label="Poslechnout úvod kurzu"
-            />
+            <TtsListenButton text={fullCourseListenText} label="Poslech celého kurzu" />
           </div>
+        ) : null}
+
+        {totalMinutes > 0 ? (
+          <p className="mb-4 text-sm text-slate-600">
+            Odhadovaná délka kurzu: <strong>{totalMinutes} min</strong> ({course.lessons.length} lekcí)
+          </p>
         ) : null}
 
         {course.lessons.length > 0 ? (

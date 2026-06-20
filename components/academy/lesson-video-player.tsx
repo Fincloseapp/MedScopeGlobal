@@ -10,6 +10,7 @@ import {
 } from "@/components/academy/video-legal-notice";
 import { TopicSlideshowPlayer } from "@/components/academy/topic-slideshow-player";
 import { V33_FALLBACK_MP4_URL } from "@/lib/v33/version";
+import { attachSlideImages } from "@/lib/v25/video/slide-images";
 import {
   extractSlideshowManifest,
   isPlaceholderVideoUrl,
@@ -90,7 +91,7 @@ function buildInlineSlideshow(
     topic: courseTopic ?? lessonTitle,
     script: slides.map((s) => s.body).join(" "),
     voiceoverText: slides.map((s) => s.body).join(" "),
-    slides,
+    slides: attachSlideImages(slides, courseTopic ?? lessonTitle),
     alignmentScore: 0.75,
     ttsMode: "web_speech_api",
     generatedAt: new Date().toISOString(),
