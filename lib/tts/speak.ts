@@ -1,6 +1,12 @@
-/** Client TTS — Web Speech API with voice selection and chunked full-text readout. */
+/** Client TTS — Web Speech API with natural Czech, voice selection, chunked readout. */
 
-export type VoiceGender = "male" | "female" | "auto";
+import {
+  SLIDE_PAUSE_MS,
+  naturalizeAndSplit,
+} from "@/lib/tts/naturalize-czech";
+import { pickVoice, type VoiceGender } from "@/lib/tts/voice-picker";
+
+export type { VoiceGender };
 
 const VOICE_PREF_KEY = "medscope-tts-voice-gender";
 
@@ -20,7 +26,8 @@ export function getVoiceGenderPreference(): VoiceGender {
 
 export function setVoiceGenderPreference(gender: VoiceGender): void {
   try {
-    localStorage.setItem(VOICE_PREF_KEY, gender);
+    if (gender === "auto") localStorage.removeItem(VOICE_PREF_KEY);
+    else localStorage.setItem(VOICE_PREF_KEY, gender);
   } catch {
     /* ignore */
   }
@@ -39,7 +46,6 @@ function loadVoices(): SpeechSynthesisVoice[] {
   return window.speechSynthesis.getVoices();
 }
 
-/** Wait for voices to populate (Chrome loads async). */
 export function waitForVoices(timeoutMs = 2000): Promise<SpeechSynthesisVoice[]> {
   return new Promise((resolve) => {
     const existing = loadVoices();
@@ -60,33 +66,28 @@ export function waitForVoices(timeoutMs = 2000): Promise<SpeechSynthesisVoice[]>
   });
 }
 
-function scoreVoice(v: SpeechSynthesisVoice, gender: VoiceGender): number {
-  const name = v.name.toLowerCase();
-  const lang = v.lang.toLowerCase();
-  let score = 0;
-  if (lang.startsWith("cs")) score += 50;
-  else if (lang.startsWith("sk")) score += 30;
-  else if (lang.startsWith("en")) score += 5;
-  if (gender === "female" && /female|zira|ivona|woman|girl|petra|elena|zuzana/i.test(name)) score += 40;
-  if (gender === "male" && /male|david|jakub|man|boy|pavel|martin/i.test(name)) score += 40;
-  if (v.default) score += 10;
-  if (v.localService) score += 5;
-  return score;
-}
-
-export function pickVoice(voices: SpeechSynthesisVoice[], gender: VoiceGender): SpeechSynthesisVoice | null {
-  if (!voices.length) return null;
-  const pref = gender === "auto" ? getVoiceGenderPreference() : gender;
-  const ranked = [...voices].sort((a, b) => scoreVoice(b, pref) - scoreVoice(a, pref));
-  return ranked[0] ?? null;
-}
-
 export type SpeakOptions = {
   lang?: string;
   gender?: VoiceGender;
   rate?: number;
-  onBoundary?: () => void;
+  pitch?: number;
 };
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+function prepareParts(text: string, lang: string): string[] {
+  const trimmed = text.trim();
+  if (!trimmed) return [];
+  if (lang.toLowerCase().startsWith("en")) {
+    return trimmed
+      .split(/(?<=[.!?])\s+/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 2);
+  }
+  return naturalizeAndSplit(trimmed);
+}
 
 function speakOnce(text: string, opts: SpeakOptions, gen: number): Promise<void> {
   const trimmed = text.trim();
@@ -101,8 +102,9 @@ function speakOnce(text: string, opts: SpeakOptions, gen: number): Promise<void>
     const utterance = new SpeechSynthesisUtterance(trimmed);
     utterance.lang = opts.lang ?? "cs-CZ";
     utterance.rate = opts.rate ?? 1;
+    utterance.pitch = opts.pitch ?? 1;
     const voices = loadVoices();
-    const voice = pickVoice(voices, opts.gender ?? "auto");
+    const voice = pickVoice(opts.gender ?? "auto", opts.lang ?? "cs", voices);
     if (voice) utterance.voice = voice;
 
     utterance.onend = () => {
@@ -121,41 +123,62 @@ function speakOnce(text: string, opts: SpeakOptions, gen: number): Promise<void>
   });
 }
 
-export async function speak(text: string, lang = "cs-CZ", gender?: VoiceGender): Promise<void> {
-  await waitForVoices();
-  stopSpeaking();
-  const gen = speakGeneration;
-  return speakOnce(text, { lang, gender }, gen);
-}
-
-/** Read full lesson text in chunks (paragraphs). */
-export async function speakFullText(text: string, opts: SpeakOptions = {}): Promise<void> {
-  await waitForVoices();
-  stopSpeaking();
-  const gen = speakGeneration;
-
-  const chunks = text
-    .replace(/\r/g, "")
-    .split(/\n\n+/)
-    .map((p) => p.replace(/[#*]/g, "").trim())
-    .filter((p) => p.length > 8);
-
-  if (!chunks.length) {
-    const fallback = text.trim().slice(0, 8000);
-    if (fallback) await speakOnce(fallback, opts, gen);
-    return;
-  }
-
-  for (const chunk of chunks) {
+async function speakNaturalChunks(parts: string[], opts: SpeakOptions, gen: number): Promise<void> {
+  for (let i = 0; i < parts.length; i++) {
     if (gen !== speakGeneration) break;
+    const rate = (opts.rate ?? 1) * (0.97 + (i % 3) * 0.03);
+    const pitch = (opts.pitch ?? 1) * (0.98 + (i % 2) * 0.04);
     try {
-      await speakOnce(chunk.slice(0, 4000), opts, gen);
+      await speakOnce(parts[i]!, { ...opts, rate, pitch }, gen);
+      if (i < parts.length - 1) await sleep(180);
     } catch {
       break;
     }
   }
 }
 
-export async function speakSlideText(title: string, body: string, opts: SpeakOptions = {}): Promise<void> {
-  await speak(`${title}. ${body}`.slice(0, 4000), opts.lang ?? "cs-CZ", opts.gender);
+export async function speak(text: string, lang = "cs-CZ", gender?: VoiceGender): Promise<void> {
+  await waitForVoices();
+  stopSpeaking();
+  const gen = speakGeneration;
+  const parts = prepareParts(text, lang);
+  if (!parts.length) return;
+  return speakNaturalChunks(parts, { lang, gender }, gen);
+}
+
+export async function speakFullText(text: string, opts: SpeakOptions = {}): Promise<void> {
+  await waitForVoices();
+  stopSpeaking();
+  const gen = speakGeneration;
+  const lang = opts.lang ?? "cs-CZ";
+
+  const paragraphs = text
+    .replace(/\r/g, "")
+    .split(/\n\n+/)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 8);
+
+  const blocks = paragraphs.length ? paragraphs : [text.trim()];
+  for (const block of blocks) {
+    if (gen !== speakGeneration) break;
+    const parts = prepareParts(block, lang);
+    await speakNaturalChunks(parts, { ...opts, lang }, gen);
+    await sleep(SLIDE_PAUSE_MS);
+  }
+}
+
+export async function speakSlideText(
+  title: string,
+  body: string,
+  opts: SpeakOptions = {},
+  slideIndex = 0
+): Promise<void> {
+  await waitForVoices();
+  stopSpeaking();
+  const gen = speakGeneration;
+  const lang = opts.lang ?? "cs-CZ";
+  const parts = prepareParts(`${title}. ${body}`, lang);
+  const rate = (opts.rate ?? 1) * (0.95 + (slideIndex % 5) * 0.025);
+  const pitch = (opts.pitch ?? 1) * (0.98 + (slideIndex % 3) * 0.02);
+  await speakNaturalChunks(parts, { ...opts, rate, pitch, lang }, gen);
 }

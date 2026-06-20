@@ -46,11 +46,17 @@ const SLIDESHOW_SYSTEM = `Jsi medicínský lektor MedScope Academy. Vrať pouze 
   "script": "celý mluvený komentář k tématu (cs)",
   "voiceoverText": "zkrácený text pro Web Speech API",
   "slides": [
-    {"title": "...", "body": "2-3 věty k tématu", "imageDescription": "vizuální popis", "durationSeconds": 10}
+    {
+      "title": "...",
+      "body": "2-3 věty k tématu",
+      "imageDescription": "vizuální popis pro alt text",
+      "imageKeywords": ["klíčové", "slova", "pro", "obrázek"],
+      "durationSeconds": 10
+    }
   ],
   "alignmentScore": 0.0-1.0
 }
-Pravidla: 4–8 slidů, česky, obsah MUSÍ odpovídat titulku lekce a textu. Žádné generické ukázkové video.`;
+Pravidla: 4–8 slidů, česky, obsah MUSÍ odpovídat titulku lekce a textu. imageKeywords = 2–5 anglických medicínských/vzdělávacích termínů pro ilustrační foto. Žádné generické ukázkové video.`;
 
 export async function generateContentSlideshow(
   input: ContentSlideshowInput
@@ -86,6 +92,7 @@ export async function generateContentSlideshow(
           title: s.title,
           body: s.body,
           imageDescription: s.imageDescription || s.title,
+          imageKeywords: s.imageKeywords,
           durationSeconds: Math.max(6, Math.min(20, s.durationSeconds ?? 10)),
         })),
         parsed.topic || topic

@@ -134,7 +134,12 @@ export function OsvetaVideoPlayer({
   return (
     <div className="space-y-4">
       {listenText ? (
-        <TtsListenButton text={listenText} label="Poslech" className="not-prose" maxChars={4096} />
+        <TtsListenButton
+          text={listenText}
+          label="Poslech"
+          className="not-prose"
+          lang={(video.metadata?.language as string) ?? "cs"}
+        />
       ) : null}
 
       {showSlideshow ? (
@@ -144,7 +149,11 @@ export function OsvetaVideoPlayer({
           sourceKind="fallback_w3schools"
           sourceLabel="Slideshow z obsahu (demo)"
         >
-          <TopicSlideshowPlayer manifest={slideshow} lessonTitle={video.title} />
+          <TopicSlideshowPlayer
+            manifest={slideshow}
+            lessonTitle={video.title}
+            lang={(video.metadata?.language as string) ?? "cs"}
+          />
         </VideoLegalNotice>
       ) : (
         <VideoLegalNotice

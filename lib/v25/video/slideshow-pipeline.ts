@@ -18,6 +18,7 @@ export type SlideItem = {
   title: string;
   body: string;
   imageDescription: string;
+  imageKeywords?: string | string[];
   durationSeconds: number;
   imageUrl?: string;
 };

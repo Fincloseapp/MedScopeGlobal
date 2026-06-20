@@ -154,7 +154,11 @@ export function LessonVideoPlayer({
         sourceKind="fallback_w3schools"
         sourceLabel="Slideshow z obsahu lekce (demo)"
       >
-        <TopicSlideshowPlayer manifest={manifest} lessonTitle={lessonTitle} />
+        <TopicSlideshowPlayer
+          manifest={manifest}
+          lessonTitle={lessonTitle}
+          lang={(contentJson?.language as string) ?? undefined}
+        />
       </VideoLegalNotice>
     );
   }

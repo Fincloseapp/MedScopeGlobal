@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import {
-  getVoiceGenderPreference,
-  setVoiceGenderPreference,
-  type VoiceGender,
-} from "@/lib/tts/speak";
+  getUserVoiceOverride,
+  initSessionVoice,
+  setUserVoiceOverride,
+} from "@/lib/tts/voice-session";
+import { setVoiceGenderPreference, type VoiceGender } from "@/lib/tts/speak";
 
 type Props = {
   className?: string;
@@ -14,21 +15,30 @@ type Props = {
 
 export function VoicePicker({ className, compact }: Props) {
   const [gender, setGender] = useState<VoiceGender>("auto");
+  const [sessionHint, setSessionHint] = useState<string>("");
 
   useEffect(() => {
-    setGender(getVoiceGenderPreference());
+    initSessionVoice();
+    const override = getUserVoiceOverride();
+    setGender(override === "auto" ? "auto" : override);
+    try {
+      const s = sessionStorage.getItem("medscope-tts-session-gender");
+      if (s === "male") setSessionHint("Muž");
+      else if (s === "female") setSessionHint("Žena");
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   function select(next: VoiceGender) {
     setGender(next);
+    setUserVoiceOverride(next);
     setVoiceGenderPreference(next);
   }
 
   return (
-    <div className={className} role="group" aria-label="Výběr hlasu">
-      {!compact ? (
-        <span className="mr-2 text-xs text-slate-500">Hlas:</span>
-      ) : null}
+    <div className={`flex flex-wrap items-center gap-1 ${className ?? ""}`} role="group" aria-label="Výběr hlasu">
+      {!compact ? <span className="mr-1 text-xs text-slate-500">Hlas:</span> : null}
       {(["female", "male", "auto"] as const).map((g) => (
         <button
           key={g}
@@ -44,6 +54,9 @@ export function VoicePicker({ className, compact }: Props) {
           {g === "female" ? "Žena" : g === "male" ? "Muž" : "Auto"}
         </button>
       ))}
+      {gender === "auto" && sessionHint ? (
+        <span className="text-[10px] text-slate-400">({sessionHint})</span>
+      ) : null}
     </div>
   );
 }
