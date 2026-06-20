@@ -60,6 +60,36 @@ export default function PrivacyPage() {
         <li>Přenositelnost údajů</li>
         <li>Podání stížnosti u ÚOOÚ</li>
       </ul>
+
+      <h2 id="video-analytics">7. Video obsah a analytika sledování</h2>
+      <p>
+        Při sledování videí v Academy a veřejné osvětě můžeme zaznamenávat technické události
+        přehrávání (play, pause, dokončení, chyba) pro měření dokončení kurzů a zlepšování
+        platformy. Zpracování probíhá na základě oprávněného zájmu (čl. 6 odst. 1 písm. f GDPR)
+        nebo plnění smlouvy u přihlášených uživatelů.
+      </p>
+      <ul>
+        <li>
+          <strong>Přihlášení uživatelé:</strong> události jsou propojeny s ID účtu (user_id) —
+          viz sekce Cookies a analytika; lze vznést námitku v nastavení účtu.
+        </li>
+        <li>
+          <strong>Anonymní / nepřihlášení:</strong> ukládáme pouze pseudonymní session_id v
+          sessionStorage prohlížeče a typ události — bez jména, e-mailu ani IP v URL videa.
+        </li>
+        <li>
+          <strong>URL videa:</strong> do logů ani analytiky neukládáme query parametry s osobními
+          údaji; cesty k souborům obsahují pouze technické identifikátory.
+        </li>
+      </ul>
+      <p>
+        Videa se načítají z našeho úložiště (Supabase Storage CDN) nebo — při technické záloze —
+        z veřejného CDN třetí strany (např. w3schools.com). Tyto domény mohou nastavovat vlastní
+        cookies nebo logovat IP adresu dle svých zásad. Náš banner cookies (
+        <Link href="/cookies">/cookies</Link>) umožňuje spravovat analytické cookies; nezbytné
+        cookies pro přehrávání z našeho CDN zůstávají aktivní. Doporučujeme se seznámit se zásadami
+        příslušného poskytovatele CDN při použití záložního zdroje.
+      </p>
     </LegalPageLayout>
   );
 }

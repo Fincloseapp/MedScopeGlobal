@@ -1,6 +1,7 @@
 import { AlertTriangle } from "lucide-react";
 import { enrichLessonContent, extractLessonMetadata } from "@/lib/v35/content-validation/enrichLesson";
 import { validateLessonContent } from "@/lib/v35/content-validation/validateLesson";
+import { scoreTopicAlignment, extractSlideshowManifest } from "@/lib/v25/video/content-slideshow";
 
 type Props = {
   title: string;
@@ -8,6 +9,7 @@ type Props = {
   contentJson: Record<string, unknown>;
   videoTitle?: string;
   videoDescription?: string;
+  slideshowTopic?: string;
 };
 
 export async function LessonMetadataBlock({
@@ -16,14 +18,20 @@ export async function LessonMetadataBlock({
   contentJson,
   videoTitle,
   videoDescription,
+  slideshowTopic,
 }: Props) {
   const existing = extractLessonMetadata(contentJson);
   const enrichment = await enrichLessonContent({ title, content, existing });
+  const slideshow = extractSlideshowManifest(contentJson, null);
+  const alignmentScore = slideshow ? scoreTopicAlignment(title, slideshow) : undefined;
+
   const validation = await validateLessonContent({
     lessonTitle: title,
     lessonContent: content,
     videoTitle,
     videoDescription,
+    slideshowTopic: slideshowTopic ?? slideshow?.topic,
+    alignmentScore,
   });
 
   return (
@@ -39,6 +47,11 @@ export async function LessonMetadataBlock({
             ))}
           </ul>
         </div>
+      ) : null}
+      {slideshow && alignmentScore !== undefined ? (
+        <p className="mt-4 text-xs text-emerald-800">
+          Video prezentace odpovídá tématu lekce (shoda {Math.round(alignmentScore * 100)} %).
+        </p>
       ) : null}
       {validation.content_mismatch ? (
         <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">

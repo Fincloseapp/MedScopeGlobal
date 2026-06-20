@@ -140,6 +140,9 @@ export default async function AcademyLessonPage({ params }: Props) {
             <LessonVideoWithConversion
               video={lesson.video}
               lessonTitle={lesson.title}
+              lessonContent={lesson.content}
+              courseTopic={lesson.course.title}
+              contentJson={(lesson.content_json ?? {}) as Record<string, unknown>}
               isVip={isVip}
               lessonIndex={lessonIndex >= 0 ? lessonIndex : 0}
             />
@@ -151,6 +154,18 @@ export default async function AcademyLessonPage({ params }: Props) {
               videoDescription={String(
                 (lesson.video?.metadata as Record<string, unknown> | undefined)?.description ?? ""
               )}
+              slideshowTopic={
+                (
+                  (lesson.content_json as Record<string, unknown> | undefined)?.slideshow as
+                    | { topic?: string; title?: string }
+                    | undefined
+                )?.topic ??
+                (
+                  (lesson.video?.metadata as Record<string, unknown> | undefined)?.slideshow as
+                    | { topic?: string }
+                    | undefined
+                )?.topic
+              }
             />
             <article className="prose prose-slate max-w-none space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="not-prose mb-4 flex flex-wrap items-center gap-3">

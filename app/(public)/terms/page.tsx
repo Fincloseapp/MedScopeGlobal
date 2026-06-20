@@ -59,6 +59,27 @@ export default function TermsPage() {
         Uživatel může kdykoli ukončit účet v sekci Účet. Provozovatel si vyhrazuje právo
         pozastavit účet při porušení podmínek, zneužití AI služeb nebo bezpečnostních pravidel.
       </p>
+
+      <h2 id="video-content">7. Video obsah a vzdělávací materiály</h2>
+      <p>
+        Videa v MedScope Academy, veřejné osvětě a v článcích slouží výhradně ke vzdělávacím a
+        informačním účelům. Nepředstavují individuální lékařskou radu, diagnózu ani léčbu a
+        nenahrazují konzultaci s kvalifikovaným zdravotnickým pracovníkem.
+      </p>
+      <p>
+        Obsah splňuje vzdělávací standard platformy a není reklamou na léčivé přípravky ani
+        zdravotnické prostředky dle platné české a evropské legislativy. Automaticky generované
+        popisy videí (AI metadata) jsou kontrolovány a nesmí obsahovat zavádějící terapeutická
+        tvrzení.
+      </p>
+      <h3 id="video-license">Licence obsahu</h3>
+      <p>
+        Autorská práva k videím a doprovodným materiálům náleží provozovateli MedScopeGlobal /
+        MedScope Academy, není-li u konkrétního díla uvedeno jinak. Uživatel smí obsah sledovat
+        v rámci platného účtu a nesmí jej bez písemného souhlasu šířit, stahovat hromadně ani
+        komerčně využívat. Záložní nebo externí ukázková videa (např. z CDN třetích stran) jsou
+        použita pouze pro technickou ukázku přehrávání — zdroj je u přehrávače vždy uveden.
+      </p>
     </LegalPageLayout>
   );
 }

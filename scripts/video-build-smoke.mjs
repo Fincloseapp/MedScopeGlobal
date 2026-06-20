@@ -8,7 +8,7 @@ const base = (process.argv[2] ?? "https://medscopeglobal.com").replace(/\/$/, ""
 const LESSONS = [
   "/academy/courses/fyziologie-zaklady-uchazece/lessons/krevni-obeh",
   "/academy/courses/fyziologie-zaklady-uchazece/lessons/dychani",
-  "/academy/courses/anatomie-zaklady/lessons/svalova-soustava",
+  "/academy/courses/fyziologie-zaklady-uchazece/lessons/bunkove-deleni",
 ];
 
 const results = [];

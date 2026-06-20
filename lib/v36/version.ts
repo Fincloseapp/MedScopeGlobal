@@ -1,4 +1,4 @@
-/** MedScope v36 — AI video analytics; delegates to v37 */
+/** MedScope v36 — video watch analytics (consent/anonymized per /privacy#video-analytics); delegates to v37 */
 
 import { getSiteVersionLabel as getV37SiteVersionLabel } from "@/lib/v37/version";
 

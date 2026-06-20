@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import type { WatchEventType } from "@/lib/v34/video-engine/types";
 
+/** GDPR: logged-in users → user_id; anonymous → null user_id + pseudonymous session_id only (no PII in URLs). See /privacy#video-analytics */
 export const dynamic = "force-dynamic";
 
 type Params = { params: Promise<{ id: string }> };

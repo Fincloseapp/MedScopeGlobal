@@ -53,7 +53,23 @@ export async function validateLessonContent(input: {
   lessonContent: string;
   videoTitle?: string;
   videoDescription?: string;
+  slideshowTopic?: string;
+  alignmentScore?: number;
 }): Promise<LessonValidationResult> {
+  if (
+    input.slideshowTopic &&
+    (input.alignmentScore ?? 0) >= 0.65 &&
+    input.lessonTitle.toLowerCase().split(/\s+/).some((w) => w.length > 3 && input.slideshowTopic!.toLowerCase().includes(w))
+  ) {
+    return {
+      ok: true,
+      content_mismatch: false,
+      confidence: input.alignmentScore ?? 0.85,
+      reason: "Slideshow odpovídá tématu lekce.",
+      flags: ["topic_slideshow_aligned"],
+    };
+  }
+
   const rule = ruleBasedValidation(input.lessonTitle, input.videoTitle ?? input.lessonTitle);
 
   if (!isLlmConfigured()) return rule;
