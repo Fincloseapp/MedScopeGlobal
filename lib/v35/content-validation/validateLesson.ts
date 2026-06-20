@@ -48,6 +48,18 @@ function ruleBasedValidation(lessonTitle: string, videoTitle: string): LessonVal
   };
 }
 
+const SLIDESHOW_ALIGNMENT_THRESHOLD = 0.65;
+
+function slideshowAlignedResult(alignmentScore: number): LessonValidationResult {
+  return {
+    ok: true,
+    content_mismatch: false,
+    confidence: alignmentScore,
+    reason: "Slideshow odpovídá tématu lekce.",
+    flags: ["topic_slideshow_aligned"],
+  };
+}
+
 export async function validateLessonContent(input: {
   lessonTitle: string;
   lessonContent: string;
@@ -56,18 +68,9 @@ export async function validateLessonContent(input: {
   slideshowTopic?: string;
   alignmentScore?: number;
 }): Promise<LessonValidationResult> {
-  if (
-    input.slideshowTopic &&
-    (input.alignmentScore ?? 0) >= 0.65 &&
-    input.lessonTitle.toLowerCase().split(/\s+/).some((w) => w.length > 3 && input.slideshowTopic!.toLowerCase().includes(w))
-  ) {
-    return {
-      ok: true,
-      content_mismatch: false,
-      confidence: input.alignmentScore ?? 0.85,
-      reason: "Slideshow odpovídá tématu lekce.",
-      flags: ["topic_slideshow_aligned"],
-    };
+  const alignmentScore = input.alignmentScore ?? 0;
+  if (alignmentScore >= SLIDESHOW_ALIGNMENT_THRESHOLD) {
+    return slideshowAlignedResult(alignmentScore);
   }
 
   const rule = ruleBasedValidation(input.lessonTitle, input.videoTitle ?? input.lessonTitle);
@@ -88,6 +91,9 @@ export async function validateLessonContent(input: {
       confidence?: number;
       reason?: string;
     };
+    if (parsed.content_mismatch && alignmentScore >= SLIDESHOW_ALIGNMENT_THRESHOLD) {
+      return slideshowAlignedResult(alignmentScore);
+    }
     return {
       ok: !parsed.content_mismatch,
       content_mismatch: Boolean(parsed.content_mismatch),

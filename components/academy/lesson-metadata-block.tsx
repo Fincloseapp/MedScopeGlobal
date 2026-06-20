@@ -23,7 +23,10 @@ export async function LessonMetadataBlock({
   const existing = extractLessonMetadata(contentJson);
   const enrichment = await enrichLessonContent({ title, content, existing });
   const slideshow = extractSlideshowManifest(contentJson, null);
-  const alignmentScore = slideshow ? scoreTopicAlignment(title, slideshow) : undefined;
+  const storedAlignment = Number(contentJson?.alignment_score ?? slideshow?.alignmentScore ?? 0);
+  const computedAlignment = slideshow ? scoreTopicAlignment(title, slideshow) : 0;
+  const alignmentScore = slideshow ? Math.max(storedAlignment, computedAlignment) : undefined;
+  const slideshowAligned = alignmentScore !== undefined && alignmentScore >= 0.65;
 
   const validation = await validateLessonContent({
     lessonTitle: title,
@@ -53,7 +56,7 @@ export async function LessonMetadataBlock({
           Video prezentace odpovídá tématu lekce (shoda {Math.round(alignmentScore * 100)} %).
         </p>
       ) : null}
-      {validation.content_mismatch ? (
+      {validation.content_mismatch && !slideshowAligned ? (
         <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           <span>Obsah lekce a video mohou být nesouladné — tým Academy to ověří.</span>

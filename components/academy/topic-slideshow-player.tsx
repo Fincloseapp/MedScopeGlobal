@@ -66,8 +66,11 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className }: Props
   if (!slide) return null;
 
   return (
-    <div className={className}>
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-[#021d33] via-[#003d66] to-[#005B96] shadow-lg">
+    <div className={className} role="region" aria-label={`Prezentace lekce: ${lessonTitle}`}>
+      <div
+        className="overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-[#021d33] via-[#003d66] to-[#005B96] shadow-lg"
+        aria-roledescription="slideshow"
+      >
         <div className="flex min-h-[280px] flex-col justify-between p-6 text-white sm:min-h-[320px] sm:p-8">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#7CC4FF]">
