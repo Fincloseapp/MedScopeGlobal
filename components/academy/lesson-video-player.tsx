@@ -146,7 +146,15 @@ export function LessonVideoPlayer({
 
   if (showSlideshow && manifest) {
     return (
-      <TopicSlideshowPlayer manifest={manifest} lessonTitle={lessonTitle} className={className} />
+      <VideoLegalNotice
+        className={className}
+        lessonTitle={lessonTitle}
+        variant="academy"
+        sourceKind="fallback_w3schools"
+        sourceLabel="Slideshow z obsahu lekce (demo)"
+      >
+        <TopicSlideshowPlayer manifest={manifest} lessonTitle={lessonTitle} />
+      </VideoLegalNotice>
     );
   }
 
