@@ -139,7 +139,7 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className }: Props
         </div>
       </div>
       <p className="mt-2 text-xs text-slate-600">
-        Slideshow odpovídá tématu „{lessonTitle}" (shoda {Math.round((manifest.alignmentScore ?? 0.8) * 100)} %)
+        Slideshow odpovídá tématu: {lessonTitle} (shoda {Math.round((manifest.alignmentScore ?? 0.8) * 100)} %)
       </p>
     </div>
   );
