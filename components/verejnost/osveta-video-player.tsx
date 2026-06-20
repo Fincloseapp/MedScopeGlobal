@@ -137,7 +137,14 @@ export function OsvetaVideoPlayer({
       ) : null}
 
       {showSlideshow ? (
-        <TopicSlideshowPlayer manifest={slideshow} lessonTitle={video.title} />
+        <VideoLegalNotice
+          lessonTitle={video.title}
+          variant="osveta"
+          sourceKind="fallback_w3schools"
+          sourceLabel="Slideshow z obsahu (demo)"
+        >
+          <TopicSlideshowPlayer manifest={slideshow} lessonTitle={video.title} />
+        </VideoLegalNotice>
       ) : (
         <VideoLegalNotice
           lessonTitle={video.title}
