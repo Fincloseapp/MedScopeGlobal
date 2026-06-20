@@ -1,11 +1,7 @@
 #!/usr/bin/env node
-/**
- * Attach topic-matched imageUrl to all academy lesson slideshows.
- * Usage: node scripts/academy-batch-slideshow-images.mjs
- */
+/** Attach slide images + listen text to all published lessons (fetch-only, no deps). */
 import fs from "node:fs";
 import path from "node:path";
-import { createClient } from "@supabase/supabase-js";
 import { MEDSCOPE_PROJECT_ROOT } from "../lib/config/paths.mjs";
 
 const root = MEDSCOPE_PROJECT_ROOT;
@@ -19,50 +15,58 @@ for (const name of [".env.local", ".env"]) {
   }
 }
 
-const TOPIC_IMAGES = {
+const BASE = (env.NEXT_PUBLIC_SUPABASE_URL ?? env.SUPABASE_URL ?? "").replace(/\/$/, "");
+const KEY = env.SUPABASE_SERVICE_ROLE_KEY;
+if (!BASE || !KEY) {
+  console.error("Missing SUPABASE_URL / SERVICE_ROLE_KEY");
+  process.exit(1);
+}
+
+const H = {
+  apikey: KEY,
+  Authorization: `Bearer ${KEY}`,
+  "Content-Type": "application/json",
+  Prefer: "return=minimal",
+};
+
+async function sbGet(table, query) {
+  const res = await fetch(`${BASE}/rest/v1/${table}?${query}`, { headers: H });
+  if (!res.ok) throw new Error(`${table} GET ${res.status}`);
+  return res.json();
+}
+
+async function sbPatch(table, query, body) {
+  const res = await fetch(`${BASE}/rest/v1/${table}?${query}`, {
+    method: "PATCH",
+    headers: H,
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`${table} PATCH ${res.status} ${await res.text()}`);
+}
+
+const IMAGES = {
   anatomy: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
   orientace: "https://images.unsplash.com/photo-1532187863486-abf9db1a4690?w=800&q=80",
   krev: "https://images.unsplash.com/photo-1559757175-5700cde872bc?w=800&q=80",
   default: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
 };
 
-function resolveImage(title, body, topic, index) {
+function imgFor(title, body, topic, i) {
   const h = `${topic} ${title} ${body}`.toLowerCase();
-  if (/orientac|poloh|roviny|anatom/i.test(h)) return TOPIC_IMAGES.orientace;
-  if (/krev|oběh|srde|kardi/i.test(h)) return TOPIC_IMAGES.krev;
-  if (/anatom|kost/i.test(h)) return TOPIC_IMAGES.anatomy;
-  return TOPIC_IMAGES.default;
+  if (/orientac|poloh|roviny|anatom/i.test(h)) return IMAGES.orientace;
+  if (/krev|oběh|srde|kardi/i.test(h)) return IMAGES.krev;
+  if (/anatom|kost/i.test(h)) return IMAGES.anatomy;
+  return IMAGES.default;
 }
 
-const url = env.NEXT_PUBLIC_SUPABASE_URL ?? env.SUPABASE_URL;
-const key = env.SUPABASE_SERVICE_ROLE_KEY;
-if (!url || !key) {
-  console.error("Missing Supabase credentials");
-  process.exit(1);
-}
-
-const admin = createClient(url, key, { auth: { persistSession: false } });
-
-const { data: lessons, error } = await admin
-  .from("lessons")
-  .select("id, title, content, content_json, slug, course_id, duration_minutes")
-  .eq("status", "published");
-
-if (error) {
-  console.error(error.message);
-  process.exit(1);
-}
-
-const courseIds = [...new Set((lessons ?? []).map((l) => l.course_id))];
-const { data: courses } = await admin.from("courses").select("id, title, duration_minutes").in("id", courseIds);
-const courseMap = new Map((courses ?? []).map((c) => [c.id, c]));
-
+const lessons = await sbGet("lessons", "select=id,title,content,content_json,slug,course_id,duration_minutes&status=eq.published");
+const courses = await sbGet("courses", "select=id,title");
+const courseMap = new Map(courses.map((c) => [c.id, c.title]));
+const courseTotals = new Map();
 let fixed = 0;
-const courseDurations = new Map();
 
-for (const lesson of lessons ?? []) {
-  const course = courseMap.get(lesson.course_id);
-  const topic = course?.title ?? "MedScope Academy";
+for (const lesson of lessons) {
+  const topic = courseMap.get(lesson.course_id) ?? "MedScope Academy";
   const cj = { ...(lesson.content_json ?? {}) };
   let slideshow = cj.slideshow ?? null;
 
@@ -81,7 +85,7 @@ for (const lesson of lessons ?? []) {
             imageDescription: topic,
             durationSeconds: 10,
           }))
-        : [{ title: lesson.title, body: lesson.content?.slice(0, 280) || lesson.title, imageDescription: topic, durationSeconds: 10 }];
+        : [{ title: lesson.title, body: (lesson.content || lesson.title).slice(0, 280), imageDescription: topic, durationSeconds: 10 }];
     slideshow = {
       title: lesson.title,
       topic,
@@ -95,38 +99,28 @@ for (const lesson of lessons ?? []) {
     };
   }
 
-  slideshow.slides = (slideshow.slides ?? []).map((s, i) => ({
+  slideshow.slides = slideshow.slides.map((s, i) => ({
     ...s,
-    imageUrl: s.imageUrl || resolveImage(s.title, s.body, topic, i),
+    imageUrl: s.imageUrl || imgFor(s.title, s.body, topic, i),
   }));
 
-  const estMinutes = Math.max(lesson.duration_minutes || 0, Math.ceil((lesson.content?.length ?? 0) / 900));
+  const estMin = Math.max(lesson.duration_minutes || 0, Math.ceil((lesson.content?.length ?? 0) / 900)) || 5;
   const listenText = [lesson.title, lesson.content, ...slideshow.slides.map((s) => `${s.title}. ${s.body}`)].join("\n\n");
 
-  await admin
-    .from("lessons")
-    .update({
-      content_json: {
-        ...cj,
-        slideshow,
-        slides: slideshow.slides,
-        voiceover_text: listenText,
-        alignment_score: slideshow.alignmentScore ?? 0.85,
-      },
-      duration_minutes: estMinutes || 5,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", lesson.id);
+  await sbPatch("lessons", `id=eq.${lesson.id}`, {
+    content_json: { ...cj, slideshow, slides: slideshow.slides, voiceover_text: listenText, alignment_score: 0.85 },
+    duration_minutes: estMin,
+    updated_at: new Date().toISOString(),
+  });
 
-  courseDurations.set(lesson.course_id, (courseDurations.get(lesson.course_id) ?? 0) + (estMinutes || 5));
+  courseTotals.set(lesson.course_id, (courseTotals.get(lesson.course_id) ?? 0) + estMin);
   fixed += 1;
-  console.log(`✓ ${lesson.slug} — ${slideshow.slides.length} slides with images`);
+  console.log(`✓ ${lesson.slug}`);
 }
 
-for (const [courseId, totalMin] of courseDurations) {
-  await admin.from("courses").update({ duration_minutes: totalMin, updated_at: new Date().toISOString() }).eq("id", courseId);
-  const c = courseMap.get(courseId);
-  console.log(`  course ${c?.title}: ${totalMin} min total`);
+for (const [cid, total] of courseTotals) {
+  await sbPatch("courses", `id=eq.${cid}`, { duration_minutes: total, updated_at: new Date().toISOString() });
+  console.log(`  course ${courseMap.get(cid)}: ${total} min`);
 }
 
-console.log(`\nBatch complete: ${fixed} lessons updated\n`);
+console.log(`\nDone: ${fixed} lessons\n`);
