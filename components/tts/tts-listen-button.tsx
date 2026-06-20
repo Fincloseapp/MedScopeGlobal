@@ -12,14 +12,23 @@ type Props = {
   className?: string;
   /** When true, read full content in chunks (no char limit). */
   full?: boolean;
+  /** Legacy cap — when set, disables full chunked readout. */
+  maxChars?: number;
 };
 
-export function TtsListenButton({ text, label = "Poslech", className, full = true }: Props) {
+export function TtsListenButton({
+  text,
+  label = "Poslech",
+  className,
+  full = true,
+  maxChars,
+}: Props) {
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const snippet = text.trim();
+  const snippet = maxChars ? text.trim().slice(0, maxChars) : text.trim();
+  const readFull = full && !maxChars;
   if (!snippet) return null;
 
   async function handlePlay() {
@@ -32,7 +41,7 @@ export function TtsListenButton({ text, label = "Poslech", className, full = tru
     setError(null);
     try {
       setPlaying(true);
-      if (full) {
+      if (readFull) {
         await speakFullText(snippet);
       } else {
         const { speak } = await import("@/lib/tts/speak");
