@@ -21,6 +21,7 @@ export type SlideItem = {
   imageKeywords?: string | string[];
   durationSeconds: number;
   imageUrl?: string;
+  imageAlt?: string;
 };
 
 export type SlideshowPlan = {

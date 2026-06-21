@@ -38,6 +38,24 @@ export type ListPublishedCoursesFilter = {
   level?: string;
 };
 
+function dedupeCoursesBySlug(courses: AcademyCourse[]): AcademyCourse[] {
+  const bySlug = new Map<string, AcademyCourse>();
+  for (const course of courses) {
+    const key = course.slug?.trim() || course.id;
+    const existing = bySlug.get(key);
+    if (!existing) {
+      bySlug.set(key, course);
+      continue;
+    }
+    const existingTs = new Date(existing.updated_at ?? 0).getTime();
+    const courseTs = new Date(course.updated_at ?? 0).getTime();
+    if (courseTs >= existingTs) bySlug.set(key, course);
+  }
+  return [...bySlug.values()].sort(
+    (a, b) => new Date(b.updated_at ?? 0).getTime() - new Date(a.updated_at ?? 0).getTime()
+  );
+}
+
 export async function listPublishedCourses(
   limit = 50,
   filter?: ListPublishedCoursesFilter
@@ -49,7 +67,7 @@ export async function listPublishedCourses(
     .eq("status", "published")
     .eq("is_public", true)
     .order("updated_at", { ascending: false })
-    .limit(limit);
+    .limit(limit * 2);
 
   if (filter?.category) query = query.eq("category", filter.category);
   if (filter?.level) query = query.eq("level", filter.level);
@@ -62,7 +80,7 @@ export async function listPublishedCourses(
     console.error("[academy] listPublishedCourses", error.message);
     return [];
   }
-  return (data ?? []) as AcademyCourse[];
+  return dedupeCoursesBySlug((data ?? []) as AcademyCourse[]).slice(0, limit);
 }
 
 export async function countPrepCourses(): Promise<number> {

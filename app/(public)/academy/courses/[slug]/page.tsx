@@ -49,7 +49,7 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
       <AcademyPageHeader
         eyebrow="Kurz"
         title={course.title}
-        description={`${course.summary ?? course.description}${totalMinutes ? ` · ${totalMinutes} min celkem` : ""}`}
+        description={`${course.summary ?? course.description}${totalMinutes ? ` · ≈ ${totalMinutes} min poslechu` : ""}`}
         ctaHref="/academy/courses"
         ctaLabel="Zpět na kurzy"
       />
@@ -81,7 +81,7 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
 
         {totalMinutes > 0 ? (
           <p className="mb-4 text-sm text-slate-600">
-            Odhadovaná délka kurzu: <strong>{totalMinutes} min</strong> ({course.lessons.length} lekcí)
+            ≈ <strong>{totalMinutes} min poslechu</strong> ({course.lessons.length} lekcí)
           </p>
         ) : null}
 

@@ -54,6 +54,9 @@ export default async function ArticlesPage({
         <Link href="/medicina" className="text-sm font-medium text-primary hover:underline">
           Medicínská větev →
         </Link>
+        <Link href="/articles/archiv" className="text-sm font-medium text-primary hover:underline">
+          Archiv →
+        </Link>
       </div>
 
       <div className="mt-6 flex flex-wrap gap-2">

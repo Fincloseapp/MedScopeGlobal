@@ -18,19 +18,34 @@ export const BROKEN_UNSPLASH_PHOTO_IDS = [
 ] as const;
 
 export const KEYWORD_IMAGES: Record<string, string> = {
-  anatomy: DEFAULT_SLIDE_IMAGE,
-  orientation: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
-  skeleton: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
-  heart: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
-  blood: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
-  circulation: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
+  anatomical_planes:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Human_anatomy_planes.jpg/960px-Human_anatomy_planes.jpg",
+  body_regions:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Regions_of_human_body.png/800px-Regions_of_human_body.png",
+  anatomy:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Human_skeleton_front_en.svg/800px-Human_skeleton_front_en.svg.png",
+  orientation:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Human_anatomy_planes.jpg/960px-Human_anatomy_planes.jpg",
+  skeleton:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Human_skeleton_front_en.svg/800px-Human_skeleton_front_en.svg.png",
+  skeleton_anterior:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Human_skeleton_front_en.svg/800px-Human_skeleton_front_en.svg.png",
+  skeleton_posterior:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Human_skeleton_back_en.svg/800px-Human_skeleton_back_en.svg.png",
+  heart:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Diagram_of_the_human_heart_%28cropped%29.svg/800px-Diagram_of_the_human_heart_%28cropped%29.svg.png",
+  blood:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Circulatory_System_en.svg/800px-Circulatory_System_en.svg.png",
+  circulation:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Circulatory_System_en.svg/800px-Circulatory_System_en.svg.png",
   pharmacy: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&h=450&fit=crop&q=80&auto=format",
-  cell: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800&h=450&fit=crop&q=80&auto=format",
-  biology: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800&h=450&fit=crop&q=80&auto=format",
+  cell: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Animal_cell_structure_en.svg/800px-Animal_cell_structure_en.svg.png",
+  biology: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Animal_cell_structure_en.svg/800px-Animal_cell_structure_en.svg.png",
   chemistry: DEFAULT_SLIDE_IMAGE,
   physics: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=450&fit=crop&q=80&auto=format",
   physiology: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&h=450&fit=crop&q=80&auto=format",
-  brain: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
+  brain:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Brain_human_sagittal_section.svg/800px-Brain_human_sagittal_section.svg.png",
   nutrition: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=450&fit=crop&q=80&auto=format",
   diet: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=450&fit=crop&q=80&auto=format",
   health: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&h=450&fit=crop&q=80&auto=format",
@@ -38,8 +53,9 @@ export const KEYWORD_IMAGES: Record<string, string> = {
   ethics: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&h=450&fit=crop&q=80&auto=format",
   latin: DEFAULT_SLIDE_IMAGE,
   muscle: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=450&fit=crop&q=80&auto=format",
-  lung: DEFAULT_SLIDE_IMAGE,
-  nerve: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
+  lung: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Lungs_diagram_detailed.svg/800px-Lungs_diagram_detailed.svg.png",
+  nerve:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Brain_human_sagittal_section.svg/800px-Brain_human_sagittal_section.svg.png",
   default: DEFAULT_SLIDE_IMAGE,
 };
 

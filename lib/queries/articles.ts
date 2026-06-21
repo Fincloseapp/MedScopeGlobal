@@ -22,6 +22,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   filterActiveArticles,
   filterCzechContent,
+  isArchivedArticle,
 } from "@/lib/v20/content-rules";
 import type { ArticleWithRelations } from "@/types/database";
 
@@ -397,4 +398,39 @@ export async function getArticlesByMetadataSection(
     maxTranslate: limit,
   });
   return prepared.slice(0, limit);
+}
+
+/** Archived articles (pre-2026 legacy / expired v19 briefs) — direct slug access still works. */
+export async function getArchivedArticles(
+  limit = 48,
+  offset = 0,
+  locale: LocaleCode = "cs"
+): Promise<{ articles: DisplayArticle[]; total: number }> {
+  const supabase = await createClient();
+  const { data, error, count } = await supabase
+    .from("articles")
+    .select(articleSelect, { count: "exact" })
+    .eq("published", true)
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .range(offset, offset + limit * 3 - 1);
+
+  if (error) {
+    console.error("getArchivedArticles", error);
+    return { articles: [], total: 0 };
+  }
+
+  const rows = mapArticleList(data as Record<string, unknown>[] | null);
+  const archived = filterCzechContent(
+    rows.filter((a) => isArchivedArticle(a)),
+    locale
+  );
+  const prepared = await prepareArticlesForDisplay(archived, locale, {
+    mode: "card",
+    maxTranslate: limit,
+  });
+
+  return {
+    articles: prepared.slice(0, limit),
+    total: count ?? archived.length,
+  };
 }

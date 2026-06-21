@@ -1,4 +1,4 @@
-/** Naturalize Czech medical/educational text for Web Speech API (human-like, not robotic). */
+/** Naturalize Czech medical/educational text for Web Speech API (spisovná čeština). */
 
 const MEDICAL_ABBR: Record<string, string> = {
   EKG: "E K G",
@@ -14,9 +14,104 @@ const MEDICAL_ABBR: Record<string, string> = {
   "mg/kg": "miligramů na kilogram",
   mmHg: "milimetrů rtuťového sloupce",
   bpm: "úderů za minutu",
+  TNM: "T N M",
+  HIV: "H I V",
+  AIDS: "A I D S",
+  COPD: "C O P D",
+  DM: "diabetes mellitus",
+  HTN: "hypertenze",
+  IV: "intravenózně",
+  IM: "intramuskulárně",
+  PO: "perorálně",
+};
+
+/** Feminine cardinal forms used before letter designations (2b → dvě bé). */
+const CZECH_DIGIT_SPOKEN: Record<string, string> = {
+  "0": "nula",
+  "1": "jedna",
+  "2": "dvě",
+  "3": "tři",
+  "4": "čtyři",
+  "5": "pět",
+  "6": "šest",
+  "7": "sedm",
+  "8": "osm",
+  "9": "devět",
+  "10": "deset",
+  "11": "jedenáct",
+  "12": "dvanáct",
+};
+
+/** Czech letter names for medical staging (a → á, b → bé). */
+const CZECH_LETTER: Record<string, string> = {
+  a: "á",
+  b: "bé",
+  c: "cé",
+  d: "dé",
+  e: "e",
+  f: "ef",
+  g: "gé",
+  h: "há",
+  i: "í",
+  j: "jé",
+  k: "ká",
+  l: "el",
+  m: "em",
+  n: "en",
+  o: "o",
+  p: "pé",
+  q: "kvé",
+  r: "er",
+  s: "es",
+  t: "té",
+  u: "u",
+  v: "vé",
+  w: "dvojité vé",
+  x: "iks",
+  y: "ypsilon",
+  z: "zet",
 };
 
 const PAUSE = "\u0000";
+
+function speakDigit(n: string): string {
+  if (CZECH_DIGIT_SPOKEN[n]) return CZECH_DIGIT_SPOKEN[n]!;
+  return n
+    .split("")
+    .map((d) => CZECH_DIGIT_SPOKEN[d] ?? d)
+    .join(" ");
+}
+
+function speakLetter(ch: string): string {
+  return CZECH_LETTER[ch.toLowerCase()] ?? ch;
+}
+
+/** e.g. 2b → dvě bé, 3a → tři á, T2N1 → té dva en jedna */
+function expandLetterNumberPatterns(text: string): string {
+  let t = text;
+
+  // Digit(s) + letter: 2b, 10a, stage IIIb handled separately
+  t = t.replace(/\b(\d{1,2})([a-d])\b/gi, (_, num, letter) => {
+    return `${speakDigit(num)} ${speakLetter(letter)}`;
+  });
+
+  // Letter + digit: a1, T1 (single letter prefix staging)
+  t = t.replace(/\b([A-Za-z])(\d+)\b/g, (_, letter, num) => {
+    const spokenLetter = speakLetter(letter);
+    const spokenNum = num
+      .split("")
+      .map((d: string) => CZECH_DIGIT_SPOKEN[d] ?? d)
+      .join(" ");
+    return `${spokenLetter} ${spokenNum}`;
+  });
+
+  // Roman numerals with optional letter suffix: IIIb
+  t = t.replace(/\b([IVXLC]+)([a-d])\b/gi, (_, roman, letter) => {
+    return `${roman} ${speakLetter(letter)}`;
+  });
+
+  return t;
+}
 
 export function naturalizeCzechForSpeech(raw: string): string {
   let t = raw.replace(/\r/g, "").replace(/[#*]/g, " ");
@@ -27,6 +122,9 @@ export function naturalizeCzechForSpeech(raw: string): string {
     if (trimmed.length <= 6 && /^[A-Z0-9/]+$/i.test(trimmed)) return ` ${PAUSE} `;
     return ` ${PAUSE} ${trimmed} ${PAUSE} `;
   });
+
+  // Letter+number medical staging before abbreviations
+  t = expandLetterNumberPatterns(t);
 
   // Slashes between words → pause (not "lomítko")
   t = t.replace(/\s+\/\s+/g, ` ${PAUSE} `);
@@ -41,8 +139,10 @@ export function naturalizeCzechForSpeech(raw: string): string {
     t = t.replace(re, spoken);
   }
 
-  // Numbers with units: 120/80 → 120 pause 80
-  t = t.replace(/(\d+)\s*\/\s*(\d+)/g, `$1 ${PAUSE} $2`);
+  // Blood pressure / ratios: 120/80 → sto dvacet pause osmdesát
+  t = t.replace(/\b(\d+)\s*\/\s*(\d+)\b/g, (_, a, b) => {
+    return `${speakDigit(a)} ${PAUSE} ${speakDigit(b)}`;
+  });
 
   // Collapse whitespace
   t = t.replace(/\s+/g, " ").trim();

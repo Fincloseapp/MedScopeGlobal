@@ -1,4 +1,4 @@
-/** Diagnose slide image URLs on prod pages */
+/** Post-deploy prod proof — slide image HEAD checks */
 const PAGES = [
   {
     name: "orientace-v-tele",
@@ -15,39 +15,24 @@ const PAGES = [
 ];
 
 async function head(url) {
+  const clean = url.replace(/&amp;/g, "&").replace(/\\u0026/g, "&").replace(/\\+$/, "");
   try {
-    const r = await fetch(url, { method: "HEAD", redirect: "follow" });
-    return { url, status: r.status, ok: r.ok };
+    const r = await fetch(clean, { method: "HEAD", redirect: "follow" });
+    return { url: clean, status: r.status, ok: r.ok };
   } catch (e) {
-    return { url, status: 0, ok: false, error: String(e) };
+    return { url: clean, status: 0, ok: false, error: String(e) };
   }
 }
 
+const table = [];
 for (const page of PAGES) {
   const r = await fetch(page.url);
   const html = await r.text();
-  const imgs = [...html.matchAll(/https:\/\/images\.unsplash\.com\/[^"'\s<>]+/g)].map((m) => m[0]);
-  const unique = [...new Set(imgs)];
-  console.log(`\n=== ${page.name} (${r.status}) ===`);
-  console.log("unsplash in HTML:", unique.length);
-  for (const u of unique.slice(0, 6)) {
-    console.log(await head(u));
-  }
-  // CSP header
-  const csp = r.headers.get("content-security-policy");
-  if (csp) console.log("CSP img-src snippet:", csp.match(/img-src[^;]+/)?.[0]);
+  const imgs = [...html.matchAll(/https:\/\/images\.unsplash\.com\/[^"'\s<>\\]+/g)].map((m) => m[0]);
+  const unique = [...new Set(imgs.map((u) => u.replace(/&amp;/g, "&")))];
+  const checks = await Promise.all(unique.slice(0, 4).map(head));
+  const allOk = checks.length > 0 && checks.every((c) => c.ok);
+  table.push({ page: page.name, status: r.status, imageCount: unique.length, allImages200: allOk, checks });
 }
 
-// HEAD all curated URLs from slide-images map
-const curated = [
-  "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
-  "https://images.unsplash.com/photo-1532187863486-abf9db1a4690?w=800&q=80",
-  "https://images.unsplash.com/photo-1628348068343-c6a848d2a385?w=800&q=80",
-  "https://images.unsplash.com/photo-1559757175-5700cde872bc?w=800&q=80",
-  "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80",
-  "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&q=80",
-];
-console.log("\n=== Curated URL HEAD checks ===");
-for (const u of curated) {
-  console.log(await head(u));
-}
+console.log(JSON.stringify(table, null, 2));

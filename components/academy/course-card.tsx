@@ -48,7 +48,7 @@ export function CourseCard({
         {course.duration_minutes > 0 ? (
           <span className="inline-flex items-center gap-1">
             <Clock className="h-3.5 w-3.5" />
-            {course.duration_minutes} min
+            ≈ {course.duration_minutes} min poslechu
           </span>
         ) : null}
         {course.xp_reward > 0 ? <span>{course.xp_reward} XP</span> : null}
