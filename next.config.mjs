@@ -211,6 +211,7 @@ const nextConfig = {
       ...supabasePatterns,
 
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+      { protocol: "https", hostname: "source.unsplash.com", pathname: "/**" },
 
     ],
 

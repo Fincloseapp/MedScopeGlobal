@@ -1,8 +1,14 @@
 #!/usr/bin/env node
-/** Refresh slide imageUrl + imageKeywords for all academy lessons + osveta videos (fetch-only). */
+/** Refresh slide imageUrl + imageKeywords for all academy lessons + osveta (HEAD-verified). */
 import fs from "node:fs";
 import path from "node:path";
 import { MEDSCOPE_PROJECT_ROOT } from "../lib/config/paths.mjs";
+import {
+  DEFAULT_SLIDE_IMAGE,
+  KEYWORD_IMAGES,
+  ensureWorkingImageUrl,
+  isBrokenSlideImageUrl,
+} from "../lib/v25/video/slide-image-urls.mjs";
 
 const root = MEDSCOPE_PROJECT_ROOT;
 const env = { ...process.env };
@@ -44,29 +50,6 @@ async function sbPatch(table, query, body) {
   if (!res.ok) throw new Error(`${table} PATCH ${res.status} ${await res.text()}`);
 }
 
-const KEYWORD_IMAGES = {
-  anatomy: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
-  skeleton: "https://images.unsplash.com/photo-1532187863486-abf9db1a4690?w=800&q=80",
-  orientation: "https://images.unsplash.com/photo-1532187863486-abf9db1a4690?w=800&q=80",
-  heart: "https://images.unsplash.com/photo-1628348068343-c6a848d2a385?w=800&q=80",
-  blood: "https://images.unsplash.com/photo-1559757175-5700cde872bc?w=800&q=80",
-  circulation: "https://images.unsplash.com/photo-1559757175-5700cde872bc?w=800&q=80",
-  pharmacy: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&q=80",
-  cell: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800&q=80",
-  biology: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800&q=80",
-  chemistry: "https://images.unsplash.com/photo-1532636865606-79b0b8b44644?w=800&q=80",
-  physics: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&q=80",
-  physiology: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&q=80",
-  brain: "https://images.unsplash.com/photo-1559757175-5700cde872bc?w=800&q=80",
-  nutrition: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80",
-  diet: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80",
-  health: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&q=80",
-  exam: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80",
-  muscle: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80",
-  lung: "https://images.unsplash.com/photo-1628595357799-9c8c8fd22790?w=800&q=80",
-  default: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
-};
-
 const CS_MAP = [
   [/orientac|poloh|roviny|anatom/i, "orientation"],
   [/kost|skelet|kostern/i, "skeleton"],
@@ -103,7 +86,7 @@ function resolveImageUrl(slide, topic, i) {
   const key = matchKey(haystack);
   if (key !== "default") return KEYWORD_IMAGES[key];
   const keys = Object.keys(KEYWORD_IMAGES).filter((k) => k !== "default");
-  return KEYWORD_IMAGES[keys[i % keys.length]] ?? KEYWORD_IMAGES.default;
+  return KEYWORD_IMAGES[keys[i % keys.length]] ?? DEFAULT_SLIDE_IMAGE;
 }
 
 function inferKeywords(slide, topic) {
@@ -116,19 +99,29 @@ function inferKeywords(slide, topic) {
   return out.length ? out : [matchKey(h)];
 }
 
-function refreshSlideshow(slideshow, topic) {
+async function refreshSlideshow(slideshow, topic) {
   if (!slideshow?.slides?.length) return slideshow;
-  slideshow.slides = slideshow.slides.map((s, i) => ({
-    ...s,
-    imageKeywords: inferKeywords(s, topic),
-    imageUrl: resolveImageUrl(s, topic, i),
-    imageDescription: s.imageDescription || s.title,
-  }));
-  return slideshow;
+  let bad = 0;
+  slideshow.slides = await Promise.all(
+    slideshow.slides.map(async (s, i) => {
+      const candidate = resolveImageUrl(s, topic, i);
+      const stored = isBrokenSlideImageUrl(s.imageUrl) ? null : s.imageUrl;
+      const imageUrl = await ensureWorkingImageUrl(stored, candidate);
+      if (imageUrl !== stored) bad += 1;
+      return {
+        ...s,
+        imageKeywords: inferKeywords(s, topic),
+        imageUrl,
+        imageDescription: s.imageDescription || s.title,
+      };
+    })
+  );
+  return { slideshow, bad };
 }
 
 let lessonCount = 0;
 let osvetaCount = 0;
+let fixedUrls = 0;
 
 const lessons = await sbGet("lessons", "select=id,title,content,content_json,slug,course_id&status=eq.published");
 const courses = await sbGet("courses", "select=id,title");
@@ -168,7 +161,9 @@ for (const lesson of lessons) {
     };
   }
 
-  slideshow = refreshSlideshow(slideshow, topic);
+  const refreshed = await refreshSlideshow(slideshow, topic);
+  slideshow = refreshed.slideshow;
+  fixedUrls += refreshed.bad;
   const listenText = [lesson.title, lesson.content, ...slideshow.slides.map((s) => `${s.title}. ${s.body}`)].join("\n\n");
 
   await sbPatch("lessons", `id=eq.${lesson.id}`, {
@@ -219,7 +214,9 @@ for (const video of osvetaVideos) {
     };
   }
 
-  slideshow = refreshSlideshow(slideshow, topic);
+  const refreshed = await refreshSlideshow(slideshow, topic);
+  slideshow = refreshed.slideshow;
+  fixedUrls += refreshed.bad;
   meta.slideshow = slideshow;
 
   await sbPatch("public_health_videos", `id=eq.${video.id}`, {
@@ -230,4 +227,4 @@ for (const video of osvetaVideos) {
   console.log(`✓ osveta ${video.slug ?? video.id}`);
 }
 
-console.log(`\nDone: ${lessonCount} lessons, ${osvetaCount} osveta videos\n`);
+console.log(`\nDone: ${lessonCount} lessons, ${osvetaCount} osveta, ${fixedUrls} slide URLs repaired\n`);

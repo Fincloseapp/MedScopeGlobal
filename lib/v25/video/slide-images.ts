@@ -1,32 +1,55 @@
 /**
- * Topic-matched slide images — curated Unsplash medical/education (free, no API key).
+ * Verified Unsplash slide image URLs (HEAD-checked 2026-06-20).
+ * Shared constants — keep in sync with slide-image-urls.mjs for batch scripts.
  */
 
-const KEYWORD_IMAGES: Record<string, string> = {
-  anatomy: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
-  skeleton: "https://images.unsplash.com/photo-1532187863486-abf9db1a4690?w=800&q=80",
-  orientation: "https://images.unsplash.com/photo-1532187863486-abf9db1a4690?w=800&q=80",
-  heart: "https://images.unsplash.com/photo-1628348068343-c6a848d2a385?w=800&q=80",
-  blood: "https://images.unsplash.com/photo-1559757175-5700cde872bc?w=800&q=80",
-  circulation: "https://images.unsplash.com/photo-1559757175-5700cde872bc?w=800&q=80",
-  pharmacy: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&q=80",
-  cell: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800&q=80",
-  biology: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800&q=80",
-  chemistry: "https://images.unsplash.com/photo-1532636865606-79b0b8b44644?w=800&q=80",
-  physics: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&q=80",
-  physiology: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&q=80",
-  brain: "https://images.unsplash.com/photo-1559757175-5700cde872bc?w=800&q=80",
-  nutrition: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80",
-  diet: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80",
-  health: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&q=80",
-  exam: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80",
-  ethics: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80",
-  latin: "https://images.unsplash.com/photo-1457369804613-52bfab068dba?w=800&q=80",
-  muscle: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80",
-  lung: "https://images.unsplash.com/photo-1628595357799-9c8c8fd22790?w=800&q=80",
-  nerve: "https://images.unsplash.com/photo-1559757175-5700cde872bc?w=800&q=80",
-  default: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
+export const DEFAULT_SLIDE_IMAGE =
+  "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=450&fit=crop&q=80&auto=format";
+
+/** Photo IDs that return 404 or were removed from Unsplash CDN. */
+export const BROKEN_UNSPLASH_PHOTO_IDS = [
+  "photo-1532187863486-abf9db1a4690",
+  "photo-1628348068343-c6a848d2a385",
+  "photo-1559757175-5700cde872bc",
+  "photo-1532636865606-79b0b8b44644",
+  "photo-1628595357799-9c8c8fd22790",
+  "photo-1523050854058-8df90110c9f1",
+  "photo-1584515930387-285e4804f4cb",
+] as const;
+
+export const KEYWORD_IMAGES: Record<string, string> = {
+  anatomy: DEFAULT_SLIDE_IMAGE,
+  orientation: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
+  skeleton: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
+  heart: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
+  blood: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
+  circulation: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
+  pharmacy: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&h=450&fit=crop&q=80&auto=format",
+  cell: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800&h=450&fit=crop&q=80&auto=format",
+  biology: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800&h=450&fit=crop&q=80&auto=format",
+  chemistry: DEFAULT_SLIDE_IMAGE,
+  physics: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=450&fit=crop&q=80&auto=format",
+  physiology: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&h=450&fit=crop&q=80&auto=format",
+  brain: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
+  nutrition: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=450&fit=crop&q=80&auto=format",
+  diet: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=450&fit=crop&q=80&auto=format",
+  health: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&h=450&fit=crop&q=80&auto=format",
+  exam: DEFAULT_SLIDE_IMAGE,
+  ethics: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&h=450&fit=crop&q=80&auto=format",
+  latin: DEFAULT_SLIDE_IMAGE,
+  muscle: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=450&fit=crop&q=80&auto=format",
+  lung: DEFAULT_SLIDE_IMAGE,
+  nerve: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
+  default: DEFAULT_SLIDE_IMAGE,
 };
+
+/** Ordered fallbacks when primary image fails to load in browser. */
+export const SLIDE_IMAGE_FALLBACKS: string[] = [
+  DEFAULT_SLIDE_IMAGE,
+  "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
+  "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=450&fit=crop&q=80&auto=format",
+  "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&h=450&fit=crop&q=80&auto=format",
+];
 
 const CS_KEYWORD_MAP: [RegExp, string][] = [
   [/orientac|poloh|roviny|anatom/i, "orientation"],
@@ -49,6 +72,21 @@ const CS_KEYWORD_MAP: [RegExp, string][] = [
   [/zdrav|prevenc|imunit|osvěta/i, "health"],
 ];
 
+export type SlideImageInput = {
+  title?: string;
+  body?: string;
+  imageDescription?: string;
+  imageKeywords?: string | string[];
+  topic?: string;
+  index?: number;
+};
+
+export function isBrokenSlideImageUrl(url?: string | null): boolean {
+  if (!url?.trim()) return true;
+  if (!url.startsWith("http")) return true;
+  return BROKEN_UNSPLASH_PHOTO_IDS.some((id) => url.includes(id));
+}
+
 function matchKeywordKey(haystack: string): string {
   const h = haystack.toLowerCase();
   for (const [re, key] of CS_KEYWORD_MAP) {
@@ -60,14 +98,7 @@ function matchKeywordKey(haystack: string): string {
   return "default";
 }
 
-export function resolveSlideImageUrl(input: {
-  title?: string;
-  body?: string;
-  imageDescription?: string;
-  imageKeywords?: string | string[];
-  topic?: string;
-  index?: number;
-}): string {
+export function resolveSlideImageUrl(input: SlideImageInput): string {
   const keywords = Array.isArray(input.imageKeywords)
     ? input.imageKeywords.join(" ")
     : input.imageKeywords ?? "";
@@ -84,20 +115,31 @@ export function resolveSlideImageUrl(input: {
   return KEYWORD_IMAGES[keys[idx]!] ?? KEYWORD_IMAGES.default;
 }
 
+export function sanitizeSlideImageUrl(
+  url: string | undefined | null,
+  fallbackInput?: SlideImageInput
+): string {
+  if (url && !isBrokenSlideImageUrl(url)) return url;
+  if (fallbackInput) return resolveSlideImageUrl(fallbackInput);
+  return DEFAULT_SLIDE_IMAGE;
+}
+
 export function attachSlideImages<
   T extends { title: string; body: string; imageDescription?: string; imageKeywords?: string | string[] },
 >(slides: T[], topic?: string): (T & { imageUrl: string })[] {
-  return slides.map((s, i) => ({
-    ...s,
-    imageUrl:
-      (s as T & { imageUrl?: string }).imageUrl ||
-      resolveSlideImageUrl({
-        title: s.title,
-        body: s.body,
-        imageDescription: s.imageDescription,
-        imageKeywords: s.imageKeywords,
-        topic,
-        index: i,
-      }),
-  }));
+  return slides.map((s, i) => {
+    const resolverInput: SlideImageInput = {
+      title: s.title,
+      body: s.body,
+      imageDescription: s.imageDescription,
+      imageKeywords: s.imageKeywords,
+      topic,
+      index: i,
+    };
+    const stored = (s as T & { imageUrl?: string }).imageUrl;
+    return {
+      ...s,
+      imageUrl: sanitizeSlideImageUrl(stored, resolverInput),
+    };
+  });
 }
