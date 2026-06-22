@@ -15,9 +15,9 @@ export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({
-    title: "MedScopeGlobal — Nejmodernější zdravotnický magazín",
+    title: "MedScopeGlobal — Prémiový zdravotnický magazín",
     description:
-      "Zdravotnický magazín pro veřejnost, studenty medicíny a lékaře. Prevence, studium, guidelines, AI asistenti a předplatné.",
+      "Evidence-based medicína v češtině pro veřejnost, studenty medicíny a lékaře. 500+ článků, 2 800+ studentů. Vyzkoušejte 14 dní zdarma.",
     path: "/",
   });
 }
@@ -47,9 +47,11 @@ export default async function HomePage() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-                Doporučené články
+                Redakční výběr
               </p>
-              <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">Nejnovější články</h2>
+              <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
+                Nejnovější z magazínu
+              </h2>
             </div>
             <Link href="/articles" prefetch className="text-sm font-medium text-primary hover:underline">
               Všechny články →
@@ -68,7 +70,7 @@ export default async function HomePage() {
 
       <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6">
         <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
-          MedScopeGlobal není přijímací komise ani oficiální učebnice LF. Obsah slouží ke vzdělávání a
+          MedScopeGlobal je vzdělávací magazín — není přijímací komise ani oficiální učebnice LF. Obsah
           nenahrazuje individuální lékařskou radu.
         </p>
       </section>

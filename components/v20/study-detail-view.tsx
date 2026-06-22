@@ -58,9 +58,11 @@ export function V20StudyDetailView({ study }: { study: V20StudyDisplay }) {
           {study.titleCs}
         </h1>
         <p className="mt-2 text-lg text-slate-600">{study.subtitleCs}</p>
-        <p className="mt-3 text-sm text-slate-500">
-          {study.publishedDateLabel} · Relevance: {study.relevance} · Zdroj: {study.source.name}
-        </p>
+      <p className="mt-3 text-sm text-slate-500">
+        {study.publishedDateLabel} · Relevance: {study.relevance} · Zdroj: {study.source.name}
+        {study.doi && !study.doi.includes("example") ? ` · DOI: ${study.doi}` : ""}
+        {study.pubmedId ? ` · PMID: ${study.pubmedId}` : ""}
+      </p>
       </header>
 
       <div className="relative mt-6 aspect-[16/9] w-full overflow-hidden rounded-2xl bg-slate-100">
@@ -104,16 +106,34 @@ export function V20StudyDetailView({ study }: { study: V20StudyDisplay }) {
             <dt className="text-slate-500">Datum publikace</dt>
             <dd className="font-medium">{study.publishedDateLabel}</dd>
           </div>
-          {study.doi && (
+          {study.doi && !study.doi.includes("example") && (
             <div>
               <dt className="text-slate-500">DOI</dt>
-              <dd className="font-medium break-all">{study.doi}</dd>
+              <dd className="font-medium break-all">
+                <a
+                  href={`https://doi.org/${study.doi}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  {study.doi}
+                </a>
+              </dd>
             </div>
           )}
           {study.pubmedId && (
             <div>
-              <dt className="text-slate-500">PubMed ID</dt>
-              <dd className="font-medium">{study.pubmedId}</dd>
+              <dt className="text-slate-500">PubMed ID (PMID)</dt>
+              <dd className="font-medium">
+                <a
+                  href={`https://pubmed.ncbi.nlm.nih.gov/${study.pubmedId}/`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  {study.pubmedId}
+                </a>
+              </dd>
             </div>
           )}
         </dl>

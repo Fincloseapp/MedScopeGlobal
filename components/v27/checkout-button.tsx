@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { V27CheckoutKind } from "@/lib/v27/stripe-products";
 
@@ -11,7 +12,12 @@ type Props = {
   className?: string;
 };
 
-export function V27CheckoutButton({ kind, productId, label = "Předplatit", className }: Props) {
+export function V27CheckoutButton({
+  kind,
+  productId,
+  label = "Přejít na Stripe pokladnu",
+  className,
+}: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,6 +44,8 @@ export function V27CheckoutButton({ kind, productId, label = "Předplatit", clas
     }
   }
 
+  const isPrimary = !className?.includes("bg-white");
+
   return (
     <div>
       <Button
@@ -45,7 +53,14 @@ export function V27CheckoutButton({ kind, productId, label = "Předplatit", clas
         disabled={loading}
         className={className ?? "w-full bg-[#005B96] hover:bg-[#004a7a]"}
       >
-        {loading ? "Načítám…" : label}
+        {loading ? (
+          "Přesměrování na Stripe…"
+        ) : (
+          <>
+            {isPrimary ? <CreditCard className="mr-2 h-4 w-4" aria-hidden /> : null}
+            {label}
+          </>
+        )}
       </Button>
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
     </div>

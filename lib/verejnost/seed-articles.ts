@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import type { PublicTopic } from "@/lib/queries/verejnost";
+import { VEREJNOST_FALLBACK_COVER } from "@/lib/verejnost/images";
 
 type SeedArticle = {
   slug: string;
@@ -8,6 +9,11 @@ type SeedArticle = {
   excerpt: string;
   topic: PublicTopic;
   content: string;
+  meta_description?: string;
+  editors_pick?: boolean;
+  fully_open?: boolean;
+  read_time_minutes?: number;
+  keywords?: string[];
 };
 
 const SEED_ARTICLES: SeedArticle[] = [
@@ -21,6 +27,12 @@ const SEED_ARTICLES: SeedArticle[] = [
 <h2>Co můžete udělat sami</h2>
 <ul><li>Pravidelný pohyb alespoň 150 minut týdně</li><li>Omezení soli a trans tuků</li><li>Kontrola krevního tlaku a cholesterolu</li><li>Nekouření a mírná konzumace alkoholu</li></ul>
 <p>Při rizikových faktorech nebo nových příznacích vyhledejte praktického lékaře.</p>`,
+    meta_description:
+      "Prevence infarktu a mrtvice: pohyb, strava, tlak a cholesterol — praktické kroky pro každodenní život.",
+    editors_pick: true,
+    fully_open: true,
+    read_time_minutes: 5,
+    keywords: ["prevence", "srdce", "kardiovaskulární", "infarkt"],
   },
   {
     slug: "spanek-a-regenerace",
@@ -32,6 +44,12 @@ const SEED_ARTICLES: SeedArticle[] = [
 <h2>Tipy pro lepší spánek</h2>
 <ul><li>Pravidelný režim vstávání a ulehání</li><li>Tmavá a chladnější ložnice</li><li>Omezení obrazovek před spaním</li><li>Lehká večeře a omezení kofeinu od odpoledne</li></ul>
 <p>Přetrvávající nespavost nebo denní únava jsou důvodem konzultace s lékařem.</p>`,
+    meta_description:
+      "Spánek a regenerace: proč na kvalitě spánku záleží a jak zlepšit hygienu spánku v běžném životě.",
+    editors_pick: true,
+    fully_open: true,
+    read_time_minutes: 4,
+    keywords: ["spánek", "regenerace", "hygiena spánku", "únava"],
   },
   {
     slug: "rozhovor-prevence-stresu",
@@ -43,11 +61,28 @@ const SEED_ARTICLES: SeedArticle[] = [
 <p><strong>Odborník:</strong> Trvalá únava, podrážděnost, poruchy spánku nebo vyhýbání se běžným aktivitám.</p>
 <h2>Kdy vyhledat pomoc</h2>
 <p>Pokud obtíže trvají déle než dva týdny a ovlivňují práci či vztahy, obraťte se na praktického lékaře nebo psychologa.</p>`,
+    meta_description:
+      "Rozhovor s psychologem o zvládání stresu: varovné signály, praktické kroky a kdy vyhledat odbornou pomoc.",
+    fully_open: true,
+    read_time_minutes: 5,
+    keywords: ["stres", "psychika", "rozhovor", "duševní zdraví"],
   },
 ];
 
 function hashContent(title: string, slug: string) {
   return createHash("sha256").update(`${title}:${slug}`).digest("hex").slice(0, 32);
+}
+
+function buildArticleMetadata(article: SeedArticle) {
+  return {
+    editorial_version: "26",
+    section: "verejnost",
+    editors_pick: article.editors_pick ?? false,
+    fully_open: article.fully_open ?? true,
+    read_time_minutes: article.read_time_minutes ?? 5,
+    keywords: article.keywords ?? [],
+    seed: true,
+  };
 }
 
 /** Vloží ukázkové veřejné články, pokud je databáze prázdná. */
@@ -86,6 +121,7 @@ export async function ensurePublicArticleSeed(): Promise<{ seeded: number; skipp
       slug: article.slug,
       excerpt: article.excerpt,
       content: article.content,
+      cover_image_url: VEREJNOST_FALLBACK_COVER,
       category_id: cat.id,
       author_id: authorId,
       published: true,
@@ -97,9 +133,10 @@ export async function ensurePublicArticleSeed(): Promise<{ seeded: number; skipp
       audience: "public",
       public_topic: article.topic,
       source_name: "MedScopeGlobal · redakce",
-      meta_description: article.excerpt.slice(0, 160),
-      ai_generated: true,
+      meta_description: article.meta_description ?? article.excerpt.slice(0, 160),
+      ai_generated: false,
       hash_dedup: hashContent(article.title, article.slug),
+      metadata: buildArticleMetadata(article),
     };
 
     const { error } = await admin.from("articles").insert(row);

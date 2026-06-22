@@ -217,7 +217,9 @@ export async function getCourseBySlug(slug: string): Promise<AcademyCourseWithLe
     .eq("status", "published")
     .order("sort_order", { ascending: true });
 
-  const lessonsWithVideo = await attachVideosToLessons((lessons ?? []) as AcademyLesson[]);
+  const lessonsWithVideo = await attachVideosToLessons(
+    dedupeLessonsBySlug((lessons ?? []) as AcademyLesson[])
+  );
 
   return {
     ...(course as AcademyCourse),
@@ -245,6 +247,23 @@ const LEGACY_LESSON_SLUG_ALIASES: Record<string, string> = {
   "orientace-v-těle": "orientace-v-tele",
   "latinske-kořeny": "latinske-koreny",
 };
+
+function normalizeLessonSlug(slug: string): string {
+  return LEGACY_LESSON_SLUG_ALIASES[slug] ?? slug;
+}
+
+/** Drop duplicate lessons (e.g. diacritic + ASCII slug pairs) keeping lowest sort_order. */
+function dedupeLessonsBySlug(lessons: AcademyLesson[]): AcademyLesson[] {
+  const byKey = new Map<string, AcademyLesson>();
+  for (const lesson of lessons) {
+    const key = normalizeLessonSlug(lesson.slug);
+    const existing = byKey.get(key);
+    if (!existing || lesson.sort_order < existing.sort_order) {
+      byKey.set(key, lesson);
+    }
+  }
+  return [...byKey.values()].sort((a, b) => a.sort_order - b.sort_order);
+}
 
 function resolveLessonSlugParam(raw: string): string {
   let slug = raw;

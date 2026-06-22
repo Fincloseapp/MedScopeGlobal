@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PRICING } from "@/lib/config/site";
+import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
 export function PremiumCta({ locale = "cs" }: { locale?: string }) {
   const isCs = locale === "cs";
@@ -21,8 +22,8 @@ export function PremiumCta({ locale = "cs" }: { locale?: string }) {
           </h3>
           <p className="mt-1 text-sm text-muted-foreground">
             {isCs
-              ? `VIP obsah, AI asistent a prioritní přístup od ${PRICING.vipMonthlyCzk} Kč/měsíc.`
-              : `VIP content, AI assistant from ${PRICING.vipMonthlyCzk} CZK/month.`}
+              ? `${VIP_TRIAL_DAYS} dní zdarma · VIP obsah a AI asistent od ${PRICING.vipMonthlyCzk} Kč/měsíc.`
+              : `${VIP_TRIAL_DAYS}-day free trial · VIP content, AI assistant from ${PRICING.vipMonthlyCzk} CZK/month.`}
           </p>
           <Button asChild className="mt-4 bg-[#005B96] hover:bg-[#004874]">
             <Link href="/predplatne">{isCs ? "Zobrazit tarify" : "View plans"}</Link>

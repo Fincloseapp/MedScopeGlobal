@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlayCircle } from "lucide-react";
+import { PlayCircle, Unlock } from "lucide-react";
 import { AcademyPageHeader } from "@/components/academy/page-header";
 import { AiLecturerPanel } from "@/components/academy/ai-lecturer-panel";
 import { TtsListenButton } from "@/components/tts/tts-listen-button";
@@ -9,6 +9,7 @@ import { LessonMetadataBlock } from "@/components/academy/lesson-metadata-block"
 import { LessonVideoWithConversion } from "@/components/v38/lesson-video-with-conversion";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getCourseBySlug, getLessonByIdOrSlug } from "@/lib/academy/db";
+import { isLessonFreePreview } from "@/lib/academy/preview";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
 import { extractSlideshowManifest } from "@/lib/v25/video/content-slideshow";
@@ -80,6 +81,7 @@ export default async function AcademyLessonPage({ params }: Props) {
   const lessons = course?.lessons ?? [];
   const { isVip } = await getReaderContext();
   const lessonIndex = lessons.findIndex((l) => l.slug === lesson.slug || l.id === lesson.id);
+  const isFreePreview = isLessonFreePreview(lessonIndex >= 0 ? lessonIndex : 0, lessons.length);
   const listenText = buildLessonListenText(
     lesson.title,
     lesson.content,
@@ -116,6 +118,12 @@ export default async function AcademyLessonPage({ params }: Props) {
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
             {lesson.duration_minutes} min
           </span>
+          {isFreePreview ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800">
+              <Unlock className="h-3 w-3" aria-hidden />
+              Náhled zdarma
+            </span>
+          ) : null}
           {lesson.video ? (
             <>
               <span className="rounded-full bg-[#e8f4fc] px-3 py-1 text-xs font-medium text-[#005B96]">

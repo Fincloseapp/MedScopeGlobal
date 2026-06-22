@@ -2,8 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { V271_HERO, V271_HERO_CTAS } from "@/lib/v271/homepage";
+import { V271_HERO, V271_HERO_CTAS, V271_SOCIAL_PROOF_STATS } from "@/lib/v271/homepage";
 import { V23_HERO_IMAGE } from "@/lib/v23/images";
+
 export function V271HomeHero() {
   return (
     <section className="relative overflow-hidden border-b border-slate-200 bg-[#021d33] text-white">
@@ -30,25 +31,37 @@ export function V271HomeHero() {
         <p className="mt-5 max-w-2xl text-lg leading-8 text-white/85">{V271_HERO.subtitle}</p>
 
         <div className="mt-8 flex flex-wrap gap-3">
-          {V271_HERO_CTAS.map((cta, i) => (
+          {V271_HERO_CTAS.map((cta) => (
             <Button
               key={cta.href}
               asChild
               size="lg"
-              variant={i === 0 ? "default" : "outline"}
+              variant={cta.primary ? "default" : "outline"}
               className={
-                i === 0
+                cta.primary
                   ? "rounded-full bg-white px-6 text-[#021d33] hover:bg-sky-50"
                   : "rounded-full border-white/40 bg-transparent text-white hover:bg-white/10"
               }
             >
               <Link href={cta.href} prefetch>
                 {cta.label}
-                {i === 0 ? <ArrowRight className="ml-2 h-4 w-4" /> : null}
+                {cta.primary ? <ArrowRight className="ml-2 h-4 w-4" /> : null}
               </Link>
             </Button>
           ))}
         </div>
+
+        <dl className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {V271_SOCIAL_PROOF_STATS.map((stat) => (
+            <div
+              key={stat.label}
+              className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur"
+            >
+              <dt className="font-display text-2xl font-bold text-white">{stat.value}</dt>
+              <dd className="mt-0.5 text-xs text-sky-200/90">{stat.label}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </section>
   );

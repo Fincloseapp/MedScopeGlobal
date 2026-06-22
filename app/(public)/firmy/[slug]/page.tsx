@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { V271HubPageView } from "@/components/v271/hub-page";
+import { V271B2BPricingTable } from "@/components/v271/b2b-pricing-table";
 import { V271_FIRMY_PAGES, buildV271HubMetadata } from "@/lib/v271/routes";
 
 export const revalidate = 120;
@@ -21,5 +22,13 @@ export default async function FirmySubPage({ params }: { params: Promise<{ slug:
   const { slug } = await params;
   const page = V271_FIRMY_PAGES[slug];
   if (!page) notFound();
-  return <V271HubPageView page={page} sectionLabel="Firmy" homeHref="/firmy" />;
+
+  return (
+    <V271HubPageView
+      page={page}
+      sectionLabel="Firmy"
+      homeHref="/firmy"
+      afterLinks={slug === "cenik" ? <V271B2BPricingTable /> : undefined}
+    />
+  );
 }

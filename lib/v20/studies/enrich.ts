@@ -30,7 +30,6 @@ const TOPIC_CS: [RegExp, string][] = [
   [/promis/i, "PROMIS"],
   [/symptom checker/i, "symptom checker"],
   [/physical examination/i, "fyzikální vyšetření"],
-  [/rheumatology/i, "revmatologie"],
   [/arthritis/i, "artritida"],
   [/randomized|randomised/i, "randomizovaná studie"],
   [/meta.?anal/i, "meta-analýza"],
@@ -80,7 +79,29 @@ function extractTopicCs(title: string): string {
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 80);
-  return cleaned || "revmatologická klinická studie";
+  if (cleaned.length >= 12) return cleaned;
+  const words = cleaned.split(/\s+/).filter((w) => w.length > 3);
+  return words.slice(0, 4).join(" ") || "klinický výsledek";
+}
+
+function inferSpecialtyCs(title: string, rowSpecialty?: string | null, meta?: Record<string, unknown>): string {
+  if (rowSpecialty && SPECIALTY_CS[rowSpecialty]) return SPECIALTY_CS[rowSpecialty];
+  const fromMeta = meta?.specialty;
+  if (typeof fromMeta === "string" && CS_RE.test(fromMeta) && fromMeta.trim().length > 3) {
+    return fromMeta.trim();
+  }
+  const lower = title.toLowerCase();
+  if (/cardio|heart|mace|infarct/i.test(lower)) return "Kardiologie";
+  if (/neuro|stroke|ms\b|epilep/i.test(lower)) return "Neurologie";
+  if (/cancer|oncol|tumor|car-t/i.test(lower)) return "Onkologie";
+  if (/rheumat|arthritis|lupus|spondyl|jak inhibitor/i.test(lower)) return "Revmatologie";
+  return "Klinická medicína";
+}
+
+function isCircularTopic(topic: string, specialtyCs: string): boolean {
+  const t = topic.toLowerCase().trim();
+  const s = specialtyCs.toLowerCase().trim();
+  return t === s || (t.length <= s.length + 2 && s.includes(t));
 }
 
 function isEnglishDominant(text: string): boolean {
@@ -96,18 +117,31 @@ function isEnglishDominant(text: string): boolean {
   return enHits > words.length * 0.2 && !/[áčďéěíňóřšťúůýž]{4,}/i.test(text);
 }
 
-function synthesizeCzechSections(topic: string, studyType: V20StudyType, specialtyCs: string) {
+function synthesizeCzechSections(
+  topic: string,
+  studyType: V20StudyType,
+  specialtyCs: string,
+  originalTitle: string
+) {
   const typeLabel = V20_STUDY_TYPE_LABELS[studyType] ?? studyType;
+  const topicDisplay = topic.charAt(0).toUpperCase() + topic.slice(1);
+  const circular = isCircularTopic(topic, specialtyCs);
+  const focusPhrase = circular
+    ? `klinické výsledky publikace „${originalTitle.slice(0, 72)}${originalTitle.length > 72 ? "…" : ""}"`
+    : `${topicDisplay} u pacientů sledovaných v oboru ${specialtyCs.toLowerCase()}`;
+
   return {
-    titleCs: `${typeLabel}: ${topic.charAt(0).toUpperCase()}${topic.slice(1)}`,
+    titleCs: circular
+      ? `${typeLabel}: ${topicDisplay !== specialtyCs ? topicDisplay : originalTitle.slice(0, 60)}`
+      : `${typeLabel}: ${topicDisplay}`,
     subtitleCs: `${specialtyCs} — ${typeLabel}`,
-    summaryCs: `Studie se zaměřuje na ${topic} v kontextu ${specialtyCs.toLowerCase()}. Cílem je poskytnout klinicky relevantní důkazy pro rozhodování v denní praxi a doplnit dosavadní evidence-based doporučení odborných společností.`,
+    summaryCs: `Studie hodnotí ${focusPhrase}. Cílem je poskytnout klinicky relevantní důkazy pro rozhodování v denní praxi a doplnit dosavadní evidence-based doporučení odborných společností.`,
     methodologyCs: `Design studie odpovídá typu ${typeLabel.toLowerCase()}. Populace, intervenční a kontrolní ramena, primární a sekundární endpointy byly definovány dle mezinárodních standardů (CONSORT / PRISMA dle typu práce). Hodnocení zahrnovalo klinické, laboratorní a bezpečnostní výstupy.`,
     resultsCs: `Analýza prokázala statisticky i klinicky významné výsledky v primárním endpointu. Sekundární výstupy podporují konzistenci hlavního závěru. Bezpečnostní profil byl v souladu s očekáváním pro danou terapeutickou intervenci; podrobná numerická data jsou uvedena v původní publikaci.`,
-    conclusionCs: `Závěry studie podporují zařazení poznatků do klinické praxe s ohledem na profil pacienta, komorbidity a lokální dostupnost léčby. Doporučuje se interpretace v kontextu aktuálních guidelines EULAR a českých odborných doporučení.`,
+    conclusionCs: `Závěry studie podporují zařazení poznatků do klinické praxe s ohledem na profil pacienta, komorbidity a lokální dostupnost léčby. Doporučuje se interpretace v kontextu aktuálních guidelines a českých odborných doporučení.`,
     clinicalImpactCs: `Publikace přináší praktické implikace pro ${specialtyCs.toLowerCase()} — zejména pro volbu léčebné strategie, sledování odpovědi a komunikaci s pacientem. Výsledky jsou relevantní pro českou klinickou praxi.`,
     keyPointsCs: [
-      `Téma: ${topic}`,
+      circular ? `Publikace: ${originalTitle.slice(0, 50)}` : `Téma: ${topicDisplay}`,
       `Typ studie: ${typeLabel}`,
       `Obor: ${specialtyCs}`,
       "Metodologie v souladu s mezinárodními standardy",
@@ -157,13 +191,9 @@ export function enrichStudy(row: StudyRow): V20StudyDisplay {
   const meta = (row.ai_metadata ?? {}) as Record<string, unknown>;
   const rawText = [row.summary, row.abstract].filter(Boolean).join("\n\n");
   const studyType = (meta.studyType as V20StudyType) ?? inferStudyType(row.title, row.journal);
-  const specialtyCs =
-    SPECIALTY_CS[row.specialty ?? ""] ??
-    (typeof meta.specialty === "string" && CS_RE.test(meta.specialty)
-      ? meta.specialty
-      : "Revmatologie");
+  const specialtyCs = inferSpecialtyCs(row.title, row.specialty, meta);
   const topic = extractTopicCs(row.title);
-  const synthesized = synthesizeCzechSections(topic, studyType, specialtyCs);
+  const synthesized = synthesizeCzechSections(topic, studyType, specialtyCs, row.title);
   const useSynthesis = !rawText || isEnglishDominant(rawText);
   const split = useSynthesis ? null : splitSections(rawText);
   const titleCs = toCzechTitle(row.title, meta, topic);
@@ -222,7 +252,31 @@ export function enrichStudy(row: StudyRow): V20StudyDisplay {
   };
 }
 
+export function isGenericPlaceholderStudy(s: V20StudyDisplay): boolean {
+  if (s.id.startsWith("curated-")) return false;
+
+  const blob = [s.titleCs, s.subtitleCs, s.summaryCs, s.methodologyCs, s.resultsCs].join(" ").toLowerCase();
+  if (/zaměřuje na revmatologie v kontextu revmatologie/i.test(blob)) return true;
+  if (/v kontextu revmatologie/i.test(blob) && /zaměřuje na revmatologie/i.test(blob)) return true;
+  if (/^[^:]+:\s*revmatologie$/i.test(s.titleCs.trim())) return true;
+  if (
+    isCircularTopic(extractTopicCs(s.titleCs), s.specialtyCs) &&
+    s.summaryCs.includes("Cílem je poskytnout klinicky relevantní důkazy")
+  ) {
+    return true;
+  }
+  const synthesizedPatterns = [
+    /statisticky i klinicky významné výsledky v primárním endpointu/i,
+    /detailní numerická data jsou uvedena v původní publikaci/i,
+    /metodologie v souladu s mezinárodními standardy/i,
+    /zaměřuje na .+ v kontextu/i,
+  ];
+  if (synthesizedPatterns.some((re) => re.test(blob))) return true;
+  return false;
+}
+
 export function isValidV20Study(s: V20StudyDisplay): boolean {
+  if (isGenericPlaceholderStudy(s)) return false;
   const fields = [s.titleCs, s.summaryCs, s.methodologyCs, s.resultsCs, s.conclusionCs];
   const noEnglish = fields.every((f) => !isEnglishDominant(f));
   return (

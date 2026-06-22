@@ -2,7 +2,6 @@
 
 import {
   V32_UI_VERSION,
-  getSiteVersionLabel as getV32SiteVersionLabel,
 } from "@/lib/v32/version";
 
 export const V29_ENGINE_VERSION = "29.0";
@@ -16,11 +15,11 @@ export const V29_UI_BUILD_STAMP = "v29.0-phase11-finalization-20260617";
 /** Live site UI label — v32.0 (security + performance + autopilot) */
 export const V29_SITE_UI_VERSION = V32_UI_VERSION;
 
-/** Display label for homepage hero, footer, and UI badges */
+/** Display label for homepage hero, footer, and UI badges (hidden from public UI) */
 export function getSiteVersionLabel(): string {
-  return getV32SiteVersionLabel();
+  return "";
 }
 
-/** Editorial copy label — v29 standard */
+/** Editorial copy label — redakční standard MedScopeGlobal */
 export const V29_EDITORIAL_COPY_LABEL =
-  "přepsané podle redakčního standardu MedScopeGlobal v29";
+  "přepsané podle redakčního standardu MedScopeGlobal";

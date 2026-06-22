@@ -13,13 +13,19 @@ const ICONS = {
 
 export function V24AiMedicalHub() {
   return (
-    <section className="border-y border-slate-200 bg-gradient-to-b from-[#f0f7fc] to-white">
+    <section
+      className="border-y border-slate-200 bg-gradient-to-b from-[#f0f7fc] to-white"
+      aria-labelledby="ai-medical-hub-title"
+    >
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
         <div className="text-center">
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
-            v24.0 ULTRA-MAX
+            AI Medical
           </p>
-          <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33] sm:text-4xl">
+          <h2
+            id="ai-medical-hub-title"
+            className="mt-2 font-display text-3xl font-semibold text-[#021d33] sm:text-4xl"
+          >
             {V24_AI_MEDICAL.title}
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-base text-slate-600">{V24_AI_MEDICAL.subtitle}</p>

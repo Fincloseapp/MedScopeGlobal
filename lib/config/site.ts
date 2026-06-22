@@ -24,5 +24,5 @@ export const PRICING = {
   basicMonthlyCzk: 149,
   vipMonthlyCzk: 499,
   yearlyCzk: 2490,
-  trialDays: 7,
+  trialDays: 14,
 } as const;

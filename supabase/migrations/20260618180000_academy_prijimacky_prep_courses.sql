@@ -45,7 +45,7 @@ WHERE c.slug = 'biologie-prijimacky-bunka-genetika'
   AND NOT EXISTS (SELECT 1 FROM public.lessons l WHERE l.course_id = c.id AND l.slug = 'bunka-struktura');
 
 INSERT INTO public.lessons (course_id, slug, title, content, sort_order, duration_minutes, status)
-SELECT c.id, 'bunkove-delení', 'Buněčné dělení — mitóza a meióza', E'## A) Mitóza
+SELECT c.id, 'bunkove-deleni', 'Buněčné dělení — mitóza a meióza', E'## A) Mitóza
 Zachovává počet chromozomů (2n→2n). Fáze: profáze, metafáze, anafáze, telofáze. Výsledek: dvě identické dcery.
 
 ## B) Meióza
@@ -58,7 +58,7 @@ Mitóza = růst, oprava; meióza = pohlavní rozmnožování, variabilita.
 Znalost pořadí fází a změn počtu chromozomů v jednotlivých fázích.', 2, 30, 'published'
 FROM public.courses c
 WHERE c.slug = 'biologie-prijimacky-bunka-genetika'
-  AND NOT EXISTS (SELECT 1 FROM public.lessons l WHERE l.course_id = c.id AND l.slug = 'bunkove-delení');
+  AND NOT EXISTS (SELECT 1 FROM public.lessons l WHERE l.course_id = c.id AND l.slug IN ('bunkove-deleni', 'bunkove-delení'));
 
 INSERT INTO public.lessons (course_id, slug, title, content, sort_order, duration_minutes, status)
 SELECT c.id, 'genetika-mendel', 'Genetika — Mendelovy zákony a křížení', E'## A) Základní pojmy

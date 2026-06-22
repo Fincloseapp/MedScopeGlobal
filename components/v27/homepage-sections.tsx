@@ -1,11 +1,8 @@
 import Link from "next/link";
 import { V27AudienceGrid } from "@/components/v27/audience-hub-section";
 import { V27_AUDIENCES } from "@/lib/v27/config";
-import { getSiteVersionLabel } from "@/lib/v27/version";
 
 export function V27HomepageSections() {
-  const version = getSiteVersionLabel();
-
   return (
     <>
       <section className="border-y border-slate-200 bg-gradient-to-b from-slate-50 to-white">
@@ -13,7 +10,7 @@ export function V27HomepageSections() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-                {version} · Kompletní webová transformace
+                Kompletní webová transformace
               </p>
               <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">
                 Vyberte si svou cestu ve zdravotnictví

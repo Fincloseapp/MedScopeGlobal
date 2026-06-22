@@ -53,6 +53,7 @@ export async function V272AcademyHomeSections() {
                     course={course}
                     hasVideo={prepFlags[course.id]?.hasVideo}
                     videoLessonCount={prepFlags[course.id]?.videoLessonCount}
+                    showFreePreview
                   />
                 </div>
               ))}
@@ -82,6 +83,7 @@ export async function V272AcademyHomeSections() {
                   course={course}
                   hasVideo={flags[course.id]?.hasVideo}
                   videoLessonCount={flags[course.id]?.videoLessonCount}
+                  showFreePreview
                 />
               ))}
             </div>

@@ -9,6 +9,12 @@ type SeedArticle = {
   content: string;
   public_topic: PublicTopic;
   cover_image_url?: string;
+  meta_description?: string;
+  /** Redakční tip — zvýraznění na hubu a plně otevřený vzorový obsah. */
+  editors_pick?: boolean;
+  fully_open?: boolean;
+  read_time_minutes?: number;
+  keywords?: string[];
 };
 
 const SEED_ARTICLES: SeedArticle[] = [
@@ -29,6 +35,12 @@ const SEED_ARTICLES: SeedArticle[] = [
 <p><em>Informace nenahrazují lékařskou péči. Při dlouhodobých poruchách spánku kontaktujte praktického lékaře.</em></p>`,
     public_topic: "zivotni-styl",
     cover_image_url: VEREJNOST_FALLBACK_COVER,
+    meta_description:
+      "Praktický průvodce zdravým spánkem: režim dne, hygiena ložnice a varovné signály pro konzultaci s lékařem.",
+    editors_pick: true,
+    fully_open: true,
+    read_time_minutes: 4,
+    keywords: ["spánek", "hygiena spánku", "regenerace", "životní styl"],
   },
   {
     slug: "verejnost-prevence-screening-a-ockovani",
@@ -47,6 +59,12 @@ const SEED_ARTICLES: SeedArticle[] = [
 <p><em>MedScopeGlobal · Veřejné zdraví · Obsah pro vzdělávání.</em></p>`,
     public_topic: "prevence",
     cover_image_url: VEREJNOST_FALLBACK_COVER,
+    meta_description:
+      "Přehled preventivních prohlídek, screeningových programů a očkování v Česku — srozumitelně pro veřejnost.",
+    editors_pick: true,
+    fully_open: true,
+    read_time_minutes: 5,
+    keywords: ["prevence", "screening", "očkování", "preventivní prohlídka"],
   },
   {
     slug: "verejnost-nemoci-kdy-vyhledat-lekare",
@@ -65,8 +83,70 @@ const SEED_ARTICLES: SeedArticle[] = [
 <p><em>MedScopeGlobal · Veřejné zdraví · V akutních stavech volejte 155.</em></p>`,
     public_topic: "nemoci",
     cover_image_url: VEREJNOST_FALLBACK_COVER,
+    meta_description:
+      "Kdy vyhledat lékaře a kdy počkat: akutní příznaky, varovné signály a praktické rady pro rozhodování.",
+    editors_pick: true,
+    fully_open: true,
+    read_time_minutes: 4,
+    keywords: ["symptomy", "první pomoc", "praktický lékař", "akutní stavy"],
+  },
+  {
+    slug: "verejnost-rozhovor-kardiolog-prevence-srdce",
+    title: "Rozhovor s kardiologem: prevence srdečních onemocnění v každodenním životě",
+    excerpt:
+      "Kardiolog vysvětluje, jak pohyb, strava a kontrola rizikových faktorů chrání srdce — bez strašení.",
+    content: `<p><strong>MedScope:</strong> Co je nejdůležitější prevence srdečních onemocnění pro běžného člověka?</p>
+<p><strong>Kardiolog:</strong> Pravidelný pohyb, kontrola krevního tlaku a cholesterolu a nekouření. Malé změny mají velký dopad.</p>
+<h2>Praktické kroky</h2>
+<ul>
+<li>150 minut středně intenzivního pohybu týdně.</li>
+<li>Omezení soli a průmyslově zpracovaných potravin.</li>
+<li>Preventivní prohlídka u praktického lékaře jednou ročně.</li>
+</ul>
+<p><em>MedScopeGlobal · Rozhovory · Informace nenahrazují vyšetření u kardiologa.</em></p>`,
+    public_topic: "rozhovory",
+    cover_image_url: VEREJNOST_FALLBACK_COVER,
+    meta_description:
+      "Rozhovor s kardiologem o prevenci infarktu a mrtvice: pohyb, strava, tlak a cholesterol srozumitelně.",
+    editors_pick: true,
+    fully_open: true,
+    read_time_minutes: 6,
+    keywords: ["kardiologie", "prevence", "srdce", "rozhovor"],
+  },
+  {
+    slug: "verejnost-zivotni-styl-vyziva-bez-extremu",
+    title: "Vyvážená strava bez extrémů: středomořský talíř v české kuchyni",
+    excerpt:
+      "Jak jíst zdravě bez dietního stresu — praktické tipy pro rodiny a zaneprázdněné jedince.",
+    content: `<p>Extrémní diety slibují rychlé výsledky, ale dlouhodobě vítězí vyváženost. Středomořský model stravování se dobře přizpůsobí české kuchyni.</p>
+<h2>Základ talíře</h2>
+<ul>
+<li>Polovina talíře zelenina a ovoce.</li>
+<li>Celozrné přílohy místo bílé mouky.</li>
+<li>Ryby a luštěniny několikrát týdně.</li>
+<li>Omezení sladkostí a slazených nápojů.</li>
+</ul>
+<p><em>MedScopeGlobal · Životní styl · Při chronických onemocněních konzultujte stravu s lékařem.</em></p>`,
+    public_topic: "zivotni-styl",
+    cover_image_url: VEREJNOST_FALLBACK_COVER,
+    meta_description:
+      "Vyvážená strava bez extrémů: středomořský talíř, praktické tipy a zdravé návyky pro každodenní jídelníček.",
+    read_time_minutes: 5,
+    keywords: ["výživa", "strava", "středomořská dieta", "životní styl"],
   },
 ];
+
+function buildArticleMetadata(article: SeedArticle) {
+  return {
+    editorial_version: "26",
+    section: "verejnost",
+    editors_pick: article.editors_pick ?? false,
+    fully_open: article.fully_open ?? true,
+    read_time_minutes: article.read_time_minutes ?? 5,
+    keywords: article.keywords ?? [],
+    seed: true,
+  };
+}
 
 export async function seedPublicArticlesIfEmpty(): Promise<{ seeded: number; skipped: boolean }> {
   const admin = createServiceRoleClient();
@@ -112,6 +192,9 @@ export async function seedPublicArticlesIfEmpty(): Promise<{ seeded: number; ski
       audience: "public",
       public_topic: article.public_topic,
       source_name: "MedScopeGlobal · Veřejné zdraví",
+      meta_description: article.meta_description ?? article.excerpt.slice(0, 160),
+      ai_generated: false,
+      metadata: buildArticleMetadata(article),
     });
 
     if (!error) seeded += 1;

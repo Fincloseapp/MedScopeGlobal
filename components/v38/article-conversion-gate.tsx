@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Crown, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { StoredNudge } from "@/lib/v38/conversion-engine";
+import { getPaywallPreviewText, VIP_TRIAL_DAYS } from "@/lib/vip";
 
 type Props = {
   copy: StoredNudge;
@@ -11,9 +12,7 @@ type Props = {
 
 /** v38 — paywall gate with content teaser and "pro váš zájem" framing */
 export function ArticleConversionGate({ copy, teaserHtml, title }: Props) {
-  const teaserText = teaserHtml
-    ? teaserHtml.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 320)
-    : null;
+  const teaserText = teaserHtml ? getPaywallPreviewText(teaserHtml) : null;
 
   return (
     <div className="overflow-hidden rounded-2xl border border-[#005B96]/20 bg-gradient-to-b from-white to-[#f0f7ff] shadow-sm dark:from-slate-900 dark:to-[#005B96]/5">
@@ -27,7 +26,9 @@ export function ArticleConversionGate({ copy, teaserHtml, title }: Props) {
               {title}
             </p>
           ) : null}
-          <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{teaserText}…</p>
+          <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+            {teaserText}…
+          </p>
           <div
             className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#f0f7ff] to-transparent dark:from-[#005B96]/5"
             aria-hidden
@@ -47,17 +48,24 @@ export function ArticleConversionGate({ copy, teaserHtml, title }: Props) {
             {copy.headline}
           </p>
           <p className="text-sm text-muted-foreground">{copy.body}</p>
+          <p className="text-sm font-medium text-emerald-700">
+            {VIP_TRIAL_DAYS} dní zkušební verze zdarma — vyzkoušejte bez rizika
+          </p>
         </div>
         <Button asChild size="lg" className="bg-[#005B96] hover:bg-[#004a7a]">
-          <Link href={copy.ctaHref}>
+          <Link href={copy.ctaHref || "/predplatne"}>
             <Crown className="mr-2 h-4 w-4" />
-            {copy.ctaLabel}
+            {copy.ctaLabel || `Začít ${VIP_TRIAL_DAYS}denní trial zdarma`}
           </Link>
         </Button>
         <p className="text-xs text-slate-500">
           Již máte účet?{" "}
           <Link href="/account" className="text-[#005B96] underline">
             Přihlásit se
+          </Link>
+          {" · "}
+          <Link href="/predplatne" className="text-[#005B96] underline">
+            Srovnání tarifů
           </Link>
         </p>
       </div>

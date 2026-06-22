@@ -11,13 +11,13 @@ const menuCs: NavItem[] = [
     label: "Pro veřejnost",
     href: "/verejnost",
     children: [
-      { label: "Přehled", href: "/verejnost", description: "Prevence, výživa, spánek a fitness" },
-      { label: "Denní videa", href: "/verejnost/osveta", description: "Zdravotní tipy s avatary" },
+      { label: "Najdi svůj problém", href: "/verejnost/temata", description: "Symptomy, prevence, nemoci — začněte zde" },
+      { label: "Zeptej se AI", href: "/ai-asistent/verejnost", description: "Odpovědi o zdraví — nenahrazuje lékaře" },
+      { label: "Přehled sekce", href: "/verejnost", description: "Vše pro veřejnost na jednom místě" },
+      { label: "Články", href: "/verejnost/clanky", description: "Krátké srozumitelné články v češtině" },
+      { label: "Denní videa", href: "/verejnost/osveta", description: "Zdravotní tipy s avatary a kvízy" },
+      { label: "Rozhovory", href: "/verejnost/rozhovory", description: "Rozhovory s lékaři a odborníky" },
       { label: "Žebříček", href: "/verejnost/zebricek", description: "XP za sledování a kvízy" },
-      { label: "Články", href: "/verejnost/clanky", description: "Krátké srozumitelné články" },
-      { label: "Témata", href: "/verejnost/temata", description: "Najdi svůj problém" },
-      { label: "Rozhovory", href: "/verejnost/rozhovory", description: "Rozhovory s odborníky" },
-      { label: "Zeptej se AI", href: "/ai-asistent/verejnost", description: "Veřejný AI asistent" },
     ],
   },
   {
@@ -44,7 +44,7 @@ const menuCs: NavItem[] = [
     label: "Academy",
     href: "/academy",
     children: [
-      { label: "Přehled", href: "/academy", description: "MedScope Academy v35" },
+      { label: "Přehled", href: "/academy", description: "MedScope Academy — kurzy a certifikáty" },
       { label: "Kurzy", href: "/academy/courses", description: "Publikované kurzy" },
       {
         label: "Příprava na přijímačky",
@@ -143,6 +143,8 @@ const menuCs: NavItem[] = [
       { label: "Univerzity", href: "/ai-medical/univerzity" },
     ],
   },
+  { label: "O nás", href: "/o-nas" },
+  { label: "Kontakt", href: "/kontakt" },
   { label: "Kongresy", href: "/kongresy" },
   { label: "Kariéra", href: "/kariera" },
   {

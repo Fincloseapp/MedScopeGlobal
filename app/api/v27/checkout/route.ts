@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { SITE } from "@/lib/config/site";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { resolveV27CheckoutItem, type V27CheckoutKind } from "@/lib/v27/stripe-products";
+import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
 export const dynamic = "force-dynamic";
 
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
           unit_amount: amount,
           product_data: {
             name: item.name,
-            description: `MedScopeGlobal — ${item.name}`,
+            description: `MedScopeGlobal — ${item.name} · ${VIP_TRIAL_DAYS}denní zkušební verze`,
           },
           ...(item.mode === "subscription"
             ? { recurring: { interval: recurringInterval } }
@@ -64,6 +65,17 @@ export async function POST(request: Request) {
         },
       },
     ],
+    ...(item.mode === "subscription"
+      ? {
+          subscription_data: {
+            trial_period_days: VIP_TRIAL_DAYS,
+            metadata: {
+              v27_trial_days: String(VIP_TRIAL_DAYS),
+              product_id: productId,
+            },
+          },
+        }
+      : {}),
   };
 
   const session = await stripe.checkout.sessions.create(sessionParams);

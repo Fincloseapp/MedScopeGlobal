@@ -6,10 +6,12 @@ export function V271HubPageView({
   page,
   sectionLabel,
   homeHref,
+  afterLinks,
 }: {
   page: V271HubPage;
   sectionLabel: string;
   homeHref: string;
+  afterLinks?: React.ReactNode;
 }) {
   return (
     <ModulePageShell
@@ -45,6 +47,8 @@ export function V271HubPageView({
           />
         ))}
       </div>
+
+      {afterLinks}
     </ModulePageShell>
   );
 }

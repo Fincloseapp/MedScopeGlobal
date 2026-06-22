@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Quote } from "lucide-react";
 import { V20ArticleCard } from "@/components/v20/article-card";
 import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { getReaderContext } from "@/lib/auth/reader-context";
@@ -8,9 +8,111 @@ import {
   V271_AUDIENCES,
   V271_AKTUALNI,
   V271_B2B,
+  V271_SOCIAL_PROOF_STATS,
   V271_SUBSCRIPTION_PLANS,
+  V271_TESTIMONIALS,
+  V271_WHY_TRUST,
 } from "@/lib/v271/homepage";
 import { subscriptionProductId } from "@/lib/v27/config";
+
+export function V272SocialProofBlock() {
+  return (
+    <section className="border-b border-slate-200 bg-white">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+        <div className="text-center">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
+            Důvěřují nám
+          </p>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
+            Čtenáři z celé České republiky
+          </h2>
+          <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-600">
+            Studenti LF, lékaři v praxi i laici, kteří chtějí spolehlivé zdravotní informace — ne
+            generické rady z internetu.
+          </p>
+        </div>
+
+        <dl className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {V271_SOCIAL_PROOF_STATS.map((stat) => (
+            <div
+              key={stat.label}
+              className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-center"
+            >
+              <dt className="font-display text-3xl font-bold text-[#005B96]">{stat.value}</dt>
+              <dd className="mt-1 text-sm text-slate-600">{stat.label}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <div className="mt-10 grid gap-5 lg:grid-cols-3">
+          {V271_TESTIMONIALS.map((item) => (
+            <figure
+              key={item.author}
+              className="flex flex-col rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-6"
+            >
+              <Quote className="h-8 w-8 text-[#005B96]/30" aria-hidden />
+              <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-slate-700">
+                &ldquo;{item.quote}&rdquo;
+              </blockquote>
+              <figcaption className="mt-4 border-t border-slate-100 pt-4">
+                <p className="font-semibold text-[#021d33]">{item.author}</p>
+                <p className="text-xs text-slate-500">{item.role}</p>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function V272WhyTrustBlock() {
+  return (
+    <section className="border-b border-slate-200 bg-slate-50">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+        <div className="text-center">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
+            Proč MedScopeGlobal
+          </p>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
+            Prémiový magazín, ne další zdravotní blog
+          </h2>
+          <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-600">
+            Redakční standard, ověřené zdroje a obsah psaný pro českou medicínu — od přijímaček po
+            klinickou praxi.
+          </p>
+        </div>
+
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {V271_WHY_TRUST.map((point) => (
+            <article
+              key={point.title}
+              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+            >
+              <h3 className="font-display text-lg font-semibold text-[#021d33]">{point.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">{point.description}</p>
+            </article>
+          ))}
+        </div>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/predplatne?trial=1"
+            className="rounded-full bg-[#005B96] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
+          >
+            Vyzkoušet 14 dní zdarma
+          </Link>
+          <Link
+            href="/predplatne"
+            className="rounded-full border border-[#005B96]/30 px-6 py-2.5 text-sm font-semibold text-[#005B96] hover:bg-[#005B96]/5"
+          >
+            Předplatit
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export function V271AudienceSections() {
   return (
@@ -18,10 +120,10 @@ export function V271AudienceSections() {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <div className="mb-8 text-center">
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-            Tři cílové skupiny
+            Pro koho píšeme
           </p>
           <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
-            Vyberte si svou cestu
+            Obsah na míru vaší roli ve zdravotnictví
           </h2>
         </div>
         <div className="grid gap-5 lg:grid-cols-3">
@@ -153,10 +255,10 @@ export function V272SubscriptionPlansBlock() {
         Předplatné
       </p>
       <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">
-        Trvalé předplatné — měsíčně nebo ročně
+        Plný přístup k prémiovému obsahu
       </h2>
       <p className="mt-1 text-sm text-slate-600">
-        Veřejnost, studenti a lékaři — plný přístup bez jednorázových PDF.
+        Začněte 14denní zkušební období zdarma — veřejnost, studenti i lékaři bez jednorázových PDF.
       </p>
       <div className="mt-6 grid gap-5 lg:grid-cols-3">
         {V271_SUBSCRIPTION_PLANS.map((plan) => (
@@ -175,6 +277,12 @@ export function V272SubscriptionPlansBlock() {
               ))}
             </ul>
             <div className="mt-4 space-y-2">
+              <Link
+                href="/predplatne?trial=1"
+                className="flex w-full items-center justify-center rounded-md bg-[#005B96] px-4 py-2 text-sm font-medium text-white hover:bg-[#004a7a]"
+              >
+                Vyzkoušet 14 dní zdarma
+              </Link>
               <V27CheckoutButton
                 kind="subscription"
                 productId={subscriptionProductId(plan.tier, "month")}
@@ -207,17 +315,26 @@ export function V272SubscriptionHeroBlock() {
           Předplatné MedScopeGlobal
         </p>
         <h2 className="mt-2 font-display text-3xl font-semibold">
-          Od 99 Kč / měsíc · studenti 149 Kč · lékaři 490 Kč
+          14 dní zdarma · poté od 99 Kč / měsíc
         </h2>
         <p className="mx-auto mt-3 max-w-2xl text-sm text-white/85">
-          Roční plány ušetří až 2 měsíce. Platba kartou, Apple Pay a Google Pay přes Stripe.
+          Studenti 149 Kč · lékaři 490 Kč. Roční plány ušetří až 2 měsíce. Platba kartou, Apple Pay
+          a Google Pay přes Stripe.
         </p>
-        <Link
-          href="/predplatne"
-          className="mt-6 inline-flex rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-[#021d33] hover:bg-sky-50"
-        >
-          Vybrat předplatné
-        </Link>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/predplatne?trial=1"
+            className="inline-flex rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-[#021d33] hover:bg-sky-50"
+          >
+            Vyzkoušet 14 dní zdarma
+          </Link>
+          <Link
+            href="/predplatne"
+            className="inline-flex rounded-full border border-white/40 px-6 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
+          >
+            Předplatit
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -235,7 +352,8 @@ export function V272AcademyCtaBlock() {
             Kurzy, lekce a kvízy pro studenty i lékaře
           </h2>
           <p className="mt-2 max-w-xl text-sm text-slate-600">
-            Gamifikace, certifikáty a AI asistovaná tvorba obsahu — nová vzdělávací platforma v35.
+            Gamifikace, certifikáty a AI lektor — interaktivní vzdělávání od anatomie po klinické
+            dovednosti.
           </p>
         </div>
         <Link
@@ -252,6 +370,8 @@ export function V272AcademyCtaBlock() {
 export async function V272HomepageSections() {
   return (
     <>
+      <V272SocialProofBlock />
+      <V272WhyTrustBlock />
       <V271AudienceSections />
       <V272AcademyCtaBlock />
       <V271B2bBlock />

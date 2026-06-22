@@ -32,8 +32,18 @@ export default async function OdbornaHubPage() {
     <ModulePageShell
       eyebrow="Odborná sekce"
       title="Obsah pro ověřené lékaře"
-      description="Přístup úroveň 3 — vyžaduje ověření evidenčního čísla v registru České lékařské komory (ČLK)."
+      description="Přístup úroveň 3 — vyžaduje ověření evidenčního čísla v registru České lékařské komory (ČLK). Obsah prochází peer review kontrolou s odkazy na primární zdroje (DOI, PMID)."
     >
+      <div className="mb-6 flex flex-wrap gap-2">
+        {["ČLK ověření", "Peer review", "CME připravováno", "DOI / PMID"].map((badge) => (
+          <span
+            key={badge}
+            className="rounded-full border border-[#005B96]/30 bg-[#005B96]/5 px-3 py-1 text-xs font-semibold text-[#005B96]"
+          >
+            {badge}
+          </span>
+        ))}
+      </div>
       {!access.allowed ? (
         <OdbornaGate reason={access.reason!} clkStatus={access.clk} />
       ) : (

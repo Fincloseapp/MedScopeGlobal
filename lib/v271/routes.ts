@@ -61,14 +61,15 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
   "chci-studovat": {
     slug: "chci-studovat",
     title: "Chci studovat medicínu",
-    description: "Přijímačky, termíny, požadavky a tipy na přípravu.",
+    description: "Přijímačky, termíny, požadavky a tipy na přípravu — včetně MedScope Academy kurzů.",
     links: [
+      { label: "Přípravné kurzy Academy", href: "/academy/courses?category=prijimacky", description: "Biologie, chemie, fyzika — ≈30 % zdarma" },
       { label: "Přijímačky", href: "/studium/prijimacky" },
       { label: "Lékařské fakulty", href: "/studium/univerzity" },
-      { label: "Příprava LF", href: "/medicina/priprava" },
+      { label: "Rozhodovací strom LF", href: "/academy/courses/ktera-lf-rozhodovaci-strom" },
     ],
-    ctaHref: "/predplatne",
-    ctaLabel: "Studentské předplatné",
+    ctaHref: "/academy/courses?category=prijimacky",
+    ctaLabel: "Začít přípravu zdarma",
   },
   zkousky: {
     slug: "zkousky",
@@ -93,19 +94,20 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
 export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
   index: {
     slug: "",
-    title: "Pro lékaře",
-    description: "Guidelines, přehledy studií, Research Hub a klinický AI asistent.",
+    title: "Pro lékaře a vědce",
+    description:
+      "Evidence-based guidelines, kurátorované studie s DOI/PMID, CME přehledy, Research Hub a klinický AI — ověřený přístup přes ČLK.",
     links: [
-      { label: "Guidelines", href: "/lekari/guidelines" },
-      { label: "Přehledy", href: "/lekari/prehledy" },
-      { label: "Studie", href: "/lekari/studie" },
-      { label: "Research Hub", href: "/lekari/research-hub" },
-      { label: "AI asistent", href: "/lekari/ai-asistent" },
-      { label: "Odborná sekce (ČLK)", href: "/odborna" },
-      { label: "Léky", href: "/leky" },
+      { label: "Guidelines", href: "/lekari/guidelines", description: "Klinická doporučení pro praxi" },
+      { label: "Přehledy", href: "/lekari/prehledy", description: "Strukturované medicínské briefy" },
+      { label: "Studie", href: "/lekari/studie", description: "RCT a meta-analýzy s DOI/PMID" },
+      { label: "Research Hub", href: "/lekari/research-hub", description: "PubMed a AI analýza výzkumu" },
+      { label: "AI asistent", href: "/lekari/ai-asistent", description: "Klinický AI pro praxi" },
+      { label: "Odborná sekce (ČLK)", href: "/odborna", description: "Ověření evidenčním číslem ČLK" },
+      { label: "Léky", href: "/leky", description: "SÚKL databáze a novinky" },
     ],
     ctaHref: "/predplatne",
-    ctaLabel: "Předplatné lékaře 490 Kč",
+    ctaLabel: "Profesionální tier 490 Kč/měs.",
   },
   guidelines: {
     slug: "guidelines",
@@ -163,27 +165,29 @@ export const V271_FIRMY_PAGES: Record<string, V271HubPage> = {
   index: {
     slug: "",
     title: "Pro firmy",
-    description: "Pharma, kliniky, laboratoře a univerzity — reklama a partnerství.",
+    description:
+      "Pharma, kliniky, laboratoře a univerzity — banner od 5 000 Kč/měs., sponzorovaný článek 15 000 Kč, enterprise na míru.",
     links: [
-      { label: "Ceník", href: "/firmy/cenik" },
-      { label: "Reklama", href: "/firmy/reklama" },
-      { label: "Partnerství", href: "/firmy/partnerstvi" },
-      { label: "Kampaně", href: "/firmy/kampane" },
-      { label: "Formulář inzerce", href: "/inzerce/formular" },
+      { label: "Ceník", href: "/firmy/cenik", description: "Banner 5 000 Kč · článek 15 000 Kč" },
+      { label: "Reklama", href: "/firmy/reklama", description: "Bannery a newsletter sloty" },
+      { label: "Partnerství", href: "/firmy/partnerstvi", description: "Univerzitní spolupráce" },
+      { label: "Kampaně", href: "/firmy/kampane", description: "Segmentace lékaři / studenti" },
+      { label: "Formulář inzerce", href: "/inzerce/formular", description: "Poptávka do 2 dnů" },
     ],
     ctaHref: "/inzerce/formular",
     ctaLabel: "Kontaktovat obchod",
   },
   cenik: {
     slug: "cenik",
-    title: "Ceník",
-    description: "Reklamní balíčky a B2B ceník MedScopeGlobal.",
+    title: "B2B ceník",
+    description:
+      "Transparentní orientační ceny: banner 5 000 Kč/měsíc, sponzorovaný článek 15 000 Kč, enterprise tier individuálně.",
     links: [
-      { label: "B2B balíčky", href: "/pro-firmy#ceny" },
-      { label: "Ceník inzerce", href: "/inzerce/cenik" },
+      { label: "Formulář poptávky", href: "/inzerce/formular", description: "Nabídka do 2 pracovních dnů" },
+      { label: "Reklamní přehled", href: "/pro-firmy", description: "Case studies a formáty" },
     ],
-    ctaHref: "/pro-firmy#ceny",
-    ctaLabel: "Zobrazit balíčky",
+    ctaHref: "/inzerce/formular",
+    ctaLabel: "Poptat nabídku",
   },
   reklama: {
     slug: "reklama",

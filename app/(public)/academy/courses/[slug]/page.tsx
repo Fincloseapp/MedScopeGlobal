@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlayCircle } from "lucide-react";
+import { PlayCircle, Sparkles, Unlock } from "lucide-react";
 import { AcademyPageHeader } from "@/components/academy/page-header";
+import { FreePreviewBanner } from "@/components/academy/free-preview-banner";
 import { getCourseBySlug } from "@/lib/academy/db";
+import { isLessonFreePreview } from "@/lib/academy/preview";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { TtsListenButton } from "@/components/tts/tts-listen-button";
 
@@ -49,7 +51,7 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
       <AcademyPageHeader
         eyebrow="Kurz"
         title={course.title}
-        description={`${course.summary ?? course.description}${totalMinutes ? ` · ≈ ${totalMinutes} min poslechu` : ""}`}
+        description={`${course.summary ?? course.description}${totalMinutes ? ` · ≈ ${totalMinutes} min` : ""}${course.xp_reward > 0 ? ` · +${course.xp_reward} XP` : ""}`}
         ctaHref="/academy/courses"
         ctaLabel="Zpět na kurzy"
       />
@@ -68,10 +70,19 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
 
         {(course.video_lesson_count ?? 0) > 0 ? (
           <p className="mb-4 inline-flex items-center gap-1 rounded-full bg-[#e8f4fc] px-3 py-1 text-xs font-medium text-[#005B96]">
-            <PlayCircle className="h-3.5 w-3.5" />
+            <PlayCircle className="h-3.5 w-3.5" aria-hidden />
             Videokurz · {course.video_lesson_count} video lekcí
           </p>
         ) : null}
+
+        {course.xp_reward > 0 ? (
+          <p className="mb-4 inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">
+            <Sparkles className="h-3.5 w-3.5" aria-hidden />
+            +{course.xp_reward} XP po dokončení kurzu
+          </p>
+        ) : null}
+
+        <FreePreviewBanner totalLessons={course.lessons.length} className="mb-6" />
 
         {(course.summary ?? course.description) ? (
           <div className="mb-6">
@@ -104,7 +115,9 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
 
         {course.lessons.length > 0 ? (
           <div className="grid gap-3 sm:grid-cols-2">
-            {course.lessons.map((lesson, i) => (
+            {course.lessons.map((lesson, i) => {
+              const isFree = isLessonFreePreview(i, course.lessons.length);
+              return (
               <div key={lesson.id}>
                 <Link
                   href={`/academy/courses/${slug}/lessons/${lesson.slug}`}
@@ -113,19 +126,28 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
                   <div>
                     <p className="text-xs text-slate-500">Lekce {i + 1}</p>
                     <p className="font-medium text-[#021d33]">{lesson.title}</p>
-                    {lesson.video_asset_id ? (
-                      <span className="mt-1 inline-flex items-center gap-1 text-xs text-[#005B96]">
-                        <PlayCircle className="h-3 w-3" />
-                        Video + AI lektor
-                      </span>
-                    ) : null}
+                    <div className="mt-1 flex flex-wrap items-center gap-2">
+                      {lesson.video_asset_id ? (
+                        <span className="inline-flex items-center gap-1 text-xs text-[#005B96]">
+                          <PlayCircle className="h-3 w-3" aria-hidden />
+                          Video + AI lektor
+                        </span>
+                      ) : null}
+                      {isFree ? (
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700">
+                          <Unlock className="h-3 w-3" aria-hidden />
+                          Zdarma
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
                   {lesson.duration_minutes > 0 ? (
                     <span className="text-xs text-slate-500">{lesson.duration_minutes} min</span>
                   ) : null}
                 </Link>
               </div>
-            ))}
+            );
+            })}
           </div>
         ) : (
           <p className="rounded-2xl border border-dashed border-slate-200 bg-white p-6 text-sm text-slate-500">

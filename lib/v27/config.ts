@@ -78,6 +78,22 @@ export const V27_SUBSCRIPTION_PLANS = [
   },
 ] as const;
 
+/** Side-by-side comparison rows for /predplatne */
+export const V27_COMPARISON_FEATURES = [
+  { label: "Magazínové články bez reklam", public: true, student: true, physician: true },
+  { label: "AI asistent pro veřejnost", public: true, student: true, physician: true },
+  { label: "Prevence a životní styl", public: true, student: true, physician: true },
+  { label: "Kvízy a studijní plány", public: false, student: true, physician: true },
+  { label: "AI tutor pro studenty LF", public: false, student: true, physician: true },
+  { label: "Modelové otázky na přijímačky", public: false, student: true, physician: false },
+  { label: "Odborná sekce a guidelines", public: false, student: false, physician: true },
+  { label: "CME přehledy a souhrny studií", public: false, student: false, physician: true },
+  { label: "Klinický AI asistent", public: false, student: false, physician: true },
+  { label: "Research Hub a diagnostické algoritmy", public: false, student: false, physician: true },
+  { label: "MedScope Academy (základní kurzy)", public: true, student: true, physician: true },
+  { label: "Prioritní notifikace novinek", public: false, student: true, physician: true },
+] as const;
+
 /** @deprecated Use V27_SUBSCRIPTION_PLANS — kept for legacy checkout IDs */
 export const V27_MINI_PRODUCTS = [] as const;
 
@@ -95,11 +111,11 @@ export const V27_EXPERT_PDFS = [
   { id: "cme-bundle", name: "CME balíček", priceCzk: 399 },
 ] as const;
 
-/** B2B pricing tiers */
+/** B2B pricing tiers — aligned with /firmy/cenik transparent pricing */
 export const V27_B2B_PACKAGES = [
-  { id: "pharma-starter", name: "Pharma Starter", priceCzk: 15000, desc: "Banner + 1 sponzorovaný článek" },
-  { id: "clinic-pro", name: "Klinika / Lab Pro", priceCzk: 25000, desc: "Segmentace + kampaň na 3 měsíce" },
-  { id: "university", name: "Univerzitní partnerství", priceCzk: 45000, desc: "Studijní obsah + branding LF" },
+  { id: "banner", name: "Banner", priceCzk: 5000, desc: "Měsíční rotace banneru — segmentace lékaři / studenti" },
+  { id: "sponsored-article", name: "Sponzorovaný článek", priceCzk: 15000, desc: "Editoriální článek s označením partnera" },
+  { id: "enterprise", name: "Enterprise", priceCzk: 0, desc: "White-label, API a kampaně na míru — individuální cena" },
 ] as const;
 
 export function parseSubscriptionProductId(productId: string): {

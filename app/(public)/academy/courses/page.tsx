@@ -4,6 +4,8 @@ import { AcademyPageHeader } from "@/components/academy/page-header";
 
 import { CourseCard } from "@/components/academy/course-card";
 
+import { FreePreviewBanner } from "@/components/academy/free-preview-banner";
+
 import { getCourseVideoFlags, listPublishedCourses } from "@/lib/academy/db";
 
 import { buildV20PageMetadata } from "@/lib/v20/seo";
@@ -110,15 +112,17 @@ export default async function AcademyCoursesPage({ searchParams }: Props) {
 
           isPrep
 
-            ? "Biologie, chemie, fyzika, strategie testu a pohovor — pro zájemce o studium medicíny."
+            ? "Biologie, chemie, fyzika, strategie testu a pohovor. ≈30 % lekcí zdarma — včetně první video lekce."
 
-            : "Publikované vzdělávací kurzy s lekcemi a kvízy."
+            : "Publikované vzdělávací kurzy s lekcemi, kvízy a XP odměnami."
 
         }
 
       />
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+
+        <FreePreviewBanner totalLessons={3} className="mb-8" />
 
         {courses.length > 0 ? (
 
@@ -135,6 +139,8 @@ export default async function AcademyCoursesPage({ searchParams }: Props) {
                 hasVideo={flags[course.id]?.hasVideo}
 
                 videoLessonCount={flags[course.id]?.videoLessonCount}
+
+                showFreePreview
 
               />
 
