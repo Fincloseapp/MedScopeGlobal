@@ -57,8 +57,16 @@ async function sbPatch(table, query, body) {
   if (!res.ok) throw new Error(`${table} PATCH ${res.status} ${await res.text()}`);
 }
 
-const MATCH_SYSTEM = `Vrať JSON: {"imageSearchQuery":"specific English 5-12 words","imageAlt":"Czech alt text","wikimediaSearchTerm":"English 3-6 words for Wikimedia"}
-Musí odpovídat slide textu — anatomie, kostra, roviny, orgány. NE jídlo/sport.`;
+const MATCH_SYSTEM = `Vrať JSON:
+{
+  "imageSearchQueryEn": "specific English 5-12 words for educational illustration",
+  "imageAltCs": "český alt text — co obrázek zobrazuje (1 věta)",
+  "captionCs": "český popisek pod obrázkem (1-2 věty)",
+  "wikimediaSearchTerm": "English 3-6 words for Wikimedia Commons"
+}
+Pravidla: vyhledávání v ANGLIČTINĚ, alt a popisek v ČEŠTINĚ s diakritikou.
+Musí odpovídat slide textu — genetika/Mendel → Punnettův čtverec, DNA, hrách; chemie → molekuly; fyzika → síly/pohyb; anatomie → orgány/kostra.
+NE jídlo, sport, generický stock.`;
 
 async function groqSlideQuery(input, attempt = 0) {
   if (!groqKey) return fallbackQuery(input);
@@ -87,10 +95,13 @@ async function groqSlideQuery(input, attempt = 0) {
   const data = await res.json();
   try {
     const p = JSON.parse(data.choices?.[0]?.message?.content ?? "{}");
+    const searchQuery = p.imageSearchQueryEn ?? p.imageSearchQuery ?? p.wikimediaSearchTerm ?? "";
+    const altCs = p.imageAltCs ?? p.imageAlt ?? input.slideTitle;
     return {
-      imageSearchQuery: p.imageSearchQuery ?? p.wikimediaSearchTerm ?? "",
-      imageAlt: p.imageAlt ?? input.slideTitle,
-      wikimediaSearchTerm: p.wikimediaSearchTerm ?? p.imageSearchQuery ?? "",
+      imageSearchQuery: searchQuery,
+      imageAlt: altCs,
+      captionCs: p.captionCs ?? altCs,
+      wikimediaSearchTerm: p.wikimediaSearchTerm ?? searchQuery,
     };
   } catch {
     return fallbackQuery(input);
@@ -111,13 +122,20 @@ function fallbackQuery(input) {
     circulation: "circulatory system anatomy diagram",
     brain: "human brain anatomy sagittal",
     lung: "human lungs anatomy diagram",
+    genetics_mendel: "Gregor Mendel pea plant genetics portrait",
+    punnett_square: "Punnett square genetics diagram",
+    dna: "DNA double helix structure diagram",
+    mendel_pea: "Mendelian inheritance pea plant diagram",
     cell: "animal cell structure diagram",
+    chemistry_molecule: "chemistry molecule periodic table diagram",
+    physics_motion: "physics forces motion Newton diagram",
     default: "human anatomy medical education diagram",
   };
   const term = terms[topic] ?? terms.default;
   return {
     imageSearchQuery: term,
     imageAlt: input.slideTitle,
+    captionCs: input.slideTitle,
     wikimediaSearchTerm: term,
   };
 }
@@ -155,7 +173,8 @@ async function refreshSlideshow(slideshow, lessonTitle, courseTopic) {
       ...s,
       imageUrl: m.imageUrl,
       imageAlt: m.imageAlt,
-      imageDescription: m.imageAlt,
+      captionCs: m.captionCs ?? m.imageAlt,
+      imageDescription: m.captionCs ?? m.imageAlt,
       imageKeywords: [m.wikimediaSearchTerm].filter(Boolean),
       imageSource: m.source,
     });

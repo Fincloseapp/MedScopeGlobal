@@ -41,8 +41,23 @@ export const KEYWORD_IMAGES: Record<string, string> = {
   pharmacy: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&h=450&fit=crop&q=80&auto=format",
   cell: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Animal_cell_structure_en.svg/800px-Animal_cell_structure_en.svg.png",
   biology: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Animal_cell_structure_en.svg/800px-Animal_cell_structure_en.svg.png",
-  chemistry: DEFAULT_SLIDE_IMAGE,
-  physics: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=450&fit=crop&q=80&auto=format",
+  genetics_mendel:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Mendel-flowers.jpg/960px-Mendel-flowers.jpg",
+  punnett_square:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Punnett_square_mendel_flowers.svg/960px-Punnett_square_mendel_flowers.svg.png",
+  dna: "https://upload.wikimedia.org/wikipedia/commons/c/c4/DNA_double_helix_horizontal.png",
+  mendel_pea:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Mendelian_inheritance_in_black_and_white_albino_guinea_pigs%28GN04114%29.jpg/960px-Mendelian_inheritance_in_black_and_white_albino_guinea_pigs%28GN04114%29.jpg",
+  genetics:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Mendel-flowers.jpg/960px-Mendel-flowers.jpg",
+  chemistry:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Periodic_table.svg/800px-Periodic_table.svg.png",
+  chemistry_molecule:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Periodic_table.svg/800px-Periodic_table.svg.png",
+  physics:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Newton%27s_cradle_animation_book_2.gif/800px-Newton%27s_cradle_animation_book_2.gif",
+  physics_motion:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Newton%27s_cradle_animation_book_2.gif/800px-Newton%27s_cradle_animation_book_2.gif",
   physiology: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&h=450&fit=crop&q=80&auto=format",
   brain:
     "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Brain_human_sagittal_section.svg/800px-Brain_human_sagittal_section.svg.png",
@@ -70,12 +85,17 @@ export const SLIDE_IMAGE_FALLBACKS: string[] = [
 const CS_KEYWORD_MAP: [RegExp, string][] = [
   [/orientac|poloh|roviny|anatom/i, "orientation"],
   [/kost|skelet|kostern/i, "skeleton"],
-  [/krev|oběh|cirkul/i, "circulation"],
+  [/krev(?!ní)|oběh|cirkul/i, "circulation"],
   [/srdce|kardi|ekg|srdeční/i, "heart"],
   [/farmak|lék|medik|dávkov/i, "pharmacy"],
-  [/buněk|buně|biolog|genet|dna|mitóz/i, "cell"],
-  [/chem|vazb|uhlík|alkohol/i, "chemistry"],
-  [/fyzik|kinemat|mechan|elektr/i, "physics"],
+  [/punnett|křížení|krízení|dělení\s+gen|druhý\s+mendel|krevní\s+skupin/i, "punnett_square"],
+  [/mendel|dědičn|genotyp|fenotyp|alel|homozyg|heterozyg|potomstv/i, "genetics_mendel"],
+  [/dna|chromosom|genet|gen\b|transkrip/i, "dna"],
+  [/hrách|hráš|pea\s+plant/i, "mendel_pea"],
+  [/buněk|buně|mitóz|organel/i, "cell"],
+  [/biolog/i, "biology"],
+  [/chem|vazb|uhlík|molekul|period|prvek|reakc|alkohol/i, "chemistry_molecule"],
+  [/fyzik|kinemat|mechan|elektr|síla|rychlost|energ/i, "physics_motion"],
   [/fyziolog|metabol|dych/i, "physiology"],
   [/mozek|neurolog|nerv/i, "brain"],
   [/strav|výživ|jídlo|diet/i, "nutrition"],

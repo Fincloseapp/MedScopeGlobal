@@ -148,6 +148,7 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className, lang }:
 
   const progressPct = slides.length > 1 ? ((index + 1) / slides.length) * 100 : 100;
   const imageAlt = slide.imageAlt || slide.imageDescription || slide.title;
+  const captionCs = slide.captionCs || slide.imageDescription;
 
   return (
     <div className={className} role="region" aria-label={`Prezentace lekce: ${lessonTitle}`}>
@@ -175,6 +176,9 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className, lang }:
               referrerPolicy="no-referrer"
               onError={handleImageError}
             />
+            {captionCs && captionCs !== slide.title && (
+              <p className="mt-2 max-w-3xl text-center text-xs text-slate-400 italic">{captionCs}</p>
+            )}
           </div>
 
           <div className="border-t border-white/10 px-4 py-5 sm:px-8 sm:py-6">

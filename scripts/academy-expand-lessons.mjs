@@ -28,12 +28,16 @@ for (const name of [".env.local", ".env"]) {
 const BASE = (env.NEXT_PUBLIC_SUPABASE_URL ?? env.SUPABASE_URL ?? "").replace(/\/$/, "");
 const KEY = env.SUPABASE_SERVICE_ROLE_KEY;
 const groqKey = env.GROQ_API_KEY;
+const geminiKey = env.GEMINI_API_KEY;
 const CZECH_WPM = 150;
 
 const dryRun = process.argv.includes("--dry-run");
 const allLessons = process.argv.includes("--all");
 const courseArg = process.argv.find((a) => a.startsWith("--course="));
 const courseSlug = courseArg?.split("=")[1] ?? "anatomie-zaklady-uchazece";
+const lessonFilter = process.argv.find((a) => a.startsWith("--lesson="))?.split("=")[1];
+const targetMinutesArg = process.argv.find((a) => a.startsWith("--target-minutes="))?.split("=")[1];
+const explicitTargetMinutes = targetMinutesArg ? Number(targetMinutesArg) : null;
 
 if (!BASE || !KEY) {
   console.error("Missing SUPABASE_URL / SERVICE_ROLE_KEY");
@@ -173,27 +177,139 @@ async function groqChat(messages, maxTokens = 8192) {
   return { error: 429 };
 }
 
-async function groqExpand(lessonTitle, lessonBody, courseTitle, targetMinutes) {
-  if (!groqKey) return null;
+async function geminiChat(messages, maxTokens = 8192) {
+  if (!geminiKey) return { error: "no_key" };
+  const model = env.GEMINI_MODEL || "gemini-2.5-flash-lite";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: messages.map((m) => `${m.role.toUpperCase()}: ${m.content}`).join("\n\n") }],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.4,
+          maxOutputTokens: maxTokens,
+          responseMimeType: "application/json",
+        },
+      }),
+      signal: AbortSignal.timeout(120000),
+    });
+    if (!res.ok) return { error: res.status };
+    const data = await res.json();
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    return content ? { content } : { error: "empty" };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+
+
+async function llmExpand(lessonTitle, lessonBody, courseTitle, targetMinutes, currentWords = 0) {
   const targetWords = targetMinutes * CZECH_WPM;
-  const result = await groqChat([
+  const providers = [
+    { name: "groq", chat: groqChat },
+    { name: "gemini", chat: geminiChat },
+  ];
+
+  for (const { name, chat } of providers) {
+    // Phase 1: expand markdown content
+    const contentMessages = [
+      {
+        role: "system",
+        content: `Jsi medicínský pedagog. Vrať JSON: {"content":"markdown cs, MINIMÁLNĚ ${targetWords} slov, 6+ odstavců"}. Rozšiř stávající text — odborná čeština, bez zkracování.`,
+      },
+      {
+        role: "user",
+        content: `Kurz: ${courseTitle}\nLekce: ${lessonTitle}\nCíl: ${targetMinutes} min (~${targetWords} slov)\n\n${lessonBody.slice(0, 3500)}`,
+      },
+    ];
+    let expandedContent = null;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const result = await chat(contentMessages, 12000);
+      if (result.error || !result.content) {
+        console.warn(`  ${name} content ${result.error ?? "empty"} (attempt ${attempt + 1})`);
+        await new Promise((r) => setTimeout(r, 3000));
+        continue;
+      }
+      try {
+        const parsed = JSON.parse(result.content);
+        const words = countWords(parsed.content ?? "");
+        if (words >= Math.max(targetWords * 0.55, currentWords + 200)) {
+          expandedContent = parsed.content;
+          console.log(`  ${name} content: ${words} words`);
+          break;
+        }
+        console.warn(`  ${name} content short (${words}/${targetWords})`);
+      } catch {
+        console.warn(`  ${name} content invalid JSON`);
+      }
+      await new Promise((r) => setTimeout(r, 2000));
+    }
+    if (!expandedContent) continue;
+
+    // Phase 2: slides from expanded content
+    const slideMessages = [
+      {
+        role: "system",
+        content: `Vrať JSON: {"slides":[{"title":"","body":"4-6 vět","imageDescription":"","imageKeywords":["english"],"durationSeconds":12}],"voiceoverText":""}. 8-10 slidů pokrývajících celý text.`,
+      },
+      {
+        role: "user",
+        content: `Lekce: ${lessonTitle}\n\n${expandedContent.slice(0, 6000)}`,
+      },
+    ];
+    const slideResult = await chat(slideMessages, 8192);
+    if (slideResult.error || !slideResult.content) {
+      console.warn(`  ${name} slides ${slideResult.error ?? "empty"}`);
+      continue;
+    }
+    try {
+      const slidesParsed = JSON.parse(slideResult.content);
+      if (slidesParsed.slides?.length >= 6) {
+        return {
+          content: expandedContent,
+          slides: slidesParsed.slides,
+          voiceoverText: slidesParsed.voiceoverText ?? expandedContent,
+          provider: name,
+        };
+      }
+    } catch {
+      console.warn(`  ${name} slides invalid JSON`);
+    }
+  }
+  return null;
+}
+
+async function llmCondense(content, slides, lessonTitle, targetMinutes) {
+  const targetWords = targetMinutes * CZECH_WPM;
+  const messages = [
     {
       role: "system",
-      content: `Jsi tým medicínských expertů (editor, klinik, pedagog). Vrať JSON:
-{"content":"markdown cs — MINIMÁLNĚ ${targetWords} slov, 5+ odstavců","slides":[{"title":"","body":"3-5 vět","imageDescription":"","imageKeywords":["english","terms"],"durationSeconds":12}],"voiceoverText":""}
-6-10 slidů, imageKeywords anglicky, odborná spisovná čeština. NEZKRACUJ — rozšiř stávající text.`,
+      content: `Zkrátíš lekci na ~${targetWords} slov celkem (content + slide body). Vrať JSON: {"content":"markdown cs","slides":[{"title":"","body":"3-4 vět","imageDescription":"","imageKeywords":["english"],"durationSeconds":12}],"voiceoverText":""}. 7-8 slidů, zachovej klíčové informace.`,
     },
-    {
-      role: "user",
-      content: `Kurz: ${courseTitle}\nLekce: ${lessonTitle}\nCíl: ${targetMinutes} min (~${targetWords} slov)\n\n${lessonBody.slice(0, 3500)}`,
-    },
-  ]);
-  if (result.error) {
-    console.warn(`  Groq ${result.error} for ${lessonTitle}`);
-    return null;
+    { role: "user", content: `Lekce: ${lessonTitle}\n\n${content.slice(0, 5000)}\n\nSlidy:\n${slides.map((s) => s.title + ": " + s.body).join("\n").slice(0, 3000)}` },
+  ];
+  for (const chat of [groqChat, geminiChat]) {
+    const result = await chat(messages, 10000);
+    if (!result.content) continue;
+    try {
+      const parsed = JSON.parse(result.content);
+      if (parsed.content && parsed.slides?.length >= 6) return parsed;
+    } catch {
+      /* retry */
+    }
   }
-  if (!result.content) return null;
-  return JSON.parse(result.content);
+  return null;
+}
+
+async function groqExpand(lessonTitle, lessonBody, courseTitle, targetMinutes, currentWords) {
+  return llmExpand(lessonTitle, lessonBody, courseTitle, targetMinutes, currentWords);
 }
 
 async function groqImageKeywords(slide, lessonTitle, topic) {
@@ -268,6 +384,7 @@ const courseTotals = new Map();
 for (const lesson of activeLessons) {
   const course = courseMap.get(lesson.course_id);
   if (!allLessons && course?.slug !== courseSlug) continue;
+  if (lessonFilter && lesson.slug !== lessonFilter) continue;
 
   const topic = course?.title ?? "MedScope Academy";
   const cj = { ...(lesson.content_json ?? {}) };
@@ -279,16 +396,35 @@ for (const lesson of activeLessons) {
 
   const courseTarget = Math.max(20, course?.duration_minutes || 22);
   const lessonsInCourse = activeLessons.filter((l) => l.course_id === lesson.course_id).length || 4;
-  const perLessonTarget = Math.max(5, Math.round(courseTarget / lessonsInCourse));
+  const perLessonTarget =
+    explicitTargetMinutes ?? Math.max(5, Math.round(courseTarget / lessonsInCourse));
   const wordTarget = perLessonTarget * CZECH_WPM;
   const needsExpand = beforeWords < wordTarget * 0.85;
+  const needsCondense =
+    explicitTargetMinutes != null &&
+    beforeMin > explicitTargetMinutes + 1 &&
+    slideshow?.slides?.length;
 
-  if (needsExpand && groqKey) {
+  if (needsCondense && (groqKey || geminiKey)) {
+    console.log(`→ condense ${lesson.slug} (${beforeMin} min → target ~${perLessonTarget} min)`);
+    const condensed = await llmCondense(content, slideshow.slides, lesson.title, perLessonTarget);
+    if (condensed?.content && condensed.slides?.length) {
+      content = condensed.content;
+      slideshow = {
+        ...slideshow,
+        script: condensed.voiceoverText ?? content,
+        voiceoverText: condensed.voiceoverText ?? content,
+        slides: condensed.slides,
+        provider: "condense",
+      };
+    }
+  } else if (needsExpand && (groqKey || geminiKey)) {
     console.log(`→ expand ${lesson.slug} (${beforeWords} words / ${beforeMin} min → target ~${perLessonTarget} min)`);
-    const expanded = await groqExpand(lesson.title, content, topic, perLessonTarget);
+    const expanded = await groqExpand(lesson.title, content, topic, perLessonTarget, beforeWords);
     if (expanded?.content) {
       const expandedWords = countWords(expanded.content);
-      if (expandedWords >= Math.max(beforeWords + 30, wordTarget * 0.35)) {
+      const minAccept = Math.max(beforeWords + 30, wordTarget * 0.35);
+      if (expandedWords >= minAccept) {
         content = expanded.content;
         slideshow = {
           title: lesson.title,
@@ -299,10 +435,10 @@ for (const lesson of activeLessons) {
           alignmentScore: 0.9,
           ttsMode: "web_speech_api",
           generatedAt: new Date().toISOString(),
-          provider: "groq",
+          provider: expanded.provider ?? "groq",
         };
       } else {
-        console.warn(`  skip short Groq output (${expandedWords} words) for ${lesson.slug}`);
+        console.warn(`  skip short LLM output (${expandedWords} words, need ${minAccept}) for ${lesson.slug}`);
       }
     }
   }

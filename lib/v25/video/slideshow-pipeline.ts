@@ -22,6 +22,8 @@ export type SlideItem = {
   durationSeconds: number;
   imageUrl?: string;
   imageAlt?: string;
+  /** Czech caption shown below slide image in player */
+  captionCs?: string;
 };
 
 export type SlideshowPlan = {
