@@ -115,14 +115,23 @@ export async function checkRateLimit(
 
 /** Endpoint-specific limits (per IP) */
 export const ENDPOINT_LIMITS: Record<string, { limit: number; windowMs: number }> = {
-  default: { limit: 120, windowMs: 60_000 },
+  default: { limit: 180, windowMs: 60_000 },
   checkout: { limit: 15, windowMs: 60_000 },
   webhook: { limit: 60, windowMs: 60_000 },
   auth: { limit: 20, windowMs: 60_000 },
-  academy: { limit: 90, windowMs: 60_000 },
+  academy: { limit: 120, windowMs: 60_000 },
   admin: { limit: 40, windowMs: 60_000 },
   tts: { limit: 30, windowMs: 60_000 },
+  public: { limit: 300, windowMs: 60_000 },
 };
+
+/** Health probes and cron hooks must not consume API rate budget. */
+export function isApiRateLimitExempt(pathname: string): boolean {
+  if (pathname.includes("/health")) return true;
+  if (pathname.startsWith("/api/cron/")) return true;
+  if (pathname.startsWith("/api/mobile/health")) return true;
+  return false;
+}
 
 export function resolveEndpointBucket(pathname: string): keyof typeof ENDPOINT_LIMITS {
   if (pathname.includes("checkout") || pathname.includes("stripe/create")) return "checkout";

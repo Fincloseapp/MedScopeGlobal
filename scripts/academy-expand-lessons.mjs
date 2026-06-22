@@ -517,7 +517,13 @@ for (const lesson of activeLessons) {
   console.log(`✓ ${lesson.slug}: ${beforeMin}→${estMin} min, ${slideshow.slides.length} slides, ${afterWords} words`);
 }
 
-for (const [cid, total] of courseTotals) {
+for (const [cid] of courseTotals) {
+  const courseLessons = activeLessons.filter((l) => l.course_id === cid);
+  let total = 0;
+  for (const l of courseLessons) {
+    const r = report.find((x) => x.slug === l.slug);
+    total += r ? r.afterMin : (l.duration_minutes ?? 0);
+  }
   await sbPatch("courses", `id=eq.${cid}`, { duration_minutes: total, updated_at: new Date().toISOString() });
   console.log(`  course ${courseMap.get(cid)?.slug}: ${total} min total`);
 }

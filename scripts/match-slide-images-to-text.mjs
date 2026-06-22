@@ -251,7 +251,7 @@ for (const lesson of lessons) {
 }
 
 let osvetaCount = 0;
-try {
+if (!lessonFilter) try {
   const osvetaVideos = await sbGet("public_health_videos", "select=id,title,script,metadata,slug");
   for (const video of osvetaVideos.slice(0, 10)) {
     const topic = video.metadata?.topic_title ?? "Zdravotní osvěta";

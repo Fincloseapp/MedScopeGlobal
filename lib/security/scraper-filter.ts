@@ -26,7 +26,8 @@ export function shouldBlockScraper(
   userAgent: string | null,
   pathname: string
 ): boolean {
-  if (!userAgent) return false;
+  // Only block obvious automation with no browser UA — real browsers always pass.
+  if (!userAgent || userAgent.trim().length < 8) return true;
   if (pathname.startsWith("/api/")) return false;
   if (pathname.startsWith("/admin")) return false;
   return isKnownScraper(userAgent);

@@ -36,9 +36,10 @@ export function shouldBlockBot(
   userAgent: string | null,
   pathname: string
 ): boolean {
-  if (!userAgent) return false;
   const sensitive = SENSITIVE_PREFIXES.some((p) => pathname.startsWith(p));
   if (!sensitive) return false;
+  // Block only obvious automation — browsers with a real UA always pass.
+  if (!userAgent || userAgent.trim().length < 8) return true;
   return isKnownScraper(userAgent);
 }
 

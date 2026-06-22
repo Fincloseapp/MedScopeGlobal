@@ -3,7 +3,7 @@ import { getClientIp } from "@/lib/security/client-ip";
 import { applySecurityMiddleware } from "@/lib/security/middleware-security";
 import { shouldBlockBot } from "@/lib/v30/security/bot-shield";
 import { writeAuditLog } from "@/lib/v30/security/audit-log";
-import { checkApiRateLimit } from "@/lib/v30/security/rate-limit";
+import { checkApiRateLimit, isApiRateLimitExempt } from "@/lib/v30/security/rate-limit";
 import { applySecurityHeaders } from "@/lib/v30/security/headers";
 import { scanQueryString } from "@/lib/v30/security/waf";
 import { isAdminIpAllowed } from "@/lib/v30/security/admin-guard";
@@ -38,7 +38,7 @@ export async function applyV30SecurityMiddleware(
     return new NextResponse("Bad Request", { status: 400 });
   }
 
-  const threatScan = scanForThreats(`${pathname}${search}`);
+  const threatScan = scanForThreats(pathname, search);
   if (threatScan.blocked) {
     recordThreatStrike(ip);
     await writeAuditLog({
@@ -72,7 +72,7 @@ export async function applyV30SecurityMiddleware(
     return new NextResponse("Forbidden", { status: 403 });
   }
 
-  if (pathname.startsWith("/api/")) {
+  if (pathname.startsWith("/api/") && !isApiRateLimitExempt(pathname)) {
     const limit = await checkApiRateLimit(ip, pathname);
     if (!limit.ok) {
       await writeAuditLog({
