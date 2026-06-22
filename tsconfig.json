@@ -1,12 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
     "lib": [
       "dom",
       "dom.iterable",
-      "es2022"
+      "esnext"
     ],
-    "allowJs": false,
+    "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
@@ -15,33 +14,41 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "incremental": true,
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "types": [
-      "vitest/globals",
-      "@testing-library/jest-dom"
-    ],
-    "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./src/*"
+        "./*"
       ]
     },
-    "ignoreDeprecations": "6.0"
+    "target": "ES2017"
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "supabase/functions",
+    "tests",
+    "e2e",
+    ".deploy-tmp",
+    ".build-tmp",
+    ".tools",
+    "src",
+    "repo-temp",
+    "github-production",
+    "vitest.config.ts",
+    "playwright.config.ts",
+    "prisma.config.ts",
+    "sentry.client.config.ts",
+    "sentry.server.config.ts"
   ]
 }

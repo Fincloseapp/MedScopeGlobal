@@ -36,7 +36,7 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/**/*": ["./prisma/**"]
   },
-  experimental: { optimizePackageImports: ["@sentry/nextjs", "zod"] },
+  experimental: { optimizePackageImports: ["zod"] },
   async headers() { return [{ source: "/(.*)", headers: securityHeaders }]; }
 };
 
