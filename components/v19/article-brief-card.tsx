@@ -2,10 +2,6 @@ import Link from "next/link";
 import { specialtyLabel } from "@/lib/v19/specialties";
 import type { V19ContentMode, V19Specialty } from "@/lib/v19/types";
 import { V19NzipTagChips } from "@/components/v19/nzip-topic-card";
-import {
-  V19NzipEducationalLinks,
-  V19NzipGlossaryTooltip,
-} from "@/components/v19/nzip-glossary-tooltip";
 
 export type V19BriefArticle = {
   id?: string;
@@ -20,8 +16,6 @@ export type V19BriefArticle = {
   nzipContext?: string;
   nzipTopicTags?: string[];
   nzipCategoryTags?: string[];
-  nzipGlossaryTerms?: string[];
-  nzipEducationalLinks?: { label: string; url: string; type?: string }[];
   specialty?: string;
   sourceUrl?: string;
   sourceName?: string;
@@ -105,18 +99,6 @@ export function V19ArticleBriefCard({
       <V19NzipTagChips
         tags={[...(article.nzipTopicTags ?? []), ...(article.nzipCategoryTags ?? [])]}
       />
-
-      {article.nzipGlossaryTerms && article.nzipGlossaryTerms.length > 0 && (
-        <p className="mt-2 flex flex-wrap gap-2 text-sm">
-          {article.nzipGlossaryTerms.slice(0, 4).map((term) => (
-            <V19NzipGlossaryTooltip key={term} term={term} locale={locale} />
-          ))}
-        </p>
-      )}
-
-      {article.nzipEducationalLinks && article.nzipEducationalLinks.length > 0 && (
-        <V19NzipEducationalLinks links={article.nzipEducationalLinks} locale={locale} />
-      )}
 
       {article.nzipContext && (
         <p className="mt-3 text-sm leading-6 text-slate-600">

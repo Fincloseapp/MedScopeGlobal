@@ -8,7 +8,7 @@ export default async function Page() {
     <ModulePageShell eyebrow="Novinky" title="Univerzity" description="Novinky z českých a zahraničních LF.">
       <div className="grid gap-4 sm:grid-cols-2">
         {news.map((n) => (
-          <V4cContentCard key={n.id} href={`/novinky/univerzity/${n.slug}`} title={n.title} meta={n.university ?? undefined} summary={n.summary} />
+          <V4cContentCard key={n.id} href="/novinky" title={n.title} meta={n.university ?? undefined} summary={n.summary} />
         ))}
       </div>
     </ModulePageShell>

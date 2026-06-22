@@ -20,7 +20,6 @@ export function buildV19SeoMeta(
     ...(article.keywords ?? []),
     ...(article.nzipTopicTags ?? []),
     ...(article.nzipCategoryTags ?? []),
-    ...(article.nzipGlossaryTerms ?? []),
   ].filter(Boolean);
   const uniqueKeywords = keywords.length
     ? [...new Set(keywords)].slice(0, 20)

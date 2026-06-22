@@ -4,7 +4,6 @@ import { getMemoryAuditLog, writeAuditLog } from "@/lib/v17/audit/logger";
 import { checkRateLimit } from "@/lib/v17/security/rate-limit";
 import { getMonitorStats } from "@/lib/v17/monitoring/hooks";
 import { getVersion } from "@/lib/v17/versioning/version";
-import { dataPath, MEDSCOPE_PROJECT_ROOT } from "@/lib/config/paths";
 
 export type HealthcheckResult = {
   status: "healthy" | "degraded" | "unhealthy";
@@ -21,7 +20,7 @@ export type HealthcheckResult = {
   };
 };
 
-const ROOT = MEDSCOPE_PROJECT_ROOT;
+const ROOT = process.cwd();
 
 function fileOk(relativePath: string): boolean {
   return fs.existsSync(path.join(ROOT, relativePath));
@@ -95,7 +94,7 @@ export async function runHealthcheck(): Promise<HealthcheckResult> {
   let storageOk = false;
   let storageDetails = "storage probe skipped";
   try {
-    const dir = dataPath("v17-audit");
+    const dir = path.join(ROOT, ".data", "v17-audit");
     fs.mkdirSync(dir, { recursive: true });
     const probe = path.join(dir, ".health-probe");
     fs.writeFileSync(probe, "ok", "utf8");

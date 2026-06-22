@@ -62,7 +62,7 @@ export function warnIfGroqKeyMissing(): void {
   if (groqKeyWarned || isGroqConfigured()) return;
   groqKeyWarned = true;
   console.warn(
-    "[MedScopeGlobal] GROQ_API_KEY is not set — LLM disabled (GROQ-only). Get a free key at https://console.groq.com/keys"
+    "[MedScopeGlobal] GROQ_API_KEY is not set — LLM will fall back to Gemini, OpenAI, or static text. Get a free key at https://console.groq.com/keys"
   );
 }
 

@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: true, skipped: true, reason: "disabled" });
   }
 
-  const maxArticles = schedule?.max_articles_per_run ?? Number(process.env.INGEST_MAX_ARTICLES ?? 80);
+  const maxArticles = schedule?.max_articles_per_run ?? 24;
 
   try {
     const result = await runIngestionPipeline({

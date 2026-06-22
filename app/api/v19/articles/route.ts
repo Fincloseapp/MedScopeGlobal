@@ -9,9 +9,6 @@ import { resolveV19LocaleFromRequest } from "@/lib/v19/localize";
 import { resolveV19Mode } from "@/lib/v19/modes";
 import { checkV19GenerateRateLimit, checkV19ListRateLimit } from "@/lib/v19/rate-limit";
 import { getV19MonitoringSnapshot } from "@/lib/v19/monitoring";
-import { enrichArticleMeta } from "@/lib/v20/content-rules";
-import { cacheKey, getCached, setCached } from "@/lib/v20/server-cache";
-import { V20_BACKEND_VERSION, V20_UI_VERSION } from "@/lib/v20/version";
 import { V19_ENGINE_VERSION } from "@/lib/v19/version";
 import type { V19ContentMode } from "@/lib/v19/types";
 
@@ -71,55 +68,18 @@ export async function GET(request: Request) {
   const mode = resolveV19Mode(url.searchParams.get("mode"));
   const limit = Math.min(30, Number(url.searchParams.get("limit") ?? 20));
   const offset = Math.max(0, Number(url.searchParams.get("offset") ?? 0));
-  const deepLink = url.searchParams.get("deepLink") === "1";
-
-  const ck = cacheKey({ locale, mode, limit, offset, deepLink: deepLink ? 1 : 0 });
-  const cached = getCached<{ body: object }>(`v19-articles:${ck}`, 90_000);
-  if (cached) {
-    const res = NextResponse.json(cached.body);
-    res.headers.set("Cache-Control", "public, s-maxage=90, stale-while-revalidate=300");
-    res.headers.set("X-Cache", "HIT");
-    return res;
-  }
-
   const articles = await getV19Articles(locale, limit, offset, mode);
 
-  const enriched = articles.map((a) => {
-    const meta = enrichArticleMeta({
-      title: a.title,
-      excerpt: a.summary,
-      summary: a.summary,
-    });
-    return {
-      ...a,
-      uiVersion: V20_UI_VERSION,
-      metaTitle: meta.metaTitle,
-      metaDescription: meta.metaDescription,
-      professionalSummary: meta.professionalSummary,
-      ...(deepLink
-        ? { nzipDeepLinking: Boolean(a.nzipRegistryId || a.nzipTopicTags?.length) }
-        : {}),
-    };
-  });
-
-  const body = {
+  return NextResponse.json({
     status: "ok",
     engine: "v19",
     engineVersion: V19_ENGINE_VERSION,
-    uiVersion: V20_UI_VERSION,
-    backendVersion: V20_BACKEND_VERSION,
     locale,
     mode,
-    count: enriched.length,
-    articles: enriched,
+    count: articles.length,
+    articles,
     monitoring: getV19MonitoringSnapshot().metrics,
-  };
-  setCached(`v19-articles:${ck}`, { body });
-
-  const res = NextResponse.json(body);
-  res.headers.set("Cache-Control", "public, s-maxage=90, stale-while-revalidate=300");
-  res.headers.set("X-Cache", "MISS");
-  return res;
+  });
 }
 
 export async function POST(request: Request) {
@@ -161,6 +121,7 @@ export async function POST(request: Request) {
       status: "ok",
       engine: "v19",
       ...result,
+      engineVersion: V19_ENGINE_VERSION,
       monitoring: getV19MonitoringSnapshot().metrics,
     });
   } catch (error) {

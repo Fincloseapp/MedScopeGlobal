@@ -12,7 +12,6 @@ export type V19HubLinks = {
   algorithms: string;
   education: string;
   glossaryHub: string;
-  scienceHub: string;
   diagnosis?: string;
 };
 
@@ -23,7 +22,7 @@ export function resolveV19HubLinks(
   >
 ): V19HubLinks {
   const isScience = article.sourceTier === "science";
-  const isPublication = article.nzipCategory === "publikace";
+  const isNzip = isNzipSource(article.sourceName, article.sourceUrl);
   const isGlossary =
     article.nzipCategory === "slovnik-pojmu" ||
     article.nzipCategory === "zdravotnicke-pojmy";
@@ -32,7 +31,6 @@ export function resolveV19HubLinks(
     briefs: "/odborne/briefy",
     aiHub: "/ai-medical",
     researchHub: isScience ? "/ai-medical/research" : "/research/articles",
-    scienceHub: isScience || isPublication ? "/api/v19/science/ls" : "/ai-medical/research",
     drugs: "/leky",
     algorithms: "/ai-medical",
     education: "/odborne/briefy?mode=patient",

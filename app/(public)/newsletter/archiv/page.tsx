@@ -1,44 +1,27 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ModulePageShell } from "@/components/b2b/module-page-shell";
+import { requireAdmin } from "@/lib/auth/admin";
 import { getNewsletterArchive } from "@/lib/queries/v4c/newsletters";
-
-export const revalidate = 3600;
+import { ModulePageShell } from "@/components/b2b/module-page-shell";
 
 export default async function NewsletterArchivPage() {
-  const issues = await getNewsletterArchive(false);
+  const gate = await requireAdmin();
+  if (!gate.ok) redirect("/login?next=/newsletter/archiv");
+
+  const issues = await getNewsletterArchive(true);
 
   return (
-    <ModulePageShell
-      eyebrow="MedScopeGlobal Newsletter"
-      title="Archiv vydání"
-      description="Všechna publikovaná vydání odborného přehledu MedScopeGlobal."
-    >
-      <ul className="space-y-3">
-        {issues.length === 0 ? (
-          <li className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-600">
-            Zatím žádné vydání. První newsletter bude brzy k dispozici.
+    <ModulePageShell eyebrow="Newsletter" title="Archiv (admin)" description="Všechna vydání včetně konceptů.">
+      <ul className="space-y-2">
+        {issues.map((i) => (
+          <li key={i.id} className="rounded-xl border border-[#cfe1f3] bg-white px-4 py-3 text-sm">
+            <span className="font-semibold">{i.title}</span>
+            <span className="text-slate-500 ml-2">{i.issue_date}</span>
+            {!i.published ? <span className="ml-2 text-amber-700">koncept</span> : null}
           </li>
-        ) : (
-          issues.map((i) => (
-            <li key={i.id}>
-              <Link
-                href={`/newsletter/${i.slug}`}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm transition hover:border-sky-200 hover:shadow-sm"
-              >
-                <span className="font-semibold text-[#021d33]">{i.title}</span>
-                <time className="text-slate-500" dateTime={i.issue_date}>
-                  {new Date(i.issue_date).toLocaleDateString("cs-CZ", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </time>
-              </Link>
-            </li>
-          ))
-        )}
+        ))}
       </ul>
-      <Link href="/newsletter" className="mt-6 inline-block text-sm text-[#005B96] hover:underline">
+      <Link href="/newsletter" className="mt-6 inline-block text-sm text-[#005B96]">
         ← Newsletter
       </Link>
     </ModulePageShell>

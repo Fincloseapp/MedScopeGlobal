@@ -54,55 +54,5 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    overflow-x: hidden;
-    -webkit-text-size-adjust: 100%;
-  }
-
-  /* v20 — medical portal typography & spacing */
-  .v20-home h1,
-  .v20-home h2,
-  .v20-home h3 {
-    @apply text-balance;
-  }
-
-  .v20-article-card,
-  .v20-category-card {
-    @apply overflow-hidden;
-  }
-
-  /* v27.2 — header nav horizontal scroll, no logo overlap */
-  .header-nav-scroll {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .header-nav-scroll::-webkit-scrollbar {
-    display: none;
-  }
-
-  .site-header .logo-block {
-    @apply relative z-10 shrink-0;
-  }
-
-  /* v38 — header nav: no overlap, safe-area, subscribe CTA spacing */
-  @media (min-width: 768px) and (max-width: 1279px) {
-    .site-header .header-nav-scroll {
-      @apply max-w-[min(100%,calc(100vw-280px))];
-    }
-  }
-
-  @media (min-width: 1280px) {
-    .site-header .header-nav-scroll {
-      @apply max-w-none;
-    }
-  }
-
-  .site-header {
-    @apply isolate;
-  }
-
-  /* v33 — primary CTA buttons */
-  .btn-primary-v33 {
-    @apply rounded-lg bg-[#005B96] text-white hover:bg-[#004a7a];
   }
 }

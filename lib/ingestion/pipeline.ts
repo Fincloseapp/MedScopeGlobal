@@ -7,15 +7,12 @@ import { ensureIngestionAuthor } from "@/lib/setup/ensure-ingestion-author";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { slugify } from "@/lib/utils";
 import type { RawFeedItem } from "@/lib/ingestion/rss";
-import { runV26ForeignNewsIngest } from "@/lib/v26/foreign-news-ingest";
-import { V26_EDITORIAL_VERSION } from "@/lib/v26/version";
 
 export interface IngestionResult {
   runId: string;
   created: number;
   skipped: number;
   errors: string[];
-  v26Foreign?: { created: number; skipped: number; errors: string[] };
 }
 
 interface QueueItem extends RawFeedItem {
@@ -200,19 +197,7 @@ export async function runIngestionPipeline(options: {
     data: { run_id: runId, created, skipped, errors: errors.length },
   });
 
-  let v26Foreign: IngestionResult["v26Foreign"];
-  try {
-    v26Foreign = await runV26ForeignNewsIngest({
-      maxArticles: Math.min(8, Math.max(maxArticles - created, 0) || 6),
-    });
-    created += v26Foreign.created;
-    skipped += v26Foreign.skipped;
-    errors.push(...v26Foreign.errors);
-  } catch (e) {
-    errors.push(`v26 foreign: ${(e as Error).message}`);
-  }
-
-  return { runId, created, skipped, errors, v26Foreign };
+  return { runId, created, skipped, errors };
 }
 
 async function upsertIngestedArticle({
@@ -310,14 +295,6 @@ async function upsertIngestedArticle({
       license: "source",
       hash_dedup: hash,
       meta_description: processed.excerpt,
-      metadata: {
-        editorial_version: V26_EDITORIAL_VERSION,
-        source_citation: {
-          name: item.sourceName,
-          url: item.link,
-          originalTitle: item.title,
-        },
-      },
       updated_at: new Date().toISOString(),
     };
 
@@ -342,20 +319,8 @@ async function upsertGeneratedArticle({
   categoryMap: Map<string, string>;
   template: (typeof INTERNAL_EDITORIAL_TEMPLATES)[number];
 }): Promise<"created" | "skipped"> {
-  const sourceUrl = `medscopeglobal://internal/${slugify(template.title)}`;
+  const sourceUrl = `medscopeglobal://internal/${slugify(template.title)}-${Date.now().toString(36)}`;
   const hash = buildHash(template.title, sourceUrl, template.body);
-
-  let existingQuery = admin.from("articles").select("id").eq("title", template.title);
-  if (template.medTrack) {
-    existingQuery = existingQuery.eq("med_track", template.medTrack);
-  } else {
-    existingQuery = existingQuery.is("med_track", null);
-  }
-  const { data: existingByTitle } = await existingQuery.maybeSingle();
-
-  if (existingByTitle?.id) {
-    return "skipped";
-  }
 
   const { data: existing } = await admin
     .from("articles")
@@ -372,15 +337,7 @@ async function upsertGeneratedArticle({
     return "skipped";
   }
 
-  const slug = slugify(template.title);
-  const { data: slugClash } = await admin
-    .from("articles")
-    .select("id")
-    .eq("slug", slug)
-    .maybeSingle();
-  if (slugClash?.id) {
-    return "skipped";
-  }
+  const slug = `${slugify(template.title)}-${Date.now().toString(36)}`;
   const payload = {
     title: template.title,
     slug,

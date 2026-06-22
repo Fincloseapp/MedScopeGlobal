@@ -9,41 +9,41 @@ import { AdPlacement } from "@/components/ads/ad-placement";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 
 const breadcrumbCatalog: Record<string, string> = {
-  professional: "Odborná sekce",
-  "clinical-insights": "Klinické postřehy",
-  "case-reports": "Kazuistiky",
-  guidelines: "Guidelines",
-  research: "Výzkum",
-  articles: "Výzkumné články",
-  "clinical-studies": "Klinické studie",
-  preprints: "Preprinty",
-  "student-research": "Studentský výzkum",
-  economics: "Ekonomika zdravotnictví",
-  "costs-drg": "Náklady a DRG",
-  insurance: "Pojištění a úhrady",
-  "market-analysis": "Tržní analýza",
-  "digital-health": "Digitální zdravotnictví",
-  ehealth: "eHealth",
-  ai: "AI v medicíně",
-  systems: "Systémy a data",
-  policy: "Regulace a politika",
-  legislation: "Legislativa",
-  compliance: "Compliance",
-  "healthcare-law": "Zdravotnické právo",
-  pharma: "Léky a farmacie",
-  "new-drugs": "Nové léky",
-  "drug-reviews": "Hodnocení léků",
-  "clinical-trials": "Klinické studie",
-  news: "Novinky",
-  daily: "Denní přehled",
-  "key-updates": "Klíčové aktuality",
-  events: "Kongresy a akce",
-  conferences: "Konference",
-  webinars: "Webináře",
-  reports: "Zprávy",
-  careers: "Kariéra",
-  subscribe: "Předplatné",
-  "submit-research": "Odeslat výzkum",
+  "professional": "Professional",
+  "clinical-insights": "Clinical Insights",
+  "case-reports": "Case Reports",
+  "guidelines": "Guidelines",
+  "research": "Research",
+  "articles": "Research Articles",
+  "clinical-studies": "Clinical Studies",
+  "preprints": "Preprints",
+  "student-research": "Student Research",
+  "economics": "Healthcare Economics",
+  "costs-drg": "Costs & DRG",
+  "insurance": "Insurance & Reimbursement",
+  "market-analysis": "Market Analysis",
+  "digital-health": "Digital Health",
+  "ehealth": "eHealth",
+  "ai": "AI in medicine",
+  "systems": "Systems & data",
+  "policy": "Regulation & Policy",
+  "legislation": "Legislation",
+  "compliance": "Compliance",
+  "healthcare-law": "Healthcare Law",
+  "pharma": "Pharma & Drugs",
+  "new-drugs": "New Drugs",
+  "drug-reviews": "Drug Reviews",
+  "clinical-trials": "Clinical Trials",
+  "news": "News & Updates",
+  "daily": "Daily News",
+  "key-updates": "Key Updates",
+  "events": "Congresses & Events",
+  "conferences": "Conferences",
+  "webinars": "Webinars",
+  "reports": "Reports",
+  "careers": "Careers",
+  "subscribe": "Subscribe",
+  "submit-research": "Submit Research",
 };
 
 function humanizeSegment(segment: string): string {
@@ -55,7 +55,7 @@ function humanizeSegment(segment: string): string {
 
 function buildBreadcrumbs(slug: string) {
   const segments = slug.split("/").filter(Boolean);
-  const breadcrumbs = [{ label: "Domů", href: "/" }];
+  const breadcrumbs = [{ label: "Home", href: "/" }];
 
   let currentPath = "";
   for (const segment of segments) {
@@ -95,12 +95,6 @@ export default async function SectionRoutePage({
 }) {
   const resolvedParams = await params;
   const key = resolvedParams.slug?.join("/") ?? "";
-
-  // Never treat API paths as content sections (safety if route precedence changes)
-  if (key.startsWith("api/") || key === "api") {
-    notFound();
-  }
-
   const data = await loadSectionPageData(key);
 
   if (!data) notFound();
@@ -162,7 +156,7 @@ export default async function SectionRoutePage({
                 href="/subscribe"
                 className="inline-flex items-center rounded-full border border-[#8dc4ea] px-4 py-2 text-sm font-medium text-[#005B96] transition hover:bg-[#f4fbff]"
               >
-                Předplatné pro hlubší pokrytí
+                Subscribe for deeper coverage
               </Link>
             </div>
 
@@ -188,10 +182,10 @@ export default async function SectionRoutePage({
         {sectionMidAds.length > 0 ? <AdPlacement ads={sectionMidAds} variant="inline" /> : null}
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">Redakční přehled</p>
-            <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">Kurátorský obsah</h2>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">Editorial feed</p>
+            <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">Curated content stream</h2>
             <p className="mt-2 max-w-2xl text-sm text-slate-600">
-              Ověřené souhrny, AI strukturované postřehy a průběžné pokrytí vybrané sekce.
+              Live-backed summaries, AI-reframed insights, and continuing coverage mapped to the section you selected.
             </p>
           </div>
         </div>

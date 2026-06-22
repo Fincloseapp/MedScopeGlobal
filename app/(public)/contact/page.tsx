@@ -2,13 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Mail, ShieldCheck } from "lucide-react";
 import { ContactForm } from "@/components/contact/contact-form";
-import { PublicTrustBadges } from "@/components/verejnost/public-trust-badges";
-import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-disclaimer";
 import { SITE } from "@/lib/config/site";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Kontakt | MedScopeGlobal",
+  title: "Kontakt",
   description: "Kontaktujte MedScopeGlobal pro odborné informace, partnerství nebo reklamní spolupráci.",
   path: "/contact",
 });
@@ -46,11 +44,10 @@ export default function ContactPage() {
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">Kontakt</p>
                 <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-[#021d33] sm:text-5xl">
-                  Napište nám — odpovíme do 24 hodin
+                  Zůstaňte v kontaktu s odborným týmem MedScopeGlobal
                 </h1>
                 <p className="mt-4 text-lg leading-8 text-slate-600">
-                  Dotazy k obsahu pro veřejnost, partnerství s univerzitami, reklamní spolupráce i technická podpora.
-                  Každá zpráva je evidována a směrována správnému týmu.
+                  Pro klinické informace, partnerské spolupráce, reklamní nabídky i podklady ke spolupráci nabízíme rychlou a transparentní komunikaci.
                 </p>
 
                 <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -69,8 +66,8 @@ export default function ContactPage() {
                     Odeslat výzkum
                     <ArrowRight className="h-4 w-4" />
                   </Link>
-                  <Link href="/pricing" className="inline-flex rounded-full border border-[#8dc4ea] px-4 py-2 text-sm font-semibold text-[#005B96]">
-                    Zobrazit ceník
+                  <Link href="/predplatne" className="inline-flex rounded-full border border-[#8dc4ea] px-4 py-2 text-sm font-semibold text-[#005B96]">
+                    Zobrazit předplatné
                   </Link>
                 </div>
               </div>
@@ -106,31 +103,6 @@ export default function ContactPage() {
         </section>
 
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-          <div className="mb-10">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">
-              Důvěra a bezpečnost
-            </p>
-            <h2 className="mt-2 font-display text-2xl font-bold text-[#021d33]">
-              Proč nám můžete napsat
-            </h2>
-            <div className="mt-5">
-              <PublicTrustBadges />
-            </div>
-            <div className="mt-6">
-              <PublicTrustDisclaimer />
-            </div>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Zásady ochrany údajů:{" "}
-              <Link href="/privacy" className="font-medium text-[#005B96] hover:underline">
-                Ochrana soukromí (GDPR)
-              </Link>
-              {" · "}
-              <Link href="/o-nas" className="font-medium text-[#005B96] hover:underline">
-                O nás
-              </Link>
-            </p>
-          </div>
-
           <div className="grid gap-6 lg:grid-cols-2">
             <ContactForm
               kind="general"

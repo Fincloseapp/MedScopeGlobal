@@ -4,10 +4,10 @@
  * Uses VERCEL_TOKEN from .env.local; optional Cloudflare DNS via CLOUDFLARE_API_TOKEN.
  */
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
-import { projectPath } from "../lib/config/paths.mjs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = projectPath();
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 function loadEnv() {
   const env = { ...process.env };

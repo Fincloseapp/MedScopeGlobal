@@ -1,37 +1,35 @@
 import type { Metadata } from "next";
+import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V19ArticleBriefFeedLazy } from "@/components/v19/article-brief-feed";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
-import { V20_UI_VERSION } from "@/lib/v20/version";
+import { resolveV19LocaleFromRequest } from "@/lib/v19/localize";
 
-export const revalidate = 120;
-
-export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
-    title: "Odborné medicínské briefy",
-    description:
-      "Krátká odborná shrnutí v češtině — prioritně revmatologie, NZIP deep linking, max 45 dní.",
-    path: "/odborne/briefy",
-  });
-}
+export const metadata: Metadata = {
+  title: "Odborné medicínské briefy v19",
+  description:
+    "Krátké, mobilně čitelné odborné shrnutí — prioritně revmatologie, automatická lokalizace, bez kopírování zdrojů.",
+};
 
 export default async function OdborneBriefyPage() {
+  const locale = await resolveV19LocaleFromRequest();
+  const isCs = locale === "cs";
+
   return (
-    <div className="v20-briefy">
-      <section className="border-b border-slate-200 bg-gradient-to-b from-white to-slate-50/80">
-        <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-            Content Engine v19 · UI {V20_UI_VERSION}
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-bold text-[#021d33] sm:text-4xl">
-            Odborné medicínské briefy
-          </h1>
-          <p className="mt-3 text-slate-600">
-            Aktuální odborná shrnutí (max 45 dní), prioritně revmatologie. Obsah je výhradně v
-            češtině, s NZIP metadata a profesionálním formátem.
-          </p>
-        </div>
-      </section>
-      <V19ArticleBriefFeedLazy title="Nejnovější briefy" limit={8} locale="cs" />
-    </div>
+    <ModulePageShell
+      eyebrow="Content Engine v19"
+      title={isCs ? "Odborné medicínské briefy" : "Medical expert briefs"}
+      description={
+        isCs
+          ? "Aktuální odborná shrnutí (max 30 dní), prioritně revmatologie. Jazyk se přizpůsobí vašemu zařízení."
+          : "Current expert summaries (max 30 days), rheumatology priority. Language follows your device."
+      }
+      ctaHref="/odborne"
+      ctaLabel={isCs ? "Všechny odborné texty" : "All expert content"}
+    >
+      <V19ArticleBriefFeedLazy
+        title={isCs ? "Nejnovější briefy" : "Latest briefs"}
+        limit={6}
+        locale="auto"
+      />
+    </ModulePageShell>
   );
 }

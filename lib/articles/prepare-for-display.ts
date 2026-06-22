@@ -6,9 +6,6 @@ import {
 import type { LocaleCode } from "@/lib/i18n/config";
 import { resolveArticleTranslation } from "@/lib/i18n/translate-article";
 import type { ArticleWithRelations } from "@/types/database";
-import { dedupeArticlesByTitle } from "@/lib/articles/dedupe";
-import { enrichArticleBodyForDisplay } from "@/lib/articles/enrich-body";
-import { polishCzechFields, isEnglishDominant } from "@/lib/v22/translate";
 
 export type DisplayArticle = ArticleWithRelations & {
   displayLocale?: string;
@@ -50,15 +47,7 @@ export async function prepareArticleForDisplay(
   const target = primaryArticleLocale(locale);
 
   if (matchesArticleLocale(base.locale, locale)) {
-    const polished =
-      locale === "cs" && isEnglishDominant(base.title)
-        ? polishCzechFields(base, locale)
-        : base;
-    const display = { ...polished, displayLocale: target };
-    if (mode === "full") {
-      return { ...display, content: enrichArticleBodyForDisplay(display) };
-    }
-    return display;
+    return { ...base, displayLocale: target };
   }
 
   const translated = await resolveArticleTranslation(
@@ -81,22 +70,11 @@ export async function prepareArticleForDisplay(
     };
   }
 
-  const content = translated.content ?? base.content;
-  const enriched =
-    mode === "full"
-      ? enrichArticleBodyForDisplay({
-          ...base,
-          title: translated.title,
-          excerpt: translated.excerpt ?? base.excerpt,
-          content,
-        })
-      : content;
-
   return {
     ...base,
     title: translated.title,
     excerpt: translated.excerpt ?? base.excerpt,
-    content: enriched,
+    content: translated.content ?? base.content,
     displayLocale: target,
     translatedFrom: base.locale ?? null,
     translation_provider: translated.translation_provider,
@@ -110,7 +88,7 @@ export async function prepareArticlesForDisplay(
   locale: LocaleCode,
   options?: { mode?: "card" | "full"; maxTranslate?: number }
 ): Promise<DisplayArticle[]> {
-  const sorted = sortByLocalePreference(dedupeArticlesByTitle(articles), locale);
+  const sorted = sortByLocalePreference(articles, locale);
   const mode = options?.mode ?? "card";
   const maxTranslate = options?.maxTranslate ?? 8;
   let translated = 0;
@@ -124,7 +102,11 @@ export async function prepareArticlesForDisplay(
       out.push(await prepareArticleForDisplay(article, locale, mode));
       translated++;
     } else if (matchesArticleLocale(article.locale, locale)) {
-      out.push(await prepareArticleForDisplay(article, locale, mode));
+      const withCat = await applyCategoryLabels(article, locale);
+      out.push({
+        ...withCat,
+        displayLocale: primaryArticleLocale(locale),
+      });
     } else {
       const withCat = await applyCategoryLabels(article, locale);
       out.push({

@@ -1,0 +1,36 @@
+import { NextResponse } from "next/server";
+import { isAdminApiAuthorized } from "@/lib/auth/admin-api";
+import { createServiceRoleClient } from "@/lib/supabase/service";
+
+export const dynamic = "force-dynamic";
+
+type Params = { params: Promise<{ id: string }> };
+
+export async function PATCH(request: Request, { params }: Params) {
+  if (!(await isAdminApiAuthorized(request))) {
+    return NextResponse.json({ error: "Neautorizováno" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  try {
+    const body = (await request.json()) as {
+      title?: string;
+      content_ref?: string;
+      status?: string;
+      metadata?: Record<string, unknown>;
+    };
+
+    const admin = createServiceRoleClient();
+    const { data, error } = await admin
+      .from("textbooks")
+      .update(body)
+      .eq("id", id)
+      .select("*")
+      .single();
+
+    if (error) throw new Error(error.message);
+    return NextResponse.json({ ok: true, textbook: data });
+  } catch (e) {
+    return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });
+  }
+}

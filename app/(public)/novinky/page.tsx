@@ -3,14 +3,8 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V4cContentCard } from "@/components/v4c/content-card";
 import { getUniversityNewsList } from "@/lib/queries/v4c/university-news";
-import { resolveManyImages } from "@/lib/v25/images/resolve-many";
 
-export const revalidate = 120;
-
-export const metadata: Metadata = {
-  title: "Novinky",
-  description: "Novinky z univerzit a výzkumu — ČR, EU a svět.",
-};
+export const metadata: Metadata = { title: "Novinky", description: "Novinky z univerzit a výzkumu (CZ, EU, svět)." };
 
 const TAGS = [
   { href: "/novinky/revmatologie", tag: "revmatologie", label: "Revmatologie" },
@@ -19,31 +13,24 @@ const TAGS = [
   { href: "/novinky/kalendar", tag: "kalendar", label: "Kalendář" },
 ];
 
-function hrefForItem(tag: string, slug: string) {
-  if (tag === "univerzity") return `/novinky/univerzity/${slug}`;
-  const section = TAGS.find((x) => x.tag === tag)?.href;
-  return section ?? `/novinky/univerzity/${slug}`;
+function hrefForTag(tag: string) {
+  return TAGS.find((x) => x.tag === tag)?.href ?? "/novinky";
 }
 
 export default async function NovinkyPage() {
-  const news = await resolveManyImages(await getUniversityNewsList(), "university_news");
+  const news = await getUniversityNewsList();
 
   return (
     <ModulePageShell
       eyebrow="Novinky"
-      title="Novinky z univerzit a výzkumu"
-      description="České LF, evropské univerzity, vědecké časopisy a klinický kontext pro praxi."
+      title="Novinky z univerzit"
+      description="České LF, evropské a světové univerzity, vědecké časopisy, SÚKL kontext u lékových témat."
       ctaHref="/novinky/ai"
       ctaLabel="AI novinky"
     >
-      <div className="mb-6 flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 mb-6">
         {TAGS.map((t) => (
-          <Link
-            key={t.href}
-            href={t.href}
-            prefetch
-            className="rounded-full border border-[#8dc4ea] px-3 py-1 text-sm text-[#005B96]"
-          >
+          <Link key={t.href} href={t.href} className="rounded-full border border-[#8dc4ea] px-3 py-1 text-sm text-[#005B96]">
             {t.label}
           </Link>
         ))}
@@ -52,13 +39,11 @@ export default async function NovinkyPage() {
         {news.map((n) => (
           <V4cContentCard
             key={n.id}
-            href={hrefForItem(n.tag, n.slug)}
+            href={hrefForTag(n.tag)}
             title={n.title}
             meta={n.university ?? n.region ?? undefined}
             summary={n.summary}
             badge={n.tag}
-            imageUrl={n.resolvedImageUrl}
-            imageAlt={n.university ?? n.title}
           />
         ))}
       </div>

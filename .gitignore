@@ -38,12 +38,6 @@ yarn-error.log*
 .deploy-tmp/
 
 # V17 audit logs (local only)
-
-# Cursor auto-git state (local only)
-.cursor/hooks/.auto-git-*
-.cursor/hooks/auto-git.log
-.scripts/hooks/.auto-git-*
-.scripts/logs/
 .data/
 
 # typescript

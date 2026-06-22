@@ -1,13 +1,11 @@
 {
   "buildCommand": "npm run build",
-  "installCommand": "npm install",
+  "installCommand": "npm ci",
   "framework": "nextjs",
   "env": {
     "INGESTION_LOCALE": "cs",
     "DEFAULT_SITE_LOCALE": "cs",
-    "OPENAI_MODEL": "gpt-4o-mini",
-    "PUBLIC_WRITER_LIMIT": "4",
-    "INGEST_MAX_ARTICLES": "80"
+    "OPENAI_MODEL": "gpt-4o-mini"
   },
   
   "crons": [
@@ -16,16 +14,12 @@
       "schedule": "0 6 * * *"
     },
     {
-      "path": "/api/cron/v4c-drugs",
-      "schedule": "15 6 * * *"
-    },
-    {
       "path": "/api/cron/v4c-daily",
       "schedule": "0 7 * * *"
     },
     {
       "path": "/api/cron/newsletter-generate",
-      "schedule": "0 8 * * 1"
+      "schedule": "0 8 1,15 * *"
     },
     {
       "path": "/api/cron/medical-ai-fetch",
@@ -66,86 +60,6 @@
     {
       "path": "/api/cron/v19-nzip-index",
       "schedule": "0 5 * * *"
-    },
-    {
-      "path": "/api/cron/v19-nzip-refresh",
-      "schedule": "30 5 * * *"
-    },
-    {
-      "path": "/api/cron/v24-ultra",
-      "schedule": "0 15 * * *"
-    },
-    {
-      "path": "/api/cron/v25-enterprise",
-      "schedule": "0 16 * * *"
-    },
-    {
-      "path": "/api/cron/v25-nav-monitor",
-      "schedule": "0 17 * * *"
-    },
-    {
-      "path": "/api/cron/v25-universities",
-      "schedule": "30 17 * * *"
-    },
-    {
-      "path": "/api/cron/v25-images",
-      "schedule": "0 18 * * *"
-    },
-    {
-      "path": "/api/cron/public-articles",
-      "schedule": "30 6 * * *"
-    },
-    {
-      "path": "/api/cron/marketing",
-      "schedule": "0 19 * * *"
-    },
-    {
-      "path": "/api/cron/v26-rewrite",
-      "schedule": "0 4 * * *"
-    },
-    {
-      "path": "/api/cron/v26-autonomous",
-      "schedule": "30 4 * * *"
-    },
-    {
-      "path": "/api/cron/academy-daily",
-      "schedule": "0 20 * * *"
-    },
-    {
-      "path": "/api/cron/academy-weekly",
-      "schedule": "0 21 * * 0"
-    },
-    {
-      "path": "/api/cron/academy-monthly",
-      "schedule": "0 22 1 * *"
-    },
-    {
-      "path": "/api/cron/academy-quality-weekly",
-      "schedule": "0 23 * * 0"
-    },
-    {
-      "path": "/api/cron/public-osveta-daily",
-      "schedule": "0 7 * * *"
-    },
-    {
-      "path": "/api/cron/conversion-renewals",
-      "schedule": "0 6 * * *"
-    },
-    {
-      "path": "/api/cron/v42-key-rotation-check",
-      "schedule": "0 3 * * *"
-    },
-    {
-      "path": "/api/cron/v43-health-monitor",
-      "schedule": "0 1 * * *"
-    },
-    {
-      "path": "/api/cron/v45-performance-audit",
-      "schedule": "0 4 * * *"
-    },
-    {
-      "path": "/api/cron/v46-security-weekly",
-      "schedule": "0 2 * * 0"
     }
   ],
   
@@ -155,15 +69,6 @@
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
       ]
-    }
-  ],
-
-  "redirects": [
-    {
-      "source": "/:path*",
-      "has": [{ "type": "host", "value": "www.medscopeglobal.com" }],
-      "destination": "https://medscopeglobal.com/:path*",
-      "permanent": true
     }
   ]
 }

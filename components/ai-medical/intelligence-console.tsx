@@ -16,21 +16,16 @@ import { V4D_SPECIALTIES, SPECIALTY_LABELS_CS } from "@/lib/v4d/constants";
 type Props = {
   defaultAssistant?: AiMedicalAssistant;
   title?: string;
-  /** Zjednodušené rozhraní pro veřejnost — bez klinických filtrů a přepínačů oborů */
-  publicMode?: boolean;
 };
 
 export function IntelligenceConsole({
   defaultAssistant = "doctor",
   title,
-  publicMode = false,
 }: Props) {
-  const [assistant, setAssistant] = useState<AiMedicalAssistant>(
-    publicMode ? "patient" : defaultAssistant,
-  );
+  const [assistant, setAssistant] = useState<AiMedicalAssistant>(defaultAssistant);
   const [query, setQuery] = useState("");
   const [language, setLanguage] = useState<AiMedicalLanguage>("cs");
-  const [outputType, setOutputType] = useState<AiMedicalOutputType>(publicMode ? "patient" : "professional");
+  const [outputType, setOutputType] = useState<AiMedicalOutputType>("professional");
   const [specialty, setSpecialty] = useState("rheumatology");
   const [diagnosis, setDiagnosis] = useState("");
   const [studyType, setStudyType] = useState("");
@@ -84,46 +79,37 @@ export function IntelligenceConsole({
         <h2 className="font-display text-xl font-semibold text-[#021d33]">{title}</h2>
       ) : null}
 
-      {publicMode ? (
-        <p className="text-sm text-muted-foreground">
-          Napište dotaz jednoduchou češtinou. Odpověď bude srozumitelná pro laiky — bez výběru
-          lékařského oboru.
-        </p>
-      ) : (
-        <div className="flex flex-wrap gap-2 text-xs">
-          {AI_MEDICAL_ASSISTANTS.map((a) => (
-            <Link
-              key={a}
-              href={ASSISTANT_ROUTES[a]}
-              className={`rounded-full px-3 py-1 border ${
-                a === assistant
-                  ? "bg-[#005B96] text-white border-[#005B96]"
-                  : "border-[#8dc4ea] text-[#005B96]"
-              }`}
-            >
-              {ASSISTANT_LABELS_CS[a]}
-            </Link>
-          ))}
-        </div>
-      )}
+      <div className="flex flex-wrap gap-2 text-xs">
+        {AI_MEDICAL_ASSISTANTS.map((a) => (
+          <Link
+            key={a}
+            href={ASSISTANT_ROUTES[a]}
+            className={`rounded-full px-3 py-1 border ${
+              a === assistant
+                ? "bg-[#005B96] text-white border-[#005B96]"
+                : "border-[#8dc4ea] text-[#005B96]"
+            }`}
+          >
+            {ASSISTANT_LABELS_CS[a]}
+          </Link>
+        ))}
+      </div>
 
-      <div className={`grid gap-4 ${publicMode ? "sm:grid-cols-1 max-w-xs" : "sm:grid-cols-2 lg:grid-cols-4"}`}>
-        {!publicMode ? (
-          <label className="block text-sm">
-            <span className="font-medium text-slate-700">Asistent</span>
-            <select
-              className="mt-1 w-full rounded-md border border-input px-3 py-2 text-sm"
-              value={assistant}
-              onChange={(e) => setAssistant(e.target.value as AiMedicalAssistant)}
-            >
-              {AI_MEDICAL_ASSISTANTS.map((a) => (
-                <option key={a} value={a}>
-                  {ASSISTANT_LABELS_CS[a]}
-                </option>
-              ))}
-            </select>
-          </label>
-        ) : null}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <label className="block text-sm">
+          <span className="font-medium text-slate-700">Asistent</span>
+          <select
+            className="mt-1 w-full rounded-md border border-input px-3 py-2 text-sm"
+            value={assistant}
+            onChange={(e) => setAssistant(e.target.value as AiMedicalAssistant)}
+          >
+            {AI_MEDICAL_ASSISTANTS.map((a) => (
+              <option key={a} value={a}>
+                {ASSISTANT_LABELS_CS[a]}
+              </option>
+            ))}
+          </select>
+        </label>
 
         <label className="block text-sm">
           <span className="font-medium text-slate-700">Jazyk</span>
@@ -138,76 +124,66 @@ export function IntelligenceConsole({
           </select>
         </label>
 
-        {!publicMode ? (
-          <>
-            <label className="block text-sm">
-              <span className="font-medium text-slate-700">Obor</span>
-              <select
-                className="mt-1 w-full rounded-md border border-input px-3 py-2 text-sm"
-                value={specialty}
-                onChange={(e) => setSpecialty(e.target.value)}
-              >
-                {V4D_SPECIALTIES.map((s) => (
-                  <option key={s} value={s}>
-                    {SPECIALTY_LABELS_CS[s]}
-                  </option>
-                ))}
-              </select>
-            </label>
+        <label className="block text-sm">
+          <span className="font-medium text-slate-700">Obor</span>
+          <select
+            className="mt-1 w-full rounded-md border border-input px-3 py-2 text-sm"
+            value={specialty}
+            onChange={(e) => setSpecialty(e.target.value)}
+          >
+            {V4D_SPECIALTIES.map((s) => (
+              <option key={s} value={s}>
+                {SPECIALTY_LABELS_CS[s]}
+              </option>
+            ))}
+          </select>
+        </label>
 
-            <label className="block text-sm">
-              <span className="font-medium text-slate-700">Typ výstupu</span>
-              <select
-                className="mt-1 w-full rounded-md border border-input px-3 py-2 text-sm"
-                value={outputType}
-                onChange={(e) => setOutputType(e.target.value as AiMedicalOutputType)}
-              >
-                <option value="professional">Odborný</option>
-                <option value="patient">Pacientský</option>
-              </select>
-            </label>
-          </>
-        ) : null}
+        <label className="block text-sm">
+          <span className="font-medium text-slate-700">Typ výstupu</span>
+          <select
+            className="mt-1 w-full rounded-md border border-input px-3 py-2 text-sm"
+            value={outputType}
+            onChange={(e) => setOutputType(e.target.value as AiMedicalOutputType)}
+          >
+            <option value="professional">Odborný</option>
+            <option value="patient">Pacientský</option>
+          </select>
+        </label>
       </div>
 
-      {!publicMode ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <input
-            className="rounded-md border border-input px-3 py-2 text-sm"
-            placeholder="Diagnóza (ra, psa, as…)"
-            value={diagnosis}
-            onChange={(e) => setDiagnosis(e.target.value)}
-          />
-          <input
-            className="rounded-md border border-input px-3 py-2 text-sm"
-            placeholder="Typ studie (rct, meta-analysis…)"
-            value={studyType}
-            onChange={(e) => setStudyType(e.target.value)}
-          />
-          <input
-            className="rounded-md border border-input px-3 py-2 text-sm"
-            placeholder="Název léku"
-            value={drugName}
-            onChange={(e) => setDrugName(e.target.value)}
-          />
-          <input
-            className="rounded-md border border-input px-3 py-2 text-sm"
-            placeholder="Kategorie legislativy"
-            value={legislationCategory}
-            onChange={(e) => setLegislationCategory(e.target.value)}
-          />
-        </div>
-      ) : null}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <input
+          className="rounded-md border border-input px-3 py-2 text-sm"
+          placeholder="Diagnóza (ra, psa, as…)"
+          value={diagnosis}
+          onChange={(e) => setDiagnosis(e.target.value)}
+        />
+        <input
+          className="rounded-md border border-input px-3 py-2 text-sm"
+          placeholder="Typ studie (rct, meta-analysis…)"
+          value={studyType}
+          onChange={(e) => setStudyType(e.target.value)}
+        />
+        <input
+          className="rounded-md border border-input px-3 py-2 text-sm"
+          placeholder="Název léku"
+          value={drugName}
+          onChange={(e) => setDrugName(e.target.value)}
+        />
+        <input
+          className="rounded-md border border-input px-3 py-2 text-sm"
+          placeholder="Kategorie legislativy"
+          value={legislationCategory}
+          onChange={(e) => setLegislationCategory(e.target.value)}
+        />
+      </div>
 
       <label className="block">
-        <span className="text-sm font-medium text-slate-700">Váš dotaz</span>
+        <span className="text-sm font-medium text-slate-700">Dotaz</span>
         <textarea
           className="mt-2 min-h-[140px] w-full rounded-xl border border-[#cfe1f3] px-4 py-3 text-sm"
-          placeholder={
-            publicMode
-              ? "Např.: Co dělat při bolesti hlavy? Jak zlepšit spánek? Jaké jsou příznaky chřipky?"
-              : "Zadejte klinický dotaz, požadavek na shrnutí, přehled studií…"
-          }
+          placeholder="Zadejte klinický dotaz, požadavek na shrnutí, přehled studií…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -218,7 +194,7 @@ export function IntelligenceConsole({
         disabled={loading}
         className="rounded-full bg-[#005B96] px-8"
       >
-        {loading ? "Připravuji odpověď…" : publicMode ? "Zeptat se" : "Spustit asistenta"}
+        {loading ? "AI Medical Intelligence…" : "Spustit asistenta"}
       </Button>
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { Search } from "lucide-react";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { normalizeLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
@@ -8,6 +7,7 @@ import { buildPageMetadata } from "@/lib/seo/metadata";
 import { createClient } from "@/lib/supabase/server";
 import { mergedArticleSearch } from "@/utils/merged-article-search";
 import { sanitizeSearchInput } from "@/utils/search";
+import { cookies } from "next/headers";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Vyhledávání",
@@ -41,6 +41,14 @@ export default async function HledatPage({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+      <nav className="mb-6 text-sm text-muted-foreground">
+        <Link href="/" className="hover:text-foreground">
+          Domů
+        </Link>
+        <span className="mx-2">/</span>
+        <span>Hledat</span>
+      </nav>
+
       <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
         Vyhledávání
       </p>
@@ -86,7 +94,7 @@ export default async function HledatPage({
       <div className="mt-10 space-y-4" aria-live="polite">
         {query.length >= 2 && results.length === 0 && (
           <p className="text-sm text-muted-foreground">
-            Pro dotaz „{query}“ nebyly nalezeny žádné články.
+            Pro dotaz „{query}" nebyly nalezeny žádné články.
           </p>
         )}
 

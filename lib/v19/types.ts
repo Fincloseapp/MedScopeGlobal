@@ -1,10 +1,4 @@
-/** MedScope Content Engine v19.9 — article types */
-
-export type NzipEducationalLink = {
-  label: string;
-  url: string;
-  type: string;
-};
+/** MedScope Content Engine v19.8 — article types */
 
 export type NzipCategory =
   | "nemoci"
@@ -97,10 +91,6 @@ export type V19ArticlePayload = {
   nzipRegistryId?: string;
   nzipTopicTags?: string[];
   nzipCategoryTags?: string[];
-  /** v19.9 — NZIP glossary & edukační odkazy */
-  nzipGlossaryTerms?: string[];
-  nzipEducationalLinks?: NzipEducationalLink[];
-  nzipRegistryRefs?: string[];
   sourceUrl: string;
   sourceName: string;
   sourceTier: V19SourceTier;

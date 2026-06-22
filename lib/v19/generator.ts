@@ -23,7 +23,6 @@ import {
 } from "@/lib/v19/legal";
 import { isNzipTopic } from "@/lib/v19/nzip";
 import { findNzipIndexEntry } from "@/lib/v19/nzip-index";
-import { applyNzipLinksToArticle } from "@/lib/v19/nzip-linking";
 import { buildV19SeoMeta } from "@/lib/v19/seo";
 import { V19_ENGINE_VERSION } from "@/lib/v19/version";
 
@@ -121,7 +120,7 @@ export async function generateV19Article(params: {
 
   const nzipEntry = isNzip ? findNzipIndexEntry(topic.id) : undefined;
 
-  const system = `Jsi odborný medicínský editor MedScope v19.9.
+  const system = `Jsi odborný medicínský editor MedScope v19.8.
 Piš v jazyce: ${lang}.
 Vytvoř VLASTNÍ shrnutí — nikdy nekopíruj texty ze zdrojů (GDPR, autorský zákon).
 ${isNzip ? NZIP_LICENSE_NOTICE : ""}
@@ -225,8 +224,7 @@ Vrať JSON:
 
   basePayload.modeLayers = buildModeLayers(raw, basePayload);
 
-  let payload: V19ArticlePayload = applyV19Safety(basePayload);
-  payload = applyNzipLinksToArticle(payload, topic);
+  const payload: V19ArticlePayload = applyV19Safety(basePayload);
 
   const validation = validateV19Article(payload);
   if (!validation.safe || payload.keyPoints.length < 3) {

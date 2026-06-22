@@ -7,7 +7,7 @@ import { NZIP_CATEGORIES } from "@/lib/v19/nzip";
 import type { NzipCategory, V19SourceTopic, V19Specialty } from "@/lib/v19/types";
 import { v19CacheGet, v19CacheSet } from "@/lib/v19/cache";
 
-export const NZIP_INDEX_CACHE_KEY = "nzip:index:v19.9";
+export const NZIP_INDEX_CACHE_KEY = "nzip:index:v19.8";
 
 export type NzipContentType =
   | "page"
@@ -318,7 +318,7 @@ export function buildNzipIndexMap(
   source: NzipIndexMap["source"] = "seed"
 ): NzipIndexMap {
   return {
-    version: "v19.9",
+    version: "v19.8",
     builtAt: new Date().toISOString(),
     source,
     pageCount: topics.length,
