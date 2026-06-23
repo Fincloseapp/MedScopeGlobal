@@ -1,0 +1,5 @@
+﻿Contact: mailto:security@medscopeglobal.cz
+Contact: https://medscopeglobal.cz/kontakt
+Preferred-Languages: cs, en
+Canonical: https://medscopeglobal.cz/.well-known/security.txt
+Expires: 2027-06-23T00:00:00.000Z

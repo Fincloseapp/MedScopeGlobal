@@ -54,11 +54,11 @@ const menuCs: NavItem[] = [
   },
   {
     label: "AI asistenti",
-    href: "/ai-medical",
+    href: "/ai-asistent",
     children: [
-      { label: "Pro veřejnost", href: "/ai-medical/patient", description: "Prevence a zdraví — nenahrazuje lékaře" },
-      { label: "Pro studenty", href: "/ai-medical/univerzity", description: "Anatomie, farmakologie a zkoušky" },
-      { label: "Pro lékaře", href: "/ai-medical/doctor", description: "Klinický AI pro praxi" },
+      { label: "Public Health Assistant", href: "/ai-asistent/verejnost", description: "Prevence a zdraví — nenahrazuje lékaře" },
+      { label: "Student Medical Tutor", href: "/ai-asistent/student", description: "Anatomie, farmakologie a zkoušky" },
+      { label: "Clinical Assistant for Doctors", href: "/ai-asistent/lekar", description: "Klinický AI pro praxi" },
     ],
   },
   { label: "O nás", href: "/o-nas" },
@@ -68,8 +68,10 @@ const menuCs: NavItem[] = [
   { label: "Kariéra", href: "/kariera" },
   {
     label: "B2B",
-    href: "/organizace",
+    href: "/b2b",
     children: [
+      { label: "B2B přehled", href: "/b2b", description: "Pharma a odborní partneři" },
+      { label: "Ceník", href: "/firmy/cenik", description: "Banner 5 000 Kč · článek 15 000 Kč" },
       { label: "Organizace", href: "/organizace", description: "Licence a instituce" },
       { label: "Inzerce", href: "/inzerce", description: "Reklama a sponzorství" },
       { label: "Partnerství", href: "/organizace/partnerstvi" },
@@ -112,11 +114,11 @@ const menuEn: NavItem[] = [
   },
   {
     label: "AI assistants",
-    href: "/ai-medical",
+    href: "/ai-asistent",
     children: [
-      { label: "Public", href: "/ai-medical/patient" },
-      { label: "Students", href: "/ai-medical/univerzity" },
-      { label: "Clinicians", href: "/ai-medical/doctor" },
+      { label: "Public Health Assistant", href: "/ai-asistent/verejnost" },
+      { label: "Student Medical Tutor", href: "/ai-asistent/student" },
+      { label: "Clinical Assistant for Doctors", href: "/ai-asistent/lekar" },
     ],
   },
   { label: "About", href: "/o-nas" },
@@ -126,8 +128,10 @@ const menuEn: NavItem[] = [
   { label: "Careers", href: "/kariera" },
   {
     label: "B2B",
-    href: "/organizace",
+    href: "/b2b",
     children: [
+      { label: "B2B overview", href: "/b2b" },
+      { label: "Pricing", href: "/firmy/cenik" },
       { label: "Organizations", href: "/organizace" },
       { label: "Advertising", href: "/inzerce" },
       { label: "Partnership", href: "/organizace/partnerstvi" },

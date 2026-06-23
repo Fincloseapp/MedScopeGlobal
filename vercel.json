@@ -1,9 +1,75 @@
 {
-  "buildCommand": "npm run build:vercel",
+  "buildCommand": "npm run build",
+  "installCommand": "npm ci",
   "framework": "nextjs",
-  "regions": ["fra1"],
-  "redirects": [
-    { "source": "/en", "destination": "/portal", "permanent": false },
-    { "source": "/en/:path*", "destination": "/portal", "permanent": false }
+  "env": {
+    "INGESTION_LOCALE": "cs",
+    "DEFAULT_SITE_LOCALE": "cs",
+    "OPENAI_MODEL": "gpt-4o-mini"
+  },
+  
+  "crons": [
+    {
+      "path": "/api/cron/ingest",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/v4c-daily",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/newsletter-generate",
+      "schedule": "0 8 1,15 * *"
+    },
+    {
+      "path": "/api/cron/medical-ai-fetch",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/daily-pubmed-update",
+      "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/daily-regulatory-update",
+      "schedule": "30 10 * * *"
+    },
+    {
+      "path": "/api/cron/hourly-pubmed-monitor",
+      "schedule": "30 10 * * *"
+    },
+    {
+      "path": "/api/cron/daily-regulatory-monitor",
+      "schedule": "0 11 * * *"
+    },
+    {
+      "path": "/api/cron/daily-autopublish",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/weekly-trend-analysis",
+      "schedule": "0 13 * * 1"
+    },
+    {
+      "path": "/api/cron/monthly-guideline-update",
+      "schedule": "0 14 1 * *"
+    },
+    {
+      "path": "/api/cron/v19-daily-briefs",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/v19-nzip-index",
+      "schedule": "0 5 * * *"
+    }
+  ],
+  
+  "headers": [
+    {
+      "source": "/api/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    }
   ]
 }
+

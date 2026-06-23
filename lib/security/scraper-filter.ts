@@ -25,6 +25,19 @@ const ALLOWED_BOTS = [
   /curl/i,
   /wget/i,
   /medscope/i,
+  /uptimerobot/i,
+  /pingdom/i,
+  /statuscake/i,
+  /site24x7/i,
+  /datadog/i,
+  /newrelic/i,
+  /sentry/i,
+  /betteruptime/i,
+  /checkly/i,
+  /gtmetrix/i,
+  /lighthouse/i,
+  /google-inspectiontool/i,
+  /headlesschrome/i,
 ];
 
 export function isKnownScraper(userAgent: string | null): boolean {

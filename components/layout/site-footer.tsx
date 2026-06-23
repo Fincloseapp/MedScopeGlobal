@@ -74,6 +74,16 @@ export async function SiteFooter() {
           <p className="font-medium text-foreground">{isCs ? "B2B" : "B2B"}</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li>
+              <Link href="/b2b" className="hover:text-foreground">
+                B2B
+              </Link>
+            </li>
+            <li>
+              <Link href="/firmy/cenik" className="hover:text-foreground">
+                {isCs ? "B2B ceník" : "B2B pricing"}
+              </Link>
+            </li>
+            <li>
               <Link href="/organizace" className="hover:text-foreground">
                 {isCs ? "Organizace" : "Organizations"}
               </Link>
