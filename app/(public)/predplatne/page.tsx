@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { SubscriptionComparisonTable } from "@/components/subscription/subscription-comparison-table";
 import { SubscriptionFaq } from "@/components/subscription/subscription-faq";
 import { SubscriptionTrialBanner } from "@/components/subscription/subscription-trial-banner";
 import { SubscriptionTrustBadges } from "@/components/subscription/subscription-trust-badges";
-import { V27_SUBSCRIPTION_PLANS } from "@/lib/v27/config";
+import { V27_SUBSCRIPTION_PLANS, subscriptionProductId } from "@/lib/v27/config";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
@@ -40,7 +41,8 @@ export default function PredplatnePage() {
       <section className="mt-12">
         <h2 className="font-display text-2xl font-semibold text-[#021d33]">Vyberte plán</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Všechny tarify zahrnují {VIP_TRIAL_DAYS} dní zkušební verze zdarma.
+          Všechny tarify zahrnují {VIP_TRIAL_DAYS} dní zkušební verze zdarma. Po kliknutí přejdete
+          na zabezpečenou Stripe pokladnu.
         </p>
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
           {V27_SUBSCRIPTION_PLANS.map((plan) => {
@@ -84,20 +86,17 @@ export default function PredplatnePage() {
                   ))}
                 </ul>
                 <div className="mt-6 space-y-2">
-                  <Button asChild className="w-full bg-[#005B96] hover:bg-[#004a7a]">
-                    <Link href={`/signup?plan=${plan.tier}&interval=month`}>
-                      Začít {VIP_TRIAL_DAYS}denní trial — měsíčně
-                    </Link>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="w-full border-[#005B96]/30 text-[#005B96] hover:bg-[#005B96]/5"
-                  >
-                    <Link href={`/signup?plan=${plan.tier}&interval=year`}>
-                      Začít trial — ročně ({plan.annualCzk} Kč)
-                    </Link>
-                  </Button>
+                  <V27CheckoutButton
+                    kind="subscription"
+                    productId={subscriptionProductId(plan.tier, "month")}
+                    label={`Začít ${VIP_TRIAL_DAYS}denní trial — měsíčně`}
+                  />
+                  <V27CheckoutButton
+                    kind="subscription"
+                    productId={subscriptionProductId(plan.tier, "year")}
+                    label={`Začít trial — ročně (${plan.annualCzk} Kč)`}
+                    className="w-full border border-[#005B96]/30 bg-white text-[#005B96] hover:bg-[#005B96]/5"
+                  />
                 </div>
                 <p className="mt-3 text-center text-xs text-slate-500">
                   Po {VIP_TRIAL_DAYS} dnech {plan.monthlyCzk} Kč/měs. · zrušení kdykoli
