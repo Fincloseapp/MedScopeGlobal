@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-disclaimer";
 import { SITE } from "@/lib/config/site";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "O nás | MedScopeGlobal",
+  title: "O nás",
   description:
     "MedScopeGlobal je český odborný medicínský portál pro laiky, studenty medicíny, lékaře a výzkumníky.",
   path: "/o-nas",
@@ -28,13 +29,7 @@ export default function ONasPage() {
       ctaHref="/kontakt"
       ctaLabel="Kontaktujte nás"
     >
-      <nav className="mb-6 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground">
-          Domů
-        </Link>
-        <span className="mx-2">/</span>
-        <span>O nás</span>
-      </nav>
+      <Breadcrumbs items={[{ label: "Domů", href: "/" }, { label: "O nás" }]} />
 
       <PublicTrustDisclaimer className="mb-8" />
 
