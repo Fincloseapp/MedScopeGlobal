@@ -29,42 +29,62 @@ function runStep(label, scriptPath, args = []) {
   return true;
 }
 
+function runNpmTypecheck() {
+  const npmCmd = process.platform === "win32" ? "npm.cmd" : "npm";
+  const result = spawnSync(npmCmd, ["run", "typecheck"], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: "inherit",
+    env: { ...process.env },
+    shell: process.platform === "win32",
+  });
+  return result.status === 0;
+}
+
 function runTsc() {
   if (process.env.SKIP_PREDEPLOY_TYPECHECK === "1") {
-    console.log("○ tsc --noEmit skipped (SKIP_PREDEPLOY_TYPECHECK=1)");
+    console.log("skip tsc (SKIP_PREDEPLOY_TYPECHECK=1)");
     return true;
   }
 
   const tsc = join(root, "node_modules/typescript/bin/tsc");
   if (!existsSync(tsc)) {
-    console.error("✗ tsc --noEmit: TypeScript binary missing (run npm install)");
+    console.error("tsc missing");
     return false;
   }
 
-  // Stale incremental cache on Windows (D:) can cause TS6053 missing-file errors.
   if (existsSync(tsbuildinfo)) {
     try {
       rmSync(tsbuildinfo, { force: true });
-      console.log("○ removed stale tsconfig.tsbuildinfo");
-    } catch {
-      /* non-fatal */
-    }
+      console.log("removed stale tsconfig.tsbuildinfo");
+    } catch {}
   }
 
   const result = spawnSync(process.execPath, [tsc, "--noEmit"], {
     cwd: root,
     encoding: "utf8",
-    stdio: "inherit",
+    stdio: ["inherit", "pipe", "pipe"],
   });
-  if (result.status !== 0) {
-    console.error("✗ tsc --noEmit failed");
-    console.error(
-      "  Tip: fix types locally, or SKIP_PREDEPLOY_TYPECHECK=1 to push (Vercel Linux build may pass)"
-    );
-    return false;
+  const out = (result.stdout || "") + (result.stderr || "");
+  if (out) process.stderr.write(out);
+
+  if (result.status === 0) {
+    console.log("tsc ok");
+    return true;
   }
-  console.log("✓ tsc --noEmit");
-  return true;
+
+  const isTs6053 = /TS6053/.test(out);
+  if (isTs6053) {
+    console.warn("TS6053 on D: - retry npm run typecheck");
+    if (runNpmTypecheck()) {
+      console.log("tsc ok via npm typecheck after TS6053");
+      return true;
+    }
+  }
+
+  console.error("tsc failed");
+  console.error("Tip: SKIP_PREDEPLOY_TYPECHECK=1 after npm run typecheck passes");
+  return false;
 }
 
 const steps = [

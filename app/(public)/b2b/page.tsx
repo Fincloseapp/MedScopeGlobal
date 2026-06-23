@@ -45,6 +45,12 @@ export default function B2BPage() {
 
       <V271B2BPricingTable />
 
+      <p className="mt-6 text-sm">
+        <Link href="/firmy/cenik" className="font-medium text-[#005B96] underline underline-offset-2">
+          Kompletní ceník pro firmy →
+        </Link>
+      </p>
+
       <p className="mt-8 text-sm text-muted-foreground">
         Dotazy:{" "}
         <Link href="/kontakt" className="text-[#005B96] underline">
