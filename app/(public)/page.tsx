@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ShieldCheck } from "lucide-react";
+import { AudienceGateway } from "@/components/home/audience-gateway";
 import { AudienceHub } from "@/components/home/audience-hub";
 import { ArticleCard } from "@/components/article/article-card";
 import { Button } from "@/components/ui/button";
@@ -96,6 +97,8 @@ export default async function HomePage() {
       </section>
 
       {showAds ? <div className="mx-auto max-w-7xl px-4 sm:px-6"><AdPlacement ads={topAds} variant="banner" /></div> : null}
+
+      <AudienceGateway locale={locale} />
 
       <AudienceHub locale={locale} />
 

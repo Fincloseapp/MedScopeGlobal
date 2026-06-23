@@ -14,6 +14,11 @@ const menuCs: NavItem[] = [
     href: "/pro-koho",
     children: [
       {
+        label: "Veřejnost",
+        href: "/verejnost",
+        description: "Prevence, témata, články a AI asistent pro každého",
+      },
+      {
         label: "Laik a student",
         href: "/pro-koho/laik-student",
         description: "Prevence, příprava na LF a srozumitelné výklady",
@@ -86,6 +91,7 @@ const menuEn: NavItem[] = [
     label: "Audiences",
     href: "/pro-koho",
     children: [
+      { label: "Public health", href: "/verejnost" },
       { label: "Public & students", href: "/pro-koho/laik-student" },
       { label: "Clinicians", href: "/pro-koho/lekar" },
       { label: "Researchers", href: "/pro-koho/vedec" },

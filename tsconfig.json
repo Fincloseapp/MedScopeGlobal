@@ -37,6 +37,7 @@
   ],
   "exclude": [
     "node_modules",
+    "node_modules.bak",
     "supabase/functions",
     "tests",
     "e2e",
@@ -53,3 +54,4 @@
     "sentry.server.config.ts"
   ]
 }
+

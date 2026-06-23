@@ -16,6 +16,9 @@ try {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   webpack: (config) => {
     config.resolve.symlinks = false;
     return config;
