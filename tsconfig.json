@@ -42,6 +42,8 @@
     "mobile",
     ".deploy-tmp",
     ".build-tmp",
-    ".tools"
+    ".tools",
+    "github-production",
+    "repo-temp"
   ]
 }

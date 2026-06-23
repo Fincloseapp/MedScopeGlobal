@@ -1,10 +1,9 @@
-<<<<<<< HEAD
 # Audit Fixes Applied — MedScopeGlobal Phase 3
 
 **Date:** 23 June 2026  
 **Sources:** `medscopeglobal-audit-report.md`, `implementation-report-by-agents.md`  
 **Repo:** `C:\_NTFS\MedScopeGlobal\repo-temp`  
-**Git:** `main` @ `1e145b3` (3 commits ahead of `origin/main`)
+**Git:** `main` rebased onto `origin/main` @ `ec6c773`
 
 ---
 
@@ -33,6 +32,9 @@ Critical audit items from the 22 June 2026 report are implemented in the working
 | 4 | Generic article titles | **Done** (seeds + writer) | `lib/v25/writers/writer-base.mjs`, `lib/verejnost/seed-*.ts` |
 | 9 | `/o-nas` page | **Done** | `app/(public)/o-nas/page.tsx` |
 | 8 | AI assistants — 3 clear products | **Done** | `lib/v271/ai-assistants.ts`, `/ai-asistent/verejnost`, `/student`, `/lekar` |
+| 14 | CSP `unsafe-eval` removed in production | **Done** | `lib/v30/security/headers.ts` |
+| 16 | Pro-me / odborne a11y (aria labels) | **Done** | `app/(public)/pro-me/*`, `app/(public)/odborne/*` |
+| 17 | Article brief feed keyboard a11y | **Done** | `components/v19/article-brief-feed-client.tsx` |
 
 ---
 
@@ -79,13 +81,15 @@ App routes, subscription components, B2B pricing, homepage trust blocks, Academy
 | `npm run typecheck` | **Pass** |
 | `npm run lint` | Pass (per prior NTFS run; 3 img warnings) |
 | `npm run build` | Pass on NTFS with Node 20.19.3 (per `c4ed054` notes) |
-| Git push | **Not performed** |
+| `npm test` | Pass |
+| `smoke:v26` (production) | Fail 403 — pre-deploy production; redeploy required |
+| Git push | **Pending** — Vercel build fix + redeploy |
 
 ---
 
 ## Blockers / requires production action
 
-1. **Deploy** — 3 local commits not pushed; production still returns 403 without UA until redeployed.
+1. **Deploy** — Vercel build failed on `github-production/` stray app; fix + push required.
 2. **Stripe** — Confirm 14-day trial on all price IDs in Stripe dashboard + env.
 3. **Supabase** — Apply migration `20260622120000_fix_biologie_prijimacky_duplicate_lessons.sql`; backfill DB articles with old generic titles.
 4. **Truncated `/articles` archive** — content/DB audit, not UI-only.
@@ -98,71 +102,3 @@ App routes, subscription components, B2B pricing, homepage trust blocks, Academy
 ## Intentionally unchanged (admin / internal)
 
 Version labels remain in **admin** and **API health** routes (e.g. `/admin/security`, `/api/v29/health`) for operator debugging — not customer-facing.
-=======
-# Audit Fixes Applied — MedScopeGlobal
-
-**Date:** 23 June 2026  
-**Sources:** `medscopeglobal-audit-report.md`, `implementation-report-by-agents.md`  
-**Repo:** `C:\_NTFS\MedScopeGlobal\repo-temp`
-
----
-
-## Critical (implemented)
-
-| # | Audit item | Status | Location |
-|---|------------|--------|----------|
-| 1 | Remove v29/v46/ULTRA-MAX from public UI | Done | `lib/v46/version.ts`, `lib/v29/version.ts`, layout, footer |
-| 2 | Fix canonical URL on `/kontakt` | Done | `app/(public)/kontakt/page.tsx` |
-| 3 | Add `/hledat` search page (404 fix) | Done | `app/(public)/hledat/page.tsx` |
-| 4 | 14-day trial + subscription comparison | Done | `app/(public)/predplatne/page.tsx`, `components/subscription/*` |
-| 5 | Extended paywall preview (~720 chars) | Done | `lib/vip.ts`, `components/v38/article-conversion-gate.tsx` |
-| 6 | B2B pricing on `/firmy/cenik` | Done | `components/v271/b2b-pricing-table.tsx` |
-| 7 | Generic article titles removed | Done | `lib/v25/writers/writer-base.mjs`, seed files |
-| 8 | Placeholder study filter | Done | `lib/v20/studies/enrich.ts` |
-| 9 | `/o-nas` about page | Done | `app/(public)/o-nas/page.tsx` |
-| 10 | AI assistants consolidated (3 products) | Done | `lib/v271/ai-assistants.ts`, landing pages |
-| 11 | Audience landings (studenti, lekari, verejnost) | Done | `app/(public)/studenti`, `/lekari`, `/verejnost` |
-| 12 | Social proof + "Proč MedScopeGlobal" | Done | `lib/v271/homepage.ts`, homepage sections |
-| 13 | Public pages 403 without User-Agent | Done | `lib/security/scraper-filter.ts` — empty UA allowed on public routes |
-| 14 | CSP `unsafe-eval` removed in production | Done | `lib/v30/security/headers.ts` |
-| 15 | Monitoring bot allowlist | Done | UptimeRobot, Pingdom, StatusCake, etc. in scraper-filter |
-| 16 | Pro-me / odborne a11y (aria labels) | Done | `app/(public)/pro-me/*`, `app/(public)/odborne/*` |
-| 17 | Article brief feed keyboard a11y | Done | `components/v19/article-brief-feed-client.tsx` |
-
----
-
-## Partial / requires production deploy or DB
-
-| Item | Notes |
-|------|-------|
-| Truncated `/articles` archive | Needs DB content audit + re-ingest |
-| Old generic titles in live DB | Run content cron / migration |
-| Stripe trial live config | Verify in Stripe dashboard + Vercel env |
-| Newsletter `/newsletter` timeout | Infra / SendGrid — not code-only |
-| Exit-intent popup | Marketing feature — deferred |
-| WCAG 2.1 AA formal audit | Deferred — incremental a11y fixes applied |
-| Homepage bundle size | Lazy-load below-fold — future sprint |
-| Partner logo bar (LF/FN) | Requires business assets |
-
----
-
-## Not implemented (out of scope / business)
-
-- CME / ČLK partnership badges
-- Mobile native apps
-- Affiliate program
-- Peer-review workflow
-- Long-term international hreflang rollout
-
----
-
-## Verification
-
-| Check | Result |
-|-------|--------|
-| `npm run typecheck` | Pass |
-| `npm run lint` | Pass (3 img warnings) |
-| `npm run build` | Pass (NTFS, Node 20.19.3) |
-| `npm test` | Pass |
-| `smoke:v26` (production) | Fail 403 — pre-deploy production; redeploy required |
->>>>>>> bbf6cc6 (Finalize NTFS path defaults and audit security fixes.)

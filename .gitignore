@@ -36,6 +36,10 @@ yarn-error.log*
 # local build/deploy staging (D: only)
 .build-tmp/
 .deploy-tmp/
+.github-production-READY.md
+github-production/
+.npm-cache/
+/repo-temp/
 
 # V17 audit logs (local only)
 

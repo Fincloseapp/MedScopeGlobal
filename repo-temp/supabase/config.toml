@@ -1,8 +1,0 @@
-# MedScopeGlobal — Supabase CLI (https://supabase.com/docs/guides/cli)
-project_id = "xcydgqnivxfhprbmdyym"
-
-[api]
-enabled = true
-
-[db]
-major_version = 15
