@@ -12,7 +12,7 @@ export async function V25UniversitiesHomeSection() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-              v25.4 — české LF
+              Studium medicíny
             </p>
             <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
               Lékařské fakulty v ČR

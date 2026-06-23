@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "PubMed / Regulatory fetch" };
 export default function OdbornePubmedPage() {
   return (
     <ModulePageShell
-      eyebrow="V5+ Evidence"
+      eyebrow="Evidence Engine"
       title="PubMed & regulace"
       description="Stažení metadat z NCBI a regulatory informací (FDA openFDA, EMA, SÚKL)."
     >

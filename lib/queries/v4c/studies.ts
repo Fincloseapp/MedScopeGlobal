@@ -19,6 +19,7 @@ export type StudyRow = {
   archived: boolean;
   featured: boolean;
   created_at: string;
+  ai_metadata?: Record<string, unknown> | null;
 };
 
 export async function getStudiesList(opts?: { archived?: boolean; limit?: number }) {

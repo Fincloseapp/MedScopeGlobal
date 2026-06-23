@@ -57,24 +57,24 @@ export function SearchCommand({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="hidden gap-2 md:flex" aria-label="Vyhledávání">
+        <Button variant="outline" size="sm" className="hidden gap-2 md:flex">
           <Search className="h-4 w-4" />
-          Hledat
+          Search
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Vyhledávání článků</DialogTitle>
+          <DialogTitle>Search articles</DialogTitle>
         </DialogHeader>
         <Input
           autoFocus
-          placeholder="Zadejte alespoň 2 znaky"
+          placeholder="Type at least two characters"
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
         <div className="max-h-72 space-y-2 overflow-auto">
           {loading && (
-            <p className="text-sm text-muted-foreground">Vyhledávání…</p>
+            <p className="text-sm text-muted-foreground">Searching…</p>
           )}
           {!loading &&
             results.map((r) => (
@@ -93,18 +93,18 @@ export function SearchCommand({
               </Link>
             ))}
           {!loading && q.trim().length >= 2 && results.length === 0 && (
-            <p className="text-sm text-muted-foreground">Žádné výsledky.</p>
+            <p className="text-sm text-muted-foreground">No matches yet.</p>
           )}
         </div>
         <Button
           variant="secondary"
           className="w-full"
           onClick={() => {
-            router.push(`/hledat?q=${encodeURIComponent(q)}`);
+            router.push(`/search?q=${encodeURIComponent(q)}`);
             setOpen(false);
           }}
         >
-          Otevřít plné vyhledávání
+          Open full search
         </Button>
       </DialogContent>
     </Dialog>

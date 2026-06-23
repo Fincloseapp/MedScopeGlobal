@@ -10,7 +10,7 @@ export default async function OdborneCitacePage() {
 
   return (
     <ModulePageShell
-      eyebrow="V5+ Evidence"
+      eyebrow="Evidence Engine"
       title="Automatické citace"
       description="Vancouver, APA a Harvard — generováno přes Groq z PubMed metadat."
     >

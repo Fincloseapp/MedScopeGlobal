@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
+import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { PERSONALIZATION_LABELS } from "@/lib/v6/personalization-config";
 import type { PersonalizationAudience } from "@/lib/v6/personalization-config";
 
-export const metadata: Metadata = {
-  title: "Pro mě",
-  description: "V6 personalizované feedy — lékař, pacient, výzkum, legislativa.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildV20PageMetadata({
+    title: "Pro mě",
+    description: "Personalizované feedy — lékař, pacient, výzkum, legislativa.",
+    path: "/pro-me",
+  });
+}
 
 const LINKS: { audience: PersonalizationAudience; href: string }[] = [
   { audience: "lekari", href: "/pro-me/lekari" },
@@ -19,7 +23,7 @@ const LINKS: { audience: PersonalizationAudience; href: string }[] = [
 export default function ProMeHubPage() {
   return (
     <ModulePageShell
-      eyebrow="V6"
+      eyebrow="Personalizace"
       title="Pro mě"
       description="Personalizované články podle role — AI kategorizace, scoring a doporučení."
       ctaHref="/dashboard"

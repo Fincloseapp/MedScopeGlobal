@@ -2,8 +2,15 @@ import {
   allowedAccessLevels,
   type AccessLevelId,
 } from "@/lib/config/access-levels";
-import { rubricSlugsForSectionQuery } from "@/lib/config/medical-sections";
 import type { MedicalSectionSlug } from "@/lib/config/medical-sections";
+import {
+  articleMatchesSection,
+  isLayAudienceArticle,
+  rubricSlugsForSectionFetch,
+  sectionShowsLayContent,
+  V19_RUBRIC_SLUG,
+  V24_RUBRIC_SLUG,
+} from "@/lib/config/section-article-map";
 import { mapArticleList } from "@/lib/db/map-article";
 import {
   prepareArticleForDisplay,
@@ -12,6 +19,11 @@ import {
 } from "@/lib/articles/prepare-for-display";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/server";
+import {
+  filterActiveArticles,
+  filterCzechContent,
+  isArchivedArticle,
+} from "@/lib/v20/content-rules";
 import type { ArticleWithRelations } from "@/types/database";
 
 export type { DisplayArticle };
@@ -22,17 +34,54 @@ const articleSelect = `
   users!author_id ( id, full_name, avatar_url )
 `;
 
+function allowedLevelsForSection(accessLevel: AccessLevelId): Set<string> {
+  const levels = new Set<string>(allowedAccessLevels(accessLevel));
+  if (accessLevel === "physician") {
+    levels.add("student");
+  }
+  return levels;
+}
+
 function filterForReader(
   articles: ArticleWithRelations[],
   isVip: boolean,
-  accessLevel: AccessLevelId
+  accessLevel: AccessLevelId,
+  locale: LocaleCode = "cs"
 ): ArticleWithRelations[] {
   const allowed = new Set(allowedAccessLevels(accessLevel));
-  return articles.filter((a) => {
+  const active = filterActiveArticles(articles);
+  const localized = filterCzechContent(active, locale);
+  return localized.filter((a) => {
     if (!isVip && a.vip_only) return false;
     const level = a.min_access_level ?? "public";
     return (allowed as Set<string>).has(level);
   });
+}
+
+function filterForSectionReader(
+  articles: ArticleWithRelations[],
+  isVip: boolean,
+  accessLevel: AccessLevelId,
+  locale: LocaleCode = "cs"
+): ArticleWithRelations[] {
+  const allowed = allowedLevelsForSection(accessLevel);
+  const active = filterActiveArticles(articles);
+  const localized = filterCzechContent(active, locale);
+  return localized.filter((a) => {
+    if (!isVip && a.vip_only) return false;
+    const level = a.min_access_level ?? "public";
+    return allowed.has(level);
+  });
+}
+
+/** Metadata rubric listings (e.g. aktuální-zprávy) — show all tagged articles; detail page gates access. */
+function filterForMetadataRubricListing(
+  articles: ArticleWithRelations[],
+  locale: LocaleCode = "cs"
+): ArticleWithRelations[] {
+  const active = filterActiveArticles(articles);
+  if (locale !== "cs") return active;
+  return active.filter((a) => a.locale !== "en" && Boolean(a.title?.trim()));
 }
 
 export async function getFeaturedArticles(
@@ -56,7 +105,8 @@ export async function getFeaturedArticles(
   const filtered = filterForReader(
     mapArticleList(data as Record<string, unknown>[] | null),
     isVip,
-    accessLevel
+    accessLevel,
+    locale
   );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
@@ -73,22 +123,22 @@ export async function getLatestArticles(
   locale: LocaleCode = "cs"
 ) {
   const supabase = await createClient();
+  const fetchLimit = limit * 8;
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
     .eq("published", true)
     .order("published_at", { ascending: false, nullsFirst: false })
-    .range(offset, offset + limit * 4 - 1);
+    .range(offset, offset + fetchLimit - 1);
 
   if (error) {
     console.error("getLatestArticles", error);
     return [];
   }
-  const filtered = filterForReader(
-    mapArticleList(data as Record<string, unknown>[] | null),
-    isVip,
-    accessLevel
+  const rows = mapArticleList(data as Record<string, unknown>[] | null).filter(
+    (a) => !isLayAudienceArticle(a)
   );
+  const filtered = filterForReader(rows, isVip, accessLevel, locale);
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
     maxTranslate: limit,
@@ -100,39 +150,33 @@ export async function getArticlesBySection(
   sectionSlug: MedicalSectionSlug,
   limit = 12,
   isVip = false,
-  accessLevel: AccessLevelId = "public",
+  accessLevel: AccessLevelId = "physician",
   locale: LocaleCode = "cs",
   contentTypeSlug?: string | null
 ) {
   const rubricSlugs = contentTypeSlug
     ? [contentTypeSlug]
-    : rubricSlugsForSectionQuery(sectionSlug);
+    : rubricSlugsForSectionFetch(sectionSlug);
 
   const supabase = await createClient();
 
   let q = supabase
     .from("articles")
     .select(articleSelect)
-    .eq("published", true);
-
-  if (rubricSlugs.length > 0) {
-    q = q.in("rubric_slug", rubricSlugs);
-  } else if (sectionSlug === "healthcare-technology") {
-    q = q.is("rubric_slug", null);
-  }
+    .eq("published", true)
+    .in("rubric_slug", rubricSlugs);
 
   let { data, error } = await q
     .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(limit * 4);
+    .limit(limit * 8);
 
   if (error?.message?.includes("rubric_slug")) {
-    let q2 = supabase.from("articles").select(articleSelect).eq("published", true);
-    if (rubricSlugs.length > 0) {
-      q2 = q2.in("rubric_slug", rubricSlugs);
-    }
-    const res = await q2
+    const res = await supabase
+      .from("articles")
+      .select(articleSelect)
+      .eq("published", true)
       .order("published_at", { ascending: false, nullsFirst: false })
-      .limit(limit * 4);
+      .limit(limit * 12);
     data = res.data;
     error = res.error;
   }
@@ -142,11 +186,28 @@ export async function getArticlesBySection(
     return [];
   }
 
-  const filtered = filterForReader(
-    mapArticleList(data as Record<string, unknown>[] | null),
-    isVip,
-    accessLevel
-  );
+  const rows = mapArticleList(data as Record<string, unknown>[] | null);
+  const allowLay = sectionShowsLayContent(sectionSlug);
+
+  const sectionMatched = rows.filter((article) => {
+    if (!allowLay && isLayAudienceArticle(article)) return false;
+    return articleMatchesSection(article, sectionSlug, contentTypeSlug);
+  });
+
+  let candidates = sectionMatched;
+  if (candidates.length < limit) {
+    const seen = new Set(candidates.map((a) => a.id));
+    const professionalPool = rows.filter((article) => {
+      if (seen.has(article.id)) return false;
+      if (!allowLay && isLayAudienceArticle(article)) return false;
+      return (
+        article.rubric_slug === V19_RUBRIC_SLUG || article.rubric_slug === V24_RUBRIC_SLUG
+      );
+    });
+    candidates = [...candidates, ...professionalPool];
+  }
+
+  const filtered = filterForSectionReader(candidates, isVip, accessLevel, locale);
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
     maxTranslate: limit,
@@ -189,7 +250,8 @@ export async function getArticlesByRubric(
   const filtered = filterForReader(
     mapArticleList(data as Record<string, unknown>[] | null),
     isVip,
-    accessLevel
+    accessLevel,
+    locale
   );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
@@ -233,7 +295,8 @@ export async function getArticlesByCategory(
   const filtered = filterForReader(
     mapArticleList(data as Record<string, unknown>[] | null),
     isVip,
-    accessLevel
+    accessLevel,
+    locale
   );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
@@ -294,11 +357,80 @@ export async function getRelatedArticles(
   const filtered = filterForReader(
     mapArticleList(data as Record<string, unknown>[] | null),
     isVip,
-    accessLevel
+    accessLevel,
+    locale
   );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
     maxTranslate: limit,
   });
   return prepared.slice(0, limit);
+}
+
+/** Articles tagged with metadata.section (e.g. v26 foreign news rubric). */
+export async function getArticlesByMetadataSection(
+  section: string,
+  limit = 24,
+  isVip = false,
+  accessLevel: AccessLevelId = "public",
+  locale: LocaleCode = "cs"
+) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("articles")
+    .select(articleSelect)
+    .eq("published", true)
+    .eq("metadata->>section", section)
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("getArticlesByMetadataSection", error);
+    return [];
+  }
+
+  const filtered = filterForMetadataRubricListing(
+    mapArticleList(data as Record<string, unknown>[] | null),
+    locale
+  );
+  const prepared = await prepareArticlesForDisplay(filtered, locale, {
+    mode: "card",
+    maxTranslate: limit,
+  });
+  return prepared.slice(0, limit);
+}
+
+/** Archived articles (pre-2026 legacy / expired v19 briefs) — direct slug access still works. */
+export async function getArchivedArticles(
+  limit = 48,
+  offset = 0,
+  locale: LocaleCode = "cs"
+): Promise<{ articles: DisplayArticle[]; total: number }> {
+  const supabase = await createClient();
+  const { data, error, count } = await supabase
+    .from("articles")
+    .select(articleSelect, { count: "exact" })
+    .eq("published", true)
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .range(offset, offset + limit * 3 - 1);
+
+  if (error) {
+    console.error("getArchivedArticles", error);
+    return { articles: [], total: 0 };
+  }
+
+  const rows = mapArticleList(data as Record<string, unknown>[] | null);
+  const archived = filterCzechContent(
+    rows.filter((a) => isArchivedArticle(a)),
+    locale
+  );
+  const prepared = await prepareArticlesForDisplay(archived, locale, {
+    mode: "card",
+    maxTranslate: limit,
+  });
+
+  return {
+    articles: prepared.slice(0, limit),
+    total: count ?? archived.length,
+  };
 }

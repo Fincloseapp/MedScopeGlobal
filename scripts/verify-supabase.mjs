@@ -28,6 +28,13 @@ const requiredTables = [
   ["vip_subscriptions", "id"],
 ];
 
+const v25Tables = [
+  ["v25_system_snapshot", "id"],
+  ["v25_system_runs", "id"],
+  ["v25_fix_log", "id"],
+  ["v25_university_runs", "id"],
+];
+
 const recommendedTables = [
   ["article_translations", "article_id"],
   ["rubrics", "slug"],
@@ -67,6 +74,13 @@ console.log(`${aiKeyConfigured ? "✓" : "○"} OPENAI_API_KEY / OPEN_API_KEY (o
 
 console.log("\n=== Supabase tables (required) ===\n");
 for (const [t, col] of requiredTables) {
+  const { error } = await s.from(t).select(col).limit(1);
+  console.log(`${error ? "✗" : "✓"} ${t}${error ? ` — ${error.message}` : ""}`);
+  if (error) ok = false;
+}
+
+console.log("\n=== v25 enterprise tables ===\n");
+for (const [t, col] of v25Tables) {
   const { error } = await s.from(t).select(col).limit(1);
   console.log(`${error ? "✗" : "✓"} ${t}${error ? ` — ${error.message}` : ""}`);
   if (error) ok = false;

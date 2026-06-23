@@ -22,7 +22,7 @@ export default async function OdborneEvidencePage() {
 
   return (
     <ModulePageShell
-      eyebrow="V5+ Evidence"
+      eyebrow="Evidence Engine"
       title="Evidence-based scoring"
       description="Úroveň důkazů A–D, typ studie, klinický dopad, síla doporučení — Groq Llama 3.3."
     >

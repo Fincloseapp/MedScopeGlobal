@@ -1,4 +1,6 @@
-import { Newspaper, Tags, Megaphone, Crown } from "lucide-react";
+import { MedScopeLogo } from "@/components/brand/medscope-logo";
+import Link from "next/link";
+import { Newspaper, Tags, Megaphone, Crown, Activity } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -56,6 +58,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-8">
+      <MedScopeLogo href="/admin" width={160} height={40} className="mb-2" />
       <div>
         <h1 className="font-display text-3xl font-bold text-medical-navy">
           Operations overview
@@ -68,6 +71,22 @@ export default async function AdminDashboardPage() {
           .
         </p>
       </div>
+
+      <Link
+        href="/admin/tests"
+        className="inline-flex items-center gap-2 rounded-xl border border-[#005B96]/30 bg-[#005B96]/5 px-4 py-3 text-sm font-medium text-[#021d33] hover:bg-[#005B96]/10"
+      >
+        <Activity className="h-4 w-4 text-[#005B96]" />
+        v25.4 Test suite — routing, ads, veřejnost, CLK
+      </Link>
+
+      <Link
+        href="/admin/system"
+        className="inline-flex items-center gap-2 rounded-xl border border-[#005B96]/30 bg-[#005B96]/5 px-4 py-3 text-sm font-medium text-[#021d33] hover:bg-[#005B96]/10"
+      >
+        <Activity className="h-4 w-4 text-[#005B96]" />
+        v25.1 System Dashboard — testy, opravy, CRONy
+      </Link>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((s) => {

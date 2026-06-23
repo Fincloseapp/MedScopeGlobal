@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function AiAsistentLekarPage() {
   return (
     <ModulePageShell
-      eyebrow="MedScope v27 · Lékaři"
+      eyebrow="AI asistent · Lékaři"
       title="Klinický AI asistent"
       description="Evidence-based odpovědi pro lékaře — guidelines, studie, léčebné algoritmy."
     >

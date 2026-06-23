@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { SITE } from "@/lib/config/site";
-import { V20_UI_VERSION } from "@/lib/v20/version";
 
 export function buildV20PageMetadata(opts: {
   title: string;
@@ -25,7 +24,6 @@ export function buildV20PageMetadata(opts: {
       title: opts.title,
       description: opts.description.slice(0, 160),
     },
-    other: { "medscope-ui-version": V20_UI_VERSION },
   };
 }
 

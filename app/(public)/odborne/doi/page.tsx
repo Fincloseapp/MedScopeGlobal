@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "DOI — extrakce a validace" };
 export default function OdborneDoiPage() {
   return (
     <ModulePageShell
-      eyebrow="V5+ Evidence"
+      eyebrow="Evidence Engine"
       title="DOI extrakce"
       description="Validace DOI, normalizace a stažení PubMed metadat do medical_sources."
     >

@@ -11,7 +11,7 @@ export default async function ProMeLekariPage() {
   const items = await getPersonalizedFeed("lekari");
   return (
     <ModulePageShell
-      eyebrow="V6 · Personalizace"
+      eyebrow="Personalizace"
       title="Feed pro lékaře"
       description="AI kategorizace, evidence scoring a doporučení pro klinickou praxi."
     >

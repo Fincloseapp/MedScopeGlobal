@@ -4,14 +4,18 @@ import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V19ArticleBriefFeedLazy } from "@/components/v19/article-brief-feed";
 import { V4cContentCard } from "@/components/v4c/content-card";
 import { getMedicalAiTexts, getStudySources } from "@/lib/queries/v4d/medical-ai";
+import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { SPECIALTY_LABELS_CS } from "@/lib/v4d/constants";
 import type { V4dSpecialty } from "@/lib/v4d/constants";
 
-export const metadata: Metadata = {
-  title: "Odborné AI texty",
-  description:
-    "Automatické odborné texty z univerzit CZ/SK/EU/svět — filtrace oborů, kvalita, překlady do češtiny.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildV20PageMetadata({
+    title: "Odborné AI texty",
+    description:
+      "Automatické odborné texty z univerzit CZ/SK/EU/svět — filtrace oborů, kvalita, překlady do češtiny.",
+    path: "/odborne",
+  });
+}
 
 export default async function OdbornePage() {
   const [texts, sources] = await Promise.all([
@@ -28,9 +32,9 @@ export default async function OdbornePage() {
 
   return (
     <ModulePageShell
-      eyebrow="V4d · Odborné texty"
+      eyebrow="Odborné texty"
       title="Odborné AI texty"
-      description="V5+: Groq AI, automatické citace (Vancouver/APA/Harvard), DOI, PubMed/FDA/EMA/SÚKL, evidence scoring A–D."
+      description="Groq AI, automatické citace (Vancouver/APA/Harvard), DOI, PubMed/FDA/EMA/SÚKL, evidence scoring A–D."
       ctaHref="/odborne/ai"
       ctaLabel="AI asistent"
     >
@@ -63,16 +67,16 @@ export default async function OdbornePage() {
           Evidence
         </Link>
         <Link href="/dashboard" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
-          V6 Dashboard
+          Dashboard
         </Link>
         <Link href="/autopilot" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
           Autopilot
         </Link>
         <Link href="/odborne/briefy" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
-          v19 Briefy
+          Odborné briefy
         </Link>
       </div>
-      <V19ArticleBriefFeedLazy title="MedScope v19 — odborné briefy" limit={4} />
+      <V19ArticleBriefFeedLazy title="Nejnovější odborné briefy" limit={4} />
       <div className="grid gap-4 sm:grid-cols-2">
         {texts.map((t) => (
           <V4cContentCard

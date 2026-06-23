@@ -11,7 +11,7 @@ export default async function ProMeVyzkumPage() {
   const items = await getPersonalizedFeed("vyzkum");
   return (
     <ModulePageShell
-      eyebrow="V6 · Personalizace"
+      eyebrow="Personalizace"
       title="Feed pro výzkum"
       description="RCT, meta-analýzy a metodologie s AI doporučeními."
     >

@@ -12,11 +12,14 @@ const isWin = process.platform === "win32";
 
 const isLocalDev = !isVercel && !isCI;
 
+/** Canonical NTFS workspace (replaces D: FAT32 / legacy D:\\medscope.*). */
+const NTFS_ROOT = "C:\\_NTFS\\MedScopeGlobal";
+
 
 
 /**
 
- * On Windows local dev, reject resolved paths on C: unless MEDSCOPE_ALLOW_C_DRIVE=1.
+ * On Windows local dev, reject resolved paths on C: unless under C:\\_NTFS\\ or MEDSCOPE_ALLOW_C_DRIVE=1.
 
  * Call before any local filesystem write when the path is not from these helpers.
 
@@ -28,13 +31,15 @@ export function assertNotOnCDrive(resolvedPath: string, label: string): void {
 
   const normalized = resolve(resolvedPath).replace(/\//g, "\\");
 
+  if (/^C:\\_NTFS\\/i.test(normalized)) return;
+
   if (/^C:\\/i.test(normalized)) {
 
     const msg =
 
       `[MedScope paths] ${label} resolves to C: drive (${normalized}). ` +
 
-      "Use D:\\medscope.local, D:\\medscope.data, or D:\\medscope.logs only.";
+      `Use ${NTFS_ROOT}\\repo-temp, ${NTFS_ROOT}\\data, or ${NTFS_ROOT}\\logs only.`;
 
     if (process.env.MEDSCOPE_ALLOW_C_DRIVE === "1") {
 
@@ -74,7 +79,7 @@ function guardRoots(): void {
 
  * Canonical project root.
 
- * Local dev: always D:\medscope.local (never C:).
+ * Local dev: C:\\_NTFS\\MedScopeGlobal\\repo-temp (NTFS — avoids FAT32 EISDIR).
 
  * Vercel/CI: process.cwd() (ephemeral build dir).
 
@@ -84,27 +89,27 @@ export const MEDSCOPE_PROJECT_ROOT =
 
   process.env.MEDSCOPE_PROJECT_ROOT ??
 
-  (isVercel || isCI ? process.cwd() : "D:\\medscope.local");
+  (isVercel || isCI ? process.cwd() : join(NTFS_ROOT, "repo-temp"));
 
 
 
-/** Off-repo data: articles, images, auth, ads, audit. Local: D:\medscope.data. */
+/** Off-repo data: articles, images, auth, ads, audit. Local: C:\\_NTFS\\MedScopeGlobal\\data. */
 
 export const MEDSCOPE_DATA_ROOT =
 
   process.env.MEDSCOPE_DATA_ROOT ??
 
-  (isVercel ? "/tmp/medscope.data" : "D:\\medscope.data");
+  (isVercel ? "/tmp/medscope.data" : join(NTFS_ROOT, "data"));
 
 
 
-/** Off-repo logs. Local: D:\medscope.logs. */
+/** Off-repo logs. Local: C:\\_NTFS\\MedScopeGlobal\\logs. */
 
 export const MEDSCOPE_LOGS_ROOT =
 
   process.env.MEDSCOPE_LOGS_ROOT ??
 
-  (isVercel ? "/tmp/medscope.logs" : "D:\\medscope.logs");
+  (isVercel ? "/tmp/medscope.logs" : join(NTFS_ROOT, "logs"));
 
 
 
@@ -116,11 +121,11 @@ export const MEDSCOPE_LOCAL_DATA_DIR =
 
 
 
-/** Logo assets source on D: (outside repo). */
+/** Logo assets source (outside repo). */
 
 export const MEDSCOPE_LOGO_SOURCE =
 
-  process.env.MEDSCOPE_LOGO_SOURCE ?? "D:\\MedScopeGlobal\\logo";
+  process.env.MEDSCOPE_LOGO_SOURCE ?? join(NTFS_ROOT, "logo");
 
 
 

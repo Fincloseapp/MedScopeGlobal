@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { V19ArticleBriefCard, type V19BriefArticle } from "@/components/v19/article-brief-card";
 import { V19ArticleBriefSkeleton } from "@/components/v19/article-brief-skeleton";
+import { fetchV20Json } from "@/lib/v20/api-client";
 
 type ApiArticle = V19BriefArticle & { id: string };
 
@@ -22,7 +23,9 @@ export function V19ArticleBriefFeedClient({
   const [loadingMore, setLoadingMore] = useState(false);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [pagesLoaded, setPagesLoaded] = useState(0);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const MAX_PAGES = 2;
 
   const fetchPage = useCallback(
     async (nextOffset: number, append: boolean) => {
@@ -31,14 +34,15 @@ export function V19ArticleBriefFeedClient({
         offset: String(nextOffset),
         locale,
         mode,
+        deepLink: "1",
       });
-      const res = await fetch(`/api/v19/articles?${params}`);
-      const json = (await res.json()) as {
+      const json = await fetchV20Json<{
         articles?: ApiArticle[];
         count?: number;
-      };
+      }>(`/api/v19/articles?${params}`, { ttlMs: 45_000, retries: 2 });
       const batch = json.articles ?? [];
       setArticles((prev) => (append ? [...prev, ...batch] : batch));
+      setPagesLoaded((p) => (append ? p + 1 : 1));
       setHasMore(batch.length >= initialLimit);
       setOffset(nextOffset + batch.length);
     },
@@ -58,7 +62,7 @@ export function V19ArticleBriefFeedClient({
 
   useEffect(() => {
     const el = sentinelRef.current;
-    if (!el || !hasMore || loading || loadingMore) return;
+    if (!el || !hasMore || loading || loadingMore || pagesLoaded >= MAX_PAGES) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -70,7 +74,7 @@ export function V19ArticleBriefFeedClient({
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [fetchPage, hasMore, loading, loadingMore, offset]);
+  }, [fetchPage, hasMore, loading, loadingMore, offset, pagesLoaded]);
 
   return (
     <section className="mx-auto max-w-3xl overflow-x-hidden px-4 py-8 sm:px-6">
@@ -79,7 +83,7 @@ export function V19ArticleBriefFeedClient({
         <V19ArticleBriefSkeleton count={initialLimit} />
       ) : articles.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          Zatím žádné briefy — generují se automaticky denně nebo přes API v19.
+          Zatím žádné briefy — generují se automaticky denně.
         </p>
       ) : (
         <div className="flex flex-col gap-4">

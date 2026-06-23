@@ -4,12 +4,12 @@
  * Usage: node scripts/sync-github-secret.mjs CRON_SECRET
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import https from "node:https";
 import { createRequire } from "node:module";
+import { projectPath } from "../lib/config/paths.mjs";
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const root = projectPath();
 const secretName = process.argv[2];
 const owner = "Fincloseapp";
 const repo = "MedScopeGlobal";
@@ -27,7 +27,7 @@ function httpsGet(url) {
 }
 
 async function ensureSodium() {
-  const dir = join(root, ".deploy-tmp", "gh-secrets");
+  const dir = projectPath(".deploy-tmp", "gh-secrets");
   mkdirSync(dir, { recursive: true });
   const files = {
     "tweetnacl.js": "https://unpkg.com/tweetnacl@1.0.3/nacl-fast.min.js",

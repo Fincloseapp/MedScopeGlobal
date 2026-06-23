@@ -21,7 +21,7 @@ export function SubscriptionTrialBanner() {
         </p>
         <p className="max-w-2xl text-sm text-white/90 sm:text-base">
           Vyzkoušejte plný přístup ke všem funkcím bez rizika. Platbu kartou zadáte až po skončení
-          zkušební doby — kdykoli zrušíte v účtu.
+          zkušební doby — kdykoli zrušíte v účtu nebo ve Stripe zákaznickém portálu.
         </p>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { isGroqConfigured } from "@/lib/ai/groq";
+import { MEDSCOPE_PROJECT_ROOT } from "@/lib/config/paths";
 
 export const V18_VERSION = "V18.0.0";
 
@@ -25,7 +26,7 @@ export type V18HealthResult = {
   };
 };
 
-export function runV18Healthcheck(root = process.cwd()): V18HealthResult {
+export function runV18Healthcheck(root = MEDSCOPE_PROJECT_ROOT): V18HealthResult {
   const missing = V18_ROUTES.filter((rel) => !existsSync(join(root, rel)));
   const routesOk = missing.length === 0;
   const groqOk = isGroqConfigured();

@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { MEDSCOPE_LOGO_SOURCE } from "../lib/config/paths.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -47,17 +48,37 @@ function runTsc() {
   return true;
 }
 
-const steps = [
-  ["env:verify", "scripts/verify-env.mjs"],
-  ["verify-v17-skeleton", "scripts/verify-v17-skeleton.mjs"],
-  ["verify-acp", "scripts/verify-acp.mjs"],
-  ["verify-clinical-safety", "scripts/verify-clinical-safety.mjs"],
-  ["verify-v6-api-routes", "scripts/verify-v6-api-routes.mjs"],
-];
-
 console.log("\n=== Pre-deploy gates ===\n");
 
-let ok = runTsc();
+const isVercel = process.env.VERCEL === "1";
+const isCI = process.env.GITHUB_ACTIONS === "true";
+const hasCronSecret = (process.env.CRON_SECRET ?? "").length >= 16;
+const logoSource = MEDSCOPE_LOGO_SOURCE;
+const canSyncLogos = existsSync(logoSource) || (!isVercel && !isCI);
+
+const steps = [
+  ...(canSyncLogos ? [["sync-logos", "scripts/sync-logos.mjs"]] : []),
+  ["validate-logos", "scripts/validate-logos.mjs"],
+  ...(hasCronSecret
+    ? [
+        ["env:verify", "scripts/verify-env.mjs"],
+        ["verify-v17-skeleton", "scripts/verify-v17-skeleton.mjs"],
+        ["verify-acp", "scripts/verify-acp.mjs"],
+        ["verify-clinical-safety", "scripts/verify-clinical-safety.mjs"],
+      ]
+    : []),
+  ["verify-v6-api-routes", "scripts/verify-v6-api-routes.mjs"],
+  ["verify-academy-v35-skeleton", "scripts/verify-academy-v35-skeleton.mjs"],
+];
+
+if (isVercel && !canSyncLogos) {
+  console.log("(Vercel) logo source unavailable — using committed assets in public/assets/logo/\n");
+}
+if (isCI && !hasCronSecret) {
+  console.log("(CI) CRON_SECRET not set — skipping cron env gates\n");
+}
+
+let ok = isCI ? true : runTsc();
 for (const [label, script] of steps) {
   ok = runStep(label, script) && ok;
 }

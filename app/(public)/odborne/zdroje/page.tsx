@@ -10,7 +10,7 @@ export default async function OdborneZdrojePage() {
 
   return (
     <ModulePageShell
-      eyebrow="V5+ Evidence"
+      eyebrow="Evidence Engine"
       title="Ověřené zdroje"
       description="PubMed, PMC, FDA, EMA, SÚKL — registry medical_sources."
     >

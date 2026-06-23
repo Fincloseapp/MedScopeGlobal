@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { V20_UI_VERSION } from "@/lib/v20/version";
 
 export function V20HomeHero() {
   return (
@@ -9,7 +8,7 @@ export function V20HomeHero() {
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:py-18">
         <div className="max-w-3xl">
           <p className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-            Český odborný medicínský portál · {V20_UI_VERSION}
+            Český odborný medicínský portál
           </p>
           <h1 className="mt-5 font-display text-4xl font-bold tracking-tight text-[#021d33] sm:text-5xl">
             Medicína s důrazem na evidenci a praxi

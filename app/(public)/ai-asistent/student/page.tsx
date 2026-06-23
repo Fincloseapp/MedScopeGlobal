@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function AiAsistentStudentPage() {
   return (
     <ModulePageShell
-      eyebrow="MedScope v27 · Studenti"
+      eyebrow="AI asistent · Studenti"
       title="AI tutor"
       description="Studijní pomocník pro studenty medicíny — anatomie, farmakologie, modelové otázky."
     >

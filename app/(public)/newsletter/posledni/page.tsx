@@ -1,32 +1,39 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
-import { getLatestNewsletter } from "@/lib/queries/v4c/newsletters";
+import { JsonLdScript } from "@/components/seo/json-ld-script";
+import { V23NewsletterIssueView } from "@/components/v23/newsletter-issue-view";
+import { medicalWebPageJsonLd } from "@/lib/seo/json-ld";
+import { getV22LatestNewsletter } from "@/lib/v22/newsletter";
+import {
+  buildNewsletterPageMetadata,
+  newsletterIssueDescription,
+  newsletterIssueTitle,
+} from "@/lib/v23/newsletter/page-meta";
+
+export const revalidate = 3600;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const issue = await getV22LatestNewsletter();
+  return buildNewsletterPageMetadata(issue, "/newsletter/posledni");
+}
 
 export default async function NewsletterPosledniPage() {
-  const issue = await getLatestNewsletter();
+  const issue = await getV22LatestNewsletter();
+  const pageTitle = newsletterIssueTitle(issue);
+  const description = newsletterIssueDescription(issue);
+
+  const ld = medicalWebPageJsonLd({
+    title: pageTitle,
+    description,
+    path: "/newsletter/posledni",
+  });
 
   return (
-    <ModulePageShell eyebrow="Newsletter" title="Poslední vydání" description="HTML přehled a textová PDF verze.">
-      {!issue ? (
-        <p className="text-sm text-slate-600">
-          Zatím žádné vydání. Spusťte <code>/api/cron/newsletter-generate?secret=…</code>
-        </p>
-      ) : (
-        <div className="rounded-2xl border border-[#cfe1f3] bg-white p-6">
-          <h2 className="font-display text-2xl font-semibold">{issue.title}</h2>
-          <p className="text-sm text-slate-500 mt-1">{issue.issue_date}</p>
-          {issue.html_content ? (
-            <div className="prose prose-slate mt-6 max-w-none" dangerouslySetInnerHTML={{ __html: issue.html_content }} />
-          ) : null}
-          {issue.pdf_text ? (
-            <details className="mt-8">
-              <summary className="cursor-pointer text-sm font-semibold text-[#005B96]">PDF text (náhled)</summary>
-              <pre className="mt-2 whitespace-pre-wrap text-xs bg-slate-50 p-4 rounded-xl">{issue.pdf_text}</pre>
-            </details>
-          ) : null}
-        </div>
-      )}
-      <Link href="/newsletter" className="mt-6 inline-block text-sm text-[#005B96]">
+    <ModulePageShell eyebrow="MedScopeGlobal Newsletter" title={pageTitle} description={description}>
+      <JsonLdScript data={ld} />
+      <V23NewsletterIssueView issue={issue} />
+      <Link href="/newsletter" className="mt-6 inline-block text-sm font-medium text-primary hover:underline">
         ← Newsletter
       </Link>
     </ModulePageShell>

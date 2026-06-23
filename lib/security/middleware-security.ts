@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getClientIp } from "@/lib/security/client-ip";
-import { checkPublicPageRateLimit } from "@/lib/security/rate-limit";
+import {
+  checkPublicPageRateLimit,
+  isNextJsSubRequest,
+  isRateLimitExemptPath,
+} from "@/lib/security/rate-limit";
 import { shouldBlockScraper } from "@/lib/security/scraper-filter";
 import { logSecurityEvent } from "@/lib/security/security-log";
 
@@ -25,9 +29,10 @@ export async function applySecurityMiddleware(
   if (
     !pathname.startsWith("/api/") &&
     !pathname.startsWith("/admin") &&
-    !pathname.startsWith("/_next")
+    !isRateLimitExemptPath(pathname) &&
+    !isNextJsSubRequest(request)
   ) {
-    const limit = await checkPublicPageRateLimit(ip);
+    const limit = await checkPublicPageRateLimit(ip, pathname);
     if (!limit.ok) {
       await logSecurityEvent({
         ip,

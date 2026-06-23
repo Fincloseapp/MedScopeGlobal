@@ -2,6 +2,8 @@ import { generateJsonFromLlm, isLlmConfigured } from "@/lib/ai/chat-json";
 import { CATEGORY_SLUGS_FOR_AI } from "@/lib/ingestion/sources";
 import type { ContentAccessLevel } from "@/lib/config/access-levels";
 import type { IngestionRubric } from "@/lib/ingestion/sources";
+import { buildV26StructurePrompt, buildBlocklistPrompt } from "@/lib/v26/editorial-standard";
+import { rewriteToV26Standard } from "@/lib/v26/rewrite-engine";
 
 export interface ProcessedArticle {
   title: string;
@@ -13,8 +15,11 @@ export interface ProcessedArticle {
   locale: string;
 }
 
-export { resolveOpenAiKey } from "@/lib/ai/openai-key";
 export { isLlmConfigured as isAiConfigured } from "@/lib/ai/chat-json";
+
+function defaultAccessLevelFromInput(level: ContentAccessLevel): "public" | "student" | "physician" {
+  return level;
+}
 
 function ingestionTargetLocale(): string {
   return (process.env.INGESTION_LOCALE ?? process.env.DEFAULT_SITE_LOCALE ?? "cs")
@@ -37,7 +42,10 @@ export async function processWithAi(input: {
 
   const categories = CATEGORY_SLUGS_FOR_AI.join(", ");
 
-  const system = `You are the MedScopeGlobal medical editorial AI. Produce evidence-based, accurate summaries for clinicians and students. Never invent study data. If the source is insufficient, state limitations clearly. Output valid JSON only.`;
+  const system = `You are the MedScopeGlobal medical editorial AI (v26). Produce evidence-based, accurate summaries for clinicians and students. Never invent study data. If the source is insufficient, state limitations clearly.
+${buildV26StructurePrompt(defaultAccessLevelFromInput(input.defaultAccessLevel))}
+${buildBlocklistPrompt()}
+Output valid JSON only.`;
 
   const user = `Source: ${input.sourceName}
 URL: ${input.sourceUrl}
@@ -53,7 +61,7 @@ Return JSON:
 {
   "title": "clear headline",
   "excerpt": "2-3 sentences",
-  "content": "HTML article body with h2 sections: Key findings, Clinical relevance, Limitations, Source. Use <p><ul><li>. Include attribution link.",
+  "content": "HTML article body with v26 h2 sections: Úvod, Proč na tom záleží právě teď, Co si odnést do praxe, Závěr. Use <p><ul><li>. Include attribution link.",
   "categorySlug": "slug",
   "rubricSlug": "${input.defaultRubric}",
   "minAccessLevel": "public|student|physician",
@@ -67,7 +75,7 @@ Write the entire article (title, excerpt, content) in the language matching loca
     if (!raw) return fallbackProcess(input);
 
     const parsed = JSON.parse(raw) as ProcessedArticle;
-    return {
+    const base: ProcessedArticle = {
       title: parsed.title?.slice(0, 300) ?? input.title,
       excerpt: parsed.excerpt?.slice(0, 500) ?? input.description.slice(0, 280),
       content: parsed.content ?? fallbackProcess(input).content,
@@ -83,6 +91,26 @@ Write the entire article (title, excerpt, content) in the language matching loca
         ? parsed.minAccessLevel
         : input.defaultAccessLevel,
       locale: parsed.locale ?? ingestionTargetLocale(),
+    };
+
+    const v26 = await rewriteToV26Standard({
+      title: base.title,
+      excerpt: base.excerpt,
+      content: base.content,
+      audience: base.minAccessLevel,
+      sourceCitation: {
+        name: input.sourceName,
+        url: input.sourceUrl,
+        originalTitle: input.title,
+      },
+      seed: input.sourceUrl,
+    });
+
+    return {
+      ...base,
+      title: v26.title,
+      excerpt: v26.excerpt,
+      content: v26.content,
     };
   } catch (e) {
     console.error("AI process failed", e);

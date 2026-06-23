@@ -15,7 +15,9 @@ export async function GET(request: Request) {
 
   try {
     const result = await runV4cDailyIngest();
-    return NextResponse.json({ ok: true, result });
+    const { runImagesFetch } = await import("@/lib/v25/runners/images");
+    const images = await runImagesFetch({ maxGenerate: 12 });
+    return NextResponse.json({ ok: true, result, images });
   } catch (e) {
     return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });
   }

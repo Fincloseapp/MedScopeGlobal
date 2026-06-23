@@ -1,5 +1,6 @@
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import type { PublicTopic } from "@/lib/queries/verejnost";
+import { inferMedicalCategorySlug } from "@/lib/i18n/category-normalize";
 import { VEREJNOST_FALLBACK_COVER } from "@/lib/verejnost/images";
 
 type SeedArticle = {
@@ -158,8 +159,13 @@ export async function seedPublicArticlesIfEmpty(): Promise<{ seeded: number; ski
 
   if ((count ?? 0) > 0) return { seeded: 0, skipped: true };
 
-  const { data: cat } = await admin.from("categories").select("id").limit(1).maybeSingle();
-  if (!cat?.id) return { seeded: 0, skipped: false };
+  const { data: categories } = await admin.from("categories").select("id, slug");
+  const categoryBySlug = new Map((categories ?? []).map((c) => [c.slug, c.id as string]));
+  if (categoryBySlug.size === 0) return { seeded: 0, skipped: false };
+
+  const fallbackCategoryId =
+    categoryBySlug.get("general-practice") ?? [...categoryBySlug.values()][0] ?? null;
+  if (!fallbackCategoryId) return { seeded: 0, skipped: false };
 
   let authorId = process.env.INGESTION_AUTHOR_ID ?? null;
   if (!authorId) {
@@ -175,13 +181,21 @@ export async function seedPublicArticlesIfEmpty(): Promise<{ seeded: number; ski
     const { data: existing } = await admin.from("articles").select("id").eq("slug", article.slug).maybeSingle();
     if (existing?.id) continue;
 
+    const categorySlug = inferMedicalCategorySlug({
+      title: article.title,
+      excerpt: article.excerpt,
+      public_topic: article.public_topic,
+      keywords: article.keywords,
+    });
+    const categoryId = categoryBySlug.get(categorySlug) ?? fallbackCategoryId;
+
     const { error } = await admin.from("articles").insert({
       title: article.title,
       slug: article.slug,
       excerpt: article.excerpt,
       content: article.content,
       cover_image_url: article.cover_image_url ?? null,
-      category_id: cat.id,
+      category_id: categoryId,
       author_id: authorId,
       published: true,
       published_at: now,

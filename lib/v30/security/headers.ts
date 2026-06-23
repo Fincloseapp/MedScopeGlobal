@@ -1,8 +1,10 @@
 import type { NextResponse } from "next/server";
 
+const isProd = process.env.NODE_ENV === "production" && process.env.VERCEL_ENV !== "preview";
+
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://vercel.live",
+  `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"} https://js.stripe.com https://vercel.live`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://images.unsplash.com https://source.unsplash.com https://*.supabase.co https: http:",
   "font-src 'self' data:",

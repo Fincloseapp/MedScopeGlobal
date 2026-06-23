@@ -73,9 +73,9 @@ export function V27AudienceGrid() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
       <div className="mb-8 text-center">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-          MedScope v27
-        </p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
+            MedScopeGlobal
+          </p>
         <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
           Tři cílové skupiny, jedna platforma
         </h2>

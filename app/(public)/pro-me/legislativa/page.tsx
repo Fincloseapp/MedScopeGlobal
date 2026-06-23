@@ -11,7 +11,7 @@ export default async function ProMeLegislativaPage() {
   const items = await getPersonalizedFeed("legislativa");
   return (
     <ModulePageShell
-      eyebrow="V6 · Personalizace"
+      eyebrow="Personalizace"
       title="Feed — legislativa"
       description="MZČR, SÚKL, EMA, FDA — legislativní monitoring a alerty."
     >

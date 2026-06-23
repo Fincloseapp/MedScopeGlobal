@@ -1,0 +1,9 @@
+Contact: mailto:support@medscopeglobal.com
+Contact: https://medscopeglobal.com/kontakt
+Expires: 2027-06-23T23:59:59.000Z
+Preferred-Languages: cs, en
+Canonical: https://medscopeglobal.com/.well-known/security.txt
+Policy: https://medscopeglobal.com/gdpr
+
+# MedScopeGlobal security disclosure
+# Please report vulnerabilities responsibly. Do not test against production without permission.

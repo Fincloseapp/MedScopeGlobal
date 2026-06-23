@@ -9,7 +9,7 @@ export const revalidate = 120;
 
 export const metadata: Metadata = buildV20PageMetadata({
   title: "Kvízy a studijní hry",
-  description: "Medicínské kvízy — farmakologie, anatomie, klinické scénáře. Česká verze MedScopeGlobal v24.",
+  description: "Medicínské kvízy — farmakologie, anatomie, klinické scénáře v češtině.",
   path: "/kvizy",
 });
 
@@ -24,7 +24,7 @@ export default async function KvizyPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
       <h1 className="font-display text-3xl font-semibold text-[#021d33]">Kvízy a studijní hry</h1>
-      <p className="mt-2 text-slate-600">v24.0 — příprava na LF a klinickou praxi.</p>
+      <p className="mt-2 text-slate-600">Příprava na LF a klinickou praxi.</p>
       <ul className="mt-8 space-y-4">
         {quizzes.map((q) => (
           <li key={q.slug}>

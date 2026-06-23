@@ -41,10 +41,17 @@ const ROUTES = [
   "/api/v25/health",
 ];
 
+const BROWSER_UA =
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 MedScopeSmoke/1.0";
+
 async function checkRoute(route) {
   const url = `${base}${route}`;
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(30_000), redirect: "follow" });
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(30_000),
+      redirect: "follow",
+      headers: { "User-Agent": BROWSER_UA },
+    });
     const text = await res.text();
     const appErr = /Application error|Internal Server Error/i.test(text.slice(0, 3000));
     const ok = res.status >= 200 && res.status < 400 && !appErr;
@@ -58,7 +65,10 @@ async function checkV26Health() {
   const r = await checkRoute("/api/v26/health");
   if (!r.ok) return r;
   try {
-    const res = await fetch(`${base}/api/v26/health`, { signal: AbortSignal.timeout(15_000) });
+    const res = await fetch(`${base}/api/v26/health`, {
+      signal: AbortSignal.timeout(15_000),
+      headers: { "User-Agent": BROWSER_UA },
+    });
     const json = await res.json();
     return { ...r, ok: json.ok === true && String(json.version).startsWith("26"), version: json.version };
   } catch (e) {
@@ -76,11 +86,10 @@ for (const route of ROUTES) {
   console.log(r.ok ? `OK ${r.status}` : `FAIL ${r.status ?? "err"} ${r.error ?? ""}`);
 }
 
-// Homepage version check
+// Public UI no longer embeds version badges (audit remediation) — functional routes only.
 const home = results.find((r) => r.route === "/");
 if (home?.text && !home.text.includes(versionConfig.ui)) {
-  home.ok = false;
-  console.log(`✗ Homepage missing expected version ${versionConfig.ui}`);
+  console.log(`○ Homepage version string ${versionConfig.ui} not in HTML (OK after audit UI cleanup)`);
 }
 
 const failed = results.filter((r) => !r.ok);

@@ -34,7 +34,7 @@ export async function V19ArticleBriefFeed({
 
 /** Client lazy-loaded feed with skeleton + infinite scroll. */
 export function V19ArticleBriefFeedLazy({
-  title = "MedScope v19 — odborné briefy",
+  title = "Odborné briefy",
   limit = 6,
   locale = "auto",
 }: {

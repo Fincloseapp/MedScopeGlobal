@@ -3,11 +3,9 @@
  * Backs up to .env.local.bak, comments invalid keys, adds placeholder.
  */
 import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import { projectPath } from "../lib/config/paths.mjs";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const envPath = path.join(__dirname, "..", ".env.local");
+const envPath = projectPath(".env.local");
 
 function isValidOpenAiKey(v) {
   const k = (v ?? "").trim();

@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
-import { V4cContentCard } from "@/components/v4c/content-card";
+import { DrugNewsListCard } from "@/components/v4c/drug-news-list-card";
+import { LekySubpageNav } from "@/components/v4c/leky-subpage-nav";
 import { getDrugNewsList } from "@/lib/queries/v4c/drug-news";
-import { DRUG_AGENCIES } from "@/lib/v4c/sources";
+import { DrugSourceAttribution } from "@/components/v4c/drug-source-attribution";
+import { buildV20PageMetadata } from "@/lib/v20/seo";
 
-export const metadata: Metadata = {
-  title: "Lékové novinky",
+export const revalidate = 120;
+
+export const metadata: Metadata = buildV20PageMetadata({
+  title: "Lékové novinky — MedScopeGlobal",
   description: "Nové, schválené a připravované léky — EMA, FDA, SÚKL.",
-};
+  path: "/leky/novinky",
+});
 
 export default async function LekyNovinkyPage() {
   const all = await getDrugNewsList();
@@ -18,29 +22,25 @@ export default async function LekyNovinkyPage() {
       eyebrow="Léky"
       title="Novinky o lécích"
       description="Monitoring EMA, FDA, SÚKL — registrace, SPC, úhrady, klinické studie."
-      ctaHref="/ai/leky"
-      ctaLabel="AI léky"
+      ctaHref="/leky"
+      ctaLabel="Hub léky"
     >
-      <div className="flex gap-2 text-sm mb-6">
-        {["new", "approved", "pipeline"].map((st) => (
-          <span key={st} className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96] capitalize">
-            {st === "new" ? "Nové" : st === "approved" ? "Schválené" : "Připravované"}
-          </span>
-        ))}
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        {all.map((d) => (
-          <V4cContentCard
-            key={d.id}
-            href={`/leky/novinky/${d.slug}`}
-            title={d.title}
-            meta={[d.agency, d.drug_name, d.published_date].filter(Boolean).join(" · ")}
-            summary={d.summary}
-            badge={d.status}
-          />
-        ))}
-      </div>
-      <p className="mt-8 text-xs text-slate-500">{DRUG_AGENCIES.map((a) => a.name).join(" · ")}</p>
+      <LekySubpageNav current="novinky" />
+      {all.length ? (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {all.map((d) => (
+            <DrugNewsListCard key={d.id} item={d} />
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+          <p>První synchronizace z oficiálních zdrojů proběhne automaticky během dne.</p>
+          <p className="mt-2 text-xs">
+            SÚKL, EMA a FDA — monitoring přes denní CRON medscopeglobal.com.
+          </p>
+        </div>
+      )}
+      <DrugSourceAttribution className="mt-8" />
     </ModulePageShell>
   );
 }
