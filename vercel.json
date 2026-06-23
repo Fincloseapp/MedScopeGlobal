@@ -1,6 +1,6 @@
-{
+﻿{
   "buildCommand": "npm run build",
-  "installCommand": "npm ci",
+  "installCommand": "npm install --no-audit --no-fund",
   "framework": "nextjs",
   "env": {
     "INGESTION_LOCALE": "cs",
@@ -72,4 +72,5 @@
     }
   ]
 }
+
 
