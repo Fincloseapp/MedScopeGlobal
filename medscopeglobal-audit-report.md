@@ -975,9 +975,22 @@ Referrer-Policy: strict-origin-when-cross-origin
 | /privacy | 200 | GDPR |
 | /login | 200 | Přihlášení |
 | /odborna | 200 | Paywall + ČLK |
-| /hledat | 404 | Chybí |
-| /o-nas | 404 | Chybí |
+| /hledat | 200 | Funkční vyhledávání (opraveno 23. 6. 2026) |
+| /o-nas | 200 | O nás stránka (opraveno 23. 6. 2026) |
 
 ---
 
-*Report vygenerován autonomním testovacím systémem — 22. 6. 2026*
+## POST-AUDIT STATUS (23. 6. 2026)
+
+Paralelní implementace po auditu — shrnutí:
+
+| Oblast | Stav |
+|--------|------|
+| **Produkce** | Všechny klíčové trasy HTTP **200** (homepage, segmenty, Academy, `/predplatne`, `/hledat`, `/o-nas`, `/api/health`) |
+| **Git** | Větev `fix/checkout-predplatne-ctas` — lokálně `3e19d9c`, `origin` na `9ca3a0f`; čeká merge + deploy |
+| **Stripe checkout** | Napojeno — `POST /api/v27/checkout`, alias `/api/stripe/checkout`, `V27CheckoutButton` na `/predplatne` |
+| **v2 backlog** | CSP hardening, Lighthouse CI, DB content backfill, PubMed live feed, CME/ČLK, marketing (referral, exit-intent) — viz `FULL_AUDIT_IMPLEMENTATION_REPORT.md` §7b |
+
+---
+
+*Report vygenerován autonomním testovacím systémem — 22. 6. 2026. Post-audit status doplněn 23. 6. 2026.*

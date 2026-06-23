@@ -1,6 +1,6 @@
 ﻿# MedScopeGlobal — Zpráva o implementaci full auditu
 
-**Datum:** 23. června 2026  
+**Datum:** 23. června 2026 (aktualizováno po paralelních úkolech)  
 **Pracovní kopie:** `D:\medscopeglobal`  
 **Repozitář:** [Fincloseapp/MedScopeGlobal](https://github.com/Fincloseapp/MedScopeGlobal)  
 **Zdroj auditu:** `medscopeglobal-audit-report.md` (22 agentních person, 22. 6. 2026)  
@@ -10,9 +10,15 @@
 
 ## 1. Shrnutí pro vedení
 
-Po auditu webu medscopeglobal.com proběhla koordinovaná implementace doporučení v lokální větvi `main`. Většina změn z auditu je v commitech `609c511`, `88e3ca9` a `20f43da`. Produkční doména **odpovídá** (HTTP 200, `/api/health` vrací `ok: true`).
+Po auditu webu medscopeglobal.com proběhla koordinovaná implementace doporučení v lokální větvi `main` a follow-up větvi `fix/checkout-predplatne-ctas`. Auditní commity zahrnují `609c511`, `88e3ca9`, `20f43da`, `9ca3a0f` a `3e19d9c`.
 
-**Stav nasazení:** lokální `main` je **3 commity před** `origin/main` (`2523e7d` → `20f43da`). Bez `git push` se nejnovější auditní opravy na GitHub/Vercel automaticky neprojeví. Ověření CI přes `gh run list` **nebylo možné** — CLI není v PATH a bundled `gh` vyžaduje `gh auth login` nebo `GH_TOKEN`.
+**Produkční stav (23. 6. 2026):** všechny klíčové trasy vrací **HTTP 200** — homepage, segmenty (veřejnost, studenti, lékaři), Academy, články, předplatné, studie, AI, B2B, kontakt, `/hledat`, `/o-nas`, login, privacy a `/api/health`.
+
+**Stripe checkout:** napojen — `V27CheckoutButton` na `/predplatne` volá `POST /api/v27/checkout`; alias `POST /api/stripe/checkout` sdílí handler v `lib/stripe/v27-checkout.ts` (commit `3e19d9c`). Success stránka `/checkout/uspesne`.
+
+**Větev `fix/checkout-predplatne-ctas`:** lokální HEAD `3e19d9c` (1 commit před `main`); `origin/fix/checkout-predplatne-ctas` na `9ca3a0f` — checkout wiring pushnut, alias + Phase 1 routes ještě nepushnut. Čeká na merge do `main` a deploy.
+
+**Stav nasazení:** lokální `main` (`9ca3a0f`) a `origin/main` (`b8c360f`) jsou **rozcházené** od společného předka `2523e7d`. Checkout změny nejsou na produkci, dokud neproběhne merge + push + Vercel deploy.
 
 ---
 
@@ -44,7 +50,7 @@ Po auditu webu medscopeglobal.com proběhla koordinovaná implementace doporuče
 - **`/predplatne`** — tři tarify, srovnávací tabulka, FAQ, trust badges (`components/subscription/*`).
 - **Trial konfigurace** — `VIP_TRIAL_DAYS = 14` v `lib/vip.ts`, `lib/v27/config.ts`.
 - **Stripe webhook** — `app/api/stripe/webhook/route.ts` (přítomen).
-- **Stripe checkout (VIP / v27)** — viz sekce 5 (mezera).
+- **Stripe checkout (VIP / v27)** — **hotovo** — viz sekce 5.
 
 ### 2.4 Obsah a kvalita
 
@@ -106,16 +112,18 @@ Hlavní doručené soubory (výběr):
 
 ---
 
-## 5. Stripe a checkout — mezera
+## 5. Stripe a checkout — stav po wiringu
 
 | Endpoint | Stav v `D:\medscopeglobal\app\api` |
 |----------|-------------------------------------|
 | `stripe/webhook` | **Ano** — `app/api/stripe/webhook/route.ts` |
-| `stripe/checkout` | **Ne** — chybí |
-| `v27/checkout` | **Ne** v aktivním `app/api` (existuje kopie v `repo-temp/app/api/v27/checkout/route.ts`) |
+| `v27/checkout` | **Ano** — `app/api/v27/checkout/route.ts` (canonical, commit `9ca3a0f`) |
+| `stripe/checkout` | **Ano** — alias na sdílený handler `lib/stripe/v27-checkout.ts` (commit `3e19d9c`) |
 | `academy/marketplace/checkout` | **Ano** — academy marketplace |
 
-**Závěr:** Hlavní VIP předplatné checkout není v produkční stromě `app/api` jako `stripe/checkout` ani `v27/checkout`. Pro rychlé doplnění stačí přesměrovat nebo zkopírovat handler z `repo-temp` (trial-aware Stripe session). **V tomto follow-upu stub nepřidáván** — záměrně bez over-engineeringu; priorita: sjednotit jednu canonical route a napojit `checkout-button` z `/predplatne`.
+**UI integrace:** `components/v27/checkout-button.tsx` na `/predplatne` — POST `{ kind, productId }` → Stripe Checkout URL s 14denním trialem (`VIP_TRIAL_DAYS`). Success redirect: `/checkout/uspesne`.
+
+**Zbývá ověřit v produkci:** Stripe price IDs v env (`lib/v27/stripe-products.ts`), trial days v Stripe Dashboard, end-to-end platba po deployi checkout větve.
 
 ---
 
@@ -124,13 +132,20 @@ Hlavní doručené soubory (výběr):
 ### 6.1 Git / remote
 
 ```
-Branch: main
-HEAD:   20f43da — fix: pre-deploy gates — tsconfig excludes, sentry stub, v19 duplicate key
-Ahead:  3 commits vs origin/main (609c511, 88e3ca9, 20f43da)
-Remote: git@github.com:Fincloseapp/MedScopeGlobal.git
+Aktivní větev:  fix/checkout-predplatne-ctas
+HEAD (local):   3e19d9c — fix(audit): add Stripe checkout alias and shared handler
+main (local):   9ca3a0f — fix(checkout): wire Stripe v27 checkout API and predplatne CTAs
+origin/fix/checkout-predplatne-ctas: 9ca3a0f (1 commit za lokální větví)
+origin/main:    b8c360f — feat(v5plus): evidence-based AI
+Merge-base:     2523e7d
+Remote:         git@github.com:Fincloseapp/MedScopeGlobal.git
 ```
 
-**Working tree:** mnoho modified + untracked souborů (celá platforma mimo poslední commit). Report commituje **pouze** tento dokument.
+**Větev `fix/checkout-predplatne-ctas` — obsah:**
+- `9ca3a0f` — `V27CheckoutButton`, `/predplatne` CTAs, `app/api/v27/checkout`, `/checkout/uspesne`
+- `3e19d9c` — `app/api/stripe/checkout` alias, `lib/stripe/v27-checkout.ts`, Phase 1 public routes (Academy, veřejnost, AI asistenti, firmy), Supabase migrace, editor's pick skript
+
+**Working tree:** permission warnings na některých `app/(public)/*` cestách (Windows EPERM); checkout soubory commitnuté ve větvi.
 
 ### 6.2 GitHub Actions (`gh`)
 
@@ -142,27 +157,57 @@ Remote: git@github.com:Fincloseapp/MedScopeGlobal.git
 
 - `vercel` / `npx` v PATH: **není** v tomto shellu.
 
-### 6.4 Produkční smoke test (23. 6. 2026)
+### 6.4 Produkční smoke test (23. 6. 2026, aktualizováno)
+
+Všechny klíčové trasy — **HTTP 200** (User-Agent: Mozilla/5.0):
 
 | URL | Výsledek |
 |-----|----------|
-| https://medscopeglobal.com | HTTP **200** |
-| https://medscopeglobal.com/api/health | HTTP **200**, `{"ok":true,"siteUrl":"https://medscopeglobal.com","vercel":true,...}` |
+| `/` | **200** |
+| `/verejnost`, `/studenti`, `/lekari` | **200** |
+| `/academy`, `/articles`, `/predplatne` | **200** |
+| `/studie`, `/aktualni-zpravy`, `/ai` | **200** |
+| `/firmy`, `/kontakt`, `/privacy`, `/login` | **200** |
+| `/hledat`, `/o-nas` | **200** (dříve 404 v auditu) |
+| `/api/health` | **200**, `ok: true` |
 | https://www.medscopeglobal.com | **308** redirect (očekávané) |
 
-**Interpretace:** Aktuálně nasazená produkce běží na Vercelu. Nejnovější lokální auditní commity **nemusí** být na produkci, dokud neproběhne úspěšný `git push` + CI/deploy.
+**Interpretace:** Produkce na Vercelu je zdravá — žádné 404 na auditních trasách. Checkout wiring (`9ca3a0f` / `3e19d9c`) **není** na produkci, dokud se větev nezmerguje a nedeployuje.
 
 ---
 
 ## 7. Další kroky (prioritizované)
 
-1. **Autentizace a push** — `gh auth login` nebo SSH deploy key; `git push origin main` (bez force push).
-2. **Ověření CI** — `gh run list --limit 5` po pushi; případně `node scripts/check-github-vercel-status.mjs`.
-3. **Stripe checkout** — nasadit jednu route (`app/api/v27/checkout` nebo `app/api/stripe/checkout`) a propojit CTA na `/predplatne`.
-4. **Kurátorovat untracked** — rozdělit na logické commity (API, admin, migrace); necommitovat `.env.local`, logy, `.build-tmp`.
+1. **Merge + deploy checkout větve** — `fix/checkout-predplatne-ctas` → `main`, push, Vercel preview, E2E Stripe test.
+2. **Push `3e19d9c`** — `git push origin fix/checkout-predplatne-ctas` (alias + Phase 1 routes).
+3. **Reconcile s `origin/main`** — lokální audit linie vs. `b8c360f` (v5plus); kurátorovaný merge bez force push.
+4. **Ověření CI** — `gh run list --limit 5` po pushi.
 5. **Obsah v DB** — job na přegenerování generických titulků a oříznutých článků.
-6. **Produkční testy** — `npm run test:prod` po deployi.
+6. **Produkční testy** — `npm run test:prod` po deployi checkoutu.
 7. **CSP a výkon** — Lighthouse na homepage, omezit script payload.
+
+---
+
+## 7b. Zbývající položky pro v2 (po Phase 1 auditu)
+
+| Oblast | Položka | Priorita |
+|--------|---------|----------|
+| **Technika** | CSP — odstranit `unsafe-eval` | Vysoká |
+| **Technika** | Lighthouse CI, homepage bundle split / lazy-load | Vysoká |
+| **Technika** | 403 bez User-Agent — politika pro crawlery | Střední |
+| **Technika** | Formální WCAG 2.1 AA audit | Střední |
+| **Monetizace** | Live Stripe trial ověření na produkčních price IDs | Vysoká |
+| **Monetizace** | Exit-intent popup, referral program, annual default A/B | Střední |
+| **Monetizace** | ISIC studentská sleva v checkoutu | Nízká |
+| **Obsah** | Regenerace starých článků s generickými titulky v DB | Vysoká |
+| **Obsah** | Oprava useknutých článků v `/articles` archivu | Vysoká |
+| **Obsah** | Peer-review bios u rozhovorů | Střední |
+| **Lékaři / věda** | Live PubMed feed, ClinicalTrials.gov integrace | Střední |
+| **Lékaři / věda** | CME ČLK akreditace, 30denní trial pro ověřené lékaře | Střední |
+| **Academy** | Prodloužení kurzů (30–60 min), Cermat modelové testy | Střední |
+| **Marketing** | Partner logo bar (LF/FN/pharma), video brand manifesto | Nízká |
+| **UX** | Senior režim (větší písmo), kategorie „Zdraví dětí a rodina“ | Nízká |
+| **Dlouhodobě** | Mobilní app, mezinárodní hreflang, white-label B2B, affiliate | v2+ |
 
 ---
 
@@ -173,6 +218,8 @@ Remote: git@github.com:Fincloseapp/MedScopeGlobal.git
 | `609c511` | feat: česká UX — laik/lékař/vědec, medicína, navigace, sitemap |
 | `88e3ca9` | feat(full-audit): complete implementation of all recommendations + full test + fixes + production deploy |
 | `20f43da` | fix: pre-deploy gates — tsconfig excludes, sentry stub, v19 duplicate key |
+| `9ca3a0f` | fix(checkout): wire Stripe v27 checkout API and predplatne CTAs |
+| `3e19d9c` | fix(audit): add Stripe checkout alias and shared handler (+ Phase 1 routes) |
 
 ---
 
@@ -185,4 +232,4 @@ Remote: git@github.com:Fincloseapp/MedScopeGlobal.git
 
 ---
 
-*Dokument vygenerován jako souhrn implementace full auditu pro MedScopeGlobal. Pro aktualizaci po pushi a CI doplňte sekci 6 o výstup `gh run list`.*
+*Dokument vygenerován jako souhrn implementace full auditu pro MedScopeGlobal. Aktualizováno 23. 6. 2026 po paralelních úkolech (produkční smoke, checkout větev, Stripe wiring, v2 backlog).*
