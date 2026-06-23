@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Search } from "lucide-react";
-import { JsonLdScript } from "@/components/seo/json-ld-script";
-import { breadcrumbJsonLd, searchResultsPageJsonLd } from "@/lib/seo/json-ld";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { normalizeLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -42,15 +40,7 @@ export default async function HledatPage({
       : [];
 
   return (
-    <>
-      <JsonLdScript
-        data={breadcrumbJsonLd([
-          { name: "Domů", href: "/" },
-          { name: "Hledat", href: "/hledat" },
-        ])}
-      />
-      <JsonLdScript data={searchResultsPageJsonLd(query || undefined)} />
-      <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <nav className="mb-6 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-foreground">
           Domů
@@ -104,7 +94,7 @@ export default async function HledatPage({
       <div className="mt-10 space-y-4" aria-live="polite">
         {query.length >= 2 && results.length === 0 && (
           <p className="text-sm text-muted-foreground">
-            Pro dotaz „{query}" nebyly nalezeny žádné články.
+            Pro dotaz „{query}&ldquo; nebyly nalezeny žádné články.
           </p>
         )}
 
@@ -131,6 +121,5 @@ export default async function HledatPage({
         ))}
       </div>
     </div>
-    </>
   );
 }

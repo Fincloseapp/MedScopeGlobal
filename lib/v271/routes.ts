@@ -68,6 +68,84 @@ export const V271_FIRMY_PAGES: Record<string, V271HubPage> = {
   },
 };
 
+export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
+  index: {
+    slug: "",
+    title: "Pro studenty medicíny",
+    description: "Anatomie, farmakologie, testy, příprava na zkoušky a AI tutor.",
+    links: [
+      { label: "Anatomie", href: "/studenti/anatomie", description: "Strukturované výklady a kvízy" },
+      { label: "Farmakologie", href: "/studenti/farmakologie", description: "Léky, mechanismy a interakce" },
+      { label: "Testy a kvízy", href: "/studenti/testy", description: "Modelové otázky a procvičení" },
+      { label: "Chci studovat medicínu", href: "/studenti/chci-studovat", description: "Přijímačky a příprava" },
+      { label: "Zkoušky", href: "/studenti/zkousky", description: "Příprava na zkoušky LF" },
+      { label: "AI tutor", href: "/studenti/ai-tutor", description: "Studentský AI asistent" },
+      { label: "Lékařské fakulty", href: "/studium/univerzity", description: "8 českých LF" },
+      { label: "Studijní plány", href: "/medicina/plany", description: "Harmonogramy 1.–6. ročník" },
+    ],
+    ctaHref: "/predplatne",
+    ctaLabel: "Studentské předplatné 149 Kč",
+  },
+  anatomie: {
+    slug: "anatomie",
+    title: "Anatomie",
+    description: "Výklady, schémata a kvízy pro studenty medicíny.",
+    links: [
+      { label: "Kvízy anatomie", href: "/medicina/hry", description: "Interaktivní procvičení" },
+      { label: "Studijní články", href: "/articles?med_track=studium" },
+      { label: "AI tutor", href: "/studenti/ai-tutor" },
+    ],
+  },
+  farmakologie: {
+    slug: "farmakologie",
+    title: "Farmakologie",
+    description: "Mechanismy účinku, dávkování a klinické souvislosti.",
+    links: [
+      { label: "Léky a SÚKL", href: "/leky" },
+      { label: "Studijní obsah", href: "/medicina/studium" },
+      { label: "AI tutor", href: "/studenti/ai-tutor" },
+    ],
+  },
+  testy: {
+    slug: "testy",
+    title: "Testy a kvízy",
+    description: "Modelové otázky a interaktivní procvičení.",
+    links: [
+      { label: "Kvízy a hry", href: "/medicina/hry" },
+      { label: "Přijímačky", href: "/studenti/chci-studovat" },
+    ],
+  },
+  "chci-studovat": {
+    slug: "chci-studovat",
+    title: "Chci studovat medicínu",
+    description: "Přijímačky, termíny, požadavky a tipy na přípravu.",
+    links: [
+      { label: "Přijímačky", href: "/studium/prijimacky" },
+      { label: "Lékařské fakulty", href: "/studium/univerzity" },
+    ],
+    ctaHref: "/studenti/chci-studovat",
+    ctaLabel: "Začít přípravu",
+  },
+  zkousky: {
+    slug: "zkousky",
+    title: "Zkoušky",
+    description: "Příprava na zkoušky z anatomie, fyziologie a klinických oborů.",
+    links: [
+      { label: "Studijní plány", href: "/medicina/plany" },
+      { label: "Testy", href: "/studenti/testy" },
+      { label: "AI tutor", href: "/studenti/ai-tutor" },
+    ],
+  },
+  "ai-tutor": {
+    slug: "ai-tutor",
+    title: "AI tutor",
+    description: "Studentský AI asistent pro anatomii, farmakologii a zkoušky.",
+    links: [{ label: "Spustit AI tutor", href: "/ai-asistent/student" }],
+    ctaHref: "/ai-asistent/student",
+    ctaLabel: "Zeptej se AI",
+  },
+};
+
 export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
   index: {
     slug: "",
