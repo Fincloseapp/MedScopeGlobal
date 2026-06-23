@@ -4,8 +4,7 @@ import { Providers } from "@/components/providers";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { HREFLANG_LOCALES } from "@/lib/seo/metadata";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
-import { SITE } from "@/lib/config/site";
-import { organizationJsonLd, newsletterJsonLd } from "@/lib/seo/json-ld";
+import { organizationJsonLd, newsletterJsonLd, webSiteJsonLd } from "@/lib/seo/json-ld";
 import "./globals.css";
 
 const inter = Inter({
@@ -31,38 +30,18 @@ export const metadata: Metadata = {
     default: "MedScopeGlobal | Odborný medicínský magazín",
     template: "%s | MedScopeGlobal",
   },
-  description: SITE.description,
-  applicationName: SITE.name,
-  keywords: [
-    "medicína",
-    "zdravotnictví",
-    "studium medicíny",
-    "klinická praxe",
-    "výzkum",
-    "evidence-based medicine",
-    "MedScopeGlobal",
-  ],
-  authors: [{ name: SITE.name, url: SITE.url }],
-  creator: SITE.name,
-  publisher: SITE.name,
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true },
-  },
+  description:
+    "Český odborný magazín pro laiky, studenty medicíny, lékaře a výzkumníky — klinická praxe, výzkum a větev medicíny.",
   openGraph: {
     type: "website",
     locale: "cs_CZ",
     alternateLocale: ["en_US"],
-    siteName: SITE.name,
+    siteName: "MedScopeGlobal",
     url: siteUrl,
-    title: "MedScopeGlobal | Odborný medicínský magazín",
-    description: SITE.description,
   },
   twitter: {
     card: "summary_large_image",
     creator: "@MedScopeGlobal",
-    site: "@MedScopeGlobal",
   },
   alternates: {
     canonical: siteUrl,
@@ -81,11 +60,12 @@ export default async function RootLayout({
   const htmlLang = locale.startsWith("en") ? "en" : locale.split("-")[0];
 
   return (
-    <html lang={htmlLang} suppressHydrationWarning data-site="medscopeglobal">
+    <html lang={htmlLang} suppressHydrationWarning>
       <body
         className={`${inter.variable} ${display.variable} min-h-screen font-sans antialiased`}
       >
         <JsonLdScript data={organizationJsonLd()} />
+        <JsonLdScript data={webSiteJsonLd()} />
         <JsonLdScript data={newsletterJsonLd()} />
         <Providers>{children}</Providers>
       </body>

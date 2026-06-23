@@ -3,11 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleBody } from "@/components/article/article-body";
-import { ArticleTtsButton } from "@/components/article/article-tts-button";
 import { V19ArticleBody } from "@/components/v19/v19-article-body";
 import { V19ArticleJsonLd } from "@/components/v19/v19-article-jsonld";
 import { V19_RUBRIC_SLUG } from "@/lib/v19/dedup";
 import { buildV19SeoMeta } from "@/lib/v19/seo";
+import { SITE } from "@/lib/config/site";
 import { specialtyLabel } from "@/lib/v19/specialties";
 import type { V19Specialty } from "@/lib/v19/types";
 import { ArticleCard } from "@/components/article/article-card";
@@ -27,13 +27,8 @@ import { getDictionary, t } from "@/lib/i18n/get-dictionary";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { ContentRecommendations } from "@/components/recommendations/content-recommendations";
 import { PremiumCta } from "@/components/ux/premium-cta";
-import { ArticleInlineNudge } from "@/components/v38/article-inline-nudge";
-import { resolveConversionCopy } from "@/lib/v38/conversion-engine";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { isFullyOpenExpertArticle } from "@/lib/config/editors-pick";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
-import { listStudentAdCampaignsForArticle } from "@/lib/queries/marketing";
-import { ArticleCtaBlocks } from "@/components/articles/article-cta-blocks";
-import { StudentAdBlocks } from "@/components/student/student-ad-blocks";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -54,11 +49,32 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     article.excerpt ??
     article.title.slice(0, 155) + (article.title.length > 155 ? "…" : "");
 
-  return buildV20PageMetadata({
+  const keywords = v19Meta?.keywords;
+
+  return {
     title: article.title,
     description,
-    path: `/article/${article.slug}`,
-  });
+    keywords,
+    alternates: {
+      canonical: `${SITE.url}/article/${article.slug}`,
+    },
+    openGraph: {
+      title: article.title,
+      description,
+      type: "article",
+      publishedTime: article.published_at ?? undefined,
+      url: `${SITE.url}/article/${article.slug}`,
+      images: article.cover_image_url
+        ? [{ url: article.cover_image_url }]
+        : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description,
+      images: article.cover_image_url ? [article.cover_image_url] : undefined,
+    },
+  };
 }
 
 export default async function ArticlePage({ params }: Props) {
@@ -70,17 +86,11 @@ export default async function ArticlePage({ params }: Props) {
 
   const { user, isVip, accessLevel } = await getReaderContext();
 
-  const [articleGateCopy, articleInlineCopy] = !isVip
-    ? await Promise.all([
-        resolveConversionCopy("article_gate", locale),
-        resolveConversionCopy("article_inline", locale),
-      ])
-    : [null, null];
-
   const minLevel = (article.min_access_level ?? "public") as AccessLevelId;
+  const fullyOpen = isFullyOpenExpertArticle(article);
   const locked =
-    (article.vip_only && !isVip) ||
-    !canAccessContent(accessLevel, minLevel);
+    !fullyOpen &&
+    ((article.vip_only && !isVip) || !canAccessContent(accessLevel, minLevel));
 
   const related =
     article.category_id &&
@@ -93,35 +103,13 @@ export default async function ArticlePage({ params }: Props) {
       locale
     ));
 
-  const articleMeta = article as {
-    med_track?: string | null;
-    study_year?: number | null;
-    student_topic?: string | null;
-  };
-  const isStudentArticle =
-    articleMeta.med_track === "priprava" || articleMeta.med_track === "studium";
-
   let ads: Awaited<ReturnType<typeof getActiveAds>> = [];
   let inlineAds: Awaited<ReturnType<typeof getActiveAds>> = [];
-  let studentCampaigns: Awaited<ReturnType<typeof listStudentAdCampaignsForArticle>> = [];
-
   if (!isVip) {
-    if (isStudentArticle) {
-      studentCampaigns = await listStudentAdCampaignsForArticle({
-        med_track: articleMeta.med_track,
-        study_year: articleMeta.study_year,
-        student_topic: articleMeta.student_topic,
-      });
-    } else {
-      const sidebar = await getActiveAdsByPlacement("article_sidebar", 3);
-      ads = sidebar.length ? sidebar : await getActiveAds();
-      inlineAds = await getActiveAdsByPlacement("article_inline", 1);
-    }
+    const sidebar = await getActiveAdsByPlacement("article_sidebar", 3);
+    ads = sidebar.length ? sidebar : await getActiveAds();
+    inlineAds = await getActiveAdsByPlacement("article_inline", 1);
   }
-
-  const studentBannerAds = studentCampaigns.filter((c) => c.type === "banner").slice(0, 1);
-  const studentInlineAds = studentCampaigns.filter((c) => c.type === "inline").slice(0, 1);
-  const studentSidebarAds = studentCampaigns.filter((c) => c.type === "sidebar").slice(0, 3);
 
   const author = article.users;
   const category = article.categories;
@@ -299,13 +287,7 @@ export default async function ArticlePage({ params }: Props) {
               )}
             </div>
 
-            {studentBannerAds.length > 0 ? (
-              <StudentAdBlocks campaigns={studentBannerAds} variant="banner" />
-            ) : null}
             {inlineAds.length > 0 ? <AdPlacement ads={inlineAds} variant="inline" /> : null}
-            {studentInlineAds.length > 0 ? (
-              <StudentAdBlocks campaigns={studentInlineAds} variant="inline" />
-            ) : null}
 
             <div className="prose-wrapper mt-10 overflow-x-hidden">
               {article.rubric_slug === V19_RUBRIC_SLUG && !locked ? (
@@ -326,30 +308,9 @@ export default async function ArticlePage({ params }: Props) {
                   }}
                 />
               ) : (
-                <>
-                  {!locked ? (
-                    <ArticleTtsButton
-                      title={article.title}
-                      excerpt={article.excerpt ?? article.content.replace(/<[^>]+>/g, " ").slice(0, 2000)}
-                    />
-                  ) : null}
-                  <ArticleBody
-                    html={article.content}
-                    locked={locked}
-                    title={article.title}
-                    gateCopy={articleGateCopy ?? undefined}
-                  />
-                </>
+                <ArticleBody html={article.content} locked={locked} title={article.title} />
               )}
             </div>
-
-            {!isVip && !locked && articleInlineCopy ? (
-              <ArticleInlineNudge copy={articleInlineCopy} />
-            ) : null}
-
-            {!locked ? (
-              <ArticleCtaBlocks articleSlug={article.slug} articleTitle={article.title} />
-            ) : null}
 
             {related && related.length > 0 && (
               <section className="mt-16 border-t pt-10">
@@ -369,11 +330,7 @@ export default async function ArticlePage({ params }: Props) {
 
           <aside className="w-full shrink-0 space-y-6 lg:w-80">
             <PremiumCta locale={locale} />
-            {studentSidebarAds.length > 0 ? (
-              <StudentAdBlocks campaigns={studentSidebarAds} variant="sidebar" />
-            ) : (
-              <AdSlot ads={ads} />
-            )}
+            <AdSlot ads={ads} />
           </aside>
         </div>
       </article>

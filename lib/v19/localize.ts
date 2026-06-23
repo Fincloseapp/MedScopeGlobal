@@ -7,12 +7,12 @@ import {
 import { detectLocaleFromAcceptLanguage } from "@/lib/i18n/detect-locale";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 
-/** v20: primární jazyk čeština. */
+/** v19: undetectable language → English (spec). */
 export function resolveV19Locale(input?: string | null): string {
   if (input && input !== "auto") {
     return primaryArticleLocale(normalizeLocale(input));
   }
-  return "cs";
+  return "en";
 }
 
 export async function resolveV19LocaleFromRequest(
@@ -35,7 +35,7 @@ export async function resolveV19LocaleFromRequest(
     return primaryArticleLocale(detected as LocaleCode);
   }
 
-  return "cs";
+  return "en";
 }
 
 export function languageNameForPrompt(locale: string): string {

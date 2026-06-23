@@ -1,0 +1,15 @@
+﻿b6ff2625 failure fix(prod): remove legacy i18n config, skip middlew
+0e001665 failure fix(api): deploy V6 routes /api/v6/* to production
+143fbfd0 failure feat(v6): nav, pro-me hub, cron log fix, manual au
+2130a9fc failure feat(v6): AI Autopilot ÔÇö monitoring, dashboard, au
+c3cbb2a1 success fix(ai-medical): Groq-first route, block absence/S
+a906b94e success fix(ops): migration retry on 503 + verify V5+ tabl
+865a20ab success fix(ai): V5+ Groq-first ÔÇö Supabase excuse filter, 
+1411be7f success feat(ai-medical): AI Medical Intelligence module
+e180e107 success feat(ai-medical): AI Medical Intelligence module
+2c89cd99 success feat(ai-medical): AI Medical Intelligence module
+7922f78e success feat(ai-medical): AI Medical Intelligence module
+d8dcd1e2 success feat(v4d): odborn├ę AI texty, study_sources, kvalit
+b3e20977 success feat(v4a): security, legal, SEO and UX layers ÔÇö Me
+7166606e failure feat(v4a): security, legal, SEO and UX layers ÔÇö Me
+e3d790a9 failure feat(v4a): security, legal, SEO and UX layers ÔÇö Me

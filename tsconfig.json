@@ -21,6 +21,7 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./*"
@@ -39,11 +40,16 @@
     "supabase/functions",
     "tests",
     "e2e",
-    "mobile",
     ".deploy-tmp",
     ".build-tmp",
     ".tools",
+    "src",
+    "repo-temp",
     "github-production",
-    "repo-temp"
+    "vitest.config.ts",
+    "playwright.config.ts",
+    "prisma.config.ts",
+    "sentry.client.config.ts",
+    "sentry.server.config.ts"
   ]
 }

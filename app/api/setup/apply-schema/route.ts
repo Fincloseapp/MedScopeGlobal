@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { projectPath } from "@/lib/config/paths";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -37,7 +36,7 @@ export async function GET(request: Request) {
   }
 
   const sql = readFileSync(
-    projectPath("supabase/MISSING_PRODUCTION_TABLES.sql"),
+    join(process.cwd(), "supabase/MISSING_PRODUCTION_TABLES.sql"),
     "utf8"
   );
 

@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { normalizeCardExcerpt } from "@/lib/content/excerpt-utils";
+import { isEditorsPickArticle } from "@/lib/config/editors-pick";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
 import type { ArticleWithRelations } from "@/types/database";
 
@@ -18,6 +20,8 @@ export function ArticleCard({ article }: { article: ArticleWithRelations }) {
     });
   const coverMeta = getArticleCoverLabel(article.title, cat?.name);
   const coverStyles = getArticleCoverStyles(article.title, cat?.name);
+  const excerpt = normalizeCardExcerpt(article.excerpt, article.title);
+  const editorsPick = isEditorsPickArticle(article);
 
   return (
     <Card className="group overflow-hidden rounded-[26px] border border-slate-200/80 bg-white/95 shadow-[0_16px_50px_-28px_rgba(2,30,57,0.55)] transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_24px_70px_-28px_rgba(0,91,150,0.6)]">
@@ -76,19 +80,26 @@ export function ArticleCard({ article }: { article: ArticleWithRelations }) {
           )}
         </div>
         <CardContent className="pt-5">
-          {cat && (
-            <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-primary">
-              {cat.name}
-            </p>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {cat && (
+              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-primary">
+                {cat.name}
+              </p>
+            )}
+            {editorsPick ? (
+              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-800 ring-1 ring-emerald-200">
+                Editor&apos;s pick
+              </span>
+            ) : null}
+          </div>
           <h3 className="mt-2 font-display text-xl font-semibold leading-snug text-medical-navy">
             {article.title}
           </h3>
-          {article.excerpt && (
+          {excerpt ? (
             <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
-              {article.excerpt}
+              {excerpt}
             </p>
-          )}
+          ) : null}
         </CardContent>
       </Link>
       <CardFooter className="flex items-center justify-between border-t border-slate-100 bg-slate-50/90 px-5 py-3 text-xs text-muted-foreground">

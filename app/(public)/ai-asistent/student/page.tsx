@@ -2,27 +2,28 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { IntelligenceConsole } from "@/components/ai-medical/intelligence-console";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
-    title: "AI tutor pro studenty | MedScopeGlobal",
-    description: "Anatomie, farmakologie a příprava na zkoušky s AI tutorem.",
-    path: "/ai-asistent/student",
-  });
-}
+export const metadata: Metadata = buildPageMetadata({
+  title: "Student Medical Tutor | MedScopeGlobal",
+  description: "Studentský AI tutor pro anatomii, farmakologii a přípravu na zkoušky LF.",
+  path: "/ai-asistent/student",
+});
 
 export default function AiAsistentStudentPage() {
   return (
     <ModulePageShell
-      eyebrow="AI asistent · Studenti"
-      title="AI tutor"
-      description="Studijní pomocník pro studenty medicíny — anatomie, farmakologie, modelové otázky."
+      eyebrow="Studenti medicíny"
+      title="Student Medical Tutor"
+      description="AI tutor pro anatomii, farmakologii, fyziologii a přípravu na přijímačky a zkoušky."
+      ctaHref="/medicina/studium"
+      ctaLabel="Studijní materiály"
     >
-      <Link href="/ai-asistent" className="mb-4 inline-block text-sm text-[#005B96]">
+      <Link href="/ai-asistent" className="mb-4 inline-block text-sm text-[#005B96] hover:underline">
         ← Všechny asistenti
       </Link>
-      <IntelligenceConsole defaultAssistant="univerzity" title="Studentský AI tutor" />
+
+      <IntelligenceConsole simplified defaultAssistant="univerzity" title="Student Medical Tutor" />
     </ModulePageShell>
   );
 }

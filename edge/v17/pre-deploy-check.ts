@@ -12,7 +12,6 @@ import { validateClinicalSafety } from "@/lib/v17/security/clinical-guardrails";
 import { checkRateLimit } from "@/lib/v17/security/rate-limit";
 import { sanitizeInput } from "@/lib/v17/security/sanitize";
 import { getVersion } from "@/lib/v17/versioning/version";
-import { MEDSCOPE_PROJECT_ROOT } from "@/lib/config/paths";
 
 export type PreDeployCheckResult = {
   ready: boolean;
@@ -20,7 +19,7 @@ export type PreDeployCheckResult = {
   mode: "serverless" | "local";
 };
 
-const root = MEDSCOPE_PROJECT_ROOT;
+const root = process.cwd();
 
 const BLUEPRINT_FILES = [
   "lib/v17/security/sanitize.ts",

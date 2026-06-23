@@ -32,15 +32,3 @@ export async function getUniversityNewsList(tag?: string) {
   }
   return (data ?? []) as UniversityNewsRow[];
 }
-
-export async function getUniversityNewsBySlug(slug: string) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("university_news")
-    .select("*")
-    .eq("slug", slug)
-    .eq("published", true)
-    .maybeSingle();
-  if (error || !data) return null;
-  return data as UniversityNewsRow;
-}

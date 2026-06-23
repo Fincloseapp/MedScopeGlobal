@@ -57,12 +57,5 @@ export function getV19LegalFramework() {
       "vědecké publikace pouze jako shrnutí",
     ],
     allowed: ["odborné shrnutí", "kontext", "edukace", "prevence (obecně)"],
-    nzipDeep: {
-      summaryOnly: true,
-      noTextCopy: true,
-      registryLinking: "metadata-only",
-      crawlScope: "public-pages-only",
-    },
-    gdpr: { personalData: false, lawfulBasis: "legitimate-interest-public-health-info" },
   };
 }

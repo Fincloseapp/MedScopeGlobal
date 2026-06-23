@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { V20ArticleCard } from "@/components/v20/article-card";
+import { ArticleCard } from "@/components/article/article-card";
 import { Button } from "@/components/ui/button";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getArticlesByCategory } from "@/lib/queries/articles";
 import { getCategoryBySlug } from "@/lib/queries/categories";
-import { getV20CategoryBySlug } from "@/lib/v20/categories";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
-import { SITE } from "@/lib/config/site";
-
-export const revalidate = 120;
+import { getServerLocale } from "@/lib/i18n/server-locale";
 
 const PAGE_SIZE = 9;
 
@@ -21,26 +17,35 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const category = await getCategoryBySlug(slug, "cs");
-  const v20 = getV20CategoryBySlug(slug);
-  if (!category) return { title: "Obor" };
-  const desc = v20?.descriptionCs ?? category.description ?? `Články z oboru ${category.name}.`;
-  return buildV20PageMetadata({
-    title: `${category.name} — MedScopeGlobal`,
-    description: desc,
-    path: `/category/${category.slug}`,
-  });
+  const locale = await getServerLocale();
+  const category = await getCategoryBySlug(slug, locale);
+  if (!category) return { title: "Category" };
+  return {
+    title: category.name,
+    description:
+      category.description ??
+      `Articles in ${category.name} from MedScopeGlobal.`,
+    alternates: {
+      canonical: `/category/${category.slug}`,
+    },
+    openGraph: {
+      title: `${category.name} | MedScopeGlobal`,
+      description: category.description ?? undefined,
+      url: `/category/${category.slug}`,
+    },
+  };
 }
 
 export default async function CategoryPage({ params, searchParams }: Props) {
   const { slug } = await params;
   const sp = await searchParams;
-  const category = await getCategoryBySlug(slug, "cs");
-  const v20 = getV20CategoryBySlug(slug);
+  const category = await getCategoryBySlug(slug);
   if (!category) notFound();
 
   const page = Math.max(1, Number(sp.page) || 1);
   const offset = (page - 1) * PAGE_SIZE;
+
+  const locale = await getServerLocale();
   const { isVip, accessLevel } = await getReaderContext();
 
   const { articles, total } = await getArticlesByCategory(
@@ -49,22 +54,21 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     offset,
     isVip,
     accessLevel,
-    "cs"
+    locale
   );
 
-  if (total === 0 && page === 1) notFound();
-
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const desc = v20?.descriptionCs ?? category.description;
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: category.name,
-    description: desc,
-    url: `${SITE.url}/category/${category.slug}`,
-    inLanguage: "cs-CZ",
-    isPartOf: { "@type": "WebSite", name: "MedScopeGlobal", url: SITE.url },
+    description: category.description,
+    url: `/category/${category.slug}`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "MedScopeGlobal",
+    },
   };
 
   return (
@@ -73,41 +77,55 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="v20-category mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-          Odborný obor
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+        <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+          Category
         </p>
-        <h1 className="mt-2 font-display text-4xl font-bold text-[#021d33]">{category.name}</h1>
-        {desc && <p className="mt-4 max-w-3xl text-slate-600">{desc}</p>}
+        <h1 className="mt-2 font-display text-4xl font-bold text-medical-navy">
+          {category.name}
+        </h1>
+        {category.description && (
+          <p className="mt-4 max-w-3xl text-muted-foreground">
+            {category.description}
+          </p>
+        )}
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {articles.map((a) => (
-            <V20ArticleCard key={a.id} article={a} />
+            <ArticleCard key={a.id} article={a} />
           ))}
         </div>
 
         {articles.length === 0 && (
           <p className="mt-8 text-sm text-muted-foreground">
-            V tomto oboru zatím nejsou aktivní články.
+            No published articles in this category yet.
           </p>
         )}
 
         <div className="mt-12 flex items-center justify-between gap-4">
           <Button variant="outline" disabled={page <= 1} asChild={page > 1}>
             {page > 1 ? (
-              <Link href={`/category/${slug}?page=${page - 1}`}>Předchozí</Link>
+              <Link href={`/category/${slug}?page=${page - 1}`}>
+                Previous
+              </Link>
             ) : (
-              <span>Předchozí</span>
+              <span>Previous</span>
             )}
           </Button>
           <p className="text-sm text-muted-foreground">
-            Strana {page} z {totalPages}
+            Page {page} of {totalPages}
           </p>
-          <Button variant="outline" disabled={page >= totalPages} asChild={page < totalPages}>
+          <Button
+            variant="outline"
+            disabled={page >= totalPages}
+            asChild={page < totalPages}
+          >
             {page < totalPages ? (
-              <Link href={`/category/${slug}?page=${page + 1}`}>Další</Link>
+              <Link href={`/category/${slug}?page=${page + 1}`}>
+                Next
+              </Link>
             ) : (
-              <span>Další</span>
+              <span>Next</span>
             )}
           </Button>
         </div>

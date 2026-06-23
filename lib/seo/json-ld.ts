@@ -1,4 +1,3 @@
-import { MEDSCOPE_LOGO } from "@/lib/brand/logo";
 import { SITE } from "@/lib/config/site";
 
 export function organizationJsonLd() {
@@ -9,7 +8,7 @@ export function organizationJsonLd() {
     url: SITE.url,
     description: SITE.description,
     email: SITE.supportEmail,
-    logo: `${SITE.url}${MEDSCOPE_LOGO.transparent}`,
+    logo: `${SITE.url}/og-default.png`,
     contactPoint: [
       {
         "@type": "ContactPoint",
@@ -141,6 +140,33 @@ export function eventJsonLd(event: {
   };
 }
 
+export function webSiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE.name,
+    url: SITE.url,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${SITE.url}/hledat?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+}
+
+export function searchResultsPageJsonLd(query?: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SearchResultsPage",
+    name: query ? `Vyhledávání: ${query}` : "Vyhledávání MedScopeGlobal",
+    url: query ? `${SITE.url}/hledat?q=${encodeURIComponent(query)}` : `${SITE.url}/hledat`,
+    isPartOf: webSiteJsonLd(),
+  };
+}
+
 export function newsletterJsonLd() {
   return {
     "@context": "https://schema.org",
@@ -149,45 +175,6 @@ export function newsletterJsonLd() {
     description: "Odborný medicínský newsletter MedScopeGlobal",
     publisher: organizationJsonLd(),
     url: `${SITE.url}/newsletter`,
-  };
-}
-
-export function medicalWebPageJsonLd(page: {
-  title: string;
-  description: string;
-  path: string;
-  dateModified?: string;
-}) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "MedicalWebPage",
-    name: page.title,
-    description: page.description,
-    url: `${SITE.url}${page.path}`,
-    inLanguage: "cs-CZ",
-    isPartOf: webSiteJsonLd(),
-    dateModified: page.dateModified,
-    publisher: organizationJsonLd(),
-    audience: {
-      "@type": "MedicalAudience",
-      audienceType: "Physician, MedicalStudent, Researcher",
-    },
-  };
-}
-
-export function webSiteJsonLd() {
-  return {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: SITE.name,
-    url: SITE.url,
-    description: SITE.description,
-    inLanguage: "cs-CZ",
-    potentialAction: {
-      "@type": "SearchAction",
-      target: `${SITE.url}/articles?q={search_term_string}`,
-      "query-input": "required name=search_term_string",
-    },
   };
 }
 
@@ -201,48 +188,5 @@ export function breadcrumbJsonLd(items: { name: string; href?: string }[]) {
       name: item.name,
       item: item.href ? `${SITE.url}${item.href}` : undefined,
     })),
-  };
-}
-
-export function courseJsonLd(course: {
-  title: string;
-  slug: string;
-  description?: string | null;
-  lessonCount?: number;
-}) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Course",
-    name: course.title,
-    description: course.description ?? course.title,
-    url: `${SITE.url}/academy/courses/${course.slug}`,
-    provider: organizationJsonLd(),
-    inLanguage: "cs-CZ",
-    hasCourseInstance: {
-      "@type": "CourseInstance",
-      courseMode: "online",
-      courseWorkload: course.lessonCount ? `PT${course.lessonCount}H` : undefined,
-    },
-  };
-}
-
-export function videoObjectJsonLd(video: {
-  title: string;
-  description?: string | null;
-  url: string;
-  thumbnailUrl?: string | null;
-  durationSeconds?: number;
-}) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "VideoObject",
-    name: video.title,
-    description: video.description ?? video.title,
-    contentUrl: video.url,
-    thumbnailUrl: video.thumbnailUrl ?? `${SITE.url}/og-default.png`,
-    duration: video.durationSeconds ? `PT${Math.max(1, video.durationSeconds)}S` : undefined,
-    uploadDate: new Date().toISOString(),
-    inLanguage: "cs-CZ",
-    publisher: organizationJsonLd(),
   };
 }

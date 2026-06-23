@@ -8,8 +8,6 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    env:
-      CRON_SECRET: ${{ secrets.CRON_SECRET }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,8 +17,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9.15.4
 
       - name: Setup Node 20
         uses: actions/setup-node@v4
@@ -40,8 +36,8 @@ jobs:
       - name: Test
         run: pnpm run test
 
-      - name: Validate (v24 structure + gates)
-        run: pnpm run validate
+      - name: Verify V18
+        run: pnpm run verify-v18
 
-      - name: Build (Vercel pipeline mirror)
+      - name: Build
         run: pnpm run build

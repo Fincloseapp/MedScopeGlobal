@@ -69,40 +69,9 @@ export async function persistentRateLimit(
   }
 }
 
-const STATIC_ASSET = /\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|mjs|map|woff2?|ttf|eot)$/i;
-
-/** Paths that should never consume rate-limit budget (health probes, Next assets). */
-export function isRateLimitExemptPath(pathname: string): boolean {
-  if (pathname.startsWith("/_next")) return true;
-  if (STATIC_ASSET.test(pathname)) return true;
-  if (pathname === "/favicon.ico" || pathname === "/robots.txt" || pathname === "/sitemap.xml") {
-    return true;
-  }
-  if (pathname.includes("/health")) return true;
-  return false;
-}
-
-/** Next.js RSC / prefetch sub-requests — one user navigation fans out into many. */
-export function isNextJsSubRequest(request: Request): boolean {
-  if (request.headers.get("rsc") === "1") return true;
-  if (request.headers.get("next-router-prefetch") === "1") return true;
-  if (request.headers.get("next-router-state-tree")) return true;
-  if (request.headers.get("purpose") === "prefetch") return true;
-  return false;
-}
-
-export function isRelaxedPublicPath(pathname: string): boolean {
-  return (
-    pathname === "/" ||
-    pathname.startsWith("/academy") ||
-    pathname.startsWith("/articles") ||
-    pathname.startsWith("/verejnost")
-  );
-}
-
-/** 120 req/min per IP — API routes guarded by withApiGuard */
+/** 10 req/min per IP */
 export async function checkIpRateLimit(ip: string) {
-  return persistentRateLimit(`ip:${ip}`, 120, 60_000);
+  return persistentRateLimit(`ip:${ip}`, 10, 60_000);
 }
 
 /** 100 req/hour per user */
@@ -110,8 +79,7 @@ export async function checkUserRateLimit(userId: string) {
   return persistentRateLimit(`user:${userId}`, 100, 3_600_000);
 }
 
-/** Public HTML navigations — relaxed routes get a higher budget than the rest. */
-export async function checkPublicPageRateLimit(ip: string, pathname: string) {
-  const limit = isRelaxedPublicPath(pathname) ? 300 : 120;
-  return persistentRateLimit(`public:${ip}`, limit, 60_000);
+/** Public page rate limit — 60 req/min per IP */
+export async function checkPublicPageRateLimit(ip: string) {
+  return persistentRateLimit(`public:${ip}`, 60, 60_000);
 }

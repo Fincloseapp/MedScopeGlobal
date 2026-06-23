@@ -3,15 +3,13 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { IntelligenceConsole } from "@/components/ai-medical/intelligence-console";
 import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-disclaimer";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
-    title: "AI asistent pro veřejnost | MedScopeGlobal",
-    description: "Zeptejte se AI o prevenci, výživě, spánku a životním stylu — srozumitelně, bez odborného žargonu.",
-    path: "/ai-asistent/verejnost",
-  });
-}
+export const metadata: Metadata = buildPageMetadata({
+  title: "Public Health Assistant | MedScopeGlobal",
+  description: "Zeptejte se AI o prevenci, výživě, spánku a životním stylu — srozumitelně, bez odborného žargonu.",
+  path: "/ai-asistent/verejnost",
+});
 
 const EXAMPLE_QUESTIONS = [
   "Jak zlepšit kvalitu spánku?",
@@ -23,13 +21,13 @@ export default function AiAsistentVerejnostPage() {
   return (
     <ModulePageShell
       eyebrow="Veřejné zdraví"
-      title="Zeptej se AI — srozumitelné odpovědi o zdraví"
+      title="Public Health Assistant"
       description="Napište dotaz o prevenci, symptomech nebo životním stylu. Odpovědi jsou vzdělávací a nenahrazují návštěvu lékaře."
-      ctaHref="/verejnost/temata"
-      ctaLabel="Najdi svůj problém"
+      ctaHref="/pro-koho/laik-student"
+      ctaLabel="Obsah pro veřejnost"
     >
-      <Link href="/verejnost" className="mb-4 inline-block text-sm text-[#005B96] hover:underline">
-        ← Zpět na veřejnou sekci
+      <Link href="/ai-asistent" className="mb-4 inline-block text-sm text-[#005B96] hover:underline">
+        ← Všechny asistenti
       </Link>
 
       <PublicTrustDisclaimer className="mb-6" />
@@ -43,7 +41,7 @@ export default function AiAsistentVerejnostPage() {
         </ul>
       </div>
 
-      <IntelligenceConsole publicMode title="Veřejný AI asistent" />
+      <IntelligenceConsole simplified defaultAssistant="patient" title="Public Health Assistant" />
     </ModulePageShell>
   );
 }

@@ -1,0 +1,7 @@
+Klinický záznam — testovací dokument v18
+
+Pacient: muž, 42 let
+Příznaky: horečka 38,5 °C, bolesti hlavy, únava od 2 dnů.
+Anamnéza: bez chronických onemocnění.
+Doporučení: sledování teploty, dostatek tekutin, klidový režim.
+Kontrola při zhoršení nebo horečce nad 39 °C.

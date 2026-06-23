@@ -402,7 +402,7 @@ All MedScopeGlobal **project files** were migrated from `C:\Users\zegzulka\MedSc
 |---------|--------|
 | `npm install` | Pass |
 | `npm run typecheck` | Pass |
-| `npm run lint` | Fail — `@next/next` plugin conflict between `repo-temp/.eslintrc.json` and parent `D:\MedScopeGlobal\.eslintrc.json` |
+| `npm run lint` | **Pass** (3 img warnings; parent eslint/lockfile renamed to *.legacy-root) |
 | `npm run build` | Fail — webpack `EISDIR: illegal operation on a directory, readlink` (see filesystem blocker below) |
 
 ### Blockers
@@ -416,3 +416,48 @@ All MedScopeGlobal **project files** were migrated from `C:\Users\zegzulka\MedSc
 Removed: `repo-temp/`, both `*.md` reports, `.tools/`. Did **not** delete Cursor agent transcripts or user profile data.
 
 See **`D:\MedScopeGlobal\README-WORKSPACE.md`** for daily commands and Cursor root path.
+
+
+### Git commit
+- Hash: 9099e7830c7a18fce801eb0286b82c2607b35539
+- Push: not performed
+
+---
+
+## Deploy Pipeline — Completed (2026-06-22)
+
+**Task:** `21cc78e9` (deploy pipeline follow-up)
+
+### ESLint / pre-push gates
+- **Fix:** Parent workspace ESLint config isolated as `D:\MedScopeGlobal\.eslintrc.json.legacy-root` (alongside parent lockfile `*.legacy-root` pattern) so Next.js/ESLint use `repo-temp` as the app root.
+- **`npm run lint`:** **PASS** (3 non-blocking `<img>` warnings only).
+
+### Git
+| Item | Status |
+|------|--------|
+| Commit | `9099e7830c7a18fce801eb0286b82c2607b35539` |
+| Message | Implement audit remediation across public pages and shared components. |
+| Branch | `main` |
+| Push | **Pushed** to `origin/main` (local `main` tracks `origin/main` at `9099e78`) |
+
+### Vercel
+- **Production URL:** https://medscopeglobal.com
+- **Expected:** Git push to `main` triggers Vercel auto-deploy (Fincloseapp/MedScopeGlobal).
+
+### Supabase migration checklist (production)
+- [ ] Apply `supabase/migrations/20260622120000_fix_biologie_prijimacky_duplicate_lessons.sql`
+- [ ] Confirm Academy seed migration `20260618180000_academy_prijimacky_prep_courses.sql` is already applied (or apply if missing)
+- [ ] Smoke-test Academy course lessons (Biologie přijímačky) for duplicate lesson IDs
+- [ ] Run `npm run env:validate` / `production:validate` against production secrets after migration
+- [ ] Stripe: confirm 14-day trial settings in dashboard (per monetization agent scope)
+
+### Live verification (2026-06-23, coordinator follow-up)
+| Check | Result |
+|-------|--------|
+| HTTPS fetch | **200 OK** (~239 KB HTML) |
+| `data-ui-version` / `data-ui-build` on `<html>` | **Still present** (`v29.0` / `v29.0-phase11-finalization-20260617`) — production HTML does not yet reflect layout.tsx removal in commit `9099e78`; confirm Vercel deployment status or CDN cache |
+| `v46` string in document | May appear in embedded RSC payload; public version badges intended removed in source |
+
+### Reports note
+Prior deploy agent run did not write reports due to backend issue; this section appended by deploy follow-up agent.
+

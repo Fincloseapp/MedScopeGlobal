@@ -96,8 +96,6 @@ type V19QuizMeta = {
   scientificTerms?: string[];
   nzipCategory?: NzipCategory;
   nzipRegistryId?: string;
-  nzipGlossaryTerms?: string[];
-  nzipRegistryRefs?: string[];
   publicationRef?: string;
   sourceTier?: V19SourceTier;
   source_name?: string;
@@ -114,8 +112,6 @@ export async function findExistingV19Duplicates(params: {
   specialty?: string;
   nzipCategory?: NzipCategory;
   nzipRegistryId?: string;
-  nzipGlossaryTerms?: string[];
-  nzipRegistryRefs?: string[];
   publicationRef?: string;
   sourceTier?: V19SourceTier;
   maxAgeDays?: number;
@@ -154,24 +150,6 @@ export async function findExistingV19Duplicates(params: {
     const metaRegistry = (meta as V19QuizMeta).nzipRegistryId;
     if (params.nzipRegistryId && metaRegistry === params.nzipRegistryId) {
       return { duplicate: true, reason: "nzip-registry", existingTitle: row.title };
-    }
-
-    const metaRefs = (meta as V19QuizMeta).nzipRegistryRefs ?? [];
-    const incomingRefs = params.nzipRegistryRefs ?? [];
-    if (
-      incomingRefs.length &&
-      incomingRefs.some((r) => metaRefs.includes(r))
-    ) {
-      return { duplicate: true, reason: "nzip-registry-refs", existingTitle: row.title };
-    }
-
-    const metaGlossary = (meta as V19QuizMeta).nzipGlossaryTerms ?? [];
-    const incomingGlossary = params.nzipGlossaryTerms ?? [];
-    if (
-      incomingGlossary.length &&
-      keywordOverlap(incomingGlossary, metaGlossary) >= 0.7
-    ) {
-      return { duplicate: true, reason: "nzip-glossary", existingTitle: row.title };
     }
 
     if (meta?.topic === params.topic && row.source_url === params.sourceUrl) {

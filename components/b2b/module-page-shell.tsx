@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { Button } from "@/components/ui/button";
 
 export function ModulePageShell({
@@ -10,7 +9,6 @@ export function ModulePageShell({
   children,
   ctaHref,
   ctaLabel,
-  showBrandLogo = true,
 }: {
   eyebrow: string;
   title: string;
@@ -18,15 +16,11 @@ export function ModulePageShell({
   children: React.ReactNode;
   ctaHref?: string;
   ctaLabel?: string;
-  showBrandLogo?: boolean;
 }) {
   return (
     <div className="bg-[#fafcff]">
       <section className="border-b border-[#d9e8f4] bg-[radial-gradient(circle_at_top,_rgba(0,91,150,0.1),transparent_30%),linear-gradient(180deg,#fff_0%,#f8fbff_100%)]">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-          {showBrandLogo ? (
-            <MedScopeLogo href="/" preset="header" className="mb-4" />
-          ) : null}
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">{eyebrow}</p>
           <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-[#021d33]">{title}</h1>
           <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-600">{description}</p>

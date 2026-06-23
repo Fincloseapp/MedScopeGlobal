@@ -36,18 +36,8 @@ yarn-error.log*
 # local build/deploy staging (D: only)
 .build-tmp/
 .deploy-tmp/
-.github-production-READY.md
-github-production/
-.npm-cache/
-/repo-temp/
 
 # V17 audit logs (local only)
-
-# Cursor auto-git state (local only)
-.cursor/hooks/.auto-git-*
-.cursor/hooks/auto-git.log
-.scripts/hooks/.auto-git-*
-.scripts/logs/
 .data/
 
 # typescript

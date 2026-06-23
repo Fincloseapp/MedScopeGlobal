@@ -1,9 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createMiddlewareClient } from "@/lib/supabase/middleware";
-import {
-  applyV30SecurityMiddleware,
-  wrapWithSecurityHeaders,
-} from "@/lib/v30/security/middleware";
+import { applySecurityMiddleware } from "@/lib/security/middleware-security";
 import {
   DEFAULT_LOCALE,
   LOCALE_COOKIE,
@@ -11,46 +8,19 @@ import {
   normalizeLocale,
 } from "@/lib/i18n/config";
 import { detectLocaleFromAcceptLanguage } from "@/lib/i18n/detect-locale";
-import { isValidAdminGateCookie, ADMIN_GATE_COOKIE } from "@/lib/auth/admin-gate-config";
-
-function adminGateRedirect(request: NextRequest): NextResponse {
-  const login = new URL("/admin/login", request.url);
-  const redirect = NextResponse.redirect(login);
-  redirect.headers.set(
-    "Cache-Control",
-    "private, no-cache, no-store, must-revalidate"
-  );
-  return redirect;
-}
-
-function requiresAdminGate(pathname: string): boolean {
-  return pathname.startsWith("/admin") && !pathname.startsWith("/admin/login");
-}
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  const securityBlock = await applyV30SecurityMiddleware(request);
+  const securityBlock = await applySecurityMiddleware(request);
   if (securityBlock) return securityBlock;
-
-  if (requiresAdminGate(pathname)) {
-    const gate = request.cookies.get(ADMIN_GATE_COOKIE)?.value;
-    if (!isValidAdminGateCookie(gate)) {
-      return adminGateRedirect(request);
-    }
-  }
-
-  if (pathname === "/stav-systemu") {
-    return NextResponse.redirect(new URL("/admin/system", request.url));
-  }
 
   const { supabase, response } = createMiddlewareClient(request);
 
   const manual = request.cookies.get(LOCALE_MANUAL_COOKIE)?.value === "1";
   const acceptLanguage = request.headers.get("accept-language");
-  // v20: web je výhradně v češtině (bez automatického přepnutí na EN)
-  const autoLocale = DEFAULT_LOCALE;
-  void detectLocaleFromAcceptLanguage(acceptLanguage);
+  const deviceLocale = detectLocaleFromAcceptLanguage(acceptLanguage);
+  // Primární jazyk webu je čeština; angličtina jen pokud ji prohlížeč výslovně preferuje
+  const autoLocale =
+    deviceLocale === "en" || deviceLocale.startsWith("en-") ? deviceLocale : DEFAULT_LOCALE;
 
   if (!manual) {
     const current = request.cookies.get(LOCALE_COOKIE)?.value;
@@ -70,15 +40,23 @@ export async function middleware(request: NextRequest) {
     });
   }
 
-  return wrapWithSecurityHeaders(response);
+  if (supabase) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (request.nextUrl.pathname.startsWith("/admin") && !user) {
+      const login = new URL("/login", request.url);
+      login.searchParams.set("next", request.nextUrl.pathname);
+      return NextResponse.redirect(login);
+    }
+  }
+
+  return response;
 }
 
 export const config = {
   matcher: [
-    "/api/:path*",
-    "/admin",
-    "/admin/:path*",
-    "/stav-systemu",
-    "/((?!_next|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?|ttf|eot)$).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
