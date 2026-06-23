@@ -16,9 +16,11 @@ Po auditu webu medscopeglobal.com proběhla koordinovaná implementace doporuče
 
 **Stripe checkout:** napojen — `V27CheckoutButton` na `/predplatne` volá `POST /api/v27/checkout`; alias `POST /api/stripe/checkout` sdílí handler v `lib/stripe/v27-checkout.ts` (commit `3e19d9c`). Success stránka `/checkout/uspesne`.
 
-**Větev `fix/checkout-predplatne-ctas`:** lokální HEAD `3e19d9c` (1 commit před `main`); `origin/fix/checkout-predplatne-ctas` na `9ca3a0f` — checkout wiring pushnut, alias + Phase 1 routes ještě nepushnut. Čeká na merge do `main` a deploy.
+**Větev `fix/checkout-predplatne-ctas`:** `origin/fix/checkout-predplatne-ctas` = **`3e19d9c`** (Stripe alias + shared handler + Phase 1 routes).
 
-**Stav nasazení:** lokální `main` (`9ca3a0f`) a `origin/main` (`b8c360f`) jsou **rozcházené** od společného předka `2523e7d`. Checkout změny nejsou na produkci, dokud neproběhne merge + push + Vercel deploy.
+**Stav nasazení:** `git push origin main` **selhal** (non-fast-forward). `origin/main` = **`b8c360f`**; lokální auditní `main` = `9ca3a0f` (rozcházeno od `2523e7d`). Checkout kód je na fix větvi; merge do `main` + deploy ještě nutný pro produkční checkout API.
+
+**Editor's pick (5 odborných článků):** Aktualizováno v Supabase (`vip_only=false`, `fully_open=true`) pro 5 slugů. Skript: `scripts/mark-editors-pick-open.mjs`.
 
 ---
 
