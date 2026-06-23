@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -22,35 +22,35 @@ const cardsCs: [GatewayCard, GatewayCard] = [
   {
     id: "verejnost",
     icon: HeartPulse,
-    title: "Pro veřejnost",
-    subtitle: "Zdraví srozumitelně",
+    title: "Pro ve┼Öejnost",
+    subtitle: "Zdrav├ş srozumiteln─Ť",
     description:
-      "Prevence, symptomy, výživa a životní styl — články v češtině, denní tipy a AI asistent pro orientaci ve zdraví.",
+      "Prevence, symptomy, v├Ż┼żiva a ┼żivotn├ş styl ÔÇö ─Źl├ínky v ─Źe┼ítin─Ť, denn├ş tipy a AI asistent pro orientaci ve zdrav├ş.",
     href: "/verejnost",
-    cta: "Vstoupit do sekce veřejnosti",
-    highlights: ["Prevence a symptomy", "Denní zdravotní tip", "Zeptej se AI"],
+    cta: "Vstoupit do sekce ve┼Öejnosti",
+    highlights: ["Prevence a symptomy", "Denn├ş zdravotn├ş tip", "Zeptej se AI"],
     quickLinks: [
-      { href: "/verejnost/temata", label: "Najdi svůj problém", desc: "Témata podle oblasti zdraví" },
-      { href: "/verejnost/clanky", label: "Články pro veřejnost", desc: "Srozumitelné texty bez žargonu" },
-      { href: "/verejnost/osveta", label: "Denní zdravotní tip", desc: "Video s kvízem a body XP" },
-      { href: "/ai-asistent/verejnost", label: "Zeptej se AI", desc: "Prevence — nenahrazuje lékaře" },
+      { href: "/verejnost/temata", label: "Najdi sv┼»j probl├ęm", desc: "T├ęmata podle oblasti zdrav├ş" },
+      { href: "/verejnost/clanky", label: "─îl├ínky pro ve┼Öejnost", desc: "Srozumiteln├ę texty bez ┼żargonu" },
+      { href: "/verejnost/osveta", label: "Denn├ş zdravotn├ş tip", desc: "Video s kv├şzem a body XP" },
+      { href: "/ai-asistent/verejnost", label: "Zeptej se AI", desc: "Prevence ÔÇö nenahrazuje l├ęka┼Öe" },
     ],
   },
   {
     id: "lekar",
     icon: Stethoscope,
-    title: "Pro lékaře",
-    subtitle: "Klinická praxe",
+    title: "Pro l├ęka┼Öe",
+    subtitle: "Klinick├í praxe",
     description:
-      "Guidelines, kazuistiky, klinické postřehy a AI asistent pro každodenní rozhodování v ambulanci i lůžkové péči.",
+      "Guidelines, kazuistiky, klinick├ę post┼Öehy a AI asistent pro ka┼żdodenn├ş rozhodov├ín├ş v ambulanci i l┼»┼żkov├ę p├ę─Źi.",
     href: "/pro-koho/lekar",
-    cta: "Obsah pro lékaře",
-    highlights: ["Klinické postupy", "Guidelines", "Kazuistiky"],
+    cta: "Obsah pro l├ęka┼Öe",
+    highlights: ["Klinick├ę postupy", "Guidelines", "Kazuistiky"],
     quickLinks: [
-      { href: "/professional/clinical-insights", label: "Klinické postřehy", desc: "Praxe a rozhodování" },
-      { href: "/professional/case-reports", label: "Kazuistiky", desc: "Případy z praxe" },
-      { href: "/professional/guidelines", label: "Guidelines", desc: "Doporučené postupy" },
-      { href: "/ai-asistent/lekar", label: "Klinický AI asistent", desc: "Evidence-based podpora" },
+      { href: "/professional/clinical-insights", label: "Klinick├ę post┼Öehy", desc: "Praxe a rozhodov├ín├ş" },
+      { href: "/professional/case-reports", label: "Kazuistiky", desc: "P┼Ö├şpady z praxe" },
+      { href: "/professional/guidelines", label: "Guidelines", desc: "Doporu─Źen├ę postupy" },
+      { href: "/ai-asistent/lekar", label: "Klinick├Ż AI asistent", desc: "Evidence-based podpora" },
     ],
   },
 ];
@@ -62,7 +62,7 @@ const cardsEn: [GatewayCard, GatewayCard] = [
     title: "For the public",
     subtitle: "Health made clear",
     description:
-      "Prevention, symptoms, nutrition and lifestyle — accessible articles, daily tips and a public health AI assistant.",
+      "Prevention, symptoms, nutrition and lifestyle ÔÇö accessible articles, daily tips and a public health AI assistant.",
     href: "/verejnost",
     cta: "Enter public health hub",
     highlights: ["Prevention", "Daily health tip", "Ask AI"],
@@ -122,7 +122,7 @@ function GatewayCardPanel({
       <p className="mt-3 flex-1 text-sm text-slate-600">{card.description}</p>
       <ul className="mt-4 space-y-1.5 text-xs text-slate-500">
         {card.highlights.map((item) => (
-          <li key={item}>• {item}</li>
+          <li key={item}>ÔÇó {item}</li>
         ))}
       </ul>
 
@@ -178,15 +178,15 @@ export function AudienceGateway({ locale }: { locale: LocaleCode }) {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <div className="max-w-2xl">
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
-            {isCs ? "Rychlý vstup" : "Quick entry"}
+            {isCs ? "Rychl├Ż vstup" : "Quick entry"}
           </p>
           <h2 id="audience-gateway-heading" className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
-            {isCs ? "Pro veřejnost i pro lékaře" : "For the public and clinicians"}
+            {isCs ? "Pro ve┼Öejnost i pro l├ęka┼Öe" : "For the public and clinicians"}
           </h2>
           <p className="mt-3 text-sm text-slate-600">
             {isCs
-              ? "Dvě hlavní cesty do portálu — rozbalte rychlé odkazy nebo vstupte přímo do celé sekce."
-              : "Two main paths into the platform — expand quick links or enter the full section."}
+              ? "Dv─Ť hlavn├ş cesty do port├ílu ÔÇö rozbalte rychl├ę odkazy nebo vstupte p┼Ö├şmo do cel├ę sekce."
+              : "Two main paths into the platform ÔÇö expand quick links or enter the full section."}
           </p>
         </div>
 
@@ -197,7 +197,7 @@ export function AudienceGateway({ locale }: { locale: LocaleCode }) {
               card={card}
               expanded={expandedId === card.id}
               onToggleQuickLinks={() => toggle(card.id)}
-              quickLinksLabel={isCs ? "Rychlé odkazy" : "Quick links"}
+              quickLinksLabel={isCs ? "Rychl├ę odkazy" : "Quick links"}
             />
           ))}
         </div>

@@ -67,31 +67,6 @@ export function parseSubscriptionProductId(productId: string): {
   return { tier: tier as V27SubscriptionTier, interval: billing };
 }
 
-/** Expert PDFs — secondary monetization */
-export const V27_EXPERT_PDFS = [
-  { id: "guidelines-pack", name: "Souhrn guidelines 2026", priceCzk: 199 },
-  { id: "diagnostics-algo", name: "Diagnostické algoritmy", priceCzk: 299 },
-  { id: "cme-bundle", name: "CME balíček", priceCzk: 399 },
-] as const;
-
-/** B2B pricing tiers */
-export const V27_B2B_PACKAGES = [
-  { id: "banner", name: "Banner", priceCzk: 5000, desc: "Měsíční rotace banneru" },
-  { id: "sponsored-article", name: "Sponzorovaný článek", priceCzk: 15000, desc: "Editoriální článek" },
-  { id: "enterprise", name: "Enterprise", priceCzk: 0, desc: "Individuální cena" },
-] as const;
-
-export function parseSubscriptionProductId(productId: string): {
-  tier: V27SubscriptionTier;
-  interval: V27BillingInterval;
-} | null {
-  const [tier, interval] = productId.split("-") as [string, string | undefined];
-  const validTiers: V27SubscriptionTier[] = ["public", "student", "physician"];
-  if (!validTiers.includes(tier as V27SubscriptionTier)) return null;
-  const billing: V27BillingInterval = interval === "year" ? "year" : "month";
-  return { tier: tier as V27SubscriptionTier, interval: billing };
-}
-
 export function subscriptionProductId(tier: V27SubscriptionTier, interval: V27BillingInterval): string {
   return interval === "year" ? `${tier}-year` : `${tier}-month`;
 }
