@@ -44,3 +44,36 @@ export async function getDrugNewsBySlug(slug: string) {
   if (error || !data) return null;
   return data as DrugNewsRow;
 }
+
+export async function getDrugNewsFiltered(filters?: {
+  status?: string;
+  agency?: string;
+  sourceId?: string;
+  limit?: number;
+}) {
+  let rows = await getDrugNewsList(filters?.status);
+  if (filters?.agency) {
+    rows = rows.filter((row) => row.agency === filters.agency);
+  }
+  if (filters?.sourceId) {
+    rows = rows.filter(
+      (row) =>
+        row.id === filters.sourceId ||
+        row.source_url?.includes(filters.sourceId ?? "")
+    );
+  }
+  if (filters?.limit) {
+    rows = rows.slice(0, filters.limit);
+  }
+  return rows;
+}
+
+export async function getDrugNewsGroupedByAgency() {
+  const rows = await getDrugNewsList();
+  const grouped: Record<string, DrugNewsRow[]> = {};
+  for (const row of rows) {
+    const key = row.agency?.trim() || "ostatní";
+    (grouped[key] ??= []).push(row);
+  }
+  return grouped;
+}

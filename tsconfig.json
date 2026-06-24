@@ -46,6 +46,7 @@
     "src",
     "repo-temp",
     "github-production",
+    "_wt-*",
     "vitest.config.ts",
     "playwright.config.ts",
     "prisma.config.ts",

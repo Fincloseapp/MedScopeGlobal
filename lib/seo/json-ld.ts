@@ -190,3 +190,19 @@ export function breadcrumbJsonLd(items: { name: string; href?: string }[]) {
     })),
   };
 }
+
+export function medicalWebPageJsonLd(page: {
+  title: string;
+  path: string;
+  description?: string | null;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "MedicalWebPage",
+    name: page.title,
+    description: page.description,
+    url: `${SITE.url}${page.path}`,
+    isPartOf: webSiteJsonLd(),
+    publisher: organizationJsonLd(),
+  };
+}

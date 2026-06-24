@@ -9,6 +9,7 @@ export function ModulePageShell({
   children,
   ctaHref,
   ctaLabel,
+  showBrandLogo: _showBrandLogo,
 }: {
   eyebrow: string;
   title: string;
@@ -16,6 +17,7 @@ export function ModulePageShell({
   children: React.ReactNode;
   ctaHref?: string;
   ctaLabel?: string;
+  showBrandLogo?: boolean;
 }) {
   return (
     <div className="bg-[#fafcff]">
