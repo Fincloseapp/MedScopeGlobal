@@ -402,7 +402,7 @@ export async function getArchivedArticles(
   limit = 24,
   offset = 0,
   isVip = true,
-  accessLevel: AccessLevelId = "physician",
+  accessLevel: AccessLevelId = "professional",
   locale: LocaleCode = "cs"
 ) {
   const supabase = await createClient();
