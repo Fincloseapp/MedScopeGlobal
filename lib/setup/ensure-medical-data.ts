@@ -1,7 +1,7 @@
 import { MEDICAL_CATEGORIES } from "@/lib/config/categories-seed";
 import { CONTENT_TYPE_SPECS } from "@/lib/config/content-types";
 import { getDictionary, t } from "@/lib/i18n/get-dictionary";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 const LEGACY_SLUGS = new Set(["technologie", "lifestyle", "zpravy", "news", "tech"]);
 
@@ -12,7 +12,8 @@ export async function ensureMedicalCategories(): Promise<void> {
   if (seedPromise) return seedPromise;
 
   seedPromise = (async () => {
-    const admin = createServiceRoleClient();
+    const admin = tryCreateServiceRoleClient();
+    if (!admin) return;
     const { data: existing } = await admin.from("categories").select("slug");
 
     const slugs = new Set((existing ?? []).map((c) => c.slug));
@@ -42,7 +43,8 @@ export async function ensureMedicalCategories(): Promise<void> {
 }
 
 export async function ensureContentTypes(): Promise<void> {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return;
   const { error } = await admin.from("rubrics").select("slug").limit(1);
   if (error?.code === "PGRST205") return;
 
