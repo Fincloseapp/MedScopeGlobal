@@ -39,7 +39,6 @@ export function V20StudyDetailView({ study }: { study: V20StudyDisplay }) {
     title: study.titleCs,
     description: study.summaryCs.slice(0, 200),
     path: `/studie/${study.slug}`,
-    dateModified: study.publishedDate,
   });
 
   return (
