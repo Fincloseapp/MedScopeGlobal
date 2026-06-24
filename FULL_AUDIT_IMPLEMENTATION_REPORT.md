@@ -8,11 +8,59 @@
 
 ---
 
+<<<<<<< Updated upstream
 ## 1. Shrnutí pro vedení
 
 Po auditu webu medscopeglobal.com proběhla koordinovaná implementace doporučení v lokální větvi `main`. Většina změn z auditu je v commitech `609c511`, `88e3ca9` a `20f43da`. Produkční doména **odpovídá** (HTTP 200, `/api/health` vrací `ok: true`).
 
 **Stav nasazení:** lokální `main` je **3 commity před** `origin/main` (`2523e7d` → `20f43da`). Bez `git push` se nejnovější auditní opravy na GitHub/Vercel automaticky neprojeví. Ověření CI přes `gh run list` **nebylo možné** — CLI není v PATH a bundled `gh` vyžaduje `gh auth login` nebo `GH_TOKEN`.
+=======
+## 0. Finální stav koordinace (4 paralelní streamy)
+
+| Stream | Stav | Detail |
+|--------|------|--------|
+| **1. Git / PR** | Částečně hotovo | Větev `fix/checkout-predplatne-ctas` @ **`d09695b40`** pushnutá (HTTPS, ověřeno `git ls-remote`) na origin. **PR #7 otevřen:** https://github.com/Fincloseapp/MedScopeGlobal/pull/7 — **`mergeable: false`** (konflikty s `origin/main` @ `f8dc62bc`). `gh` CLI není autentizované; PR ověřen přes GitHub API. |
+| **2. Produkční health** | **OK** | Všechny klíčové trasy **HTTP 200** (viz § 6.4). `/api/health` → `{"ok":true,"vercel":true}`. |
+| **3. Build / typecheck** | Pass (log) | `npm run typecheck` / `tsc --noEmit` — **bez chyb** (`build-typecheck.log`, `typecheck-result.log`). Node/npm nejsou v PATH tohoto shellu; lokální `build:win` vyžaduje `npm install`. |
+| **4. Content / SEO** | Hotovo (Phase 1) | `/hledat`, `/o-nas` live (200). Verze z UI odstraněny v commitnutých souborech. Metadata, breadcrumbs, trial banner na `/predplatne` — v kódu větve. |
+
+**Celkové hodnocení:** Produkce je zdravá; auditní kód je na feature větvi a v PR #7. **Merge PR + deploy** je blokující krok pro checkout API a další auditní změny na produkci. **Ready for scale: ne** — dokud PR #7 neprojde merge/review a Stripe E2E nebude ověřen.
+
+
+### Push status (automation 23. 6. 2026)
+
+| Položka | Hodnota |
+|---------|---------|
+| Remote branch | ix/checkout-predplatne-ctas @ **d09695b40f488114ff824f68b30db2f3306c8d26** |
+| Compare URL | https://github.com/Fincloseapp/MedScopeGlobal/compare/main...fix/checkout-predplatne-ctas |
+| PR | https://github.com/Fincloseapp/MedScopeGlobal/pull/7 — konflikty s main @ 8dc62bc, Vercel CI fail |
+| Strategie | **(b)** — větev ix/checkout-predplatne-v2 neexistuje |
+| Produkce | HTTP **200** (curl -sL -A Mozilla https://www.medscopeglobal.com) |
+
+
+### Zbývající akce pro uživatele
+
+1. **Merge PR #7** — vyřešit konflikty s `main` (`f8dc62bc`), review, merge (ne force push na main).
+2. **`gh auth login`** nebo nastavit `GH_TOKEN` pro CI/gh operace z tohoto stroje.
+3. **Stripe E2E** — po deployi checkout větve ověřit trial checkout na produkčních price IDs.
+4. **Volitelně:** `npm install` + `npm run build:win` na `D:\medscopeglobal` pro lokální build verify.
+
+---
+
+## 1. Shrnutí pro vedení
+
+Po auditu webu medscopeglobal.com proběhla koordinovaná implementace doporučení v lokální větvi `main` a follow-up větvi `fix/checkout-predplatne-ctas`. Auditní commity zahrnují `609c511`, `88e3ca9`, `20f43da`, `9ca3a0f`, `3e19d9c` a follow-up `4bd4d2f3`–`d09695b40` (13 commitů nad `origin/main`).
+
+**Produkční stav (22.–23. 6. 2026):** všechny klíčové trasy vrací **HTTP 200** — homepage, segmenty (veřejnost, studenti, lékaři), Academy, články, předplatné, studie, AI, B2B, kontakt, `/hledat`, `/o-nas`, login, privacy a `/api/health`.
+
+**Stripe checkout:** napojen v kódu větve — `V27CheckoutButton` na `/predplatne` volá `POST /api/v27/checkout`; alias `POST /api/stripe/checkout` sdílí handler v `lib/stripe/v27-checkout.ts`. Success stránka `/checkout/uspesne`. **Na produkci zatím ne** — čeká na merge PR #7.
+
+**Větev `fix/checkout-predplatne-ctas`:** `origin/fix/checkout-predplatne-ctas` = **`d09695b40`** (push 23. 6. 2026, remote hash `d09695b40f488114ff824f68b30db2f3306c8d26`).
+
+**Stav nasazení:** `origin/main` = **`f8dc62bc`** (`fix(deploy): BOM-free vercel.json + v27/v271 exports + hledat ESLint`). Checkout kód je na fix větvi v PR #7; merge + deploy nutný pro produkční checkout API.
+
+**Editor's pick (5 odborných článků):** Aktualizováno v Supabase (`vip_only=false`, `fully_open=true`) pro 5 slugů. Skript: `scripts/mark-editors-pick-open.mjs`.
+>>>>>>> Stashed changes
 
 ---
 
