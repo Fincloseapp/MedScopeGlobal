@@ -357,3 +357,74 @@ export async function getRelatedArticles(
   });
   return prepared.slice(0, limit);
 }
+
+/** Articles tagged via metadata.section (falls back to medical section rubrics). */
+export async function getArticlesByMetadataSection(
+  section: string,
+  limit = 12,
+  isVip = false,
+  accessLevel: AccessLevelId = "public",
+  locale: LocaleCode = "cs"
+) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("articles")
+    .select(articleSelect)
+    .eq("published", true)
+    .contains("metadata", { section })
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .limit(limit * 4);
+
+  if (error || !data?.length) {
+    return getArticlesBySection(
+      section as MedicalSectionSlug,
+      limit,
+      isVip,
+      accessLevel,
+      locale
+    );
+  }
+
+  const filtered = filterForReader(
+    mapArticleList(data as Record<string, unknown>[]),
+    isVip,
+    accessLevel
+  );
+  const prepared = await prepareArticlesForDisplay(filtered, locale, {
+    mode: "card",
+    maxTranslate: limit,
+  });
+  return prepared.slice(0, limit);
+}
+
+/** Unpublished / archived articles for admin or archive views. */
+export async function getArchivedArticles(
+  limit = 24,
+  offset = 0,
+  isVip = true,
+  accessLevel: AccessLevelId = "professional",
+  locale: LocaleCode = "cs"
+) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("articles")
+    .select(articleSelect)
+    .eq("published", false)
+    .order("updated_at", { ascending: false, nullsFirst: false })
+    .range(offset, offset + limit - 1);
+
+  if (error) {
+    console.error("getArchivedArticles", error);
+    return [];
+  }
+
+  const filtered = filterForReader(
+    mapArticleList(data as Record<string, unknown>[] | null),
+    isVip,
+    accessLevel
+  );
+  return prepareArticlesForDisplay(filtered, locale, {
+    mode: "card",
+    maxTranslate: limit,
+  });
+}
