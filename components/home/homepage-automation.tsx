@@ -57,7 +57,7 @@ export async function HomepageAutomation({
               >
                 {item.image_url ? (
                   <div className="relative h-36 w-full bg-slate-100">
-                    <Image src={item.image_url} alt="" fill className="object-cover" sizes="280px" />
+                    <Image src={item.image_url} alt={item.title} fill className="object-cover" sizes="280px" />
                   </div>
                 ) : null}
                 <div className="p-4">

@@ -28,8 +28,8 @@ export function PublicModuleImage({
   }
 
   return (
-    <div className={cn("relative overflow-hidden bg-slate-100", className)} aria-hidden>
-      <Image src={src} alt="" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" />
+    <div className={cn("relative overflow-hidden bg-slate-100", className)}>
+      <Image src={src} alt={label} fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" />
     </div>
   );
 }

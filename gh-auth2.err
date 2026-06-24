@@ -1,4 +1,0 @@
-
-! First copy your one-time code: 24EF-3E10
-Open this URL to continue in your web browser: https://github.com/login/device
-failed to authenticate via web browser: Post "https://github.com/login/oauth/access_token": read tcp 10.6.26.13:62497->140.82.121.3:443: wsarecv: Pokus o připojení selhal, protože připojená strana v časovém intervalu řádně neodpověděla, nebo vytvořené připojení selhalo, protože neodpověděl připojený hostitel.

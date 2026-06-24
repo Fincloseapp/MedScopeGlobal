@@ -3,8 +3,6 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const revalidate = 3600;
-
 export const metadata: Metadata = buildPageMetadata({
   title: "Newsletter",
   description: "Odborný newsletter 2× měsíčně — PDF text, reklamy a AI layout.",

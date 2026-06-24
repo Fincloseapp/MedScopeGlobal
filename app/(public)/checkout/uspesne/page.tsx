@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
-    title: "Platba úspěšná | MedScopeGlobal",
-    description: "Děkujeme za vaši objednávku.",
-    path: "/checkout/uspesne",
-  });
-}
+export const metadata: Metadata = buildPageMetadata({
+  title: "Platba úspěšná | MedScopeGlobal",
+  description: "Děkujeme za vaši objednávku.",
+  path: "/checkout/uspesne",
+});
 
 export default function CheckoutSuccessPage() {
   return (

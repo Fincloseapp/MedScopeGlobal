@@ -1,9 +1,0 @@
-{
-  "buildCommand": "npm run build:vercel",
-  "framework": "nextjs",
-  "regions": ["fra1"],
-  "redirects": [
-    { "source": "/en", "destination": "/portal", "permanent": false },
-    { "source": "/en/:path*", "destination": "/portal", "permanent": false }
-  ]
-}

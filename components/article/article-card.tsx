@@ -31,7 +31,7 @@ export function ArticleCard({ article }: { article: ArticleWithRelations }) {
             <>
               <Image
                 src={article.cover_image_url}
-                alt=""
+                alt={article.title}
                 fill
                 className="object-cover transition duration-500 group-hover:scale-[1.04]"
                 sizes="(max-width:768px) 100vw, 33vw"

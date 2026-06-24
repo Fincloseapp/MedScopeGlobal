@@ -6,14 +6,14 @@ import { ArticleCard } from "@/components/article/article-card";
 import { Button } from "@/components/ui/button";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { SITE } from "@/lib/config/site";
-import { getLatestArticles, getEditorsPickArticles } from "@/lib/queries/articles";
+import { getLatestArticles } from "@/lib/queries/articles";
 import { AdPlacement } from "@/components/ads/ad-placement";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { LOCALE_COOKIE, normalizeLocale } from "@/lib/i18n/config";
 import { getDictionary, t } from "@/lib/i18n/get-dictionary";
 import { cookies } from "next/headers";
-import { HomepageDeferredSections } from "@/components/home/homepage-deferred";
-import { HomepageSecondaryTabs } from "@/components/home/homepage-secondary-tabs";
+import { HomepageAutomation } from "@/components/home/homepage-automation";
+import { V19ArticleBriefFeedLazy } from "@/components/v19/article-brief-feed";
 
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -37,7 +37,6 @@ export default async function HomePage() {
   const isCs = locale === "cs";
   const { isVip, accessLevel } = await getReaderContext();
   const articles = await getLatestArticles(6, 0, isVip, accessLevel, locale);
-  const editorsPick = await getEditorsPickArticles(5, locale);
   const showAds = !isVip;
   const [topAds, midAds, bottomAds] = showAds
     ? await Promise.all([
@@ -100,41 +99,13 @@ export default async function HomePage() {
 
       <AudienceHub locale={locale} />
 
-      {editorsPick.length > 0 ? (
-        <section className="border-y border-[#dfeaf5] bg-white">
-          <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
-                  Editor&apos;s pick
-                </p>
-                <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
-                  {isCs ? "Odborné články zdarma" : "Open expert articles"}
-                </h2>
-                <p className="mt-2 max-w-2xl text-sm text-slate-600">
-                  {isCs
-                    ? "Plně otevřené ukázkové články — vyzkoušejte kvalitu obsahu před předplatným."
-                    : "Fully open sample articles — try before you subscribe."}
-                </p>
-              </div>
-            </div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {editorsPick.map((article) => (
-                <ArticleCard key={article.id} article={article} />
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      <HomepageDeferredSections
-        locale={locale}
-        isVip={isVip}
-        accessLevel={accessLevel}
-        briefTitle={isCs ? "Odborné medicínské briefy" : "Medical expert briefs"}
+      <V19ArticleBriefFeedLazy
+        title={isCs ? "Odborné medicínské briefy" : "Medical expert briefs"}
+        limit={4}
+        locale="auto"
       />
 
-      <HomepageSecondaryTabs isCs={isCs} />
+      <HomepageAutomation locale={locale} isVip={isVip} accessLevel={accessLevel} />
 
       {showAds ? <div className="mx-auto max-w-7xl px-4 sm:px-6"><AdPlacement ads={midAds} variant="inline" /></div> : null}
 

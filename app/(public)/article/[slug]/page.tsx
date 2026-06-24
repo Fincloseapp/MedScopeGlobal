@@ -27,7 +27,6 @@ import { getDictionary, t } from "@/lib/i18n/get-dictionary";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { ContentRecommendations } from "@/components/recommendations/content-recommendations";
 import { PremiumCta } from "@/components/ux/premium-cta";
-import { isFullyOpenExpertArticle } from "@/lib/config/editors-pick";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -87,10 +86,9 @@ export default async function ArticlePage({ params }: Props) {
   const { user, isVip, accessLevel } = await getReaderContext();
 
   const minLevel = (article.min_access_level ?? "public") as AccessLevelId;
-  const fullyOpen = isFullyOpenExpertArticle(article);
   const locked =
-    !fullyOpen &&
-    ((article.vip_only && !isVip) || !canAccessContent(accessLevel, minLevel));
+    (article.vip_only && !isVip) ||
+    !canAccessContent(accessLevel, minLevel);
 
   const related =
     article.category_id &&

@@ -1,12 +1,13 @@
 {
   "buildCommand": "npm run build",
-  "installCommand": "npm install --no-audit --no-fund",
+  "installCommand": "npm ci",
   "framework": "nextjs",
   "env": {
     "INGESTION_LOCALE": "cs",
     "DEFAULT_SITE_LOCALE": "cs",
     "OPENAI_MODEL": "gpt-4o-mini"
   },
+  
   "crons": [
     {
       "path": "/api/cron/ingest",
@@ -61,15 +62,14 @@
       "schedule": "0 5 * * *"
     }
   ],
+  
   "headers": [
     {
       "source": "/api/:path*",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
       ]
     }
   ]
 }
+
