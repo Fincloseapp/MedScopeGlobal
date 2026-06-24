@@ -34,6 +34,8 @@ const nextConfig = {
         destination: "/sections",
         permanent: false,
       },
+      { source: "/clanky", destination: "/verejnost/clanky", permanent: true },
+      { source: "/clanky/:slug", destination: "/verejnost/clanky/:slug", permanent: true },
     ];
   },
   

@@ -68,8 +68,13 @@ export async function getDrugNewsFiltered(filters?: {
   return rows;
 }
 
-export async function getDrugNewsGroupedByAgency() {
-  const rows = await getDrugNewsList();
+export async function getDrugNewsGroupedByAgency(filters?: {
+  status?: string;
+  agency?: string;
+  sourceId?: string;
+  limit?: number;
+}) {
+  const rows = await getDrugNewsFiltered(filters);
   const grouped: Record<string, DrugNewsRow[]> = {};
   for (const row of rows) {
     const key = row.agency?.trim() || "ostatní";

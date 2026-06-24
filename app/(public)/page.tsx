@@ -12,9 +12,9 @@ import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { LOCALE_COOKIE, normalizeLocale } from "@/lib/i18n/config";
 import { getDictionary, t } from "@/lib/i18n/get-dictionary";
 import { cookies } from "next/headers";
-import { HomepageAutomation } from "@/components/home/homepage-automation";
+import { HomepageDeferredSections } from "@/components/home/homepage-deferred";
+import { HomepageSecondaryTabs } from "@/components/home/homepage-secondary-tabs";
 import { SocialProofStrip } from "@/components/home/social-proof-strip";
-import { V19ArticleBriefFeedLazy } from "@/components/v19/article-brief-feed";
 
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -102,13 +102,14 @@ export default async function HomePage() {
 
       <SocialProofStrip isCs={isCs} />
 
-      <V19ArticleBriefFeedLazy
-        title={isCs ? "Odborné medicínské briefy" : "Medical expert briefs"}
-        limit={4}
-        locale="auto"
-      />
+      <HomepageSecondaryTabs isCs={isCs} />
 
-      <HomepageAutomation locale={locale} isVip={isVip} accessLevel={accessLevel} />
+      <HomepageDeferredSections
+        locale={locale}
+        isVip={isVip}
+        accessLevel={accessLevel}
+        briefTitle={isCs ? "Odborné medicínské briefy" : "Medical expert briefs"}
+      />
 
       {showAds ? <div className="mx-auto max-w-7xl px-4 sm:px-6"><AdPlacement ads={midAds} variant="inline" /></div> : null}
 
