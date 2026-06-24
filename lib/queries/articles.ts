@@ -365,7 +365,7 @@ export async function getArticlesByMetadataSection(
   isVip = false,
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
-) {
+): Promise<DisplayArticle[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("articles")
@@ -375,26 +375,26 @@ export async function getArticlesByMetadataSection(
     .order("published_at", { ascending: false, nullsFirst: false })
     .limit(limit * 4);
 
-  const articles =
-    error || !data?.length
-      ? await getArticlesBySection(
-          section as MedicalSectionSlug,
-          limit,
-          isVip,
-          accessLevel,
-          locale
-        )
-      : await prepareArticlesForDisplay(
-          filterForReader(
-            mapArticleList(data as Record<string, unknown>[]),
-            isVip,
-            accessLevel
-          ),
-          locale,
-          { mode: "card", maxTranslate: limit }
-        ).then((rows) => rows.slice(0, limit));
+  if (error || !data?.length) {
+    return getArticlesBySection(
+      section as MedicalSectionSlug,
+      limit,
+      isVip,
+      accessLevel,
+      locale
+    );
+  }
 
-  return { articles };
+  const filtered = filterForReader(
+    mapArticleList(data as Record<string, unknown>[]),
+    isVip,
+    accessLevel
+  );
+  const prepared = await prepareArticlesForDisplay(filtered, locale, {
+    mode: "card",
+    maxTranslate: limit,
+  });
+  return prepared.slice(0, limit);
 }
 
 /** Unpublished / archived articles for admin or archive views. */
