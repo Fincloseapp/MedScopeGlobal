@@ -375,26 +375,26 @@ export async function getArticlesByMetadataSection(
     .order("published_at", { ascending: false, nullsFirst: false })
     .limit(limit * 4);
 
-  if (error || !data?.length) {
-    return getArticlesBySection(
-      section as MedicalSectionSlug,
-      limit,
-      isVip,
-      accessLevel,
-      locale
-    );
-  }
+  const articles =
+    error || !data?.length
+      ? await getArticlesBySection(
+          section as MedicalSectionSlug,
+          limit,
+          isVip,
+          accessLevel,
+          locale
+        )
+      : await prepareArticlesForDisplay(
+          filterForReader(
+            mapArticleList(data as Record<string, unknown>[]),
+            isVip,
+            accessLevel
+          ),
+          locale,
+          { mode: "card", maxTranslate: limit }
+        ).then((rows) => rows.slice(0, limit));
 
-  const filtered = filterForReader(
-    mapArticleList(data as Record<string, unknown>[]),
-    isVip,
-    accessLevel
-  );
-  const prepared = await prepareArticlesForDisplay(filtered, locale, {
-    mode: "card",
-    maxTranslate: limit,
-  });
-  return prepared.slice(0, limit);
+  return { articles };
 }
 
 /** Unpublished / archived articles for admin or archive views. */
@@ -415,7 +415,7 @@ export async function getArchivedArticles(
 
   if (error) {
     console.error("getArchivedArticles", error);
-    return [];
+    return { articles: [] as DisplayArticle[] };
   }
 
   const filtered = filterForReader(
@@ -423,8 +423,9 @@ export async function getArchivedArticles(
     isVip,
     accessLevel
   );
-  return prepareArticlesForDisplay(filtered, locale, {
+  const articles = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
     maxTranslate: limit,
   });
+  return { articles };
 }
