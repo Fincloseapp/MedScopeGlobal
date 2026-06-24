@@ -9,7 +9,7 @@
     "build:win": "powershell -ExecutionPolicy Bypass -File ./scripts/build-win.ps1",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "node ./node_modules/typescript/bin/tsc --noEmit",
     "test": "node scripts/test-v18-placeholder.mjs",
     "test:v18": "node scripts/run-v18-e2e.mjs",
     "load:v18": "node loadtests/v18/run-all.mjs",
