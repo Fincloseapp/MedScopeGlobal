@@ -29,6 +29,7 @@ const staticRoutes: MetadataRoute.Sitemap = [
   { url: `${base}/studie`, changeFrequency: "weekly", priority: 0.75 },
   { url: `${base}/aktualni-zpravy`, changeFrequency: "daily", priority: 0.8 },
   { url: `${base}/firmy`, changeFrequency: "monthly", priority: 0.65 },
+  { url: `${base}/firmy/cenik`, changeFrequency: "monthly", priority: 0.7 },
   { url: `${base}/b2b`, changeFrequency: "monthly", priority: 0.65 },
   { url: `${base}/kongresy`, changeFrequency: "weekly", priority: 0.6 },
   { url: `${base}/predplatne`, changeFrequency: "weekly", priority: 0.85 },
