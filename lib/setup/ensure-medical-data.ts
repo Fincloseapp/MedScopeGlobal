@@ -43,7 +43,8 @@ export async function ensureMedicalCategories(): Promise<void> {
 }
 
 export async function ensureContentTypes(): Promise<void> {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return;
   const { error } = await admin.from("rubrics").select("slug").limit(1);
   if (error?.code === "PGRST205") return;
 
