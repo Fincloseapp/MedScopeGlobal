@@ -78,7 +78,8 @@ export function AcademyVideoPlayer({ metadata, lessonTitle, className, onWatchEv
               if (!cancelled) setLoading(false);
             });
             hls.on(Hls.Events.ERROR, (_e, data) => {
-              if (data.fatal && !cancelled) tryNextUrl();
+              const err = data as { fatal?: boolean };
+              if (err.fatal && !cancelled) tryNextUrl();
             });
             return;
           }
