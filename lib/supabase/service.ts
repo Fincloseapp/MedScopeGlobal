@@ -9,3 +9,12 @@ export function createServiceRoleClient() {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
+
+/** Returns null when service-role env is unavailable (e.g. Vercel Preview). */
+export function tryCreateServiceRoleClient() {
+  try {
+    return createServiceRoleClient();
+  } catch {
+    return null;
+  }
+}

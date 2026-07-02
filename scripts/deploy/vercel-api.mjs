@@ -123,6 +123,15 @@ export async function waitForDeploymentReady(deploymentId, env = loadDeployEnv()
 
 /** Assign production alias to a deployment. */
 export async function assignProductionAlias(deploymentId, env = loadDeployEnv()) {
+  const dep = await vercelFetch(`/v13/deployments/${deploymentId}`, { env });
+  if (dep.target !== "production") {
+    throw new Error(
+      `Refusing to alias ${deploymentId}: target is "${dep.target ?? "preview"}", not "production". ` +
+        "Preview deployments use Preview env vars (this project has no SUPABASE_* on Preview). " +
+        "Trigger a production deployment from the branch instead of aliasing a preview build."
+    );
+  }
+
   const { productionDomain } = getVercelConfig(env);
   try {
     await vercelFetch(`/v2/deployments/${deploymentId}/aliases`, {
