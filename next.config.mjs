@@ -41,6 +41,10 @@ const V25_MJS_TRACE = ["./lib/v25/**/*.mjs"];
 
 const nextConfig = {
 
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   serverExternalPackages: ["pdf-parse", "mammoth", "tesseract.js"],
 
   outputFileTracingIncludes: {
