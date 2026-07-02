@@ -1,6 +1,6 @@
-/** MedScope v26 — editorial engine (v27 extends UI version) */
+/** MedScope v26 — autonomous editorial engine for public articles */
 export const V26_ENGINE_VERSION = "26.1";
-export const V26_EDITORIAL_VERSION = "26";
+export const V26_EDITORIAL_VERSION = "26.1";
 
 export {
   V27_UI_VERSION as V26_UI_VERSION,

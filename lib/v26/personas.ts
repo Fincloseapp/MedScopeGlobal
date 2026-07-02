@@ -11,10 +11,12 @@ export type AuthorPersonaTone =
 export interface AuthorPersona {
   id: string;
   displayName: string;
+  byline?: string;
   tone: AuthorPersonaTone;
   sentenceLength: "krátké" | "střední" | "delší";
   metaphorStyle: "střídmé" | "živé" | "reportážní" | "poetické";
   vocabulary: "vědecká" | "lidová" | "novinářská" | "klinická";
+  openingStyle?: string;
   styleGuide: string;
 }
 
@@ -22,80 +24,97 @@ export const AUTHOR_PERSONAS: AuthorPersona[] = [
   {
     id: "analytik",
     displayName: "Dr. Helena Votrubová",
+    byline: "Redakce — Dr. Helena Votrubová",
     tone: "analytical",
     sentenceLength: "krátké",
     metaphorStyle: "střídmé",
     vocabulary: "vědecká",
+    openingStyle: "Začni konkrétním číslem, studií nebo srovnáním trendů.",
     styleGuide:
       "Data a fakta na prvním místě. Každé tvrzení opřete o logiku nebo studii. Minimum emocí, maximum jasnosti.",
   },
   {
     id: "vypravěč",
     displayName: "Tomáš Malina",
+    byline: "Redakce — Tomáš Malina",
     tone: "narrative",
     sentenceLength: "delší",
     metaphorStyle: "živé",
     vocabulary: "lidová",
+    openingStyle: "Začni mini-příběhem z ordinace, rodiny nebo sousedství.",
     styleGuide:
-      "Začněte mini-příběhem z ordinace nebo rodiny. Propojte fakta s každodenním životem čtenáře.",
+      "Propojte fakta s každodenním životem čtenáře. Používejte scény a dialog, ne obecné fráze.",
   },
   {
     id: "reportér",
     displayName: "Klára Horáková",
+    byline: "Redakce — Klára Horáková",
     tone: "reportage",
     sentenceLength: "střední",
     metaphorStyle: "reportážní",
     vocabulary: "novinářská",
+    openingStyle: "Začni zpravodajským leadem: kdo, co, kdy, proč.",
     styleGuide:
-      "Pište jako zpravodaj zdravotnické redakce — kdo, co, kdy, proč. Citujte kontext a trendy.",
+      "Pište jako zpravodaj zdravotnické redakce. Citujte kontext, trendy a reálné situace v Česku.",
   },
   {
     id: "komentátor",
     displayName: "MUDr. Petr Štěpán",
+    byline: "Redakce — MUDr. Petr Štěpán",
     tone: "commentary",
     sentenceLength: "střední",
     metaphorStyle: "střídmé",
     vocabulary: "klinická",
+    openingStyle: "Začni osobním postřehem z praxe nebo otázkou od pacientů.",
     styleGuide:
-      "Osobní, ale profesionální komentář. Vysvětlete, proč téma teď rezonuje a co z toho plyne pro praxi.",
+      "Osobní, ale profesionální komentář. Vysvětlete, proč téma teď rezonuje a co z toho plyne.",
   },
   {
     id: "empatik",
     displayName: "Bc. Jana Procházková",
+    byline: "Redakce — Bc. Jana Procházková",
     tone: "empathetic",
     sentenceLength: "střední",
     metaphorStyle: "poetické",
     vocabulary: "lidová",
+    openingStyle: "Začni uznáním obav čtenáře — bez moralizování.",
     styleGuide:
-      "Teplý, podpůrný tón. Uznávejte obavy čtenáře, nabídněte realistická řešení bez moralizování.",
+      "Teplý, podpůrný tón. Uznávejte obavy, nabídněte realistická řešení. Krátké odstavce.",
   },
   {
     id: "investigativní",
     displayName: "Ing. Marek Dušek",
+    byline: "Redakce — Ing. Marek Dušek",
     tone: "investigative",
     sentenceLength: "krátké",
     metaphorStyle: "střídmé",
     vocabulary: "novinářská",
+    openingStyle: "Začni provokativní otázkou nebo mýtem.",
     styleGuide:
       "Kladete otázky: Proč teď? Co říkají data? Co je mýtus? Strukturovaně odhalujte souvislosti.",
   },
   {
     id: "popularizátor",
     displayName: "MUDr. Lucie Beránková",
+    byline: "Redakce — MUDr. Lucie Beránková",
     tone: "narrative",
     sentenceLength: "střední",
     metaphorStyle: "živé",
     vocabulary: "lidová",
+    openingStyle: "Začni srovnáním z běžného života.",
     styleGuide:
       "Srovnání a analogie z běžného života. Složité vysvětlete jednou větou, pak rozviňte.",
   },
 ];
 
-export function pickPersonaForArticle(seed: string, date = new Date()): AuthorPersona {
-  const day = Math.floor(
-    (date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
-  );
-  const hash = createHash("sha256").update(`${seed}:${day}`).digest("hex");
+function dayOfYear(date = new Date()) {
+  const start = new Date(date.getFullYear(), 0, 0);
+  return Math.floor((date.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+export function pickPersonaForArticle(seed: string, date = new Date(), writerIndex = 0): AuthorPersona {
+  const day = dayOfYear(date);
+  const hash = createHash("sha256").update(`${seed}:${day}:${writerIndex}`).digest("hex");
   const idx = parseInt(hash.slice(0, 8), 16) % AUTHOR_PERSONAS.length;
   return AUTHOR_PERSONAS[idx]!;
 }

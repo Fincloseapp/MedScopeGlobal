@@ -25,6 +25,10 @@ import { fileURLToPath } from "node:url";
 import { execSync, spawnSync } from "node:child_process";
 import { pipeline } from "node:stream/promises";
 import { Readable } from "node:stream";
+import {
+  triggerProductionDeploy,
+  waitForDeploymentReady,
+} from "./deploy/vercel-api.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const tools = join(root, ".tools");
@@ -35,7 +39,7 @@ mkdirSync(deployTmp, { recursive: true });
 const cloneDir = join(deployTmp, `msg-deploy-${Date.now()}`);
 const owner = "Fincloseapp";
 const repo = "MedScopeGlobal";
-const branch = "main";
+const branch = process.env.DEPLOY_BRANCH || "main";
 const commitMessage =
   process.env.DEPLOY_COMMIT_MESSAGE ??
   "feat(v5plus): evidence-based AI — citations, DOI, PubMed, regulatory, evidence scoring";
@@ -343,38 +347,23 @@ async function pushToGitHub(token) {
   return sha;
 }
 
+/** Production deploy via vercel-api (same path as trigger-vercel-production.mjs). Never alias preview builds. */
 async function triggerVercelDeploy(env) {
-  const token = env.VERCEL_TOKEN;
-  const projectId =
-    env.VERCEL_PROJECT_ID || "prj_xewXFpK1L2PYN9kaqPrilPluQOEj";
-  const teamId = env.VERCEL_TEAM_ID || env.VERCEL_ORG_ID;
+  if (!env.VERCEL_TOKEN) return;
 
-  if (!token) return;
-
-  log("\n=== Vercel redeploy trigger ===");
-  const qs = teamId ? `?teamId=${teamId}` : "";
-  const res = await fetch(`https://api.vercel.com/v13/deployments${qs}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: "medscopeglobal",
-      project: projectId,
-      target: "production",
-      gitSource: env.GITHUB_REPO_ID
-        ? { type: "github", repoId: env.GITHUB_REPO_ID, ref: branch }
-        : undefined,
-    }),
-  });
-  const text = await res.text();
-  if (res.ok) {
-    const data = JSON.parse(text);
-    log(`Deployment: ${data.url || data.id}`);
-    if (data.inspectorUrl) log(`Inspector: ${data.inspectorUrl}`);
-  } else {
-    log(`Vercel API: ${res.status} — GitHub push stačí pro auto-deploy.`);
+  log("\n=== Vercel production deploy (target=production) ===");
+  const deployEnv = { ...env, VERCEL_GIT_REF: branch };
+  try {
+    const dep = await triggerProductionDeploy(deployEnv);
+    const id = dep.id ?? dep.uid;
+    log(`Deployment: ${id}${dep.url ? ` https://${dep.url}` : ""}`);
+    if (dep.inspectorUrl) log(`Inspector: ${dep.inspectorUrl}`);
+    const ready = await waitForDeploymentReady(id, deployEnv);
+    if (!ready.ok) {
+      log(`Varování: deployment ${ready.error ?? "not ready"} — GitHub push může spustit auto-deploy.`);
+    }
+  } catch (e) {
+    log(`Vercel API: ${e.message} — GitHub push stačí pro auto-deploy.`);
   }
 }
 

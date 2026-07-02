@@ -1,10 +1,15 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { getPublicEnv } from "@/lib/env";
+import { tryGetPublicEnv } from "@/lib/env";
 
 export async function createClient() {
   const cookieStore = await cookies();
-  const { url, anonKey } = getPublicEnv();
+  const pubEnv = tryGetPublicEnv();
+  if (!pubEnv) {
+    // Same graceful degradation as middleware when Preview env is missing
+    return null as unknown as ReturnType<typeof createServerClient>;
+  }
+  const { url, anonKey } = pubEnv;
 
   return createServerClient(url, anonKey, {
     cookies: {
