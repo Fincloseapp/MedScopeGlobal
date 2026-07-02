@@ -29,6 +29,7 @@ export interface V26RewriteInput {
   content: string;
   audience?: "public" | "student" | "physician";
   persona?: AuthorPersona;
+  topic?: string;
   sourceCitation?: V26ArticleMetadata["source_citation"];
 }
 
@@ -73,6 +74,7 @@ export function buildFallbackRewrite(input: V26RewriteInput): V26RewriteResult {
     excerpt: input.excerpt ?? input.title,
     bodyHtml: input.content.slice(0, 4000),
     personaName,
+    topic: input.topic ?? "zpravodajstvi",
   });
   const validation = validateV26Structure(content);
   return {

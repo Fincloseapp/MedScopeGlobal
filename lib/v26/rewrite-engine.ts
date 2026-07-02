@@ -40,6 +40,7 @@ export async function rewriteToV26Standard(
           excerpt: parsed.excerpt ?? input.excerpt ?? input.title,
           bodyHtml: content || input.content.slice(0, 3000),
           personaName: persona.displayName,
+          topic: input.topic ?? input.seed?.split(":")[0] ?? "zpravodajstvi",
         });
         validation = validateV26Structure(content);
       }
