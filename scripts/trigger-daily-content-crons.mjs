@@ -48,7 +48,10 @@ async function runJob(job) {
   try {
     const res = await fetch(url, {
       method: "GET",
-      headers: { Authorization: `Bearer ${secret}` },
+      headers: {
+        Authorization: `Bearer ${secret}`,
+        "User-Agent": "medscope/cron-trigger",
+      },
       signal: AbortSignal.timeout(280_000),
     });
     const text = await res.text();
