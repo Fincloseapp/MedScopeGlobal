@@ -12,6 +12,7 @@ export type DigitalHealthRow = {
   image_url: string | null;
   published_date: string | null;
   created_at: string;
+  ai_metadata?: Record<string, unknown> | null;
 };
 
 export async function getDigitalHealthList(limit?: number) {

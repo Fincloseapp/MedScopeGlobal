@@ -1,0 +1,118 @@
+name: Deploy V18
+
+on:
+  push:
+    branches: ["main"]
+
+concurrency:
+  group: v18-production-deploy
+  cancel-in-progress: false
+
+env:
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+  NEXT_PUBLIC_SITE_URL: https://medscopeglobal.com
+  CRON_SECRET: ${{ secrets.CRON_SECRET }}
+  V18_MONITORING_URL: https://medscopeglobal.com/api/v18/monitoring
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: pnpm install
+        run: pnpm install --frozen-lockfile
+
+      - name: pnpm build
+        run: pnpm run build
+
+  verify-v18:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: pnpm install
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify V18
+        run: pnpm run verify-v18
+
+      - name: Placeholder tests
+        run: pnpm run test
+
+  deploy-v18:
+    runs-on: ubuntu-latest
+    needs: verify-v18
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Deploy to Vercel
+        run: node scripts/deploy/vercel_v18.mjs
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
+  monitoring-check:
+    runs-on: ubuntu-latest
+    needs: deploy-v18
+    steps:
+      - name: GET /api/v18/monitoring
+        run: |
+          node -e "
+          const url = process.env.V18_MONITORING_URL;
+          fetch(url, { signal: AbortSignal.timeout(30000) })
+            .then(async (res) => {
+              const body = await res.json();
+              if (res.status !== 200) throw new Error('expected HTTP 200, got ' + res.status);
+              if (body.status !== 'ok' || !body.version || body.engine !== 'v18') throw new Error('invalid v18 monitoring payload');
+              console.log(JSON.stringify({ ok: true, version: body.version, engine: body.engine }));
+            })
+            .catch((err) => { console.error(err.message || err); process.exit(1); });
+          "

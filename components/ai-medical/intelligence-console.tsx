@@ -16,19 +16,21 @@ import { V4D_SPECIALTIES, SPECIALTY_LABELS_CS } from "@/lib/v4d/constants";
 type Props = {
   defaultAssistant?: AiMedicalAssistant;
   title?: string;
-  /** Hide assistant/specialty switchers — single-product UX for /ai-asistent/* */
-  simplified?: boolean;
+  /** Zjednodušené rozhraní pro veřejnost — bez klinických filtrů a přepínačů oborů */
+  publicMode?: boolean;
 };
 
 export function IntelligenceConsole({
   defaultAssistant = "doctor",
   title,
-  simplified = false,
+  publicMode = false,
 }: Props) {
-  const [assistant, setAssistant] = useState<AiMedicalAssistant>(defaultAssistant);
+  const [assistant, setAssistant] = useState<AiMedicalAssistant>(
+    publicMode ? "patient" : defaultAssistant,
+  );
   const [query, setQuery] = useState("");
   const [language, setLanguage] = useState<AiMedicalLanguage>("cs");
-  const [outputType, setOutputType] = useState<AiMedicalOutputType>("professional");
+  const [outputType, setOutputType] = useState<AiMedicalOutputType>(publicMode ? "patient" : "professional");
   const [specialty, setSpecialty] = useState("rheumatology");
   const [diagnosis, setDiagnosis] = useState("");
   const [studyType, setStudyType] = useState("");
@@ -82,7 +84,12 @@ export function IntelligenceConsole({
         <h2 className="font-display text-xl font-semibold text-[#021d33]">{title}</h2>
       ) : null}
 
-      {!simplified ? (
+      {publicMode ? (
+        <p className="text-sm text-muted-foreground">
+          Napište dotaz jednoduchou češtinou. Odpověď bude srozumitelná pro laiky — bez výběru
+          lékařského oboru.
+        </p>
+      ) : (
         <div className="flex flex-wrap gap-2 text-xs">
           {AI_MEDICAL_ASSISTANTS.map((a) => (
             <Link
@@ -98,10 +105,10 @@ export function IntelligenceConsole({
             </Link>
           ))}
         </div>
-      ) : null}
+      )}
 
-      <div className={`grid gap-4 ${simplified ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-4"}`}>
-        {!simplified ? (
+      <div className={`grid gap-4 ${publicMode ? "sm:grid-cols-1 max-w-xs" : "sm:grid-cols-2 lg:grid-cols-4"}`}>
+        {!publicMode ? (
           <label className="block text-sm">
             <span className="font-medium text-slate-700">Asistent</span>
             <select
@@ -131,37 +138,39 @@ export function IntelligenceConsole({
           </select>
         </label>
 
-        {!simplified ? (
-          <label className="block text-sm">
-            <span className="font-medium text-slate-700">Obor</span>
-            <select
-              className="mt-1 w-full rounded-md border border-input px-3 py-2 text-sm"
-              value={specialty}
-              onChange={(e) => setSpecialty(e.target.value)}
-            >
-              {V4D_SPECIALTIES.map((s) => (
-                <option key={s} value={s}>
-                  {SPECIALTY_LABELS_CS[s]}
-                </option>
-              ))}
-            </select>
-          </label>
-        ) : null}
+        {!publicMode ? (
+          <>
+            <label className="block text-sm">
+              <span className="font-medium text-slate-700">Obor</span>
+              <select
+                className="mt-1 w-full rounded-md border border-input px-3 py-2 text-sm"
+                value={specialty}
+                onChange={(e) => setSpecialty(e.target.value)}
+              >
+                {V4D_SPECIALTIES.map((s) => (
+                  <option key={s} value={s}>
+                    {SPECIALTY_LABELS_CS[s]}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-        <label className="block text-sm">
-          <span className="font-medium text-slate-700">Typ výstupu</span>
-          <select
-            className="mt-1 w-full rounded-md border border-input px-3 py-2 text-sm"
-            value={outputType}
-            onChange={(e) => setOutputType(e.target.value as AiMedicalOutputType)}
-          >
-            <option value="professional">Odborný</option>
-            <option value="patient">Pacientský</option>
-          </select>
-        </label>
+            <label className="block text-sm">
+              <span className="font-medium text-slate-700">Typ výstupu</span>
+              <select
+                className="mt-1 w-full rounded-md border border-input px-3 py-2 text-sm"
+                value={outputType}
+                onChange={(e) => setOutputType(e.target.value as AiMedicalOutputType)}
+              >
+                <option value="professional">Odborný</option>
+                <option value="patient">Pacientský</option>
+              </select>
+            </label>
+          </>
+        ) : null}
       </div>
 
-      {!simplified ? (
+      {!publicMode ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <input
             className="rounded-md border border-input px-3 py-2 text-sm"
@@ -191,10 +200,14 @@ export function IntelligenceConsole({
       ) : null}
 
       <label className="block">
-        <span className="text-sm font-medium text-slate-700">Dotaz</span>
+        <span className="text-sm font-medium text-slate-700">Váš dotaz</span>
         <textarea
           className="mt-2 min-h-[140px] w-full rounded-xl border border-[#cfe1f3] px-4 py-3 text-sm"
-          placeholder="Zadejte klinický dotaz, požadavek na shrnutí, přehled studií…"
+          placeholder={
+            publicMode
+              ? "Např.: Co dělat při bolesti hlavy? Jak zlepšit spánek? Jaké jsou příznaky chřipky?"
+              : "Zadejte klinický dotaz, požadavek na shrnutí, přehled studií…"
+          }
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -205,7 +218,7 @@ export function IntelligenceConsole({
         disabled={loading}
         className="rounded-full bg-[#005B96] px-8"
       >
-        {loading ? "AI Medical Intelligence…" : "Spustit asistenta"}
+        {loading ? "Připravuji odpověď…" : publicMode ? "Zeptat se" : "Spustit asistenta"}
       </Button>
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}

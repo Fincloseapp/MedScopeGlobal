@@ -1,4 +1,3 @@
-import { filterQualityStudies } from "@/lib/content/study-quality";
 import { createClient } from "@/lib/supabase/server";
 
 export type StudyRow = {
@@ -19,8 +18,8 @@ export type StudyRow = {
   published: boolean;
   archived: boolean;
   featured: boolean;
-  ai_metadata?: Record<string, unknown> | null;
   created_at: string;
+  ai_metadata?: Record<string, unknown> | null;
 };
 
 export async function getStudiesList(opts?: { archived?: boolean; limit?: number }) {
@@ -40,7 +39,7 @@ export async function getStudiesList(opts?: { archived?: boolean; limit?: number
     console.error("getStudiesList", error);
     return [];
   }
-  return filterQualityStudies((data ?? []) as StudyRow[]);
+  return (data ?? []) as StudyRow[];
 }
 
 export async function getStudyById(id: string) {

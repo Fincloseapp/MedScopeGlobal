@@ -74,6 +74,41 @@ export const GLOBAL_RSS_SOURCES: RssSource[] = [
     rubric: "ai-study-summary",
     minAccessLevel: "physician",
   },
+  {
+    name: "Nature Medicine RSS",
+    url: "https://www.nature.com/nm.rss",
+    categorySlug: "internal-medicine",
+    rubric: "ai-study-summary",
+    minAccessLevel: "physician",
+  },
+  {
+    name: "NIH News Releases",
+    url: "https://www.nih.gov/news-events/news-releases/rss.xml",
+    categorySlug: "internal-medicine",
+    rubric: "ai-study-summary",
+    minAccessLevel: "public",
+  },
+  {
+    name: "Mayo Clinic News",
+    url: "https://newsnetwork.mayoclinic.org/feed/",
+    categorySlug: "general-practice",
+    rubric: "ai-patient-education",
+    minAccessLevel: "public",
+  },
+  {
+    name: "Cleveland Clinic Newsroom",
+    url: "https://newsroom.clevelandclinic.org/feed/",
+    categorySlug: "cardiology",
+    rubric: "ai-patient-education",
+    minAccessLevel: "public",
+  },
+  {
+    name: "Medscape Medical News",
+    url: "https://www.medscape.com/rss/public/newsfeeds/public_news_med.xml",
+    categorySlug: "general-practice",
+    rubric: "ai-study-summary",
+    minAccessLevel: "physician",
+  },
   ...CZ_RSS_SOURCES,
 ];
 

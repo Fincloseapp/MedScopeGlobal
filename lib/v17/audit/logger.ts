@@ -1,10 +1,11 @@
 import fs from "fs/promises";
 import path from "path";
 import { createServiceRoleClient } from "@/lib/supabase/service";
+import { dataPath } from "@/lib/config/paths";
 import { monitor } from "@/lib/v17/monitoring/hooks";
 import { getVersion } from "@/lib/v17/versioning/version";
 
-const AUDIT_DIR = path.join(process.cwd(), ".data", "v17-audit");
+const AUDIT_DIR = dataPath("v17-audit");
 const AUDIT_FILE = path.join(AUDIT_DIR, "audit.jsonl");
 
 const memoryLog: Record<string, unknown>[] = [];

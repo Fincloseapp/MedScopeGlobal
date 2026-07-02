@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -54,17 +53,6 @@ export function RichTextEditor({ value, onChange, className }: Props) {
     );
   }
 
-  const chain = () =>
-    editor.chain().focus() as typeof editor.chain & {
-      toggleBold(): typeof editor.chain;
-      toggleItalic(): typeof editor.chain;
-      toggleHeading(opts: { level: number }): typeof editor.chain;
-      toggleBulletList(): typeof editor.chain;
-      toggleOrderedList(): typeof editor.chain;
-      undo(): typeof editor.chain;
-      redo(): typeof editor.chain;
-    };
-
   return (
     <div className={cn("rounded-md border bg-background", className)}>
       <div className="flex flex-wrap gap-1 border-b bg-muted/40 px-2 py-2">
@@ -72,7 +60,7 @@ export function RichTextEditor({ value, onChange, className }: Props) {
           type="button"
           size="icon"
           variant={editor.isActive("bold") ? "secondary" : "ghost"}
-          onClick={() => chain().toggleBold().run()}
+          onClick={() => editor.chain().focus().toggleBold().run()}
         >
           <Bold className="h-4 w-4" />
         </Button>
@@ -80,7 +68,7 @@ export function RichTextEditor({ value, onChange, className }: Props) {
           type="button"
           size="icon"
           variant={editor.isActive("italic") ? "secondary" : "ghost"}
-          onClick={() => chain().toggleItalic().run()}
+          onClick={() => editor.chain().focus().toggleItalic().run()}
         >
           <Italic className="h-4 w-4" />
         </Button>
@@ -91,7 +79,7 @@ export function RichTextEditor({ value, onChange, className }: Props) {
             editor.isActive("heading", { level: 2 }) ? "secondary" : "ghost"
           }
           onClick={() =>
-            chain().toggleHeading({ level: 2 }).run()
+            editor.chain().focus().toggleHeading({ level: 2 }).run()
           }
         >
           <Heading2 className="h-4 w-4" />
@@ -100,7 +88,7 @@ export function RichTextEditor({ value, onChange, className }: Props) {
           type="button"
           size="icon"
           variant={editor.isActive("bulletList") ? "secondary" : "ghost"}
-          onClick={() => chain().toggleBulletList().run()}
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
         >
           <List className="h-4 w-4" />
         </Button>
@@ -108,7 +96,7 @@ export function RichTextEditor({ value, onChange, className }: Props) {
           type="button"
           size="icon"
           variant={editor.isActive("orderedList") ? "secondary" : "ghost"}
-          onClick={() => chain().toggleOrderedList().run()}
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
         >
           <ListOrdered className="h-4 w-4" />
         </Button>
@@ -116,7 +104,7 @@ export function RichTextEditor({ value, onChange, className }: Props) {
           type="button"
           size="icon"
           variant="ghost"
-          onClick={() => chain().undo().run()}
+          onClick={() => editor.chain().focus().undo().run()}
         >
           <Undo className="h-4 w-4" />
         </Button>
@@ -124,7 +112,7 @@ export function RichTextEditor({ value, onChange, className }: Props) {
           type="button"
           size="icon"
           variant="ghost"
-          onClick={() => chain().redo().run()}
+          onClick={() => editor.chain().focus().redo().run()}
         >
           <Redo className="h-4 w-4" />
         </Button>

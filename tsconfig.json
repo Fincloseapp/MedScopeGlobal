@@ -1,124 +1,47 @@
-{
-  "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    },
-    "target": "ES2017"
-  },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "supabase/functions",
-    "tests",
-    "e2e",
-    ".deploy-tmp",
-    ".build-tmp",
-    ".tools",
-    "src",
-    "repo-temp",
-    "github-production",
-    "_wt-*",
-    "app/(admin)",
-    "app/(auth)",
-    "app/dashboard",
-    "app/auth",
-    "app/(public)/[...slug]",
-    "app/(public)/access-levels",
-    "app/(public)/account",
-    "app/(public)/ai",
-    "app/(public)/ai-medical",
-    "app/(public)/autopilot",
-    "app/(public)/categories",
-    "app/(public)/category",
-    "app/(public)/cookies",
-    "app/(public)/digital-health",
-    "app/(public)/dokumentace",
-    "app/(public)/gdpr",
-    "app/(public)/inzerce",
-    "app/(public)/kariera",
-    "app/(public)/kongresy",
-    "app/(public)/legislativa",
-    "app/(public)/leky",
-    "app/(public)/medicina",
-    "app/(public)/novinky",
-    "app/(public)/odborne",
-    "app/(public)/organizace",
-    "app/(public)/pravo",
-    "app/(public)/pro-koho",
-    "app/(public)/pro-me",
-    "app/(public)/search",
-    "app/(public)/sections",
-    "app/(public)/studie",
-    "app/(public)/studijni-spoluprace",
-    "app/(public)/vop",
-    "app/(public)/welcome",
-    "app/api/academy",
-    "app/api/ad-approval",
-    "app/api/ads",
-    "app/api/ai",
-    "app/api/ai-medical",
-    "app/api/auth",
-    "app/api/autopilot",
-    "app/api/contact",
-    "app/api/cron",
-    "app/api/events",
-    "app/api/health",
-    "app/api/kariera",
-    "app/api/kongresy",
-    "app/api/locale",
-    "app/api/setup",
-    "app/api/stripe",
-    "app/api/studijni-spoluprace",
-    "app/api/v17",
-    "app/api/v18",
-    "app/api/v5plus",
-    "app/api/v6",
-    "components/editor",
-    "scripts",
-    "edge",
-    "jobs",
-    "loadtests",
-    "node_modules.bak",
-    "node_modules.old",
-    ".npm-cache",
-    ".vercel",
-    ".data",
-    ".pr7-work",
-    ".tools-from-c",
-    "vitest.config.ts",
-    "playwright.config.ts",
-    "prisma.config.ts",
-    "sentry.client.config.ts",
-    "sentry.server.config.ts"
-  ]
-}
-
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "target": "ES2017"
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "supabase/functions",
+    "tests",
+    "e2e",
+    "mobile",
+    ".deploy-tmp",
+    ".build-tmp",
+    ".tools"
+  ]
+}

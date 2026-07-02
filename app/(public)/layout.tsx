@@ -1,38 +1,31 @@
 import { SiteFooter } from "@/components/layout/site-footer";
-import { SiteHeader } from "@/components/layout/site-header";
-import { getReaderContext } from "@/lib/auth/reader-context";
-import { REGIONS, REGION_COOKIE } from "@/lib/i18n/config";
-import { getServerLocale } from "@/lib/i18n/server-locale";
-import { getCategories } from "@/lib/queries/categories";
-import { ensureContentTypes } from "@/lib/setup/ensure-medical-data";
-import { cookies } from "next/headers";
+import { SiteHeaderWithConversion } from "@/components/v38/site-header-with-conversion";
+import { resolveConversionCopy } from "@/lib/v38/conversion-engine";
+import { REGIONS } from "@/lib/i18n/config";
+import { getPublicHeaderCategories } from "@/lib/v22/categories-cache";
+
+export const revalidate = 120;
 
 export default async function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  await ensureContentTypes();
-  const cookieStore = await cookies();
-  const [categories, locale, readerContext] = await Promise.all([
-    getCategories(),
-    getServerLocale(),
-    getReaderContext(),
+  const locale = "cs";
+  const [categories, navStripCopy] = await Promise.all([
+    getPublicHeaderCategories(locale),
+    resolveConversionCopy("nav_strip", locale),
   ]);
-  const region = cookieStore.get(REGION_COOKIE)?.value ?? REGIONS[0];
 
   return (
     <div className="flex min-h-screen flex-col bg-background" lang={locale}>
-      <SiteHeader
+      <SiteHeaderWithConversion
         categories={categories}
         locale={locale}
-        region={region}
-        user={readerContext.user}
-        profile={readerContext.profile}
-        isVip={readerContext.isVip}
-        accessLevel={readerContext.accessLevel}
+        region={REGIONS[0]}
+        navStripCopy={navStripCopy}
       />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 overflow-x-hidden">{children}</main>
       <SiteFooter />
     </div>
   );

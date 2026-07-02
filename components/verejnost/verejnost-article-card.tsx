@@ -25,7 +25,7 @@ export function VerejnostArticleCard({
         className="group flex gap-4 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-[#005B96]/40 hover:shadow-md"
       >
         <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-          <Image src={image} alt={article.title} fill className="object-cover" sizes="96px" />
+          <Image src={image} alt="" fill className="object-cover" sizes="96px" />
         </div>
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[#005B96]">{topicLabel}</p>
@@ -45,7 +45,7 @@ export function VerejnostArticleCard({
       className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="relative aspect-[16/10] bg-slate-100">
-        <Image src={image} alt={article.title} fill className="object-cover" sizes="50vw" loading="lazy" />
+        <Image src={image} alt="" fill className="object-cover" sizes="50vw" loading="lazy" />
         {variant === "interview" && isInterview ? (
           <span className="absolute bottom-3 left-3 rounded-full bg-[#021d33]/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
             Rozhovor

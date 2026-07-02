@@ -19,7 +19,10 @@ export function getV19UxListing() {
       topicCards: true,
       categoryBadges: true,
       tagChips: true,
+      glossaryTooltips: true,
+      educationalLinks: true,
       glossaryLinks: true,
+      deepLinking: true,
     },
     classes: ["v19-brief-card", "v19-nzip-topic-card", "overflow-x-hidden"],
   };

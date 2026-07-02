@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { SubscriptionComparisonTable } from "@/components/subscription/subscription-comparison-table";
 import { SubscriptionFaq } from "@/components/subscription/subscription-faq";
 import { SubscriptionTrialBanner } from "@/components/subscription/subscription-trial-banner";
 import { SubscriptionTrustBadges } from "@/components/subscription/subscription-trust-badges";
 import { V27_SUBSCRIPTION_PLANS, subscriptionProductId } from "@/lib/v27/config";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = buildPageMetadata({
-  title: "Předplatné | MedScopeGlobal",
-  description: `${VIP_TRIAL_DAYS}denní zkušební verze zdarma. Tarify 99 / 149 / 490 Kč měsíčně pro veřejnost, studenty a lékaře. Platba kartou přes Stripe.`,
-  path: "/predplatne",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  return buildV20PageMetadata({
+    title: "Předplatné | MedScopeGlobal",
+    description: `${VIP_TRIAL_DAYS}denní zkušební verze zdarma. Tarify 99 / 149 / 490 Kč měsíčně pro veřejnost, studenty a lékaře. Platba kartou přes Stripe.`,
+    path: "/predplatne",
+  });
+}
 
 export default function PredplatnePage() {
   return (
@@ -73,7 +74,8 @@ export default function PredplatnePage() {
                 </p>
                 <p className="mt-1 text-sm text-slate-600">
                   Roční: <span className="font-semibold text-[#005B96]">{plan.annualCzk} Kč</span>{" "}
-                  / rok <span className="text-emerald-700">(≈ 2 měsíce zdarma)</span>
+                  / rok{" "}
+                  <span className="text-emerald-700">(≈ 2 měsíce zdarma)</span>
                 </p>
                 <ul className="mt-4 flex-1 space-y-2 text-sm text-slate-600">
                   {plan.features.map((f) => (
@@ -118,15 +120,18 @@ export default function PredplatnePage() {
         <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
           Zaregistrujte se zdarma, poté se vraťte sem a aktivujte zkušební verzi vybraného tarifu.
         </p>
-        <Button asChild className="mt-4">
-          <Link href="/signup">Vytvořit účet zdarma</Link>
-        </Button>
+        <Link
+          href="/signup"
+          className="mt-4 inline-flex items-center justify-center rounded-lg border border-[#005B96]/30 bg-white px-6 py-2.5 text-sm font-semibold text-[#005B96] hover:bg-[#005B96]/5"
+        >
+          Vytvořit účet zdarma
+        </Link>
       </div>
 
       <p className="mt-12 text-center text-sm text-muted-foreground">
         B2B nabídka pro firmy na{" "}
-        <Link href="/organizace" className="text-[#005B96] underline">
-          /organizace
+        <Link href="/firmy" className="text-[#005B96] underline">
+          /firmy
         </Link>
         . Dotazy:{" "}
         <Link href="/kontakt" className="text-[#005B96] underline">

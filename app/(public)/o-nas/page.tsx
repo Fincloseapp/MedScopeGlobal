@@ -1,23 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-disclaimer";
 import { SITE } from "@/lib/config/site";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "O nás",
+  title: "O nás | MedScopeGlobal",
   description:
     "MedScopeGlobal je český odborný medicínský portál pro laiky, studenty medicíny, lékaře a výzkumníky.",
   path: "/o-nas",
 });
 
 const AUDIENCE_LINKS = [
-  { href: "/pro-koho/laik-student", label: "Veřejnost a studenti", desc: "Prevence, příprava na LF a srozumitelné výklady" },
-  { href: "/pro-koho/lekar", label: "Lékaři", desc: "Guidelines, studie a klinické briefy" },
-  { href: "/pro-koho/vedec", label: "Výzkum", desc: "Přehled studií a evidence-based obsah" },
-  { href: "/studie", label: "Studie", desc: "Archiv vědeckých publikací" },
+  { href: "/verejnost", label: "Veřejnost", desc: "Prevence, symptomy a životní styl srozumitelně" },
+  { href: "/studenti", label: "Studenti", desc: "Anatomie, farmakologie a příprava na LF" },
+  { href: "/lekari", label: "Lékaři", desc: "Guidelines, studie a klinické briefy" },
+  { href: "/studie", label: "Výzkum", desc: "Přehled studií a evidence-based obsah" },
 ];
 
 export default function ONasPage() {
@@ -29,7 +28,13 @@ export default function ONasPage() {
       ctaHref="/kontakt"
       ctaLabel="Kontaktujte nás"
     >
-      <Breadcrumbs items={[{ label: "Domů", href: "/" }, { label: "O nás" }]} />
+      <nav className="mb-6 text-sm text-muted-foreground">
+        <Link href="/" className="hover:text-foreground">
+          Domů
+        </Link>
+        <span className="mx-2">/</span>
+        <span>O nás</span>
+      </nav>
 
       <PublicTrustDisclaimer className="mb-8" />
 

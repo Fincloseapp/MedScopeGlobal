@@ -1,6 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /admin
-Disallow: /auth/callback
 
 Sitemap: https://medscopeglobal.com/sitemap.xml

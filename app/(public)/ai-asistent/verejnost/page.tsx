@@ -43,7 +43,7 @@ export default function AiAsistentVerejnostPage() {
         </ul>
       </div>
 
-      <IntelligenceConsole defaultAssistant="patient" simplified title="Veřejný AI asistent" />
+      <IntelligenceConsole publicMode title="Veřejný AI asistent" />
     </ModulePageShell>
   );
 }

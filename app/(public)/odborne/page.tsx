@@ -28,9 +28,9 @@ export default async function OdbornePage() {
 
   return (
     <ModulePageShell
-      eyebrow="Odborné texty"
+      eyebrow="V4d · Odborné texty"
       title="Odborné AI texty"
-      description="Automatické odborné texty z univerzit CZ/SK/EU/svět — filtrace oborů, kvalita, překlady do češtiny, citace a evidence scoring."
+      description="V5+: Groq AI, automatické citace (Vancouver/APA/Harvard), DOI, PubMed/FDA/EMA/SÚKL, evidence scoring A–D."
       ctaHref="/odborne/ai"
       ctaLabel="AI asistent"
     >
@@ -63,16 +63,16 @@ export default async function OdbornePage() {
           Evidence
         </Link>
         <Link href="/dashboard" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
-          Dashboard
+          V6 Dashboard
         </Link>
         <Link href="/autopilot" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
           Autopilot
         </Link>
         <Link href="/odborne/briefy" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
-          Odborné briefy
+          v19 Briefy
         </Link>
       </div>
-      <V19ArticleBriefFeedLazy title="Odborné medicínské briefy" limit={4} />
+      <V19ArticleBriefFeedLazy title="MedScope v19 — odborné briefy" limit={4} />
       <div className="grid gap-4 sm:grid-cols-2">
         {texts.map((t) => (
           <V4cContentCard

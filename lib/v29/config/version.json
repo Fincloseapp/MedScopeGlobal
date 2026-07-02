@@ -1,0 +1,11 @@
+{
+  "engine": "32.0",
+  "ui": "v32.0",
+  "editorial": "29",
+  "buildStamp": "v32.0-autopilot-20260619",
+  "compat": {
+    "v29": "v29.0",
+    "v30": "v30.0",
+    "v31": "v31.0"
+  }
+}

@@ -1,4 +1,6 @@
 import { MEDICAL_CATEGORIES } from "@/lib/config/categories-seed";
+import { V20_ARCHIVE_CUTOFF } from "@/lib/v20/content-rules";
+import { buildV20CategoryList } from "@/lib/v20/categories";
 import { localizeCategories, localizeCategory } from "@/lib/i18n/category-label";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { ensureMedicalCategories } from "@/lib/setup/ensure-medical-data";
@@ -44,4 +46,48 @@ export async function getCategoryBySlug(slug: string, locale?: LocaleCode) {
   if (!data) return null;
   const loc = locale ?? (await getServerLocale());
   return localizeCategory(data as Category, loc);
+}
+
+/** v20 — categories with active article counts; empty categories hidden */
+export async function getV20CategoriesWithCounts(locale?: LocaleCode) {
+  const categories = await getCategories();
+  const supabase = await createClient();
+  const counts: Record<string, number> = {};
+  const dbNames: Record<string, string> = {};
+
+  for (const cat of categories) {
+    dbNames[cat.slug] = cat.name;
+    counts[cat.slug] = 0;
+  }
+
+  if (categories.length > 0) {
+    const idToSlug = Object.fromEntries(categories.map((c) => [c.id, c.slug]));
+    const { data, error } = await supabase
+      .from("articles")
+      .select("category_id")
+      .eq("published", true)
+      .gte("published_at", V20_ARCHIVE_CUTOFF)
+      .in(
+        "category_id",
+        categories.map((c) => c.id)
+      );
+
+    if (error) {
+      console.error("getV20CategoriesWithCounts", error);
+    } else {
+      for (const row of data ?? []) {
+        const slug = idToSlug[row.category_id as string];
+        if (slug) counts[slug] = (counts[slug] ?? 0) + 1;
+      }
+    }
+  }
+
+  const loc = locale ?? (await getServerLocale());
+  const list = buildV20CategoryList(counts, dbNames);
+  if (list.length > 0) return list;
+
+  return buildV20CategoryList(
+    Object.fromEntries(categories.map((c) => [c.slug, 1])),
+    dbNames
+  ).map((item) => ({ ...item, count: counts[item.slug] ?? 0 }));
 }

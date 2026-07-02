@@ -1,5 +1,5 @@
 /**
- * MedScope Content Engine v19.8 — orchestrator
+ * MedScope Content Engine v19.9 — orchestrator
  */
 import { writeAiAuditLog } from "@/lib/ai/audit";
 import { v19CacheGet, v19CacheSet } from "@/lib/v19/cache";
@@ -21,7 +21,7 @@ export async function runV19GenerateBatch(params: {
   const t0 = Date.now();
   const mode = params.mode ?? V19_DEFAULT_MODE;
   const count = Math.min(10, Math.max(5, params.count ?? 7));
-  const cacheKey = `v19.8:batch:${params.locale}:${mode}:${new Date().toISOString().slice(0, 10)}:${count}`;
+  const cacheKey = `v19.9:batch:${params.locale}:${mode}:${new Date().toISOString().slice(0, 10)}:${count}`;
 
   const cached = v19CacheGet<V19GenerateResult>(cacheKey);
   if (cached) {
@@ -69,7 +69,9 @@ export async function runV19GenerateBatch(params: {
         scientificTerms: topic.scientificTerms,
         specialty: article.specialty,
         nzipCategory: topic.nzipCategory,
-        nzipRegistryId: topic.isNzip ? topic.id : undefined,
+        nzipRegistryId: article.nzipRegistryId ?? (topic.isNzip ? topic.id : undefined),
+        nzipGlossaryTerms: article.nzipGlossaryTerms,
+        nzipRegistryRefs: article.nzipRegistryRefs,
         publicationRef: topic.publicationRef,
         sourceTier: topic.tier,
       });
@@ -88,7 +90,7 @@ export async function runV19GenerateBatch(params: {
       }
 
       await writeAiAuditLog({
-        model: model ?? "v19.8-content",
+        model: model ?? "v19.9-content",
         inputLength: topic.briefingHint.length,
         outputLength: article.summary.length,
         risk: "low",

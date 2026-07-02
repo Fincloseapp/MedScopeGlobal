@@ -19,7 +19,7 @@ export async function DailyTipBanner() {
       >
         <div className="relative h-36 shrink-0 sm:h-auto sm:w-48">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={thumb} alt={video.title} className="h-full w-full object-cover" />
+          <img src={thumb} alt="" className="h-full w-full object-cover" />
           <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-[#005B96] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white">
             <Sparkles className="h-3 w-3" />
             Dnešní tip

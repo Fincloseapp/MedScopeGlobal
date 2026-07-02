@@ -1,29 +1,28 @@
-import { cn } from "@/lib/utils";
-import { DRUG_AGENCIES } from "@/lib/v4c/sources";
+import { DRUG_MONITOR_SOURCES } from "@/lib/v4c/drug-sources";
 
-export function DrugSourceAttribution({ className }: { className?: string }) {
+/** Minimální právní atribuce zdrojů — jedna diskrétní řádka. */
+export function DrugSourceAttribution({ className = "" }: { className?: string }) {
+  const portals = DRUG_MONITOR_SOURCES.filter(
+    (s, i, arr) => arr.findIndex((x) => x.url === s.url) === i
+  );
+
   return (
-    <aside
-      className={cn(
-        "rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-600",
-        className
-      )}
-    >
-      <p className="font-semibold text-[#021d33]">Zdroje dat</p>
-      <ul className="mt-3 space-y-2">
-        {DRUG_AGENCIES.map((agency) => (
-          <li key={agency.agency}>
-            <a
-              href={agency.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#005B96] hover:underline"
-            >
-              {agency.name}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </aside>
+    <p className={`text-[10px] leading-relaxed text-slate-400 ${className}`}>
+      Agregovaný přehled MedScopeGlobal · oficiální zdroje:{" "}
+      {portals.map((s, i) => (
+        <span key={s.id}>
+          {i > 0 ? " · " : null}
+          <a
+            href={s.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-slate-300 underline-offset-2 hover:text-slate-500"
+          >
+            {s.name}
+          </a>
+        </span>
+      ))}
+      . U každé položky odkaz na primární dokument.
+    </p>
   );
 }

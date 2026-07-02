@@ -1,4 +1,8 @@
 import type { V19BriefArticle } from "@/components/v19/article-brief-card";
+import {
+  V19NzipEducationalLinks,
+  V19NzipGlossaryTooltip,
+} from "@/components/v19/nzip-glossary-tooltip";
 import { specialtyLabel } from "@/lib/v19/specialties";
 import type { V19ContentMode, V19Specialty } from "@/lib/v19/types";
 
@@ -50,6 +54,29 @@ export function V19ArticleBody({
           {article.scientificContext}
         </p>
       )}
+      {(article as V19BriefArticle & { nzipGlossaryTerms?: string[] }).nzipGlossaryTerms
+        ?.length ? (
+        <p className="mt-4 flex flex-wrap gap-2 text-sm">
+          {(article as V19BriefArticle & { nzipGlossaryTerms?: string[] }).nzipGlossaryTerms!.map(
+            (term) => (
+              <V19NzipGlossaryTooltip key={term} term={term} locale={locale} />
+            )
+          )}
+        </p>
+      ) : null}
+      {(
+        article as V19BriefArticle & {
+          nzipEducationalLinks?: { label: string; url: string; type?: string }[];
+        }
+      ).nzipEducationalLinks?.length ? (
+        <V19NzipEducationalLinks
+          links={
+            (article as V19BriefArticle & { nzipEducationalLinks?: { label: string; url: string }[] })
+              .nzipEducationalLinks!
+          }
+          locale={locale}
+        />
+      ) : null}
       {article.nzipContext && (
         <p className="mt-4 rounded-xl bg-sky-50/70 p-4 text-sm leading-6">
           <span className="font-semibold text-slate-900">

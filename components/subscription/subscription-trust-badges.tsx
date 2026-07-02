@@ -64,7 +64,8 @@ export function SubscriptionTrustBadges() {
         })}
       </div>
       <p className="mt-6 text-center text-xs text-slate-500">
-        Powered by <span className="font-semibold text-[#635bff]">Stripe</span>
+        Powered by{" "}
+        <span className="font-semibold text-[#635bff]">Stripe</span>
         {" · "}
         <Link href="/privacy" className="text-[#005B96] underline">
           Zásady ochrany osobních údajů
