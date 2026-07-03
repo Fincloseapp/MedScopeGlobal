@@ -33,7 +33,7 @@ function attachEditorialDisplay(
   extra?: Partial<DisplayArticle>
 ): DisplayArticle {
   const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
-  const assignment = assignEditorialUnits(article);
+  const assignment = assignEditorialUnits(article ?? {});
   return {
     ...article,
     ...extra,

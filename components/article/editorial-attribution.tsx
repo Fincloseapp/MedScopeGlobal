@@ -2,6 +2,7 @@ import {
   assignEditorialUnits,
   editorialUnitLabel,
   formatEditorialUnitDisplay,
+  isEditorialUnitId,
   type ArticleForEditorialUnits,
   type EditorialLocale,
 } from "@/lib/editorial/units";
@@ -19,11 +20,14 @@ export function EditorialAttribution({
   variant = "header",
   className = "",
 }: Props) {
+  if (!article) return null;
+
   const assignment = assignEditorialUnits(article);
   const primary = formatEditorialUnitDisplay(assignment.primary, locale, assignment.aiAssisted);
-  const reviewer = assignment.reviewer
-    ? editorialUnitLabel(assignment.reviewer, locale)
-    : null;
+  const reviewer =
+    assignment.reviewer && isEditorialUnitId(assignment.reviewer)
+      ? editorialUnitLabel(assignment.reviewer, locale)
+      : null;
 
   if (variant === "compact") {
     return (

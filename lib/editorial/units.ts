@@ -144,16 +144,26 @@ export function isEditorialUnitId(value: unknown): value is EditorialUnitId {
   return typeof value === "string" && value in EDITORIAL_UNITS;
 }
 
+function normalizeArticleMetadata(
+  metadata: ArticleForEditorialUnits["metadata"]
+): Record<string, unknown> {
+  if (metadata && typeof metadata === "object" && !Array.isArray(metadata)) {
+    return metadata;
+  }
+  return {};
+}
+
 export function editorialUnitLabel(
-  unitId: EditorialUnitId,
+  unitId: EditorialUnitId | null | undefined,
   locale: EditorialLocale = "cs"
 ): string {
-  const unit = EDITORIAL_UNITS[unitId];
+  const resolved = isEditorialUnitId(unitId) ? unitId : LEGACY_DEFAULT_UNIT;
+  const unit = EDITORIAL_UNITS[resolved];
   return locale === "en" ? unit.en : unit.cs;
 }
 
 export function formatEditorialUnitDisplay(
-  unitId: EditorialUnitId,
+  unitId: EditorialUnitId | null | undefined,
   locale: EditorialLocale,
   aiAssisted = false
 ): string {
@@ -164,7 +174,7 @@ export function formatEditorialUnitDisplay(
 }
 
 function detectAiAssisted(article: ArticleForEditorialUnits): boolean {
-  const meta = article.metadata ?? {};
+  const meta = normalizeArticleMetadata(article.metadata);
   if (meta.ai_assisted === true) return true;
   if (article.ai_generated === true) return true;
   if (meta.ai_assisted === false || article.ai_generated === false) return false;
@@ -203,7 +213,8 @@ function isGeneralPublicHealth(article: ArticleForEditorialUnits): boolean {
 }
 
 function czUnitFromPersonaOrTopic(article: ArticleForEditorialUnits): EditorialUnitId {
-  const personaId = String(article.metadata?.author_persona ?? "");
+  const meta = normalizeArticleMetadata(article.metadata);
+  const personaId = String(meta.author_persona ?? "");
   if (personaId && PERSONA_STYLE_TO_CZ_UNIT[personaId]) {
     return PERSONA_STYLE_TO_CZ_UNIT[personaId]!;
   }
@@ -215,8 +226,11 @@ function czUnitFromPersonaOrTopic(article: ArticleForEditorialUnits): EditorialU
 }
 
 /** Assign primary/reviewer editorial units from article context. */
-export function assignEditorialUnits(article: ArticleForEditorialUnits): EditorialAssignment {
-  const meta = article.metadata ?? {};
+export function assignEditorialUnits(
+  article?: ArticleForEditorialUnits | null
+): EditorialAssignment {
+  const safe = article ?? {};
+  const meta = normalizeArticleMetadata(safe.metadata);
 
   if (isEditorialUnitId(meta.editorial_unit_primary)) {
     return {
@@ -224,21 +238,21 @@ export function assignEditorialUnits(article: ArticleForEditorialUnits): Editori
       reviewer: isEditorialUnitId(meta.editorial_unit_reviewer)
         ? meta.editorial_unit_reviewer
         : undefined,
-      aiAssisted: detectAiAssisted(article),
+      aiAssisted: detectAiAssisted(safe),
     };
   }
 
-  const aiAssisted = detectAiAssisted(article);
+  const aiAssisted = detectAiAssisted(safe);
 
-  if (isInternationalEn(article)) {
+  if (isInternationalEn(safe)) {
     const primary: EditorialUnitId =
-      article.rubric_slug === "studies" || meta.section === "studies"
+      safe.rubric_slug === "studies" || meta.section === "studies"
         ? "medscope_international_research"
         : "medscope_global_health";
     return { primary, aiAssisted };
   }
 
-  if (isMedicalScientific(article) && !isGeneralPublicHealth(article)) {
+  if (isMedicalScientific(safe) && !isGeneralPublicHealth(safe)) {
     return {
       primary: "medscope_clinical_insights",
       reviewer: "medscope_cz_klinicka",
@@ -246,9 +260,9 @@ export function assignEditorialUnits(article: ArticleForEditorialUnits): Editori
     };
   }
 
-  if (isGeneralPublicHealth(article)) {
+  if (isGeneralPublicHealth(safe)) {
     return {
-      primary: czUnitFromPersonaOrTopic(article),
+      primary: czUnitFromPersonaOrTopic(safe),
       aiAssisted,
     };
   }

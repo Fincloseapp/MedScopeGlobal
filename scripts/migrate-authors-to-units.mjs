@@ -15,7 +15,7 @@ import {
   LEGACY_PERSONAL_NAME_PATTERNS,
   PERSONA_STYLE_TO_CZ_UNIT,
   resolveLegacyUnitFromText,
-} from "../lib/editorial/units.mjs";
+} from "../lib/editorial/units.scripts.mjs";
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dir, "..");
