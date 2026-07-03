@@ -1,0 +1,24 @@
+{
+  "topicWeights": {
+    "zivotni-styl": {
+      "empatik": 1.5,
+      "popularizátor": 1.4,
+      "vypravěč": 1.3
+    },
+    "nemoci": {
+      "analytik": 1.5,
+      "komentátor": 1.4,
+      "investigativní": 1.3
+    },
+    "prevence": {
+      "analytik": 1.4,
+      "empatik": 1.3,
+      "popularizátor": 1.2
+    },
+    "rozhovory": {
+      "reportér": 1.6,
+      "komentátor": 1.4,
+      "vypravěč": 1.3
+    }
+  }
+}

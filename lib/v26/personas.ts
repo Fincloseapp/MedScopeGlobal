@@ -24,7 +24,7 @@ export const AUTHOR_PERSONAS: AuthorPersona[] = [
   {
     id: "analytik",
     displayName: "Dr. Helena Votrubová",
-    byline: "Redakce — Dr. Helena Votrubová",
+    byline: "Redakce MedScopeGlobal — Dr. Helena Votrubová",
     tone: "analytical",
     sentenceLength: "krátké",
     metaphorStyle: "střídmé",
@@ -36,7 +36,7 @@ export const AUTHOR_PERSONAS: AuthorPersona[] = [
   {
     id: "vypravěč",
     displayName: "Tomáš Malina",
-    byline: "Redakce — Tomáš Malina",
+    byline: "Redakce MedScopeGlobal — Tomáš Malina",
     tone: "narrative",
     sentenceLength: "delší",
     metaphorStyle: "živé",
@@ -48,7 +48,7 @@ export const AUTHOR_PERSONAS: AuthorPersona[] = [
   {
     id: "reportér",
     displayName: "Klára Horáková",
-    byline: "Redakce — Klára Horáková",
+    byline: "Redakce MedScopeGlobal — Klára Horáková",
     tone: "reportage",
     sentenceLength: "střední",
     metaphorStyle: "reportážní",
@@ -60,7 +60,7 @@ export const AUTHOR_PERSONAS: AuthorPersona[] = [
   {
     id: "komentátor",
     displayName: "MUDr. Petr Štěpán",
-    byline: "Redakce — MUDr. Petr Štěpán",
+    byline: "Redakce MedScopeGlobal — MUDr. Petr Štěpán",
     tone: "commentary",
     sentenceLength: "střední",
     metaphorStyle: "střídmé",
@@ -72,7 +72,7 @@ export const AUTHOR_PERSONAS: AuthorPersona[] = [
   {
     id: "empatik",
     displayName: "Bc. Jana Procházková",
-    byline: "Redakce — Bc. Jana Procházková",
+    byline: "Redakce MedScopeGlobal — Bc. Jana Procházková",
     tone: "empathetic",
     sentenceLength: "střední",
     metaphorStyle: "poetické",
@@ -84,7 +84,7 @@ export const AUTHOR_PERSONAS: AuthorPersona[] = [
   {
     id: "investigativní",
     displayName: "Ing. Marek Dušek",
-    byline: "Redakce — Ing. Marek Dušek",
+    byline: "Redakce MedScopeGlobal — Ing. Marek Dušek",
     tone: "investigative",
     sentenceLength: "krátké",
     metaphorStyle: "střídmé",
@@ -96,7 +96,7 @@ export const AUTHOR_PERSONAS: AuthorPersona[] = [
   {
     id: "popularizátor",
     displayName: "MUDr. Lucie Beránková",
-    byline: "Redakce — MUDr. Lucie Beránková",
+    byline: "Redakce MedScopeGlobal — MUDr. Lucie Beránková",
     tone: "narrative",
     sentenceLength: "střední",
     metaphorStyle: "živé",

@@ -9,27 +9,27 @@ export type PublicAvatarConfig = {
   voiceHint: string;
 };
 
-/** European-style public health presenters */
+/** European-style public health presenters — curated clinical imagery, no stock portraits. */
 export const PUBLIC_OSVTA_AVATARS: Record<PublicAvatarType, PublicAvatarConfig> = {
   friendly_doctor: {
     id: "friendly_doctor",
     name: "MUDr. Martin Novák",
     role: "Praktický lékař",
-    imageUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=640&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1584515930387-285e4804f4cb?w=640&h=640&fit=crop&q=85&auto=format&fm=webp",
     voiceHint: "cs_male_warm",
   },
   nurse: {
     id: "nurse",
     name: "Sestra Klára Horáková",
     role: "Všeobecná sestra",
-    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=640&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=640&h=640&fit=crop&q=85&auto=format&fm=webp",
     voiceHint: "cs_female_caring",
   },
   wellness_coach: {
     id: "wellness_coach",
     name: "Petra Svobodová",
     role: "Wellness kouč",
-    imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=640&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=640&h=640&fit=crop&q=85&auto=format&fm=webp",
     voiceHint: "cs_female_energetic",
   },
 };

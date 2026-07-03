@@ -11,6 +11,7 @@ export const V271_HERO = {
 export const V271_HERO_CTAS = [
   { label: "Vyzkoušet 14 dní zdarma", href: "/predplatne?trial=1", primary: true },
   { label: "Předplatit", href: "/predplatne", primary: false },
+  { label: "Pro veřejnost", href: "/verejnost", primary: false },
   { label: "Pro studenty", href: "/studenti", primary: false },
   { label: "Pro lékaře", href: "/lekari", primary: false },
 ] as const;

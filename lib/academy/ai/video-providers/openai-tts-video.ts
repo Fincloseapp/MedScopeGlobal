@@ -20,7 +20,7 @@ const AUDIO_PREFIX = "academy/audio";
 
 const DEFAULT_AVATAR_URL =
 
-  "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=640&q=80";
+  "https://images.unsplash.com/photo-1584515930387-285e4804f4cb?w=640&h=640&fit=crop&q=85&auto=format&fm=webp";
 
 
 
