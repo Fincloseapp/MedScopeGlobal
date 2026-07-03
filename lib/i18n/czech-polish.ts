@@ -53,9 +53,17 @@ const TYPO_PATTERNS: [RegExp, string][] = [
   [/\s+\.\s+/g, ". "],
   [/\.\.+/g, "."],
   [/\s+–\s+/g, " – "],
+  [/(\p{L})je téma/giu, "$1 je téma"],
+  [/,\.\s*/g, ". "],
 ];
 
 const MAX_READ_SENTENCE = 140;
+
+function ensureChunkPeriod(chunk: string): string {
+  if (/[.!?]$/.test(chunk)) return chunk;
+  if (/[,;]$/.test(chunk)) return `${chunk.slice(0, -1)}.`;
+  return `${chunk}.`;
+}
 
 /** Polish plain Czech text — grammar fixes and readability. */
 export function polishCzechText(text: string): string {
@@ -86,13 +94,13 @@ export function shortenLongSentences(text: string, maxLen = MAX_READ_SENTENCE): 
       for (const part of parts) {
         const next = chunk ? `${chunk} ${part}` : part;
         if (next.length > maxLen && chunk) {
-          out.push(chunk.endsWith(".") ? chunk : `${chunk}.`);
+          out.push(ensureChunkPeriod(chunk));
           chunk = part;
         } else {
           chunk = next;
         }
       }
-      if (chunk) out.push(chunk.endsWith(".") || chunk.endsWith("!") || chunk.endsWith("?") ? chunk : `${chunk}.`);
+      if (chunk) out.push(ensureChunkPeriod(chunk));
     } else {
       out.push(s);
     }
