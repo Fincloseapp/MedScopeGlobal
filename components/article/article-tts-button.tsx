@@ -20,7 +20,7 @@ export function ArticleTtsButton({ excerpt, title, content }: Props) {
       label="Poslechnout článek"
       className="not-prose my-4"
       full
-      lang="cs"
+      lang="cs-CZ"
     />
   );
 }

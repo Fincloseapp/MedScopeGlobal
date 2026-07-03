@@ -153,7 +153,7 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className, lang }:
   return (
     <div className={className} role="region" aria-label={`Prezentace lekce: ${lessonTitle}`}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <VoicePicker compact />
+        <VoicePicker compact lang={speechLang} />
         <span className="text-xs font-medium text-slate-500" aria-live="polite">
           Slide {index + 1} / {slides.length}
         </span>

@@ -1,12 +1,17 @@
 /**
  * Web Speech API helpers — client-side only (free TTS, no paid APIs).
- * Server routes return { mode: "browser", text, lang } for client playback.
+ * Czech voice selection via pickVoice — never English default for cs-CZ.
  */
+
+import { pickVoice, resolveSpeechLang } from "@/lib/tts/voice-picker";
+import { waitForVoices } from "@/lib/tts/speak";
 
 export type WebSpeechTtsRequest = {
   text: string;
   lang?: string;
   rate?: number;
+  pitch?: number;
+  gender?: "male" | "female" | "auto";
 };
 
 export type WebSpeechTtsResponse = {
@@ -24,8 +29,8 @@ export function buildWebSpeechResponse(input: WebSpeechTtsRequest): WebSpeechTts
     mode: "browser",
     provider: "web_speech_api",
     text: input.text.trim().slice(0, 4096),
-    lang: input.lang?.trim() || DEFAULT_SPEECH_LANG,
-    message: "Synthesize audio in browser via SpeechSynthesis API",
+    lang: resolveSpeechLang(input.lang ?? DEFAULT_SPEECH_LANG),
+    message: "Synthesize audio in browser via SpeechSynthesis API (Czech voice)",
   };
 }
 
@@ -34,15 +39,22 @@ export function isWebSpeechSupported(): boolean {
   return typeof window !== "undefined" && "speechSynthesis" in window;
 }
 
-export function speakInBrowser(input: WebSpeechTtsRequest): Promise<void> {
+export async function speakInBrowser(input: WebSpeechTtsRequest): Promise<void> {
+  if (!isWebSpeechSupported()) {
+    throw new Error("Web Speech API unavailable");
+  }
+  await waitForVoices();
+  const lang = resolveSpeechLang(input.lang ?? DEFAULT_SPEECH_LANG);
+  const isEn = lang.toLowerCase().startsWith("en");
+
   return new Promise((resolve, reject) => {
-    if (!isWebSpeechSupported()) {
-      reject(new Error("Web Speech API unavailable"));
-      return;
-    }
     const utterance = new SpeechSynthesisUtterance(input.text.trim().slice(0, 4096));
-    utterance.lang = input.lang ?? DEFAULT_SPEECH_LANG;
-    utterance.rate = input.rate ?? 1;
+    utterance.lang = lang;
+    utterance.rate = input.rate ?? (isEn ? 1 : 0.93);
+    utterance.pitch = input.pitch ?? 1;
+    const voice = pickVoice(input.gender ?? "auto", lang);
+    if (voice) utterance.voice = voice;
+
     utterance.onend = () => resolve();
     utterance.onerror = () => reject(new Error("Speech synthesis failed"));
     window.speechSynthesis.cancel();

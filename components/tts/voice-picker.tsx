@@ -7,15 +7,21 @@ import {
   setUserVoiceOverride,
 } from "@/lib/tts/voice-session";
 import { setVoiceGenderPreference, type VoiceGender } from "@/lib/tts/speak";
+import { describeSelectedVoice, listVoicesForLang } from "@/lib/tts/voice-picker";
+import { waitForVoices } from "@/lib/tts/speak";
 
 type Props = {
   className?: string;
   compact?: boolean;
+  /** BCP-47 locale — defaults to Czech */
+  lang?: string;
 };
 
-export function VoicePicker({ className, compact }: Props) {
+export function VoicePicker({ className, compact, lang = "cs-CZ" }: Props) {
   const [gender, setGender] = useState<VoiceGender>("auto");
   const [sessionHint, setSessionHint] = useState<string>("");
+  const [voiceLabel, setVoiceLabel] = useState<string | null>(null);
+  const [noCzechVoice, setNoCzechVoice] = useState(false);
 
   useEffect(() => {
     initSessionVoice();
@@ -29,12 +35,19 @@ export function VoicePicker({ className, compact }: Props) {
     } catch {
       /* ignore */
     }
-  }, []);
+
+    void waitForVoices().then(() => {
+      const czechVoices = listVoicesForLang(lang);
+      setNoCzechVoice(!czechVoices.length && !lang.toLowerCase().startsWith("en"));
+      setVoiceLabel(describeSelectedVoice(lang));
+    });
+  }, [lang]);
 
   function select(next: VoiceGender) {
     setGender(next);
     setUserVoiceOverride(next);
     setVoiceGenderPreference(next);
+    setVoiceLabel(describeSelectedVoice(lang));
   }
 
   return (
@@ -57,6 +70,16 @@ export function VoicePicker({ className, compact }: Props) {
       ))}
       {gender === "auto" && sessionHint ? (
         <span className="text-[10px] text-slate-400">({sessionHint})</span>
+      ) : null}
+      {voiceLabel && !noCzechVoice ? (
+        <span className="text-[10px] text-slate-400" title="Aktivní český hlas">
+          {voiceLabel}
+        </span>
+      ) : null}
+      {noCzechVoice ? (
+        <span className="text-[10px] text-amber-700" title="Nainstalujte český hlas v systému">
+          Chybí český hlas
+        </span>
       ) : null}
     </div>
   );

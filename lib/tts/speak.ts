@@ -4,7 +4,7 @@ import {
   SLIDE_PAUSE_MS,
   naturalizeAndSplit,
 } from "@/lib/tts/naturalize-czech";
-import { pickVoice, type VoiceGender } from "@/lib/tts/voice-picker";
+import { pickVoice, resolveSpeechLang, type VoiceGender } from "@/lib/tts/voice-picker";
 
 export type { VoiceGender };
 
@@ -73,6 +73,22 @@ export type SpeakOptions = {
   pitch?: number;
 };
 
+/** Natural Czech Web Speech pacing — slightly slower than English default. */
+const CZECH_SPEECH_RATE = 0.93;
+const CZECH_SPEECH_PITCH = 1.0;
+const EN_SPEECH_RATE = 1.0;
+
+function resolveSpeechDefaults(lang: string, opts: SpeakOptions) {
+  const resolvedLang = opts.lang ?? resolveSpeechLang(lang);
+  const isEn = resolvedLang.toLowerCase().startsWith("en");
+  return {
+    lang: resolvedLang,
+    rate: opts.rate ?? (isEn ? EN_SPEECH_RATE : CZECH_SPEECH_RATE),
+    pitch: opts.pitch ?? CZECH_SPEECH_PITCH,
+    gender: opts.gender,
+  };
+}
+
 function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
 }
@@ -99,12 +115,13 @@ function speakOnce(text: string, opts: SpeakOptions, gen: number): Promise<void>
       return;
     }
 
+    const defaults = resolveSpeechDefaults(opts.lang ?? "cs-CZ", opts);
     const utterance = new SpeechSynthesisUtterance(trimmed);
-    utterance.lang = opts.lang ?? "cs-CZ";
-    utterance.rate = opts.rate ?? 1;
-    utterance.pitch = opts.pitch ?? 1;
+    utterance.lang = defaults.lang;
+    utterance.rate = opts.rate ?? defaults.rate;
+    utterance.pitch = opts.pitch ?? defaults.pitch;
     const voices = loadVoices();
-    const voice = pickVoice(opts.gender ?? "auto", opts.lang ?? "cs", voices);
+    const voice = pickVoice(defaults.gender ?? "auto", defaults.lang, voices);
     if (voice) utterance.voice = voice;
 
     utterance.onend = () => {
@@ -141,16 +158,17 @@ export async function speak(text: string, lang = "cs-CZ", gender?: VoiceGender):
   await waitForVoices();
   stopSpeaking();
   const gen = speakGeneration;
-  const parts = prepareParts(text, lang);
+  const defaults = resolveSpeechDefaults(lang, { lang, gender });
+  const parts = prepareParts(text, defaults.lang);
   if (!parts.length) return;
-  return speakNaturalChunks(parts, { lang, gender }, gen);
+  return speakNaturalChunks(parts, defaults, gen);
 }
 
 export async function speakFullText(text: string, opts: SpeakOptions = {}): Promise<void> {
   await waitForVoices();
   stopSpeaking();
   const gen = speakGeneration;
-  const lang = opts.lang ?? "cs-CZ";
+  const defaults = resolveSpeechDefaults(opts.lang ?? "cs-CZ", opts);
 
   const paragraphs = text
     .replace(/\r/g, "")
@@ -161,8 +179,8 @@ export async function speakFullText(text: string, opts: SpeakOptions = {}): Prom
   const blocks = paragraphs.length ? paragraphs : [text.trim()];
   for (const block of blocks) {
     if (gen !== speakGeneration) break;
-    const parts = prepareParts(block, lang);
-    await speakNaturalChunks(parts, { ...opts, lang }, gen);
+    const parts = prepareParts(block, defaults.lang);
+    await speakNaturalChunks(parts, defaults, gen);
     await sleep(SLIDE_PAUSE_MS);
   }
 }
@@ -176,9 +194,9 @@ export async function speakSlideText(
   await waitForVoices();
   stopSpeaking();
   const gen = speakGeneration;
-  const lang = opts.lang ?? "cs-CZ";
-  const parts = prepareParts(`${title}. ${body}`, lang);
-  const rate = (opts.rate ?? 1) * (0.95 + (slideIndex % 5) * 0.025);
-  const pitch = (opts.pitch ?? 1) * (0.98 + (slideIndex % 3) * 0.02);
-  await speakNaturalChunks(parts, { ...opts, rate, pitch, lang }, gen);
+  const defaults = resolveSpeechDefaults(opts.lang ?? "cs-CZ", opts);
+  const parts = prepareParts(`${title}. ${body}`, defaults.lang);
+  const rate = defaults.rate * (0.95 + (slideIndex % 5) * 0.025);
+  const pitch = defaults.pitch * (0.98 + (slideIndex % 3) * 0.02);
+  await speakNaturalChunks(parts, { ...defaults, rate, pitch }, gen);
 }

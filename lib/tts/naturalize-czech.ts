@@ -18,6 +18,7 @@ const MEDICAL_ABBR: Record<string, string> = {
   HIV: "H I V",
   AIDS: "A I D S",
   COPD: "C O P D",
+  CHOPN: "chronická obstrukční plicní nemoc",
   DM: "diabetes mellitus",
   HTN: "hypertenze",
   IV: "intravenózně",
@@ -156,6 +157,11 @@ export function naturalizeCzechForSpeech(raw: string): string {
   // Blood pressure / ratios: 120/80 → sto dvacet pause osmdesát
   t = t.replace(/\b(\d+)\s*\/\s*(\d+)\b/g, (_, a, b) => {
     return `${speakDigit(a)} ${PAUSE} ${speakDigit(b)}`;
+  });
+
+  // Czech decimal numbers: 3,5 → tři celá pět
+  t = t.replace(/\b(\d+),(\d+)\b/g, (_, whole, frac) => {
+    return `${speakDigit(whole)} celá ${frac.split("").map((d: string) => CZECH_DIGIT_SPOKEN[d] ?? d).join(" ")}`;
   });
 
   // Collapse whitespace

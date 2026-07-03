@@ -148,7 +148,7 @@ export function OsvetaVideoPlayer({
           text={listenText}
           label="Poslech"
           className="not-prose"
-          lang="cs"
+          lang="cs-CZ"
         />
       ) : null}
 
