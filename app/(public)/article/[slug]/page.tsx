@@ -13,7 +13,13 @@ import type { V19Specialty } from "@/lib/v19/types";
 import { ArticleCard } from "@/components/article/article-card";
 import { AdSlot } from "@/components/ads/ad-slot";
 import { VipBadge } from "@/components/vip/vip-badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { EditorialAttribution } from "@/components/article/editorial-attribution";
+import { EditorialFooter } from "@/components/article/editorial-footer";
+import {
+  assignEditorialUnits,
+  buildArticleJsonLdAuthor,
+  type EditorialLocale,
+} from "@/lib/editorial/units";
 import { canAccessContent } from "@/lib/config/access-levels";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import { getReaderContext } from "@/lib/auth/reader-context";
@@ -143,8 +149,9 @@ export default async function ArticlePage({ params }: Props) {
   const studentInlineAds = studentCampaigns.filter((c) => c.type === "inline").slice(0, 1);
   const studentSidebarAds = studentCampaigns.filter((c) => c.type === "sidebar").slice(0, 3);
 
-  const author = article.users;
   const category = article.categories;
+  const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
+  const editorialAssignment = assignEditorialUnits(article);
 
   const isV19Article = article.rubric_slug === V19_RUBRIC_SLUG;
   const v19Quiz = (article.quiz_json ?? {}) as Record<string, unknown>;
@@ -181,12 +188,7 @@ export default async function ArticlePage({ params }: Props) {
         "@type": "MedicalWebPage",
         headline: article.title,
         datePublished: article.published_at,
-        author: author?.full_name
-          ? {
-              "@type": "Person",
-              name: author.full_name,
-            }
-          : undefined,
+        author: buildArticleJsonLdAuthor(editorialAssignment, editorialLocale),
         image: article.cover_image_url ? [article.cover_image_url] : undefined,
         publisher: {
           "@type": "Organization",
@@ -253,16 +255,11 @@ export default async function ArticlePage({ params }: Props) {
 
             <div className="mt-6 flex flex-wrap items-center gap-4 border-y py-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={author?.avatar_url ?? undefined} alt="" />
-                  <AvatarFallback>
-                    {author?.full_name?.slice(0, 2).toUpperCase() ?? "MS"}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                  MS
+                </div>
                 <div>
-                  <p className="font-medium text-foreground">
-                    {author?.full_name ?? "MedScopeGlobal editorial"}
-                  </p>
+                  <EditorialAttribution article={article} locale={editorialLocale} />
                   <p>
                     {article.published_at &&
                       new Date(article.published_at).toLocaleDateString(
@@ -386,6 +383,8 @@ export default async function ArticlePage({ params }: Props) {
             )}
 
             <ContentRecommendations locale={locale} currentSlug={article.slug} />
+
+            <EditorialFooter locale={editorialLocale} />
           </div>
 
           <aside className="w-full shrink-0 space-y-6 lg:w-80">

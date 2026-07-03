@@ -9,6 +9,37 @@ import { slugify } from "@/lib/utils";
 import type { RawFeedItem } from "@/lib/ingestion/rss";
 import { runV26ForeignNewsIngest } from "@/lib/v26/foreign-news-ingest";
 import { V26_EDITORIAL_VERSION } from "@/lib/v26/version";
+import {
+  assignEditorialUnits,
+  buildEditorialMetadataPatch,
+  formatEditorialUnitDisplay,
+} from "@/lib/editorial/units";
+
+function buildIngestionEditorialFields(context: {
+  locale: string;
+  min_access_level: string;
+  rubric_slug: string;
+  audience?: string;
+  sourceCitation?: { name: string; url: string; originalTitle?: string };
+}) {
+  const assignment = assignEditorialUnits({
+    locale: context.locale,
+    min_access_level: context.min_access_level,
+    rubric_slug: context.rubric_slug,
+    audience: context.audience ?? "professional",
+    ai_generated: true,
+  });
+  const editorialMeta = buildEditorialMetadataPatch(assignment);
+  return {
+    source_name: formatEditorialUnitDisplay(assignment.primary, "cs", assignment.aiAssisted),
+    ai_generated: assignment.aiAssisted,
+    metadata: {
+      editorial_version: V26_EDITORIAL_VERSION,
+      ...editorialMeta,
+      ...(context.sourceCitation ? { source_citation: context.sourceCitation } : {}),
+    },
+  };
+}
 
 export interface IngestionResult {
   runId: string;
@@ -286,6 +317,18 @@ async function upsertIngestedArticle({
       ? new Date(item.pubDate).toISOString()
       : new Date().toISOString();
 
+    const editorial = buildIngestionEditorialFields({
+      locale: processed.locale,
+      min_access_level: processed.minAccessLevel,
+      rubric_slug: processed.rubricSlug,
+      audience: "professional",
+      sourceCitation: {
+        name: item.sourceName,
+        url: item.link,
+        originalTitle: item.title,
+      },
+    });
+
     const payload = {
       title: processed.title,
       slug,
@@ -302,22 +345,15 @@ async function upsertIngestedArticle({
       min_access_level: processed.minAccessLevel,
       locale: processed.locale,
       source_url: item.link,
-      source_name: item.sourceName,
+      source_name: editorial.source_name,
       ingested_at: new Date().toISOString(),
-      ai_generated: true,
+      ai_generated: editorial.ai_generated,
       is_machine_translated: true,
       content_type: inferContentType(processed.minAccessLevel, processed.rubricSlug),
       license: "source",
       hash_dedup: hash,
       meta_description: processed.excerpt,
-      metadata: {
-        editorial_version: V26_EDITORIAL_VERSION,
-        source_citation: {
-          name: item.sourceName,
-          url: item.link,
-          originalTitle: item.title,
-        },
-      },
+      metadata: editorial.metadata,
       updated_at: new Date().toISOString(),
     };
 
@@ -381,6 +417,13 @@ async function upsertGeneratedArticle({
   if (slugClash?.id) {
     return "skipped";
   }
+  const editorial = buildIngestionEditorialFields({
+    locale: "cs",
+    min_access_level: template.premium ? "physician" : "public",
+    rubric_slug: template.contentType === "clinical" ? "ai-case-study" : "ai-textbook-summary",
+    audience: template.premium ? "professional" : "public",
+  });
+
   const payload = {
     title: template.title,
     slug,
@@ -397,9 +440,9 @@ async function upsertGeneratedArticle({
     min_access_level: template.premium ? "physician" : "public",
     locale: "cs",
     source_url: sourceUrl,
-    source_name: "MedScopeGlobal redakce",
+    source_name: editorial.source_name,
     ingested_at: new Date().toISOString(),
-    ai_generated: true,
+    ai_generated: editorial.ai_generated,
     is_machine_translated: false,
     content_type: template.contentType,
     license: "editorial",
@@ -411,6 +454,7 @@ async function upsertGeneratedArticle({
     learning_objectives: ["Klinický přehled", "Studijní opakování"],
     quiz_json: { type: "multiple-choice", items: 3 },
     meta_description: template.excerpt,
+    metadata: editorial.metadata,
     updated_at: new Date().toISOString(),
   };
 

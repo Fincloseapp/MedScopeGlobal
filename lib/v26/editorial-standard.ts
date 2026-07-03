@@ -6,15 +6,25 @@ import {
   V26_SECTIONS,
   wrapContentInV26Structure,
 } from "./editorial-prompts.mjs";
+import {
+  assignEditorialUnits,
+  buildEditorialMetadataPatch,
+  formatEditorialUnitDisplay,
+} from "@/lib/editorial/units";
 import type { AuthorPersona } from "./personas";
 
 export { V26_SECTIONS, validateV26Structure, wrapContentInV26Structure };
 
 export interface V26ArticleMetadata {
   editorial_version?: string;
-  author_persona?: string;
+  /** @deprecated use editorial_unit_primary */
+  author_persona?: string | null;
   author_display_name?: string;
   author_byline?: string;
+  editorial_unit_primary?: string;
+  editorial_unit_reviewer?: string | null;
+  ai_assisted?: boolean;
+  writing_style?: string | null;
   source_citation?: {
     name: string;
     url: string;
@@ -43,8 +53,11 @@ export interface V26RewriteResult {
 }
 
 export function buildV26SystemPrompt(audience = "public", persona?: AuthorPersona, topic?: string | null): string {
+  const personaPrompt = persona
+    ? buildPersonaStylePrompt(persona, topic as Parameters<typeof buildPersonaStylePrompt>[1])
+    : "";
   return `${buildV26StructurePrompt(audience, topic ?? null)}
-${persona ? buildPersonaStylePrompt(persona) : ""}
+${personaPrompt}
 ${buildBlocklistPrompt()}
 Vrať JSON: { "title": string, "excerpt": string (2–3 věty), "bodyHtml": string (HTML s <p>, <h2>, <ul>) }`;
 }
@@ -69,12 +82,18 @@ export function mergeV26Metadata(
 }
 
 export function buildFallbackRewrite(input: V26RewriteInput): V26RewriteResult {
-  const personaName = input.persona?.displayName ?? "Redakce MedScopeGlobal";
+  const assignment = assignEditorialUnits({
+    audience: input.audience ?? "public",
+    public_topic: input.topic ?? null,
+    ai_generated: true,
+    metadata: { author_persona: input.persona?.id ?? null },
+  });
+  const unitLabel = formatEditorialUnitDisplay(assignment.primary, "cs", assignment.aiAssisted);
   const content = wrapContentInV26Structure({
     title: input.title,
     excerpt: input.excerpt ?? input.title,
     bodyHtml: input.content.slice(0, 4000),
-    personaName,
+    personaName: unitLabel,
     persona: input.persona,
     topic: input.topic ?? "zivotni-styl",
   });
@@ -85,9 +104,8 @@ export function buildFallbackRewrite(input: V26RewriteInput): V26RewriteResult {
     content,
     metadata: {
       editorial_version: "26.2.1",
-      author_persona: input.persona?.id,
-      author_display_name: personaName,
-      author_byline: input.persona?.byline ?? personaName,
+      writing_style: input.persona?.id ?? null,
+      ...buildEditorialMetadataPatch(assignment),
       source_citation: input.sourceCitation,
       rewritten_at: new Date().toISOString(),
     },

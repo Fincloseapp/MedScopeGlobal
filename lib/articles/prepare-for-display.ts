@@ -10,6 +10,12 @@ import type { ArticleWithRelations } from "@/types/database";
 import { dedupeArticlesByTitle } from "@/lib/articles/dedupe";
 import { enrichArticleBodyForDisplay } from "@/lib/articles/enrich-body";
 import { polishCzechFields } from "@/lib/v22/translate";
+import {
+  assignEditorialUnits,
+  formatEditorialUnitDisplay,
+  type EditorialAssignment,
+  type EditorialLocale,
+} from "@/lib/editorial/units";
 
 export type DisplayArticle = ArticleWithRelations & {
   displayLocale?: string;
@@ -17,7 +23,28 @@ export type DisplayArticle = ArticleWithRelations & {
   translation_provider?: string;
   machine_translated?: boolean;
   reviewed?: boolean;
+  editorialAssignment?: EditorialAssignment;
+  editorialPrimaryLabel?: string;
 };
+
+function attachEditorialDisplay(
+  article: ArticleWithRelations,
+  locale: LocaleCode,
+  extra?: Partial<DisplayArticle>
+): DisplayArticle {
+  const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
+  const assignment = assignEditorialUnits(article);
+  return {
+    ...article,
+    ...extra,
+    editorialAssignment: assignment,
+    editorialPrimaryLabel: formatEditorialUnitDisplay(
+      assignment.primary,
+      editorialLocale,
+      assignment.aiAssisted
+    ),
+  };
+}
 
 function sortByLocalePreference(
   articles: ArticleWithRelations[],
@@ -60,7 +87,7 @@ export async function prepareArticleForDisplay(
 
   if (matchesArticleLocale(base.locale, locale)) {
     const polished = locale === "cs" ? polishCzechFields(base, locale) : base;
-    const display = { ...polished, displayLocale: target };
+    const display = attachEditorialDisplay(polished, locale, { displayLocale: target });
     if (mode === "full") {
       return { ...display, content: enrichArticleBodyForDisplay(display) };
     }
@@ -80,11 +107,10 @@ export async function prepareArticleForDisplay(
   );
 
   if (!translated) {
-    return {
-      ...base,
+    return attachEditorialDisplay(base, locale, {
       displayLocale: base.locale ?? undefined,
       translatedFrom: base.locale ?? "en",
-    };
+    });
   }
 
   const content = translated.content ?? base.content;
@@ -105,8 +131,7 @@ export async function prepareArticleForDisplay(
         })
       : polished.content ?? content;
 
-  return {
-    ...base,
+  return attachEditorialDisplay(base, locale, {
     title: polished.title,
     excerpt: polished.excerpt,
     content: enriched,
@@ -115,7 +140,7 @@ export async function prepareArticleForDisplay(
     translation_provider: translated.translation_provider,
     machine_translated: translated.machine_translated,
     reviewed: translated.reviewed,
-  };
+  });
 }
 
 export async function prepareArticlesForDisplay(
@@ -140,11 +165,12 @@ export async function prepareArticlesForDisplay(
       out.push(await prepareArticleForDisplay(article, locale, mode));
     } else {
       const withCat = await applyCategoryLabels(article, locale);
-      out.push({
-        ...withCat,
-        displayLocale: withCat.locale ?? undefined,
-        translatedFrom: withCat.locale ?? null,
-      });
+      out.push(
+        attachEditorialDisplay(withCat, locale, {
+          displayLocale: withCat.locale ?? undefined,
+          translatedFrom: withCat.locale ?? null,
+        })
+      );
     }
   }
   return out;

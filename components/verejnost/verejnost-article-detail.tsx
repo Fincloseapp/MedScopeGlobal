@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Calendar, ExternalLink } from "lucide-react";
 import { PublicAdBlocks } from "@/components/verejnost/public-ad-block";
+import { EditorialAttribution } from "@/components/article/editorial-attribution";
+import { EditorialFooter } from "@/components/article/editorial-footer";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import type { PublicAdCampaign } from "@/lib/queries/verejnost";
 import { articleTopicLabel, verejnostDateLabel } from "@/lib/verejnost/helpers";
@@ -48,6 +50,9 @@ export function VerejnostArticleDetail({
                   <time dateTime={article.published_at ?? article.created_at}>{dateLabel}</time>
                 </p>
               ) : null}
+              <div className="mt-3 text-sm">
+                <EditorialAttribution article={article} locale="cs" />
+              </div>
             </header>
 
             <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-2xl bg-slate-100">
@@ -96,6 +101,8 @@ export function VerejnostArticleDetail({
               Informace na medscopeglobal.com slouží k obecnému vzdělávání a nenahrazují konzultaci s
               lékařem. Při akutních potížích vyhledejte odbornou pomoc.
             </p>
+
+            <EditorialFooter locale="cs" />
           </article>
 
           {sidebarAds.length > 0 ? (

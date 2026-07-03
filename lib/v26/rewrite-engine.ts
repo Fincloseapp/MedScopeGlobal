@@ -11,6 +11,11 @@ import {
   type V26RewriteResult,
 } from "@/lib/v26/editorial-standard";
 import { pickPersonaForArticle, type AuthorPersona } from "@/lib/v26/personas";
+import {
+  assignEditorialUnits,
+  buildEditorialMetadataPatch,
+  formatEditorialUnitDisplay,
+} from "@/lib/editorial/units";
 import { V26_EDITORIAL_VERSION } from "@/lib/v26/version";
 
 export type { V26RewriteInput, V26RewriteResult, V26ArticleMetadata };
@@ -34,12 +39,19 @@ export async function rewriteToV26Standard(
       };
       let content = parsed.bodyHtml ?? "";
       let validation = validateV26Structure(content);
+      const assignment = assignEditorialUnits({
+        audience,
+        public_topic: input.topic ?? null,
+        ai_generated: true,
+        metadata: { author_persona: persona.id },
+      });
+      const unitLabel = formatEditorialUnitDisplay(assignment.primary, "cs", assignment.aiAssisted);
       if (!validation.ok) {
         content = wrapContentInV26Structure({
           title: parsed.title ?? input.title,
           excerpt: parsed.excerpt ?? input.excerpt ?? input.title,
           bodyHtml: content || input.content.slice(0, 3000),
-          personaName: persona.displayName,
+          personaName: unitLabel,
           persona,
           topic: input.topic ?? "zivotni-styl",
         });
@@ -51,9 +63,8 @@ export async function rewriteToV26Standard(
         content,
         metadata: {
           editorial_version: V26_EDITORIAL_VERSION,
-          author_persona: persona.id,
-          author_display_name: persona.displayName,
-          author_byline: persona.byline ?? persona.displayName,
+          writing_style: persona.id,
+          ...buildEditorialMetadataPatch(assignment),
           source_citation: input.sourceCitation,
           rewritten_at: new Date().toISOString(),
         },
@@ -67,8 +78,14 @@ export async function rewriteToV26Standard(
   return buildFallbackRewrite({ ...input, persona });
 }
 
-export function applyPersonaToWriterName(persona: AuthorPersona): string {
-  return `${persona.displayName} · MedScopeGlobal`;
+export function applyPersonaToWriterName(persona: AuthorPersona, topic?: string | null): string {
+  const assignment = assignEditorialUnits({
+    audience: "public",
+    public_topic: topic ?? null,
+    ai_generated: true,
+    metadata: { author_persona: persona.id },
+  });
+  return formatEditorialUnitDisplay(assignment.primary, "cs", assignment.aiAssisted);
 }
 
 export { pickPersonaForArticle, mergeV26Metadata, validateV26Structure };

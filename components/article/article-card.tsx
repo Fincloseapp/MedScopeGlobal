@@ -4,11 +4,19 @@ import { Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
+import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
+import { assignEditorialUnits, formatEditorialUnitDisplay } from "@/lib/editorial/units";
 import type { ArticleWithRelations } from "@/types/database";
 
-export function ArticleCard({ article }: { article: ArticleWithRelations }) {
+export function ArticleCard({ article }: { article: DisplayArticle | ArticleWithRelations }) {
   const cat = article.categories;
-  const author = article.users;
+  const assignment = assignEditorialUnits(article);
+  const editorialLocale = article.locale === "en" ? "en" : "cs";
+  const authorLabel = formatEditorialUnitDisplay(
+    assignment.primary,
+    editorialLocale,
+    assignment.aiAssisted
+  );
   const date =
     article.published_at &&
     new Date(article.published_at).toLocaleDateString(undefined, {
@@ -92,7 +100,7 @@ export function ArticleCard({ article }: { article: ArticleWithRelations }) {
         </CardContent>
       </Link>
       <CardFooter className="flex items-center justify-between border-t border-slate-100 bg-slate-50/90 px-5 py-3 text-xs text-muted-foreground">
-        <span className="font-medium text-slate-700">{author?.full_name ?? "Editorial desk"}</span>
+        <span className="font-medium text-slate-700 line-clamp-1">{authorLabel}</span>
         {date && (
           <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 font-medium text-slate-500">
             <Calendar className="h-3.5 w-3.5" />

@@ -16,6 +16,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { saveArticle } from "@/lib/actions/articles";
+import { listEditorialUnitsForAdmin, type EditorialUnitId } from "@/lib/editorial/units";
 import { uploadMediaAsset } from "@/lib/storage/upload";
 import type { Article, Category } from "@/types/database";
 
@@ -36,6 +37,15 @@ export function ArticleForm({ categories, article }: Props) {
   );
   const [published, setPublished] = useState(article?.published ?? false);
   const [vipOnly, setVipOnly] = useState(article?.vip_only ?? false);
+  const meta = (article?.metadata ?? {}) as Record<string, unknown>;
+  const [editorialUnitPrimary, setEditorialUnitPrimary] = useState<string>(
+    String(meta.editorial_unit_primary ?? "medscope_global_editorial_board")
+  );
+  const [editorialUnitReviewer, setEditorialUnitReviewer] = useState<string>(
+    String(meta.editorial_unit_reviewer ?? "")
+  );
+  const [aiAssisted, setAiAssisted] = useState(Boolean(meta.ai_assisted ?? article?.ai_generated ?? true));
+  const editorialUnits = listEditorialUnitsForAdmin();
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -60,6 +70,11 @@ export function ArticleForm({ categories, article }: Props) {
         cover_image_url: coverUrl,
         published,
         vip_only: vipOnly,
+        editorial_unit_primary: editorialUnitPrimary as EditorialUnitId,
+        editorial_unit_reviewer: editorialUnitReviewer
+          ? (editorialUnitReviewer as EditorialUnitId)
+          : null,
+        ai_assisted: aiAssisted,
       });
       router.push("/admin/articles");
       router.refresh();
@@ -126,6 +141,40 @@ export function ArticleForm({ categories, article }: Props) {
             onChange={(e) => setExcerpt(e.target.value)}
           />
         </div>
+        <div className="space-y-2 md:col-span-2">
+          <Label>Primary editorial unit</Label>
+          <Select value={editorialUnitPrimary} onValueChange={setEditorialUnitPrimary}>
+            <SelectTrigger>
+              <SelectValue placeholder="Editorial unit" />
+            </SelectTrigger>
+            <SelectContent>
+              {editorialUnits.map((u) => (
+                <SelectItem key={u.id} value={u.id}>
+                  {u.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2 md:col-span-2">
+          <Label>Reviewer editorial unit (optional)</Label>
+          <Select
+            value={editorialUnitReviewer || "__none__"}
+            onValueChange={(v) => setEditorialUnitReviewer(v === "__none__" ? "" : v)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="None" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__none__">None</SelectItem>
+              {editorialUnits.map((u) => (
+                <SelectItem key={`rev-${u.id}`} value={u.id}>
+                  {u.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="space-y-3">
@@ -158,6 +207,15 @@ export function ArticleForm({ categories, article }: Props) {
             </p>
           </div>
           <Switch checked={vipOnly} onCheckedChange={setVipOnly} />
+        </div>
+        <div className="flex items-center justify-between rounded-lg border p-4">
+          <div>
+            <p className="font-medium">AI-assisted synthesis</p>
+            <p className="text-sm text-muted-foreground">
+              Marks content as AI-asistovaná syntéza obsahu in bylines.
+            </p>
+          </div>
+          <Switch checked={aiAssisted} onCheckedChange={setAiAssisted} />
         </div>
       </div>
 

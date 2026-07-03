@@ -29,14 +29,17 @@ export function buildV20PageMetadata(opts: {
   };
 }
 
-export function buildV20ArticleJsonLd(article: {
-  title: string;
-  slug: string;
-  summary?: string;
-  date?: string;
-  category?: string;
-  image?: string;
-}) {
+export function buildV20ArticleJsonLd(
+  article: {
+    title: string;
+    slug: string;
+    summary?: string;
+    date?: string;
+    category?: string;
+    image?: string;
+  },
+  author?: { "@type": "Organization"; name: string }
+) {
   return {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -44,7 +47,7 @@ export function buildV20ArticleJsonLd(article: {
     description: article.summary ?? article.title,
     datePublished: article.date,
     dateModified: article.date,
-    author: { "@type": "Organization", name: "MedScopeGlobal" },
+    author: author ?? { "@type": "Organization", name: "MedScopeGlobal Editorial Board" },
     publisher: {
       "@type": "Organization",
       name: "MedScopeGlobal",

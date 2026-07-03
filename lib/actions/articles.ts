@@ -2,6 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth/admin";
+import {
+  buildEditorialMetadataPatch,
+  formatEditorialUnitDisplay,
+  type EditorialUnitId,
+} from "@/lib/editorial/units";
 import { logAdminEvent } from "@/lib/logging";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/utils";
@@ -16,14 +21,25 @@ export async function saveArticle(input: {
   cover_image_url: string | null;
   published: boolean;
   vip_only: boolean;
+  editorial_unit_primary?: EditorialUnitId;
+  editorial_unit_reviewer?: EditorialUnitId | null;
+  ai_assisted?: boolean;
 }) {
   const gate = await requireAdmin();
   if (!gate.ok) throw new Error("Unauthorized");
 
   const supabase = await createClient();
   const slug = input.slug?.trim() || slugify(input.title);
-  const published_at =
-    input.published ? new Date().toISOString() : null;
+  const published_at = input.published ? new Date().toISOString() : null;
+
+  const primary = input.editorial_unit_primary ?? "medscope_global_editorial_board";
+  const aiAssisted = input.ai_assisted ?? true;
+  const editorialMeta = buildEditorialMetadataPatch({
+    primary,
+    reviewer: input.editorial_unit_reviewer ?? undefined,
+    aiAssisted,
+  });
+  const sourceName = formatEditorialUnitDisplay(primary, "cs", aiAssisted);
 
   const basePayload = {
     title: input.title.trim(),
@@ -36,12 +52,23 @@ export async function saveArticle(input: {
     vip_only: input.vip_only,
     published_at,
     updated_at: new Date().toISOString(),
+    ai_generated: aiAssisted,
+    source_name: sourceName,
   };
 
   if (input.id) {
+    const { data: existing } = await supabase
+      .from("articles")
+      .select("metadata")
+      .eq("id", input.id)
+      .maybeSingle();
+
     const { error } = await supabase
       .from("articles")
-      .update(basePayload)
+      .update({
+        ...basePayload,
+        metadata: { ...(existing?.metadata ?? {}), ...editorialMeta },
+      })
       .eq("id", input.id);
     if (error) throw error;
     await logAdminEvent("ARTICLE_UPDATE", {
@@ -54,6 +81,7 @@ export async function saveArticle(input: {
       .insert({
         ...basePayload,
         author_id: gate.user.id,
+        metadata: editorialMeta,
       })
       .select("id")
       .single();

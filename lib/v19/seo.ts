@@ -1,4 +1,9 @@
 import type { V19ArticlePayload } from "@/lib/v19/types";
+import {
+  assignEditorialUnits,
+  buildArticleJsonLdAuthor,
+  type EditorialLocale,
+} from "@/lib/editorial/units";
 
 const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.medscopeglobal.com";
 
@@ -28,6 +33,14 @@ export function buildV19SeoMeta(
 
   const metaTitle = article.title.slice(0, 60);
   const metaDescription = (article.summary ?? "").slice(0, 160);
+  const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
+  const editorialAssignment = assignEditorialUnits({
+    locale,
+    min_access_level: "physician",
+    audience: "professional",
+    ai_generated: true,
+    metadata: { section: "v19-brief" },
+  });
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -37,10 +50,7 @@ export function buildV19SeoMeta(
     datePublished: article.date,
     inLanguage: locale,
     keywords: uniqueKeywords.join(", "),
-    author: {
-      "@type": "Organization",
-      name: "MedScopeGlobal",
-    },
+    author: buildArticleJsonLdAuthor(editorialAssignment, editorialLocale),
     publisher: {
       "@type": "Organization",
       name: "MedScopeGlobal",

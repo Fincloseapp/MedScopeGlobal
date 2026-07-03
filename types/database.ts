@@ -51,6 +51,7 @@ export interface Article {
   source_name?: string | null;
   quiz_json?: Record<string, unknown> | null;
   meta_description?: string | null;
+  ai_generated?: boolean | null;
   metadata?: Record<string, unknown> | null;
   created_at: string;
   updated_at: string | null;
