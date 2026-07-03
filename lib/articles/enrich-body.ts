@@ -126,8 +126,20 @@ function buildGenericBody(article: EnrichableArticle): string {
   ].join("");
 }
 
-/** Expand stub editorial HTML into a fuller article for detail pages. */
-export function enrichArticleBodyForDisplay(article: EnrichableArticle): string {
+/** Expand stub editorial HTML into a fuller article for detail pages. Skips public/verejnost articles. */
+export function enrichArticleBodyForDisplay(article: EnrichableArticle & {
+  audience?: string | null;
+  rubric_slug?: string | null;
+  public_topic?: string | null;
+}): string {
+  if (
+    article.audience === "public" ||
+    article.rubric_slug === "verejnost" ||
+    article.public_topic
+  ) {
+    return article.content;
+  }
+
   if (!isStubContent(article.content)) {
     return article.content;
   }

@@ -61,7 +61,7 @@ Return JSON:
 {
   "title": "clear headline",
   "excerpt": "2-3 sentences",
-  "content": "HTML article body with v26 h2 sections: Úvod, Proč na tom záleží právě teď, Co si odnést do praxe, Závěr. Use <p><ul><li>. Include attribution link.",
+  "content": "HTML article body with 4–5 unique <h2> sections (topic-specific headings, NOT always Úvod/Proč na tom záleží/Co si odnést). Use <p><ul><li>. Include attribution link.",
   "categorySlug": "slug",
   "rubricSlug": "${input.defaultRubric}",
   "minAccessLevel": "public|student|physician",

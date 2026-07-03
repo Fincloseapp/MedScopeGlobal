@@ -41,8 +41,8 @@ export interface V26RewriteResult {
   validation: ReturnType<typeof validateV26Structure>;
 }
 
-export function buildV26SystemPrompt(audience = "public", persona?: AuthorPersona): string {
-  return `${buildV26StructurePrompt(audience)}
+export function buildV26SystemPrompt(audience = "public", persona?: AuthorPersona, topic?: string | null): string {
+  return `${buildV26StructurePrompt(audience, topic ?? undefined)}
 ${persona ? buildPersonaStylePrompt(persona) : ""}
 ${buildBlocklistPrompt()}
 Vrať JSON: { "title": string, "excerpt": string (2–3 věty), "bodyHtml": string (HTML s <p>, <h2>, <ul>) }`;
@@ -74,7 +74,8 @@ export function buildFallbackRewrite(input: V26RewriteInput): V26RewriteResult {
     excerpt: input.excerpt ?? input.title,
     bodyHtml: input.content.slice(0, 4000),
     personaName,
-    topic: input.topic ?? "zpravodajstvi",
+    persona: input.persona,
+    topic: input.topic ?? "zivotni-styl",
   });
   const validation = validateV26Structure(content);
   return {
@@ -82,9 +83,10 @@ export function buildFallbackRewrite(input: V26RewriteInput): V26RewriteResult {
     excerpt: (input.excerpt ?? input.title).slice(0, 320),
     content,
     metadata: {
-      editorial_version: "26",
+      editorial_version: "26.2.1",
       author_persona: input.persona?.id,
       author_display_name: personaName,
+      author_byline: input.persona?.byline ?? personaName,
       source_citation: input.sourceCitation,
       rewritten_at: new Date().toISOString(),
     },

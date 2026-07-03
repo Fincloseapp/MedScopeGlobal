@@ -21,7 +21,7 @@ export async function rewriteToV26Standard(
   const persona = input.persona ?? pickPersonaForArticle(input.seed ?? input.title);
   const audience = input.audience ?? "public";
 
-  const system = buildV26SystemPrompt(audience, persona);
+  const system = buildV26SystemPrompt(audience, persona, input.topic);
   const user = buildV26UserPrompt({ ...input, persona });
 
   try {
@@ -40,7 +40,8 @@ export async function rewriteToV26Standard(
           excerpt: parsed.excerpt ?? input.excerpt ?? input.title,
           bodyHtml: content || input.content.slice(0, 3000),
           personaName: persona.displayName,
-          topic: input.topic ?? input.seed?.split(":")[0] ?? "zpravodajstvi",
+          persona,
+          topic: input.topic ?? "zivotni-styl",
         });
         validation = validateV26Structure(content);
       }
@@ -52,6 +53,7 @@ export async function rewriteToV26Standard(
           editorial_version: V26_EDITORIAL_VERSION,
           author_persona: persona.id,
           author_display_name: persona.displayName,
+          author_byline: persona.byline ?? persona.displayName,
           source_citation: input.sourceCitation,
           rewritten_at: new Date().toISOString(),
         },

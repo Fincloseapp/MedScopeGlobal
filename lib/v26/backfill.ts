@@ -3,6 +3,29 @@ import { mergeV26Metadata } from "@/lib/v26/editorial-standard";
 import { rewriteToV26Standard } from "@/lib/v26/rewrite-engine";
 import { V26_EDITORIAL_VERSION } from "@/lib/v26/version";
 
+/** Markers matching old identical template fallbacks. */
+const BOILERPLATE_MARKERS = [
+  "není třeba být expert",
+  "tento článek připravila redakce medscopeglobal",
+  "stačí pár jasných kroků a vědomé rozhodování",
+];
+
+function isBoilerplateHtml(content: string | null): boolean {
+  const lower = String(content ?? "").toLowerCase();
+  if (!lower.trim()) return false;
+  let hits = 0;
+  for (const marker of BOILERPLATE_MARKERS) {
+    if (lower.includes(marker)) hits += 1;
+  }
+  return hits >= 2;
+}
+
+function needsV26Rewrite(metadata: unknown, content: string | null): boolean {
+  const meta = (metadata ?? {}) as Record<string, unknown>;
+  if (meta.editorial_version !== V26_EDITORIAL_VERSION) return true;
+  return isBoilerplateHtml(content);
+}
+
 export interface V26BackfillResult {
   processed: number;
   updated: number;
@@ -13,11 +36,6 @@ export interface V26BackfillResult {
 }
 
 const BACKFILL_PAGE_SIZE = 100;
-
-function needsV26Rewrite(metadata: unknown): boolean {
-  const meta = (metadata ?? {}) as Record<string, unknown>;
-  return meta.editorial_version !== V26_EDITORIAL_VERSION;
-}
 
 export async function runV26RewriteBackfill(options?: {
   batchSize?: number;
@@ -39,6 +57,7 @@ export async function runV26RewriteBackfill(options?: {
     min_access_level: string | null;
     source_url: string | null;
     source_name: string | null;
+    public_topic: string | null;
   };
 
   const batch: ArticleRow[] = [];
@@ -49,7 +68,7 @@ export async function runV26RewriteBackfill(options?: {
     const { data: page, error: fetchErr } = await admin
       .from("articles")
       .select(
-        "id, title, slug, excerpt, content, metadata, min_access_level, source_url, source_name"
+        "id, title, slug, excerpt, content, metadata, min_access_level, source_url, source_name, public_topic"
       )
       .eq("published", true)
       .order("published_at", { ascending: false })
@@ -70,7 +89,7 @@ export async function runV26RewriteBackfill(options?: {
 
     scanned += page.length;
     for (const article of page as ArticleRow[]) {
-      if (needsV26Rewrite(article.metadata)) {
+      if (needsV26Rewrite(article.metadata, article.content)) {
         batch.push(article);
         if (batch.length >= batchSize) break;
       }
@@ -95,6 +114,7 @@ export async function runV26RewriteBackfill(options?: {
         excerpt: article.excerpt ?? "",
         content: article.content ?? "",
         audience,
+        topic: article.public_topic ?? undefined,
         sourceCitation: article.source_url
           ? {
               name: article.source_name ?? "Zdroj",
