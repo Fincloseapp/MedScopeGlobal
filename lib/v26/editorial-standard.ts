@@ -14,6 +14,7 @@ export interface V26ArticleMetadata {
   editorial_version?: string;
   author_persona?: string;
   author_display_name?: string;
+  author_byline?: string;
   source_citation?: {
     name: string;
     url: string;
@@ -42,7 +43,7 @@ export interface V26RewriteResult {
 }
 
 export function buildV26SystemPrompt(audience = "public", persona?: AuthorPersona, topic?: string | null): string {
-  return `${buildV26StructurePrompt(audience, topic ?? undefined)}
+  return `${buildV26StructurePrompt(audience, topic ?? null)}
 ${persona ? buildPersonaStylePrompt(persona) : ""}
 ${buildBlocklistPrompt()}
 Vrať JSON: { "title": string, "excerpt": string (2–3 věty), "bodyHtml": string (HTML s <p>, <h2>, <ul>) }`;
