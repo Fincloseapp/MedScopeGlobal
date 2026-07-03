@@ -76,7 +76,7 @@ export function getVideoEditorialLabel(input: VideoEditorialInput): string {
 
 export function buildVideoEditorialMetadataPatch(input: VideoEditorialInput): Record<string, unknown> {
   const unitId = assignVideoEditorialUnit(input);
-  const aiAssisted = input.aiAssisted ?? input.metadata?.ai_assisted === true ?? true;
+  const aiAssisted = input.aiAssisted ?? (input.metadata?.ai_assisted !== false);
   const label = formatEditorialUnitDisplay(unitId, "cs", aiAssisted);
   return {
     editorial_unit_primary: unitId,
