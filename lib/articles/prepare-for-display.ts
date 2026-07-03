@@ -9,7 +9,7 @@ import { resolveArticleTranslation } from "@/lib/i18n/translate-article";
 import type { ArticleWithRelations } from "@/types/database";
 import { dedupeArticlesByTitle } from "@/lib/articles/dedupe";
 import { enrichArticleBodyForDisplay } from "@/lib/articles/enrich-body";
-import { polishCzechFields, isEnglishDominant } from "@/lib/v22/translate";
+import { polishCzechFields } from "@/lib/v22/translate";
 
 export type DisplayArticle = ArticleWithRelations & {
   displayLocale?: string;
@@ -59,10 +59,7 @@ export async function prepareArticleForDisplay(
   const target = primaryArticleLocale(locale);
 
   if (matchesArticleLocale(base.locale, locale)) {
-    const polished =
-      locale === "cs" && isEnglishDominant(base.title)
-        ? polishCzechFields(base, locale)
-        : base;
+    const polished = locale === "cs" ? polishCzechFields(base, locale) : base;
     const display = { ...polished, displayLocale: target };
     if (mode === "full") {
       return { ...display, content: enrichArticleBodyForDisplay(display) };
@@ -91,20 +88,27 @@ export async function prepareArticleForDisplay(
   }
 
   const content = translated.content ?? base.content;
-  const enriched =
-    mode === "full"
-      ? enrichArticleBodyForDisplay({
-          ...base,
-          title: translated.title,
-          excerpt: translated.excerpt ?? base.excerpt,
-          content,
-        })
-      : content;
-
-  return {
+  const merged = {
     ...base,
     title: translated.title,
     excerpt: translated.excerpt ?? base.excerpt,
+    content,
+  };
+  const polished = locale === "cs" ? polishCzechFields(merged, locale) : merged;
+  const enriched =
+    mode === "full"
+      ? enrichArticleBodyForDisplay({
+          ...polished,
+          title: polished.title,
+          excerpt: polished.excerpt,
+          content: polished.content ?? content,
+        })
+      : polished.content ?? content;
+
+  return {
+    ...base,
+    title: polished.title,
+    excerpt: polished.excerpt,
     content: enriched,
     displayLocale: target,
     translatedFrom: base.locale ?? null,

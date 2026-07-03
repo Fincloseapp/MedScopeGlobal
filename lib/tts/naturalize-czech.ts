@@ -23,6 +23,20 @@ const MEDICAL_ABBR: Record<string, string> = {
   IV: "intravenózně",
   IM: "intramuskulárně",
   PO: "perorálně",
+  MUDr: "mudr",
+  MDDr: "mddr",
+  PhDr: "phdr",
+  RNDr: "rndr",
+  MVDr: "mvdr",
+  LF: "lékařská fakulta",
+  NZIS: "národní zdravotnický informační systém",
+  "MZČR": "ministerstvo zdravotnictví",
+  MZCR: "ministerstvo zdravotnictví",
+  "ÚZIS": "ústav zdravotnických informací a statistiky",
+  "SÚKL": "státní ústav pro kontrolu léčiv",
+  WHO: "světová zdravotnická organizace",
+  JIP: "jednotka intenzivní péče",
+  PZS: "poskytovatel zdravotních služeb",
 };
 
 /** Feminine cardinal forms used before letter designations (2b → dvě bé). */

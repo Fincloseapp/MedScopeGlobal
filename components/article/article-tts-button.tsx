@@ -1,23 +1,26 @@
 "use client";
 
 import { TtsListenButton } from "@/components/tts/tts-listen-button";
+import { prepareArticleForSpeech } from "@/lib/tts/prepare-for-speech";
 
 type Props = {
-  excerpt: string;
   title?: string;
+  excerpt?: string;
+  content?: string;
 };
 
-/** Article audio preview via Web Speech API (/api/tts browser mode) */
-export function ArticleTtsButton({ excerpt, title }: Props) {
-  const text = excerpt.trim();
+/** Article read-aloud via Web Speech API — poslechová verze celého článku. */
+export function ArticleTtsButton({ excerpt, title, content }: Props) {
+  const text = prepareArticleForSpeech({ title, excerpt, content });
   if (!text) return null;
 
   return (
     <TtsListenButton
-      text={title ? `${title}. ${text}` : text}
+      text={text}
       label="Poslechnout článek"
       className="not-prose my-4"
-      maxChars={4096}
+      full
+      lang="cs"
     />
   );
 }

@@ -13,6 +13,7 @@ import { isLessonFreePreview } from "@/lib/academy/preview";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
 import { extractSlideshowManifest } from "@/lib/v25/video/content-slideshow";
+import { prepareArticleForSpeech } from "@/lib/tts/prepare-for-speech";
 
 function buildLessonListenText(
   title: string,
@@ -20,13 +21,13 @@ function buildLessonListenText(
   contentJson: Record<string, unknown>
 ): string {
   const manifest = extractSlideshowManifest(contentJson, null);
-  const parts = [title, content];
-  if (manifest?.slides?.length) {
-    parts.push(...manifest.slides.map((s) => `${s.title}. ${s.body}`));
-  } else if (typeof contentJson.voiceover_text === "string") {
-    parts.push(contentJson.voiceover_text);
-  }
-  return parts.filter(Boolean).join("\n\n");
+  const slideText = manifest?.slides?.length
+    ? manifest.slides.map((s) => `${s.title}. ${s.body}`).join("\n\n")
+    : typeof contentJson.voiceover_text === "string"
+      ? contentJson.voiceover_text
+      : "";
+  const raw = [content, slideText].filter(Boolean).join("\n\n");
+  return prepareArticleForSpeech({ title, content: raw });
 }
 
 type Props = { params: Promise<{ slug: string; lessonId: string }> };

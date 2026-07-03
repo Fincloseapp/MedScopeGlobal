@@ -350,7 +350,8 @@ export default async function ArticlePage({ params }: Props) {
                   {!locked ? (
                     <ArticleTtsButton
                       title={article.title}
-                      excerpt={article.excerpt ?? article.content.replace(/<[^>]+>/g, " ").slice(0, 2000)}
+                      excerpt={article.excerpt ?? undefined}
+                      content={article.content}
                     />
                   ) : null}
                   <ArticleBody

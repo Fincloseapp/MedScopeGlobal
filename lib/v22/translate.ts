@@ -1,7 +1,9 @@
 import { ensureCzechText, isEnglishDominant } from "@/lib/v21/enrich";
+import { polishCzechHtml, polishCzechText } from "@/lib/i18n/czech-polish";
 import type { LocaleCode } from "@/lib/i18n/config";
 
 export { ensureCzechText, isEnglishDominant, buildModuleSections, formatCsDate } from "@/lib/v21/enrich";
+export { polishCzechText, polishCzechHtml } from "@/lib/i18n/czech-polish";
 
 /** Profesionální česká syntéza titulku bez strojového stylu */
 export function toCzechTitle(title: string, context = "medicínský obsah"): string {
@@ -23,14 +25,18 @@ export function toCzechExcerpt(excerpt: string | null | undefined, title: string
   );
 }
 
-export function polishCzechFields<T extends { title: string; excerpt?: string | null }>(
-  item: T,
-  locale: LocaleCode
-): T {
+export function polishCzechFields<
+  T extends { title: string; excerpt?: string | null; content?: string | null },
+>(item: T, locale: LocaleCode): T {
   if (locale !== "cs") return item;
-  return {
-    ...item,
-    title: toCzechTitle(item.title),
-    excerpt: toCzechExcerpt(item.excerpt, item.title),
-  };
+  const title = isEnglishDominant(item.title)
+    ? toCzechTitle(item.title)
+    : polishCzechText(item.title);
+  const excerpt = isEnglishDominant(item.excerpt ?? "")
+    ? toCzechExcerpt(item.excerpt, item.title)
+    : item.excerpt
+      ? polishCzechText(item.excerpt)
+      : item.excerpt;
+  const content = item.content ? polishCzechHtml(item.content) : item.content;
+  return { ...item, title, excerpt, content };
 }

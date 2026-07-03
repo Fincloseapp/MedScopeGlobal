@@ -4,6 +4,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { VideoLegalNotice, detectVideoSource } from "@/components/academy/video-legal-notice";
 import { TopicSlideshowPlayer } from "@/components/academy/topic-slideshow-player";
 import { TtsListenButton } from "@/components/tts/tts-listen-button";
+import { prepareArticleForSpeech } from "@/lib/tts/prepare-for-speech";
 import { V33_FALLBACK_MP4_URL } from "@/lib/v33/version";
 import { attachSlideImages } from "@/lib/v25/video/slide-images";
 import {
@@ -89,7 +90,10 @@ export function OsvetaVideoPlayer({
   } | null>(null);
   const [quizSubmitting, setQuizSubmitting] = useState(false);
 
-  const listenText = (video.script || video.title).trim();
+  const listenText = prepareArticleForSpeech({
+    title: video.title,
+    content: video.script || video.title,
+  });
 
   const awardWatch = useCallback(async () => {
     if (watchAwarded) return;

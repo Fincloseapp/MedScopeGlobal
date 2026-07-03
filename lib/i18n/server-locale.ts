@@ -1,4 +1,4 @@
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import {
   DEFAULT_LOCALE,
   LOCALE_COOKIE,
@@ -6,7 +6,6 @@ import {
   normalizeLocale,
   type LocaleCode,
 } from "@/lib/i18n/config";
-import { detectLocaleFromAcceptLanguage } from "@/lib/i18n/detect-locale";
 
 /** Locale for server components — matches cookie set by middleware from device language. */
 export async function getServerLocale(): Promise<LocaleCode> {
@@ -14,10 +13,7 @@ export async function getServerLocale(): Promise<LocaleCode> {
   const stored = cookieStore.get(LOCALE_COOKIE)?.value;
   if (stored) return normalizeLocale(stored);
 
-  const headerStore = await headers();
-  return detectLocaleFromAcceptLanguage(
-    headerStore.get("accept-language")
-  );
+  return DEFAULT_LOCALE;
 }
 
 export function isLocaleManuallySet(
