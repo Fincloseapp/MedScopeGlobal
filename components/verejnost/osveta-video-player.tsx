@@ -4,7 +4,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { VideoLegalNotice, detectVideoSource } from "@/components/academy/video-legal-notice";
 import { TopicSlideshowPlayer } from "@/components/academy/topic-slideshow-player";
 import { TtsListenButton } from "@/components/tts/tts-listen-button";
-import { prepareArticleForSpeech } from "@/lib/tts/prepare-for-speech";
+import { prepareVideoScriptForSpeech, getVideoEditorialLabel } from "@/lib/editorial/video-units";
 import { V33_FALLBACK_MP4_URL } from "@/lib/v33/version";
 import { attachSlideImages } from "@/lib/v25/video/slide-images";
 import {
@@ -74,6 +74,12 @@ export function OsvetaVideoPlayer({
   quiz: PublicHealthQuiz | null;
 }) {
   const avatar = getPublicAvatar(video.avatar_type);
+  const editorialLabel = getVideoEditorialLabel({
+    avatarType: video.avatar_type,
+    category: video.topic?.category,
+    metadata: video.metadata,
+    audience: "osveta",
+  });
   const isAudio = (video.metadata?.lesson_format as string) === "audio_lesson";
   const mediaUrl = resolveMediaUrl(video.video_url);
   const showSlideshow = !isAudio && needsSlideshow(video.video_url);
@@ -90,9 +96,9 @@ export function OsvetaVideoPlayer({
   } | null>(null);
   const [quizSubmitting, setQuizSubmitting] = useState(false);
 
-  const listenText = prepareArticleForSpeech({
+  const listenText = prepareVideoScriptForSpeech({
     title: video.title,
-    content: video.script || video.title,
+    script: video.script || video.title,
   });
 
   const awardWatch = useCallback(async () => {
@@ -142,7 +148,7 @@ export function OsvetaVideoPlayer({
           text={listenText}
           label="Poslech"
           className="not-prose"
-          lang={(video.metadata?.language as string) ?? "cs"}
+          lang="cs"
         />
       ) : null}
 
@@ -156,7 +162,7 @@ export function OsvetaVideoPlayer({
           <TopicSlideshowPlayer
             manifest={slideshow}
             lessonTitle={video.title}
-            lang={(video.metadata?.language as string) ?? "cs"}
+            lang="cs"
           />
         </VideoLegalNotice>
       ) : (
@@ -172,12 +178,11 @@ export function OsvetaVideoPlayer({
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={avatar.imageUrl}
-                  alt={avatar.name}
+                  alt={editorialLabel}
                   className="h-32 w-32 shrink-0 rounded-full border-4 border-white/20 object-cover shadow-lg"
                 />
                 <div className="flex-1 text-center sm:text-left">
-                  <p className="text-sm font-medium text-white/80">{avatar.name}</p>
-                  <p className="text-xs text-white/50">{avatar.role}</p>
+                  <p className="text-sm font-medium text-white/80">{editorialLabel}</p>
                   <audio
                     ref={mediaRef as React.RefObject<HTMLAudioElement>}
                     src={mediaUrl}

@@ -199,7 +199,7 @@ export default async function AcademyLessonPage({ params }: Props) {
             />
             <article className="prose prose-slate max-w-none space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="not-prose mb-4 flex flex-wrap items-center gap-3">
-                <TtsListenButton text={listenText} label="Poslech celé lekce" />
+                <TtsListenButton text={listenText} label="Poslech celé lekce" lang="cs" />
               </div>
               {renderContent(lesson.content)}
             </article>

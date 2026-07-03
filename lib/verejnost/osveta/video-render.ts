@@ -1,5 +1,6 @@
 import { queueExternalVideoRender, getPreferredVideoProvider } from "@/lib/academy/ai/video-providers";
 import type { VideoScriptResult } from "@/lib/academy/ai/workers/video-script-generator";
+import { buildVideoEditorialMetadataPatch } from "@/lib/editorial/video-units";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { getPublicAvatar } from "@/lib/verejnost/osveta/avatars";
 
@@ -55,7 +56,13 @@ export async function renderPublicOsvetaVideo(input: {
     lesson_format: lessonFormat,
     avatar_type: input.avatarType,
     render_status: render.status,
+    language: "cs",
     ...(render.metadata_patch ?? {}),
+    ...buildVideoEditorialMetadataPatch({
+      avatarType: input.avatarType,
+      audience: "osveta",
+      aiAssisted: true,
+    }),
   };
 
   const admin = createServiceRoleClient();

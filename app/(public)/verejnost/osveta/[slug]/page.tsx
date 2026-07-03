@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { OsvetaVideoWithConversion } from "@/components/v38/osveta-video-with-conversion";
 import { getReaderContext } from "@/lib/auth/reader-context";
-import { getPublicAvatar } from "@/lib/verejnost/osveta/avatars";
+import { getVideoEditorialLabel } from "@/lib/editorial/video-units";
 import {
   getPublicHealthQuizByVideoId,
   getPublicHealthVideoBySlug,
@@ -39,7 +39,12 @@ export default async function OsvetaVideoPage({ params }: Props) {
     listPublicHealthVideos({ limit: 4 }),
   ]);
 
-  const avatar = getPublicAvatar(video.avatar_type);
+  const editorialLabel = getVideoEditorialLabel({
+    avatarType: video.avatar_type,
+    category: video.topic?.category,
+    metadata: video.metadata,
+    audience: "osveta",
+  });
   const relatedFiltered = related.filter((v) => v.slug !== slug).slice(0, 3);
   const { isVip } = await getReaderContext();
 
@@ -58,7 +63,7 @@ export default async function OsvetaVideoPage({ params }: Props) {
           </p>
           <h1 className="mt-2 font-display text-3xl font-bold text-[#021d33]">{video.title}</h1>
           <p className="mt-2 text-sm text-slate-500">
-            {avatar.name} · {avatar.role}
+            {editorialLabel}
             {video.published_at
               ? ` · ${new Date(video.published_at).toLocaleDateString("cs-CZ")}`
               : ""}

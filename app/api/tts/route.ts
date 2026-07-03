@@ -10,7 +10,9 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     provider: "web_speech",
-    message: "Use client Web Speech API",
+    locale: "cs-CZ",
+    defaultLang: "cs-CZ",
+    message: "Use client Web Speech API — Czech (cs-CZ) default",
   });
 }
 

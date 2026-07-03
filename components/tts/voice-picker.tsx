@@ -25,6 +25,7 @@ export function VoicePicker({ className, compact }: Props) {
       const s = sessionStorage.getItem("medscope-tts-session-gender");
       if (s === "male") setSessionHint("Muž");
       else if (s === "female") setSessionHint("Žena");
+      else setSessionHint("Čeština");
     } catch {
       /* ignore */
     }

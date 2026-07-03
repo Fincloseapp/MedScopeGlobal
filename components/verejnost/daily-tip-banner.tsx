@@ -2,12 +2,19 @@ import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { getTodayPublicHealthVideo } from "@/lib/verejnost/osveta/db";
 import { getPublicAvatar } from "@/lib/verejnost/osveta/avatars";
+import { getVideoEditorialLabel } from "@/lib/editorial/video-units";
 
 export async function DailyTipBanner() {
   const video = await getTodayPublicHealthVideo();
   if (!video) return null;
 
   const avatar = getPublicAvatar(video.avatar_type);
+  const editorialLabel = getVideoEditorialLabel({
+    avatarType: video.avatar_type,
+    category: video.topic?.category,
+    metadata: video.metadata,
+    audience: "osveta",
+  });
   const thumb = video.thumbnail_url ?? avatar.imageUrl;
 
   return (
@@ -33,7 +40,7 @@ export async function DailyTipBanner() {
             {video.title}
           </h3>
           <p className="mt-1 text-sm text-slate-500">
-            {avatar.name} · {Math.round(video.duration_seconds / 60) || 1} min · +10 XP
+            {editorialLabel} · {Math.round(video.duration_seconds / 60) || 1} min · +10 XP
           </p>
         </div>
       </Link>

@@ -1,5 +1,5 @@
 import { queueExternalVideoRender, getPreferredVideoProvider } from "@/lib/academy/ai/video-providers";
-
+import { buildVideoEditorialMetadataPatch } from "@/lib/editorial/video-units";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 
 import type { VideoScriptResult } from "@/lib/academy/ai/workers/video-script-generator";
@@ -83,31 +83,24 @@ export async function createVideoAssetFromScript(input: {
 
 
   const metadata: Record<string, unknown> = {
-
     public_url: willUsePlaceholderOnly ? DEMO_VIDEO_URL : null,
-
     thumbnail_url: DEMO_THUMBNAIL,
-
     generated: true,
-
     generation_provider: provider,
-
     avatar_type: input.script.avatar_type,
-
     voice_type: input.script.voice_type,
-
     script: input.script.script,
-
     storyboard: input.script.storyboard,
-
     pending_external_render: !willUsePlaceholderOnly && provider !== "openai_tts",
-
     render_status: willUsePlaceholderOnly ? "ready" : "queued",
-
     lesson_format: provider === "openai_tts" ? "audio_lesson" : "video",
-
     external_providers: ["heygen", "synthesia", "openai_tts", "mux"],
-
+    language: "cs",
+    ...buildVideoEditorialMetadataPatch({
+      avatarType: input.script.avatar_type,
+      audience: "academy",
+      aiAssisted: true,
+    }),
   };
 
 

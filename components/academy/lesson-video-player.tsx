@@ -157,7 +157,7 @@ export function LessonVideoPlayer({
         <TopicSlideshowPlayer
           manifest={manifest}
           lessonTitle={lessonTitle}
-          lang={(contentJson?.language as string) ?? undefined}
+          lang="cs"
         />
       </VideoLegalNotice>
     );

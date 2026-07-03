@@ -1,11 +1,9 @@
 import { randomUUID } from "crypto";
 
 import { resolveOpenAiKey } from "@/lib/ai/openai-key";
-
 import { generateVideoThumbnailPlaceholder } from "@/lib/academy/storage/video-thumbnail";
-
+import { buildVideoEditorialMetadataPatch, prepareVideoScriptForSpeech } from "@/lib/editorial/video-units";
 import type { QueueRenderInput, QueueRenderResult } from "@/lib/academy/ai/video-providers/types";
-
 import { createServiceRoleClient } from "@/lib/supabase/service";
 
 
@@ -64,9 +62,10 @@ export async function queueOpenAiTtsRender(input: QueueRenderInput): Promise<Que
 
 
 
-  const scriptText = input.script.script.slice(0, 4096);
+  const rawScript = input.script.script.slice(0, 4096);
+  const scriptText = prepareVideoScriptForSpeech({ title: input.title, script: rawScript }) || rawScript;
 
-  const voice = process.env.OPENAI_TTS_VOICE?.trim() || "alloy";
+  const voice = process.env.OPENAI_TTS_VOICE?.trim() || "nova";
 
 
 
@@ -197,31 +196,25 @@ export async function queueOpenAiTtsRender(input: QueueRenderInput): Promise<Que
       message: "OpenAI TTS audio lesson ready (AI lektor)",
 
       metadata_patch: {
-
         tts_audio_url: ttsAudioUrl,
-
         avatar_image_url: avatarImageUrl,
-
         lesson_format: "audio_lesson",
-
         audio_storage_path: storagePath,
-
         tts_voice: voice,
-
         tts_provider: "openai",
-
+        tts_language: "cs",
         duration_seconds: durationSeconds,
-
         thumbnail_url: avatarImageUrl,
-
         heygen_video_id: null,
-
         pending_external_render: false,
-
         render_status: "ready",
-
         generated: true,
-
+        language: "cs",
+        ...buildVideoEditorialMetadataPatch({
+          avatarType: input.script.avatar_type,
+          audience: "academy",
+          aiAssisted: true,
+        }),
       },
 
     };

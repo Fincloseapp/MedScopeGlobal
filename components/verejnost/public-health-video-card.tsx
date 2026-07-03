@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Play, Clock } from "lucide-react";
 import { getPublicAvatar } from "@/lib/verejnost/osveta/avatars";
+import { getVideoEditorialLabel } from "@/lib/editorial/video-units";
 import type { PublicHealthVideoWithTopic } from "@/types/public-osveta";
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -18,6 +19,12 @@ export function PublicHealthVideoCard({
   featured?: boolean;
 }) {
   const avatar = getPublicAvatar(video.avatar_type);
+  const editorialLabel = getVideoEditorialLabel({
+    avatarType: video.avatar_type,
+    category: video.topic?.category,
+    metadata: video.metadata,
+    audience: "osveta",
+  });
   const thumb = video.thumbnail_url ?? avatar.imageUrl;
   const category = video.topic?.category;
   const dateLabel = video.published_at
@@ -40,7 +47,7 @@ export function PublicHealthVideoCard({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={thumb}
-          alt={avatar.name}
+          alt={editorialLabel}
           className={`w-full object-cover transition group-hover:scale-105 ${
             featured ? "aspect-video sm:h-full sm:min-h-[180px]" : "aspect-video"
           }`}
@@ -68,7 +75,7 @@ export function PublicHealthVideoCard({
         >
           {video.title}
         </h3>
-        <p className="mt-1 text-xs text-slate-500">{avatar.name} · {avatar.role}</p>
+        <p className="mt-1 text-xs text-slate-500">{editorialLabel}</p>
         {dateLabel ? <p className="mt-auto pt-2 text-[10px] text-slate-400">{dateLabel}</p> : null}
       </div>
     </Link>
