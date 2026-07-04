@@ -45,11 +45,12 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  serverExternalPackages: ["pdf-parse", "mammoth", "tesseract.js"],
+  serverExternalPackages: ["pdf-parse", "mammoth", "tesseract.js", "edge-tts-universal"],
 
   outputFileTracingIncludes: {
     "/api/v25/system/run": V25_MJS_TRACE,
     "/api/cron/public-articles": V25_MJS_TRACE,
+    "/api/cron/public-osveta-daily": ["./node_modules/edge-tts-universal/**"],
     "/api/cron/v25-enterprise": V25_MJS_TRACE,
     "/api/cron/marketing": V25_MJS_TRACE,
   },

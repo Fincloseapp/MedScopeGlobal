@@ -162,7 +162,7 @@ export function OsvetaVideoPlayer({
           <TopicSlideshowPlayer
             manifest={slideshow}
             lessonTitle={video.title}
-            lang="cs"
+            lang="cs-CZ"
           />
         </VideoLegalNotice>
       ) : (

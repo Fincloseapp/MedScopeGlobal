@@ -5,6 +5,7 @@ import { checkPublicOsvetaTables, countPublishedOsvetaVideos } from "@/lib/verej
 import { getPreferredVideoProvider } from "@/lib/academy/ai/video-providers";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 export const maxDuration = 120;
 
 export async function GET(request: Request) {
