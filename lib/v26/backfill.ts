@@ -3,27 +3,28 @@ import { mergeV26Metadata } from "@/lib/v26/editorial-standard";
 import { rewriteToV26Standard } from "@/lib/v26/rewrite-engine";
 import { V26_EDITORIAL_VERSION } from "@/lib/v26/version";
 
-/** Markers matching old identical template fallbacks. */
-const BOILERPLATE_MARKERS = [
-  "není třeba být expert",
-  "tento článek připravila redakce medscopeglobal",
-  "stačí pár jasných kroků a vědomé rozhodování",
-];
+import {
+  detectTemplateIssue,
+  isBoilerplateContent,
+} from "./editorial-prompts.mjs";
 
-function isBoilerplateHtml(content: string | null): boolean {
-  const lower = String(content ?? "").toLowerCase();
-  if (!lower.trim()) return false;
-  let hits = 0;
-  for (const marker of BOILERPLATE_MARKERS) {
-    if (lower.includes(marker)) hits += 1;
-  }
-  return hits >= 2;
-}
-
-function needsV26Rewrite(metadata: unknown, content: string | null): boolean {
+function needsV26Rewrite(
+  metadata: unknown,
+  content: string | null,
+  title?: string | null,
+  excerpt?: string | null
+): boolean {
   const meta = (metadata ?? {}) as Record<string, unknown>;
+  const reasons = detectTemplateIssue({
+    title: title ?? "",
+    excerpt: excerpt ?? "",
+    content: content ?? "",
+    locale: (meta.locale as string) ?? "cs",
+    metadata: meta,
+  });
+  if (reasons.length > 0) return true;
   if (meta.editorial_version !== V26_EDITORIAL_VERSION) return true;
-  return isBoilerplateHtml(content);
+  return isBoilerplateContent(content ?? "");
 }
 
 export interface V26BackfillResult {
@@ -89,7 +90,7 @@ export async function runV26RewriteBackfill(options?: {
 
     scanned += page.length;
     for (const article of page as ArticleRow[]) {
-      if (needsV26Rewrite(article.metadata, article.content)) {
+      if (needsV26Rewrite(article.metadata, article.content, article.title, article.excerpt)) {
         batch.push(article);
         if (batch.length >= batchSize) break;
       }

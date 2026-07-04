@@ -71,7 +71,7 @@ const { data: rows, error } = await admin
   .eq("audience", "public")
   .eq("published", true)
   .order("published_at", { ascending: false })
-  .limit(200);
+  .limit(500);
 
 if (error) {
   console.error(error.message);
