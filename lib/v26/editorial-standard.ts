@@ -32,6 +32,8 @@ export interface V26ArticleMetadata {
   };
   section?: string;
   rewritten_at?: string;
+  rewritten_from_boilerplate?: boolean;
+  rewrite_reasons?: string[];
 }
 
 export interface V26RewriteInput {
