@@ -107,7 +107,13 @@ export function LessonVideoPlayer({
   contentJson,
   className,
 }: Props) {
-  const meta = (video?.metadata ?? {}) as VideoMeta;
+  const meta = (video?.metadata ?? {}) as VideoMeta & {
+    lesson_format?: string;
+    tts_audio_url?: string;
+    avatar_image_url?: string;
+  };
+  const isAudioLesson = meta.lesson_format === "audio_lesson";
+  const audioUrl = meta.tts_audio_url ?? (isAudioLesson ? meta.public_url : undefined);
   const videoUrl = resolveVideoUrl(video);
   const isPlaceholder = isPlaceholderVideoUrl(videoUrl);
   const storedManifest = useMemo(
@@ -143,7 +149,36 @@ export function LessonVideoPlayer({
   }, [remoteVtt, subtitles]);
 
   const captionsSrc = remoteVtt ?? generatedVtt;
-  const showSlideshow = isPlaceholder && Boolean(manifest?.slides?.length);
+  const showSlideshow = !isAudioLesson && isPlaceholder && Boolean(manifest?.slides?.length);
+
+  if (isAudioLesson && audioUrl) {
+    return (
+      <VideoLegalNotice
+        className={className}
+        lessonTitle={lessonTitle}
+        variant="academy"
+        sourceKind="supabase"
+        sourceLabel="Český AI lektor (Edge TTS)"
+      >
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-900 to-slate-800 p-6 shadow-lg">
+          {meta.avatar_image_url || meta.thumbnail_url ? (
+            <img
+              src={meta.avatar_image_url ?? meta.thumbnail_url}
+              alt=""
+              className="mx-auto mb-4 h-32 w-32 rounded-full object-cover ring-2 ring-white/20"
+            />
+          ) : null}
+          <audio
+            controls
+            preload="auto"
+            src={audioUrl}
+            className="w-full"
+            aria-label={`Audio lekce: ${lessonTitle}`}
+          />
+        </div>
+      </VideoLegalNotice>
+    );
+  }
 
   if (showSlideshow && manifest) {
     return (

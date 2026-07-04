@@ -1,6 +1,10 @@
 import { logAiEvent } from "@/lib/academy/ai/controller";
 import { queueHeyGenRender, isHeyGenConfigured } from "@/lib/academy/ai/video-providers/heygen";
 import { createMuxAssetFromUrl, isMuxConfigured, muxMp4Url } from "@/lib/academy/ai/video-providers/mux";
+import {
+  isOpenAiTtsConfigured as isEdgeTtsVideoConfigured,
+  queueOpenAiTtsRender,
+} from "@/lib/academy/ai/video-providers/openai-tts-video";
 import { queueSynthesiaRender, isSynthesiaConfigured } from "@/lib/academy/ai/video-providers/synthesia";
 import type {
   QueueRenderInput,
@@ -15,14 +19,14 @@ export { isHeyGenConfigured, pollHeyGenVideoStatus } from "@/lib/academy/ai/vide
 export { isSynthesiaConfigured } from "@/lib/academy/ai/video-providers/synthesia";
 export { isMuxConfigured, muxPlaybackUrl, muxMp4Url } from "@/lib/academy/ai/video-providers/mux";
 
-/** OpenAI TTS removed — always false (v25 free-only). */
 export function isOpenAiTtsConfigured(): boolean {
-  return false;
+  return isEdgeTtsVideoConfigured();
 }
 
 export function getPreferredVideoProvider(): VideoProviderName {
   if (isHeyGenConfigured()) return "heygen";
   if (isSynthesiaConfigured()) return "synthesia";
+  if (isEdgeTtsVideoConfigured()) return "openai_tts";
   return "placeholder";
 }
 
@@ -30,12 +34,13 @@ export function getVideoProviderChain(): VideoProviderName[] {
   const chain: VideoProviderName[] = [];
   if (isHeyGenConfigured()) chain.push("heygen");
   if (isSynthesiaConfigured()) chain.push("synthesia");
+  if (isEdgeTtsVideoConfigured()) chain.push("openai_tts");
   chain.push("placeholder");
   return chain;
 }
 
 /**
- * Provider chain: HeyGen → Synthesia → free slideshow pipeline → placeholder MP4.
+ * Provider chain: HeyGen → Synthesia → Czech Edge TTS → slideshow → placeholder MP4.
  */
 export async function queueExternalVideoRender(input: QueueRenderInput): Promise<QueueRenderResult> {
   const attempts: QueueRenderResult[] = [];
@@ -50,6 +55,12 @@ export async function queueExternalVideoRender(input: QueueRenderInput): Promise
     const result = await queueSynthesiaRender(input);
     attempts.push(result);
     if (result.status === "processing") return result;
+  }
+
+  if (isEdgeTtsVideoConfigured()) {
+    const result = await queueOpenAiTtsRender(input);
+    attempts.push(result);
+    if (result.status === "ready" && result.tts_audio_url) return result;
   }
 
   const slideshow = await runSlideshowPipeline({
