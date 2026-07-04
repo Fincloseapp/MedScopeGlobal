@@ -23,6 +23,9 @@ const TRENDING_TOPICS: Array<{ slug: string; title: string; category: PublicHeal
   { slug: "hypertension", title: "Vysoký tlak: tichý nepřítel", category: "nemoc" },
   { slug: "pohyb-kazdy-den", title: "Pohyb každý den — i 10 minut stačí", category: "zivotni-styl" },
   { slug: "mozek-zdravi", title: "Mozek a paměť: výživa a pohyb", category: "dlouhovekost" },
+  { slug: "healthspan-zaklady", title: "Healthspan — více zdravých let", category: "dlouhovekost" },
+  { slug: "biomarkery-prevence", title: "Biomarkery, které stojí za sledování", category: "dlouhovekost" },
+  { slug: "sarkopenie-prevence", title: "Svaly v každém věku — prevence úbytku", category: "dlouhovekost" },
   { slug: "imunita-posileni", title: "Imunita: mýty a fakta", category: "prevence" },
 ];
 
@@ -43,11 +46,19 @@ function buildStubScript(title: string, category: string): string {
 async function generateOsvetaScript(title: string, category: string, description: string) {
   const { data, fallback } = await academyGenerateJson<{ script: string; duration_seconds: number }>({
     system:
-      "Jsi český zdravotní popularizátor pro veřejnost. Piš zábavně, srozumitelně, ale medicínsky přesně. Evropský kontext. Odpovídej pouze validním JSON.",
+      "Jsi český zdravotní popularizátor pro veřejnost MedScopeGlobal. Piš přirozenou mluvenou češtinou — vykání, energicky, ale medicínsky přesně. Evropský kontext. Bez osobních jmen moderátorů. Odpovídej pouze validním JSON.",
     user: `Napiš mluvený scénář krátkého videa (60–90 sekund, max 900 znaků) na téma "${title}" (kategorie: ${category}).
 Popis: ${description}
 
-Tón: přátelský, engaging, vykání. Začni pozdravem avatara. Ukonči výzvou k akci.
+Požadavky:
+- Začni pozdravem bez osobního jména (např. „Dobrý den, vítá vás zdravotní osvěta MedScopeGlobal.").
+- První věta musí být hook — otázka nebo překvapivý fakt k tématu.
+- Scénář musí přímo odpovídat titulku a kategorii — žádný generický obsah.
+- Uveď 2–3 praktické tipy s prospěchem pro diváka.
+- Tón: diplomaticky korektní, podpůrný, bez strašení.
+- Ukonči výzvou k jednomu konkrétnímu kroku dnes.
+- Připomeň, že informace nenahrazují lékaře.
+
 JSON: {"script": "...", "duration_seconds": number}`,
     maxTokens: 1200,
   });

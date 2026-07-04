@@ -63,6 +63,12 @@ export const VEREJNOST_HUB_TOPICS: VerejnostHubTopic[] = [
     description: "Rozhovory s odborníky pro širokou veřejnost.",
     backendTopic: "rozhovory",
   },
+  {
+    slug: "dlouhovekost",
+    label: "Dlouhověkost",
+    description: "Healthspan, prevence stárnutí, spánek, pohyb a biomarkery.",
+    backendTopic: "zivotni-styl",
+  },
 ];
 
 export const BACKEND_PUBLIC_TOPICS: {

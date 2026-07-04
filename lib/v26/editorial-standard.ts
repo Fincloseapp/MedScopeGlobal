@@ -73,7 +73,7 @@ Titulek: ${input.title}
 Perex: ${input.excerpt ?? ""}
 Obsah:
 ${input.content.slice(0, 12000)}${cite}
-Zachovej medicínskou přesnost. Délka 700–1200 slov.`;
+Zachovej medicínskou přesnost. Délka 1000–1500 slov — hlubší, bohatší text s praktickým prospěchem pro čtenáře.`;
 }
 
 export function mergeV26Metadata(
