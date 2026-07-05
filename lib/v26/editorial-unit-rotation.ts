@@ -1,7 +1,23 @@
 /**
  * v26.3 — deterministic rotation across all 14 editorial units (TS mirror of .mjs).
  */
-import { createHash } from "node:crypto";
+
+/** Browser-safe deterministic hash (hex), shared with editorial-unit-rotation.mjs. */
+function hashEditorialSeed(input: string): string {
+  let h0 = 0x811c9dc5;
+  let h1 = 0x01000193;
+  let h2 = 0;
+  let h3 = 0;
+  for (let i = 0; i < input.length; i++) {
+    const ch = input.charCodeAt(i);
+    h0 = Math.imul(h0 ^ ch, 0x01000193);
+    h1 = Math.imul(h1 ^ (ch << (i % 16)), 0x01000193);
+    h2 = (h2 + ch * (i + 1)) | 0;
+    h3 = Math.imul(h3 ^ ch, 0x85ebca6b);
+  }
+  const hex = (n: number) => (n >>> 0).toString(16).padStart(8, "0");
+  return hex(h0) + hex(h1) + hex(h2) + hex(h3);
+}
 
 /** All editorial units — keep in sync with lib/editorial/units.ts */
 export const ALL_EDITORIAL_UNIT_IDS = [
@@ -33,7 +49,8 @@ export function pickEditorialUnitForArticle(
 ): { primary: (typeof ALL_EDITORIAL_UNIT_IDS)[number]; reviewer: (typeof ALL_EDITORIAL_UNIT_IDS)[number] } {
   const n = ALL_EDITORIAL_UNIT_IDS.length;
   const day = dayOfYear(date);
-  const hash = createHash("sha256").update(`editorial-unit:${seed}:${day}:${writerIndex}`).digest("hex");
+  const hash = hashEditorialSeed(`editorial-unit:${seed}:${day}:${writerIndex}`);
+
   const primaryIdx = parseInt(hash.slice(0, 8), 16) % n;
   let reviewerIdx = (primaryIdx + 1 + parseInt(hash.slice(8, 12), 16)) % n;
   if (reviewerIdx === primaryIdx) reviewerIdx = (reviewerIdx + 1) % n;
