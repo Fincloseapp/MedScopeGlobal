@@ -2,7 +2,7 @@
 /**
  * Regenerate short/fallback public articles (v26.3 full LLM depth).
  * Usage:
- *   node scripts/regenerate-short-public.mjs [--date=2026-07-04] [--limit=20] [--dry-run]
+ *   node scripts/regenerate-short-public.mjs [--date=2026-07-04] [--limit=20] [--min-words=450] [--dry-run]
  */
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync, existsSync } from "node:fs";
@@ -48,10 +48,12 @@ function parseArgs() {
   const limitArg = process.argv.find((a) => a.startsWith("--limit="));
   const delayArg = process.argv.find((a) => a.startsWith("--delay-ms="));
   const slugArg = process.argv.find((a) => a.startsWith("--slug="));
+  const minWordsArg = process.argv.find((a) => a.startsWith("--min-words="));
   return {
     date: dateArg?.split("=")[1] ?? null,
     slug: slugArg?.split("=")[1] ?? null,
     limit: limitArg ? Number(limitArg.split("=")[1]) : 30,
+    minWords: minWordsArg ? Number(minWordsArg.split("=")[1]) : 450,
     delayMs: delayArg ? Number(delayArg.split("=")[1]) : 12000,
     dryRun: process.argv.includes("--dry-run"),
   };
@@ -87,7 +89,7 @@ function hasForeignLeak(text) {
 }
 
 loadEnv();
-const { date, slug, limit, delayMs, dryRun } = parseArgs();
+const { date, slug, limit, minWords, delayMs, dryRun } = parseArgs();
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!url || !key) {
@@ -116,11 +118,10 @@ if (error) {
   process.exit(1);
 }
 
-const MIN_WORDS = 450;
 const candidates = (rows ?? []).filter((row) => {
   if (slug && row.slug !== slug && !row.slug.includes(slug)) return false;
   const wc = wordCount(row.content);
-  const short = wc < MIN_WORDS;
+  const short = wc < minWords;
   const boiler = isBoilerplateContent(row.content);
   const badExcerpt =
     String(row.excerpt ?? "").includes("Srozumitelně a bez zbytečného strašení") ||
@@ -168,8 +169,8 @@ for (const row of candidates.slice(0, limit)) {
     let excerpt = polishCzechText(article.excerpt);
     bodyHtml = polishCzechHtml(bodyHtml);
 
-    if (wordCount(bodyHtml) < MIN_WORDS) {
-      console.warn(`  skip — still short (${wordCount(bodyHtml)} words): ${row.slug}`);
+    if (wordCount(bodyHtml) < minWords) {
+      console.warn(`  skip — still short (${wordCount(bodyHtml)} words, min ${minWords}): ${row.slug}`);
       continue;
     }
 

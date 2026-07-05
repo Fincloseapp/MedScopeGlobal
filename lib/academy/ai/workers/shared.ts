@@ -1,7 +1,6 @@
 import {
-  generateJsonFromLlm,
+  generateJsonFromLlmWithMeta,
   isLlmConfigured,
-  resolvePrimaryLlmProvider,
   type LlmProvider,
 } from "@/lib/ai/chat-json";
 
@@ -14,8 +13,7 @@ export async function academyGenerateJson<T>(input: {
     return { data: null, provider: "none", fallback: true };
   }
 
-  const provider = resolvePrimaryLlmProvider();
-  const raw = await generateJsonFromLlm({
+  const { content: raw, provider } = await generateJsonFromLlmWithMeta({
     system: input.system,
     user: input.user,
     maxTokens: input.maxTokens ?? 3000,
