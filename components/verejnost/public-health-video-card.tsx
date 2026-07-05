@@ -24,6 +24,7 @@ export function PublicHealthVideoCard({
     category: video.topic?.category,
     metadata: video.metadata,
     audience: "osveta",
+    slug: video.slug,
   });
   const thumb = video.thumbnail_url ?? avatar.imageUrl;
   const category = video.topic?.category;

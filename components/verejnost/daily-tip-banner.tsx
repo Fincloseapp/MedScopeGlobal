@@ -14,6 +14,7 @@ export async function DailyTipBanner() {
     category: video.topic?.category,
     metadata: video.metadata,
     audience: "osveta",
+    slug: video.slug,
   });
   const thumb = video.thumbnail_url ?? avatar.imageUrl;
 

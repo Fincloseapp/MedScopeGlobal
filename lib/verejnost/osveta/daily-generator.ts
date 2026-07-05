@@ -3,6 +3,7 @@ import { createServiceRoleClient } from "@/lib/supabase/service";
 import { pickAvatarForCategory, getPublicAvatar } from "@/lib/verejnost/osveta/avatars";
 import { insertPublicHealthVideo } from "@/lib/verejnost/osveta/db";
 import { renderPublicOsvetaVideo } from "@/lib/verejnost/osveta/video-render";
+import { buildVideoEditorialMetadataPatch } from "@/lib/editorial/video-units";
 import type { PublicHealthCategory } from "@/types/public-osveta";
 
 export type DailyOsvetaGenerationResult = {
@@ -40,10 +41,10 @@ function slugify(text: string): string {
 }
 
 function buildStubScript(title: string, category: string): string {
-  return `Ahoj! Dnešní zdravotní tip: ${title}. Téma spadá do oblasti ${category}. Začněte jedním malým krokem ještě dnes — pravidelný pohyb, kvalitní spánek a vyvážená strava jsou základ. Máte otázky? Zeptejte se praktika. Informace nenahrazují lékařskou péči.`;
+  return `Dobrý den, vítá vás zdravotní osvěta MedScopeGlobal. Dnešní téma: ${title}. V oblasti ${category} platí, že malé každodenní kroky mají větší účinek než jednorázové extrémy. Začněte jednou konkrétní změnou ještě dnes — třeba desetiminutovou procházkou nebo sklenicí vody navíc. Máte otázky? Obraťte se na praktického lékaře. Informace nenahrazují lékařskou péči.`;
 }
 
-async function generateOsvetaScript(title: string, category: string, description: string) {
+export async function generateOsvetaScript(title: string, category: string, description: string) {
   const { data, fallback } = await academyGenerateJson<{ script: string; duration_seconds: number }>({
     system:
       "Jsi český zdravotní popularizátor pro veřejnost MedScopeGlobal. Piš přirozenou mluvenou češtinou — vykání, energicky, ale medicínsky přesně. Evropský kontext. Bez osobních jmen moderátorů. Odpovídej pouze validním JSON.",
@@ -147,6 +148,14 @@ export async function runDailyPublicOsvetaGeneration(): Promise<DailyOsvetaGener
   const avatar = getPublicAvatar(avatarType);
   const { script, duration } = await generateOsvetaScript(topic.title, topic.category, topic.description);
 
+  const editorialMeta = buildVideoEditorialMetadataPatch({
+    audience: "osveta",
+    slug: topic.slug,
+    category: topic.category,
+    avatarType,
+    aiAssisted: true,
+  });
+
   const video = await insertPublicHealthVideo({
     topicId: topic.topicId,
     slug: topic.slug,
@@ -157,6 +166,7 @@ export async function runDailyPublicOsvetaGeneration(): Promise<DailyOsvetaGener
     thumbnailUrl: avatar.imageUrl,
     publishedAt: new Date().toISOString(),
     status: "processing",
+    metadata: editorialMeta,
   });
 
   if (!video) {

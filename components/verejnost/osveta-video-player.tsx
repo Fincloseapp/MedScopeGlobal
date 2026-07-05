@@ -79,6 +79,7 @@ export function OsvetaVideoPlayer({
     category: video.topic?.category,
     metadata: video.metadata,
     audience: "osveta",
+    slug: video.slug,
   });
   const isAudio = (video.metadata?.lesson_format as string) === "audio_lesson";
   const mediaUrl = resolveMediaUrl(video.video_url);

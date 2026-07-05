@@ -36,6 +36,40 @@ const DIACRITIC_FIXES: [RegExp, string][] = [
   [/\bprevence\b/gi, "prevence"],
 ];
 
+/** Polish / English leaks in Czech medical copy */
+const FOREIGN_LEAK_FIXES: [RegExp, string][] = [
+  [/\bS odpowiedním přístupem\b/gi, "S vhodným přístupem"],
+  [/\bodpowiedni\b/gi, "vhodný"],
+  [/\bodpowiedną\b/gi, "vhodnou"],
+  [/\bodpowiednie\b/gi, "vhodné"],
+  [/\bw odpowiedni\b/gi, "ve vhodné"],
+  [/\bmoże\b/gi, "může"],
+  [/\bwiele\b/gi, "mnoho"],
+  [/\bprzez\b/gi, "přes"],
+  [/\brównież\b/gi, "rovněž"],
+  [/\btakże\b/gi, "také"],
+  [/\bważne\b/gi, "důležité"],
+  [/\bktóre\b/gi, "které"],
+  [/\bktóry\b/gi, "který"],
+  [/\bktóra\b/gi, "která"],
+  [/\bnależy\b/gi, "je třeba"],
+  [/\bzawsze\b/gi, "vždy"],
+  [/\bpowinien\b/gi, "měl by"],
+  [/\bpowinna\b/gi, "měla by"],
+  [/\bleczenie\b/gi, "léčba"],
+  [/\bchoroba\b/gi, "nemoc"],
+  [/\bzdrowie\b/gi, "zdraví"],
+  [/\bdlatego\b/gi, "proto"],
+  [/\bponieważ\b/gi, "protože"],
+  [/\btylko\b/gi, "pouze"],
+  [/\bteż\b/gi, "také"],
+  [/\bobyvateľ\b/gi, "obyvatel"],
+  [/\bThe\b/g, "Tento"],
+  [/\bThis\b/g, "Toto"],
+  [/\bHowever\b/gi, "Nicméně"],
+  [/\bTherefore\b/gi, "Proto"],
+];
+
 /** Common AI / missing-diacritic patterns in Czech medical copy */
 const TYPO_PATTERNS: [RegExp, string][] = [
   [/\bv pripade\b/gi, "v případě"],
@@ -72,6 +106,7 @@ export function polishCzechText(text: string): string {
   if (!text?.trim()) return text?.trim() ?? "";
   let t = text.replace(/\r\n/g, "\n").trim();
   for (const [re, rep] of DIACRITIC_FIXES) t = t.replace(re, rep);
+  for (const [re, rep] of FOREIGN_LEAK_FIXES) t = t.replace(re, rep);
   for (const [re, rep] of TYPO_PATTERNS) t = t.replace(re, rep);
   t = t.replace(/[ \t]{2,}/g, " ");
   t = shortenLongSentences(t);

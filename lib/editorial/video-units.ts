@@ -10,6 +10,7 @@ import {
   type EditorialLocale,
   type EditorialUnitId,
 } from "@/lib/editorial/units";
+import { pickEditorialUnitForArticle } from "@/lib/v26/editorial-unit-rotation";
 import { prepareArticleForSpeech } from "@/lib/tts/prepare-for-speech";
 
 /** Osvěta avatar_type → CZ editorial unit */
@@ -41,15 +42,25 @@ export type VideoEditorialInput = {
   audience?: "academy" | "osveta";
   locale?: EditorialLocale;
   aiAssisted?: boolean;
+  /** Video slug — used for deterministic editorial unit rotation (osvěta). */
+  slug?: string | null;
 };
 
 export function assignVideoEditorialUnit(input: VideoEditorialInput): EditorialUnitId {
   const meta = input.metadata ?? {};
+
+  const avatarType = String(input.avatarType ?? "").trim();
+
+  // Osvěta: always rotate across editorial units by slug (same model as public articles).
+  if (input.audience === "osveta") {
+    const seed = String(input.slug ?? meta.slug ?? input.category ?? "osveta").trim();
+    return pickEditorialUnitForArticle(`osveta:${seed}`, new Date(), 0).primary;
+  }
+
   if (isEditorialUnitId(meta.editorial_unit_primary)) {
     return meta.editorial_unit_primary;
   }
 
-  const avatarType = String(input.avatarType ?? "").trim();
   if (input.audience === "academy") {
     return ACADEMY_AVATAR_TO_UNIT[avatarType] ?? "medscope_medical_knowledge_lab";
   }

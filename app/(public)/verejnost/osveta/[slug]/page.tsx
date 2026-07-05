@@ -44,6 +44,7 @@ export default async function OsvetaVideoPage({ params }: Props) {
     category: video.topic?.category,
     metadata: video.metadata,
     audience: "osveta",
+    slug: video.slug,
   });
   const relatedFiltered = related.filter((v) => v.slug !== slug).slice(0, 3);
   const { isVip } = await getReaderContext();
