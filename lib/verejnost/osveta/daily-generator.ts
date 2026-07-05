@@ -1,4 +1,5 @@
 import { academyGenerateJson } from "@/lib/academy/ai/workers/shared";
+import { isLlmConfigured } from "@/lib/ai/chat-json";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { pickAvatarForCategory, getPublicAvatar } from "@/lib/verejnost/osveta/avatars";
 import { insertPublicHealthVideo } from "@/lib/verejnost/osveta/db";
@@ -45,7 +46,7 @@ function buildStubScript(title: string, category: string): string {
 }
 
 export async function generateOsvetaScript(title: string, category: string, description: string) {
-  const { data, fallback } = await academyGenerateJson<{ script: string; duration_seconds: number }>({
+  const { data, fallback, provider } = await academyGenerateJson<{ script: string; duration_seconds: number }>({
     system:
       "Jsi český zdravotní popularizátor pro veřejnost MedScopeGlobal. Piš přirozenou mluvenou češtinou — vykání, energicky, ale medicínsky přesně. Evropský kontext. Bez osobních jmen moderátorů. Odpovídej pouze validním JSON.",
     user: `Napiš mluvený scénář krátkého videa (60–90 sekund, max 900 znaků) na téma "${title}" (kategorie: ${category}).
@@ -64,13 +65,19 @@ JSON: {"script": "...", "duration_seconds": number}`,
     maxTokens: 1200,
   });
 
-  if (fallback || !data?.script) {
-    return { script: buildStubScript(title, category), duration: 75, fallback: true };
+  if (fallback || !data?.script?.trim()) {
+    if (isLlmConfigured()) {
+      console.warn(
+        `[osveta] LLM configured (${provider}) but script generation failed for "${title}" — using stub`
+      );
+    }
+    return { script: buildStubScript(title, category), duration: 75, fallback: true, provider };
   }
   return {
     script: data.script.slice(0, 1200),
     duration: data.duration_seconds ?? 75,
     fallback: false,
+    provider,
   };
 }
 
@@ -146,15 +153,23 @@ export async function runDailyPublicOsvetaGeneration(): Promise<DailyOsvetaGener
 
   const avatarType = pickAvatarForCategory(topic.category);
   const avatar = getPublicAvatar(avatarType);
-  const { script, duration } = await generateOsvetaScript(topic.title, topic.category, topic.description);
+  const { script, duration, fallback, provider } = await generateOsvetaScript(
+    topic.title,
+    topic.category,
+    topic.description
+  );
 
-  const editorialMeta = buildVideoEditorialMetadataPatch({
-    audience: "osveta",
-    slug: topic.slug,
-    category: topic.category,
-    avatarType,
-    aiAssisted: true,
-  });
+  const editorialMeta = {
+    ...buildVideoEditorialMetadataPatch({
+      audience: "osveta",
+      slug: topic.slug,
+      category: topic.category,
+      avatarType,
+      aiAssisted: true,
+    }),
+    script_fallback: fallback,
+    llm_provider: provider,
+  };
 
   const video = await insertPublicHealthVideo({
     topicId: topic.topicId,

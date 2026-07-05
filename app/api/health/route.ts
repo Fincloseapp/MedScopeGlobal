@@ -11,6 +11,7 @@ export async function GET() {
     ok: true,
     siteUrl,
     vercel: Boolean(process.env.VERCEL),
+    gitSha: process.env.VERCEL_GIT_COMMIT_SHA?.trim() || null,
     timestamp: new Date().toISOString(),
   });
 }

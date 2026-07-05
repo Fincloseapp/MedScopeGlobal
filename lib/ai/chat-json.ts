@@ -136,29 +136,52 @@ export async function generateJsonFromLlmWithMeta(input: {
   maxTokens?: number;
   temperature?: number;
 }): Promise<{ content: string | null; provider: LlmProvider }> {
+  const { raw, provider } = await generateJsonFromAllLlmProviders(input);
+  return { content: raw, provider };
+}
+
+/** Try each configured LLM provider until one returns parseable JSON. */
+export async function generateJsonFromAllLlmProviders<T = unknown>(input: {
+  system: string;
+  user: string;
+  maxTokens?: number;
+  temperature?: number;
+}): Promise<{ data: T | null; raw: string | null; provider: LlmProvider }> {
+  const attempts: Array<{ provider: LlmProvider; getRaw: () => Promise<string | null> }> = [];
+
   if (isGroqConfigured()) {
-    warnIfGroqKeyMissing();
-    const groq = await groqCompleteJson(input);
-    if (groq) {
-      console.log("[LLM] provider groq");
-      return { content: groq, provider: "groq" };
+    attempts.push({
+      provider: "groq",
+      getRaw: async () => {
+        warnIfGroqKeyMissing();
+        return groqCompleteJson(input);
+      },
+    });
+  }
+  if (isOpenAiConfigured()) {
+    attempts.push({ provider: "openai", getRaw: () => openaiCompleteJson(input) });
+  }
+  if (isGeminiConfigured()) {
+    attempts.push({ provider: "gemini", getRaw: () => geminiCompleteJson(input) });
+  }
+
+  for (const { provider, getRaw } of attempts) {
+    const raw = await getRaw();
+    if (!raw) continue;
+    try {
+      const data = JSON.parse(raw) as T;
+      console.log(`[LLM] provider ${provider}`);
+      return { data, raw, provider };
+    } catch {
+      console.warn(`[LLM] ${provider} returned unparseable JSON — trying next provider`);
     }
-    console.warn("[LLM] Groq chain exhausted — trying secondary providers");
   }
 
-  const openai = await openaiCompleteJson(input);
-  if (openai) {
-    console.log("[LLM] provider openai");
-    return { content: openai, provider: "openai" };
+  if (attempts.length > 0) {
+    console.warn("[LLM] All configured providers failed or returned invalid JSON");
   }
 
-  const gemini = await geminiCompleteJson(input);
-  if (gemini) {
-    console.log("[LLM] provider gemini");
-    return { content: gemini, provider: "gemini" };
-  }
-
-  return { content: null, provider: "none" };
+  return { data: null, raw: null, provider: "none" };
 }
 
 export async function generateJsonFromLlm(input: {
