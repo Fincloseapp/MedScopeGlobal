@@ -32,10 +32,11 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "pg module missing" }, { status: 500 });
   }
 
-  const sql = readFileSync(
+  const sqlFiles = [
     projectPath("supabase/migrations/20260706120000_student_materials.sql"),
-    "utf8"
-  );
+    projectPath("supabase/migrations/20260707120000_student_materials_text_cache.sql"),
+  ];
+  const sql = sqlFiles.map((f) => readFileSync(f, "utf8")).join("\n\n");
 
   const client = new Client({
     connectionString: databaseUrl,

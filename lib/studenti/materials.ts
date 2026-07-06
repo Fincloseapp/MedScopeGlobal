@@ -19,6 +19,9 @@ export type StudentMaterial = {
   hosting_mode: "external_link" | "hosted";
   storage_path: string | null;
   scraped_at: string;
+  extracted_text?: string | null;
+  extracted_kind?: "text" | "html" | null;
+  text_extracted_at?: string | null;
 };
 
 /** Public-safe shape — no external URLs or source attribution. */
