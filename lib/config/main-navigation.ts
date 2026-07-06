@@ -35,6 +35,11 @@ const menuCs: NavItem[] = [
         description: "Biologie, chemie, fyzika pro přijímačky",
       },
       { label: "Zkoušky", href: "/studenti/zkousky", description: "Příprava na zkoušky LF" },
+      {
+        label: "Studijní materiály LF1",
+        href: "/studenti/materialy",
+        description: "Index materiálů z LF1.CZ podle ročníku",
+      },
       { label: "AI tutor", href: "/studenti/ai-tutor", description: "Studentský AI asistent" },
       { label: "Lékařské fakulty", href: "/studium/univerzity", description: "8 českých LF" },
       { label: "MedScope Academy", href: "/academy", description: "Kurzy, lekce a kvízy" },

@@ -22,6 +22,11 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       { label: "Testy a kvízy", href: "/studenti/testy", description: "Modelové otázky a procvičení" },
       { label: "Chci studovat medicínu", href: "/studenti/chci-studovat", description: "Přijímačky a příprava" },
       { label: "Zkoušky", href: "/studenti/zkousky", description: "Příprava na zkoušky LF" },
+      {
+        label: "Studijní materiály LF1",
+        href: "/studenti/materialy",
+        description: "Kurátorovaný index materiálů z LF1.CZ podle ročníku",
+      },
       { label: "AI tutor", href: "/studenti/ai-tutor", description: "Studentský AI asistent" },
       { label: "Lékařské fakulty", href: "/studium/univerzity", description: "8 českých LF" },
       { label: "Studijní plány", href: "/medicina/plany", description: "Harmonogramy 1.–6. ročník" },
