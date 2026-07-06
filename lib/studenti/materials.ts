@@ -1,7 +1,5 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { createClient } from "@/lib/supabase/server";
-import { projectPath } from "@/lib/config/paths";
+import lf1MaterialsExport from "@/public/data/lf1-student-materials.json";
 
 export type StudentMaterial = {
   id: string;
@@ -33,22 +31,10 @@ type JsonExport = {
   materials: StudentMaterial[];
 };
 
-let jsonCache: StudentMaterial[] | null = null;
+const jsonFallback = (lf1MaterialsExport as JsonExport).materials ?? [];
 
 function loadJsonFallback(): StudentMaterial[] {
-  if (jsonCache) return jsonCache;
-  try {
-    const raw = readFileSync(
-      join(projectPath("public/data/lf1-student-materials.json")),
-      "utf8"
-    );
-    const parsed = JSON.parse(raw) as JsonExport;
-    jsonCache = parsed.materials ?? [];
-    return jsonCache;
-  } catch {
-    jsonCache = [];
-    return jsonCache;
-  }
+  return jsonFallback;
 }
 
 function filterMaterials(materials: StudentMaterial[], query: StudentMaterialsQuery) {
