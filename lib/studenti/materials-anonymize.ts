@@ -21,6 +21,36 @@ const LORD_NICKNAME = /\b[Ll]ordovin[\wáčďéěíňóřšťúůýž]*/gi;
 /** Trailing English author attribution lists. */
 const MADE_BY_AUTHORS = /\s*\bmade\s+by\b[\s\S]*$/gi;
 
+/** Trailing "by Handle" attribution (e.g. by Langenbeck). */
+const BY_AUTHOR = /\s+\bby\b\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+!?\s*$/i;
+
+/** Trailing comma author credit (e.g. ", Matěj Rúra"). */
+const TRAILING_COMMA_AUTHOR =
+  /,\s+(?:[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+\s+)?[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+!?\s*$/g;
+
+/** Trailing informal single-word handles (e.g. "- Spongebob"). */
+const TRAILING_INFORMAL_HANDLE = /\s[-–—]\s+(?:Spongebob)\s*$/gi;
+
+/** Trailing dash author credit, optional year suffix (e.g. "- Jirka Beneš", "- Lubomír Tekeli r. 2016"). */
+const TRAILING_DASH_AUTHOR =
+  /\s[-–—]\s+(?:(?:[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+!?(?:\s+r\.\s*\d{4})?)|(?:[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+!))(?:\s+r\.\s*\d{4})?\s*$/g;
+
+/** Parenthetical author credit (full name or surname, min 3 chars). */
+const PAREN_AUTHOR =
+  /\s*\((?:[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+\s+)?[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]{2,}\)\s*/g;
+
+/** Embedded trailing nickname + surname without separator (e.g. "... r.2018 Jirka Beneš!"). */
+const EMBEDDED_TRAILING_AUTHOR =
+  /\s+(?:[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+\s+)?[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+!\s*$/g;
+
+/** "dle Jirky Beneše" style attribution. */
+const DLE_AUTHOR =
+  /\s*,?\s*\bdle\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]*(?:y|ě|a|u|í|é|ovi|em)?\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]*/g;
+
+/** "Fůze Beneše a Mikšíka" style merged credits. */
+const FUZE_AUTHORS =
+  /\s*[-–—:,]?\s*[Ff]ůze\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+\s+a\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+!?\s*$/g;
+
 const LEADING_NAME =
   /^(?:MUDr\.|Mgr\.|Bc\.|PhDr\.|RNDr\.|Ing\.|Dr\.|Doc\.)\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+(?:\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+)?\s*[-–—:,]\s*/i;
 
@@ -31,6 +61,14 @@ export function anonymizeMaterialTitle(title: string): string {
 
   t = t.replace(LEADING_NAME, "");
   t = t.replace(MADE_BY_AUTHORS, "");
+  t = t.replace(BY_AUTHOR, "");
+  t = t.replace(DLE_AUTHOR, "");
+  t = t.replace(FUZE_AUTHORS, "");
+  t = t.replace(TRAILING_INFORMAL_HANDLE, "");
+  t = t.replace(PAREN_AUTHOR, " ");
+  t = t.replace(TRAILING_DASH_AUTHOR, "");
+  t = t.replace(TRAILING_COMMA_AUTHOR, "");
+  t = t.replace(EMBEDDED_TRAILING_AUTHOR, "");
   t = t.replace(PROF_REFERENCE, (match) => {
     if (/^podle/i.test(match)) return "podle učitele";
     if (/^k\s/i.test(match)) return "k učiteli";

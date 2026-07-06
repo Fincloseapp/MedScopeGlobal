@@ -38,6 +38,20 @@ const HONORIFIC_NAME =
   /\b(?:pana|paní|lorda|lady|sira)\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]*(?:a|ovi|em|é|u)?/gi;
 const LORD_NICKNAME = /\b[Ll]ordovin[\wáčďéěíňóřšťúůýž]*/gi;
 const MADE_BY_AUTHORS = /\s*\bmade\s+by\b[\s\S]*$/gi;
+const BY_AUTHOR = /\s+\bby\b\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+!?\s*$/i;
+const TRAILING_COMMA_AUTHOR =
+  /,\s+(?:[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+\s+)?[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+!?\s*$/g;
+const TRAILING_INFORMAL_HANDLE = /\s[-–—]\s+(?:Spongebob)\s*$/gi;
+const TRAILING_DASH_AUTHOR =
+  /\s[-–—]\s+(?:(?:[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+!?(?:\s+r\.\s*\d{4})?)|(?:[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+!))(?:\s+r\.\s*\d{4})?\s*$/g;
+const PAREN_AUTHOR =
+  /\s*\((?:[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+\s+)?[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]{2,}\)\s*/g;
+const EMBEDDED_TRAILING_AUTHOR =
+  /\s+(?:[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+\s+)?[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+!\s*$/g;
+const DLE_AUTHOR =
+  /\s*,?\s*\bdle\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]*(?:y|ě|a|u|í|é|ovi|em)?\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]*/g;
+const FUZE_AUTHORS =
+  /\s*[-–—:,]?\s*[Ff]ůze\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+\s+a\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+!?\s*$/g;
 const LEADING_NAME =
   /^(?:MUDr\.|Mgr\.|Bc\.|PhDr\.|RNDr\.|Ing\.|Dr\.|Doc\.)\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+(?:\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+)?\s*[-–—:,]\s*/i;
 
@@ -46,6 +60,14 @@ function anonymizeTitle(title) {
   if (!t) return title;
   t = t.replace(LEADING_NAME, "");
   t = t.replace(MADE_BY_AUTHORS, "");
+  t = t.replace(BY_AUTHOR, "");
+  t = t.replace(DLE_AUTHOR, "");
+  t = t.replace(FUZE_AUTHORS, "");
+  t = t.replace(TRAILING_INFORMAL_HANDLE, "");
+  t = t.replace(PAREN_AUTHOR, " ");
+  t = t.replace(TRAILING_DASH_AUTHOR, "");
+  t = t.replace(TRAILING_COMMA_AUTHOR, "");
+  t = t.replace(EMBEDDED_TRAILING_AUTHOR, "");
   t = t.replace(PROF_REFERENCE, (match) => {
     if (/^podle/i.test(match)) return "podle učitele";
     if (/^k\s/i.test(match)) return "k učiteli";
