@@ -155,16 +155,20 @@ async function extractMaterialTextInternal(material: StudentMaterial): Promise<M
   }
 }
 
-async function loadMaterialText(id: string): Promise<MaterialTextContent> {
+const getCachedExtraction = unstable_cache(
+  async (id: string, materialSnapshot: string) => {
+    void id;
+    const material = JSON.parse(materialSnapshot) as StudentMaterial;
+    return extractMaterialTextInternal(material);
+  },
+  ["student-material-text"],
+  { revalidate: 86400, tags: ["student-material-text"] }
+);
+
+export async function getCachedMaterialText(id: string): Promise<MaterialTextContent> {
   const material = await getStudentMaterialById(id);
   if (!material) {
     return { ok: false, reason: "unavailable", message: "Materiál nebyl nalezen." };
   }
-  return extractMaterialTextInternal(material);
+  return getCachedExtraction(id, JSON.stringify(material));
 }
-
-export const getCachedMaterialText = unstable_cache(
-  loadMaterialText,
-  ["student-material-text"],
-  { revalidate: 86400, tags: ["student-material-text"] }
-);
