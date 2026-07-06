@@ -1,4 +1,7 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { createClient } from "@/lib/supabase/server";
+import { projectPath } from "@/lib/config/paths";
 
 export type StudentMaterial = {
   id: string;
@@ -26,9 +29,55 @@ export type StudentMaterialsQuery = {
   offset?: number;
 };
 
+type JsonExport = {
+  materials: StudentMaterial[];
+};
+
+let jsonCache: StudentMaterial[] | null = null;
+
+function loadJsonFallback(): StudentMaterial[] {
+  if (jsonCache) return jsonCache;
+  try {
+    const raw = readFileSync(
+      join(projectPath("public/data/lf1-student-materials.json")),
+      "utf8"
+    );
+    const parsed = JSON.parse(raw) as JsonExport;
+    jsonCache = parsed.materials ?? [];
+    return jsonCache;
+  } catch {
+    jsonCache = [];
+    return jsonCache;
+  }
+}
+
+function filterMaterials(materials: StudentMaterial[], query: StudentMaterialsQuery) {
+  const limit = Math.min(query.limit ?? 500, 1000);
+  const offset = query.offset ?? 0;
+  const q = query.q?.trim().toLowerCase();
+
+  let filtered = materials.filter((m) => {
+    if (query.rocnik !== undefined && query.rocnik !== null && m.rocnik !== query.rocnik) {
+      return false;
+    }
+    if (query.subject && m.subject !== query.subject) return false;
+    if (q && !m.title.toLowerCase().includes(q) && !m.subject.toLowerCase().includes(q)) {
+      return false;
+    }
+    return true;
+  });
+
+  filtered = filtered.sort(
+    (a, b) => a.subject.localeCompare(b.subject, "cs") || a.title.localeCompare(b.title, "cs")
+  );
+
+  const total = filtered.length;
+  return { materials: filtered.slice(offset, offset + limit), total };
+}
+
 export async function listStudentMaterials(
   query: StudentMaterialsQuery = {}
-): Promise<{ materials: StudentMaterial[]; total: number }> {
+): Promise<{ materials: StudentMaterial[]; total: number; source: "db" | "json" }> {
   const supabase = await createClient();
   const limit = Math.min(query.limit ?? 500, 1000);
   const offset = query.offset ?? 0;
@@ -54,12 +103,16 @@ export async function listStudentMaterials(
   }
 
   const { data, error, count } = await dbQuery;
-  if (error) throw new Error(error.message);
+  if (!error && (data?.length ?? 0) > 0) {
+    return {
+      materials: (data ?? []) as StudentMaterial[],
+      total: count ?? data?.length ?? 0,
+      source: "db",
+    };
+  }
 
-  return {
-    materials: (data ?? []) as StudentMaterial[],
-    total: count ?? data?.length ?? 0,
-  };
+  const fallback = filterMaterials(loadJsonFallback(), query);
+  return { ...fallback, source: "json" };
 }
 
 export async function listStudentMaterialSubjects(): Promise<string[]> {
@@ -69,11 +122,14 @@ export async function listStudentMaterialSubjects(): Promise<string[]> {
     .select("subject")
     .eq("is_active", true);
 
-  if (error) throw new Error(error.message);
-
   const subjects = new Set<string>();
-  for (const row of data ?? []) {
-    if (row.subject) subjects.add(row.subject);
+  if (!error) {
+    for (const row of data ?? []) {
+      if (row.subject) subjects.add(row.subject);
+    }
+  }
+  if (subjects.size === 0) {
+    for (const row of loadJsonFallback()) subjects.add(row.subject);
   }
   return [...subjects].sort((a, b) => a.localeCompare(b, "cs"));
 }

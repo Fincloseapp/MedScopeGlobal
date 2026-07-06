@@ -137,6 +137,26 @@ function summarize(materials) {
   return { byRocnik, bySubject, total: materials.length };
 }
 
+function writeJsonExport(materials, summary) {
+  const outDir = path.join(root, "public", "data");
+  fs.mkdirSync(outDir, { recursive: true });
+  const payload = {
+    generated_at: new Date().toISOString(),
+    source_url: LF1_SOURCE_PAGE,
+    summary,
+    materials: materials.map((m, index) => ({
+      id: `lf1-${index + 1}-${Buffer.from(`${m.external_url}:${m.rocnik}`).toString("base64url").slice(0, 12)}`,
+      ...m,
+      description: null,
+      file_size_bytes: null,
+      storage_path: null,
+    })),
+  };
+  const outPath = path.join(outDir, "lf1-student-materials.json");
+  fs.writeFileSync(outPath, JSON.stringify(payload, null, 2));
+  console.log(`JSON export: ${outPath}`);
+}
+
 async function fetchLf1Page() {
   const res = await fetch(LF1_SOURCE_PAGE, {
     headers: { "User-Agent": "MedScopeGlobal-Indexer/1.0 (+https://medscopeglobal.com)" },
@@ -172,6 +192,7 @@ async function main() {
 
   if (DRY_RUN) {
     console.log("\nDry run — no DB writes.");
+    writeJsonExport(materials, summary);
     fs.writeFileSync(
       path.join(root, "scripts", "_lf1-materials-preview.json"),
       JSON.stringify({ summary, sample: materials.slice(0, 5) }, null, 2)
@@ -185,7 +206,15 @@ async function main() {
   });
 
   console.log("Upserting to student_materials...");
-  await upsertMaterials(supabase, materials);
+  try {
+    await upsertMaterials(supabase, materials);
+  } catch (e) {
+    console.warn("DB upsert failed:", e.message);
+    console.warn("Writing JSON fallback export.");
+    writeJsonExport(materials, summary);
+    throw e;
+  }
+  writeJsonExport(materials, summary);
   console.log("Done.");
 }
 
