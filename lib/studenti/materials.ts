@@ -31,8 +31,11 @@ export type PublicStudentMaterial = {
   file_type: string | null;
   file_size_bytes: number | null;
   description: string | null;
+  /** @deprecated Use read_path — kept for API compatibility */
   can_preview: boolean;
+  /** @deprecated Use read_path */
   preview_path: string;
+  read_path: string;
 };
 
 export type StudentMaterialsQuery = {
@@ -54,7 +57,7 @@ function loadJsonFallback(): StudentMaterial[] {
 }
 
 export function toPublicMaterial(m: StudentMaterial): PublicStudentMaterial {
-  const fileType = (m.file_type ?? "").toLowerCase();
+  const readPath = `/studenti/materialy/${m.id}/cist`;
   return {
     id: m.id,
     display_title: anonymizeMaterialTitle(m.title),
@@ -64,8 +67,9 @@ export function toPublicMaterial(m: StudentMaterial): PublicStudentMaterial {
     file_type: m.file_type,
     file_size_bytes: m.file_size_bytes,
     description: m.description,
-    can_preview: fileType === "pdf",
-    preview_path: `/studenti/materialy/${m.id}/preview`,
+    can_preview: true,
+    preview_path: readPath,
+    read_path: readPath,
   };
 }
 

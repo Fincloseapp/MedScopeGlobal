@@ -2,13 +2,12 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { BookOpen, FileText, Search } from "lucide-react";
+import { BookOpen, Search } from "lucide-react";
 import type { PublicStudentMaterial } from "@/lib/studenti/materials";
 import {
   PUBLIC_LEGAL_NOTICE,
   PUBLIC_SOURCE_LABEL,
 } from "@/lib/studenti/materials-anonymize";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -22,11 +21,6 @@ const ROCNIK_TABS = [
   { value: "5", label: "5. ročník" },
   { value: "6", label: "6. ročník" },
 ] as const;
-
-function fileTypeLabel(type: string | null) {
-  if (!type || type === "unknown") return "Soubor";
-  return type.toUpperCase();
-}
 
 export function StudentMaterialsBrowser({
   materials,
@@ -121,38 +115,21 @@ export function StudentMaterialsBrowser({
           {filtered.map((m) => (
             <Link
               key={m.id}
-              href={m.preview_path}
-              className="group flex flex-col rounded-2xl border border-[#cfe1f3] bg-white p-4 shadow-[0_12px_30px_-24px_rgba(0,91,150,0.55)] transition hover:-translate-y-0.5 hover:border-[#005B96]/40"
+              href={m.read_path}
+              className="group flex flex-col rounded-2xl border border-[#cfe1f3] bg-white p-5 shadow-[0_12px_30px_-24px_rgba(0,91,150,0.55)] transition hover:-translate-y-0.5 hover:border-[#005B96]/40"
             >
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#eef4fb] text-[#005B96]">
-                  <FileText className="h-4 w-4" />
-                </div>
-                <Badge variant="secondary" className="shrink-0 text-[10px] uppercase">
-                  {fileTypeLabel(m.file_type)}
-                </Badge>
-              </div>
-              <h3 className="mt-3 font-display text-base font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
+              <h3 className="font-display text-base font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
                 {m.display_title}
               </h3>
-              <p className="mt-1 text-xs font-medium text-[#005B96]/80">{m.subject}</p>
+              <p className="mt-2 text-xs font-medium text-[#005B96]/80">{m.subject}</p>
               {m.rocnik !== null && m.rocnik > 0 ? (
                 <p className="mt-1 text-xs text-slate-500">{m.rocnik}. ročník</p>
               ) : m.category === "recent" ? (
                 <p className="mt-1 text-xs text-slate-500">Naposled přidané</p>
               ) : null}
-              <span className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-[#005B96]">
-                {m.can_preview ? (
-                  <>
-                    <BookOpen className="h-3 w-3" />
-                    Číst
-                  </>
-                ) : (
-                  <>
-                    <FileText className="h-3 w-3" />
-                    Detail
-                  </>
-                )}
+              <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-[#005B96]">
+                <BookOpen className="h-3.5 w-3.5" />
+                Číst
               </span>
             </Link>
           ))}
