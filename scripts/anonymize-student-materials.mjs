@@ -35,7 +35,9 @@ const PROF_REFERENCE =
 const PREFIXED_NAME =
   /\b(?:MUDr\.|Mgr\.|Bc\.|PhDr\.|RNDr\.|Ing\.|Dr\.|Doc\.|doc\.)\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+(?:\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+)?/g;
 const HONORIFIC_NAME =
-  /\b(?:pana|paní|lorda|lady|sira)\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+(?:a|ovi|em|é|u)?/gi;
+  /\b(?:pana|paní|lorda|lady|sira)\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]*(?:a|ovi|em|é|u)?/gi;
+const LORD_NICKNAME = /\b[Ll]ordovin[\wáčďéěíňóřšťúůýž]*/gi;
+const MADE_BY_AUTHORS = /\s*\bmade\s+by\b[\s\S]*$/gi;
 const LEADING_NAME =
   /^(?:MUDr\.|Mgr\.|Bc\.|PhDr\.|RNDr\.|Ing\.|Dr\.|Doc\.)\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+(?:\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ][\wáčďéěíňóřšťúůýž]+)?\s*[-–—:,]\s*/i;
 
@@ -43,12 +45,14 @@ function anonymizeTitle(title) {
   let t = title.trim();
   if (!t) return title;
   t = t.replace(LEADING_NAME, "");
+  t = t.replace(MADE_BY_AUTHORS, "");
   t = t.replace(PROF_REFERENCE, (match) => {
     if (/^podle/i.test(match)) return "podle učitele";
     if (/^k\s/i.test(match)) return "k učiteli";
     return "";
   });
   t = t.replace(HONORIFIC_NAME, "vyučujícího");
+  t = t.replace(LORD_NICKNAME, "materiály");
   t = t.replace(PREFIXED_NAME, "");
   t = t.replace(ACADEMIC_PREFIX, "");
   t = t
