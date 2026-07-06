@@ -41,6 +41,8 @@ const BACKFILL_PAGE_SIZE = 100;
 export async function runV26RewriteBackfill(options?: {
   batchSize?: number;
   audience?: "public" | "student" | "physician" | "all";
+  /** Only include articles published within the last N days. */
+  days?: number;
 }): Promise<V26BackfillResult> {
   const admin = createServiceRoleClient();
   const batchSize = options?.batchSize ?? Number(process.env.V26_REWRITE_BATCH ?? 8);
@@ -56,6 +58,7 @@ export async function runV26RewriteBackfill(options?: {
     content: string | null;
     metadata: unknown;
     min_access_level: string | null;
+    audience: string | null;
     source_url: string | null;
     source_name: string | null;
     public_topic: string | null;
@@ -65,13 +68,36 @@ export async function runV26RewriteBackfill(options?: {
   let scanned = 0;
   let offset = 0;
 
+  const since =
+    options?.days != null && options.days > 0
+      ? (() => {
+          const d = new Date();
+          d.setDate(d.getDate() - options.days!);
+          return d.toISOString();
+        })()
+      : null;
+
   while (batch.length < batchSize) {
-    const { data: page, error: fetchErr } = await admin
+    let query = admin
       .from("articles")
       .select(
-        "id, title, slug, excerpt, content, metadata, min_access_level, source_url, source_name, public_topic"
+        "id, title, slug, excerpt, content, metadata, min_access_level, audience, source_url, source_name, public_topic"
       )
-      .eq("published", true)
+      .eq("published", true);
+
+    if (options?.audience === "public") {
+      query = query.eq("audience", "public");
+    } else if (options?.audience === "student") {
+      query = query.eq("min_access_level", "student");
+    } else if (options?.audience === "physician") {
+      query = query.eq("min_access_level", "physician");
+    }
+
+    if (since) {
+      query = query.gte("published_at", since);
+    }
+
+    const { data: page, error: fetchErr } = await query
       .order("published_at", { ascending: false })
       .range(offset, offset + BACKFILL_PAGE_SIZE - 1);
 

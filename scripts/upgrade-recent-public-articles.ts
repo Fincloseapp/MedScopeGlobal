@@ -64,8 +64,8 @@ async function main() {
 
   if (scanOnly) return;
 
-  console.log(`\n=== V26 BACKFILL (batch=${batch}, audience=public) ===`);
-  const result = await runV26RewriteBackfill({ batchSize: batch, audience: "public" });
+  console.log(`\n=== V26 BACKFILL (batch=${batch}, audience=public, days=${days}) ===`);
+  const result = await runV26RewriteBackfill({ batchSize: batch, audience: "public", days });
   console.log(JSON.stringify(result, null, 2));
 }
 
