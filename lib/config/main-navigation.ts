@@ -36,9 +36,9 @@ const menuCs: NavItem[] = [
       },
       { label: "Zkoušky", href: "/studenti/zkousky", description: "Příprava na zkoušky LF" },
       {
-        label: "Studijní materiály LF1",
+        label: "Studijní materiály",
         href: "/studenti/materialy",
-        description: "Index materiálů z LF1.CZ podle ročníku",
+        description: "Kurátorovaná knihovna podle ročníku a oboru",
       },
       { label: "AI tutor", href: "/studenti/ai-tutor", description: "Studentský AI asistent" },
       { label: "Lékařské fakulty", href: "/studium/univerzity", description: "8 českých LF" },

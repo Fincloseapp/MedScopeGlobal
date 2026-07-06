@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { listStudentMaterials } from "@/lib/studenti/materials";
+import { PUBLIC_LEGAL_NOTICE } from "@/lib/studenti/materials-anonymize";
 
 export const dynamic = "force-dynamic";
 
@@ -37,8 +38,7 @@ export async function GET(request: Request) {
       total,
       count: materials.length,
       legal: {
-        hosting: "external_link",
-        attribution: "LF1.CZ (lf1.cz) — MedScopeGlobal curator index",
+        notice: PUBLIC_LEGAL_NOTICE,
       },
     });
   } catch (e) {

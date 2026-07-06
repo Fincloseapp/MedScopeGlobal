@@ -1,8 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ExternalLink, FileText, Search } from "lucide-react";
-import type { StudentMaterial } from "@/lib/studenti/materials";
+import Link from "next/link";
+import { BookOpen, FileText, Search } from "lucide-react";
+import type { PublicStudentMaterial } from "@/lib/studenti/materials";
+import {
+  PUBLIC_LEGAL_NOTICE,
+  PUBLIC_SOURCE_LABEL,
+} from "@/lib/studenti/materials-anonymize";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -28,7 +33,7 @@ export function StudentMaterialsBrowser({
   subjects,
   stats,
 }: {
-  materials: StudentMaterial[];
+  materials: PublicStudentMaterial[];
   subjects: string[];
   stats: { total: number; byRocnik: Record<string, number> };
 }) {
@@ -41,7 +46,11 @@ export function StudentMaterialsBrowser({
     return materials.filter((m) => {
       if (rocnik !== "all" && String(m.rocnik ?? "") !== rocnik) return false;
       if (subject !== "all" && m.subject !== subject) return false;
-      if (q && !m.title.toLowerCase().includes(q) && !m.subject.toLowerCase().includes(q)) {
+      if (
+        q &&
+        !m.display_title.toLowerCase().includes(q) &&
+        !m.subject.toLowerCase().includes(q)
+      ) {
         return false;
       }
       return true;
@@ -52,20 +61,12 @@ export function StudentMaterialsBrowser({
     <div className="space-y-8">
       <div className="rounded-2xl border border-[#cfe1f3] bg-white p-5 shadow-[0_12px_30px_-24px_rgba(0,91,150,0.55)]">
         <p className="text-sm leading-7 text-slate-600">
-          Kurátorovaný přehled studijních materiálů z portálu{" "}
-          <a
-            href="https://lf1.cz/materialy-ke-stazeni/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium text-[#005B96] underline-offset-2 hover:underline"
-          >
-            LF1.CZ
-          </a>{" "}
-          (neoficiální studentské stránky 1. LF UK). MedScopeGlobal materiály nehostuje — vždy
-          odkazujeme na originál u zdroje.
+          Kurátorovaná knihovna studijních materiálů pro studenty medicíny — vyhledávání
+          podle ročníku, oboru a názvu. Materiály lze{" "}
+          <span className="font-medium text-[#005B96]">číst online</span> přímo v prohlížeči.
         </p>
         <p className="mt-2 text-xs text-slate-500">
-          Celkem {stats.total} materiálů v indexu · zobrazeno {filtered.length}
+          {PUBLIC_SOURCE_LABEL} · celkem {stats.total} materiálů · zobrazeno {filtered.length}
         </p>
       </div>
 
@@ -118,11 +119,9 @@ export function StudentMaterialsBrowser({
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((m) => (
-            <a
+            <Link
               key={m.id}
-              href={m.external_url}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={m.preview_path}
               className="group flex flex-col rounded-2xl border border-[#cfe1f3] bg-white p-4 shadow-[0_12px_30px_-24px_rgba(0,91,150,0.55)] transition hover:-translate-y-0.5 hover:border-[#005B96]/40"
             >
               <div className="flex items-start justify-between gap-2">
@@ -134,7 +133,7 @@ export function StudentMaterialsBrowser({
                 </Badge>
               </div>
               <h3 className="mt-3 font-display text-base font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
-                {m.title}
+                {m.display_title}
               </h3>
               <p className="mt-1 text-xs font-medium text-[#005B96]/80">{m.subject}</p>
               {m.rocnik !== null && m.rocnik > 0 ? (
@@ -143,47 +142,32 @@ export function StudentMaterialsBrowser({
                 <p className="mt-1 text-xs text-slate-500">Naposled přidané</p>
               ) : null}
               <span className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-[#005B96]">
-                Otevřít na LF1.CZ
-                <ExternalLink className="h-3 w-3" />
+                {m.can_preview ? (
+                  <>
+                    <BookOpen className="h-3 w-3" />
+                    Číst
+                  </>
+                ) : (
+                  <>
+                    <FileText className="h-3 w-3" />
+                    Detail
+                  </>
+                )}
               </span>
-            </a>
+            </Link>
           ))}
         </div>
       )}
 
-      <footer className="rounded-2xl border border-amber-200/80 bg-amber-50/70 p-5 text-sm leading-7 text-slate-700">
-        <p className="font-semibold text-[#021d33]">Právní upozornění a podmínky použití</p>
-        <ul className="mt-2 list-disc space-y-1 pl-5">
-          <li>
-            Materiály jsou hostovány výhradně na{" "}
-            <a
-              href="https://lf1.cz/materialy-ke-stazeni/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#005B96] underline-offset-2 hover:underline"
-            >
-              lf1.cz
-            </a>
-            . Autorská práva náleží původním autorům a nahrávajícím studentům.
-          </li>
-          <li>
-            MedScopeGlobal vystupuje pouze jako kurátor a vyhledávač — nejsme vydavatelem ani
-            držitelem licencí k těmto souborům.
-          </li>
-          <li>
-            Obsah je určen výhradně pro osobní studijní účely studentů medicíny. Před sdílením
-            nebo komerčním využitím ověřte podmínky u zdroje.
-          </li>
-          <li>
-            Nenašli jste materiál nebo je odkaz nefunkční? Kontaktujte správce LF1.CZ nebo nás na{" "}
-            <a href="/kontakt" className="text-[#005B96] underline-offset-2 hover:underline">
-              kontaktní stránce
-            </a>
-            .
-          </li>
-        </ul>
+      <footer className="rounded-2xl border border-[#cfe1f3] bg-[#eef4fb]/50 p-5 text-sm leading-7 text-slate-700">
+        <p className="font-semibold text-[#021d33]">Podmínky použití</p>
+        <p className="mt-2">{PUBLIC_LEGAL_NOTICE}</p>
         <p className="mt-3 text-xs text-slate-500">
-          Zdroj: LF UK Praha — LF1.CZ · Index kurátorován MedScopeGlobal
+          Máte dotaz nebo nenašli jste materiál?{" "}
+          <Link href="/kontakt" className="text-[#005B96] underline-offset-2 hover:underline">
+            Kontaktujte nás
+          </Link>
+          .
         </p>
       </footer>
     </div>

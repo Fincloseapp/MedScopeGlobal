@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import lf1MaterialsExport from "@/public/data/lf1-student-materials.json";
+import { anonymizeMaterialTitle } from "@/lib/studenti/materials-anonymize";
 
+/** Full record — admin / server-side only. */
 export type StudentMaterial = {
   id: string;
   title: string;
@@ -17,6 +19,20 @@ export type StudentMaterial = {
   hosting_mode: "external_link" | "hosted";
   storage_path: string | null;
   scraped_at: string;
+};
+
+/** Public-safe shape — no external URLs or source attribution. */
+export type PublicStudentMaterial = {
+  id: string;
+  display_title: string;
+  subject: string;
+  rocnik: number | null;
+  category: "recent" | "rocnik" | "general";
+  file_type: string | null;
+  file_size_bytes: number | null;
+  description: string | null;
+  can_preview: boolean;
+  preview_path: string;
 };
 
 export type StudentMaterialsQuery = {
@@ -37,6 +53,22 @@ function loadJsonFallback(): StudentMaterial[] {
   return jsonFallback;
 }
 
+export function toPublicMaterial(m: StudentMaterial): PublicStudentMaterial {
+  const fileType = (m.file_type ?? "").toLowerCase();
+  return {
+    id: m.id,
+    display_title: anonymizeMaterialTitle(m.title),
+    subject: m.subject,
+    rocnik: m.rocnik,
+    category: m.category,
+    file_type: m.file_type,
+    file_size_bytes: m.file_size_bytes,
+    description: m.description,
+    can_preview: fileType === "pdf",
+    preview_path: `/studenti/materialy/${m.id}/preview`,
+  };
+}
+
 function filterMaterials(materials: StudentMaterial[], query: StudentMaterialsQuery) {
   const limit = Math.min(query.limit ?? 500, 1000);
   const offset = query.offset ?? 0;
@@ -47,8 +79,11 @@ function filterMaterials(materials: StudentMaterial[], query: StudentMaterialsQu
       return false;
     }
     if (query.subject && m.subject !== query.subject) return false;
-    if (q && !m.title.toLowerCase().includes(q) && !m.subject.toLowerCase().includes(q)) {
-      return false;
+    if (q) {
+      const display = anonymizeMaterialTitle(m.title).toLowerCase();
+      if (!display.includes(q) && !m.title.toLowerCase().includes(q) && !m.subject.toLowerCase().includes(q)) {
+        return false;
+      }
     }
     return true;
   });
@@ -63,7 +98,7 @@ function filterMaterials(materials: StudentMaterial[], query: StudentMaterialsQu
 
 export async function listStudentMaterials(
   query: StudentMaterialsQuery = {}
-): Promise<{ materials: StudentMaterial[]; total: number; source: "db" | "json" }> {
+): Promise<{ materials: PublicStudentMaterial[]; total: number; source: "db" | "json" }> {
   const supabase = await createClient();
   const limit = Math.min(query.limit ?? 500, 1000);
   const offset = query.offset ?? 0;
@@ -90,15 +125,34 @@ export async function listStudentMaterials(
 
   const { data, error, count } = await dbQuery;
   if (!error && (data?.length ?? 0) > 0) {
+    const raw = (data ?? []) as StudentMaterial[];
     return {
-      materials: (data ?? []) as StudentMaterial[],
-      total: count ?? data?.length ?? 0,
+      materials: raw.map(toPublicMaterial),
+      total: count ?? raw.length,
       source: "db",
     };
   }
 
   const fallback = filterMaterials(loadJsonFallback(), query);
-  return { ...fallback, source: "json" };
+  return {
+    materials: fallback.materials.map(toPublicMaterial),
+    total: fallback.total,
+    source: "json",
+  };
+}
+
+export async function getStudentMaterialById(id: string): Promise<StudentMaterial | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("student_materials")
+    .select("*")
+    .eq("id", id)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (!error && data) return data as StudentMaterial;
+
+  return loadJsonFallback().find((m) => m.id === id) ?? null;
 }
 
 export async function listStudentMaterialSubjects(): Promise<string[]> {
@@ -120,7 +174,7 @@ export async function listStudentMaterialSubjects(): Promise<string[]> {
   return [...subjects].sort((a, b) => a.localeCompare(b, "cs"));
 }
 
-export function computeMaterialsStats(materials: Pick<StudentMaterial, "rocnik">[]) {
+export function computeMaterialsStats(materials: Pick<PublicStudentMaterial, "rocnik">[]) {
   const byRocnik: Record<string, number> = {};
   for (const row of materials) {
     const key = row.rocnik === null ? "general" : String(row.rocnik);
