@@ -31,15 +31,27 @@ function loadEnvFile(filePath) {
   return out;
 }
 
+function isUsableSecret(v) {
+  return (
+    Boolean(v) &&
+    v !== "******" &&
+    v !== "[SENSITIVE]" &&
+    v !== "[REDACTED]" &&
+    !v.startsWith("@")
+  );
+}
+
 function pickDbUrl(env) {
   const candidates = [
     env.DIRECT_URL,
     env.DATABASE_URL,
     env.SUPABASE_DB_URL,
+    env.POSTGRES_URL,
     process.env.DIRECT_URL,
     process.env.DATABASE_URL,
     process.env.SUPABASE_DB_URL,
-  ].filter(Boolean);
+    process.env.POSTGRES_URL,
+  ].filter(isUsableSecret);
 
   for (const url of candidates) {
     try {
@@ -52,6 +64,29 @@ function pickDbUrl(env) {
     } catch {
       console.warn("Skipping unparseable DB URL candidate");
     }
+  }
+
+  const host = env.POSTGRES_HOST || process.env.POSTGRES_HOST;
+  const user = env.POSTGRES_USER || process.env.POSTGRES_USER;
+  const pass = env.POSTGRES_PASSWORD || process.env.POSTGRES_PASSWORD;
+  const db = env.POSTGRES_DATABASE || process.env.POSTGRES_DATABASE || "postgres";
+  if (
+    isUsableSecret(host) &&
+    isUsableSecret(user) &&
+    isUsableSecret(pass) &&
+    host.includes(".")
+  ) {
+    console.log(`Constructing Postgres URL from POSTGRES_* host=${host}`);
+    return (
+      "postgresql://" +
+      encodeURIComponent(user) +
+      ":" +
+      encodeURIComponent(pass) +
+      "@" +
+      host +
+      ":5432/" +
+      encodeURIComponent(db)
+    );
   }
   return null;
 }

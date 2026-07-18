@@ -44,7 +44,22 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
         run: node scripts/ci-apply-academy-b2b-migration.mjs ./.env.production.pulled
+
+      - name: Fallback via production setup API
+        if: failure()
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          test -n "${CRON_SECRET:-}"
+          curl -fsS "https://medscopeglobal.com/api/setup/academy-b2b-schema?secret=${CRON_SECRET}"
+          echo
+          echo "Fallback setup API OK"
 
       - name: Upload env for local restore
         if: always()
@@ -53,4 +68,5 @@ jobs:
           name: medscope-env-local
           path: medscope.env.local
           retention-days: 1
-          if-no-files-found: error
+          if-no-files-found: warn
+          include-hidden-files: true

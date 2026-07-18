@@ -5,6 +5,43 @@ import { projectPath } from "@/lib/config/paths";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
+function resolveDatabaseUrl(): string | null {
+  const candidates = [
+    process.env.DIRECT_URL,
+    process.env.DATABASE_URL,
+    process.env.SUPABASE_DB_URL,
+    process.env.POSTGRES_URL,
+  ].filter(Boolean) as string[];
+
+  for (const url of candidates) {
+    if (url === "[SENSITIVE]" || url === "[REDACTED]" || url === "******") continue;
+    try {
+      const u = new URL(url);
+      if (u.hostname && u.hostname.includes(".") && u.hostname !== "base") return url;
+    } catch {
+      /* skip */
+    }
+  }
+
+  const host = process.env.POSTGRES_HOST;
+  const user = process.env.POSTGRES_USER;
+  const pass = process.env.POSTGRES_PASSWORD;
+  const db = process.env.POSTGRES_DATABASE || "postgres";
+  if (host && user && pass && host.includes(".") && pass !== "[SENSITIVE]") {
+    return (
+      "postgresql://" +
+      encodeURIComponent(user) +
+      ":" +
+      encodeURIComponent(pass) +
+      "@" +
+      host +
+      ":5432/" +
+      encodeURIComponent(db)
+    );
+  }
+  return null;
+}
+
 /**
  * One-time DDL for MedScope Academy B2B CME (Lékařská zóna).
  * GET /api/setup/academy-b2b-schema?secret=CRON_SECRET
@@ -16,10 +53,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const databaseUrl = process.env.DATABASE_URL || process.env.SUPABASE_DB_URL;
+  const databaseUrl = resolveDatabaseUrl();
   if (!databaseUrl) {
     return NextResponse.json(
-      { error: "DATABASE_URL not configured on server" },
+      { error: "DATABASE_URL / POSTGRES_* not configured on server" },
       { status: 503 }
     );
   }
