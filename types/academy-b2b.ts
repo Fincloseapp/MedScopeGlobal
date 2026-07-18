@@ -1,15 +1,49 @@
 /** MedScope Academy B2B CME — Lékařská zóna types */
 
-/** Academy B2B CME is rheumatology-only. */
-export type MedicalSpecialization = "revmatologie";
+export type MedicalSpecialization =
+  | "revmatologie"
+  | "prakticke_lekarstvi"
+  | "interna"
+  | "chirurgie"
+  | "pediatrie"
+  | "gynekologie"
+  | "neurologie"
+  | "psychiatrie"
+  | "anesteziologie"
+  | "radiologie"
+  | "dermatologie"
+  | "ortopedie"
+  | "kardiologie"
+  | "onkologie"
+  | "ostatni";
 
+/** Full list for ČLK verification form. */
 export const MEDICAL_SPECIALIZATIONS: ReadonlyArray<{
   value: MedicalSpecialization;
   label: string;
-}> = [{ value: "revmatologie", label: "Revmatologie" }] as const;
+}> = [
+  { value: "revmatologie", label: "Revmatologie" },
+  { value: "prakticke_lekarstvi", label: "Praktické lékařství" },
+  { value: "interna", label: "Interna" },
+  { value: "chirurgie", label: "Chirurgie" },
+  { value: "pediatrie", label: "Pediatrie" },
+  { value: "gynekologie", label: "Gynekologie a porodnictví" },
+  { value: "neurologie", label: "Neurologie" },
+  { value: "psychiatrie", label: "Psychiatrie" },
+  { value: "anesteziologie", label: "Anesteziologie a intenzivní medicína" },
+  { value: "radiologie", label: "Radiologie" },
+  { value: "dermatologie", label: "Dermatologie" },
+  { value: "ortopedie", label: "Ortopedie" },
+  { value: "kardiologie", label: "Kardiologie" },
+  { value: "onkologie", label: "Onkologie" },
+  { value: "ostatni", label: "Ostatní" },
+] as const;
 
-/** Public-facing CME focus (single specialty). */
-export const CME_FOCUS_SPECIALTY = MEDICAL_SPECIALIZATIONS[0];
+/** Public-facing accredited CME catalog focus (rheumatology-only). */
+export const CME_FOCUS_SPECIALTY = {
+  value: "revmatologie" as const,
+  label: "Revmatologie",
+};
 
 export interface PhysicianProfile {
   id: string;
