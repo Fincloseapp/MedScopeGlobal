@@ -4,6 +4,7 @@ import type { B2BCourse, CourseModule, PartnerInstitution } from "@/types/academ
 
 export async function listPartnerInstitutions(): Promise<PartnerInstitution[]> {
   const supabase = await createClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("partner_institutions")
     .select("*")
@@ -37,6 +38,8 @@ export async function getPartnerInstitution(
 
 export async function listAccreditedCmeCourses(limit = 50): Promise<B2BCourse[]> {
   const supabase = await createClient();
+  if (!supabase) return listAccreditedCmeCoursesFlat(limit);
+
   const { data, error } = await supabase
     .from("courses")
     .select(

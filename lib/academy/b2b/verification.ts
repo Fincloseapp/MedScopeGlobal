@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import type { PhysicianProfile } from "@/types/academy-b2b";
 
 const CLK_ID_PATTERN = /^[A-Za-z0-9\-./]{3,32}$/;
@@ -19,8 +19,11 @@ export function isVerifiedPhysician(profile: PhysicianProfile | null | undefined
 export async function getPhysicianProfile(
   userId: string
 ): Promise<PhysicianProfile | null> {
-  const admin = createServiceRoleClient();
-  const { data, error } = await admin
+  const admin = tryCreateServiceRoleClient();
+  const client = admin ?? (await createClient());
+  if (!client) return null;
+
+  const { data, error } = await client
     .from("users")
     .select(
       "id, email, full_name, first_name, last_name, clk_id, specialization, verified_doctor"
@@ -81,6 +84,13 @@ export function physicianGateJsonError(
  */
 export function isLekarskaZonaPath(pathname: string): boolean {
   if (pathname.startsWith("/api/academy/b2b/verification")) return false;
+  // Partner reporting is for institution staff / admins — not physician-gated
+  if (
+    pathname.startsWith("/academy/partner") ||
+    pathname.startsWith("/api/academy/b2b/partners")
+  ) {
+    return false;
+  }
   if (
     pathname === "/academy/lekari/overeni" ||
     pathname.startsWith("/academy/lekari/overeni/")
@@ -107,7 +117,7 @@ export async function enforceLekarskaZonaMiddleware(
 
   const { data } = await supabase.auth.getUser();
   if (!data.user) {
-    const login = new URL("/prihlaseni", request.url);
+    const login = new URL("/login", request.url);
     login.searchParams.set("next", pathname);
     login.searchParams.set("reason", "lekarska-zona");
     return NextResponse.redirect(login);

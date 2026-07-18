@@ -64,16 +64,48 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check existing verified record
-    const { data: existingVerification } = await admin
+    // Self-attestation with unique ČLK ID unlocks Lékařská zóna immediately.
+    // Trigger sync_verified_doctor_from_clk keeps users.verified_doctor consistent.
+    const { data: existing } = await admin
       .from("clk_verifications")
-      .select("id, status")
+      .select("id")
       .eq("user_id", auth.user.id)
       .eq("clk_number", parsed.data.clk_id)
-      .eq("status", "verified")
       .maybeSingle();
 
-    const verified = Boolean(existingVerification?.id);
+    if (existing?.id) {
+      const { error: updErr } = await admin
+        .from("clk_verifications")
+        .update({
+          status: "verified",
+          full_name: fullName,
+          email: auth.user.email,
+          method: "self_attestation",
+        })
+        .eq("id", existing.id);
+      if (updErr) {
+        return NextResponse.json({ ok: false, error: updErr.message }, { status: 500 });
+      }
+    } else {
+      const { error: insErr } = await admin.from("clk_verifications").insert({
+        user_id: auth.user.id,
+        email: auth.user.email,
+        full_name: fullName,
+        clk_number: parsed.data.clk_id,
+        status: "verified",
+        method: "self_attestation",
+        audit_log: [
+          {
+            at: new Date().toISOString(),
+            event: "self_attested_for_cme_access",
+            specialization: parsed.data.specialization,
+          },
+        ],
+      });
+      if (insErr) {
+        return NextResponse.json({ ok: false, error: insErr.message }, { status: 500 });
+      }
+    }
 
     const { error: userErr } = await admin
       .from("users")
@@ -83,7 +115,7 @@ export async function POST(request: Request) {
         full_name: fullName,
         clk_id: parsed.data.clk_id,
         specialization: parsed.data.specialization,
-        verified_doctor: verified,
+        verified_doctor: true,
       })
       .eq("id", auth.user.id);
 
@@ -91,30 +123,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: userErr.message }, { status: 500 });
     }
 
-    if (!verified) {
-      await admin.from("clk_verifications").insert({
-        user_id: auth.user.id,
-        email: auth.user.email,
-        full_name: fullName,
-        clk_number: parsed.data.clk_id,
-        status: "manual_review",
-        method: "manual",
-        audit_log: [
-          {
-            at: new Date().toISOString(),
-            event: "submitted_for_cme_access",
-            specialization: parsed.data.specialization,
-          },
-        ],
-      });
-    }
-
     return NextResponse.json({
       ok: true,
-      verified,
-      message: verified
-        ? undefined
-        : "Údaje uloženy. Po manuálním ověření ČLK získáte přístup do Lékařské zóny.",
+      verified: true,
+      message: "ČLK ověření uloženo. Máte přístup do Lékařské zóny.",
     });
   } catch (e) {
     return NextResponse.json(

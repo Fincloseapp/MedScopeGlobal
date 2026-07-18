@@ -27,7 +27,7 @@ export default async function PhysicianVerificationPage() {
           Pro ověření ČLK se nejdříve přihlaste.
         </p>
         <Link
-          href="/prihlaseni?next=/academy/lekari/overeni"
+          href="/login?next=/academy/lekari/overeni"
           className="mt-6 inline-block bg-[#005B96] px-4 py-2 text-sm text-white"
         >
           Přihlásit se

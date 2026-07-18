@@ -66,10 +66,16 @@ export default async function LekarskaZonaPage() {
                 Ověřit ČLK a vstoupit
               </Link>
               <Link
-                href="/prihlaseni?next=/academy/lekari"
+                href="/login?next=/academy/lekari"
                 className="border border-slate-300 px-5 py-2.5 text-sm font-medium text-[#021d33]"
               >
                 Přihlásit se
+              </Link>
+              <Link
+                href="/academy/partner/reports"
+                className="border border-transparent px-5 py-2.5 text-sm font-medium text-slate-500 underline-offset-4 hover:underline"
+              >
+                Partner reporty
               </Link>
             </div>
           )}

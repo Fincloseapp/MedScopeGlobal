@@ -30,7 +30,7 @@ export function MarketplaceCheckoutButton({ listingId, priceCzk, courseSlug }: P
           const next = courseSlug
             ? `/academy/courses/${courseSlug}`
             : "/academy/marketplace";
-          window.location.href = `/prihlaseni?next=${encodeURIComponent(next)}`;
+          window.location.href = `/login?next=${encodeURIComponent(next)}`;
           return;
         }
         setError(data.error ?? `Chyba (${res.status})`);

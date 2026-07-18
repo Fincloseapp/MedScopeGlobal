@@ -28,7 +28,7 @@ export default async function CmeCoursePage({ params }: Params) {
   const gate = await requireVerifiedPhysician();
   if (!gate.ok) {
     if (gate.status === 401) {
-      redirect(`/prihlaseni?next=/academy/lekari/kurzy/${(await params).slug}`);
+      redirect(`/login?next=/academy/lekari/kurzy/${(await params).slug}`);
     }
     redirect("/academy/lekari/overeni");
   }

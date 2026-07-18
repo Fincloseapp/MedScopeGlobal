@@ -96,7 +96,11 @@ export default function LoginPage() {
 
       }
 
-      window.location.reload();
+      const next = new URLSearchParams(window.location.search).get("next");
+
+      window.location.href =
+
+        next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
 
       return;
 
