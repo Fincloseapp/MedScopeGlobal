@@ -12,6 +12,10 @@ import {
 } from "@/lib/i18n/config";
 import { detectLocaleFromAcceptLanguage } from "@/lib/i18n/detect-locale";
 import { isValidAdminGateCookie, ADMIN_GATE_COOKIE } from "@/lib/auth/admin-gate-config";
+import {
+  enforceLekarskaZonaMiddleware,
+  isLekarskaZonaPath,
+} from "@/lib/academy/b2b/verification";
 
 function adminGateRedirect(request: NextRequest): NextResponse {
   const login = new URL("/admin/login", request.url);
@@ -46,6 +50,14 @@ export async function middleware(request: NextRequest) {
 
   const { supabase, response } = createMiddlewareClient(request);
 
+  // Lékařská zóna / B2B CME — only verified physicians with valid ČLK ID
+  if (isLekarskaZonaPath(pathname)) {
+    const gated = await enforceLekarskaZonaMiddleware(request, supabase, response);
+    if (gated && gated !== response) {
+      return wrapWithSecurityHeaders(gated);
+    }
+  }
+
   const manual = request.cookies.get(LOCALE_MANUAL_COOKIE)?.value === "1";
   const acceptLanguage = request.headers.get("accept-language");
   // v20: web je výhradně v češtině (bez automatického přepnutí na EN)
@@ -79,6 +91,7 @@ export const config = {
     "/admin",
     "/admin/:path*",
     "/stav-systemu",
+    "/academy/lekari/:path*",
     "/((?!_next|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?|ttf|eot)$).*)",
   ],
 };
