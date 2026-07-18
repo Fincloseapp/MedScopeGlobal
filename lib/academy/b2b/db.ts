@@ -1,5 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import {
+  createServiceRoleClient,
+  tryCreateServiceRoleClient,
+} from "@/lib/supabase/service";
 import type { B2BCourse, CourseModule, PartnerInstitution } from "@/types/academy-b2b";
 
 export async function listPartnerInstitutions(): Promise<PartnerInstitution[]> {
@@ -21,13 +24,16 @@ export async function listPartnerInstitutions(): Promise<PartnerInstitution[]> {
 export async function getPartnerInstitution(
   idOrSlug: string
 ): Promise<PartnerInstitution | null> {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  const client = admin ?? (await createClient());
+  if (!client) return null;
+
   const isUuid =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
       idOrSlug
     );
 
-  const query = admin.from("partner_institutions").select("*");
+  const query = client.from("partner_institutions").select("*");
   const { data, error } = isUuid
     ? await query.eq("id", idOrSlug).maybeSingle()
     : await query.eq("slug", idOrSlug).maybeSingle();
@@ -82,7 +88,8 @@ export async function listAccreditedCmeCourses(limit = 50): Promise<B2BCourse[]>
 }
 
 async function listAccreditedCmeCoursesFlat(limit: number): Promise<B2BCourse[]> {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return [];
   const { data, error } = await admin
     .from("courses")
     .select("*")
@@ -116,7 +123,8 @@ async function listAccreditedCmeCoursesFlat(limit: number): Promise<B2BCourse[]>
 export async function getAccreditedCourseBySlug(
   slug: string
 ): Promise<(B2BCourse & { modules: CourseModule[] }) | null> {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return null;
   const { data: course, error } = await admin
     .from("courses")
     .select("*")
@@ -157,7 +165,8 @@ export async function getAccreditedCourseBySlug(
 export async function listPartnerMemberships(userId: string): Promise<
   Array<{ partner: PartnerInstitution; role: string }>
 > {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return [];
   const { data, error } = await admin
     .from("partner_institution_members")
     .select("role, partner_institution_id")
