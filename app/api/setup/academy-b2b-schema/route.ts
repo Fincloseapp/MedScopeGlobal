@@ -26,7 +26,19 @@ function hostFromUrl(url: string): string | null {
   }
 }
 
-/** Prefer direct DB host; avoid broken/redacted pooler URLs. */
+/** Drop strict sslmode from URL so pg ssl:{rejectUnauthorized:false} can apply. */
+function withRelaxedSsl(url: string): string {
+  try {
+    const u = new URL(url);
+    u.searchParams.delete("sslmode");
+    u.searchParams.delete("ssl");
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
+/** Prefer Supabase pooler from Vercel (direct db.* often ENOTFOUND on serverless). */
 function collectDatabaseUrls(): { url: string; source: string; host: string }[] {
   const out: { url: string; source: string; host: string }[] = [];
   const seen = new Set<string>();
@@ -35,10 +47,19 @@ function collectDatabaseUrls(): { url: string; source: string; host: string }[] 
     if (!url || isPlaceholder(url)) return;
     const host = hostFromUrl(url);
     if (!host) return;
-    if (seen.has(url)) return;
-    seen.add(url);
-    out.push({ url, source, host });
+    const normalized = withRelaxedSsl(url);
+    if (seen.has(normalized)) return;
+    seen.add(normalized);
+    out.push({ url: normalized, source, host });
   };
+
+  // Pooler URLs from Vercel Supabase integration (runtime has real secrets)
+  push(process.env.POSTGRES_URL, "POSTGRES_URL");
+  push(process.env.POSTGRES_PRISMA_URL, "POSTGRES_PRISMA_URL");
+  push(process.env.DATABASE_URL, "DATABASE_URL");
+  push(process.env.POSTGRES_URL_NON_POOLING, "POSTGRES_URL_NON_POOLING");
+  push(process.env.DIRECT_URL, "DIRECT_URL");
+  push(process.env.SUPABASE_DB_URL, "SUPABASE_DB_URL");
 
   const host = process.env.POSTGRES_HOST;
   const user = process.env.POSTGRES_USER;
@@ -58,19 +79,11 @@ function collectDatabaseUrls(): { url: string; source: string; host: string }[] 
     );
   }
 
-  // Direct / non-pooling first, then pooler
-  push(process.env.DIRECT_URL, "DIRECT_URL");
-  push(process.env.POSTGRES_URL_NON_POOLING, "POSTGRES_URL_NON_POOLING");
-  push(process.env.DATABASE_URL, "DATABASE_URL");
-  push(process.env.SUPABASE_DB_URL, "SUPABASE_DB_URL");
-  push(process.env.POSTGRES_URL, "POSTGRES_URL");
-  push(process.env.POSTGRES_PRISMA_URL, "POSTGRES_PRISMA_URL");
-
-  // Prefer hosts that look like direct Supabase DB
+  // Prefer pooler hosts (reachable from Vercel) over direct db.*
   out.sort((a, b) => {
     const score = (h: string) =>
-      (h.startsWith("db.") && h.endsWith(".supabase.co") ? 0 : 1) +
-      (h.includes("pooler") ? 2 : 0);
+      (h.includes("pooler") ? 0 : 2) +
+      (h.startsWith("db.") && h.endsWith(".supabase.co") ? 1 : 0);
     return score(a.host) - score(b.host);
   });
 
@@ -136,11 +149,20 @@ export async function GET(request: Request) {
       const client = new Client({
         connectionString: candidate.url,
         ssl: { rejectUnauthorized: false },
-        connectionTimeoutMillis: 15000,
+        connectionTimeoutMillis: 20000,
       });
       try {
-        await client.connect();
-        await client.query(sql);
+        // Supabase pooler TLS often presents an intermediate that Node rejects
+        // even with rejectUnauthorized=false unless NODE_TLS is relaxed for this hop.
+        const prevTls = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        try {
+          await client.connect();
+          await client.query(sql);
+        } finally {
+          if (prevTls === undefined) delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+          else process.env.NODE_TLS_REJECT_UNAUTHORIZED = prevTls;
+        }
         await client.end().catch(() => undefined);
         return NextResponse.json({
           ok: true,
