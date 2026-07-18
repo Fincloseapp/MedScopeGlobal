@@ -41,6 +41,8 @@ jobs:
           echo "pulled_env_lines=$(wc -l < ./medscope.env.local)"
 
       - name: Apply B2B CME SQL migrations
+        id: apply_sql
+        continue-on-error: true
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
@@ -52,7 +54,7 @@ jobs:
         run: node scripts/ci-apply-academy-b2b-migration.mjs ./.env.production.pulled
 
       - name: Fallback via production setup API
-        if: failure()
+        if: steps.apply_sql.outcome != 'success'
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
