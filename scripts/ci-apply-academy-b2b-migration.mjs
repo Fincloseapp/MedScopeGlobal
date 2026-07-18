@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * CI helper: apply Academy B2B CME SQL using DATABASE_URL from env or pulled Vercel file.
- * Usage: node scripts/ci-apply-academy-b2b-migration.mjs [.env.production.pulled]
+ * Apply Academy B2B CME SQL via:
+ * 1) valid Postgres URL (DATABASE_URL / DIRECT_URL / SUPABASE_DB_URL), or
+ * 2) Supabase Management API (SUPABASE_ACCESS_TOKEN + project ref)
  */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import pg from "pg";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const envFile = process.argv[2] || path.join(root, ".env.production.pulled");
@@ -24,49 +24,112 @@ function loadEnvFile(filePath) {
     ) {
       v = v.slice(1, -1);
     }
+    // Unwrap vercel "*****" / empty placeholders
+    if (!v || v === "******" || v.startsWith("@")) continue;
     out[m[1].trim()] = v;
   }
   return out;
 }
 
-const fileEnv = loadEnvFile(envFile);
-const url =
-  process.env.DIRECT_URL ||
-  process.env.DATABASE_URL ||
-  fileEnv.DIRECT_URL ||
-  fileEnv.DATABASE_URL ||
-  fileEnv.SUPABASE_DB_URL;
+function pickDbUrl(env) {
+  const candidates = [
+    env.DIRECT_URL,
+    env.DATABASE_URL,
+    env.SUPABASE_DB_URL,
+    process.env.DIRECT_URL,
+    process.env.DATABASE_URL,
+    process.env.SUPABASE_DB_URL,
+  ].filter(Boolean);
 
-if (!url) {
-  console.error(
-    "No DATABASE_URL/DIRECT_URL in process env or",
-    path.basename(envFile)
-  );
-  process.exit(1);
+  for (const url of candidates) {
+    try {
+      const u = new URL(url);
+      if (!u.hostname || u.hostname === "base" || !u.hostname.includes(".")) {
+        console.warn(`Skipping invalid DB host: ${u.hostname || "(empty)"}`);
+        continue;
+      }
+      return url;
+    } catch {
+      console.warn("Skipping unparseable DB URL candidate");
+    }
+  }
+  return null;
 }
 
-const hostPreview = url.replace(/:\/\/([^@/]+)@/, "://***@").slice(0, 96);
-console.log("DB target:", hostPreview);
+function projectRef(env) {
+  if (env.SUPABASE_PROJECT_REF) return env.SUPABASE_PROJECT_REF;
+  const url = env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const m = url.match(/https:\/\/([^.]+)\.supabase\.co/);
+  return m?.[1] ?? null;
+}
 
+async function applyViaPg(url, files) {
+  const { default: pg } = await import("pg");
+  const client = new pg.Client({
+    connectionString: url,
+    ssl: { rejectUnauthorized: false },
+  });
+  await client.connect();
+  try {
+    for (const file of files) {
+      const sql = fs.readFileSync(file, "utf8");
+      process.stdout.write(`-> ${path.basename(file)} (pg) ... `);
+      await client.query(sql);
+      console.log("OK");
+    }
+  } finally {
+    await client.end().catch(() => undefined);
+  }
+}
+
+async function applyViaManagementApi(token, ref, files) {
+  for (const file of files) {
+    const sql = fs.readFileSync(file, "utf8");
+    process.stdout.write(`-> ${path.basename(file)} (mgmt-api) ... `);
+    const res = await fetch(
+      `https://api.supabase.com/v1/projects/${ref}/database/query`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: sql }),
+      }
+    );
+    const text = await res.text();
+    if (!res.ok) {
+      throw new Error(`API ${res.status}: ${text.slice(0, 400)}`);
+    }
+    console.log("OK");
+  }
+}
+
+const fileEnv = loadEnvFile(envFile);
+const merged = { ...fileEnv, ...process.env };
 const files = [
   "supabase/migrations/20260718120000_academy_b2b_cme.sql",
   "supabase/migrations/20260718120100_academy_b2b_cme_seed.sql",
 ].map((rel) => path.join(root, rel));
 
-const client = new pg.Client({
-  connectionString: url,
-  ssl: { rejectUnauthorized: false },
-});
+const dbUrl = pickDbUrl(merged);
+const token = merged.SUPABASE_ACCESS_TOKEN || null;
+const ref = projectRef(merged);
 
-await client.connect();
-try {
-  for (const file of files) {
-    const sql = fs.readFileSync(file, "utf8");
-    process.stdout.write(`-> ${path.basename(file)} ... `);
-    await client.query(sql);
-    console.log("OK");
-  }
-  console.log("Academy B2B CME migrations applied.");
-} finally {
-  await client.end().catch(() => undefined);
+if (dbUrl) {
+  const host = new URL(dbUrl).hostname;
+  console.log(`Using Postgres URL host: ${host}`);
+  await applyViaPg(dbUrl, files);
+} else if (token && ref) {
+  console.log(`Using Supabase Management API project: ${ref}`);
+  await applyViaManagementApi(token, ref, files);
+} else {
+  console.error(
+    "No usable DATABASE_URL and no SUPABASE_ACCESS_TOKEN+project ref in env file."
+  );
+  const keys = Object.keys(fileEnv).sort();
+  console.error("Available env keys:", keys.join(", "));
+  process.exit(1);
 }
+
+console.log("Academy B2B CME migrations applied.");
