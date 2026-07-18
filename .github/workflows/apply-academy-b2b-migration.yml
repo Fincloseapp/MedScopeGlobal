@@ -33,10 +33,11 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           set -euo pipefail
-          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-          cp .vercel/.env.production.local ./.env.production.pulled
-          cp .vercel/.env.production.local ./medscope.env.local
-          test -s ./medscope.env.local
+          # Prefer REST decrypt path — CLI pull often writes literal [SENSITIVE]
+          node scripts/ci-pull-vercel-env-decrypted.mjs ./.env.production.pulled
+          cp ./.env.production.pulled ./medscope.env.local
+          # Also keep CLI pull for comparison metadata
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN" || true
           echo "pulled_env_lines=$(wc -l < ./medscope.env.local)"
 
       - name: Apply B2B CME SQL migrations
@@ -57,8 +58,9 @@ jobs:
         run: |
           set -euo pipefail
           test -n "${CRON_SECRET:-}"
-          curl -fsS "https://medscopeglobal.com/api/setup/academy-b2b-schema?secret=${CRON_SECRET}"
-          echo
+          body="$(curl -sS -w "\nHTTP_STATUS:%{http_code}" "https://medscopeglobal.com/api/setup/academy-b2b-schema?secret=${CRON_SECRET}")"
+          echo "$body"
+          echo "$body" | grep -q 'HTTP_STATUS:200'
           echo "Fallback setup API OK"
 
       - name: Upload env for local restore
