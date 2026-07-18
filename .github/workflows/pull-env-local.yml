@@ -1,6 +1,5 @@
 name: Pull Production Env Local
 
-# Reconstructs .env.local from Vercel production for the D: workspace.
 on:
   workflow_dispatch:
 
@@ -21,13 +20,7 @@ jobs:
         run: |
           set -euo pipefail
           vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-          if [ -f .vercel/.env.production.local ]; then
-            cp .vercel/.env.production.local ./medscope.env.local
-            cp .vercel/.env.production.local ./.env.local
-          else
-            vercel env pull ./medscope.env.local --environment=production --token="$VERCEL_TOKEN" --yes
-            cp ./medscope.env.local ./.env.local
-          fi
+          cp .vercel/.env.production.local ./medscope.env.local
           test -s ./medscope.env.local
           echo "env_lines=$(wc -l < ./medscope.env.local)"
 
@@ -35,9 +28,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: medscope-env-local
-          path: |
-            medscope.env.local
-            .env.local
+          path: medscope.env.local
           retention-days: 1
-          include-hidden-files: true
           if-no-files-found: error
