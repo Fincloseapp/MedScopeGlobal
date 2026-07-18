@@ -1,3 +1,4 @@
+import { AccreditedCmeOverview } from "@/components/academy/b2b/accredited-cme-overview";
 import { V271HubPageView } from "@/components/v271/hub-page";
 import {
   V271LekariCredibilitySection,
@@ -19,6 +20,9 @@ export default function LekariHubPage() {
       homeHref="/lekari"
       afterLinks={
         <>
+          <div className="mb-10">
+            <AccreditedCmeOverview variant="panel" />
+          </div>
           <V271LekariCredibilitySection />
           <V271PhysicianTierCard />
         </>

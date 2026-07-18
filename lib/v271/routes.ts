@@ -103,6 +103,16 @@ export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
     description:
       "Evidence-based guidelines, kurátorované studie s DOI/PMID, CME přehledy, Research Hub a klinický AI — ověřený přístup přes ČLK.",
     links: [
+      {
+        label: "Akreditované CME testy",
+        href: "/academy/lekari",
+        description: "Obory k dispozici — video, test, ČLK certifikát",
+      },
+      {
+        label: "Ověření ČLK (Academy)",
+        href: "/academy/lekari/overeni",
+        description: "Vstup do Lékařské zóny Academy",
+      },
       { label: "Guidelines", href: "/lekari/guidelines", description: "Klinická doporučení pro praxi" },
       { label: "Přehledy", href: "/lekari/prehledy", description: "Strukturované medicínské briefy" },
       { label: "Studie", href: "/lekari/studie", description: "RCT a meta-analýzy s DOI/PMID" },
@@ -111,8 +121,8 @@ export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
       { label: "Odborná sekce (ČLK)", href: "/odborna", description: "Ověření evidenčním číslem ČLK" },
       { label: "Léky", href: "/leky", description: "SÚKL databáze a novinky" },
     ],
-    ctaHref: "/predplatne",
-    ctaLabel: "Profesionální tier 490 Kč/měs.",
+    ctaHref: "/academy/lekari",
+    ctaLabel: "Akreditované CME testy",
   },
   guidelines: {
     slug: "guidelines",

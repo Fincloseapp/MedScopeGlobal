@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AccreditedCmeOverview } from "@/components/academy/b2b/accredited-cme-overview";
 import { listAccreditedCmeCourses } from "@/lib/academy/b2b/db";
 import {
   getPhysicianProfile,
@@ -82,42 +83,65 @@ export default async function LekarskaZonaPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-6 py-14">
-        {!verified ? (
-          <div className="border border-slate-200 bg-white px-6 py-10 text-sm text-slate-600">
-            Katalog akreditovaných kurzů je skrytý do ověření lékaře. Po ověření
-            ČLK uvidíte tituly, kredity a partnerské instituce.
-          </div>
-        ) : courses.length === 0 ? (
-          <div className="border border-slate-200 bg-white px-6 py-10 text-sm text-slate-600">
-            Zatím nejsou publikované žádné akreditované kurzy.
-          </div>
-        ) : (
-          <ul className="grid gap-6 sm:grid-cols-2">
-            {courses.map((course) => (
-              <li key={course.id} className="border border-slate-200 bg-white">
+      <section className="mx-auto max-w-5xl space-y-10 px-6 py-14">
+        <AccreditedCmeOverview
+          variant="panel"
+          activeSpecialization={profile?.specialization ?? null}
+        />
+
+        <div id="katalog">
+          <h2 className="font-serif text-2xl tracking-tight text-[#021d33]">
+            Katalog akreditovaných kurzů
+          </h2>
+          <p className="mt-2 text-sm text-slate-600">
+            Tituly, kredity a partneři — po ověření ČLK.
+          </p>
+
+          <div className="mt-6">
+            {!verified ? (
+              <div className="border border-slate-200 bg-white px-6 py-10 text-sm text-slate-600">
+                Detailní katalog je dostupný po ověření. Obory výše už teď ukazují,
+                že akreditované testy jsou připravené.{" "}
                 <Link
-                  href={`/academy/lekari/kurzy/${course.slug}`}
-                  className="block px-5 py-5 transition hover:bg-[#f8fafc]"
+                  href="/academy/lekari/overeni"
+                  className="font-medium text-[#005B96] hover:underline"
                 >
-                  <p className="text-xs uppercase tracking-[0.14em] text-slate-500">
-                    {course.partner?.name ?? "Partner"} · {course.credits_count}{" "}
-                    kreditů
-                  </p>
-                  <h2 className="mt-2 font-serif text-2xl tracking-tight text-[#021d33]">
-                    {course.title}
-                  </h2>
-                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-600">
-                    {course.description}
-                  </p>
-                  <p className="mt-4 text-xs text-slate-500">
-                    Akreditace ČLK: {course.accreditation_number}
-                  </p>
+                  Ověřit ČLK a vstoupit
                 </Link>
-              </li>
-            ))}
-          </ul>
-        )}
+              </div>
+            ) : courses.length === 0 ? (
+              <div className="border border-slate-200 bg-white px-6 py-10 text-sm text-slate-600">
+                Zatím nejsou publikované žádné akreditované kurzy. Obory výše jsou
+                připravené — nové testy se zobrazí zde.
+              </div>
+            ) : (
+              <ul className="grid gap-6 sm:grid-cols-2">
+                {courses.map((course) => (
+                  <li key={course.id} className="border border-slate-200 bg-white">
+                    <Link
+                      href={`/academy/lekari/kurzy/${course.slug}`}
+                      className="block px-5 py-5 transition hover:bg-[#f8fafc]"
+                    >
+                      <p className="text-xs uppercase tracking-[0.14em] text-slate-500">
+                        {course.partner?.name ?? "Partner"} · {course.credits_count}{" "}
+                        kreditů
+                      </p>
+                      <h3 className="mt-2 font-serif text-2xl tracking-tight text-[#021d33]">
+                        {course.title}
+                      </h3>
+                      <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-600">
+                        {course.description}
+                      </p>
+                      <p className="mt-4 text-xs text-slate-500">
+                        Akreditace ČLK: {course.accreditation_number}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
       </section>
     </main>
   );

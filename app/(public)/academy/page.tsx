@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen, Brain, GraduationCap, Trophy, Unlock, Video } from "lucide-react";
+import { AccreditedCmeOverview } from "@/components/academy/b2b/accredited-cme-overview";
 import { AcademyPageHeader } from "@/components/academy/page-header";
 import { CourseCard } from "@/components/academy/course-card";
 import { FreePreviewBanner } from "@/components/academy/free-preview-banner";
@@ -28,6 +29,10 @@ export default async function AcademyHubPage() {
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
         <FreePreviewBanner totalLessons={3} className="mb-8" />
+
+        <div className="mb-10">
+          <AccreditedCmeOverview variant="panel" />
+        </div>
 
         {prepCourses.length > 0 ? (
           <section className="mb-10 rounded-2xl border border-[#cfe1f3] bg-gradient-to-br from-[#f0f7ff] to-white p-6">

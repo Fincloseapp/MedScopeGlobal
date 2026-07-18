@@ -54,7 +54,11 @@ export function V271LekariCredibilitySection() {
           <Link href="/odborna" className="text-primary hover:underline">
             odborné sekce
           </Link>
-          . CME akreditace — plánováno Q3 2026.
+          .{" "}
+          <Link href="/academy/lekari" className="font-medium text-primary hover:underline">
+            Akreditované CME testy jsou k dispozici v Lékařské zóně Academy
+          </Link>
+          .
         </p>
       </section>
 

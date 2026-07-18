@@ -50,6 +50,11 @@ const menuCs: NavItem[] = [
     href: "/academy",
     children: [
       { label: "Přehled", href: "/academy", description: "MedScope Academy — kurzy a certifikáty" },
+      {
+        label: "Akreditované CME testy",
+        href: "/academy/lekari",
+        description: "Pro lékaře — obory, kredity, ČLK certifikáty",
+      },
       { label: "Kurzy", href: "/academy/courses", description: "Publikované kurzy" },
       {
         label: "Příprava na přijímačky",
@@ -71,6 +76,12 @@ const menuCs: NavItem[] = [
     href: "/lekari",
     children: [
       { label: "Přehled pro lékaře", href: "/lekari", description: "Guidelines, CME, Research Hub" },
+      {
+        label: "Akreditované CME testy",
+        href: "/academy/lekari",
+        description: "Obory a testy k dispozici — ověření ČLK",
+      },
+      { label: "Ověření ČLK (Academy)", href: "/academy/lekari/overeni", description: "Vstup do Lékařské zóny" },
       { label: "Guidelines", href: "/lekari/guidelines", description: "Klinická doporučení" },
       { label: "Přehledy", href: "/lekari/prehledy", description: "Medicínské briefy" },
       { label: "Studie", href: "/lekari/studie", description: "RCT, meta-analýzy" },
@@ -215,6 +226,11 @@ const menuEn: NavItem[] = [
     href: "/academy",
     children: [
       { label: "Overview", href: "/academy" },
+      {
+        label: "Accredited CME tests",
+        href: "/academy/lekari",
+        description: "For physicians — specialties, credits, ČLK certificates",
+      },
       { label: "Courses", href: "/academy/courses" },
       { label: "Quizzes", href: "/academy/quizzes" },
       { label: "Simulations", href: "/academy/ai-simulations" },

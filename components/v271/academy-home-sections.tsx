@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen, Brain, ShoppingBag, Stethoscope, Trophy, Users } from "lucide-react";
+import { AccreditedCmeOverview } from "@/components/academy/b2b/accredited-cme-overview";
 import { CourseCard } from "@/components/academy/course-card";
 import {
   getCourseVideoFlags,
@@ -24,6 +25,8 @@ export async function V272AcademyHomeSections() {
 
   return (
     <>
+      <AccreditedCmeOverview variant="section" />
+
       {prepCourses.length > 0 ? (
         <section className="border-b border-slate-200 bg-[#f0f7ff]">
           <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
