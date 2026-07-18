@@ -22,20 +22,22 @@ jobs:
           set -euo pipefail
           vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
           if [ -f .vercel/.env.production.local ]; then
-            cp .vercel/.env.production.local .env.local
-          elif [ -f .env.production.local ]; then
-            cp .env.production.local .env.local
+            cp .vercel/.env.production.local ./medscope.env.local
+            cp .vercel/.env.production.local ./.env.local
           else
-            vercel env pull .env.local --environment=production --token="$VERCEL_TOKEN" --yes
+            vercel env pull ./medscope.env.local --environment=production --token="$VERCEL_TOKEN" --yes
+            cp ./medscope.env.local ./.env.local
           fi
-          # Ensure key names used by local scripts exist
-          test -s .env.local
-          echo "env_lines=$(wc -l < .env.local)"
+          test -s ./medscope.env.local
+          echo "env_lines=$(wc -l < ./medscope.env.local)"
 
-      - name: Upload .env.local artifact
+      - name: Upload env artifact
         uses: actions/upload-artifact@v4
         with:
           name: medscope-env-local
-          path: .env.local
+          path: |
+            medscope.env.local
+            .env.local
           retention-days: 1
+          include-hidden-files: true
           if-no-files-found: error

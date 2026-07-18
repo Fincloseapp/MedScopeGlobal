@@ -18,10 +18,28 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
-      - name: Install pg client
-        run: npm install pg@8.13.1 --no-save
+      - name: Install tools
+        run: |
+          npm install -g vercel@latest
+          npm install pg@8.13.1 --no-save
+
+      - name: Pull production env from Vercel
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -euo pipefail
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          if [ -f .vercel/.env.production.local ]; then
+            cp .vercel/.env.production.local ./.env.production.pulled
+          else
+            vercel env pull ./.env.production.pulled --environment=production --token="$VERCEL_TOKEN" --yes
+          fi
+          test -s ./.env.production.pulled
+          echo "pulled_env_lines=$(wc -l < ./.env.production.pulled)"
 
       - name: Apply B2B CME SQL migrations
         env:
@@ -29,19 +47,45 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: |
           set -euo pipefail
-          URL="${DIRECT_URL:-$DATABASE_URL}"
-          if [ -z "${URL}" ]; then
-            echo "Missing DATABASE_URL / DIRECT_URL repository secret."
-            exit 1
-          fi
+          # Prefer GitHub secrets when set; otherwise use Vercel production env
           node <<'NODE'
           const fs = require("fs");
           const { Client } = require("pg");
-          const url = process.env.DIRECT_URL || process.env.DATABASE_URL;
+
+          function loadEnvFile(path) {
+            const out = {};
+            if (!fs.existsSync(path)) return out;
+            for (const line of fs.readFileSync(path, "utf8").split(/\r?\n/)) {
+              const m = line.match(/^([^#=]+)=(.*)$/);
+              if (!m) continue;
+              let v = m[2].trim();
+              if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+                v = v.slice(1, -1);
+              }
+              out[m[1].trim()] = v;
+            }
+            return out;
+          }
+
+          const fileEnv = loadEnvFile("./.env.production.pulled");
+          const url =
+            process.env.DIRECT_URL ||
+            process.env.DATABASE_URL ||
+            fileEnv.DIRECT_URL ||
+            fileEnv.DATABASE_URL ||
+            fileEnv.SUPABASE_DB_URL;
+
+          if (!url) {
+            console.error("No DATABASE_URL/DIRECT_URL in GitHub secrets or Vercel production env.");
+            process.exit(1);
+          }
+          console.log("Using DB URL host:", url.replace(/:\/\/([^@/]+)@/, "://***@").slice(0, 80));
+
           const files = [
             "supabase/migrations/20260718120000_academy_b2b_cme.sql",
             "supabase/migrations/20260718120100_academy_b2b_cme_seed.sql",
           ];
+
           (async () => {
             const client = new Client({
               connectionString: url,
@@ -61,3 +105,21 @@ jobs:
             process.exit(1);
           });
           NODE
+
+      - name: Prepare env artifact for D: workspace
+        run: |
+          cp ./.env.production.pulled ./medscope.env.local
+          # Also keep classic name for local scripts
+          cp ./.env.production.pulled ./.env.local
+          echo "artifact_ready"
+
+      - name: Upload env for local restore
+        uses: actions/upload-artifact@v4
+        with:
+          name: medscope-env-local
+          path: |
+            medscope.env.local
+            .env.local
+          retention-days: 1
+          include-hidden-files: true
+          if-no-files-found: error
