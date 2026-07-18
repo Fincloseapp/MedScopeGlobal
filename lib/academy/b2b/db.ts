@@ -1,8 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import {
-  createServiceRoleClient,
-  tryCreateServiceRoleClient,
-} from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import type { B2BCourse, CourseModule, PartnerInstitution } from "@/types/academy-b2b";
 
 export async function listPartnerInstitutions(): Promise<PartnerInstitution[]> {
