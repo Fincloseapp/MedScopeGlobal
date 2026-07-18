@@ -19,7 +19,7 @@ export function PhysicianVerificationForm({ specializations, initial }: Props) {
   const [lastName, setLastName] = useState(initial?.last_name ?? "");
   const [clkId, setClkId] = useState(initial?.clk_id ?? "");
   const [specialization, setSpecialization] = useState(
-    initial?.specialization ?? ""
+    initial?.specialization || specializations[0]?.value || "revmatologie"
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

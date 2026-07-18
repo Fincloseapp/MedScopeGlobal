@@ -51,9 +51,9 @@ const menuCs: NavItem[] = [
     children: [
       { label: "Přehled", href: "/academy", description: "MedScope Academy — kurzy a certifikáty" },
       {
-        label: "Akreditované CME testy",
+        label: "CME revmatologie",
         href: "/academy/lekari",
-        description: "Pro lékaře — obory, kredity, ČLK certifikáty",
+        description: "Akreditované testy výhradně pro revmatology",
       },
       { label: "Kurzy", href: "/academy/courses", description: "Publikované kurzy" },
       {
@@ -77,9 +77,9 @@ const menuCs: NavItem[] = [
     children: [
       { label: "Přehled pro lékaře", href: "/lekari", description: "Guidelines, CME, Research Hub" },
       {
-        label: "Akreditované CME testy",
+        label: "CME revmatologie",
         href: "/academy/lekari",
-        description: "Obory a testy k dispozici — ověření ČLK",
+        description: "Akreditované testy — jen revmatologie",
       },
       { label: "Ověření ČLK (Academy)", href: "/academy/lekari/overeni", description: "Vstup do Lékařské zóny" },
       { label: "Guidelines", href: "/lekari/guidelines", description: "Klinická doporučení" },
@@ -227,9 +227,9 @@ const menuEn: NavItem[] = [
     children: [
       { label: "Overview", href: "/academy" },
       {
-        label: "Accredited CME tests",
+        label: "Rheumatology CME",
         href: "/academy/lekari",
-        description: "For physicians — specialties, credits, ČLK certificates",
+        description: "Accredited tests for rheumatologists only",
       },
       { label: "Courses", href: "/academy/courses" },
       { label: "Quizzes", href: "/academy/quizzes" },

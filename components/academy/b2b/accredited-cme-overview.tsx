@@ -1,20 +1,17 @@
 import Link from "next/link";
-import { MEDICAL_SPECIALIZATIONS } from "@/types/academy-b2b";
+import { CME_FOCUS_SPECIALTY } from "@/types/academy-b2b";
 
 type Props = {
   /** Compact panel (hub pages) vs full homepage section */
   variant?: "section" | "panel";
-  /** Highlight physician's own specialization when known */
-  activeSpecialization?: string | null;
   className?: string;
 };
 
 export function AccreditedCmeOverview({
   variant = "section",
-  activeSpecialization = null,
   className = "",
 }: Props) {
-  const specialties = MEDICAL_SPECIALIZATIONS.filter((s) => s.value !== "ostatni");
+  const specialty = CME_FOCUS_SPECIALTY.label;
 
   if (variant === "panel") {
     return (
@@ -23,37 +20,20 @@ export function AccreditedCmeOverview({
         className={`border border-slate-200 bg-white px-6 py-8 ${className}`}
       >
         <p className="text-xs uppercase tracking-[0.16em] text-[#005B96]">
-          Akreditované CME testy · k dispozici
+          Akreditované CME · {specialty}
         </p>
         <h2 className="mt-3 font-serif text-2xl tracking-tight text-[#021d33]">
-          Obory, ve kterých můžete skládat testy
+          Akreditované testy v revmatologii
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
-          Po ověření ČLK získáte přístup k akreditovaným kurzům s videem, kvízem a
-          certifikátem pro ČLK. Testy pokrývají tyto lékařské obory:
+          MedScope Academy nabízí akreditované CME výhradně pro obor{" "}
+          <strong className="font-medium text-[#021d33]">{specialty}</strong> —
+          video, závěrečný test a certifikát pro ČLK. Jiné obory zatím nejsou v
+          nabídce.
         </p>
-        <ul className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {specialties.map((s) => {
-            const active = activeSpecialization === s.value;
-            return (
-              <li
-                key={s.value}
-                className={
-                  active
-                    ? "border border-[#005B96] bg-[#f0f7ff] px-3 py-2.5 text-sm font-medium text-[#021d33]"
-                    : "border border-slate-200 px-3 py-2.5 text-sm text-slate-700"
-                }
-              >
-                {s.label}
-                {active ? (
-                  <span className="ml-2 text-xs font-normal text-[#005B96]">
-                    váš obor
-                  </span>
-                ) : null}
-              </li>
-            );
-          })}
-        </ul>
+        <p className="mt-4 inline-flex border border-[#005B96] bg-[#f0f7ff] px-4 py-2.5 text-sm font-medium text-[#021d33]">
+          {specialty} · testy k dispozici
+        </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href="/academy/lekari/overeni"
@@ -81,15 +61,15 @@ export function AccreditedCmeOverview({
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-2xl">
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
-              Pro ověřené lékaře · ČLK
+              Pro ověřené lékaře · ČLK · {specialty}
             </p>
             <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
-              Akreditované CME testy jsou k dispozici
+              Akreditované CME testy v revmatologii
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-slate-600">
-              Turn-key kurzy s videem, závěrečným testem a certifikátem pro hromadný
-              upload do ČLK. Přehled oborů, ve kterých můžete skládat akreditované
-              testy:
+              Kurzy s videem, závěrečným testem a certifikátem pro ČLK — zaměřené
+              výhradně na <strong className="font-medium text-[#021d33]">{specialty}</strong>.
+              Jiné lékařské obory v této nabídce nejsou.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -108,25 +88,26 @@ export function AccreditedCmeOverview({
           </div>
         </div>
 
-        <ul className="mt-8 grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {specialties.map((s) => (
-            <li key={s.value}>
-              <Link
-                href={`/academy/lekari#obory`}
-                className="flex h-full items-center border border-slate-200 bg-white px-3 py-3 text-sm text-[#021d33] transition hover:border-[#005B96]/40 hover:bg-[#f8fafc]"
-              >
-                <span className="mr-2 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[#005B96]" />
-                {s.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <div className="mt-8 max-w-md border border-[#005B96]/30 bg-white px-5 py-5">
+          <p className="text-xs uppercase tracking-[0.14em] text-slate-500">
+            Obor v nabídce
+          </p>
+          <p className="mt-2 font-display text-2xl font-semibold text-[#021d33]">
+            {specialty}
+          </p>
+          <p className="mt-2 text-sm text-slate-600">
+            Akreditované testy a CME kurzy jsou připravené pro revmatology.
+          </p>
+          <Link
+            href="/academy/lekari#katalog"
+            className="mt-4 inline-block text-sm font-medium text-[#005B96] hover:underline"
+          >
+            Zobrazit katalog →
+          </Link>
+        </div>
 
         <p className="mt-6 text-xs text-slate-500">
-          Přístup po ověření evidenčního čísla ČLK (zákon o regulaci reklamy).{" "}
-          <Link href="/academy/lekari" className="font-medium text-[#005B96] hover:underline">
-            Zobrazit katalog akreditovaných kurzů
-          </Link>
+          Přístup po ověření evidenčního čísla ČLK (zákon o regulaci reklamy).
         </p>
       </div>
     </section>

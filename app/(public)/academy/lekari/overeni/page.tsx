@@ -63,8 +63,8 @@ export default async function PhysicianVerificationPage() {
         Ověření lékaře
       </h1>
       <p className="mt-3 text-sm leading-relaxed text-slate-600">
-        Přístup k akreditovaným CME kurzům je vyhrazen ověřeným lékařům s platným
-        ČLK číslem — v souladu se zákonem o regulaci reklamy.
+        Přístup k akreditovaným CME testům v <strong>revmatologii</strong> — po
+        ověření ČLK (zákon o regulaci reklamy). Jiné obory v nabídce nejsou.
       </p>
 
       <div className="mt-8">
@@ -77,7 +77,7 @@ export default async function PhysicianVerificationPage() {
             first_name: profile?.first_name ?? "",
             last_name: profile?.last_name ?? "",
             clk_id: profile?.clk_id ?? "",
-            specialization: profile?.specialization ?? "",
+            specialization: profile?.specialization || "revmatologie",
           }}
         />
       </div>

@@ -11,9 +11,9 @@ import { createClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Lékařská zóna — MedScope Academy",
+  title: "Lékařská zóna — Revmatologie CME",
   description:
-    "Akreditované CME kurzy pro ověřené lékaře s ČLK číslem. Partner institutions, kredity a automatické certifikáty.",
+    "Akreditované CME testy v revmatologii pro ověřené lékaře s ČLK číslem — kredity a certifikáty.",
 };
 
 export default async function LekarskaZonaPage() {
@@ -42,12 +42,11 @@ export default async function LekarskaZonaPage() {
             MedScope Academy · Lékařská zóna
           </p>
           <h1 className="mt-4 max-w-2xl font-serif text-4xl tracking-tight text-[#021d33] sm:text-5xl">
-            Akreditované CME pro ověřené lékaře
+            Akreditované CME v revmatologii
           </h1>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-600">
-            Turn-key kurzy od partnerských institucí — video, článek, kvíz a ČLK
-            akreditace. Přístup pouze pro lékaře s ověřeným ČLK ID (zákon o
-            regulaci reklamy).
+            Kurzy a testy výhradně pro obor revmatologie — video, článek, kvíz a
+            ČLK akreditace. Přístup pouze pro lékaře s ověřeným ČLK ID.
           </p>
 
           {verified && profile ? (
@@ -84,10 +83,7 @@ export default async function LekarskaZonaPage() {
       </section>
 
       <section className="mx-auto max-w-5xl space-y-10 px-6 py-14">
-        <AccreditedCmeOverview
-          variant="panel"
-          activeSpecialization={profile?.specialization ?? null}
-        />
+        <AccreditedCmeOverview variant="panel" />
 
         <div id="katalog">
           <h2 className="font-serif text-2xl tracking-tight text-[#021d33]">

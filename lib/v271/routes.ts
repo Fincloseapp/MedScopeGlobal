@@ -104,9 +104,9 @@ export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
       "Evidence-based guidelines, kurátorované studie s DOI/PMID, CME přehledy, Research Hub a klinický AI — ověřený přístup přes ČLK.",
     links: [
       {
-        label: "Akreditované CME testy",
+        label: "CME revmatologie",
         href: "/academy/lekari",
-        description: "Obory k dispozici — video, test, ČLK certifikát",
+        description: "Akreditované testy výhradně pro revmatology",
       },
       {
         label: "Ověření ČLK (Academy)",
@@ -122,7 +122,7 @@ export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
       { label: "Léky", href: "/leky", description: "SÚKL databáze a novinky" },
     ],
     ctaHref: "/academy/lekari",
-    ctaLabel: "Akreditované CME testy",
+    ctaLabel: "CME revmatologie",
   },
   guidelines: {
     slug: "guidelines",
