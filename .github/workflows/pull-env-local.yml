@@ -1,0 +1,41 @@
+name: Pull Production Env Local
+
+# Reconstructs .env.local from Vercel production for the D: workspace.
+on:
+  workflow_dispatch:
+
+jobs:
+  pull-env:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel production env
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -euo pipefail
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          if [ -f .vercel/.env.production.local ]; then
+            cp .vercel/.env.production.local .env.local
+          elif [ -f .env.production.local ]; then
+            cp .env.production.local .env.local
+          else
+            vercel env pull .env.local --environment=production --token="$VERCEL_TOKEN" --yes
+          fi
+          # Ensure key names used by local scripts exist
+          test -s .env.local
+          echo "env_lines=$(wc -l < .env.local)"
+
+      - name: Upload .env.local artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: medscope-env-local
+          path: .env.local
+          retention-days: 1
+          if-no-files-found: error

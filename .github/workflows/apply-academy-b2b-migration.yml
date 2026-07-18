@@ -1,0 +1,63 @@
+name: Apply Academy B2B CME Migration
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "supabase/migrations/20260718120000_academy_b2b_cme.sql"
+      - "supabase/migrations/20260718120100_academy_b2b_cme_seed.sql"
+      - ".github/workflows/apply-academy-b2b-migration.yml"
+    branches:
+      - main
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pg client
+        run: npm install pg@8.13.1 --no-save
+
+      - name: Apply B2B CME SQL migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: |
+          set -euo pipefail
+          URL="${DIRECT_URL:-$DATABASE_URL}"
+          if [ -z "${URL}" ]; then
+            echo "Missing DATABASE_URL / DIRECT_URL repository secret."
+            exit 1
+          fi
+          node <<'NODE'
+          const fs = require("fs");
+          const { Client } = require("pg");
+          const url = process.env.DIRECT_URL || process.env.DATABASE_URL;
+          const files = [
+            "supabase/migrations/20260718120000_academy_b2b_cme.sql",
+            "supabase/migrations/20260718120100_academy_b2b_cme_seed.sql",
+          ];
+          (async () => {
+            const client = new Client({
+              connectionString: url,
+              ssl: { rejectUnauthorized: false },
+            });
+            await client.connect();
+            for (const file of files) {
+              const sql = fs.readFileSync(file, "utf8");
+              process.stdout.write(`→ ${file} ... `);
+              await client.query(sql);
+              console.log("OK");
+            }
+            await client.end();
+            console.log("Academy B2B CME migrations applied.");
+          })().catch((err) => {
+            console.error(err);
+            process.exit(1);
+          });
+          NODE
