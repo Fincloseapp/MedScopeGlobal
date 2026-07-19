@@ -8,7 +8,7 @@ export function getSendGridFromEmail(): string {
   return (
     process.env.SENDGRID_FROM_EMAIL?.trim() ||
     process.env.SENDGRID_FROM?.trim() ||
-    "noreply@medscopeglobal.com"
+    "info@medscopeglobal.com"
   );
 }
 

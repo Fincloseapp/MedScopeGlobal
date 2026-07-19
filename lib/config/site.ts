@@ -12,7 +12,7 @@ export const SITE = {
       : "https://medscopeglobal.com"),
   supportEmail: "support@medscopeglobal.com",
   adminNotifyEmail:
-    process.env.ADMIN_NOTIFY_EMAIL ?? "dawe.zegzul@seznam.cz",
+    process.env.ADMIN_NOTIFY_EMAIL ?? "info@medscopeglobal.com",
   colors: {
     primary: "#005B96",
     white: "#FFFFFF",

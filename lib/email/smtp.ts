@@ -13,7 +13,7 @@ export function getSmtpFromEmail(): string {
     process.env.SMTP_FROM_EMAIL?.trim() ||
     process.env.SENDGRID_FROM_EMAIL?.trim() ||
     process.env.SMTP_USER?.trim() ||
-    "noreply@medscopeglobal.com"
+    "info@medscopeglobal.com"
   );
 }
 
