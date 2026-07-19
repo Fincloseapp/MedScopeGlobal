@@ -1,3 +1,4 @@
+import { loadEmailTemplate } from "@/lib/email/ai-generator";
 import { sendEmail } from "@/lib/email/engine";
 import { SITE } from "@/lib/config/site";
 import { getPublicEnv, getServiceRoleKey } from "@/lib/env";
@@ -95,37 +96,15 @@ export function buildSignupConfirmEmail(params: {
     "",
     "Odkaz platí omezenou dobu. Pokud jste se neregistrovali, e-mail ignorujte.",
     "",
-    "— MedScopeGlobal",
+    `— ${SITE.name}`,
   ].join("\n");
 
-  const html = `
-    <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;color:#021d33">
-      <p style="font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#005B96">MedScopeGlobal</p>
-      <h1 style="font-size:24px;line-height:1.3">Potvrzení registrace</h1>
-      <p>Dobrý den, ${escapeHtml(greeting)},</p>
-      <p>děkujeme za registraci. Pro aktivaci účtu klikněte na tlačítko níže:</p>
-      <p style="margin:28px 0">
-        <a href="${params.actionLink}"
-           style="background:#005B96;color:#fff;padding:12px 20px;text-decoration:none;display:inline-block">
-          Potvrdit e-mail
-        </a>
-      </p>
-      <p style="font-size:13px;color:#475569">Pokud tlačítko nefunguje, zkopírujte odkaz:<br/>
-        <a href="${params.actionLink}" style="color:#005B96;word-break:break-all">${params.actionLink}</a>
-      </p>
-      <p style="font-size:12px;color:#64748b">© ${SITE.name}</p>
-    </div>
-  `;
+  const html = loadEmailTemplate("signup-confirm", {
+    name: greeting,
+    confirm_url: params.actionLink,
+  });
 
   return { subject, html, text };
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }
 
 /**

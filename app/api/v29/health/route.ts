@@ -28,6 +28,11 @@ export async function GET() {
     email: {
       sendgrid: isSendGridConfigured(),
       smtp: isSmtpConfigured(),
+      resend: Boolean(process.env.RESEND_API_KEY?.trim()),
+      ready:
+        isSendGridConfigured() ||
+        isSmtpConfigured() ||
+        Boolean(process.env.RESEND_API_KEY?.trim()),
     },
     features: [
       "stripe-webhook-v29",
