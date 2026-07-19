@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 
 import Link from "next/link";
 
+import { AdPlacement } from "@/components/ads/ad-placement";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 
 import { V4cContentCard } from "@/components/v4c/content-card";
 
+import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { getLegislationList } from "@/lib/queries/v4c/legislation";
 import { resolvePublicImageUrl } from "@/lib/v25/images/resolve-public";
 import { LEGISLATION_SOURCES } from "@/lib/v4c/sources";
@@ -47,7 +49,11 @@ const LINKS = [
 
 
 export default async function LegislativaPage() {
-  const latest = await getLegislationList(undefined, 8);
+  const [latest, topAds, midAds] = await Promise.all([
+    getLegislationList(undefined, 8),
+    getActiveAdsByPlacement("legislation_top", 1),
+    getActiveAdsByPlacement("legislation_mid", 1),
+  ]);
   const withImages = await Promise.all(
     latest.map(async (item) => ({
       ...item,
@@ -75,6 +81,8 @@ export default async function LegislativaPage() {
 
     >
 
+      <AdPlacement ads={topAds} variant="banner" />
+
       <div className="mb-8 flex flex-wrap gap-2">
 
         {LINKS.map((l) => (
@@ -98,6 +106,8 @@ export default async function LegislativaPage() {
         ))}
 
       </div>
+
+      <AdPlacement ads={midAds} variant="inline" />
 
       <div className="grid gap-4 sm:grid-cols-2">
 

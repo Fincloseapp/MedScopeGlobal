@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getStudyBySlug } from "@/lib/queries/study-collaborations";
+import { getStudyBySlugOrId } from "@/lib/queries/study-collaborations";
 import { AdPlacement } from "@/components/ads/ad-placement";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 
@@ -9,13 +9,13 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const study = await getStudyBySlug(slug);
+  const study = await getStudyBySlugOrId(slug);
   return { title: study?.title ?? "Studie" };
 }
 
 export default async function StudieDetailPage({ params }: Props) {
   const { slug } = await params;
-  const study = await getStudyBySlug(slug);
+  const study = await getStudyBySlugOrId(slug);
   if (!study) notFound();
 
   const inlineAds = await getActiveAdsByPlacement("study_inline", 1);

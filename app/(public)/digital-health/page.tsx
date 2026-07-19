@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { AdPlacement } from "@/components/ads/ad-placement";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
+import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { getV22DigitalHealthList } from "@/lib/v22/digital-health/query";
 import { V22_DIGITAL_HEALTH_SOURCES, TIER_LABELS } from "@/lib/v22/digital-health/sources";
 
@@ -14,7 +16,11 @@ export const metadata: Metadata = {
 };
 
 export default async function DigitalHealthPage() {
-  const articles = await getV22DigitalHealthList(8);
+  const [articles, topAds, midAds] = await Promise.all([
+    getV22DigitalHealthList(8),
+    getActiveAdsByPlacement("digital_health_top", 1),
+    getActiveAdsByPlacement("digital_health_mid", 1),
+  ]);
 
   return (
     <ModulePageShell
@@ -24,6 +30,7 @@ export default async function DigitalHealthPage() {
       ctaHref="/digital-health/ai-asistent"
       ctaLabel="AI asistent"
     >
+      <AdPlacement ads={topAds} variant="banner" />
       <div className="mb-6 flex flex-wrap gap-2 text-sm">
         <Link href="/digital-health/novinky" prefetch className="rounded-full bg-primary px-3 py-1 text-white">
           Novinky
@@ -52,6 +59,8 @@ export default async function DigitalHealthPage() {
           ))}
         </div>
       </div>
+
+      <AdPlacement ads={midAds} variant="inline" />
 
       <div className="grid gap-6 sm:grid-cols-2">
         {articles.map((item) => (

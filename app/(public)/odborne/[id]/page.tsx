@@ -18,7 +18,10 @@ export default async function OdborneDetailPage({ params }: Props) {
   const text = await getMedicalAiTextById(id);
   if (!text) notFound();
 
-  const sidebarAds = await getActiveAdsByPlacement("study_sidebar", 2);
+  const [sidebarAds, inlineAds] = await Promise.all([
+    getActiveAdsByPlacement("diagnosis_sidebar", 2),
+    getActiveAdsByPlacement("diagnosis_inline", 1),
+  ]);
 
   return (
     <div className="bg-[#fafcff]">
@@ -42,6 +45,8 @@ export default async function OdborneDetailPage({ params }: Props) {
               {text.summary_clinician}
             </p>
           </section>
+
+          <AdPlacement ads={inlineAds} variant="inline" />
 
           <section className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-6">
             <h2 className="font-semibold text-emerald-900">Shrnutí pro pacienty</h2>

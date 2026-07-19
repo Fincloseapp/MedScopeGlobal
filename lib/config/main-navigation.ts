@@ -165,15 +165,23 @@ const menuCs: NavItem[] = [
   { label: "Kariéra", href: "/kariera" },
   {
     label: "Pro firmy",
-    href: "/firmy",
+    href: "/organizace",
     children: [
-      { label: "B2B přehled", href: "/firmy", description: "Pharma, kliniky, univerzity" },
-      { label: "Ceník", href: "/firmy/cenik", description: "Reklamní balíčky" },
-      { label: "Reklama", href: "/firmy/reklama", description: "Bannery a sponzorství" },
-      { label: "Partnerství", href: "/firmy/partnerstvi", description: "Univerzitní spolupráce" },
+      { label: "Organizace", href: "/organizace", description: "Licence a firemní přístupy" },
+      { label: "Partnerství", href: "/organizace/partnerstvi", description: "B2B partnerství a výhody" },
+      { label: "Licence", href: "/organizace/licence", description: "Typy licencí a integrace" },
+      { label: "Inzerce", href: "/inzerce", description: "Reklamní možnosti" },
+      { label: "Ceník inzerce", href: "/inzerce/cenik", description: "Bannery a balíčky" },
+      { label: "Objednávka reklamy", href: "/inzerce/formular", description: "Formulář pro firmy" },
+      { label: "AI reklamy", href: "/ai/reklamy", description: "Advertising assistant" },
+      { label: "Studijní spolupráce", href: "/studijni-spoluprace", description: "Nabídky studií" },
+      { label: "B2B hub (firmy)", href: "/firmy", description: "Pharma, kliniky, univerzity" },
       { label: "Kampaně", href: "/firmy/kampane", description: "Segmentované kampaně" },
-      { label: "Inzerce", href: "/inzerce", description: "Formulář a sponzorství" },
     ],
+  },
+  {
+    label: "Studijní spolupráce",
+    href: "/studijni-spoluprace",
   },
   {
     label: "Předplatné",
@@ -272,9 +280,17 @@ const menuEn: NavItem[] = [
     href: "/organizace",
     children: [
       { label: "Organizations", href: "/organizace" },
-      { label: "Advertising", href: "/inzerce" },
+      { label: "Licenses", href: "/organizace/licence" },
       { label: "Partnership", href: "/organizace/partnerstvi" },
+      { label: "Advertising", href: "/inzerce" },
+      { label: "Ad pricing", href: "/inzerce/cenik" },
+      { label: "AI ads", href: "/ai/reklamy" },
+      { label: "Study collaboration", href: "/studijni-spoluprace" },
     ],
+  },
+  {
+    label: "Study collaboration",
+    href: "/studijni-spoluprace",
   },
 ];
 
