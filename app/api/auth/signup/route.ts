@@ -244,6 +244,7 @@ export async function POST(request: Request) {
     to: email,
     fullName,
     actionLink,
+    redirectTo,
   });
 
   if (!mailed.ok) {

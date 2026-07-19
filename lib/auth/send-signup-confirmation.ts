@@ -1,5 +1,6 @@
 import { sendEmail } from "@/lib/email/engine";
 import { SITE } from "@/lib/config/site";
+import { getPublicEnv, getServiceRoleKey } from "@/lib/env";
 
 async function sendViaResend(params: {
   to: string;
@@ -34,6 +35,49 @@ async function sendViaResend(params: {
     return { ok: false, error: `Resend ${res.status}: ${(await res.text()).slice(0, 200)}` };
   }
   return { ok: true };
+}
+
+/** Fallback when SendGrid/SMTP/Resend are not configured — uses Supabase Auth SMTP/templates. */
+async function sendViaSupabaseAuthResend(params: {
+  email: string;
+  redirectTo: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const { url, anonKey } = getPublicEnv();
+    let authHeader = anonKey;
+    try {
+      authHeader = getServiceRoleKey();
+    } catch {
+      /* anon key is enough for /resend */
+    }
+
+    const res = await fetch(`${url.replace(/\/$/, "")}/auth/v1/resend`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: anonKey,
+        Authorization: `Bearer ${authHeader}`,
+      },
+      body: JSON.stringify({
+        type: "signup",
+        email: params.email,
+        options: { email_redirect_to: params.redirectTo },
+      }),
+    });
+
+    if (!res.ok) {
+      return {
+        ok: false,
+        error: `Supabase Auth resend ${res.status}: ${(await res.text()).slice(0, 200)}`,
+      };
+    }
+    return { ok: true };
+  } catch (e) {
+    return {
+      ok: false,
+      error: e instanceof Error ? e.message : "Supabase Auth resend failed",
+    };
+  }
 }
 
 export function buildSignupConfirmEmail(params: {
@@ -84,11 +128,15 @@ function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-/** Send confirmation via SendGrid/SMTP, then Resend as last resort. */
+/**
+ * Send confirmation via SendGrid/SMTP → Resend → Supabase Auth e-mail.
+ * App providers send our branded link; Supabase fallback uses Auth templates.
+ */
 export async function sendSignupConfirmationEmail(params: {
   to: string;
   fullName: string;
   actionLink: string;
+  redirectTo: string;
 }): Promise<{ ok: boolean; provider?: string; error?: string }> {
   const content = buildSignupConfirmEmail({
     fullName: params.fullName,
@@ -119,8 +167,21 @@ export async function sendSignupConfirmationEmail(params: {
     return { ok: true, provider: "resend" };
   }
 
+  const supabaseMail = await sendViaSupabaseAuthResend({
+    email: params.to,
+    redirectTo: params.redirectTo,
+  });
+
+  if (supabaseMail.ok) {
+    return { ok: true, provider: "supabase_auth" };
+  }
+
   return {
     ok: false,
-    error: primary.error || resend.error || "Email delivery failed",
+    error:
+      primary.error ||
+      resend.error ||
+      supabaseMail.error ||
+      "Email delivery failed",
   };
 }

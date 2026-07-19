@@ -82,6 +82,7 @@ export async function POST(request: Request) {
     to: email,
     fullName: (profile?.full_name as string) || email.split("@")[0] || "",
     actionLink: linkData.properties.action_link as string,
+    redirectTo,
   });
 
   if (!mailed.ok) {
