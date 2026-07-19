@@ -15,7 +15,7 @@ async function sendViaResend(params: {
   const from =
     process.env.RESEND_FROM_EMAIL?.trim() ||
     process.env.SENDGRID_FROM_EMAIL?.trim() ||
-    "MedScopeGlobal <info@medscopeglobal.com>";
+    "MedScopeGlobal <noreply@mail.medscopeglobal.com>";
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",

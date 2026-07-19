@@ -24,7 +24,7 @@ export function getSmtpFromEmail(): string {
     process.env.SMTP_FROM_EMAIL?.trim() ||
     process.env.SENDGRID_FROM_EMAIL?.trim() ||
     userAsFrom ||
-    "info@medscopeglobal.com"
+    "noreply@mail.medscopeglobal.com"
   );
 }
 

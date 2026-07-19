@@ -43,7 +43,7 @@ export async function sendContactEmail({
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "MedScopeGlobal <info@medscopeglobal.com>",
+      from: "MedScopeGlobal <noreply@mail.medscopeglobal.com>",
       to: [recipient],
       subject,
       html,
