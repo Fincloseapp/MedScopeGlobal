@@ -51,7 +51,10 @@ export async function sendViaSmtp(
       replyTo: request.replyTo,
       attachments: request.attachments?.map((a) => ({
         filename: a.filename,
-        content: a.content,
+        content:
+          a.encoding === "base64"
+            ? Buffer.from(a.content, "base64")
+            : a.content,
         contentType: a.type,
       })),
     });
