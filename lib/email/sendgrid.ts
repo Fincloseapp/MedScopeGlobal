@@ -18,8 +18,12 @@ function toRecipients(to: string | string[]): { email: string }[] {
 }
 
 function encodeAttachment(att: EmailAttachment) {
+  const content =
+    att.encoding === "base64"
+      ? att.content
+      : Buffer.from(att.content, "utf8").toString("base64");
   return {
-    content: Buffer.from(att.content, "utf8").toString("base64"),
+    content,
     filename: att.filename,
     type: att.type ?? "text/html",
     disposition: att.disposition ?? "attachment",

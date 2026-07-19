@@ -1,3 +1,5 @@
+import { invoiceHtmlToPdfBase64 } from "@/lib/billing/simple-pdf";
+
 export interface InvoiceLineItem {
   description: string;
   amountCzk: number;
@@ -72,6 +74,20 @@ export function generateInvoiceHtml(input: InvoiceInput): InvoiceDocument {
   </footer>
 </body></html>`;
 
+  const pdfBase64 = invoiceHtmlToPdfBase64({
+    transactionId: input.transactionId,
+    issuedAtLabel: formatDate(issuedAt),
+    customerName,
+    customerEmail: input.customerEmail,
+    lineItems: input.lineItems.map((i) => ({
+      description: i.description,
+      amountLabel: formatCzk(i.amountCzk),
+    })),
+    subtotalLabel: formatCzk(subtotalCzk),
+    vatLabel: formatCzk(vatCzk),
+    totalLabel: formatCzk(totalCzk),
+  });
+
   return {
     transactionId: input.transactionId,
     issuedAt: issuedAt.toISOString(),
@@ -82,7 +98,7 @@ export function generateInvoiceHtml(input: InvoiceInput): InvoiceDocument {
     totalCzk,
     vatRate,
     html,
-    pdfBase64: null,
+    pdfBase64,
   };
 }
 

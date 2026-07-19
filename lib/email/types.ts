@@ -6,9 +6,11 @@ export type EmailProvider = "sendgrid" | "smtp" | "none";
 
 export interface EmailAttachment {
   filename: string;
+  /** Raw text/html body, or base64 when encoding === "base64". */
   content: string;
   type?: string;
   disposition?: "attachment" | "inline";
+  encoding?: "utf8" | "base64";
 }
 
 export interface EmailSendRequest {

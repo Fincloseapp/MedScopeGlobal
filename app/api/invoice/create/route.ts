@@ -50,19 +50,34 @@ export async function POST(request: Request) {
       total: `${invoice.totalCzk} Kč`,
     });
 
+    const attachments: {
+      filename: string;
+      content: string;
+      type: string;
+      encoding?: "utf8" | "base64";
+    }[] = [
+      {
+        filename: `faktura-${invoice.transactionId}.html`,
+        content: invoice.html,
+        type: "text/html",
+      },
+    ];
+    if (invoice.pdfBase64) {
+      attachments.push({
+        filename: `faktura-${invoice.transactionId}.pdf`,
+        content: invoice.pdfBase64,
+        type: "application/pdf",
+        encoding: "base64",
+      });
+    }
+
     emailResult = await sendEmail({
       to: parsed.data.customerEmail,
       subject: `Faktura ${invoice.transactionId} — MedScopeGlobal`,
       html: invoice.html || tpl,
       category: "transactional",
-      attachments: [
-        {
-          filename: `faktura-${invoice.transactionId}.html`,
-          content: invoice.html,
-          type: "text/html",
-        },
-      ],
-      metadata: { transactionId: invoice.transactionId },
+      attachments,
+      metadata: { transactionId: invoice.transactionId, hasPdf: Boolean(invoice.pdfBase64) },
     });
   }
 

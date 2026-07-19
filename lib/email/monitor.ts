@@ -1,4 +1,6 @@
 import { logAdminEvent } from "@/lib/logging";
+import { persistEmailLog } from "@/lib/email/log";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 export type DeliverabilityEventType =
   | "bounce"
@@ -58,14 +60,30 @@ export async function recordDeliverabilityEvents(events: DeliverabilityEvent[]):
       timestamp: ev.timestamp,
       reason: ev.reason,
       url: ev.url,
-      stub: true,
       webhookReady: true,
+    });
+    await persistEmailLog({
+      sent_at: ev.timestamp,
+      email_type: "system",
+      recipient: ev.email || "unknown",
+      subject: `deliverability:${ev.type}`,
+      status: ev.type === "bounce" || ev.type === "dropped" ? "failed" : "sent",
+      response_code: null,
+      provider: "sendgrid",
+      fallback_used: false,
+      message_id: ev.messageId ?? null,
+      error: ev.reason ?? null,
+      metadata: {
+        deliverability: ev.type,
+        url: ev.url,
+        raw: ev.raw,
+      },
     });
     console.info("[email-monitor]", ev.type, ev.email, ev.messageId ?? "");
   }
 }
 
-/** Stub metrics for admin dashboards — populated via webhooks later. */
+/** Metrics for admin dashboards — aggregated from email_logs webhook events. */
 export async function getDeliverabilitySummary(): Promise<{
   bounces: number;
   spamReports: number;
@@ -73,11 +91,53 @@ export async function getDeliverabilitySummary(): Promise<{
   clicks: number;
   note: string;
 }> {
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) {
+    return {
+      bounces: 0,
+      spamReports: 0,
+      opens: 0,
+      clicks: 0,
+      note: "Service role unavailable — connect SendGrid Event Webhook to /api/email/webhook/sendgrid",
+    };
+  }
+
+  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const { data, error } = await admin
+    .from("email_logs")
+    .select("metadata")
+    .eq("email_type", "system")
+    .like("subject", "deliverability:%")
+    .gte("sent_at", since)
+    .limit(2000);
+
+  if (error || !data) {
+    return {
+      bounces: 0,
+      spamReports: 0,
+      opens: 0,
+      clicks: 0,
+      note: "No deliverability rows yet — connect SendGrid Event Webhook to /api/email/webhook/sendgrid",
+    };
+  }
+
+  let bounces = 0;
+  let spamReports = 0;
+  let opens = 0;
+  let clicks = 0;
+  for (const row of data) {
+    const t = String((row.metadata as Record<string, unknown> | null)?.deliverability ?? "");
+    if (t === "bounce" || t === "dropped") bounces += 1;
+    else if (t === "spam_report") spamReports += 1;
+    else if (t === "open") opens += 1;
+    else if (t === "click") clicks += 1;
+  }
+
   return {
-    bounces: 0,
-    spamReports: 0,
-    opens: 0,
-    clicks: 0,
-    note: "Webhook-ready stubs — connect SendGrid Event Webhook to /api/email/webhook/sendgrid",
+    bounces,
+    spamReports,
+    opens,
+    clicks,
+    note: "Last 30 days from SendGrid webhook → email_logs",
   };
 }
