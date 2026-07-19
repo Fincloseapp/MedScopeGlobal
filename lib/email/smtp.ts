@@ -1,5 +1,12 @@
 import type { EmailSendRequest } from "@/lib/email/types";
 
+/** Cloudflare Email Sending (beta) — username is always the literal string api_token. */
+export const CLOUDFLARE_EMAIL_SMTP = {
+  host: "smtp.mx.cloudflare.net",
+  port: 465,
+  user: "api_token",
+} as const;
+
 export function isSmtpConfigured(): boolean {
   return Boolean(
     process.env.SMTP_HOST?.trim() &&
@@ -9,10 +16,14 @@ export function isSmtpConfigured(): boolean {
 }
 
 export function getSmtpFromEmail(): string {
+  const user = process.env.SMTP_USER?.trim();
+  // Cloudflare SMTP username is "api_token" — never use it as From address
+  const userAsFrom =
+    user && user.toLowerCase() !== "api_token" ? user : undefined;
   return (
     process.env.SMTP_FROM_EMAIL?.trim() ||
     process.env.SENDGRID_FROM_EMAIL?.trim() ||
-    process.env.SMTP_USER?.trim() ||
+    userAsFrom ||
     "info@medscopeglobal.com"
   );
 }
@@ -25,10 +36,17 @@ export async function sendViaSmtp(
   }
 
   const host = process.env.SMTP_HOST!.trim();
-  const port = Number(process.env.SMTP_PORT ?? 587);
+  const isCloudflare = host.includes("cloudflare");
+  const port = Number(
+    process.env.SMTP_PORT ?? (isCloudflare ? CLOUDFLARE_EMAIL_SMTP.port : 587)
+  );
   const user = process.env.SMTP_USER!.trim();
   const pass = process.env.SMTP_PASS!.trim();
-  const secure = port === 465 || process.env.SMTP_SECURE === "true";
+  // Cloudflare Email Sending: port 465 + implicit TLS only (no STARTTLS / 587)
+  const secure =
+    port === 465 ||
+    process.env.SMTP_SECURE === "true" ||
+    isCloudflare;
   const fromEmail = request.fromEmail ?? getSmtpFromEmail();
   const fromName = request.fromName ?? "MedScopeGlobal";
   const recipients = Array.isArray(request.to) ? request.to : [request.to];
@@ -40,6 +58,7 @@ export async function sendViaSmtp(
       port,
       secure,
       auth: { user, pass },
+      ...(isCloudflare ? { requireTLS: false } : {}),
     });
 
     const info = await transport.sendMail({
