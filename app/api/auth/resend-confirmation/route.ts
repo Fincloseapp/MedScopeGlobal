@@ -86,14 +86,19 @@ export async function POST(request: Request) {
   });
 
   if (!mailed.ok) {
-    return NextResponse.json(
-      { error: "Odeslání e-mailu selhalo. Zkuste to za chvíli." },
-      { status: 502 }
-    );
+    return NextResponse.json({
+      ok: true,
+      emailDelivered: false,
+      confirmUrl: linkData.properties.action_link as string,
+      code: "EMAIL_SEND_FAILED",
+      message:
+        "E-mail se nepodařilo odeslat. Potvrďte účet tlačítkem níže.",
+    });
   }
 
   return NextResponse.json({
     ok: true,
+    emailDelivered: true,
     message: "Potvrzovací e-mail byl odeslán. Zkontrolujte schránku i spam.",
   });
 }

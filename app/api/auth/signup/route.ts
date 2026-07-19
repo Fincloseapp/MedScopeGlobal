@@ -255,17 +255,18 @@ export async function POST(request: Request) {
       status: "error",
       details: { error: mailed.error },
     });
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          "Účet byl vytvořen, ale potvrzovací e-mail se nepodařilo odeslat. Použijte „Znovu odeslat potvrzení“ nebo kontaktujte podporu.",
-        code: "EMAIL_SEND_FAILED",
-        userId,
-        needsConfirmation: true,
-      },
-      { status: 502 }
-    );
+    // Account exists; return one-time confirm URL so signup is not blocked when
+    // Vercel has no SendGrid/SMTP and Supabase Auth mail is also unavailable.
+    return NextResponse.json({
+      ok: true,
+      needsConfirmation: true,
+      emailDelivered: false,
+      confirmUrl: actionLink,
+      userId,
+      code: "EMAIL_SEND_FAILED",
+      message:
+        "Účet byl založen, ale potvrzovací e-mail se nepodařilo odeslat. Potvrďte účet tlačítkem níže (nebo zkontrolujte spam po opětovném odeslání).",
+    });
   }
 
   await recordRegistrationEvent(ip, email);
@@ -280,6 +281,7 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ok: true,
     needsConfirmation: true,
+    emailDelivered: true,
     userId,
     emailProvider: mailed.provider,
     message:

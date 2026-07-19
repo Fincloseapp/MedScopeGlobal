@@ -46,12 +46,14 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [canResend, setCanResend] = useState(false);
+  const [confirmUrl, setConfirmUrl] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
     setError(null);
+    setConfirmUrl(null);
 
     const selectedAccessLevel = normalizeAccessLevel(accessLevel);
 
@@ -79,18 +81,20 @@ export default function SignupPage() {
         message?: string;
         needsConfirmation?: boolean;
         code?: string;
+        confirmUrl?: string;
+        emailDelivered?: boolean;
       };
 
       if (!res.ok) {
         setError(body.error ?? "Registrace se nezdařila.");
-        setCanResend(
-          body.code === "EMAIL_SEND_FAILED" || res.status === 502
-        );
+        setCanResend(body.code === "EMAIL_SEND_FAILED" || res.status === 502);
+        if (body.confirmUrl) setConfirmUrl(body.confirmUrl);
         setLoading(false);
         return;
       }
 
       setCanResend(true);
+      if (body.confirmUrl) setConfirmUrl(body.confirmUrl);
       setMessage(
         body.message ??
           (selectedAccessLevel === "physician"
@@ -120,11 +124,17 @@ export default function SignupPage() {
           captchaToken: captchaToken || undefined,
         }),
       });
-      const body = (await res.json()) as { error?: string; message?: string };
+      const body = (await res.json()) as {
+        error?: string;
+        message?: string;
+        confirmUrl?: string;
+      };
       if (!res.ok) {
         setError(body.error ?? "Odeslání se nezdařilo.");
+        if (body.confirmUrl) setConfirmUrl(body.confirmUrl);
       } else {
         setMessage(body.message ?? "Potvrzovací e-mail byl odeslán.");
+        if (body.confirmUrl) setConfirmUrl(body.confirmUrl);
       }
     } catch {
       setError("Síťová chyba při odesílání e-mailu.");
@@ -236,6 +246,12 @@ export default function SignupPage() {
           <p className="mt-4 text-sm text-[#005B96]" role="status">
             {message}
           </p>
+        ) : null}
+
+        {confirmUrl ? (
+          <Button asChild className="mt-3 w-full">
+            <a href={confirmUrl}>Potvrdit e-mail a aktivovat účet</a>
+          </Button>
         ) : null}
 
         {canResend ? (
