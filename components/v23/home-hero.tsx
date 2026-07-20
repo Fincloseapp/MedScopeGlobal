@@ -78,7 +78,7 @@ export function V23HomeHero() {
             </div>
 
             <ul className="mt-8 flex flex-wrap gap-2">
-              {["2 800+ studentů", "500+ článků", "PubMed · SÚKL · EMA", "14 dní zdarma"].map((item) => (
+              {["2 800+ zdravotníků a studentů", "500+ článků", "PubMed · SÚKL · EMA", "14 dní zdarma"].map((item) => (
                 <li
                   key={item}
                   className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-sky-100 ring-1 ring-white/15"

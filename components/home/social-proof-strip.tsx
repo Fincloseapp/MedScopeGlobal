@@ -2,7 +2,7 @@ import { Quote } from "lucide-react";
 
 const STATS = [
   { value: "500+", label: "Odborných článků" },
-  { value: "2 800+", label: "Studentů v Academy" },
+  { value: "2 800+", label: "Zdravotnických profesionálů a studentů medicíny" },
   { value: "120+", label: "Kurzů a simulací" },
   { value: "14 dní", label: "Zkušební verze zdarma" },
 ];

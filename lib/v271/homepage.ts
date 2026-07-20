@@ -17,7 +17,7 @@ export const V271_HERO_CTAS = [
 ] as const;
 
 export const V271_SOCIAL_PROOF_STATS = [
-  { value: "2 800+", label: "studentů medicíny" },
+  { value: "2 800+", label: "zdravotnických profesionálů a studentů medicíny" },
   { value: "500+", label: "odborných článků" },
   { value: "1 200+", label: "studijních materiálů" },
   { value: "14 dní", label: "zkušební přístup zdarma" },
@@ -141,7 +141,7 @@ export const V271_FOOTER_TRUST = {
     { label: "Zdravotníci a zdravotní profesionálové", href: "/odborna" },
   ],
   proof: [
-    { label: "2 800+ studentů medicíny", href: "/studenti" },
+    { label: "2 800+ zdravotnických profesionálů a studentů medicíny", href: "/studenti" },
     { label: "500+ evidence-based článků", href: "/articles" },
     { label: "Recenze čtenářů", href: "/predplatne#recenze" },
     { label: "14 dní zdarma", href: "/predplatne?trial=1" },

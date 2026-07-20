@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({
     title: "MedScopeGlobal — Prémiový zdravotnický magazín",
     description:
-      "Evidence-based medicína v češtině pro veřejnost, studenty medicíny a lékaře. 500+ článků, 2 800+ studentů. Vyzkoušejte 14 dní zdarma.",
+      "Evidence-based medicína v češtině pro veřejnost, studenty medicíny a lékaře. 500+ článků, 2 800+ zdravotnických profesionálů a studentů medicíny. Vyzkoušejte 14 dní zdarma.",
     path: "/",
   });
 }
