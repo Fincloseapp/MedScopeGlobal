@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
-import { V271_FOOTER_SOCIAL_PROOF, V271_FOOTER_TAGLINE } from "@/lib/v271/homepage";
+import { V271_FOOTER_TAGLINE, V271_FOOTER_TRUST } from "@/lib/v271/homepage";
 
 export async function SiteFooter() {
   return (
@@ -16,9 +16,24 @@ export async function SiteFooter() {
 
         <div>
           <p className="font-medium text-foreground">Důvěra a čísla</p>
-          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            {V271_FOOTER_SOCIAL_PROOF.map((item) => (
+          <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#005B96]/90">
+            Pro koho píšeme
+          </p>
+          <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
+            {V271_FOOTER_TRUST.audiences.map((item) => (
               <li key={item.href}>
+                <Link href={item.href} className="hover:text-foreground">
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#005B96]/90">
+            Čísla a důvěra
+          </p>
+          <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
+            {V271_FOOTER_TRUST.proof.map((item) => (
+              <li key={`${item.href}-${item.label}`}>
                 <Link href={item.href} className="hover:text-foreground">
                   {item.label}
                 </Link>

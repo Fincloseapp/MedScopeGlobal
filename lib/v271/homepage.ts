@@ -130,11 +130,26 @@ export const V271_AKTUALNI = {
 export const V271_SUBSCRIPTION_PLANS = V27_SUBSCRIPTION_PLANS;
 
 export const V271_FOOTER_TAGLINE =
-  "Prémiový zdravotnický magazín pro veřejnost, studenty medicíny a lékaře — evidence-based obsah v češtině od roku 2024.";
+  "Prémiový zdravotnický magazín pro veřejnost, studenty medicíny, lékaře a zdravotníky — evidence-based obsah v češtině od roku 2024.";
 
+/** Audience + proof points for footer „Důvěra a čísla“ */
+export const V271_FOOTER_TRUST = {
+  audiences: [
+    { label: "Veřejnost — srozumitelná zdravotní osvěta", href: "/verejnost" },
+    { label: "Studenti medicíny — Academy a materiály", href: "/studenti" },
+    { label: "Lékaři — odborný obsah a guidelines", href: "/lekari" },
+    { label: "Zdravotníci a zdravotní profesionálové", href: "/odborna" },
+  ],
+  proof: [
+    { label: "2 800+ studentů medicíny", href: "/studenti" },
+    { label: "500+ evidence-based článků", href: "/articles" },
+    { label: "Recenze čtenářů", href: "/predplatne#recenze" },
+    { label: "14 dní zdarma", href: "/predplatne?trial=1" },
+  ],
+} as const;
+
+/** @deprecated Prefer V271_FOOTER_TRUST — kept for any legacy imports */
 export const V271_FOOTER_SOCIAL_PROOF = [
-  { label: "2 800+ studentů", href: "/studenti" },
-  { label: "500+ článků", href: "/articles" },
-  { label: "Recenze čtenářů", href: "/predplatne#recenze" },
-  { label: "14 dní zdarma", href: "/predplatne?trial=1" },
+  ...V271_FOOTER_TRUST.audiences,
+  ...V271_FOOTER_TRUST.proof,
 ] as const;
