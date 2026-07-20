@@ -48,16 +48,16 @@ function buildStubScript(title: string, category: string): string {
 export async function generateOsvetaScript(title: string, category: string, description: string) {
   const { data, fallback, provider } = await academyGenerateJson<{ script: string; duration_seconds: number }>({
     system:
-      "Jsi český zdravotní popularizátor pro veřejnost MedScopeGlobal. Piš přirozenou mluvenou češtinou — vykání, energicky, ale medicínsky přesně. Evropský kontext. Bez osobních jmen moderátorů. Odpovídej pouze validním JSON.",
-    user: `Napiš mluvený scénář krátkého videa (60–90 sekund, max 900 znaků) na téma "${title}" (kategorie: ${category}).
+      "Jsi zkušený český zdravotní redaktor MedScopeGlobal. Piš přirozenou mluvenou češtinou pro dospělou veřejnost — klidně, srozumitelně, medicínsky přesně. Žádný marketingový slang, žádné emoji, žádná osobní jména moderátorů. Evropský/český kontext. Odpovídej pouze validním JSON.",
+    user: `Napiš mluvený scénář krátké poslechové lekce (60–90 sekund, max 900 znaků) na téma "${title}" (kategorie: ${category}).
 Popis: ${description}
 
 Požadavky:
-- Začni pozdravem bez osobního jména (např. „Dobrý den, vítá vás zdravotní osvěta MedScopeGlobal.").
-- První věta musí být hook — otázka nebo překvapivý fakt k tématu.
-- Scénář musí přímo odpovídat titulku a kategorii — žádný generický obsah.
-- Uveď 2–3 praktické tipy s prospěchem pro diváka.
-- Tón: diplomaticky korektní, podpůrný, bez strašení.
+- Začni krátkým profesionálním uvedením (např. „Dobrý den, u mikrofonu zdravotní osvěta MedScopeGlobal.").
+- Hned poté konkrétní hook — otázka nebo překvapivý fakt přímo k tématu.
+- Scénář musí znít jako živý redakční příspěvek, ne jako generický AI text.
+- Uveď 2–3 praktické, proveditelné tipy s jasným prospěchem.
+- Tón: důvěryhodný, podpůrný, bez strašení a bez zbytečných anglicismů (healthspan vysvětli česky, pokud ho použiješ).
 - Ukonči výzvou k jednomu konkrétnímu kroku dnes.
 - Připomeň, že informace nenahrazují lékaře.
 
@@ -197,30 +197,46 @@ export async function runDailyPublicOsvetaGeneration(): Promise<DailyOsvetaGener
   });
 
   const admin = createServiceRoleClient();
+  const categoryLabels: Record<string, string> = {
+    prevence: "Prevence a ochrana zdraví",
+    nemoc: "Porozumění nemocem",
+    dlouhovekost: "Dlouhověkost a zdravé stárnutí",
+    "zivotni-styl": "Zdravý životní styl",
+  };
+  const topicCategoryLabel = categoryLabels[topic.category] ?? "Zdravotní osvěta";
+
   const quizQuestions = [
     {
-      question_text: `Co je hlavní téma videa „${topic.title}"?`,
-      options: [topic.category, "Sport", "Politika"],
-      correct_answer: topic.category,
-      explanation: "Téma odpovídá kategorii dnešního tipu.",
+      question_text: `Do jaké oblasti patří lekce „${topic.title}"?`,
+      options: [topicCategoryLabel, "Sportovní výsledky", "Politické zpravodajství"],
+      correct_answer: topicCategoryLabel,
+      explanation: "Lekce patří do zdravotní osvěty v uvedené kategorii.",
     },
     {
-      question_text: "Nahrazuje video lékařskou péči?",
-      options: ["Ano vždy", "Ne, je to osvěta", "Jen u dětí"],
-      correct_answer: "Ne, je to osvěta",
-      explanation: "Osvětová videa nenahrazují konzultaci s lékařem.",
+      question_text: "Nahrazuje tato lekce vyšetření nebo radu lékaře?",
+      options: [
+        "Ano, plně nahrazuje návštěvu lékaře",
+        "Ne — jde o obecnou osvětu",
+        "Ano, ale jen u dětí",
+      ],
+      correct_answer: "Ne — jde o obecnou osvětu",
+      explanation: "Osvětové lekce nenahrazují individuální lékařskou péči.",
     },
     {
-      question_text: "Co je nejlepší první krok?",
-      options: ["Extrémní dieta", "Jeden malý návyk", "Ignorovat"],
-      correct_answer: "Jeden malý návyk",
-      explanation: "Malé udržitelné změny fungují nejlépe.",
+      question_text: "Jaký první krok obvykle pomáhá nejvíce?",
+      options: [
+        "Extrémní změna jídelníčku ze dne na den",
+        "Jeden malý a udržitelný návyk",
+        "Neřešit téma vůbec",
+      ],
+      correct_answer: "Jeden malý a udržitelný návyk",
+      explanation: "Malé udržitelné změny mají největší šanci vydržet.",
     },
   ];
 
   await admin.from("public_health_quizzes").insert({
     video_id: video.id,
-    title: `Mini kvíz: ${topic.title}`,
+    title: `Kontrolní otázky: ${topic.title}`,
     passing_score: 67,
     questions: quizQuestions,
   });

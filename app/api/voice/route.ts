@@ -26,7 +26,10 @@ export async function POST(request: Request) {
   }
 
   const script =
-    prepareArticleForSpeech({ title: body.title, content: raw }) || raw;
+    prepareArticleForSpeech(
+      { title: body.title, content: raw },
+      { withBroadcastIntro: false, withClosing: false }
+    ) || raw;
 
   const result = await generateVoice({ script, title: body.title ?? "voice" });
 
@@ -52,8 +55,10 @@ export async function GET(request: Request) {
 
   const title = url.searchParams.get("title") ?? "voice";
   const script =
-    prepareArticleForSpeech({ title, content: raw.trim().slice(0, 4096) }) ||
-    raw.trim().slice(0, 4096);
+    prepareArticleForSpeech(
+      { title, content: raw.trim().slice(0, 4096) },
+      { withBroadcastIntro: false, withClosing: false }
+    ) || raw.trim().slice(0, 4096);
 
   const result = await generateVoice({ script, title });
 

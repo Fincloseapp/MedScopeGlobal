@@ -23,7 +23,8 @@ export function EditorialAttribution({
   if (!article) return null;
 
   const assignment = assignEditorialUnits(article);
-  const primary = formatEditorialUnitDisplay(assignment.primary, locale, assignment.aiAssisted);
+  // Public bylines stay clean; AI disclosure lives in EditorialFooter.
+  const primary = formatEditorialUnitDisplay(assignment.primary, locale, false);
   const reviewer =
     assignment.reviewer && isEditorialUnitId(assignment.reviewer)
       ? editorialUnitLabel(assignment.reviewer, locale)

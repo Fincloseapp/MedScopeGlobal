@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Headphones, Loader2, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VoicePicker } from "@/components/tts/voice-picker";
@@ -18,7 +18,14 @@ type Props = {
   maxChars?: number;
   /** BCP-47 or metadata language */
   lang?: string | null;
+  /** Visual treatment — editorial is magazine/podcast style */
+  variant?: "default" | "editorial";
 };
+
+function estimateListenMinutes(text: string): number {
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 150));
+}
 
 export function TtsListenButton({
   text,
@@ -27,6 +34,7 @@ export function TtsListenButton({
   full = true,
   maxChars,
   lang,
+  variant = "default",
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -39,6 +47,7 @@ export function TtsListenButton({
 
   const snippet = maxChars ? text.trim().slice(0, maxChars) : text.trim();
   const readFull = full && !maxChars;
+  const minutes = useMemo(() => estimateListenMinutes(snippet), [snippet]);
   if (!snippet) return null;
 
   async function handlePlay() {
@@ -66,6 +75,41 @@ export function TtsListenButton({
     }
   }
 
+  if (variant === "editorial") {
+    return (
+      <div
+        className={`rounded-2xl border border-[#d7e6f4] bg-gradient-to-r from-[#f4f8fc] to-white px-4 py-3.5 sm:px-5 ${className ?? ""}`}
+      >
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={() => void handlePlay()}
+            disabled={loading}
+            aria-label={playing ? "Zastavit poslech" : label}
+            className="inline-flex items-center gap-2 rounded-full bg-[#005B96] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#004a7a] disabled:opacity-60"
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : playing ? (
+              <Square className="h-3.5 w-3.5 fill-current" />
+            ) : (
+              <Headphones className="h-4 w-4" />
+            )}
+            {playing ? "Zastavit" : label}
+          </button>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-[#021d33]">
+              {playing ? "Přehrává se poslechová verze" : "Poslechová verze článku"}
+            </p>
+            <p className="text-xs text-slate-500">≈ {minutes} min · čeština · hlas prohlížeče</p>
+          </div>
+          <VoicePicker compact lang={speechLang} />
+        </div>
+        {error ? <p className="mt-2 text-xs text-amber-700">{error}</p> : null}
+      </div>
+    );
+  }
+
   return (
     <div className={`flex flex-wrap items-center gap-2 ${className ?? ""}`}>
       <Button
@@ -91,4 +135,3 @@ export function TtsListenButton({
     </div>
   );
 }
-

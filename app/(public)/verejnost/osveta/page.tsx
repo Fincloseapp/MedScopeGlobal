@@ -12,9 +12,9 @@ import {
 export const revalidate = 120;
 
 export const metadata: Metadata = {
-  title: "Denní zdravotní videa | Veřejnost | MedScopeGlobal",
+  title: "Denní zdravotní osvěta | Veřejnost | MedScopeGlobal",
   description:
-    "Krátká zdravotní videa s avatary — prevence, nemoci, dlouhověkost a životní styl. Sledujte, učte se a sbírejte XP.",
+    "Krátké poslechové lekce o prevenci, nemocech, dlouhověkosti a životním stylu — srozumitelně, v češtině, s textem k čtení.",
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -42,11 +42,11 @@ export default async function OsvetaHubPage() {
             Veřejnost · Osvěta · medscopeglobal.com
           </p>
           <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
-            Denní zdravotní videa
+            Denní zdravotní osvěta
           </h1>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/85">
-            Krátká videa s avatary — prevence, nemoci, dlouhověkost a životní styl. Zábavně,
-            srozumitelně a v češtině. Sledujte, plňte mini-kvízy a sbírejte XP.
+            Krátké poslechové lekce o prevenci, nemocech, dlouhověkosti a životním stylu —
+            srozumitelně v češtině, s textem k souběžnému čtení.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
@@ -69,7 +69,7 @@ export default async function OsvetaHubPage() {
         {today ? (
           <section className="mb-12">
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">
-              Dnešní video
+              Dnešní lekce
             </p>
             <h2 className="mt-1 font-display text-2xl font-bold text-[#021d33]">Tip dne</h2>
             <div className="mt-4">
@@ -95,7 +95,7 @@ export default async function OsvetaHubPage() {
         <div className="grid gap-10 lg:grid-cols-3">
           <section className="lg:col-span-2">
             <div className="mb-4 flex items-end justify-between">
-              <h2 className="font-display text-2xl font-bold text-[#021d33]">Archiv videí</h2>
+              <h2 className="font-display text-2xl font-bold text-[#021d33]">Archiv lekcí</h2>
             </div>
             {archive.length ? (
               <div className="grid gap-4 sm:grid-cols-2">
@@ -105,7 +105,7 @@ export default async function OsvetaHubPage() {
               </div>
             ) : (
               <p className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
-                Archiv se plní každý den novým videem.
+                Archiv se plní každý den novou lekcí.
               </p>
             )}
           </section>

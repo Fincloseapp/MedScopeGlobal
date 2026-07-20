@@ -66,68 +66,95 @@ export function VideoLegalNotice({
     }
   };
 
+  // Osvěta: never surface storage CDN hostnames — looks unprofessional to readers.
   const showSource =
-    sourceKind === "fallback_w3schools" || sourceKind === "external_cdn" || sourceKind === "supabase";
+    variant === "osveta"
+      ? sourceKind === "fallback_w3schools" || sourceKind === "external_cdn"
+      : sourceKind === "fallback_w3schools" ||
+        sourceKind === "external_cdn" ||
+        sourceKind === "supabase";
 
   const brand = variant === "osveta" ? "MedScope Osvěta" : "MedScope Academy";
 
   return (
     <div className={className}>
       {!dismissed ? (
-        <aside
-          role="note"
-          aria-label="Právní upozornění k videu"
-          className="mb-3 rounded-xl border border-sky-200 bg-sky-50/90 px-4 py-3 text-xs leading-relaxed text-sky-950"
-        >
-          <div className="flex items-start gap-2">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-sky-700" aria-hidden />
-            <div className="min-w-0 flex-1 space-y-2">
-              <p className="font-semibold">
-                {variant === "osveta"
-                  ? "Zdravotní osvěta — pouze ke vzdělávacím účelům"
-                  : "Vzdělávací video — nenahrazuje odbornou péči"}
-              </p>
-              <ul className="list-disc space-y-1 pl-4">
-                <li>
-                  Obsah nenahrazuje individuální lékařskou radu, diagnózu ani léčbu. Pro zdravotní
-                  rozhodnutí vždy konzultujte kvalifikovaného odborníka.
-                </li>
-                <li>
-                  Materiály slouží výhradně ke vzdělávání{variant === "academy" ? " zdravotnických pracovníků" : ""}{" "}
-                  a informování veřejnosti — nejsou určeny k samoléčbě.
-                </li>
-                <li>
-                  Obsah splňuje vzdělávací standard {brand} a není reklamou na léčivé přípravky ani
-                  zdravotnické prostředky (zákon č. 40/1995 Sb., reklama na zdravotnické prostředky).
-                </li>
-              </ul>
-              <p className="text-sky-800/90">
-                <span className="font-medium">EN:</span> For educational purposes only — not a substitute
-                for professional medical advice. Not intended for self-diagnosis or treatment.
-              </p>
-              <p>
-                Podrobnosti:{" "}
-                <Link href="/terms#video-content" className="font-medium underline hover:text-sky-900">
-                  Obchodní podmínky
-                </Link>
-                {" · "}
-                <Link href="/privacy#video-analytics" className="font-medium underline hover:text-sky-900">
-                  Ochrana soukromí
-                </Link>
-              </p>
-            </div>
+        variant === "osveta" ? (
+          <aside
+            role="note"
+            aria-label="Právní upozornění k lekci"
+            className="mb-3 flex items-start gap-2 rounded-xl border border-[#d7e6f4] bg-[#f4f8fc] px-3.5 py-2.5 text-xs leading-relaxed text-slate-600"
+          >
+            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#005B96]" aria-hidden />
+            <p className="min-w-0 flex-1">
+              Obecná zdravotní osvěta — nenahrazuje radu lékaře.{" "}
+              <Link href="/terms#video-content" className="font-medium text-[#005B96] underline-offset-2 hover:underline">
+                Podmínky
+              </Link>
+            </p>
             {dismissible ? (
               <button
                 type="button"
                 onClick={dismiss}
-                className="shrink-0 rounded p-1 text-sky-700 hover:bg-sky-100"
+                className="shrink-0 rounded p-1 text-slate-500 hover:bg-white"
                 aria-label="Skrýt upozornění"
               >
-                <X className="h-4 w-4" />
+                <X className="h-3.5 w-3.5" />
               </button>
             ) : null}
-          </div>
-        </aside>
+          </aside>
+        ) : (
+          <aside
+            role="note"
+            aria-label="Právní upozornění k videu"
+            className="mb-3 rounded-xl border border-sky-200 bg-sky-50/90 px-4 py-3 text-xs leading-relaxed text-sky-950"
+          >
+            <div className="flex items-start gap-2">
+              <Info className="mt-0.5 h-4 w-4 shrink-0 text-sky-700" aria-hidden />
+              <div className="min-w-0 flex-1 space-y-2">
+                <p className="font-semibold">Vzdělávací video — nenahrazuje odbornou péči</p>
+                <ul className="list-disc space-y-1 pl-4">
+                  <li>
+                    Obsah nenahrazuje individuální lékařskou radu, diagnózu ani léčbu. Pro zdravotní
+                    rozhodnutí vždy konzultujte kvalifikovaného odborníka.
+                  </li>
+                  <li>
+                    Materiály slouží výhradně ke vzdělávání zdravotnických pracovníků a informování
+                    veřejnosti — nejsou určeny k samoléčbě.
+                  </li>
+                  <li>
+                    Obsah splňuje vzdělávací standard {brand} a není reklamou na léčivé přípravky ani
+                    zdravotnické prostředky (zákon č. 40/1995 Sb., reklama na zdravotnické prostředky).
+                  </li>
+                </ul>
+                <p className="text-sky-800/90">
+                  <span className="font-medium">EN:</span> For educational purposes only — not a substitute
+                  for professional medical advice. Not intended for self-diagnosis or treatment.
+                </p>
+                <p>
+                  Podrobnosti:{" "}
+                  <Link href="/terms#video-content" className="font-medium underline hover:text-sky-900">
+                    Obchodní podmínky
+                  </Link>
+                  {" · "}
+                  <Link href="/privacy#video-analytics" className="font-medium underline hover:text-sky-900">
+                    Ochrana soukromí
+                  </Link>
+                </p>
+              </div>
+              {dismissible ? (
+                <button
+                  type="button"
+                  onClick={dismiss}
+                  className="shrink-0 rounded p-1 text-sky-700 hover:bg-sky-100"
+                  aria-label="Skrýt upozornění"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              ) : null}
+            </div>
+          </aside>
+        )
       ) : null}
 
       {children}

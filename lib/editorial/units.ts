@@ -11,68 +11,68 @@ export const EDITORIAL_UNITS = {
   },
   medscope_international_research: {
     en: "MedScopeGlobal International Research Desk",
-    cs: "MedScopeGlobal International Research Desk",
+    cs: "Mezinárodní výzkumná redakce MedScopeGlobal",
     scope: "global" as const,
   },
   medscope_clinical_insights: {
     en: "MedScopeGlobal Clinical Insights Unit",
-    cs: "MedScopeGlobal Clinical Insights Unit",
+    cs: "Klinická redakce MedScopeGlobal",
     scope: "global" as const,
   },
   medscope_global_health: {
     en: "MedScopeGlobal Global Health Content Division",
-    cs: "MedScopeGlobal Global Health Content Division",
+    cs: "Redakce globálního zdraví MedScopeGlobal",
     scope: "global" as const,
   },
   medscope_scientific_office: {
     en: "MedScopeGlobal Scientific Content Office",
-    cs: "MedScopeGlobal Scientific Content Office",
+    cs: "Vědecká obsahová redakce MedScopeGlobal",
     scope: "global" as const,
   },
   medscope_ai_editorial: {
     en: "MedScopeGlobal AI-Assisted Editorial Team",
-    cs: "MedScopeGlobal AI-Assisted Editorial Team",
+    cs: "Editoriální tým MedScopeGlobal",
     scope: "global" as const,
   },
   medscope_medical_knowledge_lab: {
     en: "MedScopeGlobal Medical Knowledge Lab",
-    cs: "MedScopeGlobal Medical Knowledge Lab",
+    cs: "Odborná redakce lékařských znalostí MedScopeGlobal",
     scope: "global" as const,
   },
   medscope_evidence_synthesis: {
     en: "MedScopeGlobal Evidence & Data Synthesis Group",
-    cs: "MedScopeGlobal Evidence & Data Synthesis Group",
+    cs: "Redakce evidence a dat MedScopeGlobal",
     scope: "global" as const,
   },
   // Czech
   medscope_cz_odborna: {
     en: "MedScopeGlobal CZ – Odborná zdravotnická redakce",
-    cs: "MedScopeGlobal CZ – Odborná zdravotnická redakce",
+    cs: "Odborná zdravotnická redakce MedScopeGlobal",
     scope: "cz" as const,
   },
   medscope_cz_klinicka: {
     en: "MedScopeGlobal CZ – Klinická obsahová jednotka",
-    cs: "MedScopeGlobal CZ – Klinická obsahová jednotka",
+    cs: "Klinická obsahová redakce MedScopeGlobal",
     scope: "cz" as const,
   },
   medscope_cz_analyzy: {
     en: "MedScopeGlobal CZ – Oddělení zdravotnických analýz",
-    cs: "MedScopeGlobal CZ – Oddělení zdravotnických analýz",
+    cs: "Oddělení zdravotnických analýz MedScopeGlobal",
     scope: "cz" as const,
   },
   medscope_cz_klinicky_obsah: {
     en: "MedScopeGlobal CZ – Redakce klinického obsahu",
-    cs: "MedScopeGlobal CZ – Redakce klinického obsahu",
+    cs: "Redakce klinického obsahu MedScopeGlobal",
     scope: "cz" as const,
   },
   medscope_cz_research_desk: {
     en: "MedScopeGlobal CZ – Content & Research Desk",
-    cs: "MedScopeGlobal CZ – Content & Research Desk",
+    cs: "Výzkumná a obsahová redakce MedScopeGlobal",
     scope: "cz" as const,
   },
   medscope_cz_info_team: {
     en: "MedScopeGlobal CZ – Zdravotnický informační tým",
-    cs: "MedScopeGlobal CZ – Zdravotnický informační tým",
+    cs: "Zdravotnický informační tým MedScopeGlobal",
     scope: "cz" as const,
   },
 } as const;
@@ -104,10 +104,10 @@ export const AI_ASSISTED_SUFFIX = {
 } as const;
 
 export const EDITORIAL_FOOTER_CS =
-  "Obsah byl vytvořen a odborně zpracován interním AI-editoriálním systémem MedScopeGlobal.com ve spolupráci s českou a mezinárodní redakcí.";
+  "Obsah připravila redakce MedScopeGlobal.com — odborně zpracovaný zdravotní materiál pro veřejnost. Při zdravotních rozhodnutích se vždy obraťte na lékaře.";
 
 export const EDITORIAL_FOOTER_EN =
-  "This content was created and professionally processed by MedScopeGlobal.com's internal AI editorial system in collaboration with Czech and international editorial teams.";
+  "Prepared by the MedScopeGlobal.com editorial team — educational health content for the public. Always consult a physician for personal medical decisions.";
 
 export const LEGACY_DEFAULT_UNIT: EditorialUnitId = "medscope_global_editorial_board";
 

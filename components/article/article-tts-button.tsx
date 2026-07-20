@@ -18,9 +18,10 @@ export function ArticleTtsButton({ excerpt, title, content }: Props) {
     <TtsListenButton
       text={text}
       label="Poslechnout článek"
-      className="not-prose my-4"
+      className="not-prose my-5"
       full
       lang="cs-CZ"
+      variant="editorial"
     />
   );
 }

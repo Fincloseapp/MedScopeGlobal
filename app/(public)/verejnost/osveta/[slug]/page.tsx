@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { EditorialFooter } from "@/components/article/editorial-footer";
 import { OsvetaVideoWithConversion } from "@/components/v38/osveta-video-with-conversion";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getVideoEditorialLabel } from "@/lib/editorial/video-units";
@@ -45,42 +46,46 @@ export default async function OsvetaVideoPage({ params }: Props) {
     metadata: video.metadata,
     audience: "osveta",
     slug: video.slug,
+    aiAssisted: false,
   });
   const relatedFiltered = related.filter((v) => v.slug !== slug).slice(0, 3);
   const { isVip } = await getReaderContext();
 
   const shareUrl = `https://medscopeglobal.com/verejnost/osveta/${slug}`;
+  const dateLabel = video.published_at
+    ? new Date(video.published_at).toLocaleDateString("cs-CZ", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : null;
+  const minutes = Math.max(1, Math.round(video.duration_seconds / 60));
 
   return (
     <div className="min-h-screen bg-[#f4f8fc]">
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
         <Link href="/verejnost/osveta" className="text-sm font-medium text-[#005B96] hover:underline">
-          ← Všechna videa
+          ← Všechny lekce
         </Link>
 
-        <header className="mt-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">
-            {video.topic?.title ?? "Zdravotní osvěta"}
+        <header className="mt-5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#005B96]">
+            {video.topic?.title ?? "Zdravotní osvěta"} · {minutes} min
           </p>
-          <h1 className="mt-2 font-display text-3xl font-bold text-[#021d33]">{video.title}</h1>
-          <p className="mt-2 text-sm text-slate-500">
-            {editorialLabel}
-            {video.published_at
-              ? ` · ${new Date(video.published_at).toLocaleDateString("cs-CZ")}`
-              : ""}
+          <h1 className="mt-2 font-display text-3xl font-bold leading-tight text-[#021d33] sm:text-4xl">
+            {video.title}
+          </h1>
+          <p className="mt-3 text-sm text-slate-600">
+            <span className="font-medium text-slate-700">{editorialLabel}</span>
+            {dateLabel ? <span className="text-slate-400"> · {dateLabel}</span> : null}
           </p>
         </header>
 
-        <div className="mt-6">
+        <div className="mt-7">
           <OsvetaVideoWithConversion video={video} quiz={quiz} isVip={isVip} />
         </div>
 
-        <details className="mt-6 rounded-xl border border-slate-200 bg-white p-4">
-          <summary className="cursor-pointer text-sm font-medium text-[#021d33]">Přepis videa</summary>
-          <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-slate-600">{video.script}</p>
-        </details>
-
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-8 flex flex-wrap gap-3">
           <a
             href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(video.title)}&url=${encodeURIComponent(shareUrl)}`}
             target="_blank"
@@ -99,7 +104,7 @@ export default async function OsvetaVideoPage({ params }: Props) {
 
         {relatedFiltered.length ? (
           <section className="mt-12">
-            <h2 className="font-display text-xl font-bold text-[#021d33]">Další videa</h2>
+            <h2 className="font-display text-xl font-bold text-[#021d33]">Další lekce</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {relatedFiltered.map((v) => (
                 <PublicHealthVideoCard key={v.id} video={v} />
@@ -108,7 +113,9 @@ export default async function OsvetaVideoPage({ params }: Props) {
           </section>
         ) : null}
 
-        <p className="mt-10 text-center text-xs text-slate-400">
+        <EditorialFooter locale="cs" />
+
+        <p className="mt-6 text-center text-xs text-slate-400">
           Informace nenahrazují lékařskou péči · medscopeglobal.com
         </p>
       </div>

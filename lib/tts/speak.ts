@@ -73,10 +73,12 @@ export type SpeakOptions = {
   pitch?: number;
 };
 
-/** Natural Czech Web Speech pacing — slightly slower than English default. */
-const CZECH_SPEECH_RATE = 0.93;
+/** Natural Czech Web Speech pacing — calm editorial tempo. */
+const CZECH_SPEECH_RATE = 0.9;
 const CZECH_SPEECH_PITCH = 1.0;
 const EN_SPEECH_RATE = 1.0;
+const SENTENCE_PAUSE_MS = 240;
+const PARAGRAPH_PAUSE_MS = 560;
 
 function resolveSpeechDefaults(lang: string, opts: SpeakOptions) {
   const resolvedLang = opts.lang ?? resolveSpeechLang(lang);
@@ -143,11 +145,12 @@ function speakOnce(text: string, opts: SpeakOptions, gen: number): Promise<void>
 async function speakNaturalChunks(parts: string[], opts: SpeakOptions, gen: number): Promise<void> {
   for (let i = 0; i < parts.length; i++) {
     if (gen !== speakGeneration) break;
-    const rate = (opts.rate ?? 1) * (0.97 + (i % 3) * 0.03);
-    const pitch = (opts.pitch ?? 1) * (0.98 + (i % 2) * 0.04);
+    // Keep rate/pitch stable — small variance sounds less professional on long articles.
+    const rate = (opts.rate ?? 1) * (0.99 + (i % 5) * 0.005);
+    const pitch = opts.pitch ?? 1;
     try {
       await speakOnce(parts[i]!, { ...opts, rate, pitch }, gen);
-      if (i < parts.length - 1) await sleep(180);
+      if (i < parts.length - 1) await sleep(SENTENCE_PAUSE_MS);
     } catch {
       break;
     }
@@ -177,11 +180,13 @@ export async function speakFullText(text: string, opts: SpeakOptions = {}): Prom
     .filter((p) => p.length > 8);
 
   const blocks = paragraphs.length ? paragraphs : [text.trim()];
-  for (const block of blocks) {
+  for (let bi = 0; bi < blocks.length; bi++) {
     if (gen !== speakGeneration) break;
-    const parts = prepareParts(block, defaults.lang);
+    const parts = prepareParts(blocks[bi]!, defaults.lang);
     await speakNaturalChunks(parts, defaults, gen);
-    await sleep(SLIDE_PAUSE_MS);
+    if (bi < blocks.length - 1) {
+      await sleep(defaults.lang.toLowerCase().startsWith("cs") ? PARAGRAPH_PAUSE_MS : SLIDE_PAUSE_MS);
+    }
   }
 }
 

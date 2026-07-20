@@ -4,7 +4,8 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { VideoLegalNotice, detectVideoSource } from "@/components/academy/video-legal-notice";
 import { TopicSlideshowPlayer } from "@/components/academy/topic-slideshow-player";
 import { TtsListenButton } from "@/components/tts/tts-listen-button";
-import { prepareVideoScriptForSpeech, getVideoEditorialLabel } from "@/lib/editorial/video-units";
+import { OsvetaListenPlayer } from "@/components/verejnost/osveta-listen-player";
+import { prepareVideoScriptForSpeech, getVideoEditorialLabel, stripPersonalVideoIntro } from "@/lib/editorial/video-units";
 import { V33_FALLBACK_MP4_URL } from "@/lib/v33/version";
 import { attachSlideImages } from "@/lib/v25/video/slide-images";
 import {
@@ -28,13 +29,29 @@ function needsSlideshow(url: string | null | undefined): boolean {
   return url.includes(GTV_HOST) || isPlaceholderVideoUrl(url);
 }
 
-function buildOsvetaSlideshow(video: PublicHealthVideoWithTopic): ContentSlideshowManifest {
-  const topic = video.topic?.title ?? "Zdravotní osvěta";
-  const paragraphs = (video.script || video.title)
+function scriptToParagraphs(script: string): string[] {
+  const cleaned = stripPersonalVideoIntro(script).trim();
+  if (!cleaned) return [];
+
+  const blocks = cleaned
     .split(/\n\n+/)
     .map((p) => p.trim())
-    .filter((p) => p.length > 15)
-    .slice(0, 6);
+    .filter(Boolean);
+  if (blocks.length > 1) return blocks;
+
+  const sentences = cleaned.split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 0);
+  if (sentences.length <= 2) return [cleaned];
+
+  const paras: string[] = [];
+  for (let i = 0; i < sentences.length; i += 2) {
+    paras.push(sentences.slice(i, i + 2).join(" "));
+  }
+  return paras;
+}
+
+function buildOsvetaSlideshow(video: PublicHealthVideoWithTopic): ContentSlideshowManifest {
+  const topic = video.topic?.title ?? "Zdravotní osvěta";
+  const paragraphs = scriptToParagraphs(video.script || video.title).slice(0, 6);
 
   const slides =
     paragraphs.length > 0
@@ -80,12 +97,18 @@ export function OsvetaVideoPlayer({
     metadata: video.metadata,
     audience: "osveta",
     slug: video.slug,
+    aiAssisted: false,
   });
   const isAudio = (video.metadata?.lesson_format as string) === "audio_lesson";
   const mediaUrl = resolveMediaUrl(video.video_url);
   const showSlideshow = !isAudio && needsSlideshow(video.video_url);
   const slideshow = useMemo(() => buildOsvetaSlideshow(video), [video]);
   const source = detectVideoSource(mediaUrl, mediaUrl.includes("w3schools.com"));
+  // Treat hosted osveta media as first-party — never surface CDN hostnames publicly.
+  const publicSourceKind =
+    source.kind === "supabase" || source.kind === "medscope" ? "medscope" : source.kind;
+  const publicSourceLabel =
+    publicSourceKind === "medscope" ? undefined : source.label;
 
   const mediaRef = useRef<HTMLVideoElement | HTMLAudioElement>(null);
   const [watchAwarded, setWatchAwarded] = useState(false);
@@ -101,6 +124,13 @@ export function OsvetaVideoPlayer({
     title: video.title,
     script: video.script || video.title,
   });
+  const readingParagraphs = useMemo(
+    () => scriptToParagraphs(video.script || ""),
+    [video.script]
+  );
+  const coverUrl = video.thumbnail_url?.includes(".svg")
+    ? avatar.imageUrl
+    : (video.thumbnail_url ?? avatar.imageUrl);
 
   const awardWatch = useCallback(async () => {
     if (watchAwarded) return;
@@ -143,13 +173,15 @@ export function OsvetaVideoPlayer({
   };
 
   return (
-    <div className="space-y-4">
-      {listenText ? (
+    <div className="space-y-6">
+      {/* Browser TTS only when there is no dedicated Edge TTS audio lesson */}
+      {!isAudio && listenText ? (
         <TtsListenButton
           text={listenText}
-          label="Poslech"
+          label="Poslechnout text"
           className="not-prose"
           lang="cs-CZ"
+          variant="editorial"
         />
       ) : null}
 
@@ -157,8 +189,8 @@ export function OsvetaVideoPlayer({
         <VideoLegalNotice
           lessonTitle={video.title}
           variant="osveta"
-          sourceKind="fallback_w3schools"
-          sourceLabel="Slideshow z obsahu (demo)"
+          sourceKind="medscope"
+          dismissible
         >
           <TopicSlideshowPlayer
             manifest={slideshow}
@@ -170,38 +202,30 @@ export function OsvetaVideoPlayer({
         <VideoLegalNotice
           lessonTitle={video.title}
           variant="osveta"
-          sourceKind={source.kind}
-          sourceLabel={source.label}
+          sourceKind={publicSourceKind}
+          sourceLabel={publicSourceLabel}
+          dismissible
         >
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-[#021d33]">
-            {isAudio ? (
-              <div className="relative flex flex-col items-center gap-4 p-6 sm:flex-row sm:p-8">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={avatar.imageUrl}
-                  alt={editorialLabel}
-                  className="h-32 w-32 shrink-0 rounded-full border-4 border-white/20 object-cover shadow-lg"
-                />
-                <div className="flex-1 text-center sm:text-left">
-                  <p className="text-sm font-medium text-white/80">{editorialLabel}</p>
-                  <audio
-                    ref={mediaRef as React.RefObject<HTMLAudioElement>}
-                    src={mediaUrl}
-                    controls
-                    playsInline
-                    preload="auto"
-                    className="mt-4 w-full"
-                    aria-label={`Audio lekce: ${video.title}`}
-                    onTimeUpdate={onTimeUpdate}
-                    onEnded={awardWatch}
-                  />
-                </div>
-              </div>
-            ) : (
+          {isAudio ? (
+            <OsvetaListenPlayer
+              title={video.title}
+              byline={editorialLabel}
+              mediaUrl={mediaUrl}
+              coverUrl={coverUrl}
+              durationSeconds={video.duration_seconds}
+              mediaRef={mediaRef as React.RefObject<HTMLAudioElement | null>}
+              onTimeUpdate={(current, duration) => {
+                if (watchAwarded || !duration) return;
+                if (current / duration >= 0.5) void awardWatch();
+              }}
+              onEnded={awardWatch}
+            />
+          ) : (
+            <div className="overflow-hidden rounded-2xl border border-[#cfe1f3] bg-[#021d33]">
               <video
                 ref={mediaRef as React.RefObject<HTMLVideoElement>}
                 src={mediaUrl}
-                poster={video.thumbnail_url ?? avatar.imageUrl}
+                poster={coverUrl}
                 controls
                 playsInline
                 preload="auto"
@@ -213,33 +237,65 @@ export function OsvetaVideoPlayer({
               >
                 <source src={mediaUrl} type="video/mp4" />
               </video>
-            )}
-          </div>
+            </div>
+          )}
         </VideoLegalNotice>
       )}
 
+      {readingParagraphs.length > 0 ? (
+        <section
+          className="rounded-2xl border border-[#d7e6f4] bg-white px-5 py-6 sm:px-8 sm:py-8"
+          aria-labelledby="osveta-transcript-heading"
+        >
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#005B96]">
+            Text k poslechu
+          </p>
+          <h3
+            id="osveta-transcript-heading"
+            className="mt-1 font-display text-xl font-semibold text-[#021d33]"
+          >
+            Číst spolu s lekcí
+          </h3>
+          <div className="mt-5 space-y-4 text-[1.05rem] leading-[1.75] text-slate-700">
+            {readingParagraphs.map((p, i) => (
+              <p key={i}>{p}</p>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       {watchAwarded ? (
-        <p className="rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-800">
-          +10 XP za zhlédnutí — díky za sledování!
+        <p className="rounded-xl border border-emerald-200/80 bg-emerald-50/90 px-4 py-2.5 text-sm text-emerald-900">
+          Děkujeme za poslech — připsali jsme vám +10 XP.
         </p>
       ) : (
         <p className="text-xs text-slate-500">
-          Přihlaste se a sledujte alespoň polovinu videa pro +10 XP.
+          Po přihlášení získáte +10 XP za poslech alespoň poloviny lekce.
         </p>
       )}
 
       {quiz && !quizResult ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h3 className="font-display text-lg font-semibold text-[#021d33]">{quiz.title}</h3>
+        <div className="rounded-2xl border border-[#d7e6f4] bg-white p-5 sm:p-6">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">
+            Ověření porozumění
+          </p>
+          <h3 className="mt-1 font-display text-lg font-semibold text-[#021d33]">{quiz.title}</h3>
           <p className="mt-1 text-xs text-slate-500">3 otázky · +20 XP za úspěšné dokončení</p>
-          <div className="mt-4 space-y-4">
+          <div className="mt-5 space-y-5">
             {(quiz.questions ?? []).map((q, qi) => (
               <fieldset key={qi} className="space-y-2">
                 <legend className="text-sm font-medium text-[#021d33]">
                   {qi + 1}. {q.question_text}
                 </legend>
                 {q.options.map((opt) => (
-                  <label key={opt} className="flex cursor-pointer items-center gap-2 text-sm text-slate-600">
+                  <label
+                    key={opt}
+                    className={`flex cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2.5 text-sm transition ${
+                      quizAnswers[qi] === opt
+                        ? "border-[#005B96]/40 bg-[#e8f4fc] text-[#021d33]"
+                        : "border-slate-200 text-slate-600 hover:border-[#005B96]/25"
+                    }`}
+                  >
                     <input
                       type="radio"
                       name={`q-${qi}`}
@@ -250,6 +306,7 @@ export function OsvetaVideoPlayer({
                         next[qi] = opt;
                         setQuizAnswers(next);
                       }}
+                      className="accent-[#005B96]"
                     />
                     {opt}
                   </label>
@@ -261,9 +318,9 @@ export function OsvetaVideoPlayer({
             type="button"
             disabled={quizSubmitting || quizAnswers.length < (quiz.questions?.length ?? 0)}
             onClick={submitQuiz}
-            className="mt-4 rounded-full bg-[#005B96] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#004a7a] disabled:opacity-50"
+            className="mt-5 rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#004a7a] disabled:opacity-50"
           >
-            {quizSubmitting ? "Odesílám…" : "Odeslat kvíz"}
+            {quizSubmitting ? "Odesílám…" : "Odeslat odpovědi"}
           </button>
         </div>
       ) : null}
@@ -278,7 +335,7 @@ export function OsvetaVideoPlayer({
             {quizResult.passed ? "Výborně!" : "Zkuste to znovu"} — {quizResult.score} %
           </p>
           {quizResult.xpAwarded > 0 ? (
-            <p className="mt-1 text-sm text-emerald-700">+{quizResult.xpAwarded} XP za kvíz!</p>
+            <p className="mt-1 text-sm text-emerald-700">+{quizResult.xpAwarded} XP za kvíz</p>
           ) : null}
         </div>
       ) : null}

@@ -27,7 +27,10 @@ function buildLessonListenText(
       ? contentJson.voiceover_text
       : "";
   const raw = [content, slideText].filter(Boolean).join("\n\n");
-  return prepareArticleForSpeech({ title, content: raw });
+  return prepareArticleForSpeech(
+    { title, content: raw },
+    { withBroadcastIntro: false, withClosing: false }
+  );
 }
 
 type Props = { params: Promise<{ slug: string; lessonId: string }> };

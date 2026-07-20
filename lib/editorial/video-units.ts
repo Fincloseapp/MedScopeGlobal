@@ -135,11 +135,15 @@ export function prepareVideoScriptForSpeech(input: {
   excerpt?: string | null;
 }): string {
   const cleaned = stripPersonalVideoIntro(input.script ?? "");
-  return prepareArticleForSpeech({
-    title: input.title,
-    excerpt: input.excerpt,
-    content: cleaned || input.script,
-  });
+  // Video scripts already carry their own open — skip article broadcast intro.
+  return prepareArticleForSpeech(
+    {
+      title: input.title,
+      excerpt: input.excerpt,
+      content: cleaned || input.script,
+    },
+    { withBroadcastIntro: false, withClosing: false }
+  );
 }
 
 // Re-export for convenience in UI

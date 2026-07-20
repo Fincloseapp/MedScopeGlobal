@@ -41,13 +41,16 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
       ? course.duration_minutes
       : course.lessons.reduce((sum, l) => sum + (l.duration_minutes || 5), 0);
 
-  const fullCourseListenText = prepareArticleForSpeech({
-    title: course.title,
-    excerpt: course.summary ?? course.description,
-    content: course.lessons
-      .map((l) => `${l.title}. ${l.content?.slice(0, 500) ?? ""}`)
-      .join("\n\n"),
-  });
+  const fullCourseListenText = prepareArticleForSpeech(
+    {
+      title: course.title,
+      excerpt: course.summary ?? course.description,
+      content: course.lessons
+        .map((l) => `${l.title}. ${l.content?.slice(0, 500) ?? ""}`)
+        .join("\n\n"),
+    },
+    { withBroadcastIntro: false, withClosing: false }
+  );
 
   return (
     <>

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, ExternalLink } from "lucide-react";
+import { ArticleTtsButton } from "@/components/article/article-tts-button";
 import { PublicAdBlocks } from "@/components/verejnost/public-ad-block";
 import { EditorialAttribution } from "@/components/article/editorial-attribution";
 import { EditorialFooter } from "@/components/article/editorial-footer";
@@ -73,8 +74,16 @@ export function VerejnostArticleDetail({
             ) : null}
 
             {article.content ? (
+              <ArticleTtsButton
+                title={article.title}
+                excerpt={article.excerpt ?? undefined}
+                content={article.content}
+              />
+            ) : null}
+
+            {article.content ? (
               <div
-                className="prose prose-slate mt-8 max-w-none prose-headings:font-display prose-headings:text-[#021d33]"
+                className="prose prose-slate mt-6 max-w-none prose-headings:font-display prose-headings:text-[#021d33] prose-p:text-[1.05rem] prose-p:leading-[1.8] prose-p:text-slate-700"
                 dangerouslySetInnerHTML={{ __html: article.content }}
               />
             ) : (
