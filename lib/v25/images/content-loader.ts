@@ -187,9 +187,12 @@ export async function uploadImageToMediaBucket(
   try {
     const admin = createServiceRoleClient();
     const path = `v25-images/${relativePath.replace(/\\/g, "/")}`;
+    // Remove first so content-type metadata is not stuck from a prior wrong upload.
+    await admin.storage.from("media").remove([path]);
     const { error } = await admin.storage.from("media").upload(path, buffer, {
       contentType,
       upsert: true,
+      cacheControl: "3600",
     });
     if (error) {
       console.error("[v25] media upload:", error.message);
