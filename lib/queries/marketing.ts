@@ -154,7 +154,8 @@ export async function getStudentAdCampaign(id: string): Promise<StudentAdCampaig
 }
 
 export async function listProAdCampaigns(options?: { activeOnly?: boolean }): Promise<ProAdCampaign[]> {
-  const supabase = await createClient();
+  // Admin-only table reads — service role bypasses RLS (anon session has no admin JWT).
+  const supabase = createServiceRoleClient();
   let q = supabase.from("pro_ad_campaigns").select("*").order("updated_at", { ascending: false });
   if (options?.activeOnly) q = q.eq("active", true);
   const { data, error } = await q;
@@ -167,7 +168,7 @@ export async function listMarketingProposals(options?: {
   marketerId?: MarketerId;
   limit?: number;
 }): Promise<MarketingProposal[]> {
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
   let q = supabase
     .from("marketing_proposals")
     .select("*")
@@ -182,14 +183,14 @@ export async function listMarketingProposals(options?: {
 }
 
 export async function getMarketingProposal(id: string): Promise<MarketingProposal | null> {
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
   const { data, error } = await supabase.from("marketing_proposals").select("*").eq("id", id).maybeSingle();
   if (error) throw error;
   return data as MarketingProposal | null;
 }
 
 export async function listMarketingReports(limit = 12): Promise<MarketingReport[]> {
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
   const { data, error } = await supabase
     .from("marketing_reports")
     .select("*")
@@ -197,6 +198,72 @@ export async function listMarketingReports(limit = 12): Promise<MarketingReport[
     .limit(limit);
   if (error) throw error;
   return (data ?? []) as MarketingReport[];
+}
+
+/** Full hub payload for /admin/marketing-hub (service role — not for public pages). */
+export async function getMarketingHubSnapshot(options?: {
+  proposalLimit?: number;
+  reportLimit?: number;
+}): Promise<{
+  publicCampaigns: Array<{
+    id: string;
+    active: boolean;
+    impressions: number;
+    clicks: number;
+    title?: string;
+  }>;
+  studentCampaigns: StudentAdCampaign[];
+  proCampaigns: ProAdCampaign[];
+  proposals: MarketingProposal[];
+  reports: MarketingReport[];
+}> {
+  const admin = createServiceRoleClient();
+  const proposalLimit = options?.proposalLimit ?? 50;
+  const reportLimit = options?.reportLimit ?? 6;
+
+  const [publicRes, studentRes, proRes, proposalsRes, reportsRes] = await Promise.all([
+    admin.from("public_ad_campaigns").select("*").order("updated_at", { ascending: false }),
+    admin.from("student_ad_campaigns").select("*").order("updated_at", { ascending: false }),
+    admin.from("pro_ad_campaigns").select("*").order("updated_at", { ascending: false }),
+    admin
+      .from("marketing_proposals")
+      .select("*")
+      .order("priority", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(proposalLimit),
+    admin
+      .from("marketing_reports")
+      .select("*")
+      .order("week_start", { ascending: false })
+      .limit(reportLimit),
+  ]);
+
+  for (const [label, res] of [
+    ["public_ad_campaigns", publicRes],
+    ["student_ad_campaigns", studentRes],
+    ["pro_ad_campaigns", proRes],
+    ["marketing_proposals", proposalsRes],
+    ["marketing_reports", reportsRes],
+  ] as const) {
+    if (res.error) {
+      console.error(`getMarketingHubSnapshot:${label}`, res.error);
+      throw new Error(res.error.message);
+    }
+  }
+
+  return {
+    publicCampaigns: (publicRes.data ?? []) as Array<{
+      id: string;
+      active: boolean;
+      impressions: number;
+      clicks: number;
+      title?: string;
+    }>,
+    studentCampaigns: (studentRes.data ?? []) as StudentAdCampaign[],
+    proCampaigns: (proRes.data ?? []) as ProAdCampaign[],
+    proposals: (proposalsRes.data ?? []) as MarketingProposal[],
+    reports: (reportsRes.data ?? []) as MarketingReport[],
+  };
 }
 
 export async function updateProposalStatus(
@@ -374,7 +441,7 @@ export async function listMarketerActivityLog(options?: {
   action?: string;
   limit?: number;
 }): Promise<MarketerActivityLog[]> {
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
   let q = supabase
     .from("marketer_activity_log")
     .select("*")
@@ -401,7 +468,7 @@ function sumMetrics(rows: Array<{ impressions?: number; clicks?: number }>): {
 }
 
 export async function getCategoryPerformanceBreakdown(): Promise<CategoryPerformance[]> {
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
   const results: CategoryPerformance[] = [];
 
   const { data: publicCampaigns } = await supabase
@@ -478,7 +545,7 @@ export async function getCategoryPerformanceBreakdown(): Promise<CategoryPerform
 }
 
 export async function getAdsOverview(options?: { includePartners?: boolean }): Promise<AdsOverview> {
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
   const now = Date.now();
   const dayAgo = new Date(now - 86400000).toISOString();
   const weekAgo = new Date(now - 7 * 86400000).toISOString();

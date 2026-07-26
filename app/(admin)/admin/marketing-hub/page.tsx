@@ -3,13 +3,7 @@ import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { computeAdStats } from "@/lib/marketing/helpers";
 import { loadMarketingPartners } from "@/lib/marketing/partners";
-import {
-  listMarketingProposals,
-  listMarketingReports,
-  listProAdCampaigns,
-  listStudentAdCampaigns,
-} from "@/lib/queries/marketing";
-import { listPublicAdCampaigns } from "@/lib/queries/verejnost";
+import { getMarketingHubSnapshot } from "@/lib/queries/marketing";
 import { MarketingProposalsPanel } from "./components/MarketingProposalsPanel";
 
 export const metadata: Metadata = {
@@ -24,16 +18,42 @@ const MARKETER_LABELS: Record<string, string> = {
   pro: "Pro / B2B",
 };
 
+const B2B_CATEGORY_LABELS: Record<string, string> = {
+  otc: "OTC / volně prodejné",
+  devices: "Zdravotnické prostředky",
+  diagnostics: "Diagnostika",
+  pharma: "Farmacie",
+  education: "Vzdělávání",
+  software: "Software / digitální",
+  insurance: "Pojištění",
+  other: "Ostatní",
+  general: "Obecné",
+};
+
+function b2bLabel(cat: string): string {
+  return B2B_CATEGORY_LABELS[cat] ?? cat.replace(/[-_]/g, " ");
+}
+
 export default async function AdminMarketingHubPage() {
-  const [publicCampaigns, studentCampaigns, proCampaigns, proposals, reports, partners] =
-    await Promise.all([
-      listPublicAdCampaigns({ activeOnly: false }).catch(() => []),
-      listStudentAdCampaigns({ activeOnly: false }).catch(() => []),
-      listProAdCampaigns({ activeOnly: false }).catch(() => []),
-      listMarketingProposals({ limit: 50 }).catch(() => []),
-      listMarketingReports(6).catch(() => []),
-      Promise.resolve(loadMarketingPartners()),
-    ]);
+  let loadError: string | null = null;
+  let publicCampaigns: Awaited<ReturnType<typeof getMarketingHubSnapshot>>["publicCampaigns"] = [];
+  let studentCampaigns: Awaited<ReturnType<typeof getMarketingHubSnapshot>>["studentCampaigns"] = [];
+  let proCampaigns: Awaited<ReturnType<typeof getMarketingHubSnapshot>>["proCampaigns"] = [];
+  let proposals: Awaited<ReturnType<typeof getMarketingHubSnapshot>>["proposals"] = [];
+  let reports: Awaited<ReturnType<typeof getMarketingHubSnapshot>>["reports"] = [];
+
+  try {
+    const snap = await getMarketingHubSnapshot({ proposalLimit: 50, reportLimit: 6 });
+    publicCampaigns = snap.publicCampaigns;
+    studentCampaigns = snap.studentCampaigns;
+    proCampaigns = snap.proCampaigns;
+    proposals = snap.proposals;
+    reports = snap.reports;
+  } catch (e) {
+    loadError = (e as Error).message;
+  }
+
+  const partners = loadMarketingPartners();
 
   const publicStats = computeAdStats(publicCampaigns);
   const studentStats = computeAdStats(studentCampaigns);
@@ -60,9 +80,12 @@ export default async function AdminMarketingHubPage() {
         <MedScopeLogo href="/admin/marketing-hub" width={160} height={40} className="mb-3" />
         <h1 className="font-display text-2xl font-bold text-[#021d33]">Marketing Hub</h1>
         <p className="mt-1 text-sm text-slate-600">
-          Observabilita Ad Engine v25.2 — 3 AI marketéři, koordinátor a výkon kampaní.
+          Observabilita Ad Engine — 3 AI marketéři, koordinátor a výkon kampaní.
         </p>
         <div className="mt-3 flex flex-wrap gap-2 text-sm">
+          <Link href="/admin/ads-overview" className="rounded-lg border px-3 py-1.5 hover:bg-muted">
+            Ads overview
+          </Link>
           <Link href="/admin/ads-public" className="rounded-lg border px-3 py-1.5 hover:bg-muted">
             Veřejné reklamy
           </Link>
@@ -74,6 +97,12 @@ export default async function AdminMarketingHubPage() {
           </Link>
         </div>
       </div>
+
+      {loadError ? (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          Nepodařilo se načíst marketingová data: {loadError}
+        </div>
+      ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
@@ -98,7 +127,7 @@ export default async function AdminMarketingHubPage() {
           {[
             { label: "Veřejné", stats: publicStats, href: "/admin/ads-public" },
             { label: "Studentské", stats: studentStats, href: "/admin/ads-students" },
-            { label: "Pro / B2B", stats: proStats, href: "/admin/marketing-hub" },
+            { label: "Pro / B2B", stats: proStats, href: "/admin/ads-overview" },
           ].map((seg) => (
             <div key={seg.label} className="rounded-xl border bg-white p-4">
               <div className="flex items-center justify-between">
@@ -123,6 +152,12 @@ export default async function AdminMarketingHubPage() {
                   </p>
                 </div>
                 <div>
+                  <p className="text-xs text-muted-foreground">Kliky</p>
+                  <p className="font-semibold tabular-nums">
+                    {seg.stats.clicks.toLocaleString("cs-CZ")}
+                  </p>
+                </div>
+                <div className="col-span-2">
                   <p className="text-xs text-muted-foreground">CTR</p>
                   <p className="font-semibold tabular-nums">{seg.stats.ctr.toFixed(2)} %</p>
                 </div>
@@ -138,7 +173,7 @@ export default async function AdminMarketingHubPage() {
           {Object.keys(b2bByCategory).length ? (
             Object.entries(b2bByCategory).map(([cat, count]) => (
               <div key={cat} className="rounded-lg border bg-white px-3 py-2">
-                <p className="text-xs text-muted-foreground">{cat}</p>
+                <p className="text-xs text-muted-foreground">{b2bLabel(cat)}</p>
                 <p className="font-semibold tabular-nums">{count}</p>
               </div>
             ))
@@ -171,7 +206,8 @@ export default async function AdminMarketingHubPage() {
           </div>
         ) : (
           <p className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
-            Koordinátor zatím nevygeneroval týdenní report.
+            Koordinátor zatím nevygeneroval týdenní report. Report vznikne při běhu marketing
+            orchestrátoru (cron / Ads overview).
           </p>
         )}
       </section>
@@ -213,10 +249,14 @@ export default async function AdminMarketingHubPage() {
         <div className="grid gap-2 sm:grid-cols-3">
           {(["public", "students", "pro"] as const).map((id) => {
             const count = proposals.filter((p) => p.marketer_id === id).length;
+            const pendingCount = proposals.filter(
+              (p) => p.marketer_id === id && p.status === "pending"
+            ).length;
             return (
               <div key={id} className="rounded-lg border bg-white p-3">
                 <p className="text-xs text-muted-foreground">{MARKETER_LABELS[id]}</p>
                 <p className="font-semibold tabular-nums">{count}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{pendingCount} čeká na schválení</p>
               </div>
             );
           })}
