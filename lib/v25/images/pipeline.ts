@@ -9,6 +9,7 @@ import {
 import {
   appendImageFixLog,
   loadImageRegistryLocal,
+  loadImageReportFromDb,
   logImageRunToDb,
   persistImageReport,
 } from "@/lib/v25/images/persist";
@@ -19,6 +20,48 @@ import type {
   V25ImageReport,
 } from "@/lib/v25/images/types";
 import { V25_PROD_BASE } from "@/lib/v25/config";
+
+function contentTypeForPath(path: string, fallback?: string): string {
+  if (fallback) return fallback;
+  const p = path.toLowerCase();
+  if (p.endsWith(".png")) return "image/png";
+  if (p.endsWith(".webp")) return "image/webp";
+  if (p.endsWith(".jpg") || p.endsWith(".jpeg")) return "image/jpeg";
+  if (p.endsWith(".svg")) return "image/svg+xml";
+  return "image/svg+xml";
+}
+
+/** Re-upload SVGs that were stored with wrong MIME (e.g. image/jpeg) so <img> can render. */
+async function repairSvgMimeTypes(registry: V25ImageRecord[]): Promise<number> {
+  let fixed = 0;
+  for (const img of registry) {
+    const url = img.publicUrl ?? "";
+    const rel =
+      img.relativePath ||
+      (url.includes("/v25-images/")
+        ? url.split("/v25-images/")[1]?.split("?")[0]
+        : "");
+    if (!rel?.toLowerCase().endsWith(".svg") && !url.toLowerCase().endsWith(".svg")) continue;
+    try {
+      let buf = rel ? readLocalImage(rel) : null;
+      if (!buf && url) {
+        const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+        if (!res.ok) continue;
+        buf = Buffer.from(await res.arrayBuffer());
+      }
+      if (!buf || !rel) continue;
+      const nextUrl = await uploadImageToMediaBucket(rel, buf, "image/svg+xml");
+      if (nextUrl) {
+        img.publicUrl = nextUrl;
+        img.relativePath = rel;
+        fixed += 1;
+      }
+    } catch {
+      /* best-effort */
+    }
+  }
+  return fixed;
+}
 
 type MissingItem = {
   id: string;
@@ -62,7 +105,15 @@ export async function runV25ImagePipeline(options?: {
   const { detector, generator } = await importEngines();
 
   const contentRows = options?.skipDb ? [] : await loadContentRowsForImages();
-  const registry = loadImageRegistryLocal();
+  // Prefer DB registry on serverless (local filesystem is ephemeral / empty).
+  const dbReport = await loadImageReportFromDb();
+  const registry = (dbReport?.images?.length ? dbReport.images : loadImageRegistryLocal()).map((img) => ({
+    ...img,
+  }));
+  const mimeRepaired = await repairSvgMimeTypes(registry);
+  if (mimeRepaired > 0) {
+    appendV25Log("images", `repaired svg mime for ${mimeRepaired} registry entries`);
+  }
   const facultyRows = detector.buildStaticMissingFaculties(registry);
   const quizRows = loadStaticQuizImageRows();
   const allRows = [...contentRows, ...facultyRows, ...quizRows];
@@ -134,9 +185,12 @@ export async function runV25ImagePipeline(options?: {
 
         const buf = readLocalImage(relativePath);
         if (buf) {
-          const ct =
-            ("contentType" in saved && saved.contentType) ||
-            (relativePath.endsWith(".png") ? "image/png" : relativePath.endsWith(".webp") ? "image/webp" : "image/jpeg");
+          const ct = contentTypeForPath(
+            relativePath,
+            "contentType" in saved && typeof saved.contentType === "string"
+              ? saved.contentType
+              : undefined
+          );
           publicUrl = await uploadImageToMediaBucket(relativePath, buf, ct);
         }
         if (!publicUrl) {

@@ -8,6 +8,15 @@ type Props = {
   selectedId?: string | null;
 };
 
+function decodeTitle(title: string): string {
+  return title
+    .replace(/&#x201[cd];/gi, '"')
+    .replace(/&#x201[89];/gi, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&#160;/g, " ");
+}
+
 export function ImageTable({ images, onSelect, selectedId }: Props) {
   if (!images.length) {
     return (
@@ -46,11 +55,15 @@ export function ImageTable({ images, onSelect, selectedId }: Props) {
                   <img
                     src={img.publicUrl}
                     alt=""
-                    className="h-10 w-16 rounded border object-cover"
+                    className="h-10 w-16 rounded border bg-[#f0f7ff] object-cover"
+                    loading="lazy"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.opacity = "0.35";
+                    }}
                   />
                 </button>
               </td>
-              <td className="px-4 py-3 font-medium">{img.title}</td>
+              <td className="px-4 py-3 font-medium">{decodeTitle(img.title)}</td>
               <td className="px-4 py-3 text-muted-foreground">{img.section}</td>
               <td className="px-4 py-3">{img.imageType}</td>
               <td className="px-4 py-3">
