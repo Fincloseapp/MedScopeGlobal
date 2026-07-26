@@ -11,9 +11,13 @@ type Props = {
 export function ImageTable({ images, onSelect, selectedId }: Props) {
   if (!images.length) {
     return (
-      <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-        Zatím žádné obrázky v registru. Spusťte automatické doplnění.
-      </p>
+      <div className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+        <p className="font-medium text-[#021d33]">Registr je prázdný</p>
+        <p className="mt-2">
+          Spusťte „Automatické doplnění obrázků“ — pipeline vygeneruje cover (OpenAI / curated Unsplash /
+          SVG fallback) a uloží ho do registru.
+        </p>
+      </div>
     );
   }
 

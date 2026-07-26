@@ -13,13 +13,30 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
+function aggregateFailureReasons(
+  entries: Array<{ result?: string; detail?: string; action?: string }>
+): Array<{ reason: string; count: number }> {
+  const counts = new Map<string, number>();
+  for (const e of entries) {
+    if (e.result !== "fail") continue;
+    const raw = (e.detail || e.action || "neznámá chyba").trim();
+    const reason = raw.length > 80 ? `${raw.slice(0, 77)}…` : raw;
+    counts.set(reason, (counts.get(reason) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([reason, count]) => ({ reason, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 6);
+}
+
 export default async function AdminImagesPage() {
   const report = await loadImageReportAsync();
-  const fixLog = loadImageFixLogLocal();
+  const localFixLog = loadImageFixLogLocal();
+  const fixLog = (report?.fixLog?.length ? report.fixLog : localFixLog) ?? [];
   const images: V25ImageRegistryEntry[] = report?.images ?? [];
 
   const stats = {
-    total: images.length,
+    total: images.length || report?.total || 0,
     generated: report?.generated ?? 0,
     assigned: report?.assigned ?? 0,
     failed: report?.failed ?? 0,
@@ -27,11 +44,15 @@ export default async function AdminImagesPage() {
     lastRun: report?.at ?? null,
   };
 
+  const failureReasons = aggregateFailureReasons(fixLog);
+  const pipelineBroken = stats.failed > 0 && stats.assigned === 0 && stats.total === 0;
+  const pipelinePartial = stats.failed > 0 && stats.assigned > 0;
+
   return (
     <div className="space-y-8 p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">v25.1</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Image pipeline</p>
           <h1 className="font-display text-3xl font-bold text-[#021d33]">AI Image Center</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
             Dynamické přiřazování obrázků — selector, generator, style filter. Neutrální evropský profesionální
@@ -40,6 +61,31 @@ export default async function AdminImagesPage() {
         </div>
         <RunImageBackfillButton />
       </div>
+
+      {pipelineBroken ? (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          <p className="font-medium">Poslední běh nepřiřadil žádný obrázek</p>
+          <p className="mt-1 text-amber-900/90">
+            Detekováno {stats.missingBefore} chybějících coverů, selhalo {stats.failed}. Spusťte znovu
+            „Automatické doplnění“ — po opravě style filtru by měla projít SVG / curated cesta.
+          </p>
+          {failureReasons.length ? (
+            <ul className="mt-2 list-inside list-disc text-xs text-amber-900/80">
+              {failureReasons.map((r) => (
+                <li key={r.reason}>
+                  {r.reason} ({r.count}×)
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      ) : null}
+
+      {pipelinePartial ? (
+        <div className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-950">
+          Částečný úspěch: přiřazeno {stats.assigned}, selhalo {stats.failed}. Detaily jsou v logu oprav.
+        </div>
+      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {[
@@ -59,8 +105,13 @@ export default async function AdminImagesPage() {
       {stats.lastRun ? (
         <p className="text-xs text-muted-foreground">
           Poslední běh pipeline: {new Date(stats.lastRun).toLocaleString("cs-CZ")}
+          {stats.missingBefore > 0
+            ? ` · zbývá doplnit až ${Math.max(0, stats.missingBefore - stats.assigned)} položek`
+            : null}
         </p>
-      ) : null}
+      ) : (
+        <p className="text-xs text-muted-foreground">Pipeline ještě neběžela — spusťte automatické doplnění.</p>
+      )}
 
       <ImageCenterClient images={images} />
 

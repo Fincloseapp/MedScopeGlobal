@@ -110,12 +110,18 @@ export async function runV25ImagePipeline(options?: {
 
         if (!saved.ok) {
           failed += 1;
+          const detail =
+            "detail" in saved && saved.detail
+              ? String(saved.detail)
+              : "rejected" in saved && Array.isArray(saved.rejected)
+                ? `style-filter-rejected: ${saved.rejected.join(", ")}`
+                : String("error" in saved ? saved.error : "generate-failed");
           const fix = appendImageFixLog({
             section: item.section,
             slug: item.slug,
             action: "style-reject",
             result: "fail",
-            detail: String("error" in saved ? saved.error : "generate-failed"),
+            detail,
           });
           fixLog.push(fix);
           continue;
