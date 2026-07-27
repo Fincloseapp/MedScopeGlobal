@@ -5,6 +5,7 @@
  * Usage:
  *   npx tsx scripts/rewrite-boilerplate-articles.ts --scan-only
  *   npx tsx scripts/rewrite-boilerplate-articles.ts [--limit=N] [--dry-run] [--delay-ms=1500]
+ *   npx tsx scripts/rewrite-boilerplate-articles.ts --section=aktuální-zprávy --limit=60
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -38,6 +39,7 @@ const scanOnly = args.includes("--scan-only");
 const dryRun = args.includes("--dry-run");
 const limit = Number(args.find((a) => a.startsWith("--limit="))?.split("=")[1] ?? 500);
 const delayMs = Number(args.find((a) => a.startsWith("--delay-ms="))?.split("=")[1] ?? 3000);
+const sectionFilter = args.find((a) => a.startsWith("--section="))?.split("=")[1];
 
 /** Force smaller Groq model for bulk rewrites (env from .env.local may set 70b). */
 process.env.AI_MODEL = "llama-3.1-8b-instant";
@@ -169,16 +171,21 @@ async function main() {
   console.log("Fetching published articles…");
   const rows = await fetchAllPublished();
   console.log(`Scanned ${rows.length} published articles`);
+  if (sectionFilter) console.log(`Section filter: ${sectionFilter}`);
 
-  const candidates = rows.filter((row) =>
-    needsTemplateRewrite({
+  const candidates = rows.filter((row) => {
+    if (sectionFilter) {
+      const section = String((row.metadata as { section?: string } | null)?.section ?? "");
+      if (section !== sectionFilter) return false;
+    }
+    return needsTemplateRewrite({
       title: row.title,
       excerpt: row.excerpt ?? "",
       content: row.content ?? "",
       locale: row.locale ?? "cs",
       metadata: row.metadata ?? {},
-    })
-  );
+    });
+  });
 
   const reasonCounts: Record<string, number> = {};
   for (const row of candidates) {

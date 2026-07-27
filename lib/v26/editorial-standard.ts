@@ -2,6 +2,7 @@ import {
   buildBlocklistPrompt,
   buildPersonaStylePrompt,
   buildV26StructurePrompt,
+  isEnglishDominantTitle,
   validateV26Structure,
   V26_SECTIONS,
   wrapContentInV26Structure,
@@ -11,6 +12,7 @@ import {
   buildEditorialMetadataPatch,
   formatEditorialUnitDisplay,
 } from "@/lib/editorial/units";
+import { toCzechExcerpt, toCzechTitle } from "@/lib/v22/translate";
 import type { AuthorPersona } from "./personas";
 
 export { V26_SECTIONS, validateV26Structure, wrapContentInV26Structure };
@@ -61,6 +63,7 @@ export function buildV26SystemPrompt(audience = "public", persona?: AuthorPerson
   return `${buildV26StructurePrompt(audience, topic ?? null)}
 ${personaPrompt}
 ${buildBlocklistPrompt()}
+Jazyk: výhradně čeština (titulek, perex i bodyHtml). Nikdy nenechávej anglický titulek ani hybrid „Odborný přehled: English…“.
 Vrať JSON: { "title": string, "excerpt": string (2–3 věty), "bodyHtml": string (HTML s <p>, <h2>, <ul>) }`;
 }
 
@@ -91,9 +94,13 @@ export function buildFallbackRewrite(input: V26RewriteInput): V26RewriteResult {
     metadata: { author_persona: input.persona?.id ?? null },
   });
   const unitLabel = formatEditorialUnitDisplay(assignment.primary, "cs", assignment.aiAssisted);
+  const title = isEnglishDominantTitle(input.title)
+    ? toCzechTitle(input.title, "zdravotní zpravodajství")
+    : input.title;
+  const excerpt = toCzechExcerpt(input.excerpt ?? null, title).slice(0, 320);
   const content = wrapContentInV26Structure({
-    title: input.title,
-    excerpt: input.excerpt ?? input.title,
+    title,
+    excerpt,
     bodyHtml: input.content.slice(0, 4000),
     personaName: unitLabel,
     persona: input.persona,
@@ -101,8 +108,8 @@ export function buildFallbackRewrite(input: V26RewriteInput): V26RewriteResult {
   });
   const validation = validateV26Structure(content);
   return {
-    title: input.title,
-    excerpt: (input.excerpt ?? input.title).slice(0, 320),
+    title,
+    excerpt,
     content,
     metadata: {
       editorial_version: "26.2.1",

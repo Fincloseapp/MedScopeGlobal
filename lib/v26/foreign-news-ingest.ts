@@ -2,6 +2,12 @@ import crypto from "crypto";
 import sourcesV26 from "@/lib/v26/config/sources-v26.json";
 import { mergeV26Metadata } from "@/lib/v26/editorial-standard";
 import { rewriteToV26Standard } from "@/lib/v26/rewrite-engine";
+import { isEnglishDominantTitle } from "@/lib/v26/editorial-prompts.mjs";
+import {
+  isEnglishDominant,
+  toCzechExcerpt,
+  toCzechTitle,
+} from "@/lib/v22/translate";
 import { fetchRssItems } from "@/lib/ingestion/rss";
 import type { ContentAccessLevel } from "@/lib/config/access-levels";
 import type { IngestionRubric } from "@/lib/ingestion/sources";
@@ -92,7 +98,17 @@ export async function runV26ForeignNewsIngest(options?: {
           seed: item.link,
         });
 
-        let slug = slugify(`zpravy-${rewritten.title}`).slice(0, 100);
+        // Hard guard: never persist English/hybrid titles into Czech news section.
+        let title = rewritten.title;
+        let excerpt = rewritten.excerpt;
+        if (isEnglishDominantTitle(title) || isEnglishDominant(title) || /Odborný přehled/i.test(title)) {
+          title = toCzechTitle(title, "zdravotní zpravodajství");
+        }
+        if (isEnglishDominant(excerpt) || /profesionální shrnutí|evidence-based přístup/i.test(excerpt)) {
+          excerpt = toCzechExcerpt(null, title);
+        }
+
+        let slug = slugify(`zpravy-${title}`).slice(0, 100);
         const { data: slugClash } = await admin.from("articles").select("id").eq("slug", slug).maybeSingle();
         if (slugClash) slug = `${slug}-${crypto.randomBytes(2).toString("hex")}`;
 
@@ -108,11 +124,11 @@ export async function runV26ForeignNewsIngest(options?: {
         });
 
         const payload = {
-          title: rewritten.title,
+          title,
           slug,
           content: rewritten.content,
-          excerpt: rewritten.excerpt,
-          summary: rewritten.excerpt,
+          excerpt,
+          summary: excerpt,
           category_id: categoryId,
           author_id: authorId,
           published: true,
@@ -129,7 +145,7 @@ export async function runV26ForeignNewsIngest(options?: {
           content_type: "policy",
           license: "source",
           hash_dedup: hash,
-          meta_description: rewritten.excerpt.slice(0, 160),
+          meta_description: excerpt.slice(0, 160),
           metadata,
           updated_at: new Date().toISOString(),
         };

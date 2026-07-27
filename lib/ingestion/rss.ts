@@ -80,9 +80,27 @@ function stripHtml(s: string): string {
 
 function decodeEntities(s: string): string {
   return s
+    .replace(/&#x([0-9a-f]+);?/gi, (_, hex: string) => {
+      try {
+        return String.fromCodePoint(Number.parseInt(hex, 16));
+      } catch {
+        return " ";
+      }
+    })
+    .replace(/&#(\d+);?/g, (_, dec: string) => {
+      try {
+        return String.fromCodePoint(Number.parseInt(dec, 10));
+      } catch {
+        return " ";
+      }
+    })
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&mdash;/gi, "—")
+    .replace(/&ndash;/gi, "–")
+    .replace(/&ldquo;|&rdquo;/gi, '"')
+    .replace(/&lsquo;|&rsquo;/gi, "'");
 }
