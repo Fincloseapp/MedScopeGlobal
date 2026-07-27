@@ -183,7 +183,9 @@ export async function runV25ImagePipeline(options?: {
         localPath = "meta" in saved && saved.meta?.localPath ? String(saved.meta.localPath) : "";
         source = "generator";
 
-        const buf = readLocalImage(relativePath);
+        const buf =
+          readLocalImage(relativePath) ??
+          ("svg" in saved && typeof saved.svg === "string" ? Buffer.from(saved.svg, "utf8") : null);
         if (buf) {
           const ct = contentTypeForPath(
             relativePath,

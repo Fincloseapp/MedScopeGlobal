@@ -1,12 +1,15 @@
 "use client";
 
 import type { V25ImageRegistryEntry } from "@/lib/v25/types";
+import { useDisplayableImageSrc } from "./useDisplayableImageSrc";
 
 type Props = {
   image: V25ImageRegistryEntry | null;
 };
 
 export function ImagePreview({ image }: Props) {
+  const src = useDisplayableImageSrc(image?.publicUrl);
+
   if (!image) {
     return (
       <div className="flex h-full min-h-[280px] items-center justify-center rounded-xl border border-dashed bg-slate-50 p-6 text-sm text-muted-foreground">
@@ -19,8 +22,12 @@ export function ImagePreview({ image }: Props) {
     <div className="rounded-xl border bg-white p-4">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Náhled</p>
       <div className="mt-3 overflow-hidden rounded-lg border bg-[#f0f7ff]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={image.publicUrl} alt={image.title} className="w-full object-cover" />
+        {src ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={src} alt={image.title} className="w-full object-cover" />
+        ) : (
+          <div className="flex h-40 items-center justify-center text-xs text-muted-foreground">Načítám…</div>
+        )}
       </div>
       <dl className="mt-4 grid gap-2 text-sm">
         <div>

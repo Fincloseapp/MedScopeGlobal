@@ -1,6 +1,7 @@
 "use client";
 
 import type { V25ImageRegistryEntry } from "@/lib/v25/types";
+import { useDisplayableImageSrc } from "./useDisplayableImageSrc";
 
 type Props = {
   images: V25ImageRegistryEntry[];
@@ -15,6 +16,19 @@ function decodeTitle(title: string): string {
     .replace(/&amp;/g, "&")
     .replace(/&nbsp;/g, " ")
     .replace(/&#160;/g, " ");
+}
+
+function Thumb({ url }: { url: string }) {
+  const src = useDisplayableImageSrc(url);
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src ?? url}
+      alt=""
+      className="h-10 w-16 rounded border bg-[#f0f7ff] object-cover"
+      loading="lazy"
+    />
+  );
 }
 
 export function ImageTable({ images, onSelect, selectedId }: Props) {
@@ -51,16 +65,7 @@ export function ImageTable({ images, onSelect, selectedId }: Props) {
             >
               <td className="px-4 py-2">
                 <button type="button" onClick={() => onSelect?.(img)} className="block">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={img.publicUrl}
-                    alt=""
-                    className="h-10 w-16 rounded border bg-[#f0f7ff] object-cover"
-                    loading="lazy"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.opacity = "0.35";
-                    }}
-                  />
+                  <Thumb url={img.publicUrl} />
                 </button>
               </td>
               <td className="px-4 py-3 font-medium">{decodeTitle(img.title)}</td>
