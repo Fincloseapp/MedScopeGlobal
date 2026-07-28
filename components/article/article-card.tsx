@@ -19,7 +19,7 @@ export function ArticleCard({ article }: { article: DisplayArticle | ArticleWith
   );
   const date =
     article.published_at &&
-    new Date(article.published_at).toLocaleDateString(undefined, {
+    new Date(article.published_at).toLocaleDateString("cs-CZ", {
       year: "numeric",
       month: "short",
       day: "numeric",

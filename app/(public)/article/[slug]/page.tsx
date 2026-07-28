@@ -263,7 +263,7 @@ export default async function ArticlePage({ params }: Props) {
                   <p>
                     {article.published_at &&
                       new Date(article.published_at).toLocaleDateString(
-                        undefined,
+                        "cs-CZ",
                         {
                           year: "numeric",
                           month: "long",
