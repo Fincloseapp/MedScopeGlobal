@@ -64,6 +64,14 @@ export default function ONasPage() {
       </div>
 
       <div className="prose prose-slate mt-10 max-w-none">
+        <h2>Nezávislost značky</h2>
+        <p>
+          MedScopeGlobal je nezávislá platforma na doméně medscopeglobal.com.{" "}
+          <strong>Nejsme spřízněni s Medscape, WebMD</strong> ani s jinými zahraničními
+          medicínskými portály se podobným názvem. Nejsme jejich českou mutací ani licencí.
+          Podrobnosti: <Link href="/znacka">Značka a duševní vlastnictví</Link>.
+        </p>
+
         <h2>Kvalita a bezpečnost</h2>
         <p>
           Obsah prochází redakční kontrolou. AI nástroje jsou auditovány a nepředstavují

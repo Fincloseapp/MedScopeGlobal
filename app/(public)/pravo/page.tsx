@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -40,10 +41,18 @@ export default function PravoPage() {
         <li>Je auditován v logu ai_agent_logs</li>
       </ul>
 
-      <h2>4. Ochranné známky</h2>
+      <h2>4. Ochranné známky a nezávislost značky</h2>
       <p>
-        MedScopeGlobal a související loga jsou ochrannými známkami provozovatele. Ostatní
-        názvy patří jejich vlastníkům.
+        MedScopeGlobal a související označení (včetně MedScope Academy) jsou označeními
+        provozovatele platformy na doméně medscopeglobal.com. Ostatní názvy patří jejich
+        vlastníkům.
+      </p>
+      <p>
+        <strong>MedScopeGlobal není spřízněn, licencován ani provozován</strong> společnostmi
+        WebMD, LLC, Medscape ani jinými zahraničními medicínskými portály se podobným názvem.
+        Nejde o oficiální mutaci Medscape. Podrobnosti:{" "}
+        <Link href="/znacka">Značka a duševní vlastnictví</Link>. Související dokumenty:{" "}
+        <Link href="/terms">Obchodní podmínky</Link>, <Link href="/privacy">Ochrana soukromí</Link>.
       </p>
     </LegalPageLayout>
   );

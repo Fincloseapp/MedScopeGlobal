@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
+import { getLegalEntity } from "@/lib/config/legal-entity";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -11,6 +12,8 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default function GdprPage() {
+  const entity = getLegalEntity();
+
   return (
     <LegalPageLayout
       title="Ochrana osobních údajů (GDPR)"
@@ -18,8 +21,11 @@ export default function GdprPage() {
     >
       <h2>1. Správce údajů</h2>
       <p>
-        Správcem osobních údajů je provozovatel MedScopeGlobal. Kontakt:{" "}
-        <a href="mailto:support@medscopeglobal.com">support@medscopeglobal.com</a>.
+        Správcem osobních údajů je <strong>{entity.name}</strong>
+        {entity.ico ? <> (IČO {entity.ico})</> : null}
+        {entity.address ? <>, sídlo: {entity.address}</> : null}. Kontakt:{" "}
+        <a href={`mailto:${entity.legalEmail}`}>{entity.legalEmail}</a>. Úplné znění:{" "}
+        <Link href="/privacy">Ochrana soukromí</Link>.
       </p>
 
       <h2>2. Rozsah zpracování</h2>

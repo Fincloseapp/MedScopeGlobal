@@ -117,6 +117,11 @@ export async function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/znacka" className="hover:text-foreground">
+                Značka a IP
+              </Link>
+            </li>
+            <li>
               <Link href="/kontakt" className="hover:text-foreground">
                 Kontakt
               </Link>
@@ -136,7 +141,9 @@ export async function SiteFooter() {
       </div>
 
       <div className="border-t py-6 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} MedScopeGlobal — obsah pro vzdělávání, nenahrazuje lékařskou radu.
+        © {new Date().getFullYear()} MedScopeGlobal · Al Synaptica Research Institute s.r.o., IČO
+        06024963 — obsah pro vzdělávání, nenahrazuje lékařskou radu. Nezávislá značka; není
+        afilována s Medscape / WebMD.
       </div>
     </footer>
   );

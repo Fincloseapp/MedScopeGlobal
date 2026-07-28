@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
+import { getLegalEntity, isLegalEntityComplete } from "@/lib/config/legal-entity";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -11,6 +12,9 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default function PrivacyPage() {
+  const entity = getLegalEntity();
+  const complete = isLegalEntityComplete(entity);
+
   return (
     <LegalPageLayout
       title="Ochrana soukromí"
@@ -18,8 +22,40 @@ export default function PrivacyPage() {
     >
       <h2>1. Správce údajů</h2>
       <p>
-        Správcem osobních údajů je provozovatel MedScopeGlobal. Kontakt:{" "}
-        <a href="mailto:support@medscopeglobal.com">support@medscopeglobal.com</a>.
+        Správcem osobních údajů je <strong>{entity.name}</strong>
+        {entity.ico ? (
+          <>
+            {" "}
+            (IČO {entity.ico}
+            {entity.dic ? `, DIČ ${entity.dic}` : ""})
+          </>
+        ) : null}
+        {entity.courtFile ? <>, sp. zn. {entity.courtFile}</> : null}
+        {entity.address ? <>. Sídlo: {entity.address}</> : null}. Značka / obchodní označení:{" "}
+        {entity.tradeName} ({entity.domain}).
+      </p>
+      <p>
+        Kontakt pro ochranu osobních údajů:{" "}
+        <a href={`mailto:${entity.legalEmail}`}>{entity.legalEmail}</a>
+        {entity.supportPhone ? (
+          <>
+            {" "}
+            · tel. <a href={`tel:${entity.supportPhone.replace(/\s/g, "")}`}>{entity.supportPhone}</a>
+          </>
+        ) : null}
+        . Podpora: <a href={`mailto:${entity.supportEmail}`}>{entity.supportEmail}</a>.
+      </p>
+      {!complete && (
+        <p>
+          <em>
+            Doplňte IČO, sídlo a obchodní firmu v proměnných LEGAL_ENTITY_* (viz provozní
+            dokumentace), aby identifikace správce odpovídala čl. 13 GDPR a českému právu.
+          </em>
+        </p>
+      )}
+      <p>
+        MedScopeGlobal není spřízněn s Medscape / WebMD. Viz{" "}
+        <Link href="/znacka">Značka a duševní vlastnictví</Link>.
       </p>
 
       <h2>2. Rozsah zpracování</h2>

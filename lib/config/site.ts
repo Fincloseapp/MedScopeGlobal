@@ -10,7 +10,7 @@ export const SITE = {
     (process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
       : "https://medscopeglobal.com"),
-  supportEmail: "support@medscopeglobal.com",
+  supportEmail: "info@medscopeglobal.com",
   adminNotifyEmail:
     process.env.ADMIN_NOTIFY_EMAIL ?? "info@medscopeglobal.com",
   colors: {

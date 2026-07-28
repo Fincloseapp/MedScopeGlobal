@@ -24,6 +24,10 @@ const staticRoutes: MetadataRoute.Sitemap = [
   { url: `${base}/gdpr`, changeFrequency: "yearly", priority: 0.3 },
   { url: `${base}/cookies`, changeFrequency: "yearly", priority: 0.3 },
   { url: `${base}/pravo`, changeFrequency: "yearly", priority: 0.3 },
+  { url: `${base}/terms`, changeFrequency: "yearly", priority: 0.3 },
+  { url: `${base}/privacy`, changeFrequency: "yearly", priority: 0.3 },
+  { url: `${base}/znacka`, changeFrequency: "yearly", priority: 0.4 },
+  { url: `${base}/o-nas`, changeFrequency: "monthly", priority: 0.5 },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

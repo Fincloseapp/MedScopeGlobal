@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
+import { getLegalEntity } from "@/lib/config/legal-entity";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -10,6 +12,8 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default function TermsPage() {
+  const entity = getLegalEntity();
+
   return (
     <LegalPageLayout
       title="Obchodní podmínky"
@@ -17,9 +21,15 @@ export default function TermsPage() {
     >
       <h2>1. Úvodní ustanovení</h2>
       <p>
-        Tyto obchodní podmínky upravují vztah mezi provozovatelem MedScopeGlobal a uživateli
-        online platformy pro odborný medicínský obsah. Používáním služby souhlasíte s těmito
-        podmínkami.
+        Tyto obchodní podmínky upravují vztah mezi provozovatelem ({entity.name}
+        {entity.ico ? `, IČO ${entity.ico}` : ""}) platformy MedScopeGlobal na doméně{" "}
+        {entity.domain} a uživateli online služby pro odborný medicínský obsah. Používáním
+        služby souhlasíte s těmito podmínkami.
+      </p>
+      <p>
+        MedScopeGlobal není spřízněn s Medscape, WebMD ani jinými zahraničními portály se
+        podobným názvem. Podrobnosti o značce a duševním vlastnictví:{" "}
+        <Link href="/znacka">Značka a IP</Link>.
       </p>
 
       <h2>2. Předplatné a platby</h2>
@@ -50,8 +60,14 @@ export default function TermsPage() {
       <h2>5. Reklamace</h2>
       <p>
         Reklamace předplatného nebo technických problémů zasílejte na{" "}
-        <a href="mailto:support@medscopeglobal.com">support@medscopeglobal.com</a>. Vyřízení do
-        14 pracovních dnů.
+        <a href={`mailto:${entity.supportEmail}`}>{entity.supportEmail}</a>
+        {entity.supportPhone ? (
+          <>
+            {" "}
+            nebo na {entity.supportPhone}
+          </>
+        ) : null}
+        . Vyřízení do 14 pracovních dnů.
       </p>
 
       <h2>6. Ukončení služby</h2>
@@ -79,6 +95,19 @@ export default function TermsPage() {
         v rámci platného účtu a nesmí jej bez písemného souhlasu šířit, stahovat hromadně ani
         komerčně využívat. Záložní nebo externí ukázková videa (např. z CDN třetích stran) jsou
         použita pouze pro technickou ukázku přehrávání — zdroj je u přehrávače vždy uveden.
+      </p>
+
+      <h2>8. Značka, doména a duševní vlastnictví</h2>
+      <p>
+        Označení MedScopeGlobal, doména {entity.domain}, obsah, design a software rozhraní jsou
+        chráněny právem duševního vlastnictví a právem nekalé soutěže. Uživatel nezískává licenci
+        k užívání značky mimo běžné citace s uvedením zdroje. Zakazuje se matoucí používání
+        označení, které by mohlo vyvolat dojem afilace s Medscape, WebMD nebo jinými třetími
+        stranami.
+      </p>
+      <p>
+        Rozhodné právo: právní řád České republiky. Příslušnost soudů: soudy ČR, není-li
+        kogentní úpravou stanoveno jinak (zejm. u spotřebitelů).
       </p>
     </LegalPageLayout>
   );
