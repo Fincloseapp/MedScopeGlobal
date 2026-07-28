@@ -6,19 +6,20 @@ import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Značka a ochrana duševního vlastnictví",
-  description:
-    "MedScopeGlobal — prohlášení o značce, autorských právech a nezávislosti na Medscape, WebMD a dalších zahraničních portálech.",
+  description: "MedScopeGlobal — prohlášení o značce, autorských právech a nezávislosti na Medscape, WebMD a dalších zahraničních portálech.",
   path: "/znacka",
 });
 
 export default function BrandLegalPage() {
   const entity = getLegalEntity();
   const complete = isLegalEntityComplete(entity);
+  const mailHref = (email: string) => "mailto:" + email;
+  const telHref = (phone: string) => "tel:" + phone.replace(/\s/g, "");
 
   return (
     <LegalPageLayout
-      title="Značka a ochrana duševního vlastnictví"
-      description="Právní postavení značky MedScopeGlobal, domény medscopeglobal.com a oddělení od zahraničních medicínských portálů."
+      title={"Značka a ochrana duševního vlastnictví"}
+      description={"Právní postavení značky MedScopeGlobal, domény medscopeglobal.com a oddělení od zahraničních medicínských portálů."}
     >
       <h2>1. Provozovatel a označení</h2>
       <p>
@@ -28,7 +29,7 @@ export default function BrandLegalPage() {
           <>
             {" "}
             (IČO {entity.ico}
-            {entity.dic ? `, DIČ ${entity.dic}` : ""})
+            {entity.dic ? ", DIČ " + entity.dic : ""})
           </>
         ) : null}
         {entity.courtFile ? <>, sp. zn. {entity.courtFile}</> : null}
@@ -41,11 +42,11 @@ export default function BrandLegalPage() {
       </p>
       <p>
         Zákaznická podpora:{" "}
-        <a href={mailto:}>{entity.supportEmail}</a>
+        <a href={mailHref(entity.supportEmail)}>{entity.supportEmail}</a>
         {entity.supportPhone ? (
           <>
             {" "}
-            · <a href={	el:}>{entity.supportPhone}</a>
+            · <a href={telHref(entity.supportPhone)}>{entity.supportPhone}</a>
           </>
         ) : null}
         .
@@ -53,6 +54,7 @@ export default function BrandLegalPage() {
       {!complete && (
         <p>
           <em>
+            
             Úplná identifikace provozovatele musí být doplněna v LEGAL_ENTITY_*.
           </em>
         </p>
@@ -109,8 +111,8 @@ export default function BrandLegalPage() {
       </p>
       <p>
         Právní kontakt:{" "}
-        <a href={mailto:}>{entity.legalEmail}</a>. Obecné dotazy:{" "}
-        <a href={mailto:}>{entity.supportEmail}</a>.
+        <a href={mailHref(entity.legalEmail)}>{entity.legalEmail}</a>. Obecné dotazy:{" "}
+        <a href={mailHref(entity.supportEmail)}>{entity.supportEmail}</a>.
       </p>
 
       <h2>6. Související dokumenty</h2>
