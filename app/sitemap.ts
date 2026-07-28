@@ -27,6 +27,7 @@ const staticRoutes: MetadataRoute.Sitemap = [
   { url: `${base}/terms`, changeFrequency: "yearly", priority: 0.3 },
   { url: `${base}/privacy`, changeFrequency: "yearly", priority: 0.3 },
   { url: `${base}/znacka`, changeFrequency: "yearly", priority: 0.4 },
+  { url: `${base}/pravni-checklist`, changeFrequency: "yearly", priority: 0.35 },
   { url: `${base}/o-nas`, changeFrequency: "monthly", priority: 0.5 },
 ];
 

@@ -55,7 +55,8 @@ export function invoiceHtmlToPdfBase64(params: {
   totalLabel: string;
 }): string {
   const lines = [
-    "MedScopeGlobal s.r.o. — Faktura",
+    "Al Synaptica Research Institute s.r.o. — MedScopeGlobal",
+    "ICO 06024963 — neplatce DPH",
     `Cislo: ${params.transactionId}`,
     `Datum: ${params.issuedAtLabel}`,
     `Odberatel: ${params.customerName}`,

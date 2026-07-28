@@ -1,4 +1,5 @@
 import { invoiceHtmlToPdfBase64 } from "@/lib/billing/simple-pdf";
+import { getLegalEntity } from "@/lib/config/legal-entity";
 
 export interface InvoiceLineItem {
   description: string;
@@ -10,6 +11,7 @@ export interface InvoiceInput {
   customerEmail: string;
   customerName?: string;
   lineItems: InvoiceLineItem[];
+  /** Default 0 — provozovatel je dle ARES neplátce DPH. */
   vatRate?: number;
   issuedAt?: Date;
 }
@@ -36,12 +38,22 @@ function formatDate(d: Date): string {
 }
 
 export function generateInvoiceHtml(input: InvoiceInput): InvoiceDocument {
+  const entity = getLegalEntity();
   const issuedAt = input.issuedAt ?? new Date();
-  const vatRate = input.vatRate ?? 21;
+  // Neplátce DPH (ARES) — defaultně bez DPH.
+  const vatRate = input.vatRate ?? 0;
   const subtotalCzk = input.lineItems.reduce((s, i) => s + i.amountCzk, 0);
   const vatCzk = Math.round(subtotalCzk * (vatRate / 100));
   const totalCzk = subtotalCzk + vatCzk;
   const customerName = input.customerName?.trim() || input.customerEmail;
+  const supplierLine = [
+    entity.name,
+    entity.ico ? `IČO ${entity.ico}` : null,
+    entity.dic ? `DIČ ${entity.dic}` : "neplátce DPH",
+    entity.address,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   const rows = input.lineItems
     .map(
@@ -55,7 +67,8 @@ export function generateInvoiceHtml(input: InvoiceInput): InvoiceDocument {
 <head><meta charset="utf-8"><title>Faktura ${input.transactionId}</title></head>
 <body style="font-family:system-ui,sans-serif;color:#021d33;max-width:640px;margin:0 auto;padding:24px">
   <header style="border-bottom:3px solid #005B96;padding-bottom:16px;margin-bottom:24px">
-    <h1 style="margin:0;font-size:24px;color:#005B96">MedScopeGlobal s.r.o.</h1>
+    <h1 style="margin:0;font-size:24px;color:#005B96">${entity.tradeName}</h1>
+    <p style="margin:4px 0 0;color:#64748b;font-size:13px">${supplierLine}</p>
     <p style="margin:4px 0 0;color:#64748b;font-size:13px">Faktura č. ${input.transactionId}</p>
   </header>
   <p><strong>Datum vystavení:</strong> ${formatDate(issuedAt)}</p>
@@ -66,11 +79,11 @@ export function generateInvoiceHtml(input: InvoiceInput): InvoiceDocument {
   </table>
   <table style="width:100%;max-width:280px;margin-left:auto;font-size:14px">
     <tr><td>Základ</td><td style="text-align:right">${formatCzk(subtotalCzk)}</td></tr>
-    <tr><td>DPH ${vatRate} %</td><td style="text-align:right">${formatCzk(vatCzk)}</td></tr>
+    <tr><td>${vatRate > 0 ? `DPH ${vatRate} %` : "DPH (neplátce)"}</td><td style="text-align:right">${formatCzk(vatCzk)}</td></tr>
     <tr style="font-weight:bold;font-size:16px"><td>Celkem</td><td style="text-align:right;color:#005B96">${formatCzk(totalCzk)}</td></tr>
   </table>
   <footer style="margin-top:32px;padding-top:16px;border-top:1px solid #e2e8f0;font-size:12px;color:#64748b">
-  <p>MedScopeGlobal · info@medscopeglobal.com · https://medscopeglobal.com</p>
+  <p>${entity.tradeName} · ${entity.supportEmail} · https://${entity.domain}</p>
   </footer>
 </body></html>`;
 

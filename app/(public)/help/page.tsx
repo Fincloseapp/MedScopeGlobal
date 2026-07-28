@@ -25,7 +25,7 @@ const FAQ = [
   },
   {
     q: "Jak kontaktovat podporu?",
-    a: "Napište na support@medscopeglobal.com nebo využijte kontaktní formulář.",
+    a: "Napište na info@medscopeglobal.com, volejte +420 736 532 952, nebo využijte kontaktní formulář.",
   },
 ];
 

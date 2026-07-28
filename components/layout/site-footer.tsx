@@ -122,6 +122,11 @@ export async function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/pravni-checklist" className="hover:text-foreground">
+                Právní checklist
+              </Link>
+            </li>
+            <li>
               <Link href="/kontakt" className="hover:text-foreground">
                 Kontakt
               </Link>
