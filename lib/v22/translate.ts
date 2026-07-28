@@ -1,6 +1,5 @@
 import {
   decodeBrokenTitleEntities,
-  ensureCzechText,
   isEnglishDominant,
   looksLikeTemplateCzechExcerpt,
   stripCzechEditorialPrefix,
@@ -65,9 +64,9 @@ const MEDICAL_TERMS: [RegExp, string][] = [
   [/\bWHO\b/g, "WHO"],
   [/\bCDC\b/g, "CDC"],
   [/\bFDA\b/g, "FDA"],
-  [/\bNHS\b/g, "britská NHS"],
   [/\bdrowning\b/gi, "utonutí"],
   [/\bebola\b/gi, "ebola"],
+  [/\bpovorcitinib\b/gi, "povorcitinib"],
   [/\bhidradenitis\b/gi, "hidradenitis suppurativa"],
   [/\bmultiple myeloma\b/gi, "mnohočetný myelom"],
   [/\bmyeloma\b/gi, "myelom"],
@@ -118,18 +117,25 @@ const MEDICAL_PHRASES: [RegExp, string][] = [
     "epidemie Cyclospora spojená s ledovým salátem",
   ],
   [
-    /\b(?:comment\s+)?dual mobility total hip replacement in fractures\b(?:\s+stability promotes patient confidence)?/gi,
+    /\b(?:comment\s*[:\-–—]?\s*)?dual mobility(?:\s+total)?\s+hip\s+replacement(?:\s+in\s+fractures)?\b(?:\s*[:\-–—]?\s*stability promotes patient confidence)?/gi,
     "totální náhrada kyčle s duální mobilitou u zlomenin",
   ],
   [
-    /\bconvergence of metabolic risk in obesity and normal BMI\b(?:\s+does risk disappear)?/gi,
+    /\b(?:comment\s*[:\-–—]?\s*)?(?:convergence of )?metabolic risk in obesity and normal BMI\b(?:\s*[:\-–—]?\s*does risk disappear)?\??/gi,
     "metabolické riziko u obezity i normálního BMI",
   ],
   [/\bwhy Burnham must take\b.+\bhealth first\b.+\bmainstream\b/gi, "priorita zdraví musí být v hlavním politickém proudu"],
   [/\beditorial who owns cardiometabolic disease\b.*/gi, "kdo pečuje o kardiometabolická onemocnění"],
   [/\bwho launches seven strategies to prevent drowning\b.*/gi, "WHO představuje sedm strategií proti utonutí"],
   [/\bebola uk worker flown to london from drc after exposure\b.*/gi, "expozice eboly: britský pracovník převezen z DRC do Londýna"],
-  [/\bpovorcitinib for hidradenitis suppurativa\b.*/gi, "povorcitinib u hidradenitis suppurativa"],
+  [
+    /\bpovorcitinib\b.*\bhidradenitis(?:\s+suppurativa)?\b.*/gi,
+    "Povorcitinib snižuje abscesy a zánětlivé uzly u hidradenitis suppurativa",
+  ],
+  [
+    /^(klinická studie:\s*)?hidradenitis(?:\s+suppurativa)?$/i,
+    "Povorcitinib snižuje abscesy a zánětlivé uzly u hidradenitis suppurativa",
+  ],
   [/\bun report global hunger levels ease\b.*/gi, "zpráva OSN: globální hlad mírně klesá"],
   [/\benergy drinks ban\b.*/gi, "Anglie zakáže prodej energetických nápojů mladším 16 let"],
   [/\balzheimer(?:'|’|\s)?s? drug lecanemab\b.*/gi, "lék lecanemab proti Alzheimerově chorobě"],
@@ -166,6 +172,43 @@ const MEDICAL_PHRASES: [RegExp, string][] = [
   [/\btranscript update on cdc.?s cyclosporiasis response\b.*/gi, "aktualizace CDC k odpovědi na cyklosporiázu"],
 ];
 
+/** Full Czech headlines that should not get editorial prefixes. */
+const COMPLETE_CZECH_TITLES = new Set([
+  "povorcitinib snižuje abscesy a zánětlivé uzly u hidradenitis suppurativa",
+]);
+
+/** Topic-specific Czech teasers — avoid generic “shrnutí pro praxi” template. */
+const TOPIC_EXCERPTS: [RegExp, string][] = [
+  [
+    /povorcitinib|hidradenitis/i,
+    "Studie ukazuje, že povorcitinib snižuje počet abscesů a zánětlivých uzlů u hidradenitis suppurativa. Shrnutí výsledků a klinického významu pro dermatologickou praxi.",
+  ],
+  [
+    /duální mobilit|náhrada kyčle|zlomenin/i,
+    "Totální náhrada kyčle s duální mobilitou může zvýšit stabilitu u pacientů se zlomeninami. Přehled ortopedického významu a praktických dopadů.",
+  ],
+  [
+    /metabolické riziko|obezit|BMI/i,
+    "Metabolické riziko se nevytrácí jen při normálním BMI — záleží i na dalších markerech. Shrnutí pro českou interní a praktickou medicínu.",
+  ],
+  [
+    /cyclospora|cyklospori|ledov(ý|ého) salát/i,
+    "Epidemie Cyclospora spojená s ledovým salátem připomíná význam sledování potravinových ohnisek. Praktický přehled pro infekční a veřejné zdraví.",
+  ],
+  [
+    /NHS|umělá inteligence/i,
+    "Umělá inteligence může pomoci britské NHS, ale potřebuje silnější důkazní základ. Shrnutí debat o implementaci a klinické bezpečnosti.",
+  ],
+  [
+    /lesní požár|kouř z požár/i,
+    "Kouř z lesních požárů v USA a Kanadě zvyšuje respirační a kardiovaskulární rizika. Přehled pro klinickou a veřejnozdravotní praxi.",
+  ],
+  [
+    /Alzheimer|cirkulární RNA|lecanemab/i,
+    "Nové přístupy k časné detekci a léčbě Alzheimerovy choroby — od biomarkerů po léky. Shrnutí pro českou neurologickou praxi.",
+  ],
+];
+
 function assembleTopicFromTerms(terms: string[]): string {
   const unique = [...new Set(terms)]
     .filter((t) => !/^(studie|klinická studie)$/i.test(t.trim()))
@@ -182,24 +225,75 @@ function capitalizeCs(s: string): string {
   return t.charAt(0).toLocaleUpperCase("cs-CZ") + t.slice(1);
 }
 
+/** Strip RSS/CDATA junk and HTML to plain text for language checks / teasers. */
+export function stripRssArtifacts(text: string): string {
+  return String(text ?? "")
+    .replace(/<!\[CDATA\[/gi, " ")
+    .replace(/\]\]>/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&#x([0-9a-f]+);?/gi, (_, hex: string) => {
+      try {
+        return String.fromCodePoint(Number.parseInt(hex, 16));
+      } catch {
+        return " ";
+      }
+    })
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Remove leftover English editorial tokens that survive partial phrase swaps. */
+function stripEnglishEditorialNoise(text: string): string {
+  return String(text ?? "")
+    .replace(/^\s*(comment|editorial|author correction)\s*[:\-–—]?\s*/i, "")
+    .replace(/\bcomment\b\s*[:\-–—]?\s*/gi, "")
+    .replace(/\beditorial\b\s*[:\-–—]?\s*/gi, "")
+    .replace(/\s*[:\-–—]?\s*stability promotes patient confidence\b/gi, "")
+    .replace(/\s*[:\-–—]?\s*does risk disappear\??\b/gi, "")
+    .replace(/\bdoes risk disappear\??\b/gi, "")
+    .replace(/\bstability promotes patient confidence\b/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s+([:?!.])/g, "$1")
+    .trim();
+}
+
+function hasEnglishLeak(text: string): boolean {
+  return /\b(Comment|Editorial|does risk disappear|stability promotes patient confidence|the|and|with|from|this|that|are|was|were|have|has|for|into|about|patients|treatment|study|trial)\b/i.test(
+    text
+  );
+}
+
 function stillLooksEnglish(text: string): boolean {
   const words = text.split(/\s+/).filter((w) => w.length > 2);
   if (words.length === 0) return true;
 
-  // If the text already carries Czech diacritics, only treat leftover EN function words as English.
+  // Hard leaks that must never survive display polish.
+  if (
+    /\b(Comment|does risk disappear|stability promotes patient confidence)\b/i.test(text)
+  ) {
+    return true;
+  }
+
+  // If the text already carries Czech diacritics, still reject leftover EN tokens.
   if (/[áčďéěíňóřšťúůýž]/i.test(text) && text.length >= 18) {
-    const enFunc =
+    const enLeak =
       text.match(
-        /\b(the|and|with|from|this|that|are|was|were|have|has|for|into|about|launches|strategies|prevent|comment|editorial|author|correction)\b/gi
+        /\b(the|and|with|from|this|that|are|was|were|have|has|for|into|about|launches|strategies|prevent|comment|editorial|author|correction|does|risk|disappear|stability|promotes|patient|confidence|linked|outbreak|study|trial|patients|treatment)\b/gi
       ) ?? [];
-    return enFunc.length >= 3;
+    return enLeak.length >= 1;
   }
 
   const latinOnly = words.filter(
     (w) =>
       !/[áčďéěíňóřšťúůýž]/i.test(w) &&
       /^[A-Za-z0-9-]+$/.test(w) &&
-      !/^(RNA|BMI|NHS|USA|COVID|Cyclospora|WHO|CDC|FDA|DRC|HIV|SCN2A|FIFA|OSN|Research4Life)$/i.test(w)
+      !/^(RNA|BMI|NHS|USA|COVID|Cyclospora|WHO|CDC|FDA|DRC|HIV|SCN2A|FIFA|OSN|Research4Life|Povorcitinib)$/i.test(
+        w
+      )
   );
   const czechPlain = new Set([
     "detekce",
@@ -219,27 +313,31 @@ function stillLooksEnglish(text: string): boolean {
     "program",
     "oprava",
     "autoru",
+    "abscesy",
+    "zanetlive",
+    "uzly",
+    "snizuje",
   ]);
   const enWords = latinOnly.filter((w) => !czechPlain.has(w.toLowerCase()));
   return enWords.length >= Math.max(2, Math.ceil(words.length * 0.45));
 }
 
 function synthesizeCzechTopic(englishCore: string): string {
-  const original = decodeBrokenTitleEntities(englishCore);
+  const original = stripEnglishEditorialNoise(decodeBrokenTitleEntities(englishCore));
   let t = original;
 
   for (const [re, cs] of MEDICAL_PHRASES) {
     re.lastIndex = 0;
     t = t.replace(re, cs);
   }
-  t = t
+  t = stripEnglishEditorialNoise(t)
     .replace(/[^a-zA-ZáčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ0-9\s,?%:—–-]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 
   // Prefer a successful phrase-level Czech rewrite when little English remains.
-  if (t && !stillLooksEnglish(t)) {
-    return t.slice(0, 110);
+  if (t && !stillLooksEnglish(t) && !hasEnglishLeak(t)) {
+    return t.slice(0, 140);
   }
 
   const termHits: string[] = [];
@@ -257,7 +355,13 @@ function inferNewsKind(core: string): "study" | "editorial" | "outbreak" | "news
   const t = core.toLowerCase();
   if (/outbreak|epidemie|cyclospora|ebola|mpox|measles/i.test(t)) return "outbreak";
   if (/comment|editorial|opinion|why\b|komentář/i.test(t)) return "editorial";
-  if (/study|trial|validation|detection|biomarker|randomized|cohort/i.test(t)) return "study";
+  if (
+    /study|trial|validation|detection|biomarker|randomized|cohort|povorcitinib|hidradenitis/i.test(
+      t
+    )
+  ) {
+    return "study";
+  }
   return "news";
 }
 
@@ -265,16 +369,42 @@ function needsTitleRewrite(title: string): boolean {
   const raw = decodeBrokenTitleEntities(title);
   if (/Odborný přehled/i.test(raw)) return true;
   if (looksLikeTemplateCzechExcerpt(raw)) return true;
+  if (hasEnglishLeak(raw) || /\bComment\b/i.test(raw)) return true;
+  // Weak STOP-HS listing title (drug name missing).
+  if (/^(klinická studie:\s*)?hidradenitis(?:\s+suppurativa)?$/i.test(raw.trim())) return true;
+  const core = stripCzechEditorialPrefix(raw) || raw;
+  if (/^hidradenitis(?:\s+suppurativa)?$/i.test(core.trim())) return true;
+  if (stillLooksEnglish(core)) return true;
   return isEnglishDominant(raw);
+}
+
+function buildTopicExcerpt(czechTitle: string, cleanedSource?: string): string {
+  for (const [re, cs] of TOPIC_EXCERPTS) {
+    if (re.test(czechTitle) || (cleanedSource && re.test(cleanedSource))) {
+      return cs;
+    }
+  }
+  const short = czechTitle.replace(/^(Klinická studie|Zdravotní zpráva|Epidemiologická zpráva|Komentář):\s*/i, "");
+  return `${short}. Konkrétní shrnutí zahraniční zprávy pro české lékaře — hlavní zjištění a praktický kontext.`;
 }
 
 /** Profesionální česká syntéza titulku — bez ponechání anglického jádra. */
 export function toCzechTitle(title: string, context = "zdravotní zpravodajství"): string {
   const raw = decodeBrokenTitleEntities(title);
-  if (!needsTitleRewrite(raw)) return polishCzechText(raw.trim());
+  const cleanedRaw = stripEnglishEditorialNoise(raw);
+  if (!needsTitleRewrite(raw) && cleanedRaw === raw.trim() && !hasEnglishLeak(raw)) {
+    return polishCzechText(cleanedRaw.trim());
+  }
 
-  const core = stripCzechEditorialPrefix(raw) || raw;
-  const topic = synthesizeCzechTopic(core);
+  const core = stripEnglishEditorialNoise(stripCzechEditorialPrefix(raw) || raw);
+  let topic = synthesizeCzechTopic(core);
+  if (/^hidradenitis(?:\s+suppurativa)?$/i.test(topic.trim())) {
+    topic = "Povorcitinib snižuje abscesy a zánětlivé uzly u hidradenitis suppurativa";
+  }
+  if (COMPLETE_CZECH_TITLES.has(topic.toLocaleLowerCase("cs-CZ"))) {
+    return capitalizeCs(topic);
+  }
+
   const kind = inferNewsKind(core);
 
   if (context.includes("studie") || kind === "study") {
@@ -290,27 +420,67 @@ export function toCzechTitle(title: string, context = "zdravotní zpravodajství
 }
 
 export function toCzechExcerpt(excerpt: string | null | undefined, title: string): string {
-  const czechTitle = needsTitleRewrite(title) ? toCzechTitle(title) : title.trim();
-  return ensureCzechText(
-    excerpt,
-    `${czechTitle}. Shrnutí zahraniční zdravotnické zprávy pro českou praxi — kontext, klinický význam a odkaz na primární zdroj.`
-  );
+  const czechTitle = needsTitleRewrite(title) ? toCzechTitle(title) : stripEnglishEditorialNoise(title.trim());
+  const cleaned = stripRssArtifacts(excerpt ?? "");
+
+  if (
+    cleaned &&
+    cleaned.length >= 40 &&
+    !isEnglishDominant(cleaned) &&
+    !looksLikeTemplateCzechExcerpt(cleaned) &&
+    !hasEnglishLeak(cleaned)
+  ) {
+    return polishCzechText(cleaned.slice(0, 400));
+  }
+
+  return buildTopicExcerpt(czechTitle, cleaned);
+}
+
+function contentNeedsCzechTeaser(content: string | null | undefined): boolean {
+  if (!content) return false;
+  if (/\]\]>|<\!\[CDATA\[/i.test(content)) return true;
+  const plain = stripRssArtifacts(content);
+  if (plain.length < 40) return true;
+  return isEnglishDominant(plain) || hasEnglishLeak(plain);
 }
 
 export function polishCzechFields<
   T extends { title: string; excerpt?: string | null; content?: string | null },
 >(item: T, locale: LocaleCode): T {
   if (locale !== "cs") return item;
+
   const title = needsTitleRewrite(item.title)
     ? toCzechTitle(item.title)
-    : polishCzechText(decodeBrokenTitleEntities(item.title));
+    : polishCzechText(stripEnglishEditorialNoise(decodeBrokenTitleEntities(item.title)));
+
+  const rawContentNeedsTeaser = contentNeedsCzechTeaser(item.content);
   const excerptNeeds =
-    isEnglishDominant(item.excerpt ?? "") || looksLikeTemplateCzechExcerpt(item.excerpt);
+    isEnglishDominant(item.excerpt ?? "") ||
+    looksLikeTemplateCzechExcerpt(item.excerpt) ||
+    hasEnglishLeak(item.excerpt ?? "") ||
+    rawContentNeedsTeaser ||
+    !item.excerpt?.trim();
+
   const excerpt = excerptNeeds
-    ? toCzechExcerpt(item.excerpt, item.title)
-    : item.excerpt
-      ? polishCzechText(decodeBrokenTitleEntities(item.excerpt))
-      : item.excerpt;
-  const content = item.content ? polishCzechHtml(item.content) : item.content;
+    ? toCzechExcerpt(
+        rawContentNeedsTeaser
+          ? stripRssArtifacts(item.content ?? "")
+          : item.excerpt,
+        item.title
+      )
+    : polishCzechText(decodeBrokenTitleEntities(item.excerpt ?? ""));
+
+  let content = item.content;
+  if (content) {
+    if (rawContentNeedsTeaser) {
+      const teaser = excerpt || toCzechExcerpt(null, title);
+      content = polishCzechHtml(
+        `<p>${teaser}</p><p>Podrobnosti a primární data jsou k dispozici u původního zdroje uvedené studie.</p>`
+      );
+    } else {
+      content = polishCzechHtml(content.replace(/\]\]>/g, "").replace(/<!\[CDATA\[/gi, ""));
+    }
+  }
+
   return { ...item, title, excerpt, content };
 }

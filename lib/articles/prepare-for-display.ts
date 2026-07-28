@@ -107,6 +107,20 @@ export async function prepareArticleForDisplay(
   );
 
   if (!translated) {
+    if (locale === "cs") {
+      // English / mismatched locale: still polish so RSS CDATA bodies get a Czech teaser.
+      const polished = polishCzechFields(base, "cs");
+      return attachEditorialDisplay(base, locale, {
+        title: polished.title,
+        excerpt: polished.excerpt,
+        content:
+          mode === "full"
+            ? enrichArticleBodyForDisplay({ ...polished, content: polished.content ?? base.content })
+            : polished.content ?? base.content,
+        displayLocale: target,
+        translatedFrom: base.locale ?? "en",
+      });
+    }
     return attachEditorialDisplay(base, locale, {
       displayLocale: base.locale ?? undefined,
       translatedFrom: base.locale ?? "en",
@@ -163,6 +177,18 @@ export async function prepareArticlesForDisplay(
       translated++;
     } else if (matchesArticleLocale(article.locale, locale)) {
       out.push(await prepareArticleForDisplay(article, locale, mode));
+    } else if (locale === "cs") {
+      const withCat = await applyCategoryLabels(article, locale);
+      const polished = polishCzechFields(withCat, "cs");
+      out.push(
+        attachEditorialDisplay(withCat, locale, {
+          title: polished.title,
+          excerpt: polished.excerpt,
+          content: polished.content,
+          displayLocale: targetLocaleOrUndefined(withCat.locale),
+          translatedFrom: withCat.locale ?? null,
+        })
+      );
     } else {
       const withCat = await applyCategoryLabels(article, locale);
       out.push(
@@ -174,4 +200,8 @@ export async function prepareArticlesForDisplay(
     }
   }
   return out;
+}
+
+function targetLocaleOrUndefined(locale: string | null | undefined): string | undefined {
+  return locale ?? undefined;
 }

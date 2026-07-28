@@ -21,6 +21,8 @@ import { isEnglishDominantTitle } from "@/lib/v26/editorial-prompts.mjs";
 import {
   isEnglishDominant,
   looksLikeTemplateCzechExcerpt,
+  polishCzechFields,
+  stripRssArtifacts,
   toCzechExcerpt,
   toCzechTitle,
 } from "@/lib/v22/translate";
@@ -31,19 +33,21 @@ async function ensureCzechFields(input: {
   title: string;
   excerpt: string;
   content: string;
-}): Promise<{ title: string; excerpt: string }> {
-  let title = input.title;
-  let excerpt = input.excerpt;
+}): Promise<{ title: string; excerpt: string; content: string }> {
+  let title = stripRssArtifacts(input.title);
+  let excerpt = stripRssArtifacts(input.excerpt);
+  let content = input.content.replace(/<!\[CDATA\[/gi, "").replace(/\]\]>/g, "");
 
   const titleBad =
     isEnglishDominant(title) ||
     isEnglishDominantTitle(title) ||
-    /Odborný přehled/i.test(title);
+    /Odborný přehled/i.test(title) ||
+    /\b(Comment|does risk disappear|stability promotes)\b/i.test(title);
 
   if (titleBad) {
     const translated = await generateTextFromLlm({
       system:
-        "Přelož medicínský titulek zdravotní zprávy do češtiny. Vrať pouze přeložený titulek — srozumitelná čeština, max 110 znaků, bez uvozovek a bez angličtiny.",
+        "Přelož medicínský titulek zdravotní zprávy do češtiny. Vrať pouze přeložený titulek — srozumitelná čeština, max 110 znaků, bez uvozovek a bez angličtiny. Nikdy neponechávej slova Comment, Editorial ani anglické věty.",
       user: title.replace(/^Odborný přehled[^:]*:\s*/i, "").trim() || title,
       maxTokens: 200,
       temperature: 0.2,
@@ -51,7 +55,8 @@ async function ensureCzechFields(input: {
     if (
       translated?.trim() &&
       !isEnglishDominant(translated) &&
-      !isEnglishDominantTitle(translated)
+      !isEnglishDominantTitle(translated) &&
+      !/\b(Comment|does risk disappear)\b/i.test(translated)
     ) {
       title = translated.trim().slice(0, 300);
     } else {
@@ -62,24 +67,35 @@ async function ensureCzechFields(input: {
   const excerptBad =
     isEnglishDominant(excerpt) ||
     looksLikeTemplateCzechExcerpt(excerpt) ||
-    isEnglishDominantTitle(excerpt);
+    isEnglishDominantTitle(excerpt) ||
+    !excerpt.trim();
 
   if (excerptBad) {
     const translatedExcerpt = await generateTextFromLlm({
       system:
-        "Napiš český perex (2 věty) k zdravotní zprávě. Odborný, konkrétní tón, bez šablonových frází redakce a bez angličtiny.",
-      user: `Titulek: ${title}\nPůvodní perex: ${excerpt}\nObsah:\n${input.content.slice(0, 900)}`,
+        "Napiš český perex (2 věty) k zdravotní zprávě. Odborný, konkrétní tón, bez šablonových frází redakce a bez angličtiny. Nezačínej generickým „Shrnutí zahraniční…“.",
+      user: `Titulek: ${title}\nPůvodní perex: ${excerpt}\nObsah:\n${stripRssArtifacts(content).slice(0, 900)}`,
       maxTokens: 280,
       temperature: 0.3,
     });
-    if (translatedExcerpt?.trim() && !isEnglishDominant(translatedExcerpt)) {
+    if (
+      translatedExcerpt?.trim() &&
+      !isEnglishDominant(translatedExcerpt) &&
+      !looksLikeTemplateCzechExcerpt(translatedExcerpt)
+    ) {
       excerpt = translatedExcerpt.trim().slice(0, 500);
     } else {
       excerpt = toCzechExcerpt(null, title);
     }
   }
 
-  return { title, excerpt };
+  // Hard Czech-only pass for display-quality fields.
+  const polished = polishCzechFields({ title, excerpt, content }, "cs");
+  return {
+    title: polished.title,
+    excerpt: polished.excerpt ?? excerpt,
+    content: polished.content ?? content,
+  };
 }
 
 export async function rewriteToV26Standard(
@@ -91,7 +107,7 @@ export async function rewriteToV26Standard(
   const system = buildV26SystemPrompt(audience, persona, input.topic);
   const user = `${buildV26UserPrompt({ ...input, persona })}
 
-DŮLEŽITÉ: Titulek i perex musí být výhradně v češtině. Neponechávej anglické věty ani hybridní „Odborný přehled: English title“.`;
+DŮLEŽITÉ: Titulek, perex i tělo musí být výhradně v češtině. Neponechávej anglické věty, CDATA/]]> ani hybridní „Odborný přehled: English title“ / „Comment …“.`;
 
   try {
     const raw = await generateJsonFromLlm({ system, user, maxTokens: 5000, temperature: 0.35 });
@@ -116,6 +132,7 @@ DŮLEŽITÉ: Titulek i perex musí být výhradně v češtině. Neponechávej a
         excerpt: (parsed.excerpt ?? input.excerpt ?? input.title).slice(0, 500),
         content: content || input.content,
       });
+      content = ensured.content;
 
       if (!validation.ok) {
         content = wrapContentInV26Structure({
@@ -146,7 +163,13 @@ DŮLEŽITÉ: Titulek i perex musí být výhradně v češtině. Neponechávej a
     console.warn("v26 rewrite LLM failed", e);
   }
 
-  return buildFallbackRewrite({ ...input, persona });
+  const fallback = buildFallbackRewrite({ ...input, persona });
+  const ensuredFallback = await ensureCzechFields({
+    title: fallback.title,
+    excerpt: fallback.excerpt,
+    content: fallback.content,
+  });
+  return { ...fallback, ...ensuredFallback };
 }
 
 export function applyPersonaToWriterName(persona: AuthorPersona, topic?: string | null): string {

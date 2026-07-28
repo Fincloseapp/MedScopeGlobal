@@ -5,6 +5,8 @@ import { rewriteToV26Standard } from "@/lib/v26/rewrite-engine";
 import { isEnglishDominantTitle } from "@/lib/v26/editorial-prompts.mjs";
 import {
   isEnglishDominant,
+  polishCzechFields,
+  stripRssArtifacts,
   toCzechExcerpt,
   toCzechTitle,
 } from "@/lib/v22/translate";
@@ -72,7 +74,8 @@ export async function runV26ForeignNewsIngest(options?: {
       for (const item of items) {
         if (created >= maxArticles) break;
 
-        const hash = buildHash(item.title, item.link, item.description);
+        const cleanDescription = stripRssArtifacts(item.description);
+        const hash = buildHash(item.title, item.link, cleanDescription);
         const { data: existing } = await admin
           .from("articles")
           .select("id")
@@ -91,8 +94,8 @@ export async function runV26ForeignNewsIngest(options?: {
 
         const rewritten = await rewriteToV26Standard({
           title: item.title,
-          excerpt: item.description.slice(0, 400),
-          content: `<p>${item.description}</p><p><a href="${item.link}">Původní zdroj: ${src.name}</a></p>`,
+          excerpt: cleanDescription.slice(0, 400),
+          content: `<p>${cleanDescription}</p><p>Původní zdroj: ${src.name}</p>`,
           audience: src.minAccessLevel === "physician" ? "physician" : "public",
           sourceCitation: { name: src.name, url: item.link, originalTitle: item.title },
           seed: item.link,
@@ -101,12 +104,28 @@ export async function runV26ForeignNewsIngest(options?: {
         // Hard guard: never persist English/hybrid titles into Czech news section.
         let title = rewritten.title;
         let excerpt = rewritten.excerpt;
-        if (isEnglishDominantTitle(title) || isEnglishDominant(title) || /Odborný přehled/i.test(title)) {
+        let content = rewritten.content;
+        if (
+          isEnglishDominantTitle(title) ||
+          isEnglishDominant(title) ||
+          /Odborný přehled/i.test(title) ||
+          /\b(Comment|does risk disappear)\b/i.test(title)
+        ) {
           title = toCzechTitle(title, "zdravotní zpravodajství");
         }
-        if (isEnglishDominant(excerpt) || /profesionální shrnutí|evidence-based přístup/i.test(excerpt)) {
-          excerpt = toCzechExcerpt(null, title);
+        if (
+          isEnglishDominant(excerpt) ||
+          /profesionální shrnutí|evidence-based přístup|Shrnutí zahraniční zdravotnické zprávy pro českou praxi/i.test(
+            excerpt
+          )
+        ) {
+          excerpt = toCzechExcerpt(cleanDescription, title);
         }
+
+        const polished = polishCzechFields({ title, excerpt, content }, "cs");
+        title = polished.title;
+        excerpt = polished.excerpt ?? excerpt;
+        content = polished.content ?? content;
 
         let slug = slugify(`zpravy-${title}`).slice(0, 100);
         const { data: slugClash } = await admin.from("articles").select("id").eq("slug", slug).maybeSingle();
@@ -121,12 +140,13 @@ export async function runV26ForeignNewsIngest(options?: {
             url: item.link,
             originalTitle: item.title,
           },
+          czech_only: true,
         });
 
         const payload = {
           title,
           slug,
-          content: rewritten.content,
+          content,
           excerpt,
           summary: excerpt,
           category_id: categoryId,
