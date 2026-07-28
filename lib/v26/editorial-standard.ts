@@ -36,6 +36,8 @@ export interface V26ArticleMetadata {
   rewritten_at?: string;
   rewritten_from_boilerplate?: boolean;
   rewrite_reasons?: string[];
+  /** Ingested foreign news rewritten to Czech-only display fields. */
+  czech_only?: boolean;
 }
 
 export interface V26RewriteInput {
