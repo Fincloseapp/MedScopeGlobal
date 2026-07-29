@@ -2,8 +2,9 @@
 /**
  * Regenerate short/fallback public articles (v26.3 full LLM depth).
  * Usage:
- *   node scripts/regenerate-short-public.mjs [--date=2026-07-04] [--limit=20] [--min-words=450] [--dry-run]
- *   [--slug=foo] [--slugs=a,b,c] [--expand] [--no-expand] [--expand-target=700] [--delay-ms=35000]
+ *   node scripts/regenerate-short-public.mjs [--date=2026-07-04] [--limit=20] [--min-words=900] [--dry-run]
+ *   [--slug=foo] [--slugs=a,b,c] [--expand] [--no-expand] [--expand-only]
+ *   [--expand-target=1200] [--delay-ms=35000]
  */
 import { createClient } from "@supabase/supabase-js";
 import { join, dirname } from "node:path";
@@ -14,6 +15,8 @@ import {
   persistPublicArticleToDb,
   expandPublicArticleIfShort,
   countPublicArticleWords,
+  PUBLIC_ARTICLE_MIN_WORDS,
+  PUBLIC_ARTICLE_TARGET_WORDS,
   PUBLIC_TOPICS,
 } from "../lib/v25/writers/writer-base.mjs";
 import { isBoilerplateContent } from "../lib/v26/editorial-prompts.mjs";
@@ -73,10 +76,13 @@ function parseArgs() {
     slug: slugArg?.split("=")[1] ?? null,
     slugs: slugList,
     limit: limitArg ? Number(limitArg.split("=")[1]) : 30,
-    minWords: minWordsArg ? Number(minWordsArg.split("=")[1]) : 450,
-    expandTarget: expandTargetArg ? Number(expandTargetArg.split("=")[1]) : 700,
+    minWords: minWordsArg ? Number(minWordsArg.split("=")[1]) : PUBLIC_ARTICLE_MIN_WORDS,
+    expandTarget: expandTargetArg
+      ? Number(expandTargetArg.split("=")[1])
+      : PUBLIC_ARTICLE_TARGET_WORDS,
     delayMs: delayArg ? Number(delayArg.split("=")[1]) : 12000,
     expand: !process.argv.includes("--no-expand"),
+    expandOnly: process.argv.includes("--expand-only"),
     dryRun: process.argv.includes("--dry-run"),
   };
 }
@@ -106,7 +112,8 @@ function hasForeignLeak(text) {
 }
 
 loadEnv();
-const { date, slug, slugs, limit, minWords, expandTarget, delayMs, expand, dryRun } = parseArgs();
+const { date, slug, slugs, limit, minWords, expandTarget, delayMs, expand, expandOnly, dryRun } =
+  parseArgs();
 const envKeys = envKeyStatus();
 console.log(`API keys (.env.local): GROQ=${envKeys.groq}, OPENAI=${envKeys.openai}, GEMINI=${envKeys.gemini}`);
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -188,23 +195,8 @@ for (const row of candidates.slice(0, limit)) {
     let draftWords;
     let usedExpandOnly = false;
 
-    try {
-      article = await generatePublicArticle({
-        topic: internalTopic === "dlouhovekost" ? "dlouhovekost" : topic,
-        topicLabel,
-        dbPublicTopic: topic,
-        contentPillar: row.metadata?.content_pillar ?? null,
-        seed,
-        writerName: "MedScopeGlobal",
-        angle,
-        writerIndex: rewritten % 5,
-      });
-      bodyHtml = polishCzechHtml(article.bodyHtml);
-      title = polishCzechText(article.title);
-      excerpt = polishCzechText(article.excerpt);
-      draftWords = wordCount(bodyHtml);
-    } catch (genErr) {
-      console.warn(`  gen failed, expand-only fallback: ${genErr.message}`);
+    if (expandOnly) {
+      usedExpandOnly = true;
       title = polishCzechText(row.title);
       excerpt = polishCzechText(row.excerpt);
       bodyHtml = polishCzechHtml(row.content);
@@ -218,7 +210,39 @@ for (const row of candidates.slice(0, limit)) {
         metaDescription: row.meta_description ?? excerpt?.slice(0, 160),
         keywords: row.metadata?.keywords ?? [],
       };
-      usedExpandOnly = true;
+    } else {
+      try {
+        article = await generatePublicArticle({
+          topic: internalTopic === "dlouhovekost" ? "dlouhovekost" : topic,
+          topicLabel,
+          dbPublicTopic: topic,
+          contentPillar: row.metadata?.content_pillar ?? null,
+          seed,
+          writerName: "MedScopeGlobal",
+          angle,
+          writerIndex: rewritten % 5,
+        });
+        bodyHtml = polishCzechHtml(article.bodyHtml);
+        title = polishCzechText(article.title);
+        excerpt = polishCzechText(article.excerpt);
+        draftWords = wordCount(bodyHtml);
+      } catch (genErr) {
+        console.warn(`  gen failed, expand-only fallback: ${genErr.message}`);
+        title = polishCzechText(row.title);
+        excerpt = polishCzechText(row.excerpt);
+        bodyHtml = polishCzechHtml(row.content);
+        draftWords = wordCount(bodyHtml);
+        article = {
+          writerPersona: row.metadata?.author_persona ?? "public-general",
+          writerDisplayName: row.metadata?.author_display_name ?? "MedScopeGlobal",
+          writerByline: row.source_name ?? "MedScopeGlobal",
+          editorialUnit: row.metadata?.editorial_unit_primary ?? null,
+          editorialUnitReviewer: row.metadata?.editorial_unit_reviewer ?? null,
+          metaDescription: row.meta_description ?? excerpt?.slice(0, 160),
+          keywords: row.metadata?.keywords ?? [],
+        };
+        usedExpandOnly = true;
+      }
     }
 
     if (draftWords < minWords && expand) {
@@ -239,7 +263,13 @@ for (const row of candidates.slice(0, limit)) {
       }
     }
 
-    if (draftWords < minWords) {
+    const originalWords = wordCount(row.content);
+    const softFloor = Math.min(minWords, 700);
+    const gainedWords = draftWords - originalWords;
+    const improvedEnough =
+      gainedWords >= 80 &&
+      (draftWords >= softFloor || draftWords >= Math.round(originalWords * 1.35));
+    if (draftWords < minWords && !improvedEnough) {
       console.warn(`  skip — still short (${draftWords} words, min ${minWords}): ${row.slug}`);
       results.push({
         slug: row.slug,
@@ -248,6 +278,11 @@ for (const row of candidates.slice(0, limit)) {
         reason: usedExpandOnly ? "expand_only_still_short" : "still_short",
       });
       continue;
+    }
+    if (draftWords < minWords) {
+      console.warn(
+        `  save soft-floor improve ${originalWords}→${draftWords} (target ${minWords}): ${row.slug}`
+      );
     }
 
     if (hasForeignLeak(`${title}\n${excerpt}\n${bodyHtml}`)) foreignFixed += 1;
@@ -265,21 +300,33 @@ for (const row of candidates.slice(0, limit)) {
       regenerated_at: new Date().toISOString(),
     };
 
-    const { error: updErr } = await admin
-      .from("articles")
-      .update({
-        title,
-        excerpt,
-        content: bodyHtml,
-        meta_description: article.metaDescription ?? excerpt?.slice(0, 160),
-        source_name: article.writerByline ?? article.writerDisplayName,
-        metadata,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", row.id);
+    let updErr = null;
+    for (let saveAttempt = 0; saveAttempt < 3; saveAttempt++) {
+      try {
+        const res = await admin
+          .from("articles")
+          .update({
+            title,
+            excerpt,
+            content: bodyHtml,
+            meta_description: article.metaDescription ?? excerpt?.slice(0, 160),
+            source_name: article.writerByline ?? article.writerDisplayName,
+            metadata,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", row.id);
+        updErr = res.error;
+        if (!updErr) break;
+      } catch (saveEx) {
+        updErr = { message: String(saveEx?.message ?? saveEx) };
+      }
+      console.warn(`  DB save retry ${saveAttempt + 1}/3: ${updErr?.message ?? "unknown"}`);
+      await sleep(2000 * (saveAttempt + 1));
+    }
 
     if (updErr) {
       console.error(`  DB error: ${updErr.message}`);
+      results.push({ slug: row.slug, ok: false, words: draftWords, reason: `db:${updErr.message}` });
       continue;
     }
 
