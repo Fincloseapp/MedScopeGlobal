@@ -11,20 +11,20 @@ const TESTIMONIALS = [
   {
     quote:
       "MedScopeGlobal mi pomáhá rychle najít guidelines a studie v českém kontextu — ideální mezi pacienty.",
-    author: "MUDr. Novák",
-    role: "Praktický lékař, Praha",
+    author: "MUDr. R. S.",
+    role: "Praktický lékař · primární péče (ČR)",
   },
   {
     quote:
       "Kurzy pro přijímačky a AI tutor jsou pro mě nejlepší doplněk k doučování — strukturované a srozumitelné.",
-    author: "Lucie K.",
-    role: "Uchazečka o LF Praha",
+    author: "Uchazečka o medicínu",
+    role: "Příprava na přijímačky (ČR)",
   },
   {
     quote:
       "Konečně magazín, který respektuje odbornou hloubku i srozumitelnost pro laiky. Doporučuji kolegům.",
-    author: "PhDr. Krejčí",
-    role: "Klinický výzkumník, FN",
+    author: "PhDr. E. N., Ph.D.",
+    role: "Klinický výzkum · zdravotnické zařízení (ČR)",
   },
 ];
 

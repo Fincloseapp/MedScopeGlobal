@@ -27,20 +27,20 @@ export const V271_TESTIMONIALS = [
   {
     quote:
       "Konečně český zdroj, kde u každé studie vidím klinický dopad a ne jen abstrakt z PubMedu. Používám to denně před ordinací.",
-    author: "MUDr. Petra Horáková",
-    role: "internistka, FN Motol",
+    author: "MUDr. A. V., Ph.D.",
+    role: "interní medicína · fakultní nemocnice (ČR)",
   },
   {
     quote:
       "Přijímačky jsem zvládla díky strukturovaným kvízům a shrnutím anatomie. Je to jako mít spolužáka, který už prošel šestým ročníkem.",
-    author: "Tereza K.",
-    role: "6. ročník LF UK Praha",
+    author: "Studentka medicíny",
+    role: "6. ročník lékařské fakulty (ČR)",
   },
   {
     quote:
       "Guidelines a lékové novinky v jednom feedu — ušetří mi hodinu týdně oproti procházení deseti různých portálů.",
-    author: "MUDr. Jan Procházka",
-    role: "revmatolog, Olomouc",
+    author: "MUDr. M. L., Ph.D.",
+    role: "revmatologie · ambulantní praxe (ČR)",
   },
 ] as const;
 
