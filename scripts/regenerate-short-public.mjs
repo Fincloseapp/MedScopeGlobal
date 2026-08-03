@@ -106,8 +106,11 @@ function extractAngleFromExcerpt(excerpt) {
 }
 
 function hasForeignLeak(text) {
-  return /\b(odpowied|może|wiele|przez|które|który|należy|zawsze|powinien|leczenie|choroba|zdrowie)\b/i.test(
-    String(text ?? "")
+  const s = String(text ?? "");
+  return (
+    /\b(odpowied|może|wiele|przez|które|który|należy|zawsze|powinien|leczenie|choroba|zdrowie)\b/i.test(
+      s
+    ) || /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uac00-\ud7af]/.test(s)
   );
 }
 

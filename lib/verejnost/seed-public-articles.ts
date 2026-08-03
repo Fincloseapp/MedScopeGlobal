@@ -117,22 +117,48 @@ const SEED_ARTICLES: SeedArticle[] = [
     slug: "verejnost-zivotni-styl-vyziva-bez-extremu",
     title: "Vyvážená strava bez extrémů: středomořský talíř v české kuchyni",
     excerpt:
-      "Jak jíst zdravě bez dietního stresu — praktické tipy pro rodiny a zaneprázdněné jedince.",
-    content: `<p>Extrémní diety slibují rychlé výsledky, ale dlouhodobě vítězí vyváženost. Středomořský model stravování se dobře přizpůsobí české kuchyni.</p>
-<h2>Základ talíře</h2>
+      "Zapomeňte na drastické diety. Středomořský talíř jde skvěle přeložit do české kuchyně — s olivovým olejem, zeleninou sezóny a realistickým týdenním plánem.",
+    content: `<p>Večer po směně stojíte u lednice a řešíte klasiku: ohřát knedlíky, objednat něco rychlého, nebo zkusit jíst „zdravě“ a zase skončit u pocitu, že to nejde. Právě tady dává smysl středomořský talíř — ne jako dovolená v Řecku, ale jako praktický model, jak jíst sytě, pestře a bez dietního stresu v běžném českém týdnu.</p>
+<h2>Co středomořský talíř opravdu znamená</h2>
+<p>Nejde o jednu recepturu. Jde o poměr: hodně zeleniny a ovoce, celozrnné přílohy, luštěniny, ryby a kvalitní tuky (hlavně olivový olej), méně průmyslově zpracovaných potravin a slazených nápojů. Maso může zůstat — spíš jako příloha než jako jediná hvězda talíře. Alkohol není nutný; pokud ho pijete, držte ho v rozumné míře a ne jako „zdravotní tip“.</p>
+<p>Pro české podmínky je důležité přiznání: nemáme celoroční farmářské trhy plné rajčat. Máme zimu, směny, školku a obědy v jídelně. Proto vyhrává adaptace — mražená zelenina, konzervovaná cizrna, pečená zelenina na plechu a jeden jednoduchý recept, který zvládnete i unavení.</p>
+<h2>Jak vypadá talíř v praxi (ne na Instagramu)</h2>
 <ul>
-<li>Polovina talíře zelenina a ovoce.</li>
-<li>Celozrné přílohy místo bílé mouky.</li>
-<li>Ryby a luštěniny několikrát týdně.</li>
-<li>Omezení sladkostí a slazených nápojů.</li>
+<li>Polovina talíře: zelenina (čerstvá, mražená nebo pečená).</li>
+<li>Čtvrtina: celozrnná příloha (kroupy, pohanka, celozrnná rýže, kvalitní chléb).</li>
+<li>Čtvrtina: bílkovina (ryba, luštěniny, vejce, jogurt, libovější maso).</li>
+<li>Tuk: lžíce olivového oleje, hrst ořechů, semínka — ne litr omáčky.</li>
 </ul>
-<p><em>MedScopeGlobal · Životní styl · Při chronických onemocněních konzultujte stravu s lékařem.</em></p>`,
+<p>Příklad večere po práci: pečená zelenina s cizrnou, hrst kroupů a jogurt s bylinkami. Příklad oběda z „české“ kuchyně: guláš s menší porcí masa, víc zeleniny a celozrnnou přílohou místo hromady knedlíků — chuť zůstane, poměr se posune.</p>
+<h2>Nákupní seznam, který vydrží týden</h2>
+<p>Základ do košíku: sezónní nebo mražená zelenina, cibule, česnek, rajčata (i pasírovaná), luštěniny ve skle, celozrnné přílohy, vejce, bílý jogurt, tuňák nebo mražené ryby, olivový olej, ořechy, citron, bylinky. „Radost“ nechte v rozpočtu — kousek sýra, dobrý chléb, ovoce — ať plán nevypadá jako trest.</p>
+<ul>
+<li>70 % základ, který uvaříte opakovaně.</li>
+<li>20 % sezónní novinky (řepa, dýně, chřest, jahody…).</li>
+<li>10 % drobná radost bez výčitek.</li>
+</ul>
+<h2>Týdenní plán bez pondělního restartu</h2>
+<p>Pondělí a úterý: jedna změna — například zelenina k večeři vždycky. Středa a čtvrtek: stejnou změnu jen udržte. Pátek: krátké zhodnocení. Víkend: jedno pečené jídlo na více porcí. Když týden selže, vraťte se k nejmenší verzi (zelenina + bílkovina), ne k nule.</p>
+<p>Pro rodiny funguje „jedno jídlo, různé přílohy“: někdo dostane víc zeleniny, někdo víc přílohy, děti mohou mít známou chuť s menší úpravou. Nemusíte vařit dvě úplně jiná jídla.</p>
+<h2>Časté mýty</h2>
+<p><strong>Mýtus:</strong> „Musím jíst jen ryby a saláty.“ <strong>Realita:</strong> luštěniny, vejce, jogurt a občasné maso jsou v pořádku — důležitý je celkový poměr a pravidelnost.</p>
+<p><strong>Mýtus:</strong> „Bez drahých superpotravin to nemá cenu.“ <strong>Realita:</strong> základní český nákup stačí. Olivový olej pomůže, ale rozhoduje pestrost a méně sladkých nápojů.</p>
+<p><strong>Mýtus:</strong> „Buď dietuji naprosto správně, nebo to vzdám.“ <strong>Realita:</strong> 70 % dodržení plánu často vydá víc než týden perfekcionismu a pak návrat ke starým návykům.</p>
+<h2>Kdy dává smysl mluvit s lékařem nebo nutričním terapeutem</h2>
+<p>Při chronickém onemocnění (cukrovka, onemocnění ledvin, trávicí potíže), při nechtěném hubnutí, dlouhodobé únavě nebo pokud užíváte léky, které ovlivňují stravu, konzultujte změnu s odborníkem. Článek nenahrazuje vyšetření ani individuální doporučení.</p>
+<h2>Zdroje</h2>
+<ul>
+<li>WHO — healthy diet recommendations</li>
+<li>SZÚ / odborné výživové doporučení pro veřejnost</li>
+<li>MedScopeGlobal redakce — praktická adaptace pro české domácnosti</li>
+</ul>
+<p><em>MedScopeGlobal · Životní styl · Informace nenahrazují individuální lékařskou péči.</em></p>`,
     public_topic: "zivotni-styl",
     cover_image_url: VEREJNOST_FALLBACK_COVER,
     meta_description:
-      "Vyvážená strava bez extrémů: středomořský talíř, praktické tipy a zdravé návyky pro každodenní jídelníček.",
-    read_time_minutes: 5,
-    keywords: ["výživa", "strava", "středomořská dieta", "životní styl"],
+      "Vyvážená strava bez extrémů: středomořský talíř v české kuchyni — nákupní seznam, týdenní plán a mýty vs. realita.",
+    read_time_minutes: 9,
+    keywords: ["výživa", "strava", "středomořská dieta", "životní styl", "česká kuchyně"],
   },
 ];
 
