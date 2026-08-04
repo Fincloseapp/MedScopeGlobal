@@ -14,19 +14,28 @@ export type V271HubPage = {
 export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
   index: {
     slug: "",
-    title: "Pro studenty medicíny",
-    description: "Anatomie, farmakologie, testy, příprava na zkoušky a AI tutor.",
+    title: "Pro studenty a uchazeče o medicínu",
+    description:
+      "Dvě cesty: příprava na přijímačky LF, nebo materiály a testy pro studenty fakulty. Začněte zdarma.",
     links: [
-      { label: "Anatomie", href: "/studenti/anatomie", description: "Strukturované výklady a kvízy" },
-      { label: "Farmakologie", href: "/studenti/farmakologie", description: "Léky, mechanismy a interakce" },
-      { label: "Testy a kvízy", href: "/studenti/testy", description: "Modelové otázky a procvičení" },
-      { label: "Chci studovat medicínu", href: "/studenti/chci-studovat", description: "Přijímačky a příprava" },
-      { label: "Zkoušky", href: "/studenti/zkousky", description: "Příprava na zkoušky LF" },
+      {
+        label: "Chci na medicínu",
+        href: "/studenti/chci-studovat",
+        description: "Přijímačky, přípravné kurzy a self-test",
+      },
       {
         label: "Studijní materiály",
         href: "/studenti/materialy",
-        description: "Kurátorovaná knihovna studijních materiálů podle ročníku",
+        description: "Knihovna pro studenty LF podle ročníku",
       },
+      {
+        label: "Testy a kvízy",
+        href: "/studenti/testy",
+        description: "Academy kvízy, self-test a školní procvičení",
+      },
+      { label: "Anatomie", href: "/studenti/anatomie", description: "Strukturované výklady a kvízy" },
+      { label: "Farmakologie", href: "/studenti/farmakologie", description: "Léky, mechanismy a interakce" },
+      { label: "Zkoušky", href: "/studenti/zkousky", description: "Příprava na zkoušky LF" },
       { label: "AI tutor", href: "/studenti/ai-tutor", description: "Studentský AI asistent" },
       { label: "Lékařské fakulty", href: "/studium/univerzity", description: "8 českých LF" },
       { label: "Studijní plány", href: "/medicina/plany", description: "Harmonogramy 1.–6. ročník" },
@@ -57,11 +66,29 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
   testy: {
     slug: "testy",
     title: "Testy a kvízy",
-    description: "Modelové otázky a interaktivní procvičení.",
+    description:
+      "Procvičení ke školním testům, přijímačkám i zkouškám — s okamžitou zpětnou vazbou.",
     links: [
-      { label: "Kvízy a hry", href: "/medicina/hry" },
-      { label: "Přijímačky", href: "/studenti/chci-studovat" },
+      {
+        label: "Academy kvízy",
+        href: "/academy/quizzes",
+        description: "Kvízy vázané na kurzy — vysvětlení správných odpovědí",
+      },
+      {
+        label: "Self-test přijímaček",
+        href: "/academy/prijimacky/self-test",
+        description: "Biologie, chemie, fyzika — rychlá kontrola úrovně",
+      },
+      {
+        label: "Přípravné kurzy",
+        href: "/academy/courses?category=prijimacky",
+        description: "Lekce + kvíz v jednom balíčku",
+      },
+      { label: "Kvízy a hry", href: "/medicina/hry", description: "Interaktivní anatomie a procvičení" },
+      { label: "Chci studovat medicínu", href: "/studenti/chci-studovat" },
     ],
+    ctaHref: "/academy/quizzes",
+    ctaLabel: "Spustit kvíz",
   },
   "chci-studovat": {
     slug: "chci-studovat",

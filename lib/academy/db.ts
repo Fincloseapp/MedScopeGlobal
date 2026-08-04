@@ -672,6 +672,22 @@ export async function listPublishedQuizzes(limit = 50) {
   return data ?? [];
 }
 
+export async function listPublishedQuizzesByCourseId(courseId: string): Promise<AcademyQuiz[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("quizzes")
+    .select("*")
+    .eq("course_id", courseId)
+    .eq("status", "published")
+    .order("updated_at", { ascending: false });
+
+  if (error) {
+    console.error("[academy] listPublishedQuizzesByCourseId", error.message);
+    return [];
+  }
+  return (data ?? []) as AcademyQuiz[];
+}
+
 export async function listMarketplaceListings(limit = 20) {
   const supabase = await createClient();
   const { data, error } = await supabase

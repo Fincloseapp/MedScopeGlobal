@@ -17,13 +17,14 @@ export function FreePreviewBanner({
     >
       <Unlock className="h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
       <p>
-        <strong>Náhled zdarma:</strong> {formatFreePreviewLabel(totalLessons)} — bez předplatného.
+        <strong>Začněte zdarma:</strong> {formatFreePreviewLabel(totalLessons)}. Ověřte si styl
+        výkladu — bez karty a bez závazku.
       </p>
       <Link
         href="/predplatne"
         className="ml-auto text-xs font-medium text-emerald-800 underline-offset-2 hover:underline"
       >
-        Studentské předplatné →
+        Pak předplatné od 149 Kč →
       </Link>
     </div>
   );

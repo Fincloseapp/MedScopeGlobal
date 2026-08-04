@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlayCircle, Unlock } from "lucide-react";
+import { ArrowRight, PlayCircle, Unlock } from "lucide-react";
 import { AcademyPageHeader } from "@/components/academy/page-header";
 import { AiLecturerPanel } from "@/components/academy/ai-lecturer-panel";
 import { TtsListenButton } from "@/components/tts/tts-listen-button";
 import { LessonMetadataBlock } from "@/components/academy/lesson-metadata-block";
 import { LessonVideoWithConversion } from "@/components/v38/lesson-video-with-conversion";
+import { Button } from "@/components/ui/button";
 import { getReaderContext } from "@/lib/auth/reader-context";
-import { getCourseBySlug, getLessonByIdOrSlug } from "@/lib/academy/db";
+import {
+  getCourseBySlug,
+  getLessonByIdOrSlug,
+  listPublishedQuizzesByCourseId,
+} from "@/lib/academy/db";
 import { isLessonFreePreview } from "@/lib/academy/preview";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
@@ -52,6 +57,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
+function renderInline(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return (
+        <strong key={i} className="font-semibold text-[#021d33]">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
+
 function renderContent(content: string) {
   return content.split(/\n\n+/).filter(Boolean).map((block, i) => {
     if (block.startsWith("## ")) {
@@ -68,9 +87,19 @@ function renderContent(content: string) {
         </h3>
       );
     }
+    const lines = block.split("\n").filter(Boolean);
+    if (lines.length > 1 && lines.every((l) => /^[-*•]\s+/.test(l))) {
+      return (
+        <ul key={i} className="list-disc space-y-1 pl-5 leading-7 text-slate-700">
+          {lines.map((line, j) => (
+            <li key={j}>{renderInline(line.replace(/^[-*•]\s+/, ""))}</li>
+          ))}
+        </ul>
+      );
+    }
     return (
       <p key={i} className="leading-7 text-slate-700">
-        {block.replace(/\*\*/g, "")}
+        {renderInline(block.replace(/\n/g, " "))}
       </p>
     );
   });
@@ -83,9 +112,16 @@ export default async function AcademyLessonPage({ params }: Props) {
 
   const course = await getCourseBySlug(slug);
   const lessons = course?.lessons ?? [];
+  const quizzes = course ? await listPublishedQuizzesByCourseId(course.id) : [];
   const { isVip } = await getReaderContext();
   const lessonIndex = lessons.findIndex((l) => l.slug === lesson.slug || l.id === lesson.id);
   const isFreePreview = isLessonFreePreview(lessonIndex >= 0 ? lessonIndex : 0, lessons.length);
+  const nextLesson =
+    lessonIndex >= 0 && lessonIndex < lessons.length - 1 ? lessons[lessonIndex + 1] : null;
+  const nextIsLocked =
+    nextLesson != null &&
+    !isVip &&
+    !isLessonFreePreview(lessonIndex + 1, lessons.length);
   const listenText = buildLessonListenText(
     lesson.title,
     lesson.content,
@@ -206,6 +242,45 @@ export default async function AcademyLessonPage({ params }: Props) {
               </div>
               {renderContent(lesson.content)}
             </article>
+
+            <div className="rounded-2xl border border-[#cfe1f3] bg-[#f0f7ff] p-5">
+              <p className="font-display text-lg font-semibold text-[#021d33]">
+                {isFreePreview
+                  ? "Líbí se vám výklad? Pokračujte dál"
+                  : "Procvičte si látku a pokračujte"}
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-slate-700">
+                {isFreePreview
+                  ? "První lekce je zdarma — další odemyká studentské předplatné. Zároveň si můžete hned ověřit znalosti kvízem."
+                  : "Doporučte kurz spolužákům a držte tempo: další lekce + kvíz = jistější příprava na test."}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {nextLesson && !nextIsLocked ? (
+                  <Button asChild className="rounded-full bg-[#005B96]">
+                    <Link href={`/academy/courses/${slug}/lessons/${nextLesson.slug}`}>
+                      Další lekce
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                ) : null}
+                {nextIsLocked || (!nextLesson && isFreePreview) ? (
+                  <Button asChild className="rounded-full bg-[#005B96]">
+                    <Link href="/predplatne">
+                      Odemknout předplatné
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                ) : null}
+                {quizzes[0] ? (
+                  <Button asChild variant="outline" className="rounded-full">
+                    <Link href={`/academy/quizzes/${quizzes[0].id}`}>Spustit kvíz kurzu</Link>
+                  </Button>
+                ) : null}
+                <Button asChild variant="outline" className="rounded-full">
+                  <Link href={`/academy/courses/${slug}`}>Zpět na přehled kurzu</Link>
+                </Button>
+              </div>
+            </div>
           </div>
 
           <aside className="xl:sticky xl:top-20 xl:self-start">
