@@ -235,44 +235,61 @@ export async function getLessonBySlug(
   const course = await getCourseBySlug(courseSlug);
   if (!course) return null;
 
-  const lesson = course.lessons.find((l) => l.slug === lessonSlug);
+  const folded = foldLessonSlug(lessonSlug);
+  const lesson = course.lessons.find(
+    (l) => l.slug === lessonSlug || foldLessonSlug(l.slug) === folded
+  );
   if (!lesson) return null;
 
   return { ...lesson, course };
 }
 
-const LEGACY_LESSON_SLUG_ALIASES: Record<string, string> = {
-  "bunkove-delení": "bunkove-deleni",
-  "homologické-rady": "homologicke-rady",
-  "orientace-v-těle": "orientace-v-tele",
-  "latinske-kořeny": "latinske-koreny",
-};
-
-function normalizeLessonSlug(slug: string): string {
-  return LEGACY_LESSON_SLUG_ALIASES[slug] ?? slug;
-}
-
-/** Drop duplicate lessons (e.g. diacritic + ASCII slug pairs) keeping lowest sort_order. */
-function dedupeLessonsBySlug(lessons: AcademyLesson[]): AcademyLesson[] {
-  const byKey = new Map<string, AcademyLesson>();
-  for (const lesson of lessons) {
-    const key = normalizeLessonSlug(lesson.slug);
-    const existing = byKey.get(key);
-    if (!existing || lesson.sort_order < existing.sort_order) {
-      byKey.set(key, lesson);
-    }
-  }
-  return [...byKey.values()].sort((a, b) => a.sort_order - b.sort_order);
-}
-
-function resolveLessonSlugParam(raw: string): string {
-  let slug = raw;
+/** ASCII-fold lesson slugs so diacritic + NFC/NFD URL variants resolve to one key. */
+function foldLessonSlug(slug: string): string {
+  let value = slug;
   try {
-    slug = decodeURIComponent(raw);
+    value = decodeURIComponent(value);
   } catch {
     /* keep raw */
   }
-  return LEGACY_LESSON_SLUG_ALIASES[slug] ?? slug;
+  return value
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase();
+}
+
+function isAsciiSlug(slug: string): boolean {
+  return /^[\x00-\x7F]+$/.test(slug);
+}
+
+/** Drop duplicate lessons (diacritic + ASCII) — prefer ASCII slug, then lowest sort_order. */
+function dedupeLessonsBySlug(lessons: AcademyLesson[]): AcademyLesson[] {
+  const byKey = new Map<string, AcademyLesson>();
+  for (const lesson of lessons) {
+    const key = foldLessonSlug(lesson.slug);
+    const existing = byKey.get(key);
+    if (!existing) {
+      byKey.set(key, lesson);
+      continue;
+    }
+    const lessonAscii = isAsciiSlug(lesson.slug);
+    const existingAscii = isAsciiSlug(existing.slug);
+    if (lessonAscii && !existingAscii) {
+      byKey.set(key, lesson);
+      continue;
+    }
+    if (lessonAscii === existingAscii && lesson.sort_order < existing.sort_order) {
+      byKey.set(key, lesson);
+    }
+  }
+  // Expose canonical ASCII slug in links when a folded form differs.
+  return [...byKey.values()]
+    .map((lesson) => {
+      const folded = foldLessonSlug(lesson.slug);
+      if (lesson.slug === folded) return lesson;
+      return { ...lesson, slug: folded };
+    })
+    .sort((a, b) => a.sort_order - b.sort_order);
 }
 
 export async function getLessonByIdOrSlug(
@@ -283,9 +300,11 @@ export async function getLessonByIdOrSlug(
   const course = await getCourseBySlug(courseSlug);
   if (!course) return null;
 
-  const resolvedSlug = resolveLessonSlugParam(lessonIdOrSlug);
+  const foldedParam = foldLessonSlug(lessonIdOrSlug);
   const lesson = course.lessons.find((l) =>
-    isUuid ? l.id === lessonIdOrSlug : l.slug === resolvedSlug || l.slug === lessonIdOrSlug
+    isUuid
+      ? l.id === lessonIdOrSlug
+      : foldLessonSlug(l.slug) === foldedParam || l.slug === lessonIdOrSlug
   );
   if (!lesson) return null;
 
