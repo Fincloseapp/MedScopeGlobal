@@ -77,6 +77,10 @@ const nextConfig = {
 
       { source: "/studium", destination: "/studenti", permanent: true },
 
+      // Misleading hub titles → clear destinations
+      { source: "/studenti/anatomie", destination: "/studenti/hry", permanent: true },
+      { source: "/studenti/farmakologie", destination: "/studenti/leky", permanent: true },
+
       { source: "/pro-lekare", destination: "/lekari", permanent: true },
 
       { source: "/pro-firmy", destination: "/firmy", permanent: true },

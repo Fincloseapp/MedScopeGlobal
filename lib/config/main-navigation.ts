@@ -24,9 +24,9 @@ const menuCs: NavItem[] = [
     label: "Pro studenty",
     href: "/studenti",
     children: [
-      { label: "Přehled", href: "/studenti", description: "Anatomie, farmakologie, zkoušky" },
-      { label: "Anatomie", href: "/studenti/anatomie", description: "Výklady a kvízy" },
-      { label: "Farmakologie", href: "/studenti/farmakologie", description: "Léky a mechanismy" },
+      { label: "Přehled", href: "/studenti", description: "Přijímačky, materiály, kvízy" },
+      { label: "Kvízy a hry", href: "/studenti/hry", description: "Studijní hry a kvízy" },
+      { label: "Léky", href: "/studenti/leky", description: "SÚKL a studijní odkazy" },
       { label: "Testy", href: "/studenti/testy", description: "Modelové otázky" },
       { label: "Chci studovat medicínu", href: "/studenti/chci-studovat", description: "Přijímačky a příprava" },
       {

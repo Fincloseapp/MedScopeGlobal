@@ -33,8 +33,16 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
         href: "/studenti/testy",
         description: "Academy kvízy, self-test a školní procvičení",
       },
-      { label: "Anatomie", href: "/studenti/anatomie", description: "Rozcestník k procvičení a studijnímu obsahu" },
-      { label: "Farmakologie", href: "/studenti/farmakologie", description: "Léky, SÚKL a studijní odkazy" },
+      {
+        label: "Kvízy a hry",
+        href: "/studenti/hry",
+        description: "Všechny studijní hry — anatomie, fyziologie, patologie, klinika…",
+      },
+      {
+        label: "Léky a léčiva",
+        href: "/studenti/leky",
+        description: "SÚKL katalog a studijní odkazy — ne kurz farmakologie",
+      },
       { label: "Zkoušky", href: "/studenti/zkousky", description: "Plány a nástroje ke zkouškám LF" },
       { label: "AI tutor", href: "/studenti/ai-tutor", description: "Studentský AI asistent na vysvětlení látky" },
       { label: "Lékařské fakulty", href: "/studium/univerzity", description: "8 českých LF" },
@@ -42,26 +50,6 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
     ],
     ctaHref: "/predplatne",
     ctaLabel: "Studentské předplatné 149 Kč",
-  },
-  anatomie: {
-    slug: "anatomie",
-    title: "Anatomie",
-    description: "Rozcestník: procvičení, studijní články a AI tutor — ne kompletní učebnice anatomie.",
-    links: [
-      { label: "Kvízy anatomie", href: "/medicina/hry", description: "Interaktivní procvičení" },
-      { label: "Studijní články", href: "/articles?med_track=studium", description: "Články se studijním zaměřením" },
-      { label: "AI tutor", href: "/studenti/ai-tutor", description: "Vysvětlení pojmů na vyžádání" },
-    ],
-  },
-  farmakologie: {
-    slug: "farmakologie",
-    title: "Farmakologie",
-    description: "Rozcestník k lékům (SÚKL), studijnímu obsahu a AI tutorovi.",
-    links: [
-      { label: "Léky a SÚKL", href: "/leky", description: "Přehled léčiv a informací" },
-      { label: "Studijní obsah", href: "/medicina/studium", description: "Materiály ke studiu medicíny" },
-      { label: "AI tutor", href: "/studenti/ai-tutor", description: "Rychlé vysvětlení mechanismů" },
-    ],
   },
   testy: {
     slug: "testy",
@@ -84,11 +72,15 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
         href: "/academy/courses?category=prijimacky",
         description: "Lekce + kvíz v jednom balíčku",
       },
-      { label: "Kvízy a hry", href: "/medicina/hry", description: "Interaktivní anatomie a procvičení" },
+      {
+        label: "Kvízy a studijní hry",
+        href: "/studenti/hry",
+        description: "Kompletní hub her — nejen anatomie",
+      },
       { label: "Chci studovat medicínu", href: "/studenti/chci-studovat" },
     ],
-    ctaHref: "/academy/quizzes",
-    ctaLabel: "Spustit kvíz",
+    ctaHref: "/studenti/hry",
+    ctaLabel: "Otevřít kvízy a hry",
   },
   "chci-studovat": {
     slug: "chci-studovat",
@@ -116,7 +108,7 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
   "ai-tutor": {
     slug: "ai-tutor",
     title: "AI tutor",
-    description: "Studentský AI asistent pro anatomii, farmakologii a zkoušky.",
+    description: "Studentský AI asistent pro vysvětlení látky, opakování a zkoušky.",
     links: [{ label: "Spustit AI tutor", href: "/ai-asistent/student" }],
     ctaHref: "/ai-asistent/student",
     ctaLabel: "Zeptej se AI",

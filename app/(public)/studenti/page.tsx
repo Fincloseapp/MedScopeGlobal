@@ -60,14 +60,14 @@ const ON_LF = [
 
 const MORE = [
   {
-    href: "/studenti/anatomie",
-    title: "Anatomie",
-    body: "Rozcestník k procvičení a studijnímu obsahu",
+    href: "/studenti/hry",
+    title: "Kvízy a hry",
+    body: "Anatomie, fyziologie, patologie, klinika i přijímačky",
   },
   {
-    href: "/studenti/farmakologie",
-    title: "Farmakologie",
-    body: "Od lékových přehledů po studijní články",
+    href: "/studenti/leky",
+    title: "Léky a léčiva",
+    body: "SÚKL katalog — ne plný kurz farmakologie",
   },
   {
     href: "/studenti/zkousky",
