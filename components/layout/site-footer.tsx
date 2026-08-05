@@ -76,7 +76,7 @@ export async function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link href="/studium" className="hover:text-foreground">
+              <Link href="/studenti" className="hover:text-foreground">
                 Studenti
               </Link>
             </li>

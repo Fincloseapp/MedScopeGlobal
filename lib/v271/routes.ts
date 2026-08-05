@@ -53,9 +53,9 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
   },
   testy: {
     slug: "testy",
-    title: "Testy a kvízy",
+    title: "Testy a procvičení",
     description:
-      "Procvičení ke školním testům, přijímačkám i zkouškám — s okamžitou zpětnou vazbou. Odděleně od studijních her.",
+      "Self-test přijímaček, Academy kvízy a studijní hry — s okamžitou zpětnou vazbou. Nejde o oficiální fakultní zkoušku.",
     links: [
       {
         label: "Self-test přijímaček",
@@ -102,22 +102,22 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
   },
   zkousky: {
     slug: "zkousky",
-    title: "Zkoušky",
+    title: "Zkoušky a semestr",
     description:
-      "Orientace ke zkouškovému období — plány, testy a AI tutor. Doplněk k vašim skriptům, ne náhrada výuky.",
+      "Orientace ke zkouškovému období: plány, materiály a procvičení. Doplněk k fakultním skriptům — ne oficiální rozpis termínů.",
     links: [
       { label: "Studijní plány", href: "/medicina/plany", description: "Struktura napříč ročníky" },
       { label: "Studijní materiály", href: "/studenti/materialy", description: "Knihovna podle oboru" },
-      { label: "Testy", href: "/studenti/testy", description: "Procvičení s zpětnou vazbou" },
+      { label: "Testy a procvičení", href: "/studenti/testy", description: "Procvičení se zpětnou vazbou" },
       { label: "AI tutor", href: "/studenti/ai-tutor", description: "Dotazy k látce" },
       {
         label: "Studentské předplatné",
-        href: "/predplatne#student",
+        href: "/predplatne?trial=1#student",
         description: "Plný přístup během semestru — od 149 Kč/měsíc",
       },
     ],
-    ctaHref: "/studenti/materialy",
-    ctaLabel: "Otevřít materiály",
+    ctaHref: "/medicina/plany",
+    ctaLabel: "Otevřít studijní plány",
   },
   "ai-tutor": {
     slug: "ai-tutor",
