@@ -3,40 +3,44 @@ import Link from "next/link";
 import {
   ArrowRight,
   BookOpen,
+  CheckCircle2,
   ClipboardList,
   GraduationCap,
+  HeartHandshake,
   Sparkles,
   Target,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
-export const revalidate = 120;
-
-export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+export const metadata: Metadata = {
+  title: "MedScope pro studenty a uchazeče o medicínu",
+  description:
+    "Příprava na přijímačky na LF, studijní materiály a kvízy. Studentské předplatné od 149 Kč/měsíc — první lekce a trial zdarma.",
+  alternates: { canonical: "/studenti" },
+  openGraph: {
     title: "MedScope pro studenty a uchazeče o medicínu",
     description:
-      "Vyberte cestu: příprava na přijímačky LF, nebo materiály a testy pro studenty fakulty. Přehledně, pravdivě, začněte zdarma.",
-    path: "/studenti",
-  });
-}
+      "Jedna mapa: přijímačky, materiály, testy. Pro gymnazisty, studenty LF i rodiče — začněte zdarma.",
+    url: "/studenti",
+  },
+};
 
 const APPLICANT = [
   {
-    href: "/academy/courses?category=prijimacky",
+    href: "/studenti/chci-studovat",
     title: "Přípravné kurzy Academy",
     body: "Biologie, chemie, fyzika, fyziologie — lekce, slidy a kvízy. První lekce zdarma.",
   },
   {
     href: "/academy/prijimacky/self-test",
     title: "Self-test přijímaček",
-    body: "Losované otázky B / C / F s vysvětlením po odevzdání.",
+    body: "Rychlý přehled silných a slabých míst — ideální první krok před kurzy.",
   },
   {
     href: "/studium/prijimacky",
     title: "Termíny a požadavky LF",
-    body: "Přehled českých lékařských fakult a přijímacího řízení.",
+    body: "Přehled fakult a přijímacího řízení — ať víte, na co se připravovat.",
   },
 ] as const;
 
@@ -44,72 +48,88 @@ const ON_LF = [
   {
     href: "/studenti/materialy",
     title: "Studijní materiály",
-    body: "Kurátorovaná knihovna — filtr podle ročníku a předmětu, čtení online.",
+    body: "Knihovna článků a podkladů podle témat — rychlá orientace během semestru.",
   },
   {
     href: "/studenti/testy",
-    title: "Testy a kvízy",
-    body: "Academy kvízy, self-test a odkazy na procvičení ke zkouškám.",
+    title: "Testy a procvičení",
+    body: "Modelové otázky a procvičení — odděleně od studijních her.",
   },
   {
     href: "/studenti/ai-tutor",
     title: "AI tutor",
-    body: "Rychlé vysvětlení látky a tipy na opakování — studentský asistent.",
+    body: "Dotazy k látce v kontextu studia — doplněk k materiálům, ne náhrada přednášek.",
   },
 ] as const;
 
 const MORE = [
   {
     href: "/studenti/hry",
-    title: "Kvízy a hry",
-    body: "Anatomie, fyziologie, patologie, klinika i přijímačky",
+    title: "Kvízy a studijní hry",
+    body: "Krátké hry na opakování — anatomie, fyziologie i přijímačky.",
   },
   {
     href: "/studenti/leky",
-    title: "Léky a léčiva",
-    body: "SÚKL katalog — ne plný kurz farmakologie",
+    title: "Léky (SÚKL)",
+    body: "Vyhledávání léčiv — praktický rozcestník, ne farmakologický kurz.",
   },
   {
     href: "/studenti/zkousky",
-    title: "Zkoušky",
-    body: "Plány a nástroje na přípravu ke zkouškám LF",
+    title: "Zkoušky a semestr",
+    body: "Orientace ke zkouškovému období a opakování.",
   },
   {
     href: "/medicina/plany",
     title: "Studijní plány",
-    body: "Harmonogramy podle ročníku",
+    body: "Strukturované cesty studiem napříč MedScope.",
   },
+] as const;
+
+const START_STEPS = [
+  {
+    n: "1",
+    title: "Self-test (5–10 min)",
+    body: "Zjistíte, kde jste a co dohnat.",
+    href: "/academy/prijimacky/self-test",
+    cta: "Spustit self-test",
+  },
+  {
+    n: "2",
+    title: "Jedna lekce zdarma",
+    body: "Uvidíte styl videa, slidů a kvízů.",
+    href: "/academy/courses?category=prijimacky",
+    cta: "Otevřít kurzy",
+  },
+  {
+    n: "3",
+    title: `${VIP_TRIAL_DAYS} dní zdarma`,
+    body: "Celá Academy + AI tutor bez závazku.",
+    href: "/predplatne?trial=1#student",
+    cta: "Vyzkoušet předplatné",
+  },
+] as const;
+
+const SUB_BENEFITS = [
+  "Všechny přípravné kurzy Academy (ne jen první lekce)",
+  "AI tutor a studijní materiály bez omezení free vrstvy",
+  "Kvízy, hry a procvičení — opakované použití během semestru",
+  `${VIP_TRIAL_DAYS} dní zdarma, pak od 149 Kč/měsíc (Student LF)`,
 ] as const;
 
 export default function StudentiHubPage() {
   return (
     <>
-      <style>{`
-        @keyframes msg-fade-up {
-          from { opacity: 0; transform: translateY(14px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes msg-soft-pulse {
-          0%, 100% { opacity: 0.35; }
-          50% { opacity: 0.55; }
-        }
-        .msg-hero-copy { animation: msg-fade-up 0.7s ease-out both; }
-        .msg-hero-cta { animation: msg-fade-up 0.7s ease-out 0.12s both; }
-        .msg-path { animation: msg-fade-up 0.65s ease-out 0.2s both; }
-        .msg-glow {
-          animation: msg-soft-pulse 7s ease-in-out infinite;
-        }
-      `}</style>
-
-      <section
-        className="relative overflow-hidden border-b border-[#d9e8f4]"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 60% at 15% 0%, rgba(0,91,150,0.16), transparent 55%), radial-gradient(ellipse 50% 40% at 90% 20%, rgba(2,29,51,0.08), transparent 50%), linear-gradient(165deg, #f7fbff 0%, #eef5fb 45%, #f8fafc 100%)",
-        }}
-      >
+      <section className="relative overflow-hidden border-b border-[#d9e8f4]">
         <div
-          className="msg-glow pointer-events-none absolute -right-24 top-0 h-72 w-72 rounded-full bg-[#005B96]/15 blur-3xl"
+          className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_0%,rgba(0,91,150,0.14),transparent_55%),radial-gradient(ellipse_50%_40%_at_90%_20%,rgba(14,116,144,0.08),transparent_50%),linear-gradient(180deg,#f8fbff_0%,#ffffff_70%)]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.35]"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23005B96' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
+          }}
           aria-hidden
         />
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
@@ -123,8 +143,8 @@ export default function StudentiHubPage() {
             </span>
           </h1>
           <p className="msg-hero-copy mt-5 max-w-xl text-lg leading-8 text-slate-600">
-            Jedna přehledná mapa: přijímačky, materiály, testy. Začněte zdarma — bez bloudění a bez
-            prázdných slibů.
+            Jedna přehledná mapa pro uchazeče, studenty LF i rodiče: přijímačky, materiály, testy.
+            Začněte zdarma — bez bloudění a bez prázdných slibů.
           </p>
           <div className="msg-hero-cta mt-8 flex flex-wrap gap-3">
             <Button asChild className="rounded-full bg-[#005B96] px-6">
@@ -135,6 +155,9 @@ export default function StudentiHubPage() {
             </Button>
             <Button asChild variant="outline" className="rounded-full border-[#005B96]/35 px-6">
               <Link href="/studenti/materialy">Už studuji na LF</Link>
+            </Button>
+            <Button asChild variant="ghost" className="rounded-full text-[#005B96]">
+              <Link href="#pro-rodice">Jsem rodič</Link>
             </Button>
           </div>
         </div>
@@ -148,6 +171,40 @@ export default function StudentiHubPage() {
           <span className="mx-2">/</span>
           <span>Studenti</span>
         </nav>
+
+        <section className="msg-path mb-12 rounded-3xl border border-[#cfe1f3] bg-[#f0f7ff]/70 p-6 sm:p-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#005B96]">
+            Doporučený start · uchazeči
+          </p>
+          <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">
+            Tři kroky dnes — pak předplatné dává smysl
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
+            Nejdřív ochutnejte obsah. Teprve když vidíte styl a zpětnou vazbu, má smysl otevřít celé
+            studentské předplatné.
+          </p>
+          <ol className="mt-6 grid gap-4 sm:grid-cols-3">
+            {START_STEPS.map((step) => (
+              <li
+                key={step.n}
+                className="flex flex-col rounded-2xl border border-white bg-white/90 p-5 shadow-[0_12px_28px_-24px_rgba(0,91,150,0.45)]"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#005B96] text-sm font-bold text-white">
+                  {step.n}
+                </span>
+                <p className="mt-3 font-medium text-[#021d33]">{step.title}</p>
+                <p className="mt-1 flex-1 text-xs leading-relaxed text-slate-500">{step.body}</p>
+                <Link
+                  href={step.href}
+                  className="mt-4 inline-flex items-center text-sm font-medium text-[#005B96] hover:underline"
+                >
+                  {step.cta}
+                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </section>
 
         <p className="msg-path mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-[#005B96]">
           Vyberte si cestu
@@ -240,16 +297,107 @@ export default function StudentiHubPage() {
                 </li>
               ))}
             </ul>
-            <div className="mt-5">
+            <div className="mt-5 flex flex-wrap gap-2">
               <Button asChild className="rounded-full bg-[#005B96]">
                 <Link href="/studenti/materialy">
                   Otevřít studijní materiály
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
+              <Button asChild variant="outline" className="rounded-full">
+                <Link href="/predplatne#student">Studentské předplatné</Link>
+              </Button>
             </div>
           </section>
         </div>
+
+        <section
+          id="pro-rodice"
+          className="mt-12 scroll-mt-24 rounded-3xl border border-[#cfe1f3] bg-white p-6 sm:p-8"
+        >
+          <div className="flex flex-wrap items-start gap-4">
+            <HeartHandshake className="h-7 w-7 shrink-0 text-[#005B96]" aria-hidden />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#005B96]">
+                Pro rodiče
+              </p>
+              <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">
+                Podpora přípravy — srozumitelně a bez přehánění
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-700">
+                Předplatné Student LF (od 149 Kč/měsíc) otevírá celou Academy a AI tutor. Nezaručuje
+                přijetí na medicínu — zvyšuje ale šanci tím, že dítě má strukturovanou přípravu,
+                kvízy a zpětnou vazbu místo nahodilého scrollování. Začněte trialem: uvidíte, jestli
+                to dítě skutečně používá.
+              </p>
+              <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+                {[
+                  "První lekce kurzů zdarma — bez karty",
+                  `${VIP_TRIAL_DAYS} dní plného přístupu zdarma`,
+                  "Cena srovnatelná s jedním doučováním",
+                  "Obsah v češtině, zaměřený na LF přijímačky",
+                ].map((line) => (
+                  <li key={line} className="flex items-start gap-2 text-sm text-slate-700">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#005B96]" aria-hidden />
+                    {line}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6 flex flex-wrap gap-2">
+                <Button asChild className="rounded-full bg-[#005B96]">
+                  <Link href="/predplatne?trial=1#student">
+                    Darovat / vyzkoušet {VIP_TRIAL_DAYS} dní
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="rounded-full">
+                  <Link href="/studenti/chci-studovat">Ukázat dítěti přípravu</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-12 overflow-hidden rounded-3xl border border-[#005B96]/25 bg-[linear-gradient(135deg,#005B96_0%,#0a4a7a_55%,#021d33_100%)] p-6 text-white sm:p-8">
+          <div className="flex flex-wrap items-start gap-4">
+            <Sparkles className="h-6 w-6 shrink-0 text-sky-200" aria-hidden />
+            <div className="min-w-0 flex-1">
+              <h2 className="font-display text-xl font-semibold sm:text-2xl">
+                Studentské předplatné — od 149 Kč/měsíc
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-sky-100">
+                Free vrstva stačí na ochutnávku. Předplatné je pro ty, kdo chtějí pravidelnou
+                přípravu nebo studijní oporu během semestru.
+              </p>
+              <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+                {SUB_BENEFITS.map((line) => (
+                  <li key={line} className="flex items-start gap-2 text-sm text-sky-50">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-sky-300" aria-hidden />
+                    {line}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6 flex flex-wrap gap-2">
+                <Button
+                  asChild
+                  className="rounded-full bg-white text-[#005B96] hover:bg-sky-50"
+                >
+                  <Link href="/predplatne?trial=1#student">
+                    {VIP_TRIAL_DAYS} dní zdarma
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="rounded-full border-white/40 bg-transparent text-white hover:bg-white/10"
+                >
+                  <Link href="/predplatne#student">Porovnat plány</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
 
         <section className="mt-12">
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
@@ -259,12 +407,6 @@ export default function StudentiHubPage() {
                 Rozcestníky — vedou dál do obsahu MedScope, ne nahrazují celý předmět.
               </p>
             </div>
-            <Link
-              href="/predplatne"
-              className="text-sm font-medium text-[#005B96] underline-offset-2 hover:underline"
-            >
-              Studentské předplatné od 149 Kč →
-            </Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {MORE.map((item) => (
@@ -283,7 +425,7 @@ export default function StudentiHubPage() {
 
         <section className="mt-10 overflow-hidden rounded-3xl border border-[#cfe1f3] bg-[linear-gradient(135deg,#f0f7ff_0%,#ffffff_55%,#eef6fc_100%)] p-6 sm:p-8">
           <div className="flex flex-wrap items-start gap-4">
-            <Sparkles className="h-6 w-6 shrink-0 text-[#005B96]" aria-hidden />
+            <ClipboardList className="h-6 w-6 shrink-0 text-[#005B96]" aria-hidden />
             <div className="min-w-0 flex-1">
               <h2 className="font-display text-xl font-semibold text-[#021d33]">
                 Proč se sem vracet
@@ -302,12 +444,6 @@ export default function StudentiHubPage() {
                 </Button>
                 <Button asChild variant="outline" className="rounded-full">
                   <Link href="/academy/prijimacky/self-test">Spustit self-test</Link>
-                </Button>
-                <Button asChild variant="outline" className="rounded-full">
-                  <Link href="/">
-                    <ClipboardList className="mr-2 h-4 w-4" />
-                    Domů MedScope
-                  </Link>
                 </Button>
               </div>
             </div>

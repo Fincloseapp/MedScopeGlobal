@@ -51,7 +51,8 @@ export default function PredplatnePage() {
             return (
               <div
                 key={plan.tier}
-                className={`relative flex flex-col rounded-2xl border bg-white p-6 shadow-sm ${
+                id={plan.tier}
+                className={`relative flex scroll-mt-24 flex-col rounded-2xl border bg-white p-6 shadow-sm ${
                   highlighted
                     ? "border-[#005B96] ring-2 ring-[#005B96]/25"
                     : "border-[#005B96]/20 ring-1 ring-[#005B96]/10"

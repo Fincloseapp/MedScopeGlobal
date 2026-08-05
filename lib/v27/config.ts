@@ -23,10 +23,10 @@ export const V27_AUDIENCES = {
     label: "Pro studenty",
     shortLabel: "Studenti",
     href: "/studenti",
-    description: "Anatomie, farmakologie, příprava na zkoušky a AI tutor.",
+    description: "Příprava na přijímačky LF, studijní materiály, kvízy a AI tutor.",
     ctaPrimary: { label: "Chci studovat medicínu", href: "/studenti/chci-studovat" },
     ctaSecondary: { label: "AI tutor", href: "/studenti/ai-tutor" },
-    topics: ["anatomie", "farmakologie", "přijímačky", "modelové otázky", "rozhovory se studenty"],
+    topics: ["přijímačky", "studijní materiály", "kvízy", "modelové otázky", "AI tutor"],
     aiRoute: "/ai-asistent/student",
   },
   physician: {
@@ -67,7 +67,11 @@ export const V27_SUBSCRIPTION_PLANS = [
     name: "Student LF",
     monthlyCzk: 149,
     annualCzk: 1490,
-    features: ["Kvízy a studijní plány", "AI tutor", "Modelové otázky"],
+    features: [
+      "Celá Academy včetně přípravných kurzů na přijímačky",
+      "AI tutor a studijní materiály",
+      "Kvízy, hry a modelové otázky",
+    ],
   },
   {
     tier: "physician" as const,

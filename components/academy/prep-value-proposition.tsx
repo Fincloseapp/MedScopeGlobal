@@ -62,6 +62,9 @@ export async function PrepValueProposition() {
               </Link>
             </Button>
             <Button asChild variant="outline" className="rounded-full border-[#005B96]/30">
+              <Link href="/academy/prijimacky/self-test">Self-test přijímaček</Link>
+            </Button>
+            <Button asChild variant="outline" className="rounded-full border-[#005B96]/30">
               <Link href="/studium/prijimacky">Termíny a požadavky LF</Link>
             </Button>
           </div>
@@ -133,6 +136,28 @@ export async function PrepValueProposition() {
             </div>
           </section>
         ) : null}
+
+        <section className="mt-12 rounded-2xl border border-[#cfe1f3] bg-white p-6 sm:p-8">
+          <h2 className="font-display text-xl font-semibold text-[#021d33]">
+            Pro rodiče a uchazeče: kdy má smysl předplatné
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
+            Free lekce a self-test stačí na rozhodnutí. Studentské předplatné (od 149 Kč/měsíc) dává
+            smysl, když chcete pravidelnou přípravu — celou Academy, AI tutor a opakované kvízy.
+            Nezaručuje přijetí; zvyšuje šanci strukturovaným tréninkem.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Button asChild className="rounded-full bg-[#005B96]">
+              <Link href="/predplatne?trial=1">
+                14 dní zdarma
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="rounded-full">
+              <Link href="/studenti#pro-rodice">Informace pro rodiče</Link>
+            </Button>
+          </div>
+        </section>
 
         <section className="mt-12 grid gap-4 sm:grid-cols-3">
           <Link
