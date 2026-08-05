@@ -20,8 +20,8 @@ export function SubscriptionTrialBanner() {
           {VIP_TRIAL_DAYS} dní zdarma na všechny tarify
         </p>
         <p className="max-w-2xl text-sm text-white/90 sm:text-base">
-          Vyzkoušejte plný přístup ke všem funkcím bez rizika. Platbu kartou zadáte až po skončení
-          zkušební doby — kdykoli zrušíte v účtu nebo ve Stripe zákaznickém portálu.
+          Plný přístup {VIP_TRIAL_DAYS} dní zdarma. Při aktivaci zadáte kartu přes Stripe — prvních{" "}
+          {VIP_TRIAL_DAYS} dní nic neúčtujeme. Zrušíte kdykoli v účtu nebo ve Stripe portálu.
         </p>
       </div>
     </div>

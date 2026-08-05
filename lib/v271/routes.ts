@@ -55,17 +55,17 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
     slug: "testy",
     title: "Testy a kvízy",
     description:
-      "Procvičení ke školním testům, přijímačkám i zkouškám — s okamžitou zpětnou vazbou.",
+      "Procvičení ke školním testům, přijímačkám i zkouškám — s okamžitou zpětnou vazbou. Odděleně od studijních her.",
     links: [
-      {
-        label: "Academy kvízy",
-        href: "/academy/quizzes",
-        description: "Kvízy vázané na kurzy — vysvětlení správných odpovědí",
-      },
       {
         label: "Self-test přijímaček",
         href: "/academy/prijimacky/self-test",
         description: "Biologie, chemie, fyzika — rychlá kontrola úrovně",
+      },
+      {
+        label: "Academy kvízy",
+        href: "/academy/quizzes",
+        description: "Kvízy vázané na kurzy — vysvětlení správných odpovědí",
       },
       {
         label: "Přípravné kurzy",
@@ -78,9 +78,14 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
         description: "Kompletní hub her — nejen anatomie",
       },
       { label: "Chci studovat medicínu", href: "/studenti/chci-studovat" },
+      {
+        label: "Studentské předplatné",
+        href: "/predplatne?trial=1#student",
+        description: "Neomezené procvičení — od 149 Kč/měsíc, trial zdarma",
+      },
     ],
-    ctaHref: "/studenti/hry",
-    ctaLabel: "Otevřít kvízy a hry",
+    ctaHref: "/academy/prijimacky/self-test",
+    ctaLabel: "Spustit self-test",
   },
   "chci-studovat": {
     slug: "chci-studovat",
@@ -98,18 +103,44 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
   zkousky: {
     slug: "zkousky",
     title: "Zkoušky",
-    description: "Příprava na zkoušky z anatomie, fyziologie a klinických oborů.",
+    description:
+      "Orientace ke zkouškovému období — plány, testy a AI tutor. Doplněk k vašim skriptům, ne náhrada výuky.",
     links: [
-      { label: "Studijní plány", href: "/medicina/plany" },
-      { label: "Testy", href: "/studenti/testy" },
-      { label: "AI tutor", href: "/studenti/ai-tutor" },
+      { label: "Studijní plány", href: "/medicina/plany", description: "Struktura napříč ročníky" },
+      { label: "Studijní materiály", href: "/studenti/materialy", description: "Knihovna podle oboru" },
+      { label: "Testy", href: "/studenti/testy", description: "Procvičení s zpětnou vazbou" },
+      { label: "AI tutor", href: "/studenti/ai-tutor", description: "Dotazy k látce" },
+      {
+        label: "Studentské předplatné",
+        href: "/predplatne#student",
+        description: "Plný přístup během semestru — od 149 Kč/měsíc",
+      },
     ],
+    ctaHref: "/studenti/materialy",
+    ctaLabel: "Otevřít materiály",
   },
   "ai-tutor": {
     slug: "ai-tutor",
     title: "AI tutor",
-    description: "Studentský AI asistent pro vysvětlení látky, opakování a zkoušky.",
-    links: [{ label: "Spustit AI tutor", href: "/ai-asistent/student" }],
+    description:
+      "Studentský AI asistent pro vysvětlení látky, opakování a zkoušky. Doplněk k materiálům — ne náhrada přednášek.",
+    links: [
+      {
+        label: "Spustit AI tutor",
+        href: "/ai-asistent/student",
+        description: "Dotazy v kontextu studia medicíny",
+      },
+      {
+        label: "Studijní materiály",
+        href: "/studenti/materialy",
+        description: "Nejdřív si otevřete téma, pak se ptejte",
+      },
+      {
+        label: "Studentské předplatné",
+        href: "/predplatne?trial=1#student",
+        description: "Plný AI tutor bez free omezení — trial zdarma",
+      },
+    ],
     ctaHref: "/ai-asistent/student",
     ctaLabel: "Zeptej se AI",
   },

@@ -12,6 +12,10 @@ const FAQ_ITEMS = [
     a: "Veřejnost (99 Kč) — prevence, životní styl a AI pro laiky. Student LF (149 Kč) — studijní materiály, kvízy a AI tutor. Lékař v praxi (490 Kč) — odborná sekce, guidelines, CME a klinický AI.",
   },
   {
+    q: "Mohu předplatné koupit jako rodič pro dítě?",
+    a: "Ano. Zvolte tarif Student LF (149 Kč/měsíc) a účet, který bude dítě používat. Nejdřív doporučujeme self-test a jednu free lekci — uvidíte, jestli přípravu opravdu používá. Předplatné nezaručuje přijetí na medicínu; dává strukturovaný trénink a zpětnou vazbu.",
+  },
+  {
     q: "Jaké platební metody podporujete?",
     a: "Platby zpracovává Stripe: platební karta (Visa, Mastercard), Apple Pay a Google Pay. Údaje o kartě neukládáme na našich serverech.",
   },

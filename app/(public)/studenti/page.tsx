@@ -4,7 +4,6 @@ import {
   ArrowRight,
   BookOpen,
   CheckCircle2,
-  ClipboardList,
   GraduationCap,
   HeartHandshake,
   Sparkles,
@@ -85,7 +84,7 @@ const MORE = [
   },
 ] as const;
 
-const START_STEPS = [
+const APPLICANT_STEPS = [
   {
     n: "1",
     title: "Self-test (5–10 min)",
@@ -109,12 +108,72 @@ const START_STEPS = [
   },
 ] as const;
 
+const LF_STEPS = [
+  {
+    n: "1",
+    title: "Materiály podle tématu",
+    body: "Najděte podklad ke zkoušce nebo semináři.",
+    href: "/studenti/materialy",
+    cta: "Otevřít knihovnu",
+  },
+  {
+    n: "2",
+    title: "Procvičení",
+    body: "Kvízy a testy — krátké opakování před testem.",
+    href: "/studenti/testy",
+    cta: "Spustit procvičení",
+  },
+  {
+    n: "3",
+    title: "AI tutor",
+    body: "Doptat se na nejasnou látku, když není čas čekat.",
+    href: "/studenti/ai-tutor",
+    cta: "Otevřít AI tutor",
+  },
+] as const;
+
 const SUB_BENEFITS = [
   "Všechny přípravné kurzy Academy (ne jen první lekce)",
   "AI tutor a studijní materiály bez omezení free vrstvy",
   "Kvízy, hry a procvičení — opakované použití během semestru",
   `${VIP_TRIAL_DAYS} dní zdarma, pak od 149 Kč/měsíc (Student LF)`,
 ] as const;
+
+function StepCards({
+  steps,
+}: {
+  steps: readonly {
+    n: string;
+    title: string;
+    body: string;
+    href: string;
+    cta: string;
+  }[];
+}) {
+  return (
+    <ol className="mt-6 grid gap-4 sm:grid-cols-3">
+      {steps.map((step) => (
+        <li
+          key={step.n}
+          className="flex flex-col rounded-2xl border border-white bg-white/90 p-5 shadow-[0_12px_28px_-24px_rgba(0,91,150,0.45)]"
+        >
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#005B96] text-sm font-bold text-white">
+            {step.n}
+          </span>
+          <p className="mt-3 font-medium text-[#021d33]">{step.title}</p>
+          <p className="mt-1 flex-1 text-xs leading-relaxed text-slate-500">{step.body}</p>
+          <Link
+            href={step.href}
+            className="mt-4 inline-flex items-center text-sm font-medium text-[#005B96] hover:underline"
+          >
+            {step.cta}
+            <ArrowRight className="ml-1 h-3.5 w-3.5" />
+          </Link>
+        </li>
+      ))}
+    </ol>
+  );
+}
 
 export default function StudentiHubPage() {
   return (
@@ -138,13 +197,16 @@ export default function StudentiHubPage() {
           </p>
           <h1 className="msg-hero-copy mt-4 max-w-3xl font-display text-4xl font-bold tracking-tight text-[#021d33] sm:text-5xl">
             MedScope pro cestu na medicínu
-            <span className="block text-[0.85em] font-semibold text-[#005B96] sm:mt-1">
-              i studium na LF
+            <span className="mt-1 block text-[0.85em] font-semibold text-[#005B96]">
+              a studium na LF
             </span>
           </h1>
           <p className="msg-hero-copy mt-5 max-w-xl text-lg leading-8 text-slate-600">
             Jedna přehledná mapa pro uchazeče, studenty LF i rodiče: přijímačky, materiály, testy.
             Začněte zdarma — bez bloudění a bez prázdných slibů.
+          </p>
+          <p className="msg-hero-copy mt-3 text-sm font-medium text-[#0a4a7a]/90">
+            První lekce zdarma · {VIP_TRIAL_DAYS} dní trial · od 149 Kč/měsíc
           </p>
           <div className="msg-hero-cta mt-8 flex flex-wrap gap-3">
             <Button asChild className="rounded-full bg-[#005B96] px-6">
@@ -154,7 +216,7 @@ export default function StudentiHubPage() {
               </Link>
             </Button>
             <Button asChild variant="outline" className="rounded-full border-[#005B96]/35 px-6">
-              <Link href="/studenti/materialy">Už studuji na LF</Link>
+              <Link href="#pro-studenty-lf">Už studuji na LF</Link>
             </Button>
             <Button asChild variant="ghost" className="rounded-full text-[#005B96]">
               <Link href="#pro-rodice">Jsem rodič</Link>
@@ -183,27 +245,7 @@ export default function StudentiHubPage() {
             Nejdřív ochutnejte obsah. Teprve když vidíte styl a zpětnou vazbu, má smysl otevřít celé
             studentské předplatné.
           </p>
-          <ol className="mt-6 grid gap-4 sm:grid-cols-3">
-            {START_STEPS.map((step) => (
-              <li
-                key={step.n}
-                className="flex flex-col rounded-2xl border border-white bg-white/90 p-5 shadow-[0_12px_28px_-24px_rgba(0,91,150,0.45)]"
-              >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#005B96] text-sm font-bold text-white">
-                  {step.n}
-                </span>
-                <p className="mt-3 font-medium text-[#021d33]">{step.title}</p>
-                <p className="mt-1 flex-1 text-xs leading-relaxed text-slate-500">{step.body}</p>
-                <Link
-                  href={step.href}
-                  className="mt-4 inline-flex items-center text-sm font-medium text-[#005B96] hover:underline"
-                >
-                  {step.cta}
-                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                </Link>
-              </li>
-            ))}
-          </ol>
+          <StepCards steps={APPLICANT_STEPS} />
         </section>
 
         <p className="msg-path mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-[#005B96]">
@@ -260,7 +302,10 @@ export default function StudentiHubPage() {
             </div>
           </section>
 
-          <section className="rounded-3xl border border-slate-200 bg-white p-6">
+          <section
+            id="pro-studenty-lf"
+            className="scroll-mt-24 rounded-3xl border border-slate-200 bg-white p-6"
+          >
             <div className="flex items-start gap-3">
               <GraduationCap className="mt-0.5 h-7 w-7 shrink-0 text-[#005B96]" aria-hidden />
               <div>
@@ -310,6 +355,23 @@ export default function StudentiHubPage() {
             </div>
           </section>
         </div>
+
+        <section
+          id="lf-start"
+          className="msg-path mt-10 scroll-mt-24 rounded-3xl border border-slate-200 bg-slate-50/80 p-6 sm:p-8"
+        >
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#005B96]">
+            Doporučený start · studenti LF
+          </p>
+          <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">
+            Tři kroky během semestru
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
+            Nejdřív najděte materiál, pak si látku procvičte. AI tutor je doplněk — ne náhrada
+            přednášek ani skript z fakulty.
+          </p>
+          <StepCards steps={LF_STEPS} />
+        </section>
 
         <section
           id="pro-rodice"
@@ -367,7 +429,7 @@ export default function StudentiHubPage() {
               </h2>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-sky-100">
                 Free vrstva stačí na ochutnávku. Předplatné je pro ty, kdo chtějí pravidelnou
-                přípravu nebo studijní oporu během semestru.
+                přípravu nebo studijní oporu během semestru — uchazeči i studenti LF.
               </p>
               <ul className="mt-4 grid gap-2 sm:grid-cols-2">
                 {SUB_BENEFITS.map((line) => (
@@ -420,33 +482,6 @@ export default function StudentiHubPage() {
                 <p className="mt-1 text-xs leading-relaxed text-slate-500">{item.body}</p>
               </Link>
             ))}
-          </div>
-        </section>
-
-        <section className="mt-10 overflow-hidden rounded-3xl border border-[#cfe1f3] bg-[linear-gradient(135deg,#f0f7ff_0%,#ffffff_55%,#eef6fc_100%)] p-6 sm:p-8">
-          <div className="flex flex-wrap items-start gap-4">
-            <ClipboardList className="h-6 w-6 shrink-0 text-[#005B96]" aria-hidden />
-            <div className="min-w-0 flex-1">
-              <h2 className="font-display text-xl font-semibold text-[#021d33]">
-                Proč se sem vracet
-              </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-700">
-                Jedna lekce zdarma ukáže styl. Self-test dá rychlou zpětnou vazbu. Materiály a kvízy
-                drží tempo během semestru. MedScope má být klidný, opakovaně použitelný studijní
-                prostor — ne jednorázová reklama.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                <Button asChild className="rounded-full bg-[#005B96]">
-                  <Link href="/academy/courses?category=prijimacky">
-                    Začít lekcí zdarma
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="rounded-full">
-                  <Link href="/academy/prijimacky/self-test">Spustit self-test</Link>
-                </Button>
-              </div>
-            </div>
           </div>
         </section>
       </div>

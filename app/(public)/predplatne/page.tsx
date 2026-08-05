@@ -19,7 +19,14 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default function PredplatnePage() {
+export default async function PredplatnePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ trial?: string }>;
+}) {
+  const { trial } = await searchParams;
+  const highlightTrial = trial === "1";
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <div className="text-center">
@@ -38,6 +45,36 @@ export default function PredplatnePage() {
       <div className="mt-10">
         <SubscriptionTrialBanner />
       </div>
+
+      {highlightTrial ? (
+        <p className="mt-6 rounded-2xl border border-[#cfe1f3] bg-[#f0f7ff]/80 px-4 py-3 text-center text-sm text-slate-700">
+          Přicházíte z trial CTA — níže je zvýrazněný tarif{" "}
+          <Link href="#student" className="font-semibold text-[#005B96] hover:underline">
+            Student LF
+          </Link>{" "}
+          (příprava na přijímačky i studium). Rodiče: účet založte na jméno studenta.
+        </p>
+      ) : null}
+
+      <section
+        id="pro-rodice"
+        className="mt-8 scroll-mt-24 rounded-2xl border border-[#cfe1f3] bg-white px-5 py-5 sm:px-6"
+      >
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#005B96]">
+          Tip pro rodiče a uchazeče
+        </p>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-700">
+          Tarif Student LF (149 Kč/měsíc) otevírá Academy, AI tutor a kvízy. Nejdřív vyzkoušejte{" "}
+          <Link href="/academy/prijimacky/self-test" className="text-[#005B96] hover:underline">
+            self-test
+          </Link>{" "}
+          a jednu lekci zdarma — pak dává trial smysl.{" "}
+          <Link href="/studenti#pro-rodice" className="text-[#005B96] hover:underline">
+            Více pro rodiče na /studenti
+          </Link>
+          .
+        </p>
+      </section>
 
       <section className="mt-12">
         <h2 className="font-display text-2xl font-semibold text-[#021d33]">Vyberte plán</h2>
