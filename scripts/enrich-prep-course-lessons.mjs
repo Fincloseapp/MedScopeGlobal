@@ -8,7 +8,23 @@ import { createClient } from "@supabase/supabase-js";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadProjectEnv } from "./load-env.mjs";
-import { COURSE_META, LESSON_BODIES } from "./data/prep-lesson-enrichment.mjs";
+import {
+  COURSE_META as BASE_META,
+  LESSON_BODIES as BASE_BODIES,
+} from "./data/prep-lesson-enrichment.mjs";
+import {
+  COURSE_META as EXTRA_META,
+  LESSON_BODIES as EXTRA_BODIES,
+} from "./data/prep-lesson-deep-extra.mjs";
+
+const COURSE_META = { ...BASE_META, ...EXTRA_META };
+const LESSON_BODIES = { ...BASE_BODIES, ...EXTRA_BODIES };
+if (BASE_BODIES["fyziologie-zaklady-uchazece"]) {
+  LESSON_BODIES["fyziologie-zaklady-uchazece"] = BASE_BODIES["fyziologie-zaklady-uchazece"];
+}
+if (BASE_META["fyziologie-zaklady-uchazece"]) {
+  COURSE_META["fyziologie-zaklady-uchazece"] = BASE_META["fyziologie-zaklady-uchazece"];
+}
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dir, "..");
@@ -84,7 +100,9 @@ async function main() {
           ? lessonSlug === "krevni-obeh"
             ? 32
             : 30
-          : undefined;
+          : words > 200
+            ? 28
+            : undefined;
 
       const patch = {
         content,

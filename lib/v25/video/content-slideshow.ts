@@ -113,45 +113,95 @@ function clampScore(n: unknown): number {
   return Math.max(0, Math.min(1, v));
 }
 
-function buildStaticSlideshow(
+function plainText(block: string): string {
+  return block
+    .replace(/^#{1,3}\s+/gm, "")
+    .replace(/\*\*/g, "")
+    .replace(/^[-*•]\s+/gm, "")
+    .replace(/\n+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Build professional topic slides directly from lesson markdown.
+ * Prefers ## / ### sections so the player always matches the written lesson.
+ */
+export function buildSlideshowFromLessonContent(
   title: string,
-  body: string,
-  topic: string
+  content: string,
+  topic?: string
 ): ContentSlideshowManifest {
-  const paragraphs = body
-    .split(/\n\n+/)
-    .map((p) => p.trim())
-    .filter((p) => p.length > 15)
-    .slice(0, 6);
+  const courseTopic = topic?.trim() || title;
+  const sections: Array<{ title: string; body: string }> = [];
+  const normalized = content.replace(/\r\n/g, "\n").trim();
+
+  if (normalized) {
+    const parts = normalized.split(/(?=^#{2,3}\s+)/m).map((p) => p.trim()).filter(Boolean);
+    for (const part of parts) {
+      const headingMatch = part.match(/^#{2,3}\s+(.+?)(?:\n|$)/);
+      if (headingMatch) {
+        const sectionTitle = headingMatch[1].replace(/\*\*/g, "").trim();
+        const body = plainText(part.slice(headingMatch[0].length));
+        if (body.length > 25) {
+          sections.push({
+            title: sectionTitle.slice(0, 80),
+            body: body.slice(0, 420),
+          });
+        }
+      } else {
+        const body = plainText(part);
+        if (body.length > 40) {
+          sections.push({
+            title: title,
+            body: body.slice(0, 420),
+          });
+        }
+      }
+    }
+  }
 
   const slides: SlideItem[] =
-    paragraphs.length > 0
-      ? paragraphs.map((p, i) => ({
-          title: i === 0 ? title : `${title} — část ${i + 1}`,
-          body: p.slice(0, 280),
-          imageDescription: topic,
-          durationSeconds: 10,
+    sections.length > 0
+      ? sections.slice(0, 8).map((s) => ({
+          title: s.title,
+          body: s.body,
+          imageDescription: `${courseTopic}: ${s.title}`,
+          imageKeywords: s.title
+            .toLowerCase()
+            .split(/[^a-záčďéěíňóřšťúůýž0-9]+/i)
+            .filter((w) => w.length > 3)
+            .slice(0, 5),
+          durationSeconds: 12,
         }))
       : [
           {
             title,
-            body: `Tato lekce v kurzu „${topic}" pokrývá téma: ${title}.`,
-            imageDescription: topic,
+            body: `Lekce „${title}" v kurzu ${courseTopic}. Projděte si text lekce a procvičte kvízem.`,
+            imageDescription: courseTopic,
             durationSeconds: 10,
           },
         ];
 
   return {
     title,
-    topic,
+    topic: courseTopic,
     script: slides.map((s) => `${s.title}. ${s.body}`).join(" "),
     voiceoverText: slides.map((s) => s.body).join(" "),
-    slides: attachSlideImages(slides, topic),
-    alignmentScore: 0.7,
+    slides: attachSlideImages(slides, courseTopic),
+    alignmentScore: sections.length > 0 ? 0.92 : 0.7,
     ttsMode: "web_speech_api",
     generatedAt: new Date().toISOString(),
     provider: "static",
   };
+}
+
+function buildStaticSlideshow(
+  title: string,
+  body: string,
+  topic: string
+): ContentSlideshowManifest {
+  return buildSlideshowFromLessonContent(title, body, topic);
 }
 
 export function extractSlideshowManifest(

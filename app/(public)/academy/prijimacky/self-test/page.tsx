@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { AcademyPageHeader } from "@/components/academy/page-header";
 import { SelfTestPlayer } from "@/components/prijimacky/self-test-player";
 import { generateSelfTest } from "@/lib/prijimacky/quiz-from-bank";
@@ -46,20 +47,34 @@ export default async function PrijimackySelfTestPage({ searchParams }: Props) {
       />
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
         <div className="mb-6 flex flex-wrap gap-2 text-sm">
-          <Link href="/academy/prijimacky/self-test?subject=biologie&count=12" className="rounded-full bg-[#f0f7ff] px-3 py-1 text-[#005B96]">
+          <Link
+            href={`/academy/prijimacky/self-test?subject=biologie&count=12&seed=${encodeURIComponent(`${seed}-bio`)}`}
+            className="rounded-full bg-[#f0f7ff] px-3 py-1 text-[#005B96]"
+          >
             Biologie
           </Link>
-          <Link href="/academy/prijimacky/self-test?subject=chemie&count=12" className="rounded-full bg-[#f0f7ff] px-3 py-1 text-[#005B96]">
+          <Link
+            href={`/academy/prijimacky/self-test?subject=chemie&count=12&seed=${encodeURIComponent(`${seed}-chem`)}`}
+            className="rounded-full bg-[#f0f7ff] px-3 py-1 text-[#005B96]"
+          >
             Chemie
           </Link>
-          <Link href="/academy/prijimacky/self-test?subject=fyzika&count=12" className="rounded-full bg-[#f0f7ff] px-3 py-1 text-[#005B96]">
+          <Link
+            href={`/academy/prijimacky/self-test?subject=fyzika&count=12&seed=${encodeURIComponent(`${seed}-fyz`)}`}
+            className="rounded-full bg-[#f0f7ff] px-3 py-1 text-[#005B96]"
+          >
             Fyzika
           </Link>
-          <Link href="/academy/prijimacky/self-test?subject=mixed&count=20" className="rounded-full bg-[#005B96] px-3 py-1 text-white">
+          <Link
+            href={`/academy/prijimacky/self-test?subject=mixed&count=20&seed=${encodeURIComponent(`${seed}-mix`)}`}
+            className="rounded-full bg-[#005B96] px-3 py-1 text-white"
+          >
             Mixed 20
           </Link>
         </div>
-        <SelfTestPlayer test={test} />
+        <Suspense fallback={<p className="text-sm text-slate-500">Načítám self-test…</p>}>
+          <SelfTestPlayer key={test.id} test={test} />
+        </Suspense>
       </div>
     </>
   );

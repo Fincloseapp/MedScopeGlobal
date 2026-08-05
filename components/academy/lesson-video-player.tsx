@@ -10,8 +10,8 @@ import {
 } from "@/components/academy/video-legal-notice";
 import { TopicSlideshowPlayer } from "@/components/academy/topic-slideshow-player";
 import { V33_FALLBACK_MP4_URL } from "@/lib/v33/version";
-import { attachSlideImages } from "@/lib/v25/video/slide-images";
 import {
+  buildSlideshowFromLessonContent,
   extractSlideshowManifest,
   isPlaceholderVideoUrl,
   type ContentSlideshowManifest,
@@ -57,46 +57,29 @@ function resolveVideoUrl(video: VideoAsset | null | undefined): string {
   return V33_FALLBACK_MP4_URL;
 }
 
-function buildInlineSlideshow(
-  lessonTitle: string,
-  lessonContent: string,
-  courseTopic?: string
-): ContentSlideshowManifest {
-  const paragraphs = lessonContent
-    .replace(/[#*]/g, "")
-    .split(/\n\n+/)
-    .map((p) => p.trim())
-    .filter((p) => p.length > 15)
-    .slice(0, 5);
-
-  const slides =
-    paragraphs.length > 0
-      ? paragraphs.map((body, i) => ({
-          title: i === 0 ? lessonTitle : `${lessonTitle} — ${i + 1}`,
-          body: body.slice(0, 280),
-          imageDescription: courseTopic ?? lessonTitle,
-          durationSeconds: 10,
-        }))
-      : [
-          {
-            title: lessonTitle,
-            body: `Lekce v kurzu ${courseTopic ?? "MedScope Academy"}: ${lessonTitle}.`,
-            imageDescription: lessonTitle,
-            durationSeconds: 10,
-          },
-        ];
-
-  return {
-    title: lessonTitle,
-    topic: courseTopic ?? lessonTitle,
-    script: slides.map((s) => s.body).join(" "),
-    voiceoverText: slides.map((s) => s.body).join(" "),
-    slides: attachSlideImages(slides, courseTopic ?? lessonTitle),
-    alignmentScore: 0.75,
-    ttsMode: "web_speech_api",
-    generatedAt: new Date().toISOString(),
-    provider: "static",
-  };
+function storedSlidesMatchContent(
+  stored: ContentSlideshowManifest | null,
+  lessonContent: string
+): boolean {
+  if (!stored?.slides?.length || !lessonContent.trim()) return false;
+  const contentWords = lessonContent.split(/\s+/).filter(Boolean).length;
+  const slideWords = stored.slides
+    .map((s) => `${s.title} ${s.body}`)
+    .join(" ")
+    .split(/\s+/)
+    .filter(Boolean).length;
+  // Stale outline slides are much shorter than a deepened lesson body.
+  if (contentWords >= 180 && slideWords < Math.min(120, contentWords * 0.2)) return false;
+  const hay = stored.slides.map((s) => s.body.toLowerCase()).join(" ");
+  const probes = lessonContent
+    .toLowerCase()
+    .replace(/[#*]/g, " ")
+    .split(/\s+/)
+    .filter((w) => w.length > 5)
+    .slice(0, 12);
+  if (!probes.length) return true;
+  const hits = probes.filter((w) => hay.includes(w)).length;
+  return hits / probes.length >= 0.25;
 }
 
 export function LessonVideoPlayer({
@@ -120,16 +103,21 @@ export function LessonVideoPlayer({
     () => extractSlideshowManifest(contentJson, video?.metadata ?? null),
     [contentJson, video?.metadata]
   );
-  const [manifest, setManifest] = useState<ContentSlideshowManifest | null>(storedManifest);
-
-  useEffect(() => {
-    setManifest(storedManifest);
-  }, [storedManifest]);
-
-  useEffect(() => {
-    if (!isPlaceholder || manifest?.slides?.length || !lessonContent.trim()) return;
-    setManifest(buildInlineSlideshow(lessonTitle, lessonContent, courseTopic));
-  }, [isPlaceholder, manifest, lessonTitle, lessonContent, courseTopic]);
+  const contentManifest = useMemo(
+    () =>
+      lessonContent.trim()
+        ? buildSlideshowFromLessonContent(lessonTitle, lessonContent, courseTopic)
+        : null,
+    [lessonTitle, lessonContent, courseTopic]
+  );
+  const manifest: ContentSlideshowManifest | null = useMemo(() => {
+    if (!isPlaceholder) return storedManifest ?? contentManifest;
+    // Placeholder / demo video: lesson text is the source of truth for slides.
+    if (contentManifest && !storedSlidesMatchContent(storedManifest, lessonContent)) {
+      return contentManifest;
+    }
+    return storedManifest ?? contentManifest;
+  }, [isPlaceholder, storedManifest, contentManifest, lessonContent]);
 
   const usingFallback = isPlaceholder;
   const source = detectVideoSource(videoUrl, usingFallback);
@@ -187,7 +175,7 @@ export function LessonVideoPlayer({
         lessonTitle={lessonTitle}
         variant="academy"
         sourceKind="fallback_w3schools"
-        sourceLabel="Slideshow z obsahu lekce (demo)"
+        sourceLabel="Slideshow z textu lekce"
       >
         <TopicSlideshowPlayer
           manifest={manifest}
