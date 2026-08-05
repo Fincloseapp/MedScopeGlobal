@@ -8,6 +8,7 @@ import {
   computeMaterialsStats,
   listStudentMaterialSubjects,
   listStudentMaterials,
+  toListMaterial,
 } from "@/lib/studenti/materials";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { VIP_TRIAL_DAYS } from "@/lib/vip";
@@ -22,11 +23,12 @@ export const metadata: Metadata = buildV20PageMetadata({
 });
 
 export default async function StudentiMaterialyPage() {
-  const [{ materials }, subjects] = await Promise.all([
+  const [{ materials, total }, subjects] = await Promise.all([
     listStudentMaterials({ limit: 1000 }),
     listStudentMaterialSubjects(),
   ]);
-  const stats = computeMaterialsStats(materials);
+  const listItems = materials.map(toListMaterial);
+  const stats = computeMaterialsStats(listItems, total);
 
   return (
     <ModulePageShell
@@ -48,7 +50,7 @@ export default async function StudentiMaterialyPage() {
         <span>Studijní materiály</span>
       </nav>
 
-      <StudentMaterialsBrowser materials={materials} subjects={subjects} stats={stats} />
+      <StudentMaterialsBrowser materials={listItems} subjects={subjects} stats={stats} />
 
       <section className="mt-10 rounded-2xl border border-[#cfe1f3] bg-[#f0f7ff]/70 p-5 sm:p-6">
         <h2 className="font-display text-lg font-semibold text-[#021d33]">
@@ -60,13 +62,18 @@ export default async function StudentiMaterialyPage() {
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button asChild className="rounded-full bg-[#005B96]">
-            <Link href="/predplatne?trial=1#student">
+            <Link
+              href="/predplatne?trial=1#student"
+              data-cta="materialy-trial"
+            >
               {VIP_TRIAL_DAYS} dní zdarma
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
           <Button asChild variant="outline" className="rounded-full">
-            <Link href="/studenti/ai-tutor">AI tutor</Link>
+            <Link href="/studenti/ai-tutor" data-cta="materialy-ai-tutor">
+              AI tutor
+            </Link>
           </Button>
         </div>
       </section>

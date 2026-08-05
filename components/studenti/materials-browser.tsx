@@ -1,15 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { BookOpen, Search } from "lucide-react";
-import type { PublicStudentMaterial } from "@/lib/studenti/materials";
+import type { PublicStudentMaterialListItem } from "@/lib/studenti/materials";
 import {
   PUBLIC_LEGAL_NOTICE,
   PUBLIC_SOURCE_LABEL,
 } from "@/lib/studenti/materials-anonymize";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+const PAGE_SIZE = 24;
 
 const ROCNIK_TABS = [
   { value: "all", label: "Vše" },
@@ -27,18 +30,23 @@ export function StudentMaterialsBrowser({
   subjects,
   stats,
 }: {
-  materials: PublicStudentMaterial[];
+  materials: PublicStudentMaterialListItem[];
   subjects: string[];
   stats: { total: number; byRocnik: Record<string, number> };
 }) {
   const [rocnik, setRocnik] = useState<string>("all");
   const [subject, setSubject] = useState<string>("all");
   const [query, setQuery] = useState("");
+  const [visible, setVisible] = useState(PAGE_SIZE);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return materials.filter((m) => {
-      if (rocnik !== "all" && String(m.rocnik ?? "") !== rocnik) return false;
+      if (rocnik === "0") {
+        if (m.category !== "recent" && m.rocnik !== 0) return false;
+      } else if (rocnik !== "all" && String(m.rocnik ?? "") !== rocnik) {
+        return false;
+      }
       if (subject !== "all" && m.subject !== subject) return false;
       if (
         q &&
@@ -51,16 +59,24 @@ export function StudentMaterialsBrowser({
     });
   }, [materials, rocnik, subject, query]);
 
+  useEffect(() => {
+    setVisible(PAGE_SIZE);
+  }, [rocnik, subject, query]);
+
+  const shown = filtered.slice(0, visible);
+  const hasMore = visible < filtered.length;
+
   return (
     <div className="space-y-8">
-      <div className="rounded-2xl border border-[#cfe1f3] bg-white p-5 shadow-[0_12px_30px_-24px_rgba(0,91,150,0.55)]">
+      <div className="rounded-2xl border border-[#cfe1f3] bg-white p-5">
         <p className="text-sm leading-7 text-slate-600">
           Kurátorovaná knihovna studijních materiálů pro studenty medicíny — vyhledávání
           podle ročníku, oboru a názvu. Materiály lze{" "}
           <span className="font-medium text-[#005B96]">číst online</span> přímo v prohlížeči.
         </p>
         <p className="mt-2 text-xs text-slate-500">
-          {PUBLIC_SOURCE_LABEL} · celkem {stats.total} materiálů · zobrazeno {filtered.length}
+          {PUBLIC_SOURCE_LABEL} · celkem {stats.total} materiálů · filtr: {filtered.length}
+          {filtered.length > shown.length ? ` · zobrazeno ${shown.length}` : ""}
         </p>
       </div>
 
@@ -111,29 +127,43 @@ export function StudentMaterialsBrowser({
           Žádné materiály pro zvolené filtry.
         </p>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((m) => (
-            <Link
-              key={m.id}
-              href={m.read_path}
-              className="group flex flex-col rounded-2xl border border-[#cfe1f3] bg-white p-5 shadow-[0_12px_30px_-24px_rgba(0,91,150,0.55)] transition hover:-translate-y-0.5 hover:border-[#005B96]/40"
-            >
-              <h3 className="font-display text-base font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
-                {m.display_title}
-              </h3>
-              <p className="mt-2 text-xs font-medium text-[#005B96]/80">{m.subject}</p>
-              {m.rocnik !== null && m.rocnik > 0 ? (
-                <p className="mt-1 text-xs text-slate-500">{m.rocnik}. ročník</p>
-              ) : m.category === "recent" ? (
-                <p className="mt-1 text-xs text-slate-500">Naposled přidané</p>
-              ) : null}
-              <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-[#005B96]">
-                <BookOpen className="h-3.5 w-3.5" />
-                Číst
-              </span>
-            </Link>
-          ))}
-        </div>
+        <>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {shown.map((m) => (
+              <Link
+                key={m.id}
+                href={m.read_path}
+                className="group flex flex-col rounded-2xl border border-[#cfe1f3] bg-white p-5 transition hover:border-[#005B96]/40"
+              >
+                <h3 className="font-display text-base font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
+                  {m.display_title}
+                </h3>
+                <p className="mt-2 text-xs font-medium text-[#005B96]/80">{m.subject}</p>
+                {m.rocnik !== null && m.rocnik > 0 ? (
+                  <p className="mt-1 text-xs text-slate-500">{m.rocnik}. ročník</p>
+                ) : m.category === "recent" ? (
+                  <p className="mt-1 text-xs text-slate-500">Naposled přidané</p>
+                ) : null}
+                <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-[#005B96]">
+                  <BookOpen className="h-3.5 w-3.5" />
+                  Číst
+                </span>
+              </Link>
+            ))}
+          </div>
+          {hasMore ? (
+            <div className="flex justify-center">
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-full"
+                onClick={() => setVisible((n) => n + PAGE_SIZE)}
+              >
+                Načíst další ({filtered.length - shown.length} zbývá)
+              </Button>
+            </div>
+          ) : null}
+        </>
       )}
 
       <footer className="rounded-2xl border border-[#cfe1f3] bg-[#eef4fb]/50 p-5 text-sm leading-7 text-slate-700">

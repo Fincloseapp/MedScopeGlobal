@@ -91,6 +91,7 @@ const APPLICANT_STEPS = [
     body: "Zjistíte, kde jste a co dohnat.",
     href: "/academy/prijimacky/self-test",
     cta: "Spustit self-test",
+    ctaAttr: "studenti-step-self-test",
   },
   {
     n: "2",
@@ -98,6 +99,7 @@ const APPLICANT_STEPS = [
     body: "Uvidíte styl videa, slidů a kvízů.",
     href: "/academy/courses?category=prijimacky",
     cta: "Otevřít kurzy",
+    ctaAttr: "studenti-step-free-lesson",
   },
   {
     n: "3",
@@ -105,6 +107,7 @@ const APPLICANT_STEPS = [
     body: "Celá Academy + AI tutor bez závazku.",
     href: "/predplatne?trial=1#student",
     cta: "Vyzkoušet předplatné",
+    ctaAttr: "studenti-step-trial",
   },
 ] as const;
 
@@ -148,6 +151,7 @@ function StepCards({
     body: string;
     href: string;
     cta: string;
+    ctaAttr?: string;
   }[];
 }) {
   return (
@@ -164,6 +168,7 @@ function StepCards({
           <p className="mt-1 flex-1 text-xs leading-relaxed text-slate-500">{step.body}</p>
           <Link
             href={step.href}
+            data-cta={step.ctaAttr}
             className="mt-4 inline-flex items-center text-sm font-medium text-[#005B96] hover:underline"
           >
             {step.cta}
@@ -407,13 +412,15 @@ export default function StudentiHubPage() {
               </ul>
               <div className="mt-6 flex flex-wrap gap-2">
                 <Button asChild className="rounded-full bg-[#005B96]">
-                  <Link href="/predplatne?trial=1#student">
+                  <Link href="/predplatne?trial=1#student" data-cta="studenti-parent-trial">
                     Darovat / vyzkoušet {VIP_TRIAL_DAYS} dní
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="rounded-full">
-                  <Link href="/studenti/chci-studovat">Ukázat dítěti přípravu</Link>
+                  <Link href="/studenti/chci-studovat" data-cta="studenti-parent-prep">
+                    Ukázat dítěti přípravu
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -444,7 +451,7 @@ export default function StudentiHubPage() {
                   asChild
                   className="rounded-full bg-white text-[#005B96] hover:bg-sky-50"
                 >
-                  <Link href="/predplatne?trial=1#student">
+                  <Link href="/predplatne?trial=1#student" data-cta="studenti-sub-trial">
                     {VIP_TRIAL_DAYS} dní zdarma
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>

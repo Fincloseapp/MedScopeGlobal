@@ -1,12 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SubscriptionNudgeStrip } from "@/components/v38/subscription-nudge-strip";
 import type { AppUser, Category } from "@/types/database";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import type { StoredNudge } from "@/lib/v38/conversion-engine";
-import { getStaticCopy } from "@/lib/v38/conversion-copy";
+import {
+  daySeed,
+  getStaticCopy,
+  getStudentiNavStripCopy,
+  isStudentAudiencePath,
+} from "@/lib/v38/conversion-copy";
 
 type ReaderPayload = {
   user: { id: string; email?: string | null } | null;
@@ -36,6 +42,13 @@ export function SiteHeaderWithConversion({
   region,
   navStripCopy,
 }: Props) {
+  const pathname = usePathname();
+  const studentPath = isStudentAudiencePath(pathname);
+  const studentStrip = useMemo(
+    () => ({ ...getStudentiNavStripCopy(daySeed()), generatedBy: "static" as const }),
+    []
+  );
+
   const [reader, setReader] = useState<ReaderPayload>(DEFAULT_READER);
   const [stripCopy, setStripCopy] = useState<StoredNudge>(
     navStripCopy ?? { ...getStaticCopy("nav_strip"), generatedBy: "static" }
@@ -50,7 +63,7 @@ export function SiteHeaderWithConversion({
       })
       .catch(() => {});
 
-    if (!navStripCopy) {
+    if (!studentPath && !navStripCopy) {
       fetch("/api/v38/conversion-copy?slot=nav_strip")
         .then((r) => (r.ok ? r.json() : null))
         .then((data: StoredNudge | null) => {
@@ -62,7 +75,9 @@ export function SiteHeaderWithConversion({
     return () => {
       cancelled = true;
     };
-  }, [navStripCopy]);
+  }, [navStripCopy, studentPath]);
+
+  const effectiveStrip = studentPath ? studentStrip : stripCopy;
 
   return (
     <>
@@ -75,7 +90,12 @@ export function SiteHeaderWithConversion({
         isVip={reader.isVip}
         accessLevel={reader.accessLevel}
       />
-      {!reader.isVip ? <SubscriptionNudgeStrip copy={stripCopy} /> : null}
+      {!reader.isVip ? (
+        <SubscriptionNudgeStrip
+          copy={effectiveStrip}
+          ctaDataAttr={studentPath ? "nav-strip-student-trial" : "nav-strip-trial"}
+        />
+      ) : null}
     </>
   );
 }

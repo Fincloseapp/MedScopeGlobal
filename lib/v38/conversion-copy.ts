@@ -97,6 +97,24 @@ export function getStaticCopy(slot: ConversionSlot, seed = 0): ConversionCopy {
   return pool[Math.abs(seed) % pool.length] ?? pool[0]!;
 }
 
+/** Path-aware nav strip for student / academy prep surfaces. */
+export function getStudentiNavStripCopy(seed = 0): ConversionCopy {
+  const pool = STATIC_POOL.nav_strip;
+  return pool[Math.abs(seed) % pool.length] ?? pool[0]!;
+}
+
+export function isStudentAudiencePath(pathname: string | null | undefined): boolean {
+  if (!pathname) return false;
+  return (
+    pathname === "/studenti" ||
+    pathname.startsWith("/studenti/") ||
+    pathname.startsWith("/academy/") ||
+    pathname.startsWith("/studium/") ||
+    pathname.startsWith("/medicina/") ||
+    pathname.startsWith("/ai-asistent/student")
+  );
+}
+
 export function daySeed(): number {
   const d = new Date();
   return d.getFullYear() * 1000 + d.getMonth() * 50 + d.getDate();

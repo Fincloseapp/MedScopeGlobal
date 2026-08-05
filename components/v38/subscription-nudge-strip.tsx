@@ -10,10 +10,12 @@ const DISMISS_KEY = "medscope-v38-nudge-dismissed";
 
 type Props = {
   copy: StoredNudge;
+  /** Optional analytics hook for CTA clicks */
+  ctaDataAttr?: string;
 };
 
 /** v38 — dismissible subscription strip below header */
-export function SubscriptionNudgeStrip({ copy }: Props) {
+export function SubscriptionNudgeStrip({ copy, ctaDataAttr }: Props) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -48,7 +50,9 @@ export function SubscriptionNudgeStrip({ copy }: Props) {
             <span className="hidden text-xs text-slate-500 md:inline">{copy.hint}</span>
           ) : null}
           <Button asChild size="sm" className="h-8 bg-[#005B96] hover:bg-[#004a7a]">
-            <Link href={copy.ctaHref}>{copy.ctaLabel}</Link>
+            <Link href={copy.ctaHref} data-cta={ctaDataAttr ?? "nav-strip-cta"}>
+              {copy.ctaLabel}
+            </Link>
           </Button>
           <button
             type="button"

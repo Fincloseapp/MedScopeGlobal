@@ -41,6 +41,29 @@ export type PublicStudentMaterial = {
   read_path: string;
 };
 
+/** Lean list card — keeps /studenti/materialy HTML/RSC payload small. */
+export type PublicStudentMaterialListItem = {
+  id: string;
+  display_title: string;
+  subject: string;
+  rocnik: number | null;
+  category: "recent" | "rocnik" | "general";
+  read_path: string;
+};
+
+export function toListMaterial(
+  m: Pick<PublicStudentMaterial, "id" | "display_title" | "subject" | "rocnik" | "category" | "read_path">
+): PublicStudentMaterialListItem {
+  return {
+    id: m.id,
+    display_title: m.display_title,
+    subject: m.subject,
+    rocnik: m.rocnik,
+    category: m.category,
+    read_path: m.read_path,
+  };
+}
+
 export type StudentMaterialsQuery = {
   rocnik?: number | null;
   subject?: string;
@@ -112,7 +135,10 @@ export async function listStudentMaterials(
 
   let dbQuery = supabase
     .from("student_materials")
-    .select("*", { count: "exact" })
+    .select(
+      "id, title, subject, rocnik, category, file_type, file_size_bytes, description, external_url, source_name, source_url, source_attribution, hosting_mode, storage_path, scraped_at",
+      { count: "exact" }
+    )
     .eq("is_active", true)
     .order("subject", { ascending: true })
     .order("title", { ascending: true })
@@ -181,11 +207,21 @@ export async function listStudentMaterialSubjects(): Promise<string[]> {
   return [...subjects].sort((a, b) => a.localeCompare(b, "cs"));
 }
 
-export function computeMaterialsStats(materials: Pick<PublicStudentMaterial, "rocnik">[]) {
+export function computeMaterialsStats(
+  materials: Pick<PublicStudentMaterial, "rocnik" | "category">[],
+  totalOverride?: number
+) {
   const byRocnik: Record<string, number> = {};
   for (const row of materials) {
-    const key = row.rocnik === null ? "general" : String(row.rocnik);
-    byRocnik[key] = (byRocnik[key] ?? 0) + 1;
+    if (row.category === "recent" || row.rocnik === 0) {
+      byRocnik["0"] = (byRocnik["0"] ?? 0) + 1;
+    }
+    if (row.rocnik !== null && row.rocnik > 0) {
+      const key = String(row.rocnik);
+      byRocnik[key] = (byRocnik[key] ?? 0) + 1;
+    } else if (row.rocnik === null && row.category !== "recent") {
+      byRocnik.general = (byRocnik.general ?? 0) + 1;
+    }
   }
-  return { total: materials.length, byRocnik };
+  return { total: totalOverride ?? materials.length, byRocnik };
 }
