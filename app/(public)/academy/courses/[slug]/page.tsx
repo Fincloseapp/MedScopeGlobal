@@ -146,7 +146,11 @@ export default async function AcademyCourseDetailPage({ params }: Props) {
 
             {(course.summary ?? course.description) ? (
               <div>
-                <TtsListenButton text={fullCourseListenText} label="Poslech celého kurzu" />
+                <TtsListenButton
+                  text={fullCourseListenText}
+                  label="Poslech celého kurzu"
+                  lang="cs-CZ"
+                />
               </div>
             ) : null}
 

@@ -68,7 +68,7 @@ export function TtsListenButton({
       }
       setPlaying(false);
     } catch {
-      setError("Poslech se nepodařilo spustit — zkuste jiný hlas v prohlížeči");
+      setError("Poslech se nepodařilo spustit — zkontrolujte český hlas (Vlasta/Antonín) v prohlížeči");
       setPlaying(false);
     } finally {
       setLoading(false);
@@ -101,7 +101,7 @@ export function TtsListenButton({
             <p className="text-sm font-medium text-[#021d33]">
               {playing ? "Přehrává se poslechová verze" : "Poslechová verze článku"}
             </p>
-            <p className="text-xs text-slate-500">≈ {minutes} min · čeština · hlas prohlížeče</p>
+            <p className="text-xs text-slate-500">≈ {minutes} min · čeština · neuralní hlas</p>
           </div>
           <VoicePicker compact lang={speechLang} />
         </div>

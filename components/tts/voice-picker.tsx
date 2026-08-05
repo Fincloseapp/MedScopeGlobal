@@ -77,8 +77,8 @@ export function VoicePicker({ className, compact, lang = "cs-CZ" }: Props) {
         </span>
       ) : null}
       {noCzechVoice ? (
-        <span className="text-[10px] text-amber-700" title="Nainstalujte český hlas v systému">
-          Chybí český hlas
+        <span className="text-[10px] text-emerald-700" title="Použije se neuralní český hlas Vlasta/Antonín">
+          Neuralní čeština
         </span>
       ) : null}
     </div>

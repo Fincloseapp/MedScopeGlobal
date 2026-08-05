@@ -4,9 +4,13 @@ import { getEffectiveVoiceGender } from "@/lib/tts/voice-session";
 
 export type VoiceGender = "male" | "female" | "auto";
 
-/** Known Czech voice name fragments (Windows Jakub/Vlasta, Google čeština, Ivona, macOS). */
+/** Known Czech voice name fragments (Windows Jakub/Vlasta/Antonin, Google čeština, Ivona, macOS Zuzana). */
 const CZECH_VOICE_HINTS =
-  /jakub|anton[ií]n|vlasta|ivona|zuzana|barbora|libor|josef|marie|petra|elena|jana|pavel|martin|čeština|czech|cs[_-]?cz|google.*cs|microsoft.*cs|microsoft.*jakub|microsoft.*anton/i;
+  /jakub|anton[ií]n|vlasta|ivona|zuzana|barbora|libor|josef|marie|petra|elena|jana|pavel|martin|čeština|cestina|czech|cs[_-]?cz|google.*cs|microsoft.*cs|microsoft.*jakub|microsoft.*anton|neural.*cs|cs-cz-/i;
+
+/** Prefer true Czech neural / system voices over generic TTS. */
+const NATIVE_CZECH_NEURAL =
+  /vlasta|anton[ií]n|jakub|microsoft.*(czech|čeština|cestina|cs)|google.*(czech|čeština|cestina|cs)|zuzana.*cs|cs-cz-.*neural/i;
 
 export function resolveSpeechLang(lang?: string | null): string {
   if (!lang) return "cs-CZ";
@@ -42,10 +46,13 @@ export function filterVoicesForLang(
   if (l.startsWith("en")) {
     return voices.filter((v) => v.lang.toLowerCase().startsWith("en") && !isCzechVoice(v));
   }
+  // Strict Czech only for native accent. Slovak only if absolutely no cs-* voice exists.
   const czech = voices.filter(isCzechVoice);
   if (czech.length) return czech;
-  const sk = voices.filter((v) => v.lang.toLowerCase().startsWith("sk"));
-  return sk;
+  return voices.filter((v) => {
+    const code = v.lang.toLowerCase().replace("_", "-");
+    return code.startsWith("sk") && !isEnglishOnlyVoice(v);
+  });
 }
 
 function scoreVoice(v: SpeechSynthesisVoice, gender: VoiceGender, lang: string): number {
@@ -58,11 +65,16 @@ function scoreVoice(v: SpeechSynthesisVoice, gender: VoiceGender, lang: string):
     if (vlang.startsWith("en-us")) score += 55;
     else if (vlang.startsWith("en")) score += 45;
   } else {
-    if (vlang === "cs-cz") score += 60;
-    else if (vlang.startsWith("cs")) score += 50;
-    else if (vlang.startsWith("sk")) score += 28;
-    if (CZECH_VOICE_HINTS.test(v.name)) score += 45;
+    if (vlang === "cs-cz") score += 80;
+    else if (vlang.startsWith("cs")) score += 65;
+    else if (vlang.startsWith("sk")) score += 15;
+    if (NATIVE_CZECH_NEURAL.test(v.name) || NATIVE_CZECH_NEURAL.test(vlang)) score += 90;
+    if (CZECH_VOICE_HINTS.test(v.name)) score += 50;
     if (isEnglishOnlyVoice(v)) return -1000;
+    // Never prefer generic "Google US English" etc. for Czech content
+    if (!vlang.startsWith("cs") && !vlang.startsWith("sk") && !CZECH_VOICE_HINTS.test(v.name)) {
+      return -1000;
+    }
   }
 
   if (gender === "female") {

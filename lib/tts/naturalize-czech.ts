@@ -38,6 +38,24 @@ const MEDICAL_ABBR: Record<string, string> = {
   WHO: "světová zdravotnická organizace",
   JIP: "jednotka intenzivní péče",
   PZS: "poskytovatel zdravotních služeb",
+  ATP: "á té pé",
+  DNA: "dé en á",
+  RNA: "er en á",
+  mRNA: "em er en á",
+  pH: "pé há",
+  CO: "cé ó",
+  NaCl: "chlorid sodný",
+  H2O: "voda",
+  "H₂O": "voda",
+  SI: "es í",
+  XP: "ikspé",
+  AI: "á í",
+  CNS: "cé en es",
+  PNS: "pé en es",
+  BMI: "bé em í",
+  CT: "cé té",
+  MRI: "em er í",
+  PCR: "pé cé er",
 };
 
 /** Feminine cardinal forms used before letter designations (2b → dvě bé). */
@@ -138,7 +156,13 @@ export function naturalizeCzechForSpeech(raw: string): string {
     return ` ${PAUSE} ${trimmed} ${PAUSE} `;
   });
 
-  // Letter+number medical staging before abbreviations
+  // Medical / academy abbreviations first (before letter+digit staging)
+  for (const [abbr, spoken] of Object.entries(MEDICAL_ABBR).sort((a, b) => b[0].length - a[0].length)) {
+    const re = new RegExp(`\\b${abbr.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi");
+    t = t.replace(re, spoken);
+  }
+
+  // Letter+number medical staging (2b, T1…)
   t = expandLetterNumberPatterns(t);
 
   // Slashes between words → pause (not "lomítko")
@@ -147,12 +171,6 @@ export function naturalizeCzechForSpeech(raw: string): string {
 
   // Dashes → pause
   t = t.replace(/\s*[–—-]\s*/g, ` ${PAUSE} `);
-
-  // Medical abbreviations (longer first)
-  for (const [abbr, spoken] of Object.entries(MEDICAL_ABBR).sort((a, b) => b[0].length - a[0].length)) {
-    const re = new RegExp(`\\b${abbr.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi");
-    t = t.replace(re, spoken);
-  }
 
   // Blood pressure / ratios: 120/80 → sto dvacet pause osmdesát
   t = t.replace(/\b(\d+)\s*\/\s*(\d+)\b/g, (_, a, b) => {

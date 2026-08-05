@@ -180,7 +180,7 @@ export function LessonVideoPlayer({
         <TopicSlideshowPlayer
           manifest={manifest}
           lessonTitle={lessonTitle}
-          lang="cs"
+          lang="cs-CZ"
         />
       </VideoLegalNotice>
     );
