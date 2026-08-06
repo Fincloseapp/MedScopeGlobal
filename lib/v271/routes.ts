@@ -159,6 +159,11 @@ export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
         description: "Akreditované testy výhradně pro revmatology",
       },
       {
+        label: "MedScope Dokumentace",
+        href: "/lekari/dokumentace",
+        description: "AI zapisovatel — nahrávka → český zápis podle šablony",
+      },
+      {
         label: "Ověření ČLK (Academy)",
         href: "/academy/lekari/overeni",
         description: "Vstup do Lékařské zóny Academy",

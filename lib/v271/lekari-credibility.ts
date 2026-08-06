@@ -9,6 +9,13 @@ export const V271_LEKARI_CREDIBILITY = [
     badge: "CME",
   },
   {
+    id: "dokumentace",
+    title: "MedScope Dokumentace",
+    description:
+      "AI zapisovatel: nahrávka nebo diktát → český přepis → strukturovaný zápis. Asistent pro lékaře, ephemeral audio.",
+    badge: "AI scribe",
+  },
+  {
     id: "clk",
     title: "Partnerství s ČLK",
     description:
@@ -33,6 +40,7 @@ export const V271_PHYSICIAN_TIER = {
     "Odborná sekce, guidelines a diagnostické algoritmy",
     "Kurátorované souhrny studií s DOI a PMID",
     "Klinický AI asistent a Research Hub",
+    "MedScope Dokumentace — AI zápisy z nahrávky",
     "CME přehledy a prioritní notifikace novinek",
   ],
   comparisonNote:

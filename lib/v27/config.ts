@@ -36,7 +36,7 @@ export const V27_AUDIENCES = {
     href: "/lekari",
     description: "Guidelines, souhrny studií, diagnostické algoritmy, CME a Research Hub.",
     ctaPrimary: { label: "Odborná sekce", href: "/odborna" },
-    ctaSecondary: { label: "Klinický AI", href: "/lekari/ai-asistent" },
+    ctaSecondary: { label: "Dokumentace", href: "/lekari/dokumentace" },
     topics: ["guidelines", "CME", "Research Hub", "diagnostika", "léčebné algoritmy"],
     aiRoute: "/ai-asistent/lekar",
   },
@@ -79,7 +79,12 @@ export const V27_SUBSCRIPTION_PLANS = [
     name: "Lékař v praxi",
     monthlyCzk: 490,
     annualCzk: 4900,
-    features: ["Odborná sekce a guidelines", "CME přehledy", "Klinický AI asistent"],
+    features: [
+      "Odborná sekce a guidelines",
+      "CME přehledy",
+      "Klinický AI asistent",
+      "MedScope Dokumentace (AI zápisy)",
+    ],
   },
 ] as const;
 
@@ -94,6 +99,7 @@ export const V27_COMPARISON_FEATURES = [
   { label: "Odborná sekce a guidelines", public: false, student: false, physician: true },
   { label: "CME přehledy a souhrny studií", public: false, student: false, physician: true },
   { label: "Klinický AI asistent", public: false, student: false, physician: true },
+  { label: "MedScope Dokumentace (AI zápisy)", public: false, student: false, physician: true },
   { label: "Research Hub a diagnostické algoritmy", public: false, student: false, physician: true },
   { label: "MedScope Academy (základní kurzy)", public: true, student: true, physician: true },
   { label: "Prioritní notifikace novinek", public: false, student: true, physician: true },
