@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service";
 import { withApiGuard } from "@/lib/security/api-guard";
 import { logAiAgentUsage } from "@/lib/security/ai-abuse";
 import { assertDokumentaceAccess } from "@/lib/lekari/dokumentace/access";
@@ -9,9 +10,18 @@ import {
 } from "@/lib/lekari/dokumentace/templates";
 import { transcribeAudio } from "@/lib/lekari/dokumentace/stt";
 import { structureDokumentaceNote } from "@/lib/lekari/dokumentace/structure";
+import { saveDokumentaceNote } from "@/lib/lekari/dokumentace/notes";
 
 export const runtime = "nodejs";
 export const maxDuration = 180;
+
+function resolveSource(request: Request, form: FormData): string {
+  const header = request.headers.get("x-dokumentace-source");
+  const field = form.get("source");
+  if (typeof field === "string" && field.trim()) return field.trim().slice(0, 40);
+  if (header?.trim()) return header.trim().slice(0, 40);
+  return "web";
+}
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -52,6 +62,7 @@ export async function POST(request: Request) {
   const mode =
     modeRaw === "dictation" || modeRaw === "verbatim" ? modeRaw : "consultation";
   const template = getDokumentaceTemplate(templateId);
+  const source = resolveSource(request, form);
 
   const mimeType = file.type || "audio/webm";
   const buffer = Buffer.from(await file.arrayBuffer());
@@ -82,12 +93,31 @@ export async function POST(request: Request) {
       status: "ok",
     });
 
+    let savedId: string | null = null;
+    try {
+      const admin = createServiceRoleClient();
+      const saved = await saveDokumentaceNote(admin, {
+        userId: user!.id,
+        note,
+        transcript,
+        templateId: template.id,
+        mode,
+        specialty,
+        source,
+      });
+      savedId = saved.id;
+    } catch {
+      // Note persistence is best-effort; processing still succeeds.
+    }
+
     return NextResponse.json({
       transcript,
       note,
       provider,
       templateId: template.id,
       remaining: Math.max(0, access.remaining - 1),
+      saved: Boolean(savedId),
+      noteId: savedId,
     });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Zpracování selhalo.";

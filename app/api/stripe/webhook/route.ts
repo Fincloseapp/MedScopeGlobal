@@ -10,6 +10,8 @@ import { updateUserProgress } from "@/lib/academy/db";
 
 export const dynamic = "force-dynamic";
 
+type AdminClient = ReturnType<typeof createServiceRoleClient>;
+
 const HANDLED_EVENTS = new Set([
   "checkout.session.completed",
   "invoice.paid",
@@ -57,7 +59,76 @@ function extractObjectId(obj: unknown): string | undefined {
   return typeof id === "string" ? id : undefined;
 }
 
-async function upsertSubscription(admin: ReturnType<typeof createServiceRoleClient>, sub: Stripe.Subscription, ip: string) {
+function isPhysicianGrantProduct(productId: string | undefined | null): boolean {
+  if (!productId) return false;
+  return productId.startsWith("physician-") || productId.startsWith("dokumentace-");
+}
+
+async function resolveV27UserId(
+  admin: AdminClient,
+  opts: {
+    sessionUserId?: string | null;
+    subscriptionUserId?: string | null;
+    sessionId?: string | null;
+  }
+): Promise<string | null> {
+  if (opts.sessionUserId) return opts.sessionUserId;
+  if (opts.subscriptionUserId) return opts.subscriptionUserId;
+  if (opts.sessionId) {
+    const { data } = await admin
+      .from("v27_orders")
+      .select("user_id")
+      .eq("stripe_session_id", opts.sessionId)
+      .maybeSingle();
+    if (data?.user_id) return data.user_id as string;
+  }
+  return null;
+}
+
+/**
+ * Grant full physician VIP access for physician-* or dokumentace-* products.
+ */
+async function grantV27PhysicianAccess(
+  admin: AdminClient,
+  userId: string,
+  productId: string,
+  periodEndIso: string | null
+) {
+  if (!isPhysicianGrantProduct(productId)) return;
+
+  const now = new Date().toISOString();
+  const { data: existing } = await admin
+    .from("vip_subscriptions")
+    .select("user_id")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (existing?.user_id) {
+    await admin
+      .from("vip_subscriptions")
+      .update({
+        active: true,
+        starts_at: now,
+        ends_at: periodEndIso,
+      })
+      .eq("user_id", userId);
+  } else {
+    await admin.from("vip_subscriptions").insert({
+      user_id: userId,
+      active: true,
+      starts_at: now,
+      ends_at: periodEndIso,
+    });
+  }
+
+  await admin.from("users").update({ access_level: "physician" }).eq("id", userId);
+}
+
+async function deactivateVipForUser(admin: AdminClient, userId: string) {
+  await admin.from("vip_subscriptions").update({ active: false }).eq("user_id", userId);
+}
+
+async function upsertSubscription(admin: AdminClient, sub: Stripe.Subscription, ip: string) {
   const userId = sub.metadata?.user_id;
   if (!userId) {
     await logSecurityEvent({
@@ -186,11 +257,37 @@ export async function POST(request: Request) {
     if (event.type.startsWith("customer.subscription")) {
       const sub = event.data.object as Stripe.Subscription;
       await upsertSubscription(admin, sub, ip);
+
+      const productId = sub.metadata?.product_id;
+      const periodEndIso = sub.current_period_end
+        ? new Date(sub.current_period_end * 1000).toISOString()
+        : null;
+
+      const subUserId = await resolveV27UserId(admin, {
+        subscriptionUserId: sub.metadata?.user_id,
+      });
+
+      if (
+        event.type === "customer.subscription.deleted" ||
+        sub.status === "canceled"
+      ) {
+        if (subUserId) {
+          await deactivateVipForUser(admin, subUserId);
+        }
+      } else if (
+        (sub.status === "active" || sub.status === "trialing") &&
+        isPhysicianGrantProduct(productId) &&
+        subUserId &&
+        productId
+      ) {
+        await grantV27PhysicianAccess(admin, subUserId, productId, periodEndIso);
+      }
+
       await logSecurityEvent({
         ip,
         action: `stripe:${event.type}`,
         status: "ok",
-        details: { subscriptionId: sub.id },
+        details: { subscriptionId: sub.id, productId },
       });
     }
 
@@ -226,6 +323,32 @@ export async function POST(request: Request) {
             customerEmail,
             session.metadata.product_id.replace(/-month|-year/g, "")
           );
+        }
+
+        const kind = session.metadata?.kind ?? "";
+        const productId = session.metadata?.product_id;
+        if (kind.includes("subscription") && isPhysicianGrantProduct(productId) && productId) {
+          let periodEndIso: string | null = null;
+          let subscriptionUserId: string | null = null;
+          if (subscriptionId) {
+            try {
+              const sub = await stripe.subscriptions.retrieve(subscriptionId);
+              periodEndIso = sub.current_period_end
+                ? new Date(sub.current_period_end * 1000).toISOString()
+                : null;
+              subscriptionUserId = sub.metadata?.user_id ?? null;
+            } catch {
+              // period end optional
+            }
+          }
+          const resolvedUserId = await resolveV27UserId(admin, {
+            sessionUserId: userId,
+            subscriptionUserId,
+            sessionId: session.id,
+          });
+          if (resolvedUserId) {
+            await grantV27PhysicianAccess(admin, resolvedUserId, productId, periodEndIso);
+          }
         }
 
         await logSecurityEvent({

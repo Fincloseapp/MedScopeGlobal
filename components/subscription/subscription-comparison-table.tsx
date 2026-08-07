@@ -1,5 +1,9 @@
 import { Check, Minus } from "lucide-react";
-import { V27_COMPARISON_FEATURES, V27_SUBSCRIPTION_PLANS } from "@/lib/v27/config";
+import {
+  V27_COMPARISON_FEATURES,
+  V27_COMPARISON_TIERS,
+  V27_SUBSCRIPTION_PLANS,
+} from "@/lib/v27/config";
 
 function CellValue({ included }: { included: boolean }) {
   if (included) {
@@ -17,7 +21,9 @@ function CellValue({ included }: { included: boolean }) {
 }
 
 export function SubscriptionComparisonTable() {
-  const tiers = V27_SUBSCRIPTION_PLANS;
+  const tiers = V27_COMPARISON_TIERS.map(
+    (tier) => V27_SUBSCRIPTION_PLANS.find((p) => p.tier === tier)!
+  ).filter(Boolean);
 
   return (
     <section aria-labelledby="comparison-heading" className="mt-16">
@@ -26,6 +32,7 @@ export function SubscriptionComparisonTable() {
       </h2>
       <p className="mt-2 text-sm text-muted-foreground">
         Přehled funkcí podle cílové skupiny — všechny tarify zahrnují 14denní zkušební verzi.
+        MedScope Dokumentace (390 Kč) je samostatný vstup se stejnými právy lékaře.
       </p>
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-[#005B96]/15 bg-white shadow-sm">

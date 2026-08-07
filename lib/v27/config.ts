@@ -2,7 +2,7 @@
 
 export type V27Audience = "public" | "student" | "physician" | "b2b";
 
-export type V27SubscriptionTier = "public" | "student" | "physician";
+export type V27SubscriptionTier = "public" | "student" | "physician" | "dokumentace";
 
 export type V27BillingInterval = "month" | "year";
 
@@ -75,6 +75,19 @@ export const V27_SUBSCRIPTION_PLANS = [
     ],
   },
   {
+    tier: "dokumentace" as const,
+    name: "MedScope Dokumentace",
+    monthlyCzk: 390,
+    annualCzk: 3900,
+    features: [
+      "AI zápisy z nahrávky / diktátu (mobil i PC)",
+      "Šablony: ambulantní, SOAP, anamnéza…",
+      "Historie zápisů v účtu — sync mobil ↔ web",
+      "Celý balíček Lékař v praxi v ceně (guidelines, CME, klinický AI)",
+      "14 dní zdarma",
+    ],
+  },
+  {
     tier: "physician" as const,
     name: "Lékař v praxi",
     monthlyCzk: 490,
@@ -84,9 +97,13 @@ export const V27_SUBSCRIPTION_PLANS = [
       "CME přehledy",
       "Klinický AI asistent",
       "MedScope Dokumentace (AI zápisy)",
+      "Stejná práva lékaře i přes Dokumentaci standalone (390 Kč)",
     ],
   },
 ] as const;
+
+/** Tiers shown in side-by-side comparison (Dokumentace is marketed as a separate card) */
+export const V27_COMPARISON_TIERS = ["public", "student", "physician"] as const;
 
 /** Side-by-side comparison rows for /predplatne */
 export const V27_COMPARISON_FEATURES = [
@@ -99,7 +116,12 @@ export const V27_COMPARISON_FEATURES = [
   { label: "Odborná sekce a guidelines", public: false, student: false, physician: true },
   { label: "CME přehledy a souhrny studií", public: false, student: false, physician: true },
   { label: "Klinický AI asistent", public: false, student: false, physician: true },
-  { label: "MedScope Dokumentace (AI zápisy)", public: false, student: false, physician: true },
+  {
+    label: "MedScope Dokumentace (AI zápisy) — i standalone 390 Kč se stejnými právy lékaře",
+    public: false,
+    student: false,
+    physician: true,
+  },
   { label: "Research Hub a diagnostické algoritmy", public: false, student: false, physician: true },
   { label: "MedScope Academy (základní kurzy)", public: true, student: true, physician: true },
   { label: "Prioritní notifikace novinek", public: false, student: true, physician: true },
@@ -112,6 +134,12 @@ export const V27_MINI_PRODUCTS = [] as const;
 export const V27_SUBSCRIPTIONS = {
   public: { id: "public", name: "Veřejnost", priceCzk: 99, interval: "month" as const },
   student: { id: "student", name: "Student LF", priceCzk: 149, interval: "month" as const },
+  dokumentace: {
+    id: "dokumentace",
+    name: "MedScope Dokumentace",
+    priceCzk: 390,
+    interval: "month" as const,
+  },
   physician: { id: "physician", name: "Lékař v praxi", priceCzk: 490, interval: "month" as const },
 } as const;
 
@@ -134,7 +162,7 @@ export function parseSubscriptionProductId(productId: string): {
   interval: V27BillingInterval;
 } | null {
   const [tier, interval] = productId.split("-") as [string, string | undefined];
-  const validTiers: V27SubscriptionTier[] = ["public", "student", "physician"];
+  const validTiers: V27SubscriptionTier[] = ["public", "student", "physician", "dokumentace"];
   if (!validTiers.includes(tier as V27SubscriptionTier)) return null;
   const billing: V27BillingInterval = interval === "year" ? "year" : "month";
   return { tier: tier as V27SubscriptionTier, interval: billing };

@@ -2,16 +2,35 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Mic, Sparkles, FileCheck2, Shield } from "lucide-react";
 import { DokumentaceWorkspace } from "@/components/lekari/dokumentace-workspace";
+import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { Button } from "@/components/ui/button";
+import { SITE } from "@/lib/config/site";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  const base = buildV20PageMetadata({
     title: "MedScope Dokumentace — AI zápisy pro lékaře | MedScopeGlobal",
     description:
-      "AI klinický zapisovatel: nahrávka nebo diktát → český přepis → strukturovaný zápis podle šablony. Asistent pro lékaře, ephemeral audio, GDPR.",
+      "AI klinický zapisovatel: nahrávka nebo diktát → český přepis → strukturovaný zápis. Standalone 390 Kč/měsíc včetně balíčku Lékař v praxi.",
     path: "/lekari/dokumentace",
   });
+
+  return {
+    ...base,
+    manifest: "/dokumentace-manifest.json",
+    appleWebApp: {
+      capable: true,
+      title: "MedScope Dokumentace",
+      statusBarStyle: "default",
+    },
+    other: {
+      ...(base.other ?? {}),
+      "mobile-web-app-capable": "yes",
+      "apple-mobile-web-app-capable": "yes",
+      "apple-mobile-web-app-title": "MedScope Dokumentace",
+      "theme-color": "#005B96",
+    },
+  };
 }
 
 const VALUE_PROPS = [
@@ -54,8 +73,8 @@ export default function LekariDokumentacePage() {
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-sky-100/95">
             AI zapisovatel pro ordinaci — nahrávka nebo diktát, český přepis a
-            strukturovaný klinický zápis podle šablony. Asistent, ne automatická
-            dokumentace.
+            strukturovaný klinický zápis. Samostatně 390 Kč/měsíc včetně celého
+            balíčku Lékař v praxi.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg" className="h-12 rounded-full bg-white px-6 text-[#021d33] hover:bg-sky-50">
@@ -67,8 +86,44 @@ export default function LekariDokumentacePage() {
               variant="outline"
               className="h-12 rounded-full border-white/40 bg-transparent px-6 text-white hover:bg-white/10"
             >
-              <Link href="/predplatne#physician">Předplatné od 490 Kč</Link>
+              <Link href="/predplatne#dokumentace">390 Kč / měsíc</Link>
             </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <div className="rounded-2xl border border-[#005B96]/25 bg-white p-6 shadow-sm sm:p-8">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">
+            Nejvýhodnější vstup pro ordinaci
+          </p>
+          <h2 className="mt-2 font-display text-2xl font-bold text-[#021d33]">
+            Dokumentace standalone — 390 Kč/měsíc
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+            Levnější než Lékař v praxi (490 Kč), se stejnými právy lékaře: guidelines,
+            CME, klinický AI i historie zápisů (sync mobil ↔ web). Ročně 3900 Kč · 14 dní
+            zdarma.
+          </p>
+          <ul className="mt-4 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
+            <li>✓ AI zápisy z nahrávky / diktátu</li>
+            <li>✓ Šablony ambulantní, SOAP, anamnéza…</li>
+            <li>✓ Celý balíček Lékař v praxi v ceně</li>
+            <li>✓ Historie v účtu — mobil i PC</li>
+          </ul>
+          <div className="mt-6 max-w-md space-y-2">
+            <V27CheckoutButton
+              kind="subscription"
+              productId="dokumentace-month"
+              label="Začít 14 dní zdarma — 390 Kč"
+            />
+            <p className="text-center text-xs text-slate-500">
+              Nebo{" "}
+              <Link href="/predplatne#physician" className="text-[#005B96] underline">
+                Lékař v praxi za 490 Kč
+              </Link>{" "}
+              — Dokumentace je levnější vstup se stejnými právy.
+            </p>
           </div>
         </div>
       </section>
@@ -97,11 +152,11 @@ export default function LekariDokumentacePage() {
       <section className="border-y border-[#d9e8f4] bg-[#eef6fb]">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p className="text-sm leading-6 text-[#021d33]">
-            <span className="font-semibold">Součást předplatného Lékař v praxi</span>{" "}
-            od 490 Kč/měsíc · 14 dní trial · demo 3 zápisy/den po přihlášení
+            <span className="font-semibold">390 Kč/měsíc</span> včetně celého balíčku
+            Lékař · 14 dní trial · demo 3 zápisy/den po přihlášení
           </p>
           <Button asChild className="rounded-full bg-[#005B96] shrink-0">
-            <Link href="/predplatne#physician">Zobrazit předplatné</Link>
+            <Link href="/predplatne#dokumentace">Zobrazit předplatné</Link>
           </Button>
         </div>
       </section>
@@ -133,7 +188,7 @@ export default function LekariDokumentacePage() {
             </li>
             <li>
               Audio se po zpracování neukládá na disk ani do databáze (ephemeral
-              zpracování).
+              zpracování). Textápisy se ukládají do vašeho účtu na {SITE.name}.
             </li>
           </ul>
         </div>

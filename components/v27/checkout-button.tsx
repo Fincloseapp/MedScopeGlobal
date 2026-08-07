@@ -25,10 +25,24 @@ export function V27CheckoutButton({
     setLoading(true);
     setError(null);
     try {
+      let userId: string | undefined;
+      try {
+        const ctxRes = await fetch("/api/v22/reader-context", {
+          credentials: "same-origin",
+        });
+        if (ctxRes.ok) {
+          const ctx = (await ctxRes.json()) as { user?: { id?: string } | null };
+          if (ctx.user?.id) userId = ctx.user.id;
+        }
+      } catch {
+        // Guest checkout still allowed; webhook may resolve later.
+      }
+
       const res = await fetch("/api/v27/checkout", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind, productId }),
+        body: JSON.stringify({ kind, productId, ...(userId ? { userId } : {}) }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Checkout selhal");

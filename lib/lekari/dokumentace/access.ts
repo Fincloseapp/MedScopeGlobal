@@ -35,8 +35,23 @@ async function countDokumentaceSessions(userId: string): Promise<number> {
   }
 }
 
+async function hasPhysicianAccessLevel(userId: string): Promise<boolean> {
+  try {
+    const admin = createServiceRoleClient();
+    const { data } = await admin
+      .from("users")
+      .select("access_level")
+      .eq("id", userId)
+      .maybeSingle();
+    return data?.access_level === "physician";
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Gate for MedScope Dokumentace: login required; non-VIP 3/day, VIP 40/day.
+ * VIP via vip_subscriptions OR users.access_level = physician (belt and suspenders).
  */
 export async function assertDokumentaceAccess(
   userId: string | undefined
@@ -49,7 +64,9 @@ export async function assertDokumentaceAccess(
     };
   }
 
-  const isVip = await getVipStatus(userId);
+  const vipRow = await getVipStatus(userId);
+  const physicianLevel = vipRow ? false : await hasPhysicianAccessLevel(userId);
+  const isVip = vipRow || physicianLevel;
   const limit = isVip ? VIP_DAILY_LIMIT : FREE_DAILY_LIMIT;
   const used = await countDokumentaceSessions(userId);
   const remaining = Math.max(0, limit - used);
@@ -60,7 +77,7 @@ export async function assertDokumentaceAccess(
         ok: false,
         status: 402,
         error:
-          "Vyčerpán denní demo limit (3 zápisy). Předplatné Lékař v praxi odemyká až 40 zápisů denně.",
+          "Vyčerpán denní demo limit (3 zápisy). Předplatné Dokumentace nebo Lékař v praxi odemyká až 40 zápisů denně.",
       };
     }
     return {

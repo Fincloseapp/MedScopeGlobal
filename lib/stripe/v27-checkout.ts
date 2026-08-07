@@ -1,4 +1,4 @@
-﻿import Stripe from "stripe";
+import Stripe from "stripe";
 import { SITE } from "@/lib/config/site";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { resolveV27CheckoutItem, type V27CheckoutKind } from "@/lib/v27/stripe-products";
@@ -15,13 +15,13 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
   if (!secret) {
     return {
       status: 503 as const,
-      body: { error: "Stripe nen├ş nakonfigurov├ín. Nastavte STRIPE_SECRET_KEY na Vercel." },
+      body: { error: "Stripe není nakonfigurován. Nastavte STRIPE_SECRET_KEY na Vercel." },
     };
   }
 
   const { kind, productId, userId } = body;
   if (!kind || !productId) {
-    return { status: 400 as const, body: { error: "Chyb├ş kind nebo productId" } };
+    return { status: 400 as const, body: { error: "Chybí kind nebo productId" } };
   }
 
   const item = resolveV27CheckoutItem(kind, productId);
@@ -53,7 +53,7 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
           unit_amount: amount,
           product_data: {
             name: item.name,
-            description: `MedScopeGlobal ÔÇö ${item.name} ┬Ě ${VIP_TRIAL_DAYS}denn├ş zku┼íebn├ş verze`,
+            description: `MedScopeGlobal — ${item.name} · ${VIP_TRIAL_DAYS}denní zkušební verze`,
           },
           ...(item.mode === "subscription"
             ? { recurring: { interval: recurringInterval } }
@@ -68,6 +68,7 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
             metadata: {
               v27_trial_days: String(VIP_TRIAL_DAYS),
               product_id: productId,
+              ...(userId ? { user_id: userId } : {}),
             },
           },
         }

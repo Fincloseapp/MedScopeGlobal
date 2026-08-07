@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service";
 import { withApiGuard } from "@/lib/security/api-guard";
 import { logAiAgentUsage } from "@/lib/security/ai-abuse";
 import { assertDokumentaceAccess } from "@/lib/lekari/dokumentace/access";
@@ -9,6 +10,7 @@ import {
   DOKUMENTACE_MODES,
   DOKUMENTACE_TEMPLATES,
 } from "@/lib/lekari/dokumentace/templates";
+import { saveDokumentaceNote } from "@/lib/lekari/dokumentace/notes";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -25,6 +27,7 @@ const bodySchema = z.object({
     "prakticky-lekar",
   ]),
   specialty: z.string().max(120).optional(),
+  source: z.string().max(40).optional(),
 });
 
 export async function POST(request: Request) {
@@ -67,6 +70,9 @@ export async function POST(request: Request) {
     );
   }
 
+  const sourceHeader = request.headers.get("x-dokumentace-source");
+  const source = body.source ?? sourceHeader ?? "web";
+
   try {
     const note = await structureDokumentaceNote({
       transcript: body.transcript,
@@ -82,10 +88,29 @@ export async function POST(request: Request) {
       status: "ok",
     });
 
+    let savedId: string | null = null;
+    try {
+      const admin = createServiceRoleClient();
+      const saved = await saveDokumentaceNote(admin, {
+        userId: user.id,
+        note,
+        transcript: body.transcript,
+        templateId: body.templateId,
+        mode: body.mode,
+        specialty: body.specialty,
+        source,
+      });
+      savedId = saved.id;
+    } catch {
+      // best-effort
+    }
+
     return NextResponse.json({
       note,
       templateId: body.templateId,
       remaining: access.ok ? access.remaining : undefined,
+      saved: Boolean(savedId),
+      noteId: savedId,
     });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Strukturování selhalo.";

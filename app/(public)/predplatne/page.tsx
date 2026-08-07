@@ -14,7 +14,7 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({
     title: "Předplatné | MedScopeGlobal",
-    description: `${VIP_TRIAL_DAYS}denní zkušební verze zdarma. Tarify 99 / 149 / 490 Kč měsíčně pro veřejnost, studenty a lékaře. Platba kartou přes Stripe.`,
+    description: `${VIP_TRIAL_DAYS}denní zkušební verze zdarma. Tarify 99 / 149 / 390 / 490 Kč měsíčně — včetně MedScope Dokumentace. Platba kartou přes Stripe.`,
     path: "/predplatne",
   });
 }
@@ -37,8 +37,9 @@ export default async function PredplatnePage({
           Prémiový přístup k medicínskému obsahu
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-          Měsíční nebo roční plány pro veřejnost, studenty medicíny a lékaře. Bez reklam, s AI
-          asistenty a odborným obsahem — platba přes Stripe včetně Apple Pay a Google Pay.
+          Měsíční nebo roční plány pro veřejnost, studenty, ordinace (Dokumentace) a
+          lékaře. Bez reklam, s AI asistenty — platba přes Stripe včetně Apple Pay a
+          Google Pay.
         </p>
       </div>
 
@@ -82,20 +83,28 @@ export default async function PredplatnePage({
           Všechny tarify zahrnují {VIP_TRIAL_DAYS} dní zkušební verze zdarma. Po kliknutí přejdete
           na zabezpečenou Stripe pokladnu.
         </p>
-        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {V27_SUBSCRIPTION_PLANS.map((plan) => {
-            const highlighted = plan.tier === "student";
+            const highlighted = plan.tier === "dokumentace";
+            const studentHighlight = plan.tier === "student" && !highlighted;
             return (
               <div
                 key={plan.tier}
                 id={plan.tier}
                 className={`relative flex scroll-mt-24 flex-col rounded-2xl border bg-white p-6 shadow-sm ${
                   highlighted
-                    ? "border-[#005B96] ring-2 ring-[#005B96]/25"
-                    : "border-[#005B96]/20 ring-1 ring-[#005B96]/10"
+                    ? "border-emerald-600 ring-2 ring-emerald-500/30"
+                    : studentHighlight
+                      ? "border-[#005B96] ring-2 ring-[#005B96]/25"
+                      : "border-[#005B96]/20 ring-1 ring-[#005B96]/10"
                 }`}
               >
                 {highlighted ? (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-emerald-700 px-3 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+                    Nejvýhodnější pro ordinaci — 390 Kč
+                  </span>
+                ) : null}
+                {studentHighlight ? (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#005B96] px-3 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
                     Nejoblíbenější
                   </span>
@@ -115,6 +124,11 @@ export default async function PredplatnePage({
                   / rok{" "}
                   <span className="text-emerald-700">(≈ 2 měsíce zdarma)</span>
                 </p>
+                {plan.tier === "dokumentace" ? (
+                  <p className="mt-2 text-xs font-medium text-emerald-800">
+                    Stejná práva lékaře jako tarif 490 Kč — levnější vstup s AI zápisy.
+                  </p>
+                ) : null}
                 <ul className="mt-4 flex-1 space-y-2 text-sm text-slate-600">
                   {plan.features.map((f) => (
                     <li key={f} className="flex gap-2">
@@ -129,7 +143,11 @@ export default async function PredplatnePage({
                   <V27CheckoutButton
                     kind="subscription"
                     productId={subscriptionProductId(plan.tier, "month")}
-                    label={`Začít ${VIP_TRIAL_DAYS}denní trial — měsíčně`}
+                    label={
+                      plan.tier === "dokumentace"
+                        ? `Začít ${VIP_TRIAL_DAYS} dní zdarma — 390 Kč`
+                        : `Začít ${VIP_TRIAL_DAYS}denní trial — měsíčně`
+                    }
                   />
                   <V27CheckoutButton
                     kind="subscription"
