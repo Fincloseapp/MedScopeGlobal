@@ -24,7 +24,6 @@ export async function generateMetadata(): Promise<Metadata> {
       statusBarStyle: "default",
     },
     other: {
-      ...(base.other ?? {}),
       "mobile-web-app-capable": "yes",
       "apple-mobile-web-app-capable": "yes",
       "apple-mobile-web-app-title": "MedScope Dokumentace",
