@@ -1,5 +1,6 @@
 import { getVipStatus } from "@/lib/vip";
 import { createServiceRoleClient } from "@/lib/supabase/service";
+import { getDokumentaceEligibility } from "@/lib/lekari/dokumentace/eligibility";
 
 const FREE_DAILY_LIMIT = 3;
 const VIP_DAILY_LIMIT = 40;
@@ -9,12 +10,14 @@ export type DokumentaceAccessOk = {
   ok: true;
   isVip: boolean;
   remaining: number;
+  facilities: Array<{ id: string; name: string; role: string }>;
 };
 
 export type DokumentaceAccessDenied = {
   ok: false;
   status: number;
   error: string;
+  code?: string;
 };
 
 export type DokumentaceAccessResult = DokumentaceAccessOk | DokumentaceAccessDenied;
@@ -50,8 +53,9 @@ async function hasPhysicianAccessLevel(userId: string): Promise<boolean> {
 }
 
 /**
- * Gate for MedScope Dokumentace: login required; non-VIP 3/day, VIP 40/day.
- * VIP via vip_subscriptions OR users.access_level = physician (belt and suspenders).
+ * Gate for MedScope Dokumentace:
+ * 1) verified physician / facility-linked account
+ * 2) daily quota (3 non-VIP / 40 VIP)
  */
 export async function assertDokumentaceAccess(
   userId: string | undefined
@@ -61,12 +65,26 @@ export async function assertDokumentaceAccess(
       ok: false,
       status: 401,
       error: "Pro MedScope Dokumentace se musíte přihlásit.",
+      code: "UNAUTHENTICATED",
+    };
+  }
+
+  const eligibility = await getDokumentaceEligibility(userId);
+  if (!eligibility.eligible) {
+    return {
+      ok: false,
+      status: eligibility.reason === "unauthenticated" ? 401 : 403,
+      error: eligibility.message,
+      code:
+        eligibility.reason === "unauthenticated"
+          ? "UNAUTHENTICATED"
+          : "DOCTOR_VERIFICATION_REQUIRED",
     };
   }
 
   const vipRow = await getVipStatus(userId);
   const physicianLevel = vipRow ? false : await hasPhysicianAccessLevel(userId);
-  const isVip = vipRow || physicianLevel;
+  const isVip = Boolean(vipRow || physicianLevel);
   const limit = isVip ? VIP_DAILY_LIMIT : FREE_DAILY_LIMIT;
   const used = await countDokumentaceSessions(userId);
   const remaining = Math.max(0, limit - used);
@@ -78,14 +96,21 @@ export async function assertDokumentaceAccess(
         status: 402,
         error:
           "Vyčerpán denní demo limit (3 zápisy). Předplatné Dokumentace nebo Lékař v praxi odemyká až 40 zápisů denně.",
+        code: "PAYMENT_REQUIRED",
       };
     }
     return {
       ok: false,
       status: 429,
       error: "Vyčerpán denní limit Dokumentace (40 zápisů / 24 h). Zkuste později.",
+      code: "RATE_LIMITED",
     };
   }
 
-  return { ok: true, isVip, remaining };
+  return {
+    ok: true,
+    isVip,
+    remaining,
+    facilities: eligibility.facilities,
+  };
 }

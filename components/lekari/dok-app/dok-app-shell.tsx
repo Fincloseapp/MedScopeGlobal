@@ -7,6 +7,7 @@ import { DokAppRecord } from "@/components/lekari/dok-app/dok-app-record";
 import { DokAppHistory } from "@/components/lekari/dok-app/dok-app-history";
 import { DokAppGuide } from "@/components/lekari/dok-app/dok-app-guide";
 import { DokAppAccount } from "@/components/lekari/dok-app/dok-app-account";
+import { DokAppGate } from "@/components/lekari/dok-app/dok-app-gate";
 
 type TabId = "zapis" | "historie" | "navod" | "ucet";
 
@@ -16,6 +17,17 @@ const TABS: { id: TabId; label: string; icon: typeof FilePlus2 }[] = [
   { id: "navod", label: "Návod", icon: BookOpen },
   { id: "ucet", label: "Účet", icon: UserRound },
 ];
+
+type EligibilityState = {
+  eligible: boolean;
+  canInstall: boolean;
+  message: string;
+  displayName?: string | null;
+  email?: string | null;
+  facilities: Array<{ id: string; name: string; role: string }>;
+  loginUrl?: string;
+  verifyUrl?: string;
+};
 
 function initialTab(): TabId {
   if (typeof window === "undefined") return "zapis";
@@ -27,6 +39,9 @@ function initialTab(): TabId {
 export function DokAppShell() {
   const [tab, setTab] = useState<TabId>(initialTab);
   const [online, setOnline] = useState(true);
+  const [elig, setElig] = useState<EligibilityState | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [linkHint, setLinkHint] = useState<string | null>(null);
 
   useEffect(() => {
     setOnline(navigator.onLine);
@@ -41,10 +56,66 @@ export function DokAppShell() {
   }, []);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const link = params.get("link");
+    if (link) {
+      try {
+        sessionStorage.setItem("dokumentace_install_link", link);
+        setLinkHint(
+          "QR odkaz je vázaný na lékařský účet. Přihlaste se stejným účtem — zápisy a historie se propojí."
+        );
+      } catch {
+        setLinkHint(
+          "QR odkaz je vázaný na lékařský účet. Přihlaste se stejným účtem pro synchronizaci."
+        );
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await fetch("/api/lekari/dokumentace/eligibility", {
+          credentials: "same-origin",
+        });
+        if (res.ok) {
+          const data = (await res.json()) as EligibilityState & {
+            loginUrl?: string;
+            verifyUrl?: string;
+          };
+          setElig(data);
+        } else {
+          setElig({
+            eligible: false,
+            canInstall: false,
+            message: "Pro aplikaci se přihlaste ověřeným lékařským účtem.",
+            facilities: [],
+          });
+        }
+      } catch {
+        setElig({
+          eligible: false,
+          canInstall: false,
+          message: "Nepodařilo se ověřit přístup. Zkontrolujte připojení.",
+          facilities: [],
+        });
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
     const url = new URL(window.location.href);
     url.searchParams.set("tab", tab);
     window.history.replaceState({}, "", url.toString());
   }, [tab]);
+
+  useEffect(() => {
+    if (!elig?.eligible && (tab === "zapis" || tab === "historie")) {
+      setTab("ucet");
+    }
+  }, [elig?.eligible, tab]);
 
   return (
     <div
@@ -77,16 +148,34 @@ export function DokAppShell() {
               {online ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
               {online ? "Online" : "Offline"}
             </span>
-            <InstallAppButton />
+            <InstallAppButton gated canInstall={Boolean(elig?.canInstall)} />
           </div>
         </div>
       </header>
 
       <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-[#f4f9fc]">
-        {tab === "zapis" ? <DokAppRecord /> : null}
-        {tab === "historie" ? <DokAppHistory /> : null}
-        {tab === "navod" ? <DokAppGuide /> : null}
-        {tab === "ucet" ? <DokAppAccount /> : null}
+        {loading ? (
+          <p className="px-4 py-16 text-center text-sm text-slate-500">Načítám aplikaci…</p>
+        ) : !elig?.eligible && (tab === "zapis" || tab === "historie") ? (
+          <DokAppGate
+            message={elig?.message || "Stažení a zápisy jsou jen pro ověřené lékaře."}
+            loginUrl={elig?.loginUrl}
+            verifyUrl={elig?.verifyUrl}
+            linkedHint={linkHint}
+          />
+        ) : tab === "zapis" ? (
+          <DokAppRecord />
+        ) : tab === "historie" ? (
+          <DokAppHistory />
+        ) : tab === "navod" ? (
+          <DokAppGuide />
+        ) : (
+          <DokAppAccount
+            eligibility={elig}
+            linkHint={linkHint}
+            onEligibility={setElig}
+          />
+        )}
       </main>
 
       <nav
@@ -97,13 +186,14 @@ export function DokAppShell() {
         <div className="mx-auto grid max-w-3xl grid-cols-4">
           {TABS.map(({ id, label, icon: Icon }) => {
             const active = tab === id;
+            const locked = !elig?.eligible && (id === "zapis" || id === "historie");
             return (
               <button
                 key={id}
                 type="button"
                 onClick={() => setTab(id)}
                 className={`flex flex-col items-center gap-0.5 px-1 py-2.5 text-[11px] font-medium transition-colors ${
-                  active ? "text-[#005B96]" : "text-slate-500"
+                  active ? "text-[#005B96]" : locked ? "text-slate-300" : "text-slate-500"
                 }`}
                 aria-current={active ? "page" : undefined}
               >

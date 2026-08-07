@@ -52,6 +52,8 @@ async function upsertUsersRow(admin, userId) {
     access_level: "physician",
     verification_status: "approved",
     verified_doctor: true,
+    clk_id: "TESTD-CLK-001",
+    specialization: "všeobecné praktické lékařství",
   };
 
   let { error } = await admin.from("users").upsert(full, { onConflict: "id" });
@@ -171,6 +173,16 @@ async function main() {
     if (!vdErr) usersResult.verified_doctor = true;
     else if (!isMissingColumnError(vdErr)) {
       console.error("verified_doctor update warning:", vdErr.message);
+    }
+  }
+
+  {
+    const { error: clkErr } = await admin
+      .from("users")
+      .update({ clk_id: "TESTD-CLK-001", specialization: "všeobecné praktické lékařství" })
+      .eq("id", userId);
+    if (clkErr && !isMissingColumnError(clkErr)) {
+      console.error("clk_id update warning:", clkErr.message);
     }
   }
 

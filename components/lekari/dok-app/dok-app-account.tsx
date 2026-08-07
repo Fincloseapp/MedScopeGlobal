@@ -2,10 +2,31 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { LogIn, LogOut, CreditCard, User, Loader2 } from "lucide-react";
+import {
+  LogIn,
+  LogOut,
+  CreditCard,
+  User,
+  Loader2,
+  ShieldCheck,
+  Building2,
+  QrCode,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { InstallAppButton } from "@/components/lekari/dok-app/install-app-button";
+import { DokumentaceDownloadPanel } from "@/components/lekari/dokumentace-download-panel";
+
+type EligibilityState = {
+  eligible: boolean;
+  canInstall: boolean;
+  message: string;
+  displayName?: string | null;
+  email?: string | null;
+  facilities: Array<{ id: string; name: string; role: string }>;
+  loginUrl?: string;
+  verifyUrl?: string;
+};
 
 type ReaderContext = {
   user: { id: string; email: string | null } | null;
@@ -14,10 +35,23 @@ type ReaderContext = {
   accessLevel: string | null;
 };
 
-export function DokAppAccount() {
+export function DokAppAccount({
+  eligibility,
+  linkHint,
+  onEligibility,
+}: {
+  eligibility?: EligibilityState | null;
+  linkHint?: string | null;
+  onEligibility?: (e: EligibilityState) => void;
+}) {
   const [ctx, setCtx] = useState<ReaderContext | null>(null);
+  const [elig, setElig] = useState<EligibilityState | null>(eligibility ?? null);
   const [loading, setLoading] = useState(true);
   const [online, setOnline] = useState(true);
+
+  useEffect(() => {
+    if (eligibility) setElig(eligibility);
+  }, [eligibility]);
 
   useEffect(() => {
     setOnline(typeof navigator !== "undefined" ? navigator.onLine : true);
@@ -28,13 +62,19 @@ export function DokAppAccount() {
 
     void (async () => {
       try {
-        const res = await fetch("/api/v22/reader-context", {
-          credentials: "same-origin",
-        });
-        if (res.ok) {
-          setCtx((await res.json()) as ReaderContext);
+        const [ctxRes, eligRes] = await Promise.all([
+          fetch("/api/v22/reader-context", { credentials: "same-origin" }),
+          fetch("/api/lekari/dokumentace/eligibility", { credentials: "same-origin" }),
+        ]);
+        if (ctxRes.ok) {
+          setCtx((await ctxRes.json()) as ReaderContext);
         } else {
           setCtx({ user: null, profile: null, isVip: false, accessLevel: null });
+        }
+        if (eligRes.ok) {
+          const e = (await eligRes.json()) as EligibilityState;
+          setElig(e);
+          onEligibility?.(e);
         }
       } catch {
         setCtx({ user: null, profile: null, isVip: false, accessLevel: null });
@@ -47,7 +87,7 @@ export function DokAppAccount() {
       window.removeEventListener("online", on);
       window.removeEventListener("offline", off);
     };
-  }, []);
+  }, [onEligibility]);
 
   async function signOut() {
     const supabase = createClient();
@@ -65,6 +105,7 @@ export function DokAppAccount() {
   }
 
   const loggedIn = Boolean(ctx?.user);
+  const canInstall = Boolean(elig?.canInstall);
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-4 px-3 pb-4 pt-2 sm:px-4">
@@ -87,23 +128,44 @@ export function DokAppAccount() {
             {loggedIn ? (
               <>
                 <p className="truncate text-sm font-semibold text-[#021d33]">
-                  {ctx?.profile?.full_name || "Lékař"}
+                  {ctx?.profile?.full_name || elig?.displayName || "Lékař"}
                 </p>
                 <p className="truncate text-xs text-slate-500">{ctx?.user?.email}</p>
                 <p className="mt-1 text-xs text-slate-500">
                   Přístup: {ctx?.isVip ? "VIP / předplatné" : ctx?.accessLevel || "základní"}
                 </p>
+                {canInstall ? (
+                  <p className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-emerald-700">
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    Ověřený lékař — aplikace propojena s tímto účtem
+                  </p>
+                ) : (
+                  <p className="mt-1 text-xs text-amber-700">{elig?.message}</p>
+                )}
+                {elig?.facilities?.length ? (
+                  <p className="mt-1 inline-flex items-center gap-1 text-xs text-slate-600">
+                    <Building2 className="h-3.5 w-3.5 text-[#005B96]" />
+                    {elig.facilities.map((f) => f.name).join(", ")}
+                  </p>
+                ) : null}
               </>
             ) : (
               <>
                 <p className="text-sm font-semibold text-[#021d33]">Nejste přihlášeni</p>
                 <p className="mt-0.5 text-xs text-slate-500">
-                  Pro ukládání zápisů a historii se přihlaste.
+                  Pro stažení, zápisy a historii se přihlaste ověřeným lékařským účtem.
                 </p>
               </>
             )}
           </div>
         </div>
+
+        {linkHint ? (
+          <p className="mt-3 rounded-xl bg-[#eef6fb] px-3 py-2 text-xs leading-5 text-[#021d33]">
+            <QrCode className="mr-1 inline h-3.5 w-3.5 text-[#005B96]" />
+            {linkHint}
+          </p>
+        ) : null}
 
         <div className="mt-4 flex flex-col gap-2">
           {!loggedIn ? (
@@ -125,6 +187,12 @@ export function DokAppAccount() {
             </Button>
           )}
 
+          {!canInstall ? (
+            <Button asChild variant="outline" className="h-11 rounded-full border-[#cfe1f3]">
+              <Link href="/academy/lekari/overeni">Ověřit lékařský účet</Link>
+            </Button>
+          ) : null}
+
           <Button asChild variant="outline" className="h-11 rounded-full border-[#cfe1f3]">
             <Link href="/predplatne#dokumentace">
               <CreditCard className="mr-2 h-4 w-4" />
@@ -134,15 +202,19 @@ export function DokAppAccount() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-[#cfe1f3] bg-[#021d33] p-4 text-white">
-        <p className="text-sm font-semibold">Instalace aplikace</p>
-        <p className="mt-1 text-xs text-sky-100/90">
-          Stáhněte si MedScope Dokumentace na plochu — funguje jako nativní aplikace.
-        </p>
-        <div className="mt-3">
-          <InstallAppButton />
+      {canInstall ? (
+        <div className="rounded-2xl border border-[#cfe1f3] bg-[#021d33] p-4 text-white">
+          <p className="text-sm font-semibold">Instalace aplikace</p>
+          <p className="mt-1 text-xs text-sky-100/90">
+            Stažení je vázané na váš ověřený účet — historie zápisů se synchronizuje.
+          </p>
+          <div className="mt-3">
+            <InstallAppButton gated canInstall />
+          </div>
         </div>
-      </div>
+      ) : (
+        <DokumentaceDownloadPanel variant="app" />
+      )}
 
       <p className="text-center text-xs text-slate-500">
         <Link href="/lekari/dokumentace" className="text-[#005B96] underline">

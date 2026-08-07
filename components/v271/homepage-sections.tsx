@@ -8,12 +8,14 @@ import {
   V271_AUDIENCES,
   V271_AKTUALNI,
   V271_B2B,
+  V271_DOKUMENTACE_APP,
   V271_SOCIAL_PROOF_STATS,
   V271_SUBSCRIPTION_PLANS,
   V271_TESTIMONIALS,
   V271_WHY_TRUST,
 } from "@/lib/v271/homepage";
 import { subscriptionProductId } from "@/lib/v27/config";
+import { DokumentaceDownloadPanel } from "@/components/lekari/dokumentace-download-panel";
 
 export function V272SocialProofBlock() {
   return (
@@ -109,6 +111,30 @@ export function V272WhyTrustBlock() {
             Předplatit
           </Link>
         </div>
+      </div>
+    </section>
+  );
+}
+
+export function V272DokumentaceAppBlock() {
+  return (
+    <section className="border-b border-slate-200 bg-gradient-to-b from-[#eef6fb] to-white">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+        <div className="mb-6 max-w-3xl">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
+            {V271_DOKUMENTACE_APP.eyebrow}
+          </p>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33] sm:text-4xl">
+            {V271_DOKUMENTACE_APP.title}
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-slate-600 sm:text-base">
+            {V271_DOKUMENTACE_APP.description}{" "}
+            <span className="font-semibold text-[#005B96]">{V271_DOKUMENTACE_APP.price}</span>
+            {" · "}
+            14 dní zdarma.
+          </p>
+        </div>
+        <DokumentaceDownloadPanel variant="homepage" />
       </div>
     </section>
   );
@@ -371,6 +397,7 @@ export async function V272HomepageSections() {
   return (
     <>
       <V272SocialProofBlock />
+      <V272DokumentaceAppBlock />
       <V272WhyTrustBlock />
       <V271AudienceSections />
       <V272AcademyCtaBlock />

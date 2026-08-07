@@ -7,6 +7,7 @@ import {
   listDokumentaceNotes,
   saveDokumentaceNote,
 } from "@/lib/lekari/dokumentace/notes";
+import { getDokumentaceEligibility } from "@/lib/lekari/dokumentace/eligibility";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -37,6 +38,14 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Přihlášení vyžadováno." }, { status: 401 });
   }
 
+  const eligibility = await getDokumentaceEligibility(user.id);
+  if (!eligibility.eligible) {
+    return NextResponse.json(
+      { error: eligibility.message, code: "DOCTOR_VERIFICATION_REQUIRED" },
+      { status: 403 }
+    );
+  }
+
   const url = new URL(request.url);
   const limit = Number(url.searchParams.get("limit") ?? "30");
 
@@ -63,6 +72,14 @@ export async function POST(request: Request) {
   if (!guard.ok) return guard.response;
   if (!user) {
     return NextResponse.json({ error: "Přihlášení vyžadováno." }, { status: 401 });
+  }
+
+  const eligibility = await getDokumentaceEligibility(user.id);
+  if (!eligibility.eligible) {
+    return NextResponse.json(
+      { error: eligibility.message, code: "DOCTOR_VERIFICATION_REQUIRED" },
+      { status: 403 }
+    );
   }
 
   let body: z.infer<typeof createSchema>;

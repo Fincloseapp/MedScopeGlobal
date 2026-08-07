@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Download, CheckCircle2, Share } from "lucide-react";
+import Link from "next/link";
+import { Download, CheckCircle2, Share, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type BeforeInstallPromptEvent = Event & {
@@ -21,14 +22,27 @@ function isIos(): boolean {
   return /iPad|iPhone|iPod/.test(navigator.userAgent);
 }
 
-export function InstallAppButton({ className }: { className?: string }) {
+export function InstallAppButton({
+  className,
+  gated = false,
+  canInstall = true,
+}: {
+  className?: string;
+  /** When true, requires canInstall=true (verified physician). */
+  gated?: boolean;
+  canInstall?: boolean;
+}) {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [iosTip, setIosTip] = useState(false);
 
+  const allowed = !gated || canInstall;
+
   useEffect(() => {
     setInstalled(isStandalone());
     setIosTip(isIos() && !isStandalone());
+
+    if (!allowed) return;
 
     if ("serviceWorker" in navigator) {
       void navigator.serviceWorker
@@ -52,9 +66,10 @@ export function InstallAppButton({ className }: { className?: string }) {
       window.removeEventListener("beforeinstallprompt", onBip);
       window.removeEventListener("appinstalled", onInstalled);
     };
-  }, []);
+  }, [allowed]);
 
   async function onInstall() {
+    if (!allowed) return;
     if (!deferred) {
       setIosTip(true);
       return;
@@ -76,6 +91,22 @@ export function InstallAppButton({ className }: { className?: string }) {
         <CheckCircle2 className="h-3.5 w-3.5" />
         Aplikace nainstalována
       </div>
+    );
+  }
+
+  if (!allowed) {
+    return (
+      <Button
+        asChild
+        size="sm"
+        variant="outline"
+        className={`h-8 rounded-full border-white/40 bg-transparent px-3 text-xs text-white hover:bg-white/10 ${className ?? ""}`}
+      >
+        <Link href="/login?next=/app/dokumentace">
+          <Lock className="mr-1.5 h-3.5 w-3.5" />
+          Stažení po ověření
+        </Link>
+      </Button>
     );
   }
 

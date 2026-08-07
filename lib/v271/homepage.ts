@@ -98,12 +98,23 @@ export const V271_AUDIENCES = [
     label: "Lékaři",
     description:
       "Guidelines, přehledy studií, Research Hub a klinický AI — pro rozhodování v ordinaci, ne v teoretické laboratoři.",
-    topics: ["guidelines", "CME", "studie", "diagnostika", "Research Hub"],
+    topics: ["guidelines", "CME", "Dokumentace", "studie", "Research Hub"],
     href: "/lekari",
-    ctaPrimary: { label: "Odborná sekce", href: "/odborna" },
+    ctaPrimary: { label: "Stáhnout Dokumentaci", href: "/app/dokumentace" },
     ctaSecondary: { label: "Klinický AI", href: "/lekari/ai-asistent" },
   },
 ] as const;
+
+/** Homepage spotlight — installable physician Dokumentace app */
+export const V271_DOKUMENTACE_APP = {
+  eyebrow: "Novinka pro ordinaci",
+  title: "MedScope Dokumentace — stáhněte aplikaci pro lékaře",
+  description:
+    "AI zápisy z nahrávky nebo diktátu. Instalace jen pro ověřené lékaře, propojení s osobním účtem nebo účtem zdravotnického zařízení.",
+  href: "/lekari/dokumentace",
+  appHref: "/app/dokumentace",
+  price: "390 Kč / měsíc",
+} as const;
 
 export const V271_B2B = {
   title: "Pro firmy a instituce",
@@ -137,7 +148,7 @@ export const V271_FOOTER_TRUST = {
   audiences: [
     { label: "Veřejnost — srozumitelná zdravotní osvěta", href: "/verejnost" },
     { label: "Studenti medicíny — Academy a materiály", href: "/studenti" },
-    { label: "Lékaři — odborný obsah a guidelines", href: "/lekari" },
+    { label: "Lékaři — Dokumentace a guidelines", href: "/lekari/dokumentace" },
     { label: "Zdravotníci a zdravotní profesionálové", href: "/odborna" },
   ],
   proof: [
