@@ -1,14 +1,19 @@
 {
+  "id": "/app/dokumentace",
   "name": "MedScope Dokumentace",
   "short_name": "Dokumentace",
-  "description": "AI zápisy pro lékaře — nahrávka, přepis a strukturovaný zápis.",
-  "start_url": "/lekari/dokumentace",
-  "scope": "/lekari/dokumentace",
+  "description": "AI zápisy pro lékaře — nahrávka, diktát, šablony. Funguje na mobilu i PC.",
+  "start_url": "/app/dokumentace?source=pwa",
+  "scope": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#fafcff",
+  "orientation": "any",
+  "background_color": "#021d33",
   "theme_color": "#005B96",
   "lang": "cs",
+  "categories": [
+    "medical",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "/assets/logo/Logo_Transparent.png",
@@ -21,6 +26,26 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/logo/Logo_Transparent@2x.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nový zápis",
+      "short_name": "Zápis",
+      "url": "/app/dokumentace?tab=zapis",
+      "description": "Spustit nahrávku nebo diktát"
+    },
+    {
+      "name": "Historie zápisů",
+      "short_name": "Historie",
+      "url": "/app/dokumentace?tab=historie",
+      "description": "Otevře uložené zápisy"
     }
   ]
 }

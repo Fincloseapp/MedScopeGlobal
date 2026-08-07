@@ -61,7 +61,12 @@ function isMobileClient(): boolean {
   return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 }
 
-export function DokumentaceWorkspace() {
+type DokumentaceWorkspaceProps = {
+  variant?: "default" | "app";
+};
+
+export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspaceProps) {
+  const isApp = variant === "app";
   const [consent, setConsent] = useState(false);
   const [mode, setMode] = useState<DokumentaceMode>("consultation");
   const [templateId, setTemplateId] =
@@ -175,14 +180,14 @@ export function DokumentaceWorkspace() {
     form.append("mode", mode);
     form.append("templateId", templateId);
     if (specialty.trim()) form.append("specialty", specialty.trim());
-    form.append("source", isMobileClient() ? "mobile" : "web");
+    form.append("source", isApp ? "pwa" : isMobileClient() ? "mobile" : "web");
 
     try {
       const res = await fetch("/api/lekari/dokumentace/process", {
         method: "POST",
         credentials: "same-origin",
         headers: {
-          "x-dokumentace-source": isMobileClient() ? "mobile" : "web",
+          "x-dokumentace-source": isApp ? "pwa" : isMobileClient() ? "mobile" : "web",
         },
         body: form,
       });
@@ -372,8 +377,8 @@ export function DokumentaceWorkspace() {
   const processing = state === "processing";
 
   return (
-    <div className="space-y-6 pb-24 sm:pb-0">
-      {showInstallTip ? (
+    <div className={isApp ? "space-y-4 pb-2" : "space-y-6 pb-24 sm:pb-0"}>
+      {!isApp && showInstallTip ? (
         <div className="flex gap-3 rounded-xl border border-[#cfe1f3] bg-[#eef6fb] px-4 py-3 text-sm text-[#021d33]">
           <Smartphone className="mt-0.5 h-5 w-5 shrink-0 text-[#005B96]" />
           <div>
@@ -565,7 +570,7 @@ export function DokumentaceWorkspace() {
             <p>{error}</p>
             {gateHint === "login" ? (
               <p className="mt-2">
-                <Link href="/login" className="font-semibold text-[#005B96] underline">
+                <Link href={isApp ? "/login?next=/app/dokumentace" : "/login"} className="font-semibold text-[#005B96] underline">
                   Přihlásit se
                 </Link>
               </p>
@@ -671,6 +676,7 @@ export function DokumentaceWorkspace() {
         </div>
       )}
 
+{!isApp ? (
       <div
         ref={historyRef}
         id="moje-zapisy"
@@ -753,6 +759,7 @@ export function DokumentaceWorkspace() {
           </div>
         )}
       </div>
+      ) : null}
 
       <div className="rounded-xl border border-[#d9e8f4] bg-[#f4f9fc] px-4 py-3 text-xs leading-5 text-slate-600">
         MedScope Dokumentace není zdravotnický prostředek. Výstup je návrh AI —
@@ -761,6 +768,7 @@ export function DokumentaceWorkspace() {
       </div>
 
       {/* Mobile sticky bottom bar */}
+      {!isApp ? (
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[#cfe1f3] bg-white/95 px-3 py-2 backdrop-blur sm:hidden">
         <div className="mx-auto flex max-w-lg items-center justify-around gap-1">
           <Button
@@ -793,6 +801,7 @@ export function DokumentaceWorkspace() {
           </Button>
         </div>
       </div>
+      ) : null}
     </div>
   );
 }

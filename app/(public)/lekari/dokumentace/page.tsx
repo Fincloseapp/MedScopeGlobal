@@ -77,7 +77,10 @@ export default function LekariDokumentacePage() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg" className="h-12 rounded-full bg-white px-6 text-[#021d33] hover:bg-sky-50">
-              <a href="#workspace">Spustit zápis</a>
+              <Link href="/app/dokumentace">Stáhnout aplikaci</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="h-12 rounded-full border-white/40 bg-transparent px-6 text-white hover:bg-white/10">
+              <a href="#workspace">Spustit zápis na webu</a>
             </Button>
             <Button
               asChild
@@ -157,6 +160,43 @@ export default function LekariDokumentacePage() {
           <Button asChild className="rounded-full bg-[#005B96] shrink-0">
             <Link href="/predplatne#dokumentace">Zobrazit předplatné</Link>
           </Button>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <div className="relative overflow-hidden rounded-2xl border border-[#005B96]/30 bg-[#021d33] p-6 text-white shadow-sm sm:p-8">
+          <div
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_90%_10%,rgba(0,91,150,0.45),transparent_55%)]"
+            aria-hidden
+          />
+          <div className="relative">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-sky-200">
+              Aplikace pro ordinaci
+            </p>
+            <h2 className="mt-2 font-display text-2xl font-bold sm:text-3xl">
+              Stáhnout aplikaci pro lékaře
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-sky-100/95">
+              MedScope Dokumentace jako instalovatelná PWA — bez marketingového menu,
+              s kartami Zápis, Historie, Návod a Účet. Funguje na Androidu i iOS.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild size="lg" className="h-12 rounded-full bg-white px-6 text-[#021d33] hover:bg-sky-50">
+                <Link href="/app/dokumentace">Otevřít aplikaci</Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="h-12 rounded-full border-white/40 bg-transparent px-6 text-white hover:bg-white/10"
+              >
+                <a href="#workspace">Zůstat na webu</a>
+              </Button>
+            </div>
+            <p className="mt-4 text-xs leading-5 text-sky-100/80">
+              Tip: Android Chrome → nabídka → Instalovat aplikaci. iOS Safari → Sdílet → Na plochu.
+            </p>
+          </div>
         </div>
       </section>
 

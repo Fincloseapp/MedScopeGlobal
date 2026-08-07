@@ -100,6 +100,11 @@ const menuCs: NavItem[] = [
         href: "/lekari/dokumentace",
         description: "AI klinický zapisovatel",
       },
+      {
+        label: "Aplikace Dokumentace",
+        href: "/app/dokumentace",
+        description: "Instalovatelná app pro lékaře",
+      },
       { label: "Ověření ČLK (Academy)", href: "/academy/lekari/overeni", description: "Vstup do Lékařské zóny" },
       { label: "Guidelines", href: "/lekari/guidelines", description: "Klinická doporučení" },
       { label: "Přehledy", href: "/lekari/prehledy", description: "Medicínské briefy" },

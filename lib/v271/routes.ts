@@ -164,6 +164,11 @@ export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
         description: "AI zapisovatel — nahrávka → český zápis podle šablony",
       },
       {
+        label: "Aplikace Dokumentace",
+        href: "/app/dokumentace",
+        description: "Stáhnout PWA — zápisy bez marketingového chrome",
+      },
+      {
         label: "Ověření ČLK (Academy)",
         href: "/academy/lekari/overeni",
         description: "Vstup do Lékařské zóny Academy",
