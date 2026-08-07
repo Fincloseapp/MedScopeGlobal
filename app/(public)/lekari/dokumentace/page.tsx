@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Mic, Sparkles, FileCheck2, Shield } from "lucide-react";
 import { DokumentaceWorkspace } from "@/components/lekari/dokumentace-workspace";
 import { DokumentaceDownloadPanel } from "@/components/lekari/dokumentace-download-panel";
+import { DokumentaceTutorial } from "@/components/lekari/dokumentace-tutorial";
 import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,7 @@ const VALUE_PROPS = [
   {
     icon: Sparkles,
     title: "AI zpracuje",
-    text: "Český STT a strukturování do šablony (SOAP, ambulantní zpráva, anamnéza…).",
+    text: "Návrh strukturovaného zápisu pro českou ordinaci — detaily šablon až v aplikaci.",
   },
   {
     icon: FileCheck2,
@@ -81,7 +82,7 @@ export default function LekariDokumentacePage() {
               <a href="#stahnout">Stáhnout přes QR</a>
             </Button>
             <Button asChild size="lg" variant="outline" className="h-12 rounded-full border-white/40 bg-transparent px-6 text-white hover:bg-white/10">
-              <a href="#workspace">Spustit zápis na webu</a>
+              <a href="#ukazka">Jak to funguje</a>
             </Button>
             <Button
               asChild
@@ -96,6 +97,10 @@ export default function LekariDokumentacePage() {
             Stažení aplikace jen pro ověřené lékaře — propojeno s vaším účtem MedScope.
           </p>
         </div>
+      </section>
+
+      <section id="ukazka" className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <DokumentaceTutorial variant="full" />
       </section>
 
       <section id="stahnout" className="mx-auto max-w-6xl px-4 py-10 sm:px-6">

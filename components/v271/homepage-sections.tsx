@@ -16,6 +16,7 @@ import {
 } from "@/lib/v271/homepage";
 import { subscriptionProductId } from "@/lib/v27/config";
 import { DokumentaceDownloadPanel } from "@/components/lekari/dokumentace-download-panel";
+import { DokumentaceTutorial } from "@/components/lekari/dokumentace-tutorial";
 
 export function V272SocialProofBlock() {
   return (
@@ -135,6 +136,9 @@ export function V272DokumentaceAppBlock() {
           </p>
         </div>
         <DokumentaceDownloadPanel variant="homepage" />
+        <div className="mt-8">
+          <DokumentaceTutorial variant="compact" />
+        </div>
       </div>
     </section>
   );
