@@ -146,34 +146,37 @@ async function uploadViaSignedUrl(
 
   onProgress?.(0.15, "Odesílám soubor…");
 
-  // Prefer token upload through supabase REST (uploadToSignedUrl compatible)
-  if (token && signedUrl) {
+  // Official Supabase signed upload (FormData PUT) — most reliable on mobile
+  if (token) {
+    try {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      const { error } = await supabase.storage
+        .from("media")
+        .uploadToSignedUrl(path, token, file, { contentType: mime, upsert: true });
+      if (!error) {
+        onProgress?.(0.55, "Soubor nahrán…");
+        return path;
+      }
+    } catch {
+      // fall through to raw signedUrl / chunked
+    }
+  }
+
+  if (signedUrl) {
+    const form = new FormData();
+    form.append("cacheControl", "3600");
+    form.append("", file);
     const putRes = await fetchWithRetry(
       signedUrl,
       {
         method: "PUT",
-        headers: {
-          "Content-Type": mime,
-          "x-upsert": "true",
-        },
-        body: file,
+        headers: { "x-upsert": "true" },
+        body: form,
       },
-      3
+      2
     );
-    if (putRes.ok || putRes.status === 200) {
-      onProgress?.(0.55, "Soubor nahrán…");
-      return path;
-    }
-  }
-
-  // Fallback: Supabase storage API with token query (createSignedUploadUrl shape)
-  if (token) {
-    const { createClient } = await import("@/lib/supabase/client");
-    const supabase = createClient();
-    const { error } = await supabase.storage
-      .from("media")
-      .uploadToSignedUrl(path, token, file, { contentType: mime, upsert: true });
-    if (!error) {
+    if (putRes.ok) {
       onProgress?.(0.55, "Soubor nahrán…");
       return path;
     }

@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     const admin = createServiceRoleClient();
     const { data, error } = await admin.storage
       .from(BUCKET)
-      .createSignedUploadUrl(path);
+      .createSignedUploadUrl(path, { upsert: true });
 
     if (error || !data?.token || !data?.path) {
       return NextResponse.json(
