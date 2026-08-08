@@ -108,9 +108,9 @@ export const V271_AUDIENCES = [
 /** Homepage spotlight — installable physician Dokumentace app */
 export const V271_DOKUMENTACE_APP = {
   eyebrow: "Novinka pro ordinaci",
-  title: "MedScope Dokumentace — stáhněte aplikaci pro lékaře",
+  title: "DokScope od MedScopeGlobal — stáhněte aplikaci pro lékaře",
   description:
-    "AI zápisy z nahrávky nebo diktátu. Instalace jen pro ověřené lékaře, propojení s osobním účtem nebo účtem zdravotnického zařízení.",
+    "DokScope · medscopeglobal.com — AI zápisy z nahrávky nebo diktátu. Instalace jen pro ověřené lékaře, propojení s účtem MedScopeGlobal.",
   href: "/lekari/dokumentace",
   appHref: "/app/dokumentace",
   price: "390 Kč / měsíc",
@@ -148,7 +148,7 @@ export const V271_FOOTER_TRUST = {
   audiences: [
     { label: "Veřejnost — srozumitelná zdravotní osvěta", href: "/verejnost" },
     { label: "Studenti medicíny — Academy a materiály", href: "/studenti" },
-    { label: "Lékaři — Dokumentace a guidelines", href: "/lekari/dokumentace" },
+    { label: "Lékaři — DokScope a guidelines", href: "/lekari/dokumentace" },
     { label: "Zdravotníci a zdravotní profesionálové", href: "/odborna" },
   ],
   proof: [

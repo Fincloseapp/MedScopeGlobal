@@ -70,7 +70,7 @@ export function DokAppHistory() {
   async function shareText(text: string, title?: string | null) {
     try {
       if (navigator.share) {
-        await navigator.share({ title: title || "MedScope Dokumentace", text });
+        await navigator.share({ title: title || "DokScope", text });
       } else {
         await copyText(text);
       }

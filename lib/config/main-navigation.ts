@@ -96,14 +96,14 @@ const menuCs: NavItem[] = [
         description: "Akreditované testy — jen revmatologie",
       },
       {
-        label: "MedScope Dokumentace",
+        label: "DokScope",
         href: "/lekari/dokumentace",
-        description: "AI klinický zapisovatel",
+        description: "DokScope od MedScopeGlobal — AI zápisy",
       },
       {
-        label: "Aplikace Dokumentace",
+        label: "Aplikace DokScope",
         href: "/app/dokumentace",
-        description: "Instalovatelná app pro lékaře",
+        description: "DokScope · medscopeglobal.com",
       },
       { label: "Ověření ČLK (Academy)", href: "/academy/lekari/overeni", description: "Vstup do Lékařské zóny" },
       { label: "Guidelines", href: "/lekari/guidelines", description: "Klinická doporučení" },

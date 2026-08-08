@@ -56,7 +56,7 @@ export function DokAppGuide() {
       <div className="rounded-2xl border border-[#d9e8f4] bg-[#f4f9fc] p-4 text-xs leading-5 text-slate-600">
         <p className="font-semibold text-[#021d33]">Právní upozornění</p>
         <ul className="mt-2 list-disc space-y-1.5 pl-4">
-          <li>MedScope Dokumentace není zdravotnický prostředek ani diagnóza.</li>
+          <li>DokScope od MedScopeGlobal není zdravotnický prostředek ani diagnóza.</li>
           <li>Lékař odpovídá za kontrolu a schválení zápisu.</li>
           <li>Audio se po zpracování neukládá (ephemeral).</li>
         </ul>

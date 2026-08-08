@@ -196,7 +196,7 @@ export function DokAppAccount({
           <Button asChild variant="outline" className="h-11 rounded-full border-[#cfe1f3]">
             <Link href="/predplatne#dokumentace">
               <CreditCard className="mr-2 h-4 w-4" />
-              Předplatné Dokumentace (390 Kč)
+              Předplatné DokScope (390 Kč)
             </Link>
           </Button>
         </div>
@@ -206,7 +206,7 @@ export function DokAppAccount({
         <div className="rounded-2xl border border-[#cfe1f3] bg-[#021d33] p-4 text-white">
           <p className="text-sm font-semibold">Instalace aplikace</p>
           <p className="mt-1 text-xs text-sky-100/90">
-            Stažení je vázané na váš ověřený účet — historie zápisů se synchronizuje.
+            Stažení DokScope je vázané na váš ověřený účet MedScopeGlobal — historie se synchronizuje.
           </p>
           <div className="mt-3">
             <InstallAppButton gated canInstall />

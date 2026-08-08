@@ -14,7 +14,7 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({
     title: "Předplatné | MedScopeGlobal",
-    description: `${VIP_TRIAL_DAYS}denní zkušební verze zdarma. Tarify 99 / 149 / 390 / 490 Kč měsíčně — včetně MedScope Dokumentace. Platba kartou přes Stripe.`,
+    description: `${VIP_TRIAL_DAYS}denní zkušební verze zdarma. Tarify 99 / 149 / 390 / 490 Kč měsíčně — včetně DokScope od MedScopeGlobal. Platba kartou přes Stripe.`,
     path: "/predplatne",
   });
 }

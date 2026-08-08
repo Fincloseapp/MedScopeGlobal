@@ -8,6 +8,7 @@ import { DokAppHistory } from "@/components/lekari/dok-app/dok-app-history";
 import { DokAppGuide } from "@/components/lekari/dok-app/dok-app-guide";
 import { DokAppAccount } from "@/components/lekari/dok-app/dok-app-account";
 import { DokAppGate } from "@/components/lekari/dok-app/dok-app-gate";
+import { DOKSCOPE } from "@/lib/lekari/dokumentace/branding";
 
 type TabId = "zapis" | "historie" | "navod" | "ucet";
 
@@ -130,11 +131,12 @@ export function DokAppShell() {
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-2">
           <div className="min-w-0">
             <p className="truncate text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-100/90">
-              MedScope
+              {DOKSCOPE.provider}
             </p>
             <h1 className="truncate text-base font-semibold leading-tight sm:text-lg">
-              Dokumentace
+              {DOKSCOPE.shortName}
             </h1>
+            <p className="truncate text-[10px] text-sky-100/70">{DOKSCOPE.lockline}</p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <span
@@ -181,7 +183,7 @@ export function DokAppShell() {
       <nav
         className="shrink-0 border-t border-[#cfe1f3] bg-white/95 backdrop-blur"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-        aria-label="Aplikace Dokumentace"
+        aria-label={DOKSCOPE.fullName}
       >
         <div className="mx-auto grid max-w-3xl grid-cols-4">
           {TABS.map(({ id, label, icon: Icon }) => {
