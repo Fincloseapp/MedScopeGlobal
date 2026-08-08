@@ -53,7 +53,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Chybí audio segment." }, { status: 400 });
   }
 
-  const mimeType = file.type || "audio/webm";
+  const uploadedName = typeof file.name === "string" ? file.name : "";
+  let mimeType = file.type || "";
+  if (!mimeType || mimeType === "application/octet-stream") {
+    const n = uploadedName.toLowerCase();
+    if (n.endsWith(".m4a") || n.endsWith(".mp4")) mimeType = "audio/mp4";
+    else if (n.endsWith(".mp3")) mimeType = "audio/mpeg";
+    else if (n.endsWith(".wav")) mimeType = "audio/wav";
+    else if (n.endsWith(".aac")) mimeType = "audio/aac";
+    else if (n.endsWith(".webm")) mimeType = "audio/webm";
+    else mimeType = "audio/mp4";
+  }
+  if (mimeType === "audio/x-m4a" || mimeType === "video/mp4") mimeType = "audio/mp4";
   const buffer = Buffer.from(await file.arrayBuffer());
 
   if (buffer.byteLength === 0) {
@@ -73,7 +84,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { text, provider } = await transcribeAudio(buffer, mimeType);
+    const { text, provider } = await transcribeAudio(buffer, mimeType, uploadedName);
     return NextResponse.json({
       transcript: text,
       provider,

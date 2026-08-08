@@ -20,7 +20,6 @@ import { Button } from "@/components/ui/button";
 import {
   DOKUMENTACE_AUDIO_BITS_PER_SECOND,
   DOKUMENTACE_MAX_RECORD_MS,
-  DOKUMENTACE_MAX_UPLOAD_BYTES,
   DOKUMENTACE_SEGMENT_MS,
   DOKUMENTACE_SOFT_UPLOAD_BYTES,
   DOKUMENTACE_MODES,
@@ -28,6 +27,11 @@ import {
   type DokumentaceMode,
   type DokumentaceTemplateId,
 } from "@/lib/lekari/dokumentace/templates";
+import {
+  MEDIKTOR_FILE_ACCEPT,
+  prepareUploadBlobs,
+  resolveAudioMeta,
+} from "@/components/lekari/mediktor-audio";
 
 type WorkspaceState = "idle" | "recording" | "processing" | "done" | "error";
 
@@ -281,9 +285,17 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         }
 
         const form = new FormData();
-        const mime = blob.type || "audio/webm";
-        const ext = mime.includes("mp4") ? "m4a" : "webm";
-        form.append("audio", new Blob([blob], { type: mime }), `recording-${i}.${ext}`);
+        const meta = resolveAudioMeta(
+          blob instanceof File
+            ? blob
+            : Object.assign(blob, { name: `chunk-${i}.wav` }),
+          i
+        );
+        const part =
+          blob instanceof File
+            ? blob
+            : new File([blob], meta.filename, { type: meta.mime || blob.type || "audio/wav" });
+        form.append("audio", part, meta.filename);
 
         const res = await fetch("/api/lekari/dokumentace/stt-chunk", {
           method: "POST",
@@ -517,9 +529,20 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     }
   }
 
-  function onFileSelected(file: File | undefined) {
+  async function onFileSelected(file: File | undefined) {
     if (!file) return;
-    void processBlobs([file]);
+    if (!consent) setConsent(true);
+    setError(null);
+    setGateHint(null);
+    setState("processing");
+    try {
+      const prepared = await prepareUploadBlobs(file, DOKUMENTACE_SOFT_UPLOAD_BYTES);
+      await processBlobs(prepared.blobs);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg.slice(0, 240));
+      setState("error");
+    }
   }
 
   async function copyText(text: string) {
@@ -781,7 +804,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
               size="lg"
               variant="outline"
               className="h-12 rounded-full px-5"
-              disabled={!consent || recording || processing}
+              disabled={recording || processing}
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="mr-2 h-4 w-4" />
@@ -790,16 +813,20 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             <input
               ref={fileInputRef}
               type="file"
-              accept="audio/*,.webm,.mp3,.m4a,.wav,.ogg"
+              accept={MEDIKTOR_FILE_ACCEPT}
               className="hidden"
-              onChange={(e) => onFileSelected(e.target.files?.[0])}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = "";
+                void onFileSelected(f);
+              }}
             />
           </div>
         </div>
         {processing ? (
           <p className="mt-3 flex items-center gap-2 text-sm text-slate-600">
             <Loader2 className="h-4 w-4 animate-spin text-[#005B96]" />
-            Přepisuji a sestavuji zápis… Audio se neukládá.
+            Přepisuji soubor / nahrávku a sestavuji zápis… Audio se neukládá.
           </p>
         ) : null}
       </div>

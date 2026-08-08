@@ -19,12 +19,14 @@ const STT_TIMEOUT_MS = 280_000;
 async function transcribeWithOpenAi(
   buffer: Buffer,
   mimeType: string,
-  apiKey: string
+  apiKey: string,
+  originalName?: string
 ): Promise<TranscribeResult> {
   const form = new FormData();
-  const blob = new Blob([new Uint8Array(buffer)], { type: mimeType || "audio/webm" });
-  form.append("file", blob, guessFilename(mimeType));
-  form.append("model", "whisper-1");
+  const filename = guessFilename(mimeType, originalName);
+  const blob = new Blob([new Uint8Array(buffer)], { type: mimeType || "audio/mp4" });
+  form.append("file", blob, filename);
+  form.append("model", "whisper-1"); // filename via mime
   form.append("language", "cs");
   form.append("prompt", MEDICAL_STT_PROMPT);
   form.append("temperature", "0");
@@ -51,11 +53,13 @@ async function transcribeWithOpenAi(
 async function transcribeWithGroq(
   buffer: Buffer,
   mimeType: string,
-  apiKey: string
+  apiKey: string,
+  originalName?: string
 ): Promise<TranscribeResult> {
   const form = new FormData();
-  const blob = new Blob([new Uint8Array(buffer)], { type: mimeType || "audio/webm" });
-  form.append("file", blob, guessFilename(mimeType));
+  const filename = guessFilename(mimeType, originalName);
+  const blob = new Blob([new Uint8Array(buffer)], { type: mimeType || "audio/mp4" });
+  form.append("file", blob, filename);
   form.append("model", "whisper-large-v3");
   form.append("language", "cs");
   form.append("prompt", MEDICAL_STT_PROMPT);
@@ -80,12 +84,21 @@ async function transcribeWithGroq(
   return { text, provider: "groq:whisper-large-v3" };
 }
 
-function guessFilename(mimeType: string): string {
-  if (mimeType.includes("mp4") || mimeType.includes("m4a")) return "audio.m4a";
-  if (mimeType.includes("mpeg") || mimeType.includes("mp3")) return "audio.mp3";
-  if (mimeType.includes("wav")) return "audio.wav";
-  if (mimeType.includes("ogg")) return "audio.ogg";
-  return "audio.webm";
+function guessFilename(mimeType: string, originalName?: string): string {
+  const name = (originalName || "").toLowerCase();
+  if (name.endsWith(".m4a")) return "audio.m4a";
+  if (name.endsWith(".mp3")) return "audio.mp3";
+  if (name.endsWith(".wav")) return "audio.wav";
+  if (name.endsWith(".aac")) return "audio.aac";
+  if (name.endsWith(".ogg")) return "audio.ogg";
+  if (name.endsWith(".webm")) return "audio.webm";
+  const m = (mimeType || "").toLowerCase();
+  if (m.includes("mp4") || m.includes("m4a") || m.includes("aac")) return "audio.m4a";
+  if (m.includes("mpeg") || m.includes("mp3")) return "audio.mp3";
+  if (m.includes("wav")) return "audio.wav";
+  if (m.includes("ogg")) return "audio.ogg";
+  if (m.includes("webm")) return "audio.webm";
+  return "audio.m4a";
 }
 
 /**
@@ -95,7 +108,8 @@ function guessFilename(mimeType: string): string {
  */
 export async function transcribeAudio(
   buffer: Buffer,
-  mimeType: string
+  mimeType: string,
+  originalName?: string
 ): Promise<TranscribeResult> {
   const openAiKey = resolveOpenAiKey();
   const groqKey = resolveGroqKey();
@@ -104,7 +118,7 @@ export async function transcribeAudio(
   // Prefer OpenAI for Czech clinical quality; Groq as fast fallback.
   if (openAiKey) {
     try {
-      return await transcribeWithOpenAi(buffer, mimeType, openAiKey);
+      return await transcribeWithOpenAi(buffer, mimeType, openAiKey, originalName);
     } catch (e) {
       errors.push(e instanceof Error ? e.message : String(e));
     }
@@ -112,7 +126,7 @@ export async function transcribeAudio(
 
   if (groqKey) {
     try {
-      return await transcribeWithGroq(buffer, mimeType, groqKey);
+      return await transcribeWithGroq(buffer, mimeType, groqKey, originalName);
     } catch (e) {
       errors.push(e instanceof Error ? e.message : String(e));
     }
