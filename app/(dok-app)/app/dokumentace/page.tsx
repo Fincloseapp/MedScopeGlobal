@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import { DokAppShell } from "@/components/lekari/dok-app/dok-app-shell";
-import { DOKSCOPE } from "@/lib/lekari/dokumentace/branding";
+import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
 
 export const metadata: Metadata = {
-  title: DOKSCOPE.pwaName,
-  description: DOKSCOPE.seoDescription,
+  title: MEDIKTOR.pwaName,
+  description: MEDIKTOR.seoDescription,
   manifest: "/dokumentace-manifest.json",
   appleWebApp: {
     capable: true,
-    title: DOKSCOPE.pwaShortName,
+    title: MEDIKTOR.pwaShortName,
     statusBarStyle: "black-translucent",
   },
   other: {
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
-    "apple-mobile-web-app-title": DOKSCOPE.pwaShortName,
+    "apple-mobile-web-app-title": MEDIKTOR.pwaShortName,
     "theme-color": "#005B96",
   },
   themeColor: "#005B96",

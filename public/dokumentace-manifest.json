@@ -1,8 +1,8 @@
 {
   "id": "/app/dokumentace",
-  "name": "DokScope · MedScopeGlobal",
-  "short_name": "DokScope",
-  "description": "DokScope od MedScopeGlobal — AI zápisy pro ordinaci. medscopeglobal.com",
+  "name": "MeDiktor · MedScopeGlobal",
+  "short_name": "MeDiktor",
+  "description": "MeDiktor od MedScopeGlobal — AI zápisy pro ordinaci. medscopeglobal.com",
   "start_url": "/app/dokumentace?source=pwa",
   "scope": "/",
   "display": "standalone",
@@ -39,7 +39,7 @@
       "name": "Nový zápis",
       "short_name": "Zápis",
       "url": "/app/dokumentace?tab=zapis",
-      "description": "Spustit nahrávkku nebo diktát"
+      "description": "Spustit nahrávku nebo diktát"
     },
     {
       "name": "Historie zápisů",

@@ -8,12 +8,12 @@ import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { Button } from "@/components/ui/button";
 import { SITE } from "@/lib/config/site";
-import { DOKSCOPE } from "@/lib/lekari/dokumentace/branding";
+import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
 
 export async function generateMetadata(): Promise<Metadata> {
   const base = buildV20PageMetadata({
-    title: DOKSCOPE.seoTitle,
-    description: DOKSCOPE.seoDescription,
+    title: MEDIKTOR.seoTitle,
+    description: MEDIKTOR.seoDescription,
     path: "/lekari/dokumentace",
   });
 
@@ -22,13 +22,13 @@ export async function generateMetadata(): Promise<Metadata> {
     manifest: "/dokumentace-manifest.json",
     appleWebApp: {
       capable: true,
-      title: DOKSCOPE.pwaName,
+      title: MEDIKTOR.pwaName,
       statusBarStyle: "default",
     },
     other: {
       "mobile-web-app-capable": "yes",
       "apple-mobile-web-app-capable": "yes",
-      "apple-mobile-web-app-title": DOKSCOPE.pwaShortName,
+      "apple-mobile-web-app-title": MEDIKTOR.pwaShortName,
       "theme-color": "#005B96",
     },
   };
@@ -70,11 +70,11 @@ export default function LekariDokumentacePage() {
             Pro lékaře
           </p>
           <h1 className="mt-3 max-w-3xl font-display text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
-            {DOKSCOPE.shortName}
+            {MEDIKTOR.shortName}
           </h1>
-          <p className="mt-2 text-sm font-medium text-sky-200/90">{DOKSCOPE.lockline}</p>
+          <p className="mt-2 text-sm font-medium text-sky-200/90">{MEDIKTOR.lockline}</p>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-sky-100/95">
-            {DOKSCOPE.fullName} — AI zapisovatel pro ordinaci. Nahrávka nebo diktát, strukturovaný klinický zápis. Samostatně 390 Kč/měsíc včetně balíčku Lékař v praxi.
+            {MEDIKTOR.fullName} — AI zapisovatel pro ordinaci. Nahrávka nebo diktát, strukturovaný klinický zápis. Samostatně 390 Kč/měsíc včetně balíčku Lékař v praxi.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg" className="h-12 rounded-full bg-white px-6 text-[#021d33] hover:bg-sky-50">
@@ -93,7 +93,7 @@ export default function LekariDokumentacePage() {
             </Button>
           </div>
           <p className="mt-4 text-xs text-sky-100/80">
-            {`Stažení jen pro ověřené lékaře — účet MedScopeGlobal · ${DOKSCOPE.domain}`}
+            {`Stažení jen pro ověřené lékaře — účet MedScopeGlobal · ${MEDIKTOR.domain}`}
           </p>
         </div>
       </section>
@@ -112,7 +112,7 @@ export default function LekariDokumentacePage() {
             Nejvýhodnější vstup pro ordinaci
           </p>
           <h2 className="mt-2 font-display text-2xl font-bold text-[#021d33]">
-            DokScope standalone — 390 Kč/měsíc
+            MeDiktor standalone — 390 Kč/měsíc
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
             Levnější než Lékař v praxi (490 Kč), se stejnými právy lékaře: guidelines,
@@ -136,7 +136,7 @@ export default function LekariDokumentacePage() {
               <Link href="/predplatne#physician" className="text-[#005B96] underline">
                 Lékař v praxi za 490 Kč
               </Link>{" "}
-              — DokScope je levnější vstup se stejnými právy.
+              — MeDiktor je levnější vstup se stejnými právy.
             </p>
           </div>
         </div>
@@ -189,7 +189,7 @@ export default function LekariDokumentacePage() {
           </h2>
           <ul className="mt-4 max-w-3xl list-disc space-y-2 pl-5 text-sm leading-6 text-slate-600">
             <li>
-              DokScope od MedScopeGlobal je asistent pro lékaře — není zdravotnický
+              MeDiktor od MedScopeGlobal je asistent pro lékaře — není zdravotnický
               prostředek ani diagnóza.
             </li>
             <li>

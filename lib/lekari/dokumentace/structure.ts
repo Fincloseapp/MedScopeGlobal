@@ -5,7 +5,7 @@ import {
   type DokumentaceMode,
 } from "@/lib/lekari/dokumentace/templates";
 
-const SYSTEM_PROMPT = `Jsi asistent klinické dokumentace DokScope od MedScopeGlobal.
+const SYSTEM_PROMPT = `Jsi asistent klinické dokumentace MeDiktor od MedScopeGlobal.
 Piš výhradně česky, odborným lékařským stylem vhodným do zdravotnické dokumentace.
 Nejsi zdravotnický prostředek (medical device) ani diagnostický nástroj.
 Nevymýšlej fakta, hodnoty ani diagnózy, které nejsou v přepisu.

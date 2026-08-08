@@ -53,7 +53,7 @@ async function hasPhysicianAccessLevel(userId: string): Promise<boolean> {
 }
 
 /**
- * Gate for DokScope (MedScopeGlobal):
+ * Gate for MeDiktor (MedScopeGlobal):
  * 1) verified physician / facility-linked account
  * 2) daily quota (3 non-VIP / 40 VIP)
  */
@@ -64,7 +64,7 @@ export async function assertDokumentaceAccess(
     return {
       ok: false,
       status: 401,
-      error: "Pro DokScope od MedScopeGlobal se musíte přihlásit.",
+      error: "Pro MeDiktor od MedScopeGlobal se musíte přihlásit.",
       code: "UNAUTHENTICATED",
     };
   }
@@ -95,14 +95,14 @@ export async function assertDokumentaceAccess(
         ok: false,
         status: 402,
         error:
-          "Vyčerpán denní demo limit (3 zápisy). Předplatné DokScope nebo Lékař v praxi odemyká až 40 zápisů denně.",
+          "Vyčerpán denní demo limit (3 zápisy). Předplatné MeDiktor nebo Lékař v praxi odemyká až 40 zápisů denně.",
         code: "PAYMENT_REQUIRED",
       };
     }
     return {
       ok: false,
       status: 429,
-      error: "Vyčerpán denní limit DokScope (40 zápisů / 24 h). Zkuste později.",
+      error: "Vyčerpán denní limit MeDiktor (40 zápisů / 24 h). Zkuste později.",
       code: "RATE_LIMITED",
     };
   }

@@ -76,7 +76,7 @@ export const V27_SUBSCRIPTION_PLANS = [
   },
   {
     tier: "dokumentace" as const,
-    name: "DokScope od MedScopeGlobal",
+    name: "MeDiktor od MedScopeGlobal",
     monthlyCzk: 390,
     annualCzk: 3900,
     features: [
@@ -96,8 +96,8 @@ export const V27_SUBSCRIPTION_PLANS = [
       "Odborná sekce a guidelines",
       "CME přehledy",
       "Klinický AI asistent",
-      "DokScope od MedScopeGlobal (AI zápisy)",
-      "Stejná práva lékaře i přes DokScope standalone (390 Kč)",
+      "MeDiktor od MedScopeGlobal (AI zápisy)",
+      "Stejná práva lékaře i přes MeDiktor standalone (390 Kč)",
     ],
   },
 ] as const;
@@ -117,7 +117,7 @@ export const V27_COMPARISON_FEATURES = [
   { label: "CME přehledy a souhrny studií", public: false, student: false, physician: true },
   { label: "Klinický AI asistent", public: false, student: false, physician: true },
   {
-    label: "DokScope od MedScopeGlobal (AI zápisy) — i standalone 390 Kč se stejnými právy lékaře",
+    label: "MeDiktor od MedScopeGlobal (AI zápisy) — i standalone 390 Kč se stejnými právy lékaře",
     public: false,
     student: false,
     physician: true,
@@ -136,7 +136,7 @@ export const V27_SUBSCRIPTIONS = {
   student: { id: "student", name: "Student LF", priceCzk: 149, interval: "month" as const },
   dokumentace: {
     id: "dokumentace",
-    name: "DokScope od MedScopeGlobal",
+    name: "MeDiktor od MedScopeGlobal",
     priceCzk: 390,
     interval: "month" as const,
   },

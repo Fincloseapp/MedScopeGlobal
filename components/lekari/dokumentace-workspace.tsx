@@ -338,7 +338,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     try {
       if (navigator.share) {
         await navigator.share({
-          title: title || "DokScope",
+          title: title || "MeDiktor",
           text,
         });
       } else {
@@ -762,7 +762,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       ) : null}
 
       <div className="rounded-xl border border-[#d9e8f4] bg-[#f4f9fc] px-4 py-3 text-xs leading-5 text-slate-600">
-        DokScope od MedScopeGlobal není zdravotnický prostředek. Výstup je návrh AI —
+        MeDiktor od MedScopeGlobal není zdravotnický prostředek. Výstup je návrh AI —
         konečnou odpovědnost za obsah nese lékař. Audio se po zpracování
         neukládá (ephemeral). Před nahráváním rozhovoru informujte pacienta.
       </div>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Download, QrCode, ShieldCheck, Building2, Loader2, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InstallAppButton } from "@/components/lekari/dok-app/install-app-button";
-import { DOKSCOPE } from "@/lib/lekari/dokumentace/branding";
+import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
 
 type EligibilityResponse = {
   eligible: boolean;
@@ -86,11 +86,11 @@ export function DokumentaceDownloadPanel({
               variant === "homepage" ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl"
             }`}
           >
-            {"Stáhnout "}{DOKSCOPE.shortName}
+            {"Stáhnout "}{MEDIKTOR.shortName}
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-sky-100/95">
-            {DOKSCOPE.fullName} — AI zápisy z nahrávky nebo diktátu. Instalovatelná aplikace
-            propojená s účtem MedScopeGlobal. Stažení jen po ověření · {DOKSCOPE.domain}
+            {MEDIKTOR.fullName} — AI zápisy z nahrávky nebo diktátu. Instalovatelná aplikace
+            propojená s účtem MedScopeGlobal. Stažení jen po ověření · {MEDIKTOR.domain}
           </p>
 
           {loading ? (
@@ -156,7 +156,7 @@ export function DokumentaceDownloadPanel({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={qrSrc}
-              alt={`QR kód pro stažení ${DOKSCOPE.fullName}`}
+              alt={`QR kód pro stažení ${MEDIKTOR.fullName}`}
               width={180}
               height={180}
               className="h-[160px] w-[160px] sm:h-[180px] sm:w-[180px]"
