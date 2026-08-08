@@ -99,93 +99,149 @@ export function encodeWavMono(buffer: AudioBuffer, sampleRate = 16000): Blob {
   return new Blob([arrayBuffer], { type: "audio/wav" });
 }
 
+export const MEDIKTOR_MAX_FILE_BYTES = 25 * 1024 * 1024;
+export const MEDIKTOR_UPLOAD_CHUNK_BYTES = 3_000_000;
+
+/** Normalize a phone file for direct STT when it fits under the gateway soft limit. */
+export function normalizePhoneFile(file: File): File {
+  const { mime, filename } = resolveAudioMeta(file);
+  if (file.type === mime && file.name === filename) return file;
+  return new File([file], filename, { type: mime });
+}
+
+export type PhoneFileProcessResult = {
+  transcript: string;
+  note: string;
+  provider?: string;
+  remaining?: number;
+  saved?: boolean;
+  noteId?: string | null;
+};
+
 /**
- * Prepare phone recordings for upload under gateway size limits.
- * Small files go through as-is; larger ones are decoded and split into ~90s WAV chunks.
+ * Upload a phone recording in binary chunks (no browser decode), then process on server.
+ * Use when the file exceeds the Vercel/gateway soft limit — iOS m4a often cannot be decoded in Safari.
+ */
+export async function uploadAndProcessPhoneFile(opts: {
+  file: File;
+  mode: string;
+  templateId: string;
+  specialty?: string;
+  source?: string;
+  onProgress?: (ratio: number, label: string) => void;
+}): Promise<PhoneFileProcessResult> {
+  const { file, mode, templateId, specialty, source } = opts;
+  if (file.size <= 0) {
+    throw new Error("Soubor je prázdný.");
+  }
+  if (file.size > MEDIKTOR_MAX_FILE_BYTES) {
+    throw new Error(
+      "Soubor je větší než 25 MB. Nahrajte kratší nahrávku nebo použijte Nahrávat v MeDiktoru."
+    );
+  }
+
+  const { mime, filename } = resolveAudioMeta(file);
+  opts.onProgress?.(0.02, "Připravuji nahrávku…");
+
+  const sessionRes = await fetch("/api/lekari/dokumentace/file-session", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      byteLength: file.size,
+      filename,
+      mimeType: mime,
+    }),
+  });
+  const sessionJson = (await sessionRes.json().catch(() => ({}))) as {
+    error?: string;
+    sessionId?: string;
+    maxChunkBytes?: number;
+  };
+  if (!sessionRes.ok || !sessionJson.sessionId) {
+    throw new Error(sessionJson.error || "Nepodařilo se zahájit nahrání souboru.");
+  }
+
+  const chunkSize = Math.min(
+    sessionJson.maxChunkBytes || MEDIKTOR_UPLOAD_CHUNK_BYTES,
+    MEDIKTOR_UPLOAD_CHUNK_BYTES
+  );
+  const total = Math.max(1, Math.ceil(file.size / chunkSize));
+
+  for (let i = 0; i < total; i++) {
+    const start = i * chunkSize;
+    const end = Math.min(file.size, start + chunkSize);
+    const slice = file.slice(start, end);
+    const form = new FormData();
+    form.append("sessionId", sessionJson.sessionId);
+    form.append("index", String(i));
+    form.append("total", String(total));
+    form.append("chunk", slice, `${filename}.part${i}`);
+
+    const chunkRes = await fetch("/api/lekari/dokumentace/file-chunk", {
+      method: "POST",
+      credentials: "same-origin",
+      body: form,
+    });
+    const chunkJson = (await chunkRes.json().catch(() => ({}))) as { error?: string };
+    if (!chunkRes.ok) {
+      throw new Error(chunkJson.error || `Odeslání části ${i + 1}/${total} selhalo.`);
+    }
+    opts.onProgress?.(0.05 + (0.55 * (i + 1)) / total, `Odesílám ${i + 1}/${total}…`);
+  }
+
+  opts.onProgress?.(0.65, "Přepisuji nahrávku…");
+  const processRes = await fetch("/api/lekari/dokumentace/process-file", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+      "x-dokumentace-source": source || "mobile-file",
+    },
+    body: JSON.stringify({
+      sessionId: sessionJson.sessionId,
+      total,
+      filename,
+      mimeType: mime,
+      mode,
+      templateId,
+      specialty: specialty || undefined,
+      source: source || "mobile-file",
+    }),
+  });
+  const processJson = (await processRes.json().catch(() => ({}))) as PhoneFileProcessResult & {
+    error?: string;
+  };
+  if (!processRes.ok) {
+    throw new Error(processJson.error || "Zpracování souboru selhalo.");
+  }
+  if (!(processJson.note ?? "").trim()) {
+    throw new Error("Zápis se nepodařilo sestavit ze souboru.");
+  }
+  opts.onProgress?.(1, "Hotovo");
+  return {
+    transcript: processJson.transcript ?? "",
+    note: processJson.note ?? "",
+    provider: processJson.provider,
+    remaining: processJson.remaining,
+    saved: processJson.saved,
+    noteId: processJson.noteId,
+  };
+}
+
+/**
+ * @deprecated Prefer normalizePhoneFile + uploadAndProcessPhoneFile for phone files.
+ * Kept for small in-app blobs only.
  */
 export async function prepareUploadBlobs(
   file: File,
   softLimitBytes: number
 ): Promise<{ blobs: Blob[]; warning?: string }> {
   if (file.size > 0 && file.size <= softLimitBytes) {
-    const { mime } = resolveAudioMeta(file);
-    const blob =
-      file.type && file.type === mime
-        ? file
-        : new File([file], resolveAudioMeta(file).filename, { type: mime });
-    return { blobs: [blob] };
+    return { blobs: [normalizePhoneFile(file)] };
   }
-
-  const AudioCtx =
-    window.AudioContext ||
-    (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-  if (!AudioCtx) {
-    throw new Error(
-      "Tento prohlížeč neumí zpracovat velký audio soubor. Použijte kratší nahrávku nebo tlačítko Nahrávat v aplikaci."
-    );
-  }
-
-  const ctx = new AudioCtx();
-  try {
-    const raw = await file.arrayBuffer();
-    const audioBuffer = await ctx.decodeAudioData(raw.slice(0));
-    const chunkSec = 90;
-    const blobs: Blob[] = [];
-    let start = 0;
-    let index = 0;
-    while (start < audioBuffer.duration) {
-      const end = Math.min(audioBuffer.duration, start + chunkSec);
-      const frameCount = Math.max(1, Math.ceil((end - start) * audioBuffer.sampleRate));
-      const slice = ctx.createBuffer(
-        audioBuffer.numberOfChannels,
-        frameCount,
-        audioBuffer.sampleRate
-      );
-      for (let c = 0; c < audioBuffer.numberOfChannels; c++) {
-        const src = audioBuffer.getChannelData(c);
-        const dst = slice.getChannelData(c);
-        const from = Math.floor(start * audioBuffer.sampleRate);
-        dst.set(src.subarray(from, from + frameCount));
-      }
-      const wav = encodeWavMono(slice, 16000);
-      if (wav.size > softLimitBytes) {
-        // Fallback shorter chunk
-        const shorter = ctx.createBuffer(
-          slice.numberOfChannels,
-          Math.floor(slice.length / 2),
-          slice.sampleRate
-        );
-        for (let c = 0; c < slice.numberOfChannels; c++) {
-          shorter.getChannelData(c).set(slice.getChannelData(c).subarray(0, shorter.length));
-        }
-        blobs.push(encodeWavMono(shorter, 16000));
-        start += chunkSec / 2;
-      } else {
-        blobs.push(wav);
-        start = end;
-      }
-      index += 1;
-      if (index > 80) break; // safety: ~2h
-    }
-    if (blobs.length === 0) {
-      throw new Error("Soubor se nepodařilo rozdělit na odesílatelné části.");
-    }
-    return {
-      blobs,
-      warning:
-        file.size > softLimitBytes
-          ? `Soubor byl rozdělen na ${blobs.length} částí kvůli limitu odeslání.`
-          : undefined,
-    };
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (/decode|EncodingError|Unable to decode/i.test(msg)) {
-      throw new Error(
-        "Formát nahrávky telefon neumí převést v prohlížeči. Uložte jako M4A/MP3, nebo použijte Nahrávat přímo v MeDiktoru."
-      );
-    }
-    throw e instanceof Error ? e : new Error(msg);
-  } finally {
-    void ctx.close();
-  }
+  // Large phone files must not rely on browser decode (iOS Voice Memos often fails).
+  throw new Error(
+    "Soubor je příliš velký pro přímé odeslání — použijte nahrání přes MeDiktor (automatické dělení)."
+  );
 }

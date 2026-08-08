@@ -29,8 +29,10 @@ import {
 } from "@/lib/lekari/dokumentace/templates";
 import {
   MEDIKTOR_FILE_ACCEPT,
-  prepareUploadBlobs,
+  MEDIKTOR_MAX_FILE_BYTES,
+  normalizePhoneFile,
   resolveAudioMeta,
+  uploadAndProcessPhoneFile,
 } from "@/components/lekari/mediktor-audio";
 
 type WorkspaceState = "idle" | "recording" | "processing" | "done" | "error";
@@ -534,13 +536,43 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     if (!consent) setConsent(true);
     setError(null);
     setGateHint(null);
+    setSavedInAccount(false);
     setState("processing");
+
+    const source = isApp ? "pwa-file" : isMobileClient() ? "mobile-file" : "web-file";
+
     try {
-      const prepared = await prepareUploadBlobs(file, DOKUMENTACE_SOFT_UPLOAD_BYTES);
-      await processBlobs(prepared.blobs);
+      // Small files: direct STT chunk (under gateway limit).
+      // Larger phone files (typical Voice Memos m4a): binary chunk upload — no browser decode.
+      if (file.size > 0 && file.size <= DOKUMENTACE_SOFT_UPLOAD_BYTES) {
+        await processBlobs([normalizePhoneFile(file)]);
+        return;
+      }
+      if (file.size > MEDIKTOR_MAX_FILE_BYTES) {
+        setError(
+          "Soubor je větší než 25 MB. Nahrajte kratší nahrávku nebo použijte Nahrávat v MeDiktoru."
+        );
+        setState("error");
+        return;
+      }
+
+      const result = await uploadAndProcessPhoneFile({
+        file,
+        mode,
+        templateId,
+        specialty: specialty.trim() || undefined,
+        source,
+      });
+      setTranscript(result.transcript);
+      setNote(result.note);
+      setProvider(result.provider ?? null);
+      setRemaining(typeof result.remaining === "number" ? result.remaining : null);
+      setSavedInAccount(Boolean(result.saved));
+      setState("done");
+      void loadHistory();
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      setError(msg.slice(0, 240));
+      setError(msg.slice(0, 280));
       setState("error");
     }
   }
@@ -826,7 +858,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         {processing ? (
           <p className="mt-3 flex items-center gap-2 text-sm text-slate-600">
             <Loader2 className="h-4 w-4 animate-spin text-[#005B96]" />
-            Přepisuji soubor / nahrávku a sestavuji zápis… Audio se neukládá.
+            Odesílám a přepisuji nahrávku (včetně M4A z telefonu), pak sestavím zápis… Audio se neukládá trvale.
           </p>
         ) : null}
       </div>
