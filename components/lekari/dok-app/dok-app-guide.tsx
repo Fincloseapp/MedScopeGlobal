@@ -6,18 +6,18 @@ import { Mic, Sparkles, FileCheck2, Shield } from "lucide-react";
 const STEPS = [
   {
     icon: Mic,
-    title: "1. Nahrávejte nebo diktujte",
-    text: "V záložce Zápis potvrďte souhlas, zvolte režim a šablonu, pak stiskněte Nahrávat.",
+    title: "1. Povolte mikrofon",
+    text: "Jednou klepněte na „Povolit mikrofon“ a v telefonu potvrďte přístup. Pak stačí Nahrávat — až 60 minut.",
   },
   {
     icon: Sparkles,
-    title: "2. AI zpracuje",
-    text: "Český přepis a strukturovaný zápis (SOAP, ambulantní zpráva…). Audio se neukládá.",
+    title: "2. Nahrajte konzultaci nebo diktát",
+    text: "Zvolte šablonu (např. Anamnéza). Po Stop AI přepíše češtinu a sestaví profesionální zápis. Audio se neukládá.",
   },
   {
     icon: FileCheck2,
     title: "3. Zkontrolujte a zkopírujte",
-    text: "Upravte návrh, zkopírujte do NIS/dokumentace. Historie je v záložce Historie.",
+    text: "Upravte návrh, zkopírujte do NIS. Historie je pod stejným účtem na mobilu i PC.",
   },
   {
     icon: Shield,
@@ -32,7 +32,7 @@ export function DokAppGuide() {
       <div>
         <h2 className="text-base font-semibold text-[#021d33]">Návod</h2>
         <p className="mt-1 text-xs text-slate-500">
-          Krátký postup pro ordinaci — mobil i PC.
+          Po stažení: mikrofon → nahrát → hotový zápis.
         </p>
       </div>
 
@@ -54,7 +54,13 @@ export function DokAppGuide() {
       </ol>
 
       <div className="rounded-2xl border border-[#d9e8f4] bg-[#f4f9fc] p-4 text-xs leading-5 text-slate-600">
-        <p className="font-semibold text-[#021d33]">Právní upozornění</p>
+        <p className="font-semibold text-[#021d33]">Když telefon mikrofon nepovolí</p>
+        <ul className="mt-2 list-disc space-y-1.5 pl-4">
+          <li>iPhone: Nastavení → Safari (nebo MeDiktor) → Mikrofon → Povolit</li>
+          <li>Android: Nastavení → Aplikace → Chrome / MeDiktor → Oprávnění → Mikrofon</li>
+          <li>Pak v aplikaci znovu „Povolit mikrofon“</li>
+        </ul>
+        <p className="mt-3 font-semibold text-[#021d33]">Právní upozornění</p>
         <ul className="mt-2 list-disc space-y-1.5 pl-4">
           <li>MeDiktor od MedScopeGlobal není zdravotnický prostředek ani diagnóza.</li>
           <li>Lékař odpovídá za kontrolu a schválení zápisu.</li>

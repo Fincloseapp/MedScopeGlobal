@@ -7,7 +7,7 @@ import { DOKUMENTACE_MAX_UPLOAD_BYTES } from "@/lib/lekari/dokumentace/templates
 import { transcribeAudio } from "@/lib/lekari/dokumentace/stt";
 
 export const runtime = "nodejs";
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 export async function POST(request: Request) {
   const supabase = await createClient();

@@ -18,8 +18,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
+  DOKUMENTACE_AUDIO_BITS_PER_SECOND,
   DOKUMENTACE_MAX_RECORD_MS,
   DOKUMENTACE_MAX_UPLOAD_BYTES,
+  DOKUMENTACE_SEGMENT_MS,
   DOKUMENTACE_MODES,
   DOKUMENTACE_TEMPLATES,
   type DokumentaceMode,
@@ -61,6 +63,33 @@ function isMobileClient(): boolean {
   return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 }
 
+const CONSENT_KEY = "mediktor_consent_v1";
+
+function micErrorMessage(err: unknown): string {
+  const name = err && typeof err === "object" && "name" in err ? String((err as { name: string }).name) : "";
+  if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+    return "Mikrofon je zablokovaný. V telefonu: Nastavení → MeDiktor / Safari / Chrome → Mikrofon → Povolit, pak znovu klepněte na „Povolit mikrofon“.";
+  }
+  if (name === "NotFoundError") {
+    return "Mikrofon nebyl nalezen. Zkontrolujte, že zařízení má mikrofon a není používán jinou aplikací.";
+  }
+  return "Nepodařilo se získat mikrofon. Povolte přístup a zkuste znovu.";
+}
+
+async function ensureMicPermission(): Promise<MediaStream> {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    throw Object.assign(new Error("getUserMedia unavailable"), { name: "NotSupportedError" });
+  }
+  return navigator.mediaDevices.getUserMedia({
+    audio: {
+      channelCount: 1,
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true,
+    },
+  });
+}
+
 type DokumentaceWorkspaceProps = {
   variant?: "default" | "app";
 };
@@ -88,13 +117,21 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
   const [historyOpen, setHistoryOpen] = useState(false);
   const [copyFlash, setCopyFlash] = useState(false);
   const [showInstallTip, setShowInstallTip] = useState(false);
+  const [micReady, setMicReady] = useState(false);
+  const [micBusy, setMicBusy] = useState(false);
+  const [segmentCount, setSegmentCount] = useState(0);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const segmentBlobsRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
   const startedAtRef = useRef<number>(0);
   const accumulatedRef = useRef(0);
   const timerRef = useRef<number | null>(null);
+  const rotatingRef = useRef(false);
+  const mimeTypeRef = useRef("audio/webm");
+  const finalizingRef = useRef(false);
+  const lastRotateRef = useRef(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const historyRef = useRef<HTMLDivElement>(null);
 
@@ -157,16 +194,24 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     else setGateHint(null);
   }
 
-  async function processBlob(blob: Blob) {
+  async function processBlobs(blobs: Blob[]) {
     if (!consent) {
       setError("Nejprve potvrďte souhlas s nahráváním.");
       setState("error");
       return;
     }
-    if (blob.size > DOKUMENTACE_MAX_UPLOAD_BYTES) {
-      setError("Audio přesahuje limit 25 MB.");
+    const usable = blobs.filter((b) => b.size > 0);
+    if (usable.length === 0) {
+      setError("Nahrávka je prázdná — mikrofon nic nezachytil. Povolte mikrofon a zkuste znovu.");
       setState("error");
       return;
+    }
+    for (const blob of usable) {
+      if (blob.size > DOKUMENTACE_MAX_UPLOAD_BYTES) {
+        setError("Audio segment přesahuje 25 MB. Použijte nižší kvalitu nebo kratší úsek.");
+        setState("error");
+        return;
+      }
     }
 
     setState("processing");
@@ -175,8 +220,10 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     setSavedInAccount(false);
 
     const form = new FormData();
-    const ext = blob.type.includes("mp4") ? "m4a" : "webm";
-    form.append("audio", blob, `recording.${ext}`);
+    usable.forEach((blob, i) => {
+      const ext = blob.type.includes("mp4") ? "m4a" : "webm";
+      form.append("audio", blob, `recording-${i}.${ext}`);
+    });
     form.append("mode", mode);
     form.append("templateId", templateId);
     if (specialty.trim()) form.append("specialty", specialty.trim());
@@ -203,6 +250,11 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         applyGate(res.status, json.error ?? "Zpracování selhalo.");
         return;
       }
+      if (!(json.transcript ?? "").trim()) {
+        setError("Přepis je prázdný — záznam se nepřenesl. Zkontrolujte mikrofon a zkuste znovu.");
+        setState("error");
+        return;
+      }
       setTranscript(json.transcript ?? "");
       setNote(json.note ?? "");
       setProvider(json.provider ?? null);
@@ -211,14 +263,31 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       setState("done");
       void loadHistory();
     } catch {
-      setError("Síťová chyba při zpracování.");
+      setError("Síťová chyba při zpracování — zkontrolujte připojení a zkuste znovu.");
       setState("error");
+    }
+  }
+
+  async function enableMicrophone() {
+    setMicBusy(true);
+    setError(null);
+    try {
+      const stream = await ensureMicPermission();
+      stream.getTracks().forEach((tr) => tr.stop());
+      setMicReady(true);
+      if (!consent) setConsent(true);
+    } catch (err) {
+      setMicReady(false);
+      setError(micErrorMessage(err));
+      setState("error");
+    } finally {
+      setMicBusy(false);
     }
   }
 
   async function startRecording() {
     if (!consent) {
-      setError("Nejprve potvrďte souhlas s nahráváním.");
+      setError("Nejprve potvrďte souhlas s nahráváním (nebo povolte mikrofon).");
       setState("error");
       return;
     }
@@ -228,35 +297,68 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     setNote("");
     setProvider(null);
     setSavedInAccount(false);
+    segmentBlobsRef.current = [];
+    setSegmentCount(0);
+    finalizingRef.current = false;
+    rotatingRef.current = false;
+    lastRotateRef.current = 0;
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = streamRef.current?.active
+        ? streamRef.current
+        : await ensureMicPermission();
       streamRef.current = stream;
+      setMicReady(true);
       const mimeType = pickMimeType();
-      const recorder = new MediaRecorder(stream, { mimeType });
-      chunksRef.current = [];
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data);
-      };
-      recorder.onstop = async () => {
-        clearTimer();
-        stopTracks();
-        const blob = new Blob(chunksRef.current, { type: mimeType });
-        chunksRef.current = [];
-        mediaRecorderRef.current = null;
-        if (blob.size === 0) {
-          setError("Nahrávka je prázdná.");
-          setState("error");
-          return;
+      mimeTypeRef.current = mimeType;
+
+      const attachRecorder = () => {
+        let recorder: MediaRecorder;
+        try {
+          recorder = new MediaRecorder(stream, {
+            mimeType,
+            audioBitsPerSecond: DOKUMENTACE_AUDIO_BITS_PER_SECOND,
+          });
+        } catch {
+          recorder = new MediaRecorder(stream, { mimeType });
         }
-        await processBlob(blob);
+        chunksRef.current = [];
+        recorder.ondataavailable = (e) => {
+          if (e.data.size > 0) chunksRef.current.push(e.data);
+        };
+        recorder.onstop = () => {
+          const blob = new Blob(chunksRef.current, { type: mimeTypeRef.current });
+          chunksRef.current = [];
+          if (blob.size > 0) {
+            segmentBlobsRef.current.push(blob);
+            setSegmentCount(segmentBlobsRef.current.length);
+          }
+          if (rotatingRef.current) {
+            rotatingRef.current = false;
+            if (!finalizingRef.current && streamRef.current?.active) {
+              attachRecorder();
+              mediaRecorderRef.current?.start(1000);
+            }
+            return;
+          }
+          if (finalizingRef.current) {
+            clearTimer();
+            stopTracks();
+            mediaRecorderRef.current = null;
+            const blobs = [...segmentBlobsRef.current];
+            segmentBlobsRef.current = [];
+            void processBlobs(blobs);
+          }
+        };
+        mediaRecorderRef.current = recorder;
       };
-      mediaRecorderRef.current = recorder;
+
+      attachRecorder();
       accumulatedRef.current = 0;
       startedAtRef.current = Date.now();
       setElapsedMs(0);
       setPaused(false);
-      recorder.start(250);
+      mediaRecorderRef.current?.start(1000);
       setState("recording");
       timerRef.current = window.setInterval(() => {
         if (pausedRef.current) return;
@@ -264,10 +366,20 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         setElapsedMs(ms);
         if (ms >= DOKUMENTACE_MAX_RECORD_MS) {
           stopRecording();
+          return;
+        }
+        if (ms - lastRotateRef.current >= DOKUMENTACE_SEGMENT_MS) {
+          const rec = mediaRecorderRef.current;
+          if (rec && rec.state === "recording" && !rotatingRef.current) {
+            lastRotateRef.current = ms;
+            rotatingRef.current = true;
+            rec.stop();
+          }
         }
       }, 200);
-    } catch {
-      setError("Nepodařilo se získat mikrofon. Povolte přístup v prohlížeči.");
+    } catch (err) {
+      setError(micErrorMessage(err));
+      setMicReady(false);
       setState("error");
     }
   }
@@ -275,17 +387,25 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
   function pauseRecording() {
     const rec = mediaRecorderRef.current;
     if (!rec || rec.state !== "recording") return;
-    rec.pause();
-    accumulatedRef.current += Date.now() - startedAtRef.current;
-    setPaused(true);
+    try {
+      rec.pause();
+      accumulatedRef.current += Date.now() - startedAtRef.current;
+      setPaused(true);
+    } catch {
+      // iOS may not support pause — ignore
+    }
   }
 
   function resumeRecording() {
     const rec = mediaRecorderRef.current;
     if (!rec || rec.state !== "paused") return;
-    startedAtRef.current = Date.now();
-    rec.resume();
-    setPaused(false);
+    try {
+      startedAtRef.current = Date.now();
+      rec.resume();
+      setPaused(false);
+    } catch {
+      // ignore
+    }
   }
 
   function stopRecording() {
@@ -296,13 +416,21 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         accumulatedRef.current += Date.now() - startedAtRef.current;
       }
       setElapsedMs(accumulatedRef.current);
-      rec.stop();
+      rotatingRef.current = false;
+      finalizingRef.current = true;
+      try {
+        rec.stop();
+      } catch {
+        clearTimer();
+        stopTracks();
+        void processBlobs([...segmentBlobsRef.current]);
+      }
     }
   }
 
   function onFileSelected(file: File | undefined) {
     if (!file) return;
-    void processBlob(file);
+    void processBlobs([file]);
   }
 
   async function copyText(text: string) {
@@ -368,7 +496,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `medscope-dokumentace-${templateId}.txt`;
+    a.download = `mediktor-${templateId}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -392,20 +520,39 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       ) : null}
 
       <div className="rounded-2xl border border-[#cfe1f3] bg-white p-5 sm:p-6 shadow-[0_12px_30px_-24px_rgba(0,91,150,0.55)]">
-        <label className="flex items-start gap-3 text-sm text-[#021d33] cursor-pointer">
-          <input
-            type="checkbox"
-            className="mt-1 h-5 w-5 accent-[#005B96]"
-            checked={consent}
-            onChange={(e) => setConsent(e.target.checked)}
-          />
-          <span>
-            Informoval/a jsem pacienta o nahrávání (nebo jde o diktát bez pacienta)
-          </span>
-        </label>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <label className="flex items-start gap-3 text-sm text-[#021d33] cursor-pointer">
+            <input
+              type="checkbox"
+              className="mt-1 h-5 w-5 accent-[#005B96]"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+            />
+            <span>
+              Informoval/a jsem pacienta o nahrávání (nebo jde o diktát bez pacienta)
+            </span>
+          </label>
+          <Button
+            type="button"
+            size="sm"
+            variant={micReady ? "outline" : "default"}
+            className={`h-10 shrink-0 rounded-full ${micReady ? "border-emerald-300 text-emerald-800" : "bg-[#005B96]"}`}
+            disabled={micBusy || recording || processing}
+            onClick={() => void enableMicrophone()}
+          >
+            {micBusy ? (
+              <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+            ) : micReady ? (
+              <CheckCircle2 className="mr-1.5 h-4 w-4" />
+            ) : (
+              <Mic className="mr-1.5 h-4 w-4" />
+            )}
+            {micReady ? "Mikrofon povolen" : "1. Povolit mikrofon"}
+          </Button>
+        </div>
 
         <p className="mt-3 text-xs leading-5 text-slate-500">
-          Nahrajte na mobilu → zápis se objeví i na PC (historie v účtu).
+          Po stažení: nejdříve „Povolit mikrofon“, pak „Nahrávat“. Až 60 minut (automatické dělení po 8 min). Zápis se uloží do účtu.
         </p>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -496,6 +643,11 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
               <p className="font-mono text-lg text-[#005B96]">
                 {formatMs(elapsedMs)}
                 <span className="ml-2 text-xs text-slate-400">/ 60:00</span>
+                {segmentCount > 0 ? (
+                  <span className="ml-2 text-xs text-slate-400">
+                    · segmenty {segmentCount}
+                  </span>
+                ) : null}
               </p>
             </div>
           </div>
@@ -510,7 +662,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                 disabled={!consent || processing}
               >
                 <Mic className="mr-2 h-5 w-5" />
-                Nahrávat
+                {micReady ? "2. Nahrávat" : "Nahrávat"}
               </Button>
             ) : (
               <>
@@ -581,7 +733,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                   href="/predplatne#dokumentace"
                   className="font-semibold text-[#005B96] underline"
                 >
-                  Dokumentace od 390 Kč
+                  MeDiktor od 390 Kč
                 </Link>
                 {" · "}
                 <Link href="/predplatne#physician" className="underline">

@@ -13,7 +13,7 @@ import { structureDokumentaceNote } from "@/lib/lekari/dokumentace/structure";
 import { saveDokumentaceNote } from "@/lib/lekari/dokumentace/notes";
 
 export const runtime = "nodejs";
-export const maxDuration = 180;
+export const maxDuration = 300;
 
 function resolveSource(request: Request, form: FormData): string {
   const header = request.headers.get("x-dokumentace-source");
@@ -21,6 +21,25 @@ function resolveSource(request: Request, form: FormData): string {
   if (typeof field === "string" && field.trim()) return field.trim().slice(0, 40);
   if (header?.trim()) return header.trim().slice(0, 40);
   return "web";
+}
+
+function collectAudioFiles(form: FormData): File[] {
+  const files: File[] = [];
+  const all = form.getAll("audio");
+  for (const item of all) {
+    if (item && typeof item !== "string") files.push(item);
+  }
+  if (files.length === 0) {
+    const single = form.get("file");
+    if (single && typeof single !== "string") files.push(single);
+  }
+  // audio_0, audio_1, …
+  for (const [key, value] of form.entries()) {
+    if (/^audio_\d+$/.test(key) && value && typeof value !== "string") {
+      files.push(value);
+    }
+  }
+  return files;
 }
 
 export async function POST(request: Request) {
@@ -48,8 +67,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Neplatný multipart formulář." }, { status: 400 });
   }
 
-  const file = form.get("audio") ?? form.get("file");
-  if (!file || typeof file === "string") {
+  const files = collectAudioFiles(form);
+  if (files.length === 0) {
     return NextResponse.json(
       { error: "Chybí audio soubor (pole audio nebo file)." },
       { status: 400 }
@@ -64,21 +83,40 @@ export async function POST(request: Request) {
   const template = getDokumentaceTemplate(templateId);
   const source = resolveSource(request, form);
 
-  const mimeType = file.type || "audio/webm";
-  const buffer = Buffer.from(await file.arrayBuffer());
-
-  if (buffer.byteLength === 0) {
-    return NextResponse.json({ error: "Prázdný audio soubor." }, { status: 400 });
-  }
-  if (buffer.byteLength > DOKUMENTACE_MAX_UPLOAD_BYTES) {
-    return NextResponse.json(
-      { error: "Audio přesahuje limit 25 MB." },
-      { status: 413 }
-    );
-  }
+  const parts: string[] = [];
+  const providers: string[] = [];
 
   try {
-    const { text: transcript, provider } = await transcribeAudio(buffer, mimeType);
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const mimeType = file.type || "audio/webm";
+      const buffer = Buffer.from(await file.arrayBuffer());
+
+      if (buffer.byteLength === 0) continue;
+      if (buffer.byteLength > DOKUMENTACE_MAX_UPLOAD_BYTES) {
+        return NextResponse.json(
+          {
+            error: `Segment ${i + 1} přesahuje limit 25 MB. Nahrajte kratší úsek nebo použijte automatické dělení.`,
+          },
+          { status: 413 }
+        );
+      }
+
+      const { text, provider } = await transcribeAudio(buffer, mimeType);
+      if (text) {
+        parts.push(text);
+        providers.push(provider);
+      }
+    }
+
+    const transcript = parts.join("\n\n").trim();
+    if (!transcript) {
+      return NextResponse.json(
+        { error: "Přepis je prázdný — nahrávka se nepřenášla nebo mikrofon nic nezachytil." },
+        { status: 422 }
+      );
+    }
+
     const note = await structureDokumentaceNote({
       transcript,
       mode,
@@ -89,7 +127,7 @@ export async function POST(request: Request) {
     await logAiAgentUsage({
       userId: user!.id,
       agent: "dokumentace",
-      prompt: `process:${mode}:${template.id}:${provider}:${transcript.slice(0, 200)}`,
+      prompt: `process:${mode}:${template.id}:${providers.join("+")}:segs=${files.length}:${transcript.slice(0, 200)}`,
       status: "ok",
     });
 
@@ -113,11 +151,12 @@ export async function POST(request: Request) {
     return NextResponse.json({
       transcript,
       note,
-      provider,
+      provider: providers.join("+") || null,
       templateId: template.id,
       remaining: Math.max(0, access.remaining - 1),
       saved: Boolean(savedId),
       noteId: savedId,
+      segments: files.length,
     });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Zpracování selhalo.";

@@ -1,5 +1,11 @@
+/** Hard cap: 60 minutes continuous recording in the app. */
 export const DOKUMENTACE_MAX_RECORD_MS = 60 * 60 * 1000;
+/** Whisper API hard limit (~25 MB). Keep segments under this. */
 export const DOKUMENTACE_MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
+/** Rotate MediaRecorder every 8 minutes so long sessions stay under size/API limits. */
+export const DOKUMENTACE_SEGMENT_MS = 8 * 60 * 1000;
+/** Target bitrate — ~60 min ≈ 14 MB at 32 kbps mono. */
+export const DOKUMENTACE_AUDIO_BITS_PER_SECOND = 32_000;
 
 export type DokumentaceMode = "consultation" | "dictation" | "verbatim";
 

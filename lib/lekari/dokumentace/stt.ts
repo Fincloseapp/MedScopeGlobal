@@ -6,6 +6,16 @@ export type TranscribeResult = {
   provider: string;
 };
 
+/** Bias Whisper toward Czech clinical vocabulary (dialogue + anamnesis). */
+const MEDICAL_STT_PROMPT =
+  "Ambulantní vyšetření v češtině. Rozhovor lékaře s pacientem. " +
+  "Anamnéza, nynější onemocnění, osobní anamnéza, rodinná anamnéza, " +
+  "farmakologická anamnéza, alergie, abúzus, objektivní nález, diagnóza, " +
+  "terapie, doporučení. Léky: Paralen, Ibalgin, Prednison, Warfarin, " +
+  "Metformin, Amlodipin, Bisoprolol, Atorvastatin. Jednotky: mmHg, tepů/min, °C.";
+
+const STT_TIMEOUT_MS = 280_000;
+
 async function transcribeWithOpenAi(
   buffer: Buffer,
   mimeType: string,
@@ -16,12 +26,15 @@ async function transcribeWithOpenAi(
   form.append("file", blob, guessFilename(mimeType));
   form.append("model", "whisper-1");
   form.append("language", "cs");
+  form.append("prompt", MEDICAL_STT_PROMPT);
+  form.append("temperature", "0");
+  form.append("response_format", "json");
 
   const res = await fetch("https://api.openai.com/v1/audio/transcriptions", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}` },
     body: form,
-    signal: AbortSignal.timeout(120_000),
+    signal: AbortSignal.timeout(STT_TIMEOUT_MS),
   });
 
   if (!res.ok) {
@@ -45,13 +58,15 @@ async function transcribeWithGroq(
   form.append("file", blob, guessFilename(mimeType));
   form.append("model", "whisper-large-v3");
   form.append("language", "cs");
+  form.append("prompt", MEDICAL_STT_PROMPT);
+  form.append("temperature", "0");
   form.append("response_format", "json");
 
   const res = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}` },
     body: form,
-    signal: AbortSignal.timeout(120_000),
+    signal: AbortSignal.timeout(STT_TIMEOUT_MS),
   });
 
   if (!res.ok) {
@@ -74,7 +89,8 @@ function guessFilename(mimeType: string): string {
 }
 
 /**
- * Czech speech-to-text. Prefers OpenAI whisper-1, falls back to Groq whisper-large-v3.
+ * Czech clinical speech-to-text.
+ * Prefers OpenAI Whisper for medical Czech quality, falls back to Groq large-v3.
  * Audio is never persisted — caller must discard the buffer after use.
  */
 export async function transcribeAudio(
@@ -85,18 +101,18 @@ export async function transcribeAudio(
   const groqKey = resolveGroqKey();
   const errors: string[] = [];
 
-  // Prefer Groq in production (often configured); fall back to OpenAI.
-  if (groqKey) {
+  // Prefer OpenAI for Czech clinical quality; Groq as fast fallback.
+  if (openAiKey) {
     try {
-      return await transcribeWithGroq(buffer, mimeType, groqKey);
+      return await transcribeWithOpenAi(buffer, mimeType, openAiKey);
     } catch (e) {
       errors.push(e instanceof Error ? e.message : String(e));
     }
   }
 
-  if (openAiKey) {
+  if (groqKey) {
     try {
-      return await transcribeWithOpenAi(buffer, mimeType, openAiKey);
+      return await transcribeWithGroq(buffer, mimeType, groqKey);
     } catch (e) {
       errors.push(e instanceof Error ? e.message : String(e));
     }
