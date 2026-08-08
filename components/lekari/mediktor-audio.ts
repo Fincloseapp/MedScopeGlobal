@@ -3,6 +3,9 @@
 export const MEDIKTOR_FILE_ACCEPT =
   "audio/*,video/mp4,video/quicktime,.m4a,.mp3,.wav,.aac,.caf,.ogg,.webm,.mp4,.mpeg";
 
+export const MEDIKTOR_MAX_FILE_BYTES = 25 * 1024 * 1024;
+export const MEDIKTOR_UPLOAD_CHUNK_BYTES = 2_000_000;
+
 export function resolveAudioMeta(
   file: Blob & { name?: string },
   index = 0
@@ -24,11 +27,10 @@ export function resolveAudioMeta(
     } else if (name.endsWith(".webm")) {
       mime = "audio/webm";
     } else {
-      mime = "audio/mp4"; // iOS Voice Memos default guess
+      mime = "audio/mp4";
     }
   }
 
-  // Normalize iOS quirks
   if (mime === "audio/x-m4a" || mime === "audio/m4a") mime = "audio/mp4";
   if (mime === "video/mp4" || mime === "video/quicktime") mime = "audio/mp4";
 
@@ -48,60 +50,6 @@ export function resolveAudioMeta(
   return { mime, filename: `${safeBase}.${ext}` };
 }
 
-function writeString(view: DataView, offset: number, str: string) {
-  for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
-}
-
-/** Encode mono PCM WAV at given sample rate (keeps upload size predictable). */
-export function encodeWavMono(buffer: AudioBuffer, sampleRate = 16000): Blob {
-  const duration = buffer.duration;
-  const length = Math.floor(duration * sampleRate);
-  const mono = new Float32Array(length);
-  const channels = buffer.numberOfChannels;
-  const ratio = buffer.sampleRate / sampleRate;
-
-  for (let i = 0; i < length; i++) {
-    const srcIndex = Math.min(buffer.length - 1, Math.floor(i * ratio));
-    let sum = 0;
-    for (let c = 0; c < channels; c++) {
-      sum += buffer.getChannelData(c)[srcIndex] || 0;
-    }
-    mono[i] = sum / channels;
-  }
-
-  const bytesPerSample = 2;
-  const blockAlign = bytesPerSample;
-  const dataSize = mono.length * bytesPerSample;
-  const arrayBuffer = new ArrayBuffer(44 + dataSize);
-  const view = new DataView(arrayBuffer);
-
-  writeString(view, 0, "RIFF");
-  view.setUint32(4, 36 + dataSize, true);
-  writeString(view, 8, "WAVE");
-  writeString(view, 12, "fmt ");
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true);
-  view.setUint16(22, 1, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * blockAlign, true);
-  view.setUint16(32, blockAlign, true);
-  view.setUint16(34, 16, true);
-  writeString(view, 36, "data");
-  view.setUint32(40, dataSize, true);
-
-  let offset = 44;
-  for (let i = 0; i < mono.length; i++) {
-    const s = Math.max(-1, Math.min(1, mono[i]));
-    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
-    offset += 2;
-  }
-
-  return new Blob([arrayBuffer], { type: "audio/wav" });
-}
-
-export const MEDIKTOR_MAX_FILE_BYTES = 25 * 1024 * 1024;
-export const MEDIKTOR_UPLOAD_CHUNK_BYTES = 3_000_000;
-
 /** Normalize a phone file for direct STT when it fits under the gateway soft limit. */
 export function normalizePhoneFile(file: File): File {
   const { mime, filename } = resolveAudioMeta(file);
@@ -109,41 +57,73 @@ export function normalizePhoneFile(file: File): File {
   return new File([file], filename, { type: mime });
 }
 
-export type PhoneFileProcessResult = {
-  transcript: string;
-  note: string;
-  provider?: string;
-  remaining?: number;
-  saved?: boolean;
-  noteId?: string | null;
-};
+export function isFetchNetworkError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return /failed to fetch|networkerror|load failed|abort|timed out|timeout/i.test(msg);
+}
 
-/**
- * Upload a phone recording in binary chunks (no browser decode), then process on server.
- * Use when the file exceeds the Vercel/gateway soft limit — iOS m4a often cannot be decoded in Safari.
- */
-export async function uploadAndProcessPhoneFile(opts: {
-  file: File;
-  mode: string;
-  templateId: string;
-  specialty?: string;
-  source?: string;
-  onProgress?: (ratio: number, label: string) => void;
-}): Promise<PhoneFileProcessResult> {
-  const { file, mode, templateId, specialty, source } = opts;
-  if (file.size <= 0) {
-    throw new Error("Soubor je prázdný.");
-  }
-  if (file.size > MEDIKTOR_MAX_FILE_BYTES) {
-    throw new Error(
-      "Soubor je větší než 25 MB. Nahrajte kratší nahrávku nebo použijte Nahrávat v MeDiktoru."
+export function friendlyFetchError(err: unknown, fallback: string): string {
+  if (isFetchNetworkError(err)) {
+    return (
+      "Spojení při odesílání nahrávky selhalo (časté u většího M4A na mobilu). " +
+      "Zkuste znovu na Wi‑Fi, nebo použijte Nahrávat přímo v MeDiktoru."
     );
   }
+  const msg = err instanceof Error ? err.message : String(err);
+  return msg.trim() || fallback;
+}
 
-  const { mime, filename } = resolveAudioMeta(file);
-  opts.onProgress?.(0.02, "Připravuji nahrávku…");
+async function sleep(ms: number) {
+  await new Promise((r) => window.setTimeout(r, ms));
+}
 
-  const sessionRes = await fetch("/api/lekari/dokumentace/file-session", {
+async function fetchWithRetry(
+  input: RequestInfo | URL,
+  init: RequestInit | undefined,
+  tries = 3
+): Promise<Response> {
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= tries; attempt++) {
+    try {
+      const res = await fetch(input, init);
+      // Retry transient gateway / overload
+      if ((res.status === 502 || res.status === 503 || res.status === 429) && attempt < tries) {
+        await sleep(400 * attempt);
+        continue;
+      }
+      return res;
+    } catch (err) {
+      lastErr = err;
+      if (attempt >= tries) break;
+      await sleep(500 * attempt);
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error("Failed to fetch");
+}
+
+async function readJson(res: Response): Promise<Record<string, unknown>> {
+  const raw = await res.text();
+  if (!raw) return {};
+  try {
+    return JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    return { error: raw.slice(0, 180) };
+  }
+}
+
+export type PhoneTranscribeResult = {
+  transcript: string;
+  provider?: string;
+};
+
+async function uploadViaSignedUrl(
+  file: File,
+  mime: string,
+  filename: string,
+  onProgress?: (ratio: number, label: string) => void
+): Promise<string | null> {
+  onProgress?.(0.05, "Připravuji bezpečný upload…");
+  const intentRes = await fetchWithRetry("/api/lekari/dokumentace/file-upload-url", {
     method: "POST",
     credentials: "same-origin",
     headers: { "Content-Type": "application/json" },
@@ -153,17 +133,83 @@ export async function uploadAndProcessPhoneFile(opts: {
       mimeType: mime,
     }),
   });
-  const sessionJson = (await sessionRes.json().catch(() => ({}))) as {
-    error?: string;
-    sessionId?: string;
-    maxChunkBytes?: number;
-  };
-  if (!sessionRes.ok || !sessionJson.sessionId) {
-    throw new Error(sessionJson.error || "Nepodařilo se zahájit nahrání souboru.");
+  const intent = await readJson(intentRes);
+  if (!intentRes.ok) {
+    // Caller will fall back to chunked upload
+    return null;
+  }
+
+  const path = typeof intent.path === "string" ? intent.path : "";
+  const token = typeof intent.token === "string" ? intent.token : "";
+  const signedUrl = typeof intent.signedUrl === "string" ? intent.signedUrl : "";
+  if (!path || (!token && !signedUrl)) return null;
+
+  onProgress?.(0.15, "Odesílám soubor…");
+
+  // Prefer token upload through supabase REST (uploadToSignedUrl compatible)
+  if (token && signedUrl) {
+    const putRes = await fetchWithRetry(
+      signedUrl,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": mime,
+          "x-upsert": "true",
+        },
+        body: file,
+      },
+      3
+    );
+    if (putRes.ok || putRes.status === 200) {
+      onProgress?.(0.55, "Soubor nahrán…");
+      return path;
+    }
+  }
+
+  // Fallback: Supabase storage API with token query (createSignedUploadUrl shape)
+  if (token) {
+    const { createClient } = await import("@/lib/supabase/client");
+    const supabase = createClient();
+    const { error } = await supabase.storage
+      .from("media")
+      .uploadToSignedUrl(path, token, file, { contentType: mime, upsert: true });
+    if (!error) {
+      onProgress?.(0.55, "Soubor nahrán…");
+      return path;
+    }
+  }
+
+  return null;
+}
+
+async function uploadViaChunks(
+  file: File,
+  mime: string,
+  filename: string,
+  onProgress?: (ratio: number, label: string) => void
+): Promise<{ sessionId: string; total: number }> {
+  onProgress?.(0.05, "Připravuji nahrávku po částech…");
+  const sessionRes = await fetchWithRetry("/api/lekari/dokumentace/file-session", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      byteLength: file.size,
+      filename,
+      mimeType: mime,
+    }),
+  });
+  const sessionJson = await readJson(sessionRes);
+  const sessionId = typeof sessionJson.sessionId === "string" ? sessionJson.sessionId : "";
+  if (!sessionRes.ok || !sessionId) {
+    throw new Error(
+      (typeof sessionJson.error === "string" && sessionJson.error) ||
+        "Nepodařilo se zahájit nahrání souboru."
+    );
   }
 
   const chunkSize = Math.min(
-    sessionJson.maxChunkBytes || MEDIKTOR_UPLOAD_CHUNK_BYTES,
+    Number(sessionJson.maxChunkBytes) || MEDIKTOR_UPLOAD_CHUNK_BYTES,
     MEDIKTOR_UPLOAD_CHUNK_BYTES
   );
   const total = Math.max(1, Math.ceil(file.size / chunkSize));
@@ -173,66 +219,159 @@ export async function uploadAndProcessPhoneFile(opts: {
     const end = Math.min(file.size, start + chunkSize);
     const slice = file.slice(start, end);
     const form = new FormData();
-    form.append("sessionId", sessionJson.sessionId);
+    form.append("sessionId", sessionId);
     form.append("index", String(i));
     form.append("total", String(total));
     form.append("chunk", slice, `${filename}.part${i}`);
 
-    const chunkRes = await fetch("/api/lekari/dokumentace/file-chunk", {
-      method: "POST",
-      credentials: "same-origin",
-      body: form,
-    });
-    const chunkJson = (await chunkRes.json().catch(() => ({}))) as { error?: string };
+    const chunkRes = await fetchWithRetry(
+      "/api/lekari/dokumentace/file-chunk",
+      {
+        method: "POST",
+        credentials: "same-origin",
+        body: form,
+      },
+      3
+    );
+    const chunkJson = await readJson(chunkRes);
     if (!chunkRes.ok) {
-      throw new Error(chunkJson.error || `Odeslání části ${i + 1}/${total} selhalo.`);
+      throw new Error(
+        (typeof chunkJson.error === "string" && chunkJson.error) ||
+          `Odeslání části ${i + 1}/${total} selhalo.`
+      );
     }
-    opts.onProgress?.(0.05 + (0.55 * (i + 1)) / total, `Odesílám ${i + 1}/${total}…`);
+    onProgress?.(0.1 + (0.45 * (i + 1)) / total, `Odesílám ${i + 1}/${total}…`);
+  }
+
+  return { sessionId, total };
+}
+
+/**
+ * Upload a phone recording (no browser decode) and return STT transcript.
+ * Structure/note assembly is done by the caller via /structure.
+ */
+export async function uploadAndTranscribePhoneFile(opts: {
+  file: File;
+  onProgress?: (ratio: number, label: string) => void;
+}): Promise<PhoneTranscribeResult> {
+  const { file } = opts;
+  if (file.size <= 0) throw new Error("Soubor je prázdný.");
+  if (file.size > MEDIKTOR_MAX_FILE_BYTES) {
+    throw new Error(
+      "Soubor je větší než 25 MB. Nahrajte kratší nahrávku nebo použijte Nahrávat v MeDiktoru."
+    );
+  }
+
+  const { mime, filename } = resolveAudioMeta(file);
+
+  let path: string | null = null;
+  let session: { sessionId: string; total: number } | null = null;
+
+  try {
+    path = await uploadViaSignedUrl(file, mime, filename, opts.onProgress);
+  } catch {
+    path = null;
+  }
+
+  if (!path) {
+    session = await uploadViaChunks(file, mime, filename, opts.onProgress);
   }
 
   opts.onProgress?.(0.65, "Přepisuji nahrávku…");
-  const processRes = await fetch("/api/lekari/dokumentace/process-file", {
+  const processRes = await fetchWithRetry(
+    "/api/lekari/dokumentace/process-file",
+    {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(
+        path
+          ? { path, filename, mimeType: mime }
+          : {
+              sessionId: session!.sessionId,
+              total: session!.total,
+              filename,
+              mimeType: mime,
+            }
+      ),
+    },
+    2
+  );
+  const processJson = await readJson(processRes);
+  if (!processRes.ok) {
+    throw new Error(
+      (typeof processJson.error === "string" && processJson.error) ||
+        "Přepis souboru selhal."
+    );
+  }
+  const transcript =
+    typeof processJson.transcript === "string" ? processJson.transcript.trim() : "";
+  if (!transcript) {
+    throw new Error("Přepis je prázdný — soubor se nepodařilo rozpoznat.");
+  }
+  opts.onProgress?.(0.9, "Přepis hotov…");
+  return {
+    transcript,
+    provider: typeof processJson.provider === "string" ? processJson.provider : undefined,
+  };
+}
+
+/** @deprecated */
+export async function uploadAndProcessPhoneFile(opts: {
+  file: File;
+  mode: string;
+  templateId: string;
+  specialty?: string;
+  source?: string;
+  onProgress?: (ratio: number, label: string) => void;
+}): Promise<{
+  transcript: string;
+  note: string;
+  provider?: string;
+  remaining?: number;
+  saved?: boolean;
+  noteId?: string | null;
+}> {
+  const stt = await uploadAndTranscribePhoneFile({
+    file: opts.file,
+    onProgress: opts.onProgress,
+  });
+  const structRes = await fetchWithRetry("/api/lekari/dokumentace/structure", {
     method: "POST",
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
-      "x-dokumentace-source": source || "mobile-file",
+      "x-dokumentace-source": opts.source || "mobile-file",
     },
     body: JSON.stringify({
-      sessionId: sessionJson.sessionId,
-      total,
-      filename,
-      mimeType: mime,
-      mode,
-      templateId,
-      specialty: specialty || undefined,
-      source: source || "mobile-file",
+      transcript: stt.transcript,
+      mode: opts.mode,
+      templateId: opts.templateId,
+      specialty: opts.specialty || undefined,
+      source: opts.source || "mobile-file",
     }),
   });
-  const processJson = (await processRes.json().catch(() => ({}))) as PhoneFileProcessResult & {
-    error?: string;
-  };
-  if (!processRes.ok) {
-    throw new Error(processJson.error || "Zpracování souboru selhalo.");
+  const structJson = await readJson(structRes);
+  if (!structRes.ok) {
+    throw new Error(
+      (typeof structJson.error === "string" && structJson.error) ||
+        "Sestavení zápisu selhalo."
+    );
   }
-  if (!(processJson.note ?? "").trim()) {
-    throw new Error("Zápis se nepodařilo sestavit ze souboru.");
-  }
-  opts.onProgress?.(1, "Hotovo");
+  const note = typeof structJson.note === "string" ? structJson.note : "";
+  if (!note.trim()) throw new Error("Zápis se nepodařilo sestavit ze souboru.");
   return {
-    transcript: processJson.transcript ?? "",
-    note: processJson.note ?? "",
-    provider: processJson.provider,
-    remaining: processJson.remaining,
-    saved: processJson.saved,
-    noteId: processJson.noteId,
+    transcript: stt.transcript,
+    note,
+    provider: stt.provider,
+    remaining:
+      typeof structJson.remaining === "number" ? structJson.remaining : undefined,
+    saved: Boolean(structJson.saved),
+    noteId: typeof structJson.noteId === "string" ? structJson.noteId : null,
   };
 }
 
-/**
- * @deprecated Prefer normalizePhoneFile + uploadAndProcessPhoneFile for phone files.
- * Kept for small in-app blobs only.
- */
+/** @deprecated */
 export async function prepareUploadBlobs(
   file: File,
   softLimitBytes: number
@@ -240,7 +379,6 @@ export async function prepareUploadBlobs(
   if (file.size > 0 && file.size <= softLimitBytes) {
     return { blobs: [normalizePhoneFile(file)] };
   }
-  // Large phone files must not rely on browser decode (iOS Voice Memos often fails).
   throw new Error(
     "Soubor je příliš velký pro přímé odeslání — použijte nahrání přes MeDiktor (automatické dělení)."
   );

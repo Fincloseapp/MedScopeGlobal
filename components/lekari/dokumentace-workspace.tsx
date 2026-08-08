@@ -30,9 +30,9 @@ import {
 import {
   MEDIKTOR_FILE_ACCEPT,
   MEDIKTOR_MAX_FILE_BYTES,
-  normalizePhoneFile,
+  friendlyFetchError,
   resolveAudioMeta,
-  uploadAndProcessPhoneFile,
+  uploadAndTranscribePhoneFile,
 } from "@/components/lekari/mediktor-audio";
 
 type WorkspaceState = "idle" | "recording" | "processing" | "done" | "error";
@@ -359,14 +359,12 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       setState("done");
       void loadHistory();
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      if (/failed to fetch|networkerror|load failed/i.test(msg)) {
-        setError(
-          "Odeslání nahrávky selhalo. Často jde o příliš velký soubor, ne o výpadek sítě — zkuste kratší nahrávku (dělení po 2 min je zapnuté)."
-        );
-      } else {
-        setError(`Zpracování selhalo: ${msg.slice(0, 180)}`);
-      }
+      setError(
+        friendlyFetchError(
+          err,
+          "Zpracování nahrávky selhalo. Zkuste kratší úsek nebo Nahrát soubor znovu."
+        )
+      );
       setState("error");
     }
   }
@@ -542,12 +540,6 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     const source = isApp ? "pwa-file" : isMobileClient() ? "mobile-file" : "web-file";
 
     try {
-      // Small files: direct STT chunk (under gateway limit).
-      // Larger phone files (typical Voice Memos m4a): binary chunk upload — no browser decode.
-      if (file.size > 0 && file.size <= DOKUMENTACE_SOFT_UPLOAD_BYTES) {
-        await processBlobs([normalizePhoneFile(file)]);
-        return;
-      }
       if (file.size > MEDIKTOR_MAX_FILE_BYTES) {
         setError(
           "Soubor je větší než 25 MB. Nahrajte kratší nahrávku nebo použijte Nahrávat v MeDiktoru."
@@ -556,23 +548,45 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         return;
       }
 
-      const result = await uploadAndProcessPhoneFile({
-        file,
-        mode,
-        templateId,
-        specialty: specialty.trim() || undefined,
-        source,
+      // Always storage/signed upload for picked files (no browser decode, avoids Vercel body kills).
+      const stt = await uploadAndTranscribePhoneFile({ file });
+      const structRes = await fetch("/api/lekari/dokumentace/structure", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          "x-dokumentace-source": source,
+        },
+        body: JSON.stringify({
+          transcript: stt.transcript,
+          mode,
+          templateId,
+          specialty: specialty.trim() || undefined,
+          source,
+        }),
       });
-      setTranscript(result.transcript);
-      setNote(result.note);
-      setProvider(result.provider ?? null);
-      setRemaining(typeof result.remaining === "number" ? result.remaining : null);
-      setSavedInAccount(Boolean(result.saved));
+      const structJson = await readApiJson(structRes);
+      if (!structRes.ok) {
+        applyGate(structRes.status, structJson.error ?? "Sestavení zápisu selhalo.");
+        return;
+      }
+      if (!(structJson.note ?? "").trim()) {
+        setError("Zápis se nepodařilo sestavit. Zkuste nahrávku znovu.");
+        setState("error");
+        return;
+      }
+
+      setTranscript(stt.transcript);
+      setNote(structJson.note ?? "");
+      setProvider(stt.provider ?? null);
+      setRemaining(
+        typeof structJson.remaining === "number" ? structJson.remaining : null
+      );
+      setSavedInAccount(Boolean(structJson.saved));
       setState("done");
       void loadHistory();
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      setError(msg.slice(0, 280));
+      setError(friendlyFetchError(err, "Zpracování souboru selhalo.").slice(0, 280));
       setState("error");
     }
   }
