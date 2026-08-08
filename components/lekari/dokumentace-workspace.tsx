@@ -22,6 +22,7 @@ import {
   DOKUMENTACE_MAX_RECORD_MS,
   DOKUMENTACE_MAX_UPLOAD_BYTES,
   DOKUMENTACE_SEGMENT_MS,
+  DOKUMENTACE_SOFT_UPLOAD_BYTES,
   DOKUMENTACE_MODES,
   DOKUMENTACE_TEMPLATES,
   type DokumentaceMode,
@@ -194,6 +195,56 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     else setGateHint(null);
   }
 
+  async function readApiJson(res: Response): Promise<{
+    error?: string;
+    transcript?: string;
+    note?: string;
+    provider?: string;
+    remaining?: number;
+    saved?: boolean;
+    code?: string;
+  }> {
+    const raw = await res.text();
+    if (!raw) {
+      return {
+        error:
+          res.status === 413
+            ? "Nahrávka je příliš velká pro odeslání. Zkuste kratší úsek — aplikace teď dělí nahrávku po 2 minutách."
+            : `Server neodpověděl (HTTP ${res.status}). Zkuste znovu.`,
+      };
+    }
+    try {
+      return JSON.parse(raw) as {
+        error?: string;
+        transcript?: string;
+        note?: string;
+        provider?: string;
+        remaining?: number;
+        saved?: boolean;
+        code?: string;
+      };
+    } catch {
+      if (res.status === 413 || /request entity too large|payload/i.test(raw)) {
+        return {
+          error:
+            "Nahrávka je příliš velká pro odeslání. Zkuste kratší úsek — aplikace teď dělí nahrávku po 2 minutách.",
+          code: "SEGMENT_TOO_LARGE",
+        };
+      }
+      if (res.status === 401) {
+        return { error: "Pro zpracování se musíte přihlásit." };
+      }
+      if (res.status >= 500) {
+        return {
+          error: `Zpracování na serveru selhalo (HTTP ${res.status}). Zkuste znovu za chvíli.`,
+        };
+      }
+      return {
+        error: `Neočekávaná odpověď serveru (HTTP ${res.status}). Zkuste znovu.`,
+      };
+    }
+  }
+
   async function processBlobs(blobs: Blob[]) {
     if (!consent) {
       setError("Nejprve potvrďte souhlas s nahráváním.");
@@ -202,16 +253,11 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     }
     const usable = blobs.filter((b) => b.size > 0);
     if (usable.length === 0) {
-      setError("Nahrávka je prázdná — mikrofon nic nezachytil. Povolte mikrofon a zkuste znovu.");
+      setError(
+        "Nahrávka je prázdná — mikrofon nic nezachytil. Povolte mikrofon a zkuste znovu."
+      );
       setState("error");
       return;
-    }
-    for (const blob of usable) {
-      if (blob.size > DOKUMENTACE_MAX_UPLOAD_BYTES) {
-        setError("Audio segment přesahuje 25 MB. Použijte nižší kvalitu nebo kratší úsek.");
-        setState("error");
-        return;
-      }
     }
 
     setState("processing");
@@ -219,51 +265,94 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     setGateHint(null);
     setSavedInAccount(false);
 
-    const form = new FormData();
-    usable.forEach((blob, i) => {
-      const ext = blob.type.includes("mp4") ? "m4a" : "webm";
-      form.append("audio", blob, `recording-${i}.${ext}`);
-    });
-    form.append("mode", mode);
-    form.append("templateId", templateId);
-    if (specialty.trim()) form.append("specialty", specialty.trim());
-    form.append("source", isApp ? "pwa" : isMobileClient() ? "mobile" : "web");
+    const source = isApp ? "pwa" : isMobileClient() ? "mobile" : "web";
+    const parts: string[] = [];
+    const providers: string[] = [];
 
     try {
-      const res = await fetch("/api/lekari/dokumentace/process", {
+      for (let i = 0; i < usable.length; i++) {
+        const blob = usable[i];
+        if (blob.size > DOKUMENTACE_SOFT_UPLOAD_BYTES) {
+          setError(
+            `Segment ${i + 1} je příliš velký (${Math.max(1, Math.round(blob.size / (1024 * 1024)))} MB). Nahrajte znovu — nahrávka se teď automaticky dělí po 2 minutách.`
+          );
+          setState("error");
+          return;
+        }
+
+        const form = new FormData();
+        const mime = blob.type || "audio/webm";
+        const ext = mime.includes("mp4") ? "m4a" : "webm";
+        form.append("audio", new Blob([blob], { type: mime }), `recording-${i}.${ext}`);
+
+        const res = await fetch("/api/lekari/dokumentace/stt-chunk", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "x-dokumentace-source": source },
+          body: form,
+        });
+        const json = await readApiJson(res);
+        if (!res.ok) {
+          applyGate(res.status, json.error ?? `Přepis segmentu ${i + 1} selhal.`);
+          return;
+        }
+        const piece = (json.transcript ?? "").trim();
+        if (!piece) {
+          setError(
+            `Segment ${i + 1} se nepřepsal (prázdný výsledek). Zkontrolujte mikrofon a zkuste znovu.`
+          );
+          setState("error");
+          return;
+        }
+        parts.push(piece);
+        if (json.provider) providers.push(json.provider);
+      }
+
+      const transcript = parts.join("\n\n").trim();
+      const structRes = await fetch("/api/lekari/dokumentace/structure", {
         method: "POST",
         credentials: "same-origin",
         headers: {
-          "x-dokumentace-source": isApp ? "pwa" : isMobileClient() ? "mobile" : "web",
+          "Content-Type": "application/json",
+          "x-dokumentace-source": source,
         },
-        body: form,
+        body: JSON.stringify({
+          transcript,
+          mode,
+          templateId,
+          specialty: specialty.trim() || undefined,
+          source,
+        }),
       });
-      const json = (await res.json()) as {
-        error?: string;
-        transcript?: string;
-        note?: string;
-        provider?: string;
-        remaining?: number;
-        saved?: boolean;
-      };
-      if (!res.ok) {
-        applyGate(res.status, json.error ?? "Zpracování selhalo.");
+      const structJson = await readApiJson(structRes);
+      if (!structRes.ok) {
+        applyGate(structRes.status, structJson.error ?? "Sestavení zápisu selhalo.");
         return;
       }
-      if (!(json.transcript ?? "").trim()) {
-        setError("Přepis je prázdný — záznam se nepřenesl. Zkontrolujte mikrofon a zkuste znovu.");
+      if (!(structJson.note ?? "").trim()) {
+        setError("Zápis se nepodařilo sestavit. Zkuste nahrávku znovu.");
         setState("error");
         return;
       }
-      setTranscript(json.transcript ?? "");
-      setNote(json.note ?? "");
-      setProvider(json.provider ?? null);
-      setRemaining(typeof json.remaining === "number" ? json.remaining : null);
-      setSavedInAccount(Boolean(json.saved));
+
+      setTranscript(transcript);
+      setNote(structJson.note ?? "");
+      setProvider(providers.join("+") || null);
+      setRemaining(
+        typeof structJson.remaining === "number" ? structJson.remaining : null
+      );
+      setSavedInAccount(Boolean(structJson.saved));
       setState("done");
       void loadHistory();
-    } catch {
-      setError("Síťová chyba při zpracování — zkontrolujte připojení a zkuste znovu.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (/failed to fetch|networkerror|load failed/i.test(msg)) {
+        setError(
+          "Odeslání nahrávky selhalo. Často jde o příliš velký soubor, ne o výpadek sítě — zkuste kratší nahrávku (dělení po 2 min je zapnuté)."
+        );
+      } else {
+        setError(`Zpracování selhalo: ${msg.slice(0, 180)}`);
+      }
       setState("error");
     }
   }
@@ -552,7 +641,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         </div>
 
         <p className="mt-3 text-xs leading-5 text-slate-500">
-          Po stažení: nejdříve „Povolit mikrofon“, pak „Nahrávat“. Až 60 minut (automatické dělení po 8 min). Zápis se uloží do účtu.
+          Po stažení: nejdříve „Povolit mikrofon“, pak „Nahrávat“. Až 60 minut (automatické dělení po 2 min — spolehlivý přenos). Zápis se uloží do účtu.
         </p>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">

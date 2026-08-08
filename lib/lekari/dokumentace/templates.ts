@@ -2,10 +2,15 @@
 export const DOKUMENTACE_MAX_RECORD_MS = 60 * 60 * 1000;
 /** Whisper API hard limit (~25 MB). Keep segments under this. */
 export const DOKUMENTACE_MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
-/** Rotate MediaRecorder every 8 minutes so long sessions stay under size/API limits. */
-export const DOKUMENTACE_SEGMENT_MS = 8 * 60 * 1000;
-/** Target bitrate — ~60 min ≈ 14 MB at 32 kbps mono. */
-export const DOKUMENTACE_AUDIO_BITS_PER_SECOND = 32_000;
+/**
+ * Rotate MediaRecorder every 2 minutes so each upload stays under Vercel ~4.5 MB body limit.
+ * (Phone MediaRecorder often ignores bitrate hints and records much larger files.)
+ */
+export const DOKUMENTACE_SEGMENT_MS = 2 * 60 * 1000;
+/** Target bitrate — prefer small segments for reliable mobile upload. */
+export const DOKUMENTACE_AUDIO_BITS_PER_SECOND = 16_000;
+/** Soft client upload cap per segment (under platform gateway limits). */
+export const DOKUMENTACE_SOFT_UPLOAD_BYTES = 3_500_000;
 
 export type DokumentaceMode = "consultation" | "dictation" | "verbatim";
 

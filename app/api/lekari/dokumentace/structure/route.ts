@@ -13,10 +13,10 @@ import {
 import { saveDokumentaceNote } from "@/lib/lekari/dokumentace/notes";
 
 export const runtime = "nodejs";
-export const maxDuration = 120;
+export const maxDuration = 180;
 
 const bodySchema = z.object({
-  transcript: z.string().min(1).max(100_000),
+  transcript: z.string().min(1).max(400_000),
   mode: z.enum(["consultation", "dictation", "verbatim"]),
   templateId: z.enum([
     "ambulantni-zprava",
@@ -50,9 +50,8 @@ export async function POST(request: Request) {
     );
   }
 
-  // Still require auth; soft-check quota (structuring after same session still counts lightly)
   const access = await assertDokumentaceAccess(user.id);
-  if (!access.ok && access.status === 401) {
+  if (!access.ok) {
     return NextResponse.json({ error: access.error }, { status: access.status });
   }
 
