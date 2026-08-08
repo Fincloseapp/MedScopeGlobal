@@ -8,11 +8,12 @@ export type TranscribeResult = {
 
 /** Bias Whisper toward Czech clinical vocabulary (dialogue + anamnesis). */
 const MEDICAL_STT_PROMPT =
-  "Ambulantní vyšetření v češtině. Rozhovor lékaře s pacientem. " +
+  "Ambulantní vyšetření ve spisovné češtině. Rozhovor lékaře s pacientem. " +
   "Anamnéza, nynější onemocnění, osobní anamnéza, rodinná anamnéza, " +
   "farmakologická anamnéza, alergie, abúzus, objektivní nález, diagnóza, " +
-  "terapie, doporučení. Léky: Paralen, Ibalgin, Prednison, Warfarin, " +
-  "Metformin, Amlodipin, Bisoprolol, Atorvastatin. Jednotky: mmHg, tepů/min, °C.";
+  "terapie, doporučení, kontrola. Léky: Paralen, Ibalgin, Prednison, Warfarin, " +
+  "Metformin, Amlodipin, Bisoprolol, Atorvastatin, Omeprazol. " +
+  "Jednotky: mmHg, tepů/min, °C, mg, tbl.";
 
 const STT_TIMEOUT_MS = 280_000;
 

@@ -34,6 +34,10 @@ import {
   resolveAudioMeta,
   uploadAndTranscribePhoneFile,
 } from "@/components/lekari/mediktor-audio";
+import {
+  downloadMediktorDoc,
+  shareMediktorDoc,
+} from "@/components/lekari/mediktor-export";
 
 type WorkspaceState = "idle" | "recording" | "processing" | "done" | "error";
 
@@ -622,13 +626,13 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
   async function shareNote(text: string, title?: string | null) {
     if (!text) return;
     try {
-      if (navigator.share) {
-        await navigator.share({
-          title: title || "MeDiktor",
-          text,
-        });
-      } else {
-        await copyText(text);
+      const result = await shareMediktorDoc(text, {
+        title: title || "MeDiktor zápis",
+        templateId,
+      });
+      if (result === "copied") {
+        setCopyFlash(true);
+        window.setTimeout(() => setCopyFlash(false), 1600);
       }
     } catch {
       // user cancelled share
@@ -650,13 +654,10 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
 
   function downloadNote() {
     if (!note) return;
-    const blob = new Blob([note], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `mediktor-${templateId}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadMediktorDoc(note, {
+      title: "MeDiktor · klinický zápis",
+      templateId,
+    });
   }
 
   const recording = state === "recording";
@@ -962,7 +963,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                   disabled={!note}
                 >
                   <Download className="mr-1.5 h-3.5 w-3.5" />
-                  .txt
+                  .doc
                 </Button>
               </div>
             </div>

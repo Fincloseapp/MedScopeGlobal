@@ -2,8 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Copy, Loader2, Share2, RefreshCw, FileText } from "lucide-react";
+import { Copy, Download, Loader2, Share2, RefreshCw, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  downloadMediktorDoc,
+  shareMediktorDoc,
+} from "@/components/lekari/mediktor-export";
 
 type NoteListItem = {
   id: string;
@@ -67,12 +71,19 @@ export function DokAppHistory() {
     }
   }
 
-  async function shareText(text: string, title?: string | null) {
+  async function shareText(
+    text: string,
+    title?: string | null,
+    templateId?: string | null
+  ) {
     try {
-      if (navigator.share) {
-        await navigator.share({ title: title || "MeDiktor", text });
-      } else {
-        await copyText(text);
+      const result = await shareMediktorDoc(text, {
+        title: title || "MeDiktor zápis",
+        templateId,
+      });
+      if (result === "copied") {
+        setFlash(true);
+        window.setTimeout(() => setFlash(false), 1400);
       }
     } catch {
       // cancelled
@@ -161,10 +172,27 @@ export function DokAppHistory() {
                   size="sm"
                   variant="outline"
                   className="h-8 rounded-full"
-                  onClick={() => void shareText(item.note, item.title)}
+                  onClick={() =>
+                    void shareText(item.note, item.title, item.template_id)
+                  }
                 >
                   <Share2 className="mr-1 h-3.5 w-3.5" />
                   Sdílet
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 rounded-full"
+                  onClick={() =>
+                    downloadMediktorDoc(item.note, {
+                      title: item.title || "MeDiktor zápis",
+                      templateId: item.template_id,
+                    })
+                  }
+                >
+                  <Download className="mr-1 h-3.5 w-3.5" />
+                  .doc
                 </Button>
               </div>
               {selected?.id === item.id ? (
