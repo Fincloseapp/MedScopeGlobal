@@ -1085,7 +1085,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       <div className="rounded-xl border border-[#d9e8f4] bg-[#f4f9fc] px-4 py-3 text-xs leading-5 text-slate-600">
         MeDiktor od MedScopeGlobal není zdravotnický prostředek. Výstup je návrh AI —
         konečnou odpovědnost za obsah nese lékař. Audio se po zpracování
-        neukládá (ephemeral). Před nahráváním rozhovoru informujte pacienta.
+        neukládá (ephemeral). Před nahráváním rozhovoru informujte pacienta / pacientku.
       </div>
 
       {/* Mobile sticky bottom bar */}
