@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Download, QrCode, ShieldCheck, Building2, Loader2, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InstallAppButton } from "@/components/lekari/dok-app/install-app-button";
+import { MediktorMark } from "@/components/lekari/mediktor-mark";
 import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
 
 type EligibilityResponse = {
@@ -78,9 +79,15 @@ export function DokumentaceDownloadPanel({
         }`}
       >
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-sky-200">
-            Aplikace pro ověřené lékaře
-          </p>
+          <div className="mb-3 flex items-center gap-3">
+            <MediktorMark size="md" className="rounded-[22%] ring-2 ring-white/25" />
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-sky-200">
+                Aplikace pro ověřené lékaře · {MEDIKTOR.domain}
+              </p>
+              <p className="text-sm font-medium text-sky-100/90">{MEDIKTOR.tagline}</p>
+            </div>
+          </div>
           <h2
             className={`mt-2 font-display font-bold ${
               variant === "homepage" ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl"
@@ -89,8 +96,7 @@ export function DokumentaceDownloadPanel({
             {"Stáhnout "}{MEDIKTOR.shortName}
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-sky-100/95">
-            {MEDIKTOR.fullName} — AI zápisy z nahrávky nebo diktátu. Instalovatelná aplikace
-            propojená s účtem MedScopeGlobal. Stažení jen po ověření · {MEDIKTOR.domain}
+            {MEDIKTOR.pitch} Instalovatelná aplikace propojená s účtem {MEDIKTOR.provider}.
           </p>
 
           {loading ? (
@@ -144,7 +150,7 @@ export function DokumentaceDownloadPanel({
                   variant="outline"
                   className="h-10 rounded-full border-white/40 bg-transparent px-5 text-white hover:bg-white/10"
                 >
-                  <Link href="/lekari/dokumentace">Více o Dokumentaci</Link>
+                  <Link href="/lekari/dokumentace">Více o MeDiktoru</Link>
                 </Button>
               </div>
             </div>

@@ -6,6 +6,13 @@ export const metadata: Metadata = {
   title: MEDIKTOR.pwaName,
   description: MEDIKTOR.seoDescription,
   manifest: "/dokumentace-manifest.json",
+  icons: {
+    icon: [
+      { url: MEDIKTOR.assets.icon192, sizes: "192x192", type: "image/png" },
+      { url: MEDIKTOR.assets.icon512, sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: MEDIKTOR.assets.appleTouch, sizes: "180x180", type: "image/png" }],
+  },
   appleWebApp: {
     capable: true,
     title: MEDIKTOR.pwaShortName,

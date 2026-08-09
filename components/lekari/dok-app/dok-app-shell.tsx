@@ -8,6 +8,7 @@ import { DokAppHistory } from "@/components/lekari/dok-app/dok-app-history";
 import { DokAppGuide } from "@/components/lekari/dok-app/dok-app-guide";
 import { DokAppAccount } from "@/components/lekari/dok-app/dok-app-account";
 import { DokAppGate } from "@/components/lekari/dok-app/dok-app-gate";
+import { MediktorMark } from "@/components/lekari/mediktor-mark";
 import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
 
 type TabId = "zapis" | "historie" | "navod" | "ucet";
@@ -129,14 +130,20 @@ export function DokAppShell() {
     >
       <header className="shrink-0 border-b border-[#0a4a78] bg-[#005B96] px-3 py-2.5 text-white sm:px-4">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-2">
-          <div className="min-w-0">
-            <p className="truncate text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-100/90">
-              {MEDIKTOR.provider}
-            </p>
-            <h1 className="truncate text-base font-semibold leading-tight sm:text-lg">
-              {MEDIKTOR.shortName}
-            </h1>
-            <p className="truncate text-[10px] text-sky-100/70">{MEDIKTOR.lockline}</p>
+          <div className="flex min-w-0 items-center gap-2.5">
+            <MediktorMark
+              size="sm"
+              className="shrink-0 rounded-[22%] ring-1 ring-white/30"
+            />
+            <div className="min-w-0">
+              <p className="truncate text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-100/90">
+                {MEDIKTOR.provider}
+              </p>
+              <h1 className="truncate text-base font-semibold leading-tight sm:text-lg">
+                {MEDIKTOR.shortName}
+              </h1>
+              <p className="truncate text-[10px] text-sky-100/70">{MEDIKTOR.lockline}</p>
+            </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <span

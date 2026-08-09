@@ -1,4 +1,5 @@
 import { AccreditedCmeOverview } from "@/components/academy/b2b/accredited-cme-overview";
+import { MediktorPromoBanner } from "@/components/lekari/mediktor-promo-banner";
 import { V271HubPageView } from "@/components/v271/hub-page";
 import {
   V271LekariCredibilitySection,
@@ -20,6 +21,9 @@ export default function LekariHubPage() {
       homeHref="/lekari"
       afterLinks={
         <>
+          <div className="mb-8">
+            <MediktorPromoBanner variant="hub" />
+          </div>
           <div className="mb-10">
             <AccreditedCmeOverview variant="panel" />
           </div>

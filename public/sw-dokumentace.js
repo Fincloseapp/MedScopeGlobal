@@ -1,9 +1,10 @@
 /* MedScope Dokumentace PWA service worker */
-const CACHE_NAME = 'msg-dok-v1';
+const CACHE_NAME = 'msg-dok-v2';
 const SHELL = [
   '/app/dokumentace',
   '/dokumentace-manifest.json',
-  '/assets/logo/Logo_Transparent.png',
+  '/assets/mediktor/icon-192.png',
+  '/assets/mediktor/icon-512.png',
 ];
 
 self.addEventListener('install', (event) => {

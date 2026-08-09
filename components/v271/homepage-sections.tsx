@@ -16,7 +16,8 @@ import {
 } from "@/lib/v271/homepage";
 import { subscriptionProductId } from "@/lib/v27/config";
 import { DokumentaceDownloadPanel } from "@/components/lekari/dokumentace-download-panel";
-import { DokumentaceTutorial } from "@/components/lekari/dokumentace-tutorial";
+import { MediktorLockup } from "@/components/lekari/mediktor-mark";
+import { MediktorPromoBanner } from "@/components/lekari/mediktor-promo-banner";
 
 export function V272SocialProofBlock() {
   return (
@@ -120,25 +121,33 @@ export function V272WhyTrustBlock() {
 export function V272DokumentaceAppBlock() {
   return (
     <section className="border-b border-slate-200 bg-gradient-to-b from-[#eef6fb] to-white">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <div className="mb-6 max-w-3xl">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
-            {V271_DOKUMENTACE_APP.eyebrow}
-          </p>
-          <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33] sm:text-4xl">
-            {V271_DOKUMENTACE_APP.title}
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-slate-600 sm:text-base">
-            {V271_DOKUMENTACE_APP.description}{" "}
-            <span className="font-semibold text-[#005B96]">{V271_DOKUMENTACE_APP.price}</span>
-            {" · "}
-            14 dní zdarma.
-          </p>
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
+        <div className="mb-6 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <div className="mb-4">
+              <MediktorLockup showTagline />
+            </div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
+              {V271_DOKUMENTACE_APP.eyebrow}
+            </p>
+            <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33] sm:text-4xl">
+              {V271_DOKUMENTACE_APP.title}
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-slate-600 sm:text-base">
+              {V271_DOKUMENTACE_APP.description}{" "}
+              <span className="font-semibold text-[#005B96]">{V271_DOKUMENTACE_APP.price}</span>
+              {" · "}
+              14 dní zdarma.
+            </p>
+          </div>
+          <Link
+            href={V271_DOKUMENTACE_APP.href}
+            className="inline-flex h-11 shrink-0 items-center justify-center rounded-full border border-[#005B96]/30 bg-white px-5 text-sm font-semibold text-[#005B96] hover:bg-[#005B96]/5"
+          >
+            Detail pro lékaře →
+          </Link>
         </div>
         <DokumentaceDownloadPanel variant="homepage" />
-        <div className="mt-8">
-          <DokumentaceTutorial variant="compact" />
-        </div>
       </div>
     </section>
   );
@@ -401,6 +410,7 @@ export async function V272HomepageSections() {
   return (
     <>
       <V272SocialProofBlock />
+      <MediktorPromoBanner variant="homepage" />
       <V272DokumentaceAppBlock />
       <V272WhyTrustBlock />
       <V271AudienceSections />

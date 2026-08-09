@@ -7,6 +7,7 @@ import { DokumentaceTutorial } from "@/components/lekari/dokumentace-tutorial";
 import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { Button } from "@/components/ui/button";
+import { MediktorMark } from "@/components/lekari/mediktor-mark";
 import { SITE } from "@/lib/config/site";
 import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
 
@@ -24,6 +25,10 @@ export async function generateMetadata(): Promise<Metadata> {
       capable: true,
       title: MEDIKTOR.pwaName,
       statusBarStyle: "default",
+    },
+    icons: {
+      icon: [{ url: MEDIKTOR.assets.icon192 }, { url: MEDIKTOR.assets.icon512 }],
+      apple: [{ url: MEDIKTOR.assets.appleTouch }],
     },
     other: {
       "mobile-web-app-capable": "yes",
@@ -66,15 +71,25 @@ export default function LekariDokumentacePage() {
           aria-hidden
         />
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-sky-200">
-            Pro lékaře
-          </p>
-          <h1 className="mt-3 max-w-3xl font-display text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
-            {MEDIKTOR.shortName}
-          </h1>
-          <p className="mt-2 text-sm font-medium text-sky-200/90">{MEDIKTOR.lockline}</p>
-          <p className="mt-5 max-w-2xl text-lg leading-8 text-sky-100/95">
-            {MEDIKTOR.fullName} — AI zapisovatel pro ordinaci. Nahrávka nebo diktát, strukturovaný klinický zápis. Samostatně 390 Kč/měsíc včetně balíčku Lékař v praxi.
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+            <MediktorMark
+              size="xl"
+              priority
+              className="rounded-[22%] ring-2 ring-white/25 shadow-[0_16px_40px_-16px_rgba(0,0,0,0.55)]"
+            />
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-sky-200">
+                Pro lékaře · {MEDIKTOR.domain}
+              </p>
+              <h1 className="mt-2 max-w-3xl font-display text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
+                {MEDIKTOR.shortName}
+              </h1>
+              <p className="mt-2 text-base font-medium text-sky-100">{MEDIKTOR.tagline}</p>
+              <p className="mt-1 text-sm font-medium text-sky-200/90">{MEDIKTOR.lockline}</p>
+            </div>
+          </div>
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-sky-100/95">
+            {MEDIKTOR.pitch} Samostatně {MEDIKTOR.priceMonthlyCzk} Kč/měsíc včetně práv balíčku Lékař v praxi · 14 dní zdarma.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg" className="h-12 rounded-full bg-white px-6 text-[#021d33] hover:bg-sky-50">

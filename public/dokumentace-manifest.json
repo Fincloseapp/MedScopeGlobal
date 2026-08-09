@@ -2,7 +2,7 @@
   "id": "/app/dokumentace",
   "name": "MeDiktor · MedScopeGlobal",
   "short_name": "MeDiktor",
-  "description": "MeDiktor od MedScopeGlobal — AI zápisy pro ordinaci. medscopeglobal.com",
+  "description": "MeDiktor od MedScopeGlobal — lékař mluví, zápis píše aplikace. Odborná anamnéza z nahrávky nebo diktátu. medscopeglobal.com",
   "start_url": "/app/dokumentace?source=pwa",
   "scope": "/",
   "display": "standalone",
@@ -10,26 +10,29 @@
   "background_color": "#021d33",
   "theme_color": "#005B96",
   "lang": "cs",
-  "categories": [
-    "medical",
-    "productivity"
-  ],
+  "categories": ["medical", "productivity"],
   "icons": [
     {
-      "src": "/assets/logo/Logo_Transparent.png",
+      "src": "/assets/mediktor/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/logo/Logo_Transparent.png",
+      "src": "/assets/mediktor/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/assets/logo/Logo_Transparent@2x.png",
-      "sizes": "384x384",
+      "src": "/assets/mediktor/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/mediktor/apple-touch-icon.png",
+      "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
     }

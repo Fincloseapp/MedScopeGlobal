@@ -100,17 +100,17 @@ export const V271_AUDIENCES = [
       "Guidelines, přehledy studií, Research Hub a klinický AI — pro rozhodování v ordinaci, ne v teoretické laboratoři.",
     topics: ["guidelines", "CME", "Dokumentace", "studie", "Research Hub"],
     href: "/lekari",
-    ctaPrimary: { label: "Stáhnout Dokumentaci", href: "/app/dokumentace" },
-    ctaSecondary: { label: "Klinický AI", href: "/lekari/ai-asistent" },
+    ctaPrimary: { label: "Stáhnout MeDiktor", href: "/app/dokumentace" },
+    ctaSecondary: { label: "Více o MeDiktoru", href: "/lekari/dokumentace" },
   },
 ] as const;
 
-/** Homepage spotlight — installable physician Dokumentace app */
+/** Homepage spotlight — installable physician MeDiktor app */
 export const V271_DOKUMENTACE_APP = {
-  eyebrow: "Novinka pro ordinaci",
-  title: "MeDiktor od MedScopeGlobal — stáhněte aplikaci pro lékaře",
+  eyebrow: "Aplikace pro lékaře · medscopeglobal.com",
+  title: "MeDiktor — lékař mluví, zápis píše aplikace",
   description:
-    "MeDiktor · medscopeglobal.com — AI zápisy z nahrávky nebo diktátu. Instalace jen pro ověřené lékaře, propojení s účtem MedScopeGlobal.",
+    "Nahrávka konzultace nebo diktát → odborná anamnéza a klinický zápis. Stažení jen pro ověřené lékaře, účet MedScopeGlobal.",
   href: "/lekari/dokumentace",
   appHref: "/app/dokumentace",
   price: "390 Kč / měsíc",
