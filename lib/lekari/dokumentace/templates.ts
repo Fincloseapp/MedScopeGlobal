@@ -35,14 +35,14 @@ export const DOKUMENTACE_MODES: {
   description: string;
 }[] = [
   {
-    id: "consultation",
-    label: "Konzultace",
-    description: "Nahrávka rozhovoru s pacientem → strukturovaný zápis",
-  },
-  {
     id: "dictation",
     label: "Diktát",
-    description: "Lékař diktuje nález bez pacienta",
+    description: "Hlavní režim: diktujte do mobilu → odborný zápis",
+  },
+  {
+    id: "consultation",
+    label: "Konzultace",
+    description: "Volitelně: nahrávka rozhovoru s pacientem",
   },
   {
     id: "verbatim",

@@ -108,7 +108,7 @@ type DokumentaceWorkspaceProps = {
 export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspaceProps) {
   const isApp = variant === "app";
   const [consent, setConsent] = useState(false);
-  const [mode, setMode] = useState<DokumentaceMode>("consultation");
+  const [mode, setMode] = useState<DokumentaceMode>("dictation");
   const [templateId, setTemplateId] =
     useState<DokumentaceTemplateId>("ambulantni-zprava");
   const [specialty, setSpecialty] = useState("");
@@ -688,7 +688,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
               onChange={(e) => setConsent(e.target.checked)}
             />
             <span>
-              Informoval/a jsem pacienta o nahrávání (nebo jde o diktát bez pacienta)
+              Jde o diktát, nebo jsem informoval/a pacienta o nahrávání konzultace
             </span>
           </label>
           <Button
@@ -711,7 +711,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         </div>
 
         <p className="mt-3 text-xs leading-5 text-slate-500">
-          Po stažení: nejdříve „Povolit mikrofon“, pak „Nahrávat“. Až 60 minut (automatické dělení po 2 min — spolehlivý přenos). Zápis se uloží do účtu.
+          Hlavní postup: povolit mikrofon → diktovat do telefonu → Stop a zpracovat. Až 60 min (dělení po 2 min). Konzultaci s pacientem nahrávejte jen když chcete. Zápis se uloží do účtu.
         </p>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -821,7 +821,13 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                 disabled={!consent || processing}
               >
                 <Mic className="mr-2 h-5 w-5" />
-                {micReady ? "2. Nahrávat" : "Nahrávat"}
+                {micReady
+                  ? mode === "consultation"
+                    ? "2. Nahrávat konzultaci"
+                    : "2. Diktovat"
+                  : mode === "consultation"
+                    ? "Nahrávat konzultaci"
+                    : "Diktovat"}
               </Button>
             ) : (
               <>

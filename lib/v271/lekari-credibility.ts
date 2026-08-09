@@ -12,7 +12,7 @@ export const V271_LEKARI_CREDIBILITY = [
     id: "dokumentace",
     title: "MeDiktor od MedScopeGlobal",
     description:
-      "AI zapisovatel: nahrávka nebo diktát → český přepis → strukturovaný zápis. Asistent pro lékaře, ephemeral audio.",
+      "AI zapisovatel: diktát do mobilu → český přepis → strukturovaný zápis. Volitelně nahrávka konzultace. Asistent pro lékaře.",
     badge: "AI scribe",
   },
   {
@@ -40,7 +40,7 @@ export const V271_PHYSICIAN_TIER = {
     "Odborná sekce, guidelines a diagnostické algoritmy",
     "Kurátorované souhrny studií s DOI a PMID",
     "Klinický AI asistent a Research Hub",
-    "MeDiktor od MedScopeGlobal — AI zápisy z nahrávky",
+    "MeDiktor od MedScopeGlobal — diktování do mobilu → zápis",
     "CME přehledy a prioritní notifikace novinek",
   ],
   comparisonNote:

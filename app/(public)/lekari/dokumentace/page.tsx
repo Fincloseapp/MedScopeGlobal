@@ -42,23 +42,23 @@ export async function generateMetadata(): Promise<Metadata> {
 const VALUE_PROPS = [
   {
     icon: Mic,
-    title: "Nahrávejte",
-    text: "Konzultaci s pacientem nebo diktát — mikrofonem či nahráním audia.",
+    title: "Diktujte v mobilu",
+    text: "Hlavní režim: mikrofon telefonu má každý lékař. Po vyšetření nadiktujte nález — MeDiktor sestaví zápis.",
   },
   {
     icon: Sparkles,
     title: "AI zpracuje",
-    text: "Návrh strukturovaného zápisu pro českou ordinaci — detaily šablon až v aplikaci.",
+    text: "Návrh odborné anamnézy a strukturovaného zápisu pro českou ordinaci.",
   },
   {
     icon: FileCheck2,
     title: "Hotovo ke kontrole",
-    text: "Upravitelný zápis ke kopírování. Lékař vždy schvaluje finální znění.",
+    text: "Upravitelný zápis ke kopírování do NIS. Lékař vždy schvaluje finální znění.",
   },
   {
     icon: Shield,
-    title: "GDPR ephemeral",
-    text: "Audio se po zpracování neukládá. Souhlas pacienta před nahráváním.",
+    title: "Volitelná konzultace",
+    text: "Druhotně můžete nahrát i rozhovor s pacientem (po informování). Audio se neukládá.",
   },
 ] as const;
 
@@ -135,7 +135,7 @@ export default function LekariDokumentacePage() {
             zdarma.
           </p>
           <ul className="mt-4 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
-            <li>✓ AI zápisy z nahrávky / diktátu</li>
+            <li>✓ Diktování do mobilu → odborný zápis</li>
             <li>✓ Šablony ambulantní, SOAP, anamnéza…</li>
             <li>✓ Celý balíček Lékař v praxi v ceně</li>
             <li>✓ Historie v účtu — mobil i PC</li>
@@ -159,11 +159,11 @@ export default function LekariDokumentacePage() {
 
       <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <h2 className="font-display text-2xl font-bold text-[#021d33]">
-          Nahrávejte · AI zpracuje · Hotovo
+          Diktujte · AI zpracuje · Hotovo
         </h2>
         <p className="mt-2 max-w-2xl text-slate-600">
-          Konzultace i diktát, šablony pro praxi a ephemeral audio — inspirováno
-          moderními AI scribe nástroji, přizpůsobeno české dokumentaci.
+          Hlavní je diktát do telefonu. Nahrávka konzultace je druhotná volba —
+          šablony pro praxi a ephemeral audio, přizpůsobeno české dokumentaci.
         </p>
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {VALUE_PROPS.map(({ icon: Icon, title, text }) => (
@@ -212,8 +212,8 @@ export default function LekariDokumentacePage() {
               zdravotnické dokumentace.
             </li>
             <li>
-              Před nahráváním rozhovoru informujte pacienta (nebo použijte režim
-              diktátu bez pacienta).
+              Doporučený režim je diktát bez pacienta. Před nahráváním rozhovoru
+              pacienta vždy informujte.
             </li>
             <li>
               Audio se po zpracování neukládá na disk ani do databáze (ephemeral
