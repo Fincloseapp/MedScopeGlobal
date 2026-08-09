@@ -47,7 +47,7 @@ export function MediktorPromoBanner({
               className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-[#021d33] hover:bg-sky-50"
             >
               <Mic className="h-4 w-4 text-[#005B96]" />
-              Stáhnout aplikaci
+              Stáhnout a diktovat
             </Link>
             <Link
               href={MEDIKTOR.routes.marketing}
