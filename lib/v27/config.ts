@@ -80,7 +80,7 @@ export const V27_SUBSCRIPTION_PLANS = [
     monthlyCzk: 390,
     annualCzk: 3900,
     features: [
-      "MeDiktor: diktování do mobilu → zápis (konzultace volitelně)",
+      "MeDiktor: nahrávání v mobilu — diktát i konzultace → zápis",
       "Šablony: ambulantní, SOAP, anamnéza…",
       "Historie zápisů v účtu — sync mobil ↔ web",
       "Celý balíček Lékař v praxi v ceně (guidelines, CME, klinický AI)",

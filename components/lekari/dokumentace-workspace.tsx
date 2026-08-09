@@ -688,7 +688,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
               onChange={(e) => setConsent(e.target.checked)}
             />
             <span>
-              Jde o diktát, nebo jsem informoval/a pacienta o nahrávání konzultace
+              Jde o diktát, nebo jsem informoval/a pacienta / pacientku o nahrávání konzultace
             </span>
           </label>
           <Button
@@ -711,7 +711,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         </div>
 
         <p className="mt-3 text-xs leading-5 text-slate-500">
-          Hlavní postup: povolit mikrofon → diktovat do telefonu → Stop a zpracovat. Až 60 min (dělení po 2 min). Konzultaci s pacientem nahrávejte jen když chcete. Zápis se uloží do účtu.
+          Postup: povolit mikrofon → nahrát v mobilu diktát nebo konzultaci s pacientem / pacientkou → Stop a zpracovat. Až 60 min (dělení po 2 min). Zápis se uloží do účtu.
         </p>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">

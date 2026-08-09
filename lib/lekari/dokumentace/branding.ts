@@ -6,11 +6,11 @@ export const MEDIKTOR = {
   domain: "medscopeglobal.com",
   pwaShortName: "MeDiktor",
   pwaName: "MeDiktor · MedScopeGlobal",
-  /** Short line under logo / banners — dictation-first */
-  tagline: "Diktujte v mobilu — zápis píše MeDiktor",
-  /** One-sentence pitch for banners — mic/dictation primary */
+  /** Short line under logo / banners — mobile mic for dictation + consult */
+  tagline: "Nahrajte v mobilu — zápis píše MeDiktor",
+  /** One-sentence pitch: mobile recording for dictation OR patient consult */
   pitch:
-    "Diktujte do telefonu (mikrofon má každý lékař) → odborná anamnéza a klinický zápis. Volitelně i nahrávka konzultace s pacientem.",
+    "Nahrajte v telefonu diktát, nebo konzultaci s pacientem či pacientkou → odborná anamnéza a klinický zápis. Mikrofon má každý mobil.",
   priceMonthlyCzk: 390,
   assets: {
     /** Full marketing render of the app icon */
@@ -37,7 +37,7 @@ export const MEDIKTOR = {
     return `${this.productName} — AI zápisy a anamnéza pro lékaře | ${this.provider}`;
   },
   get seoDescription() {
-    return `${this.productName} od ${this.provider}: diktování do mobilu → strukturovaný odborný zápis. Volitelně nahrávka konzultace. Stáhněte na ${this.domain}, ${this.priceMonthlyCzk} Kč/měsíc, 14 dní zdarma.`;
+    return `${this.productName} od ${this.provider}: nahrávání v mobilu — diktát nebo konzultace s pacientem/pacientkou → strukturovaný odborný zápis. Stáhněte na ${this.domain}, ${this.priceMonthlyCzk} Kč/měsíc, 14 dní zdarma.`;
   },
 } as const;
 

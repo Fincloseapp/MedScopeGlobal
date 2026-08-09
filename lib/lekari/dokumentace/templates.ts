@@ -37,12 +37,12 @@ export const DOKUMENTACE_MODES: {
   {
     id: "dictation",
     label: "Diktát",
-    description: "Hlavní režim: diktujte do mobilu → odborný zápis",
+    description: "Diktujte do mobilu po vyšetření → odborný zápis",
   },
   {
     id: "consultation",
     label: "Konzultace",
-    description: "Volitelně: nahrávka rozhovoru s pacientem",
+    description: "Nahrajte v mobilu rozhovor s pacientem / pacientkou",
   },
   {
     id: "verbatim",

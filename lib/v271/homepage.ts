@@ -108,9 +108,9 @@ export const V271_AUDIENCES = [
 /** Homepage spotlight — installable physician MeDiktor app */
 export const V271_DOKUMENTACE_APP = {
   eyebrow: "Aplikace pro lékaře · medscopeglobal.com",
-  title: "MeDiktor — diktujte v mobilu, zápis je hotový",
+  title: "MeDiktor — nahrávejte v mobilu, zápis je hotový",
   description:
-    "Hlavní režim: diktát do mikrofonu telefonu → odborná anamnéza a klinický zápis. Nahrávka rozhovoru s pacientem je volitelná. Stažení pro ověřené lékaře, účet MedScopeGlobal.",
+    "Diktát do telefonu, nebo nahrávka konzultace s pacientem či pacientkou → odborná anamnéza a klinický zápis. Stažení pro ověřené lékaře, účet MedScopeGlobal.",
   href: "/lekari/dokumentace",
   appHref: "/app/dokumentace",
   price: "390 Kč / měsíc",

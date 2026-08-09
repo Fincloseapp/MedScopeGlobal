@@ -42,8 +42,8 @@ export async function generateMetadata(): Promise<Metadata> {
 const VALUE_PROPS = [
   {
     icon: Mic,
-    title: "Diktujte v mobilu",
-    text: "Hlavní režim: mikrofon telefonu má každý lékař. Po vyšetření nadiktujte nález — MeDiktor sestaví zápis.",
+    title: "Nahrávejte v mobilu",
+    text: "Diktát po vyšetření, nebo přímo konzultaci s pacientem či pacientkou — mikrofon má každý telefon.",
   },
   {
     icon: Sparkles,
@@ -57,8 +57,8 @@ const VALUE_PROPS = [
   },
   {
     icon: Shield,
-    title: "Volitelná konzultace",
-    text: "Druhotně můžete nahrát i rozhovor s pacientem (po informování). Audio se neukládá.",
+    title: "Souhlas a GDPR",
+    text: "Při nahrávce rozhovoru informujte pacienta / pacientku. Audio se po zpracování neukládá.",
   },
 ] as const;
 
@@ -135,7 +135,7 @@ export default function LekariDokumentacePage() {
             zdarma.
           </p>
           <ul className="mt-4 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
-            <li>✓ Diktování do mobilu → odborný zápis</li>
+            <li>✓ Nahrávání v mobilu: diktát i konzultace</li>
             <li>✓ Šablony ambulantní, SOAP, anamnéza…</li>
             <li>✓ Celý balíček Lékař v praxi v ceně</li>
             <li>✓ Historie v účtu — mobil i PC</li>
@@ -159,10 +159,10 @@ export default function LekariDokumentacePage() {
 
       <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <h2 className="font-display text-2xl font-bold text-[#021d33]">
-          Diktujte · AI zpracuje · Hotovo
+          Nahrajte · AI zpracuje · Hotovo
         </h2>
         <p className="mt-2 max-w-2xl text-slate-600">
-          Hlavní je diktát do telefonu. Nahrávka konzultace je druhotná volba —
+          V mobilu nahrajete diktát i konzultaci s pacientem nebo pacientkou —
           šablony pro praxi a ephemeral audio, přizpůsobeno české dokumentaci.
         </p>
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -212,8 +212,8 @@ export default function LekariDokumentacePage() {
               zdravotnické dokumentace.
             </li>
             <li>
-              Doporučený režim je diktát bez pacienta. Před nahráváním rozhovoru
-              pacienta vždy informujte.
+              Před nahráváním konzultace informujte pacienta nebo pacientku.
+              Režim diktátu probíhá bez pacienta.
             </li>
             <li>
               Audio se po zpracování neukládá na disk ani do databáze (ephemeral

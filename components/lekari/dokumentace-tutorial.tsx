@@ -17,9 +17,9 @@ const STEPS: {
 }[] = [
   {
     id: "nahrat",
-    label: "1 · Diktovat",
-    title: "Diktujte do telefonu",
-    benefit: "Po vyšetření diktujte do telefonu. Nahrávka konzultace je jen volitelná.",
+    label: "1 · Nahrát",
+    title: "Nahrajte v mobilu",
+    benefit: "Diktát po vyšetření, nebo konzultaci s pacientem či pacientkou — přímo v telefonu.",
     icon: Mic,
   },
   {
@@ -152,7 +152,7 @@ export function DokumentaceTutorial({
                       </div>
                     </div>
                     <p className="text-center text-sm font-medium text-white">
-                      Diktuji do mobilu…
+                      Nahrávám v mobilu…
                     </p>
                     <div className="flex h-8 items-end gap-1">
                       {[4, 10, 6, 14, 8, 12, 5, 11, 7].map((h, i) => (
@@ -167,7 +167,7 @@ export function DokumentaceTutorial({
                       ))}
                     </div>
                     <p className="max-w-[240px] text-center text-xs text-sky-100/75">
-                      Diktát do mobilu — bez ručního přepisu věty po větě.
+                      Diktát i konzultace — bez ručního přepisu věty po větě.
                     </p>
                   </div>
                 ) : null}

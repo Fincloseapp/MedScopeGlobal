@@ -2,7 +2,7 @@
   "id": "/app/dokumentace",
   "name": "MeDiktor · MedScopeGlobal",
   "short_name": "MeDiktor",
-  "description": "MeDiktor od MedScopeGlobal — diktujte v mobilu, zápis píše aplikace. Volitelně nahrávka konzultace. medscopeglobal.com",
+  "description": "MeDiktor od MedScopeGlobal — nahrávejte v mobilu diktát nebo konzultaci s pacientem/pacientkou. medscopeglobal.com",
   "start_url": "/app/dokumentace?source=pwa",
   "scope": "/",
   "display": "standalone",

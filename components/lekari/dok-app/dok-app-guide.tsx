@@ -7,12 +7,12 @@ const STEPS = [
   {
     icon: Mic,
     title: "1. Povolte mikrofon",
-    text: "Jednou klepněte na „Povolit mikrofon“ v telefonu. Mikrofon má každý mobil — to je hlavní způsob práce.",
+    text: "Jednou klepněte na „Povolit mikrofon“ v telefonu. Nahráváte přímo v mobilu — diktát i konzultaci.",
   },
   {
     icon: Sparkles,
-    title: "2. Diktujte (hlavní režim)",
-    text: "Režim Diktát + šablona (např. Anamnéza). Po vyšetření nadiktujte nález → Stop a zpracovat. Konzultaci s pacientem nahrávejte jen když chcete.",
+    title: "2. Nahrajte diktát nebo konzultaci",
+    text: "Režim Diktát (po vyšetření) nebo Konzultace (rozhovor s pacientem / pacientkou). Zvolte šablonu → Stop a zpracovat.",
   },
   {
     icon: FileCheck2,
@@ -22,7 +22,7 @@ const STEPS = [
   {
     icon: Shield,
     title: "4. Právní rámec",
-    text: "Asistent, ne zdravotnický prostředek. Lékař schvaluje finální znění. U nahrávky pacienta vždy informujte.",
+    text: "Asistent, ne zdravotnický prostředek. Lékař schvaluje finální znění. Před nahrávkou konzultace informujte pacienta / pacientku.",
   },
 ] as const;
 
@@ -32,7 +32,7 @@ export function DokAppGuide() {
       <div>
         <h2 className="text-base font-semibold text-[#021d33]">Návod</h2>
         <p className="mt-1 text-xs text-slate-500">
-          Po stažení: mikrofon → diktovat → hotový zápis.
+          Po stažení: mikrofon → nahrát (diktát nebo konzultace) → hotový zápis.
         </p>
       </div>
 
