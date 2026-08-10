@@ -1,0 +1,47 @@
+name: Cloudflare Cron Dispatcher
+
+on:
+  schedule:
+    - cron: "0 4 * * *"
+    - cron: "0 6 * * *"
+    - cron: "0 7 * * *"
+    - cron: "0 8 * * *"
+    - cron: "0 12 * * *"
+    - cron: "0 16 * * *"
+    - cron: "0 20 * * *"
+  workflow_dispatch:
+    inputs:
+      path:
+        description: "API cron path e.g. /api/cron/ingest"
+        required: true
+        default: "/api/cron/v43-health-monitor"
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call cron endpoints
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          BASE: https://medscopeglobal.com
+        run: |
+          set -euo pipefail
+          auth="Authorization: Bearer ${CRON_SECRET}"
+          paths=(
+            /api/cron/ingest
+            /api/cron/public-articles
+            /api/cron/public-osveta-daily
+            /api/cron/v25-enterprise
+            /api/cron/marketing
+            /api/cron/academy-daily
+            /api/cron/v43-health-monitor
+          )
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            paths=("${{ github.event.inputs.path }}")
+          fi
+          for p in "${paths[@]}"; do
+            code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X POST -H "$auth" "$BASE$p" || true)
+            echo "$code $p"
+            head -c 200 /tmp/cron.out || true
+            echo
+          done

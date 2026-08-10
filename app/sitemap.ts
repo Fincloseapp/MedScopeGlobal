@@ -3,7 +3,13 @@ import { createClient } from "@/lib/supabase/server";
 
 const base =
   process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://medscopeglobal.com");
+  (process.env.CF_PAGES_URL
+    ? process.env.CF_PAGES_URL.startsWith("http")
+      ? process.env.CF_PAGES_URL
+      : `https://${process.env.CF_PAGES_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "https://medscopeglobal.com");
 
 const staticRoutes: MetadataRoute.Sitemap = [
   { url: base, changeFrequency: "daily", priority: 1 },

@@ -7,9 +7,13 @@ export const SITE = {
   domain: "medscopeglobal.com",
   url:
     process.env.NEXT_PUBLIC_SITE_URL ||
-    (process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "https://medscopeglobal.com"),
+    (process.env.CF_PAGES_URL
+      ? process.env.CF_PAGES_URL.startsWith("http")
+        ? process.env.CF_PAGES_URL
+        : `https://${process.env.CF_PAGES_URL}`
+      : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : "https://medscopeglobal.com"),
   supportEmail: "info@medscopeglobal.com",
   adminNotifyEmail:
     process.env.ADMIN_NOTIFY_EMAIL ?? "info@medscopeglobal.com",
