@@ -271,7 +271,7 @@ const nextConfig = {
 
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
 
-          { key: "Vercel-Cache-Tag", value: CACHE_TAGS },
+          { key: "Cache-Tag", value: CACHE_TAGS },
 
           {
 

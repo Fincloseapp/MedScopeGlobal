@@ -20,6 +20,10 @@
   "observability": {
     "enabled": true
   },
+  "vars": {
+    "MEDSCOPE_RUNTIME": "cloudflare-workers",
+    "NEXT_PUBLIC_SITE_URL": "https://medscopeglobal.com"
+  },
   "routes": [
     { "pattern": "medscopeglobal.com/*", "zone_name": "medscopeglobal.com" },
     { "pattern": "www.medscopeglobal.com/*", "zone_name": "medscopeglobal.com" }

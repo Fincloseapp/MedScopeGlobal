@@ -29,10 +29,15 @@ jobs:
           CLOUDFLARE_ENV_JSON: ${{ secrets.CLOUDFLARE_ENV_JSON }}
         run: |
           if [ -z "$CLOUDFLARE_ENV_JSON" ]; then
-            echo "CLOUDFLARE_ENV_JSON secret missing"
-            exit 1
+            echo "CLOUDFLARE_ENV_JSON not set — using dashboard bindings plus minimal .dev.vars"
+            printf '%s\n' \
+              "NEXTJS_ENV=production" \
+              "NEXT_PUBLIC_SITE_URL=https://medscopeglobal.com" \
+              "MEDSCOPE_RUNTIME=cloudflare-workers" \
+              > .dev.vars
+          else
+            node scripts/cloudflare/write-dev-vars-from-json.mjs
           fi
-          node scripts/cloudflare/write-dev-vars-from-json.mjs
 
       - name: Build + deploy OpenNext to Cloudflare Workers
         env:

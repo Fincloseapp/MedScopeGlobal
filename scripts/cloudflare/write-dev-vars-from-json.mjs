@@ -19,5 +19,11 @@ const lines = Object.entries(obj).map(([k, v]) => `${k}=${String(v ?? "")}`);
 if (!lines.some((l) => l.startsWith("NEXTJS_ENV="))) {
   lines.unshift("NEXTJS_ENV=production");
 }
+if (!lines.some((l) => l.startsWith("MEDSCOPE_RUNTIME="))) {
+  lines.push("MEDSCOPE_RUNTIME=cloudflare-workers");
+}
+if (!lines.some((l) => l.startsWith("NEXT_PUBLIC_SITE_URL="))) {
+  lines.push("NEXT_PUBLIC_SITE_URL=https://medscopeglobal.com");
+}
 writeFileSync(".dev.vars", lines.join("\n") + "\n", "utf8");
 console.log(`Wrote .dev.vars (${lines.length} keys)`);

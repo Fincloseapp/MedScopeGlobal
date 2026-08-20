@@ -19,6 +19,7 @@ const pages = [
   { path: "/dashboard", must: ["MeDipacient", "MeDiprep"] },
   { path: "/predplatne", must: ["14"] },
   { path: "/login", must: ["přihlá"] },
+  { path: "/api/health", must: [] },
 ];
 
 const assets = [
@@ -148,6 +149,18 @@ try {
   }
 } catch (e) {
   fail(`qr: ${e instanceof Error ? e.message : e}`);
+}
+
+try {
+  const health = await jsonGet("/api/health");
+  console.log(`${health.status} ${health.url}`);
+  if (!health.ok || health.body?.ok !== true) {
+    fail("health must return ok");
+  } else {
+    ok(`health runtime=${health.body.runtime ?? "unknown"} cloudflare=${health.body.cloudflare ?? false}`);
+  }
+} catch (e) {
+  fail(`health: ${e instanceof Error ? e.message : e}`);
 }
 
 if (failed) {
