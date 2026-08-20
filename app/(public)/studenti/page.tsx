@@ -87,10 +87,10 @@ const MORE = [
 const APPLICANT_STEPS = [
   {
     n: "1",
-    title: "Self-test (5–10 min)",
-    body: "Zjistíte, kde jste a co dohnat.",
-    href: "/academy/prijimacky/self-test",
-    cta: "Spustit self-test",
+    title: "Self-test v MeDiprep (5–10 min)",
+    body: "Zjistíte, kde jste a co dohnat — v aplikaci na ploše telefonu.",
+    href: "/app/priprava",
+    cta: "Otevřít MeDiprep",
     ctaAttr: "studenti-step-self-test",
   },
   {
@@ -215,13 +215,13 @@ export default function StudentiHubPage() {
           </p>
           <div className="msg-hero-cta mt-8 flex flex-wrap gap-3">
             <Button asChild className="rounded-full bg-[#005B96] px-6">
-              <Link href="/studenti/chci-studovat">
-                Chci na medicínu
+              <Link href="/app/priprava">
+                Stáhnout MeDiprep
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="outline" className="rounded-full border-[#005B96]/35 px-6">
-              <Link href="#pro-studenty-lf">Už studuji na LF</Link>
+              <Link href="/studenti/chci-studovat">Chci na medicínu</Link>
             </Button>
             <Button asChild variant="ghost" className="rounded-full text-[#005B96]">
               <Link href="#pro-rodice">Jsem rodič</Link>

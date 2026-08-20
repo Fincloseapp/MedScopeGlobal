@@ -8,9 +8,24 @@ export type NavItem = {
 
 const menuCs: NavItem[] = [
   {
+    label: "Aplikace",
+    href: "/aplikace",
+    children: [
+      { label: "Přehled aplikací", href: "/aplikace", description: "MeDipacient, MeDiprep a MeDiktor" },
+      { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu i offline" },
+      { label: "Otevřít MeDipacient", href: "/app/pacient", description: "Dashboard se zkušebními zprávami" },
+      { label: "MeDiprep", href: "/mediprep", description: "Příprava na přijímačky LF" },
+      { label: "Otevřít MeDiprep", href: "/app/priprava", description: "Testy B/C/F, simulace fakult" },
+      { label: "MeDiktor", href: "/lekari/dokumentace", description: "AI zápisy pro ověřené lékaře" },
+      { label: "Otevřít MeDiktor", href: "/app/dokumentace", description: "Nahrávat v mobilu" },
+      { label: "Můj dashboard", href: "/dashboard", description: "Všechny aplikace a ukázková data" },
+    ],
+  },
+  {
     label: "Pro veřejnost",
     href: "/verejnost",
     children: [
+      { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu — i offline" },
       { label: "Najdi svůj problém", href: "/verejnost/temata", description: "Symptomy, prevence, nemoci — začněte zde" },
       { label: "Zeptej se AI", href: "/ai-asistent/verejnost", description: "Odpovědi o zdraví — nenahrazuje lékaře" },
       { label: "Přehled sekce", href: "/verejnost", description: "Vše pro veřejnost na jednom místě" },
@@ -24,6 +39,7 @@ const menuCs: NavItem[] = [
     label: "Pro studenty",
     href: "/studenti",
     children: [
+      { label: "MeDiprep", href: "/mediprep", description: "Aplikace na přijímačky — stáhnout na plochu" },
       { label: "Přehled", href: "/studenti", description: "Mapa pro uchazeče, LF i rodiče" },
       {
         label: "Chci studovat medicínu",
@@ -215,6 +231,20 @@ const menuCs: NavItem[] = [
 
 const menuEn: NavItem[] = [
   {
+    label: "Apps",
+    href: "/aplikace",
+    children: [
+      { label: "All apps", href: "/aplikace", description: "MeDipacient, MeDiprep, MeDiktor" },
+      { label: "MeDipacient", href: "/medipacient", description: "Medical reports on your phone" },
+      { label: "Open MeDipacient", href: "/app/pacient", description: "Dashboard with sample reports" },
+      { label: "MeDiprep", href: "/mediprep", description: "CZ medical-school admissions prep" },
+      { label: "Open MeDiprep", href: "/app/priprava", description: "B/C/F tests and faculty mocks" },
+      { label: "MeDiktor", href: "/lekari/dokumentace", description: "AI notes for verified physicians" },
+      { label: "Open MeDiktor", href: "/app/dokumentace", description: "Record on mobile" },
+      { label: "My dashboard", href: "/dashboard", description: "All apps and sample data" },
+    ],
+  },
+  {
     label: "Articles",
     href: "/articles",
     children: [
@@ -331,15 +361,25 @@ export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
   const verejnost = find("Pro veřejnost");
   const studenti = find("Pro studenty");
   const lekari = find("Pro lékaře");
-  const academy = find("Academy");
-  const clanky = find("Články");
   const predplatne = find("Předplatné");
   return [
     verejnost ? { ...verejnost, label: "Veřejnost" } : { label: "Veřejnost", href: "/verejnost" },
     studenti ? { ...studenti, label: "Studenti" } : { label: "Studenti", href: "/studenti" },
     lekari ? { ...lekari, label: "Lékaři" } : { label: "Lékaři", href: "/lekari" },
-    academy ?? { label: "Academy", href: "/academy" },
-    clanky ?? { label: "Články", href: "/articles" },
+    {
+      label: "Aplikace",
+      href: "/aplikace",
+      children: [
+        { label: "Přehled aplikací", href: "/aplikace", description: "MeDipacient, MeDiprep, MeDiktor" },
+        { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu" },
+        { label: "Stáhnout MeDipacient", href: "/app/pacient", description: "Instalace na plochu" },
+        { label: "MeDiprep", href: "/mediprep", description: "Přijímačky 8 českých LF" },
+        { label: "Stáhnout MeDiprep", href: "/app/priprava", description: "Testy B/C/F na ploše" },
+        { label: "MeDiktor", href: "/lekari/dokumentace", description: "AI zápisy pro lékaře" },
+        { label: "Stáhnout MeDiktor", href: "/app/dokumentace", description: "Nahrávání v mobilu" },
+        { label: "Můj dashboard", href: "/dashboard", description: "Zprávy, testy a zápisy" },
+      ],
+    },
     predplatne ?? { label: "Předplatné", href: "/predplatne" },
   ];
 }

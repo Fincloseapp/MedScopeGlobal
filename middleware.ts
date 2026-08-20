@@ -54,7 +54,7 @@ export async function middleware(request: NextRequest) {
   if (isLekarskaZonaPath(pathname)) {
     const gated = await enforceLekarskaZonaMiddleware(request, supabase, response);
     if (gated && gated !== response) {
-      return wrapWithSecurityHeaders(gated);
+      return wrapWithSecurityHeaders(gated, pathname);
     }
   }
 
@@ -82,7 +82,7 @@ export async function middleware(request: NextRequest) {
     });
   }
 
-  return wrapWithSecurityHeaders(response);
+  return wrapWithSecurityHeaders(response, pathname);
 }
 
 export const config = {

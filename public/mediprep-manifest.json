@@ -1,0 +1,57 @@
+{
+  "id": "/app/priprava",
+  "name": "MeDiprep · MedScopeGlobal",
+  "short_name": "MeDiprep",
+  "description": "MeDiprep od MedScopeGlobal: příprava na přijímačky LF. Testy B/C/F, simulace fakult. medscopeglobal.com",
+  "start_url": "/app/priprava?source=pwa",
+  "scope": "/app/priprava",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#F4F7FB",
+  "theme_color": "#0A192F",
+  "lang": "cs",
+  "dir": "ltr",
+  "categories": ["education", "medical"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/assets/mediprep/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/mediprep/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/mediprep/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/mediprep/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Simulace",
+      "short_name": "Test",
+      "url": "/app/priprava?tab=testy",
+      "description": "Spustit test nanečisto"
+    },
+    {
+      "name": "Plán a skóre",
+      "short_name": "Plán",
+      "url": "/app/priprava?tab=plan",
+      "description": "Týdenní plán a slabá místa"
+    }
+  ]
+}

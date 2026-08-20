@@ -18,6 +18,8 @@ import { subscriptionProductId } from "@/lib/v27/config";
 import { DokumentaceDownloadPanel } from "@/components/lekari/dokumentace-download-panel";
 import { MediktorLockup } from "@/components/lekari/mediktor-mark";
 import { MediktorPromoBanner } from "@/components/lekari/mediktor-promo-banner";
+import { AppDownloadPanel } from "@/components/apps/app-download-panel";
+import { MEDIPACIENT, MEDIPREP } from "@/lib/apps/catalog";
 
 export function V272SocialProofBlock() {
   return (
@@ -406,12 +408,36 @@ export function V272AcademyCtaBlock() {
   );
 }
 
+export function V272AppsTrioBlock() {
+  return (
+    <section className="border-b border-slate-200 bg-white">
+      <div className="mx-auto max-w-7xl space-y-8 px-4 py-12 sm:px-6">
+        <div className="text-center">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
+            Aplikace MedScopeGlobal
+          </p>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
+            Stáhnout na mobil — stejně jednoduše jako MeDiktor
+          </h2>
+          <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-600">
+            Chrome → Nainstalovat aplikaci. iPhone Safari → Sdílet → Přidat na plochu. Každá aplikace má přehledný
+            dashboard se zkušebními daty, ať vidíte maximum ještě před předplatným.
+          </p>
+        </div>
+        <AppDownloadPanel app={MEDIPACIENT} variant="homepage" extraCta={{ href: "/medipacient", label: "Jak to funguje" }} />
+        <AppDownloadPanel app={MEDIPREP} variant="homepage" extraCta={{ href: "/mediprep", label: "Jak to funguje" }} />
+        <V272DokumentaceAppBlock />
+      </div>
+    </section>
+  );
+}
+
 export async function V272HomepageSections() {
   return (
     <>
       <V272SocialProofBlock />
+      <V272AppsTrioBlock />
       <MediktorPromoBanner variant="homepage" />
-      <V272DokumentaceAppBlock />
       <V272WhyTrustBlock />
       <V271AudienceSections />
       <V272AcademyCtaBlock />

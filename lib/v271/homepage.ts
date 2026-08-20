@@ -2,18 +2,18 @@
 import { V27_SUBSCRIPTION_PLANS } from "@/lib/v27/config";
 
 export const V271_HERO = {
-  eyebrow: "Prémiový zdravotnický magazín",
-  claim: "Medicína, kterou čtete s důvěrou — od prvního ročníku po klinickou praxi",
+  eyebrow: "Zdravotnické prostředí MedScopeGlobal.com",
+  claim: "Zdraví, vzdělávání a výzkum na jednom místě — pro veřejnost, studenty, lékaře i vědce",
   subtitle:
-    "Redakčně kurátorované studie, guidelines a vzdělávání v češtině. Pro ty, kdo chtějí víc než generické zdravotní rady — s citacemi, klinickým dopadem a AI, které rozumí kontextu.",
+    "Tři aplikace na ploše telefonu: MeDipacient (zprávy), MeDiprep (přijímačky) a MeDiktor (zápisy). Plus redakce, Academy a Research Hub. 14 dní zdarma.",
 } as const;
 
 export const V271_HERO_CTAS = [
-  { label: "Vyzkoušet 14 dní zdarma", href: "/predplatne?trial=1", primary: true },
-  { label: "Předplatit", href: "/predplatne", primary: false },
-  { label: "Pro veřejnost", href: "/verejnost", primary: false },
-  { label: "Pro studenty", href: "/studenti", primary: false },
-  { label: "Pro lékaře", href: "/lekari", primary: false },
+  { label: "Stáhnout aplikace", href: "/aplikace", primary: true },
+  { label: "Vyzkoušet 14 dní zdarma", href: "/predplatne?trial=1", primary: false },
+  { label: "MeDipacient", href: "/app/pacient", primary: false },
+  { label: "MeDiprep", href: "/app/priprava", primary: false },
+  { label: "MeDiktor", href: "/app/dokumentace", primary: false },
 ] as const;
 
 export const V271_SOCIAL_PROOF_STATS = [
@@ -78,27 +78,27 @@ export const V271_AUDIENCES = [
     label: "Veřejnost",
     description:
       "Prevence a životní styl bez sensace — srozumitelné články od odborníků, ne od influencerů.",
-    topics: ["prevence", "výživa", "spánek", "fitness", "ženské zdraví", "mužské zdraví"],
+    topics: ["MeDipacient", "prevence", "výživa", "spánek", "fitness", "ženské zdraví", "mužské zdraví"],
     href: "/verejnost",
-    ctaPrimary: { label: "Najít téma", href: "/verejnost/temata" },
-    ctaSecondary: { label: "Zeptat se AI", href: "/ai-asistent/verejnost" },
+    ctaPrimary: { label: "Stáhnout MeDipacient", href: "/app/pacient" },
+    ctaSecondary: { label: "Najít téma", href: "/verejnost/temata" },
   },
   {
     id: "student",
     label: "Studenti",
     description:
       "Anatomie, farmakologie, přijímačky a AI tutor — od prvního dne na LF po státnice.",
-    topics: ["anatomie", "farmakologie", "testy", "přijímačky", "zkoušky", "AI tutor"],
+    topics: ["MeDiprep", "anatomie", "farmakologie", "testy", "přijímačky", "AI tutor"],
     href: "/studenti",
-    ctaPrimary: { label: "Chci studovat medicínu", href: "/studenti/chci-studovat" },
-    ctaSecondary: { label: "AI tutor", href: "/studenti/ai-tutor" },
+    ctaPrimary: { label: "Stáhnout MeDiprep", href: "/app/priprava" },
+    ctaSecondary: { label: "Chci studovat medicínu", href: "/studenti/chci-studovat" },
   },
   {
     id: "physician",
     label: "Lékaři",
     description:
       "Guidelines, přehledy studií, Research Hub a klinický AI — pro rozhodování v ordinaci, ne v teoretické laboratoři.",
-    topics: ["guidelines", "CME", "Dokumentace", "studie", "Research Hub"],
+    topics: ["guidelines", "MeDiktor", "CME", "studie", "Research Hub"],
     href: "/lekari",
     ctaPrimary: { label: "Stáhnout MeDiktor", href: "/app/dokumentace" },
     ctaSecondary: { label: "Více o MeDiktoru", href: "/lekari/dokumentace" },

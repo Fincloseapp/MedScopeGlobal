@@ -1,0 +1,57 @@
+{
+  "id": "/app/pacient",
+  "name": "MeDipacient · MedScopeGlobal",
+  "short_name": "MeDipacient",
+  "description": "MeDipacient od MedScopeGlobal — lékařské zprávy v telefonu i v prohlížeči. medscopeglobal.com",
+  "start_url": "/app/pacient?source=pwa",
+  "scope": "/app/pacient",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#021d33",
+  "theme_color": "#2D7FF9",
+  "lang": "cs",
+  "dir": "ltr",
+  "categories": ["medical", "health"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/assets/medipacient/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/medipacient/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/medipacient/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/medipacient/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Přehled",
+      "short_name": "Dashboard",
+      "url": "/app/pacient?tab=prehled",
+      "description": "Časová osa zpráv, léky a kontroly"
+    },
+    {
+      "name": "Nahrát zprávu",
+      "short_name": "Nahrát",
+      "url": "/app/pacient?tab=nahrat",
+      "description": "Fotka nebo PDF lékařské zprávy"
+    }
+  ]
+}

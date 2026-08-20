@@ -60,7 +60,7 @@ export const V27_SUBSCRIPTION_PLANS = [
     name: "Veřejnost",
     monthlyCzk: 99,
     annualCzk: 990,
-    features: ["Prevence a životní styl", "AI asistent pro veřejnost", "Bez reklam v článcích"],
+    features: ["Prevence a životní styl", "MeDipacient — zprávy v telefonu", "AI asistent pro veřejnost", "Bez reklam v článcích"],
   },
   {
     tier: "student" as const,
@@ -68,6 +68,7 @@ export const V27_SUBSCRIPTION_PLANS = [
     monthlyCzk: 149,
     annualCzk: 1490,
     features: [
+      "MeDiprep: testy B/C/F a simulace 8 českých LF",
       "Celá Academy včetně přípravných kurzů na přijímačky",
       "AI tutor a studijní materiály",
       "Kvízy, hry a modelové otázky",

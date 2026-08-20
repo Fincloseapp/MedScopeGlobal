@@ -86,8 +86,14 @@ export default async function VerejnostHubPage() {
           ) : null}
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/verejnost/temata"
+              href="/app/pacient"
               className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#005B96] shadow-sm transition hover:bg-white/90"
+            >
+              Stáhnout MeDipacient
+            </Link>
+            <Link
+              href="/verejnost/temata"
+              className="rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
             >
               Najdi svůj problém
             </Link>

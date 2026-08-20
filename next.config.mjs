@@ -80,6 +80,10 @@ const nextConfig = {
       // Misleading hub titles → clear destinations
       { source: "/studenti/anatomie", destination: "/studenti/hry", permanent: true },
       { source: "/studenti/farmakologie", destination: "/studenti/leky", permanent: true },
+      { source: "/app/medipacient", destination: "/app/pacient", permanent: false },
+      { source: "/app/mediprep", destination: "/app/priprava", permanent: false },
+      { source: "/medipacient/app", destination: "/app/pacient", permanent: false },
+      { source: "/mediprep/app", destination: "/app/priprava", permanent: false },
 
       { source: "/pro-lekare", destination: "/lekari", permanent: true },
 
@@ -145,11 +149,63 @@ const nextConfig = {
 
       {
 
+        source: "/dashboard",
+
+        headers: [
+
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+
+        ],
+
+      },
+
+      {
+
         source: "/dashboard/:path*",
 
         headers: [
 
           { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+
+        ],
+
+      },
+
+      {
+
+        source: "/app/pacient",
+
+        headers: [
+
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+
+          { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=()" },
+
+        ],
+
+      },
+
+      {
+
+        source: "/app/priprava",
+
+        headers: [
+
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+
+        ],
+
+      },
+
+      {
+
+        source: "/app/dokumentace",
+
+        headers: [
+
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+
+          { key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=()" },
 
         ],
 
@@ -177,6 +233,28 @@ const nextConfig = {
 
         headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
 
+      },
+
+      {
+        source: "/sw-medipacient.js",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
+          { key: "Service-Worker-Allowed", value: "/" },
+        ],
+      },
+      {
+        source: "/sw-mediprep.js",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
+          { key: "Service-Worker-Allowed", value: "/" },
+        ],
+      },
+      {
+        source: "/sw-dokumentace.js",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
+          { key: "Service-Worker-Allowed", value: "/" },
+        ],
       },
 
       {

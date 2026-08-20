@@ -90,11 +90,11 @@ export async function applyV30SecurityMiddleware(
   }
 
   const legacy = await applySecurityMiddleware(request);
-  if (legacy) return applySecurityHeaders(legacy);
+  if (legacy) return applySecurityHeaders(legacy, pathname);
 
   return null;
 }
 
-export function wrapWithSecurityHeaders(response: NextResponse): NextResponse {
-  return applySecurityHeaders(response);
+export function wrapWithSecurityHeaders(response: NextResponse, pathname?: string): NextResponse {
+  return applySecurityHeaders(response, pathname);
 }

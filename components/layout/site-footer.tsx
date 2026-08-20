@@ -51,6 +51,26 @@ export async function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/aplikace" className="hover:text-foreground">
+                Aplikace
+              </Link>
+            </li>
+            <li>
+              <Link href="/app/pacient" className="hover:text-foreground">
+                MeDipacient
+              </Link>
+            </li>
+            <li>
+              <Link href="/app/priprava" className="hover:text-foreground">
+                MeDiprep
+              </Link>
+            </li>
+            <li>
+              <Link href="/app/dokumentace" className="hover:text-foreground">
+                MeDiktor
+              </Link>
+            </li>
+            <li>
               <Link href="/articles" className="hover:text-foreground">
                 Články
               </Link>

@@ -8,6 +8,7 @@ import { SubscriptionTrustBadges } from "@/components/subscription/subscription-
 import { V27_SUBSCRIPTION_PLANS, subscriptionProductId } from "@/lib/v27/config";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { VIP_TRIAL_DAYS } from "@/lib/vip";
+import { APP_PRODUCTS } from "@/lib/apps/catalog";
 
 export const revalidate = 60;
 
@@ -37,9 +38,8 @@ export default async function PredplatnePage({
           Prémiový přístup k medicínskému obsahu
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-          Měsíční nebo roční plány pro veřejnost, studenty, ordinace (Dokumentace) a
-          lékaře. Bez reklam, s AI asistenty — platba přes Stripe včetně Apple Pay a
-          Google Pay.
+          Měsíční nebo roční plány pro veřejnost (MeDipacient), studenty (MeDiprep), ordinace (MeDiktor) a
+          lékaře. Stažení na mobil u všech tří aplikací. Bez reklam, s AI asistenty — platba přes Stripe.
         </p>
       </div>
 
@@ -75,6 +75,25 @@ export default async function PredplatnePage({
           </Link>
           .
         </p>
+      </section>
+
+      <section className="mt-10 grid gap-4 md:grid-cols-3">
+        {APP_PRODUCTS.map((app) => (
+          <article key={app.id} className="rounded-2xl border border-[#d9e8f4] bg-white p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">{app.audience}</p>
+            <h2 className="mt-1 font-display text-lg font-semibold">{app.shortName}</h2>
+            <p className="mt-1 text-sm text-slate-600">{app.tagline}</p>
+            <p className="mt-2 text-xs text-slate-500">{app.priceNote}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link href={app.appPath} className="text-sm font-semibold text-[#005B96]">
+                Otevřít →
+              </Link>
+              <Link href={app.downloadPath} className="text-sm text-slate-500">
+                Stáhnout na mobil
+              </Link>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="mt-12">

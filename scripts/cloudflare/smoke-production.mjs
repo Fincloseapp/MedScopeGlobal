@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const base = process.env.SMOKE_BASE_URL || "https://medscopeglobal.com";
-const paths = ["/", "/lekari/dokumentace", "/app/dokumentace"];
+const paths = ["/", "/aplikace", "/medipacient", "/mediprep", "/app/pacient", "/app/priprava", "/lekari/dokumentace", "/app/dokumentace", "/dashboard", "/predplatne"];
 let failed = 0;
 for (const p of paths) {
   const url = base.replace(/\/$/, "") + p;
