@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
+import { AppOpenLink } from "@/components/apps/app-origin-bar";
 import { V271_FOOTER_TAGLINE, V271_FOOTER_TRUST } from "@/lib/v271/homepage";
 
 export async function SiteFooter() {
@@ -56,19 +57,19 @@ export async function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link href="/app/pacient" className="hover:text-foreground">
+              <AppOpenLink href="/app/pacient" className="hover:text-foreground">
                 MeDipacient
-              </Link>
+              </AppOpenLink>
             </li>
             <li>
-              <Link href="/app/priprava" className="hover:text-foreground">
+              <AppOpenLink href="/app/priprava" className="hover:text-foreground">
                 MeDiprep
-              </Link>
+              </AppOpenLink>
             </li>
             <li>
-              <Link href="/app/dokumentace" className="hover:text-foreground">
+              <AppOpenLink href="/app/dokumentace" className="hover:text-foreground">
                 MeDiktor
-              </Link>
+              </AppOpenLink>
             </li>
             <li>
               <Link href="/articles" className="hover:text-foreground">

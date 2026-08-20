@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sheet";
 import type { Category } from "@/types/database";
 import { HeaderLogo, HEADER_TAGLINE } from "@/components/layout/header-logo";
+import { AppOpenLink } from "@/components/apps/app-origin-bar";
 import type { NavItem } from "@/lib/config/main-navigation";
 
 export function V20MobileNav({
@@ -64,27 +65,24 @@ export function V20MobileNav({
           <div className="rounded-xl border border-[#005B96]/20 bg-[#f4f9fc] p-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">Aplikace</p>
             <div className="mt-2 grid grid-cols-3 gap-1.5">
-              <Link
+              <AppOpenLink
                 href="/app/pacient"
-                onClick={() => setOpen(false)}
                 className="rounded-lg bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#021d33]"
               >
                 MeDipacient
-              </Link>
-              <Link
+              </AppOpenLink>
+              <AppOpenLink
                 href="/app/priprava"
-                onClick={() => setOpen(false)}
                 className="rounded-lg bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#021d33]"
               >
                 MeDiprep
-              </Link>
-              <Link
+              </AppOpenLink>
+              <AppOpenLink
                 href="/app/dokumentace"
-                onClick={() => setOpen(false)}
                 className="rounded-lg bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#021d33]"
               >
                 MeDiktor
-              </Link>
+              </AppOpenLink>
             </div>
           </div>
           {mainMenu.map((item) => {

@@ -1,3 +1,4 @@
+import { CoverImage } from "@/components/media/cover-image";
 import Image from "next/image";
 import Link from "next/link";
 import type { DisplayArticle } from "@/lib/queries/articles";
@@ -12,6 +13,8 @@ import {
 import { PortalSearch } from "@/components/v271/portal-search";
 import { WriterAgentMark } from "@/components/editorial/writer-agent-mark";
 import { WriterAgentsStrip } from "@/components/editorial/writer-agents-strip";
+import { AppOpenLink, isStandaloneAppHref } from "@/components/apps/app-origin-bar";
+import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { resolveWriterAgent, resolveWritingStyle } from "@/lib/editorial/writer-agents";
 import { BookOpen, Gift, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
 
@@ -72,13 +75,7 @@ function ArticleThumb({
   return (
     <div className={`relative overflow-hidden rounded-md bg-slate-100 ${className}`}>
       {article.cover_image_url ? (
-        <Image
-          src={article.cover_image_url}
-          alt=""
-          fill
-          className="object-cover"
-          sizes={sizes}
-        />
+        <CoverImage src={article.cover_image_url} alt="" className="absolute inset-0" />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-[#021d33] to-[#005B96]" />
       )}
@@ -194,9 +191,12 @@ export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
 
         <nav aria-label="Služby MedScopeGlobal" className="mt-3 rounded-lg border border-slate-200 bg-white px-2 py-3 shadow-sm sm:px-3">
           <ul className="grid grid-cols-5 gap-1 sm:grid-cols-10">
-            {PORTAL_SERVICES.map((svc) => (
+            {PORTAL_SERVICES.map((svc) => {
+              const openApp = isStandaloneAppHref(svc.href);
+              const Item = openApp ? AppOpenLink : Link;
+              return (
               <li key={svc.id}>
-                <Link
+                <Item
                   href={svc.href}
                   className="flex flex-col items-center gap-1 rounded-md px-1 py-1.5 text-center hover:bg-slate-50"
                 >
@@ -215,9 +215,10 @@ export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
                   )}
                   <span className="text-[11px] font-semibold leading-tight text-[#021d33]">{svc.label}</span>
                   <span className="hidden text-[10px] text-slate-500 sm:block">{svc.hint}</span>
-                </Link>
+                </Item>
               </li>
-            ))}
+              );
+            })}
           </ul>
         </nav>
 
@@ -233,23 +234,25 @@ export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
               <ul className="space-y-2">
                 {APP_PRODUCTS.map((app) => (
                   <li key={app.id}>
-                    <Link
-                      href={app.appPath}
-                      className="flex items-center gap-3 rounded-md p-1.5 hover:bg-slate-50"
-                    >
-                      <Image
-                        src={app.assets.icon192}
-                        alt=""
-                        width={36}
-                        height={36}
-                        className="rounded-[22%]"
-                      />
+                      <AppOpenLink
+                        href={app.appPath}
+                        className="flex items-center gap-3 rounded-md p-1.5 hover:bg-slate-50"
+                      >
+                      <span className="relative h-12 w-[4.5rem] shrink-0 overflow-hidden rounded-md bg-slate-100">
+                        <Image
+                          src={APP_MARKETING_IMAGE[app.id]}
+                          alt=""
+                          fill
+                          className="object-cover"
+                          sizes="72px"
+                        />
+                      </span>
                       <span className="min-w-0 flex-1">
                         <span className="block text-sm font-semibold text-[#021d33]">{app.shortName}</span>
                         <span className="block truncate text-xs text-slate-500">{app.tagline}</span>
                       </span>
-                      <span className="text-xs font-semibold text-[#005B96]">otevřít</span>
-                    </Link>
+                      <span className="text-xs font-semibold text-[#005B96]">nová karta</span>
+                    </AppOpenLink>
                   </li>
                 ))}
               </ul>

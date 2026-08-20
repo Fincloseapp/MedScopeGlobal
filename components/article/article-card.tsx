@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { CoverImage } from "@/components/media/cover-image";
 import Link from "next/link";
 import { Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -35,13 +35,7 @@ export function ArticleCard({ article }: { article: DisplayArticle | ArticleWith
         <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-950">
           {article.cover_image_url ? (
             <>
-              <Image
-                src={article.cover_image_url}
-                alt=""
-                fill
-                className="object-cover transition duration-500 group-hover:scale-[1.04]"
-                sizes="(max-width:768px) 100vw, 33vw"
-              />
+              <CoverImage src={article.cover_image_url} alt="" className="absolute inset-0 transition duration-500 group-hover:scale-[1.04]" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
             </>
           ) : (

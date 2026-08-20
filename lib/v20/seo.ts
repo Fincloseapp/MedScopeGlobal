@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SITE } from "@/lib/config/site";
 import { V20_UI_VERSION } from "@/lib/v20/version";
+import { ogImages } from "@/lib/seo/og";
 
 export function buildV20PageMetadata(opts: {
   title: string;
@@ -8,6 +9,7 @@ export function buildV20PageMetadata(opts: {
   path?: string;
 }): Metadata {
   const url = opts.path ? `${SITE.url}${opts.path}` : SITE.url;
+  const images = ogImages(opts.title);
   return {
     title: opts.title,
     description: opts.description.slice(0, 160),
@@ -19,11 +21,13 @@ export function buildV20PageMetadata(opts: {
       locale: "cs_CZ",
       siteName: "MedScopeGlobal",
       type: "website",
+      images,
     },
     twitter: {
       card: "summary_large_image",
       title: opts.title,
       description: opts.description.slice(0, 160),
+      images: images.map((img) => img.url),
     },
     other: { "medscope-ui-version": V20_UI_VERSION },
   };
@@ -54,7 +58,7 @@ export function buildV20ArticleJsonLd(
       url: SITE.url,
     },
     mainEntityOfPage: `${SITE.url}/article/${article.slug}`,
-    image: article.image ?? `${SITE.url}/og-default.png`,
+    image: article.image ?? `${SITE.url}/og-medscopeglobal.jpg`,
     articleSection: article.category ?? "Medicína",
     inLanguage: "cs-CZ",
   };

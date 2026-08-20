@@ -6,6 +6,7 @@ import { HREFLANG_LOCALES } from "@/lib/seo/metadata";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { SITE } from "@/lib/config/site";
 import { organizationJsonLd, newsletterJsonLd } from "@/lib/seo/json-ld";
+import { ogImages } from "@/lib/seo/og";
 import "./globals.css";
 
 const inter = Inter({
@@ -19,11 +20,7 @@ const display = Libre_Baskerville({
   variable: "--font-display",
 });
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000");
+const siteUrl = SITE.url;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -58,11 +55,13 @@ export const metadata: Metadata = {
     url: siteUrl,
     title: "MedScopeGlobal | Odborný medicínský magazín",
     description: SITE.description,
+    images: ogImages("MedScopeGlobal"),
   },
   twitter: {
     card: "summary_large_image",
     creator: "@MedScopeGlobal",
     site: "@MedScopeGlobal",
+    images: ogImages("MedScopeGlobal").map((img) => img.url),
   },
   alternates: {
     canonical: siteUrl,

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { IntelligenceConsole } from "@/components/ai-medical/intelligence-console";
+import { AiAssistantVisual } from "@/components/ai/assistant-visual";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -22,6 +23,9 @@ export default function AiAsistentLekarPage() {
       <Link href="/ai-asistent" className="mb-4 inline-block text-sm text-[#005B96]">
         ← Všechny asistenti
       </Link>
+      <div className="mb-6">
+        <AiAssistantVisual caption="Klinický AI MedScopeGlobal — vzdělávací podpora, nenahrazuje lékařské rozhodnutí." />
+      </div>
       <IntelligenceConsole defaultAssistant="doctor" title="Klinický AI asistent" />
     </ModulePageShell>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { CoverImage } from "@/components/media/cover-image";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
 
 type Props = {
@@ -11,12 +11,11 @@ type Props = {
   className?: string;
 };
 
-/** v20 — WebP-optimized cover with fixed 16:10 ratio and gradient fallback */
+/** v20 — cover with native img (Cloudflare) and gradient fallback */
 export function V20ArticleCover({
   title,
   category,
   coverUrl,
-  priority = false,
   className = "",
 }: Props) {
   const coverStyles = getArticleCoverStyles(title, category ?? undefined);
@@ -28,15 +27,7 @@ export function V20ArticleCover({
     >
       {coverUrl ? (
         <>
-          <Image
-            src={coverUrl}
-            alt={title}
-            fill
-            priority={priority}
-            loading={priority ? undefined : "lazy"}
-            className="object-cover object-center"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
+          <CoverImage src={coverUrl} alt={title} className="absolute inset-0" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent to-transparent" />
         </>
       ) : (

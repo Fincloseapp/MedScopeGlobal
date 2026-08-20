@@ -5,6 +5,7 @@ import { getPacientDashboard } from "@/lib/medipacient/store";
 import { getPrepDashboard } from "@/lib/mediprep/dashboard";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { APP_PRODUCTS } from "@/lib/apps/catalog";
+import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { getLatestArticles } from "@/lib/queries/articles";
 
 export const metadata: Metadata = {
@@ -42,7 +43,17 @@ export default async function DashboardPage() {
       <div className="mx-auto max-w-6xl space-y-8 px-4 py-10 sm:px-6">
         <section className="grid gap-4 md:grid-cols-3">
           {APP_PRODUCTS.map((app) => (
-            <article key={app.id} className="rounded-2xl border border-[#d9e8f4] bg-white p-5 shadow-sm">
+            <article key={app.id} className="overflow-hidden rounded-2xl border border-[#d9e8f4] bg-white shadow-sm">
+              <div className="relative aspect-[16/9] bg-slate-100">
+                <Image
+                  src={APP_MARKETING_IMAGE[app.id]}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+              </div>
+              <div className="p-5">
               <Image src={app.assets.icon192} alt={app.shortName} width={48} height={48} className="rounded-[22%]" />
               <h2 className="mt-3 font-display text-xl font-semibold">{app.shortName}</h2>
               <p className="mt-1 text-sm text-slate-600">{app.tagline}</p>
@@ -50,6 +61,8 @@ export default async function DashboardPage() {
               <div className="mt-4 flex flex-wrap gap-2">
                 <Link
                   href={app.appPath}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="rounded-full bg-[#005B96] px-4 py-1.5 text-sm font-semibold text-white"
                 >
                   Otevřít
@@ -57,6 +70,7 @@ export default async function DashboardPage() {
                 <Link href={app.downloadPath} className="rounded-full border px-4 py-1.5 text-sm text-[#005B96]">
                   Stáhnout na mobil
                 </Link>
+              </div>
               </div>
             </article>
           ))}

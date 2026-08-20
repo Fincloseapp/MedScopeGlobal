@@ -5,6 +5,7 @@ import { AppDownloadPanel } from "@/components/apps/app-download-panel";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { MEDIPREP, appSeoDescription, appSeoTitle } from "@/lib/apps/catalog";
+import { MARKETING_VISUALS } from "@/lib/brand/marketing-visuals";
 import { getPrepDashboard } from "@/lib/mediprep/dashboard";
 import { FACULTIES_ADMISSIONS_2026 } from "@/lib/prijimacky/faculties-admissions";
 import { bankStats } from "@/lib/prijimacky/question-bank";
@@ -42,7 +43,8 @@ export default function MediprepMarketingPage() {
         })}
       />
       <section className="border-b border-[#e0d5c4] bg-[#0A192F] text-white">
-        <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto grid max-w-5xl items-center gap-8 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
           <div className="flex items-center gap-4">
             <Image
               src={MEDIPREP.assets.icon192}
@@ -69,6 +71,8 @@ export default function MediprepMarketingPage() {
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href={MEDIPREP.appPath}
+              target="_blank"
+              rel="noopener noreferrer"
               className="rounded-full bg-[#C45C26] px-6 py-2.5 text-sm font-semibold text-white"
             >
               Otevřít {MEDIPREP.shortName}
@@ -83,6 +87,17 @@ export default function MediprepMarketingPage() {
           <p className="mt-4 text-xs text-white/60">
             {stats.total} originálních otázek · e-mail + kód · medscopeglobal.com
           </p>
+          </div>
+          <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/15 shadow-2xl">
+            <Image
+              src={MARKETING_VISUALS.mediprep}
+              alt="MeDiprep — příprava na přijímačky lékařských fakult"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 420px"
+              priority
+            />
+          </div>
         </div>
       </section>
 

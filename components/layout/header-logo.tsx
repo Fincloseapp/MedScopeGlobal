@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { cn } from "@/lib/utils";
 
-export const HEADER_TAGLINE = "MeDipacient · MeDiprep · MeDiktor";
+export const HEADER_TAGLINE = "medscopeglobal.com";
 
-export const HEADER_LOGO_HEIGHT = { mobile: 56, tablet: 56, desktop: 70 } as const;
+export const HEADER_LOGO_HEIGHT = { mobile: 56, tablet: 60, desktop: 64 } as const;
 
 type Props = {
   centered?: boolean;
@@ -12,51 +11,45 @@ type Props = {
   priority?: boolean;
 };
 
-/** v23.3.1 — mobile 56px max visibility + desktop 70px */
+/** Emblem + readable MedScopeGlobal.com lockup for the main bar. */
 export function HeaderLogo({ centered = false, className, priority = true }: Props) {
   return (
     <Link
       href="/"
       prefetch
       className={cn(
-        "logo-block group flex shrink-0 flex-col transition-opacity hover:opacity-[0.97]",
-        centered ? "items-center pr-0 text-center" : "items-start pr-2 text-left lg:pr-3",
+        "logo-block group flex shrink-0 items-center gap-2.5 transition-opacity hover:opacity-[0.97]",
+        centered ? "justify-center pr-0" : "justify-start pr-2 lg:gap-3 lg:pr-3",
         className
       )}
-      aria-label="MedScopeGlobal — domů"
+      aria-label="MedScopeGlobal.com — domů"
     >
-      <span
-        className={cn(
-          "logo-mark mb-1 inline-block translate-y-px md:mb-0.5 md:origin-left md:translate-y-[2px] lg:origin-left",
-          centered
-            ? "origin-center max-md:scale-[1.13]"
-            : "max-md:origin-left max-md:scale-[1.13]"
-        )}
-      >
-        <MedScopeLogo
-          href=""
-          preset="header"
-          priority={priority}
-          className="p-0"
-          imageClassName={cn(
-            "w-auto object-contain [letter-spacing:0.12px]",
-            "h-14 min-w-[148px] max-w-[200px]",
-            "md:h-14 md:min-w-[150px] md:max-w-[210px]",
-            "lg:h-[64px] lg:min-w-[168px] lg:max-w-[240px]"
-          )}
-        />
+      <span className={cn("logo-mark inline-flex shrink-0", centered ? "origin-center" : "origin-left")}>
+        <picture>
+          <source srcSet="/assets/logo/logo-emblem.webp" type="image/webp" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/assets/logo/logo-emblem.png"
+            alt=""
+            width={160}
+            height={76}
+            className={cn(
+              "w-auto object-contain object-left",
+              centered ? "h-11" : "h-11 md:h-12 lg:h-[52px]"
+            )}
+            loading={priority ? "eager" : "lazy"}
+            decoding="async"
+          />
+        </picture>
       </span>
-      <p
-        className={cn(
-          "tagline font-extralight leading-tight",
-          "text-xs tracking-[0.35px] opacity-80",
-          "lg:mt-1 lg:text-[13px] lg:opacity-75",
-          centered ? "text-center" : "hidden text-left xl:block",
-          "text-[#6A6A6A] dark:text-[#A0A0A0] dark:opacity-85"
-        )}
-      >
-        {HEADER_TAGLINE}
-      </p>
+      <span className={cn("min-w-0", centered ? "text-center" : "text-left")}>
+        <span className="block font-display text-[15px] font-bold leading-tight tracking-tight text-[#005B96] sm:text-base lg:text-[1.15rem]">
+          MedScopeGlobal.com
+        </span>
+        <span className="mt-0.5 block text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500 sm:text-[10px]">
+          MeDipacient · MeDiprep · MeDiktor
+        </span>
+      </span>
     </Link>
   );
 }

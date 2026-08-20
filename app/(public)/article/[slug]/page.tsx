@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { CoverImage } from "@/components/media/cover-image";
+import { ogImages } from "@/lib/seo/og";
+import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleBody } from "@/components/article/article-body";
@@ -63,6 +65,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const keywords = v19Meta?.keywords;
 
+  const cover = resolveVerejnostCoverUrl(article);
+  const shareImages = ogImages(article.title, cover);
+
   return {
     title: article.title,
     description,
@@ -76,15 +81,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "article",
       publishedTime: article.published_at ?? undefined,
       url: `/article/${article.slug}`,
-      images: article.cover_image_url
-        ? [{ url: article.cover_image_url }]
-        : undefined,
+      siteName: "MedScopeGlobal",
+      images: shareImages,
     },
     twitter: {
       card: "summary_large_image",
       title: article.title,
       description,
-      images: article.cover_image_url ? [article.cover_image_url] : undefined,
+      images: shareImages.map((img) => img.url),
     },
   };
 }
@@ -152,6 +156,7 @@ export default async function ArticlePage({ params }: Props) {
   const studentSidebarAds = studentCampaigns.filter((c) => c.type === "sidebar").slice(0, 3);
 
   const category = article.categories;
+  const coverUrl = resolveVerejnostCoverUrl(article);
   const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
   const editorialAssignment = assignEditorialUnits(article);
   const writerAgent = resolveWriterAgent(article);
@@ -193,7 +198,7 @@ export default async function ArticlePage({ params }: Props) {
         headline: article.title,
         datePublished: article.published_at,
         author: buildArticleJsonLdAuthor(editorialAssignment, editorialLocale),
-        image: article.cover_image_url ? [article.cover_image_url] : undefined,
+        image: coverUrl ? [coverUrl] : undefined,
         publisher: {
           "@type": "Organization",
           name: "MedScopeGlobal",
@@ -291,16 +296,9 @@ export default async function ArticlePage({ params }: Props) {
             </div>
 
             <div className="relative mt-8 aspect-[21/9] w-full overflow-hidden rounded-[28px] border border-slate-200 bg-slate-950 shadow-[0_22px_70px_-35px_rgba(2,30,57,0.85)]">
-              {article.cover_image_url ? (
+              {coverUrl ? (
                 <>
-                  <Image
-                    src={article.cover_image_url}
-                    alt=""
-                    fill
-                    priority
-                    className="object-cover"
-                    sizes="(max-width:1024px) 100vw, 896px"
-                  />
+                  <CoverImage src={coverUrl} alt="" className="absolute inset-0" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
                 </>
               ) : (

@@ -293,6 +293,8 @@ const nextConfig = {
 
   images: {
 
+    unoptimized: true,
+
     remotePatterns: [
 
       ...supabasePatterns,

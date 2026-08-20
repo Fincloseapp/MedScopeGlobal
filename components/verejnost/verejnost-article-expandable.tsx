@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { CoverImage } from "@/components/media/cover-image";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
@@ -39,7 +39,7 @@ export function VerejnostArticleExpandable({
         aria-expanded={open}
       >
         <div className="relative aspect-[16/10] bg-slate-100">
-          <Image src={coverUrl} alt="" fill className="object-cover" sizes="50vw" loading="lazy" />
+          <CoverImage src={coverUrl} alt="" className="absolute inset-0" />
           {agent ? (
             <span className="absolute left-3 top-3">
               <WriterAgentMark agent={agent} size={32} />

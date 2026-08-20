@@ -5,6 +5,7 @@ import { AppDownloadPanel } from "@/components/apps/app-download-panel";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { MEDIPACIENT, appSeoDescription, appSeoTitle } from "@/lib/apps/catalog";
+import { MARKETING_VISUALS } from "@/lib/brand/marketing-visuals";
 import { MEDIPACIENT_DEMO_REPORTS } from "@/lib/medipacient/demo-reports";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
@@ -45,7 +46,8 @@ export default function MedipacientMarketingPage() {
         })}
       />
       <section className="border-b border-[#d9e8f4] bg-gradient-to-br from-[#021d33] via-[#0a3d6b] to-[#2D7FF9] text-white">
-        <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto grid max-w-5xl items-center gap-8 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
           <div className="flex items-center gap-4">
             <Image
               src={MEDIPACIENT.assets.icon192}
@@ -66,6 +68,8 @@ export default function MedipacientMarketingPage() {
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href={MEDIPACIENT.appPath}
+              target="_blank"
+              rel="noopener noreferrer"
               className="rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-[#021d33]"
             >
               Stáhnout {MEDIPACIENT.shortName}
@@ -77,6 +81,17 @@ export default function MedipacientMarketingPage() {
               Průvodce stažením
             </Link>
           </div>
+          </div>
+          <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/20 shadow-2xl">
+            <Image
+              src={MARKETING_VISUALS.medipacient}
+              alt="MeDipacient v telefonu — lékařské zprávy na jednom místě"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 420px"
+              priority
+            />
+          </div>
         </div>
       </section>
 
@@ -87,7 +102,12 @@ export default function MedipacientMarketingPage() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#2D7FF9]">{s.n}</p>
               <h2 className="mt-2 font-display text-lg font-semibold text-[#021d33]">{s.title}</h2>
               {"cta" in s && s.cta ? (
-                <Link href={MEDIPACIENT.appPath} className="mt-3 inline-block text-sm font-medium text-[#2D7FF9]">
+                <Link
+                  href={MEDIPACIENT.appPath}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-block text-sm font-medium text-[#2D7FF9]"
+                >
                   {s.cta} →
                 </Link>
               ) : null}
@@ -121,6 +141,8 @@ export default function MedipacientMarketingPage() {
           </ol>
           <Link
             href={MEDIPACIENT.appPath}
+            target="_blank"
+            rel="noopener noreferrer"
             className="mt-5 inline-flex rounded-full bg-[#2D7FF9] px-5 py-2.5 text-sm font-semibold text-white"
           >
             Otevřít plný dashboard
