@@ -3,8 +3,16 @@ import Link from "next/link";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import { APP_PRODUCTS } from "@/lib/apps/catalog";
 import { V271_AUDIENCES, V271_SOCIAL_PROOF_STATS } from "@/lib/v271/homepage";
-import { PORTAL_NEWS_TABS, PORTAL_PHILOSOPHY, PORTAL_SERVICES } from "@/lib/v271/portal";
+import {
+  PORTAL_NEWS_NOTE,
+  PORTAL_NEWS_TABS,
+  PORTAL_PHILOSOPHY,
+  PORTAL_SERVICES,
+} from "@/lib/v271/portal";
 import { PortalSearch } from "@/components/v271/portal-search";
+import { WriterAgentMark } from "@/components/editorial/writer-agent-mark";
+import { WriterAgentsStrip } from "@/components/editorial/writer-agents-strip";
+import { resolveWriterAgent, resolveWritingStyle } from "@/lib/editorial/writer-agents";
 import { BookOpen, Gift, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
 
 function ServiceGlyph({ icon }: { icon?: string }) {
@@ -51,10 +59,123 @@ function Box({
   );
 }
 
-export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
-  const featured = articles[0];
-  const rest = articles.slice(1, 8);
+function ArticleThumb({
+  article,
+  className,
+  sizes,
+}: {
+  article: DisplayArticle;
+  className: string;
+  sizes: string;
+}) {
+  const agent = resolveWriterAgent(article);
+  return (
+    <div className={`relative overflow-hidden rounded-md bg-slate-100 ${className}`}>
+      {article.cover_image_url ? (
+        <Image
+          src={article.cover_image_url}
+          alt=""
+          fill
+          className="object-cover"
+          sizes={sizes}
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-[#021d33] to-[#005B96]" />
+      )}
+      {agent ? (
+        <span className="absolute bottom-1 left-1">
+          <WriterAgentMark agent={agent} size={22} />
+        </span>
+      ) : null}
+    </div>
+  );
+}
 
+function PortalNewsFeed({ articles }: { articles: DisplayArticle[] }) {
+  const featured = articles[0];
+  const spotlight = articles.slice(1, 5);
+  const rest = articles.slice(5);
+  const featuredAgent = featured ? resolveWriterAgent(featured) : null;
+  const featuredStyle = featured ? resolveWritingStyle(featured) : null;
+
+  return (
+    <>
+      <div className="mb-3 flex flex-wrap gap-1.5">
+        {PORTAL_NEWS_TABS.map((tab) => (
+          <Link
+            key={tab.href}
+            href={tab.href}
+            className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-700 hover:bg-[#e8f3fb] hover:text-[#005B96]"
+          >
+            {tab.label}
+          </Link>
+        ))}
+      </div>
+      <p className="mb-3 text-[11px] text-slate-500">{PORTAL_NEWS_NOTE}</p>
+      {featured ? (
+        <article className="border-b border-slate-100 pb-3">
+          <Link href={`/article/${featured.slug}`} className="group grid gap-3 sm:grid-cols-[220px_minmax(0,1fr)]">
+            <ArticleThumb article={featured} className="h-36 sm:h-full min-h-[9rem]" sizes="220px" />
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#005B96]">
+                {featuredAgent?.topicLabel ?? featured.categories?.name ?? "Magazín"}
+              </p>
+              <h3 className="mt-1 font-display text-lg font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
+                {featured.title}
+              </h3>
+              {featured.excerpt ? (
+                <p className="mt-1 line-clamp-3 text-sm text-slate-600">{featured.excerpt}</p>
+              ) : null}
+              {featuredStyle ? (
+                <p className="mt-2 text-[10px] uppercase tracking-wide text-slate-400">styl {featuredStyle.label}</p>
+              ) : null}
+            </div>
+          </Link>
+        </article>
+      ) : (
+        <p className="text-sm text-slate-500">Redakční články se načtou, jakmile je databáze k dispozici.</p>
+      )}
+      {spotlight.length > 0 ? (
+        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+          {spotlight.map((article) => (
+            <li key={article.id}>
+              <Link href={`/article/${article.slug}`} className="group flex gap-2.5">
+                <ArticleThumb article={article} className="h-[4.5rem] w-[5.5rem] shrink-0" sizes="88px" />
+                <span className="min-w-0">
+                  <span className="block text-[10px] font-semibold uppercase tracking-wide text-[#005B96]">
+                    {resolveWriterAgent(article)?.label ?? article.categories?.name ?? ""}
+                  </span>
+                  <span className="mt-0.5 block text-sm font-medium leading-snug text-[#021d33] group-hover:text-[#005B96]">
+                    {article.title}
+                  </span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {rest.length > 0 ? (
+        <ul className="mt-3 divide-y divide-slate-100 border-t border-slate-100">
+          {rest.map((article) => (
+            <li key={article.id}>
+              <Link href={`/article/${article.slug}`} className="flex items-center gap-2.5 py-2 hover:bg-slate-50">
+                <ArticleThumb article={article} className="h-12 w-16 shrink-0" sizes="64px" />
+                <span className="min-w-0 flex-1 text-sm font-medium leading-snug text-[#021d33] hover:text-[#005B96]">
+                  {article.title}
+                </span>
+                <span className="hidden shrink-0 text-[10px] uppercase tracking-wide text-slate-400 sm:inline">
+                  {resolveWriterAgent(article)?.label ?? article.categories?.name ?? ""}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </>
+  );
+}
+
+export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
   return (
     <div className="border-b border-slate-200 bg-[#e8eef3]">
       <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5">
@@ -100,66 +221,11 @@ export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
           </ul>
         </nav>
 
+        <WriterAgentsStrip />
+
         <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
           <Box title="Zpravodajství" href="/articles">
-            <div className="mb-3 flex flex-wrap gap-1.5">
-              {PORTAL_NEWS_TABS.map((tab) => (
-                <Link
-                  key={tab.href}
-                  href={tab.href}
-                  className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-700 hover:bg-[#e8f3fb] hover:text-[#005B96]"
-                >
-                  {tab.label}
-                </Link>
-              ))}
-            </div>
-            {featured ? (
-              <article className="border-b border-slate-100 pb-3">
-                <Link href={`/article/${featured.slug}`} className="group grid gap-3 sm:grid-cols-[200px_minmax(0,1fr)]">
-                  {featured.cover_image_url ? (
-                    <div className="relative h-32 overflow-hidden rounded-md bg-slate-100 sm:h-full">
-                      <Image
-                        src={featured.cover_image_url}
-                        alt=""
-                        fill
-                        className="object-cover"
-                        sizes="200px"
-                      />
-                    </div>
-                  ) : null}
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-wide text-[#005B96]">
-                      {featured.categories?.name ?? "Magazín"}
-                    </p>
-                    <h3 className="mt-1 font-display text-lg font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
-                      {featured.title}
-                    </h3>
-                    {featured.excerpt ? (
-                      <p className="mt-1 line-clamp-3 text-sm text-slate-600">{featured.excerpt}</p>
-                    ) : null}
-                  </div>
-                </Link>
-              </article>
-            ) : (
-              <p className="text-sm text-slate-500">Redakční články se načtou, jakmile je databáze k dispozici.</p>
-            )}
-            <ul className="divide-y divide-slate-100">
-              {rest.map((article) => (
-                <li key={article.id}>
-                  <Link
-                    href={`/article/${article.slug}`}
-                    className="flex items-start justify-between gap-3 py-2.5 hover:bg-slate-50"
-                  >
-                    <span className="text-sm font-medium leading-snug text-[#021d33] hover:text-[#005B96]">
-                      {article.title}
-                    </span>
-                    <span className="shrink-0 pt-0.5 text-[10px] uppercase tracking-wide text-slate-400">
-                      {article.categories?.name ?? ""}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <PortalNewsFeed articles={articles} />
           </Box>
 
           <div className="space-y-3">

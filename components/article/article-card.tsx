@@ -6,6 +6,8 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { assignEditorialUnits, formatEditorialUnitDisplay } from "@/lib/editorial/units";
+import { resolveWriterAgent } from "@/lib/editorial/writer-agents";
+import { WriterAgentByline } from "@/components/editorial/writer-agent-byline";
 import type { ArticleWithRelations } from "@/types/database";
 
 export function ArticleCard({ article }: { article: DisplayArticle | ArticleWithRelations }) {
@@ -100,7 +102,11 @@ export function ArticleCard({ article }: { article: DisplayArticle | ArticleWith
         </CardContent>
       </Link>
       <CardFooter className="flex items-center justify-between border-t border-slate-100 bg-slate-50/90 px-5 py-3 text-xs text-muted-foreground">
-        <span className="font-medium text-slate-700 line-clamp-1">{authorLabel}</span>
+        {resolveWriterAgent(article) ? (
+          <WriterAgentByline article={article} size={28} />
+        ) : (
+          <span className="font-medium text-slate-700 line-clamp-1">{authorLabel}</span>
+        )}
         {date && (
           <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 font-medium text-slate-500">
             <Calendar className="h-3.5 w-3.5" />

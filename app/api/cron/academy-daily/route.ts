@@ -57,3 +57,5 @@ export async function GET(request: Request) {
     generatedAt: new Date().toISOString(),
   });
 }
+
+export const POST = GET;

@@ -14,6 +14,8 @@ import { ArticleCard } from "@/components/article/article-card";
 import { AdSlot } from "@/components/ads/ad-slot";
 import { VipBadge } from "@/components/vip/vip-badge";
 import { EditorialAttribution } from "@/components/article/editorial-attribution";
+import { WriterAgentMark } from "@/components/editorial/writer-agent-mark";
+import { resolveWriterAgent, resolveWritingStyle } from "@/lib/editorial/writer-agents";
 import { EditorialFooter } from "@/components/article/editorial-footer";
 import {
   assignEditorialUnits,
@@ -152,6 +154,8 @@ export default async function ArticlePage({ params }: Props) {
   const category = article.categories;
   const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
   const editorialAssignment = assignEditorialUnits(article);
+  const writerAgent = resolveWriterAgent(article);
+  const writingStyle = resolveWritingStyle(article);
 
   const isV19Article = article.rubric_slug === V19_RUBRIC_SLUG;
   const v19Quiz = (article.quiz_json ?? {}) as Record<string, unknown>;
@@ -255,11 +259,21 @@ export default async function ArticlePage({ params }: Props) {
 
             <div className="mt-6 flex flex-wrap items-center gap-4 border-y py-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                  MS
-                </div>
+                {writerAgent ? (
+                  <WriterAgentMark agent={writerAgent} size={40} />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                    MS
+                  </div>
+                )}
                 <div>
                   <EditorialAttribution article={article} locale={editorialLocale} />
+                  {writerAgent ? (
+                    <p className="text-xs text-slate-500">
+                      Redakční agent: {writerAgent.label}
+                      {writingStyle ? ` · styl ${writingStyle.label}` : ""}
+                    </p>
+                  ) : null}
                   <p>
                     {article.published_at &&
                       new Date(article.published_at).toLocaleDateString(

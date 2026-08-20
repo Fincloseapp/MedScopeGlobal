@@ -6,6 +6,8 @@ import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { articleTopicLabel, verejnostDateLabel } from "@/lib/verejnost/helpers";
+import { resolveWriterAgent } from "@/lib/editorial/writer-agents";
+import { WriterAgentMark } from "@/components/editorial/writer-agent-mark";
 import { cn } from "@/lib/utils";
 
 export function VerejnostArticleExpandable({
@@ -19,6 +21,7 @@ export function VerejnostArticleExpandable({
   const dateLabel = verejnostDateLabel(article);
   const topicLabel = articleTopicLabel(article);
   const isInterview = article.public_topic === "rozhovory";
+  const agent = resolveWriterAgent(article);
 
   const toggle = () => setOpen((v) => !v);
 
@@ -37,6 +40,11 @@ export function VerejnostArticleExpandable({
       >
         <div className="relative aspect-[16/10] bg-slate-100">
           <Image src={coverUrl} alt="" fill className="object-cover" sizes="50vw" loading="lazy" />
+          {agent ? (
+            <span className="absolute left-3 top-3">
+              <WriterAgentMark agent={agent} size={32} />
+            </span>
+          ) : null}
           {isInterview ? (
             <span className="absolute bottom-3 left-3 rounded-full bg-[#021d33]/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
               Rozhovor

@@ -12,3 +12,5 @@ export async function GET(request: Request) {
   const result = await runImagesFetch({ maxGenerate: 32 });
   return NextResponse.json(result);
 }
+
+export const POST = GET;

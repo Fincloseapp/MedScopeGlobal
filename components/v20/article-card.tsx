@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { Calendar, User } from "lucide-react";
 import { V20ArticleCover } from "@/components/v20/article-cover";
+import { WriterAgentByline } from "@/components/editorial/writer-agent-byline";
 import { enrichArticleMeta } from "@/lib/v20/content-rules";
 import { assignEditorialUnits, formatEditorialUnitDisplay } from "@/lib/editorial/units";
+import { resolveWriterAgent } from "@/lib/editorial/writer-agents";
 import type { ArticleWithRelations } from "@/types/database";
 
 export function V20ArticleCard({ article }: { article: ArticleWithRelations }) {
@@ -45,10 +47,14 @@ export function V20ArticleCard({ article }: { article: ArticleWithRelations }) {
         </div>
       </Link>
       <footer className="flex items-center justify-between gap-2 border-t border-slate-100 px-4 py-3 text-xs text-slate-500 sm:px-5">
-        <span className="inline-flex min-w-0 items-center gap-1.5 truncate font-medium text-slate-700">
-          <User className="h-3.5 w-3.5 shrink-0" aria-hidden />
-          {authorLabel}
-        </span>
+        {resolveWriterAgent(article) ? (
+          <WriterAgentByline article={article} size={28} />
+        ) : (
+          <span className="inline-flex min-w-0 items-center gap-1.5 truncate font-medium text-slate-700">
+            <User className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            {authorLabel}
+          </span>
+        )}
         {date && (
           <time className="inline-flex shrink-0 items-center gap-1" dateTime={article.published_at!}>
             <Calendar className="h-3.5 w-3.5" aria-hidden />

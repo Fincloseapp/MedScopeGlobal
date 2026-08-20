@@ -6,11 +6,15 @@ import { join, resolve } from "node:path";
 
 export const isVercel = process.env.VERCEL === "1";
 
+export const isCloudflareWorkers = process.env.MEDSCOPE_RUNTIME === "cloudflare-workers";
+
+export const isServerlessRuntime = isVercel || isCloudflareWorkers;
+
 const isCI = process.env.GITHUB_ACTIONS === "true";
 
 const isWin = process.platform === "win32";
 
-const isLocalDev = !isVercel && !isCI;
+const isLocalDev = !isServerlessRuntime && !isCI;
 
 
 
@@ -84,7 +88,7 @@ export const MEDSCOPE_PROJECT_ROOT =
 
   process.env.MEDSCOPE_PROJECT_ROOT ??
 
-  (isVercel || isCI ? process.cwd() : "D:\\medscope.local");
+  (isServerlessRuntime || isCI ? process.cwd() : "D:\\medscope.local");
 
 
 
@@ -94,7 +98,7 @@ export const MEDSCOPE_DATA_ROOT =
 
   process.env.MEDSCOPE_DATA_ROOT ??
 
-  (isVercel ? "/tmp/medscope.data" : "D:\\medscope.data");
+  (isServerlessRuntime ? "/tmp/medscope.data" : "D:\\medscope.data");
 
 
 
@@ -104,7 +108,7 @@ export const MEDSCOPE_LOGS_ROOT =
 
   process.env.MEDSCOPE_LOGS_ROOT ??
 
-  (isVercel ? "/tmp/medscope.logs" : "D:\\medscope.logs");
+  (isServerlessRuntime ? "/tmp/medscope.logs" : "D:\\medscope.logs");
 
 
 

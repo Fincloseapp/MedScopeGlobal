@@ -56,5 +56,9 @@ export const PORTAL_NEWS_TABS = [
   { label: "Studie", href: "/studie" },
   { label: "Léky", href: "/leky" },
   { label: "Novinky", href: "/novinky" },
+  { label: "Veřejnost", href: "/verejnost/clanky" },
   { label: "Vše", href: "/articles" },
 ] as const;
+
+export const PORTAL_NEWS_NOTE =
+  "Celý magazín — denní crony doplňují články i obálky, marketingové bloky se aktualizují zvlášť.";

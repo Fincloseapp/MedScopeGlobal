@@ -3,6 +3,7 @@ import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
 import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rules";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
+import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import type { AdRow } from "@/types/database";
 
@@ -48,7 +49,7 @@ async function loadArticlesPublic(): Promise<DisplayArticle[]> {
     .select(articleSelect)
     .eq("published", true)
     .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(24);
+    .limit(48);
 
   if (error) {
     console.error("loadArticlesPublic", error);
@@ -60,9 +61,12 @@ async function loadArticlesPublic(): Promise<DisplayArticle[]> {
   const publicOnly = active.filter((a) => !a.vip_only);
   const prepared = await prepareArticlesForDisplay(publicOnly, "cs", {
     mode: "card",
-    maxTranslate: 6,
+    maxTranslate: 12,
   });
-  return prepared.slice(0, 6);
+  return prepared.map((article) => ({
+    ...article,
+    cover_image_url: resolveVerejnostCoverUrl(article),
+  }));
 }
 
 async function loadHomepageData(): Promise<{
@@ -82,6 +86,6 @@ async function loadHomepageData(): Promise<{
 
 export const getHomepageCachedData = unstable_cache(
   loadHomepageData,
-  ["v22-homepage-public"],
-  { revalidate: 120, tags: ["medscope-ui-v22.4", "v22-content"] }
+  ["v22-homepage-public-v3"],
+  { revalidate: 120, tags: ["medscope-ui-v22.4", "v22-content", "portal-articles"] }
 );
