@@ -5,7 +5,7 @@ import type { DisplayArticle } from "@/lib/queries/articles";
 import { APP_PRODUCTS } from "@/lib/apps/catalog";
 import { V271_AUDIENCES, V271_SOCIAL_PROOF_STATS } from "@/lib/v271/homepage";
 import {
-  PORTAL_NEWS_NOTE,
+  getPortalNewsNote,
   PORTAL_NEWS_TABS,
   PORTAL_PHILOSOPHY,
   PORTAL_SERVICES,
@@ -108,7 +108,7 @@ function PortalNewsFeed({ articles }: { articles: DisplayArticle[] }) {
           </Link>
         ))}
       </div>
-      <p className="mb-3 text-[11px] text-slate-500">{PORTAL_NEWS_NOTE}</p>
+      <p className="mb-3 text-[11px] leading-relaxed text-slate-500">{getPortalNewsNote()}</p>
       {featured ? (
         <article className="border-b border-slate-100 pb-3">
           <Link href={`/article/${featured.slug}`} className="group grid gap-3 sm:grid-cols-[220px_minmax(0,1fr)]">

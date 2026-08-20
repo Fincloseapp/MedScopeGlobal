@@ -60,5 +60,4 @@ export const PORTAL_NEWS_TABS = [
   { label: "Vše", href: "/articles" },
 ] as const;
 
-export const PORTAL_NEWS_NOTE =
-  "Celý magazín — denní crony doplňují články i obálky, marketingové bloky se aktualizují zvlášť.";
+export { getPortalTodayNote as getPortalNewsNote } from "@/lib/calendar/czech-today";

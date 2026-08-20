@@ -6,7 +6,7 @@
 const base = (process.env.SMOKE_BASE_URL || "https://medscopeglobal.com").replace(/\/$/, "");
 
 const pages = [
-  { path: "/", must: ["MeDipacient", "MeDiprep", "MeDiktor", "Zpravodajství", "Redakční agenti", "medscopeglobal.com"] },
+  { path: "/", must: ["MeDipacient", "MeDiprep", "MeDiktor", "Zpravodajství", "Redakční agenti", "medscopeglobal.com", "svátek"], mustNot: ["denní crony", "marketingové bloky"] },
   { path: "/articles", must: ["Články", "Magazín"] },
   { path: "/verejnost/clanky", mustNot: ["se brzy objeví"] },
   { path: "/verejnost/clanky?topic=zivotni-styl", must: ["Životní styl"], mustNot: ["zatím nejsou publikované"] },
