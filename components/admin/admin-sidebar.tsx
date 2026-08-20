@@ -7,7 +7,7 @@ import { ADMIN_NAV_ITEMS } from "@/components/admin/admin-nav-config";
 import { cn } from "@/lib/utils";
 
 export function AdminSidebar() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
 
   return (
     <aside className="hidden w-64 shrink-0 border-r bg-white lg:block">

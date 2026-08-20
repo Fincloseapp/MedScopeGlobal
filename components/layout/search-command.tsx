@@ -44,6 +44,11 @@ export function SearchCommand({
     }
     setLoading(true);
     const supabase = createClient();
+    if (!supabase) {
+      setLoading(false);
+      setResults([]);
+      return;
+    }
     const rows = await mergedArticleSearch(supabase, term, 12, isVip, accessLevel);
     setLoading(false);
     setResults(rows);

@@ -121,6 +121,12 @@ export default function LoginPage() {
 
 
 
+    if (!supabase) {
+      setLoading(false);
+      setMessage("Přihlášení teď není dostupné.");
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
 
       email,
@@ -157,6 +163,12 @@ export default function LoginPage() {
 
     setMessage(null);
 
+    if (!supabase) {
+      setLoading(false);
+      setMessage("Přihlášení teď není dostupné.");
+      return;
+    }
+
     const origin = window.location.origin;
 
     const { error } = await supabase.auth.signInWithOtp({
@@ -190,6 +202,12 @@ export default function LoginPage() {
   async function onGoogle() {
 
     setLoading(true);
+
+    if (!supabase) {
+      setLoading(false);
+      setMessage("Přihlášení teď není dostupné.");
+      return;
+    }
 
     const origin = window.location.origin;
 

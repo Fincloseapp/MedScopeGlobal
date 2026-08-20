@@ -30,13 +30,17 @@ export function AdSlot({ ads }: { ads: AdRow[] }) {
             className="group block overflow-hidden rounded-[26px] border border-slate-200 bg-white shadow-[0_16px_40px_-30px_rgba(2,30,57,0.7)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_22px_60px_-32px_rgba(0,91,150,0.72)]"
           >
             <div className="relative aspect-[4/3] w-full bg-slate-100">
-              <Image
-                src={ad.image_url}
-                alt={ad.title}
-                fill
-                className="object-cover transition duration-300 group-hover:scale-[1.03]"
-                sizes="320px"
-              />
+              {ad.image_url ? (
+                <Image
+                  src={ad.image_url}
+                  alt={ad.title}
+                  fill
+                  className="object-cover transition duration-300 group-hover:scale-[1.03]"
+                  sizes="320px"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-[#021d33] to-[#005B96]" />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/15 to-transparent" />
               <div className="absolute bottom-3 left-3 right-3">
                 <p className="rounded-full bg-white/15 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.24em] text-white/80 backdrop-blur">

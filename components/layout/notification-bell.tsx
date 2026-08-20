@@ -17,6 +17,7 @@ export function NotificationBell() {
   const [items, setItems] = useState<NotificationRow[]>([]);
 
   const refresh = useCallback(async () => {
+    if (!supabase) return;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -37,6 +38,7 @@ export function NotificationBell() {
   const unread = items.filter((n) => !n.read).length;
 
   async function markRead(id: string) {
+    if (!supabase) return;
     await supabase.from("notifications").update({ read: true }).eq("id", id);
     await refresh();
   }

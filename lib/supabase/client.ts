@@ -2,14 +2,15 @@
 
 import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getPublicEnv } from "@/lib/env";
+import { tryGetPublicEnv } from "@/lib/env";
 
 let browserClient: SupabaseClient | undefined;
 
-export function createClient() {
-  if (!browserClient) {
-    const { url, anonKey } = getPublicEnv();
-    browserClient = createBrowserClient(url, anonKey);
-  }
+/** Browser Supabase client. Returns null when public keys are missing — never throw in the magazine shell. */
+export function createClient(): SupabaseClient | null {
+  if (browserClient) return browserClient;
+  const env = tryGetPublicEnv();
+  if (!env) return null;
+  browserClient = createBrowserClient(env.url, env.anonKey);
   return browserClient;
 }

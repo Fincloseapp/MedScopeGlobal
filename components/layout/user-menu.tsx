@@ -43,9 +43,12 @@ export function UserMenu({ user, profile }: Props) {
     user.email?.slice(0, 2).toUpperCase() ||
     "MS";
 
-  const supabase = createClient();
-
   async function signOut() {
+    const supabase = createClient();
+    if (!supabase) {
+      window.location.href = "/";
+      return;
+    }
     await supabase.auth.signOut();
     window.location.href = "/";
   }

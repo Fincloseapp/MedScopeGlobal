@@ -24,7 +24,7 @@ export function V20MobileNav({
   mainMenu: NavItem[];
   categories: Category[];
 }) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
 
