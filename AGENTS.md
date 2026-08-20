@@ -44,6 +44,8 @@ Cloudflare Workers via OpenNext; the source of truth for data is **Supabase** (P
   `fixed` bottom bar. The prep layout must stay a single `h-[100dvh]` flex column with
   `AppOriginBar` + `flex-1` children — nested `h-[100dvh]` under the origin bar clips chrome.
   Homepage/portal `AppOpenLink` opens apps in the same tab (not `target=_blank`).
+  Service worker `sw-mediprep.js` must not cache-first `/_next/*` (stale JS hides chrome);
+  bump `CACHE_NAME` when changing shell markup.
 - **MeDipacient** patient-report PWA at `/app/pacient` renders a client demo dashboard similarly.
 - **PWA install:** Chromium only fires `beforeinstallprompt` on pages inside manifest `scope`
   (`/app/priprava` for MeDiprep). The **Stáhnout** button on marketing/download pages redirects
