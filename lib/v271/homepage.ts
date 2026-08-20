@@ -2,10 +2,10 @@
 import { V27_SUBSCRIPTION_PLANS } from "@/lib/v27/config";
 
 export const V271_HERO = {
-  eyebrow: "MedScopeGlobal.com · tři aplikace",
-  claim: "Zprávy, přijímačky a zápisy — na ploše telefonu",
+  eyebrow: "MedScopeGlobal.com",
+  claim: "Zdravotnictví na jednom místě",
   subtitle:
-    "MeDipacient pro veřejnost, MeDiprep pro uchazeče o LF a MeDiktor pro ověřené lékaře. Stejné stažení jako u MeDiktoru. 14 dní zdarma.",
+    "Hledejte, otevřete aplikaci, čtěte zprávy. MeDipacient, MeDiprep a MeDiktor vedle redakce — bez extra záložek.",
 } as const;
 
 export const V271_HERO_CTAS = [
