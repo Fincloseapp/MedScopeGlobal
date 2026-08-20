@@ -2,7 +2,7 @@ import { unstable_cache } from "next/cache";
 import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
 import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rules";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import type { AdRow } from "@/types/database";
 
@@ -23,7 +23,8 @@ function isWithinSchedule(row: AdRow): boolean {
 }
 
 async function loadAds(placement: string, limit: number): Promise<AdRow[]> {
-  const supabase = createServiceRoleClient();
+  const supabase = tryCreateServiceRoleClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("ads")
     .select("*")
@@ -40,7 +41,8 @@ async function loadAds(placement: string, limit: number): Promise<AdRow[]> {
 }
 
 async function loadArticlesPublic(): Promise<DisplayArticle[]> {
-  const supabase = createServiceRoleClient();
+  const supabase = tryCreateServiceRoleClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
