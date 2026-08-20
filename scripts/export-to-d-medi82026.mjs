@@ -107,6 +107,11 @@ if (rsync.status !== 0) {
 mkdirSync(join(dest, "data"), { recursive: true });
 mkdirSync(join(dest, "logs"), { recursive: true });
 
+for (const nested of ["D:\\medscope.local", "D:\\medscope.logs", "D:\\Medi82026"]) {
+  const nestedPath = join(dest, nested);
+  if (existsSync(nestedPath)) rmSync(nestedPath, { recursive: true, force: true });
+}
+
 const copiedEnv = [
   ".env.example",
   ".env.production.local.example",
