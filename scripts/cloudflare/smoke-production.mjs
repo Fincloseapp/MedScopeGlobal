@@ -8,6 +8,8 @@ const base = (process.env.SMOKE_BASE_URL || "https://medscopeglobal.com").replac
 const pages = [
   { path: "/", must: ["MeDipacient", "MeDiprep", "MeDiktor", "Zpravodajství", "Redakční agenti", "medscopeglobal.com"] },
   { path: "/articles", must: ["Články", "Magazín"] },
+  { path: "/verejnost/clanky", mustNot: ["se brzy objeví"] },
+  { path: "/verejnost/clanky?topic=zivotni-styl", must: ["Životní styl"], mustNot: ["zatím nejsou publikované"] },
   { path: "/ai-asistent/verejnost", must: ["AI", "assistant-brunette"] },
   { path: "/aplikace", must: ["MeDipacient", "MeDiprep", "MeDiktor", "14 dní"] },
   { path: "/medipacient", must: ["MeDipacient"] },
@@ -72,14 +74,33 @@ for (const page of pages) {
     const text = await res.text();
     console.log(`${res.status} ${url}`);
     if (res.status >= 400) fail(`${url} status ${res.status}`);
-    for (const needle of page.must) {
+    for (const needle of page.must ?? []) {
       if (!text.toLowerCase().includes(needle.toLowerCase())) {
         fail(`${url} missing “${needle}”`);
+      }
+    }
+    for (const needle of page.mustNot ?? []) {
+      if (text.toLowerCase().includes(needle.toLowerCase())) {
+        fail(`${url} unexpectedly contains “${needle}”`);
       }
     }
   } catch (e) {
     fail(`${page.path}: ${e instanceof Error ? e.message : e}`);
   }
+}
+
+try {
+  const home = await (await get("/")).res.text();
+  const m = home.match(/href="\/article\/([^"]+)"/);
+  if (!m) fail("homepage missing article links");
+  else {
+    const { url, res } = await get(`/article/${m[1]}`);
+    console.log(`${res.status} ${url}`);
+    if (res.status >= 400) fail(`${url} status ${res.status}`);
+    else ok(`article ${m[1].slice(0, 48)}`);
+  }
+} catch (e) {
+  fail(`article detail: ${e instanceof Error ? e.message : e}`);
 }
 
 for (const path of assets) {

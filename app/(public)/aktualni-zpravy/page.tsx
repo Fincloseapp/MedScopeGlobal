@@ -4,6 +4,7 @@ import { V20ArticleCard } from "@/components/v20/article-card";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getArticlesByMetadataSection } from "@/lib/queries/articles";
+import { getHomepageCachedData } from "@/lib/v22/homepage-cache";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { V27_EDITORIAL_COPY_LABEL } from "@/lib/v27/version";
 
@@ -22,13 +23,14 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AktualniZpravyPage() {
   const locale = "cs" as const;
   const { isVip, accessLevel } = await getReaderContext();
-  const articles = await getArticlesByMetadataSection(
+  const tagged = await getArticlesByMetadataSection(
     SECTION_SLUG,
     48,
     isVip,
     accessLevel,
     locale
   );
+  const articles = tagged.length ? tagged : (await getHomepageCachedData()).articles;
 
   return (
     <ModulePageShell

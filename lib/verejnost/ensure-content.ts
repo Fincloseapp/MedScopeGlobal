@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { getPublishedReadClient } from "@/lib/supabase/published-read";
 import { seedPublicArticlesIfEmpty } from "@/lib/verejnost/seed-public-articles";
 
 let ensureDateKey: string | null = null;
@@ -9,11 +9,11 @@ function todayKey() {
 }
 
 export async function countPublicArticles(): Promise<number> {
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return 0;
   const { count, error } = await supabase
     .from("articles")
     .select("id", { count: "exact", head: true })
-    .eq("audience", "public")
     .eq("published", true);
 
   if (error) {
@@ -24,13 +24,13 @@ export async function countPublicArticles(): Promise<number> {
 }
 
 export async function countPublicArticlesToday(): Promise<number> {
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return 0;
   const start = `${todayKey()}T00:00:00.000Z`;
   const end = `${todayKey()}T23:59:59.999Z`;
   const { count, error } = await supabase
     .from("articles")
     .select("id", { count: "exact", head: true })
-    .eq("audience", "public")
     .eq("published", true)
     .gte("published_at", start)
     .lte("published_at", end);

@@ -106,6 +106,25 @@ export function resolveBackendTopic(slug: string | undefined): PublicTopic | nul
   return hub?.backendTopic ?? null;
 }
 
+export function hubTopicKeywords(slug: string | undefined | null): RegExp | null {
+  switch (slug) {
+    case "vyziva":
+      return /výživ|vyziv|jíd|jidlo|talíř|talir|bílkovin|bilkovin|strav|diet|zelenin|hydrat|pitn/i;
+    case "spanek":
+      return /spánk|spanek|insomn|regenerac|unaven/i;
+    case "stres":
+      return /stres|dechov|imunit|odolnost|klid|úzkost|uzkost/i;
+    case "ergonomie":
+      return /ergon|počítač|pocitac|sedav|záda|zada|držení|drzeni|kancelář|kancelar/i;
+    case "dlouhovekost":
+      return /dlouhověk|dlouhovek|healthspan|longevity|stárnut|starnut|biomarker/i;
+    case "symptomy":
+      return /symptom|příznak|priznak|bolest|horeč|horec/i;
+    default:
+      return null;
+  }
+}
+
 export function topicLabelForSlug(slug: string | null | undefined): string {
   if (!slug) return "Veřejné zdraví";
   const hub = VEREJNOST_HUB_TOPICS.find((t) => t.slug === slug);

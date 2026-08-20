@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { getPublishedReadClient } from "@/lib/supabase/published-read";
 
 export type UniversityNewsRow = {
   id: string;
@@ -16,8 +16,21 @@ export type UniversityNewsRow = {
   created_at: string;
 };
 
+const PLACEHOLDER_TITLE = /^(?:\d\.\s*)?LF\s*(?:UK|MU|HK|OL|PL)\s*[—\-–:]?\s*výzkumná novinka\s*$/i;
+const EMPTY_SUMMARY = /^(?:není k dispozici|n\/a|-)?\s*$/i;
+
+function isUsableUniversityNews(row: UniversityNewsRow): boolean {
+  const title = (row.title ?? "").trim();
+  const summary = (row.summary ?? row.body ?? "").trim();
+  if (title.length < 18) return false;
+  if (PLACEHOLDER_TITLE.test(title) && summary.length < 80) return false;
+  if (EMPTY_SUMMARY.test(summary) && PLACEHOLDER_TITLE.test(title)) return false;
+  return true;
+}
+
 export async function getUniversityNewsList(tag?: string) {
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return [];
   let q = supabase
     .from("university_news")
     .select("*")
@@ -30,11 +43,12 @@ export async function getUniversityNewsList(tag?: string) {
     console.error("getUniversityNewsList", error);
     return [];
   }
-  return (data ?? []) as UniversityNewsRow[];
+  return ((data ?? []) as UniversityNewsRow[]).filter(isUsableUniversityNews);
 }
 
 export async function getUniversityNewsBySlug(slug: string) {
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return null;
   const { data, error } = await supabase
     .from("university_news")
     .select("*")
