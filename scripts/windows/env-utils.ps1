@@ -29,7 +29,8 @@ function Test-EnvValueFilled {
   if ($null -eq $Value) { return $false }
   $t = $Value.Trim()
   if ($t -eq "") { return $false }
-  if ($t -match '^(your[-_]|from https?:)') { return $false }
+  if ($t -match 'your[-_]') { return $false }
+  if ($t -match '^from https?:') { return $false }
   if ($t -eq "generate-a-long-random-string") { return $false }
   if ($t -match '\[PASSWORD\]') { return $false }
   return $true

@@ -88,7 +88,7 @@ function envFilled(val) {
   if (val == null) return false;
   const v = String(val).trim();
   if (!v) return false;
-  if (/^your[-_]/i.test(v)) return false;
+  if (/your[-_]/i.test(v)) return false;
   if (/^from https?:/i.test(v)) return false;
   if (v === "generate-a-long-random-string") return false;
   if (v.includes("[PASSWORD]")) return false;
