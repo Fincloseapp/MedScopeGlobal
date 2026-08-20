@@ -18,6 +18,7 @@ import { mergedArticleSearch } from "@/utils/merged-article-search";
 import { sanitizeSearchInput } from "@/utils/search";
 
 import type { AccessLevelId } from "@/lib/config/access-levels";
+import { APP_PRODUCTS } from "@/lib/apps/catalog";
 
 export function SearchCommand({
   isVip = false,
@@ -59,23 +60,37 @@ export function SearchCommand({
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="hidden gap-2 md:flex">
           <Search className="h-4 w-4" />
-          Search
+          Hledat
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Search articles</DialogTitle>
+          <DialogTitle>Hledat na MedScopeGlobal</DialogTitle>
         </DialogHeader>
         <Input
           autoFocus
-          placeholder="Type at least two characters"
+          placeholder="Aplikace, články, témata…"
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
         <div className="max-h-72 space-y-2 overflow-auto">
-          {loading && (
-            <p className="text-sm text-muted-foreground">Searching…</p>
-          )}
+          {q.trim().length < 2 ? (
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[#005B96]">Aplikace</p>
+              {APP_PRODUCTS.map((app) => (
+                <Link
+                  key={app.id}
+                  href={app.appPath}
+                  className="block rounded-md border p-3 text-left transition hover:bg-muted"
+                  onClick={() => setOpen(false)}
+                >
+                  <p className="font-medium">{app.shortName}</p>
+                  <p className="text-sm text-muted-foreground">{app.tagline}</p>
+                </Link>
+              ))}
+            </div>
+          ) : null}
+          {loading && <p className="text-sm text-muted-foreground">Hledám…</p>}
           {!loading &&
             results.map((r) => (
               <Link
@@ -93,7 +108,7 @@ export function SearchCommand({
               </Link>
             ))}
           {!loading && q.trim().length >= 2 && results.length === 0 && (
-            <p className="text-sm text-muted-foreground">No matches yet.</p>
+            <p className="text-sm text-muted-foreground">Nic se nenašlo. Zkuste MeDipacient, MeDiprep nebo MeDiktor.</p>
           )}
         </div>
         <Button
@@ -104,7 +119,7 @@ export function SearchCommand({
             setOpen(false);
           }}
         >
-          Open full search
+          Otevřít plné hledání
         </Button>
       </DialogContent>
     </Dialog>

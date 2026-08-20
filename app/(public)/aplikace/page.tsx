@@ -3,7 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { AppDownloadPanel } from "@/components/apps/app-download-panel";
 import { DokumentaceDownloadPanel } from "@/components/lekari/dokumentace-download-panel";
-import { APP_PRODUCTS, appLockline } from "@/lib/apps/catalog";
+import { JsonLdScript } from "@/components/seo/json-ld-script";
+import { softwareApplicationJsonLd } from "@/lib/seo/json-ld";
+import { APP_PRODUCTS, appLockline, appSeoDescription } from "@/lib/apps/catalog";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -18,6 +20,18 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function AplikaceHubPage() {
   return (
     <div className="bg-[#f7fbfe]">
+      {APP_PRODUCTS.map((app) => (
+        <JsonLdScript
+          key={app.id}
+          data={softwareApplicationJsonLd({
+            name: app.shortName,
+            description: appSeoDescription(app),
+            url: app.marketingPath,
+            installUrl: app.downloadPath,
+            category: app.id === "mediprep" ? "EducationalApplication" : "HealthApplication",
+          })}
+        />
+      ))}
       <section className="border-b bg-[#021d33] text-white">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200">Aplikace MedScopeGlobal</p>

@@ -13,8 +13,8 @@ type Props = {
 
 /** v38 — compact subscribe pill in main navbar for non-VIP users */
 export function NavSubscribeCta({
-  label = "Předplatné",
-  href = "/predplatne",
+  label = "14 dní zdarma",
+  href = "/predplatne?trial=1",
   className,
   compact = false,
 }: Props) {

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { AppDownloadPanel } from "@/components/apps/app-download-panel";
+import { JsonLdScript } from "@/components/seo/json-ld-script";
+import { softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { MEDIPACIENT, appSeoDescription, appSeoTitle } from "@/lib/apps/catalog";
 import { MEDIPACIENT_DEMO_REPORTS } from "@/lib/medipacient/demo-reports";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
@@ -34,6 +36,14 @@ const STEPS = [
 export default function MedipacientMarketingPage() {
   return (
     <div className="bg-[#fafcff]">
+      <JsonLdScript
+        data={softwareApplicationJsonLd({
+          name: MEDIPACIENT.shortName,
+          description: appSeoDescription(MEDIPACIENT),
+          url: MEDIPACIENT.marketingPath,
+          installUrl: MEDIPACIENT.downloadPath,
+        })}
+      />
       <section className="border-b border-[#d9e8f4] bg-gradient-to-br from-[#021d33] via-[#0a3d6b] to-[#2D7FF9] text-white">
         <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 sm:py-20">
           <div className="flex items-center gap-4">

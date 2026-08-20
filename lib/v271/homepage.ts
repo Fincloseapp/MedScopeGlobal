@@ -2,18 +2,22 @@
 import { V27_SUBSCRIPTION_PLANS } from "@/lib/v27/config";
 
 export const V271_HERO = {
-  eyebrow: "Zdravotnické prostředí MedScopeGlobal.com",
-  claim: "Zdraví, vzdělávání a výzkum na jednom místě — pro veřejnost, studenty, lékaře i vědce",
+  eyebrow: "MedScopeGlobal.com · tři aplikace",
+  claim: "Zprávy, přijímačky a zápisy — na ploše telefonu",
   subtitle:
-    "Tři aplikace na ploše telefonu: MeDipacient (zprávy), MeDiprep (přijímačky) a MeDiktor (zápisy). Plus redakce, Academy a Research Hub. 14 dní zdarma.",
+    "MeDipacient pro veřejnost, MeDiprep pro uchazeče o LF a MeDiktor pro ověřené lékaře. Stejné stažení jako u MeDiktoru. 14 dní zdarma.",
 } as const;
 
 export const V271_HERO_CTAS = [
   { label: "Stáhnout aplikace", href: "/aplikace", primary: true },
-  { label: "Vyzkoušet 14 dní zdarma", href: "/predplatne?trial=1", primary: false },
-  { label: "MeDipacient", href: "/app/pacient", primary: false },
-  { label: "MeDiprep", href: "/app/priprava", primary: false },
-  { label: "MeDiktor", href: "/app/dokumentace", primary: false },
+  { label: "14 dní zdarma", href: "/predplatne?trial=1", primary: false },
+  { label: "Ukázkový dashboard", href: "/dashboard", primary: false },
+] as const;
+
+export const V271_HERO_APP_CHIPS = [
+  { label: "MeDipacient", href: "/app/pacient" },
+  { label: "MeDiprep", href: "/app/priprava" },
+  { label: "MeDiktor", href: "/app/dokumentace" },
 ] as const;
 
 export const V271_SOCIAL_PROOF_STATS = [
@@ -32,6 +36,12 @@ export const V271_TESTIMONIALS = [
   },
   {
     quote:
+      "Zkušební osu zpráv vidím hned — diagnózy, léky i otázky k lékaři. Pak dává smysl nahrát vlastní PDF.",
+    author: "Uživatelka MeDipacient",
+    role: "veřejnost · Praha",
+  },
+  {
+    quote:
       "Přijímačky jsem zvládla díky strukturovaným kvízům a shrnutím anatomie. Je to jako mít spolužáka, který už prošel šestým ročníkem.",
     author: "Studentka medicíny",
     role: "6. ročník lékařské fakulty (ČR)",
@@ -45,6 +55,11 @@ export const V271_TESTIMONIALS = [
 ] as const;
 
 export const V271_WHY_TRUST = [
+  {
+    title: "Tři aplikace, jedno prostředí",
+    description:
+      "MeDipacient, MeDiprep a MeDiktor stáhnete na plochu telefonu. Zkušební dashboardy ukazují, co umí, ještě před předplatným.",
+  },
   {
     title: "Evidence-based, ne clickbait",
     description:
@@ -77,7 +92,7 @@ export const V271_AUDIENCES = [
     id: "public",
     label: "Veřejnost",
     description:
-      "Prevence a životní styl bez sensace — srozumitelné články od odborníků, ne od influencerů.",
+      "MeDipacient složí lékařské zprávy do přehledu. K tomu prevence a životní styl bez sensace.",
     topics: ["MeDipacient", "prevence", "výživa", "spánek", "fitness", "ženské zdraví", "mužské zdraví"],
     href: "/verejnost",
     ctaPrimary: { label: "Stáhnout MeDipacient", href: "/app/pacient" },
@@ -87,7 +102,7 @@ export const V271_AUDIENCES = [
     id: "student",
     label: "Studenti",
     description:
-      "Anatomie, farmakologie, přijímačky a AI tutor — od prvního dne na LF po státnice.",
+      "MeDiprep ukáže mezery v B/C/F. K tomu Academy, AI tutor a materiály od přijímaček po státnice.",
     topics: ["MeDiprep", "anatomie", "farmakologie", "testy", "přijímačky", "AI tutor"],
     href: "/studenti",
     ctaPrimary: { label: "Stáhnout MeDiprep", href: "/app/priprava" },
@@ -97,7 +112,7 @@ export const V271_AUDIENCES = [
     id: "physician",
     label: "Lékaři",
     description:
-      "Guidelines, přehledy studií, Research Hub a klinický AI — pro rozhodování v ordinaci, ne v teoretické laboratoři.",
+      "MeDiktor napíše zápis z diktátu v telefonu. K tomu guidelines, studie a Research Hub.",
     topics: ["guidelines", "MeDiktor", "CME", "studie", "Research Hub"],
     href: "/lekari",
     ctaPrimary: { label: "Stáhnout MeDiktor", href: "/app/dokumentace" },
@@ -141,13 +156,13 @@ export const V271_AKTUALNI = {
 export const V271_SUBSCRIPTION_PLANS = V27_SUBSCRIPTION_PLANS;
 
 export const V271_FOOTER_TAGLINE =
-  "Prémiový zdravotnický magazín pro veřejnost, studenty medicíny, lékaře a zdravotníky — evidence-based obsah v češtině od roku 2024.";
+  "MeDipacient, MeDiprep a MeDiktor plus evidence-based obsah v češtině — pro veřejnost, studenty medicíny a lékaře.";
 
 /** Audience + proof points for footer „Důvěra a čísla“ */
 export const V271_FOOTER_TRUST = {
   audiences: [
-    { label: "Veřejnost — srozumitelná zdravotní osvěta", href: "/verejnost" },
-    { label: "Studenti medicíny — Academy a materiály", href: "/studenti" },
+    { label: "Veřejnost — MeDipacient a osvěta", href: "/verejnost" },
+    { label: "Studenti — MeDiprep a Academy", href: "/studenti" },
     { label: "Lékaři — MeDiktor a guidelines", href: "/lekari/dokumentace" },
     { label: "Zdravotníci a zdravotní profesionálové", href: "/odborna" },
   ],

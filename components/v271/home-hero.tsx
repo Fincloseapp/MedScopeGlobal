@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { V271_HERO, V271_HERO_CTAS, V271_SOCIAL_PROOF_STATS } from "@/lib/v271/homepage";
+import { V271_HERO, V271_HERO_CTAS, V271_HERO_APP_CHIPS, V271_SOCIAL_PROOF_STATS } from "@/lib/v271/homepage";
 import { V23_HERO_IMAGE } from "@/lib/v23/images";
 
 export function V271HomeHero() {
@@ -48,6 +48,19 @@ export function V271HomeHero() {
                 {cta.primary ? <ArrowRight className="ml-2 h-4 w-4" /> : null}
               </Link>
             </Button>
+          ))}
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-2">
+          {V271_HERO_APP_CHIPS.map((app) => (
+            <Link
+              key={app.href}
+              href={app.href}
+              prefetch
+              className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-semibold text-sky-100 hover:bg-white/20"
+            >
+              {app.label}
+            </Link>
           ))}
         </div>
 

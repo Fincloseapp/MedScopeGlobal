@@ -18,12 +18,29 @@ const STATIC_POOL: Record<ConversionSlot, ConversionCopy[]> = {
       slot: "nav_cta",
       eyebrow: "Pro váš zájem",
       headline: "MedScope Premium",
-      body: "Plný přístup k VIP článkům a Academy.",
-      ctaLabel: "Předplatné",
-      ctaHref: "/predplatne",
+      body: "Aplikace MeDipacient, MeDiprep a MeDiktor plus VIP články. 14 dní zdarma.",
+      ctaLabel: "14 dní zdarma",
+      ctaHref: "/predplatne?trial=1",
     },
   ],
   nav_strip: [
+    {
+      slot: "nav_strip",
+      eyebrow: "Pro váš zájem",
+      headline: "Tři aplikace na ploše telefonu",
+      body: "MeDipacient, MeDiprep a MeDiktor — zkušební dashboard hned, předplatné od 99 Kč. 14 dní zdarma.",
+      ctaLabel: "Stáhnout aplikace",
+      ctaHref: "/aplikace",
+      hint: "14 dní na vyzkoušení",
+    },
+    {
+      slot: "nav_strip",
+      eyebrow: "Doporučeno pro vás",
+      headline: "MeDipacient složí vaše lékařské zprávy",
+      body: "Zkušební osa diagnóz, léků a kontrol je otevřená. Vlastní PDF po přihlášení — tarif Veřejnost 99 Kč.",
+      ctaLabel: "Otevřít MeDipacient",
+      ctaHref: "/app/pacient",
+    },
     {
       slot: "nav_strip",
       eyebrow: "Pro váš zájem",
@@ -99,8 +116,49 @@ export function getStaticCopy(slot: ConversionSlot, seed = 0): ConversionCopy {
 
 /** Path-aware nav strip for student / academy prep surfaces. */
 export function getStudentiNavStripCopy(seed = 0): ConversionCopy {
-  const pool = STATIC_POOL.nav_strip;
-  return pool[Math.abs(seed) % pool.length] ?? pool[0]!;
+  const student: ConversionCopy[] = [
+    {
+      slot: "nav_strip",
+      eyebrow: "Pro váš zájem",
+      headline: "Pokračujte v přípravě s MeDiprep",
+      body: "První test zdarma, pak simulace 8 českých LF. Student 149 Kč · 14 dní zdarma.",
+      ctaLabel: "Otevřít MeDiprep",
+      ctaHref: "/app/priprava",
+      hint: "14 dní na vyzkoušení",
+    },
+    {
+      slot: "nav_strip",
+      eyebrow: "Doporučeno pro vás",
+      headline: "Pokračujte v přípravě na medicínu",
+      body: "Přípravné kurzy, self-test a AI tutor — studentské předplatné od 149 Kč/měsíc.",
+      ctaLabel: "14 dní zdarma",
+      ctaHref: "/predplatne?trial=1#student",
+    },
+  ];
+  return student[Math.abs(seed) % student.length] ?? student[0]!;
+}
+
+export function getVerejnostNavStripCopy(): ConversionCopy {
+  return {
+    slot: "nav_strip",
+    eyebrow: "Pro váš zájem",
+    headline: "MeDipacient: zprávy v telefonu",
+    body: "Zkušební časová osa je otevřená. Nahrání vlastních zpráv po přihlášení — 99 Kč/měsíc.",
+    ctaLabel: "Otevřít MeDipacient",
+    ctaHref: "/app/pacient",
+    hint: "Stažení na plochu jako MeDiktor",
+  };
+}
+
+export function getLekariNavStripCopy(): ConversionCopy {
+  return {
+    slot: "nav_strip",
+    eyebrow: "Pro ověřené lékaře",
+    headline: "MeDiktor napíše zápis z diktátu",
+    body: "Nahrávejte v mobilu. Stažení po ověření účtu. 390 Kč/měsíc · 14 dní zdarma.",
+    ctaLabel: "Stáhnout MeDiktor",
+    ctaHref: "/lekari/dokumentace",
+  };
 }
 
 export function isStudentAudiencePath(pathname: string | null | undefined): boolean {
@@ -111,7 +169,29 @@ export function isStudentAudiencePath(pathname: string | null | undefined): bool
     pathname.startsWith("/academy/") ||
     pathname.startsWith("/studium/") ||
     pathname.startsWith("/medicina/") ||
+    pathname.startsWith("/mediprep") ||
+    pathname.startsWith("/app/priprava") ||
     pathname.startsWith("/ai-asistent/student")
+  );
+}
+
+export function isPublicAudiencePath(pathname: string | null | undefined): boolean {
+  if (!pathname) return false;
+  return (
+    pathname === "/verejnost" ||
+    pathname.startsWith("/verejnost/") ||
+    pathname.startsWith("/medipacient") ||
+    pathname.startsWith("/app/pacient")
+  );
+}
+
+export function isPhysicianAudiencePath(pathname: string | null | undefined): boolean {
+  if (!pathname) return false;
+  return (
+    pathname === "/lekari" ||
+    pathname.startsWith("/lekari/") ||
+    pathname.startsWith("/odborna") ||
+    pathname.startsWith("/app/dokumentace")
   );
 }
 

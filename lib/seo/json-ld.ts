@@ -246,3 +246,30 @@ export function videoObjectJsonLd(video: {
     publisher: organizationJsonLd(),
   };
 }
+
+export function softwareApplicationJsonLd(app: {
+  name: string;
+  description: string;
+  url: string;
+  installUrl: string;
+  category?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: app.name,
+    applicationCategory: app.category ?? "HealthApplication",
+    operatingSystem: "Android, iOS, Windows, macOS, ChromeOS",
+    description: app.description,
+    url: `${SITE.url}${app.url}`,
+    installUrl: `${SITE.url}${app.installUrl}`,
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "CZK",
+      description: "Zkušební přístup; předplatné odemyká plné funkce",
+    },
+    inLanguage: "cs-CZ",
+    publisher: organizationJsonLd(),
+  };
+}

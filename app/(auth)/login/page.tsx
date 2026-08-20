@@ -4,7 +4,7 @@
 
 import Link from "next/link";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
 
@@ -59,6 +59,19 @@ export default function LoginPage() {
   const [message, setMessage] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
+
+  const [nextHint, setNextHint] = useState<string | null>(null);
+
+  useEffect(() => {
+    const next = new URLSearchParams(window.location.search).get("next") || "";
+    if (next.startsWith("/app/pacient")) {
+      setNextHint("Po přihlášení se vrátíte do MeDipacient — nahrávání vlastních zpráv.");
+    } else if (next.startsWith("/app/priprava")) {
+      setNextHint("Po přihlášení se vrátíte do MeDiprep — testy a simulace fakult.");
+    } else if (next.startsWith("/app/dokumentace")) {
+      setNextHint("Po přihlášení se vrátíte do MeDiktor — nahrávání zápisů.");
+    }
+  }, []);
 
 
 
@@ -217,6 +230,8 @@ export default function LoginPage() {
         <CardDescription>
 
           Přihlaste se e-mailem, magickým odkazem nebo účtem Google.
+
+          {nextHint ? ` ${nextHint}` : ""}
 
         </CardDescription>
 

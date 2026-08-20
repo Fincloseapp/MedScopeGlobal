@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Quote } from "lucide-react";
 import { V20ArticleCard } from "@/components/v20/article-card";
 import { V27CheckoutButton } from "@/components/v27/checkout-button";
@@ -17,9 +18,7 @@ import {
 import { subscriptionProductId } from "@/lib/v27/config";
 import { DokumentaceDownloadPanel } from "@/components/lekari/dokumentace-download-panel";
 import { MediktorLockup } from "@/components/lekari/mediktor-mark";
-import { MediktorPromoBanner } from "@/components/lekari/mediktor-promo-banner";
-import { AppDownloadPanel } from "@/components/apps/app-download-panel";
-import { MEDIPACIENT, MEDIPREP } from "@/lib/apps/catalog";
+import { APP_PRODUCTS } from "@/lib/apps/catalog";
 
 export function V272SocialProofBlock() {
   return (
@@ -30,7 +29,7 @@ export function V272SocialProofBlock() {
             Důvěřují nám
           </p>
           <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
-            Čtenáři z celé České republiky
+            Pacienti, studenti i lékaři v Česku
           </h2>
           <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-600">
             Studenti LF, lékaři v praxi i laici, kteří chtějí spolehlivé zdravotní informace — ne
@@ -50,7 +49,7 @@ export function V272SocialProofBlock() {
           ))}
         </dl>
 
-        <div className="mt-10 grid gap-5 lg:grid-cols-3">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-2">
           {V271_TESTIMONIALS.map((item) => (
             <figure
               key={item.author}
@@ -81,11 +80,10 @@ export function V272WhyTrustBlock() {
             Proč MedScopeGlobal
           </p>
           <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
-            Prémiový magazín, ne další zdravotní blog
+            Aplikace na mobilu, obsah když ho potřebujete
           </h2>
           <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-600">
-            Redakční standard, ověřené zdroje a obsah psaný pro českou medicínu — od přijímaček po
-            klinickou praxi.
+            Stažení na plochu, zkušební data v dashboardu a ověřené zdroje — od přijímaček po klinickou praxi.
           </p>
         </div>
 
@@ -417,15 +415,53 @@ export function V272AppsTrioBlock() {
             Aplikace MedScopeGlobal
           </p>
           <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
-            Stáhnout na mobil — stejně jednoduše jako MeDiktor
+            Vyberte aplikaci a stáhněte ji na plochu
           </h2>
           <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-600">
-            Chrome → Nainstalovat aplikaci. iPhone Safari → Sdílet → Přidat na plochu. Každá aplikace má přehledný
-            dashboard se zkušebními daty, ať vidíte maximum ještě před předplatným.
+            Chrome → Nainstalovat aplikaci. iPhone Safari → Sdílet → Přidat na plochu. Dashboardy už teď ukazují
+            zkušební data.
           </p>
         </div>
-        <AppDownloadPanel app={MEDIPACIENT} variant="homepage" extraCta={{ href: "/medipacient", label: "Jak to funguje" }} />
-        <AppDownloadPanel app={MEDIPREP} variant="homepage" extraCta={{ href: "/mediprep", label: "Jak to funguje" }} />
+        <div className="grid gap-4 md:grid-cols-3">
+          {APP_PRODUCTS.map((app) => (
+            <article
+              key={app.id}
+              className="flex flex-col rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-5 shadow-sm"
+            >
+              <Image
+                src={app.assets.icon192}
+                alt={app.shortName}
+                width={56}
+                height={56}
+                className="rounded-[22%]"
+              />
+              <h3 className="mt-3 font-display text-xl font-semibold text-[#021d33]">{app.shortName}</h3>
+              <p className="mt-1 flex-1 text-sm text-slate-600">{app.tagline}</p>
+              <p className="mt-2 text-xs text-[#005B96]">{app.priceNote}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Link
+                  href={app.appPath}
+                  className="rounded-full bg-[#005B96] px-4 py-2 text-sm font-semibold text-white hover:bg-[#004a7a]"
+                >
+                  Otevřít
+                </Link>
+                <Link
+                  href={app.downloadPath}
+                  className="rounded-full border border-[#005B96]/30 px-4 py-2 text-sm font-semibold text-[#005B96]"
+                >
+                  Stáhnout
+                </Link>
+              </div>
+            </article>
+          ))}
+        </div>
+        <p className="text-center text-sm text-slate-600">
+          Kompletní návod s QR kódem je na{" "}
+          <Link href="/aplikace" className="font-semibold text-[#005B96] hover:underline">
+            /aplikace
+          </Link>
+          .
+        </p>
         <V272DokumentaceAppBlock />
       </div>
     </section>
@@ -437,7 +473,6 @@ export async function V272HomepageSections() {
     <>
       <V272SocialProofBlock />
       <V272AppsTrioBlock />
-      <MediktorPromoBanner variant="homepage" />
       <V272WhyTrustBlock />
       <V271AudienceSections />
       <V272AcademyCtaBlock />

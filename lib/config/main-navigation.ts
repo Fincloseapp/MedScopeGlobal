@@ -391,6 +391,6 @@ export function getMobileMenu(locale: LocaleCode): NavItem[] {
 
 export function getHeaderTagline(locale: LocaleCode): string {
   return locale === "cs"
-    ? "Odborný medicínský magazín"
-    : "Medical intelligence";
+    ? "MeDipacient · MeDiprep · MeDiktor"
+    : "MeDipacient · MeDiprep · MeDiktor";
 }

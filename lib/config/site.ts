@@ -1,9 +1,9 @@
 /** MedScopeGlobal — central project configuration */
 export const SITE = {
   name: "MedScopeGlobal",
-  tagline: "Klinická inteligence a evidence-based medicína",
+  tagline: "MeDipacient · MeDiprep · MeDiktor",
   description:
-    "Český odborný medicínský magazín pro laiky, studenty medicíny, lékaře a výzkumníky — s citacemi, kurátorským obsahem a větví medicíny od přijímaček po 6. ročník LF.",
+    "MeDipacient, MeDiprep a MeDiktor na ploše telefonu. Evidence-based medicína v češtině pro veřejnost, studenty LF a lékaře. 14 dní zdarma.",
   domain: "medscopeglobal.com",
   url:
     process.env.NEXT_PUBLIC_SITE_URL ||

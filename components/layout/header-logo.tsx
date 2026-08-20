@@ -2,7 +2,7 @@ import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { cn } from "@/lib/utils";
 
-export const HEADER_TAGLINE = "Medical Intelligence Network";
+export const HEADER_TAGLINE = "MeDipacient · MeDiprep · MeDiktor";
 
 export const HEADER_LOGO_HEIGHT = { mobile: 56, tablet: 56, desktop: 70 } as const;
 

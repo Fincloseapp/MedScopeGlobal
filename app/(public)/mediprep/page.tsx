@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { AppDownloadPanel } from "@/components/apps/app-download-panel";
+import { JsonLdScript } from "@/components/seo/json-ld-script";
+import { softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { MEDIPREP, appSeoDescription, appSeoTitle } from "@/lib/apps/catalog";
 import { getPrepDashboard } from "@/lib/mediprep/dashboard";
 import { FACULTIES_ADMISSIONS_2026 } from "@/lib/prijimacky/faculties-admissions";
@@ -30,6 +32,15 @@ export default function MediprepMarketingPage() {
   ] as const;
   return (
     <div className="bg-[#F8F4EA]">
+      <JsonLdScript
+        data={softwareApplicationJsonLd({
+          name: MEDIPREP.shortName,
+          description: appSeoDescription(MEDIPREP),
+          url: MEDIPREP.marketingPath,
+          installUrl: MEDIPREP.downloadPath,
+          category: "EducationalApplication",
+        })}
+      />
       <section className="border-b border-[#e0d5c4] bg-[#0A192F] text-white">
         <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 sm:py-20">
           <div className="flex items-center gap-4">

@@ -385,6 +385,49 @@ export function PacientAppShell() {
             <Link href="/predplatne#public" className="block text-sm font-medium text-[#2D7FF9]">
               Předplatné Veřejnost od 99 Kč →
             </Link>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="rounded-full border border-[#2D7FF9]/30 bg-white px-4 py-2 text-sm font-medium text-[#2D7FF9]"
+                onClick={() => {
+                  void (async () => {
+                    const res = await fetch("/api/medipacient/export", { credentials: "same-origin" });
+                    if (!res.ok) {
+                      setFlash("Export se nepodařil.");
+                      return;
+                    }
+                    const blob = new Blob([JSON.stringify(await res.json(), null, 2)], {
+                      type: "application/json",
+                    });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "medipacient-prehled.json";
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    setFlash("Přehled je stažený jako JSON.");
+                  })();
+                }}
+              >
+                Stáhnout přehled (JSON)
+              </button>
+              <button
+                type="button"
+                className="rounded-full border border-[#2D7FF9]/30 bg-white px-4 py-2 text-sm font-medium text-[#2D7FF9]"
+                onClick={() => {
+                  void (async () => {
+                    const res = await fetch("/api/medipacient/reminders/notify", {
+                      method: "POST",
+                      credentials: "same-origin",
+                    });
+                    const json = (await res.json()) as { message?: string; error?: string };
+                    setFlash(json.message || json.error || "Připomínka uložena.");
+                  })();
+                }}
+              >
+                Připomínka kontroly
+              </button>
+            </div>
             <Link href={MEDIPACIENT.marketingPath} className="block text-sm text-slate-500">
               Jak MeDipacient funguje
             </Link>

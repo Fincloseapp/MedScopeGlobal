@@ -6,7 +6,8 @@ import { V271HomeHero } from "@/components/v271/home-hero";
 import { V272AcademyHomeSections } from "@/components/v271/academy-home-sections";
 import { V272HomepageSections } from "@/components/v271/homepage-sections";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
-import { medicalWebPageJsonLd, webSiteJsonLd } from "@/lib/seo/json-ld";
+import { medicalWebPageJsonLd, webSiteJsonLd, softwareApplicationJsonLd } from "@/lib/seo/json-ld";
+import { APP_PRODUCTS, appSeoDescription } from "@/lib/apps/catalog";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { getHomepageCachedData } from "@/lib/v22/homepage-cache";
 import { V271_HERO } from "@/lib/v271/homepage";
@@ -35,6 +36,18 @@ export default async function HomePage() {
     <div className="v271-home bg-background">
       <JsonLdScript data={webSiteJsonLd()} />
       <JsonLdScript data={homeLd} />
+      {APP_PRODUCTS.map((app) => (
+        <JsonLdScript
+          key={app.id}
+          data={softwareApplicationJsonLd({
+            name: app.shortName,
+            description: appSeoDescription(app),
+            url: app.marketingPath,
+            installUrl: app.downloadPath,
+            category: app.id === "mediprep" ? "EducationalApplication" : "HealthApplication",
+          })}
+        />
+      ))}
 
       <V271HomeHero />
       <V272HomepageSections />

@@ -11,7 +11,11 @@ import {
   daySeed,
   getStaticCopy,
   getStudentiNavStripCopy,
+  getVerejnostNavStripCopy,
+  getLekariNavStripCopy,
   isStudentAudiencePath,
+  isPublicAudiencePath,
+  isPhysicianAudiencePath,
 } from "@/lib/v38/conversion-copy";
 
 type ReaderPayload = {
@@ -44,10 +48,14 @@ export function SiteHeaderWithConversion({
 }: Props) {
   const pathname = usePathname();
   const studentPath = isStudentAudiencePath(pathname);
-  const studentStrip = useMemo(
-    () => ({ ...getStudentiNavStripCopy(daySeed()), generatedBy: "static" as const }),
-    []
-  );
+  const publicPath = isPublicAudiencePath(pathname);
+  const physicianPath = isPhysicianAudiencePath(pathname);
+  const audienceStrip = useMemo(() => {
+    if (studentPath) return { ...getStudentiNavStripCopy(daySeed()), generatedBy: "static" as const };
+    if (publicPath) return { ...getVerejnostNavStripCopy(), generatedBy: "static" as const };
+    if (physicianPath) return { ...getLekariNavStripCopy(), generatedBy: "static" as const };
+    return null;
+  }, [studentPath, publicPath, physicianPath]);
 
   const [reader, setReader] = useState<ReaderPayload>(DEFAULT_READER);
   const [stripCopy, setStripCopy] = useState<StoredNudge>(
@@ -63,7 +71,7 @@ export function SiteHeaderWithConversion({
       })
       .catch(() => {});
 
-    if (!studentPath && !navStripCopy) {
+    if (!audienceStrip && !navStripCopy) {
       fetch("/api/v38/conversion-copy?slot=nav_strip")
         .then((r) => (r.ok ? r.json() : null))
         .then((data: StoredNudge | null) => {
@@ -75,9 +83,9 @@ export function SiteHeaderWithConversion({
     return () => {
       cancelled = true;
     };
-  }, [navStripCopy, studentPath]);
+  }, [navStripCopy, audienceStrip]);
 
-  const effectiveStrip = studentPath ? studentStrip : stripCopy;
+  const effectiveStrip = audienceStrip ?? stripCopy;
 
   return (
     <>
@@ -93,7 +101,9 @@ export function SiteHeaderWithConversion({
       {!reader.isVip ? (
         <SubscriptionNudgeStrip
           copy={effectiveStrip}
-          ctaDataAttr={studentPath ? "nav-strip-student-trial" : "nav-strip-trial"}
+          ctaDataAttr={
+            studentPath ? "nav-strip-student-trial" : publicPath ? "nav-strip-public-app" : "nav-strip-trial"
+          }
         />
       ) : null}
     </>

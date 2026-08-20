@@ -13,18 +13,21 @@ export default function NotFound() {
         Stránka nebyla nalezena
       </h1>
       <p className="mt-3 max-w-md text-muted-foreground">
-        Požadovaná stránka na MedScopeGlobal neexistuje nebo byla přesunuta. Zkuste návrat na
-        úvodní stránku nebo prohledání obsahu.
+        Požadovaná stránka na MedScopeGlobal neexistuje nebo byla přesunuta. Otevřete aplikaci, předplatné nebo
+        úvodní stránku.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Button asChild className="rounded-full bg-[#005B96]">
           <Link href="/">Domů</Link>
         </Button>
         <Button asChild variant="outline" className="rounded-full">
-          <Link href="/articles">Články</Link>
+          <Link href="/aplikace">Aplikace</Link>
         </Button>
         <Button asChild variant="outline" className="rounded-full">
-          <Link href="/help">Nápověda</Link>
+          <Link href="/dashboard">Dashboard</Link>
+        </Button>
+        <Button asChild variant="outline" className="rounded-full">
+          <Link href="/predplatne?trial=1">14 dní zdarma</Link>
         </Button>
       </div>
     </div>

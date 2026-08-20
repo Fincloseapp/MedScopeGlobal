@@ -61,6 +61,32 @@ export function V20MobileNav({
         </SheetHeader>
 
         <nav className="mt-4 flex-1 space-y-2" aria-label="Mobilní navigace">
+          <div className="rounded-xl border border-[#005B96]/20 bg-[#f4f9fc] p-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">Aplikace</p>
+            <div className="mt-2 grid grid-cols-3 gap-1.5">
+              <Link
+                href="/app/pacient"
+                onClick={() => setOpen(false)}
+                className="rounded-lg bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#021d33]"
+              >
+                MeDipacient
+              </Link>
+              <Link
+                href="/app/priprava"
+                onClick={() => setOpen(false)}
+                className="rounded-lg bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#021d33]"
+              >
+                MeDiprep
+              </Link>
+              <Link
+                href="/app/dokumentace"
+                onClick={() => setOpen(false)}
+                className="rounded-lg bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#021d33]"
+              >
+                MeDiktor
+              </Link>
+            </div>
+          </div>
           {mainMenu.map((item) => {
             const hasChildren = Boolean(item.children?.length);
             const isExpanded = expanded === item.label;
@@ -140,8 +166,13 @@ export function V20MobileNav({
 
         <div className="mt-4 shrink-0 flex flex-col gap-2 border-t border-slate-200 pt-4">
           <Button asChild className="rounded-full bg-primary touch-manipulation">
-            <Link href="/predplatne" onClick={() => setOpen(false)}>
-              Předplatné
+            <Link href="/predplatne?trial=1" onClick={() => setOpen(false)}>
+              14 dní zdarma
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="rounded-full touch-manipulation">
+            <Link href="/aplikace" onClick={() => setOpen(false)}>
+              Stáhnout aplikace
             </Link>
           </Button>
           <Button asChild variant="outline" className="rounded-full touch-manipulation">
