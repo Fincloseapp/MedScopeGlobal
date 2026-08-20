@@ -34,12 +34,14 @@ const REASON_COPY: Record<OdbornaGateReason, { title: string; body: string }> = 
 export function OdbornaGate({
   reason,
   clkStatus,
+  nextPath = "/odborna",
 }: {
   reason: OdbornaGateReason;
   clkStatus?: {
     status: string;
     clkNumber?: string;
   } | null;
+  nextPath?: string;
 }) {
   const copy = REASON_COPY[reason];
 
@@ -57,7 +59,7 @@ export function OdbornaGate({
           {reason === "login" && (
             <div className="flex flex-wrap gap-3">
               <Button asChild>
-                <Link href="/login?next=/odborna">Přihlásit se</Link>
+                <Link href={`/login?next=${encodeURIComponent(nextPath)}`}>Přihlásit se</Link>
               </Button>
               <Button asChild variant="outline">
                 <Link href="/signup">Registrace</Link>

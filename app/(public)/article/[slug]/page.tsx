@@ -26,6 +26,10 @@ import {
 } from "@/lib/editorial/units";
 import { canAccessContent } from "@/lib/config/access-levels";
 import type { AccessLevelId } from "@/lib/config/access-levels";
+import { isLayAudienceArticle } from "@/lib/config/section-article-map";
+import { isPhysicianRestrictedArticle } from "@/lib/articles/professional-access";
+import { getOdbornaAccess } from "@/lib/auth/odborna-access";
+import { OdbornaGate } from "@/components/odborna/odborna-gate";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getActiveAds, getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { AdPlacement } from "@/components/ads/ad-placement";
@@ -102,7 +106,8 @@ export default async function ArticlePage({ params }: Props) {
   const article = await getArticleBySlug(slug, locale);
   if (!article) notFound();
 
-  const { user, isVip, accessLevel } = await getReaderContext();
+  const { isVip, accessLevel } = await getReaderContext();
+  const odborna = await getOdbornaAccess();
 
   const [articleGateCopy, articleInlineCopy] = !isVip
     ? await Promise.all([
@@ -112,20 +117,27 @@ export default async function ArticlePage({ params }: Props) {
     : [null, null];
 
   const minLevel = (article.min_access_level ?? "public") as AccessLevelId;
+  const physicianLocked = isPhysicianRestrictedArticle(article) && !odborna.allowed;
   const locked =
+    physicianLocked ||
     (article.vip_only && !isVip) ||
     !canAccessContent(accessLevel, minLevel);
+  const publicMagazine =
+    isLayAudienceArticle(article) || Boolean(article.public_topic) || article.slug.startsWith("verejnost-");
 
-  const related =
+  const relatedRaw =
     article.category_id &&
     (await getRelatedArticles(
       article.category_id,
       article.id,
-      3,
+      6,
       isVip,
       accessLevel,
       locale
     ));
+  const related = (relatedRaw || []).filter(
+    (item) => odborna.allowed || !isPhysicianRestrictedArticle(item)
+  ).slice(0, 3);
 
   const articleMeta = article as {
     med_track?: string | null;
@@ -139,7 +151,7 @@ export default async function ArticlePage({ params }: Props) {
   let inlineAds: Awaited<ReturnType<typeof getActiveAds>> = [];
   let studentCampaigns: Awaited<ReturnType<typeof listStudentAdCampaignsForArticle>> = [];
 
-  if (!isVip) {
+  if (!isVip && !publicMagazine) {
     if (isStudentArticle) {
       studentCampaigns = await listStudentAdCampaignsForArticle({
         med_track: articleMeta.med_track,
@@ -330,16 +342,22 @@ export default async function ArticlePage({ params }: Props) {
               )}
             </div>
 
-            {studentBannerAds.length > 0 ? (
+            {publicMagazine ? null : studentBannerAds.length > 0 ? (
               <StudentAdBlocks campaigns={studentBannerAds} variant="banner" />
             ) : null}
-            {inlineAds.length > 0 ? <AdPlacement ads={inlineAds} variant="inline" /> : null}
-            {studentInlineAds.length > 0 ? (
+            {publicMagazine ? null : inlineAds.length > 0 ? <AdPlacement ads={inlineAds} variant="inline" /> : null}
+            {publicMagazine ? null : studentInlineAds.length > 0 ? (
               <StudentAdBlocks campaigns={studentInlineAds} variant="inline" />
             ) : null}
 
             <div className="prose-wrapper mt-10 overflow-x-hidden">
-              {article.rubric_slug === V19_RUBRIC_SLUG && !locked ? (
+              {physicianLocked ? (
+                <OdbornaGate
+                  reason={odborna.reason ?? "login"}
+                  clkStatus={odborna.clk}
+                  nextPath={`/article/${article.slug}`}
+                />
+              ) : article.rubric_slug === V19_RUBRIC_SLUG && !locked ? (
                 <V19ArticleBody
                   locale={locale}
                   article={{
@@ -375,18 +393,18 @@ export default async function ArticlePage({ params }: Props) {
               )}
             </div>
 
-            {!isVip && !locked && articleInlineCopy ? (
+            {!isVip && !locked && !publicMagazine && articleInlineCopy ? (
               <ArticleInlineNudge copy={articleInlineCopy} />
             ) : null}
 
-            {!locked ? (
+            {!locked && !publicMagazine ? (
               <ArticleCtaBlocks articleSlug={article.slug} articleTitle={article.title} />
             ) : null}
 
             {related && related.length > 0 && (
               <section className="mt-16 border-t pt-10">
                 <h2 className="font-display text-2xl font-semibold text-medical-navy">
-                  Related coverage
+                  Související články
                 </h2>
                 <div className="mt-6 grid gap-6 md:grid-cols-3">
                   {related.map((a) => (
