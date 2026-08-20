@@ -3,17 +3,29 @@ import { MEDICAL_CATEGORIES } from "@/lib/config/categories-seed";
 import { localizeCategories } from "@/lib/i18n/category-label";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { ensureMedicalCategories } from "@/lib/setup/ensure-medical-data";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { buildV20CategoryList } from "@/lib/v20/categories";
 import { V20_ARCHIVE_CUTOFF } from "@/lib/v20/content-rules";
 import type { Category } from "@/types/database";
 
 const MEDICAL_SLUGS = new Set<string>(MEDICAL_CATEGORIES.map((c) => c.slug));
 
+function seedCategories(): Category[] {
+  return MEDICAL_CATEGORIES.map((c) => ({
+    id: `seed-${c.slug}`,
+    name: c.nameCs,
+    slug: c.slug,
+    description: null,
+    created_at: new Date(0).toISOString(),
+  }));
+}
+
 async function loadCategoriesRaw(): Promise<Category[]> {
   await ensureMedicalCategories();
 
-  const supabase = createServiceRoleClient();
+  const supabase = tryCreateServiceRoleClient();
+  if (!supabase) return seedCategories();
+
   const { data, error } = await supabase
     .from("categories")
     .select("*")
@@ -21,12 +33,12 @@ async function loadCategoriesRaw(): Promise<Category[]> {
 
   if (error) {
     console.error("loadCategoriesRaw", error);
-    return [];
+    return seedCategories();
   }
 
   const rows = (data ?? []) as Category[];
   const medical = rows.filter((c) => MEDICAL_SLUGS.has(c.slug));
-  return medical.length > 0 ? medical : rows;
+  return medical.length > 0 ? medical : rows.length > 0 ? rows : seedCategories();
 }
 
 async function loadArticleCountsBySlug(categories: Category[]): Promise<Record<string, number>> {
@@ -37,7 +49,9 @@ async function loadArticleCountsBySlug(categories: Category[]): Promise<Record<s
 
   if (categories.length === 0) return counts;
 
-  const supabase = createServiceRoleClient();
+  const supabase = tryCreateServiceRoleClient();
+  if (!supabase) return counts;
+
   const idToSlug = Object.fromEntries(categories.map((c) => [c.id, c.slug]));
   const { data, error } = await supabase
     .from("articles")

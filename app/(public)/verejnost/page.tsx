@@ -181,7 +181,7 @@ export default async function VerejnostHubPage() {
                 href={
                   t.slug === "rozhovory"
                     ? "/verejnost/rozhovory"
-                    : `/verejnost/clanky?topic=${t.backendTopic}`
+                    : `/verejnost/clanky?topic=${t.slug}`
                 }
                 prefetch
                 className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-[#005B96]/40 hover:shadow-sm"

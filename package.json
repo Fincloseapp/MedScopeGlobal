@@ -5,6 +5,7 @@
   "packageManager": "pnpm@9.15.4",
   "scripts": {
     "dev": "next dev",
+    "dev:d": "next dev -H 0.0.0.0 -p 3000",
     "build": "node scripts/run-cloudflare-build.mjs",
     "build:win": "powershell -ExecutionPolicy Bypass -File ./scripts/build-win.ps1",
     "start": "next start",
@@ -74,6 +75,7 @@
     "test:prod": "node tests/production/run-prod-tests.mjs",
     "cron:trigger-daily": "node scripts/trigger-daily-content-crons.mjs",
     "verify:d-drive": "node scripts/verify-d-drive-only.mjs",
+    "export:d-medi82026": "node scripts/export-to-d-medi82026.mjs",
     "build:next": "node scripts/run-vercel-build.mjs",
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",

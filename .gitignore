@@ -55,3 +55,8 @@ next-env.d.ts
 .dev.vars
 cloudflare-env.d.ts
 scripts/cloudflare/.env.cloudflare.json
+
+# Windows D: local trees (never commit)
+/D:\\medscope.local/
+/D:\\medscope.logs/
+/D:\\Medi82026/

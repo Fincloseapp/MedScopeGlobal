@@ -98,7 +98,7 @@ function NavDropdownPanel({
 
 /** v27.2 — viewport-safe dropdowns + horizontal scroll for overflow */
 export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   const [openLabel, setOpenLabel] = useState<string | null>(null);
   const navRef = useRef<HTMLElement>(null);
   const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});

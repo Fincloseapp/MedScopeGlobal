@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { getPublishedReadClient } from "@/lib/supabase/published-read";
 import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
 import { allowedAccessLevels, type AccessLevelId } from "@/lib/config/access-levels";
@@ -38,7 +38,8 @@ export async function getMedicalArticles({
   accessLevel?: AccessLevelId;
   locale?: LocaleCode;
 }) {
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return [];
   let query = supabase
     .from("articles")
     .select(articleSelect)

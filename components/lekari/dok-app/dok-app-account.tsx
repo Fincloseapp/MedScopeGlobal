@@ -91,7 +91,7 @@ export function DokAppAccount({
 
   async function signOut() {
     const supabase = createClient();
-    await supabase.auth.signOut();
+    if (supabase) await supabase.auth.signOut();
     window.location.href = "/login?next=/app/dokumentace";
   }
 

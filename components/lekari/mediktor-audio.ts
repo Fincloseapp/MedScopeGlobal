@@ -151,6 +151,7 @@ async function uploadViaSignedUrl(
     try {
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
+      if (!supabase) throw new Error("supabase unavailable");
       const { error } = await supabase.storage
         .from("media")
         .uploadToSignedUrl(path, token, file, { contentType: mime, upsert: true });

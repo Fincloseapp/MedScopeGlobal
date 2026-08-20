@@ -59,7 +59,11 @@ function AdCard({ ad, compact, wide }: { ad: AdRow; compact?: boolean; wide?: bo
       }`}
     >
       <div className={`relative w-full bg-slate-100 ${compact ? "aspect-[3/1]" : "aspect-[5/1]"}`}>
-        <Image src={ad.image_url} alt={title} fill className="object-cover" sizes="(max-width:768px) 100vw, 900px" />
+        {ad.image_url ? (
+          <Image src={ad.image_url} alt={title} fill className="object-cover" sizes="(max-width:768px) 100vw, 900px" />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-[#021d33] to-[#005B96]" />
+        )}
         <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-white">
           Sponzorováno
         </span>

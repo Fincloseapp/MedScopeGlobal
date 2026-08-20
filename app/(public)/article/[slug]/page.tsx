@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { CoverImage } from "@/components/media/cover-image";
+import { ogImages } from "@/lib/seo/og";
+import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleBody } from "@/components/article/article-body";
@@ -14,6 +16,8 @@ import { ArticleCard } from "@/components/article/article-card";
 import { AdSlot } from "@/components/ads/ad-slot";
 import { VipBadge } from "@/components/vip/vip-badge";
 import { EditorialAttribution } from "@/components/article/editorial-attribution";
+import { WriterAgentMark } from "@/components/editorial/writer-agent-mark";
+import { resolveWriterAgent, resolveWritingStyle } from "@/lib/editorial/writer-agents";
 import { EditorialFooter } from "@/components/article/editorial-footer";
 import {
   assignEditorialUnits,
@@ -22,6 +26,9 @@ import {
 } from "@/lib/editorial/units";
 import { canAccessContent } from "@/lib/config/access-levels";
 import type { AccessLevelId } from "@/lib/config/access-levels";
+import { isPhysicianRestrictedArticle } from "@/lib/articles/professional-access";
+import { getOdbornaAccess } from "@/lib/auth/odborna-access";
+import { OdbornaGate } from "@/components/odborna/odborna-gate";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getActiveAds, getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { AdPlacement } from "@/components/ads/ad-placement";
@@ -42,6 +49,8 @@ import { StudentAdBlocks } from "@/components/student/student-ad-blocks";
 
 type Props = { params: Promise<{ slug: string }> };
 
+export const revalidate = 60;
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const locale = await getServerLocale();
@@ -61,6 +70,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const keywords = v19Meta?.keywords;
 
+  const cover = resolveVerejnostCoverUrl(article);
+  const shareImages = ogImages(article.title, cover);
+
   return {
     title: article.title,
     description,
@@ -74,15 +86,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "article",
       publishedTime: article.published_at ?? undefined,
       url: `/article/${article.slug}`,
-      images: article.cover_image_url
-        ? [{ url: article.cover_image_url }]
-        : undefined,
+      siteName: "MedScopeGlobal",
+      images: shareImages,
     },
     twitter: {
       card: "summary_large_image",
       title: article.title,
       description,
-      images: article.cover_image_url ? [article.cover_image_url] : undefined,
+      images: shareImages.map((img) => img.url),
     },
   };
 }
@@ -94,7 +105,8 @@ export default async function ArticlePage({ params }: Props) {
   const article = await getArticleBySlug(slug, locale);
   if (!article) notFound();
 
-  const { user, isVip, accessLevel } = await getReaderContext();
+  const { isVip, accessLevel } = await getReaderContext();
+  const odborna = await getOdbornaAccess();
 
   const [articleGateCopy, articleInlineCopy] = !isVip
     ? await Promise.all([
@@ -104,21 +116,11 @@ export default async function ArticlePage({ params }: Props) {
     : [null, null];
 
   const minLevel = (article.min_access_level ?? "public") as AccessLevelId;
+  const physicianLocked = isPhysicianRestrictedArticle(article) && !odborna.allowed;
   const locked =
+    physicianLocked ||
     (article.vip_only && !isVip) ||
     !canAccessContent(accessLevel, minLevel);
-
-  const related =
-    article.category_id &&
-    (await getRelatedArticles(
-      article.category_id,
-      article.id,
-      3,
-      isVip,
-      accessLevel,
-      locale
-    ));
-
   const articleMeta = article as {
     med_track?: string | null;
     study_year?: number | null;
@@ -126,12 +128,27 @@ export default async function ArticlePage({ params }: Props) {
   };
   const isStudentArticle =
     articleMeta.med_track === "priprava" || articleMeta.med_track === "studium";
+  const publicMagazine = !isPhysicianRestrictedArticle(article) && !isStudentArticle;
+
+  const relatedRaw =
+    article.category_id &&
+    (await getRelatedArticles(
+      article.category_id,
+      article.id,
+      6,
+      isVip,
+      accessLevel,
+      locale
+    ));
+  const related = (relatedRaw || []).filter(
+    (item) => odborna.allowed || !isPhysicianRestrictedArticle(item)
+  ).slice(0, 3);
 
   let ads: Awaited<ReturnType<typeof getActiveAds>> = [];
   let inlineAds: Awaited<ReturnType<typeof getActiveAds>> = [];
   let studentCampaigns: Awaited<ReturnType<typeof listStudentAdCampaignsForArticle>> = [];
 
-  if (!isVip) {
+  if (!isVip && !publicMagazine) {
     if (isStudentArticle) {
       studentCampaigns = await listStudentAdCampaignsForArticle({
         med_track: articleMeta.med_track,
@@ -150,8 +167,11 @@ export default async function ArticlePage({ params }: Props) {
   const studentSidebarAds = studentCampaigns.filter((c) => c.type === "sidebar").slice(0, 3);
 
   const category = article.categories;
+  const coverUrl = resolveVerejnostCoverUrl(article);
   const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
   const editorialAssignment = assignEditorialUnits(article);
+  const writerAgent = resolveWriterAgent(article);
+  const writingStyle = resolveWritingStyle(article);
 
   const isV19Article = article.rubric_slug === V19_RUBRIC_SLUG;
   const v19Quiz = (article.quiz_json ?? {}) as Record<string, unknown>;
@@ -189,7 +209,7 @@ export default async function ArticlePage({ params }: Props) {
         headline: article.title,
         datePublished: article.published_at,
         author: buildArticleJsonLdAuthor(editorialAssignment, editorialLocale),
-        image: article.cover_image_url ? [article.cover_image_url] : undefined,
+        image: coverUrl ? [coverUrl] : undefined,
         publisher: {
           "@type": "Organization",
           name: "MedScopeGlobal",
@@ -255,11 +275,21 @@ export default async function ArticlePage({ params }: Props) {
 
             <div className="mt-6 flex flex-wrap items-center gap-4 border-y py-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                  MS
-                </div>
+                {writerAgent ? (
+                  <WriterAgentMark agent={writerAgent} size={40} />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                    MS
+                  </div>
+                )}
                 <div>
                   <EditorialAttribution article={article} locale={editorialLocale} />
+                  {writerAgent ? (
+                    <p className="text-xs text-slate-500">
+                      Redakční agent: {writerAgent.label}
+                      {writingStyle ? ` · styl ${writingStyle.label}` : ""}
+                    </p>
+                  ) : null}
                   <p>
                     {article.published_at &&
                       new Date(article.published_at).toLocaleDateString(
@@ -277,16 +307,9 @@ export default async function ArticlePage({ params }: Props) {
             </div>
 
             <div className="relative mt-8 aspect-[21/9] w-full overflow-hidden rounded-[28px] border border-slate-200 bg-slate-950 shadow-[0_22px_70px_-35px_rgba(2,30,57,0.85)]">
-              {article.cover_image_url ? (
+              {coverUrl ? (
                 <>
-                  <Image
-                    src={article.cover_image_url}
-                    alt=""
-                    fill
-                    priority
-                    className="object-cover"
-                    sizes="(max-width:1024px) 100vw, 896px"
-                  />
+                  <CoverImage src={coverUrl} alt="" className="absolute inset-0" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
                 </>
               ) : (
@@ -316,16 +339,22 @@ export default async function ArticlePage({ params }: Props) {
               )}
             </div>
 
-            {studentBannerAds.length > 0 ? (
+            {publicMagazine ? null : studentBannerAds.length > 0 ? (
               <StudentAdBlocks campaigns={studentBannerAds} variant="banner" />
             ) : null}
-            {inlineAds.length > 0 ? <AdPlacement ads={inlineAds} variant="inline" /> : null}
-            {studentInlineAds.length > 0 ? (
+            {publicMagazine ? null : inlineAds.length > 0 ? <AdPlacement ads={inlineAds} variant="inline" /> : null}
+            {publicMagazine ? null : studentInlineAds.length > 0 ? (
               <StudentAdBlocks campaigns={studentInlineAds} variant="inline" />
             ) : null}
 
             <div className="prose-wrapper mt-10 overflow-x-hidden">
-              {article.rubric_slug === V19_RUBRIC_SLUG && !locked ? (
+              {physicianLocked ? (
+                <OdbornaGate
+                  reason={odborna.reason ?? "login"}
+                  clkStatus={odborna.clk}
+                  nextPath={`/article/${article.slug}`}
+                />
+              ) : article.rubric_slug === V19_RUBRIC_SLUG && !locked ? (
                 <V19ArticleBody
                   locale={locale}
                   article={{
@@ -361,18 +390,18 @@ export default async function ArticlePage({ params }: Props) {
               )}
             </div>
 
-            {!isVip && !locked && articleInlineCopy ? (
+            {!isVip && !locked && !publicMagazine && articleInlineCopy ? (
               <ArticleInlineNudge copy={articleInlineCopy} />
             ) : null}
 
-            {!locked ? (
+            {!locked && !publicMagazine ? (
               <ArticleCtaBlocks articleSlug={article.slug} articleTitle={article.title} />
             ) : null}
 
             {related && related.length > 0 && (
               <section className="mt-16 border-t pt-10">
                 <h2 className="font-display text-2xl font-semibold text-medical-navy">
-                  Related coverage
+                  Související články
                 </h2>
                 <div className="mt-6 grid gap-6 md:grid-cols-3">
                   {related.map((a) => (
@@ -388,11 +417,15 @@ export default async function ArticlePage({ params }: Props) {
           </div>
 
           <aside className="w-full shrink-0 space-y-6 lg:w-80">
-            <PremiumCta locale={locale} />
-            {studentSidebarAds.length > 0 ? (
-              <StudentAdBlocks campaigns={studentSidebarAds} variant="sidebar" />
-            ) : (
-              <AdSlot ads={ads} />
+            {publicMagazine || physicianLocked ? null : (
+              <>
+                <PremiumCta locale={locale} />
+                {studentSidebarAds.length > 0 ? (
+                  <StudentAdBlocks campaigns={studentSidebarAds} variant="sidebar" />
+                ) : (
+                  <AdSlot ads={ads} />
+                )}
+              </>
             )}
           </aside>
         </div>

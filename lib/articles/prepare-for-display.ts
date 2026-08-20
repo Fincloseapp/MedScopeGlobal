@@ -9,7 +9,9 @@ import { resolveArticleTranslation } from "@/lib/i18n/translate-article";
 import type { ArticleWithRelations } from "@/types/database";
 import { dedupeArticlesByTitle } from "@/lib/articles/dedupe";
 import { enrichArticleBodyForDisplay } from "@/lib/articles/enrich-body";
+import { sanitizeArticleFields } from "@/lib/articles/sanitize-display";
 import { polishCzechFields } from "@/lib/v22/translate";
+import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 import {
   assignEditorialUnits,
   formatEditorialUnitDisplay,
@@ -27,6 +29,13 @@ export type DisplayArticle = ArticleWithRelations & {
   editorialPrimaryLabel?: string;
 };
 
+function withMagazineCover(article: DisplayArticle): DisplayArticle {
+  return {
+    ...article,
+    cover_image_url: resolveVerejnostCoverUrl(article),
+  };
+}
+
 function attachEditorialDisplay(
   article: ArticleWithRelations,
   locale: LocaleCode,
@@ -34,16 +43,19 @@ function attachEditorialDisplay(
 ): DisplayArticle {
   const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
   const assignment = assignEditorialUnits(article ?? {});
-  return {
+  const merged = sanitizeArticleFields({
     ...article,
     ...extra,
+  });
+  return withMagazineCover({
+    ...merged,
     editorialAssignment: assignment,
     editorialPrimaryLabel: formatEditorialUnitDisplay(
       assignment.primary,
       editorialLocale,
       assignment.aiAssisted
     ),
-  };
+  });
 }
 
 function sortByLocalePreference(
@@ -89,7 +101,10 @@ export async function prepareArticleForDisplay(
     const polished = locale === "cs" ? polishCzechFields(base, locale) : base;
     const display = attachEditorialDisplay(polished, locale, { displayLocale: target });
     if (mode === "full") {
-      return { ...display, content: enrichArticleBodyForDisplay(display) };
+      return { ...display, content: sanitizeArticleFields({
+        ...display,
+        content: enrichArticleBodyForDisplay(display),
+      }).content };
     }
     return display;
   }

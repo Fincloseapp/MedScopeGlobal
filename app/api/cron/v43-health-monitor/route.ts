@@ -21,3 +21,5 @@ export async function GET(request: Request) {
     generated_at: report.generated_at,
   });
 }
+
+export const POST = GET;

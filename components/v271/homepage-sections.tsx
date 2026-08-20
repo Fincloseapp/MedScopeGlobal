@@ -19,6 +19,8 @@ import { subscriptionProductId } from "@/lib/v27/config";
 import { DokumentaceDownloadPanel } from "@/components/lekari/dokumentace-download-panel";
 import { MediktorLockup } from "@/components/lekari/mediktor-mark";
 import { APP_PRODUCTS } from "@/lib/apps/catalog";
+import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
+import { AppOpenLink } from "@/components/apps/app-origin-bar";
 
 export function V272SocialProofBlock() {
   return (
@@ -426,8 +428,18 @@ export function V272AppsTrioBlock() {
           {APP_PRODUCTS.map((app) => (
             <article
               key={app.id}
-              className="flex flex-col rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-5 shadow-sm"
+              className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white shadow-sm"
             >
+              <div className="relative aspect-[16/9] bg-slate-100">
+                <Image
+                  src={APP_MARKETING_IMAGE[app.id]}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+              </div>
+              <div className="flex flex-1 flex-col p-5">
               <Image
                 src={app.assets.icon192}
                 alt={app.shortName}
@@ -439,18 +451,19 @@ export function V272AppsTrioBlock() {
               <p className="mt-1 flex-1 text-sm text-slate-600">{app.tagline}</p>
               <p className="mt-2 text-xs text-[#005B96]">{app.priceNote}</p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <Link
+                <AppOpenLink
                   href={app.appPath}
                   className="rounded-full bg-[#005B96] px-4 py-2 text-sm font-semibold text-white hover:bg-[#004a7a]"
                 >
                   Otevřít
-                </Link>
+                </AppOpenLink>
                 <Link
                   href={app.downloadPath}
                   className="rounded-full border border-[#005B96]/30 px-4 py-2 text-sm font-semibold text-[#005B96]"
                 >
                   Stáhnout
                 </Link>
+              </div>
               </div>
             </article>
           ))}

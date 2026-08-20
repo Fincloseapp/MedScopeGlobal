@@ -20,13 +20,6 @@ interface Props {
 }
 
 export function UserMenu({ user, profile }: Props) {
-  const supabase = createClient();
-
-  async function signOut() {
-    await supabase.auth.signOut();
-    window.location.href = "/";
-  }
-
   if (!user) {
     return (
       <div className="hidden items-center gap-2 sm:flex">
@@ -49,6 +42,16 @@ export function UserMenu({ user, profile }: Props) {
       .toUpperCase() ||
     user.email?.slice(0, 2).toUpperCase() ||
     "MS";
+
+  async function signOut() {
+    const supabase = createClient();
+    if (!supabase) {
+      window.location.href = "/";
+      return;
+    }
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  }
 
   return (
     <DropdownMenu>

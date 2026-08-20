@@ -50,6 +50,11 @@ export function SearchClient({
         }
         setLoading(true);
         const supabase = createClient();
+        if (!supabase) {
+          setLoading(false);
+          setResults([]);
+          return;
+        }
         const rows = await mergedArticleSearch(
           supabase,
           t,

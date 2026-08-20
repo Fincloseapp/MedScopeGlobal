@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+import { getPublishedReadClient } from "@/lib/supabase/published-read";
+import { isPlaceholderUniversityNewsTitle } from "@/lib/articles/quality-filters";
 
 export type UniversityNewsRow = {
   id: string;
@@ -16,8 +17,23 @@ export type UniversityNewsRow = {
   created_at: string;
 };
 
+const EMPTY_SUMMARY = /^(?:není k dispozici|n\/a|-|není k dispozici\.?)?\s*$/i;
+
+function isUsableUniversityNews(row: UniversityNewsRow): boolean {
+  const title = (row.title ?? "").trim();
+  const summary = (row.summary ?? row.body ?? "").trim();
+  if (isPlaceholderUniversityNewsTitle(title)) return false;
+  if (summary.length < 40 && title.length < 40) return false;
+  if (EMPTY_SUMMARY.test(summary) && title.length < 48) return false;
+  if (/\b(the|and|with|study|breakthrough)\b/i.test(title) && !/[áčďéěíňóřšťúůýž]/i.test(title)) {
+    return false;
+  }
+  return true;
+}
+
 export async function getUniversityNewsList(tag?: string) {
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return [];
   let q = supabase
     .from("university_news")
     .select("*")
@@ -30,11 +46,19 @@ export async function getUniversityNewsList(tag?: string) {
     console.error("getUniversityNewsList", error);
     return [];
   }
-  return (data ?? []) as UniversityNewsRow[];
+  const rows = ((data ?? []) as UniversityNewsRow[]).filter(isUsableUniversityNews);
+  const seen = new Set<string>();
+  return rows.filter((row) => {
+    const key = row.title.trim().toLocaleLowerCase("cs-CZ");
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 export async function getUniversityNewsBySlug(slug: string) {
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return null;
   const { data, error } = await supabase
     .from("university_news")
     .select("*")

@@ -1,11 +1,14 @@
-import Image from "next/image";
+import { CoverImage } from "@/components/media/cover-image";
 import Link from "next/link";
-import { Calendar } from "lucide-react";
+import { Calendar, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { assignEditorialUnits, formatEditorialUnitDisplay } from "@/lib/editorial/units";
+import { resolveWriterAgent } from "@/lib/editorial/writer-agents";
+import { isPhysicianRestrictedArticle } from "@/lib/articles/professional-access";
+import { WriterAgentByline } from "@/components/editorial/writer-agent-byline";
 import type { ArticleWithRelations } from "@/types/database";
 
 export function ArticleCard({ article }: { article: DisplayArticle | ArticleWithRelations }) {
@@ -26,6 +29,7 @@ export function ArticleCard({ article }: { article: DisplayArticle | ArticleWith
     });
   const coverMeta = getArticleCoverLabel(article.title, cat?.name);
   const coverStyles = getArticleCoverStyles(article.title, cat?.name);
+  const locked = isPhysicianRestrictedArticle(article);
 
   return (
     <Card className="group overflow-hidden rounded-[26px] border border-slate-200/80 bg-white/95 shadow-[0_16px_50px_-28px_rgba(2,30,57,0.55)] transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_24px_70px_-28px_rgba(0,91,150,0.6)]">
@@ -33,13 +37,7 @@ export function ArticleCard({ article }: { article: DisplayArticle | ArticleWith
         <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-950">
           {article.cover_image_url ? (
             <>
-              <Image
-                src={article.cover_image_url}
-                alt=""
-                fill
-                className="object-cover transition duration-500 group-hover:scale-[1.04]"
-                sizes="(max-width:768px) 100vw, 33vw"
-              />
+              <CoverImage src={article.cover_image_url} alt="" className="absolute inset-0 transition duration-500 group-hover:scale-[1.04]" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
             </>
           ) : (
@@ -89,18 +87,30 @@ export function ArticleCard({ article }: { article: DisplayArticle | ArticleWith
               {cat.name}
             </p>
           )}
+          {locked ? (
+            <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-[#021d33] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+              <Lock className="h-3 w-3" aria-hidden />
+              ČLK
+            </span>
+          ) : null}
           <h3 className="mt-2 font-display text-xl font-semibold leading-snug text-medical-navy">
             {article.title}
           </h3>
-          {article.excerpt && (
+          {(locked || article.excerpt) && (
             <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
-              {article.excerpt}
+              {locked
+                ? "Odborný článek pro ověřené lékaře. Plný text po přihlášení a ověření ČLK."
+                : article.excerpt}
             </p>
           )}
         </CardContent>
       </Link>
       <CardFooter className="flex items-center justify-between border-t border-slate-100 bg-slate-50/90 px-5 py-3 text-xs text-muted-foreground">
-        <span className="font-medium text-slate-700 line-clamp-1">{authorLabel}</span>
+        {resolveWriterAgent(article) ? (
+          <WriterAgentByline article={article} size={28} />
+        ) : (
+          <span className="font-medium text-slate-700 line-clamp-1">{authorLabel}</span>
+        )}
         {date && (
           <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 font-medium text-slate-500">
             <Calendar className="h-3.5 w-3.5" />

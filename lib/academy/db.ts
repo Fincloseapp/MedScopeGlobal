@@ -61,6 +61,7 @@ export async function listPublishedCourses(
   filter?: ListPublishedCoursesFilter
 ): Promise<AcademyCourse[]> {
   const supabase = await createClient();
+  if (!supabase) return [];
   let query = supabase
     .from("courses")
     .select("*")

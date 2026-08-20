@@ -31,6 +31,7 @@ jobs:
             /api/cron/ingest
             /api/cron/public-articles
             /api/cron/public-osveta-daily
+            /api/cron/v25-images
             /api/cron/v25-enterprise
             /api/cron/marketing
             /api/cron/academy-daily

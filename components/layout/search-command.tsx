@@ -19,6 +19,7 @@ import { sanitizeSearchInput } from "@/utils/search";
 
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import { APP_PRODUCTS } from "@/lib/apps/catalog";
+import { AppOpenLink } from "@/components/apps/app-origin-bar";
 
 export function SearchCommand({
   isVip = false,
@@ -43,6 +44,11 @@ export function SearchCommand({
     }
     setLoading(true);
     const supabase = createClient();
+    if (!supabase) {
+      setLoading(false);
+      setResults([]);
+      return;
+    }
     const rows = await mergedArticleSearch(supabase, term, 12, isVip, accessLevel);
     setLoading(false);
     setResults(rows);
@@ -78,15 +84,14 @@ export function SearchCommand({
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wide text-[#005B96]">Aplikace</p>
               {APP_PRODUCTS.map((app) => (
-                <Link
+                <AppOpenLink
                   key={app.id}
                   href={app.appPath}
                   className="block rounded-md border p-3 text-left transition hover:bg-muted"
-                  onClick={() => setOpen(false)}
                 >
                   <p className="font-medium">{app.shortName}</p>
                   <p className="text-sm text-muted-foreground">{app.tagline}</p>
-                </Link>
+                </AppOpenLink>
               ))}
             </div>
           ) : null}

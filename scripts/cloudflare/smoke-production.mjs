@@ -6,7 +6,15 @@
 const base = (process.env.SMOKE_BASE_URL || "https://medscopeglobal.com").replace(/\/$/, "");
 
 const pages = [
-  { path: "/", must: ["MeDipacient", "MeDiprep", "MeDiktor"] },
+  { path: "/", must: ["MeDipacient", "MeDiprep", "MeDiktor", "Zpravodajství", "Redakční agenti", "medscopeglobal.com", "svátek"], mustNot: ["denní crony", "marketingové bloky"] },
+  { path: "/articles", must: ["Články", "Magazín"] },
+  { path: "/verejnost/clanky", mustNot: ["se brzy objeví"] },
+  { path: "/verejnost/clanky?topic=zivotni-styl", must: ["Životní styl"], mustNot: ["zatím nejsou publikované"] },
+  { path: "/verejnost/clanky?topic=nemoci", must: ["Nemoci"], mustNot: ["zatím nejsou publikované", "Zdraví na dosah"] },
+  { path: "/aktualni-zpravy", must: ["Aktuální zprávy"], mustNot: ["Zatím nejsou publikované zprávy"] },
+  { path: "/novinky", must: ["Novinky"], mustNot: ["výzkumná novinka"] },
+  { path: "/article/kompas-projekt-kter-mn-podobu-domc-pe-v-esku", must: ["KOMPAS"], mustNot: ["GROQ_API_KEY", "plné redakční zpracování"] },
+  { path: "/article/dost-o-informace-ze-dne-982026", mustNot: ["GROQ_API_KEY", "plné redakční zpracování"] },
   { path: "/aplikace", must: ["MeDipacient", "MeDiprep", "MeDiktor", "14 dní"] },
   { path: "/medipacient", must: ["MeDipacient"] },
   { path: "/medipacient/stahnout", must: ["MeDipacient"] },
@@ -35,6 +43,12 @@ const assets = [
   "/assets/mediprep/icon-512.png",
   "/assets/mediktor/icon-192.png",
   "/assets/mediktor/icon-512.png",
+  "/og-default.jpg",
+  "/og-medscopeglobal.jpg",
+  "/assets/logo/Logo_Transparent.png",
+  "/assets/logo/logo-emblem.webp",
+  "/assets/ai/assistant-brunette.webp",
+  "/assets/marketing/medipacient.webp",
 ];
 
 let failed = 0;
@@ -64,14 +78,33 @@ for (const page of pages) {
     const text = await res.text();
     console.log(`${res.status} ${url}`);
     if (res.status >= 400) fail(`${url} status ${res.status}`);
-    for (const needle of page.must) {
+    for (const needle of page.must ?? []) {
       if (!text.toLowerCase().includes(needle.toLowerCase())) {
         fail(`${url} missing “${needle}”`);
+      }
+    }
+    for (const needle of page.mustNot ?? []) {
+      if (text.toLowerCase().includes(needle.toLowerCase())) {
+        fail(`${url} unexpectedly contains “${needle}”`);
       }
     }
   } catch (e) {
     fail(`${page.path}: ${e instanceof Error ? e.message : e}`);
   }
+}
+
+try {
+  const home = await (await get("/")).res.text();
+  const m = home.match(/href="\/article\/([^"]+)"/);
+  if (!m) fail("homepage missing article links");
+  else {
+    const { url, res } = await get(`/article/${m[1]}`);
+    console.log(`${res.status} ${url}`);
+    if (res.status >= 400) fail(`${url} status ${res.status}`);
+    else ok(`article ${m[1].slice(0, 48)}`);
+  }
+} catch (e) {
+  fail(`article detail: ${e instanceof Error ? e.message : e}`);
 }
 
 for (const path of assets) {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { IntelligenceConsole } from "@/components/ai-medical/intelligence-console";
+import { AiAssistantVisual } from "@/components/ai/assistant-visual";
 import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-disclaimer";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
@@ -33,6 +34,10 @@ export default function AiAsistentVerejnostPage() {
       </Link>
 
       <PublicTrustDisclaimer className="mb-6" />
+
+      <div className="mb-6">
+        <AiAssistantVisual />
+      </div>
 
       <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4">
         <p className="text-sm font-semibold text-[#021d33]">Příklady dotazů</p>

@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { projectPath } from "@/lib/config/paths";
+import { isServerlessRuntime, projectPath } from "@/lib/config/paths";
 import { setCronStatus } from "@/lib/v25/system-state";
 import { DEFAULT_PUBLIC_WRITER_LIMIT } from "@/lib/v25/config/public-writers";
 
@@ -33,7 +33,7 @@ export async function runPublicArticlesFetch(options?: {
 }): Promise<PublicArticlesFetchResult> {
   const t0 = Date.now();
 
-  if (process.env.VERCEL === "1") {
+  if (isServerlessRuntime) {
     const writersMod = (await import("../writers/run-public-writers.mjs")) as unknown as PublicWritersModule;
     const report = await writersMod.runPublicWriters({
       limitPerWriter: options?.limitPerWriter ?? DEFAULT_PUBLIC_WRITER_LIMIT,

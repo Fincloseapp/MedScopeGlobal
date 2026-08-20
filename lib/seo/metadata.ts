@@ -1,5 +1,6 @@
 import { SITE } from "@/lib/config/site";
 import type { Metadata } from "next";
+import { ogImages } from "@/lib/seo/og";
 
 export const HREFLANG_LOCALES = [
   { code: "cs", hreflang: "cs-CZ", label: "Čeština" },
@@ -26,7 +27,7 @@ export function buildPageMetadata(params: {
   image?: string;
 }): Metadata {
   const { canonical, languages } = buildHreflangAlternates(params.path);
-  const ogImage = params.image ?? `${SITE.url}/og-default.png`;
+  const images = ogImages(params.title, params.image);
 
   return {
     title: params.title,
@@ -39,13 +40,13 @@ export function buildPageMetadata(params: {
       siteName: SITE.name,
       locale: "cs_CZ",
       alternateLocale: HREFLANG_LOCALES.map((l) => l.hreflang.replace("-", "_")),
-      images: [{ url: ogImage, width: 1200, height: 630, alt: params.title }],
+      images,
     },
     twitter: {
       card: "summary_large_image",
       title: params.title,
       description: params.description,
-      images: [ogImage],
+      images: images.map((img) => img.url),
     },
   };
 }

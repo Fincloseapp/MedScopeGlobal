@@ -18,12 +18,13 @@ import {
   type DisplayArticle,
 } from "@/lib/articles/prepare-for-display";
 import type { LocaleCode } from "@/lib/i18n/config";
-import { createClient } from "@/lib/supabase/server";
+import { getPublishedReadClient } from "@/lib/supabase/published-read";
 import {
   filterActiveArticles,
   filterCzechContent,
   isArchivedArticle,
 } from "@/lib/v20/content-rules";
+import { isThinMagazineTitle } from "@/lib/articles/quality-filters";
 import type { ArticleWithRelations } from "@/types/database";
 
 export type { DisplayArticle };
@@ -79,7 +80,7 @@ function filterForMetadataRubricListing(
   articles: ArticleWithRelations[],
   locale: LocaleCode = "cs"
 ): ArticleWithRelations[] {
-  const active = filterActiveArticles(articles);
+  const active = filterActiveArticles(articles).filter((a) => !isThinMagazineTitle(a.title));
   if (locale !== "cs") return active;
   return active.filter((a) => a.locale !== "en" && Boolean(a.title?.trim()));
 }
@@ -90,7 +91,8 @@ export async function getFeaturedArticles(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -122,7 +124,8 @@ export async function getLatestArticles(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return [];
   const fetchLimit = limit * 8;
   const { data, error } = await supabase
     .from("articles")
@@ -158,7 +161,8 @@ export async function getArticlesBySection(
     ? [contentTypeSlug]
     : rubricSlugsForSectionFetch(sectionSlug);
 
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return [];
 
   let q = supabase
     .from("articles")
@@ -223,7 +227,8 @@ export async function getArticlesByRubric(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return [];
   let { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -268,7 +273,8 @@ export async function getArticlesByCategory(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return { articles: [] as DisplayArticle[], total: 0 };
   const { data: cat } = await supabase
     .from("categories")
     .select("id")
@@ -313,7 +319,8 @@ export async function getArticleBySlug(
   slug: string,
   locale: LocaleCode = "cs"
 ): Promise<DisplayArticle | null> {
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return null;
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -340,7 +347,8 @@ export async function getRelatedArticles(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -375,7 +383,8 @@ export async function getArticlesByMetadataSection(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -406,7 +415,8 @@ export async function getArchivedArticles(
   offset = 0,
   locale: LocaleCode = "cs"
 ): Promise<{ articles: DisplayArticle[]; total: number }> {
-  const supabase = await createClient();
+  const supabase = await getPublishedReadClient();
+  if (!supabase) return { articles: [], total: 0 };
   const { data, error, count } = await supabase
     .from("articles")
     .select(articleSelect, { count: "exact" })

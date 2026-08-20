@@ -16,6 +16,9 @@ export const BAD_UNSPLASH_IDS = [
   "photo-1631217868264-e5b1ff5d8800",
   "photo-1581595214485-989ff4a4c44d",
   "photo-1579684385127-1ef15d508118",
+  "photo-1559757148-5c350d0d3c56",
+  "photo-1559757175-0eb30cd8c063",
+  "photo-1612349317150-e413f6a5b16d",
 ] as const;
 
 export function hasBadUnsplashId(url?: string | null): boolean {

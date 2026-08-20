@@ -239,7 +239,7 @@ export function videoObjectJsonLd(video: {
     name: video.title,
     description: video.description ?? video.title,
     contentUrl: video.url,
-    thumbnailUrl: video.thumbnailUrl ?? `${SITE.url}/og-default.png`,
+    thumbnailUrl: video.thumbnailUrl ?? `${SITE.url}/og-medscopeglobal.jpg`,
     duration: video.durationSeconds ? `PT${Math.max(1, video.durationSeconds)}S` : undefined,
     uploadDate: new Date().toISOString(),
     inLanguage: "cs-CZ",

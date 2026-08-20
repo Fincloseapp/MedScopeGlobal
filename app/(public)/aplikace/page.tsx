@@ -6,6 +6,8 @@ import { DokumentaceDownloadPanel } from "@/components/lekari/dokumentace-downlo
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { APP_PRODUCTS, appLockline, appSeoDescription } from "@/lib/apps/catalog";
+import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
+import { AppOpenLink } from "@/components/apps/app-origin-bar";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -53,7 +55,18 @@ export default function AplikaceHubPage() {
 
       <div className="mx-auto max-w-6xl space-y-10 px-4 py-12 sm:px-6">
         {APP_PRODUCTS.map((app) => (
-          <article key={app.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <article key={app.id} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <div className="relative aspect-[16/7] bg-slate-100">
+              <Image
+                src={APP_MARKETING_IMAGE[app.id]}
+                alt={`${app.shortName} — ${app.tagline}`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 960px"
+                priority={app.id === "medipacient"}
+              />
+            </div>
+            <div className="p-6">
             <div className="mb-6 flex flex-wrap items-start gap-4">
               <Image
                 src={app.assets.icon192}
@@ -70,12 +83,12 @@ export default function AplikaceHubPage() {
                 <p className="mt-1 text-slate-600">{app.pitch}</p>
                 <p className="mt-2 text-sm font-medium text-[#005B96]">{app.priceNote}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <Link
+                  <AppOpenLink
                     href={app.appPath}
                     className="rounded-full bg-[#005B96] px-4 py-2 text-sm font-semibold text-white"
                   >
                     Otevřít {app.shortName}
-                  </Link>
+                  </AppOpenLink>
                   <Link
                     href={app.marketingPath}
                     className="rounded-full border border-[#005B96]/30 px-4 py-2 text-sm font-semibold text-[#005B96]"
@@ -90,6 +103,7 @@ export default function AplikaceHubPage() {
             ) : (
               <AppDownloadPanel app={app} />
             )}
+            </div>
           </article>
         ))}
       </div>

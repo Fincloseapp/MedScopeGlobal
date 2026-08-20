@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 
@@ -6,13 +7,41 @@ import { join, resolve } from "node:path";
 
 export const isVercel = process.env.VERCEL === "1";
 
+export const isCloudflareWorkers = process.env.MEDSCOPE_RUNTIME === "cloudflare-workers";
+
+export const isServerlessRuntime = isVercel || isCloudflareWorkers;
+
 const isCI = process.env.GITHUB_ACTIONS === "true";
 
 const isWin = process.platform === "win32";
 
-const isLocalDev = !isVercel && !isCI;
+const isLocalDev = !isServerlessRuntime && !isCI;
 
+function defaultLocalProjectRoot(): string {
+  if (process.env.MEDSCOPE_PROJECT_ROOT) return process.env.MEDSCOPE_PROJECT_ROOT;
+  if (isServerlessRuntime || isCI) return process.cwd();
+  if (isWin) {
+    const cwd = resolve(process.cwd());
+    if (/^D:\\/i.test(cwd) && existsSync(join(cwd, "package.json"))) return cwd;
+    if (existsSync("D:\\Medi82026\\package.json")) return "D:\\Medi82026";
+    return "D:\\medscope.local";
+  }
+  return process.cwd();
+}
 
+function defaultLocalSideRoot(
+  envName: string,
+  projectRoot: string,
+  folder: string,
+  classicWinPath: string,
+  serverlessPath: string
+): string {
+  if (process.env[envName]) return process.env[envName] as string;
+  if (isServerlessRuntime) return serverlessPath;
+  if (/medi82026/i.test(projectRoot)) return join(projectRoot, folder);
+  // Windows and this Linux workspace both use the D:\ side folders.
+  return classicWinPath;
+}
 
 /**
 
@@ -34,7 +63,7 @@ export function assertNotOnCDrive(resolvedPath: string, label: string): void {
 
       `[MedScope paths] ${label} resolves to C: drive (${normalized}). ` +
 
-      "Use D:\\medscope.local, D:\\medscope.data, or D:\\medscope.logs only.";
+      "Use D:\\Medi82026, D:\\medscope.local, D:\\medscope.data, or D:\\medscope.logs only.";
 
     if (process.env.MEDSCOPE_ALLOW_C_DRIVE === "1") {
 
@@ -74,37 +103,31 @@ function guardRoots(): void {
 
  * Canonical project root.
 
- * Local dev: always D:\medscope.local (never C:).
+ * Windows: D:\Medi82026 when present, else cwd on D:, else D:\medscope.local.
 
- * Vercel/CI: process.cwd() (ephemeral build dir).
+ * Linux / CI / serverless: process.cwd() (never the nested snapshot folder).
 
  */
 
-export const MEDSCOPE_PROJECT_ROOT =
+export const MEDSCOPE_PROJECT_ROOT = defaultLocalProjectRoot();
 
-  process.env.MEDSCOPE_PROJECT_ROOT ??
+/** Off-repo data. Medi82026: D:\Medi82026\data. Jinak D:\medscope.data. */
 
-  (isVercel || isCI ? process.cwd() : "D:\\medscope.local");
+export const MEDSCOPE_DATA_ROOT = defaultLocalSideRoot(
+  "MEDSCOPE_DATA_ROOT",
+  MEDSCOPE_PROJECT_ROOT,
+  "data",
+  "D:\\medscope.data",
+  "/tmp/medscope.data"
+);
 
-
-
-/** Off-repo data: articles, images, auth, ads, audit. Local: D:\medscope.data. */
-
-export const MEDSCOPE_DATA_ROOT =
-
-  process.env.MEDSCOPE_DATA_ROOT ??
-
-  (isVercel ? "/tmp/medscope.data" : "D:\\medscope.data");
-
-
-
-/** Off-repo logs. Local: D:\medscope.logs. */
-
-export const MEDSCOPE_LOGS_ROOT =
-
-  process.env.MEDSCOPE_LOGS_ROOT ??
-
-  (isVercel ? "/tmp/medscope.logs" : "D:\\medscope.logs");
+export const MEDSCOPE_LOGS_ROOT = defaultLocalSideRoot(
+  "MEDSCOPE_LOGS_ROOT",
+  MEDSCOPE_PROJECT_ROOT,
+  "logs",
+  "D:\\medscope.logs",
+  "/tmp/medscope.logs"
+);
 
 
 

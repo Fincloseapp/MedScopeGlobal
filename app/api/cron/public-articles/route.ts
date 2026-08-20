@@ -16,3 +16,5 @@ export async function GET(request: Request) {
   const result = await runPublicArticlesFetch({ limitPerWriter });
   return NextResponse.json(result);
 }
+
+export const POST = GET;

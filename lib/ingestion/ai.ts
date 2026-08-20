@@ -140,20 +140,18 @@ function fallbackProcess(input: {
     ? `
 <h2>Shrnutí</h2>
 <p>${escapeHtml(excerpt)}</p>
-<h2>Klinický význam</h2>
-<p>Tento článek byl automaticky zpracován ze zdroje <strong>${escapeHtml(input.sourceName)}</strong>. Pro plné redakční zpracování nastavte <code>GROQ_API_KEY</code> (zdarma).</p>
 <h2>Zdroj</h2>
+<p>Text vychází z materiálu <strong>${escapeHtml(input.sourceName)}</strong>.</p>
 <p><a href="${escapeAttr(input.sourceUrl)}" rel="noopener noreferrer" target="_blank">Původní publikace</a></p>
-<p><em>MedScopeGlobal — ověřte vůči primární literatuře před klinickým použitím.</em></p>
+<p><em>MedScopeGlobal — informační přehled, nenahrazuje lékařskou péči.</em></p>
 `.trim()
     : `
 <h2>Summary</h2>
 <p>${escapeHtml(excerpt)}</p>
-<h2>Clinical relevance</h2>
-<p>This dispatch was ingested automatically from <strong>${escapeHtml(input.sourceName)}</strong>. Enable <code>GROQ_API_KEY</code> for full editorial synthesis.</p>
 <h2>Source</h2>
-<p><a href="${escapeAttr(input.sourceUrl)}" rel="noopener noreferrer" target="_blank">Read original publication</a></p>
-<p><em>MedScopeGlobal — verify against primary literature before clinical application.</em></p>
+<p>Based on material from <strong>${escapeHtml(input.sourceName)}</strong>.</p>
+<p><a href="${escapeAttr(input.sourceUrl)}" rel="noopener noreferrer" target="_blank">Original publication</a></p>
+<p><em>MedScopeGlobal — educational briefing, not a substitute for clinical care.</em></p>
 `.trim();
 
   return {

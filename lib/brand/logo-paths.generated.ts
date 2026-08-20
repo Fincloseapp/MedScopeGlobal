@@ -1,6 +1,6 @@
 /** AUTO-GENERATED — scripts/sync-logos.mjs — do not edit */
 export const LOGO_FILES = {
-  "transparent": "Logo_Transparent.jpg",
+  "transparent": "Logo_Transparent.png",
   "print": "Logo_Print.jpg",
   "negative": "Logo_Negative.jpg"
 } as const;

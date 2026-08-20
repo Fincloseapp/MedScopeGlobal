@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AiAssistantVisual } from "@/components/ai/assistant-visual";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -39,6 +40,9 @@ export default function AiAsistentHubPage() {
         Tři specializované asistenty napojené na AI Medical engine. Neposkytují diagnózu — slouží ke
         vzdělávání.
       </p>
+      <div className="mt-8">
+        <AiAssistantVisual />
+      </div>
       <div className="mt-10 grid gap-4">
         {ASSISTANTS.map((a) => (
           <Link

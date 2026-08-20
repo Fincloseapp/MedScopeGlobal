@@ -8,15 +8,12 @@ import { VerejnostArticleExpandable } from "@/components/verejnost/verejnost-art
 import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 
 import {
-
   BACKEND_PUBLIC_TOPICS,
-
+  VEREJNOST_HUB_TOPICS,
+  hubTopicKeywords,
   resolveBackendTopic,
-
   topicLabelForSlug,
-
 } from "@/lib/config/verejnost-topics";
-
 import { listPublicArticles } from "@/lib/queries/verejnost";
 
 import { buildV20PageMetadata } from "@/lib/v20/seo";
@@ -57,17 +54,20 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
 
   const backendTopic = resolveBackendTopic(topic);
 
-  const articles = await listPublicArticles({
-
+  let articles = await listPublicArticles({
     limit: 48,
-
     topic: backendTopic,
-
-    ensureContent: true,
-
+    ensureContent: false,
     mode: "full",
-
   });
+
+  const hubKeys = hubTopicKeywords(topic);
+  if (hubKeys) {
+    const narrowed = articles.filter((article) =>
+      hubKeys.test(`${article.title} ${article.excerpt ?? ""} ${article.slug}`)
+    );
+    if (narrowed.length) articles = narrowed;
+  }
 
 
 
@@ -123,7 +123,7 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
 
         </Link>
 
-        {BACKEND_PUBLIC_TOPICS.map((t) => (
+        {VEREJNOST_HUB_TOPICS.map((t) => (
 
           <Link
 
