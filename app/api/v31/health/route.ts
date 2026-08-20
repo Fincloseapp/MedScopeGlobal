@@ -3,7 +3,7 @@ import { getQueryCacheStats } from "@/lib/v31/performance/query-cache";
 import { V31_CACHE_TAGS } from "@/lib/v31/performance/cache";
 import { V31_UI_VERSION } from "@/lib/v31/version";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const INDEX_COUNT = 4;
