@@ -38,8 +38,13 @@ Cloudflare Workers via OpenNext; the source of truth for data is **Supabase** (P
 ### Good no-credential smoke targets (degrade gracefully without Supabase)
 - **MeDiprep** exam-prep PWA at `/app/priprava`: the client shell fetches `/api/mediprep/*` but
   falls back to fully client-side generated tests/dashboards, so you can start a practice test,
-  answer questions, and get a score with no external services.
+  answer questions, and get a score with no external services. Test builder (tab **Testy**) lets
+  you pick mode / subject / count / faculty. Login is always in the app header.
 - **MeDipacient** patient-report PWA at `/app/pacient` renders a client demo dashboard similarly.
+- **PWA install:** Chromium only fires `beforeinstallprompt` on pages inside manifest `scope`
+  (`/app/priprava` for MeDiprep). The **Stáhnout** button on marketing/download pages redirects
+  to `/app/priprava?install=1`. Icons must be truecolor PNG (RGBA). iOS uses Safari Share →
+  Přidat na plochu (no BIP).
 
 ### Repo hygiene note
 - The repo root is cluttered with transient scratch/log files (`_poll-*.mjs`, `*-log.txt`,
