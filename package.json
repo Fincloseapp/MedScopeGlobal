@@ -5,6 +5,7 @@
   "packageManager": "pnpm@9.15.4",
   "scripts": {
     "dev": "next dev",
+    "dev:d": "next dev -H 0.0.0.0 -p 3000",
     "build": "node scripts/run-cloudflare-build.mjs",
     "build:win": "powershell -ExecutionPolicy Bypass -File ./scripts/build-win.ps1",
     "start": "next start",

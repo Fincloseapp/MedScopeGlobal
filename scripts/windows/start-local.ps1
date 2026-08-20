@@ -43,10 +43,19 @@ Write-DotEnvFile -Path $envLocal -Map $merged
 Write-EnvStatusFile -Path (Join-Path $root "NASTAVENI-STAV.txt") -Map $merged
 Write-Host "Aktualizováno .env.local (klíče ze starého D:\medscope.local se doplní, vyplněné se nepřepíší prázdnými)."
 
+$env:SKIP_OPENNEXT_DEV = "1"
+Remove-Item Env:OPENNEXT_CLOUDFLARE_DEV -ErrorAction SilentlyContinue
+Remove-Item Env:MEDSCOPE_RUNTIME -ErrorAction SilentlyContinue
+$env:NEXT_PUBLIC_SITE_URL = "http://localhost:3000"
+$env:DEFAULT_SITE_LOCALE = "cs"
+$env:INGESTION_LOCALE = "cs"
+$env:PORT = "3000"
+
 if (-not (Test-Path (Join-Path $root "node_modules"))) {
   Write-Host "Instaluji závislosti (jednou)…"
   npm install
   if ($LASTEXITCODE -ne 0) { throw "npm install selhal" }
 }
 
-npm run dev
+Write-Host "Otevřete http://localhost:3000  (zastavení: Ctrl+C)"
+npm run dev:d

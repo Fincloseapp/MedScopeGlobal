@@ -141,7 +141,7 @@ function envStatusText(map) {
 
 function copyWindowsLaunchers(srcRoot, dest) {
   const dir = join(srcRoot, "scripts", "windows");
-  const names = ["env-utils.ps1", "set-roots.ps1", "start-local.ps1", "deploy-from-d.ps1"];
+  const names = ["env-utils.ps1", "set-roots.ps1", "start-local.ps1", "start-local.cmd", "deploy-from-d.ps1"];
   const copied = [];
   for (const name of names) {
     const from = join(dir, name);
@@ -299,21 +299,18 @@ Nespoléhá na Cloud Agent. Otevřete ji v Cursoru z disku **D:**.
 - Zdrojový kód větve \`${branch}\` (commit \`${head}\`) včetně git historie
 - Sloučené \`.env.local\` + inventura klíčů v \`NASTAVENI-STAV.txt\` (bez hodnot)
 - Data a logy v \`data\\\` a \`logs\\\`
-- \`set-roots.ps1\`, \`start-local.ps1\`, \`deploy-from-d.ps1\`
+- \`set-roots.ps1\`, \`start-local.cmd\`, \`start-local.ps1\`, \`deploy-from-d.ps1\`
 - Logo header: ${copiedLogos.join(", ") || "doplňte public/assets/logo/logo-header.webp"}
 
-Není tu \`node_modules\` ani Cloudflare build — na D: je doplníte příkazem \`npm install\`.
+Není tu \`node_modules\` ani Cloudflare build — první spuštění je doplní (\`npm install\`).
 
 ## Spuštění na Windows (disk D)
 
-\`\`\`powershell
-cd D:\\Medi82026
-. .\\set-roots.ps1
-npm install
-npm run dev
-\`\`\`
+Dvojklik na \`D:\\Medi82026\\start-local.cmd\`
 
-nebo:
+Stránka: **http://localhost:3000**
+
+Nebo v PowerShellu:
 
 \`\`\`powershell
 powershell -ExecutionPolicy Bypass -File D:\\Medi82026\\start-local.ps1
@@ -321,6 +318,7 @@ powershell -ExecutionPolicy Bypass -File D:\\Medi82026\\start-local.ps1
 
 \`start-local.ps1\` sloučí klíče ze starého \`D:\\medscope.local\\.env.local\` do \`.env.local\`.
 Vyplněné hodnoty se prázdnou šablonou **nepřepíší**.
+Lokální náhled používá \`http://localhost:3000\` a **nespouští** wrangler/OpenNext (to blokovalo \`next dev\`).
 
 ## Nasazení na medscopeglobal.com z D:
 
@@ -354,7 +352,7 @@ Commit: \`${head}\`
 
 ## Lokální kořen D:\\Medi82026
 
-- \`npm run dev\` z této složky (nebo \`start-local.ps1\`)
+- dvojklik \`start-local.cmd\` → **http://localhost:3000** (bez wrangleru)
 - data \`D:\\Medi82026\\data\`, logy \`D:\\Medi82026\\logs\`
 - cesty: pokud existuje \`D:\\Medi82026\\package.json\`, bere se jako projektový kořen
 - deploy: \`deploy-from-d.ps1\` (Wrangler OAuth, bez read-only API tokenu)

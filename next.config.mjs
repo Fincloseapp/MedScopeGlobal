@@ -316,6 +316,13 @@ const nextConfig = {
 
 export default nextConfig;
 
-// OpenNext Cloudflare local bindings for next dev
+// OpenNext Cloudflare bindings are only for `OPENNEXT_CLOUDFLARE_DEV=1`.
+// Plain `next dev` on D:\Medi82026 must start without wrangler.
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
-initOpenNextCloudflareForDev();
+if (process.env.OPENNEXT_CLOUDFLARE_DEV === "1" && process.env.SKIP_OPENNEXT_DEV !== "1") {
+  try {
+    initOpenNextCloudflareForDev();
+  } catch (err) {
+    console.warn("[next.config] OpenNext Cloudflare dev init skipped:", err?.message || err);
+  }
+}
