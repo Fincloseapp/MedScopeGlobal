@@ -10,10 +10,10 @@ const THIN_NEWS_PREFIX =
   /^(klinická studie|zdravotní zpráva|epidemiologická zpráva|komentář):\s*(umělá inteligence|epidemie a cdc|who a hiv|cdc|hiv|who)\s*$/i;
 
 const PLACEHOLDER_UNIVERSITY =
-  /(?:\d\.\s*)?LF\s*(?:UK|MU|HK|OL|PL|OU)?\s*[—\-–:]?\s*(?:výzkumná novinka|výzkumné objevy)?\s*$/i;
+  /(?:\d\.\s*)?LF\s*(?:UK|MU|HK|OL|PL|OU)?\s*[—\-–:]?\s*(?:výzkumná novinka|výzkumné objevy|výzkumné úspěchy)?\s*$/i;
 
 const GENERIC_DISCOVERY =
-  /^nový objev v léčbě|^new breakthrough in|^nový výzkum v oblasti|^nový projekt (?:v oblasti|na rozvoji|pro zlepšení)|^nové (?:centrum|přístupy|přístroje) /i;
+  /^nový objev v léčbě|^new breakthrough in|^nový výzkum v oblasti|^nový projekt (?:v oblasti|na rozvoji|pro zlepšení)|^nové (?:centrum|přístupy|přístroje|ústav) |^výzkum na lékařské fakultě|^výzkumné (?:úspěchy|objevy)\b/i;
 
 export function isThinMagazineTitle(title?: string | null): boolean {
   const t = String(title ?? "").replace(/\s+/g, " ").trim();
@@ -25,7 +25,7 @@ export function isThinMagazineTitle(title?: string | null): boolean {
   if (/^(klinická studie|zdravotní zpráva|epidemiologická zpráva):\s*.{0,22}$/i.test(t)) {
     return true;
   }
-  if (/^zahraniční zdravotnická zpráva$/i.test(t)) return true;
+  if (/zahraniční zdravotnická zpráva/i.test(t) && t.length < 64) return true;
   return false;
 }
 

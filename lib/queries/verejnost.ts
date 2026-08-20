@@ -119,7 +119,7 @@ function articleMatchesPublicTopic(
 ): boolean {
   if (isThinMagazineTitle(article.title)) return false;
   if (article.public_topic === topic) {
-    if (topic === "nemoci" && /zdravý život|praktické rady pro kaž/i.test(article.title ?? "")) {
+    if (topic === "nemoci" && /očkov|ockov|screening|zdravý život|praktické rady pro kaž/i.test(article.title ?? "")) {
       return false;
     }
     return true;
