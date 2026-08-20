@@ -3,6 +3,7 @@ import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
 import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rules";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
+import { isThinMagazineTitle } from "@/lib/articles/quality-filters";
 import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import type { AdRow } from "@/types/database";
@@ -58,7 +59,7 @@ async function loadArticlesPublic(): Promise<DisplayArticle[]> {
 
   const mapped = mapArticleList(data as Record<string, unknown>[] | null);
   const active = filterCzechContent(filterActiveArticles(mapped), "cs");
-  const publicOnly = active.filter((a) => !a.vip_only);
+  const publicOnly = active.filter((a) => !a.vip_only && !isThinMagazineTitle(a.title));
   const prepared = await prepareArticlesForDisplay(publicOnly, "cs", {
     mode: "card",
     maxTranslate: 12,
@@ -86,6 +87,6 @@ async function loadHomepageData(): Promise<{
 
 export const getHomepageCachedData = unstable_cache(
   loadHomepageData,
-  ["v22-homepage-public-v4"],
+  ["v22-homepage-public-v5"],
   { revalidate: 120, tags: ["medscope-ui-v22.5", "v22-content", "portal-articles"] }
 );

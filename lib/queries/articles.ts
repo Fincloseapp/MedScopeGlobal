@@ -24,6 +24,7 @@ import {
   filterCzechContent,
   isArchivedArticle,
 } from "@/lib/v20/content-rules";
+import { isThinMagazineTitle } from "@/lib/articles/quality-filters";
 import type { ArticleWithRelations } from "@/types/database";
 
 export type { DisplayArticle };
@@ -79,7 +80,7 @@ function filterForMetadataRubricListing(
   articles: ArticleWithRelations[],
   locale: LocaleCode = "cs"
 ): ArticleWithRelations[] {
-  const active = filterActiveArticles(articles);
+  const active = filterActiveArticles(articles).filter((a) => !isThinMagazineTitle(a.title));
   if (locale !== "cs") return active;
   return active.filter((a) => a.locale !== "en" && Boolean(a.title?.trim()));
 }

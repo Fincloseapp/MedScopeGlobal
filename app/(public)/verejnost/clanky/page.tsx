@@ -9,6 +9,7 @@ import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 
 import {
   BACKEND_PUBLIC_TOPICS,
+  VEREJNOST_HUB_TOPICS,
   hubTopicKeywords,
   resolveBackendTopic,
   topicLabelForSlug,
@@ -56,7 +57,7 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
   let articles = await listPublicArticles({
     limit: 48,
     topic: backendTopic,
-    ensureContent: true,
+    ensureContent: false,
     mode: "full",
   });
 
@@ -122,7 +123,7 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
 
         </Link>
 
-        {BACKEND_PUBLIC_TOPICS.map((t) => (
+        {VEREJNOST_HUB_TOPICS.map((t) => (
 
           <Link
 

@@ -1,6 +1,7 @@
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { getPublishedReadClient } from "@/lib/supabase/published-read";
 import { isLayAudienceArticle } from "@/lib/config/section-article-map";
+import { isThinMagazineTitle } from "@/lib/articles/quality-filters";
 import { resolveWriterAgent } from "@/lib/editorial/writer-agents";
 import { mapArticleList } from "@/lib/db/map-article";
 import {
@@ -45,63 +46,92 @@ export async function listPublicArticles(options?: {
   /** full = načte celý obsah článku (pro expand-on-click). */
   mode?: "card" | "full";
 }): Promise<DisplayArticle[]> {
-  if (options?.ensureContent !== false) {
-    const { ensurePublicArticlesSeeded } = await import("@/lib/verejnost/ensure-content");
-    await ensurePublicArticlesSeeded();
+  if (options?.ensureContent === true) {
+    try {
+      const { ensurePublicArticlesSeeded } = await import("@/lib/verejnost/ensure-content");
+      await ensurePublicArticlesSeeded();
+    } catch (error) {
+      console.error("listPublicArticles:ensure", error);
+    }
   }
 
   const limit = options?.limit ?? 12;
   const offset = options?.offset ?? 0;
   const locale = options?.locale ?? "cs";
   const supabase = await getPublishedReadClient();
-  if (!supabase) return [];
+  let prepared: DisplayArticle[] = [];
 
-  const { data, error } = await supabase
-    .from("articles")
-    .select(articleSelect)
-    .eq("published", true)
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .range(0, 79);
+  if (supabase) {
+    const { data, error } = await supabase
+      .from("articles")
+      .select(articleSelect)
+      .eq("published", true)
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(48);
 
-  if (error) {
-    console.error("listPublicArticles", error);
-    return [];
+    if (error) {
+      console.error("listPublicArticles", error);
+    } else {
+      const rows = mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[];
+      const publicFacing = rows.filter(
+        (article) =>
+          !article.vip_only &&
+          !isThinMagazineTitle(article.title) &&
+          (isLayAudienceArticle(article) ||
+            article.min_access_level === "public" ||
+            article.slug.startsWith("verejnost-") ||
+            Boolean(resolveWriterAgent(article)))
+      );
+      const mode = options?.mode ?? "card";
+      prepared = await prepareArticlesForDisplay(publicFacing, locale, { mode, maxTranslate: limit });
+    }
   }
 
-  const rows = mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[];
-  const publicFacing = rows.filter(
-    (article) =>
-      !article.vip_only &&
-      (isLayAudienceArticle(article) ||
-        article.min_access_level === "public" ||
-        article.slug.startsWith("verejnost-") ||
-        Boolean(resolveWriterAgent(article)))
-  );
-  const mode = options?.mode ?? "card";
-  const prepared = await prepareArticlesForDisplay(publicFacing, locale, { mode, maxTranslate: limit });
-  const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
-  let withCovers = prepared.map((a) => ({ ...a, cover_image_url: resolveVerejnostCoverUrl(a) }));
+  if (!prepared.length) {
+    try {
+      const { getHomepageCachedData } = await import("@/lib/v22/homepage-cache");
+      const home = await getHomepageCachedData();
+      prepared = home.articles.filter((article) => !article.vip_only && !isThinMagazineTitle(article.title));
+    } catch (error) {
+      console.error("listPublicArticles:homepage-fallback", error);
+    }
+  }
+
+  let withCovers = prepared.filter((article) => !isThinMagazineTitle(article.title));
 
   if (options?.topic) {
-    const topic = options.topic;
-    withCovers = withCovers.filter((article) => articleMatchesPublicTopic(article, topic));
+    withCovers = withCovers.filter((article) => articleMatchesPublicTopic(article, options.topic!));
   }
 
   return withCovers.slice(offset, offset + limit);
 }
 
+const TOPIC_HINTS: Record<PublicTopic, RegExp> = {
+  "zivotni-styl": /spánk|spanek|strav|pohyb|stres|hydrat|bílkovin|bilkovin|talíř|talir|výživ|vyziv|chůz|chuz|ergon/i,
+  nemoci: /nemoc|chřip|chrip|tlak|cukrovk|alerg|bolest|infekc|žalud|zalud|migré|migr|lyme|klíšť|klist/i,
+  prevence: /prevenc|očkov|ockov|screening|prohlíd|prohlid|hpv|mamograf|kolonoskop/i,
+  rozhovory: /rozhovor|příběh|pribeh|geriatr|pečovatel|pecovatel|host|q&a|interview/i,
+};
+
 function articleMatchesPublicTopic(
   article: DisplayArticle,
   topic: PublicTopic
 ): boolean {
-  if (article.public_topic === topic) return true;
+  if (isThinMagazineTitle(article.title)) return false;
+  if (article.public_topic === topic) {
+    if (topic === "nemoci" && /zdravý život|praktické rady pro kaž/i.test(article.title ?? "")) {
+      return false;
+    }
+    return true;
+  }
   if (article.slug.includes(`verejnost-${topic}`)) return true;
   const agent = resolveWriterAgent(article);
   if (agent?.topic === topic) return true;
   if (topic === "zivotni-styl" && (agent?.id === "writer5" || article.slug.includes("dlouhovekost"))) {
     return true;
   }
-  return false;
+  const blob = `${article.title ?? ""} ${article.excerpt ?? ""} ${article.slug}`;
+  return TOPIC_HINTS[topic].test(blob);
 }
 
 export async function getPublicArticleBySlug(

@@ -1,9 +1,8 @@
 import { resolvePublicImageUrl } from "@/lib/v25/images/resolve-public";
 
-export async function resolveManyImages<T extends { slug: string; image_url?: string | null }>(
-  items: T[],
-  section: string
-): Promise<Array<T & { resolvedImageUrl: string }>> {
+export async function resolveManyImages<
+  T extends { slug: string; image_url?: string | null; title?: string | null; summary?: string | null },
+>(items: T[], section: string): Promise<Array<T & { resolvedImageUrl: string }>> {
   return Promise.all(
     items.map(async (item) => ({
       ...item,
@@ -11,6 +10,8 @@ export async function resolveManyImages<T extends { slug: string; image_url?: st
         section,
         slug: item.slug,
         dbUrl: item.image_url,
+        title: item.title,
+        excerpt: item.summary,
       }),
     }))
   );

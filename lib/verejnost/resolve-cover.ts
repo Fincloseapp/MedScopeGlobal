@@ -18,10 +18,14 @@ const PHOTO = {
   food: U("photo-1490645935967-10de6ba17061"),
   salad: U("photo-1512621776951-a57141f2eefd"),
   kitchen: U("photo-1498837167922-ddd27525ae35"),
+  fruit: U("photo-1610832958506-aa56368176cf"),
   water: U("photo-1548839140-29a749e1cf4d"),
+  tea: U("photo-1544787219-7f47ccb76574"),
   sleep: U("photo-1631049307264-da0ec9d70304"),
   forest: U("photo-1441974231531-c6227db76b6e"),
+  landscape: U("photo-1469474968028-56623f02e42e"),
   weights: U("photo-1517836357463-d25dfeac3438"),
+  track: U("photo-1476480862126-209bfaa8edc8"),
   shoes: U("photo-1542291026-7eec264c27ff"),
   books: U("photo-1481627834876-b7833e8f5570"),
   desk: U("photo-1434030216411-0b793f4b4173"),
@@ -33,13 +37,17 @@ const PHOTO = {
 const ALLOWED_IDS = Object.values(PHOTO).map((url) => url.match(/photo-[a-z0-9]+/i)?.[0] ?? "");
 
 const KEYWORD_PHOTOS: { keys: RegExp; url: string }[] = [
-  { keys: /spánk|spanek|insomn|regenerac|postel|unaven/i, url: PHOTO.sleep },
+  { keys: /spánk|spanek|insomn|postel|unaven|nočn|nocni/i, url: PHOTO.sleep },
   { keys: /hydrat|pitn[ée]|vod[ae]|tekutin/i, url: PHOTO.water },
-  { keys: /výživ|vyziv|jíd|jidlo|talíř|talir|bílkovin|bilkovin|strav|diet|zelenin|snídan/i, url: PHOTO.food },
   { keys: /středomoř|stredomor|salát|salat|oliv/i, url: PHOTO.salad },
+  { keys: /ovoce|vitamín c|vitamin c|citrus/i, url: PHOTO.fruit },
+  { keys: /výživ|vyziv|jíd|jidlo|talíř|talir|bílkovin|bilkovin|strav|diet|zelenin|snídan/i, url: PHOTO.food },
   { keys: /kuchyň|kuchyn|vařen|varen/i, url: PHOTO.kitchen },
-  { keys: /stres|dechov|imunit|odolnost|klid|pohod/i, url: PHOTO.forest },
-  { keys: /pohyb|cvič|cvic|fitness|posilov|chůz|chuz|běh|beh|10 minut/i, url: PHOTO.weights },
+  { keys: /čaj|caj|bylinn/i, url: PHOTO.tea },
+  { keys: /stres|úzkost|uzkost|dechov/i, url: PHOTO.forest },
+  { keys: /klid|pohoda|přírod|prirod|les\b|procházk|prochazk/i, url: PHOTO.landscape },
+  { keys: /10 minut|posilov|fitness|činka|cinka|sval/i, url: PHOTO.weights },
+  { keys: /chůz|chuz|běh|beh|dráha|draha|vo2/i, url: PHOTO.track },
   { keys: /bot[ay]|běžeck|bezeck/i, url: PHOTO.shoes },
   { keys: /lék[yu]|lek[yu]|pilulk|farmak|tabletk/i, url: PHOTO.pills },
   { keys: /rozhovor|podcast|mikrofon|interview|host/i, url: PHOTO.mic },
@@ -48,17 +56,19 @@ const KEYWORD_PHOTOS: { keys: RegExp; url: string }[] = [
   { keys: /knih|čtení|cteni/i, url: PHOTO.books },
   { keys: /kongres|konferen/i, url: PHOTO.congress },
   { keys: /zákon|zakon|legislativ|právo|pravo/i, url: PHOTO.law },
-  { keys: /digitál|digital|aplikac|počítač|pocitac|notebook/i, url: PHOTO.laptop },
-  { keys: /prevenc|screening|očkov|ockov|prohlíd|prohlid/i, url: PHOTO.clinic },
+  { keys: /digitál|digital|aplikac|počítač|pocitac|notebook|wearable/i, url: PHOTO.laptop },
+  { keys: /očkov|ockov|vakcín|vakcin|screening|prohlíd|prohlid/i, url: PHOTO.clinic },
+  { keys: /tlak|hypertenz|srdc|kardi/i, url: PHOTO.hands },
+  { keys: /chřip|chrip|nachlazen|infekc|horeč|horec/i, url: PHOTO.clinic },
   { keys: /nemoc|diagnóz|diagnos|symptom|příznak|priznak/i, url: PHOTO.hands },
 ];
 
 const TOPIC_PHOTOS: Record<string, string[]> = {
-  "zivotni-styl": [PHOTO.food, PHOTO.sleep, PHOTO.forest, PHOTO.water, PHOTO.weights, PHOTO.salad],
+  "zivotni-styl": [PHOTO.food, PHOTO.sleep, PHOTO.landscape, PHOTO.water, PHOTO.track, PHOTO.salad, PHOTO.fruit, PHOTO.tea],
   nemoci: [PHOTO.hands, PHOTO.clinic, PHOTO.pills],
-  prevence: [PHOTO.clinic, PHOTO.hands, PHOTO.weights, PHOTO.food],
+  prevence: [PHOTO.clinic, PHOTO.hands, PHOTO.food, PHOTO.track],
   rozhovory: [PHOTO.mic, PHOTO.lecture, PHOTO.campus],
-  dlouhovekost: [PHOTO.forest, PHOTO.food, PHOTO.sleep, PHOTO.weights],
+  dlouhovekost: [PHOTO.landscape, PHOTO.food, PHOTO.sleep, PHOTO.track],
 };
 
 function sigForSlug(slug: string): string {
@@ -69,6 +79,11 @@ function sigForSlug(slug: string): string {
 function isAllowedUnsplash(url: string): boolean {
   if (hasBadUnsplashId(url)) return false;
   return ALLOWED_IDS.some((id) => id && url.includes(id));
+}
+
+export function isWeakMagazineCover(url?: string | null): boolean {
+  if (!url) return true;
+  return isUnsafeCover(url);
 }
 
 function isUnsafeCover(url: string): boolean {
@@ -102,8 +117,10 @@ export function resolveVerejnostCoverUrl(article: {
   public_topic?: string | null;
   metadata?: Record<string, unknown> | null;
 }): string {
-  const blob = `${article.title ?? ""} ${article.excerpt ?? ""} ${article.slug}`;
-  const keyword = KEYWORD_PHOTOS.find((row) => row.keys.test(blob));
+  const titleBlob = `${article.title ?? ""} ${article.slug}`;
+  const keyword =
+    KEYWORD_PHOTOS.find((row) => row.keys.test(titleBlob)) ??
+    KEYWORD_PHOTOS.find((row) => row.keys.test(`${article.excerpt ?? ""}`));
   if (keyword) return `${keyword.url}${sigForSlug(article.slug)}`;
 
   const stored = article.cover_image_url?.trim();

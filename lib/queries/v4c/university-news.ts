@@ -1,4 +1,5 @@
 import { getPublishedReadClient } from "@/lib/supabase/published-read";
+import { isPlaceholderUniversityNewsTitle } from "@/lib/articles/quality-filters";
 
 export type UniversityNewsRow = {
   id: string;
@@ -16,15 +17,17 @@ export type UniversityNewsRow = {
   created_at: string;
 };
 
-const PLACEHOLDER_TITLE = /^(?:\d\.\s*)?LF\s*(?:UK|MU|HK|OL|PL)\s*[—\-–:]?\s*výzkumná novinka\s*$/i;
-const EMPTY_SUMMARY = /^(?:není k dispozici|n\/a|-)?\s*$/i;
+const EMPTY_SUMMARY = /^(?:není k dispozici|n\/a|-|není k dispozici\.?)?\s*$/i;
 
 function isUsableUniversityNews(row: UniversityNewsRow): boolean {
   const title = (row.title ?? "").trim();
   const summary = (row.summary ?? row.body ?? "").trim();
-  if (title.length < 18) return false;
-  if (PLACEHOLDER_TITLE.test(title) && summary.length < 80) return false;
-  if (EMPTY_SUMMARY.test(summary) && PLACEHOLDER_TITLE.test(title)) return false;
+  if (isPlaceholderUniversityNewsTitle(title)) return false;
+  if (summary.length < 40 && title.length < 40) return false;
+  if (EMPTY_SUMMARY.test(summary) && title.length < 48) return false;
+  if (/\b(the|and|with|study|breakthrough)\b/i.test(title) && !/[áčďéěíňóřšťúůýž]/i.test(title)) {
+    return false;
+  }
   return true;
 }
 
@@ -43,7 +46,14 @@ export async function getUniversityNewsList(tag?: string) {
     console.error("getUniversityNewsList", error);
     return [];
   }
-  return ((data ?? []) as UniversityNewsRow[]).filter(isUsableUniversityNews);
+  const rows = ((data ?? []) as UniversityNewsRow[]).filter(isUsableUniversityNews);
+  const seen = new Set<string>();
+  return rows.filter((row) => {
+    const key = row.title.trim().toLocaleLowerCase("cs-CZ");
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 export async function getUniversityNewsBySlug(slug: string) {

@@ -374,18 +374,17 @@ function needsTitleRewrite(title: string): boolean {
   if (/^(klinická studie:\s*)?hidradenitis(?:\s+suppurativa)?$/i.test(raw.trim())) return true;
   const core = stripCzechEditorialPrefix(raw) || raw;
   if (/^hidradenitis(?:\s+suppurativa)?$/i.test(core.trim())) return true;
+  if (/^(klinická studie|zdravotní zpráva|epidemiologická zpráva):\s*.{0,28}$/i.test(raw.trim())) {
+    return true;
+  }
   if (stillLooksEnglish(core)) return true;
   return isEnglishDominant(raw);
 }
 
-function buildTopicExcerpt(czechTitle: string, cleanedSource?: string): string {
-  for (const [re, cs] of TOPIC_EXCERPTS) {
-    if (re.test(czechTitle) || (cleanedSource && re.test(cleanedSource))) {
-      return cs;
-    }
-  }
-  const short = czechTitle.replace(/^(Klinická studie|Zdravotní zpráva|Epidemiologická zpráva|Komentář):\s*/i, "");
-  return `${short}. Konkrétní shrnutí zahraniční zprávy pro české lékaře — hlavní zjištění a praktický kontext.`;
+function isThinNewsPayload(topic: string): boolean {
+  const t = topic.trim();
+  if (t.length < 28) return true;
+  return /^(umělá inteligence|epidemie a cdc|who a hiv|cdc|hiv|who)$/i.test(t);
 }
 
 /** Profesionální česká syntéza titulku — bez ponechání anglického jádra. */
@@ -406,17 +405,32 @@ export function toCzechTitle(title: string, context = "zdravotní zpravodajství
   }
 
   const kind = inferNewsKind(core);
+  const payload = capitalizeCs(topic);
+
+  if (isThinNewsPayload(topic)) {
+    return payload.length >= 18 ? payload : "Zahraniční zdravotnická zpráva";
+  }
 
   if (context.includes("studie") || kind === "study") {
-    return `Klinická studie: ${capitalizeCs(topic)}`;
+    return `Klinická studie: ${payload}`;
   }
   if (kind === "outbreak") {
-    return `Epidemiologická zpráva: ${capitalizeCs(topic)}`;
+    return `Epidemiologická zpráva: ${payload}`;
   }
   if (kind === "editorial") {
-    return `Komentář: ${capitalizeCs(topic)}`;
+    return `Komentář: ${payload}`;
   }
-  return `Zdravotní zpráva: ${capitalizeCs(topic)}`;
+  return `Zdravotní zpráva: ${payload}`;
+}
+
+function buildTopicExcerpt(czechTitle: string, cleanedSource?: string): string {
+  for (const [re, cs] of TOPIC_EXCERPTS) {
+    if (re.test(czechTitle) || (cleanedSource && re.test(cleanedSource))) {
+      return cs;
+    }
+  }
+  const short = czechTitle.replace(/^(Klinická studie|Zdravotní zpráva|Epidemiologická zpráva|Komentář):\s*/i, "");
+  return `${short}. Konkrétní shrnutí zahraniční zprávy pro české lékaře — hlavní zjištění a praktický kontext.`;
 }
 
 export function toCzechExcerpt(excerpt: string | null | undefined, title: string): string {

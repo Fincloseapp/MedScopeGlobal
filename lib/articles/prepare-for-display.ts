@@ -10,6 +10,7 @@ import type { ArticleWithRelations } from "@/types/database";
 import { dedupeArticlesByTitle } from "@/lib/articles/dedupe";
 import { enrichArticleBodyForDisplay } from "@/lib/articles/enrich-body";
 import { polishCzechFields } from "@/lib/v22/translate";
+import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 import {
   assignEditorialUnits,
   formatEditorialUnitDisplay,
@@ -27,6 +28,13 @@ export type DisplayArticle = ArticleWithRelations & {
   editorialPrimaryLabel?: string;
 };
 
+function withMagazineCover(article: DisplayArticle): DisplayArticle {
+  return {
+    ...article,
+    cover_image_url: resolveVerejnostCoverUrl(article),
+  };
+}
+
 function attachEditorialDisplay(
   article: ArticleWithRelations,
   locale: LocaleCode,
@@ -34,7 +42,7 @@ function attachEditorialDisplay(
 ): DisplayArticle {
   const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
   const assignment = assignEditorialUnits(article ?? {});
-  return {
+  return withMagazineCover({
     ...article,
     ...extra,
     editorialAssignment: assignment,
@@ -43,7 +51,7 @@ function attachEditorialDisplay(
       editorialLocale,
       assignment.aiAssisted
     ),
-  };
+  });
 }
 
 function sortByLocalePreference(
