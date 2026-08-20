@@ -48,7 +48,18 @@ assert.equal(
     slug: "acep-sedation",
     title: "Unscheduled Procedural Sedation Multidisciplinary Delphi Consensus Guidelines",
     locale: "en",
+    audience: "public",
     min_access_level: "public",
+  }),
+  true
+);
+
+assert.equal(
+  isPhysicianRestrictedArticle({
+    slug: "odborny-brief-kardiologie",
+    title: "Nové doporučení pro léčbu srdečního selhání",
+    locale: "cs",
+    audience: "professional",
   }),
   true
 );
@@ -61,5 +72,14 @@ assert.equal(
   }),
   false
 );
+
+const foi = sanitizeArticleHtml("Metodický návod pro měření a hodnocení hluku", {
+  title: "Žádost o informace ze dne 9.8.2026",
+  excerpt: "Metodický návod pro měření a hodnocení hluku",
+  source_name: "Ministerstvo zdravotnictví ČR",
+  source_url: "https://www.mzcr.cz/example",
+});
+assert.doesNotMatch(foi, /GROQ/i);
+assert.match(foi, /žádost o informace|informační přehled|Původní dokument/i);
 
 console.log("article-display-gate-check ok");

@@ -99,34 +99,7 @@ function buildStudiumBody(article: EnrichableArticle): string {
   ].join("");
 }
 
-function buildGenericBody(article: EnrichableArticle): string {
-  const intro =
-    article.excerpt?.trim() ||
-    "Praktický přehled pro studenty a lékaře v ambulantní praxi.";
-
-  const objectives = article.learning_objectives?.length
-    ? article.learning_objectives
-    : [
-        "Porozumět hlavnímu klinickému kontextu",
-        "Aplikovat doporučení v každodenní praxi",
-        "Vyhodnotit limity a rizika",
-      ];
-
-  return [
-    section("Shrnutí", [intro]),
-    listSection("Klíčové body", objectives),
-    section("Klinický kontext", [
-      "Obsah je připraven redakcí MedScopeGlobal jako vzdělávací materiál. Vždy ověřte aktuální guidelines a lokální protokoly před klinickým rozhodnutím.",
-      "U složitějších případů konzultujte specialista — tento článek nenahrazuje individuální péči.",
-    ]),
-    section("Další kroky", [
-      "Projděte související články v sekci Medicína nebo odborné briefy.",
-      "Uložte si klíčové poznámky pro opakování před zkouškou nebo atestací.",
-    ]),
-  ].join("");
-}
-
-/** Expand stub editorial HTML into a fuller article for detail pages. Skips public/verejnost articles. */
+/** Expand stub study/prep HTML only. Never invent clinical copy for news or FOI stubs. */
 export function enrichArticleBodyForDisplay(article: EnrichableArticle & {
   audience?: string | null;
   rubric_slug?: string | null;
@@ -140,17 +113,17 @@ export function enrichArticleBodyForDisplay(article: EnrichableArticle & {
     return article.content;
   }
 
+  const medTrack = article.med_track;
+  if (medTrack !== "priprava" && medTrack !== "studium") {
+    return article.content;
+  }
+
   if (!isStubContent(article.content)) {
     return article.content;
   }
 
-  const medTrack = article.med_track;
   if (medTrack === "priprava") {
     return buildPripravaBody(article);
   }
-  if (medTrack === "studium") {
-    return buildStudiumBody(article);
-  }
-
-  return buildGenericBody(article);
+  return buildStudiumBody(article);
 }

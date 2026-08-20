@@ -26,7 +26,9 @@ export async function ContentRecommendations({
     .limit(24);
 
   const rows = (data ?? []).filter((row) => {
+    const blob = `${row.title ?? ""} ${row.excerpt ?? ""}`;
     if (hasEditorialSetupLeak(row.title) || hasEditorialSetupLeak(row.excerpt)) return false;
+    if (/MeDiprep|MeDipacient|GROQ_API_KEY|plné redakční zpracování/i.test(blob)) return false;
     if (!odborna.allowed && isPhysicianRestrictedArticle(row)) return false;
     return true;
   });

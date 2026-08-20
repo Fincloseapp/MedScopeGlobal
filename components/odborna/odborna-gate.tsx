@@ -15,7 +15,7 @@ import type { OdbornaGateReason } from "@/lib/auth/odborna-access";
 const REASON_COPY: Record<OdbornaGateReason, { title: string; body: string }> = {
   login: {
     title: "Přihlášení vyžadováno",
-    body: "Odborná sekce je dostupná pouze registrovaným uživatelům.",
+    body: "Odborný obsah pro lékaře je dostupný po přihlášení a ověření ČLK.",
   },
   verify: {
     title: "Ověření ČLK",

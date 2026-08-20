@@ -4,6 +4,8 @@ import { V19_RUBRIC_SLUG, V24_RUBRIC_SLUG } from "@/lib/config/section-article-m
 const CLINICAL_EN =
   /\b(guideline|guidelines|delphi|consensus|acep|patients?|trial|randomized|approved by the|clinical practice|procedural sedation|multidisciplinary)\b/i;
 
+const CZECH_DIACRITICS = /[áčďéěíňóřšťúůýž]/i;
+
 export type ProfessionalArticleLike = {
   slug: string;
   title?: string | null;
@@ -16,8 +18,7 @@ export type ProfessionalArticleLike = {
   metadata?: Record<string, unknown> | null;
 };
 
-function isLayMagazine(article: ProfessionalArticleLike): boolean {
-  if (article.audience === "public") return true;
+function hasLayMagazineSignals(article: ProfessionalArticleLike): boolean {
   if (article.public_topic) return true;
   if (article.slug.startsWith("verejnost-")) return true;
   const rubric = article.rubric_slug ?? "";
@@ -26,11 +27,13 @@ function isLayMagazine(article: ProfessionalArticleLike): boolean {
 
 /** Lay magazine pieces stay open. Highly clinical items need ČLK verification. */
 export function isPhysicianRestrictedArticle(article: ProfessionalArticleLike): boolean {
-  if (isLayMagazine(article)) return false;
-  if (resolveWriterAgent(article)) return false;
+  if (hasLayMagazineSignals(article)) return false;
 
   const level = (article.min_access_level ?? "public").toLowerCase();
   if (level === "physician") return true;
+
+  const audience = (article.audience ?? "").toLowerCase();
+  if (audience === "professional" || audience === "physician") return true;
 
   const rubric = article.rubric_slug ?? "";
   if (rubric === V19_RUBRIC_SLUG || rubric === V24_RUBRIC_SLUG || rubric === "odborna") {
@@ -39,7 +42,8 @@ export function isPhysicianRestrictedArticle(article: ProfessionalArticleLike): 
 
   const title = article.title ?? "";
   if (article.locale === "en") return true;
-  if (CLINICAL_EN.test(title) && !/[áčďéěíňóřšťúůýž]/i.test(title)) return true;
-  if (article.audience === "professional" && !/[áčďéěíňóřšťúůýž]/i.test(title)) return true;
+  if (CLINICAL_EN.test(title) && !CZECH_DIACRITICS.test(title)) return true;
+
+  if (resolveWriterAgent(article)) return false;
   return false;
 }

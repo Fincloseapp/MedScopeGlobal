@@ -5,7 +5,7 @@ const AD_ASIDE =
   /<aside\b[^>]*class="[^"]*ms-(?:public|student|pro)-ad[\s\S]*?<\/aside>/gi;
 
 const GROQ_BLOCK =
-  /<(p|li|div|h2|h3)\b[^>]*>[\s\S]*?(?:GROQ_API_KEY|plné redakční zpracování nastavte|Enable <code>GROQ)[\s\S]*?<\/\1>/gi;
+  /<(p|li|div|h2|h3)\b[^>]*>[\s\S]*?(?:GROQ_API_KEY|plné redakční zpracování nastavte|Enable <code>GROQ|Tento článek byl automaticky zpracován)[\s\S]*?<\/\1>/gi;
 
 function escapeHtml(s: string): string {
   return String(s ?? "")
@@ -29,6 +29,7 @@ export function sanitizePublicText(text?: string | null): string {
   return raw
     .replace(/\s*Pro plné redakční zpracování nastavte[\s\S]{0,80}/gi, " ")
     .replace(/\s*Enable <code>GROQ_API_KEY<\/code>[\s\S]{0,80}/gi, " ")
+    .replace(/\s*Tento článek byl automaticky zpracován[\s\S]{0,180}/gi, " ")
     .replace(/GROQ_API_KEY/gi, "")
     .replace(/\s+/g, " ")
     .trim();
@@ -40,21 +41,36 @@ function rebuildSourceBrief(input: {
   source_name?: string | null;
   source_url?: string | null;
 }): string {
-  const excerpt =
-    sanitizePublicText(stripTags(input.excerpt ?? "")) ||
-    "Oficiální materiál je k dispozici u vydavatele. MedScopeGlobal jej uvádí jako informační přehled.";
+  const title = String(input.title ?? "").trim();
+  const excerptPlain = sanitizePublicText(stripTags(input.excerpt ?? ""));
   const source = escapeHtml(input.source_name?.trim() || "původní zdroj");
   const url = input.source_url?.trim();
   const link = url
     ? `<p><a href="${escapeHtml(url)}" rel="noopener noreferrer" target="_blank">Původní dokument — ${source}</a></p>`
     : `<p>Zdroj: ${source}</p>`;
+
+  const isFoi = /žádost o informace/i.test(title);
+  const lead = isFoi
+    ? `Jde o oficiální žádost o informace. ${
+        excerptPlain
+          ? `Předmětem je ${excerptPlain.charAt(0).toLowerCase()}${excerptPlain.slice(1)}.`
+          : "Úplné znění je u vydavatele."
+      }`
+    : excerptPlain ||
+      "Oficiální materiál je k dispozici u vydavatele. MedScopeGlobal jej uvádí jako informační přehled.";
+
   return [
     "<h2>Shrnutí</h2>",
-    `<p>${escapeHtml(excerpt)}</p>`,
+    `<p>${escapeHtml(lead)}</p>`,
+    isFoi
+      ? "<p>Redakce MedScopeGlobal zde zveřejňuje orientační přehled veřejného dokumentu, nikoli právní rady ani stanovisko úřadu.</p>"
+      : "",
     "<h2>Zdroj</h2>",
     link,
     "<p><em>MedScopeGlobal — informační přehled, nenahrazuje lékařskou péči ani rozhodnutí ošetřujícího lékaře.</em></p>",
-  ].join("");
+  ]
+    .filter(Boolean)
+    .join("");
 }
 
 export function sanitizeArticleHtml(

@@ -1,12 +1,13 @@
 import { CoverImage } from "@/components/media/cover-image";
 import Link from "next/link";
-import { Calendar } from "lucide-react";
+import { Calendar, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { assignEditorialUnits, formatEditorialUnitDisplay } from "@/lib/editorial/units";
 import { resolveWriterAgent } from "@/lib/editorial/writer-agents";
+import { isPhysicianRestrictedArticle } from "@/lib/articles/professional-access";
 import { WriterAgentByline } from "@/components/editorial/writer-agent-byline";
 import type { ArticleWithRelations } from "@/types/database";
 
@@ -28,6 +29,7 @@ export function ArticleCard({ article }: { article: DisplayArticle | ArticleWith
     });
   const coverMeta = getArticleCoverLabel(article.title, cat?.name);
   const coverStyles = getArticleCoverStyles(article.title, cat?.name);
+  const locked = isPhysicianRestrictedArticle(article);
 
   return (
     <Card className="group overflow-hidden rounded-[26px] border border-slate-200/80 bg-white/95 shadow-[0_16px_50px_-28px_rgba(2,30,57,0.55)] transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_24px_70px_-28px_rgba(0,91,150,0.6)]">
@@ -85,12 +87,20 @@ export function ArticleCard({ article }: { article: DisplayArticle | ArticleWith
               {cat.name}
             </p>
           )}
+          {locked ? (
+            <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-[#021d33] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+              <Lock className="h-3 w-3" aria-hidden />
+              ČLK
+            </span>
+          ) : null}
           <h3 className="mt-2 font-display text-xl font-semibold leading-snug text-medical-navy">
             {article.title}
           </h3>
-          {article.excerpt && (
+          {(locked || article.excerpt) && (
             <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
-              {article.excerpt}
+              {locked
+                ? "Odborný článek pro ověřené lékaře. Plný text po přihlášení a ověření ČLK."
+                : article.excerpt}
             </p>
           )}
         </CardContent>

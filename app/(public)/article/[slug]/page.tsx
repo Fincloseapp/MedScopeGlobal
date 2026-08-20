@@ -26,7 +26,6 @@ import {
 } from "@/lib/editorial/units";
 import { canAccessContent } from "@/lib/config/access-levels";
 import type { AccessLevelId } from "@/lib/config/access-levels";
-import { isLayAudienceArticle } from "@/lib/config/section-article-map";
 import { isPhysicianRestrictedArticle } from "@/lib/articles/professional-access";
 import { getOdbornaAccess } from "@/lib/auth/odborna-access";
 import { OdbornaGate } from "@/components/odborna/odborna-gate";
@@ -122,8 +121,14 @@ export default async function ArticlePage({ params }: Props) {
     physicianLocked ||
     (article.vip_only && !isVip) ||
     !canAccessContent(accessLevel, minLevel);
-  const publicMagazine =
-    isLayAudienceArticle(article) || Boolean(article.public_topic) || article.slug.startsWith("verejnost-");
+  const articleMeta = article as {
+    med_track?: string | null;
+    study_year?: number | null;
+    student_topic?: string | null;
+  };
+  const isStudentArticle =
+    articleMeta.med_track === "priprava" || articleMeta.med_track === "studium";
+  const publicMagazine = !isPhysicianRestrictedArticle(article) && !isStudentArticle;
 
   const relatedRaw =
     article.category_id &&
@@ -138,14 +143,6 @@ export default async function ArticlePage({ params }: Props) {
   const related = (relatedRaw || []).filter(
     (item) => odborna.allowed || !isPhysicianRestrictedArticle(item)
   ).slice(0, 3);
-
-  const articleMeta = article as {
-    med_track?: string | null;
-    study_year?: number | null;
-    student_topic?: string | null;
-  };
-  const isStudentArticle =
-    articleMeta.med_track === "priprava" || articleMeta.med_track === "studium";
 
   let ads: Awaited<ReturnType<typeof getActiveAds>> = [];
   let inlineAds: Awaited<ReturnType<typeof getActiveAds>> = [];
@@ -420,11 +417,15 @@ export default async function ArticlePage({ params }: Props) {
           </div>
 
           <aside className="w-full shrink-0 space-y-6 lg:w-80">
-            <PremiumCta locale={locale} />
-            {studentSidebarAds.length > 0 ? (
-              <StudentAdBlocks campaigns={studentSidebarAds} variant="sidebar" />
-            ) : (
-              <AdSlot ads={ads} />
+            {publicMagazine || physicianLocked ? null : (
+              <>
+                <PremiumCta locale={locale} />
+                {studentSidebarAds.length > 0 ? (
+                  <StudentAdBlocks campaigns={studentSidebarAds} variant="sidebar" />
+                ) : (
+                  <AdSlot ads={ads} />
+                )}
+              </>
             )}
           </aside>
         </div>
