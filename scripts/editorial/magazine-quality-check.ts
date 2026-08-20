@@ -16,12 +16,13 @@ assert.equal(
 assert.equal(isPlaceholderUniversityNewsTitle("1. LF UK"), true);
 assert.equal(isPlaceholderUniversityNewsTitle("1. LF UK — výzkumná novinka"), true);
 assert.equal(isPlaceholderUniversityNewsTitle("2. LF UK — Výzkumné úspěchy"), true);
-assert.equal(isPlaceholderUniversityNewsTitle("Výzkum na Lékařské fakultě Masarykovy univerzity"), true);
+assert.equal(isPlaceholderUniversityNewsTitle("Výzkumné objevy na Lékařské fakultě Masarykovy univerzity"), true);
+assert.equal(isPlaceholderUniversityNewsTitle("Nový výzkum na Lékařské fakultě Masarykovy univerzity"), true);
 assert.equal(isThinMagazineTitle("Klinická studie: Zahraniční zdravotnická zpráva"), true);
 assert.equal(isPlaceholderUniversityNewsTitle("Nový objev v léčbě roztroušené sklerózy"), true);
 assert.equal(
   isPlaceholderUniversityNewsTitle("Nové centrum pro výzkum a vývoj léčiv na Lékařské fakultě MU"),
-  false
+  true
 );
 
 const sleepCover = resolveVerejnostCoverUrl({

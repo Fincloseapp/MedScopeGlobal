@@ -13,7 +13,7 @@ const PLACEHOLDER_UNIVERSITY =
   /(?:\d\.\s*)?LF\s*(?:UK|MU|HK|OL|PL|OU)?\s*[—\-–:]?\s*(?:výzkumná novinka|výzkumné objevy|výzkumné úspěchy)?\s*$/i;
 
 const GENERIC_DISCOVERY =
-  /^nový objev v léčbě|^new breakthrough in|^nový výzkum v oblasti|^nový projekt (?:v oblasti|na rozvoji|pro zlepšení)|^nové (?:centrum|přístupy|přístroje|ústav) |^výzkum na lékařské fakultě|^výzkumné (?:úspěchy|objevy)\b/i;
+  /^nový objev v léčbě|^new breakthrough in|^nový výzkum (?:v oblasti|na)|^nový projekt (?:v oblasti|na rozvoji|pro zlepšení)|^nové (?:centrum|přístupy|přístroje|ústav) |^výzkum na lékařské fakultě|^výzkumné (?:úspěchy|objevy)/i;
 
 export function isThinMagazineTitle(title?: string | null): boolean {
   const t = String(title ?? "").replace(/\s+/g, " ").trim();
@@ -34,7 +34,7 @@ export function isPlaceholderUniversityNewsTitle(title?: string | null): boolean
   if (t.length < 18) return true;
   if (PLACEHOLDER_UNIVERSITY.test(t)) return true;
   if (/výzkumná novinka/i.test(t)) return true;
-  if (GENERIC_DISCOVERY.test(t) && t.length < 56) return true;
+  if (GENERIC_DISCOVERY.test(t) && t.length < 90) return true;
   return false;
 }
 

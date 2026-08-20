@@ -131,6 +131,7 @@ function articleMatchesPublicTopic(
     return true;
   }
   const blob = `${article.title ?? ""} ${article.excerpt ?? ""} ${article.slug}`;
+  if (topic === "nemoci" && /očkov|ockov|screening/i.test(article.title ?? "")) return false;
   return TOPIC_HINTS[topic].test(blob);
 }
 
