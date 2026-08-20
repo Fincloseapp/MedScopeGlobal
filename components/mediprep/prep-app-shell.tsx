@@ -277,34 +277,77 @@ export function PrepAppShell() {
         </div>
       </header>
 
+      {/* Always-visible section tabs — must never sit inside a nested 100dvh that clips chrome */}
+      <nav
+        className="shrink-0 border-b border-slate-200 bg-white"
+        aria-label="MeDiprep sekce"
+      >
+        <div className="mx-auto grid max-w-5xl grid-cols-4 md:flex md:gap-1 md:px-3 md:py-1.5">
+          {TABS.map(({ id, label, icon: Icon }) => {
+            const active = tab === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setTab(id)}
+                className={`flex flex-col items-center gap-0.5 px-1 py-2 text-[11px] font-semibold touch-manipulation md:flex-row md:gap-2 md:rounded-xl md:px-3 md:py-2 md:text-sm ${
+                  active
+                    ? "text-[#C45C26] md:bg-[#C45C26]/15"
+                    : "text-slate-500 hover:bg-slate-50 md:hover:bg-slate-100"
+                }`}
+              >
+                <Icon className={`h-5 w-5 ${active ? "text-[#C45C26]" : "text-slate-400"}`} />
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+
       <div className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 overflow-hidden">
-        <aside className="hidden w-48 shrink-0 flex-col gap-1 border-r border-slate-200 bg-white/90 p-3 md:flex">
-          <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Navigace</p>
-          <nav className="flex flex-col gap-1" aria-label="MeDiprep navigace">
-            {TABS.map(({ id, label, icon: Icon }) => {
-              const active = tab === id;
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setTab(id)}
-                  className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium touch-manipulation ${
-                    active ? "bg-[#C45C26]/15 text-[#C45C26]" : "text-slate-500 hover:bg-slate-100"
-                  }`}
-                >
-                  <Icon className={`h-5 w-5 ${active ? "text-[#C45C26]" : "text-slate-400"}`} />
-                  {label}
-                </button>
-              );
-            })}
-          </nav>
+        <aside className="hidden w-48 shrink-0 flex-col gap-1 border-r border-slate-200 bg-white/90 p-3 lg:flex">
+          <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Rychlé akce</p>
+          <div className="flex flex-col gap-1">
+            <button
+              type="button"
+              onClick={() => {
+                resetBuilder();
+                setTab("testy");
+              }}
+              className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 touch-manipulation hover:bg-slate-100"
+            >
+              <GraduationCap className="h-5 w-5 text-[#C45C26]" />
+              Sestavit test
+            </button>
+            <button
+              type="button"
+              disabled={starting}
+              onClick={() => {
+                setMode("cviceni");
+                setSubject("mix");
+                setCount(12);
+                void startTest({ mode: "cviceni", subject: "mix", count: 12, faculty: "mix" });
+              }}
+              className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 touch-manipulation hover:bg-slate-100 disabled:opacity-60"
+            >
+              <Play className="h-5 w-5 text-[#C45C26]" />
+              Spustit rychle
+            </button>
+            <Link
+              href={loginHref}
+              className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
+            >
+              <LogIn className="h-5 w-5 text-[#C45C26]" />
+              {session.authenticated ? "Účet" : "Přihlášení"}
+            </Link>
+          </div>
           <div className="mt-auto space-y-2 rounded-xl bg-[#0A192F] p-3 text-white">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-sky-200/80">Stažení</p>
             <p className="text-[11px] leading-4 text-sky-100/85">Dejte si MeDiprep na plochu telefonu i PC.</p>
             <InstallPwaButton app={MEDIPREP} label="Stáhnout na mobil" />
           </div>
         </aside>
-      <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-[calc(4.25rem+env(safe-area-inset-bottom))] md:pb-0">
         {loading ? (
           <p className="px-4 py-16 text-center text-sm text-slate-500">Načítám MeDiprep…</p>
         ) : tab === "prehled" ? (
@@ -680,8 +723,9 @@ export function PrepAppShell() {
       </div>
 
       <nav
-        className="shrink-0 border-t border-slate-200 bg-white/95 backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur md:hidden"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        aria-label="MeDiprep mobilní navigace"
       >
         <div className="mx-auto grid max-w-3xl grid-cols-4">
           {TABS.map(({ id, label, icon: Icon }) => {
@@ -691,7 +735,7 @@ export function PrepAppShell() {
                 key={id}
                 type="button"
                 onClick={() => setTab(id)}
-                className={`flex flex-col items-center gap-0.5 px-1 py-2.5 text-[11px] font-medium ${
+                className={`flex flex-col items-center gap-0.5 px-1 py-2.5 text-[11px] font-medium touch-manipulation ${
                   active ? "text-[#C45C26]" : "text-slate-500"
                 }`}
               >

@@ -1,5 +1,5 @@
 /* MeDiprep PWA — scope /app/priprava */
-const CACHE_NAME = "msg-mediprep-v2";
+const CACHE_NAME = "msg-mediprep-v3";
 const SHELL = [
   "/app/priprava",
   "/mediprep-manifest.json",

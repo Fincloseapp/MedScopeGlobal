@@ -40,6 +40,10 @@ Cloudflare Workers via OpenNext; the source of truth for data is **Supabase** (P
   falls back to fully client-side generated tests/dashboards, so you can start a practice test,
   answer questions, and get a score with no external services. Test builder (tab **Testy**) lets
   you pick mode / subject / count / faculty. Login is always in the app header.
+  Section tabs (Přehled / Testy / Plán / Účet) are always under the header; mobile also has a
+  `fixed` bottom bar. The prep layout must stay a single `h-[100dvh]` flex column with
+  `AppOriginBar` + `flex-1` children — nested `h-[100dvh]` under the origin bar clips chrome.
+  Homepage/portal `AppOpenLink` opens apps in the same tab (not `target=_blank`).
 - **MeDipacient** patient-report PWA at `/app/pacient` renders a client demo dashboard similarly.
 - **PWA install:** Chromium only fires `beforeinstallprompt` on pages inside manifest `scope`
   (`/app/priprava` for MeDiprep). The **Stáhnout** button on marketing/download pages redirects
