@@ -106,7 +106,6 @@ export function isLekarskaZonaPath(pathname: string): boolean {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function enforceLekarskaZonaMiddleware(
   request: NextRequest,
   supabase: any,

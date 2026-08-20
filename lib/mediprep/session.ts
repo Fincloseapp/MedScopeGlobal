@@ -2,19 +2,11 @@ import { cookies } from "next/headers";
 import { getSessionProfile } from "@/lib/auth/session";
 import { getVipStatus } from "@/lib/vip";
 import { MEDIPREP } from "@/lib/apps/catalog";
+import type { PrepSession } from "@/lib/mediprep/types";
 
 export const MEDIPREP_OTP_COOKIE = "mediprep_otp_email";
 
-export type PrepSession = {
-  authenticated: boolean;
-  email: string | null;
-  userId: string | null;
-  entitled: boolean;
-  displayName: string | null;
-  firstTestUsed: boolean;
-  message: string;
-  loginUrl: string;
-};
+export type { PrepSession };
 
 export async function getPrepSession(): Promise<PrepSession> {
   const { user, profile } = await getSessionProfile();

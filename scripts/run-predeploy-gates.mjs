@@ -54,7 +54,7 @@ const isVercel = process.env.VERCEL === "1";
 const isCI = process.env.GITHUB_ACTIONS === "true";
 const hasCronSecret = (process.env.CRON_SECRET ?? "").length >= 16;
 const logoSource = MEDSCOPE_LOGO_SOURCE;
-const canSyncLogos = existsSync(logoSource) || (!isVercel && !isCI);
+const canSyncLogos = existsSync(logoSource);
 
 const steps = [
   ...(canSyncLogos ? [["sync-logos", "scripts/sync-logos.mjs"]] : []),

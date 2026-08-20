@@ -17,8 +17,8 @@ import {
 } from "lucide-react";
 import { InstallPwaButton } from "@/components/apps/install-pwa-button";
 import { MEDIPACIENT, appLockline } from "@/lib/apps/catalog";
-import type { PacientDashboard, PacientDocument } from "@/lib/medipacient/types";
-import type { PacientSession } from "@/lib/medipacient/session";
+import { GUEST_PACIENT_SESSION, publicDemoDashboard } from "@/lib/medipacient/demo-dashboard";
+import type { PacientDashboard, PacientDocument, PacientSession } from "@/lib/medipacient/types";
 
 type TabId = "prehled" | "zpravy" | "nahrat" | "ucet";
 
@@ -47,10 +47,10 @@ function formatCs(iso: string) {
 export function PacientAppShell() {
   const [tab, setTab] = useState<TabId>(initialTab);
   const [online, setOnline] = useState(true);
-  const [session, setSession] = useState<PacientSession | null>(null);
-  const [dash, setDash] = useState<PacientDashboard | null>(null);
+  const [session, setSession] = useState<PacientSession>(GUEST_PACIENT_SESSION);
+  const [dash, setDash] = useState<PacientDashboard>(() => publicDemoDashboard());
   const [selected, setSelected] = useState<PacientDocument | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
 
@@ -73,12 +73,18 @@ export function PacientAppShell() {
         fetch("/api/medipacient/timeline", { credentials: "same-origin" }),
       ]);
       if (sRes.ok) setSession((await sRes.json()) as PacientSession);
+      else setSession(GUEST_PACIENT_SESSION);
       if (tRes.ok) {
         const json = (await tRes.json()) as PacientDashboard;
-        setDash(json);
+        if (json?.documents?.length && json?.stats) setDash(json);
+        else setDash(publicDemoDashboard());
+      } else {
+        setDash(publicDemoDashboard());
       }
     } catch {
-      setFlash("Nepodařilo se načíst přehled. Zkušební zprávy zkusím znovu.");
+      setSession(GUEST_PACIENT_SESSION);
+      setDash(publicDemoDashboard());
+      setFlash("Jste offline nebo API neodpovědělo — ukazuji zkušební osu zpráv.");
     } finally {
       setLoading(false);
     }
@@ -183,7 +189,7 @@ export function PacientAppShell() {
           </p>
         ) : null}
 
-        {loading || !dash ? (
+        {loading ? (
           <p className="px-4 py-16 text-center text-sm text-slate-500">Načítám přehled zpráv…</p>
         ) : tab === "prehled" ? (
           <div className="mx-auto w-full max-w-3xl space-y-4 px-3 py-3 sm:px-4">
@@ -391,12 +397,19 @@ export function PacientAppShell() {
                 className="rounded-full border border-[#2D7FF9]/30 bg-white px-4 py-2 text-sm font-medium text-[#2D7FF9]"
                 onClick={() => {
                   void (async () => {
-                    const res = await fetch("/api/medipacient/export", { credentials: "same-origin" });
-                    if (!res.ok) {
-                      setFlash("Export se nepodařil.");
-                      return;
+                    let payload: unknown = {
+                      documents: dash.documents,
+                      timeline: dash.timeline,
+                      medications: dash.medications,
+                      diagnoses: dash.diagnoses,
+                    };
+                    try {
+                      const res = await fetch("/api/medipacient/export", { credentials: "same-origin" });
+                      if (res.ok) payload = await res.json();
+                    } catch {
+                      /* keep local dashboard */
                     }
-                    const blob = new Blob([JSON.stringify(await res.json(), null, 2)], {
+                    const blob = new Blob([JSON.stringify(payload, null, 2)], {
                       type: "application/json",
                     });
                     const url = URL.createObjectURL(blob);

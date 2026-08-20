@@ -45,10 +45,15 @@ for (const rel of required) {
   }
 }
 
-const vercel = JSON.parse(fs.readFileSync(path.join(root, "vercel.json"), "utf8"));
-const hasCron = (vercel.crons ?? []).some((c) => c.path === "/api/cron/academy-daily");
+const cronSources = ["vercel.json", "vercel.json.bak", ".github/workflows/cloudflare-cron.yml"];
+const hasCron = cronSources.some((rel) => {
+  const abs = path.join(root, rel);
+  if (!fs.existsSync(abs)) return false;
+  const text = fs.readFileSync(abs, "utf8");
+  return text.includes("/api/cron/academy-daily");
+});
 if (!hasCron) {
-  console.error("✗ vercel.json missing academy-daily cron");
+  console.error("✗ academy-daily cron missing (vercel.json / Cloudflare cron workflow)");
   failed += 1;
 }
 

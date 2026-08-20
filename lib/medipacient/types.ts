@@ -67,3 +67,20 @@ export type PacientDashboard = {
     upcoming: number;
   };
 };
+
+export type PacientSession = {
+  authenticated: boolean;
+  entitled: boolean;
+  owner: boolean;
+  isVip: boolean;
+  reason: "ok" | "unauthenticated" | "ok_demo";
+  userId: string | null;
+  email: string | null;
+  displayName: string | null;
+  role: string | null;
+  message: string;
+  loginUrl: string;
+  appUrl: string;
+  canUpload: boolean;
+  limits: { timeline: boolean; upload: boolean };
+};

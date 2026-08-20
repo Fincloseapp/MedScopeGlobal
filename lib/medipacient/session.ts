@@ -1,23 +1,9 @@
 import { getSessionProfile } from "@/lib/auth/session";
 import { getVipStatus } from "@/lib/vip";
 import { MEDIPACIENT } from "@/lib/apps/catalog";
+import type { PacientSession } from "@/lib/medipacient/types";
 
-export type PacientSession = {
-  authenticated: boolean;
-  entitled: boolean;
-  owner: boolean;
-  isVip: boolean;
-  reason: "ok" | "unauthenticated" | "ok_demo";
-  userId: string | null;
-  email: string | null;
-  displayName: string | null;
-  role: string | null;
-  message: string;
-  loginUrl: string;
-  appUrl: string;
-  canUpload: boolean;
-  limits: { timeline: boolean; upload: boolean };
-};
+export type { PacientSession };
 
 export async function getPacientSession(): Promise<PacientSession> {
   const { user, profile } = await getSessionProfile();

@@ -76,7 +76,7 @@ export function SocialProofStrip({ isCs = true }: { isCs?: boolean }) {
             >
               <Quote className="h-5 w-5 text-[#005B96]/40" aria-hidden />
               <blockquote className="mt-2 text-sm leading-relaxed text-slate-700">
-                „{t.quote}"
+                {`\u201E${t.quote}\u201C`}
               </blockquote>
               <figcaption className="mt-4 text-xs text-slate-500">
                 <span className="font-semibold text-[#021d33]">{t.author}</span>

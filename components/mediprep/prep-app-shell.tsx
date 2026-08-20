@@ -13,8 +13,9 @@ import {
 } from "lucide-react";
 import { InstallPwaButton } from "@/components/apps/install-pwa-button";
 import { MEDIPREP, appLockline } from "@/lib/apps/catalog";
-import type { PrepSession } from "@/lib/mediprep/session";
-import type { PrepDashboard } from "@/lib/mediprep/dashboard";
+import { buildPrepTest, getPrepDashboard, type PrepDashboard } from "@/lib/mediprep/dashboard";
+import { GUEST_PREP_SESSION } from "@/lib/mediprep/guest";
+import type { PrepSession } from "@/lib/mediprep/types";
 import type { GeneratedSelfTest } from "@/lib/prijimacky/quiz-from-bank";
 
 type TabId = "prehled" | "testy" | "plan" | "ucet";
@@ -36,15 +37,15 @@ function initialTab(): TabId {
 export function PrepAppShell() {
   const [tab, setTab] = useState<TabId>(initialTab);
   const [online, setOnline] = useState(true);
-  const [session, setSession] = useState<PrepSession | null>(null);
-  const [dash, setDash] = useState<PrepDashboard | null>(null);
+  const [session, setSession] = useState<PrepSession>(GUEST_PREP_SESSION);
+  const [dash, setDash] = useState<PrepDashboard>(() => getPrepDashboard());
   const [test, setTest] = useState<GeneratedSelfTest | null>(null);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState(false);
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [otpHint, setOtpHint] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setOnline(navigator.onLine);
@@ -65,7 +66,17 @@ export function PrepAppShell() {
         fetch("/api/mediprep/dashboard", { credentials: "same-origin" }),
       ]);
       if (sRes.ok) setSession((await sRes.json()) as PrepSession);
-      if (dRes.ok) setDash((await dRes.json()) as PrepDashboard);
+      else setSession(GUEST_PREP_SESSION);
+      if (dRes.ok) {
+        const json = (await dRes.json()) as PrepDashboard;
+        if (json?.bank?.total && json?.faculties?.length) setDash(json);
+        else setDash(getPrepDashboard());
+      } else {
+        setDash(getPrepDashboard());
+      }
+    } catch {
+      setSession(GUEST_PREP_SESSION);
+      setDash(getPrepDashboard());
     } finally {
       setLoading(false);
     }
@@ -82,37 +93,62 @@ export function PrepAppShell() {
   }, [tab]);
 
   async function startTest(faculty?: string) {
-    const res = await fetch(
-      `/api/mediprep/test?mode=simulace&count=12&faculty=${encodeURIComponent(faculty || "mix")}`,
-      { credentials: "same-origin" }
-    );
-    if (!res.ok) return;
-    const json = (await res.json()) as { test: GeneratedSelfTest };
-    setTest(json.test);
+    const fallback = () =>
+      buildPrepTest({
+        mode: "simulace",
+        count: 12,
+        faculty: faculty || "mix",
+        seed: `client-${faculty || "mix"}`,
+      });
+    try {
+      const res = await fetch(
+        `/api/mediprep/test?mode=simulace&count=12&faculty=${encodeURIComponent(faculty || "mix")}`,
+        { credentials: "same-origin" }
+      );
+      if (!res.ok) {
+        setTest(fallback());
+        setAnswers({});
+        setSubmitted(false);
+        setTab("testy");
+        return;
+      }
+      const json = (await res.json()) as { test: GeneratedSelfTest };
+      setTest(json.test ?? fallback());
+    } catch {
+      setTest(fallback());
+    }
     setAnswers({});
     setSubmitted(false);
     setTab("testy");
   }
 
   async function requestCode() {
-    const res = await fetch("/api/mediprep/otp/request", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-    const json = (await res.json()) as { message?: string; devCode?: string };
-    setOtpHint(json.devCode ? `${json.message} (kód ${json.devCode})` : json.message || "Kód odeslán.");
+    try {
+      const res = await fetch("/api/mediprep/otp/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const json = (await res.json()) as { message?: string; devCode?: string; error?: string };
+      setOtpHint(json.devCode ? `${json.message} (kód ${json.devCode})` : json.message || json.error || "Kód odeslán.");
+    } catch {
+      setOtpHint("Kód se nepodařilo odeslat. Zkuste to znovu online.");
+    }
   }
 
   async function verifyCode() {
-    const res = await fetch("/api/mediprep/otp/verify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, code }),
-    });
-    const json = (await res.json()) as { ok?: boolean; message?: string };
-    setOtpHint(json.message || (json.ok ? "Přihlášeni." : "Ověření selhalo."));
-    if (json.ok) await load();
+    try {
+      const res = await fetch("/api/mediprep/otp/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code }),
+      });
+      const json = (await res.json()) as { ok?: boolean; message?: string; error?: string };
+      setOtpHint(json.message || json.error || (json.ok ? "Přihlášeni." : "Ověření selhalo."));
+      if (json.ok) await load();
+    } catch {
+      setOtpHint("Ověření selhalo. Zkuste to znovu online.");
+    }
   }
 
   const score = submitted && test
@@ -166,7 +202,7 @@ export function PrepAppShell() {
       </header>
 
       <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-        {loading || !dash ? (
+        {loading ? (
           <p className="px-4 py-16 text-center text-sm text-slate-500">Načítám MeDiprep…</p>
         ) : tab === "prehled" ? (
           <div className="mx-auto w-full max-w-3xl space-y-4 px-3 py-3 sm:px-4">
