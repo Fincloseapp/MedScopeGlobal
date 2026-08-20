@@ -143,13 +143,7 @@ export const MEDSCOPE_LOCAL_DATA_DIR =
 
 export const MEDSCOPE_LOGO_SOURCE =
 
-  process.env.MEDSCOPE_LOGO_SOURCE ??
-
-  (existsSync(join(MEDSCOPE_PROJECT_ROOT, "public", "assets", "logo"))
-
-    ? join(MEDSCOPE_PROJECT_ROOT, "public", "assets", "logo")
-
-    : "D:\\MedScopeGlobal\\logo");
+  process.env.MEDSCOPE_LOGO_SOURCE ?? "D:\\MedScopeGlobal\\logo";
 
 
 
