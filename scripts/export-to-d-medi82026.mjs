@@ -337,6 +337,18 @@ Soubor \`dnesni-updaty.md\`. Živý web: https://medscopeglobal.com
 );
 
 writeFileSync(
+  join(dest, "SPUSTIT-STRANKU.txt"),
+  [
+    "Dvojklik: start-local.cmd",
+    "Prohlizec: http://localhost:3000",
+    "Zastaveni: Ctrl+C v otevrenem okne.",
+    "Prvni spusteni nainstaluje npm balicky (nekolik minut).",
+    "",
+  ].join("\n"),
+  "utf8"
+);
+
+writeFileSync(
   join(dest, "dnesni-updaty.md"),
   `# Dnešní updaty — 20. 8. 2026
 
