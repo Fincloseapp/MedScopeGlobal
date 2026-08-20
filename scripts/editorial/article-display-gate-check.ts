@@ -38,7 +38,18 @@ assert.equal(
     slug: "kompas-projekt",
     title: "KOMPAS: Projekt, který mění podobu domácí péče v Česku",
     locale: "cs",
-    audience: "public",
+    audience: "professional",
+    rubric_slug: "v19-medical-brief",
+  }),
+  false
+);
+
+assert.equal(
+  isPhysicianRestrictedArticle({
+    slug: "dost-o-informace-ze-dne-982026",
+    title: "Žádost o informace ze dne 9.8.2026",
+    locale: "cs",
+    audience: "professional",
   }),
   false
 );
@@ -60,6 +71,7 @@ assert.equal(
     title: "Nové doporučení pro léčbu srdečního selhání",
     locale: "cs",
     audience: "professional",
+    rubric_slug: "v19-medical-brief",
   }),
   true
 );
