@@ -273,9 +273,18 @@ export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
                       <span className="mt-0.5 block text-xs leading-snug text-slate-500">{aud.description}</span>
                     </Link>
                     <div className="mt-1 flex flex-wrap gap-1.5 px-1.5">
-                      <Link href={aud.ctaPrimary.href} className="text-[11px] font-semibold text-[#005B96] hover:underline">
-                        {aud.ctaPrimary.label}
-                      </Link>
+                      {isStandaloneAppHref(aud.ctaPrimary.href) ? (
+                        <AppOpenLink
+                          href={aud.ctaPrimary.href}
+                          className="text-[11px] font-semibold text-[#005B96] hover:underline"
+                        >
+                          {aud.ctaPrimary.label}
+                        </AppOpenLink>
+                      ) : (
+                        <Link href={aud.ctaPrimary.href} className="text-[11px] font-semibold text-[#005B96] hover:underline">
+                          {aud.ctaPrimary.label}
+                        </Link>
+                      )}
                       <span className="text-slate-300">·</span>
                       <Link href={aud.ctaSecondary.href} className="text-[11px] text-slate-500 hover:underline">
                         {aud.ctaSecondary.label}

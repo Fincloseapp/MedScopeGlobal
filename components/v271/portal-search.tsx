@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Search, Sparkles } from "lucide-react";
 import { PORTAL_SEARCH_TABS, PORTAL_TRENDING } from "@/lib/v271/portal";
 import Link from "next/link";
+import { AppOpenLink, isStandaloneAppHref } from "@/components/apps/app-origin-bar";
 
 export function PortalSearch() {
   const router = useRouter();
@@ -68,11 +69,17 @@ export function PortalSearch() {
       </form>
       <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
         <span className="font-medium text-slate-400">Často:</span>
-        {PORTAL_TRENDING.map((item) => (
-          <Link key={item.href} href={item.href} className="hover:text-[#005B96] hover:underline">
-            {item.label}
-          </Link>
-        ))}
+        {PORTAL_TRENDING.map((item) =>
+          isStandaloneAppHref(item.href) ? (
+            <AppOpenLink key={item.href} href={item.href} className="hover:text-[#005B96] hover:underline">
+              {item.label}
+            </AppOpenLink>
+          ) : (
+            <Link key={item.href} href={item.href} className="hover:text-[#005B96] hover:underline">
+              {item.label}
+            </Link>
+          )
+        )}
       </p>
     </div>
   );
