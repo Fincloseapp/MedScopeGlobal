@@ -1,5 +1,5 @@
 import { generateJsonFromLlm, isLlmConfigured } from "@/lib/ai/chat-json";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import {
   type ConversionCopy,
   type ConversionSlot,
@@ -20,7 +20,11 @@ export async function resolveConversionCopy(
   locale = "cs"
 ): Promise<StoredNudge> {
   try {
-    const admin = createServiceRoleClient();
+    const admin = tryCreateServiceRoleClient();
+    if (!admin) {
+      const staticCopy = getStaticCopy(slot, daySeed());
+      return { ...staticCopy, generatedBy: "static" };
+    }
     const { data } = await admin
       .from("conversion_nudges")
       .select("id, eyebrow, headline, body, cta_label, cta_href, hint, generated_by, created_at")
@@ -79,7 +83,10 @@ export async function runConversionRenewals(): Promise<{
 
   let admin;
   try {
-    admin = createServiceRoleClient();
+    admin = tryCreateServiceRoleClient();
+    if (!admin) {
+      return { ok: false, refreshed: 0, llm: true, errors: ["DB: missing Supabase service role"] };
+    }
     await admin.from("conversion_nudges").select("id").limit(1);
   } catch (e) {
     return { ok: false, refreshed: 0, llm: true, errors: [`DB: ${String(e)}`] };
