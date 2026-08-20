@@ -90,7 +90,10 @@ function checkFile(filePath) {
   }
 
   if (hasWrites && !usesPaths) {
-    const allowedWithoutPaths = ["scripts/auto-git-commit-push.js"];
+    const allowedWithoutPaths = [
+      "scripts/auto-git-commit-push.js",
+      "scripts/export-to-d-medi82026.mjs",
+    ];
     if (!allowedWithoutPaths.includes(rel)) {
       issues.push({
         kind: "write-without-paths-import",
@@ -101,7 +104,10 @@ function checkFile(filePath) {
   }
 
   if (/fileURLToPath\s*\(\s*import\.meta\.url\s*\)/.test(text) && hasWrites && !usesPaths) {
-    const allowedFileUrl = ["scripts/auto-git-commit-push.js"];
+    const allowedFileUrl = [
+      "scripts/auto-git-commit-push.js",
+      "scripts/export-to-d-medi82026.mjs",
+    ];
     if (!allowedFileUrl.includes(rel)) {
       issues.push({
         kind: "dirname-root-write",

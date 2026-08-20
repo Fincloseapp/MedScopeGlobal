@@ -74,6 +74,7 @@
     "test:prod": "node tests/production/run-prod-tests.mjs",
     "cron:trigger-daily": "node scripts/trigger-daily-content-crons.mjs",
     "verify:d-drive": "node scripts/verify-d-drive-only.mjs",
+    "export:d-medi82026": "node scripts/export-to-d-medi82026.mjs",
     "build:next": "node scripts/run-vercel-build.mjs",
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",

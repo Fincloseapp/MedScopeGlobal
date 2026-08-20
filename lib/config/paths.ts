@@ -38,7 +38,7 @@ export function assertNotOnCDrive(resolvedPath: string, label: string): void {
 
       `[MedScope paths] ${label} resolves to C: drive (${normalized}). ` +
 
-      "Use D:\\medscope.local, D:\\medscope.data, or D:\\medscope.logs only.";
+      "Use D:\\Medi82026, D:\\medscope.local, D:\\medscope.data, or D:\\medscope.logs only.";
 
     if (process.env.MEDSCOPE_ALLOW_C_DRIVE === "1") {
 
