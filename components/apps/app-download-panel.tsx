@@ -79,7 +79,9 @@ export function AppDownloadPanel({
               variant="outline"
               className="h-9 rounded-full border-white/40 bg-transparent text-white hover:bg-white/10"
             >
-              <Link href={app.appPath}>Otevřít aplikaci</Link>
+              <Link href={app.appPath}>
+                Otevřít aplikaci
+              </Link>
             </Button>
             {extraCta ? (
               <Button
