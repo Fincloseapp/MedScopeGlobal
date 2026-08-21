@@ -73,3 +73,7 @@
 [2026-08-21T12:17:44.127Z] [INFO] === auto-git start ===
 [2026-08-21T12:17:44.134Z] [WARN] Jen větev main — aktuální: cursor/cloudflare-workers-build-cd52
 [2026-08-21T13:04:42.371Z] [INFO] === auto-git start ===
+[2026-08-21T13:04:42.457Z] [OK] Commit: feat: added .dev.vars, ", "
+[2026-08-21T13:04:43.743Z] [OK] Push origin/main → Vercel deploy (medscopeglobal.com)
+[2026-08-21T13:04:43.744Z] [INFO] === auto-git end ===
+[2026-08-21T13:14:55.508Z] [INFO] === auto-git start ===
