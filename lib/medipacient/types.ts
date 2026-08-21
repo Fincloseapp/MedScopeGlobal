@@ -83,4 +83,6 @@ export type PacientSession = {
   appUrl: string;
   canUpload: boolean;
   limits: { timeline: boolean; upload: boolean };
+  /** Normalized chrome: account + plan + validity */
+  access: import("@/lib/apps/access-status").AppAccessInfo;
 };

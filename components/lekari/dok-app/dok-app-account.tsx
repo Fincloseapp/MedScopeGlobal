@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { InstallAppButton } from "@/components/lekari/dok-app/install-app-button";
 import { DokumentaceDownloadPanel } from "@/components/lekari/dokumentace-download-panel";
+import type { AppAccessInfo } from "@/lib/apps/access-status";
 
 type EligibilityState = {
   eligible: boolean;
@@ -26,6 +27,8 @@ type EligibilityState = {
   facilities: Array<{ id: string; name: string; role: string }>;
   loginUrl?: string;
   verifyUrl?: string;
+  isVip?: boolean;
+  access?: AppAccessInfo;
 };
 
 type ReaderContext = {
@@ -128,11 +131,21 @@ export function DokAppAccount({
             {loggedIn ? (
               <>
                 <p className="truncate text-sm font-semibold text-[#021d33]">
-                  {ctx?.profile?.full_name || elig?.displayName || "Lékař"}
+                  {elig?.access?.accountLabel ||
+                    ctx?.profile?.full_name ||
+                    elig?.displayName ||
+                    "Lékař"}
                 </p>
-                <p className="truncate text-xs text-slate-500">{ctx?.user?.email}</p>
+                <p className="truncate text-xs text-slate-500">{ctx?.user?.email || elig?.email}</p>
                 <p className="mt-1 text-xs text-slate-500">
-                  Přístup: {ctx?.isVip ? "VIP / předplatné" : ctx?.accessLevel || "základní"}
+                  Přístup:{" "}
+                  <strong>
+                    {elig?.access?.planLabel ||
+                      (ctx?.isVip ? "VIP / předplatné" : ctx?.accessLevel || "základní")}
+                  </strong>
+                </p>
+                <p className="mt-0.5 text-xs text-slate-500">
+                  Platnost: <strong>{elig?.access?.validityLabel || "—"}</strong>
                 </p>
                 {canInstall ? (
                   <p className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-emerald-700">
@@ -154,6 +167,9 @@ export function DokAppAccount({
                 <p className="text-sm font-semibold text-[#021d33]">Nejste přihlášeni</p>
                 <p className="mt-0.5 text-xs text-slate-500">
                   Pro stažení, zápisy a historii se přihlaste ověřeným lékařským účtem.
+                </p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Platnost: <strong>{elig?.access?.validityLabel || "po přihlášení"}</strong>
                 </p>
               </>
             )}

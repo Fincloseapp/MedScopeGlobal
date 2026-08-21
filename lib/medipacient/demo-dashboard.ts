@@ -18,6 +18,17 @@ export const GUEST_PACIENT_SESSION: PacientSession = {
   appUrl: MEDIPACIENT.appPath,
   canUpload: false,
   limits: { timeline: true, upload: false },
+  access: {
+    authenticated: false,
+    accountLabel: "Nepřihlášeni",
+    email: null,
+    planLabel: "Host · zkušební zprávy",
+    entitled: false,
+    validUntil: null,
+    validityLabel: "po přihlášení",
+    loginUrl: `/login?next=${encodeURIComponent(MEDIPACIENT.appPath)}`,
+    subscribeUrl: "/predplatne#public",
+  },
 };
 
 export function mergeDashboard(userDocs: PacientDocument[]): PacientDashboard {

@@ -15,6 +15,8 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { InstallPwaButton } from "@/components/apps/install-pwa-button";
+import { AppAccountStatus } from "@/components/apps/app-account-status";
+import { AppSectionNav } from "@/components/apps/app-section-nav";
 import { MEDIPREP, appLockline } from "@/lib/apps/catalog";
 import { buildPrepTest, getPrepDashboard, type PrepDashboard } from "@/lib/mediprep/dashboard";
 import { GUEST_PREP_SESSION } from "@/lib/mediprep/guest";
@@ -277,32 +279,19 @@ export function PrepAppShell() {
         </div>
       </header>
 
-      {/* Always-visible section tabs — must never sit inside a nested 100dvh that clips chrome */}
-      <nav
-        className="shrink-0 border-b border-slate-200 bg-white"
-        aria-label="MeDiprep sekce"
-      >
-        <div className="mx-auto grid max-w-5xl grid-cols-4 md:flex md:gap-1 md:px-3 md:py-1.5">
-          {TABS.map(({ id, label, icon: Icon }) => {
-            const active = tab === id;
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setTab(id)}
-                className={`flex flex-col items-center gap-0.5 px-1 py-2 text-[11px] font-semibold touch-manipulation md:flex-row md:gap-2 md:rounded-xl md:px-3 md:py-2 md:text-sm ${
-                  active
-                    ? "text-[#C45C26] md:bg-[#C45C26]/15"
-                    : "text-slate-500 hover:bg-slate-50 md:hover:bg-slate-100"
-                }`}
-              >
-                <Icon className={`h-5 w-5 ${active ? "text-[#C45C26]" : "text-slate-400"}`} />
-                {label}
-              </button>
-            );
-          })}
-        </div>
-      </nav>
+      <AppAccountStatus
+        access={session.access ?? GUEST_PREP_SESSION.access}
+        accent="#C45C26"
+        onOpenAccount={() => setTab("ucet")}
+      />
+
+      <AppSectionNav
+        tabs={TABS}
+        active={tab}
+        onChange={setTab}
+        accent="#C45C26"
+        ariaLabel="MeDiprep sekce"
+      />
 
       <div className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 overflow-hidden">
         <aside className="hidden w-48 shrink-0 flex-col gap-1 border-r border-slate-200 bg-white/90 p-3 lg:flex">
@@ -668,6 +657,20 @@ export function PrepAppShell() {
           <div className="mx-auto w-full max-w-3xl space-y-4 px-3 py-6 sm:px-4">
             <h2 className="font-display text-xl font-semibold">Účet</h2>
             <p className="text-sm text-slate-600">{session?.message}</p>
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm space-y-2">
+              <p>
+                <span className="text-slate-500">Účet: </span>
+                <strong>{session.access?.accountLabel ?? session.displayName ?? "Nepřihlášeni"}</strong>
+              </p>
+              <p>
+                <span className="text-slate-500">Přístup: </span>
+                <strong>{session.access?.planLabel ?? "—"}</strong>
+              </p>
+              <p>
+                <span className="text-slate-500">Platnost: </span>
+                <strong>{session.access?.validityLabel ?? "—"}</strong>
+              </p>
+            </div>
             {session?.authenticated ? (
               <p className="rounded-xl bg-white p-4 text-sm">{session.displayName || session.email}</p>
             ) : (
@@ -721,31 +724,6 @@ export function PrepAppShell() {
         )}
       </main>
       </div>
-
-      <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur md:hidden"
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-        aria-label="MeDiprep mobilní navigace"
-      >
-        <div className="mx-auto grid max-w-3xl grid-cols-4">
-          {TABS.map(({ id, label, icon: Icon }) => {
-            const active = tab === id;
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setTab(id)}
-                className={`flex flex-col items-center gap-0.5 px-1 py-2.5 text-[11px] font-medium touch-manipulation ${
-                  active ? "text-[#C45C26]" : "text-slate-500"
-                }`}
-              >
-                <Icon className={`h-5 w-5 ${active ? "text-[#C45C26]" : "text-slate-400"}`} />
-                {label}
-              </button>
-            );
-          })}
-        </div>
-      </nav>
     </div>
   );
 }

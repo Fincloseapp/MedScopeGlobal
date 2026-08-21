@@ -1,3 +1,5 @@
+import type { AppAccessInfo } from "@/lib/apps/access-status";
+
 export type PrepSession = {
   authenticated: boolean;
   email: string | null;
@@ -7,4 +9,6 @@ export type PrepSession = {
   firstTestUsed: boolean;
   message: string;
   loginUrl: string;
+  /** Normalized chrome: account + plan + validity */
+  access: AppAccessInfo;
 };

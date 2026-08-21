@@ -36,21 +36,19 @@ Cloudflare Workers via OpenNext; the source of truth for data is **Supabase** (P
   environments and generally need real credentials.
 
 ### Good no-credential smoke targets (degrade gracefully without Supabase)
-- **MeDiprep** exam-prep PWA at `/app/priprava`: the client shell fetches `/api/mediprep/*` but
-  falls back to fully client-side generated tests/dashboards, so you can start a practice test,
-  answer questions, and get a score with no external services. Test builder (tab **Testy**) lets
-  you pick mode / subject / count / faculty. Login is always in the app header.
-  Section tabs (Přehled / Testy / Plán / Účet) are always under the header; mobile also has a
-  `fixed` bottom bar. The prep layout must stay a single `h-[100dvh]` flex column with
-  `AppOriginBar` + `flex-1` children — nested `h-[100dvh]` under the origin bar clips chrome.
-  Homepage/portal `AppOpenLink` opens apps in the same tab (not `target=_blank`).
-  Service worker `sw-mediprep.js` must not cache-first `/_next/*` (stale JS hides chrome);
-  bump `CACHE_NAME` when changing shell markup.
-- **MeDipacient** patient-report PWA at `/app/pacient` renders a client demo dashboard similarly.
-- **PWA install:** Chromium only fires `beforeinstallprompt` on pages inside manifest `scope`
-  (`/app/priprava` for MeDiprep). The **Stáhnout** button on marketing/download pages redirects
-  to `/app/priprava?install=1`. Icons must be truecolor PNG (RGBA). iOS uses Safari Share →
-  Přidat na plochu (no BIP).
+- All three PWAs share chrome: `AppAccountStatus` (účet / přístup / platnost + Přihlášení) and
+  `AppSectionNav` (always-visible section tabs + fixed mobile bottom bar). Layouts must stay a
+  single `h-[100dvh]` flex column with `AppOriginBar` + `flex-1` children.
+- Session/eligibility payloads include `access: AppAccessInfo` (accountLabel, planLabel,
+  validityLabel from `vip_subscriptions.ends_at` when available).
+- **MeDiprep** `/app/priprava`: client fallback tests; header + status bar login; tab Testy builder.
+- **MeDipacient** `/app/pacient`: demo timeline; header login; tabs Přehled / Zprávy / Nahrát / Účet.
+- **MeDiktor** `/app/dokumentace`: eligibility gate for zápis/historie; header login; tabs Zápis /
+  Historie / Návod / Účet.
+- Homepage/portal `AppOpenLink` opens apps in the same tab. MeDiprep SW must not cache-first
+  `/_next/*`; bump `CACHE_NAME` when changing shell markup.
+- **PWA install:** Chromium only fires `beforeinstallprompt` on pages inside manifest `scope`.
+  Icons must be truecolor PNG (RGBA). iOS uses Safari Share → Přidat na plochu (no BIP).
 
 ### Repo hygiene note
 - The repo root is cluttered with transient scratch/log files (`_poll-*.mjs`, `*-log.txt`,
