@@ -6,19 +6,38 @@ export const VIP_TRIAL_DAYS = 14;
 /** Characters of article HTML shown before paywall gate */
 export const PAYWALL_PREVIEW_CHARS = 720;
 
-export async function getVipStatus(userId: string | undefined) {
-  if (!userId) return false;
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("vip_subscriptions")
-    .select("active, ends_at")
-    .eq("user_id", userId)
-    .eq("active", true)
-    .maybeSingle();
+export type VipSubscriptionInfo = {
+  active: boolean;
+  /** ISO timestamp from vip_subscriptions.ends_at when known */
+  endsAt: string | null;
+};
 
-  if (!data?.active) return false;
-  if (data.ends_at && new Date(data.ends_at) < new Date()) return false;
-  return true;
+export async function getVipSubscription(
+  userId: string | undefined
+): Promise<VipSubscriptionInfo> {
+  if (!userId) return { active: false, endsAt: null };
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("vip_subscriptions")
+      .select("active, ends_at")
+      .eq("user_id", userId)
+      .eq("active", true)
+      .maybeSingle();
+
+    if (!data?.active) return { active: false, endsAt: null };
+    const endsAt = (data.ends_at as string | null) ?? null;
+    if (endsAt && new Date(endsAt) < new Date()) {
+      return { active: false, endsAt };
+    }
+    return { active: true, endsAt };
+  } catch {
+    return { active: false, endsAt: null };
+  }
+}
+
+export async function getVipStatus(userId: string | undefined) {
+  return (await getVipSubscription(userId)).active;
 }
 
 /** Plain-text teaser for paywall preview */

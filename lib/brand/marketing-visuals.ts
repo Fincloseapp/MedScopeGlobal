@@ -10,3 +10,8 @@ export const APP_MARKETING_IMAGE: Record<"medipacient" | "mediprep" | "mediktor"
   mediprep: MARKETING_VISUALS.mediprep,
   mediktor: MARKETING_VISUALS.mediktor,
 };
+
+/** Alias for in-app shells — same files as homepage /aplikace cards. */
+export function appMarketingImage(appId: keyof typeof APP_MARKETING_IMAGE): string {
+  return APP_MARKETING_IMAGE[appId];
+}

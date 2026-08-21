@@ -36,10 +36,19 @@ export function SiteHeader({
 
   return (
     <header className="site-header sticky top-0 z-50 w-full overflow-visible border-b border-black/[0.06] bg-white/[0.98] backdrop-blur supports-[padding:max(0px)]:pt-[env(safe-area-inset-top)] dark:border-white/[0.08] dark:bg-slate-950/[0.98]">
-      <div className="mx-auto grid h-[4.75rem] max-w-[1680px] grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 md:hidden">
-        <div aria-hidden />
-        <HeaderLogo centered className="max-w-[min(70vw,280px)] shrink-0" />
-        <div className="flex justify-end">
+      <div className="mx-auto grid h-[4.75rem] max-w-[1680px] grid-cols-[auto_1fr_auto] items-center gap-2 px-3 md:hidden">
+        {user ? (
+          <UserMenu user={user} profile={profile} />
+        ) : (
+          <Link
+            href="/login"
+            className="inline-flex h-9 items-center justify-center rounded-full bg-[#0A192F] px-3 text-xs font-bold text-white touch-manipulation"
+          >
+            Přihlášení
+          </Link>
+        )}
+        <HeaderLogo centered className="mx-auto max-w-[min(58vw,240px)] shrink-0" />
+        <div className="flex items-center justify-end gap-1">
           <V20MobileNav mainMenu={mobileMenu} categories={categories} />
         </div>
       </div>

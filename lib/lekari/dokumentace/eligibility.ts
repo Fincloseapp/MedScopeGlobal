@@ -1,6 +1,9 @@
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { isValidClkId } from "@/lib/academy/b2b/verification";
 import { listPartnerMemberships } from "@/lib/academy/b2b/db";
+import { getVipSubscription } from "@/lib/vip";
+import { buildValidityLabel, guestAccess } from "@/lib/apps/access-status";
+import type { AppAccessInfo } from "@/lib/apps/access-status";
 
 export type DokumentaceEligibility = {
   eligible: boolean;
@@ -19,6 +22,8 @@ export type DokumentaceEligibility = {
   clkId?: string | null;
   facilities: Array<{ id: string; name: string; role: string }>;
   message: string;
+  isVip?: boolean;
+  access: AppAccessInfo;
 };
 
 type UserEligibilityRow = {
@@ -87,6 +92,9 @@ async function loadUserRow(userId: string): Promise<UserEligibilityRow | null> {
 export async function getDokumentaceEligibility(
   userId: string | undefined
 ): Promise<DokumentaceEligibility> {
+  const loginUrl = "/login?next=/app/dokumentace";
+  const subscribeUrl = "/predplatne#dokumentace";
+
   if (!userId) {
     return {
       eligible: false,
@@ -96,6 +104,8 @@ export async function getDokumentaceEligibility(
       facilities: [],
       message:
         "Pro stažení a používání MeDiktor od MedScopeGlobal se přihlaste ověřeným lékařským účtem.",
+      isVip: false,
+      access: guestAccess(loginUrl, subscribeUrl, "Host · vyžaduje ověřeného lékaře"),
     };
   }
 
@@ -109,6 +119,18 @@ export async function getDokumentaceEligibility(
       verifiedDoctor: false,
       facilities: [],
       message: "Nepodařilo se ověřit účet. Zkuste to znovu.",
+      isVip: false,
+      access: {
+        authenticated: true,
+        accountLabel: "Účet MedScope",
+        email: null,
+        planLabel: "Nelze ověřit",
+        entitled: false,
+        validUntil: null,
+        validityLabel: "zkontrolujte připojení",
+        loginUrl,
+        subscribeUrl,
+      },
     };
   }
 
@@ -124,7 +146,10 @@ export async function getDokumentaceEligibility(
     facilities = [];
   }
 
+  const vip = await getVipSubscription(userId);
   const eligible = isEligibleFromRow(row, facilities.length > 0);
+  const accountLabel = row.full_name || row.email || "Účet MedScope";
+
   if (!eligible) {
     return {
       eligible: false,
@@ -140,8 +165,28 @@ export async function getDokumentaceEligibility(
       facilities,
       message:
         "Stažení a plné používání MeDiktor je jen pro ověřené lékaře (nebo účet zdravotnického zařízení). Dokončete ověření v Lékařské zóně.",
+      isVip: vip.active,
+      access: {
+        authenticated: true,
+        accountLabel,
+        email: row.email,
+        planLabel: "Čeká na ověření lékaře",
+        entitled: false,
+        validUntil: vip.endsAt,
+        validityLabel: buildValidityLabel({
+          authenticated: true,
+          entitled: false,
+          endsAt: vip.endsAt,
+        }),
+        loginUrl,
+        subscribeUrl,
+      },
     };
   }
+
+  const planLabel = vip.active
+    ? "Lékař · předplatné MeDiktor"
+    : "Ověřený lékařský účet";
 
   return {
     eligible: true,
@@ -159,5 +204,21 @@ export async function getDokumentaceEligibility(
       facilities.length > 0
         ? `Účet propojen: ${row.full_name || "lékař"} · ${facilities.map((f) => f.name).join(", ")}`
         : `Účet propojen: ${row.full_name || row.email || "ověřený lékař"}`,
+    isVip: vip.active,
+    access: {
+      authenticated: true,
+      accountLabel,
+      email: row.email,
+      planLabel,
+      entitled: true,
+      validUntil: vip.endsAt,
+      validityLabel: buildValidityLabel({
+        authenticated: true,
+        entitled: true,
+        endsAt: vip.endsAt,
+      }),
+      loginUrl,
+      subscribeUrl,
+    },
   };
 }

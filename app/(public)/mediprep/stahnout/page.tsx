@@ -5,11 +5,27 @@ import { MEDIPREP } from "@/lib/apps/catalog";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  const base = await buildV20PageMetadata({
     title: `Stáhnout ${MEDIPREP.shortName}`,
     description: MEDIPREP.pitch,
     path: MEDIPREP.downloadPath,
   });
+  return {
+    ...base,
+    manifest: MEDIPREP.manifest,
+    appleWebApp: {
+      capable: true,
+      title: MEDIPREP.shortName,
+      statusBarStyle: "black-translucent",
+    },
+    icons: {
+      icon: [
+        { url: MEDIPREP.assets.icon192, sizes: "192x192", type: "image/png" },
+        { url: MEDIPREP.assets.icon512, sizes: "512x512", type: "image/png" },
+      ],
+      apple: [{ url: MEDIPREP.assets.appleTouch, sizes: "180x180", type: "image/png" }],
+    },
+  };
 }
 
 export default function MediprepDownloadPage() {
@@ -22,9 +38,13 @@ export default function MediprepDownloadPage() {
         Start jako běžná aplikace. Účet: e-mail + ověřovací kód, bez hesla.
       </p>
       <ol className="mt-6 space-y-2 text-sm text-slate-700">
-        <li>1. Na tomto zařízení klepněte na „Nainstalovat MeDiprep na plochu“.</li>
-        <li>2. Chrome/Edge: ikona ⊕ v adresním řádku, nebo … → Aplikace → Instalovat.</li>
-        <li>3. iPhone: Safari → Sdílet → Přidat na plochu.</li>
+        <li>
+          1. Klepněte na <strong>Stáhnout MeDiprep</strong> — otevře se aplikace a nabídne instalaci na
+          plochu.
+        </li>
+        <li>2. Android Chrome: menu ⋮ → <strong>Nainstalovat aplikaci</strong> / Přidat na plochu.</li>
+        <li>3. iPhone Safari: <strong>Sdílet</strong> → <strong>Přidat na plochu</strong>.</li>
+        <li>4. PC Chrome/Edge: ikona ⊕ v adresním řádku, nebo menu → Instalovat aplikaci.</li>
       </ol>
       <div className="mt-8">
         <AppDownloadPanel app={MEDIPREP} />

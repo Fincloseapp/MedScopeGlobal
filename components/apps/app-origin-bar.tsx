@@ -30,6 +30,7 @@ export function isStandaloneAppHref(href: string): boolean {
   );
 }
 
+/** Opens standalone app shells in the same tab so full chrome (tabs / panels) stays visible. */
 export function AppOpenLink({
   href,
   children,
@@ -40,9 +41,9 @@ export function AppOpenLink({
   className?: string;
 }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+    <Link href={href} className={className}>
       {children}
-    </a>
+    </Link>
   );
 }
 

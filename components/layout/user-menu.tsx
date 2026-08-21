@@ -22,11 +22,16 @@ interface Props {
 export function UserMenu({ user, profile }: Props) {
   if (!user) {
     return (
-      <div className="hidden items-center gap-2 sm:flex">
-        <Button variant="ghost" size="sm" asChild>
+      <div className="flex items-center gap-1.5 sm:gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          asChild
+          className="h-9 px-2.5 text-xs font-semibold sm:px-3 sm:text-sm"
+        >
           <Link href="/login">Přihlášení</Link>
         </Button>
-        <Button size="sm" asChild>
+        <Button size="sm" asChild className="h-9 px-2.5 text-xs font-semibold sm:px-3 sm:text-sm">
           <Link href="/signup">Registrace</Link>
         </Button>
       </div>

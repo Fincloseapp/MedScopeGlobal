@@ -1,12 +1,15 @@
 import { cookies } from "next/headers";
 import { getSessionProfile } from "@/lib/auth/session";
-import { getVipStatus } from "@/lib/vip";
+import { getVipSubscription } from "@/lib/vip";
 import { MEDIPREP } from "@/lib/apps/catalog";
+import { buildValidityLabel, type AppAccessInfo } from "@/lib/apps/access-status";
 import type { PrepSession } from "@/lib/mediprep/types";
 
 export const MEDIPREP_OTP_COOKIE = "mediprep_otp_email";
 
 export type { PrepSession };
+
+const SUBSCRIBE = "/predplatne#student";
 
 export async function getPrepSession(): Promise<PrepSession> {
   const { user, profile } = await getSessionProfile();
@@ -16,6 +19,17 @@ export async function getPrepSession(): Promise<PrepSession> {
 
   if (!user) {
     if (otpEmail) {
+      const access: AppAccessInfo = {
+        authenticated: true,
+        accountLabel: otpEmail,
+        email: otpEmail,
+        planLabel: "E-mail ověřen · první test",
+        entitled: false,
+        validUntil: null,
+        validityLabel: "omezený přístup (OTP)",
+        loginUrl,
+        subscribeUrl: SUBSCRIBE,
+      };
       return {
         authenticated: true,
         email: otpEmail,
@@ -25,8 +39,20 @@ export async function getPrepSession(): Promise<PrepSession> {
         firstTestUsed: false,
         message: "E-mail ověřen kódem. První test zdarma — předplatné Student odemyká simulace.",
         loginUrl,
+        access,
       };
     }
+    const access: AppAccessInfo = {
+      authenticated: false,
+      accountLabel: "Nepřihlášeni",
+      email: null,
+      planLabel: "Host · zkušební test",
+      entitled: false,
+      validUntil: null,
+      validityLabel: buildValidityLabel({ authenticated: false, entitled: false, endsAt: null }),
+      loginUrl,
+      subscribeUrl: SUBSCRIBE,
+    };
     return {
       authenticated: false,
       email: null,
@@ -36,24 +62,51 @@ export async function getPrepSession(): Promise<PrepSession> {
       firstTestUsed: false,
       message: "Stačí e-mail a ověřovací kód — bez hesla. První test zdarma.",
       loginUrl,
+      access,
     };
   }
-  const isVip = await getVipStatus(user.id);
+
+  const vip = await getVipSubscription(user.id);
   const studentLike =
-    isVip ||
+    vip.active ||
     profile?.access_level === "student" ||
     profile?.access_level === "physician" ||
     profile?.role === "admin";
+  const email = user.email ?? profile?.email ?? otpEmail;
+  const displayName = profile?.full_name ?? user.email ?? null;
+  const planLabel = vip.active
+    ? "Student LF · předplatné"
+    : studentLike
+      ? "Student / lékařský účet"
+      : "Přihlášeni · základní";
+
+  const access: AppAccessInfo = {
+    authenticated: true,
+    accountLabel: displayName || email || "Účet MedScope",
+    email,
+    planLabel,
+    entitled: Boolean(studentLike),
+    validUntil: vip.endsAt,
+    validityLabel: buildValidityLabel({
+      authenticated: true,
+      entitled: Boolean(studentLike),
+      endsAt: vip.endsAt,
+    }),
+    loginUrl,
+    subscribeUrl: SUBSCRIBE,
+  };
+
   return {
     authenticated: true,
-    email: user.email ?? profile?.email ?? otpEmail,
+    email,
     userId: user.id,
     entitled: Boolean(studentLike),
-    displayName: profile?.full_name ?? user.email ?? null,
+    displayName,
     firstTestUsed: false,
     message: studentLike
       ? "Předplatné Student je aktivní — simulace a drill jsou odemčené."
       : "Přihlášeni. První test zdarma, další simulace v tarifu Student 149 Kč.",
     loginUrl,
+    access,
   };
 }

@@ -14,8 +14,12 @@ import {
   Pill,
   CalendarClock,
   ShieldAlert,
+  LogIn,
 } from "lucide-react";
 import { InstallPwaButton } from "@/components/apps/install-pwa-button";
+import { AppAccountStatus } from "@/components/apps/app-account-status";
+import { AppSectionNav } from "@/components/apps/app-section-nav";
+import { AppBrandVisual } from "@/components/apps/app-brand-visual";
 import { MEDIPACIENT, appLockline } from "@/lib/apps/catalog";
 import { GUEST_PACIENT_SESSION, publicDemoDashboard } from "@/lib/medipacient/demo-dashboard";
 import type { PacientDashboard, PacientDocument, PacientSession } from "@/lib/medipacient/types";
@@ -30,9 +34,6 @@ const TABS: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
 ];
 
 function initialTab(): TabId {
-  if (typeof window === "undefined") return "prehled";
-  const t = new URLSearchParams(window.location.search).get("tab");
-  if (t === "prehled" || t === "zpravy" || t === "nahrat" || t === "ucet") return t;
   return "prehled";
 }
 
@@ -53,6 +54,11 @@ export function PacientAppShell() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
+
+  useEffect(() => {
+    const t = new URLSearchParams(window.location.search).get("tab");
+    if (t === "prehled" || t === "zpravy" || t === "nahrat" || t === "ucet") setTab(t);
+  }, []);
 
   useEffect(() => {
     setOnline(navigator.onLine);
@@ -143,7 +149,7 @@ export function PacientAppShell() {
 
   return (
     <div
-      className="flex h-[100dvh] flex-col overflow-hidden bg-[#f4f9fc] text-[#021d33]"
+      className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#f4f9fc] text-[#021d33]"
       style={{
         paddingTop: "env(safe-area-inset-top)",
         paddingLeft: "env(safe-area-inset-left)",
@@ -168,21 +174,53 @@ export function PacientAppShell() {
               <p className="truncate text-[10px] text-sky-100/70">{appLockline(MEDIPACIENT)}</p>
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <span
-              className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-medium ${
+              className={`hidden items-center gap-1 rounded-full px-2 py-1 text-[10px] font-medium sm:inline-flex ${
                 online ? "bg-emerald-400/20 text-emerald-100" : "bg-amber-400/20 text-amber-100"
               }`}
             >
               {online ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
               {online ? "Online" : "Offline"}
             </span>
-            <InstallPwaButton app={MEDIPACIENT} compact />
+            {session.authenticated ? (
+              <button
+                type="button"
+                onClick={() => setTab("ucet")}
+                className="inline-flex max-w-[9rem] items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1.5 text-[11px] font-semibold text-white touch-manipulation hover:bg-white/25"
+              >
+                <UserRound className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{session.displayName || session.email || "Účet"}</span>
+              </button>
+            ) : (
+              <Link
+                href={session.loginUrl || `/login?next=${encodeURIComponent(MEDIPACIENT.appPath)}`}
+                className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1.5 text-[11px] font-bold text-[#1b4f9a] shadow-sm touch-manipulation hover:bg-sky-50 sm:px-3 sm:text-xs"
+              >
+                <LogIn className="h-3.5 w-3.5" />
+                Přihlášení
+              </Link>
+            )}
+            <InstallPwaButton app={MEDIPACIENT} compact label="Stáhnout" />
           </div>
         </div>
       </header>
 
-      <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-[#f4f9fc]">
+      <AppAccountStatus
+        access={session.access ?? GUEST_PACIENT_SESSION.access}
+        accent="#2D7FF9"
+        onOpenAccount={() => setTab("ucet")}
+      />
+
+      <AppSectionNav
+        tabs={TABS}
+        active={tab}
+        onChange={setTab}
+        accent="#2D7FF9"
+        ariaLabel="MeDipacient sekce"
+      />
+
+      <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-[#f4f9fc] pb-[calc(4.25rem+env(safe-area-inset-bottom))] md:pb-0">
         {flash ? (
           <p className="mx-3 mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950">
             {flash}
@@ -192,7 +230,12 @@ export function PacientAppShell() {
         {loading ? (
           <p className="px-4 py-16 text-center text-sm text-slate-500">Načítám přehled zpráv…</p>
         ) : tab === "prehled" ? (
-          <div className="mx-auto w-full max-w-3xl space-y-4 px-3 py-3 sm:px-4">
+          <div className="mx-auto w-full max-w-3xl space-y-4 pb-3 pt-0">
+            <AppBrandVisual
+              app={MEDIPACIENT}
+              className="border-b border-[#cfe1f3] sm:mx-4 sm:mt-3 sm:rounded-2xl sm:border"
+            />
+            <div className="space-y-4 px-3 sm:px-4">
             <section className="rounded-2xl border border-[#cfe1f3] bg-white p-4 shadow-sm">
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#2D7FF9]">Dashboard</p>
               <h2 className="mt-1 font-display text-xl font-semibold">Všechny zprávy na jednom místě</h2>
@@ -304,6 +347,7 @@ export function PacientAppShell() {
             <p className="pb-4 text-[11px] text-slate-500">
               MeDipacient je vzdělávací přehled zpráv — nenahrazuje lékařskou péči ani diagnózu.
             </p>
+            </div>
           </div>
         ) : tab === "zpravy" ? (
           <div className="mx-auto w-full max-w-3xl space-y-3 px-3 py-3 sm:px-4">
@@ -373,8 +417,23 @@ export function PacientAppShell() {
           </div>
         ) : (
           <div className="mx-auto w-full max-w-3xl space-y-4 px-3 py-6 sm:px-4">
+            <AppBrandVisual app={MEDIPACIENT} compact className="rounded-2xl border border-[#cfe1f3]" />
             <h2 className="font-display text-xl font-semibold">Účet</h2>
             <p className="text-sm text-slate-600">{session?.message}</p>
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm space-y-2">
+              <p>
+                <span className="text-slate-500">Účet: </span>
+                <strong>{session.access?.accountLabel ?? session.displayName ?? "Nepřihlášeni"}</strong>
+              </p>
+              <p>
+                <span className="text-slate-500">Přístup: </span>
+                <strong>{session.access?.planLabel ?? (session.isVip ? "Premium" : "Základní")}</strong>
+              </p>
+              <p>
+                <span className="text-slate-500">Platnost: </span>
+                <strong>{session.access?.validityLabel ?? "—"}</strong>
+              </p>
+            </div>
             {session?.authenticated ? (
               <p className="rounded-xl bg-white p-4 text-sm">
                 {session.displayName || session.email}
@@ -383,8 +442,9 @@ export function PacientAppShell() {
             ) : (
               <Link
                 href={session?.loginUrl || "/login?next=/app/pacient"}
-                className="inline-flex rounded-full bg-[#2D7FF9] px-5 py-2.5 text-sm font-semibold text-white"
+                className="inline-flex items-center gap-2 rounded-full bg-[#2D7FF9] px-5 py-2.5 text-sm font-semibold text-white"
               >
+                <LogIn className="h-4 w-4" />
                 Přihlásit se
               </Link>
             )}
@@ -447,31 +507,6 @@ export function PacientAppShell() {
           </div>
         )}
       </main>
-
-      <nav
-        className="shrink-0 border-t border-[#cfe1f3] bg-white/95 backdrop-blur"
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-        aria-label={MEDIPACIENT.shortName}
-      >
-        <div className="mx-auto grid max-w-3xl grid-cols-4">
-          {TABS.map(({ id, label, icon: Icon }) => {
-            const active = tab === id;
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setTab(id)}
-                className={`flex flex-col items-center gap-0.5 px-1 py-2.5 text-[11px] font-medium ${
-                  active ? "text-[#2D7FF9]" : "text-slate-500"
-                }`}
-              >
-                <Icon className={`h-5 w-5 ${active ? "text-[#2D7FF9]" : "text-slate-400"}`} />
-                {label}
-              </button>
-            );
-          })}
-        </div>
-      </nav>
     </div>
   );
 }
