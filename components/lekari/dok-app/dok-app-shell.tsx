@@ -46,9 +46,7 @@ const FALLBACK_ACCESS = guestAccess(
 );
 
 function initialTab(): TabId {
-  if (typeof window === "undefined") return "zapis";
-  const t = new URLSearchParams(window.location.search).get("tab");
-  if (t === "historie" || t === "navod" || t === "ucet" || t === "zapis") return t;
+  // Always same on server + first client paint (avoid hydration mismatch).
   return "zapis";
 }
 
@@ -58,6 +56,13 @@ export function DokAppShell() {
   const [elig, setElig] = useState<EligibilityState | null>(null);
   const [loading, setLoading] = useState(true);
   const [linkHint, setLinkHint] = useState<string | null>(null);
+
+  useEffect(() => {
+    const t = new URLSearchParams(window.location.search).get("tab");
+    if (t === "historie" || t === "navod" || t === "ucet" || t === "zapis") {
+      setTab(t);
+    }
+  }, []);
 
   useEffect(() => {
     setOnline(navigator.onLine);
@@ -218,16 +223,12 @@ export function DokAppShell() {
       />
 
       <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-[#f4f9fc] pb-[calc(4.25rem+env(safe-area-inset-bottom))] md:pb-0">
-        {!loading ? (
-          <div className="mx-auto w-full max-w-3xl">
-            <AppBrandVisual
-              app={MEDIKTOR_APP}
-              priority={tab === "navod" || tab === "ucet"}
-              compact={tab === "zapis" || tab === "historie"}
-              className="border-b border-[#cfe1f3] sm:mx-4 sm:mt-3 sm:rounded-2xl sm:border"
-            />
-          </div>
-        ) : null}
+        <div className="mx-auto w-full max-w-3xl">
+          <AppBrandVisual
+            app={MEDIKTOR_APP}
+            className="border-b border-[#cfe1f3] sm:mx-4 sm:mt-3 sm:rounded-2xl sm:border"
+          />
+        </div>
         {loading ? (
           <p className="px-4 py-16 text-center text-sm text-slate-500">Načítám aplikaci…</p>
         ) : !elig?.eligible && (tab === "zapis" || tab === "historie") ? (

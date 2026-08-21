@@ -58,9 +58,6 @@ function defaultCount(mode: TestMode): number {
 }
 
 function initialTab(): TabId {
-  if (typeof window === "undefined") return "prehled";
-  const t = new URLSearchParams(window.location.search).get("tab");
-  if (t === "prehled" || t === "testy" || t === "plan" || t === "ucet") return t;
   return "prehled";
 }
 
@@ -81,6 +78,11 @@ export function PrepAppShell() {
   const [subject, setSubject] = useState<TestSubject>("mix");
   const [count, setCount] = useState(12);
   const [faculty, setFaculty] = useState("mix");
+
+  useEffect(() => {
+    const t = new URLSearchParams(window.location.search).get("tab");
+    if (t === "prehled" || t === "testy" || t === "plan" || t === "ucet") setTab(t);
+  }, []);
 
   useEffect(() => {
     setOnline(navigator.onLine);
@@ -336,7 +338,7 @@ export function PrepAppShell() {
             <div className="relative mb-2 aspect-[16/9] overflow-hidden rounded-lg">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/assets/marketing/mediprep.webp"
+                src={APP_MARKETING_IMAGE.mediprep}
                 alt=""
                 className="h-full w-full object-cover"
               />
@@ -353,7 +355,6 @@ export function PrepAppShell() {
           <div className="mx-auto w-full max-w-3xl space-y-4 pb-3 pt-0 sm:px-0">
             <AppBrandVisual
               app={MEDIPREP}
-              priority
               className="border-b border-[#e0d5c4] sm:mx-4 sm:mt-3 sm:rounded-2xl sm:border"
             />
             <div className="space-y-4 px-3 sm:px-4">

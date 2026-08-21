@@ -34,9 +34,6 @@ const TABS: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
 ];
 
 function initialTab(): TabId {
-  if (typeof window === "undefined") return "prehled";
-  const t = new URLSearchParams(window.location.search).get("tab");
-  if (t === "prehled" || t === "zpravy" || t === "nahrat" || t === "ucet") return t;
   return "prehled";
 }
 
@@ -57,6 +54,11 @@ export function PacientAppShell() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
+
+  useEffect(() => {
+    const t = new URLSearchParams(window.location.search).get("tab");
+    if (t === "prehled" || t === "zpravy" || t === "nahrat" || t === "ucet") setTab(t);
+  }, []);
 
   useEffect(() => {
     setOnline(navigator.onLine);
@@ -231,7 +233,6 @@ export function PacientAppShell() {
           <div className="mx-auto w-full max-w-3xl space-y-4 pb-3 pt-0">
             <AppBrandVisual
               app={MEDIPACIENT}
-              priority
               className="border-b border-[#cfe1f3] sm:mx-4 sm:mt-3 sm:rounded-2xl sm:border"
             />
             <div className="space-y-4 px-3 sm:px-4">
