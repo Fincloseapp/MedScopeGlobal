@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
 import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rules";
+import { mixListableFeed } from "@/lib/v271/news-desks";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import type { AdRow } from "@/types/database";
@@ -46,7 +47,7 @@ async function loadArticlesPublic(): Promise<DisplayArticle[]> {
     .select(articleSelect)
     .eq("published", true)
     .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(48);
+    .limit(72);
 
   if (error) {
     console.error("loadArticlesPublic", error);
@@ -58,9 +59,9 @@ async function loadArticlesPublic(): Promise<DisplayArticle[]> {
   const publicOnly = active.filter((a) => !a.vip_only);
   const prepared = await prepareArticlesForDisplay(publicOnly, "cs", {
     mode: "card",
-    maxTranslate: 12,
+    maxTranslate: 16,
   });
-  return prepared.slice(0, 12);
+  return mixListableFeed(prepared, 36);
 }
 
 async function loadHomepageData(): Promise<{
@@ -80,6 +81,6 @@ async function loadHomepageData(): Promise<{
 
 export const getHomepageCachedData = unstable_cache(
   loadHomepageData,
-  ["v22-homepage-public-v2"],
+  ["v22-homepage-public-v3-news-desks"],
   { revalidate: 120, tags: ["medscope-ui-v22.4", "v22-content"] }
 );

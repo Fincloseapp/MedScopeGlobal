@@ -81,7 +81,7 @@ export const WRITER_AGENTS: WriterAgent[] = [
     topic: "dlouhovekost",
     topicLabel: "Dlouhověkost",
     hint: "healthspan a biomarkery",
-    href: "/verejnost/clanky?topic=zivotni-styl",
+    href: "/verejnost/clanky?topic=dlouhovekost",
     cron: "/api/cron/public-articles",
     accent: "#0f3d5c",
     accentSoft: "#dbeafe",

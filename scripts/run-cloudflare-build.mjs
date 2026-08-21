@@ -11,7 +11,13 @@ import { spawnSync } from "node:child_process";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 function run(label, cmd, args) {
-  const result = spawnSync(cmd, args, { cwd: root, stdio: "inherit", shell: process.platform === "win32" });
+  const useShell = process.platform === "win32" && cmd === "powershell";
+  const result = spawnSync(cmd, args, {
+    cwd: root,
+    stdio: "inherit",
+    shell: useShell,
+    windowsHide: true,
+  });
   if (result.status !== 0) {
     console.error(`\n✗ ${label} failed (exit ${result.status ?? 1})\n`);
     process.exit(result.status || 1);

@@ -13,6 +13,13 @@ export function verejnostDateLabel(article: Pick<DisplayArticle, "published_at" 
 }
 
 export function articleTopicLabel(article: DisplayArticle): string {
+  const meta = article.metadata ?? {};
+  const pillar = String(meta.content_pillar ?? meta.internal_topic ?? "")
+    .toLowerCase()
+    .trim();
+  if (pillar === "dlouhovekost" || String(article.public_topic ?? "") === "dlouhovekost") {
+    return "Dlouhověkost";
+  }
   return topicLabelForSlug(article.public_topic ?? undefined);
 }
 

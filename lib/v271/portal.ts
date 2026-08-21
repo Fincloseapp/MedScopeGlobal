@@ -52,12 +52,10 @@ export const PORTAL_SERVICES = [
 ] as const;
 
 export const PORTAL_NEWS_TABS = [
-  { label: "Zprávy", href: "/aktualni-zpravy" },
-  { label: "Studie", href: "/studie" },
-  { label: "Léky", href: "/leky" },
   { label: "Novinky", href: "/novinky" },
   { label: "Veřejnost", href: "/verejnost/clanky" },
-  { label: "Vše", href: "/articles" },
+  { label: "Dlouhověkost", href: "/verejnost/clanky?topic=dlouhovekost" },
+  { label: "Články", href: "/articles" },
 ] as const;
 
 export { getPortalTodayNote as getPortalNewsNote } from "@/lib/calendar/czech-today";

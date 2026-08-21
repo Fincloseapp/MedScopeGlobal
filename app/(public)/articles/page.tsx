@@ -1,34 +1,59 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { MagazineListing } from "@/components/articles/magazine-listing";
 import { V20ArticleCard } from "@/components/v20/article-card";
 import { getLatestArticles } from "@/lib/queries/articles";
 import { getMedicalArticles } from "@/lib/queries/medicina";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { filterArticlesForDesk, mixListableFeed, type NewsDeskId } from "@/lib/v271/news-desks";
+import Link from "next/link";
 
 export const revalidate = 120;
 
-export async function generateMetadata(): Promise<Metadata> {
+const DESK_IDS = new Set<NewsDeskId>(["novinky", "verejnost", "dlouhovekost", "clanky"]);
+
+function parseDesk(value: string | undefined): NewsDeskId | null {
+  if (value && DESK_IDS.has(value as NewsDeskId)) return value as NewsDeskId;
+  return null;
+}
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ desk?: string }>;
+}): Promise<Metadata> {
+  const sp = await searchParams;
+  const desk = parseDesk(sp.desk);
+  const title =
+    desk === "novinky"
+      ? "Novinky"
+      : desk === "verejnost"
+        ? "Články pro veřejnost"
+        : desk === "dlouhovekost"
+          ? "Dlouhověkost"
+          : "Články";
   return buildV20PageMetadata({
-    title: "Články — MedScopeGlobal",
-    description: "Aktuální odborné články v češtině pro praxi a studium medicíny.",
-    path: "/articles",
+    title: `${title} — MedScopeGlobal`,
+    description:
+      "Aktuální zdravotnické články v češtině: novinky, veřejné zdraví, dlouhověkost a redakční magazín s fotografiemi.",
+    path: desk ? `/articles?desk=${desk}` : "/articles",
   });
 }
 
 export default async function ArticlesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ med_track?: string; rok?: string }>;
+  searchParams: Promise<{ med_track?: string; rok?: string; desk?: string }>;
 }) {
   const sp = await searchParams;
   const locale = "cs" as const;
   const { isVip, accessLevel } = await getReaderContext();
+  const desk = parseDesk(sp.desk);
 
   const medTrack = sp.med_track === "priprava" || sp.med_track === "studium" ? sp.med_track : null;
   const year = sp.rok ? Number(sp.rok) : undefined;
 
-  const coreArticles = await getLatestArticles(24, 0, isVip, accessLevel, locale);
+  const coreArticles = await getLatestArticles(48, 0, isVip, accessLevel, locale);
   const medArticles = medTrack
     ? await getMedicalArticles({
         medTrack,
@@ -40,60 +65,43 @@ export default async function ArticlesPage({
       })
     : [];
 
-  const articles = medTrack ? medArticles : coreArticles;
-
-  return (
-    <div className="v20-articles mx-auto max-w-7xl px-4 py-12 sm:px-6">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-        Odborný obsah
-      </p>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="font-display text-4xl font-bold text-[#021d33]">Články</h1>
-        </div>
-        <Link href="/medicina" className="text-sm font-medium text-primary hover:underline">
-          Medicínská větev →
-        </Link>
-        <Link href="/articles/archiv" className="text-sm font-medium text-primary hover:underline">
-          Archiv →
-        </Link>
-      </div>
-
-      <div className="mt-6 flex flex-wrap gap-2">
-        <Link
-          href="/articles"
-          className={`rounded-full border px-3 py-1.5 text-sm ${!medTrack ? "bg-primary text-white" : "bg-white"}`}
-        >
-          Vše
-        </Link>
-        <Link
-          href="/articles?med_track=priprava"
-          className={`rounded-full border px-3 py-1.5 text-sm ${medTrack === "priprava" ? "bg-primary text-white" : "bg-white"}`}
-        >
-          Příprava LF
-        </Link>
-        <Link
-          href="/articles?med_track=studium"
-          className={`rounded-full border px-3 py-1.5 text-sm ${medTrack === "studium" ? "bg-primary text-white" : "bg-white"}`}
-        >
-          Studium medicíny
-        </Link>
-      </div>
-
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {articles.map((a) => (
-          <V20ArticleCard key={a.slug} article={a} />
-        ))}
-      </div>
-      {articles.length === 0 && (
-        <p className="mt-8 text-sm text-muted-foreground">
-          Žádné aktivní články. Podívejte se na{" "}
-          <Link href="/odborne/briefy" className="text-primary hover:underline">
-            odborné briefy
-          </Link>
-          .
+  if (medTrack) {
+    return (
+      <div className="v20-articles mx-auto max-w-7xl px-4 py-12 sm:px-6">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
+          Odborný obsah
         </p>
-      )}
-    </div>
-  );
+        <h1 className="font-display text-4xl font-bold text-[#021d33]">Články</h1>
+        <div className="mt-6 flex flex-wrap gap-2">
+          <Link href="/articles" className="rounded-full border bg-white px-3 py-1.5 text-sm">
+            Vše
+          </Link>
+          <Link
+            href="/articles?med_track=priprava"
+            className={`rounded-full border px-3 py-1.5 text-sm ${
+              medTrack === "priprava" ? "bg-primary text-white" : "bg-white"
+            }`}
+          >
+            Příprava LF
+          </Link>
+          <Link
+            href="/articles?med_track=studium"
+            className={`rounded-full border px-3 py-1.5 text-sm ${
+              medTrack === "studium" ? "bg-primary text-white" : "bg-white"
+            }`}
+          >
+            Studium medicíny
+          </Link>
+        </div>
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {medArticles.map((article) => (
+            <V20ArticleCard key={article.slug} article={article} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const mixed = mixListableFeed(filterArticlesForDesk(coreArticles, desk), 24);
+  return <MagazineListing articles={mixed} activeDesk={desk} />;
 }

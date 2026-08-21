@@ -1,4 +1,3 @@
-import { CoverImage } from "@/components/media/cover-image";
 import Image from "next/image";
 import Link from "next/link";
 import type { DisplayArticle } from "@/lib/queries/articles";
@@ -10,12 +9,12 @@ import {
   PORTAL_PHILOSOPHY,
   PORTAL_SERVICES,
 } from "@/lib/v271/portal";
+import { NEWS_DESKS, splitNewsDesks, type NewsDeskId } from "@/lib/v271/news-desks";
+import { NewsArticleThumb, NewsDeskFallback, NewsHeadlineRow } from "@/components/articles/news-article-card";
 import { PortalSearch } from "@/components/v271/portal-search";
-import { WriterAgentMark } from "@/components/editorial/writer-agent-mark";
 import { WriterAgentsStrip } from "@/components/editorial/writer-agents-strip";
 import { AppOpenLink, isStandaloneAppHref } from "@/components/apps/app-origin-bar";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
-import { resolveWriterAgent, resolveWritingStyle } from "@/lib/editorial/writer-agents";
 import { BookOpen, Gift, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
 
 function ServiceGlyph({ icon }: { icon?: string }) {
@@ -62,38 +61,51 @@ function Box({
   );
 }
 
-function ArticleThumb({
-  article,
-  className,
-  sizes,
+function DeskColumn({
+  desk,
+  articles,
+  featured,
 }: {
-  article: DisplayArticle;
-  className: string;
-  sizes: string;
+  desk: NewsDeskId;
+  articles: DisplayArticle[];
+  featured?: boolean;
 }) {
-  const agent = resolveWriterAgent(article);
+  const def = NEWS_DESKS.find((item) => item.id === desk)!;
+  const lead = featured ? articles[0] : null;
+  const rows = featured ? articles.slice(1, 4) : articles.slice(0, 4);
+
   return (
-    <div className={`relative overflow-hidden rounded-md bg-slate-100 ${className}`}>
-      {article.cover_image_url ? (
-        <CoverImage src={article.cover_image_url} alt="" className="absolute inset-0" />
-      ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-[#021d33] to-[#005B96]" />
-      )}
-      {agent ? (
-        <span className="absolute bottom-1 left-1">
-          <WriterAgentMark agent={agent} size={22} />
-        </span>
+    <div>
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#005B96]">{def.label}</h3>
+        <Link href={def.href} className="text-[11px] font-medium text-[#005B96] hover:underline">
+          {def.more} →
+        </Link>
+      </div>
+      {lead ? (
+        <Link href={`/article/${lead.slug}`} className="group mb-2 block">
+          <NewsArticleThumb article={lead} large sizes="(max-width: 768px) 100vw, 40vw" />
+          <h4 className="mt-2 font-display text-base font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
+            {lead.title}
+          </h4>
+          {lead.excerpt ? (
+            <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-600">{lead.excerpt}</p>
+          ) : null}
+        </Link>
       ) : null}
+      <div className="divide-y divide-slate-100 border-t border-slate-200">
+        {rows.length > 0
+          ? rows.map((article) => <NewsHeadlineRow key={article.id} article={article} />)
+          : !lead
+            ? <NewsDeskFallback desk={desk} />
+            : null}
+      </div>
     </div>
   );
 }
 
 function PortalNewsFeed({ articles }: { articles: DisplayArticle[] }) {
-  const featured = articles[0];
-  const spotlight = articles.slice(1, 5);
-  const rest = articles.slice(5);
-  const featuredAgent = featured ? resolveWriterAgent(featured) : null;
-  const featuredStyle = featured ? resolveWritingStyle(featured) : null;
+  const desks = splitNewsDesks(articles);
 
   return (
     <>
@@ -109,65 +121,12 @@ function PortalNewsFeed({ articles }: { articles: DisplayArticle[] }) {
         ))}
       </div>
       <p className="mb-3 text-[11px] leading-relaxed text-slate-500">{getPortalNewsNote()}</p>
-      {featured ? (
-        <article className="border-b border-slate-100 pb-3">
-          <Link href={`/article/${featured.slug}`} className="group grid gap-3 sm:grid-cols-[220px_minmax(0,1fr)]">
-            <ArticleThumb article={featured} className="h-36 sm:h-full min-h-[9rem]" sizes="220px" />
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#005B96]">
-                {featuredAgent?.topicLabel ?? featured.categories?.name ?? "Magazín"}
-              </p>
-              <h3 className="mt-1 font-display text-lg font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
-                {featured.title}
-              </h3>
-              {featured.excerpt ? (
-                <p className="mt-1 line-clamp-3 text-sm text-slate-600">{featured.excerpt}</p>
-              ) : null}
-              {featuredStyle ? (
-                <p className="mt-2 text-[10px] uppercase tracking-wide text-slate-400">styl {featuredStyle.label}</p>
-              ) : null}
-            </div>
-          </Link>
-        </article>
-      ) : (
-        <p className="text-sm text-slate-500">Redakční články se načtou, jakmile je databáze k dispozici.</p>
-      )}
-      {spotlight.length > 0 ? (
-        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-          {spotlight.map((article) => (
-            <li key={article.id}>
-              <Link href={`/article/${article.slug}`} className="group flex gap-2.5">
-                <ArticleThumb article={article} className="h-[4.5rem] w-[5.5rem] shrink-0" sizes="88px" />
-                <span className="min-w-0">
-                  <span className="block text-[10px] font-semibold uppercase tracking-wide text-[#005B96]">
-                    {resolveWriterAgent(article)?.label ?? article.categories?.name ?? ""}
-                  </span>
-                  <span className="mt-0.5 block text-sm font-medium leading-snug text-[#021d33] group-hover:text-[#005B96]">
-                    {article.title}
-                  </span>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-      {rest.length > 0 ? (
-        <ul className="mt-3 divide-y divide-slate-100 border-t border-slate-100">
-          {rest.map((article) => (
-            <li key={article.id}>
-              <Link href={`/article/${article.slug}`} className="flex items-center gap-2.5 py-2 hover:bg-slate-50">
-                <ArticleThumb article={article} className="h-12 w-16 shrink-0" sizes="64px" />
-                <span className="min-w-0 flex-1 text-sm font-medium leading-snug text-[#021d33] hover:text-[#005B96]">
-                  {article.title}
-                </span>
-                <span className="hidden shrink-0 text-[10px] uppercase tracking-wide text-slate-400 sm:inline">
-                  {resolveWriterAgent(article)?.label ?? article.categories?.name ?? ""}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      <div className="grid gap-5 sm:grid-cols-2">
+        <DeskColumn desk="novinky" articles={desks.novinky} featured />
+        <DeskColumn desk="verejnost" articles={desks.verejnost} featured />
+        <DeskColumn desk="dlouhovekost" articles={desks.dlouhovekost} featured />
+        <DeskColumn desk="clanky" articles={desks.clanky} featured />
+      </div>
     </>
   );
 }

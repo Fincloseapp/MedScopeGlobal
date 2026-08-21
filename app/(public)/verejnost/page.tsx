@@ -45,6 +45,7 @@ const START_HERE = [
 const QUICK_LINKS = [
   { href: "/verejnost/temata", label: "Najdi svůj problém", desc: "Symptomy, prevence, nemoci — začněte zde" },
   { href: "/verejnost/clanky", label: "Články pro veřejnost", desc: "Srozumitelné texty v češtině" },
+  { href: "/verejnost/clanky?topic=dlouhovekost", label: "Dlouhověkost", desc: "Healthspan, spánek, pohyb a biomarkery" },
   { href: "/verejnost/osveta", label: "Denní zdravotní tip", desc: "Krátké video s avatarem a kvízem" },
   { href: "/ai-asistent/verejnost", label: "Zeptej se AI", desc: "Odpovědi o prevenci — nenahrazuje lékaře" },
   { href: "/verejnost/rozhovory", label: "Rozhovory s odborníky", desc: "Lékaři a specialisté vysvětlují srozumitelně" },
@@ -78,8 +79,8 @@ export default async function VerejnostHubPage() {
             Zdraví srozumitelně — bez odborného žargonu
           </h1>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/85">
-            Průvodce prevencí, symptomy, výživou, spánkem a stresem. Obsah pro širokou veřejnost
-            v češtině — vzdělávací, nikoli náhrada lékařské péče.
+            Průvodce prevencí, symptomy, výživou, spánkem, stresem a dlouhověkostí. Obsah pro
+            širokou veřejnost v češtině — vzdělávací, nikoli náhrada lékařské péče.
           </p>
           {lastUpdateLabel ? (
             <p className="mt-4 text-xs text-white/50">Poslední článek: {lastUpdateLabel}</p>

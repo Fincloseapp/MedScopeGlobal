@@ -138,6 +138,7 @@ const PUBLIC_TOPIC_TO_CZ_UNIT: Record<string, EditorialUnitId> = {
   nemoci: "medscope_cz_klinicka",
   prevence: "medscope_cz_info_team",
   rozhovory: "medscope_cz_odborna",
+  dlouhovekost: "medscope_cz_research_desk",
 };
 
 export function isEditorialUnitId(value: unknown): value is EditorialUnitId {
@@ -218,6 +219,10 @@ function czUnitFromPersonaOrTopic(article: ArticleForEditorialUnits): EditorialU
   if (personaId && PERSONA_STYLE_TO_CZ_UNIT[personaId]) {
     return PERSONA_STYLE_TO_CZ_UNIT[personaId]!;
   }
+  const pillar = String(meta.content_pillar ?? meta.internal_topic ?? "")
+    .toLowerCase()
+    .trim();
+  if (pillar === "dlouhovekost") return "medscope_cz_research_desk";
   const topic = article.public_topic ?? "";
   if (topic && PUBLIC_TOPIC_TO_CZ_UNIT[topic]) {
     return PUBLIC_TOPIC_TO_CZ_UNIT[topic]!;
@@ -261,8 +266,12 @@ export function assignEditorialUnits(
   }
 
   if (isGeneralPublicHealth(safe)) {
+    const primary = czUnitFromPersonaOrTopic(safe);
+    const reviewer: EditorialUnitId =
+      primary === "medscope_cz_klinicka" ? "medscope_cz_odborna" : "medscope_cz_klinicka";
     return {
-      primary: czUnitFromPersonaOrTopic(safe),
+      primary,
+      reviewer,
       aiAssisted,
     };
   }
