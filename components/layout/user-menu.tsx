@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { createClient } from "@/lib/supabase/client";
+import { tryCreateClient } from "@/lib/supabase/client";
 import type { AppUser } from "@/types/database";
 
 interface Props {
@@ -20,10 +20,9 @@ interface Props {
 }
 
 export function UserMenu({ user, profile }: Props) {
-  const supabase = createClient();
-
   async function signOut() {
-    await supabase.auth.signOut();
+    const supabase = tryCreateClient();
+    if (supabase) await supabase.auth.signOut();
     window.location.href = "/";
   }
 

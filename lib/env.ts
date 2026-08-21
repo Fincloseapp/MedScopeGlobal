@@ -7,19 +7,46 @@ function isUsableSecret(value: string | undefined): value is string {
   return true;
 }
 
+type PublicEnvBridge = {
+  NEXT_PUBLIC_SUPABASE_URL?: string;
+  NEXT_PUBLIC_SUPABASE_ANON_KEY?: string;
+};
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __MEDSCOPE_PUBLIC__: PublicEnvBridge | undefined;
+}
+
+/** Browser bridge from PublicEnvScript (Worker secrets available only on SSR). */
+function bridgePublicEnv(): PublicEnvBridge | undefined {
+  if (typeof globalThis === "undefined") return undefined;
+  return globalThis.__MEDSCOPE_PUBLIC__;
+}
+
 function resolveSupabaseUrl(): string | undefined {
+  const bridge = bridgePublicEnv();
+  // Prefer runtime bridge on the client when build-time NEXT_PUBLIC_* is missing.
   const url =
+    (typeof window !== "undefined"
+      ? bridge?.NEXT_PUBLIC_SUPABASE_URL?.trim()
+      : undefined) ||
     process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ||
-    process.env.SUPABASE_URL?.trim();
+    process.env.SUPABASE_URL?.trim() ||
+    bridge?.NEXT_PUBLIC_SUPABASE_URL?.trim();
   return isUsableSecret(url) ? url : undefined;
 }
 
 function resolveAnonKey(): string | undefined {
+  const bridge = bridgePublicEnv();
   const anonKey =
+    (typeof window !== "undefined"
+      ? bridge?.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
+      : undefined) ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ||
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
     process.env.SUPABASE_ANON_KEY?.trim() ||
-    process.env.SUPABASE_PUBLISHABLE_KEY?.trim();
+    process.env.SUPABASE_PUBLISHABLE_KEY?.trim() ||
+    bridge?.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
   return isUsableSecret(anonKey) ? anonKey : undefined;
 }
 

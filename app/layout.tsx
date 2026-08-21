@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Libre_Baskerville } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { PublicEnvScript } from "@/components/system/public-env-script";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { HREFLANG_LOCALES } from "@/lib/seo/metadata";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
@@ -85,6 +86,7 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${display.variable} min-h-screen font-sans antialiased`}
       >
+        <PublicEnvScript />
         <JsonLdScript data={organizationJsonLd()} />
         <JsonLdScript data={newsletterJsonLd()} />
         <Providers>{children}</Providers>

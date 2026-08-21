@@ -9,14 +9,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { createClient } from "@/lib/supabase/client";
+import { tryCreateClient } from "@/lib/supabase/client";
 import type { NotificationRow } from "@/types/database";
 
 export function NotificationBell() {
-  const supabase = createClient();
   const [items, setItems] = useState<NotificationRow[]>([]);
 
   const refresh = useCallback(async () => {
+    const supabase = tryCreateClient();
+    if (!supabase) return;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -28,7 +29,7 @@ export function NotificationBell() {
       .order("created_at", { ascending: false })
       .limit(30);
     setItems((data ?? []) as NotificationRow[]);
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     void refresh();
@@ -37,6 +38,8 @@ export function NotificationBell() {
   const unread = items.filter((n) => !n.read).length;
 
   async function markRead(id: string) {
+    const supabase = tryCreateClient();
+    if (!supabase) return;
     await supabase.from("notifications").update({ read: true }).eq("id", id);
     await refresh();
   }

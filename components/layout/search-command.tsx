@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { createClient } from "@/lib/supabase/client";
+import { tryCreateClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { mergedArticleSearch } from "@/utils/merged-article-search";
 import { sanitizeSearchInput } from "@/utils/search";
@@ -42,7 +42,12 @@ export function SearchCommand({
       return;
     }
     setLoading(true);
-    const supabase = createClient();
+    const supabase = tryCreateClient();
+    if (!supabase) {
+      setLoading(false);
+      setResults([]);
+      return;
+    }
     const rows = await mergedArticleSearch(supabase, term, 12, isVip, accessLevel);
     setLoading(false);
     setResults(rows);
