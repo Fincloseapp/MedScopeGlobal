@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createDataClient } from "@/lib/supabase/data";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { mapArticleList } from "@/lib/db/map-article";
 import {
@@ -51,7 +51,7 @@ export async function listPublicArticles(options?: {
   const limit = options?.limit ?? 12;
   const offset = options?.offset ?? 0;
   const locale = options?.locale ?? "cs";
-  const supabase = await createClient();
+  const supabase = await createDataClient();
 
   let q = supabase
     .from("articles")
@@ -82,7 +82,7 @@ export async function getPublicArticleBySlug(
   slug: string,
   locale: LocaleCode = "cs"
 ): Promise<DisplayArticle | null> {
-  const supabase = await createClient();
+  const supabase = await createDataClient();
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -107,7 +107,7 @@ export async function listPublicAdCampaigns(options?: {
   activeOnly?: boolean;
   topic?: PublicTopic | null;
 }): Promise<PublicAdCampaign[]> {
-  const supabase = await createClient();
+  const supabase = await createDataClient();
   let q = supabase.from("public_ad_campaigns").select("*").order("updated_at", { ascending: false });
   if (options?.activeOnly !== false) q = q.eq("active", true);
 
@@ -127,7 +127,7 @@ export async function listPublicAdCampaigns(options?: {
 }
 
 export async function getPublicAdCampaign(id: string): Promise<PublicAdCampaign | null> {
-  const supabase = await createClient();
+  const supabase = await createDataClient();
   const { data, error } = await supabase.from("public_ad_campaigns").select("*").eq("id", id).maybeSingle();
   if (error) {
     console.error("getPublicAdCampaign", error);
@@ -149,7 +149,7 @@ export async function incrementPublicAdClick(campaignId: string): Promise<boolea
 }
 
 export async function countPublicArticlesByTopic(): Promise<Record<string, number>> {
-  const supabase = await createClient();
+  const supabase = await createDataClient();
   const topics: PublicTopic[] = ["zivotni-styl", "nemoci", "prevence", "rozhovory"];
   const out: Record<string, number> = {};
   for (const topic of topics) {

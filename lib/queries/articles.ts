@@ -18,7 +18,7 @@ import {
   type DisplayArticle,
 } from "@/lib/articles/prepare-for-display";
 import type { LocaleCode } from "@/lib/i18n/config";
-import { createClient } from "@/lib/supabase/server";
+import { createDataClient } from "@/lib/supabase/data";
 import {
   filterActiveArticles,
   filterCzechContent,
@@ -90,7 +90,7 @@ export async function getFeaturedArticles(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
-  const supabase = await createClient();
+  const supabase = await createDataClient();
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -122,7 +122,7 @@ export async function getLatestArticles(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
-  const supabase = await createClient();
+  const supabase = await createDataClient();
   const fetchLimit = limit * 8;
   const { data, error } = await supabase
     .from("articles")
@@ -135,9 +135,9 @@ export async function getLatestArticles(
     console.error("getLatestArticles", error);
     return [];
   }
-  const rows = mapArticleList(data as Record<string, unknown>[] | null).filter(
-    (a) => !isLayAudienceArticle(a)
-  );
+  // Include lay/public Czech articles so /articles "Vše" matches the live portal feed
+  // (recent pipeline output is mostly audience=public / rubric verejnost).
+  const rows = mapArticleList(data as Record<string, unknown>[] | null);
   const filtered = filterForReader(rows, isVip, accessLevel, locale);
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
@@ -158,7 +158,7 @@ export async function getArticlesBySection(
     ? [contentTypeSlug]
     : rubricSlugsForSectionFetch(sectionSlug);
 
-  const supabase = await createClient();
+  const supabase = await createDataClient();
 
   let q = supabase
     .from("articles")
@@ -223,7 +223,7 @@ export async function getArticlesByRubric(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
-  const supabase = await createClient();
+  const supabase = await createDataClient();
   let { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -268,7 +268,7 @@ export async function getArticlesByCategory(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
-  const supabase = await createClient();
+  const supabase = await createDataClient();
   const { data: cat } = await supabase
     .from("categories")
     .select("id")
@@ -313,7 +313,7 @@ export async function getArticleBySlug(
   slug: string,
   locale: LocaleCode = "cs"
 ): Promise<DisplayArticle | null> {
-  const supabase = await createClient();
+  const supabase = await createDataClient();
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -340,7 +340,7 @@ export async function getRelatedArticles(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
-  const supabase = await createClient();
+  const supabase = await createDataClient();
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -375,7 +375,7 @@ export async function getArticlesByMetadataSection(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
-  const supabase = await createClient();
+  const supabase = await createDataClient();
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -406,7 +406,7 @@ export async function getArchivedArticles(
   offset = 0,
   locale: LocaleCode = "cs"
 ): Promise<{ articles: DisplayArticle[]; total: number }> {
-  const supabase = await createClient();
+  const supabase = await createDataClient();
   const { data, error, count } = await supabase
     .from("articles")
     .select(articleSelect, { count: "exact" })

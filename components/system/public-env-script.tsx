@@ -1,3 +1,4 @@
+import Script from "next/script";
 import { tryGetPublicEnv } from "@/lib/env";
 
 /**
@@ -15,8 +16,9 @@ export function PublicEnvScript() {
   });
 
   return (
-    <script
+    <Script
       id="medscope-public-env"
+      strategy="beforeInteractive"
       dangerouslySetInnerHTML={{
         __html: `globalThis.__MEDSCOPE_PUBLIC__=${payload};`,
       }}
