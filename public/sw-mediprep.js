@@ -1,7 +1,6 @@
 /* MeDiprep PWA — scope /app/priprava */
-const CACHE_NAME = "msg-mediprep-v1";
+const CACHE_NAME = "msg-mediprep-v4";
 const SHELL = [
-  "/app/priprava",
   "/mediprep-manifest.json",
   "/assets/mediprep/icon-192.png",
   "/assets/mediprep/icon-512.png",
@@ -43,8 +42,8 @@ function isApi(url) {
   return url.pathname.startsWith("/api/mediprep");
 }
 
-function isStaticAsset(url) {
-  return url.pathname.startsWith("/assets/mediprep/") || url.pathname.startsWith("/_next/static/");
+function isAppAsset(url) {
+  return url.pathname.startsWith("/assets/mediprep/");
 }
 
 self.addEventListener("fetch", (event) => {
@@ -58,12 +57,17 @@ self.addEventListener("fetch", (event) => {
   }
   if (url.origin !== self.location.origin) return;
 
+  // Never cache-first /_next/* — hashed or stable chunk URLs must stay fresh.
+  if (url.pathname.startsWith("/_next/")) {
+    return;
+  }
+
   if (isApi(url)) {
     event.respondWith(fetch(req).then((res) => res).catch(() => caches.match(req)));
     return;
   }
 
-  if (isStaticAsset(url)) {
+  if (isAppAsset(url)) {
     event.respondWith(
       caches.match(req).then((cached) => {
         if (cached) return cached;
@@ -79,11 +83,12 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // App shell HTML: network-first so control panels always match the deployed build.
   if (url.pathname.startsWith("/app/priprava") || req.mode === "navigate") {
     event.respondWith(
       fetch(req)
         .then((res) => {
-          if (res && res.ok) {
+          if (res && res.ok && url.pathname.startsWith("/app/priprava")) {
             const copy = res.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
           }
