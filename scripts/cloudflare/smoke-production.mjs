@@ -6,7 +6,7 @@
 const base = (process.env.SMOKE_BASE_URL || "https://medscopeglobal.com").replace(/\/$/, "");
 
 const pages = [
-  { path: "/", must: ["MeDipacient", "MeDiprep", "MeDiktor"] },
+  { path: "/", must: ["MeDipacient", "MeDiprep", "MeDiktor", "Zpravodajství", "medscopeglobal.com", "svátek"], mustNot: ["denní crony"] },
   { path: "/aplikace", must: ["MeDipacient", "MeDiprep", "MeDiktor", "14 dní"] },
   { path: "/medipacient", must: ["MeDipacient"] },
   { path: "/medipacient/stahnout", must: ["MeDipacient"] },
@@ -35,6 +35,10 @@ const assets = [
   "/assets/mediprep/icon-512.png",
   "/assets/mediktor/icon-192.png",
   "/assets/mediktor/icon-512.png",
+  "/assets/ai/assistant-brunette.webp",
+  "/assets/marketing/medipacient.webp",
+  "/assets/marketing/mediprep.webp",
+  "/assets/marketing/mediktor-cs.webp",
 ];
 
 let failed = 0;
