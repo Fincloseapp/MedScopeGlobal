@@ -12,7 +12,9 @@ import { DokAppGate } from "@/components/lekari/dok-app/dok-app-gate";
 import { MediktorMark } from "@/components/lekari/mediktor-mark";
 import { AppAccountStatus } from "@/components/apps/app-account-status";
 import { AppSectionNav } from "@/components/apps/app-section-nav";
+import { AppBrandVisual } from "@/components/apps/app-brand-visual";
 import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
+import { MEDIKTOR_APP } from "@/lib/apps/catalog";
 import { guestAccess, type AppAccessInfo } from "@/lib/apps/access-status";
 
 type TabId = "zapis" | "historie" | "navod" | "ucet";
@@ -216,6 +218,16 @@ export function DokAppShell() {
       />
 
       <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-[#f4f9fc] pb-[calc(4.25rem+env(safe-area-inset-bottom))] md:pb-0">
+        {!loading ? (
+          <div className="mx-auto w-full max-w-3xl">
+            <AppBrandVisual
+              app={MEDIKTOR_APP}
+              priority={tab === "navod" || tab === "ucet"}
+              compact={tab === "zapis" || tab === "historie"}
+              className="border-b border-[#cfe1f3] sm:mx-4 sm:mt-3 sm:rounded-2xl sm:border"
+            />
+          </div>
+        ) : null}
         {loading ? (
           <p className="px-4 py-16 text-center text-sm text-slate-500">Načítám aplikaci…</p>
         ) : !elig?.eligible && (tab === "zapis" || tab === "historie") ? (

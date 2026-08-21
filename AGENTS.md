@@ -39,6 +39,8 @@ Cloudflare Workers via OpenNext; the source of truth for data is **Supabase** (P
 - All three PWAs share chrome: `AppAccountStatus` (účet / přístup / platnost + Přihlášení) and
   `AppSectionNav` (always-visible section tabs + fixed mobile bottom bar). Layouts must stay a
   single `h-[100dvh]` flex column with `AppOriginBar` + `flex-1` children.
+- In-app brand art uses the same files as the homepage cards via `AppBrandVisual` /
+  `APP_MARKETING_IMAGE` (`/assets/marketing/medipacient.webp`, `mediprep.webp`, `mediktor-cs.webp`).
 - Session/eligibility payloads include `access: AppAccessInfo` (accountLabel, planLabel,
   validityLabel from `vip_subscriptions.ends_at` when available).
 - **MeDiprep** `/app/priprava`: client fallback tests; header + status bar login; tab Testy builder.

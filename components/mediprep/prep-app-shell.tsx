@@ -17,7 +17,9 @@ import {
 import { InstallPwaButton } from "@/components/apps/install-pwa-button";
 import { AppAccountStatus } from "@/components/apps/app-account-status";
 import { AppSectionNav } from "@/components/apps/app-section-nav";
+import { AppBrandVisual } from "@/components/apps/app-brand-visual";
 import { MEDIPREP, appLockline } from "@/lib/apps/catalog";
+import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { buildPrepTest, getPrepDashboard, type PrepDashboard } from "@/lib/mediprep/dashboard";
 import { GUEST_PREP_SESSION } from "@/lib/mediprep/guest";
 import type { PrepSession } from "@/lib/mediprep/types";
@@ -331,6 +333,14 @@ export function PrepAppShell() {
             </Link>
           </div>
           <div className="mt-auto space-y-2 rounded-xl bg-[#0A192F] p-3 text-white">
+            <div className="relative mb-2 aspect-[16/9] overflow-hidden rounded-lg">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/assets/marketing/mediprep.webp"
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            </div>
             <p className="text-[10px] font-semibold uppercase tracking-wider text-sky-200/80">Stažení</p>
             <p className="text-[11px] leading-4 text-sky-100/85">Dejte si MeDiprep na plochu telefonu i PC.</p>
             <InstallPwaButton app={MEDIPREP} label="Stáhnout na mobil" />
@@ -340,7 +350,13 @@ export function PrepAppShell() {
         {loading ? (
           <p className="px-4 py-16 text-center text-sm text-slate-500">Načítám MeDiprep…</p>
         ) : tab === "prehled" ? (
-          <div className="mx-auto w-full max-w-3xl space-y-4 px-3 py-3 sm:px-4">
+          <div className="mx-auto w-full max-w-3xl space-y-4 pb-3 pt-0 sm:px-0">
+            <AppBrandVisual
+              app={MEDIPREP}
+              priority
+              className="border-b border-[#e0d5c4] sm:mx-4 sm:mt-3 sm:rounded-2xl sm:border"
+            />
+            <div className="space-y-4 px-3 sm:px-4">
             <section className="rounded-2xl border border-[#e0d5c4] bg-white p-4">
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C45C26]">Dashboard</p>
               <h2 className="mt-1 font-display text-xl font-semibold">Zjisti mezery. Natrénuj je.</h2>
@@ -444,6 +460,7 @@ export function PrepAppShell() {
                 Celý plán →
               </button>
             </section>
+            </div>
           </div>
         ) : tab === "testy" ? (
           <div className="mx-auto w-full max-w-3xl space-y-4 px-3 py-3 sm:px-4">
@@ -655,6 +672,7 @@ export function PrepAppShell() {
           </div>
         ) : (
           <div className="mx-auto w-full max-w-3xl space-y-4 px-3 py-6 sm:px-4">
+            <AppBrandVisual app={MEDIPREP} compact className="rounded-2xl border border-[#e0d5c4]" />
             <h2 className="font-display text-xl font-semibold">Účet</h2>
             <p className="text-sm text-slate-600">{session?.message}</p>
             <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm space-y-2">

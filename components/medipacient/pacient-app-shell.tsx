@@ -19,6 +19,7 @@ import {
 import { InstallPwaButton } from "@/components/apps/install-pwa-button";
 import { AppAccountStatus } from "@/components/apps/app-account-status";
 import { AppSectionNav } from "@/components/apps/app-section-nav";
+import { AppBrandVisual } from "@/components/apps/app-brand-visual";
 import { MEDIPACIENT, appLockline } from "@/lib/apps/catalog";
 import { GUEST_PACIENT_SESSION, publicDemoDashboard } from "@/lib/medipacient/demo-dashboard";
 import type { PacientDashboard, PacientDocument, PacientSession } from "@/lib/medipacient/types";
@@ -227,7 +228,13 @@ export function PacientAppShell() {
         {loading ? (
           <p className="px-4 py-16 text-center text-sm text-slate-500">Načítám přehled zpráv…</p>
         ) : tab === "prehled" ? (
-          <div className="mx-auto w-full max-w-3xl space-y-4 px-3 py-3 sm:px-4">
+          <div className="mx-auto w-full max-w-3xl space-y-4 pb-3 pt-0">
+            <AppBrandVisual
+              app={MEDIPACIENT}
+              priority
+              className="border-b border-[#cfe1f3] sm:mx-4 sm:mt-3 sm:rounded-2xl sm:border"
+            />
+            <div className="space-y-4 px-3 sm:px-4">
             <section className="rounded-2xl border border-[#cfe1f3] bg-white p-4 shadow-sm">
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#2D7FF9]">Dashboard</p>
               <h2 className="mt-1 font-display text-xl font-semibold">Všechny zprávy na jednom místě</h2>
@@ -339,6 +346,7 @@ export function PacientAppShell() {
             <p className="pb-4 text-[11px] text-slate-500">
               MeDipacient je vzdělávací přehled zpráv — nenahrazuje lékařskou péči ani diagnózu.
             </p>
+            </div>
           </div>
         ) : tab === "zpravy" ? (
           <div className="mx-auto w-full max-w-3xl space-y-3 px-3 py-3 sm:px-4">
@@ -408,6 +416,7 @@ export function PacientAppShell() {
           </div>
         ) : (
           <div className="mx-auto w-full max-w-3xl space-y-4 px-3 py-6 sm:px-4">
+            <AppBrandVisual app={MEDIPACIENT} compact className="rounded-2xl border border-[#cfe1f3]" />
             <h2 className="font-display text-xl font-semibold">Účet</h2>
             <p className="text-sm text-slate-600">{session?.message}</p>
             <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm space-y-2">
