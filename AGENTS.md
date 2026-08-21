@@ -75,11 +75,15 @@ Cloudflare Workers via OpenNext; the source of truth for data is **Supabase** (P
 - Do not use `pnpm push:github` for pull — that overwrites GitHub from D:.
 - Keep local `.env.local` intact; article SSR listings need `SUPABASE_SERVICE_ROLE_KEY` (anon alone
   cannot `select=*` on `articles`).
+- After pull: `pnpm verify:articles` against production, or
+  `MEDSCOPE_ORIGIN=http://localhost:3000 pnpm verify:articles` with `pnpm dev` running.
 
 ### Article listings (non-obvious)
 - Public article cards use `createDataClient()` (service role preferred). Anon JWT may only allow
   narrow column grants — `select=*` then 401s and hubs show empty (“brzy objeví”).
 - `/articles` includes lay/public Czech rows (same pool as portal Zpravodajství).
+- Detail URL is `/article/[slug]` (singular). `/studenti/clanky` and `/lekari/clanky`
+  redirect to article listings via `next.config.mjs`.
 
 ### Repo hygiene note
 - The repo root is cluttered with transient scratch/log files (`_poll-*.mjs`, `*-log.txt`,

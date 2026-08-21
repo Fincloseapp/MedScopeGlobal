@@ -35,4 +35,7 @@ if ($pnpm) {
 }
 
 Write-Host "Done. Local tree matches origin/$ref."
+$sha = & $git rev-parse --short HEAD
+Write-Host "HEAD=$sha"
 Write-Host "Keep .env.local on D: (do not overwrite). Start: pnpm dev"
+Write-Host "Verify articles: pnpm verify:articles   (or MEDSCOPE_ORIGIN=http://localhost:3000 pnpm verify:articles)"
