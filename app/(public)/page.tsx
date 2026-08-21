@@ -1,24 +1,26 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { HomepageAds } from "@/components/home/homepage-ads";
-import { V20ArticleCard } from "@/components/v20/article-card";
-import { V271HomeHero } from "@/components/v271/home-hero";
 import { V272AcademyHomeSections } from "@/components/v271/academy-home-sections";
-import { V272HomepageSections } from "@/components/v271/homepage-sections";
+import {
+  V271B2bBlock,
+  V272SubscriptionPlansBlock,
+  V272WhyTrustBlock,
+} from "@/components/v271/homepage-sections";
+import { PortalHome } from "@/components/v271/portal-home";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { medicalWebPageJsonLd, webSiteJsonLd, softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { APP_PRODUCTS, appSeoDescription } from "@/lib/apps/catalog";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { getHomepageCachedData } from "@/lib/v22/homepage-cache";
-import { V271_HERO } from "@/lib/v271/homepage";
+import { PORTAL_PHILOSOPHY } from "@/lib/v271/portal";
 
 export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({
-    title: "MedScopeGlobal — zdravotnické prostředí pro veřejnost, studenty a lékaře",
+    title: "MedScopeGlobal — zdravotnictví na jednom místě",
     description:
-      "MeDipacient, MeDiprep a MeDiktor na ploše telefonu. Evidence-based medicína v češtině. 14 dní zdarma.",
+      "Hledejte, otevřete MeDipacient, MeDiprep nebo MeDiktor a čtěte redakci. Evidence-based medicína v češtině. 14 dní zdarma.",
     path: "/",
   });
 }
@@ -27,13 +29,13 @@ export default async function HomePage() {
   const { articles, topAds, midAds, bottomAds } = await getHomepageCachedData();
 
   const homeLd = medicalWebPageJsonLd({
-    title: V271_HERO.claim,
-    description: V271_HERO.subtitle,
+    title: PORTAL_PHILOSOPHY.claim,
+    description: PORTAL_PHILOSOPHY.subtitle,
     path: "/",
   });
 
   return (
-    <div className="v271-home bg-background">
+    <div className="v271-home bg-[#e8eef3]">
       <JsonLdScript data={webSiteJsonLd()} />
       <JsonLdScript data={homeLd} />
       {APP_PRODUCTS.map((app) => (
@@ -49,40 +51,15 @@ export default async function HomePage() {
         />
       ))}
 
-      <V271HomeHero />
-      <V272HomepageSections />
-      <V272AcademyHomeSections />
-
+      <PortalHome articles={articles} />
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
+      <V272AcademyHomeSections />
+      <V272WhyTrustBlock />
+      <V272SubscriptionPlansBlock />
+      <V271B2bBlock />
 
-      <section className="border-y border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-                Redakční výběr
-              </p>
-              <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
-                Nejnovější z magazínu
-              </h2>
-            </div>
-            <Link href="/articles" prefetch className="text-sm font-medium text-primary hover:underline">
-              Všechny články →
-            </Link>
-          </div>
-          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {articles.map((article) => (
-              <V20ArticleCard key={article.id} article={article} />
-            ))}
-          </div>
-          {articles.length === 0 && (
-            <p className="mt-6 text-sm text-muted-foreground">Zatím žádné aktivní články.</p>
-          )}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6">
-        <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+      <section className="mx-auto max-w-7xl px-3 pb-8 sm:px-4">
+        <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
           MedScopeGlobal je vzdělávací magazín — není přijímací komise ani oficiální učebnice LF. Obsah
           nenahrazuje individuální lékařskou radu.
         </p>
