@@ -68,6 +68,19 @@ Cloudflare Workers via OpenNext; the source of truth for data is **Supabase** (P
   Without them the workflow fails fast; Workers Builds still works via the dashboard.
 - Local/CI with tokens: `pnpm cf:deploy` (builds + deploys). Smoke: `pnpm cf:smoke`.
 
+### Windows D: local workspace
+- Canonical PC root is **`D:\medscope.local`** (data `D:\medscope.data`, logs `D:\medscope.logs`).
+- Cloud agents cannot write the Windows D: drive. To refresh the PC from GitHub after cloud work:
+  `pnpm pull:d` (or `powershell -File .\scripts\pull-cloud-to-d.ps1`) inside `D:\medscope.local`.
+- Do not use `pnpm push:github` for pull — that overwrites GitHub from D:.
+- Keep local `.env.local` intact; article SSR listings need `SUPABASE_SERVICE_ROLE_KEY` (anon alone
+  cannot `select=*` on `articles`).
+
+### Article listings (non-obvious)
+- Public article cards use `createDataClient()` (service role preferred). Anon JWT may only allow
+  narrow column grants — `select=*` then 401s and hubs show empty (“brzy objeví”).
+- `/articles` includes lay/public Czech rows (same pool as portal Zpravodajství).
+
 ### Repo hygiene note
 - The repo root is cluttered with transient scratch/log files (`_poll-*.mjs`, `*-log.txt`,
   `*-audit*.md`, `tmp-*`, `vercel.json.bak`). These are not part of the app.

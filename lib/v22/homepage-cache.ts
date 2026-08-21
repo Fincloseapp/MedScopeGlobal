@@ -46,7 +46,7 @@ async function loadArticlesPublic(): Promise<DisplayArticle[]> {
     .select(articleSelect)
     .eq("published", true)
     .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(24);
+    .limit(48);
 
   if (error) {
     console.error("loadArticlesPublic", error);
@@ -58,9 +58,9 @@ async function loadArticlesPublic(): Promise<DisplayArticle[]> {
   const publicOnly = active.filter((a) => !a.vip_only);
   const prepared = await prepareArticlesForDisplay(publicOnly, "cs", {
     mode: "card",
-    maxTranslate: 6,
+    maxTranslate: 12,
   });
-  return prepared.slice(0, 6);
+  return prepared.slice(0, 12);
 }
 
 async function loadHomepageData(): Promise<{
@@ -80,6 +80,6 @@ async function loadHomepageData(): Promise<{
 
 export const getHomepageCachedData = unstable_cache(
   loadHomepageData,
-  ["v22-homepage-public"],
+  ["v22-homepage-public-v2"],
   { revalidate: 120, tags: ["medscope-ui-v22.4", "v22-content"] }
 );
