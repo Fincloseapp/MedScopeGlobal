@@ -80,6 +80,9 @@ const nextConfig = {
       // Misleading hub titles → clear destinations
       { source: "/studenti/anatomie", destination: "/studenti/hry", permanent: true },
       { source: "/studenti/farmakologie", destination: "/studenti/leky", permanent: true },
+      // Article hubs that were never implemented as standalone routes
+      { source: "/studenti/clanky", destination: "/articles?med_track=studium", permanent: false },
+      { source: "/lekari/clanky", destination: "/articles", permanent: false },
       { source: "/app/medipacient", destination: "/app/pacient", permanent: false },
       { source: "/app/mediprep", destination: "/app/priprava", permanent: false },
       { source: "/medipacient/app", destination: "/app/pacient", permanent: false },

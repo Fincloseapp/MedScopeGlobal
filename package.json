@@ -42,6 +42,7 @@
     "autogit": "node scripts/auto-git-commit-push.js --watch",
     "push:github": "powershell -ExecutionPolicy Bypass -File ./scripts/push-d-to-github.ps1",
     "pull:d": "powershell -ExecutionPolicy Bypass -File ./scripts/pull-cloud-to-d.ps1",
+    "verify:articles": "node scripts/verify-prod-articles.mjs",
     "validate": "node scripts/validate.mjs",
     "verify-v24": "node scripts/verify-v24.0.mjs",
     "verify-v25": "node scripts/verify-v25.0.mjs",
