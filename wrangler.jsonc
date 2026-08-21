@@ -1,5 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
+  // Cloudflare Workers Builds / Create and deploy:
+  //   Project name: medscopeglobal
+  //   Production branch: main
+  //   Root directory: /
+  //   Build command: npm run cf:build
+  //   Deploy command: npx opennextjs-cloudflare deploy
+  //   (or Deploy only: npm run deploy)
   "name": "medscopeglobal",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-08-10",

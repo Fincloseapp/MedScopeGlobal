@@ -83,7 +83,7 @@
     "cf:env:sync": "node scripts/cloudflare/sync-env-from-dotenv.mjs",
     "cf:dns": "node scripts/cloudflare/dns-point-workers.mjs",
     "cf:smoke": "node scripts/cloudflare/smoke-production.mjs",
-    "deploy": "npm run cf:deploy"
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
