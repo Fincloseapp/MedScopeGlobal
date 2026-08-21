@@ -52,6 +52,20 @@ Cloudflare Workers via OpenNext; the source of truth for data is **Supabase** (P
 - **PWA install:** Chromium only fires `beforeinstallprompt` on pages inside manifest `scope`.
   Icons must be truecolor PNG (RGBA). iOS uses Safari Share → Přidat na plochu (no BIP).
 
+### Cloudflare Workers production deploy
+- Worker name / project: `medscopeglobal` (`wrangler.jsonc`). Domain routes: `medscopeglobal.com/*`.
+- **Cloudflare dashboard → Create and deploy / Workers Builds**
+  - Project name: `medscopeglobal`
+  - Production branch: `main`
+  - Root directory: `/`
+  - Build command: `npm run cf:build`
+  - Deploy command: `npx opennextjs-cloudflare deploy`
+  - Or leave Build empty and set Deploy to: `npm run deploy`
+- **GitHub Actions** (`.github/workflows/cloudflare-deploy.yml`) needs secrets
+  `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` (optional `CLOUDFLARE_ENV_JSON`).
+  Without them the workflow fails fast; Workers Builds still works via the dashboard.
+- Local/CI with tokens: `pnpm cf:deploy` (builds + deploys). Smoke: `pnpm cf:smoke`.
+
 ### Repo hygiene note
 - The repo root is cluttered with transient scratch/log files (`_poll-*.mjs`, `*-log.txt`,
   `*-audit*.md`, `tmp-*`, `vercel.json.bak`). These are not part of the app.

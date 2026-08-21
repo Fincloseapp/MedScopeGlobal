@@ -55,3 +55,10 @@ next-env.d.ts
 .dev.vars
 cloudflare-env.d.ts
 scripts/cloudflare/.env.cloudflare.json
+
+# Wrangler local state
+.wrangler/
+
+# Accidental Windows path trees (auto-git noise)
+D:\medscope.local/
+D:\medscope.logs/
