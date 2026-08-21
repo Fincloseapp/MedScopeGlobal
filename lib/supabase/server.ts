@@ -1,12 +1,16 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { tryGetPublicEnv } from "@/lib/env";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 export async function createClient() {
   const cookieStore = await cookies();
   const pubEnv = tryGetPublicEnv();
   if (!pubEnv) {
-    // Same graceful degradation as middleware when Preview env is missing
+    // Server-side fallback: public article/data reads still work via service role
+    // when anon env is missing or was accidentally set to a placeholder.
+    const admin = tryCreateServiceRoleClient();
+    if (admin) return admin as unknown as ReturnType<typeof createServerClient>;
     return null as unknown as ReturnType<typeof createServerClient>;
   }
   const { url, anonKey } = pubEnv;
