@@ -149,9 +149,10 @@ for (const slug of routes) {
     slug === "monitoring" && src.includes("getMonitoringSnapshot");
   const usesDeployPostPipeline =
     slug === "deploy" &&
-    (src.includes("vercel_production") || src.includes("auto_deploy") || src.includes("AUTO_DEPLOY"));
+    (src.includes("auto_deploy") || src.includes("AUTO_DEPLOY") || src.includes("npm run deploy"));
   const usesRollbackPipeline =
-    slug === "rollback" && (src.includes("vercel_rollback") || src.includes("use_vercel_dashboard"));
+    slug === "rollback" &&
+    (src.includes("use_cloudflare_dashboard") || src.includes("use_vercel_dashboard"));
   if (
     !usesHandler &&
     !usesProductionJob &&

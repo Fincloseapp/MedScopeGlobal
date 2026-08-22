@@ -5,7 +5,11 @@ alwaysApply: true
 
 # Production upload from this PC
 
-- Project and build stay on **D:** (`D:\MedScopeGlobal\marketing-hub-deploy` or `D:\medscope.local`). Never copy the app tree or `node_modules` to **C:** or `%TEMP%` for deploy.
-- Command: `npm run deploy` from that D: folder (gates once, in-place `next build`, wrangler OAuth → Worker `medscopeglobal`).
-- Do not use `npm run cf:deploy` on this PC unless `CLOUDFLARE_API_TOKEN` is set; local upload uses wrangler login (`dawe.zegzul@seznam.cz`).
+Production is **Cloudflare Workers (OpenNext)** only — Worker `medscopeglobal`, domain `medscopeglobal.com`. **Never Vercel.** Never copy the app tree or `node_modules` to **C:** or `%TEMP%`.
+
+- Project and build stay on **D:** (`D:\MedScopeGlobal\marketing-hub-deploy` or `D:\medscope.local`).
+- One command: `npm run deploy` from that D: folder (gates once, in-place `next build`, wrangler OAuth → Worker `medscopeglobal`).
+- Upload without rebuild when `.open-next` already exists: `npm run upload` (or `npx opennextjs-cloudflare upload`). Do not run a 9-minute rebuild just to republish.
+- Do not use `npm run cf:deploy` on this PC unless `CLOUDFLARE_API_TOKEN` is set; local upload uses wrangler login (`dawe.zegzul@seznam.cz`). `npm run deploy` strips leftover tokens so OAuth works.
 - D: is FAT32. `scripts/win-fat32-fs-patch.cjs` must stay required for `next build` so webpack `readlink` EISDIR does not fail the upload.
+- `next.config.mjs` must call `initOpenNextCloudflareForDev()` only during `next dev` — never during `next build` / OpenNext package (workerd hangs on Windows).

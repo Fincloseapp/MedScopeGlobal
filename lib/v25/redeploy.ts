@@ -5,15 +5,15 @@ import { V25_PROD_BASE } from "@/lib/v25/config";
 export async function runV25Redeploy(trigger: string): Promise<{ ok: boolean; detail: string }> {
   appendV25Log("autofix", `redeploy requested: ${trigger}`);
 
-  if (process.env.VERCEL === "1") {
+  if (process.env.WORKERS_CI === "1") {
     recordV25Fix({
       errorType: "deploy",
       module: "redeploy",
       action: "redeploy",
       result: "ok",
-      detail: "Push to main triggers Vercel — use CI webhook",
+      detail: "Workers Builds / GitHub Actions handle production upload",
     });
-    return { ok: true, detail: "Vercel auto-deploy on git push" };
+    return { ok: true, detail: "Cloudflare Workers deploy via CI" };
   }
 
   try {

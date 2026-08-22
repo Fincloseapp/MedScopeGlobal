@@ -50,8 +50,7 @@ function runTsc() {
 
 console.log("\n=== Pre-deploy gates ===\n");
 
-const isVercel = process.env.VERCEL === "1";
-const isCI = process.env.GITHUB_ACTIONS === "true";
+const isCI = process.env.GITHUB_ACTIONS === "true" || process.env.WORKERS_CI === "1";
 const hasCronSecret = (process.env.CRON_SECRET ?? "").length >= 16;
 const logoSource = MEDSCOPE_LOGO_SOURCE;
 const canSyncLogos = existsSync(logoSource);
@@ -71,8 +70,8 @@ const steps = [
   ["verify-academy-v35-skeleton", "scripts/verify-academy-v35-skeleton.mjs"],
 ];
 
-if (isVercel && !canSyncLogos) {
-  console.log("(Vercel) logo source unavailable — using committed assets in public/assets/logo/\n");
+if (!canSyncLogos) {
+  console.log("Logo source unavailable — using committed assets in public/assets/logo/\n");
 }
 if (isCI && !hasCronSecret) {
   console.log("(CI) CRON_SECRET not set — skipping cron env gates\n");

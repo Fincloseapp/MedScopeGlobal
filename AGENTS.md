@@ -56,20 +56,29 @@ Cloudflare Workers via OpenNext; the source of truth for data is **Supabase** (P
 
 ### Cloudflare Workers production deploy
 - Worker name / project: `medscopeglobal` (`wrangler.jsonc`). Domain routes: `medscopeglobal.com/*`.
-- **Cloudflare dashboard → Create and deploy / Workers Builds**
+- **Vercel is retired.** Do not deploy with `vercel`, Vercel Git Integration, or leftover `*vercel*` scripts.
+- **This Windows PC (D: FAT32):** from `D:\MedScopeGlobal\marketing-hub-deploy` (or `D:\medscope.local`):
+  - Full production path: `npm run deploy` — gates once, in-place `next build` (FAT32 patch
+    `scripts/win-fat32-fs-patch.cjs`), OpenNext, wrangler OAuth (`dawe.zegzul@seznam.cz`) → Worker
+    `medscopeglobal`. Never copy the tree or `node_modules` to C: or `%TEMP%`.
+  - Do not require `CLOUDFLARE_API_TOKEN` for PC upload (`npm run deploy` strips leftover tokens).
+  - Upload without rebuilding when `.open-next` already exists: `npm run upload`
+    (or `npx opennextjs-cloudflare upload`).
+  - `next.config.mjs` must call `initOpenNextCloudflareForDev()` only during `next dev`.
+- **Cloudflare dashboard → Workers Builds**
   - Project name: `medscopeglobal`
   - Production branch: `main`
   - Root directory: `/`
   - Build command: `npm run cf:build`
   - Deploy command: `npx opennextjs-cloudflare deploy`
-  - Or leave Build empty and set Deploy to: `npm run deploy`
 - **GitHub Actions** (`.github/workflows/cloudflare-deploy.yml`) needs secrets
   `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` (optional `CLOUDFLARE_ENV_JSON`).
   Without them the workflow fails fast; Workers Builds still works via the dashboard.
-- Local/CI with tokens: `pnpm cf:deploy` (builds + deploys). Smoke: `pnpm cf:smoke`.
+- Token CI path: `pnpm cf:deploy` (builds + deploys). Smoke: `pnpm cf:smoke`.
 
 ### Windows D: local workspace
 - Canonical PC root is **`D:\medscope.local`** (data `D:\medscope.data`, logs `D:\medscope.logs`).
+  The same repo also lives at `D:\MedScopeGlobal\marketing-hub-deploy`.
 - Cloud agents cannot write the Windows D: drive. To refresh the PC from GitHub after cloud work:
   `pnpm pull:d` (or `powershell -File .\scripts\pull-cloud-to-d.ps1`) inside `D:\medscope.local`.
 - Do not use `pnpm push:github` for pull — that overwrites GitHub from D:.

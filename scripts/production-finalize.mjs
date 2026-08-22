@@ -55,12 +55,11 @@ console.log("\n→ Building production bundle...");
 await run("npm", ["run", "build:win"]);
 
 console.log(`
-=== Deploy (requires Vercel login) ===
-  npx vercel login
-  npx vercel link
-  npx vercel env pull .env.vercel.local
-  npx vercel --prod
+=== Deploy (Cloudflare Workers, D: only) ===
+  npm run deploy
 
-Set Vercel env (Production): same keys as .env.local
-Domain: medscopeglobal.com + www → Vercel → Settings → Domains
+Upload without rebuild when .open-next already exists:
+  npm run upload
+
+Worker: medscopeglobal   Domain: medscopeglobal.com
 `);

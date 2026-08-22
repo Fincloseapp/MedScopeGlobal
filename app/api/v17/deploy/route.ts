@@ -3,9 +3,9 @@ import { preDeployCheck } from "@/edge/v17/pre-deploy-check";
 import { getVersion } from "@/lib/v17/versioning/version";
 
 const AUTO_DEPLOY = {
-  method: "git push origin main",
+  method: "npm run deploy",
   domain: "https://medscopeglobal.com",
-  provider: "Vercel Git Integration",
+  provider: "Cloudflare Workers OpenNext",
   productionBranch: "main",
 };
 
@@ -33,14 +33,14 @@ export async function PUT() {
   }
 }
 
-/** Deploy is handled by Vercel on push to main — no local script. */
+/** Production upload is Cloudflare Workers from D: — `npm run deploy`. */
 export async function POST() {
   return NextResponse.json(
     {
       deployed: false,
       status: "auto_deploy",
-      message: "Production deploys via Vercel Git Integration on push to main.",
-      instructions: ["git add -A", 'git commit -m "feat: update"', "git push origin main"],
+      message: "Production is Cloudflare Workers. From D: run npm run deploy (or npm run upload if .open-next exists).",
+      instructions: ["cd D:\\MedScopeGlobal\\marketing-hub-deploy", "npm run deploy"],
       ...AUTO_DEPLOY,
     },
     { status: 200 }

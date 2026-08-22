@@ -37,8 +37,8 @@ async function runSmokeOnProduction(): Promise<V26AutonomousPhase> {
 }
 
 function runLocalPredeploy(): V26AutonomousPhase {
-  if (process.env.VERCEL === "1") {
-    return { ok: true, detail: "skipped on Vercel" };
+  if (process.env.WORKERS_CI === "1") {
+    return { ok: true, detail: "skipped on Workers CI" };
   }
   const script = projectPath("scripts/run-predeploy-gates.mjs");
   const result = spawnSync(process.execPath, [script], {
@@ -53,7 +53,7 @@ function runLocalPredeploy(): V26AutonomousPhase {
 }
 
 function runLocalPush(): V26AutonomousPhase & { sha?: string } {
-  if (process.env.VERCEL === "1") {
+  if (process.env.WORKERS_CI === "1") {
     return { ok: true, detail: "push via CI only" };
   }
   const msg = process.env.DEPLOY_COMMIT_MESSAGE ?? "feat: MedScope v26 autonomous deploy";
@@ -76,9 +76,8 @@ function runLocalPush(): V26AutonomousPhase & { sha?: string } {
   };
 }
 
-async function pollVercelReady(): Promise<V26AutonomousPhase> {
-  // Production is Cloudflare Workers (OpenNext). Vercel deploy polling is retired.
-  return { ok: true, detail: "skipped — production is Cloudflare Workers, not Vercel" };
+async function pollWorkersReady(): Promise<V26AutonomousPhase> {
+  return { ok: true, detail: "skipped — production is Cloudflare Workers (OpenNext)" };
 }
 
 export async function runV26AutonomousEngine(options?: {
@@ -115,7 +114,7 @@ export async function runV26AutonomousEngine(options?: {
   phases.images = { ok: images.ok, detail: images.detail };
   if (!images.ok) errors.push("images: pipeline");
 
-  if (!options?.skipDeploy && process.env.VERCEL !== "1") {
+  if (!options?.skipDeploy && process.env.WORKERS_CI !== "1") {
     let deployOk = false;
     while (retries <= MAX_DEPLOY_RETRIES && !deployOk) {
       const predeploy = runLocalPredeploy();
@@ -134,7 +133,7 @@ export async function runV26AutonomousEngine(options?: {
         continue;
       }
 
-      const workers = await pollVercelReady();
+      const workers = await pollWorkersReady();
       phases[`workers_${retries}`] = workers;
       if (!workers.ok) {
         errors.push("workers deploy not ready");
@@ -145,7 +144,7 @@ export async function runV26AutonomousEngine(options?: {
       deployOk = true;
     }
   } else {
-    phases.deploy = { ok: true, detail: "deploy skipped or Vercel runtime" };
+    phases.deploy = { ok: true, detail: "deploy skipped or Workers CI" };
   }
 
   const smoke = await runSmokeOnProduction();

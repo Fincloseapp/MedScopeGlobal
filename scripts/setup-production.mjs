@@ -1,16 +1,17 @@
 #!/usr/bin/env node
 /**
- * Production setup helper for Supabase + Vercel.
+ * Production setup helper for Supabase + Cloudflare Workers.
  *
  * Usage:
  *   1. Copy .env.production.local.example → .env.production.local
  *   2. Fill Supabase connection strings from dashboard
- *   3. Run: npm run setup:production
- *   4. Redeploy on Vercel (or push to main)
+ *   3. Run: node scripts/setup-production.mjs
+ *   4. Sync Workers env: npm run cf:env:sync
+ *   5. Upload from D:: npm run deploy
  */
 import { randomBytes } from "node:crypto";
 import { readFileSync, existsSync, writeFileSync } from "node:fs";
-import { execSync, spawnSync } from "node:child_process";
+import { execSync } from "node:child_process";
 
 const envFile = ".env.production.local";
 const exampleFile = ".env.production.local.example";
@@ -78,31 +79,15 @@ function main() {
   execSync("npx prisma migrate deploy", { stdio: "inherit", env: { ...process.env, ...env } });
   execSync("node prisma/seed.mjs", { stdio: "inherit", env: { ...process.env, ...env } });
 
-  const vercel = spawnSync("npx", ["vercel", "--version"], { encoding: "utf8" });
-  if (vercel.status !== 0) {
-    console.log("");
-    console.log("Vercel CLI není přihlášené. Nastavte env vars ručně ve Vercel Dashboard:");
-    console.log("");
-    for (const key of ["DATABASE_URL", "DIRECT_URL", "AUTH_SECRET", "NEXT_PUBLIC_SITE_URL"]) {
-      console.log(`${key}=${env[key] ?? "https://medscopeglobal.com"}`);
-    }
-    console.log("");
-    return;
-  }
-
   console.log("");
-  console.log("Nastavuji Vercel environment variables (production)...");
-  for (const [key, value] of Object.entries(env)) {
-    if (!value) continue;
-    console.log(`→ ${key}`);
-    execSync(`printf '%s' '${value.replace(/'/g, "'\\''")}' | npx vercel env add ${key} production --force`, {
-      stdio: "inherit",
-      shell: "/bin/bash"
-    });
-  }
-
+  console.log("Production is Cloudflare Workers (OpenNext), Worker medscopeglobal.");
+  console.log("Sync env from .env.local, then upload from D: (never Vercel):");
+  console.log("  npm run cf:env:sync");
+  console.log("  npm run deploy");
   console.log("");
-  console.log("Hotovo. Spusťte redeploy: npx vercel --prod");
+  for (const key of ["DATABASE_URL", "DIRECT_URL", "AUTH_SECRET", "NEXT_PUBLIC_SITE_URL"]) {
+    console.log(`${key}=${env[key] ?? "https://medscopeglobal.com"}`);
+  }
 }
 
 main();

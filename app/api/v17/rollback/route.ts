@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
 
-/** Rollback via Vercel Dashboard — Deployments → previous → Promote to Production. */
+/** Rollback via Cloudflare dashboard — Workers → medscopeglobal → Deployments. */
 export async function POST() {
   return NextResponse.json(
     {
       rolledBackTo: null,
-      status: "use_vercel_dashboard",
+      status: "use_cloudflare_dashboard",
       message:
-        "Local rollback scripts removed. Use Vercel Dashboard → Deployments → Promote previous deployment to Production.",
+        "Use Cloudflare Dashboard → Workers & Pages → medscopeglobal → Deployments → retry a previous version.",
       domain: "https://medscopeglobal.com",
-      dashboard: "https://vercel.com/dashboard",
+      dashboard: "https://dash.cloudflare.com",
     },
     { status: 200 }
   );

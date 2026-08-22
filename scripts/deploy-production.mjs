@@ -41,15 +41,17 @@ function run(label, cmd, args, env = process.env) {
 }
 
 const npx = process.platform === "win32" ? "npx.cmd" : "npx";
-const buildEnv = { ...process.env, MEDSCOPE_GATES_DONE: "1" };
-delete buildEnv.CLOUDFLARE_API_TOKEN;
-delete buildEnv.CF_API_TOKEN;
+// Strip API tokens so this PC uses wrangler OAuth (dawe.zegzul@seznam.cz), not CI tokens.
+const oauthEnv = { ...process.env, MEDSCOPE_GATES_DONE: "1" };
+delete oauthEnv.CLOUDFLARE_API_TOKEN;
+delete oauthEnv.CF_API_TOKEN;
 
 if (!existsSync(join(root, "node_modules", "next"))) {
   console.error("✗ node_modules missing — run npm install on D:");
   process.exit(1);
 }
 
-run("OpenNext build", npx, ["opennextjs-cloudflare", "build"], buildEnv);
-run("OpenNext deploy (wrangler)", npx, ["opennextjs-cloudflare", "deploy"]);
-console.log("\n✓ Production upload complete (Worker medscopeglobal)\n");
+run("OpenNext build", npx, ["opennextjs-cloudflare", "build"], oauthEnv);
+run("OpenNext deploy (wrangler OAuth)", npx, ["opennextjs-cloudflare", "deploy"], oauthEnv);
+console.log("\n✓ Production upload complete (Worker medscopeglobal)");
+console.log("  Next time, if .open-next already exists and you only need upload: npm run upload\n");

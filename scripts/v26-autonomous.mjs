@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Local v26 autonomous pipeline — predeploy, push, poll Vercel, smoke, retry loop.
+ * Local v26 autonomous pipeline — predeploy, push, smoke, retry loop.
+ * Production upload is Cloudflare Workers (`npm run deploy` on D:), not Vercel.
  */
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
@@ -56,8 +57,7 @@ while (attempt <= MAX_RETRIES && !success) {
     continue;
   }
 
-  // Production is Cloudflare Workers — do not poll or trigger Vercel.
-  console.log("skip Vercel READY poll (production is Cloudflare Workers)");
+  console.log("skip host READY poll (production is Cloudflare Workers; upload separately with npm run deploy)");
 
   const secret = env.CRON_SECRET;
   if (secret) {

@@ -50,5 +50,5 @@ console.log(`article_translations table: ${tr ? "MISSING (run SQL migration)" : 
 console.log(`https://medscopeglobal.com → HTTP ${siteStatus}`);
 
 if (siteStatus === "503" || siteStatus.startsWith("5")) {
-  console.log("\n→ Deploy app on Vercel and connect domain (see docs/PRODUCTION-MEDSCOPEGLOBAL.md)");
+  console.log("\n→ Deploy from D: with npm run deploy (Cloudflare Workers, Worker medscopeglobal)");
 }

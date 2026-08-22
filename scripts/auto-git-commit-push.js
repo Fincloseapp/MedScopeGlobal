@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Full auto git workflow: watch changes → add → commit → push → Vercel deploy
+ * Full auto git workflow: watch changes → add → commit → push.
+ * Production upload is separate: npm run deploy (Cloudflare Workers, D: only).
  *
  * Usage:
  *   npm run autogit
@@ -120,7 +121,7 @@ function tryPushWithRetry() {
     const push = git(["push", "origin", "main"]);
     if (push.status === 0) {
       if (existsSync(PENDING_PUSH_FILE)) unlinkSync(PENDING_PUSH_FILE);
-      writeLog("OK", "Push origin/main → Vercel deploy (medscopeglobal.com)");
+      writeLog("OK", "Push origin/main (production upload is npm run deploy on D:)");
       return true;
     }
 
