@@ -36,6 +36,7 @@ import {
 } from "@/components/lekari/mediktor-audio";
 import {
   downloadMediktorDoc,
+  downloadMediktorPdf,
   shareMediktorDoc,
 } from "@/components/lekari/mediktor-export";
 
@@ -652,9 +653,17 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     historyRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function downloadNote() {
+  function downloadNoteDocx() {
     if (!note) return;
-    downloadMediktorDoc(note, {
+    void downloadMediktorDoc(note, {
+      title: "MeDiktor · klinický zápis",
+      templateId,
+    });
+  }
+
+  function downloadNotePdf() {
+    if (!note) return;
+    downloadMediktorPdf(note, {
       title: "MeDiktor · klinický zápis",
       templateId,
     });
@@ -965,11 +974,21 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                   type="button"
                   size="sm"
                   variant="outline"
-                  onClick={downloadNote}
+                  onClick={downloadNoteDocx}
                   disabled={!note}
                 >
                   <Download className="mr-1.5 h-3.5 w-3.5" />
-                  .doc
+                  Word
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={downloadNotePdf}
+                  disabled={!note}
+                >
+                  <Download className="mr-1.5 h-3.5 w-3.5" />
+                  PDF
                 </Button>
               </div>
             </div>

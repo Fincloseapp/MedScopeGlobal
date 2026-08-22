@@ -6,6 +6,7 @@ import { Copy, Download, Loader2, Share2, RefreshCw, FileText } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import {
   downloadMediktorDoc,
+  downloadMediktorPdf,
   shareMediktorDoc,
 } from "@/components/lekari/mediktor-export";
 
@@ -197,14 +198,29 @@ Lékař schvaluje finální znění. MeDiktor není zdravotnický prostředek.`}
                   variant="outline"
                   className="h-8 rounded-full"
                   onClick={() =>
-                    downloadMediktorDoc(item.note, {
+                    void downloadMediktorDoc(item.note, {
                       title: item.title || "MeDiktor zápis",
                       templateId: item.template_id,
                     })
                   }
                 >
                   <Download className="mr-1 h-3.5 w-3.5" />
-                  .doc
+                  Word
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 rounded-full"
+                  onClick={() =>
+                    downloadMediktorPdf(item.note, {
+                      title: item.title || "MeDiktor zápis",
+                      templateId: item.template_id,
+                    })
+                  }
+                >
+                  <Download className="mr-1 h-3.5 w-3.5" />
+                  PDF
                 </Button>
               </div>
               {selected?.id === item.id ? (
