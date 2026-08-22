@@ -42,6 +42,22 @@
     "mobile",
     ".deploy-tmp",
     ".build-tmp",
-    ".tools"
+    ".tools",
+    ".open-next",
+    "cloudflare/worker.ts",
+    "scripts/test-article-access.ts",
+    "app/(public)/mediktor",
+    "components/mediktor",
+    "components/v271/apps-marketplace.tsx",
+    "components/home/homepage-student-sponsored.tsx",
+    "components/home/homepage-student-ads.tsx",
+    "components/student/student-hub-ads.tsx",
+    "components/lekari/mediktor-physician-guide.tsx",
+    "lib/lekari/dokumentace/marketing-content.ts",
+    "scripts/test-anamnesis-intake.ts",
+    "scripts/test-mediktor-export.ts",
+    "scripts/test-prep-bank.ts",
+    "scripts/test-medipacient-patient-summary.ts",
+    "scripts/test-medipacient-medical-parser.ts"
   ]
 }
