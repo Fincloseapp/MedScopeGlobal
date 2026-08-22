@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "updated": "2026-08-15",
+  "policy": "Original project visuals and curated license-compatible editorial photography only. No real patient data.",
+  "originalProjectVisuals": [
+    "medscopeglobal-research-workstation.png",
+    "medscopeglobal-digital-health-specialist.png",
+    "medscopeglobal-home-hero-v2.png",
+    "medscope-cardiology-editorial-v2.png",
+    "medscope-neuroscience-editorial-v2.png",
+    "medscope-pharmacology-editorial.png",
+    "medscope-students-editorial.png",
+    "medscope-prevention-editorial.png",
+    "medscope-sleep-editorial.png"
+  ],
+  "externalProvider": {
+    "name": "Unsplash",
+    "usage": "Curated thematic fallback photographs",
+    "licenseUrl": "https://unsplash.com/license"
+  }
+}
