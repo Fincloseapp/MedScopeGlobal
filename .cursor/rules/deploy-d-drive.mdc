@@ -1,0 +1,11 @@
+---
+description: PC production upload stays on D: and uses npm run deploy (wrangler OAuth)
+alwaysApply: true
+---
+
+# Production upload from this PC
+
+- Project and build stay on **D:** (`D:\MedScopeGlobal\marketing-hub-deploy` or `D:\medscope.local`). Never copy the app tree or `node_modules` to **C:** or `%TEMP%` for deploy.
+- Command: `npm run deploy` from that D: folder (gates once, in-place `next build`, wrangler OAuth → Worker `medscopeglobal`).
+- Do not use `npm run cf:deploy` on this PC unless `CLOUDFLARE_API_TOKEN` is set; local upload uses wrangler login (`dawe.zegzul@seznam.cz`).
+- D: is FAT32. `scripts/win-fat32-fs-patch.cjs` must stay required for `next build` so webpack `readlink` EISDIR does not fail the upload.

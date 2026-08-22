@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = dirname(fileURLToPath(import.meta.url));
 
 const supabasePatterns = [];
 
@@ -44,6 +48,8 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+
+  outputFileTracingRoot: projectRoot,
 
   serverExternalPackages: ["pdf-parse", "mammoth", "tesseract.js", "edge-tts-universal"],
 
@@ -311,12 +317,31 @@ const nextConfig = {
 
   },
 
+  webpack: (config) => {
+    if (process.platform === "win32") {
+      config.resolve.symlinks = false;
+      config.cache = { type: "memory" };
+      config.snapshot = {
+        ...(config.snapshot || {}),
+        managedPaths: [],
+        immutablePaths: [],
+      };
+    }
+    return config;
+  },
+
 };
 
 
 
 export default nextConfig;
 
-// OpenNext Cloudflare local bindings for next dev
+// Bindings only for `next dev`. During `next build` / OpenNext packaging this
+// starts workerd and on Windows/FAT32 it can hang or crash (ERR_RUNTIME_FAILURE).
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
-initOpenNextCloudflareForDev();
+const isNextDev =
+  process.env.NEXT_PHASE === "phase-development-server" ||
+  process.argv.includes("dev");
+if (isNextDev) {
+  initOpenNextCloudflareForDev();
+}
