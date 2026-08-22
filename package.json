@@ -78,6 +78,7 @@
     "cf:deploy": "node scripts/cloudflare/deploy.mjs",
     "upload": "opennextjs-cloudflare upload",
     "cf:upload": "opennextjs-cloudflare upload",
+    "ship": "npm run deploy",
     "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "cf:env:sync": "node scripts/cloudflare/sync-env-from-dotenv.mjs",
     "cf:dns": "node scripts/cloudflare/dns-point-workers.mjs",

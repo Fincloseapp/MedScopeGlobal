@@ -1,15 +1,25 @@
 ---
-description: PC production upload stays on D: and uses npm run deploy (wrangler OAuth)
+description: Permanent live loop — local pnpm dev, then npm run ship to medscopeglobal.com
 alwaysApply: true
 ---
 
-# Production upload from this PC
+# Permanent live loop (this PC)
 
-Production is **Cloudflare Workers (OpenNext)** only — Worker `medscopeglobal`, domain `medscopeglobal.com`. **Never Vercel.** Never copy the app tree or `node_modules` to **C:** or `%TEMP%`.
+Production is **Cloudflare Workers (OpenNext)** only — Worker `medscopeglobal`, domain `https://medscopeglobal.com`. **Never Vercel.** Never copy the app tree or `node_modules` to **C:** or `%TEMP%`.
 
-- Project and build stay on **D:** (`D:\MedScopeGlobal\marketing-hub-deploy` or `D:\medscope.local`).
-- One command: `npm run deploy` from that D: folder (gates once, in-place `next build`, wrangler OAuth → Worker `medscopeglobal`).
-- Upload without rebuild when `.open-next` already exists: `npm run upload` (or `npx opennextjs-cloudflare upload`). Do not run a 9-minute rebuild just to republish.
-- Do not use `npm run cf:deploy` on this PC unless `CLOUDFLARE_API_TOKEN` is set; local upload uses wrangler login (`dawe.zegzul@seznam.cz`). `npm run deploy` strips leftover tokens so OAuth works.
+Workers Builds is **not** connected (0 builds). GitHub Actions `cloudflare-deploy.yml` needs `CLOUDFLARE_API_TOKEN` (often missing). Do **not** wait on git-push auto-deploy.
+
+## Chosen loop (do this)
+
+1. Edit on **D:** (`D:\MedScopeGlobal\marketing-hub-deploy` or `D:\medscope.local`).
+2. Fast preview: `pnpm dev` → http://localhost:3000
+3. Visible on **https://medscopeglobal.com**: `npm run ship` (alias of `npm run deploy`: gates + in-place OpenNext build + wrangler OAuth → Worker `medscopeglobal`). ~9 min on FAT32.
+4. Already have a **fresh** `.open-next` and only need republish? `npm run upload` (no rebuild).
+
+## Do not
+
+- Do not use `npm run cf:deploy` on this PC unless `CLOUDFLARE_API_TOKEN` is set. Local ship uses wrangler login (`dawe.zegzul@seznam.cz`). `npm run deploy` / `npm run ship` strip leftover tokens so OAuth works.
+- Do not rebuild just to republish — use `npm run upload` when `.open-next` is current.
+- Do not add a Preview Worker + promote path (extra moving parts).
 - D: is FAT32. `scripts/win-fat32-fs-patch.cjs` must stay required for `next build` so webpack `readlink` EISDIR does not fail the upload.
 - `next.config.mjs` must call `initOpenNextCloudflareForDev()` only during `next dev` — never during `next build` / OpenNext package (workerd hangs on Windows).
