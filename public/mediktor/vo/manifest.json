@@ -1,0 +1,34 @@
+{
+  "voice": "cs-CZ-VlastaNeural",
+  "gender": "female",
+  "locale": "cs-CZ",
+  "rate": "-8%",
+  "pitch": "+2Hz",
+  "scenes": [
+    {
+      "id": "01-tired",
+      "text": "Psaní anamnézy zabírá lékařům desítky minut denně.",
+      "src": "/mediktor/vo/01-tired.mp3"
+    },
+    {
+      "id": "02-start",
+      "text": "Mediktor zapisuje za vás.",
+      "src": "/mediktor/vo/02-start.mp3"
+    },
+    {
+      "id": "03-dictate",
+      "text": "Stačí mluvit. Mediktor píše.",
+      "src": "/mediktor/vo/03-dictate.mp3"
+    },
+    {
+      "id": "04-done",
+      "text": "Rychlejší práce. Méně psaní. Více péče.",
+      "src": "/mediktor/vo/04-done.mp3"
+    },
+    {
+      "id": "05-cta",
+      "text": "Stáhněte si Mediktor a začněte diktovat.",
+      "src": "/mediktor/vo/05-cta.mp3"
+    }
+  ]
+}
