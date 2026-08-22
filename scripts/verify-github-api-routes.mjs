@@ -33,7 +33,7 @@ for (const path of REQUIRED) {
 
 if (missing.length) {
   console.error(`\n✗ ${missing.length} required route(s) missing on GitHub ${branch}.`);
-  console.error("Run: node scripts/deploy-vercel-production.mjs");
+  console.error("Run: npm run deploy   # Cloudflare Workers (OpenNext), D: only");
   process.exit(1);
 }
 

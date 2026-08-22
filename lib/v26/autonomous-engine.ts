@@ -77,23 +77,8 @@ function runLocalPush(): V26AutonomousPhase & { sha?: string } {
 }
 
 async function pollVercelReady(): Promise<V26AutonomousPhase> {
-  if (process.env.VERCEL === "1") {
-    return { ok: true, detail: "running on Vercel" };
-  }
-  try {
-    const script = projectPath("scripts/trigger-vercel-production.mjs");
-    const result = spawnSync(process.execPath, [script], {
-      encoding: "utf8",
-      timeout: 900_000,
-      cwd: MEDSCOPE_PROJECT_ROOT,
-    });
-    return {
-      ok: result.status === 0,
-      detail: result.stdout?.includes("READY") ? "Vercel READY" : result.stderr?.slice(0, 200),
-    };
-  } catch (e) {
-    return { ok: false, detail: (e as Error).message };
-  }
+  // Production is Cloudflare Workers (OpenNext). Vercel deploy polling is retired.
+  return { ok: true, detail: "skipped — production is Cloudflare Workers, not Vercel" };
 }
 
 export async function runV26AutonomousEngine(options?: {
@@ -149,10 +134,10 @@ export async function runV26AutonomousEngine(options?: {
         continue;
       }
 
-      const vercel = await pollVercelReady();
-      phases[`vercel_${retries}`] = vercel;
-      if (!vercel.ok) {
-        errors.push("vercel not ready");
+      const workers = await pollVercelReady();
+      phases[`workers_${retries}`] = workers;
+      if (!workers.ok) {
+        errors.push("workers deploy not ready");
         retries++;
         continue;
       }

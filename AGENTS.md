@@ -87,4 +87,4 @@ Cloudflare Workers via OpenNext; the source of truth for data is **Supabase** (P
 
 ### Repo hygiene note
 - The repo root is cluttered with transient scratch/log files (`_poll-*.mjs`, `*-log.txt`,
-  `*-audit*.md`, `tmp-*`, `vercel.json.bak`). These are not part of the app.
+  `*-audit*.md`, `tmp-*`). These are not part of the app.

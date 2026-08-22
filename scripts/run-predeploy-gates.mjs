@@ -89,4 +89,4 @@ if (!ok) {
 }
 
 console.log("\nPre-deploy gates PASSED");
-console.log("Tip: npm run env:diff — compare local vs Vercel env keys\n");
+console.log("Tip: npm run cf:env:sync — write Workers env JSON from .env.local\n");

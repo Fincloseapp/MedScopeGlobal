@@ -56,10 +56,8 @@ while (attempt <= MAX_RETRIES && !success) {
     continue;
   }
 
-  if (!run("poll Vercel READY", node, [path.join(root, "scripts/trigger-vercel-production.mjs")])) {
-    attempt++;
-    continue;
-  }
+  // Production is Cloudflare Workers — do not poll or trigger Vercel.
+  console.log("skip Vercel READY poll (production is Cloudflare Workers)");
 
   const secret = env.CRON_SECRET;
   if (secret) {

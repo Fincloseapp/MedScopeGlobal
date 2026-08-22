@@ -43,5 +43,5 @@ jobs:
       - name: Validate (v24 structure + gates)
         run: pnpm run validate
 
-      - name: Build (Vercel pipeline mirror)
+      - name: Build (OpenNext / Cloudflare)
         run: pnpm run build
