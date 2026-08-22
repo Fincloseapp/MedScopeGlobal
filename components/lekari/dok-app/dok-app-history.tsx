@@ -117,7 +117,7 @@ export function DokAppHistory() {
           {error}
           {authHint ? (
             <p className="mt-1">
-              <Link href="/login?next=/app/dokumentace" className="font-semibold underline">
+              <Link href="/login?next=/app/mediktor" className="font-semibold underline">
                 Přihlásit se
               </Link>
             </p>

@@ -62,7 +62,7 @@ export function dokumentaceAppUrl(opts?: {
   link?: string;
   absolute?: boolean;
 }): string {
-  const path = "/app/dokumentace";
+  const path = "/app/mediktor";
   const params = new URLSearchParams();
   if (opts?.source) params.set("source", opts.source);
   if (opts?.link) params.set("link", opts.link);

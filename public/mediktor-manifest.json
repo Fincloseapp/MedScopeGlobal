@@ -1,0 +1,54 @@
+{
+  "id": "/app/mediktor",
+  "name": "MeDiktor · MedScopeGlobal",
+  "short_name": "MeDiktor",
+  "description": "MeDiktor od MedScopeGlobal — nahrávejte v mobilu diktát nebo konzultaci s pacientem/pacientkou. medscopeglobal.com",
+  "start_url": "/app/mediktor?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#021d33",
+  "theme_color": "#005B96",
+  "lang": "cs",
+  "categories": ["medical", "productivity"],
+  "icons": [
+    {
+      "src": "/assets/mediktor/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/mediktor/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/mediktor/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/mediktor/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nový zápis",
+      "short_name": "Zápis",
+      "url": "/app/mediktor?tab=zapis",
+      "description": "Spustit nahrávku nebo diktát"
+    },
+    {
+      "name": "Historie zápisů",
+      "short_name": "Historie",
+      "url": "/app/mediktor?tab=historie",
+      "description": "Otevřít uložené zápisy"
+    }
+  ]
+}

@@ -67,7 +67,7 @@ export function DokAppAccount({
       try {
         const [ctxRes, eligRes] = await Promise.all([
           fetch("/api/v22/reader-context", { credentials: "same-origin" }),
-          fetch("/api/lekari/dokumentace/eligibility", { credentials: "same-origin" }),
+          fetch("/api/lekari/mediktor/eligibility", { credentials: "same-origin" }),
         ]);
         if (ctxRes.ok) {
           setCtx((await ctxRes.json()) as ReaderContext);
@@ -95,7 +95,7 @@ export function DokAppAccount({
   async function signOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
-    window.location.href = "/login?next=/app/dokumentace";
+    window.location.href = "/login?next=/app/mediktor";
   }
 
   if (loading) {
@@ -186,7 +186,7 @@ export function DokAppAccount({
         <div className="mt-4 flex flex-col gap-2">
           {!loggedIn ? (
             <Button asChild className="h-11 rounded-full bg-[#005B96]">
-              <Link href="/login?next=/app/dokumentace">
+              <Link href="/login?next=/app/mediktor">
                 <LogIn className="mr-2 h-4 w-4" />
                 Přihlásit se
               </Link>
@@ -233,7 +233,7 @@ export function DokAppAccount({
       )}
 
       <p className="text-center text-xs text-slate-500">
-        <Link href="/lekari/dokumentace" className="text-[#005B96] underline">
+        <Link href="/lekari/mediktor" className="text-[#005B96] underline">
           Zpět na marketingovou stránku
         </Link>
       </p>

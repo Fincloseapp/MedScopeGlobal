@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Mic, Sparkles, FileCheck2, Shield } from "lucide-react";
+import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
 
 const STEPS = [
   {
@@ -68,8 +69,8 @@ export function DokAppGuide() {
         </ul>
         <p className="mt-3">
           Marketing a předplatné:{" "}
-          <Link href="/lekari/dokumentace" className="font-medium text-[#005B96] underline">
-            /lekari/dokumentace
+          <Link href={MEDIKTOR.routes.marketing} className="font-medium text-[#005B96] underline">
+            {MEDIKTOR.routes.marketing}
           </Link>
         </p>
       </div>

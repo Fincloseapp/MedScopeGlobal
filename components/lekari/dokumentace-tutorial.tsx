@@ -271,7 +271,7 @@ export function DokumentaceTutorial({
 
             <div className="mt-6 flex flex-wrap gap-2">
               <Button asChild className="h-11 rounded-full bg-[#005B96] px-5">
-                <Link href="/app/dokumentace">Vyzkoušet v aplikaci</Link>
+                <Link href="/app/mediktor">Vyzkoušet v aplikaci</Link>
               </Button>
               <Button
                 asChild
@@ -281,7 +281,7 @@ export function DokumentaceTutorial({
                 <Link
                   href={
                     variant === "compact"
-                      ? "/lekari/dokumentace#stahnout"
+                      ? "/lekari/mediktor#stahnout"
                       : "#stahnout"
                   }
                 >

@@ -79,7 +79,7 @@ export function V20MobileNav({
                 MeDiprep
               </Link>
               <Link
-                href="/app/dokumentace"
+                href="/app/mediktor"
                 onClick={() => setOpen(false)}
                 className="rounded-lg bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#021d33]"
               >

@@ -21,8 +21,8 @@ export const MEDIKTOR = {
     lockup: "/assets/mediktor/logo-lockup.png",
   },
   routes: {
-    marketing: "/lekari/dokumentace",
-    app: "/app/dokumentace",
+    marketing: "/lekari/mediktor",
+    app: "/app/mediktor",
   },
   get fullName() {
     return `${this.productName} od ${this.provider}`;

@@ -157,7 +157,7 @@ export function getLekariNavStripCopy(): ConversionCopy {
     headline: "MeDiktor napíše zápis z diktátu",
     body: "Nahrávejte v mobilu. Stažení po ověření účtu. 390 Kč/měsíc · 14 dní zdarma.",
     ctaLabel: "Stáhnout MeDiktor",
-    ctaHref: "/lekari/dokumentace",
+    ctaHref: "/lekari/mediktor",
   };
 }
 
@@ -191,6 +191,7 @@ export function isPhysicianAudiencePath(pathname: string | null | undefined): bo
     pathname === "/lekari" ||
     pathname.startsWith("/lekari/") ||
     pathname.startsWith("/odborna") ||
+    pathname.startsWith("/app/mediktor") ||
     pathname.startsWith("/app/dokumentace")
   );
 }

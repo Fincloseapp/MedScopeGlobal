@@ -56,7 +56,7 @@ async function main() {
   for (const [path, label] of [
     ["/app/priprava", "mediprep"],
     ["/app/pacient", "medipacient"],
-    ["/app/dokumentace", "mediktor"],
+    ["/app/mediktor", "mediktor"],
   ]) {
     const page = await get(path);
     check(`${label}_chrome`, page.status === 200 && page.body.includes("Platnost"));

@@ -26,6 +26,7 @@ export function isStandaloneAppHref(href: string): boolean {
   return (
     href.startsWith("/app/pacient") ||
     href.startsWith("/app/priprava") ||
+    href.startsWith("/app/mediktor") ||
     href.startsWith("/app/dokumentace")
   );
 }

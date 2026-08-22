@@ -93,6 +93,12 @@ const nextConfig = {
       { source: "/app/mediprep", destination: "/app/priprava", permanent: false },
       { source: "/medipacient/app", destination: "/app/pacient", permanent: false },
       { source: "/mediprep/app", destination: "/app/priprava", permanent: false },
+      { source: "/app/dokumentace", destination: "/app/mediktor", permanent: true },
+      { source: "/app/dokumentace/:path*", destination: "/app/mediktor/:path*", permanent: true },
+      { source: "/lekari/dokumentace", destination: "/lekari/mediktor", permanent: true },
+      { source: "/lekari/dokumentace/:path*", destination: "/lekari/mediktor/:path*", permanent: true },
+      { source: "/dokumentace-manifest.json", destination: "/mediktor-manifest.json", permanent: true },
+      { source: "/sw-dokumentace.js", destination: "/sw-mediktor.js", permanent: true },
 
       { source: "/pro-lekare", destination: "/lekari", permanent: true },
 
@@ -208,6 +214,20 @@ const nextConfig = {
 
       {
 
+        source: "/app/mediktor",
+
+        headers: [
+
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+
+          { key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=()" },
+
+        ],
+
+      },
+
+      {
+
         source: "/app/dokumentace",
 
         headers: [
@@ -253,6 +273,13 @@ const nextConfig = {
       },
       {
         source: "/sw-mediprep.js",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
+          { key: "Service-Worker-Allowed", value: "/" },
+        ],
+      },
+      {
+        source: "/sw-mediktor.js",
         headers: [
           { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
           { key: "Service-Worker-Allowed", value: "/" },

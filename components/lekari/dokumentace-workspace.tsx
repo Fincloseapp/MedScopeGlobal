@@ -891,7 +891,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             <p>{error}</p>
             {gateHint === "login" ? (
               <p className="mt-2">
-                <Link href={isApp ? "/login?next=/app/dokumentace" : "/login"} className="font-semibold text-[#005B96] underline">
+                <Link href={isApp ? "/login?next=/app/mediktor" : "/login"} className="font-semibold text-[#005B96] underline">
                   Přihlásit se
                 </Link>
               </p>

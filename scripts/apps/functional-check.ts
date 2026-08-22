@@ -25,10 +25,10 @@ function file(rel: string) {
 assert.equal(APP_PRODUCTS.length, 3, "three consumer apps");
 assert.equal(MEDIPACIENT.appPath, "/app/pacient");
 assert.equal(MEDIPREP.appPath, "/app/priprava");
-assert.equal(MEDIKTOR_APP.appPath, "/app/dokumentace");
+assert.equal(MEDIKTOR_APP.appPath, "/app/mediktor");
 assert.equal(MEDIPACIENT.manifest, "/medipacient-manifest.json");
 assert.equal(MEDIPREP.manifest, "/mediprep-manifest.json");
-assert.equal(MEDIKTOR_APP.manifest, "/dokumentace-manifest.json");
+assert.equal(MEDIKTOR_APP.manifest, "/mediktor-manifest.json");
 assert.equal(MEDIPACIENT.domain, "medscopeglobal.com");
 
 for (const app of APP_PRODUCTS) {
@@ -112,6 +112,7 @@ assert.deepEqual(
 file("app/(public)/aplikace/page.tsx");
 file("app/(pacient-app)/app/pacient/page.tsx");
 file("app/(prep-app)/app/priprava/page.tsx");
+file("app/(dok-app)/app/mediktor/page.tsx");
 file("app/api/medipacient/timeline/route.ts");
 file("app/api/mediprep/dashboard/route.ts");
 file("app/api/mediprep/test/route.ts");

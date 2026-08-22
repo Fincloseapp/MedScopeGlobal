@@ -92,7 +92,7 @@ async function loadUserRow(userId: string): Promise<UserEligibilityRow | null> {
 export async function getDokumentaceEligibility(
   userId: string | undefined
 ): Promise<DokumentaceEligibility> {
-  const loginUrl = "/login?next=/app/dokumentace";
+  const loginUrl = "/login?next=/app/mediktor";
   const subscribeUrl = "/predplatne#dokumentace";
 
   if (!userId) {

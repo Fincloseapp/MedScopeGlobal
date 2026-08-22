@@ -17,7 +17,7 @@ export const V271_HERO_CTAS = [
 export const V271_HERO_APP_CHIPS = [
   { label: "MeDipacient", href: "/app/pacient" },
   { label: "MeDiprep", href: "/app/priprava" },
-  { label: "MeDiktor", href: "/app/dokumentace" },
+  { label: "MeDiktor", href: "/app/mediktor" },
 ] as const;
 
 export const V271_SOCIAL_PROOF_STATS = [
@@ -115,8 +115,8 @@ export const V271_AUDIENCES = [
       "MeDiktor napíše zápis z diktátu v telefonu. K tomu guidelines, studie a Research Hub.",
     topics: ["guidelines", "MeDiktor", "CME", "studie", "Research Hub"],
     href: "/lekari",
-    ctaPrimary: { label: "Stáhnout MeDiktor", href: "/app/dokumentace" },
-    ctaSecondary: { label: "Více o MeDiktoru", href: "/lekari/dokumentace" },
+    ctaPrimary: { label: "Stáhnout MeDiktor", href: "/app/mediktor" },
+    ctaSecondary: { label: "Více o MeDiktoru", href: "/lekari/mediktor" },
   },
 ] as const;
 
@@ -126,8 +126,8 @@ export const V271_DOKUMENTACE_APP = {
   title: "MeDiktor — nahrávejte v mobilu, zápis je hotový",
   description:
     "Diktát do telefonu, nebo nahrávka konzultace s pacientem či pacientkou → odborná anamnéza a klinický zápis. Stažení pro ověřené lékaře, účet MedScopeGlobal.",
-  href: "/lekari/dokumentace",
-  appHref: "/app/dokumentace",
+  href: "/lekari/mediktor",
+  appHref: "/app/mediktor",
   price: "390 Kč / měsíc",
 } as const;
 
@@ -163,7 +163,7 @@ export const V271_FOOTER_TRUST = {
   audiences: [
     { label: "Veřejnost — MeDipacient a osvěta", href: "/verejnost" },
     { label: "Studenti — MeDiprep a Academy", href: "/studenti" },
-    { label: "Lékaři — MeDiktor a guidelines", href: "/lekari/dokumentace" },
+    { label: "Lékaři — MeDiktor a guidelines", href: "/lekari/mediktor" },
     { label: "Zdravotníci a zdravotní profesionálové", href: "/odborna" },
   ],
   proof: [

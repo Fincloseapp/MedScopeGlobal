@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { LogIn, ShieldAlert, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
 
 export function DokAppGate({
   message,
-  loginUrl = "/login?next=/app/dokumentace",
+  loginUrl = `/login?next=${MEDIKTOR.routes.app}`,
   verifyUrl = "/academy/lekari/overeni",
   linkedHint,
 }: {
@@ -42,7 +43,7 @@ export function DokAppGate({
             <Link href={verifyUrl}>Požádat o ověření lékaře</Link>
           </Button>
           <Button asChild variant="ghost" className="h-10 rounded-full text-[#005B96]">
-            <Link href="/lekari/dokumentace">Zjistit více o Dokumentaci</Link>
+            <Link href={MEDIKTOR.routes.marketing}>Zjistit více o MeDiktoru</Link>
           </Button>
         </div>
       </div>

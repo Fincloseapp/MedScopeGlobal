@@ -144,7 +144,7 @@ export default async function DashboardPage() {
               Nahrávání v mobilu, SOAP a anamnéza. Stejné stažení na plochu jako u ostatních aplikací.
             </p>
             <Link
-              href="/app/dokumentace"
+              href="/app/mediktor"
               className="mt-4 inline-flex rounded-full bg-[#005B96] px-4 py-2 text-sm font-semibold text-white"
             >
               Stáhnout MeDiktor

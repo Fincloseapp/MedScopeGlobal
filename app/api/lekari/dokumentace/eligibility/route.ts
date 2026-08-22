@@ -29,6 +29,6 @@ export async function GET() {
     installUrl,
     linkedInstallUrl,
     verifyUrl: "/academy/lekari/overeni",
-    loginUrl: "/login?next=/app/dokumentace",
+    loginUrl: "/login?next=/app/mediktor",
   });
 }

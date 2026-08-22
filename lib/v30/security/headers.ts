@@ -17,7 +17,7 @@ const CSP = [
 
 export function permissionsPolicyForPath(pathname?: string): string {
   if (!pathname) return "camera=(), microphone=(), geolocation=()";
-  if (pathname.startsWith("/app/dokumentace") || pathname.startsWith("/lekari/dokumentace")) {
+  if (pathname.startsWith("/app/mediktor") || pathname.startsWith("/app/dokumentace") || pathname.startsWith("/lekari/mediktor") || pathname.startsWith("/lekari/dokumentace")) {
     return "camera=(), microphone=(self), geolocation=()";
   }
   if (pathname.startsWith("/app/pacient") || pathname.startsWith("/medipacient")) {

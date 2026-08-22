@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { DokAppShell } from "@/components/lekari/dok-app/dok-app-shell";
+import { MEDIKTOR_APP } from "@/lib/apps/catalog";
 import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
 
 export const metadata: Metadata = {
   title: MEDIKTOR.pwaName,
   description: MEDIKTOR.seoDescription,
-  manifest: "/dokumentace-manifest.json",
+  manifest: MEDIKTOR_APP.manifest,
   icons: {
     icon: [
       { url: MEDIKTOR.assets.icon192, sizes: "192x192", type: "image/png" },
@@ -27,6 +28,6 @@ export const metadata: Metadata = {
   themeColor: "#005B96",
 };
 
-export default function DokumentaceAppPage() {
+export default function MediktorAppPage() {
   return <DokAppShell />;
 }

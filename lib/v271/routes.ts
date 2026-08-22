@@ -160,12 +160,12 @@ export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
       },
       {
         label: "MeDiktor",
-        href: "/lekari/dokumentace",
+        href: "/lekari/mediktor",
         description: "AI zapisovatel — nahrávka → český zápis podle šablony",
       },
       {
         label: "Aplikace Dokumentace",
-        href: "/app/dokumentace",
+        href: "/app/mediktor",
         description: "Stáhnout PWA — zápisy bez marketingového chrome",
       },
       {

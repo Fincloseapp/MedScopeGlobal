@@ -9,18 +9,19 @@ import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { Button } from "@/components/ui/button";
 import { MediktorMark } from "@/components/lekari/mediktor-mark";
 import { SITE } from "@/lib/config/site";
+import { MEDIKTOR_APP } from "@/lib/apps/catalog";
 import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
 
 export async function generateMetadata(): Promise<Metadata> {
   const base = buildV20PageMetadata({
     title: MEDIKTOR.seoTitle,
     description: MEDIKTOR.seoDescription,
-    path: "/lekari/dokumentace",
+    path: MEDIKTOR.routes.marketing,
   });
 
   return {
     ...base,
-    manifest: "/dokumentace-manifest.json",
+    manifest: MEDIKTOR_APP.manifest,
     appleWebApp: {
       capable: true,
       title: MEDIKTOR.pwaName,
@@ -62,7 +63,7 @@ const VALUE_PROPS = [
   },
 ] as const;
 
-export default function LekariDokumentacePage() {
+export default function LekariMediktorPage() {
   return (
     <div className="bg-[#fafcff]">
       <section className="relative overflow-hidden border-b border-[#d9e8f4]">

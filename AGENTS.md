@@ -47,7 +47,7 @@ Cloudflare Workers via OpenNext; the source of truth for data is **Supabase** (P
   validityLabel from `vip_subscriptions.ends_at` when available).
 - **MeDiprep** `/app/priprava`: client fallback tests; header + status bar login; tab Testy builder.
 - **MeDipacient** `/app/pacient`: demo timeline; header login; tabs Přehled / Zprávy / Nahrát / Účet.
-- **MeDiktor** `/app/dokumentace`: eligibility gate for zápis/historie; header login; tabs Zápis /
+- **MeDiktor** `/app/mediktor`: eligibility gate for zápis/historie; header login; tabs Zápis /
   Historie / Návod / Účet.
 - Homepage/portal `AppOpenLink` opens apps in the same tab. MeDiprep SW must not cache-first
   `/_next/*`; bump `CACHE_NAME` when changing shell markup.

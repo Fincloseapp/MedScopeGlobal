@@ -37,7 +37,7 @@ export function DokumentaceDownloadPanel({
   useEffect(() => {
     void (async () => {
       try {
-        const res = await fetch("/api/lekari/dokumentace/eligibility", {
+        const res = await fetch("/api/lekari/mediktor/eligibility", {
           credentials: "same-origin",
         });
         if (res.ok) {
@@ -55,8 +55,8 @@ export function DokumentaceDownloadPanel({
 
   const canInstall = Boolean(data?.canInstall);
   const qrSrc = canInstall
-    ? `/api/lekari/dokumentace/qr?linked=1&t=${Date.now()}`
-    : "/api/lekari/dokumentace/qr?public=1";
+    ? `/api/lekari/mediktor/qr?linked=1&t=${Date.now()}`
+    : "/api/lekari/mediktor/qr?public=1";
 
   const compact = variant === "app";
 
@@ -119,7 +119,7 @@ export function DokumentaceDownloadPanel({
               <div className="mt-3 flex flex-wrap items-center gap-3">
                 <InstallAppButton gated canInstall />
                 <Button asChild variant="outline" className="h-9 rounded-full border-white/40 bg-transparent text-white hover:bg-white/10">
-                  <Link href="/app/dokumentace">Otevřít aplikaci</Link>
+                  <Link href="/app/mediktor">Otevřít aplikaci</Link>
                 </Button>
               </div>
             </div>
@@ -131,7 +131,7 @@ export function DokumentaceDownloadPanel({
               </p>
               <div className="flex flex-wrap gap-2">
                 <Button asChild className="h-10 rounded-full bg-white px-5 text-[#021d33] hover:bg-sky-50">
-                  <Link href={data?.loginUrl || "/login?next=/app/dokumentace"}>
+                  <Link href={data?.loginUrl || "/login?next=/app/mediktor"}>
                     <LogIn className="mr-2 h-4 w-4" />
                     Přihlásit se
                   </Link>
@@ -150,7 +150,7 @@ export function DokumentaceDownloadPanel({
                   variant="outline"
                   className="h-10 rounded-full border-white/40 bg-transparent px-5 text-white hover:bg-white/10"
                 >
-                  <Link href="/lekari/dokumentace">Více o MeDiktoru</Link>
+                  <Link href="/lekari/mediktor">Více o MeDiktoru</Link>
                 </Button>
               </div>
             </div>

@@ -40,7 +40,7 @@ type EligibilityState = {
 };
 
 const FALLBACK_ACCESS = guestAccess(
-  "/login?next=/app/dokumentace",
+  `/login?next=${MEDIKTOR.routes.app}`,
   "/predplatne#dokumentace",
   "Host · vyžaduje ověřeného lékaře"
 );

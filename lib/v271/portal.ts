@@ -15,7 +15,7 @@ export const PORTAL_SEARCH_TABS = [
 export const PORTAL_TRENDING = [
   { label: "MeDipacient", href: "/app/pacient" },
   { label: "přijímačky LF", href: "/app/priprava" },
-  { label: "MeDiktor", href: "/app/dokumentace" },
+  { label: "MeDiktor", href: "/app/mediktor" },
   { label: "guidelines", href: "/lekari/guidelines" },
   { label: "léky SÚKL", href: "/leky" },
 ] as const;
@@ -39,7 +39,7 @@ export const PORTAL_SERVICES = [
     id: "mediktor",
     label: "MeDiktor",
     hint: "zápisy",
-    href: "/app/dokumentace",
+    href: "/app/mediktor",
     image: "/assets/mediktor/icon-192.png",
   },
   { id: "dashboard", label: "Dashboard", hint: "přehled", href: "/dashboard", icon: "grid" },

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Download, CheckCircle2, Share, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MEDIKTOR_APP } from "@/lib/apps/catalog";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -46,7 +47,7 @@ export function InstallAppButton({
 
     if ("serviceWorker" in navigator) {
       void navigator.serviceWorker
-        .register("/sw-dokumentace.js", { scope: "/app/dokumentace" })
+        .register(MEDIKTOR_APP.serviceWorker, { scope: MEDIKTOR_APP.appPath })
         .catch(() => {
           // SW optional — app still works online
         });
@@ -102,7 +103,7 @@ export function InstallAppButton({
         variant="outline"
         className={`h-8 rounded-full border-white/40 bg-transparent px-3 text-xs text-white hover:bg-white/10 ${className ?? ""}`}
       >
-        <Link href="/login?next=/app/dokumentace">
+        <Link href={`/login?next=${MEDIKTOR_APP.appPath}`}>
           <Lock className="mr-1.5 h-3.5 w-3.5" />
           Stažení po ověření
         </Link>
