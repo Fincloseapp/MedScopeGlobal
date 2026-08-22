@@ -16,10 +16,18 @@ Workers Builds is **not** connected (0 builds). GitHub Actions `cloudflare-deplo
 3. Visible on **https://medscopeglobal.com**: `npm run ship` (alias of `npm run deploy`: gates + in-place OpenNext build + wrangler OAuth → Worker `medscopeglobal`). ~9 min on FAT32.
 4. Already have a **fresh** `.open-next` and only need republish? `npm run upload` (no rebuild).
 
+## Slice branches (review before merge)
+
+- Day-to-day work on `feat/*`; cut focused `pr/*` slices from the nearest parent (`pr/article-content-rls`, `pr/editorial-freshness`, etc.).
+- Stage **named files only** — never `git add .`. Do not mix portal UI, PNG assets, logs, `.tools/`, or `.env` into a slice.
+- Push slice → open PR on GitHub (`gh` may be unauthenticated on this PC; use compare URLs).
+- Merge slices to `main` when reviewed; production still goes live via `npm run ship` from D: (not git-push auto-deploy).
+
 ## Do not
 
 - Do not use `npm run cf:deploy` on this PC unless `CLOUDFLARE_API_TOKEN` is set. Local ship uses wrangler login (`dawe.zegzul@seznam.cz`). `npm run deploy` / `npm run ship` strip leftover tokens so OAuth works.
 - Do not rebuild just to republish — use `npm run upload` when `.open-next` is current.
+- Do not deploy to Vercel — production is Cloudflare Workers only (`pr/drop-vercel` removed active Vercel paths).
 - Do not add a Preview Worker + promote path (extra moving parts).
 - D: is FAT32. `scripts/win-fat32-fs-patch.cjs` must stay required for `next build` so webpack `readlink` EISDIR does not fail the upload.
 - `next.config.mjs` must call `initOpenNextCloudflareForDev()` only during `next dev` — never during `next build` / OpenNext package (workerd hangs on Windows).
