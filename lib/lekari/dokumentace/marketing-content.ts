@@ -1,12 +1,16 @@
 import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
 
-/** Original Czech marketing copy for /lekari/mediktor — MedScopeGlobal / MeDiktor only. */
+/** Original Czech marketing copy for /mediktor hub — MedScopeGlobal / MeDiktor only. */
 export const MEDIKTOR_MARKETING = {
   icpNote:
     "MeDiktor je určen ověřeným lékařům. Veřejnost vidí pouze obecné informace; plná aplikace vyžaduje lékařský účet MedScopeGlobal.",
 
   hero: {
-    title: `${MEDIKTOR.shortName} — ${MEDIKTOR.tagline}`,
+    eyebrow: `Pro lékaře · ${MEDIKTOR.domain}`,
+    title: MEDIKTOR.shortName,
+    tagline: MEDIKTOR.tagline,
+    pitch: MEDIKTOR.pitch,
+    priceLine: `Samostatně ${MEDIKTOR.priceMonthlyCzk} Kč/měsíc · 14 dní zdarma`,
     subline: MEDIKTOR.heroSubline,
     support: MEDIKTOR.heroSupport,
     providerLine: `Produkt od ${MEDIKTOR.provider} · ${MEDIKTOR.domain}`,
@@ -16,8 +20,9 @@ export const MEDIKTOR_MARKETING = {
     },
     ctaSecondary: {
       label: "Jak to funguje",
-      href: `${MEDIKTOR.routes.marketing}#ukazka`,
+      href: `${MEDIKTOR.routes.marketing}#jak-to-funguje`,
     },
+    ctaPricing: { label: "390 Kč / měsíc", href: "/predplatne#dokumentace" },
     ctaApp: { label: "Otevřít aplikaci", href: MEDIKTOR.routes.app },
   },
 
@@ -43,40 +48,18 @@ export const MEDIKTOR_MARKETING = {
       },
       {
         id: "export",
-        title: "Export a kopírování",
-        text: "Upravitelný text, PDF, DOCX nebo TXT — zkopírujete do NIS podle interních pravidel.",
+        title: "Export Word a PDF",
+        text: "Upravitelný text, PDF, DOCX nebo TXT — zkopírujete do NIS nebo stáhnete pro archivaci.",
       },
       {
         id: "sync",
-        title: "Historie v účtu",
+        title: "Mobil i PC",
         text: "Zápisy pod stejným účtem na mobilu i na webu — návrat k rozpracované dokumentaci.",
       },
       {
         id: "privacy",
         title: "Audio jen pro zpracování",
         text: "Zvuk se po vygenerování textu neukládá trvale. V účtu zůstává schválený textový návrh.",
-      },
-    ],
-  },
-
-  whyDoctors: {
-    title: "Proč lékaři volí MeDiktor",
-    items: [
-      {
-        title: "Více času u pacienta",
-        text: "Administrativu zkrátíte diktováním — zápis dokončíte až po kontrole návrhu.",
-      },
-      {
-        title: "Odborný jazyk",
-        text: "Návrh respektuje klinickou terminologii; finální znění vždy schvaluje lékař.",
-      },
-      {
-        title: "Mobil i ordinace",
-        text: "Nahrávání u lůžka, v ambulanci nebo u PC — podle zvoleného vstupního zařízení.",
-      },
-      {
-        title: "Právní jistota",
-        text: "Souhlas při nahrávce rozhovoru, jasné vymezení role asistenta, odpovědnost u lékaře.",
       },
     ],
   },
@@ -160,15 +143,70 @@ export const MEDIKTOR_MARKETING = {
     cta: { label: "Kontakt pro pracoviště", href: MEDIKTOR.routes.contact },
   },
 
+  account: {
+    title: "Účet a předplatné",
+    text: "Správa účtu, ověření lékaře, instalace PWA a stav předplatného — v aplikaci MeDiktor nebo na stránce předplatného.",
+    links: [
+      { label: "Účet v MeDiktoru", href: "/app/mediktor?tab=ucet" },
+      { label: "Předplatné MeDiktor", href: "/predplatne#dokumentace" },
+      { label: "Ověření lékaře", href: "/academy/lekari/overeni" },
+    ],
+  },
+
+  guide: {
+    title: "Návod a dokumentace",
+    text: "Podrobný návod k mikrofonu, režimům diktát/konzultace a exportu — v aplikaci nebo níže na této stránce.",
+    href: "/app/mediktor?tab=navod",
+    linkLabel: "Otevřít návod v aplikaci",
+  },
+
+  faq: {
+    title: "Časté dotazy lékařů",
+    items: [
+      {
+        q: "Potřebuji ověřený lékařský účet?",
+        a: "Stažení PWA a plný přístup vyžadují ověřený lékařský účet MedScopeGlobal. Po přihlášení můžete vyzkoušet demo (3 zápisy/den).",
+      },
+      {
+        q: "Je MeDiktor zdravotnický prostředek?",
+        a: "Ne. MeDiktor je asistent pro dokumentaci — není zdravotnický prostředek, diagnóza ani klinické rozhodování. Finální znění vždy schvaluje lékař.",
+      },
+      {
+        q: "Jak je to s GDPR a nahráváním pacienta?",
+        a: "Před nahrávkou konzultace informujte pacienta nebo pacientku. Režim diktátu probíhá bez pacienta. Audio se po zpracování neukládá (ephemeral zpracování).",
+      },
+      {
+        q: "Funguje to offline?",
+        a: "Nahrávku můžete připravit offline; odeslání a AI zpracování vyžadují síť. Historie zápisů je dostupná po přihlášení.",
+      },
+      {
+        q: "Mohu exportovat do Word nebo PDF?",
+        a: "Ano. Po schválení zápisu exportujete PDF, Word (.docx) nebo prostý text — v aplikaci v historii zápisů.",
+      },
+      {
+        q: "Jaký je rozdíl oproti tarifu Lékař v praxi?",
+        a: "MeDiktor standalone (390 Kč) má stejná práva jako Lékař v praxi (490 Kč) — je to levnější vstup do stejného balíčku pro lékaře.",
+      },
+    ],
+  },
+
   legal: {
-    title: "Právní rámec",
+    title: "Právní rámec a ochrana údajů",
+    intro:
+      "MeDiktor zpracovává zdravotní údaje v rozsahu nezbytném pro generování zápisu. Provozovatel platformy je uveden v zásadách ochrany osobních údajů.",
     items: [
       `${MEDIKTOR.fullName} je softwarový asistent pro lékaře — není zdravotnický prostředek, diagnóza ani léčebný algoritmus.`,
       "Lékař odpovídá za kontrolu, úpravu a schválení zápisu před uložením do zdravotnické dokumentace nebo NIS.",
+      "Obsah generovaný AI je návrh — může obsahovat chyby; vždy kontrolujte před použitím u pacienta.",
       "Před nahráváním konzultace informujte pacienta nebo pacientku o účelu záznamu. Režim diktátu probíhá bez přítomnosti pacienta.",
-      "Zvuková data slouží výhradně ke generování textového návrhu a po zpracování se neukládají trvale (ephemeral zpracování).",
+      "Zvuková data slouží výhravně ke generování textového návrhu a po zpracování se neukládají trvale (ephemeral zpracování).",
       "Textové návrhy a historie zápisů se ukládají do zabezpečeného účtu MedScopeGlobal dle podmínek služby a GDPR.",
-      "Výstup může využívat AI — vždy jej před použitím klinicky ověřte.",
+    ],
+    links: [
+      { label: "Zásady ochrany osobních údajů", href: "/privacy" },
+      { label: "Obchodní podmínky (VOP)", href: "/terms" },
+      { label: "GDPR — přehled", href: "/gdpr" },
+      { label: "Právní checklist", href: "/pravni-checklist" },
     ],
   },
 

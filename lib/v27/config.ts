@@ -36,7 +36,7 @@ export const V27_AUDIENCES = {
     href: "/lekari",
     description: "Guidelines, souhrny studií, diagnostické algoritmy, CME a Research Hub.",
     ctaPrimary: { label: "Odborná sekce", href: "/odborna" },
-    ctaSecondary: { label: "MeDiktor", href: "/lekari/mediktor" },
+    ctaSecondary: { label: "MeDiktor", href: "/mediktor" },
     topics: ["guidelines", "CME", "Research Hub", "diagnostika", "léčebné algoritmy"],
     aiRoute: "/ai-asistent/lekar",
   },

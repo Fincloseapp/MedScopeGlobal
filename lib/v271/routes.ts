@@ -160,7 +160,7 @@ export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
       },
       {
         label: "MeDiktor",
-        href: "/lekari/mediktor",
+        href: "/mediktor",
         description: "AI zapisovatel — nahrávka → český zápis podle šablony",
       },
       {

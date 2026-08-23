@@ -150,7 +150,7 @@ export function DokumentaceDownloadPanel({
                   variant="outline"
                   className="h-10 rounded-full border-white/40 bg-transparent px-5 text-white hover:bg-white/10"
                 >
-                  <Link href="/lekari/mediktor">Více o MeDiktoru</Link>
+                  <Link href="/mediktor">Více o MeDiktoru</Link>
                 </Button>
               </div>
             </div>

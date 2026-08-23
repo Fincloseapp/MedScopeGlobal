@@ -157,7 +157,7 @@ export function getLekariNavStripCopy(): ConversionCopy {
     headline: "MeDiktor napíše zápis z diktátu",
     body: "Nahrávejte v mobilu. Stažení po ověření účtu. 390 Kč/měsíc · 14 dní zdarma.",
     ctaLabel: "Stáhnout MeDiktor",
-    ctaHref: "/lekari/mediktor",
+    ctaHref: "/mediktor",
   };
 }
 

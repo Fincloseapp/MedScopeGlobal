@@ -27,7 +27,7 @@ export const MEDIKTOR = {
     lockup: "/assets/mediktor/logo-lockup.png",
   },
   routes: {
-    marketing: "/lekari/mediktor",
+    marketing: "/mediktor",
     app: "/app/mediktor",
     contact: "/kontakt",
   },

@@ -233,7 +233,7 @@ export function DokAppAccount({
       )}
 
       <p className="text-center text-xs text-slate-500">
-        <Link href="/lekari/mediktor" className="text-[#005B96] underline">
+        <Link href="/mediktor" className="text-[#005B96] underline">
           Zpět na marketingovou stránku
         </Link>
       </p>

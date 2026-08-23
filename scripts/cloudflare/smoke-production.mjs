@@ -14,9 +14,13 @@ const pages = [
   { path: "/mediprep/stahnout", must: ["MeDiprep"] },
   { path: "/app/pacient", must: ["MeDipacient"] },
   { path: "/app/priprava", must: ["MeDiprep"] },
-  { path: "/lekari/mediktor", must: ["MeDiktor"] },
+  { path: "/mediktor", must: ["MeDiktor", "390"] },
+  { path: "/mediktor/stahnout", must: ["MeDiktor"] },
+  { path: "/mediktor", must: ["MeDiktor", "390"] },
+  { path: "/mediktor/stahnout", must: ["MeDiktor"] },
+  { path: "/lekari/mediktor", must: ["MeDiktor"], redirectTo: "/mediktor" },
   { path: "/app/mediktor", must: ["MeDiktor"] },
-  { path: "/lekari/dokumentace", must: ["MeDiktor"] },
+  { path: "/lekari/dokumentace", must: ["MeDiktor"], redirectTo: "/mediktor" },
   { path: "/app/dokumentace", must: ["MeDiktor"] },
   { path: "/dashboard", must: ["MeDipacient", "MeDiprep"] },
   { path: "/predplatne", must: ["14"] },
@@ -68,6 +72,20 @@ function ok(msg) {
 
 for (const page of pages) {
   try {
+    if (page.redirectTo) {
+      const url = base + page.path;
+      const res = await fetch(url, { redirect: "manual", signal: AbortSignal.timeout(30000) });
+      const loc = res.headers.get("location") || "";
+      console.log(`${res.status} ${url} → ${loc}`);
+      if (res.status !== 308 && res.status !== 301 && res.status !== 307) {
+        fail(`${url} expected redirect, got ${res.status}`);
+      } else if (!loc.includes(page.redirectTo)) {
+        fail(`${url} redirect location ${loc} missing ${page.redirectTo}`);
+      } else {
+        ok(`${url} redirects to ${page.redirectTo}`);
+      }
+      continue;
+    }
     const { url, res } = await get(page.path);
     const text = await res.text();
     console.log(`${res.status} ${url}`);

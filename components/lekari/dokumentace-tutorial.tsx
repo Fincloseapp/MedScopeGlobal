@@ -281,7 +281,7 @@ export function DokumentaceTutorial({
                 <Link
                   href={
                     variant === "compact"
-                      ? "/lekari/mediktor#stahnout"
+                      ? "/mediktor#stahnout"
                       : "#stahnout"
                   }
                 >
