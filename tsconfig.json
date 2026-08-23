@@ -52,8 +52,6 @@
     "components/home/homepage-student-sponsored.tsx",
     "components/home/homepage-student-ads.tsx",
     "components/student/student-hub-ads.tsx",
-    "components/lekari/mediktor-physician-guide.tsx",
-    "lib/lekari/dokumentace/marketing-content.ts",
     "scripts/test-anamnesis-intake.ts",
     "scripts/test-mediktor-export.ts",
     "scripts/test-prep-bank.ts",

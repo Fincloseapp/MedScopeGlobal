@@ -42,6 +42,7 @@ import {
   downloadMediktorTxt,
   shareMediktorDoc,
 } from "@/components/lekari/mediktor-export";
+import { MediktorWorkspaceTips } from "@/components/lekari/mediktor-physician-guide";
 
 type WorkspaceState = "idle" | "recording" | "processing" | "done" | "error";
 
@@ -735,6 +736,17 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
 
   return (
     <div className={isApp ? "space-y-4 pb-2" : "space-y-6 pb-24 sm:pb-0"}>
+      {isApp && state === "idle" ? (
+        <div className="rounded-2xl border border-[#cfe1f3] bg-white p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#005B96]">
+            Rychlé tipy
+          </p>
+          <div className="mt-3">
+            <MediktorWorkspaceTips />
+          </div>
+        </div>
+      ) : null}
+
       {!isApp && showInstallTip && !onComputer ? (
         <div className="flex gap-3 rounded-xl border border-[#cfe1f3] bg-[#eef6fb] px-4 py-3 text-sm text-[#021d33]">
           <Smartphone className="mt-0.5 h-5 w-5 shrink-0 text-[#005B96]" />
