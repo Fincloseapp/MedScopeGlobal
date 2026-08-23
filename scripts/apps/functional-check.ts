@@ -112,7 +112,10 @@ assert.deepEqual(
 file("app/(public)/aplikace/page.tsx");
 file("app/(pacient-app)/app/pacient/page.tsx");
 file("app/(prep-app)/app/priprava/page.tsx");
-file("app/(dok-app)/app/mediktor/page.tsx");
+assert.equal(MEDIKTOR_APP.marketingPath, "/mediktor");
+assert.equal(MEDIKTOR_APP.downloadPath, "/mediktor/stahnout");
+file("app/(public)/mediktor/page.tsx");
+file("app/(public)/mediktor/stahnout/page.tsx");
 file("app/api/medipacient/timeline/route.ts");
 file("app/api/mediprep/dashboard/route.ts");
 file("app/api/mediprep/test/route.ts");

@@ -66,6 +66,11 @@ export async function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/mediktor" className="hover:text-foreground">
+                MeDiktor — marketing
+              </Link>
+            </li>
+            <li>
               <Link href="/app/mediktor" className="hover:text-foreground">
                 MeDiktor
               </Link>
