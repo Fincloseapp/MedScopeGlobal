@@ -11,6 +11,12 @@ export const MEDIKTOR = {
   /** One-sentence pitch: mobile recording for dictation OR patient consult */
   pitch:
     "Nahrajte v telefonu diktát, nebo konzultaci s pacientem či pacientkou → odborná anamnéza a klinický zápis. Mikrofon má každý mobil.",
+  /** Hero subline on marketing page */
+  heroSubline:
+    "Hlasový asistent pro českou ordinaci — strukturovaný návrh zápisu, ne náhrada klinického úsudku.",
+  /** Supporting line under hero CTAs */
+  heroSupport:
+    "PWA pro ověřené lékaře · synchronizace mobil ↔ web · export do NIS",
   priceMonthlyCzk: 390,
   assets: {
     /** Full marketing render of the app icon */
@@ -23,6 +29,7 @@ export const MEDIKTOR = {
   routes: {
     marketing: "/lekari/mediktor",
     app: "/app/mediktor",
+    contact: "/kontakt",
   },
   get fullName() {
     return `${this.productName} od ${this.provider}`;
