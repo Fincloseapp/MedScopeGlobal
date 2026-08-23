@@ -110,27 +110,27 @@ async function main() {
   assert.ok(!documentXml.includes("chronicé"));
   assert.ok(documentXml.includes("Hlavní potíž") || documentXml.includes("Identifika"));
 
-  const pdf = buildMediktorPdfBytes(stored, title);
+  const pdf = await buildMediktorPdfBytes(stored, title);
   assert.ok(pdf.byteLength > 64, "pdf empty");
   assert.ok(looksLikePdf(pdf), "pdf missing %PDF signature");
   assert.equal(String.fromCharCode(pdf[0], pdf[1], pdf[2], pdf[3], pdf[4]), "%PDF-");
-  // Binary marker after %PDF-1.4\n% must be raw 0xE2 E3 CF D3 (not UTF-8 multi-byte)
-  const pct = "%PDF-1.4\n%".length;
-  assert.equal(pdf[pct], 0xe2, "pdf binary comment byte 0");
-  assert.equal(pdf[pct + 1], 0xe3, "pdf binary comment byte 1");
-  assert.equal(pdf[pct + 2], 0xcf, "pdf binary comment byte 2");
-  assert.equal(pdf[pct + 3], 0xd3, "pdf binary comment byte 3");
   const pdfText = new TextDecoder("latin1").decode(pdf);
-  assert.ok(pdfText.includes("%PDF-1.4"));
-  assert.ok(pdfText.includes("%%EOF"));
-  assert.ok(pdfText.includes("/Type /Catalog"));
-  assert.ok(pdfText.includes("Identifika"));
-  assert.ok(pdfText.includes("Agen 5 mg"));
+  assert.ok(pdfText.startsWith("%PDF-1."));
+  assert.ok(pdfText.includes("endobj") || pdfText.includes("%%EOF") || pdfText.includes("ObjStm"));
   assertNoMarker("pdf", pdfText);
-  assert.ok(pdfText.includes("Times-Bold") || pdfText.includes("Times-Roman"));
-  assert.ok(pdfText.includes("Strana"));
-  assert.ok(!pdfText.includes("vzdelavaci"));
+  // WinAnsi Times hack produced tiny PDFs without embedded glyphs; Unicode embed is larger.
+  assert.ok(pdf.byteLength > 8_000, "pdf should embed subset font bytes");
 
+  // Round-trip extract: Czech medical sample must survive as readable text
+  const { default: pdfParse } = await import("pdf-parse");
+  const parsed = await pdfParse(Buffer.from(pdf));
+  assert.ok(parsed.text.includes("Identifikační") || parsed.text.includes("Identifika"), "pdf czech Identifikační");
+  assert.ok(/Nynější|Nyn[eě]j[sš][ií]/i.test(parsed.text), "pdf czech Nynější");
+  assert.ok(parsed.text.includes("Agen 5 mg"));
+  assert.ok(/ž|š|č|ř|ď|ť|ň|ů|á|é|í|ó|ú|ý/i.test(parsed.text), "pdf must contain Czech diacritics");
+  assert.ok(!parsed.text.includes("vzdelavaci"));
+  assert.ok(parsed.text.includes("Strana") || /\/\s*\d/.test(parsed.text));
+  assertNoMarker("pdf parse", parsed.text);
   const printHtml = buildAnamnesisPrintDocument(parseAnamnesisFromNote(stored));
   assert.ok(printHtml.includes("1. Identifikační"));
   assert.ok(printHtml.includes("2. Nynější"));

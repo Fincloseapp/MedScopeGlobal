@@ -89,7 +89,7 @@ export async function downloadMediktorPdf(
 ): Promise<"shared" | "downloaded" | void> {
   if (!note.trim()) return;
   const title = opts?.title || "MeDiktor · klinický zápis";
-  const bytes = buildMediktorPdfBytes(note, title);
+  const bytes = await buildMediktorPdfBytes(note, title);
   return saveBytesAsFile(
     bytes,
     mediktorExportFilename("pdf", opts?.templateId),
@@ -154,7 +154,7 @@ export async function shareMediktorDoc(
   };
 
   try {
-    const pdfBytes = buildMediktorPdfBytes(note, title);
+    const pdfBytes = await buildMediktorPdfBytes(note, title);
     if (
       await tryShareFile(
         pdfBytes,

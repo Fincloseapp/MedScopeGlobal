@@ -87,7 +87,7 @@ if (!sample?.note) {
 const title = "Anamnestický dotazník pro dospělé pacienty";
 const lines = exportPlainLines(sample.note, title);
 const docx = await buildMediktorDocxBytes(sample.note, title);
-const pdf = buildMediktorPdfBytes(sample.note, title);
+const pdf = await buildMediktorPdfBytes(sample.note, title);
 const zip = await JSZip.loadAsync(docx);
 const documentXml = (await zip.file("word/document.xml")?.async("string")) || "";
 const pdfText = Buffer.from(pdf).toString("latin1");
