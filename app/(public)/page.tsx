@@ -3,10 +3,12 @@ import { HomepageAds } from "@/components/home/homepage-ads";
 import { V272AcademyHomeSections } from "@/components/v271/academy-home-sections";
 import {
   V271B2bBlock,
+  V272DokumentaceAppBlock,
   V272SubscriptionPlansBlock,
   V272WhyTrustBlock,
 } from "@/components/v271/homepage-sections";
 import { PortalHome } from "@/components/v271/portal-home";
+import { V271ServiceStrip } from "@/components/v271/service-strip";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { medicalWebPageJsonLd, webSiteJsonLd, softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { APP_PRODUCTS, appSeoDescription } from "@/lib/apps/catalog";
@@ -52,6 +54,8 @@ export default async function HomePage() {
       ))}
 
       <PortalHome articles={articles} />
+      <V271ServiceStrip />
+      <V272DokumentaceAppBlock />
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
       <V272AcademyHomeSections />
       <V272WhyTrustBlock />

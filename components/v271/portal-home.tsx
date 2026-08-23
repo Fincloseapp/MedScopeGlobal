@@ -244,41 +244,8 @@ export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
               <ul className="space-y-2">
                 {APP_PRODUCTS.map((app) => (
                   <li key={app.id}>
-                    {app.id === "mediktor" ? (
-                      <div className="rounded-md p-1.5 hover:bg-slate-50">
-                        <div className="flex items-center gap-3">
-                          <span className="relative h-12 w-[4.5rem] shrink-0 overflow-hidden rounded-md bg-slate-100">
-                            <Image
-                              src={APP_MARKETING_IMAGE[app.id]}
-                              alt=""
-                              fill
-                              className="object-cover"
-                              sizes="72px"
-                            />
-                          </span>
-                          <span className="min-w-0 flex-1">
-                            <span className="block text-sm font-semibold text-[#021d33]">{app.shortName}</span>
-                            <span className="block truncate text-xs text-slate-500">{app.tagline}</span>
-                            <span className="mt-0.5 block text-[11px] font-semibold text-[#005B96]">{app.priceNote}</span>
-                          </span>
-                        </div>
-                        <div className="mt-2 flex flex-wrap gap-2 px-1">
-                          <Link href={app.marketingPath} className="text-[11px] font-semibold text-[#005B96] hover:underline">
-                            Více →
-                          </Link>
-                          <Link href={app.pricingPath ?? "/mediktor/ceny"} className="text-[11px] font-semibold text-[#005B96] hover:underline">
-                            Ceník →
-                          </Link>
-                          <AppOpenLink href={app.appPath} className="text-[11px] text-slate-500 hover:underline">
-                            Aplikace
-                          </AppOpenLink>
-                        </div>
-                      </div>
-                    ) : (
-                      <AppOpenLink
-                        href={app.appPath}
-                        className="flex items-center gap-3 rounded-md p-1.5 hover:bg-slate-50"
-                      >
+                    <div className="rounded-md p-1.5 hover:bg-slate-50">
+                      <Link href={app.marketingPath} className="flex items-center gap-3">
                         <span className="relative h-12 w-[4.5rem] shrink-0 overflow-hidden rounded-md bg-slate-100">
                           <Image
                             src={APP_MARKETING_IMAGE[app.id]}
@@ -291,10 +258,23 @@ export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
                         <span className="min-w-0 flex-1">
                           <span className="block text-sm font-semibold text-[#021d33]">{app.shortName}</span>
                           <span className="block truncate text-xs text-slate-500">{app.tagline}</span>
+                          <span className="mt-0.5 block text-[11px] font-semibold text-[#005B96]">{app.priceNote}</span>
                         </span>
-                        <span className="text-xs font-semibold text-[#005B96]">nová karta</span>
-                      </AppOpenLink>
-                    )}
+                      </Link>
+                      <div className="mt-2 flex flex-wrap gap-2 px-1">
+                        <Link href={app.marketingPath} className="text-[11px] font-semibold text-[#005B96] hover:underline">
+                          Více →
+                        </Link>
+                        {app.pricingPath ? (
+                          <Link href={app.pricingPath} className="text-[11px] font-semibold text-[#005B96] hover:underline">
+                            Ceník →
+                          </Link>
+                        ) : null}
+                        <AppOpenLink href={app.appPath} className="text-[11px] text-slate-500 hover:underline">
+                          Aplikace
+                        </AppOpenLink>
+                      </div>
+                    </div>
                   </li>
                 ))}
               </ul>
