@@ -21,6 +21,7 @@ const staticRoutes: MetadataRoute.Sitemap = [
   { url: `${base}/mediprep/stahnout`, changeFrequency: "monthly", priority: 0.8 },
   { url: `${base}/app/priprava`, changeFrequency: "weekly", priority: 0.9 },
   { url: `${base}/mediktor`, changeFrequency: "weekly", priority: 0.95 },
+  { url: `${base}/mediktor/ceny`, changeFrequency: "weekly", priority: 0.9 },
   { url: `${base}/mediktor/stahnout`, changeFrequency: "monthly", priority: 0.85 },
   { url: `${base}/app/mediktor`, changeFrequency: "weekly", priority: 0.85 },
   { url: `${base}/dashboard`, changeFrequency: "weekly", priority: 0.8 },

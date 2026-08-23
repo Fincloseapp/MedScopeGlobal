@@ -14,8 +14,14 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/contact",
 });
 
-export default function ContactPage() {
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ predmet?: string; zprava?: string }>;
+}) {
   const entity = getLegalEntity();
+  const params = searchParams ? await searchParams : {};
+  const defaultMessage = [params.predmet, params.zprava].filter(Boolean).join("\n\n");
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -192,6 +198,7 @@ export default function ContactPage() {
               title="Obecný dotaz"
               description="Napište nám, pokud potřebujete informace o obsahu, spolupráci nebo publikaci."
               destination="info@medscopeglobal.com"
+              defaultMessage={defaultMessage || undefined}
             />
             <ContactForm
               kind="partner"

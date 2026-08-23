@@ -71,6 +71,11 @@ export async function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/mediktor/ceny" className="hover:text-foreground">
+                Ceník MeDiktor
+              </Link>
+            </li>
+            <li>
               <Link href="/app/mediktor" className="hover:text-foreground">
                 MeDiktor
               </Link>

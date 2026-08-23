@@ -13,6 +13,7 @@ export type AppProduct = {
   priceMonthlyCzk: number;
   priceNote: string;
   marketingPath: string;
+  pricingPath?: string;
   downloadPath: string;
   appPath: string;
   manifest: string;
@@ -94,6 +95,7 @@ export const MEDIKTOR_APP: AppProduct = {
   priceMonthlyCzk: 390,
   priceNote: "390 Kč/měsíc · 14 dní zdarma · stejná práva jako tarif Lékař",
   marketingPath: "/mediktor",
+  pricingPath: "/mediktor/ceny",
   downloadPath: "/mediktor/stahnout",
   appPath: "/app/mediktor",
   manifest: "/mediktor-manifest.json",

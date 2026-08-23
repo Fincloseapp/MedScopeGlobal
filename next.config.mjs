@@ -100,6 +100,7 @@ const nextConfig = {
       { source: "/lekari/dokumentace/:path*", destination: "/mediktor", permanent: true },
       { source: "/lekari/mediktor", destination: "/mediktor", permanent: true },
       { source: "/lekari/mediktor/:path*", destination: "/mediktor/:path*", permanent: true },
+      { source: "/mediktor/cenik", destination: "/mediktor/ceny", permanent: true },
       { source: "/dokumentace-manifest.json", destination: "/mediktor-manifest.json", permanent: true },
       { source: "/sw-dokumentace.js", destination: "/sw-mediktor.js", permanent: true },
 

@@ -28,6 +28,7 @@ export const MEDIKTOR = {
   },
   routes: {
     marketing: "/mediktor",
+    pricing: "/mediktor/ceny",
     app: "/app/mediktor",
     contact: "/kontakt",
   },

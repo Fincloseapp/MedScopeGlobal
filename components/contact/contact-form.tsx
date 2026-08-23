@@ -12,11 +12,13 @@ export function ContactForm({
   title,
   description,
   destination,
+  defaultMessage,
 }: {
   kind: "general" | "partner";
   title: string;
   description: string;
   destination: string;
+  defaultMessage?: string;
 }) {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -110,7 +112,14 @@ export function ContactForm({
 
       <div className="space-y-2">
         <Label htmlFor={`${kind}-message`}>Zpráva</Label>
-        <Textarea id={`${kind}-message`} name="message" required rows={5} placeholder="Popište vaši potřebu..." />
+        <Textarea
+          id={`${kind}-message`}
+          name="message"
+          required
+          rows={5}
+          placeholder="Popište vaši potřebu..."
+          defaultValue={defaultMessage}
+        />
       </div>
 
       <Button type="submit" disabled={submitting} className="w-full bg-[#005B96] hover:bg-[#004874]">

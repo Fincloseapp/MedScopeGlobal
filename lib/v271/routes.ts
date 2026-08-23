@@ -164,6 +164,11 @@ export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
         description: "AI zapisovatel — nahrávka → český zápis podle šablony",
       },
       {
+        label: "Ceník MeDiktor",
+        href: "/mediktor/ceny",
+        description: "390 Kč/měsíc · ambulance · nemocnice",
+      },
+      {
         label: "Aplikace Dokumentace",
         href: "/app/mediktor",
         description: "Stáhnout PWA — zápisy bez marketingového chrome",

@@ -22,7 +22,7 @@ export const MEDIKTOR_MARKETING = {
       label: "Jak to funguje",
       href: `${MEDIKTOR.routes.marketing}#jak-to-funguje`,
     },
-    ctaPricing: { label: "390 Kč / měsíc", href: "/predplatne#dokumentace" },
+    ctaPricing: { label: "Ceník od 390 Kč", href: "/mediktor/ceny" },
     ctaApp: { label: "Otevřít aplikaci", href: MEDIKTOR.routes.app },
   },
 
@@ -103,8 +103,10 @@ export const MEDIKTOR_MARKETING = {
       "14 dní zkušební období · ročně 3900 Kč",
     ],
     trialLabel: "Začít 14 dní zdarma",
-    altLinkLabel: "Lékař v praxi za 490 Kč",
-    altLinkHref: "/predplatne#physician",
+    altLinkLabel: "Celý ceník MeDiktor",
+    altLinkHref: "/mediktor/ceny",
+    fullPricingHref: "/mediktor/ceny",
+    fullPricingLabel: "Zobrazit všechny tarify",
   },
 
   workflowStrip: {
@@ -139,8 +141,8 @@ export const MEDIKTOR_MARKETING = {
   hospitals: {
     title: "Pro týmy a pracoviště",
     text:
-      "Hromadné nasazení, zaškolení ordinace a individuální podmínky pro více lékařů — napište nám.",
-    cta: { label: "Kontakt pro pracoviště", href: MEDIKTOR.routes.contact },
+      "Hromadné nasazení, zaškolení ordinace a individuální podmínky pro více lékařů — viz ceník nebo napište nám.",
+    cta: { label: "Ceník pro pracoviště", href: "/mediktor/ceny#practice" },
   },
 
   account: {
@@ -148,6 +150,7 @@ export const MEDIKTOR_MARKETING = {
     text: "Správa účtu, ověření lékaře, instalace PWA a stav předplatného — v aplikaci MeDiktor nebo na stránce předplatného.",
     links: [
       { label: "Účet v MeDiktoru", href: "/app/mediktor?tab=ucet" },
+      { label: "Ceník MeDiktor", href: "/mediktor/ceny" },
       { label: "Předplatné MeDiktor", href: "/predplatne#dokumentace" },
       { label: "Ověření lékaře", href: "/academy/lekari/overeni" },
     ],
@@ -212,6 +215,7 @@ export const MEDIKTOR_MARKETING = {
 
   footerCta: {
     priceLine: `${MEDIKTOR.priceMonthlyCzk} Kč/měsíc včetně balíčku Lékař · 14 dní trial · demo 3 zápisy/den po přihlášení`,
-    subscribeHref: "/predplatne#dokumentace",
+    subscribeHref: "/mediktor/ceny",
+    subscribeLabel: "Zobrazit ceník",
   },
 } as const;

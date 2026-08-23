@@ -82,6 +82,14 @@ export default function AplikaceHubPage() {
                   >
                     Jak to funguje
                   </Link>
+                  {app.pricingPath ? (
+                    <Link
+                      href={app.pricingPath}
+                      className="rounded-full border border-[#005B96]/30 px-4 py-2 text-sm font-semibold text-[#005B96]"
+                    >
+                      Ceník
+                    </Link>
+                  ) : null}
                 </div>
               </div>
             </div>

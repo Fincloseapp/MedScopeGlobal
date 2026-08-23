@@ -9,4 +9,10 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/kontakt",
 });
 
-export default ContactPage;
+export default function KontaktPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ predmet?: string; zprava?: string }>;
+}) {
+  return <ContactPage searchParams={searchParams} />;
+}

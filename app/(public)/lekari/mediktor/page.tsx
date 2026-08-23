@@ -200,7 +200,7 @@ export default function LekariMediktorPage() {
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p className="text-sm leading-6 text-[#021d33]">{m.footerCta.priceLine}</p>
           <Button asChild className="shrink-0 rounded-full bg-[#005B96]">
-            <Link href={m.footerCta.subscribeHref}>Zobrazit předplatné</Link>
+            <Link href={m.footerCta.subscribeHref}>{m.footerCta.subscribeLabel}</Link>
           </Button>
         </div>
       </section>

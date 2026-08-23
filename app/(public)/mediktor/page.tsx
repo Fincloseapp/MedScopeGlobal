@@ -195,11 +195,10 @@ export default function MediktorHubPage() {
               label={`${pricing.trialLabel} — ${MEDIKTOR.priceMonthlyCzk} Kč`}
             />
             <p className="text-center text-xs text-slate-500">
-              Nebo{" "}
-              <Link href={pricing.altLinkHref} className="text-[#005B96] underline">
-                {pricing.altLinkLabel}
+              <Link href={pricing.fullPricingHref} className="font-medium text-[#005B96] underline">
+                {pricing.fullPricingLabel}
               </Link>
-              {" — MeDiktor je levnější vstup se stejnými právy."}
+              {" — tarify pro ambulance a nemocnice."}
             </p>
           </div>
         </div>
@@ -245,7 +244,7 @@ export default function MediktorHubPage() {
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p className="text-sm leading-6 text-[#021d33]">{m.footerCta.priceLine}</p>
           <Button asChild className="shrink-0 rounded-full bg-[#005B96]">
-            <Link href={m.footerCta.subscribeHref}>Zobrazit předplatné</Link>
+            <Link href={m.footerCta.subscribeHref}>{m.footerCta.subscribeLabel}</Link>
           </Button>
         </div>
       </section>
