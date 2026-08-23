@@ -5,8 +5,10 @@ import Link from "next/link";
 import { Copy, Download, Loader2, Share2, RefreshCw, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
+  clinicianVisibleNote,
   downloadMediktorDoc,
   downloadMediktorPdf,
+  downloadMediktorTxt,
   shareMediktorDoc,
 } from "@/components/lekari/mediktor-export";
 
@@ -64,7 +66,7 @@ export function DokAppHistory() {
 
   async function copyText(text: string) {
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(clinicianVisibleNote(text));
       setFlash(true);
       window.setTimeout(() => setFlash(false), 1400);
     } catch {
@@ -198,6 +200,21 @@ Lékař schvaluje finální znění. MeDiktor není zdravotnický prostředek.`}
                   variant="outline"
                   className="h-8 rounded-full"
                   onClick={() =>
+                    void downloadMediktorPdf(item.note, {
+                      title: item.title || "MeDiktor zápis",
+                      templateId: item.template_id,
+                    })
+                  }
+                >
+                  <Download className="mr-1 h-3.5 w-3.5" />
+                  PDF
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 rounded-full"
+                  onClick={() =>
                     void downloadMediktorDoc(item.note, {
                       title: item.title || "MeDiktor zápis",
                       templateId: item.template_id,
@@ -213,19 +230,19 @@ Lékař schvaluje finální znění. MeDiktor není zdravotnický prostředek.`}
                   variant="outline"
                   className="h-8 rounded-full"
                   onClick={() =>
-                    downloadMediktorPdf(item.note, {
+                    void downloadMediktorTxt(item.note, {
                       title: item.title || "MeDiktor zápis",
                       templateId: item.template_id,
                     })
                   }
                 >
                   <Download className="mr-1 h-3.5 w-3.5" />
-                  PDF
+                  TXT
                 </Button>
               </div>
               {selected?.id === item.id ? (
                 <pre className="mt-3 max-h-64 overflow-auto whitespace-pre-wrap rounded-xl bg-[#f4f9fc] p-3 text-xs leading-5 text-[#021d33]">
-                  {item.note}
+                  {clinicianVisibleNote(item.note)}
                 </pre>
               ) : null}
             </li>

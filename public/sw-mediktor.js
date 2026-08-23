@@ -1,5 +1,5 @@
 /* MedScope MeDiktor PWA service worker */
-const CACHE_NAME = 'msg-mediktor-v1';
+const CACHE_NAME = 'msg-mediktor-v2';
 const SHELL = [
   '/app/mediktor',
   '/mediktor-manifest.json',

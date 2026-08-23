@@ -354,12 +354,16 @@ export function attachAnamnesisJson(report: string, record: AnamnesisRecord): st
 
 export function stripAnamnesisMachineBlock(text: string): string {
   if (!text) return "";
-  return text
-    .replace(
-      new RegExp(`${escapeReg(JSON_OPEN)}[\\s\\S]*?${escapeReg(JSON_CLOSE)}`, "g"),
-      ""
-    )
+  let out = text.replace(
+    new RegExp(`${escapeReg(JSON_OPEN)}[\\s\\S]*?${escapeReg(JSON_CLOSE)}\\s*`, "g"),
+    ""
+  );
+  // Truncated / missing close marker — never leak machine JSON to clinicians
+  const openIdx = out.indexOf(JSON_OPEN);
+  if (openIdx >= 0) out = out.slice(0, openIdx);
+  return out
     .replace(/<!--\s*mediktor-anamnesis[\s\S]*?-->/gi, "")
+    .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
 

@@ -23,6 +23,7 @@ import {
 export const DOCX_MIME =
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 export const PDF_MIME = "application/pdf";
+export const TXT_MIME = "text/plain;charset=utf-8";
 
 function xmlEscape(value: string): string {
   return value
@@ -35,10 +36,20 @@ function xmlEscape(value: string): string {
 export function exportPlainLines(note: string, title: string): string[] {
   const visible = stripAnamnesisMachineBlock(note);
   const body = looksLikeAnamnesisNote(note)
-    ? renderAnamnesisReport(parseAnamnesisFromNote(note))
+    ? stripAnamnesisMachineBlock(renderAnamnesisReport(parseAnamnesisFromNote(note)))
     : visible;
   const lines = [title.trim() || "MeDiktor zápis", "", ...body.split(/\r?\n/)];
-  return lines.map((l) => l.replace(/\u0000/g, "")).filter((l, i, arr) => !(l === "" && arr[i - 1] === ""));
+  return lines
+    .map((l) => l.replace(/\u0000/g, ""))
+    .filter((l, i, arr) => !(l === "" && arr[i - 1] === ""))
+    .filter((l) => !l.includes("MEDIKTOR_ANAMNESIS_JSON") && !l.includes("<<<MEDIKTOR"));
+}
+
+/** UTF-8 plain text — most reliable open-on-mobile fallback. */
+export function buildMediktorTxtBytes(note: string, title = "MeDiktor zápis"): Uint8Array {
+  const text = exportPlainLines(note, title).join("\n");
+  // UTF-8 without BOM — BOM sometimes confuses mobile text viewers as binary
+  return new TextEncoder().encode(text.endsWith("\n") ? text : `${text}\n`);
 }
 
 function resolveExport(note: string, title: string): AnamnesisExportDocument | { plain: string[] } {
@@ -525,16 +536,17 @@ export function buildMediktorPdfBytes(
     `${fontBold} 0 obj<< /Type /Font /Subtype /Type1 /BaseFont /Times-Bold /Encoding /WinAnsiEncoding >>endobj`
   );
 
-  const header = "%PDF-1.4\n%\xE2\xE3\xCF\xD3\n";
+  // Binary comment must be raw high bytes (not UTF-8-encoded Latin-1 via TextEncoder).
   const chunks: Uint8Array[] = [];
   const offsets = [0];
   let sizeSoFar = 0;
-  const push = (s: string) => {
-    const buf = utf8Bytes(s);
+  const pushBytes = (buf: Uint8Array) => {
     chunks.push(buf);
     sizeSoFar += buf.length;
   };
-  push(header);
+  const push = (s: string) => pushBytes(utf8Bytes(s));
+  push("%PDF-1.4\n%");
+  pushBytes(new Uint8Array([0xe2, 0xe3, 0xcf, 0xd3, 0x0a]));
   for (const obj of objects) {
     offsets.push(sizeSoFar);
     push(`${obj}\n`);

@@ -35,8 +35,10 @@ import {
   uploadAndTranscribePhoneFile,
 } from "@/components/lekari/mediktor-audio";
 import {
+  clinicianVisibleNote,
   downloadMediktorDoc,
   downloadMediktorPdf,
+  downloadMediktorTxt,
   shareMediktorDoc,
 } from "@/components/lekari/mediktor-export";
 
@@ -599,7 +601,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
   async function copyText(text: string) {
     if (!text) return;
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(clinicianVisibleNote(text));
       setCopyFlash(true);
       window.setTimeout(() => setCopyFlash(false), 1600);
     } catch {
@@ -663,7 +665,15 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
 
   function downloadNotePdf() {
     if (!note) return;
-    downloadMediktorPdf(note, {
+    void downloadMediktorPdf(note, {
+      title: "MeDiktor · klinický zápis",
+      templateId,
+    });
+  }
+
+  function downloadNoteTxt() {
+    if (!note) return;
+    void downloadMediktorTxt(note, {
       title: "MeDiktor · klinický zápis",
       templateId,
     });
@@ -974,6 +984,16 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                   type="button"
                   size="sm"
                   variant="outline"
+                  onClick={downloadNotePdf}
+                  disabled={!note}
+                >
+                  <Download className="mr-1.5 h-3.5 w-3.5" />
+                  PDF
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
                   onClick={downloadNoteDocx}
                   disabled={!note}
                 >
@@ -984,11 +1004,11 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                   type="button"
                   size="sm"
                   variant="outline"
-                  onClick={downloadNotePdf}
+                  onClick={downloadNoteTxt}
                   disabled={!note}
                 >
                   <Download className="mr-1.5 h-3.5 w-3.5" />
-                  PDF
+                  TXT
                 </Button>
               </div>
             </div>
