@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import { APP_PRODUCTS } from "@/lib/apps/catalog";
-import { V271_AUDIENCES, V271_SOCIAL_PROOF_STATS } from "@/lib/v271/homepage";
+import { V271_AUDIENCES, V271_DOKUMENTACE_APP, V271_SOCIAL_PROOF_STATS } from "@/lib/v271/homepage";
 import {
   getPortalNewsNote,
   PORTAL_NEWS_TABS,
@@ -181,6 +181,57 @@ export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
           </ul>
         </nav>
 
+        <section
+          aria-label="MeDiktor pro lékaře"
+          className="mt-3 overflow-hidden rounded-lg border border-[#005B96]/25 bg-gradient-to-r from-[#021d33] via-[#005B96] to-[#0a7ab8] shadow-sm"
+        >
+          <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+            <div className="flex items-start gap-4">
+              <Image
+                src="/assets/mediktor/icon-192.png"
+                alt=""
+                width={64}
+                height={64}
+                className="shrink-0 rounded-[22%] ring-2 ring-white/20"
+              />
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-sky-200">
+                  {V271_DOKUMENTACE_APP.eyebrow}
+                </p>
+                <h2 className="mt-1 font-display text-xl font-bold text-white sm:text-2xl">
+                  {V271_DOKUMENTACE_APP.title}
+                </h2>
+                <p className="mt-1 max-w-2xl text-sm leading-relaxed text-sky-100/95">
+                  {V271_DOKUMENTACE_APP.description}
+                </p>
+                <p className="mt-2 text-sm font-semibold text-white">
+                  {V271_DOKUMENTACE_APP.price} · {V271_DOKUMENTACE_APP.trial}
+                </p>
+              </div>
+            </div>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              <Link
+                href={V271_DOKUMENTACE_APP.href}
+                className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#021d33] hover:bg-sky-50"
+              >
+                Více o MeDiktoru
+              </Link>
+              <Link
+                href={V271_DOKUMENTACE_APP.pricingHref}
+                className="rounded-full border border-white/40 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+              >
+                Ceník od 390 Kč
+              </Link>
+              <AppOpenLink
+                href={V271_DOKUMENTACE_APP.appHref}
+                className="rounded-full border border-white/25 px-4 py-2 text-sm font-semibold text-sky-100 hover:bg-white/5"
+              >
+                Otevřít aplikaci
+              </AppOpenLink>
+            </div>
+          </div>
+        </section>
+
         <WriterAgentsStrip />
 
         <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -193,25 +244,57 @@ export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
               <ul className="space-y-2">
                 {APP_PRODUCTS.map((app) => (
                   <li key={app.id}>
+                    {app.id === "mediktor" ? (
+                      <div className="rounded-md p-1.5 hover:bg-slate-50">
+                        <div className="flex items-center gap-3">
+                          <span className="relative h-12 w-[4.5rem] shrink-0 overflow-hidden rounded-md bg-slate-100">
+                            <Image
+                              src={APP_MARKETING_IMAGE[app.id]}
+                              alt=""
+                              fill
+                              className="object-cover"
+                              sizes="72px"
+                            />
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-sm font-semibold text-[#021d33]">{app.shortName}</span>
+                            <span className="block truncate text-xs text-slate-500">{app.tagline}</span>
+                            <span className="mt-0.5 block text-[11px] font-semibold text-[#005B96]">{app.priceNote}</span>
+                          </span>
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-2 px-1">
+                          <Link href={app.marketingPath} className="text-[11px] font-semibold text-[#005B96] hover:underline">
+                            Více →
+                          </Link>
+                          <Link href={app.pricingPath ?? "/mediktor/ceny"} className="text-[11px] font-semibold text-[#005B96] hover:underline">
+                            Ceník →
+                          </Link>
+                          <AppOpenLink href={app.appPath} className="text-[11px] text-slate-500 hover:underline">
+                            Aplikace
+                          </AppOpenLink>
+                        </div>
+                      </div>
+                    ) : (
                       <AppOpenLink
                         href={app.appPath}
                         className="flex items-center gap-3 rounded-md p-1.5 hover:bg-slate-50"
                       >
-                      <span className="relative h-12 w-[4.5rem] shrink-0 overflow-hidden rounded-md bg-slate-100">
-                        <Image
-                          src={APP_MARKETING_IMAGE[app.id]}
-                          alt=""
-                          fill
-                          className="object-cover"
-                          sizes="72px"
-                        />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-semibold text-[#021d33]">{app.shortName}</span>
-                        <span className="block truncate text-xs text-slate-500">{app.tagline}</span>
-                      </span>
-                      <span className="text-xs font-semibold text-[#005B96]">nová karta</span>
-                    </AppOpenLink>
+                        <span className="relative h-12 w-[4.5rem] shrink-0 overflow-hidden rounded-md bg-slate-100">
+                          <Image
+                            src={APP_MARKETING_IMAGE[app.id]}
+                            alt=""
+                            fill
+                            className="object-cover"
+                            sizes="72px"
+                          />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-semibold text-[#021d33]">{app.shortName}</span>
+                          <span className="block truncate text-xs text-slate-500">{app.tagline}</span>
+                        </span>
+                        <span className="text-xs font-semibold text-[#005B96]">nová karta</span>
+                      </AppOpenLink>
+                    )}
                   </li>
                 ))}
               </ul>

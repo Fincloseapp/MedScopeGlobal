@@ -142,12 +142,20 @@ export function V272DokumentaceAppBlock() {
               14 dní zdarma.
             </p>
           </div>
-          <Link
-            href={V271_DOKUMENTACE_APP.href}
-            className="inline-flex h-11 shrink-0 items-center justify-center rounded-full border border-[#005B96]/30 bg-white px-5 text-sm font-semibold text-[#005B96] hover:bg-[#005B96]/5"
-          >
-            Detail pro lékaře →
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href={V271_DOKUMENTACE_APP.href}
+              className="inline-flex h-11 shrink-0 items-center justify-center rounded-full bg-[#005B96] px-5 text-sm font-semibold text-white hover:bg-[#004a7a]"
+            >
+              Více o MeDiktoru →
+            </Link>
+            <Link
+              href={V271_DOKUMENTACE_APP.pricingHref}
+              className="inline-flex h-11 shrink-0 items-center justify-center rounded-full border border-[#005B96]/30 bg-white px-5 text-sm font-semibold text-[#005B96] hover:bg-[#005B96]/5"
+            >
+              Ceník od 390 Kč
+            </Link>
+          </div>
         </div>
         <DokumentaceDownloadPanel variant="homepage" />
       </div>
@@ -457,6 +465,20 @@ export function V272AppsTrioBlock() {
                 >
                   Otevřít
                 </AppOpenLink>
+                <Link
+                  href={app.marketingPath}
+                  className="rounded-full border border-[#005B96]/30 px-4 py-2 text-sm font-semibold text-[#005B96]"
+                >
+                  Více
+                </Link>
+                {app.pricingPath ? (
+                  <Link
+                    href={app.pricingPath}
+                    className="rounded-full border border-[#005B96]/30 px-4 py-2 text-sm font-semibold text-[#005B96]"
+                  >
+                    Ceník
+                  </Link>
+                ) : null}
                 <Link
                   href={app.downloadPath}
                   className="rounded-full border border-[#005B96]/30 px-4 py-2 text-sm font-semibold text-[#005B96]"

@@ -115,8 +115,8 @@ export const V271_AUDIENCES = [
       "MeDiktor napíše zápis z diktátu v telefonu. K tomu guidelines, studie a Research Hub.",
     topics: ["guidelines", "MeDiktor", "CME", "studie", "Research Hub"],
     href: "/lekari",
-    ctaPrimary: { label: "Stáhnout MeDiktor", href: "/app/mediktor" },
-    ctaSecondary: { label: "Více o MeDiktoru", href: "/mediktor" },
+    ctaPrimary: { label: "Více o MeDiktoru", href: "/mediktor" },
+    ctaSecondary: { label: "Ceník od 390 Kč", href: "/mediktor/ceny" },
   },
 ] as const;
 
@@ -127,8 +127,10 @@ export const V271_DOKUMENTACE_APP = {
   description:
     "Diktát do telefonu, nebo nahrávka konzultace s pacientem či pacientkou → odborná anamnéza a klinický zápis. Stažení pro ověřené lékaře, účet MedScopeGlobal.",
   href: "/mediktor",
+  pricingHref: "/mediktor/ceny",
   appHref: "/app/mediktor",
   price: "390 Kč / měsíc",
+  trial: "14 dní zdarma",
 } as const;
 
 export const V271_B2B = {
