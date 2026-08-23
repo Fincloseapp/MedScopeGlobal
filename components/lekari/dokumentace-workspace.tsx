@@ -7,6 +7,7 @@ import {
   Download,
   History,
   Loader2,
+  Laptop,
   Mic,
   Pause,
   Share2,
@@ -78,14 +79,31 @@ function isMobileClient(): boolean {
 }
 
 const CONSENT_KEY = "mediktor_consent_v1";
+const INPUT_DEVICE_KEY = "mediktor_input_device_v1";
 
-function micErrorMessage(err: unknown): string {
-  const name = err && typeof err === "object" && "name" in err ? String((err as { name: string }).name) : "";
+type InputDevice = "mobile" | "computer";
+
+function micErrorMessage(err: unknown, device: InputDevice): string {
+  const name =
+    err && typeof err === "object" && "name" in err
+      ? String((err as { name: string }).name)
+      : "";
+  const onPc = device === "computer";
+
   if (name === "NotAllowedError" || name === "PermissionDeniedError") {
-    return "Mikrofon je zablokovaný. V telefonu: Nastavení → MeDiktor / Safari / Chrome → Mikrofon → Povolit, pak znovu klepněte na „Povolit mikrofon“.";
+    return onPc
+      ? "Mikrofon je zablokovaný. V prohlížeči klepněte na ikonu zámku u adresy → Mikrofon → Povolit, pak znovu „Povolit mikrofon“."
+      : "Mikrofon je zablokovaný. V telefonu: Nastavení → MeDiktor / Safari / Chrome → Mikrofon → Povolit, pak znovu klepněte na „Povolit mikrofon“.";
   }
   if (name === "NotFoundError") {
-    return "Mikrofon nebyl nalezen. Zkontrolujte, že zařízení má mikrofon a není používán jinou aplikací.";
+    return onPc
+      ? "Mikrofon nebyl nalezen. Zapojte headset / notebookový mikrofon a zkontrolujte, že ho nepoužívá jiná aplikace (Teams, Zoom)."
+      : "Mikrofon nebyl nalezen. Zkontrolujte, že zařízení má mikrofon a není používán jinou aplikací.";
+  }
+  if (name === "NotSupportedError") {
+    return onPc
+      ? "Tento prohlížeč nepodporuje nahrávání. Použijte Chrome / Edge, nebo „Nahrát soubor z PC“."
+      : "Tento prohlížeč nepodporuje nahrávání. Aktualizujte telefon, nebo nahrajte soubor z diktafonu.";
   }
   return "Nepodařilo se získat mikrofon. Povolte přístup a zkuste znovu.";
 }
@@ -131,6 +149,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
   const [historyOpen, setHistoryOpen] = useState(false);
   const [copyFlash, setCopyFlash] = useState(false);
   const [showInstallTip, setShowInstallTip] = useState(false);
+  const [inputDevice, setInputDevice] = useState<InputDevice>("computer");
   const [micReady, setMicReady] = useState(false);
   const [micBusy, setMicBusy] = useState(false);
   const [segmentCount, setSegmentCount] = useState(0);
@@ -154,8 +173,31 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
   }, [paused]);
 
   useEffect(() => {
-    setShowInstallTip(isMobileClient());
+    const mobile = isMobileClient();
+    setShowInstallTip(mobile);
+    try {
+      const saved = window.localStorage.getItem(INPUT_DEVICE_KEY);
+      if (saved === "mobile" || saved === "computer") {
+        setInputDevice(saved);
+        return;
+      }
+    } catch {
+      /* ignore */
+    }
+    setInputDevice(mobile ? "mobile" : "computer");
   }, []);
+
+  function chooseInputDevice(next: InputDevice) {
+    if (state === "recording" || state === "processing") return;
+    setInputDevice(next);
+    setShowInstallTip(next === "mobile");
+    setError(null);
+    try {
+      window.localStorage.setItem(INPUT_DEVICE_KEY, next);
+    } catch {
+      /* ignore */
+    }
+  }
 
   const stopTracks = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -278,7 +320,11 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     setGateHint(null);
     setSavedInAccount(false);
 
-    const source = isApp ? "pwa" : isMobileClient() ? "mobile" : "web";
+    const source = isApp
+      ? "pwa"
+      : inputDevice === "mobile"
+        ? "mobile"
+        : "web";
     const parts: string[] = [];
     const providers: string[] = [];
 
@@ -386,7 +432,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       if (!consent) setConsent(true);
     } catch (err) {
       setMicReady(false);
-      setError(micErrorMessage(err));
+      setError(micErrorMessage(err, inputDevice));
       setState("error");
     } finally {
       setMicBusy(false);
@@ -486,7 +532,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         }
       }, 200);
     } catch (err) {
-      setError(micErrorMessage(err));
+      setError(micErrorMessage(err, inputDevice));
       setMicReady(false);
       setState("error");
     }
@@ -544,7 +590,11 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     setSavedInAccount(false);
     setState("processing");
 
-    const source = isApp ? "pwa-file" : isMobileClient() ? "mobile-file" : "web-file";
+    const source = isApp
+      ? "pwa-file"
+      : inputDevice === "mobile"
+        ? "mobile-file"
+        : "web-file";
 
     try {
       if (file.size > MEDIKTOR_MAX_FILE_BYTES) {
@@ -681,10 +731,11 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
 
   const recording = state === "recording";
   const processing = state === "processing";
+  const onComputer = inputDevice === "computer";
 
   return (
     <div className={isApp ? "space-y-4 pb-2" : "space-y-6 pb-24 sm:pb-0"}>
-      {!isApp && showInstallTip ? (
+      {!isApp && showInstallTip && !onComputer ? (
         <div className="flex gap-3 rounded-xl border border-[#cfe1f3] bg-[#eef6fb] px-4 py-3 text-sm text-[#021d33]">
           <Smartphone className="mt-0.5 h-5 w-5 shrink-0 text-[#005B96]" />
           <div>
@@ -698,7 +749,61 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       ) : null}
 
       <div className="rounded-2xl border border-[#cfe1f3] bg-white p-5 sm:p-6 shadow-[0_12px_30px_-24px_rgba(0,91,150,0.55)]">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#005B96]">
+            Odkud nahráváte?
+          </p>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              disabled={recording || processing}
+              onClick={() => chooseInputDevice("mobile")}
+              className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-left transition ${
+                inputDevice === "mobile"
+                  ? "border-[#005B96] bg-[#eef6fb] shadow-sm"
+                  : "border-[#d9e8f4] bg-white hover:border-[#005B96]/40"
+              } disabled:opacity-60`}
+            >
+              <Smartphone
+                className={`mt-0.5 h-5 w-5 shrink-0 ${
+                  inputDevice === "mobile" ? "text-[#005B96]" : "text-slate-400"
+                }`}
+              />
+              <span>
+                <span className="block text-sm font-semibold text-[#021d33]">Mobil</span>
+                <span className="mt-0.5 block text-xs leading-5 text-slate-500">
+                  Telefon u lůžka / ambulanci — mikrofon v mobilu
+                </span>
+              </span>
+            </button>
+            <button
+              type="button"
+              disabled={recording || processing}
+              onClick={() => chooseInputDevice("computer")}
+              className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-left transition ${
+                onComputer
+                  ? "border-[#005B96] bg-[#eef6fb] shadow-sm"
+                  : "border-[#d9e8f4] bg-white hover:border-[#005B96]/40"
+              } disabled:opacity-60`}
+            >
+              <Laptop
+                className={`mt-0.5 h-5 w-5 shrink-0 ${
+                  onComputer ? "text-[#005B96]" : "text-slate-400"
+                }`}
+              />
+              <span>
+                <span className="block text-sm font-semibold text-[#021d33]">
+                  Počítač / notebook
+                </span>
+                <span className="mt-0.5 block text-xs leading-5 text-slate-500">
+                  Mikrofon u PC, nebo nahrát hotový soubor z disku
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <label className="flex items-start gap-3 text-sm text-[#021d33] cursor-pointer">
             <input
               type="checkbox"
@@ -725,12 +830,18 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             ) : (
               <Mic className="mr-1.5 h-4 w-4" />
             )}
-            {micReady ? "Mikrofon povolen" : "1. Povolit mikrofon"}
+            {micReady
+              ? "Mikrofon povolen"
+              : onComputer
+                ? "1. Povolit mikrofon (PC)"
+                : "1. Povolit mikrofon"}
           </Button>
         </div>
 
         <p className="mt-3 text-xs leading-5 text-slate-500">
-          Postup: povolit mikrofon → nahrát v mobilu diktát nebo konzultaci s pacientem / pacientkou → Stop a zpracovat. Až 60 min (dělení po 2 min). Zápis se uloží do účtu.
+          {onComputer
+            ? "Postup na PC/notebooku: povolit mikrofon → diktovat headsetem, nebo „Nahrát soubor z PC“ (M4A, MP3, WAV, WEBM). Až 60 min. Zápis se uloží do účtu."
+            : "Postup v mobilu: povolit mikrofon → nahrát diktát nebo konzultaci → Stop a zpracovat. Až 60 min (dělení po 2 min). Zápis se uloží do účtu."}
         </p>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -842,11 +953,19 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                 <Mic className="mr-2 h-5 w-5" />
                 {micReady
                   ? mode === "consultation"
-                    ? "2. Nahrávat konzultaci"
-                    : "2. Diktovat"
+                    ? onComputer
+                      ? "2. Nahrávat konzultaci (PC)"
+                      : "2. Nahrávat konzultaci"
+                    : onComputer
+                      ? "2. Diktovat u PC"
+                      : "2. Diktovat"
                   : mode === "consultation"
-                    ? "Nahrávat konzultaci"
-                    : "Diktovat"}
+                    ? onComputer
+                      ? "Nahrávat konzultaci (PC)"
+                      : "Nahrávat konzultaci"
+                    : onComputer
+                      ? "Diktovat u PC"
+                      : "Diktovat"}
               </Button>
             ) : (
               <>
@@ -874,13 +993,15 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             <Button
               type="button"
               size="lg"
-              variant="outline"
-              className="h-12 rounded-full px-5"
+              variant={onComputer ? "default" : "outline"}
+              className={`h-12 rounded-full px-5 ${
+                onComputer ? "bg-[#021d33] text-white hover:bg-[#021d33]/90" : ""
+              }`}
               disabled={recording || processing}
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="mr-2 h-4 w-4" />
-              Nahrát soubor
+              {onComputer ? "Nahrát soubor z PC" : "Nahrát soubor"}
             </Button>
             <input
               ref={fileInputRef}
@@ -895,10 +1016,18 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             />
           </div>
         </div>
+        {onComputer && !recording && !processing ? (
+          <p className="mt-3 text-xs leading-5 text-slate-500">
+            Na notebooku můžete diktovat mikrofonem, nebo vybrat hotovou nahrávku z disku
+            (M4A, MP3, WAV, WEBM, OGG). Stejný účet jako na mobilu — zápisy se synchronizují.
+          </p>
+        ) : null}
         {processing ? (
           <p className="mt-3 flex items-center gap-2 text-sm text-slate-600">
             <Loader2 className="h-4 w-4 animate-spin text-[#005B96]" />
-            Odesílám a přepisuji nahrávku (včetně M4A z telefonu), pak sestavím zápis… Audio se neukládá trvale.
+            {onComputer
+              ? "Odesílám a přepisuji nahrávku z PC, pak sestavím zápis… Audio se neukládá trvale."
+              : "Odesílám a přepisuji nahrávku (včetně M4A z telefonu), pak sestavím zápis… Audio se neukládá trvale."}
           </p>
         ) : null}
       </div>
