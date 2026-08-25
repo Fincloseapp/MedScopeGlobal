@@ -47,6 +47,7 @@ import {
   ArticleShareButton,
   VipUpgradeNudge,
 } from "@/components/monetization/article-cta";
+import { ArticleTringeltTip } from "@/components/monetization/article-tringelt-tip";
 import { TopLongevityProducts } from "@/components/monetization/affiliate-box";
 import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
@@ -400,6 +401,19 @@ export default async function ArticlePage({ params }: Props) {
 
             {!locked ? (
               <ArticleCtaBlocks articleSlug={article.slug} articleTitle={article.title} />
+            ) : null}
+
+            {!locked ? (
+              <ArticleTringeltTip
+                articleSlug={article.slug}
+                articleTitle={article.title}
+                authorName={formatEditorialUnitDisplay(
+                  editorialAssignment.primary,
+                  editorialLocale,
+                  editorialAssignment.aiAssisted
+                )}
+                locale={(locale as GlobalLocaleCode) ?? "cs"}
+              />
             ) : null}
 
             {!locked ? (
