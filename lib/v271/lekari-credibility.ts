@@ -10,7 +10,7 @@ export const V271_LEKARI_CREDIBILITY = [
   },
   {
     id: "dokumentace",
-    title: "MeDiktor od MedScopeGlobal",
+    title: "OrdiZapis od MedScopeGlobal",
     description:
       "AI zapisovatel: nahrávání v mobilu — diktát nebo konzultace s pacientem/pacientkou → český přepis → strukturovaný zápis.",
     badge: "AI scribe",
@@ -40,7 +40,7 @@ export const V271_PHYSICIAN_TIER = {
     "Odborná sekce, guidelines a diagnostické algoritmy",
     "Kurátorované souhrny studií s DOI a PMID",
     "Klinický AI asistent a Research Hub",
-    "MeDiktor od MedScopeGlobal — nahrávání v mobilu → zápis",
+    "OrdiZapis od MedScopeGlobal — nahrávání v mobilu → zápis",
     "CME přehledy a prioritní notifikace novinek",
   ],
   comparisonNote:

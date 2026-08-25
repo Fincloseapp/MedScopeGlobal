@@ -83,7 +83,7 @@ export function V20MobileNav({
                 onClick={() => setOpen(false)}
                 className="rounded-lg bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#021d33]"
               >
-                MeDiktor
+                OrdiZapis
               </Link>
             </div>
           </div>

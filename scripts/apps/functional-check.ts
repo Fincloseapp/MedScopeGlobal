@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { APP_PRODUCTS, MEDIKTOR_APP, MEDIPACIENT, MEDIPREP } from "../../lib/apps/catalog";
+import { APP_PRODUCTS, ORDIZAPIS_APP, MEDIPACIENT, MEDIPREP } from "../../lib/apps/catalog";
 import { publicDemoDashboard } from "../../lib/medipacient/demo-dashboard";
 import { MEDIPACIENT_DEMO_REPORTS } from "../../lib/medipacient/demo-reports";
 import { parseReportText, documentFromUpload } from "../../lib/medipacient/parse-report";
@@ -25,10 +25,12 @@ function file(rel: string) {
 assert.equal(APP_PRODUCTS.length, 3, "three consumer apps");
 assert.equal(MEDIPACIENT.appPath, "/app/pacient");
 assert.equal(MEDIPREP.appPath, "/app/priprava");
-assert.equal(MEDIKTOR_APP.appPath, "/app/dokumentace");
+assert.equal(ORDIZAPIS_APP.shortName, "OrdiZapis");
+assert.equal(ORDIZAPIS_APP.id, "ordizapis");
+assert.equal(ORDIZAPIS_APP.appPath, "/app/dokumentace");
 assert.equal(MEDIPACIENT.manifest, "/medipacient-manifest.json");
 assert.equal(MEDIPREP.manifest, "/mediprep-manifest.json");
-assert.equal(MEDIKTOR_APP.manifest, "/dokumentace-manifest.json");
+assert.equal(ORDIZAPIS_APP.manifest, "/dokumentace-manifest.json");
 assert.equal(MEDIPACIENT.domain, "medscopeglobal.com");
 
 for (const app of APP_PRODUCTS) {

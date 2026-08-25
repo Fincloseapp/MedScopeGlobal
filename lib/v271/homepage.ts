@@ -5,7 +5,7 @@ export const V271_HERO = {
   eyebrow: "MedScopeGlobal.com · tři aplikace",
   claim: "Zprávy, přijímačky a zápisy — na ploše telefonu",
   subtitle:
-    "MeDipacient pro veřejnost, MeDiprep pro uchazeče o LF a MeDiktor pro ověřené lékaře. Stejné stažení jako u MeDiktoru. 14 dní zdarma.",
+    "MeDipacient pro veřejnost, MeDiprep pro uchazeče o LF a OrdiZapis pro ověřené lékaře. Stejné stažení jako u OrdiZapisu. 14 dní zdarma.",
 } as const;
 
 export const V271_HERO_CTAS = [
@@ -17,7 +17,7 @@ export const V271_HERO_CTAS = [
 export const V271_HERO_APP_CHIPS = [
   { label: "MeDipacient", href: "/app/pacient" },
   { label: "MeDiprep", href: "/app/priprava" },
-  { label: "MeDiktor", href: "/app/dokumentace" },
+  { label: "OrdiZapis", href: "/app/dokumentace" },
 ] as const;
 
 export const V271_SOCIAL_PROOF_STATS = [
@@ -58,7 +58,7 @@ export const V271_WHY_TRUST = [
   {
     title: "Tři aplikace, jedno prostředí",
     description:
-      "MeDipacient, MeDiprep a MeDiktor stáhnete na plochu telefonu. Zkušební dashboardy ukazují, co umí, ještě před předplatným.",
+      "MeDipacient, MeDiprep a OrdiZapis stáhnete na plochu telefonu. Zkušební dashboardy ukazují, co umí, ještě před předplatným.",
   },
   {
     title: "Evidence-based, ne clickbait",
@@ -112,18 +112,18 @@ export const V271_AUDIENCES = [
     id: "physician",
     label: "Lékaři",
     description:
-      "MeDiktor napíše zápis z diktátu v telefonu. K tomu guidelines, studie a Research Hub.",
-    topics: ["guidelines", "MeDiktor", "CME", "studie", "Research Hub"],
+      "OrdiZapis napíše zápis z diktátu v telefonu. K tomu guidelines, studie a Research Hub.",
+    topics: ["guidelines", "OrdiZapis", "CME", "studie", "Research Hub"],
     href: "/lekari",
-    ctaPrimary: { label: "Stáhnout MeDiktor", href: "/app/dokumentace" },
-    ctaSecondary: { label: "Více o MeDiktoru", href: "/lekari/dokumentace" },
+    ctaPrimary: { label: "Stáhnout OrdiZapis", href: "/app/dokumentace" },
+    ctaSecondary: { label: "Více o OrdiZapisu", href: "/lekari/dokumentace" },
   },
 ] as const;
 
-/** Homepage spotlight — installable physician MeDiktor app */
+/** Homepage spotlight — installable physician OrdiZapis app */
 export const V271_DOKUMENTACE_APP = {
   eyebrow: "Aplikace pro lékaře · medscopeglobal.com",
-  title: "MeDiktor — nahrávejte v mobilu, zápis je hotový",
+  title: "OrdiZapis — nahrávejte v mobilu, zápis je hotový",
   description:
     "Diktát do telefonu, nebo nahrávka konzultace s pacientem či pacientkou → odborná anamnéza a klinický zápis. Stažení pro ověřené lékaře, účet MedScopeGlobal.",
   href: "/lekari/dokumentace",
@@ -156,14 +156,14 @@ export const V271_AKTUALNI = {
 export const V271_SUBSCRIPTION_PLANS = V27_SUBSCRIPTION_PLANS;
 
 export const V271_FOOTER_TAGLINE =
-  "MeDipacient, MeDiprep a MeDiktor plus evidence-based obsah v češtině — pro veřejnost, studenty medicíny a lékaře.";
+  "MeDipacient, MeDiprep a OrdiZapis plus evidence-based obsah v češtině — pro veřejnost, studenty medicíny a lékaře.";
 
 /** Audience + proof points for footer „Důvěra a čísla“ */
 export const V271_FOOTER_TRUST = {
   audiences: [
     { label: "Veřejnost — MeDipacient a osvěta", href: "/verejnost" },
     { label: "Studenti — MeDiprep a Academy", href: "/studenti" },
-    { label: "Lékaři — MeDiktor a guidelines", href: "/lekari/dokumentace" },
+    { label: "Lékaři — OrdiZapis a guidelines", href: "/lekari/dokumentace" },
     { label: "Zdravotníci a zdravotní profesionálové", href: "/odborna" },
   ],
   proof: [

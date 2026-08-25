@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({
     title: "MedScopeGlobal — zdravotnictví na jednom místě",
     description:
-      "Hledejte, otevřete MeDipacient, MeDiprep nebo MeDiktor a čtěte redakci. Evidence-based medicína v češtině. 14 dní zdarma.",
+      "Hledejte, otevřete MeDipacient, MeDiprep nebo OrdiZapis a čtěte redakci. Evidence-based medicína v češtině. 14 dní zdarma.",
     path: "/",
   });
 }

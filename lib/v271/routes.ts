@@ -159,7 +159,7 @@ export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
         description: "Akreditované testy výhradně pro revmatology",
       },
       {
-        label: "MeDiktor",
+        label: "OrdiZapis",
         href: "/lekari/dokumentace",
         description: "AI zapisovatel — nahrávka → český zápis podle šablony",
       },

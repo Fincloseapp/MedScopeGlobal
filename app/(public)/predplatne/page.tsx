@@ -15,7 +15,7 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({
     title: "Předplatné | MedScopeGlobal",
-    description: `${VIP_TRIAL_DAYS}denní zkušební verze zdarma. Tarify 99 / 149 / 390 / 490 Kč měsíčně — včetně MeDiktor od MedScopeGlobal. Platba kartou přes Stripe.`,
+    description: `${VIP_TRIAL_DAYS}denní zkušební verze zdarma. Tarify 99 / 149 / 390 / 490 Kč měsíčně — včetně OrdiZapis od MedScopeGlobal. Platba kartou přes Stripe.`,
     path: "/predplatne",
   });
 }
@@ -38,7 +38,7 @@ export default async function PredplatnePage({
           Prémiový přístup k medicínskému obsahu
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-          Měsíční nebo roční plány pro veřejnost (MeDipacient), studenty (MeDiprep), ordinace (MeDiktor) a
+          Měsíční nebo roční plány pro veřejnost (MeDipacient), studenty (MeDiprep), ordinace (OrdiZapis) a
           lékaře. Stažení na mobil u všech tří aplikací. Bez reklam, s AI asistenty — platba přes Stripe.
         </p>
       </div>

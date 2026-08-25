@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Mic, Wand2, ClipboardCheck, Clock3, Stethoscope, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
+import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
 
 type StepId = "nahrat" | "zpracovat" | "zkontrolovat";
 
@@ -76,7 +76,7 @@ export function DokumentaceTutorial({
           ? "rounded-3xl border border-[#cfe1f3] bg-white p-5 sm:p-6"
           : "relative overflow-hidden rounded-3xl border border-[#cfe1f3] bg-white shadow-sm"
       }
-      aria-label={`Ukázka ${MEDIKTOR.fullName}`}
+      aria-label={`Ukázka ${ORDIZAPIS.fullName}`}
     >
       {variant === "full" ? (
         <div
@@ -132,9 +132,9 @@ export function DokumentaceTutorial({
               <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sky-200/80">
-                    {MEDIKTOR.provider}
+                    {ORDIZAPIS.provider}
                   </p>
-                  <p className="text-sm font-semibold text-white">{MEDIKTOR.shortName}</p>
+                  <p className="text-sm font-semibold text-white">{ORDIZAPIS.shortName}</p>
                 </div>
                 <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[10px] font-medium text-emerald-100">
                   Ukázka
@@ -290,7 +290,7 @@ export function DokumentaceTutorial({
               </Button>
             </div>
             <p className="mt-3 text-[11px] leading-4 text-slate-500">
-              Přístup a stažení jen pro ověřené lékaře · účet MedScopeGlobal synchronizuje historii · {MEDIKTOR.domain}
+              Přístup a stažení jen pro ověřené lékaře · účet MedScopeGlobal synchronizuje historii · {ORDIZAPIS.domain}
             </p>
           </div>
         </div>

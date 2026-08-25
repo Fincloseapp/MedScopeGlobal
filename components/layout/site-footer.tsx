@@ -67,7 +67,7 @@ export async function SiteFooter() {
             </li>
             <li>
               <Link href="/app/dokumentace" className="hover:text-foreground">
-                MeDiktor
+                OrdiZapis
               </Link>
             </li>
             <li>

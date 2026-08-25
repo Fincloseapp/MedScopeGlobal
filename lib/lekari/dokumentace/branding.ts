@@ -1,24 +1,24 @@
 /** Public product brand for the physician documentation app */
-export const MEDIKTOR = {
-  shortName: "MeDiktor",
-  productName: "MeDiktor",
+export const ORDIZAPIS = {
+  shortName: "OrdiZapis",
+  productName: "OrdiZapis",
   provider: "MedScopeGlobal",
   domain: "medscopeglobal.com",
-  pwaShortName: "MeDiktor",
-  pwaName: "MeDiktor · MedScopeGlobal",
+  pwaShortName: "OrdiZapis",
+  pwaName: "OrdiZapis · MedScopeGlobal",
   /** Short line under logo / banners — mobile mic for dictation + consult */
-  tagline: "Nahrajte v mobilu — zápis píše MeDiktor",
+  tagline: "Nahrajte v mobilu — zápis píše OrdiZapis",
   /** One-sentence pitch: mobile recording for dictation OR patient consult */
   pitch:
     "Nahrajte v telefonu diktát, nebo konzultaci s pacientem či pacientkou → odborná anamnéza a klinický zápis. Mikrofon má každý mobil.",
   priceMonthlyCzk: 390,
   assets: {
     /** Full marketing render of the app icon */
-    appIcon: "/assets/mediktor/app-icon.png",
-    icon192: "/assets/mediktor/icon-192.png",
-    icon512: "/assets/mediktor/icon-512.png",
-    appleTouch: "/assets/mediktor/apple-touch-icon.png",
-    lockup: "/assets/mediktor/logo-lockup.png",
+    appIcon: "/assets/ordizapis/app-icon.png",
+    icon192: "/assets/ordizapis/icon-192.png",
+    icon512: "/assets/ordizapis/icon-512.png",
+    appleTouch: "/assets/ordizapis/apple-touch-icon.png",
+    lockup: "/assets/ordizapis/logo-lockup.png",
   },
   routes: {
     marketing: "/lekari/dokumentace",
@@ -41,5 +41,8 @@ export const MEDIKTOR = {
   },
 } as const;
 
-/** @deprecated Use MEDIKTOR */
-export const DOKSCOPE = MEDIKTOR;
+/** @deprecated Use ORDIZAPIS */
+export const MEDIKTOR = ORDIZAPIS;
+
+/** @deprecated Use ORDIZAPIS */
+export const DOKSCOPE = ORDIZAPIS;

@@ -4,7 +4,7 @@ export const PORTAL_PHILOSOPHY = {
   eyebrow: "MedScopeGlobal.com",
   claim: "Zdravotnictví na jednom místě",
   subtitle:
-    "Hledejte, otevřete aplikaci, čtěte zprávy. MeDipacient, MeDiprep a MeDiktor vedle redakce — bez extra záložek.",
+    "Hledejte, otevřete aplikaci, čtěte zprávy. MeDipacient, MeDiprep a OrdiZapis vedle redakce — bez extra záložek.",
 } as const;
 
 export const PORTAL_SEARCH_TABS = [
@@ -15,7 +15,7 @@ export const PORTAL_SEARCH_TABS = [
 export const PORTAL_TRENDING = [
   { label: "MeDipacient", href: "/app/pacient" },
   { label: "přijímačky LF", href: "/app/priprava" },
-  { label: "MeDiktor", href: "/app/dokumentace" },
+  { label: "OrdiZapis", href: "/app/dokumentace" },
   { label: "guidelines", href: "/lekari/guidelines" },
   { label: "léky SÚKL", href: "/leky" },
 ] as const;
@@ -36,11 +36,11 @@ export const PORTAL_SERVICES = [
     image: "/assets/mediprep/icon-192.png",
   },
   {
-    id: "mediktor",
-    label: "MeDiktor",
+    id: "ordizapis",
+    label: "OrdiZapis",
     hint: "zápisy",
     href: "/app/dokumentace",
-    image: "/assets/mediktor/icon-192.png",
+    image: "/assets/ordizapis/icon-192.png",
   },
   { id: "dashboard", label: "Dashboard", hint: "přehled", href: "/dashboard", icon: "grid" },
   { id: "academy", label: "Academy", hint: "kurzy", href: "/academy", icon: "book" },

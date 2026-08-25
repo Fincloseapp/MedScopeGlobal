@@ -7,14 +7,14 @@ import { DokumentaceTutorial } from "@/components/lekari/dokumentace-tutorial";
 import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { Button } from "@/components/ui/button";
-import { MediktorMark } from "@/components/lekari/mediktor-mark";
+import { OrdiZapisMark } from "@/components/lekari/ordizapis-mark";
 import { SITE } from "@/lib/config/site";
-import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
+import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
 
 export async function generateMetadata(): Promise<Metadata> {
   const base = buildV20PageMetadata({
-    title: MEDIKTOR.seoTitle,
-    description: MEDIKTOR.seoDescription,
+    title: ORDIZAPIS.seoTitle,
+    description: ORDIZAPIS.seoDescription,
     path: "/lekari/dokumentace",
   });
 
@@ -23,17 +23,17 @@ export async function generateMetadata(): Promise<Metadata> {
     manifest: "/dokumentace-manifest.json",
     appleWebApp: {
       capable: true,
-      title: MEDIKTOR.pwaName,
+      title: ORDIZAPIS.pwaName,
       statusBarStyle: "default",
     },
     icons: {
-      icon: [{ url: MEDIKTOR.assets.icon192 }, { url: MEDIKTOR.assets.icon512 }],
-      apple: [{ url: MEDIKTOR.assets.appleTouch }],
+      icon: [{ url: ORDIZAPIS.assets.icon192 }, { url: ORDIZAPIS.assets.icon512 }],
+      apple: [{ url: ORDIZAPIS.assets.appleTouch }],
     },
     other: {
       "mobile-web-app-capable": "yes",
       "apple-mobile-web-app-capable": "yes",
-      "apple-mobile-web-app-title": MEDIKTOR.pwaShortName,
+      "apple-mobile-web-app-title": ORDIZAPIS.pwaShortName,
       "theme-color": "#005B96",
     },
   };
@@ -72,24 +72,24 @@ export default function LekariDokumentacePage() {
         />
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-            <MediktorMark
+            <OrdiZapisMark
               size="xl"
               priority
               className="rounded-[22%] ring-2 ring-white/25 shadow-[0_16px_40px_-16px_rgba(0,0,0,0.55)]"
             />
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-sky-200">
-                Pro lékaře · {MEDIKTOR.domain}
+                Pro lékaře · {ORDIZAPIS.domain}
               </p>
               <h1 className="mt-2 max-w-3xl font-display text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
-                {MEDIKTOR.shortName}
+                {ORDIZAPIS.shortName}
               </h1>
-              <p className="mt-2 text-base font-medium text-sky-100">{MEDIKTOR.tagline}</p>
-              <p className="mt-1 text-sm font-medium text-sky-200/90">{MEDIKTOR.lockline}</p>
+              <p className="mt-2 text-base font-medium text-sky-100">{ORDIZAPIS.tagline}</p>
+              <p className="mt-1 text-sm font-medium text-sky-200/90">{ORDIZAPIS.lockline}</p>
             </div>
           </div>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-sky-100/95">
-            {MEDIKTOR.pitch} Samostatně {MEDIKTOR.priceMonthlyCzk} Kč/měsíc včetně práv balíčku Lékař v praxi · 14 dní zdarma.
+            {ORDIZAPIS.pitch} Samostatně {ORDIZAPIS.priceMonthlyCzk} Kč/měsíc včetně práv balíčku Lékař v praxi · 14 dní zdarma.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg" className="h-12 rounded-full bg-white px-6 text-[#021d33] hover:bg-sky-50">
@@ -108,7 +108,7 @@ export default function LekariDokumentacePage() {
             </Button>
           </div>
           <p className="mt-4 text-xs text-sky-100/80">
-            {`Stažení jen pro ověřené lékaře — účet MedScopeGlobal · ${MEDIKTOR.domain}`}
+            {`Stažení jen pro ověřené lékaře — účet MedScopeGlobal · ${ORDIZAPIS.domain}`}
           </p>
         </div>
       </section>
@@ -127,7 +127,7 @@ export default function LekariDokumentacePage() {
             Nejvýhodnější vstup pro ordinaci
           </p>
           <h2 className="mt-2 font-display text-2xl font-bold text-[#021d33]">
-            MeDiktor standalone — 390 Kč/měsíc
+            OrdiZapis standalone — 390 Kč/měsíc
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
             Levnější než Lékař v praxi (490 Kč), se stejnými právy lékaře: guidelines,
@@ -151,7 +151,7 @@ export default function LekariDokumentacePage() {
               <Link href="/predplatne#physician" className="text-[#005B96] underline">
                 Lékař v praxi za 490 Kč
               </Link>{" "}
-              — MeDiktor je levnější vstup se stejnými právy.
+              — OrdiZapis je levnější vstup se stejnými právy.
             </p>
           </div>
         </div>
@@ -204,7 +204,7 @@ export default function LekariDokumentacePage() {
           </h2>
           <ul className="mt-4 max-w-3xl list-disc space-y-2 pl-5 text-sm leading-6 text-slate-600">
             <li>
-              MeDiktor od MedScopeGlobal je asistent pro lékaře — není zdravotnický
+              OrdiZapis od MedScopeGlobal je asistent pro lékaře — není zdravotnický
               prostředek ani diagnóza.
             </li>
             <li>

@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.json(
-      { error: "Pro MeDiktor od MedScopeGlobal se musíte přihlásit." },
+      { error: "Pro OrdiZapis od MedScopeGlobal se musíte přihlásit." },
       { status: 401 }
     );
   }

@@ -11,13 +11,13 @@ const menuCs: NavItem[] = [
     label: "Aplikace",
     href: "/aplikace",
     children: [
-      { label: "Přehled aplikací", href: "/aplikace", description: "MeDipacient, MeDiprep a MeDiktor" },
+      { label: "Přehled aplikací", href: "/aplikace", description: "MeDipacient, MeDiprep a OrdiZapis" },
       { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu i offline" },
       { label: "Otevřít MeDipacient", href: "/app/pacient", description: "Dashboard se zkušebními zprávami" },
       { label: "MeDiprep", href: "/mediprep", description: "Příprava na přijímačky LF" },
       { label: "Otevřít MeDiprep", href: "/app/priprava", description: "Testy B/C/F, simulace fakult" },
-      { label: "MeDiktor", href: "/lekari/dokumentace", description: "AI zápisy pro ověřené lékaře" },
-      { label: "Otevřít MeDiktor", href: "/app/dokumentace", description: "Nahrávat v mobilu" },
+      { label: "OrdiZapis", href: "/lekari/dokumentace", description: "AI zápisy pro ověřené lékaře" },
+      { label: "Otevřít OrdiZapis", href: "/app/dokumentace", description: "Nahrávat v mobilu" },
       { label: "Můj dashboard", href: "/dashboard", description: "Všechny aplikace a ukázková data" },
     ],
   },
@@ -112,14 +112,14 @@ const menuCs: NavItem[] = [
         description: "Akreditované testy — jen revmatologie",
       },
       {
-        label: "MeDiktor",
+        label: "OrdiZapis",
         href: "/lekari/dokumentace",
-        description: "MeDiktor od MedScopeGlobal — AI zápisy",
+        description: "OrdiZapis od MedScopeGlobal — AI zápisy",
       },
       {
-        label: "Aplikace MeDiktor",
+        label: "Aplikace OrdiZapis",
         href: "/app/dokumentace",
-        description: "MeDiktor · medscopeglobal.com",
+        description: "OrdiZapis · medscopeglobal.com",
       },
       { label: "Ověření ČLK (Academy)", href: "/academy/lekari/overeni", description: "Vstup do Lékařské zóny" },
       { label: "Guidelines", href: "/lekari/guidelines", description: "Klinická doporučení" },
@@ -234,13 +234,13 @@ const menuEn: NavItem[] = [
     label: "Apps",
     href: "/aplikace",
     children: [
-      { label: "All apps", href: "/aplikace", description: "MeDipacient, MeDiprep, MeDiktor" },
+      { label: "All apps", href: "/aplikace", description: "MeDipacient, MeDiprep, OrdiZapis" },
       { label: "MeDipacient", href: "/medipacient", description: "Medical reports on your phone" },
       { label: "Open MeDipacient", href: "/app/pacient", description: "Dashboard with sample reports" },
       { label: "MeDiprep", href: "/mediprep", description: "CZ medical-school admissions prep" },
       { label: "Open MeDiprep", href: "/app/priprava", description: "B/C/F tests and faculty mocks" },
-      { label: "MeDiktor", href: "/lekari/dokumentace", description: "AI notes for verified physicians" },
-      { label: "Open MeDiktor", href: "/app/dokumentace", description: "Record on mobile" },
+      { label: "OrdiZapis", href: "/lekari/dokumentace", description: "AI notes for verified physicians" },
+      { label: "Open OrdiZapis", href: "/app/dokumentace", description: "Record on mobile" },
       { label: "My dashboard", href: "/dashboard", description: "All apps and sample data" },
     ],
   },
@@ -370,13 +370,13 @@ export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
       label: "Aplikace",
       href: "/aplikace",
       children: [
-        { label: "Přehled aplikací", href: "/aplikace", description: "MeDipacient, MeDiprep, MeDiktor" },
+        { label: "Přehled aplikací", href: "/aplikace", description: "MeDipacient, MeDiprep, OrdiZapis" },
         { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu" },
         { label: "Stáhnout MeDipacient", href: "/app/pacient", description: "Instalace na plochu" },
         { label: "MeDiprep", href: "/mediprep", description: "Přijímačky 8 českých LF" },
         { label: "Stáhnout MeDiprep", href: "/app/priprava", description: "Testy B/C/F na ploše" },
-        { label: "MeDiktor", href: "/lekari/dokumentace", description: "AI zápisy pro lékaře" },
-        { label: "Stáhnout MeDiktor", href: "/app/dokumentace", description: "Nahrávání v mobilu" },
+        { label: "OrdiZapis", href: "/lekari/dokumentace", description: "AI zápisy pro lékaře" },
+        { label: "Stáhnout OrdiZapis", href: "/app/dokumentace", description: "Nahrávání v mobilu" },
         { label: "Můj dashboard", href: "/dashboard", description: "Zprávy, testy a zápisy" },
       ],
     },
@@ -391,6 +391,6 @@ export function getMobileMenu(locale: LocaleCode): NavItem[] {
 
 export function getHeaderTagline(locale: LocaleCode): string {
   return locale === "cs"
-    ? "MeDipacient · MeDiprep · MeDiktor"
-    : "MeDipacient · MeDiprep · MeDiktor";
+    ? "MeDipacient · MeDiprep · OrdiZapis"
+    : "MeDipacient · MeDiprep · OrdiZapis";
 }

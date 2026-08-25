@@ -69,7 +69,7 @@ export default function LoginPage() {
     } else if (next.startsWith("/app/priprava")) {
       setNextHint("Po přihlášení se vrátíte do MeDiprep — testy a simulace fakult.");
     } else if (next.startsWith("/app/dokumentace")) {
-      setNextHint("Po přihlášení se vrátíte do MeDiktor — nahrávání zápisů.");
+      setNextHint("Po přihlášení se vrátíte do OrdiZapis — nahrávání zápisů.");
     }
   }, []);
 

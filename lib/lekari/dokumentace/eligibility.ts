@@ -103,7 +103,7 @@ export async function getDokumentaceEligibility(
       verifiedDoctor: false,
       facilities: [],
       message:
-        "Pro stažení a používání MeDiktor od MedScopeGlobal se přihlaste ověřeným lékařským účtem.",
+        "Pro stažení a používání OrdiZapis od MedScopeGlobal se přihlaste ověřeným lékařským účtem.",
       isVip: false,
       access: guestAccess(loginUrl, subscribeUrl, "Host · vyžaduje ověřeného lékaře"),
     };
@@ -164,7 +164,7 @@ export async function getDokumentaceEligibility(
       clkId: row.clk_id,
       facilities,
       message:
-        "Stažení a plné používání MeDiktor je jen pro ověřené lékaře (nebo účet zdravotnického zařízení). Dokončete ověření v Lékařské zóně.",
+        "Stažení a plné používání OrdiZapis je jen pro ověřené lékaře (nebo účet zdravotnického zařízení). Dokončete ověření v Lékařské zóně.",
       isVip: vip.active,
       access: {
         authenticated: true,
@@ -185,7 +185,7 @@ export async function getDokumentaceEligibility(
   }
 
   const planLabel = vip.active
-    ? "Lékař · předplatné MeDiktor"
+    ? "Lékař · předplatné OrdiZapis"
     : "Ověřený lékařský účet";
 
   return {

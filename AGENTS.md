@@ -42,12 +42,12 @@ Cloudflare Workers via OpenNext; the source of truth for data is **Supabase** (P
 - Homepage (`/`) uses Czech **PortalHome** (search + services + magazine feed + phone mockups),
   not the old Unsplash `V271HomeHero`. App cards use `APP_MARKETING_IMAGE`.
 - In-app brand art uses the same files via `AppBrandVisual` /
-  `APP_MARKETING_IMAGE` (`/assets/marketing/medipacient.webp`, `mediprep.webp`, `mediktor-cs.webp`).
+  `APP_MARKETING_IMAGE` (`/assets/marketing/medipacient.webp`, `mediprep.webp`, `ordizapis-cs.webp`).
 - Session/eligibility payloads include `access: AppAccessInfo` (accountLabel, planLabel,
   validityLabel from `vip_subscriptions.ends_at` when available).
 - **MeDiprep** `/app/priprava`: client fallback tests; header + status bar login; tab Testy builder.
 - **MeDipacient** `/app/pacient`: demo timeline; header login; tabs Přehled / Zprávy / Nahrát / Účet.
-- **MeDiktor** `/app/dokumentace`: eligibility gate for zápis/historie; header login; tabs Zápis /
+- **OrdiZapis** `/app/dokumentace`: eligibility gate for zápis/historie; header login; tabs Zápis /
   Historie / Návod / Účet.
 - Homepage/portal `AppOpenLink` opens apps in the same tab. MeDiprep SW must not cache-first
   `/_next/*`; bump `CACHE_NAME` when changing shell markup.
