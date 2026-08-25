@@ -1,14 +1,28 @@
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 
-export function formatArticleDateLabel(iso?: string | null): string {
-  if (!iso) return "";
+export type ArticleDateLabel = {
+  text: string;
+  dateTime: string;
+};
+
+export function formatArticleDateLabel(
+  articleOrIso?: DisplayArticle | string | null
+): ArticleDateLabel | null {
+  const iso =
+    typeof articleOrIso === "string"
+      ? articleOrIso
+      : articleOrIso?.published_at ?? null;
+  if (!iso) return null;
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleDateString("cs-CZ", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  if (Number.isNaN(d.getTime())) return null;
+  return {
+    dateTime: d.toISOString(),
+    text: d.toLocaleDateString("cs-CZ", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }),
+  };
 }
 
 /** Prefer newest items, then fill with resurface candidates. */

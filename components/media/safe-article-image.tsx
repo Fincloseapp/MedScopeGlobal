@@ -8,6 +8,7 @@ type Props = {
   alt?: string;
   className?: string;
   sizes?: string;
+  priority?: boolean;
 };
 
 /** Direct <img> with optional fallback — avoids /_next/image 404s on Workers. */
@@ -16,6 +17,7 @@ export function SafeArticleImage({
   fallbackSrc,
   alt = "",
   className = "",
+  priority = false,
 }: Props) {
   const [step, setStep] = useState<"primary" | "fallback" | "empty">(
     src ? "primary" : fallbackSrc ? "fallback" : "empty"
@@ -37,7 +39,7 @@ export function SafeArticleImage({
       src={current}
       alt={alt}
       className={`h-full w-full object-cover object-center ${className}`}
-      loading="lazy"
+      loading={priority ? "eager" : "lazy"}
       decoding="async"
       referrerPolicy="no-referrer"
       onError={() => {
