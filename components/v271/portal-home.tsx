@@ -227,7 +227,9 @@ export function PortalHome({
                         <span className="block text-sm font-semibold text-[#021d33]">{app.shortName}</span>
                         <span className="block truncate text-xs text-slate-500">{app.tagline}</span>
                       </span>
-                      <span className="text-xs font-semibold text-[#005B96]">nová karta</span>
+                      <span className="text-xs font-semibold text-[#005B96]">
+                        {app.id === "mediprep" ? "legacy" : "nová karta"}
+                      </span>
                     </AppOpenLink>
                   </li>
                 ))}

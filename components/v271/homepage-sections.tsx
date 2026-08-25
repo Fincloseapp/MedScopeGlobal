@@ -85,7 +85,7 @@ export function V272WhyTrustBlock() {
             Aplikace na mobilu, obsah když ho potřebujete
           </h2>
           <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-600">
-            Stažení na plochu, zkušební data v dashboardu a ověřené zdroje — od přijímaček po klinickou praxi.
+            Stažení na plochu, zkušební data v dashboardu a ověřené zdroje — od longevity magazínu po klinickou praxi.
           </p>
         </div>
 

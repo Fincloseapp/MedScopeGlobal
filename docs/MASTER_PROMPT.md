@@ -21,7 +21,7 @@ Tagline: *See life clearly. Live it longer.*
 | **VitaScope** | Magazine — longevity, lifestyle, news desks |
 | **MediFlow** | Personal wellness journal (articles, symptoms, supplements) |
 | **MeDipacient** | Patient messaging demo PWA |
-| **MeDiprep** | Medical school prep / tests PWA |
+| **MeDiprep** | Medical school prep / tests PWA — **legacy**, deprioritized in nav & homepage |
 | **OrdiZapis** | Physician documentation PWA |
 | **Academy** | Courses and certificates |
 | **VIP** | Paid longevity protocols ($6.99/mo en-US) |
@@ -49,6 +49,8 @@ Monetization on articles: display ads, VIP CTA, tringelt micro-tip, affiliate bo
 - Eyebrow: `VitaScope · powered by MedScopeGlobal` (EN) / `VitaScope · platforma MedScopeGlobal` (CS)
 - Claim: Health, longevity & lifestyle — for everyone
 - Badge: New ecosystem — MediFlow, VIP, autonomous editorial, 19 locales
+- **App order (homepage)**: MediFlow → MeDipacient → OrdiZapis → MeDiprep (legacy last)
+- **Do not lead** with přijímačky / LF prep in hero, services grid, or primary nav
 
 ## Do not
 

@@ -29,6 +29,16 @@ Alternatives considered: Longevita, WellSpan, ThriveLife, EverWell, VitaeVerse �
 | Seniors & caregivers | 15% | Accessible framing, Czech/EU prevention tone |
 | Trends & evidence | 20% | GLP-1, biohacking, study digests, disclaimers |
 
+**Not a primary pillar:** Czech LF entrance-exam prep (MeDiprep). Keep routes working; list last in app catalog and secondary in nav/footer.
+
+## Product prominence (homepage & nav)
+
+1. VitaScope magazine + news desks  
+2. MediFlow wellness journal  
+3. VIP longevity protocols  
+4. MeDipacient · OrdiZapis  
+5. MeDiprep — legacy / student secondary (footer, `/studenti`, not hero)
+
 ## Autonomous redakce
 
 - Cron hub: `/api/ecosystem/autonomous`

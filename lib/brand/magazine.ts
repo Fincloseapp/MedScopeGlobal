@@ -24,8 +24,8 @@ export const MAGAZINE = {
     cs: "Jasně o zdraví. Délka i kvalita života.",
   },
   subtitle: {
-    en: "Longevity, wellness, and healthy lifestyle for everyone who wants to improve — plus MediFlow, VIP protocols, and MeDipacient · MeDiprep · OrdiZapis on one platform.",
-    cs: "Dlouhověkost, wellness a zdravý životní styl pro každého, kdo chce být lépe — plus MediFlow, VIP protokoly a MeDipacient · MeDiprep · OrdiZapis na jedné platformě.",
+    en: "Longevity, wellness, and healthy lifestyle for everyone who wants to improve — MediFlow journal, VIP protocols, and MeDipacient · OrdiZapis on one platform. MeDiprep (LF prep) remains as a legacy app.",
+    cs: "Dlouhověkost, wellness a zdravý životní styl pro každého, kdo chce být lépe — deník MediFlow, VIP protokoly a MeDipacient · OrdiZapis na jedné platformě. MeDiprep (příprava na LF) zůstává jako legacy aplikace.",
   },
   heroClaim: {
     en: "Health, longevity & lifestyle — for everyone",
