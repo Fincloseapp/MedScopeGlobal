@@ -61,6 +61,7 @@ export async function listPublishedCourses(
   filter?: ListPublishedCoursesFilter
 ): Promise<AcademyCourse[]> {
   const supabase = await createClient();
+  if (!supabase) return [];
   let query = supabase
     .from("courses")
     .select("*")
@@ -568,6 +569,7 @@ export async function submitQuizAnswers(
 
 export async function getLeaderboard(period: LeaderboardPeriod = "all_time", limit = 20): Promise<LeaderboardEntry[]> {
   const supabase = await createClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("leaderboard")
     .select("*")
@@ -709,6 +711,7 @@ export async function listPublishedQuizzesByCourseId(courseId: string): Promise<
 
 export async function listMarketplaceListings(limit = 20) {
   const supabase = await createClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("marketplace_courses")
     .select("*")
@@ -772,6 +775,7 @@ export async function listVideoAssets(limit = 20) {
 
 export async function listClinicalSimulations(limit = 20) {
   const supabase = await createClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("clinical_simulations")
     .select("*")
@@ -801,6 +805,7 @@ export async function getSimulationBySlug(slug: string) {
 
 export async function listTextbooks(limit = 20) {
   const supabase = await createClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("textbooks")
     .select("*")
