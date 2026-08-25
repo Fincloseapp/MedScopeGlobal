@@ -17,7 +17,7 @@ type Props = {
 export function AppBrandVisual({ app, compact = false, className = "" }: Props) {
   const src =
     app.id === "ordizapis"
-      ? `${APP_MARKETING_IMAGE[app.id]}?v=ordizapis-phone-v3`
+      ? `${APP_MARKETING_IMAGE[app.id]}?v=ordizapis-phone-v4`
       : APP_MARKETING_IMAGE[app.id];
   const phoneHeader = app.id === "ordizapis";
   return (
