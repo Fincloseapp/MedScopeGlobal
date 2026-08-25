@@ -1,0 +1,75 @@
+{
+  "site": {
+    "name": "MedScopeGlobal",
+    "tagline": "Trí tuệ lâm sàng và y học dựa trên bằng chứng"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "magazine": "Tạp chí",
+    "pricing": "Bảng giá",
+    "welcome": "Nền tảng",
+    "sections": "Mục",
+    "access": "Cấp truy cập",
+    "specialties": "Chuyên khoa",
+    "articles": "Bài viết",
+    "search": "Tìm kiếm",
+    "login": "Đăng nhập",
+    "signup": "Đăng ký",
+    "audiences": "Dành cho ai",
+    "medicine": "Y học",
+    "subscribe": "Đăng ký"
+  },
+  "cta": {
+    "readMore": "Đọc thêm",
+    "share": "Chia sẻ",
+    "supportAuthor": "Ủng hộ tác giả",
+    "saveToMediFlow": "Lưu vào MediFlow",
+    "tryFree": "Dùng thử miễn phí 14 ngày",
+    "upgradeVip": "Nâng cấp VIP",
+    "exploreProtocols": "Khám phá giao thức"
+  },
+  "disclaimer": {
+    "medical": "Nội dung không phải là chẩn đoán y khoa hay khuyến nghị điều trị. Luôn tham khảo ý kiến bác sĩ."
+  },
+  "vip": {
+    "title": "Giao thức VIP trường thọ",
+    "subtitle": "10 giao thức dựa trên bằng chứng cho giấc ngủ, chuyển hóa, miễn dịch và trường thọ.",
+    "price": "120.000 ₫/tháng"
+  },
+  "tringelt": {
+    "title": "Ủng hộ tác giả · Tringelt",
+    "subtitle": "Đóng góp vi mô tùy chọn — như tiền boa ở nhà hàng. Cảm ơn ban biên tập.",
+    "custom": "Tùy chỉnh",
+    "vipUpsell": "Ủng hộ ban biên tập và nhận giao thức VIP trường thọ —",
+    "unavailable": "Tringelt hiện không khả dụng.",
+    "tip": "Ủng hộ ban biên tập bằng tringelt",
+    "exploreVip": "hoặc khám phá giao thức VIP trường thọ"
+  },
+  "donation": {
+    "title": "Ủng hộ tác giả",
+    "subtitle": "Quyên góp vi mô giúp tiếp tục tạo nội dung chất lượng.",
+    "amounts": [
+      "50.000 ₫",
+      "120.000 ₫",
+      "240.000 ₫"
+    ],
+    "custom": "Số tiền tùy chỉnh"
+  },
+  "mediflow": {
+    "name": "MediFlow",
+    "tagline": "Nhật ký wellness cá nhân",
+    "description": "Lưu bài viết, theo dõi triệu chứng và thực phẩm bổ sung. Không để chẩn đoán — cho cái nhìn tổng quan."
+  },
+  "ordizaznam": {
+    "name": "OrdiZáznam",
+    "tagline": "Ghi trên di động — AI viết ghi chú",
+    "description": "Công cụ tài liệu chuyên nghiệp cho bác sĩ. Tuân thủ GDPR, mã hóa."
+  },
+  "trends": {
+    "title": "Xu hướng 2026–2027",
+    "glp1": "GLP-1 và chuyển hóa",
+    "biohacking": "Biohacking cho người mới",
+    "sleep": "Tối ưu giấc ngủ",
+    "mental": "Sức khỏe tinh thần"
+  }
+}

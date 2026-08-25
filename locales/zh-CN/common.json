@@ -1,0 +1,75 @@
+{
+  "site": {
+    "name": "MedScopeGlobal",
+    "tagline": "临床智能与循证医学"
+  },
+  "nav": {
+    "home": "首页",
+    "magazine": "杂志",
+    "pricing": "定价",
+    "welcome": "平台",
+    "sections": "栏目",
+    "access": "访问级别",
+    "specialties": "专科",
+    "articles": "文章",
+    "search": "搜索",
+    "login": "登录",
+    "signup": "注册",
+    "audiences": "面向人群",
+    "medicine": "医学",
+    "subscribe": "订阅"
+  },
+  "cta": {
+    "readMore": "阅读更多",
+    "share": "分享",
+    "supportAuthor": "支持作者",
+    "saveToMediFlow": "保存到 MediFlow",
+    "tryFree": "14 天免费试用",
+    "upgradeVip": "升级 VIP",
+    "exploreProtocols": "探索方案"
+  },
+  "disclaimer": {
+    "medical": "本内容不构成医疗诊断或治疗建议。请务必咨询您的医生。"
+  },
+  "vip": {
+    "title": "VIP 长寿方案",
+    "subtitle": "10 个基于证据的睡眠、代谢、免疫与长寿方案。",
+    "price": "¥25/月"
+  },
+  "tringelt": {
+    "title": "支持作者 · Tringelt",
+    "subtitle": "可选微捐赠——如同餐厅小费。感谢编辑部。",
+    "custom": "自定义",
+    "vipUpsell": "支持编辑部并获取 VIP 长寿方案 —",
+    "unavailable": "Tringelt 目前不可用。",
+    "tip": "用 tringelt 支持编辑部",
+    "exploreVip": "或探索 VIP 长寿方案"
+  },
+  "donation": {
+    "title": "支持作者",
+    "subtitle": "微捐赠有助于持续创作优质内容。",
+    "amounts": [
+      "¥10",
+      "¥25",
+      "¥49"
+    ],
+    "custom": "自定义金额"
+  },
+  "mediflow": {
+    "name": "MediFlow",
+    "tagline": "您的个人健康日记",
+    "description": "保存文章、跟踪症状和补充剂。非诊断用途——供个人概览。"
+  },
+  "ordizaznam": {
+    "name": "OrdiZáznam",
+    "tagline": "手机录音——AI 撰写记录",
+    "description": "面向医生的专业文档工具。符合 GDPR，加密存储。"
+  },
+  "trends": {
+    "title": "2026–2027 趋势",
+    "glp1": "GLP-1 与代谢",
+    "biohacking": "初学者生物黑客",
+    "sleep": "睡眠优化",
+    "mental": "心理健康"
+  }
+}

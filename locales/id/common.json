@@ -1,0 +1,75 @@
+{
+  "site": {
+    "name": "MedScopeGlobal",
+    "tagline": "Inteligensi klinis dan kedokteran berbasis bukti"
+  },
+  "nav": {
+    "home": "Beranda",
+    "magazine": "Majalah",
+    "pricing": "Harga",
+    "welcome": "Platform",
+    "sections": "Bagian",
+    "access": "Tingkat akses",
+    "specialties": "Spesialisasi",
+    "articles": "Artikel",
+    "search": "Cari",
+    "login": "Masuk",
+    "signup": "Daftar",
+    "audiences": "Untuk siapa",
+    "medicine": "Kedokteran",
+    "subscribe": "Berlangganan"
+  },
+  "cta": {
+    "readMore": "Baca selengkapnya",
+    "share": "Bagikan",
+    "supportAuthor": "Dukung penulis",
+    "saveToMediFlow": "Simpan ke MediFlow",
+    "tryFree": "Uji coba gratis 14 hari",
+    "upgradeVip": "Upgrade ke VIP",
+    "exploreProtocols": "Jelajahi protokol"
+  },
+  "disclaimer": {
+    "medical": "Konten ini bukan diagnosis medis atau rekomendasi pengobatan. Selalu konsultasikan dengan dokter Anda."
+  },
+  "vip": {
+    "title": "Protokol VIP longevitas",
+    "subtitle": "10 protokol berbasis bukti untuk tidur, metabolisme, imunitas, dan longevitas.",
+    "price": "Rp 75.000/bulan"
+  },
+  "tringelt": {
+    "title": "Dukung penulis · Tringelt",
+    "subtitle": "Kontribusi mikro opsional — seperti tip di restoran. Terima kasih redaksi.",
+    "custom": "Kustom",
+    "vipUpsell": "Dukung redaksi dan dapatkan protokol VIP longevitas —",
+    "unavailable": "Tringelt saat ini tidak tersedia.",
+    "tip": "Dukung redaksi dengan tringelt",
+    "exploreVip": "atau jelajahi protokol VIP longevitas"
+  },
+  "donation": {
+    "title": "Dukung penulis",
+    "subtitle": "Micro-donation membantu melanjutkan konten berkualitas.",
+    "amounts": [
+      "Rp 30.000",
+      "Rp 75.000",
+      "Rp 149.000"
+    ],
+    "custom": "Jumlah kustom"
+  },
+  "mediflow": {
+    "name": "MediFlow",
+    "tagline": "Jurnal wellness pribadi Anda",
+    "description": "Simpan artikel, lacak gejala dan suplemen. Bukan untuk diagnosis — untuk gambaran Anda sendiri."
+  },
+  "ordizaznam": {
+    "name": "OrdiZáznam",
+    "tagline": "Rekam di ponsel — AI menulis catatan",
+    "description": "Alat dokumentasi profesional untuk dokter. Patuh GDPR, terenkripsi."
+  },
+  "trends": {
+    "title": "Tren 2026–2027",
+    "glp1": "GLP-1 & metabolisme",
+    "biohacking": "Biohacking untuk pemula",
+    "sleep": "Optimasi tidur",
+    "mental": "Kesejahteraan mental"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "site": {
+    "name": "MedScopeGlobal",
+    "tagline": "Inteligencia clínica y medicina basada en la evidencia"
+  },
+  "nav": {
+    "home": "Inicio",
+    "magazine": "Revista",
+    "pricing": "Precios",
+    "welcome": "Plataforma",
+    "sections": "Secciones",
+    "access": "Niveles de acceso",
+    "specialties": "Especialidades",
+    "articles": "Artículos",
+    "search": "Buscar",
+    "login": "Iniciar sesión",
+    "signup": "Registrarse",
+    "audiences": "Para quién",
+    "medicine": "Medicina",
+    "subscribe": "Suscripción"
+  },
+  "cta": {
+    "readMore": "Leer más",
+    "share": "Compartir",
+    "supportAuthor": "Apoyar al autor",
+    "saveToMediFlow": "Guardar en MediFlow",
+    "tryFree": "Prueba gratuita de 14 días",
+    "upgradeVip": "Actualizar a VIP",
+    "exploreProtocols": "Explorar protocolos"
+  },
+  "disclaimer": {
+    "medical": "El contenido no constituye un diagnóstico médico ni una recomendación terapéutica. Consulte siempre a su médico."
+  },
+  "vip": {
+    "title": "Protocolos VIP de longevidad",
+    "subtitle": "10 protocolos basados en evidencia para sueño, metabolismo, inmunidad y longevidad.",
+    "price": "5,99 €/mes"
+  },
+  "tringelt": {
+    "title": "Apoyar al autor · Tringelt",
+    "subtitle": "Micro-aporte opcional — como una propina en un restaurante. Gracias a la redacción.",
+    "custom": "Importe personalizado",
+    "vipUpsell": "Apoye a la redacción y acceda a protocolos VIP de longevidad —",
+    "unavailable": "Tringelt no está disponible en este momento.",
+    "tip": "Apoye a la redacción con un tringelt",
+    "exploreVip": "o explore protocolos VIP de longevidad"
+  },
+  "donation": {
+    "title": "Apoyar al autor",
+    "subtitle": "Una micro-donación ayuda a seguir creando contenido de calidad.",
+    "amounts": [
+      "€2",
+      "€5",
+      "€9.90"
+    ],
+    "custom": "Importe personalizado"
+  },
+  "mediflow": {
+    "name": "MediFlow",
+    "tagline": "Tu diario personal de bienestar",
+    "description": "Guarda artículos, registra síntomas y suplementos. No para diagnóstico — para tu propia visión."
+  },
+  "ordizaznam": {
+    "name": "OrdiZáznam",
+    "tagline": "Graba en móvil — la IA escribe la nota",
+    "description": "Herramienta profesional de documentación para médicos. Cumple GDPR, cifrada."
+  },
+  "trends": {
+    "title": "Tendencias 2026–2027",
+    "glp1": "GLP-1 y metabolismo",
+    "biohacking": "Biohacking para principiantes",
+    "sleep": "Optimización del sueño",
+    "mental": "Bienestar mental"
+  }
+}

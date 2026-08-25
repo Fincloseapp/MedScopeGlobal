@@ -1,0 +1,75 @@
+{
+  "site": {
+    "name": "MedScopeGlobal",
+    "tagline": "Klinická inteligencia a medicína založená na dôkazoch"
+  },
+  "nav": {
+    "home": "Domov",
+    "magazine": "Magazín",
+    "pricing": "Cenník",
+    "welcome": "O platforme",
+    "sections": "Sekcie",
+    "access": "Úrovne prístupu",
+    "specialties": "Odbory",
+    "articles": "Články",
+    "search": "Hľadať",
+    "login": "Prihlásiť",
+    "signup": "Registrácia",
+    "audiences": "Pre koho",
+    "medicine": "Medicína",
+    "subscribe": "Predplatné"
+  },
+  "cta": {
+    "readMore": "Čítať viac",
+    "share": "Zdieľať",
+    "supportAuthor": "Podporiť autora",
+    "saveToMediFlow": "Uložiť do MediFlow",
+    "tryFree": "14-dňová skúšobná verzia zdarma",
+    "upgradeVip": "Prejsť na VIP",
+    "exploreProtocols": "Preskúmať protokoly"
+  },
+  "disclaimer": {
+    "medical": "Obsah nie je lekárska diagnóza ani liečebné odporúčanie. Vždy konzultujte so svojím lekárom."
+  },
+  "vip": {
+    "title": "VIP longevity protokoly",
+    "subtitle": "10 protokolov založených na dôkazoch pre spánok, metabolizmus, imunitu a dlhovekosť.",
+    "price": "5,99 €/mesiac"
+  },
+  "tringelt": {
+    "title": "Podporiť autora · Tringelt",
+    "subtitle": "Voliteľný mikro-príspevok — ako prepitné v reštaurácii. Ďakujeme redakcii.",
+    "custom": "Vlastné",
+    "vipUpsell": "Podporte redakciu a získajte VIP longevity protokoly —",
+    "unavailable": "Tringelt momentálne nie je k dispozícii.",
+    "tip": "Podporte redakciu tringeltom",
+    "exploreVip": "alebo preskúmajte VIP longevity protokoly"
+  },
+  "donation": {
+    "title": "Podporiť autora",
+    "subtitle": "Mikro-dar pomáha pokračovať v tvorbe kvalitného obsahu.",
+    "amounts": [
+      "€2",
+      "€5",
+      "€9.90"
+    ],
+    "custom": "Vlastná suma"
+  },
+  "mediflow": {
+    "name": "MediFlow",
+    "tagline": "Váš osobný wellness denník",
+    "description": "Ukladajte články, sledujte príznaky a doplnky. Nie na diagnózu — pre vlastný prehľad."
+  },
+  "ordizaznam": {
+    "name": "OrdiZáznam",
+    "tagline": "Záznam v mobile — AI píše poznámku",
+    "description": "Profesionálny nástroj dokumentácie pre lekárov. GDPR, šifrované."
+  },
+  "trends": {
+    "title": "Trendy 2026–2027",
+    "glp1": "GLP-1 a metabolizmus",
+    "biohacking": "Biohacking pre začiatočníkov",
+    "sleep": "Optimalizácia spánku",
+    "mental": "Mentálne wellness"
+  }
+}

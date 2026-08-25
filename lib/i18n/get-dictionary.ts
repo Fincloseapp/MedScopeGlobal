@@ -4,32 +4,76 @@ type Dictionary = Record<string, string | Record<string, string>>;
 
 const cache = new Map<LocaleCode, Dictionary>();
 
+/** Locale codes that share another locale's dictionary file. */
+const LOCALE_ALIASES: Partial<Record<LocaleCode, string>> = {
+  "en-UK": "en",
+  jp: "ja",
+  kr: "ko",
+  cn: "zh-CN",
+  nl: "en",
+};
+
+const LOCALE_FILES = new Set([
+  "cs",
+  "sk",
+  "pl",
+  "de",
+  "fr",
+  "it",
+  "es",
+  "ro",
+  "hu",
+  "ru",
+  "uk",
+  "be",
+  "zh-CN",
+  "ja",
+  "ko",
+  "vi",
+  "id",
+  "en",
+  "en-US",
+  "pt",
+  "ar",
+  "hi",
+]);
+
+function resolveLocaleChain(locale: LocaleCode): string[] {
+  const chain: string[] = [];
+  const alias = LOCALE_ALIASES[locale];
+  if (alias) chain.push(alias);
+  if (LOCALE_FILES.has(locale)) chain.push(locale);
+  if (locale.startsWith("en") && locale !== "en" && locale !== "en-US") {
+    chain.push("en");
+  }
+  if (!locale.startsWith("en") && locale !== "en" && locale !== "en-US") {
+    chain.push("en");
+  }
+  chain.push("cs");
+
+  return [...new Set(chain)];
+}
+
 export async function getDictionary(locale: LocaleCode): Promise<Dictionary> {
-  const loadLocale =
-    locale === "cs"
-      ? "cs"
-      : locale === "en-US"
-        ? "en-US"
-        : locale.startsWith("en")
-          ? "en"
-          : "en";
-
-  const cacheKey = loadLocale as LocaleCode;
-  if (cache.has(cacheKey)) {
-    return cache.get(cacheKey)!;
+  if (cache.has(locale)) {
+    return cache.get(locale)!;
   }
 
-  try {
-    const mod = await import(`@/locales/${loadLocale}/common.json`);
-    const dict = mod.default as unknown as Dictionary;
-    cache.set(cacheKey, dict);
-    return dict;
-  } catch {
-    const mod = await import("@/locales/en/common.json");
-    const dict = mod.default as unknown as Dictionary;
-    cache.set(cacheKey, dict);
-    return dict;
+  for (const loadLocale of resolveLocaleChain(locale)) {
+    try {
+      const mod = await import(`@/locales/${loadLocale}/common.json`);
+      const dict = mod.default as unknown as Dictionary;
+      cache.set(locale, dict);
+      return dict;
+    } catch {
+      // try next fallback
+    }
   }
+
+  const mod = await import("@/locales/en/common.json");
+  const dict = mod.default as unknown as Dictionary;
+  cache.set(locale, dict);
+  return dict;
 }
 
 export function t(
