@@ -15,6 +15,7 @@ import { buildPrepTest, getPrepDashboard } from "../../lib/mediprep/dashboard";
 import { bankStats } from "../../lib/prijimacky/question-bank";
 import { generateSelfTest } from "../../lib/prijimacky/quiz-from-bank";
 import { FACULTIES_ADMISSIONS_2026 } from "../../lib/prijimacky/faculties-admissions";
+import { getAffiliateRedirectDestination } from "../../lib/ecosystem/monetization";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -124,6 +125,15 @@ file("app/api/mediflow/dashboard/route.ts");
 file("app/api/mediprep/dashboard/route.ts");
 file("app/api/mediprep/test/route.ts");
 file("app/api/apps/qr/route.ts");
+
+file("app/(public)/go/[slug]/route.ts");
+file("public/assets/affiliate/magnesium.svg");
+file("public/assets/affiliate/omega-test.svg");
+file("public/assets/affiliate/sleep-tracker.svg");
+
+assert.equal(getAffiliateRedirectDestination("mg-cz")?.includes("heureka"), true);
+assert.equal(getAffiliateRedirectDestination("mg-us")?.includes("amazon.com"), true);
+assert.equal(getAffiliateRedirectDestination("unknown"), null);
 
 console.log("✓ app functional checks passed");
 console.log(

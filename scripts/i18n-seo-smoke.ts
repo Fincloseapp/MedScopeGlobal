@@ -39,6 +39,7 @@ assert.equal(buildLocalePath("en-US", "/"), "/en-us");
 
 assert.ok(isLocaleRoutingExcluded("/app/pacient"));
 assert.ok(isLocaleRoutingExcluded("/api/locale/set"));
+assert.ok(isLocaleRoutingExcluded("/go/mg-cz"));
 assert.ok(!isLocaleRoutingExcluded("/articles"));
 
 const hreflang = buildGlobalHreflang("/articles", "de");

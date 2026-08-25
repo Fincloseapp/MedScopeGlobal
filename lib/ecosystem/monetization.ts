@@ -97,7 +97,7 @@ export const AFFILIATE_PRODUCTS: AffiliateProduct[] = [
     description: { cs: "Podpora spánku a regenerace", en: "Sleep and recovery support", "en-US": "Premium sleep support" },
     category: "supplements",
     affiliateUrl: { cs: "https://medscopeglobal.com/go/mg-cz", en: "https://medscopeglobal.com/go/mg-en", "en-US": "https://medscopeglobal.com/go/mg-us" },
-    imageUrl: "/assets/affiliate/magnesium.webp",
+    imageUrl: "/assets/affiliate/magnesium.svg",
     regions: ["EU", "USA", "GLOBAL"],
   },
   {
@@ -106,7 +106,7 @@ export const AFFILIATE_PRODUCTS: AffiliateProduct[] = [
     description: { cs: "Domácí test indexu omega-3", en: "At-home omega-3 index test", "en-US": "CLIA-certified omega-3 test" },
     category: "lab-tests",
     affiliateUrl: { cs: "https://medscopeglobal.com/go/omega-cz", en: "https://medscopeglobal.com/go/omega-en", "en-US": "https://medscopeglobal.com/go/omega-us" },
-    imageUrl: "/assets/affiliate/omega-test.webp",
+    imageUrl: "/assets/affiliate/omega-test.svg",
     regions: ["EU", "USA"],
   },
   {
@@ -115,10 +115,28 @@ export const AFFILIATE_PRODUCTS: AffiliateProduct[] = [
     description: { cs: "Sledování spánku a HRV", en: "Sleep and HRV monitoring", "en-US": "Advanced biohacking wearable" },
     category: "sleep",
     affiliateUrl: { cs: "https://medscopeglobal.com/go/sleep-cz", en: "https://medscopeglobal.com/go/sleep-en", "en-US": "https://medscopeglobal.com/go/sleep-us" },
-    imageUrl: "/assets/affiliate/sleep-tracker.webp",
+    imageUrl: "/assets/affiliate/sleep-tracker.svg",
     regions: ["EU", "USA", "GLOBAL"],
   },
 ];
+
+/** Outbound affiliate destinations keyed by /go/[slug] */
+export const AFFILIATE_REDIRECT_DESTINATIONS: Record<string, string> = {
+  "mg-cz": "https://www.heureka.cz/?h%5Bfraze%5D=magnesium+glycinát",
+  "mg-en": "https://www.amazon.co.uk/s?k=magnesium+glycinate",
+  "mg-us": "https://www.amazon.com/s?k=magnesium+glycinate",
+  "omega-cz": "https://www.heureka.cz/?h%5Bfraze%5D=omega+3+test",
+  "omega-en": "https://www.amazon.co.uk/s?k=omega+3+index+test",
+  "omega-us": "https://www.amazon.com/s?k=omega+3+index+test",
+  "sleep-cz": "https://www.heureka.cz/?h%5Bfraze%5D=sleep+tracker",
+  "sleep-en": "https://www.amazon.co.uk/s?k=sleep+tracker+hrv",
+  "sleep-us": "https://www.amazon.com/s?k=oura+ring+whoop",
+};
+
+export function getAffiliateRedirectDestination(slug: string): string | null {
+  const key = slug.trim().toLowerCase();
+  return AFFILIATE_REDIRECT_DESTINATIONS[key] ?? null;
+}
 
 export const HIGH_CTR_PLACEMENTS: AdPlacement[] = ["below-title", "in-content", "sticky"];
 
