@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Soubor je větší než 25 MB (limit přepisu). Nahrajte kratší nahrávku nebo použijte Nahrávat v MeDiktoru.",
+          "Soubor je větší než 25 MB (limit přepisu). Nahrajte kratší nahrávku nebo použijte Nahrávat v OrdiZapisu.",
       },
       { status: 413 }
     );

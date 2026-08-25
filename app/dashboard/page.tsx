@@ -9,7 +9,7 @@ import { getLatestArticles } from "@/lib/queries/articles";
 
 export const metadata: Metadata = {
   title: "Můj dashboard | MedScopeGlobal",
-  description: "Přehled MeDipacient, MeDiprep a MeDiktor — zkušební zprávy, testy a stažení na mobil.",
+  description: "Přehled MeDipacient, MeDiprep a OrdiZapis — zkušební zprávy, testy a stažení na mobil.",
 };
 
 export const dynamic = "force-dynamic";
@@ -34,7 +34,7 @@ export default async function DashboardPage() {
           </h1>
           <p className="mt-3 max-w-2xl text-slate-600">
             Ukázkové lékařské zprávy, přijímačkový plán i odkazy ke stažení na mobil. Žádný prázdný stav — maximum
-            toho, co MeDipacient, MeDiprep a MeDiktor umí.
+            toho, co MeDipacient, MeDiprep a OrdiZapis umí.
           </p>
         </div>
       </section>
@@ -139,7 +139,7 @@ export default async function DashboardPage() {
             </Link>
           </article>
           <article className="rounded-2xl border border-[#d9e8f4] bg-white p-6 shadow-sm">
-            <h2 className="font-display text-xl font-semibold">MeDiktor · pro lékaře</h2>
+            <h2 className="font-display text-xl font-semibold">OrdiZapis · pro lékaře</h2>
             <p className="mt-1 text-sm text-slate-600">
               Nahrávání v mobilu, SOAP a anamnéza. Stejné stažení na plochu jako u ostatních aplikací.
             </p>
@@ -147,7 +147,7 @@ export default async function DashboardPage() {
               href="/app/dokumentace"
               className="mt-4 inline-flex rounded-full bg-[#005B96] px-4 py-2 text-sm font-semibold text-white"
             >
-              Stáhnout MeDiktor
+              Stáhnout OrdiZapis
             </Link>
           </article>
         </section>

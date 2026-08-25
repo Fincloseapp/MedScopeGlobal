@@ -9,12 +9,12 @@ import { DokAppHistory } from "@/components/lekari/dok-app/dok-app-history";
 import { DokAppGuide } from "@/components/lekari/dok-app/dok-app-guide";
 import { DokAppAccount } from "@/components/lekari/dok-app/dok-app-account";
 import { DokAppGate } from "@/components/lekari/dok-app/dok-app-gate";
-import { MediktorMark } from "@/components/lekari/mediktor-mark";
+import { OrdiZapisMark } from "@/components/lekari/ordizapis-mark";
 import { AppAccountStatus } from "@/components/apps/app-account-status";
 import { AppSectionNav } from "@/components/apps/app-section-nav";
 import { AppBrandVisual } from "@/components/apps/app-brand-visual";
-import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
-import { MEDIKTOR_APP } from "@/lib/apps/catalog";
+import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
+import { ORDIZAPIS_APP } from "@/lib/apps/catalog";
 import { guestAccess, type AppAccessInfo } from "@/lib/apps/access-status";
 
 type TabId = "zapis" | "historie" | "navod" | "ucet";
@@ -159,18 +159,18 @@ export function DokAppShell() {
       <header className="shrink-0 border-b border-[#0a4a78] bg-[#005B96] px-3 py-2.5 text-white sm:px-4">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2.5">
-            <MediktorMark
+            <OrdiZapisMark
               size="sm"
               className="shrink-0 rounded-[22%] ring-1 ring-white/30"
             />
             <div className="min-w-0">
               <p className="truncate text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-100/90">
-                {MEDIKTOR.provider}
+                {ORDIZAPIS.provider}
               </p>
               <h1 className="truncate text-base font-semibold leading-tight sm:text-lg">
-                {MEDIKTOR.shortName}
+                {ORDIZAPIS.shortName}
               </h1>
-              <p className="truncate text-[10px] text-sky-100/70">{MEDIKTOR.lockline}</p>
+              <p className="truncate text-[10px] text-sky-100/70">{ORDIZAPIS.lockline}</p>
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
@@ -219,13 +219,13 @@ export function DokAppShell() {
         active={tab}
         onChange={setTab}
         accent="#005B96"
-        ariaLabel={`${MEDIKTOR.shortName} sekce`}
+        ariaLabel={`${ORDIZAPIS.shortName} sekce`}
       />
 
       <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-[#f4f9fc] pb-[calc(4.25rem+env(safe-area-inset-bottom))] md:pb-0">
         <div className="mx-auto w-full max-w-3xl">
           <AppBrandVisual
-            app={MEDIKTOR_APP}
+            app={ORDIZAPIS_APP}
             className="border-b border-[#cfe1f3] sm:mx-4 sm:mt-3 sm:rounded-2xl sm:border"
           />
         </div>

@@ -10,9 +10,9 @@ import { buildV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({
-    title: "Aplikace MedScopeGlobal — MeDipacient, MeDiprep, MeDiktor",
+    title: "Aplikace MedScopeGlobal — MeDipacient, MeDiprep, OrdiZapis",
     description:
-      "Tři instalovatelné aplikace: MeDipacient pro zprávy, MeDiprep na přijímačky LF a MeDiktor pro lékaře. Stažení na mobil jako u MeDiktoru.",
+      "Tři instalovatelné aplikace: MeDipacient pro zprávy, MeDiprep na přijímačky LF a OrdiZapis pro lékaře. Stažení na mobil jako u OrdiZapisu.",
     path: "/aplikace",
   });
 }
@@ -37,7 +37,7 @@ export default function AplikaceHubPage() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200">Aplikace MedScopeGlobal</p>
           <h1 className="mt-2 font-display text-4xl font-bold">Tři aplikace. Jedno prostředí.</h1>
           <p className="mt-4 max-w-2xl text-white/80">
-            Stáhnete je na plochu telefonu stejně jako MeDiktor: Chrome → Nainstalovat, iPhone Safari → Sdílet → Na
+            Stáhnete je na plochu telefonu stejně jako OrdiZapis: Chrome → Nainstalovat, iPhone Safari → Sdílet → Na
             plochu. Cíl je jasný — předplatitelé a denní použití, ne další webová záložka.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
@@ -85,7 +85,7 @@ export default function AplikaceHubPage() {
                 </div>
               </div>
             </div>
-            {app.id === "mediktor" ? (
+            {app.id === "ordizapis" ? (
               <DokumentaceDownloadPanel />
             ) : (
               <AppDownloadPanel app={app} />

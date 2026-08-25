@@ -56,13 +56,13 @@ export function DokAppGuide() {
       <div className="rounded-2xl border border-[#d9e8f4] bg-[#f4f9fc] p-4 text-xs leading-5 text-slate-600">
         <p className="font-semibold text-[#021d33]">Když telefon mikrofon nepovolí</p>
         <ul className="mt-2 list-disc space-y-1.5 pl-4">
-          <li>iPhone: Nastavení → Safari (nebo MeDiktor) → Mikrofon → Povolit</li>
-          <li>Android: Nastavení → Aplikace → Chrome / MeDiktor → Oprávnění → Mikrofon</li>
+          <li>iPhone: Nastavení → Safari (nebo OrdiZapis) → Mikrofon → Povolit</li>
+          <li>Android: Nastavení → Aplikace → Chrome / OrdiZapis → Oprávnění → Mikrofon</li>
           <li>Pak v aplikaci znovu „Povolit mikrofon“</li>
         </ul>
         <p className="mt-3 font-semibold text-[#021d33]">Právní upozornění</p>
         <ul className="mt-2 list-disc space-y-1.5 pl-4">
-          <li>MeDiktor od MedScopeGlobal není zdravotnický prostředek ani diagnóza.</li>
+          <li>OrdiZapis od MedScopeGlobal není zdravotnický prostředek ani diagnóza.</li>
           <li>Lékař odpovídá za kontrolu a schválení zápisu.</li>
           <li>Audio se po zpracování neukládá (ephemeral).</li>
         </ul>

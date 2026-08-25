@@ -17,7 +17,7 @@ import {
 } from "@/lib/v271/homepage";
 import { subscriptionProductId } from "@/lib/v27/config";
 import { DokumentaceDownloadPanel } from "@/components/lekari/dokumentace-download-panel";
-import { MediktorLockup } from "@/components/lekari/mediktor-mark";
+import { OrdiZapisLockup } from "@/components/lekari/ordizapis-mark";
 import { APP_PRODUCTS } from "@/lib/apps/catalog";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { AppOpenLink } from "@/components/apps/app-origin-bar";
@@ -127,7 +127,7 @@ export function V272DokumentaceAppBlock() {
         <div className="mb-6 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
             <div className="mb-4">
-              <MediktorLockup showTagline />
+              <OrdiZapisLockup showTagline />
             </div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
               {V271_DOKUMENTACE_APP.eyebrow}

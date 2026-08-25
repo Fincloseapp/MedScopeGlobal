@@ -5,8 +5,8 @@ import Link from "next/link";
 import { Download, QrCode, ShieldCheck, Building2, Loader2, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InstallAppButton } from "@/components/lekari/dok-app/install-app-button";
-import { MediktorMark } from "@/components/lekari/mediktor-mark";
-import { MEDIKTOR } from "@/lib/lekari/dokumentace/branding";
+import { OrdiZapisMark } from "@/components/lekari/ordizapis-mark";
+import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
 
 type EligibilityResponse = {
   eligible: boolean;
@@ -80,12 +80,12 @@ export function DokumentaceDownloadPanel({
       >
         <div>
           <div className="mb-3 flex items-center gap-3">
-            <MediktorMark size="md" className="rounded-[22%] ring-2 ring-white/25" />
+            <OrdiZapisMark size="md" className="rounded-[22%] ring-2 ring-white/25" />
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-sky-200">
-                Aplikace pro ověřené lékaře · {MEDIKTOR.domain}
+                Aplikace pro ověřené lékaře · {ORDIZAPIS.domain}
               </p>
-              <p className="text-sm font-medium text-sky-100/90">{MEDIKTOR.tagline}</p>
+              <p className="text-sm font-medium text-sky-100/90">{ORDIZAPIS.tagline}</p>
             </div>
           </div>
           <h2
@@ -93,10 +93,10 @@ export function DokumentaceDownloadPanel({
               variant === "homepage" ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl"
             }`}
           >
-            {"Stáhnout "}{MEDIKTOR.shortName}
+            {"Stáhnout "}{ORDIZAPIS.shortName}
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-sky-100/95">
-            {MEDIKTOR.pitch} Instalovatelná aplikace propojená s účtem {MEDIKTOR.provider}.
+            {ORDIZAPIS.pitch} Instalovatelná aplikace propojená s účtem {ORDIZAPIS.provider}.
           </p>
 
           {loading ? (
@@ -150,7 +150,7 @@ export function DokumentaceDownloadPanel({
                   variant="outline"
                   className="h-10 rounded-full border-white/40 bg-transparent px-5 text-white hover:bg-white/10"
                 >
-                  <Link href="/lekari/dokumentace">Více o MeDiktoru</Link>
+                  <Link href="/lekari/dokumentace">Více o OrdiZapisu</Link>
                 </Button>
               </div>
             </div>
@@ -162,7 +162,7 @@ export function DokumentaceDownloadPanel({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={qrSrc}
-              alt={`QR kód pro stažení ${MEDIKTOR.fullName}`}
+              alt={`QR kód pro stažení ${ORDIZAPIS.fullName}`}
               width={180}
               height={180}
               className="h-[160px] w-[160px] sm:h-[180px] sm:w-[180px]"

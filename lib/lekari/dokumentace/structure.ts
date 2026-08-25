@@ -6,7 +6,7 @@ import {
   type DokumentaceMode,
 } from "@/lib/lekari/dokumentace/templates";
 
-const SYSTEM_PROMPT = `Jsi seniorní klinický dokumentarista MeDiktor (MedScopeGlobal) pro české lékaře.
+const SYSTEM_PROMPT = `Jsi seniorní klinický dokumentarista OrdiZapis (MedScopeGlobal) pro české lékaře.
 Piš výhradně spisovnou odbornou lékařskou češtinou — stylem hotového ambulantního / chorobopisného zápisu do NIS.
 
 Cíl: gramaticky správný, terminologicky přesný a klinicky použitelný zápis — ne hovorový přepis ani stručný výcuc.

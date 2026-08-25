@@ -28,16 +28,16 @@ import {
   type DokumentaceTemplateId,
 } from "@/lib/lekari/dokumentace/templates";
 import {
-  MEDIKTOR_FILE_ACCEPT,
-  MEDIKTOR_MAX_FILE_BYTES,
+  ORDIZAPIS_FILE_ACCEPT,
+  ORDIZAPIS_MAX_FILE_BYTES,
   friendlyFetchError,
   resolveAudioMeta,
   uploadAndTranscribePhoneFile,
-} from "@/components/lekari/mediktor-audio";
+} from "@/components/lekari/ordizapis-audio";
 import {
-  downloadMediktorDoc,
-  shareMediktorDoc,
-} from "@/components/lekari/mediktor-export";
+  downloadOrdiZapisDoc,
+  shareOrdiZapisDoc,
+} from "@/components/lekari/ordizapis-export";
 
 type WorkspaceState = "idle" | "recording" | "processing" | "done" | "error";
 
@@ -74,12 +74,12 @@ function isMobileClient(): boolean {
   return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 }
 
-const CONSENT_KEY = "mediktor_consent_v1";
+const CONSENT_KEY = "ordizapis_consent_v1";
 
 function micErrorMessage(err: unknown): string {
   const name = err && typeof err === "object" && "name" in err ? String((err as { name: string }).name) : "";
   if (name === "NotAllowedError" || name === "PermissionDeniedError") {
-    return "Mikrofon je zablokovaný. V telefonu: Nastavení → MeDiktor / Safari / Chrome → Mikrofon → Povolit, pak znovu klepněte na „Povolit mikrofon“.";
+    return "Mikrofon je zablokovaný. V telefonu: Nastavení → OrdiZapis / Safari / Chrome → Mikrofon → Povolit, pak znovu klepněte na „Povolit mikrofon“.";
   }
   if (name === "NotFoundError") {
     return "Mikrofon nebyl nalezen. Zkontrolujte, že zařízení má mikrofon a není používán jinou aplikací.";
@@ -544,9 +544,9 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     const source = isApp ? "pwa-file" : isMobileClient() ? "mobile-file" : "web-file";
 
     try {
-      if (file.size > MEDIKTOR_MAX_FILE_BYTES) {
+      if (file.size > ORDIZAPIS_MAX_FILE_BYTES) {
         setError(
-          "Soubor je větší než 25 MB. Nahrajte kratší nahrávku nebo použijte Nahrávat v MeDiktoru."
+          "Soubor je větší než 25 MB. Nahrajte kratší nahrávku nebo použijte Nahrávat v OrdiZapisu."
         );
         setState("error");
         return;
@@ -626,8 +626,8 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
   async function shareNote(text: string, title?: string | null) {
     if (!text) return;
     try {
-      const result = await shareMediktorDoc(text, {
-        title: title || "MeDiktor zápis",
+      const result = await shareOrdiZapisDoc(text, {
+        title: title || "OrdiZapis zápis",
         templateId,
       });
       if (result === "copied") {
@@ -654,8 +654,8 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
 
   function downloadNote() {
     if (!note) return;
-    downloadMediktorDoc(note, {
-      title: "MeDiktor · klinický zápis",
+    downloadOrdiZapisDoc(note, {
+      title: "OrdiZapis · klinický zápis",
       templateId,
     });
   }
@@ -866,7 +866,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             <input
               ref={fileInputRef}
               type="file"
-              accept={MEDIKTOR_FILE_ACCEPT}
+              accept={ORDIZAPIS_FILE_ACCEPT}
               className="hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];
@@ -902,7 +902,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                   href="/predplatne#dokumentace"
                   className="font-semibold text-[#005B96] underline"
                 >
-                  MeDiktor od 390 Kč
+                  OrdiZapis od 390 Kč
                 </Link>
                 {" · "}
                 <Link href="/predplatne#physician" className="underline">
@@ -1083,7 +1083,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       ) : null}
 
       <div className="rounded-xl border border-[#d9e8f4] bg-[#f4f9fc] px-4 py-3 text-xs leading-5 text-slate-600">
-        MeDiktor od MedScopeGlobal není zdravotnický prostředek. Výstup je návrh AI —
+        OrdiZapis od MedScopeGlobal není zdravotnický prostředek. Výstup je návrh AI —
         konečnou odpovědnost za obsah nese lékař. Audio se po zpracování
         neukládá (ephemeral). Před nahráváním rozhovoru informujte pacienta / pacientku.
       </div>

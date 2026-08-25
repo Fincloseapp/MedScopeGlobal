@@ -1,10 +1,10 @@
 /* MedScope Dokumentace PWA service worker */
-const CACHE_NAME = 'msg-dok-v2';
+const CACHE_NAME = 'msg-ordizapis-v1';
 const SHELL = [
   '/app/dokumentace',
   '/dokumentace-manifest.json',
-  '/assets/mediktor/icon-192.png',
-  '/assets/mediktor/icon-512.png',
+  '/assets/ordizapis/icon-192.png',
+  '/assets/ordizapis/icon-512.png',
 ];
 
 self.addEventListener('install', (event) => {

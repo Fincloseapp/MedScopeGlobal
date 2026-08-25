@@ -1,6 +1,8 @@
 /** Three consumer apps of MedScopeGlobal — shared product catalog */
 
-export type AppProductId = "medipacient" | "mediprep" | "mediktor";
+export type AppProductId = "medipacient" | "mediprep" | "ordizapis";
+/** @deprecated Legacy product id — use ordizapis */
+export type LegacyAppProductId = AppProductId | "mediktor";
 
 export type AppProduct = {
   id: AppProductId;
@@ -82,12 +84,12 @@ export const MEDIPREP: AppProduct = {
   },
 };
 
-export const MEDIKTOR_APP: AppProduct = {
-  id: "mediktor",
-  shortName: "MeDiktor",
+export const ORDIZAPIS_APP: AppProduct = {
+  id: "ordizapis",
+  shortName: "OrdiZapis",
   provider: PROVIDER,
   domain: DOMAIN,
-  tagline: "Nahrajte v mobilu — zápis píše MeDiktor",
+  tagline: "Nahrajte v mobilu — zápis píše OrdiZapis",
   pitch:
     "Nahrajte v telefonu diktát, nebo konzultaci s pacientem či pacientkou → odborná anamnéza a klinický zápis.",
   audience: "Ověření lékaři",
@@ -101,16 +103,20 @@ export const MEDIKTOR_APP: AppProduct = {
   themeColor: "#005B96",
   backgroundColor: "#021d33",
   assets: {
-    icon192: "/assets/mediktor/icon-192.png",
-    icon512: "/assets/mediktor/icon-512.png",
-    appleTouch: "/assets/mediktor/apple-touch-icon.png",
+    icon192: "/assets/ordizapis/icon-192.png",
+    icon512: "/assets/ordizapis/icon-512.png",
+    appleTouch: "/assets/ordizapis/apple-touch-icon.png",
   },
 };
 
-export const APP_PRODUCTS: AppProduct[] = [MEDIPACIENT, MEDIPREP, MEDIKTOR_APP];
+/** @deprecated Use ORDIZAPIS_APP */
+export const MEDIKTOR_APP = ORDIZAPIS_APP;
 
-export function appById(id: AppProductId): AppProduct {
-  const found = APP_PRODUCTS.find((a) => a.id === id);
+export const APP_PRODUCTS: AppProduct[] = [MEDIPACIENT, MEDIPREP, ORDIZAPIS_APP];
+
+export function appById(id: LegacyAppProductId): AppProduct {
+  const normalized: AppProductId = id === "mediktor" ? "ordizapis" : id;
+  const found = APP_PRODUCTS.find((a) => a.id === normalized);
   if (!found) throw new Error(`Unknown app ${id}`);
   return found;
 }

@@ -113,7 +113,7 @@ export function SearchCommand({
               </Link>
             ))}
           {!loading && q.trim().length >= 2 && results.length === 0 && (
-            <p className="text-sm text-muted-foreground">Nic se nenašlo. Zkuste MeDipacient, MeDiprep nebo MeDiktor.</p>
+            <p className="text-sm text-muted-foreground">Nic se nenašlo. Zkuste MeDipacient, MeDiprep nebo OrdiZapis.</p>
           )}
         </div>
         <Button

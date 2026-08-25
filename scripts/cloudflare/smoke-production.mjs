@@ -6,16 +6,16 @@
 const base = (process.env.SMOKE_BASE_URL || "https://medscopeglobal.com").replace(/\/$/, "");
 
 const pages = [
-  { path: "/", must: ["MeDipacient", "MeDiprep", "MeDiktor", "Zpravodajství", "medscopeglobal.com", "svátek"], mustNot: ["denní crony"] },
-  { path: "/aplikace", must: ["MeDipacient", "MeDiprep", "MeDiktor", "14 dní"] },
+  { path: "/", must: ["MeDipacient", "MeDiprep", "OrdiZapis", "Zpravodajství", "medscopeglobal.com", "svátek"], mustNot: ["denní crony"] },
+  { path: "/aplikace", must: ["MeDipacient", "MeDiprep", "OrdiZapis", "14 dní"] },
   { path: "/medipacient", must: ["MeDipacient"] },
   { path: "/medipacient/stahnout", must: ["MeDipacient"] },
   { path: "/mediprep", must: ["MeDiprep"] },
   { path: "/mediprep/stahnout", must: ["MeDiprep"] },
   { path: "/app/pacient", must: ["MeDipacient"] },
   { path: "/app/priprava", must: ["MeDiprep"] },
-  { path: "/lekari/dokumentace", must: ["MeDiktor"] },
-  { path: "/app/dokumentace", must: ["MeDiktor"] },
+  { path: "/lekari/dokumentace", must: ["OrdiZapis"] },
+  { path: "/app/dokumentace", must: ["OrdiZapis"] },
   { path: "/dashboard", must: ["MeDipacient", "MeDiprep"] },
   { path: "/predplatne", must: ["14"] },
   { path: "/login", must: ["přihlá"] },
@@ -33,12 +33,12 @@ const assets = [
   "/assets/medipacient/icon-512.png",
   "/assets/mediprep/icon-192.png",
   "/assets/mediprep/icon-512.png",
-  "/assets/mediktor/icon-192.png",
-  "/assets/mediktor/icon-512.png",
+  "/assets/ordizapis/icon-192.png",
+  "/assets/ordizapis/icon-512.png",
   "/assets/ai/assistant-brunette.webp",
   "/assets/marketing/medipacient.webp",
   "/assets/marketing/mediprep.webp",
-  "/assets/marketing/mediktor-cs.webp",
+  "/assets/marketing/ordizapis-cs.webp",
 ];
 
 let failed = 0;

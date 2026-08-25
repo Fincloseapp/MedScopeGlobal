@@ -32,7 +32,7 @@ export function SubscriptionComparisonTable() {
       </h2>
       <p className="mt-2 text-sm text-muted-foreground">
         Přehled funkcí podle cílové skupiny — všechny tarify zahrnují 14denní zkušební verzi.
-        MeDiktor od MedScopeGlobal (390 Kč) je samostatný vstup se stejnými právy lékaře.
+        OrdiZapis od MedScopeGlobal (390 Kč) je samostatný vstup se stejnými právy lékaře.
       </p>
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-[#005B96]/15 bg-white shadow-sm">

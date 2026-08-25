@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 export const maxDuration = 120;
 
 /**
- * Single audio segment STT for MeDiktor.
+ * Single audio segment STT for OrdiZapis.
  * Does not consume the daily Dokumentace quota (final structure/process does).
  * Kept small so uploads stay under Vercel body limits (~4.5 MB).
  */

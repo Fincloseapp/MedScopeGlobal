@@ -18,7 +18,7 @@ const STATIC_POOL: Record<ConversionSlot, ConversionCopy[]> = {
       slot: "nav_cta",
       eyebrow: "Pro váš zájem",
       headline: "MedScope Premium",
-      body: "Aplikace MeDipacient, MeDiprep a MeDiktor plus VIP články. 14 dní zdarma.",
+      body: "Aplikace MeDipacient, MeDiprep a OrdiZapis plus VIP články. 14 dní zdarma.",
       ctaLabel: "14 dní zdarma",
       ctaHref: "/predplatne?trial=1",
     },
@@ -28,7 +28,7 @@ const STATIC_POOL: Record<ConversionSlot, ConversionCopy[]> = {
       slot: "nav_strip",
       eyebrow: "Pro váš zájem",
       headline: "Tři aplikace na ploše telefonu",
-      body: "MeDipacient, MeDiprep a MeDiktor — zkušební dashboard hned, předplatné od 99 Kč. 14 dní zdarma.",
+      body: "MeDipacient, MeDiprep a OrdiZapis — zkušební dashboard hned, předplatné od 99 Kč. 14 dní zdarma.",
       ctaLabel: "Stáhnout aplikace",
       ctaHref: "/aplikace",
       hint: "14 dní na vyzkoušení",
@@ -146,7 +146,7 @@ export function getVerejnostNavStripCopy(): ConversionCopy {
     body: "Zkušební časová osa je otevřená. Nahrání vlastních zpráv po přihlášení — 99 Kč/měsíc.",
     ctaLabel: "Otevřít MeDipacient",
     ctaHref: "/app/pacient",
-    hint: "Stažení na plochu jako MeDiktor",
+    hint: "Stažení na plochu jako OrdiZapis",
   };
 }
 
@@ -154,9 +154,9 @@ export function getLekariNavStripCopy(): ConversionCopy {
   return {
     slot: "nav_strip",
     eyebrow: "Pro ověřené lékaře",
-    headline: "MeDiktor napíše zápis z diktátu",
+    headline: "OrdiZapis napíše zápis z diktátu",
     body: "Nahrávejte v mobilu. Stažení po ověření účtu. 390 Kč/měsíc · 14 dní zdarma.",
-    ctaLabel: "Stáhnout MeDiktor",
+    ctaLabel: "Stáhnout OrdiZapis",
     ctaHref: "/lekari/dokumentace",
   };
 }
