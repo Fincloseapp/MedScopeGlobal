@@ -9,12 +9,13 @@ export const MARKETING_VISUALS = {
 } as const;
 
 export const APP_MARKETING_IMAGE: Record<
-  "medipacient" | "mediprep" | "ordizapis" | "mediktor",
+  "medipacient" | "mediprep" | "ordizapis" | "mediflow" | "mediktor",
   string
 > = {
   medipacient: MARKETING_VISUALS.medipacient,
   mediprep: MARKETING_VISUALS.mediprep,
   ordizapis: MARKETING_VISUALS.ordizapis,
+  mediflow: MARKETING_VISUALS.medipacient,
   /** @deprecated Use ordizapis */
   mediktor: MARKETING_VISUALS.ordizapis,
 };
