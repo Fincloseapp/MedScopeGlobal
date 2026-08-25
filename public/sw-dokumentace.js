@@ -1,5 +1,5 @@
 /* MedScope Dokumentace PWA service worker */
-const CACHE_NAME = 'msg-ordizapis-v2';
+const CACHE_NAME = 'msg-ordizapis-v3';
 const SHELL = [
   '/app/dokumentace',
   '/dokumentace-manifest.json',
@@ -26,6 +26,8 @@ function isApi(url) {
 }
 
 function isStaticAsset(url) {
+  // Never cache-first marketing art (brand renames must show immediately)
+  if (url.pathname.startsWith('/assets/marketing/')) return false;
   return (
     url.pathname.startsWith('/assets/') ||
     url.pathname.startsWith('/_next/static/') ||

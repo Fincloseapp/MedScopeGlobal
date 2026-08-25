@@ -85,8 +85,10 @@ const nextConfig = {
       { source: "/lekari/clanky", destination: "/articles", permanent: false },
       // MeDiktor → OrdiZapis asset aliases (installed PWAs / old caches)
       { source: "/assets/mediktor/:path*", destination: "/assets/ordizapis/:path*", permanent: false },
-      { source: "/assets/marketing/mediktor-cs.webp", destination: "/assets/marketing/ordizapis-cs.webp", permanent: false },
-      { source: "/assets/marketing/mediktor.webp", destination: "/assets/marketing/ordizapis.webp", permanent: false },
+      { source: "/assets/marketing/mediktor-cs.webp", destination: "/assets/marketing/ordizapis-phone-v2.webp", permanent: false },
+      { source: "/assets/marketing/mediktor.webp", destination: "/assets/marketing/ordizapis-phone-v2.webp", permanent: false },
+      { source: "/assets/marketing/ordizapis-cs.webp", destination: "/assets/marketing/ordizapis-phone-v2.webp", permanent: false },
+      { source: "/assets/marketing/ordizapis.webp", destination: "/assets/marketing/ordizapis-phone-v2.webp", permanent: false },
 
       { source: "/app/medipacient", destination: "/app/pacient", permanent: false },
       { source: "/app/mediprep", destination: "/app/priprava", permanent: false },

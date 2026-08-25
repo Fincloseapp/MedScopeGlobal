@@ -2,9 +2,10 @@ export const MARKETING_VISUALS = {
   aiAssistant: "/assets/ai/assistant-brunette.webp",
   medipacient: "/assets/marketing/medipacient.webp",
   mediprep: "/assets/marketing/mediprep.webp",
-  ordizapis: "/assets/marketing/ordizapis-cs.webp",
+  /** Cache-busted phone mockup with OrdiZapis on-screen branding */
+  ordizapis: "/assets/marketing/ordizapis-phone-v2.webp",
   /** @deprecated Use ordizapis */
-  mediktor: "/assets/marketing/ordizapis-cs.webp",
+  mediktor: "/assets/marketing/ordizapis-phone-v2.webp",
 } as const;
 
 export const APP_MARKETING_IMAGE: Record<
