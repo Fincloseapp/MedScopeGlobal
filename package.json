@@ -85,6 +85,7 @@
     "cf:env:sync": "node scripts/cloudflare/sync-env-from-dotenv.mjs",
     "cf:dns": "node scripts/cloudflare/dns-point-workers.mjs",
     "cf:smoke": "node scripts/cloudflare/smoke-production.mjs",
+    "deploy:checklist": "node scripts/deploy/deploy-checklist.mjs",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
