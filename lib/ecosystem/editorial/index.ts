@@ -4,6 +4,7 @@ export * from "./desks";
 export * from "./personas";
 export * from "./syndication";
 export * from "./compliance";
+export * from "./images";
 
 export type EditorialQueueItem = {
   id: string;

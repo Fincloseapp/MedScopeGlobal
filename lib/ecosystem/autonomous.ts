@@ -12,6 +12,7 @@ export type AutonomousTask =
   | "switch-locale"
   | "mediflow-daily-reset"
   | "editorial-queue"
+  | "editorial-images"
   | "syndicate-articles";
 
 export const AUTONOMOUS_SCHEDULE: Record<AutonomousTask, { cron: string; description: string }> = {
@@ -58,6 +59,10 @@ export const AUTONOMOUS_SCHEDULE: Record<AutonomousTask, { cron: string; descrip
   "editorial-queue": {
     cron: "0 5 * * *",
     description: "Autonomní redakční fronta — téma, persona, compliance review",
+  },
+  "editorial-images": {
+    cron: "0 10 * * *",
+    description: "Autonomní vizuální redakce — hero obrázky, alt text, compliance",
   },
   "syndicate-articles": {
     cron: "0 14 * * *",

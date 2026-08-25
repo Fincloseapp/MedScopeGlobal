@@ -7,7 +7,8 @@ export type EditorialRole =
   | "journalist"
   | "editor"
   | "language_reviewer"
-  | "compliance_reviewer";
+  | "compliance_reviewer"
+  | "image_curator";
 
 export type EditorialPersona = {
   id: string;
@@ -164,6 +165,25 @@ export const EDITORIAL_PERSONAS: EditorialPersona[] = [
     editorialUnitId: "medscope_scientific_office",
     active: true,
   },
+  // Visual editorial — inclusive hero/inline imagery
+  {
+    id: "image-curator-global",
+    displayName: { cs: "Vizuální kurátor", en: "Visual Image Curator" },
+    role: "image_curator",
+    locales: ["cs", "sk", "en", "en-US", "de", "pl"],
+    topics: ["longevity", "lifestyle", "seniors", "trending"],
+    editorialUnitId: "medscope_global_editorial_board",
+    active: true,
+  },
+  {
+    id: "image-curator-cz",
+    displayName: { cs: "Kurátor ilustrací (CS)", en: "Czech Image Curator" },
+    role: "image_curator",
+    locales: ["cs", "sk"],
+    topics: ["longevity", "lifestyle", "seniors"],
+    editorialUnitId: "medscope_cz_odborna",
+    active: true,
+  },
 ];
 
 export function getPersonasForLocale(locale: GlobalLocaleCode): EditorialPersona[] {
@@ -194,4 +214,11 @@ export function getReviewPipeline(locale: GlobalLocaleCode): EditorialPersona[] 
     ...getPersonasByRole(locale, "language_reviewer").slice(0, 1),
     ...getPersonasByRole(locale, "compliance_reviewer").slice(0, 1),
   ];
+}
+
+export function getImageCuratorForLocale(
+  locale: GlobalLocaleCode
+): EditorialPersona | undefined {
+  const curators = getPersonasByRole(locale, "image_curator");
+  return curators[0] ?? getPersonasByRole("en", "image_curator")[0];
 }
