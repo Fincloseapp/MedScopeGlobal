@@ -10,7 +10,9 @@ export type AutonomousTask =
   | "generate-affiliate-boxes"
   | "generate-donation-cta"
   | "switch-locale"
-  | "mediflow-daily-reset";
+  | "mediflow-daily-reset"
+  | "editorial-queue"
+  | "syndicate-articles";
 
 export const AUTONOMOUS_SCHEDULE: Record<AutonomousTask, { cron: string; description: string }> = {
   "generate-articles": {
@@ -52,6 +54,14 @@ export const AUTONOMOUS_SCHEDULE: Record<AutonomousTask, { cron: string; descrip
   "mediflow-daily-reset": {
     cron: "0 4 * * *",
     description: "MediFlow: reset denního stavu suplementů (taken_today)",
+  },
+  "editorial-queue": {
+    cron: "0 5 * * *",
+    description: "Autonomní redakční fronta — téma, persona, compliance review",
+  },
+  "syndicate-articles": {
+    cron: "0 14 * * *",
+    description: "Syndikace článků mezi locale redakcemi (adaptace, ne duplikace)",
   },
 };
 
