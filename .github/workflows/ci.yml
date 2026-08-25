@@ -43,5 +43,8 @@ jobs:
       - name: Validate (v24 structure + gates)
         run: pnpm run validate
 
-      - name: Build (Vercel pipeline mirror)
+      - name: Build (Cloudflare / OpenNext pipeline)
+        env:
+          NEXT_PUBLIC_SITE_URL: https://medscopeglobal.com
+          MEDSCOPE_RUNTIME: cloudflare-workers
         run: pnpm run build

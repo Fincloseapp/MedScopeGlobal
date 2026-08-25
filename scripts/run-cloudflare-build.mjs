@@ -3,7 +3,7 @@
  * Cloudflare / CI build — pre-deploy gates + Next.js build.
  * OpenNext (`opennextjs-cloudflare build`) invokes `npm run build` / next build.
  */
-import { existsSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
@@ -47,7 +47,29 @@ if (process.platform === "win32" && !process.env.CI) {
     join(root, "scripts/build-win.ps1"),
   ]);
 } else {
-  run("next build", process.execPath, [nextBin, "build"]);
+  const maxAttempts = Number(process.env.NEXT_BUILD_RETRIES ?? 3);
+  let built = false;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    if (attempt > 1) {
+      console.warn(`\nRetrying next build (${attempt}/${maxAttempts}) after PageNotFound flake…\n`);
+      rmSync(join(root, ".next"), { recursive: true, force: true });
+    }
+    const result = spawnSync(process.execPath, [nextBin, "build"], {
+      cwd: root,
+      stdio: "inherit",
+      windowsHide: true,
+    });
+    if (result.status === 0) {
+      built = true;
+      console.log("✓ next build");
+      break;
+    }
+    if (attempt === maxAttempts) {
+      console.error(`\n✗ next build failed (exit ${result.status ?? 1})\n`);
+      process.exit(result.status || 1);
+    }
+  }
+  if (!built) process.exit(1);
 }
 
 console.log("\n=== Next build complete — OpenNext will package for Cloudflare Workers ===\n");
