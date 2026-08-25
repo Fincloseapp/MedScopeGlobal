@@ -117,6 +117,7 @@ const LOCALE_EXCLUDED_PREFIXES = [
   "/admin",
   "/auth/",
   "/dashboard",
+  "/go/",
   "/_next/",
   "/sw-",
 ];
