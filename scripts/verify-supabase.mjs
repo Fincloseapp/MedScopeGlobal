@@ -58,6 +58,9 @@ const recommendedTables = [
   ["mediflow_symptoms", "id"],
   ["mediflow_supplements", "id"],
   ["mediflow_saved_articles", "id"],
+  ["article_syndications", "id"],
+  ["editorial_queue", "id"],
+  ["article_image_suggestions", "id"],
 ];
 
 let ok = true;
