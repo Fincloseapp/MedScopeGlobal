@@ -1,8 +1,23 @@
 # MedScopeGlobal — Global Marketing Plan
 
+## Brand stack
+
+| Layer | Name | URL |
+|-------|------|-----|
+| Platform | **MedScopeGlobal** | medscopeglobal.com |
+| Magazine | **VitaScope** | medscopeglobal.com (editorial home `/`, `/articles`) |
+
+**VitaScope** positioning: global health & longevity magazine — longevity, wellness, and healthy lifestyle for everyone who aspires to improve. EN tagline: *See life clearly. Live it longer.*
+
+Ecosystem upsell on every touchpoint: MediFlow journal, VIP protocols, MeDipacient · MeDiprep · OrdiZapis, Academy, tringelt tips.
+
+See `docs/brand/magazine-brand.md` and `docs/MASTER_PROMPT.md`.
+
+---
+
 ## Overview
 
-MedScopeGlobal transforms into a multilingual health ecosystem targeting USA, EU, Asia, and Russia with autonomous content operations, multi-engine SEO, and diversified monetization.
+MedScopeGlobal transforms into a multilingual health ecosystem targeting USA, EU, Asia, and Russia with autonomous **VitaScope** editorial, multi-engine SEO, and diversified monetization.
 
 ---
 
@@ -119,6 +134,8 @@ MedScopeGlobal transforms into a multilingual health ecosystem targeting USA, EU
 |---------|---------------|----------|
 | Display ads | `GlobalAdSlot` component, provider by locale | High |
 | VIP subscriptions | Stripe checkout, 4 tiers + VIP longevity | High |
+| Tringelt (micro-tip) | `ArticleTringeltTip`, `/api/ecosystem/article-tip` | Medium |
+| MediFlow | Wellness journal, article save, supplement tracking | High |
 | Micro-donations | Stripe one-time, `/api/ecosystem/donate` | Medium |
 | Affiliate boxes | `AffiliateBox` in articles, regional URLs | Medium |
 | Sponsored articles | Admin CMS ad campaigns | Medium |

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MAGAZINE } from "@/lib/brand/magazine";
 import { MEDSCOPE_LOGO_ALT } from "@/lib/brand/logo";
 
 /** Persistent origin bar inside app shells — always points back to the magazine. */
@@ -50,7 +51,7 @@ export function AppOpenLink({
 export function MagazineHomeLink({ className = "" }: { className?: string }) {
   return (
     <Link href="/" className={`text-sm font-semibold text-[#005B96] hover:underline ${className}`}>
-      ← MedScopeGlobal.com
+      ← {MAGAZINE.name}
     </Link>
   );
 }

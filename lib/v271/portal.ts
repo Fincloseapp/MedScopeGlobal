@@ -1,11 +1,20 @@
 /** Homepage portal IA — compact start page, then news + services (Seznam-inspired). */
 
+import { getMagazineCopy, MAGAZINE } from "@/lib/brand/magazine";
+import type { LocaleCode } from "@/lib/i18n/config";
+
+/** Default Czech hero copy (legacy export — prefer getPortalPhilosophy(locale) on server). */
 export const PORTAL_PHILOSOPHY = {
-  eyebrow: "MedScopeGlobal.com",
-  claim: "Zdravotnictví na jednom místě",
-  subtitle:
-    "Hledejte, otevřete aplikaci, čtěte zprávy. MeDipacient, MeDiprep a OrdiZapis vedle redakce — bez extra záložek.",
+  eyebrow: MAGAZINE.heroEyebrow.cs,
+  claim: MAGAZINE.heroClaim.cs,
+  subtitle: MAGAZINE.subtitle.cs,
+  whatsNew: MAGAZINE.whatsNew.cs,
+  magazineName: MAGAZINE.name,
 } as const;
+
+export function getPortalPhilosophy(locale?: LocaleCode | string) {
+  return getMagazineCopy(locale);
+}
 
 export const PORTAL_SEARCH_TABS = [
   { id: "search", label: "Hledat", action: "/search", queryParam: "q" },

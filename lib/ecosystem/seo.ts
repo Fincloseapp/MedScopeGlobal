@@ -1,6 +1,7 @@
 /** Multi-engine SEO configuration — Google, Yandex, Baidu, Naver, Seznam */
 
 import { SITE } from "@/lib/config/site";
+import { MAGAZINE } from "@/lib/brand/magazine";
 import { GLOBAL_LOCALES, type GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { localeToPathSegment } from "@/lib/i18n/locale-path";
 
@@ -77,8 +78,8 @@ export function articleJsonLdGlobal(article: {
     inLanguage: article.locale ?? "cs",
     author: { "@type": "Person", name: article.authorName ?? SITE.name },
     publisher: {
-      "@type": "Organization",
-      name: SITE.name,
+      "@type": "NewsMediaOrganization",
+      name: MAGAZINE.name,
       url: SITE.url,
     },
     datePublished: article.publishedAt,

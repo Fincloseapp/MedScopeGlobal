@@ -1,4 +1,5 @@
 import { MEDSCOPE_LOGO } from "@/lib/brand/logo";
+import { MAGAZINE } from "@/lib/brand/magazine";
 import { SITE } from "@/lib/config/site";
 
 export function organizationJsonLd() {
@@ -6,6 +7,7 @@ export function organizationJsonLd() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: SITE.name,
+    alternateName: MAGAZINE.name,
     url: SITE.url,
     description: SITE.description,
     email: SITE.supportEmail,
@@ -18,6 +20,25 @@ export function organizationJsonLd() {
         availableLanguage: ["Czech", "English", "German", "Polish", "Slovak"],
       },
     ],
+  };
+}
+
+/** VitaScope — global health & longevity publication on MedScopeGlobal */
+export function publicationJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "NewsMediaOrganization",
+    name: MAGAZINE.name,
+    alternateName: "VitaScope Magazine",
+    url: SITE.url,
+    description: MAGAZINE.positioning.en,
+    parentOrganization: {
+      "@type": "Organization",
+      name: SITE.name,
+      url: SITE.url,
+    },
+    publishingPrinciples: `${SITE.url}/info`,
+    inLanguage: ["en", "cs", "de", "fr", "es", "pl", "sk"],
   };
 }
 
@@ -35,9 +56,10 @@ export function articleJsonLd(article: {
     description: article.excerpt,
     author: {
       "@type": "Person",
-      name: article.authorName ?? SITE.name,
+      name: article.authorName ?? MAGAZINE.name,
     },
-    publisher: organizationJsonLd(),
+    publisher: publicationJsonLd(),
+    isPartOf: publicationJsonLd(),
     datePublished: article.publishedAt,
     mainEntityOfPage: `${SITE.url}/article/${article.slug}`,
   };
@@ -145,9 +167,9 @@ export function newsletterJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Newsletter",
-    name: `${SITE.name} Newsletter`,
-    description: "Odborný medicínský newsletter MedScopeGlobal",
-    publisher: organizationJsonLd(),
+    name: `${MAGAZINE.name} Newsletter`,
+    description: `Health, longevity, and wellness updates from ${MAGAZINE.name} on ${SITE.name}`,
+    publisher: publicationJsonLd(),
     url: `${SITE.url}/newsletter`,
   };
 }
@@ -180,9 +202,11 @@ export function webSiteJsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: SITE.name,
+    alternateName: MAGAZINE.name,
     url: SITE.url,
     description: SITE.description,
-    inLanguage: "cs-CZ",
+    inLanguage: ["cs-CZ", "en-US"],
+    about: publicationJsonLd(),
     potentialAction: {
       "@type": "SearchAction",
       target: `${SITE.url}/articles?q={search_term_string}`,

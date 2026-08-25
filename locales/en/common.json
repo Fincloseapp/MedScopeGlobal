@@ -1,11 +1,13 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "Clinical intelligence & evidence-based medicine"
+    "magazine": "VitaScope",
+    "tagline": "See life clearly. Live it longer.",
+    "magazineTagline": "Global health & longevity magazine — live well, longer, at every age"
   },
   "nav": {
     "home": "Home",
-    "magazine": "Magazine",
+    "magazine": "VitaScope",
     "pricing": "Pricing",
     "welcome": "Platform",
     "sections": "Sections",
