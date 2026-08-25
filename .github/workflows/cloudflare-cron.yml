@@ -35,6 +35,7 @@ jobs:
             /api/cron/marketing
             /api/cron/academy-daily
             /api/cron/v43-health-monitor
+            /api/cron/ecosystem-mediflow
           )
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             paths=("${{ github.event.inputs.path }}")

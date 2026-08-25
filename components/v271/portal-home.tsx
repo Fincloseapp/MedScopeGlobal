@@ -17,6 +17,7 @@ import {
   TrendySection,
   LongevityProtocolsSection,
   RecommendedToolsSection,
+  HomepageAffiliateSection,
 } from "@/components/ecosystem/magazine-sections";
 import { AppOpenLink, isStandaloneAppHref } from "@/components/apps/app-origin-bar";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
@@ -273,6 +274,7 @@ export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
             <TrendySection />
             <LongevityProtocolsSection />
             <RecommendedToolsSection />
+            <HomepageAffiliateSection />
           </div>
         </div>
       </div>

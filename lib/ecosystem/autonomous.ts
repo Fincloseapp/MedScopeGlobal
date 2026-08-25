@@ -9,7 +9,8 @@ export type AutonomousTask =
   | "generate-vip-content"
   | "generate-affiliate-boxes"
   | "generate-donation-cta"
-  | "switch-locale";
+  | "switch-locale"
+  | "mediflow-daily-reset";
 
 export const AUTONOMOUS_SCHEDULE: Record<AutonomousTask, { cron: string; description: string }> = {
   "generate-articles": {
@@ -47,6 +48,10 @@ export const AUTONOMOUS_SCHEDULE: Record<AutonomousTask, { cron: string; descrip
   "switch-locale": {
     cron: "0 * * * *",
     description: "Geolokace → automatické přepnutí jazyka",
+  },
+  "mediflow-daily-reset": {
+    cron: "0 4 * * *",
+    description: "MediFlow: reset denního stavu suplementů (taken_today)",
   },
 };
 

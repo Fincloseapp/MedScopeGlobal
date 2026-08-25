@@ -166,6 +166,21 @@ export async function saveMediFlowArticle(
   return rowToSaved(data);
 }
 
+/** Cron: reset taken_today flags on all MediFlow supplements (daily at 04:00 UTC). */
+export async function resetMediFlowSupplementsDaily(): Promise<{ reset: number; skipped?: boolean }> {
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return { reset: 0, skipped: true };
+
+  const { data, error } = await admin
+    .from("mediflow_supplements")
+    .update({ taken_today: false, updated_at: new Date().toISOString() })
+    .eq("taken_today", true)
+    .select("id");
+
+  if (error) throw new Error(error.message);
+  return { reset: data?.length ?? 0 };
+}
+
 export async function seedMediFlowDefaults(userId: string): Promise<void> {
   const admin = tryCreateServiceRoleClient();
   if (!admin) return;
