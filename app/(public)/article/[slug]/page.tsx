@@ -48,6 +48,8 @@ import {
   VipUpgradeNudge,
 } from "@/components/monetization/article-cta";
 import { ArticleTringeltTip } from "@/components/monetization/article-tringelt-tip";
+import { ArticleImageSupportNudge } from "@/components/monetization/article-image-support-nudge";
+import { getArticleHeroAltText } from "@/lib/ecosystem/editorial/images";
 import { TopLongevityProducts } from "@/components/monetization/affiliate-box";
 import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
@@ -170,6 +172,14 @@ export default async function ArticlePage({ params }: Props) {
   const category = article.categories;
   const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
   const editorialAssignment = assignEditorialUnits(article);
+  const heroAlt = getArticleHeroAltText(
+    {
+      title: article.title,
+      excerpt: article.excerpt,
+      metadata: (article.metadata as Record<string, unknown> | null) ?? null,
+    },
+    (locale as GlobalLocaleCode) ?? "cs"
+  );
 
   const isV19Article = article.rubric_slug === V19_RUBRIC_SLUG;
   const v19Quiz = (article.quiz_json ?? {}) as Record<string, unknown>;
@@ -315,7 +325,7 @@ export default async function ArticlePage({ params }: Props) {
                 <>
                   <Image
                     src={article.cover_image_url}
-                    alt=""
+                    alt={heroAlt}
                     fill
                     priority
                     className="object-cover"
@@ -349,6 +359,13 @@ export default async function ArticlePage({ params }: Props) {
                 </div>
               )}
             </div>
+
+            {!locked ? (
+              <ArticleImageSupportNudge
+                locale={(locale as GlobalLocaleCode) ?? "cs"}
+                articleSlug={article.slug}
+              />
+            ) : null}
 
             {studentBannerAds.length > 0 ? (
               <StudentAdBlocks campaigns={studentBannerAds} variant="banner" />
@@ -404,16 +421,18 @@ export default async function ArticlePage({ params }: Props) {
             ) : null}
 
             {!locked ? (
-              <ArticleTringeltTip
-                articleSlug={article.slug}
-                articleTitle={article.title}
-                authorName={formatEditorialUnitDisplay(
-                  editorialAssignment.primary,
-                  editorialLocale,
-                  editorialAssignment.aiAssisted
-                )}
-                locale={(locale as GlobalLocaleCode) ?? "cs"}
-              />
+              <div id={`article-tip-${article.slug}`}>
+                <ArticleTringeltTip
+                  articleSlug={article.slug}
+                  articleTitle={article.title}
+                  authorName={formatEditorialUnitDisplay(
+                    editorialAssignment.primary,
+                    editorialLocale,
+                    editorialAssignment.aiAssisted
+                  )}
+                  locale={(locale as GlobalLocaleCode) ?? "cs"}
+                />
+              </div>
             ) : null}
 
             {!locked ? (

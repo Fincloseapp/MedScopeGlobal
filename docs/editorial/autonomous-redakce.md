@@ -57,10 +57,50 @@ Konfigurace: `lib/ecosystem/editorial/compliance.ts`
 | Task | Cron | Popis |
 |------|------|-------|
 | `editorial-queue` | 05:00 | Fronta redakčních úkolů per desk |
+| `editorial-images` | 10:00 | Vizuální redakce — hero obrázky, alt text, compliance |
 | `syndicate-articles` | 14:00 | Plán syndikace mezi locale |
 | `generate-articles` | 06:00 | LLM + editorial review |
 
-Endpoint: `POST /api/ecosystem/autonomous` (Bearer `CRON_SECRET`)
+Endpoint: `POST /api/ecosystem/autonomous` (Bearer `CRON_SECRET`)  
+Obrázky: `POST /api/ecosystem/editorial/images` (Bearer `CRON_SECRET`)
+
+## Vizuální redakce (obrázky)
+
+Autonomní pipeline vybírá ilustrační hero obrázky k článkům podle tématu (longevity, lifestyle, seniors, trending).
+
+### Persony
+
+| Role | Úloha |
+|------|-------|
+| **image_curator** | Vybírá inclusive, legálně compliant imagery; generuje alt text CS+EN |
+
+Persony: `image-curator-global`, `image-curator-cz` — viz `lib/ecosystem/editorial/personas.ts`
+
+### Pravidla (policy)
+
+- **Zamítnuto:** politika, násilí, stereotypy, zavádějící health claims
+- **Priorita:** longevity, zdravý životní styl, senioři — globálně přijatelné, rasově inclusive
+- **Zdroje:** kurátorovaný Unsplash pool, volitelně `UNSPLASH_ACCESS_KEY`, SVG fallback z `/assets/affiliate/`
+- **Bez AI generování** — scaffold pro budoucí AI provider
+
+Konfigurace: `lib/ecosystem/editorial/images/` (`policy.ts`, `matcher.ts`, `sources.ts`, `processor.ts`)
+
+### Backfill existujících článků
+
+```bash
+# Dry-run (default) — vypíše kandidáty bez zápisu
+node scripts/editorial/backfill-article-images.mjs
+
+# Zápis cover_image_url + metadata alt text (service role)
+node scripts/editorial/backfill-article-images.mjs --apply --limit=20
+```
+
+### UI integrace
+
+- Hero `alt` z `metadata.hero_alt_text_cs/en` nebo generovaný fallback
+- Jemný CTA pod hero: `ArticleImageSupportNudge` → tringelt / VIP (nepřímý, nenásilný)
+
+Komponenty: `components/monetization/article-image-support-nudge.tsx`
 
 ## Tringelt (tip) monetizace
 
@@ -89,14 +129,23 @@ Soubor: `supabase/migrations/20260825220000_editorial_redakce.sql`
 - `editorial_queue` — cron pipeline scaffold
 - Index `idx_v27_orders_article_tip` — tipy per slug
 
+Soubor: `supabase/migrations/20260825230000_editorial_images.sql`
+
+- `article_image_suggestions` — navržené hero URL, alt text CS/EN, compliance, `applied_at`
+- `editorial_queue.task_type` — `article` | `image` | `syndication`
+
 ## Související soubory
 
 ```
 lib/ecosystem/editorial/
   desks.ts, personas.ts, syndication.ts, compliance.ts, index.ts
+  images/ — policy, prompts, matcher, sources, processor, alt-text
 lib/ecosystem/monetization.ts  — ARTICLE_TIP_TIERS
-lib/ecosystem/autonomous.ts    — editorial-queue, syndicate-articles
+lib/ecosystem/autonomous.ts    — editorial-queue, editorial-images, syndicate-articles
 app/api/ecosystem/article-tip/route.ts
 app/api/ecosystem/editorial/desks/route.ts
+app/api/ecosystem/editorial/images/route.ts
 components/monetization/article-tringelt-tip.tsx
+components/monetization/article-image-support-nudge.tsx
+scripts/editorial/backfill-article-images.mjs
 ```

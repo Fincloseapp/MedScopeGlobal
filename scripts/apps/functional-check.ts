@@ -16,6 +16,15 @@ import { bankStats } from "../../lib/prijimacky/question-bank";
 import { generateSelfTest } from "../../lib/prijimacky/quiz-from-bank";
 import { FACULTIES_ADMISSIONS_2026 } from "../../lib/prijimacky/faculties-admissions";
 import { getAffiliateRedirectDestination } from "../../lib/ecosystem/monetization";
+import {
+  inferArticleTopic,
+  matchImageForArticleSync,
+  validateImageCompliance,
+  isMissingOrStaleHeroImage,
+  scanTextForBlockedTopics,
+  getArticleHeroAltText,
+} from "../../lib/ecosystem/editorial/images";
+import { getImageCuratorForLocale } from "../../lib/ecosystem/editorial/personas";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -135,7 +144,45 @@ assert.equal(getAffiliateRedirectDestination("mg-cz")?.includes("heureka"), true
 assert.equal(getAffiliateRedirectDestination("mg-us")?.includes("amazon.com"), true);
 assert.equal(getAffiliateRedirectDestination("unknown"), null);
 
-console.log("✓ app functional checks passed");
+file("app/api/ecosystem/editorial/images/route.ts");
+file("lib/ecosystem/editorial/images/policy.ts");
+file("lib/ecosystem/editorial/images/matcher.ts");
+file("scripts/editorial/backfill-article-images.mjs");
+
+assert.equal(isMissingOrStaleHeroImage(null), true);
+assert.equal(isMissingOrStaleHeroImage(""), true);
+assert.equal(isMissingOrStaleHeroImage("https://images.unsplash.com/photo-1"), false);
+
+const longevityArticle = {
+  id: "a1",
+  slug: "longevity-spani-test",
+  title: "Dlouhověkost a kvalitní spánek pro aktivní stárnutí",
+  excerpt: "Jak spánek ovlivňuje zdraví seniorů a prevenci",
+};
+assert.equal(inferArticleTopic(longevityArticle), "longevity");
+
+const matched = matchImageForArticleSync(longevityArticle);
+assert.ok(matched?.url, "matcher returns image url");
+assert.ok(matched!.altTextCs.includes("Ilustra"), "czech alt text");
+const compliance = validateImageCompliance({
+  url: matched!.url,
+  altTextCs: matched!.altTextCs,
+  altTextEn: matched!.altTextEn,
+  topic: matched!.topic,
+  articleTitle: longevityArticle.title,
+});
+assert.equal(compliance.passed, true, "curated image passes compliance");
+
+const politicsBlocked = scanTextForBlockedTopics("political election rally health");
+assert.ok(politicsBlocked.some((t) => /politic/i.test(t)));
+
+const curator = getImageCuratorForLocale("cs");
+assert.equal(curator?.role, "image_curator");
+
+const alt = getArticleHeroAltText({ title: longevityArticle.title, excerpt: longevityArticle.excerpt }, "cs");
+assert.ok(alt.length > 20);
+
+console.log("✓ editorial image pipeline checks passed");
 console.log(
   `  MeDipacient demo: ${dash.stats.reports} zpráv, ${dash.stats.diagnoses} dg, ${dash.stats.meds} léků`
 );
