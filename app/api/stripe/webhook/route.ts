@@ -333,6 +333,29 @@ export async function POST(request: Request) {
         });
       }
 
+      if (session.metadata?.type === "article_tip" && session.id) {
+        await admin
+          .from("v27_orders")
+          .update({
+            status: "paid",
+            stripe_payment_intent_id: (session.payment_intent as string) ?? null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("stripe_session_id", session.id);
+
+        await logSecurityEvent({
+          ip,
+          action: "stripe:article_tip_completed",
+          status: "ok",
+          details: {
+            sessionId: session.id,
+            articleSlug: session.metadata?.articleSlug,
+            locale: session.metadata?.locale,
+            amountTotal: session.amount_total,
+          },
+        });
+      }
+
       if (session.metadata?.v27_checkout === "true" && session.id) {
         await admin
           .from("v27_orders")

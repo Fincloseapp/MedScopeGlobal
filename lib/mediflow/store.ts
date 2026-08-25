@@ -234,3 +234,35 @@ export async function logDonationOrder(fields: {
     { onConflict: "stripe_session_id" }
   );
 }
+
+export async function logArticleTipOrder(fields: {
+  stripeSessionId: string;
+  amountMinor: number;
+  currency: string;
+  userId?: string | null;
+  articleSlug: string;
+  articleTitle?: string;
+  locale?: string;
+}): Promise<void> {
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return;
+
+  await admin.from("v27_orders").upsert(
+    {
+      stripe_session_id: fields.stripeSessionId,
+      kind: "article_tip",
+      product_id: "article_tringelt",
+      amount_czk: fields.currency === "czk" ? fields.amountMinor : Math.round(fields.amountMinor / 100),
+      status: "pending",
+      user_id: fields.userId ?? null,
+      metadata: {
+        currency: fields.currency,
+        amount_minor: fields.amountMinor,
+        article_slug: fields.articleSlug,
+        article_title: fields.articleTitle ?? "",
+        locale: fields.locale ?? "cs",
+      },
+    },
+    { onConflict: "stripe_session_id" }
+  );
+}
