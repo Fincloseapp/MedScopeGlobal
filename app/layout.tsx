@@ -3,9 +3,10 @@ import { Inter, Libre_Baskerville } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { PublicEnvScript } from "@/components/system/public-env-script";
 import { getServerLocale } from "@/lib/i18n/server-locale";
-import { HREFLANG_LOCALES } from "@/lib/seo/metadata";
+import { buildGlobalHreflang } from "@/lib/ecosystem/seo";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { SITE } from "@/lib/config/site";
+import { getSiteUrl } from "@/lib/config/site-url";
 import { organizationJsonLd, newsletterJsonLd } from "@/lib/seo/json-ld";
 import "./globals.css";
 
@@ -20,11 +21,8 @@ const display = Libre_Baskerville({
   variable: "--font-display",
 });
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000");
+const siteUrl = getSiteUrl();
+const rootHreflang = buildGlobalHreflang("/", "cs");
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -66,10 +64,8 @@ export const metadata: Metadata = {
     site: "@MedScopeGlobal",
   },
   alternates: {
-    canonical: siteUrl,
-    languages: Object.fromEntries(
-      HREFLANG_LOCALES.map((l) => [l.hreflang, `${siteUrl}?lang=${l.code}`])
-    ),
+    canonical: rootHreflang.canonical,
+    languages: rootHreflang.languages,
   },
 };
 

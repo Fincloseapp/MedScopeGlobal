@@ -1,6 +1,7 @@
 import { SITE } from "@/lib/config/site";
 import type { Metadata } from "next";
 import { GLOBAL_LOCALES } from "@/lib/ecosystem/locales";
+import { buildGlobalHreflang } from "@/lib/ecosystem/seo";
 
 export const HREFLANG_LOCALES = GLOBAL_LOCALES.map((l) => ({
   code: l.code,
@@ -8,22 +9,9 @@ export const HREFLANG_LOCALES = GLOBAL_LOCALES.map((l) => ({
   label: l.label,
 }));
 
-function hreflangUrl(path: string, localeCode: string) {
-  return localeCode === "cs"
-    ? `${SITE.url}${path}`
-    : `${SITE.url}${path}?lang=${encodeURIComponent(localeCode)}`;
-}
-
+/** Path-prefix hreflang alternates for all global locales + x-default. */
 export function buildHreflangAlternates(path: string, locale?: string) {
-  const clean = path.startsWith("/") ? path : `/${path}`;
-  const languages: Record<string, string> = {};
-  for (const loc of GLOBAL_LOCALES) {
-    languages[loc.hreflang] = hreflangUrl(clean, loc.code);
-  }
-  languages["x-default"] = `${SITE.url}${clean}`;
-  const canonical =
-    locale && locale !== "cs" ? hreflangUrl(clean, locale) : `${SITE.url}${clean}`;
-  return { canonical, languages };
+  return buildGlobalHreflang(path, locale as Parameters<typeof buildGlobalHreflang>[1]);
 }
 
 export function buildPageMetadata(params: {

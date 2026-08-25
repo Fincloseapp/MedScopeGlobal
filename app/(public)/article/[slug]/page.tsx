@@ -20,7 +20,7 @@ import {
   formatEditorialUnitDisplay,
   type EditorialLocale,
 } from "@/lib/editorial/units";
-import { articleJsonLdGlobal } from "@/lib/ecosystem/seo";
+import { articleJsonLdGlobal, buildGlobalHreflang } from "@/lib/ecosystem/seo";
 import { canAccessContent } from "@/lib/config/access-levels";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import { getReaderContext } from "@/lib/auth/reader-context";
@@ -71,20 +71,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     article.title.slice(0, 155) + (article.title.length > 155 ? "…" : "");
 
   const keywords = v19Meta?.keywords;
+  const articlePath = `/article/${article.slug}`;
+  const { canonical, languages } = buildGlobalHreflang(
+    articlePath,
+    locale as GlobalLocaleCode
+  );
 
   return {
     title: article.title,
     description,
     keywords,
     alternates: {
-      canonical: `/article/${article.slug}`,
+      canonical,
+      languages,
     },
     openGraph: {
       title: article.title,
       description,
       type: "article",
       publishedTime: article.published_at ?? undefined,
-      url: `/article/${article.slug}`,
+      url: canonical,
       images: article.cover_image_url
         ? [{ url: article.cover_image_url }]
         : undefined,

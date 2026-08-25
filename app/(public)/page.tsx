@@ -10,19 +10,39 @@ import { PortalHome } from "@/components/v271/portal-home";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { medicalWebPageJsonLd, webSiteJsonLd, softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { APP_PRODUCTS, appSeoDescription } from "@/lib/apps/catalog";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildGlobalHreflang } from "@/lib/ecosystem/seo";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getHomepageCachedData } from "@/lib/v22/homepage-cache";
 import { PORTAL_PHILOSOPHY } from "@/lib/v271/portal";
 
 export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
-    title: "MedScopeGlobal — zdravotnictví na jednom místě",
-    description:
-      "Hledejte, otevřete MeDipacient, MeDiprep nebo OrdiZapis a čtěte redakci. Evidence-based medicína v češtině. 14 dní zdarma.",
-    path: "/",
-  });
+  const locale = (await getServerLocale()) as GlobalLocaleCode;
+  const { canonical, languages } = buildGlobalHreflang("/", locale);
+  const title = "MedScopeGlobal — zdravotnictví na jednom místě";
+  const description =
+    "Hledejte, otevřete MeDipacient, MeDiprep nebo OrdiZapis a čtěte redakci. Evidence-based medicína v češtině. 14 dní zdarma.";
+
+  return {
+    title,
+    description: description.slice(0, 160),
+    alternates: { canonical, languages },
+    openGraph: {
+      title,
+      description: description.slice(0, 160),
+      url: canonical,
+      locale: "cs_CZ",
+      siteName: "MedScopeGlobal",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: description.slice(0, 160),
+    },
+  };
 }
 
 export default async function HomePage() {

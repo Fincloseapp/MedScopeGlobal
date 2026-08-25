@@ -2,6 +2,7 @@
 
 import { SITE } from "@/lib/config/site";
 import { GLOBAL_LOCALES, type GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { localeToPathSegment } from "@/lib/i18n/locale-path";
 
 export type SearchEngine = "google" | "yandex" | "baidu" | "naver" | "seznam";
 
@@ -37,20 +38,20 @@ export const SEARCH_ENGINE_CONFIG: Record<SearchEngine, {
   },
 };
 
-/** Build path-based hreflang alternates (not query params) */
+/** Build path-based hreflang alternates (/{locale}/… prefix for every locale). */
 export function buildGlobalHreflang(path: string, locale?: GlobalLocaleCode) {
   const clean = path.startsWith("/") ? path : `/${path}`;
   const languages: Record<string, string> = {};
 
   for (const loc of GLOBAL_LOCALES) {
-    const prefix = loc.code === "cs" ? "" : `/${loc.code}`;
-    languages[loc.hreflang] = `${SITE.url}${prefix}${clean}`;
+    const prefix = `/${localeToPathSegment(loc.code)}`;
+    languages[loc.hreflang] = `${SITE.url}${prefix}${clean === "/" ? "" : clean}`;
   }
-  languages["x-default"] = `${SITE.url}${clean}`;
+  languages["x-default"] = `${SITE.url}/cs${clean === "/" ? "" : clean}`;
 
-  const canonicalPrefix = locale && locale !== "cs" ? `/${locale}` : "";
+  const canonicalPrefix = locale ? `/${localeToPathSegment(locale)}` : "/cs";
   return {
-    canonical: `${SITE.url}${canonicalPrefix}${clean}`,
+    canonical: `${SITE.url}${canonicalPrefix}${clean === "/" ? "" : clean}`,
     languages,
   };
 }
@@ -65,7 +66,9 @@ export function articleJsonLdGlobal(article: {
   authorName?: string | null;
   coverImage?: string | null;
 }) {
-  const localePrefix = article.locale && article.locale !== "cs" ? `/${article.locale}` : "";
+  const localePrefix = article.locale
+    ? `/${localeToPathSegment(article.locale)}`
+    : "/cs";
   return {
     "@context": "https://schema.org",
     "@type": "MedicalWebPage",
@@ -96,7 +99,9 @@ export function longevityProtocolJsonLd(protocol: {
   slug: string;
   locale?: string;
 }) {
-  const localePrefix = protocol.locale && protocol.locale !== "cs" ? `/${protocol.locale}` : "";
+  const localePrefix = protocol.locale
+    ? `/${localeToPathSegment(protocol.locale)}`
+    : "/cs";
   return {
     "@context": "https://schema.org",
     "@type": "HowTo",
@@ -136,7 +141,9 @@ export function rssItem(article: {
   publishedAt?: string | null;
   locale?: string;
 }) {
-  const localePrefix = article.locale && article.locale !== "cs" ? `/${article.locale}` : "";
+  const localePrefix = article.locale
+    ? `/${localeToPathSegment(article.locale)}`
+    : "/cs";
   return {
     title: article.title,
     link: `${SITE.url}${localePrefix}/article/${article.slug}`,

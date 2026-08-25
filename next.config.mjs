@@ -121,6 +121,17 @@ const nextConfig = {
 
 
 
+  async rewrites() {
+    return [
+      {
+        source: "/sitemap-:locale.xml",
+        destination: "/sitemaps/:locale",
+      },
+    ];
+  },
+
+
+
   async headers() {
 
     return [
