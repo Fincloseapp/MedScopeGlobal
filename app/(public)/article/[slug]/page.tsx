@@ -17,9 +17,10 @@ import { EditorialAttribution } from "@/components/article/editorial-attribution
 import { EditorialFooter } from "@/components/article/editorial-footer";
 import {
   assignEditorialUnits,
-  buildArticleJsonLdAuthor,
+  formatEditorialUnitDisplay,
   type EditorialLocale,
 } from "@/lib/editorial/units";
+import { articleJsonLdGlobal } from "@/lib/ecosystem/seo";
 import { canAccessContent } from "@/lib/config/access-levels";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import { getReaderContext } from "@/lib/auth/reader-context";
@@ -166,6 +167,20 @@ export default async function ArticlePage({ params }: Props) {
   const isV19Article = article.rubric_slug === V19_RUBRIC_SLUG;
   const v19Quiz = (article.quiz_json ?? {}) as Record<string, unknown>;
 
+  const globalJsonLd = articleJsonLdGlobal({
+    title: article.title,
+    excerpt: article.excerpt,
+    slug: article.slug,
+    locale,
+    publishedAt: article.published_at,
+    authorName: formatEditorialUnitDisplay(
+      editorialAssignment.primary,
+      editorialLocale,
+      editorialAssignment.aiAssisted
+    ),
+    coverImage: article.cover_image_url,
+  });
+
   const jsonLd = isV19Article
     ? buildV19SeoMeta(
         {
@@ -193,27 +208,18 @@ export default async function ArticlePage({ params }: Props) {
         },
         locale
       ).jsonLd
-    : {
-        "@context": "https://schema.org",
-        "@type": "MedicalWebPage",
-        headline: article.title,
-        datePublished: article.published_at,
-        author: buildArticleJsonLdAuthor(editorialAssignment, editorialLocale),
-        image: article.cover_image_url ? [article.cover_image_url] : undefined,
-        publisher: {
-          "@type": "Organization",
-          name: "MedScopeGlobal",
-        },
-        mainEntityOfPage: {
-          "@type": "WebPage",
-          "@id": `/article/${article.slug}`,
-        },
-      };
+    : globalJsonLd;
 
   return (
     <>
       {isV19Article ? (
-        <V19ArticleJsonLd data={jsonLd} />
+        <>
+          <V19ArticleJsonLd data={jsonLd} />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(globalJsonLd) }}
+          />
+        </>
       ) : (
         <script
           type="application/ld+json"

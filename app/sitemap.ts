@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { LONGEVITY_PROTOCOLS } from "@/lib/ecosystem/longevity-protocols";
 import { createClient } from "@/lib/supabase/server";
 
 const base =
@@ -49,6 +50,14 @@ const staticRoutes: MetadataRoute.Sitemap = [
   { url: `${base}/znacka`, changeFrequency: "yearly", priority: 0.4 },
   { url: `${base}/pravni-checklist`, changeFrequency: "yearly", priority: 0.35 },
   { url: `${base}/o-nas`, changeFrequency: "monthly", priority: 0.5 },
+  { url: `${base}/mediflow`, changeFrequency: "weekly", priority: 0.85 },
+  { url: `${base}/ordizaznam`, changeFrequency: "weekly", priority: 0.85 },
+  { url: `${base}/vip/protokoly`, changeFrequency: "weekly", priority: 0.8 },
+  ...LONGEVITY_PROTOCOLS.map((protocol) => ({
+    url: `${base}/vip/protokoly/${protocol.slug}`,
+    changeFrequency: "monthly" as const,
+    priority: protocol.vipOnly ? 0.65 : 0.7,
+  })),
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

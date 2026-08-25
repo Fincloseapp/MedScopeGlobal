@@ -8,17 +8,22 @@ export const HREFLANG_LOCALES = GLOBAL_LOCALES.map((l) => ({
   label: l.label,
 }));
 
+function hreflangUrl(path: string, localeCode: string) {
+  return localeCode === "cs"
+    ? `${SITE.url}${path}`
+    : `${SITE.url}${path}?lang=${encodeURIComponent(localeCode)}`;
+}
+
 export function buildHreflangAlternates(path: string, locale?: string) {
   const clean = path.startsWith("/") ? path : `/${path}`;
   const languages: Record<string, string> = {};
   for (const loc of GLOBAL_LOCALES) {
-    languages[loc.hreflang] =
-      loc.code === "cs"
-        ? `${SITE.url}${clean}`
-        : `${SITE.url}${clean}?lang=${encodeURIComponent(loc.code)}`;
+    languages[loc.hreflang] = hreflangUrl(clean, loc.code);
   }
   languages["x-default"] = `${SITE.url}${clean}`;
-  return { canonical: `${SITE.url}${clean}`, languages };
+  const canonical =
+    locale && locale !== "cs" ? hreflangUrl(clean, locale) : `${SITE.url}${clean}`;
+  return { canonical, languages };
 }
 
 export function buildPageMetadata(params: {
@@ -26,8 +31,9 @@ export function buildPageMetadata(params: {
   description: string;
   path: string;
   image?: string;
+  locale?: string;
 }): Metadata {
-  const { canonical, languages } = buildHreflangAlternates(params.path);
+  const { canonical, languages } = buildHreflangAlternates(params.path, params.locale);
   const ogImage = params.image ?? `${SITE.url}/og-default.png`;
 
   return {
