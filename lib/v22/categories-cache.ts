@@ -3,7 +3,7 @@ import { MEDICAL_CATEGORIES } from "@/lib/config/categories-seed";
 import { localizeCategories } from "@/lib/i18n/category-label";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { ensureMedicalCategories } from "@/lib/setup/ensure-medical-data";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { buildV20CategoryList } from "@/lib/v20/categories";
 import { V20_ARCHIVE_CUTOFF } from "@/lib/v20/content-rules";
 import type { Category } from "@/types/database";
@@ -11,9 +11,20 @@ import type { Category } from "@/types/database";
 const MEDICAL_SLUGS = new Set<string>(MEDICAL_CATEGORIES.map((c) => c.slug));
 
 async function loadCategoriesRaw(): Promise<Category[]> {
+  const supabase = tryCreateServiceRoleClient();
+  if (!supabase) {
+    return MEDICAL_CATEGORIES.map((c) => ({
+      id: `seed-${c.slug}`,
+      name: c.nameCs,
+      slug: c.slug,
+      description: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })) as Category[];
+  }
+
   await ensureMedicalCategories();
 
-  const supabase = createServiceRoleClient();
   const { data, error } = await supabase
     .from("categories")
     .select("*")
@@ -37,7 +48,9 @@ async function loadArticleCountsBySlug(categories: Category[]): Promise<Record<s
 
   if (categories.length === 0) return counts;
 
-  const supabase = createServiceRoleClient();
+  const supabase = tryCreateServiceRoleClient();
+  if (!supabase) return counts;
+
   const idToSlug = Object.fromEntries(categories.map((c) => [c.id, c.slug]));
   const { data, error } = await supabase
     .from("articles")

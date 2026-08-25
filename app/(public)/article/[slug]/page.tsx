@@ -39,6 +39,16 @@ import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article
 import { listStudentAdCampaignsForArticle } from "@/lib/queries/marketing";
 import { ArticleCtaBlocks } from "@/components/articles/article-cta-blocks";
 import { StudentAdBlocks } from "@/components/student/student-ad-blocks";
+import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
+import {
+  AuthorDonationButton,
+  SaveToMediFlowButton,
+  ArticleShareButton,
+  VipUpgradeNudge,
+} from "@/components/monetization/article-cta";
+import { TopLongevityProducts } from "@/components/monetization/affiliate-box";
+import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -253,6 +263,17 @@ export default async function ArticlePage({ params }: Props) {
               </p>
             )}
 
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <SaveToMediFlowButton articleSlug={article.slug} articleTitle={article.title} />
+              <ArticleShareButton title={article.title} slug={article.slug} />
+            </div>
+
+            <GlobalAdSlot placement="below-title" locale={(locale as GlobalLocaleCode) ?? "cs"} />
+
+            <p className="mt-3 text-xs text-slate-500">
+              {MEDICAL_DISCLAIMER[(locale as GlobalLocaleCode) ?? "cs"] ?? MEDICAL_DISCLAIMER.cs}
+            </p>
+
             <div className="mt-6 flex flex-wrap items-center gap-4 border-y py-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
@@ -368,6 +389,18 @@ export default async function ArticlePage({ params }: Props) {
             {!locked ? (
               <ArticleCtaBlocks articleSlug={article.slug} articleTitle={article.title} />
             ) : null}
+
+            {!locked ? (
+              <AuthorDonationButton
+                articleSlug={article.slug}
+                articleTitle={article.title}
+                locale={(locale as GlobalLocaleCode) ?? "cs"}
+              />
+            ) : null}
+
+            {!locked ? <TopLongevityProducts locale={(locale as GlobalLocaleCode) ?? "cs"} /> : null}
+
+            {!isVip && !locked ? <VipUpgradeNudge locale={(locale as GlobalLocaleCode) ?? "cs"} /> : null}
 
             {related && related.length > 0 && (
               <section className="mt-16 border-t pt-10">

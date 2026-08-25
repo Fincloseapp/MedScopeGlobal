@@ -54,6 +54,10 @@ const recommendedTables = [
   ["autopilot_trends", "id"],
   ["autopilot_settings", "id"],
   ["autopilot_cron_jobs", "slug"],
+  ["mediflow_notes", "id"],
+  ["mediflow_symptoms", "id"],
+  ["mediflow_supplements", "id"],
+  ["mediflow_saved_articles", "id"],
 ];
 
 let ok = true;

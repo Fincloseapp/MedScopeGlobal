@@ -1,19 +1,21 @@
 import { SITE } from "@/lib/config/site";
 import type { Metadata } from "next";
+import { GLOBAL_LOCALES } from "@/lib/ecosystem/locales";
 
-export const HREFLANG_LOCALES = [
-  { code: "cs", hreflang: "cs-CZ", label: "Čeština" },
-  { code: "en", hreflang: "en-US", label: "English" },
-  { code: "de", hreflang: "de-DE", label: "Deutsch" },
-  { code: "pl", hreflang: "pl-PL", label: "Polski" },
-  { code: "sk", hreflang: "sk-SK", label: "Slovenčina" },
-] as const;
+export const HREFLANG_LOCALES = GLOBAL_LOCALES.map((l) => ({
+  code: l.code,
+  hreflang: l.hreflang,
+  label: l.label,
+}));
 
-export function buildHreflangAlternates(path: string) {
+export function buildHreflangAlternates(path: string, locale?: string) {
   const clean = path.startsWith("/") ? path : `/${path}`;
   const languages: Record<string, string> = {};
-  for (const loc of HREFLANG_LOCALES) {
-    languages[loc.hreflang] = `${SITE.url}${clean}?lang=${loc.code}`;
+  for (const loc of GLOBAL_LOCALES) {
+    languages[loc.hreflang] =
+      loc.code === "cs"
+        ? `${SITE.url}${clean}`
+        : `${SITE.url}${clean}?lang=${encodeURIComponent(loc.code)}`;
   }
   languages["x-default"] = `${SITE.url}${clean}`;
   return { canonical: `${SITE.url}${clean}`, languages };

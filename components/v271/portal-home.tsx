@@ -13,6 +13,11 @@ import { NEWS_DESKS, splitNewsDesks, type NewsDeskId } from "@/lib/v271/news-des
 import { NewsArticleThumb, NewsDeskFallback, NewsHeadlineRow } from "@/components/articles/news-article-card";
 import { PortalSearch } from "@/components/v271/portal-search";
 import { WriterAgentsStrip } from "@/components/editorial/writer-agents-strip";
+import {
+  TrendySection,
+  LongevityProtocolsSection,
+  RecommendedToolsSection,
+} from "@/components/ecosystem/magazine-sections";
 import { AppOpenLink, isStandaloneAppHref } from "@/components/apps/app-origin-bar";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { BookOpen, Gift, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
@@ -264,6 +269,10 @@ export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
                 ))}
               </dl>
             </Box>
+
+            <TrendySection />
+            <LongevityProtocolsSection />
+            <RecommendedToolsSection />
           </div>
         </div>
       </div>

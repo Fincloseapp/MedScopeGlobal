@@ -11,6 +11,7 @@ import {
   normalizeLocale,
 } from "@/lib/i18n/config";
 import { detectLocaleFromAcceptLanguage } from "@/lib/i18n/detect-locale";
+import { localeFromCountry } from "@/lib/ecosystem/locales";
 import { isValidAdminGateCookie, ADMIN_GATE_COOKIE } from "@/lib/auth/admin-gate-config";
 import {
   enforceLekarskaZonaMiddleware,
@@ -60,9 +61,10 @@ export async function middleware(request: NextRequest) {
 
   const manual = request.cookies.get(LOCALE_MANUAL_COOKIE)?.value === "1";
   const acceptLanguage = request.headers.get("accept-language");
-  // v20: web je výhradně v češtině (bez automatického přepnutí na EN)
-  const autoLocale = DEFAULT_LOCALE;
-  void detectLocaleFromAcceptLanguage(acceptLanguage);
+  const cfCountry = request.headers.get("cf-ipcountry");
+  const geoLocale = localeFromCountry(cfCountry);
+  const browserLocale = detectLocaleFromAcceptLanguage(acceptLanguage);
+  const autoLocale = cfCountry ? geoLocale : browserLocale;
 
   if (!manual) {
     const current = request.cookies.get(LOCALE_COOKIE)?.value;

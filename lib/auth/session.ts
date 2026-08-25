@@ -6,6 +6,9 @@ export async function getSessionProfile(): Promise<{
   profile: AppUser | null;
 }> {
   const supabase = await createClient();
+  if (!supabase) {
+    return { user: null, profile: null };
+  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
