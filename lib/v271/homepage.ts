@@ -2,10 +2,10 @@
 import { V27_SUBSCRIPTION_PLANS } from "@/lib/v27/config";
 
 export const V271_HERO = {
-  eyebrow: "MedScopeGlobal.com · tři aplikace",
-  claim: "Zprávy, přijímačky a zápisy — na ploše telefonu",
+  eyebrow: "VitaScope · MedScopeGlobal.com",
+  claim: "Zdraví, dlouhověkost a životní styl — pro každého",
   subtitle:
-    "MeDipacient pro veřejnost, MeDiprep pro uchazeče o LF a OrdiZapis pro ověřené lékaře. Stejné stažení jako u OrdiZapisu. 14 dní zdarma.",
+    "Magazín VitaScope, wellness deník MediFlow, VIP protokoly a aplikace MeDipacient a OrdiZapis. MeDiprep zůstává pro přípravu na LF. 14 dní zdarma.",
 } as const;
 
 export const V271_HERO_CTAS = [
@@ -15,8 +15,8 @@ export const V271_HERO_CTAS = [
 ] as const;
 
 export const V271_HERO_APP_CHIPS = [
+  { label: "MediFlow", href: "/app/mediflow" },
   { label: "MeDipacient", href: "/app/pacient" },
-  { label: "MeDiprep", href: "/app/priprava" },
   { label: "OrdiZapis", href: "/app/dokumentace" },
 ] as const;
 
@@ -56,9 +56,9 @@ export const V271_TESTIMONIALS = [
 
 export const V271_WHY_TRUST = [
   {
-    title: "Tři aplikace, jedno prostředí",
+    title: "Magazín + aplikace na jedné platformě",
     description:
-      "MeDipacient, MeDiprep a OrdiZapis stáhnete na plochu telefonu. Zkušební dashboardy ukazují, co umí, ještě před předplatným.",
+      "VitaScope pro dlouhověkost a prevenci, MediFlow pro vlastní deník, MeDipacient a OrdiZapis jako instalovatelné PWA.",
   },
   {
     title: "Evidence-based, ne clickbait",
@@ -71,9 +71,9 @@ export const V271_WHY_TRUST = [
       "Nejen „co studie říká“, ale co to znamená pro praxi, pacienta nebo zkoušku. Shrnutí psaná pro lékaře, ne pro algoritmy.",
   },
   {
-    title: "Jedna platforma, tři světy",
+    title: "Jedna platforma, více cílových skupin",
     description:
-      "Veřejnost, studenti a lékaři mají vlastní sekce, AI asistenty a obsah — bez zbytečného šumu z jiných cílových skupin.",
+      "Veřejnost, lékaři a studenti mají vlastní sekce — magazín a wellness jsou v popředí, příprava na LF zůstává dostupná v sekci Studenti.",
   },
   {
     title: "Academy s certifikáty",
@@ -92,21 +92,11 @@ export const V271_AUDIENCES = [
     id: "public",
     label: "Veřejnost",
     description:
-      "MeDipacient složí lékařské zprávy do přehledu. K tomu prevence a životní styl bez sensace.",
-    topics: ["MeDipacient", "prevence", "výživa", "spánek", "fitness", "ženské zdraví", "mužské zdraví"],
+      "VitaScope a MediFlow pro dlouhověkost a prevenci. MeDipacient složí lékařské zprávy do přehledu.",
+    topics: ["VitaScope", "MediFlow", "MeDipacient", "prevence", "výživa", "spánek", "longevity"],
     href: "/verejnost",
-    ctaPrimary: { label: "Stáhnout MeDipacient", href: "/app/pacient" },
-    ctaSecondary: { label: "Najít téma", href: "/verejnost/temata" },
-  },
-  {
-    id: "student",
-    label: "Studenti",
-    description:
-      "MeDiprep ukáže mezery v B/C/F. K tomu Academy, AI tutor a materiály od přijímaček po státnice.",
-    topics: ["MeDiprep", "anatomie", "farmakologie", "testy", "přijímačky", "AI tutor"],
-    href: "/studenti",
-    ctaPrimary: { label: "Stáhnout MeDiprep", href: "/app/priprava" },
-    ctaSecondary: { label: "Chci studovat medicínu", href: "/studenti/chci-studovat" },
+    ctaPrimary: { label: "Číst magazín", href: "/articles" },
+    ctaSecondary: { label: "Otevřít MediFlow", href: "/app/mediflow" },
   },
   {
     id: "physician",
@@ -117,6 +107,16 @@ export const V271_AUDIENCES = [
     href: "/lekari",
     ctaPrimary: { label: "Stáhnout OrdiZapis", href: "/app/dokumentace" },
     ctaSecondary: { label: "Více o OrdiZapisu", href: "/lekari/dokumentace" },
+  },
+  {
+    id: "student",
+    label: "Studenti (legacy)",
+    description:
+      "MeDiprep a Academy pro přípravu na LF — sekundární nabídka, primárně pro uchazeče o medicínu v ČR.",
+    topics: ["MeDiprep", "Academy", "přijímačky", "AI tutor"],
+    href: "/studenti",
+    ctaPrimary: { label: "MeDiprep", href: "/app/priprava" },
+    ctaSecondary: { label: "Chci studovat medicínu", href: "/studenti/chci-studovat" },
   },
 ] as const;
 
@@ -156,15 +156,15 @@ export const V271_AKTUALNI = {
 export const V271_SUBSCRIPTION_PLANS = V27_SUBSCRIPTION_PLANS;
 
 export const V271_FOOTER_TAGLINE =
-  "MeDipacient, MeDiprep a OrdiZapis plus evidence-based obsah v češtině — pro veřejnost, studenty medicíny a lékaře.";
+  "VitaScope — magazín zdraví a dlouhověkosti. MediFlow, VIP protokoly, MeDipacient a OrdiZapis na MedScopeGlobal.com. MeDiprep zůstává pro přípravu na LF.";
 
 /** Audience + proof points for footer „Důvěra a čísla“ */
 export const V271_FOOTER_TRUST = {
   audiences: [
-    { label: "Veřejnost — MeDipacient a osvěta", href: "/verejnost" },
-    { label: "Studenti — MeDiprep a Academy", href: "/studenti" },
+    { label: "Veřejnost — VitaScope a MediFlow", href: "/verejnost" },
+    { label: "VIP longevity protokoly", href: "/vip/protokoly" },
     { label: "Lékaři — OrdiZapis a guidelines", href: "/lekari/dokumentace" },
-    { label: "Zdravotníci a zdravotní profesionálové", href: "/odborna" },
+    { label: "Studenti — MeDiprep a Academy", href: "/studenti" },
   ],
   proof: [
     { label: "2 800+ zdravotnických profesionálů a studentů medicíny", href: "/studenti" },

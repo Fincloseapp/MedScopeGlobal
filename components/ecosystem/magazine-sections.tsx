@@ -84,10 +84,10 @@ export function LongevityProtocolsSection() {
 /** Recommended tools section */
 export function RecommendedToolsSection() {
   const tools = [
-    { name: "MediFlow", desc: "Wellness tracker", href: "/app/mediflow", color: "emerald" },
+    { name: "MediFlow", desc: "Wellness deník", href: "/app/mediflow", color: "emerald" },
+    { name: "VIP", desc: "Longevity protokoly", href: "/vip/protokoly", color: "amber" },
     { name: "MeDipacient", desc: "Lékařské zprávy", href: "/app/pacient", color: "blue" },
-    { name: "OrdiZáznam", desc: "Pro lékaře", href: "/ordizaznam", color: "navy" },
-    { name: "MeDiprep", desc: "Přijímačky LF", href: "/app/priprava", color: "slate" },
+    { name: "OrdiZapis", desc: "Pro lékaře", href: "/app/dokumentace", color: "navy" },
   ];
 
   return (

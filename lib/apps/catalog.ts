@@ -138,7 +138,8 @@ export const MEDIFLOW: AppProduct = {
   },
 };
 
-export const APP_PRODUCTS: AppProduct[] = [MEDIPACIENT, MEDIPREP, ORDIZAPIS_APP, MEDIFLOW];
+/** Homepage / hub order — magazine-first ecosystem; MeDiprep legacy last */
+export const APP_PRODUCTS: AppProduct[] = [MEDIFLOW, MEDIPACIENT, ORDIZAPIS_APP, MEDIPREP];
 
 export function appById(id: LegacyAppProductId): AppProduct {
   const normalized: AppProductId = id === "mediktor" ? "ordizapis" : id;
