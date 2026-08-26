@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { APP_PRODUCTS, ORDIZAPIS_APP, MEDIPACIENT, MEDIPREP } from "../../lib/apps/catalog";
+import { APP_PRODUCTS, MEDIFLOW, ORDIZAPIS_APP, MEDIPACIENT, MEDIPREP } from "../../lib/apps/catalog";
 import { publicDemoDashboard } from "../../lib/medipacient/demo-dashboard";
 import { MEDIPACIENT_DEMO_REPORTS } from "../../lib/medipacient/demo-reports";
 import { parseReportText, documentFromUpload } from "../../lib/medipacient/parse-report";
@@ -15,6 +15,16 @@ import { buildPrepTest, getPrepDashboard } from "../../lib/mediprep/dashboard";
 import { bankStats } from "../../lib/prijimacky/question-bank";
 import { generateSelfTest } from "../../lib/prijimacky/quiz-from-bank";
 import { FACULTIES_ADMISSIONS_2026 } from "../../lib/prijimacky/faculties-admissions";
+import { getAffiliateRedirectDestination } from "../../lib/ecosystem/monetization";
+import {
+  inferArticleTopic,
+  matchImageForArticleSync,
+  validateImageCompliance,
+  isMissingOrStaleHeroImage,
+  scanTextForBlockedTopics,
+  getArticleHeroAltText,
+} from "../../lib/ecosystem/editorial/images";
+import { getImageCuratorForLocale } from "../../lib/ecosystem/editorial/personas";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -22,14 +32,17 @@ function file(rel: string) {
   assert.ok(existsSync(join(root, rel)), `missing ${rel}`);
 }
 
-assert.equal(APP_PRODUCTS.length, 3, "three consumer apps");
+assert.equal(APP_PRODUCTS.length, 4, "four consumer apps");
 assert.equal(MEDIPACIENT.appPath, "/app/pacient");
 assert.equal(MEDIPREP.appPath, "/app/priprava");
+assert.equal(MEDIFLOW.appPath, "/app/mediflow");
+assert.equal(MEDIFLOW.downloadPath, "/mediflow/stahnout");
 assert.equal(ORDIZAPIS_APP.shortName, "OrdiZapis");
 assert.equal(ORDIZAPIS_APP.id, "ordizapis");
 assert.equal(ORDIZAPIS_APP.appPath, "/app/dokumentace");
 assert.equal(MEDIPACIENT.manifest, "/medipacient-manifest.json");
 assert.equal(MEDIPREP.manifest, "/mediprep-manifest.json");
+assert.equal(MEDIFLOW.manifest, "/mediflow-manifest.json");
 assert.equal(ORDIZAPIS_APP.manifest, "/dokumentace-manifest.json");
 assert.equal(MEDIPACIENT.domain, "medscopeglobal.com");
 
@@ -114,12 +127,62 @@ assert.deepEqual(
 file("app/(public)/aplikace/page.tsx");
 file("app/(pacient-app)/app/pacient/page.tsx");
 file("app/(prep-app)/app/priprava/page.tsx");
+file("app/(mediflow-app)/app/mediflow/page.tsx");
+file("app/(public)/mediflow/stahnout/page.tsx");
 file("app/api/medipacient/timeline/route.ts");
+file("app/api/mediflow/dashboard/route.ts");
 file("app/api/mediprep/dashboard/route.ts");
 file("app/api/mediprep/test/route.ts");
 file("app/api/apps/qr/route.ts");
 
-console.log("✓ app functional checks passed");
+file("app/(public)/go/[slug]/route.ts");
+file("public/assets/affiliate/magnesium.svg");
+file("public/assets/affiliate/omega-test.svg");
+file("public/assets/affiliate/sleep-tracker.svg");
+
+assert.equal(getAffiliateRedirectDestination("mg-cz")?.includes("heureka"), true);
+assert.equal(getAffiliateRedirectDestination("mg-us")?.includes("amazon.com"), true);
+assert.equal(getAffiliateRedirectDestination("unknown"), null);
+
+file("app/api/ecosystem/editorial/images/route.ts");
+file("lib/ecosystem/editorial/images/policy.ts");
+file("lib/ecosystem/editorial/images/matcher.ts");
+file("scripts/editorial/backfill-article-images.mjs");
+
+assert.equal(isMissingOrStaleHeroImage(null), true);
+assert.equal(isMissingOrStaleHeroImage(""), true);
+assert.equal(isMissingOrStaleHeroImage("https://images.unsplash.com/photo-1"), false);
+
+const longevityArticle = {
+  id: "a1",
+  slug: "longevity-spani-test",
+  title: "Dlouhověkost a kvalitní spánek pro aktivní stárnutí",
+  excerpt: "Jak spánek ovlivňuje zdraví seniorů a prevenci",
+};
+assert.equal(inferArticleTopic(longevityArticle), "longevity");
+
+const matched = matchImageForArticleSync(longevityArticle);
+assert.ok(matched?.url, "matcher returns image url");
+assert.ok(matched!.altTextCs.includes("Ilustra"), "czech alt text");
+const compliance = validateImageCompliance({
+  url: matched!.url,
+  altTextCs: matched!.altTextCs,
+  altTextEn: matched!.altTextEn,
+  topic: matched!.topic,
+  articleTitle: longevityArticle.title,
+});
+assert.equal(compliance.passed, true, "curated image passes compliance");
+
+const politicsBlocked = scanTextForBlockedTopics("political election rally health");
+assert.ok(politicsBlocked.some((t) => /politic/i.test(t)));
+
+const curator = getImageCuratorForLocale("cs");
+assert.equal(curator?.role, "image_curator");
+
+const alt = getArticleHeroAltText({ title: longevityArticle.title, excerpt: longevityArticle.excerpt }, "cs");
+assert.ok(alt.length > 20);
+
+console.log("✓ editorial image pipeline checks passed");
 console.log(
   `  MeDipacient demo: ${dash.stats.reports} zpráv, ${dash.stats.diagnoses} dg, ${dash.stats.meds} léků`
 );

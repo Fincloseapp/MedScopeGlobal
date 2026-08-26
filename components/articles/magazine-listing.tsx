@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { NewsMagazineCard } from "@/components/articles/news-article-card";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
+import { MAGAZINE } from "@/lib/brand/magazine";
 import { NEWS_DESKS, type NewsDeskId } from "@/lib/v271/news-desks";
 
 export function MagazineListing({
@@ -17,7 +18,7 @@ export function MagazineListing({
   return (
     <div className="v20-articles mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-        {desk.kicker}
+        {MAGAZINE.name} · {desk.kicker}
       </p>
       <div className="mt-1 flex flex-wrap items-end justify-between gap-3">
         <div className="max-w-3xl">
@@ -70,9 +71,35 @@ export function MagazineListing({
           <NewsMagazineCard article={featured} featured />
         </div>
       ) : (
-        <p className="mt-8 text-sm text-slate-500">
-          V této oblasti zatím nejsou články, které by splnily redakční pravidla zobrazení.
-        </p>
+        <div className="mt-8 rounded-2xl border border-dashed border-[#cfe1f3] bg-[#f6fbff] px-6 py-10 text-center">
+          <p className="font-display text-xl font-semibold text-[#021d33]">
+            {MAGAZINE.name} zatím nemá zobrazené články
+          </p>
+          <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-600">
+            Redakční feed se připravuje. Mezitím můžete vést wellness deník v MediFlow, prozkoumat VIP
+            protokoly nebo podpořit redakci tringeltem u publikovaných textů.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/app/mediflow"
+              className="rounded-full bg-[#005B96] px-4 py-2 text-sm font-medium text-white hover:bg-[#004a7a]"
+            >
+              Otevřít MediFlow
+            </Link>
+            <Link
+              href="/vip/protokoly"
+              className="rounded-full border border-[#005B96]/40 bg-white px-4 py-2 text-sm font-medium text-[#005B96] hover:bg-[#eef6fc]"
+            >
+              VIP protokoly
+            </Link>
+            <Link
+              href="/predplatne"
+              className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+            >
+              Předplatné / tringelt
+            </Link>
+          </div>
+        </div>
       )}
 
       {rest.length > 0 ? (

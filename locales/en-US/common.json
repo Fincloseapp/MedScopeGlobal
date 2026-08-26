@@ -1,0 +1,64 @@
+{
+  "site": {
+    "name": "MedScopeGlobal",
+    "magazine": "VitaScope",
+    "tagline": "See life clearly. Live it longer.",
+    "magazineTagline": "Global health & longevity magazine — live well, longer, at every age"
+  },
+  "nav": {
+    "home": "Home",
+    "magazine": "VitaScope",
+    "pricing": "Pricing",
+    "welcome": "About",
+    "sections": "Sections",
+    "access": "Access Levels",
+    "specialties": "Specialties",
+    "articles": "Articles",
+    "search": "Search",
+    "login": "Log In",
+    "signup": "Sign Up",
+    "audiences": "For You",
+    "medicine": "Medicine",
+    "subscribe": "Subscribe"
+  },
+  "cta": {
+    "readMore": "Read More",
+    "share": "Share",
+    "supportAuthor": "Support Author",
+    "saveToMediFlow": "Save to MediFlow",
+    "tryFree": "Start 14-Day Free Trial",
+    "upgradeVip": "Upgrade to VIP",
+    "exploreProtocols": "Explore Protocols"
+  },
+  "disclaimer": {
+    "medical": "This content is not medical advice, diagnosis, or treatment. Always consult your healthcare provider."
+  },
+  "vip": {
+    "title": "VIP Longevity Protocols",
+    "subtitle": "10 evidence-based protocols for sleep, metabolism, immunity, and longevity.",
+    "price": "$6.99/month"
+  },
+  "mediflow": {
+    "name": "MediFlow",
+    "tagline": "Your personal wellness journal",
+    "description": "Save articles, track symptoms and supplements. Not for diagnosis — for your own overview."
+  },
+  "ordizaznam": {
+    "name": "OrdiZáznam",
+    "tagline": "Record on mobile — AI writes the note",
+    "description": "Professional documentation tool for physicians. GDPR compliant, encrypted."
+  },
+  "donation": {
+    "title": "Support the Author",
+    "subtitle": "A micro-donation helps continue creating quality content.",
+    "amounts": ["$2.99", "$4.99", "$9.99"],
+    "custom": "Custom amount"
+  },
+  "trends": {
+    "title": "Trends 2026–2027",
+    "glp1": "GLP-1 & Metabolism",
+    "biohacking": "Biohacking for Beginners",
+    "sleep": "Sleep Optimization",
+    "mental": "Mental Wellness"
+  }
+}

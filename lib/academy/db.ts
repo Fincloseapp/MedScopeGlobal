@@ -1,4 +1,4 @@
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { createServiceRoleClient, tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { createClient } from "@/lib/supabase/server";
 import type {
   AcademyCourse,
@@ -31,6 +31,11 @@ function adminClient() {
   return createServiceRoleClient();
 }
 
+/** Soft admin — null when service role env is placeholder/missing (Cloud Agent, preview). */
+function tryAdminClient() {
+  return tryCreateServiceRoleClient();
+}
+
 export type ListPublishedCoursesFilter = {
   category?: string;
   audience?: string;
@@ -61,6 +66,7 @@ export async function listPublishedCourses(
   filter?: ListPublishedCoursesFilter
 ): Promise<AcademyCourse[]> {
   const supabase = await createClient();
+  if (!supabase) return [];
   let query = supabase
     .from("courses")
     .select("*")
@@ -117,19 +123,21 @@ export async function countPublishedCourses(): Promise<number> {
 export async function getCourseVideoFlags(
   courseIds: string[]
 ): Promise<Record<string, { hasVideo: boolean; videoLessonCount: number }>> {
-  if (!courseIds.length) return {};
+  const flags: Record<string, { hasVideo: boolean; videoLessonCount: number }> = {};
+  for (const id of courseIds) {
+    flags[id] = { hasVideo: false, videoLessonCount: 0 };
+  }
+  if (!courseIds.length) return flags;
 
-  const admin = adminClient();
+  const admin = tryAdminClient();
+  if (!admin) return flags;
+
   const { data: lessons } = await admin
     .from("lessons")
     .select("course_id, video_asset_id")
     .in("course_id", courseIds)
     .eq("status", "published");
 
-  const flags: Record<string, { hasVideo: boolean; videoLessonCount: number }> = {};
-  for (const id of courseIds) {
-    flags[id] = { hasVideo: false, videoLessonCount: 0 };
-  }
   for (const row of lessons ?? []) {
     if (!row.video_asset_id) continue;
     const entry = flags[row.course_id];
@@ -568,6 +576,7 @@ export async function submitQuizAnswers(
 
 export async function getLeaderboard(period: LeaderboardPeriod = "all_time", limit = 20): Promise<LeaderboardEntry[]> {
   const supabase = await createClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("leaderboard")
     .select("*")
@@ -709,6 +718,7 @@ export async function listPublishedQuizzesByCourseId(courseId: string): Promise<
 
 export async function listMarketplaceListings(limit = 20) {
   const supabase = await createClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("marketplace_courses")
     .select("*")
@@ -772,6 +782,7 @@ export async function listVideoAssets(limit = 20) {
 
 export async function listClinicalSimulations(limit = 20) {
   const supabase = await createClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("clinical_simulations")
     .select("*")
@@ -801,6 +812,7 @@ export async function getSimulationBySlug(slug: string) {
 
 export async function listTextbooks(limit = 20) {
   const supabase = await createClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("textbooks")
     .select("*")

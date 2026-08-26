@@ -1,0 +1,75 @@
+{
+  "site": {
+    "name": "MedScopeGlobal",
+    "tagline": "Klinikai intelligencia és evidencián alapuló orvostudomány"
+  },
+  "nav": {
+    "home": "Kezdőlap",
+    "magazine": "Magazin",
+    "pricing": "Árak",
+    "welcome": "Platform",
+    "sections": "Szekciók",
+    "access": "Hozzáférési szintek",
+    "specialties": "Szakterületek",
+    "articles": "Cikkek",
+    "search": "Keresés",
+    "login": "Bejelentkezés",
+    "signup": "Regisztráció",
+    "audiences": "Kinek",
+    "medicine": "Orvostudomány",
+    "subscribe": "Előfizetés"
+  },
+  "cta": {
+    "readMore": "Tovább olvasom",
+    "share": "Megosztás",
+    "supportAuthor": "Szerző támogatása",
+    "saveToMediFlow": "Mentés MediFlow-ba",
+    "tryFree": "14 napos ingyenes próba",
+    "upgradeVip": "VIP frissítés",
+    "exploreProtocols": "Protokollok felfedezése"
+  },
+  "disclaimer": {
+    "medical": "A tartalom nem minősül orvosi diagnózisnak vagy kezelési javaslatnak. Mindig konzultáljon orvosával."
+  },
+  "vip": {
+    "title": "VIP longevity protokollok",
+    "subtitle": "10 evidencián alapuló protokoll alvásra, anyagcserére, immunitásra és hosszú életre.",
+    "price": "1 990 Ft/hó"
+  },
+  "tringelt": {
+    "title": "Szerző támogatása · Tringelt",
+    "subtitle": "Opcionális mikro-hozzájárulás — mint egy borravaló étteremben. Köszönjük a szerkesztőségnek.",
+    "custom": "Egyedi összeg",
+    "vipUpsell": "Támogassa a szerkesztőséget és szerezzen VIP longevity protokollokat —",
+    "unavailable": "A Tringelt jelenleg nem elérhető.",
+    "tip": "Támogassa a szerkesztőséget tringelttel",
+    "exploreVip": "vagy fedezze fel a VIP longevity protokollokat"
+  },
+  "donation": {
+    "title": "Szerző támogatása",
+    "subtitle": "Egy mikroadomány segít minőségi tartalom készítésében.",
+    "amounts": [
+      "800 Ft",
+      "2 000 Ft",
+      "3 900 Ft"
+    ],
+    "custom": "Egyedi összeg"
+  },
+  "mediflow": {
+    "name": "MediFlow",
+    "tagline": "Személyes wellness napló",
+    "description": "Mentsen cikkeket, kövessen tüneteket és kiegészítőket. Nem diagnózisra — saját áttekintéshez."
+  },
+  "ordizaznam": {
+    "name": "OrdiZáznam",
+    "tagline": "Rögzítés mobilon — az AI írja a jegyzetet",
+    "description": "Professzionális dokumentációs eszköz orvosoknak. GDPR-kompatibilis, titkosított."
+  },
+  "trends": {
+    "title": "Trendek 2026–2027",
+    "glp1": "GLP-1 és anyagcsere",
+    "biohacking": "Biohacking kezdőknek",
+    "sleep": "Alvásoptimalizálás",
+    "mental": "Mentális jólét"
+  }
+}

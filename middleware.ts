@@ -11,6 +11,12 @@ import {
   normalizeLocale,
 } from "@/lib/i18n/config";
 import { detectLocaleFromAcceptLanguage } from "@/lib/i18n/detect-locale";
+import {
+  buildLocalePath,
+  isLocaleRoutingExcluded,
+  resolveLocalePath,
+} from "@/lib/i18n/locale-path";
+import { localeFromCountry } from "@/lib/ecosystem/locales";
 import { isValidAdminGateCookie, ADMIN_GATE_COOKIE } from "@/lib/auth/admin-gate-config";
 import {
   enforceLekarskaZonaMiddleware,
@@ -31,6 +37,60 @@ function requiresAdminGate(pathname: string): boolean {
   return pathname.startsWith("/admin") && !pathname.startsWith("/admin/login");
 }
 
+function getRequestCountry(request: NextRequest): string | null {
+  const geoCountry = (
+    request as NextRequest & { geo?: { country?: string | null } }
+  ).geo?.country;
+  return geoCountry ?? request.headers.get("cf-ipcountry");
+}
+
+function detectTargetLocale(request: NextRequest): string {
+  const manual = request.cookies.get(LOCALE_MANUAL_COOKIE)?.value === "1";
+  const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value;
+  if (manual && cookieLocale) {
+    return normalizeLocale(cookieLocale);
+  }
+
+  const acceptLanguage = request.headers.get("accept-language");
+  const cfCountry = getRequestCountry(request);
+  const geoLocale = localeFromCountry(cfCountry);
+  const browserLocale = detectLocaleFromAcceptLanguage(acceptLanguage);
+  return normalizeLocale(cfCountry ? geoLocale : browserLocale);
+}
+
+function applyLocaleCookie(
+  response: NextResponse,
+  request: NextRequest,
+  forcedLocale?: string
+): void {
+  const manual = request.cookies.get(LOCALE_MANUAL_COOKIE)?.value === "1";
+  const acceptLanguage = request.headers.get("accept-language");
+  const cfCountry = getRequestCountry(request);
+  const geoLocale = localeFromCountry(cfCountry);
+  const browserLocale = detectLocaleFromAcceptLanguage(acceptLanguage);
+  const autoLocale = cfCountry ? geoLocale : browserLocale;
+  const next = forcedLocale
+    ? normalizeLocale(forcedLocale)
+    : normalizeLocale(autoLocale);
+
+  if (forcedLocale || !manual) {
+    const current = request.cookies.get(LOCALE_COOKIE)?.value;
+    if (!current || normalizeLocale(current) !== next) {
+      response.cookies.set(LOCALE_COOKIE, next, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 365,
+        sameSite: "lax",
+      });
+    }
+  } else if (!request.cookies.get(LOCALE_COOKIE)?.value) {
+    response.cookies.set(LOCALE_COOKIE, DEFAULT_LOCALE, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "lax",
+    });
+  }
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -48,38 +108,48 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/admin/system", request.url));
   }
 
-  const { supabase, response } = createMiddlewareClient(request);
+  const localeExcluded = isLocaleRoutingExcluded(pathname);
+  const { locale: pathLocale, pathname: strippedPath } = localeExcluded
+    ? { locale: null, pathname }
+    : resolveLocalePath(pathname);
 
-  // Lékařská zóna / B2B CME — only verified physicians with valid ČLK ID
-  if (isLekarskaZonaPath(pathname)) {
+  // Geo / browser locale redirect when URL has no locale prefix
+  if (!localeExcluded && !pathLocale) {
+    const targetLocale = detectTargetLocale(request);
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = buildLocalePath(targetLocale, pathname);
+    redirectUrl.search = request.nextUrl.search;
+    const redirect = NextResponse.redirect(redirectUrl);
+    applyLocaleCookie(redirect, request, targetLocale);
+    return wrapWithSecurityHeaders(redirect, pathname);
+  }
+
+  const effectivePathname = pathLocale ? strippedPath : pathname;
+
+  const { supabase, response: baseResponse } = createMiddlewareClient(request);
+
+  let response: NextResponse;
+  if (pathLocale) {
+    const rewriteUrl = request.nextUrl.clone();
+    rewriteUrl.pathname = strippedPath;
+    rewriteUrl.search = request.nextUrl.search;
+    response = NextResponse.rewrite(rewriteUrl, {
+      request: { headers: request.headers },
+    });
+    baseResponse.cookies.getAll().forEach((cookie) => {
+      response.cookies.set(cookie.name, cookie.value);
+    });
+    applyLocaleCookie(response, request, pathLocale);
+  } else {
+    response = baseResponse;
+    applyLocaleCookie(response, request);
+  }
+
+  if (isLekarskaZonaPath(effectivePathname)) {
     const gated = await enforceLekarskaZonaMiddleware(request, supabase, response);
     if (gated && gated !== response) {
       return wrapWithSecurityHeaders(gated, pathname);
     }
-  }
-
-  const manual = request.cookies.get(LOCALE_MANUAL_COOKIE)?.value === "1";
-  const acceptLanguage = request.headers.get("accept-language");
-  // v20: web je výhradně v češtině (bez automatického přepnutí na EN)
-  const autoLocale = DEFAULT_LOCALE;
-  void detectLocaleFromAcceptLanguage(acceptLanguage);
-
-  if (!manual) {
-    const current = request.cookies.get(LOCALE_COOKIE)?.value;
-    const next = normalizeLocale(autoLocale);
-    if (!current || normalizeLocale(current) !== next) {
-      response.cookies.set(LOCALE_COOKIE, next, {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 365,
-        sameSite: "lax",
-      });
-    }
-  } else if (!request.cookies.get(LOCALE_COOKIE)?.value) {
-    response.cookies.set(LOCALE_COOKIE, DEFAULT_LOCALE, {
-      path: "/",
-      maxAge: 60 * 60 * 24 * 365,
-      sameSite: "lax",
-    });
   }
 
   return wrapWithSecurityHeaders(response, pathname);

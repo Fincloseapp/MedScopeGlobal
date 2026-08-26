@@ -56,6 +56,30 @@ const recommendedTables = [
   ["autopilot_cron_jobs", "slug"],
 ];
 
+/** Ecosystem migrations shipped 2026-08-25 — see supabase/migrations/20260825*.sql */
+const ecosystemMigrations = [
+  {
+    file: "20260825120000_mediflow_ecosystem.sql",
+    tables: [
+      ["mediflow_notes", "id"],
+      ["mediflow_symptoms", "id"],
+      ["mediflow_supplements", "id"],
+      ["mediflow_saved_articles", "id"],
+    ],
+  },
+  {
+    file: "20260825220000_editorial_redakce.sql",
+    tables: [
+      ["article_syndications", "id"],
+      ["editorial_queue", "id"],
+    ],
+  },
+  {
+    file: "20260825230000_editorial_images.sql",
+    tables: [["article_image_suggestions", "id"]],
+  },
+];
+
 let ok = true;
 
 console.log("=== .env.local ===\n");
@@ -95,6 +119,20 @@ for (const [t, col] of recommendedTables) {
 }
 if (missingRecommended) {
   console.log("\n→ Paste supabase/MISSING_PRODUCTION_TABLES.sql in Supabase SQL Editor");
+}
+
+console.log("\n=== Ecosystem migrations (20260825*) ===\n");
+let missingEcosystem = false;
+for (const migration of ecosystemMigrations) {
+  console.log(`— ${migration.file}`);
+  for (const [t, col] of migration.tables) {
+    const { error } = await s.from(t).select(col).limit(1);
+    console.log(`  ${error ? "✗" : "✓"} ${t}${error ? ` — ${error.message}` : ""}`);
+    if (error) missingEcosystem = true;
+  }
+}
+if (missingEcosystem) {
+  console.log("\n→ Apply missing files from supabase/migrations/ in Supabase SQL Editor");
 }
 
 const colChecks = [

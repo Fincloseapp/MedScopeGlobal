@@ -17,9 +17,10 @@ import { EditorialAttribution } from "@/components/article/editorial-attribution
 import { EditorialFooter } from "@/components/article/editorial-footer";
 import {
   assignEditorialUnits,
-  buildArticleJsonLdAuthor,
+  formatEditorialUnitDisplay,
   type EditorialLocale,
 } from "@/lib/editorial/units";
+import { articleJsonLdGlobal, buildGlobalHreflang } from "@/lib/ecosystem/seo";
 import { canAccessContent } from "@/lib/config/access-levels";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import { getReaderContext } from "@/lib/auth/reader-context";
@@ -39,6 +40,19 @@ import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article
 import { listStudentAdCampaignsForArticle } from "@/lib/queries/marketing";
 import { ArticleCtaBlocks } from "@/components/articles/article-cta-blocks";
 import { StudentAdBlocks } from "@/components/student/student-ad-blocks";
+import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
+import {
+  AuthorDonationButton,
+  SaveToMediFlowButton,
+  ArticleShareButton,
+  VipUpgradeNudge,
+} from "@/components/monetization/article-cta";
+import { ArticleTringeltTip } from "@/components/monetization/article-tringelt-tip";
+import { ArticleImageSupportNudge } from "@/components/monetization/article-image-support-nudge";
+import { getArticleHeroAltText } from "@/lib/ecosystem/editorial/images";
+import { TopLongevityProducts } from "@/components/monetization/affiliate-box";
+import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -60,20 +74,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     article.title.slice(0, 155) + (article.title.length > 155 ? "…" : "");
 
   const keywords = v19Meta?.keywords;
+  const articlePath = `/article/${article.slug}`;
+  const { canonical, languages } = buildGlobalHreflang(
+    articlePath,
+    locale as GlobalLocaleCode
+  );
 
   return {
     title: article.title,
     description,
     keywords,
     alternates: {
-      canonical: `/article/${article.slug}`,
+      canonical,
+      languages,
     },
     openGraph: {
       title: article.title,
       description,
       type: "article",
       publishedTime: article.published_at ?? undefined,
-      url: `/article/${article.slug}`,
+      url: canonical,
       images: article.cover_image_url
         ? [{ url: article.cover_image_url }]
         : undefined,
@@ -152,9 +172,31 @@ export default async function ArticlePage({ params }: Props) {
   const category = article.categories;
   const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
   const editorialAssignment = assignEditorialUnits(article);
+  const heroAlt = getArticleHeroAltText(
+    {
+      title: article.title,
+      excerpt: article.excerpt,
+      metadata: (article.metadata as Record<string, unknown> | null) ?? null,
+    },
+    (locale as GlobalLocaleCode) ?? "cs"
+  );
 
   const isV19Article = article.rubric_slug === V19_RUBRIC_SLUG;
   const v19Quiz = (article.quiz_json ?? {}) as Record<string, unknown>;
+
+  const globalJsonLd = articleJsonLdGlobal({
+    title: article.title,
+    excerpt: article.excerpt,
+    slug: article.slug,
+    locale,
+    publishedAt: article.published_at,
+    authorName: formatEditorialUnitDisplay(
+      editorialAssignment.primary,
+      editorialLocale,
+      editorialAssignment.aiAssisted
+    ),
+    coverImage: article.cover_image_url,
+  });
 
   const jsonLd = isV19Article
     ? buildV19SeoMeta(
@@ -183,27 +225,18 @@ export default async function ArticlePage({ params }: Props) {
         },
         locale
       ).jsonLd
-    : {
-        "@context": "https://schema.org",
-        "@type": "MedicalWebPage",
-        headline: article.title,
-        datePublished: article.published_at,
-        author: buildArticleJsonLdAuthor(editorialAssignment, editorialLocale),
-        image: article.cover_image_url ? [article.cover_image_url] : undefined,
-        publisher: {
-          "@type": "Organization",
-          name: "MedScopeGlobal",
-        },
-        mainEntityOfPage: {
-          "@type": "WebPage",
-          "@id": `/article/${article.slug}`,
-        },
-      };
+    : globalJsonLd;
 
   return (
     <>
       {isV19Article ? (
-        <V19ArticleJsonLd data={jsonLd} />
+        <>
+          <V19ArticleJsonLd data={jsonLd} />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(globalJsonLd) }}
+          />
+        </>
       ) : (
         <script
           type="application/ld+json"
@@ -253,6 +286,17 @@ export default async function ArticlePage({ params }: Props) {
               </p>
             )}
 
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <SaveToMediFlowButton articleSlug={article.slug} articleTitle={article.title} />
+              <ArticleShareButton title={article.title} slug={article.slug} />
+            </div>
+
+            <GlobalAdSlot placement="below-title" locale={(locale as GlobalLocaleCode) ?? "cs"} />
+
+            <p className="mt-3 text-xs text-slate-500">
+              {MEDICAL_DISCLAIMER[(locale as GlobalLocaleCode) ?? "cs"] ?? MEDICAL_DISCLAIMER.cs}
+            </p>
+
             <div className="mt-6 flex flex-wrap items-center gap-4 border-y py-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
@@ -281,7 +325,7 @@ export default async function ArticlePage({ params }: Props) {
                 <>
                   <Image
                     src={article.cover_image_url}
-                    alt=""
+                    alt={heroAlt}
                     fill
                     priority
                     className="object-cover"
@@ -315,6 +359,13 @@ export default async function ArticlePage({ params }: Props) {
                 </div>
               )}
             </div>
+
+            {!locked ? (
+              <ArticleImageSupportNudge
+                locale={(locale as GlobalLocaleCode) ?? "cs"}
+                articleSlug={article.slug}
+              />
+            ) : null}
 
             {studentBannerAds.length > 0 ? (
               <StudentAdBlocks campaigns={studentBannerAds} variant="banner" />
@@ -368,6 +419,33 @@ export default async function ArticlePage({ params }: Props) {
             {!locked ? (
               <ArticleCtaBlocks articleSlug={article.slug} articleTitle={article.title} />
             ) : null}
+
+            {!locked ? (
+              <div id={`article-tip-${article.slug}`}>
+                <ArticleTringeltTip
+                  articleSlug={article.slug}
+                  articleTitle={article.title}
+                  authorName={formatEditorialUnitDisplay(
+                    editorialAssignment.primary,
+                    editorialLocale,
+                    editorialAssignment.aiAssisted
+                  )}
+                  locale={(locale as GlobalLocaleCode) ?? "cs"}
+                />
+              </div>
+            ) : null}
+
+            {!locked ? (
+              <AuthorDonationButton
+                articleSlug={article.slug}
+                articleTitle={article.title}
+                locale={(locale as GlobalLocaleCode) ?? "cs"}
+              />
+            ) : null}
+
+            {!locked ? <TopLongevityProducts locale={(locale as GlobalLocaleCode) ?? "cs"} /> : null}
+
+            {!isVip && !locked ? <VipUpgradeNudge locale={(locale as GlobalLocaleCode) ?? "cs"} /> : null}
 
             {related && related.length > 0 && (
               <section className="mt-16 border-t pt-10">

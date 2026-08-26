@@ -197,7 +197,10 @@ export async function POST(request: Request) {
 
   if (!webhookSecret) {
     return NextResponse.json(
-      { error: "STRIPE_WEBHOOK_SECRET not configured — see D:\\medscope.data\\docs\\v29-stripe-setup.md" },
+      {
+        error:
+          "STRIPE_WEBHOOK_SECRET not configured — set in Cloudflare Workers Variables or run scripts/setup-stripe-webhook.mjs on Windows D:",
+      },
       { status: 503 }
     );
   }
@@ -305,6 +308,51 @@ export async function POST(request: Request) {
           action: "stripe:ad_checkout_completed",
           status: result.ok ? "ok" : "error",
           details: { adsRequestId, sessionId: session.id, result },
+        });
+      }
+
+      if (session.metadata?.type === "donation" && session.id) {
+        await admin
+          .from("v27_orders")
+          .update({
+            status: "paid",
+            stripe_payment_intent_id: (session.payment_intent as string) ?? null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("stripe_session_id", session.id);
+
+        await logSecurityEvent({
+          ip,
+          action: "stripe:donation_completed",
+          status: "ok",
+          details: {
+            sessionId: session.id,
+            articleSlug: session.metadata?.articleSlug,
+            amountTotal: session.amount_total,
+          },
+        });
+      }
+
+      if (session.metadata?.type === "article_tip" && session.id) {
+        await admin
+          .from("v27_orders")
+          .update({
+            status: "paid",
+            stripe_payment_intent_id: (session.payment_intent as string) ?? null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("stripe_session_id", session.id);
+
+        await logSecurityEvent({
+          ip,
+          action: "stripe:article_tip_completed",
+          status: "ok",
+          details: {
+            sessionId: session.id,
+            articleSlug: session.metadata?.articleSlug,
+            locale: session.metadata?.locale,
+            amountTotal: session.amount_total,
+          },
         });
       }
 

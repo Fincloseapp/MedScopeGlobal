@@ -3,7 +3,7 @@ import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
 import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rules";
 import { mixListableFeed } from "@/lib/v271/news-desks";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import type { AdRow } from "@/types/database";
 
@@ -24,7 +24,9 @@ function isWithinSchedule(row: AdRow): boolean {
 }
 
 async function loadAds(placement: string, limit: number): Promise<AdRow[]> {
-  const supabase = createServiceRoleClient();
+  const supabase = tryCreateServiceRoleClient();
+  if (!supabase) return [];
+
   const { data, error } = await supabase
     .from("ads")
     .select("*")
@@ -41,7 +43,15 @@ async function loadAds(placement: string, limit: number): Promise<AdRow[]> {
 }
 
 async function loadArticlesPublic(): Promise<DisplayArticle[]> {
-  const supabase = createServiceRoleClient();
+  const { getDemoMagazineArticles } = await import(
+    "@/lib/verejnost/demo-magazine-articles"
+  );
+
+  const supabase = tryCreateServiceRoleClient();
+  if (!supabase) {
+    return mixListableFeed(getDemoMagazineArticles(), 36);
+  }
+
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -51,7 +61,7 @@ async function loadArticlesPublic(): Promise<DisplayArticle[]> {
 
   if (error) {
     console.error("loadArticlesPublic", error);
-    return [];
+    return mixListableFeed(getDemoMagazineArticles(), 36);
   }
 
   const mapped = mapArticleList(data as Record<string, unknown>[] | null);
@@ -61,6 +71,9 @@ async function loadArticlesPublic(): Promise<DisplayArticle[]> {
     mode: "card",
     maxTranslate: 16,
   });
+  if (prepared.length === 0) {
+    return mixListableFeed(getDemoMagazineArticles(), 36);
+  }
   return mixListableFeed(prepared, 36);
 }
 
@@ -81,6 +94,6 @@ async function loadHomepageData(): Promise<{
 
 export const getHomepageCachedData = unstable_cache(
   loadHomepageData,
-  ["v22-homepage-public-v3-news-desks"],
+  ["v22-homepage-public-v5-demo-magazine"],
   { revalidate: 120, tags: ["medscope-ui-v22.4", "v22-content"] }
 );

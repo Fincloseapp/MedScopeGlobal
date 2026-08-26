@@ -15,7 +15,10 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
   if (!secret) {
     return {
       status: 503 as const,
-      body: { error: "Stripe není nakonfigurován. Nastavte STRIPE_SECRET_KEY na Vercel." },
+      body: {
+        error:
+          "Stripe není nakonfigurován. Nastavte STRIPE_SECRET_KEY v Cloudflare Workers (Variables) nebo v .env.local.",
+      },
     };
   }
 

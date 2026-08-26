@@ -1,22 +1,18 @@
 import { SITE } from "@/lib/config/site";
+import { MAGAZINE } from "@/lib/brand/magazine";
 import type { Metadata } from "next";
+import { GLOBAL_LOCALES } from "@/lib/ecosystem/locales";
+import { buildGlobalHreflang } from "@/lib/ecosystem/seo";
 
-export const HREFLANG_LOCALES = [
-  { code: "cs", hreflang: "cs-CZ", label: "Čeština" },
-  { code: "en", hreflang: "en-US", label: "English" },
-  { code: "de", hreflang: "de-DE", label: "Deutsch" },
-  { code: "pl", hreflang: "pl-PL", label: "Polski" },
-  { code: "sk", hreflang: "sk-SK", label: "Slovenčina" },
-] as const;
+export const HREFLANG_LOCALES = GLOBAL_LOCALES.map((l) => ({
+  code: l.code,
+  hreflang: l.hreflang,
+  label: l.label,
+}));
 
-export function buildHreflangAlternates(path: string) {
-  const clean = path.startsWith("/") ? path : `/${path}`;
-  const languages: Record<string, string> = {};
-  for (const loc of HREFLANG_LOCALES) {
-    languages[loc.hreflang] = `${SITE.url}${clean}?lang=${loc.code}`;
-  }
-  languages["x-default"] = `${SITE.url}${clean}`;
-  return { canonical: `${SITE.url}${clean}`, languages };
+/** Path-prefix hreflang alternates for all global locales + x-default. */
+export function buildHreflangAlternates(path: string, locale?: string) {
+  return buildGlobalHreflang(path, locale as Parameters<typeof buildGlobalHreflang>[1]);
 }
 
 export function buildPageMetadata(params: {
@@ -24,8 +20,9 @@ export function buildPageMetadata(params: {
   description: string;
   path: string;
   image?: string;
+  locale?: string;
 }): Metadata {
-  const { canonical, languages } = buildHreflangAlternates(params.path);
+  const { canonical, languages } = buildHreflangAlternates(params.path, params.locale);
   const ogImage = params.image ?? `${SITE.url}/og-default.png`;
 
   return {
@@ -36,7 +33,7 @@ export function buildPageMetadata(params: {
       title: params.title,
       description: params.description,
       url: canonical,
-      siteName: SITE.name,
+      siteName: `${MAGAZINE.name} · ${SITE.name}`,
       locale: "cs_CZ",
       alternateLocale: HREFLANG_LOCALES.map((l) => l.hreflang.replace("-", "_")),
       images: [{ url: ogImage, width: 1200, height: 630, alt: params.title }],

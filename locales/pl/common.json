@@ -1,0 +1,75 @@
+{
+  "site": {
+    "name": "MedScopeGlobal",
+    "tagline": "Inteligencja kliniczna i medycyna oparta na dowodach"
+  },
+  "nav": {
+    "home": "Strona główna",
+    "magazine": "Magazyn",
+    "pricing": "Cennik",
+    "welcome": "Platforma",
+    "sections": "Sekcje",
+    "access": "Poziomy dostępu",
+    "specialties": "Specjalizacje",
+    "articles": "Artykuły",
+    "search": "Szukaj",
+    "login": "Zaloguj",
+    "signup": "Rejestracja",
+    "audiences": "Dla kogo",
+    "medicine": "Medycyna",
+    "subscribe": "Subskrypcja"
+  },
+  "cta": {
+    "readMore": "Czytaj więcej",
+    "share": "Udostępnij",
+    "supportAuthor": "Wesprzyj autora",
+    "saveToMediFlow": "Zapisz w MediFlow",
+    "tryFree": "14-dniowy bezpłatny okres próbny",
+    "upgradeVip": "Przejdź na VIP",
+    "exploreProtocols": "Poznaj protokoły"
+  },
+  "disclaimer": {
+    "medical": "Treść nie stanowi diagnozy medycznej ani zaleceń terapeutycznych. Zawsze konsultuj z lekarzem."
+  },
+  "vip": {
+    "title": "Protokoły VIP longevity",
+    "subtitle": "10 protokołów opartych na dowodach dla snu, metabolizmu, odporności i długowieczności.",
+    "price": "29 zł/miesiąc"
+  },
+  "tringelt": {
+    "title": "Wesprzyj autora · Tringelt",
+    "subtitle": "Opcjonalny mikro-wkład — jak napiwek w restauracji. Dziękujemy redakcji.",
+    "custom": "Własna kwota",
+    "vipUpsell": "Wesprzyj redakcję i uzyskaj protokoły VIP longevity —",
+    "unavailable": "Tringelt jest obecnie niedostępny.",
+    "tip": "Wesprzyj redakcję tringeltem",
+    "exploreVip": "lub poznaj protokoły VIP longevity"
+  },
+  "donation": {
+    "title": "Wesprzyj autora",
+    "subtitle": "Mikro-dar pomaga tworzyć wysokiej jakości treści.",
+    "amounts": [
+      "10 zł",
+      "25 zł",
+      "49 zł"
+    ],
+    "custom": "Własna kwota"
+  },
+  "mediflow": {
+    "name": "MediFlow",
+    "tagline": "Twój osobisty dziennik wellness",
+    "description": "Zapisuj artykuły, śledź objawy i suplementy. Nie do diagnozy — dla własnego przeglądu."
+  },
+  "ordizaznam": {
+    "name": "OrdiZáznam",
+    "tagline": "Nagraj na mobile — AI pisze notatkę",
+    "description": "Profesjonalne narzędzie dokumentacji dla lekarzy. Zgodne z RODO, szyfrowane."
+  },
+  "trends": {
+    "title": "Trendy 2026–2027",
+    "glp1": "GLP-1 i metabolizm",
+    "biohacking": "Biohacking dla początkujących",
+    "sleep": "Optymalizacja snu",
+    "mental": "Dobrostan psychiczny"
+  }
+}

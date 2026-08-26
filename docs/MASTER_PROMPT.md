@@ -1,0 +1,86 @@
+# MedScopeGlobal — Master Prompt (VitaScope Era)
+
+Use this document when generating content, code, or marketing copy for the MedScopeGlobal ecosystem.
+
+## Identity
+
+**MedScopeGlobal** (`medscopeglobal.com`) is a global health platform hosting apps, Academy, and autonomous editorial.
+
+**VitaScope** is the platform’s global health & longevity magazine:
+
+- **Audience**: Everyone who wants better health, longer life, and a healthier lifestyle — all ages, aspiration-driven
+- **Tone**: Evidence-based, warm, accessible; never diagnostic or miracle-cure
+- **Languages**: EN-US primary for global; CS for Czech portal; 19+ locale path prefixes
+
+Tagline: *See life clearly. Live it longer.*
+
+## Ecosystem (always mention when describing the platform)
+
+| Product | Role |
+|---------|------|
+| **VitaScope** | Magazine — longevity, lifestyle, news desks |
+| **MediFlow** | Personal wellness journal (articles, symptoms, supplements) |
+| **MeDipacient** | Patient messaging demo PWA |
+| **MeDiprep** | Medical school prep / tests PWA — **legacy**, deprioritized in nav & homepage |
+| **OrdiZapis** | Physician documentation PWA |
+| **Academy** | Courses and certificates |
+| **VIP** | Paid longevity protocols ($6.99/mo en-US) |
+
+## Editorial direction
+
+1. **Longevity (40%)** — healthy aging, protocols, sleep, metabolism, VIP teasers
+2. **Lifestyle (25%)** — nutrition, movement, prevention, mental wellness
+3. **Seniors (15%)** — caregiver-friendly, EU prevention framing
+4. **Trends (20%)** — GLP-1, biohacking, study digests with disclaimers
+
+Autonomous pipeline: LLM draft → editorial review → translate → SEO/JSON-LD → hero image suggestion → syndication.
+
+Monetization on articles: display ads, VIP CTA, tringelt micro-tip, affiliate boxes, MediFlow save.
+
+## Technical constraints
+
+- Next.js 15 App Router, Supabase, Cloudflare Workers (OpenNext)
+- Locale middleware must not break; path pattern `/{locale}/…`
+- PWAs keep **MedScopeGlobal** / app names in manifests; magazine = VitaScope in portal chrome
+- Medical disclaimer on all health content
+
+## Homepage messaging (reference)
+
+- Eyebrow: `VitaScope · powered by MedScopeGlobal` (EN) / `VitaScope · platforma MedScopeGlobal` (CS)
+- Claim: Health, longevity & lifestyle — for everyone
+- Badge: New ecosystem — MediFlow, VIP, autonomous editorial, 19 locales
+- **App order (homepage)**: MediFlow → MeDipacient → OrdiZapis → MeDiprep (legacy last)
+- **Do not lead** with přijímačky / LF prep in hero, services grid, or primary nav
+
+## Do not
+
+- Claim diagnosis, treatment, or guaranteed outcomes
+- Replace physician-facing content tone with clickbait on `/lekari` routes
+- Break standalone PWA shells or `AppOriginBar` → VitaScope home link
+
+## D: PC secrets / deploy (Windows only)
+
+Cloud agents cannot read `D:\`. On the PC after `git pull`:
+
+```powershell
+cd D:\medscope.local
+pnpm sync:d                 # restore:d + backup:d
+pnpm restore:d -- -Deploy   # optional CF production deploy
+```
+
+| Script | Purpose |
+|--------|---------|
+| `pnpm sync:d` | One-shot restore env + dated backup under `D:\medscope.data\backups\` |
+| `pnpm restore:d` | Merge CF/Supabase keys → `.env.local`, optional `gh secret set`, checklist |
+| `pnpm backup:d` | Git bundle + env backup (never commit secrets) |
+| `pnpm pull:d` | Pull cloud branch onto D: only (does not overwrite GitHub) |
+
+Full runbook: `docs/deploy/RESTORE_FROM_D.md`. Production: `pnpm cf:deploy` (needs real CF tokens + non-placeholder `SUPABASE_SERVICE_ROLE_KEY`).
+
+## Related docs
+
+- `docs/deploy/RESTORE_FROM_D.md` — D: sync/backup/deploy runbook
+- `docs/brand/magazine-brand.md` — brand rationale and code map
+- `docs/marketing/global-plan.md` — geo marketing and KPIs
+- `docs/editorial/autonomous-redakce.md` — redakce + tringelt + images
+- `AGENTS.md` — cloud agent dev/run instructions

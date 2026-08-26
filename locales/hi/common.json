@@ -1,0 +1,75 @@
+{
+  "site": {
+    "name": "MedScopeGlobal",
+    "tagline": "क्लिनिकल इंटेलिजेंस और साक्ष्य-आधारित चिकित्सा"
+  },
+  "nav": {
+    "home": "होम",
+    "magazine": "पत्रिका",
+    "pricing": "मूल्य",
+    "welcome": "प्लेटफ़ॉर्म",
+    "sections": "अनुभाग",
+    "access": "पहुँच स्तर",
+    "specialties": "विशेषताएँ",
+    "articles": "लेख",
+    "search": "खोज",
+    "login": "लॉग इन",
+    "signup": "पंजीकरण",
+    "audiences": "किसके लिए",
+    "medicine": "चिकित्सा",
+    "subscribe": "सदस्यता"
+  },
+  "cta": {
+    "readMore": "और पढ़ें",
+    "share": "साझा करें",
+    "supportAuthor": "लेखक का समर्थन",
+    "saveToMediFlow": "MediFlow में सहेजें",
+    "tryFree": "14 दिन का निःशुल्क परीक्षण",
+    "upgradeVip": "VIP में अपग्रेड",
+    "exploreProtocols": "प्रोटोकॉल देखें"
+  },
+  "disclaimer": {
+    "medical": "यह सामग्री चिकित्सा निदान या उपचार सलाह नहीं है। हमेशा अपने चिकित्सक से परामर्श करें।"
+  },
+  "vip": {
+    "title": "VIP longevity प्रोटोकॉल",
+    "subtitle": "नींद, चयापचय, प्रतिरक्षा और longevity के लिए 10 साक्ष्य-आधारित प्रोटोकॉल।",
+    "price": "$4.99/माह"
+  },
+  "tringelt": {
+    "title": "लेखक का समर्थन · Tringelt",
+    "subtitle": "वैकल्पिक सूक्ष्म योगदान — रेस्टोरां में टिप की तरह। संपादन को धन्यवाद।",
+    "custom": "कस्टम",
+    "vipUpsell": "संपादन का समर्थन करें और VIP longevity प्रोटोकॉल प्राप्त करें —",
+    "unavailable": "Tringelt अभी उपलब्ध नहीं है।",
+    "tip": "tringelt से संपादन का समर्थन करें",
+    "exploreVip": "या VIP longevity प्रोटोकॉल देखें"
+  },
+  "donation": {
+    "title": "लेखक का समर्थन",
+    "subtitle": "सूक्ष्म दान गुणवत्तापूर्ण सामग्री बनाने में मदद करता है।",
+    "amounts": [
+      "$2.99",
+      "$4.99",
+      "$9.99"
+    ],
+    "custom": "कस्टम राशि"
+  },
+  "mediflow": {
+    "name": "MediFlow",
+    "tagline": "आपकी व्यक्तिगत wellness डायरी",
+    "description": "लेख सहेजें, लक्षण और सप्लीमेंट ट्रैक करें। निदान के लिए नहीं — अपने अवलोकन के लिए।"
+  },
+  "ordizaznam": {
+    "name": "OrdiZáznam",
+    "tagline": "मोबाइल पर रिकॉर्ड — AI नोट लिखता है",
+    "description": "चिकित्सकों के लिए पेशेवर दस्तावेज़ उपकरण। GDPR अनुपालन, एन्क्रिप्टेड।"
+  },
+  "trends": {
+    "title": "रुझान 2026–2027",
+    "glp1": "GLP-1 और चयापचय",
+    "biohacking": "शुरुआती के लिए biohacking",
+    "sleep": "नींद अनुकूलन",
+    "mental": "मानसिक wellness"
+  }
+}

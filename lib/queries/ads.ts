@@ -13,6 +13,8 @@ function isWithinSchedule(row: AdRow): boolean {
 
 export async function getActiveAds(placement?: string | null) {
   const supabase = await createClient();
+  if (!supabase) return [];
+
   let query = supabase.from("ads").select("*").eq("active", true);
 
   if (placement) {

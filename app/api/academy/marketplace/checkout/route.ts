@@ -10,7 +10,10 @@ export async function POST(request: Request) {
   const secret = process.env.STRIPE_SECRET_KEY?.trim();
   if (!secret) {
     return NextResponse.json(
-      { error: "Stripe není nakonfigurován. Nastavte STRIPE_SECRET_KEY na Vercel." },
+      {
+        error:
+          "Stripe není nakonfigurován. Nastavte STRIPE_SECRET_KEY v Cloudflare Workers (Variables) nebo v .env.local.",
+      },
       { status: 503 }
     );
   }

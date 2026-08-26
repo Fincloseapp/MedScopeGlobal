@@ -39,6 +39,7 @@ export async function getMedicalArticles({
   locale?: LocaleCode;
 }) {
   const supabase = await createDataClient();
+  if (!supabase) return [];
   let query = supabase
     .from("articles")
     .select(articleSelect)

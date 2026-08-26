@@ -1,0 +1,75 @@
+{
+  "site": {
+    "name": "MedScopeGlobal",
+    "tagline": "臨床インテリジェンスとエビデンスに基づく医学"
+  },
+  "nav": {
+    "home": "ホーム",
+    "magazine": "マガジン",
+    "pricing": "料金",
+    "welcome": "プラットフォーム",
+    "sections": "セクション",
+    "access": "アクセスレベル",
+    "specialties": "専門分野",
+    "articles": "記事",
+    "search": "検索",
+    "login": "ログイン",
+    "signup": "登録",
+    "audiences": "対象者",
+    "medicine": "医学",
+    "subscribe": "購読"
+  },
+  "cta": {
+    "readMore": "続きを読む",
+    "share": "共有",
+    "supportAuthor": "著者を支援",
+    "saveToMediFlow": "MediFlow に保存",
+    "tryFree": "14日間無料トライアル",
+    "upgradeVip": "VIP にアップグレード",
+    "exploreProtocols": "プロトコルを見る"
+  },
+  "disclaimer": {
+    "medical": "このコンテンツは医学的診断や治療の推奨ではありません。必ず医師にご相談ください。"
+  },
+  "vip": {
+    "title": "VIP ロンジェビティプロトコル",
+    "subtitle": "睡眠、代謝、免疫、長寿のための10のエビデンスベースプロトコル。",
+    "price": "¥600/月"
+  },
+  "tringelt": {
+    "title": "著者を支援 · Tringelt",
+    "subtitle": "任意のマイクロ寄付——レストランのチップのように。編集部に感謝します。",
+    "custom": "カスタム",
+    "vipUpsell": "編集部を支援して VIP ロンジェビティプロトコルを取得 —",
+    "unavailable": "Tringelt は現在利用できません。",
+    "tip": "tringelt で編集部を支援",
+    "exploreVip": "または VIP ロンジェビティプロトコルを見る"
+  },
+  "donation": {
+    "title": "著者を支援",
+    "subtitle": "マイクロ寄付は質の高いコンテンツ制作を支えます。",
+    "amounts": [
+      "¥300",
+      "¥600",
+      "¥980"
+    ],
+    "custom": "カスタム金額"
+  },
+  "mediflow": {
+    "name": "MediFlow",
+    "tagline": "あなた専用のウェルネスジャーナル",
+    "description": "記事を保存し、症状やサプリメントを記録。診断用ではなく——自分の概要のため。"
+  },
+  "ordizaznam": {
+    "name": "OrdiZáznam",
+    "tagline": "モバイルで録音——AI が記録を作成",
+    "description": "医師向けプロフェッショナル文書ツール。GDPR 準拠、暗号化。"
+  },
+  "trends": {
+    "title": "2026–2027 トレンド",
+    "glp1": "GLP-1 と代謝",
+    "biohacking": "初心者向けバイオハッキング",
+    "sleep": "睡眠最適化",
+    "mental": "メンタルウェルネス"
+  }
+}

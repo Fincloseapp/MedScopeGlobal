@@ -10,9 +10,9 @@ import { buildV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({
-    title: "Aplikace MedScopeGlobal — MeDipacient, MeDiprep, OrdiZapis",
+    title: "Aplikace MedScopeGlobal — MediFlow, MeDipacient, OrdiZapis",
     description:
-      "Tři instalovatelné aplikace: MeDipacient pro zprávy, MeDiprep na přijímačky LF a OrdiZapis pro lékaře. Stažení na mobil jako u OrdiZapisu.",
+      "Wellness deník MediFlow, MeDipacient pro zprávy a OrdiZapis pro lékaře — plus legacy MeDiprep pro přípravu na LF. Stažení na mobil jako PWA.",
     path: "/aplikace",
   });
 }
@@ -35,10 +35,11 @@ export default function AplikaceHubPage() {
       <section className="border-b bg-[#021d33] text-white">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200">Aplikace MedScopeGlobal</p>
-          <h1 className="mt-2 font-display text-4xl font-bold">Tři aplikace. Jedno prostředí.</h1>
+          <h1 className="mt-2 font-display text-4xl font-bold">Wellness, zprávy a zápisy — na jedné platformě</h1>
           <p className="mt-4 max-w-2xl text-white/80">
-            Stáhnete je na plochu telefonu stejně jako OrdiZapis: Chrome → Nainstalovat, iPhone Safari → Sdílet → Na
-            plochu. Cíl je jasný — předplatitelé a denní použití, ne další webová záložka.
+            MediFlow pro dlouhověkost a vlastní deník, MeDipacient pro lékařské zprávy, OrdiZapis pro ověřené lékaře.
+            MeDiprep (přijímačky LF) zůstává dostupný jako doplňková aplikace. Stažení na plochu telefonu — Chrome
+            nebo Safari.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href="/predplatne?trial=1" className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#021d33]">

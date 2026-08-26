@@ -56,7 +56,7 @@ export function PortalSearch() {
           placeholder={
             tab === "ai"
               ? "Otevřít AI asistenta pro veřejnost…"
-              : "Aplikace, články, přijímačky, léky…"
+              : "Longevity, články, MediFlow, VIP, léky…"
           }
           className="h-12 flex-1 rounded-lg border border-slate-300 bg-white px-4 text-base text-[#021d33] shadow-sm outline-none ring-[#005B96] placeholder:text-slate-400 focus:border-[#005B96] focus:ring-2"
         />

@@ -11,30 +11,45 @@ export async function ContentRecommendations({
   const isCs = locale === "cs";
   const supabase = await createClient();
 
-  const [articlesRes, studiesRes, diagnosesRes] = await Promise.all([
-    supabase
-      .from("articles")
-      .select("slug, title, excerpt")
-      .eq("published", true)
-      .neq("slug", currentSlug ?? "")
-      .order("published_at", { ascending: false })
-      .limit(4),
-    supabase
-      .from("studies")
-      .select("slug, title, abstract")
-      .eq("published", true)
-      .order("published_date", { ascending: false })
-      .limit(3),
-    supabase
-      .from("diagnoses")
-      .select("slug, name, description")
-      .eq("published", true)
-      .limit(3),
-  ]);
+  let articles: { slug: string; title: string; excerpt: string | null }[] = [];
+  let studies: { slug: string; title: string; abstract: string | null }[] = [];
+  let diagnoses: { slug: string; name: string; description: string | null }[] = [];
 
-  const articles = articlesRes.data ?? [];
-  const studies = studiesRes.data ?? [];
-  const diagnoses = diagnosesRes.data ?? [];
+  if (supabase) {
+    const [articlesRes, studiesRes, diagnosesRes] = await Promise.all([
+      supabase
+        .from("articles")
+        .select("slug, title, excerpt")
+        .eq("published", true)
+        .neq("slug", currentSlug ?? "")
+        .order("published_at", { ascending: false })
+        .limit(4),
+      supabase
+        .from("studies")
+        .select("slug, title, abstract")
+        .eq("published", true)
+        .order("published_date", { ascending: false })
+        .limit(3),
+      supabase
+        .from("diagnoses")
+        .select("slug, name, description")
+        .eq("published", true)
+        .limit(3),
+    ]);
+    articles = articlesRes.data ?? [];
+    studies = studiesRes.data ?? [];
+    diagnoses = diagnosesRes.data ?? [];
+  }
+
+  if (!articles.length) {
+    const { getDemoMagazineArticles } = await import(
+      "@/lib/verejnost/demo-magazine-articles"
+    );
+    articles = getDemoMagazineArticles()
+      .filter((a) => a.slug !== currentSlug)
+      .slice(0, 4)
+      .map((a) => ({ slug: a.slug, title: a.title, excerpt: a.excerpt }));
+  }
 
   if (!articles.length && !studies.length && !diagnoses.length) return null;
 

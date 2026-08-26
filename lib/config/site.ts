@@ -1,9 +1,13 @@
+import { MAGAZINE } from "@/lib/brand/magazine";
+
 /** MedScopeGlobal — central project configuration */
 export const SITE = {
   name: "MedScopeGlobal",
-  tagline: "MeDipacient · MeDiprep · OrdiZapis",
+  /** Global publication hosted on this platform */
+  magazineName: MAGAZINE.name,
+  tagline: "VitaScope · MediFlow · MeDipacient · OrdiZapis",
   description:
-    "MeDipacient, MeDiprep a OrdiZapis na ploše telefonu. Evidence-based medicína v češtině pro veřejnost, studenty LF a lékaře. 14 dní zdarma.",
+    "VitaScope — globální magazín zdraví a dlouhověkosti na MedScopeGlobal.com. MediFlow, VIP protokoly, MeDipacient a OrdiZapis. Evidence-based obsah ve 19 jazycích. 14 dní zdarma.",
   domain: "medscopeglobal.com",
   url:
     process.env.NEXT_PUBLIC_SITE_URL ||

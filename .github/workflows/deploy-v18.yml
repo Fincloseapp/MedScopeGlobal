@@ -1,8 +1,10 @@
-name: Deploy V18
+name: Deploy V18 (legacy Vercel — disabled)
+
+# Production deploys run via Cloudflare Workers (cloudflare-deploy.yml).
+# Manual only if you intentionally need a legacy Vercel deploy.
 
 on:
-  push:
-    branches: ["main"]
+  workflow_dispatch:
 
 concurrency:
   group: v18-production-deploy

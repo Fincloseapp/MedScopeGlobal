@@ -3,10 +3,12 @@ import { Inter, Libre_Baskerville } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { PublicEnvScript } from "@/components/system/public-env-script";
 import { getServerLocale } from "@/lib/i18n/server-locale";
-import { HREFLANG_LOCALES } from "@/lib/seo/metadata";
+import { buildGlobalHreflang } from "@/lib/ecosystem/seo";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
+import { MAGAZINE, getSiteDefaultTitle } from "@/lib/brand/magazine";
 import { SITE } from "@/lib/config/site";
-import { organizationJsonLd, newsletterJsonLd } from "@/lib/seo/json-ld";
+import { getSiteUrl } from "@/lib/config/site-url";
+import { organizationJsonLd, newsletterJsonLd, publicationJsonLd } from "@/lib/seo/json-ld";
 import "./globals.css";
 
 const inter = Inter({
@@ -20,32 +22,33 @@ const display = Libre_Baskerville({
   variable: "--font-display",
 });
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000");
+const siteUrl = getSiteUrl();
+const rootHreflang = buildGlobalHreflang("/", "cs");
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "MedScopeGlobal | Odborný medicínský magazín",
-    template: "%s | MedScopeGlobal",
+    default: getSiteDefaultTitle("en-US"),
+    template: `%s | ${MAGAZINE.name}`,
   },
   description: SITE.description,
   applicationName: SITE.name,
   keywords: [
+    "VitaScope",
+    "longevity",
+    "wellness",
+    "healthy lifestyle",
+    "health magazine",
+    "MedScopeGlobal",
+    "MediFlow",
     "medicína",
     "zdravotnictví",
-    "studium medicíny",
-    "klinická praxe",
-    "výzkum",
+    "dlouhověkost",
     "evidence-based medicine",
-    "MedScopeGlobal",
   ],
-  authors: [{ name: SITE.name, url: SITE.url }],
+  authors: [{ name: MAGAZINE.name, url: SITE.url }],
   creator: SITE.name,
-  publisher: SITE.name,
+  publisher: MAGAZINE.name,
   robots: {
     index: true,
     follow: true,
@@ -53,11 +56,11 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: "cs_CZ",
-    alternateLocale: ["en_US"],
-    siteName: SITE.name,
+    locale: "en_US",
+    alternateLocale: ["cs_CZ"],
+    siteName: `${MAGAZINE.name} · ${SITE.name}`,
     url: siteUrl,
-    title: "MedScopeGlobal | Odborný medicínský magazín",
+    title: getSiteDefaultTitle("en-US"),
     description: SITE.description,
   },
   twitter: {
@@ -66,10 +69,8 @@ export const metadata: Metadata = {
     site: "@MedScopeGlobal",
   },
   alternates: {
-    canonical: siteUrl,
-    languages: Object.fromEntries(
-      HREFLANG_LOCALES.map((l) => [l.hreflang, `${siteUrl}?lang=${l.code}`])
-    ),
+    canonical: rootHreflang.canonical,
+    languages: rootHreflang.languages,
   },
 };
 
@@ -88,6 +89,7 @@ export default async function RootLayout({
       >
         <PublicEnvScript />
         <JsonLdScript data={organizationJsonLd()} />
+        <JsonLdScript data={publicationJsonLd()} />
         <JsonLdScript data={newsletterJsonLd()} />
         <Providers>{children}</Providers>
       </body>

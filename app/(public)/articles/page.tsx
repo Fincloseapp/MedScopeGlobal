@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MagazineListing } from "@/components/articles/magazine-listing";
 import { V20ArticleCard } from "@/components/v20/article-card";
+import { MAGAZINE } from "@/lib/brand/magazine";
 import { getLatestArticles } from "@/lib/queries/articles";
 import { getMedicalArticles } from "@/lib/queries/medicina";
 import { getReaderContext } from "@/lib/auth/reader-context";
@@ -33,9 +34,9 @@ export async function generateMetadata({
           ? "Dlouhověkost"
           : "Články";
   return buildV20PageMetadata({
-    title: `${title} — MedScopeGlobal`,
+    title: `${title} — ${MAGAZINE.name}`,
     description:
-      "Aktuální zdravotnické články v češtině: novinky, veřejné zdraví, dlouhověkost a redakční magazín s fotografiemi.",
+      "Aktuální zdravotnické články v češtině: novinky, veřejné zdraví, dlouhověkost a redakční magazín VitaScope s fotografiemi.",
     path: desk ? `/articles?desk=${desk}` : "/articles",
   });
 }
@@ -98,6 +99,19 @@ export default async function ArticlesPage({
             <V20ArticleCard key={article.slug} article={article} />
           ))}
         </div>
+        {medArticles.length === 0 ? (
+          <p className="mt-8 text-center text-sm text-slate-500">
+            Žádné odborné články v této kategorii. Zkuste{" "}
+            <Link href="/articles" className="text-primary hover:underline">
+              magazín {MAGAZINE.name}
+            </Link>{" "}
+            nebo{" "}
+            <Link href="/app/mediflow" className="text-primary hover:underline">
+              MediFlow
+            </Link>
+            .
+          </p>
+        ) : null}
       </div>
     );
   }

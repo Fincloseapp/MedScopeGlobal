@@ -6,13 +6,19 @@ import { V271_AUDIENCES, V271_SOCIAL_PROOF_STATS } from "@/lib/v271/homepage";
 import {
   getPortalNewsNote,
   PORTAL_NEWS_TABS,
-  PORTAL_PHILOSOPHY,
   PORTAL_SERVICES,
+  getPortalPhilosophy,
 } from "@/lib/v271/portal";
 import { NEWS_DESKS, splitNewsDesks, type NewsDeskId } from "@/lib/v271/news-desks";
 import { NewsArticleThumb, NewsDeskFallback, NewsHeadlineRow } from "@/components/articles/news-article-card";
 import { PortalSearch } from "@/components/v271/portal-search";
 import { WriterAgentsStrip } from "@/components/editorial/writer-agents-strip";
+import {
+  TrendySection,
+  LongevityProtocolsSection,
+  RecommendedToolsSection,
+  HomepageAffiliateSection,
+} from "@/components/ecosystem/magazine-sections";
 import { AppOpenLink, isStandaloneAppHref } from "@/components/apps/app-origin-bar";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { BookOpen, Gift, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
@@ -131,18 +137,29 @@ function PortalNewsFeed({ articles }: { articles: DisplayArticle[] }) {
   );
 }
 
-export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
+export function PortalHome({
+  articles,
+  philosophy,
+}: {
+  articles: DisplayArticle[];
+  philosophy: ReturnType<typeof getPortalPhilosophy>;
+}) {
   return (
     <div className="border-b border-slate-200 bg-[#e8eef3]">
       <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5">
         <div className="rounded-lg border border-slate-200 bg-white px-4 py-4 shadow-sm sm:px-6 sm:py-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">
-            {PORTAL_PHILOSOPHY.eyebrow}
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">
+              {philosophy.eyebrow}
+            </p>
+            <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-800 ring-1 ring-emerald-200">
+              {philosophy.whatsNew}
+            </span>
+          </div>
           <h1 className="mt-1 font-display text-2xl font-bold text-[#021d33] sm:text-3xl">
-            {PORTAL_PHILOSOPHY.claim}
+            {philosophy.claim}
           </h1>
-          <p className="mt-1 max-w-3xl text-sm text-slate-600">{PORTAL_PHILOSOPHY.subtitle}</p>
+          <p className="mt-1 max-w-3xl text-sm text-slate-600">{philosophy.subtitle}</p>
           <div className="mt-4">
             <PortalSearch />
           </div>
@@ -184,7 +201,7 @@ export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
         <WriterAgentsStrip />
 
         <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <Box title="Zpravodajství" href="/articles">
+          <Box title={`${philosophy.magazineName ?? "VitaScope"} — Zpravodajství`} href="/articles">
             <PortalNewsFeed articles={articles} />
           </Box>
 
@@ -210,7 +227,9 @@ export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
                         <span className="block text-sm font-semibold text-[#021d33]">{app.shortName}</span>
                         <span className="block truncate text-xs text-slate-500">{app.tagline}</span>
                       </span>
-                      <span className="text-xs font-semibold text-[#005B96]">nová karta</span>
+                      <span className="text-xs font-semibold text-[#005B96]">
+                        {app.id === "mediprep" ? "legacy" : "nová karta"}
+                      </span>
                     </AppOpenLink>
                   </li>
                 ))}
@@ -264,6 +283,11 @@ export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
                 ))}
               </dl>
             </Box>
+
+            <TrendySection />
+            <LongevityProtocolsSection />
+            <RecommendedToolsSection />
+            <HomepageAffiliateSection />
           </div>
         </div>
       </div>

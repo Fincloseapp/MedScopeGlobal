@@ -10,33 +10,58 @@ import { PortalHome } from "@/components/v271/portal-home";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { medicalWebPageJsonLd, webSiteJsonLd, softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { APP_PRODUCTS, appSeoDescription } from "@/lib/apps/catalog";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildGlobalHreflang } from "@/lib/ecosystem/seo";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getHomepageCachedData } from "@/lib/v22/homepage-cache";
-import { PORTAL_PHILOSOPHY } from "@/lib/v271/portal";
+import { getPortalPhilosophy } from "@/lib/v271/portal";
+import { getHomepageDescription, getHomepageTitle, MAGAZINE } from "@/lib/brand/magazine";
+import { SITE } from "@/lib/config/site";
+import { publicationJsonLd } from "@/lib/seo/json-ld";
 
 export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
-    title: "MedScopeGlobal — zdravotnictví na jednom místě",
-    description:
-      "Hledejte, otevřete MeDipacient, MeDiprep nebo OrdiZapis a čtěte redakci. Evidence-based medicína v češtině. 14 dní zdarma.",
-    path: "/",
-  });
+  const locale = (await getServerLocale()) as GlobalLocaleCode;
+  const { canonical, languages } = buildGlobalHreflang("/", locale);
+  const title = getHomepageTitle(locale);
+  const description = getHomepageDescription(locale);
+
+  return {
+    title,
+    description,
+    alternates: { canonical, languages },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      locale: locale.startsWith("en") ? "en_US" : "cs_CZ",
+      siteName: `${MAGAZINE.name} · ${MAGAZINE.platform}`,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
 }
 
 export default async function HomePage() {
+  const locale = await getServerLocale();
+  const philosophy = getPortalPhilosophy(locale);
   const { articles, topAds, midAds, bottomAds } = await getHomepageCachedData();
 
   const homeLd = medicalWebPageJsonLd({
-    title: PORTAL_PHILOSOPHY.claim,
-    description: PORTAL_PHILOSOPHY.subtitle,
+    title: philosophy.claim,
+    description: philosophy.subtitle,
     path: "/",
   });
 
   return (
     <div className="v271-home bg-[#e8eef3]">
       <JsonLdScript data={webSiteJsonLd()} />
+      <JsonLdScript data={publicationJsonLd()} />
       <JsonLdScript data={homeLd} />
       {APP_PRODUCTS.map((app) => (
         <JsonLdScript
@@ -51,7 +76,7 @@ export default async function HomePage() {
         />
       ))}
 
-      <PortalHome articles={articles} />
+      <PortalHome articles={articles} philosophy={philosophy} />
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
       <V272AcademyHomeSections />
       <V272WhyTrustBlock />
@@ -60,8 +85,8 @@ export default async function HomePage() {
 
       <section className="mx-auto max-w-7xl px-3 pb-8 sm:px-4">
         <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
-          MedScopeGlobal je vzdělávací magazín — není přijímací komise ani oficiální učebnice LF. Obsah
-          nenahrazuje individuální lékařskou radu.
+          {MAGAZINE.name} na {SITE.name} je vzdělávací magazín zdraví a dlouhověkosti — není přijímací
+          komise ani oficiální učebnice LF. Obsah nenahrazuje individuální lékařskou radu.
         </p>
       </section>
     </div>

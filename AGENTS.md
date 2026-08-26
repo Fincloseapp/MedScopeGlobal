@@ -72,6 +72,10 @@ Cloudflare Workers via OpenNext; the source of truth for data is **Supabase** (P
 - Canonical PC root is **`D:\medscope.local`** (data `D:\medscope.data`, logs `D:\medscope.logs`).
 - Cloud agents cannot write the Windows D: drive. To refresh the PC from GitHub after cloud work:
   `pnpm pull:d` (or `powershell -File .\scripts\pull-cloud-to-d.ps1`) inside `D:\medscope.local`.
+- **Secrets + backup on the PC** (see `docs/deploy/RESTORE_FROM_D.md`):
+  - `pnpm restore:d` — select keys from D: `.env.local` → workspace, `cf:env:sync`, optional GH secrets, checklist
+  - `pnpm backup:d` — dated backup under `D:\medscope.data\backups\YYYY-MM-DD\` (git bundle + `.env.local` + manifest)
+  - `pnpm sync:d` — restore + verify + backup one-shot (`-Deploy` / `-IncludeZip` optional)
 - Do not use `pnpm push:github` for pull — that overwrites GitHub from D:.
 - Keep local `.env.local` intact; article SSR listings need `SUPABASE_SERVICE_ROLE_KEY` (anon alone
   cannot `select=*` on `articles`).

@@ -1,11 +1,20 @@
 /** Homepage portal IA — compact start page, then news + services (Seznam-inspired). */
 
+import { getMagazineCopy, MAGAZINE } from "@/lib/brand/magazine";
+import type { LocaleCode } from "@/lib/i18n/config";
+
+/** Default Czech hero copy (legacy export — prefer getPortalPhilosophy(locale) on server). */
 export const PORTAL_PHILOSOPHY = {
-  eyebrow: "MedScopeGlobal.com",
-  claim: "Zdravotnictví na jednom místě",
-  subtitle:
-    "Hledejte, otevřete aplikaci, čtěte zprávy. MeDipacient, MeDiprep a OrdiZapis vedle redakce — bez extra záložek.",
+  eyebrow: MAGAZINE.heroEyebrow.cs,
+  claim: MAGAZINE.heroClaim.cs,
+  subtitle: MAGAZINE.subtitle.cs,
+  whatsNew: MAGAZINE.whatsNew.cs,
+  magazineName: MAGAZINE.name,
 } as const;
+
+export function getPortalPhilosophy(locale?: LocaleCode | string) {
+  return getMagazineCopy(locale);
+}
 
 export const PORTAL_SEARCH_TABS = [
   { id: "search", label: "Hledat", action: "/search", queryParam: "q" },
@@ -13,14 +22,23 @@ export const PORTAL_SEARCH_TABS = [
 ] as const;
 
 export const PORTAL_TRENDING = [
+  { label: "dlouhověkost", href: "/verejnost/clanky?topic=dlouhovekost" },
+  { label: "MediFlow", href: "/app/mediflow" },
+  { label: "VIP protokoly", href: "/vip/protokoly" },
   { label: "MeDipacient", href: "/app/pacient" },
-  { label: "přijímačky LF", href: "/app/priprava" },
   { label: "OrdiZapis", href: "/app/dokumentace" },
-  { label: "guidelines", href: "/lekari/guidelines" },
-  { label: "léky SÚKL", href: "/leky" },
 ] as const;
 
 export const PORTAL_SERVICES = [
+  { id: "articles", label: "Články", hint: "VitaScope", href: "/articles", icon: "news" },
+  {
+    id: "mediflow",
+    label: "MediFlow",
+    hint: "deník",
+    href: "/app/mediflow",
+    image: "/assets/mediflow/icon-192.png",
+  },
+  { id: "vip", label: "VIP", hint: "protokoly", href: "/vip/protokoly", icon: "spark" },
   {
     id: "medipacient",
     label: "MeDipacient",
@@ -29,26 +47,23 @@ export const PORTAL_SERVICES = [
     image: "/assets/medipacient/icon-192.png",
   },
   {
-    id: "mediprep",
-    label: "MeDiprep",
-    hint: "přijímačky",
-    href: "/app/priprava",
-    image: "/assets/mediprep/icon-192.png",
-  },
-  {
     id: "ordizapis",
     label: "OrdiZapis",
     hint: "zápisy",
     href: "/app/dokumentace",
     image: "/assets/ordizapis/icon-192.png",
   },
-  { id: "dashboard", label: "Dashboard", hint: "přehled", href: "/dashboard", icon: "grid" },
   { id: "academy", label: "Academy", hint: "kurzy", href: "/academy", icon: "book" },
-  { id: "articles", label: "Články", hint: "magazín", href: "/articles", icon: "news" },
   { id: "ai", label: "AI", hint: "zeptat se", href: "/ai-asistent/verejnost", icon: "spark" },
   { id: "trial", label: "14 dní", hint: "zdarma", href: "/predplatne?trial=1", icon: "gift" },
   { id: "leky", label: "Léky", hint: "SÚKL", href: "/leky", icon: "pill" },
-  { id: "fakulty", label: "Fakulty", hint: "8 LF", href: "/studium/univerzity", icon: "school" },
+  {
+    id: "mediprep",
+    label: "MeDiprep",
+    hint: "legacy",
+    href: "/app/priprava",
+    image: "/assets/mediprep/icon-192.png",
+  },
 ] as const;
 
 export const PORTAL_NEWS_TABS = [

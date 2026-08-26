@@ -51,7 +51,20 @@ export async function listPublicArticles(options?: {
   const limit = options?.limit ?? 12;
   const offset = options?.offset ?? 0;
   const locale = options?.locale ?? "cs";
+  const {
+    getDemoMagazineArticles,
+  } = await import("@/lib/verejnost/demo-magazine-articles");
+
+  const demoSlice = () => {
+    let demo = getDemoMagazineArticles();
+    if (options?.topic) {
+      demo = demo.filter((a) => a.public_topic === options.topic);
+    }
+    return demo.slice(offset, offset + limit);
+  };
+
   const supabase = await createDataClient();
+  if (!supabase) return demoSlice();
 
   let q = supabase
     .from("articles")
@@ -68,10 +81,12 @@ export async function listPublicArticles(options?: {
   const { data, error } = await q;
   if (error) {
     console.error("listPublicArticles", error);
-    return [];
+    return demoSlice();
   }
 
   const rows = mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[];
+  if (rows.length === 0) return demoSlice();
+
   const mode = options?.mode ?? "card";
   const prepared = await prepareArticlesForDisplay(rows, locale, { mode, maxTranslate: limit });
   const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
@@ -82,7 +97,16 @@ export async function getPublicArticleBySlug(
   slug: string,
   locale: LocaleCode = "cs"
 ): Promise<DisplayArticle | null> {
+  const { getDemoMagazineArticleBySlug } = await import(
+    "@/lib/verejnost/demo-magazine-articles"
+  );
+  const demoHit = () => {
+    const demo = getDemoMagazineArticleBySlug(slug);
+    return demo;
+  };
+
   const supabase = await createDataClient();
+  if (!supabase) return demoHit();
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -93,11 +117,11 @@ export async function getPublicArticleBySlug(
 
   if (error) {
     console.error("getPublicArticleBySlug", error);
-    return null;
+    return demoHit();
   }
 
   const row = data ? (mapArticleList([data as Record<string, unknown>])[0] ?? null) : null;
-  if (!row) return null;
+  if (!row) return demoHit();
   const article = await prepareArticleForDisplay(row, locale, "full");
   const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
   return { ...article, cover_image_url: resolveVerejnostCoverUrl(article) };
@@ -108,6 +132,7 @@ export async function listPublicAdCampaigns(options?: {
   topic?: PublicTopic | null;
 }): Promise<PublicAdCampaign[]> {
   const supabase = await createDataClient();
+  if (!supabase) return [];
   let q = supabase.from("public_ad_campaigns").select("*").order("updated_at", { ascending: false });
   if (options?.activeOnly !== false) q = q.eq("active", true);
 
@@ -128,6 +153,7 @@ export async function listPublicAdCampaigns(options?: {
 
 export async function getPublicAdCampaign(id: string): Promise<PublicAdCampaign | null> {
   const supabase = await createDataClient();
+  if (!supabase) return null;
   const { data, error } = await supabase.from("public_ad_campaigns").select("*").eq("id", id).maybeSingle();
   if (error) {
     console.error("getPublicAdCampaign", error);
@@ -150,6 +176,7 @@ export async function incrementPublicAdClick(campaignId: string): Promise<boolea
 
 export async function countPublicArticlesByTopic(): Promise<Record<string, number>> {
   const supabase = await createDataClient();
+  if (!supabase) return {};
   const topics: PublicTopic[] = ["zivotni-styl", "nemoci", "prevence", "rozhovory"];
   const out: Record<string, number> = {};
   for (const topic of topics) {

@@ -1,11 +1,13 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "Klinická inteligence a evidence-based medicína"
+    "magazine": "VitaScope",
+    "tagline": "Jasně o zdraví. Délka i kvalita života.",
+    "magazineTagline": "Globální magazín zdraví a dlouhověkosti — pro každého, kdo chce být lépe"
   },
   "nav": {
     "home": "Domů",
-    "magazine": "Magazín",
+    "magazine": "VitaScope",
     "pricing": "Ceník",
     "welcome": "O platformě",
     "sections": "Sekce",

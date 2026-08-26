@@ -126,6 +126,7 @@ export async function listStudentAdCampaigns(options?: {
   activeOnly?: boolean;
 }): Promise<StudentAdCampaign[]> {
   const supabase = await createClient();
+  if (!supabase) return [];
   let q = supabase.from("student_ad_campaigns").select("*").order("updated_at", { ascending: false });
   if (options?.activeOnly) q = q.eq("active", true);
   const { data, error } = await q;

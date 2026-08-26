@@ -85,7 +85,7 @@ export function V272WhyTrustBlock() {
             Aplikace na mobilu, obsah když ho potřebujete
           </h2>
           <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-600">
-            Stažení na plochu, zkušební data v dashboardu a ověřené zdroje — od přijímaček po klinickou praxi.
+            Stažení na plochu, zkušební data v dashboardu a ověřené zdroje — od longevity magazínu po klinickou praxi.
           </p>
         </div>
 
@@ -251,7 +251,7 @@ export async function V272AktualniBlock() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-              Zpravodajství
+              VitaScope · Zpravodajství
             </p>
             <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">
               {V271_AKTUALNI.title}

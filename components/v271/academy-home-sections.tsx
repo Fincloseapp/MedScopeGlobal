@@ -12,16 +12,29 @@ import {
 } from "@/lib/academy/db";
 
 export async function V272AcademyHomeSections() {
-  const [courses, prepCourses, simulations, textbooks, listings, leaderboard] = await Promise.all([
-    listPublishedCourses(3),
-    listPublishedCourses(6, { prepOnly: true }),
-    listClinicalSimulations(2),
-    listTextbooks(2),
-    listMarketplaceListings(2),
-    getLeaderboard("all_time", 5),
-  ]);
-  const flags = await getCourseVideoFlags(courses.map((c) => c.id));
-  const prepFlags = await getCourseVideoFlags(prepCourses.map((c) => c.id));
+  let courses: Awaited<ReturnType<typeof listPublishedCourses>> = [];
+  let prepCourses: Awaited<ReturnType<typeof listPublishedCourses>> = [];
+  let simulations: Awaited<ReturnType<typeof listClinicalSimulations>> = [];
+  let textbooks: Awaited<ReturnType<typeof listTextbooks>> = [];
+  let listings: Awaited<ReturnType<typeof listMarketplaceListings>> = [];
+  let leaderboard: Awaited<ReturnType<typeof getLeaderboard>> = [];
+
+  try {
+    [courses, prepCourses, simulations, textbooks, listings, leaderboard] = await Promise.all([
+      listPublishedCourses(3),
+      listPublishedCourses(6, { prepOnly: true }),
+      listClinicalSimulations(2),
+      listTextbooks(2),
+      listMarketplaceListings(2),
+      getLeaderboard("all_time", 5),
+    ]);
+  } catch (error) {
+    console.error("[academy] V272AcademyHomeSections", error);
+  }
+
+  const emptyFlags: Record<string, { hasVideo: boolean; videoLessonCount: number }> = {};
+  const flags = await getCourseVideoFlags(courses.map((c) => c.id)).catch(() => emptyFlags);
+  const prepFlags = await getCourseVideoFlags(prepCourses.map((c) => c.id)).catch(() => emptyFlags);
 
   return (
     <>

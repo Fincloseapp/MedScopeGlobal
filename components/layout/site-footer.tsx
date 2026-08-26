@@ -56,13 +56,23 @@ export async function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link href="/app/pacient" className="hover:text-foreground">
-                MeDipacient
+              <Link href="/articles" className="hover:text-foreground">
+                Články · VitaScope
               </Link>
             </li>
             <li>
-              <Link href="/app/priprava" className="hover:text-foreground">
-                MeDiprep
+              <Link href="/vip/protokoly" className="hover:text-foreground">
+                VIP protokoly
+              </Link>
+            </li>
+            <li>
+              <Link href="/app/mediflow" className="hover:text-foreground">
+                MediFlow
+              </Link>
+            </li>
+            <li>
+              <Link href="/app/pacient" className="hover:text-foreground">
+                MeDipacient
               </Link>
             </li>
             <li>
@@ -71,8 +81,8 @@ export async function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link href="/articles" className="hover:text-foreground">
-                Články
+              <Link href="/app/priprava" className="hover:text-foreground">
+                MeDiprep (legacy)
               </Link>
             </li>
             <li>

@@ -1,0 +1,75 @@
+{
+  "site": {
+    "name": "MedScopeGlobal",
+    "tagline": "Klinische Intelligenz und evidenzbasierte Medizin"
+  },
+  "nav": {
+    "home": "Start",
+    "magazine": "Magazin",
+    "pricing": "Preise",
+    "welcome": "Plattform",
+    "sections": "Bereiche",
+    "access": "Zugangsstufen",
+    "specialties": "Fachgebiete",
+    "articles": "Artikel",
+    "search": "Suchen",
+    "login": "Anmelden",
+    "signup": "Registrieren",
+    "audiences": "Für wen",
+    "medicine": "Medizin",
+    "subscribe": "Abonnement"
+  },
+  "cta": {
+    "readMore": "Weiterlesen",
+    "share": "Teilen",
+    "supportAuthor": "Autor unterstützen",
+    "saveToMediFlow": "In MediFlow speichern",
+    "tryFree": "14 Tage kostenlos testen",
+    "upgradeVip": "VIP upgraden",
+    "exploreProtocols": "Protokolle entdecken"
+  },
+  "disclaimer": {
+    "medical": "Der Inhalt stellt keine medizinische Diagnose oder Behandlungsempfehlung dar. Konsultieren Sie immer Ihren Arzt."
+  },
+  "vip": {
+    "title": "VIP Longevity-Protokolle",
+    "subtitle": "10 evidenzbasierte Protokolle für Schlaf, Stoffwechsel, Immunität und Langlebigkeit.",
+    "price": "5,99 €/Monat"
+  },
+  "tringelt": {
+    "title": "Autor unterstützen · Tringelt",
+    "subtitle": "Optionaler Mikrobeitrag — wie ein Trinkgeld im Restaurant. Danke an die Redaktion.",
+    "custom": "Eigener Betrag",
+    "vipUpsell": "Unterstützen Sie die Redaktion und erhalten Sie VIP Longevity-Protokolle —",
+    "unavailable": "Tringelt ist derzeit nicht verfügbar.",
+    "tip": "Unterstützen Sie die Redaktion mit einem Tringelt",
+    "exploreVip": "oder entdecken Sie VIP Longevity-Protokolle"
+  },
+  "donation": {
+    "title": "Autor unterstützen",
+    "subtitle": "Eine Mikro-Spende hilft, qualitativ hochwertige Inhalte zu erstellen.",
+    "amounts": [
+      "€2",
+      "€5",
+      "€9.90"
+    ],
+    "custom": "Eigener Betrag"
+  },
+  "mediflow": {
+    "name": "MediFlow",
+    "tagline": "Ihr persönliches Wellness-Tagebuch",
+    "description": "Artikel speichern, Symptome und Nahrungsergänzung tracken. Keine Diagnose — für den eigenen Überblick."
+  },
+  "ordizaznam": {
+    "name": "OrdiZáznam",
+    "tagline": "Mobil aufnehmen — KI schreibt die Notiz",
+    "description": "Professionelles Dokumentationstool für Ärzte. DSGVO-konform, verschlüsselt."
+  },
+  "trends": {
+    "title": "Trends 2026–2027",
+    "glp1": "GLP-1 & Stoffwechsel",
+    "biohacking": "Biohacking für Einsteiger",
+    "sleep": "Schlafoptimierung",
+    "mental": "Mentales Wohlbefinden"
+  }
+}

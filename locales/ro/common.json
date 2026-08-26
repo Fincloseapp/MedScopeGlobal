@@ -1,0 +1,75 @@
+{
+  "site": {
+    "name": "MedScopeGlobal",
+    "tagline": "Inteligență clinică și medicină bazată pe dovezi"
+  },
+  "nav": {
+    "home": "Acasă",
+    "magazine": "Revistă",
+    "pricing": "Prețuri",
+    "welcome": "Platformă",
+    "sections": "Secțiuni",
+    "access": "Niveluri de acces",
+    "specialties": "Specialități",
+    "articles": "Articole",
+    "search": "Căutare",
+    "login": "Autentificare",
+    "signup": "Înregistrare",
+    "audiences": "Pentru cine",
+    "medicine": "Medicină",
+    "subscribe": "Abonament"
+  },
+  "cta": {
+    "readMore": "Citește mai mult",
+    "share": "Distribuie",
+    "supportAuthor": "Susține autorul",
+    "saveToMediFlow": "Salvează în MediFlow",
+    "tryFree": "Probă gratuită de 14 zile",
+    "upgradeVip": "Upgrade la VIP",
+    "exploreProtocols": "Explorează protocoalele"
+  },
+  "disclaimer": {
+    "medical": "Conținutul nu reprezintă un diagnostic medical sau o recomandare terapeutică. Consultați întotdeauna medicul."
+  },
+  "vip": {
+    "title": "Protocoale VIP longevitate",
+    "subtitle": "10 protocoale bazate pe dovezi pentru somn, metabolism, imunitate și longevitate.",
+    "price": "29 lei/lună"
+  },
+  "tringelt": {
+    "title": "Susține autorul · Tringelt",
+    "subtitle": "Micro-contribuție opțională — ca un bacșiș la restaurant. Mulțumim redacției.",
+    "custom": "Sumă personalizată",
+    "vipUpsell": "Susține redacția și obține protocoale VIP longevitate —",
+    "unavailable": "Tringelt nu este disponibil momentan.",
+    "tip": "Susține redacția cu un tringelt",
+    "exploreVip": "sau explorează protocoalele VIP longevitate"
+  },
+  "donation": {
+    "title": "Susține autorul",
+    "subtitle": "O micro-donație ajută la crearea de conținut de calitate.",
+    "amounts": [
+      "10 lei",
+      "25 lei",
+      "49 lei"
+    ],
+    "custom": "Sumă personalizată"
+  },
+  "mediflow": {
+    "name": "MediFlow",
+    "tagline": "Jurnalul tău personal de wellness",
+    "description": "Salvează articole, urmărește simptome și suplimente. Nu pentru diagnostic — pentru propria imagine de ansamblu."
+  },
+  "ordizaznam": {
+    "name": "OrdiZáznam",
+    "tagline": "Înregistrează pe mobil — AI scrie nota",
+    "description": "Instrument profesional de documentare pentru medici. Conform GDPR, criptat."
+  },
+  "trends": {
+    "title": "Tendințe 2026–2027",
+    "glp1": "GLP-1 și metabolism",
+    "biohacking": "Biohacking pentru începători",
+    "sleep": "Optimizarea somnului",
+    "mental": "Bunăstare mentală"
+  }
+}

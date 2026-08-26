@@ -1,6 +1,6 @@
 /** Three consumer apps of MedScopeGlobal — shared product catalog */
 
-export type AppProductId = "medipacient" | "mediprep" | "ordizapis";
+export type AppProductId = "medipacient" | "mediprep" | "ordizapis" | "mediflow";
 /** @deprecated Legacy product id — use ordizapis */
 export type LegacyAppProductId = AppProductId | "mediktor";
 
@@ -112,7 +112,34 @@ export const ORDIZAPIS_APP: AppProduct = {
 /** @deprecated Use ORDIZAPIS_APP */
 export const MEDIKTOR_APP = ORDIZAPIS_APP;
 
-export const APP_PRODUCTS: AppProduct[] = [MEDIPACIENT, MEDIPREP, ORDIZAPIS_APP];
+export const MEDIFLOW: AppProduct = {
+  id: "mediflow",
+  shortName: "MediFlow",
+  provider: PROVIDER,
+  domain: DOMAIN,
+  tagline: "Váš osobní wellness deník",
+  pitch:
+    "Ukládejte články z MedscopeGlobal, sledujte symptomy a suplementy. Bez diagnostiky — pro vlastní přehled a sdílení s lékařem.",
+  audience: "Veřejnost a wellness nadšenci",
+  priceMonthlyCzk: 0,
+  priceNote: "zdarma · VIP export PDF a sync od 149 Kč/měsíc",
+  marketingPath: "/mediflow",
+  downloadPath: "/mediflow/stahnout",
+  appPath: "/app/mediflow",
+  manifest: "/mediflow-manifest.json",
+  serviceWorker: "/sw-mediflow.js",
+  themeColor: "#10b981",
+  backgroundColor: "#0a1628",
+  assets: {
+    icon192: "/assets/mediflow/icon-192.png",
+    icon512: "/assets/mediflow/icon-512.png",
+    appleTouch: "/assets/mediflow/icon-192.png",
+    maskable: "/assets/mediflow/icon-512-maskable.png",
+  },
+};
+
+/** Homepage / hub order — magazine-first ecosystem; MeDiprep legacy last */
+export const APP_PRODUCTS: AppProduct[] = [MEDIFLOW, MEDIPACIENT, ORDIZAPIS_APP, MEDIPREP];
 
 export function appById(id: LegacyAppProductId): AppProduct {
   const normalized: AppProductId = id === "mediktor" ? "ordizapis" : id;

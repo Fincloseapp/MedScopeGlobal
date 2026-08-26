@@ -11,13 +11,15 @@ const menuCs: NavItem[] = [
     label: "Aplikace",
     href: "/aplikace",
     children: [
-      { label: "Přehled aplikací", href: "/aplikace", description: "MeDipacient, MeDiprep a OrdiZapis" },
+      { label: "Přehled aplikací", href: "/aplikace", description: "MediFlow, MeDipacient, OrdiZapis (+ MeDiprep legacy)" },
+      { label: "MediFlow", href: "/mediflow", description: "Wellness deník — články, symptomy, suplementy" },
+      { label: "Otevřít MediFlow", href: "/app/mediflow", description: "Osobní longevity deník" },
       { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu i offline" },
       { label: "Otevřít MeDipacient", href: "/app/pacient", description: "Dashboard se zkušebními zprávami" },
-      { label: "MeDiprep", href: "/mediprep", description: "Příprava na přijímačky LF" },
-      { label: "Otevřít MeDiprep", href: "/app/priprava", description: "Testy B/C/F, simulace fakult" },
       { label: "OrdiZapis", href: "/lekari/dokumentace", description: "AI zápisy pro ověřené lékaře" },
       { label: "Otevřít OrdiZapis", href: "/app/dokumentace", description: "Nahrávat v mobilu" },
+      { label: "MeDiprep (legacy)", href: "/mediprep", description: "Příprava na přijímačky LF — sekundární" },
+      { label: "Otevřít MeDiprep", href: "/app/priprava", description: "Testy B/C/F, simulace fakult" },
       { label: "Můj dashboard", href: "/dashboard", description: "Všechny aplikace a ukázková data" },
     ],
   },
@@ -234,13 +236,15 @@ const menuEn: NavItem[] = [
     label: "Apps",
     href: "/aplikace",
     children: [
-      { label: "All apps", href: "/aplikace", description: "MeDipacient, MeDiprep, OrdiZapis" },
+      { label: "All apps", href: "/aplikace", description: "MediFlow, MeDipacient, OrdiZapis (+ MeDiprep legacy)" },
+      { label: "MediFlow", href: "/mediflow", description: "Personal wellness journal" },
+      { label: "Open MediFlow", href: "/app/mediflow", description: "Track symptoms and saved articles" },
       { label: "MeDipacient", href: "/medipacient", description: "Medical reports on your phone" },
       { label: "Open MeDipacient", href: "/app/pacient", description: "Dashboard with sample reports" },
-      { label: "MeDiprep", href: "/mediprep", description: "CZ medical-school admissions prep" },
-      { label: "Open MeDiprep", href: "/app/priprava", description: "B/C/F tests and faculty mocks" },
       { label: "OrdiZapis", href: "/lekari/dokumentace", description: "AI notes for verified physicians" },
       { label: "Open OrdiZapis", href: "/app/dokumentace", description: "Record on mobile" },
+      { label: "MeDiprep (legacy)", href: "/mediprep", description: "CZ medical-school admissions prep — secondary" },
+      { label: "Open MeDiprep", href: "/app/priprava", description: "B/C/F tests and faculty mocks" },
       { label: "My dashboard", href: "/dashboard", description: "All apps and sample data" },
     ],
   },
@@ -370,14 +374,15 @@ export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
       label: "Aplikace",
       href: "/aplikace",
       children: [
-        { label: "Přehled aplikací", href: "/aplikace", description: "MeDipacient, MeDiprep, OrdiZapis" },
+        { label: "Přehled aplikací", href: "/aplikace", description: "MediFlow, MeDipacient, OrdiZapis" },
+        { label: "MediFlow", href: "/mediflow", description: "Wellness deník a longevity" },
+        { label: "Stáhnout MediFlow", href: "/app/mediflow", description: "Instalace na plochu" },
         { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu" },
         { label: "Stáhnout MeDipacient", href: "/app/pacient", description: "Instalace na plochu" },
-        { label: "MeDiprep", href: "/mediprep", description: "Přijímačky 8 českých LF" },
-        { label: "Stáhnout MeDiprep", href: "/app/priprava", description: "Testy B/C/F na ploše" },
         { label: "OrdiZapis", href: "/lekari/dokumentace", description: "AI zápisy pro lékaře" },
         { label: "Stáhnout OrdiZapis", href: "/app/dokumentace", description: "Nahrávání v mobilu" },
-        { label: "Můj dashboard", href: "/dashboard", description: "Zprávy, testy a zápisy" },
+        { label: "MeDiprep (legacy)", href: "/mediprep", description: "Přijímačky LF — sekundární" },
+        { label: "Můj dashboard", href: "/dashboard", description: "Zprávy, deník a zápisy" },
       ],
     },
     predplatne ?? { label: "Předplatné", href: "/predplatne" },
@@ -391,6 +396,6 @@ export function getMobileMenu(locale: LocaleCode): NavItem[] {
 
 export function getHeaderTagline(locale: LocaleCode): string {
   return locale === "cs"
-    ? "MeDipacient · MeDiprep · OrdiZapis"
-    : "MeDipacient · MeDiprep · OrdiZapis";
+    ? "VitaScope · MediFlow · MeDipacient · OrdiZapis"
+    : "VitaScope · MediFlow · MeDipacient · OrdiZapis";
 }
