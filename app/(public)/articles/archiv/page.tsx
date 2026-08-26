@@ -9,7 +9,7 @@ export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({
-    title: "Archiv článků — MedScopeGlobal",
+    title: "Archiv článků — VitaScope",
     description: "Starší odborné články a briefy — stále dostupné ke čtení.",
     path: "/articles/archiv",
   });

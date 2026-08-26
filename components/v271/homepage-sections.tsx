@@ -251,7 +251,7 @@ export async function V272AktualniBlock() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-              Zpravodajství
+              VitaScope · Zpravodajství
             </p>
             <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">
               {V271_AKTUALNI.title}

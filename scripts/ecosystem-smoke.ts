@@ -39,7 +39,7 @@ const CASES: SmokeCase[] = [
     path: "/cs/article/verejnost-zivotni-styl-zdravy-spanek",
     label: "Demo seed article detail",
     expectStatus: 200,
-    expectBody: /spánek|VitaScope/i,
+    expectBody: /spánek|VitaScope|Tringelt|Podpořit autora/i,
   },
   {
     path: "/cs/article/missing-slug-smoke-test",

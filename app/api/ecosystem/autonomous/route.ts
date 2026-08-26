@@ -2,19 +2,9 @@ import { NextResponse } from "next/server";
 import { verifyCronAuth, AUTONOMOUS_SCHEDULE } from "@/lib/ecosystem/autonomous";
 import { resetMediFlowSupplementsDaily } from "@/lib/mediflow/store";
 import {
-  getDeskForLocale,
-  pickTopicForDesk,
-  type EditorialTopic,
-} from "@/lib/ecosystem/editorial/desks";
-import {
-  getJournalistForTopic,
-  getReviewPipeline,
   getImageCuratorForLocale,
 } from "@/lib/ecosystem/editorial/personas";
-import {
-  createEditorialQueueItem,
-  type EditorialQueueItem,
-} from "@/lib/ecosystem/editorial";
+import { runEditorialQueueCron } from "@/lib/ecosystem/editorial";
 import { getSyndicationTargets } from "@/lib/ecosystem/editorial/syndication";
 import {
   processEditorialImageBatch,
@@ -57,48 +47,14 @@ export async function POST(request: Request) {
 
   // Editorial queue — scaffold autonomous redakce pipeline
   if (task === "editorial-queue") {
-    const locales: GlobalLocaleCode[] = ["cs", "sk", "en-US", "de"];
-    const queued: EditorialQueueItem[] = [];
-
-    for (const locale of locales) {
-      const desk = getDeskForLocale(locale);
-      const topic = pickTopicForDesk(desk) as EditorialTopic;
-      const journalist = getJournalistForTopic(locale, topic);
-      const reviewers = getReviewPipeline(locale);
-      const item = createEditorialQueueItem(
-        desk.id,
-        locale,
-        topic,
-        journalist?.id
-      );
-      queued.push(item);
-
-      const admin = tryCreateServiceRoleClient();
-      if (admin) {
-        const { error } = await admin.from("editorial_queue").insert({
-          desk_id: desk.id,
-          locale,
-          topic,
-          status: "queued",
-          journalist_persona_id: journalist?.id ?? null,
-          editor_persona_id: reviewers.find((r) => r.role === "editor")?.id ?? null,
-          metadata: {
-            queue_ref: item.id,
-            review_pipeline: reviewers.map((r) => ({ id: r.id, role: r.role })),
-            vip_cta_weight: desk.vipCtaWeight,
-          },
-        });
-        if (error) console.warn("[editorial-queue] insert:", error.message);
-      }
-    }
-
+    const result = await runEditorialQueueCron();
     return NextResponse.json({
       task,
-      status: "queued",
+      status: result.status,
       description: schedule.description,
-      items: queued.length,
-      queued,
-      timestamp: new Date().toISOString(),
+      items: result.items,
+      queued: result.queued,
+      timestamp: result.timestamp,
     });
   }
 
@@ -189,6 +145,8 @@ export async function GET() {
       cronEndpoint:
         id === "mediflow-daily-reset"
           ? "/api/cron/ecosystem-mediflow"
+          : id === "editorial-queue"
+            ? "/api/cron/ecosystem-editorial-queue"
           : id === "editorial-images"
             ? "/api/ecosystem/editorial/images"
             : undefined,
