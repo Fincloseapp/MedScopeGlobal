@@ -4,7 +4,6 @@
  * Run: pnpm exec tsx scripts/ecosystem-smoke.ts
  * Requires dev server: MEDSCOPE_ORIGIN=http://localhost:3000
  */
-import assert from "node:assert/strict";
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
@@ -21,15 +20,26 @@ type SmokeCase = {
 
 const CASES: SmokeCase[] = [
   { path: "/", label: "root locale redirect", expectStatus: [302, 307, 308], allowRedirect: true },
-  { path: "/cs", label: "Czech homepage", expectStatus: 200 },
+  {
+    path: "/cs",
+    label: "Czech homepage magazine desks",
+    expectStatus: 200,
+    expectBody: /href="\/article\/|Zpravodajství|VitaScope/i,
+  },
   { path: "/cs/", label: "Czech homepage trailing slash", expectStatus: [200, 308] },
   { path: "/en-us", label: "English homepage", expectStatus: 200 },
   { path: "/en-us/", label: "English homepage trailing slash", expectStatus: [200, 308] },
   {
     path: "/cs/articles",
-    label: "Czech articles magazine (empty OK without Supabase)",
+    label: "Czech articles magazine with demo feed",
     expectStatus: 200,
-    expectBody: /VitaScope|Články|MediFlow/i,
+    expectBody: /href="\/article\/[^"]+|VitaScope/i,
+  },
+  {
+    path: "/cs/article/verejnost-zivotni-styl-zdravy-spanek",
+    label: "Demo seed article detail",
+    expectStatus: 200,
+    expectBody: /spánek|VitaScope/i,
   },
   {
     path: "/cs/article/missing-slug-smoke-test",
@@ -44,6 +54,24 @@ const CASES: SmokeCase[] = [
     expectBody: /MediFlow|Biohacking/i,
   },
   { path: "/app/mediflow", label: "MediFlow PWA shell", expectStatus: 200 },
+  {
+    path: "/app/pacient",
+    label: "MeDipacient PWA shell",
+    expectStatus: 200,
+    expectBody: /Přehled|MeDipacient|Přihlášení/i,
+  },
+  {
+    path: "/app/dokumentace",
+    label: "OrdiZapis PWA shell",
+    expectStatus: 200,
+    expectBody: /OrdiZapis|Zápis|Přihlášení/i,
+  },
+  {
+    path: "/go/magnesium",
+    label: "Affiliate alias redirect",
+    expectStatus: [302, 307],
+    allowRedirect: true,
+  },
   { path: "/robots.txt", label: "robots.txt", expectStatus: 200, expectBody: /Sitemap|User-agent/i },
   { path: "/sitemap-cs.xml", label: "Czech sitemap", expectStatus: 200, expectBody: /<urlset/i },
   {

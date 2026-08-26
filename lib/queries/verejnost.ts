@@ -51,8 +51,20 @@ export async function listPublicArticles(options?: {
   const limit = options?.limit ?? 12;
   const offset = options?.offset ?? 0;
   const locale = options?.locale ?? "cs";
+  const {
+    getDemoMagazineArticles,
+  } = await import("@/lib/verejnost/demo-magazine-articles");
+
+  const demoSlice = () => {
+    let demo = getDemoMagazineArticles();
+    if (options?.topic) {
+      demo = demo.filter((a) => a.public_topic === options.topic);
+    }
+    return demo.slice(offset, offset + limit);
+  };
+
   const supabase = await createDataClient();
-  if (!supabase) return [];
+  if (!supabase) return demoSlice();
 
   let q = supabase
     .from("articles")
@@ -69,10 +81,12 @@ export async function listPublicArticles(options?: {
   const { data, error } = await q;
   if (error) {
     console.error("listPublicArticles", error);
-    return [];
+    return demoSlice();
   }
 
   const rows = mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[];
+  if (rows.length === 0) return demoSlice();
+
   const mode = options?.mode ?? "card";
   const prepared = await prepareArticlesForDisplay(rows, locale, { mode, maxTranslate: limit });
   const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");

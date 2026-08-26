@@ -125,12 +125,19 @@ export const AFFILIATE_REDIRECT_DESTINATIONS: Record<string, string> = {
   "mg-cz": "https://www.heureka.cz/?h%5Bfraze%5D=magnesium+glycinát",
   "mg-en": "https://www.amazon.co.uk/s?k=magnesium+glycinate",
   "mg-us": "https://www.amazon.com/s?k=magnesium+glycinate",
+  /** Friendly aliases (product id / marketing short links) */
+  magnesium: "https://www.heureka.cz/?h%5Bfraze%5D=magnesium+glycinát",
+  "magnesium-glycinate": "https://www.heureka.cz/?h%5Bfraze%5D=magnesium+glycinát",
   "omega-cz": "https://www.heureka.cz/?h%5Bfraze%5D=omega+3+test",
   "omega-en": "https://www.amazon.co.uk/s?k=omega+3+index+test",
   "omega-us": "https://www.amazon.com/s?k=omega+3+index+test",
+  omega: "https://www.heureka.cz/?h%5Bfraze%5D=omega+3+test",
+  "omega-3-test": "https://www.heureka.cz/?h%5Bfraze%5D=omega+3+test",
   "sleep-cz": "https://www.heureka.cz/?h%5Bfraze%5D=sleep+tracker",
   "sleep-en": "https://www.amazon.co.uk/s?k=sleep+tracker+hrv",
   "sleep-us": "https://www.amazon.com/s?k=oura+ring+whoop",
+  sleep: "https://www.heureka.cz/?h%5Bfraze%5D=sleep+tracker",
+  "sleep-tracker": "https://www.heureka.cz/?h%5Bfraze%5D=sleep+tracker",
 };
 
 export function getAffiliateRedirectDestination(slug: string): string | null {
