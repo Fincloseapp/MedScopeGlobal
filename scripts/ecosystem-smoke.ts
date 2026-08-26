@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 /**
  * HTTP smoke for global health ecosystem routes (locale, SEO, editorial API, apps).
- * Run: pnpm exec tsx scripts/ecosystem-smoke.ts
- * Requires dev server: MEDSCOPE_ORIGIN=http://localhost:3000
+ * Run: pnpm smoke:ecosystem (dev) or pnpm smoke:ecosystem:production
+ * Env: MEDSCOPE_ORIGIN (default http://localhost:3000; use production URL when dev server is down)
  */
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
 const origin = (process.env.MEDSCOPE_ORIGIN ?? "http://localhost:3000").replace(/\/$/, "");
+const FETCH_TIMEOUT_MS = 30_000;
 
 type SmokeCase = {
   path: string;
@@ -89,9 +90,21 @@ function statusOk(actual: number, expected: number | number[] | undefined): bool
 }
 
 async function runCase(test: SmokeCase): Promise<{ ok: boolean; status: number; detail: string }> {
-  const res = await fetch(`${origin}${test.path}`, { redirect: test.allowRedirect ? "manual" : "follow" });
+  let res: Response;
+  try {
+    res = await fetch(`${origin}${test.path}`, {
+      redirect: test.allowRedirect ? "manual" : "follow",
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    const hint =
+      origin.includes("localhost") && /abort|timeout|ECONNREFUSED/i.test(message)
+        ? " — start pnpm dev:d or use pnpm smoke:ecosystem:production"
+        : "";
+    return { ok: false, status: 0, detail: `${message}${hint}` };
+  }
   const status = res.status;
-  let detail = "";
 
   if (!statusOk(status, test.expectStatus)) {
     return { ok: false, status, detail: `expected ${JSON.stringify(test.expectStatus ?? "2xx")}` };

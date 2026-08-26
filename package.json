@@ -94,6 +94,7 @@
     "cf:smoke": "node scripts/cloudflare/smoke-production.mjs",
     "smoke:production": "node scripts/smoke-production.mjs",
     "smoke:ecosystem": "pnpm exec tsx scripts/ecosystem-smoke.ts",
+    "smoke:ecosystem:production": "MEDSCOPE_ORIGIN=https://medscopeglobal.com pnpm exec tsx scripts/ecosystem-smoke.ts",
     "deploy:checklist": "node scripts/deploy/deploy-checklist.mjs",
     "deploy:production": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy-production.ps1",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
