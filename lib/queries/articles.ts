@@ -388,8 +388,16 @@ export async function getRelatedArticles(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
+  const { getDemoMagazineArticles } = await import(
+    "@/lib/verejnost/demo-magazine-articles"
+  );
+  const demoRelated = () =>
+    getDemoMagazineArticles()
+      .filter((a) => a.id !== excludeId)
+      .slice(0, limit);
+
   const supabase = await createDataClient();
-  if (!supabase) return [];
+  if (!supabase) return demoRelated();
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -401,7 +409,7 @@ export async function getRelatedArticles(
 
   if (error) {
     console.error("getRelatedArticles", error);
-    return [];
+    return demoRelated();
   }
   const filtered = filterForReader(
     mapArticleList(data as Record<string, unknown>[] | null),
@@ -413,6 +421,7 @@ export async function getRelatedArticles(
     mode: "card",
     maxTranslate: limit,
   });
+  if (prepared.length === 0) return demoRelated();
   return prepared.slice(0, limit);
 }
 
