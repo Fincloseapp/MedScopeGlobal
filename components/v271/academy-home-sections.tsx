@@ -32,8 +32,9 @@ export async function V272AcademyHomeSections() {
     console.error("[academy] V272AcademyHomeSections", error);
   }
 
-  const flags = await getCourseVideoFlags(courses.map((c) => c.id)).catch(() => ({}));
-  const prepFlags = await getCourseVideoFlags(prepCourses.map((c) => c.id)).catch(() => ({}));
+  const emptyFlags: Record<string, { hasVideo: boolean; videoLessonCount: number }> = {};
+  const flags = await getCourseVideoFlags(courses.map((c) => c.id)).catch(() => emptyFlags);
+  const prepFlags = await getCourseVideoFlags(prepCourses.map((c) => c.id)).catch(() => emptyFlags);
 
   return (
     <>
