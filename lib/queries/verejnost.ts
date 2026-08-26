@@ -97,8 +97,16 @@ export async function getPublicArticleBySlug(
   slug: string,
   locale: LocaleCode = "cs"
 ): Promise<DisplayArticle | null> {
+  const { getDemoMagazineArticleBySlug } = await import(
+    "@/lib/verejnost/demo-magazine-articles"
+  );
+  const demoHit = () => {
+    const demo = getDemoMagazineArticleBySlug(slug);
+    return demo;
+  };
+
   const supabase = await createDataClient();
-  if (!supabase) return null;
+  if (!supabase) return demoHit();
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -109,11 +117,11 @@ export async function getPublicArticleBySlug(
 
   if (error) {
     console.error("getPublicArticleBySlug", error);
-    return null;
+    return demoHit();
   }
 
   const row = data ? (mapArticleList([data as Record<string, unknown>])[0] ?? null) : null;
-  if (!row) return null;
+  if (!row) return demoHit();
   const article = await prepareArticleForDisplay(row, locale, "full");
   const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
   return { ...article, cover_image_url: resolveVerejnostCoverUrl(article) };

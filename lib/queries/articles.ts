@@ -194,8 +194,16 @@ export async function getArticlesBySection(
     ? [contentTypeSlug]
     : rubricSlugsForSectionFetch(sectionSlug);
 
+  const allowLay = sectionShowsLayContent(sectionSlug);
+  const {
+    getDemoMagazineArticles,
+    shouldUseDemoMagazineArticles,
+  } = await import("@/lib/verejnost/demo-magazine-articles");
+  const demoForLay = () =>
+    allowLay ? getDemoMagazineArticles().slice(0, limit) : [];
+
   const supabase = await createDataClient();
-  if (!supabase) return [];
+  if (!supabase) return demoForLay();
 
   let q = supabase
     .from("articles")
@@ -220,11 +228,10 @@ export async function getArticlesBySection(
 
   if (error) {
     console.error("getArticlesBySection", error);
-    return [];
+    return demoForLay();
   }
 
   const rows = mapArticleList(data as Record<string, unknown>[] | null);
-  const allowLay = sectionShowsLayContent(sectionSlug);
 
   const sectionMatched = rows.filter((article) => {
     if (!allowLay && isLayAudienceArticle(article)) return false;
@@ -249,6 +256,7 @@ export async function getArticlesBySection(
     mode: "card",
     maxTranslate: limit,
   });
+  if (shouldUseDemoMagazineArticles(prepared)) return demoForLay();
   return prepared.slice(0, limit);
 }
 
