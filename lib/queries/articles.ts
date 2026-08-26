@@ -269,7 +269,15 @@ export async function getArticlesByRubric(
   locale: LocaleCode = "cs"
 ) {
   const supabase = await createDataClient();
-  if (!supabase) return [];
+  if (!supabase) {
+    if (accessLevel === "public") {
+      const { getDemoMagazineArticles } = await import(
+        "@/lib/verejnost/demo-magazine-articles"
+      );
+      return getDemoMagazineArticles().slice(0, limit);
+    }
+    return [];
+  }
   let { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -291,6 +299,12 @@ export async function getArticlesByRubric(
 
   if (error) {
     console.error("getArticlesByRubric", error);
+    if (accessLevel === "public") {
+      const { getDemoMagazineArticles } = await import(
+        "@/lib/verejnost/demo-magazine-articles"
+      );
+      return getDemoMagazineArticles().slice(0, limit);
+    }
     return [];
   }
   const filtered = filterForReader(
