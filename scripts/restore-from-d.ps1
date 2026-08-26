@@ -342,9 +342,13 @@ try {
 Write-Step "Next steps"
 Write-Host @"
 1. Paste secrets into Cursor Cloud Agents environment (see docs/deploy/RESTORE_FROM_D.md §3)
-2. Backup:  pnpm backup:d
-3. One-shot: pnpm sync:d
-4. Deploy:  pnpm deploy:production   (or pnpm restore:d -- -Deploy)
-5. Smoke:   pnpm smoke:production
+2. Backup:  pnpm backup:d   → D:\medscope.data\backups\<yyyy-MM-dd>\
+3. One-shot: pnpm sync:d    (restore + backup)
+4. Verify DB: pnpm db:verify
+   If pending: pnpm db:trigger-ecosystem-cron && pnpm db:verify
+5. Deploy:  pnpm deploy:production   (or pnpm sync:d -- -Deploy)
+   After sync:d: pnpm deploy:production -- -SkipRestore
+6. Smoke:    pnpm smoke:production && pnpm smoke:ecosystem:production
+7. Images:   pnpm images:backfill   (optional editorial cover suggestions)
 "@
 Write-Ok "restore-from-d complete"

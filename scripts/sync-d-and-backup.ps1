@@ -54,12 +54,15 @@ if (-not (Test-Path "D:\")) {
 Cloud agents cannot access Windows D:. On the PC run:
 
   cd D:\medscope.local
-  git pull origin cursor/global-health-ecosystem-2b2d   # or your branch
+  git pull origin main
   pnpm sync:d
+  pnpm db:verify
+  pnpm deploy:production -- -SkipRestore
 
 This will:
-  1) restore-from-d  (select keys → .env.local → cf:env:sync → optional gh secrets → verify)
+  1) restore-from-d  (select keys → .env.local → cf:env:sync → optional gh secrets → deploy:checklist)
   2) backup-to-d     → D:\medscope.data\backups\<yyyy-MM-dd>\
+  3) then deploy:production — db:verify → cf:deploy → smoke:production → smoke:ecosystem:production
 "@
   exit 2
 }
@@ -107,18 +110,28 @@ if ($IncludeZip) { $backupArgs.IncludeZip = $true }
 & $backupScript @backupArgs
 if ($LASTEXITCODE -ne 0) { throw "backup-to-d failed (exit $LASTEXITCODE)" }
 
-Write-Step "Next steps (Cloudflare)"
+Write-Step "Next steps (production deploy)"
 if ($hasToken -and $hasAccount) {
   Write-Host @"
 Cloudflare credentials found in .env.local.
 
-Deploy production from D: (if not already done with -Deploy):
+Canonical PC operator flow:
   cd D:\medscope.local
-  pnpm deploy:production
+  pnpm db:verify
+  # if migrations pending:
+  pnpm db:trigger-ecosystem-cron
+  pnpm db:verify
+  pnpm deploy:production -- -SkipRestore
+  # or step-by-step:
+  pnpm cf:deploy
+  pnpm smoke:production
+  pnpm smoke:ecosystem:production
 
-Or merge to main + Cloudflare Workers Builds — see docs\deploy\CF_DASHBOARD_DEPLOY.md
+Backup folder: D:\medscope.data\backups\$BackupDate\
 
-Cursor Cloud: paste CLOUDFLARE_* + SUPABASE_* + CLOUDFLARE_ENV_JSON into the environment Secrets dashboard, then start a NEW agent run.
+Optional editorial images: pnpm images:backfill
+
+Cursor Cloud: paste CLOUDFLARE_* + SUPABASE_* + CLOUDFLARE_ENV_JSON into environment Secrets, then start a NEW agent run.
 Docs: docs\deploy\RESTORE_FROM_D.md
 "@
 } else {
@@ -126,7 +139,8 @@ Docs: docs\deploy\RESTORE_FROM_D.md
 CLOUDFLARE_API_TOKEN and/or CLOUDFLARE_ACCOUNT_ID missing — deploy skipped.
 
 Add them to D:\medscope.local\.env.local, then:
-  pnpm deploy:production
+  pnpm db:verify
+  pnpm deploy:production -- -SkipRestore
 
 Or deploy without tokens: docs\deploy\CF_DASHBOARD_DEPLOY.md
 "@
