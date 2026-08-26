@@ -4,7 +4,7 @@ Use this when a Cloud Agent pod starts **without** Cursor Secrets (`SUPABASE_SER
 `SUPABASE_ACCESS_TOKEN`, `CRON_SECRET`) but you still need to develop, verify, and finish
 ecosystem migration rollout.
 
-Related: [`POST_MERGE_CHECKLIST.md`](./POST_MERGE_CHECKLIST.md), [`production-runbook.md`](./production-runbook.md),
+Related: [`MANUAL_OPERATOR_CHECKLIST.md`](./MANUAL_OPERATOR_CHECKLIST.md), [`POST_MERGE_CHECKLIST.md`](./POST_MERGE_CHECKLIST.md), [`production-runbook.md`](./production-runbook.md),
 [`RESTORE_FROM_D.md`](./RESTORE_FROM_D.md).
 
 ---
