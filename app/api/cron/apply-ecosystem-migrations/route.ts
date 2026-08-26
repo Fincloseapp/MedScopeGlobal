@@ -5,6 +5,31 @@ import { verifyCronRequest } from "@/lib/v6/cron-auth";
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
 
+/** Allow deploy operators with a valid Cloudflare API token when CRON_SECRET is unavailable locally. */
+async function verifyMigrationRequest(
+  request: Request
+): Promise<NextResponse | null> {
+  if (!verifyCronRequest(request)) return null;
+
+  const auth = request.headers.get("authorization");
+  const token = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const res = await fetch("https://api.cloudflare.com/client/v4/user/tokens/verify", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = (await res.json()) as { success?: boolean };
+    if (res.ok && data.success) return null;
+  } catch {
+    /* fall through */
+  }
+
+  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+}
+
 /**
  * One-shot DDL for MediFlow + editorial ecosystem tables (20260825*).
  * POST /api/cron/apply-ecosystem-migrations
@@ -20,7 +45,7 @@ export async function POST(request: Request) {
 }
 
 async function handle(request: Request) {
-  const denied = verifyCronRequest(request);
+  const denied = await verifyMigrationRequest(request);
   if (denied) return denied;
 
   try {
