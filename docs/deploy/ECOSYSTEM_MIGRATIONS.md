@@ -26,6 +26,8 @@ Worker secrets `SUPABASE_ACCESS_TOKEN` and `CRON_SECRET` are already set.
 
 ```bash
 # From D:\medscope.local or any machine with CRON_SECRET
+pnpm db:trigger-ecosystem-cron
+# or raw curl:
 curl -s -X POST \
   -H "Authorization: Bearer $CRON_SECRET" \
   https://medscopeglobal.com/api/cron/apply-ecosystem-migrations | jq .

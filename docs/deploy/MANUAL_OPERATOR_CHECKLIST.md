@@ -84,7 +84,16 @@ pnpm pull:d
 After `/api/cron/apply-ecosystem-migrations` is deployed (on `main`), the **Worker** already holds
 `SUPABASE_ACCESS_TOKEN` and `CRON_SECRET`. You trigger from any machine that has one of those secrets.
 
-### Option 1 — curl with `CRON_SECRET` (recommended)
+### Option 1 — `pnpm db:trigger-ecosystem-cron` (recommended)
+
+Reads `CRON_SECRET` or `CLOUDFLARE_API_TOKEN` from `.env.local` and POSTs to production:
+
+```bash
+cd D:\medscope.local
+pnpm db:trigger-ecosystem-cron
+```
+
+### Option 2 — curl with `CRON_SECRET`
 
 ```bash
 # Bash — CRON_SECRET from D:\medscope.local\.env.local
@@ -113,7 +122,7 @@ Invoke-RestMethod -Method POST -Uri "https://medscopeglobal.com/api/cron/apply-e
 }
 ```
 
-### Option 2 — Cloudflare API token fallback
+### Option 3 — Cloudflare API token fallback
 
 If you have `CLOUDFLARE_API_TOKEN` but not `CRON_SECRET`, the route accepts a valid CF token in the Bearer header (verified via Cloudflare API):
 
@@ -187,6 +196,28 @@ pnpm dev          # http://localhost:3000 — /cs → 200, / → 307→/cs
 ```
 
 On branches with `dev:d` script: `pnpm dev:d` binds `0.0.0.0:3000` for remote browser testing.
+
+---
+
+## F. GitHub Actions secrets (CI deploy + migrations)
+
+Push to `main` triggers two workflows. Both **fail fast** if secrets are missing:
+
+| Workflow | Required GitHub Actions secrets | Fallback |
+|----------|--------------------------------|----------|
+| `cloudflare-deploy.yml` | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | Cloudflare Workers Builds dashboard |
+| `apply-ecosystem-migrations.yml` | `DATABASE_URL` or `SUPABASE_ACCESS_TOKEN`, `CRON_SECRET`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Manual SQL Editor or `pnpm db:trigger-ecosystem-cron` from PC |
+
+Populate from PC after `pnpm sync:d` (runs `gh secret set` unless `-SkipGhSecrets`):
+
+```powershell
+cd D:\medscope.local
+pnpm sync:d    # restores .env.local + pushes keys to GitHub Actions secrets
+```
+
+Optional: `CLOUDFLARE_ENV_JSON` (full Worker vars from `pnpm cf:env:sync`) for deploy workflow.
+
+**Note:** Cloud Agent pods cannot deploy — CF tokens in Cursor Secrets are often invalid/expired. Use PC `pnpm cf:deploy` or Workers Builds dashboard.
 
 ---
 

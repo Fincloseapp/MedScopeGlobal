@@ -24,9 +24,11 @@ Push na `main` → automatický build (`npm run cf:build` + `npx opennextjs-clou
 
 1. `cd D:\medscope.local` → `git pull origin main`
 2. `pnpm sync:d` — obnoví `.env.local` + záloha na `D:\medscope.data\backups\`
-3. `pnpm cf:deploy` — build + deploy na Cloudflare Workers (`medscopeglobal.com`)
-4. Ověř: `pnpm smoke:production` nebo `curl -sL https://medscopeglobal.com/cs | findstr VitaScope`
-5. Volitelně: `MEDSCOPE_ORIGIN=https://medscopeglobal.com pnpm smoke:ecosystem`
+3. Migrace (pokud ještě nejsou): SQL Editor **nebo** `pnpm db:apply-ecosystem` **nebo** `pnpm db:trigger-ecosystem-cron`
+4. `pnpm cf:deploy` — build + deploy na Cloudflare Workers (`medscopeglobal.com`)
+5. Ověř: `pnpm smoke:production` nebo `curl -sL https://medscopeglobal.com/cs | findstr VitaScope`
+6. Volitelně: `MEDSCOPE_ORIGIN=https://medscopeglobal.com pnpm smoke:ecosystem`
+7. Volitelně (editorial obrázky): `pnpm images:backfill` — doplní návrhy obrázků pro články bez coveru
 
 ---
 
