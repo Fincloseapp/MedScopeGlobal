@@ -1,6 +1,7 @@
 /**
  * One-off edge worker — apply ecosystem migrations using Worker secrets.
- * Run: npx wrangler dev -c scripts/wrangler-edge-apply.jsonc --remote --port 8787
+ * Run: pnpm db:edge-apply-ecosystem
+ * Or:  npx wrangler dev -c scripts/wrangler-edge-apply.jsonc --remote --port 8787
  * Then: curl http://127.0.0.1:8787/
  */
 import { MIGRATIONS } from "./edge-apply-ecosystem-data.mjs";
