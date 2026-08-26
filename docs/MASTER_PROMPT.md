@@ -58,8 +58,28 @@ Monetization on articles: display ads, VIP CTA, tringelt micro-tip, affiliate bo
 - Replace physician-facing content tone with clickbait on `/lekari` routes
 - Break standalone PWA shells or `AppOriginBar` → VitaScope home link
 
+## D: PC secrets / deploy (Windows only)
+
+Cloud agents cannot read `D:\`. On the PC after `git pull`:
+
+```powershell
+cd D:\medscope.local
+pnpm sync:d                 # restore:d + backup:d
+pnpm restore:d -- -Deploy   # optional CF production deploy
+```
+
+| Script | Purpose |
+|--------|---------|
+| `pnpm sync:d` | One-shot restore env + dated backup under `D:\medscope.data\backups\` |
+| `pnpm restore:d` | Merge CF/Supabase keys → `.env.local`, optional `gh secret set`, checklist |
+| `pnpm backup:d` | Git bundle + env backup (never commit secrets) |
+| `pnpm pull:d` | Pull cloud branch onto D: only (does not overwrite GitHub) |
+
+Full runbook: `docs/deploy/RESTORE_FROM_D.md`. Production: `pnpm cf:deploy` (needs real CF tokens + non-placeholder `SUPABASE_SERVICE_ROLE_KEY`).
+
 ## Related docs
 
+- `docs/deploy/RESTORE_FROM_D.md` — D: sync/backup/deploy runbook
 - `docs/brand/magazine-brand.md` — brand rationale and code map
 - `docs/marketing/global-plan.md` — geo marketing and KPIs
 - `docs/editorial/autonomous-redakce.md` — redakce + tringelt + images
