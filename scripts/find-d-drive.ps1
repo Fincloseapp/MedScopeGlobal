@@ -248,9 +248,14 @@ Write-Step "Recommended next steps"
 Write-Host @"
 1. Primary restore:  cd D:\medscope.local && pnpm restore:d
 2. If .env.local missing, copy from newest backup above, then restore:d
-3. Deploy production: pnpm restore:d -- -Deploy   (needs CLOUDFLARE_* on D:)
+3. Full PC flow:
+     git pull origin main
+     pnpm sync:d
+     pnpm db:verify
+     pnpm deploy:production -- -SkipRestore
 4. Push secrets to GitHub / Cursor — see docs/deploy/RESTORE_FROM_D.md §4–5
-5. After PR #19 merge on main: git checkout main && git pull && pnpm cf:deploy
+5. Migrations pending? pnpm db:trigger-ecosystem-cron && pnpm db:verify
+6. Editorial images: pnpm images:backfill
 "@
 
 if ($summary.ContainsKey("D:\medscope.local\.env.local")) {

@@ -1,9 +1,10 @@
 /** MedScope v28 — homepage copy and CTA wiring */
+import { MAGAZINE } from "@/lib/brand/magazine";
 import { V27_SUBSCRIPTION_PLANS } from "@/lib/v27/config";
 
 export const V271_HERO = {
-  eyebrow: "VitaScope · MedScopeGlobal.com",
-  claim: "Zdraví, dlouhověkost a životní styl — pro každého",
+  eyebrow: MAGAZINE.heroEyebrow.cs,
+  claim: MAGAZINE.heroClaim.cs,
   subtitle:
     "Magazín VitaScope, wellness deník MediFlow, VIP protokoly a aplikace MeDipacient a OrdiZapis. MeDiprep zůstává pro přípravu na LF. 14 dní zdarma.",
 } as const;

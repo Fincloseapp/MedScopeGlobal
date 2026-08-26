@@ -10,8 +10,8 @@ Každý locale má redakční stůl s váhami témat:
 |------|------|-------|
 | **longevity** | 40 % | Dlouhověkost — prioritní podíl obsahu |
 | **lifestyle** | 25 % | Zdravý životní styl |
-| **seniors** | 20 % | Zdraví pro seniory |
-| **trending** | 15 % | Aktuální zdravotní zprávy |
+| **seniors** | 15 % | Zdraví pro seniory |
+| **trending** | 20 % | Aktuální zdravotní zprávy |
 
 Hub stoly (`cs`, `en-US`, `en`) syndikují obsah do ostatních locale. Konfigurace: `lib/ecosystem/editorial/desks.ts`.
 

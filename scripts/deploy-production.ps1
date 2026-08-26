@@ -7,12 +7,19 @@
   Run on the PC (cloud agents cannot access D: or Cloudflare tokens).
 
   Steps:
-    1. restore-from-d.ps1  (secrets → .env.local → cf:env:sync)
-    2. pnpm cf:deploy      (OpenNext build + Workers deploy)
-    3. pnpm smoke:production
+    1. restore-from-d.ps1       (secrets → .env.local → cf:env:sync)
+    2. pnpm db:verify           (Supabase schema — run after sync:d on PC)
+    3. pnpm cf:deploy           (OpenNext build + Workers deploy)
+    4. pnpm smoke:production    (homepage / API smoke)
+    5. pnpm smoke:ecosystem:production  (MediFlow / editorial smoke)
+
+  Typical PC flow (backup first):
+    git pull origin main
+    pnpm sync:d                 # restore + D:\medscope.data\backups\<date>\
+    pnpm deploy:production -- -SkipRestore
 
 .PARAMETER SkipRestore
-  Skip restore-from-d (use existing .env.local).
+  Skip restore-from-d (use after pnpm sync:d).
 
 .PARAMETER SkipValidate
   Skip deploy:checklist during restore.
@@ -20,8 +27,11 @@
 .PARAMETER SkipGhSecrets
   Skip gh secret set during restore.
 
+.PARAMETER SkipDbVerify
+  Skip pnpm db:verify before deploy.
+
 .PARAMETER SkipSmoke
-  Skip post-deploy smoke:production.
+  Skip post-deploy smoke:production and smoke:ecosystem:production.
 
 .EXAMPLE
   pnpm deploy:production
@@ -32,6 +42,7 @@ param(
   [switch]$SkipRestore,
   [switch]$SkipValidate,
   [switch]$SkipGhSecrets,
+  [switch]$SkipDbVerify,
   [switch]$SkipSmoke,
   [string]$WorkspaceRoot = "D:\medscope.local"
 )
@@ -60,16 +71,21 @@ Without D:, use Cloudflare Workers Builds — see docs\deploy\CF_DASHBOARD_DEPLO
 $scriptDir = $PSScriptRoot
 $restoreScript = Join-Path $scriptDir "restore-from-d.ps1"
 
+$step = 1
+$totalSteps = 5
+
 if (-not $SkipRestore) {
   if (-not (Test-Path $restoreScript)) { throw "Missing $restoreScript" }
-  Write-Step "1/3 restore-from-d"
+  Write-Step "$step/$totalSteps restore-from-d"
   $restoreArgs = @{ WorkspaceRoot = $WorkspaceRoot }
   if ($SkipGhSecrets) { $restoreArgs.SkipGhSecrets = $true }
   if ($SkipValidate) { $restoreArgs.SkipValidate = $true }
   & $restoreScript @restoreArgs
   if ($LASTEXITCODE -ne 0) { throw "restore-from-d failed (exit $LASTEXITCODE)" }
+  $step++
 } else {
-  Write-Step "1/3 restore skipped (-SkipRestore)"
+  Write-Step "$step/$totalSteps restore skipped (-SkipRestore; run pnpm sync:d first for backup)"
+  $step++
 }
 
 $envLocal = Join-Path $WorkspaceRoot ".env.local"
@@ -100,20 +116,50 @@ try {
   $pnpm = (Get-Command pnpm -ErrorAction SilentlyContinue).Source
   if (-not $pnpm) { throw "pnpm not found on PATH" }
 
-  Write-Step "2/3 cf:deploy"
+  if (-not $SkipDbVerify) {
+    Write-Step "$step/$totalSteps db:verify"
+    & $pnpm db:verify
+    if ($LASTEXITCODE -ne 0) {
+      Write-Warning "db:verify failed — migrations may be pending."
+      Write-Host @"
+
+Run one of:
+  pnpm db:trigger-ecosystem-cron   # POST /api/cron/apply-ecosystem-migrations on production
+  pnpm db:migrate                  # needs SUPABASE_ACCESS_TOKEN on PC
+  Manual SQL — see docs\deploy\MANUAL_OPERATOR_CHECKLIST.md §A
+
+Then re-run: pnpm db:verify
+"@
+      throw "pnpm db:verify failed (exit $LASTEXITCODE)"
+    }
+    Write-Ok "db:verify passed"
+    $step++
+  } else {
+    Write-Step "$step/$totalSteps db:verify skipped (-SkipDbVerify)"
+    $step++
+  }
+
+  Write-Step "$step/$totalSteps cf:deploy"
   $env:CLOUDFLARE_API_TOKEN = (Get-Content $envLocal | Where-Object { $_ -match '^\s*CLOUDFLARE_API_TOKEN=' } | ForEach-Object { ($_ -split '=', 2)[1].Trim() } | Select-Object -First 1)
   $env:CLOUDFLARE_ACCOUNT_ID = (Get-Content $envLocal | Where-Object { $_ -match '^\s*CLOUDFLARE_ACCOUNT_ID=' } | ForEach-Object { ($_ -split '=', 2)[1].Trim() } | Select-Object -First 1)
   & $pnpm cf:deploy
   if ($LASTEXITCODE -ne 0) { throw "pnpm cf:deploy failed (exit $LASTEXITCODE)" }
   Write-Ok "Deploy finished"
+  $step++
 
   if (-not $SkipSmoke) {
-    Write-Step "3/3 smoke:production"
+    Write-Step "$step/$totalSteps smoke:production"
     & $pnpm smoke:production
     if ($LASTEXITCODE -ne 0) { throw "pnpm smoke:production failed (exit $LASTEXITCODE)" }
     Write-Ok "Production smoke passed"
+    $step++
+
+    Write-Step "$step/$totalSteps smoke:ecosystem:production"
+    & $pnpm smoke:ecosystem:production
+    if ($LASTEXITCODE -ne 0) { throw "pnpm smoke:ecosystem:production failed (exit $LASTEXITCODE)" }
+    Write-Ok "Ecosystem production smoke passed"
   } else {
-    Write-Step "3/3 smoke skipped (-SkipSmoke)"
+    Write-Step "$step/$totalSteps smoke skipped (-SkipSmoke)"
   }
 } finally {
   Pop-Location

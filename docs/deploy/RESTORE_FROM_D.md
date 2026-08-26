@@ -22,14 +22,24 @@ After `git pull` on the PC:
 
 ```powershell
 cd D:\medscope.local
+git pull origin main
 pnpm sync:d
-# optional: pnpm sync:d -- -Deploy -IncludeZip
+pnpm db:verify
+pnpm deploy:production -- -SkipRestore
+# optional zip backup during sync:
+# pnpm sync:d -- -IncludeZip
 ```
+
+**Canonical operator flow** (copy/paste block at end of this doc):
+
+`git pull main` → `sync:d` → `db:verify` → `deploy:production -SkipRestore` (runs `cf:deploy` + `smoke:production` + `smoke:ecosystem:production`)
 
 This runs:
 
 1. `pnpm restore:d` — merge selected keys → `.env.local` → `pnpm cf:env:sync` → optional `gh secret set` → `pnpm deploy:checklist`
 2. `pnpm backup:d` — git bundle + `.env.local` (sensitive) + docs + `BACKUP_MANIFEST.txt` under `D:\medscope.data\backups\<today>\`
+3. `pnpm db:verify` — Supabase schema (MediFlow, editorial queue, image suggestions)
+4. `pnpm deploy:production -- -SkipRestore` — `cf:deploy` + post-deploy smokes
 
 | Command | Script |
 |---------|--------|
@@ -38,6 +48,11 @@ This runs:
 | `pnpm backup:d` | `scripts/backup-to-d.ps1` |
 | `pnpm sync:d` | `scripts/sync-d-and-backup.ps1` |
 | `pnpm pull:d` | `scripts/pull-cloud-to-d.ps1` (git pull cloud → D: only) |
+| `pnpm deploy:production` | `scripts/deploy-production.ps1` — db:verify + cf:deploy + smokes |
+| `pnpm db:verify` | Supabase schema verification |
+| `pnpm db:trigger-ecosystem-cron` | POST production migration cron |
+| `pnpm smoke:ecosystem:production` | MediFlow / editorial production smoke |
+| `pnpm images:backfill` | Editorial cover image suggestions |
 
 Cloud agents implement/update these scripts in git; **you** must execute them on D:.
 
@@ -189,17 +204,23 @@ After saving secrets, **start a new cloud agent run** (existing pods do not pick
 
 ---
 
-## 6. Deploy production NOW from D: (PR #19 merged to `main`)
+## 6. Deploy production from D:
 
 ```powershell
 cd D:\medscope.local
 git checkout main
 git pull origin main
 pnpm find:d          # confirm CLOUDFLARE_* key names exist on D:
-pnpm restore:d -- -Deploy
-# or:
-pnpm cf:deploy
-pnpm cf:smoke
+pnpm sync:d          # restore + backup → D:\medscope.data\backups\<today>\
+pnpm db:verify
+# if migrations pending:
+pnpm db:trigger-ecosystem-cron
+pnpm db:verify
+pnpm deploy:production -- -SkipRestore
+# or all-in-one (no separate backup):
+pnpm deploy:production
+# optional editorial images:
+pnpm images:backfill
 # expect VitaScope on https://medscopeglobal.com/cs
 curl.exe -sL https://medscopeglobal.com/cs | Select-String -Pattern 'VitaScope|MediFlow'
 ```
@@ -232,7 +253,47 @@ npx vercel env pull .env.vercel.local --yes --environment=production
 ## Smoke after secrets land in Cursor
 
 ```text
-pnpm verify:articles
-pnpm cf:deploy          # on main after PR #19 merge
+pnpm db:verify
+pnpm cf:deploy
+pnpm smoke:production
+pnpm smoke:ecosystem:production
 curl -sL https://medscopeglobal.com/cs | rg -i 'VitaScope'
+```
+
+---
+
+## Windows operator command block (copy/paste)
+
+Run in **PowerShell** on the PC. Cloud agents cannot access D:.
+
+```powershell
+cd D:\medscope.local
+git fetch origin
+git checkout main
+git pull origin main
+
+# 1) Restore secrets + dated backup (D:\medscope.data\backups\2026-08-26\)
+pnpm sync:d
+# pnpm sync:d -- -IncludeZip   # optional full source zip
+
+# 2) Verify Supabase schema
+pnpm db:verify
+# if FAIL — apply migrations via cron or SQL Editor:
+pnpm db:trigger-ecosystem-cron
+pnpm db:verify
+
+# 3) Deploy + post-deploy smoke (skip restore — sync:d already ran)
+pnpm deploy:production -- -SkipRestore
+
+# 4) Optional editorial cover suggestions
+pnpm images:backfill
+
+# 5) Confirm live site
+curl.exe -sL https://medscopeglobal.com/cs | Select-String -Pattern 'VitaScope|MediFlow'
+```
+
+**One-liner shortcut** (restore + deploy + smokes, no dated backup):
+
+```powershell
+cd D:\medscope.local; git pull origin main; pnpm deploy:production
 ```
