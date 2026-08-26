@@ -1,4 +1,4 @@
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { createServiceRoleClient, tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { createClient } from "@/lib/supabase/server";
 import type {
   AcademyCourse,
@@ -29,6 +29,11 @@ export { ACADEMY_VERSION };
 
 function adminClient() {
   return createServiceRoleClient();
+}
+
+/** Soft admin — null when service role env is placeholder/missing (Cloud Agent, preview). */
+function tryAdminClient() {
+  return tryCreateServiceRoleClient();
 }
 
 export type ListPublishedCoursesFilter = {
@@ -118,19 +123,21 @@ export async function countPublishedCourses(): Promise<number> {
 export async function getCourseVideoFlags(
   courseIds: string[]
 ): Promise<Record<string, { hasVideo: boolean; videoLessonCount: number }>> {
-  if (!courseIds.length) return {};
+  const flags: Record<string, { hasVideo: boolean; videoLessonCount: number }> = {};
+  for (const id of courseIds) {
+    flags[id] = { hasVideo: false, videoLessonCount: 0 };
+  }
+  if (!courseIds.length) return flags;
 
-  const admin = adminClient();
+  const admin = tryAdminClient();
+  if (!admin) return flags;
+
   const { data: lessons } = await admin
     .from("lessons")
     .select("course_id, video_asset_id")
     .in("course_id", courseIds)
     .eq("status", "published");
 
-  const flags: Record<string, { hasVideo: boolean; videoLessonCount: number }> = {};
-  for (const id of courseIds) {
-    flags[id] = { hasVideo: false, videoLessonCount: 0 };
-  }
   for (const row of lessons ?? []) {
     if (!row.video_asset_id) continue;
     const entry = flags[row.course_id];
