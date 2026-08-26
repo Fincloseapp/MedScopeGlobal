@@ -33,6 +33,7 @@ This runs:
 
 | Command | Script |
 |---------|--------|
+| `pnpm find:d` | `scripts/find-d-drive.ps1` — list all env files on D: (key names only) |
 | `pnpm restore:d` | `scripts/restore-from-d.ps1` |
 | `pnpm backup:d` | `scripts/backup-to-d.ps1` |
 | `pnpm sync:d` | `scripts/sync-d-and-backup.ps1` |
