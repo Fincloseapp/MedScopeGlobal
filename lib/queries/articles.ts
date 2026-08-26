@@ -91,6 +91,7 @@ export async function getFeaturedArticles(
   locale: LocaleCode = "cs"
 ) {
   const supabase = await createDataClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -123,6 +124,7 @@ export async function getLatestArticles(
   locale: LocaleCode = "cs"
 ) {
   const supabase = await createDataClient();
+  if (!supabase) return [];
   const fetchLimit = limit * 8;
   const { data, error } = await supabase
     .from("articles")
@@ -159,6 +161,7 @@ export async function getArticlesBySection(
     : rubricSlugsForSectionFetch(sectionSlug);
 
   const supabase = await createDataClient();
+  if (!supabase) return [];
 
   let q = supabase
     .from("articles")
@@ -224,6 +227,7 @@ export async function getArticlesByRubric(
   locale: LocaleCode = "cs"
 ) {
   const supabase = await createDataClient();
+  if (!supabase) return [];
   let { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -269,6 +273,7 @@ export async function getArticlesByCategory(
   locale: LocaleCode = "cs"
 ) {
   const supabase = await createDataClient();
+  if (!supabase) return { articles: [] as DisplayArticle[], total: 0 };
   const { data: cat } = await supabase
     .from("categories")
     .select("id")
@@ -314,6 +319,7 @@ export async function getArticleBySlug(
   locale: LocaleCode = "cs"
 ): Promise<DisplayArticle | null> {
   const supabase = await createDataClient();
+  if (!supabase) return null;
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -341,6 +347,7 @@ export async function getRelatedArticles(
   locale: LocaleCode = "cs"
 ) {
   const supabase = await createDataClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -376,6 +383,7 @@ export async function getArticlesByMetadataSection(
   locale: LocaleCode = "cs"
 ) {
   const supabase = await createDataClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -407,6 +415,7 @@ export async function getArchivedArticles(
   locale: LocaleCode = "cs"
 ): Promise<{ articles: DisplayArticle[]; total: number }> {
   const supabase = await createDataClient();
+  if (!supabase) return { articles: [], total: 0 };
   const { data, error, count } = await supabase
     .from("articles")
     .select(articleSelect, { count: "exact" })

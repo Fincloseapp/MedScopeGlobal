@@ -52,6 +52,7 @@ export async function listPublicArticles(options?: {
   const offset = options?.offset ?? 0;
   const locale = options?.locale ?? "cs";
   const supabase = await createDataClient();
+  if (!supabase) return [];
 
   let q = supabase
     .from("articles")
@@ -83,6 +84,7 @@ export async function getPublicArticleBySlug(
   locale: LocaleCode = "cs"
 ): Promise<DisplayArticle | null> {
   const supabase = await createDataClient();
+  if (!supabase) return null;
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -108,6 +110,7 @@ export async function listPublicAdCampaigns(options?: {
   topic?: PublicTopic | null;
 }): Promise<PublicAdCampaign[]> {
   const supabase = await createDataClient();
+  if (!supabase) return [];
   let q = supabase.from("public_ad_campaigns").select("*").order("updated_at", { ascending: false });
   if (options?.activeOnly !== false) q = q.eq("active", true);
 
@@ -128,6 +131,7 @@ export async function listPublicAdCampaigns(options?: {
 
 export async function getPublicAdCampaign(id: string): Promise<PublicAdCampaign | null> {
   const supabase = await createDataClient();
+  if (!supabase) return null;
   const { data, error } = await supabase.from("public_ad_campaigns").select("*").eq("id", id).maybeSingle();
   if (error) {
     console.error("getPublicAdCampaign", error);
@@ -150,6 +154,7 @@ export async function incrementPublicAdClick(campaignId: string): Promise<boolea
 
 export async function countPublicArticlesByTopic(): Promise<Record<string, number>> {
   const supabase = await createDataClient();
+  if (!supabase) return {};
   const topics: PublicTopic[] = ["zivotni-styl", "nemoci", "prevence", "rozhovory"];
   const out: Record<string, number> = {};
   for (const topic of topics) {

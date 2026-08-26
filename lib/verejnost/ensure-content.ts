@@ -10,6 +10,7 @@ function todayKey() {
 
 export async function countPublicArticles(): Promise<number> {
   const supabase = await createDataClient();
+  if (!supabase) return 0;
   const { count, error } = await supabase
     .from("articles")
     .select("id", { count: "exact", head: true })
@@ -25,6 +26,7 @@ export async function countPublicArticles(): Promise<number> {
 
 export async function countPublicArticlesToday(): Promise<number> {
   const supabase = await createDataClient();
+  if (!supabase) return 0;
   const start = `${todayKey()}T00:00:00.000Z`;
   const end = `${todayKey()}T23:59:59.999Z`;
   const { count, error } = await supabase

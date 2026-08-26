@@ -27,8 +27,14 @@ const CASES: SmokeCase[] = [
   { path: "/en-us/", label: "English homepage trailing slash", expectStatus: [200, 308] },
   {
     path: "/cs/articles",
-    label: "Czech articles magazine",
-    expectStatus: [200, 500],
+    label: "Czech articles magazine (empty OK without Supabase)",
+    expectStatus: 200,
+    expectBody: /VitaScope|Články|MediFlow/i,
+  },
+  {
+    path: "/cs/article/missing-slug-smoke-test",
+    label: "Missing article slug soft 404",
+    expectStatus: [404, 200],
   },
   { path: "/cs/vip/protokoly", label: "VIP protocols listing", expectStatus: 200, expectBody: /protokol/i },
   {
@@ -108,13 +114,6 @@ async function main(): Promise<void> {
   }
 
   if (failed > 0) {
-    // Articles 500 without Supabase is expected in placeholder env — warn but do not fail CI on that alone
-    const onlyArticlesFail =
-      failed === 1 && lines.some((l) => l.startsWith("✗") && l.includes("/cs/articles"));
-    if (onlyArticlesFail) {
-      console.warn("⚠ /cs/articles failed (likely missing Supabase credentials in dev env)");
-      return;
-    }
     process.exit(1);
   }
 }
