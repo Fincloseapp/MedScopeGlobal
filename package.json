@@ -21,6 +21,8 @@
     "env:diff": "node scripts/diff-vercel-env.mjs",
     "db:setup": "node scripts/apply-migrations.mjs",
     "db:migrate": "node scripts/apply-migrations.mjs",
+    "db:apply-ecosystem": "node scripts/apply-ecosystem-migrations.mjs",
+    "db:edge-apply-ecosystem": "node scripts/generate-ecosystem-embedded-sql.mjs && npx wrangler dev -c scripts/wrangler-edge-apply.jsonc --remote --port 8787",
     "db:apply-translations": "node scripts/apply-article-translations-table.mjs",
     "db:apply-pg": "node scripts/apply-migration-pg.mjs",
     "db:verify": "node scripts/verify-supabase.mjs",
