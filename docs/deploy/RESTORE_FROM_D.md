@@ -47,9 +47,16 @@ Cloud agents implement/update these scripts in git; **you** must execute them on
 ```powershell
 cd D:\medscope.local
 git fetch origin
-git checkout cursor/global-health-ecosystem-2b2d
-git pull origin cursor/global-health-ecosystem-2b2d
+git checkout main
+git pull origin main
 # keep existing .env.local — do not overwrite with placeholders
+```
+
+List all env files on D: (key **names** only):
+
+```powershell
+pnpm find:d
+# or: powershell -ExecutionPolicy Bypass -File .\scripts\find-d-drive.ps1
 ```
 
 Confirm secrets exist (names only):
@@ -181,12 +188,13 @@ After saving secrets, **start a new cloud agent run** (existing pods do not pick
 
 ---
 
-## 6. Optional — deploy production NOW from D:
+## 6. Deploy production NOW from D: (PR #19 merged to `main`)
 
 ```powershell
 cd D:\medscope.local
-git checkout cursor/global-health-ecosystem-2b2d
-git pull origin cursor/global-health-ecosystem-2b2d
+git checkout main
+git pull origin main
+pnpm find:d          # confirm CLOUDFLARE_* key names exist on D:
 pnpm restore:d -- -Deploy
 # or:
 pnpm cf:deploy
@@ -195,7 +203,7 @@ pnpm cf:smoke
 curl.exe -sL https://medscopeglobal.com/cs | Select-String -Pattern 'VitaScope|MediFlow'
 ```
 
-Or merge PR #19 to `main` and let Workers Builds / Actions deploy (only after GH CF secrets are set).
+Workers Builds / GitHub Actions on `main` also deploy after push — only if `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` are set (GH secrets or dashboard).
 
 ---
 
@@ -224,6 +232,6 @@ npx vercel env pull .env.vercel.local --yes --environment=production
 
 ```text
 pnpm verify:articles
-pnpm cf:deploy          # from cursor/global-health-ecosystem-2b2d
+pnpm cf:deploy          # on main after PR #19 merge
 curl -sL https://medscopeglobal.com/cs | rg -i 'VitaScope'
 ```

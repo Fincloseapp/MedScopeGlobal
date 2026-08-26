@@ -42,6 +42,7 @@
     "autogit": "node scripts/auto-git-commit-push.js --watch",
     "push:github": "powershell -ExecutionPolicy Bypass -File ./scripts/push-d-to-github.ps1",
     "pull:d": "powershell -ExecutionPolicy Bypass -File ./scripts/pull-cloud-to-d.ps1",
+    "find:d": "powershell -ExecutionPolicy Bypass -File ./scripts/find-d-drive.ps1",
     "restore:d": "powershell -ExecutionPolicy Bypass -File ./scripts/restore-from-d.ps1",
     "backup:d": "powershell -ExecutionPolicy Bypass -File ./scripts/backup-to-d.ps1",
     "sync:d": "powershell -ExecutionPolicy Bypass -File ./scripts/sync-d-and-backup.ps1",

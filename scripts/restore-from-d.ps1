@@ -181,10 +181,32 @@ $sourceEnv = Join-Path $SourceRoot ".env.local"
 $sourceDevVars = Join-Path $SourceRoot ".dev.vars"
 $targetEnv = Join-Path $WorkspaceRoot ".env.local"
 
+function Find-LatestBackupEnvFile {
+  $candidates = [System.Collections.Generic.List[string]]::new()
+  foreach ($bRoot in @("D:\medscope.data\backups", (Join-Path $SourceRoot "backups"))) {
+    if (-not (Test-Path $bRoot)) { continue }
+    Get-ChildItem -Path $bRoot -Directory -ErrorAction SilentlyContinue |
+      Sort-Object Name -Descending |
+      ForEach-Object {
+        $p = Join-Path $_.FullName ".env.local"
+        if (Test-Path $p) { $candidates.Add($p) }
+      }
+  }
+  if ($candidates.Count -eq 0) { return $null }
+  return $candidates[0]
+}
+
 if (-not (Test-Path $sourceEnv)) {
-  Write-Err2 "Missing $sourceEnv — cannot restore secrets."
-  Write-Host "Create it on the PC or recover via Vercel (see docs/deploy/RESTORE_FROM_D.md §5)."
-  exit 2
+  Write-Warn2 "Missing $sourceEnv — searching D: backups..."
+  $backupEnv = Find-LatestBackupEnvFile
+  if ($backupEnv) {
+    Write-Ok "Using backup copy: $backupEnv"
+    $sourceEnv = $backupEnv
+  } else {
+    Write-Err2 "Missing $sourceEnv and no backup .env.local under D:\medscope.data\backups or D:\medscope.local\backups"
+    Write-Host "Run on PC: pnpm find:d — then recover (see docs/deploy/RESTORE_FROM_D.md §5–7)."
+    exit 2
+  }
 }
 
 Write-Step "Reading D: env sources"
