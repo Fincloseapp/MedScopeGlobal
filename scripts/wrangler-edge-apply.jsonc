@@ -1,0 +1,6 @@
+{
+  "name": "medscopeglobal",
+  "main": "edge-apply-ecosystem.mjs",
+  "compatibility_date": "2026-08-10",
+  "compatibility_flags": ["nodejs_compat"]
+}
