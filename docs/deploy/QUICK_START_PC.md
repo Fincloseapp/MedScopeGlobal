@@ -32,5 +32,6 @@ Push na `main` → automatický build (`npm run cf:build` + `npx opennextjs-clou
 
 ## Po merge PR #19
 
+- Ruční kroky (migrace, sync, secrets): [`MANUAL_OPERATOR_CHECKLIST.md`](./MANUAL_OPERATOR_CHECKLIST.md)
 - Migrace Supabase: [`POST_MERGE_CHECKLIST.md`](./POST_MERGE_CHECKLIST.md) §2
 - Produkční smoke: `pnpm smoke:production` (očekává VitaScope na `/cs`)

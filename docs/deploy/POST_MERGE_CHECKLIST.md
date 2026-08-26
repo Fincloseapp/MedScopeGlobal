@@ -97,6 +97,22 @@ pnpm db:verify
 
 Expect ✓ for `mediflow_*`, `article_syndications`, `editorial_queue`, `article_image_suggestions`.
 
+### Option C — Production cron route (Worker has `SUPABASE_ACCESS_TOKEN`)
+
+After deploy includes `/api/cron/apply-ecosystem-migrations` (see branch
+`cursor/apply-ecosystem-migrations-1c5f` or merged `main`):
+
+```bash
+# From D: with CRON_SECRET in .env.local (see MANUAL_OPERATOR_CHECKLIST.md §C)
+curl -s -X POST \
+  -H "Authorization: Bearer $CRON_SECRET" \
+  https://medscopeglobal.com/api/cron/apply-ecosystem-migrations | jq .
+```
+
+Fallback auth: valid `CLOUDFLARE_API_TOKEN` in the Bearer header (verified via Cloudflare API).
+
+See also: [`MANUAL_OPERATOR_CHECKLIST.md`](./MANUAL_OPERATOR_CHECKLIST.md) §A–C, [`CLOUD_AGENT_ENV_SETUP.md`](./CLOUD_AGENT_ENV_SETUP.md) for agent pods without Cursor Secrets.
+
 ---
 
 ## 3. Wait for deploy, then smoke
