@@ -344,7 +344,7 @@ Write-Host @"
 1. Paste secrets into Cursor Cloud Agents environment (see docs/deploy/RESTORE_FROM_D.md §3)
 2. Backup:  pnpm backup:d
 3. One-shot: pnpm sync:d
-4. Deploy:  pnpm restore:d -- -Deploy   (or pnpm cf:deploy)
-5. Smoke:   pnpm cf:smoke
+4. Deploy:  pnpm deploy:production   (or pnpm restore:d -- -Deploy)
+5. Smoke:   pnpm smoke:production
 "@
 Write-Ok "restore-from-d complete"

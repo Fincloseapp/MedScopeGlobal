@@ -61,10 +61,14 @@ Both paths build with `npm run cf:build` (OpenNext) and deploy via `opennextjs-c
 **Manual deploy** (either path failed or hotfix):
 
 ```bash
+pnpm deploy:production          # Windows D: — restore + cf:deploy + smoke:production
+# or step-by-step:
 pnpm cf:env:sync          # Windows D: — writes scripts/cloudflare/.env.cloudflare.json
 pnpm cf:deploy
 pnpm smoke:production
 ```
+
+**No GitHub/CLI tokens?** See [`CF_DASHBOARD_DEPLOY.md`](./CF_DASHBOARD_DEPLOY.md) — 5-step Cloudflare dashboard deploy.
 
 ---
 

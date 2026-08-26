@@ -114,10 +114,9 @@ Cloudflare credentials found in .env.local.
 
 Deploy production from D: (if not already done with -Deploy):
   cd D:\medscope.local
-  pnpm cf:deploy
-  pnpm cf:smoke
+  pnpm deploy:production
 
-Or merge PR #19 to main after GitHub secrets are set (pnpm restore:d pushes them when gh is logged in).
+Or merge to main + Cloudflare Workers Builds — see docs\deploy\CF_DASHBOARD_DEPLOY.md
 
 Cursor Cloud: paste CLOUDFLARE_* + SUPABASE_* + CLOUDFLARE_ENV_JSON into the environment Secrets dashboard, then start a NEW agent run.
 Docs: docs\deploy\RESTORE_FROM_D.md
@@ -127,10 +126,9 @@ Docs: docs\deploy\RESTORE_FROM_D.md
 CLOUDFLARE_API_TOKEN and/or CLOUDFLARE_ACCOUNT_ID missing — deploy skipped.
 
 Add them to D:\medscope.local\.env.local, then:
-  pnpm restore:d
-  pnpm cf:deploy
+  pnpm deploy:production
 
-See docs\deploy\RESTORE_FROM_D.md
+Or deploy without tokens: docs\deploy\CF_DASHBOARD_DEPLOY.md
 "@
 }
 
