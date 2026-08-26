@@ -75,6 +75,54 @@ See [`RESTORE_FROM_D.md`](./RESTORE_FROM_D.md) for step-by-step restore, GitHub 
 
 ```powershell
 pnpm pull:d
+# then: pnpm sync:d && pnpm db:verify && pnpm deploy:production -- -SkipRestore
+```
+
+---
+
+## G. Canonical PC deploy flow (after cloud merge)
+
+Cloud agents update scripts in git; **you** run this on the Windows PC. D: is not mountable from cloud pods.
+
+```powershell
+cd D:\medscope.local
+git fetch origin
+git checkout main
+git pull origin main
+
+# Restore secrets + dated backup
+pnpm sync:d
+# Backup lands at: D:\medscope.data\backups\2026-08-26\  (today's date)
+
+# Verify Supabase (MediFlow, editorial_queue, article_image_suggestions)
+pnpm db:verify
+
+# If db:verify fails — apply ecosystem migrations:
+pnpm db:trigger-ecosystem-cron
+pnpm db:verify
+
+# Deploy + post-deploy smoke (sync:d already restored secrets)
+pnpm deploy:production -- -SkipRestore
+
+# Optional editorial cover suggestions
+pnpm images:backfill
+```
+
+**What each step does:**
+
+| Step | Command | Result |
+|------|---------|--------|
+| Pull | `git pull origin main` | Latest scripts from GitHub |
+| Sync | `pnpm sync:d` | `.env.local` + CF JSON + backup under `D:\medscope.data\backups\<date>\` |
+| Verify DB | `pnpm db:verify` | Confirms `20260825*` migrations applied |
+| Cron fallback | `pnpm db:trigger-ecosystem-cron` | POSTs production Worker migration route |
+| Deploy | `pnpm deploy:production -- -SkipRestore` | `cf:deploy` + `smoke:production` + `smoke:ecosystem:production` |
+| Images | `pnpm images:backfill` | Editorial cover suggestions for articles without images |
+
+**Shortcut** (no separate backup step):
+
+```powershell
+cd D:\medscope.local; git pull origin main; pnpm deploy:production
 ```
 
 ---
@@ -137,6 +185,7 @@ curl -s -X POST \
 ```bash
 pnpm db:verify
 pnpm smoke:production
+pnpm smoke:ecosystem:production
 ```
 
 **Do not** rely on Cloud Agent pods for this unless `CRON_SECRET` or `CLOUDFLARE_API_TOKEN` is in Cursor Secrets or `.env.local`.
@@ -225,6 +274,8 @@ Optional: `CLOUDFLARE_ENV_JSON` (full Worker vars from `pnpm cf:env:sync`) for d
 
 - [ ] Migrations 1–3 applied (SQL Editor **or** cron **or** `pnpm db:migrate`)
 - [ ] `pnpm db:verify` exit 0 on PC
-- [ ] `pnpm sync:d` run after cloud merge (backup created)
+- [ ] `pnpm sync:d` run after cloud merge (backup at `D:\medscope.data\backups\<date>\`)
 - [ ] Cursor Secrets updated if next agent needs DB/deploy
+- [ ] `pnpm cf:deploy` or `pnpm deploy:production -- -SkipRestore` exit 0
 - [ ] `pnpm smoke:production` exit 0
+- [ ] `pnpm smoke:ecosystem:production` exit 0
