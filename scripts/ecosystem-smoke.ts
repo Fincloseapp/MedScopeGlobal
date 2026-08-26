@@ -30,6 +30,8 @@ const CASES: SmokeCase[] = [
   { path: "/cs/", label: "Czech homepage trailing slash", expectStatus: [200, 308] },
   { path: "/en-us", label: "English homepage", expectStatus: 200 },
   { path: "/en-us/", label: "English homepage trailing slash", expectStatus: [200, 308] },
+  { path: "/de", label: "German homepage", expectStatus: 200 },
+  { path: "/de/articles", label: "German articles listing", expectStatus: 200 },
   {
     path: "/cs/articles",
     label: "Czech articles magazine with demo feed",
@@ -47,7 +49,12 @@ const CASES: SmokeCase[] = [
     label: "Missing article slug soft 404",
     expectStatus: [404, 200],
   },
-  { path: "/cs/vip/protokoly", label: "VIP protocols listing", expectStatus: 200, expectBody: /protokol/i },
+  {
+    path: "/cs/vip/protokoly",
+    label: "VIP protocols listing (10)",
+    expectStatus: 200,
+    expectBody: /Longevity Protokoly|#01|#10/i,
+  },
   {
     path: "/cs/vip/protokoly/biohacking-zacatecnici",
     label: "VIP protocol detail",
@@ -72,6 +79,17 @@ const CASES: SmokeCase[] = [
     label: "Affiliate alias redirect",
     expectStatus: [302, 307],
     allowRedirect: true,
+  },
+  {
+    path: "/go/unknown-affiliate-slug",
+    label: "Affiliate unknown slug 404",
+    expectStatus: 404,
+  },
+  {
+    path: "/api/ecosystem/editorial/images",
+    label: "editorial images pipeline status",
+    expectStatus: 200,
+    jsonField: "task",
   },
   { path: "/robots.txt", label: "robots.txt", expectStatus: 200, expectBody: /Sitemap|User-agent/i },
   { path: "/sitemap-cs.xml", label: "Czech sitemap", expectStatus: 200, expectBody: /<urlset/i },

@@ -85,7 +85,7 @@ async function runHttpSmoke(): Promise<void> {
     `/cs should rewrite to app routes (got ${csStatus}, 404 = broken locale routing)`
   );
 
-  for (const path of ["/en-us", "/robots.txt"]) {
+  for (const path of ["/en-us", "/de", "/robots.txt"]) {
     const status = await fetchStatus(path);
     if (path === "/robots.txt") {
       assert.ok(status >= 200 && status < 400, `${path} should be reachable (got ${status})`);
