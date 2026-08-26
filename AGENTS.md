@@ -54,6 +54,42 @@ Cloudflare Workers via OpenNext; the source of truth for data is **Supabase** (P
 - **PWA install:** Chromium only fires `beforeinstallprompt` on pages inside manifest `scope`.
   Icons must be truecolor PNG (RGBA). iOS uses Safari Share → Přidat na plochu (no BIP).
 
+### Cloud agent (Linux) path override
+- `lib/config/paths.mjs` defaults `MEDSCOPE_PROJECT_ROOT` to `D:\medscope.local` on non-CI Linux.
+  Cloud agents run in `/workspace` — export before path-sensitive scripts:
+  `export MEDSCOPE_PROJECT_ROOT=/workspace` (or add to Cursor environment secrets).
+- Scripts affected: `pnpm db:migrate`, anything using `projectPath()` without override.
+
+### Minimum `.env.local` for cloud dev (gitignored)
+| Key | Required for |
+|-----|----------------|
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | dev server, public pages |
+| `NEXT_PUBLIC_SITE_URL` | canonical URLs (`https://medscopeglobal.com`) |
+| `SUPABASE_SERVICE_ROLE_KEY` | `pnpm db:verify`, article SSR, editorial backfill |
+| `CRON_SECRET` | `pnpm db:verify` (≥32 chars) |
+| `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | optional local `pnpm cf:deploy` |
+| `SUPABASE_ACCESS_TOKEN` | optional `pnpm db:migrate` (Management API) |
+
+After deploy-agent sessions, add `SUPABASE_SERVICE_ROLE_KEY` from D: backup (`pnpm restore:d` on PC)
+or Cursor Secrets — anon key alone cannot verify ecosystem tables or run backfill.
+
+### Ecosystem migrations (20260825*)
+Production deploy does **not** auto-apply SQL. After merge, run the three files in order (see
+`docs/deploy/POST_MERGE_CHECKLIST.md` §2) via Supabase SQL Editor or `pnpm db:migrate`.
+Verify: `pnpm db:verify` → ✓ for `mediflow_*`, `article_syndications`, `editorial_queue`,
+`article_image_suggestions`. Anon REST probe returning `PGRST205` means not applied yet.
+
+### Security — token rotation (recommended, non-blocking)
+After a cloud agent used deploy credentials (skipped GH secrets rotation is OK to unblock setup),
+**rotate on a best-effort schedule**:
+- **Cloudflare:** create a new API token, update Workers Builds / `.env.local`, revoke the old token.
+- **GitHub Actions:** rotate `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and `CLOUDFLARE_ENV_JSON`
+  if the agent had access.
+- **Supabase:** rotate `SUPABASE_SERVICE_ROLE_KEY` and `SUPABASE_ACCESS_TOKEN` if they were exposed
+  in agent logs; update Worker vars via dashboard or `pnpm cf:env:sync` on D:.
+
+Never commit secrets. Use Cursor Secrets, D: `.env.local`, or Cloudflare dashboard Variables.
+
 ### Cloudflare Workers production deploy
 - Worker name / project: `medscopeglobal` (`wrangler.jsonc`). Domain routes: `medscopeglobal.com/*`.
 - **Cloudflare dashboard → Create and deploy / Workers Builds**
