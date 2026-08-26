@@ -38,7 +38,7 @@ const assets = [
   "/assets/ai/assistant-brunette.webp",
   "/assets/marketing/medipacient.webp",
   "/assets/marketing/mediprep.webp",
-  "/assets/marketing/ordizapis-phone-v2.webp",
+  "/assets/marketing/ordizapis-phone-v3.webp",
 ];
 
 let failed = 0;

@@ -1,5 +1,5 @@
 /* MedScope Dokumentace PWA service worker */
-const CACHE_NAME = 'msg-ordizapis-v3';
+const CACHE_NAME = 'msg-ordizapis-v5';
 const SHELL = [
   '/app/dokumentace',
   '/dokumentace-manifest.json',

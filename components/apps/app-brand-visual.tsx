@@ -15,7 +15,11 @@ type Props = {
  * (`APP_MARKETING_IMAGE` / `/assets/marketing/*`).
  */
 export function AppBrandVisual({ app, compact = false, className = "" }: Props) {
-  const src = `${APP_MARKETING_IMAGE[app.id]}?v=ordizapis-phone-v2`;
+  const src =
+    app.id === "ordizapis"
+      ? `${APP_MARKETING_IMAGE[app.id]}?v=ordizapis-phone-v4`
+      : APP_MARKETING_IMAGE[app.id];
+  const phoneHeader = app.id === "ordizapis";
   return (
     <figure className={`overflow-hidden bg-slate-200 ${className}`}>
       <div
@@ -30,7 +34,11 @@ export function AppBrandVisual({ app, compact = false, className = "" }: Props) 
         <img
           src={src}
           alt={`${app.shortName} — ${app.tagline}`}
-          className="h-full w-full object-cover object-center"
+          className={
+            phoneHeader
+              ? "h-full w-full object-cover object-[center_top]"
+              : "h-full w-full object-cover object-center"
+          }
           decoding="async"
         />
       </div>

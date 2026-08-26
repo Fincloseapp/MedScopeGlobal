@@ -124,6 +124,9 @@ assert.deepEqual(
   "same seed yields same test"
 );
 
+file("public/assets/marketing/ordizapis-phone-v3.webp");
+file("public/assets/marketing/medipacient.webp");
+file("public/assets/marketing/mediprep.webp");
 file("app/(public)/aplikace/page.tsx");
 file("app/(pacient-app)/app/pacient/page.tsx");
 file("app/(prep-app)/app/priprava/page.tsx");
