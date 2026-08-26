@@ -21,12 +21,12 @@ export type EditorialDesk = {
   syndicationHub: boolean;
 };
 
-/** Default topic mix — longevity-heavy editorial direction */
+/** Default topic mix — longevity-heavy editorial direction (MASTER_PROMPT / magazine-brand) */
 export const DEFAULT_TOPIC_WEIGHTS: TopicWeights = {
   longevity: 0.4,
   lifestyle: 0.25,
-  seniors: 0.2,
-  trending: 0.15,
+  seniors: 0.15,
+  trending: 0.2,
 };
 
 export const EDITORIAL_DESKS: EditorialDesk[] = [
@@ -45,7 +45,7 @@ export const EDITORIAL_DESKS: EditorialDesk[] = [
     locale: "sk",
     region: "SK",
     label: { cs: "Slovenská redakce", sk: "Slovenská redakcia", en: "Slovak Editorial Desk" },
-    topicWeights: { longevity: 0.38, lifestyle: 0.27, seniors: 0.2, trending: 0.15 },
+    topicWeights: { longevity: 0.38, lifestyle: 0.27, seniors: 0.15, trending: 0.2 },
     vipCtaWeight: 0.85,
     maxArticlesPerDay: 4,
     syndicationHub: false,
@@ -65,7 +65,7 @@ export const EDITORIAL_DESKS: EditorialDesk[] = [
     locale: "en-US",
     region: "USA",
     label: { en: "US Editorial Desk", "en-US": "US Editorial Desk" },
-    topicWeights: { longevity: 0.35, lifestyle: 0.3, seniors: 0.2, trending: 0.15 },
+    topicWeights: { longevity: 0.35, lifestyle: 0.3, seniors: 0.15, trending: 0.2 },
     vipCtaWeight: 0.9,
     maxArticlesPerDay: 5,
     syndicationHub: true,

@@ -43,7 +43,7 @@ Alternatives considered: Longevita, WellSpan, ThriveLife, EverWell, VitaeVerse �
 
 - Cron hub: `/api/ecosystem/autonomous`
 - Desks: Novinky, Veřejnost, Dlouhověkost, Články (+ global locale variants)
-- Personas + syndication config: `lib/editorial/autonomous-config.ts`
+- Personas + syndication config: `lib/ecosystem/editorial/` (`desks.ts`, `personas.ts`, `syndication.ts`)
 - Image pipeline: hero suggestions, editorial-images cron, article page integration
 - Safety: max articles/day, blocked topics, mandatory medical disclaimers, human review for en-US / ru / zh-CN
 

@@ -22,7 +22,7 @@ Tagline: *See life clearly. Live it longer.*
 | **MediFlow** | Personal wellness journal (articles, symptoms, supplements) |
 | **MeDipacient** | Patient messaging demo PWA |
 | **MeDiprep** | Medical school prep / tests PWA — **legacy**, deprioritized in nav & homepage |
-| **OrdiZapis** | Physician documentation PWA |
+| **OrdiZapis** | Physician documentation PWA (Czech marketing alias **OrdiZáznam**, route `/ordizaznam`) |
 | **Academy** | Courses and certificates |
 | **VIP** | Paid longevity protocols ($6.99/mo en-US) |
 
