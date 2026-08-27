@@ -1,7 +1,7 @@
 /**
  * User-facing tip / donation copy.
  * Tips (Příspěvek) and donations (Dar) are voluntary support — never VIP / membership / předplatné.
- * VIP Longevity CTAs live in separate components (VipUpgradeNudge, /vip/protokoly).
+ * VIP Longevity lives on /vip/protokoly and dedicated VIP surfaces — not in article tip/footer CTAs.
  */
 
 export type TipLocale = "cs" | "en";

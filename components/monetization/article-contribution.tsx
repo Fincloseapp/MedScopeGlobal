@@ -27,7 +27,7 @@ const ZERO_DECIMAL = new Set(["ja", "ko", "vi", "id", "hu"]);
 /**
  * Unified article support: Příspěvek (tip) + Dar (donate).
  * Never claims tips unlock VIP / membership / předplatné.
- * VIP Longevity stays in VipUpgradeNudge separately on the article page.
+ * Article pages intentionally omit VIP / tariff footers next to this block.
  */
 export function ArticleContribution({
   articleSlug,
