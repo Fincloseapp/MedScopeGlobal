@@ -7,6 +7,7 @@ import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { assignEditorialUnits, formatEditorialUnitDisplay } from "@/lib/editorial/units";
 import type { ArticleWithRelations } from "@/types/database";
+import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
 
 export function ArticleCard({ article }: { article: DisplayArticle | ArticleWithRelations }) {
   const cat = article.categories;
@@ -26,15 +27,24 @@ export function ArticleCard({ article }: { article: DisplayArticle | ArticleWith
     });
   const coverMeta = getArticleCoverLabel(article.title, cat?.name);
   const coverStyles = getArticleCoverStyles(article.title, cat?.name);
+  const coverUrl = resolveArticleCoverUrl({
+    title: article.title,
+    slug: article.slug,
+    excerpt: article.excerpt,
+    category: cat?.name,
+    publicTopic: article.public_topic,
+    coverImageUrl: article.cover_image_url,
+    preferCurated: true,
+  });
 
   return (
     <Card className="group overflow-hidden rounded-[26px] border border-slate-200/80 bg-white/95 shadow-[0_16px_50px_-28px_rgba(2,30,57,0.55)] transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_24px_70px_-28px_rgba(0,91,150,0.6)]">
       <Link href={`/article/${article.slug}`} className="block">
         <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-950">
-          {article.cover_image_url ? (
+          {coverUrl ? (
             <>
               <Image
-                src={article.cover_image_url}
+                src={coverUrl}
                 alt=""
                 fill
                 className="object-cover transition duration-500 group-hover:scale-[1.04]"
@@ -70,14 +80,14 @@ export function ArticleCard({ article }: { article: DisplayArticle | ArticleWith
               </div>
             </div>
           )}
-          {article.cover_image_url && (
+          {coverUrl && (
             <div className="absolute left-3 top-3">
               <span className="rounded-full border border-white/20 bg-slate-950/55 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/85 backdrop-blur">
                 {cat?.name ?? "Medical briefing"}
               </span>
             </div>
           )}
-          {article.vip_only && article.cover_image_url && (
+          {article.vip_only && coverUrl && (
             <Badge className="absolute right-3 top-3 bg-[#005B96]/90 text-[10px] text-white" variant="vip">
               VIP
             </Badge>

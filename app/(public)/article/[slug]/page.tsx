@@ -55,6 +55,7 @@ import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { MAGAZINE } from "@/lib/brand/magazine";
 import { isArticleTipUiEnabled } from "@/lib/ecosystem/tip-copy";
+import { SITE } from "@/lib/config/site";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -85,8 +86,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const coverForMeta = resolveArticleCoverUrl({
     title: article.title,
     slug: article.slug,
+    excerpt: article.excerpt,
+    category: article.categories?.name,
+    publicTopic: article.public_topic,
     coverImageUrl: article.cover_image_url,
+    preferCurated: true,
   });
+  const ogImage = coverForMeta
+    ? coverForMeta.startsWith("http")
+      ? coverForMeta
+      : `${SITE.url}${coverForMeta}`
+    : `${SITE.url}/og-default.png`;
 
   return {
     title: article.title,
@@ -102,13 +112,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "article",
       publishedTime: article.published_at ?? undefined,
       url: canonical,
-      images: coverForMeta ? [{ url: coverForMeta }] : undefined,
+      images: [{ url: ogImage }],
     },
     twitter: {
       card: "summary_large_image",
       title: article.title,
       description,
-      images: coverForMeta ? [coverForMeta] : undefined,
+      images: [ogImage],
     },
   };
 }
@@ -194,7 +204,11 @@ export default async function ArticlePage({ params }: Props) {
   const coverUrl = resolveArticleCoverUrl({
     title: article.title,
     slug: article.slug,
+    excerpt: article.excerpt,
+    category: category?.name,
+    publicTopic: article.public_topic,
     coverImageUrl: article.cover_image_url,
+    preferCurated: true,
   });
   const coverMeta = getArticleCoverLabel(article.title, category?.name);
 

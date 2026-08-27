@@ -27,6 +27,8 @@ import {
   isMissingOrStaleHeroImage,
   scanTextForBlockedTopics,
   getArticleHeroAltText,
+  resolveArticleCoverUrl,
+  classifyCoverTopic,
 } from "../../lib/ecosystem/editorial/images";
 import { getImageCuratorForLocale } from "../../lib/ecosystem/editorial/personas";
 import {
@@ -37,7 +39,7 @@ import {
   createEditorialQueueItem,
 } from "../../lib/ecosystem/editorial";
 import { SYNDICATION_RULES, getSyndicationTargets } from "../../lib/ecosystem/editorial/syndication";
-
+import { APP_MARKETING_IMAGE, MARKETING_VISUALS } from "../../lib/brand/marketing-visuals";
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 function file(rel: string) {
@@ -200,6 +202,42 @@ console.log(
 assert.equal(isMissingOrStaleHeroImage(null), true);
 assert.equal(isMissingOrStaleHeroImage(""), true);
 assert.equal(isMissingOrStaleHeroImage("https://images.unsplash.com/photo-1"), false);
+
+{
+  const foodCover = resolveArticleCoverUrl({
+    title: "Středomořský talíř v české kuchyni",
+    slug: "verejnost-zivotni-styl-stredomorsky-talir",
+    coverImageUrl:
+      "https://xcydgqnivxfhprbmdyym.supabase.co/storage/v1/object/public/media/v25-images/images/verejnost/doctor-phone.webp",
+    preferCurated: true,
+  });
+  assert.ok(foodCover?.startsWith("/assets/covers/"), `food cover local, got ${foodCover}`);
+  assert.equal(classifyCoverTopic({ title: "Středomořský talíř", slug: "stredomorsky" }), "food");
+
+  const sleepCover = resolveArticleCoverUrl({
+    title: "Zimní spánek a odpočinek",
+    slug: "verejnost-zivotni-styl-zimni-spanek",
+    coverImageUrl:
+      "https://xcydgqnivxfhprbmdyym.supabase.co/storage/v1/object/public/media/v25-images/images/verejnost/x.webp",
+    preferCurated: true,
+  });
+  assert.ok(sleepCover?.includes("sleep") || sleepCover?.includes("calm"), `sleep cover, got ${sleepCover}`);
+
+  assert.equal(
+    resolveArticleCoverUrl({
+      title: "x",
+      coverImageUrl: "https://via.placeholder.com/800",
+      preferCurated: true,
+    })?.startsWith("/assets/covers/"),
+    true
+  );
+
+  assert.notEqual(MARKETING_VISUALS.mediflow, MARKETING_VISUALS.medipacient);
+  assert.ok(APP_MARKETING_IMAGE.mediflow.includes("mediflow.webp"));
+  assert.ok(APP_MARKETING_IMAGE.medipacient.includes("medipacient.webp"));
+  assert.ok(existsSync(join(root, "public/assets/covers/food.webp")));
+  assert.ok(existsSync(join(root, "public/assets/marketing/mediflow.webp")));
+}
 
 const longevityArticle = {
   id: "a1",

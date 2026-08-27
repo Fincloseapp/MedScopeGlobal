@@ -13,11 +13,15 @@ function coverOf(article: DisplayArticle) {
     category: article.categories?.name,
     excerpt: article.excerpt,
     coverUrl: article.cover_image_url,
+    slug: article.slug,
+    public_topic: article.public_topic,
   });
   const fallbackSrc = resolveTopicFallbackCover({
     title: article.title,
     category: article.categories?.name,
     excerpt: article.excerpt,
+    slug: article.slug,
+    public_topic: article.public_topic,
   });
   return { src, fallbackSrc };
 }
