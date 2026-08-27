@@ -72,7 +72,7 @@ export const V27_SUBSCRIPTION_PLANS = [
       "Celá Academy včetně přípravných kurzů na přijímačky",
       "AI tutor a studijní materiály",
       "Kvízy, hry a modelové otázky",
-      "Vhodné i jako podpora přípravy od rodičů",
+      "149 Kč = Student LF (Academy) — není VIP longevity protokoly",
     ],
   },
   {

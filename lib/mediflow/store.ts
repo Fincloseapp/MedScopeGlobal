@@ -247,7 +247,7 @@ export async function logArticleTipOrder(fields: {
   const admin = tryCreateServiceRoleClient();
   if (!admin) return;
 
-  await admin.from("v27_orders").upsert(
+  const { error } = await admin.from("v27_orders").upsert(
     {
       stripe_session_id: fields.stripeSessionId,
       kind: "article_tip",
@@ -265,4 +265,7 @@ export async function logArticleTipOrder(fields: {
     },
     { onConflict: "stripe_session_id" }
   );
+  if (error) {
+    console.error("[logArticleTipOrder]", error.message);
+  }
 }
