@@ -40,6 +40,7 @@ const SEGMENT_TO_LOCALE: Record<string, GlobalLocaleCode> = {
   cn: "zh-CN",
   "zh-cn": "zh-CN",
   jp: "ja",
+  ja: "ja",
   ko: "ko",
   kr: "ko",
   vi: "vi",
@@ -47,6 +48,13 @@ const SEGMENT_TO_LOCALE: Record<string, GlobalLocaleCode> = {
   en: "en",
   "en-us": "en-US",
   "en-uk": "en",
+};
+
+/** Non-canonical path segments that should 308 to the canonical prefix. */
+const ALIAS_SEGMENT_REDIRECT: Record<string, string> = {
+  ja: "jp",
+  "zh-cn": "cn",
+  ko: "kr",
 };
 
 export const LOCALE_PATH_SEGMENTS = GLOBAL_LOCALES.map((l) => localeToPathSegment(l.code));
@@ -75,6 +83,20 @@ export function localeToPathSegment(locale: string): string {
 export function pathSegmentToLocale(segment: string): GlobalLocaleCode | null {
   const key = segment.toLowerCase();
   return SEGMENT_TO_LOCALE[key] ?? null;
+}
+
+/**
+ * If the first path segment is a known alias (e.g. `/ja` → `/jp`),
+ * return the canonical pathname; otherwise null.
+ */
+export function canonicalLocalePathname(pathname: string): string | null {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length === 0) return null;
+  const raw = segments[0]!;
+  const canonicalSeg = ALIAS_SEGMENT_REDIRECT[raw.toLowerCase()];
+  if (!canonicalSeg) return null;
+  const rest = segments.slice(1);
+  return rest.length === 0 ? `/${canonicalSeg}` : `/${canonicalSeg}/${rest.join("/")}`;
 }
 
 export function resolveLocalePath(pathname: string): {

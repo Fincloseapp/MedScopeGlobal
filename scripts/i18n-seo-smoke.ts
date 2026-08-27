@@ -7,11 +7,14 @@
 import assert from "node:assert/strict";
 import {
   buildLocalePath,
+  canonicalLocalePathname,
   localeToPathSegment,
   pathSegmentToLocale,
   resolveLocalePath,
   isLocaleRoutingExcluded,
 } from "../lib/i18n/locale-path";
+import { normalizeLocale } from "../lib/i18n/config";
+import { getHomepageTitle, getOgLocale } from "../lib/brand/magazine";
 import { buildGlobalHreflang } from "../lib/ecosystem/seo";
 import { allLocaleSitemapUrls } from "../lib/seo/locale-sitemap";
 import { GLOBAL_LOCALES } from "../lib/ecosystem/locales";
@@ -29,6 +32,23 @@ assert.equal(localeToPathSegment("ja"), "jp");
 assert.equal(pathSegmentToLocale("en-us"), "en-US");
 assert.equal(pathSegmentToLocale("cn"), "zh-CN");
 assert.equal(pathSegmentToLocale("jp"), "ja");
+assert.equal(pathSegmentToLocale("ja"), "ja");
+assert.equal(pathSegmentToLocale("zh-cn"), "zh-CN");
+
+assert.equal(normalizeLocale("en-US"), "en-US");
+assert.equal(normalizeLocale("en-us"), "en-US");
+assert.equal(normalizeLocale("en"), "en");
+assert.equal(normalizeLocale("jp"), "ja");
+assert.equal(normalizeLocale("cn"), "zh-CN");
+assert.equal(canonicalLocalePathname("/ja"), "/jp");
+assert.equal(canonicalLocalePathname("/zh-cn/articles"), "/cn/articles");
+assert.equal(canonicalLocalePathname("/ko"), "/kr");
+assert.equal(canonicalLocalePathname("/de"), null);
+assert.ok(getHomepageTitle("de").includes("Gesundheit"));
+assert.ok(getHomepageTitle("fr").includes("Santé"));
+assert.ok(getHomepageTitle("zh-CN").includes("健康"));
+assert.equal(getOgLocale("de"), "de_DE");
+assert.equal(getOgLocale("en-US"), "en_US");
 
 const resolved = resolveLocalePath("/de/articles");
 assert.equal(resolved.locale, "de");
@@ -85,7 +105,7 @@ async function runHttpSmoke(): Promise<void> {
     `/cs should rewrite to app routes (got ${csStatus}, 404 = broken locale routing)`
   );
 
-  for (const path of ["/en-us", "/de", "/robots.txt"]) {
+  for (const path of ["/en-us", "/de", "/jp", "/robots.txt"]) {
     const status = await fetchStatus(path);
     if (path === "/robots.txt") {
       assert.ok(status >= 200 && status < 400, `${path} should be reachable (got ${status})`);
@@ -94,10 +114,32 @@ async function runHttpSmoke(): Promise<void> {
     }
   }
 
+  const jaAlias = await fetchStatus("/ja");
+  assert.ok(
+    jaAlias === 308 || jaAlias === 307 || jaAlias === 301,
+    `/ja should redirect to canonical /jp (got ${jaAlias})`
+  );
+
   const sitemapStatus = await fetchStatus("/sitemap-cs.xml");
   assert.ok(
     sitemapStatus >= 200 && sitemapStatus < 400,
     `/sitemap-cs.xml should be reachable (got ${sitemapStatus})`
+  );
+
+  async function fetchHtml(path: string): Promise<string> {
+    const res = await fetch(`${origin}${path}`, { redirect: "follow" });
+    return res.text();
+  }
+
+  const enUsHtml = await fetchHtml("/en-us");
+  assert.ok(
+    /rel="canonical"[^>]*href="[^"]*\/en-us"?/i.test(enUsHtml) ||
+      /href="[^"]*\/en-us"[^>]*rel="canonical"/i.test(enUsHtml),
+    "/en-us canonical should target en-us (not /en)"
+  );
+  assert.ok(
+    /hrefLang="en-US"|hreflang="en-US"/i.test(enUsHtml),
+    "/en-us should emit hreflang en-US"
   );
 
   console.log(`✓ HTTP smoke passed against ${origin}`);

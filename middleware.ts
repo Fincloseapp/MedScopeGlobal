@@ -13,6 +13,7 @@ import {
 import { detectLocaleFromAcceptLanguage } from "@/lib/i18n/detect-locale";
 import {
   buildLocalePath,
+  canonicalLocalePathname,
   isLocaleRoutingExcluded,
   resolveLocalePath,
 } from "@/lib/i18n/locale-path";
@@ -112,6 +113,19 @@ export async function middleware(request: NextRequest) {
   const { locale: pathLocale, pathname: strippedPath } = localeExcluded
     ? { locale: null, pathname }
     : resolveLocalePath(pathname);
+
+  // Collapse alias prefixes (/ja → /jp, /zh-cn → /cn, /ko → /kr) for a single canonical URL
+  if (!localeExcluded && pathLocale) {
+    const canonicalPath = canonicalLocalePathname(pathname);
+    if (canonicalPath && canonicalPath !== pathname) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = canonicalPath;
+      redirectUrl.search = request.nextUrl.search;
+      const redirect = NextResponse.redirect(redirectUrl, 308);
+      applyLocaleCookie(redirect, request, pathLocale);
+      return wrapWithSecurityHeaders(redirect, pathname);
+    }
+  }
 
   // Geo / browser locale redirect when URL has no locale prefix
   if (!localeExcluded && !pathLocale) {

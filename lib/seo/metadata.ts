@@ -1,5 +1,5 @@
 import { SITE } from "@/lib/config/site";
-import { MAGAZINE } from "@/lib/brand/magazine";
+import { getOgLocale, MAGAZINE } from "@/lib/brand/magazine";
 import type { Metadata } from "next";
 import { GLOBAL_LOCALES } from "@/lib/ecosystem/locales";
 import { buildGlobalHreflang } from "@/lib/ecosystem/seo";
@@ -34,7 +34,7 @@ export function buildPageMetadata(params: {
       description: params.description,
       url: canonical,
       siteName: `${MAGAZINE.name} · ${SITE.name}`,
-      locale: "cs_CZ",
+      locale: getOgLocale(params.locale),
       alternateLocale: HREFLANG_LOCALES.map((l) => l.hreflang.replace("-", "_")),
       images: [{ url: ogImage, width: 1200, height: 630, alt: params.title }],
     },
