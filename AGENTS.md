@@ -108,6 +108,10 @@ Never commit secrets. Use Cursor Secrets, D: `.env.local`, or Cloudflare dashboa
 - Canonical PC root is **`D:\medscope.local`** (data `D:\medscope.data`, logs `D:\medscope.logs`).
 - Cloud agents cannot write the Windows D: drive. To refresh the PC from GitHub after cloud work:
   `pnpm pull:d` (or `powershell -File .\scripts\pull-cloud-to-d.ps1`) inside `D:\medscope.local`.
+- **One-shot secrets + deploy on the PC** (see `docs/deploy/RESTORE_FROM_D.md`):
+  `cd D:\medscope.local; git pull origin main; pnpm auto:d`
+  (find → restore from D:/backups → `cf:env:sync` → gh secrets → backup → `db:verify` → `cf:deploy`)
+- Cloud VMs: `pnpm find:d:cloud` probes mounts + local `.env` copies (names only; D: almost never present).
 - **Secrets + backup on the PC** (see `docs/deploy/RESTORE_FROM_D.md`):
   - `pnpm restore:d` — select keys from D: `.env.local` → workspace, `cf:env:sync`, optional GH secrets, checklist
   - `pnpm backup:d` — dated backup under `D:\medscope.data\backups\YYYY-MM-DD\` (git bundle + `.env.local` + manifest)

@@ -16,9 +16,30 @@ Never commit `.env.local` or `.env.cloudflare.json`.
 
 ---
 
-## Quick one-shot (recommended)
+## Quick one-shot (recommended) — fully automatic
 
-After `git pull` on the PC:
+After any cloud agent says “run on D:”, paste this on the PC:
+
+```powershell
+cd D:\medscope.local
+git pull origin main
+pnpm auto:d
+```
+
+`pnpm auto:d` (`scripts/auto-restore-from-d.ps1`) does everything in order:
+
+1. `git pull origin main` (best-effort)
+2. `pnpm find:d` — inventory all env files on D: (key **names** only)
+3. Auto-recover `.env.local` from newest `D:\medscope.data\backups\*\.env.local` if missing/incomplete
+4. Merge Stripe webhook from `D:\medscope.data\secrets\stripe-webhook-secret.txt` when present
+5. `pnpm restore:d -ForceKeys` → `.env.local` → `cf:env:sync` → `gh secret set`
+6. `pnpm backup:d` → `D:\medscope.data\backups\<today>\`
+7. `pnpm db:verify`
+8. `pnpm deploy:production -- -SkipRestore` (`cf:deploy` + smokes)
+
+Skip deploy: `pnpm auto:d -- -SkipDeploy`
+
+### Manual step-by-step (same outcome)
 
 ```powershell
 cd D:\medscope.local
@@ -30,20 +51,11 @@ pnpm deploy:production -- -SkipRestore
 # pnpm sync:d -- -IncludeZip
 ```
 
-**Canonical operator flow** (copy/paste block at end of this doc):
-
-`git pull main` → `sync:d` → `db:verify` → `deploy:production -SkipRestore` (runs `cf:deploy` + `smoke:production` + `smoke:ecosystem:production`)
-
-This runs:
-
-1. `pnpm restore:d` — merge selected keys → `.env.local` → `pnpm cf:env:sync` → optional `gh secret set` → `pnpm deploy:checklist`
-2. `pnpm backup:d` — git bundle + `.env.local` (sensitive) + docs + `BACKUP_MANIFEST.txt` under `D:\medscope.data\backups\<today>\`
-3. `pnpm db:verify` — Supabase schema (MediFlow, editorial queue, image suggestions)
-4. `pnpm deploy:production -- -SkipRestore` — `cf:deploy` + post-deploy smokes
-
 | Command | Script |
 |---------|--------|
+| `pnpm auto:d` | `scripts/auto-restore-from-d.ps1` — **full auto** find → restore → backup → verify → deploy |
 | `pnpm find:d` | `scripts/find-d-drive.ps1` — list all env files on D: (key names only) |
+| `pnpm find:d:cloud` | `scripts/find-d-drive.mjs` — Linux/cloud probe (mounts + local copies; names only) |
 | `pnpm restore:d` | `scripts/restore-from-d.ps1` |
 | `pnpm backup:d` | `scripts/backup-to-d.ps1` |
 | `pnpm sync:d` | `scripts/sync-d-and-backup.ps1` |
@@ -55,6 +67,19 @@ This runs:
 | `pnpm images:backfill` | Editorial cover image suggestions |
 
 Cloud agents implement/update these scripts in git; **you** must execute them on D:.
+
+### Cloud agent probe (no D: mount)
+
+On a Linux cloud VM:
+
+```bash
+export MEDSCOPE_PROJECT_ROOT=/workspace
+pnpm find:d:cloud
+```
+
+Expected: D: **not** mounted; public Supabase keys may already be in `.env.local`;
+`CLOUDFLARE_*` / `STRIPE_*` / `SUPABASE_SERVICE_ROLE_KEY` still missing until PC `pnpm auto:d`
+or Cursor Secrets are filled.
 
 ---
 
@@ -266,13 +291,21 @@ curl -sL https://medscopeglobal.com/cs | rg -i 'VitaScope'
 
 Run in **PowerShell** on the PC. Cloud agents cannot access D:.
 
+**Preferred one-liner (auto find + restore + backup + verify + deploy):**
+
+```powershell
+cd D:\medscope.local; git pull origin main; pnpm auto:d
+```
+
+**Expanded (same as `auto:d`, for debugging):**
+
 ```powershell
 cd D:\medscope.local
 git fetch origin
 git checkout main
 git pull origin main
 
-# 1) Restore secrets + dated backup (D:\medscope.data\backups\2026-08-26\)
+# 1) Restore secrets + dated backup (D:\medscope.data\backups\<today>\)
 pnpm sync:d
 # pnpm sync:d -- -IncludeZip   # optional full source zip
 
@@ -290,9 +323,10 @@ pnpm images:backfill
 
 # 5) Confirm live site
 curl.exe -sL https://medscopeglobal.com/cs | Select-String -Pattern 'VitaScope|MediFlow'
+curl.exe -sI https://medscopeglobal.com/assets/marketing/mediflow.webp
 ```
 
-**One-liner shortcut** (restore + deploy + smokes, no dated backup):
+**Minimal deploy-only** (when `.env.local` already complete):
 
 ```powershell
 cd D:\medscope.local; git pull origin main; pnpm deploy:production

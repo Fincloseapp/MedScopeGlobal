@@ -246,14 +246,13 @@ if ($backupEnvHits.Count -eq 0) {
 
 Write-Step "Recommended next steps"
 Write-Host @"
-1. Primary restore:  cd D:\medscope.local && pnpm restore:d
-2. If .env.local missing, copy from newest backup above, then restore:d
-3. Full PC flow:
+1. Fully automatic (preferred):
+     cd D:\medscope.local
      git pull origin main
-     pnpm sync:d
-     pnpm db:verify
-     pnpm deploy:production -- -SkipRestore
-4. Push secrets to GitHub / Cursor — see docs/deploy/RESTORE_FROM_D.md §4–5
+     pnpm auto:d
+2. Or step-by-step:  pnpm restore:d  →  pnpm sync:d  →  pnpm deploy:production -- -SkipRestore
+3. If .env.local missing, auto:d copies newest backup under D:\medscope.data\backups\
+4. Push secrets to Cursor Secrets — see docs/deploy/RESTORE_FROM_D.md §5
 5. Migrations pending? pnpm db:trigger-ecosystem-cron && pnpm db:verify
 6. Editorial images: pnpm images:backfill
 "@
