@@ -161,38 +161,85 @@ export function getLekariNavStripCopy(): ConversionCopy {
   };
 }
 
+/** MediFlow surfaces — never push MeDipacient 99 Kč here */
+export function getMediFlowNavStripCopy(): ConversionCopy {
+  return {
+    slot: "nav_strip",
+    eyebrow: "MediFlow",
+    headline: "Wellness deník zdarma",
+    body: "Symptomy, suplementy a články z VitaScope. VIP Longevity sync (protokoly) je oddělený plán — ne Student LF.",
+    ctaLabel: "Otevřít MediFlow",
+    ctaHref: "/app/mediflow",
+    hint: "Zdarma · VIP sync volitelně",
+  };
+}
+
+export function getVipNavStripCopy(): ConversionCopy {
+  return {
+    slot: "nav_strip",
+    eyebrow: "VIP Longevity",
+    headline: "10 protokolů · 14 dní zdarma",
+    body: "Spánek, metabolismus, pohyb. Pak 149 Kč/měsíc — odděleně od Student LF (Academy) a MeDipacient.",
+    ctaLabel: "Začít zkušební VIP",
+    ctaHref: "/predplatne?trial=1&plan=vip",
+    hint: "14 dní na vyzkoušení",
+  };
+}
+
+/** Strip `/cs`, `/en`, … so audience path checks work with locale-prefixed URLs. */
+function stripLocalePrefix(pathname: string): string {
+  const stripped = pathname.replace(/^\/[a-z]{2}(?:-[a-zA-Z]+)?(?=\/|$)/, "");
+  return stripped || "/";
+}
+
 export function isStudentAudiencePath(pathname: string | null | undefined): boolean {
   if (!pathname) return false;
+  const p = stripLocalePrefix(pathname);
   return (
-    pathname === "/studenti" ||
-    pathname.startsWith("/studenti/") ||
-    pathname.startsWith("/academy/") ||
-    pathname.startsWith("/studium/") ||
-    pathname.startsWith("/medicina/") ||
-    pathname.startsWith("/mediprep") ||
-    pathname.startsWith("/app/priprava") ||
-    pathname.startsWith("/ai-asistent/student")
+    p === "/studenti" ||
+    p.startsWith("/studenti/") ||
+    p.startsWith("/academy/") ||
+    p.startsWith("/studium/") ||
+    p.startsWith("/medicina/") ||
+    p.startsWith("/mediprep") ||
+    p.startsWith("/app/priprava") ||
+    p.startsWith("/ai-asistent/student")
   );
 }
 
 export function isPublicAudiencePath(pathname: string | null | undefined): boolean {
   if (!pathname) return false;
+  const p = stripLocalePrefix(pathname);
   return (
-    pathname === "/verejnost" ||
-    pathname.startsWith("/verejnost/") ||
-    pathname.startsWith("/medipacient") ||
-    pathname.startsWith("/app/pacient")
+    p === "/verejnost" ||
+    p.startsWith("/verejnost/") ||
+    p.startsWith("/medipacient") ||
+    p.startsWith("/app/pacient")
   );
 }
 
 export function isPhysicianAudiencePath(pathname: string | null | undefined): boolean {
   if (!pathname) return false;
+  const p = stripLocalePrefix(pathname);
   return (
-    pathname === "/lekari" ||
-    pathname.startsWith("/lekari/") ||
-    pathname.startsWith("/odborna") ||
-    pathname.startsWith("/app/dokumentace")
+    p === "/lekari" ||
+    p.startsWith("/lekari/") ||
+    p.startsWith("/odborna") ||
+    p.startsWith("/app/dokumentace") ||
+    p.startsWith("/ordizaznam")
   );
+}
+
+export function isMediFlowAudiencePath(pathname: string | null | undefined): boolean {
+  if (!pathname) return false;
+  const p = stripLocalePrefix(pathname);
+  return p === "/mediflow" || p.startsWith("/mediflow/") || p.startsWith("/app/mediflow");
+}
+
+export function isVipAudiencePath(pathname: string | null | undefined): boolean {
+  if (!pathname) return false;
+  const p = stripLocalePrefix(pathname);
+  return p === "/vip" || p.startsWith("/vip/");
 }
 
 export function daySeed(): number {

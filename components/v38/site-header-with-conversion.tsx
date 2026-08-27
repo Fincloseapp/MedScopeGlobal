@@ -13,9 +13,13 @@ import {
   getStudentiNavStripCopy,
   getVerejnostNavStripCopy,
   getLekariNavStripCopy,
+  getMediFlowNavStripCopy,
+  getVipNavStripCopy,
   isStudentAudiencePath,
   isPublicAudiencePath,
   isPhysicianAudiencePath,
+  isMediFlowAudiencePath,
+  isVipAudiencePath,
 } from "@/lib/v38/conversion-copy";
 
 type ReaderPayload = {
@@ -50,6 +54,8 @@ export function SiteHeaderWithConversion({
   const studentPath = isStudentAudiencePath(pathname);
   const publicPath = isPublicAudiencePath(pathname);
   const physicianPath = isPhysicianAudiencePath(pathname);
+  const mediflowPath = isMediFlowAudiencePath(pathname);
+  const vipPath = isVipAudiencePath(pathname);
   /** Homepage hero owns first viewport — hide competing conversion strip */
   const isMagazineHome = useMemo(() => {
     if (!pathname) return false;
@@ -62,11 +68,13 @@ export function SiteHeaderWithConversion({
     );
   }, [pathname]);
   const audienceStrip = useMemo(() => {
+    if (mediflowPath) return { ...getMediFlowNavStripCopy(), generatedBy: "static" as const };
+    if (vipPath) return { ...getVipNavStripCopy(), generatedBy: "static" as const };
     if (studentPath) return { ...getStudentiNavStripCopy(daySeed()), generatedBy: "static" as const };
     if (publicPath) return { ...getVerejnostNavStripCopy(), generatedBy: "static" as const };
     if (physicianPath) return { ...getLekariNavStripCopy(), generatedBy: "static" as const };
     return null;
-  }, [studentPath, publicPath, physicianPath]);
+  }, [studentPath, publicPath, physicianPath, mediflowPath, vipPath]);
 
   const [reader, setReader] = useState<ReaderPayload>(DEFAULT_READER);
   const [stripCopy, setStripCopy] = useState<StoredNudge>(
@@ -113,7 +121,15 @@ export function SiteHeaderWithConversion({
         <SubscriptionNudgeStrip
           copy={effectiveStrip}
           ctaDataAttr={
-            studentPath ? "nav-strip-student-trial" : publicPath ? "nav-strip-public-app" : "nav-strip-trial"
+            mediflowPath
+              ? "nav-strip-mediflow"
+              : vipPath
+                ? "nav-strip-vip"
+                : studentPath
+                  ? "nav-strip-student-trial"
+                  : publicPath
+                    ? "nav-strip-public-app"
+                    : "nav-strip-trial"
           }
         />
       ) : null}
