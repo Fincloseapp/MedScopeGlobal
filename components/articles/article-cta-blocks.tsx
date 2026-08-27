@@ -8,40 +8,38 @@ type Props = {
 
 const blocks = [
   {
-    label: "Vyzkoušej AI simulaci",
+    label: "AI simulace",
     href: "/academy/ai-simulations",
     icon: FlaskConical,
   },
   {
-    label: "Otestuj se z tohoto tématu",
+    label: "Otestovat téma",
     href: (slug: string) => `/academy/tests?topic=${encodeURIComponent(slug)}`,
     icon: BookOpen,
   },
   {
-    label: "Stáhni PDF shrnutí",
-    href: (slug: string) => `/academy/courses?summary=${encodeURIComponent(slug)}`,
+    label: "PDF shrnutí",
+    href: (slug: string) =>
+      `/academy/courses?summary=${encodeURIComponent(slug)}`,
     icon: Download,
   },
   {
-    label: "Přidej se do Academy",
+    label: "Academy",
     href: "/academy",
     icon: GraduationCap,
   },
 ] as const;
 
-export function ArticleCtaBlocks({ articleSlug, articleTitle }: Props) {
+export function ArticleCtaBlocks({ articleSlug }: Props) {
   return (
-    <section
-      className="not-prose my-10 rounded-2xl border border-[#cfe1f3] bg-gradient-to-br from-[#f0f7ff] to-white p-6 shadow-sm"
-      aria-label="Akce z článku"
-    >
-      <p className="text-sm font-semibold uppercase tracking-wide text-[#005B96]">
+    <section className="not-prose my-10 border-t border-slate-200 pt-8" aria-label="Academy">
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#005B96]">
         MedScope Academy
       </p>
-      <h2 className="mt-1 font-display text-xl font-semibold text-medical-navy">
-        Pokračuj ve studiu: {articleTitle}
-      </h2>
-      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+      <p className="mt-1 text-sm text-slate-600">
+        Pokračovat ve studiu k tomuto tématu
+      </p>
+      <div className="mt-4 flex flex-wrap gap-2">
         {blocks.map((block) => {
           const Icon = block.icon;
           const href =
@@ -50,9 +48,9 @@ export function ArticleCtaBlocks({ articleSlug, articleTitle }: Props) {
             <Link
               key={block.label}
               href={href}
-              className="flex items-center gap-3 rounded-xl border border-[#b8d4ef] bg-white px-4 py-3 text-sm font-medium text-[#005B96] transition hover:border-[#005B96] hover:bg-[#e8f4fc]"
+              className="inline-flex items-center gap-2 border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-[#021d33] transition hover:border-[#005B96] hover:text-[#005B96]"
             >
-              <Icon className="h-4 w-4 shrink-0" />
+              <Icon className="h-3.5 w-3.5 shrink-0" />
               {block.label}
             </Link>
           );
