@@ -21,11 +21,17 @@ export function AuthorDonationButton({
   locale = "cs",
 }: Props) {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [unavailable, setUnavailable] = useState(false);
   const [customAmount, setCustomAmount] = useState("");
   const tiers = DONATION_TIERS[locale] ?? DONATION_TIERS.cs;
+  const zeroDecimal =
+    locale === "ja" || locale === "ko" || locale === "vi" || locale === "id" || locale === "hu";
 
   const donate = async (amountMinor: number) => {
+    if (!amountMinor || amountMinor < 1) return;
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/ecosystem/donate", {
         method: "POST",
@@ -37,19 +43,43 @@ export function AuthorDonationButton({
           articleTitle,
         }),
       });
-      const data = (await res.json()) as { url?: string };
-      if (data.url) window.location.href = data.url;
+      const data = (await res.json()) as { url?: string; error?: string; enabled?: boolean };
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      if (res.status === 503 && data.enabled === false) {
+        setUnavailable(true);
+        return;
+      }
+      setError(data.error ?? "Platbu se nepodařilo spustit. Zkuste to prosím znovu.");
+    } catch {
+      setError("Síťová chyba — zkontrolujte připojení a zkuste znovu.");
     } finally {
       setLoading(false);
     }
   };
+
+  const submitCustom = () => {
+    const parsed = parseFloat(customAmount);
+    if (Number.isNaN(parsed) || parsed <= 0) return;
+    donate(zeroDecimal ? Math.round(parsed) : Math.round(parsed * 100));
+  };
+
+  if (unavailable) {
+    return (
+      <div className="my-6 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
+        Dary momentálně nejsou k dispozici — platební brána není nakonfigurována.
+      </div>
+    );
+  }
 
   return (
     <div className="my-6 rounded-2xl border border-rose-200 bg-gradient-to-br from-rose-50 to-pink-50 p-5">
       <div className="flex items-center gap-2">
         <Heart className="h-5 w-5 text-rose-500" />
         <p className="font-semibold text-[#021d33]">
-          Podpořit {authorName ? `autora (${authorName})` : "autora"}
+          Podpořit {authorName ? `autora (${authorName})` : "autora"} · Dar
         </p>
       </div>
       <p className="mt-1 text-sm text-slate-600">
@@ -78,13 +108,19 @@ export function AuthorDonationButton({
           <button
             type="button"
             disabled={loading || !customAmount}
-            onClick={() => donate(Math.round(parseFloat(customAmount) * 100))}
+            onClick={submitCustom}
             className="rounded-full bg-rose-500 px-3 py-1.5 text-sm font-semibold text-white hover:bg-rose-600 disabled:opacity-50"
           >
             {tiers.symbol}
           </button>
         </div>
       </div>
+      {error ? (
+        <p className="mt-3 text-sm font-medium text-rose-700" role="alert">
+          {error}
+        </p>
+      ) : null}
+      {loading ? <p className="mt-2 text-xs text-slate-500">Přesměrování na Stripe Checkout…</p> : null}
     </div>
   );
 }
