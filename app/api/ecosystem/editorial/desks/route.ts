@@ -32,6 +32,7 @@ export async function GET(request: Request) {
     syndicationRules: SYNDICATION_RULES.filter(
       (r) => r.sourceLocale === locale || r.targetLocales.includes(locale)
     ),
+    desksTotal: EDITORIAL_DESKS.length,
     allDesks: EDITORIAL_DESKS.map((d) => ({
       id: d.id,
       locale: d.locale,
