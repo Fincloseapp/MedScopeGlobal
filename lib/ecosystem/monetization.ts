@@ -57,7 +57,7 @@ export const DONATION_TIERS: Record<GlobalLocaleCode, { amounts: number[]; curre
 
 /** VIP pricing by locale */
 export const VIP_PRICING: Record<GlobalLocaleCode, { monthly: number; currency: string; symbol: string; label: string }> = {
-  cs: { monthly: 14900, currency: "czk", symbol: "Kč", label: "149 Kč/měsíc" },
+  cs: { monthly: 14900, currency: "czk", symbol: "Kč", label: "149 Kč/měsíc (VIP Longevity)" },
   sk: { monthly: 599, currency: "eur", symbol: "€", label: "5,99 €/mesiac" },
   pl: { monthly: 2900, currency: "pln", symbol: "zł", label: "29 zł/miesiąc" },
   de: { monthly: 599, currency: "eur", symbol: "€", label: "5,99 €/Monat" },

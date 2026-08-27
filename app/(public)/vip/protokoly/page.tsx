@@ -17,21 +17,26 @@ export default function VipProtocolsPage() {
   const pricing = VIP_PRICING.cs;
   return (
     <div className="bg-[#0c0a08] text-white">
-      {/* Full-bleed VIP hero — soft dawn gradients, no checkerboard texture */}
+      {/* Full-bleed VIP hero — brand first, no badge clutter */}
       <section className="relative isolate min-h-[min(88vh,820px)] overflow-hidden">
         <div
-          className="mkt-drift absolute inset-0 bg-[radial-gradient(ellipse_at_25%_15%,rgba(245,158,11,0.32),transparent_50%),radial-gradient(ellipse_at_85%_70%,rgba(14,116,144,0.22),transparent_45%),linear-gradient(165deg,#0a0908_0%,#1c140c_42%,#0c1520_100%)]"
+          className="mkt-drift absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(245,158,11,0.28),transparent_45%),radial-gradient(ellipse_at_90%_80%,rgba(120,53,15,0.35),transparent_40%),linear-gradient(160deg,#0c0a08_0%,#1a140c_50%,#0f1a22_100%)]"
           aria-hidden
         />
+        {/* Soft amber glow — not a transparency checkerboard */}
         <div
-          className="pointer-events-none absolute -right-16 top-10 h-[70%] w-[55%] rounded-full bg-[radial-gradient(circle,rgba(245,200,75,0.18),transparent_68%)] blur-2xl"
+          className="pointer-events-none absolute inset-0 opacity-40"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 55% at 20% 30%, rgba(245,158,11,0.22), transparent 60%), radial-gradient(ellipse 50% 40% at 85% 70%, rgba(180,83,9,0.18), transparent 55%)",
+          }}
           aria-hidden
         />
 
         <div className="relative mx-auto flex min-h-[min(88vh,820px)] max-w-6xl flex-col justify-end px-4 pb-16 pt-28 sm:px-6 sm:pb-20 lg:justify-center">
           <div className="max-w-2xl">
             <p className="mkt-rise text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-300/90">
-              MedScopeGlobal VIP · longevity
+              MedScopeGlobal VIP Longevity
             </p>
             <h1 className="mkt-rise-delay-1 mt-3 font-display text-[clamp(2.75rem,8vw,5.25rem)] font-bold leading-[0.95] tracking-tight">
               Longevity
@@ -42,13 +47,12 @@ export default function VipProtocolsPage() {
               Deset vědecky podložených plánů — spánek, metabolismus, imunita. Denní rytmus, suplementy
               a lab testy, napojené na MediFlow.
             </p>
-            <p className="mkt-rise-delay-2 mt-3 max-w-lg text-sm text-amber-100/55">
-              Samostatný produkt VIP protokoly ({pricing.label}) — odlišný od Student LF (Academy 149 Kč)
-              i od MediFlow sync. 14 dní zdarma na /predplatne.
+            <p className="mkt-rise-delay-2 mt-3 text-sm text-amber-100/65">
+              Odděleně od Student LF (Academy) a tarifu Veřejnost (MeDipacient).
             </p>
             <div className="mkt-rise-delay-2 mt-9 flex flex-wrap items-center gap-5">
               <Link
-                href="/predplatne"
+                href="/predplatne?trial=1&plan=vip"
                 className="inline-flex items-center gap-2 bg-[#f5c84b] px-7 py-3.5 text-sm font-semibold text-[#1a1005] shadow-[0_0_40px_rgba(245,200,75,0.35)] transition hover:bg-[#ffd666]"
               >
                 14 dní zdarma · pak {pricing.label}
@@ -103,15 +107,15 @@ export default function VipProtocolsPage() {
 
       <section className="px-4 py-14 sm:px-6">
         <div className="mx-auto max-w-5xl text-center">
-          <h2 className="font-display text-2xl font-bold">VIP od {pricing.label}</h2>
+          <h2 className="font-display text-2xl font-bold">VIP Longevity · {pricing.label}</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-white/55">
-            Všechny protokoly, export PDF, MediFlow sync, bez reklam.
+            Všechny protokoly, export PDF, MediFlow sync. Ne Student LF ani MeDipacient Veřejnost.
           </p>
           <Link
-            href="/predplatne"
+            href="/predplatne?trial=1&plan=vip"
             className="mt-7 inline-flex items-center gap-2 bg-amber-400 px-7 py-3.5 text-sm font-semibold text-[#1a1005] transition hover:bg-amber-300"
           >
-            Aktivovat VIP
+            Začít 14 dní zdarma
             <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
           <p className="mx-auto mt-10 flex max-w-2xl items-start gap-2 text-left text-xs text-white/40">

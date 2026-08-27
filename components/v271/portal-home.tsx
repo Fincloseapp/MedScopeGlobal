@@ -20,7 +20,7 @@ import { AppOpenLink } from "@/components/apps/app-origin-bar";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { ArrowRight } from "lucide-react";
 
-/** Marketing display names — keep OrdiZapis consistent across hero/cards/nav */
+/** Marketing display names — keep OrdiZapis consistent with product/nav */
 const APP_MARKETING_NAME: Record<string, string> = {
   mediflow: "MediFlow",
   medipacient: "MeDipacient",
@@ -324,10 +324,10 @@ export function PortalHome({
           <div className="portal-reveal mx-auto max-w-2xl text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">Platforma</p>
             <h2 id="portal-apps-heading" className="mt-2 font-display text-3xl font-semibold text-[#021d33] sm:text-4xl">
-              MediFlow · OrdiZáznam · VIP
+              MediFlow · MeDipacient · OrdiZapis
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-slate-600 sm:text-base">
-              Denní wellness, zápisy pro ordinaci a longevity protokoly — na jedné platformě MedScopeGlobal.
+              Denní wellness, lékařské zprávy a zápisy pro ordinaci — VIP longevity odděleně.
             </p>
           </div>
           <div className="mt-10">
