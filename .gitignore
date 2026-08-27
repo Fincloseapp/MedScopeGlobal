@@ -50,6 +50,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# agent / tool caches
+.cache/
+.config/
+~/
+
 # OpenNext / Cloudflare
 .open-next/
 .dev.vars

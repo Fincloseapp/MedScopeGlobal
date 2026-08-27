@@ -4,7 +4,7 @@
  *
  * Cache-bust query (`MARKETING_ASSET_V`) so production CDNs pick up replacements.
  */
-export const MARKETING_ASSET_V = "fix-images-20260827";
+export const MARKETING_ASSET_V = "fix-images-thorough-20260827b";
 
 export const MARKETING_VISUALS = {
   aiAssistant: "/assets/ai/assistant-brunette.webp",

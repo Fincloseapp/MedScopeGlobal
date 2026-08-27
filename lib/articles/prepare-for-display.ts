@@ -16,6 +16,7 @@ import {
   type EditorialAssignment,
   type EditorialLocale,
 } from "@/lib/editorial/units";
+import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
 
 export type DisplayArticle = ArticleWithRelations & {
   displayLocale?: string;
@@ -27,6 +28,23 @@ export type DisplayArticle = ArticleWithRelations & {
   editorialPrimaryLabel?: string;
 };
 
+function withResolvedCover(
+  article: ArticleWithRelations,
+  extra?: Partial<DisplayArticle>
+): Partial<DisplayArticle> {
+  const title = extra?.title ?? article.title;
+  const resolved = resolveArticleCoverUrl({
+    title,
+    slug: article.slug,
+    excerpt: extra?.excerpt ?? article.excerpt,
+    category: article.categories?.name,
+    publicTopic: article.public_topic,
+    coverImageUrl: article.cover_image_url,
+    preferCurated: true,
+  });
+  return { cover_image_url: resolved };
+}
+
 function attachEditorialDisplay(
   article: ArticleWithRelations,
   locale: LocaleCode,
@@ -34,9 +52,11 @@ function attachEditorialDisplay(
 ): DisplayArticle {
   const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
   const assignment = assignEditorialUnits(article ?? {});
+  const coverFields = withResolvedCover(article, extra);
   return {
     ...article,
     ...extra,
+    ...coverFields,
     editorialAssignment: assignment,
     editorialPrimaryLabel: formatEditorialUnitDisplay(
       assignment.primary,

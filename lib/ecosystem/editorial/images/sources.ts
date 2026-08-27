@@ -1,96 +1,102 @@
-/** Safe image sources — curated assets, Unsplash (optional), placeholders */
+/** Safe image sources — curated local assets + optional Unsplash search */
 
 import type { EditorialTopic } from "../desks";
 import type { ArticleImageCandidate, ImageSourceType, ArticleForImageMatch } from "./types";
 import { buildAltText } from "./prompts";
 
-const UNSPLASH_BASE = "https://images.unsplash.com";
-
-/** Curated, royalty-free health imagery — diverse, non-political, globally acceptable */
+/** Curated first-party covers — never depend on remote Unsplash for production display. */
 export const CURATED_ASSET_POOL: Record<
   EditorialTopic,
   Array<{ url: string; keywords: string[]; sourceType?: ImageSourceType }>
 > = {
   longevity: [
     {
-      url: `${UNSPLASH_BASE}/photo-1571019614242-c5c5dee9f50b?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
+      url: "/assets/covers/movement.webp",
       keywords: ["exercise", "fitness", "movement", "active", "pohyb", "cvičení"],
     },
     {
-      url: `${UNSPLASH_BASE}/photo-1498837167922-ddd27525d352?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
+      url: "/assets/covers/produce.webp",
       keywords: ["nutrition", "vegetables", "food", "strava", "výživa"],
     },
     {
-      url: `${UNSPLASH_BASE}/photo-1544367567-0f2fcb009e0b?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
+      url: "/assets/covers/calm.webp",
       keywords: ["yoga", "mindfulness", "relax", "wellness", "klid"],
     },
     {
-      url: `${UNSPLASH_BASE}/photo-1559757148-5c350d0d3c56?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
+      url: "/assets/covers/vitals.webp",
       keywords: ["medical", "health", "care", "prevention", "prevence"],
     },
   ],
   lifestyle: [
     {
-      url: `${UNSPLASH_BASE}/photo-1512621776951-a57141f2eefd?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
+      url: "/assets/covers/food.webp",
       keywords: ["salad", "healthy eating", "meal", "jídlo", "strava"],
     },
     {
-      url: `${UNSPLASH_BASE}/photo-1476480862126-209bfaa8edc8?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
+      url: "/assets/covers/walk.webp",
       keywords: ["walking", "nature", "outdoor", "chůze", "příroda"],
     },
     {
-      url: `${UNSPLASH_BASE}/photo-1573164713714-d95e436ab8d6?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
+      url: "/assets/covers/tech.webp",
       keywords: ["digital health", "technology", "app", "wellness"],
     },
     {
-      url: `${UNSPLASH_BASE}/photo-1506126613408-eca07ce68773?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
+      url: "/assets/covers/calm-2.webp",
       keywords: ["meditation", "balance", "calm", "mindfulness"],
+    },
+    {
+      url: "/assets/covers/food-2.webp",
+      keywords: ["meal", "diet", "strava", "jídlo", "talíř"],
+    },
+    {
+      url: "/assets/covers/sleep.webp",
+      keywords: ["sleep", "rest", "spánek", "odpočinek"],
     },
   ],
   seniors: [
     {
-      url: `${UNSPLASH_BASE}/photo-1581579438749-86c8e8f9f9d0?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
+      url: "/assets/covers/seniors.webp",
       keywords: ["senior", "elderly", "couple", "active", "senioři"],
     },
     {
-      url: `${UNSPLASH_BASE}/photo-1576765608535-5e04c5a8f0c0?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
-      keywords: ["care", "support", "community", "peče", "komunita"],
+      url: "/assets/covers/walk.webp",
+      keywords: ["care", "support", "community", "péče", "komunita"],
     },
     {
-      url: `${UNSPLASH_BASE}/photo-1576091160399-112ba8d25d1d?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
+      url: "/assets/covers/research.webp",
       keywords: ["doctor", "consultation", "health", "lékař", "preventivní"],
     },
     {
-      url: `${UNSPLASH_BASE}/photo-1559757175-5700cde872bc?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
+      url: "/assets/covers/clinical.webp",
       keywords: ["heart", "cardio", "monitoring", "srdce", "vitality"],
     },
   ],
   trending: [
     {
-      url: `${UNSPLASH_BASE}/photo-1576091160550-2173dba999ef?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
+      url: "/assets/covers/research.webp",
       keywords: ["research", "science", "study", "výzkum", "studie"],
     },
     {
-      url: `${UNSPLASH_BASE}/photo-1584515930387-285e4804f4cb?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
+      url: "/assets/covers/clinical.webp",
       keywords: ["medicine", "clinical", "healthcare", "medicína"],
     },
     {
-      url: `${UNSPLASH_BASE}/photo-1530026405186-ed1f139313f8?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
+      url: "/assets/covers/research-2.webp",
       keywords: ["hospital", "care", "public health", "zdravotnictví"],
     },
     {
-      url: `${UNSPLASH_BASE}/photo-1635070041078-e363dbe005cb?w=1200&h=675&fit=crop&q=85&auto=format&fm=webp`,
+      url: "/assets/covers/science.webp",
       keywords: ["biology", "microscope", "science", "věda"],
     },
   ],
 };
 
-/** Local static fallbacks when remote URLs unavailable */
+/** Local static fallbacks when remote URLs unavailable — raster covers, not affiliate SVG. */
 export const LOCAL_PLACEHOLDER_ASSETS: Record<EditorialTopic, string> = {
-  longevity: "/assets/affiliate/magnesium.svg",
-  lifestyle: "/assets/affiliate/sleep-tracker.svg",
-  seniors: "/assets/affiliate/omega-test.svg",
-  trending: "/assets/affiliate/magnesium.svg",
+  longevity: "/assets/covers/movement.webp",
+  lifestyle: "/assets/covers/food.webp",
+  seniors: "/assets/covers/seniors.webp",
+  trending: "/assets/covers/research.webp",
 };
 
 export function getPlaceholderFallback(topic: EditorialTopic): string {
