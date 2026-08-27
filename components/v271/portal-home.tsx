@@ -284,9 +284,9 @@ export function PortalHome({
       <section aria-labelledby="portal-magazine-heading" className="bg-[#f3f7fb]">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
           <div className="portal-reveal max-w-2xl">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">Magazín</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">Zpravodajství</p>
             <h2 id="portal-magazine-heading" className="mt-2 font-display text-3xl font-semibold text-[#021d33] sm:text-4xl">
-              {brand} — zpravodajství
+              {brand} — Magazín
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-slate-600 sm:text-base">
               Dlouhověkost, životní styl a evidence — srozumitelně, bez senzací.

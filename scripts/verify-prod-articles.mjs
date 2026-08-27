@@ -33,7 +33,11 @@ async function main() {
 
   const home = await get("/");
   check("home_ok", home.status === 200 && !home.body.includes("Application error"));
-  check("home_portal", home.body.includes("Zpravodajství"));
+  // Portal magazine desk uses Czech "Zpravodajství" (eyebrow) + Magazín heading.
+  check(
+    "home_portal",
+    home.body.includes("Zpravodajství") || home.body.includes("Magazín")
+  );
   check("home_articles", countVerejnost(home.body) >= 6, `slugs=${countVerejnost(home.body)}`);
   check("home_env_bridge", home.body.includes("__MEDSCOPE_PUBLIC__") || origin.includes("localhost"));
 

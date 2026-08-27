@@ -3,7 +3,6 @@ import { HomepageAds } from "@/components/home/homepage-ads";
 import { V272AcademyHomeSections } from "@/components/v271/academy-home-sections";
 import {
   V271B2bBlock,
-  V272SubscriptionPlansBlock,
   V272WhyTrustBlock,
 } from "@/components/v271/homepage-sections";
 import { PortalHome } from "@/components/v271/portal-home";
@@ -81,11 +80,10 @@ export default async function HomePage() {
         />
       ))}
 
-      {/* Story: VitaScope hero → magazín → apps/VIP → CTA (PortalHome), then trust & plans */}
+      {/* Story: VitaScope hero → magazín → apps/VIP → CTA (PortalHome). Pricing lives on /predplatne — not duplicated under the portal. */}
       <PortalHome articles={articles} philosophy={philosophy} />
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
       <V272WhyTrustBlock />
-      <V272SubscriptionPlansBlock />
       <V272AcademyHomeSections />
       <V271B2bBlock />
 
