@@ -54,26 +54,59 @@ function resolveLocaleChain(locale: LocaleCode): string[] {
   return [...new Set(chain)];
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+/** Deep-merge dictionaries; earlier (more specific) locales win. */
+function mergeDictionaries(base: Dictionary, overlay: Dictionary): Dictionary {
+  const out: Dictionary = { ...base };
+  for (const [key, value] of Object.entries(overlay)) {
+    const existing = out[key];
+    if (isPlainObject(existing) && isPlainObject(value)) {
+      out[key] = mergeDictionaries(
+        existing as Dictionary,
+        value as Dictionary
+      ) as Dictionary[string];
+    } else {
+      out[key] = value;
+    }
+  }
+  return out;
+}
+
+async function loadLocaleFile(locale: string): Promise<Dictionary | null> {
+  try {
+    const mod = await import(`@/locales/${locale}/common.json`);
+    return mod.default as unknown as Dictionary;
+  } catch {
+    return null;
+  }
+}
+
 export async function getDictionary(locale: LocaleCode): Promise<Dictionary> {
   if (cache.has(locale)) {
     return cache.get(locale)!;
   }
 
-  for (const loadLocale of resolveLocaleChain(locale)) {
-    try {
-      const mod = await import(`@/locales/${loadLocale}/common.json`);
-      const dict = mod.default as unknown as Dictionary;
-      cache.set(locale, dict);
-      return dict;
-    } catch {
-      // try next fallback
+  // Load fallbacks first (cs → en → …), then overlay more specific locales
+  const chain = resolveLocaleChain(locale).reverse();
+  let merged: Dictionary = {};
+
+  for (const loadLocale of chain) {
+    const dict = await loadLocaleFile(loadLocale);
+    if (dict) {
+      merged = mergeDictionaries(merged, dict);
     }
   }
 
-  const mod = await import("@/locales/en/common.json");
-  const dict = mod.default as unknown as Dictionary;
-  cache.set(locale, dict);
-  return dict;
+  if (Object.keys(merged).length === 0) {
+    const fallback = await loadLocaleFile("en");
+    merged = fallback ?? {};
+  }
+
+  cache.set(locale, merged);
+  return merged;
 }
 
 export function t(

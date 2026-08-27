@@ -15,7 +15,12 @@ import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getHomepageCachedData } from "@/lib/v22/homepage-cache";
 import { getPortalPhilosophy } from "@/lib/v271/portal";
-import { getHomepageDescription, getHomepageTitle, MAGAZINE } from "@/lib/brand/magazine";
+import {
+  getHomepageDescription,
+  getHomepageTitle,
+  getOgLocale,
+  MAGAZINE,
+} from "@/lib/brand/magazine";
 import { SITE } from "@/lib/config/site";
 import { publicationJsonLd } from "@/lib/seo/json-ld";
 
@@ -35,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       url: canonical,
-      locale: locale.startsWith("en") ? "en_US" : "cs_CZ",
+      locale: getOgLocale(locale),
       siteName: `${MAGAZINE.name} · ${MAGAZINE.platform}`,
       type: "website",
     },
