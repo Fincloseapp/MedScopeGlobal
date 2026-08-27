@@ -7,7 +7,7 @@ import { VEREJNOST_HUB_TOPICS } from "@/lib/config/verejnost-topics";
 import { listPublicArticles } from "@/lib/queries/verejnost";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
-export const revalidate = 120;
+export const revalidate = 45;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildV20PageMetadata({

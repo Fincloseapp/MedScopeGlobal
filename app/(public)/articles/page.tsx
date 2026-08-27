@@ -9,7 +9,7 @@ import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { filterArticlesForDesk, mixListableFeed, type NewsDeskId } from "@/lib/v271/news-desks";
 import Link from "next/link";
 
-export const revalidate = 60;
+export const revalidate = 45;
 
 const DESK_IDS = new Set<NewsDeskId>(["novinky", "verejnost", "dlouhovekost", "clanky"]);
 
