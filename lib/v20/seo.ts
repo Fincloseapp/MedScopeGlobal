@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { SITE } from "@/lib/config/site";
 import { V20_UI_VERSION } from "@/lib/v20/version";
 import { buildPageMetadata } from "@/lib/seo/metadata";
-import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getOgLocale } from "@/lib/brand/magazine";
 import { localeToPathSegment } from "@/lib/i18n/locale-path";
 
@@ -32,6 +31,7 @@ export async function buildLocalizedV20PageMetadata(opts: {
   path?: string;
   locale?: string;
 }): Promise<Metadata> {
+  const { getServerLocale } = await import("@/lib/i18n/server-locale");
   const locale = opts.locale ?? (await getServerLocale());
   return buildV20PageMetadata({ ...opts, locale });
 }

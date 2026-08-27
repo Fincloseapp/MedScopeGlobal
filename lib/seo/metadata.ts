@@ -3,7 +3,6 @@ import { getOgLocale, MAGAZINE } from "@/lib/brand/magazine";
 import type { Metadata } from "next";
 import { GLOBAL_LOCALES } from "@/lib/ecosystem/locales";
 import { buildGlobalHreflang } from "@/lib/ecosystem/seo";
-import { getServerLocale } from "@/lib/i18n/server-locale";
 
 export const HREFLANG_LOCALES = GLOBAL_LOCALES.map((l) => ({
   code: l.code,
@@ -30,6 +29,7 @@ export function buildPageMetadata(params: {
 }): Metadata {
   const { canonical, languages } = buildHreflangAlternates(params.path, params.locale);
   const ogImage = params.image ?? `${SITE.url}/og-default.png`;
+  const ogLocale = getOgLocale(params.locale);
 
   return {
     title: params.title,
@@ -40,10 +40,8 @@ export function buildPageMetadata(params: {
       description: params.description,
       url: canonical,
       siteName: `${MAGAZINE.name} · ${SITE.name}`,
-      locale: getOgLocale(params.locale),
-      alternateLocale: OG_ALTERNATE_LOCALES.filter(
-        (alt) => alt !== getOgLocale(params.locale)
-      ),
+      locale: ogLocale,
+      alternateLocale: OG_ALTERNATE_LOCALES.filter((alt) => alt !== ogLocale),
       images: [{ url: ogImage, width: 1200, height: 630, alt: params.title }],
     },
     twitter: {
@@ -61,6 +59,8 @@ export async function buildLocalizedPageMetadata(
     locale?: string;
   }
 ): Promise<Metadata> {
+  // Dynamic import keeps next/headers out of static metadata consumers (e.g. root layout constants).
+  const { getServerLocale } = await import("@/lib/i18n/server-locale");
   const locale = params.locale ?? (await getServerLocale());
   return buildPageMetadata({ ...params, locale });
 }
