@@ -21,14 +21,19 @@ Veřejné API: `GET /api/ecosystem/editorial/desks?locale=cs`
 
 ## Persony a role
 
-Autonomní redakční persony mají čtyři role:
+Autonomní redakční persony mají čtyři role (+ image curator):
 
-| Role | Úloha |
-|------|-------|
-| **journalist** | Píše články podle tématu a locale |
-| **editor** | Reviduje obsah, schvaluje publikaci |
-| **language_reviewer** | Jazyková QA (gramatika, terminologie) |
-| **compliance_reviewer** | Lékařské disclaimery, guardrails pro health claims |
+| Role | Úloha | Počet |
+|------|-------|------:|
+| **journalist** | Píše články podle tématu a locale | 9 |
+| **editor** | Reviduje obsah, schvaluje publikaci | 3 |
+| **language_reviewer** | Jazyková QA (gramatika, terminologie) | 6 |
+| **compliance_reviewer** | Lékařské disclaimery, guardrails pro health claims | 3 |
+| **image_curator** | Hero imagery, alt text, compliance | 2 |
+
+**Celkem ecosystem personas: 23.** Denní produkční writers: **5** (`writer1`–`writer5` → `/api/cron/public-articles`).
+
+Plný roster + cron mapa: [`REDAKCE_ROSTER.md`](./REDAKCE_ROSTER.md).
 
 Konfigurace: `lib/ecosystem/editorial/personas.ts`
 
@@ -68,9 +73,12 @@ Dispatcher: `.github/workflows/cloudflare-cron.yml` (includes generate + syndica
 Endpoint: `POST /api/ecosystem/autonomous` (Bearer `CRON_SECRET`)  
 Obrázky: `POST /api/ecosystem/editorial/images` (Bearer `CRON_SECRET`)
 
-**Poznámka:** `generate-articles` / `syndicate-articles` zapisují do `editorial_queue`
-(a syndikace do `article_syndications`). Plné LLM psaní/adaptace zůstává na legacy
-public-articles / budoucím AI kroku — bez AI klíčů se nic nepřepisuje.
+**Poznámka:** `generate-articles` / `syndicate-articles` / `translate-content` /
+`seo-optimize` / monetizační tasky zapisují do `editorial_queue` (a syndikace do
+`article_syndications`) když je dostupný service role. Plné LLM psaní/adaptace
+zůstává na legacy public-articles / AI klíče — bez nich se nic nepřepisuje.
+Dispatcher (`.github/workflows/cloudflare-cron.yml`) volá crony metodou **GET**
+(výjimka: images = POST).
 
 ## Vizuální redakce (obrázky)
 
