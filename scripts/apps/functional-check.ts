@@ -15,7 +15,7 @@ import { buildPrepTest, getPrepDashboard } from "../../lib/mediprep/dashboard";
 import { bankStats } from "../../lib/prijimacky/question-bank";
 import { generateSelfTest } from "../../lib/prijimacky/quiz-from-bank";
 import { FACULTIES_ADMISSIONS_2026 } from "../../lib/prijimacky/faculties-admissions";
-import { getAffiliateRedirectDestination } from "../../lib/ecosystem/monetization";
+import { AFFILIATE_PRODUCTS, getAffiliateRedirectDestination } from "../../lib/ecosystem/monetization";
 import {
   inferArticleTopic,
   matchImageForArticleSync,
@@ -147,10 +147,22 @@ file("app/(public)/go/[slug]/route.ts");
 file("public/assets/affiliate/magnesium.svg");
 file("public/assets/affiliate/omega-test.svg");
 file("public/assets/affiliate/sleep-tracker.svg");
+file("public/assets/affiliate/vitamin-d.svg");
+file("public/assets/affiliate/creatine.svg");
+file("public/assets/affiliate/collagen.svg");
+file("public/assets/affiliate/nmn.svg");
+file("public/assets/affiliate/blood-panel.svg");
+file("public/assets/affiliate/bp-monitor.svg");
+file("components/monetization/affiliate-strip.tsx");
+file("docs/monetization/AFFILIATE_CATALOG.md");
 
 assert.equal(getAffiliateRedirectDestination("mg-cz")?.includes("heureka"), true);
 assert.equal(getAffiliateRedirectDestination("mg-us")?.includes("amazon.com"), true);
+assert.equal(getAffiliateRedirectDestination("mg-us")?.includes("tag="), true);
+assert.equal(getAffiliateRedirectDestination("d3k2-cz")?.includes("heureka"), true);
+assert.equal(getAffiliateRedirectDestination("creatine-us")?.includes("amazon.com"), true);
 assert.equal(getAffiliateRedirectDestination("unknown"), null);
+assert.ok(AFFILIATE_PRODUCTS.length >= 8);
 
 file("app/api/ecosystem/editorial/images/route.ts");
 file("lib/ecosystem/editorial/images/policy.ts");

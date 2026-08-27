@@ -67,8 +67,13 @@ export function LongevityProductsSection({ locale = "cs" }: { locale?: GlobalLoc
 /** Fallback: show all supplement + sleep products for longevity section */
 export function TopLongevityProducts({ locale = "cs" }: { locale?: GlobalLocaleCode }) {
   const products = AFFILIATE_PRODUCTS.filter(
-    (p) => p.category === "supplements" || p.category === "sleep" || p.category === "lab-tests"
-  );
+    (p) =>
+      p.category === "supplements" ||
+      p.category === "sleep" ||
+      p.category === "lab-tests" ||
+      p.category === "longevity" ||
+      p.category === "fitness"
+  ).slice(0, 6);
 
   return (
     <section className="my-8 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-5">

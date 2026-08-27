@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400" role="img" aria-label="Blood pressure monitor placeholder">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0fdfa"/>
+      <stop offset="100%" stop-color="#ccfbf1"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" rx="32" fill="url(#bg)"/>
+  <rect x="110" y="120" width="180" height="140" rx="20" fill="#fff" stroke="#0d9488" stroke-width="4"/>
+  <rect x="140" y="150" width="120" height="50" rx="8" fill="#99f6e4"/>
+  <text x="200" y="185" text-anchor="middle" font-family="system-ui,sans-serif" font-size="22" font-weight="700" fill="#115e59">120/80</text>
+  <text x="200" y="310" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" fill="#0f766e">BP Monitor</text>
+</svg>

@@ -51,6 +51,7 @@ import { ArticleTringeltTip } from "@/components/monetization/article-tringelt-t
 import { ArticleImageSupportNudge } from "@/components/monetization/article-image-support-nudge";
 import { getArticleHeroAltText } from "@/lib/ecosystem/editorial/images";
 import { TopLongevityProducts } from "@/components/monetization/affiliate-box";
+import { AffiliateStrip } from "@/components/monetization/affiliate-strip";
 import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
@@ -472,6 +473,13 @@ export default async function ArticlePage({ params }: Props) {
             ) : (
               <AdSlot ads={ads} />
             )}
+            {!locked ? (
+              <AffiliateStrip
+                locale={(locale as GlobalLocaleCode) ?? "cs"}
+                limit={5}
+                variant="rail"
+              />
+            ) : null}
           </aside>
         </div>
       </article>

@@ -8,6 +8,7 @@ import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { APP_PRODUCTS, appLockline, appSeoDescription } from "@/lib/apps/catalog";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
+import { AffiliateStrip } from "@/components/monetization/affiliate-strip";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -183,6 +184,8 @@ export default function AplikaceHubPage() {
           );
         })}
       </div>
+
+      <AffiliateStrip locale="cs" limit={6} variant="section" title="Wellness & longevity katalog" />
     </div>
   );
 }
