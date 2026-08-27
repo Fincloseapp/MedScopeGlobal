@@ -15,15 +15,16 @@ import {
   LongevityProtocolsSection,
   HomepageAffiliateSection,
 } from "@/components/ecosystem/magazine-sections";
+import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
 import { AppOpenLink } from "@/components/apps/app-origin-bar";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { ArrowRight } from "lucide-react";
 
-/** Marketing display names — OrdiZáznam is the Czech public alias for OrdiZapis */
+/** Marketing display names — keep OrdiZapis consistent across hero/cards/nav */
 const APP_MARKETING_NAME: Record<string, string> = {
   mediflow: "MediFlow",
   medipacient: "MeDipacient",
-  ordizapis: "OrdiZáznam",
+  ordizapis: "OrdiZapis",
   mediprep: "MeDiprep",
 };
 
@@ -114,7 +115,7 @@ function HeroPhones() {
       <div className="portal-phone portal-phone-b absolute right-0 top-[14%] w-[54%] overflow-hidden rounded-[1.75rem] shadow-[0_32px_80px_rgba(2,29,51,0.6)] ring-1 ring-white/15">
         <Image
           src={APP_MARKETING_IMAGE.ordizapis}
-          alt="OrdiZáznam — zápisy pro ordinaci"
+          alt="OrdiZapis — zápisy pro ordinaci"
           width={480}
           height={960}
           className="h-auto w-full object-cover"
@@ -309,6 +310,11 @@ export function PortalHome({
           <div className="mt-6">
             <WriterAgentsStrip />
           </div>
+
+          {/* Display ads — empty until NEXT_PUBLIC_ADS_ENABLED + provider keys */}
+          <div className="portal-reveal mt-8">
+            <GlobalAdSlot placement="in-content" locale="cs" />
+          </div>
         </div>
       </section>
 
@@ -337,6 +343,10 @@ export function PortalHome({
           <HomepageAffiliateSection />
         </div>
       </section>
+
+      <div className="mx-auto max-w-7xl px-4 py-2 sm:px-6">
+        <GlobalAdSlot placement="footer" locale="cs" />
+      </div>
 
       {/* 5 — Closing CTA */}
       <section className="relative overflow-hidden bg-[#021d33] text-white">

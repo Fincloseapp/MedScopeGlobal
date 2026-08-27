@@ -44,9 +44,15 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             paths=("${{ github.event.inputs.path }}")
           fi
+          # Most /api/cron/* routes export GET only (POST → 405). Ecosystem
+          # routes accept both; editorial/images is POST-only for the batch.
           for p in "${paths[@]}"; do
-            code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X POST -H "$auth" "$BASE$p" || true)
-            echo "$code $p"
+            method=GET
+            if [ "$p" = "/api/ecosystem/editorial/images" ]; then
+              method=POST
+            fi
+            code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X "$method" -H "$auth" "$BASE$p" || true)
+            echo "$code $method $p"
             head -c 200 /tmp/cron.out || true
             echo
           done

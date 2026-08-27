@@ -31,8 +31,9 @@ export function SubscriptionComparisonTable() {
         Srovnání tarifů
       </h2>
       <p className="mt-2 text-sm text-muted-foreground">
-        Přehled funkcí podle cílové skupiny — všechny tarify zahrnují 14denní zkušební verzi.
-        OrdiZapis od MedScopeGlobal (390 Kč) je samostatný vstup se stejnými právy lékaře.
+        Přehled funkcí podle cílové skupiny — tarify Veřejnost, Student LF a Lékař mají 14denní zkušební
+        verzi. OrdiZapis (390 Kč) je samostatný nástroj pro zápisy; Lékař v praxi (490 Kč) přidává CME,
+        Research Hub a klinický AI navíc.
       </p>
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-[#005B96]/15 bg-white shadow-sm">

@@ -7,6 +7,7 @@ import { softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { MEDIPACIENT, appSeoDescription, appSeoTitle } from "@/lib/apps/catalog";
 import { MEDIPACIENT_DEMO_REPORTS } from "@/lib/medipacient/demo-reports";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -95,6 +96,10 @@ export default function MedipacientMarketingPage() {
           ))}
         </div>
       </section>
+
+      <div className="mx-auto max-w-5xl px-4 py-2 sm:px-6">
+        <GlobalAdSlot placement="in-content" locale="cs" />
+      </div>
 
       <section className="mx-auto max-w-5xl px-4 pb-10 sm:px-6">
         <div className="rounded-3xl border border-[#cfe1f3] bg-white p-6 shadow-sm">

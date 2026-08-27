@@ -2,6 +2,8 @@ export const MARKETING_VISUALS = {
   aiAssistant: "/assets/ai/assistant-brunette.webp",
   medipacient: "/assets/marketing/medipacient.webp",
   mediprep: "/assets/marketing/mediprep.webp",
+  /** Dedicated MediFlow diary phone mock — must NOT reuse medipacient.webp */
+  mediflow: "/assets/marketing/mediflow.webp",
   /** Cache-busted phone mockup with OrdiZapis on-screen branding */
   ordizapis: "/assets/marketing/ordizapis-phone-v2.webp",
   /** @deprecated Use ordizapis */
@@ -15,7 +17,7 @@ export const APP_MARKETING_IMAGE: Record<
   medipacient: MARKETING_VISUALS.medipacient,
   mediprep: MARKETING_VISUALS.mediprep,
   ordizapis: MARKETING_VISUALS.ordizapis,
-  mediflow: MARKETING_VISUALS.medipacient,
+  mediflow: MARKETING_VISUALS.mediflow,
   /** @deprecated Use ordizapis */
   mediktor: MARKETING_VISUALS.ordizapis,
 };

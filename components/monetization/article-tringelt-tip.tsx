@@ -17,6 +17,35 @@ type Props = {
   locale?: GlobalLocaleCode;
 };
 
+const COPY: Record<
+  "cs" | "en",
+  {
+    title: (author?: string) => string;
+    blurb: string;
+    custom: string;
+    unavailable: string;
+    vipLead: string;
+    vipLink: string;
+  }
+> = {
+  cs: {
+    title: (author) => `Podpořit autora${author ? ` (${author})` : ""} · Tringelt`,
+    blurb: "Volitelný mikro-příspěvek — jako spropitné. Pomáhá redakci VitaScope.",
+    custom: "Vlastní",
+    unavailable: "Tringelt momentálně není k dispozici.",
+    vipLead: "Podpořte redakci a získejte VIP longevity protokoly —",
+    vipLink: "protokoly",
+  },
+  en: {
+    title: (author) => `Support the author${author ? ` (${author})` : ""} · Tip`,
+    blurb: "Optional micro-contribution — like a tip. Funds VitaScope editorial.",
+    custom: "Custom",
+    unavailable: "Tips are unavailable right now.",
+    vipLead: "Support the desk and unlock VIP longevity protocols —",
+    vipLink: "protocols",
+  },
+};
+
 export function ArticleTringeltTip({
   articleSlug,
   articleTitle,
@@ -28,12 +57,14 @@ export function ArticleTringeltTip({
   const [customAmount, setCustomAmount] = useState("");
   const tiers = ARTICLE_TIP_TIERS[locale] ?? ARTICLE_TIP_TIERS.cs;
   const vip = VIP_PRICING[locale] ?? VIP_PRICING.cs;
+  const copy = locale === "en" || locale === "en-US" ? COPY.en : COPY.cs;
 
   const zeroDecimal =
     locale === "ja" || locale === "ko" || locale === "vi" || locale === "id" || locale === "hu";
 
   const tip = async (amountMinor: number) => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/ecosystem/article-tip", {
         method: "POST",
@@ -46,12 +77,18 @@ export function ArticleTringeltTip({
           locale,
         }),
       });
-      if (res.status === 503) {
+      const data = (await res.json()) as { url?: string; error?: string; enabled?: boolean };
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      if (res.status === 503 && data.enabled === false) {
         setDisabled(true);
         return;
       }
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (data.url) window.location.href = data.url;
+      setError(data.error ?? "Platbu se nepodařilo spustit. Zkuste to prosím znovu.");
+    } catch {
+      setError("Síťová chyba — zkontrolujte připojení a zkuste znovu.");
     } finally {
       setLoading(false);
     }
@@ -67,22 +104,26 @@ export function ArticleTringeltTip({
   if (disabled) {
     return (
       <div className="my-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
-        Tringelt momentálně není k dispozici.
+        {copy.unavailable}
       </div>
     );
   }
 
   return (
-    <div className="my-6 rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50/80 to-orange-50/50 p-5">
+    <aside
+      className="my-6 rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50/80 to-orange-50/50 p-5"
+      aria-labelledby={`tringelt-heading-${articleSlug}`}
+    >
       <div className="flex items-center gap-2">
-        <Coins className="h-4 w-4 text-amber-600" />
-        <p className="text-sm font-semibold text-[#021d33]">
-          Podpořit autora{authorName ? ` (${authorName})` : ""} · Tringelt
+        <Coins className="h-4 w-4 text-amber-600" aria-hidden />
+        <p
+          id={`tringelt-heading-${articleSlug}`}
+          className="text-sm font-semibold text-[#021d33]"
+        >
+          {copy.title(authorName)}
         </p>
       </div>
-      <p className="mt-1 text-xs text-slate-600">
-        Volitelný mikro-příspěvek — jako spropitné v restauraci. Děkujeme redakci.
-      </p>
+      <p className="mt-1 text-xs text-slate-600">{copy.blurb}</p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {tiers.amounts.map((amount) => (
           <button
@@ -100,7 +141,8 @@ export function ArticleTringeltTip({
             type="number"
             min={zeroDecimal ? tiers.minAmount : tiers.minAmount / 100}
             step={zeroDecimal ? 1 : 0.5}
-            placeholder="Vlastní"
+            placeholder={copy.custom}
+            aria-label={copy.custom}
             value={customAmount}
             onChange={(e) => setCustomAmount(e.target.value)}
             className="w-16 rounded-full border border-amber-300/80 px-2 py-1 text-xs"
@@ -116,14 +158,15 @@ export function ArticleTringeltTip({
         </div>
       </div>
       <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-200/60 bg-white/60 p-3">
-        <Crown className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+        <Crown className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" aria-hidden />
         <p className="text-xs text-slate-600">
-          Podpořte redakci a získejte VIP longevity protokoly —{" "}
+          {copy.vipLead}{" "}
           <Link href="/vip/protokoly" className="font-medium text-amber-700 hover:underline">
             {vip.label}
-          </Link>
+          </Link>{" "}
+          ({copy.vipLink}).
         </p>
       </div>
-    </div>
+    </aside>
   );
 }
