@@ -32,7 +32,7 @@ const COPY: Record<
     title: (author) => `Podpořit autora${author ? ` (${author})` : ""} · Tringelt`,
     blurb: "Volitelný mikro-příspěvek — jako spropitné. Pomáhá redakci VitaScope.",
     custom: "Vlastní",
-    unavailable: "Tringelt momentálně není k dispozici.",
+    unavailable: "Tringelt momentálně není k dispozici — platební brána není nakonfigurována.",
     vipLead: "Podpořte redakci a získejte VIP longevity protokoly —",
     vipLink: "protokoly",
   },
@@ -40,7 +40,7 @@ const COPY: Record<
     title: (author) => `Support the author${author ? ` (${author})` : ""} · Tip`,
     blurb: "Optional micro-contribution — like a tip. Funds VitaScope editorial.",
     custom: "Custom",
-    unavailable: "Tips are unavailable right now.",
+    unavailable: "Tips are unavailable — payment gateway is not configured.",
     vipLead: "Support the desk and unlock VIP longevity protocols —",
     vipLink: "protocols",
   },
@@ -53,6 +53,7 @@ export function ArticleTringeltTip({
   locale = "cs",
 }: Props) {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [disabled, setDisabled] = useState(false);
   const [customAmount, setCustomAmount] = useState("");
   const tiers = ARTICLE_TIP_TIERS[locale] ?? ARTICLE_TIP_TIERS.cs;
@@ -63,6 +64,7 @@ export function ArticleTringeltTip({
     locale === "ja" || locale === "ko" || locale === "vi" || locale === "id" || locale === "hu";
 
   const tip = async (amountMinor: number) => {
+    if (!amountMinor || amountMinor < 1) return;
     setLoading(true);
     setError(null);
     try {
@@ -157,6 +159,12 @@ export function ArticleTringeltTip({
           </button>
         </div>
       </div>
+      {error ? (
+        <p className="mt-3 text-sm text-red-600" role="alert">
+          {error}
+        </p>
+      ) : null}
+      {loading ? <p className="mt-2 text-xs text-slate-500">Přesměrování na Stripe…</p> : null}
       <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-200/60 bg-white/60 p-3">
         <Crown className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" aria-hidden />
         <p className="text-xs text-slate-600">
