@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { Heart, Share2, BookmarkPlus, Crown } from "lucide-react";
 import { DONATION_TIERS, formatDonationAmount } from "@/lib/ecosystem/monetization";
+import { DONATION_COPY, tipLocale } from "@/lib/ecosystem/tip-copy";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { MEDIFLOW_STORAGE_KEY, demoMediFlowDashboard } from "@/lib/mediflow/types";
 
@@ -24,9 +25,25 @@ export function AuthorDonationButton({
   const [error, setError] = useState<string | null>(null);
   const [unavailable, setUnavailable] = useState(false);
   const [customAmount, setCustomAmount] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
   const tiers = DONATION_TIERS[locale] ?? DONATION_TIERS.cs;
+  const copy = DONATION_COPY[tipLocale(locale)];
   const zeroDecimal =
     locale === "ja" || locale === "ko" || locale === "vi" || locale === "id" || locale === "hu";
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("donated") !== "1") return;
+    setShowSuccess(true);
+    url.searchParams.delete("donated");
+    const qs = url.searchParams.toString();
+    window.history.replaceState(
+      {},
+      "",
+      qs ? `${url.pathname}?${qs}` : url.pathname
+    );
+  }, []);
 
   const donate = async (amountMinor: number) => {
     if (!amountMinor || amountMinor < 1) return;
@@ -78,22 +95,26 @@ export function AuthorDonationButton({
   if (unavailable) {
     return (
       <div className="my-6 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
-        Dary momentálně nejsou k dispozici — Stripe není nakonfigurován (API 503).
+        {copy.unavailable}
       </div>
     );
   }
 
   return (
     <div className="my-6 rounded-2xl border border-rose-200 bg-gradient-to-br from-rose-50 to-pink-50 p-5">
+      {showSuccess ? (
+        <p
+          className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900"
+          role="status"
+        >
+          {copy.success}
+        </p>
+      ) : null}
       <div className="flex items-center gap-2">
         <Heart className="h-5 w-5 text-rose-500" />
-        <p className="font-semibold text-[#021d33]">
-          Podpořit {authorName ? `autora (${authorName})` : "autora"} · Dar
-        </p>
+        <p className="font-semibold text-[#021d33]">{copy.title(authorName)}</p>
       </div>
-      <p className="mt-1 text-sm text-slate-600">
-        Mikro-dar pomůže pokračovat v tvorbě kvalitního obsahu.
-      </p>
+      <p className="mt-1 text-sm text-slate-600">{copy.blurb}</p>
       <div className="mt-3 flex flex-wrap gap-2">
         {tiers.amounts.map((amount) => (
           <button
@@ -125,7 +146,7 @@ export function AuthorDonationButton({
         </div>
       </div>
       {error ? <p className="mt-3 text-sm text-red-600" role="alert">{error}</p> : null}
-      {loading ? <p className="mt-2 text-xs text-slate-500">Přesměrování na Stripe…</p> : null}
+      {loading ? <p className="mt-2 text-xs text-slate-500">{copy.redirecting}</p> : null}
     </div>
   );
 }
@@ -180,10 +201,10 @@ export function SaveToMediFlowButton({ articleSlug, articleTitle }: { articleSlu
     <Link
       href={`/app/mediflow?saved=${articleSlug}`}
       onClick={save}
-      className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-100"
+      className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 underline-offset-2 hover:text-[#005B96] hover:underline"
     >
       <BookmarkPlus className="h-3.5 w-3.5" />
-      {saved ? "Uloženo v MediFlow" : "Uložit do MediFlow"}
+      {saved ? "Uloženo" : "Uložit"}
     </Link>
   );
 }
@@ -202,7 +223,7 @@ export function ArticleShareButton({ title, slug }: { title: string; slug: strin
     <button
       type="button"
       onClick={share}
-      className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+      className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 underline-offset-2 hover:text-[#005B96] hover:underline"
     >
       <Share2 className="h-3.5 w-3.5" />
       Sdílet
@@ -212,20 +233,23 @@ export function ArticleShareButton({ title, slug }: { title: string; slug: strin
 
 export function VipUpgradeNudge({ locale = "cs" }: { locale?: GlobalLocaleCode }) {
   return (
-    <div className="my-6 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5">
+    <aside className="my-10 border-t border-slate-200 pt-8">
       <div className="flex items-center gap-2">
-        <Crown className="h-5 w-5 text-amber-500" />
-        <p className="font-semibold text-[#021d33]">VIP Longevity protokoly</p>
+        <Crown className="h-4 w-4 text-[#005B96]" aria-hidden />
+        <p className="font-display text-lg font-semibold text-[#021d33]">
+          VIP Longevity protokoly
+        </p>
       </div>
-      <p className="mt-1 text-sm text-slate-600">
-        10 vědecky podložených protokolů pro dlouhověkost. Export do PDF, MediFlow sync.
+      <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600">
+        Placené předplatné s 10 vědecky podloženými protokoly — oddělené od
+        jednorázového příspěvku u článku.
       </p>
       <Link
         href="/vip/protokoly"
-        className="mt-3 inline-block rounded-full bg-amber-500 px-5 py-2 text-sm font-semibold text-black hover:bg-amber-400"
+        className="mt-4 inline-block bg-[#005B96] px-4 py-2 text-sm font-semibold text-white hover:bg-[#004a7a]"
       >
-        Prozkoumat protokoly →
+        Prozkoumat protokoly
       </Link>
-    </div>
+    </aside>
   );
 }

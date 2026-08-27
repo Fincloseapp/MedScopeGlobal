@@ -36,15 +36,6 @@
     "subtitle": "10 protokolov založených na dôkazoch pre spánok, metabolizmus, imunitu a dlhovekosť.",
     "price": "5,99 €/mesiac"
   },
-  "tringelt": {
-    "title": "Podporiť autora · Tringelt",
-    "subtitle": "Voliteľný mikro-príspevok — ako prepitné v reštaurácii. Ďakujeme redakcii.",
-    "custom": "Vlastné",
-    "vipUpsell": "Podporte redakciu a získajte VIP longevity protokoly —",
-    "unavailable": "Tringelt momentálne nie je k dispozícii.",
-    "tip": "Podporte redakciu tringeltom",
-    "exploreVip": "alebo preskúmajte VIP longevity protokoly"
-  },
   "donation": {
     "title": "Podporiť autora",
     "subtitle": "Mikro-dar pomáha pokračovať v tvorbe kvalitného obsahu.",
@@ -71,5 +62,14 @@
     "biohacking": "Biohacking pre začiatočníkov",
     "sleep": "Optimalizácia spánku",
     "mental": "Mentálne wellness"
+  },
+  "contribution": {
+    "title": "Podporiť autora · Príspevok",
+    "subtitle": "Voliteľný príspevok — ďakujeme. Nie je to VIP ani predplatné.",
+    "custom": "Vlastné",
+    "vipUpsell": "VIP Longevity je samostatné platené predplatné —",
+    "unavailable": "Príspevky momentálne nie sú k dispozícii.",
+    "tip": "Podporte redakciu príspevkom",
+    "exploreVip": "alebo preskúmajte VIP longevity protokoly"
   }
 }

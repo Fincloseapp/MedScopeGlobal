@@ -42,17 +42,17 @@ import { ArticleCtaBlocks } from "@/components/articles/article-cta-blocks";
 import { StudentAdBlocks } from "@/components/student/student-ad-blocks";
 import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
 import {
-  AuthorDonationButton,
   SaveToMediFlowButton,
   ArticleShareButton,
   VipUpgradeNudge,
 } from "@/components/monetization/article-cta";
-import { ArticleTringeltTip } from "@/components/monetization/article-tringelt-tip";
+import { ArticleContribution } from "@/components/monetization/article-contribution";
 import { ArticleImageSupportNudge } from "@/components/monetization/article-image-support-nudge";
 import { getArticleHeroAltText } from "@/lib/ecosystem/editorial/images";
 import { TopLongevityProducts } from "@/components/monetization/affiliate-box";
 import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { isArticleTipUiEnabled } from "@/lib/ecosystem/tip-copy";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -127,6 +127,9 @@ export default async function ArticlePage({ params }: Props) {
   const locked =
     (article.vip_only && !isVip) ||
     !canAccessContent(accessLevel, minLevel);
+
+  /** Tips/dary on every public article page — never grant VIP (separate VipUpgradeNudge). */
+  const showContribution = isArticleTipUiEnabled(locked);
 
   const related =
     article.category_id &&
@@ -360,7 +363,7 @@ export default async function ArticlePage({ params }: Props) {
               )}
             </div>
 
-            {!locked ? (
+            {showContribution ? (
               <ArticleImageSupportNudge
                 locale={(locale as GlobalLocaleCode) ?? "cs"}
                 articleSlug={article.slug}
@@ -427,25 +430,15 @@ export default async function ArticlePage({ params }: Props) {
               <ArticleCtaBlocks articleSlug={article.slug} articleTitle={article.title} />
             ) : null}
 
-            {!locked ? (
-              <div id={`article-tip-${article.slug}`} className="scroll-mt-24">
-                <ArticleTringeltTip
-                  articleSlug={article.slug}
-                  articleTitle={article.title}
-                  authorName={formatEditorialUnitDisplay(
-                    editorialAssignment.primary,
-                    editorialLocale,
-                    editorialAssignment.aiAssisted
-                  )}
-                  locale={(locale as GlobalLocaleCode) ?? "cs"}
-                />
-              </div>
-            ) : null}
-
-            {!locked ? (
-              <AuthorDonationButton
+            {showContribution ? (
+              <ArticleContribution
                 articleSlug={article.slug}
                 articleTitle={article.title}
+                authorName={formatEditorialUnitDisplay(
+                  editorialAssignment.primary,
+                  editorialLocale,
+                  editorialAssignment.aiAssisted
+                )}
                 locale={(locale as GlobalLocaleCode) ?? "cs"}
               />
             ) : null}

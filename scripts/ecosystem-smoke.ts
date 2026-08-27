@@ -42,7 +42,7 @@ const CASES: SmokeCase[] = [
     path: "/cs/article/verejnost-zivotni-styl-zdravy-spanek",
     label: "Demo seed article detail",
     expectStatus: 200,
-    expectBody: /spánek|VitaScope|Tringelt|Podpořit autora/i,
+    expectBody: /spánek|VitaScope|Příspěvek|Podpořit autora|Přispět/i,
   },
   {
     path: "/cs/article/missing-slug-smoke-test",
@@ -87,9 +87,9 @@ const CASES: SmokeCase[] = [
   },
   {
     path: "/cs/tips",
-    label: "Tips alias → VIP",
+    label: "Tips alias → articles (not VIP)",
     expectStatus: 200,
-    expectBody: /VIP|protokol|Longevity/i,
+    expectBody: /článk|articles|VitaScope|magazín|Zpravodajství/i,
   },
   {
     path: "/cs/affiliate",

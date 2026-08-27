@@ -36,15 +36,6 @@
     "subtitle": "10 giao thức dựa trên bằng chứng cho giấc ngủ, chuyển hóa, miễn dịch và trường thọ.",
     "price": "120.000 ₫/tháng"
   },
-  "tringelt": {
-    "title": "Ủng hộ tác giả · Tringelt",
-    "subtitle": "Đóng góp vi mô tùy chọn — như tiền boa ở nhà hàng. Cảm ơn ban biên tập.",
-    "custom": "Tùy chỉnh",
-    "vipUpsell": "Ủng hộ ban biên tập và nhận giao thức VIP trường thọ —",
-    "unavailable": "Tringelt hiện không khả dụng.",
-    "tip": "Ủng hộ ban biên tập bằng tringelt",
-    "exploreVip": "hoặc khám phá giao thức VIP trường thọ"
-  },
   "donation": {
     "title": "Ủng hộ tác giả",
     "subtitle": "Quyên góp vi mô giúp tiếp tục tạo nội dung chất lượng.",
@@ -71,5 +62,14 @@
     "biohacking": "Biohacking cho người mới",
     "sleep": "Tối ưu giấc ngủ",
     "mental": "Sức khỏe tinh thần"
+  },
+  "contribution": {
+    "title": "Ủng hộ tác giả · Đóng góp",
+    "subtitle": "Đóng góp tùy chọn — cảm ơn. Không phải VIP hay đăng ký.",
+    "custom": "Tùy chỉnh",
+    "vipUpsell": "VIP Longevity là gói đăng ký trả phí riêng —",
+    "unavailable": "Đóng góp hiện không khả dụng.",
+    "tip": "Ủng hộ ban biên tập bằng đóng góp",
+    "exploreVip": "hoặc xem giao thức VIP Longevity"
   }
 }

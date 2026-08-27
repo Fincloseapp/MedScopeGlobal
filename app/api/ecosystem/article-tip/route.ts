@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSessionProfile } from "@/lib/auth/session";
 import { logArticleTipOrder } from "@/lib/mediflow/store";
 import { ARTICLE_TIP_TIERS } from "@/lib/ecosystem/monetization";
+import { ARTICLE_TIP_COPY, tipLocale } from "@/lib/ecosystem/tip-copy";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { getStripeSecretKey } from "@/lib/stripe/client";
 import {
@@ -58,11 +59,13 @@ export async function POST(request: Request) {
   const currency = (body.currency ?? tiers.currency).toLowerCase();
   const amount = Math.round(Number(body.amount) || 0);
 
+  const copy = ARTICLE_TIP_COPY[tipLocale(locale)];
+
   if (!amount || amount < tiers.minAmount) {
     const divisor = ZERO_DECIMAL.has(currency) ? 1 : 100;
     return NextResponse.json(
       {
-        error: `Minimální tringelt je ${tiers.minAmount / divisor} ${tiers.symbol}`,
+        error: copy.minError(String(tiers.minAmount / divisor), tiers.symbol),
       },
       { status: 400 }
     );
@@ -88,13 +91,12 @@ export async function POST(request: Request) {
         {
           currency,
           unitAmount: amount,
-          name: body.articleTitle
-            ? `Tringelt: ${body.articleTitle.slice(0, 80)}`
-            : "Tringelt pro autora",
-          description: "Volitelný mikro-příspěvek autorovi článku",
+          name: copy.lineItemName(body.articleTitle),
+          description: copy.lineItemDescription,
         },
       ],
       metadata: {
+        // Tip only — never grant VIP / membership / předplatné on fulfillment.
         type: "article_tip",
         articleSlug: slug,
         locale,
