@@ -1,7 +1,6 @@
-import Stripe from "stripe";
-
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service";
+import { createStripeClient, getStripeSecretKey } from "@/lib/stripe/client";
 
 export type MarketplacePurchaseStatus = {
   verified: boolean;
@@ -22,12 +21,12 @@ export async function resolveMarketplacePurchase(
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user?.id) return null;
 
-  const secret = process.env.STRIPE_SECRET_KEY?.trim();
+  const secret = getStripeSecretKey();
   if (!secret) {
     return { verified: false, pending: true, enrolled: false, sessionId };
   }
 
-  const stripe = new Stripe(secret);
+  const stripe = createStripeClient(secret);
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     if (session.metadata?.academy_marketplace !== "true") return null;

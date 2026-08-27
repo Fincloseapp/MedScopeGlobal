@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
+import type Stripe from "stripe";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { logSecurityEvent } from "@/lib/security/security-log";
 import { getClientIp } from "@/lib/security/client-ip";
@@ -7,6 +7,11 @@ import { activateAdFromCheckout } from "@/lib/ads/activate-from-payment";
 import { persistStripeWebhookLog } from "@/lib/billing/stripe-webhook-log";
 import { notifySubscriptionConfirmed } from "@/lib/notifications/engine";
 import { updateUserProgress } from "@/lib/academy/db";
+import {
+  createStripeClient,
+  getStripeSecretKey,
+  stripeWebhookCryptoProvider,
+} from "@/lib/stripe/client";
 
 export const dynamic = "force-dynamic";
 
@@ -188,7 +193,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing signature" }, { status: 400 });
   }
 
-  const secret = process.env.STRIPE_SECRET_KEY?.trim();
+  const secret = getStripeSecretKey();
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
 
   if (!secret) {
@@ -205,12 +210,18 @@ export async function POST(request: Request) {
     );
   }
 
-  const stripe = new Stripe(secret);
+  const stripe = createStripeClient(secret);
   const rawBody = await request.text();
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+    event = await stripe.webhooks.constructEventAsync(
+      rawBody,
+      signature,
+      webhookSecret,
+      undefined,
+      stripeWebhookCryptoProvider()
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown";
     await logSecurityEvent({

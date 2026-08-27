@@ -320,7 +320,7 @@ export const ARTICLE_TIP_TIERS: Record<
   GlobalLocaleCode,
   { amounts: number[]; currency: string; symbol: string; minAmount: number }
 > = {
-  cs: { amounts: [200, 500, 1000, 2000, 5000], currency: "czk", symbol: "Kč", minAmount: 200 },
+  cs: { amounts: [1500, 2000, 5000], currency: "czk", symbol: "Kč", minAmount: 1500 },
   sk: { amounts: [10, 25, 50, 100, 250], currency: "eur", symbol: "€", minAmount: 10 },
   pl: { amounts: [100, 250, 500, 1000, 2500], currency: "pln", symbol: "zł", minAmount: 100 },
   de: { amounts: [10, 25, 50, 100, 250], currency: "eur", symbol: "€", minAmount: 10 },

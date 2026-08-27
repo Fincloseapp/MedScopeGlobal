@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { sendAdApprovalEmail } from "@/lib/services/ads-mail";
 import { SITE } from "@/lib/config/site";
+import { createStripeClient, getStripeSecretKey } from "@/lib/stripe/client";
 
 export async function GET(request: Request) {
   const token = new URL(request.url).searchParams.get("token");
@@ -22,11 +22,11 @@ export async function GET(request: Request) {
     return new NextResponse("Žádost nenalezena nebo již zpracována.", { status: 404 });
   }
 
-  const stripeKey = process.env.STRIPE_SECRET_KEY;
+  const stripeKey = getStripeSecretKey();
   let paymentLink: string | null = req.stripe_payment_link;
 
   if (stripeKey && !paymentLink) {
-    const stripe = new Stripe(stripeKey);
+    const stripe = createStripeClient(stripeKey);
     const amount = Math.round((req.price ?? 0) * 100);
     if (amount > 0) {
       const session = await stripe.checkout.sessions.create({
