@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { V20ArticleCard } from "@/components/v20/article-card";
 import { getArchivedArticles } from "@/lib/queries/articles";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { V20_ARCHIVE_CUTOFF } from "@/lib/v20/content-rules";
 
 export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: "Archiv článků — VitaScope",
     description: "Starší odborné články a briefy — stále dostupné ke čtení.",
     path: "/articles/archiv",

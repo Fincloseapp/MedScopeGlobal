@@ -5,7 +5,7 @@ import { AcademyPageHeader } from "@/components/academy/page-header";
 import { SelfTestPlayer } from "@/components/prijimacky/self-test-player";
 import { generateSelfTest } from "@/lib/prijimacky/quiz-from-bank";
 import type { PrepSubject } from "@/lib/prijimacky/faculties-admissions";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,7 @@ type Props = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: "Self-test přijímačky LF — MedScope Academy",
     description: "Automaticky generované self-testy z biologie, chemie a fyziky pro přípravu na LF.",
     path: "/academy/prijimacky/self-test",

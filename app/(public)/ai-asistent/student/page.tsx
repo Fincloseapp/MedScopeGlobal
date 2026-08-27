@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { IntelligenceConsole } from "@/components/ai-medical/intelligence-console";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: "AI tutor pro studenty | MedScopeGlobal",
     description: "Anatomie, farmakologie a příprava na zkoušky s AI tutorem.",
     path: "/ai-asistent/student",

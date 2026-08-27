@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { V19ArticleBriefFeedLazy } from "@/components/v19/article-brief-feed";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { V20_UI_VERSION } from "@/lib/v20/version";
 
 export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: "Odborné medicínské briefy",
     description:
       "Krátká odborná shrnutí v češtině — prioritně revmatologie, NZIP deep linking, max 45 dní.",

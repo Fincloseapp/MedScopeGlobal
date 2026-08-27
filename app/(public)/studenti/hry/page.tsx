@@ -5,16 +5,18 @@ import { PublicModuleImage } from "@/components/v25/public-module-image";
 import { Button } from "@/components/ui/button";
 import { resolveStudyGameImageUrl } from "@/lib/v22/game-images";
 import { V22_STUDY_GAMES } from "@/lib/v22/games";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
 
-export const metadata: Metadata = buildV20PageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedV20PageMetadata({
   title: "Kvízy a studijní hry — MedScope pro studenty",
   description:
     "Všechny studijní kvízy a hry MedScope: anatomie, fyziologie, patologie, terminologie, klinika i přijímačky. Plus Academy kvízy a self-test.",
   path: "/studenti/hry",
 });
+}
 
 const EXTRA_TOOLS = [
   {

@@ -22,7 +22,7 @@ import {
   getFreePreviewLessonCount,
   isLessonFreePreview,
 } from "@/lib/academy/preview";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { TtsListenButton } from "@/components/tts/tts-listen-button";
 import { prepareArticleForSpeech } from "@/lib/tts/prepare-for-speech";
 
@@ -45,13 +45,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const course = await getCourseBySlug(slug);
   if (!course) {
-    return buildV20PageMetadata({
+    return await buildLocalizedV20PageMetadata({
       title: "Kurz nenalezen",
       description: "Požadovaný kurz v MedScope Academy nebyl nalezen.",
       path: `/academy/courses/${slug}`,
     });
   }
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: `${course.title} — MedScope Academy`,
     description: course.summary ?? course.description,
     path: `/academy/courses/${slug}`,

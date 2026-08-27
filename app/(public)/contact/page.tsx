@@ -6,13 +6,15 @@ import { PublicTrustBadges } from "@/components/verejnost/public-trust-badges";
 import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-disclaimer";
 import { getLegalEntity } from "@/lib/config/legal-entity";
 import { SITE } from "@/lib/config/site";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = buildPageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedPageMetadata({
   title: "Kontakt | MedScopeGlobal",
   description: "Kontaktujte MedScopeGlobal pro odborné informace, partnerství nebo reklamní spolupráci.",
   path: "/contact",
 });
+}
 
 export default function ContactPage() {
   const entity = getLegalEntity();

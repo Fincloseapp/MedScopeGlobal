@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
 import { getLegalEntity } from "@/lib/config/legal-entity";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = buildPageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedPageMetadata({
   title: "Obchodní podmínky",
   description:
     "Obchodní podmínky MedScopeGlobal — předplatné, odpovědnost, záruky, reklamace a ukončení služby.",
   path: "/terms",
 });
+}
 
 export default function TermsPage() {
   const entity = getLegalEntity();

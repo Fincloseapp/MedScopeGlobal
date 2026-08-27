@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
 import { CookiePreferenceCenter } from "@/components/legal/cookie-banner";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = buildPageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedPageMetadata({
   title: "Cookies a preference",
   description: "Informace o cookies a centrum preferencí MedScopeGlobal.",
   path: "/cookies",
 });
+}
 
 export default function CookiesPage() {
   return (

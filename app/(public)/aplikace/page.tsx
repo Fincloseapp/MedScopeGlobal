@@ -8,10 +8,10 @@ import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { APP_PRODUCTS, appLockline, appSeoDescription } from "@/lib/apps/catalog";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: "Aplikace MedScopeGlobal — MediFlow, MeDipacient, OrdiZapis",
     description:
       "Wellness deník MediFlow, MeDipacient pro zprávy a OrdiZapis pro lékaře — plus legacy MeDiprep pro přípravu na LF. Stažení na mobil jako PWA.",

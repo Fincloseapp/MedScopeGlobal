@@ -4,7 +4,7 @@ import { V20ArticleCard } from "@/components/v20/article-card";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getArticlesByMetadataSection } from "@/lib/queries/articles";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { V27_EDITORIAL_COPY_LABEL } from "@/lib/v27/version";
 
 export const revalidate = 120;
@@ -12,7 +12,7 @@ export const revalidate = 120;
 const SECTION_SLUG = "aktuální-zprávy";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: "Aktuální zprávy — MedScopeGlobal",
     description: `Zahraniční a domácí zdravotnické zprávy ${V27_EDITORIAL_COPY_LABEL} — srozumitelně pro praxi i veřejnost.`,
     path: "/aktualni-zpravy",

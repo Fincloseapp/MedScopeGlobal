@@ -8,7 +8,7 @@ import { VerejnostTopicCard } from "@/components/verejnost/verejnost-topic-card"
 
 import { VEREJNOST_HUB_TOPICS } from "@/lib/config/verejnost-topics";
 
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 
 
@@ -18,7 +18,7 @@ export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
 
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
 
     title: "Témata — Veřejné zdraví | MedScopeGlobal",
 

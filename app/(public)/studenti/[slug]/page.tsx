@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const page = V271_STUDENTI_PAGES[slug];
   if (!page) return {};
-  return buildV271HubMetadata("studenti", page);
+  return await buildV271HubMetadata("studenti", page);
 }
 
 export default async function StudentiSubPage({ params }: { params: Promise<{ slug: string }> }) {

@@ -6,14 +6,14 @@ import { SubscriptionFaq } from "@/components/subscription/subscription-faq";
 import { SubscriptionTrialBanner } from "@/components/subscription/subscription-trial-banner";
 import { SubscriptionTrustBadges } from "@/components/subscription/subscription-trust-badges";
 import { V27_SUBSCRIPTION_PLANS, subscriptionProductId } from "@/lib/v27/config";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { VIP_TRIAL_DAYS } from "@/lib/vip";
 import { APP_PRODUCTS } from "@/lib/apps/catalog";
 
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: "Předplatné | MedScopeGlobal",
     description: `${VIP_TRIAL_DAYS}denní zkušební verze zdarma. Tarify 99 / 149 / 390 / 490 Kč měsíčně — včetně OrdiZapis od MedScopeGlobal. Platba kartou přes Stripe.`,
     path: "/predplatne",

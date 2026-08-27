@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const page = V271_FIRMY_PAGES[slug];
   if (!page) return {};
-  return buildV271HubMetadata("firmy", page);
+  return await buildV271HubMetadata("firmy", page);
 }
 
 export default async function FirmySubPage({ params }: { params: Promise<{ slug: string }> }) {

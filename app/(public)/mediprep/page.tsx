@@ -8,15 +8,15 @@ import { MEDIPREP, appSeoDescription, appSeoTitle } from "@/lib/apps/catalog";
 import { getPrepDashboard } from "@/lib/mediprep/dashboard";
 import { FACULTIES_ADMISSIONS_2026 } from "@/lib/prijimacky/faculties-admissions";
 import { bankStats } from "@/lib/prijimacky/question-bank";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    ...buildV20PageMetadata({
+    ...(await buildLocalizedV20PageMetadata({
       title: appSeoTitle(MEDIPREP),
       description: appSeoDescription(MEDIPREP),
       path: MEDIPREP.marketingPath,
-    }),
+    })),
     manifest: MEDIPREP.manifest,
   };
 }

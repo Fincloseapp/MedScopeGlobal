@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AppDownloadPanel } from "@/components/apps/app-download-panel";
 import { MEDIFLOW } from "@/lib/apps/catalog";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: `Stáhnout ${MEDIFLOW.shortName}`,
     description: MEDIFLOW.pitch,
     path: MEDIFLOW.downloadPath,

@@ -4,17 +4,19 @@ import { cookies } from "next/headers";
 import { Search } from "lucide-react";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { normalizeLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 import { createClient } from "@/lib/supabase/server";
 import { mergedArticleSearch } from "@/utils/merged-article-search";
 import { sanitizeSearchInput } from "@/utils/search";
 
-export const metadata: Metadata = buildPageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedPageMetadata({
   title: "Vyhledávání",
   description:
     "Vyhledávejte články, studie a odborný obsah v archivu MedScopeGlobal.",
   path: "/hledat",
 });
+}
 
 export default async function HledatPage({
   searchParams,

@@ -11,7 +11,7 @@ import {
   newsletterIssueDescription,
   newsletterIssueTitle,
 } from "@/lib/v23/newsletter/page-meta";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 3600;
 
@@ -21,13 +21,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const issue = await getNewsletterBySlug(slug);
   if (!issue) {
-    return buildV20PageMetadata({
+    return await buildLocalizedV20PageMetadata({
       title: "MedScopeGlobal Newsletter",
       description: "Odborný medicínský newsletter v češtině.",
       path: `/newsletter/${slug}`,
     });
   }
-  return buildNewsletterPageMetadata(issue, `/newsletter/${slug}`);
+  return await buildNewsletterPageMetadata(issue, `/newsletter/${slug}`);
 }
 
 export default async function NewsletterIssuePage({ params }: Props) {

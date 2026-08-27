@@ -14,7 +14,7 @@ import { getReaderContext } from "@/lib/auth/reader-context";
 import { getArticlesBySection } from "@/lib/queries/articles";
 import { getDictionary, t } from "@/lib/i18n/get-dictionary";
 import { normalizeLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { cookies } from "next/headers";
 
 type SectionDetailProps = {
@@ -35,10 +35,11 @@ export async function generateSectionDetailMetadata({
   const dict = await getDictionary(locale);
   const title = t(dict, section.nameKey);
   const description = t(dict, section.descriptionKey);
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: `${title} — MedScopeGlobal`,
     description,
     path: `${basePath}/${slug}`,
+    locale,
   });
 }
 

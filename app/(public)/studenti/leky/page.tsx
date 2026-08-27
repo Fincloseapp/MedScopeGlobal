@@ -2,16 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Pill } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
 
-export const metadata: Metadata = buildV20PageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedV20PageMetadata({
   title: "Léky a léčiva — MedScope pro studenty",
   description:
     "Přehled léčiv (SÚKL), studijní odkazy a AI tutor. Není to kompletní kurz farmakologie — je to praktický rozcestník k lékům a učení.",
   path: "/studenti/leky",
 });
+}
 
 const LINKS = [
   {

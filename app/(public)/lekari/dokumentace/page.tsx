@@ -5,14 +5,14 @@ import { DokumentaceWorkspace } from "@/components/lekari/dokumentace-workspace"
 import { DokumentaceDownloadPanel } from "@/components/lekari/dokumentace-download-panel";
 import { DokumentaceTutorial } from "@/components/lekari/dokumentace-tutorial";
 import { V27CheckoutButton } from "@/components/v27/checkout-button";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { Button } from "@/components/ui/button";
 import { OrdiZapisMark } from "@/components/lekari/ordizapis-mark";
 import { SITE } from "@/lib/config/site";
 import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const base = buildV20PageMetadata({
+  const base = await buildLocalizedV20PageMetadata({
     title: ORDIZAPIS.seoTitle,
     description: ORDIZAPIS.seoDescription,
     path: "/lekari/dokumentace",

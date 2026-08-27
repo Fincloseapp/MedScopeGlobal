@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AppDownloadPanel } from "@/components/apps/app-download-panel";
 import { MEDIPACIENT } from "@/lib/apps/catalog";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: `Stáhnout ${MEDIPACIENT.shortName}`,
     description: MEDIPACIENT.pitch,
     path: MEDIPACIENT.downloadPath,

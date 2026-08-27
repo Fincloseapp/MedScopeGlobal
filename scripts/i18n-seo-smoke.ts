@@ -16,6 +16,7 @@ import {
 import { normalizeLocale } from "../lib/i18n/config";
 import { getHomepageTitle, getOgLocale } from "../lib/brand/magazine";
 import { buildGlobalHreflang } from "../lib/ecosystem/seo";
+import { buildPageMetadata } from "../lib/seo/metadata";
 import { allLocaleSitemapUrls } from "../lib/seo/locale-sitemap";
 import { GLOBAL_LOCALES } from "../lib/ecosystem/locales";
 import {
@@ -48,7 +49,29 @@ assert.ok(getHomepageTitle("de").includes("Gesundheit"));
 assert.ok(getHomepageTitle("fr").includes("Santé"));
 assert.ok(getHomepageTitle("zh-CN").includes("健康"));
 assert.equal(getOgLocale("de"), "de_DE");
+assert.equal(getOgLocale("pl"), "pl_PL");
+assert.equal(getOgLocale("fr"), "fr_FR");
 assert.equal(getOgLocale("en-US"), "en_US");
+assert.equal(getOgLocale("zh-CN"), "zh_CN");
+assert.equal(getOgLocale("ja"), "ja_JP");
+
+const deAbout = buildPageMetadata({
+  title: "About",
+  description: "desc",
+  path: "/about",
+  locale: "de",
+});
+assert.equal(deAbout.openGraph?.locale, "de_DE");
+assert.equal(deAbout.alternates?.canonical, "https://medscopeglobal.com/de/about");
+
+const plArticles = buildPageMetadata({
+  title: "Articles",
+  description: "desc",
+  path: "/articles",
+  locale: "pl",
+});
+assert.equal(plArticles.openGraph?.locale, "pl_PL");
+assert.equal(plArticles.alternates?.canonical, "https://medscopeglobal.com/pl/articles");
 
 const resolved = resolveLocalePath("/de/articles");
 assert.equal(resolved.locale, "de");

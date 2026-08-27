@@ -9,7 +9,7 @@ import {
   topicLabelForSlug,
 } from "@/lib/config/verejnost-topics";
 import { listPublicArticles } from "@/lib/queries/verejnost";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { isListableNewsArticle, isLongevityArticle } from "@/lib/v271/news-desks";
 
 export const revalidate = 120;
@@ -30,7 +30,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { topic } = await searchParams;
   const title = topic ? `${topicLabelForSlug(topic)} — Veřejné zdraví` : "Články — Veřejné zdraví";
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: `${title} | MedScopeGlobal`,
     description:
       "Aktuální články o prevenci, výživě, spánku, dlouhověkosti a zdravém životním stylu. Srozumitelná čeština, redakční kontrola.",

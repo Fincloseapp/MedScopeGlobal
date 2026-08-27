@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { V20StudyDetailView } from "@/components/v20/study-detail-view";
 import { getV20StudyBySlugOrId } from "@/lib/v20/studies/query";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { AdPlacement } from "@/components/ads/ad-placement";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 
@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const s = await getV20StudyBySlugOrId(id);
   if (!s) return { title: "Studie" };
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: `${s.titleCs} — MedScopeGlobal`,
     description: s.summaryCs.slice(0, 160),
     path: `/studie/${s.slug}`,

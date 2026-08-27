@@ -53,7 +53,7 @@ import {
 import { TopLongevityProducts } from "@/components/monetization/affiliate-box";
 import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
-import { MAGAZINE } from "@/lib/brand/magazine";
+import { MAGAZINE, getOgLocale } from "@/lib/brand/magazine";
 import { isArticleTipUiEnabled } from "@/lib/ecosystem/tip-copy";
 import { SITE } from "@/lib/config/site";
 
@@ -112,6 +112,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "article",
       publishedTime: article.published_at ?? undefined,
       url: canonical,
+      locale: getOgLocale(locale),
       images: [{ url: ogImage }],
     },
     twitter: {

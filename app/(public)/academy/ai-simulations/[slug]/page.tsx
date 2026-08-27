@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { AcademyPageHeader } from "@/components/academy/page-header";
 import { SimulationPlayer, type SimulationScenario } from "@/components/academy/SimulationPlayer";
 import { getSimulationBySlug } from "@/lib/academy/db";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
 
@@ -13,13 +13,13 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const sim = await getSimulationBySlug(slug);
   if (!sim) {
-    return buildV20PageMetadata({
+    return await buildLocalizedV20PageMetadata({
       title: "Simulace nenalezena",
       description: "Požadovaná klinická simulace nebyla nalezena.",
       path: `/academy/ai-simulations/${slug}`,
     });
   }
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: `${sim.title} — AI simulace`,
     description: `Klinická simulace · obtížnost ${sim.difficulty}`,
     path: `/academy/ai-simulations/${slug}`,

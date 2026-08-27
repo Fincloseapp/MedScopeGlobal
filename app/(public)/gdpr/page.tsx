@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
 import { getLegalEntity } from "@/lib/config/legal-entity";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = buildPageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedPageMetadata({
   title: "Ochrana osobních údajů (GDPR)",
   description:
     "Zpracování osobních údajů, cookies, analytika, newsletter a AI zpracování dat na MedScopeGlobal.",
   path: "/gdpr",
 });
+}
 
 export default function GdprPage() {
   const entity = getLegalEntity();

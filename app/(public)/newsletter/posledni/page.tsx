@@ -15,7 +15,7 @@ export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const issue = await getV22LatestNewsletter();
-  return buildNewsletterPageMetadata(issue, "/newsletter/posledni");
+  return await buildNewsletterPageMetadata(issue, "/newsletter/posledni");
 }
 
 export default async function NewsletterPosledniPage() {
