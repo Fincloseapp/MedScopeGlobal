@@ -15,7 +15,11 @@ import { buildPrepTest, getPrepDashboard } from "../../lib/mediprep/dashboard";
 import { bankStats } from "../../lib/prijimacky/question-bank";
 import { generateSelfTest } from "../../lib/prijimacky/quiz-from-bank";
 import { FACULTIES_ADMISSIONS_2026 } from "../../lib/prijimacky/faculties-admissions";
-import { getAffiliateRedirectDestination } from "../../lib/ecosystem/monetization";
+import {
+  getAffiliateRedirectDestination,
+  AD_INVENTORY,
+  getClientAdConfig,
+} from "../../lib/ecosystem/monetization";
 import {
   inferArticleTopic,
   matchImageForArticleSync,
@@ -151,6 +155,13 @@ file("public/assets/affiliate/sleep-tracker.svg");
 assert.equal(getAffiliateRedirectDestination("mg-cz")?.includes("heureka"), true);
 assert.equal(getAffiliateRedirectDestination("mg-us")?.includes("amazon.com"), true);
 assert.equal(getAffiliateRedirectDestination("unknown"), null);
+
+assert.ok(AD_INVENTORY.some((e) => e.id === "article-below-title"));
+assert.ok(AD_INVENTORY.some((e) => e.surface === "homepage"));
+assert.ok(AD_INVENTORY.some((e) => e.surface === "app-landing"));
+const adCfg = getClientAdConfig();
+assert.equal(typeof adCfg.enabled, "boolean");
+assert.equal(adCfg.enabled, false); // no keys in CI / default env
 
 file("app/api/ecosystem/editorial/images/route.ts");
 file("lib/ecosystem/editorial/images/policy.ts");

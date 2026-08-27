@@ -56,7 +56,7 @@ See also: `docs/editorial/autonomous-redakce.md`
 | **VIP** | Longevity protocols — `$6.99/mo` en-US, localized Stripe |
 | **Tringelt** | Micro-tip on articles — `ArticleTringeltTip`, `/api/ecosystem/article-tip` |
 | **MediFlow** | Personal wellness journal — save articles, supplements, symptoms |
-| **Display ads** | `GlobalAdSlot` by locale (Mediavine, AdSense, Yandex, …) |
+| **Display ads** | `GlobalAdSlot` + `AD_INVENTORY`; empty until `NEXT_PUBLIC_ADS_ENABLED` + provider key — `docs/monetization/` |
 | **Affiliate** | Tracked `/go` redirects, homepage affiliate sections |
 
 ## Production path

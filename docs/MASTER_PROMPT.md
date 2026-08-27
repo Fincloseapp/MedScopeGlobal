@@ -37,6 +37,25 @@ Autonomous pipeline: LLM draft → editorial review → translate → SEO/JSON-L
 
 Monetization on articles: display ads, VIP CTA, tringelt micro-tip, affiliate boxes, MediFlow save.
 
+### Monetization (operators)
+
+| Channel | Status in code | Operator action |
+|---------|----------------|-----------------|
+| **VIP** | Stripe checkout `/vip/protokoly` | Live Stripe keys on Workers |
+| **Tringelt** | `ArticleTringeltTip` + `/api/ecosystem/article-tip` | Same Stripe keys |
+| **Donations** | `AuthorDonationButton` + `/api/ecosystem/donate` | Same Stripe keys |
+| **Display ads** | `GlobalAdSlot` + `AD_INVENTORY` — **empty until env** | AdSense → then Mediavine; see setup doc |
+| **Affiliate** | `/go/[slug]` + homepage/article boxes | Replace destinations with tagged links |
+| **CMS / B2B ads** | `components/ads/*`, `/admin/ads` | Sales later |
+
+Display ads require `NEXT_PUBLIC_ADS_ENABLED=true` **and** a provider id
+(`NEXT_PUBLIC_ADSENSE_CLIENT_ID` / Mediavine / Ezoic). Without them, slots render nothing.
+
+Operator runbooks:
+
+- `docs/monetization/AD_ACCOUNTS_SETUP.md` — which accounts to create, priority for income
+- `docs/monetization/AD_INVENTORY.md` — placements, sizes, density rules
+
 ## Technical constraints
 
 - Next.js 15 App Router, Supabase, Cloudflare Workers (OpenNext)
@@ -83,4 +102,6 @@ Full runbook: `docs/deploy/RESTORE_FROM_D.md`. Production: `pnpm cf:deploy` (nee
 - `docs/brand/magazine-brand.md` — brand rationale and code map
 - `docs/marketing/global-plan.md` — geo marketing and KPIs
 - `docs/editorial/autonomous-redakce.md` — redakce + tringelt + images
+- `docs/monetization/AD_ACCOUNTS_SETUP.md` — AdSense / affiliates / Stripe accounts
+- `docs/monetization/AD_INVENTORY.md` — ad placements and formats
 - `AGENTS.md` — cloud agent dev/run instructions

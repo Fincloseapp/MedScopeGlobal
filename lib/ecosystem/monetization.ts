@@ -147,6 +147,169 @@ export function getAffiliateRedirectDestination(slug: string): string | null {
 
 export const HIGH_CTR_PLACEMENTS: AdPlacement[] = ["below-title", "in-content", "sticky"];
 
+/** IAB-oriented inventory for display ads (homepage, articles, app landings). */
+export type AdInventorySurface = "homepage" | "article" | "app-landing";
+
+export type AdInventoryEntry = {
+  id: string;
+  surface: AdInventorySurface;
+  /** Route pattern for operators */
+  routes: string[];
+  placement: AdPlacement;
+  /** Typical creative sizes (IAB / responsive) */
+  sizes: string[];
+  format: "display" | "native" | "sticky-mobile";
+  /** Higher = place first when inventory is scarce */
+  incomePriority: 1 | 2 | 3;
+  notes: string;
+};
+
+/**
+ * Canonical ad placements — wire via `GlobalAdSlot`.
+ * Empty in production until `NEXT_PUBLIC_ADS_ENABLED` + provider keys are set.
+ */
+export const AD_INVENTORY: AdInventoryEntry[] = [
+  {
+    id: "home-mid",
+    surface: "homepage",
+    routes: ["/"],
+    placement: "in-content",
+    sizes: ["728x90", "970x90", "320x100", "300x250"],
+    format: "display",
+    incomePriority: 1,
+    notes: "Below magazine feed, above apps — high viewability, not in hero.",
+  },
+  {
+    id: "home-footer",
+    surface: "homepage",
+    routes: ["/"],
+    placement: "footer",
+    sizes: ["728x90", "320x50", "300x250"],
+    format: "display",
+    incomePriority: 2,
+    notes: "Before closing CTA strip.",
+  },
+  {
+    id: "article-below-title",
+    surface: "article",
+    routes: ["/article/[slug]", "/{locale}/article/[slug]"],
+    placement: "below-title",
+    sizes: ["728x90", "320x100", "300x250"],
+    format: "display",
+    incomePriority: 1,
+    notes: "Highest CTR on long-form; keep one unit only.",
+  },
+  {
+    id: "article-in-content",
+    surface: "article",
+    routes: ["/article/[slug]", "/{locale}/article/[slug]"],
+    placement: "in-content",
+    sizes: ["300x250", "336x280", "responsive"],
+    format: "display",
+    incomePriority: 1,
+    notes: "After primary body; never inside medical disclaimer.",
+  },
+  {
+    id: "article-footer",
+    surface: "article",
+    routes: ["/article/[slug]", "/{locale}/article/[slug]"],
+    placement: "footer",
+    sizes: ["728x90", "300x250"],
+    format: "display",
+    incomePriority: 2,
+    notes: "After tip / affiliate blocks, before related.",
+  },
+  {
+    id: "article-sticky",
+    surface: "article",
+    routes: ["/article/[slug]"],
+    placement: "sticky",
+    sizes: ["320x50", "320x100"],
+    format: "sticky-mobile",
+    incomePriority: 3,
+    notes: "Mobile only; enable only with explicit env + consent.",
+  },
+  {
+    id: "landing-mediflow",
+    surface: "app-landing",
+    routes: ["/mediflow"],
+    placement: "in-content",
+    sizes: ["728x90", "300x250", "320x100"],
+    format: "display",
+    incomePriority: 2,
+    notes: "Below fold after product pillars — never in hero.",
+  },
+  {
+    id: "landing-medipacient",
+    surface: "app-landing",
+    routes: ["/medipacient"],
+    placement: "in-content",
+    sizes: ["728x90", "300x250"],
+    format: "display",
+    incomePriority: 2,
+    notes: "Between steps grid and pricing — respectful density.",
+  },
+  {
+    id: "landing-ordizaznam",
+    surface: "app-landing",
+    routes: ["/ordizaznam", "/ordizapis"],
+    placement: "in-content",
+    sizes: ["728x90", "300x250"],
+    format: "display",
+    incomePriority: 3,
+    notes: "Physician landing — lighter inventory; prefer B2B later.",
+  },
+];
+
+export type ClientAdConfig = {
+  /** Master switch — must be true AND a provider key present to render live ads */
+  enabled: boolean;
+  /** Dev-only dashed boxes when live ads are off */
+  showPlaceholders: boolean;
+  adsenseClientId: string | null;
+  mediavineSiteId: string | null;
+  ezoicSiteId: string | null;
+};
+
+/** Read public ad env (inlined at build for client components). */
+export function getClientAdConfig(): ClientAdConfig {
+  const adsenseClientId = (process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID ?? "").trim() || null;
+  const mediavineSiteId = (process.env.NEXT_PUBLIC_MEDIAVINE_SITE_ID ?? "").trim() || null;
+  const ezoicSiteId = (process.env.NEXT_PUBLIC_EZOIC_SITE_ID ?? "").trim() || null;
+  const hasProvider = Boolean(adsenseClientId || mediavineSiteId || ezoicSiteId);
+  const flag = (process.env.NEXT_PUBLIC_ADS_ENABLED ?? "").trim().toLowerCase();
+  const enabled =
+    (flag === "1" || flag === "true" || flag === "yes") && hasProvider;
+  const showPlaceholders =
+    (process.env.NEXT_PUBLIC_ADS_SHOW_PLACEHOLDERS ?? "").trim().toLowerCase() === "1" ||
+    (process.env.NEXT_PUBLIC_ADS_SHOW_PLACEHOLDERS ?? "").trim().toLowerCase() === "true";
+
+  return {
+    enabled,
+    showPlaceholders,
+    adsenseClientId,
+    mediavineSiteId,
+    ezoicSiteId,
+  };
+}
+
+export function resolveAdProvider(
+  locale: GlobalLocaleCode,
+  config: ClientAdConfig = getClientAdConfig()
+): AdProvider | null {
+  if (!config.enabled) return null;
+  const preferred = getAdProvidersForLocale(locale);
+  for (const p of preferred) {
+    if (p === "adsense" && config.adsenseClientId) return "adsense";
+    if (p === "mediavine" && config.mediavineSiteId) return "mediavine";
+    if (p === "ezoic" && config.ezoicSiteId) return "ezoic";
+  }
+  if (config.adsenseClientId) return "adsense";
+  if (config.mediavineSiteId) return "mediavine";
+  if (config.ezoicSiteId) return "ezoic";
+  return null;
+}
+
 export function formatDonationAmount(amountMinor: number, locale: GlobalLocaleCode): string {
   const tier = DONATION_TIERS[locale] ?? DONATION_TIERS.en;
   return formatMinorAmount(amountMinor, locale, tier.symbol);

@@ -15,6 +15,7 @@ import {
   LongevityProtocolsSection,
   HomepageAffiliateSection,
 } from "@/components/ecosystem/magazine-sections";
+import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
 import { AppOpenLink } from "@/components/apps/app-origin-bar";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { ArrowRight } from "lucide-react";
@@ -309,6 +310,11 @@ export function PortalHome({
           <div className="mt-6">
             <WriterAgentsStrip />
           </div>
+
+          {/* Display ads — empty until NEXT_PUBLIC_ADS_ENABLED + provider keys */}
+          <div className="portal-reveal mt-8">
+            <GlobalAdSlot placement="in-content" locale="cs" />
+          </div>
         </div>
       </section>
 
@@ -337,6 +343,10 @@ export function PortalHome({
           <HomepageAffiliateSection />
         </div>
       </section>
+
+      <div className="mx-auto max-w-7xl px-4 py-2 sm:px-6">
+        <GlobalAdSlot placement="footer" locale="cs" />
+      </div>
 
       {/* 5 — Closing CTA */}
       <section className="relative overflow-hidden bg-[#021d33] text-white">
