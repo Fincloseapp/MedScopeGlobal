@@ -100,7 +100,7 @@ function PortalNewsFeed({ articles }: { articles: DisplayArticle[] }) {
 function HeroPhones() {
   return (
     <div className="portal-hero-phones relative mx-auto h-[min(58vh,420px)] w-full max-w-md lg:mx-0 lg:h-[min(72vh,520px)] lg:max-w-none">
-      <div className="portal-phone portal-phone-a absolute left-[4%] top-[8%] w-[46%] overflow-hidden rounded-[1.6rem] border border-white/25 bg-[#021d33]/40 shadow-[0_24px_60px_rgba(2,29,51,0.45)]">
+      <div className="portal-phone portal-phone-a absolute left-[2%] top-[6%] w-[48%] overflow-hidden rounded-[1.75rem] shadow-[0_28px_70px_rgba(2,29,51,0.55)] ring-1 ring-white/15">
         <Image
           src={APP_MARKETING_IMAGE.mediflow}
           alt="MediFlow — wellness deník"
@@ -111,7 +111,7 @@ function HeroPhones() {
           sizes="(max-width: 1024px) 40vw, 220px"
         />
       </div>
-      <div className="portal-phone portal-phone-b absolute right-[2%] top-[18%] w-[52%] overflow-hidden rounded-[1.6rem] border border-white/25 bg-[#021d33]/40 shadow-[0_28px_70px_rgba(2,29,51,0.5)]">
+      <div className="portal-phone portal-phone-b absolute right-0 top-[14%] w-[54%] overflow-hidden rounded-[1.75rem] shadow-[0_32px_80px_rgba(2,29,51,0.6)] ring-1 ring-white/15">
         <Image
           src={APP_MARKETING_IMAGE.ordizapis}
           alt="OrdiZáznam — zápisy pro ordinaci"
@@ -122,7 +122,7 @@ function HeroPhones() {
           sizes="(max-width: 1024px) 45vw, 260px"
         />
       </div>
-      <div className="portal-phone portal-phone-c absolute bottom-[2%] left-[22%] w-[42%] overflow-hidden rounded-[1.4rem] border border-white/20 bg-[#021d33]/35 shadow-[0_18px_48px_rgba(2,29,51,0.4)]">
+      <div className="portal-phone portal-phone-c absolute bottom-0 left-[18%] w-[44%] overflow-hidden rounded-[1.5rem] shadow-[0_22px_56px_rgba(2,29,51,0.5)] ring-1 ring-white/10">
         <Image
           src={APP_MARKETING_IMAGE.medipacient}
           alt="MeDipacient — lékařské zprávy"

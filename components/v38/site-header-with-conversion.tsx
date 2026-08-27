@@ -50,6 +50,17 @@ export function SiteHeaderWithConversion({
   const studentPath = isStudentAudiencePath(pathname);
   const publicPath = isPublicAudiencePath(pathname);
   const physicianPath = isPhysicianAudiencePath(pathname);
+  /** Homepage hero owns first viewport — hide competing conversion strip */
+  const isMagazineHome = useMemo(() => {
+    if (!pathname) return false;
+    const p = pathname.replace(/\/$/, "") || "/";
+    return (
+      p === "/" ||
+      p === "/cs" ||
+      p === "/en" ||
+      /^\/[a-z]{2}(-[a-zA-Z]+)?$/.test(p)
+    );
+  }, [pathname]);
   const audienceStrip = useMemo(() => {
     if (studentPath) return { ...getStudentiNavStripCopy(daySeed()), generatedBy: "static" as const };
     if (publicPath) return { ...getVerejnostNavStripCopy(), generatedBy: "static" as const };
@@ -98,7 +109,7 @@ export function SiteHeaderWithConversion({
         isVip={reader.isVip}
         accessLevel={reader.accessLevel}
       />
-      {!reader.isVip ? (
+      {!reader.isVip && !isMagazineHome ? (
         <SubscriptionNudgeStrip
           copy={effectiveStrip}
           ctaDataAttr={
