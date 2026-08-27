@@ -31,7 +31,17 @@ export type EditorialQueueItem = {
   topic: string;
   status: "queued" | "writing" | "reviewing" | "compliance" | "published" | "failed";
   journalistPersonaId?: string;
-  taskType?: "article" | "image" | "syndication" | "generate";
+  taskType?:
+    | "article"
+    | "image"
+    | "syndication"
+    | "generate"
+    | "translate"
+    | "seo"
+    | "ads"
+    | "vip"
+    | "affiliate"
+    | "donation";
   createdAt: string;
 };
 
@@ -347,5 +357,156 @@ export async function runSyndicateArticlesCron(options?: {
       admin == null
         ? "No service role — plan only; set SUPABASE_SERVICE_ROLE_KEY to persist"
         : "Pending syndications queued; LLM adaptation not run (no rewrite in this step)",
+  };
+}
+
+type AuxiliaryEditorialTask =
+  | "translate-content"
+  | "seo-optimize"
+  | "place-ads"
+  | "generate-vip-content"
+  | "generate-affiliate-boxes"
+  | "generate-donation-cta";
+
+const AUX_TASK_TYPE: Record<AuxiliaryEditorialTask, NonNullable<EditorialQueueItem["taskType"]>> = {
+  "translate-content": "translate",
+  "seo-optimize": "seo",
+  "place-ads": "ads",
+  "generate-vip-content": "vip",
+  "generate-affiliate-boxes": "affiliate",
+  "generate-donation-cta": "donation",
+};
+
+/**
+ * Enqueue auxiliary autonomous tasks (translate / SEO / ads / VIP / affiliate / donation)
+ * into editorial_queue when the service role is available. LLM/ad execution remains a
+ * follow-up step — this replaces empty "queued" stubs with persisted work items.
+ */
+export async function runAuxiliaryEditorialCron(
+  task: AuxiliaryEditorialTask,
+  options?: { limit?: number }
+): Promise<{
+  ok: true;
+  task: AuxiliaryEditorialTask;
+  status: "queued";
+  items: number;
+  queued: EditorialQueueItem[];
+  persisted: number;
+  timestamp: string;
+  note: string;
+}> {
+  const limit = options?.limit ?? getPrimaryDesks().length;
+  const desks = getPrimaryDesks().slice(0, limit);
+  const queued: EditorialQueueItem[] = [];
+  let persisted = 0;
+  const taskType = AUX_TASK_TYPE[task];
+  const admin = tryCreateServiceRoleClient();
+
+  for (const desk of desks) {
+    const topic = pickTopicForDesk(desk) as EditorialTopic;
+    const journalist = getJournalistForTopic(desk.locale, topic);
+    const reviewers = getReviewPipeline(desk.locale);
+    const item = createEditorialQueueItem(desk.id, desk.locale, topic, journalist?.id, taskType);
+    queued.push(item);
+
+    const ok = await insertQueueRow({
+      desk_id: desk.id,
+      locale: desk.locale,
+      topic,
+      status: "queued",
+      task_type: taskType,
+      journalist_persona_id: journalist?.id ?? null,
+      editor_persona_id: reviewers.find((r) => r.role === "editor")?.id ?? null,
+      metadata: {
+        queue_ref: item.id,
+        pipeline: task,
+        require_editorial_review: CONTENT_GUARDRAILS.requireEditorialReview,
+        review_pipeline: reviewers.map((r) => ({ id: r.id, role: r.role })),
+      },
+    });
+    if (ok) persisted += 1;
+  }
+
+  return {
+    ok: true,
+    task,
+    status: "queued",
+    items: queued.length,
+    queued,
+    persisted,
+    timestamp: new Date().toISOString(),
+    note:
+      admin == null
+        ? "No service role — in-memory queue only; set SUPABASE_SERVICE_ROLE_KEY to persist"
+        : `Persisted ${persisted}/${queued.length} ${task} jobs to editorial_queue (execution deferred)`,
+  };
+}
+
+/**
+ * add-images — enqueue image tasks for primary desks + run curated suggestion batch
+ * when service role is present (dry-run suggestions by default; apply via images endpoint).
+ */
+export async function runAddImagesCron(options?: {
+  limit?: number;
+  apply?: boolean;
+  dryRun?: boolean;
+}): Promise<{
+  ok: true;
+  task: "add-images";
+  status: "queued" | "completed" | "partial";
+  items: number;
+  queued: EditorialQueueItem[];
+  persisted: number;
+  imageCandidates: number;
+  imageSuggestions: number;
+  timestamp: string;
+  note: string;
+}> {
+  const { processEditorialImageBatch } = await import("./images");
+  const desks = getPrimaryDesks();
+  const queued: EditorialQueueItem[] = [];
+  let persisted = 0;
+
+  for (const desk of desks) {
+    const topic = pickTopicForDesk(desk) as EditorialTopic;
+    const item = createEditorialQueueItem(desk.id, desk.locale, topic, "image-curator-global", "image");
+    queued.push(item);
+    const ok = await insertQueueRow({
+      desk_id: desk.id,
+      locale: desk.locale,
+      topic,
+      status: "queued",
+      task_type: "image",
+      journalist_persona_id: "image-curator-global",
+      metadata: {
+        queue_ref: item.id,
+        pipeline: "add-images",
+        legacy_endpoint: "/api/ecosystem/editorial/images",
+      },
+    });
+    if (ok) persisted += 1;
+  }
+
+  const batch = await processEditorialImageBatch({
+    limit: options?.limit ?? 10,
+    apply: options?.apply ?? false,
+    dryRun: options?.dryRun ?? true,
+  });
+
+  const admin = tryCreateServiceRoleClient();
+  return {
+    ok: true,
+    task: "add-images",
+    status: batch.result.failures.length ? "partial" : "completed",
+    items: queued.length,
+    queued,
+    persisted,
+    imageCandidates: batch.candidates.length,
+    imageSuggestions: batch.suggestions.length,
+    timestamp: new Date().toISOString(),
+    note:
+      admin == null
+        ? "No service role — queue + suggestions in-memory only"
+        : `Queued ${persisted} image jobs; ${batch.suggestions.length} suggestions from batch`,
   };
 }

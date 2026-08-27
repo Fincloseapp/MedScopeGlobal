@@ -5,6 +5,8 @@ import {
   getImageCuratorForLocale,
 } from "@/lib/ecosystem/editorial/personas";
 import {
+  runAddImagesCron,
+  runAuxiliaryEditorialCron,
   runEditorialQueueCron,
   runGenerateArticlesCron,
   runSyndicateArticlesCron,
@@ -14,6 +16,23 @@ import {
   IMAGE_CURATOR_PERSONA_ID,
 } from "@/lib/ecosystem/editorial/images";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
+
+type AuxiliaryTask =
+  | "translate-content"
+  | "seo-optimize"
+  | "place-ads"
+  | "generate-vip-content"
+  | "generate-affiliate-boxes"
+  | "generate-donation-cta";
+
+const AUXILIARY_TASKS: ReadonlySet<string> = new Set<AuxiliaryTask>([
+  "translate-content",
+  "seo-optimize",
+  "place-ads",
+  "generate-vip-content",
+  "generate-affiliate-boxes",
+  "generate-donation-cta",
+]);
 
 /** Autonomous task runner — triggered by cron or manual admin invoke */
 export async function POST(request: Request) {
@@ -101,7 +120,28 @@ export async function POST(request: Request) {
     });
   }
 
-  if (task === "editorial-images") {
+  if (task === "editorial-images" || task === "add-images") {
+    if (task === "add-images") {
+      const result = await runAddImagesCron({
+        limit: body.limit ?? 10,
+        apply: body.apply ?? false,
+        dryRun: body.dryRun ?? true,
+      });
+      return NextResponse.json({
+        task,
+        status: result.status,
+        description: schedule.description,
+        items: result.items,
+        queued: result.queued,
+        persisted: result.persisted,
+        imageCandidates: result.imageCandidates,
+        imageSuggestions: result.imageSuggestions,
+        note: result.note,
+        cronEndpoint: "/api/ecosystem/editorial/images",
+        timestamp: result.timestamp,
+      });
+    }
+
     const curator = getImageCuratorForLocale("cs");
     const { result, suggestions, candidates } = await processEditorialImageBatch({
       limit: body.limit ?? 10,
@@ -147,6 +187,33 @@ export async function POST(request: Request) {
     });
   }
 
+  if (AUXILIARY_TASKS.has(task)) {
+    const result = await runAuxiliaryEditorialCron(task as AuxiliaryTask, {
+      limit: body.limit,
+    });
+    return NextResponse.json({
+      task,
+      status: result.status,
+      description: schedule.description,
+      items: result.items,
+      queued: result.queued,
+      persisted: result.persisted,
+      note: result.note,
+      timestamp: result.timestamp,
+    });
+  }
+
+  // switch-locale is client-side geolocation — no queue work
+  if (task === "switch-locale") {
+    return NextResponse.json({
+      task,
+      status: "noop",
+      description: schedule.description,
+      note: "Client-side geolocation; no server queue",
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   return NextResponse.json({
     task,
     status: "queued",
@@ -159,6 +226,7 @@ const CRON_ENDPOINT_BY_TASK: Partial<Record<string, string>> = {
   "mediflow-daily-reset": "/api/cron/ecosystem-mediflow",
   "editorial-queue": "/api/cron/ecosystem-editorial-queue",
   "editorial-images": "/api/ecosystem/editorial/images",
+  "add-images": "/api/ecosystem/editorial/images",
   "generate-articles": "/api/cron/ecosystem-generate-articles",
   "syndicate-articles": "/api/cron/ecosystem-syndicate",
 };
