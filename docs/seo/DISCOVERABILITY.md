@@ -123,3 +123,17 @@ curl -sI https://medscopeglobal.com/en-us       # Set-Cookie medscope_locale=en-
 curl -s https://medscopeglobal.com/de | rg -o 'rel="canonical"[^>]+|og:locale[^>]+|<title>[^<]+'
 curl -s https://medscopeglobal.com/robots.txt | rg Sitemap
 ```
+
+## Live production probe (2026-08-27 11:08 UTC)
+
+| Path | Status | Location / cookie | Verdict |
+|---|---|---|---|
+| `/cs` `/en` `/de` `/jp` `/cn` `/kr` `/sk` `/pl` | 200 | OK | works |
+| `/en-us` | 200 | cookie `medscope_locale=en` (should be `en-US`) | **critical** until this branch deploys |
+| `/ja` | 307 → `/en/ja` | treated as unprefixed path | **critical** — alias missing on prod |
+| `/zh-cn` | 200 | cookie `zh-CN` (should 308 → `/cn`) | partial |
+| `/ko` | 200 | cookie `ko` (should 308 → `/kr`) | partial |
+| `/robots.txt` `/sitemap-cs.xml` `/sitemap-en-us.xml` | 200 | OK | works |
+
+Fixes in this branch resolve the critical `/ja` and `en-US` cookie/canonical issues after Cloudflare deploy of `main`.
+
