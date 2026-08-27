@@ -4,9 +4,21 @@ Live donations use Stripe Checkout via `POST /api/ecosystem/donate` (and tip/che
 
 **Root cause of production hang (2026-08-27):** `secretKeyConfigured: true` but `POST /api/ecosystem/donate` returned `503` `{"error":"Chyba při vytváření platby"}` after **~242s**. The Stripe Node default HTTP client stalls on Cloudflare Workers.
 
-**Canonical Workers-safe path on `main`:** `Stripe.createFetchHttpClient()` via `lib/stripe/client.ts` (`createStripeClient`, 20s timeout) for donate/tip/ads/academy/webhook. Alternate pure-fetch helper: `lib/stripe/checkout-fetch.ts` (12s `AbortSignal`) + `scripts/smoke-stripe-checkout-fetch.ts` — kept for tests, not used by production routes.
+**Canonical Workers-safe path on `main`:** donate/tip create Checkout with pure-fetch `lib/stripe/checkout-fetch.ts` (`createCheckoutSession`, 12s `AbortSignal`). Shared `lib/stripe/client.ts` (`createStripeClient` + `Stripe.createFetchHttpClient()`, 20s) still backs ads/academy/webhook and secret-key helpers. Smoke: `scripts/smoke-stripe-checkout-fetch.ts`.
 
 Canonical site: `https://medscopeglobal.com`
+
+---
+
+## Checkout vs webhook (read this first)
+
+| Capability | Needs `STRIPE_SECRET_KEY` | Needs `STRIPE_WEBHOOK_SECRET` |
+|------------|---------------------------|------------------------------|
+| Create Checkout session (`POST /api/ecosystem/donate`, article tip) | **Yes** | **No** |
+| Redirect payer to `checkout.stripe.com` and collect payment | **Yes** | **No** |
+| Post-payment fulfillment / order logging via `/api/stripe/webhook` | — | **Yes** (when you want server-side confirmation) |
+
+**Webhook is optional until fulfillment is required.** Skipping `STRIPE_WEBHOOK_SECRET` in Cursor Secrets / local `.env.local` does **not** block Checkout. Payments still complete in Stripe Checkout; without the webhook you only lose automatic post-payment fulfillment and webhook-driven logging until you add `whsec_…` later.
 
 ---
 
@@ -16,8 +28,8 @@ Cloudflare Dashboard → **Workers & Pages** → **medscopeglobal** → **Settin
 
 | Name | Type | Notes |
 |------|------|--------|
-| `STRIPE_SECRET_KEY` | Secret | Live secret key (`sk_live_…`). Required for Checkout session creation. |
-| `STRIPE_WEBHOOK_SECRET` | Secret | Endpoint signing secret (`whsec_…`). Required for `/api/stripe/webhook` fulfillment (Checkout redirect works without it). |
+| `STRIPE_SECRET_KEY` | Secret | Live secret key (`sk_live_…`). **Required** for Checkout session creation. |
+| `STRIPE_WEBHOOK_SECRET` | Secret | Endpoint signing secret (`whsec_…`). **Optional until fulfillment required** — Checkout redirect works without it. Only needed for `/api/stripe/webhook` verification + post-payment fulfillment/logging. |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Variable (or Secret) | Live publishable key (`pk_live_…`). Used by client Checkout / Elements. |
 
 Also keep `NEXT_PUBLIC_SITE_URL=https://medscopeglobal.com` so success/cancel URLs resolve correctly.
@@ -26,7 +38,7 @@ Optional bulk sync from PC: `pnpm cf:env:sync` — then paste into dashboard or 
 
 ---
 
-## Webhook endpoint
+## Webhook endpoint (optional until fulfillment)
 
 | Field | Value |
 |-------|--------|
@@ -77,7 +89,7 @@ curl -sS https://medscopeglobal.com/api/v29/health | jq '.stripe.webhookSecretCo
 ```bash
 curl -sS https://medscopeglobal.com/api/v29/health | jq '.stripe'
 # Expect: secretKeyConfigured=true, httpClient=fetch after Workers-safe deploy
-# webhookSecretConfigured should become true once whsec is set
+# webhookSecretConfigured may be false — OK until you need post-payment fulfillment
 
 curl -sS -X POST https://medscopeglobal.com/api/ecosystem/donate \
   -H 'content-type: application/json' \
