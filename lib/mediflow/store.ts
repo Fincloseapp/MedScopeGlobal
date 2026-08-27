@@ -216,23 +216,30 @@ export async function logDonationOrder(fields: {
   const admin = tryCreateServiceRoleClient();
   if (!admin) return;
 
-  await admin.from("v27_orders").upsert(
-    {
-      stripe_session_id: fields.stripeSessionId,
-      kind: "donation",
-      product_id: "author_donation",
-      amount_czk: fields.currency === "czk" ? fields.amountMinor : Math.round(fields.amountMinor / 100),
-      status: "pending",
-      user_id: fields.userId ?? null,
-      metadata: {
-        currency: fields.currency,
-        amount_minor: fields.amountMinor,
-        article_slug: fields.articleSlug ?? "",
-        article_title: fields.articleTitle ?? "",
+  try {
+    const { error } = await admin.from("v27_orders").upsert(
+      {
+        stripe_session_id: fields.stripeSessionId,
+        kind: "donation",
+        product_id: "author_donation",
+        amount_czk: fields.currency === "czk" ? fields.amountMinor : Math.round(fields.amountMinor / 100),
+        status: "pending",
+        user_id: fields.userId ?? null,
+        metadata: {
+          currency: fields.currency,
+          amount_minor: fields.amountMinor,
+          article_slug: fields.articleSlug ?? "",
+          article_title: fields.articleTitle ?? "",
+        },
       },
-    },
-    { onConflict: "stripe_session_id" }
-  );
+      { onConflict: "stripe_session_id" }
+    );
+    if (error) {
+      console.error("[logDonationOrder]", error.message);
+    }
+  } catch (err) {
+    console.error("[logDonationOrder]", err);
+  }
 }
 
 export async function logArticleTipOrder(fields: {
@@ -247,25 +254,29 @@ export async function logArticleTipOrder(fields: {
   const admin = tryCreateServiceRoleClient();
   if (!admin) return;
 
-  const { error } = await admin.from("v27_orders").upsert(
-    {
-      stripe_session_id: fields.stripeSessionId,
-      kind: "article_tip",
-      product_id: "article_tringelt",
-      amount_czk: fields.currency === "czk" ? fields.amountMinor : Math.round(fields.amountMinor / 100),
-      status: "pending",
-      user_id: fields.userId ?? null,
-      metadata: {
-        currency: fields.currency,
-        amount_minor: fields.amountMinor,
-        article_slug: fields.articleSlug,
-        article_title: fields.articleTitle ?? "",
-        locale: fields.locale ?? "cs",
+  try {
+    const { error } = await admin.from("v27_orders").upsert(
+      {
+        stripe_session_id: fields.stripeSessionId,
+        kind: "article_tip",
+        product_id: "article_tringelt",
+        amount_czk: fields.currency === "czk" ? fields.amountMinor : Math.round(fields.amountMinor / 100),
+        status: "pending",
+        user_id: fields.userId ?? null,
+        metadata: {
+          currency: fields.currency,
+          amount_minor: fields.amountMinor,
+          article_slug: fields.articleSlug,
+          article_title: fields.articleTitle ?? "",
+          locale: fields.locale ?? "cs",
+        },
       },
-    },
-    { onConflict: "stripe_session_id" }
-  );
-  if (error) {
-    console.error("[logArticleTipOrder]", error.message);
+      { onConflict: "stripe_session_id" }
+    );
+    if (error) {
+      console.error("[logArticleTipOrder]", error.message);
+    }
+  } catch (err) {
+    console.error("[logArticleTipOrder]", err);
   }
 }

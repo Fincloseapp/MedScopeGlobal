@@ -161,31 +161,6 @@ export function getLekariNavStripCopy(): ConversionCopy {
   };
 }
 
-/** MediFlow / VIP destinations — never cross-sell MeDipacient 99 Kč here */
-export function getMediFlowVipNavStripCopy(pathname: string | null | undefined): ConversionCopy {
-  const onVip = Boolean(pathname && (pathname === "/vip" || pathname.startsWith("/vip/")));
-  if (onVip) {
-    return {
-      slot: "nav_strip",
-      eyebrow: "VIP longevity",
-      headline: "Protokoly dlouhověkosti",
-      body: "VIP longevity 149 Kč/měsíc — protokoly, PDF a MediFlow sync. Oddělené od Student LF (Academy).",
-      ctaLabel: "14 dní zdarma",
-      ctaHref: "/predplatne?trial=1",
-      hint: "Ne Student LF",
-    };
-  }
-  return {
-    slot: "nav_strip",
-    eyebrow: "MediFlow",
-    headline: "Wellness deník zdarma",
-    body: "Symptomy, suplementy a články z VitaScope. VIP longevity sync/PDF zvlášť za 149 Kč — není Student LF.",
-    ctaLabel: "Spustit MediFlow",
-    ctaHref: "/app/mediflow",
-    hint: "Základ zdarma",
-  };
-}
-
 export function isStudentAudiencePath(pathname: string | null | undefined): boolean {
   if (!pathname) return false;
   return (
@@ -217,17 +192,6 @@ export function isPhysicianAudiencePath(pathname: string | null | undefined): bo
     pathname.startsWith("/lekari/") ||
     pathname.startsWith("/odborna") ||
     pathname.startsWith("/app/dokumentace")
-  );
-}
-
-export function isMediFlowOrVipPath(pathname: string | null | undefined): boolean {
-  if (!pathname) return false;
-  return (
-    pathname === "/mediflow" ||
-    pathname.startsWith("/mediflow/") ||
-    pathname.startsWith("/app/mediflow") ||
-    pathname === "/vip" ||
-    pathname.startsWith("/vip/")
   );
 }
 

@@ -100,6 +100,7 @@ export async function POST(request: Request) {
           articleTitle: body.articleTitle,
         });
       } catch (logErr) {
+        // Never block redirect to Checkout if order logging fails.
         console.error("[donate] order log failed (checkout still valid)", logErr);
       }
     }

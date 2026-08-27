@@ -115,12 +115,8 @@ export function AuthorDonationButton({
           </button>
         </div>
       </div>
-      {error ? (
-        <p className="mt-3 text-sm font-medium text-rose-700" role="alert">
-          {error}
-        </p>
-      ) : null}
-      {loading ? <p className="mt-2 text-xs text-slate-500">Přesměrování na Stripe Checkout…</p> : null}
+      {error ? <p className="mt-3 text-sm text-red-600" role="alert">{error}</p> : null}
+      {loading ? <p className="mt-2 text-xs text-slate-500">Přesměrování na Stripe…</p> : null}
     </div>
   );
 }
