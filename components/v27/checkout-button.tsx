@@ -44,7 +44,14 @@ export function V27CheckoutButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ kind, productId, ...(userId ? { userId } : {}) }),
       });
-      const data = await res.json();
+      const data = (await res.json()) as {
+        url?: string;
+        error?: string;
+        enabled?: boolean;
+      };
+      if (res.status === 503 && data.enabled === false) {
+        throw new Error("Stripe není nakonfigurován — nastavte STRIPE_SECRET_KEY na Workeru");
+      }
       if (!res.ok) throw new Error(data.error ?? "Checkout selhal");
       if (data.url) {
         window.location.href = data.url;

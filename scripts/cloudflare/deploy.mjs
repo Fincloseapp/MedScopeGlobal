@@ -63,16 +63,26 @@ const accountId = process.env.CLOUDFLARE_ACCOUNT_ID || process.env.CF_ACCOUNT_ID
 if (!inWorkersBuilds) {
   if (!token) {
     console.error(`
-Missing CLOUDFLARE_API_TOKEN
+Missing CLOUDFLARE_API_TOKEN — cannot deploy to Cloudflare Workers.
 
-GitHub Actions:
-  Repo → Settings → Secrets and variables → Actions
-  Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID
+Unblock (pick one):
+  1) PC: in D:\\medscope.local run  pnpm auto:d  (restore token from D: .env.local)
+  2) Set CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID in env / Cursor Secrets / .env.local
+  3) GitHub Actions secrets, then re-run workflow cloudflare-deploy.yml
+  4) Cloudflare Workers Builds (medscopeglobal) — platform injects credentials
+
+Verify after deploy:
+  curl -sI https://medscopeglobal.com/assets/marketing/mediflow.webp
 `);
     process.exit(1);
   }
   if (!accountId) {
-    console.error("Missing CLOUDFLARE_ACCOUNT_ID");
+    console.error(`
+Missing CLOUDFLARE_ACCOUNT_ID
+
+Set it alongside CLOUDFLARE_API_TOKEN (env, .env.local, or GitHub Actions secrets).
+PC shortcut: pnpm auto:d inside D:\\medscope.local
+`);
     process.exit(1);
   }
 }
