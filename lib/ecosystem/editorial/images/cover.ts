@@ -60,7 +60,7 @@ const DEAD_OR_BAD_REMOTE = [
 ] as const;
 
 const FOOD_RE =
-  /tal[ií][rř]|st[rř]edo\s*mo[rř]|stredomorsk|kuchyn|strav|j[ií]dl|meal|diet|v[yý][zž]iv|sal[aá]t|olive|zelenin|protein|b[ií]lkovin|hydrat|pitn[eé]|ovoce|sn[ií]dan|ve[cč]e[rř]|potravin/i;
+  /tal[ií][rř]|st[rř]edo\s*mo[rř]|stredomorsk|kuchyn|strav|j[ií]dl|meal|diet|v[yý][zž]iv|sal[aá]t|olive|zelenin|protein|b[ií]lkovin|hydrat|pitn[yý]\s+re[zž]im|pitn[eé]\s+re[zž]im|ovoce|sn[ií]dan|ve[cč]e[rř]|potravin/i;
 
 const SLEEP_RE =
   /sp[aá]nek|sleep|apnoe|insomni|odpo[cč]ink|no[cč]n[ií]|polar|postel|unava|únava|jarn[ií]\s+unava|zimn[ií]\s+unava/i;
@@ -125,14 +125,14 @@ export function classifyCoverTopic(input: {
   const hay = haystack(input);
   const topic = (input.publicTopic ?? "").toLowerCase();
 
-  if (FOOD_RE.test(hay) || topic.includes("zivotni") || topic.includes("strav")) {
-    if (FOOD_RE.test(hay)) return "food";
-  }
+  // Specific lifestyle signals before broad food / clinical stock — avoids
+  // “zimní únava + pitný režim” landing on meal photography.
   if (SLEEP_RE.test(hay)) return "sleep";
   if (CALM_RE.test(hay)) return "calm";
   if (MOVEMENT_RE.test(hay)) return "movement";
   if (SENIORS_RE.test(hay)) return "seniors";
   if (KIDS_RE.test(hay)) return "walk";
+  if (FOOD_RE.test(hay) || topic.includes("strav")) return "food";
   if (VITALS_RE.test(hay)) return "vitals";
   if (TECH_RE.test(hay)) return "tech";
   if (RESEARCH_RE.test(hay) || topic.includes("prevence")) return "research";

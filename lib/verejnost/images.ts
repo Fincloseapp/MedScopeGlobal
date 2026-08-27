@@ -1,25 +1,29 @@
-import { V21_MEDICAL_IMAGES } from "@/lib/v21/images";
+/**
+ * Public-health topic stills for hub tiles — local curated covers only.
+ * Do not point at Unsplash / v25 doctor-phone stock (listings rewrite via
+ * resolveArticleCoverUrl; hub tiles must match).
+ */
 
-/** Obrázky pro veřejnostní témata — fallback bez broken SVG. */
 const TOPIC_IMAGES: Record<string, string> = {
-  "pruvodce-nemocemi": V21_MEDICAL_IMAGES.study,
-  symptomy: V21_MEDICAL_IMAGES.study,
-  prevence: V21_MEDICAL_IMAGES.hero,
-  "zivotni-styl": V21_MEDICAL_IMAGES.medicina,
-  vyziva: V21_MEDICAL_IMAGES.study,
-  spanek: V21_MEDICAL_IMAGES.digitalHealth,
-  stres: V21_MEDICAL_IMAGES.digitalHealth,
-  ergonomie: V21_MEDICAL_IMAGES.medicina,
-  rozhovory: V21_MEDICAL_IMAGES.university,
-  "zivotni-styl-backend": V21_MEDICAL_IMAGES.medicina,
-  nemoci: V21_MEDICAL_IMAGES.study,
-  "prevence-backend": V21_MEDICAL_IMAGES.hero,
-  "rozhovory-backend": V21_MEDICAL_IMAGES.university,
+  "pruvodce-nemocemi": "/assets/covers/clinical.webp",
+  symptomy: "/assets/covers/clinical-2.webp",
+  prevence: "/assets/covers/research.webp",
+  "zivotni-styl": "/assets/covers/movement.webp",
+  vyziva: "/assets/covers/food.webp",
+  spanek: "/assets/covers/sleep.webp",
+  stres: "/assets/covers/calm.webp",
+  ergonomie: "/assets/covers/walk.webp",
+  rozhovory: "/assets/covers/clinical-3.webp",
+  "zivotni-styl-backend": "/assets/covers/movement.webp",
+  nemoci: "/assets/covers/clinical.webp",
+  "prevence-backend": "/assets/covers/research.webp",
+  "rozhovory-backend": "/assets/covers/clinical-3.webp",
+  dlouhovekost: "/assets/covers/seniors.webp",
 };
 
 export function getPublicTopicImage(slug: string): string | null {
   return TOPIC_IMAGES[slug] ?? null;
 }
 
-export const VEREJNOST_FALLBACK_COVER =
-  "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80&auto=format&fit=crop";
+/** Seed / demo fallback when no article-specific cover is set. */
+export const VEREJNOST_FALLBACK_COVER = "/assets/covers/clinical.webp";
