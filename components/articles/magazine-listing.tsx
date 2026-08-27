@@ -77,7 +77,7 @@ export function MagazineListing({
           </p>
           <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-600">
             Redakční feed se připravuje. Mezitím můžete vést wellness deník v MediFlow, prozkoumat VIP
-            protokoly nebo podpořit redakci tringeltem u publikovaných textů.
+            protokoly nebo podpořit redakci příspěvkem / darem u publikovaných textů.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <Link
@@ -96,7 +96,7 @@ export function MagazineListing({
               href="/predplatne"
               className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
             >
-              Předplatné / tringelt
+              Předplatné
             </Link>
           </div>
         </div>

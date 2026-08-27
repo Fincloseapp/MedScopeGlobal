@@ -36,15 +36,6 @@
     "subtitle": "10 protokol berbasis bukti untuk tidur, metabolisme, imunitas, dan longevitas.",
     "price": "Rp 75.000/bulan"
   },
-  "tringelt": {
-    "title": "Dukung penulis · Tringelt",
-    "subtitle": "Kontribusi mikro opsional — seperti tip di restoran. Terima kasih redaksi.",
-    "custom": "Kustom",
-    "vipUpsell": "Dukung redaksi dan dapatkan protokol VIP longevitas —",
-    "unavailable": "Tringelt saat ini tidak tersedia.",
-    "tip": "Dukung redaksi dengan tringelt",
-    "exploreVip": "atau jelajahi protokol VIP longevitas"
-  },
   "donation": {
     "title": "Dukung penulis",
     "subtitle": "Micro-donation membantu melanjutkan konten berkualitas.",
@@ -71,5 +62,14 @@
     "biohacking": "Biohacking untuk pemula",
     "sleep": "Optimasi tidur",
     "mental": "Kesejahteraan mental"
+  },
+  "contribution": {
+    "title": "Dukung penulis · Kontribusi",
+    "subtitle": "Kontribusi opsional — terima kasih. Bukan VIP atau langganan.",
+    "custom": "Kustom",
+    "vipUpsell": "VIP Longevity adalah langganan berbayar terpisah —",
+    "unavailable": "Kontribusi saat ini tidak tersedia.",
+    "tip": "Dukung redaksi dengan kontribusi",
+    "exploreVip": "atau jelajahi protokol VIP Longevity"
   }
 }

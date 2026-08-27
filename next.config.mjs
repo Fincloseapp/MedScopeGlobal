@@ -88,12 +88,14 @@ const nextConfig = {
       { source: "/vitascope", destination: "/", permanent: false },
       { source: "/magazine", destination: "/articles", permanent: false },
       { source: "/affiliate", destination: "/aplikace", permanent: false },
-      { source: "/tips", destination: "/vip/protokoly", permanent: false },
-      { source: "/tipy", destination: "/vip/protokoly", permanent: false },
-      { source: "/tip", destination: "/vip/protokoly", permanent: false },
-      { source: "/tringelt", destination: "/vip/protokoly", permanent: false },
-      { source: "/donate", destination: "/vip/protokoly", permanent: false },
-      { source: "/podpora", destination: "/vip/protokoly", permanent: false },
+      // Tips / donations live on public articles — keep separate from VIP Longevity
+      { source: "/tips", destination: "/articles", permanent: false },
+      { source: "/tipy", destination: "/articles", permanent: false },
+      { source: "/tip", destination: "/articles", permanent: false },
+      { source: "/tringelt", destination: "/articles", permanent: false },
+      { source: "/prispevek", destination: "/articles", permanent: false },
+      { source: "/donate", destination: "/articles", permanent: false },
+      { source: "/podpora", destination: "/articles", permanent: false },
 
       // MeDiktor → OrdiZapis asset aliases (installed PWAs / old caches)
       { source: "/assets/mediktor/:path*", destination: "/assets/ordizapis/:path*", permanent: false },

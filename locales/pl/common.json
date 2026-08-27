@@ -36,15 +36,6 @@
     "subtitle": "10 protokołów opartych na dowodach dla snu, metabolizmu, odporności i długowieczności.",
     "price": "29 zł/miesiąc"
   },
-  "tringelt": {
-    "title": "Wesprzyj autora · Tringelt",
-    "subtitle": "Opcjonalny mikro-wkład — jak napiwek w restauracji. Dziękujemy redakcji.",
-    "custom": "Własna kwota",
-    "vipUpsell": "Wesprzyj redakcję i uzyskaj protokoły VIP longevity —",
-    "unavailable": "Tringelt jest obecnie niedostępny.",
-    "tip": "Wesprzyj redakcję tringeltem",
-    "exploreVip": "lub poznaj protokoły VIP longevity"
-  },
   "donation": {
     "title": "Wesprzyj autora",
     "subtitle": "Mikro-dar pomaga tworzyć wysokiej jakości treści.",
@@ -71,5 +62,14 @@
     "biohacking": "Biohacking dla początkujących",
     "sleep": "Optymalizacja snu",
     "mental": "Dobrostan psychiczny"
+  },
+  "contribution": {
+    "title": "Wesprzyj autora · Wkład",
+    "subtitle": "Opcjonalny wkład — dziękujemy. To nie VIP ani subskrypcja.",
+    "custom": "Własna",
+    "vipUpsell": "VIP Longevity to osobna płatna subskrypcja —",
+    "unavailable": "Wkłady są obecnie niedostępne.",
+    "tip": "Wesprzyj redakcję wkładem",
+    "exploreVip": "lub poznaj protokoły VIP Longevity"
   }
 }

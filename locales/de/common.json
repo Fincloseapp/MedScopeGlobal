@@ -36,15 +36,6 @@
     "subtitle": "10 evidenzbasierte Protokolle für Schlaf, Stoffwechsel, Immunität und Langlebigkeit.",
     "price": "5,99 €/Monat"
   },
-  "tringelt": {
-    "title": "Autor unterstützen · Tringelt",
-    "subtitle": "Optionaler Mikrobeitrag — wie ein Trinkgeld im Restaurant. Danke an die Redaktion.",
-    "custom": "Eigener Betrag",
-    "vipUpsell": "Unterstützen Sie die Redaktion und erhalten Sie VIP Longevity-Protokolle —",
-    "unavailable": "Tringelt ist derzeit nicht verfügbar.",
-    "tip": "Unterstützen Sie die Redaktion mit einem Tringelt",
-    "exploreVip": "oder entdecken Sie VIP Longevity-Protokolle"
-  },
   "donation": {
     "title": "Autor unterstützen",
     "subtitle": "Eine Mikro-Spende hilft, qualitativ hochwertige Inhalte zu erstellen.",
@@ -71,5 +62,14 @@
     "biohacking": "Biohacking für Einsteiger",
     "sleep": "Schlafoptimierung",
     "mental": "Mentales Wohlbefinden"
+  },
+  "contribution": {
+    "title": "Autor unterstützen · Beitrag",
+    "subtitle": "Freiwilliger Beitrag — danke. Kein VIP und kein Abo.",
+    "custom": "Eigene",
+    "vipUpsell": "VIP Longevity ist ein separates bezahltes Abo —",
+    "unavailable": "Beiträge sind derzeit nicht verfügbar.",
+    "tip": "Unterstützen Sie die Redaktion mit einem Beitrag",
+    "exploreVip": "oder VIP-Longevity-Protokolle erkunden"
   }
 }

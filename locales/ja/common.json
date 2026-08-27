@@ -36,15 +36,6 @@
     "subtitle": "睡眠、代謝、免疫、長寿のための10のエビデンスベースプロトコル。",
     "price": "¥600/月"
   },
-  "tringelt": {
-    "title": "著者を支援 · Tringelt",
-    "subtitle": "任意のマイクロ寄付——レストランのチップのように。編集部に感謝します。",
-    "custom": "カスタム",
-    "vipUpsell": "編集部を支援して VIP ロンジェビティプロトコルを取得 —",
-    "unavailable": "Tringelt は現在利用できません。",
-    "tip": "tringelt で編集部を支援",
-    "exploreVip": "または VIP ロンジェビティプロトコルを見る"
-  },
   "donation": {
     "title": "著者を支援",
     "subtitle": "マイクロ寄付は質の高いコンテンツ制作を支えます。",
@@ -71,5 +62,14 @@
     "biohacking": "初心者向けバイオハッキング",
     "sleep": "睡眠最適化",
     "mental": "メンタルウェルネス"
+  },
+  "contribution": {
+    "title": "著者を支援 · 寄付",
+    "subtitle": "任意の寄付です。VIPやサブスクではありません。",
+    "custom": "カスタム",
+    "vipUpsell": "VIP Longevity は別の有料サブスクです —",
+    "unavailable": "寄付は現在利用できません。",
+    "tip": "寄付で編集部を支援",
+    "exploreVip": "または VIP Longevity を見る"
   }
 }

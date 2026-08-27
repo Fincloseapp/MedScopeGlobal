@@ -36,15 +36,6 @@
     "subtitle": "10 protocolos basados en evidencia para sueño, metabolismo, inmunidad y longevidad.",
     "price": "5,99 €/mes"
   },
-  "tringelt": {
-    "title": "Apoyar al autor · Tringelt",
-    "subtitle": "Micro-aporte opcional — como una propina en un restaurante. Gracias a la redacción.",
-    "custom": "Importe personalizado",
-    "vipUpsell": "Apoye a la redacción y acceda a protocolos VIP de longevidad —",
-    "unavailable": "Tringelt no está disponible en este momento.",
-    "tip": "Apoye a la redacción con un tringelt",
-    "exploreVip": "o explore protocolos VIP de longevidad"
-  },
   "donation": {
     "title": "Apoyar al autor",
     "subtitle": "Una micro-donación ayuda a seguir creando contenido de calidad.",
@@ -71,5 +62,14 @@
     "biohacking": "Biohacking para principiantes",
     "sleep": "Optimización del sueño",
     "mental": "Bienestar mental"
+  },
+  "contribution": {
+    "title": "Apoyar al autor · Contribución",
+    "subtitle": "Contribución opcional — gracias. No es VIP ni una suscripción.",
+    "custom": "Personalizado",
+    "vipUpsell": "VIP Longevity es una suscripción de pago aparte —",
+    "unavailable": "Las contribuciones no están disponibles en este momento.",
+    "tip": "Apoye a la redacción con una contribución",
+    "exploreVip": "o explore los protocolos VIP Longevity"
   }
 }

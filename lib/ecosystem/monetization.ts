@@ -315,7 +315,7 @@ export function formatDonationAmount(amountMinor: number, locale: GlobalLocaleCo
   return formatMinorAmount(amountMinor, locale, tier.symbol);
 }
 
-/** Tringelt (article tip) tiers — micro-contributions from ~2 CZK equivalent */
+/** Article tip (Příspěvek) tiers — voluntary micro-contributions; not VIP / předplatné */
 export const ARTICLE_TIP_TIERS: Record<
   GlobalLocaleCode,
   { amounts: number[]; currency: string; symbol: string; minAmount: number }
