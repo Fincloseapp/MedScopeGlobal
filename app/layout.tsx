@@ -84,6 +84,16 @@ export default async function RootLayout({
 
   return (
     <html lang={htmlLang} suppressHydrationWarning data-site="medscopeglobal">
+      <head>
+        {/* OpenNext/esbuild may inject __name() into next-themes' inline boot script.
+            Define a no-op helper before that script runs so theme boot does not throw. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'typeof __name!="function"&&(globalThis.__name=function(t,n){try{Object.defineProperty(t,"name",{value:n,configurable:!0})}catch(e){}return t});',
+          }}
+        />
+      </head>
       <body
         className={`${inter.variable} ${display.variable} min-h-screen font-sans antialiased`}
       >
