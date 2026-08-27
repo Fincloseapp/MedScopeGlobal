@@ -6,6 +6,7 @@ import { ORDIZAPIS_APP } from "@/lib/apps/catalog";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { softwareApplicationJsonLd } from "@/lib/ecosystem/seo";
+import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "OrdiZáznam — Profesionální nástroj pro lékaře | MedScopeGlobal",
@@ -115,6 +116,10 @@ export default function OrdiZaznamPage() {
           </ol>
         </div>
       </section>
+
+      <div className="mx-auto max-w-5xl px-4 py-2 sm:px-6">
+        <GlobalAdSlot placement="in-content" locale="cs" />
+      </div>
 
       {/* Single clear offer — not a pricing card grid */}
       <section className="relative overflow-hidden bg-[#f0f6fb] px-4 py-16 sm:px-6">

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { MEDIFLOW, appSeoDescription, appSeoTitle } from "@/lib/apps/catalog";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
 
 export const metadata: Metadata = buildPageMetadata({
   title: appSeoTitle(MEDIFLOW),
@@ -139,6 +140,10 @@ export default function MediFlowMarketingPage() {
           </ol>
         </div>
       </section>
+
+      <div className="mx-auto max-w-5xl px-4 py-2 sm:px-6">
+        <GlobalAdSlot placement="in-content" locale="cs" />
+      </div>
 
       <section className="px-4 py-14 text-center sm:px-6">
         <p className="text-sm text-white/55">

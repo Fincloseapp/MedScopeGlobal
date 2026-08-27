@@ -412,6 +412,13 @@ export default async function ArticlePage({ params }: Props) {
               )}
             </div>
 
+            {!locked ? (
+              <GlobalAdSlot
+                placement="in-content"
+                locale={(locale as GlobalLocaleCode) ?? "cs"}
+              />
+            ) : null}
+
             {!isVip && !locked && articleInlineCopy ? (
               <ArticleInlineNudge copy={articleInlineCopy} />
             ) : null}
@@ -421,7 +428,7 @@ export default async function ArticlePage({ params }: Props) {
             ) : null}
 
             {!locked ? (
-              <div id={`article-tip-${article.slug}`}>
+              <div id={`article-tip-${article.slug}`} className="scroll-mt-24">
                 <ArticleTringeltTip
                   articleSlug={article.slug}
                   articleTitle={article.title}
@@ -446,6 +453,13 @@ export default async function ArticlePage({ params }: Props) {
             {!locked ? <TopLongevityProducts locale={(locale as GlobalLocaleCode) ?? "cs"} /> : null}
 
             {!isVip && !locked ? <VipUpgradeNudge locale={(locale as GlobalLocaleCode) ?? "cs"} /> : null}
+
+            {!locked ? (
+              <GlobalAdSlot
+                placement="footer"
+                locale={(locale as GlobalLocaleCode) ?? "cs"}
+              />
+            ) : null}
 
             {related && related.length > 0 && (
               <section className="mt-16 border-t pt-10">
