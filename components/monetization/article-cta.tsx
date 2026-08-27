@@ -231,24 +231,31 @@ export function ArticleShareButton({ title, slug }: { title: string; slug: strin
   );
 }
 
+/**
+ * Soft VIP Longevity CTA for dedicated VIP / marketing surfaces.
+ * Do not mount on open article footers next to tip/donate — that confuses
+ * voluntary support with paid předplatné.
+ */
 export function VipUpgradeNudge({ locale = "cs" }: { locale?: GlobalLocaleCode }) {
+  const isEn = locale === "en" || locale === "en-US";
   return (
     <aside className="my-10 border-t border-slate-200 pt-8">
       <div className="flex items-center gap-2">
         <Crown className="h-4 w-4 text-[#005B96]" aria-hidden />
         <p className="font-display text-lg font-semibold text-[#021d33]">
-          VIP Longevity protokoly
+          {isEn ? "VIP Longevity protocols" : "VIP Longevity protokoly"}
         </p>
       </div>
       <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600">
-        Placené předplatné s 10 vědecky podloženými protokoly — oddělené od
-        jednorázového příspěvku u článku.
+        {isEn
+          ? "A separate paid subscription with 10 science-backed protocols — not a tip or donation on an article."
+          : "Samostatné placené předplatné s 10 vědecky podloženými protokoly — nejde o příspěvek ani dar u článku."}
       </p>
       <Link
         href="/vip/protokoly"
         className="mt-4 inline-block bg-[#005B96] px-4 py-2 text-sm font-semibold text-white hover:bg-[#004a7a]"
       >
-        Prozkoumat protokoly
+        {isEn ? "Explore protocols" : "Prozkoumat protokoly"}
       </Link>
     </aside>
   );
