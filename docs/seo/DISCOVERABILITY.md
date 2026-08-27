@@ -32,12 +32,38 @@ Probed with follow-redirects. Status meanings:
 - **partial** — route OK + SEO tags OK, but UI dictionary still thin / copy falls back to EN for non-hero chrome, or few articles in that sitemap
 - **broken** — 404 or wrong locale collapse (pre-fix production issues noted)
 
+### Live probe — 2026-08-27 (pre-i18n deploy)
+
+Worker cache-tag `medscope-ui-v23.0`. Measured on `https://medscopeglobal.com`:
+
+| Request | HTTP | Cookie `medscope_locale` | Canonical | `og:locale` | `<html lang>` | Title locale | Verdict |
+|---|---|---|---|---|---|---|---|
+| `/cs` | 200 | `cs` | `/cs` | `cs_CZ` | `cs` | CS | **works** |
+| `/en` | 200 | `en` | `/en` | `en_US` | `en` | EN | **works** |
+| `/en-us` | 200 | `en` (bug) | `/en` (bug) | `en_US` | `en` | EN | **partial** — cookie + canonical collapse to `en` |
+| `/de` | 200 | `de` | `/de` | `cs_CZ` (bug) | `de` | EN title | **partial** |
+| `/pl` | 200 | `pl` | `/pl` | `cs_CZ` (bug) | `pl` | EN title | **partial** |
+| `/fr` | 200 | `fr` | `/fr` | `cs_CZ` (bug) | `fr` | EN title | **partial** |
+
+Hreflang count on all homepage locales: **20** (19 + `x-default`).
+
+Robots / sitemaps (same probe):
+
+| Asset | HTTP | Notes |
+|---|---|---|
+| `/robots.txt` | 200 | Lists `/sitemap.xml` + 19 locale sitemaps (`sitemap-cs.xml` … `sitemap-en-us.xml`) |
+| `/sitemap.xml` | 200 | Index present |
+| `/sitemap-cs.xml` | 200 | **1018** `<url>` entries |
+| `/sitemap-en-us.xml` `/sitemap-de.xml` `/sitemap-pl.xml` `/sitemap-fr.xml` | 200 | **18** URLs each (static hubs only) |
+
+### Matrix after this branch (code)
+
 | Request | Canonical | Prod (pre-fix) | After fixes (code) | Notes |
 |---|---|---|---|---|
 | `/cs` | `/cs` | **works** | works | Czech title + description |
 | `/en` | `/en` | **works** | works | EN international |
 | `/en-us` | `/en-us` | **partial** | works | Was collapsing canonical → `/en` via `normalizeLocale` bug |
-| `/de` `/fr` `/es` `/it` `/pl` | same | **partial** | works* | Route + hreflang OK; titles were EN-only → localized claims added |
+| `/de` `/fr` `/es` `/it` `/pl` | same | **partial** | works* | Route + hreflang OK; titles were EN-only → localized claims added; `og:locale` was stuck `cs_CZ` |
 | `/jp` | `/jp` | **works** | works | Japanese segment |
 | `/ja` | `/jp` | **broken** (→ `/en/ja` 404) | works (308→`/jp`) | Alias now recognized + redirected |
 | `/cn` | `/cn` | **works** | works | Chinese segment |
