@@ -36,15 +36,6 @@
     "subtitle": "10 个基于证据的睡眠、代谢、免疫与长寿方案。",
     "price": "¥25/月"
   },
-  "tringelt": {
-    "title": "支持作者 · Tringelt",
-    "subtitle": "可选微捐赠——如同餐厅小费。感谢编辑部。",
-    "custom": "自定义",
-    "vipUpsell": "支持编辑部并获取 VIP 长寿方案 —",
-    "unavailable": "Tringelt 目前不可用。",
-    "tip": "用 tringelt 支持编辑部",
-    "exploreVip": "或探索 VIP 长寿方案"
-  },
   "donation": {
     "title": "支持作者",
     "subtitle": "微捐赠有助于持续创作优质内容。",
@@ -71,5 +62,14 @@
     "biohacking": "初学者生物黑客",
     "sleep": "睡眠优化",
     "mental": "心理健康"
+  },
+  "contribution": {
+    "title": "支持作者 · 赞助",
+    "subtitle": "自愿赞助 — 谢谢。不是 VIP，也不是订阅。",
+    "custom": "自定义",
+    "vipUpsell": "VIP Longevity 是单独的付费订阅 —",
+    "unavailable": "赞助暂时不可用。",
+    "tip": "用赞助支持编辑部",
+    "exploreVip": "或了解 VIP Longevity 方案"
   }
 }

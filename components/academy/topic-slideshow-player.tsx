@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Pause, Play, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { VoicePicker } from "@/components/tts/voice-picker";
 import { SLIDE_PAUSE_MS } from "@/lib/tts/naturalize-czech";
 import { speakSlideText, stopSpeaking } from "@/lib/tts/speak";
 import { resolveSpeechLang } from "@/lib/tts/voice-picker";
@@ -152,8 +151,7 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className, lang }:
 
   return (
     <div className={className} role="region" aria-label={`Prezentace lekce: ${lessonTitle}`}>
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <VoicePicker compact lang={speechLang} />
+      <div className="mb-3 flex flex-wrap items-center justify-end gap-2">
         <span className="text-xs font-medium text-slate-500" aria-live="polite">
           Slide {index + 1} / {slides.length}
         </span>

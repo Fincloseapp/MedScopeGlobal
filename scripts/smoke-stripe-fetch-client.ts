@@ -7,7 +7,7 @@ import {
   createStripeClient,
   stripeClientErrorBody,
   STRIPE_REQUEST_TIMEOUT_MS,
-} from "../lib/stripe/client.ts";
+} from "../lib/stripe/client";
 
 async function main() {
   const t0 = Date.now();

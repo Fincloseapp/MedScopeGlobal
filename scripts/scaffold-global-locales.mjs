@@ -66,14 +66,14 @@ const COPY = {
       subtitle: "10 protokolov založených na dôkazoch pre spánok, metabolizmus, imunitu a dlhovekosť.",
       price: "5,99 €/mesiac",
     },
-    tringelt: {
-      title: "Podporiť autora · Tringelt",
+    contribution: {
+      title: "Podporiť autora · Tip",
       subtitle:
         "Voliteľný mikro-príspevok — ako prepitné v reštaurácii. Ďakujeme redakcii.",
       custom: "Vlastné",
-      vipUpsell: "Podporte redakciu a získajte VIP longevity protokoly —",
-      unavailable: "Tringelt momentálne nie je k dispozícii.",
-      tip: "Podporte redakciu tringeltom",
+      vipUpsell: "VIP Longevity je samostatné platené predplatné —",
+      unavailable: "Tip momentálne nie je k dispozícii.",
+      tip: "Podporte redakciu príspevkom",
       exploreVip: "alebo preskúmajte VIP longevity protokoly",
     },
     donation: {
@@ -139,14 +139,14 @@ const COPY = {
         "10 evidenzbasierte Protokolle für Schlaf, Stoffwechsel, Immunität und Langlebigkeit.",
       price: "5,99 €/Monat",
     },
-    tringelt: {
-      title: "Autor unterstützen · Tringelt",
+    contribution: {
+      title: "Autor unterstützen · Tip",
       subtitle:
         "Optionaler Mikrobeitrag — wie ein Trinkgeld im Restaurant. Danke an die Redaktion.",
       custom: "Eigener Betrag",
-      vipUpsell: "Unterstützen Sie die Redaktion und erhalten Sie VIP Longevity-Protokolle —",
-      unavailable: "Tringelt ist derzeit nicht verfügbar.",
-      tip: "Unterstützen Sie die Redaktion mit einem Tringelt",
+      vipUpsell: "VIP Longevity ist ein separates bezahltes Abo —",
+      unavailable: "Tip ist derzeit nicht verfügbar.",
+      tip: "Unterstützen Sie die Redaktion mit einem Contribution",
       exploreVip: "oder entdecken Sie VIP Longevity-Protokolle",
     },
     donation: {
@@ -212,14 +212,14 @@ const COPY = {
         "10 protocoles fondés sur les preuves pour le sommeil, le métabolisme, l'immunité et la longévité.",
       price: "5,99 €/mois",
     },
-    tringelt: {
-      title: "Soutenir l'auteur · Tringelt",
+    contribution: {
+      title: "Soutenir l'auteur · Tip",
       subtitle:
         "Micro-contribution optionnelle — comme un pourboire au restaurant. Merci à la rédaction.",
       custom: "Montant libre",
-      vipUpsell: "Soutenez la rédaction et accédez aux protocoles VIP longévité —",
-      unavailable: "Tringelt n'est pas disponible pour le moment.",
-      tip: "Soutenez la rédaction avec un tringelt",
+      vipUpsell: "VIP Longevity est un abonnement payant séparé —",
+      unavailable: "Tip n'est pas disponible pour le moment.",
+      tip: "Soutenez la rédaction avec un tip",
       exploreVip: "ou explorez les protocoles VIP longévité",
     },
     donation: {
@@ -285,14 +285,14 @@ const COPY = {
         "10 protocolli basati sulle evidenze per sonno, metabolismo, immunità e longevità.",
       price: "5,99 €/mese",
     },
-    tringelt: {
-      title: "Sostieni l'autore · Tringelt",
+    contribution: {
+      title: "Sostieni l'autore · Tip",
       subtitle:
         "Micro-contributo facoltativo — come una mancia al ristorante. Grazie alla redazione.",
       custom: "Importo personalizzato",
-      vipUpsell: "Sostieni la redazione e ottieni i protocolli VIP longevità —",
-      unavailable: "Tringelt non è al momento disponibile.",
-      tip: "Sostieni la redazione con un tringelt",
+      vipUpsell: "VIP Longevity è un abbonamento a pagamento separato —",
+      unavailable: "Tip non è al momento disponibile.",
+      tip: "Sostieni la redazione con un tip",
       exploreVip: "o esplora i protocolli VIP longevità",
     },
     donation: {
@@ -358,14 +358,14 @@ const COPY = {
         "10 protocolos basados en evidencia para sueño, metabolismo, inmunidad y longevidad.",
       price: "5,99 €/mes",
     },
-    tringelt: {
-      title: "Apoyar al autor · Tringelt",
+    contribution: {
+      title: "Apoyar al autor · Tip",
       subtitle:
         "Micro-aporte opcional — como una propina en un restaurante. Gracias a la redacción.",
       custom: "Importe personalizado",
-      vipUpsell: "Apoye a la redacción y acceda a protocolos VIP de longevidad —",
-      unavailable: "Tringelt no está disponible en este momento.",
-      tip: "Apoye a la redacción con un tringelt",
+      vipUpsell: "VIP Longevity es una suscripción de pago aparte —",
+      unavailable: "Tip no está disponible en este momento.",
+      tip: "Apoye a la redacción con un tip",
       exploreVip: "o explore protocolos VIP de longevidad",
     },
     donation: {
@@ -431,14 +431,14 @@ const COPY = {
         "10 protokołów opartych na dowodach dla snu, metabolizmu, odporności i długowieczności.",
       price: "29 zł/miesiąc",
     },
-    tringelt: {
-      title: "Wesprzyj autora · Tringelt",
+    contribution: {
+      title: "Wesprzyj autora · Tip",
       subtitle:
         "Opcjonalny mikro-wkład — jak napiwek w restauracji. Dziękujemy redakcji.",
       custom: "Własna kwota",
-      vipUpsell: "Wesprzyj redakcję i uzyskaj protokoły VIP longevity —",
-      unavailable: "Tringelt jest obecnie niedostępny.",
-      tip: "Wesprzyj redakcję tringeltem",
+      vipUpsell: "VIP Longevity to osobna płatna subskrypcja —",
+      unavailable: "Tip jest obecnie niedostępny.",
+      tip: "Wesprzyj redakcję contribution",
       exploreVip: "lub poznaj protokoły VIP longevity",
     },
     donation: {
@@ -504,14 +504,14 @@ const COPY = {
         "10 protocoale bazate pe dovezi pentru somn, metabolism, imunitate și longevitate.",
       price: "29 lei/lună",
     },
-    tringelt: {
-      title: "Susține autorul · Tringelt",
+    contribution: {
+      title: "Susține autorul · Tip",
       subtitle:
         "Micro-contribuție opțională — ca un bacșiș la restaurant. Mulțumim redacției.",
       custom: "Sumă personalizată",
-      vipUpsell: "Susține redacția și obține protocoale VIP longevitate —",
-      unavailable: "Tringelt nu este disponibil momentan.",
-      tip: "Susține redacția cu un tringelt",
+      vipUpsell: "VIP Longevity este un abonament plătit separat —",
+      unavailable: "Tip nu este disponibil momentan.",
+      tip: "Susține redacția cu un tip",
       exploreVip: "sau explorează protocoalele VIP longevitate",
     },
     donation: {
@@ -577,14 +577,14 @@ const COPY = {
         "10 evidencián alapuló protokoll alvásra, anyagcserére, immunitásra és hosszú életre.",
       price: "1 990 Ft/hó",
     },
-    tringelt: {
-      title: "Szerző támogatása · Tringelt",
+    contribution: {
+      title: "Szerző támogatása · Tip",
       subtitle:
         "Opcionális mikro-hozzájárulás — mint egy borravaló étteremben. Köszönjük a szerkesztőségnek.",
       custom: "Egyedi összeg",
-      vipUpsell: "Támogassa a szerkesztőséget és szerezzen VIP longevity protokollokat —",
-      unavailable: "A Tringelt jelenleg nem elérhető.",
-      tip: "Támogassa a szerkesztőséget tringelttel",
+      vipUpsell: "A VIP Longevity külön fizetős előfizetés —",
+      unavailable: "A Tip jelenleg nem elérhető.",
+      tip: "Támogassa a szerkesztőséget contribution",
       exploreVip: "vagy fedezze fel a VIP longevity protokollokat",
     },
     donation: {
@@ -650,14 +650,14 @@ const COPY = {
         "10 протоколов на основе доказательств для сна, метаболизма, иммунитета и долголетия.",
       price: "299 ₽/мес",
     },
-    tringelt: {
-      title: "Поддержать автора · Tringelt",
+    contribution: {
+      title: "Поддержать автора · Tip",
       subtitle:
         "Добровольный микровзнос — как чаевые в ресторане. Спасибо редакции.",
       custom: "Своя сумма",
-      vipUpsell: "Поддержите редакцию и получите VIP протоколы долголетия —",
-      unavailable: "Tringelt сейчас недоступен.",
-      tip: "Поддержите редакцию tringelt'ом",
+      vipUpsell: "VIP Longevity — отдельная платная подписка —",
+      unavailable: "Tip сейчас недоступен.",
+      tip: "Поддержите редакцию contribution",
       exploreVip: "или изучите VIP протоколы долголетия",
     },
     donation: {
@@ -723,14 +723,14 @@ const COPY = {
         "10 протоколів на основі доказів для сну, метаболізму, імунітету та довголіття.",
       price: "149 ₴/міс",
     },
-    tringelt: {
-      title: "Підтримати автора · Tringelt",
+    contribution: {
+      title: "Підтримати автора · Tip",
       subtitle:
         "Добровільний мікровнесок — як чайові в ресторані. Дякуємо редакції.",
       custom: "Своя сума",
-      vipUpsell: "Підтримайте редакцію та отримайте VIP протоколи довголіття —",
-      unavailable: "Tringelt зараз недоступний.",
-      tip: "Підтримайте редакцію tringelt'ом",
+      vipUpsell: "VIP Longevity — окрема платна підписка —",
+      unavailable: "Tip зараз недоступний.",
+      tip: "Підтримайте редакцію contribution",
       exploreVip: "або перегляньте VIP протоколи довголіття",
     },
     donation: {
@@ -794,13 +794,13 @@ const COPY = {
       subtitle: "10 个基于证据的睡眠、代谢、免疫与长寿方案。",
       price: "¥25/月",
     },
-    tringelt: {
-      title: "支持作者 · Tringelt",
+    contribution: {
+      title: "支持作者 · Tip",
       subtitle: "可选微捐赠——如同餐厅小费。感谢编辑部。",
       custom: "自定义",
-      vipUpsell: "支持编辑部并获取 VIP 长寿方案 —",
-      unavailable: "Tringelt 目前不可用。",
-      tip: "用 tringelt 支持编辑部",
+      vipUpsell: "VIP Longevity 是单独的付费订阅 —",
+      unavailable: "Tip 目前不可用。",
+      tip: "用 tip 支持编辑部",
       exploreVip: "或探索 VIP 长寿方案",
     },
     donation: {
@@ -863,13 +863,13 @@ const COPY = {
       subtitle: "睡眠、代謝、免疫、長寿のための10のエビデンスベースプロトコル。",
       price: "¥600/月",
     },
-    tringelt: {
-      title: "著者を支援 · Tringelt",
+    contribution: {
+      title: "著者を支援 · Tip",
       subtitle: "任意のマイクロ寄付——レストランのチップのように。編集部に感謝します。",
       custom: "カスタム",
-      vipUpsell: "編集部を支援して VIP ロンジェビティプロトコルを取得 —",
-      unavailable: "Tringelt は現在利用できません。",
-      tip: "tringelt で編集部を支援",
+      vipUpsell: "VIP Longevity は別の有料サブスクです —",
+      unavailable: "Tip は現在利用できません。",
+      tip: "contribution で編集部を支援",
       exploreVip: "または VIP ロンジェビティプロトコルを見る",
     },
     donation: {
@@ -933,13 +933,13 @@ const COPY = {
       subtitle: "수면, 대사, 면역, 장수를 위한 10가지 근거 기반 프로토콜.",
       price: "₩6,000/월",
     },
-    tringelt: {
-      title: "작가 지원 · Tringelt",
+    contribution: {
+      title: "작가 지원 · Tip",
       subtitle: "선택적 소액 기부 — 레스토랑 팁처럼. 편집부에 감사드립니다.",
       custom: "직접 입력",
-      vipUpsell: "편집부를 지원하고 VIP 장수 프로토콜을 받으세요 —",
-      unavailable: "Tringelt을 현재 사용할 수 없습니다.",
-      tip: "tringelt으로 편집부 지원",
+      vipUpsell: "VIP Longevity는 별도의 유료 구독입니다 —",
+      unavailable: "Contribution을 현재 사용할 수 없습니다.",
+      tip: "contribution으로 편집부 지원",
       exploreVip: "또는 VIP 장수 프로토콜 탐색",
     },
     donation: {
@@ -1004,14 +1004,14 @@ const COPY = {
         "10 giao thức dựa trên bằng chứng cho giấc ngủ, chuyển hóa, miễn dịch và trường thọ.",
       price: "120.000 ₫/tháng",
     },
-    tringelt: {
-      title: "Ủng hộ tác giả · Tringelt",
+    contribution: {
+      title: "Ủng hộ tác giả · Tip",
       subtitle:
         "Đóng góp vi mô tùy chọn — như tiền boa ở nhà hàng. Cảm ơn ban biên tập.",
       custom: "Tùy chỉnh",
-      vipUpsell: "Ủng hộ ban biên tập và nhận giao thức VIP trường thọ —",
-      unavailable: "Tringelt hiện không khả dụng.",
-      tip: "Ủng hộ ban biên tập bằng tringelt",
+      vipUpsell: "VIP Longevity là gói đăng ký trả phí riêng —",
+      unavailable: "Tip hiện không khả dụng.",
+      tip: "Ủng hộ ban biên tập bằng tip",
       exploreVip: "hoặc khám phá giao thức VIP trường thọ",
     },
     donation: {
@@ -1077,14 +1077,14 @@ const COPY = {
         "10 protokol berbasis bukti untuk tidur, metabolisme, imunitas, dan longevitas.",
       price: "Rp 75.000/bulan",
     },
-    tringelt: {
-      title: "Dukung penulis · Tringelt",
+    contribution: {
+      title: "Dukung penulis · Tip",
       subtitle:
         "Kontribusi mikro opsional — seperti tip di restoran. Terima kasih redaksi.",
       custom: "Kustom",
-      vipUpsell: "Dukung redaksi dan dapatkan protokol VIP longevitas —",
-      unavailable: "Tringelt saat ini tidak tersedia.",
-      tip: "Dukung redaksi dengan tringelt",
+      vipUpsell: "VIP Longevity adalah langganan berbayar terpisah —",
+      unavailable: "Tip saat ini tidak tersedia.",
+      tip: "Dukung redaksi dengan tip",
       exploreVip: "atau jelajahi protokol VIP longevitas",
     },
     donation: {
@@ -1150,14 +1150,14 @@ const COPY = {
         "10 пратаколаў на аснове доказаў для сну, метабалізму, імунітэту і даўгалетасці.",
       price: "14,90 Br/мес",
     },
-    tringelt: {
-      title: "Падтрымаць аўтара · Tringelt",
+    contribution: {
+      title: "Падтрымаць аўтара · Tip",
       subtitle:
         "Добраахвотны мікраўзнос — як чаевыя ў рэстаране. Дзякуем рэдакцыі.",
       custom: "Свая сума",
-      vipUpsell: "Падтрымайце рэдакцыю і атрымайце VIP пратаколы даўгалетасці —",
-      unavailable: "Tringelt зараз недаступны.",
-      tip: "Падтрымайце рэдакцыю tringelt'ам",
+      vipUpsell: "VIP Longevity — асобная платная падпіска —",
+      unavailable: "Tip зараз недаступны.",
+      tip: "Падтрымайце рэдакцыю contribution",
       exploreVip: "або праглядзіце VIP пратаколы даўгалетасці",
     },
     donation: {
@@ -1223,14 +1223,14 @@ const COPY = {
         "10 protocolos baseados em evidência para sono, metabolismo, imunidade e longevidade.",
       price: "€5,99/mês",
     },
-    tringelt: {
-      title: "Apoiar autor · Tringelt",
+    contribution: {
+      title: "Apoiar autor · Tip",
       subtitle:
         "Micro-contribuição opcional — como gorjeta num restaurante. Obrigado à redação.",
       custom: "Valor personalizado",
-      vipUpsell: "Apoie a redação e obtenha protocolos VIP longevidade —",
-      unavailable: "Tringelt não está disponível de momento.",
-      tip: "Apoie a redação com um tringelt",
+      vipUpsell: "VIP Longevity é uma assinatura paga separada —",
+      unavailable: "Tip não está disponível de momento.",
+      tip: "Apoie a redação com um tip",
       exploreVip: "ou explore protocolos VIP longevidade",
     },
     donation: {
@@ -1295,13 +1295,13 @@ const COPY = {
       subtitle: "10 بروتوكولات مبنية على الأدلة للنوم والتمثيل الغذائي والمناعة والعمر الطويل.",
       price: "$4.99/شهر",
     },
-    tringelt: {
-      title: "ادعم المؤلف · Tringelt",
+    contribution: {
+      title: "ادعم المؤلف · Tip",
       subtitle: "مساهمة صغيرة اختيارية — مثل الإكرامية في المطعم. شكرًا للتحرير.",
       custom: "مبلغ مخصص",
-      vipUpsell: "ادعم التحرير واحصل على بروتوكولات VIP للعمر الطويل —",
-      unavailable: "Tringelt غير متاح حاليًا.",
-      tip: "ادعم التحرير بـ tringelt",
+      vipUpsell: "VIP Longevity اشتراك مدفوع منفصل —",
+      unavailable: "Tip غير متاح حاليًا.",
+      tip: "ادعم التحرير بـ tip",
       exploreVip: "أو استكشف بروتوكولات VIP للعمر الطويل",
     },
     donation: {
@@ -1365,14 +1365,14 @@ const COPY = {
       subtitle: "नींद, चयापचय, प्रतिरक्षा और longevity के लिए 10 साक्ष्य-आधारित प्रोटोकॉल।",
       price: "$4.99/माह",
     },
-    tringelt: {
-      title: "लेखक का समर्थन · Tringelt",
+    contribution: {
+      title: "लेखक का समर्थन · Tip",
       subtitle:
         "वैकल्पिक सूक्ष्म योगदान — рестोरां में टिप की तरह। संपादन को धन्यवाद।",
       custom: "कस्टम",
-      vipUpsell: "संपादन का समर्थन करें और VIP longevity प्रोटोकॉल प्राप्त करें —",
-      unavailable: "Tringelt अभी उपलब्ध नहीं है।",
-      tip: "tringelt से संपादन का समर्थन करें",
+      vipUpsell: "VIP Longevity एक अलग सशुल्क सदस्यता है —",
+      unavailable: "Tip अभी उपलब्ध नहीं है।",
+      tip: "tip से संपादन का समर्थन करें",
       exploreVip: "या VIP longevity प्रोटोकॉल देखें",
     },
     donation: {
@@ -1413,7 +1413,7 @@ function buildLocale(code, copy) {
     cta: copy.cta,
     disclaimer: copy.disclaimer,
     vip: copy.vip,
-    tringelt: copy.tringelt,
+    contribution: copy.contribution,
     donation: copy.donation,
     mediflow: copy.mediflow,
     ordizaznam: copy.ordizaznam,

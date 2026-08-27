@@ -36,15 +36,6 @@
     "subtitle": "10 protocoale bazate pe dovezi pentru somn, metabolism, imunitate și longevitate.",
     "price": "29 lei/lună"
   },
-  "tringelt": {
-    "title": "Susține autorul · Tringelt",
-    "subtitle": "Micro-contribuție opțională — ca un bacșiș la restaurant. Mulțumim redacției.",
-    "custom": "Sumă personalizată",
-    "vipUpsell": "Susține redacția și obține protocoale VIP longevitate —",
-    "unavailable": "Tringelt nu este disponibil momentan.",
-    "tip": "Susține redacția cu un tringelt",
-    "exploreVip": "sau explorează protocoalele VIP longevitate"
-  },
   "donation": {
     "title": "Susține autorul",
     "subtitle": "O micro-donație ajută la crearea de conținut de calitate.",
@@ -71,5 +62,14 @@
     "biohacking": "Biohacking pentru începători",
     "sleep": "Optimizarea somnului",
     "mental": "Bunăstare mentală"
+  },
+  "contribution": {
+    "title": "Susține autorul · Contribuție",
+    "subtitle": "Contribuție opțională — mulțumim. Nu este VIP nici abonament.",
+    "custom": "Personalizat",
+    "vipUpsell": "VIP Longevity este un abonament plătit separat —",
+    "unavailable": "Contribuțiile nu sunt disponibile momentan.",
+    "tip": "Susține redacția cu o contribuție",
+    "exploreVip": "sau explorează protocoalele VIP Longevity"
   }
 }

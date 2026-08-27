@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { ArticleBody } from "@/components/article/article-body";
 import { ArticleTtsButton } from "@/components/article/article-tts-button";
@@ -42,17 +43,18 @@ import { ArticleCtaBlocks } from "@/components/articles/article-cta-blocks";
 import { StudentAdBlocks } from "@/components/student/student-ad-blocks";
 import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
 import {
-  AuthorDonationButton,
   SaveToMediFlowButton,
   ArticleShareButton,
   VipUpgradeNudge,
 } from "@/components/monetization/article-cta";
-import { ArticleTringeltTip } from "@/components/monetization/article-tringelt-tip";
+import { ArticleContribution } from "@/components/monetization/article-contribution";
 import { ArticleImageSupportNudge } from "@/components/monetization/article-image-support-nudge";
 import { getArticleHeroAltText } from "@/lib/ecosystem/editorial/images";
 import { TopLongevityProducts } from "@/components/monetization/affiliate-box";
 import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { MAGAZINE } from "@/lib/brand/magazine";
+import { isArticleTipUiEnabled } from "@/lib/ecosystem/tip-copy";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -107,6 +109,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+function isBrokenCoverUrl(url: string | null | undefined): boolean {
+  if (!url) return true;
+  const lower = url.toLowerCase();
+  return (
+    lower.includes("placeholder") ||
+    lower.includes("via.placeholder") ||
+    lower.includes("placehold.co") ||
+    lower.includes("checkerboard") ||
+    (lower.endsWith(".svg") && lower.includes("empty"))
+  );
+}
+
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params;
   const locale = await getServerLocale();
@@ -114,7 +128,7 @@ export default async function ArticlePage({ params }: Props) {
   const article = await getArticleBySlug(slug, locale);
   if (!article) notFound();
 
-  const { user, isVip, accessLevel } = await getReaderContext();
+  const { isVip, accessLevel } = await getReaderContext();
 
   const [articleGateCopy, articleInlineCopy] = !isVip
     ? await Promise.all([
@@ -172,6 +186,11 @@ export default async function ArticlePage({ params }: Props) {
   const category = article.categories;
   const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
   const editorialAssignment = assignEditorialUnits(article);
+  const authorDisplay = formatEditorialUnitDisplay(
+    editorialAssignment.primary,
+    editorialLocale,
+    editorialAssignment.aiAssisted
+  );
   const heroAlt = getArticleHeroAltText(
     {
       title: article.title,
@@ -181,8 +200,14 @@ export default async function ArticlePage({ params }: Props) {
     (locale as GlobalLocaleCode) ?? "cs"
   );
 
+  const coverUrl = isBrokenCoverUrl(article.cover_image_url)
+    ? null
+    : article.cover_image_url;
+  const coverMeta = getArticleCoverLabel(article.title, category?.name);
+
   const isV19Article = article.rubric_slug === V19_RUBRIC_SLUG;
   const v19Quiz = (article.quiz_json ?? {}) as Record<string, unknown>;
+  const showContribution = isArticleTipUiEnabled(locked);
 
   const globalJsonLd = articleJsonLdGlobal({
     title: article.title,
@@ -190,12 +215,8 @@ export default async function ArticlePage({ params }: Props) {
     slug: article.slug,
     locale,
     publishedAt: article.published_at,
-    authorName: formatEditorialUnitDisplay(
-      editorialAssignment.primary,
-      editorialLocale,
-      editorialAssignment.aiAssisted
-    ),
-    coverImage: article.cover_image_url,
+    authorName: authorDisplay,
+    coverImage: coverUrl,
   });
 
   const jsonLd = isV19Article
@@ -227,6 +248,13 @@ export default async function ArticlePage({ params }: Props) {
       ).jsonLd
     : globalJsonLd;
 
+  const publishedLabel =
+    article.published_at &&
+    new Date(article.published_at).toLocaleDateString(
+      locale === "en" || locale === "en-US" ? "en-GB" : "cs-CZ",
+      { year: "numeric", month: "long", day: "numeric" }
+    );
+
   return (
     <>
       {isV19Article ? (
@@ -243,251 +271,240 @@ export default async function ArticlePage({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <article className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-        <div className="flex flex-col gap-10 lg:flex-row">
-          <div className="flex-1">
-            {category && (
+
+      <article className="article-reading-page">
+        <div className="article-reading-shell">
+          <header className="article-reading-header">
+            <p className="article-brand-kicker">{MAGAZINE.name}</p>
+
+            {category ? (
               <Link
                 href={`/category/${category.slug}`}
-                className="text-xs font-semibold uppercase tracking-wide text-primary hover:underline"
+                className="article-category-link"
               >
                 {category.name}
               </Link>
-            )}
-            {article.translatedFrom && (
-              <p className="mt-3 rounded-lg border border-[#C7E3FF] bg-[#f0f7ff] px-4 py-2 text-sm text-[#005B96]">
+            ) : null}
+
+            {article.translatedFrom ? (
+              <p className="mt-4 border border-[#C7E3FF] bg-[#f0f7ff] px-4 py-2 text-sm text-[#005B96]">
                 {t(dict, "alerts.translatedArticle")}
-                {article.translation_provider && (
+                {article.translation_provider ? (
                   <span className="ml-2 font-semibold">
-                    ({article.translation_provider === "google" ? "Google Translate" : article.translation_provider === "openai" ? "OpenAI" : article.translation_provider})
+                    (
+                    {article.translation_provider === "google"
+                      ? "Google Translate"
+                      : article.translation_provider === "openai"
+                        ? "OpenAI"
+                        : article.translation_provider}
+                    )
                   </span>
-                )}
+                ) : null}
               </p>
-            )}
-            <div className="mt-3 flex flex-wrap items-center gap-3">
-              <h1 className="font-display text-4xl font-bold text-medical-navy sm:text-5xl">
-                {article.title}
-              </h1>
-              {article.vip_only && (
-                <>
+            ) : null}
+
+            <h1 className="article-reading-title">
+              {article.title}
+              {article.vip_only ? (
+                <span className="ml-3 inline-flex align-middle">
                   {isVip ? (
                     <VipBadge />
                   ) : (
-                    <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900 ring-1 ring-amber-200">
-                      VIP article
+                    <span className="border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-900">
+                      VIP
                     </span>
                   )}
-                </>
-              )}
+                </span>
+              ) : null}
+            </h1>
+
+            {article.excerpt ? (
+              <p className="article-reading-deck">{article.excerpt}</p>
+            ) : null}
+
+            <div className="article-meta-row">
+              <div className="min-w-0">
+                <EditorialAttribution article={article} locale={editorialLocale} />
+                {publishedLabel ? (
+                  <p className="mt-0.5 text-sm text-slate-500">{publishedLabel}</p>
+                ) : null}
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <SaveToMediFlowButton
+                  articleSlug={article.slug}
+                  articleTitle={article.title}
+                />
+                <ArticleShareButton title={article.title} slug={article.slug} />
+              </div>
             </div>
-            {article.excerpt && (
-              <p className="mt-4 text-lg text-muted-foreground">
-                {article.excerpt}
-              </p>
-            )}
 
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <SaveToMediFlowButton articleSlug={article.slug} articleTitle={article.title} />
-              <ArticleShareButton title={article.title} slug={article.slug} />
-            </div>
-
-            <GlobalAdSlot placement="below-title" locale={(locale as GlobalLocaleCode) ?? "cs"} />
-
-            <p className="mt-3 text-xs text-slate-500">
-              {MEDICAL_DISCLAIMER[(locale as GlobalLocaleCode) ?? "cs"] ?? MEDICAL_DISCLAIMER.cs}
+            <p className="article-disclaimer">
+              {MEDICAL_DISCLAIMER[(locale as GlobalLocaleCode) ?? "cs"] ??
+                MEDICAL_DISCLAIMER.cs}
             </p>
+          </header>
 
-            <div className="mt-6 flex flex-wrap items-center gap-4 border-y py-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                  MS
-                </div>
-                <div>
-                  <EditorialAttribution article={article} locale={editorialLocale} />
-                  <p>
-                    {article.published_at &&
-                      new Date(article.published_at).toLocaleDateString(
-                        "cs-CZ",
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        }
-                      )}
+          <figure className="article-cover">
+            {coverUrl ? (
+              <Image
+                src={coverUrl}
+                alt={heroAlt}
+                fill
+                priority
+                className="object-cover"
+                sizes="(max-width:768px) 100vw, 720px"
+              />
+            ) : (
+              <div
+                className="absolute inset-0"
+                style={getArticleCoverStyles(article.title, category?.name)}
+                role="img"
+                aria-label={heroAlt}
+              >
+                <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/75">
+                    {category?.name ?? MAGAZINE.name}
+                  </p>
+                  <p className="mt-2 max-w-xl font-display text-2xl font-semibold leading-snug text-white sm:text-3xl">
+                    {coverMeta.shortTitle}
                   </p>
                 </div>
               </div>
-              {isVip && <VipBadge />}
-            </div>
-
-            <div className="relative mt-8 aspect-[21/9] w-full overflow-hidden rounded-[28px] border border-slate-200 bg-slate-950 shadow-[0_22px_70px_-35px_rgba(2,30,57,0.85)]">
-              {article.cover_image_url ? (
-                <>
-                  <Image
-                    src={article.cover_image_url}
-                    alt={heroAlt}
-                    fill
-                    priority
-                    className="object-cover"
-                    sizes="(max-width:1024px) 100vw, 896px"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
-                </>
-              ) : (
-                <div className="absolute inset-0" style={getArticleCoverStyles(article.title, category?.name)}>
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.22),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.14),transparent_22%)]" />
-                  <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="rounded-full border border-white/20 bg-white/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/85 backdrop-blur">
-                        {category?.name ?? "Medical briefing"}
-                      </span>
-                      {article.vip_only && (
-                        <span className="rounded-full bg-[#005B96]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-white">
-                          VIP
-                        </span>
-                      )}
-                    </div>
-                    <div className="max-w-2xl space-y-2">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/70">
-                        Evidence-based clinical briefing
-                      </p>
-                      <p className="font-display text-3xl font-semibold leading-tight text-white sm:text-4xl">
-                        {getArticleCoverLabel(article.title, category?.name).shortTitle}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {!locked ? (
-              <ArticleImageSupportNudge
-                locale={(locale as GlobalLocaleCode) ?? "cs"}
-                articleSlug={article.slug}
-              />
-            ) : null}
-
-            {studentBannerAds.length > 0 ? (
-              <StudentAdBlocks campaigns={studentBannerAds} variant="banner" />
-            ) : null}
-            {inlineAds.length > 0 ? <AdPlacement ads={inlineAds} variant="inline" /> : null}
-            {studentInlineAds.length > 0 ? (
-              <StudentAdBlocks campaigns={studentInlineAds} variant="inline" />
-            ) : null}
-
-            <div className="prose-wrapper mt-10 overflow-x-hidden">
-              {article.rubric_slug === V19_RUBRIC_SLUG && !locked ? (
-                <V19ArticleBody
-                  locale={locale}
-                  article={{
-                    title: article.title,
-                    date: article.published_at ?? new Date().toISOString(),
-                    summary: article.excerpt ?? "",
-                    keyPoints: (v19Quiz.keyPoints as string[]) ?? [],
-                    clinicalImpact: (v19Quiz.clinicalImpact as string) ?? "",
-                    scientificContext: (v19Quiz.scientificContext as string) ?? "",
-                    patientEducation: (v19Quiz.patientEducation as string) ?? "",
-                    nzipContext: (v19Quiz.nzipContext as string) ?? undefined,
-                    specialty: v19Quiz.specialty as string | undefined,
-                    sourceUrl: article.source_url ?? undefined,
-                    sourceName: article.source_name ?? undefined,
-                  }}
-                />
-              ) : (
-                <>
-                  {!locked ? (
-                    <ArticleTtsButton
-                      title={article.title}
-                      excerpt={article.excerpt ?? undefined}
-                      content={article.content}
-                    />
-                  ) : null}
-                  <ArticleBody
-                    html={article.content}
-                    locked={locked}
-                    title={article.title}
-                    gateCopy={articleGateCopy ?? undefined}
-                  />
-                </>
-              )}
-            </div>
-
-            {!locked ? (
-              <GlobalAdSlot
-                placement="in-content"
-                locale={(locale as GlobalLocaleCode) ?? "cs"}
-              />
-            ) : null}
-
-            {!isVip && !locked && articleInlineCopy ? (
-              <ArticleInlineNudge copy={articleInlineCopy} />
-            ) : null}
-
-            {!locked ? (
-              <ArticleCtaBlocks articleSlug={article.slug} articleTitle={article.title} />
-            ) : null}
-
-            {!locked ? (
-              <div id={`article-tip-${article.slug}`} className="scroll-mt-24">
-                <ArticleTringeltTip
-                  articleSlug={article.slug}
-                  articleTitle={article.title}
-                  authorName={formatEditorialUnitDisplay(
-                    editorialAssignment.primary,
-                    editorialLocale,
-                    editorialAssignment.aiAssisted
-                  )}
-                  locale={(locale as GlobalLocaleCode) ?? "cs"}
-                />
-              </div>
-            ) : null}
-
-            {!locked ? (
-              <AuthorDonationButton
-                articleSlug={article.slug}
-                articleTitle={article.title}
-                locale={(locale as GlobalLocaleCode) ?? "cs"}
-              />
-            ) : null}
-
-            {!locked ? <TopLongevityProducts locale={(locale as GlobalLocaleCode) ?? "cs"} /> : null}
-
-            {!isVip && !locked ? <VipUpgradeNudge locale={(locale as GlobalLocaleCode) ?? "cs"} /> : null}
-
-            {!locked ? (
-              <GlobalAdSlot
-                placement="footer"
-                locale={(locale as GlobalLocaleCode) ?? "cs"}
-              />
-            ) : null}
-
-            {related && related.length > 0 && (
-              <section className="mt-16 border-t pt-10">
-                <h2 className="font-display text-2xl font-semibold text-medical-navy">
-                  Related coverage
-                </h2>
-                <div className="mt-6 grid gap-6 md:grid-cols-3">
-                  {related.map((a) => (
-                    <ArticleCard key={a.id} article={a} />
-                  ))}
-                </div>
-              </section>
             )}
+          </figure>
 
-            <ContentRecommendations locale={locale} currentSlug={article.slug} />
+          <ArticleImageSupportNudge
+            locale={(locale as GlobalLocaleCode) ?? "cs"}
+            articleSlug={article.slug}
+          />
 
-            <EditorialFooter locale={editorialLocale} />
+          {!isVip ? (
+            <GlobalAdSlot
+              placement="below-title"
+              locale={(locale as GlobalLocaleCode) ?? "cs"}
+            />
+          ) : null}
+
+          {studentBannerAds.length > 0 ? (
+            <StudentAdBlocks campaigns={studentBannerAds} variant="banner" />
+          ) : null}
+          {inlineAds.length > 0 ? <AdPlacement ads={inlineAds} variant="inline" /> : null}
+          {studentInlineAds.length > 0 ? (
+            <StudentAdBlocks campaigns={studentInlineAds} variant="inline" />
+          ) : null}
+
+          <div className="article-body-column">
+            {article.rubric_slug === V19_RUBRIC_SLUG && !locked ? (
+              <V19ArticleBody
+                locale={locale}
+                article={{
+                  title: article.title,
+                  date: article.published_at ?? new Date().toISOString(),
+                  summary: article.excerpt ?? "",
+                  keyPoints: (v19Quiz.keyPoints as string[]) ?? [],
+                  clinicalImpact: (v19Quiz.clinicalImpact as string) ?? "",
+                  scientificContext: (v19Quiz.scientificContext as string) ?? "",
+                  patientEducation: (v19Quiz.patientEducation as string) ?? "",
+                  nzipContext: (v19Quiz.nzipContext as string) ?? undefined,
+                  specialty: v19Quiz.specialty as string | undefined,
+                  sourceUrl: article.source_url ?? undefined,
+                  sourceName: article.source_name ?? undefined,
+                }}
+              />
+            ) : (
+              <>
+                {!locked ? (
+                  <ArticleTtsButton
+                    title={article.title}
+                    excerpt={article.excerpt ?? undefined}
+                    content={article.content}
+                  />
+                ) : null}
+                <ArticleBody
+                  html={article.content}
+                  locked={locked}
+                  title={article.title}
+                  gateCopy={articleGateCopy ?? undefined}
+                />
+              </>
+            )}
           </div>
 
-          <aside className="w-full shrink-0 space-y-6 lg:w-80">
-            <PremiumCta locale={locale} />
-            {studentSidebarAds.length > 0 ? (
-              <StudentAdBlocks campaigns={studentSidebarAds} variant="sidebar" />
-            ) : (
-              <AdSlot ads={ads} />
-            )}
-          </aside>
+          {!locked ? (
+            <GlobalAdSlot
+              placement="in-content"
+              locale={(locale as GlobalLocaleCode) ?? "cs"}
+            />
+          ) : null}
+
+          {!isVip && !locked && articleInlineCopy ? (
+            <ArticleInlineNudge copy={articleInlineCopy} />
+          ) : null}
+
+          {showContribution ? (
+            <Suspense
+              fallback={
+                <section className="article-contribute scroll-mt-24">
+                  <p className="text-sm text-slate-500">Načítání příspěvků…</p>
+                </section>
+              }
+            >
+              <ArticleContribution
+                articleSlug={article.slug}
+                articleTitle={article.title}
+                authorName={authorDisplay}
+                locale={(locale as GlobalLocaleCode) ?? "cs"}
+              />
+            </Suspense>
+          ) : null}
+
+          {!locked ? (
+            <ArticleCtaBlocks
+              articleSlug={article.slug}
+              articleTitle={article.title}
+            />
+          ) : null}
+
+          {!locked ? (
+            <TopLongevityProducts locale={(locale as GlobalLocaleCode) ?? "cs"} />
+          ) : null}
+
+          {!isVip && !locked ? (
+            <VipUpgradeNudge locale={(locale as GlobalLocaleCode) ?? "cs"} />
+          ) : null}
+
+          {!locked ? (
+            <GlobalAdSlot
+              placement="footer"
+              locale={(locale as GlobalLocaleCode) ?? "cs"}
+            />
+          ) : null}
+
+          {related && related.length > 0 ? (
+            <section className="article-related">
+              <h2 className="font-display text-2xl font-semibold text-[#021d33]">
+                Související čtení
+              </h2>
+              <div className="mt-6 grid gap-6 md:grid-cols-3">
+                {related.map((a) => (
+                  <ArticleCard key={a.id} article={a} />
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          <ContentRecommendations locale={locale} currentSlug={article.slug} />
+          <EditorialFooter locale={editorialLocale} />
         </div>
+
+        <aside className="article-reading-aside">
+          <PremiumCta locale={locale} />
+          {studentSidebarAds.length > 0 ? (
+            <StudentAdBlocks campaigns={studentSidebarAds} variant="sidebar" />
+          ) : (
+            <AdSlot ads={ads} />
+          )}
+        </aside>
       </article>
     </>
   );

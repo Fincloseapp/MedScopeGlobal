@@ -255,3 +255,64 @@
     animation: none;
   }
 }
+
+/* Article detail — calm reading layout */
+.article-reading-page {
+  @apply mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_16rem] lg:py-14;
+}
+
+.article-reading-shell {
+  @apply min-w-0;
+}
+
+.article-reading-aside {
+  @apply hidden space-y-6 lg:block;
+}
+
+.article-brand-kicker {
+  @apply text-xs font-semibold uppercase tracking-[0.22em] text-[#005B96];
+}
+
+.article-category-link {
+  @apply mt-3 inline-block text-sm font-medium text-slate-600 underline-offset-2 hover:text-[#005B96] hover:underline;
+}
+
+.article-reading-title {
+  @apply mt-4 font-display text-[1.85rem] font-semibold leading-[1.15] tracking-tight text-[#021d33] sm:text-4xl lg:text-[2.65rem];
+}
+
+.article-reading-deck {
+  @apply mt-4 max-w-2xl text-lg leading-relaxed text-slate-600;
+}
+
+.article-meta-row {
+  @apply mt-6 flex flex-col gap-3 border-y border-slate-200 py-4 text-sm text-slate-600 sm:flex-row sm:items-end sm:justify-between;
+}
+
+.article-disclaimer {
+  @apply mt-3 text-xs leading-relaxed text-slate-500;
+}
+
+.article-cover {
+  @apply relative mt-8 aspect-[16/9] w-full overflow-hidden bg-slate-900;
+}
+
+.article-audio-bar {
+  @apply mb-8 flex flex-wrap items-center gap-3 border border-slate-200 bg-slate-50 px-4 py-3;
+}
+
+.article-body-column {
+  @apply mt-8 overflow-x-hidden;
+}
+
+.article-prose {
+  @apply prose-headings:font-display prose-headings:tracking-tight prose-headings:text-[#021d33] prose-p:text-[1.05rem] prose-p:leading-[1.75] prose-p:text-slate-700 prose-li:text-slate-700 prose-a:font-medium prose-a:text-[#005B96] prose-img:my-8 prose-img:rounded-none;
+}
+
+.article-contribute {
+  @apply my-10 border-y border-slate-200 py-8;
+}
+
+.article-related {
+  @apply mt-14 border-t border-slate-200 pt-10;
+}

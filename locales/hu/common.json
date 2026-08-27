@@ -36,15 +36,6 @@
     "subtitle": "10 evidencián alapuló protokoll alvásra, anyagcserére, immunitásra és hosszú életre.",
     "price": "1 990 Ft/hó"
   },
-  "tringelt": {
-    "title": "Szerző támogatása · Tringelt",
-    "subtitle": "Opcionális mikro-hozzájárulás — mint egy borravaló étteremben. Köszönjük a szerkesztőségnek.",
-    "custom": "Egyedi összeg",
-    "vipUpsell": "Támogassa a szerkesztőséget és szerezzen VIP longevity protokollokat —",
-    "unavailable": "A Tringelt jelenleg nem elérhető.",
-    "tip": "Támogassa a szerkesztőséget tringelttel",
-    "exploreVip": "vagy fedezze fel a VIP longevity protokollokat"
-  },
   "donation": {
     "title": "Szerző támogatása",
     "subtitle": "Egy mikroadomány segít minőségi tartalom készítésében.",
@@ -71,5 +62,14 @@
     "biohacking": "Biohacking kezdőknek",
     "sleep": "Alvásoptimalizálás",
     "mental": "Mentális jólét"
+  },
+  "contribution": {
+    "title": "Szerző támogatása · Hozzájárulás",
+    "subtitle": "Opcionális hozzájárulás — köszönjük. Nem VIP és nem előfizetés.",
+    "custom": "Egyéni",
+    "vipUpsell": "A VIP Longevity külön fizetős előfizetés —",
+    "unavailable": "A hozzájárulások jelenleg nem elérhetők.",
+    "tip": "Támogassa a szerkesztőséget hozzájárulással",
+    "exploreVip": "vagy fedezze fel a VIP Longevity protokollokat"
   }
 }

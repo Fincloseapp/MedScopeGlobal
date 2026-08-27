@@ -1,24 +1,22 @@
-/** Per-page session voice — random male/female on load, overridable via picker. */
+/** Per-page session voice — one fixed gender (no multi-voice UI). */
 
 import type { VoiceGender } from "@/lib/tts/voice-picker";
 
 const SESSION_KEY = "medscope-tts-session-gender";
 const OVERRIDE_KEY = "medscope-tts-voice-gender";
 
-function randomGender(): "male" | "female" {
-  return Math.random() < 0.5 ? "male" : "female";
-}
+/** Single default voice for article/read-aloud — Czech neural female. */
+const DEFAULT_GENDER: "male" | "female" = "female";
 
 export function initSessionVoice(): "male" | "female" {
-  if (typeof window === "undefined") return "female";
+  if (typeof window === "undefined") return DEFAULT_GENDER;
   try {
     const existing = sessionStorage.getItem(SESSION_KEY);
     if (existing === "male" || existing === "female") return existing;
-    const picked = randomGender();
-    sessionStorage.setItem(SESSION_KEY, picked);
-    return picked;
+    sessionStorage.setItem(SESSION_KEY, DEFAULT_GENDER);
+    return DEFAULT_GENDER;
   } catch {
-    return randomGender();
+    return DEFAULT_GENDER;
   }
 }
 
@@ -33,9 +31,9 @@ export function getSessionVoice(): "male" | "female" | null {
   return null;
 }
 
-/** Effective gender: user override (localStorage) > session random > auto picks session. */
+/** Effective gender: prefer fixed session voice (single voice policy). */
 export function getEffectiveVoiceGender(): VoiceGender {
-  if (typeof window === "undefined") return "auto";
+  if (typeof window === "undefined") return DEFAULT_GENDER;
   try {
     const override = localStorage.getItem(OVERRIDE_KEY);
     if (override === "male" || override === "female") return override;
@@ -60,12 +58,12 @@ export function setUserVoiceOverride(gender: VoiceGender): void {
 }
 
 export function getUserVoiceOverride(): VoiceGender {
-  if (typeof window === "undefined") return "auto";
+  if (typeof window === "undefined") return DEFAULT_GENDER;
   try {
     const v = localStorage.getItem(OVERRIDE_KEY);
     if (v === "male" || v === "female" || v === "auto") return v;
   } catch {
     /* ignore */
   }
-  return "auto";
+  return DEFAULT_GENDER;
 }
