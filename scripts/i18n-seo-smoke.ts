@@ -48,12 +48,20 @@ assert.equal(canonicalLocalePathname("/de"), null);
 assert.ok(getHomepageTitle("de").includes("Gesundheit"));
 assert.ok(getHomepageTitle("fr").includes("Santé"));
 assert.ok(getHomepageTitle("zh-CN").includes("健康"));
+assert.ok(getHomepageTitle("sk").includes("Dlhovekosť") || getHomepageTitle("sk").includes("dlhovekosť"));
+assert.ok(getHomepageTitle("ru").includes("долголетие") || getHomepageTitle("ru").includes("Долголетие") || getHomepageTitle("ru").includes("Здоровье"));
+assert.ok(getHomepageTitle("ko").includes("건강"));
+assert.ok(getHomepageTitle("ro").includes("Sănătate") || getHomepageTitle("ro").includes("longevitate"));
+assert.ok(getHomepageTitle("hu").includes("Egészség") || getHomepageTitle("hu").includes("hosszúélet"));
 assert.equal(getOgLocale("de"), "de_DE");
 assert.equal(getOgLocale("pl"), "pl_PL");
 assert.equal(getOgLocale("fr"), "fr_FR");
 assert.equal(getOgLocale("en-US"), "en_US");
 assert.equal(getOgLocale("zh-CN"), "zh_CN");
 assert.equal(getOgLocale("ja"), "ja_JP");
+assert.equal(getOgLocale("sk"), "sk_SK");
+assert.equal(getOgLocale("ru"), "ru_RU");
+assert.equal(getOgLocale("ko"), "ko_KR");
 
 const deAbout = buildPageMetadata({
   title: "About",

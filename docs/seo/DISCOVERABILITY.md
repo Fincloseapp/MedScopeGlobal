@@ -42,11 +42,11 @@ Probed with follow-redirects on `https://medscopeglobal.com`. Status meanings:
 | `/fr` | 200 | `fr` | `/fr` | `fr_FR` | `fr` | FR | **works** |
 | `/es` | 200 | `es` | `/es` | `es_ES` | `es` | ES | **works** |
 | `/it` | 200 | `it` | `/it` | `it_IT` | `it` | IT | **works** |
-| `/sk` | 200 | `sk` | `/sk` | `sk_SK` | `sk` | CS claim fallback | **partial** |
+| `/sk` | 200 | `sk` | `/sk` | `sk_SK` | `sk` | SK | **works** |
 | `/jp` | 200 | `ja` | `/jp` | `ja_JP` | `ja` | JA | **works** |
 | `/cn` | 200 | `zh-CN` | `/cn` | `zh_CN` | `zh` | ZH | **works** |
-| `/kr` | 200 | `ko` | `/kr` | `ko_KR` | `ko` | EN title | **partial** |
-| `/ru` `/uk` `/be` `/ro` `/hu` `/vi` `/id` | 200 | match | match | match | match | EN title | **partial** |
+| `/kr` | 200 | `ko` | `/kr` | `ko_KR` | `ko` | KO | **works** |
+| `/ru` `/uk` `/be` `/ro` `/hu` `/vi` `/id` | 200 | match | match | match | match | localized title | **works** (UI chrome still thin) |
 
 Hreflang on homepage: **20** links (`hrefLang`, 19 locales + `x-default` → `/cs`).
 
@@ -97,9 +97,9 @@ Hreflang on homepage: **20** links (`hrefLang`, 19 locales + `x-default` → `/c
 ## Remaining gaps
 
 - Fill thin `locales/{…}/common.json` dictionaries (UI chrome still EN for many locales).
-- Expand magazine copy for remaining `GLOBAL_LOCALES` (sk, ru, uk, be, ko, vi, id, ro, hu).
 - Syndicate articles into non-CS locales so locale sitemaps gain story URLs.
 - Confirm GSC / Bing / Yandex sitemap submission.
+- Homepage magazine claims localized for all `GLOBAL_LOCALES` (done on `cursor/continue-next-2b2d`).
 
 ## How to re-verify
 

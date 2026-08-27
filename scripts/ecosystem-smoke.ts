@@ -117,6 +117,12 @@ const CASES: SmokeCase[] = [
     allowRedirect: true,
   },
   {
+    path: "/go/d3-cz",
+    label: "Affiliate vitamin D3 redirect",
+    expectStatus: [302, 307],
+    allowRedirect: true,
+  },
+  {
     path: "/go/unknown-affiliate-slug",
     label: "Affiliate unknown slug 404",
     expectStatus: 404,
