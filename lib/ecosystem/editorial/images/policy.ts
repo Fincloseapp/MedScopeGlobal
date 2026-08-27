@@ -1,6 +1,10 @@
 /** Legal, geo, age, and inclusivity rules for editorial images */
 
 import { CONTENT_GUARDRAILS } from "@/lib/ecosystem/autonomous";
+import {
+  isBrokenCoverUrl,
+  isStaleGenericStockUrl,
+} from "@/lib/ecosystem/editorial/images/cover";
 import type { EditorialTopic } from "../desks";
 import type { ImageComplianceResult } from "./types";
 
@@ -85,7 +89,7 @@ export function isMissingOrStaleHeroImage(coverUrl: string | null | undefined): 
   if (!coverUrl?.trim()) return true;
   const url = coverUrl.trim();
   if (PLACEHOLDER_PATTERNS.some((p) => p.test(url))) return true;
-  // Gradient-only articles have no URL — handled by null check
+  if (isBrokenCoverUrl(url) || isStaleGenericStockUrl(url)) return true;
   return false;
 }
 

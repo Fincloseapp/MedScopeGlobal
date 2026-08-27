@@ -94,6 +94,6 @@ async function loadHomepageData(): Promise<{
 
 export const getHomepageCachedData = unstable_cache(
   loadHomepageData,
-  ["v22-homepage-public-v6-topic-covers"],
+  ["v22-homepage-public-v7-cover-sweep"],
   { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
 );

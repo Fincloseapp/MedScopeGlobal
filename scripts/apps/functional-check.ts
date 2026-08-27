@@ -201,7 +201,14 @@ console.log(
 
 assert.equal(isMissingOrStaleHeroImage(null), true);
 assert.equal(isMissingOrStaleHeroImage(""), true);
-assert.equal(isMissingOrStaleHeroImage("https://images.unsplash.com/photo-1"), false);
+assert.equal(isMissingOrStaleHeroImage("https://images.unsplash.com/photo-1"), true);
+assert.equal(
+  isMissingOrStaleHeroImage(
+    "https://xcydgqnivxfhprbmdyym.supabase.co/storage/v1/object/public/media/v25-images/images/verejnost/doctor-phone.webp"
+  ),
+  true
+);
+assert.equal(isMissingOrStaleHeroImage("/assets/covers/food.webp"), false);
 
 {
   const foodCover = resolveArticleCoverUrl({
@@ -222,6 +229,14 @@ assert.equal(isMissingOrStaleHeroImage("https://images.unsplash.com/photo-1"), f
     preferCurated: true,
   });
   assert.ok(sleepCover?.includes("sleep") || sleepCover?.includes("calm"), `sleep cover, got ${sleepCover}`);
+
+  assert.equal(
+    classifyCoverTopic({
+      title: "Zimní únava: mýty o pitném režimu",
+      slug: "verejnost-zivotni-styl-2026-07-29-zimni-unava-myty-o-pitnem",
+    }),
+    "sleep"
+  );
 
   assert.equal(
     resolveArticleCoverUrl({

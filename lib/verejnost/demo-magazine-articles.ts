@@ -7,7 +7,7 @@
  */
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { assignEditorialUnits, formatEditorialUnitDisplay } from "@/lib/editorial/units";
-import { VEREJNOST_FALLBACK_COVER } from "@/lib/verejnost/images";
+import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
 import type { ArticleWithRelations } from "@/types/database";
 
 type DemoSeed = {
@@ -195,7 +195,13 @@ function buildDemoRow(seed: DemoSeed, index: number): ArticleWithRelations {
     slug: seed.slug,
     excerpt: seed.excerpt,
     content: seed.content,
-    cover_image_url: VEREJNOST_FALLBACK_COVER,
+    cover_image_url: resolveArticleCoverUrl({
+      title: seed.title,
+      slug: seed.slug,
+      excerpt: seed.excerpt,
+      publicTopic: seed.public_topic,
+      preferCurated: true,
+    }),
     category_id: "demo-category",
     author_id: "demo-author",
     published: true,

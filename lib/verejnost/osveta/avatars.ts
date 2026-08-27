@@ -22,24 +22,21 @@ export const PUBLIC_OSVTA_AVATARS: Record<PublicAvatarType, PublicAvatarConfig> 
     id: "friendly_doctor",
     editorialUnitId: OSVETA_AVATAR_TO_UNIT.friendly_doctor!,
     label: editorialUnitLabel(OSVETA_AVATAR_TO_UNIT.friendly_doctor!, "cs"),
-    imageUrl:
-      "https://images.unsplash.com/photo-1584515930387-285e4804f4cb?w=640&h=640&fit=crop&q=85&auto=format&fm=webp",
+    imageUrl: "/assets/covers/clinical.webp",
     voiceHint: "cs_male_warm",
   },
   nurse: {
     id: "nurse",
     editorialUnitId: OSVETA_AVATAR_TO_UNIT.nurse!,
     label: editorialUnitLabel(OSVETA_AVATAR_TO_UNIT.nurse!, "cs"),
-    imageUrl:
-      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=640&h=640&fit=crop&q=85&auto=format&fm=webp",
+    imageUrl: "/assets/covers/clinical-2.webp",
     voiceHint: "cs_female_caring",
   },
   wellness_coach: {
     id: "wellness_coach",
     editorialUnitId: OSVETA_AVATAR_TO_UNIT.wellness_coach!,
     label: editorialUnitLabel(OSVETA_AVATAR_TO_UNIT.wellness_coach!, "cs"),
-    imageUrl:
-      "https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=640&h=640&fit=crop&q=85&auto=format&fm=webp",
+    imageUrl: "/assets/covers/movement.webp",
     voiceHint: "cs_female_energetic",
   },
 };
