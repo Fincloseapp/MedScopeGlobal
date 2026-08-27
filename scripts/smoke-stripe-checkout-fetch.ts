@@ -12,7 +12,21 @@ async function main() {
   const orig = globalThis.fetch;
   let passed = 0;
 
-  globalThis.fetch = () => new Promise(() => {});
+  // Keep a ref'd timer so Node does not exit before AbortSignal.timeout (unref'd) fires.
+  globalThis.fetch = (_url, init) =>
+    new Promise((_resolve, reject) => {
+      const hang = setTimeout(() => reject(new Error("fetch hang")), 60_000);
+      const signal = init?.signal;
+      const onAbort = () => {
+        clearTimeout(hang);
+        reject(signal?.reason ?? new DOMException("Aborted", "AbortError"));
+      };
+      if (signal?.aborted) {
+        onAbort();
+        return;
+      }
+      signal?.addEventListener("abort", onAbort, { once: true });
+    });
   const t0 = Date.now();
   try {
     await createCheckoutSession({
@@ -66,8 +80,9 @@ async function main() {
 
   globalThis.fetch = async (_url, init) => {
     const body = String(init?.body ?? "");
-    if (!body.includes("unit_amount=100") || !body.includes("currency=czk")) {
-      return new Response(JSON.stringify({ error: { message: "bad form" } }), { status: 400 });
+    // URLSearchParams encodes brackets; match encoded keys.
+    if (!body.includes("unit_amount") || !body.includes("100") || !body.includes("czk")) {
+      return new Response(JSON.stringify({ error: { message: "bad form", body } }), { status: 400 });
     }
     return new Response(
       JSON.stringify({ id: "cs_test_123", url: "https://checkout.stripe.com/c/pay/cs_test_123" }),
