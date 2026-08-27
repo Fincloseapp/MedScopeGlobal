@@ -34,8 +34,6 @@ import {
 import { getDictionary, t } from "@/lib/i18n/get-dictionary";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { ContentRecommendations } from "@/components/recommendations/content-recommendations";
-import { PremiumCta } from "@/components/ux/premium-cta";
-import { ArticleInlineNudge } from "@/components/v38/article-inline-nudge";
 import { resolveConversionCopy } from "@/lib/v38/conversion-engine";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
 import { listStudentAdCampaignsForArticle } from "@/lib/queries/marketing";
@@ -45,11 +43,13 @@ import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
 import {
   SaveToMediFlowButton,
   ArticleShareButton,
-  VipUpgradeNudge,
 } from "@/components/monetization/article-cta";
 import { ArticleContribution } from "@/components/monetization/article-contribution";
 import { ArticleImageSupportNudge } from "@/components/monetization/article-image-support-nudge";
-import { getArticleHeroAltText } from "@/lib/ecosystem/editorial/images";
+import {
+  getArticleHeroAltText,
+  resolveArticleCoverUrl,
+} from "@/lib/ecosystem/editorial/images";
 import { TopLongevityProducts } from "@/components/monetization/affiliate-box";
 import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
@@ -82,6 +82,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     locale as GlobalLocaleCode
   );
 
+  const coverForMeta = resolveArticleCoverUrl({
+    title: article.title,
+    slug: article.slug,
+    coverImageUrl: article.cover_image_url,
+  });
+
   return {
     title: article.title,
     description,
@@ -96,29 +102,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "article",
       publishedTime: article.published_at ?? undefined,
       url: canonical,
-      images: article.cover_image_url
-        ? [{ url: article.cover_image_url }]
-        : undefined,
+      images: coverForMeta ? [{ url: coverForMeta }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
       title: article.title,
       description,
-      images: article.cover_image_url ? [article.cover_image_url] : undefined,
+      images: coverForMeta ? [coverForMeta] : undefined,
     },
   };
-}
-
-function isBrokenCoverUrl(url: string | null | undefined): boolean {
-  if (!url) return true;
-  const lower = url.toLowerCase();
-  return (
-    lower.includes("placeholder") ||
-    lower.includes("via.placeholder") ||
-    lower.includes("placehold.co") ||
-    lower.includes("checkerboard") ||
-    (lower.endsWith(".svg") && lower.includes("empty"))
-  );
 }
 
 export default async function ArticlePage({ params }: Props) {
@@ -130,17 +122,16 @@ export default async function ArticlePage({ params }: Props) {
 
   const { isVip, accessLevel } = await getReaderContext();
 
-  const [articleGateCopy, articleInlineCopy] = !isVip
-    ? await Promise.all([
-        resolveConversionCopy("article_gate", locale),
-        resolveConversionCopy("article_inline", locale),
-      ])
-    : [null, null];
-
   const minLevel = (article.min_access_level ?? "public") as AccessLevelId;
   const locked =
     (article.vip_only && !isVip) ||
     !canAccessContent(accessLevel, minLevel);
+
+  // Gate copy only when the body is locked — open articles get no subscription nudge.
+  const articleGateCopy =
+    locked && !isVip
+      ? await resolveConversionCopy("article_gate", locale)
+      : null;
 
   const related =
     article.category_id &&
@@ -200,9 +191,11 @@ export default async function ArticlePage({ params }: Props) {
     (locale as GlobalLocaleCode) ?? "cs"
   );
 
-  const coverUrl = isBrokenCoverUrl(article.cover_image_url)
-    ? null
-    : article.cover_image_url;
+  const coverUrl = resolveArticleCoverUrl({
+    title: article.title,
+    slug: article.slug,
+    coverImageUrl: article.cover_image_url,
+  });
   const coverMeta = getArticleCoverLabel(article.title, category?.name);
 
   const isV19Article = article.rubric_slug === V19_RUBRIC_SLUG;
@@ -437,10 +430,6 @@ export default async function ArticlePage({ params }: Props) {
             />
           ) : null}
 
-          {!isVip && !locked && articleInlineCopy ? (
-            <ArticleInlineNudge copy={articleInlineCopy} />
-          ) : null}
-
           {showContribution ? (
             <Suspense
               fallback={
@@ -458,7 +447,7 @@ export default async function ArticlePage({ params }: Props) {
             </Suspense>
           ) : null}
 
-          {!locked ? (
+          {isStudentArticle && !locked ? (
             <ArticleCtaBlocks
               articleSlug={article.slug}
               articleTitle={article.title}
@@ -467,10 +456,6 @@ export default async function ArticlePage({ params }: Props) {
 
           {!locked ? (
             <TopLongevityProducts locale={(locale as GlobalLocaleCode) ?? "cs"} />
-          ) : null}
-
-          {!isVip && !locked ? (
-            <VipUpgradeNudge locale={(locale as GlobalLocaleCode) ?? "cs"} />
           ) : null}
 
           {!locked ? (
@@ -498,7 +483,6 @@ export default async function ArticlePage({ params }: Props) {
         </div>
 
         <aside className="article-reading-aside">
-          <PremiumCta locale={locale} />
           {studentSidebarAds.length > 0 ? (
             <StudentAdBlocks campaigns={studentSidebarAds} variant="sidebar" />
           ) : (
