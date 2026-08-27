@@ -52,19 +52,19 @@ export default function OrdiZaznamPage() {
           fill
           priority
           sizes="100vw"
-          className="mkt-drift object-cover object-[72%_center] opacity-55 sm:object-[68%_center]"
+          className="mkt-drift object-cover object-[85%_center] opacity-60 sm:object-[80%_center]"
         />
         <div
-          className="absolute inset-0 bg-gradient-to-r from-[#021d33] via-[#021d33]/88 to-[#021d33]/25 sm:via-[#021d33]/78 sm:to-transparent"
+          className="absolute inset-0 bg-gradient-to-r from-[#021d33] from-0% via-[#021d33]/95 via-40% to-[#021d33]/20 to-100%"
           aria-hidden
         />
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#021d33] via-transparent to-[#021d33]/40"
+          className="absolute inset-0 bg-gradient-to-t from-[#021d33] via-transparent to-[#021d33]/45"
           aria-hidden
         />
 
         <div className="relative mx-auto flex min-h-[min(92vh,900px)] max-w-6xl flex-col justify-end px-4 pb-16 pt-28 sm:px-6 sm:pb-20 lg:justify-center lg:pb-24">
-          <div className="max-w-xl">
+          <div className="max-w-lg lg:max-w-xl">
             <h1 className="mkt-rise font-display text-[clamp(3rem,9vw,5.5rem)] font-bold leading-[0.94] tracking-tight">
               OrdiZáznam
             </h1>

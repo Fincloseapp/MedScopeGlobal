@@ -62,9 +62,9 @@ export default function AplikaceHubPage() {
                   alt=""
                   fill
                   sizes="18vw"
-                  className="object-cover object-top opacity-80"
+                  className="object-cover object-top"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#07121c] via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#07121c]/90 via-transparent to-transparent" />
               </div>
             ))}
           </div>
@@ -82,9 +82,9 @@ export default function AplikaceHubPage() {
               MediFlow, MeDipacient a OrdiZapis — wellness, zprávy a zápisy na jedné platformě.
             </p>
             <div className="mkt-rise-delay-2 mt-9 flex flex-wrap items-center gap-4">
-              <Link
+                <Link
                 href="/predplatne?trial=1"
-                className="inline-flex items-center gap-2 bg-white px-7 py-3.5 text-sm font-semibold text-[#021d33] transition hover:bg-sky-50"
+                className="inline-flex items-center gap-2 bg-[#3db4ff] px-7 py-3.5 text-sm font-semibold text-[#021d33] transition hover:bg-[#6cc4ff]"
               >
                 14 dní zdarma
                 <ArrowRight className="h-4 w-4" aria-hidden />

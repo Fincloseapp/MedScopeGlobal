@@ -49,7 +49,7 @@ export default function VipProtocolsPage() {
             <div className="mkt-rise-delay-2 mt-9 flex flex-wrap items-center gap-5">
               <Link
                 href="/predplatne"
-                className="inline-flex items-center gap-2 bg-amber-400 px-7 py-3.5 text-sm font-semibold text-[#1a1005] transition hover:bg-amber-300"
+                className="inline-flex items-center gap-2 bg-[#f5c84b] px-7 py-3.5 text-sm font-semibold text-[#1a1005] shadow-[0_0_40px_rgba(245,200,75,0.35)] transition hover:bg-[#ffd666]"
               >
                 Aktivovat VIP · {pricing.label}
                 <ArrowRight className="h-4 w-4" aria-hidden />
