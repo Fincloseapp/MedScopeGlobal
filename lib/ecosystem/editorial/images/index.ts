@@ -6,5 +6,6 @@ export * from "./prompts";
 export * from "./sources";
 export * from "./matcher";
 export * from "./processor";
+export * from "./cover";
 
 export { getArticleHeroAltText } from "./alt-text";
