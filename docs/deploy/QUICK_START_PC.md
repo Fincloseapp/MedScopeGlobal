@@ -20,7 +20,7 @@ pnpm db:verify
 pnpm deploy:production -- -SkipRestore
 ```
 
-Záloha skončí v `D:\medscope.data\backups\<yyyy-MM-dd>\` (např. `2026-08-26\`).
+Záloha skončí v `D:\medscope.data\backups\<yyyy-MM-dd>\`.
 
 ---
 

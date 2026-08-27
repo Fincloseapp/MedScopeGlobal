@@ -92,7 +92,7 @@ git pull origin main
 
 # Restore secrets + dated backup
 pnpm sync:d
-# Backup lands at: D:\medscope.data\backups\2026-08-26\  (today's date)
+# Backup lands at: D:\medscope.data\backups\YYYY-MM-DD\  (today's date)
 
 # Verify Supabase (MediFlow, editorial_queue, article_image_suggestions)
 pnpm db:verify
@@ -123,6 +123,12 @@ pnpm images:backfill
 
 ```powershell
 cd D:\medscope.local; git pull origin main; pnpm deploy:production
+```
+
+**One-liner after cloud merge** (pull + sync + verify + deploy + smoke):
+
+```powershell
+cd D:\medscope.local; git pull origin main; pnpm sync:d; pnpm db:verify; pnpm deploy:production -- -SkipRestore
 ```
 
 ---

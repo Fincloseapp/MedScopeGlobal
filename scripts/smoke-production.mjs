@@ -33,6 +33,24 @@ const CHECKS = [
     status: [200],
   },
   {
+    path: "/vip",
+    label: "VIP root alias → protokoly",
+    must: /protokol|Longevity|VIP/i,
+    status: [200],
+  },
+  {
+    path: "/ordizaznam",
+    label: "OrdiZáznam marketing",
+    must: /OrdiZ[aá]pis|OrdiZ[aá]znam|zápis/i,
+    status: [200],
+  },
+  {
+    path: "/vitascope",
+    label: "VitaScope brand alias",
+    must: /VitaScope/i,
+    status: [200],
+  },
+  {
     path: "/robots.txt",
     label: "robots.txt",
     must: /Sitemap|User-agent/i,

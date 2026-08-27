@@ -56,10 +56,46 @@ const CASES: SmokeCase[] = [
     expectBody: /Longevity Protokoly|#01|#10/i,
   },
   {
+    path: "/cs/vip",
+    label: "VIP root alias → protokoly",
+    expectStatus: 200,
+    expectBody: /Longevity Protokoly|VIP|protokol/i,
+  },
+  {
     path: "/cs/vip/protokoly/biohacking-zacatecnici",
     label: "VIP protocol detail",
     expectStatus: 200,
     expectBody: /MediFlow|Biohacking/i,
+  },
+  {
+    path: "/cs/ordizaznam",
+    label: "OrdiZáznam marketing alias",
+    expectStatus: 200,
+    expectBody: /OrdiZ[aá]pis|OrdiZ[aá]znam|zápis/i,
+  },
+  {
+    path: "/cs/vitascope",
+    label: "VitaScope brand alias → home",
+    expectStatus: 200,
+    expectBody: /VitaScope/i,
+  },
+  {
+    path: "/cs/magazine",
+    label: "Magazine alias → articles",
+    expectStatus: 200,
+    expectBody: /article|VitaScope|Zpravodajství/i,
+  },
+  {
+    path: "/cs/tips",
+    label: "Tips alias → VIP",
+    expectStatus: 200,
+    expectBody: /VIP|protokol|Longevity/i,
+  },
+  {
+    path: "/cs/affiliate",
+    label: "Affiliate hub alias → aplikace",
+    expectStatus: 200,
+    expectBody: /MediFlow|MeDipacient|OrdiZapis|aplikac/i,
   },
   { path: "/app/mediflow", label: "MediFlow PWA shell", expectStatus: 200 },
   {

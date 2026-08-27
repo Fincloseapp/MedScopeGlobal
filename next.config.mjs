@@ -83,6 +83,18 @@ const nextConfig = {
       // Article hubs that were never implemented as standalone routes
       { source: "/studenti/clanky", destination: "/articles?med_track=studium", permanent: false },
       { source: "/lekari/clanky", destination: "/articles", permanent: false },
+      // MASTER_PROMPT ecosystem aliases (unprefixed; locale pages also redirect)
+      { source: "/vip", destination: "/vip/protokoly", permanent: false },
+      { source: "/vitascope", destination: "/", permanent: false },
+      { source: "/magazine", destination: "/articles", permanent: false },
+      { source: "/affiliate", destination: "/aplikace", permanent: false },
+      { source: "/tips", destination: "/vip/protokoly", permanent: false },
+      { source: "/tipy", destination: "/vip/protokoly", permanent: false },
+      { source: "/tip", destination: "/vip/protokoly", permanent: false },
+      { source: "/tringelt", destination: "/vip/protokoly", permanent: false },
+      { source: "/donate", destination: "/vip/protokoly", permanent: false },
+      { source: "/podpora", destination: "/vip/protokoly", permanent: false },
+
       // MeDiktor → OrdiZapis asset aliases (installed PWAs / old caches)
       { source: "/assets/mediktor/:path*", destination: "/assets/ordizapis/:path*", permanent: false },
       { source: "/assets/marketing/mediktor-cs.webp", destination: "/assets/marketing/ordizapis-phone-v2.webp", permanent: false },
