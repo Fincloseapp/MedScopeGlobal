@@ -4,14 +4,16 @@ import { resetMediFlowSupplementsDaily } from "@/lib/mediflow/store";
 import {
   getImageCuratorForLocale,
 } from "@/lib/ecosystem/editorial/personas";
-import { runEditorialQueueCron } from "@/lib/ecosystem/editorial";
-import { getSyndicationTargets } from "@/lib/ecosystem/editorial/syndication";
+import {
+  runEditorialQueueCron,
+  runGenerateArticlesCron,
+  runSyndicateArticlesCron,
+} from "@/lib/ecosystem/editorial";
 import {
   processEditorialImageBatch,
   IMAGE_CURATOR_PERSONA_ID,
 } from "@/lib/ecosystem/editorial/images";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
-import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 /** Autonomous task runner — triggered by cron or manual admin invoke */
 export async function POST(request: Request) {
@@ -19,7 +21,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = (await request.json().catch(() => ({}))) as { task?: string };
+  const body = (await request.json().catch(() => ({}))) as {
+    task?: string;
+    limit?: number;
+    apply?: boolean;
+    dryRun?: boolean;
+  };
   const task = body.task ?? "seo-optimize";
 
   const schedule = AUTONOMOUS_SCHEDULE[task as keyof typeof AUTONOMOUS_SCHEDULE];
@@ -27,7 +34,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: `Unknown task: ${task}` }, { status: 400 });
   }
 
-  // MediFlow ecosystem — delegates to same logic as GET /api/cron/ecosystem-mediflow
   if (task === "mediflow-daily-reset") {
     try {
       const reset = await resetMediFlowSupplementsDaily();
@@ -45,7 +51,6 @@ export async function POST(request: Request) {
     }
   }
 
-  // Editorial queue — scaffold autonomous redakce pipeline
   if (task === "editorial-queue") {
     const result = await runEditorialQueueCron();
     return NextResponse.json({
@@ -53,18 +58,55 @@ export async function POST(request: Request) {
       status: result.status,
       description: schedule.description,
       items: result.items,
+      desksTotal: result.desksTotal,
       queued: result.queued,
+      persisted: result.persisted,
+      cronEndpoint: "/api/cron/ecosystem-editorial-queue",
+      timestamp: result.timestamp,
+    });
+  }
+
+  if (task === "generate-articles") {
+    const result = await runGenerateArticlesCron();
+    return NextResponse.json({
+      task,
+      status: result.status,
+      description: schedule.description,
+      items: result.items,
+      queued: result.queued,
+      persisted: result.persisted,
+      legacyCronEndpoint: result.legacyCronEndpoint,
+      cronEndpoint: "/api/cron/ecosystem-generate-articles",
+      maxArticlesPerDay: result.maxArticlesPerDay,
+      timestamp: result.timestamp,
+    });
+  }
+
+  if (task === "syndicate-articles") {
+    const result = await runSyndicateArticlesCron({
+      limitPerHub: body.limit ?? 3,
+    });
+    return NextResponse.json({
+      task,
+      status: result.status,
+      description: schedule.description,
+      candidates: result.candidates,
+      persistedSyndications: result.persistedSyndications,
+      persistedQueue: result.persistedQueue,
+      plan: result.plan,
+      sample: result.sample,
+      note: result.note,
+      cronEndpoint: "/api/cron/ecosystem-syndicate",
       timestamp: result.timestamp,
     });
   }
 
   if (task === "editorial-images") {
     const curator = getImageCuratorForLocale("cs");
-    const bodyExt = body as { limit?: number; apply?: boolean; dryRun?: boolean };
     const { result, suggestions, candidates } = await processEditorialImageBatch({
-      limit: bodyExt.limit ?? 10,
-      apply: bodyExt.apply ?? false,
-      dryRun: bodyExt.dryRun ?? false,
+      limit: body.limit ?? 10,
+      apply: body.apply ?? false,
+      dryRun: body.dryRun ?? false,
     });
 
     const admin = tryCreateServiceRoleClient();
@@ -105,51 +147,29 @@ export async function POST(request: Request) {
     });
   }
 
-  if (task === "syndicate-articles") {
-    const hubLocales: GlobalLocaleCode[] = ["cs", "en-US"];
-    const syndicationPlan: Array<{ source: GlobalLocaleCode; targets: string[] }> = [];
-
-    for (const source of hubLocales) {
-      const rules = getSyndicationTargets(source);
-      syndicationPlan.push({
-        source,
-        targets: rules.flatMap((r) => r.targetLocales),
-      });
-    }
-
-    return NextResponse.json({
-      task,
-      status: "queued",
-      description: schedule.description,
-      syndicationPlan,
-      timestamp: new Date().toISOString(),
-    });
-  }
-
-  // Other tasks — queued for existing ingestion/editorial pipelines
-  const result = {
+  return NextResponse.json({
     task,
     status: "queued",
     description: schedule.description,
     timestamp: new Date().toISOString(),
-  };
-
-  return NextResponse.json(result);
+  });
 }
+
+const CRON_ENDPOINT_BY_TASK: Partial<Record<string, string>> = {
+  "mediflow-daily-reset": "/api/cron/ecosystem-mediflow",
+  "editorial-queue": "/api/cron/ecosystem-editorial-queue",
+  "editorial-images": "/api/ecosystem/editorial/images",
+  "generate-articles": "/api/cron/ecosystem-generate-articles",
+  "syndicate-articles": "/api/cron/ecosystem-syndicate",
+};
 
 export async function GET() {
   return NextResponse.json({
     tasks: Object.entries(AUTONOMOUS_SCHEDULE).map(([id, config]) => ({
       id,
       ...config,
-      cronEndpoint:
-        id === "mediflow-daily-reset"
-          ? "/api/cron/ecosystem-mediflow"
-          : id === "editorial-queue"
-            ? "/api/cron/ecosystem-editorial-queue"
-          : id === "editorial-images"
-            ? "/api/ecosystem/editorial/images"
-            : undefined,
+      cronEndpoint: CRON_ENDPOINT_BY_TASK[id],
+      legacyCronEndpoint: id === "generate-articles" ? "/api/cron/public-articles" : undefined,
     })),
   });
 }

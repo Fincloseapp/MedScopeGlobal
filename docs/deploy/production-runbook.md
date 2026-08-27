@@ -269,7 +269,19 @@ curl -s -X POST \
   https://medscopeglobal.com/api/ecosystem/autonomous | jq .
 ```
 
-Expect: `"status": "queued"`, `"items": 4` (cs, sk, en-US, de). Confirm rows in Supabase `editorial_queue`.
+Expect: `"status": "queued"`, `"items"` ≈ primary desks (≥10). Confirm rows in Supabase `editorial_queue`.
+
+### 5.2b `generate-articles` / `syndicate-articles`
+
+```bash
+curl -s -X POST -H "Authorization: Bearer $CRON_SECRET" \
+  https://medscopeglobal.com/api/cron/ecosystem-generate-articles | jq .
+curl -s -X POST -H "Authorization: Bearer $CRON_SECRET" \
+  https://medscopeglobal.com/api/cron/ecosystem-syndicate | jq .
+```
+
+Expect generate: `"legacyCronEndpoint": "/api/cron/public-articles"`.  
+Expect syndicate: `"status": "queued"` with `plan` and optional `persistedSyndications` when service role is set.
 
 List all autonomous tasks (no auth):
 

@@ -23,7 +23,7 @@ export type SyndicationRule = {
 export const SYNDICATION_RULES: SyndicationRule[] = [
   {
     sourceLocale: "cs",
-    targetLocales: ["sk"],
+    targetLocales: ["sk", "pl"],
     mode: "adapted_translation",
     requiresComplianceReview: true,
     preserveAuthorAttribution: true,
@@ -31,7 +31,7 @@ export const SYNDICATION_RULES: SyndicationRule[] = [
   },
   {
     sourceLocale: "cs",
-    targetLocales: ["en", "en-US"],
+    targetLocales: ["en", "en-US", "de"],
     mode: "summary_adaptation",
     requiresComplianceReview: true,
     preserveAuthorAttribution: true,
@@ -47,15 +47,23 @@ export const SYNDICATION_RULES: SyndicationRule[] = [
   },
   {
     sourceLocale: "en-US",
-    targetLocales: ["cs", "de"],
+    targetLocales: ["cs", "de", "fr", "es", "it", "pl"],
     mode: "adapted_translation",
     requiresComplianceReview: true,
     preserveAuthorAttribution: true,
     maxAgeDays: 10,
   },
   {
+    sourceLocale: "en",
+    targetLocales: ["fr", "es", "it", "de", "pl", "ru", "uk", "zh-CN", "ja"],
+    mode: "summary_adaptation",
+    requiresComplianceReview: true,
+    preserveAuthorAttribution: true,
+    maxAgeDays: 10,
+  },
+  {
     sourceLocale: "de",
-    targetLocales: ["cs", "sk", "pl"],
+    targetLocales: ["cs", "sk", "pl", "hu"],
     mode: "adapted_translation",
     requiresComplianceReview: true,
     preserveAuthorAttribution: true,

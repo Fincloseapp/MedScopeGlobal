@@ -4,7 +4,9 @@ MedScopeGlobal provozuje autonomní redakční systém s locale-specific desks, 
 
 ## Redakční stoly (Desks)
 
-Každý locale má redakční stůl s váhami témat:
+Každý z **19** global locale má redakční stůl s váhami témat. Denní enqueue běží na
+**primary** desks (`PRIMARY_EDITORIAL_LOCALES`: cs, sk, pl, de, fr, es, it, en, en-US,
+ru, uk, zh-CN, ja).
 
 | Téma | Váha | Popis |
 |------|------|-------|
@@ -54,15 +56,21 @@ Konfigurace: `lib/ecosystem/editorial/compliance.ts`
 
 ## Autonomní cron
 
-| Task | Cron | Popis |
-|------|------|-------|
-| `editorial-queue` | 05:00 | Fronta redakčních úkolů per desk |
-| `editorial-images` | 10:00 | Vizuální redakce — hero obrázky, alt text, compliance |
-| `syndicate-articles` | 14:00 | Plán syndikace mezi locale |
-| `generate-articles` | 06:00 | LLM + editorial review |
+| Task | Cron | Endpoint | Popis |
+|------|------|----------|-------|
+| `editorial-queue` | 05:00 | `/api/cron/ecosystem-editorial-queue` | Fronta redakčních úkolů (primary desks) |
+| `generate-articles` | 06:00 | `/api/cron/ecosystem-generate-articles` | Enqueue generation + legacy `/api/cron/public-articles` |
+| `editorial-images` | 10:00 | `/api/ecosystem/editorial/images` | Hero obrázky, alt text, compliance |
+| `syndicate-articles` | 14:00 | `/api/cron/ecosystem-syndicate` | Pending rows in `article_syndications` + queue |
+
+Dispatcher: `.github/workflows/cloudflare-cron.yml` (includes generate + syndicate).
 
 Endpoint: `POST /api/ecosystem/autonomous` (Bearer `CRON_SECRET`)  
 Obrázky: `POST /api/ecosystem/editorial/images` (Bearer `CRON_SECRET`)
+
+**Poznámka:** `generate-articles` / `syndicate-articles` zapisují do `editorial_queue`
+(a syndikace do `article_syndications`). Plné LLM psaní/adaptace zůstává na legacy
+public-articles / budoucím AI kroku — bez AI klíčů se nic nepřepisuje.
 
 ## Vizuální redakce (obrázky)
 

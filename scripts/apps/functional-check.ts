@@ -25,6 +25,14 @@ import {
   getArticleHeroAltText,
 } from "../../lib/ecosystem/editorial/images";
 import { getImageCuratorForLocale } from "../../lib/ecosystem/editorial/personas";
+import {
+  EDITORIAL_DESKS,
+  PRIMARY_EDITORIAL_LOCALES,
+  getDeskForLocale,
+  getPrimaryDesks,
+  createEditorialQueueItem,
+} from "../../lib/ecosystem/editorial";
+import { SYNDICATION_RULES, getSyndicationTargets } from "../../lib/ecosystem/editorial/syndication";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -148,6 +156,35 @@ file("app/api/ecosystem/editorial/images/route.ts");
 file("lib/ecosystem/editorial/images/policy.ts");
 file("lib/ecosystem/editorial/images/matcher.ts");
 file("scripts/editorial/backfill-article-images.mjs");
+file("app/api/cron/ecosystem-generate-articles/route.ts");
+file("app/api/cron/ecosystem-syndicate/route.ts");
+file("lib/ecosystem/editorial/desks.ts");
+file("lib/ecosystem/editorial/syndication.ts");
+
+assert.equal(EDITORIAL_DESKS.length, 19, "desk per global locale");
+assert.ok(PRIMARY_EDITORIAL_LOCALES.includes("fr"), "fr is primary desk");
+assert.ok(PRIMARY_EDITORIAL_LOCALES.includes("zh-CN"), "zh-CN is primary desk");
+assert.equal(getDeskForLocale("cs").id, "desk-cz");
+assert.equal(getPrimaryDesks().length, PRIMARY_EDITORIAL_LOCALES.length);
+assert.ok(getSyndicationTargets("en").length >= 1, "en syndication rules");
+assert.ok(
+  SYNDICATION_RULES.some((r) => r.targetLocales.includes("ja")),
+  "ja is a syndication target"
+);
+{
+  const item = createEditorialQueueItem(
+    "desk-cz",
+    "cs",
+    "longevity",
+    "journalist-longevity-cz",
+    "generate"
+  );
+  assert.equal(item.taskType, "generate");
+  assert.equal(item.status, "queued");
+}
+console.log(
+  `✓ editorial desks=${EDITORIAL_DESKS.length} primary=${PRIMARY_EDITORIAL_LOCALES.length} syndicationRules=${SYNDICATION_RULES.length}`
+);
 
 assert.equal(isMissingOrStaleHeroImage(null), true);
 assert.equal(isMissingOrStaleHeroImage(""), true);
