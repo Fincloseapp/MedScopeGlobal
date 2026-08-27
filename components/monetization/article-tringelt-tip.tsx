@@ -34,6 +34,7 @@ export function ArticleTringeltTip({
 
   const tip = async (amountMinor: number) => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/ecosystem/article-tip", {
         method: "POST",
@@ -46,12 +47,18 @@ export function ArticleTringeltTip({
           locale,
         }),
       });
-      if (res.status === 503) {
+      const data = (await res.json()) as { url?: string; error?: string; enabled?: boolean };
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      if (res.status === 503 && data.enabled === false) {
         setDisabled(true);
         return;
       }
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (data.url) window.location.href = data.url;
+      setError(data.error ?? "Platbu se nepodařilo spustit. Zkuste to prosím znovu.");
+    } catch {
+      setError("Síťová chyba — zkontrolujte připojení a zkuste znovu.");
     } finally {
       setLoading(false);
     }

@@ -19,11 +19,11 @@ import { AppOpenLink } from "@/components/apps/app-origin-bar";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { ArrowRight } from "lucide-react";
 
-/** Marketing display names — OrdiZáznam is the Czech public alias for OrdiZapis */
+/** Marketing display names — keep OrdiZapis consistent across hero/cards/nav */
 const APP_MARKETING_NAME: Record<string, string> = {
   mediflow: "MediFlow",
   medipacient: "MeDipacient",
-  ordizapis: "OrdiZáznam",
+  ordizapis: "OrdiZapis",
   mediprep: "MeDiprep",
 };
 
