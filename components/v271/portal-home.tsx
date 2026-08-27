@@ -114,7 +114,7 @@ function HeroPhones() {
       <div className="portal-phone portal-phone-b absolute right-0 top-[14%] w-[54%] overflow-hidden rounded-[1.75rem] shadow-[0_32px_80px_rgba(2,29,51,0.6)] ring-1 ring-white/15">
         <Image
           src={APP_MARKETING_IMAGE.ordizapis}
-          alt="OrdiZáznam — zápisy pro ordinaci"
+          alt="OrdiZapis — zápisy pro ordinaci"
           width={480}
           height={960}
           className="h-auto w-full object-cover"

@@ -17,25 +17,21 @@ export default function VipProtocolsPage() {
   const pricing = VIP_PRICING.cs;
   return (
     <div className="bg-[#0c0a08] text-white">
-      {/* Full-bleed VIP hero — brand first, no badge clutter */}
+      {/* Full-bleed VIP hero — soft dawn gradients, no checkerboard texture */}
       <section className="relative isolate min-h-[min(88vh,820px)] overflow-hidden">
         <div
-          className="mkt-drift absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(245,158,11,0.28),transparent_45%),radial-gradient(ellipse_at_90%_80%,rgba(120,53,15,0.35),transparent_40%),linear-gradient(160deg,#0c0a08_0%,#1a140c_50%,#0f1a22_100%)]"
+          className="mkt-drift absolute inset-0 bg-[radial-gradient(ellipse_at_25%_15%,rgba(245,158,11,0.32),transparent_50%),radial-gradient(ellipse_at_85%_70%,rgba(14,116,144,0.22),transparent_45%),linear-gradient(165deg,#0a0908_0%,#1c140c_42%,#0c1520_100%)]"
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f59e0b' fill-opacity='1'%3E%3Cpath d='M0 0h40v40H0V0zm40 40h40v40H40V40z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
-          }}
+          className="pointer-events-none absolute -right-16 top-10 h-[70%] w-[55%] rounded-full bg-[radial-gradient(circle,rgba(245,200,75,0.18),transparent_68%)] blur-2xl"
           aria-hidden
         />
 
         <div className="relative mx-auto flex min-h-[min(88vh,820px)] max-w-6xl flex-col justify-end px-4 pb-16 pt-28 sm:px-6 sm:pb-20 lg:justify-center">
           <div className="max-w-2xl">
             <p className="mkt-rise text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-300/90">
-              MedScopeGlobal VIP
+              MedScopeGlobal VIP · longevity
             </p>
             <h1 className="mkt-rise-delay-1 mt-3 font-display text-[clamp(2.75rem,8vw,5.25rem)] font-bold leading-[0.95] tracking-tight">
               Longevity
@@ -46,12 +42,16 @@ export default function VipProtocolsPage() {
               Deset vědecky podložených plánů — spánek, metabolismus, imunita. Denní rytmus, suplementy
               a lab testy, napojené na MediFlow.
             </p>
+            <p className="mkt-rise-delay-2 mt-3 max-w-lg text-sm text-amber-100/55">
+              Samostatný produkt VIP protokoly ({pricing.label}) — odlišný od Student LF (Academy 149 Kč)
+              i od MediFlow sync. 14 dní zdarma na /predplatne.
+            </p>
             <div className="mkt-rise-delay-2 mt-9 flex flex-wrap items-center gap-5">
               <Link
                 href="/predplatne"
                 className="inline-flex items-center gap-2 bg-[#f5c84b] px-7 py-3.5 text-sm font-semibold text-[#1a1005] shadow-[0_0_40px_rgba(245,200,75,0.35)] transition hover:bg-[#ffd666]"
               >
-                Aktivovat VIP · {pricing.label}
+                14 dní zdarma · pak {pricing.label}
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
               <a
