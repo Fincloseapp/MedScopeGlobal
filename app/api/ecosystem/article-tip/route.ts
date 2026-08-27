@@ -4,14 +4,16 @@ import { logArticleTipOrder } from "@/lib/mediflow/store";
 import { ARTICLE_TIP_TIERS } from "@/lib/ecosystem/monetization";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import {
-  createCheckoutSession,
-  stripeErrorToJson,
-} from "@/lib/stripe/checkout-fetch";
+  createStripeClient,
+  getStripeSecretKey,
+  stripeClientErrorBody,
+} from "@/lib/stripe/client";
 
 export const dynamic = "force-dynamic";
 
 const ZERO_DECIMAL = new Set(["jpy", "krw", "vnd", "idr", "huf", "ugx", "clp"]);
 
+/** Don't let auth/session hang block anonymous Checkout. */
 async function optionalUserId(): Promise<string | null> {
   try {
     const result = await Promise.race([
@@ -26,7 +28,7 @@ async function optionalUserId(): Promise<string | null> {
 }
 
 export async function POST(request: Request) {
-  const secret = process.env.STRIPE_SECRET_KEY?.trim();
+  const secret = getStripeSecretKey();
   if (!secret) {
     return NextResponse.json(
       { error: "Stripe není nakonfigurován", enabled: false },
@@ -74,29 +76,35 @@ export async function POST(request: Request) {
   const userId = await optionalUserId();
 
   try {
+    const stripe = createStripeClient(secret);
     const slug = body.articleSlug.trim();
 
-    const session = await createCheckoutSession({
-      secretKey: secret,
+    const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      successUrl: `${origin}/article/${encodeURIComponent(slug)}?tip=1`,
-      cancelUrl: `${origin}/article/${encodeURIComponent(slug)}`,
-      lineItems: [
+      payment_method_types: ["card"],
+      line_items: [
         {
-          currency,
-          unitAmount: amount,
-          name: body.articleTitle
-            ? `Tringelt: ${body.articleTitle.slice(0, 80)}`
-            : "Tringelt pro autora",
-          description: "Volitelný mikro-příspěvek autorovi článku",
+          price_data: {
+            currency,
+            product_data: {
+              name: body.articleTitle
+                ? `Tringelt: ${body.articleTitle.slice(0, 80)}`
+                : "Tringelt pro autora",
+              description: "Volitelný mikro-příspěvek autorovi článku",
+            },
+            unit_amount: amount,
+          },
+          quantity: 1,
         },
       ],
+      success_url: `${origin}/article/${encodeURIComponent(slug)}?tip=1`,
+      cancel_url: `${origin}/article/${encodeURIComponent(slug)}`,
       metadata: {
         type: "article_tip",
         articleSlug: slug,
         locale,
       },
-      clientReferenceId: userId,
+      ...(userId ? { client_reference_id: userId } : {}),
     });
 
     if (!session.url) {
@@ -124,8 +132,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ url: session.url, sessionId: session.id });
   } catch (err) {
-    const mapped = stripeErrorToJson(err);
-    console.error("[article-tip]", mapped.body.detail ?? mapped.body.error);
-    return NextResponse.json(mapped.body, { status: mapped.status });
+    const payload = stripeClientErrorBody(err);
+    console.error("[article-tip]", payload.detail);
+    return NextResponse.json(payload, { status: 503 });
   }
 }

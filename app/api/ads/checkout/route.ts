@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
 import { SITE } from "@/lib/config/site";
 import { createServiceRoleClient } from "@/lib/supabase/service";
+import {
+  createStripeClient,
+  getStripeSecretKey,
+  stripeClientErrorBody,
+} from "@/lib/stripe/client";
 
 /**
  * Stripe Checkout for an approved ads_request.
@@ -13,10 +17,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Missing request_id" }, { status: 400 });
   }
 
-  const stripeKey = process.env.STRIPE_SECRET_KEY?.trim();
+  const stripeKey = getStripeSecretKey();
   if (!stripeKey) {
     return NextResponse.json(
-      { error: "Stripe není nakonfigurován." },
+      { error: "Stripe není nakonfigurován.", enabled: false },
       { status: 503 }
     );
   }
@@ -63,27 +67,32 @@ export async function GET(request: Request) {
     );
   }
 
-  const stripe = new Stripe(stripeKey);
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    success_url: `${SITE.url}/inzerce/formular?paid=1`,
-    cancel_url: `${SITE.url}/inzerce/formular?paid=0`,
-    customer_email: req.email ?? undefined,
-    metadata: { ads_request_id: req.id, kind: "ad_campaign" },
-    line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          currency: "czk",
-          unit_amount: amount,
-          product_data: {
-            name: `MedScopeGlobal reklama — ${req.company}`,
-            description: `${req.type} / ${req.position ?? "web"}`,
+  let session;
+  try {
+    const stripe = createStripeClient(stripeKey);
+    session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      success_url: `${SITE.url}/inzerce/formular?paid=1`,
+      cancel_url: `${SITE.url}/inzerce/formular?paid=0`,
+      customer_email: req.email ?? undefined,
+      metadata: { ads_request_id: req.id, kind: "ad_campaign" },
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency: "czk",
+            unit_amount: amount,
+            product_data: {
+              name: `MedScopeGlobal reklama — ${req.company}`,
+              description: `${req.type} / ${req.position ?? "web"}`,
+            },
           },
         },
-      },
-    ],
-  });
+      ],
+    });
+  } catch (err) {
+    return NextResponse.json(stripeClientErrorBody(err), { status: 503 });
+  }
 
   if (!session.url) {
     return NextResponse.json(

@@ -43,7 +43,12 @@ export function AuthorDonationButton({
           articleTitle,
         }),
       });
-      const data = (await res.json()) as { url?: string; error?: string; enabled?: boolean };
+      const data = (await res.json()) as {
+        url?: string;
+        error?: string;
+        enabled?: boolean;
+        detail?: string;
+      };
       if (data.url) {
         window.location.href = data.url;
         return;
@@ -52,7 +57,11 @@ export function AuthorDonationButton({
         setUnavailable(true);
         return;
       }
-      setError(data.error ?? "Platbu se nepodařilo spustit. Zkuste to prosím znovu.");
+      setError(
+        data.error ??
+          data.detail ??
+          "Platbu se nepodařilo spustit. Zkuste to prosím znovu."
+      );
     } catch {
       setError("Síťová chyba — zkontrolujte připojení a zkuste znovu.");
     } finally {

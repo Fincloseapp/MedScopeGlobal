@@ -339,7 +339,11 @@ Fix all failures before merging to `main` or triggering Workers Builds.
 |---------|-------|
 | 503 / empty articles | `SUPABASE_SERVICE_ROLE_KEY` on Worker; anon alone cannot `select=*` on `articles` |
 | Cron 401 | `CRON_SECRET` mismatch between Worker and caller |
-| Stripe tips 503 | Live Stripe trio on Worker; webhook URL on Stripe dashboard |
+| Stripe donate POST hangs ~4 min then 503 | Node Stripe HTTP client on Workers — deploy `createFetchHttpClient` (`lib/stripe/client.ts`); expect `<5s` + `{url}` or actionable `detail` |
+| Stripe tips / donate 503 with `enabled:false` | `STRIPE_SECRET_KEY` missing on Worker |
+| Stripe 503 with auth/`detail` message | Invalid/restricted live key — rotate `sk_live_…` in Workers Variables |
+| `webhookSecretConfigured: false` | Checkout still works; set `STRIPE_WEBHOOK_SECRET` for VIP/fulfillment (see `docs/deploy/STRIPE_DONATIONS.md`) |
+| Stripe tips 503 (generic) | Live Stripe trio on Worker; webhook URL on Stripe dashboard |
 | MediFlow reset fails | Migration 1 applied; `mediflow_supplements` exists |
 | Editorial queue empty | Migration 2 applied; service role present at cron time |
 | Images not applied | Migration 3 + run backfill or cron with `"apply":true` |

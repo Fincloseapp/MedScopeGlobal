@@ -1,6 +1,7 @@
-import Stripe from "stripe";
+import type Stripe from "stripe";
 import { SITE } from "@/lib/config/site";
 import { createServiceRoleClient } from "@/lib/supabase/service";
+import { createStripeClient, getStripeSecretKey } from "@/lib/stripe/client";
 import { resolveV27CheckoutItem, type V27CheckoutKind } from "@/lib/v27/stripe-products";
 import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
@@ -11,13 +12,14 @@ export type V27CheckoutBody = {
 };
 
 export async function createV27CheckoutSession(body: V27CheckoutBody) {
-  const secret = process.env.STRIPE_SECRET_KEY;
+  const secret = getStripeSecretKey();
   if (!secret) {
     return {
       status: 503 as const,
       body: {
         error:
           "Stripe není nakonfigurován. Nastavte STRIPE_SECRET_KEY v Cloudflare Workers (Variables) nebo v .env.local.",
+        enabled: false,
       },
     };
   }
@@ -32,7 +34,7 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
     return { status: 404 as const, body: { error: "Produkt nenalezen" } };
   }
 
-  const stripe = new Stripe(secret);
+  const stripe = createStripeClient(secret);
   const amount = Math.round(item.priceCzk * 100);
   const recurringInterval = item.billingInterval === "year" ? "year" : "month";
 
