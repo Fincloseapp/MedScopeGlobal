@@ -1,16 +1,33 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
 import { getSessionProfile } from "@/lib/auth/session";
 import { logArticleTipOrder } from "@/lib/mediflow/store";
 import { ARTICLE_TIP_TIERS } from "@/lib/ecosystem/monetization";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import {
+  createStripeClient,
+  getStripeSecretKey,
+  stripeClientErrorBody,
+} from "@/lib/stripe/client";
 
 export const dynamic = "force-dynamic";
 
 const ZERO_DECIMAL = new Set(["jpy", "krw", "vnd", "idr", "huf", "ugx", "clp"]);
 
+async function optionalUserId(): Promise<string | null> {
+  try {
+    const result = await Promise.race([
+      getSessionProfile(),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500)),
+    ]);
+    if (!result || !("user" in result)) return null;
+    return result.user?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(request: Request) {
-  const secret = process.env.STRIPE_SECRET_KEY?.trim();
+  const secret = getStripeSecretKey();
   if (!secret) {
     return NextResponse.json(
       { error: "Stripe není nakonfigurován", enabled: false },
@@ -55,16 +72,10 @@ export async function POST(request: Request) {
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
     "https://medscopeglobal.com";
 
-  let userId: string | null = null;
-  try {
-    const { user } = await getSessionProfile();
-    userId = user?.id ?? null;
-  } catch {
-    /* anonymous tip OK */
-  }
+  const userId = await optionalUserId();
 
   try {
-    const stripe = new Stripe(secret);
+    const stripe = createStripeClient(secret);
     const slug = body.articleSlug.trim();
 
     const session = await stripe.checkout.sessions.create({
@@ -120,20 +131,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ url: session.url, sessionId: session.id });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "unknown";
-    console.error("[article-tip]", message);
-    const isConfig =
-      /invalid api key|no such api key|authentication|api_key/i.test(message) ||
-      message.includes("Invalid API Key");
-    return NextResponse.json(
-      {
-        error: isConfig
-          ? "Stripe klíč je neplatný nebo neúplný — zkontrolujte STRIPE_SECRET_KEY na Workeru"
-          : "Chyba při vytváření platby",
-        enabled: !isConfig,
-        detail: process.env.NODE_ENV === "development" ? message : undefined,
-      },
-      { status: 503 }
-    );
+    const payload = stripeClientErrorBody(err);
+    console.error("[article-tip]", payload.detail);
+    return NextResponse.json(payload, { status: 503 });
   }
 }
