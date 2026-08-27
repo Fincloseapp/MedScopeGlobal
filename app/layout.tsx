@@ -9,6 +9,7 @@ import { MAGAZINE, getSiteDefaultTitle } from "@/lib/brand/magazine";
 import { SITE } from "@/lib/config/site";
 import { getSiteUrl } from "@/lib/config/site-url";
 import { organizationJsonLd, newsletterJsonLd, publicationJsonLd } from "@/lib/seo/json-ld";
+import { OG_ALTERNATE_LOCALES } from "@/lib/seo/metadata";
 import "./globals.css";
 
 const inter = Inter({
@@ -57,7 +58,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    alternateLocale: ["cs_CZ"],
+    alternateLocale: OG_ALTERNATE_LOCALES.filter((l) => l !== "en_US"),
     siteName: `${MAGAZINE.name} · ${SITE.name}`,
     url: siteUrl,
     title: getSiteDefaultTitle("en-US"),

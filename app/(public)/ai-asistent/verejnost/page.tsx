@@ -3,10 +3,10 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { IntelligenceConsole } from "@/components/ai-medical/intelligence-console";
 import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-disclaimer";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: "AI asistent pro veřejnost | MedScopeGlobal",
     description: "Zeptejte se AI o prevenci, výživě, spánku a životním stylu — srozumitelně, bez odborného žargonu.",
     path: "/ai-asistent/verejnost",

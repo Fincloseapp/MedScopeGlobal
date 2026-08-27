@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { AcademyPageHeader } from "@/components/academy/page-header";
 import { TextbookChapterReader, type TextbookChapter } from "@/components/academy/textbook-chapter-reader";
 import { getTextbookBySlug } from "@/lib/academy/db";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
 
@@ -13,13 +13,13 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const book = await getTextbookBySlug(slug);
   if (!book) {
-    return buildV20PageMetadata({
+    return await buildLocalizedV20PageMetadata({
       title: "Učebnice nenalezena",
       description: "Požadovaná učebnice nebyla nalezena.",
       path: `/academy/textbooks/${slug}`,
     });
   }
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: `${book.title} — digitální učebnice`,
     description: "Interaktivní kapitoly pro studenty medicíny.",
     path: `/academy/textbooks/${slug}`,

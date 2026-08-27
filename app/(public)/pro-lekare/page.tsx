@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { V27AudienceHub } from "@/components/v27/audience-hub-section";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: "Pro lékaře | MedScopeGlobal",
     description:
       "Guidelines, souhrny studií, diagnostické algoritmy, CME body a Research Hub pro lékaře v praxi.",

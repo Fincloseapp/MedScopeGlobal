@@ -3,12 +3,12 @@ import Link from "next/link";
 import { V20StudyCard } from "@/components/v20/study-card";
 import { getV20StudiesList } from "@/lib/v20/studies/query";
 import { V20_STUDY_SOURCES } from "@/lib/v20/studies/sources";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: "Studie — MedScopeGlobal",
     description:
       "Revmatologické a klinické studie v češtině — PubMed, ClinicalTrials.gov, EULAR, SÚKL, WHO, NZIP. Každý souhrn s DOI nebo PMID.",

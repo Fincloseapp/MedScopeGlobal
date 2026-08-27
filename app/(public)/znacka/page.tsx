@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
 import { getLegalEntity, isLegalEntityComplete } from "@/lib/config/legal-entity";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = buildPageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedPageMetadata({
   title: "Značka a ochrana duševního vlastnictví",
   description: "MedScopeGlobal — prohlášení o značce, autorských právech a nezávislosti na Medscape, WebMD a dalších zahraničních portálech.",
   path: "/znacka",
 });
+}
 
 export default function BrandLegalPage() {
   const entity = getLegalEntity();

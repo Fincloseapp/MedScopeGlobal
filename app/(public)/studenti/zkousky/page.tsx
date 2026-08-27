@@ -2,17 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
 export const revalidate = 120;
 
-export const metadata: Metadata = buildV20PageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedV20PageMetadata({
   title: "Zkoušky a semestr — MedScope pro studenty LF",
   description:
     "Orientace ke zkouškovému období: studijní plány, materiály, procvičení a AI tutor. Doplněk k fakultním skriptům — ne oficiální rozpis zkoušek.",
   path: "/studenti/zkousky",
 });
+}
 
 const TOOLS = [
   {

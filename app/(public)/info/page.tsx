@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { SITE } from "@/lib/config/site";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = buildPageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedPageMetadata({
   title: "Informace o platformě",
   description:
     "Přehled sekcí, přístupových úrovní a funkcí MedScopeGlobal pro čtenáře a partnery.",
   path: "/info",
 });
+}
 
 export default function InfoPage() {
   return (

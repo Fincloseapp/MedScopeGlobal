@@ -3,12 +3,18 @@ import { getOgLocale, MAGAZINE } from "@/lib/brand/magazine";
 import type { Metadata } from "next";
 import { GLOBAL_LOCALES } from "@/lib/ecosystem/locales";
 import { buildGlobalHreflang } from "@/lib/ecosystem/seo";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 
 export const HREFLANG_LOCALES = GLOBAL_LOCALES.map((l) => ({
   code: l.code,
   hreflang: l.hreflang,
   label: l.label,
 }));
+
+/** Open Graph alternateLocale list (underscore form) for all global locales. */
+export const OG_ALTERNATE_LOCALES = HREFLANG_LOCALES.map((l) =>
+  l.hreflang.replace("-", "_")
+);
 
 /** Path-prefix hreflang alternates for all global locales + x-default. */
 export function buildHreflangAlternates(path: string, locale?: string) {
@@ -35,7 +41,9 @@ export function buildPageMetadata(params: {
       url: canonical,
       siteName: `${MAGAZINE.name} · ${SITE.name}`,
       locale: getOgLocale(params.locale),
-      alternateLocale: HREFLANG_LOCALES.map((l) => l.hreflang.replace("-", "_")),
+      alternateLocale: OG_ALTERNATE_LOCALES.filter(
+        (alt) => alt !== getOgLocale(params.locale)
+      ),
       images: [{ url: ogImage, width: 1200, height: 630, alt: params.title }],
     },
     twitter: {
@@ -45,4 +53,14 @@ export function buildPageMetadata(params: {
       images: [ogImage],
     },
   };
+}
+
+/** Locale-aware page metadata — reads `medscope_locale` when locale omitted. */
+export async function buildLocalizedPageMetadata(
+  params: Omit<Parameters<typeof buildPageMetadata>[0], "locale"> & {
+    locale?: string;
+  }
+): Promise<Metadata> {
+  const locale = params.locale ?? (await getServerLocale());
+  return buildPageMetadata({ ...params, locale });
 }

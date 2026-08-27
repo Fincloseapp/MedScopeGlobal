@@ -1,6 +1,6 @@
 # MedScopeGlobal — Internet discoverability & locale mutations
 
-Status snapshot from production probes (`https://medscopeglobal.com`) plus code audit on branch `cursor/i18n-seo-discover-2b2d`.
+Status snapshot from production probes (`https://medscopeglobal.com`) plus code audit on branch `cursor/parallel-seo-i18n-2b2d`.
 
 ## How foreign-language mutations work
 
@@ -20,120 +20,95 @@ Status snapshot from production probes (`https://medscopeglobal.com`) plus code 
 3. **Geo / Accept-Language** — Requests without a locale prefix redirect to `/{detected}/…` using CF country (`localeFromCountry`) or `Accept-Language`, unless the user set a manual locale cookie.
 4. **Dictionaries** — `locales/{code}/common.json` via `getDictionary()`. Thin locale files deep-merge onto `en` then `cs` so missing keys fall back instead of showing raw paths.
 5. **Editorial / articles** — Per-locale sitemaps list static hub URLs always; article URLs only when `articles.locale` matches (Czech corpus dominates `sitemap-cs.xml`).
-6. **Hreflang** — `buildGlobalHreflang()` emits all 19 `GLOBAL_LOCALES` + `x-default` → `/cs…` on homepage (and helpers in `lib/seo/metadata.ts`).
+6. **Hreflang** — `buildGlobalHreflang()` emits all 19 `GLOBAL_LOCALES` + `x-default` → `/cs…` via `buildPageMetadata` / homepage `generateMetadata`.
 
 PWAs (`/app/*`), API, admin, and sitemap/robots paths are **excluded** from locale redirects.
 
-## Production locale matrix (homepage)
+## Production locale matrix (homepage) — 2026-08-27
 
-Probed with follow-redirects. Status meanings:
+Probed with follow-redirects on `https://medscopeglobal.com`. Status meanings:
 
-- **works** — 200 on canonical segment, locale-aware title (or intentional EN), correct canonical, full hreflang set, `html[lang]` sane
-- **partial** — route OK + SEO tags OK, but UI dictionary still thin / copy falls back to EN for non-hero chrome, or few articles in that sitemap
-- **broken** — 404 or wrong locale collapse (pre-fix production issues noted)
+- **works** — 200 on canonical segment, locale-aware title (or intentional EN fallback), correct canonical, `og:locale` matches, `<html lang>` sane, full hreflang set (19 + x-default)
+- **partial** — route + SEO tags OK, but UI dictionary / homepage title still EN for thin locales
+- **broken** — 404 or wrong locale collapse
 
-### Live probe — 2026-08-27 (pre-i18n deploy)
-
-Worker cache-tag `medscope-ui-v23.0`. Measured on `https://medscopeglobal.com`:
-
-| Request | HTTP | Cookie `medscope_locale` | Canonical | `og:locale` | `<html lang>` | Title locale | Verdict |
+| Request | HTTP | Cookie | Canonical | `og:locale` | `<html lang>` | Title | Verdict |
 |---|---|---|---|---|---|---|---|
 | `/cs` | 200 | `cs` | `/cs` | `cs_CZ` | `cs` | CS | **works** |
 | `/en` | 200 | `en` | `/en` | `en_US` | `en` | EN | **works** |
-| `/en-us` | 200 | `en` (bug) | `/en` (bug) | `en_US` | `en` | EN | **partial** — cookie + canonical collapse to `en` |
-| `/de` | 200 | `de` | `/de` | `cs_CZ` (bug) | `de` | EN title | **partial** |
-| `/pl` | 200 | `pl` | `/pl` | `cs_CZ` (bug) | `pl` | EN title | **partial** |
-| `/fr` | 200 | `fr` | `/fr` | `cs_CZ` (bug) | `fr` | EN title | **partial** |
+| `/en-us` | 200 | `en-US` | `/en-us` | `en_US` | `en` | EN | **works** |
+| `/de` | 200 | `de` | `/de` | `de_DE` | `de` | DE | **works** |
+| `/pl` | 200 | `pl` | `/pl` | `pl_PL` | `pl` | PL | **works** |
+| `/fr` | 200 | `fr` | `/fr` | `fr_FR` | `fr` | FR | **works** |
+| `/es` | 200 | `es` | `/es` | `es_ES` | `es` | ES | **works** |
+| `/it` | 200 | `it` | `/it` | `it_IT` | `it` | IT | **works** |
+| `/sk` | 200 | `sk` | `/sk` | `sk_SK` | `sk` | CS claim fallback | **partial** |
+| `/jp` | 200 | `ja` | `/jp` | `ja_JP` | `ja` | JA | **works** |
+| `/cn` | 200 | `zh-CN` | `/cn` | `zh_CN` | `zh` | ZH | **works** |
+| `/kr` | 200 | `ko` | `/kr` | `ko_KR` | `ko` | EN title | **partial** |
+| `/ru` `/uk` `/be` `/ro` `/hu` `/vi` `/id` | 200 | match | match | match | match | EN title | **partial** |
 
-Hreflang count on all homepage locales: **20** (19 + `x-default`).
+Hreflang on homepage: **20** links (`hrefLang`, 19 locales + `x-default` → `/cs`).
 
-Robots / sitemaps (same probe):
+### Inner routes (pre-fix production bug → fixed on this branch)
+
+| Request | Prod (pre-fix) | After fix | Notes |
+|---|---|---|---|
+| `/de/articles` `/pl/articles` `/fr/articles` | `og:locale=cs_CZ`, canonical `/articles` (no prefix) | `og` + canonical locale-prefixed | `buildV20PageMetadata` now uses `buildLocalizedV20PageMetadata` → `getServerLocale()` |
+| `/de/about` `/de/kontakt` `/pl/o-nas` `/fr/privacy` | `og:locale=cs_CZ`, canonical `/cs/…` | locale-matched | static `export const metadata` → `generateMetadata` + `buildLocalizedPageMetadata` |
+| `/de/article/[slug]` | canonical OK, `og:locale` missing (inherit) | `openGraph.locale` set via `getOgLocale` | article detail |
+
+## Robots / sitemaps
 
 | Asset | HTTP | Notes |
 |---|---|---|
-| `/robots.txt` | 200 | Lists `/sitemap.xml` + 19 locale sitemaps (`sitemap-cs.xml` … `sitemap-en-us.xml`) |
+| `/robots.txt` | 200 | Lists `/sitemap.xml` + 19 locale sitemaps |
 | `/sitemap.xml` | 200 | Index present |
 | `/sitemap-cs.xml` | 200 | **1018** `<url>` entries |
-| `/sitemap-en-us.xml` `/sitemap-de.xml` `/sitemap-pl.xml` `/sitemap-fr.xml` | 200 | **18** URLs each (static hubs only) |
-
-### Matrix after this branch (code)
-
-| Request | Canonical | Prod (pre-fix) | After fixes (code) | Notes |
-|---|---|---|---|---|
-| `/cs` | `/cs` | **works** | works | Czech title + description |
-| `/en` | `/en` | **works** | works | EN international |
-| `/en-us` | `/en-us` | **partial** | works | Was collapsing canonical → `/en` via `normalizeLocale` bug |
-| `/de` `/fr` `/es` `/it` `/pl` | same | **partial** | works* | Route + hreflang OK; titles were EN-only → localized claims added; `og:locale` was stuck `cs_CZ` |
-| `/jp` | `/jp` | **works** | works | Japanese segment |
-| `/ja` | `/jp` | **broken** (→ `/en/ja` 404) | works (308→`/jp`) | Alias now recognized + redirected |
-| `/cn` | `/cn` | **works** | works | Chinese segment |
-| `/zh-CN` `/zh-cn` | `/cn` | **partial** (200 duplicate) | works (308→`/cn`) | Prefer single canonical |
-| `/ko` | `/kr` | **partial** (duplicate) | works (308→`/kr`) | |
-| `/kr` | `/kr` | **works** | works | |
-
-\*Non-CS/EN magazines still use EN for many UI chrome strings until dictionaries are fully filled; homepage **title/description/hero claim** are localized for top locales.
+| `/sitemap-de.xml` `/sitemap-pl.xml` `/sitemap-fr.xml` `/sitemap-en-us.xml` … | 200 | **18** URLs each (static hubs; no non-CS articles yet) |
 
 ## SEO checklist (Google-facing)
 
 | Signal | Status | Location |
 |---|---|---|
-| `robots.txt` allow + multi-bot rules | ✅ | `app/robots.ts` → live |
-| Sitemap index + 19 locale sitemaps | ✅ | `/sitemap.xml`, `/sitemap-{seg}.xml` listed in robots |
-| Per-locale static hubs in sitemaps | ✅ | `lib/seo/locale-sitemap.ts` (~18 URLs when no locale articles) |
+| `robots.txt` allow + multi-bot rules | ✅ | `app/robots.ts` |
+| Sitemap index + 19 locale sitemaps | ✅ | `/sitemap.xml`, `/sitemap-{seg}.xml` |
+| Per-locale static hubs in sitemaps | ✅ | `lib/seo/locale-sitemap.ts` |
 | Czech article volume in `sitemap-cs.xml` | ✅ | ~1000+ URLs on prod |
-| Non-CS article syndication in sitemaps | ⚠️ gap | Most locale sitemaps static-only until editorial pipeline fills `articles.locale` |
-| Homepage `<title>` / meta description per locale | ✅ (fixed) | `getHomepageTitle` / `getHomepageDescription` |
-| `rel=canonical` matches locale prefix | ✅ (fixed for `en-US`) | `buildGlobalHreflang` |
-| `hreflang` alternates (19 + x-default) | ✅ | Present in homepage HTML (`hrefLang`) |
-| `og:locale` matches page locale | ✅ (fixed) | Was `cs_CZ` for DE/FR/… |
-| JSON-LD (`WebSite`, `Organization`, `MedicalWebPage`, apps) | ✅ | Root layout + homepage |
-| `<html lang>` | ✅ | Derived from cookie / path locale |
-| Search Console / Bing / Yandex property verify meta | ⚠️ ops | Meta hooks in `SEARCH_ENGINE_CONFIG`; tokens must be set in env/dashboard |
-| Indexing of thin EN-fallback locales | ⚠️ | Prefer quality translations before pushing crawl budget |
+| Non-CS article syndication in sitemaps | ⚠️ gap | Static-only until `articles.locale` filled |
+| Homepage `<title>` / meta description per locale | ✅ | `getHomepageTitle` / `getHomepageDescription` |
+| `rel=canonical` matches locale prefix | ✅ | `buildGlobalHreflang` + localized page metadata |
+| `hreflang` alternates (19 + x-default) | ✅ | Homepage + localized `buildPageMetadata` |
+| `og:locale` matches page locale | ✅ | Homepage + inner routes (this branch) |
+| Root `alternateLocale` full set | ✅ | `OG_ALTERNATE_LOCALES` in `lib/seo/metadata.ts` |
+| JSON-LD | ✅ | Root layout + homepage + articles |
+| `<html lang>` | ✅ | Cookie / path locale |
+| Search Console verify meta | ⚠️ ops | Tokens in env/dashboard |
 
-## Fixes landed on this branch
+## Fixes on `cursor/parallel-seo-i18n-2b2d`
 
-1. **`normalizeLocale`** — Exact/alias match before prefix; `en-US` no longer collapses to `en`. Aliases: `cn`→`zh-CN`, `jp`→`ja`, `kr`→`ko`.
-2. **Alias path segments** — `/ja`, `/zh-cn`, `/ko` resolve and **308** to `/jp`, `/cn`, `/kr`.
-3. **Dictionary deep-merge** — Thin `de`/`fr`/… files inherit missing keys from `en`/`cs`.
-4. **Magazine SEO copy** — Localized homepage claim/subtitle for `de` `fr` `es` `it` `pl` `ja` `zh-CN` (+ `getOgLocale`).
-5. **Smoke coverage** — `scripts/i18n-seo-smoke.ts` asserts normalize, aliases, titles, and optional live `/en-us` canonical.
+1. **`buildLocalizedPageMetadata` / `buildLocalizedV20PageMetadata`** — read `medscope_locale` and emit matching `og:locale`, canonical, and hreflang.
+2. **Static marketing/legal pages** — converted `export const metadata = buildPageMetadata(…)` to `generateMetadata` so `/de/about` etc. no longer stick to `cs_CZ` / `/cs/…`.
+3. **Articles + V20 hubs** — `buildV20PageMetadata` delegates to `buildPageMetadata`; callers await the localized helper.
+4. **Article detail** — sets `openGraph.locale` via `getOgLocale(locale)`.
+5. **Root layout** — `alternateLocale` lists all global OG locales (not only `cs_CZ`).
+6. **Smoke** — `scripts/i18n-seo-smoke.ts` asserts `de`/`pl`/`fr` OG tokens and localized canonicals.
 
-## Remaining gaps (not blocked on this PR)
+## Remaining gaps
 
-- Fill `locales/{de,fr,…}/common.json` to parity with `en` (merge makes UI safe; chrome still mostly EN).
+- Fill thin `locales/{…}/common.json` dictionaries (UI chrome still EN for many locales).
 - Expand magazine copy for remaining `GLOBAL_LOCALES` (sk, ru, uk, be, ko, vi, id, ro, hu).
-- Publish/syndicate articles into non-CS locales so locale sitemaps gain story URLs.
-- Confirm Google Search Console property + sitemap submission for `medscopeglobal.com`.
-- Root layout default metadata is still EN-leaning; page-level `generateMetadata` overrides the homepage.
+- Syndicate articles into non-CS locales so locale sitemaps gain story URLs.
+- Confirm GSC / Bing / Yandex sitemap submission.
 
 ## How to re-verify
 
 ```bash
 pnpm exec tsx scripts/i18n-seo-smoke.ts
 MEDSCOPE_ORIGIN=https://medscopeglobal.com pnpm exec tsx scripts/i18n-seo-smoke.ts
-pnpm smoke:ecosystem:production
-```
 
-Manual probes:
-
-```bash
-curl -sI https://medscopeglobal.com/ja          # expect 308 → /jp
-curl -sI https://medscopeglobal.com/en-us       # Set-Cookie medscope_locale=en-US
-curl -s https://medscopeglobal.com/de | rg -o 'rel="canonical"[^>]+|og:locale[^>]+|<title>[^<]+'
+curl -s https://medscopeglobal.com/de | rg -o 'rel="canonical"[^>]+|og:locale[^>]+|hrefLang="[^"]+"'
+curl -s https://medscopeglobal.com/de/articles | rg -o 'rel="canonical"[^>]+|og:locale[^>]+'
+curl -s https://medscopeglobal.com/de/about | rg -o 'rel="canonical"[^>]+|og:locale[^>]+'
 curl -s https://medscopeglobal.com/robots.txt | rg Sitemap
 ```
-
-## Live production probe (2026-08-27 11:08 UTC)
-
-| Path | Status | Location / cookie | Verdict |
-|---|---|---|---|
-| `/cs` `/en` `/de` `/jp` `/cn` `/kr` `/sk` `/pl` | 200 | OK | works |
-| `/en-us` | 200 | cookie `medscope_locale=en` (should be `en-US`) | **critical** until this branch deploys |
-| `/ja` | 307 → `/en/ja` | treated as unprefixed path | **critical** — alias missing on prod |
-| `/zh-cn` | 200 | cookie `zh-CN` (should 308 → `/cn`) | partial |
-| `/ko` | 200 | cookie `ko` (should 308 → `/kr`) | partial |
-| `/robots.txt` `/sitemap-cs.xml` `/sitemap-en-us.xml` | 200 | OK | works |
-
-Fixes in this branch resolve the critical `/ja` and `en-US` cookie/canonical issues after Cloudflare deploy of `main`.
-

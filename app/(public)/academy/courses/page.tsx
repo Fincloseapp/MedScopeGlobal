@@ -4,7 +4,7 @@ import { CourseCard } from "@/components/academy/course-card";
 import { FreePreviewBanner } from "@/components/academy/free-preview-banner";
 import { PrijimackyPrepHub } from "@/components/prijimacky/prep-hub";
 import { getCourseVideoFlags, listPublishedCourses } from "@/lib/academy/db";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
 
@@ -20,7 +20,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     params.level === "priprava";
 
   if (isPrep) {
-    return buildV20PageMetadata({
+    return await buildLocalizedV20PageMetadata({
       title: "Příprava na přijímačky LF — MedScope Academy",
       description:
         "Kurzy a self-testy z biologie, chemie a fyziky pro maturanty gymnázií + termíny přihlášek na české lékařské fakulty.",
@@ -28,7 +28,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     });
   }
 
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: "Kurzy — MedScope Academy",
     description: "Přehled publikovaných videokurzů MedScope Academy pro studenty a lékaře.",
     path: "/academy/courses",

@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { MEDIFLOW, appSeoDescription, appSeoTitle } from "@/lib/apps/catalog";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
 
-export const metadata: Metadata = buildPageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedPageMetadata({
   title: appSeoTitle(MEDIFLOW),
   description: appSeoDescription(MEDIFLOW),
   path: "/mediflow",
 });
+}
 
 const PILLARS = [
   {

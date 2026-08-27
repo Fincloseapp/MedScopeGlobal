@@ -8,7 +8,7 @@ import { VerejnostArticleCard } from "@/components/verejnost/verejnost-article-c
 
 import { listPublicArticles } from "@/lib/queries/verejnost";
 
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 
 
@@ -18,7 +18,7 @@ export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
 
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
 
     title: "Rozhovory — Veřejné zdraví | MedScopeGlobal",
 

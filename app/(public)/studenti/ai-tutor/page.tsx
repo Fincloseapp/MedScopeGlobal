@@ -2,17 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Brain, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
 export const revalidate = 120;
 
-export const metadata: Metadata = buildV20PageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedV20PageMetadata({
   title: "AI tutor — MedScope pro studenty",
   description:
     "Studentský AI asistent na vysvětlení látky, opakování a přípravu. Doplněk k materiálům a kurzům — ne náhrada přednášek ani garance přijetí.",
   path: "/studenti/ai-tutor",
 });
+}
 
 const USE_CASES = [
   "Vysvětlení pojmu vlastními slovy (např. homeostáza, acidobazická rovnováha)",

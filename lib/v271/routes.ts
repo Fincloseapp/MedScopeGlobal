@@ -1,6 +1,6 @@
 /** v27.1 route IA — studenti / lekari / firmy hubs */
 import type { Metadata } from "next";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export type V271HubPage = {
   slug: string;
@@ -295,14 +295,14 @@ export const V271_FIRMY_PAGES: Record<string, V271HubPage> = {
   },
 };
 
-export function buildV271HubMetadata(
+export async function buildV271HubMetadata(
   section: "studenti" | "lekari" | "firmy",
   page: V271HubPage
-): Metadata {
+): Promise<Metadata> {
   const prefix =
     section === "studenti" ? "Studenti" : section === "lekari" ? "Lékaři" : "Firmy";
   const path = page.slug ? `/${section}/${page.slug}` : `/${section}`;
-  return buildV20PageMetadata({
+  return buildLocalizedV20PageMetadata({
     title: `${page.title} | ${prefix} — MedScopeGlobal`,
     description: page.description,
     path,

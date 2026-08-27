@@ -3,12 +3,12 @@ import Link from "next/link";
 import { V27AudienceHub } from "@/components/v27/audience-hub-section";
 import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { V27_B2B_PACKAGES } from "@/lib/v27/config";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: "Pro firmy | MedScopeGlobal B2B",
     description:
       "Reklamní formáty, pharma balíčky, kliniky, laboratoře a univerzitní partnerství na MedScopeGlobal.",

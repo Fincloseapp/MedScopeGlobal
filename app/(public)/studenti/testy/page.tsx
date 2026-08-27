@@ -2,17 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
 export const revalidate = 120;
 
-export const metadata: Metadata = buildV20PageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedV20PageMetadata({
   title: "Testy a procvičení — MedScope pro studenty",
   description:
     "Self-test přijímaček, Academy kvízy a studijní hry. Procvičení pro uchazeče o LF i studenty fakulty — s okamžitou zpětnou vazbou.",
   path: "/studenti/testy",
 });
+}
 
 const PATHS = [
   {

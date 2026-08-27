@@ -4,16 +4,18 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { ORDIZAPIS_APP } from "@/lib/apps/catalog";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 import { softwareApplicationJsonLd } from "@/lib/ecosystem/seo";
 import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
 
-export const metadata: Metadata = buildPageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedPageMetadata({
   title: "OrdiZáznam — Profesionální nástroj pro lékaře | MedScopeGlobal",
   description:
     "OrdiZáznam: nahrávejte v mobilu diktát nebo konzultaci → odborná anamnéza a klinický zápis. GDPR, šifrování, 14 dní zdarma.",
   path: "/ordizaznam",
 });
+}
 
 const BENEFITS = [
   {

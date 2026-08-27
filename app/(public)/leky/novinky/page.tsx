@@ -4,15 +4,17 @@ import { DrugNewsListCard } from "@/components/v4c/drug-news-list-card";
 import { LekySubpageNav } from "@/components/v4c/leky-subpage-nav";
 import { getDrugNewsList } from "@/lib/queries/v4c/drug-news";
 import { DrugSourceAttribution } from "@/components/v4c/drug-source-attribution";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
 
-export const metadata: Metadata = buildV20PageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedV20PageMetadata({
   title: "Lékové novinky — MedScopeGlobal",
   description: "Nové, schválené a připravované léky — EMA, FDA, SÚKL.",
   path: "/leky/novinky",
 });
+}
 
 export default async function LekyNovinkyPage() {
   const all = await getDrugNewsList();

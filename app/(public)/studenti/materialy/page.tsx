@@ -10,17 +10,19 @@ import {
   listStudentMaterials,
   toListMaterial,
 } from "@/lib/studenti/materials";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
 export const revalidate = 3600;
 
-export const metadata: Metadata = buildV20PageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedV20PageMetadata({
   title: "Studijní materiály | MedScopeGlobal",
   description:
     "Kurátorovaná knihovna studijních materiálů pro studenty medicíny — vyhledávání podle ročníku, oboru a názvu. Čtení online v prohlížeči.",
   path: "/studenti/materialy",
 });
+}
 
 export default async function StudentiMaterialyPage() {
   const [{ materials, total }, subjects] = await Promise.all([

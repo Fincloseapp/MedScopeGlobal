@@ -3,14 +3,16 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-disclaimer";
 import { SITE } from "@/lib/config/site";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = buildPageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedPageMetadata({
   title: "O nás | MedScopeGlobal",
   description:
     "MedScopeGlobal je český odborný medicínský portál pro laiky, studenty medicíny, lékaře a výzkumníky.",
   path: "/o-nas",
 });
+}
 
 const AUDIENCE_LINKS = [
   { href: "/verejnost", label: "Veřejnost", desc: "Prevence, symptomy a životní styl srozumitelně" },

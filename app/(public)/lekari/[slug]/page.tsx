@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const page = V271_LEKARI_PAGES[slug];
   if (!page) return {};
-  return buildV271HubMetadata("lekari", page);
+  return await buildV271HubMetadata("lekari", page);
 }
 
 export default async function LekariSubPage({ params }: { params: Promise<{ slug: string }> }) {

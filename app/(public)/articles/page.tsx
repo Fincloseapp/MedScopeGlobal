@@ -5,7 +5,7 @@ import { MAGAZINE } from "@/lib/brand/magazine";
 import { getLatestArticles } from "@/lib/queries/articles";
 import { getMedicalArticles } from "@/lib/queries/medicina";
 import { getReaderContext } from "@/lib/auth/reader-context";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { filterArticlesForDesk, mixListableFeed, type NewsDeskId } from "@/lib/v271/news-desks";
 import Link from "next/link";
 
@@ -33,7 +33,7 @@ export async function generateMetadata({
         : desk === "dlouhovekost"
           ? "Dlouhověkost"
           : "Články";
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: `${title} — ${MAGAZINE.name}`,
     description:
       "Aktuální zdravotnické články v češtině: novinky, veřejné zdraví, dlouhověkost a redakční magazín VitaScope s fotografiemi.",

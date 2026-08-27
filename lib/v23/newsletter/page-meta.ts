@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { NewsletterRow } from "@/lib/queries/v4c/newsletters";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import type { V23NewsletterLayout } from "@/lib/v23/newsletter/types";
 import { newsletterHeadline } from "@/lib/v23/newsletter/title";
 
@@ -16,8 +16,8 @@ export function newsletterIssueDescription(issue: NewsletterRow): string {
   return layout?.intro?.slice(0, 160) ?? DEFAULT_DESC;
 }
 
-export function buildNewsletterPageMetadata(issue: NewsletterRow, path: string): Metadata {
+export async function buildNewsletterPageMetadata(issue: NewsletterRow, path: string): Promise<Metadata> {
   const title = newsletterIssueTitle(issue);
   const description = newsletterIssueDescription(issue);
-  return buildV20PageMetadata({ title, description, path });
+  return buildLocalizedV20PageMetadata({ title, description, path });
 }

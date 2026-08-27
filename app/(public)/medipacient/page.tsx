@@ -6,16 +6,16 @@ import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { MEDIPACIENT, appSeoDescription, appSeoTitle } from "@/lib/apps/catalog";
 import { MEDIPACIENT_DEMO_REPORTS } from "@/lib/medipacient/demo-reports";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    ...buildV20PageMetadata({
+    ...(await buildLocalizedV20PageMetadata({
       title: appSeoTitle(MEDIPACIENT),
       description: appSeoDescription(MEDIPACIENT),
       path: MEDIPACIENT.marketingPath,
-    }),
+    })),
     manifest: MEDIPACIENT.manifest,
     appleWebApp: { capable: true, title: MEDIPACIENT.shortName, statusBarStyle: "default" },
     icons: {

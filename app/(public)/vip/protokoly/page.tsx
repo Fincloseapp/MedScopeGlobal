@@ -2,16 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Shield } from "lucide-react";
 import { LONGEVITY_PROTOCOLS, localizedText } from "@/lib/ecosystem/longevity-protocols";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
 import { VIP_PRICING } from "@/lib/ecosystem/monetization";
 
-export const metadata: Metadata = buildPageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedPageMetadata({
   title: "VIP Longevity Protokoly | MedScopeGlobal",
   description:
     "10 vědecky podložených protokolů pro dlouhověkost: spánek, metabolismus, suplementy, biohacking a více. VIP předplatné.",
   path: "/vip/protokoly",
 });
+}
 
 export default function VipProtocolsPage() {
   const pricing = VIP_PRICING.cs;

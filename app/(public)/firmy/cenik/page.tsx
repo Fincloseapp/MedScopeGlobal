@@ -3,14 +3,16 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V271B2BPricingTable } from "@/components/v271/b2b-pricing-table";
 import { SITE } from "@/lib/config/site";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = buildPageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedPageMetadata({
   title: "B2B ceník pro firmy",
   description:
     "Transparentní ceník pro pharma, kliniky a univerzity — banner od 5 000 Kč/měs., sponzorovaný článek 15 000 Kč, enterprise na míru.",
   path: "/firmy/cenik",
 });
+}
 
 export default function FirmyCenikPage() {
   return (

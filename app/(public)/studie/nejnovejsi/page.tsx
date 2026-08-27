@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { V20StudyCard } from "@/components/v20/study-card";
 import { getV20StudiesList } from "@/lib/v20/studies/query";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: "Nejnovější studie",
     description: "Chronologický přehled nejnovějších medicínských studií v češtině.",
     path: "/studie/nejnovejsi",

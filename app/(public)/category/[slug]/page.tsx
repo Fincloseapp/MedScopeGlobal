@@ -7,7 +7,7 @@ import { getReaderContext } from "@/lib/auth/reader-context";
 import { getArticlesByCategory } from "@/lib/queries/articles";
 import { getCategoryBySlug } from "@/lib/queries/categories";
 import { getV20CategoryBySlug } from "@/lib/v20/categories";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { SITE } from "@/lib/config/site";
 
 export const revalidate = 120;
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const v20 = getV20CategoryBySlug(slug);
   if (!category) return { title: "Obor" };
   const desc = v20?.descriptionCs ?? category.description ?? `Články z oboru ${category.name}.`;
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: `${category.name} — MedScopeGlobal`,
     description: desc,
     path: `/category/${category.slug}`,

@@ -3,14 +3,16 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V271B2BPricingTable } from "@/components/v271/b2b-pricing-table";
 import { SITE } from "@/lib/config/site";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = buildPageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedPageMetadata({
   title: "B2B a pharma partnerství",
   description:
     "Měřitelné B2B kampaně, reklama a lead generation pro medicínské partnery — transparentní ceník od 5 000 Kč/měs.",
   path: "/b2b",
 });
+}
 
 export default function B2BPage() {
   return (

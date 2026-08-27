@@ -5,12 +5,12 @@ import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-discl
 import { VerejnostArticleCard } from "@/components/verejnost/verejnost-article-card";
 import { VEREJNOST_HUB_TOPICS } from "@/lib/config/verejnost-topics";
 import { listPublicArticles } from "@/lib/queries/verejnost";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 45;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: "Veřejné zdraví | MedScopeGlobal",
     description:
       "Průvodce nemocemi, prevence, výživa, spánek, stres a rozhovory s odborníky — srozumitelně pro každého.",

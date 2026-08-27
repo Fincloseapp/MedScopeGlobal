@@ -15,7 +15,7 @@ import {
   listPublishedQuizzesByCourseId,
 } from "@/lib/academy/db";
 import { isLessonFreePreview } from "@/lib/academy/preview";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 import { extractSlideshowManifest } from "@/lib/v25/video/content-slideshow";
 import { prepareArticleForSpeech } from "@/lib/tts/prepare-for-speech";
@@ -44,13 +44,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, lessonId } = await params;
   const lesson = await getLessonByIdOrSlug(slug, lessonId);
   if (!lesson) {
-    return buildV20PageMetadata({
+    return await buildLocalizedV20PageMetadata({
       title: "Lekce nenalezena",
       description: "Požadovaná lekce v MedScope Academy nebyla nalezena.",
       path: `/academy/courses/${slug}/lessons/${lessonId}`,
     });
   }
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: `${lesson.title} — ${lesson.course.title}`,
     description: lesson.content.slice(0, 160),
     path: `/academy/courses/${slug}/lessons/${lesson.slug}`,

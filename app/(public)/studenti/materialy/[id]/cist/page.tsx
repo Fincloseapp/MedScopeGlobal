@@ -5,7 +5,7 @@ import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { MaterialTextReader } from "@/components/studenti/material-text-reader";
 import { getCachedMaterialText } from "@/lib/studenti/material-text";
 import { getStudentMaterialById, toPublicMaterial } from "@/lib/studenti/materials";
-import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 3600;
 export const maxDuration = 120;
@@ -16,14 +16,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const material = await getStudentMaterialById(id);
   if (!material) {
-    return buildV20PageMetadata({
+    return await buildLocalizedV20PageMetadata({
       title: "Materiál nenalezen | MedScopeGlobal",
       description: "Studijní materiál nebyl nalezen.",
       path: "/studenti/materialy",
     });
   }
   const pub = toPublicMaterial(material);
-  return buildV20PageMetadata({
+  return await buildLocalizedV20PageMetadata({
     title: `${pub.display_title} | Studijní materiály | MedScopeGlobal`,
     description: `${pub.subject} — studijní materiál pro studenty medicíny.`,
     path: pub.read_path,

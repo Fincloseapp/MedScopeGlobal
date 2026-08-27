@@ -5,7 +5,7 @@ import { buildV271HubMetadata } from "@/lib/v271/routes";
 export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildV271HubMetadata("studenti", {
+  return await buildV271HubMetadata("studenti", {
     slug: "chci-studovat",
     title: "Chci studovat medicínu",
     description:
