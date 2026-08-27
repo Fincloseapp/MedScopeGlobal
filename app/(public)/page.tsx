@@ -24,7 +24,7 @@ import {
 import { SITE } from "@/lib/config/site";
 import { publicationJsonLd } from "@/lib/seo/json-ld";
 
-export const revalidate = 120;
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getServerLocale()) as GlobalLocaleCode;

@@ -29,6 +29,9 @@ export function V20ArticleCard({ article }: { article: ArticleWithRelations }) {
           title={article.title}
           category={cat?.name}
           coverUrl={article.cover_image_url}
+          slug={article.slug}
+          excerpt={article.excerpt}
+          publicTopic={article.public_topic}
         />
         <div className="flex flex-1 flex-col p-4 sm:p-5">
           {cat && (
