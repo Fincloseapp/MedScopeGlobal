@@ -43,3 +43,6 @@
 [2026-08-27T11:03:52.743Z] [OK] Push origin/main → Vercel deploy (medscopeglobal.com)
 [2026-08-27T11:03:52.743Z] [INFO] === auto-git end ===
 [2026-08-27T11:04:02.384Z] [INFO] === auto-git start ===
+[2026-08-27T11:05:46.264Z] [INFO] === auto-git start ===
+[2026-08-27T11:05:46.268Z] [INFO] Paralelní běh — přeskočeno
+[2026-08-27T11:06:20.517Z] [INFO] === auto-git start ===

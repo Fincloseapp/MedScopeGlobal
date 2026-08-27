@@ -13,9 +13,11 @@ import {
   getStudentiNavStripCopy,
   getVerejnostNavStripCopy,
   getLekariNavStripCopy,
+  getMediFlowVipNavStripCopy,
   isStudentAudiencePath,
   isPublicAudiencePath,
   isPhysicianAudiencePath,
+  isMediFlowOrVipPath,
 } from "@/lib/v38/conversion-copy";
 
 type ReaderPayload = {
@@ -50,6 +52,7 @@ export function SiteHeaderWithConversion({
   const studentPath = isStudentAudiencePath(pathname);
   const publicPath = isPublicAudiencePath(pathname);
   const physicianPath = isPhysicianAudiencePath(pathname);
+  const mediFlowVipPath = isMediFlowOrVipPath(pathname);
   /** Homepage hero owns first viewport — hide competing conversion strip */
   const isMagazineHome = useMemo(() => {
     if (!pathname) return false;
@@ -62,11 +65,14 @@ export function SiteHeaderWithConversion({
     );
   }, [pathname]);
   const audienceStrip = useMemo(() => {
+    if (mediFlowVipPath) {
+      return { ...getMediFlowVipNavStripCopy(pathname), generatedBy: "static" as const };
+    }
     if (studentPath) return { ...getStudentiNavStripCopy(daySeed()), generatedBy: "static" as const };
     if (publicPath) return { ...getVerejnostNavStripCopy(), generatedBy: "static" as const };
     if (physicianPath) return { ...getLekariNavStripCopy(), generatedBy: "static" as const };
     return null;
-  }, [studentPath, publicPath, physicianPath]);
+  }, [mediFlowVipPath, studentPath, publicPath, physicianPath, pathname]);
 
   const [reader, setReader] = useState<ReaderPayload>(DEFAULT_READER);
   const [stripCopy, setStripCopy] = useState<StoredNudge>(
