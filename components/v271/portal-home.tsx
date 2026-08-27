@@ -2,11 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import { APP_PRODUCTS } from "@/lib/apps/catalog";
-import { V271_AUDIENCES, V271_SOCIAL_PROOF_STATS } from "@/lib/v271/homepage";
 import {
   getPortalNewsNote,
   PORTAL_NEWS_TABS,
-  PORTAL_SERVICES,
   getPortalPhilosophy,
 } from "@/lib/v271/portal";
 import { NEWS_DESKS, splitNewsDesks, type NewsDeskId } from "@/lib/v271/news-desks";
@@ -14,58 +12,20 @@ import { NewsArticleThumb, NewsDeskFallback, NewsHeadlineRow } from "@/component
 import { PortalSearch } from "@/components/v271/portal-search";
 import { WriterAgentsStrip } from "@/components/editorial/writer-agents-strip";
 import {
-  TrendySection,
   LongevityProtocolsSection,
-  RecommendedToolsSection,
   HomepageAffiliateSection,
 } from "@/components/ecosystem/magazine-sections";
-import { AppOpenLink, isStandaloneAppHref } from "@/components/apps/app-origin-bar";
+import { AppOpenLink } from "@/components/apps/app-origin-bar";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
-import { BookOpen, Gift, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
-function ServiceGlyph({ icon }: { icon?: string }) {
-  const cls = "h-5 w-5";
-  switch (icon) {
-    case "book":
-      return <BookOpen className={cls} aria-hidden />;
-    case "news":
-      return <Newspaper className={cls} aria-hidden />;
-    case "spark":
-      return <Sparkles className={cls} aria-hidden />;
-    case "gift":
-      return <Gift className={cls} aria-hidden />;
-    case "pill":
-      return <Pill className={cls} aria-hidden />;
-    case "school":
-      return <GraduationCap className={cls} aria-hidden />;
-    default:
-      return <LayoutGrid className={cls} aria-hidden />;
-  }
-}
-
-function Box({
-  title,
-  href,
-  children,
-}: {
-  title: string;
-  href?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-      <header className="flex items-center justify-between border-b border-slate-100 bg-[#f7fafc] px-3 py-2">
-        <h2 className="text-sm font-bold text-[#021d33]">{title}</h2>
-        {href ? (
-          <Link href={href} className="text-xs font-medium text-[#005B96] hover:underline">
-            více
-          </Link>
-        ) : null}
-      </header>
-      <div className="p-3">{children}</div>
-    </section>
-  );
-}
+/** Marketing display names — OrdiZáznam is the Czech public alias for OrdiZapis */
+const APP_MARKETING_NAME: Record<string, string> = {
+  mediflow: "MediFlow",
+  medipacient: "MeDipacient",
+  ordizapis: "OrdiZáznam",
+  mediprep: "MeDiprep",
+};
 
 function DeskColumn({
   desk,
@@ -115,25 +75,151 @@ function PortalNewsFeed({ articles }: { articles: DisplayArticle[] }) {
 
   return (
     <>
-      <div className="mb-3 flex flex-wrap gap-1.5">
+      <nav aria-label="Rubriky" className="mb-4 flex flex-wrap gap-x-4 gap-y-1 border-b border-slate-200 pb-3">
         {PORTAL_NEWS_TABS.map((tab) => (
           <Link
             key={tab.href}
             href={tab.href}
-            className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-700 hover:bg-[#e8f3fb] hover:text-[#005B96]"
+            className="text-sm font-medium text-slate-600 transition-colors hover:text-[#005B96]"
           >
             {tab.label}
           </Link>
         ))}
-      </div>
-      <p className="mb-3 text-[11px] leading-relaxed text-slate-500">{getPortalNewsNote()}</p>
-      <div className="grid gap-5 sm:grid-cols-2">
+      </nav>
+      <p className="mb-4 text-[11px] leading-relaxed text-slate-500">{getPortalNewsNote()}</p>
+      <div className="grid gap-6 sm:grid-cols-2">
         <DeskColumn desk="novinky" articles={desks.novinky} featured />
         <DeskColumn desk="verejnost" articles={desks.verejnost} featured />
         <DeskColumn desk="dlouhovekost" articles={desks.dlouhovekost} featured />
         <DeskColumn desk="clanky" articles={desks.clanky} featured />
       </div>
     </>
+  );
+}
+
+function HeroPhones() {
+  return (
+    <div className="portal-hero-phones relative mx-auto h-[min(58vh,420px)] w-full max-w-md lg:mx-0 lg:h-[min(72vh,520px)] lg:max-w-none">
+      <div className="portal-phone portal-phone-a absolute left-[4%] top-[8%] w-[46%] overflow-hidden rounded-[1.6rem] border border-white/25 bg-[#021d33]/40 shadow-[0_24px_60px_rgba(2,29,51,0.45)]">
+        <Image
+          src={APP_MARKETING_IMAGE.mediflow}
+          alt="MediFlow — wellness deník"
+          width={480}
+          height={960}
+          className="h-auto w-full object-cover"
+          priority
+          sizes="(max-width: 1024px) 40vw, 220px"
+        />
+      </div>
+      <div className="portal-phone portal-phone-b absolute right-[2%] top-[18%] w-[52%] overflow-hidden rounded-[1.6rem] border border-white/25 bg-[#021d33]/40 shadow-[0_28px_70px_rgba(2,29,51,0.5)]">
+        <Image
+          src={APP_MARKETING_IMAGE.ordizapis}
+          alt="OrdiZáznam — zápisy pro ordinaci"
+          width={480}
+          height={960}
+          className="h-auto w-full object-cover"
+          priority
+          sizes="(max-width: 1024px) 45vw, 260px"
+        />
+      </div>
+      <div className="portal-phone portal-phone-c absolute bottom-[2%] left-[22%] w-[42%] overflow-hidden rounded-[1.4rem] border border-white/20 bg-[#021d33]/35 shadow-[0_18px_48px_rgba(2,29,51,0.4)]">
+        <Image
+          src={APP_MARKETING_IMAGE.medipacient}
+          alt="MeDipacient — lékařské zprávy"
+          width={480}
+          height={960}
+          className="h-auto w-full object-cover"
+          sizes="(max-width: 1024px) 35vw, 200px"
+        />
+      </div>
+    </div>
+  );
+}
+
+function AppsShowcase() {
+  const featured = APP_PRODUCTS.filter((a) => a.id !== "mediprep");
+  const legacy = APP_PRODUCTS.find((a) => a.id === "mediprep");
+
+  return (
+    <div className="space-y-8">
+      <ul className="grid gap-6 md:grid-cols-3">
+        {featured.map((app, i) => {
+          const name = APP_MARKETING_NAME[app.id] ?? app.shortName;
+          return (
+            <li key={app.id} className="portal-reveal" style={{ animationDelay: `${0.08 * (i + 1)}s` }}>
+              <AppOpenLink
+                href={app.appPath}
+                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white/80 transition hover:border-[#005B96]/35 hover:bg-white"
+              >
+                <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-b from-[#e8f3fb] to-slate-100">
+                  <Image
+                    src={APP_MARKETING_IMAGE[app.id]}
+                    alt=""
+                    fill
+                    className="object-cover object-top transition duration-500 group-hover:scale-[1.03]"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                </div>
+                <div className="flex flex-1 flex-col p-5">
+                  <h3 className="font-display text-xl font-semibold text-[#021d33]">{name}</h3>
+                  <p className="mt-1 flex-1 text-sm leading-relaxed text-slate-600">{app.tagline}</p>
+                  <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#005B96]">
+                    Otevřít
+                    <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" aria-hidden />
+                  </span>
+                </div>
+              </AppOpenLink>
+            </li>
+          );
+        })}
+      </ul>
+
+      <div className="portal-reveal grid gap-4 overflow-hidden rounded-2xl border border-amber-200/80 bg-gradient-to-br from-[#fff8eb] via-white to-[#e8f3fb] p-6 sm:grid-cols-[1.2fr_1fr] sm:items-center sm:p-8">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-800">VIP · dlouhověkost</p>
+          <h3 className="mt-2 font-display text-2xl font-semibold text-[#021d33] sm:text-3xl">
+            Protokoly pro delší a kvalitnější život
+          </h3>
+          <p className="mt-2 max-w-lg text-sm leading-relaxed text-slate-600">
+            Spánek, metabolismus, pohyb a mentální wellness — evidence-based postupy bez zázračných slibů.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href="/vip/protokoly"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#021d33] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#005B96]"
+            >
+              Prohlédnout VIP
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+            <Link
+              href="/predplatne?trial=1"
+              className="inline-flex rounded-lg border border-[#021d33]/20 px-5 py-2.5 text-sm font-semibold text-[#021d33] hover:border-[#005B96] hover:text-[#005B96]"
+            >
+              14 dní zdarma
+            </Link>
+          </div>
+        </div>
+        <div className="relative mx-auto hidden h-48 w-full max-w-xs sm:block">
+          <Image
+            src={APP_MARKETING_IMAGE.mediflow}
+            alt=""
+            fill
+            className="object-contain object-bottom drop-shadow-xl"
+            sizes="240px"
+          />
+        </div>
+      </div>
+
+      {legacy ? (
+        <p className="text-center text-xs text-slate-500">
+          {legacy.shortName} (příprava na LF) zůstává jako legacy aplikace —{" "}
+          <AppOpenLink href={legacy.appPath} className="font-medium text-[#005B96] hover:underline">
+            otevřít
+          </AppOpenLink>
+          .
+        </p>
+      ) : null}
+    </div>
   );
 }
 
@@ -144,153 +230,140 @@ export function PortalHome({
   articles: DisplayArticle[];
   philosophy: ReturnType<typeof getPortalPhilosophy>;
 }) {
+  const brand = philosophy.magazineName ?? "VitaScope";
+
   return (
-    <div className="border-b border-slate-200 bg-[#e8eef3]">
-      <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5">
-        <div className="rounded-lg border border-slate-200 bg-white px-4 py-4 shadow-sm sm:px-6 sm:py-5">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">
+    <div className="border-b border-slate-200">
+      {/* 1 — Hero: VitaScope only (first viewport) */}
+      <section
+        aria-label={`${brand} úvod`}
+        className="portal-hero relative isolate min-h-[100svh] overflow-hidden text-white"
+      >
+        <div className="portal-hero-atmosphere absolute inset-0" aria-hidden />
+        <div className="portal-hero-pattern absolute inset-0 opacity-40" aria-hidden />
+
+        <div className="relative mx-auto grid min-h-[100svh] max-w-7xl items-center gap-8 px-4 py-16 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10 lg:py-20">
+          <div className="portal-hero-copy max-w-xl">
+            <p className="font-display text-5xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
+              {brand}
+            </p>
+            <h1 className="mt-5 font-display text-2xl font-semibold leading-snug text-white/95 sm:text-3xl lg:text-[2.15rem]">
+              {philosophy.claim}
+            </h1>
+            <p className="mt-4 max-w-md text-base leading-relaxed text-white/75 sm:text-lg">
+              {philosophy.tagline}
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/articles"
+                className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-semibold text-[#021d33] transition hover:bg-[#e8f3fb]"
+              >
+                Číst magazín
+                <ArrowRight className="h-4 w-4" aria-hidden />
+              </Link>
+              <AppOpenLink
+                href="/app/mediflow"
+                className="inline-flex items-center rounded-lg border border-white/35 bg-white/5 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:border-white/60 hover:bg-white/10"
+              >
+                Otevřít MediFlow
+              </AppOpenLink>
+            </div>
+            <p className="mt-6 text-[11px] font-medium uppercase tracking-[0.16em] text-white/45">
               {philosophy.eyebrow}
             </p>
-            <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-800 ring-1 ring-emerald-200">
-              {philosophy.whatsNew}
-            </span>
           </div>
-          <h1 className="mt-1 font-display text-2xl font-bold text-[#021d33] sm:text-3xl">
-            {philosophy.claim}
-          </h1>
-          <p className="mt-1 max-w-3xl text-sm text-slate-600">{philosophy.subtitle}</p>
-          <div className="mt-4">
+
+          <div className="portal-hero-visual min-w-0">
+            <HeroPhones />
+          </div>
+        </div>
+      </section>
+
+      {/* 2 — Magazine / news */}
+      <section aria-labelledby="portal-magazine-heading" className="bg-[#f3f7fb]">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
+          <div className="portal-reveal max-w-2xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">Magazín</p>
+            <h2 id="portal-magazine-heading" className="mt-2 font-display text-3xl font-semibold text-[#021d33] sm:text-4xl">
+              {brand} — zpravodajství
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600 sm:text-base">
+              Dlouhověkost, životní styl a evidence — srozumitelně, bez senzací.
+            </p>
+          </div>
+
+          <div className="portal-reveal mt-8 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm sm:p-6">
             <PortalSearch />
           </div>
-        </div>
 
-        <nav aria-label="Služby MedScopeGlobal" className="mt-3 rounded-lg border border-slate-200 bg-white px-2 py-3 shadow-sm sm:px-3">
-          <ul className="grid grid-cols-5 gap-1 sm:grid-cols-10">
-            {PORTAL_SERVICES.map((svc) => {
-              const openApp = isStandaloneAppHref(svc.href);
-              const Item = openApp ? AppOpenLink : Link;
-              return (
-              <li key={svc.id}>
-                <Item
-                  href={svc.href}
-                  className="flex flex-col items-center gap-1 rounded-md px-1 py-1.5 text-center hover:bg-slate-50"
-                >
-                  {"image" in svc && svc.image ? (
-                    <Image
-                      src={svc.image}
-                      alt=""
-                      width={40}
-                      height={40}
-                      className="h-10 w-10 rounded-[22%]"
-                    />
-                  ) : (
-                    <span className="flex h-10 w-10 items-center justify-center rounded-[22%] bg-[#e8f3fb] text-[#005B96]">
-                      <ServiceGlyph icon={"icon" in svc ? svc.icon : undefined} />
-                    </span>
-                  )}
-                  <span className="text-[11px] font-semibold leading-tight text-[#021d33]">{svc.label}</span>
-                  <span className="hidden text-[10px] text-slate-500 sm:block">{svc.hint}</span>
-                </Item>
-              </li>
-              );
-            })}
-          </ul>
-        </nav>
-
-        <WriterAgentsStrip />
-
-        <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <Box title={`${philosophy.magazineName ?? "VitaScope"} — Zpravodajství`} href="/articles">
-            <PortalNewsFeed articles={articles} />
-          </Box>
-
-          <div className="space-y-3">
-            <Box title="Aplikace" href="/aplikace">
-              <ul className="space-y-2">
-                {APP_PRODUCTS.map((app) => (
-                  <li key={app.id}>
-                      <AppOpenLink
-                        href={app.appPath}
-                        className="flex items-center gap-3 rounded-md p-1.5 hover:bg-slate-50"
-                      >
-                      <span className="relative h-12 w-[4.5rem] shrink-0 overflow-hidden rounded-md bg-slate-100">
-                        <Image
-                          src={APP_MARKETING_IMAGE[app.id]}
-                          alt=""
-                          fill
-                          className="object-cover"
-                          sizes="72px"
-                        />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-semibold text-[#021d33]">{app.shortName}</span>
-                        <span className="block truncate text-xs text-slate-500">{app.tagline}</span>
-                      </span>
-                      <span className="text-xs font-semibold text-[#005B96]">
-                        {app.id === "mediprep" ? "legacy" : "nová karta"}
-                      </span>
-                    </AppOpenLink>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/predplatne?trial=1"
-                className="mt-3 flex w-full items-center justify-center rounded-md bg-[#005B96] px-3 py-2 text-sm font-semibold text-white hover:bg-[#004a7a]"
-              >
-                14 dní zdarma
+          <div className="portal-reveal mt-6 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm sm:p-6">
+            <div className="mb-4 flex items-end justify-between gap-3">
+              <h3 className="font-display text-lg font-semibold text-[#021d33]">Aktuální desk</h3>
+              <Link href="/articles" className="text-sm font-semibold text-[#005B96] hover:underline">
+                Všechny články →
               </Link>
-            </Box>
+            </div>
+            <PortalNewsFeed articles={articles} />
+          </div>
 
-            <Box title="Pro koho">
-              <ul className="space-y-2">
-                {V271_AUDIENCES.map((aud) => (
-                  <li key={aud.id}>
-                    <Link href={aud.href} className="block rounded-md p-1.5 hover:bg-slate-50">
-                      <span className="text-sm font-semibold text-[#021d33]">{aud.label}</span>
-                      <span className="mt-0.5 block text-xs leading-snug text-slate-500">{aud.description}</span>
-                    </Link>
-                    <div className="mt-1 flex flex-wrap gap-1.5 px-1.5">
-                      {isStandaloneAppHref(aud.ctaPrimary.href) ? (
-                        <AppOpenLink
-                          href={aud.ctaPrimary.href}
-                          className="text-[11px] font-semibold text-[#005B96] hover:underline"
-                        >
-                          {aud.ctaPrimary.label}
-                        </AppOpenLink>
-                      ) : (
-                        <Link href={aud.ctaPrimary.href} className="text-[11px] font-semibold text-[#005B96] hover:underline">
-                          {aud.ctaPrimary.label}
-                        </Link>
-                      )}
-                      <span className="text-slate-300">·</span>
-                      <Link href={aud.ctaSecondary.href} className="text-[11px] text-slate-500 hover:underline">
-                        {aud.ctaSecondary.label}
-                      </Link>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </Box>
-
-            <Box title="V číslech">
-              <dl className="grid grid-cols-2 gap-2">
-                {V271_SOCIAL_PROOF_STATS.map((stat) => (
-                  <div key={stat.label} className="rounded-md bg-slate-50 px-2 py-2">
-                    <dt className="font-display text-lg font-bold text-[#005B96]">{stat.value}</dt>
-                    <dd className="text-[10px] leading-snug text-slate-500">{stat.label}</dd>
-                  </div>
-                ))}
-              </dl>
-            </Box>
-
-            <TrendySection />
-            <LongevityProtocolsSection />
-            <RecommendedToolsSection />
-            <HomepageAffiliateSection />
+          <div className="mt-6">
+            <WriterAgentsStrip />
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* 3 — Apps + VIP */}
+      <section aria-labelledby="portal-apps-heading" className="bg-gradient-to-b from-white via-[#f7fafc] to-[#eef4f9]">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
+          <div className="portal-reveal mx-auto max-w-2xl text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">Platforma</p>
+            <h2 id="portal-apps-heading" className="mt-2 font-display text-3xl font-semibold text-[#021d33] sm:text-4xl">
+              MediFlow · OrdiZáznam · VIP
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600 sm:text-base">
+              Denní wellness, zápisy pro ordinaci a longevity protokoly — na jedné platformě MedScopeGlobal.
+            </p>
+          </div>
+          <div className="mt-10">
+            <AppsShowcase />
+          </div>
+        </div>
+      </section>
+
+      {/* 4 — VIP protocols depth + affiliate */}
+      <section aria-label="VIP protokoly a doporučení" className="bg-[#f3f7fb]">
+        <div className="mx-auto grid max-w-7xl gap-4 px-4 py-12 sm:px-6 sm:py-14 lg:grid-cols-2">
+          <LongevityProtocolsSection />
+          <HomepageAffiliateSection />
+        </div>
+      </section>
+
+      {/* 5 — Closing CTA */}
+      <section className="relative overflow-hidden bg-[#021d33] text-white">
+        <div className="portal-cta-glow absolute inset-0" aria-hidden />
+        <div className="relative mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 px-4 py-14 sm:flex-row sm:items-center sm:px-6 sm:py-16">
+          <div className="max-w-xl">
+            <h2 className="font-display text-3xl font-semibold sm:text-4xl">Začněte s {brand}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-white/70 sm:text-base">
+              Magazín zdarma. Aplikace a VIP protokoly s 14denní zkušební dobou — bez závazku.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/articles"
+              className="inline-flex rounded-lg bg-white px-5 py-3 text-sm font-semibold text-[#021d33] hover:bg-[#e8f3fb]"
+            >
+              Číst články
+            </Link>
+            <Link
+              href="/predplatne?trial=1"
+              className="inline-flex rounded-lg border border-white/30 px-5 py-3 text-sm font-semibold text-white hover:border-white/60"
+            >
+              14 dní zdarma
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

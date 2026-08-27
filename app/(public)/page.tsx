@@ -59,7 +59,7 @@ export default async function HomePage() {
   });
 
   return (
-    <div className="v271-home bg-[#e8eef3]">
+    <div className="v271-home bg-[#f3f7fb]">
       <JsonLdScript data={webSiteJsonLd()} />
       <JsonLdScript data={publicationJsonLd()} />
       <JsonLdScript data={homeLd} />
@@ -76,15 +76,16 @@ export default async function HomePage() {
         />
       ))}
 
+      {/* Story: VitaScope hero → magazín → apps/VIP → CTA (PortalHome), then trust & plans */}
       <PortalHome articles={articles} philosophy={philosophy} />
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
-      <V272AcademyHomeSections />
       <V272WhyTrustBlock />
       <V272SubscriptionPlansBlock />
+      <V272AcademyHomeSections />
       <V271B2bBlock />
 
-      <section className="mx-auto max-w-7xl px-3 pb-8 sm:px-4">
-        <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+      <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6">
+        <p className="border-t border-slate-200 pt-6 text-sm leading-relaxed text-slate-600">
           {MAGAZINE.name} na {SITE.name} je vzdělávací magazín zdraví a dlouhověkosti — není přijímací
           komise ani oficiální učebnice LF. Obsah nenahrazuje individuální lékařskou radu.
         </p>

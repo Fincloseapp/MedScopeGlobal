@@ -1,4 +1,4 @@
-/** Homepage portal IA — compact start page, then news + services (Seznam-inspired). */
+/** Homepage portal IA — VitaScope magazine-first marketing story (hero → news → apps/VIP). */
 
 import { getMagazineCopy, MAGAZINE } from "@/lib/brand/magazine";
 import type { LocaleCode } from "@/lib/i18n/config";

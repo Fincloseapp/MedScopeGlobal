@@ -106,3 +106,152 @@
     @apply rounded-lg bg-[#005B96] text-white hover:bg-[#004a7a];
   }
 }
+
+/* VitaScope portal homepage — marketing hero atmosphere + motion */
+.portal-hero-atmosphere {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 20%, rgba(0, 120, 170, 0.55), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 85% 75%, rgba(0, 70, 120, 0.5), transparent 50%),
+    linear-gradient(155deg, #021d33 0%, #0a3d5c 42%, #005b96 78%, #1478b0 100%);
+}
+
+.portal-hero-pattern {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 20%, transparent 75%);
+}
+
+.portal-cta-glow {
+  background:
+    radial-gradient(ellipse 50% 80% at 90% 50%, rgba(0, 91, 150, 0.45), transparent 60%),
+    radial-gradient(ellipse 40% 60% at 10% 80%, rgba(20, 120, 176, 0.25), transparent 55%);
+}
+
+@keyframes portal-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes portal-phone-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes portal-phone-float-alt {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.portal-hero-copy {
+  animation: portal-fade-up 0.75s ease-out both;
+}
+
+.portal-hero-visual {
+  animation: portal-fade-up 0.9s ease-out 0.12s both;
+}
+
+.portal-phone-a {
+  animation: portal-phone-float 7s ease-in-out infinite;
+}
+
+.portal-phone-b {
+  animation: portal-phone-float-alt 8.5s ease-in-out 0.4s infinite;
+}
+
+.portal-phone-c {
+  animation: portal-phone-float 9s ease-in-out 0.8s infinite;
+}
+
+.portal-reveal {
+  animation: portal-fade-up 0.7s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-hero-copy,
+  .portal-hero-visual,
+  .portal-phone-a,
+  .portal-phone-b,
+  .portal-phone-c,
+  .portal-reveal {
+    animation: none;
+  }
+}
+
+/* Marketing landings — intentional motion (not PortalHome) */
+@keyframes mkt-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mkt-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes mkt-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(1.5%, -1.5%, 0) scale(1.03);
+  }
+}
+
+.mkt-rise {
+  animation: mkt-rise 0.7s ease-out both;
+}
+
+.mkt-rise-delay-1 {
+  animation: mkt-rise 0.7s ease-out 0.12s both;
+}
+
+.mkt-rise-delay-2 {
+  animation: mkt-rise 0.7s ease-out 0.24s both;
+}
+
+.mkt-fade {
+  animation: mkt-fade 1s ease-out 0.2s both;
+}
+
+.mkt-drift {
+  animation: mkt-drift 18s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mkt-rise,
+  .mkt-rise-delay-1,
+  .mkt-rise-delay-2,
+  .mkt-fade,
+  .mkt-drift {
+    animation: none;
+  }
+}
