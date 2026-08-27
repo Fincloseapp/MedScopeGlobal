@@ -39,6 +39,7 @@ const assets = [
   "/assets/marketing/medipacient.webp",
   "/assets/marketing/mediprep.webp",
   "/assets/marketing/ordizapis-phone-v2.webp",
+  "/assets/marketing/mediflow.webp",
 ];
 
 let failed = 0;

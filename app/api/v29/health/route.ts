@@ -23,12 +23,13 @@ export async function GET() {
     stripe: {
       secretKeyConfigured: Boolean(process.env.STRIPE_SECRET_KEY?.trim()),
       webhookSecretConfigured: Boolean(process.env.STRIPE_WEBHOOK_SECRET?.trim()),
-      webhookUrl: "https://www.medscopeglobal.com/api/stripe/webhook",
+      webhookUrl: "https://medscopeglobal.com/api/stripe/webhook",
       webhookGuidance:
         "Stripe Dashboard → Developers → Webhooks → Add endpoint " +
-        "https://www.medscopeglobal.com/api/stripe/webhook " +
+        "https://medscopeglobal.com/api/stripe/webhook " +
         "(events: checkout.session.completed, invoice.*, customer.subscription.*) → " +
-        "copy Signing secret to Worker secret STRIPE_WEBHOOK_SECRET",
+        "copy Signing secret to Worker secret STRIPE_WEBHOOK_SECRET " +
+        "(PC: node scripts/setup-stripe-webhook.mjs or pnpm auto:d reminder)",
       httpClient: "fetch",
     },
     email: {

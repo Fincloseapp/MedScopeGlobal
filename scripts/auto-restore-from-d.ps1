@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Fully automatic D: restore → Cloudflare/GitHub sync → verify → optional production deploy.
+  Fully automatic D: restore → Cloudflare/GitHub sync → verify → production deploy → Stripe probe.
 
 .DESCRIPTION
   Run ON the Windows PC (cloud agents cannot mount D:).
@@ -11,8 +11,10 @@
     2. Pick best .env.local source (project root, then newest backup)
     3. restore-from-d.ps1 -ForceKeys — merge into workspace, cf:env:sync, gh secrets
     4. backup-to-d.ps1           — dated backup under D:\medscope.data\backups\
-    5. db:verify (best-effort)
-    6. With -Deploy (default): deploy:production -SkipRestore
+    5. db:verify + deploy:production (default)
+    6. Stripe webhook reminder + pnpm probe:prod:stripe (donate + mediflow.webp)
+
+  Cloud agents without D: use: pnpm auto:continue
 
 .PARAMETER SkipDeploy
   Stop after restore + backup + db:verify (no Cloudflare deploy).
@@ -55,7 +57,10 @@ Cloud agents cannot access Windows D:. On the PC:
   pnpm auto:d
 
 This auto-applies secrets from D: (or newest backup), syncs Cloudflare/GitHub,
-backs up, verifies DB, and deploys production.
+backs up, verifies DB, deploys production, reminds Stripe webhook, and probes donate.
+
+From a cloud agent with Cursor Secrets instead:
+  pnpm auto:continue
 "@
   exit 2
 }
@@ -76,7 +81,7 @@ if (-not (Test-Path $WorkspaceRoot)) {
   exit 2
 }
 
-Write-Step "0/5 ensure git on main (best-effort)"
+Write-Step "0/6 ensure git on main (best-effort)"
 Push-Location $WorkspaceRoot
 try {
   $git = (Get-Command git -ErrorAction SilentlyContinue).Source
@@ -93,14 +98,14 @@ try {
   Pop-Location
 }
 
-Write-Step "1/5 inventory D: (names only)"
+Write-Step "1/6 inventory D: (names only)"
 & powershell -ExecutionPolicy Bypass -File $findScript
 # find script exits 2 when D: missing — already gated above; non-zero otherwise is soft
 if ($LASTEXITCODE -notin @(0, $null)) {
   Write-Warn2 "find-d-drive exited $LASTEXITCODE — continuing"
 }
 
-Write-Step "2/5 ensure primary .env.local (auto-recover from backup if needed)"
+Write-Step "2/6 ensure primary .env.local (auto-recover from backup if needed)"
 $primaryEnv = Join-Path $WorkspaceRoot ".env.local"
 function Find-LatestBackupEnv {
   $hits = @()
@@ -200,7 +205,7 @@ if (Test-Path $stripeSecretFile) {
   }
 }
 
-Write-Step "3/5 restore-from-d (ForceKeys + cf:env:sync + gh secrets)"
+Write-Step "3/6 restore-from-d (ForceKeys + cf:env:sync + gh secrets)"
 $restoreArgs = @{
   WorkspaceRoot = $WorkspaceRoot
   SourceRoot    = $WorkspaceRoot
@@ -212,7 +217,7 @@ if ($SkipValidate) { $restoreArgs.SkipValidate = $true }
 if ($LASTEXITCODE -ne 0) { throw "restore-from-d failed (exit $LASTEXITCODE)" }
 Write-Ok "restore-from-d complete"
 
-Write-Step "4/5 dated backup"
+Write-Step "4/6 dated backup"
 $backupArgs = @{
   WorkspaceRoot = $WorkspaceRoot
   BackupDate    = (Get-Date).ToString("yyyy-MM-dd")
@@ -222,7 +227,7 @@ if ($IncludeZip) { $backupArgs.IncludeZip = $true }
 if ($LASTEXITCODE -ne 0) { Write-Warn2 "backup-to-d exited $LASTEXITCODE" }
 else { Write-Ok "backup written under D:\medscope.data\backups\" }
 
-Write-Step "5/5 db:verify + deploy"
+Write-Step "5/6 db:verify + deploy"
 Push-Location $WorkspaceRoot
 try {
   $pnpm = (Get-Command pnpm -ErrorAction SilentlyContinue).Source
@@ -248,6 +253,38 @@ try {
   Pop-Location
 }
 
+Write-Step "6/6 Stripe webhook reminder + prod probe"
+$envLocalText = if (Test-Path $primaryEnv) { Get-Content -LiteralPath $primaryEnv -Raw } else { "" }
+$hasWhsec = $envLocalText -match '(?m)^STRIPE_WEBHOOK_SECRET=.+'
+if (-not $hasWhsec) {
+  Write-Warn2 "STRIPE_WEBHOOK_SECRET missing — Checkout redirect works without it; fulfillment does not."
+  Write-Host @"
+
+Stripe webhook (one-time on PC):
+  cd D:\medscope.local
+  node scripts\setup-stripe-webhook.mjs
+  # Endpoint: https://medscopeglobal.com/api/stripe/webhook
+  # Copy whsec_… → Worker secret STRIPE_WEBHOOK_SECRET  (or append to .env.local + pnpm cf:env:sync)
+"@
+} else {
+  Write-Ok "STRIPE_WEBHOOK_SECRET present in .env.local — ensure it is synced to the Worker"
+}
+
+Push-Location $WorkspaceRoot
+try {
+  $pnpm = (Get-Command pnpm -ErrorAction SilentlyContinue).Source
+  if ($pnpm) {
+    & $pnpm probe:prod:stripe
+    if ($LASTEXITCODE -eq 0) {
+      Write-Ok "probe:prod:stripe passed (fetch client + mediflow.webp)"
+    } else {
+      Write-Warn2 "probe:prod:stripe failed — deploy may still be propagating; re-run: pnpm probe:prod:stripe"
+    }
+  }
+} finally {
+  Pop-Location
+}
+
 Write-Step "Done — also paste into Cursor Secrets"
 Write-Host @"
 Cursor Dashboard → Cloud Agents → medscopeglobal → Secrets:
@@ -257,7 +294,11 @@ Cursor Dashboard → Cloud Agents → medscopeglobal → Secrets:
 
 Then start a NEW cloud agent run (existing pods do not pick up new secrets).
 
+One-button (this script):  pnpm auto:d
+Cloud without D::         pnpm auto:continue
+
 Smoke:
+  pnpm probe:prod:stripe
   pnpm smoke:production
   curl.exe -sI https://medscopeglobal.com/assets/marketing/mediflow.webp
 "@

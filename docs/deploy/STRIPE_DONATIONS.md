@@ -71,9 +71,9 @@ Unblock from PC:
 cd D:\medscope.local
 git checkout main
 git pull origin main
-pnpm auto:d          # or: pnpm restore:d — loads CLOUDFLARE_* + STRIPE_* from D:
-pnpm cf:deploy
-# verify donate + mediflow.webp as above
+pnpm auto:d          # restore CF/Stripe from D: → deploy → webhook reminder → donate/mediflow probe
+# or cloud with Cursor Secrets: pnpm auto:continue
+pnpm probe:prod:stripe
 ```
 
 Dashboard fallback (no token): Workers Builds → **medscopeglobal** → Retry deployment of `main` — see [`CF_DASHBOARD_DEPLOY.md`](./CF_DASHBOARD_DEPLOY.md).

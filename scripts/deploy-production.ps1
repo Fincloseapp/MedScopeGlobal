@@ -72,7 +72,7 @@ $scriptDir = $PSScriptRoot
 $restoreScript = Join-Path $scriptDir "restore-from-d.ps1"
 
 $step = 1
-$totalSteps = 5
+$totalSteps = 6
 
 if (-not $SkipRestore) {
   if (-not (Test-Path $restoreScript)) { throw "Missing $restoreScript" }
@@ -158,6 +158,12 @@ Then re-run: pnpm db:verify
     & $pnpm smoke:ecosystem:production
     if ($LASTEXITCODE -ne 0) { throw "pnpm smoke:ecosystem:production failed (exit $LASTEXITCODE)" }
     Write-Ok "Ecosystem production smoke passed"
+    $step++
+
+    Write-Step "$step/$totalSteps probe:prod:stripe (donate + mediflow.webp)"
+    & $pnpm probe:prod:stripe
+    if ($LASTEXITCODE -ne 0) { throw "pnpm probe:prod:stripe failed (exit $LASTEXITCODE)" }
+    Write-Ok "Stripe/mediflow probe passed"
   } else {
     Write-Step "$step/$totalSteps smoke skipped (-SkipSmoke)"
   }
@@ -165,4 +171,10 @@ Then re-run: pnpm db:verify
   Pop-Location
 }
 
+Write-Host @"
+
+Stripe webhook reminder (if Worker still shows webhookSecretConfigured=false):
+  node scripts\setup-stripe-webhook.mjs
+  → paste whsec_… into Worker STRIPE_WEBHOOK_SECRET
+"@
 Write-Ok "deploy-production complete — https://medscopeglobal.com/cs should show VitaScope"
