@@ -36,8 +36,8 @@ export const MAGAZINE = {
     cs: "VitaScope · platforma MedScopeGlobal",
   },
   whatsNew: {
-    en: "New: global ecosystem — MediFlow journal, VIP longevity, autonomous editorial, 19 locales",
-    cs: "Nově: globální ekosystém — MediFlow deník, VIP dlouhověkost, autonomní redakce, 19 jazyků",
+    en: "Clear offers: MediFlow journal, VIP longevity (priced), MeDipacient & OrdiZapis — distinct product visuals",
+    cs: "Jasné nabídky: deník MediFlow, VIP dlouhověkost (s cenou), MeDipacient a OrdiZapis — každá aplikace vlastní vizuál",
   },
 } as const;
 

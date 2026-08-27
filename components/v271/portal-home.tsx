@@ -11,13 +11,10 @@ import { NEWS_DESKS, splitNewsDesks, type NewsDeskId } from "@/lib/v271/news-des
 import { NewsArticleThumb, NewsDeskFallback, NewsHeadlineRow } from "@/components/articles/news-article-card";
 import { PortalSearch } from "@/components/v271/portal-search";
 import { WriterAgentsStrip } from "@/components/editorial/writer-agents-strip";
-import {
-  LongevityProtocolsSection,
-  HomepageAffiliateSection,
-} from "@/components/ecosystem/magazine-sections";
 import { AppOpenLink } from "@/components/apps/app-origin-bar";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
-import { ArrowRight } from "lucide-react";
+import { VIP_PRICING } from "@/lib/ecosystem/monetization";
+import { ArrowRight, Coins, Crown, Heart } from "lucide-react";
 
 /** Marketing display names — OrdiZáznam is the Czech public alias for OrdiZapis */
 const APP_MARKETING_NAME: Record<string, string> = {
@@ -25,6 +22,13 @@ const APP_MARKETING_NAME: Record<string, string> = {
   medipacient: "MeDipacient",
   ordizapis: "OrdiZáznam",
   mediprep: "MeDiprep",
+};
+
+const APP_PRICE_LINE: Record<string, string> = {
+  mediflow: "Zdarma · VIP sync od 149 Kč/měsíc",
+  medipacient: "Od 99 Kč/měsíc · tarif Veřejnost",
+  ordizapis: "390 Kč/měsíc · 14 dní zdarma",
+  mediprep: "Legacy · 149 Kč/měsíc Student LF",
 };
 
 function DeskColumn({
@@ -39,6 +43,9 @@ function DeskColumn({
   const def = NEWS_DESKS.find((item) => item.id === desk)!;
   const lead = featured ? articles[0] : null;
   const rows = featured ? articles.slice(1, 4) : articles.slice(0, 4);
+  const tipHref = lead
+    ? `/article/${lead.slug}#article-tip-${lead.slug}`
+    : "/articles";
 
   return (
     <div>
@@ -49,15 +56,23 @@ function DeskColumn({
         </Link>
       </div>
       {lead ? (
-        <Link href={`/article/${lead.slug}`} className="group mb-2 block">
-          <NewsArticleThumb article={lead} large sizes="(max-width: 768px) 100vw, 40vw" />
-          <h4 className="mt-2 font-display text-base font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
-            {lead.title}
-          </h4>
-          {lead.excerpt ? (
-            <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-600">{lead.excerpt}</p>
-          ) : null}
-        </Link>
+        <div className="mb-2">
+          <Link href={`/article/${lead.slug}`} className="group block">
+            <NewsArticleThumb article={lead} large sizes="(max-width: 768px) 100vw, 40vw" />
+            <h4 className="mt-2 font-display text-base font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
+              {lead.title}
+            </h4>
+            {lead.excerpt ? (
+              <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-600">{lead.excerpt}</p>
+            ) : null}
+          </Link>
+          <p className="mt-2 text-[11px] text-slate-500">
+            Líbí se vám text?{" "}
+            <Link href={tipHref} className="font-semibold text-amber-800 underline-offset-2 hover:underline">
+              Podpořit tringeltem
+            </Link>
+          </p>
+        </div>
       ) : null}
       <div className="divide-y divide-slate-100 border-t border-slate-200">
         {rows.length > 0
@@ -97,6 +112,7 @@ function PortalNewsFeed({ articles }: { articles: DisplayArticle[] }) {
   );
 }
 
+/** Full-bleed product phones — MediFlow / Ordi / MeDipacient (distinct assets) */
 function HeroPhones() {
   return (
     <div className="portal-hero-phones relative mx-auto h-[min(58vh,420px)] w-full max-w-md lg:mx-0 lg:h-[min(72vh,520px)] lg:max-w-none">
@@ -105,8 +121,8 @@ function HeroPhones() {
           src={APP_MARKETING_IMAGE.mediflow}
           alt="MediFlow — wellness deník"
           width={480}
-          height={960}
-          className="h-auto w-full object-cover"
+          height={720}
+          className="h-auto w-full object-cover object-top"
           priority
           sizes="(max-width: 1024px) 40vw, 220px"
         />
@@ -128,7 +144,7 @@ function HeroPhones() {
           alt="MeDipacient — lékařské zprávy"
           width={480}
           height={960}
-          className="h-auto w-full object-cover"
+          className="h-auto w-full object-cover object-top"
           sizes="(max-width: 1024px) 35vw, 200px"
         />
       </div>
@@ -141,7 +157,7 @@ function AppsShowcase() {
   const legacy = APP_PRODUCTS.find((a) => a.id === "mediprep");
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <ul className="grid gap-6 md:grid-cols-3">
         {featured.map((app, i) => {
           const name = APP_MARKETING_NAME[app.id] ?? app.shortName;
@@ -154,7 +170,7 @@ function AppsShowcase() {
                 <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-b from-[#e8f3fb] to-slate-100">
                   <Image
                     src={APP_MARKETING_IMAGE[app.id]}
-                    alt=""
+                    alt={`${name} — ${app.tagline}`}
                     fill
                     className="object-cover object-top transition duration-500 group-hover:scale-[1.03]"
                     sizes="(max-width: 768px) 100vw, 33vw"
@@ -163,6 +179,9 @@ function AppsShowcase() {
                 <div className="flex flex-1 flex-col p-5">
                   <h3 className="font-display text-xl font-semibold text-[#021d33]">{name}</h3>
                   <p className="mt-1 flex-1 text-sm leading-relaxed text-slate-600">{app.tagline}</p>
+                  <p className="mt-2 text-xs font-medium text-[#005B96]">
+                    {APP_PRICE_LINE[app.id] ?? app.priceNote}
+                  </p>
                   <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#005B96]">
                     Otevřít
                     <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" aria-hidden />
@@ -174,42 +193,6 @@ function AppsShowcase() {
         })}
       </ul>
 
-      <div className="portal-reveal grid gap-4 overflow-hidden rounded-2xl border border-amber-200/80 bg-gradient-to-br from-[#fff8eb] via-white to-[#e8f3fb] p-6 sm:grid-cols-[1.2fr_1fr] sm:items-center sm:p-8">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-800">VIP · dlouhověkost</p>
-          <h3 className="mt-2 font-display text-2xl font-semibold text-[#021d33] sm:text-3xl">
-            Protokoly pro delší a kvalitnější život
-          </h3>
-          <p className="mt-2 max-w-lg text-sm leading-relaxed text-slate-600">
-            Spánek, metabolismus, pohyb a mentální wellness — evidence-based postupy bez zázračných slibů.
-          </p>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <Link
-              href="/vip/protokoly"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#021d33] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#005B96]"
-            >
-              Prohlédnout VIP
-              <ArrowRight className="h-4 w-4" aria-hidden />
-            </Link>
-            <Link
-              href="/predplatne?trial=1"
-              className="inline-flex rounded-lg border border-[#021d33]/20 px-5 py-2.5 text-sm font-semibold text-[#021d33] hover:border-[#005B96] hover:text-[#005B96]"
-            >
-              14 dní zdarma
-            </Link>
-          </div>
-        </div>
-        <div className="relative mx-auto hidden h-48 w-full max-w-xs sm:block">
-          <Image
-            src={APP_MARKETING_IMAGE.mediflow}
-            alt=""
-            fill
-            className="object-contain object-bottom drop-shadow-xl"
-            sizes="240px"
-          />
-        </div>
-      </div>
-
       {legacy ? (
         <p className="text-center text-xs text-slate-500">
           {legacy.shortName} (příprava na LF) zůstává jako legacy aplikace —{" "}
@@ -219,6 +202,141 @@ function AppsShowcase() {
           .
         </p>
       ) : null}
+    </div>
+  );
+}
+
+/** Single clear VIP offer — price, what you get, one primary CTA */
+function VipOfferSection() {
+  const vip = VIP_PRICING.cs;
+
+  return (
+    <section
+      aria-labelledby="portal-vip-heading"
+      className="relative overflow-hidden bg-gradient-to-br from-[#1a1408] via-[#2a1f0a] to-[#021d33] text-white"
+    >
+      <div
+        className="pointer-events-none absolute inset-0 opacity-50"
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 50% at 80% 20%, rgba(245,158,11,0.28), transparent 55%), radial-gradient(ellipse 40% 40% at 10% 80%, rgba(0,91,150,0.25), transparent 50%)",
+        }}
+        aria-hidden
+      />
+      <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 sm:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-300/90">
+            VIP Longevity · jasná nabídka
+          </p>
+          <h2 id="portal-vip-heading" className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
+            10 protokolů. Jeden plán. {vip.label}.
+          </h2>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/75 sm:text-base">
+            Spánek, metabolismus, pohyb a mentální wellness — evidence-based postupy bez zázračných slibů.
+            MediFlow sync a PDF export v ceně. Odděleně od tarifů Student LF / OrdiZapis.
+          </p>
+          <ul className="mt-5 space-y-2 text-sm text-white/80">
+            <li>· 10 longevity protokolů (VIP knihovna)</li>
+            <li>· Sync do MediFlow deníku</li>
+            <li>· 14 dní zkušebně · zrušení kdykoli</li>
+          </ul>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link
+              href="/predplatne?trial=1&plan=vip"
+              className="inline-flex items-center gap-2 rounded-lg bg-amber-400 px-5 py-3 text-sm font-semibold text-[#1a1408] transition hover:bg-amber-300"
+            >
+              Začít 14 dní zdarma
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+            <Link
+              href="/vip/protokoly"
+              className="inline-flex items-center rounded-lg border border-white/25 px-5 py-3 text-sm font-semibold text-white hover:border-white/50"
+            >
+              Prohlédnout protokoly
+            </Link>
+          </div>
+        </div>
+        <div className="relative mx-auto hidden w-full max-w-sm lg:block">
+          <div className="relative aspect-[3/4] overflow-hidden rounded-2xl ring-1 ring-white/15">
+            <Image
+              src={APP_MARKETING_IMAGE.mediflow}
+              alt="MediFlow s VIP protokoly"
+              fill
+              className="object-cover object-top"
+              sizes="320px"
+            />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-5">
+              <p className="font-display text-lg font-semibold">MediFlow + VIP</p>
+              <p className="text-sm text-white/70">{vip.label}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Compact monetization paths — tip / donate / VIP — not a card clutter grid */
+function MonetizationSupportStrip() {
+  return (
+    <section aria-label="Podpora redakce" className="border-y border-slate-200 bg-white">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="max-w-md">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">Podpora</p>
+          <p className="mt-1 font-display text-lg font-semibold text-[#021d33]">
+            Magazín zdarma. Redakci drží tipy a VIP.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2 sm:gap-3">
+          <Link
+            href="/articles"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300/80 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900 hover:bg-amber-100"
+          >
+            <Coins className="h-4 w-4" aria-hidden />
+            Tringelt u článku
+          </Link>
+          <Link
+            href="/article/optimalizace-spanku#article-tip-optimalizace-spanku"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-800 hover:bg-rose-100"
+          >
+            <Heart className="h-4 w-4" aria-hidden />
+            Dar redakci
+          </Link>
+          <Link
+            href="/vip/protokoly"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-[#021d33] px-4 py-2 text-sm font-semibold text-white hover:bg-[#005B96]"
+          >
+            <Crown className="h-4 w-4" aria-hidden />
+            VIP · 149 Kč
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MagazineContributeBanner() {
+  return (
+    <div className="portal-reveal mt-6 flex flex-col gap-3 rounded-xl border border-amber-200/70 bg-gradient-to-r from-amber-50 to-[#e8f3fb] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+      <p className="text-sm text-slate-700">
+        <span className="font-semibold text-[#021d33]">Podpořte autonomní redakci</span>
+        {" — "}
+        tringelt od 2 Kč u článku, nebo VIP protokoly za 149 Kč/měsíc.
+      </p>
+      <div className="flex flex-wrap gap-2">
+        <Link
+          href="/articles"
+          className="inline-flex rounded-lg bg-amber-500 px-4 py-2 text-xs font-semibold text-white hover:bg-amber-600"
+        >
+          Číst a přispět
+        </Link>
+        <Link
+          href="/vip/protokoly"
+          className="inline-flex rounded-lg border border-[#021d33]/20 px-4 py-2 text-xs font-semibold text-[#021d33] hover:border-[#005B96]"
+        >
+          VIP nabídka
+        </Link>
+      </div>
     </div>
   );
 }
@@ -261,12 +379,12 @@ export function PortalHome({
                 Číst magazín
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
-              <AppOpenLink
-                href="/app/mediflow"
+              <Link
+                href="/vip/protokoly"
                 className="inline-flex items-center rounded-lg border border-white/35 bg-white/5 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:border-white/60 hover:bg-white/10"
               >
-                Otevřít MediFlow
-              </AppOpenLink>
+                VIP · 149 Kč/měsíc
+              </Link>
             </div>
             <p className="mt-6 text-[11px] font-medium uppercase tracking-[0.16em] text-white/45">
               {philosophy.eyebrow}
@@ -279,7 +397,7 @@ export function PortalHome({
         </div>
       </section>
 
-      {/* 2 — Magazine / news */}
+      {/* 2 — Magazine / news + tip CTAs */}
       <section aria-labelledby="portal-magazine-heading" className="bg-[#f3f7fb]">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
           <div className="portal-reveal max-w-2xl">
@@ -295,6 +413,8 @@ export function PortalHome({
           <div className="portal-reveal mt-8 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm sm:p-6">
             <PortalSearch />
           </div>
+
+          <MagazineContributeBanner />
 
           <div className="portal-reveal mt-6 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm sm:p-6">
             <div className="mb-4 flex items-end justify-between gap-3">
@@ -312,16 +432,16 @@ export function PortalHome({
         </div>
       </section>
 
-      {/* 3 — Apps + VIP */}
+      {/* 3 — Apps with correct marketing images */}
       <section aria-labelledby="portal-apps-heading" className="bg-gradient-to-b from-white via-[#f7fafc] to-[#eef4f9]">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
           <div className="portal-reveal mx-auto max-w-2xl text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">Platforma</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">Aplikace</p>
             <h2 id="portal-apps-heading" className="mt-2 font-display text-3xl font-semibold text-[#021d33] sm:text-4xl">
-              MediFlow · OrdiZáznam · VIP
+              MediFlow · MeDipacient · OrdiZáznam
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-slate-600 sm:text-base">
-              Denní wellness, zápisy pro ordinaci a longevity protokoly — na jedné platformě MedScopeGlobal.
+              Každá aplikace má vlastní obrazovku a cenu — wellness deník, lékařské zprávy, zápisy pro ordinaci.
             </p>
           </div>
           <div className="mt-10">
@@ -330,22 +450,20 @@ export function PortalHome({
         </div>
       </section>
 
-      {/* 4 — VIP protocols depth + affiliate */}
-      <section aria-label="VIP protokoly a doporučení" className="bg-[#f3f7fb]">
-        <div className="mx-auto grid max-w-7xl gap-4 px-4 py-12 sm:px-6 sm:py-14 lg:grid-cols-2">
-          <LongevityProtocolsSection />
-          <HomepageAffiliateSection />
-        </div>
-      </section>
+      {/* 4 — Clear VIP subscription */}
+      <VipOfferSection />
 
-      {/* 5 — Closing CTA */}
+      {/* 5 — Monetization paths */}
+      <MonetizationSupportStrip />
+
+      {/* 6 — Closing CTA */}
       <section className="relative overflow-hidden bg-[#021d33] text-white">
         <div className="portal-cta-glow absolute inset-0" aria-hidden />
         <div className="relative mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 px-4 py-14 sm:flex-row sm:items-center sm:px-6 sm:py-16">
           <div className="max-w-xl">
             <h2 className="font-display text-3xl font-semibold sm:text-4xl">Začněte s {brand}</h2>
             <p className="mt-2 text-sm leading-relaxed text-white/70 sm:text-base">
-              Magazín zdarma. Aplikace a VIP protokoly s 14denní zkušební dobou — bez závazku.
+              Magazín zdarma. VIP longevity od 149 Kč/měsíc — 14 dní na vyzkoušení.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -356,10 +474,10 @@ export function PortalHome({
               Číst články
             </Link>
             <Link
-              href="/predplatne?trial=1"
+              href="/predplatne?trial=1&plan=vip"
               className="inline-flex rounded-lg border border-white/30 px-5 py-3 text-sm font-semibold text-white hover:border-white/60"
             >
-              14 dní zdarma
+              VIP 14 dní zdarma
             </Link>
           </div>
         </div>

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { HomepageAds } from "@/components/home/homepage-ads";
 import { V272AcademyHomeSections } from "@/components/v271/academy-home-sections";
 import {
   V271B2bBlock,
-  V272SubscriptionPlansBlock,
   V272WhyTrustBlock,
 } from "@/components/v271/homepage-sections";
 import { PortalHome } from "@/components/v271/portal-home";
@@ -37,7 +37,6 @@ export async function generateMetadata(): Promise<Metadata> {
       url: canonical,
       locale: locale.startsWith("en") ? "en_US" : "cs_CZ",
       siteName: `${MAGAZINE.name} · ${MAGAZINE.platform}`,
-      type: "website",
     },
     twitter: {
       card: "summary_large_image",
@@ -76,11 +75,30 @@ export default async function HomePage() {
         />
       ))}
 
-      {/* Story: VitaScope hero → magazín → apps/VIP → CTA (PortalHome), then trust & plans */}
+      {/* Story: VitaScope hero → magazín+tips → apps → VIP → support (PortalHome) */}
       <PortalHome articles={articles} philosophy={philosophy} />
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
       <V272WhyTrustBlock />
-      <V272SubscriptionPlansBlock />
+      {/* Full multi-tier ceník on /predplatne — VIP already clear in PortalHome */}
+      <section className="border-t border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-4 px-4 py-10 sm:flex-row sm:items-center sm:px-6">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">Ceník aplikací</p>
+            <h2 className="mt-1 font-display text-xl font-semibold text-[#021d33]">
+              Veřejnost 99 · Student 149 · OrdiZapis 390 · Lékař 490 Kč
+            </h2>
+            <p className="mt-1 text-sm text-slate-600">
+              VIP longevity (149 Kč) je samostatná nabídka výše. Kompletní srovnání tarifů na jedné stránce.
+            </p>
+          </div>
+          <Link
+            href="/predplatne"
+            className="inline-flex shrink-0 rounded-lg bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
+          >
+            Otevřít ceník →
+          </Link>
+        </div>
+      </section>
       <V272AcademyHomeSections />
       <V271B2bBlock />
 

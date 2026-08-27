@@ -110,9 +110,10 @@
 /* VitaScope portal homepage — marketing hero atmosphere + motion */
 .portal-hero-atmosphere {
   background:
-    radial-gradient(ellipse 80% 60% at 15% 20%, rgba(0, 120, 170, 0.55), transparent 55%),
-    radial-gradient(ellipse 70% 50% at 85% 75%, rgba(0, 70, 120, 0.5), transparent 50%),
-    linear-gradient(155deg, #021d33 0%, #0a3d5c 42%, #005b96 78%, #1478b0 100%);
+    radial-gradient(ellipse 70% 55% at 12% 18%, rgba(16, 185, 129, 0.22), transparent 52%),
+    radial-gradient(ellipse 80% 60% at 15% 20%, rgba(0, 120, 170, 0.5), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 88% 72%, rgba(0, 70, 120, 0.48), transparent 50%),
+    linear-gradient(158deg, #021d33 0%, #0a3d5c 38%, #005b96 72%, #0d6a8f 100%);
 }
 
 .portal-hero-pattern {

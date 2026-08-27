@@ -23,10 +23,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PredplatnePage({
   searchParams,
 }: {
-  searchParams: Promise<{ trial?: string }>;
+  searchParams: Promise<{ trial?: string; plan?: string }>;
 }) {
-  const { trial } = await searchParams;
+  const { trial, plan } = await searchParams;
   const highlightTrial = trial === "1";
+  const fromVip = plan === "vip";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -35,11 +36,12 @@ export default async function PredplatnePage({
           Předplatné
         </p>
         <h1 className="mt-2 font-display text-4xl font-bold text-[#021d33]">
-          Prémiový přístup k medicínskému obsahu
+          {fromVip ? "VIP Longevity · 149 Kč/měsíc" : "Prémiový přístup k medicínskému obsahu"}
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-          Měsíční nebo roční plány pro veřejnost (MeDipacient), studenty (MeDiprep), ordinace (OrdiZapis) a
-          lékaře. Stažení na mobil u všech tří aplikací. Bez reklam, s AI asistenty — platba přes Stripe.
+          {fromVip
+            ? "VIP protokoly a MediFlow sync. Níže také tarify aplikací (Veřejnost, Student LF, OrdiZapis, Lékař) — vyberte jen jeden plán."
+            : "Měsíční nebo roční plány pro veřejnost (MeDipacient), studenty (MeDiprep), ordinace (OrdiZapis) a lékaře. VIP longevity je samostatná nabídka na /vip/protokoly."}
         </p>
       </div>
 
@@ -47,13 +49,43 @@ export default async function PredplatnePage({
         <SubscriptionTrialBanner />
       </div>
 
-      {highlightTrial ? (
+      {fromVip ? (
+        <section
+          id="vip"
+          className="mt-6 scroll-mt-24 rounded-2xl border border-amber-300 bg-gradient-to-br from-amber-50 to-orange-50 px-5 py-5 sm:px-6"
+        >
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-800">
+            VIP Longevity — co dostanete
+          </p>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-700">
+            10 longevity protokolů, MediFlow sync a PDF export za{" "}
+            <span className="font-semibold text-[#021d33]">149 Kč/měsíc</span>
+            . Toto není tarif Student LF (příprava na přijímačky) — stejná cena, jiný produkt.{" "}
+            <Link href="/vip/protokoly" className="font-semibold text-amber-800 hover:underline">
+              Prohlédnout protokoly →
+            </Link>
+          </p>
+          <div className="mt-4">
+            <V27CheckoutButton
+              kind="subscription"
+              productId={subscriptionProductId("public", "month")}
+              label="Aktivovat VIP trial (tarif Veřejnost + protokoly)"
+            />
+          </div>
+        </section>
+      ) : null}
+
+      {highlightTrial && !fromVip ? (
         <p className="mt-6 rounded-2xl border border-[#cfe1f3] bg-[#f0f7ff]/80 px-4 py-3 text-center text-sm text-slate-700">
           Přicházíte z trial CTA — níže je zvýrazněný tarif{" "}
           <Link href="#student" className="font-semibold text-[#005B96] hover:underline">
             Student LF
           </Link>{" "}
-          (příprava na přijímačky i studium). Rodiče: účet založte na jméno studenta.
+          (příprava na přijímačky i studium). Pro VIP longevity použijte{" "}
+          <Link href="/vip/protokoly" className="font-semibold text-amber-800 hover:underline">
+            /vip/protokoly
+          </Link>
+          .
         </p>
       ) : null}
 

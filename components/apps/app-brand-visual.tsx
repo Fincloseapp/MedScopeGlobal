@@ -15,7 +15,7 @@ type Props = {
  * (`APP_MARKETING_IMAGE` / `/assets/marketing/*`).
  */
 export function AppBrandVisual({ app, compact = false, className = "" }: Props) {
-  const src = `${APP_MARKETING_IMAGE[app.id]}?v=ordizapis-phone-v2`;
+  const src = APP_MARKETING_IMAGE[app.id];
   return (
     <figure className={`overflow-hidden bg-slate-200 ${className}`}>
       <div
