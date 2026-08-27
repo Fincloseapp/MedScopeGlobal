@@ -106,3 +106,64 @@
     @apply rounded-lg bg-[#005B96] text-white hover:bg-[#004a7a];
   }
 }
+
+/* Marketing landings — intentional motion (MediFlow / Ordi / VIP / Apps) */
+@keyframes mkt-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mkt-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes mkt-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(1.5%, -1.5%, 0) scale(1.03);
+  }
+}
+
+.mkt-rise {
+  animation: mkt-rise 0.7s ease-out both;
+}
+
+.mkt-rise-delay-1 {
+  animation: mkt-rise 0.7s ease-out 0.12s both;
+}
+
+.mkt-rise-delay-2 {
+  animation: mkt-rise 0.7s ease-out 0.24s both;
+}
+
+.mkt-fade {
+  animation: mkt-fade 1s ease-out 0.2s both;
+}
+
+.mkt-drift {
+  animation: mkt-drift 18s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mkt-rise,
+  .mkt-rise-delay-1,
+  .mkt-rise-delay-2,
+  .mkt-fade,
+  .mkt-drift {
+    animation: none;
+  }
+}
