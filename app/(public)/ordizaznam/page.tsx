@@ -1,16 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import {
-  Mic,
-  FileText,
-  Shield,
-  Lock,
-  Smartphone,
-  Clock,
-  CheckCircle2,
-  ArrowRight,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { ORDIZAPIS_APP } from "@/lib/apps/catalog";
+import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { softwareApplicationJsonLd } from "@/lib/ecosystem/seo";
 
@@ -21,43 +14,20 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/ordizaznam",
 });
 
-const FEATURES = [
+const BENEFITS = [
   {
-    icon: Mic,
-    title: "Nahrávání v mobilu",
-    description: "Diktát nebo konzultace s pacientem — AI vytvoří strukturovaný zápis.",
+    title: "Diktát → strukturovaný zápis",
+    description: "Nahrajte konzultaci v telefonu. OrdiZáznam sestaví anamnézu a klinický zápis.",
   },
   {
-    icon: FileText,
-    title: "Profesionální šablony",
-    description: "Ambulantní, SOAP, anamnéza, propouštěcí zprávy a další.",
+    title: "Mobil a web v synchronu",
+    description: "Stejná historie zápisů v ordinaci i cestou — bez přepisování.",
   },
   {
-    icon: Smartphone,
-    title: "Mobil ↔ Web sync",
-    description: "Historie zápisů synchronizovaná mezi telefonem a počítačem.",
+    title: "GDPR a šifrování v EU",
+    description: "Data v klidu i při přenosu. Nástroj pro dokumentaci, ne náhrada úsudku.",
   },
-  {
-    icon: Clock,
-    title: "Úspora času",
-    description: "Průměrně 15 minut ušetřených na každém zápisu.",
-  },
-  {
-    icon: Shield,
-    title: "GDPR kompatibilita",
-    description: "Data zpracovávána v EU, plná compliance s nařízením GDPR.",
-  },
-  {
-    icon: Lock,
-    title: "End-to-end šifrování",
-    description: "Záznamy šifrovány v klidu i při přenosu.",
-  },
-];
-
-const PRICING = [
-  { name: "OrdiZáznam", price: "390 Kč", period: "/měsíc", features: ["Neomezené zápisy", "Všechny šablony", "Mobil + web", "14 dní zdarma"] },
-  { name: "Lékař v praxi", price: "490 Kč", period: "/měsíc", features: ["OrdiZáznam v ceně", "Guidelines & CME", "Klinický AI asistent", "Odborná sekce"], highlight: true },
-];
+] as const;
 
 export default function OrdiZaznamPage() {
   const jsonLd = softwareApplicationJsonLd({
@@ -74,114 +44,131 @@ export default function OrdiZaznamPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#021d33] via-[#003d6b] to-[#005B96] px-4 py-16 text-white sm:py-24">
+      {/* Full-bleed product photo hero */}
+      <section className="relative isolate min-h-[min(92vh,900px)] overflow-hidden bg-[#021d33] text-white">
+        <Image
+          src={APP_MARKETING_IMAGE.ordizapis}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="mkt-drift object-cover object-[72%_center] opacity-55 sm:object-[68%_center]"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-[#021d33] via-[#021d33]/88 to-[#021d33]/25 sm:via-[#021d33]/78 sm:to-transparent"
+          aria-hidden
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#021d33] via-transparent to-[#021d33]/40"
+          aria-hidden
+        />
+
+        <div className="relative mx-auto flex min-h-[min(92vh,900px)] max-w-6xl flex-col justify-end px-4 pb-16 pt-28 sm:px-6 sm:pb-20 lg:justify-center lg:pb-24">
+          <div className="max-w-xl">
+            <h1 className="mkt-rise font-display text-[clamp(3rem,9vw,5.5rem)] font-bold leading-[0.94] tracking-tight">
+              OrdiZáznam
+            </h1>
+            <p className="mkt-rise-delay-1 mt-5 max-w-md text-lg leading-relaxed text-sky-50/85 sm:text-xl">
+              Nahrajte diktát nebo konzultaci — hotový klinický zápis za minuty, ne za čtvrt hodiny.
+            </p>
+            <div className="mkt-rise-delay-2 mt-9 flex flex-wrap items-center gap-4">
+              <Link
+                href="/app/dokumentace"
+                className="inline-flex items-center gap-2 bg-white px-7 py-3.5 text-sm font-semibold text-[#005B96] transition hover:bg-sky-50"
+              >
+                Vyzkoušet demo
+                <ArrowRight className="h-4 w-4" aria-hidden />
+              </Link>
+              <Link
+                href="/predplatne"
+                className="inline-flex items-center gap-2 border border-white/35 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
+              >
+                14 dní zdarma
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white px-4 py-16 sm:px-6 sm:py-20">
         <div className="mx-auto max-w-5xl">
-          <p className="text-sm font-semibold uppercase tracking-wider text-[#8dc4ea]">
-            Profesionální nástroj pro lékaře
+          <h2 className="font-display text-2xl font-bold text-[#021d33] sm:text-3xl">
+            Proč lékaři přecházejí na OrdiZáznam
+          </h2>
+          <ol className="mt-10 divide-y divide-slate-200 border-y border-slate-200">
+            {BENEFITS.map((item, index) => (
+              <li
+                key={item.title}
+                className="grid gap-2 py-7 sm:grid-cols-[4rem_1fr] sm:items-baseline sm:gap-8"
+              >
+                <span className="font-display text-3xl font-bold text-[#005B96]/70">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <h3 className="font-display text-xl font-semibold text-[#021d33]">{item.title}</h3>
+                  <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-base">
+                    {item.description}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* Single clear offer — not a pricing card grid */}
+      <section className="relative overflow-hidden bg-[#f0f6fb] px-4 py-16 sm:px-6">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(0,91,150,0.12),transparent_50%)]"
+          aria-hidden
+        />
+        <div className="relative mx-auto max-w-5xl">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#005B96]">
+            Ceník
           </p>
-          <h1 className="mt-3 font-display text-4xl font-bold leading-tight sm:text-5xl">
-            OrdiZáznam
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg text-white/80">
-            Nahrajte v telefonu diktát nebo konzultaci s pacientem → odborná anamnéza a klinický zápis.
-            Ušetřete 15 minut na každém zápisu.
+          <h2 className="mt-2 font-display text-3xl font-bold text-[#021d33] sm:text-4xl">
+            390 Kč / měsíc
+          </h2>
+          <p className="mt-3 max-w-xl text-slate-600">
+            Neomezené zápisy, všechny šablony, mobil + web. 14 dní zdarma. Tarif Lékař v praxi
+            (490 Kč) přidá guidelines, CME a klinického AI asistenta.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Link
-              href="/app/dokumentace"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-semibold text-[#005B96] hover:bg-white/90"
+              href="/predplatne"
+              className="inline-flex items-center gap-2 bg-[#005B96] px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-[#004a7a]"
             >
-              Vyzkoušet demo <ArrowRight className="h-4 w-4" />
+              Vybrat tarif
+              <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
             <Link
-              href="/predplatne"
-              className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 font-semibold hover:bg-white/10"
+              href="/app/dokumentace"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[#005B96] underline-offset-4 hover:underline"
             >
-              14 dní zdarma
+              Nejdřív demo
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="mx-auto max-w-5xl px-4 py-16">
-        <h2 className="font-display text-2xl font-bold text-[#021d33]">Funkce a výhody</h2>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((f) => (
-            <div key={f.title} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <f.icon className="h-8 w-8 text-[#005B96]" />
-              <h3 className="mt-3 font-semibold text-[#021d33]">{f.title}</h3>
-              <p className="mt-2 text-sm text-slate-600">{f.description}</p>
-            </div>
-          ))}
-        </div>
+      <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+        <p className="text-sm leading-relaxed text-slate-600">
+          <span className="font-semibold text-[#021d33]">Právní upozornění. </span>
+          OrdiZáznam je nástroj pro dokumentaci, nikoli náhrada klinického úsudku. Lékař nese plnou
+          odpovědnost za obsah a správnost zápisu. Data jsou zpracovávána v souladu s GDPR (EU).
+          OrdiZáznam není certifikován jako zdravotnický prostředek.
+        </p>
       </section>
 
-      {/* Pricing */}
-      <section className="bg-[#f7fafc] px-4 py-16">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="font-display text-2xl font-bold text-[#021d33]">Ceník</h2>
-          <div className="mt-8 grid gap-6 sm:grid-cols-2">
-            {PRICING.map((plan) => (
-              <div
-                key={plan.name}
-                className={`rounded-2xl border p-6 ${
-                  plan.highlight
-                    ? "border-[#005B96] bg-white shadow-lg ring-2 ring-[#005B96]/20"
-                    : "border-slate-200 bg-white"
-                }`}
-              >
-                <h3 className="font-semibold text-[#021d33]">{plan.name}</h3>
-                <p className="mt-2">
-                  <span className="text-3xl font-bold">{plan.price}</span>
-                  <span className="text-slate-500">{plan.period}</span>
-                </p>
-                <ul className="mt-4 space-y-2">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-slate-700">
-                      <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/predplatne"
-                  className={`mt-6 block rounded-full py-2.5 text-center text-sm font-semibold ${
-                    plan.highlight
-                      ? "bg-[#005B96] text-white hover:bg-[#004a7a]"
-                      : "border border-[#005B96] text-[#005B96] hover:bg-[#005B96]/5"
-                  }`}
-                >
-                  Vybrat tarif
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Legal */}
-      <section className="mx-auto max-w-5xl px-4 py-12">
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
-          <h3 className="font-semibold text-amber-900">Právní upozornění</h3>
-          <p className="mt-2 text-sm text-amber-800">
-            OrdiZáznam je nástroj pro dokumentaci, nikoli náhrada klinického úsudku. Lékař nese plnou
-            odpovědnost za obsah a správnost zápisu. Data jsou zpracovávána v souladu s GDPR (EU)
-            a ukládána na serverech v EU. OrdiZáznam není certifikován jako zdravotnický prostředek.
-          </p>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="bg-[#021d33] px-4 py-12 text-center text-white">
-        <h2 className="font-display text-2xl font-bold">Začněte ještě dnes</h2>
-        <p className="mt-2 text-white/70">14 dní zdarma · Bez závazků · Zrušení kdykoliv</p>
+      <section className="bg-[#021d33] px-4 py-14 text-center text-white sm:px-6">
+        <h2 className="font-display text-2xl font-bold sm:text-3xl">Začněte ještě dnes</h2>
+        <p className="mt-2 text-white/65">14 dní zdarma · Bez závazků · Zrušení kdykoliv</p>
         <Link
           href="/app/dokumentace"
-          className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#005B96] px-8 py-3 font-semibold hover:bg-[#004a7a]"
+          className="mt-7 inline-flex items-center gap-2 bg-[#005B96] px-8 py-3.5 font-semibold transition hover:bg-[#004a7a]"
         >
-          Spustit OrdiZáznam <ArrowRight className="h-4 w-4" />
+          Spustit OrdiZáznam
+          <ArrowRight className="h-4 w-4" aria-hidden />
         </Link>
       </section>
     </>
