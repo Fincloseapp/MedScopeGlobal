@@ -370,6 +370,78 @@ ${"<p>Další praktický odstavec o nákupním seznamu, týdenním plánu a mýt
     "sleep"
   );
 
+  // Cover mismatch sweep: excerpt calm must not steal diabetes / kids / prevence titles.
+  assert.equal(
+    classifyCoverTopic({
+      title: "Cukrovka 2. typ: klíčová zjištění a praktický průvodce",
+      slug: "verejnost-nemoci-2026-07-27-cukrovka-2-typu-jak-zit-plnohodnotne-s-chronickym-onemocnenim",
+      excerpt: "Přinášíme pohled na cukrovku 2. typu bez zbytečného stresu a se konkrétními kroky.",
+    }),
+    "clinical"
+  );
+  assert.equal(
+    classifyCoverTopic({
+      title: "Školní zvonění a sirény imunity: Jak vyzbrojit děti na podzimní nápor",
+      slug: "verejnost-zivotni-styl-2026-08-03-navrat-do-skoly-a-imunita-deti-jak-zajistit-nejlepsi-ochranu",
+      excerpt: "Prázdniny končí a s nimi i klidné dny. Jakmile se třídy znovu naplní…",
+    }),
+    "walk"
+  );
+  assert.equal(
+    classifyCoverTopic({
+      title: "Jak si vybudovat pevné zdraví: 5 pilířů pro život plný energie",
+      slug: "verejnost-prevence-2026-06-14-prevence-kardiovaskularnich-onemocneni-prakticke-rady-pro-kazdodenni-zdravi",
+      excerpt: "Unavuje vás kolísání energie? Objevte praktické kroky a dietní návyky bez extrémů.",
+    }),
+    "research"
+  );
+  assert.equal(
+    classifyCoverTopic({
+      title: "Menopauza a kosti: rozhovor s gynekologem o HRT, mýtech a screeningu",
+      slug: "verejnost-rozhovory-2026-08-14-menopauza-a-kosti-rozhovor-s-gynekologem-o-hrt-mytech-a-screeningu",
+    }),
+    "seniors"
+  );
+
+  const diabetesFromCalmAbs = resolveArticleCoverUrl({
+    title: "Cukrovka 2. typ: klíčová zjištění a praktický průvodce",
+    slug: "verejnost-nemoci-2026-07-27-cukrovka-2-typu",
+    excerpt: "Bez zbytečného stresu.",
+    coverImageUrl: "https://medscopeglobal.com/assets/covers/calm-2.webp",
+    preferCurated: true,
+  });
+  assert.ok(
+    diabetesFromCalmAbs?.includes("clinical") ||
+      diabetesFromCalmAbs?.includes("research") ||
+      diabetesFromCalmAbs?.includes("vitals"),
+    `diabetes must remap absolute calm-2 → clinical pool, got ${diabetesFromCalmAbs}`
+  );
+
+  const kidsFromCalm = resolveArticleCoverUrl({
+    title: "Školní zvonění a sirény imunity: Jak vyzbrojit děti na podzimní nápor",
+    slug: "verejnost-zivotni-styl-2026-08-03-navrat-do-skoly-a-imunita-deti",
+    excerpt: "Prázdniny končí a s nimi i klidné dny.",
+    coverImageUrl: "/assets/covers/calm.webp",
+    preferCurated: true,
+  });
+  assert.ok(
+    kidsFromCalm?.includes("walk") || kidsFromCalm?.includes("movement"),
+    `kids/school must remap calm → walk/movement, got ${kidsFromCalm}`
+  );
+
+  const menopauseCover = resolveArticleCoverUrl({
+    title: "Menopauza a kosti: rozhovor s gynekologem o HRT",
+    slug: "verejnost-rozhovory-2026-08-14-menopauza-a-kosti",
+    coverImageUrl:
+      "https://xcydgqnivxfhprbmdyym.supabase.co/storage/v1/object/public/media/v25-images/images/verejnost/x.webp",
+    preferCurated: true,
+  });
+  assert.ok(
+    menopauseCover === "/assets/covers/seniors.webp" ||
+      menopauseCover === "/assets/covers/walk.webp",
+    `menopause stale stock → seniors pool, got ${menopauseCover}`
+  );
+
   assert.equal(
     resolveArticleCoverUrl({
       title: "x",

@@ -190,7 +190,7 @@ const LOCAL_COVER_TOPICS: Partial<
   "/assets/covers/calm-2.webp": ["calm", "sleep"],
   "/assets/covers/movement.webp": ["movement", "walk"],
   "/assets/covers/movement-2.webp": ["movement", "walk"],
-  "/assets/covers/walk.webp": ["walk", "movement"],
+  "/assets/covers/walk.webp": ["walk", "movement", "seniors"],
   "/assets/covers/seniors.webp": ["seniors"],
   "/assets/covers/clinical.webp": ["clinical", "research", "vitals"],
   "/assets/covers/clinical-2.webp": ["clinical", "research", "vitals"],
@@ -199,7 +199,7 @@ const LOCAL_COVER_TOPICS: Partial<
   "/assets/covers/research-2.webp": ["research", "clinical"],
   "/assets/covers/science.webp": ["research", "tech"],
   "/assets/covers/tech.webp": ["tech"],
-  "/assets/covers/vitals.webp": ["vitals", "clinical"],
+  "/assets/covers/vitals.webp": ["vitals", "clinical", "tech"],
 };
 
 const FOOD_RE =
@@ -266,17 +266,27 @@ export function classifyCoverTopic(input: {
   publicTopic?: string | null;
 }): CoverVisualTopic {
   const hay = haystack(input);
-  // Title + slug only — excerpt often says “bez stresu” / “více energie” and must
-  // not steal Mediterranean / protein heroes onto calm or sleep stock.
+  // Title + slug only — excerpt often says “bez stresu” / “diet” / “klid” and must
+  // not steal Mediterranean / protein / diabetes / kids heroes onto calm or food stock.
   const titleSlug = [input.title, input.slug].filter(Boolean).join(" ");
   const topic = (input.publicTopic ?? "").toLowerCase();
 
-  // 1) Title/slug sleep before title/slug food — “zimní únava + pitný režim” stays sleep.
-  // 2) Title/slug food before full-haystack calm — “středomořský… bez zbytečného stresu”
-  //    in the excerpt must stay on food covers.
-  // 3) Food before movement/seniors — “bílkoviny … klíč k síle” / “…senioři…” stay food.
+  // Strong title/slug signals before any excerpt-driven calm/food matches.
+  // 1) Sleep before food — “zimní únava + pitný režim” stays sleep.
+  // 2) Food before seniors/movement — “bílkoviny … senioři / síla” stays food.
+  // 3) Clinical / kids / research before excerpt calm — “cukrovka… stres”, “školní… klid”.
   if (SLEEP_RE.test(titleSlug)) return "sleep";
   if (FOOD_RE.test(titleSlug) || topic.includes("strav")) return "food";
+  if (SENIORS_RE.test(titleSlug)) return "seniors";
+  if (KIDS_RE.test(titleSlug)) return "walk";
+  if (VITALS_RE.test(titleSlug)) return "vitals";
+  if (MOVEMENT_RE.test(titleSlug)) return "movement";
+  if (TECH_RE.test(titleSlug)) return "tech";
+  if (RESEARCH_RE.test(titleSlug) || topic.includes("prevence")) return "research";
+  if (CLINICAL_RE.test(titleSlug) || topic.includes("nemoci")) return "clinical";
+  if (CALM_RE.test(titleSlug)) return "calm";
+
+  // Weaker excerpt / category signals
   if (SLEEP_RE.test(hay)) return "sleep";
   if (CALM_RE.test(hay)) return "calm";
   if (FOOD_RE.test(hay)) return "food";
@@ -292,12 +302,35 @@ export function classifyCoverTopic(input: {
   return "research";
 }
 
+/** Normalize absolute or relative cover URLs to `/assets/covers/…` path when local. */
+export function normalizeLocalCoverPath(
+  url: string | null | undefined
+): string | null {
+  if (!url?.trim()) return null;
+  const raw = url.trim().split("?")[0]!;
+  if (/^\/assets\/covers\//i.test(raw)) return raw.toLowerCase();
+  try {
+    const pathname = new URL(raw).pathname;
+    if (/^\/assets\/covers\//i.test(pathname)) return pathname.toLowerCase();
+  } catch {
+    // not a URL
+  }
+  const idx = raw.toLowerCase().indexOf("/assets/covers/");
+  if (idx >= 0) return raw.slice(idx).toLowerCase();
+  return null;
+}
+
 export function pickCuratedCover(
   topic: CoverVisualTopic,
   seed: string
 ): string {
   const pool = COVER_POOL[topic] ?? COVER_POOL.research;
-  return pool[hashString(seed) % pool.length]!;
+  const allowed = pool.filter((path) => {
+    const topics = LOCAL_COVER_TOPICS[path.toLowerCase()];
+    return !topics || topics.includes(topic);
+  });
+  const use = allowed.length > 0 ? allowed : pool;
+  return use[hashString(seed) % use.length]!;
 }
 
 export function isDeniedStockUrl(url: string | null | undefined): boolean {
@@ -334,9 +367,8 @@ export function isMismatchedLocalCover(
   url: string | null | undefined,
   topic: CoverVisualTopic
 ): boolean {
-  if (!url?.trim()) return false;
-  const normalized = url.split("?")[0]!.toLowerCase();
-  if (!normalized.startsWith("/assets/covers/")) return false;
+  const normalized = normalizeLocalCoverPath(url);
+  if (!normalized) return false;
   const allowed = LOCAL_COVER_TOPICS[normalized];
   if (!allowed) return false;
   return !allowed.includes(topic);
@@ -385,16 +417,16 @@ export function resolveArticleCoverUrl(input: {
     return curated;
   }
 
-  // Local covers: keep only when topic-appropriate (clinical.webp is not food art)
-  if (raw && /^\/assets\/covers\//i.test(raw)) {
-    return isMismatchedLocalCover(raw, topic) ? curated : raw;
+  // Local covers (relative or absolute site URL): keep only when topic-appropriate
+  const localPath = normalizeLocalCoverPath(raw);
+  if (localPath) {
+    return isMismatchedLocalCover(localPath, topic) ? curated : localPath;
   }
 
   // Marketing / newsletter art — keep as-is
   if (
     raw &&
-    (/^\/assets\/newsletter\//i.test(raw) ||
-      /^\/assets\/marketing\//i.test(raw))
+    (/\/assets\/newsletter\//i.test(raw) || /\/assets\/marketing\//i.test(raw))
   ) {
     return raw;
   }
