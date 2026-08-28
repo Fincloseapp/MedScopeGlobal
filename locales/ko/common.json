@@ -1,11 +1,13 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "임상 인텔리전스와 근거 기반 의학"
+    "tagline": "건강을 분명히. 더 오래, 더 건강하게.",
+    "magazine": "VitaScope",
+    "magazineTagline": "글로벌 건강·장수 매거진 — 모든 연령에서 더 건강하고 더 길게"
   },
   "nav": {
     "home": "홈",
-    "magazine": "매거진",
+    "magazine": "VitaScope",
     "pricing": "요금",
     "welcome": "플랫폼",
     "sections": "섹션",

@@ -1,11 +1,13 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "Trí tuệ lâm sàng và y học dựa trên bằng chứng"
+    "tagline": "Rõ ràng về sức khỏe. Sống lâu và tốt hơn.",
+    "magazine": "VitaScope",
+    "magazineTagline": "Tạp chí sức khỏe & trường thọ toàn cầu — sống tốt hơn, lâu hơn"
   },
   "nav": {
     "home": "Trang chủ",
-    "magazine": "Tạp chí",
+    "magazine": "VitaScope",
     "pricing": "Bảng giá",
     "welcome": "Nền tảng",
     "sections": "Mục",

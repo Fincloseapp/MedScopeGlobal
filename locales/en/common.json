@@ -16,7 +16,10 @@
     "articles": "Articles",
     "search": "Search",
     "login": "Sign in",
-    "signup": "Register"
+    "signup": "Register",
+    "audiences": "For you",
+    "medicine": "Medicine",
+    "subscribe": "Subscribe"
   },
   "sections": {
     "title": "Medical sections",
@@ -160,5 +163,8 @@
     "localeArticles": "Articles and UI follow your device language. Foreign-language items are translated when displayed.",
     "localeDevice": "Site language follows your phone or computer primary language. Use the header switcher to override.",
     "translatedArticle": "This article was automatically translated into your selected language."
+  },
+  "disclaimer": {
+    "medical": "Content is not medical diagnosis or treatment advice. Always consult your physician."
   }
 }

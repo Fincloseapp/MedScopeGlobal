@@ -22,6 +22,7 @@ import {
 } from "@/lib/brand/magazine";
 import { SITE } from "@/lib/config/site";
 import { publicationJsonLd } from "@/lib/seo/json-ld";
+import { formatPortal, getPortalUi, showCzechAcademyPrep } from "@/lib/i18n/portal-copy";
 
 export const revalidate = 45;
 
@@ -81,16 +82,18 @@ export default async function HomePage() {
       ))}
 
       {/* Story: VitaScope hero → magazín → apps/VIP → CTA (PortalHome). Pricing lives on /predplatne — not duplicated under the portal. */}
-      <PortalHome articles={articles} philosophy={philosophy} />
+      <PortalHome articles={articles} philosophy={philosophy} locale={locale} />
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
-      <V272WhyTrustBlock />
-      <V272AcademyHomeSections />
-      <V271B2bBlock />
+      <V272WhyTrustBlock locale={locale} />
+      {showCzechAcademyPrep(locale) ? <V272AcademyHomeSections /> : null}
+      <V271B2bBlock locale={locale} />
 
       <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6">
         <p className="border-t border-slate-200 pt-6 text-sm leading-relaxed text-slate-600">
-          {MAGAZINE.name} na {SITE.name} je vzdělávací magazín zdraví a dlouhověkosti — není přijímací
-          komise ani oficiální učebnice LF. Obsah nenahrazuje individuální lékařskou radu.
+          {formatPortal(getPortalUi(locale).footerDisclaimer, {
+            magazine: MAGAZINE.name,
+            site: SITE.name,
+          })}
         </p>
       </section>
     </div>

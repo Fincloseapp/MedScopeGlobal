@@ -14,11 +14,13 @@ import {
   isLocaleRoutingExcluded,
 } from "../lib/i18n/locale-path";
 import { normalizeLocale } from "../lib/i18n/config";
-import { getHomepageTitle, getOgLocale } from "../lib/brand/magazine";
+import { getHomepageTitle, getOgLocale, getMagazineCopy } from "../lib/brand/magazine";
 import { buildGlobalHreflang } from "../lib/ecosystem/seo";
 import { buildPageMetadata } from "../lib/seo/metadata";
 import { allLocaleSitemapUrls } from "../lib/seo/locale-sitemap";
-import { GLOBAL_LOCALES } from "../lib/ecosystem/locales";
+import { GLOBAL_LOCALES, MEDICAL_DISCLAIMER } from "../lib/ecosystem/locales";
+import { getPortalUi } from "../lib/i18n/portal-copy";
+import { pickCopyLocale } from "../lib/i18n/copy-locale";
 import {
   detectClientLanguage,
   getPreferredLocale,
@@ -52,7 +54,7 @@ assert.ok(getHomepageTitle("sk").includes("Dlhovekosť") || getHomepageTitle("sk
 assert.ok(getHomepageTitle("ru").includes("долголетие") || getHomepageTitle("ru").includes("Долголетие") || getHomepageTitle("ru").includes("Здоровье"));
 assert.ok(getHomepageTitle("ko").includes("건강"));
 assert.ok(getHomepageTitle("ro").includes("Sănătate") || getHomepageTitle("ro").includes("longevitate"));
-assert.ok(getHomepageTitle("hu").includes("Egészség") || getHomepageTitle("hu").includes("hosszúélet"));
+assert.ok(getHomepageTitle("hu").includes("Egészség") || getHomepageTitle("hu").includes("hosszú"));
 assert.equal(getOgLocale("de"), "de_DE");
 assert.equal(getOgLocale("pl"), "pl_PL");
 assert.equal(getOgLocale("fr"), "fr_FR");
@@ -104,6 +106,30 @@ const sitemaps = allLocaleSitemapUrls();
 assert.equal(sitemaps.length, GLOBAL_LOCALES.length);
 assert.ok(sitemaps.some((u) => u.endsWith("/sitemap-cs.xml")));
 assert.ok(sitemaps.some((u) => u.endsWith("/sitemap-en-us.xml")));
+
+assert.ok(getMagazineCopy("de").eyebrow.includes("Plattform"));
+assert.ok(!getMagazineCopy("de").eyebrow.includes("powered by"));
+assert.ok(getMagazineCopy("en").eyebrow.includes("powered by"));
+assert.ok(getMagazineCopy("fr").tagline.includes("clarté"));
+assert.equal(pickCopyLocale("en-US"), "en");
+assert.equal(pickCopyLocale("jp"), "ja");
+assert.equal(pickCopyLocale("cn"), "zh-CN");
+assert.ok(MEDICAL_DISCLAIMER.pl.includes("konsultuj się"));
+assert.ok(MEDICAL_DISCLAIMER.it.includes("Consulti sempre"));
+assert.equal(getPortalUi("cs").readMagazine, "Číst magazín");
+assert.equal(getPortalUi("de").readMagazine, "Magazin lesen");
+assert.equal(getPortalUi("pl").readMagazine, "Czytaj magazyn");
+assert.equal(getPortalUi("ja").readMagazine, "雑誌を読む");
+assert.equal(getPortalUi("zh-CN").readMagazine, "阅读杂志");
+assert.ok(!getPortalUi("fr").startWith.includes("powered by"));
+for (const loc of GLOBAL_LOCALES) {
+  const ui = getPortalUi(loc.code);
+  assert.ok(ui.readMagazine.trim().length > 0, `${loc.code} portal chrome missing`);
+  assert.ok(ui.trial14.trim().length > 0, `${loc.code} trial CTA missing`);
+  if (loc.code !== "en" && loc.code !== "en-US") {
+    assert.ok(!ui.footerTagline.includes("powered by"), `${loc.code} leftover English powered by`);
+  }
+}
 
 console.log("✓ i18n/SEO unit checks passed");
 
@@ -171,6 +197,16 @@ async function runHttpSmoke(): Promise<void> {
   assert.ok(
     /hrefLang="en-US"|hreflang="en-US"/i.test(enUsHtml),
     "/en-us should emit hreflang en-US"
+  );
+
+  const deHtml = await fetchHtml("/de");
+  assert.ok(
+    deHtml.includes("Magazin lesen") || deHtml.includes("Gesundheit"),
+    "/de homepage should render German chrome, not Czech-only"
+  );
+  assert.ok(
+    !deHtml.includes("Číst magazín"),
+    "/de must not keep Czech hero CTA"
   );
 
   console.log(`✓ HTTP smoke passed against ${origin}`);

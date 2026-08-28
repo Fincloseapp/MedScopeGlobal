@@ -1,11 +1,13 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "Klinikai intelligencia és evidencián alapuló orvostudomány"
+    "tagline": "Világosan az egészségről. Éljen tovább és jobban.",
+    "magazine": "VitaScope",
+    "magazineTagline": "Globális egészség- és hosszúélet-magazin — éljen jobban és tovább"
   },
   "nav": {
     "home": "Kezdőlap",
-    "magazine": "Magazin",
+    "magazine": "VitaScope",
     "pricing": "Árak",
     "welcome": "Platform",
     "sections": "Szekciók",
@@ -32,7 +34,7 @@
     "medical": "A tartalom nem minősül orvosi diagnózisnak vagy kezelési javaslatnak. Mindig konzultáljon orvosával."
   },
   "vip": {
-    "title": "VIP longevity protokollok",
+    "title": "VIP hosszúélet-protokollok",
     "subtitle": "10 evidencián alapuló protokoll alvásra, anyagcserére, immunitásra és hosszú életre.",
     "price": "1 990 Ft/hó"
   },

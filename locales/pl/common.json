@@ -1,11 +1,13 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "Inteligencja kliniczna i medycyna oparta na dowodach"
+    "tagline": "Jasno o zdrowiu. Żyj dłużej i lepiej.",
+    "magazine": "VitaScope",
+    "magazineTagline": "Globalny magazyn zdrowia i długowieczności — żyj lepiej i dłużej"
   },
   "nav": {
     "home": "Strona główna",
-    "magazine": "Magazyn",
+    "magazine": "VitaScope",
     "pricing": "Cennik",
     "welcome": "Platforma",
     "sections": "Sekcje",
@@ -29,10 +31,10 @@
     "exploreProtocols": "Poznaj protokoły"
   },
   "disclaimer": {
-    "medical": "Treść nie stanowi diagnozy medycznej ani zaleceń terapeutycznych. Zawsze konsultuj z lekarzem."
+    "medical": "Treść nie stanowi diagnozy medycznej ani zaleceń terapeutycznych. Zawsze konsultuj się z lekarzem."
   },
   "vip": {
-    "title": "Protokoły VIP longevity",
+    "title": "Protokoły VIP długowieczności",
     "subtitle": "10 protokołów opartych na dowodach dla snu, metabolizmu, odporności i długowieczności.",
     "price": "29 zł/miesiąc"
   },

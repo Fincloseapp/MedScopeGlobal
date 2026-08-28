@@ -1,11 +1,12 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "क्लिनिकल इंटेलिजेंस और साक्ष्य-आधारित चिकित्सा"
+    "tagline": "क्लिनिकल इंटेलिजेंस और साक्ष्य-आधारित चिकित्सा",
+    "magazine": "VitaScope"
   },
   "nav": {
     "home": "होम",
-    "magazine": "पत्रिका",
+    "magazine": "VitaScope",
     "pricing": "मूल्य",
     "welcome": "प्लेटफ़ॉर्म",
     "sections": "अनुभाग",

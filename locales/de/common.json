@@ -1,11 +1,13 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "Klinische Intelligenz und evidenzbasierte Medizin"
+    "tagline": "Klar über Gesundheit. Länger und besser leben.",
+    "magazine": "VitaScope",
+    "magazineTagline": "Globales Magazin für Gesundheit & Langlebigkeit — besser und länger leben"
   },
   "nav": {
     "home": "Start",
-    "magazine": "Magazin",
+    "magazine": "VitaScope",
     "pricing": "Preise",
     "welcome": "Plattform",
     "sections": "Bereiche",
@@ -32,7 +34,7 @@
     "medical": "Der Inhalt stellt keine medizinische Diagnose oder Behandlungsempfehlung dar. Konsultieren Sie immer Ihren Arzt."
   },
   "vip": {
-    "title": "VIP Longevity-Protokolle",
+    "title": "VIP-Langlebigkeitsprotokolle",
     "subtitle": "10 evidenzbasierte Protokolle für Schlaf, Stoffwechsel, Immunität und Langlebigkeit.",
     "price": "5,99 €/Monat"
   },

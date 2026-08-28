@@ -1,11 +1,12 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "الذكاء السريري والطب المبني على الأدلة"
+    "tagline": "الذكاء السريري والطب المبني على الأدلة",
+    "magazine": "VitaScope"
   },
   "nav": {
     "home": "الرئيسية",
-    "magazine": "المجلة",
+    "magazine": "VitaScope",
     "pricing": "الأسعار",
     "welcome": "المنصة",
     "sections": "الأقسام",

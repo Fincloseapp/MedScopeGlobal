@@ -1,11 +1,12 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "Inteligência clínica e medicina baseada em evidências"
+    "tagline": "Inteligência clínica e medicina baseada em evidências",
+    "magazine": "VitaScope"
   },
   "nav": {
     "home": "Início",
-    "magazine": "Revista",
+    "magazine": "VitaScope",
     "pricing": "Preços",
     "welcome": "Plataforma",
     "sections": "Secções",

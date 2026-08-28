@@ -1,11 +1,13 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "臨床インテリジェンスとエビデンスに基づく医学"
+    "tagline": "健康を見通す。より長く生きる。",
+    "magazine": "VitaScope",
+    "magazineTagline": "グローバルな健康・長寿マガジン — どの年代でも、より良く、より長く"
   },
   "nav": {
     "home": "ホーム",
-    "magazine": "マガジン",
+    "magazine": "VitaScope",
     "pricing": "料金",
     "welcome": "プラットフォーム",
     "sections": "セクション",
@@ -32,7 +34,7 @@
     "medical": "このコンテンツは医学的診断や治療の推奨ではありません。必ず医師にご相談ください。"
   },
   "vip": {
-    "title": "VIP ロンジェビティプロトコル",
+    "title": "VIP 長寿プロトコル",
     "subtitle": "睡眠、代謝、免疫、長寿のための10のエビデンスベースプロトコル。",
     "price": "¥600/月"
   },

@@ -51,7 +51,11 @@
   "donation": {
     "title": "Support the Author",
     "subtitle": "A micro-donation helps continue creating quality content.",
-    "amounts": ["$2.99", "$4.99", "$9.99"],
+    "amounts": [
+      "$2.99",
+      "$4.99",
+      "$9.99"
+    ],
     "custom": "Custom amount"
   },
   "trends": {

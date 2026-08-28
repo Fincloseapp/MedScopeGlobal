@@ -1,11 +1,13 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "Klinická inteligencia a medicína založená na dôkazoch"
+    "tagline": "Jasne o zdraví. Dĺžka aj kvalita života.",
+    "magazine": "VitaScope",
+    "magazineTagline": "Globálny magazín zdravia a dlhovekosti — žite lepšie a dlhšie v každom veku"
   },
   "nav": {
     "home": "Domov",
-    "magazine": "Magazín",
+    "magazine": "VitaScope",
     "pricing": "Cenník",
     "welcome": "O platforme",
     "sections": "Sekcie",
@@ -32,7 +34,7 @@
     "medical": "Obsah nie je lekárska diagnóza ani liečebné odporúčanie. Vždy konzultujte so svojím lekárom."
   },
   "vip": {
-    "title": "VIP longevity protokoly",
+    "title": "VIP protokoly dlhovekosti",
     "subtitle": "10 protokolov založených na dôkazoch pre spánok, metabolizmus, imunitu a dlhovekosť.",
     "price": "5,99 €/mesiac"
   },

@@ -9,22 +9,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LOCALES, REGIONS } from "@/lib/i18n/config";
+import { GLOBAL_LOCALES } from "@/lib/ecosystem/locales";
+import { REGIONS } from "@/lib/i18n/config";
 import { buildLocalePath, resolveLocalePath } from "@/lib/i18n/locale-path";
 import { setPreferredLocale, clearPreferredLocale } from "@/lib/i18n/detect-language";
+import { getPortalUi } from "@/lib/i18n/portal-copy";
+import { cn } from "@/lib/utils";
 
 export function LocaleSwitcher({
   currentLocale = "cs",
   currentRegion = "EU",
+  compact = false,
 }: {
   currentLocale?: string;
   currentRegion?: string;
+  compact?: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const [locale, setLocale] = useState(currentLocale);
   const [region, setRegion] = useState(currentRegion);
   const [saving, setSaving] = useState(false);
+  const ui = getPortalUi(currentLocale);
 
   function pathWithoutLocale(): string {
     const { pathname: stripped } = resolveLocalePath(pathname);
@@ -53,7 +59,7 @@ export function LocaleSwitcher({
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className={cn("flex items-center gap-1.5", compact && "max-w-full")}>
       <Select
         value={locale}
         disabled={saving}
@@ -62,44 +68,49 @@ export function LocaleSwitcher({
           void persist(v, region);
         }}
       >
-        <SelectTrigger className="h-8 w-[88px] text-xs">
+        <SelectTrigger
+          className={cn("h-8 text-xs", compact ? "w-[7.5rem]" : "w-[10.5rem]")}
+          aria-label={ui.useDeviceLanguage}
+        >
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
-          {LOCALES.slice(0, 8).map((l) => (
-            <SelectItem key={l} value={l}>
-              {l.toUpperCase()}
+        <SelectContent className="max-h-80">
+          {GLOBAL_LOCALES.map((item) => (
+            <SelectItem key={item.code} value={item.code}>
+              {item.label}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
-      <Select
-        value={region}
-        disabled={saving}
-        onValueChange={(v) => {
-          setRegion(v);
-          void persist(locale, v);
-        }}
-      >
-        <SelectTrigger className="h-8 w-[72px] text-xs">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {REGIONS.map((r) => (
-            <SelectItem key={r} value={r}>
-              {r}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {compact ? null : (
+        <Select
+          value={region}
+          disabled={saving}
+          onValueChange={(v) => {
+            setRegion(v);
+            void persist(locale, v);
+          }}
+        >
+          <SelectTrigger className="h-8 w-[72px] text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {REGIONS.map((r) => (
+              <SelectItem key={r} value={r}>
+                {r}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
       <button
         type="button"
         disabled={saving}
         onClick={() => void syncDeviceLanguage()}
         className="text-[10px] text-muted-foreground underline hover:text-foreground"
-        title="Use browser / device language"
+        title={ui.useDeviceLanguage}
       >
-        Auto
+        {ui.switcherAuto}
       </button>
     </div>
   );

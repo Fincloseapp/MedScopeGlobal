@@ -6,48 +6,8 @@
  */
 
 import type { LocaleCode } from "@/lib/i18n/config";
+import { pickCopy } from "@/lib/i18n/copy-locale";
 import { resolveGlobalLocale } from "@/lib/i18n/locale-path";
-
-type CopyLocale =
-  | "cs"
-  | "en"
-  | "de"
-  | "fr"
-  | "es"
-  | "it"
-  | "pl"
-  | "sk"
-  | "ro"
-  | "hu"
-  | "ru"
-  | "uk"
-  | "be"
-  | "ko"
-  | "vi"
-  | "id"
-  | "ja"
-  | "zh-CN";
-
-const COPY_KEYS = [
-  "cs",
-  "en",
-  "de",
-  "fr",
-  "es",
-  "it",
-  "pl",
-  "sk",
-  "ro",
-  "hu",
-  "ru",
-  "uk",
-  "be",
-  "ko",
-  "vi",
-  "id",
-  "ja",
-  "zh-CN",
-] as const;
 
 export const MAGAZINE = {
   /** Global publication brand (EN-primary, used as proper noun in all locales) */
@@ -67,9 +27,9 @@ export const MAGAZINE = {
     it: "Magazine globale di salute e longevità — vivi meglio e più a lungo",
     pl: "Globalny magazyn zdrowia i długowieczności — żyj lepiej i dłużej",
     ro: "Revistă globală de sănătate și longevitate — trăiește mai bine, mai mult",
-    hu: "Globális egészség- és hosszúélet-magazin — élj jobban és tovább",
+    hu: "Globális egészség- és hosszúélet-magazin — éljen jobban és tovább",
     ru: "Глобальный журнал о здоровье и долголетии — живите лучше и дольше",
-    uk: "Глобальний журнал про здоровʼя та довголіття — живіть краще і довше",
+    uk: "Глобальний журнал про здоров'я та довголіття — живіть краще і довше",
     be: "Глабальны часопіс пра здароўе і даўгалецце — жывіце лепш і даўжэй",
     ko: "글로벌 건강·장수 매거진 — 모든 연령에서 더 건강하고 더 길게",
     vi: "Tạp chí sức khỏe & trường thọ toàn cầu — sống tốt hơn, lâu hơn",
@@ -82,16 +42,16 @@ export const MAGAZINE = {
     cs: "Jasně o zdraví. Délka i kvalita života.",
     sk: "Jasne o zdraví. Dĺžka aj kvalita života.",
     de: "Klar über Gesundheit. Länger und besser leben.",
-    fr: "Voir la santé clairement. Vivre plus longtemps.",
+    fr: "La santé en toute clarté. Vivre plus longtemps.",
     es: "Ver la salud con claridad. Vivir más tiempo.",
     it: "Vedere la salute con chiarezza. Vivere più a lungo.",
     pl: "Jasno o zdrowiu. Żyj dłużej i lepiej.",
     ro: "Clar despre sănătate. Trăiește mai mult și mai bine.",
-    hu: "Világosan az egészségről. Élj tovább és jobban.",
+    hu: "Világosan az egészségről. Éljen tovább és jobban.",
     ru: "Ясно о здоровье. Живите дольше и лучше.",
-    uk: "Ясно про здоровʼя. Живіть довше і краще.",
+    uk: "Ясно про здоров'я. Живіть довше і краще.",
     be: "Ясна пра здароўе. Жывіце даўжэй і лепш.",
-    ko: "건강을 분명히. 더 오래, 더 잘 살다.",
+    ko: "건강을 분명히. 더 오래, 더 건강하게.",
     vi: "Rõ ràng về sức khỏe. Sống lâu và tốt hơn.",
     id: "Jelas soal kesehatan. Hidup lebih lama dan lebih baik.",
     ja: "健康を見通す。より長く生きる。",
@@ -99,21 +59,21 @@ export const MAGAZINE = {
   },
   subtitle: {
     en: "Longevity, wellness, and healthy lifestyle for everyone who wants to improve — MediFlow journal, VIP protocols, and MeDipacient · OrdiZapis on one platform. MeDiprep (LF prep) remains as a legacy app.",
-    cs: "Dlouhověkost, wellness a zdravý životní styl pro každého, kdo chce být lépe — deník MediFlow, VIP protokoly a MeDipacient · OrdiZapis na jedné platformě. MeDiprep (příprava na LF) zůstává jako legacy aplikace.",
-    sk: "Dlhovekosť, wellness a zdravý životný štýl — denník MediFlow, VIP protokoly a MeDipacient · OrdiZapis na jednej platforme.",
-    de: "Langlebigkeit, Wellness und gesunder Lebensstil — MediFlow-Tagebuch, VIP-Protokolle und MeDipacient · OrdiZapis auf einer Plattform.",
+    cs: "Dlouhověkost, prevence a zdravý životní styl pro každého, kdo chce být lépe — deník MediFlow, VIP protokoly a MeDipacient · OrdiZapis na jedné platformě. MeDiprep (příprava na LF) zůstává k dispozici.",
+    sk: "Dlhovekosť, prevencia a zdravý životný štýl — denník MediFlow, VIP protokoly a MeDipacient · OrdiZapis na jednej platforme.",
+    de: "Langlebigkeit, Prävention und gesunder Lebensstil — MediFlow-Tagebuch, VIP-Protokolle und MeDipacient · OrdiZapis auf einer Plattform.",
     fr: "Longévité, bien-être et mode de vie sain — journal MediFlow, protocoles VIP et MeDipacient · OrdiZapis sur une seule plateforme.",
     es: "Longevidad, bienestar y estilo de vida saludable — diario MediFlow, protocolos VIP y MeDipacient · OrdiZapis en una plataforma.",
     it: "Longevità, benessere e stile di vita sano — diario MediFlow, protocolli VIP e MeDipacient · OrdiZapis su un'unica piattaforma.",
-    pl: "Długowieczność, wellness i zdrowy styl życia — dziennik MediFlow, protokoły VIP oraz MeDipacient · OrdiZapis na jednej platformie.",
-    ro: "Longevitate, wellness și stil de viață sănătos — jurnal MediFlow, protocoale VIP și MeDipacient · OrdiZapis pe o platformă.",
-    hu: "Hosszúélet, wellness és egészséges életmód — MediFlow napló, VIP protokollok és MeDipacient · OrdiZapis egy platformon.",
-    ru: "Долголетие, wellness и здоровый образ жизни — дневник MediFlow, VIP-протоколы и MeDipacient · OrdiZapis на одной платформе.",
-    uk: "Довголіття, wellness і здоровий спосіб життя — щоденник MediFlow, VIP-протоколи та MeDipacient · OrdiZapis на одній платформі.",
-    be: "Даўгалецце, wellness і здаровы лад жыцця — дзённік MediFlow, VIP-пратаколы і MeDipacient · OrdiZapis на адной платформе.",
-    ko: "장수·웰니스·건강한 생활 — MediFlow 일기, VIP 프로토콜, MeDipacient · OrdiZapis를 하나의 플랫폼에서.",
-    vi: "Trường thọ, wellness và lối sống lành mạnh — nhật ký MediFlow, giao thức VIP và MeDipacient · OrdiZapis trên một nền tảng.",
-    id: "Umur panjang, wellness, dan gaya hidup sehat — jurnal MediFlow, protokol VIP, serta MeDipacient · OrdiZapis di satu platform.",
+    pl: "Długowieczność, profilaktyka i zdrowy styl życia — dziennik MediFlow, protokoły VIP oraz MeDipacient · OrdiZapis na jednej platformie.",
+    ro: "Longevitate, prevenție și stil de viață sănătos — jurnal MediFlow, protocoale VIP și MeDipacient · OrdiZapis pe o platformă.",
+    hu: "Hosszú élet, prevenció és egészséges életmód — MediFlow napló, VIP protokollok és MeDipacient · OrdiZapis egy platformon.",
+    ru: "Долголетие, профилактика и здоровый образ жизни — дневник MediFlow, VIP-протоколы и MeDipacient · OrdiZapis на одной платформе.",
+    uk: "Довголіття, профілактика і здоровий спосіб життя — щоденник MediFlow, VIP-протоколи та MeDipacient · OrdiZapis на одній платформі.",
+    be: "Даўгалецце, прафілактыка і здаровы лад жыцця — дзённік MediFlow, VIP-пратаколы і MeDipacient · OrdiZapis на адной платформе.",
+    ko: "장수·예방·건강한 생활 — MediFlow 일기, VIP 프로토콜, MeDipacient · OrdiZapis를 하나의 플랫폼에서.",
+    vi: "Trường thọ, phòng ngừa và lối sống lành mạnh — nhật ký MediFlow, giao thức VIP và MeDipacient · OrdiZapis trên một nền tảng.",
+    id: "Umur panjang, pencegahan, dan gaya hidup sehat — jurnal MediFlow, protokol VIP, serta MeDipacient · OrdiZapis di satu platform.",
     ja: "長寿・ウェルネス・健康的なライフスタイル — MediFlow日記、VIPプロトコル、MeDipacient · OrdiZapisを一つのプラットフォームで。",
     "zh-CN": "长寿、健康与生活方式 — MediFlow日记、VIP方案以及 MeDipacient · OrdiZapis 同在一个平台。",
   },
@@ -127,9 +87,9 @@ export const MAGAZINE = {
     it: "Salute, longevità e stile di vita — per tutti",
     pl: "Zdrowie, długowieczność i styl życia — dla każdego",
     ro: "Sănătate, longevitate și stil de viață — pentru toți",
-    hu: "Egészség, hosszúélet és életmód — mindenkinek",
+    hu: "Egészség, hosszú élet és életmód — mindenkinek",
     ru: "Здоровье, долголетие и образ жизни — для каждого",
-    uk: "Здоровʼя, довголіття та спосіб життя — для кожного",
+    uk: "Здоров'я, довголіття та спосіб життя — для кожного",
     be: "Здароўе, даўгалецце і лад жыцця — для кожнага",
     ko: "건강·장수·라이프스타일 — 모두를 위해",
     vi: "Sức khỏe, trường thọ & lối sống — cho mọi người",
@@ -141,21 +101,21 @@ export const MAGAZINE = {
     en: "VitaScope · powered by MedScopeGlobal",
     cs: "VitaScope · platforma MedScopeGlobal",
     sk: "VitaScope · platforma MedScopeGlobal",
-    de: "VitaScope · powered by MedScopeGlobal",
-    fr: "VitaScope · powered by MedScopeGlobal",
-    es: "VitaScope · powered by MedScopeGlobal",
-    it: "VitaScope · powered by MedScopeGlobal",
-    pl: "VitaScope · powered by MedScopeGlobal",
-    ro: "VitaScope · powered by MedScopeGlobal",
-    hu: "VitaScope · powered by MedScopeGlobal",
-    ru: "VitaScope · powered by MedScopeGlobal",
-    uk: "VitaScope · powered by MedScopeGlobal",
-    be: "VitaScope · powered by MedScopeGlobal",
-    ko: "VitaScope · powered by MedScopeGlobal",
-    vi: "VitaScope · powered by MedScopeGlobal",
-    id: "VitaScope · powered by MedScopeGlobal",
-    ja: "VitaScope · powered by MedScopeGlobal",
-    "zh-CN": "VitaScope · powered by MedScopeGlobal",
+    de: "VitaScope · Plattform von MedScopeGlobal",
+    fr: "VitaScope · une plateforme MedScopeGlobal",
+    es: "VitaScope · plataforma MedScopeGlobal",
+    it: "VitaScope · piattaforma MedScopeGlobal",
+    pl: "VitaScope · platforma MedScopeGlobal",
+    ro: "VitaScope · platformă MedScopeGlobal",
+    hu: "VitaScope · MedScopeGlobal platform",
+    ru: "VitaScope · платформа MedScopeGlobal",
+    uk: "VitaScope · платформа MedScopeGlobal",
+    be: "VitaScope · платформа MedScopeGlobal",
+    ko: "VitaScope · MedScopeGlobal 플랫폼",
+    vi: "VitaScope · nền tảng MedScopeGlobal",
+    id: "VitaScope · platform MedScopeGlobal",
+    ja: "VitaScope · MedScopeGlobal のプラットフォーム",
+    "zh-CN": "VitaScope · MedScopeGlobal 平台",
   },
   whatsNew: {
     en: "New: global ecosystem — MediFlow journal, VIP longevity, autonomous editorial, 19 locales",
@@ -167,7 +127,7 @@ export const MAGAZINE = {
     it: "Novità: ecosistema globale — MediFlow, longevità VIP, redazione autonoma, 19 lingue",
     pl: "Nowość: globalny ekosystem — MediFlow, VIP długowieczność, autonomiczna redakcja, 19 języków",
     ro: "Nou: ecosistem global — MediFlow, longevitate VIP, redacție autonomă, 19 limbi",
-    hu: "Új: globális ökoszisztéma — MediFlow, VIP hosszúélet, autonóm szerkesztőség, 19 nyelv",
+    hu: "Új: globális ökoszisztéma — MediFlow, VIP hosszú élet, autonóm szerkesztőség, 19 nyelv",
     ru: "Новое: глобальная экосистема — MediFlow, VIP-долголетие, автономная редакция, 19 языков",
     uk: "Нове: глобальна екосистема — MediFlow, VIP-довголіття, автономна редакція, 19 мов",
     be: "Новае: глабальная экасістэма — MediFlow, VIP-даўгалецце, аўтаномная рэдакцыя, 19 моў",
@@ -185,28 +145,6 @@ export const EDITORIAL_PILLARS = [
   { id: "seniors", share: 15, label: { en: "Seniors & caregivers", cs: "Senioři a pečovatelé" } },
   { id: "trends", share: 20, label: { en: "Trends & evidence", cs: "Trendy a evidence" } },
 ] as const;
-
-function pickCopyLocale(locale?: string): CopyLocale {
-  if (!locale || locale === "cs" || locale.startsWith("cs-") || locale.startsWith("cs_")) {
-    return "cs";
-  }
-  try {
-    const resolved = resolveGlobalLocale(locale);
-    if ((COPY_KEYS as readonly string[]).includes(resolved)) {
-      return resolved as CopyLocale;
-    }
-    if (resolved === "en-US" || resolved === "en") return "en";
-  } catch {
-    // fall through
-  }
-  if (locale.startsWith("en")) return "en";
-  return "en";
-}
-
-function pick<T extends Record<CopyLocale, string>>(bag: T, locale?: string): string {
-  const key = pickCopyLocale(locale);
-  return bag[key] ?? bag.en;
-}
 
 /** Open Graph locale token (underscore form) for a site locale. */
 export function getOgLocale(locale?: LocaleCode | string): string {
@@ -245,12 +183,12 @@ export function getMagazineCopy(locale?: LocaleCode | string) {
     name: MAGAZINE.name,
     platform: MAGAZINE.platform,
     magazineName: MAGAZINE.name,
-    eyebrow: pick(MAGAZINE.heroEyebrow, locale),
-    claim: pick(MAGAZINE.heroClaim, locale),
-    tagline: pick(MAGAZINE.tagline, locale),
-    subtitle: pick(MAGAZINE.subtitle, locale),
-    whatsNew: pick(MAGAZINE.whatsNew, locale),
-    positioning: pick(MAGAZINE.positioning, locale),
+    eyebrow: pickCopy(MAGAZINE.heroEyebrow, locale),
+    claim: pickCopy(MAGAZINE.heroClaim, locale),
+    tagline: pickCopy(MAGAZINE.tagline, locale),
+    subtitle: pickCopy(MAGAZINE.subtitle, locale),
+    whatsNew: pickCopy(MAGAZINE.whatsNew, locale),
+    positioning: pickCopy(MAGAZINE.positioning, locale),
   };
 }
 

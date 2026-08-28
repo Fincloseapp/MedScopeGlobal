@@ -1,11 +1,13 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "临床智能与循证医学"
+    "tagline": "看清健康。活得更久。",
+    "magazine": "VitaScope",
+    "magazineTagline": "全球健康与长寿杂志 — 每个年龄都活得更好、更久"
   },
   "nav": {
     "home": "首页",
-    "magazine": "杂志",
+    "magazine": "VitaScope",
     "pricing": "定价",
     "welcome": "平台",
     "sections": "栏目",

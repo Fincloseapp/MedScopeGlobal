@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Crown, TrendingUp, Sparkles, ArrowRight } from "lucide-react";
 import { LONGEVITY_PROTOCOLS, localizedText } from "@/lib/ecosystem/longevity-protocols";
 import { TopLongevityProducts } from "@/components/monetization/affiliate-box";
+import { getPortalUi } from "@/lib/i18n/portal-copy";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 /** Trendy 2026–2027 section */
 export function TrendySection() {
@@ -44,18 +46,20 @@ export function TrendySection() {
 }
 
 /** Longevity protocols preview on homepage */
-export function LongevityProtocolsSection() {
+export function LongevityProtocolsSection({ locale = "cs" }: { locale?: string }) {
   const preview = LONGEVITY_PROTOCOLS.slice(0, 4);
+  const ui = getPortalUi(locale);
+  const protocolLocale = locale.startsWith("en") ? (locale === "en-US" ? "en-US" : "en") : locale === "cs" ? "cs" : "en";
 
   return (
     <section className="rounded-lg border border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50 shadow-sm">
       <header className="flex items-center justify-between border-b border-amber-100 px-3 py-2">
         <div className="flex items-center gap-2">
           <Crown className="h-4 w-4 text-amber-600" />
-          <h2 className="text-sm font-bold text-[#021d33]">Longevity protokoly</h2>
+          <h2 className="text-sm font-bold text-[#021d33]">{ui.protocolsTitle}</h2>
         </div>
         <Link href="/vip/protokoly" className="text-xs font-medium text-amber-700 hover:underline">
-          všech 10 →
+          {ui.allTen} →
         </Link>
       </header>
       <div className="space-y-2 p-3">
@@ -70,7 +74,7 @@ export function LongevityProtocolsSection() {
                 #{p.number.toString().padStart(2, "0")}
               </span>
               <p className="text-sm font-medium text-[#021d33]">
-                {localizedText(p.title, "cs")}
+                {localizedText(p.title, protocolLocale)}
               </p>
             </div>
             <ArrowRight className="h-4 w-4 text-amber-500" />
@@ -118,6 +122,6 @@ export function RecommendedToolsSection() {
 }
 
 /** Affiliate longevity products for homepage sidebar */
-export function HomepageAffiliateSection() {
-  return <TopLongevityProducts locale="cs" />;
+export function HomepageAffiliateSection({ locale = "cs" }: { locale?: string }) {
+  return <TopLongevityProducts locale={(locale as GlobalLocaleCode) ?? "cs"} />;
 }
