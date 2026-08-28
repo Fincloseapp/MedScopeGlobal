@@ -64,12 +64,40 @@ async function loadCoverHelpers() {
   return await import("../lib/ecosystem/editorial/images/cover.ts");
 }
 
+function extractListingCards(html) {
+  const cards = [];
+  const blocks = html.split(/<article[^>]*group flex h-full/i);
+  for (const block of blocks.slice(1)) {
+    const slugMatch = block.match(/href="\/article\/([^"]+)"/);
+    const imgMatch = block.match(/<img[^>]+src="([^"]+)"/);
+    const titleMatch = block.match(
+      /font-display[^>]*font-semibold[^>]*>([^<]+)/i
+    );
+    if (!slugMatch || !imgMatch) continue;
+    let coverPath = imgMatch[1].split("?")[0];
+    try {
+      coverPath = new URL(coverPath, ORIGIN).pathname;
+    } catch {
+      /* keep relative */
+    }
+    cards.push({
+      slug: decodeURIComponent(slugMatch[1]),
+      title: titleMatch?.[1]?.replace(/\s+/g, " ").trim() ?? slugMatch[1],
+      coverPath,
+    });
+  }
+  return cards;
+}
+
+const LIFESTYLE_TOPICS = new Set(["food", "sleep", "calm", "movement", "walk", "seniors"]);
+
 async function main() {
   const helpers = await loadCoverHelpers();
   const report = {
     origin: ORIGIN,
     scrapedAt: new Date().toISOString(),
     listings: {},
+    listingCoverViolations: [],
     articles: { sampled: 0, shortInListing: [], coverMismatches: [], stubPhrases: [], uxIssues: [] },
     stripe: null,
     smoke: { production: "not-run", ecosystem: "not-run" },
@@ -82,6 +110,41 @@ async function main() {
     const slugs = status === 200 ? extractSlugs(body) : [];
     slugs.forEach((s) => allSlugs.add(s));
     report.listings[path] = { status, slugCount: slugs.length };
+
+    if (path === "/cs/articles" && status === 200) {
+      const cards = extractListingCards(body);
+      report.listings[path].cardsChecked = cards.length;
+      for (const card of cards) {
+        const expected = helpers.classifyCoverTopic({
+          title: card.title,
+          slug: card.slug,
+        });
+        if (helpers.isBrainScanCoverUrl(card.coverPath)) {
+          report.listingCoverViolations.push({
+            slug: card.slug,
+            title: card.title.slice(0, 72),
+            issue: "brain-scan-clinical-webp",
+            coverPath: card.coverPath,
+          });
+          report.pass = false;
+        }
+        if (
+          LIFESTYLE_TOPICS.has(expected) &&
+          helpers.isClinicalOrBrainCoverUrl(card.coverPath)
+        ) {
+          report.listingCoverViolations.push({
+            slug: card.slug,
+            title: card.title.slice(0, 72),
+            issue: `clinical-on-${expected}`,
+            coverPath: card.coverPath,
+            expected,
+          });
+          report.pass = false;
+        }
+      }
+      report.listings[path].coverViolations = report.listingCoverViolations.length;
+    }
+
     if (status !== 200) report.pass = false;
   }
 
@@ -130,6 +193,15 @@ async function main() {
     const expected = helpers.classifyCoverTopic({ title, slug });
     if (coverPath && helpers.isMismatchedLocalCover(coverPath, expected)) {
       report.articles.coverMismatches.push({ slug, title: title.slice(0, 72), expected, coverPath });
+      report.pass = false;
+    }
+    if (coverPath && helpers.isBrainScanCoverUrl(coverPath)) {
+      report.articles.coverMismatches.push({
+        slug,
+        title: title.slice(0, 72),
+        expected: "no-brain-scan",
+        coverPath,
+      });
       report.pass = false;
     }
     if (coverPath && helpers.isDeniedStockUrl(coverPath)) {
@@ -182,6 +254,7 @@ async function main() {
     `- Short in listing (<800w): ${report.articles.shortInListing.length}`,
     `- Stub phrases: ${report.articles.stubPhrases.length}`,
     `- Cover mismatches: ${report.articles.coverMismatches.length}`,
+    `- Listing cover violations (/cs/articles): ${report.listingCoverViolations.length}`,
     `- UX issues: ${report.articles.uxIssues.length}`,
     ``,
     `## Stripe donate`,
@@ -190,6 +263,12 @@ async function main() {
   ].join("\n");
 
   console.log(summary);
+  if (report.listingCoverViolations.length) {
+    console.log(
+      "Listing cover violations:",
+      JSON.stringify(report.listingCoverViolations, null, 2)
+    );
+  }
   if (report.articles.coverMismatches.length) {
     console.log("Cover mismatches:", JSON.stringify(report.articles.coverMismatches, null, 2));
   }

@@ -77,9 +77,11 @@ Shared helpers:
 - `isClinicalOrBrainCoverUrl()` — clinical/lab/brain local paths
 - `isFoodCoverUrl()` — food/produce paths only
 
-### Step 5 — Stale stock replacement
+### Step 5 — Stale stock + brain-scan replacement
 
 `isStaleGenericStockUrl()` flags legacy v25 Supabase / remote Unsplash heroes. `resolveArticleCoverUrl()` swaps them for topic-matched local art even before backfill runs.
+
+**Retired asset:** `/assets/covers/clinical.webp` is a brain CT on a monitor (legacy v25 “brain on stick” family). It is **never** assigned by the matcher, backfill, or display resolver — use `clinical-2.webp` / `clinical-3.webp` / `research.webp` for clinical topics instead. Detect via `isBrainScanCoverUrl()`.
 
 ## Editorial desk topic vs visual topic
 
@@ -98,7 +100,7 @@ Persona `image-curator-global` (`lib/ecosystem/editorial/personas.ts`) runs on c
 
 ### What the cron does
 
-1. Finds published articles with missing/stale heroes (`isMissingOrStaleHeroImage`)
+1. Finds published articles needing remediation (`articleNeedsCoverRemediation` — stale v25, brain-scan, topic mismatch)
 2. Classifies visual topic (`classifyCoverTopic`) — same as article page
 3. Ranks curated pool candidates (`rankCuratedCandidates`)
 4. Runs compliance (`validateImageCompliance`) including **deny list**
@@ -110,6 +112,7 @@ Persona `image-curator-global` (`lib/ecosystem/editorial/personas.ts`) runs on c
 
 | Pattern | Reason |
 |---------|--------|
+| `/assets/covers/clinical.webp` | retired brain CT monitor hero (`isBrainScanCoverUrl`) |
 | `photo-1576091160399` | brain-on-stick anatomy model |
 | `doctor-phone` | overused v25 clinical stock |
 | `/brain`, `brain-on-stick` | misleading neurology imagery |

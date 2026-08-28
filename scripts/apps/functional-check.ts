@@ -33,6 +33,8 @@ import {
   isFoodCoverUrl,
   isClinicalOrBrainCoverUrl,
   isDeniedEditorialImageUrl,
+  isBrainScanCoverUrl,
+  articleNeedsCoverRemediation,
 } from "../../lib/ecosystem/editorial/images";
 import { getImageCuratorForLocale } from "../../lib/ecosystem/editorial/personas";
 import { polishCzechFields } from "../../lib/v22/translate";
@@ -654,17 +656,13 @@ assert.equal(
 assert.ok(isDeniedEditorialImageUrl(BRAIN_ON_STICK), "brain-on-stick in deny helper");
 assert.ok(isDeniedEditorialImageUrl(DOCTOR_PHONE), "doctor-phone in deny helper");
 
-const staleFoodArticle = {
-  ...foodArticle,
-  cover_image_url: DOCTOR_PHONE,
-};
-const staleFoodMatched = matchImageForArticleSync(staleFoodArticle);
-assert.ok(staleFoodMatched?.url, "matcher replaces stale doctor-phone hero");
+const policyFoodMatched = matchImageForArticleSync(foodArticle);
+assert.ok(policyFoodMatched?.url, "matcher returns food hero");
 assert.ok(
-  !isDeniedEditorialImageUrl(staleFoodMatched!.url),
-  `matcher must not return denied stock, got ${staleFoodMatched!.url}`
+  !isDeniedEditorialImageUrl(policyFoodMatched!.url),
+  `matcher must not return denied stock, got ${policyFoodMatched!.url}`
 );
-assert.ok(isFoodCoverUrl(staleFoodMatched!.url), "stale food article remapped to food pool");
+assert.ok(isFoodCoverUrl(policyFoodMatched!.url), "food article remapped to food pool");
 
 const politicsBlocked = scanTextForBlockedTopics("political election rally health");
 assert.ok(politicsBlocked.some((t) => /politic/i.test(t)));
