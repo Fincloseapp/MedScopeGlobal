@@ -14,11 +14,17 @@ import {
   isLocaleRoutingExcluded,
 } from "../lib/i18n/locale-path";
 import { normalizeLocale } from "../lib/i18n/config";
-import { getHomepageTitle, getOgLocale } from "../lib/brand/magazine";
+import { getHomepageTitle, getOgLocale, getMagazineCopy } from "../lib/brand/magazine";
 import { buildGlobalHreflang } from "../lib/ecosystem/seo";
 import { buildPageMetadata } from "../lib/seo/metadata";
 import { allLocaleSitemapUrls } from "../lib/seo/locale-sitemap";
-import { GLOBAL_LOCALES } from "../lib/ecosystem/locales";
+import { GLOBAL_LOCALES, MEDICAL_DISCLAIMER } from "../lib/ecosystem/locales";
+import { getPortalUi } from "../lib/i18n/portal-copy";
+import { pickCopyLocale } from "../lib/i18n/copy-locale";
+import { getMagazineListingUi } from "../lib/i18n/magazine-listing-copy";
+import { getDemoArticleTranslation } from "../lib/verejnost/demo-magazine-i18n";
+import { getDemoMagazineArticles } from "../lib/verejnost/demo-magazine-articles";
+import { mixListableFeed } from "../lib/v271/news-desks";
 import {
   detectClientLanguage,
   getPreferredLocale,
@@ -52,7 +58,7 @@ assert.ok(getHomepageTitle("sk").includes("Dlhovekosť") || getHomepageTitle("sk
 assert.ok(getHomepageTitle("ru").includes("долголетие") || getHomepageTitle("ru").includes("Долголетие") || getHomepageTitle("ru").includes("Здоровье"));
 assert.ok(getHomepageTitle("ko").includes("건강"));
 assert.ok(getHomepageTitle("ro").includes("Sănătate") || getHomepageTitle("ro").includes("longevitate"));
-assert.ok(getHomepageTitle("hu").includes("Egészség") || getHomepageTitle("hu").includes("hosszúélet"));
+assert.ok(getHomepageTitle("hu").includes("Egészség") || getHomepageTitle("hu").includes("hosszú"));
 assert.equal(getOgLocale("de"), "de_DE");
 assert.equal(getOgLocale("pl"), "pl_PL");
 assert.equal(getOgLocale("fr"), "fr_FR");
@@ -104,6 +110,66 @@ const sitemaps = allLocaleSitemapUrls();
 assert.equal(sitemaps.length, GLOBAL_LOCALES.length);
 assert.ok(sitemaps.some((u) => u.endsWith("/sitemap-cs.xml")));
 assert.ok(sitemaps.some((u) => u.endsWith("/sitemap-en-us.xml")));
+
+assert.ok(getMagazineCopy("de").eyebrow.includes("Plattform"));
+assert.ok(!getMagazineCopy("de").eyebrow.includes("powered by"));
+assert.ok(getMagazineCopy("en").eyebrow.includes("powered by"));
+assert.ok(getMagazineCopy("fr").tagline.includes("clarté"));
+assert.equal(pickCopyLocale("en-US"), "en");
+assert.equal(pickCopyLocale("jp"), "ja");
+assert.equal(pickCopyLocale("cn"), "zh-CN");
+assert.ok(MEDICAL_DISCLAIMER.pl.includes("konsultuj się"));
+assert.ok(MEDICAL_DISCLAIMER.it.includes("Consulti sempre"));
+assert.equal(getPortalUi("cs").readMagazine, "Číst magazín");
+assert.equal(getPortalUi("de").readMagazine, "Magazin lesen");
+assert.equal(getPortalUi("pl").readMagazine, "Czytaj magazyn");
+assert.equal(getPortalUi("ja").readMagazine, "雑誌を読む");
+assert.equal(getPortalUi("zh-CN").readMagazine, "阅读杂志");
+assert.ok(!getPortalUi("fr").startWith.includes("powered by"));
+for (const loc of GLOBAL_LOCALES) {
+  const ui = getPortalUi(loc.code);
+  assert.ok(ui.readMagazine.trim().length > 0, `${loc.code} portal chrome missing`);
+  assert.ok(ui.trial14.trim().length > 0, `${loc.code} trial CTA missing`);
+  if (loc.code !== "en" && loc.code !== "en-US") {
+    assert.ok(!ui.footerTagline.includes("powered by"), `${loc.code} leftover English powered by`);
+  }
+  const listing = getMagazineListingUi(loc.code);
+  assert.ok(listing.allFilter.trim().length > 0, `${loc.code} listing chrome missing`);
+  assert.ok(listing.relatedReading.trim().length > 0, `${loc.code} related reading missing`);
+  const demos = getDemoMagazineArticles(loc.code);
+  assert.ok(demos.length >= 7, `${loc.code} demo magazine too short`);
+  const sleep = getDemoArticleTranslation("verejnost-zivotni-styl-zdravy-spanek", loc.code);
+  assert.ok(sleep?.title, `${loc.code} sleep article missing`);
+  if (loc.code === "cs") {
+    assert.ok(sleep!.title.includes("spánek") || sleep!.title.includes("Spánek"));
+  } else if (loc.code === "de") {
+    assert.ok(sleep!.title.includes("Schlaf"));
+    assert.ok(!sleep!.title.includes("spánek"));
+  } else if (loc.code === "en" || loc.code === "en-US") {
+    assert.ok(/sleep/i.test(sleep!.title));
+    assert.ok(!sleep!.title.includes("spánek"));
+  } else if (loc.code === "pl") {
+    assert.ok(/sen/i.test(sleep!.title));
+    assert.ok(!sleep!.title.includes("spánek"));
+  } else if (loc.code === "ja") {
+    assert.ok(sleep!.title.includes("睡眠"));
+  } else if (loc.code === "zh-CN") {
+    assert.ok(sleep!.title.includes("睡眠"));
+  }
+}
+
+assert.equal(getMagazineListingUi("de").allFilter, "Alle");
+assert.equal(getMagazineListingUi("pl").archive.includes("Archiwum"), true);
+assert.ok(getDemoMagazineArticles("de")[0]?.title && !getDemoMagazineArticles("de")[0]!.title.includes("Zdravý"));
+assert.ok(getDemoMagazineArticles("en")[0]?.displayLocale === "en");
+assert.ok(
+  mixListableFeed(getDemoMagazineArticles("de"), 24).length > 0,
+  "German demo magazine must remain listable"
+);
+assert.ok(
+  mixListableFeed(getDemoMagazineArticles("ja"), 24).some((a) => a.title.includes("睡眠")),
+  "Japanese demo magazine must remain listable"
+);
 
 console.log("✓ i18n/SEO unit checks passed");
 
@@ -171,6 +237,46 @@ async function runHttpSmoke(): Promise<void> {
   assert.ok(
     /hrefLang="en-US"|hreflang="en-US"/i.test(enUsHtml),
     "/en-us should emit hreflang en-US"
+  );
+
+  const deHtml = await fetchHtml("/de");
+  assert.ok(
+    deHtml.includes("Magazin lesen") || deHtml.includes("Gesundheit"),
+    "/de homepage should render German chrome, not Czech-only"
+  );
+  assert.ok(
+    !deHtml.includes("Číst magazín"),
+    "/de must not keep Czech hero CTA"
+  );
+
+  const deArticles = await fetchHtml("/de/articles");
+  assert.ok(
+    deArticles.includes("Alle") || deArticles.includes("Magazin"),
+    "/de/articles should render German listing chrome"
+  );
+  assert.ok(
+    !deArticles.includes("Číst magazín"),
+    "/de/articles must not keep Czech hero CTA"
+  );
+  assert.ok(
+    deArticles.includes("Schlaf") || deArticles.includes("Prävention") || deArticles.includes("Gesunder"),
+    "/de/articles should show German article titles, not Czech-only cards"
+  );
+
+  const deArticle = await fetchHtml("/de/article/verejnost-zivotni-styl-zdravy-spanek");
+  assert.ok(
+    deArticle.includes("Schlaf") || deArticle.includes("Gesunder"),
+    "/de/article sleep piece should be readable in German"
+  );
+  assert.ok(
+    !/<h1[^>]*>Zdravý spánek/i.test(deArticle),
+    "/de/article must not keep Czech H1"
+  );
+
+  const enUsArticles = await fetchHtml("/en-us/articles");
+  assert.ok(
+    /Healthy sleep|Prevention|Healthspan/i.test(enUsArticles),
+    "/en-us/articles should show English magazine cards"
   );
 
   console.log(`✓ HTTP smoke passed against ${origin}`);

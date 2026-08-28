@@ -1,11 +1,13 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "Inteligență clinică și medicină bazată pe dovezi"
+    "tagline": "Clar despre sănătate. Trăiește mai mult și mai bine.",
+    "magazine": "VitaScope",
+    "magazineTagline": "Revistă globală de sănătate și longevitate — trăiește mai bine, mai mult"
   },
   "nav": {
     "home": "Acasă",
-    "magazine": "Revistă",
+    "magazine": "VitaScope",
     "pricing": "Prețuri",
     "welcome": "Platformă",
     "sections": "Secțiuni",
@@ -32,7 +34,7 @@
     "medical": "Conținutul nu reprezintă un diagnostic medical sau o recomandare terapeutică. Consultați întotdeauna medicul."
   },
   "vip": {
-    "title": "Protocoale VIP longevitate",
+    "title": "Protocoale VIP de longevitate",
     "subtitle": "10 protocoale bazate pe dovezi pentru somn, metabolism, imunitate și longevitate.",
     "price": "29 lei/lună"
   },

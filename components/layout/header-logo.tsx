@@ -10,10 +10,16 @@ type Props = {
   centered?: boolean;
   className?: string;
   priority?: boolean;
+  homeAria?: string;
 };
 
 /** v23.3.1 — mobile 56px max visibility + desktop 70px */
-export function HeaderLogo({ centered = false, className, priority = true }: Props) {
+export function HeaderLogo({
+  centered = false,
+  className,
+  priority = true,
+  homeAria = "MedScopeGlobal — home",
+}: Props) {
   return (
     <Link
       href="/"
@@ -23,7 +29,7 @@ export function HeaderLogo({ centered = false, className, priority = true }: Pro
         centered ? "items-center pr-0 text-center" : "items-start pr-2 text-left lg:pr-3",
         className
       )}
-      aria-label="MedScopeGlobal — domů"
+      aria-label={homeAria}
     >
       <span
         className={cn(

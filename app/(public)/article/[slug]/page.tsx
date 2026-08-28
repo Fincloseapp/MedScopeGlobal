@@ -56,6 +56,7 @@ import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { MAGAZINE, getOgLocale } from "@/lib/brand/magazine";
 import { isArticleTipUiEnabled } from "@/lib/ecosystem/tip-copy";
 import { SITE } from "@/lib/config/site";
+import { getMagazineListingUi } from "@/lib/i18n/magazine-listing-copy";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -222,9 +223,9 @@ export default async function ArticlePage({ params }: Props) {
    * Czech magazine pieces (verejnost-* / locale cs) must stay Kč + Czech copy
    * even when the site UI cookie resolves to en.
    */
-  const articleLocaleTag = String(article.locale ?? "").toLowerCase();
+  const articleLocaleTag = String(article.displayLocale ?? article.locale ?? "").toLowerCase();
   const supportLocale: GlobalLocaleCode =
-    articleLocaleTag.startsWith("cs") || article.slug.startsWith("verejnost-")
+    articleLocaleTag.startsWith("cs") && !article.translation_provider
       ? "cs"
       : (((locale as GlobalLocaleCode) || "cs") as GlobalLocaleCode);
 
@@ -267,12 +268,31 @@ export default async function ArticlePage({ params }: Props) {
       ).jsonLd
     : globalJsonLd;
 
+  const listing = getMagazineListingUi(locale);
+  const dateLocale =
+    locale === "en-US"
+      ? "en-US"
+      : locale.startsWith("en")
+        ? "en-GB"
+        : locale === "zh-CN" || locale === "cn"
+          ? "zh-CN"
+          : locale === "ja" || locale === "jp"
+            ? "ja-JP"
+            : locale === "ko" || locale === "kr"
+              ? "ko-KR"
+              : locale === "uk"
+                ? "uk-UA"
+                : locale === "be"
+                  ? "be-BY"
+                  : locale;
+
   const publishedLabel =
     article.published_at &&
-    new Date(article.published_at).toLocaleDateString(
-      locale === "en" || locale === "en-US" ? "en-GB" : "cs-CZ",
-      { year: "numeric", month: "long", day: "numeric" }
-    );
+    new Date(article.published_at).toLocaleDateString(dateLocale, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
   return (
     <>
@@ -305,7 +325,7 @@ export default async function ArticlePage({ params }: Props) {
               </Link>
             ) : null}
 
-            {article.translatedFrom ? (
+            {article.translatedFrom && article.translation_provider !== "static" ? (
               <p className="mt-4 border border-[#C7E3FF] bg-[#f0f7ff] px-4 py-2 text-sm text-[#005B96]">
                 {t(dict, "alerts.translatedArticle")}
                 {article.translation_provider ? (
@@ -460,7 +480,7 @@ export default async function ArticlePage({ params }: Props) {
             <Suspense
               fallback={
                 <section className="article-contribute scroll-mt-24">
-                  <p className="text-sm text-slate-500">Načítání příspěvků…</p>
+                  <p className="text-sm text-slate-500">{listing.loadingContributions}</p>
                 </section>
               }
             >
@@ -494,7 +514,7 @@ export default async function ArticlePage({ params }: Props) {
           {related && related.length > 0 ? (
             <section className="article-related">
               <h2 className="font-display text-2xl font-semibold text-[#021d33]">
-                Související čtení
+                {listing.relatedReading}
               </h2>
               <div className="mt-6 grid gap-6 md:grid-cols-3">
                 {related.map((a) => (

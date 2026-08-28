@@ -7,6 +7,7 @@ import {
   type DisplayArticle,
 } from "@/lib/articles/prepare-for-display";
 import { filterMagazineListableArticles, shouldHideFromPublicListing } from "@/lib/editorial/article-quality-audit";
+import { mergeReadableWithDemo } from "@/lib/articles/readable-feed";
 import type { LocaleCode } from "@/lib/i18n/config";
 import type { ArticleWithRelations } from "@/types/database";
 
@@ -57,7 +58,7 @@ export async function listPublicArticles(options?: {
   } = await import("@/lib/verejnost/demo-magazine-articles");
 
   const demoSlice = () => {
-    let demo = getDemoMagazineArticles();
+    let demo = getDemoMagazineArticles(locale);
     if (options?.topic) {
       demo = demo.filter((a) => a.public_topic === options.topic);
     }
@@ -97,8 +98,9 @@ export async function listPublicArticles(options?: {
     mode,
     maxTranslate: limit,
   });
+  const merged = mergeReadableWithDemo(prepared, demoSlice(), locale);
   const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
-  return prepared.map((a) => ({ ...a, cover_image_url: resolveVerejnostCoverUrl(a) }));
+  return merged.map((a) => ({ ...a, cover_image_url: resolveVerejnostCoverUrl(a) }));
 }
 
 export async function getPublicArticleBySlug(
@@ -108,10 +110,7 @@ export async function getPublicArticleBySlug(
   const { getDemoMagazineArticleBySlug } = await import(
     "@/lib/verejnost/demo-magazine-articles"
   );
-  const demoHit = () => {
-    const demo = getDemoMagazineArticleBySlug(slug);
-    return demo;
-  };
+  const demoHit = () => getDemoMagazineArticleBySlug(slug, locale);
 
   const supabase = await createDataClient();
   if (!supabase) return demoHit();

@@ -1,4 +1,5 @@
 import type { LocaleCode } from "@/lib/i18n/config";
+import { getPortalUi } from "@/lib/i18n/portal-copy";
 
 export type NavItem = {
   label: string;
@@ -353,39 +354,55 @@ const menuEn: NavItem[] = [
 ];
 
 export function getMainMenu(locale: LocaleCode): NavItem[] {
-  return locale === "cs" ? menuCs : menuEn;
+  return locale === "cs" || locale === "sk" ? menuCs : menuEn;
 }
 
 /** v33 — compact desktop header: 6 primary items, all visible without overflow */
 export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
-  if (locale !== "cs") {
-    return getMainMenu(locale).slice(0, 6);
+  const ui = getPortalUi(locale);
+  if (locale === "cs" || locale === "sk") {
+    const source = locale === "cs" ? menuCs : menuCs;
+    const find = (label: string) => source.find((item) => item.label === label);
+    const verejnost = find("Pro veřejnost");
+    const studenti = find("Pro studenty");
+    const lekari = find("Pro lékaře");
+    const predplatne = find("Předplatné");
+    return [
+      verejnost
+        ? { ...verejnost, label: ui.navPublic }
+        : { label: ui.navPublic, href: "/verejnost" },
+      studenti
+        ? { ...studenti, label: ui.navStudents }
+        : { label: ui.navStudents, href: "/studenti" },
+      lekari
+        ? { ...lekari, label: ui.navDoctors }
+        : { label: ui.navDoctors, href: "/lekari" },
+      {
+        label: ui.navApps,
+        href: "/aplikace",
+        children: [
+          { label: locale === "sk" ? "Prehľad aplikácií" : "Přehled aplikací", href: "/aplikace", description: "MediFlow, MeDipacient, OrdiZapis" },
+          { label: "MediFlow", href: "/mediflow", description: ui.appMediflowTagline },
+          { label: "MeDipacient", href: "/medipacient", description: ui.appMedipacientTagline },
+          { label: "OrdiZapis", href: "/lekari/dokumentace", description: ui.appOrdizapisTagline },
+          { label: "MeDiprep", href: "/mediprep", description: ui.mediprepLegacy },
+        ],
+      },
+      predplatne ?? { label: ui.navSubscribe, href: "/predplatne" },
+    ];
   }
-  const find = (label: string) => menuCs.find((item) => item.label === label);
-  const verejnost = find("Pro veřejnost");
-  const studenti = find("Pro studenty");
-  const lekari = find("Pro lékaře");
-  const predplatne = find("Předplatné");
+
+  const apps = menuEn.find((item) => item.href === "/aplikace");
   return [
-    verejnost ? { ...verejnost, label: "Veřejnost" } : { label: "Veřejnost", href: "/verejnost" },
-    studenti ? { ...studenti, label: "Studenti" } : { label: "Studenti", href: "/studenti" },
-    lekari ? { ...lekari, label: "Lékaři" } : { label: "Lékaři", href: "/lekari" },
+    { label: ui.navPublic, href: "/verejnost", children: menuEn.find((i) => i.href === "/verejnost")?.children },
+    { label: ui.readArticles, href: "/articles", children: menuEn.find((i) => i.href === "/articles")?.children },
     {
-      label: "Aplikace",
+      label: ui.navApps,
       href: "/aplikace",
-      children: [
-        { label: "Přehled aplikací", href: "/aplikace", description: "MediFlow, MeDipacient, OrdiZapis" },
-        { label: "MediFlow", href: "/mediflow", description: "Wellness deník a longevity" },
-        { label: "Stáhnout MediFlow", href: "/app/mediflow", description: "Instalace na plochu" },
-        { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu" },
-        { label: "Stáhnout MeDipacient", href: "/app/pacient", description: "Instalace na plochu" },
-        { label: "OrdiZapis", href: "/lekari/dokumentace", description: "AI zápisy pro lékaře" },
-        { label: "Stáhnout OrdiZapis", href: "/app/dokumentace", description: "Nahrávání v mobilu" },
-        { label: "MeDiprep (legacy)", href: "/mediprep", description: "Přijímačky LF — sekundární" },
-        { label: "Můj dashboard", href: "/dashboard", description: "Zprávy, deník a zápisy" },
-      ],
+      children: apps?.children,
     },
-    predplatne ?? { label: "Předplatné", href: "/predplatne" },
+    { label: ui.vipProtocols, href: "/vip/protokoly" },
+    { label: ui.navSubscribe, href: "/predplatne" },
   ];
 }
 

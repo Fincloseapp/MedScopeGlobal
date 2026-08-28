@@ -3,7 +3,7 @@
     "name": "MedScopeGlobal",
     "magazine": "VitaScope",
     "tagline": "Jasně o zdraví. Délka i kvalita života.",
-    "magazineTagline": "Globální magazín zdraví a dlouhověkosti — pro každého, kdo chce být lépe"
+    "magazineTagline": "Globální magazín zdraví a dlouhověkosti — žijte lépe a déle v každém věku"
   },
   "nav": {
     "home": "Domů",
@@ -102,7 +102,7 @@
     "step3Title": "Automatická kontrola dokumentu",
     "step3Body": "Systém dokument předběžně zkontroluje a nastaví stav kontroly.",
     "step4Title": "Ruční schválení administrátorem",
-    "step4Body": "Editorial tým dokončí ověření a odemkne plný lékařský přístup.",
+    "step4Body": "Redakce dokončí ověření a odemkne plný lékařský přístup.",
     "status": {
       "pending": "Čeká na dokument",
       "aiReview": "Kontrola dokumentu probíhá",
@@ -163,5 +163,8 @@
     "localeArticles": "Články a rozhraní odpovídají jazyku vašeho zařízení. Cizojazyčné texty se při zobrazení přeloží.",
     "localeDevice": "Jazyk stránky se řídí primárním jazykem telefonu nebo počítače. Přepínačem v hlavičce ho můžete změnit.",
     "translatedArticle": "Článek byl automaticky přeložen do zvoleného jazyka."
+  },
+  "disclaimer": {
+    "medical": "Obsah není lékařská diagnóza ani léčebné doporučení. Vždy konzultujte se svým lékařem."
   }
 }

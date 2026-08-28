@@ -6,6 +6,10 @@ import {
 } from "@/lib/i18n/article-locale";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { resolveArticleTranslation } from "@/lib/i18n/translate-article";
+import {
+  demoArticleLocaleTag,
+  getDemoArticleTranslation,
+} from "@/lib/verejnost/demo-magazine-i18n";
 import type { ArticleWithRelations } from "@/types/database";
 import { dedupeArticlesByTitle } from "@/lib/articles/dedupe";
 import { enrichArticleBodyForDisplay } from "@/lib/articles/enrich-body";
@@ -104,6 +108,29 @@ export async function prepareArticleForDisplay(
 ): Promise<DisplayArticle> {
   let base = await applyCategoryLabels(article, locale);
   const target = primaryArticleLocale(locale);
+  const staticCopy = getDemoArticleTranslation(base.slug, locale);
+
+  if (staticCopy && !matchesArticleLocale(base.locale, locale)) {
+    const content =
+      mode === "full"
+        ? enrichArticleBodyForDisplay({
+            ...base,
+            title: staticCopy.title,
+            excerpt: staticCopy.excerpt,
+            content: staticCopy.content,
+          })
+        : staticCopy.content;
+    return attachEditorialDisplay(base, locale, {
+      title: staticCopy.title,
+      excerpt: staticCopy.excerpt,
+      content,
+      displayLocale: demoArticleLocaleTag(locale),
+      translatedFrom: base.locale ?? "cs",
+      translation_provider: "static",
+      machine_translated: false,
+      reviewed: true,
+    });
+  }
 
   if (matchesArticleLocale(base.locale, locale)) {
     const polished = locale === "cs" ? polishCzechFields(base, locale) : base;
@@ -196,6 +223,8 @@ export async function prepareArticlesForDisplay(
       out.push(await prepareArticleForDisplay(article, locale, mode));
       translated++;
     } else if (matchesArticleLocale(article.locale, locale)) {
+      out.push(await prepareArticleForDisplay(article, locale, mode));
+    } else if (getDemoArticleTranslation(article.slug, locale)) {
       out.push(await prepareArticleForDisplay(article, locale, mode));
     } else if (locale === "cs") {
       const withCat = await applyCategoryLabels(article, locale);

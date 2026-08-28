@@ -1,11 +1,13 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "Intelligence clinique et médecine fondée sur les preuves"
+    "tagline": "La santé en toute clarté. Vivre plus longtemps.",
+    "magazine": "VitaScope",
+    "magazineTagline": "Magazine mondial de santé et longévité — vivre mieux, plus longtemps"
   },
   "nav": {
     "home": "Accueil",
-    "magazine": "Magazine",
+    "magazine": "VitaScope",
     "pricing": "Tarifs",
     "welcome": "Plateforme",
     "sections": "Sections",
@@ -32,7 +34,7 @@
     "medical": "Le contenu ne constitue pas un diagnostic médical ni une recommandation thérapeutique. Consultez toujours votre médecin."
   },
   "vip": {
-    "title": "Protocoles VIP longévité",
+    "title": "Protocoles VIP de longévité",
     "subtitle": "10 protocoles fondés sur les preuves pour le sommeil, le métabolisme, l'immunité et la longévité.",
     "price": "5,99 €/mois"
   },

@@ -1,11 +1,13 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "tagline": "Inteligencia clínica y medicina basada en la evidencia"
+    "tagline": "Ver la salud con claridad. Vivir más tiempo.",
+    "magazine": "VitaScope",
+    "magazineTagline": "Revista global de salud y longevidad — vive mejor y más tiempo"
   },
   "nav": {
     "home": "Inicio",
-    "magazine": "Revista",
+    "magazine": "VitaScope",
     "pricing": "Precios",
     "welcome": "Plataforma",
     "sections": "Secciones",

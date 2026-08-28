@@ -18,6 +18,7 @@ import {
   type DisplayArticle,
 } from "@/lib/articles/prepare-for-display";
 import { filterMagazineListableArticles, shouldHideFromPublicListing } from "@/lib/editorial/article-quality-audit";
+import { mergeReadableWithDemo } from "@/lib/articles/readable-feed";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { createDataClient } from "@/lib/supabase/data";
 import {
@@ -91,12 +92,12 @@ export async function getFeaturedArticles(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
+  const { getDemoMagazineArticles } = await import(
+    "@/lib/verejnost/demo-magazine-articles"
+  );
   const supabase = await createDataClient();
   if (!supabase) {
-    const { getDemoMagazineArticles } = await import(
-      "@/lib/verejnost/demo-magazine-articles"
-    );
-    return getDemoMagazineArticles().slice(0, limit);
+    return getDemoMagazineArticles(locale).slice(0, limit);
   }
   const { data, error } = await supabase
     .from("articles")
@@ -107,10 +108,7 @@ export async function getFeaturedArticles(
 
   if (error) {
     console.error("getFeaturedArticles", error);
-    const { getDemoMagazineArticles } = await import(
-      "@/lib/verejnost/demo-magazine-articles"
-    );
-    return getDemoMagazineArticles().slice(0, limit);
+    return getDemoMagazineArticles(locale).slice(0, limit);
   }
   const filtered = filterMagazineListableArticles(
     filterForReader(
@@ -124,7 +122,7 @@ export async function getFeaturedArticles(
     mode: "card",
     maxTranslate: limit,
   });
-  return prepared.slice(0, limit);
+  return mergeReadableWithDemo(prepared, getDemoMagazineArticles(locale), locale).slice(0, limit);
 }
 
 export async function getLatestArticles(
@@ -150,7 +148,7 @@ export async function getLatestArticles(
 
   const supabase = await createDataClient();
   if (!supabase) {
-    return getDemoMagazineArticles().slice(offset, offset + limit);
+    return getDemoMagazineArticles(locale).slice(offset, offset + limit);
   }
   const fetchLimit = limit * 12;
   const { data, error } = await supabase
@@ -162,7 +160,7 @@ export async function getLatestArticles(
 
   if (error) {
     console.error("getLatestArticles", error);
-    return getDemoMagazineArticles().slice(offset, offset + limit);
+    return getDemoMagazineArticles(locale).slice(offset, offset + limit);
   }
   // Include lay/public Czech articles so /articles "Vše" matches the live portal feed
   // (recent pipeline output is mostly audience=public / rubric verejnost).
@@ -174,7 +172,11 @@ export async function getLatestArticles(
     mode: "card",
     maxTranslate: limit,
   });
-  return prepared.slice(0, limit);
+  return mergeReadableWithDemo(
+    prepared,
+    getDemoMagazineArticles(locale),
+    locale
+  ).slice(0, limit);
 }
 
 export async function getArticlesBySection(
@@ -195,7 +197,7 @@ export async function getArticlesBySection(
     shouldUseDemoMagazineArticles,
   } = await import("@/lib/verejnost/demo-magazine-articles");
   const demoForLay = () =>
-    allowLay ? getDemoMagazineArticles().slice(0, limit) : [];
+    allowLay ? getDemoMagazineArticles(locale).slice(0, limit) : [];
 
   const supabase = await createDataClient();
   if (!supabase) return demoForLay();
@@ -269,7 +271,7 @@ export async function getArticlesByRubric(
       const { getDemoMagazineArticles } = await import(
         "@/lib/verejnost/demo-magazine-articles"
       );
-      return getDemoMagazineArticles().slice(0, limit);
+      return getDemoMagazineArticles(locale).slice(0, limit);
     }
     return [];
   }
@@ -298,7 +300,7 @@ export async function getArticlesByRubric(
       const { getDemoMagazineArticles } = await import(
         "@/lib/verejnost/demo-magazine-articles"
       );
-      return getDemoMagazineArticles().slice(0, limit);
+      return getDemoMagazineArticles(locale).slice(0, limit);
     }
     return [];
   }
@@ -375,7 +377,7 @@ export async function getArticleBySlug(
 
   const supabase = await createDataClient();
   if (!supabase) {
-    return getDemoMagazineArticleBySlug(slug);
+    return getDemoMagazineArticleBySlug(slug, locale);
   }
   const { data, error } = await supabase
     .from("articles")
@@ -386,13 +388,13 @@ export async function getArticleBySlug(
 
   if (error) {
     console.error("getArticleBySlug", error);
-    return getDemoMagazineArticleBySlug(slug);
+    return getDemoMagazineArticleBySlug(slug, locale);
   }
   const row = data
     ? (mapArticleList([data as Record<string, unknown>])[0] ?? null)
     : null;
   if (!row) {
-    return getDemoMagazineArticleBySlug(slug);
+    return getDemoMagazineArticleBySlug(slug, locale);
   }
   if (shouldHideFromPublicListing(row)) {
     return null;
@@ -412,7 +414,7 @@ export async function getRelatedArticles(
     "@/lib/verejnost/demo-magazine-articles"
   );
   const demoRelated = () =>
-    getDemoMagazineArticles()
+    getDemoMagazineArticles(locale)
       .filter((a) => a.id !== excludeId)
       .slice(0, limit);
 
@@ -442,7 +444,7 @@ export async function getRelatedArticles(
     maxTranslate: limit,
   });
   if (prepared.length === 0) return demoRelated();
-  return prepared.slice(0, limit);
+  return mergeReadableWithDemo(prepared, demoRelated(), locale).slice(0, limit);
 }
 
 /** Articles tagged with metadata.section (e.g. v26 foreign news rubric). */

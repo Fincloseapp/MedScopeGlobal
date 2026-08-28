@@ -46,10 +46,10 @@ export function getLocaleConfig(code: string) {
 export const MEDICAL_DISCLAIMER: Record<GlobalLocaleCode, string> = {
   cs: "Obsah není lékařská diagnóza ani léčebné doporučení. Vždy konzultujte se svým lékařem.",
   sk: "Obsah nie je lekárska diagnóza ani liečebné odporúčanie. Vždy konzultujte so svojím lekárom.",
-  pl: "Treść nie stanowi diagnozy medycznej ani zaleceń terapeutycznych. Zawsze konsultuj z lekarzem.",
+  pl: "Treść nie stanowi diagnozy medycznej ani zaleceń terapeutycznych. Zawsze konsultuj się z lekarzem.",
   de: "Der Inhalt stellt keine medizinische Diagnose oder Behandlungsempfehlung dar. Konsultieren Sie immer Ihren Arzt.",
   fr: "Le contenu ne constitue pas un diagnostic médical ni une recommandation thérapeutique. Consultez toujours votre médecin.",
-  it: "Il contenuto non costituisce una diagnosi medica né una raccomandazione terapeutica. Consultare sempre il proprio medico.",
+  it: "Il contenuto non costituisce una diagnosi medica né una raccomandazione terapeutica. Consulti sempre il proprio medico.",
   es: "El contenido no constituye un diagnóstico médico ni una recomendación terapéutica. Consulte siempre a su médico.",
   ro: "Conținutul nu reprezintă un diagnostic medical sau o recomandare terapeutică. Consultați întotdeauna medicul.",
   hu: "A tartalom nem minősül orvosi diagnózisnak vagy kezelési javaslatnak. Mindig konzultáljon orvosával.",
