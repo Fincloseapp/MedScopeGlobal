@@ -5,7 +5,7 @@
  */
 
 const TOPIC_IMAGES: Record<string, string> = {
-  "pruvodce-nemocemi": "/assets/covers/clinical.webp",
+  "pruvodce-nemocemi": "/assets/covers/clinical-2.webp",
   symptomy: "/assets/covers/clinical-2.webp",
   prevence: "/assets/covers/research.webp",
   "zivotni-styl": "/assets/covers/movement.webp",
@@ -15,7 +15,7 @@ const TOPIC_IMAGES: Record<string, string> = {
   ergonomie: "/assets/covers/walk.webp",
   rozhovory: "/assets/covers/clinical-3.webp",
   "zivotni-styl-backend": "/assets/covers/movement.webp",
-  nemoci: "/assets/covers/clinical.webp",
+  nemoci: "/assets/covers/clinical-2.webp",
   "prevence-backend": "/assets/covers/research.webp",
   "rozhovory-backend": "/assets/covers/clinical-3.webp",
   dlouhovekost: "/assets/covers/seniors.webp",
@@ -26,4 +26,4 @@ export function getPublicTopicImage(slug: string): string | null {
 }
 
 /** Seed / demo fallback when no article-specific cover is set. */
-export const VEREJNOST_FALLBACK_COVER = "/assets/covers/clinical.webp";
+export const VEREJNOST_FALLBACK_COVER = "/assets/covers/clinical-2.webp";

@@ -1,13 +1,13 @@
 /**
- * Premium magazine hub config — shared pattern for section landing pages (osvěta, future hubs).
+ * Premium magazine hub config — shared pattern for veřejnost section landings.
  *
- * ## Premium osvěta standard
- * - Hero: curated `/assets/covers/*` art (never v25/Unsplash stock), Czech editorial deck.
- * - Intro: substantive copy for public-health audience — education, not lorem.
+ * ## Premium magazine standard (osvěta + remaining /verejnost hubs)
+ * - Hero: curated `/assets/covers/*` art (never v25/Unsplash stock, never retired clinical.webp).
+ * - Intro: substantive Czech copy for a public-health audience — education, not lorem.
  * - Pillars: topic tiles with local covers + deep links into articles or filtered hubs.
- * - Featured: today's listen lesson + longform articles from the same editorial pool as `/articles`.
+ * - Featured: section-specific content (listen lesson, article grid, leaderboard).
  * - CTAs: clear nav to magazine (`/articles`, `/verejnost/clanky`); tips ≠ VIP / předplatné.
- * - Visuals: Poslechnout (podcast-style) parity with article longform reading UX.
+ * - Copy: no Tringelt branding — příspěvek / darovat only.
  */
 
 export type MagazineHubPillar = {
@@ -90,7 +90,7 @@ export const OSVETA_MAGAZINE_HUB: MagazineSectionHubConfig = {
       slug: "nemoc",
       label: "Nemoci a symptomy",
       description: "Co znamenají běžné příznaky a kdy nečekat s návštěvou u specialisty.",
-      coverImage: "/assets/covers/clinical.webp",
+      coverImage: "/assets/covers/clinical-2.webp",
       href: "/verejnost/clanky?topic=nemoci",
     },
     {
@@ -152,6 +152,72 @@ const SHARED_CONTRIBUTION = {
   ctaLabel: "Prohlédnout magazín",
 } as const;
 
+/** Veřejnost index — vstup do magazínu, osvěty, témat a rozhovorů. */
+export const VEREJNOST_MAGAZINE_HUB: MagazineSectionHubConfig = {
+  id: "verejnost",
+  eyebrow: "Veřejnost · VitaScope",
+  title: "Zdraví srozumitelně — bez odborného žargonu",
+  heroDeck:
+    "Průvodce prevencí, symptomy, výživou, spánkem, stresem a dlouhověkostí. Obsah pro širokou veřejnost v češtině — vzdělávací, nikoli náhrada lékařské péče.",
+  editorialIntro: [
+    "Sekce Veřejnost je vstupní brána do magazínu VitaScope: dlouhé články, témata, poslechová osvěta a rozhovory s odborníky. Všechno je volně dostupné — není to VIP sekce ani placené předplatné.",
+    "Texty i poslechové lekce procházejí stejným redakčním rámcem: ověřitelné zdroje, srozumitelná čeština, žádné sliby zázračných výsledků. Informace slouží k vzdělávání. U závažných příznaků vždy vyhledejte lékaře.",
+    "Začněte tématem, které vás právě zajímá, nebo si poslechněte dnešní lekci. Dobrovolný příspěvek u článků pomáhá udržet českou osvětu — je to poděkování redakci, ne nákup přístupu.",
+  ],
+  editorialIntroTitle: "Jak se orientovat ve veřejném zdraví",
+  heroCoverImage: "/assets/covers/science.webp",
+  heroCoverAlt: "Vědecký kontext veřejného zdraví — ilustrace vstupní stránky magazínu",
+  heroBadge: {
+    label: "Pro každého",
+    description:
+      "Články, témata a poslech — srozumitelně v češtině, s redakční kontrolou.",
+  },
+  pillarsEyebrow: "Kam dál",
+  pillarsTitle: "Čtyři vstupy do veřejného magazínu",
+  pillars: [
+    {
+      slug: "clanky",
+      label: "Články",
+      description: "Dlouhé texty o prevenci, nemocích, životním stylu a dlouhověkosti.",
+      coverImage: "/assets/covers/produce.webp",
+      href: "/verejnost/clanky",
+    },
+    {
+      slug: "temata",
+      label: "Témata",
+      description: "Deset oblastí od symptomů po výživu — vyberte si, co vás zajímá.",
+      coverImage: "/assets/covers/science.webp",
+      href: "/verejnost/temata",
+    },
+    {
+      slug: "osveta",
+      label: "Poslechová osvěta",
+      description: "Krátké lekce s textem k čtení a volitelným kvízem — každý den nová.",
+      coverImage: "/assets/covers/calm.webp",
+      href: "/verejnost/osveta",
+    },
+    {
+      slug: "rozhovory",
+      label: "Rozhovory",
+      description: "Lékaři a psychologové odpovídají na otázky, které si kladou čtenáři.",
+      coverImage: "/assets/covers/clinical-3.webp",
+      href: "/verejnost/rozhovory",
+    },
+  ],
+  primaryCta: {
+    label: "Najděte své téma",
+    href: "/verejnost/temata",
+    variant: "primary",
+  },
+  secondaryCtas: [
+    { label: "Články magazínu", href: "/verejnost/clanky", variant: "secondary" },
+    { label: "Dnešní lekce", href: "/verejnost/osveta", variant: "secondary" },
+    { label: "MeDipacient", href: "/app/pacient", variant: "secondary" },
+  ],
+  articlesNav: SHARED_ARTICLES_NAV,
+  contribution: SHARED_CONTRIBUTION,
+};
+
 const CORE_TOPIC_PILLARS: readonly MagazineHubPillar[] = [
   {
     slug: "prevence",
@@ -164,7 +230,7 @@ const CORE_TOPIC_PILLARS: readonly MagazineHubPillar[] = [
     slug: "nemoci",
     label: "Nemoci a symptomy",
     description: "Průvodce příznaky a kdy nečekat s návštěvou u specialisty.",
-    coverImage: "/assets/covers/clinical.webp",
+    coverImage: "/assets/covers/clinical-2.webp",
     href: "/verejnost/clanky?topic=nemoci",
   },
   {
@@ -252,7 +318,7 @@ export const ROZHOVORY_MAGAZINE_HUB: MagazineSectionHubConfig = {
       slug: "nemoci",
       label: "Nemoci",
       description: "Průvodce onemocněními doplněný o rozhovory se specialisty.",
-      coverImage: "/assets/covers/clinical.webp",
+      coverImage: "/assets/covers/clinical-2.webp",
       href: "/verejnost/clanky?topic=nemoci",
     },
     {
@@ -402,7 +468,7 @@ const CLANKY_TOPIC_HUBS: Record<
       "Obsah není diagnóza přes obrazovku. Při přetrvávajících nebo náhlých příznacích vyhledejte odbornou pomoc — v akutních případech volejte 155.",
     ],
     editorialIntroTitle: "Jak číst průvodce nemocemi",
-    heroCoverImage: "/assets/covers/clinical.webp",
+    heroCoverImage: "/assets/covers/clinical-2.webp",
     heroCoverAlt: "Klinický kontext — ilustrace rubriky nemocí",
     heroBadge: {
       label: "Symptomy · průvodce",

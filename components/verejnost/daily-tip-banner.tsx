@@ -4,7 +4,7 @@ import { getTodayPublicHealthVideo } from "@/lib/verejnost/osveta/db";
 import { getVideoEditorialLabel } from "@/lib/editorial/video-units";
 import { resolveOsvetaThumb } from "@/lib/verejnost/osveta/resolve-thumb";
 
-export async function DailyTipBanner() {
+export async function DailyTipBanner({ embedded = false }: { embedded?: boolean }) {
   const video = await getTodayPublicHealthVideo();
   if (!video) return null;
 
@@ -23,7 +23,7 @@ export async function DailyTipBanner() {
   });
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
+    <section className={embedded ? "mb-12" : "mx-auto max-w-6xl px-4 py-6 sm:px-6"}>
       <Link
         href={`/verejnost/osveta/${video.slug}`}
         prefetch
