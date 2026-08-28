@@ -44,6 +44,11 @@ import {
 } from "../../lib/ecosystem/editorial";
 import { SYNDICATION_RULES, getSyndicationTargets } from "../../lib/ecosystem/editorial/syndication";
 import { APP_MARKETING_IMAGE, MARKETING_VISUALS } from "../../lib/brand/marketing-visuals";
+import {
+  MAGAZINE_LISTING_MIN_WORDS,
+  shouldHideFromPublicListing,
+  filterMagazineListableArticles,
+} from "../../lib/editorial/article-quality-audit";
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 function file(rel: string) {
@@ -232,6 +237,46 @@ assert.equal(
     `food topic cover, got ${foodCover}`
   );
   assert.equal(classifyCoverTopic({ title: "Středomořský talíř", slug: "stredomorsky" }), "food");
+
+  // Magazine hubs must hide under-800w stubs (cron drafts + briefs), not only seeds.
+  assert.equal(MAGAZINE_LISTING_MIN_WORDS, 800);
+  assert.equal(
+    shouldHideFromPublicListing({
+      title: "Krátký stub",
+      slug: "verejnost-nemoci-2026-06-15-sezonni-alergie-jak-se-pripravit-na-jaro-co-stoji-za-to-vedet-jeste-dnes",
+      vip_only: false,
+      content: "<p>" + "slovo ".repeat(250) + "</p>",
+    }),
+    true,
+    "cron draft under 800w must be hidden from listings"
+  );
+  assert.equal(
+    shouldHideFromPublicListing({
+      title: "Plný magazine článek",
+      slug: "verejnost-zivotni-styl-2026-06-23-stredomorsky-talir-v-ceske-kuchyni-vyvazena-strava-bez-extremu",
+      vip_only: false,
+      content: "<p>" + "slovo ".repeat(900) + "</p>",
+    }),
+    false,
+    "800+ word magazine article stays listable"
+  );
+  assert.deepEqual(
+    filterMagazineListableArticles([
+      {
+        title: "Seed",
+        slug: "verejnost-prevence-screening-a-ockovani",
+        vip_only: false,
+        content: "<p>" + "slovo ".repeat(120) + "</p>",
+      },
+      {
+        title: "Long",
+        slug: "verejnost-zivotni-styl-2026-08-01-long",
+        vip_only: false,
+        content: "<p>" + "slovo ".repeat(900) + "</p>",
+      },
+    ]).map((a) => a.slug),
+    ["verejnost-zivotni-styl-2026-08-01-long"]
+  );
   {
     // Regression: a single EN byline token must not collapse magazine Czech HTML on /cs.
     const longCzech = `<h2>Zahradní slavnost na talíři</h2>

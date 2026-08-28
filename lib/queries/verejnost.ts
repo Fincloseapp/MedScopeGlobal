@@ -6,6 +6,7 @@ import {
   prepareArticlesForDisplay,
   type DisplayArticle,
 } from "@/lib/articles/prepare-for-display";
+import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-audit";
 import type { LocaleCode } from "@/lib/i18n/config";
 import type { ArticleWithRelations } from "@/types/database";
 
@@ -66,13 +67,15 @@ export async function listPublicArticles(options?: {
   const supabase = await createDataClient();
   if (!supabase) return demoSlice();
 
+  // Over-fetch then drop short/seed stubs so hubs stay magazine-depth after filter.
+  const fetchLimit = Math.max(limit * 8, limit + 24);
   let q = supabase
     .from("articles")
     .select(articleSelect)
     .eq("published", true)
     .eq("audience", "public")
     .order("published_at", { ascending: false, nullsFirst: false })
-    .range(offset, offset + limit - 1);
+    .range(offset, offset + fetchLimit - 1);
 
   if (options?.topic) {
     q = q.eq("public_topic", options.topic);
@@ -84,11 +87,16 @@ export async function listPublicArticles(options?: {
     return demoSlice();
   }
 
-  const rows = mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[];
+  const rows = filterMagazineListableArticles(
+    mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[]
+  );
   if (rows.length === 0) return demoSlice();
 
   const mode = options?.mode ?? "card";
-  const prepared = await prepareArticlesForDisplay(rows, locale, { mode, maxTranslate: limit });
+  const prepared = await prepareArticlesForDisplay(rows.slice(0, limit), locale, {
+    mode,
+    maxTranslate: limit,
+  });
   const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
   return prepared.map((a) => ({ ...a, cover_image_url: resolveVerejnostCoverUrl(a) }));
 }

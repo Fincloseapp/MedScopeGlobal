@@ -91,6 +91,12 @@ export function shouldHideFromPublicListing(
   if (isSeedOrDemoArticle(article)) return true;
 
   const words = countArticleWords(article.content);
+  // Hide short stubs from magazine hubs until expanded to longform (800–1500).
+  // Applies to brief ingest AND under-length cron/persona drafts so /articles,
+  // homepage, and /verejnost/clanky never surface thin cards next to full pieces.
+  if (words > 0 && words < MAGAZINE_LISTING_MIN_WORDS) {
+    return true;
+  }
   if (isBriefIngestArticle(article) && words < MAGAZINE_LISTING_MIN_WORDS) {
     return true;
   }

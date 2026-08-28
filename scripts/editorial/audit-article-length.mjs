@@ -126,7 +126,11 @@ function isCzechPublicArticle(row) {
 
 async function fetchText(url) {
   const res = await fetch(url, {
-    headers: { "User-Agent": "MedScopeArticleLengthAudit/1.0", "Cache-Control": "no-cache" },
+    headers: {
+      "User-Agent": "MedScopeArticleLengthAudit/1.0",
+      "Cache-Control": "no-cache",
+      "Accept-Language": "cs-CZ,cs;q=0.9,en;q=0.5",
+    },
     redirect: "follow",
     signal: AbortSignal.timeout(120_000),
   });
@@ -135,10 +139,41 @@ async function fetchText(url) {
 
 function extractSlugsFromHtml(html) {
   const slugs = new Set();
-  for (const m of html.matchAll(/href="(?:\/cs)?\/article\/([^"?#]+)"/g)) {
+  for (const m of html.matchAll(/href="(?:\/(?:cs|en-us))?\/article\/([^"?#]+)"/g)) {
+    slugs.add(m[1]);
+  }
+  // /verejnost/clanky expandable cards embed slugs without /article/ hrefs
+  for (const m of html.matchAll(/\b((?:verejnost|demo)-[a-z0-9-]{8,})\b/g)) {
     slugs.add(m[1]);
   }
   return [...slugs];
+}
+
+/** When service role is invalid, anon can still list public slug metadata (not content). */
+async function loadPublicSlugIndexFromAnon(limit) {
+  const env = loadProjectEnv(ROOT);
+  const url = env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anon = env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anon) return [];
+
+  const client = createClient(url, anon, { auth: { persistSession: false } });
+  const rows = [];
+  let from = 0;
+  const page = 1000;
+  while (rows.length < limit) {
+    const { data, error } = await client
+      .from("articles")
+      .select("slug,title,published_at,audience,locale,rubric_slug,public_topic,source_name")
+      .eq("published", true)
+      .eq("audience", "public")
+      .order("published_at", { ascending: false })
+      .range(from, from + page - 1);
+    if (error || !data?.length) break;
+    rows.push(...data);
+    if (data.length < page) break;
+    from += page;
+  }
+  return rows.slice(0, limit);
 }
 
 function extractArticleProse(html) {
@@ -173,7 +208,14 @@ async function loadFromSupabase(limit) {
 }
 
 async function loadFromProduction(origin, limit, verbose) {
-  const listingPaths = ["/articles", "/verejnost/clanky", "/cs", "/"];
+  const listingPaths = [
+    "/articles",
+    "/cs/articles",
+    "/verejnost/clanky",
+    "/cs/verejnost/clanky",
+    "/cs",
+    "/",
+  ];
   const slugSet = new Set();
 
   for (const path of listingPaths) {
@@ -181,6 +223,16 @@ async function loadFromProduction(origin, limit, verbose) {
     if (verbose) console.error(`listing ${path} → ${status} ${url}`);
     if (status >= 400) continue;
     for (const slug of extractSlugsFromHtml(body)) slugSet.add(slug);
+  }
+
+  // Full inventory: merge anon public slug index (metadata only) so we cover
+  // articles not currently on listing pages (typically the short backlog).
+  const anonRows = await loadPublicSlugIndexFromAnon(limit);
+  for (const row of anonRows) {
+    if (row?.slug) slugSet.add(row.slug);
+  }
+  if (verbose) {
+    console.error(`listings+anon combined unique≈${slugSet.size} (anon index=${anonRows.length})`);
   }
 
   const slugs = [...slugSet].slice(0, limit);
