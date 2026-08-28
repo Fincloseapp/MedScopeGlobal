@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
+import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-audit";
 import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rules";
 import { mixListableFeed } from "@/lib/v271/news-desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
@@ -66,7 +67,9 @@ async function loadArticlesPublic(): Promise<DisplayArticle[]> {
 
   const mapped = mapArticleList(data as Record<string, unknown>[] | null);
   const active = filterCzechContent(filterActiveArticles(mapped), "cs");
-  const publicOnly = active.filter((a) => !a.vip_only);
+  const publicOnly = filterMagazineListableArticles(
+    active.filter((a) => !a.vip_only)
+  );
   const prepared = await prepareArticlesForDisplay(publicOnly, "cs", {
     mode: "card",
     maxTranslate: 16,

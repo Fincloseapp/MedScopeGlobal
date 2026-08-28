@@ -17,6 +17,7 @@ import {
   prepareArticlesForDisplay,
   type DisplayArticle,
 } from "@/lib/articles/prepare-for-display";
+import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-audit";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { createDataClient } from "@/lib/supabase/data";
 import {
@@ -111,22 +112,18 @@ export async function getFeaturedArticles(
     );
     return getDemoMagazineArticles().slice(0, limit);
   }
-  const filtered = filterForReader(
-    mapArticleList(data as Record<string, unknown>[] | null),
-    isVip,
-    accessLevel,
-    locale
+  const filtered = filterMagazineListableArticles(
+    filterForReader(
+      mapArticleList(data as Record<string, unknown>[] | null),
+      isVip,
+      accessLevel,
+      locale
+    )
   );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
     maxTranslate: limit,
   });
-  if (prepared.length === 0) {
-    const { getDemoMagazineArticles } = await import(
-      "@/lib/verejnost/demo-magazine-articles"
-    );
-    return getDemoMagazineArticles().slice(0, limit);
-  }
   return prepared.slice(0, limit);
 }
 
@@ -137,10 +134,9 @@ export async function getLatestArticles(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
-  const {
-    getDemoMagazineArticles,
-    shouldUseDemoMagazineArticles,
-  } = await import("@/lib/verejnost/demo-magazine-articles");
+  const { getDemoMagazineArticles } = await import(
+    "@/lib/verejnost/demo-magazine-articles"
+  );
 
   // When DB exists but is empty, try the same static seed as /verejnost hubs.
   try {
@@ -156,7 +152,7 @@ export async function getLatestArticles(
   if (!supabase) {
     return getDemoMagazineArticles().slice(offset, offset + limit);
   }
-  const fetchLimit = limit * 8;
+  const fetchLimit = limit * 12;
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -171,14 +167,13 @@ export async function getLatestArticles(
   // Include lay/public Czech articles so /articles "Vše" matches the live portal feed
   // (recent pipeline output is mostly audience=public / rubric verejnost).
   const rows = mapArticleList(data as Record<string, unknown>[] | null);
-  const filtered = filterForReader(rows, isVip, accessLevel, locale);
+  const filtered = filterMagazineListableArticles(
+    filterForReader(rows, isVip, accessLevel, locale)
+  );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
     maxTranslate: limit,
   });
-  if (shouldUseDemoMagazineArticles(prepared) && offset === 0) {
-    return getDemoMagazineArticles().slice(0, limit);
-  }
   return prepared.slice(0, limit);
 }
 
