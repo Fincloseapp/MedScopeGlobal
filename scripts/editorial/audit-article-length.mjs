@@ -135,7 +135,7 @@ async function fetchText(url) {
 
 function extractSlugsFromHtml(html) {
   const slugs = new Set();
-  for (const m of html.matchAll(/href="\/article\/([^"?#]+)"/g)) {
+  for (const m of html.matchAll(/href="(?:\/cs)?\/article\/([^"?#]+)"/g)) {
     slugs.add(m[1]);
   }
   return [...slugs];
@@ -187,12 +187,24 @@ async function loadFromProduction(origin, limit, verbose) {
   const rows = [];
 
   for (const slug of slugs) {
-    const { status, body } = await fetchText(`${origin}/article/${slug}?_=${Date.now()}`);
-    if (status >= 400) continue;
-    const content = extractArticleProse(body);
-    if (!content) continue;
-    const titleMatch = body.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-    const title = titleMatch ? stripHtml(titleMatch[1]) : slug;
+    // Prefer Czech UI path — `/article/...` often redirects to en-us and skips
+    // polishCzechFields, which historically hid short `/cs/article/...` stubs.
+    const paths = [`/cs/article/${slug}`, `/article/${slug}`];
+    let content = "";
+    let title = slug;
+    let fetched = false;
+    for (const path of paths) {
+      const { status, body } = await fetchText(`${origin}${path}?_=${Date.now()}`);
+      if (status >= 400) continue;
+      const prose = extractArticleProse(body);
+      if (!prose) continue;
+      content = prose;
+      const titleMatch = body.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+      title = titleMatch ? stripHtml(titleMatch[1]) : slug;
+      fetched = true;
+      break;
+    }
+    if (!fetched || !content) continue;
     rows.push({
       id: `prod-${slug}`,
       title,

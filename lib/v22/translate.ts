@@ -261,9 +261,22 @@ function stripEnglishEditorialNoise(text: string): string {
     .trim();
 }
 
+/** Drop known bilingual bylines before EN-leak checks (must not nuke magazine bodies). */
+function stripAttributionNoise(text: string): string {
+  return String(text ?? "")
+    .replace(/\bMedScopeGlobal\s+AI-Assisted\s+Editorial\s+Team\b/gi, " ")
+    .replace(/\bAI-Assisted\s+Editorial\s+Team\b/gi, " ")
+    .replace(/\bAI-asistovaná\s+syntéza\s+obsahu\b/gi, " ")
+    .replace(/\bEditoriální\s+tým\s+MedScopeGlobal\b/gi, " ")
+    .replace(/\b\(AI-asistovaná\s+syntéza\s+obsahu\)\b/gi, " ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 function hasEnglishLeak(text: string): boolean {
+  const cleaned = stripAttributionNoise(text);
   return /\b(Comment|Editorial|does risk disappear|stability promotes patient confidence|the|and|with|from|this|that|are|was|were|have|has|for|into|about|patients|treatment|study|trial)\b/i.test(
-    text
+    cleaned
   );
 }
 
@@ -436,12 +449,27 @@ export function toCzechExcerpt(excerpt: string | null | undefined, title: string
   return buildTopicExcerpt(czechTitle, cleaned);
 }
 
+/**
+ * Foreign / RSS bodies get a short Czech teaser. Magazine-length Czech HTML must
+ * never be replaced — a single EN byline token (e.g. "Editorial Team") used to
+ * collapse 1200+ word public articles on `/cs/article/...` to ~40 words.
+ */
 function contentNeedsCzechTeaser(content: string | null | undefined): boolean {
   if (!content) return false;
   if (/\]\]>|<\!\[CDATA\[/i.test(content)) return true;
   const plain = stripRssArtifacts(content);
   if (plain.length < 40) return true;
-  return isEnglishDominant(plain) || hasEnglishLeak(plain);
+
+  const cleaned = stripAttributionNoise(plain);
+  const words = cleaned.split(/\s+/).filter(Boolean).length;
+  const hasCzech = /[áčďéěíňóřšťúůýž]/i.test(cleaned);
+
+  // Substantial Czech magazine draft → keep body; only rewrite if EN-dominant.
+  if (hasCzech && words >= 200) {
+    return isEnglishDominant(cleaned);
+  }
+
+  return isEnglishDominant(cleaned) || hasEnglishLeak(cleaned);
 }
 
 export function polishCzechFields<
