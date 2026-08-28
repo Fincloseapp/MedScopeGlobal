@@ -11,7 +11,7 @@
  * before next-env via ??= in OpenNext init).
  */
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync } from "node:fs";
 
 function loadEnvFile(path) {
   if (!existsSync(path)) return;
@@ -95,6 +95,11 @@ if (!process.env.NEXT_PUBLIC_SITE_URL) {
 
 if (!existsSync(".dev.vars")) {
   console.warn("Warning: .dev.vars missing — secrets may be incomplete for SSR.");
+}
+
+// Fresh OpenNext output — stale next-env.mjs can duplicate production/development exports
+if (existsSync(".open-next")) {
+  rmSync(".open-next", { recursive: true, force: true });
 }
 
 // Build without baking Cloudflare API credentials into next-env.mjs

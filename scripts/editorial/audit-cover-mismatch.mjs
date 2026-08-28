@@ -91,35 +91,14 @@ function coverPathFromUrl(url) {
   }
 }
 
-/** Infer observed visual bucket from cover path (mirrors LOCAL_COVER_TOPICS loosely). */
-function observedTopicsFromCover(path, helpers) {
-  if (!path) return [];
-  const lower = path.toLowerCase();
-  if (helpers.isFoodCoverUrl(path)) return ["food"];
-  if (lower.includes("/covers/sleep")) return ["sleep"];
-  if (lower.includes("/covers/calm")) return ["calm", "sleep"];
-  if (lower.includes("/covers/movement")) return ["movement", "walk"];
-  if (lower.includes("/covers/walk")) return ["walk", "movement"];
-  if (lower.includes("/covers/seniors")) return ["seniors"];
-  if (lower.includes("/covers/tech")) return ["tech"];
-  if (lower.includes("/covers/vitals")) return ["vitals", "clinical"];
-  if (lower.includes("/covers/science")) return ["research", "tech"];
-  if (lower.includes("/covers/research")) return ["research", "clinical"];
-  if (lower.includes("/covers/clinical")) return ["clinical", "research", "vitals"];
-  return [];
-}
-
 function reasonForMismatch(expected, path, helpers) {
   if (!path) return "missing-cover";
   if (helpers.isBrokenCoverUrl(path) || helpers.isDeniedStockUrl(path) || helpers.isStaleGenericStockUrl(path)) {
     return "stale-or-broken-stock";
   }
+  // Single source of truth — same LOCAL_COVER_TOPICS as resolveArticleCoverUrl
   if (helpers.isMismatchedLocalCover(path, expected)) {
     return `local-cover-mismatch: expected=${expected} got=${path}`;
-  }
-  const observed = observedTopicsFromCover(path, helpers);
-  if (observed.length && !observed.includes(expected)) {
-    return `topic-mismatch: expected=${expected} cover-topics=[${observed.join(",")}] path=${path}`;
   }
   // Food titles must never show clinical/brain
   if (expected === "food" && helpers.isClinicalOrBrainCoverUrl(path)) {
