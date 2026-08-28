@@ -3,7 +3,7 @@
  * Apply / verify Mediterranean article longform on /cs after polishCzechFields fix.
  *
  * Usage (PC with valid service role + after Workers deploy):
- *   export MEDSCOPE_PROJECT_ROOT=D:\medscope.local   # or /workspace
+ *   export MEDSCOPE_PROJECT_ROOT=D:\medscope.local
  *   node scripts/editorial/verify-mediterranean-cs.mjs
  *   node scripts/editorial/verify-mediterranean-cs.mjs --origin=https://medscopeglobal.com
  *
@@ -14,7 +14,7 @@ import { createClient } from "@supabase/supabase-js";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadProjectEnv } from "../load-env.mjs";
-import { polishCzechFields } from "../../lib/v22/translate.ts";
+import { countPublicArticleWords } from "../../lib/v25/writers/writer-base.mjs";
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dir, "..", "..");
@@ -36,10 +36,7 @@ function extractArticleProse(html) {
 }
 
 function wordCount(html) {
-  return String(html ?? "")
-    .replace(/<[^>]+>/g, " ")
-    .split(/\s+/)
-    .filter(Boolean).length;
+  return countPublicArticleWords(html);
 }
 
 function parseArgs() {
@@ -60,11 +57,11 @@ const enProse = extractArticleProse(enHtml);
 const csWords = wordCount(csProse);
 const enWords = wordCount(enProse);
 const stub = /Konkrétní shrnutí zahraniční zprávy pro české lékaře/i.test(csProse);
-const foodCover = /food|produce|olive|vegetable/i.test(
-  (csHtml.match(/og:image"[^>]*content="([^"]+)"/i) ||
-    csHtml.match(/content="([^"]+)"[^>]*og:image/i) ||
-    [])[1] ?? ""
-);
+const og =
+  (csHtml.match(/property="og:image"[^>]*content="([^"]+)"/i) ||
+    csHtml.match(/content="([^"]+)"[^>]*property="og:image"/i) ||
+    [])[1] ?? "";
+const foodCover = /food|produce|olive|vegetable/i.test(og);
 const contribution = /Příspěvek|mikro-příspěvek/i.test(csHtml);
 
 const report = {
@@ -72,6 +69,7 @@ const report = {
   cs_prose_words: csWords,
   en_us_prose_words: enWords,
   stub_on_cs: stub,
+  og_image: og,
   food_cover: foodCover,
   contribution_cta: contribution,
   ok: csWords >= 800 && !stub,
@@ -90,20 +88,10 @@ if (writeFromEnUs) {
   const body = enProse
     .replace(/<h2[^>]*>Support the author[\s\S]*$/i, "")
     .replace(/<h2[^>]*>Podpořit autora[\s\S]*$/i, "");
-  const polished = polishCzechFields(
-    {
-      title: "Středomořský talíř na českém stole: Jak si dopřát zdraví bez nutnosti opustit domov",
-      excerpt:
-        "Středomořský talíř v české kuchyni — vyvážená strava bez extrémů, praktický nákup a týdenní plán.",
-      content: body,
-    },
-    "cs"
-  );
   const { error } = await admin
     .from("articles")
     .update({
-      content: polished.content,
-      excerpt: polished.excerpt,
+      content: body,
       updated_at: new Date().toISOString(),
     })
     .eq("slug", SLUG);
@@ -111,7 +99,7 @@ if (writeFromEnUs) {
     console.error("DB write failed:", error.message);
     process.exit(1);
   }
-  console.log(`Wrote ${wordCount(polished.content)} words to articles.content for ${SLUG}`);
+  console.log(`Wrote ${wordCount(body)} words to articles.content for ${SLUG}`);
 }
 
 process.exit(report.ok ? 0 : 2);
