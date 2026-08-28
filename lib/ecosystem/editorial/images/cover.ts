@@ -485,7 +485,12 @@ export function articleNeedsCoverRemediation(input: {
     if (isMismatchedLocalCover(localPath, topic)) return true;
   }
   const resolved = resolveArticleCoverUrl({
-    ...input,
+    title: input.title,
+    slug: input.slug ?? undefined,
+    excerpt: input.excerpt,
+    category: input.category,
+    publicTopic: input.publicTopic,
+    coverImageUrl: input.coverImageUrl,
     preferCurated: true,
   });
   return (resolved ?? null) !== raw;
