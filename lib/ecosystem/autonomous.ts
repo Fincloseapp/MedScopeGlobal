@@ -1,3 +1,5 @@
+import { ARTICLE_LENGTH_CONFIG } from "@/lib/ecosystem/editorial/article-length";
+
 /** Autonomous operation configuration — content, SEO, ads, translations */
 
 export type AutonomousTask =
@@ -84,6 +86,8 @@ export const CONTENT_GUARDRAILS = {
   requiredDisclaimers: true,
   maxTranslationBatch: 50,
   humanReviewLocales: ["en-US", "ru", "zh-CN"] as const,
+  /** Czech lay public articles — min/target/max words, token budget, required sections */
+  articleLength: ARTICLE_LENGTH_CONFIG,
 };
 
 /** Cron endpoint auth — uses CRON_SECRET from env */

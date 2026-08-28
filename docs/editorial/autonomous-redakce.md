@@ -56,6 +56,7 @@ Guardrails pro autonomní generování:
 - Blokovaná témata (miracle claims, diagnosis without disclaimer)
 - Povinný medical disclaimer per locale (`MEDICAL_DISCLAIMER`)
 - VIP CTA šablony — čtenáře směřují k longevity protokolům
+- **Délka veřejných článků (CS lay):** 800–1500 slov, struktura úvod → tělo → praktické tipy → shrnutí → Zdroje (`lib/ecosystem/editorial/article-length.mjs`, `CONTENT_GUARDRAILS.articleLength`)
 
 Konfigurace: `lib/ecosystem/editorial/compliance.ts`
 
@@ -137,6 +138,36 @@ UI: `components/monetization/article-tringelt-tip.tsx` na stránce článku.
 
 Bez Stripe klíčů: komponenta zobrazí disabled stav (503).
 
+## Délka článků a backfill
+
+| Konstanta | Hodnota | Soubor |
+|-----------|---------|--------|
+| `PUBLIC_ARTICLE_MIN_WORDS` | **800** | `lib/ecosystem/editorial/article-length.mjs` |
+| `PUBLIC_ARTICLE_TARGET_WORDS` | **1500** | stejné |
+| `PUBLIC_ARTICLE_MAX_TOKENS` | **8192** | stejné (Gemini/OpenAI; Groq max 4096) |
+
+Denní generování: `/api/cron/public-articles` → `lib/v25/writers/writer-base.mjs` volá `expandPublicArticleIfShort()` po každém draftu. `generate-articles` cron zapisuje `article_length` do `editorial_queue.metadata`.
+
+### Regenerace krátkých existujících článků
+
+```bash
+# Dry-run — vypíše kandidáty pod 800 slov
+node scripts/regenerate-short-public.mjs --dry-run --limit=20
+
+# Plná regenerace + expansion pass (vyžaduje GROQ/OpenAI/Gemini + service role)
+node scripts/regenerate-short-public.mjs --limit=10 --expand --expand-target=1500
+
+# Konkrétní slug
+node scripts/regenerate-short-public.mjs --slug=verejnost-prevence-2026-01-15-foo --expand
+```
+
+Manuální trigger cronu (Bearer `CRON_SECRET`):
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" \
+  "https://medscopeglobal.com/api/cron/public-articles?limit=4"
+```
+
 ## Migrace
 
 Soubor: `supabase/migrations/20260825220000_editorial_redakce.sql`
@@ -154,7 +185,7 @@ Soubor: `supabase/migrations/20260825230000_editorial_images.sql`
 
 ```
 lib/ecosystem/editorial/
-  desks.ts, personas.ts, syndication.ts, compliance.ts, index.ts
+  desks.ts, personas.ts, syndication.ts, compliance.ts, article-length.mjs, index.ts
   images/ — policy, prompts, matcher, sources, processor, alt-text
 lib/ecosystem/monetization.ts  — ARTICLE_TIP_TIERS
 lib/ecosystem/autonomous.ts    — editorial-queue, editorial-images, syndicate-articles

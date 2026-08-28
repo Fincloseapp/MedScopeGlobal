@@ -2,6 +2,7 @@
 
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { CONTENT_GUARDRAILS } from "@/lib/ecosystem/autonomous";
+import { ARTICLE_LENGTH_CONFIG } from "@/lib/ecosystem/editorial/article-length";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import {
   EDITORIAL_DESKS,
@@ -23,6 +24,7 @@ export * from "./personas";
 export * from "./syndication";
 export * from "./compliance";
 export * from "./images";
+export * from "./article-length";
 
 export type EditorialQueueItem = {
   id: string;
@@ -120,6 +122,7 @@ export async function runEditorialQueueCron(): Promise<{
         queue_ref: item.id,
         review_pipeline: reviewers.map((r) => ({ id: r.id, role: r.role })),
         vip_cta_weight: desk.vipCtaWeight,
+        article_length: ARTICLE_LENGTH_CONFIG,
       },
     });
     if (ok) persisted += 1;
@@ -180,6 +183,7 @@ export async function runGenerateArticlesCron(): Promise<{
         require_editorial_review: CONTENT_GUARDRAILS.requireEditorialReview,
         legacy_cron: "/api/cron/public-articles",
         review_pipeline: reviewers.map((r) => ({ id: r.id, role: r.role })),
+        article_length: ARTICLE_LENGTH_CONFIG,
       },
     });
     if (ok) persisted += 1;
