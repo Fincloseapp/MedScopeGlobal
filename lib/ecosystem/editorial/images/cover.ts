@@ -5,7 +5,12 @@
  * reused across Mediterranean diet, menopause, sleep, prevention…). Replace
  * broken / placeholder / mismatched clinical stock with topic-matched local
  * curated covers under /assets/covers/.
+ *
+ * Shared by: article pages, veřejnost listings, editorial image backfill
+ * (`matcher.ts`), and the brain-cover-ban compliance layer in `policy.ts`.
  */
+
+import type { EditorialTopic } from "../desks";
 
 export type CoverVisualTopic =
   | "food"
@@ -46,6 +51,98 @@ const COVER_POOL: Record<CoverVisualTopic, readonly string[]> = {
   walk: ["/assets/covers/walk.webp", "/assets/covers/movement.webp"],
 };
 
+/** Curated paths that read as clinical / lab / brain — never pair with food titles. */
+export const CLINICAL_COVER_SLUGS = [
+  "clinical",
+  "clinical-2",
+  "clinical-3",
+  "vitals",
+  "research",
+  "research-2",
+  "science",
+  "tech",
+] as const;
+
+/** Keywords used to score cover candidates against article text (editorial matcher). */
+export const VISUAL_TOPIC_KEYWORDS: Record<CoverVisualTopic, readonly string[]> = {
+  food: [
+    "talíř",
+    "talir",
+    "středomořsk",
+    "stredomorsk",
+    "strava",
+    "výživ",
+    "vyziv",
+    "jídlo",
+    "jidlo",
+    "meal",
+    "diet",
+    "salad",
+    "salát",
+    "produce",
+    "food",
+    "kuchyn",
+    "olive",
+    "zelenin",
+    "ovoce",
+    "snídan",
+    "snidani",
+    "potravin",
+  ],
+  sleep: ["spánek", "spanek", "sleep", "odpočinek", "odpocinek", "postel", "unava", "únava"],
+  calm: ["stres", "stress", "mindful", "meditac", "relax", "klid", "wellness"],
+  movement: ["pohyb", "cvič", "cvic", "fitness", "sport", "chůze", "chuze", "walk", "trenink"],
+  seniors: ["senior", "stárnut", "starnut", "aging", "menopauz", "důchod", "duchod"],
+  clinical: ["klinick", "nemoc", "chorob", "lékař", "lekar", "hospital", "ordinac", "diagn"],
+  research: ["studie", "výzkum", "vyzkum", "research", "biomarker", "guideline", "prevence"],
+  tech: ["digitáln", "digital", "aplikac", "telemedic", "wearable", "ai"],
+  vitals: ["glukóz", "glukoz", "tlak", "srdce", "cholesterol", "vitamin", "krev"],
+  walk: ["chůze", "chuze", "walk", "příroda", "priroda", "outdoor"],
+};
+
+export function getCoverPoolForTopic(topic: CoverVisualTopic): readonly string[] {
+  return COVER_POOL[topic] ?? COVER_POOL.research;
+}
+
+/** Map fine-grained visual topic → editorial desk topic (DB / alt-text metadata). */
+export function mapCoverVisualTopicToEditorialTopic(
+  visual: CoverVisualTopic
+): EditorialTopic {
+  switch (visual) {
+    case "food":
+    case "sleep":
+    case "calm":
+    case "movement":
+    case "walk":
+      return "lifestyle";
+    case "seniors":
+      return "seniors";
+    case "clinical":
+    case "vitals":
+    case "tech":
+    case "research":
+    default:
+      return "trending";
+  }
+}
+
+/** True when URL points at clinical/lab/brain-style local covers. */
+export function isClinicalOrBrainCoverUrl(url: string): boolean {
+  const lower = url.toLowerCase();
+  if (!lower.includes("/assets/covers/")) return false;
+  return CLINICAL_COVER_SLUGS.some((slug) => lower.includes(`/covers/${slug}.webp`));
+}
+
+/** True when URL is from the food visual pool. */
+export function isFoodCoverUrl(url: string): boolean {
+  const lower = url.toLowerCase();
+  if (!lower.includes("/assets/covers/")) return false;
+  return (
+    lower.includes("/covers/food") ||
+    lower.includes("/covers/produce")
+  );
+}
+
 /** Dead / blocked remote IDs that 404 or are known-bad stock. */
 const DEAD_OR_BAD_REMOTE = [
   "photo-1584515930387-285e4804f4cb",
@@ -55,9 +152,46 @@ const DEAD_OR_BAD_REMOTE = [
   "photo-1559757175-5700cde872bc",
   "photo-1584308664744-24d5c474f2ae",
   "photo-1478737270239-2f02e77f67c9",
-  "photo-1576091160550-2173dba999ef", // listed bad-unsplash
+  "photo-1576091160550-2173dba999ef", // dark hands clinical
+  "photo-1576091160399-112ba8d25d1d", // brain-on-stick anatomy model (v25 default)
   "photo-1579684385127-1ef15d508118",
 ] as const;
+
+/** v25 / Unsplash stock paths and IDs that must never appear on lifestyle articles. */
+const DENIED_STOCK_PATTERNS = [
+  /doctor-phone/i,
+  /\/brain\b/i,
+  /brain-on-stick/i,
+  /photo-1576091160399/i,
+  /photo-1576091160550/i,
+  /photo-1559757175-0eb30cd8c063/i, // brain cross-section stock
+] as const;
+
+/** Which article topics each local cover asset is appropriate for. */
+const LOCAL_COVER_TOPICS: Partial<
+  Record<string, readonly CoverVisualTopic[]>
+> = {
+  "/assets/covers/food.webp": ["food"],
+  "/assets/covers/food-2.webp": ["food"],
+  "/assets/covers/food-3.webp": ["food"],
+  "/assets/covers/food-4.webp": ["food"],
+  "/assets/covers/produce.webp": ["food"],
+  "/assets/covers/sleep.webp": ["sleep"],
+  "/assets/covers/calm.webp": ["calm"],
+  "/assets/covers/calm-2.webp": ["calm", "sleep"],
+  "/assets/covers/movement.webp": ["movement", "walk"],
+  "/assets/covers/movement-2.webp": ["movement", "walk"],
+  "/assets/covers/walk.webp": ["walk", "movement"],
+  "/assets/covers/seniors.webp": ["seniors"],
+  "/assets/covers/clinical.webp": ["clinical", "research", "vitals"],
+  "/assets/covers/clinical-2.webp": ["clinical", "research", "vitals"],
+  "/assets/covers/clinical-3.webp": ["clinical", "research"],
+  "/assets/covers/research.webp": ["research", "clinical"],
+  "/assets/covers/research-2.webp": ["research", "clinical"],
+  "/assets/covers/science.webp": ["research", "tech"],
+  "/assets/covers/tech.webp": ["tech"],
+  "/assets/covers/vitals.webp": ["vitals", "clinical"],
+};
 
 const FOOD_RE =
   /tal[ií][rř]|st[rř]edo\s*mo[rř]|stredomorsk|kuchyn|strav|j[ií]dl|meal|diet|v[yý][zž]iv|sal[aá]t|olive|zelenin|protein|b[ií]lkovin|hydrat|pitn[yý]\s+re[zž]im|pitn[eé]\s+re[zž]im|ovoce|sn[ií]dan|ve[cč]e[rř]|potravin/i;
@@ -150,6 +284,14 @@ export function pickCuratedCover(
   return pool[hashString(seed) % pool.length]!;
 }
 
+export function isDeniedStockUrl(url: string | null | undefined): boolean {
+  if (!url?.trim()) return false;
+  const lower = url.toLowerCase();
+  if (DENIED_STOCK_PATTERNS.some((pattern) => pattern.test(lower))) return true;
+  if (DEAD_OR_BAD_REMOTE.some((id) => lower.includes(id))) return true;
+  return false;
+}
+
 export function isBrokenCoverUrl(url: string | null | undefined): boolean {
   if (!url?.trim()) return true;
   const lower = url.toLowerCase();
@@ -167,8 +309,21 @@ export function isBrokenCoverUrl(url: string | null | undefined): boolean {
   }
   if (/\.svg(\?|$)/i.test(lower)) return true;
   if (/\/assets\/affiliate\//i.test(lower)) return true;
-  if (DEAD_OR_BAD_REMOTE.some((id) => lower.includes(id))) return true;
+  if (isDeniedStockUrl(url)) return true;
   return false;
+}
+
+/** Stored local cover does not match the article topic (e.g. clinical.webp on food copy). */
+export function isMismatchedLocalCover(
+  url: string | null | undefined,
+  topic: CoverVisualTopic
+): boolean {
+  if (!url?.trim()) return false;
+  const normalized = url.split("?")[0]!.toLowerCase();
+  if (!normalized.startsWith("/assets/covers/")) return false;
+  const allowed = LOCAL_COVER_TOPICS[normalized];
+  if (!allowed) return false;
+  return !allowed.includes(topic);
 }
 
 /** Overused / generic clinical AI stock from the v25 pipeline. */
@@ -206,22 +361,26 @@ export function resolveArticleCoverUrl(input: {
   const seed = input.slug || input.title;
   const curated = pickCuratedCover(topic, seed);
 
-  if (isBrokenCoverUrl(raw)) {
+  if (isBrokenCoverUrl(raw) || (raw && isDeniedStockUrl(raw))) {
     return input.preferCurated === false ? null : curated;
-  }
-
-  // Keep first-party local covers (marketing / covers / newsletter)
-  if (
-    raw &&
-    (/^\/assets\/covers\//i.test(raw) ||
-      /^\/assets\/newsletter\//i.test(raw) ||
-      /^\/assets\/marketing\//i.test(raw))
-  ) {
-    return raw;
   }
 
   if (raw && isStaleGenericStockUrl(raw)) {
     return curated;
+  }
+
+  // Local covers: keep only when topic-appropriate (clinical.webp is not food art)
+  if (raw && /^\/assets\/covers\//i.test(raw)) {
+    return isMismatchedLocalCover(raw, topic) ? curated : raw;
+  }
+
+  // Marketing / newsletter art — keep as-is
+  if (
+    raw &&
+    (/^\/assets\/newsletter\//i.test(raw) ||
+      /^\/assets\/marketing\//i.test(raw))
+  ) {
+    return raw;
   }
 
   // Unknown remote — keep if it looks like a real raster URL

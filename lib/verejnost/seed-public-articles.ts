@@ -1,6 +1,6 @@
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import type { PublicTopic } from "@/lib/queries/verejnost";
-import { VEREJNOST_FALLBACK_COVER } from "@/lib/verejnost/images";
+import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
 
 type SeedArticle = {
   slug: string;
@@ -34,7 +34,6 @@ const SEED_ARTICLES: SeedArticle[] = [
 </ul>
 <p><em>Informace nenahrazují lékařskou péči. Při dlouhodobých poruchách spánku kontaktujte praktického lékaře.</em></p>`,
     public_topic: "zivotni-styl",
-    cover_image_url: VEREJNOST_FALLBACK_COVER,
     meta_description:
       "Praktický průvodce zdravým spánkem: režim dne, hygiena ložnice a varovné signály pro konzultaci s lékařem.",
     editors_pick: true,
@@ -58,7 +57,6 @@ const SEED_ARTICLES: SeedArticle[] = [
 </ul>
 <p><em>MedScopeGlobal · Veřejné zdraví · Obsah pro vzdělávání.</em></p>`,
     public_topic: "prevence",
-    cover_image_url: VEREJNOST_FALLBACK_COVER,
     meta_description:
       "Přehled preventivních prohlídek, screeningových programů a očkování v Česku — srozumitelně pro veřejnost.",
     editors_pick: true,
@@ -82,7 +80,6 @@ const SEED_ARTICLES: SeedArticle[] = [
 <p>Přetrvávající horečka, opakující se bolesti nebo neobvyklé změny na kůži — domluvte se s praktickým lékařem.</p>
 <p><em>MedScopeGlobal · Veřejné zdraví · V akutních stavech volejte 155.</em></p>`,
     public_topic: "nemoci",
-    cover_image_url: VEREJNOST_FALLBACK_COVER,
     meta_description:
       "Kdy vyhledat lékaře a kdy počkat: akutní příznaky, varovné signály a praktické rady pro rozhodování.",
     editors_pick: true,
@@ -105,7 +102,6 @@ const SEED_ARTICLES: SeedArticle[] = [
 </ul>
 <p><em>MedScopeGlobal · Rozhovory · Informace nenahrazují vyšetření u kardiologa.</em></p>`,
     public_topic: "rozhovory",
-    cover_image_url: VEREJNOST_FALLBACK_COVER,
     meta_description:
       "Rozhovor s kardiologem o prevenci infarktu a mrtvice: pohyb, strava, tlak a cholesterol srozumitelně.",
     editors_pick: true,
@@ -154,7 +150,6 @@ const SEED_ARTICLES: SeedArticle[] = [
 </ul>
 <p><em>MedScopeGlobal · Životní styl · Informace nenahrazují individuální lékařskou péči.</em></p>`,
     public_topic: "zivotni-styl",
-    cover_image_url: VEREJNOST_FALLBACK_COVER,
     meta_description:
       "Vyvážená strava bez extrémů: středomořský talíř v české kuchyni — nákupní seznam, týdenní plán a mýty vs. realita.",
     read_time_minutes: 9,
@@ -206,7 +201,15 @@ export async function seedPublicArticlesIfEmpty(): Promise<{ seeded: number; ski
       slug: article.slug,
       excerpt: article.excerpt,
       content: article.content,
-      cover_image_url: article.cover_image_url ?? null,
+      cover_image_url:
+        article.cover_image_url ??
+        resolveArticleCoverUrl({
+          title: article.title,
+          slug: article.slug,
+          excerpt: article.excerpt,
+          publicTopic: article.public_topic,
+          preferCurated: true,
+        }),
       category_id: cat.id,
       author_id: authorId,
       published: true,
