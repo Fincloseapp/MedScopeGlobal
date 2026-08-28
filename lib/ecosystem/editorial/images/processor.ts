@@ -2,7 +2,7 @@
 
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { isMissingOrStaleHeroImage, validateImageCompliance } from "./policy";
-import { matchImageForArticle } from "./matcher";
+import { matchImageForArticle, inferVisualTopic } from "./matcher";
 import type {
   ArticleForImageMatch,
   ArticleImageSuggestionRecord,
@@ -46,12 +46,17 @@ export async function suggestImageForArticle(
   const candidate = await matchImageForArticle(article);
   if (!candidate) return null;
 
+  const visualTopic = inferVisualTopic(article);
+
   const compliance = validateImageCompliance({
     url: candidate.url,
     altTextCs: candidate.altTextCs,
     altTextEn: candidate.altTextEn,
     topic: candidate.topic,
     articleTitle: article.title,
+    articleSlug: article.slug,
+    excerpt: article.excerpt,
+    visualTopic,
   });
 
   return {
@@ -64,6 +69,7 @@ export async function suggestImageForArticle(
     sourceType: candidate.sourceType,
     compliancePassed: compliance.passed,
     complianceNotes: compliance.issues,
+    visualTopic,
   };
 }
 
@@ -116,6 +122,7 @@ async function applySuggestion(
     hero_alt_text_cs: suggestion.altTextCs,
     hero_alt_text_en: suggestion.altTextEn,
     editorial_image_topic: suggestion.topic,
+    editorial_image_visual_topic: suggestion.visualTopic,
     editorial_image_source: suggestion.sourceType,
     editorial_image_applied_at: new Date().toISOString(),
   };

@@ -5,57 +5,97 @@ import { DEFAULT_TOPIC_WEIGHTS } from "../desks";
 import type { ArticleForImageMatch, ArticleImageCandidate } from "./types";
 import { buildImageBrief, buildAltText } from "./prompts";
 import {
-  listCuratedCandidates,
   buildCandidateFromUrl,
   fetchUnsplashIfAvailable,
   getPlaceholderFallback,
+  listCuratedCandidatesForVisualTopic,
 } from "./sources";
 import { validateImageCompliance } from "./policy";
+import {
+  classifyCoverTopic,
+  mapCoverVisualTopicToEditorialTopic,
+  type CoverVisualTopic,
+} from "./cover";
 
 const TOPIC_KEYWORDS: Record<EditorialTopic, string[]> = {
   longevity: [
     "longevity",
     "dlouhověkost",
+    "dlouhovekost",
     "stárnutí",
+    "starnuti",
     "aging",
     "anti-aging",
     "telomere",
     "biohacking",
     "preventivní",
+    "preventivni",
     "vitality",
   ],
   lifestyle: [
     "lifestyle",
     "životní styl",
+    "zivotni styl",
     "strava",
     "nutrition",
+    "výživa",
+    "vyziva",
     "cvičení",
+    "cviceni",
     "exercise",
     "spánek",
+    "spanek",
     "sleep",
     "wellness",
     "mindfulness",
+    "talíř",
+    "talir",
+    "středomořsk",
+    "stredomorsk",
+    "kuchyn",
+    "jídlo",
+    "jidlo",
+    "meal",
+    "diet",
+    "salát",
+    "salat",
+    "potravin",
+    "ovoce",
+    "zelenin",
   ],
   seniors: [
     "senior",
     "senioři",
+    "seniori",
     "elderly",
     "geriatr",
     "pečovatelsk",
+    "pecovatelsk",
     "domácí péče",
+    "domaci pece",
     "mobilita",
     "fall prevention",
+    "menopauz",
+    "důchod",
+    "duchod",
   ],
   trending: [
     "zprávy",
+    "zpravy",
     "news",
     "studie",
     "study",
     "výzkum",
+    "vyzkum",
     "research",
     "guideline",
     "doporučení",
+    "doporuceni",
     "epidemi",
+    "biomarker",
+    "klinick",
+    "nemoc",
+    "chorob",
   ],
 };
 
@@ -67,12 +107,20 @@ function tokenize(text: string): string[] {
     .filter((w) => w.length > 2);
 }
 
-/** Infer editorial topic from article text using desk-weighted keyword scoring */
+function articleHaystack(article: ArticleForImageMatch): string {
+  const publicTopic =
+    typeof article.metadata?.public_topic === "string"
+      ? article.metadata.public_topic
+      : null;
+  return `${article.title} ${article.excerpt ?? ""} ${article.content?.slice(0, 500) ?? ""} ${publicTopic ?? ""}`;
+}
+
+/** Infer editorial desk topic from article text (metadata / alt-text). */
 export function inferArticleTopic(article: ArticleForImageMatch): EditorialTopic {
-  const corpus = `${article.title} ${article.excerpt ?? ""} ${article.content?.slice(0, 500) ?? ""}`;
+  const corpus = articleHaystack(article);
   const tokens = tokenize(corpus);
 
-  let bestTopic: EditorialTopic = "longevity";
+  let bestTopic: EditorialTopic = "lifestyle";
   let bestScore = -1;
 
   for (const topic of Object.keys(TOPIC_KEYWORDS) as EditorialTopic[]) {
@@ -94,6 +142,20 @@ export function inferArticleTopic(article: ArticleForImageMatch): EditorialTopic
   return bestTopic;
 }
 
+/** Infer visual cover topic — shared classifier with article page + listings. */
+export function inferVisualTopic(article: ArticleForImageMatch): CoverVisualTopic {
+  const publicTopic =
+    typeof article.metadata?.public_topic === "string"
+      ? article.metadata.public_topic
+      : null;
+  return classifyCoverTopic({
+    title: article.title,
+    slug: article.slug,
+    excerpt: article.excerpt,
+    publicTopic,
+  });
+}
+
 function scoreCandidate(
   candidate: ArticleImageCandidate,
   article: ArticleForImageMatch
@@ -105,7 +167,6 @@ function scoreCandidate(
     if (corpus.includes(kw.toLowerCase())) score += 2;
   }
 
-  // Prefer unique match per slug — stable tie-breaker
   const slugHash = article.slug.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
   const urlHash = candidate.url.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
   score += ((slugHash + urlHash) % 100) / 1000;
@@ -117,11 +178,18 @@ function scoreCandidate(
 
 export function rankCuratedCandidates(
   article: ArticleForImageMatch,
-  topic: EditorialTopic
+  visualTopic: CoverVisualTopic
 ): ArticleImageCandidate[] {
-  const candidates = listCuratedCandidates(topic).map((c) => {
-    const alt = buildAltText(article, topic);
-    const scored = { ...c, altTextCs: alt.cs, altTextEn: alt.en, score: scoreCandidate(c, article) };
+  const editorialTopic = mapCoverVisualTopicToEditorialTopic(visualTopic);
+  const candidates = listCuratedCandidatesForVisualTopic(visualTopic).map((c) => {
+    const alt = buildAltText(article, editorialTopic);
+    const scored = {
+      ...c,
+      topic: editorialTopic,
+      altTextCs: alt.cs,
+      altTextEn: alt.en,
+      score: scoreCandidate({ ...c, topic: editorialTopic, altTextCs: alt.cs, altTextEn: alt.en }, article),
+    };
     return scored;
   });
 
@@ -133,28 +201,32 @@ export async function matchImageForArticle(
   article: ArticleForImageMatch,
   topicOverride?: EditorialTopic
 ): Promise<ArticleImageCandidate | null> {
-  const topic = topicOverride ?? inferArticleTopic(article);
-  const brief = buildImageBrief(article, topic);
+  const visualTopic = inferVisualTopic(article);
+  const editorialTopic =
+    topicOverride ?? mapCoverVisualTopicToEditorialTopic(visualTopic);
+  const brief = buildImageBrief(article, editorialTopic);
 
-  const ranked = rankCuratedCandidates(article, topic);
+  const ranked = rankCuratedCandidates(article, visualTopic);
 
   for (const candidate of ranked) {
     const compliance = validateImageCompliance({
       url: candidate.url,
       altTextCs: candidate.altTextCs,
       altTextEn: candidate.altTextEn,
-      topic,
+      topic: editorialTopic,
       articleTitle: article.title,
+      articleSlug: article.slug,
+      excerpt: article.excerpt,
+      visualTopic,
     });
-    if (compliance.passed) return candidate;
+    if (compliance.passed) return { ...candidate, topic: editorialTopic };
   }
 
-  // Optional Unsplash when curated pool fails compliance (unlikely) or for variety
   const unsplashUrl = await fetchUnsplashIfAvailable(brief.searchKeywords.slice(0, 3).join(" "));
   if (unsplashUrl) {
     const candidate = buildCandidateFromUrl(
       unsplashUrl,
-      topic,
+      editorialTopic,
       "unsplash",
       article,
       1,
@@ -164,21 +236,33 @@ export async function matchImageForArticle(
       url: candidate.url,
       altTextCs: candidate.altTextCs,
       altTextEn: candidate.altTextEn,
-      topic,
+      topic: editorialTopic,
       articleTitle: article.title,
+      articleSlug: article.slug,
+      excerpt: article.excerpt,
+      visualTopic,
     });
     if (compliance.passed) return candidate;
   }
 
-  // SVG placeholder fallback — always compliant
-  const fallbackUrl = getPlaceholderFallback(topic);
-  const fallback = buildCandidateFromUrl(fallbackUrl, topic, "placeholder", article, 0, []);
+  const fallbackUrl = getPlaceholderFallback(visualTopic);
+  const fallback = buildCandidateFromUrl(
+    fallbackUrl,
+    editorialTopic,
+    "placeholder",
+    article,
+    0,
+    []
+  );
   const compliance = validateImageCompliance({
     url: fallback.url,
     altTextCs: fallback.altTextCs,
     altTextEn: fallback.altTextEn,
-    topic,
+    topic: editorialTopic,
     articleTitle: article.title,
+    articleSlug: article.slug,
+    excerpt: article.excerpt,
+    visualTopic,
   });
   return compliance.passed ? fallback : null;
 }
@@ -187,21 +271,25 @@ export function matchImageForArticleSync(
   article: ArticleForImageMatch,
   topicOverride?: EditorialTopic
 ): ArticleImageCandidate | null {
-  const topic = topicOverride ?? inferArticleTopic(article);
-  const ranked = rankCuratedCandidates(article, topic);
+  const visualTopic = inferVisualTopic(article);
+  const editorialTopic =
+    topicOverride ?? mapCoverVisualTopicToEditorialTopic(visualTopic);
+  const ranked = rankCuratedCandidates(article, visualTopic);
 
   for (const candidate of ranked) {
     const compliance = validateImageCompliance({
       url: candidate.url,
       altTextCs: candidate.altTextCs,
       altTextEn: candidate.altTextEn,
-      topic,
+      topic: editorialTopic,
       articleTitle: article.title,
+      articleSlug: article.slug,
+      excerpt: article.excerpt,
+      visualTopic,
     });
-    if (compliance.passed) return candidate;
+    if (compliance.passed) return { ...candidate, topic: editorialTopic };
   }
 
-  const fallbackUrl = getPlaceholderFallback(topic);
-  const fallback = buildCandidateFromUrl(fallbackUrl, topic, "placeholder", article, 0, []);
-  return fallback;
+  const fallbackUrl = getPlaceholderFallback(visualTopic);
+  return buildCandidateFromUrl(fallbackUrl, editorialTopic, "placeholder", article, 0, []);
 }

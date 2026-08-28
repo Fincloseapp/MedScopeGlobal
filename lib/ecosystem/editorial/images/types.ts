@@ -1,6 +1,7 @@
 /** Editorial image pipeline — shared types */
 
 import type { EditorialTopic } from "../desks";
+import type { CoverVisualTopic } from "./cover";
 
 export type ImageSourceType = "curated" | "unsplash" | "storage" | "placeholder";
 
@@ -30,6 +31,7 @@ export type ArticleImageSuggestionRecord = {
   sourceType: ImageSourceType;
   compliancePassed: boolean;
   complianceNotes: string[];
+  visualTopic?: CoverVisualTopic;
   appliedAt?: string | null;
 };
 
