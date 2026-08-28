@@ -3,8 +3,13 @@
 import type { EditorialTopic } from "../desks";
 import type { ArticleImageCandidate, ImageSourceType, ArticleForImageMatch } from "./types";
 import { buildAltText } from "./prompts";
+import {
+  getCoverPoolForTopic,
+  VISUAL_TOPIC_KEYWORDS,
+  type CoverVisualTopic,
+} from "./cover";
 
-/** Curated first-party covers — never depend on remote Unsplash for production display. */
+/** @deprecated Use listCuratedCandidatesForVisualTopic — kept for import stability */
 export const CURATED_ASSET_POOL: Record<
   EditorialTopic,
   Array<{ url: string; keywords: string[]; sourceType?: ImageSourceType }>
@@ -30,7 +35,7 @@ export const CURATED_ASSET_POOL: Record<
   lifestyle: [
     {
       url: "/assets/covers/food.webp",
-      keywords: ["salad", "healthy eating", "meal", "jídlo", "strava"],
+      keywords: ["salad", "healthy eating", "meal", "jídlo", "strava", "talíř"],
     },
     {
       url: "/assets/covers/walk.webp",
@@ -46,7 +51,7 @@ export const CURATED_ASSET_POOL: Record<
     },
     {
       url: "/assets/covers/food-2.webp",
-      keywords: ["meal", "diet", "strava", "jídlo", "talíř"],
+      keywords: ["meal", "diet", "strava", "jídlo", "talíř", "středomořsk"],
     },
     {
       url: "/assets/covers/sleep.webp",
@@ -91,18 +96,51 @@ export const CURATED_ASSET_POOL: Record<
   ],
 };
 
-/** Local static fallbacks when remote URLs unavailable — raster covers, not affiliate SVG. */
-export const LOCAL_PLACEHOLDER_ASSETS: Record<EditorialTopic, string> = {
-  longevity: "/assets/covers/movement.webp",
-  lifestyle: "/assets/covers/food.webp",
+/** Local static fallbacks when remote URLs unavailable — keyed by visual topic. */
+export const LOCAL_PLACEHOLDER_ASSETS: Record<CoverVisualTopic, string> = {
+  food: "/assets/covers/food.webp",
+  sleep: "/assets/covers/sleep.webp",
+  calm: "/assets/covers/calm.webp",
+  movement: "/assets/covers/movement.webp",
   seniors: "/assets/covers/seniors.webp",
-  trending: "/assets/covers/research.webp",
+  clinical: "/assets/covers/clinical.webp",
+  research: "/assets/covers/research.webp",
+  tech: "/assets/covers/tech.webp",
+  vitals: "/assets/covers/vitals.webp",
+  walk: "/assets/covers/walk.webp",
 };
 
-export function getPlaceholderFallback(topic: EditorialTopic): string {
-  return LOCAL_PLACEHOLDER_ASSETS[topic] ?? LOCAL_PLACEHOLDER_ASSETS.longevity;
+export function getPlaceholderFallback(visualTopic: CoverVisualTopic): string {
+  return LOCAL_PLACEHOLDER_ASSETS[visualTopic] ?? LOCAL_PLACEHOLDER_ASSETS.research;
 }
 
+/** Primary candidate list — uses the same pool as resolveArticleCoverUrl. */
+export function listCuratedCandidatesForVisualTopic(
+  visualTopic: CoverVisualTopic
+): ArticleImageCandidate[] {
+  const keywords = [...VISUAL_TOPIC_KEYWORDS[visualTopic]];
+  const editorialTopic =
+    visualTopic === "seniors"
+      ? "seniors"
+      : visualTopic === "clinical" ||
+          visualTopic === "research" ||
+          visualTopic === "tech" ||
+          visualTopic === "vitals"
+        ? "trending"
+        : "lifestyle";
+
+  return getCoverPoolForTopic(visualTopic).map((url) => ({
+    url,
+    sourceType: "curated" as const,
+    topic: editorialTopic as EditorialTopic,
+    score: 0,
+    keywords,
+    altTextCs: "",
+    altTextEn: "",
+  }));
+}
+
+/** @deprecated Prefer listCuratedCandidatesForVisualTopic */
 export function listCuratedCandidates(topic: EditorialTopic): ArticleImageCandidate[] {
   return CURATED_ASSET_POOL[topic].map((asset) => ({
     url: asset.url,

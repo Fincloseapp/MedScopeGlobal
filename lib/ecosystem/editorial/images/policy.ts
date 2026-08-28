@@ -2,8 +2,12 @@
 
 import { CONTENT_GUARDRAILS } from "@/lib/ecosystem/autonomous";
 import {
+  classifyCoverTopic,
   isBrokenCoverUrl,
+  isClinicalOrBrainCoverUrl,
+  isFoodCoverUrl,
   isStaleGenericStockUrl,
+  type CoverVisualTopic,
 } from "@/lib/ecosystem/editorial/images/cover";
 import type { EditorialTopic } from "../desks";
 import type { ImageComplianceResult } from "./types";
@@ -98,12 +102,49 @@ export function scanTextForBlockedTopics(text: string): string[] {
   return BLOCKED_IMAGE_TOPICS.filter((term) => lower.includes(term.toLowerCase()));
 }
 
+export function validateVisualTopicMatch(input: {
+  url: string;
+  articleTitle?: string | null;
+  articleSlug?: string | null;
+  excerpt?: string | null;
+  visualTopic?: CoverVisualTopic;
+}): string[] {
+  const issues: string[] = [];
+  const visual =
+    input.visualTopic ??
+    classifyCoverTopic({
+      title: input.articleTitle,
+      slug: input.articleSlug,
+      excerpt: input.excerpt,
+    });
+
+  if (visual === "food") {
+    if (isClinicalOrBrainCoverUrl(input.url)) {
+      issues.push("Food/nutrition article must not use clinical, lab, or brain imagery");
+    } else if (input.url.includes("/assets/covers/") && !isFoodCoverUrl(input.url)) {
+      issues.push("Food article must use food or produce cover from local pool");
+    }
+  }
+
+  if (
+    (visual === "sleep" || visual === "calm") &&
+    isClinicalOrBrainCoverUrl(input.url)
+  ) {
+    issues.push("Sleep/wellness article must not use clinical or brain stock");
+  }
+
+  return issues;
+}
+
 export function validateImageCompliance(input: {
   url: string;
   altTextCs: string;
   altTextEn: string;
   topic: EditorialTopic;
   articleTitle?: string;
+  articleSlug?: string;
+  excerpt?: string | null;
+  visualTopic?: CoverVisualTopic;
 }): ImageComplianceResult {
   const issues: string[] = [];
   const suggestions: string[] = [];
@@ -147,6 +188,16 @@ export function validateImageCompliance(input: {
     if (altCombined.includes(avoid.toLowerCase())) {
       issues.push(`Alt text conflicts with ${input.topic} guideline: ${avoid}`);
     }
+  }
+
+  for (const mismatch of validateVisualTopicMatch({
+    url: input.url,
+    articleTitle: input.articleTitle,
+    articleSlug: input.articleSlug,
+    excerpt: input.excerpt,
+    visualTopic: input.visualTopic,
+  })) {
+    issues.push(mismatch);
   }
 
   if (!altCombined.includes("ilustr") && !altCombined.includes("illustr") && !altCombined.includes("photo")) {

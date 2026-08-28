@@ -22,6 +22,7 @@ import {
 } from "../../lib/ecosystem/monetization";
 import {
   inferArticleTopic,
+  inferVisualTopic,
   matchImageForArticleSync,
   validateImageCompliance,
   isMissingOrStaleHeroImage,
@@ -29,6 +30,8 @@ import {
   getArticleHeroAltText,
   resolveArticleCoverUrl,
   classifyCoverTopic,
+  isFoodCoverUrl,
+  isClinicalOrBrainCoverUrl,
 } from "../../lib/ecosystem/editorial/images";
 import { getImageCuratorForLocale } from "../../lib/ecosystem/editorial/personas";
 import {
@@ -293,9 +296,14 @@ const longevityArticle = {
   excerpt: "Jak spánek ovlivňuje zdraví seniorů a prevenci",
 };
 assert.equal(inferArticleTopic(longevityArticle), "longevity");
+assert.equal(inferVisualTopic(longevityArticle), "sleep");
 
 const matched = matchImageForArticleSync(longevityArticle);
 assert.ok(matched?.url, "matcher returns image url");
+assert.ok(
+  matched!.url.includes("sleep") || matched!.url.includes("calm"),
+  `sleep article gets sleep/calm cover, got ${matched!.url}`
+);
 assert.ok(matched!.altTextCs.includes("Ilustra"), "czech alt text");
 const compliance = validateImageCompliance({
   url: matched!.url,
@@ -303,8 +311,46 @@ const compliance = validateImageCompliance({
   altTextEn: matched!.altTextEn,
   topic: matched!.topic,
   articleTitle: longevityArticle.title,
+  articleSlug: longevityArticle.slug,
+  excerpt: longevityArticle.excerpt,
+  visualTopic: inferVisualTopic(longevityArticle),
 });
 assert.equal(compliance.passed, true, "curated image passes compliance");
+
+const foodArticle = {
+  id: "a2",
+  slug: "verejnost-zivotni-styl-stredomorsky-talir",
+  title: "Středomořský talíř v české kuchyni: výživa pro dlouhověkost",
+  excerpt: "Jak sestavit vyvážený talíř podle středomořské stravy",
+};
+assert.equal(inferVisualTopic(foodArticle), "food");
+const foodMatched = matchImageForArticleSync(foodArticle);
+assert.ok(foodMatched?.url, "food matcher returns url");
+assert.ok(isFoodCoverUrl(foodMatched!.url), `food article gets food cover, got ${foodMatched!.url}`);
+assert.ok(!isClinicalOrBrainCoverUrl(foodMatched!.url), "food article must not get clinical/brain cover");
+const foodCompliance = validateImageCompliance({
+  url: foodMatched!.url,
+  altTextCs: foodMatched!.altTextCs,
+  altTextEn: foodMatched!.altTextEn,
+  topic: foodMatched!.topic,
+  articleTitle: foodArticle.title,
+  articleSlug: foodArticle.slug,
+  excerpt: foodArticle.excerpt,
+  visualTopic: "food",
+});
+assert.equal(foodCompliance.passed, true, "food cover passes compliance");
+assert.equal(
+  validateImageCompliance({
+    url: "/assets/covers/clinical.webp",
+    altTextCs: "Ilustrační foto k článku o stravě — zdravý životní styl",
+    altTextEn: "Illustration for nutrition article — healthy lifestyle",
+    topic: "lifestyle",
+    articleTitle: foodArticle.title,
+    visualTopic: "food",
+  }).passed,
+  false,
+  "clinical cover rejected for food title"
+);
 
 const politicsBlocked = scanTextForBlockedTopics("political election rally health");
 assert.ok(politicsBlocked.some((t) => /politic/i.test(t)));
