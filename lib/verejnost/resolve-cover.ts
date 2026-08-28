@@ -1,4 +1,6 @@
 import {
+  pickCuratedCover,
+  classifyCoverTopic,
   resolveArticleCoverUrl,
 } from "@/lib/ecosystem/editorial/images/cover";
 
@@ -21,6 +23,15 @@ export function resolveVerejnostCoverUrl(article: {
       publicTopic: article.public_topic,
       coverImageUrl: article.cover_image_url,
       preferCurated: true,
-    }) ?? "/assets/covers/clinical.webp"
+    }) ??
+    pickCuratedCover(
+      classifyCoverTopic({
+        title: article.title ?? article.slug,
+        slug: article.slug,
+        excerpt: article.excerpt,
+        publicTopic: article.public_topic,
+      }),
+      article.slug
+    )
   );
 }
