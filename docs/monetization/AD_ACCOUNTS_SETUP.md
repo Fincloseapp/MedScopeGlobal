@@ -34,6 +34,7 @@ Prefer one primary display network per locale (see `AD_PROVIDERS_BY_REGION`).
    - `STRIPE_SECRET_KEY`
    - `STRIPE_WEBHOOK_SECRET`
    - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+   - `STRIPE_ACCOUNT_ID=acct_1TiWEIBEAzp5LarK` (Connect destination for donate/tip; also in `wrangler.jsonc` vars)
 4. Webhook URL: `https://www.medscopeglobal.com/api/stripe/webhook`
 5. Smoke: tip CTA on `/article/[slug]` → Checkout; VIP at `/vip/protokoly`.
 

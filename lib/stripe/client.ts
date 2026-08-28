@@ -8,6 +8,21 @@ export function getStripeSecretKey(): string | null {
   return secret || null;
 }
 
+const CONNECT_ACCOUNT_RE = /^acct_[A-Za-z0-9]+$/;
+
+/**
+ * Stripe Connect destination for donations/tips.
+ * Prefer `STRIPE_ACCOUNT_ID`, then `STRIPE_CONNECTED_ACCOUNT`.
+ * Production value lives in wrangler vars / `.env.local` (not hardcoded here).
+ */
+export function getStripeConnectedAccountId(): string | null {
+  const id =
+    process.env.STRIPE_ACCOUNT_ID?.trim() ||
+    process.env.STRIPE_CONNECTED_ACCOUNT?.trim() ||
+    "";
+  return CONNECT_ACCOUNT_RE.test(id) ? id : null;
+}
+
 /**
  * Stripe client for Node + Cloudflare Workers (OpenNext).
  * Default Node HTTP client can hang until outer timeouts on Workers;

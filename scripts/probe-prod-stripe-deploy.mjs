@@ -39,7 +39,7 @@ async function main() {
     if (!res.ok) fail(`health status ${res.status}`);
     const stripe = body?.stripe || {};
     if (stripe.httpClient === "fetch") {
-      ok(`health stripe.httpClient=fetch secret=${Boolean(stripe.secretKeyConfigured)} webhook=${Boolean(stripe.webhookSecretConfigured)}`);
+      ok(`health stripe.httpClient=fetch secret=${Boolean(stripe.secretKeyConfigured)} webhook=${Boolean(stripe.webhookSecretConfigured)} dest=${stripe.connectedAccountId || stripe.connectedAccountConfigured || "unset"}`);
     } else {
       fail(
         `health missing stripe.httpClient=fetch (got ${JSON.stringify(stripe.httpClient ?? null)}) — Workers-safe Stripe client not deployed yet`

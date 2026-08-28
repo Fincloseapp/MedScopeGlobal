@@ -99,9 +99,39 @@ async function main() {
   console.log("success", session);
   if (session.id === "cs_test_123" && session.url?.includes("checkout.stripe.com")) passed++;
 
+  let connectForm = "";
+  let connectHeaders: HeadersInit | undefined;
+  globalThis.fetch = async (_url, init) => {
+    connectForm = String(init?.body ?? "");
+    connectHeaders = init?.headers;
+    return new Response(
+      JSON.stringify({ id: "cs_test_connect", url: "https://checkout.stripe.com/c/pay/cs_test_connect" }),
+      { status: 200 }
+    );
+  };
+  await createCheckoutSession({
+    secretKey: "sk_test_ok",
+    successUrl: "https://example.com/ok",
+    cancelUrl: "https://example.com/cancel",
+    lineItems: [{ currency: "czk", unitAmount: 2000, name: "Dar" }],
+    connectedAccountId: "acct_1TiWEIBEAzp5LarK",
+    timeoutMs: 2000,
+  });
+  const headerBag = new Headers(connectHeaders);
+  const hasDestination =
+    connectForm.includes("payment_intent_data") &&
+    connectForm.includes("transfer_data") &&
+    connectForm.includes("destination") &&
+    connectForm.includes("acct_1TiWEIBEAzp5LarK") &&
+    connectForm.includes("on_behalf_of");
+  const usedStripeAccountHeader = headerBag.get("Stripe-Account") != null;
+  console.log("connect", { hasDestination, usedStripeAccountHeader });
+  if (hasDestination && !usedStripeAccountHeader) passed++;
+  else console.error("FAIL connect destination encoding", connectForm.slice(0, 400));
+
   globalThis.fetch = orig;
-  console.log("PASSED", passed, "/ 3", "defaultTimeout", STRIPE_CHECKOUT_TIMEOUT_MS);
-  if (passed !== 3) process.exit(1);
+  console.log("PASSED", passed, "/ 4", "defaultTimeout", STRIPE_CHECKOUT_TIMEOUT_MS);
+  if (passed !== 4) process.exit(1);
 }
 
 main().catch((err) => {

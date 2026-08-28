@@ -23,6 +23,14 @@ export async function GET() {
     stripe: {
       secretKeyConfigured: Boolean(process.env.STRIPE_SECRET_KEY?.trim()),
       webhookSecretConfigured: Boolean(process.env.STRIPE_WEBHOOK_SECRET?.trim()),
+      connectedAccountConfigured: Boolean(
+        process.env.STRIPE_ACCOUNT_ID?.trim() ||
+          process.env.STRIPE_CONNECTED_ACCOUNT?.trim()
+      ),
+      connectedAccountId:
+        process.env.STRIPE_ACCOUNT_ID?.trim() ||
+        process.env.STRIPE_CONNECTED_ACCOUNT?.trim() ||
+        null,
       webhookUrl: "https://medscopeglobal.com/api/stripe/webhook",
       webhookGuidance:
         "Stripe Dashboard → Developers → Webhooks → Add endpoint " +

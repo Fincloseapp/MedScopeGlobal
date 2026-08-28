@@ -4,7 +4,7 @@ import { logArticleTipOrder } from "@/lib/mediflow/store";
 import { ARTICLE_TIP_TIERS } from "@/lib/ecosystem/monetization";
 import { ARTICLE_TIP_COPY, tipLocale } from "@/lib/ecosystem/tip-copy";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
-import { getStripeSecretKey } from "@/lib/stripe/client";
+import { getStripeConnectedAccountId, getStripeSecretKey } from "@/lib/stripe/client";
 import {
   createCheckoutSession,
   stripeErrorToJson,
@@ -81,6 +81,8 @@ export async function POST(request: Request) {
   try {
     const slug = body.articleSlug.trim();
 
+    const destination = getStripeConnectedAccountId();
+
     // Pure fetch + AbortSignal — Node Stripe SDK can hang indefinitely on Workers.
     const session = await createCheckoutSession({
       secretKey: secret,
@@ -100,8 +102,10 @@ export async function POST(request: Request) {
         type: "article_tip",
         articleSlug: slug,
         locale,
+        ...(destination ? { stripe_destination_account: destination } : {}),
       },
       clientReferenceId: userId,
+      connectedAccountId: destination,
     });
 
     if (!session.url) {

@@ -99,6 +99,7 @@ Production secrets live on the **Worker**, not in git. Source of truth for local
 | `CRON_SECRET` | Bearer token for all cron routes; must match GitHub Actions `CRON_SECRET` |
 | `NEXT_PUBLIC_SITE_URL` | `https://medscopeglobal.com` |
 | `STRIPE_SECRET_KEY` | Live `sk_live_…` for checkout, tringelt tips, donations |
+| `STRIPE_ACCOUNT_ID` | Connect destination `acct_1TiWEIBEAzp5LarK` for donate/tip (wrangler `vars`; not a secret) |
 | `STRIPE_WEBHOOK_SECRET` | From Stripe webhook `https://www.medscopeglobal.com/api/stripe/webhook` |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Live `pk_live_…` |
 

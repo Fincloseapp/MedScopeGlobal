@@ -29,7 +29,8 @@
   },
   "vars": {
     "MEDSCOPE_RUNTIME": "cloudflare-workers",
-    "NEXT_PUBLIC_SITE_URL": "https://medscopeglobal.com"
+    "NEXT_PUBLIC_SITE_URL": "https://medscopeglobal.com",
+    "STRIPE_ACCOUNT_ID": "acct_1TiWEIBEAzp5LarK"
   },
   "routes": [
     { "pattern": "medscopeglobal.com/*", "zone_name": "medscopeglobal.com" },

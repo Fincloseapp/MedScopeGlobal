@@ -43,6 +43,7 @@ const recommendedVars = [
 const stripeVars = [
   "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
   "STRIPE_SECRET_KEY",
+  "STRIPE_ACCOUNT_ID",
 ];
 
 console.log("\n📋 MedScopeGlobal Production Environment Validation\n");

@@ -31,8 +31,36 @@ Cloudflare Dashboard → **Workers & Pages** → **medscopeglobal** → **Settin
 | `STRIPE_SECRET_KEY` | Secret | Live secret key (`sk_live_…`). **Required** for Checkout session creation. |
 | `STRIPE_WEBHOOK_SECRET` | Secret | Endpoint signing secret (`whsec_…`). **Optional until fulfillment required** — Checkout redirect works without it. Only needed for `/api/stripe/webhook` verification + post-payment fulfillment/logging. |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Variable (or Secret) | Live publishable key (`pk_live_…`). Used by client Checkout / Elements. |
+| `STRIPE_ACCOUNT_ID` | Variable | Production Connect account `acct_1TiWEIBEAzp5LarK`. **Not a secret.** Donations/tips create a destination charge (`payment_intent_data[transfer_data][destination]` + `on_behalf_of`) so funds land here while Checkout/webhooks stay on the platform. Alias: `STRIPE_CONNECTED_ACCOUNT`. Also set in committed `wrangler.jsonc` `vars`. |
 
 Also keep `NEXT_PUBLIC_SITE_URL=https://medscopeglobal.com` so success/cancel URLs resolve correctly.
+
+### Connect destination (donations / tips)
+
+`POST /api/ecosystem/donate` and `POST /api/ecosystem/article-tip` use the fetch Checkout client (`lib/stripe/checkout-fetch.ts`). When `STRIPE_ACCOUNT_ID` (or `STRIPE_CONNECTED_ACCOUNT`) is set, the session is a **destination charge**, not a direct charge:
+
+| Applied | Not applied |
+|---------|-------------|
+| `payment_intent_data[transfer_data][destination]=acct_…` | `Stripe-Account` header (`stripeAccount` request option) |
+| `payment_intent_data[on_behalf_of]=acct_…` | Direct charges on the connected account |
+
+This keeps `/api/stripe/webhook` on the **platform** account (existing `whsec_…`) while funds transfer to `acct_1TiWEIBEAzp5LarK`.
+
+Production account ID (safe to commit / document):
+
+```
+STRIPE_ACCOUNT_ID=acct_1TiWEIBEAzp5LarK
+```
+
+Canonical Worker var: `wrangler.jsonc` → `vars.STRIPE_ACCOUNT_ID`. Local: gitignored `.env.local` (and `.dev.vars` if you use wrangler locally — do not commit).
+
+Optional wrangler (only if the var is missing after deploy; account ID is not a secret):
+
+```bash
+printf '%s' 'acct_1TiWEIBEAzp5LarK' | npx wrangler secret put STRIPE_ACCOUNT_ID --name medscopeglobal
+```
+
+Prefer the committed `wrangler.jsonc` var + `pnpm cf:deploy` so the value is on the Worker without a secret.
 
 Optional bulk sync from PC: `pnpm cf:env:sync` — then paste into dashboard or use `CLOUDFLARE_ENV_JSON` in GitHub Actions.
 
@@ -89,6 +117,7 @@ curl -sS https://medscopeglobal.com/api/v29/health | jq '.stripe.webhookSecretCo
 ```bash
 curl -sS https://medscopeglobal.com/api/v29/health | jq '.stripe'
 # Expect: secretKeyConfigured=true, httpClient=fetch after Workers-safe deploy
+# connectedAccountId=acct_1TiWEIBEAzp5LarK (destination for donate/tip)
 # webhookSecretConfigured may be false — OK until you need post-payment fulfillment
 
 curl -sS -X POST https://medscopeglobal.com/api/ecosystem/donate \

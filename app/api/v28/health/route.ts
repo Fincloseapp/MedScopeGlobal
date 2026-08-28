@@ -31,6 +31,10 @@ export async function GET() {
     stripe: {
       secretKeyConfigured: Boolean(process.env.STRIPE_SECRET_KEY?.trim()),
       webhookSecretConfigured: Boolean(process.env.STRIPE_WEBHOOK_SECRET?.trim()),
+      connectedAccountConfigured: Boolean(
+        process.env.STRIPE_ACCOUNT_ID?.trim() ||
+          process.env.STRIPE_CONNECTED_ACCOUNT?.trim()
+      ),
     },
     email: {
       sendgrid: isSendGridConfigured(),

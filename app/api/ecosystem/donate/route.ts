@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionProfile } from "@/lib/auth/session";
 import { logDonationOrder } from "@/lib/mediflow/store";
-import { getStripeSecretKey } from "@/lib/stripe/client";
+import { getStripeConnectedAccountId, getStripeSecretKey } from "@/lib/stripe/client";
 import {
   createCheckoutSession,
   stripeErrorToJson,
@@ -75,6 +75,8 @@ export async function POST(request: Request) {
     const successPath = slug ? `/article/${encodeURIComponent(slug)}?donated=1` : "/?donated=1";
     const cancelPath = slug ? `/article/${encodeURIComponent(slug)}` : "/";
 
+    const destination = getStripeConnectedAccountId();
+
     // Pure fetch + AbortSignal — Node Stripe SDK can hang indefinitely on Workers.
     const session = await createCheckoutSession({
       secretKey: secret,
@@ -94,8 +96,10 @@ export async function POST(request: Request) {
       metadata: {
         type: "donation",
         articleSlug: slug,
+        ...(destination ? { stripe_destination_account: destination } : {}),
       },
       clientReferenceId: userId,
+      connectedAccountId: destination,
     });
 
     if (!session.url) {

@@ -23,6 +23,14 @@ export type CreateCheckoutSessionInput = {
   clientReferenceId?: string | null;
   paymentMethodTypes?: string[];
   timeoutMs?: number;
+  /**
+   * Stripe Connect destination (`acct_…`).
+   * Applied as a destination charge (`transfer_data.destination` + `on_behalf_of`)
+   * so funds land on the connected account while the session stays on the platform
+   * (existing `/api/stripe/webhook` still receives `checkout.session.completed`).
+   * Do not send a `Stripe-Account` header here — that would be a direct charge.
+   */
+  connectedAccountId?: string | null;
 };
 
 export type StripeCheckoutSession = {
@@ -100,6 +108,18 @@ export async function createCheckoutSession(
 
   if (input.clientReferenceId) {
     appendForm(body, "client_reference_id", input.clientReferenceId);
+  }
+
+  const destination = input.connectedAccountId?.trim();
+  if (destination) {
+    const mode = input.mode ?? "payment";
+    if (mode === "subscription") {
+      appendForm(body, "subscription_data[transfer_data][destination]", destination);
+      appendForm(body, "subscription_data[on_behalf_of]", destination);
+    } else {
+      appendForm(body, "payment_intent_data[transfer_data][destination]", destination);
+      appendForm(body, "payment_intent_data[on_behalf_of]", destination);
+    }
   }
 
   let res: Response;
