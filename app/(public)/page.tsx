@@ -81,7 +81,7 @@ export default async function HomePage() {
       ))}
 
       {/* Story: VitaScope hero → magazín → apps/VIP → CTA (PortalHome). Pricing lives on /predplatne — not duplicated under the portal. */}
-      <PortalHome articles={articles} philosophy={philosophy} />
+      <PortalHome articles={articles} />
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
       <V272WhyTrustBlock />
       <V272AcademyHomeSections />
