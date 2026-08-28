@@ -64,6 +64,12 @@ scripts/cloudflare/.env.cloudflare.json
 # Wrangler local state
 .wrangler/
 
-# Accidental Windows path trees (auto-git noise)
+# Accidental Windows absolute path trees committed as repo paths (never re-add)
+D:/medscope.local/
+D:/medscope.logs/
 D:\medscope.local/
 D:\medscope.logs/
+**/D:\medscope.local/**
+**/D:\medscope.logs/**
+.cursor/hooks/.auto-git.lock
+**/.auto-git.lock
