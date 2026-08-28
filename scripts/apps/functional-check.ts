@@ -32,6 +32,7 @@ import {
   classifyCoverTopic,
   isFoodCoverUrl,
   isClinicalOrBrainCoverUrl,
+  isDeniedEditorialImageUrl,
 } from "../../lib/ecosystem/editorial/images";
 import { getImageCuratorForLocale } from "../../lib/ecosystem/editorial/personas";
 import { polishCzechFields } from "../../lib/v22/translate";
@@ -619,6 +620,51 @@ assert.equal(
   false,
   "clinical cover rejected for food title"
 );
+
+const BRAIN_ON_STICK =
+  "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200";
+const DOCTOR_PHONE =
+  "https://xcydgqnivxfhprbmdyym.supabase.co/storage/v1/object/public/media/v25-images/images/verejnost/doctor-phone.webp";
+
+assert.equal(
+  validateImageCompliance({
+    url: BRAIN_ON_STICK,
+    altTextCs: "Ilustrační foto k článku — zdravý životní styl",
+    altTextEn: "Illustration for article — healthy lifestyle",
+    topic: "lifestyle",
+    articleTitle: foodArticle.title,
+    articleSlug: foodArticle.slug,
+    visualTopic: "food",
+  }).passed,
+  false,
+  "brain-on-stick denied in compliance gate"
+);
+assert.equal(
+  validateImageCompliance({
+    url: DOCTOR_PHONE,
+    altTextCs: "Ilustrační foto k článku — zdravý životní styl",
+    altTextEn: "Illustration for article — healthy lifestyle",
+    topic: "lifestyle",
+    articleTitle: foodArticle.title,
+    visualTopic: "food",
+  }).passed,
+  false,
+  "doctor-phone v25 stock denied in compliance gate"
+);
+assert.ok(isDeniedEditorialImageUrl(BRAIN_ON_STICK), "brain-on-stick in deny helper");
+assert.ok(isDeniedEditorialImageUrl(DOCTOR_PHONE), "doctor-phone in deny helper");
+
+const staleFoodArticle = {
+  ...foodArticle,
+  cover_image_url: DOCTOR_PHONE,
+};
+const staleFoodMatched = matchImageForArticleSync(staleFoodArticle);
+assert.ok(staleFoodMatched?.url, "matcher replaces stale doctor-phone hero");
+assert.ok(
+  !isDeniedEditorialImageUrl(staleFoodMatched!.url),
+  `matcher must not return denied stock, got ${staleFoodMatched!.url}`
+);
+assert.ok(isFoodCoverUrl(staleFoodMatched!.url), "stale food article remapped to food pool");
 
 const politicsBlocked = scanTextForBlockedTopics("political election rally health");
 assert.ok(politicsBlocked.some((t) => /politic/i.test(t)));

@@ -3,6 +3,7 @@ import { verifyCronAuth, AUTONOMOUS_SCHEDULE } from "@/lib/ecosystem/autonomous"
 import {
   processEditorialImageBatch,
   getImagePipelineStatus,
+  applyPendingEditorialImageSuggestions,
   IMAGE_CURATOR_PERSONA_ID,
 } from "@/lib/ecosystem/editorial/images";
 
@@ -15,6 +16,7 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as {
     limit?: number;
     apply?: boolean;
+    applyPending?: boolean;
     dryRun?: boolean;
   };
 
@@ -23,6 +25,13 @@ export async function POST(request: Request) {
     apply: body.apply ?? false,
     dryRun: body.dryRun ?? false,
   });
+
+  let pendingApplied = { applied: 0, skipped: 0, failures: [] as string[] };
+  if (body.applyPending === true && body.dryRun !== true) {
+    pendingApplied = await applyPendingEditorialImageSuggestions({
+      limit: body.limit ?? 50,
+    });
+  }
 
   const schedule = AUTONOMOUS_SCHEDULE["editorial-images"];
 
@@ -33,6 +42,7 @@ export async function POST(request: Request) {
     personaId: IMAGE_CURATOR_PERSONA_ID,
     candidates: candidates.length,
     result,
+    pendingApplied,
     suggestions: suggestions.map((s) => ({
       slug: s.articleSlug,
       url: s.suggestedUrl,

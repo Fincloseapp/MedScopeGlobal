@@ -10,7 +10,7 @@ import {
   getPlaceholderFallback,
   listCuratedCandidatesForVisualTopic,
 } from "./sources";
-import { validateImageCompliance } from "./policy";
+import { isDeniedEditorialImageUrl, validateImageCompliance } from "./policy";
 import {
   classifyCoverTopic,
   mapCoverVisualTopicToEditorialTopic,
@@ -214,6 +214,7 @@ export async function matchImageForArticle(
   const ranked = rankCuratedCandidates(article, visualTopic);
 
   for (const candidate of ranked) {
+    if (isDeniedEditorialImageUrl(candidate.url)) continue;
     const compliance = validateImageCompliance({
       url: candidate.url,
       altTextCs: candidate.altTextCs,
@@ -228,7 +229,7 @@ export async function matchImageForArticle(
   }
 
   const unsplashUrl = await fetchUnsplashIfAvailable(brief.searchKeywords.slice(0, 3).join(" "));
-  if (unsplashUrl) {
+  if (unsplashUrl && !isDeniedEditorialImageUrl(unsplashUrl)) {
     const candidate = buildCandidateFromUrl(
       unsplashUrl,
       editorialTopic,
@@ -282,6 +283,7 @@ export function matchImageForArticleSync(
   const ranked = rankCuratedCandidates(article, visualTopic);
 
   for (const candidate of ranked) {
+    if (isDeniedEditorialImageUrl(candidate.url)) continue;
     const compliance = validateImageCompliance({
       url: candidate.url,
       altTextCs: candidate.altTextCs,

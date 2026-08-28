@@ -36,7 +36,9 @@ export function MagazineSectionHub({ config, children, primaryCtaHref }: Props) 
                 href={primaryHref}
                 className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#005B96] shadow-sm transition hover:bg-white/90"
               >
-                <Headphones className="h-4 w-4" aria-hidden />
+                {config.id === "osveta" ? (
+                  <Headphones className="h-4 w-4" aria-hidden />
+                ) : null}
                 {config.primaryCta.label}
               </Link>
               {config.secondaryCtas.map((cta) => (
@@ -61,14 +63,16 @@ export function MagazineSectionHub({ config, children, primaryCtaHref }: Props) 
                 priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#021d33]/60 via-transparent to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-white/20 bg-[#021d33]/75 px-4 py-3 backdrop-blur-sm">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9fd0f5]">
-                  Poslech + čtení
-                </p>
-                <p className="mt-1 text-sm leading-relaxed text-white/90">
-                  Každá lekce má text k souběžnému čtení — stejný tón jako dlouhé články magazínu.
-                </p>
-              </div>
+              {config.heroBadge ? (
+                <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-white/20 bg-[#021d33]/75 px-4 py-3 backdrop-blur-sm">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9fd0f5]">
+                    {config.heroBadge.label}
+                  </p>
+                  <p className="mt-1 text-sm leading-relaxed text-white/90">
+                    {config.heroBadge.description}
+                  </p>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
@@ -82,7 +86,7 @@ export function MagazineSectionHub({ config, children, primaryCtaHref }: Props) 
             Redakční úvod
           </p>
           <h2 className="mt-1 font-display text-2xl font-bold text-[#021d33]">
-            Co je osvěta na MedScopeGlobal
+            {config.editorialIntroTitle}
           </h2>
           <div className="mt-4 max-w-3xl space-y-4 text-base leading-relaxed text-slate-600">
             {config.editorialIntro.map((paragraph) => (

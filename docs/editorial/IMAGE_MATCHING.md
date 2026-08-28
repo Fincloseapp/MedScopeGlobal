@@ -53,13 +53,27 @@ Food is detected **before** movement/seniors and clinical/research fallbacks so 
 
 `validateImageCompliance()` + `validateVisualTopicMatch()` enforce:
 
+- **Global deny list** — `isDeniedEditorialImageUrl()` / `isDeniedStockUrl()` in `cover.ts`:
+  brain-on-stick Unsplash ID (`photo-1576091160399`), doctor-phone v25 stock,
+  dark-hands clinical, brain cross-section, and other blocked remote IDs
 - Blocked political/violence URL patterns
 - Min alt-text length (CS + EN)
 - **Food articles** → must use `food*` or `produce` covers; **reject** `clinical`, `research`, `science`, `vitals`, `tech`
 - **Sleep/calm** → reject clinical/brain paths
 
+The deny list runs in **all write paths**:
+
+| Path | Enforcement |
+|------|-------------|
+| `matcher.ts` | Skips denied URLs before scoring; Unsplash results filtered |
+| `policy.ts` | `validateImageCompliance` + `validateVisualTopicMatch` |
+| `processor.ts` | `applySuggestion` + `applyPendingEditorialImageSuggestions` re-validate |
+| Backfill script | Uses `suggestImageForArticle` → same compliance gate |
+| Cron `POST /api/ecosystem/editorial/images` | Batch + optional `applyPending: true` |
+
 Shared helpers:
 
+- `isDeniedEditorialImageUrl()` — policy wrapper for deny list (matcher, backfill, cron)
 - `isClinicalOrBrainCoverUrl()` — clinical/lab/brain local paths
 - `isFoodCoverUrl()` — food/produce paths only
 
@@ -76,6 +90,52 @@ Shared helpers:
 | clinical, research, tech, vitals | trending |
 
 Stored in article metadata as `editorial_image_topic` and `editorial_image_visual_topic`.
+
+## Autonomous redakce rules (image curator)
+
+Persona `image-curator-global` (`lib/ecosystem/editorial/personas.ts`) runs on cron
+`POST /api/ecosystem/editorial/images` (Bearer `CRON_SECRET`).
+
+### What the cron does
+
+1. Finds published articles with missing/stale heroes (`isMissingOrStaleHeroImage`)
+2. Classifies visual topic (`classifyCoverTopic`) — same as article page
+3. Ranks curated pool candidates (`rankCuratedCandidates`)
+4. Runs compliance (`validateImageCompliance`) including **deny list**
+5. Persists row to `article_image_suggestions`
+6. When `apply: true` — writes `articles.cover_image_url` + alt metadata
+7. When `applyPending: true` — applies compliant pending suggestion rows (re-validates policy)
+
+### Deny list (never suggest or apply)
+
+| Pattern | Reason |
+|---------|--------|
+| `photo-1576091160399` | brain-on-stick anatomy model |
+| `doctor-phone` | overused v25 clinical stock |
+| `/brain`, `brain-on-stick` | misleading neurology imagery |
+| All `/v25-images/` paths | stale generic Supabase stock |
+| Remote `images.unsplash.com` on articles | legacy mismatched heroes |
+
+Lifestyle/food/sleep articles additionally reject local `clinical*`, `research*`, `science`, `vitals`, `tech` covers via `validateVisualTopicMatch`.
+
+### Cron examples
+
+```bash
+# Status (GET, no auth in dev)
+curl -s http://localhost:3000/api/ecosystem/editorial/images | jq
+
+# Dry-run batch
+curl -s -X POST http://localhost:3000/api/ecosystem/editorial/images \
+  -H "Authorization: Bearer $CRON_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"limit":20,"dryRun":true}'
+
+# Apply new matches + pending compliant suggestions
+curl -s -X POST http://localhost:3000/api/ecosystem/editorial/images \
+  -H "Authorization: Bearer $CRON_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"limit":50,"apply":true,"applyPending":true}'
+```
 
 ## Image curator persona
 
@@ -125,6 +185,8 @@ Functional checks include:
 - Středomořský talíř → `food` visual topic + food cover
 - Sleep longevity title → sleep/calm cover (not vitals)
 - Clinical cover rejected for food title
+- **brain-on-stick** and **doctor-phone** denied in `validateImageCompliance`
+- Matcher never returns denied stock for food articles
 
 ## Coordination with brain-cover-ban
 

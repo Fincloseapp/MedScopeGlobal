@@ -5,6 +5,7 @@ import {
   classifyCoverTopic,
   isBrokenCoverUrl,
   isClinicalOrBrainCoverUrl,
+  isDeniedStockUrl,
   isFoodCoverUrl,
   isStaleGenericStockUrl,
   type CoverVisualTopic,
@@ -102,6 +103,11 @@ export function scanTextForBlockedTopics(text: string): string[] {
   return BLOCKED_IMAGE_TOPICS.filter((term) => lower.includes(term.toLowerCase()));
 }
 
+/** Global deny list — brain-on-stick, doctor-phone, v25 clinical stock leftovers. */
+export function isDeniedEditorialImageUrl(url: string | null | undefined): boolean {
+  return isDeniedStockUrl(url);
+}
+
 export function validateVisualTopicMatch(input: {
   url: string;
   articleTitle?: string | null;
@@ -110,6 +116,11 @@ export function validateVisualTopicMatch(input: {
   visualTopic?: CoverVisualTopic;
 }): string[] {
   const issues: string[] = [];
+
+  if (isDeniedEditorialImageUrl(input.url)) {
+    issues.push("URL matches denied editorial stock (brain-on-stick, doctor-phone, or blocked v25/Unsplash ID)");
+  }
+
   const visual =
     input.visualTopic ??
     classifyCoverTopic({
@@ -148,6 +159,10 @@ export function validateImageCompliance(input: {
 }): ImageComplianceResult {
   const issues: string[] = [];
   const suggestions: string[] = [];
+
+  if (isDeniedEditorialImageUrl(input.url)) {
+    issues.push("Denied editorial stock URL (brain-on-stick, doctor-phone, or blocked remote ID)");
+  }
 
   for (const pattern of BLOCKED_IMAGE_URL_PATTERNS) {
     if (pattern.test(input.url)) {

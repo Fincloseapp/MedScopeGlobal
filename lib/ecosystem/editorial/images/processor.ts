@@ -1,7 +1,11 @@
 /** Process editorial image suggestions — DB apply + batch runner */
 
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
-import { isMissingOrStaleHeroImage, validateImageCompliance } from "./policy";
+import {
+  isDeniedEditorialImageUrl,
+  isMissingOrStaleHeroImage,
+  validateImageCompliance,
+} from "./policy";
 import { matchImageForArticle, inferVisualTopic } from "./matcher";
 import type {
   ArticleForImageMatch,
@@ -106,6 +110,7 @@ async function applySuggestion(
   suggestion: ArticleImageSuggestionRecord
 ): Promise<boolean> {
   if (!suggestion.compliancePassed) return false;
+  if (isDeniedEditorialImageUrl(suggestion.suggestedUrl)) return false;
 
   const admin = tryCreateServiceRoleClient();
   if (!admin) return false;
@@ -151,6 +156,95 @@ async function applySuggestion(
   }
 
   return true;
+}
+
+/** Apply compliant pending rows from article_image_suggestions (re-validates current policy). */
+export async function applyPendingEditorialImageSuggestions(options?: {
+  limit?: number;
+}): Promise<{ applied: number; skipped: number; failures: string[] }> {
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) {
+    return { applied: 0, skipped: 0, failures: ["service role unavailable"] };
+  }
+
+  const limit = options?.limit ?? 50;
+  const { data, error } = await admin
+    .from("article_image_suggestions")
+    .select(
+      "article_id, article_slug, suggested_url, alt_text_cs, alt_text_en, topic, source_type, compliance_passed, compliance_notes"
+    )
+    .eq("compliance_passed", true)
+    .is("applied_at", null)
+    .order("created_at", { ascending: true })
+    .limit(limit);
+
+  if (error || !data) {
+    return {
+      applied: 0,
+      skipped: 0,
+      failures: [error?.message ?? "fetch pending suggestions failed"],
+    };
+  }
+
+  let applied = 0;
+  let skipped = 0;
+  const failures: string[] = [];
+
+  for (const row of data) {
+    const articleRes = await admin
+      .from("articles")
+      .select("title, excerpt, slug")
+      .eq("id", row.article_id)
+      .maybeSingle();
+
+    const article = articleRes.data;
+    const visualTopic = article
+      ? inferVisualTopic({
+          id: row.article_id,
+          slug: article.slug ?? row.article_slug,
+          title: article.title ?? row.article_slug,
+          excerpt: article.excerpt,
+        })
+      : undefined;
+
+    const compliance = validateImageCompliance({
+      url: row.suggested_url,
+      altTextCs: row.alt_text_cs,
+      altTextEn: row.alt_text_en,
+      topic: row.topic as ArticleImageSuggestionRecord["topic"],
+      articleTitle: article?.title,
+      articleSlug: article?.slug ?? row.article_slug,
+      excerpt: article?.excerpt,
+      visualTopic,
+    });
+
+    if (!compliance.passed) {
+      skipped += 1;
+      continue;
+    }
+
+    const suggestion: ArticleImageSuggestionRecord = {
+      articleId: row.article_id,
+      articleSlug: row.article_slug,
+      suggestedUrl: row.suggested_url,
+      altTextCs: row.alt_text_cs,
+      altTextEn: row.alt_text_en,
+      topic: row.topic as ArticleImageSuggestionRecord["topic"],
+      sourceType: row.source_type as ArticleImageSuggestionRecord["sourceType"],
+      compliancePassed: true,
+      complianceNotes: [],
+      visualTopic,
+    };
+
+    const ok = await applySuggestion(suggestion);
+    if (ok) applied += 1;
+    else {
+      skipped += 1;
+      failures.push(`apply failed: ${row.article_slug}`);
+    }
+  }
+
+  return { applied, skipped, failures };
 }
 
 export async function processEditorialImageBatch(

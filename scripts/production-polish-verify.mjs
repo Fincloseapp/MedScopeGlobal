@@ -132,6 +132,15 @@ async function main() {
       report.articles.coverMismatches.push({ slug, title: title.slice(0, 72), expected, coverPath });
       report.pass = false;
     }
+    if (coverPath && helpers.isDeniedStockUrl(coverPath)) {
+      report.articles.coverMismatches.push({
+        slug,
+        title: title.slice(0, 72),
+        expected: "denied-stock",
+        coverPath,
+      });
+      report.pass = false;
+    }
   }
 
   try {
