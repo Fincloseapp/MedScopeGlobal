@@ -2,6 +2,13 @@ import { NextResponse } from "next/server";
 import { isSendGridConfigured } from "@/lib/email/sendgrid";
 import { isSmtpConfigured } from "@/lib/email/smtp";
 import {
+  getConfiguredStripeAccountId,
+  isStripePublishableConfigured,
+  isStripeSecretConfigured,
+  isStripeWebhookConfigured,
+  STRIPE_WEBHOOK_URL,
+} from "@/lib/config/stripe";
+import {
   V29_ENGINE_VERSION,
   V29_UI_BUILD_STAMP,
   V29_UI_VERSION,
@@ -21,16 +28,11 @@ export async function GET() {
     timestamp,
     service: "medscope-v29",
     stripe: {
-      secretKeyConfigured: Boolean(process.env.STRIPE_SECRET_KEY?.trim()),
-      webhookSecretConfigured: Boolean(process.env.STRIPE_WEBHOOK_SECRET?.trim()),
-      webhookUrl: "https://medscopeglobal.com/api/stripe/webhook",
-      webhookGuidance:
-        "Stripe Dashboard → Developers → Webhooks → Add endpoint " +
-        "https://medscopeglobal.com/api/stripe/webhook " +
-        "(events: checkout.session.completed, invoice.*, customer.subscription.*) → " +
-        "copy Signing secret to Worker secret STRIPE_WEBHOOK_SECRET " +
-        "(PC: node scripts/setup-stripe-webhook.mjs or pnpm auto:d reminder)",
-      httpClient: "fetch",
+      accountId: getConfiguredStripeAccountId(),
+      secretKeyConfigured: isStripeSecretConfigured(),
+      publishableKeyConfigured: isStripePublishableConfigured(),
+      webhookSecretConfigured: isStripeWebhookConfigured(),
+      webhookUrl: STRIPE_WEBHOOK_URL,
     },
     email: {
       sendgrid: isSendGridConfigured(),

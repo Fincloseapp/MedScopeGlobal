@@ -29,6 +29,7 @@ export async function GET() {
       v29Health: "/api/v29/health",
     },
     stripe: {
+      accountId: process.env.STRIPE_ACCOUNT_ID?.trim() || "acct_1TiWEIBEAzp5LarK",
       secretKeyConfigured: Boolean(process.env.STRIPE_SECRET_KEY?.trim()),
       webhookSecretConfigured: Boolean(process.env.STRIPE_WEBHOOK_SECRET?.trim()),
     },
