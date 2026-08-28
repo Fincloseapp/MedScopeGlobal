@@ -217,6 +217,17 @@ export default async function ArticlePage({ params }: Props) {
   const v19Quiz = (article.quiz_json ?? {}) as Record<string, unknown>;
   const showContribution = isArticleTipUiEnabled(locked);
 
+  /**
+   * Tip / Darovat chrome follows the *article* language, not browser geo.
+   * Czech magazine pieces (verejnost-* / locale cs) must stay Kč + Czech copy
+   * even when the site UI cookie resolves to en.
+   */
+  const articleLocaleTag = String(article.locale ?? "").toLowerCase();
+  const supportLocale: GlobalLocaleCode =
+    articleLocaleTag.startsWith("cs") || article.slug.startsWith("verejnost-")
+      ? "cs"
+      : (((locale as GlobalLocaleCode) || "cs") as GlobalLocaleCode);
+
   const globalJsonLd = articleJsonLdGlobal({
     title: article.title,
     excerpt: article.excerpt,
@@ -382,7 +393,7 @@ export default async function ArticlePage({ params }: Props) {
           </figure>
 
           <ArticleImageSupportNudge
-            locale={(locale as GlobalLocaleCode) ?? "cs"}
+            locale={supportLocale}
             articleSlug={article.slug}
           />
 
@@ -457,7 +468,7 @@ export default async function ArticlePage({ params }: Props) {
                 articleSlug={article.slug}
                 articleTitle={article.title}
                 authorName={authorDisplay}
-                locale={(locale as GlobalLocaleCode) ?? "cs"}
+                locale={supportLocale}
               />
             </Suspense>
           ) : null}
@@ -470,7 +481,7 @@ export default async function ArticlePage({ params }: Props) {
           ) : null}
 
           {!locked ? (
-            <TopLongevityProducts locale={(locale as GlobalLocaleCode) ?? "cs"} />
+            <TopLongevityProducts locale={supportLocale} />
           ) : null}
 
           {!locked ? (
