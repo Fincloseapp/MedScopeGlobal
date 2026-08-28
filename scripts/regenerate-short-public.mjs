@@ -127,27 +127,58 @@ if (!url || !key) {
 }
 
 const admin = createClient(url, key, { auth: { persistSession: false } });
-let query = admin
-  .from("articles")
-  .select("id, title, slug, excerpt, content, metadata, public_topic, source_name, published_at")
-  .eq("audience", "public")
-  .eq("published", true)
-  .order("published_at", { ascending: false })
-  .limit(500);
-
-if (date) {
-  const start = `${date}T00:00:00.000Z`;
-  const end = `${date}T23:59:59.999Z`;
-  query = query.gte("published_at", start).lte("published_at", end);
+const slugFilters = slugs.length ? slugs : slug ? [slug] : [];
+const noLlm = envKeys.groq !== "ok" && envKeys.openai !== "ok" && envKeys.gemini !== "ok";
+const delayMsEffective =
+  process.argv.some((a) => a.startsWith("--delay-ms=")) ? delayMs : noLlm ? 250 : delayMs;
+if (noLlm && !expandOnly) {
+  console.log("No LLM keys — using expand-only + deterministic magazine depth");
+}
+if (noLlm && delayMsEffective !== delayMs) {
+  console.log(`No LLM keys — delay ${delayMsEffective}ms (override with --delay-ms)`);
 }
 
-const { data: rows, error } = await query;
-if (error) {
-  console.error(error.message);
+async function fetchCandidateRows() {
+  const selectCols =
+    "id, title, slug, excerpt, content, metadata, public_topic, source_name, published_at, meta_description";
+  if (slugFilters.length) {
+    const { data, error } = await admin.from("articles").select(selectCols).in("slug", slugFilters);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  }
+
+  const PAGE = 1000;
+  let from = 0;
+  const all = [];
+  while (true) {
+    let query = admin
+      .from("articles")
+      .select(selectCols)
+      .eq("audience", "public")
+      .eq("published", true)
+      .order("published_at", { ascending: false })
+      .range(from, from + PAGE - 1);
+    if (date) {
+      const start = `${date}T00:00:00.000Z`;
+      const end = `${date}T23:59:59.999Z`;
+      query = query.gte("published_at", start).lte("published_at", end);
+    }
+    const { data, error } = await query;
+    if (error) throw new Error(error.message);
+    all.push(...(data ?? []));
+    if (!data || data.length < PAGE) break;
+    from += PAGE;
+  }
+  return all;
+}
+
+let rows;
+try {
+  rows = await fetchCandidateRows();
+} catch (fetchErr) {
+  console.error(fetchErr.message);
   process.exit(1);
 }
-
-const slugFilters = slugs.length ? slugs : slug ? [slug] : [];
 
 const candidates = (rows ?? []).filter((row) => {
   if (
@@ -198,7 +229,7 @@ for (const row of candidates.slice(0, limit)) {
     let draftWords;
     let usedExpandOnly = false;
 
-    if (expandOnly) {
+    if (expandOnly || noLlm) {
       usedExpandOnly = true;
       title = polishCzechText(row.title);
       excerpt = polishCzechText(row.excerpt);
@@ -333,7 +364,10 @@ for (const row of candidates.slice(0, limit)) {
       continue;
     }
 
-    await persistPublicArticleToDb({ ...article, slug: row.slug, title, excerpt, bodyHtml }, bodyHtml);
+    // Expand/update already saved by id — skip upsert persist (it would reset published_at).
+    if (!usedExpandOnly && !noLlm) {
+      await persistPublicArticleToDb({ ...article, slug: row.slug, title, excerpt, bodyHtml }, bodyHtml);
+    }
 
     rewritten += 1;
     results.push({ slug: row.slug, ok: true, words: draftWords, expanded: draftWords > wordCount(row.content) });
@@ -345,7 +379,7 @@ for (const row of candidates.slice(0, limit)) {
         url: `https://medscopeglobal.com/verejnost/${topic}/${row.slug}`,
       });
     }
-    if (rewritten < limit) await sleep(delayMs);
+    if (rewritten < limit) await sleep(delayMsEffective);
   } catch (e) {
     console.error(`  fail: ${e.message}`);
     results.push({ slug: row.slug, ok: false, words: wordCount(row.content), reason: e.message });
