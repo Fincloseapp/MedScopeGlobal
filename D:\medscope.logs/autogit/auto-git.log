@@ -71,3 +71,7 @@
 [2026-08-28T08:06:25.396Z] [INFO] === auto-git start ===
 [2026-08-28T08:06:25.400Z] [INFO] Paralelní běh — přeskočeno
 [2026-08-28T08:07:12.107Z] [INFO] === auto-git start ===
+[2026-08-28T08:07:12.753Z] [OK] Commit: chore: cleanup — .auto git + auto git + translate
+[2026-08-28T08:07:13.934Z] [OK] Push origin/main → Vercel deploy (medscopeglobal.com)
+[2026-08-28T08:07:13.935Z] [INFO] === auto-git end ===
+[2026-08-28T08:07:20.414Z] [INFO] === auto-git start ===
