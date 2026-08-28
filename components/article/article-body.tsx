@@ -22,7 +22,7 @@ export function ArticleBody({
         {previewHtml ? (
           <div className="relative">
             <div
-              className="article-prose prose prose-slate max-w-none"
+              className="article-prose prose prose-slate"
               dangerouslySetInnerHTML={{ __html: previewHtml }}
             />
             <div
@@ -40,7 +40,7 @@ export function ArticleBody({
 
   return (
     <div
-      className="article-prose prose prose-slate max-w-none"
+      className="article-prose prose prose-slate"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

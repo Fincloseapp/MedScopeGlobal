@@ -302,15 +302,27 @@
 }
 
 .article-body-column {
-  @apply mt-8 overflow-x-hidden;
+  @apply mt-8 max-w-[42rem] overflow-x-hidden;
 }
 
 .article-prose {
-  @apply prose-headings:font-display prose-headings:tracking-tight prose-headings:text-[#021d33] prose-p:text-[1.05rem] prose-p:leading-[1.75] prose-p:text-slate-700 prose-li:text-slate-700 prose-a:font-medium prose-a:text-[#005B96] prose-img:my-8 prose-img:rounded-none;
+  @apply max-w-none
+    prose-headings:font-display prose-headings:tracking-tight prose-headings:text-[#021d33]
+    prose-h2:mb-4 prose-h2:mt-12 prose-h2:border-t prose-h2:border-slate-200 prose-h2:pt-8 prose-h2:text-[1.35rem] prose-h2:font-semibold prose-h2:leading-snug
+    prose-h3:mb-3 prose-h3:mt-8 prose-h3:text-[1.125rem] prose-h3:font-semibold prose-h3:leading-snug
+    prose-p:my-[1.05em] prose-p:text-[1.0625rem] prose-p:leading-[1.8] prose-p:text-slate-700
+    prose-li:my-1 prose-li:text-[1.0625rem] prose-li:leading-[1.7] prose-li:text-slate-700
+    prose-ul:my-5 prose-ol:my-5
+    prose-strong:font-semibold prose-strong:text-[#021d33]
+    prose-a:font-medium prose-a:text-[#005B96] prose-a:underline-offset-2
+    prose-blockquote:border-l-[#005B96] prose-blockquote:bg-slate-50/80 prose-blockquote:py-1 prose-blockquote:not-italic prose-blockquote:text-slate-700
+    prose-hr:my-12 prose-hr:border-slate-200
+    prose-img:my-10 prose-img:rounded-none
+    [&>h2:first-of-type]:mt-0 [&>h2:first-of-type]:border-t-0 [&>h2:first-of-type]:pt-0;
 }
 
 .article-contribute {
-  @apply my-10 border-y border-slate-200 py-8;
+  @apply my-12 max-w-[42rem] scroll-mt-24 rounded-xl border border-slate-200/90 bg-slate-50/70 px-5 py-8 sm:px-7 sm:py-9;
 }
 
 .article-related {
