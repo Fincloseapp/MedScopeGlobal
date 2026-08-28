@@ -212,7 +212,7 @@ const CALM_RE =
   /stres|stress|mindful|meditac|dechov|relax|pohoda|imunit.*pr[aá]ce|wellness|klid/i;
 
 const MOVEMENT_RE =
-  /pohyb|cvi[cč]|fitness|sport|ch[uů]ze|walk|cvik|trenink|tr[eé]nink|svalov|svaly|posilov/i;
+  /pohyb|cvi[cč]|fitness|sport|ch[uů]ze|walk|cvik|trenink|tr[eé]nink|svalov|svaly|posilov|sedav|sedent|neat\b|schod|st[aá]n[ií]|zam[eě]stn|kancel[aá][řr]|office/i;
 
 const SENIORS_RE =
   /senior|st[aá][rř]nut|aging|menopauz|osteopor|hrt|d[uů]chod|kostn[ií]|[rř][ií]dnut[ií]\s+kost/i;
@@ -297,6 +297,8 @@ export function classifyCoverTopic(input: {
   if (TECH_RE.test(hay)) return "tech";
   if (RESEARCH_RE.test(hay) || topic.includes("prevence")) return "research";
   if (CLINICAL_RE.test(hay) || topic.includes("nemoci")) return "clinical";
+  // Slug/title movement beats generic zivotni-styl → calm (e.g. sedavé zaměstnání / NEAT).
+  if (MOVEMENT_RE.test(titleSlug)) return "movement";
   if (topic.includes("zivotni")) return "calm";
   if (topic.includes("rozhovor")) return "clinical";
   return "research";

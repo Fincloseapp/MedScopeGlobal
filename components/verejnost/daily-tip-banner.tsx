@@ -1,14 +1,13 @@
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { getTodayPublicHealthVideo } from "@/lib/verejnost/osveta/db";
-import { getPublicAvatar } from "@/lib/verejnost/osveta/avatars";
 import { getVideoEditorialLabel } from "@/lib/editorial/video-units";
+import { resolveOsvetaThumb } from "@/lib/verejnost/osveta/resolve-thumb";
 
 export async function DailyTipBanner() {
   const video = await getTodayPublicHealthVideo();
   if (!video) return null;
 
-  const avatar = getPublicAvatar(video.avatar_type);
   const editorialLabel = getVideoEditorialLabel({
     avatarType: video.avatar_type,
     category: video.topic?.category,
@@ -16,7 +15,12 @@ export async function DailyTipBanner() {
     audience: "osveta",
     slug: video.slug,
   });
-  const thumb = video.thumbnail_url ?? avatar.imageUrl;
+  const thumb = resolveOsvetaThumb({
+    thumbnailUrl: video.thumbnail_url,
+    avatarType: video.avatar_type,
+    category: video.topic?.category,
+    slug: video.slug,
+  });
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6">

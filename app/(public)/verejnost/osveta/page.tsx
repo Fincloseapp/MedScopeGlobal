@@ -2,6 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PublicHealthVideoCard } from "@/components/verejnost/public-health-video-card";
 import { PublicLeaderboard, PublicLeaderboardCta } from "@/components/verejnost/public-leaderboard";
+import { VerejnostArticleCard } from "@/components/verejnost/verejnost-article-card";
+import {
+  MagazineHubSectionHeader,
+  MagazineSectionHub,
+} from "@/components/portal/magazine-section-hub";
+import { OSVETA_MAGAZINE_HUB } from "@/lib/portal/magazine-section-hub";
+import { listPublicArticles } from "@/lib/queries/verejnost";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import {
   getPublicOsvetaLeaderboard,
   getTodayPublicHealthVideo,
@@ -11,11 +19,13 @@ import {
 
 export const revalidate = 120;
 
-export const metadata: Metadata = {
-  title: "Denní zdravotní osvěta | Veřejnost | MedScopeGlobal",
-  description:
-    "Krátké poslechové lekce o prevenci, nemocech, dlouhověkosti a životním stylu — srozumitelně, v češtině, s textem k čtení.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return await buildLocalizedV20PageMetadata({
+    title: "Zdravotní osvěta | Veřejnost | MedScopeGlobal",
+    description: OSVETA_MAGAZINE_HUB.heroDeck,
+    path: "/verejnost/osveta",
+  });
+}
 
 const CATEGORY_LABELS: Record<string, string> = {
   prevence: "Prevence",
@@ -25,103 +35,104 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 export default async function OsvetaHubPage() {
-  const [today, videos, topics, leaderboard] = await Promise.all([
+  const [today, videos, topics, leaderboard, articles] = await Promise.all([
     getTodayPublicHealthVideo(),
     listPublicHealthVideos({ limit: 20 }),
     listPublicHealthTopics(),
     getPublicOsvetaLeaderboard(5),
+    listPublicArticles({ limit: 3, ensureContent: true, mode: "card" }),
   ]);
 
   const archive = videos.filter((v) => v.id !== today?.id);
+  const primaryCtaHref = today ? `/verejnost/osveta/${today.slug}` : "#dnesni-lekce";
+  const nav = OSVETA_MAGAZINE_HUB.articlesNav;
 
   return (
-    <div className="min-h-screen bg-[#f4f8fc]">
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#021d33] via-[#003d6b] to-[#005B96] px-4 py-14 sm:px-6 sm:py-16">
-        <div className="relative mx-auto max-w-4xl">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/60">
-            Veřejnost · Osvěta · medscopeglobal.com
+    <MagazineSectionHub config={OSVETA_MAGAZINE_HUB} primaryCtaHref={primaryCtaHref}>
+      {today ? (
+        <section id="dnesni-lekce" className="mb-12 scroll-mt-24">
+          <MagazineHubSectionHeader
+            eyebrow="Poslech dne"
+            title="Dnešní lekce"
+            description="Krátká poslechová lekce s textem k čtení a volitelným kvízem — není to VIP obsah ani placený tip."
+          />
+          <PublicHealthVideoCard video={today} featured />
+        </section>
+      ) : (
+        <section id="dnesni-lekce" className="mb-12 scroll-mt-24">
+          <MagazineHubSectionHeader eyebrow="Poslech" title="Dnešní lekce" />
+          <p className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+            Nová lekce se publikuje každý den — vraťte se brzy nebo prohlédněte archiv níže.
           </p>
-          <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
-            Denní zdravotní osvěta
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/85">
-            Krátké poslechové lekce o prevenci, nemocech, dlouhověkosti a životním stylu —
-            srozumitelně v češtině, s textem k souběžnému čtení.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              href="/verejnost/zebricek"
-              className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#005B96] shadow-sm transition hover:bg-white/90"
-            >
-              Žebříček uživatelů
-            </Link>
-            <Link
-              href="/verejnost"
-              className="rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
-            >
-              ← Veřejné zdraví
-            </Link>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        {today ? (
-          <section className="mb-12">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">
-              Dnešní lekce
-            </p>
-            <h2 className="mt-1 font-display text-2xl font-bold text-[#021d33]">Tip dne</h2>
-            <div className="mt-4">
-              <PublicHealthVideoCard video={today} featured />
-            </div>
-          </section>
-        ) : null}
-
+      {articles.length ? (
         <section className="mb-12">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">Kategorie</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {topics.map((t) => (
-              <span
-                key={t.id}
-                className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600"
-              >
-                {CATEGORY_LABELS[t.category] ?? t.category} · {t.title}
-              </span>
+          <MagazineHubSectionHeader
+            eyebrow={nav.eyebrow}
+            title={nav.title}
+            description={nav.description}
+            href={nav.href}
+            ctaLabel={nav.ctaLabel}
+          />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {articles.map((item) => (
+              <VerejnostArticleCard key={item.id} article={item} />
             ))}
           </div>
         </section>
+      ) : null}
 
-        <div className="grid gap-10 lg:grid-cols-3">
-          <section className="lg:col-span-2">
-            <div className="mb-4 flex items-end justify-between">
-              <h2 className="font-display text-2xl font-bold text-[#021d33]">Archiv lekcí</h2>
-            </div>
-            {archive.length ? (
-              <div className="grid gap-4 sm:grid-cols-2">
-                {archive.map((v) => (
-                  <PublicHealthVideoCard key={v.id} video={v} />
-                ))}
-              </div>
-            ) : (
-              <p className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
-                Archiv se plní každý den novou lekcí.
-              </p>
-            )}
-          </section>
-
-          <aside>
-            <div className="mb-4 flex items-end justify-between">
-              <h2 className="font-display text-xl font-bold text-[#021d33]">Top 5 XP</h2>
-              <PublicLeaderboardCta />
-            </div>
-            <PublicLeaderboard entries={leaderboard} />
-            <p className="mt-4 text-xs text-slate-400">
-              +10 XP za video · +20 XP za kvíz · odznaky: První video, Týden prevence
-            </p>
-          </aside>
+      <section className="mb-10">
+        <MagazineHubSectionHeader
+          eyebrow="Rubriky poslechu"
+          title="Témata v archivu lekcí"
+        />
+        <div className="flex flex-wrap gap-2">
+          {topics.map((t) => (
+            <span
+              key={t.id}
+              className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600"
+            >
+              {CATEGORY_LABELS[t.category] ?? t.category} · {t.title}
+            </span>
+          ))}
         </div>
+      </section>
+
+      <div className="grid gap-10 lg:grid-cols-3">
+        <section className="lg:col-span-2">
+          <MagazineHubSectionHeader eyebrow="Archiv" title="Poslechové lekce" />
+          {archive.length ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {archive.map((v) => (
+                <PublicHealthVideoCard key={v.id} video={v} />
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+              Archiv se plní každý den novou lekcí. Mezitím si přečtěte{" "}
+              <Link href="/articles" className="font-medium text-[#005B96] hover:underline">
+                články magazínu
+              </Link>
+              .
+            </p>
+          )}
+        </section>
+
+        <aside>
+          <div className="mb-4 flex items-end justify-between">
+            <h2 className="font-display text-xl font-bold text-[#021d33]">Top 5 XP</h2>
+            <PublicLeaderboardCta />
+          </div>
+          <PublicLeaderboard entries={leaderboard} />
+          <p className="mt-4 text-xs leading-relaxed text-slate-400">
+            +10 XP za poslech · +20 XP za kvíz · odznaky: První lekce, Týden prevence. Body jsou
+            volitelná hra — ne odemykají VIP ani předplatné.
+          </p>
+        </aside>
       </div>
-    </div>
+    </MagazineSectionHub>
   );
 }

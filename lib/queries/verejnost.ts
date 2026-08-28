@@ -6,7 +6,7 @@ import {
   prepareArticlesForDisplay,
   type DisplayArticle,
 } from "@/lib/articles/prepare-for-display";
-import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-audit";
+import { filterMagazineListableArticles, shouldHideFromPublicListing } from "@/lib/editorial/article-quality-audit";
 import type { LocaleCode } from "@/lib/i18n/config";
 import type { ArticleWithRelations } from "@/types/database";
 
@@ -130,6 +130,7 @@ export async function getPublicArticleBySlug(
 
   const row = data ? (mapArticleList([data as Record<string, unknown>])[0] ?? null) : null;
   if (!row) return demoHit();
+  if (shouldHideFromPublicListing(row)) return null;
   const article = await prepareArticleForDisplay(row, locale, "full");
   const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
   return { ...article, cover_image_url: resolveVerejnostCoverUrl(article) };

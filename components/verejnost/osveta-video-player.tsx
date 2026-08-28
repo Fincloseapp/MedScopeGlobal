@@ -12,7 +12,7 @@ import {
   isPlaceholderVideoUrl,
   type ContentSlideshowManifest,
 } from "@/lib/v25/video/content-slideshow";
-import { getPublicAvatar } from "@/lib/verejnost/osveta/avatars";
+import { resolveOsvetaThumb } from "@/lib/verejnost/osveta/resolve-thumb";
 import type { PublicHealthQuiz, PublicHealthVideoWithTopic } from "@/types/public-osveta";
 
 const GTV_HOST = "storage.googleapis.com/gtv-videos-bucket";
@@ -90,7 +90,6 @@ export function OsvetaVideoPlayer({
   video: PublicHealthVideoWithTopic;
   quiz: PublicHealthQuiz | null;
 }) {
-  const avatar = getPublicAvatar(video.avatar_type);
   const editorialLabel = getVideoEditorialLabel({
     avatarType: video.avatar_type,
     category: video.topic?.category,
@@ -98,6 +97,12 @@ export function OsvetaVideoPlayer({
     audience: "osveta",
     slug: video.slug,
     aiAssisted: false,
+  });
+  const coverUrl = resolveOsvetaThumb({
+    thumbnailUrl: video.thumbnail_url,
+    avatarType: video.avatar_type,
+    category: video.topic?.category,
+    slug: video.slug,
   });
   const isAudio = (video.metadata?.lesson_format as string) === "audio_lesson";
   const mediaUrl = resolveMediaUrl(video.video_url);
@@ -128,9 +133,6 @@ export function OsvetaVideoPlayer({
     () => scriptToParagraphs(video.script || ""),
     [video.script]
   );
-  const coverUrl = video.thumbnail_url?.includes(".svg")
-    ? avatar.imageUrl
-    : (video.thumbnail_url ?? avatar.imageUrl);
 
   const awardWatch = useCallback(async () => {
     if (watchAwarded) return;

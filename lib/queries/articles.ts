@@ -17,7 +17,7 @@ import {
   prepareArticlesForDisplay,
   type DisplayArticle,
 } from "@/lib/articles/prepare-for-display";
-import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-audit";
+import { filterMagazineListableArticles, shouldHideFromPublicListing } from "@/lib/editorial/article-quality-audit";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { createDataClient } from "@/lib/supabase/data";
 import {
@@ -393,6 +393,9 @@ export async function getArticleBySlug(
     : null;
   if (!row) {
     return getDemoMagazineArticleBySlug(slug);
+  }
+  if (shouldHideFromPublicListing(row)) {
+    return null;
   }
   return prepareArticleForDisplay(row, locale, "full");
 }

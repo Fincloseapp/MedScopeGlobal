@@ -416,6 +416,27 @@ ${"<p>Další praktický odstavec o nákupním seznamu, týdenním plánu a mýt
     "sleep"
   );
 
+  // Sedentary / NEAT slug must classify as movement even with generic title + zivotni-styl topic.
+  assert.equal(
+    classifyCoverTopic({
+      title: "Zdraví v každodenním rytmu: Praktické rady pro každého",
+      slug: "verejnost-zivotni-styl-2026-08-19-sedave-zamestnani-kdyz-se-divame-na-skutecne-reseni-neat-schody-stani",
+      publicTopic: "zivotni-styl",
+    }),
+    "movement"
+  );
+  const sedentaryCover = resolveArticleCoverUrl({
+    title: "Zdraví v každodenním rytmu: Praktické rady pro každého",
+    slug: "verejnost-zivotni-styl-2026-08-19-sedave-zamestnani-kdyz-se-divame-na-skutecne-reseni-neat-schody-stani",
+    publicTopic: "zivotni-styl",
+    coverImageUrl: "/assets/covers/calm-2.webp",
+    preferCurated: true,
+  });
+  assert.ok(
+    sedentaryCover?.includes("movement"),
+    `sedentary NEAT must remap calm → movement cover, got ${sedentaryCover}`
+  );
+
   // Excerpt “bez zbytečného stresu” must not steal Mediterranean / food heroes to calm.
   assert.equal(
     classifyCoverTopic({

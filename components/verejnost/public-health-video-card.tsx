@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Play, Clock } from "lucide-react";
-import { getPublicAvatar } from "@/lib/verejnost/osveta/avatars";
 import { getVideoEditorialLabel } from "@/lib/editorial/video-units";
+import { resolveOsvetaThumb } from "@/lib/verejnost/osveta/resolve-thumb";
 import type { PublicHealthVideoWithTopic } from "@/types/public-osveta";
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -18,7 +18,6 @@ export function PublicHealthVideoCard({
   video: PublicHealthVideoWithTopic;
   featured?: boolean;
 }) {
-  const avatar = getPublicAvatar(video.avatar_type);
   const editorialLabel = getVideoEditorialLabel({
     avatarType: video.avatar_type,
     category: video.topic?.category,
@@ -27,9 +26,12 @@ export function PublicHealthVideoCard({
     slug: video.slug,
     aiAssisted: false,
   });
-  const thumb = video.thumbnail_url?.includes(".svg")
-    ? avatar.imageUrl
-    : (video.thumbnail_url ?? avatar.imageUrl);
+  const thumb = resolveOsvetaThumb({
+    thumbnailUrl: video.thumbnail_url,
+    avatarType: video.avatar_type,
+    category: video.topic?.category,
+    slug: video.slug,
+  });
   const category = video.topic?.category;
   const dateLabel = video.published_at
     ? new Date(video.published_at).toLocaleDateString("cs-CZ", {
