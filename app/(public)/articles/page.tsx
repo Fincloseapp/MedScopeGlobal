@@ -7,6 +7,10 @@ import { getMedicalArticles } from "@/lib/queries/medicina";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { filterArticlesForDesk, mixListableFeed, type NewsDeskId } from "@/lib/v271/news-desks";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { formatPortal } from "@/lib/i18n/portal-copy";
+import { getMagazineListingUi } from "@/lib/i18n/magazine-listing-copy";
+import { showCzechAcademyPrep } from "@/lib/i18n/portal-copy";
 import Link from "next/link";
 
 export const revalidate = 45;
@@ -25,18 +29,18 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const sp = await searchParams;
   const desk = parseDesk(sp.desk);
+  const listing = getMagazineListingUi(await getServerLocale());
   const title =
     desk === "novinky"
-      ? "Novinky"
+      ? listing.metaNews
       : desk === "verejnost"
-        ? "Články pro veřejnost"
+        ? listing.metaPublic
         : desk === "dlouhovekost"
-          ? "Dlouhověkost"
-          : "Články";
+          ? listing.metaLongevity
+          : listing.metaArticles;
   return await buildLocalizedV20PageMetadata({
     title: `${title} — ${MAGAZINE.name}`,
-    description:
-      "Aktuální zdravotnické články v češtině: novinky, veřejné zdraví, dlouhověkost a redakční magazín VitaScope s fotografiemi.",
+    description: listing.metaDescription,
     path: desk ? `/articles?desk=${desk}` : "/articles",
   });
 }
@@ -47,11 +51,15 @@ export default async function ArticlesPage({
   searchParams: Promise<{ med_track?: string; rok?: string; desk?: string }>;
 }) {
   const sp = await searchParams;
-  const locale = "cs" as const;
+  const locale = await getServerLocale();
+  const listing = getMagazineListingUi(locale);
   const { isVip, accessLevel } = await getReaderContext();
   const desk = parseDesk(sp.desk);
+  const showAcademy = showCzechAcademyPrep(locale);
 
-  const medTrack = sp.med_track === "priprava" || sp.med_track === "studium" ? sp.med_track : null;
+  const medTrack = showAcademy && (sp.med_track === "priprava" || sp.med_track === "studium")
+    ? sp.med_track
+    : null;
   const year = sp.rok ? Number(sp.rok) : undefined;
 
   const coreArticles = await getLatestArticles(48, 0, isVip, accessLevel, locale);
@@ -70,12 +78,12 @@ export default async function ArticlesPage({
     return (
       <div className="v20-articles mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-          Odborný obsah
+          {listing.professionalEyebrow}
         </p>
-        <h1 className="font-display text-4xl font-bold text-[#021d33]">Články</h1>
+        <h1 className="font-display text-4xl font-bold text-[#021d33]">{listing.articlesHeading}</h1>
         <div className="mt-6 flex flex-wrap gap-2">
           <Link href="/articles" className="rounded-full border bg-white px-3 py-1.5 text-sm">
-            Vše
+            {listing.allFilter}
           </Link>
           <Link
             href="/articles?med_track=priprava"
@@ -83,7 +91,7 @@ export default async function ArticlesPage({
               medTrack === "priprava" ? "bg-primary text-white" : "bg-white"
             }`}
           >
-            Příprava LF
+            {listing.lfPrep}
           </Link>
           <Link
             href="/articles?med_track=studium"
@@ -91,7 +99,7 @@ export default async function ArticlesPage({
               medTrack === "studium" ? "bg-primary text-white" : "bg-white"
             }`}
           >
-            Studium medicíny
+            {listing.medStudy}
           </Link>
         </div>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -101,11 +109,12 @@ export default async function ArticlesPage({
         </div>
         {medArticles.length === 0 ? (
           <p className="mt-8 text-center text-sm text-slate-500">
-            Žádné odborné články v této kategorii. Zkuste{" "}
+            {formatPortal(listing.noProfessional, { magazine: MAGAZINE.name })}
+            {" "}
             <Link href="/articles" className="text-primary hover:underline">
-              magazín {MAGAZINE.name}
+              {MAGAZINE.name}
             </Link>{" "}
-            nebo{" "}
+            ·{" "}
             <Link href="/app/mediflow" className="text-primary hover:underline">
               MediFlow
             </Link>
@@ -117,5 +126,5 @@ export default async function ArticlesPage({
   }
 
   const mixed = mixListableFeed(filterArticlesForDesk(coreArticles, desk), 24);
-  return <MagazineListing articles={mixed} activeDesk={desk} />;
+  return <MagazineListing articles={mixed} activeDesk={desk} locale={locale} />;
 }

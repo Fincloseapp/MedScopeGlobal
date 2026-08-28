@@ -1,10 +1,12 @@
 import { unstable_cache } from "next/cache";
 import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
+import { mergeReadableWithDemo } from "@/lib/articles/readable-feed";
 import { mapArticleList } from "@/lib/db/map-article";
 import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-audit";
 import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rules";
 import { mixListableFeed } from "@/lib/v271/news-desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
+import type { LocaleCode } from "@/lib/i18n/config";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import type { AdRow } from "@/types/database";
 
@@ -43,14 +45,15 @@ async function loadAds(placement: string, limit: number): Promise<AdRow[]> {
   return ((data ?? []) as AdRow[]).filter(isWithinSchedule);
 }
 
-async function loadArticlesPublic(): Promise<DisplayArticle[]> {
+async function loadArticlesPublic(locale: LocaleCode): Promise<DisplayArticle[]> {
   const { getDemoMagazineArticles } = await import(
     "@/lib/verejnost/demo-magazine-articles"
   );
+  const demo = getDemoMagazineArticles(locale);
 
   const supabase = tryCreateServiceRoleClient();
   if (!supabase) {
-    return mixListableFeed(getDemoMagazineArticles(), 36);
+    return mixListableFeed(demo, 36);
   }
 
   const { data, error } = await supabase
@@ -62,32 +65,29 @@ async function loadArticlesPublic(): Promise<DisplayArticle[]> {
 
   if (error) {
     console.error("loadArticlesPublic", error);
-    return mixListableFeed(getDemoMagazineArticles(), 36);
+    return mixListableFeed(demo, 36);
   }
 
   const mapped = mapArticleList(data as Record<string, unknown>[] | null);
-  const active = filterCzechContent(filterActiveArticles(mapped), "cs");
+  const active = filterCzechContent(filterActiveArticles(mapped), locale);
   const publicOnly = filterMagazineListableArticles(
     active.filter((a) => !a.vip_only)
   );
-  const prepared = await prepareArticlesForDisplay(publicOnly, "cs", {
+  const prepared = await prepareArticlesForDisplay(publicOnly, locale, {
     mode: "card",
     maxTranslate: 16,
   });
-  if (prepared.length === 0) {
-    return mixListableFeed(getDemoMagazineArticles(), 36);
-  }
-  return mixListableFeed(prepared, 36);
+  return mixListableFeed(mergeReadableWithDemo(prepared, demo, locale), 36);
 }
 
-async function loadHomepageData(): Promise<{
+async function loadHomepageData(locale: LocaleCode): Promise<{
   articles: DisplayArticle[];
   topAds: AdRow[];
   midAds: AdRow[];
   bottomAds: AdRow[];
 }> {
   const [articles, topAds, midAds, bottomAds] = await Promise.all([
-    loadArticlesPublic(),
+    loadArticlesPublic(locale),
     loadAds("homepage_top", 1),
     loadAds("homepage_mid", 1),
     loadAds("homepage_bottom", 1),
@@ -95,8 +95,10 @@ async function loadHomepageData(): Promise<{
   return { articles, topAds, midAds, bottomAds };
 }
 
-export const getHomepageCachedData = unstable_cache(
-  loadHomepageData,
-  ["v22-homepage-public-v7-cover-sweep"],
-  { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
-);
+export async function getHomepageCachedData(locale: LocaleCode = "cs") {
+  return unstable_cache(
+    () => loadHomepageData(locale),
+    ["v22-homepage-public-v8-locale-feed", locale],
+    { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
+  )();
+}

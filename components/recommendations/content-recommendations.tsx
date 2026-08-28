@@ -45,7 +45,7 @@ export async function ContentRecommendations({
     const { getDemoMagazineArticles } = await import(
       "@/lib/verejnost/demo-magazine-articles"
     );
-    articles = getDemoMagazineArticles()
+    articles = getDemoMagazineArticles(locale)
       .filter((a) => a.slug !== currentSlug)
       .slice(0, 4)
       .map((a) => ({ slug: a.slug, title: a.title, excerpt: a.excerpt }));

@@ -3,17 +3,37 @@ import { NewsMagazineCard } from "@/components/articles/news-article-card";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { MAGAZINE } from "@/lib/brand/magazine";
 import { NEWS_DESKS, type NewsDeskId } from "@/lib/v271/news-desks";
+import { formatPortal, getPortalUi, showCzechAcademyPrep } from "@/lib/i18n/portal-copy";
+import { getMagazineListingUi } from "@/lib/i18n/magazine-listing-copy";
 
 export function MagazineListing({
   articles,
   activeDesk,
+  locale = "cs",
 }: {
   articles: DisplayArticle[];
   activeDesk: NewsDeskId | null;
+  locale?: string;
 }) {
   const featured = articles[0];
   const rest = articles.slice(1);
-  const desk = NEWS_DESKS.find((item) => item.id === (activeDesk ?? "clanky")) ?? NEWS_DESKS[3]!;
+  const portal = getPortalUi(locale);
+  const listing = getMagazineListingUi(locale);
+  const showAcademy = showCzechAcademyPrep(locale);
+
+  const deskCopy: Record<NewsDeskId, { label: string; kicker: string; blurb: string }> = {
+    novinky: { label: portal.deskNews, kicker: listing.kickerNews, blurb: listing.blurbNews },
+    verejnost: { label: portal.deskPublic, kicker: listing.kickerPublic, blurb: listing.blurbPublic },
+    dlouhovekost: {
+      label: portal.deskLongevity,
+      kicker: listing.kickerLongevity,
+      blurb: listing.blurbLongevity,
+    },
+    clanky: { label: portal.deskArticles, kicker: listing.kickerArticles, blurb: listing.blurbArticles },
+  };
+
+  const deskId = (activeDesk ?? "clanky") as NewsDeskId;
+  const desk = deskCopy[deskId] ?? deskCopy.clanky;
 
   return (
     <div className="v20-articles mx-auto max-w-7xl px-4 py-10 sm:px-6">
@@ -26,44 +46,51 @@ export function MagazineListing({
           <p className="mt-2 text-sm leading-6 text-slate-600">{desk.blurb}</p>
         </div>
         <Link href="/articles/archiv" className="text-sm font-medium text-primary hover:underline">
-          Archiv →
+          {listing.archive}
         </Link>
       </div>
 
-      <nav aria-label="Oblasti zpravodajství" className="mt-6 flex flex-wrap gap-2">
+      <nav aria-label={listing.desksAria} className="mt-6 flex flex-wrap gap-2">
         <Link
           href="/articles"
           className={`rounded-full border px-3 py-1.5 text-sm ${
             !activeDesk ? "bg-[#005B96] text-white border-[#005B96]" : "bg-white text-slate-700"
           }`}
         >
-          Vše
+          {listing.allFilter}
         </Link>
-        {NEWS_DESKS.map((item) => (
-          <Link
-            key={item.id}
-            href={item.id === "clanky" ? "/articles?desk=clanky" : `/articles?desk=${item.id}`}
-            className={`rounded-full border px-3 py-1.5 text-sm ${
-              activeDesk === item.id
-                ? "bg-[#005B96] text-white border-[#005B96]"
-                : "bg-white text-slate-700"
-            }`}
-          >
-            {item.label}
-          </Link>
-        ))}
-        <Link
-          href="/articles?med_track=priprava"
-          className="rounded-full border bg-white px-3 py-1.5 text-sm text-slate-700"
-        >
-          Příprava LF
-        </Link>
-        <Link
-          href="/articles?med_track=studium"
-          className="rounded-full border bg-white px-3 py-1.5 text-sm text-slate-700"
-        >
-          Studium medicíny
-        </Link>
+        {NEWS_DESKS.map((item) => {
+          const copy = deskCopy[item.id];
+          return (
+            <Link
+              key={item.id}
+              href={item.id === "clanky" ? "/articles?desk=clanky" : `/articles?desk=${item.id}`}
+              className={`rounded-full border px-3 py-1.5 text-sm ${
+                activeDesk === item.id
+                  ? "bg-[#005B96] text-white border-[#005B96]"
+                  : "bg-white text-slate-700"
+              }`}
+            >
+              {copy.label}
+            </Link>
+          );
+        })}
+        {showAcademy ? (
+          <>
+            <Link
+              href="/articles?med_track=priprava"
+              className="rounded-full border bg-white px-3 py-1.5 text-sm text-slate-700"
+            >
+              {listing.lfPrep}
+            </Link>
+            <Link
+              href="/articles?med_track=studium"
+              className="rounded-full border bg-white px-3 py-1.5 text-sm text-slate-700"
+            >
+              {listing.medStudy}
+            </Link>
+          </>
+        ) : null}
       </nav>
 
       {featured ? (
@@ -73,30 +100,29 @@ export function MagazineListing({
       ) : (
         <div className="mt-8 rounded-2xl border border-dashed border-[#cfe1f3] bg-[#f6fbff] px-6 py-10 text-center">
           <p className="font-display text-xl font-semibold text-[#021d33]">
-            {MAGAZINE.name} zatím nemá zobrazené články
+            {formatPortal(listing.emptyTitle, { magazine: MAGAZINE.name })}
           </p>
           <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-600">
-            Redakční feed se připravuje. Mezitím můžete vést wellness deník v MediFlow, prozkoumat VIP
-            protokoly nebo podpořit redakci příspěvkem / darem u publikovaných textů.
+            {listing.emptyBody}
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/app/mediflow"
               className="rounded-full bg-[#005B96] px-4 py-2 text-sm font-medium text-white hover:bg-[#004a7a]"
             >
-              Otevřít MediFlow
+              {portal.openMediFlow}
             </Link>
             <Link
               href="/vip/protokoly"
               className="rounded-full border border-[#005B96]/40 bg-white px-4 py-2 text-sm font-medium text-[#005B96] hover:bg-[#eef6fc]"
             >
-              VIP protokoly
+              {portal.vipProtocols}
             </Link>
             <Link
               href="/predplatne"
               className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
             >
-              Předplatné
+              {portal.subscribe}
             </Link>
           </div>
         </div>
@@ -111,9 +137,7 @@ export function MagazineListing({
       ) : null}
 
       <p className="mt-10 rounded-xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm leading-6 text-amber-950">
-        Texty slouží ke vzdělávání. Nenahrazují vyšetření ani individuální lékařskou radu. U
-        každého článku je uvedena redakční jednotka a nezávislá kontrola; primární zdroje
-        redakce nevymýšlí.
+        {listing.disclaimer}
       </p>
     </div>
   );

@@ -6,8 +6,14 @@
  * and production-empty states still show a working VitaScope magazine feed.
  */
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
-import { assignEditorialUnits, formatEditorialUnitDisplay } from "@/lib/editorial/units";
+import { assignEditorialUnits, formatEditorialUnitDisplay, type EditorialLocale } from "@/lib/editorial/units";
 import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
+import {
+  demoArticleLocaleTag,
+  getDemoArticleTranslation,
+} from "@/lib/verejnost/demo-magazine-i18n";
+import { getMagazineListingUi } from "@/lib/i18n/magazine-listing-copy";
+import { pickCopyLocale } from "@/lib/i18n/copy-locale";
 import type { ArticleWithRelations } from "@/types/database";
 
 type DemoSeed = {
@@ -169,11 +175,25 @@ const DEMO_SEEDS: DemoSeed[] = [
   },
 ];
 
-function buildDemoRow(seed: DemoSeed, index: number): ArticleWithRelations {
+function demoCategoryName(
+  deskHint: DemoSeed["deskHint"],
+  locale?: string | null
+): string {
+  const listing = getMagazineListingUi(locale);
+  if (deskHint === "dlouhovekost") return listing.metaLongevity;
+  if (deskHint === "novinky") return listing.metaNews;
+  return listing.kickerPublic;
+}
+
+function buildDemoRow(seed: DemoSeed, index: number, locale?: string | null): ArticleWithRelations {
   const now = new Date();
-  // Stagger published_at so mixFreshFeed keeps variety
   const published = new Date(now.getTime() - index * 86_400_000).toISOString();
   const id = `demo-magazine-${seed.slug}`;
+  const copy = getDemoArticleTranslation(seed.slug, locale);
+  const title = copy?.title ?? seed.title;
+  const excerpt = copy?.excerpt ?? seed.excerpt;
+  const content = copy?.content ?? seed.content;
+  const localeTag = demoArticleLocaleTag(locale);
 
   const metadata: Record<string, unknown> = {
     editorial_version: "26",
@@ -191,14 +211,14 @@ function buildDemoRow(seed: DemoSeed, index: number): ArticleWithRelations {
 
   return {
     id,
-    title: seed.title,
+    title,
     slug: seed.slug,
-    excerpt: seed.excerpt,
-    content: seed.content,
+    excerpt,
+    content,
     cover_image_url: resolveArticleCoverUrl({
-      title: seed.title,
+      title,
       slug: seed.slug,
-      excerpt: seed.excerpt,
+      excerpt,
       publicTopic: seed.public_topic,
       preferCurated: true,
     }),
@@ -211,21 +231,16 @@ function buildDemoRow(seed: DemoSeed, index: number): ArticleWithRelations {
     min_access_level: "public",
     audience: "public",
     public_topic: seed.public_topic,
-    locale: "cs",
-    source_name: "VitaScope · Demo magazín",
-    meta_description: seed.meta_description ?? seed.excerpt.slice(0, 160),
+    locale: localeTag,
+    source_name: "VitaScope",
+    meta_description: copy?.meta_description ?? seed.meta_description ?? excerpt.slice(0, 160),
     ai_generated: false,
     metadata,
     created_at: published,
     updated_at: published,
     categories: {
       id: "demo-category",
-      name:
-        seed.deskHint === "dlouhovekost"
-          ? "Dlouhověkost"
-          : seed.deskHint === "novinky"
-            ? "Novinky"
-            : "Veřejné zdraví",
+      name: demoCategoryName(seed.deskHint, locale),
       slug:
         seed.deskHint === "dlouhovekost"
           ? "dlouhovekost"
@@ -237,35 +252,47 @@ function buildDemoRow(seed: DemoSeed, index: number): ArticleWithRelations {
     },
     users: {
       id: "demo-author",
-      full_name: "Redakce VitaScope",
+      full_name: "VitaScope",
       avatar_url: null,
     },
   };
 }
 
-function toDisplayArticle(row: ArticleWithRelations): DisplayArticle {
+function toDisplayArticle(row: ArticleWithRelations, locale?: string | null): DisplayArticle {
   const assignment = assignEditorialUnits(row);
+  const editorialLocale: EditorialLocale = pickCopyLocale(locale) === "en" ? "en" : "cs";
   return {
     ...row,
-    displayLocale: "cs",
+    displayLocale: demoArticleLocaleTag(locale),
     editorialAssignment: assignment,
-    editorialPrimaryLabel: formatEditorialUnitDisplay(assignment.primary, "cs", assignment.aiAssisted),
+    editorialPrimaryLabel: formatEditorialUnitDisplay(
+      assignment.primary,
+      editorialLocale,
+      assignment.aiAssisted
+    ),
   };
 }
 
-let cached: DisplayArticle[] | null = null;
+const cached = new Map<string, DisplayArticle[]>();
 
 /** Full demo magazine set (DisplayArticle ready for cards and desks). */
-export function getDemoMagazineArticles(): DisplayArticle[] {
-  if (!cached) {
-    cached = DEMO_SEEDS.map((seed, i) => toDisplayArticle(buildDemoRow(seed, i)));
-  }
-  return cached;
+export function getDemoMagazineArticles(locale?: string | null): DisplayArticle[] {
+  const key = pickCopyLocale(locale);
+  const hit = cached.get(key);
+  if (hit) return hit;
+  const built = DEMO_SEEDS.map((seed, i) =>
+    toDisplayArticle(buildDemoRow(seed, i, locale), locale)
+  );
+  cached.set(key, built);
+  return built;
 }
 
-export function getDemoMagazineArticleBySlug(slug: string): DisplayArticle | null {
+export function getDemoMagazineArticleBySlug(
+  slug: string,
+  locale?: string | null
+): DisplayArticle | null {
   const key = slug.trim().toLowerCase();
-  return getDemoMagazineArticles().find((a) => a.slug.toLowerCase() === key) ?? null;
+  return getDemoMagazineArticles(locale).find((a) => a.slug.toLowerCase() === key) ?? null;
 }
 
 /** True when listings should fall back to demo content (no usable DB rows). */

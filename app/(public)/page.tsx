@@ -55,7 +55,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const locale = await getServerLocale();
   const philosophy = getPortalPhilosophy(locale);
-  const { articles, topAds, midAds, bottomAds } = await getHomepageCachedData();
+  const { articles, topAds, midAds, bottomAds } = await getHomepageCachedData(locale);
 
   const homeLd = medicalWebPageJsonLd({
     title: philosophy.claim,
