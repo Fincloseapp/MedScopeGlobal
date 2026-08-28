@@ -147,7 +147,7 @@ async function fetchCandidateRows() {
     return data ?? [];
   }
 
-  const PAGE = 1000;
+  const PAGE = 100;
   let from = 0;
   const all = [];
   while (true) {
@@ -189,6 +189,7 @@ const candidates = (rows ?? []).filter((row) => {
   }
   const wc = wordCount(row.content);
   const short = wc < minWords;
+  if (expandOnly || noLlm) return short;
   const boiler = isBoilerplateContent(row.content);
   const badExcerpt =
     String(row.excerpt ?? "").includes("Srozumitelně a bez zbytečného strašení") ||
