@@ -37,9 +37,9 @@ const COVER_POOL: Record<CoverVisualTopic, readonly string[]> = {
   movement: ["/assets/covers/movement.webp", "/assets/covers/movement-2.webp"],
   seniors: ["/assets/covers/seniors.webp", "/assets/covers/walk.webp"],
   clinical: [
-    "/assets/covers/clinical.webp",
     "/assets/covers/clinical-2.webp",
     "/assets/covers/clinical-3.webp",
+    "/assets/covers/research.webp",
   ],
   research: [
     "/assets/covers/research.webp",
@@ -47,7 +47,7 @@ const COVER_POOL: Record<CoverVisualTopic, readonly string[]> = {
     "/assets/covers/science.webp",
   ],
   tech: ["/assets/covers/tech.webp", "/assets/covers/vitals.webp"],
-  vitals: ["/assets/covers/vitals.webp", "/assets/covers/clinical.webp"],
+  vitals: ["/assets/covers/vitals.webp", "/assets/covers/clinical-3.webp"],
   walk: ["/assets/covers/walk.webp", "/assets/covers/movement.webp"],
 };
 
@@ -135,8 +135,22 @@ export function mapCoverVisualTopicToEditorialTopic(
   }
 }
 
+/**
+ * Legacy v25 local asset — brain CT on monitor (“brain on stick” family).
+ * Never assign via matcher, backfill, or display resolver.
+ */
+export const BRAIN_SCAN_COVER_PATHS = ["/assets/covers/clinical.webp"] as const;
+
+/** True when URL is the retired brain-scan hero (`clinical.webp`). */
+export function isBrainScanCoverUrl(url: string | null | undefined): boolean {
+  const path = normalizeLocalCoverPath(url);
+  if (!path) return false;
+  return (BRAIN_SCAN_COVER_PATHS as readonly string[]).includes(path);
+}
+
 /** True when URL points at clinical/lab/brain-style local covers. */
 export function isClinicalOrBrainCoverUrl(url: string): boolean {
+  if (isBrainScanCoverUrl(url)) return true;
   const lower = url.toLowerCase();
   if (!lower.includes("/assets/covers/")) return false;
   return CLINICAL_COVER_SLUGS.some((slug) => lower.includes(`/covers/${slug}.webp`));
@@ -192,7 +206,6 @@ const LOCAL_COVER_TOPICS: Partial<
   "/assets/covers/movement-2.webp": ["movement", "walk"],
   "/assets/covers/walk.webp": ["walk", "movement", "seniors"],
   "/assets/covers/seniors.webp": ["seniors"],
-  "/assets/covers/clinical.webp": ["clinical", "research", "vitals"],
   "/assets/covers/clinical-2.webp": ["clinical", "research", "vitals"],
   "/assets/covers/clinical-3.webp": ["clinical", "research"],
   "/assets/covers/research.webp": ["research", "clinical"],
@@ -411,7 +424,11 @@ export function resolveArticleCoverUrl(input: {
   const seed = input.slug || input.title;
   const curated = pickCuratedCover(topic, seed);
 
-  if (isBrokenCoverUrl(raw) || (raw && isDeniedStockUrl(raw))) {
+  if (
+    isBrokenCoverUrl(raw) ||
+    (raw && isDeniedStockUrl(raw)) ||
+    (raw && isBrainScanCoverUrl(raw))
+  ) {
     return input.preferCurated === false ? null : curated;
   }
 
@@ -422,6 +439,7 @@ export function resolveArticleCoverUrl(input: {
   // Local covers (relative or absolute site URL): keep only when topic-appropriate
   const localPath = normalizeLocalCoverPath(raw);
   if (localPath) {
+    if (isBrainScanCoverUrl(localPath)) return curated;
     return isMismatchedLocalCover(localPath, topic) ? curated : localPath;
   }
 
@@ -439,4 +457,36 @@ export function resolveArticleCoverUrl(input: {
   }
 
   return input.preferCurated === false ? null : curated;
+}
+
+/** True when stored cover should be rewritten (stale v25, brain scan, or topic mismatch). */
+export function articleNeedsCoverRemediation(input: {
+  title: string;
+  slug?: string | null;
+  excerpt?: string | null;
+  category?: string | null;
+  publicTopic?: string | null;
+  coverImageUrl?: string | null;
+}): boolean {
+  const raw = input.coverImageUrl?.trim() || null;
+  if (!raw) return true;
+  if (
+    isBrokenCoverUrl(raw) ||
+    isStaleGenericStockUrl(raw) ||
+    isDeniedStockUrl(raw) ||
+    isBrainScanCoverUrl(raw)
+  ) {
+    return true;
+  }
+  const topic = classifyCoverTopic(input);
+  const localPath = normalizeLocalCoverPath(raw);
+  if (localPath) {
+    if (isBrainScanCoverUrl(localPath)) return true;
+    if (isMismatchedLocalCover(localPath, topic)) return true;
+  }
+  const resolved = resolveArticleCoverUrl({
+    ...input,
+    preferCurated: true,
+  });
+  return (resolved ?? null) !== raw;
 }

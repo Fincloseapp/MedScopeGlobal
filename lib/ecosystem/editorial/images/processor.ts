@@ -2,6 +2,12 @@
 
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import {
+  articleNeedsCoverRemediation,
+  mapCoverVisualTopicToEditorialTopic,
+  resolveArticleCoverUrl,
+} from "./cover";
+import { buildAltText } from "./prompts";
+import {
   isDeniedEditorialImageUrl,
   isMissingOrStaleHeroImage,
   validateImageCompliance,

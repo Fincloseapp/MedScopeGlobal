@@ -72,7 +72,7 @@ export const CURATED_ASSET_POOL: Record<
       keywords: ["doctor", "consultation", "health", "lékař", "preventivní"],
     },
     {
-      url: "/assets/covers/clinical.webp",
+      url: "/assets/covers/clinical-3.webp",
       keywords: ["heart", "cardio", "monitoring", "srdce", "vitality"],
     },
   ],
@@ -82,7 +82,7 @@ export const CURATED_ASSET_POOL: Record<
       keywords: ["research", "science", "study", "výzkum", "studie"],
     },
     {
-      url: "/assets/covers/clinical.webp",
+      url: "/assets/covers/research-2.webp",
       keywords: ["medicine", "clinical", "healthcare", "medicína"],
     },
     {
@@ -103,7 +103,7 @@ export const LOCAL_PLACEHOLDER_ASSETS: Record<CoverVisualTopic, string> = {
   calm: "/assets/covers/calm.webp",
   movement: "/assets/covers/movement.webp",
   seniors: "/assets/covers/seniors.webp",
-  clinical: "/assets/covers/clinical.webp",
+  clinical: "/assets/covers/clinical-3.webp",
   research: "/assets/covers/research.webp",
   tech: "/assets/covers/tech.webp",
   vitals: "/assets/covers/vitals.webp",
