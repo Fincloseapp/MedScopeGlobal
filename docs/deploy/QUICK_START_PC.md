@@ -69,6 +69,7 @@ curl.exe -sL https://medscopeglobal.com/cs | Select-String -Pattern 'VitaScope|M
 ## Související dokumentace
 
 - Plný D: restore / backup: [`RESTORE_FROM_D.md`](./RESTORE_FROM_D.md)
+- Article expand + image backfill (PC): [`PC_ARTICLE_EXPAND_BACKFILL.md`](./PC_ARTICLE_EXPAND_BACKFILL.md)
 - Stripe donations Worker secrets + webhook: [`STRIPE_DONATIONS.md`](./STRIPE_DONATIONS.md)
 - Operátorský checklist: [`MANUAL_OPERATOR_CHECKLIST.md`](./MANUAL_OPERATOR_CHECKLIST.md)
 - Po merge ecosystem PR: [`POST_MERGE_CHECKLIST.md`](./POST_MERGE_CHECKLIST.md)

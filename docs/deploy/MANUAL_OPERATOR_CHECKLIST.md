@@ -6,6 +6,7 @@ PC secret sync, production cron migrations, and Cursor Secrets for the next agen
 | Doc | When to use |
 |-----|-------------|
 | **This file** | Day-to-day manual steps (migrations, sync, secrets) |
+| [`PC_ARTICLE_EXPAND_BACKFILL.md`](./PC_ARTICLE_EXPAND_BACKFILL.md) | PC: restore secrets → expand shorts → image backfill / cron |
 | [`POST_MERGE_CHECKLIST.md`](./POST_MERGE_CHECKLIST.md) | After merging ecosystem PR to `main` |
 | [`CLOUD_AGENT_ENV_SETUP.md`](./CLOUD_AGENT_ENV_SETUP.md) | Agent pod without Cursor Secrets |
 | [`RESTORE_FROM_D.md`](./RESTORE_FROM_D.md) | Full D: restore / backup / GH secrets |
