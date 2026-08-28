@@ -256,9 +256,9 @@
   }
 }
 
-/* Article detail — calm reading layout */
+/* Article detail — calm longform reading layout */
 .article-reading-page {
-  @apply mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_16rem] lg:py-14;
+  @apply mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-12 lg:py-14;
 }
 
 .article-reading-shell {
@@ -278,11 +278,11 @@
 }
 
 .article-reading-title {
-  @apply mt-4 font-display text-[1.85rem] font-semibold leading-[1.15] tracking-tight text-[#021d33] sm:text-4xl lg:text-[2.65rem];
+  @apply mt-4 max-w-[22ch] font-display text-[1.85rem] font-semibold leading-[1.15] tracking-tight text-[#021d33] sm:max-w-none sm:text-4xl lg:text-[2.65rem];
 }
 
 .article-reading-deck {
-  @apply mt-4 max-w-2xl text-lg leading-relaxed text-slate-600;
+  @apply mt-4 max-w-[42rem] text-lg leading-relaxed text-slate-600;
 }
 
 .article-meta-row {
@@ -290,15 +290,19 @@
 }
 
 .article-disclaimer {
-  @apply mt-3 text-xs leading-relaxed text-slate-500;
+  @apply mt-3 max-w-[42rem] text-xs leading-relaxed text-slate-500;
 }
 
 .article-cover {
-  @apply relative mt-8 aspect-[16/9] w-full overflow-hidden bg-slate-900;
+  @apply relative mt-8 aspect-[16/9] w-full max-w-[42rem] overflow-hidden bg-slate-900;
+}
+
+.article-support-nudge {
+  @apply mt-2 max-w-[42rem] text-center text-[11px] leading-relaxed text-slate-500;
 }
 
 .article-audio-bar {
-  @apply mb-8 flex flex-wrap items-center gap-3 border border-slate-200 bg-slate-50 px-4 py-3;
+  @apply mb-8 flex flex-wrap items-center gap-3 border border-slate-200 bg-slate-50/90 px-4 py-3;
 }
 
 .article-body-column {
@@ -321,10 +325,17 @@
     [&>h2:first-of-type]:mt-0 [&>h2:first-of-type]:border-t-0 [&>h2:first-of-type]:pt-0;
 }
 
+/* Contribution is interactive — contained measure aligned with prose */
 .article-contribute {
-  @apply my-12 max-w-[42rem] scroll-mt-24 rounded-xl border border-slate-200/90 bg-slate-50/70 px-5 py-8 sm:px-7 sm:py-9;
+  @apply my-12 max-w-[42rem] scroll-mt-24 border border-slate-200/90 bg-slate-50/60 px-5 py-8 sm:px-7 sm:py-9;
 }
 
 .article-related {
-  @apply mt-14 border-t border-slate-200 pt-10;
+  @apply mt-14 max-w-[42rem] border-t border-slate-200 pt-10 lg:max-w-none;
+}
+
+@media (min-width: 640px) {
+  .article-prose {
+    @apply prose-p:text-[1.125rem] prose-p:leading-[1.85] prose-li:text-[1.125rem];
+  }
 }

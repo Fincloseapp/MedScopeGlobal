@@ -11,12 +11,13 @@ type Props = {
 /**
  * Soft tip nudge under hero art.
  * Tip-only — VIP / předplatné never share this line (tips ≠ membership).
+ * No Tringelt branding.
  */
 export function ArticleImageSupportNudge({ locale = "cs", articleSlug }: Props) {
   const tip = ARTICLE_TIP_COPY[tipLocale(locale)];
 
   return (
-    <p className="mt-2 text-center text-[11px] leading-relaxed text-slate-500">
+    <p className="article-support-nudge">
       {tip.nudgeLine}{" "}
       <Link
         href={`#article-tip-${articleSlug}`}

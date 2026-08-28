@@ -1,4 +1,4 @@
-/** Re-export for existing imports; implementation is ArticleContribution. */
+/** Legacy path — tips UI lives in ArticleContribution (Příspěvek / Darovat, no Tringelt). */
 export {
   ArticleContribution,
   ArticleTringeltTip,

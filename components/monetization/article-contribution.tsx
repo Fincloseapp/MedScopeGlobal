@@ -24,10 +24,20 @@ type Props = {
 
 const ZERO_DECIMAL = new Set(["ja", "ko", "vi", "id", "hu"]);
 
+/** Strip repeated VIP/předplatné disclaimers so tip ≠ VIP is said once, clearly. */
+function withoutVipNoise(text: string): string {
+  return text
+    .replace(/\s*Nejde o VIP ani předplatné\.?/gi, "")
+    .replace(/\s*Not VIP or a subscription\.?/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 /**
  * Unified article support: Příspěvek (tip) + Dar (donate).
  * Never claims tips unlock VIP / membership / předplatné.
  * Article pages intentionally omit VIP / tariff footers next to this block.
+ * No "Tringelt" branding — single voice is Příspěvek / Darovat.
  */
 export function ArticleContribution({
   articleSlug,
@@ -44,9 +54,25 @@ export function ArticleContribution({
 
   const tipTiers = ARTICLE_TIP_TIERS[locale] ?? ARTICLE_TIP_TIERS.cs;
   const donateTiers = DONATION_TIERS[locale] ?? DONATION_TIERS.cs;
-  const tipCopy = ARTICLE_TIP_COPY[tipLocale(locale)];
-  const donateCopy = DONATION_COPY[tipLocale(locale)];
+  const lang = tipLocale(locale);
+  const tipCopy = ARTICLE_TIP_COPY[lang];
+  const donateCopy = DONATION_COPY[lang];
   const zeroDecimal = ZERO_DECIMAL.has(locale);
+  const isEn = lang === "en";
+
+  const labels = isEn
+    ? {
+        tipSection: "Contribution",
+        tipAction: "Contribute",
+        donateSection: "Donate",
+        donateAction: "Donate",
+      }
+    : {
+        tipSection: "Příspěvek",
+        tipAction: "Přispět",
+        donateSection: "Darovat",
+        donateAction: "Darovat",
+      };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -107,10 +133,16 @@ export function ArticleContribution({
       setError(
         data.error ??
           data.detail ??
-          "Platbu se nepodařilo spustit. Zkuste to prosím znovu."
+          (isEn
+            ? "Could not start payment. Please try again."
+            : "Platbu se nepodařilo spustit. Zkuste to prosím znovu.")
       );
     } catch {
-      setError("Síťová chyba — zkontrolujte připojení a zkuste znovu.");
+      setError(
+        isEn
+          ? "Network error — check your connection and try again."
+          : "Síťová chyba — zkontrolujte připojení a zkuste znovu."
+      );
     } finally {
       setLoading(null);
     }
@@ -133,6 +165,9 @@ export function ArticleContribution({
       </section>
     );
   }
+
+  const tipBlurb = withoutVipNoise(tipCopy.blurb);
+  const donateBlurb = withoutVipNoise(donateCopy.blurb);
 
   return (
     <section
@@ -159,8 +194,9 @@ export function ArticleContribution({
             {tipCopy.title(authorName)}
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-slate-600">
-            {tipCopy.blurb}
+            {tipBlurb}
           </p>
+          {/* Single tip ≠ VIP clarification — avoid stacking VIP/předplatné noise */}
           <p className="mt-2 text-xs leading-relaxed text-slate-500">
             {tipCopy.clarifying}
           </p>
@@ -168,7 +204,7 @@ export function ArticleContribution({
           <div className="mt-6 space-y-6">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#005B96]">
-                Příspěvek
+                {labels.tipSection}
               </p>
               <div className="mt-2.5 flex flex-wrap items-center gap-2">
                 {tipTiers.amounts.map((amount) => (
@@ -194,7 +230,7 @@ export function ArticleContribution({
                     }
                     step={zeroDecimal ? 1 : 0.5}
                     placeholder={tipCopy.custom}
-                    aria-label={`Příspěvek — ${tipCopy.custom}`}
+                    aria-label={`${labels.tipSection} — ${tipCopy.custom}`}
                     value={customTip}
                     onChange={(e) => setCustomTip(e.target.value)}
                     className="w-20 border border-slate-300 bg-white px-2.5 py-1.5 text-sm"
@@ -208,7 +244,7 @@ export function ArticleContribution({
                     }}
                     className="bg-[#005B96] px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-[#004a7a] disabled:opacity-50"
                   >
-                    Přispět
+                    {labels.tipAction}
                   </button>
                 </div>
               </div>
@@ -216,9 +252,11 @@ export function ArticleContribution({
 
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#005B96]">
-                Darovat
+                {labels.donateSection}
               </p>
-              <p className="mt-1 text-xs text-slate-500">{donateCopy.blurb}</p>
+              {donateBlurb ? (
+                <p className="mt-1 text-xs text-slate-500">{donateBlurb}</p>
+              ) : null}
               <div className="mt-2.5 flex flex-wrap items-center gap-2">
                 {donateTiers.amounts.map((amount) => (
                   <button
@@ -237,7 +275,7 @@ export function ArticleContribution({
                   <input
                     type="number"
                     placeholder={tipCopy.custom}
-                    aria-label={`Darovat — ${tipCopy.custom}`}
+                    aria-label={`${labels.donateSection} — ${tipCopy.custom}`}
                     value={customDonate}
                     onChange={(e) => setCustomDonate(e.target.value)}
                     className="w-20 border border-slate-300 bg-white px-2.5 py-1.5 text-sm"
@@ -252,7 +290,7 @@ export function ArticleContribution({
                     }}
                     className="bg-[#021d33] px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-[#0a3d5c] disabled:opacity-50"
                   >
-                    Darovat
+                    {labels.donateAction}
                   </button>
                 </div>
               </div>
@@ -273,7 +311,7 @@ export function ArticleContribution({
   );
 }
 
-/** Legacy name — article tip UI now lives in ArticleContribution. */
+/** @deprecated Legacy alias — use ArticleContribution. No Tringelt branding. */
 export function ArticleTringeltTip(props: Props) {
   return <ArticleContribution {...props} />;
 }
