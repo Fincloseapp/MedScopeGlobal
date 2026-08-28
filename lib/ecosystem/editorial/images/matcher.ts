@@ -62,6 +62,11 @@ const TOPIC_KEYWORDS: Record<EditorialTopic, string[]> = {
     "potravin",
     "ovoce",
     "zelenin",
+    "bílkovin",
+    "bilkovin",
+    "protein",
+    "sytost",
+    "recept",
   ],
   seniors: [
     "senior",

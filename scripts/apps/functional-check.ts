@@ -231,6 +231,42 @@ assert.equal(
     `food topic cover, got ${foodCover}`
   );
   assert.equal(classifyCoverTopic({ title: "Středomořský talíř", slug: "stredomorsky" }), "food");
+  assert.equal(
+    classifyCoverTopic({
+      title: "Bílkoviny ke každému jídlu: Klíč k síle, sytosti a vitalitě v české kuchyni",
+      slug: "verejnost-zivotni-styl-2026-08-20-bilkoviny-ke-kazdemu-jidlu-klic-k-sile-sytosti-a-vitalite-v-ceske-kuchyni",
+    }),
+    "food"
+  );
+  assert.equal(
+    classifyCoverTopic({
+      title: "Bílkoviny u každého jídla: klíč k síle, sytosti a dlouhověkosti",
+      slug: "verejnost-zivotni-styl-2026-08-20-bilkoviny-u-kazdeho-jidla-klic-k-sile-sytosti-a-dlouhovekosti",
+    }),
+    "food"
+  );
+  assert.equal(
+    classifyCoverTopic({
+      title: "Bílkoviny: klíč k síle a sytosti — proč je senioři potřebují víc",
+      slug: "verejnost-zivotni-styl-2026-08-14-bilkoviny-klic-k-sile-a-sytosti-v-ceske-kuchyni-proc-je-seniori-potrebuji-vic",
+    }),
+    "food"
+  );
+
+  const proteinFromResearch = resolveArticleCoverUrl({
+    title: "Bílkoviny ke každému jídlu: Klíč k síle, sytosti a vitalitě v české kuchyni",
+    slug: "verejnost-zivotni-styl-2026-08-20-bilkoviny-ke-kazdemu-jidlu-klic-k-sile-sytosti-a-vitalite-v-ceske-kuchyni",
+    coverImageUrl: "/assets/covers/research-2.webp",
+    preferCurated: true,
+  });
+  assert.ok(
+    isFoodCoverUrl(proteinFromResearch ?? ""),
+    `bilkoviny must remap research-2.webp → food cover, got ${proteinFromResearch}`
+  );
+  assert.ok(
+    !isClinicalOrBrainCoverUrl(proteinFromResearch ?? ""),
+    `bilkoviny must not keep clinical/research stock, got ${proteinFromResearch}`
+  );
 
   const mediterraneanFromClinical = resolveArticleCoverUrl({
     title: "Vyvážená strava bez extrémů: středomořský talíř v české kuchyni",

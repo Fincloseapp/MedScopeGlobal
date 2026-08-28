@@ -88,6 +88,15 @@ export const VISUAL_TOPIC_KEYWORDS: Record<CoverVisualTopic, readonly string[]> 
     "snídan",
     "snidani",
     "potravin",
+    "bílkovin",
+    "bilkovin",
+    "protein",
+    "sytost",
+    "recept",
+    "jídelníček",
+    "jidelnicek",
+    "výživa",
+    "nutrition",
   ],
   sleep: ["spánek", "spanek", "sleep", "odpočinek", "odpocinek", "postel", "unava", "únava"],
   calm: ["stres", "stress", "mindful", "meditac", "relax", "klid", "wellness"],
@@ -194,7 +203,7 @@ const LOCAL_COVER_TOPICS: Partial<
 };
 
 const FOOD_RE =
-  /tal[ií][rř]|st[rř]edo\s*mo[rř]|stredomorsk|kuchyn|strav|j[ií]dl|meal|diet|v[yý][zž]iv|sal[aá]t|olive|zelenin|protein|b[ií]lkovin|hydrat|pitn[yý]\s+re[zž]im|pitn[eé]\s+re[zž]im|ovoce|sn[ií]dan|ve[cč]e[rř]|potravin/i;
+  /tal[ií][rř]|st[rř]edo\s*mo[rř]|stredomorsk|kuchyn|strav|j[ií]dl|meal|diet|v[yý][zž]iv|sal[aá]t|olive|zelenin|protein|b[ií]lkovin|sytost|recept|j[ií]deln[ií][cč]ek|nutrition|hydrat|pitn[yý]\s+re[zž]im|pitn[eé]\s+re[zž]im|ovoce|sn[ií]dan|ve[cč]e[rř]|potravin/i;
 
 const SLEEP_RE =
   /sp[aá]nek|sleep|apnoe|insomni|odpo[cč]ink|no[cč]n[ií]|polar|postel|unava|únava|jarn[ií]\s+unava|zimn[ií]\s+unava/i;
@@ -203,10 +212,10 @@ const CALM_RE =
   /stres|stress|mindful|meditac|dechov|relax|pohoda|imunit.*pr[aá]ce|wellness|klid/i;
 
 const MOVEMENT_RE =
-  /pohyb|cvi[cč]|fitness|sport|ch[uů]ze|walk|cvik|trenink|tr[eé]nink|s[ií]la|sval/i;
+  /pohyb|cvi[cč]|fitness|sport|ch[uů]ze|walk|cvik|trenink|tr[eé]nink|svalov|svaly|posilov/i;
 
 const SENIORS_RE =
-  /senior|st[aá][rř]nut|aging|menopauz|kost[ií]|osteopor|hrt|d[uů]chod/i;
+  /senior|st[aá][rř]nut|aging|menopauz|osteopor|hrt|d[uů]chod|kostn[ií]|[rř][ií]dnut[ií]\s+kost/i;
 
 const KIDS_RE = /d[eě]t[ií]|[sš]kol|imunit.*d[eě]t|pediatr/i;
 
@@ -259,14 +268,15 @@ export function classifyCoverTopic(input: {
   const hay = haystack(input);
   const topic = (input.publicTopic ?? "").toLowerCase();
 
-  // Specific lifestyle signals before broad food / clinical stock — avoids
-  // “zimní únava + pitný režim” landing on meal photography.
+  // Sleep/calm before food — avoids “zimní únava + pitný režim” → meal art.
+  // Food before movement/seniors — “bílkoviny … klíč k síle” / “…senioři…” must
+  // stay on food covers (síla/senior must not steal nutrition titles).
   if (SLEEP_RE.test(hay)) return "sleep";
   if (CALM_RE.test(hay)) return "calm";
+  if (FOOD_RE.test(hay) || topic.includes("strav")) return "food";
   if (MOVEMENT_RE.test(hay)) return "movement";
   if (SENIORS_RE.test(hay)) return "seniors";
   if (KIDS_RE.test(hay)) return "walk";
-  if (FOOD_RE.test(hay) || topic.includes("strav")) return "food";
   if (VITALS_RE.test(hay)) return "vitals";
   if (TECH_RE.test(hay)) return "tech";
   if (RESEARCH_RE.test(hay) || topic.includes("prevence")) return "research";
