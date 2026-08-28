@@ -3,6 +3,7 @@
  */
 export const BAD_UNSPLASH_IDS = [
   "photo-1576091160550-2173dba999ef",
+  "photo-1576091160399-112ba8d25d1d", // brain-on-stick anatomy model
   "photo-1582750433449-648ed127bb54",
   "photo-1519494026892-80bbd2d6fd0d",
   "photo-1559839734-2b71ea197ec2",

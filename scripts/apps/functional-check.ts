@@ -208,7 +208,11 @@ assert.equal(
   ),
   true
 );
-assert.equal(isMissingOrStaleHeroImage("/assets/covers/food.webp"), false);
+  assert.equal(isMissingOrStaleHeroImage("/assets/covers/food.webp"), false);
+  assert.equal(
+    isMissingOrStaleHeroImage("/assets/covers/clinical.webp"),
+    false
+  );
 
 {
   const foodCover = resolveArticleCoverUrl({
@@ -219,7 +223,35 @@ assert.equal(isMissingOrStaleHeroImage("/assets/covers/food.webp"), false);
     preferCurated: true,
   });
   assert.ok(foodCover?.startsWith("/assets/covers/"), `food cover local, got ${foodCover}`);
+  assert.ok(
+    foodCover?.includes("food") || foodCover?.includes("produce"),
+    `food topic cover, got ${foodCover}`
+  );
   assert.equal(classifyCoverTopic({ title: "Středomořský talíř", slug: "stredomorsky" }), "food");
+
+  const mediterraneanFromClinical = resolveArticleCoverUrl({
+    title: "Vyvážená strava bez extrémů: středomořský talíř v české kuchyni",
+    slug: "verejnost-zivotni-styl-vyziva-bez-extremu",
+    coverImageUrl: "/assets/covers/clinical.webp",
+    preferCurated: true,
+  });
+  assert.ok(
+    mediterraneanFromClinical?.includes("food") ||
+      mediterraneanFromClinical?.includes("produce"),
+    `Mediterranean must not keep clinical.webp, got ${mediterraneanFromClinical}`
+  );
+
+  const brainStock = resolveArticleCoverUrl({
+    title: "Středomořský talíř",
+    slug: "test-brain-stock",
+    coverImageUrl:
+      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200",
+    preferCurated: true,
+  });
+  assert.ok(
+    brainStock?.includes("food") || brainStock?.includes("produce"),
+    `brain-on-stick denied, got ${brainStock}`
+  );
 
   const sleepCover = resolveArticleCoverUrl({
     title: "Zimní spánek a odpočinek",
