@@ -34,6 +34,7 @@ import {
   isClinicalOrBrainCoverUrl,
 } from "../../lib/ecosystem/editorial/images";
 import { getImageCuratorForLocale } from "../../lib/ecosystem/editorial/personas";
+import { polishCzechFields } from "../../lib/v22/translate";
 import {
   EDITORIAL_DESKS,
   PRIMARY_EDITORIAL_LOCALES,
@@ -231,6 +232,34 @@ assert.equal(
     `food topic cover, got ${foodCover}`
   );
   assert.equal(classifyCoverTopic({ title: "Středomořský talíř", slug: "stredomorsky" }), "food");
+  {
+    // Regression: a single EN byline token must not collapse magazine Czech HTML on /cs.
+    const longCzech = `<h2>Zahradní slavnost na talíři</h2>
+<p>Představte si talíř plný zeleniny, kousek ryby a olivový olej — středomořský model jde skvěle přeložit do české kuchyně bez extrémů a bez dietního stresu.</p>
+<p>Polovina talíře zelenina, čtvrtina příloha, čtvrtina bílkovina. Mražená zelenina, luštěniny ve skle a jeden pečený recept na více porcí stačí i po směně.</p>
+<p>MedScopeGlobal AI-Assisted Editorial Team (AI-asistovaná syntéza obsahu) · Životní styl</p>
+${"<p>Další praktický odstavec o nákupním seznamu, týdenním plánu a mýtech versus realitě v běžné české domácnosti.</p>".repeat(12)}`;
+    const polished = polishCzechFields(
+      {
+        title: "Středomořský talíř na českém stole",
+        excerpt: "Vyvážená strava bez extrémů",
+        content: longCzech,
+      },
+      "cs"
+    );
+    const words = String(polished.content ?? "")
+      .replace(/<[^>]+>/g, " ")
+      .split(/\s+/)
+      .filter(Boolean).length;
+    assert.ok(
+      words >= 200,
+      `polishCzechFields must keep long Czech body, got ${words} words`
+    );
+    assert.ok(
+      !/Konkrétní shrnutí zahraniční zprávy pro české lékaře/i.test(String(polished.content)),
+      "must not replace magazine body with foreign-news teaser stub"
+    );
+  }
   assert.equal(
     classifyCoverTopic({
       title: "Bílkoviny ke každému jídlu: Klíč k síle, sytosti a vitalitě v české kuchyni",
