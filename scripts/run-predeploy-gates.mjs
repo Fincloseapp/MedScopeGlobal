@@ -48,6 +48,26 @@ function runTsc() {
   return true;
 }
 
+function runLocaleGuards() {
+  const tsx = join(root, "node_modules/tsx/dist/cli.mjs");
+  const script = join(root, "scripts/verify-czech-locale-guards.ts");
+  if (!existsSync(tsx) || !existsSync(script)) {
+    console.error("✗ verify-czech-locale-guards: missing tsx or script");
+    return false;
+  }
+  const result = spawnSync(process.execPath, [tsx, script], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: "inherit",
+  });
+  if (result.status !== 0) {
+    console.error("✗ verify-czech-locale-guards failed");
+    return false;
+  }
+  console.log("✓ verify-czech-locale-guards");
+  return true;
+}
+
 console.log("\n=== Pre-deploy gates ===\n");
 
 const isVercel = process.env.VERCEL === "1";
@@ -79,6 +99,7 @@ if (isCI && !hasCronSecret) {
 }
 
 let ok = isCI ? true : runTsc();
+ok = runLocaleGuards() && ok;
 for (const [label, script] of steps) {
   ok = runStep(label, script) && ok;
 }

@@ -261,22 +261,9 @@ function stripEnglishEditorialNoise(text: string): string {
     .trim();
 }
 
-/** Drop known bilingual bylines before EN-leak checks (must not nuke magazine bodies). */
-function stripAttributionNoise(text: string): string {
-  return String(text ?? "")
-    .replace(/\bMedScopeGlobal\s+AI-Assisted\s+Editorial\s+Team\b/gi, " ")
-    .replace(/\bAI-Assisted\s+Editorial\s+Team\b/gi, " ")
-    .replace(/\bAI-asistovaná\s+syntéza\s+obsahu\b/gi, " ")
-    .replace(/\bEditoriální\s+tým\s+MedScopeGlobal\b/gi, " ")
-    .replace(/\b\(AI-asistovaná\s+syntéza\s+obsahu\)\b/gi, " ")
-    .replace(/\s{2,}/g, " ")
-    .trim();
-}
-
 function hasEnglishLeak(text: string): boolean {
-  const cleaned = stripAttributionNoise(text);
   return /\b(Comment|Editorial|does risk disappear|stability promotes patient confidence|the|and|with|from|this|that|are|was|were|have|has|for|into|about|patients|treatment|study|trial)\b/i.test(
-    cleaned
+    text
   );
 }
 
@@ -435,20 +422,6 @@ export function toCzechTitle(title: string, context = "zdravotní zpravodajství
 export function toCzechExcerpt(excerpt: string | null | undefined, title: string): string {
   const czechTitle = needsTitleRewrite(title) ? toCzechTitle(title) : stripEnglishEditorialNoise(title.trim());
   const cleaned = stripRssArtifacts(excerpt ?? "");
-  const cleanedWords = cleaned.split(/\s+/).filter(Boolean).length;
-  const hasCzech = /[áčďéěíňóřšťúůýž]/i.test(cleaned);
-
-  // Body-seeded magazine excerpts: keep Czech prose even if a citation embeds a few EN stopwords.
-  if (
-    cleaned &&
-    hasCzech &&
-    cleanedWords >= 25 &&
-    czechMagazineBodyShouldKeep(cleaned, cleanedWords) &&
-    !looksLikeTemplateCzechExcerpt(cleaned) &&
-    !/Konkrétní shrnutí zahraniční zprávy/i.test(cleaned)
-  ) {
-    return polishCzechText(cleaned.slice(0, 400));
-  }
 
   if (
     cleaned &&
@@ -463,45 +436,30 @@ export function toCzechExcerpt(excerpt: string | null | undefined, title: string
   return buildTopicExcerpt(czechTitle, cleaned);
 }
 
-/**
- * Title-tuned `isEnglishDominant` treats ≥3 EN stopwords as dominant. That is
- * correct for headlines/RSS teasers, but false-positives on Czech magazine HTML
- * that cites one English WHO/guideline title ("diet … and … for the prevention").
- */
-function czechMagazineBodyShouldKeep(cleanedPlain: string, wordCount: number): boolean {
-  const csWords = cleanedPlain.split(/\s+/).filter((w) => /[áčďéěíňóřšťúůýž]/i.test(w)).length;
-  if (csWords >= 50) return true;
-  const enStops =
-    cleanedPlain.match(
-      /\b(the|and|for|with|from|into|about|study|trial|patients|treatment|clinical|this|was|were|health|disease|risk|does|are|what)\b/gi
-    ) ?? [];
-  // Absolute ≥3 EN hits is title-tuned; Czech prose keeps unless EN dominates by ratio.
-  if (csWords >= 12 && enStops.length <= Math.max(4, wordCount * 0.25)) return true;
-  if (wordCount >= 200 && enStops.length <= wordCount * 0.25) return true;
-  return false;
+const CZECH_TEASER_MARKER =
+  "Podrobnosti a primární data jsou k dispozici u původního zdroje uvedené studie.";
+
+/** True when body is already a real Czech article (EN citations in sources are OK). */
+export function isSubstantialCzechContent(
+  content: string | null | undefined
+): boolean {
+  if (!content) return false;
+  const plain = stripRssArtifacts(content);
+  if (plain.length < 400) return false;
+  if (!/[áčďéěíňóřšťúůýž]/i.test(plain)) return false;
+  const words = plain.split(/\s+/).filter(Boolean);
+  const czMarked = words.filter((w) => /[áčďéěíňóřšťúůýž]/i.test(w)).length;
+  return czMarked >= 6 || czMarked / Math.max(words.length, 1) >= 0.04;
 }
 
-/**
- * Foreign / RSS bodies get a short Czech teaser. Magazine-length Czech HTML must
- * never be replaced — EN byline tokens ("Editorial Team") or a few EN citation
- * words used to collapse 1200+ word public articles on `/cs/article/...` to ~40 words.
- */
 function contentNeedsCzechTeaser(content: string | null | undefined): boolean {
   if (!content) return false;
+  // Never collapse a full Czech magazine/physician article to a 2-paragraph stub.
+  if (isSubstantialCzechContent(content)) return false;
   if (/\]\]>|<\!\[CDATA\[/i.test(content)) return true;
   const plain = stripRssArtifacts(content);
   if (plain.length < 40) return true;
-
-  const cleaned = stripAttributionNoise(plain);
-  const words = cleaned.split(/\s+/).filter(Boolean).length;
-  const hasCzech = /[áčďéěíňóřšťúůýž]/i.test(cleaned);
-
-  // Substantial Czech magazine draft → keep body (ignore title-tuned EN heuristics).
-  if (hasCzech && words >= 200 && czechMagazineBodyShouldKeep(cleaned, words)) {
-    return false;
-  }
-
-  return isEnglishDominant(cleaned) || hasEnglishLeak(cleaned);
+  return isEnglishDominant(plain) || hasEnglishLeak(plain);
 }
 
 export function polishCzechFields<
@@ -513,31 +471,24 @@ export function polishCzechFields<
     ? toCzechTitle(item.title)
     : polishCzechText(stripEnglishEditorialNoise(decodeBrokenTitleEntities(item.title)));
 
-  const rawContentNeedsTeaser = contentNeedsCzechTeaser(item.content);
+  const preserveBody = isSubstantialCzechContent(item.content);
+  const rawContentNeedsTeaser =
+    !preserveBody && contentNeedsCzechTeaser(item.content);
   const excerptNeeds =
-    isEnglishDominant(item.excerpt ?? "") ||
-    looksLikeTemplateCzechExcerpt(item.excerpt) ||
-    hasEnglishLeak(item.excerpt ?? "") ||
-    rawContentNeedsTeaser ||
-    !item.excerpt?.trim();
-
-  // When keeping a magazine Czech body, seed a missing/leaky excerpt from the
-  // body — never the foreign-news stub phrase used for RSS teasers.
-  const storedExcerpt = item.excerpt?.trim() ?? "";
-  const storedExcerptOk =
-    Boolean(storedExcerpt) &&
-    !isEnglishDominant(storedExcerpt) &&
-    !looksLikeTemplateCzechExcerpt(storedExcerpt) &&
-    !hasEnglishLeak(storedExcerpt) &&
-    !/Konkrétní shrnutí zahraniční zprávy/i.test(storedExcerpt);
-  const excerptSource = rawContentNeedsTeaser
-    ? stripRssArtifacts(item.content ?? "")
-    : storedExcerptOk
-      ? storedExcerpt
-      : stripRssArtifacts(item.content ?? "").slice(0, 500);
+    !preserveBody &&
+    (isEnglishDominant(item.excerpt ?? "") ||
+      looksLikeTemplateCzechExcerpt(item.excerpt) ||
+      hasEnglishLeak(item.excerpt ?? "") ||
+      rawContentNeedsTeaser ||
+      !item.excerpt?.trim());
 
   const excerpt = excerptNeeds
-    ? toCzechExcerpt(excerptSource, item.title)
+    ? toCzechExcerpt(
+        rawContentNeedsTeaser
+          ? stripRssArtifacts(item.content ?? "")
+          : item.excerpt,
+        item.title
+      )
     : polishCzechText(decodeBrokenTitleEntities(item.excerpt ?? ""));
 
   let content = item.content;
@@ -545,7 +496,7 @@ export function polishCzechFields<
     if (rawContentNeedsTeaser) {
       const teaser = excerpt || toCzechExcerpt(null, title);
       content = polishCzechHtml(
-        `<p>${teaser}</p><p>Podrobnosti a primární data jsou k dispozici u původního zdroje uvedené studie.</p>`
+        `<p>${teaser}</p><p>${CZECH_TEASER_MARKER}</p>`
       );
     } else {
       content = polishCzechHtml(content.replace(/\]\]>/g, "").replace(/<!\[CDATA\[/gi, ""));

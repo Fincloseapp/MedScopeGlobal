@@ -33,6 +33,15 @@ if ($inplaceOk) {
       $inplaceOk = $false
     } else {
       Write-Host "In-place Next.js build OK."
+      # OpenNext expects middleware.js inside standalone; Next often omits it there.
+      $mwSrc = Join-Path $root ".next\server\middleware.js"
+      $mwDstDir = Join-Path $root ".next\standalone\.next\server"
+      $mwDst = Join-Path $mwDstDir "middleware.js"
+      if ((Test-Path $mwSrc) -and -not (Test-Path $mwDst)) {
+        New-Item -ItemType Directory -Force -Path $mwDstDir | Out-Null
+        Copy-Item $mwSrc $mwDst -Force
+        Write-Host "Copied middleware.js into standalone for OpenNext."
+      }
       exit 0
     }
   } finally {
