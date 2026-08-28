@@ -222,7 +222,7 @@ const SLEEP_RE =
   /sp[aá]nek|sleep|apnoe|insomni|odpo[cč]ink|no[cč]n[ií]|polar|postel|unava|únava|jarn[ií]\s+unava|zimn[ií]\s+unava/i;
 
 const CALM_RE =
-  /stres|stress|mindful|meditac|dechov|relax|pohoda|imunit.*pr[aá]ce|wellness|klid/i;
+  /stres|stress|mindful|meditac|dechov|relax|pohoda|imunit.*pr[aá]ce|wellness|klid|du[sš]evn|detox|wellbeing|přetížení\s*informac|pretizeni\s*informac/i;
 
 const MOVEMENT_RE =
   /pohyb|cvi[cč]|fitness|sport|ch[uů]ze|walk|cvik|trenink|tr[eé]nink|svalov|svaly|posilov|sedav|sedent|neat\b|schod|st[aá]n[ií]|zam[eě]stn|kancel[aá][řr]|office/i;
@@ -294,6 +294,9 @@ export function classifyCoverTopic(input: {
   if (KIDS_RE.test(titleSlug)) return "walk";
   if (VITALS_RE.test(titleSlug)) return "vitals";
   if (MOVEMENT_RE.test(titleSlug)) return "movement";
+  // Digitální detox + duševní pohoda: calm/wellness hero, not tech/clinical stock.
+  if (/digit[aá]ln[ií]\s*detox|detox.*du[sš]evn|du[sš]evn[ií]\s*pohod/i.test(titleSlug))
+    return "calm";
   if (TECH_RE.test(titleSlug)) return "tech";
   if (RESEARCH_RE.test(titleSlug) || topic.includes("prevence")) return "research";
   if (CLINICAL_RE.test(titleSlug) || topic.includes("nemoci")) return "clinical";
