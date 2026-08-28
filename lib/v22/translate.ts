@@ -435,6 +435,20 @@ export function toCzechTitle(title: string, context = "zdravotní zpravodajství
 export function toCzechExcerpt(excerpt: string | null | undefined, title: string): string {
   const czechTitle = needsTitleRewrite(title) ? toCzechTitle(title) : stripEnglishEditorialNoise(title.trim());
   const cleaned = stripRssArtifacts(excerpt ?? "");
+  const cleanedWords = cleaned.split(/\s+/).filter(Boolean).length;
+  const hasCzech = /[áčďéěíňóřšťúůýž]/i.test(cleaned);
+
+  // Body-seeded magazine excerpts: keep Czech prose even if a citation embeds a few EN stopwords.
+  if (
+    cleaned &&
+    hasCzech &&
+    cleanedWords >= 25 &&
+    czechMagazineBodyShouldKeep(cleaned, cleanedWords) &&
+    !looksLikeTemplateCzechExcerpt(cleaned) &&
+    !/Konkrétní shrnutí zahraniční zprávy/i.test(cleaned)
+  ) {
+    return polishCzechText(cleaned.slice(0, 400));
+  }
 
   if (
     cleaned &&
@@ -450,9 +464,27 @@ export function toCzechExcerpt(excerpt: string | null | undefined, title: string
 }
 
 /**
+ * Title-tuned `isEnglishDominant` treats ≥3 EN stopwords as dominant. That is
+ * correct for headlines/RSS teasers, but false-positives on Czech magazine HTML
+ * that cites one English WHO/guideline title ("diet … and … for the prevention").
+ */
+function czechMagazineBodyShouldKeep(cleanedPlain: string, wordCount: number): boolean {
+  const csWords = cleanedPlain.split(/\s+/).filter((w) => /[áčďéěíňóřšťúůýž]/i.test(w)).length;
+  if (csWords >= 50) return true;
+  const enStops =
+    cleanedPlain.match(
+      /\b(the|and|for|with|from|into|about|study|trial|patients|treatment|clinical|this|was|were|health|disease|risk|does|are|what)\b/gi
+    ) ?? [];
+  // Absolute ≥3 EN hits is title-tuned; Czech prose keeps unless EN dominates by ratio.
+  if (csWords >= 12 && enStops.length <= Math.max(4, wordCount * 0.25)) return true;
+  if (wordCount >= 200 && enStops.length <= wordCount * 0.25) return true;
+  return false;
+}
+
+/**
  * Foreign / RSS bodies get a short Czech teaser. Magazine-length Czech HTML must
- * never be replaced — a single EN byline token (e.g. "Editorial Team") used to
- * collapse 1200+ word public articles on `/cs/article/...` to ~40 words.
+ * never be replaced — EN byline tokens ("Editorial Team") or a few EN citation
+ * words used to collapse 1200+ word public articles on `/cs/article/...` to ~40 words.
  */
 function contentNeedsCzechTeaser(content: string | null | undefined): boolean {
   if (!content) return false;
@@ -464,9 +496,9 @@ function contentNeedsCzechTeaser(content: string | null | undefined): boolean {
   const words = cleaned.split(/\s+/).filter(Boolean).length;
   const hasCzech = /[áčďéěíňóřšťúůýž]/i.test(cleaned);
 
-  // Substantial Czech magazine draft → keep body; only rewrite if EN-dominant.
-  if (hasCzech && words >= 200) {
-    return isEnglishDominant(cleaned);
+  // Substantial Czech magazine draft → keep body (ignore title-tuned EN heuristics).
+  if (hasCzech && words >= 200 && czechMagazineBodyShouldKeep(cleaned, words)) {
+    return false;
   }
 
   return isEnglishDominant(cleaned) || hasEnglishLeak(cleaned);
@@ -489,13 +521,23 @@ export function polishCzechFields<
     rawContentNeedsTeaser ||
     !item.excerpt?.trim();
 
+  // When keeping a magazine Czech body, seed a missing/leaky excerpt from the
+  // body — never the foreign-news stub phrase used for RSS teasers.
+  const storedExcerpt = item.excerpt?.trim() ?? "";
+  const storedExcerptOk =
+    Boolean(storedExcerpt) &&
+    !isEnglishDominant(storedExcerpt) &&
+    !looksLikeTemplateCzechExcerpt(storedExcerpt) &&
+    !hasEnglishLeak(storedExcerpt) &&
+    !/Konkrétní shrnutí zahraniční zprávy/i.test(storedExcerpt);
+  const excerptSource = rawContentNeedsTeaser
+    ? stripRssArtifacts(item.content ?? "")
+    : storedExcerptOk
+      ? storedExcerpt
+      : stripRssArtifacts(item.content ?? "").slice(0, 500);
+
   const excerpt = excerptNeeds
-    ? toCzechExcerpt(
-        rawContentNeedsTeaser
-          ? stripRssArtifacts(item.content ?? "")
-          : item.excerpt,
-        item.title
-      )
+    ? toCzechExcerpt(excerptSource, item.title)
     : polishCzechText(decodeBrokenTitleEntities(item.excerpt ?? ""));
 
   let content = item.content;

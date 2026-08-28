@@ -305,6 +305,39 @@ ${"<p>Další praktický odstavec o nákupním seznamu, týdenním plánu a mýt
       "must not replace magazine body with foreign-news teaser stub"
     );
   }
+  {
+    // Regression: a few EN citation stopwords in an otherwise Czech magazine body
+    // (e.g. WHO guideline title) must not collapse /cs/article HTML.
+    const withCitation = `<h2>Slunce na talíři</h2>
+<p>Středomořská kuchyně není jen o jídle, je to životní styl, který vědci zkoumají už desítky let.</p>
+<p>Podle WHO – Guidelines on diet, nutrition and physical activity for the prevention of noncommunicable diseases European Society of Cardiology – jde o model s jasným přínosem.</p>
+<p>Polovina talíře zelenina, čtvrtina příloha, čtvrtina bílkovina. Mražená zelenina a luštěniny ve skle stačí i po směně.</p>
+${"<p>Další praktický odstavec o nákupním seznamu, týdenním plánu a mýtech versus realitě v běžné české domácnosti bez dietního stresu.</p>".repeat(14)}`;
+    const polished = polishCzechFields(
+      {
+        title: "Středomořská dieta: Váš recept na dlouhověkost",
+        excerpt: null,
+        content: withCitation,
+      },
+      "cs"
+    );
+    const words = String(polished.content ?? "")
+      .replace(/<[^>]+>/g, " ")
+      .split(/\s+/)
+      .filter(Boolean).length;
+    assert.ok(
+      words >= 200,
+      `polishCzechFields must keep Czech body with EN citation, got ${words} words`
+    );
+    assert.ok(
+      !/Konkrétní shrnutí zahraniční zprávy pro české lékaře/i.test(String(polished.content)),
+      "EN citation must not trigger foreign-news body stub"
+    );
+    assert.ok(
+      !/Konkrétní shrnutí zahraniční zprávy pro české lékaře/i.test(String(polished.excerpt ?? "")),
+      "magazine excerpt must not be foreign-news stub when body is kept"
+    );
+  }
   assert.equal(
     classifyCoverTopic({
       title: "Bílkoviny ke každému jídlu: Klíč k síle, sytosti a vitalitě v české kuchyni",
