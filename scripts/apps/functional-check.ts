@@ -309,6 +309,38 @@ assert.equal(
     "sleep"
   );
 
+  // Excerpt “bez zbytečného stresu” must not steal Mediterranean / food heroes to calm.
+  assert.equal(
+    classifyCoverTopic({
+      title: "Středomořská dieta v Česku: Jak si ji přizpůsobit bez exotiky a selským rozumem",
+      slug: "verejnost-zivotni-styl-2026-07-03-stredomorsky-talir-v-ceske-kuchyni-vyvazena-strava-bez-extremu",
+      excerpt:
+        "Zapomeňte na složité recepty a drahé ingredience. Středomořská strava může být snadno součástí vašeho jídelníčku i v české kotlině. Objevte, jak si vychutnat její benefity s lokálními surovinami a bez zbytečného stresu.",
+    }),
+    "food"
+  );
+  const mediterraneanFromCalm = resolveArticleCoverUrl({
+    title: "Středomořská dieta v Česku: Jak si ji přizpůsobit bez exotiky a selským rozumem",
+    slug: "verejnost-zivotni-styl-2026-07-03-stredomorsky-talir-v-ceske-kuchyni-vyvazena-strava-bez-extremu",
+    excerpt:
+      "Objevte benefity s lokálními surovinami a bez zbytečného stresu.",
+    coverImageUrl: "/assets/covers/calm-2.webp",
+    preferCurated: true,
+  });
+  assert.ok(
+    isFoodCoverUrl(mediterraneanFromCalm ?? ""),
+    `Mediterranean + stres excerpt must remap calm-2 → food, got ${mediterraneanFromCalm}`
+  );
+  // Title-level únava still wins over food keywords in the same title.
+  assert.equal(
+    classifyCoverTopic({
+      title: "Zimní únava: mýty o pitném režimu, které vás okrádají o energii",
+      slug: "verejnost-zivotni-styl-2026-07-29-zimni-unava-myty-o-pitnem-rezimu-ktere-vas-okradaji-o-energii",
+      excerpt: "Pitný režim a strava v zimě — bez zbytečného stresu.",
+    }),
+    "sleep"
+  );
+
   assert.equal(
     resolveArticleCoverUrl({
       title: "x",

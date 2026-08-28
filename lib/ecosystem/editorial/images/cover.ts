@@ -266,14 +266,20 @@ export function classifyCoverTopic(input: {
   publicTopic?: string | null;
 }): CoverVisualTopic {
   const hay = haystack(input);
+  // Title + slug only — excerpt often says “bez stresu” / “více energie” and must
+  // not steal Mediterranean / protein heroes onto calm or sleep stock.
+  const titleSlug = [input.title, input.slug].filter(Boolean).join(" ");
   const topic = (input.publicTopic ?? "").toLowerCase();
 
-  // Sleep/calm before food — avoids “zimní únava + pitný režim” → meal art.
-  // Food before movement/seniors — “bílkoviny … klíč k síle” / “…senioři…” must
-  // stay on food covers (síla/senior must not steal nutrition titles).
+  // 1) Title/slug sleep before title/slug food — “zimní únava + pitný režim” stays sleep.
+  // 2) Title/slug food before full-haystack calm — “středomořský… bez zbytečného stresu”
+  //    in the excerpt must stay on food covers.
+  // 3) Food before movement/seniors — “bílkoviny … klíč k síle” / “…senioři…” stay food.
+  if (SLEEP_RE.test(titleSlug)) return "sleep";
+  if (FOOD_RE.test(titleSlug) || topic.includes("strav")) return "food";
   if (SLEEP_RE.test(hay)) return "sleep";
   if (CALM_RE.test(hay)) return "calm";
-  if (FOOD_RE.test(hay) || topic.includes("strav")) return "food";
+  if (FOOD_RE.test(hay)) return "food";
   if (MOVEMENT_RE.test(hay)) return "movement";
   if (SENIORS_RE.test(hay)) return "seniors";
   if (KIDS_RE.test(hay)) return "walk";
