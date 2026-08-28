@@ -24,6 +24,7 @@ import { pickCopyLocale } from "../lib/i18n/copy-locale";
 import { getMagazineListingUi } from "../lib/i18n/magazine-listing-copy";
 import { getDemoArticleTranslation } from "../lib/verejnost/demo-magazine-i18n";
 import { getDemoMagazineArticles } from "../lib/verejnost/demo-magazine-articles";
+import { mixListableFeed } from "../lib/v271/news-desks";
 import {
   detectClientLanguage,
   getPreferredLocale,
@@ -161,6 +162,14 @@ assert.equal(getMagazineListingUi("de").allFilter, "Alle");
 assert.equal(getMagazineListingUi("pl").archive.includes("Archiwum"), true);
 assert.ok(getDemoMagazineArticles("de")[0]?.title && !getDemoMagazineArticles("de")[0]!.title.includes("Zdravý"));
 assert.ok(getDemoMagazineArticles("en")[0]?.displayLocale === "en");
+assert.ok(
+  mixListableFeed(getDemoMagazineArticles("de"), 24).length > 0,
+  "German demo magazine must remain listable"
+);
+assert.ok(
+  mixListableFeed(getDemoMagazineArticles("ja"), 24).some((a) => a.title.includes("睡眠")),
+  "Japanese demo magazine must remain listable"
+);
 
 console.log("✓ i18n/SEO unit checks passed");
 

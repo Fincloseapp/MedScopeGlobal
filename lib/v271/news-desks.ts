@@ -5,7 +5,7 @@
 import { shouldHideFromPublicListing } from "@/lib/editorial/article-quality-audit";
 import { mixFreshFeed, selectResurfaceCandidates } from "@/lib/editorial/freshness";
 import { resolveWriterAgent } from "@/lib/editorial/writer-agents";
-import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rules";
+import { filterActiveArticles, filterCzechContent, isArchivedArticle } from "@/lib/v20/content-rules";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 
 export type NewsDeskId = "novinky" | "verejnost" | "dlouhovekost" | "clanky";
@@ -124,8 +124,17 @@ export function classifyNewsDesk(article: DisplayArticle): NewsDeskId {
 
 export function isListableNewsArticle(article: DisplayArticle, now = new Date()): boolean {
   if (!article.slug || !article.title?.trim()) return false;
+  // In-memory demo pack (id demo-magazine-*) is the readable fallback when CMS
+  // has no translated longform. shouldHideFromPublicListing hides seed/demo stubs
+  // from the database on purpose — do not apply that to the localized pack.
+  if (String(article.id ?? "").startsWith("demo-magazine-")) {
+    return !isArchivedArticle(article);
+  }
   if (shouldHideFromPublicListing(article, now)) return false;
-  return filterCzechContent(filterActiveArticles([article]), "cs").length === 1;
+  const display = String(article.displayLocale ?? article.locale ?? "cs");
+  const czechOnly = display === "cs" || display.startsWith("cs");
+  return filterCzechContent(filterActiveArticles([article]), czechOnly ? "cs" : display)
+    .length === 1;
 }
 
 export function splitNewsDesks(
