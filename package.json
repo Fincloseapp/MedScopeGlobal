@@ -55,6 +55,7 @@
     "auto:continue": "node scripts/auto-continue-cloud.mjs",
     "probe:prod:stripe": "node scripts/probe-prod-stripe-deploy.mjs",
     "verify:articles": "node scripts/verify-prod-articles.mjs",
+    "audit:article-length": "node scripts/editorial/audit-article-length.mjs --write-doc",
     "validate": "node scripts/validate.mjs",
     "verify-v24": "node scripts/verify-v24.0.mjs",
     "verify-v25": "node scripts/verify-v25.0.mjs",
