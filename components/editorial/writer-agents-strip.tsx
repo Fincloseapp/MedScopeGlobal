@@ -6,12 +6,7 @@ export function WriterAgentsStrip() {
   return (
     <section className="mt-3 rounded-lg border border-slate-200 bg-white px-3 py-3 shadow-sm sm:px-4">
       <div className="flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <h2 className="text-sm font-bold text-[#021d33]">Redakční agenti</h2>
-          <p className="mt-0.5 text-xs text-slate-500">
-            Pět denních writerů napojených na cron veřejných článků — vizuál je redakční značka, ne portrét.
-          </p>
-        </div>
+        <h2 className="text-sm font-bold text-[#021d33]">Redakční agenti</h2>
         <Link href="/verejnost/clanky" className="text-xs font-medium text-[#005B96] hover:underline">
           všechny články
         </Link>
