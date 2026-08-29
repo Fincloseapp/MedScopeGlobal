@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SafeArticleImage } from "@/components/media/safe-article-image";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { formatArticleDateLabel } from "@/lib/editorial/freshness";
-import { editorialUnitLabel, isEditorialUnitId } from "@/lib/editorial/units";
+import { publicEditorialByline } from "@/lib/editorial/units";
 import { resolveWriterAgent } from "@/lib/editorial/writer-agents";
 import { resolveDisplayCover, resolveTopicFallbackCover } from "@/lib/v271/topic-covers";
 import { classifyNewsDesk, NEWS_DESKS, type NewsDeskId } from "@/lib/v271/news-desks";
@@ -33,16 +33,8 @@ function kickerOf(article: DisplayArticle): string {
   return article.categories?.name ?? desk?.label ?? "Redakce";
 }
 
-function reviewLine(article: DisplayArticle): string {
-  const assignment = article.editorialAssignment;
-  const reviewer =
-    assignment?.reviewer && isEditorialUnitId(assignment.reviewer)
-      ? editorialUnitLabel(assignment.reviewer, "cs")
-      : null;
-  if (reviewer) return `Nezávislá redakční kontrola: ${reviewer}`;
-  return article.editorialPrimaryLabel
-    ? `Redakční kontrola: ${article.editorialPrimaryLabel}`
-    : "Redakční kontrola MedScopeGlobal";
+function reviewLine(_article: DisplayArticle): string {
+  return publicEditorialByline("cs");
 }
 
 export function NewsArticleThumb({
