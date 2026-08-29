@@ -29,8 +29,9 @@ const staticRoutes: MetadataRoute.Sitemap = [
   { url: `${base}/verejnost`, changeFrequency: "daily", priority: 0.85 },
   { url: `${base}/lekari`, changeFrequency: "weekly", priority: 0.82 },
   { url: `${base}/dashboard`, changeFrequency: "weekly", priority: 0.75 },
-  { url: `${base}/academy`, changeFrequency: "weekly", priority: 0.8 },
-  { url: `${base}/academy/courses`, changeFrequency: "weekly", priority: 0.78 },
+  { url: `${base}/academy`, changeFrequency: "weekly", priority: 0.72 },
+  // Soft-gated catalog: keep URL indexed lightly until ACADEMY_COURSES_CATALOG_PROMO is true
+  { url: `${base}/academy/courses`, changeFrequency: "monthly", priority: 0.35 },
   { url: `${base}/mediprep`, changeFrequency: "monthly", priority: 0.55 },
   { url: `${base}/mediprep/stahnout`, changeFrequency: "monthly", priority: 0.5 },
   { url: `${base}/app/priprava`, changeFrequency: "monthly", priority: 0.5 },
