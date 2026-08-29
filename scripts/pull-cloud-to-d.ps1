@@ -1,4 +1,4 @@
-# Pull current cloud/GitHub state into D:\medscope.local for local PC work.
+﻿# Pull current cloud/GitHub state into D:\medscope.local for local PC work.
 # Run in PowerShell on the Windows machine (not in Cursor Cloud).
 $ErrorActionPreference = "Stop"
 $root = "D:\medscope.local"
@@ -21,9 +21,9 @@ Write-Host "=== Checkout + pull $ref ==="
 if ($LASTEXITCODE -ne 0) { throw "git checkout $ref failed" }
 & $git pull --rebase origin $ref
 if ($LASTEXITCODE -ne 0) {
-  Write-Warning "rebase failed — trying merge pull"
+  Write-Warning "rebase failed - trying merge pull"
   & $git pull origin $ref
-  if ($LASTEXITCODE -ne 0) { throw "git pull failed — resolve conflicts in D:\medscope.local" }
+  if ($LASTEXITCODE -ne 0) { throw "git pull failed - resolve conflicts in D:\medscope.local" }
 }
 
 Write-Host "=== pnpm install ==="
@@ -31,7 +31,7 @@ $pnpm = (Get-Command pnpm -ErrorAction SilentlyContinue).Source
 if ($pnpm) {
   & $pnpm install
 } else {
-  Write-Warning "pnpm not on PATH — run pnpm install manually in D:\medscope.local"
+  Write-Warning "pnpm not on PATH - run pnpm install manually in D:\medscope.local"
 }
 
 Write-Host "Done. Local tree matches origin/$ref."
