@@ -87,7 +87,21 @@ export function shouldHideFromArticleDetail(
   article: ArticleEligibilityFields
 ): boolean {
   if (isSpecialAccessArticle(article)) return false;
-  return shouldHideFromPublicListing(article);
+  const metadata =
+    article.metadata &&
+    typeof article.metadata === "object" &&
+    !Array.isArray(article.metadata)
+      ? (article.metadata as Record<string, unknown>)
+      : null;
+  return shouldHideFromPublicListing({
+    title: article.title ?? "",
+    slug: article.slug ?? "",
+    vip_only: Boolean(article.vip_only),
+    content: article.content ?? "",
+    metadata,
+    rubric_slug: article.rubric_slug,
+    source_name: article.source_name,
+  });
 }
 
 /** Safe to link from a public magazine page (guest, no new paywall). */
