@@ -6,7 +6,7 @@ Production is **Cloudflare Workers** (`medscopeglobal` → `https://medscopeglob
 
 | Field | Value |
 |-------|--------|
-| Account ID | `acct_1TiWEIBEAzp5LarK` |
+| Account ID | `acct_1TO0PrDCziy2VdwH` |
 | Constant | `lib/config/stripe.ts` → `STRIPE_ACCOUNT_ID` |
 | Env | `STRIPE_ACCOUNT_ID` (optional override; default is the constant above) |
 
@@ -25,15 +25,15 @@ Set on Cloudflare: Worker `medscopeglobal` → Settings → Variables and Secret
 Local:
 
 ```text
-STRIPE_ACCOUNT_ID=acct_1TiWEIBEAzp5LarK
-STRIPE_SECRET_KEY=sk_live_…          # from acct_1TiWEIBEAzp5LarK only
+STRIPE_ACCOUNT_ID=acct_1TO0PrDCziy2VdwH
+STRIPE_SECRET_KEY=sk_live_…          # from acct_1TO0PrDCziy2VdwH only
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_…
 STRIPE_WEBHOOK_SECRET=whsec_…
 ```
 
 ## Webhook (Dashboard)
 
-1. Open [Stripe Dashboard](https://dashboard.stripe.com) for **acct_1TiWEIBEAzp5LarK**
+1. Open [Stripe Dashboard](https://dashboard.stripe.com) for **acct_1TO0PrDCziy2VdwH**
 2. Developers → Webhooks → Add endpoint  
    URL: `https://medscopeglobal.com/api/stripe/webhook`  
    (www alias also works: `https://www.medscopeglobal.com/api/stripe/webhook`)
@@ -57,4 +57,4 @@ curl -X POST https://medscopeglobal.com/api/stripe/webhook
 curl https://medscopeglobal.com/api/v29/health
 ```
 
-Health JSON includes `stripe.accountId` = `acct_1TiWEIBEAzp5LarK` and booleans for whether keys are configured.
+Health JSON includes `stripe.accountId` = `acct_1TO0PrDCziy2VdwH` and booleans for whether keys are configured.

@@ -2,7 +2,7 @@
  * MedScopeGlobal Stripe merchant account (Dashboard → Settings → Account details).
  * Secret/publishable keys must belong to this account — never commit live keys.
  */
-export const STRIPE_ACCOUNT_ID = "acct_1TiWEIBEAzp5LarK" as const;
+export const STRIPE_ACCOUNT_ID = "acct_1TO0PrDCziy2VdwH" as const;
 
 export const STRIPE_WEBHOOK_URL = "https://medscopeglobal.com/api/stripe/webhook" as const;
 export const STRIPE_WEBHOOK_URL_WWW = "https://www.medscopeglobal.com/api/stripe/webhook" as const;

@@ -169,8 +169,8 @@ CRON_SECRET=<your-cron-secret>
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...
-STRIPE_ACCOUNT_ID=acct_1TiWEIBEAzp5LarK
-# Keys must belong to acct_1TiWEIBEAzp5LarK — see docs/STRIPE.md (Cloudflare Worker secrets)
+STRIPE_ACCOUNT_ID=acct_1TO0PrDCziy2VdwH
+# Keys must belong to acct_1TO0PrDCziy2VdwH — see docs/STRIPE.md (Cloudflare Worker secrets)
 ```
 
 ---
