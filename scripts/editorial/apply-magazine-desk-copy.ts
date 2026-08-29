@@ -35,39 +35,43 @@ if (!url || !key) {
   process.exit(0);
 }
 
-let ok = 0;
-let failed = 0;
-for (const [slug, copy] of Object.entries(MAGAZINE_DESK_OVERRIDES)) {
-  const patch: Record<string, string> = {
-    title: copy.title,
-    excerpt: copy.excerpt,
-    source_name: "Redakce MedScopeGlobal",
-  };
-  if (copy.content) patch.content = copy.content;
-  if (dryRun) {
-    console.log("dry-run", slug, copy.title);
-    ok += 1;
-    continue;
+async function main() {
+  let ok = 0;
+  let failed = 0;
+  for (const [slug, copy] of Object.entries(MAGAZINE_DESK_OVERRIDES)) {
+    const patch: Record<string, string> = {
+      title: copy.title,
+      excerpt: copy.excerpt,
+      source_name: "Redakce MedScopeGlobal",
+    };
+    if (copy.content) patch.content = copy.content;
+    if (dryRun) {
+      console.log("dry-run", slug, copy.title);
+      ok += 1;
+      continue;
+    }
+    const qs = new URLSearchParams({ slug: `eq.${slug}` });
+    const res = await fetch(`${url}/rest/v1/articles?${qs}`, {
+      method: "PATCH",
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify(patch),
+    });
+    if (!res.ok) {
+      failed += 1;
+      console.error(slug, res.status, await res.text());
+    } else {
+      ok += 1;
+      console.log("updated", slug);
+    }
   }
-  const qs = new URLSearchParams({ slug: `eq.${slug}` });
-  const res = await fetch(`${url}/rest/v1/articles?${qs}`, {
-    method: "PATCH",
-    headers: {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-      "Content-Type": "application/json",
-      Prefer: "return=minimal",
-    },
-    body: JSON.stringify(patch),
-  });
-  if (!res.ok) {
-    failed += 1;
-    console.error(slug, res.status, await res.text());
-  } else {
-    ok += 1;
-    console.log("updated", slug);
-  }
+
+  console.log(`done ok=${ok} failed=${failed}`);
+  if (failed) process.exit(1);
 }
 
-console.log(`done ok=${ok} failed=${failed}`);
-if (failed) process.exit(1);
+void main();
