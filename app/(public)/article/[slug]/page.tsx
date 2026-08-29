@@ -22,8 +22,10 @@ import {
   type EditorialLocale,
 } from "@/lib/editorial/units";
 import { articleJsonLdGlobal, buildGlobalHreflang } from "@/lib/ecosystem/seo";
-import { canAccessContent } from "@/lib/config/access-levels";
-import type { AccessLevelId } from "@/lib/config/access-levels";
+import {
+  isPublicMagazineArticle,
+  resolveArticleBodyLock,
+} from "@/lib/auth/article-eligibility";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getActiveAds, getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { AdPlacement } from "@/components/ads/ad-placement";
@@ -132,11 +134,7 @@ export default async function ArticlePage({ params }: Props) {
   if (!article) notFound();
 
   const { isVip, accessLevel } = await getReaderContext();
-
-  const minLevel = (article.min_access_level ?? "public") as AccessLevelId;
-  const locked =
-    (article.vip_only && !isVip) ||
-    !canAccessContent(accessLevel, minLevel);
+  const { locked } = resolveArticleBodyLock(article, { isVip, accessLevel });
 
   // Gate copy only when the body is locked — open articles get no subscription nudge.
   const articleGateCopy =
@@ -504,7 +502,11 @@ export default async function ArticlePage({ params }: Props) {
             </section>
           ) : null}
 
-          <ContentRecommendations locale={locale} currentSlug={article.slug} />
+          <ContentRecommendations
+            locale={locale}
+            currentSlug={article.slug}
+            magazineOnly={isPublicMagazineArticle(article)}
+          />
           <EditorialFooter locale={editorialLocale} />
         </div>
 
