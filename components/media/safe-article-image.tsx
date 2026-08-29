@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { isBannedCoverUrl } from "@/lib/editorial/image-policy";
 
 type Props = {
   src?: string | null;
@@ -11,6 +12,12 @@ type Props = {
   priority?: boolean;
 };
 
+function safeSrc(url?: string | null): string | null {
+  if (!url?.trim()) return null;
+  if (isBannedCoverUrl(url)) return null;
+  return url.trim();
+}
+
 /** Direct <img> with optional fallback — avoids /_next/image 404s on Workers. */
 export function SafeArticleImage({
   src,
@@ -19,10 +26,12 @@ export function SafeArticleImage({
   className = "",
   priority = false,
 }: Props) {
+  const primary = safeSrc(src);
+  const fallback = safeSrc(fallbackSrc);
   const [step, setStep] = useState<"primary" | "fallback" | "empty">(
-    src ? "primary" : fallbackSrc ? "fallback" : "empty"
+    primary ? "primary" : fallback ? "fallback" : "empty"
   );
-  const current = step === "primary" ? src : step === "fallback" ? fallbackSrc : null;
+  const current = step === "primary" ? primary : step === "fallback" ? fallback : null;
 
   if (!current) {
     return (
@@ -43,7 +52,7 @@ export function SafeArticleImage({
       decoding="async"
       referrerPolicy="no-referrer"
       onError={() => {
-        if (step === "primary" && fallbackSrc) setStep("fallback");
+        if (step === "primary" && fallback) setStep("fallback");
         else setStep("empty");
       }}
     />

@@ -106,7 +106,8 @@
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "ship": "node scripts/ship.mjs",
     "upload": "opennextjs-cloudflare deploy",
-    "verify:locale": "node node_modules/tsx/dist/cli.mjs scripts/verify-czech-locale-guards.ts"
+    "verify:locale": "node node_modules/tsx/dist/cli.mjs scripts/verify-czech-locale-guards.ts",
+    "verify:covers": "node scripts/verify-editorial-covers.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

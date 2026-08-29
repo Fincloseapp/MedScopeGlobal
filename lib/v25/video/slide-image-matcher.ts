@@ -68,10 +68,7 @@ const GRANULAR_TOPIC_IMAGES: Record<string, string> = {
 
     "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Circulatory_System_en.svg/800px-Circulatory_System_en.svg.png",
 
-  brain:
-
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Brain_human_sagittal_section.svg/800px-Brain_human_sagittal_section.svg.png",
-
+  brain: DEFAULT_SLIDE_IMAGE,
   lung:
 
     "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Lungs_diagram_detailed.svg/800px-Lungs_diagram_detailed.svg.png",

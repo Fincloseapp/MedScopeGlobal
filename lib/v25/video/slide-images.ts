@@ -11,6 +11,8 @@ export const BROKEN_UNSPLASH_PHOTO_IDS = [
   "photo-1532187863486-abf9db1a4690",
   "photo-1628348068343-c6a848d2a385",
   "photo-1559757175-5700cde872bc",
+  "photo-1559757175-0eb30cd8c063",
+  "Brain_human_sagittal_section",
   "photo-1532636865606-79b0b8b44644",
   "photo-1628595357799-9c8c8fd22790",
   "photo-1523050854058-8df90110c9f1",
@@ -59,8 +61,7 @@ export const KEYWORD_IMAGES: Record<string, string> = {
   physics_motion:
     "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Newton%27s_cradle_animation_book_2.gif/800px-Newton%27s_cradle_animation_book_2.gif",
   physiology: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&h=450&fit=crop&q=80&auto=format",
-  brain:
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Brain_human_sagittal_section.svg/800px-Brain_human_sagittal_section.svg.png",
+  brain: DEFAULT_SLIDE_IMAGE,
   nutrition: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=450&fit=crop&q=80&auto=format",
   diet: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=450&fit=crop&q=80&auto=format",
   health: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=450&fit=crop&q=80&auto=format&fm=webp",
@@ -69,15 +70,13 @@ export const KEYWORD_IMAGES: Record<string, string> = {
   latin: DEFAULT_SLIDE_IMAGE,
   muscle: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=450&fit=crop&q=80&auto=format",
   lung: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Lungs_diagram_detailed.svg/800px-Lungs_diagram_detailed.svg.png",
-  nerve:
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Brain_human_sagittal_section.svg/800px-Brain_human_sagittal_section.svg.png",
+  nerve: DEFAULT_SLIDE_IMAGE,
   default: DEFAULT_SLIDE_IMAGE,
 };
 
 /** Ordered fallbacks when primary image fails to load in browser. */
 export const SLIDE_IMAGE_FALLBACKS: string[] = [
   DEFAULT_SLIDE_IMAGE,
-  "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&h=450&fit=crop&q=80&auto=format",
   "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=450&fit=crop&q=80&auto=format",
   "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&h=450&fit=crop&q=80&auto=format",
 ];

@@ -1,8 +1,4 @@
-import {
-  classifyCoverTopic,
-  pickCuratedCover,
-  resolveArticleCoverUrl,
-} from "@/lib/ecosystem/editorial/images/cover";
+import { resolveEditorialCover } from "@/lib/editorial/image-policy";
 
 type CoverInput = {
   title?: string | null;
@@ -13,26 +9,25 @@ type CoverInput = {
   public_topic?: string | null;
 };
 
-/** Prefer topic-matched curated art; never return dead Unsplash leftovers. */
+/** Prefer stored cover after editorial gate; else topic-safe fallback. */
 export function resolveDisplayCover(input: CoverInput): string | null {
-  return resolveArticleCoverUrl({
-    title: input.title ?? "MedScopeGlobal",
-    slug: input.slug ?? undefined,
-    excerpt: input.excerpt,
+  return resolveEditorialCover({
+    title: input.title,
     category: input.category,
-    publicTopic: input.public_topic,
-    coverImageUrl: input.coverUrl,
-    preferCurated: true,
+    excerpt: input.excerpt,
+    coverUrl: input.coverUrl,
+    slug: input.slug,
+    public_topic: input.public_topic,
   });
 }
 
 export function resolveTopicFallbackCover(input: CoverInput): string | null {
-  const topic = classifyCoverTopic({
+  return resolveEditorialCover({
     title: input.title,
-    slug: input.slug,
-    excerpt: input.excerpt,
     category: input.category,
-    publicTopic: input.public_topic,
+    excerpt: input.excerpt,
+    coverUrl: null,
+    slug: input.slug,
+    public_topic: input.public_topic,
   });
-  return pickCuratedCover(topic, input.slug || input.title || "cover");
 }

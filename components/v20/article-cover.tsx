@@ -2,50 +2,41 @@
 
 import Image from "next/image";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
-import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
+import { isBannedCoverUrl, resolveEditorialCover } from "@/lib/editorial/image-policy";
 
 type Props = {
   title: string;
   category?: string | null;
   coverUrl?: string | null;
-  slug?: string | null;
-  excerpt?: string | null;
-  publicTopic?: string | null;
   priority?: boolean;
   className?: string;
 };
 
-/** v20 — WebP-optimized cover with fixed 16:10 ratio and topic-matched fallback */
+/** v20 — WebP-optimized cover with fixed 16:10 ratio and gradient fallback */
 export function V20ArticleCover({
   title,
   category,
   coverUrl,
-  slug,
-  excerpt,
-  publicTopic,
   priority = false,
   className = "",
 }: Props) {
   const coverStyles = getArticleCoverStyles(title, category ?? undefined);
   const coverMeta = getArticleCoverLabel(title, category ?? undefined);
-  const resolved = resolveArticleCoverUrl({
+  const gated = resolveEditorialCover({
+    coverUrl: coverUrl && !isBannedCoverUrl(coverUrl) ? coverUrl : null,
     title,
-    slug: slug ?? undefined,
-    excerpt,
     category,
-    publicTopic,
-    coverImageUrl: coverUrl,
-    preferCurated: true,
   });
+  const safeCover = gated && !isBannedCoverUrl(gated) ? gated : null;
 
   return (
     <div
       className={`relative aspect-[16/10] w-full overflow-hidden rounded-t-2xl bg-slate-100 ${className}`}
     >
-      {resolved ? (
+      {safeCover ? (
         <>
           <Image
-            src={resolved}
+            src={safeCover}
             alt={title}
             fill
             priority={priority}

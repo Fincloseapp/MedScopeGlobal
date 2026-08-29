@@ -16,7 +16,7 @@ import {
   type EditorialAssignment,
   type EditorialLocale,
 } from "@/lib/editorial/units";
-import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
+import { resolveEditorialCover } from "@/lib/editorial/image-policy";
 
 export type DisplayArticle = ArticleWithRelations & {
   displayLocale?: string;
@@ -28,23 +28,6 @@ export type DisplayArticle = ArticleWithRelations & {
   editorialPrimaryLabel?: string;
 };
 
-function withResolvedCover(
-  article: ArticleWithRelations,
-  extra?: Partial<DisplayArticle>
-): Partial<DisplayArticle> {
-  const title = extra?.title ?? article.title;
-  const resolved = resolveArticleCoverUrl({
-    title,
-    slug: article.slug,
-    excerpt: extra?.excerpt ?? article.excerpt,
-    category: article.categories?.name,
-    publicTopic: article.public_topic,
-    coverImageUrl: article.cover_image_url,
-    preferCurated: true,
-  });
-  return { cover_image_url: resolved };
-}
-
 function attachEditorialDisplay(
   article: ArticleWithRelations,
   locale: LocaleCode,
@@ -52,11 +35,18 @@ function attachEditorialDisplay(
 ): DisplayArticle {
   const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
   const assignment = assignEditorialUnits(article ?? {});
-  const coverFields = withResolvedCover(article, extra);
+  const merged = { ...article, ...extra };
+  const cover_image_url = resolveEditorialCover({
+    coverUrl: merged.cover_image_url,
+    title: merged.title,
+    excerpt: merged.excerpt,
+    slug: merged.slug,
+    public_topic: merged.public_topic,
+    category: merged.categories?.name,
+  });
   return {
-    ...article,
-    ...extra,
-    ...coverFields,
+    ...merged,
+    cover_image_url,
     editorialAssignment: assignment,
     editorialPrimaryLabel: formatEditorialUnitDisplay(
       assignment.primary,
