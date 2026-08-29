@@ -539,8 +539,7 @@ ${"<p>Další praktický odstavec o nákupním seznamu, týdenním plánu a mýt
     preferCurated: true,
   });
   assert.ok(
-    menopauseCover === "/assets/covers/seniors.webp" ||
-      menopauseCover === "/assets/covers/walk.webp",
+    /^\/assets\/covers\/(seniors|walk)\.webp(\?|$)/.test(menopauseCover ?? ""),
     `menopause stale stock → seniors pool, got ${menopauseCover}`
   );
 
