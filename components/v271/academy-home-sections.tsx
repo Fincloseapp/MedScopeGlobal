@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, BookOpen, Brain, ShoppingBag, Stethoscope, Trophy, Users } from "lucide-react";
 import { AccreditedCmeOverview } from "@/components/academy/b2b/accredited-cme-overview";
 import { CourseCard } from "@/components/academy/course-card";
+import { isAcademyCoursesCatalogPromoEnabled } from "@/lib/academy/public-catalog";
 import {
   getCourseVideoFlags,
   getLeaderboard,
@@ -12,6 +13,7 @@ import {
 } from "@/lib/academy/db";
 
 export async function V272AcademyHomeSections() {
+  const promo = isAcademyCoursesCatalogPromoEnabled();
   let courses: Awaited<ReturnType<typeof listPublishedCourses>> = [];
   let prepCourses: Awaited<ReturnType<typeof listPublishedCourses>> = [];
   let simulations: Awaited<ReturnType<typeof listClinicalSimulations>> = [];
@@ -21,8 +23,8 @@ export async function V272AcademyHomeSections() {
 
   try {
     [courses, prepCourses, simulations, textbooks, listings, leaderboard] = await Promise.all([
-      listPublishedCourses(3),
-      listPublishedCourses(6, { prepOnly: true }),
+      promo ? listPublishedCourses(3) : Promise.resolve([]),
+      promo ? listPublishedCourses(6, { prepOnly: true }) : Promise.resolve([]),
       listClinicalSimulations(2),
       listTextbooks(2),
       listMarketplaceListings(2),
