@@ -10,6 +10,7 @@ export {
   BANNED_COVER_IDS,
   BANNED_STOCK_IDS,
   BANNED_VISUAL_KEYWORDS,
+  COVER_ASSET_VERSION,
   EDITORIAL_IMAGE_POLICY_VERSION,
   LAPTOP_BRAND_COVERS,
   LOCAL_MAGAZINE_COVERS,
@@ -19,6 +20,7 @@ export {
   curatedCoverForModule,
   hasBadUnsplashId,
   hasBannedCoverId,
+  isAllowedLocalCover,
   isBannedCoverUrl,
   isLaptopSceneHint,
   matchesBannedVisualKeyword,
@@ -26,4 +28,5 @@ export {
   resolveEditorialCover,
   resolveTopicModule,
   scoreCoverCandidate,
+  withCoverCacheBust,
 } from "./image-policy.mjs";
