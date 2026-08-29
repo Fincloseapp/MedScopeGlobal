@@ -1,17 +1,35 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import {
+  isPublicMagazineRecommendable,
+  isSpecialAccessArticle,
+} from "@/lib/auth/article-eligibility";
+import { createDataClient } from "@/lib/supabase/data";
+
+type RecArticle = {
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  vip_only?: boolean | null;
+  min_access_level?: string | null;
+  audience?: string | null;
+  rubric_slug?: string | null;
+  public_topic?: string | null;
+};
 
 export async function ContentRecommendations({
   locale = "cs",
   currentSlug,
+  magazineOnly = true,
 }: {
   locale?: string;
   currentSlug?: string;
+  /** Public magazine pages only recommend free magazine pieces (no 404 / gate links). */
+  magazineOnly?: boolean;
 }) {
   const isCs = locale === "cs";
-  const supabase = await createClient();
+  const supabase = await createDataClient();
 
-  let articles: { slug: string; title: string; excerpt: string | null }[] = [];
+  let articles: RecArticle[] = [];
   let studies: { slug: string; title: string; abstract: string | null }[] = [];
   let diagnoses: { slug: string; name: string; description: string | null }[] = [];
 
@@ -19,11 +37,13 @@ export async function ContentRecommendations({
     const [articlesRes, studiesRes, diagnosesRes] = await Promise.all([
       supabase
         .from("articles")
-        .select("slug, title, excerpt")
+        .select(
+          "slug, title, excerpt, vip_only, min_access_level, audience, rubric_slug, public_topic"
+        )
         .eq("published", true)
         .neq("slug", currentSlug ?? "")
         .order("published_at", { ascending: false })
-        .limit(4),
+        .limit(24),
       supabase
         .from("studies")
         .select("slug, title, abstract")
@@ -36,9 +56,13 @@ export async function ContentRecommendations({
         .eq("published", true)
         .limit(3),
     ]);
-    articles = articlesRes.data ?? [];
-    studies = studiesRes.data ?? [];
-    diagnoses = diagnosesRes.data ?? [];
+    articles = (articlesRes.data ?? []).filter((row) =>
+      magazineOnly
+        ? isPublicMagazineRecommendable(row)
+        : isSpecialAccessArticle(row) || isPublicMagazineRecommendable(row)
+    );
+    studies = magazineOnly ? [] : studiesRes.data ?? [];
+    diagnoses = magazineOnly ? [] : diagnosesRes.data ?? [];
   }
 
   if (!articles.length) {
@@ -46,9 +70,11 @@ export async function ContentRecommendations({
       "@/lib/verejnost/demo-magazine-articles"
     );
     articles = getDemoMagazineArticles()
-      .filter((a) => a.slug !== currentSlug)
+      .filter((a) => a.slug !== currentSlug && !isSpecialAccessArticle(a))
       .slice(0, 4)
       .map((a) => ({ slug: a.slug, title: a.title, excerpt: a.excerpt }));
+  } else {
+    articles = articles.slice(0, 4);
   }
 
   if (!articles.length && !studies.length && !diagnoses.length) return null;

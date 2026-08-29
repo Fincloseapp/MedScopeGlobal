@@ -52,6 +52,13 @@ import {
   shouldHideFromPublicListing,
   filterMagazineListableArticles,
 } from "../../lib/editorial/article-quality-audit";
+import {
+  isPublicMagazineArticle,
+  isPublicMagazineRecommendable,
+  isSpecialAccessArticle,
+  resolveArticleBodyLock,
+  shouldHideFromArticleDetail,
+} from "../../lib/auth/article-eligibility";
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 function file(rel: string) {
@@ -280,6 +287,58 @@ assert.equal(
     ]).map((a) => a.slug),
     ["verejnost-zivotni-styl-2026-08-01-long"]
   );
+
+  // Special access: existing vip_only / physician flags only. Magazine stays free.
+  const magazineArticle = {
+    title: "Chřipka nebo nachlazení",
+    slug: "verejnost-nemoci-2026-06-24-chripka-nebo-nachlazeni-jak-rozlisit-tyto-dva-caste-nemoci",
+    vip_only: false,
+    min_access_level: "public",
+    audience: "public",
+    rubric_slug: "verejnost",
+    public_topic: "nemoci",
+    content: "<p>" + "slovo ".repeat(900) + "</p>",
+  };
+  const physicianArticle = {
+    title: "ISH hypertension guidelines",
+    slug: "2026-ish-guidelines-for-the-management-of-hypertension-in-africa",
+    vip_only: true,
+    min_access_level: "physician",
+    audience: "professional",
+    rubric_slug: "ai-study-summary",
+    content: "<p>" + "slovo ".repeat(120) + "</p>",
+  };
+  assert.equal(isPublicMagazineArticle(magazineArticle), true);
+  assert.equal(isSpecialAccessArticle(magazineArticle), false);
+  assert.equal(
+    resolveArticleBodyLock(magazineArticle, { isVip: false, accessLevel: "public" }).locked,
+    false,
+    "public magazine is never paywalled"
+  );
+  assert.equal(isPublicMagazineRecommendable(magazineArticle), true);
+  assert.equal(isSpecialAccessArticle(physicianArticle), true);
+  assert.equal(isPublicMagazineArticle(physicianArticle), false);
+  assert.equal(
+    shouldHideFromPublicListing(physicianArticle),
+    true,
+    "VIP medical articles stay off public magazine hubs"
+  );
+  assert.equal(
+    shouldHideFromArticleDetail(physicianArticle),
+    false,
+    "special-access medical articles must resolve on detail (existing gate, not 404)"
+  );
+  assert.equal(
+    resolveArticleBodyLock(physicianArticle, { isVip: false, accessLevel: "public" }).locked,
+    true,
+    "guests see the existing VIP / physician gate"
+  );
+  assert.equal(
+    resolveArticleBodyLock(physicianArticle, { isVip: true, accessLevel: "physician" }).locked,
+    false,
+    "eligible physician + VIP keeps full text"
+  );
+  assert.equal(isPublicMagazineRecommendable(physicianArticle), false);
   {
     // Regression: a single EN byline token must not collapse magazine Czech HTML on /cs.
     const longCzech = `<h2>Zahradní slavnost na talíři</h2>
