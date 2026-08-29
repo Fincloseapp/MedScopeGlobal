@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, Download, FlaskConical, GraduationCap } from "lucide-react";
+import { BookOpen, FlaskConical, GraduationCap } from "lucide-react";
 
 type Props = {
   articleSlug: string;
@@ -16,12 +16,6 @@ const blocks = [
     label: "Otestovat téma",
     href: (slug: string) => `/academy/tests?topic=${encodeURIComponent(slug)}`,
     icon: BookOpen,
-  },
-  {
-    label: "PDF shrnutí",
-    href: (slug: string) =>
-      `/academy/courses?summary=${encodeURIComponent(slug)}`,
-    icon: Download,
   },
   {
     label: "Academy",

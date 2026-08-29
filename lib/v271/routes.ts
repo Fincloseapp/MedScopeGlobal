@@ -69,8 +69,8 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       },
       {
         label: "Přípravné kurzy",
-        href: "/academy/courses?category=prijimacky",
-        description: "Lekce + kvíz v jednom balíčku",
+        href: "/app/priprava",
+        description: "MeDiprep — testy B/C/F (Academy katalog připravujeme)",
       },
       {
         label: "Kvízy a studijní hry",
@@ -90,15 +90,16 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
   "chci-studovat": {
     slug: "chci-studovat",
     title: "Chci studovat medicínu",
-    description: "Přijímačky, termíny, požadavky a tipy na přípravu — včetně MedScope Academy kurzů.",
+    description: "Přijímačky, termíny, požadavky a tipy na přípravu — MeDiprep a redakce MedScope.",
     links: [
-      { label: "Přípravné kurzy Academy", href: "/academy/courses?category=prijimacky", description: "Biologie, chemie, fyzika — ≈30 % zdarma" },
+      // Soft-gated: restore Academy courses link when ACADEMY_COURSES_CATALOG_PROMO is true
+      { label: "MeDiprep — přijímačky", href: "/app/priprava", description: "Testy B/C/F a simulace fakult" },
       { label: "Přijímačky", href: "/studium/prijimacky" },
       { label: "Lékařské fakulty", href: "/studium/univerzity" },
-      { label: "Rozhodovací strom LF", href: "/academy/courses/ktera-lf-rozhodovaci-strom" },
+      { label: "Self-test Academy", href: "/academy/prijimacky/self-test" },
     ],
-    ctaHref: "/academy/courses?category=prijimacky",
-    ctaLabel: "Začít přípravu zdarma",
+    ctaHref: "/app/priprava",
+    ctaLabel: "Otevřít MeDiprep",
   },
   zkousky: {
     slug: "zkousky",

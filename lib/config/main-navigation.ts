@@ -56,11 +56,8 @@ const menuCs: NavItem[] = [
       { label: "Testy", href: "/studenti/testy", description: "Self-test a modelové otázky" },
       { label: "Kvízy a hry", href: "/studenti/hry", description: "Studijní hry a kvízy" },
       { label: "AI tutor", href: "/studenti/ai-tutor", description: "Studentský AI asistent" },
-      {
-        label: "Přípravné kurzy Academy",
-        href: "/academy/courses?category=prijimacky",
-        description: "Biologie, chemie, fyzika pro přijímačky",
-      },
+      // Soft-gated: restore “Přípravné kurzy Academy” → /academy/courses?category=prijimacky
+      // when ACADEMY_COURSES_CATALOG_PROMO is true (lib/academy/public-catalog.ts).
       {
         label: "Předplatné Student",
         href: "/predplatne#student",
@@ -74,25 +71,20 @@ const menuCs: NavItem[] = [
       { label: "Zkoušky", href: "/studenti/zkousky", description: "Orientace ke zkouškám LF" },
       { label: "Léky", href: "/studenti/leky", description: "SÚKL — ne kurz farmakologie" },
       { label: "Lékařské fakulty", href: "/studium/univerzity", description: "8 českých LF" },
-      { label: "MedScope Academy", href: "/academy", description: "Kurzy, lekce a kvízy" },
+      { label: "MedScope Academy", href: "/academy", description: "Vzdělávání a CME" },
     ],
   },
   {
     label: "Academy",
     href: "/academy",
     children: [
-      { label: "Přehled", href: "/academy", description: "MedScope Academy — kurzy a certifikáty" },
+      { label: "Přehled", href: "/academy", description: "MedScope Academy — přehled a CME" },
       {
         label: "CME revmatologie",
         href: "/academy/lekari",
         description: "Akreditované testy výhradně pro revmatology",
       },
-      { label: "Kurzy", href: "/academy/courses", description: "Publikované kurzy" },
-      {
-        label: "Příprava na přijímačky",
-        href: "/academy/courses?category=prijimacky",
-        description: "Kurzy pro zájemce o LF",
-      },
+      // Soft-gated: restore “Kurzy” + “Příprava na přijímačky” when ACADEMY_COURSES_CATALOG_PROMO is true.
       { label: "Kvízy", href: "/academy/quizzes", description: "Testy znalostí" },
       { label: "Simulace", href: "/academy/ai-simulations", description: "Klinické AI scénáře" },
       { label: "Mentoring", href: "/academy/mentoring", description: "Mentoring sessions" },
@@ -297,7 +289,7 @@ const menuEn: NavItem[] = [
         href: "/academy/lekari",
         description: "Accredited tests for rheumatologists only",
       },
-      { label: "Courses", href: "/academy/courses" },
+      // Soft-gated: restore “Courses” → /academy/courses when ACADEMY_COURSES_CATALOG_PROMO is true.
       { label: "Quizzes", href: "/academy/quizzes" },
       { label: "Simulations", href: "/academy/ai-simulations" },
       { label: "Mentoring", href: "/academy/mentoring" },

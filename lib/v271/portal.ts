@@ -53,7 +53,8 @@ export const PORTAL_SERVICES = [
     href: "/app/dokumentace",
     image: "/assets/ordizapis/icon-192.png",
   },
-  { id: "academy", label: "Academy", hint: "kurzy", href: "/academy", icon: "book" },
+  // hint soft while ACADEMY_COURSES_CATALOG_PROMO is false — restore "kurzy" when re-enabled
+  { id: "academy", label: "Academy", hint: "vzdělávání", href: "/academy", icon: "book" },
   { id: "ai", label: "AI", hint: "zeptat se", href: "/ai-asistent/verejnost", icon: "spark" },
   { id: "trial", label: "14 dní", hint: "zdarma", href: "/predplatne?trial=1", icon: "gift" },
   { id: "leky", label: "Léky", hint: "SÚKL", href: "/leky", icon: "pill" },
