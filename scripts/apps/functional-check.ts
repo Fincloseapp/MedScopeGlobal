@@ -624,6 +624,10 @@ assert.equal(
 );
 
 const BRAIN_ON_STICK =
+  "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1200";
+const SAGITTAL_BRAIN =
+  "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1200";
+const DOCTOR_PHONE_UNSPLASH =
   "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200";
 const DOCTOR_PHONE =
   "https://xcydgqnivxfhprbmdyym.supabase.co/storage/v1/object/public/media/v25-images/images/verejnost/doctor-phone.webp";
@@ -654,6 +658,8 @@ assert.equal(
   "doctor-phone v25 stock denied in compliance gate"
 );
 assert.ok(isDeniedEditorialImageUrl(BRAIN_ON_STICK), "brain-on-stick in deny helper");
+assert.ok(isDeniedEditorialImageUrl(SAGITTAL_BRAIN), "sagittal brain-on-stick in deny helper");
+assert.ok(isDeniedEditorialImageUrl(DOCTOR_PHONE_UNSPLASH), "doctor-on-phone unsplash in deny helper");
 assert.ok(isDeniedEditorialImageUrl(DOCTOR_PHONE), "doctor-phone in deny helper");
 
 const policyFoodMatched = matchImageForArticleSync(foodArticle);

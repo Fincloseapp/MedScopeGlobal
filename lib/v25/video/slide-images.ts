@@ -3,8 +3,7 @@
  * Shared constants — keep in sync with slide-image-urls.mjs for batch scripts.
  */
 
-export const DEFAULT_SLIDE_IMAGE =
-  "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=450&fit=crop&q=80&auto=format";
+export const DEFAULT_SLIDE_IMAGE = "/assets/covers/clinical-3.webp";
 
 /** Photo IDs that return 404 or were removed from Unsplash CDN. */
 export const BROKEN_UNSPLASH_PHOTO_IDS = [
@@ -12,6 +11,8 @@ export const BROKEN_UNSPLASH_PHOTO_IDS = [
   "photo-1628348068343-c6a848d2a385",
   "photo-1559757175-5700cde872bc",
   "photo-1559757175-0eb30cd8c063",
+  "photo-1559757148-5c350d0d3c56",
+  "photo-1576091160399-112ba8d25d1d",
   "Brain_human_sagittal_section",
   "photo-1532636865606-79b0b8b44644",
   "photo-1628595357799-9c8c8fd22790",
@@ -64,7 +65,7 @@ export const KEYWORD_IMAGES: Record<string, string> = {
   brain: DEFAULT_SLIDE_IMAGE,
   nutrition: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=450&fit=crop&q=80&auto=format",
   diet: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=450&fit=crop&q=80&auto=format",
-  health: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=450&fit=crop&q=80&auto=format&fm=webp",
+  health: "/assets/covers/clinical-3.webp",
   exam: DEFAULT_SLIDE_IMAGE,
   ethics: "https://images.unsplash.com/photo-1584515930387-285e4804f4cb?w=800&h=450&fit=crop&q=80&auto=format&fm=webp",
   latin: DEFAULT_SLIDE_IMAGE,

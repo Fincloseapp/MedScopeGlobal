@@ -81,7 +81,7 @@ Shared helpers:
 
 `isStaleGenericStockUrl()` flags legacy v25 Supabase / remote Unsplash heroes. `resolveArticleCoverUrl()` swaps them for topic-matched local art even before backfill runs.
 
-**Retired asset:** `/assets/covers/clinical.webp` is a brain CT on a monitor (legacy v25 “brain on stick” family). It is **never** assigned by the matcher, backfill, or display resolver — use `clinical-2.webp` / `clinical-3.webp` / `research.webp` for clinical topics instead. Detect via `isBrainScanCoverUrl()`.
+`clinical.webp` is a first-party operating-room cover (bytes replaced 2026-08-29). Food/lifestyle titles still remap it via topic mismatch. Brain-on-stick Unsplash IDs (`photo-1559757175-*`, `photo-1559757148-*`) and doctor-on-phone stock (`photo-1576091160399`) are denied in `lib/editorial/image-policy.mjs`.
 
 ## Editorial desk topic vs visual topic
 
@@ -112,8 +112,8 @@ Persona `image-curator-global` (`lib/ecosystem/editorial/personas.ts`) runs on c
 
 | Pattern | Reason |
 |---------|--------|
-| `/assets/covers/clinical.webp` | retired brain CT monitor hero (`isBrainScanCoverUrl`) |
-| `photo-1576091160399` | brain-on-stick anatomy model |
+| `photo-1559757175-*` / `photo-1559757148-*` | plastic brain model on a stand |
+| `photo-1576091160399` | doctor-on-phone stock |
 | `doctor-phone` | overused v25 clinical stock |
 | `/brain`, `brain-on-stick` | misleading neurology imagery |
 | All `/v25-images/` paths | stale generic Supabase stock |

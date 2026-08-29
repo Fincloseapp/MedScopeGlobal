@@ -11,6 +11,7 @@
  */
 
 import type { EditorialTopic } from "../desks";
+import { withCoverCacheBust } from "@/lib/editorial/image-policy";
 
 export type CoverVisualTopic =
   | "food"
@@ -37,6 +38,7 @@ const COVER_POOL: Record<CoverVisualTopic, readonly string[]> = {
   movement: ["/assets/covers/movement.webp", "/assets/covers/movement-2.webp"],
   seniors: ["/assets/covers/seniors.webp", "/assets/covers/walk.webp"],
   clinical: [
+    "/assets/covers/clinical.webp",
     "/assets/covers/clinical-2.webp",
     "/assets/covers/clinical-3.webp",
     "/assets/covers/research.webp",
@@ -136,10 +138,11 @@ export function mapCoverVisualTopicToEditorialTopic(
 }
 
 /**
- * Legacy v25 local asset — brain CT on monitor (“brain on stick” family).
- * Never assign via matcher, backfill, or display resolver.
+ * Retired local paths that historically held brain-on-stick / brain-CT bytes.
+ * clinical.webp bytes were replaced 2026-08-29; keep the helper for stored URLs
+ * that still name the old asset in comments / audits. Assignment uses COVER_POOL.
  */
-export const BRAIN_SCAN_COVER_PATHS = ["/assets/covers/clinical.webp"] as const;
+export const BRAIN_SCAN_COVER_PATHS = [] as const;
 
 /** True when URL is the retired brain-scan hero (`clinical.webp`). */
 export function isBrainScanCoverUrl(url: string | null | undefined): boolean {
@@ -173,10 +176,12 @@ const DEAD_OR_BAD_REMOTE = [
   "photo-1581579438749-86c8e8f9f9d0",
   "photo-1576765608535-5e04c5a8f0c0",
   "photo-1559757175-5700cde872bc",
+  "photo-1559757148-5c350d0d3c56", // sagittal brain-on-stick (v21/v23 hero)
   "photo-1584308664744-24d5c474f2ae",
   "photo-1478737270239-2f02e77f67c9",
   "photo-1576091160550-2173dba999ef", // dark hands clinical
-  "photo-1576091160399-112ba8d25d1d", // brain-on-stick anatomy model (v25 default)
+  "photo-1576091160399-112ba8d25d1d", // doctor-on-phone stock (v21 study/anatomy default)
+  "photo-1559839734-2b71ea197ec2",
   "photo-1579684385127-1ef15d508118",
 ] as const;
 
@@ -187,7 +192,9 @@ const DENIED_STOCK_PATTERNS = [
   /brain-on-stick/i,
   /photo-1576091160399/i,
   /photo-1576091160550/i,
-  /photo-1559757175-0eb30cd8c063/i, // brain cross-section stock
+  /photo-1559757175-0eb30cd8c063/i, // brain-on-stick
+  /photo-1559757148-5c350d0d3c56/i, // sagittal brain-on-stick
+  /photo-1576091160399/i, // doctor-on-phone stock
 ] as const;
 
 /** Which article topics each local cover asset is appropriate for. */
@@ -206,6 +213,7 @@ const LOCAL_COVER_TOPICS: Partial<
   "/assets/covers/movement-2.webp": ["movement", "walk"],
   "/assets/covers/walk.webp": ["walk", "movement", "seniors"],
   "/assets/covers/seniors.webp": ["seniors"],
+  "/assets/covers/clinical.webp": ["clinical"],
   "/assets/covers/clinical-2.webp": ["clinical", "research", "vitals"],
   "/assets/covers/clinical-3.webp": ["clinical", "research"],
   "/assets/covers/research.webp": ["research", "clinical"],
@@ -422,7 +430,7 @@ export function resolveArticleCoverUrl(input: {
   const raw = input.coverImageUrl?.trim() || null;
   const topic = classifyCoverTopic(input);
   const seed = input.slug || input.title;
-  const curated = pickCuratedCover(topic, seed);
+  const curated = withCoverCacheBust(pickCuratedCover(topic, seed));
 
   if (
     isBrokenCoverUrl(raw) ||
@@ -440,7 +448,9 @@ export function resolveArticleCoverUrl(input: {
   const localPath = normalizeLocalCoverPath(raw);
   if (localPath) {
     if (isBrainScanCoverUrl(localPath)) return curated;
-    return isMismatchedLocalCover(localPath, topic) ? curated : localPath;
+    return isMismatchedLocalCover(localPath, topic)
+      ? curated
+      : withCoverCacheBust(localPath);
   }
 
   // Marketing / newsletter art — keep as-is
@@ -493,5 +503,7 @@ export function articleNeedsCoverRemediation(input: {
     coverImageUrl: input.coverImageUrl,
     preferCurated: true,
   });
-  return (resolved ?? null) !== raw;
+  const resolvedPath = (resolved ?? "").split("?")[0];
+  const rawPath = raw.split("?")[0];
+  return resolvedPath !== rawPath;
 }

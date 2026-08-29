@@ -1,8 +1,6 @@
-/** Profesionální medicínské hero a sekční obrázky (WebP přes next/image) */
+/** Profesionální medicínské hero a sekční obrázky — local magazine covers only. */
 export { V21_MEDICAL_IMAGES as V23_MEDICAL_IMAGES, v21ImageForModule as v23ImageForModule } from "@/lib/v21/images";
 
-export const V23_HERO_IMAGE =
-  "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1600&h=900&fit=crop&q=85&auto=format&fm=webp";
+export const V23_HERO_IMAGE = "/assets/covers/produce.webp";
 
-export const V23_NEWSLETTER_IMAGE =
-  "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&h=600&fit=crop&q=85&auto=format&fm=webp";
+export const V23_NEWSLETTER_IMAGE = "/assets/covers/clinical-3.webp";

@@ -5,13 +5,15 @@
  *   node scripts/verify-editorial-covers.mjs
  *   MEDSCOPE_ORIGIN=http://localhost:3000 node scripts/verify-editorial-covers.mjs
  */
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const {
+  ALL_BANNED_IDS,
   BANNED_COVER_IDS,
   COVER_ASSET_VERSION,
   EDITORIAL_IMAGE_POLICY_VERSION,
@@ -52,6 +54,14 @@ check(
   "policy_blocks_remote_unsplash",
   isBannedCoverUrl("https://images.unsplash.com/photo-1584515930387-285e4804f4cb") === true
 );
+check(
+  "policy_bans_sagittal_brain_allowlist_leak",
+  isBannedCoverUrl("https://images.unsplash.com/photo-1559757148-5c350d0d3c56") === true
+);
+check(
+  "policy_bans_doctor_phone_stock",
+  isBannedCoverUrl("https://images.unsplash.com/photo-1576091160399-112ba8d25d1d") === true
+);
 
 const liveSeniors = join(root, "public/assets/covers/seniors.webp");
 const liveVitals = join(root, "public/assets/covers/vitals.webp");
@@ -68,6 +78,25 @@ if (existsSync(liveVitals) && existsSync(join(qDir, "vitals-brain-on-stick.webp"
 }
 if (existsSync(liveSeniors)) {
   check("local_seniors_exists", statSync(liveSeniors).size > 1000);
+}
+
+const coversDir = join(root, "public/assets/covers");
+if (existsSync(coversDir)) {
+  const hashes = new Map();
+  for (const name of readdirSync(coversDir).filter((n) => n.endsWith(".webp"))) {
+    const buf = readFileSync(join(coversDir, name));
+    const h = createHash("md5").update(buf).digest("hex");
+    const list = hashes.get(h) ?? [];
+    list.push(name);
+    hashes.set(h, list);
+    check(`local_${name}_size`, buf.length > 8000, `${buf.length} bytes`);
+  }
+  const dups = [...hashes.values()].filter((names) => names.length > 1);
+  check(
+    "local_covers_unique_bytes",
+    dups.length === 0,
+    dups.map((n) => n.join("=")).join(" ") || "all unique"
+  );
 }
 
 const paths = ["/articles", "/"];
@@ -94,7 +123,15 @@ for (const p of paths) {
 
 check("articles_http_200", status === 200, `${usedPath} status=${status} len=${html.length}`);
 
-const bannedHits = BANNED_COVER_IDS.filter((id) => html.includes(id));
+const extraLiveNeedles = [
+  ...ALL_BANNED_IDS,
+  ...BANNED_COVER_IDS,
+  "1559757148",
+  "1576091160399",
+  "1559839734",
+  "Brain_human_sagittal",
+];
+const bannedHits = [...new Set(extraLiveNeedles)].filter((id) => html.includes(id));
 check("no_banned_ids_in_html", bannedHits.length === 0, bannedHits.join(", ") || "none");
 
 const imgUrls = [
