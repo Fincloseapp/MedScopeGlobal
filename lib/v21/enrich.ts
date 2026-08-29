@@ -7,7 +7,7 @@ const EDITORIAL_PREFIX_RE =
   /^(Odborný přehled[^:]*:\s*|Klinická studie:\s*|Zdravotní zpráva:\s*|Epidemiologická zpráva:\s*|Komentář:\s*|Editorial:\s*)/i;
 
 const TEMPLATE_EXCERPT_RE =
-  /profesionální shrnutí pro českou klinickou|evidence-based přístup|Odborný přehled\s*[—\-–]/i;
+  /profesionální shrnutí pro českou klinickou|evidence-based přístup|Odborný přehled\s*[—\-–]|srozumitelně a bez zbytečného strašení|srozumitelný průvodce pro každého|zjistěte,?\s+jak|přečtěte si,?\s+jak/i;
 
 const BROKEN_ENTITY_RE = /\bx20[0-9a-f]{2}\b/i;
 
