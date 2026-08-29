@@ -84,6 +84,7 @@ export default async function HomePage() {
       <PortalHome articles={articles} />
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
       <V272WhyTrustBlock />
+      {/* Course carousels gated in V272AcademyHomeSections via ACADEMY_COURSES_CATALOG_PROMO */}
       <V272AcademyHomeSections />
       <V271B2bBlock />
 

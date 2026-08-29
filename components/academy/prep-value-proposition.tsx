@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CourseCard } from "@/components/academy/course-card";
+import { isAcademyCoursesCatalogPromoEnabled } from "@/lib/academy/public-catalog";
 import { getCourseVideoFlags, listPublishedCourses } from "@/lib/academy/db";
 import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
@@ -38,8 +39,9 @@ const VALUE_POINTS = [
 ];
 
 export async function PrepValueProposition() {
-  const prepCourses = await listPublishedCourses(6, { prepOnly: true });
-  const flags = await getCourseVideoFlags(prepCourses.map((c) => c.id));
+  const promo = isAcademyCoursesCatalogPromoEnabled();
+  const prepCourses = promo ? await listPublishedCourses(6, { prepOnly: true }) : [];
+  const flags = promo ? await getCourseVideoFlags(prepCourses.map((c) => c.id)) : {};
 
   return (
     <>
@@ -52,13 +54,14 @@ export async function PrepValueProposition() {
             Chci studovat medicínu
           </h1>
           <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-600">
-            MedScope Academy vás provede přípravou na přijímačky — od buněčné biologie po ústní
-            pohovor. Začněte zdarma, pokračujte s studentským předplatným od 149 Kč/měsíc.
+            {promo
+              ? "MedScope Academy vás provede přípravou na přijímačky — od buněčné biologie po ústní pohovor. Začněte zdarma, pokračujte s studentským předplatným od 149 Kč/měsíc."
+              : "Připravte se na přijímačky v MeDiprep. Katalog Academy kurzů připravujeme — nechceme vás posílat do polovičatého obsahu."}
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Button asChild className="rounded-full bg-[#005B96]">
-              <Link href="/academy/courses?category=prijimacky">
-                Přípravné kurzy
+              <Link href={promo ? "/academy/courses?category=prijimacky" : "/app/priprava"}>
+                {promo ? "Přípravné kurzy" : "Otevřít MeDiprep"}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
