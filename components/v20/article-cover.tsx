@@ -8,6 +8,9 @@ type Props = {
   title: string;
   category?: string | null;
   coverUrl?: string | null;
+  slug?: string | null;
+  excerpt?: string | null;
+  publicTopic?: string | null;
   priority?: boolean;
   className?: string;
 };
@@ -17,6 +20,9 @@ export function V20ArticleCover({
   title,
   category,
   coverUrl,
+  slug,
+  excerpt,
+  publicTopic,
   priority = false,
   className = "",
 }: Props) {
@@ -26,6 +32,9 @@ export function V20ArticleCover({
     coverUrl: coverUrl && !isBannedCoverUrl(coverUrl) ? coverUrl : null,
     title,
     category,
+    slug,
+    excerpt,
+    public_topic: publicTopic,
   });
   const safeCover = gated && !isBannedCoverUrl(gated) ? gated : null;
 
