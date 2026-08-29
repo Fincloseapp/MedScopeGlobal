@@ -65,7 +65,7 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       {
         label: "Academy kvízy",
         href: "/academy/quizzes",
-        description: "Kvízy vázané na kurzy — vysvětlení správných odpovědí",
+        description: "Kvízy s vysvětlením správných odpovědí",
       },
       {
         label: "Přípravné kurzy",

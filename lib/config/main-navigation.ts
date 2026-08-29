@@ -46,7 +46,7 @@ const menuCs: NavItem[] = [
       {
         label: "Chci studovat medicínu",
         href: "/studenti/chci-studovat",
-        description: "Přijímačky a přípravné kurzy",
+        description: "Přijímačky, fakulty a MeDiprep",
       },
       {
         label: "Studijní materiály",

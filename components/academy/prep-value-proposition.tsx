@@ -89,22 +89,39 @@ export async function PrepValueProposition() {
           ))}
         </div>
 
-        <div className="mt-10 rounded-2xl border border-[#cfe1f3] bg-[#f0f7ff] p-6">
-          <div className="flex flex-wrap items-start gap-4">
-            <Sparkles className="h-8 w-8 shrink-0 text-[#005B96]" aria-hidden />
-            <div>
-              <h2 className="font-display text-xl font-semibold text-[#021d33]">
-                Proč MedScope místo generického doučování?
-              </h2>
-              <ul className="mt-3 space-y-2 text-sm text-slate-700">
-                <li>• 12 přípravných kurzů včetně rozhodovacího stromu „Která LF?“</li>
-                <li>• Videokurzy s AI lektorem — ne jen statické PDF</li>
-                <li>• Kvízy s okamžitou zpětnou vazbou a vysvětlením odpovědí</li>
-                <li>• Sledování postupu, XP body a certifikáty po dokončení</li>
-              </ul>
+        {promo ? (
+          <div className="mt-10 rounded-2xl border border-[#cfe1f3] bg-[#f0f7ff] p-6">
+            <div className="flex flex-wrap items-start gap-4">
+              <Sparkles className="h-8 w-8 shrink-0 text-[#005B96]" aria-hidden />
+              <div>
+                <h2 className="font-display text-xl font-semibold text-[#021d33]">
+                  Proč MedScope místo generického doučování?
+                </h2>
+                <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                  <li>• 12 přípravných kurzů včetně rozhodovacího stromu „Která LF?“</li>
+                  <li>• Videokurzy s AI lektorem — ne jen statické PDF</li>
+                  <li>• Kvízy s okamžitou zpětnou vazbou a vysvětlením odpovědí</li>
+                  <li>• Sledování postupu, XP body a certifikáty po dokončení</li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="mt-10 rounded-2xl border border-[#cfe1f3] bg-[#f8fbff] p-6">
+            <div className="flex flex-wrap items-start gap-4">
+              <Sparkles className="h-8 w-8 shrink-0 text-[#005B96]" aria-hidden />
+              <div>
+                <h2 className="font-display text-xl font-semibold text-[#021d33]">
+                  Příprava zatím vede přes MeDiprep
+                </h2>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-700">
+                  Katalog Academy kurzů připravujeme. Do té doby cvičte v MeDiprep — testy B/C/F
+                  a simulace fakult — bez slibů polovičatého obsahu.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {prepCourses.length > 0 ? (
           <section className="mt-12">
