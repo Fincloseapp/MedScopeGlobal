@@ -87,6 +87,8 @@ const TYPO_PATTERNS: [RegExp, string][] = [
   [/\s+\.\s+/g, ". "],
   [/\.\.+/g, "."],
   [/\s+–\s+/g, " – "],
+  [/\búspech/gi, "úspěch"],
+  [/\bkdy exactly\b/gi, "kdy"],
   [/(\p{L})je téma/giu, "$1 je téma"],
   [/(<\/(?:strong|em|b|i|span)>)(\p{L})/giu, "$1 $2"],
   [/(\p{L})(<(?:strong|em|b|i|span)[\s>])/giu, "$1 $2"],

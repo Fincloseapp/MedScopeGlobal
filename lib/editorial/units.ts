@@ -103,6 +103,16 @@ export const AI_ASSISTED_SUFFIX = {
   cs: "(AI-asistovaná syntéza obsahu)",
 } as const;
 
+/** Single reader-facing byline — no desk roulette, no AI-suffix. */
+export const PUBLIC_EDITORIAL_BYLINE = {
+  cs: "Redakce MedScopeGlobal",
+  en: "MedScopeGlobal Editorial",
+} as const;
+
+export function publicEditorialByline(locale: EditorialLocale = "cs"): string {
+  return locale === "en" ? PUBLIC_EDITORIAL_BYLINE.en : PUBLIC_EDITORIAL_BYLINE.cs;
+}
+
 export const EDITORIAL_FOOTER_CS =
   "Obsah připravila redakce MedScopeGlobal.com — odborně zpracovaný zdravotní materiál pro veřejnost. Při zdravotních rozhodnutích se vždy obraťte na lékaře.";
 
@@ -164,14 +174,11 @@ export function editorialUnitLabel(
 }
 
 export function formatEditorialUnitDisplay(
-  unitId: EditorialUnitId | null | undefined,
+  _unitId: EditorialUnitId | null | undefined,
   locale: EditorialLocale,
-  aiAssisted = false
+  _aiAssisted = false
 ): string {
-  const label = editorialUnitLabel(unitId, locale);
-  if (!aiAssisted) return label;
-  const suffix = locale === "en" ? AI_ASSISTED_SUFFIX.en : AI_ASSISTED_SUFFIX.cs;
-  return `${label} ${suffix}`;
+  return publicEditorialByline(locale);
 }
 
 function detectAiAssisted(article: ArticleForEditorialUnits): boolean {

@@ -38,6 +38,13 @@ import {
 } from "../../lib/ecosystem/editorial/images";
 import { getImageCuratorForLocale } from "../../lib/ecosystem/editorial/personas";
 import { polishCzechFields } from "../../lib/v22/translate";
+import { formatEditorialUnitDisplay, publicEditorialByline } from "../../lib/editorial/units";
+import {
+  applyMagazineDeskCopy,
+  polishMagazineExcerpt,
+  polishMagazineTitle,
+} from "../../lib/editorial/magazine-desk-copy";
+import { MAGAZINE_DESK_OVERRIDES } from "../../lib/editorial/magazine-desk-overrides";
 import {
   EDITORIAL_DESKS,
   PRIMARY_EDITORIAL_LOCALES,
@@ -677,6 +684,37 @@ assert.equal(curator?.role, "image_curator");
 
 const alt = getArticleHeroAltText({ title: longevityArticle.title, excerpt: longevityArticle.excerpt }, "cs");
 assert.ok(alt.length > 20);
+
+assert.equal(publicEditorialByline("cs"), "Redakce MedScopeGlobal");
+assert.equal(formatEditorialUnitDisplay("medscope_cz_analyzy", "cs", true), "Redakce MedScopeGlobal");
+assert.equal(
+  polishMagazineTitle("Prevence: Kdy vyhledat odbornou pomoc: Mentální prevence a duševní pohoda"),
+  "Kdy vyhledat odbornou pomoc — Mentální prevence a duševní pohoda"
+);
+assert.ok(
+  !/srozumitelně a bez zbytečného strašení/i.test(
+    polishMagazineExcerpt(
+      "Screening rakoviny — srozumitelný průvodce pro každého. Srozumitelně a bez zbytečného strašení.",
+      "Screening rakoviny v Česku"
+    )
+  )
+);
+const desk = applyMagazineDeskCopy({
+  slug: "verejnost-prevence-2026-06-23-dusevni-pohoda-kdy-vyhledat-odbornou-pomoc",
+  title: "Duševní pohoda: Kdy vyhledat odbornou pomoc?",
+  excerpt: "Čtěte o tom, jak udržet svou duševní pohodu.",
+  content: "<p>AI-asistovaná syntéza obsahu</p>",
+});
+assert.equal(
+  desk.title,
+  MAGAZINE_DESK_OVERRIDES["verejnost-prevence-2026-06-23-dusevni-pohoda-kdy-vyhledat-odbornou-pomoc"]!.title
+);
+assert.ok((desk.content ?? "").includes("Praktický lékař"));
+assert.ok(!(desk.content ?? "").includes("AI-asistovaná"));
+assert.ok(
+  Object.keys(MAGAZINE_DESK_OVERRIDES).filter((slug) => MAGAZINE_DESK_OVERRIDES[slug]?.content).length >= 8
+);
+console.log("✓ magazine desk byline and copy checks passed");
 
 console.log("✓ editorial image pipeline checks passed");
 console.log(

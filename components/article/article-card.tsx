@@ -5,19 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
-import { assignEditorialUnits, formatEditorialUnitDisplay } from "@/lib/editorial/units";
+import { publicEditorialByline } from "@/lib/editorial/units";
 import type { ArticleWithRelations } from "@/types/database";
 import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
 
 export function ArticleCard({ article }: { article: DisplayArticle | ArticleWithRelations }) {
   const cat = article.categories;
-  const assignment = assignEditorialUnits(article);
   const editorialLocale = article.locale === "en" ? "en" : "cs";
-  const authorLabel = formatEditorialUnitDisplay(
-    assignment.primary,
-    editorialLocale,
-    assignment.aiAssisted
-  );
+  const authorLabel = publicEditorialByline(editorialLocale);
   const date =
     article.published_at &&
     new Date(article.published_at).toLocaleDateString("cs-CZ", {

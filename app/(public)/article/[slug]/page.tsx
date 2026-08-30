@@ -17,8 +17,7 @@ import { VipBadge } from "@/components/vip/vip-badge";
 import { EditorialAttribution } from "@/components/article/editorial-attribution";
 import { EditorialFooter } from "@/components/article/editorial-footer";
 import {
-  assignEditorialUnits,
-  formatEditorialUnitDisplay,
+  publicEditorialByline,
   type EditorialLocale,
 } from "@/lib/editorial/units";
 import { articleJsonLdGlobal, buildGlobalHreflang } from "@/lib/ecosystem/seo";
@@ -187,12 +186,7 @@ export default async function ArticlePage({ params }: Props) {
 
   const category = article.categories;
   const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
-  const editorialAssignment = assignEditorialUnits(article);
-  const authorDisplay = formatEditorialUnitDisplay(
-    editorialAssignment.primary,
-    editorialLocale,
-    editorialAssignment.aiAssisted
-  );
+  const authorDisplay = publicEditorialByline(editorialLocale);
   const heroAlt = getArticleHeroAltText(
     {
       title: article.title,

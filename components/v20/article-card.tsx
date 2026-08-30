@@ -2,13 +2,12 @@ import Link from "next/link";
 import { Calendar, User } from "lucide-react";
 import { V20ArticleCover } from "@/components/v20/article-cover";
 import { enrichArticleMeta } from "@/lib/v20/content-rules";
-import { assignEditorialUnits, formatEditorialUnitDisplay } from "@/lib/editorial/units";
+import { publicEditorialByline } from "@/lib/editorial/units";
 import type { ArticleWithRelations } from "@/types/database";
 
 export function V20ArticleCard({ article }: { article: ArticleWithRelations }) {
   const cat = article.categories;
-  const assignment = assignEditorialUnits(article);
-  const authorLabel = formatEditorialUnitDisplay(assignment.primary, "cs", assignment.aiAssisted);
+  const authorLabel = publicEditorialByline("cs");
   const meta = enrichArticleMeta({
     title: article.title,
     excerpt: article.excerpt,

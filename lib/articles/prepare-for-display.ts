@@ -12,11 +12,12 @@ import { enrichArticleBodyForDisplay } from "@/lib/articles/enrich-body";
 import { polishCzechFields } from "@/lib/v22/translate";
 import {
   assignEditorialUnits,
-  formatEditorialUnitDisplay,
+  publicEditorialByline,
   type EditorialAssignment,
   type EditorialLocale,
 } from "@/lib/editorial/units";
 import { resolveEditorialCover } from "@/lib/editorial/image-policy";
+import { applyMagazineDeskCopy } from "@/lib/editorial/magazine-desk-copy";
 
 export type DisplayArticle = ArticleWithRelations & {
   displayLocale?: string;
@@ -35,7 +36,11 @@ function attachEditorialDisplay(
 ): DisplayArticle {
   const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
   const assignment = assignEditorialUnits(article ?? {});
-  const merged = { ...article, ...extra };
+  const desk =
+    editorialLocale === "cs"
+      ? applyMagazineDeskCopy({ ...article, ...extra })
+      : { ...article, ...extra };
+  const merged = { ...article, ...extra, ...desk };
   const cover_image_url = resolveEditorialCover({
     coverUrl: merged.cover_image_url,
     title: merged.title,
@@ -48,11 +53,7 @@ function attachEditorialDisplay(
     ...merged,
     cover_image_url,
     editorialAssignment: assignment,
-    editorialPrimaryLabel: formatEditorialUnitDisplay(
-      assignment.primary,
-      editorialLocale,
-      assignment.aiAssisted
-    ),
+    editorialPrimaryLabel: publicEditorialByline(editorialLocale),
   };
 }
 
