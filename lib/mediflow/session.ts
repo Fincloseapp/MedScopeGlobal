@@ -14,7 +14,7 @@ export async function getMediFlowSession(): Promise<MediFlowSession & {
   access: AppAccessInfo;
   loginUrl: string;
 }> {
-  const loginUrl = `/login?redirect=${encodeURIComponent(MEDIFLOW.appPath)}`;
+  const loginUrl = `/login?next=${encodeURIComponent(MEDIFLOW.appPath)}`;
   const { user, profile } = await getSessionProfile();
 
   if (!user) {

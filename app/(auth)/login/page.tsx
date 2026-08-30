@@ -63,13 +63,16 @@ export default function LoginPage() {
   const [nextHint, setNextHint] = useState<string | null>(null);
 
   useEffect(() => {
-    const next = new URLSearchParams(window.location.search).get("next") || "";
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get("next") || params.get("redirect") || "";
     if (next.startsWith("/app/pacient")) {
       setNextHint("Po přihlášení se vrátíte do MeDipacient — nahrávání vlastních zpráv.");
     } else if (next.startsWith("/app/priprava")) {
       setNextHint("Po přihlášení se vrátíte do MeDiprep — testy a simulace fakult.");
     } else if (next.startsWith("/app/dokumentace")) {
       setNextHint("Po přihlášení se vrátíte do OrdiZapis — nahrávání zápisů.");
+    } else if (next.startsWith("/app/mediflow")) {
+      setNextHint("Po přihlášení se vrátíte do MediFlow.");
     }
   }, []);
 
@@ -109,7 +112,8 @@ export default function LoginPage() {
 
       }
 
-      const next = new URLSearchParams(window.location.search).get("next");
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get("next") || params.get("redirect");
 
       window.location.href =
 
@@ -139,7 +143,8 @@ export default function LoginPage() {
 
     }
 
-    const next = new URLSearchParams(window.location.search).get("next");
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get("next") || params.get("redirect");
 
     window.location.href =
 

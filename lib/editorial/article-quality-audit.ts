@@ -81,6 +81,11 @@ export const SEED_DEMO_SLUGS = [
   "demo-novinky-prevence-v-cesku",
 ] as const;
 
+/**
+ * Magazine hub / listing filter only.
+ * Do not use this to 404 article detail — special-access medical
+ * articles (vip_only) must still resolve so existing eligibility can run.
+ */
 export function shouldHideFromPublicListing(
   article: ListingArticle,
   _now = new Date()

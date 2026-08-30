@@ -245,7 +245,7 @@ export function MediFlowAppShell() {
     entitled: session.isVip,
     validUntil: null,
     validityLabel: session.isVip ? "Aktivní" : "—",
-    loginUrl: "/login?redirect=/app/mediflow",
+    loginUrl: "/login?next=/app/mediflow",
     subscribeUrl: "/predplatne",
   };
 
@@ -431,7 +431,7 @@ export function MediFlowAppShell() {
               </p>
               {session.isGuest ? (
                 <Link
-                  href="/login?redirect=/app/mediflow"
+                  href="/login?next=/app/mediflow"
                   className="mt-3 inline-flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm hover:bg-white/20"
                 >
                   <LogIn className="h-4 w-4" /> Přihlásit
