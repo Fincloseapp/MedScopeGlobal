@@ -3,16 +3,13 @@ import { Play, Clock } from "lucide-react";
 import { getVideoEditorialLabel } from "@/lib/editorial/video-units";
 import { resolveOsvetaThumb } from "@/lib/verejnost/osveta/resolve-thumb";
 import { formatPublicDate } from "@/lib/i18n/format-date";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
+import { topicLabelForSlug } from "@/lib/config/verejnost-topics";
+import { translatePublicTitle } from "@/lib/verejnost/translate-public-text";
 import type { PublicHealthVideoWithTopic } from "@/types/public-osveta";
 
-const CATEGORY_LABELS: Record<string, string> = {
-  prevence: "Prevence",
-  nemoc: "Nemoci",
-  dlouhovekost: "Dlouhověkost",
-  "zivotni-styl": "Životní styl",
-};
-
-export function PublicHealthVideoCard({
+export async function PublicHealthVideoCard({
   video,
   featured = false,
   locale,
@@ -21,12 +18,15 @@ export function PublicHealthVideoCard({
   featured?: boolean;
   locale?: string;
 }) {
+  const uiLocale = locale ?? "cs";
+  const chrome = getVerejnostChrome(uiLocale);
   const editorialLabel = getVideoEditorialLabel({
     avatarType: video.avatar_type,
     category: video.topic?.category,
     metadata: video.metadata,
     audience: "osveta",
     slug: video.slug,
+    locale: uiLocale,
     aiAssisted: false,
   });
   const thumb = resolveOsvetaThumb({
@@ -36,15 +36,16 @@ export function PublicHealthVideoCard({
     slug: video.slug,
   });
   const category = video.topic?.category;
-  const dateLabel = formatPublicDate(video.published_at, locale, {
+  const dateLabel = formatPublicDate(video.published_at, uiLocale, {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
+  const title = await translatePublicTitle(video.title, uiLocale, chrome.dailyVideoEyebrow);
 
   return (
     <Link
-      href={`/verejnost/osveta/${video.slug}`}
+      href={localizePublicHref(`/verejnost/osveta/${video.slug}`, uiLocale)}
       prefetch
       className={`group flex flex-col overflow-hidden rounded-2xl border bg-white transition hover:-translate-y-0.5 hover:shadow-lg ${
         featured ? "border-[#005B96]/35 shadow-md sm:flex-row" : "border-[#d7e6f4]"
@@ -66,7 +67,7 @@ export function PublicHealthVideoCard({
           </span>
         </div>
         <span className="absolute bottom-2.5 left-2.5 rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
-          Poslech
+          {chrome.listenBadge}
         </span>
         <span className="absolute bottom-2.5 right-2.5 flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-medium text-white">
           <Clock className="h-3 w-3" />
@@ -76,7 +77,7 @@ export function PublicHealthVideoCard({
       <div className={`flex flex-1 flex-col p-4 ${featured ? "sm:p-6" : ""}`}>
         {category ? (
           <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">
-            {CATEGORY_LABELS[category] ?? category}
+            {topicLabelForSlug(category, uiLocale)}
           </span>
         ) : null}
         <h3
@@ -84,7 +85,7 @@ export function PublicHealthVideoCard({
             featured ? "text-xl" : "text-base"
           }`}
         >
-          {video.title}
+          {title}
         </h3>
         <p className="mt-1.5 text-xs leading-relaxed text-slate-500">{editorialLabel}</p>
         {dateLabel ? <p className="mt-auto pt-3 text-[11px] text-slate-400">{dateLabel}</p> : null}

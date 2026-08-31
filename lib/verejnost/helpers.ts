@@ -17,15 +17,19 @@ export function verejnostDateLabel(
   );
 }
 
-export function articleTopicLabel(article: DisplayArticle): string {
+export function articleTopicLabel(
+  article: DisplayArticle,
+  locale?: string | null
+): string {
+  const loc = locale ?? article.displayLocale ?? "cs";
   const meta = article.metadata ?? {};
   const pillar = String(meta.content_pillar ?? meta.internal_topic ?? "")
     .toLowerCase()
     .trim();
   if (pillar === "dlouhovekost" || String(article.public_topic ?? "") === "dlouhovekost") {
-    return "Dlouhověkost";
+    return topicLabelForSlug("dlouhovekost", loc);
   }
-  return topicLabelForSlug(article.public_topic ?? undefined);
+  return topicLabelForSlug(article.public_topic ?? undefined, loc);
 }
 
 export function computePublicAdStats(campaigns: PublicAdCampaign[]) {

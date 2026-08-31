@@ -45,6 +45,10 @@ import { formatPublicDate, intlLocaleFor } from "../lib/i18n/format-date";
 import { getArticleChrome } from "../lib/i18n/article-chrome";
 import { tipLocale, ARTICLE_TIP_COPY } from "../lib/ecosystem/tip-copy";
 import { publicEditorialByline } from "../lib/editorial/units";
+import { getVerejnostChrome } from "../lib/i18n/verejnost-chrome";
+import { topicLabelForSlug } from "../lib/config/verejnost-topics";
+import { localizeMagazineHubConfig } from "../lib/i18n/localize-magazine-hub";
+import { OSVETA_MAGAZINE_HUB } from "../lib/portal/magazine-section-hub";
 
 // --- unit checks (no server required) ---
 assert.equal(localeToPathSegment("en-US"), "en-us");
@@ -268,6 +272,27 @@ assert.equal(getArticleChrome("fr").save, "Enregistrer");
 assert.equal(getArticleChrome("de").share, "Teilen");
 assert.ok(!getArticleChrome("fr").related.includes("Související"));
 assert.ok(!getArticleChrome("en").recsTitle.includes("dlouhověkost"));
+
+assert.equal(topicLabelForSlug("zivotni-styl", "cs"), "Životní styl");
+assert.equal(topicLabelForSlug("zivotni-styl", "fr"), "Lifestyle");
+assert.equal(topicLabelForSlug("zivotni-styl", "de"), "Lifestyle");
+assert.equal(topicLabelForSlug("dlouhovekost", "en"), "Longevity");
+assert.equal(getVerejnostChrome("cs").dailyTipBadge, "Dnešní tip");
+assert.equal(getVerejnostChrome("fr").dailyTipBadge, "Conseil du jour");
+assert.equal(getVerejnostChrome("de").dailyTipBadge, "Tipp des Tages");
+assert.ok(!looksLikeCzech(getVerejnostChrome("fr").dailyVideoEyebrow));
+assert.ok(!looksLikeCzech(getVerejnostChrome("de").interviewBadge));
+assert.equal(getVerejnostChrome("cs").interviewBadge, "Rozhovor");
+assert.ok(!looksLikeCzech(getVerejnostChrome("fr").hubs.osveta.title));
+assert.ok(!looksLikeCzech(getVerejnostChrome("de").hubs.clanky.heroDeck));
+const frOsvetaHub = localizeMagazineHubConfig(OSVETA_MAGAZINE_HUB, "fr");
+assert.ok(!looksLikeCzech(frOsvetaHub.title), `FR osveta hub title leaked Czech: ${frOsvetaHub.title}`);
+assert.ok(!looksLikeCzech(frOsvetaHub.heroDeck));
+assert.ok(frOsvetaHub.primaryCta.href.startsWith("/fr/") || frOsvetaHub.primaryCta.href.startsWith("#"));
+assert.ok(frOsvetaHub.secondaryCtas.every((cta) => !looksLikeCzech(cta.label)));
+assert.ok(frOsvetaHub.pillars.every((p) => !looksLikeCzech(p.label)));
+const csOsvetaHub = localizeMagazineHubConfig(OSVETA_MAGAZINE_HUB, "cs");
+assert.ok(csOsvetaHub.title.includes("osvěta") || csOsvetaHub.title.includes("Osvěta") || /osvěta/i.test(csOsvetaHub.title));
 
 console.log("✓ i18n/SEO unit checks passed");
 

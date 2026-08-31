@@ -4,6 +4,7 @@ import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 import { articleTopicLabel, verejnostDateLabel } from "@/lib/verejnost/helpers";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
 
 export function VerejnostArticleCard({
   article,
@@ -18,7 +19,8 @@ export function VerejnostArticleCard({
   const href = localizePublicHref(`/verejnost/clanky/${article.slug}`, uiLocale);
   const image = resolveVerejnostCoverUrl(article);
   const dateLabel = verejnostDateLabel(article, uiLocale);
-  const topicLabel = articleTopicLabel(article);
+  const topicLabel = articleTopicLabel(article, uiLocale);
+  const chrome = getVerejnostChrome(uiLocale);
   const isInterview = article.public_topic === "rozhovory";
 
   if (variant === "compact") {
@@ -52,7 +54,7 @@ export function VerejnostArticleCard({
         <Image src={image} alt="" fill className="object-cover" sizes="50vw" loading="lazy" />
         {variant === "interview" && isInterview ? (
           <span className="absolute bottom-3 left-3 rounded-full bg-[#021d33]/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
-            Rozhovor
+            {chrome.interviewBadge}
           </span>
         ) : null}
       </div>

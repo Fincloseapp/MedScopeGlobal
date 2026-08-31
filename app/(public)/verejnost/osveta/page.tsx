@@ -11,6 +11,11 @@ import { OSVETA_MAGAZINE_HUB } from "@/lib/portal/magazine-section-hub";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { listPublicArticles } from "@/lib/queries/verejnost";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
+import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { topicLabelForSlug } from "@/lib/config/verejnost-topics";
+import { translatePublicTitle } from "@/lib/verejnost/translate-public-text";
+import { localizeMagazineHubConfig } from "@/lib/i18n/localize-magazine-hub";
 import {
   getPublicOsvetaLeaderboard,
   getTodayPublicHealthVideo,
@@ -21,22 +26,20 @@ import {
 export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const hub = localizeMagazineHubConfig(OSVETA_MAGAZINE_HUB, locale);
   return await buildLocalizedV20PageMetadata({
-    title: "Zdravotní osvěta | Veřejnost | MedScopeGlobal",
-    description: OSVETA_MAGAZINE_HUB.heroDeck,
+    title: `${hub.title} | MedScopeGlobal`,
+    description: hub.heroDeck,
     path: "/verejnost/osveta",
+    locale,
   });
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  prevence: "Prevence",
-  nemoc: "Nemoci",
-  dlouhovekost: "Dlouhověkost",
-  "zivotni-styl": "Životní styl",
-};
-
 export default async function OsvetaHubPage() {
   const locale = await getServerLocale();
+  const chrome = getVerejnostChrome(locale);
+  const hub = localizeMagazineHubConfig(OSVETA_MAGAZINE_HUB, locale);
   const [today, videos, topics, leaderboard, articles] = await Promise.all([
     getTodayPublicHealthVideo(),
     listPublicHealthVideos({ limit: 20 }),
@@ -47,24 +50,31 @@ export default async function OsvetaHubPage() {
 
   const archive = videos.filter((v) => v.id !== today?.id);
   const primaryCtaHref = today ? `/verejnost/osveta/${today.slug}` : "#dnesni-lekce";
-  const nav = OSVETA_MAGAZINE_HUB.articlesNav;
+  const nav = hub.articlesNav;
+  const topicChips = await Promise.all(
+    topics.map(async (t) => ({
+      id: t.id,
+      label: topicLabelForSlug(t.category, locale),
+      title: await translatePublicTitle(t.title, locale, topicLabelForSlug(t.category, locale)),
+    }))
+  );
 
   return (
     <MagazineSectionHub config={OSVETA_MAGAZINE_HUB} primaryCtaHref={primaryCtaHref}>
       {today ? (
         <section id="dnesni-lekce" className="mb-12 scroll-mt-24">
           <MagazineHubSectionHeader
-            eyebrow="Poslech dne"
-            title="Dnešní lekce"
-            description="Krátká poslechová lekce s textem k čtení a volitelným kvízem — není to VIP obsah ani placený tip."
+            eyebrow={chrome.todayLessonEyebrow}
+            title={chrome.todayLessonTitle}
+            description={chrome.todayLessonLead}
           />
           <PublicHealthVideoCard video={today} featured locale={locale} />
         </section>
       ) : (
         <section id="dnesni-lekce" className="mb-12 scroll-mt-24">
-          <MagazineHubSectionHeader eyebrow="Poslech" title="Dnešní lekce" />
+          <MagazineHubSectionHeader eyebrow={chrome.listenBadge} title={chrome.todayLessonTitle} />
           <p className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
-            Nová lekce se publikuje každý den — vraťte se brzy nebo prohlédněte archiv níže.
+            {chrome.noLesson}
           </p>
         </section>
       )}
@@ -88,16 +98,16 @@ export default async function OsvetaHubPage() {
 
       <section className="mb-10">
         <MagazineHubSectionHeader
-          eyebrow="Rubriky poslechu"
-          title="Témata v archivu lekcí"
+          eyebrow={chrome.listenRubrics}
+          title={chrome.archiveTopics}
         />
         <div className="flex flex-wrap gap-2">
-          {topics.map((t) => (
+          {topicChips.map((t) => (
             <span
               key={t.id}
               className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600"
             >
-              {CATEGORY_LABELS[t.category] ?? t.category} · {t.title}
+              {t.label} · {t.title}
             </span>
           ))}
         </div>
@@ -105,7 +115,7 @@ export default async function OsvetaHubPage() {
 
       <div className="grid gap-10 lg:grid-cols-3">
         <section className="lg:col-span-2">
-          <MagazineHubSectionHeader eyebrow="Archiv" title="Poslechové lekce" />
+          <MagazineHubSectionHeader eyebrow={chrome.archiveEyebrow} title={chrome.archiveTitle} />
           {archive.length ? (
             <div className="grid gap-4 sm:grid-cols-2">
               {archive.map((v) => (
@@ -114,9 +124,12 @@ export default async function OsvetaHubPage() {
             </div>
           ) : (
             <p className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
-              Archiv se plní každý den novou lekcí. Mezitím si přečtěte{" "}
-              <Link href="/articles" className="font-medium text-[#005B96] hover:underline">
-                články magazínu
+              {chrome.archiveEmpty}{" "}
+              <Link
+                href={localizePublicHref("/articles", locale)}
+                className="font-medium text-[#005B96] hover:underline"
+              >
+                {chrome.archiveEmptyLink}
               </Link>
               .
             </p>
@@ -126,13 +139,10 @@ export default async function OsvetaHubPage() {
         <aside>
           <div className="mb-4 flex items-end justify-between">
             <h2 className="font-display text-xl font-bold text-[#021d33]">Top 5 XP</h2>
-            <PublicLeaderboardCta />
+            <PublicLeaderboardCta locale={locale} />
           </div>
-          <PublicLeaderboard entries={leaderboard} />
-          <p className="mt-4 text-xs leading-relaxed text-slate-400">
-            +10 XP za poslech · +20 XP za kvíz · odznaky: První lekce, Týden prevence. Body jsou
-            volitelná hra — ne odemykají VIP ani předplatné.
-          </p>
+          <PublicLeaderboard entries={leaderboard} locale={locale} />
+          <p className="mt-4 text-xs leading-relaxed text-slate-400">{chrome.xpAsideLead}</p>
         </aside>
       </div>
     </MagazineSectionHub>

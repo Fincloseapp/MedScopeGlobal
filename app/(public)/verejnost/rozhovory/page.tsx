@@ -9,19 +9,26 @@ import { ROZHOVORY_MAGAZINE_HUB } from "@/lib/portal/magazine-section-hub";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { listPublicArticles } from "@/lib/queries/verejnost";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
+import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { localizeMagazineHubConfig } from "@/lib/i18n/localize-magazine-hub";
 
 export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const hub = localizeMagazineHubConfig(ROZHOVORY_MAGAZINE_HUB, locale);
   return await buildLocalizedV20PageMetadata({
-    title: "Rozhovory — Veřejné zdraví | MedScopeGlobal",
-    description: ROZHOVORY_MAGAZINE_HUB.heroDeck,
+    title: `${hub.title} | MedScopeGlobal`,
+    description: hub.heroDeck,
     path: "/verejnost/rozhovory",
+    locale,
   });
 }
 
 export default async function VerejnostRozhovoryPage() {
   const locale = await getServerLocale();
+  const chrome = getVerejnostChrome(locale);
   const interviews = await listPublicArticles({
     topic: "rozhovory",
     limit: 24,
@@ -33,9 +40,9 @@ export default async function VerejnostRozhovoryPage() {
     <MagazineSectionHub config={ROZHOVORY_MAGAZINE_HUB}>
       <section id="rozhovory-grid" className="scroll-mt-24">
         <MagazineHubSectionHeader
-          eyebrow="Rozhovory"
-          title="Rozhovory s odborníky"
-          description="Lékaři, psychologové a specialisté vysvětlují prevenci a zdraví srozumitelně — bez žargonu."
+          eyebrow={chrome.interviewsEyebrow}
+          title={chrome.interviewsTitle}
+          description={chrome.interviewsLead}
         />
         {interviews.length ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -45,9 +52,12 @@ export default async function VerejnostRozhovoryPage() {
           </div>
         ) : (
           <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
-            <p>Rozhovory s odborníky se připravují — brzy na medscopeglobal.com.</p>
-            <Link href="/verejnost/clanky" className="mt-4 inline-block text-[#005B96] hover:underline">
-              Prohlédnout články →
+            <p>{chrome.interviewsEmpty}</p>
+            <Link
+              href={localizePublicHref("/verejnost/clanky", locale)}
+              className="mt-4 inline-block text-[#005B96] hover:underline"
+            >
+              {chrome.allArticles} →
             </Link>
           </div>
         )}

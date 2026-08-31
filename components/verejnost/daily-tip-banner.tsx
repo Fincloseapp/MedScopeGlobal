@@ -3,8 +3,14 @@ import { Sparkles } from "lucide-react";
 import { getTodayPublicHealthVideo } from "@/lib/verejnost/osveta/db";
 import { getVideoEditorialLabel } from "@/lib/editorial/video-units";
 import { resolveOsvetaThumb } from "@/lib/verejnost/osveta/resolve-thumb";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { translatePublicTitle } from "@/lib/verejnost/translate-public-text";
 
 export async function DailyTipBanner() {
+  const locale = await getServerLocale();
+  const chrome = getVerejnostChrome(locale);
   const video = await getTodayPublicHealthVideo();
   if (!video) return null;
 
@@ -14,6 +20,7 @@ export async function DailyTipBanner() {
     metadata: video.metadata,
     audience: "osveta",
     slug: video.slug,
+    locale,
   });
   const thumb = resolveOsvetaThumb({
     thumbnailUrl: video.thumbnail_url,
@@ -21,11 +28,12 @@ export async function DailyTipBanner() {
     category: video.topic?.category,
     slug: video.slug,
   });
+  const title = await translatePublicTitle(video.title, locale, chrome.dailyVideoEyebrow);
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
       <Link
-        href={`/verejnost/osveta/${video.slug}`}
+        href={localizePublicHref(`/verejnost/osveta/${video.slug}`, locale)}
         prefetch
         className="group flex flex-col overflow-hidden rounded-2xl border border-[#005B96]/20 bg-gradient-to-r from-[#005B96]/5 to-white shadow-sm transition hover:border-[#005B96]/40 hover:shadow-md sm:flex-row"
       >
@@ -34,15 +42,15 @@ export async function DailyTipBanner() {
           <img src={thumb} alt="" className="h-full w-full object-cover" />
           <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-[#005B96] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white">
             <Sparkles className="h-3 w-3" />
-            Dnešní tip
+            {chrome.dailyTipBadge}
           </span>
         </div>
         <div className="flex flex-1 flex-col justify-center p-5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">
-            Denní zdravotní video
+            {chrome.dailyVideoEyebrow}
           </p>
           <h3 className="mt-1 font-display text-lg font-semibold text-[#021d33] group-hover:text-[#005B96]">
-            {video.title}
+            {title}
           </h3>
           <p className="mt-1 text-sm text-slate-500">
             {editorialLabel} · {Math.round(video.duration_seconds / 60) || 1} min · +10 XP
