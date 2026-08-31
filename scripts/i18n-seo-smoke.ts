@@ -49,6 +49,7 @@ import { getVerejnostChrome } from "../lib/i18n/verejnost-chrome";
 import { topicLabelForSlug } from "../lib/config/verejnost-topics";
 import { localizeMagazineHubConfig } from "../lib/i18n/localize-magazine-hub";
 import { OSVETA_MAGAZINE_HUB } from "../lib/portal/magazine-section-hub";
+import { getVerejnostNavStripCopy } from "../lib/v38/conversion-copy";
 
 // --- unit checks (no server required) ---
 assert.equal(localeToPathSegment("en-US"), "en-us");
@@ -283,6 +284,9 @@ assert.equal(getVerejnostChrome("de").dailyTipBadge, "Tipp des Tages");
 assert.ok(!looksLikeCzech(getVerejnostChrome("fr").dailyVideoEyebrow));
 assert.ok(!looksLikeCzech(getVerejnostChrome("de").interviewBadge));
 assert.equal(getVerejnostChrome("cs").interviewBadge, "Rozhovor");
+assert.ok(!looksLikeCzech(getVerejnostNavStripCopy("fr").headline));
+assert.ok(!looksLikeCzech(getVerejnostNavStripCopy("de").ctaLabel));
+assert.equal(getVerejnostNavStripCopy("cs").ctaLabel, "Otevřít MeDipacient");
 assert.ok(!looksLikeCzech(getVerejnostChrome("fr").hubs.osveta.title));
 assert.ok(!looksLikeCzech(getVerejnostChrome("de").hubs.clanky.heroDeck));
 const frOsvetaHub = localizeMagazineHubConfig(OSVETA_MAGAZINE_HUB, "fr");

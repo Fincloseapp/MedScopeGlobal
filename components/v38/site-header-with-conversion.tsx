@@ -71,10 +71,10 @@ export function SiteHeaderWithConversion({
     if (mediflowPath) return { ...getMediFlowNavStripCopy(), generatedBy: "static" as const };
     if (vipPath) return { ...getVipNavStripCopy(), generatedBy: "static" as const };
     if (studentPath) return { ...getStudentiNavStripCopy(daySeed()), generatedBy: "static" as const };
-    if (publicPath) return { ...getVerejnostNavStripCopy(), generatedBy: "static" as const };
+    if (publicPath) return { ...getVerejnostNavStripCopy(locale), generatedBy: "static" as const };
     if (physicianPath) return { ...getLekariNavStripCopy(), generatedBy: "static" as const };
     return null;
-  }, [studentPath, publicPath, physicianPath, mediflowPath, vipPath]);
+  }, [studentPath, publicPath, physicianPath, mediflowPath, vipPath, locale]);
 
   const [reader, setReader] = useState<ReaderPayload>(DEFAULT_READER);
   const [stripCopy, setStripCopy] = useState<StoredNudge>(

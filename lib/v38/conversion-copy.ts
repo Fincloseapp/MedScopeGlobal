@@ -205,7 +205,41 @@ export function getStudentiNavStripCopy(seed = 0): ConversionCopy {
   return student[Math.abs(seed) % student.length] ?? student[0]!;
 }
 
-export function getVerejnostNavStripCopy(): ConversionCopy {
+export function getVerejnostNavStripCopy(locale?: string | null): ConversionCopy {
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  if (primary === "de") {
+    return {
+      slot: "nav_strip",
+      eyebrow: "Für Sie",
+      headline: "MeDipacient: Befunde auf dem Handy",
+      body: "Die Test-Zeitachse ist offen. Eigene Befunde nach der Anmeldung hochladen — 99 CZK/Monat.",
+      ctaLabel: "MeDipacient öffnen",
+      ctaHref: "/app/pacient",
+      hint: "Als App auf den Bildschirm legen",
+    };
+  }
+  if (primary === "fr") {
+    return {
+      slot: "nav_strip",
+      eyebrow: "Pour vous",
+      headline: "MeDipacient : comptes rendus sur le téléphone",
+      body: "La frise d’essai est ouverte. Déposez vos propres comptes rendus après connexion — 99 CZK/mois.",
+      ctaLabel: "Ouvrir MeDipacient",
+      ctaHref: "/app/pacient",
+      hint: "Installer sur l’écran d’accueil",
+    };
+  }
+  if (primary !== "cs") {
+    return {
+      slot: "nav_strip",
+      eyebrow: "For you",
+      headline: "MeDipacient: reports on your phone",
+      body: "The trial timeline is open. Upload your own reports after sign-in — 99 CZK/month.",
+      ctaLabel: "Open MeDipacient",
+      ctaHref: "/app/pacient",
+      hint: "Add to the home screen",
+    };
+  }
   return {
     slot: "nav_strip",
     eyebrow: "Pro váš zájem",
