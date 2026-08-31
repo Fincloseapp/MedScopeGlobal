@@ -61,7 +61,7 @@ export function V20MobileNav({
         className="flex w-[min(100vw-1rem,380px)] flex-col overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]"
       >
         <SheetHeader className="shrink-0 text-left">
-          <HeaderLogo className="mb-2 items-start" />
+          <HeaderLogo locale={locale} className="mb-2 items-start" />
           <SheetTitle className="font-display text-lg text-[#021d33] dark:text-[#E0E0E0]">
             {HEADER_TAGLINE}
           </SheetTitle>

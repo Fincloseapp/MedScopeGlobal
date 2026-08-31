@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { cn } from "@/lib/utils";
 
 export const HEADER_TAGLINE = "ViaLongeVita · MediFlow · MeDipacient · OrdiZapis";
@@ -10,13 +11,19 @@ type Props = {
   centered?: boolean;
   className?: string;
   priority?: boolean;
+  locale?: string;
 };
 
 /** v23.3.1 — mobile 56px max visibility + desktop 70px */
-export function HeaderLogo({ centered = false, className, priority = true }: Props) {
+export function HeaderLogo({
+  centered = false,
+  className,
+  priority = true,
+  locale = "cs",
+}: Props) {
   return (
     <Link
-      href="/"
+      href={localizePublicHref("/", locale)}
       prefetch
       className={cn(
         "logo-block group flex shrink-0 flex-col transition-opacity hover:opacity-[0.97]",

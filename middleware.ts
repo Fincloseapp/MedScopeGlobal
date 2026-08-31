@@ -5,13 +5,11 @@ import {
   wrapWithSecurityHeaders,
 } from "@/lib/v30/security/middleware";
 import {
-  DEFAULT_LOCALE,
   LOCALE_COOKIE,
-  LOCALE_MANUAL_COOKIE,
   LOCALE_REQUEST_HEADER,
   normalizeLocale,
 } from "@/lib/i18n/config";
-import { detectLocaleFromAcceptLanguage } from "@/lib/i18n/detect-locale";
+import { localeForUnprefixedEntry } from "@/lib/i18n/detect-locale";
 import {
   canonicalLocalePathname,
   isLocaleRoutingExcluded,
@@ -105,18 +103,12 @@ export async function middleware(request: NextRequest) {
     return wrapWithSecurityHeaders(response, pathname);
   }
 
-  const manual = request.cookies.get(LOCALE_MANUAL_COOKIE)?.value === "1";
+  // Typing medscopeglobal.com (or any unprefixed public URL) always follows
+  // the device/browser language. A previous locale-switcher cookie must not
+  // lock the apex domain to English when the phone is Czech.
   const acceptLanguage = request.headers.get("accept-language");
-  const detected = detectLocaleFromAcceptLanguage(acceptLanguage);
-  const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value;
   const bot = isSearchEngineBot(request.headers.get("user-agent"));
-
-  let target = DEFAULT_LOCALE;
-  if (manual && cookieLocale) {
-    target = normalizeLocale(cookieLocale);
-  } else if (!bot) {
-    target = detected;
-  }
+  const target = localeForUnprefixedEntry(acceptLanguage, bot);
 
   const prefix = `/${localeToPathSegment(target)}`;
   const destPath = pathname === "/" ? prefix : `${prefix}${pathname.startsWith("/") ? pathname : `/${pathname}`}`;
@@ -127,11 +119,15 @@ export async function middleware(request: NextRequest) {
     dest.pathname = pathname === "/" ? "/cs" : `/cs${pathname.startsWith("/") ? pathname : `/${pathname}`}`;
     const redirect = NextResponse.redirect(dest, 308);
     copyResponseCookies(response, redirect);
+    redirect.headers.set("Vary", "Accept-Language, User-Agent");
+    redirect.headers.set("Cache-Control", "public, max-age=300");
     return wrapWithSecurityHeaders(redirect, pathname);
   }
 
   const redirect = NextResponse.redirect(dest, 302);
   copyResponseCookies(response, redirect);
+  redirect.headers.set("Vary", "Accept-Language, User-Agent");
+  redirect.headers.set("Cache-Control", "private, no-store, must-revalidate");
   redirect.cookies.set(LOCALE_COOKIE, normalizeLocale(target), LOCALE_COOKIE_OPTS);
   return wrapWithSecurityHeaders(redirect, pathname);
 }

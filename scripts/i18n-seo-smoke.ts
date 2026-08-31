@@ -25,7 +25,10 @@ import {
   PREFERRED_LOCALE_KEY,
   setPreferredLocale,
 } from "../lib/i18n/detect-language";
-import { detectLocaleFromAcceptLanguage } from "../lib/i18n/detect-locale";
+import {
+  detectLocaleFromAcceptLanguage,
+  localeForUnprefixedEntry,
+} from "../lib/i18n/detect-locale";
 import { isSearchEngineBot } from "../lib/i18n/search-bots";
 import { newsDesksForLocale } from "../lib/v271/news-desks";
 import { getPortalChrome } from "../lib/v271/portal";
@@ -137,6 +140,22 @@ assert.ok(
 assert.equal(detectLocaleFromAcceptLanguage("de-DE,de;q=0.9,en;q=0.8"), "de");
 assert.equal(detectLocaleFromAcceptLanguage("fr-FR,fr;q=0.9"), "fr");
 assert.equal(detectLocaleFromAcceptLanguage("en-US,en;q=0.8"), "en-US");
+assert.equal(detectLocaleFromAcceptLanguage("cs-CZ,cs;q=0.9,en;q=0.5"), "cs");
+assert.equal(detectLocaleFromAcceptLanguage("cs; q=0.9,en; q=0.8"), "cs");
+assert.equal(detectLocaleFromAcceptLanguage("de-AT,de;q=0.9"), "de");
+assert.equal(detectLocaleFromAcceptLanguage("en-GB,en;q=0.9"), "en-UK");
+assert.equal(detectLocaleFromAcceptLanguage("zh-CN,zh;q=0.8"), "zh-CN");
+assert.equal(detectLocaleFromAcceptLanguage("zh,en;q=0.5"), "zh-CN");
+assert.equal(detectLocaleFromAcceptLanguage("sk-SK,sk;q=0.9"), "sk");
+assert.equal(detectLocaleFromAcceptLanguage("pl-PL,pl;q=0.9,cs;q=0.4"), "pl");
+assert.equal(detectLocaleFromAcceptLanguage("sv-SE,sv;q=0.9,en;q=0.8"), "en");
+assert.equal(detectLocaleFromAcceptLanguage(""), "cs");
+assert.equal(localeForUnprefixedEntry("cs-CZ,cs;q=0.9", false), "cs");
+assert.equal(localeForUnprefixedEntry("de-DE,de;q=0.9", false), "de");
+assert.equal(localeForUnprefixedEntry("fr-FR", false), "fr");
+assert.equal(localeForUnprefixedEntry("de-DE", true), "cs");
+assert.equal(localizePublicHref("/", "fr"), "/fr");
+assert.equal(localizePublicHref("/", "cs"), "/cs");
 assert.ok(isSearchEngineBot("Mozilla/5.0 (compatible; Googlebot/2.1)"));
 assert.ok(isSearchEngineBot("SeznamBot/3.0"));
 assert.ok(isSearchEngineBot("YandexBot/3.0"));
@@ -235,6 +254,33 @@ async function runHttpSmoke(): Promise<void> {
     homeRedirect === 307 || homeRedirect === 308 || homeRedirect === 302,
     `/ should redirect (got ${homeRedirect})`
   );
+
+  async function fetchRedirect(path: string, headers: HeadersInit): Promise<Response> {
+    return fetch(`${origin}${path}`, { redirect: "manual", headers });
+  }
+
+  const czechDevice = await fetchRedirect("/", {
+    "Accept-Language": "cs-CZ,cs;q=0.9,en;q=0.5",
+    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)",
+  });
+  assert.equal(czechDevice.status, 302);
+  assert.match(czechDevice.headers.get("location") ?? "", /\/cs\/?$/);
+  assert.match(czechDevice.headers.get("vary") ?? "", /Accept-Language/i);
+
+  const germanDevice = await fetchRedirect("/", {
+    "Accept-Language": "de-DE,de;q=0.9",
+    "User-Agent": "Mozilla/5.0 (Linux; Android 14)",
+    Cookie: "medscope_locale=en-US; medscope_locale_manual=1",
+  });
+  assert.equal(germanDevice.status, 302);
+  assert.match(germanDevice.headers.get("location") ?? "", /\/de\/?$/);
+
+  const googlebot = await fetchRedirect("/", {
+    "Accept-Language": "de-DE",
+    "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+  });
+  assert.ok(googlebot.status === 308 || googlebot.status === 301);
+  assert.match(googlebot.headers.get("location") ?? "", /\/cs\/?$/);
 
   const csStatus = await fetchStatus("/cs");
   assert.ok(
