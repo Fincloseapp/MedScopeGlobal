@@ -90,6 +90,7 @@ export type SurfaceCopy = {
   expandMenu: string;
   language: string;
   signIn: string;
+  register: string;
   downloadApps: string;
   siteDescription: string;
   cookieTitle: string;
@@ -219,6 +220,7 @@ const COPY: Record<string, SurfaceCopy> = {
     expandMenu: "Rozbalit",
     language: "Jazyk",
     signIn: "Přihlášení",
+    register: "Registrace",
     downloadApps: "Stáhnout aplikace",
     siteDescription:
       "ViaLongeVita — globální magazín zdraví a dlouhověkosti na MedScopeGlobal.com. MediFlow, VIP protokoly, MeDipacient a OrdiZapis. Evidence-based obsah ve 19 jazycích. 14 dní zdarma.",
@@ -378,6 +380,7 @@ const COPY: Record<string, SurfaceCopy> = {
     expandMenu: "Expand",
     language: "Language",
     signIn: "Sign in",
+    register: "Register",
     downloadApps: "Get the apps",
     siteDescription: `${MAGAZINE.name} — health and longevity magazine on MedScopeGlobal.com. MediFlow, VIP protocols, MeDipacient and OrdiZapis. Evidence-based content in 19 languages. 14 days free.`,
     cookieTitle: "Cookies and privacy",
@@ -535,6 +538,7 @@ const COPY: Record<string, SurfaceCopy> = {
     expandMenu: "Ausklappen",
     language: "Sprache",
     signIn: "Anmelden",
+    register: "Registrieren",
     downloadApps: "Apps laden",
     siteDescription: `${MAGAZINE.name} — Magazin für Gesundheit und Langlebigkeit auf MedScopeGlobal.com. MediFlow, VIP-Protokolle, MeDipacient und OrdiZapis. Evidenzbasierte Inhalte in 19 Sprachen. 14 Tage kostenlos.`,
     cookieTitle: "Cookies und Datenschutz",
@@ -692,6 +696,7 @@ const COPY: Record<string, SurfaceCopy> = {
     expandMenu: "Déplier",
     language: "Langue",
     signIn: "Connexion",
+    register: "Inscription",
     downloadApps: "Télécharger les applis",
     siteDescription: `${MAGAZINE.name} — magazine de santé et de longévité sur MedScopeGlobal.com. MediFlow, protocoles VIP, MeDipacient et OrdiZapis. Contenus fondés sur les preuves en 19 langues. 14 jours gratuits.`,
     cookieTitle: "Cookies et confidentialité",

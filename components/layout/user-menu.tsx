@@ -13,13 +13,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { tryCreateClient } from "@/lib/supabase/client";
 import type { AppUser } from "@/types/database";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 interface Props {
   user: { id: string; email?: string | null } | null;
   profile: AppUser | null;
+  locale?: string;
 }
 
-export function UserMenu({ user, profile }: Props) {
+export function UserMenu({ user, profile, locale = "cs" }: Props) {
+  const surface = getSurfaceCopy(locale);
   async function signOut() {
     const supabase = tryCreateClient();
     if (supabase) await supabase.auth.signOut();
@@ -30,10 +34,10 @@ export function UserMenu({ user, profile }: Props) {
     return (
       <div className="hidden items-center gap-2 sm:flex">
         <Button variant="ghost" size="sm" asChild>
-          <Link href="/login">Přihlášení</Link>
+          <Link href={localizePublicHref("/login", locale)}>{surface.signIn}</Link>
         </Button>
         <Button size="sm" asChild>
-          <Link href="/signup">Registrace</Link>
+          <Link href={localizePublicHref("/signup", locale)}>{surface.register}</Link>
         </Button>
       </div>
     );

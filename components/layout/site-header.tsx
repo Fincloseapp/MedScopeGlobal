@@ -67,7 +67,7 @@ export function SiteHeader({
             <SearchCommand isVip={isVip} accessLevel={accessLevel} locale={locale} />
             <ThemeToggle />
             {user ? <NotificationBell /> : null}
-            <UserMenu user={user} profile={profile} />
+            <UserMenu user={user} profile={profile} locale={locale} />
           </div>
         </div>
       </div>
