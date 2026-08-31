@@ -380,7 +380,8 @@ export async function getArticleBySlug(
 
   const supabase = await createDataClient();
   if (!supabase) {
-    return getDemoMagazineArticleBySlug(dbSlug);
+    const demo = getDemoMagazineArticleBySlug(dbSlug);
+    return demo ? prepareArticleForDisplay(demo, locale, "full") : null;
   }
   const { data, error } = await supabase
     .from("articles")
@@ -391,13 +392,15 @@ export async function getArticleBySlug(
 
   if (error) {
     console.error("getArticleBySlug", error);
-    return getDemoMagazineArticleBySlug(dbSlug);
+    const demo = getDemoMagazineArticleBySlug(dbSlug);
+    return demo ? prepareArticleForDisplay(demo, locale, "full") : null;
   }
   const row = data
     ? (mapArticleList([data as Record<string, unknown>])[0] ?? null)
     : null;
   if (!row) {
-    return getDemoMagazineArticleBySlug(dbSlug);
+    const demo = getDemoMagazineArticleBySlug(dbSlug);
+    return demo ? prepareArticleForDisplay(demo, locale, "full") : null;
   }
   // Listing hide is for magazine hubs. Special-access medical/doctor
   // articles must resolve so the existing VIP / physician gate can run.

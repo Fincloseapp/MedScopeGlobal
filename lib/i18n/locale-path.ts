@@ -142,6 +142,8 @@ const LOCALE_EXCLUDED_PREFIXES = [
   "/go/",
   "/_next/",
   "/sw-",
+  "/feed/",
+  "/sitemaps/",
 ];
 
 const LOCALE_EXCLUDED_EXACT = new Set([

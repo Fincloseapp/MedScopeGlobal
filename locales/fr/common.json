@@ -71,5 +71,8 @@
     "unavailable": "Les contributions ne sont pas disponibles pour le moment.",
     "tip": "Soutenez la rédaction par une contribution",
     "exploreVip": "ou explorez les protocoles VIP Longevity"
+  },
+  "alerts": {
+    "translatedArticle": "Cet article a été traduit automatiquement dans la langue sélectionnée."
   }
 }

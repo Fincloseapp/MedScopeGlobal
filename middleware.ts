@@ -15,8 +15,10 @@ import { detectLocaleFromAcceptLanguage } from "@/lib/i18n/detect-locale";
 import {
   canonicalLocalePathname,
   isLocaleRoutingExcluded,
+  localeToPathSegment,
   resolveLocalePath,
 } from "@/lib/i18n/locale-path";
+import { isSearchEngineBot } from "@/lib/i18n/search-bots";
 import { isValidAdminGateCookie, ADMIN_GATE_COOKIE } from "@/lib/auth/admin-gate-config";
 import {
   enforceLekarskaZonaMiddleware,
@@ -97,28 +99,41 @@ export async function middleware(request: NextRequest) {
       });
       copyResponseCookies(response, rewrite);
       rewrite.cookies.set(LOCALE_COOKIE, normalizeLocale(pathLocale), LOCALE_COOKIE_OPTS);
-      rewrite.cookies.set(LOCALE_MANUAL_COOKIE, "1", LOCALE_COOKIE_OPTS);
       return wrapWithSecurityHeaders(rewrite, pathname);
     }
+  } else {
+    return wrapWithSecurityHeaders(response, pathname);
   }
 
   const manual = request.cookies.get(LOCALE_MANUAL_COOKIE)?.value === "1";
   const acceptLanguage = request.headers.get("accept-language");
-  // Unprefixed URLs stay Czech unless the reader picked a language (header or /de/…).
-  const autoLocale = DEFAULT_LOCALE;
-  void detectLocaleFromAcceptLanguage(acceptLanguage);
+  const detected = detectLocaleFromAcceptLanguage(acceptLanguage);
+  const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value;
+  const bot = isSearchEngineBot(request.headers.get("user-agent"));
 
-  if (!manual) {
-    const current = request.cookies.get(LOCALE_COOKIE)?.value;
-    const next = normalizeLocale(autoLocale);
-    if (!current || normalizeLocale(current) !== next) {
-      response.cookies.set(LOCALE_COOKIE, next, LOCALE_COOKIE_OPTS);
-    }
-  } else if (!request.cookies.get(LOCALE_COOKIE)?.value) {
-    response.cookies.set(LOCALE_COOKIE, DEFAULT_LOCALE, LOCALE_COOKIE_OPTS);
+  let target = DEFAULT_LOCALE;
+  if (manual && cookieLocale) {
+    target = normalizeLocale(cookieLocale);
+  } else if (!bot) {
+    target = detected;
   }
 
-  return wrapWithSecurityHeaders(response, pathname);
+  const prefix = `/${localeToPathSegment(target)}`;
+  const destPath = pathname === "/" ? prefix : `${prefix}${pathname.startsWith("/") ? pathname : `/${pathname}`}`;
+  const dest = request.nextUrl.clone();
+  dest.pathname = destPath;
+
+  if (bot) {
+    dest.pathname = pathname === "/" ? "/cs" : `/cs${pathname.startsWith("/") ? pathname : `/${pathname}`}`;
+    const redirect = NextResponse.redirect(dest, 308);
+    copyResponseCookies(response, redirect);
+    return wrapWithSecurityHeaders(redirect, pathname);
+  }
+
+  const redirect = NextResponse.redirect(dest, 302);
+  copyResponseCookies(response, redirect);
+  redirect.cookies.set(LOCALE_COOKIE, normalizeLocale(target), LOCALE_COOKIE_OPTS);
+  return wrapWithSecurityHeaders(redirect, pathname);
 }
 
 export const config = {

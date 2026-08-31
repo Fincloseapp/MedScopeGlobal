@@ -17,7 +17,16 @@ export function organizationJsonLd() {
         "@type": "ContactPoint",
         email: SITE.supportEmail,
         contactType: "customer support",
-        availableLanguage: ["Czech", "English", "German", "Polish", "Slovak"],
+        availableLanguage: [
+          "Czech",
+          "Slovak",
+          "Polish",
+          "English",
+          "German",
+          "French",
+          "Spanish",
+          "Italian",
+        ],
       },
     ],
   };
@@ -38,7 +47,7 @@ export function publicationJsonLd() {
       url: SITE.url,
     },
     publishingPrinciples: `${SITE.url}/info`,
-    inLanguage: ["en", "cs", "de", "fr", "es", "pl", "sk"],
+    inLanguage: ["en", "cs", "de", "fr", "es", "it", "pl", "sk", "ru", "zh-CN", "ja", "ko"],
   };
 }
 
@@ -179,6 +188,7 @@ export function medicalWebPageJsonLd(page: {
   description: string;
   path: string;
   dateModified?: string;
+  inLanguage?: string;
 }) {
   return {
     "@context": "https://schema.org",
@@ -186,7 +196,7 @@ export function medicalWebPageJsonLd(page: {
     name: page.title,
     description: page.description,
     url: `${SITE.url}${page.path}`,
-    inLanguage: "cs-CZ",
+    inLanguage: page.inLanguage ?? "cs-CZ",
     isPartOf: webSiteJsonLd(),
     dateModified: page.dateModified,
     publisher: organizationJsonLd(),
@@ -205,7 +215,21 @@ export function webSiteJsonLd() {
     alternateName: MAGAZINE.name,
     url: SITE.url,
     description: SITE.description,
-    inLanguage: ["cs-CZ", "en-US"],
+    inLanguage: [
+      "cs-CZ",
+      "sk-SK",
+      "pl-PL",
+      "de-DE",
+      "fr-FR",
+      "it-IT",
+      "es-ES",
+      "en",
+      "en-US",
+      "ru-RU",
+      "zh-CN",
+      "ja-JP",
+      "ko-KR",
+    ],
     about: publicationJsonLd(),
     potentialAction: {
       "@type": "SearchAction",

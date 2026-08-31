@@ -4,13 +4,13 @@ import type { DisplayArticle } from "@/lib/queries/articles";
 import { APP_PRODUCTS } from "@/lib/apps/catalog";
 import { V271_AUDIENCES, V271_SOCIAL_PROOF_STATS } from "@/lib/v271/homepage";
 import {
+  getPortalChrome,
   getPortalNewsNote,
-  PORTAL_NEWS_TABS,
   PORTAL_PHILOSOPHY,
   PORTAL_SERVICES,
 } from "@/lib/v271/portal";
 import type { getMagazineCopy } from "@/lib/brand/magazine";
-import { NEWS_DESKS, splitNewsDesks, type NewsDeskId } from "@/lib/v271/news-desks";
+import { NEWS_DESKS, newsDesksForLocale, splitNewsDesks, type NewsDeskId } from "@/lib/v271/news-desks";
 import { NewsArticleThumb, NewsDeskFallback, NewsHeadlineRow } from "@/components/articles/news-article-card";
 import { VitascopeMark } from "@/components/articles/vitascope-mark";
 import { PortalSearch } from "@/components/v271/portal-search";
@@ -43,10 +43,12 @@ function ServiceGlyph({ icon }: { icon?: string }) {
 function Box({
   title,
   href,
+  moreLabel,
   children,
 }: {
   title: string;
   href?: string;
+  moreLabel: string;
   children: React.ReactNode;
 }) {
   return (
@@ -55,7 +57,7 @@ function Box({
         <h2 className="text-sm font-bold text-[#021d33]">{title}</h2>
         {href ? (
           <Link href={href} className="text-xs font-medium text-[#005B96] hover:underline">
-            více
+            {moreLabel}
           </Link>
         ) : null}
       </header>
@@ -68,12 +70,14 @@ function DeskColumn({
   desk,
   articles,
   featured,
+  desks,
 }: {
   desk: NewsDeskId;
   articles: DisplayArticle[];
   featured?: boolean;
+  desks: typeof NEWS_DESKS;
 }) {
-  const def = NEWS_DESKS.find((item) => item.id === desk)!;
+  const def = desks.find((item) => item.id === desk) ?? NEWS_DESKS.find((item) => item.id === desk)!;
   const lead = featured ? articles[0] : null;
   const rows = featured ? articles.slice(1, 4) : articles.slice(0, 4);
   const longevity = desk === "dlouhovekost";
@@ -133,13 +137,21 @@ function DeskColumn({
   );
 }
 
-function PortalNewsFeed({ articles }: { articles: DisplayArticle[] }) {
-  const desks = splitNewsDesks(articles);
+function PortalNewsFeed({
+  articles,
+  chrome,
+  desks,
+}: {
+  articles: DisplayArticle[];
+  chrome: ReturnType<typeof getPortalChrome>;
+  desks: ReturnType<typeof newsDesksForLocale>;
+}) {
+  const split = splitNewsDesks(articles);
 
   return (
     <>
       <div className="mb-3 flex flex-wrap gap-1.5">
-        {PORTAL_NEWS_TABS.map((tab) => (
+        {chrome.newsTabs.map((tab) => (
           <Link
             key={tab.href}
             href={tab.href}
@@ -151,10 +163,10 @@ function PortalNewsFeed({ articles }: { articles: DisplayArticle[] }) {
       </div>
       <p className="mb-3 text-[11px] leading-relaxed text-slate-500">{getPortalNewsNote()}</p>
       <div className="grid gap-5 sm:grid-cols-2">
-        <DeskColumn desk="novinky" articles={desks.novinky} featured />
-        <DeskColumn desk="verejnost" articles={desks.verejnost} featured />
-        <DeskColumn desk="dlouhovekost" articles={desks.dlouhovekost} featured />
-        <DeskColumn desk="clanky" articles={desks.clanky} featured />
+        <DeskColumn desk="novinky" articles={split.novinky} featured desks={desks} />
+        <DeskColumn desk="verejnost" articles={split.verejnost} featured desks={desks} />
+        <DeskColumn desk="dlouhovekost" articles={split.dlouhovekost} featured desks={desks} />
+        <DeskColumn desk="clanky" articles={split.clanky} featured desks={desks} />
       </div>
     </>
   );
@@ -163,11 +175,15 @@ function PortalNewsFeed({ articles }: { articles: DisplayArticle[] }) {
 export function PortalHome({
   articles,
   copy,
+  locale = "cs",
 }: {
   articles: DisplayArticle[];
   copy?: ReturnType<typeof getMagazineCopy>;
+  locale?: string;
 }) {
   const philosophy = copy ?? PORTAL_PHILOSOPHY;
+  const chrome = getPortalChrome(locale);
+  const desks = newsDesksForLocale(locale);
   return (
     <div className="border-b border-slate-200 bg-[#e8eef3]">
       <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5">
@@ -184,11 +200,12 @@ export function PortalHome({
           </div>
         </div>
 
-        <nav aria-label="Služby MedScopeGlobal" className="mt-3 rounded-lg border border-slate-200 bg-white px-2 py-3 shadow-sm sm:px-3">
+        <nav aria-label={chrome.servicesNav} className="mt-3 rounded-lg border border-slate-200 bg-white px-2 py-3 shadow-sm sm:px-3">
           <ul className="grid grid-cols-5 gap-1 sm:grid-cols-10">
             {PORTAL_SERVICES.map((svc) => {
               const openApp = isStandaloneAppHref(svc.href);
               const Item = openApp ? AppOpenLink : Link;
+              const localized = chrome.services.find((item) => item.id === svc.id);
               return (
               <li key={svc.id}>
                 <Item
@@ -208,8 +225,8 @@ export function PortalHome({
                       <ServiceGlyph icon={"icon" in svc ? svc.icon : undefined} />
                     </span>
                   )}
-                  <span className="text-[11px] font-semibold leading-tight text-[#021d33]">{svc.label}</span>
-                  <span className="hidden text-[10px] text-slate-500 sm:block">{svc.hint}</span>
+                  <span className="text-[11px] font-semibold leading-tight text-[#021d33]">{localized?.label ?? svc.label}</span>
+                  <span className="hidden text-[10px] text-slate-500 sm:block">{localized?.hint ?? svc.hint}</span>
                 </Item>
               </li>
               );
@@ -220,7 +237,7 @@ export function PortalHome({
         <WriterAgentsStrip />
 
         <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <Box title="Zpravodajství" href="/articles">
+          <Box title={chrome.news} href="/articles" moreLabel={chrome.more}>
             <div className="mb-3 flex items-center gap-3 rounded-lg border border-slate-100 bg-[#050b1d] px-3 py-2.5">
               <VitascopeMark desk="clanky" size="sm" />
               <div className="min-w-0">
@@ -232,11 +249,11 @@ export function PortalHome({
                 </p>
               </div>
             </div>
-            <PortalNewsFeed articles={articles} />
+            <PortalNewsFeed articles={articles} chrome={chrome} desks={desks} />
           </Box>
 
           <div className="space-y-3">
-            <Box title="Aplikace" href="/aplikace">
+            <Box title={chrome.apps} href="/aplikace" moreLabel={chrome.more}>
               <ul className="space-y-2">
                 {APP_PRODUCTS.map((app) => (
                   <li key={app.id}>
@@ -257,7 +274,7 @@ export function PortalHome({
                         <span className="block text-sm font-semibold text-[#021d33]">{app.shortName}</span>
                         <span className="block truncate text-xs text-slate-500">{app.tagline}</span>
                       </span>
-                      <span className="text-xs font-semibold text-[#005B96]">nová karta</span>
+                      <span className="text-xs font-semibold text-[#005B96]">{chrome.newTab}</span>
                     </AppOpenLink>
                   </li>
                 ))}
@@ -266,11 +283,11 @@ export function PortalHome({
                 href="/predplatne?trial=1"
                 className="mt-3 flex w-full items-center justify-center rounded-md bg-[#005B96] px-3 py-2 text-sm font-semibold text-white hover:bg-[#004a7a]"
               >
-                14 dní zdarma
+                {chrome.trialCta}
               </Link>
             </Box>
 
-            <Box title="Pro koho">
+            <Box title={chrome.forWhom} moreLabel={chrome.more}>
               <ul className="space-y-2">
                 {V271_AUDIENCES.map((aud) => (
                   <li key={aud.id}>
@@ -301,7 +318,7 @@ export function PortalHome({
               </ul>
             </Box>
 
-            <Box title="V číslech">
+            <Box title={chrome.inNumbers} moreLabel={chrome.more}>
               <dl className="grid grid-cols-2 gap-2">
                 {V271_SOCIAL_PROOF_STATS.map((stat) => (
                   <div key={stat.label} className="rounded-md bg-slate-50 px-2 py-2">

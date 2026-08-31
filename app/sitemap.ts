@@ -74,7 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const storyUrls: MetadataRoute.Sitemap =
       articles?.map((article) => ({
-        url: `${base}/article/${publicArticleSlug(article.slug as string)}`,
+        url: `${base}/cs/article/${publicArticleSlug(article.slug as string)}`,
         lastModified: article.published_at
           ? new Date(article.published_at as string)
           : new Date(),

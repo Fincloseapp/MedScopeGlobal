@@ -71,5 +71,8 @@
     "unavailable": "Beiträge sind derzeit nicht verfügbar.",
     "tip": "Unterstützen Sie die Redaktion mit einem Beitrag",
     "exploreVip": "oder VIP-Longevity-Protokolle erkunden"
+  },
+  "alerts": {
+    "translatedArticle": "Dieser Artikel wurde automatisch in die gewählte Sprache übersetzt."
   }
 }

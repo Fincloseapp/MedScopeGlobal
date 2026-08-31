@@ -11,9 +11,10 @@ import { medicalWebPageJsonLd, webSiteJsonLd, softwareApplicationJsonLd } from "
 import { APP_PRODUCTS, appSeoDescription } from "@/lib/apps/catalog";
 import { buildGlobalHreflang } from "@/lib/ecosystem/seo";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { localeToPathSegment } from "@/lib/i18n/locale-path";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getHomepageCachedData } from "@/lib/v22/homepage-cache";
-import { getPortalPhilosophy } from "@/lib/v271/portal";
+import { getPortalChrome, getPortalPhilosophy } from "@/lib/v271/portal";
 import {
   getHomepageDescription,
   getHomepageTitle,
@@ -30,11 +31,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const { canonical, languages } = buildGlobalHreflang("/", locale);
   const title = getHomepageTitle(locale);
   const description = getHomepageDescription(locale);
+  const feed = `${SITE.url}/feed-${localeToPathSegment(locale)}.xml`;
 
   return {
     title,
     description,
-    alternates: { canonical, languages },
+    alternates: {
+      canonical,
+      languages,
+      types: { "application/rss+xml": feed },
+    },
     openGraph: {
       title,
       description,
@@ -54,12 +60,14 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const locale = await getServerLocale();
   const philosophy = getPortalPhilosophy(locale);
+  const chrome = getPortalChrome(locale);
   const { articles, topAds, midAds, bottomAds } = await getHomepageCachedData(locale);
 
   const homeLd = medicalWebPageJsonLd({
     title: philosophy.claim,
     description: philosophy.subtitle,
-    path: "/",
+    path: `/${localeToPathSegment(locale)}`,
+    inLanguage: locale === "cs" ? "cs-CZ" : String(locale),
   });
 
   return (
@@ -81,7 +89,7 @@ export default async function HomePage() {
       ))}
 
       {/* Story: ViaLongeVita hero → magazín → apps/VIP → CTA (PortalHome). Pricing lives on /predplatne — not duplicated under the portal. */}
-      <PortalHome articles={articles} copy={philosophy} />
+      <PortalHome articles={articles} copy={philosophy} locale={locale} />
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
       <V272WhyTrustBlock />
       <V272AcademyHomeSections />
@@ -89,8 +97,7 @@ export default async function HomePage() {
 
       <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6">
         <p className="border-t border-slate-200 pt-6 text-sm leading-relaxed text-slate-600">
-          {MAGAZINE.name} na {SITE.name} je vzdělávací magazín zdraví a dlouhověkosti — není přijímací
-          komise ani oficiální učebnice LF. Obsah nenahrazuje individuální lékařskou radu.
+          {chrome.footerLegal}
         </p>
       </section>
     </div>

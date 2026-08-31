@@ -97,12 +97,17 @@ Excerpt: ${input.excerpt ?? ""}
 Content HTML: ${(input.content ?? "").slice(0, 12000)}`;
 
   try {
-    const raw = await generateJsonFromLlm({
-      system: "You are a medical translator. Output valid JSON only. Do not invent clinical facts.",
-      user: body,
-      temperature: 0.2,
-      maxTokens: 4096,
-    });
+    const raw = await Promise.race([
+      generateJsonFromLlm({
+        system: "You are a medical translator. Output valid JSON only. Do not invent clinical facts.",
+        user: body,
+        temperature: 0.2,
+        maxTokens: input.mode === "card" ? 800 : 4096,
+      }),
+      new Promise<null>((resolve) => {
+        setTimeout(() => resolve(null), input.mode === "card" ? 7000 : 14000);
+      }),
+    ]);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as TranslatedFields;
     return {
@@ -180,48 +185,70 @@ export async function resolveArticleTranslation(
     locale?: string | null;
   },
   uiLocale: LocaleCode,
-  mode: "card" | "full"
+  mode: "card" | "full",
+  options?: { live?: boolean }
 ): Promise<TranslatedFields | null> {
   if (matchesArticleLocale(fields.locale, uiLocale)) return null;
 
   const cached = await getCachedTranslation(articleId, uiLocale);
   if (cached) {
-    if (mode === "card") return { title: cached.title, excerpt: cached.excerpt };
-    return cached;
+    if (mode === "card" && cached.title) {
+      return { title: cached.title, excerpt: cached.excerpt };
+    }
+    if (mode === "full" && cached.content) return cached;
+    if (mode === "full" && cached.title && options?.live === false) return cached;
   }
+
+  const payload = {
+    title: fields.title,
+    excerpt: fields.excerpt,
+    content: mode === "full" ? fields.content : undefined,
+  };
 
   let translated: TranslatedFields | null = null;
 
-  // Try Groq LLM first
-  translated = await translateArticleFields({
-    title: fields.title,
-    excerpt: fields.excerpt,
-    content: fields.content,
-    sourceLocale: fields.locale,
-    targetLocale: uiLocale,
-    mode,
-  }).catch(() => null);
+  if (options?.live !== false) {
+    translated = await translateArticleFields({
+      title: fields.title,
+      excerpt: fields.excerpt,
+      content: fields.content,
+      sourceLocale: fields.locale,
+      targetLocale: uiLocale,
+      mode,
+    }).catch(() => null);
 
-  // If Groq not available or returned null, try Google Translate fallback
-  if (!translated && process.env.GOOGLE_TRANSLATE_KEY) {
-    const target = primaryArticleLocale(uiLocale);
-    try {
-      translated = await googleTranslateFields(
-        { title: fields.title, excerpt: fields.excerpt, content: fields.content },
-        target,
-        process.env.GOOGLE_TRANSLATE_KEY
-      );
-    } catch {
-      translated = null;
+    if (!translated && process.env.GOOGLE_TRANSLATE_KEY) {
+      const target = primaryArticleLocale(uiLocale);
+      try {
+        translated = await googleTranslateFields(
+          payload,
+          target,
+          process.env.GOOGLE_TRANSLATE_KEY
+        );
+      } catch {
+        translated = null;
+      }
     }
+  }
+
+  if (!translated) {
+    const { fallbackTranslateFields } = await import("@/lib/i18n/translate-fallback");
+    translated = await fallbackTranslateFields({
+      title: fields.title,
+      excerpt: fields.excerpt,
+      content: fields.content,
+      sourceLocale: fields.locale ?? "cs",
+      targetLocale: uiLocale,
+      mode,
+    }).catch(() => null);
   }
 
   if (translated) {
     await saveCachedTranslation(articleId, uiLocale, {
       ...translated,
-      content: mode === "full" ? translated.content : undefined,
+      content: mode === "full" ? translated.content : cached?.content ?? translated.content,
     }).catch(() => {});
   }
 
-  return translated;
+  return translated ?? cached;
 }

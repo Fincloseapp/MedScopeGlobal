@@ -173,6 +173,10 @@ const nextConfig = {
         source: "/sitemap-:locale.xml",
         destination: "/sitemaps/:locale",
       },
+      {
+        source: "/feed-:locale.xml",
+        destination: "/feed/:locale",
+      },
       ...localeSegments.flatMap((segment) => [
         { source: `/${segment}`, destination: "/" },
         { source: `/${segment}/:path*`, destination: "/:path*" },

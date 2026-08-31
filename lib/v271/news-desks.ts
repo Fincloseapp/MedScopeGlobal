@@ -5,6 +5,8 @@
 import { shouldHideFromPublicListing } from "@/lib/editorial/article-quality-audit";
 import { mixFreshFeed, selectResurfaceCandidates } from "@/lib/editorial/freshness";
 import { resolveWriterAgent } from "@/lib/editorial/writer-agents";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { normalizeLocale } from "@/lib/i18n/config";
 import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rules";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 
@@ -213,4 +215,199 @@ export function filterArticlesForDesk(
   const listable = articles.filter((article) => isListableNewsArticle(article));
   if (!desk || desk === "clanky") return listable;
   return listable.filter((article) => classifyNewsDesk(article) === desk);
+}
+
+type DeskCopy = Pick<NewsDeskDef, "label" | "more" | "kicker" | "blurb">;
+
+const DESK_COPY: Record<string, Record<NewsDeskId, DeskCopy>> = {
+  en: {
+    novinky: {
+      label: "News",
+      more: "All news",
+      kicker: "Now",
+      blurb: "Health news with context — no sensationalism.",
+    },
+    verejnost: {
+      label: "Public health",
+      more: "Articles for everyone",
+      kicker: "Public health",
+      blurb: "Prevention, illness, and lifestyle in plain language.",
+    },
+    dlouhovekost: {
+      label: "Longevity",
+      more: "On this topic",
+      kicker: "Healthspan",
+      blurb: "Sleep, movement, nutrition, biomarkers — evidence vs hype.",
+    },
+    clanky: {
+      label: "Magazine",
+      more: "Open magazine",
+      kicker: "Magazine",
+      blurb: "Editorial reading with photography and independent review.",
+    },
+  },
+  de: {
+    novinky: {
+      label: "News",
+      more: "Alle News",
+      kicker: "Aktuell",
+      blurb: "Gesundheitsmeldungen mit Kontext — ohne Sensationslust.",
+    },
+    verejnost: {
+      label: "Öffentlichkeit",
+      more: "Artikel für alle",
+      kicker: "Public Health",
+      blurb: "Prävention, Krankheiten und Lebensstil verständlich erklärt.",
+    },
+    dlouhovekost: {
+      label: "Langlebigkeit",
+      more: "Zum Thema",
+      kicker: "Healthspan",
+      blurb: "Schlaf, Bewegung, Ernährung, Biomarker — Evidenz statt Hype.",
+    },
+    clanky: {
+      label: "Magazin",
+      more: "Magazin öffnen",
+      kicker: "Magazin",
+      blurb: "Redaktionelle Texte mit Fotos und unabhängiger Prüfung.",
+    },
+  },
+  fr: {
+    novinky: {
+      label: "Actualités",
+      more: "Toutes les actus",
+      kicker: "En ce moment",
+      blurb: "L’actualité santé avec du contexte — sans sensationnalisme.",
+    },
+    verejnost: {
+      label: "Grand public",
+      more: "Articles pour tous",
+      kicker: "Santé publique",
+      blurb: "Prévention, maladies et mode de vie en langage clair.",
+    },
+    dlouhovekost: {
+      label: "Longévité",
+      more: "Sur le sujet",
+      kicker: "Healthspan",
+      blurb: "Sommeil, mouvement, nutrition, biomarqueurs — preuves vs hype.",
+    },
+    clanky: {
+      label: "Magazine",
+      more: "Ouvrir le magazine",
+      kicker: "Magazine",
+      blurb: "Lecture éditoriale avec photos et relecture indépendante.",
+    },
+  },
+  es: {
+    novinky: {
+      label: "Noticias",
+      more: "Todas las noticias",
+      kicker: "Ahora",
+      blurb: "Noticias de salud con contexto — sin sensacionalismo.",
+    },
+    verejnost: {
+      label: "Público",
+      more: "Artículos para todos",
+      kicker: "Salud pública",
+      blurb: "Prevención, enfermedades y estilo de vida en lenguaje claro.",
+    },
+    dlouhovekost: {
+      label: "Longevidad",
+      more: "Sobre el tema",
+      kicker: "Healthspan",
+      blurb: "Sueño, movimiento, nutrición, biomarcadores — evidencia vs hype.",
+    },
+    clanky: {
+      label: "Revista",
+      more: "Abrir revista",
+      kicker: "Revista",
+      blurb: "Lectura editorial con fotos y revisión independiente.",
+    },
+  },
+  it: {
+    novinky: {
+      label: "Notizie",
+      more: "Tutte le notizie",
+      kicker: "Ora",
+      blurb: "Notizie sanitarie con contesto — senza sensazionalismo.",
+    },
+    verejnost: {
+      label: "Pubblico",
+      more: "Articoli per tutti",
+      kicker: "Sanità pubblica",
+      blurb: "Prevenzione, malattie e stile di vita in linguaggio chiaro.",
+    },
+    dlouhovekost: {
+      label: "Longevità",
+      more: "Sul tema",
+      kicker: "Healthspan",
+      blurb: "Sonno, movimento, nutrizione, biomarcatori — evidenze vs hype.",
+    },
+    clanky: {
+      label: "Magazine",
+      more: "Apri il magazine",
+      kicker: "Magazine",
+      blurb: "Lettura editoriale con foto e revisione indipendente.",
+    },
+  },
+  pl: {
+    novinky: {
+      label: "Aktualności",
+      more: "Wszystkie newsy",
+      kicker: "Teraz",
+      blurb: "Wiadomości zdrowotne z kontekstem — bez sensacji.",
+    },
+    verejnost: {
+      label: "Dla wszystkich",
+      more: "Artykuły dla wszystkich",
+      kicker: "Zdrowie publiczne",
+      blurb: "Profilaktyka, choroby i styl życia prostym językiem.",
+    },
+    dlouhovekost: {
+      label: "Długowieczność",
+      more: "W temacie",
+      kicker: "Healthspan",
+      blurb: "Sen, ruch, żywienie, biomarkery — dowody vs hype.",
+    },
+    clanky: {
+      label: "Magazyn",
+      more: "Otwórz magazyn",
+      kicker: "Magazyn",
+      blurb: "Teksty redakcyjne ze zdjęciami i niezależną weryfikacją.",
+    },
+  },
+  sk: {
+    novinky: {
+      label: "Novinky",
+      more: "Všetky novinky",
+      kicker: "Aktuálne",
+      blurb: "Zdravotnícke udalosti s kontextom — bez senzácie.",
+    },
+    verejnost: {
+      label: "Verejnosť",
+      more: "Články pre verejnosť",
+      kicker: "Verejné zdravie",
+      blurb: "Prevencia, choroby a životný štýl zrozumiteľne.",
+    },
+    dlouhovekost: {
+      label: "Dlhovekosť",
+      more: "K téme",
+      kicker: "Healthspan",
+      blurb: "Spánok, pohyb, výživa a biomarkery — dôkaz vs hype.",
+    },
+    clanky: {
+      label: "Články",
+      more: "Otvoriť magazín",
+      kicker: "Magazín",
+      blurb: "Redakčné čítanie s fotografiami a nezávislou kontrolou.",
+    },
+  },
+};
+
+/** Desk chrome in the active UI language (Czech copy stays the source of truth). */
+export function newsDesksForLocale(locale?: string | null): NewsDeskDef[] {
+  const primary = primaryArticleLocale(normalizeLocale(locale));
+  if (primary === "cs") return NEWS_DESKS;
+  const pack = DESK_COPY[primary] ?? DESK_COPY.en;
+  return NEWS_DESKS.map((desk) => ({ ...desk, ...pack[desk.id] }));
 }

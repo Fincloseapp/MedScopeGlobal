@@ -2,6 +2,7 @@
 
 import { SITE } from "@/lib/config/site";
 import { MAGAZINE } from "@/lib/brand/magazine";
+import { publicArticleSlug } from "@/lib/editorial/clinician-anonymize";
 import { GLOBAL_LOCALES, type GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { localeToPathSegment } from "@/lib/i18n/locale-path";
 
@@ -70,12 +71,18 @@ export function articleJsonLdGlobal(article: {
   const localePrefix = article.locale
     ? `/${localeToPathSegment(article.locale)}`
     : "/cs";
+  const slug = publicArticleSlug(article.slug);
+  const inLanguage =
+    GLOBAL_LOCALES.find((item) => item.code === article.locale)?.hreflang ??
+    article.locale ??
+    "cs-CZ";
   return {
     "@context": "https://schema.org",
-    "@type": "MedicalWebPage",
+    "@type": "NewsArticle",
     headline: article.title,
     description: article.excerpt,
-    inLanguage: article.locale ?? "cs",
+    inLanguage,
+    isAccessibleForFree: true,
     author: { "@type": "Person", name: article.authorName ?? SITE.name },
     publisher: {
       "@type": "NewsMediaOrganization",
@@ -83,7 +90,8 @@ export function articleJsonLdGlobal(article: {
       url: SITE.url,
     },
     datePublished: article.publishedAt,
-    mainEntityOfPage: `${SITE.url}${localePrefix}/article/${article.slug}`,
+    mainEntityOfPage: `${SITE.url}${localePrefix}/article/${slug}`,
+    url: `${SITE.url}${localePrefix}/article/${slug}`,
     image: article.coverImage ?? `${SITE.url}/og-default.png`,
     medicalAudience: {
       "@type": "MedicalAudience",

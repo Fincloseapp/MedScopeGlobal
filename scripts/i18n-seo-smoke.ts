@@ -17,7 +17,7 @@ import { normalizeLocale } from "../lib/i18n/config";
 import { getHomepageTitle, getOgLocale } from "../lib/brand/magazine";
 import { buildGlobalHreflang } from "../lib/ecosystem/seo";
 import { buildPageMetadata } from "../lib/seo/metadata";
-import { allLocaleSitemapUrls } from "../lib/seo/locale-sitemap";
+import { allLocaleFeedUrls, allLocaleSitemapUrls, localeArticleUrl } from "../lib/seo/locale-sitemap";
 import { GLOBAL_LOCALES } from "../lib/ecosystem/locales";
 import {
   detectClientLanguage,
@@ -25,6 +25,10 @@ import {
   PREFERRED_LOCALE_KEY,
   setPreferredLocale,
 } from "../lib/i18n/detect-language";
+import { detectLocaleFromAcceptLanguage } from "../lib/i18n/detect-locale";
+import { isSearchEngineBot } from "../lib/i18n/search-bots";
+import { newsDesksForLocale } from "../lib/v271/news-desks";
+import { getPortalChrome } from "../lib/v271/portal";
 
 // --- unit checks (no server required) ---
 assert.equal(localeToPathSegment("en-US"), "en-us");
@@ -105,6 +109,41 @@ const sitemaps = allLocaleSitemapUrls();
 assert.equal(sitemaps.length, GLOBAL_LOCALES.length);
 assert.ok(sitemaps.some((u) => u.endsWith("/sitemap-cs.xml")));
 assert.ok(sitemaps.some((u) => u.endsWith("/sitemap-en-us.xml")));
+assert.ok(sitemaps.some((u) => u.endsWith("/sitemap-de.xml")));
+
+const feeds = allLocaleFeedUrls();
+assert.equal(feeds.length, GLOBAL_LOCALES.length);
+assert.ok(feeds.some((u) => u.endsWith("/feed-de.xml")));
+
+assert.equal(
+  localeArticleUrl("https://medscopeglobal.com", "de", "osteoporoza-po-50"),
+  "https://medscopeglobal.com/de/article/osteoporoza-po-50"
+);
+assert.ok(
+  localeArticleUrl(
+    "https://medscopeglobal.com",
+    "fr",
+    "verejnost-rozhovory-2026-07-03-cesta-zpet-k-zivotu-pribeh-mudr-novaka-po-infarktu"
+  ).includes("pribeh-lekare-po-infarktu")
+);
+
+assert.equal(detectLocaleFromAcceptLanguage("de-DE,de;q=0.9,en;q=0.8"), "de");
+assert.equal(detectLocaleFromAcceptLanguage("fr-FR,fr;q=0.9"), "fr");
+assert.equal(detectLocaleFromAcceptLanguage("en-US,en;q=0.8"), "en-US");
+assert.ok(isSearchEngineBot("Mozilla/5.0 (compatible; Googlebot/2.1)"));
+assert.ok(isSearchEngineBot("SeznamBot/3.0"));
+assert.ok(isSearchEngineBot("YandexBot/3.0"));
+assert.equal(isSearchEngineBot("Mozilla/5.0 (iPhone)"), false);
+assert.ok(isLocaleRoutingExcluded("/feed/de"));
+assert.ok(isLocaleRoutingExcluded("/sitemap-de.xml"));
+assert.ok(isLocaleRoutingExcluded("/api/health"));
+
+const deDesks = newsDesksForLocale("de");
+assert.equal(deDesks.find((d) => d.id === "dlouhovekost")?.label, "Langlebigkeit");
+assert.equal(newsDesksForLocale("cs").find((d) => d.id === "dlouhovekost")?.label, "Dlouhověkost");
+assert.equal(getPortalChrome("de").newsTabs[0]?.label, "News");
+assert.equal(getPortalChrome("fr").trialCta.includes("14"), true);
+assert.ok(getPortalChrome("de").footerLegal.includes("Langlebigkeit"));
 
 console.log("✓ i18n/SEO unit checks passed");
 

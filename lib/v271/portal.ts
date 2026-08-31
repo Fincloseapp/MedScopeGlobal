@@ -1,7 +1,8 @@
 /** Homepage portal IA — ViaLongeVita magazine-first marketing story (hero → news → apps/VIP). */
 
 import { getMagazineCopy, MAGAZINE } from "@/lib/brand/magazine";
-import type { LocaleCode } from "@/lib/i18n/config";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { normalizeLocale, type LocaleCode } from "@/lib/i18n/config";
 
 /** Default Czech hero copy (legacy export — prefer getPortalPhilosophy(locale) on server). */
 export const PORTAL_PHILOSOPHY = {
@@ -76,3 +77,137 @@ export const PORTAL_NEWS_TABS = [
 ] as const;
 
 export { getPortalTodayNote as getPortalNewsNote } from "@/lib/calendar/czech-today";
+
+export type PortalChrome = {
+  news: string;
+  apps: string;
+  forWhom: string;
+  inNumbers: string;
+  more: string;
+  newTab: string;
+  trialCta: string;
+  servicesNav: string;
+  newsTabs: { label: string; href: string }[];
+  services: { id: string; label: string; hint: string }[];
+  footerLegal: string;
+};
+
+const SERVICE_HINTS: Record<string, Record<string, string>> = {
+  en: {
+    articles: MAGAZINE.name,
+    mediflow: "journal",
+    vip: "protocols",
+    medipacient: "records",
+    ordizapis: "notes",
+    academy: "learning",
+    ai: "ask",
+    trial: "free",
+    leky: "SÚKL",
+    mediprep: "legacy",
+  },
+  de: {
+    articles: MAGAZINE.name,
+    mediflow: "Tagebuch",
+    vip: "Protokolle",
+    medipacient: "Berichte",
+    ordizapis: "Notizen",
+    academy: "Bildung",
+    ai: "fragen",
+    trial: "kostenlos",
+    leky: "SÚKL",
+    mediprep: "Legacy",
+  },
+  fr: {
+    articles: MAGAZINE.name,
+    mediflow: "journal",
+    vip: "protocoles",
+    medipacient: "dossiers",
+    ordizapis: "notes",
+    academy: "formation",
+    ai: "demander",
+    trial: "gratuit",
+    leky: "SÚKL",
+    mediprep: "legacy",
+  },
+};
+
+const SERVICE_LABELS: Record<string, Record<string, string>> = {
+  en: { articles: "Articles", trial: "14 days", leky: "Drugs", academy: "Academy", ai: "AI" },
+  de: { articles: "Artikel", trial: "14 Tage", leky: "Arznei", academy: "Academy", ai: "KI" },
+  fr: { articles: "Articles", trial: "14 jours", leky: "Médicaments", academy: "Academy", ai: "IA" },
+};
+
+const NEWS_TAB_LABELS: Record<string, string[]> = {
+  en: ["News", "Public", "Longevity", "Articles"],
+  de: ["News", "Öffentlichkeit", "Langlebigkeit", "Artikel"],
+  fr: ["Actualités", "Grand public", "Longévité", "Articles"],
+  es: ["Noticias", "Público", "Longevidad", "Artículos"],
+  it: ["Notizie", "Pubblico", "Longevità", "Articoli"],
+  pl: ["Aktualności", "Dla wszystkich", "Długowieczność", "Artykuły"],
+  sk: ["Novinky", "Verejnosť", "Dlhovekosť", "Články"],
+};
+
+const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
+  en: {
+    news: "Newsroom",
+    apps: "Apps",
+    forWhom: "Who it's for",
+    inNumbers: "In numbers",
+    more: "more",
+    newTab: "new tab",
+    trialCta: "14 days free",
+    servicesNav: "MedScopeGlobal services",
+    footerLegal: `${MAGAZINE.name} on ${MAGAZINE.platform} is an educational health and longevity magazine — not an admissions board or official medical-school textbook. Content does not replace individual medical advice.`,
+  },
+  de: {
+    news: "Nachrichten",
+    apps: "Apps",
+    forWhom: "Für wen",
+    inNumbers: "In Zahlen",
+    more: "mehr",
+    newTab: "neuer Tab",
+    trialCta: "14 Tage kostenlos",
+    servicesNav: "MedScopeGlobal-Dienste",
+    footerLegal: `${MAGAZINE.name} auf ${MAGAZINE.platform} ist ein Bildungs-Magazin für Gesundheit und Langlebigkeit — keine Zulassungskommission und kein offizielles Lehrbuch. Der Inhalt ersetzt keine individuelle ärztliche Beratung.`,
+  },
+  fr: {
+    news: "Rédaction",
+    apps: "Applis",
+    forWhom: "Pour qui",
+    inNumbers: "En chiffres",
+    more: "plus",
+    newTab: "nouvel onglet",
+    trialCta: "14 jours gratuits",
+    servicesNav: "Services MedScopeGlobal",
+    footerLegal: `${MAGAZINE.name} sur ${MAGAZINE.platform} est un magazine éducatif de santé et de longévité — ce n’est ni un jury d’admission ni un manuel officiel. Le contenu ne remplace pas un avis médical individuel.`,
+  },
+  cs: {
+    news: "Zpravodajství",
+    apps: "Aplikace",
+    forWhom: "Pro koho",
+    inNumbers: "V číslech",
+    more: "více",
+    newTab: "nová karta",
+    trialCta: "14 dní zdarma",
+    servicesNav: "Služby MedScopeGlobal",
+    footerLegal: `${MAGAZINE.name} na ${MAGAZINE.platform} je vzdělávací magazín zdraví a dlouhověkosti — není přijímací komise ani oficiální učebnice LF. Obsah nenahrazuje individuální lékařskou radu.`,
+  },
+};
+
+export function getPortalChrome(locale?: LocaleCode | string): PortalChrome {
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const base = CHROME[primary] ?? CHROME.en ?? CHROME.cs;
+  const tabLabels = NEWS_TAB_LABELS[primary];
+  const newsTabs = PORTAL_NEWS_TABS.map((tab, index) => ({
+    href: tab.href,
+    label: tabLabels?.[index] ?? tab.label,
+  }));
+  const hints = SERVICE_HINTS[primary];
+  const labels = SERVICE_LABELS[primary];
+  const services = PORTAL_SERVICES.map((svc) => ({
+    id: svc.id,
+    label: labels?.[svc.id] ?? svc.label,
+    hint: hints?.[svc.id] ?? svc.hint,
+  }));
+  return { ...base, newsTabs, services };
+}

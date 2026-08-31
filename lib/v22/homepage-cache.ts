@@ -73,7 +73,8 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
   );
   const prepared = await prepareArticlesForDisplay(publicOnly, normalizeLocale(locale), {
     mode: "card",
-    maxTranslate: 16,
+    maxTranslate: 36,
+    maxLive: 4,
   });
   if (prepared.length === 0) {
     return pinLongevityIntoFeed(getDemoMagazineArticles(), 36);
@@ -99,7 +100,7 @@ async function loadHomepageData(locale: string): Promise<{
 export function getHomepageCachedData(locale = "cs") {
   return unstable_cache(
     () => loadHomepageData(locale),
-    ["v22-homepage-public-v10-anon-clinician", locale],
+    ["v22-homepage-public-v11-i18n-mt", locale],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }
