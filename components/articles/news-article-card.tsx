@@ -7,8 +7,6 @@ import { resolveWriterAgent } from "@/lib/editorial/writer-agents";
 import { resolveDisplayCover, resolveTopicFallbackCover } from "@/lib/v271/topic-covers";
 import { classifyNewsDesk, NEWS_DESKS, newsDesksForLocale, type NewsDeskDef, type NewsDeskId } from "@/lib/v271/news-desks";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
-import { primaryArticleLocale } from "@/lib/i18n/article-locale";
-import { normalizeLocale } from "@/lib/i18n/config";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
 
 function coverOf(article: DisplayArticle) {
@@ -44,8 +42,7 @@ function articleHref(slug: string, locale?: string) {
 }
 
 function reviewLine(locale = "cs"): string {
-  const loc = primaryArticleLocale(normalizeLocale(locale));
-  return publicEditorialByline(loc === "cs" ? "cs" : "en");
+  return publicEditorialByline(locale);
 }
 
 export function NewsArticleThumb({
@@ -76,7 +73,7 @@ export function NewsArticleThumb({
 }
 
 export function NewsHeadlineRow({ article, locale = "cs" }: { article: DisplayArticle; locale?: string }) {
-  const date = formatArticleDateLabel(article);
+  const date = formatArticleDateLabel(article, locale);
   return (
     <Link href={articleHref(article.slug, locale)} className="group flex gap-3 py-2.5">
       <NewsArticleThumb article={article} sizes="96px" />
@@ -102,7 +99,7 @@ export function NewsMagazineCard({
   featured?: boolean;
   locale?: string;
 }) {
-  const date = formatArticleDateLabel(article);
+  const date = formatArticleDateLabel(article, locale);
   const { src, fallbackSrc } = coverOf(article);
   const desk = classifyNewsDesk(article);
   const surface = getSurfaceCopy(locale);

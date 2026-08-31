@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Play, Clock } from "lucide-react";
 import { getVideoEditorialLabel } from "@/lib/editorial/video-units";
 import { resolveOsvetaThumb } from "@/lib/verejnost/osveta/resolve-thumb";
+import { formatPublicDate } from "@/lib/i18n/format-date";
 import type { PublicHealthVideoWithTopic } from "@/types/public-osveta";
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -14,9 +15,11 @@ const CATEGORY_LABELS: Record<string, string> = {
 export function PublicHealthVideoCard({
   video,
   featured = false,
+  locale,
 }: {
   video: PublicHealthVideoWithTopic;
   featured?: boolean;
+  locale?: string;
 }) {
   const editorialLabel = getVideoEditorialLabel({
     avatarType: video.avatar_type,
@@ -33,13 +36,11 @@ export function PublicHealthVideoCard({
     slug: video.slug,
   });
   const category = video.topic?.category;
-  const dateLabel = video.published_at
-    ? new Date(video.published_at).toLocaleDateString("cs-CZ", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      })
-    : null;
+  const dateLabel = formatPublicDate(video.published_at, locale, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
   return (
     <Link

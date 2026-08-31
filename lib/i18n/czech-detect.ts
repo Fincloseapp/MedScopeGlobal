@@ -11,6 +11,22 @@ export function looksLikeCzech(text: string | null | undefined): boolean {
   return CS_UNIQUE.test(plain) || CS_WORDS.test(plain);
 }
 
+/** Non-empty text that is safe to show on `targetLocale` (no leftover Czech). */
+export function isUsableTargetText(
+  text: string | null | undefined,
+  targetLocale: string
+): boolean {
+  const plain = String(text ?? "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (plain.length < 2) return false;
+  const target = targetLocale.split("-")[0]?.toLowerCase() ?? "en";
+  if (target === "cs") return true;
+  return !looksLikeCzech(plain);
+}
+
 /** English leftovers that must not appear on the Czech edition. */
 const EN_STOP =
   /\b(the|and|with|from|this|that|study|patients|treatment|clinical|health|article|listen|donate|support the author|editorial)\b/i;

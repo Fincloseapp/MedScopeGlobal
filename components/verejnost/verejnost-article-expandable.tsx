@@ -7,6 +7,7 @@ import { useState } from "react";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { articleTopicLabel, verejnostDateLabel } from "@/lib/verejnost/helpers";
 import { cn } from "@/lib/utils";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export function VerejnostArticleExpandable({
   article,
@@ -16,7 +17,7 @@ export function VerejnostArticleExpandable({
   coverUrl: string;
 }) {
   const [open, setOpen] = useState(false);
-  const dateLabel = verejnostDateLabel(article);
+  const dateLabel = verejnostDateLabel(article, article.displayLocale);
   const topicLabel = articleTopicLabel(article);
   const isInterview = article.public_topic === "rozhovory";
 
@@ -78,7 +79,7 @@ export function VerejnostArticleExpandable({
             <p className="text-sm text-slate-500">Obsah článku bude brzy doplněn.</p>
           )}
           <Link
-            href={`/verejnost/clanky/${article.slug}`}
+            href={localizePublicHref(`/verejnost/clanky/${article.slug}`, article.displayLocale ?? "cs")}
             className="mt-4 inline-block text-sm font-medium text-[#005B96] hover:underline"
           >
             Otevřít celý článek na samostatné stránce →

@@ -29,14 +29,6 @@ async function optionalUserId(): Promise<string | null> {
 }
 
 export async function POST(request: Request) {
-  const secret = getStripeSecretKey();
-  if (!secret) {
-    return NextResponse.json(
-      { error: ARTICLE_TIP_COPY.en.unavailable, enabled: false },
-      { status: 503 }
-    );
-  }
-
   let body: {
     amount: number;
     currency?: string;
@@ -56,11 +48,18 @@ export async function POST(request: Request) {
   }
 
   const locale = body.locale ?? "cs";
-  const tiers = paymentTiersForUser(locale);
-  const currency = (body.currency ?? tiers.currency).toLowerCase();
-  const amount = Math.round(Number(body.amount) || 0);
-
   const copy = ARTICLE_TIP_COPY[tipLocale(locale)];
+  const secret = getStripeSecretKey();
+  if (!secret) {
+    return NextResponse.json(
+      { error: copy.unavailable, enabled: false },
+      { status: 503 }
+    );
+  }
+
+  const tiers = paymentTiersForUser(locale);
+  const currency = tiers.currency.toLowerCase();
+  const amount = Math.round(Number(body.amount) || 0);
 
   if (!amount || amount < tiers.minAmount) {
     const divisor = ZERO_DECIMAL.has(currency) ? 1 : 100;
@@ -110,7 +109,7 @@ export async function POST(request: Request) {
 
     if (!session.url) {
       return NextResponse.json(
-        { error: "Stripe nevrátil platební URL", enabled: true },
+        { error: copy.unavailable, enabled: true },
         { status: 503 }
       );
     }

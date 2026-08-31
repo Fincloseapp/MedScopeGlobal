@@ -1,15 +1,20 @@
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import type { PublicAdCampaign } from "@/lib/queries/verejnost";
 import { topicLabelForSlug } from "@/lib/config/verejnost-topics";
+import { formatPublicDate } from "@/lib/i18n/format-date";
 
-export function verejnostDateLabel(article: Pick<DisplayArticle, "published_at" | "created_at">): string {
+export function verejnostDateLabel(
+  article: Pick<DisplayArticle, "published_at" | "created_at" | "displayLocale">,
+  locale?: string | null
+): string {
   const iso = article.published_at ?? article.created_at;
-  if (!iso) return "";
-  return new Date(iso).toLocaleDateString("cs-CZ", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  return (
+    formatPublicDate(iso, locale ?? article.displayLocale ?? "cs", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }) ?? ""
+  );
 }
 
 export function articleTopicLabel(article: DisplayArticle): string {

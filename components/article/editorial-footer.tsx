@@ -1,6 +1,6 @@
-import { editorialFooterText, type EditorialLocale } from "@/lib/editorial/units";
+import { editorialFooterText } from "@/lib/editorial/units";
 
-export function EditorialFooter({ locale = "cs" }: { locale?: EditorialLocale }) {
+export function EditorialFooter({ locale = "cs" }: { locale?: string }) {
   const text = editorialFooterText(locale);
 
   return (

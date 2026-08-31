@@ -4,26 +4,32 @@ import { V20ArticleCover } from "@/components/v20/article-cover";
 import { enrichArticleMeta } from "@/lib/v20/content-rules";
 import { publicEditorialByline } from "@/lib/editorial/units";
 import type { ArticleWithRelations } from "@/types/database";
+import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
+import { formatPublicDate } from "@/lib/i18n/format-date";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
-export function V20ArticleCard({ article }: { article: ArticleWithRelations }) {
+export function V20ArticleCard({
+  article,
+  locale,
+}: {
+  article: DisplayArticle | ArticleWithRelations;
+  locale?: string;
+}) {
   const cat = article.categories;
-  const authorLabel = publicEditorialByline("cs");
+  const uiLocale =
+    locale ??
+    ("displayLocale" in article && article.displayLocale ? article.displayLocale : "cs");
+  const authorLabel = publicEditorialByline(uiLocale);
   const meta = enrichArticleMeta({
     title: article.title,
     excerpt: article.excerpt,
     categories: cat,
   });
-  const date =
-    article.published_at &&
-    new Date(article.published_at).toLocaleDateString("cs-CZ", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+  const date = formatPublicDate(article.published_at, uiLocale);
 
   return (
     <article className="v20-article-card group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md">
-      <Link href={`/article/${article.slug}`} className="flex flex-1 flex-col">
+      <Link href={localizePublicHref(`/article/${article.slug}`, uiLocale)} className="flex flex-1 flex-col">
         <V20ArticleCover
           title={article.title}
           category={cat?.name}

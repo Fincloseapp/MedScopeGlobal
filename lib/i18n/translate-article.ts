@@ -4,6 +4,7 @@ import {
   matchesArticleLocale,
   primaryArticleLocale,
 } from "@/lib/i18n/article-locale";
+import { isUsableTargetText, looksLikeCzech } from "@/lib/i18n/czech-detect";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
@@ -124,9 +125,11 @@ Content HTML: ${(input.content ?? "").slice(0, 3500)}`;
     ]);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as TranslatedFields;
+    const title = parsed.title?.trim() ? parsed.title.slice(0, 300) : "";
+    if (!title) return null;
     return {
-      title: parsed.title?.slice(0, 300) ?? input.title,
-      excerpt: parsed.excerpt?.slice(0, 500) ?? input.excerpt,
+      title,
+      excerpt: parsed.excerpt?.trim() ? parsed.excerpt.slice(0, 500) : input.excerpt,
       content: parsed.content ?? input.content,
       translation_provider: "groq",
       machine_translated: true,
@@ -190,6 +193,48 @@ async function googleTranslateFields(
   };
 }
 
+function mergeTranslation(
+  cached: TranslatedFields | null | undefined,
+  live: TranslatedFields | null | undefined,
+  target: string,
+  mode: "card" | "full"
+): TranslatedFields | null {
+  const title = isUsableTargetText(live?.title, target)
+    ? live!.title
+    : isUsableTargetText(cached?.title, target)
+      ? cached!.title
+      : (live?.title?.trim() || cached?.title?.trim() || "");
+  if (!title) return null;
+
+  const excerpt = isUsableTargetText(live?.excerpt, target)
+    ? live!.excerpt ?? null
+    : isUsableTargetText(cached?.excerpt, target)
+      ? cached!.excerpt ?? null
+      : live?.excerpt ?? cached?.excerpt ?? null;
+
+  let content =
+    mode === "full"
+      ? isUsableTargetText(live?.content, target)
+        ? live!.content
+        : isUsableTargetText(cached?.content, target)
+          ? cached!.content
+          : live?.content ?? cached?.content
+      : undefined;
+
+  if (mode === "full" && target !== "cs" && looksLikeCzech(content)) {
+    content = excerpt && !looksLikeCzech(excerpt) ? `<p>${excerpt}</p>` : "";
+  }
+
+  return {
+    title,
+    excerpt,
+    content,
+    translation_provider: live?.translation_provider ?? cached?.translation_provider,
+    machine_translated: live?.machine_translated ?? cached?.machine_translated ?? true,
+    reviewed: cached?.reviewed ?? false,
+  };
+}
+
 export async function resolveArticleTranslation(
   articleId: string,
   fields: {
@@ -204,75 +249,101 @@ export async function resolveArticleTranslation(
 ): Promise<TranslatedFields | null> {
   if (matchesArticleLocale(fields.locale, uiLocale)) return null;
 
+  const target = primaryArticleLocale(uiLocale);
   const cached = await getCachedTranslation(articleId, uiLocale);
-  if (cached?.title) {
-    if (mode === "card") {
-      return {
-        title: cached.title,
-        excerpt: cached.excerpt,
-        translation_provider: cached.translation_provider,
-        machine_translated: cached.machine_translated ?? true,
-        reviewed: cached.reviewed,
-      };
-    }
-    if (cached.content) return cached;
-    // Title/excerpt cache is not enough for the article body — keep translating.
-  }
+  const cacheTitleOk = isUsableTargetText(cached?.title, target);
+  const cacheBodyOk =
+    mode === "card" ||
+    isUsableTargetText(cached?.content, target) ||
+    (target === "cs" && Boolean(cached?.content));
 
-  if (options?.live === false && mode === "card") {
+  if (mode === "card" && cacheTitleOk) {
+    return {
+      title: cached!.title,
+      excerpt: cached!.excerpt,
+      translation_provider: cached!.translation_provider,
+      machine_translated: cached!.machine_translated ?? true,
+      reviewed: cached!.reviewed,
+    };
+  }
+  if (mode === "full" && cacheTitleOk && cacheBodyOk) {
     return cached;
   }
 
-  const payload = {
-    title: fields.title,
-    excerpt: fields.excerpt,
-    content: mode === "full" ? fields.content : undefined,
-  };
-
-  let translated: TranslatedFields | null = null;
+  if (options?.live === false && mode === "card") {
+    return cacheTitleOk ? cached : null;
+  }
 
   const { fallbackTranslateFields } = await import("@/lib/i18n/translate-fallback");
-  translated = await fallbackTranslateFields({
-    title: fields.title,
-    excerpt: fields.excerpt,
-    content: fields.content,
-    sourceLocale: fields.locale ?? "cs",
-    targetLocale: uiLocale,
-    mode,
-  }).catch(() => null);
 
-  if (!translated) {
-    translated = await translateArticleFields({
+  // Title first so a full-body timeout can never blank the H1.
+  let live: TranslatedFields | null = null;
+  if (!cacheTitleOk) {
+    live = await fallbackTranslateFields({
       title: fields.title,
       excerpt: fields.excerpt,
       content: fields.content,
-      sourceLocale: fields.locale,
+      sourceLocale: fields.locale ?? "cs",
       targetLocale: uiLocale,
-      mode,
+      mode: "card",
     }).catch(() => null);
   }
 
-  if (!translated && process.env.GOOGLE_TRANSLATE_KEY) {
-    const target = primaryArticleLocale(uiLocale);
+  if (mode === "full" && !cacheBodyOk) {
+    const body = await fallbackTranslateFields({
+      title: fields.title,
+      excerpt: fields.excerpt,
+      content: fields.content,
+      sourceLocale: fields.locale ?? "cs",
+      targetLocale: uiLocale,
+      mode: "full",
+      deadlineMs: 7500,
+      maxBlocks: 12,
+    }).catch(() => null);
+    live = mergeTranslation(live ?? cached, body, target, "full") ?? body ?? live;
+  }
+
+  if (!isUsableTargetText(live?.title ?? cached?.title, target)) {
+    const llm = await translateArticleFields({
+      title: fields.title,
+      excerpt: fields.excerpt,
+      content: mode === "card" ? undefined : fields.content,
+      sourceLocale: fields.locale,
+      targetLocale: uiLocale,
+      mode: "card",
+    }).catch(() => null);
+    if (llm) live = mergeTranslation(live ?? cached, llm, target, mode) ?? llm;
+  }
+
+  if (
+    !isUsableTargetText(live?.title ?? cached?.title, target) &&
+    process.env.GOOGLE_TRANSLATE_KEY
+  ) {
     try {
-      translated = await googleTranslateFields(
-        payload,
+      const google = await googleTranslateFields(
+        {
+          title: fields.title,
+          excerpt: fields.excerpt,
+          content: mode === "full" ? fields.content : undefined,
+        },
         target,
         process.env.GOOGLE_TRANSLATE_KEY
       );
+      live = mergeTranslation(live ?? cached, google, target, mode) ?? google;
     } catch {
-      translated = null;
+      /* ignore */
     }
   }
 
-  if (translated) {
+  const merged = mergeTranslation(cached, live, target, mode);
+  if (merged && isUsableTargetText(merged.title, target)) {
     await saveCachedTranslation(articleId, uiLocale, {
-      ...translated,
-      content: mode === "full" ? translated.content : cached?.content ?? translated.content,
+      ...merged,
+      content: mode === "full" ? merged.content : cached?.content ?? merged.content,
     }).catch(() => {});
   }
 
-  return translated ?? cached;
+  return merged;
 }
 
 /** One Groq call for many listing cards — avoids N sequential LLM timeouts on Workers. */

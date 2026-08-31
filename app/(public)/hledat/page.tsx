@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { Search } from "lucide-react";
 import { getReaderContext } from "@/lib/auth/reader-context";
-import { normalizeLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { formatPublicDate } from "@/lib/i18n/format-date";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 import { createClient } from "@/lib/supabase/server";
 import { mergedArticleSearch } from "@/utils/merged-article-search";
@@ -26,8 +26,7 @@ export default async function HledatPage({
   const sp = await searchParams;
   const query = sanitizeSearchInput(sp.q ?? "");
   const { isVip, accessLevel } = await getReaderContext();
-  const cookieStore = await cookies();
-  const locale = normalizeLocale(cookieStore.get(LOCALE_COOKIE)?.value);
+  const locale = await getServerLocale();
 
   const results =
     query.length >= 2
@@ -108,7 +107,11 @@ export default async function HledatPage({
             )}
             {article.published_at && (
               <p className="mt-3 text-xs text-muted-foreground">
-                {new Date(article.published_at).toLocaleDateString("cs-CZ")}
+                {formatPublicDate(article.published_at, locale, {
+                  year: "numeric",
+                  month: "numeric",
+                  day: "numeric",
+                })}
               </p>
             )}
           </Link>

@@ -4,6 +4,8 @@ import { V20ArticleCard } from "@/components/v20/article-card";
 import { getArchivedArticles } from "@/lib/queries/articles";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { V20_ARCHIVE_CUTOFF } from "@/lib/v20/content-rules";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { formatPublicDate } from "@/lib/i18n/format-date";
 
 export const revalidate = 300;
 
@@ -16,8 +18,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ArticlesArchivePage() {
-  const { articles } = await getArchivedArticles(36);
-  const cutoffLabel = new Date(V20_ARCHIVE_CUTOFF).toLocaleDateString("cs-CZ");
+  const locale = await getServerLocale();
+  const { articles } = await getArchivedArticles(36, 0, locale);
+  const cutoffLabel = formatPublicDate(V20_ARCHIVE_CUTOFF, locale);
 
   return (
     <div className="v20-articles mx-auto max-w-7xl px-4 py-12 sm:px-6">
@@ -41,7 +44,7 @@ export default async function ArticlesArchivePage() {
       {articles.length > 0 ? (
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => (
-            <V20ArticleCard key={article.id} article={article} />
+            <V20ArticleCard key={article.id} article={article} locale={locale} />
           ))}
         </div>
       ) : (

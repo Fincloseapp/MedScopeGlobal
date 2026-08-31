@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { getNewsletterArchive } from "@/lib/queries/v4c/newsletters";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { formatPublicDate } from "@/lib/i18n/format-date";
 
 export const revalidate = 3600;
 
 export default async function NewsletterArchivPage() {
+  const locale = await getServerLocale();
   const issues = await getNewsletterArchive(false);
 
   return (
@@ -27,11 +30,7 @@ export default async function NewsletterArchivPage() {
               >
                 <span className="font-semibold text-[#021d33]">{i.title}</span>
                 <time className="text-slate-500" dateTime={i.issue_date}>
-                  {new Date(i.issue_date).toLocaleDateString("cs-CZ", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  {formatPublicDate(i.issue_date, locale)}
                 </time>
               </Link>
             </li>

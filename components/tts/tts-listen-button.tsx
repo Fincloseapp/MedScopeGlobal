@@ -25,6 +25,7 @@ function ttsChrome(lang?: string | null) {
   const l = (lang ?? "cs").toLowerCase();
   if (l.startsWith("cs")) {
     return {
+      listen: "Poslech",
       stop: "Zastavit",
       playing: "Přehrává se poslechová verze",
       version: (m: number) => `Poslechová verze · ≈ ${m} min`,
@@ -33,6 +34,7 @@ function ttsChrome(lang?: string | null) {
   }
   if (l.startsWith("de")) {
     return {
+      listen: "Anhören",
       stop: "Stopp",
       playing: "Hörfassung wird abgespielt",
       version: (m: number) => `Hörfassung · ≈ ${m} Min.`,
@@ -41,6 +43,7 @@ function ttsChrome(lang?: string | null) {
   }
   if (l.startsWith("fr")) {
     return {
+      listen: "Écouter",
       stop: "Arrêter",
       playing: "Lecture en cours",
       version: (m: number) => `Version audio · ≈ ${m} min`,
@@ -48,6 +51,7 @@ function ttsChrome(lang?: string | null) {
     };
   }
   return {
+    listen: "Listen",
     stop: "Stop",
     playing: "Playing audio version",
     version: (m: number) => `Audio version · ≈ ${m} min`,
@@ -62,7 +66,7 @@ function estimateListenMinutes(text: string): number {
 
 export function TtsListenButton({
   text,
-  label = "Poslech",
+  label,
   className,
   full = true,
   maxChars,
@@ -74,6 +78,7 @@ export function TtsListenButton({
   const [error, setError] = useState<string | null>(null);
   const speechLang = resolveSpeechLang(lang);
   const chrome = ttsChrome(speechLang);
+  const buttonLabel = label ?? chrome.listen;
 
   useEffect(() => {
     // Lock to a single session voice — no multi-voice picker in UI.
@@ -117,7 +122,7 @@ export function TtsListenButton({
           type="button"
           onClick={() => void handlePlay()}
           disabled={loading}
-          aria-label={playing ? chrome.stop : label}
+          aria-label={playing ? chrome.stop : buttonLabel}
           className="inline-flex items-center gap-2 bg-[#005B96] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#004a7a] disabled:opacity-60"
         >
           {loading ? (
@@ -127,7 +132,7 @@ export function TtsListenButton({
           ) : (
             <Headphones className="h-4 w-4" />
           )}
-          {playing ? chrome.stop : label}
+          {playing ? chrome.stop : buttonLabel}
         </button>
         <p className="text-sm text-slate-600">
           {playing ? chrome.playing : chrome.version(minutes)}
@@ -146,7 +151,7 @@ export function TtsListenButton({
         className="rounded-lg border-[#cfe1f3] text-[#005B96] hover:bg-[#e8f4fc]"
         onClick={() => void handlePlay()}
         disabled={loading}
-          aria-label={playing ? chrome.stop : label}
+          aria-label={playing ? chrome.stop : buttonLabel}
       >
         {loading ? (
           <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
@@ -155,7 +160,7 @@ export function TtsListenButton({
         ) : (
           <Headphones className="mr-1.5 h-3.5 w-3.5" />
         )}
-        {playing ? "Zastavit" : label}
+        {playing ? chrome.stop : buttonLabel}
       </Button>
       {error ? <p className="w-full text-xs text-amber-700">{error}</p> : null}
     </div>

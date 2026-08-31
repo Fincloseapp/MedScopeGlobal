@@ -50,16 +50,15 @@ const BY_REGION: Partial<Record<RegionCode, PaymentTiers>> = {
   INDIA: { amounts: [10000, 25000, 49000], currency: "inr", symbol: "₹", minAmount: 100 },
 };
 
-/** Stripe / UI currency from the visitor's locale (and optional region cookie). */
+/**
+ * Stripe / UI currency from the visitor's language edition.
+ * Czech page is always CZK; eurozone editions EUR; en-US USD; en-UK GBP.
+ * Region cookie only fills gaps for generic English — it never overrides /cs or /fr.
+ */
 export function paymentTiersForUser(
   locale: string | null | undefined,
   region?: string | null
 ): PaymentTiers {
-  if (region && region in BY_REGION && BY_REGION[region as RegionCode]) {
-    const regional = BY_REGION[region as RegionCode];
-    if (regional) return regional;
-  }
-
   const normalized = normalizeLocale(locale);
   const exact = BY_LOCALE[normalized];
   if (exact) return exact;
@@ -72,6 +71,11 @@ export function paymentTiersForUser(
   if (listed?.currency === "CZK") return CZK;
   if (listed?.currency === "EUR") return EUR;
   if (listed?.currency === "USD") return USD;
+
+  if (region && region in BY_REGION && BY_REGION[region as RegionCode]) {
+    const regional = BY_REGION[region as RegionCode];
+    if (regional) return regional;
+  }
 
   return USD;
 }

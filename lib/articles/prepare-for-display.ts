@@ -135,12 +135,29 @@ export async function prepareArticleForDisplay(
         translatedFrom: base.locale ?? "en",
       });
     }
+    const lastResort = await fallbackTranslateFields({
+      title: base.title,
+      excerpt: base.excerpt,
+      content: base.content,
+      sourceLocale: base.locale ?? "cs",
+      targetLocale: locale,
+      mode: "card",
+    }).catch(() => null);
+    const rescueTitle =
+      lastResort && !looksLikeCzech(lastResort.title) ? lastResort.title : "";
+    const rescueExcerpt =
+      lastResort && lastResort.excerpt && !looksLikeCzech(lastResort.excerpt)
+        ? lastResort.excerpt
+        : null;
     return attachEditorialDisplay(base, locale, {
-      title: "",
-      excerpt: null,
-      content: "",
+      title: rescueTitle || (looksLikeCzech(base.title) ? rescueExcerpt ?? "" : base.title),
+      excerpt: rescueExcerpt,
+      content: rescueExcerpt ? `<p>${rescueExcerpt}</p>` : "",
       displayLocale: target,
       translatedFrom: base.locale ?? null,
+      translation_provider: lastResort?.translation_provider,
+      machine_translated: Boolean(rescueTitle),
+      reviewed: false,
     });
   }
 
@@ -156,6 +173,7 @@ export async function prepareArticleForDisplay(
     if (looksLikeCzech(content)) {
       content = excerpt && !looksLikeCzech(excerpt) ? `<p>${excerpt}</p>` : "";
     }
+    if (!title.trim() && excerpt && !looksLikeCzech(excerpt)) title = excerpt;
   }
   const merged = {
     ...base,

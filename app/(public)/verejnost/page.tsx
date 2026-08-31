@@ -8,7 +8,7 @@ import { listPublicArticles } from "@/lib/queries/verejnost";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getMarketingCopy } from "@/lib/i18n/marketing-copy";
-import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { formatPublicDateTime } from "@/lib/i18n/format-date";
 
 export const revalidate = 45;
 
@@ -28,20 +28,10 @@ const START_HREFS = ["/verejnost/temata", "/verejnost/clanky", "/ai-asistent/ver
 export default async function VerejnostHubPage() {
   const locale = await getServerLocale();
   const copy = getMarketingCopy(locale).publicHub;
-  const latest = await listPublicArticles({ limit: 6 });
+  const latest = await listPublicArticles({ limit: 6, locale });
   const topics = VEREJNOST_HUB_TOPICS;
-  const dateLocale = locale.startsWith("cs") ? "cs-CZ" : locale.startsWith("de") ? "de-DE" : locale.startsWith("fr") ? "fr-FR" : "en-GB";
-
   const lastUpdate = latest[0]?.published_at ?? latest[0]?.created_at ?? null;
-  const lastUpdateLabel = lastUpdate
-    ? new Date(lastUpdate).toLocaleString(dateLocale, {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : null;
+  const lastUpdateLabel = formatPublicDateTime(lastUpdate, locale);
 
   return (
     <div className="min-h-screen bg-[#f4f8fc]">
@@ -192,7 +182,7 @@ export default async function VerejnostHubPage() {
           {latest.length ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {latest.map((item) => (
-                <VerejnostArticleCard key={item.id} article={item} />
+                <VerejnostArticleCard key={item.id} article={item} locale={locale} />
               ))}
             </div>
           ) : (

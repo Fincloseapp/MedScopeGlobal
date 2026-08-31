@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { EditorialFooter } from "@/components/article/editorial-footer";
 import { OsvetaVideoWithConversion } from "@/components/v38/osveta-video-with-conversion";
 import { getReaderContext } from "@/lib/auth/reader-context";
@@ -10,6 +11,7 @@ import {
   getPublicHealthVideoBySlug,
   listPublicHealthVideos,
 } from "@/lib/verejnost/osveta/db";
+import { formatPublicDate } from "@/lib/i18n/format-date";
 import { PublicHealthVideoCard } from "@/components/verejnost/public-health-video-card";
 
 export const revalidate = 120;
@@ -32,6 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function OsvetaVideoPage({ params }: Props) {
   const { slug } = await params;
+  const locale = await getServerLocale();
   const video = await getPublicHealthVideoBySlug(slug);
   if (!video) notFound();
 
@@ -52,13 +55,7 @@ export default async function OsvetaVideoPage({ params }: Props) {
   const { isVip } = await getReaderContext();
 
   const shareUrl = `https://medscopeglobal.com/verejnost/osveta/${slug}`;
-  const dateLabel = video.published_at
-    ? new Date(video.published_at).toLocaleDateString("cs-CZ", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })
-    : null;
+  const dateLabel = formatPublicDate(video.published_at, locale);
   const minutes = Math.max(1, Math.round(video.duration_seconds / 60));
 
   return (
@@ -107,13 +104,13 @@ export default async function OsvetaVideoPage({ params }: Props) {
             <h2 className="font-display text-xl font-bold text-[#021d33]">Další lekce</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {relatedFiltered.map((v) => (
-                <PublicHealthVideoCard key={v.id} video={v} />
+                <PublicHealthVideoCard key={v.id} video={v} locale={locale} />
               ))}
             </div>
           </section>
         ) : null}
 
-        <EditorialFooter locale="cs" />
+        <EditorialFooter locale={locale} />
 
         <p className="mt-6 text-center text-xs text-slate-400">
           Informace nenahrazují lékařskou péči · medscopeglobal.com

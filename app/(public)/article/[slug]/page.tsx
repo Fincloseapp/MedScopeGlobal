@@ -32,6 +32,7 @@ import {
 } from "@/lib/queries/articles";
 import { getDictionary, t } from "@/lib/i18n/get-dictionary";
 import { getServerLocale } from "@/lib/i18n/server-locale";
+import { formatPublicDate } from "@/lib/i18n/format-date";
 import { ContentRecommendations } from "@/components/recommendations/content-recommendations";
 import { resolveConversionCopy } from "@/lib/v38/conversion-engine";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
@@ -253,12 +254,7 @@ export default async function ArticlePage({ params }: Props) {
       ).jsonLd
     : globalJsonLd;
 
-  const publishedLabel =
-    article.published_at &&
-    new Date(article.published_at).toLocaleDateString(
-      locale === "en" || locale === "en-US" ? "en-GB" : "cs-CZ",
-      { year: "numeric", month: "long", day: "numeric" }
-    );
+  const publishedLabel = formatPublicDate(article.published_at, locale);
 
   return (
     <>

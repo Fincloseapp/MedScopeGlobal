@@ -29,14 +29,6 @@ async function optionalUserId(): Promise<string | null> {
 }
 
 export async function POST(request: Request) {
-  const secret = getStripeSecretKey();
-  if (!secret) {
-    return NextResponse.json(
-      { error: "Stripe není nakonfigurován", enabled: false },
-      { status: 503 }
-    );
-  }
-
   let body: {
     amount: number;
     currency?: string;
@@ -54,9 +46,18 @@ export async function POST(request: Request) {
   const locale = body.locale ?? "cs";
   const tiers = paymentTiersForUser(locale);
   const copy = DONATION_COPY[tipLocale(locale)];
-  const currency = (body.currency ?? tiers.currency).toLowerCase();
+
+  const secret = getStripeSecretKey();
+  if (!secret) {
+    return NextResponse.json(
+      { error: copy.unavailable, enabled: false },
+      { status: 503 }
+    );
+  }
+
+  const currency = tiers.currency.toLowerCase();
   const amount = Math.round(Number(body.amount) || 0);
-  const minAmount = currency === "czk" ? 1500 : ZERO_DECIMAL.has(currency) ? 100 : 50;
+  const minAmount = tiers.minAmount;
 
   if (!amount || amount < minAmount) {
     const divisor = ZERO_DECIMAL.has(currency) ? 1 : 100;
@@ -110,7 +111,7 @@ export async function POST(request: Request) {
 
     if (!session.url) {
       return NextResponse.json(
-        { error: "Stripe nevrátil platební URL", enabled: true },
+        { error: copy.unavailable, enabled: true },
         { status: 503 }
       );
     }

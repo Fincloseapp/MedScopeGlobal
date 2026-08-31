@@ -51,17 +51,23 @@ export async function listPublicArticles(options?: {
 
   const limit = options?.limit ?? 12;
   const offset = options?.offset ?? 0;
-  const locale = options?.locale ?? "cs";
+  const locale: LocaleCode =
+    options?.locale ??
+    (await import("@/lib/i18n/server-locale").then((m) => m.getServerLocale()).catch(() => "cs" as LocaleCode));
   const {
     getDemoMagazineArticles,
   } = await import("@/lib/verejnost/demo-magazine-articles");
 
-  const demoSlice = () => {
+  const demoSlice = async () => {
     let demo = getDemoMagazineArticles();
     if (options?.topic) {
       demo = demo.filter((a) => a.public_topic === options.topic);
     }
-    return demo.slice(offset, offset + limit);
+    const mode = options?.mode ?? "card";
+    return prepareArticlesForDisplay(demo.slice(offset, offset + limit), locale, {
+      mode,
+      maxTranslate: limit,
+    });
   };
 
   const supabase = await createDataClient();
@@ -103,8 +109,11 @@ export async function listPublicArticles(options?: {
 
 export async function getPublicArticleBySlug(
   slug: string,
-  locale: LocaleCode = "cs"
+  locale?: LocaleCode
 ): Promise<DisplayArticle | null> {
+  const uiLocale =
+    locale ??
+    (await import("@/lib/i18n/server-locale").then((m) => m.getServerLocale()).catch(() => "cs" as LocaleCode));
   const { resolveCanonicalArticleSlug } = await import(
     "@/lib/editorial/clinician-anonymize"
   );
@@ -112,9 +121,10 @@ export async function getPublicArticleBySlug(
     "@/lib/verejnost/demo-magazine-articles"
   );
   const dbSlug = resolveCanonicalArticleSlug(slug);
-  const demoHit = () => {
+  const demoHit = async () => {
     const demo = getDemoMagazineArticleBySlug(dbSlug);
-    return demo;
+    if (!demo) return null;
+    return prepareArticleForDisplay(demo, uiLocale, "full");
   };
 
   const supabase = await createDataClient();
@@ -135,7 +145,7 @@ export async function getPublicArticleBySlug(
   const row = data ? (mapArticleList([data as Record<string, unknown>])[0] ?? null) : null;
   if (!row) return demoHit();
   if (shouldHideFromPublicListing(row)) return null;
-  const article = await prepareArticleForDisplay(row, locale, "full");
+  const article = await prepareArticleForDisplay(row, uiLocale, "full");
   const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
   return { ...article, cover_image_url: resolveVerejnostCoverUrl(article) };
 }

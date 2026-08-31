@@ -8,6 +8,7 @@ import {
   MagazineSectionHub,
 } from "@/components/portal/magazine-section-hub";
 import { OSVETA_MAGAZINE_HUB } from "@/lib/portal/magazine-section-hub";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { listPublicArticles } from "@/lib/queries/verejnost";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import {
@@ -35,12 +36,13 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 export default async function OsvetaHubPage() {
+  const locale = await getServerLocale();
   const [today, videos, topics, leaderboard, articles] = await Promise.all([
     getTodayPublicHealthVideo(),
     listPublicHealthVideos({ limit: 20 }),
     listPublicHealthTopics(),
     getPublicOsvetaLeaderboard(5),
-    listPublicArticles({ limit: 3, ensureContent: true, mode: "card" }),
+    listPublicArticles({ limit: 3, ensureContent: true, mode: "card", locale }),
   ]);
 
   const archive = videos.filter((v) => v.id !== today?.id);
@@ -56,7 +58,7 @@ export default async function OsvetaHubPage() {
             title="Dnešní lekce"
             description="Krátká poslechová lekce s textem k čtení a volitelným kvízem — není to VIP obsah ani placený tip."
           />
-          <PublicHealthVideoCard video={today} featured />
+          <PublicHealthVideoCard video={today} featured locale={locale} />
         </section>
       ) : (
         <section id="dnesni-lekce" className="mb-12 scroll-mt-24">
@@ -78,7 +80,7 @@ export default async function OsvetaHubPage() {
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {articles.map((item) => (
-              <VerejnostArticleCard key={item.id} article={item} />
+              <VerejnostArticleCard key={item.id} article={item} locale={locale} />
             ))}
           </div>
         </section>
@@ -107,7 +109,7 @@ export default async function OsvetaHubPage() {
           {archive.length ? (
             <div className="grid gap-4 sm:grid-cols-2">
               {archive.map((v) => (
-                <PublicHealthVideoCard key={v.id} video={v} />
+                <PublicHealthVideoCard key={v.id} video={v} locale={locale} />
               ))}
             </div>
           ) : (

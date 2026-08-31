@@ -6,6 +6,7 @@ import {
   MagazineSectionHub,
 } from "@/components/portal/magazine-section-hub";
 import { ROZHOVORY_MAGAZINE_HUB } from "@/lib/portal/magazine-section-hub";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { listPublicArticles } from "@/lib/queries/verejnost";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
@@ -20,7 +21,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function VerejnostRozhovoryPage() {
-  const interviews = await listPublicArticles({ topic: "rozhovory", limit: 24, ensureContent: true });
+  const locale = await getServerLocale();
+  const interviews = await listPublicArticles({
+    topic: "rozhovory",
+    limit: 24,
+    ensureContent: true,
+    locale,
+  });
 
   return (
     <MagazineSectionHub config={ROZHOVORY_MAGAZINE_HUB}>
@@ -33,7 +40,7 @@ export default async function VerejnostRozhovoryPage() {
         {interviews.length ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {interviews.map((item) => (
-              <VerejnostArticleCard key={item.id} article={item} variant="interview" />
+              <VerejnostArticleCard key={item.id} article={item} variant="interview" locale={locale} />
             ))}
           </div>
         ) : (

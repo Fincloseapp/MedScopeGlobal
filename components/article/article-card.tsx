@@ -7,7 +7,7 @@ import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { publicEditorialByline } from "@/lib/editorial/units";
 import type { ArticleWithRelations } from "@/types/database";
-import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
+import { formatPublicDate } from "@/lib/i18n/format-date";
 
 export function ArticleCard({ article }: { article: DisplayArticle | ArticleWithRelations }) {
   const cat = article.categories;
@@ -16,16 +16,11 @@ export function ArticleCard({ article }: { article: DisplayArticle | ArticleWith
       ? article.displayLocale
       : article.locale ?? "cs";
   const authorLabel = publicEditorialByline(editorialLocale);
-  const date =
-    article.published_at &&
-    new Date(article.published_at).toLocaleDateString(
-      editorialLocale === "cs" || String(editorialLocale).startsWith("cs") ? "cs-CZ" : "en-GB",
-      {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      }
-    );
+  const date = formatPublicDate(article.published_at, editorialLocale, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
   const coverMeta = getArticleCoverLabel(article.title, cat?.name);
   const coverStyles = getArticleCoverStyles(article.title, cat?.name);
   const coverUrl = resolveArticleCoverUrl({

@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminVerejnostPage() {
   const [latest, counts, campaigns] = await Promise.all([
-    listPublicArticles({ limit: 8 }),
+    listPublicArticles({ limit: 8, locale: "cs" }),
     countPublicArticlesByTopic(),
     listPublicAdCampaigns({ activeOnly: false }),
   ]);

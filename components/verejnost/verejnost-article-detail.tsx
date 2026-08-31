@@ -21,7 +21,7 @@ export function VerejnostArticleDetail({
   inlineAds: PublicAdCampaign[];
   sidebarAds: PublicAdCampaign[];
 }) {
-  const dateLabel = verejnostDateLabel(article);
+  const dateLabel = verejnostDateLabel(article, article.displayLocale);
   const topicLabel = articleTopicLabel(article);
   const isInterview = article.public_topic === "rozhovory";
   const coverUrl = resolveVerejnostCoverUrl(article);
@@ -111,7 +111,7 @@ export function VerejnostArticleDetail({
               lékařem. Při akutních potížích vyhledejte odbornou pomoc.
             </p>
 
-            <EditorialFooter locale="cs" />
+            <EditorialFooter locale={article.displayLocale ?? "cs"} />
           </article>
 
           {sidebarAds.length > 0 ? (

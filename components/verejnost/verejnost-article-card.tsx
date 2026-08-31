@@ -3,17 +3,21 @@ import Link from "next/link";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 import { articleTopicLabel, verejnostDateLabel } from "@/lib/verejnost/helpers";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export function VerejnostArticleCard({
   article,
   variant = "default",
+  locale,
 }: {
   article: DisplayArticle;
   variant?: "default" | "compact" | "interview";
+  locale?: string;
 }) {
-  const href = `/verejnost/clanky/${article.slug}`;
+  const uiLocale = locale ?? article.displayLocale ?? "cs";
+  const href = localizePublicHref(`/verejnost/clanky/${article.slug}`, uiLocale);
   const image = resolveVerejnostCoverUrl(article);
-  const dateLabel = verejnostDateLabel(article);
+  const dateLabel = verejnostDateLabel(article, uiLocale);
   const topicLabel = articleTopicLabel(article);
   const isInterview = article.public_topic === "rozhovory";
 

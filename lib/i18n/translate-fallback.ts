@@ -1,5 +1,5 @@
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
-import { looksLikeCzech } from "@/lib/i18n/czech-detect";
+import { isUsableTargetText, looksLikeCzech } from "@/lib/i18n/czech-detect";
 import type { LocaleCode } from "@/lib/i18n/config";
 import type { TranslatedFields } from "@/lib/i18n/translate-article";
 
@@ -162,26 +162,40 @@ export async function fallbackTranslateFields(input: {
   sourceLocale: string | null | undefined;
   targetLocale: LocaleCode;
   mode: "card" | "full";
+  /** Wall-clock budget for body blocks (title+excerpt always run first). */
+  deadlineMs?: number;
+  maxBlocks?: number;
 }): Promise<TranslatedFields | null> {
   const source = mymemoryLang(input.sourceLocale || "cs");
   const target = mymemoryLang(input.targetLocale);
   if (source === target) return null;
 
-  const title = await translatePlain(input.title, source, target);
-  const excerpt = input.excerpt
-    ? await translatePlain(input.excerpt, source, target)
-    : input.excerpt;
+  const targetIsCs = target === "cs" || target === "czech";
+  const [titleRaw, excerptRaw] = await Promise.all([
+    translatePlain(input.title, source, target),
+    input.excerpt ? translatePlain(input.excerpt, source, target) : Promise.resolve(input.excerpt),
+  ]);
+  const title = titleRaw;
+  const excerpt = excerptRaw;
 
   let content = input.content;
   if (input.mode === "full" && input.content) {
+    const deadline = Date.now() + (input.deadlineMs ?? 7500);
     const parts = input.content.split(/(<\/p>|<h[1-6][^>]*>|<\/h[1-6]>)/i);
     const out: string[] = [];
     let translatedBlocks = 0;
-    const maxBlocks = 24;
+    const maxBlocks = input.maxBlocks ?? 12;
     for (const part of parts) {
       const inner = part.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
       const isMarker = /^<\/?(p|h[1-6])\b/i.test(part.trim()) || inner.length < 18;
-      if (isMarker || translatedBlocks >= maxBlocks) {
+      const overBudget = translatedBlocks >= maxBlocks || Date.now() >= deadline;
+      if (isMarker) {
+        out.push(part);
+        continue;
+      }
+      if (overBudget) {
+        // Never leak leftover Czech paragraphs on a non-Czech edition.
+        if (!targetIsCs && looksLikeCzech(part)) continue;
         out.push(part);
         continue;
       }
@@ -190,18 +204,24 @@ export async function fallbackTranslateFields(input: {
       translatedBlocks += 1;
     }
     content = out.join("");
+    if (!targetIsCs && looksLikeCzech(content) && excerpt && !looksLikeCzech(excerpt)) {
+      content = `<p>${excerpt}</p>`;
+    }
   }
 
-  const targetIsCs = target === "cs" || target === "czech";
-  if (!targetIsCs && looksLikeCzech(title) && looksLikeCzech(input.title)) {
-    return null;
+  if (!targetIsCs && !isUsableTargetText(title, target) && looksLikeCzech(input.title)) {
+    if (input.mode === "card") return null;
+    if (!isUsableTargetText(excerpt, target) && looksLikeCzech(content)) return null;
   }
   if (title === input.title && excerpt === input.excerpt && input.mode === "card") {
     return null;
   }
 
+  const outTitle = title.trim() ? title.slice(0, 300) : "";
+  if (!outTitle) return null;
+
   return {
-    title: title.slice(0, 300),
+    title: outTitle,
     excerpt: excerpt?.slice(0, 500) ?? input.excerpt,
     content,
     translation_provider: "mymemory",

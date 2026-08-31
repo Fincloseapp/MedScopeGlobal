@@ -119,7 +119,7 @@ export default async function ArticlesPage({
         </nav>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {medArticles.map((article) => (
-            <V20ArticleCard key={article.slug} article={article} />
+            <V20ArticleCard key={article.slug} article={article} locale={locale} />
           ))}
         </div>
       </div>

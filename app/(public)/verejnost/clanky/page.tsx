@@ -12,6 +12,7 @@ import {
   resolveBackendTopic,
   topicLabelForSlug,
 } from "@/lib/config/verejnost-topics";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { listPublicArticles } from "@/lib/queries/verejnost";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { isListableNewsArticle, isLongevityArticle } from "@/lib/v271/news-desks";
@@ -46,6 +47,7 @@ type Props = { searchParams: Promise<{ topic?: string }> };
 
 export default async function VerejnostClankyPage({ searchParams }: Props) {
   const { topic } = await searchParams;
+  const locale = await getServerLocale();
   const hub = getClankyMagazineHub(topic);
   const longevity = topic === "dlouhovekost";
   const backendTopic = longevity ? null : resolveBackendTopic(topic);
@@ -54,6 +56,7 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
     topic: backendTopic,
     ensureContent: true,
     mode: "full",
+    locale,
   });
 
   const articles = fetched.filter((article) => {

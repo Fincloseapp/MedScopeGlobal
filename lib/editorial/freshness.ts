@@ -1,4 +1,5 @@
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
+import { formatPublicDate } from "@/lib/i18n/format-date";
 
 export type ArticleDateLabel = {
   text: string;
@@ -6,7 +7,8 @@ export type ArticleDateLabel = {
 };
 
 export function formatArticleDateLabel(
-  articleOrIso?: DisplayArticle | string | null
+  articleOrIso?: DisplayArticle | string | null,
+  locale?: string | null
 ): ArticleDateLabel | null {
   const iso =
     typeof articleOrIso === "string"
@@ -15,13 +17,19 @@ export function formatArticleDateLabel(
   if (!iso) return null;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
+  const uiLocale =
+    locale ??
+    (typeof articleOrIso === "object" && articleOrIso
+      ? articleOrIso.displayLocale
+      : null);
   return {
     dateTime: d.toISOString(),
-    text: d.toLocaleDateString("cs-CZ", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }),
+    text:
+      formatPublicDate(d, uiLocale, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }) ?? "",
   };
 }
 

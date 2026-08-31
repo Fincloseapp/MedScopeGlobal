@@ -4,20 +4,25 @@ import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { getCongressEvents } from "@/lib/queries/congresses";
 import { AdPlacement } from "@/components/ads/ad-placement";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { formatPublicDate } from "@/lib/i18n/format-date";
 
 export const metadata: Metadata = {
   title: "Kalendář kongresů",
 };
 
 export default async function KongresyKalendarPage() {
+  const locale = await getServerLocale();
   const events = await getCongressEvents();
   const calAds = await getActiveAdsByPlacement("congress_calendar", 1);
 
   const byMonth = new Map<string, typeof events>();
   for (const ev of events) {
     const key = ev.starts_at
-      ? new Date(ev.starts_at).toLocaleDateString("cs-CZ", { year: "numeric", month: "long" })
-      : "Bez data";
+      ? formatPublicDate(ev.starts_at, locale, { year: "numeric", month: "long" }) ?? "—"
+      : locale === "cs"
+        ? "Bez data"
+        : "No date";
     const list = byMonth.get(key) ?? [];
     list.push(ev);
     byMonth.set(key, list);
