@@ -56,6 +56,7 @@ import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { MAGAZINE, getOgLocale } from "@/lib/brand/magazine";
 import { isArticleTipUiEnabled, ARTICLE_TIP_COPY, tipLocale } from "@/lib/ecosystem/tip-copy";
 import { SITE } from "@/lib/config/site";
+import { getArticleChrome } from "@/lib/i18n/article-chrome";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -254,6 +255,7 @@ export default async function ArticlePage({ params }: Props) {
       ).jsonLd
     : globalJsonLd;
 
+  const chrome = getArticleChrome(locale);
   const publishedLabel = formatPublicDate(article.published_at, locale);
 
   return (
@@ -334,8 +336,9 @@ export default async function ArticlePage({ params }: Props) {
                 <SaveToMediFlowButton
                   articleSlug={article.slug}
                   articleTitle={article.title}
+                  locale={locale}
                 />
-                <ArticleShareButton title={article.title} slug={article.slug} />
+                <ArticleShareButton title={article.title} slug={article.slug} locale={locale} />
               </div>
             </div>
 
@@ -477,7 +480,7 @@ export default async function ArticlePage({ params }: Props) {
           {related && related.length > 0 ? (
             <section className="article-related">
               <h2 className="font-display text-2xl font-semibold text-[#021d33]">
-                Související čtení
+                {chrome.related}
               </h2>
               <div className="mt-6 grid gap-6 md:grid-cols-3">
                 {related.map((a) => (

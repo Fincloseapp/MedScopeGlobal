@@ -4,6 +4,9 @@ import {
   isSpecialAccessArticle,
 } from "@/lib/auth/article-eligibility";
 import { createDataClient } from "@/lib/supabase/data";
+import { getArticleChrome } from "@/lib/i18n/article-chrome";
+import { looksLikeCzech } from "@/lib/i18n/czech-detect";
+import { normalizeLocale } from "@/lib/i18n/config";
 
 type RecArticle = {
   slug: string;
@@ -26,7 +29,8 @@ export async function ContentRecommendations({
   /** Public magazine pages only recommend free magazine pieces (no 404 / gate links). */
   magazineOnly?: boolean;
 }) {
-  const isCs = locale === "cs";
+  const isCs = locale === "cs" || locale.startsWith("cs");
+  const chrome = getArticleChrome(locale);
   const supabase = await createDataClient();
 
   let articles: RecArticle[] = [];
@@ -77,22 +81,43 @@ export async function ContentRecommendations({
     articles = articles.slice(0, 4);
   }
 
+  if (!isCs && articles.length > 0) {
+    const { fallbackTranslateFields } = await import("@/lib/i18n/translate-fallback");
+    const target = normalizeLocale(locale);
+    articles = (
+      await Promise.all(
+        articles.map(async (item) => {
+          if (!looksLikeCzech(item.title)) return item;
+          const hit = await fallbackTranslateFields({
+            title: item.title,
+            excerpt: item.excerpt,
+            sourceLocale: "cs",
+            targetLocale: target,
+            mode: "card",
+          });
+          if (!hit || looksLikeCzech(hit.title)) return null;
+          return { ...item, title: hit.title, excerpt: hit.excerpt ?? item.excerpt };
+        })
+      )
+    ).filter((row): row is RecArticle => Boolean(row));
+  }
+
   if (!articles.length && !studies.length && !diagnoses.length) return null;
 
   return (
     <section
       className="mt-12 space-y-8 rounded-2xl border bg-medical-light/50 p-6 dark:bg-muted/30"
-      aria-label={isCs ? "Doporučený obsah" : "Recommended content"}
+      aria-label={chrome.recommended}
     >
       <h2 className="font-display text-xl font-semibold text-medical-navy dark:text-foreground">
-        {isCs ? "Doporučený obsah" : "Recommended content"}
+        {chrome.recommended}
       </h2>
 
       <div className="grid gap-6 md:grid-cols-3">
         {articles.length > 0 && (
           <div>
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              {isCs ? "Články" : "Articles"}
+              {chrome.articlesLabel}
             </h3>
             <ul className="space-y-2 text-sm">
               {articles.map((a) => (

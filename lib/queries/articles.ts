@@ -421,10 +421,12 @@ export async function getRelatedArticles(
   const { getDemoMagazineArticles } = await import(
     "@/lib/verejnost/demo-magazine-articles"
   );
-  const demoRelated = () =>
-    getDemoMagazineArticles()
+  const demoRelated = async () => {
+    const raw = getDemoMagazineArticles()
       .filter((a) => a.id !== excludeId)
       .slice(0, limit);
+    return prepareArticlesForDisplay(raw, locale, { mode: "card", maxTranslate: limit });
+  };
 
   const supabase = await createDataClient();
   if (!supabase) return demoRelated();

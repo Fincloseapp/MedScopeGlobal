@@ -42,6 +42,7 @@ import { V271_LEKARI_PAGES } from "../lib/v271/routes";
 import { looksLikeCzech } from "../lib/i18n/czech-detect";
 import { paymentTiersForUser } from "../lib/i18n/payment-currency";
 import { formatPublicDate, intlLocaleFor } from "../lib/i18n/format-date";
+import { getArticleChrome } from "../lib/i18n/article-chrome";
 import { tipLocale, ARTICLE_TIP_COPY } from "../lib/ecosystem/tip-copy";
 import { publicEditorialByline } from "../lib/editorial/units";
 
@@ -262,6 +263,11 @@ assert.equal(ARTICLE_TIP_COPY.cs.tipSection, "Příspěvek");
 assert.equal(publicEditorialByline("fr"), "Rédaction MedScopeGlobal");
 assert.equal(publicEditorialByline("cs"), "Redakce MedScopeGlobal");
 assert.ok(!publicEditorialByline("de").includes("Redakce"));
+assert.equal(getArticleChrome("cs").save, "Uložit");
+assert.equal(getArticleChrome("fr").save, "Enregistrer");
+assert.equal(getArticleChrome("de").share, "Teilen");
+assert.ok(!getArticleChrome("fr").related.includes("Související"));
+assert.ok(!getArticleChrome("en").recsTitle.includes("dlouhověkost"));
 
 console.log("✓ i18n/SEO unit checks passed");
 
