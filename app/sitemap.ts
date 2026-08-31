@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { isAcademyCoursesCatalogPromoEnabled } from "@/lib/academy/public-catalog";
 import { LONGEVITY_PROTOCOLS } from "@/lib/ecosystem/longevity-protocols";
 import { createClient } from "@/lib/supabase/server";
 
@@ -88,13 +89,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.55,
       })) ?? [];
 
-    const academyUrls: MetadataRoute.Sitemap =
-      courses?.map((course) => ({
-        url: `${base}/academy/courses/${course.slug}`,
-        lastModified: course.updated_at ? new Date(course.updated_at as string) : new Date(),
-        changeFrequency: "weekly",
-        priority: 0.7,
-      })) ?? [];
+    const academyUrls: MetadataRoute.Sitemap = isAcademyCoursesCatalogPromoEnabled()
+      ? courses?.map((course) => ({
+          url: `${base}/academy/courses/${course.slug}`,
+          lastModified: course.updated_at ? new Date(course.updated_at as string) : new Date(),
+          changeFrequency: "weekly" as const,
+          priority: 0.7,
+        })) ?? []
+      : [];
 
     return [...staticRoutes, ...categoryUrls, ...academyUrls, ...storyUrls];
   } catch (error) {
