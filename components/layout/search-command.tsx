@@ -19,15 +19,19 @@ import { sanitizeSearchInput } from "@/utils/search";
 
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import { APP_PRODUCTS } from "@/lib/apps/catalog";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 
 export function SearchCommand({
   isVip = false,
   accessLevel = "public",
+  locale = "cs",
 }: {
   isVip?: boolean;
   accessLevel?: AccessLevelId;
+  locale?: string;
 }) {
   const router = useRouter();
+  const copy = getSurfaceCopy(locale);
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [results, setResults] = useState<
@@ -65,23 +69,23 @@ export function SearchCommand({
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="hidden gap-2 md:flex">
           <Search className="h-4 w-4" />
-          Hledat
+          {copy.searchTab}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Hledat na MedScopeGlobal</DialogTitle>
+          <DialogTitle>{copy.searchLabel}</DialogTitle>
         </DialogHeader>
         <Input
           autoFocus
-          placeholder="Aplikace, články, témata…"
+          placeholder={copy.headerSearchPlaceholder}
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
         <div className="max-h-72 space-y-2 overflow-auto">
           {q.trim().length < 2 ? (
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#005B96]">Aplikace</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-[#005B96]">{copy.footer.apps}</p>
               {APP_PRODUCTS.map((app) => (
                 <Link
                   key={app.id}
@@ -90,12 +94,12 @@ export function SearchCommand({
                   onClick={() => setOpen(false)}
                 >
                   <p className="font-medium">{app.shortName}</p>
-                  <p className="text-sm text-muted-foreground">{app.tagline}</p>
+                  <p className="text-sm text-muted-foreground">{copy.appTaglines[app.id] ?? app.tagline}</p>
                 </Link>
               ))}
             </div>
           ) : null}
-          {loading && <p className="text-sm text-muted-foreground">Hledám…</p>}
+          {loading && <p className="text-sm text-muted-foreground">{copy.searching}</p>}
           {!loading &&
             results.map((r) => (
               <Link
@@ -113,7 +117,7 @@ export function SearchCommand({
               </Link>
             ))}
           {!loading && q.trim().length >= 2 && results.length === 0 && (
-            <p className="text-sm text-muted-foreground">Nic se nenašlo. Zkuste MeDipacient, MeDiprep nebo OrdiZapis.</p>
+            <p className="text-sm text-muted-foreground">{copy.searchNoResults}</p>
           )}
         </div>
         <Button
@@ -124,7 +128,7 @@ export function SearchCommand({
             setOpen(false);
           }}
         >
-          Otevřít plné hledání
+          {copy.searchOpenFull}
         </Button>
       </DialogContent>
     </Dialog>

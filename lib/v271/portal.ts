@@ -197,13 +197,13 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
 export function getPortalChrome(locale?: LocaleCode | string): PortalChrome {
   const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
   const base = CHROME[primary] ?? CHROME.en ?? CHROME.cs;
-  const tabLabels = NEWS_TAB_LABELS[primary];
+  const tabLabels = NEWS_TAB_LABELS[primary] ?? NEWS_TAB_LABELS.en;
   const newsTabs = PORTAL_NEWS_TABS.map((tab, index) => ({
     href: tab.href,
     label: tabLabels?.[index] ?? tab.label,
   }));
-  const hints = SERVICE_HINTS[primary];
-  const labels = SERVICE_LABELS[primary];
+  const hints = SERVICE_HINTS[primary] ?? SERVICE_HINTS.en ?? SERVICE_HINTS.de;
+  const labels = SERVICE_LABELS[primary] ?? SERVICE_LABELS.en;
   const services = PORTAL_SERVICES.map((svc) => ({
     id: svc.id,
     label: labels?.[svc.id] ?? svc.label,

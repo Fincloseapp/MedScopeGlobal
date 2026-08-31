@@ -27,7 +27,7 @@ export default async function PublicLayout({
         navStripCopy={navStripCopy}
       />
       <main className="flex-1 overflow-x-hidden">{children}</main>
-      <SiteFooter />
+      <SiteFooter locale={locale} />
     </div>
   );
 }

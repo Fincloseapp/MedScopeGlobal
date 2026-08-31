@@ -1,14 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { DisplayArticle } from "@/lib/queries/articles";
-import { APP_PRODUCTS } from "@/lib/apps/catalog";
-import { V271_AUDIENCES, V271_SOCIAL_PROOF_STATS } from "@/lib/v271/homepage";
+import { APP_PRODUCTS, type AppProductId } from "@/lib/apps/catalog";
+import { V271_AUDIENCES } from "@/lib/v271/homepage";
 import {
   getPortalChrome,
   getPortalNewsNote,
   PORTAL_PHILOSOPHY,
   PORTAL_SERVICES,
 } from "@/lib/v271/portal";
+import { getSurfaceCopy, isCzechSurface } from "@/lib/i18n/surface-copy";
 import type { getMagazineCopy } from "@/lib/brand/magazine";
 import { NEWS_DESKS, newsDesksForLocale, splitNewsDesks, type NewsDeskId } from "@/lib/v271/news-desks";
 import { NewsArticleThumb, NewsDeskFallback, NewsHeadlineRow } from "@/components/articles/news-article-card";
@@ -71,11 +72,13 @@ function DeskColumn({
   articles,
   featured,
   desks,
+  locale,
 }: {
   desk: NewsDeskId;
   articles: DisplayArticle[];
   featured?: boolean;
   desks: typeof NEWS_DESKS;
+  locale: string;
 }) {
   const def = desks.find((item) => item.id === desk) ?? NEWS_DESKS.find((item) => item.id === desk)!;
   const lead = featured ? articles[0] : null;
@@ -128,9 +131,11 @@ function DeskColumn({
       ) : null}
       <div className="divide-y divide-slate-100 border-t border-slate-200">
         {rows.length > 0
-          ? rows.map((article) => <NewsHeadlineRow key={article.id} article={article} />)
+          ? rows.map((article) => (
+              <NewsHeadlineRow key={article.id} article={article} locale={locale} />
+            ))
           : !lead
-            ? <NewsDeskFallback desk={desk} />
+            ? <NewsDeskFallback desk={desk} desks={desks} />
             : null}
       </div>
     </div>
@@ -141,10 +146,14 @@ function PortalNewsFeed({
   articles,
   chrome,
   desks,
+  locale,
+  todayNote,
 }: {
   articles: DisplayArticle[];
   chrome: ReturnType<typeof getPortalChrome>;
   desks: ReturnType<typeof newsDesksForLocale>;
+  locale: string;
+  todayNote: string;
 }) {
   const split = splitNewsDesks(articles);
 
@@ -161,12 +170,12 @@ function PortalNewsFeed({
           </Link>
         ))}
       </div>
-      <p className="mb-3 text-[11px] leading-relaxed text-slate-500">{getPortalNewsNote()}</p>
+      <p className="mb-3 text-[11px] leading-relaxed text-slate-500">{todayNote}</p>
       <div className="grid gap-5 sm:grid-cols-2">
-        <DeskColumn desk="novinky" articles={split.novinky} featured desks={desks} />
-        <DeskColumn desk="verejnost" articles={split.verejnost} featured desks={desks} />
-        <DeskColumn desk="dlouhovekost" articles={split.dlouhovekost} featured desks={desks} />
-        <DeskColumn desk="clanky" articles={split.clanky} featured desks={desks} />
+        <DeskColumn desk="novinky" articles={split.novinky} featured desks={desks} locale={locale} />
+        <DeskColumn desk="verejnost" articles={split.verejnost} featured desks={desks} locale={locale} />
+        <DeskColumn desk="dlouhovekost" articles={split.dlouhovekost} featured desks={desks} locale={locale} />
+        <DeskColumn desk="clanky" articles={split.clanky} featured desks={desks} locale={locale} />
       </div>
     </>
   );
@@ -184,6 +193,8 @@ export function PortalHome({
   const philosophy = copy ?? PORTAL_PHILOSOPHY;
   const chrome = getPortalChrome(locale);
   const desks = newsDesksForLocale(locale);
+  const surface = getSurfaceCopy(locale);
+  const todayNote = isCzechSurface(locale) ? getPortalNewsNote() : surface.todayFallback;
   return (
     <div className="border-b border-slate-200 bg-[#e8eef3]">
       <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5">
@@ -196,7 +207,7 @@ export function PortalHome({
           </h1>
           <p className="mt-1 max-w-3xl text-sm text-slate-600">{philosophy.subtitle}</p>
           <div className="mt-4">
-            <PortalSearch />
+            <PortalSearch copy={surface} />
           </div>
         </div>
 
@@ -234,7 +245,7 @@ export function PortalHome({
           </ul>
         </nav>
 
-        <WriterAgentsStrip />
+        <WriterAgentsStrip locale={locale} />
 
         <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
           <Box title={chrome.news} href="/articles" moreLabel={chrome.more}>
@@ -249,7 +260,13 @@ export function PortalHome({
                 </p>
               </div>
             </div>
-            <PortalNewsFeed articles={articles} chrome={chrome} desks={desks} />
+            <PortalNewsFeed
+              articles={articles}
+              chrome={chrome}
+              desks={desks}
+              locale={locale}
+              todayNote={todayNote}
+            />
           </Box>
 
           <div className="space-y-3">
@@ -272,7 +289,9 @@ export function PortalHome({
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block text-sm font-semibold text-[#021d33]">{app.shortName}</span>
-                        <span className="block truncate text-xs text-slate-500">{app.tagline}</span>
+                        <span className="block truncate text-xs text-slate-500">
+                          {surface.appTaglines[app.id as AppProductId] ?? app.tagline}
+                        </span>
                       </span>
                       <span className="text-xs font-semibold text-[#005B96]">{chrome.newTab}</span>
                     </AppOpenLink>
@@ -289,11 +308,17 @@ export function PortalHome({
 
             <Box title={chrome.forWhom} moreLabel={chrome.more}>
               <ul className="space-y-2">
-                {V271_AUDIENCES.map((aud) => (
+                {V271_AUDIENCES.map((aud) => {
+                  const localized = surface.audiences.find((item) => item.id === aud.id);
+                  const label = localized?.label ?? aud.label;
+                  const description = localized?.description ?? aud.description;
+                  const ctaPrimary = localized?.ctaPrimary ?? aud.ctaPrimary.label;
+                  const ctaSecondary = localized?.ctaSecondary ?? aud.ctaSecondary.label;
+                  return (
                   <li key={aud.id}>
                     <Link href={aud.href} className="block rounded-md p-1.5 hover:bg-slate-50">
-                      <span className="text-sm font-semibold text-[#021d33]">{aud.label}</span>
-                      <span className="mt-0.5 block text-xs leading-snug text-slate-500">{aud.description}</span>
+                      <span className="text-sm font-semibold text-[#021d33]">{label}</span>
+                      <span className="mt-0.5 block text-xs leading-snug text-slate-500">{description}</span>
                     </Link>
                     <div className="mt-1 flex flex-wrap gap-1.5 px-1.5">
                       {isStandaloneAppHref(aud.ctaPrimary.href) ? (
@@ -301,26 +326,27 @@ export function PortalHome({
                           href={aud.ctaPrimary.href}
                           className="text-[11px] font-semibold text-[#005B96] hover:underline"
                         >
-                          {aud.ctaPrimary.label}
+                          {ctaPrimary}
                         </AppOpenLink>
                       ) : (
                         <Link href={aud.ctaPrimary.href} className="text-[11px] font-semibold text-[#005B96] hover:underline">
-                          {aud.ctaPrimary.label}
+                          {ctaPrimary}
                         </Link>
                       )}
                       <span className="text-slate-300">·</span>
                       <Link href={aud.ctaSecondary.href} className="text-[11px] text-slate-500 hover:underline">
-                        {aud.ctaSecondary.label}
+                        {ctaSecondary}
                       </Link>
                     </div>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             </Box>
 
             <Box title={chrome.inNumbers} moreLabel={chrome.more}>
               <dl className="grid grid-cols-2 gap-2">
-                {V271_SOCIAL_PROOF_STATS.map((stat) => (
+                {surface.stats.map((stat) => (
                   <div key={stat.label} className="rounded-md bg-slate-50 px-2 py-2">
                     <dt className="font-display text-lg font-bold text-[#005B96]">{stat.value}</dt>
                     <dd className="text-[10px] leading-snug text-slate-500">{stat.label}</dd>

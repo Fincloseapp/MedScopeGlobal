@@ -15,6 +15,7 @@ import { localeToPathSegment } from "@/lib/i18n/locale-path";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getHomepageCachedData } from "@/lib/v22/homepage-cache";
 import { getPortalChrome, getPortalPhilosophy } from "@/lib/v271/portal";
+import { isCzechSurface } from "@/lib/i18n/surface-copy";
 import {
   getHomepageDescription,
   getHomepageTitle,
@@ -91,9 +92,9 @@ export default async function HomePage() {
       {/* Story: ViaLongeVita hero → magazín → apps/VIP → CTA (PortalHome). Pricing lives on /predplatne — not duplicated under the portal. */}
       <PortalHome articles={articles} copy={philosophy} locale={locale} />
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
-      <V272WhyTrustBlock />
-      <V272AcademyHomeSections />
-      <V271B2bBlock />
+      <V272WhyTrustBlock locale={locale} />
+      {isCzechSurface(locale) ? <V272AcademyHomeSections /> : null}
+      <V271B2bBlock locale={locale} />
 
       <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6">
         <p className="border-t border-slate-200 pt-6 text-sm leading-relaxed text-slate-600">

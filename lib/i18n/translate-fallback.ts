@@ -44,13 +44,19 @@ async function workersAiTranslate(text: string, source: string, target: string):
     const { env } = await getCloudflareContext({ async: true });
     const ai = (env as { AI?: { run: (model: string, input: Record<string, string>) => Promise<unknown> } }).AI;
     if (!ai) return null;
-    const result = await ai.run("@cf/meta/m2m100-1.2b", {
-      text: text.slice(0, 1800),
-      source_lang: langName(source),
-      target_lang: langName(target),
-    });
+    const result = await Promise.race([
+      ai.run("@cf/meta/m2m100-1.2b", {
+        text: text.slice(0, 1800),
+        source_lang: langName(source),
+        target_lang: langName(target),
+      }),
+      new Promise<null>((resolve) => {
+        setTimeout(() => resolve(null), 2000);
+      }),
+    ]);
+    if (!result) return null;
     if (typeof result === "string" && result.trim()) return result.trim();
-    if (result && typeof result === "object") {
+    if (typeof result === "object") {
       const rec = result as Record<string, unknown>;
       const out = rec.translated_text ?? rec.translatedText ?? rec.response ?? rec.text;
       if (typeof out === "string" && out.trim()) return out.trim();
@@ -62,7 +68,7 @@ async function workersAiTranslate(text: string, source: string, target: string):
 }
 let mtQueue: Promise<void> = Promise.resolve();
 let mtInFlight = 0;
-const MT_CONCURRENCY = 4;
+const MT_CONCURRENCY = 8;
 
 async function withMtSlot<T>(fn: () => Promise<T>): Promise<T> {
   while (mtInFlight >= MT_CONCURRENCY) {
@@ -140,6 +146,9 @@ async function translatePlain(
   return withMtSlot(async () => {
     const local = await workersAiTranslate(trimmed, source, target);
     if (local && local !== trimmed) return local;
+    if (process.env.MEDSCOPE_RUNTIME === "cloudflare-workers") {
+      return text;
+    }
     const gtx = await gtxTranslate(trimmed, source, target);
     if (gtx && gtx !== trimmed) return gtx;
     const memory = await mymemoryTranslate(trimmed, source, target);

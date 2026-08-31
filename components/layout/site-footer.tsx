@@ -1,26 +1,28 @@
 import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
-import { V271_FOOTER_TAGLINE, V271_FOOTER_TRUST } from "@/lib/v271/homepage";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 
-export async function SiteFooter() {
+export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
+  const copy = getSurfaceCopy(locale);
+  const footer = copy.footer;
   return (
-    <footer className="border-t bg-slate-50" aria-label="Patička webu">
+    <footer className="border-t bg-slate-50" aria-label={footer.aria}>
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-5">
         <div className="sm:col-span-2 lg:col-span-2">
           <MedScopeLogo href="/" preset="footer" />
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{V271_FOOTER_TAGLINE}</p>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{footer.tagline}</p>
           <p className="mt-3 text-xs font-medium uppercase tracking-wider text-[#005B96]">
-            Evidence-based medicína v češtině
+            {footer.evidence}
           </p>
         </div>
 
         <div>
-          <p className="font-medium text-foreground">Důvěra a čísla</p>
+          <p className="font-medium text-foreground">{footer.trustTitle}</p>
           <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#005B96]/90">
-            Pro koho píšeme
+            {footer.forWhom}
           </p>
           <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
-            {V271_FOOTER_TRUST.audiences.map((item) => (
+            {footer.audiences.map((item) => (
               <li key={item.href}>
                 <Link href={item.href} className="hover:text-foreground">
                   {item.label}
@@ -29,10 +31,10 @@ export async function SiteFooter() {
             ))}
           </ul>
           <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#005B96]/90">
-            Čísla a důvěra
+            {footer.numbers}
           </p>
           <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
-            {V271_FOOTER_TRUST.proof.map((item) => (
+            {footer.proof.map((item) => (
               <li key={`${item.href}-${item.label}`}>
                 <Link href={item.href} className="hover:text-foreground">
                   {item.label}
@@ -43,26 +45,26 @@ export async function SiteFooter() {
         </div>
 
         <div>
-          <p className="font-medium text-foreground">Prozkoumat</p>
+          <p className="font-medium text-foreground">{footer.explore}</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li>
               <Link href="/" className="hover:text-foreground">
-                Domů
+                {footer.home}
               </Link>
             </li>
             <li>
               <Link href="/aplikace" className="hover:text-foreground">
-                Aplikace
+                {footer.apps}
               </Link>
             </li>
             <li>
               <Link href="/articles" className="hover:text-foreground">
-                Články · ViaLongeVita
+                {footer.articles}
               </Link>
             </li>
             <li>
               <Link href="/vip/protokoly" className="hover:text-foreground">
-                VIP protokoly
+                {footer.vip}
               </Link>
             </li>
             <li>
@@ -87,88 +89,88 @@ export async function SiteFooter() {
             </li>
             <li>
               <Link href="/verejnost/temata" className="hover:text-foreground">
-                Najdi svůj problém
+                {footer.findProblem}
               </Link>
             </li>
             <li>
               <Link href="/verejnost/clanky" className="hover:text-foreground">
-                Články pro veřejnost
+                {footer.publicArticles}
               </Link>
             </li>
             <li>
               <Link href="/ai-asistent/verejnost" className="hover:text-foreground">
-                Zeptej se AI
+                {footer.askAi}
               </Link>
             </li>
             <li>
               <Link href="/verejnost" className="hover:text-foreground">
-                Veřejnost — přehled
+                {footer.publicOverview}
               </Link>
             </li>
             <li>
               <Link href="/studenti" className="hover:text-foreground">
-                Studenti
+                {footer.students}
               </Link>
             </li>
             <li>
               <Link href="/studie" className="hover:text-foreground">
-                Studie
+                {footer.studies}
               </Link>
             </li>
             <li>
               <Link href="/odborna" className="hover:text-foreground">
-                Odborníci (ČLK)
+                {footer.experts}
               </Link>
             </li>
             <li>
               <Link href="/predplatne" className="hover:text-foreground">
-                Předplatné
+                {footer.subscribe}
               </Link>
             </li>
           </ul>
         </div>
 
         <div>
-          <p className="font-medium text-foreground">Právní a kontakt</p>
+          <p className="font-medium text-foreground">{footer.legal}</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li>
               <Link href="/privacy" className="hover:text-foreground">
-                Ochrana soukromí
+                {footer.privacy}
               </Link>
             </li>
             <li>
               <Link href="/terms" className="hover:text-foreground">
-                Podmínky
+                {footer.terms}
               </Link>
             </li>
             <li>
               <Link href="/cookies" className="hover:text-foreground">
-                Cookies
+                {footer.cookies}
               </Link>
             </li>
             <li>
               <Link href="/znacka" className="hover:text-foreground">
-                Značka a IP
+                {footer.brand}
               </Link>
             </li>
             <li>
               <Link href="/pravni-checklist" className="hover:text-foreground">
-                Právní checklist
+                {footer.legalChecklist}
               </Link>
             </li>
             <li>
               <Link href="/kontakt" className="hover:text-foreground">
-                Kontakt
+                {footer.contact}
               </Link>
             </li>
             <li>
               <Link href="/o-nas" className="hover:text-foreground">
-                O nás
+                {footer.about}
               </Link>
             </li>
             <li>
               <Link href="/subscribe" className="hover:text-foreground">
-                Registrace
+                {footer.register}
               </Link>
             </li>
           </ul>
@@ -177,8 +179,7 @@ export async function SiteFooter() {
 
       <div className="border-t py-6 text-center text-xs text-muted-foreground">
         © {new Date().getFullYear()} MedScopeGlobal · Al Synaptica Research Institute s.r.o., IČO
-        06024963 — obsah pro vzdělávání, nenahrazuje lékařskou radu. Nezávislá značka; není
-        afilována s Medscape / WebMD.
+        06024963 — {footer.copyright}
       </div>
     </footer>
   );

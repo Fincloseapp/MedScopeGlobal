@@ -5,7 +5,7 @@ import {
   primaryArticleLocale,
 } from "@/lib/i18n/article-locale";
 import type { LocaleCode } from "@/lib/i18n/config";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 export interface TranslatedFields {
   title: string;
@@ -20,27 +20,40 @@ export async function getCachedTranslation(
   articleId: string,
   targetLocale: LocaleCode
 ): Promise<TranslatedFields | null> {
-  const target = primaryArticleLocale(targetLocale);
-  const admin = createServiceRoleClient();
-  const { data, error } = await admin
-    .from("article_translations")
-    .select("title, excerpt, content, translation_provider, machine_translated, reviewed")
-    .eq("article_id", articleId)
-    .eq("locale", target)
-    .maybeSingle();
+  const map = await getCachedTranslations([articleId], targetLocale);
+  return map.get(articleId) ?? null;
+}
 
-  if (error?.code === "PGRST205" || error?.message?.includes("article_translations")) {
-    return null;
+export async function getCachedTranslations(
+  articleIds: string[],
+  targetLocale: LocaleCode
+): Promise<Map<string, TranslatedFields>> {
+  const out = new Map<string, TranslatedFields>();
+  if (articleIds.length === 0) return out;
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return out;
+  const target = primaryArticleLocale(targetLocale);
+  try {
+    const { data, error } = await admin
+      .from("article_translations")
+      .select("article_id, title, excerpt, content, translation_provider, machine_translated, reviewed")
+      .in("article_id", articleIds)
+      .eq("locale", target);
+    if (error || !data) return out;
+    for (const row of data) {
+      out.set(row.article_id as string, {
+        title: row.title as string,
+        excerpt: (row.excerpt as string | null) ?? null,
+        content: (row.content as string | undefined) ?? undefined,
+        translation_provider: (row.translation_provider as string | null) ?? undefined,
+        machine_translated: (row.machine_translated as boolean | null) ?? undefined,
+        reviewed: (row.reviewed as boolean | null) ?? undefined,
+      });
+    }
+  } catch {
+    return out;
   }
-  if (!data) return null;
-  return {
-    title: data.title as string,
-    excerpt: (data.excerpt as string | null) ?? null,
-    content: data.content as string | undefined,
-    translation_provider: (data.translation_provider as string | null) ?? undefined,
-    machine_translated: (data.machine_translated as boolean | null) ?? undefined,
-    reviewed: (data.reviewed as boolean | null) ?? undefined,
-  };
+  return out;
 }
 
 export async function saveCachedTranslation(
@@ -49,7 +62,8 @@ export async function saveCachedTranslation(
   fields: TranslatedFields
 ) {
   const target = primaryArticleLocale(targetLocale);
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return;
   try {
     await admin.from("article_translations").upsert(
       {

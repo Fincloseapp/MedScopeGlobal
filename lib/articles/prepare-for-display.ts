@@ -6,7 +6,7 @@ import {
 } from "@/lib/i18n/article-locale";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { mapPool } from "@/lib/i18n/map-pool";
-import { resolveArticleTranslation, saveCachedTranslation, translateCardsBatch } from "@/lib/i18n/translate-article";
+import { getCachedTranslations, resolveArticleTranslation, saveCachedTranslation } from "@/lib/i18n/translate-article";
 import { fallbackTranslateFields } from "@/lib/i18n/translate-fallback";
 import type { ArticleWithRelations } from "@/types/database";
 import { dedupeArticlesByTitle } from "@/lib/articles/dedupe";
@@ -195,26 +195,35 @@ export async function prepareArticlesForDisplay(
     return { article, kind: "translate" as const };
   });
 
-  const firstPass = await mapPool(plan, 8, async (item) => {
+  const translateIds = plan
+    .filter((item) => item.kind === "translate")
+    .map((item) => item.article.id);
+  const cachedMap = await getCachedTranslations(translateIds, locale);
+
+  const firstPass = await mapPool(plan, 10, async (item) => {
     if (item.kind === "native") {
       return prepareArticleForDisplay(item.article, locale, mode, { live: false });
     }
     if (item.kind === "passthrough") {
-      const withCat = await applyCategoryLabels(item.article, locale);
-      if (locale === "cs") {
-        const polished = polishCzechFields(withCat, "cs");
-        return attachEditorialDisplay(withCat, locale, {
-          title: polished.title,
-          excerpt: polished.excerpt,
-          content: polished.content,
-          displayLocale: targetLocaleOrUndefined(withCat.locale),
-        });
-      }
-      return attachEditorialDisplay(withCat, locale, {
+      return attachEditorialDisplay(item.article, locale, {
         displayLocale: primaryArticleLocale(locale),
       });
     }
-    return prepareArticleForDisplay(item.article, locale, mode, { live: false });
+    const cached = cachedMap.get(item.article.id);
+    if (cached?.title) {
+      return attachEditorialDisplay(item.article, locale, {
+        title: cached.title,
+        excerpt: cached.excerpt ?? item.article.excerpt,
+        displayLocale: primaryArticleLocale(locale),
+        translatedFrom: item.article.locale ?? null,
+        translation_provider: cached.translation_provider,
+        machine_translated: true,
+        reviewed: cached.reviewed,
+      });
+    }
+    return attachEditorialDisplay(item.article, locale, {
+      displayLocale: primaryArticleLocale(locale),
+    });
   });
 
   const missIndexes: number[] = [];
@@ -234,8 +243,7 @@ export async function prepareArticlesForDisplay(
     return firstPass;
   }
 
-  const stillMissing = missIndexes;
-  const filled = await mapPool(stillMissing, 2, async (index) => {
+  const fill = mapPool(missIndexes, 8, async (index) => {
     const article = plan[index]!.article;
     const hit = await fallbackTranslateFields({
       title: article.title,
@@ -248,7 +256,7 @@ export async function prepareArticlesForDisplay(
     if (!hit) {
       return { index, display: firstPass[index]! };
     }
-    await saveCachedTranslation(article.id, locale, hit).catch(() => {});
+    void saveCachedTranslation(article.id, locale, hit);
     return {
       index,
       display: attachEditorialDisplay(firstPass[index]!, locale, {
@@ -262,39 +270,17 @@ export async function prepareArticlesForDisplay(
       }),
     };
   });
-  for (const row of filled) {
-    firstPass[row.index] = row.display;
-  }
 
-  const groqMisses = stillMissing.filter(
-    (index) => !firstPass[index]?.machine_translated
-  );
-  if (groqMisses.length > 0) {
-    const batched = await translateCardsBatch(
-      groqMisses.map((index) => {
-        const article = plan[index]!.article;
-        return {
-          id: article.id,
-          title: article.title,
-          excerpt: article.excerpt,
-          locale: article.locale,
-        };
-      }),
-      locale
-    );
-    for (const index of groqMisses) {
-      const article = plan[index]!.article;
-      const hit = batched.get(article.id);
-      if (!hit) continue;
-      firstPass[index] = attachEditorialDisplay(firstPass[index]!, locale, {
-        title: hit.title,
-        excerpt: hit.excerpt ?? firstPass[index]!.excerpt,
-        displayLocale: primaryArticleLocale(locale),
-        translatedFrom: article.locale ?? null,
-        translation_provider: hit.translation_provider,
-        machine_translated: true,
-        reviewed: hit.reviewed,
-      });
+  const filled = await Promise.race([
+    fill,
+    new Promise<null>((resolve) => {
+      setTimeout(() => resolve(null), 4500);
+    }),
+  ]);
+
+  if (filled) {
+    for (const row of filled) {
+      firstPass[row.index] = row.display;
     }
   }
   return firstPass;

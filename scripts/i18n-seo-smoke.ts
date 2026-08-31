@@ -29,6 +29,7 @@ import { detectLocaleFromAcceptLanguage } from "../lib/i18n/detect-locale";
 import { isSearchEngineBot } from "../lib/i18n/search-bots";
 import { newsDesksForLocale } from "../lib/v271/news-desks";
 import { getPortalChrome } from "../lib/v271/portal";
+import { getSurfaceCopy, isCzechSurface } from "../lib/i18n/surface-copy";
 
 // --- unit checks (no server required) ---
 assert.equal(localeToPathSegment("en-US"), "en-us");
@@ -144,6 +145,25 @@ assert.equal(newsDesksForLocale("cs").find((d) => d.id === "dlouhovekost")?.labe
 assert.equal(getPortalChrome("de").newsTabs[0]?.label, "News");
 assert.equal(getPortalChrome("fr").trialCta.includes("14"), true);
 assert.ok(getPortalChrome("de").footerLegal.includes("Langlebigkeit"));
+assert.equal(getPortalChrome("sk").forWhom, "Who it's for");
+assert.equal(getPortalChrome("ru").trialCta, "14 days free");
+assert.equal(getPortalChrome("ja").news, "Newsroom");
+
+assert.equal(getSurfaceCopy("cs").searchTab, "Hledat");
+assert.equal(getSurfaceCopy("de").searchTab, "Suchen");
+assert.equal(getSurfaceCopy("fr").searchTab, "Rechercher");
+assert.equal(getSurfaceCopy("en-US").searchTab, "Search");
+assert.equal(getSurfaceCopy("ru").searchTab, "Search");
+assert.equal(getSurfaceCopy("ja").searchTab, "Search");
+assert.equal(getSurfaceCopy("sk").writersTitle, "Editorial desks");
+assert.equal(getSurfaceCopy("pl").why[0]?.title.includes("Magazine"), true);
+assert.equal(isCzechSurface("cs"), true);
+assert.equal(isCzechSurface("de"), false);
+assert.ok(!getSurfaceCopy("de").footer.tagline.includes("v češtině"));
+assert.ok(!getSurfaceCopy("fr").footer.evidence.includes("češtině"));
+assert.equal(getSurfaceCopy("de").appTaglines.ordizapis.includes("OrdiZapis"), true);
+assert.equal(newsDesksForLocale("ru")[0]?.label, "News");
+assert.equal(newsDesksForLocale("ja").find((d) => d.id === "dlouhovekost")?.label, "Longevity");
 
 console.log("✓ i18n/SEO unit checks passed");
 

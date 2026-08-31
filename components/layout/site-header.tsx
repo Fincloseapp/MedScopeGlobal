@@ -55,7 +55,7 @@ export function SiteHeader({
           <div className="flex shrink-0 items-center gap-1 border-l border-black/[0.06] pl-2 dark:border-white/10 lg:gap-1.5 lg:pl-3">
             <LocaleSwitcher currentLocale={locale} compact />
             {!isVip ? <NavSubscribeCta compact className="hidden lg:inline-flex" /> : null}
-            <SearchCommand isVip={isVip} accessLevel={accessLevel} />
+            <SearchCommand isVip={isVip} accessLevel={accessLevel} locale={locale} />
             <ThemeToggle />
             {user ? <NotificationBell /> : null}
             <UserMenu user={user} profile={profile} />

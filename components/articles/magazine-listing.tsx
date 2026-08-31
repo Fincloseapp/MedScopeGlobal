@@ -146,7 +146,7 @@ export function MagazineListing({
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
             {copy.featured}
           </p>
-          <NewsMagazineCard article={featured} featured />
+          <NewsMagazineCard article={featured} featured locale={locale} />
         </div>
       ) : (
         <p className="mt-8 text-sm text-slate-500">{copy.empty}</p>
@@ -159,7 +159,7 @@ export function MagazineListing({
           </p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {rest.map((article) => (
-              <NewsMagazineCard key={article.id} article={article} />
+              <NewsMagazineCard key={article.id} article={article} locale={locale} />
             ))}
           </div>
         </div>
