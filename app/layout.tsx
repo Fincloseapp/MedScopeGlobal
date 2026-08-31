@@ -103,7 +103,7 @@ export default async function RootLayout({
         <JsonLdScript data={organizationJsonLd(locale)} />
         <JsonLdScript data={publicationJsonLd()} />
         <JsonLdScript data={newsletterJsonLd()} />
-        <Providers>{children}</Providers>
+        <Providers locale={locale}>{children}</Providers>
       </body>
     </html>
   );

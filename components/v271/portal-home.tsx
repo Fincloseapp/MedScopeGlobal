@@ -20,6 +20,7 @@ import { AppOpenLink, isStandaloneAppHref } from "@/components/apps/app-origin-b
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { VITASCOPE, VITASCOPE_DESK_LOGO } from "@/lib/brand/vitascope";
 import { BookOpen, Gift, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
+import { buildLocalePath } from "@/lib/i18n/locale-path";
 
 function ServiceGlyph({ icon }: { icon?: string }) {
   const cls = "h-5 w-5";
@@ -116,7 +117,7 @@ function DeskColumn({
         </Link>
       </div>
       {lead ? (
-        <Link href={`/article/${lead.slug}`} className="group mb-2 block">
+        <Link href={buildLocalePath(locale, `/article/${lead.slug}`)} className="group mb-2 block">
           <NewsArticleThumb article={lead} large sizes="(max-width: 768px) 100vw, 40vw" />
           <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#005B96]">
             {def.kicker}

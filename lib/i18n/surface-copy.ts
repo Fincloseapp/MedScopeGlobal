@@ -90,6 +90,10 @@ export type SurfaceCopy = {
   signIn: string;
   downloadApps: string;
   siteDescription: string;
+  cookieTitle: string;
+  cookieBody: string;
+  cookieNecessary: string;
+  cookieAcceptAll: string;
   footer: FooterCopy;
 };
 
@@ -214,6 +218,10 @@ const COPY: Record<string, SurfaceCopy> = {
     downloadApps: "Stáhnout aplikace",
     siteDescription:
       "ViaLongeVita — globální magazín zdraví a dlouhověkosti na MedScopeGlobal.com. MediFlow, VIP protokoly, MeDipacient a OrdiZapis. Evidence-based obsah ve 19 jazycích. 14 dní zdarma.",
+    cookieTitle: "Cookies a soukromí",
+    cookieBody: "Používáme cookies pro fungování webu, analytiku a marketing.",
+    cookieNecessary: "Pouze nezbytné",
+    cookieAcceptAll: "Přijmout vše",
     footer: {
       aria: "Patička webu",
       tagline:
@@ -366,6 +374,10 @@ const COPY: Record<string, SurfaceCopy> = {
     signIn: "Sign in",
     downloadApps: "Get the apps",
     siteDescription: `${MAGAZINE.name} — health and longevity magazine on MedScopeGlobal.com. MediFlow, VIP protocols, MeDipacient and OrdiZapis. Evidence-based content in 19 languages. 14 days free.`,
+    cookieTitle: "Cookies and privacy",
+    cookieBody: "We use cookies for the site to work, plus analytics and marketing.",
+    cookieNecessary: "Necessary only",
+    cookieAcceptAll: "Accept all",
     footer: {
       aria: "Site footer",
       tagline: `${MAGAZINE.name} — health and longevity magazine. MediFlow, VIP protocols, MeDipacient and OrdiZapis on MedScopeGlobal.com.`,
@@ -517,6 +529,10 @@ const COPY: Record<string, SurfaceCopy> = {
     signIn: "Anmelden",
     downloadApps: "Apps laden",
     siteDescription: `${MAGAZINE.name} — Magazin für Gesundheit und Langlebigkeit auf MedScopeGlobal.com. MediFlow, VIP-Protokolle, MeDipacient und OrdiZapis. Evidenzbasierte Inhalte in 19 Sprachen. 14 Tage kostenlos.`,
+    cookieTitle: "Cookies und Datenschutz",
+    cookieBody: "Wir verwenden Cookies für den Betrieb der Website sowie für Analyse und Marketing.",
+    cookieNecessary: "Nur notwendige",
+    cookieAcceptAll: "Alle akzeptieren",
     footer: {
       aria: "Seitenfuß",
       tagline: `${MAGAZINE.name} — Magazin für Gesundheit und Langlebigkeit. MediFlow, VIP-Protokolle, MeDipacient und OrdiZapis auf MedScopeGlobal.com.`,
@@ -668,6 +684,10 @@ const COPY: Record<string, SurfaceCopy> = {
     signIn: "Connexion",
     downloadApps: "Télécharger les applis",
     siteDescription: `${MAGAZINE.name} — magazine de santé et de longévité sur MedScopeGlobal.com. MediFlow, protocoles VIP, MeDipacient et OrdiZapis. Contenus fondés sur les preuves en 19 langues. 14 jours gratuits.`,
+    cookieTitle: "Cookies et confidentialité",
+    cookieBody: "Nous utilisons des cookies pour le fonctionnement du site, l’analyse et le marketing.",
+    cookieNecessary: "Essentiels seulement",
+    cookieAcceptAll: "Tout accepter",
     footer: {
       aria: "Pied de page",
       tagline: `${MAGAZINE.name} — magazine de santé et de longévité. MediFlow, protocoles VIP, MeDipacient et OrdiZapis sur MedScopeGlobal.com.`,

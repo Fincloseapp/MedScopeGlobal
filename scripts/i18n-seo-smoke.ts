@@ -165,7 +165,8 @@ assert.equal(getSurfaceCopy("de").appTaglines.ordizapis.includes("OrdiZapis"), t
 assert.equal(newsDesksForLocale("ru")[0]?.label, "News");
 assert.ok(!getSurfaceCopy("de").siteDescription.includes("14 dní"));
 assert.ok(getSurfaceCopy("de").siteDescription.includes("14 Tage"));
-assert.equal(getSurfaceCopy("sk").menuOpen, "Open menu");
+assert.equal(getSurfaceCopy("de").cookieTitle, "Cookies und Datenschutz");
+assert.equal(getSurfaceCopy("sk").cookieTitle, "Cookies and privacy");
 
 console.log("✓ i18n/SEO unit checks passed");
 

@@ -9,6 +9,7 @@ import { classifyNewsDesk, NEWS_DESKS, newsDesksForLocale, type NewsDeskDef, typ
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { buildLocalePath } from "@/lib/i18n/locale-path";
 
 function coverOf(article: DisplayArticle) {
   const src = resolveDisplayCover({
@@ -35,6 +36,11 @@ function kickerOf(article: DisplayArticle, locale = "cs"): string {
   if (agent) return surface.writers[agent.id]?.topicLabel ?? agent.topicLabel;
   const desk = newsDesksForLocale(locale).find((item) => item.id === classifyNewsDesk(article));
   return article.categories?.name ?? desk?.label ?? surface.newsroom;
+}
+
+function articleHref(slug: string, locale?: string) {
+  const path = `/article/${slug}`;
+  return locale ? buildLocalePath(locale, path) : path;
 }
 
 function reviewLine(locale = "cs"): string {
@@ -72,7 +78,7 @@ export function NewsArticleThumb({
 export function NewsHeadlineRow({ article, locale = "cs" }: { article: DisplayArticle; locale?: string }) {
   const date = formatArticleDateLabel(article);
   return (
-    <Link href={`/article/${article.slug}`} className="group flex gap-3 py-2.5">
+    <Link href={articleHref(article.slug, locale)} className="group flex gap-3 py-2.5">
       <NewsArticleThumb article={article} sizes="96px" />
       <div className="min-w-0">
         <p className="text-[10px] font-semibold uppercase tracking-wide text-[#005B96]">
@@ -109,7 +115,7 @@ export function NewsMagazineCard({
       }`}
     >
       <Link
-        href={`/article/${article.slug}`}
+        href={articleHref(article.slug, locale)}
         className={`relative overflow-hidden bg-slate-100 ${
           featured ? "aspect-[16/9] lg:w-[58%] lg:aspect-auto lg:min-h-[22rem]" : "aspect-[16/10]"
         }`}
@@ -132,7 +138,7 @@ export function NewsMagazineCard({
             featured ? "text-2xl sm:text-3xl" : "text-lg"
           }`}
         >
-          <Link href={`/article/${article.slug}`}>{article.title}</Link>
+          <Link href={articleHref(article.slug, locale)}>{article.title}</Link>
         </h2>
         {article.excerpt ? (
           <p className={`mt-2 text-sm leading-6 text-slate-600 ${featured ? "line-clamp-5" : "line-clamp-3"}`}>
@@ -146,7 +152,7 @@ export function NewsMagazineCard({
           </p>
         ) : null}
         <Link
-          href={`/article/${article.slug}`}
+          href={articleHref(article.slug, locale)}
           className="mt-4 inline-flex text-sm font-semibold text-[#005B96] hover:underline"
         >
           {surface.readArticle} →

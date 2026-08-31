@@ -14,6 +14,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+
 const COOKIE_KEY = "msg_cookie_consent";
 
 type Consent = {
@@ -39,8 +41,9 @@ function saveConsent(consent: Consent) {
   document.cookie = `msg_marketing=${consent.marketing ? "1" : "0"};path=/;max-age=31536000;SameSite=Lax`;
 }
 
-export function CookieBanner() {
+export function CookieBanner({ locale = "cs" }: { locale?: string }) {
   const [open, setOpen] = useState(false);
+  const copy = getSurfaceCopy(locale);
 
   useEffect(() => {
     if (!readConsent()) setOpen(true);
@@ -72,13 +75,13 @@ export function CookieBanner() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-lg" aria-describedby="cookie-desc">
         <DialogHeader>
-          <DialogTitle>Cookies a soukromí</DialogTitle>
+          <DialogTitle>{copy.cookieTitle}</DialogTitle>
           <DialogDescription id="cookie-desc">
-            Používáme cookies pro fungování webu, analytiku a marketing. Více v{" "}
+            {copy.cookieBody}{" "}
             <Link href="/gdpr" className="text-primary underline">
               GDPR
             </Link>{" "}
-            a{" "}
+            ·{" "}
             <Link href="/cookies" className="text-primary underline">
               Cookies
             </Link>
@@ -87,10 +90,10 @@ export function CookieBanner() {
         </DialogHeader>
         <DialogFooter className="flex-col gap-2 sm:flex-row">
           <Button variant="outline" onClick={acceptNecessary}>
-            Pouze nezbytné
+            {copy.cookieNecessary}
           </Button>
           <Button onClick={acceptAll} className="bg-[#005B96] hover:bg-[#004874]">
-            Přijmout vše
+            {copy.cookieAcceptAll}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -20,6 +20,7 @@ import { sanitizeSearchInput } from "@/utils/search";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import { APP_PRODUCTS } from "@/lib/apps/catalog";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { buildLocalePath } from "@/lib/i18n/locale-path";
 
 export function SearchCommand({
   isVip = false,
@@ -104,7 +105,7 @@ export function SearchCommand({
             results.map((r) => (
               <Link
                 key={r.slug}
-                href={`/article/${r.slug}`}
+                href={buildLocalePath(locale, `/article/${r.slug}`)}
                 className="block rounded-md border p-3 text-left transition hover:bg-muted"
                 onClick={() => setOpen(false)}
               >
