@@ -29,8 +29,8 @@ loadEnv();
 
 const dryRun = process.argv.includes("--dry-run");
 const url = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL ?? "").replace(/\/$/, "");
-const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!url || !key) {
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+if (!url || !serviceKey) {
   console.error("Missing Supabase credentials — display overrides still apply after deploy.");
   process.exit(0);
 }
@@ -54,8 +54,8 @@ async function main() {
     const res = await fetch(`${url}/rest/v1/articles?${qs}`, {
       method: "PATCH",
       headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`,
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
         "Content-Type": "application/json",
         Prefer: "return=minimal",
       },

@@ -1,5 +1,3 @@
-import type { ArticleWithRelations } from "@/types/database";
-
 /** Magazine listing minimum — aligns with audit THRESHOLD_MAGAZINE (800w). */
 export const MAGAZINE_LISTING_MIN_WORDS = 800;
 
@@ -8,10 +6,15 @@ const SEED_STATIC_SLUG_RE =
 
 const PUBLIC_CRON_SLUG_RE = /verejnost-[a-z0-9-]+-\d{4}-\d{2}-\d{2}-/;
 
-type ListingArticle = Pick<
-  ArticleWithRelations,
-  "title" | "slug" | "vip_only" | "content" | "metadata" | "rubric_slug" | "source_name"
->;
+type ListingArticle = {
+  title?: string | null;
+  slug?: string | null;
+  vip_only?: boolean | null;
+  content?: string | null;
+  metadata?: unknown;
+  rubric_slug?: string | null;
+  source_name?: string | null;
+};
 
 function metaRecord(metadata: unknown): Record<string, unknown> {
   if (metadata && typeof metadata === "object" && !Array.isArray(metadata)) {
