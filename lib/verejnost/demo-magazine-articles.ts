@@ -3,7 +3,7 @@
  * (placeholder credentials) or the articles table is empty.
  *
  * Content mirrors `seed-public-articles.ts` / `seed-articles.ts` so Cloud Agent
- * and production-empty states still show a working VitaScope magazine feed.
+ * and production-empty states still show a working ViaLongeVita magazine feed.
  */
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { assignEditorialUnits, formatEditorialUnitDisplay } from "@/lib/editorial/units";
@@ -60,7 +60,7 @@ const DEMO_SEEDS: DemoSeed[] = [
 <li>Kolorektální screening (krev ve stolici, kolonoskopie).</li>
 <li>Screening karcinomu děložního hrdla.</li>
 </ul>
-<p><em>VitaScope · Veřejné zdraví · Obsah pro vzdělávání.</em></p>`,
+<p><em>ViaLongeVita · Veřejné zdraví · Obsah pro vzdělávání.</em></p>`,
     public_topic: "prevence",
     deskHint: "verejnost",
     meta_description:
@@ -80,7 +80,7 @@ const DEMO_SEEDS: DemoSeed[] = [
 <li>Náhlá silná bolest hlavy nebo porucha řeči.</li>
 <li>Silné krvácení nebo ztráta vědomí.</li>
 </ul>
-<p><em>VitaScope · Veřejné zdraví · V akutních stavech volejte 155.</em></p>`,
+<p><em>ViaLongeVita · Veřejné zdraví · V akutních stavech volejte 155.</em></p>`,
     public_topic: "nemoci",
     deskHint: "verejnost",
     meta_description: "Kdy vyhledat lékaře a kdy počkat: akutní příznaky a varovné signály.",
@@ -92,7 +92,7 @@ const DEMO_SEEDS: DemoSeed[] = [
     title: "Rozhovor s kardiologem: prevence srdečních onemocnění v každodenním životě",
     excerpt:
       "Kardiolog vysvětluje, jak pohyb, strava a kontrola rizikových faktorů chrání srdce — bez strašení.",
-    content: `<p><strong>VitaScope:</strong> Co je nejdůležitější prevence srdečních onemocnění pro běžného člověka?</p>
+    content: `<p><strong>ViaLongeVita:</strong> Co je nejdůležitější prevence srdečních onemocnění pro běžného člověka?</p>
 <p><strong>Kardiolog:</strong> Pravidelný pohyb, kontrola krevního tlaku a cholesterolu a nekouření. Malé změny mají velký dopad.</p>
 <h2>Praktické kroky</h2>
 <ul>
@@ -100,7 +100,7 @@ const DEMO_SEEDS: DemoSeed[] = [
 <li>Omezení soli a průmyslově zpracovaných potravin.</li>
 <li>Preventivní prohlídka u praktického lékaře jednou ročně.</li>
 </ul>
-<p><em>VitaScope · Rozhovory · Informace nenahrazují vyšetření u kardiologa.</em></p>`,
+<p><em>ViaLongeVita · Rozhovory · Informace nenahrazují vyšetření u kardiologa.</em></p>`,
     public_topic: "rozhovory",
     deskHint: "clanky",
     meta_description:
@@ -121,7 +121,7 @@ const DEMO_SEEDS: DemoSeed[] = [
 <li>Čtvrtina: bílkovina.</li>
 <li>Tuk: lžíce olivového oleje nebo hrst ořechů.</li>
 </ul>
-<p><em>VitaScope · Životní styl · Informace nenahrazují individuální lékařskou péči.</em></p>`,
+<p><em>ViaLongeVita · Životní styl · Informace nenahrazují individuální lékařskou péči.</em></p>`,
     public_topic: "zivotni-styl",
     deskHint: "clanky",
     meta_description:
@@ -141,7 +141,7 @@ const DEMO_SEEDS: DemoSeed[] = [
 <li>7–9 hodin kvalitního spánku.</li>
 <li>Kontrola krevního tlaku, lipidů a glykémie.</li>
 </ul>
-<p><em>VitaScope · Dlouhověkost · Edukační obsah, ne individuální doporučení.</em></p>`,
+<p><em>ViaLongeVita · Dlouhověkost · Edukační obsah, ne individuální doporučení.</em></p>`,
     public_topic: "zivotni-styl",
     deskHint: "dlouhovekost",
     meta_description: "Healthspan a dlouhověkost: důkaz vs. hype, spánek, pohyb a biomarkery.",
@@ -152,15 +152,15 @@ const DEMO_SEEDS: DemoSeed[] = [
     slug: "demo-novinky-prevence-v-cesku",
     title: "Novinky: prevence v Česku — co sledovat tento měsíc",
     excerpt:
-      "Přehled aktuálních témat veřejného zdraví pro čtenáře VitaScope — bez senzace, s kontextem pro ČR.",
-    content: `<p>Redakce VitaScope sleduje zprávy MZČR, SÚKL a mezinárodních agentur a převádí je do srozumitelného kontextu pro české čtenáře.</p>
+      "Přehled aktuálních témat veřejného zdraví pro čtenáře ViaLongeVita — bez senzace, s kontextem pro ČR.",
+    content: `<p>Redakce ViaLongeVita sleduje zprávy MZČR, SÚKL a mezinárodních agentur a převádí je do srozumitelného kontextu pro české čtenáře.</p>
 <h2>Na co se soustředit</h2>
 <ul>
 <li>Sezónní očkování a respirační infekce.</li>
 <li>Screeningové programy a účast veřejnosti.</li>
 <li>Bezpečnost léčiv a regulační novinky SÚKL.</li>
 </ul>
-<p><em>VitaScope · Novinky · Krátký redakční přehled.</em></p>`,
+<p><em>ViaLongeVita · Novinky · Krátký redakční přehled.</em></p>`,
     public_topic: "prevence",
     deskHint: "novinky",
     meta_description: "Aktuální přehled prevence a veřejného zdraví v Česku.",
@@ -212,7 +212,7 @@ function buildDemoRow(seed: DemoSeed, index: number): ArticleWithRelations {
     audience: "public",
     public_topic: seed.public_topic,
     locale: "cs",
-    source_name: "VitaScope · Demo magazín",
+    source_name: "ViaLongeVita · Demo magazín",
     meta_description: seed.meta_description ?? seed.excerpt.slice(0, 160),
     ai_generated: false,
     metadata,
@@ -237,7 +237,7 @@ function buildDemoRow(seed: DemoSeed, index: number): ArticleWithRelations {
     },
     users: {
       id: "demo-author",
-      full_name: "Redakce VitaScope",
+      full_name: "Redakce ViaLongeVita",
       avatar_url: null,
     },
   };

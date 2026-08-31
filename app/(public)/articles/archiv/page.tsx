@@ -9,7 +9,7 @@ export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   return await buildLocalizedV20PageMetadata({
-    title: "Archiv článků — VitaScope",
+    title: "Archiv článků — ViaLongeVita",
     description: "Starší odborné články a briefy — stále dostupné ke čtení.",
     path: "/articles/archiv",
   });

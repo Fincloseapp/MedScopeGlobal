@@ -2,6 +2,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeaderWithConversion } from "@/components/v38/site-header-with-conversion";
 import { resolveConversionCopy } from "@/lib/v38/conversion-engine";
 import { REGIONS } from "@/lib/i18n/config";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getPublicHeaderCategories } from "@/lib/v22/categories-cache";
 
 export const revalidate = 120;
@@ -11,7 +12,7 @@ export default async function PublicLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const locale = "cs";
+  const locale = await getServerLocale();
   const [categories, navStripCopy] = await Promise.all([
     getPublicHeaderCategories(locale),
     resolveConversionCopy("nav_strip", locale),

@@ -54,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const locale = await getServerLocale();
   const philosophy = getPortalPhilosophy(locale);
-  const { articles, topAds, midAds, bottomAds } = await getHomepageCachedData();
+  const { articles, topAds, midAds, bottomAds } = await getHomepageCachedData(locale);
 
   const homeLd = medicalWebPageJsonLd({
     title: philosophy.claim,
@@ -80,8 +80,8 @@ export default async function HomePage() {
         />
       ))}
 
-      {/* Story: VitaScope hero → magazín → apps/VIP → CTA (PortalHome). Pricing lives on /predplatne — not duplicated under the portal. */}
-      <PortalHome articles={articles} />
+      {/* Story: ViaLongeVita hero → magazín → apps/VIP → CTA (PortalHome). Pricing lives on /predplatne — not duplicated under the portal. */}
+      <PortalHome articles={articles} copy={philosophy} />
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
       <V272WhyTrustBlock />
       <V272AcademyHomeSections />

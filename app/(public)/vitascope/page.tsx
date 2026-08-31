@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-/** Brand alias → VitaScope magazine home */
+/** Legacy brand alias → ViaLongeVita magazine home */
 export default function VitaScopeAliasPage() {
   redirect("/");
 }

@@ -86,6 +86,7 @@ const nextConfig = {
       // MASTER_PROMPT ecosystem aliases (unprefixed; locale pages also redirect)
       { source: "/vip", destination: "/vip/protokoly", permanent: false },
       { source: "/vitascope", destination: "/", permanent: false },
+      { source: "/vialongevita", destination: "/", permanent: false },
       { source: "/magazine", destination: "/articles", permanent: false },
       { source: "/affiliate", destination: "/aplikace", permanent: false },
       // Tips / donations live on public articles — keep separate from VIP Longevity
@@ -136,11 +137,36 @@ const nextConfig = {
 
 
   async rewrites() {
+    const localeSegments = [
+      "cs",
+      "sk",
+      "pl",
+      "de",
+      "fr",
+      "it",
+      "es",
+      "ro",
+      "hu",
+      "ru",
+      "uk",
+      "be",
+      "cn",
+      "jp",
+      "kr",
+      "vi",
+      "id",
+      "en",
+      "en-us",
+    ];
     return [
       {
         source: "/sitemap-:locale.xml",
         destination: "/sitemaps/:locale",
       },
+      ...localeSegments.flatMap((segment) => [
+        { source: `/${segment}`, destination: "/" },
+        { source: `/${segment}/:path*`, destination: "/:path*" },
+      ]),
     ];
   },
 

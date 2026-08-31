@@ -59,7 +59,7 @@ export type MagazineSectionHubConfig = {
 /** Osvěta hub — poslechové lekce + propojení na články veřejného magazínu. */
 export const OSVETA_MAGAZINE_HUB: MagazineSectionHubConfig = {
   id: "osveta",
-  eyebrow: "Veřejnost · Osvěta · VitaScope",
+  eyebrow: "Veřejnost · Osvěta · ViaLongeVita",
   title: "Zdravotní osvěta pro každého",
   heroDeck:
     "Poslechové lekce a dlouhé články o prevenci, nemocích, dlouhověkosti a každodenních rozhodnutích — srozumitelně v češtině, s redakční kontrolou.",
@@ -119,7 +119,7 @@ export const OSVETA_MAGAZINE_HUB: MagazineSectionHubConfig = {
     { label: "Žebříček XP", href: "/verejnost/zebricek", variant: "secondary" },
   ],
   articlesNav: {
-    eyebrow: "Magazín VitaScope",
+    eyebrow: "Magazín ViaLongeVita",
     title: "Doporučené články k poslechu",
     description:
       "Dlouhé texty ze stejné redakce — přečtěte si souvislosti, poslechněte si shrnutí v osvětě.",
@@ -136,7 +136,7 @@ export const OSVETA_MAGAZINE_HUB: MagazineSectionHubConfig = {
 };
 
 const SHARED_ARTICLES_NAV = {
-  eyebrow: "Magazín VitaScope",
+  eyebrow: "Magazín ViaLongeVita",
   title: "Nejnovější z veřejného magazínu",
   description:
     "Dlouhé texty ze stejné redakce — srozumitelně v češtině, s redakční kontrolou a ověřitelnými zdroji.",
@@ -186,7 +186,7 @@ const CORE_TOPIC_PILLARS: readonly MagazineHubPillar[] = [
 /** Témata hub — katalog oblastí veřejného zdraví. */
 export const TEMATA_MAGAZINE_HUB: MagazineSectionHubConfig = {
   id: "temata",
-  eyebrow: "Veřejnost · Témata · VitaScope",
+  eyebrow: "Veřejnost · Témata · ViaLongeVita",
   title: "Najděte své téma ve zdraví",
   heroDeck:
     "Deset oblastí od prevence po rozhovory s odborníky — každá s články srozumitelně pro širokou veřejnost, bez odborného žargonu.",
@@ -222,7 +222,7 @@ export const TEMATA_MAGAZINE_HUB: MagazineSectionHubConfig = {
 /** Rozhovory hub — interview formát s odborníky. */
 export const ROZHOVORY_MAGAZINE_HUB: MagazineSectionHubConfig = {
   id: "rozhovory",
-  eyebrow: "Veřejnost · Rozhovory · VitaScope",
+  eyebrow: "Veřejnost · Rozhovory · ViaLongeVita",
   title: "Rozhovory s odborníky",
   heroDeck:
     "Lékaři, psychologové a specialisté vysvětlují prevenci, nemoci a každodenní rozhodnutí — srozumitelně, bez žargonu a s respektem k české realitě.",
@@ -291,7 +291,7 @@ export const ROZHOVORY_MAGAZINE_HUB: MagazineSectionHubConfig = {
 /** Žebříček hub — gamifikace osvěty. */
 export const ZEBRICEK_MAGAZINE_HUB: MagazineSectionHubConfig = {
   id: "zebricek",
-  eyebrow: "Veřejnost · Gamifikace · VitaScope",
+  eyebrow: "Veřejnost · Gamifikace · ViaLongeVita",
   title: "Žebříček uživatelů",
   heroDeck:
     "Sledujte poslechové lekce, plňte mini-kvízy a sbírejte XP. Top 20 veřejných uživatelů — volitelná hra, ne VIP ani placené předplatné.",
@@ -476,7 +476,7 @@ export function getClankyMagazineHub(topic?: string | null): MagazineSectionHubC
   if (topicHub) {
     return {
       id: `clanky-${normalized}`,
-      eyebrow: `Veřejnost · ${topicHub.title} · VitaScope`,
+      eyebrow: `Veřejnost · ${topicHub.title} · ViaLongeVita`,
       title: topicHub.title,
       heroDeck: topicHub.heroDeck,
       editorialIntro: topicHub.editorialIntro,
@@ -504,7 +504,7 @@ export function getClankyMagazineHub(topic?: string | null): MagazineSectionHubC
 
   return {
     id: "clanky",
-    eyebrow: "Veřejnost · Články · VitaScope",
+    eyebrow: "Veřejnost · Články · ViaLongeVita",
     title: "Články pro veřejnost",
     heroDeck:
       "Aktuální texty o prevenci, nemocích, životním stylu a dlouhověkosti — srozumitelná čeština, redakční kontrola, ověřitelné zdroje.",
@@ -513,7 +513,7 @@ export function getClankyMagazineHub(topic?: string | null): MagazineSectionHubC
       "Rubriky pokrývají prevenci, nemoci a symptomy, životní styl i dlouhověkost. Filtrujte podle tématu nebo procházejte všechny články — obsah je volně dostupný, není to VIP sekce.",
       "Informace slouží k obecnému vzdělávání a nenahrazují konzultaci s lékařem. U závažných příznaků vždy vyhledejte odbornou péči.",
     ],
-    editorialIntroTitle: "Veřejný magazín VitaScope",
+    editorialIntroTitle: "Veřejný magazín ViaLongeVita",
     heroCoverImage: "/assets/covers/produce.webp",
     heroCoverAlt: "Zdravá strava — ilustrace veřejného magazínu",
     heroBadge: {

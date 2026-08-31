@@ -1,4 +1,4 @@
-/** Homepage portal IA — VitaScope magazine-first marketing story (hero → news → apps/VIP). */
+/** Homepage portal IA — ViaLongeVita magazine-first marketing story (hero → news → apps/VIP). */
 
 import { getMagazineCopy, MAGAZINE } from "@/lib/brand/magazine";
 import type { LocaleCode } from "@/lib/i18n/config";
@@ -8,6 +8,7 @@ export const PORTAL_PHILOSOPHY = {
   eyebrow: MAGAZINE.heroEyebrow.cs,
   claim: MAGAZINE.heroClaim.cs,
   subtitle: MAGAZINE.subtitle.cs,
+  tagline: MAGAZINE.tagline.cs,
   whatsNew: MAGAZINE.whatsNew.cs,
   magazineName: MAGAZINE.name,
 } as const;
@@ -30,7 +31,7 @@ export const PORTAL_TRENDING = [
 ] as const;
 
 export const PORTAL_SERVICES = [
-  { id: "articles", label: "Články", hint: "VitaScope", href: "/articles", icon: "news" },
+  { id: "articles", label: "Články", hint: MAGAZINE.name, href: "/articles", icon: "news" },
   {
     id: "mediflow",
     label: "MediFlow",

@@ -45,6 +45,7 @@ assert.equal(canonicalLocalePathname("/ja"), "/jp");
 assert.equal(canonicalLocalePathname("/zh-cn/articles"), "/cn/articles");
 assert.equal(canonicalLocalePathname("/ko"), "/kr");
 assert.equal(canonicalLocalePathname("/de"), null);
+assert.ok(getHomepageTitle("de").includes("ViaLongeVita"));
 assert.ok(getHomepageTitle("de").includes("Gesundheit"));
 assert.ok(getHomepageTitle("fr").includes("Santé"));
 assert.ok(getHomepageTitle("zh-CN").includes("健康"));

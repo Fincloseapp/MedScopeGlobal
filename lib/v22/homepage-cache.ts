@@ -6,6 +6,7 @@ import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rule
 import { mixListableFeed } from "@/lib/v271/news-desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import type { DisplayArticle } from "@/lib/queries/articles";
+import { normalizeLocale } from "@/lib/i18n/config";
 import type { AdRow } from "@/types/database";
 
 const articleSelect = `
@@ -43,7 +44,7 @@ async function loadAds(placement: string, limit: number): Promise<AdRow[]> {
   return ((data ?? []) as AdRow[]).filter(isWithinSchedule);
 }
 
-async function loadArticlesPublic(): Promise<DisplayArticle[]> {
+async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
   const { getDemoMagazineArticles } = await import(
     "@/lib/verejnost/demo-magazine-articles"
   );
@@ -66,11 +67,11 @@ async function loadArticlesPublic(): Promise<DisplayArticle[]> {
   }
 
   const mapped = mapArticleList(data as Record<string, unknown>[] | null);
-  const active = filterCzechContent(filterActiveArticles(mapped), "cs");
+  const active = filterCzechContent(filterActiveArticles(mapped), locale);
   const publicOnly = filterMagazineListableArticles(
     active.filter((a) => !a.vip_only)
   );
-  const prepared = await prepareArticlesForDisplay(publicOnly, "cs", {
+  const prepared = await prepareArticlesForDisplay(publicOnly, normalizeLocale(locale), {
     mode: "card",
     maxTranslate: 16,
   });
@@ -80,14 +81,14 @@ async function loadArticlesPublic(): Promise<DisplayArticle[]> {
   return mixListableFeed(prepared, 36);
 }
 
-async function loadHomepageData(): Promise<{
+async function loadHomepageData(locale: string): Promise<{
   articles: DisplayArticle[];
   topAds: AdRow[];
   midAds: AdRow[];
   bottomAds: AdRow[];
 }> {
   const [articles, topAds, midAds, bottomAds] = await Promise.all([
-    loadArticlesPublic(),
+    loadArticlesPublic(locale),
     loadAds("homepage_top", 1),
     loadAds("homepage_mid", 1),
     loadAds("homepage_bottom", 1),
@@ -95,8 +96,10 @@ async function loadHomepageData(): Promise<{
   return { articles, topAds, midAds, bottomAds };
 }
 
-export const getHomepageCachedData = unstable_cache(
-  loadHomepageData,
-  ["v22-homepage-public-v7-cover-sweep"],
-  { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
-);
+export function getHomepageCachedData(locale = "cs") {
+  return unstable_cache(
+    () => loadHomepageData(locale),
+    ["v22-homepage-public-v8-vialongevita", locale],
+    { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
+  )();
+}

@@ -23,13 +23,13 @@ export function organizationJsonLd() {
   };
 }
 
-/** VitaScope — global health & longevity publication on MedScopeGlobal */
+/** ViaLongeVita — global health & longevity publication on MedScopeGlobal */
 export function publicationJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "NewsMediaOrganization",
     name: MAGAZINE.name,
-    alternateName: "VitaScope Magazine",
+    alternateName: [MAGAZINE.formerName, `${MAGAZINE.formerName} Magazine`, `${MAGAZINE.name} Magazine`],
     url: SITE.url,
     description: MAGAZINE.positioning.en,
     parentOrganization: {

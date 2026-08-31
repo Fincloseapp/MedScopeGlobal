@@ -2,7 +2,7 @@ import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { cn } from "@/lib/utils";
 
-export const HEADER_TAGLINE = "VitaScope · MediFlow · MeDipacient · OrdiZapis";
+export const HEADER_TAGLINE = "ViaLongeVita · MediFlow · MeDipacient · OrdiZapis";
 
 export const HEADER_LOGO_HEIGHT = { mobile: 56, tablet: 56, desktop: 70 } as const;
 

@@ -1,9 +1,11 @@
 import type { NewsDeskId } from "@/lib/v271/news-desks";
 
-/** VITASCOPE magazine mark — MedScopeGlobal editorial brand. */
+import { MAGAZINE } from "@/lib/brand/magazine";
+
+/** Magazine mark assets — paths stay under /assets/magazine/vitascope. */
 export const VITASCOPE = {
-  name: "VITASCOPE",
-  tagline: "Magazín MedScopeGlobal",
+  name: MAGAZINE.name,
+  tagline: MAGAZINE.tagline.cs,
   url: "https://medscopeglobal.com",
   /** Primary masthead (DNA + aperture + EKG). */
   masthead: "/assets/magazine/vitascope/masthead.jpg",

@@ -7,7 +7,9 @@ import { V20ArticleCard } from "@/components/v20/article-card";
 import { getLatestArticles } from "@/lib/queries/articles";
 import { getMedicalArticles } from "@/lib/queries/medicina";
 import { getReaderContext } from "@/lib/auth/reader-context";
+import { MAGAZINE, getMagazineListingCopy } from "@/lib/brand/magazine";
 import { VITASCOPE_TRACK_LOGO } from "@/lib/brand/vitascope";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { filterArticlesForDesk, mixListableFeed, type NewsDeskId } from "@/lib/v271/news-desks";
 
@@ -25,13 +27,15 @@ export async function generateMetadata({
 }: {
   searchParams: Promise<{ desk?: string; med_track?: string }>;
 }): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getMagazineListingCopy(locale);
   const sp = await searchParams;
   const desk = parseDesk(sp.desk);
   const title =
     sp.med_track === "priprava"
-      ? "Příprava LF"
+      ? copy.prep
       : sp.med_track === "studium"
-        ? "Studium medicíny"
+        ? copy.study
         : desk === "novinky"
           ? "Novinky"
           : desk === "verejnost"
@@ -40,10 +44,13 @@ export async function generateMetadata({
               ? "Dlouhověkost"
               : "Články";
   return buildV20PageMetadata({
-    title: `${title} — VITASCOPE`,
+    title: `${title} — ${MAGAZINE.name}`,
     description:
-      "Aktuální zdravotnické články v češtině: novinky, veřejné zdraví, dlouhověkost a redakční magazín VITASCOPE.",
+      locale === "cs"
+        ? `Aktuální zdravotnické články: novinky, veřejné zdraví, dlouhověkost a redakční magazín ${MAGAZINE.name}.`
+        : `Current health articles: news, public health, longevity, and the ${MAGAZINE.name} magazine.`,
     path: desk ? `/articles?desk=${desk}` : "/articles",
+    locale,
   });
 }
 
@@ -53,7 +60,8 @@ export default async function ArticlesPage({
   searchParams: Promise<{ med_track?: string; rok?: string; desk?: string }>;
 }) {
   const sp = await searchParams;
-  const locale = "cs" as const;
+  const locale = await getServerLocale();
+  const copy = getMagazineListingCopy(locale);
   const { isVip, accessLevel } = await getReaderContext();
   const desk = parseDesk(sp.desk);
 
@@ -73,18 +81,18 @@ export default async function ArticlesPage({
     : [];
 
   if (medTrack) {
-    const title = medTrack === "priprava" ? "Příprava LF" : "Studium medicíny";
+    const title = medTrack === "priprava" ? copy.prep : copy.study;
     const blurb =
       medTrack === "priprava"
-        ? "Přijímačky a základy — VITASCOPE výběr pro přípravu na LF."
-        : "Klinický kontext pro studenty medicíny — redakční výběr VITASCOPE.";
+        ? `${copy.prep} — ${MAGAZINE.name}`
+        : `${copy.study} — ${MAGAZINE.name}`;
 
     return (
       <div className="v20-articles mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <VitascopeMastheadBanner track={medTrack} title={title} blurb={blurb} />
-        <nav aria-label="Odborné stopy" className="mt-6 flex flex-wrap gap-2">
+        <nav aria-label={copy.studyLabel} className="mt-6 flex flex-wrap gap-2">
           <Link href="/articles" className="rounded-full border bg-white px-3 py-1.5 text-sm">
-            Vše
+            {copy.all}
           </Link>
           <Link
             href="/articles?med_track=priprava"
@@ -95,7 +103,7 @@ export default async function ArticlesPage({
             <span className="relative h-5 w-5 overflow-hidden rounded-full bg-[#050b1d]">
               <Image src={VITASCOPE_TRACK_LOGO.priprava} alt="" fill className="object-cover" sizes="20px" />
             </span>
-            Příprava LF
+            {copy.prep}
           </Link>
           <Link
             href="/articles?med_track=studium"
@@ -106,7 +114,7 @@ export default async function ArticlesPage({
             <span className="relative h-5 w-5 overflow-hidden rounded-full bg-[#050b1d]">
               <Image src={VITASCOPE_TRACK_LOGO.studium} alt="" fill className="object-cover" sizes="20px" />
             </span>
-            Studium medicíny
+            {copy.study}
           </Link>
         </nav>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -119,5 +127,5 @@ export default async function ArticlesPage({
   }
 
   const mixed = mixListableFeed(filterArticlesForDesk(coreArticles, desk), 24);
-  return <MagazineListing articles={mixed} activeDesk={desk} />;
+  return <MagazineListing articles={mixed} activeDesk={desk} locale={locale} />;
 }

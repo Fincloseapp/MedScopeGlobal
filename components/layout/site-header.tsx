@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import type { AppUser, Category } from "@/types/database";
 import { NotificationBell } from "@/components/layout/notification-bell";
 import { SearchCommand } from "@/components/layout/search-command";
@@ -9,14 +8,16 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { V20MobileNav } from "@/components/v20/mobile-nav";
 import { HeaderLogo } from "@/components/layout/header-logo";
 import { HeaderNavigation } from "@/components/layout/header-navigation";
+import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { NavSubscribeCta } from "@/components/v38/nav-subscribe-cta";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import { getDesktopHeaderMenu, getMobileMenu } from "@/lib/config/main-navigation";
+import { normalizeLocale } from "@/lib/i18n/config";
 
 /** v38 — sticky header, compact nav, subscribe CTA for non-VIP */
 export function SiteHeader({
   categories,
-  locale: _locale,
+  locale,
   region: _region,
   user,
   profile,
@@ -31,8 +32,9 @@ export function SiteHeader({
   isVip: boolean;
   accessLevel: AccessLevelId;
 }) {
-  const desktopMenu = getDesktopHeaderMenu("cs");
-  const mobileMenu = getMobileMenu("cs");
+  const navLocale = normalizeLocale(locale);
+  const desktopMenu = getDesktopHeaderMenu(navLocale);
+  const mobileMenu = getMobileMenu(navLocale);
 
   return (
     <header className="site-header sticky top-0 z-50 w-full overflow-visible border-b border-black/[0.06] bg-white/[0.98] backdrop-blur supports-[padding:max(0px)]:pt-[env(safe-area-inset-top)] dark:border-white/[0.08] dark:bg-slate-950/[0.98]">
@@ -40,7 +42,7 @@ export function SiteHeader({
         <div aria-hidden />
         <HeaderLogo centered className="max-w-[min(52vw,180px)] shrink-0" />
         <div className="flex justify-end">
-          <V20MobileNav mainMenu={mobileMenu} categories={categories} />
+          <V20MobileNav mainMenu={mobileMenu} categories={categories} locale={locale} />
         </div>
       </div>
 
@@ -51,6 +53,7 @@ export function SiteHeader({
           <HeaderNavigation mainMenu={desktopMenu} />
 
           <div className="flex shrink-0 items-center gap-1 border-l border-black/[0.06] pl-2 dark:border-white/10 lg:gap-1.5 lg:pl-3">
+            <LocaleSwitcher currentLocale={locale} compact />
             {!isVip ? <NavSubscribeCta compact className="hidden lg:inline-flex" /> : null}
             <SearchCommand isVip={isVip} accessLevel={accessLevel} />
             <ThemeToggle />

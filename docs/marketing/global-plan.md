@@ -5,9 +5,9 @@
 | Layer | Name | URL |
 |-------|------|-----|
 | Platform | **MedScopeGlobal** | medscopeglobal.com |
-| Magazine | **VitaScope** | medscopeglobal.com (editorial home `/`, `/articles`) |
+| Magazine | **ViaLongeVita** | medscopeglobal.com (editorial home `/`, `/articles`) |
 
-**VitaScope** positioning: global health & longevity magazine — longevity, wellness, and healthy lifestyle for everyone who aspires to improve. EN tagline: *See life clearly. Live it longer.*
+**ViaLongeVita** positioning: global health & longevity magazine — longevity, wellness, and healthy lifestyle for everyone who aspires to improve. EN tagline: *See life clearly. Live it longer.* Former name: VitaScope.
 
 Ecosystem upsell on every touchpoint: MediFlow journal, VIP protocols, MeDipacient · MeDiprep · OrdiZapis, Academy, tringelt tips.
 
@@ -17,7 +17,7 @@ See `docs/brand/magazine-brand.md` and `docs/MASTER_PROMPT.md`.
 
 ## Overview
 
-MedScopeGlobal transforms into a multilingual health ecosystem targeting USA, EU, Asia, and Russia with autonomous **VitaScope** editorial, multi-engine SEO, and diversified monetization.
+MedScopeGlobal transforms into a multilingual health ecosystem targeting USA, EU, Asia, and Russia with autonomous **ViaLongeVita** editorial, multi-engine SEO, and diversified monetization.
 
 ---
 

@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const PILLARS = [
   {
-    title: "Články z VitaScope",
+    title: "Články z ViaLongeVita",
     description: "Uložte si longevity a lifestyle texty na jedno místo.",
   },
   {
@@ -51,7 +51,7 @@ export default function MediFlowMarketingPage() {
             </div>
             <ul className="divide-y divide-white/8">
               {[
-                { label: "Uloženo z VitaScope", detail: "Spánek a HRV — přehled týdne" },
+                { label: "Uloženo z ViaLongeVita", detail: "Spánek a HRV — přehled týdne" },
                 { label: "Symptom", detail: "Energie · mírná · ráno" },
                 { label: "Suplement", detail: "Magnesium glycinát · večer" },
                 { label: "Poznámka", detail: "Chůze 35 min po obědě" },
@@ -122,7 +122,7 @@ export default function MediFlowMarketingPage() {
             Tři věci, které MediFlow drží pohromadě
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60 sm:text-base">
-            Jednoduchý deník napojený na VitaScope — bez dashboardového šumu.
+            Jednoduchý deník napojený na ViaLongeVita — bez dashboardového šumu.
           </p>
           <ol className="mt-10 divide-y divide-white/10 border-y border-white/10">
             {PILLARS.map((item, index) => (

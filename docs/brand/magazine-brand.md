@@ -1,24 +1,26 @@
-# VitaScope — Magazine Brand
+# ViaLongeVita — Magazine Brand
 
 ## Brand architecture
 
 | Layer | Name | Role |
 |-------|------|------|
 | **Platform** | MedScopeGlobal | Domain, apps, billing, infra (`medscopeglobal.com`) |
-| **Publication** | **VitaScope** | Global health & longevity magazine — editorial voice, SEO, syndication |
+| **Publication** | **ViaLongeVita** | Global health & longevity magazine — editorial voice, SEO, syndication |
+| **Former name** | VitaScope | Keep `/vitascope` alias, JSON-LD `alternateName`, SEO keywords |
 
 Tagline (EN): **See life clearly. Live it longer.**  
 Tagline (CS): **Jasně o zdraví. Délka i kvalita života.**
 
-## Why VitaScope
+## Why ViaLongeVita
 
-- **Vita** (life) — understood across geographies via Latin root
-- **Scope** — ties to MedScopeGlobal; implies insight, perspective, evidence
-- Short (8 letters), positive, aspirational — “scope out a better life”
+- **Via** — a path, a way of living
+- **Longe / Longevity** — the editorial core (healthspan, not miracle-cure lifespan)
+- **Vita** — life, understood across geographies via the Latin root
 - Works as a proper noun in all locales (no translation required)
 - Signals longevity + wellness without clinical coldness
+- Distinct from the **MedScopeGlobal** platform name (do not rename the domain or apps)
 
-Alternatives considered: Longevita, WellSpan, ThriveLife, EverWell, VitaeVerse — VitaScope best balances memorability, platform coherence, and global EN-primary positioning.
+Previous name **VitaScope** remains a redirect and an alternate SEO name.
 
 ## Editorial pillars
 
@@ -33,7 +35,7 @@ Alternatives considered: Longevita, WellSpan, ThriveLife, EverWell, VitaeVerse �
 
 ## Product prominence (homepage & nav)
 
-1. VitaScope magazine + news desks  
+1. ViaLongeVita magazine + news desks  
 2. MediFlow wellness journal  
 3. VIP longevity protocols  
 4. MeDipacient · OrdiZapis  
@@ -68,10 +70,11 @@ See also: `docs/editorial/autonomous-redakce.md`
 
 ## Global locale strategy
 
-- Path-prefix routing: `/{locale}/…` (19+ languages)
-- Default messaging: **en-US** for global SEO/OG; **cs** for Czech paths and legacy portal copy
+- Path-prefix routing: `/{locale}/…` (19+ languages) — middleware rewrite + cookie
+- Default messaging: **en-US** for global SEO/OG; **cs** for unprefixed Czech paths
+- Header language switcher uses native names from `GLOBAL_LOCALES`
 - hreflang + canonical: `lib/ecosystem/seo.ts`, `lib/seo/metadata.ts`
-- Device locale → cookie via middleware; header switcher overrides
+- Device locale → cookie only when the reader chooses **Auto**; unprefixed URLs stay Czech
 
 ## Code references
 

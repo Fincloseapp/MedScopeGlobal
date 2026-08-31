@@ -6,7 +6,7 @@ export const V271_HERO = {
   eyebrow: MAGAZINE.heroEyebrow.cs,
   claim: MAGAZINE.heroClaim.cs,
   subtitle:
-    "Magazín VitaScope, wellness deník MediFlow, VIP protokoly a aplikace MeDipacient a OrdiZapis. MeDiprep zůstává pro přípravu na LF. 14 dní zdarma.",
+    "Magazín ViaLongeVita, wellness deník MediFlow, VIP protokoly a aplikace MeDipacient a OrdiZapis. MeDiprep zůstává pro přípravu na LF. 14 dní zdarma.",
 } as const;
 
 export const V271_HERO_CTAS = [
@@ -59,7 +59,7 @@ export const V271_WHY_TRUST = [
   {
     title: "Magazín + aplikace na jedné platformě",
     description:
-      "VitaScope pro dlouhověkost a prevenci, MediFlow pro vlastní deník, MeDipacient a OrdiZapis jako instalovatelné PWA.",
+      "ViaLongeVita pro dlouhověkost a prevenci, MediFlow pro vlastní deník, MeDipacient a OrdiZapis jako instalovatelné PWA.",
   },
   {
     title: "Evidence-based, ne clickbait",
@@ -93,8 +93,8 @@ export const V271_AUDIENCES = [
     id: "public",
     label: "Veřejnost",
     description:
-      "VitaScope a MediFlow pro dlouhověkost a prevenci. MeDipacient složí lékařské zprávy do přehledu.",
-    topics: ["VitaScope", "MediFlow", "MeDipacient", "prevence", "výživa", "spánek", "longevity"],
+      "ViaLongeVita a MediFlow pro dlouhověkost a prevenci. MeDipacient složí lékařské zprávy do přehledu.",
+    topics: ["ViaLongeVita", "MediFlow", "MeDipacient", "prevence", "výživa", "spánek", "longevity"],
     href: "/verejnost",
     ctaPrimary: { label: "Číst magazín", href: "/articles" },
     ctaSecondary: { label: "Otevřít MediFlow", href: "/app/mediflow" },
@@ -157,12 +157,12 @@ export const V271_AKTUALNI = {
 export const V271_SUBSCRIPTION_PLANS = V27_SUBSCRIPTION_PLANS;
 
 export const V271_FOOTER_TAGLINE =
-  "VitaScope — magazín zdraví a dlouhověkosti. MediFlow, VIP protokoly, MeDipacient a OrdiZapis na MedScopeGlobal.com. MeDiprep zůstává pro přípravu na LF.";
+  "ViaLongeVita — magazín zdraví a dlouhověkosti. MediFlow, VIP protokoly, MeDipacient a OrdiZapis na MedScopeGlobal.com. MeDiprep zůstává pro přípravu na LF.";
 
 /** Audience + proof points for footer „Důvěra a čísla“ */
 export const V271_FOOTER_TRUST = {
   audiences: [
-    { label: "Veřejnost — VitaScope a MediFlow", href: "/verejnost" },
+    { label: "Veřejnost — ViaLongeVita a MediFlow", href: "/verejnost" },
     { label: "VIP longevity protokoly", href: "/vip/protokoly" },
     { label: "Lékaři — OrdiZapis a guidelines", href: "/lekari/dokumentace" },
     { label: "Studenti — MeDiprep a Academy", href: "/studenti" },

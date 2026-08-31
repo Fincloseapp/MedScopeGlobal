@@ -15,12 +15,12 @@ export const ARTICLE_TIP_COPY = {
     title: (author?: string) =>
       author ? `Podpořit autora (${author}) · Příspěvek` : "Podpořit autora · Příspěvek",
     blurb:
-      "Volitelný mikro-příspěvek — jako spropitné. Pomáhá redakci VitaScope. Nejde o VIP ani předplatné.",
+      "Volitelný mikro-příspěvek — jako spropitné. Pomáhá redakci ViaLongeVita. Nejde o VIP ani předplatné.",
     custom: "Vlastní",
     unavailable:
       "Příspěvky momentálně nejsou k dispozici — Stripe není nakonfigurován (API 503).",
     success:
-      "Děkujeme za váš příspěvek. Podporuje redakci VitaScope — nejde o VIP, členství ani předplatné.",
+      "Děkujeme za váš příspěvek. Podporuje redakci ViaLongeVita — nejde o VIP, členství ani předplatné.",
     redirecting: "Přesměrování na Stripe…",
     minError: (amount: string, symbol: string) =>
       `Minimální příspěvek je ${amount} ${symbol}`,
@@ -39,12 +39,12 @@ export const ARTICLE_TIP_COPY = {
     title: (author?: string) =>
       author ? `Support the author (${author}) · Tip` : "Support the author · Tip",
     blurb:
-      "Optional micro-contribution — like a tip. Funds VitaScope editorial. Not VIP or a subscription.",
+      "Optional micro-contribution — like a tip. Funds ViaLongeVita editorial. Not VIP or a subscription.",
     custom: "Custom",
     unavailable:
       "Tips are unavailable — Stripe is not configured (API 503).",
     success:
-      "Thank you for your tip. It supports VitaScope editorial — this is not VIP, membership, or a subscription.",
+      "Thank you for your tip. It supports ViaLongeVita editorial — this is not VIP, membership, or a subscription.",
     redirecting: "Redirecting to Stripe…",
     minError: (amount: string, symbol: string) =>
       `Minimum tip is ${amount} ${symbol}`,

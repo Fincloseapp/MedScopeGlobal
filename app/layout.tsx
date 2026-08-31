@@ -35,6 +35,7 @@ export const metadata: Metadata = {
   description: SITE.description,
   applicationName: SITE.name,
   keywords: [
+    "ViaLongeVita",
     "VitaScope",
     "longevity",
     "wellness",

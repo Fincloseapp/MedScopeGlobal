@@ -14,16 +14,19 @@ import {
 } from "@/components/ui/sheet";
 import type { Category } from "@/types/database";
 import { HeaderLogo, HEADER_TAGLINE } from "@/components/layout/header-logo";
+import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import type { NavItem } from "@/lib/config/main-navigation";
 
 export function V20MobileNav({
   mainMenu,
   categories,
+  locale = "cs",
 }: {
   mainMenu: NavItem[];
   categories: Category[];
+  locale?: string;
 }) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
 
@@ -172,6 +175,12 @@ export function V20MobileNav({
         </nav>
 
         <div className="mt-4 shrink-0 flex flex-col gap-2 border-t border-slate-200 pt-4">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">
+              Jazyk
+            </p>
+            <LocaleSwitcher currentLocale={locale} />
+          </div>
           <Button asChild className="rounded-full bg-primary touch-manipulation">
             <Link href="/predplatne?trial=1" onClick={() => setOpen(false)}>
               14 dní zdarma

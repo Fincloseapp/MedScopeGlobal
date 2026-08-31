@@ -388,6 +388,6 @@ export function getMobileMenu(locale: LocaleCode): NavItem[] {
 
 export function getHeaderTagline(locale: LocaleCode): string {
   return locale === "cs"
-    ? "VitaScope · MediFlow · MeDipacient · OrdiZapis"
-    : "VitaScope · MediFlow · MeDipacient · OrdiZapis";
+    ? "ViaLongeVita · MediFlow · MeDipacient · OrdiZapis"
+    : "ViaLongeVita · MediFlow · MeDipacient · OrdiZapis";
 }

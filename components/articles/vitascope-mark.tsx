@@ -45,7 +45,7 @@ export function VitascopeMark({
       </span>
       {showWordmark ? (
         <span className="min-w-0">
-          <span className="block text-[10px] font-semibold uppercase tracking-[0.28em] text-[#7dd3fc]">
+          <span className="block font-display text-sm font-semibold tracking-[0.04em] text-[#7dd3fc] sm:text-base">
             {VITASCOPE.name}
           </span>
           <span className="mt-0.5 block text-xs text-slate-300">{VITASCOPE.tagline}</span>
@@ -83,7 +83,7 @@ export function VitascopeMastheadBanner({
       <div className="relative flex flex-wrap items-center gap-4 px-5 py-6 sm:px-8 sm:py-8">
         <VitascopeMark desk={desk} track={track} size="lg" />
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#7dd3fc]">
+          <p className="font-display text-sm font-semibold tracking-[0.08em] text-[#7dd3fc] sm:text-base">
             {VITASCOPE.name}
           </p>
           <h1 className="mt-1 font-display text-3xl font-bold text-white sm:text-4xl">{title}</h1>

@@ -1,4 +1,4 @@
-# MedScopeGlobal — Master Prompt (VitaScope Era)
+# MedScopeGlobal — Master Prompt (ViaLongeVita Era)
 
 Use this document when generating content, code, or marketing copy for the MedScopeGlobal ecosystem.
 
@@ -6,7 +6,7 @@ Use this document when generating content, code, or marketing copy for the MedSc
 
 **MedScopeGlobal** (`medscopeglobal.com`) is a global health platform hosting apps, Academy, and autonomous editorial.
 
-**VitaScope** is the platform’s global health & longevity magazine:
+**ViaLongeVita** is the platform’s global health & longevity magazine (former name: VitaScope):
 
 - **Audience**: Everyone who wants better health, longer life, and a healthier lifestyle — all ages, aspiration-driven
 - **Tone**: Evidence-based, warm, accessible; never diagnostic or miracle-cure
@@ -18,7 +18,7 @@ Tagline: *See life clearly. Live it longer.*
 
 | Product | Role |
 |---------|------|
-| **VitaScope** | Magazine — longevity, lifestyle, news desks |
+| **ViaLongeVita** | Magazine — longevity, lifestyle, news desks |
 | **MediFlow** | Personal wellness journal (articles, symptoms, supplements) |
 | **MeDipacient** | Patient messaging demo PWA |
 | **MeDiprep** | Medical school prep / tests PWA — **legacy**, deprioritized in nav & homepage |
@@ -60,12 +60,12 @@ Operator runbooks:
 
 - Next.js 15 App Router, Supabase, Cloudflare Workers (OpenNext)
 - Locale middleware must not break; path pattern `/{locale}/…`
-- PWAs keep **MedScopeGlobal** / app names in manifests; magazine = VitaScope in portal chrome
+- PWAs keep **MedScopeGlobal** / app names in manifests; magazine = ViaLongeVita in portal chrome
 - Medical disclaimer on all health content
 
 ## Homepage messaging (reference)
 
-- Eyebrow: `VitaScope · powered by MedScopeGlobal` (EN) / `VitaScope · platforma MedScopeGlobal` (CS)
+- Eyebrow: `ViaLongeVita · powered by MedScopeGlobal` (EN) / `ViaLongeVita · platforma MedScopeGlobal` (CS)
 - Claim: Health, longevity & lifestyle — for everyone
 - Badge: New ecosystem — MediFlow, VIP, autonomous editorial, 19 locales
 - **App order (homepage)**: MediFlow → MeDipacient → OrdiZapis → MeDiprep (legacy last)
@@ -75,7 +75,7 @@ Operator runbooks:
 
 - Claim diagnosis, treatment, or guaranteed outcomes
 - Replace physician-facing content tone with clickbait on `/lekari` routes
-- Break standalone PWA shells or `AppOriginBar` → VitaScope home link
+- Break standalone PWA shells or `AppOriginBar` → ViaLongeVita home link
 
 ## D: PC secrets / deploy (Windows only)
 

@@ -1,13 +1,13 @@
 {
   "site": {
     "name": "MedScopeGlobal",
-    "magazine": "VitaScope",
+    "magazine": "ViaLongeVita",
     "tagline": "See life clearly. Live it longer.",
     "magazineTagline": "Global health & longevity magazine — live well, longer, at every age"
   },
   "nav": {
     "home": "Home",
-    "magazine": "VitaScope",
+    "magazine": "ViaLongeVita",
     "pricing": "Pricing",
     "welcome": "Platform",
     "sections": "Sections",

@@ -10,14 +10,14 @@ const origin = (process.env.MEDSCOPE_ORIGIN || "https://medscopeglobal.com").rep
 const CHECKS = [
   {
     path: "/cs",
-    label: "Czech homepage (VitaScope)",
-    must: /VitaScope/i,
+    label: "Czech homepage (ViaLongeVita)",
+    must: /ViaLongeVita/i,
     status: [200],
   },
   {
     path: "/en-us",
     label: "English homepage",
-    must: /VitaScope|MediFlow|health/i,
+    must: /ViaLongeVita|MediFlow|health/i,
     status: [200],
   },
   {
@@ -46,8 +46,14 @@ const CHECKS = [
   },
   {
     path: "/vitascope",
-    label: "VitaScope brand alias",
-    must: /VitaScope/i,
+    label: "Legacy VitaScope alias → ViaLongeVita home",
+    must: /ViaLongeVita/i,
+    status: [200],
+  },
+  {
+    path: "/vialongevita",
+    label: "ViaLongeVita brand alias",
+    must: /ViaLongeVita/i,
     status: [200],
   },
   {

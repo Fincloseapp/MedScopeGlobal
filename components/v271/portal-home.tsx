@@ -9,6 +9,7 @@ import {
   PORTAL_PHILOSOPHY,
   PORTAL_SERVICES,
 } from "@/lib/v271/portal";
+import type { getMagazineCopy } from "@/lib/brand/magazine";
 import { NEWS_DESKS, splitNewsDesks, type NewsDeskId } from "@/lib/v271/news-desks";
 import { NewsArticleThumb, NewsDeskFallback, NewsHeadlineRow } from "@/components/articles/news-article-card";
 import { VitascopeMark } from "@/components/articles/vitascope-mark";
@@ -144,18 +145,25 @@ function PortalNewsFeed({ articles }: { articles: DisplayArticle[] }) {
   );
 }
 
-export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
+export function PortalHome({
+  articles,
+  copy,
+}: {
+  articles: DisplayArticle[];
+  copy?: ReturnType<typeof getMagazineCopy>;
+}) {
+  const philosophy = copy ?? PORTAL_PHILOSOPHY;
   return (
     <div className="border-b border-slate-200 bg-[#e8eef3]">
       <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5">
         <div className="rounded-lg border border-slate-200 bg-white px-4 py-4 shadow-sm sm:px-6 sm:py-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">
-            {PORTAL_PHILOSOPHY.eyebrow}
+            {philosophy.eyebrow}
           </p>
           <h1 className="mt-1 font-display text-2xl font-bold text-[#021d33] sm:text-3xl">
-            {PORTAL_PHILOSOPHY.claim}
+            {philosophy.claim}
           </h1>
-          <p className="mt-1 max-w-3xl text-sm text-slate-600">{PORTAL_PHILOSOPHY.subtitle}</p>
+          <p className="mt-1 max-w-3xl text-sm text-slate-600">{philosophy.subtitle}</p>
           <div className="mt-4">
             <PortalSearch />
           </div>
@@ -201,10 +209,12 @@ export function PortalHome({ articles }: { articles: DisplayArticle[] }) {
             <div className="mb-3 flex items-center gap-3 rounded-lg border border-slate-100 bg-[#050b1d] px-3 py-2.5">
               <VitascopeMark desk="clanky" size="sm" />
               <div className="min-w-0">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#7dd3fc]">
+                <p className="font-display text-sm font-semibold tracking-[0.06em] text-[#7dd3fc]">
                   {VITASCOPE.name}
                 </p>
-                <p className="text-[11px] text-slate-300">{VITASCOPE.tagline}</p>
+                <p className="text-[11px] text-slate-300">
+                  {"tagline" in philosophy ? philosophy.tagline : VITASCOPE.tagline}
+                </p>
               </div>
             </div>
             <PortalNewsFeed articles={articles} />

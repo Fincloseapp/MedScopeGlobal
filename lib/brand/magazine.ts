@@ -1,8 +1,9 @@
 /**
- * VitaScope — global health & longevity magazine on MedScopeGlobal.com
+ * ViaLongeVita — global health & longevity magazine on MedScopeGlobal.com
  *
  * Platform: MedScopeGlobal (medscopeglobal.com)
- * Publication: VitaScope (editorial layer — longevity, wellness, lifestyle for all ages)
+ * Publication: ViaLongeVita (editorial layer — longevity, wellness, lifestyle for all ages)
+ * Former name: VitaScope (keep /vitascope alias and JSON-LD alternateName)
  */
 
 import type { LocaleCode } from "@/lib/i18n/config";
@@ -51,8 +52,10 @@ const COPY_KEYS = [
 
 export const MAGAZINE = {
   /** Global publication brand (EN-primary, used as proper noun in all locales) */
-  name: "VitaScope",
-  slug: "vitascope",
+  name: "ViaLongeVita",
+  slug: "vialongevita",
+  /** Previous magazine name — keep in SEO aliases and legacy URLs */
+  formerName: "VitaScope",
   /** Platform that hosts the magazine and apps */
   platform: "MedScopeGlobal",
   domain: "medscopeglobal.com",
@@ -138,24 +141,24 @@ export const MAGAZINE = {
     "zh-CN": "健康、长寿与生活方式 — 面向每个人",
   },
   heroEyebrow: {
-    en: "VitaScope · powered by MedScopeGlobal",
-    cs: "VitaScope · platforma MedScopeGlobal",
-    sk: "VitaScope · platforma MedScopeGlobal",
-    de: "VitaScope · powered by MedScopeGlobal",
-    fr: "VitaScope · powered by MedScopeGlobal",
-    es: "VitaScope · powered by MedScopeGlobal",
-    it: "VitaScope · powered by MedScopeGlobal",
-    pl: "VitaScope · powered by MedScopeGlobal",
-    ro: "VitaScope · powered by MedScopeGlobal",
-    hu: "VitaScope · powered by MedScopeGlobal",
-    ru: "VitaScope · powered by MedScopeGlobal",
-    uk: "VitaScope · powered by MedScopeGlobal",
-    be: "VitaScope · powered by MedScopeGlobal",
-    ko: "VitaScope · powered by MedScopeGlobal",
-    vi: "VitaScope · powered by MedScopeGlobal",
-    id: "VitaScope · powered by MedScopeGlobal",
-    ja: "VitaScope · powered by MedScopeGlobal",
-    "zh-CN": "VitaScope · powered by MedScopeGlobal",
+    en: "ViaLongeVita · powered by MedScopeGlobal",
+    cs: "ViaLongeVita · platforma MedScopeGlobal",
+    sk: "ViaLongeVita · platforma MedScopeGlobal",
+    de: "ViaLongeVita · powered by MedScopeGlobal",
+    fr: "ViaLongeVita · powered by MedScopeGlobal",
+    es: "ViaLongeVita · powered by MedScopeGlobal",
+    it: "ViaLongeVita · powered by MedScopeGlobal",
+    pl: "ViaLongeVita · powered by MedScopeGlobal",
+    ro: "ViaLongeVita · powered by MedScopeGlobal",
+    hu: "ViaLongeVita · powered by MedScopeGlobal",
+    ru: "ViaLongeVita · powered by MedScopeGlobal",
+    uk: "ViaLongeVita · powered by MedScopeGlobal",
+    be: "ViaLongeVita · powered by MedScopeGlobal",
+    ko: "ViaLongeVita · powered by MedScopeGlobal",
+    vi: "ViaLongeVita · powered by MedScopeGlobal",
+    id: "ViaLongeVita · powered by MedScopeGlobal",
+    ja: "ViaLongeVita · powered by MedScopeGlobal",
+    "zh-CN": "ViaLongeVita · powered by MedScopeGlobal",
   },
   whatsNew: {
     en: "New: global ecosystem — MediFlow journal, VIP longevity, autonomous editorial, 19 locales",
@@ -269,4 +272,33 @@ export function getHomepageDescription(locale?: LocaleCode | string): string {
 export function getSiteDefaultTitle(locale?: LocaleCode | string): string {
   const copy = getMagazineCopy(locale);
   return `${MAGAZINE.name} | ${copy.platform}`;
+}
+
+/** Articles listing chrome — Czech default, English for other UI locales */
+export function getMagazineListingCopy(locale?: LocaleCode | string) {
+  const cs = pickCopyLocale(locale) === "cs";
+  const magazine = MAGAZINE.name;
+  return {
+    all: cs ? "Vše" : "All",
+    archive: cs ? "Archiv →" : "Archive →",
+    desksLabel: cs ? "Rubriky magazínu" : "Magazine desks",
+    studyLabel: cs ? "Studium a příprava" : "Study & prep",
+    prep: cs ? "Příprava LF" : "Medical-school prep",
+    study: cs ? "Studium medicíny" : "Medical studies",
+    brandLine: cs
+      ? `Redakce ${magazine} · zdraví, dlouhověkost a životní styl`
+      : `${magazine} editorial · health, longevity, and lifestyle`,
+    empty: cs
+      ? "V této oblasti zatím nejsou články, které by splnily redakční pravidla zobrazení."
+      : "No articles in this desk currently meet the editorial display rules.",
+    legal: cs
+      ? "Texty slouží ke vzdělávání. Nenahrazují vyšetření ani individuální lékařskou radu. U každého článku je uvedena redakční jednotka a nezávislá kontrola; primární zdroje redakce nevymýšlí."
+      : "These texts are educational. They do not replace an examination or personal medical advice. Each article lists its editorial unit and independent review; the newsroom does not invent primary sources.",
+    intro: cs
+      ? "Přehledný magazín dlouhověkosti: novinky, veřejné zdraví a to, co je důkaz — ne hype."
+      : "A clear longevity magazine: news, public health, and what the evidence actually says.",
+    featured: cs ? "Hlavní článek" : "Featured",
+    more: cs ? "Další čtení" : "More to read",
+    openMagazine: cs ? "Otevřít magazín" : "Open magazine",
+  };
 }

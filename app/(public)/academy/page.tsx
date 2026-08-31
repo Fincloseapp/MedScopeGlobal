@@ -58,7 +58,7 @@ export default async function AcademyHubPage() {
                 CME revmatologie
               </Link>
               <Link href="/articles" className="text-slate-600 hover:underline">
-                VitaScope magazín
+                ViaLongeVita magazín
               </Link>
             </div>
           </section>

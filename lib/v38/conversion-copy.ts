@@ -167,7 +167,7 @@ export function getMediFlowNavStripCopy(): ConversionCopy {
     slot: "nav_strip",
     eyebrow: "MediFlow",
     headline: "Wellness deník zdarma",
-    body: "Symptomy, suplementy a články z VitaScope. VIP Longevity sync (protokoly) je oddělený plán — ne Student LF.",
+    body: "Symptomy, suplementy a články z ViaLongeVita. VIP Longevity sync (protokoly) je oddělený plán — ne Student LF.",
     ctaLabel: "Otevřít MediFlow",
     ctaHref: "/app/mediflow",
     hint: "Zdarma · VIP sync volitelně",

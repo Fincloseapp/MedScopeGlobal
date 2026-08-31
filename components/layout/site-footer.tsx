@@ -57,7 +57,7 @@ export async function SiteFooter() {
             </li>
             <li>
               <Link href="/articles" className="hover:text-foreground">
-                Články · VitaScope
+                Články · ViaLongeVita
               </Link>
             </li>
             <li>
