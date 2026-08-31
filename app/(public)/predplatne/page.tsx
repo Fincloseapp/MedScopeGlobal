@@ -38,6 +38,15 @@ export default async function PredplatnePage({
   const region = await getServerRegion();
   const copy = getSubscribeCopy(locale);
   const surface = getSurfaceCopy(locale);
+  const publicPrice = convertCzkToCharge(99, locale, region);
+  const studentPrice = convertCzkToCharge(149, locale, region);
+  const clinicPrice = convertCzkToCharge(390, locale, region);
+  const appPriceById: Record<string, string> = {
+    medipacient: publicPrice.formatted,
+    mediflow: publicPrice.formatted,
+    mediprep: studentPrice.formatted,
+    ordizapis: clinicPrice.formatted,
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -101,7 +110,14 @@ export default async function PredplatnePage({
             <p className="mt-1 text-sm text-slate-600">
               {surface.appTaglines[app.id as AppProductId] ?? app.tagline}
             </p>
-            <p className="mt-2 text-xs text-slate-500">{copy.priceNoteByApp[app.id] ?? app.priceNote}</p>
+            <p className="mt-2 text-xs text-slate-500">
+              {(() => {
+                const note = copy.priceNoteByApp[app.id] ?? app.priceNote;
+                const amount = appPriceById[app.id];
+                const needsAmount = Boolean(amount && /(?:potom|then|dann|puis)$/i.test(note.trim()));
+                return needsAmount ? `${note} ${amount} ${copy.perMonth}` : note;
+              })()}
+            </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Link href={app.appPath} className="text-sm font-semibold text-[#005B96]">
                 {copy.openApp}
@@ -138,7 +154,7 @@ export default async function PredplatnePage({
               >
                 {highlighted ? (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-emerald-700 px-3 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
-                    {copy.bestForClinic}
+                    {copy.bestForClinic} — {clinicPrice.formatted}
                   </span>
                 ) : null}
                 {studentHighlight ? (
