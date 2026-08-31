@@ -79,7 +79,7 @@ export const EDITORIAL_UNITS = {
 
 export type EditorialUnitId = keyof typeof EDITORIAL_UNITS;
 
-export type EditorialLocale = "cs" | "en";
+export type EditorialLocale = string;
 
 export interface EditorialAssignment {
   primary: EditorialUnitId;
@@ -106,11 +106,25 @@ export const AI_ASSISTED_SUFFIX = {
 /** Single reader-facing byline — no desk roulette, no AI-suffix. */
 export const PUBLIC_EDITORIAL_BYLINE = {
   cs: "Redakce MedScopeGlobal",
+  sk: "Redakcia MedScopeGlobal",
+  de: "Redaktion MedScopeGlobal",
+  fr: "Rédaction MedScopeGlobal",
+  es: "Redacción MedScopeGlobal",
+  it: "Redazione MedScopeGlobal",
+  pl: "Redakcja MedScopeGlobal",
   en: "MedScopeGlobal Editorial",
 } as const;
 
 export function publicEditorialByline(locale: EditorialLocale = "cs"): string {
-  return locale === "en" ? PUBLIC_EDITORIAL_BYLINE.en : PUBLIC_EDITORIAL_BYLINE.cs;
+  const tag = String(locale).toLowerCase();
+  if (tag === "cs" || tag.startsWith("cs-")) return PUBLIC_EDITORIAL_BYLINE.cs;
+  if (tag === "sk" || tag.startsWith("sk-")) return PUBLIC_EDITORIAL_BYLINE.sk;
+  if (tag === "de" || tag.startsWith("de-")) return PUBLIC_EDITORIAL_BYLINE.de;
+  if (tag === "fr" || tag.startsWith("fr-")) return PUBLIC_EDITORIAL_BYLINE.fr;
+  if (tag === "es" || tag.startsWith("es-")) return PUBLIC_EDITORIAL_BYLINE.es;
+  if (tag === "it" || tag.startsWith("it-")) return PUBLIC_EDITORIAL_BYLINE.it;
+  if (tag === "pl" || tag.startsWith("pl-")) return PUBLIC_EDITORIAL_BYLINE.pl;
+  return PUBLIC_EDITORIAL_BYLINE.en;
 }
 
 export const EDITORIAL_FOOTER_CS =
@@ -118,6 +132,23 @@ export const EDITORIAL_FOOTER_CS =
 
 export const EDITORIAL_FOOTER_EN =
   "Prepared by the MedScopeGlobal.com editorial team — educational health content for the public. Always consult a physician for personal medical decisions.";
+
+const EDITORIAL_FOOTER: Record<string, string> = {
+  cs: EDITORIAL_FOOTER_CS,
+  sk: "Obsah pripravila redakcia MedScopeGlobal.com — odborný zdravotný materiál pre verejnosť. Pri zdravotných rozhodnutiach sa vždy obráťte na lekára.",
+  de: "Erstellt von der Redaktion MedScopeGlobal.com — fachlich aufbereitete Gesundheitsinhalte für die Öffentlichkeit. Bei medizinischen Entscheidungen wenden Sie sich immer an einen Arzt.",
+  fr: "Préparé par la rédaction MedScopeGlobal.com — contenus de santé destinés au public. Consultez toujours un médecin pour toute décision médicale personnelle.",
+  es: "Preparado por la redacción de MedScopeGlobal.com — contenidos de salud para el público. Consulte siempre a un médico para decisiones médicas personales.",
+  it: "A cura della redazione MedScopeGlobal.com — contenuti sanitari per il pubblico. Consultare sempre un medico per decisioni mediche personali.",
+  pl: "Przygotowane przez redakcję MedScopeGlobal.com — materiały zdrowotne dla czytelników. W decyzjach medycznych zawsze skonsultuj się z lekarzem.",
+  en: EDITORIAL_FOOTER_EN,
+};
+
+export function editorialFooterText(locale: EditorialLocale = "cs"): string {
+  const tag = String(locale).toLowerCase().split("-")[0];
+  if (tag === "cs") return EDITORIAL_FOOTER.cs;
+  return EDITORIAL_FOOTER[tag] ?? EDITORIAL_FOOTER.en;
+}
 
 export const LEGACY_DEFAULT_UNIT: EditorialUnitId = "medscope_global_editorial_board";
 

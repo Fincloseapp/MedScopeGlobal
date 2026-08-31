@@ -21,6 +21,40 @@ type Props = {
   variant?: "default" | "editorial";
 };
 
+function ttsChrome(lang?: string | null) {
+  const l = (lang ?? "cs").toLowerCase();
+  if (l.startsWith("cs")) {
+    return {
+      stop: "Zastavit",
+      playing: "Přehrává se poslechová verze",
+      version: (m: number) => `Poslechová verze · ≈ ${m} min`,
+      error: "Poslech se nepodařilo spustit — zkontrolujte hlas v prohlížeči",
+    };
+  }
+  if (l.startsWith("de")) {
+    return {
+      stop: "Stopp",
+      playing: "Hörfassung wird abgespielt",
+      version: (m: number) => `Hörfassung · ≈ ${m} Min.`,
+      error: "Wiedergabe fehlgeschlagen — prüfen Sie die Stimme im Browser",
+    };
+  }
+  if (l.startsWith("fr")) {
+    return {
+      stop: "Arrêter",
+      playing: "Lecture en cours",
+      version: (m: number) => `Version audio · ≈ ${m} min`,
+      error: "Lecture impossible — vérifiez la voix du navigateur",
+    };
+  }
+  return {
+    stop: "Stop",
+    playing: "Playing audio version",
+    version: (m: number) => `Audio version · ≈ ${m} min`,
+    error: "Could not start playback — check the browser voice",
+  };
+}
+
 function estimateListenMinutes(text: string): number {
   const words = text.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 150));
@@ -39,6 +73,7 @@ export function TtsListenButton({
   const [playing, setPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const speechLang = resolveSpeechLang(lang);
+  const chrome = ttsChrome(speechLang);
 
   useEffect(() => {
     // Lock to a single session voice — no multi-voice picker in UI.
@@ -68,9 +103,7 @@ export function TtsListenButton({
       }
       setPlaying(false);
     } catch {
-      setError(
-        "Poslech se nepodařilo spustit — zkontrolujte český hlas v prohlížeči"
-      );
+      setError(chrome.error);
       setPlaying(false);
     } finally {
       setLoading(false);
@@ -84,7 +117,7 @@ export function TtsListenButton({
           type="button"
           onClick={() => void handlePlay()}
           disabled={loading}
-          aria-label={playing ? "Zastavit poslech" : label}
+          aria-label={playing ? chrome.stop : label}
           className="inline-flex items-center gap-2 bg-[#005B96] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#004a7a] disabled:opacity-60"
         >
           {loading ? (
@@ -94,12 +127,10 @@ export function TtsListenButton({
           ) : (
             <Headphones className="h-4 w-4" />
           )}
-          {playing ? "Zastavit" : label}
+          {playing ? chrome.stop : label}
         </button>
         <p className="text-sm text-slate-600">
-          {playing
-            ? "Přehrává se poslechová verze"
-            : `Poslechová verze · ≈ ${minutes} min`}
+          {playing ? chrome.playing : chrome.version(minutes)}
         </p>
         {error ? <p className="w-full text-xs text-amber-700">{error}</p> : null}
       </div>
@@ -115,7 +146,7 @@ export function TtsListenButton({
         className="rounded-lg border-[#cfe1f3] text-[#005B96] hover:bg-[#e8f4fc]"
         onClick={() => void handlePlay()}
         disabled={loading}
-        aria-label={playing ? "Zastavit poslech" : label}
+          aria-label={playing ? chrome.stop : label}
       >
         {loading ? (
           <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />

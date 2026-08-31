@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { getSessionProfile } from "@/lib/auth/session";
 import { logDonationOrder } from "@/lib/mediflow/store";
+import { DONATION_COPY, ARTICLE_TIP_COPY, tipLocale } from "@/lib/ecosystem/tip-copy";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { paymentTiersForUser } from "@/lib/i18n/payment-currency";
 import { getStripeSecretKey } from "@/lib/stripe/client";
 import {
   createCheckoutSession,
@@ -39,25 +42,30 @@ export async function POST(request: Request) {
     currency?: string;
     articleSlug?: string;
     articleTitle?: string;
+    locale?: GlobalLocaleCode;
+    returnPath?: string;
   };
   try {
     body = (await request.json()) as typeof body;
   } catch {
-    return NextResponse.json({ error: "Neplatný JSON" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const currency = (body.currency ?? "czk").toLowerCase();
+  const locale = body.locale ?? "cs";
+  const tiers = paymentTiersForUser(locale);
+  const copy = DONATION_COPY[tipLocale(locale)];
+  const currency = (body.currency ?? tiers.currency).toLowerCase();
   const amount = Math.round(Number(body.amount) || 0);
-  // Stripe card minimum for CZK is typically ~15.00 Kč (1500 haliers).
   const minAmount = currency === "czk" ? 1500 : ZERO_DECIMAL.has(currency) ? 100 : 50;
 
   if (!amount || amount < minAmount) {
+    const divisor = ZERO_DECIMAL.has(currency) ? 1 : 100;
     return NextResponse.json(
       {
-        error:
-          currency === "czk"
-            ? "Minimální dar je 15 Kč (Stripe limit)"
-            : "Částka je pod minimem pro danou měnu",
+        error: ARTICLE_TIP_COPY[tipLocale(locale)].minError(
+          String(minAmount / divisor),
+          tiers.symbol
+        ),
       },
       { status: 400 }
     );
@@ -72,23 +80,25 @@ export async function POST(request: Request) {
 
   try {
     const slug = (body.articleSlug ?? "").trim();
-    const successPath = slug ? `/article/${encodeURIComponent(slug)}?donated=1` : "/?donated=1";
-    const cancelPath = slug ? `/article/${encodeURIComponent(slug)}` : "/";
+    const returnPath =
+      body.returnPath && body.returnPath.startsWith("/") && !body.returnPath.startsWith("//")
+        ? body.returnPath
+        : slug
+          ? `/article/${encodeURIComponent(slug)}`
+          : "/";
+    const successPath = `${returnPath}${returnPath.includes("?") ? "&" : "?"}donated=1`;
 
-    // Pure fetch + AbortSignal — Node Stripe SDK can hang indefinitely on Workers.
     const session = await createCheckoutSession({
       secretKey: secret,
       mode: "payment",
       successUrl: `${origin}${successPath}`,
-      cancelUrl: `${origin}${cancelPath}`,
+      cancelUrl: `${origin}${returnPath}`,
       lineItems: [
         {
           currency,
           unitAmount: amount,
-          name: body.articleTitle
-            ? `Dar autorovi: ${body.articleTitle.slice(0, 80)}`
-            : "Podpora MedScopeGlobal",
-          description: "Mikro-dar pro podporu tvorby obsahu",
+          name: copy.lineItemName(body.articleTitle),
+          description: copy.lineItemDescription,
         },
       ],
       metadata: {

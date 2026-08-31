@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionProfile } from "@/lib/auth/session";
 import { logArticleTipOrder } from "@/lib/mediflow/store";
-import { ARTICLE_TIP_TIERS } from "@/lib/ecosystem/monetization";
+import { paymentTiersForUser } from "@/lib/i18n/payment-currency";
 import { ARTICLE_TIP_COPY, tipLocale } from "@/lib/ecosystem/tip-copy";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { getStripeSecretKey } from "@/lib/stripe/client";
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   const secret = getStripeSecretKey();
   if (!secret) {
     return NextResponse.json(
-      { error: "Stripe není nakonfigurován", enabled: false },
+      { error: ARTICLE_TIP_COPY.en.unavailable, enabled: false },
       { status: 503 }
     );
   }
@@ -43,19 +43,20 @@ export async function POST(request: Request) {
     articleSlug: string;
     articleTitle?: string;
     locale?: GlobalLocaleCode;
+    returnPath?: string;
   };
   try {
     body = (await request.json()) as typeof body;
   } catch {
-    return NextResponse.json({ error: "Neplatný JSON" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
   if (!body.articleSlug?.trim()) {
-    return NextResponse.json({ error: "Chybí articleSlug" }, { status: 400 });
+    return NextResponse.json({ error: "Missing articleSlug" }, { status: 400 });
   }
 
   const locale = body.locale ?? "cs";
-  const tiers = ARTICLE_TIP_TIERS[locale] ?? ARTICLE_TIP_TIERS.cs;
+  const tiers = paymentTiersForUser(locale);
   const currency = (body.currency ?? tiers.currency).toLowerCase();
   const amount = Math.round(Number(body.amount) || 0);
 
@@ -80,13 +81,16 @@ export async function POST(request: Request) {
 
   try {
     const slug = body.articleSlug.trim();
+    const returnPath =
+      body.returnPath && body.returnPath.startsWith("/") && !body.returnPath.startsWith("//")
+        ? body.returnPath
+        : `/article/${encodeURIComponent(slug)}`;
 
-    // Pure fetch + AbortSignal — Node Stripe SDK can hang indefinitely on Workers.
     const session = await createCheckoutSession({
       secretKey: secret,
       mode: "payment",
-      successUrl: `${origin}/article/${encodeURIComponent(slug)}?tip=1`,
-      cancelUrl: `${origin}/article/${encodeURIComponent(slug)}`,
+      successUrl: `${origin}${returnPath}?tip=1`,
+      cancelUrl: `${origin}${returnPath}`,
       lineItems: [
         {
           currency,

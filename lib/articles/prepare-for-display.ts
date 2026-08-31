@@ -4,6 +4,7 @@ import {
   matchesArticleLocale,
   primaryArticleLocale,
 } from "@/lib/i18n/article-locale";
+import { looksLikeCzech } from "@/lib/i18n/czech-detect";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { mapPool } from "@/lib/i18n/map-pool";
 import { getCachedTranslations, resolveArticleTranslation, saveCachedTranslation } from "@/lib/i18n/translate-article";
@@ -16,7 +17,6 @@ import {
   assignEditorialUnits,
   publicEditorialByline,
   type EditorialAssignment,
-  type EditorialLocale,
 } from "@/lib/editorial/units";
 import { resolveEditorialCover } from "@/lib/editorial/image-policy";
 import { applyMagazineDeskCopy } from "@/lib/editorial/magazine-desk-copy";
@@ -36,8 +36,6 @@ function attachEditorialDisplay(
   locale: LocaleCode,
   extra?: Partial<DisplayArticle>
 ): DisplayArticle {
-  const editorialLocale: EditorialLocale =
-    primaryArticleLocale(locale) === "en" ? "en" : "cs";
   const assignment = assignEditorialUnits(article ?? {});
   // Czech magazine desk overrides must not clobber DE/FR/IT/… translations.
   const desk =
@@ -57,7 +55,7 @@ function attachEditorialDisplay(
     ...merged,
     cover_image_url,
     editorialAssignment: assignment,
-    editorialPrimaryLabel: publicEditorialByline(editorialLocale),
+    editorialPrimaryLabel: publicEditorialByline(locale),
   };
 }
 
@@ -104,7 +102,7 @@ export async function prepareArticleForDisplay(
   if (matchesArticleLocale(base.locale, locale)) {
     const polished = locale === "cs" ? polishCzechFields(base, locale) : base;
     const display = attachEditorialDisplay(polished, locale, { displayLocale: target });
-    if (mode === "full") {
+    if (mode === "full" && target === "cs") {
       return { ...display, content: enrichArticleBodyForDisplay(display) };
     }
     return display;
@@ -125,7 +123,6 @@ export async function prepareArticleForDisplay(
 
   if (!translated) {
     if (locale === "cs") {
-      // English / mismatched locale: still polish so RSS CDATA bodies get a Czech teaser.
       const polished = polishCzechFields(base, "cs");
       return attachEditorialDisplay(base, locale, {
         title: polished.title,
@@ -139,20 +136,36 @@ export async function prepareArticleForDisplay(
       });
     }
     return attachEditorialDisplay(base, locale, {
+      title: "",
+      excerpt: null,
+      content: "",
       displayLocale: target,
+      translatedFrom: base.locale ?? null,
     });
   }
 
-  const content = translated.content ?? base.content;
+  let title = translated.title;
+  let excerpt = translated.excerpt ?? base.excerpt;
+  let content =
+    translated.content ??
+    (target === "cs" ? base.content : translated.excerpt ? `<p>${translated.excerpt}</p>` : "");
+
+  if (target !== "cs") {
+    if (looksLikeCzech(title)) title = excerpt && !looksLikeCzech(excerpt) ? excerpt : title;
+    if (looksLikeCzech(excerpt)) excerpt = looksLikeCzech(title) ? null : title;
+    if (looksLikeCzech(content)) {
+      content = excerpt && !looksLikeCzech(excerpt) ? `<p>${excerpt}</p>` : "";
+    }
+  }
   const merged = {
     ...base,
-    title: translated.title,
-    excerpt: translated.excerpt ?? base.excerpt,
+    title,
+    excerpt,
     content,
   };
   const polished = locale === "cs" ? polishCzechFields(merged, locale) : merged;
   const enriched =
-    mode === "full"
+    mode === "full" && target === "cs"
       ? enrichArticleBodyForDisplay({
           ...polished,
           title: polished.title,
@@ -180,7 +193,7 @@ export async function prepareArticlesForDisplay(
 ): Promise<DisplayArticle[]> {
   const sorted = sortByLocalePreference(dedupeArticlesByTitle(articles), locale);
   const mode = options?.mode ?? "card";
-  const maxTranslate = options?.maxTranslate ?? 8;
+  const maxTranslate = options?.maxTranslate ?? 24;
 
   let translateUsed = 0;
   const plan = sorted.map((article) => {
@@ -205,6 +218,27 @@ export async function prepareArticlesForDisplay(
       return prepareArticleForDisplay(item.article, locale, mode, { live: false });
     }
     if (item.kind === "passthrough") {
+      if (primaryArticleLocale(locale) !== "cs" && looksLikeCzech(item.article.title)) {
+        const hit = await fallbackTranslateFields({
+          title: item.article.title,
+          excerpt: item.article.excerpt,
+          content: item.article.content,
+          sourceLocale: item.article.locale ?? "cs",
+          targetLocale: locale,
+          mode: "card",
+        });
+        if (hit && !looksLikeCzech(hit.title)) {
+          return attachEditorialDisplay(item.article, locale, {
+            title: hit.title,
+            excerpt: hit.excerpt ?? item.article.excerpt,
+            displayLocale: primaryArticleLocale(locale),
+            translatedFrom: item.article.locale ?? null,
+            translation_provider: hit.translation_provider,
+            machine_translated: true,
+            reviewed: false,
+          });
+        }
+      }
       return attachEditorialDisplay(item.article, locale, {
         displayLocale: primaryArticleLocale(locale),
       });
@@ -228,7 +262,10 @@ export async function prepareArticlesForDisplay(
 
   const missIndexes: number[] = [];
   firstPass.forEach((display, index) => {
-    if (plan[index]?.kind === "translate" && !display.machine_translated) {
+    const czechLeak =
+      primaryArticleLocale(locale) !== "cs" &&
+      (looksLikeCzech(display.title) || looksLikeCzech(display.excerpt));
+    if ((plan[index]?.kind === "translate" && !display.machine_translated) || czechLeak) {
       missIndexes.push(index);
     }
   });
@@ -271,21 +308,16 @@ export async function prepareArticlesForDisplay(
     };
   });
 
-  const filled = await Promise.race([
-    fill,
-    new Promise<null>((resolve) => {
-      setTimeout(() => resolve(null), 4500);
-    }),
-  ]);
+  const filled = await fill;
 
   if (filled) {
     for (const row of filled) {
       firstPass[row.index] = row.display;
     }
   }
-  return firstPass;
-}
 
-function targetLocaleOrUndefined(locale: string | null | undefined): string | undefined {
-  return locale ?? undefined;
+  if (primaryArticleLocale(locale) !== "cs") {
+    return firstPass.filter((row) => !looksLikeCzech(row.title));
+  }
+  return firstPass;
 }

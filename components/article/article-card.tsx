@@ -11,15 +11,21 @@ import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
 
 export function ArticleCard({ article }: { article: DisplayArticle | ArticleWithRelations }) {
   const cat = article.categories;
-  const editorialLocale = article.locale === "en" ? "en" : "cs";
+  const editorialLocale =
+    "displayLocale" in article && article.displayLocale
+      ? article.displayLocale
+      : article.locale ?? "cs";
   const authorLabel = publicEditorialByline(editorialLocale);
   const date =
     article.published_at &&
-    new Date(article.published_at).toLocaleDateString("cs-CZ", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    new Date(article.published_at).toLocaleDateString(
+      editorialLocale === "cs" || String(editorialLocale).startsWith("cs") ? "cs-CZ" : "en-GB",
+      {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      }
+    );
   const coverMeta = getArticleCoverLabel(article.title, cat?.name);
   const coverStyles = getArticleCoverStyles(article.title, cat?.name);
   const coverUrl = resolveArticleCoverUrl({

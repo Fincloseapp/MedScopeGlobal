@@ -3,7 +3,8 @@
 import { useEffect, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { Heart, Share2, BookmarkPlus, Crown } from "lucide-react";
-import { DONATION_TIERS, formatDonationAmount } from "@/lib/ecosystem/monetization";
+import { formatDonationAmount } from "@/lib/ecosystem/monetization";
+import { paymentTiersForUser } from "@/lib/i18n/payment-currency";
 import { DONATION_COPY, tipLocale } from "@/lib/ecosystem/tip-copy";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { MEDIFLOW_STORAGE_KEY, demoMediFlowDashboard } from "@/lib/mediflow/types";
@@ -26,10 +27,9 @@ export function AuthorDonationButton({
   const [unavailable, setUnavailable] = useState(false);
   const [customAmount, setCustomAmount] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const tiers = DONATION_TIERS[locale] ?? DONATION_TIERS.cs;
+  const tiers = paymentTiersForUser(locale);
   const copy = DONATION_COPY[tipLocale(locale)];
-  const zeroDecimal =
-    locale === "ja" || locale === "ko" || locale === "vi" || locale === "id" || locale === "hu";
+  const zeroDecimal = new Set(["jpy", "krw", "vnd", "idr", "huf"]).has(tiers.currency);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

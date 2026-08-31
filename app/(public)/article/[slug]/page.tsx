@@ -53,7 +53,7 @@ import { TopLongevityProducts } from "@/components/monetization/affiliate-box";
 import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { MAGAZINE, getOgLocale } from "@/lib/brand/magazine";
-import { isArticleTipUiEnabled } from "@/lib/ecosystem/tip-copy";
+import { isArticleTipUiEnabled, ARTICLE_TIP_COPY, tipLocale } from "@/lib/ecosystem/tip-copy";
 import { SITE } from "@/lib/config/site";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -185,8 +185,8 @@ export default async function ArticlePage({ params }: Props) {
   const studentSidebarAds = studentCampaigns.filter((c) => c.type === "sidebar").slice(0, 3);
 
   const category = article.categories;
-  const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
-  const authorDisplay = publicEditorialByline(editorialLocale);
+  const editorialLocale: EditorialLocale = locale;
+  const authorDisplay = publicEditorialByline(locale);
   const heroAlt = getArticleHeroAltText(
     {
       title: article.title,
@@ -211,16 +211,8 @@ export default async function ArticlePage({ params }: Props) {
   const v19Quiz = (article.quiz_json ?? {}) as Record<string, unknown>;
   const showContribution = isArticleTipUiEnabled(locked);
 
-  /**
-   * Tip / Darovat chrome follows the *article* language, not browser geo.
-   * Czech magazine pieces (verejnost-* / locale cs) must stay Kč + Czech copy
-   * even when the site UI cookie resolves to en.
-   */
-  const articleLocaleTag = String(article.locale ?? "").toLowerCase();
   const supportLocale: GlobalLocaleCode =
-    articleLocaleTag.startsWith("cs") || article.slug.startsWith("verejnost-")
-      ? "cs"
-      : (((locale as GlobalLocaleCode) || "cs") as GlobalLocaleCode);
+    ((locale as GlobalLocaleCode) || "cs") as GlobalLocaleCode;
 
   const globalJsonLd = articleJsonLdGlobal({
     title: article.title,
@@ -431,6 +423,7 @@ export default async function ArticlePage({ params }: Props) {
                     title={article.title}
                     excerpt={article.excerpt ?? undefined}
                     content={article.content}
+                    locale={locale}
                   />
                 ) : null}
                 <ArticleBody
@@ -454,7 +447,7 @@ export default async function ArticlePage({ params }: Props) {
             <Suspense
               fallback={
                 <section className="article-contribute scroll-mt-24">
-                  <p className="text-sm text-slate-500">Načítání příspěvků…</p>
+                  <p className="text-sm text-slate-500">{ARTICLE_TIP_COPY[tipLocale(locale)].loading}</p>
                 </section>
               }
             >

@@ -1,4 +1,5 @@
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { looksLikeCzech } from "@/lib/i18n/czech-detect";
 import type { LocaleCode } from "@/lib/i18n/config";
 import type { TranslatedFields } from "@/lib/i18n/translate-article";
 
@@ -146,9 +147,6 @@ async function translatePlain(
   return withMtSlot(async () => {
     const local = await workersAiTranslate(trimmed, source, target);
     if (local && local !== trimmed) return local;
-    if (process.env.MEDSCOPE_RUNTIME === "cloudflare-workers") {
-      return text;
-    }
     const gtx = await gtxTranslate(trimmed, source, target);
     if (gtx && gtx !== trimmed) return gtx;
     const memory = await mymemoryTranslate(trimmed, source, target);
@@ -170,34 +168,37 @@ export async function fallbackTranslateFields(input: {
   if (source === target) return null;
 
   const title = await translatePlain(input.title, source, target);
-  const excerpt =
-    input.mode === "full" && input.excerpt
-      ? await translatePlain(input.excerpt, source, target)
-      : input.excerpt;
+  const excerpt = input.excerpt
+    ? await translatePlain(input.excerpt, source, target)
+    : input.excerpt;
 
   let content = input.content;
   if (input.mode === "full" && input.content) {
-    const parts = input.content.split(/(<\/p>)/i);
+    const parts = input.content.split(/(<\/p>|<h[1-6][^>]*>|<\/h[1-6]>)/i);
     const out: string[] = [];
     let translatedBlocks = 0;
+    const maxBlocks = 24;
     for (const part of parts) {
-      if (translatedBlocks >= 3) {
-        out.push(part);
-        continue;
-      }
       const inner = part.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-      if (inner.length < 40 || /<\/p>/i.test(part)) {
+      const isMarker = /^<\/?(p|h[1-6])\b/i.test(part.trim()) || inner.length < 18;
+      if (isMarker || translatedBlocks >= maxBlocks) {
         out.push(part);
         continue;
       }
-      const translated = await translatePlain(inner.slice(0, 900), source, target);
-      out.push(part.replace(inner, translated));
+      const translated = await translatePlain(inner.slice(0, 1100), source, target);
+      out.push(inner && part.includes(inner) ? part.replace(inner, translated) : translated);
       translatedBlocks += 1;
     }
     content = out.join("");
   }
 
-  if (title === input.title && excerpt === input.excerpt) return null;
+  const targetIsCs = target === "cs" || target === "czech";
+  if (!targetIsCs && looksLikeCzech(title) && looksLikeCzech(input.title)) {
+    return null;
+  }
+  if (title === input.title && excerpt === input.excerpt && input.mode === "card") {
+    return null;
+  }
 
   return {
     title: title.slice(0, 300),

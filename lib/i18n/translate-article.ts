@@ -216,14 +216,10 @@ export async function resolveArticleTranslation(
       };
     }
     if (cached.content) return cached;
-    // Listing cache has title/excerpt only. On Workers a full-body MT often exceeds
-    // the request budget and leaves the H1 in Czech — serve the cached headline.
-    if (process.env.MEDSCOPE_RUNTIME === "cloudflare-workers" || options?.live === false) {
-      return cached;
-    }
+    // Title/excerpt cache is not enough for the article body — keep translating.
   }
 
-  if (options?.live === false) {
+  if (options?.live === false && mode === "card") {
     return cached;
   }
 

@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 import {
-  ARTICLE_TIP_TIERS,
-  DONATION_TIERS,
-  formatDonationAmount,
+  formatMinorAmount,
   formatTipAmount,
 } from "@/lib/ecosystem/monetization";
+import { paymentTiersForUser } from "@/lib/i18n/payment-currency";
 import {
   ARTICLE_TIP_COPY,
   DONATION_COPY,
@@ -22,7 +21,7 @@ type Props = {
   locale?: GlobalLocaleCode;
 };
 
-const ZERO_DECIMAL = new Set(["ja", "ko", "vi", "id", "hu"]);
+const ZERO_DECIMAL = new Set(["jpy", "krw", "vnd", "idr", "huf"]);
 
 /** Strip repeated VIP/předplatné disclaimers so tip ≠ VIP is said once, clearly. */
 function withoutVipNoise(text: string): string {
@@ -52,27 +51,18 @@ export function ArticleContribution({
   const [customDonate, setCustomDonate] = useState("");
   const [showSuccess, setShowSuccess] = useState<"tip" | "donate" | null>(null);
 
-  const tipTiers = ARTICLE_TIP_TIERS[locale] ?? ARTICLE_TIP_TIERS.cs;
-  const donateTiers = DONATION_TIERS[locale] ?? DONATION_TIERS.cs;
   const lang = tipLocale(locale);
   const tipCopy = ARTICLE_TIP_COPY[lang];
   const donateCopy = DONATION_COPY[lang];
-  const zeroDecimal = ZERO_DECIMAL.has(locale);
-  const isEn = lang === "en";
-
-  const labels = isEn
-    ? {
-        tipSection: "Contribution",
-        tipAction: "Contribute",
-        donateSection: "Donate",
-        donateAction: "Donate",
-      }
-    : {
-        tipSection: "Příspěvek",
-        tipAction: "Přispět",
-        donateSection: "Darovat",
-        donateAction: "Darovat",
-      };
+  const tipTiers = paymentTiersForUser(locale);
+  const donateTiers = paymentTiersForUser(locale);
+  const zeroDecimal = new Set(["jpy", "krw", "vnd", "idr", "huf"]).has(tipTiers.currency);
+  const labels = {
+    tipSection: tipCopy.tipSection,
+    tipAction: tipCopy.tipAction,
+    donateSection: tipCopy.donateSection,
+    donateAction: tipCopy.donateAction,
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -114,6 +104,7 @@ export function ArticleContribution({
           articleSlug,
           articleTitle,
           locale,
+          returnPath: typeof window !== "undefined" ? window.location.pathname : undefined,
         }),
       });
       const data = (await res.json()) as {
@@ -133,16 +124,10 @@ export function ArticleContribution({
       setError(
         data.error ??
           data.detail ??
-          (isEn
-            ? "Could not start payment. Please try again."
-            : "Platbu se nepodařilo spustit. Zkuste to prosím znovu.")
+          tipCopy.paymentError
       );
     } catch {
-      setError(
-        isEn
-          ? "Network error — check your connection and try again."
-          : "Síťová chyba — zkontrolujte připojení a zkuste znovu."
-      );
+      setError(tipCopy.networkError);
     } finally {
       setLoading(null);
     }
@@ -217,7 +202,7 @@ export function ArticleContribution({
                     }
                     className="border border-slate-300 bg-white px-3.5 py-1.5 text-sm font-medium text-[#021d33] transition hover:border-[#005B96] hover:text-[#005B96] disabled:opacity-50"
                   >
-                    {formatTipAmount(amount, locale)}
+                    {formatTipAmount(amount, locale, tipTiers.symbol)}
                   </button>
                 ))}
                 <div className="flex items-center gap-1.5">
@@ -268,7 +253,7 @@ export function ArticleContribution({
                     }
                     className="border border-slate-300 bg-white px-3.5 py-1.5 text-sm font-medium text-[#021d33] transition hover:border-[#005B96] hover:text-[#005B96] disabled:opacity-50"
                   >
-                    {formatDonationAmount(amount, locale)}
+                    {formatMinorAmount(amount, locale, donateTiers.symbol, donateTiers.currency)}
                   </button>
                 ))}
                 <div className="flex items-center gap-1.5">

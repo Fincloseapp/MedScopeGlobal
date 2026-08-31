@@ -39,6 +39,10 @@ import { localizePublicHref } from "../lib/i18n/nav-copy";
 import { localizeV271Page } from "../lib/i18n/hub-copy";
 import { getDesktopHeaderMenu } from "../lib/config/main-navigation";
 import { V271_LEKARI_PAGES } from "../lib/v271/routes";
+import { looksLikeCzech } from "../lib/i18n/czech-detect";
+import { paymentTiersForUser } from "../lib/i18n/payment-currency";
+import { tipLocale, ARTICLE_TIP_COPY } from "../lib/ecosystem/tip-copy";
+import { publicEditorialByline } from "../lib/editorial/units";
 
 // --- unit checks (no server required) ---
 assert.equal(localeToPathSegment("en-US"), "en-us");
@@ -229,6 +233,22 @@ assert.equal(frLekari.sectionLabel, "Médecins");
 assert.ok(frLekari.page.title.includes("médecins") || frLekari.page.title.includes("Médecins") || frLekari.page.title.includes("chercheurs"));
 assert.ok(!frLekari.page.title.includes("lékaře"));
 assert.ok(frLekari.page.links.some((l) => l.href.startsWith("/fr/")));
+
+assert.equal(looksLikeCzech("Duševní pohoda je důležitá"), true);
+assert.equal(looksLikeCzech("Santé mentale : quand demander de l’aide ?"), false);
+assert.equal(paymentTiersForUser("cs").currency, "czk");
+assert.equal(paymentTiersForUser("fr").currency, "eur");
+assert.equal(paymentTiersForUser("de").currency, "eur");
+assert.equal(paymentTiersForUser("en-US").currency, "usd");
+assert.equal(paymentTiersForUser("en-UK").currency, "gbp");
+assert.equal(paymentTiersForUser("sk").currency, "eur");
+assert.equal(tipLocale("fr"), "fr");
+assert.equal(tipLocale("cs"), "cs");
+assert.ok(!ARTICLE_TIP_COPY[tipLocale("fr")].tipSection.includes("Příspěvek"));
+assert.equal(ARTICLE_TIP_COPY.cs.tipSection, "Příspěvek");
+assert.equal(publicEditorialByline("fr"), "Rédaction MedScopeGlobal");
+assert.equal(publicEditorialByline("cs"), "Redakce MedScopeGlobal");
+assert.ok(!publicEditorialByline("de").includes("Redakce"));
 
 console.log("✓ i18n/SEO unit checks passed");
 

@@ -427,12 +427,12 @@ export const ARTICLE_TIP_TIERS: Record<
   { amounts: number[]; currency: string; symbol: string; minAmount: number }
 > = {
   cs: { amounts: [1500, 2000, 5000], currency: "czk", symbol: "Kč", minAmount: 1500 },
-  sk: { amounts: [10, 25, 50, 100, 250], currency: "eur", symbol: "€", minAmount: 10 },
-  pl: { amounts: [100, 250, 500, 1000, 2500], currency: "pln", symbol: "zł", minAmount: 100 },
-  de: { amounts: [10, 25, 50, 100, 250], currency: "eur", symbol: "€", minAmount: 10 },
-  fr: { amounts: [10, 25, 50, 100, 250], currency: "eur", symbol: "€", minAmount: 10 },
-  it: { amounts: [10, 25, 50, 100, 250], currency: "eur", symbol: "€", minAmount: 10 },
-  es: { amounts: [10, 25, 50, 100, 250], currency: "eur", symbol: "€", minAmount: 10 },
+  sk: { amounts: [200, 500, 1000], currency: "eur", symbol: "€", minAmount: 50 },
+  pl: { amounts: [1000, 2500, 4900], currency: "pln", symbol: "zł", minAmount: 100 },
+  de: { amounts: [200, 500, 1000], currency: "eur", symbol: "€", minAmount: 50 },
+  fr: { amounts: [200, 500, 1000], currency: "eur", symbol: "€", minAmount: 50 },
+  it: { amounts: [200, 500, 1000], currency: "eur", symbol: "€", minAmount: 50 },
+  es: { amounts: [200, 500, 1000], currency: "eur", symbol: "€", minAmount: 50 },
   ro: { amounts: [50, 125, 250, 500, 1250], currency: "ron", symbol: "lei", minAmount: 50 },
   hu: { amounts: [8000, 20000, 40000, 80000, 200000], currency: "huf", symbol: "Ft", minAmount: 8000 },
   ru: { amounts: [1000, 2500, 5000, 10000, 25000], currency: "rub", symbol: "₽", minAmount: 1000 },
@@ -443,23 +443,36 @@ export const ARTICLE_TIP_TIERS: Record<
   ko: { amounts: [30000, 60000, 120000, 240000, 600000], currency: "krw", symbol: "₩", minAmount: 30000 },
   vi: { amounts: [500000, 1250000, 2500000, 5000000, 12500000], currency: "vnd", symbol: "₫", minAmount: 500000 },
   id: { amounts: [300000, 750000, 1500000, 3000000, 7500000], currency: "idr", symbol: "Rp", minAmount: 300000 },
-  en: { amounts: [10, 25, 50, 100, 250], currency: "usd", symbol: "$", minAmount: 10 },
-  "en-US": { amounts: [10, 25, 50, 100, 250], currency: "usd", symbol: "$", minAmount: 10 },
+  en: { amounts: [200, 500, 1000], currency: "usd", symbol: "$", minAmount: 50 },
+  "en-US": { amounts: [200, 500, 1000], currency: "usd", symbol: "$", minAmount: 50 },
 };
+
+const ZERO_DECIMAL_CCY = new Set(["jpy", "krw", "vnd", "idr", "huf"]);
 
 export function formatMinorAmount(
   amountMinor: number,
   locale: GlobalLocaleCode,
-  symbol?: string
+  symbol?: string,
+  currency?: string
 ): string {
   const tier = ARTICLE_TIP_TIERS[locale] ?? ARTICLE_TIP_TIERS.en;
   const sym = symbol ?? tier.symbol;
+  const ccy = (currency ?? tier.currency).toLowerCase();
   const zeroDecimal =
-    locale === "ja" || locale === "ko" || locale === "vi" || locale === "id" || locale === "hu";
+    ZERO_DECIMAL_CCY.has(ccy) ||
+    locale === "ja" ||
+    locale === "ko" ||
+    locale === "vi" ||
+    locale === "id" ||
+    locale === "hu";
   const major = zeroDecimal ? amountMinor : amountMinor / 100;
   return `${major} ${sym}`;
 }
 
-export function formatTipAmount(amountMinor: number, locale: GlobalLocaleCode): string {
-  return formatMinorAmount(amountMinor, locale);
+export function formatTipAmount(
+  amountMinor: number,
+  locale: GlobalLocaleCode,
+  symbol?: string
+): string {
+  return formatMinorAmount(amountMinor, locale, symbol);
 }
