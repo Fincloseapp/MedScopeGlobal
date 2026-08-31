@@ -112,7 +112,7 @@ const COPY: Record<string, SurfaceCopy> = {
   cs: {
     searchTab: "Hledat",
     aiTab: "AI asistent",
-    searchPlaceholder: "Longevity, články, MediFlow, VIP, léky…",
+    searchPlaceholder: "Dlouhověkost, články, MediFlow, léky…",
     aiPlaceholder: "Otevřít AI asistenta pro veřejnost…",
     searchSubmit: "Hledat",
     openSubmit: "Otevřít",
@@ -121,7 +121,7 @@ const COPY: Record<string, SurfaceCopy> = {
     trending: [
       { label: "dlouhověkost", href: TRENDING_HREFS[0] },
       { label: "MediFlow", href: TRENDING_HREFS[1] },
-      { label: "VIP protokoly", href: TRENDING_HREFS[2] },
+      { label: "dnešní tip", href: "/verejnost/osveta" },
       { label: "MeDipacient", href: TRENDING_HREFS[3] },
       { label: "OrdiZapis", href: TRENDING_HREFS[4] },
     ],
@@ -172,7 +172,7 @@ const COPY: Record<string, SurfaceCopy> = {
     whyEyebrow: "Proč MedScopeGlobal",
     whyTitle: "Aplikace na mobilu, obsah když ho potřebujete",
     whyLead:
-      "Stažení na plochu, zkušební data v dashboardu a ověřené zdroje — od longevity magazínu po klinickou praxi.",
+      "Stažení na plochu, zkušební data v dashboardu a ověřené zdroje — od magazínu o dlouhověkosti po klinickou praxi.",
     why: [
       {
         title: "Magazín + aplikace na jedné platformě",

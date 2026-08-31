@@ -99,6 +99,18 @@ export type PortalChrome = {
 };
 
 const SERVICE_HINTS: Record<string, Record<string, string>> = {
+  cs: {
+    articles: MAGAZINE.name,
+    mediflow: "deník",
+    vip: "články",
+    medipacient: "zprávy",
+    ordizapis: "zápisy",
+    academy: "vzdělávání",
+    ai: "zeptat se",
+    trial: "zdarma",
+    leky: "SÚKL",
+    mediprep: "legacy",
+  },
   en: {
     articles: MAGAZINE.name,
     mediflow: "journal",
@@ -106,7 +118,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     medipacient: "records",
     ordizapis: "notes",
     academy: "learning",
-    ai: "ask",
+    ai: "ask AI",
     trial: "free",
     leky: "SÚKL",
     mediprep: "legacy",
@@ -138,14 +150,23 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
 };
 
 const SERVICE_LABELS: Record<string, Record<string, string>> = {
-  en: { articles: "Articles", trial: "14 days", leky: "Drugs", academy: "Academy", ai: "AI", vip: "Longevity" },
+  cs: {
+    articles: "Články",
+    trial: "14 dní",
+    leky: "Léky",
+    academy: "Academy",
+    ai: "AI",
+    vip: "Dlouhověkost",
+  },
+  en: { articles: "Articles", trial: "14 days", leky: "Medicines", academy: "Academy", ai: "AI", vip: "Longevity" },
   de: { articles: "Artikel", trial: "14 Tage", leky: "Arznei", academy: "Academy", ai: "KI", vip: "Langlebigkeit" },
   fr: { articles: "Articles", trial: "14 jours", leky: "Médicaments", academy: "Academy", ai: "IA", vip: "Longévité" },
 };
 
 const NEWS_TAB_LABELS: Record<string, string[]> = {
+  cs: ["Novinky", "Veřejnost", "Dlouhověkost", "Články"],
   en: ["News", "Public", "Longevity", "Articles"],
-  de: ["News", "Öffentlichkeit", "Langlebigkeit", "Artikel"],
+  de: ["Nachrichten", "Öffentlichkeit", "Langlebigkeit", "Artikel"],
   fr: ["Actualités", "Grand public", "Longévité", "Articles"],
   es: ["Noticias", "Público", "Longevidad", "Artículos"],
   it: ["Notizie", "Pubblico", "Longevità", "Articoli"],
@@ -202,14 +223,15 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
 
 export function getPortalChrome(locale?: LocaleCode | string): PortalChrome {
   const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const isCs = primary === "cs";
   const base = CHROME[primary] ?? CHROME.en ?? CHROME.cs;
-  const tabLabels = NEWS_TAB_LABELS[primary] ?? NEWS_TAB_LABELS.en;
+  const tabLabels = isCs ? NEWS_TAB_LABELS.cs : NEWS_TAB_LABELS[primary] ?? NEWS_TAB_LABELS.en;
   const newsTabs = PORTAL_NEWS_TABS.map((tab, index) => ({
     href: tab.href,
     label: tabLabels?.[index] ?? tab.label,
   }));
-  const hints = SERVICE_HINTS[primary] ?? SERVICE_HINTS.en ?? SERVICE_HINTS.de;
-  const labels = SERVICE_LABELS[primary] ?? SERVICE_LABELS.en;
+  const hints = isCs ? SERVICE_HINTS.cs : SERVICE_HINTS[primary] ?? SERVICE_HINTS.en;
+  const labels = isCs ? SERVICE_LABELS.cs : SERVICE_LABELS[primary] ?? SERVICE_LABELS.en;
   const services = PORTAL_SERVICES.map((svc) => ({
     id: svc.id,
     label: labels?.[svc.id] ?? svc.label,

@@ -180,7 +180,7 @@ assert.ok(isLocaleRoutingExcluded("/api/health"));
 const deDesks = newsDesksForLocale("de");
 assert.equal(deDesks.find((d) => d.id === "dlouhovekost")?.label, "Langlebigkeit");
 assert.equal(newsDesksForLocale("cs").find((d) => d.id === "dlouhovekost")?.label, "Dlouhověkost");
-assert.equal(getPortalChrome("de").newsTabs[0]?.label, "News");
+assert.equal(getPortalChrome("de").newsTabs[0]?.label, "Nachrichten");
 assert.equal(getPortalChrome("fr").trialCta.includes("14"), true);
 assert.ok(getPortalChrome("de").footerLegal.includes("Langlebigkeit"));
 assert.equal(getPortalChrome("sk").forWhom, "Who it's for");
@@ -243,6 +243,16 @@ assert.equal(getDesktopHeaderMenu("de")[0]?.children?.[0]?.label, "Langlebigkeit
 assert.ok((frHeader[4]?.children?.length ?? 0) >= 4);
 assert.ok(getPortalChrome("cs").trialCta.includes("zdarma"));
 assert.ok(getPortalChrome("fr").services.some((s) => s.id === "vip" && s.label === "Longévité"));
+assert.equal(getPortalChrome("cs").services.find((s) => s.id === "leky")?.label, "Léky");
+assert.equal(getPortalChrome("cs").services.find((s) => s.id === "ai")?.hint, "zeptat se");
+assert.ok(!getPortalChrome("cs").services.some((s) => s.label === "Drugs" || s.hint === "ask"));
+assert.deepEqual(
+  getPortalChrome("cs").newsTabs.map((tab) => tab.label),
+  ["Novinky", "Veřejnost", "Dlouhověkost", "Články"]
+);
+assert.equal(getSurfaceCopy("cs").searchPlaceholder.includes("Dlouhověkost"), true);
+assert.ok(!getSurfaceCopy("cs").searchPlaceholder.includes("Longevity"));
+assert.ok(!getSurfaceCopy("cs").trending.some((item) => /VIP/i.test(item.label)));
 assert.equal(getMarketingCopy("de").publicHub.topics["zivotni-styl"]?.label, "Lebensstil");
 assert.equal(getMarketingCopy("fr").publicHub.topics["zivotni-styl"]?.label, "Mode de vie");
 assert.ok(getHomepageLongevityCopy("cs").title.includes("kroky"));
