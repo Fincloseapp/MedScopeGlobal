@@ -17,8 +17,7 @@ export default function LekariHubPage() {
   return (
     <V271HubPageView
       page={V271_LEKARI_PAGES.index}
-      sectionLabel="Lékaři"
-      homeHref="/lekari"
+      section="lekari"
       afterLinks={
         <>
           <div className="mb-8">

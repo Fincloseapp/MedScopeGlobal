@@ -1,4 +1,5 @@
 import type { LocaleCode } from "@/lib/i18n/config";
+import { localizeNavTree } from "@/lib/i18n/nav-copy";
 
 export type NavItem = {
   label: string;
@@ -345,20 +346,17 @@ const menuEn: NavItem[] = [
 ];
 
 export function getMainMenu(locale: LocaleCode): NavItem[] {
-  return locale === "cs" ? menuCs : menuEn;
+  return localizeNavTree(menuCs, locale);
 }
 
-/** v33 — compact desktop header: 6 primary items, all visible without overflow */
+/** v33 — compact desktop header: same Czech IA, translated labels. */
 export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
-  if (locale !== "cs") {
-    return getMainMenu(locale).slice(0, 6);
-  }
   const find = (label: string) => menuCs.find((item) => item.label === label);
   const verejnost = find("Pro veřejnost");
   const studenti = find("Pro studenty");
   const lekari = find("Pro lékaře");
   const predplatne = find("Předplatné");
-  return [
+  const tree: NavItem[] = [
     verejnost ? { ...verejnost, label: "Veřejnost" } : { label: "Veřejnost", href: "/verejnost" },
     studenti ? { ...studenti, label: "Studenti" } : { label: "Studenti", href: "/studenti" },
     lekari ? { ...lekari, label: "Lékaři" } : { label: "Lékaři", href: "/lekari" },
@@ -379,6 +377,7 @@ export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
     },
     predplatne ?? { label: "Předplatné", href: "/predplatne" },
   ];
+  return localizeNavTree(tree, locale);
 }
 
 /** v33 — mobile drawer shows full menu */

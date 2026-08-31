@@ -26,8 +26,7 @@ export default async function FirmySubPage({ params }: { params: Promise<{ slug:
   return (
     <V271HubPageView
       page={page}
-      sectionLabel="Firmy"
-      homeHref="/firmy"
+      section="firmy"
       afterLinks={slug === "cenik" ? <V271B2BPricingTable /> : undefined}
     />
   );

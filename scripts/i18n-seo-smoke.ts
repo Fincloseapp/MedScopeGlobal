@@ -30,6 +30,12 @@ import { isSearchEngineBot } from "../lib/i18n/search-bots";
 import { newsDesksForLocale } from "../lib/v271/news-desks";
 import { getPortalChrome } from "../lib/v271/portal";
 import { getSurfaceCopy, isCzechSurface } from "../lib/i18n/surface-copy";
+import { getSubscribeCopy } from "../lib/i18n/subscribe-copy";
+import { getMarketingCopy } from "../lib/i18n/marketing-copy";
+import { localizePublicHref } from "../lib/i18n/nav-copy";
+import { localizeV271Page } from "../lib/i18n/hub-copy";
+import { getDesktopHeaderMenu } from "../lib/config/main-navigation";
+import { V271_LEKARI_PAGES } from "../lib/v271/routes";
 
 // --- unit checks (no server required) ---
 assert.equal(localeToPathSegment("en-US"), "en-us");
@@ -167,6 +173,40 @@ assert.ok(!getSurfaceCopy("de").siteDescription.includes("14 dní"));
 assert.ok(getSurfaceCopy("de").siteDescription.includes("14 Tage"));
 assert.equal(getSurfaceCopy("de").cookieTitle, "Cookies und Datenschutz");
 assert.equal(getSurfaceCopy("sk").cookieTitle, "Cookies and privacy");
+assert.equal(getSurfaceCopy("fr").mainNav, "Navigation principale");
+assert.equal(getSubscribeCopy("fr").title, "Accès premium aux contenus médicaux");
+assert.ok(!getSubscribeCopy("fr").title.includes("Předplatné"));
+assert.ok(!getSubscribeCopy("de").faqTitle.includes("Časté"));
+assert.equal(getSubscribeCopy("sk").eyebrow, "Subscription");
+assert.equal(localizePublicHref("/predplatne", "fr"), "/fr/predplatne");
+assert.equal(localizePublicHref("/predplatne?trial=1", "de"), "/de/predplatne?trial=1");
+assert.equal(localizePublicHref("/app/pacient", "fr"), "/app/pacient");
+
+const csHeader = getDesktopHeaderMenu("cs");
+const frHeader = getDesktopHeaderMenu("fr");
+assert.equal(csHeader.length, 5);
+assert.equal(frHeader.length, 5);
+assert.deepEqual(
+  csHeader.map((item) => item.href.replace(/^\/cs(?=\/)/, "")),
+  ["/verejnost", "/studenti", "/lekari", "/aplikace", "/predplatne"]
+);
+assert.deepEqual(
+  frHeader.map((item) => item.href),
+  ["/fr/verejnost", "/fr/studenti", "/fr/lekari", "/fr/aplikace", "/fr/predplatne"]
+);
+assert.equal(frHeader[0]?.label, "Grand public");
+assert.equal(frHeader[4]?.label, "Abonnement");
+assert.equal(getDesktopHeaderMenu("de")[2]?.label, "Ärzte");
+assert.equal(getMarketingCopy("fr").apps.title, "Applis");
+assert.ok(!getMarketingCopy("fr").apps.trialCta.includes("zdarma"));
+assert.equal(getMarketingCopy("de").about.eyebrow, "Über uns");
+assert.equal(getMarketingCopy("sk").publicHub.title.includes("plain"), true);
+
+const frLekari = localizeV271Page(V271_LEKARI_PAGES.index, "lekari", "fr");
+assert.equal(frLekari.sectionLabel, "Médecins");
+assert.ok(frLekari.page.title.includes("médecins") || frLekari.page.title.includes("Médecins") || frLekari.page.title.includes("chercheurs"));
+assert.ok(!frLekari.page.title.includes("lékaře"));
+assert.ok(frLekari.page.links.some((l) => l.href.startsWith("/fr/")));
 
 console.log("✓ i18n/SEO unit checks passed");
 

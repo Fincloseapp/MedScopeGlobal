@@ -22,6 +22,6 @@ export default async function StudentiSubPage({ params }: { params: Promise<{ sl
   const page = V271_STUDENTI_PAGES[slug];
   if (!page) notFound();
   return (
-    <V271HubPageView page={page} sectionLabel="Studenti" homeHref="/studenti" />
+    <V271HubPageView page={page} section="studenti" />
   );
 }

@@ -7,16 +7,24 @@ import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-discl
 import { getLegalEntity } from "@/lib/config/legal-entity";
 import { SITE } from "@/lib/config/site";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getMarketingCopy } from "@/lib/i18n/marketing-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getMarketingCopy(locale).contact;
   return await buildLocalizedPageMetadata({
-  title: "Kontakt | MedScopeGlobal",
-  description: "Kontaktujte MedScopeGlobal pro odborné informace, partnerství nebo reklamní spolupráci.",
-  path: "/contact",
-});
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    path: "/contact",
+    locale,
+  });
 }
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const locale = await getServerLocale();
+  const copy = getMarketingCopy(locale).contact;
   const entity = getLegalEntity();
   const organizationSchema = {
     "@context": "https://schema.org",
@@ -64,33 +72,30 @@ export default function ContactPage() {
           <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
             <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">Kontakt</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">{copy.eyebrow}</p>
                 <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-[#021d33] sm:text-5xl">
-                  Napište nám — odpovíme do 24 hodin
+                  {copy.title}
                 </h1>
-                <p className="mt-4 text-lg leading-8 text-slate-600">
-                  Dotazy k obsahu pro veřejnost, partnerství s univerzitami, reklamní spolupráce i technická podpora.
-                  Každá zpráva je evidována a směrována správnému týmu.
-                </p>
+                <p className="mt-4 text-lg leading-8 text-slate-600">{copy.lead}</p>
 
                 <div className="mt-6 grid gap-3 sm:grid-cols-2">
                   <a href={`mailto:${entity.supportEmail}`} className="rounded-2xl border border-[#cfe1f3] bg-white p-4 shadow-[0_12px_30px_-24px_rgba(0,91,150,0.65)]">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">Hlavní kontakt</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">{copy.mainContact}</p>
                     <p className="mt-2 text-sm font-semibold text-[#021d33]">{entity.supportEmail}</p>
                   </a>
                   <a href="mailto:ads@medscopeglobal.com" className="rounded-2xl border border-[#cfe1f3] bg-white p-4 shadow-[0_12px_30px_-24px_rgba(0,91,150,0.65)]">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">Reklamy & inzerce</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">{copy.ads}</p>
                     <p className="mt-2 text-sm font-semibold text-[#021d33]">ads@medscopeglobal.com</p>
                   </a>
                   {entity.supportPhone ? (
                     <a href={`tel:${entity.supportPhone.replace(/\s/g, "")}`} className="rounded-2xl border border-[#cfe1f3] bg-white p-4 shadow-[0_12px_30px_-24px_rgba(0,91,150,0.65)]">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">Telefon</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">{copy.phone}</p>
                       <p className="mt-2 text-sm font-semibold text-[#021d33]">{entity.supportPhone}</p>
                     </a>
                   ) : null}
                   {entity.address ? (
                     <div className="rounded-2xl border border-[#cfe1f3] bg-white p-4 shadow-[0_12px_30px_-24px_rgba(0,91,150,0.65)]">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">Provozovatel</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">{copy.operator}</p>
                       <p className="mt-2 text-sm font-semibold text-[#021d33]">{entity.name}</p>
                       <p className="mt-1 text-xs text-muted-foreground">
                         IČO {entity.ico}
@@ -102,32 +107,30 @@ export default function ContactPage() {
                 </div>
 
                 <div className="mt-6 flex flex-wrap gap-3">
-                  <Link href="/submit-research" className="inline-flex items-center gap-2 rounded-full bg-[#005B96] px-4 py-2 text-sm font-semibold text-white">
-                    Odeslat výzkum
+                  <Link href={localizePublicHref("/submit-research", locale)} className="inline-flex items-center gap-2 rounded-full bg-[#005B96] px-4 py-2 text-sm font-semibold text-white">
+                    {copy.sendResearch}
                     <ArrowRight className="h-4 w-4" />
                   </Link>
-                  <Link href="/pricing" className="inline-flex rounded-full border border-[#8dc4ea] px-4 py-2 text-sm font-semibold text-[#005B96]">
-                    Zobrazit ceník
+                  <Link href={localizePublicHref("/pricing", locale)} className="inline-flex rounded-full border border-[#8dc4ea] px-4 py-2 text-sm font-semibold text-[#005B96]">
+                    {copy.showPricing}
                   </Link>
                 </div>
               </div>
 
               <div className="rounded-[30px] border border-[#dfeaf5] bg-white p-5 shadow-[0_26px_70px_-34px_rgba(0,91,150,0.68)]">
                 <div className="rounded-3xl bg-[#0A3D5C] p-5 text-white">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#bfe3ff]">Odpověď do 24 hodin</p>
-                  <h2 className="mt-2 font-display text-2xl font-semibold">Prioritizovaný kontakt</h2>
-                  <p className="mt-2 text-sm text-white/80">
-                    Zprávy z kontaktního formuláře jsou směrovány podle typu žádosti a každý dotaz je evidován do interního logu.
-                  </p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#bfe3ff]">{copy.replyEyebrow}</p>
+                  <h2 className="mt-2 font-display text-2xl font-semibold">{copy.replyTitle}</h2>
+                  <p className="mt-2 text-sm text-white/80">{copy.replyLead}</p>
                 </div>
 
                 <div className="mt-5 space-y-3">
                   <div className="flex items-start gap-3 rounded-2xl border border-[#dbeaf7] bg-[#f8fbff] p-4">
                     <Mail className="mt-0.5 h-5 w-5 text-[#005B96]" />
                     <div>
-                      <p className="text-sm font-semibold text-[#021d33]">Hlavní kontakty</p>
+                      <p className="text-sm font-semibold text-[#021d33]">{copy.contactsTitle}</p>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        {entity.supportEmail} pro odborné dotazy, publikace a spolupráce.
+                        {entity.supportEmail} {copy.contactsBody}
                       </p>
                     </div>
                   </div>
@@ -135,7 +138,7 @@ export default function ContactPage() {
                     <div className="flex items-start gap-3 rounded-2xl border border-[#dbeaf7] bg-[#f8fbff] p-4">
                       <Phone className="mt-0.5 h-5 w-5 text-[#005B96]" />
                       <div>
-                        <p className="text-sm font-semibold text-[#021d33]">Telefon podpory</p>
+                        <p className="text-sm font-semibold text-[#021d33]">{copy.phoneSupport}</p>
                         <p className="mt-1 text-sm text-muted-foreground">{entity.supportPhone}</p>
                       </div>
                     </div>
@@ -144,7 +147,7 @@ export default function ContactPage() {
                     <div className="flex items-start gap-3 rounded-2xl border border-[#dbeaf7] bg-[#f8fbff] p-4">
                       <MapPin className="mt-0.5 h-5 w-5 text-[#005B96]" />
                       <div>
-                        <p className="text-sm font-semibold text-[#021d33]">Sídlo</p>
+                        <p className="text-sm font-semibold text-[#021d33]">{copy.seat}</p>
                         <p className="mt-1 text-sm text-muted-foreground">{entity.address}</p>
                       </div>
                     </div>
@@ -152,8 +155,8 @@ export default function ContactPage() {
                   <div className="flex items-start gap-3 rounded-2xl border border-[#dbeaf7] bg-[#f8fbff] p-4">
                     <ShieldCheck className="mt-0.5 h-5 w-5 text-[#005B96]" />
                     <div>
-                      <p className="text-sm font-semibold text-[#021d33]">Bezpečné zpracování</p>
-                      <p className="mt-1 text-sm text-muted-foreground">Formuláře mají validaci, anti-spam ochranu a auditní logování.</p>
+                      <p className="text-sm font-semibold text-[#021d33]">{copy.safeTitle}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{copy.safeBody}</p>
                     </div>
                   </div>
                 </div>
@@ -165,10 +168,10 @@ export default function ContactPage() {
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
           <div className="mb-10">
             <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">
-              Důvěra a bezpečnost
+              {copy.trustEyebrow}
             </p>
             <h2 className="mt-2 font-display text-2xl font-bold text-[#021d33]">
-              Proč nám můžete napsat
+              {copy.trustTitle}
             </h2>
             <div className="mt-5">
               <PublicTrustBadges />
@@ -178,12 +181,12 @@ export default function ContactPage() {
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
               Zásady ochrany údajů:{" "}
-              <Link href="/privacy" className="font-medium text-[#005B96] hover:underline">
-                Ochrana soukromí (GDPR)
+              <Link href={localizePublicHref("/privacy", locale)} className="font-medium text-[#005B96] hover:underline">
+                {copy.privacy}
               </Link>
               {" · "}
-              <Link href="/o-nas" className="font-medium text-[#005B96] hover:underline">
-                O nás
+              <Link href={localizePublicHref("/o-nas", locale)} className="font-medium text-[#005B96] hover:underline">
+                {copy.about}
               </Link>
             </p>
           </div>
@@ -191,14 +194,14 @@ export default function ContactPage() {
           <div className="grid gap-6 lg:grid-cols-2">
             <ContactForm
               kind="general"
-              title="Obecný dotaz"
-              description="Napište nám, pokud potřebujete informace o obsahu, spolupráci nebo publikaci."
+              title={copy.generalTitle}
+              description={copy.generalDesc}
               destination="info@medscopeglobal.com"
             />
             <ContactForm
               kind="partner"
-              title="Partnerský kontakt"
-              description="Pro reklamní spolupráci, inzerci nebo komerční partnerství využijte tento formulář."
+              title={copy.partnerTitle}
+              description={copy.partnerDesc}
               destination="ads@medscopeglobal.com"
             />
           </div>

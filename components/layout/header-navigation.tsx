@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import type { NavItem } from "@/lib/config/main-navigation";
 import { cn } from "@/lib/utils";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 
 const NAV_ITEM =
   "inline-flex shrink-0 items-center whitespace-nowrap py-1 text-sm font-medium leading-none tracking-[0.1px]";
@@ -97,7 +98,7 @@ function NavDropdownPanel({
 }
 
 /** v27.2 — viewport-safe dropdowns + horizontal scroll for overflow */
-export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
+export function HeaderNavigation({ mainMenu, locale = "cs" }: { mainMenu: NavItem[]; locale?: string }) {
   const pathname = usePathname() ?? "";
   const [openLabel, setOpenLabel] = useState<string | null>(null);
   const navRef = useRef<HTMLElement>(null);
@@ -133,7 +134,7 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
     <nav
       ref={navRef}
       className="header-nav-scroll hidden min-w-0 flex-1 flex-nowrap items-center justify-end gap-1 overflow-x-auto overflow-y-visible md:flex lg:gap-2 xl:gap-3"
-      aria-label="Hlavní navigace"
+      aria-label={getSurfaceCopy(locale).mainNav}
     >
       {mainMenu.map((item) => {
         const isOpen = openLabel === item.label;
@@ -192,6 +193,6 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
   );
 }
 
-export function V21DesktopNav({ mainMenu }: { mainMenu: NavItem[] }) {
-  return <HeaderNavigation mainMenu={mainMenu} />;
+export function V21DesktopNav({ mainMenu, locale = "cs" }: { mainMenu: NavItem[]; locale?: string }) {
+  return <HeaderNavigation mainMenu={mainMenu} locale={locale} />;
 }

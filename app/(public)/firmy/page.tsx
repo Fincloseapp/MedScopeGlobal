@@ -12,8 +12,7 @@ export default function FirmyHubPage() {
   return (
     <V271HubPageView
       page={V271_FIRMY_PAGES.index}
-      sectionLabel="Firmy"
-      homeHref="/firmy"
+      section="firmy"
       afterLinks={<V271B2BPricingTable compact />}
     />
   );

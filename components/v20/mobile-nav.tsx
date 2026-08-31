@@ -129,7 +129,7 @@ export function V20MobileNav({
                     <button
                       type="button"
                       aria-expanded={isExpanded}
-                      aria-label={`Rozbalit ${item.label}`}
+                      aria-label={`${surface.expandMenu} ${item.label}`}
                       className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100"
                       onClick={() => setExpanded(isExpanded ? null : item.label)}
                     >

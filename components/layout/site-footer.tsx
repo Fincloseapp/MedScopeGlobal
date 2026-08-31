@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
   const copy = getSurfaceCopy(locale);
   const footer = copy.footer;
+  const href = (path: string) => localizePublicHref(path, locale);
   return (
     <footer className="border-t bg-slate-50" aria-label={footer.aria}>
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-5">
         <div className="sm:col-span-2 lg:col-span-2">
-          <MedScopeLogo href="/" preset="footer" />
+          <MedScopeLogo href={href("/")} preset="footer" />
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{footer.tagline}</p>
           <p className="mt-3 text-xs font-medium uppercase tracking-wider text-[#005B96]">
             {footer.evidence}
@@ -24,7 +26,7 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
           <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
             {footer.audiences.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="hover:text-foreground">
+                <Link href={href(item.href)} className="hover:text-foreground">
                   {item.label}
                 </Link>
               </li>
@@ -36,7 +38,7 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
           <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
             {footer.proof.map((item) => (
               <li key={`${item.href}-${item.label}`}>
-                <Link href={item.href} className="hover:text-foreground">
+                <Link href={href(item.href)} className="hover:text-foreground">
                   {item.label}
                 </Link>
               </li>
@@ -48,22 +50,22 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
           <p className="font-medium text-foreground">{footer.explore}</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li>
-              <Link href="/" className="hover:text-foreground">
+              <Link href={href("/")} className="hover:text-foreground">
                 {footer.home}
               </Link>
             </li>
             <li>
-              <Link href="/aplikace" className="hover:text-foreground">
+              <Link href={href("/aplikace")} className="hover:text-foreground">
                 {footer.apps}
               </Link>
             </li>
             <li>
-              <Link href="/articles" className="hover:text-foreground">
+              <Link href={href("/articles")} className="hover:text-foreground">
                 {footer.articles}
               </Link>
             </li>
             <li>
-              <Link href="/vip/protokoly" className="hover:text-foreground">
+              <Link href={href("/vip/protokoly")} className="hover:text-foreground">
                 {footer.vip}
               </Link>
             </li>
@@ -88,42 +90,42 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
               </Link>
             </li>
             <li>
-              <Link href="/verejnost/temata" className="hover:text-foreground">
+              <Link href={href("/verejnost/temata")} className="hover:text-foreground">
                 {footer.findProblem}
               </Link>
             </li>
             <li>
-              <Link href="/verejnost/clanky" className="hover:text-foreground">
+              <Link href={href("/verejnost/clanky")} className="hover:text-foreground">
                 {footer.publicArticles}
               </Link>
             </li>
             <li>
-              <Link href="/ai-asistent/verejnost" className="hover:text-foreground">
+              <Link href={href("/ai-asistent/verejnost")} className="hover:text-foreground">
                 {footer.askAi}
               </Link>
             </li>
             <li>
-              <Link href="/verejnost" className="hover:text-foreground">
+              <Link href={href("/verejnost")} className="hover:text-foreground">
                 {footer.publicOverview}
               </Link>
             </li>
             <li>
-              <Link href="/studenti" className="hover:text-foreground">
+              <Link href={href("/studenti")} className="hover:text-foreground">
                 {footer.students}
               </Link>
             </li>
             <li>
-              <Link href="/studie" className="hover:text-foreground">
+              <Link href={href("/studie")} className="hover:text-foreground">
                 {footer.studies}
               </Link>
             </li>
             <li>
-              <Link href="/odborna" className="hover:text-foreground">
+              <Link href={href("/odborna")} className="hover:text-foreground">
                 {footer.experts}
               </Link>
             </li>
             <li>
-              <Link href="/predplatne" className="hover:text-foreground">
+              <Link href={href("/predplatne")} className="hover:text-foreground">
                 {footer.subscribe}
               </Link>
             </li>
@@ -134,42 +136,42 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
           <p className="font-medium text-foreground">{footer.legal}</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li>
-              <Link href="/privacy" className="hover:text-foreground">
+              <Link href={href("/privacy")} className="hover:text-foreground">
                 {footer.privacy}
               </Link>
             </li>
             <li>
-              <Link href="/terms" className="hover:text-foreground">
+              <Link href={href("/terms")} className="hover:text-foreground">
                 {footer.terms}
               </Link>
             </li>
             <li>
-              <Link href="/cookies" className="hover:text-foreground">
+              <Link href={href("/cookies")} className="hover:text-foreground">
                 {footer.cookies}
               </Link>
             </li>
             <li>
-              <Link href="/znacka" className="hover:text-foreground">
+              <Link href={href("/znacka")} className="hover:text-foreground">
                 {footer.brand}
               </Link>
             </li>
             <li>
-              <Link href="/pravni-checklist" className="hover:text-foreground">
+              <Link href={href("/pravni-checklist")} className="hover:text-foreground">
                 {footer.legalChecklist}
               </Link>
             </li>
             <li>
-              <Link href="/kontakt" className="hover:text-foreground">
+              <Link href={href("/kontakt")} className="hover:text-foreground">
                 {footer.contact}
               </Link>
             </li>
             <li>
-              <Link href="/o-nas" className="hover:text-foreground">
+              <Link href={href("/o-nas")} className="hover:text-foreground">
                 {footer.about}
               </Link>
             </li>
             <li>
-              <Link href="/subscribe" className="hover:text-foreground">
+              <Link href={href("/subscribe")} className="hover:text-foreground">
                 {footer.register}
               </Link>
             </li>

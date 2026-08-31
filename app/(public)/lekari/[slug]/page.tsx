@@ -21,5 +21,5 @@ export default async function LekariSubPage({ params }: { params: Promise<{ slug
   const { slug } = await params;
   const page = V271_LEKARI_PAGES[slug];
   if (!page) notFound();
-  return <V271HubPageView page={page} sectionLabel="Lékaři" homeHref="/lekari" />;
+  return <V271HubPageView page={page} section="lekari" />;
 }

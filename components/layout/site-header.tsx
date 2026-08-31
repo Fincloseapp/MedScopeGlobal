@@ -51,7 +51,7 @@ export function SiteHeader({
         <HeaderLogo className="max-w-[min(28vw,168px)] shrink-0 lg:max-w-[200px]" />
 
         <div className="flex min-w-0 flex-1 items-center justify-end gap-2 lg:gap-3">
-          <HeaderNavigation mainMenu={desktopMenu} />
+          <HeaderNavigation mainMenu={desktopMenu} locale={locale} />
 
           <div className="flex shrink-0 items-center gap-1 border-l border-black/[0.06] pl-2 dark:border-white/10 lg:gap-1.5 lg:pl-3">
             <LocaleSwitcher currentLocale={locale} compact />

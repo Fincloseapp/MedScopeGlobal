@@ -1,34 +1,20 @@
 import Link from "next/link";
 import { CreditCard, Lock, ShieldCheck } from "lucide-react";
+import { getSubscribeCopy } from "@/lib/i18n/subscribe-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
-const badges = [
-  {
-    icon: CreditCard,
-    title: "Platby přes Stripe",
-    description: "Karta, Apple Pay a Google Pay. Bezpečná PCI-kompatibilní platba.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "GDPR a ochrana dat",
-    description: "Zpracování v souladu s EU nařízením. Vaše data neprodáváme.",
-    href: "/privacy",
-  },
-  {
-    icon: Lock,
-    title: "Zrušení kdykoli",
-    description: "Předplatné spravujete v účtu. Po zkušební době bez skrytých poplatků.",
-  },
-] as const;
+const ICONS = [CreditCard, ShieldCheck, Lock] as const;
 
-export function SubscriptionTrustBadges() {
+export function SubscriptionTrustBadges({ locale = "cs" }: { locale?: string }) {
+  const copy = getSubscribeCopy(locale);
   return (
-    <section aria-label="Důvěryhodnost plateb" className="mt-16">
+    <section aria-label={copy.trustAria} className="mt-16">
       <h2 className="text-center font-display text-2xl font-semibold text-[#021d33]">
-        Bezpečná platba a ochrana soukromí
+        {copy.trustTitle}
       </h2>
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        {badges.map((badge) => {
-          const Icon = badge.icon;
+        {copy.trust.map((badge, index) => {
+          const Icon = ICONS[index] ?? CreditCard;
           const inner = (
             <>
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#005B96]/10 text-[#005B96]">
@@ -41,11 +27,11 @@ export function SubscriptionTrustBadges() {
             </>
           );
 
-          if ("href" in badge && badge.href) {
+          if (index === 1) {
             return (
               <Link
                 key={badge.title}
-                href={badge.href}
+                href={localizePublicHref("/privacy", locale)}
                 className="flex gap-4 rounded-2xl border border-[#005B96]/15 bg-white p-5 shadow-sm transition hover:border-[#005B96]/30 hover:shadow-md"
               >
                 {inner}
@@ -67,12 +53,12 @@ export function SubscriptionTrustBadges() {
         Powered by{" "}
         <span className="font-semibold text-[#635bff]">Stripe</span>
         {" · "}
-        <Link href="/privacy" className="text-[#005B96] underline">
-          Zásady ochrany osobních údajů
+        <Link href={localizePublicHref("/privacy", locale)} className="text-[#005B96] underline">
+          {copy.privacy}
         </Link>
         {" · "}
-        <Link href="/terms" className="text-[#005B96] underline">
-          Obchodní podmínky
+        <Link href={localizePublicHref("/terms", locale)} className="text-[#005B96] underline">
+          {copy.terms}
         </Link>
       </p>
     </section>

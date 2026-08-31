@@ -300,12 +300,15 @@ export async function buildV271HubMetadata(
   section: "studenti" | "lekari" | "firmy",
   page: V271HubPage
 ): Promise<Metadata> {
-  const prefix =
-    section === "studenti" ? "Studenti" : section === "lekari" ? "Lékaři" : "Firmy";
+  const { getServerLocale } = await import("@/lib/i18n/server-locale");
+  const { localizeV271Page } = await import("@/lib/i18n/hub-copy");
+  const locale = await getServerLocale();
+  const localized = localizeV271Page(page, section, locale);
   const path = page.slug ? `/${section}/${page.slug}` : `/${section}`;
   return buildLocalizedV20PageMetadata({
-    title: `${page.title} | ${prefix} — MedScopeGlobal`,
-    description: page.description,
+    title: `${localized.page.title} | ${localized.sectionLabel} — MedScopeGlobal`,
+    description: localized.page.description,
     path,
+    locale,
   });
 }

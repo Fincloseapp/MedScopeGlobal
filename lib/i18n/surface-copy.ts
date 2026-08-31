@@ -86,6 +86,8 @@ export type SurfaceCopy = {
   searchNoResults: string;
   searchOpenFull: string;
   menuOpen: string;
+  mainNav: string;
+  expandMenu: string;
   language: string;
   signIn: string;
   downloadApps: string;
@@ -213,6 +215,8 @@ const COPY: Record<string, SurfaceCopy> = {
     searchNoResults: "Nic se nenašlo. Zkuste MeDipacient, MeDiprep nebo OrdiZapis.",
     searchOpenFull: "Otevřít plné hledání",
     menuOpen: "Otevřít menu",
+    mainNav: "Hlavní navigace",
+    expandMenu: "Rozbalit",
     language: "Jazyk",
     signIn: "Přihlášení",
     downloadApps: "Stáhnout aplikace",
@@ -370,6 +374,8 @@ const COPY: Record<string, SurfaceCopy> = {
     searchNoResults: "Nothing found. Try MeDipacient, MeDiprep or OrdiZapis.",
     searchOpenFull: "Open full search",
     menuOpen: "Open menu",
+    mainNav: "Main navigation",
+    expandMenu: "Expand",
     language: "Language",
     signIn: "Sign in",
     downloadApps: "Get the apps",
@@ -525,6 +531,8 @@ const COPY: Record<string, SurfaceCopy> = {
     searchNoResults: "Nichts gefunden. Versuchen Sie MeDipacient, MeDiprep oder OrdiZapis.",
     searchOpenFull: "Vollständige Suche öffnen",
     menuOpen: "Menü öffnen",
+    mainNav: "Hauptnavigation",
+    expandMenu: "Ausklappen",
     language: "Sprache",
     signIn: "Anmelden",
     downloadApps: "Apps laden",
@@ -680,6 +688,8 @@ const COPY: Record<string, SurfaceCopy> = {
     searchNoResults: "Aucun résultat. Essayez MeDipacient, MeDiprep ou OrdiZapis.",
     searchOpenFull: "Ouvrir la recherche complète",
     menuOpen: "Ouvrir le menu",
+    mainNav: "Navigation principale",
+    expandMenu: "Déplier",
     language: "Langue",
     signIn: "Connexion",
     downloadApps: "Télécharger les applis",
