@@ -205,12 +205,22 @@ export async function resolveArticleTranslation(
   if (matchesArticleLocale(fields.locale, uiLocale)) return null;
 
   const cached = await getCachedTranslation(articleId, uiLocale);
-  if (cached) {
-    if (mode === "card" && cached.title) {
-      return { title: cached.title, excerpt: cached.excerpt };
+  if (cached?.title) {
+    if (mode === "card") {
+      return {
+        title: cached.title,
+        excerpt: cached.excerpt,
+        translation_provider: cached.translation_provider,
+        machine_translated: cached.machine_translated ?? true,
+        reviewed: cached.reviewed,
+      };
     }
-    if (mode === "full" && cached.content) return cached;
-    if (mode === "full" && cached.title && options?.live === false) return cached;
+    if (cached.content) return cached;
+    // Listing cache has title/excerpt only. On Workers a full-body MT often exceeds
+    // the request budget and leaves the H1 in Czech — serve the cached headline.
+    if (process.env.MEDSCOPE_RUNTIME === "cloudflare-workers" || options?.live === false) {
+      return cached;
+    }
   }
 
   if (options?.live === false) {

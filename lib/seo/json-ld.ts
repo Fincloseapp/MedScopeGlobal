@@ -190,6 +190,7 @@ export function medicalWebPageJsonLd(page: {
   path: string;
   dateModified?: string;
   inLanguage?: string;
+  locale?: string;
 }) {
   return {
     "@context": "https://schema.org",
@@ -198,9 +199,9 @@ export function medicalWebPageJsonLd(page: {
     description: page.description,
     url: `${SITE.url}${page.path}`,
     inLanguage: page.inLanguage ?? "cs-CZ",
-    isPartOf: webSiteJsonLd(),
+    isPartOf: webSiteJsonLd(page.locale),
     dateModified: page.dateModified,
-    publisher: organizationJsonLd(),
+    publisher: organizationJsonLd(page.locale),
     audience: {
       "@type": "MedicalAudience",
       audienceType: "Physician, MedicalStudent, Researcher",

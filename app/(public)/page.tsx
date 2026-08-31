@@ -69,6 +69,7 @@ export default async function HomePage() {
     description: philosophy.subtitle,
     path: `/${localeToPathSegment(locale)}`,
     inLanguage: locale === "cs" ? "cs-CZ" : String(locale),
+    locale,
   });
 
   return (
