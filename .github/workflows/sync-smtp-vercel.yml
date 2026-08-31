@@ -1,56 +1,18 @@
-name: Sync SMTP to Vercel
+name: Sync SMTP (Cloudflare)
 
-# Pushes Cloudflare Email Sending SMTP credentials to Vercel (all envs) and redeploys.
+# SMTP for medscopeglobal.com is Cloudflare Email Sending.
+# Worker secrets live in Cloudflare (pnpm cf:env:sync / dashboard), not Vercel.
+
 on:
   workflow_dispatch:
 
 jobs:
-  sync:
+  note:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Vercel CLI
-        run: npm install -g vercel@latest
-
-      - name: Upsert SMTP env on Vercel
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
-          SMTP_FROM_EMAIL: ${{ secrets.SMTP_FROM_EMAIL }}
-          SMTP_SECURE: ${{ secrets.SMTP_SECURE }}
+      - name: Cloudflare-only SMTP
         run: |
-          set -euo pipefail
-          if [ -z "${SMTP_PASS:-}" ]; then
-            echo "SMTP_PASS secret is empty"
-            exit 1
-          fi
-          # Defaults if secrets only store the password
-          SMTP_HOST="${SMTP_HOST:-smtp.mx.cloudflare.net}"
-          SMTP_PORT="${SMTP_PORT:-465}"
-          SMTP_USER="${SMTP_USER:-api_token}"
-          SMTP_FROM_EMAIL="${SMTP_FROM_EMAIL:-info@medscopeglobal.com}"
-          SMTP_SECURE="${SMTP_SECURE:-true}"
-
-          for key in SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASS SMTP_FROM_EMAIL SMTP_SECURE; do
-            val="${!key}"
-            echo "→ upsert $key"
-            printf '%s' "$val" | vercel env add "$key" production --force --token="$VERCEL_TOKEN"
-            printf '%s' "$val" | vercel env add "$key" preview --force --token="$VERCEL_TOKEN" || true
-            printf '%s' "$val" | vercel env add "$key" development --force --token="$VERCEL_TOKEN" || true
-          done
-
-      - name: Redeploy production
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |
-          set -euo pipefail
-          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-          vercel deploy --prod --token="$VERCEL_TOKEN" --yes
+          echo "Do not sync SMTP to Vercel."
+          echo "Set SMTP_* on the Cloudflare Worker (pnpm cf:env:sync or dashboard bindings)."
+          echo "Host: smtp.mx.cloudflare.net"
+          echo "Site: https://medscopeglobal.com"

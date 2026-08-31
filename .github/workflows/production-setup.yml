@@ -1,10 +1,13 @@
 name: Production Setup
 
+# Production is Cloudflare Workers only. Prisma/migrations use GitHub secrets.
+# Deploys: cloudflare-deploy.yml (push to main) or pnpm cf:deploy.
+
 on:
   workflow_dispatch:
 
 jobs:
-  configure-and-deploy:
+  migrate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,41 +35,8 @@ jobs:
           npx prisma migrate deploy
           node prisma/seed.mjs
 
-      - name: Install Vercel CLI
-        run: npm install -g vercel@latest
-
-      - name: Pull Vercel settings
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-
-      - name: Sync production environment variables
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL }}
-          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+      - name: Production deploy is Cloudflare Workers
         run: |
-          for key in DATABASE_URL DIRECT_URL AUTH_SECRET NEXT_PUBLIC_SITE_URL; do
-            value="${!key}"
-            if [ "$key" = "NEXT_PUBLIC_SITE_URL" ] && [ -z "$value" ]; then
-              value="https://medscopeglobal.com"
-            fi
-            if [ -n "$value" ]; then
-              printf '%s' "$value" | vercel env add "$key" production --force --token="$VERCEL_TOKEN"
-            fi
-          done
-
-      - name: Deploy to production
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: vercel deploy --prod --token="$VERCEL_TOKEN"
-
-      - name: Verify health endpoint
-        run: |
-          sleep 30
-          curl --fail --retry 5 --retry-delay 10 https://medscopeglobal.com/api/portal/health
+          echo "Vercel is not used."
+          echo "Deploy: GitHub Actions cloudflare-deploy.yml or pnpm cf:deploy"
+          echo "Site: https://medscopeglobal.com"

@@ -21,24 +21,8 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install tools
-        run: |
-          npm install -g vercel@latest
-          npm install pg@8.13.1 --no-save
-
-      - name: Pull production env from Vercel
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |
-          set -euo pipefail
-          # Prefer REST decrypt path — CLI pull often writes literal [SENSITIVE]
-          node scripts/ci-pull-vercel-env-decrypted.mjs ./.env.production.pulled
-          cp ./.env.production.pulled ./medscope.env.local
-          # Also keep CLI pull for comparison metadata
-          vercel pull --yes --environment=production --token="$VERCEL_TOKEN" || true
-          echo "pulled_env_lines=$(wc -l < ./medscope.env.local)"
+      - name: Install pg (optional Postgres path)
+        run: npm install pg@8.13.1 --no-save
 
       - name: Apply B2B CME SQL migrations
         id: apply_sql
@@ -51,7 +35,7 @@ jobs:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
-        run: node scripts/ci-apply-academy-b2b-migration.mjs ./.env.production.pulled
+        run: node scripts/ci-apply-academy-b2b-migration.mjs
 
       - name: Fallback via production setup API
         if: steps.apply_sql.outcome != 'success'
@@ -64,13 +48,3 @@ jobs:
           echo "$body"
           echo "$body" | grep -q 'HTTP_STATUS:200'
           echo "Fallback setup API OK"
-
-      - name: Upload env for local restore
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: medscope-env-local
-          path: medscope.env.local
-          retention-days: 1
-          if-no-files-found: warn
-          include-hidden-files: true

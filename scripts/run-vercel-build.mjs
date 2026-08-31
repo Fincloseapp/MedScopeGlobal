@@ -19,10 +19,10 @@ function run(label, cmd, args) {
   console.log(`✓ ${label}`);
 }
 
-console.log("\n=== MedScopeGlobal build (Vercel auto-deploy pipeline) ===\n");
+console.log("\n=== MedScopeGlobal build (local Next.js) ===\n");
 if (process.env.VERCEL === "1") {
-  console.log(`Vercel environment: ${process.env.VERCEL_ENV ?? "unknown"}`);
-  console.log(`Git branch: ${process.env.VERCEL_GIT_COMMIT_REF ?? "unknown"}\n`);
+  console.error("Vercel builds are disabled. Deploy with pnpm cf:deploy (Cloudflare Workers).");
+  process.exit(1);
 }
 
 run("pre-deploy gates", process.execPath, [join(root, "scripts/run-predeploy-gates.mjs")]);
@@ -45,4 +45,4 @@ if (process.platform === "win32" && process.env.VERCEL !== "1") {
   run("next build", process.execPath, [nextBin, "build"]);
 }
 
-console.log("\n=== Build complete — Vercel will alias production to medscopeglobal.com ===\n");
+console.log("\n=== Build complete — production deploys via Cloudflare Workers (pnpm cf:deploy) ===\n");
