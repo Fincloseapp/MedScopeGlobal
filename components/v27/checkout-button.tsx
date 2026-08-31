@@ -10,6 +10,7 @@ type Props = {
   productId: string;
   label?: string;
   className?: string;
+  locale?: string;
 };
 
 export function V27CheckoutButton({
@@ -17,6 +18,7 @@ export function V27CheckoutButton({
   productId,
   label = "Přejít na Stripe pokladnu",
   className,
+  locale,
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +44,12 @@ export function V27CheckoutButton({
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind, productId, ...(userId ? { userId } : {}) }),
+        body: JSON.stringify({
+          kind,
+          productId,
+          ...(userId ? { userId } : {}),
+          ...(locale ? { locale } : {}),
+        }),
       });
       const data = (await res.json()) as {
         url?: string;

@@ -8,7 +8,8 @@ import { SubscriptionTrustBadges } from "@/components/subscription/subscription-
 import { V27_SUBSCRIPTION_PLANS, subscriptionProductId } from "@/lib/v27/config";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { APP_PRODUCTS, type AppProductId } from "@/lib/apps/catalog";
-import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getServerLocale, getServerRegion } from "@/lib/i18n/server-locale";
+import { convertCzkToCharge } from "@/lib/i18n/payment-currency";
 import { getSubscribeCopy } from "@/lib/i18n/subscribe-copy";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
@@ -34,6 +35,7 @@ export default async function PredplatnePage({
   const { trial } = await searchParams;
   const highlightTrial = trial === "1";
   const locale = await getServerLocale();
+  const region = await getServerRegion();
   const copy = getSubscribeCopy(locale);
   const surface = getSurfaceCopy(locale);
 
@@ -120,6 +122,8 @@ export default async function PredplatnePage({
             const localized = copy.plans[plan.tier];
             const highlighted = plan.tier === "dokumentace";
             const studentHighlight = plan.tier === "student" && !highlighted;
+            const monthly = convertCzkToCharge(plan.monthlyCzk, locale, region);
+            const annual = convertCzkToCharge(plan.annualCzk, locale, region);
             return (
               <div
                 key={plan.tier}
@@ -149,16 +153,12 @@ export default async function PredplatnePage({
                   {localized.name}
                 </h3>
                 <p className="mt-2">
-                  <span className="text-3xl font-bold">
-                    {plan.monthlyCzk} {copy.currencyLabel}
-                  </span>
+                  <span className="text-3xl font-bold">{monthly.formatted}</span>
                   <span className="text-muted-foreground"> {copy.perMonth}</span>
                 </p>
                 <p className="mt-1 text-sm text-slate-600">
                   {copy.yearly}{" "}
-                  <span className="font-semibold text-[#005B96]">
-                    {plan.annualCzk} {copy.currencyLabel}
-                  </span>{" "}
+                  <span className="font-semibold text-[#005B96]">{annual.formatted}</span>{" "}
                   {copy.perYear}{" "}
                   <span className="text-emerald-700">{copy.twoMonthsFree}</span>
                 </p>
@@ -179,19 +179,23 @@ export default async function PredplatnePage({
                   <V27CheckoutButton
                     kind="subscription"
                     productId={subscriptionProductId(plan.tier, "month")}
+                    locale={locale}
                     label={
-                      plan.tier === "dokumentace" ? copy.startOrdiZapis : copy.startTrialMonth
+                      plan.tier === "dokumentace"
+                        ? `${copy.daysFree} — ${monthly.formatted}`
+                        : copy.startTrialMonth
                     }
                   />
                   <V27CheckoutButton
                     kind="subscription"
                     productId={subscriptionProductId(plan.tier, "year")}
-                    label={`${copy.startTrialYear} (${plan.annualCzk} ${copy.currencyLabel})`}
+                    locale={locale}
+                    label={`${copy.startTrialYear} (${annual.formatted})`}
                     className="w-full border border-[#005B96]/30 bg-white text-[#005B96] hover:bg-[#005B96]/5"
                   />
                 </div>
                 <p className="mt-3 text-center text-xs text-slate-500">
-                  {copy.afterTrial} {plan.monthlyCzk} {copy.afterTrialUnit} · {copy.cancelAnytime}
+                  {copy.afterTrial} {monthly.formatted} {copy.perMonth} · {copy.cancelAnytime}
                 </p>
               </div>
             );
@@ -199,7 +203,7 @@ export default async function PredplatnePage({
         </div>
       </section>
 
-      <SubscriptionComparisonTable locale={locale} />
+      <SubscriptionComparisonTable locale={locale} region={region} />
       <SubscriptionTrustBadges locale={locale} />
       <SubscriptionFaq locale={locale} />
 

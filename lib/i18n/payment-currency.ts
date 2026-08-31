@@ -1,6 +1,7 @@
 import { GLOBAL_LOCALES, type GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale, type LocaleCode, type RegionCode } from "@/lib/i18n/config";
+import { intlLocaleFor } from "@/lib/i18n/format-date";
 
 const EUROZONE = new Set(["de", "fr", "it", "es", "sk", "nl", "pt", "fi", "at", "be", "ie", "lt", "lv", "ee", "si", "mt", "cy", "lu"]);
 
@@ -90,4 +91,94 @@ export function paymentLocaleTag(locale: string | null | undefined): GlobalLocal
   if (primary === "ja") return "ja";
   if (primary === "zh") return "zh-CN";
   return primary === "cs" ? "cs" : "en";
+}
+
+/** Stripe zero-decimal currencies — unit_amount is the whole major unit. */
+export const ZERO_DECIMAL_CURRENCIES = new Set(["jpy", "krw", "vnd", "idr", "huf"]);
+
+/**
+ * Editorial CZK per 1 unit of charge currency (list prices stay CZK).
+ * Used for display + Stripe price_data so /fr charges EUR, /en-us USD, /cs CZK.
+ */
+const CZK_PER_UNIT: Record<string, number> = {
+  czk: 1,
+  eur: 25,
+  usd: 23,
+  gbp: 29,
+  cad: 16.5,
+  pln: 5.8,
+  ron: 5,
+  huf: 0.062,
+  rub: 0.25,
+  uah: 0.55,
+  byn: 7,
+  cny: 3.2,
+  jpy: 0.155,
+  krw: 0.017,
+  vnd: 0.0009,
+  idr: 0.0014,
+  inr: 0.27,
+};
+
+export type ChargeAmount = {
+  currency: string;
+  symbol: string;
+  unitAmount: number;
+  major: number;
+  formatted: string;
+};
+
+export function isZeroDecimalCurrency(currency: string): boolean {
+  return ZERO_DECIMAL_CURRENCIES.has(currency.toLowerCase());
+}
+
+/** Convert a CZK list price into the visitor's charge currency (locale + optional region). */
+export function convertCzkToCharge(
+  czkMajor: number,
+  locale?: string | null,
+  region?: string | null
+): ChargeAmount {
+  const tiers = paymentTiersForUser(locale, region);
+  const currency = tiers.currency.toLowerCase();
+  const perUnit = CZK_PER_UNIT[currency] ?? CZK_PER_UNIT.usd!;
+  const majorRaw = czkMajor / perUnit;
+  const unitAmount = isZeroDecimalCurrency(currency)
+    ? Math.max(1, Math.round(majorRaw))
+    : Math.max(1, Math.round(majorRaw * 100));
+  const major = isZeroDecimalCurrency(currency) ? unitAmount : unitAmount / 100;
+  return {
+    currency,
+    symbol: tiers.symbol,
+    unitAmount,
+    major,
+    formatted: formatChargeAmount(unitAmount, currency, locale, tiers.symbol),
+  };
+}
+
+export function formatChargeAmount(
+  unitAmount: number,
+  currency: string,
+  locale?: string | null,
+  symbol?: string
+): string {
+  const ccy = currency.toLowerCase();
+  const major = isZeroDecimalCurrency(ccy) ? unitAmount : unitAmount / 100;
+  try {
+    return new Intl.NumberFormat(intlLocaleFor(locale), {
+      style: "currency",
+      currency: ccy.toUpperCase(),
+      maximumFractionDigits: isZeroDecimalCurrency(ccy) ? 0 : 2,
+    }).format(major);
+  } catch {
+    const rounded = isZeroDecimalCurrency(ccy) ? String(Math.round(major)) : major.toFixed(2);
+    return `${rounded} ${symbol ?? ccy.toUpperCase()}`;
+  }
+}
+
+export function formatCzkListPrice(
+  czkMajor: number,
+  locale?: string | null,
+  region?: string | null
+): string {
+  return convertCzkToCharge(czkMajor, locale, region).formatted;
 }

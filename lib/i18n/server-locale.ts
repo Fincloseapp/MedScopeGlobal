@@ -4,8 +4,11 @@ import {
   LOCALE_COOKIE,
   LOCALE_MANUAL_COOKIE,
   LOCALE_REQUEST_HEADER,
+  REGION_COOKIE,
+  REGIONS,
   normalizeLocale,
   type LocaleCode,
+  type RegionCode,
 } from "@/lib/i18n/config";
 
 export { LOCALE_REQUEST_HEADER };
@@ -30,3 +33,11 @@ export function isLocaleManuallySet(
 }
 
 export { DEFAULT_LOCALE };
+
+/** Optional region cookie — fills currency only for generic English, never overrides /cs or /fr. */
+export async function getServerRegion(): Promise<RegionCode | null> {
+  const cookieStore = await cookies();
+  const raw = cookieStore.get(REGION_COOKIE)?.value;
+  if (raw && REGIONS.includes(raw as RegionCode)) return raw as RegionCode;
+  return null;
+}

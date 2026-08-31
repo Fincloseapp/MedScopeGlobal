@@ -4,6 +4,7 @@ import {
   V27_COMPARISON_TIERS,
   V27_SUBSCRIPTION_PLANS,
 } from "@/lib/v27/config";
+import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
 import { getSubscribeCopy } from "@/lib/i18n/subscribe-copy";
 
 function CellValue({ included, includedLabel, missingLabel }: { included: boolean; includedLabel: string; missingLabel: string }) {
@@ -21,7 +22,13 @@ function CellValue({ included, includedLabel, missingLabel }: { included: boolea
   );
 }
 
-export function SubscriptionComparisonTable({ locale = "cs" }: { locale?: string }) {
+export function SubscriptionComparisonTable({
+  locale = "cs",
+  region,
+}: {
+  locale?: string;
+  region?: string | null;
+}) {
   const copy = getSubscribeCopy(locale);
   const tiers = V27_COMPARISON_TIERS.map(
     (tier) => V27_SUBSCRIPTION_PLANS.find((p) => p.tier === tier)!
@@ -49,7 +56,7 @@ export function SubscriptionComparisonTable({ locale = "cs" }: { locale?: string
                 >
                   <span className="block">{copy.plans[plan.tier].name}</span>
                   <span className="mt-1 block text-lg font-bold text-[#021d33]">
-                    {plan.monthlyCzk} Kč
+                    {formatCzkListPrice(plan.monthlyCzk, locale, region)}
                   </span>
                   <span className="text-xs font-normal text-muted-foreground">{copy.perMonth}</span>
                 </th>
