@@ -48,7 +48,7 @@ import { publicEditorialByline } from "../lib/editorial/units";
 import { getVerejnostChrome } from "../lib/i18n/verejnost-chrome";
 import { topicLabelForSlug } from "../lib/config/verejnost-topics";
 import { localizeMagazineHubConfig } from "../lib/i18n/localize-magazine-hub";
-import { OSVETA_MAGAZINE_HUB } from "../lib/portal/magazine-section-hub";
+import { getClankyMagazineHub, OSVETA_MAGAZINE_HUB } from "../lib/portal/magazine-section-hub";
 import { getVerejnostNavStripCopy } from "../lib/v38/conversion-copy";
 import { getHomepageLongevityCopy } from "../lib/i18n/homepage-longevity";
 import { classifyCoverTopic } from "../lib/ecosystem/editorial/images/cover";
@@ -361,6 +361,19 @@ assert.ok(frOsvetaHub.secondaryCtas.every((cta) => !looksLikeCzech(cta.label)));
 assert.ok(frOsvetaHub.pillars.every((p) => !looksLikeCzech(p.label)));
 const csOsvetaHub = localizeMagazineHubConfig(OSVETA_MAGAZINE_HUB, "cs");
 assert.ok(csOsvetaHub.title.includes("osvěta") || csOsvetaHub.title.includes("Osvěta") || /osvěta/i.test(csOsvetaHub.title));
+const csClankyHub = localizeMagazineHubConfig(getClankyMagazineHub(), "cs");
+assert.equal(csClankyHub.editorialIntroTitle, "Vítejte v MedScopeGlobal");
+assert.equal(csClankyHub.editorialIntro.length, 5);
+assert.ok(csClankyHub.editorialIntro[0]?.includes("MedScopeGlobal"));
+assert.ok(csClankyHub.editorialIntro.some((p) => p.includes("ViaLongeVita")));
+assert.ok(!csClankyHub.editorialIntro.join(" ").includes("VIP"));
+const frClankyHub = localizeMagazineHubConfig(getClankyMagazineHub(), "fr");
+assert.equal(frClankyHub.editorialIntroTitle, "Bienvenue sur MedScopeGlobal");
+assert.ok(!looksLikeCzech(frClankyHub.editorialIntro.join(" ")));
+assert.ok(frClankyHub.editorialIntro.some((p) => p.includes("ViaLongeVita")));
+const deClankyHub = localizeMagazineHubConfig(getClankyMagazineHub(), "de");
+assert.equal(deClankyHub.editorialIntroTitle, "Willkommen bei MedScopeGlobal");
+assert.ok(!looksLikeCzech(deClankyHub.editorialIntro.join(" ")));
 
 console.log("✓ i18n/SEO unit checks passed");
 

@@ -213,9 +213,13 @@ const CS: VerejnostChrome = {
       title: "Články pro veřejnost",
       heroDeck:
         "Aktuální texty o prevenci, nemocích, životním stylu a dlouhověkosti — srozumitelně, s redakční kontrolou.",
-      introTitle: "Veřejný magazín ViaLongeVita",
+      introTitle: "Vítejte v MedScopeGlobal",
       intro: [
-        "Veřejný magazín publikuje dlouhé články pro širokou veřejnost. Každý text prochází redakční kontrolou: ověřitelné zdroje a jasné oddělení vzdělávání od diagnózy.",
+        "Vítejte v MedScopeGlobal – komplexním prostředí, které spojuje moderní medicínu, prevenci, dlouhověkost a odborné vzdělávání. medscopeglobal.com je platforma, která přináší jistotu tam, kde ji lidé nejvíce potřebují: kvalitní informace, odborné přehledy, vzdělávací materiály a praktické návody, které pomáhají žít zdravěji, vědoměji a sebevědoměji.",
+        "Součástí našeho ekosystému je ViaLongeVita – prémiový magazín zaměřený na dlouhověkost, vitalitu a moderní wellness. ViaLongeVita není jen magazín. Je to místo, kde se inspirace mění v každodenní praxi, kde exkluzivní články, rozhovory a analýzy otevírají dveře k životu, který je kvalitnější, vyrovnanější a dlouhodobě udržitelný.",
+        "Pro studenty medicíny, zdravotníky a odbornou veřejnost nabízíme také přehled lékařských učebnic, odborných knih, kurzů a školení. Vzdělávání je pilířem našeho projektu – a proto vytváříme prostředí, které podporuje profesní růst, jistotu a dlouhodobou odbornou kompetenci.",
+        "Každý článek, každá publikace a každý vzdělávací materiál vzniká s cílem přinést skutečnou hodnotu. Pokud chcete být součástí komunity, která si cení kvalitních informací, podporuje naši práci a získává přístup k prémiovým materiálům, předplatné je ideální cestou. Umožňuje nám tvořit obsah, který má smysl – a vám poskytuje výhody, které jinde nenajdete.",
+        "Děkujeme, že jste součástí MedScopeGlobal a ViaLongeVita. Vaše zdraví, vzdělání a dlouhodobá vitalita jsou naším posláním – a společně budujeme prostor, který inspiruje, vzdělává a posouvá kupředu.",
       ],
       coverAlt: "Zdravá strava — ilustrace veřejného magazínu",
       badge: {
@@ -392,9 +396,13 @@ const EN: VerejnostChrome = {
       title: "Articles for everyone",
       heroDeck:
         "Current pieces on prevention, illness, lifestyle and longevity — plain language, editorial review.",
-      introTitle: "The ViaLongeVita public magazine",
+      introTitle: "Welcome to MedScopeGlobal",
       intro: [
-        "The public magazine publishes longform for a general audience. Every text is reviewed: checkable sources and a clear line between education and diagnosis.",
+        "Welcome to MedScopeGlobal — a complete environment that brings together modern medicine, prevention, longevity and professional education. medscopeglobal.com is the platform that offers certainty where people need it most: reliable information, expert briefings, learning materials and practical guides that help you live healthier, more consciously and with more confidence.",
+        "Part of our ecosystem is ViaLongeVita — a premium magazine focused on longevity, vitality and modern wellness. ViaLongeVita is more than a magazine. It is a place where inspiration becomes everyday practice, where exclusive articles, interviews and analyses open the door to a life that is higher-quality, more balanced and sustainable over time.",
+        "For medical students, health professionals and the specialist public we also offer an overview of medical textbooks, professional books, courses and training. Education is a pillar of the project — which is why we build an environment that supports professional growth, confidence and lasting competence.",
+        "Every article, every publication and every learning resource is made to deliver real value. If you want to be part of a community that values reliable information, supports our work and gains access to premium materials, a subscription is the right path. It lets us create content that matters — and gives you benefits you will not find elsewhere.",
+        "Thank you for being part of MedScopeGlobal and ViaLongeVita. Your health, education and long-term vitality are our mission — and together we are building a space that inspires, teaches and moves us forward.",
       ],
       coverAlt: "Healthy food — illustration for the public magazine",
       badge: {
@@ -572,9 +580,13 @@ const DE: VerejnostChrome = {
       title: "Artikel für alle",
       heroDeck:
         "Aktuelle Texte zu Prävention, Krankheit, Lebensstil und Langlebigkeit — verständlich, redaktionell geprüft.",
-      introTitle: "Das öffentliche ViaLongeVita-Magazin",
+      introTitle: "Willkommen bei MedScopeGlobal",
       intro: [
-        "Das öffentliche Magazin veröffentlicht Longform für ein allgemeines Publikum. Jeder Text wird geprüft: nachvollziehbare Quellen und eine klare Grenze zwischen Bildung und Diagnose.",
+        "Willkommen bei MedScopeGlobal — einer umfassenden Umgebung, die moderne Medizin, Prävention, Langlebigkeit und fachliche Bildung verbindet. medscopeglobal.com ist die Plattform, die Sicherheit dort schafft, wo Menschen sie am meisten brauchen: verlässliche Informationen, Fachüberblicke, Lernmaterial und praktische Anleitungen, die helfen, gesünder, bewusster und selbstbewusster zu leben.",
+        "Teil unseres Ökosystems ist ViaLongeVita — ein Premium-Magazin für Langlebigkeit, Vitalität und modernes Wellness. ViaLongeVita ist mehr als ein Magazin. Es ist ein Ort, an dem Inspiration zur Alltagspraxis wird und exklusive Artikel, Gespräche und Analysen den Weg zu einem qualitativ besseren, ausgeglicheneren und nachhaltigen Leben öffnen.",
+        "Für Medizinstudierende, Gesundheitsberufe und die Fachöffentlichkeit bieten wir außerdem einen Überblick über Lehrbücher, Fachbücher, Kurse und Fortbildungen. Bildung ist eine Säule des Projekts — deshalb schaffen wir ein Umfeld, das berufliches Wachstum, Sicherheit und dauerhafte Kompetenz trägt.",
+        "Jeder Artikel, jede Publikation und jedes Lernmaterial entsteht, um echten Nutzen zu stiften. Wenn Sie Teil einer Gemeinschaft sein möchten, die verlässliche Informationen schätzt, unsere Arbeit unterstützt und Zugang zu Premium-Materialien erhält, ist ein Abo der richtige Weg. Es ermöglicht uns, Inhalte mit Sinn zu schaffen — und gibt Ihnen Vorteile, die Sie anderswo nicht finden.",
+        "Danke, dass Sie Teil von MedScopeGlobal und ViaLongeVita sind. Ihre Gesundheit, Ihre Bildung und Ihre langfristige Vitalität sind unser Auftrag — gemeinsam bauen wir einen Raum, der inspiriert, bildet und voranbringt.",
       ],
       coverAlt: "Gesunde Ernährung — Illustration für das öffentliche Magazin",
       badge: {
@@ -752,9 +764,13 @@ const FR: VerejnostChrome = {
       title: "Articles pour tous",
       heroDeck:
         "Textes actuels sur la prévention, la maladie, le mode de vie et la longévité — langage clair, relecture éditoriale.",
-      introTitle: "Le magazine public ViaLongeVita",
+      introTitle: "Bienvenue sur MedScopeGlobal",
       intro: [
-        "Le magazine public publie des longs formats pour un large public. Chaque texte est relu : sources vérifiables et séparation claire entre éducation et diagnostic.",
+        "Bienvenue sur MedScopeGlobal — un environnement complet qui relie médecine moderne, prévention, longévité et formation professionnelle. medscopeglobal.com est la plateforme qui apporte de la certitude là où les gens en ont le plus besoin : des informations fiables, des synthèses d’experts, des supports d’apprentissage et des guides pratiques pour vivre plus sainement, plus consciemment et avec plus d’assurance.",
+        "ViaLongeVita fait partie de notre écosystème — un magazine premium consacré à la longévité, à la vitalité et au wellness moderne. ViaLongeVita n’est pas seulement un magazine. C’est un lieu où l’inspiration devient une pratique quotidienne, où des articles, entretiens et analyses exclusifs ouvrent la voie à une vie plus qualitative, plus équilibrée et durable.",
+        "Pour les étudiants en médecine, les professionnels de santé et le public spécialisé, nous proposons aussi un aperçu des manuels, ouvrages, cours et formations. L’éducation est un pilier du projet — c’est pourquoi nous créons un environnement qui soutient la croissance professionnelle, la confiance et une compétence durable.",
+        "Chaque article, chaque publication et chaque ressource pédagogique vise une vraie valeur. Si vous voulez faire partie d’une communauté qui tient aux informations de qualité, soutient notre travail et accède à des contenus premium, l’abonnement est le bon chemin. Il nous permet de créer un contenu qui a du sens — et vous offre des avantages que vous ne trouverez pas ailleurs.",
+        "Merci de faire partie de MedScopeGlobal et de ViaLongeVita. Votre santé, votre formation et votre vitalité à long terme sont notre mission — ensemble, nous construisons un espace qui inspire, forme et fait avancer.",
       ],
       coverAlt: "Alimentation saine — illustration du magazine grand public",
       badge: {
