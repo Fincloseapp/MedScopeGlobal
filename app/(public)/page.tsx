@@ -15,7 +15,7 @@ import { localeToPathSegment } from "@/lib/i18n/locale-path";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getHomepageCachedData } from "@/lib/v22/homepage-cache";
 import { getPortalChrome, getPortalPhilosophy } from "@/lib/v271/portal";
-import { isCzechSurface } from "@/lib/i18n/surface-copy";
+import { isCzechSurface, getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import {
   getHomepageDescription,
   getHomepageTitle,
@@ -73,15 +73,17 @@ export default async function HomePage() {
 
   return (
     <div className="v271-home bg-[#f3f7fb]">
-      <JsonLdScript data={webSiteJsonLd()} />
+      <JsonLdScript data={webSiteJsonLd(locale)} />
       <JsonLdScript data={publicationJsonLd()} />
       <JsonLdScript data={homeLd} />
-      {APP_PRODUCTS.map((app) => (
+      {APP_PRODUCTS.filter((app) => isCzechSurface(locale) || app.id !== "mediprep").map((app) => (
         <JsonLdScript
           key={app.id}
           data={softwareApplicationJsonLd({
             name: app.shortName,
-            description: appSeoDescription(app),
+            description: isCzechSurface(locale)
+              ? appSeoDescription(app)
+              : `${app.shortName}: ${getSurfaceCopy(locale).appTaglines[app.id]}`,
             url: app.marketingPath,
             installUrl: app.downloadPath,
             category: app.id === "mediprep" ? "EducationalApplication" : "HealthApplication",

@@ -51,7 +51,7 @@ export async function resolveConversionCopy(
     /* table may not exist yet — fall through */
   }
 
-  const staticCopy = getStaticCopy(slot, daySeed());
+  const staticCopy = getStaticCopy(slot, daySeed(), locale);
   return { ...staticCopy, generatedBy: "static" };
 }
 

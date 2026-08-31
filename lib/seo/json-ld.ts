@@ -1,15 +1,16 @@
 import { MEDSCOPE_LOGO } from "@/lib/brand/logo";
 import { MAGAZINE } from "@/lib/brand/magazine";
 import { SITE } from "@/lib/config/site";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 
-export function organizationJsonLd() {
+export function organizationJsonLd(locale?: string) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: SITE.name,
     alternateName: MAGAZINE.name,
     url: SITE.url,
-    description: SITE.description,
+    description: getSurfaceCopy(locale).siteDescription,
     email: SITE.supportEmail,
     logo: `${SITE.url}${MEDSCOPE_LOGO.transparent}`,
     contactPoint: [
@@ -207,14 +208,14 @@ export function medicalWebPageJsonLd(page: {
   };
 }
 
-export function webSiteJsonLd() {
+export function webSiteJsonLd(locale?: string) {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: SITE.name,
     alternateName: MAGAZINE.name,
     url: SITE.url,
-    description: SITE.description,
+    description: getSurfaceCopy(locale).siteDescription,
     inLanguage: [
       "cs-CZ",
       "sk-SK",

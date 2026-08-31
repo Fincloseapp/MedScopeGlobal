@@ -85,6 +85,11 @@ export type SurfaceCopy = {
   searching: string;
   searchNoResults: string;
   searchOpenFull: string;
+  menuOpen: string;
+  language: string;
+  signIn: string;
+  downloadApps: string;
+  siteDescription: string;
   footer: FooterCopy;
 };
 
@@ -203,6 +208,12 @@ const COPY: Record<string, SurfaceCopy> = {
     searching: "Hledám…",
     searchNoResults: "Nic se nenašlo. Zkuste MeDipacient, MeDiprep nebo OrdiZapis.",
     searchOpenFull: "Otevřít plné hledání",
+    menuOpen: "Otevřít menu",
+    language: "Jazyk",
+    signIn: "Přihlášení",
+    downloadApps: "Stáhnout aplikace",
+    siteDescription:
+      "ViaLongeVita — globální magazín zdraví a dlouhověkosti na MedScopeGlobal.com. MediFlow, VIP protokoly, MeDipacient a OrdiZapis. Evidence-based obsah ve 19 jazycích. 14 dní zdarma.",
     footer: {
       aria: "Patička webu",
       tagline:
@@ -350,6 +361,11 @@ const COPY: Record<string, SurfaceCopy> = {
     searching: "Searching…",
     searchNoResults: "Nothing found. Try MeDipacient, MeDiprep or OrdiZapis.",
     searchOpenFull: "Open full search",
+    menuOpen: "Open menu",
+    language: "Language",
+    signIn: "Sign in",
+    downloadApps: "Get the apps",
+    siteDescription: `${MAGAZINE.name} — health and longevity magazine on MedScopeGlobal.com. MediFlow, VIP protocols, MeDipacient and OrdiZapis. Evidence-based content in 19 languages. 14 days free.`,
     footer: {
       aria: "Site footer",
       tagline: `${MAGAZINE.name} — health and longevity magazine. MediFlow, VIP protocols, MeDipacient and OrdiZapis on MedScopeGlobal.com.`,
@@ -496,6 +512,11 @@ const COPY: Record<string, SurfaceCopy> = {
     searching: "Suche…",
     searchNoResults: "Nichts gefunden. Versuchen Sie MeDipacient, MeDiprep oder OrdiZapis.",
     searchOpenFull: "Vollständige Suche öffnen",
+    menuOpen: "Menü öffnen",
+    language: "Sprache",
+    signIn: "Anmelden",
+    downloadApps: "Apps laden",
+    siteDescription: `${MAGAZINE.name} — Magazin für Gesundheit und Langlebigkeit auf MedScopeGlobal.com. MediFlow, VIP-Protokolle, MeDipacient und OrdiZapis. Evidenzbasierte Inhalte in 19 Sprachen. 14 Tage kostenlos.`,
     footer: {
       aria: "Seitenfuß",
       tagline: `${MAGAZINE.name} — Magazin für Gesundheit und Langlebigkeit. MediFlow, VIP-Protokolle, MeDipacient und OrdiZapis auf MedScopeGlobal.com.`,
@@ -642,6 +663,11 @@ const COPY: Record<string, SurfaceCopy> = {
     searching: "Recherche…",
     searchNoResults: "Aucun résultat. Essayez MeDipacient, MeDiprep ou OrdiZapis.",
     searchOpenFull: "Ouvrir la recherche complète",
+    menuOpen: "Ouvrir le menu",
+    language: "Langue",
+    signIn: "Connexion",
+    downloadApps: "Télécharger les applis",
+    siteDescription: `${MAGAZINE.name} — magazine de santé et de longévité sur MedScopeGlobal.com. MediFlow, protocoles VIP, MeDipacient et OrdiZapis. Contenus fondés sur les preuves en 19 langues. 14 jours gratuits.`,
     footer: {
       aria: "Pied de page",
       tagline: `${MAGAZINE.name} — magazine de santé et de longévité. MediFlow, protocoles VIP, MeDipacient et OrdiZapis sur MedScopeGlobal.com.`,

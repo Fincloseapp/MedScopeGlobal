@@ -100,7 +100,7 @@ export default async function RootLayout({
         className={`${inter.variable} ${display.variable} min-h-screen font-sans antialiased`}
       >
         <PublicEnvScript />
-        <JsonLdScript data={organizationJsonLd()} />
+        <JsonLdScript data={organizationJsonLd(locale)} />
         <JsonLdScript data={publicationJsonLd()} />
         <JsonLdScript data={newsletterJsonLd()} />
         <Providers>{children}</Providers>

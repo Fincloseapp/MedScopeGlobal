@@ -78,7 +78,7 @@ export function SiteHeaderWithConversion({
 
   const [reader, setReader] = useState<ReaderPayload>(DEFAULT_READER);
   const [stripCopy, setStripCopy] = useState<StoredNudge>(
-    navStripCopy ?? { ...getStaticCopy("nav_strip"), generatedBy: "static" }
+    navStripCopy ?? { ...getStaticCopy("nav_strip", 0, locale), generatedBy: "static" }
   );
 
   useEffect(() => {

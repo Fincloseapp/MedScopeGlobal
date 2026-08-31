@@ -13,6 +13,7 @@ import { NavSubscribeCta } from "@/components/v38/nav-subscribe-cta";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import { getDesktopHeaderMenu, getMobileMenu } from "@/lib/config/main-navigation";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { getPortalChrome } from "@/lib/v271/portal";
 
 /** v38 — sticky header, compact nav, subscribe CTA for non-VIP */
 export function SiteHeader({
@@ -54,7 +55,13 @@ export function SiteHeader({
 
           <div className="flex shrink-0 items-center gap-1 border-l border-black/[0.06] pl-2 dark:border-white/10 lg:gap-1.5 lg:pl-3">
             <LocaleSwitcher currentLocale={locale} compact />
-            {!isVip ? <NavSubscribeCta compact className="hidden lg:inline-flex" /> : null}
+            {!isVip ? (
+              <NavSubscribeCta
+                compact
+                className="hidden lg:inline-flex"
+                label={getPortalChrome(navLocale).trialCta}
+              />
+            ) : null}
             <SearchCommand isVip={isVip} accessLevel={accessLevel} locale={locale} />
             <ThemeToggle />
             {user ? <NotificationBell /> : null}

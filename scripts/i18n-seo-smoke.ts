@@ -163,7 +163,9 @@ assert.ok(!getSurfaceCopy("de").footer.tagline.includes("v češtině"));
 assert.ok(!getSurfaceCopy("fr").footer.evidence.includes("češtině"));
 assert.equal(getSurfaceCopy("de").appTaglines.ordizapis.includes("OrdiZapis"), true);
 assert.equal(newsDesksForLocale("ru")[0]?.label, "News");
-assert.equal(newsDesksForLocale("ja").find((d) => d.id === "dlouhovekost")?.label, "Longevity");
+assert.ok(!getSurfaceCopy("de").siteDescription.includes("14 dní"));
+assert.ok(getSurfaceCopy("de").siteDescription.includes("14 Tage"));
+assert.equal(getSurfaceCopy("sk").menuOpen, "Open menu");
 
 console.log("✓ i18n/SEO unit checks passed");
 

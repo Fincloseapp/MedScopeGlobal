@@ -1,4 +1,5 @@
-/** v38 — static conversion copy pool with "pro váš zájem" framing */
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { normalizeLocale } from "@/lib/i18n/config";
 
 export type ConversionSlot = "article_gate" | "article_inline" | "video_overlay" | "nav_strip" | "nav_cta";
 
@@ -109,7 +110,73 @@ const STATIC_POOL: Record<ConversionSlot, ConversionCopy[]> = {
   ],
 };
 
-export function getStaticCopy(slot: ConversionSlot, seed = 0): ConversionCopy {
+const I18N_STATIC: Record<string, Partial<Record<ConversionSlot, ConversionCopy>>> = {
+  en: {
+    nav_cta: {
+      slot: "nav_cta",
+      eyebrow: "For you",
+      headline: "MedScope Premium",
+      body: "MeDipacient, MediFlow and OrdiZapis plus VIP articles. 14 days free.",
+      ctaLabel: "14 days free",
+      ctaHref: "/predplatne?trial=1",
+    },
+    nav_strip: {
+      slot: "nav_strip",
+      eyebrow: "For you",
+      headline: "Apps on your home screen",
+      body: "MeDipacient, MediFlow and OrdiZapis — open the trial dashboard now. 14 days free.",
+      ctaLabel: "Get the apps",
+      ctaHref: "/aplikace",
+      hint: "14-day trial",
+    },
+  },
+  de: {
+    nav_cta: {
+      slot: "nav_cta",
+      eyebrow: "Für Sie",
+      headline: "MedScope Premium",
+      body: "MeDipacient, MediFlow und OrdiZapis plus VIP-Artikel. 14 Tage kostenlos.",
+      ctaLabel: "14 Tage kostenlos",
+      ctaHref: "/predplatne?trial=1",
+    },
+    nav_strip: {
+      slot: "nav_strip",
+      eyebrow: "Für Sie",
+      headline: "Apps auf dem Homescreen",
+      body: "MeDipacient, MediFlow und OrdiZapis — Testdashboard sofort. 14 Tage kostenlos.",
+      ctaLabel: "Apps laden",
+      ctaHref: "/aplikace",
+      hint: "14 Tage testen",
+    },
+  },
+  fr: {
+    nav_cta: {
+      slot: "nav_cta",
+      eyebrow: "Pour vous",
+      headline: "MedScope Premium",
+      body: "MeDipacient, MediFlow et OrdiZapis plus articles VIP. 14 jours gratuits.",
+      ctaLabel: "14 jours gratuits",
+      ctaHref: "/predplatne?trial=1",
+    },
+    nav_strip: {
+      slot: "nav_strip",
+      eyebrow: "Pour vous",
+      headline: "Des applis sur l’écran d’accueil",
+      body: "MeDipacient, MediFlow et OrdiZapis — tableau d’essai immédiat. 14 jours gratuits.",
+      ctaLabel: "Télécharger les applis",
+      ctaHref: "/aplikace",
+      hint: "Essai de 14 jours",
+    },
+  },
+};
+
+export function getStaticCopy(slot: ConversionSlot, seed = 0, locale = "cs"): ConversionCopy {
+  const primary = primaryArticleLocale(normalizeLocale(locale));
+  if (primary !== "cs") {
+    const pack = I18N_STATIC[primary] ?? I18N_STATIC.en;
+    const localized = pack?.[slot];
+    if (localized) return localized;
+  }
   const pool = STATIC_POOL[slot];
   return pool[Math.abs(seed) % pool.length] ?? pool[0]!;
 }
