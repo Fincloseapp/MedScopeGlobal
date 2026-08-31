@@ -1,5 +1,6 @@
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { localizeListedCzkIn } from "@/lib/i18n/payment-currency";
 import type { AppProductId } from "@/lib/apps/catalog";
 
 function pack(locale?: string | null): string {
@@ -910,5 +911,5 @@ const PACKS: Record<string, MarketingCopy> = { cs: CS, en: EN, de: DE, fr: FR };
 
 export function getMarketingCopy(locale?: string | null): MarketingCopy {
   const key = pack(locale);
-  return PACKS[key] ?? PACKS.en;
+  return localizeListedCzkIn(PACKS[key] ?? PACKS.en, locale);
 }

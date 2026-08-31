@@ -69,10 +69,10 @@ export function SiteHeaderWithConversion({
   }, [pathname]);
   const audienceStrip = useMemo(() => {
     if (mediflowPath) return { ...getMediFlowNavStripCopy(), generatedBy: "static" as const };
-    if (vipPath) return { ...getVipNavStripCopy(), generatedBy: "static" as const };
-    if (studentPath) return { ...getStudentiNavStripCopy(daySeed()), generatedBy: "static" as const };
+    if (vipPath) return { ...getVipNavStripCopy(locale), generatedBy: "static" as const };
+    if (studentPath) return { ...getStudentiNavStripCopy(daySeed(), locale), generatedBy: "static" as const };
     if (publicPath) return { ...getVerejnostNavStripCopy(locale), generatedBy: "static" as const };
-    if (physicianPath) return { ...getLekariNavStripCopy(), generatedBy: "static" as const };
+    if (physicianPath) return { ...getLekariNavStripCopy(locale), generatedBy: "static" as const };
     return null;
   }, [studentPath, publicPath, physicianPath, mediflowPath, vipPath, locale]);
 

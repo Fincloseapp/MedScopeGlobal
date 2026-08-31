@@ -1,7 +1,13 @@
 import { getSubscribeCopy } from "@/lib/i18n/subscribe-copy";
 
-export function SubscriptionFaq({ locale = "cs" }: { locale?: string }) {
-  const copy = getSubscribeCopy(locale);
+export function SubscriptionFaq({
+  locale = "cs",
+  region,
+}: {
+  locale?: string;
+  region?: string | null;
+}) {
+  const copy = getSubscribeCopy(locale, region);
   return (
     <section aria-labelledby="faq-heading" className="mt-16">
       <h2 id="faq-heading" className="font-display text-2xl font-semibold text-[#021d33]">

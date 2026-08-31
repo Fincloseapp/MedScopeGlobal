@@ -1,5 +1,6 @@
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { localizeListedCzk } from "@/lib/i18n/payment-currency";
 
 export type ConversionSlot = "article_gate" | "article_inline" | "video_overlay" | "nav_strip" | "nav_cta";
 
@@ -170,19 +171,28 @@ const I18N_STATIC: Record<string, Partial<Record<ConversionSlot, ConversionCopy>
   },
 };
 
+function withLocalPrices(copy: ConversionCopy, locale?: string | null): ConversionCopy {
+  return {
+    ...copy,
+    headline: localizeListedCzk(copy.headline, locale),
+    body: localizeListedCzk(copy.body, locale),
+    ctaLabel: localizeListedCzk(copy.ctaLabel, locale),
+  };
+}
+
 export function getStaticCopy(slot: ConversionSlot, seed = 0, locale = "cs"): ConversionCopy {
   const primary = primaryArticleLocale(normalizeLocale(locale));
   if (primary !== "cs") {
     const pack = I18N_STATIC[primary] ?? I18N_STATIC.en;
     const localized = pack?.[slot];
-    if (localized) return localized;
+    if (localized) return withLocalPrices(localized, locale);
   }
   const pool = STATIC_POOL[slot];
-  return pool[Math.abs(seed) % pool.length] ?? pool[0]!;
+  return withLocalPrices(pool[Math.abs(seed) % pool.length] ?? pool[0]!, locale);
 }
 
 /** Path-aware nav strip for student / academy prep surfaces. */
-export function getStudentiNavStripCopy(seed = 0): ConversionCopy {
+export function getStudentiNavStripCopy(seed = 0, locale = "cs"): ConversionCopy {
   const student: ConversionCopy[] = [
     {
       slot: "nav_strip",
@@ -202,64 +212,79 @@ export function getStudentiNavStripCopy(seed = 0): ConversionCopy {
       ctaHref: "/predplatne?trial=1#student",
     },
   ];
-  return student[Math.abs(seed) % student.length] ?? student[0]!;
+  return withLocalPrices(student[Math.abs(seed) % student.length] ?? student[0]!, locale);
 }
 
 export function getVerejnostNavStripCopy(locale?: string | null): ConversionCopy {
   const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
   if (primary === "de") {
-    return {
-      slot: "nav_strip",
-      eyebrow: "Für Sie",
-      headline: "MeDipacient: Befunde auf dem Handy",
-      body: "Die Test-Zeitachse ist offen. Eigene Befunde nach der Anmeldung hochladen — 99 CZK/Monat.",
-      ctaLabel: "MeDipacient öffnen",
-      ctaHref: "/app/pacient",
-      hint: "Als App auf den Bildschirm legen",
-    };
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "Für Sie",
+        headline: "MeDipacient: Befunde auf dem Handy",
+        body: "Die Test-Zeitachse ist offen. Eigene Befunde nach der Anmeldung hochladen — 99 CZK/Monat.",
+        ctaLabel: "MeDipacient öffnen",
+        ctaHref: "/app/pacient",
+        hint: "Als App auf den Bildschirm legen",
+      },
+      locale
+    );
   }
   if (primary === "fr") {
-    return {
-      slot: "nav_strip",
-      eyebrow: "Pour vous",
-      headline: "MeDipacient : comptes rendus sur le téléphone",
-      body: "La frise d’essai est ouverte. Déposez vos propres comptes rendus après connexion — 99 CZK/mois.",
-      ctaLabel: "Ouvrir MeDipacient",
-      ctaHref: "/app/pacient",
-      hint: "Installer sur l’écran d’accueil",
-    };
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "Pour vous",
+        headline: "MeDipacient : comptes rendus sur le téléphone",
+        body: "La frise d’essai est ouverte. Déposez vos propres comptes rendus après connexion — 99 CZK/mois.",
+        ctaLabel: "Ouvrir MeDipacient",
+        ctaHref: "/app/pacient",
+        hint: "Installer sur l’écran d’accueil",
+      },
+      locale
+    );
   }
   if (primary !== "cs") {
-    return {
-      slot: "nav_strip",
-      eyebrow: "For you",
-      headline: "MeDipacient: reports on your phone",
-      body: "The trial timeline is open. Upload your own reports after sign-in — 99 CZK/month.",
-      ctaLabel: "Open MeDipacient",
-      ctaHref: "/app/pacient",
-      hint: "Add to the home screen",
-    };
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "For you",
+        headline: "MeDipacient: reports on your phone",
+        body: "The trial timeline is open. Upload your own reports after sign-in — 99 CZK/month.",
+        ctaLabel: "Open MeDipacient",
+        ctaHref: "/app/pacient",
+        hint: "Add to the home screen",
+      },
+      locale
+    );
   }
-  return {
-    slot: "nav_strip",
-    eyebrow: "Pro váš zájem",
-    headline: "MeDipacient: zprávy v telefonu",
-    body: "Zkušební časová osa je otevřená. Nahrání vlastních zpráv po přihlášení — 99 Kč/měsíc.",
-    ctaLabel: "Otevřít MeDipacient",
-    ctaHref: "/app/pacient",
-    hint: "Stažení na plochu jako OrdiZapis",
-  };
+  return withLocalPrices(
+    {
+      slot: "nav_strip",
+      eyebrow: "Pro váš zájem",
+      headline: "MeDipacient: zprávy v telefonu",
+      body: "Zkušební časová osa je otevřená. Nahrání vlastních zpráv po přihlášení — 99 Kč/měsíc.",
+      ctaLabel: "Otevřít MeDipacient",
+      ctaHref: "/app/pacient",
+      hint: "Stažení na plochu jako OrdiZapis",
+    },
+    locale
+  );
 }
 
-export function getLekariNavStripCopy(): ConversionCopy {
-  return {
-    slot: "nav_strip",
-    eyebrow: "Pro ověřené lékaře",
-    headline: "OrdiZapis napíše zápis z diktátu",
-    body: "Nahrávejte v mobilu. Stažení po ověření účtu. 390 Kč/měsíc · 14 dní zdarma.",
-    ctaLabel: "Stáhnout OrdiZapis",
-    ctaHref: "/lekari/dokumentace",
-  };
+export function getLekariNavStripCopy(locale = "cs"): ConversionCopy {
+  return withLocalPrices(
+    {
+      slot: "nav_strip",
+      eyebrow: "Pro ověřené lékaře",
+      headline: "OrdiZapis napíše zápis z diktátu",
+      body: "Nahrávejte v mobilu. Stažení po ověření účtu. 390 Kč/měsíc · 14 dní zdarma.",
+      ctaLabel: "Stáhnout OrdiZapis",
+      ctaHref: "/lekari/dokumentace",
+    },
+    locale
+  );
 }
 
 /** MediFlow surfaces — never push MeDipacient 99 Kč here */
@@ -275,16 +300,19 @@ export function getMediFlowNavStripCopy(): ConversionCopy {
   };
 }
 
-export function getVipNavStripCopy(): ConversionCopy {
-  return {
-    slot: "nav_strip",
-    eyebrow: "VIP Longevity",
-    headline: "10 protokolů · 14 dní zdarma",
-    body: "Spánek, metabolismus, pohyb. Pak 149 Kč/měsíc — odděleně od Student LF (Academy) a MeDipacient.",
-    ctaLabel: "Začít zkušební VIP",
-    ctaHref: "/predplatne?trial=1&plan=vip",
-    hint: "14 dní na vyzkoušení",
-  };
+export function getVipNavStripCopy(locale = "cs"): ConversionCopy {
+  return withLocalPrices(
+    {
+      slot: "nav_strip",
+      eyebrow: "VIP Longevity",
+      headline: "10 protokolů · 14 dní zdarma",
+      body: "Spánek, metabolismus, pohyb. Pak 149 Kč/měsíc — odděleně od Student LF (Academy) a MeDipacient.",
+      ctaLabel: "Začít zkušební VIP",
+      ctaHref: "/predplatne?trial=1&plan=vip",
+      hint: "14 dní na vyzkoušení",
+    },
+    locale
+  );
 }
 
 /** Strip `/cs`, `/en`, … so audience path checks work with locale-prefixed URLs. */

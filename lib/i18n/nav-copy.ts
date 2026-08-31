@@ -1,6 +1,7 @@
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { buildLocalePath, isLocaleRoutingExcluded } from "@/lib/i18n/locale-path";
+import { localizeListedCzk } from "@/lib/i18n/payment-currency";
 
 type NavNode = {
   label: string;
@@ -273,8 +274,11 @@ export function translateNavHref(
   const strings = stringsFor(locale);
   const hit = strings[href];
   return {
-    label: hit?.label ?? fallback.label,
-    description: hit?.description ?? fallback.description,
+    label: localizeListedCzk(hit?.label ?? fallback.label, locale),
+    description:
+      hit?.description || fallback.description
+        ? localizeListedCzk(hit?.description ?? fallback.description ?? "", locale)
+        : fallback.description,
   };
 }
 
@@ -285,14 +289,15 @@ export function localizeNavTree<T extends NavNode>(items: T[], locale: string): 
     const children = item.children ? localizeNavTree(item.children, locale) : undefined;
     return {
       ...item,
-      label: hit?.label ?? item.label,
+      label: localizeListedCzk(hit?.label ?? item.label, locale),
       href: localizePublicHref(item.href, locale),
       children: children?.map((child, index) => {
         const raw = item.children?.[index];
         const rawHit = raw ? strings[raw.href] : undefined;
+        const description = rawHit?.description ?? child.description;
         return {
           ...child,
-          description: rawHit?.description ?? child.description,
+          description: description ? localizeListedCzk(description, locale) : description,
         };
       }),
     };

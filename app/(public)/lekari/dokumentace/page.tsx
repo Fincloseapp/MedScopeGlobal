@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button";
 import { OrdiZapisMark } from "@/components/lekari/ordizapis-mark";
 import { SITE } from "@/lib/config/site";
 import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
+import { getServerLocale, getServerRegion } from "@/lib/i18n/server-locale";
+import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
   const base = await buildLocalizedV20PageMetadata({
@@ -62,7 +65,15 @@ const VALUE_PROPS = [
   },
 ] as const;
 
-export default function LekariDokumentacePage() {
+export default async function LekariDokumentacePage() {
+  const locale = await getServerLocale();
+  const region = await getServerRegion();
+  const clinic = formatCzkListPrice(390, locale, region);
+  const physician = formatCzkListPrice(490, locale, region);
+  const clinicYear = formatCzkListPrice(3900, locale, region);
+  const predplatneHref = localizePublicHref("/predplatne#dokumentace", locale);
+  const physicianHref = localizePublicHref("/predplatne#physician", locale);
+
   return (
     <div className="bg-[#fafcff]">
       <section className="relative overflow-hidden border-b border-[#d9e8f4]">
@@ -89,7 +100,7 @@ export default function LekariDokumentacePage() {
             </div>
           </div>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-sky-100/95">
-            {ORDIZAPIS.pitch} Samostatně {ORDIZAPIS.priceMonthlyCzk} Kč/měsíc včetně práv balíčku Lékař v praxi · 14 dní zdarma.
+            {ORDIZAPIS.pitch} Samostatně {clinic}/měsíc včetně práv balíčku Lékař v praxi · 14 dní zdarma.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg" className="h-12 rounded-full bg-white px-6 text-[#021d33] hover:bg-sky-50">
@@ -104,7 +115,7 @@ export default function LekariDokumentacePage() {
               variant="outline"
               className="h-12 rounded-full border-white/40 bg-transparent px-6 text-white hover:bg-white/10"
             >
-              <Link href="/predplatne#dokumentace">390 Kč / měsíc</Link>
+              <Link href={predplatneHref}>{clinic} / měsíc</Link>
             </Button>
           </div>
           <p className="mt-4 text-xs text-sky-100/80">
@@ -127,11 +138,11 @@ export default function LekariDokumentacePage() {
             Nejvýhodnější vstup pro ordinaci
           </p>
           <h2 className="mt-2 font-display text-2xl font-bold text-[#021d33]">
-            OrdiZapis standalone — 390 Kč/měsíc
+            OrdiZapis standalone — {clinic}/měsíc
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-            Levnější než Lékař v praxi (490 Kč), se stejnými právy lékaře: guidelines,
-            CME, klinický AI i historie zápisů (sync mobil ↔ web). Ročně 3900 Kč · 14 dní
+            Levnější než Lékař v praxi ({physician}), se stejnými právy lékaře: guidelines,
+            CME, klinický AI i historie zápisů (sync mobil ↔ web). Ročně {clinicYear} · 14 dní
             zdarma.
           </p>
           <ul className="mt-4 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
@@ -144,12 +155,13 @@ export default function LekariDokumentacePage() {
             <V27CheckoutButton
               kind="subscription"
               productId="dokumentace-month"
-              label="Začít 14 dní zdarma — 390 Kč"
+              label={`Začít 14 dní zdarma — ${clinic}`}
+              locale={locale}
             />
             <p className="text-center text-xs text-slate-500">
               Nebo{" "}
-              <Link href="/predplatne#physician" className="text-[#005B96] underline">
-                Lékař v praxi za 490 Kč
+              <Link href={physicianHref} className="text-[#005B96] underline">
+                Lékař v praxi za {physician}
               </Link>{" "}
               — OrdiZapis je levnější vstup se stejnými právy.
             </p>
@@ -181,11 +193,11 @@ export default function LekariDokumentacePage() {
       <section className="border-y border-[#d9e8f4] bg-[#eef6fb]">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p className="text-sm leading-6 text-[#021d33]">
-            <span className="font-semibold">390 Kč/měsíc</span> včetně celého balíčku
+            <span className="font-semibold">{clinic}/měsíc</span> včetně celého balíčku
             Lékař · 14 dní trial · demo 3 zápisy/den po přihlášení
           </p>
           <Button asChild className="rounded-full bg-[#005B96] shrink-0">
-            <Link href="/predplatne#dokumentace">Zobrazit předplatné</Link>
+            <Link href={predplatneHref}>Zobrazit předplatné</Link>
           </Button>
         </div>
       </section>

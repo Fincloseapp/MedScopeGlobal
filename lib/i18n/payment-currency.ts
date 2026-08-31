@@ -182,3 +182,82 @@ export function formatCzkListPrice(
 ): string {
   return convertCzkToCharge(czkMajor, locale, region).formatted;
 }
+
+/** Editorial CZK list prices that appear in public copy. Largest first. */
+const LISTED_CZK_AMOUNTS = [15000, 5000, 4900, 3900, 1788, 1490, 490, 390, 149, 99] as const;
+
+function listedAmountPattern(czk: number): string {
+  const raw = String(czk);
+  if (czk >= 1000) {
+    const head = raw.slice(0, -3);
+    const tail = raw.slice(-3);
+    return `(?:${head}[\\s.,\\u00a0]?${tail}|${raw})`;
+  }
+  return raw;
+}
+
+/**
+ * Rewrite leftover “99 Kč / 149 CZK” amounts in chrome copy to the edition currency.
+ * Czech pages stay as authored (CZK). Does not invent live FX — uses convertCzkToCharge.
+ */
+export function localizeListedCzk(
+  text: string,
+  locale?: string | null,
+  region?: string | null
+): string {
+  if (!text) return text;
+  if (paymentTiersForUser(locale, region).currency === "czk") return text;
+
+  let out = text.replace(
+    /99\s*\/\s*149\s*\/\s*390\s*\/\s*490(?:\s*(?:Kč|CZK))?/g,
+    () =>
+      [99, 149, 390, 490]
+        .map((amount) => formatCzkListPrice(amount, locale, region))
+        .join(" / ")
+  );
+
+  const mark = "(?:Kč|CZK)";
+  for (const czk of LISTED_CZK_AMOUNTS) {
+    const formatted = formatCzkListPrice(czk, locale, region);
+    const amount = listedAmountPattern(czk);
+    const re = new RegExp(
+      `(?:${mark}\\s*)?(?<![\\d])${amount}(?![\\d])(?:\\s*[-–]?${mark})?`,
+      "g"
+    );
+    out = out.replace(re, formatted);
+  }
+  return out;
+}
+
+/** Swap leftover CZK / Kč tokens (e.g. “CZK/mois”) after amounts are gone. */
+export function localizeCurrencyToken(
+  text: string,
+  locale?: string | null,
+  region?: string | null
+): string {
+  if (!text) return text;
+  const { currency, symbol } = convertCzkToCharge(1, locale, region);
+  if (currency === "czk") return text;
+  return text.replace(/\bCZK\b/g, currency.toUpperCase()).replace(/\bKč\b/g, symbol);
+}
+
+export function localizeListedCzkIn<T>(
+  value: T,
+  locale?: string | null,
+  region?: string | null
+): T {
+  if (typeof value === "string") {
+    return localizeListedCzk(value, locale, region) as T;
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => localizeListedCzkIn(item, locale, region)) as T;
+  }
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
+      out[key] = localizeListedCzkIn(nested, locale, region);
+    }
+    return out as T;
+  }
+  return value;
+}

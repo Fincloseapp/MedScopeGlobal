@@ -1,6 +1,7 @@
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { localizePublicHref, translateNavHref } from "@/lib/i18n/nav-copy";
+import { localizeListedCzk, localizeListedCzkIn } from "@/lib/i18n/payment-currency";
 import type { V271HubPage } from "@/lib/v271/routes";
 
 export type HubSection = "studenti" | "lekari" | "firmy";
@@ -281,7 +282,7 @@ const PACKS: Record<string, HubPack> = { cs: CS, en: EN, de: DE, fr: FR };
 
 export function getHubPack(locale?: string | null): HubPack {
   const key = pack(locale);
-  return PACKS[key] ?? PACKS.en;
+  return localizeListedCzkIn(PACKS[key] ?? PACKS.en, locale);
 }
 
 /** Same Czech IA as V271_*: translate chrome, keep href structure, prefix locale. */
@@ -302,7 +303,11 @@ export function localizeV271Page(
       ...page,
       title: overlay?.title ?? page.title,
       description: overlay?.description ?? page.description,
-      ctaLabel: overlay?.ctaLabel ?? page.ctaLabel,
+      ctaLabel: overlay?.ctaLabel
+        ? localizeListedCzk(overlay.ctaLabel, locale)
+        : page.ctaLabel
+          ? localizeListedCzk(page.ctaLabel, locale)
+          : page.ctaLabel,
       ctaHref: page.ctaHref ? localizePublicHref(page.ctaHref, locale) : undefined,
       links: page.links.map((link) => {
         const translated = translateNavHref(link.href, locale, {

@@ -29,7 +29,7 @@ export function SubscriptionComparisonTable({
   locale?: string;
   region?: string | null;
 }) {
-  const copy = getSubscribeCopy(locale);
+  const copy = getSubscribeCopy(locale, region);
   const tiers = V27_COMPARISON_TIERS.map(
     (tier) => V27_SUBSCRIPTION_PLANS.find((p) => p.tier === tier)!
   ).filter(Boolean);

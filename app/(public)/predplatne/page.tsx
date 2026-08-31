@@ -18,7 +18,8 @@ export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getServerLocale();
-  const copy = getSubscribeCopy(locale);
+  const region = await getServerRegion();
+  const copy = getSubscribeCopy(locale, region);
   return await buildLocalizedV20PageMetadata({
     title: copy.metaTitle,
     description: copy.metaDescription,
@@ -36,7 +37,7 @@ export default async function PredplatnePage({
   const highlightTrial = trial === "1";
   const locale = await getServerLocale();
   const region = await getServerRegion();
-  const copy = getSubscribeCopy(locale);
+  const copy = getSubscribeCopy(locale, region);
   const surface = getSurfaceCopy(locale);
   const publicPrice = convertCzkToCharge(99, locale, region);
   const studentPrice = convertCzkToCharge(149, locale, region);
@@ -221,7 +222,7 @@ export default async function PredplatnePage({
 
       <SubscriptionComparisonTable locale={locale} region={region} />
       <SubscriptionTrustBadges locale={locale} />
-      <SubscriptionFaq locale={locale} />
+      <SubscriptionFaq locale={locale} region={region} />
 
       <div className="mt-12 rounded-2xl border border-[#cfe1f3] bg-white px-6 py-8 text-center">
         <h2 className="font-display text-xl font-semibold text-[#021d33]">{copy.supportTitle}</h2>

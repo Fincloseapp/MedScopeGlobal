@@ -1,5 +1,6 @@
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { localizeCurrencyToken, localizeListedCzkIn } from "@/lib/i18n/payment-currency";
 import type { V27SubscriptionTier } from "@/lib/v27/config";
 
 export type SubscribePlanCopy = {
@@ -711,7 +712,13 @@ const COPY: Record<string, SubscribeCopy> = {
   },
 };
 
-export function getSubscribeCopy(locale?: string | null): SubscribeCopy {
+export function getSubscribeCopy(
+  locale?: string | null,
+  region?: string | null
+): SubscribeCopy {
   const key = pack(locale);
-  return COPY[key] ?? COPY.en;
+  const localized = localizeListedCzkIn(COPY[key] ?? COPY.en, locale, region);
+  localized.afterTrialUnit = localizeCurrencyToken(localized.afterTrialUnit, locale, region);
+  localized.currencyLabel = localizeCurrencyToken(localized.currencyLabel, locale, region);
+  return localized;
 }
