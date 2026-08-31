@@ -34,6 +34,9 @@ export const DEFAULT_LOCALE: LocaleCode = "cs";
 
 export const LOCALE_COOKIE = "medscope_locale";
 
+/** Middleware → RSC: path-prefix locale for the current rewritten request. */
+export const LOCALE_REQUEST_HEADER = "x-medscope-locale";
+
 /** Set when user picks language in the header — stops auto-sync from device language. */
 export const LOCALE_MANUAL_COOKIE = "medscope_locale_manual";
 

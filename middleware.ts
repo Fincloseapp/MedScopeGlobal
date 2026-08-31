@@ -8,6 +8,7 @@ import {
   DEFAULT_LOCALE,
   LOCALE_COOKIE,
   LOCALE_MANUAL_COOKIE,
+  LOCALE_REQUEST_HEADER,
   normalizeLocale,
 } from "@/lib/i18n/config";
 import { detectLocaleFromAcceptLanguage } from "@/lib/i18n/detect-locale";
@@ -89,8 +90,10 @@ export async function middleware(request: NextRequest) {
     if (pathLocale) {
       const url = request.nextUrl.clone();
       url.pathname = stripped;
+      const requestHeaders = new Headers(request.headers);
+      requestHeaders.set(LOCALE_REQUEST_HEADER, normalizeLocale(pathLocale));
       const rewrite = NextResponse.rewrite(url, {
-        request: { headers: request.headers },
+        request: { headers: requestHeaders },
       });
       copyResponseCookies(response, rewrite);
       rewrite.cookies.set(LOCALE_COOKIE, normalizeLocale(pathLocale), LOCALE_COOKIE_OPTS);
