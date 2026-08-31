@@ -211,14 +211,26 @@ export async function resolveArticleTranslation(
 
   let translated: TranslatedFields | null = null;
 
-  translated = await translateArticleFields({
+  const { fallbackTranslateFields } = await import("@/lib/i18n/translate-fallback");
+  translated = await fallbackTranslateFields({
     title: fields.title,
     excerpt: fields.excerpt,
     content: fields.content,
-    sourceLocale: fields.locale,
+    sourceLocale: fields.locale ?? "cs",
     targetLocale: uiLocale,
     mode,
   }).catch(() => null);
+
+  if (!translated) {
+    translated = await translateArticleFields({
+      title: fields.title,
+      excerpt: fields.excerpt,
+      content: fields.content,
+      sourceLocale: fields.locale,
+      targetLocale: uiLocale,
+      mode,
+    }).catch(() => null);
+  }
 
   if (!translated && process.env.GOOGLE_TRANSLATE_KEY) {
     const target = primaryArticleLocale(uiLocale);
@@ -231,18 +243,6 @@ export async function resolveArticleTranslation(
     } catch {
       translated = null;
     }
-  }
-
-  if (!translated) {
-    const { fallbackTranslateFields } = await import("@/lib/i18n/translate-fallback");
-    translated = await fallbackTranslateFields({
-      title: fields.title,
-      excerpt: fields.excerpt,
-      content: fields.content,
-      sourceLocale: fields.locale ?? "cs",
-      targetLocale: uiLocale,
-      mode,
-    }).catch(() => null);
   }
 
   if (translated) {

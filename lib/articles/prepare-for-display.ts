@@ -6,7 +6,8 @@ import {
 } from "@/lib/i18n/article-locale";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { mapPool } from "@/lib/i18n/map-pool";
-import { resolveArticleTranslation, saveCachedTranslation, translateCardsBatch } from "@/lib/i18n/translate-article";
+import { resolveArticleTranslation, saveCachedTranslation } from "@/lib/i18n/translate-article";
+import { fallbackTranslateFields } from "@/lib/i18n/translate-fallback";
 import type { ArticleWithRelations } from "@/types/database";
 import { dedupeArticlesByTitle } from "@/lib/articles/dedupe";
 import { enrichArticleBodyForDisplay } from "@/lib/articles/enrich-body";
@@ -233,39 +234,7 @@ export async function prepareArticlesForDisplay(
     return firstPass;
   }
 
-  const batchSource = missIndexes.map((index) => plan[index]!.article);
-  const batched = await translateCardsBatch(
-    batchSource.map((article) => ({
-      id: article.id,
-      title: article.title,
-      excerpt: article.excerpt,
-      locale: article.locale,
-    })),
-    locale
-  );
-
-  const stillMissing: number[] = [];
-  for (const index of missIndexes) {
-    const article = plan[index]!.article;
-    const hit = batched.get(article.id);
-    if (hit) {
-      firstPass[index] = attachEditorialDisplay(firstPass[index]!, locale, {
-        title: hit.title,
-        excerpt: hit.excerpt ?? firstPass[index]!.excerpt,
-        displayLocale: primaryArticleLocale(locale),
-        translatedFrom: article.locale ?? null,
-        translation_provider: hit.translation_provider,
-        machine_translated: true,
-        reviewed: hit.reviewed,
-      });
-    } else {
-      stillMissing.push(index);
-    }
-  }
-
-  if (stillMissing.length === 0) return firstPass;
-
-  const { fallbackTranslateFields } = await import("@/lib/i18n/translate-fallback");
+  const stillMissing = missIndexes;
   const filled = await mapPool(stillMissing, 2, async (index) => {
     const article = plan[index]!.article;
     const hit = await fallbackTranslateFields({

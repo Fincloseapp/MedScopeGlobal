@@ -107,10 +107,11 @@ export async function fallbackTranslateFields(input: {
   const target = mymemoryLang(input.targetLocale);
   if (source === target) return null;
 
-  const [title, excerpt] = await Promise.all([
-    translatePlain(input.title, source, target),
-    input.excerpt ? translatePlain(input.excerpt, source, target) : Promise.resolve(null),
-  ]);
+  const title = await translatePlain(input.title, source, target);
+  const excerpt =
+    input.mode === "full" && input.excerpt
+      ? await translatePlain(input.excerpt, source, target)
+      : input.excerpt;
 
   let content = input.content;
   if (input.mode === "full" && input.content) {
