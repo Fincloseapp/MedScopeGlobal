@@ -6,7 +6,7 @@ import {
 } from "@/lib/i18n/article-locale";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { mapPool } from "@/lib/i18n/map-pool";
-import { resolveArticleTranslation, saveCachedTranslation } from "@/lib/i18n/translate-article";
+import { resolveArticleTranslation, saveCachedTranslation, translateCardsBatch } from "@/lib/i18n/translate-article";
 import { fallbackTranslateFields } from "@/lib/i18n/translate-fallback";
 import type { ArticleWithRelations } from "@/types/database";
 import { dedupeArticlesByTitle } from "@/lib/articles/dedupe";
@@ -264,6 +264,38 @@ export async function prepareArticlesForDisplay(
   });
   for (const row of filled) {
     firstPass[row.index] = row.display;
+  }
+
+  const groqMisses = stillMissing.filter(
+    (index) => !firstPass[index]?.machine_translated
+  );
+  if (groqMisses.length > 0) {
+    const batched = await translateCardsBatch(
+      groqMisses.map((index) => {
+        const article = plan[index]!.article;
+        return {
+          id: article.id,
+          title: article.title,
+          excerpt: article.excerpt,
+          locale: article.locale,
+        };
+      }),
+      locale
+    );
+    for (const index of groqMisses) {
+      const article = plan[index]!.article;
+      const hit = batched.get(article.id);
+      if (!hit) continue;
+      firstPass[index] = attachEditorialDisplay(firstPass[index]!, locale, {
+        title: hit.title,
+        excerpt: hit.excerpt ?? firstPass[index]!.excerpt,
+        displayLocale: primaryArticleLocale(locale),
+        translatedFrom: article.locale ?? null,
+        translation_provider: hit.translation_provider,
+        machine_translated: true,
+        reviewed: hit.reviewed,
+      });
+    }
   }
   return firstPass;
 }

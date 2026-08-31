@@ -9,9 +9,60 @@ function mymemoryLang(locale: string): string {
   return primary;
 }
 
+function langName(code: string): string {
+  const map: Record<string, string> = {
+    cs: "czech",
+    sk: "slovak",
+    pl: "polish",
+    de: "german",
+    fr: "french",
+    es: "spanish",
+    it: "italian",
+    pt: "portuguese",
+    nl: "dutch",
+    hu: "hungarian",
+    ro: "romanian",
+    ru: "russian",
+    uk: "ukrainian",
+    be: "belarusian",
+    en: "english",
+    ja: "japanese",
+    ko: "korean",
+    zh: "chinese",
+    "zh-CN": "chinese",
+    vi: "vietnamese",
+    id: "indonesian",
+    ar: "arabic",
+    hi: "hindi",
+  };
+  return map[code] ?? code;
+}
+
+async function workersAiTranslate(text: string, source: string, target: string): Promise<string | null> {
+  try {
+    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
+    const { env } = await getCloudflareContext({ async: true });
+    const ai = (env as { AI?: { run: (model: string, input: Record<string, string>) => Promise<unknown> } }).AI;
+    if (!ai) return null;
+    const result = await ai.run("@cf/meta/m2m100-1.2b", {
+      text: text.slice(0, 1800),
+      source_lang: langName(source),
+      target_lang: langName(target),
+    });
+    if (typeof result === "string" && result.trim()) return result.trim();
+    if (result && typeof result === "object") {
+      const rec = result as Record<string, unknown>;
+      const out = rec.translated_text ?? rec.translatedText ?? rec.response ?? rec.text;
+      if (typeof out === "string" && out.trim()) return out.trim();
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
 let mtQueue: Promise<void> = Promise.resolve();
 let mtInFlight = 0;
-const MT_CONCURRENCY = 2;
+const MT_CONCURRENCY = 4;
 
 async function withMtSlot<T>(fn: () => Promise<T>): Promise<T> {
   while (mtInFlight >= MT_CONCURRENCY) {
@@ -87,6 +138,8 @@ async function translatePlain(
   if (!trimmed) return text;
   if (source === target) return text;
   return withMtSlot(async () => {
+    const local = await workersAiTranslate(trimmed, source, target);
+    if (local && local !== trimmed) return local;
     const gtx = await gtxTranslate(trimmed, source, target);
     if (gtx && gtx !== trimmed) return gtx;
     const memory = await mymemoryTranslate(trimmed, source, target);

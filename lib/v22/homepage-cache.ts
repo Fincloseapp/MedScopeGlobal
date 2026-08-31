@@ -100,7 +100,7 @@ async function loadHomepageData(locale: string): Promise<{
 export function getHomepageCachedData(locale = "cs") {
   return unstable_cache(
     () => loadHomepageData(locale),
-    ["v22-homepage-public-v13-i18n-mt-first", locale],
+    ["v22-homepage-public-v14-workers-ai-mt", locale],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }
