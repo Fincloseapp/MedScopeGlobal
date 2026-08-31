@@ -21,6 +21,14 @@ export type MarketingCopy = {
     catalogCta: string;
     openApp: string;
     howItWorks: string;
+    downloadTitle: string;
+    openInstalled: string;
+    installLead: string;
+    stepIos: string;
+    stepAndroid: string;
+    stepDesktop: string;
+    scanInstall: string;
+    eyebrowApps: string;
     pitch: Record<AppProductId, string>;
   };
   about: {
@@ -170,6 +178,14 @@ const CS: MarketingCopy = {
     catalogCta: "Prohlédnout katalog",
     openApp: "Otevřít",
     howItWorks: "Jak to funguje",
+    downloadTitle: "Stáhnout",
+    openInstalled: "Otevřít aplikaci",
+    installLead: "Nainstalujete z prohlížeče na plochu telefonu i PC — bez App Store i Google Play.",
+    stepIos: "1. iPhone: Safari → Sdílet → Přidat na plochu",
+    stepAndroid: "2. Android: Chrome → Nainstalovat aplikaci",
+    stepDesktop: "3. PC: Chrome/Edge → ikona ⊕ v adresním řádku",
+    scanInstall: "Naskenujte a nainstalujte",
+    eyebrowApps: "Aplikace",
     pitch: {
       medipacient:
         "Vyfoťte PDF nebo fotografii lékařské zprávy — i bez dat. Po připojení se soubor přečte, OCR vytáhne diagnózy, léky a kontroly.",
@@ -409,6 +425,14 @@ const EN: MarketingCopy = {
     catalogCta: "Browse the catalogue",
     openApp: "Open",
     howItWorks: "How it works",
+    downloadTitle: "Download",
+    openInstalled: "Open the app",
+    installLead: "Install from the browser onto your phone or PC home screen — no App Store or Google Play.",
+    stepIos: "1. iPhone: Safari → Share → Add to Home Screen",
+    stepAndroid: "2. Android: Chrome → Install app",
+    stepDesktop: "3. PC: Chrome/Edge → ⊕ icon in the address bar",
+    scanInstall: "Scan and install",
+    eyebrowApps: "Apps",
     pitch: {
       medipacient:
         "Photograph a PDF or a medical report — even offline. When you reconnect, OCR extracts diagnoses, medicines and follow-ups.",
@@ -634,6 +658,14 @@ const DE: MarketingCopy = {
     catalogCta: "Katalog ansehen",
     openApp: "Öffnen",
     howItWorks: "So funktioniert es",
+    downloadTitle: "Laden",
+    openInstalled: "App öffnen",
+    installLead: "Aus dem Browser auf den Homescreen von Handy oder PC — ohne App Store und Google Play.",
+    stepIos: "1. iPhone: Safari → Teilen → Zum Home-Bildschirm",
+    stepAndroid: "2. Android: Chrome → App installieren",
+    stepDesktop: "3. PC: Chrome/Edge → ⊕ in der Adressleiste",
+    scanInstall: "Scannen und installieren",
+    eyebrowApps: "Apps",
   },
   about: {
     ...EN.about,
@@ -742,6 +774,14 @@ const FR: MarketingCopy = {
     catalogCta: "Voir le catalogue",
     openApp: "Ouvrir",
     howItWorks: "Comment ça marche",
+    downloadTitle: "Télécharger",
+    openInstalled: "Ouvrir l’appli",
+    installLead: "Installez depuis le navigateur sur l’écran d’accueil du téléphone ou du PC — sans App Store ni Google Play.",
+    stepIos: "1. iPhone : Safari → Partager → Sur l’écran d’accueil",
+    stepAndroid: "2. Android : Chrome → Installer l’application",
+    stepDesktop: "3. PC : Chrome/Edge → icône ⊕ dans la barre d’adresse",
+    scanInstall: "Scanner et installer",
+    eyebrowApps: "Applis",
   },
   about: {
     ...EN.about,

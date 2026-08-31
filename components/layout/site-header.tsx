@@ -13,6 +13,7 @@ import { NavSubscribeCta } from "@/components/v38/nav-subscribe-cta";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import { getDesktopHeaderMenu, getMobileMenu } from "@/lib/config/main-navigation";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { getPortalChrome } from "@/lib/v271/portal";
 
 /** v38 — sticky header, compact nav, subscribe CTA for non-VIP */
@@ -60,6 +61,7 @@ export function SiteHeader({
                 compact
                 className="hidden lg:inline-flex"
                 label={getPortalChrome(navLocale).trialCta}
+                href={localizePublicHref("/predplatne?trial=1", navLocale)}
               />
             ) : null}
             <SearchCommand isVip={isVip} accessLevel={accessLevel} locale={locale} />
