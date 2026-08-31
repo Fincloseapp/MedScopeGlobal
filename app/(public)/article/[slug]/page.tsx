@@ -299,7 +299,7 @@ export default async function ArticlePage({ params }: Props) {
               </Link>
             ) : null}
 
-            {article.translatedFrom || article.machine_translated ? (
+            {article.machine_translated ? (
               <p className="mt-4 border border-[#C7E3FF] bg-[#f0f7ff] px-4 py-2 text-sm text-[#005B96]">
                 {t(dict, "alerts.translatedArticle")}
                 {article.translation_provider ? (

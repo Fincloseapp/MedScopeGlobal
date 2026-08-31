@@ -6,7 +6,7 @@ import {
 } from "@/lib/i18n/article-locale";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { mapPool } from "@/lib/i18n/map-pool";
-import { resolveArticleTranslation } from "@/lib/i18n/translate-article";
+import { resolveArticleTranslation, saveCachedTranslation, translateCardsBatch } from "@/lib/i18n/translate-article";
 import type { ArticleWithRelations } from "@/types/database";
 import { dedupeArticlesByTitle } from "@/lib/articles/dedupe";
 import { enrichArticleBodyForDisplay } from "@/lib/articles/enrich-body";
@@ -138,8 +138,7 @@ export async function prepareArticleForDisplay(
       });
     }
     return attachEditorialDisplay(base, locale, {
-      displayLocale: base.locale ?? undefined,
-      translatedFrom: base.locale ?? "en",
+      displayLocale: target,
     });
   }
 
@@ -181,44 +180,123 @@ export async function prepareArticlesForDisplay(
   const sorted = sortByLocalePreference(dedupeArticlesByTitle(articles), locale);
   const mode = options?.mode ?? "card";
   const maxTranslate = options?.maxTranslate ?? 8;
-  const maxLive = Math.min(options?.maxLive ?? 4, maxTranslate);
 
-  let liveUsed = 0;
-  let fallbackUsed = 0;
+  let translateUsed = 0;
   const plan = sorted.map((article) => {
     const needsTranslation = !matchesArticleLocale(article.locale, locale);
     if (!needsTranslation) {
-      return { article, kind: "native" as const, live: false };
+      return { article, kind: "native" as const };
     }
-    if (fallbackUsed >= maxTranslate) {
-      return { article, kind: "passthrough" as const, live: false };
+    if (translateUsed >= maxTranslate) {
+      return { article, kind: "passthrough" as const };
     }
-    fallbackUsed += 1;
-    const live = liveUsed < maxLive;
-    if (live) liveUsed += 1;
-    return { article, kind: "translate" as const, live };
+    translateUsed += 1;
+    return { article, kind: "translate" as const };
   });
 
-  return mapPool(plan, 6, async (item) => {
-    if (item.kind === "native" || item.kind === "translate") {
-      return prepareArticleForDisplay(item.article, locale, mode, { live: item.live });
+  const firstPass = await mapPool(plan, 8, async (item) => {
+    if (item.kind === "native") {
+      return prepareArticleForDisplay(item.article, locale, mode, { live: false });
     }
-    const withCat = await applyCategoryLabels(item.article, locale);
-    if (locale === "cs") {
-      const polished = polishCzechFields(withCat, "cs");
+    if (item.kind === "passthrough") {
+      const withCat = await applyCategoryLabels(item.article, locale);
+      if (locale === "cs") {
+        const polished = polishCzechFields(withCat, "cs");
+        return attachEditorialDisplay(withCat, locale, {
+          title: polished.title,
+          excerpt: polished.excerpt,
+          content: polished.content,
+          displayLocale: targetLocaleOrUndefined(withCat.locale),
+        });
+      }
       return attachEditorialDisplay(withCat, locale, {
-        title: polished.title,
-        excerpt: polished.excerpt,
-        content: polished.content,
-        displayLocale: targetLocaleOrUndefined(withCat.locale),
-        translatedFrom: withCat.locale ?? null,
+        displayLocale: primaryArticleLocale(locale),
       });
     }
-    return attachEditorialDisplay(withCat, locale, {
-      displayLocale: withCat.locale ?? undefined,
-      translatedFrom: withCat.locale ?? null,
-    });
+    return prepareArticleForDisplay(item.article, locale, mode, { live: false });
   });
+
+  const missIndexes: number[] = [];
+  firstPass.forEach((display, index) => {
+    if (plan[index]?.kind === "translate" && !display.machine_translated) {
+      missIndexes.push(index);
+    }
+  });
+
+  if (missIndexes.length === 0 || mode !== "card") {
+    if (missIndexes.length && mode === "full") {
+      return mapPool(firstPass, 2, async (display, index) => {
+        if (!missIndexes.includes(index)) return display;
+        return prepareArticleForDisplay(plan[index]!.article, locale, mode, { live: true });
+      });
+    }
+    return firstPass;
+  }
+
+  const batchSource = missIndexes.map((index) => plan[index]!.article);
+  const batched = await translateCardsBatch(
+    batchSource.map((article) => ({
+      id: article.id,
+      title: article.title,
+      excerpt: article.excerpt,
+      locale: article.locale,
+    })),
+    locale
+  );
+
+  const stillMissing: number[] = [];
+  for (const index of missIndexes) {
+    const article = plan[index]!.article;
+    const hit = batched.get(article.id);
+    if (hit) {
+      firstPass[index] = attachEditorialDisplay(firstPass[index]!, locale, {
+        title: hit.title,
+        excerpt: hit.excerpt ?? firstPass[index]!.excerpt,
+        displayLocale: primaryArticleLocale(locale),
+        translatedFrom: article.locale ?? null,
+        translation_provider: hit.translation_provider,
+        machine_translated: true,
+        reviewed: hit.reviewed,
+      });
+    } else {
+      stillMissing.push(index);
+    }
+  }
+
+  if (stillMissing.length === 0) return firstPass;
+
+  const { fallbackTranslateFields } = await import("@/lib/i18n/translate-fallback");
+  const filled = await mapPool(stillMissing, 2, async (index) => {
+    const article = plan[index]!.article;
+    const hit = await fallbackTranslateFields({
+      title: article.title,
+      excerpt: article.excerpt,
+      content: article.content,
+      sourceLocale: article.locale ?? "cs",
+      targetLocale: locale,
+      mode: "card",
+    });
+    if (!hit) {
+      return { index, display: firstPass[index]! };
+    }
+    await saveCachedTranslation(article.id, locale, hit).catch(() => {});
+    return {
+      index,
+      display: attachEditorialDisplay(firstPass[index]!, locale, {
+        title: hit.title,
+        excerpt: hit.excerpt ?? firstPass[index]!.excerpt,
+        displayLocale: primaryArticleLocale(locale),
+        translatedFrom: article.locale ?? null,
+        translation_provider: hit.translation_provider,
+        machine_translated: true,
+        reviewed: false,
+      }),
+    };
+  });
+  for (const row of filled) {
+    firstPass[row.index] = row.display;
+  }
+  return firstPass;
 }
 
 function targetLocaleOrUndefined(locale: string | null | undefined): string | undefined {

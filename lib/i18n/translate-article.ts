@@ -94,7 +94,7 @@ Excerpt: ${input.excerpt ?? ""}`
       : `Translate to ${target} (medical journalism). Preserve HTML structure. Return JSON: {"title":"...","excerpt":"...","content":"..."}
 Title: ${input.title}
 Excerpt: ${input.excerpt ?? ""}
-Content HTML: ${(input.content ?? "").slice(0, 12000)}`;
+Content HTML: ${(input.content ?? "").slice(0, 3500)}`;
 
   try {
     const raw = await Promise.race([
@@ -105,7 +105,7 @@ Content HTML: ${(input.content ?? "").slice(0, 12000)}`;
         maxTokens: input.mode === "card" ? 800 : 4096,
       }),
       new Promise<null>((resolve) => {
-        setTimeout(() => resolve(null), input.mode === "card" ? 7000 : 14000);
+        setTimeout(() => resolve(null), input.mode === "card" ? 6000 : 9000);
       }),
     ]);
     if (!raw) return null;
@@ -199,6 +199,10 @@ export async function resolveArticleTranslation(
     if (mode === "full" && cached.title && options?.live === false) return cached;
   }
 
+  if (options?.live === false) {
+    return cached;
+  }
+
   const payload = {
     title: fields.title,
     excerpt: fields.excerpt,
@@ -207,27 +211,25 @@ export async function resolveArticleTranslation(
 
   let translated: TranslatedFields | null = null;
 
-  if (options?.live !== false) {
-    translated = await translateArticleFields({
-      title: fields.title,
-      excerpt: fields.excerpt,
-      content: fields.content,
-      sourceLocale: fields.locale,
-      targetLocale: uiLocale,
-      mode,
-    }).catch(() => null);
+  translated = await translateArticleFields({
+    title: fields.title,
+    excerpt: fields.excerpt,
+    content: fields.content,
+    sourceLocale: fields.locale,
+    targetLocale: uiLocale,
+    mode,
+  }).catch(() => null);
 
-    if (!translated && process.env.GOOGLE_TRANSLATE_KEY) {
-      const target = primaryArticleLocale(uiLocale);
-      try {
-        translated = await googleTranslateFields(
-          payload,
-          target,
-          process.env.GOOGLE_TRANSLATE_KEY
-        );
-      } catch {
-        translated = null;
-      }
+  if (!translated && process.env.GOOGLE_TRANSLATE_KEY) {
+    const target = primaryArticleLocale(uiLocale);
+    try {
+      translated = await googleTranslateFields(
+        payload,
+        target,
+        process.env.GOOGLE_TRANSLATE_KEY
+      );
+    } catch {
+      translated = null;
     }
   }
 
@@ -251,4 +253,61 @@ export async function resolveArticleTranslation(
   }
 
   return translated ?? cached;
+}
+
+/** One Groq call for many listing cards — avoids N sequential LLM timeouts on Workers. */
+export async function translateCardsBatch(
+  items: { id: string; title: string; excerpt: string | null; locale?: string | null }[],
+  uiLocale: LocaleCode
+): Promise<Map<string, TranslatedFields>> {
+  const out = new Map<string, TranslatedFields>();
+  if (items.length === 0 || !isAiConfigured()) return out;
+
+  const target = primaryArticleLocale(uiLocale);
+  const limited = items.slice(0, 24);
+
+  for (let offset = 0; offset < limited.length; offset += 12) {
+    const chunk = limited.slice(offset, offset + 12);
+    const payload = chunk.map((item, index) => ({
+      i: index,
+      title: item.title.slice(0, 220),
+      excerpt: (item.excerpt ?? "").slice(0, 280),
+    }));
+    try {
+      const raw = await Promise.race([
+        generateJsonFromLlm({
+          system:
+            "You are a medical translator. Output valid JSON only. Do not invent clinical facts.",
+          user: `Translate each item to ${target} (medical journalism). Return {"items":[{"i":0,"title":"...","excerpt":"..."}]}
+${JSON.stringify(payload)}`,
+          temperature: 0.15,
+          maxTokens: 2800,
+        }),
+        new Promise<null>((resolve) => {
+          setTimeout(() => resolve(null), 8000);
+        }),
+      ]);
+      if (!raw) continue;
+      const parsed = JSON.parse(raw) as {
+        items?: { i?: number; title?: string; excerpt?: string }[];
+      };
+      for (const row of parsed.items ?? []) {
+        const index = typeof row.i === "number" ? row.i : -1;
+        const source = chunk[index];
+        if (!source || !row.title) continue;
+        const fields: TranslatedFields = {
+          title: row.title.slice(0, 300),
+          excerpt: row.excerpt?.slice(0, 500) ?? source.excerpt,
+          translation_provider: "groq",
+          machine_translated: true,
+          reviewed: false,
+        };
+        out.set(source.id, fields);
+        void saveCachedTranslation(source.id, uiLocale, fields);
+      }
+    } catch {
+      continue;
+    }
+  }
+  return out;
 }
