@@ -389,6 +389,13 @@ const nextConfig = {
 
 export default nextConfig;
 
-// OpenNext Cloudflare local bindings for next dev
+// OpenNext local bindings for `next dev` only. The Workers `AI` binding makes
+// wrangler open a remote proxy; CI `next build` has no CLOUDFLARE_API_TOKEN.
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
-initOpenNextCloudflareForDev();
+const skipCloudflareDevInit =
+  process.env.CI === "true" ||
+  process.env.NEXTJS_ENV === "production" ||
+  process.env.npm_lifecycle_event === "build";
+if (!skipCloudflareDevInit) {
+  initOpenNextCloudflareForDev();
+}
