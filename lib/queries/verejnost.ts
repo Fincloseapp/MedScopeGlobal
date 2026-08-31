@@ -105,11 +105,15 @@ export async function getPublicArticleBySlug(
   slug: string,
   locale: LocaleCode = "cs"
 ): Promise<DisplayArticle | null> {
+  const { resolveCanonicalArticleSlug } = await import(
+    "@/lib/editorial/clinician-anonymize"
+  );
   const { getDemoMagazineArticleBySlug } = await import(
     "@/lib/verejnost/demo-magazine-articles"
   );
+  const dbSlug = resolveCanonicalArticleSlug(slug);
   const demoHit = () => {
-    const demo = getDemoMagazineArticleBySlug(slug);
+    const demo = getDemoMagazineArticleBySlug(dbSlug);
     return demo;
   };
 
@@ -118,7 +122,7 @@ export async function getPublicArticleBySlug(
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
-    .eq("slug", slug)
+    .eq("slug", dbSlug)
     .eq("published", true)
     .eq("audience", "public")
     .maybeSingle();

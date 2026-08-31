@@ -52,6 +52,11 @@ import {
 } from "../../lib/editorial/magazine-desk-copy";
 import { MAGAZINE_DESK_OVERRIDES } from "../../lib/editorial/magazine-desk-overrides";
 import {
+  anonymizeClinicianNames,
+  publicArticleSlug,
+  resolveCanonicalArticleSlug,
+} from "../../lib/editorial/clinician-anonymize";
+import {
   EDITORIAL_DESKS,
   PRIMARY_EDITORIAL_LOCALES,
   getDeskForLocale,
@@ -717,6 +722,35 @@ assert.equal(
 );
 assert.ok((desk.content ?? "").includes("Praktický lékař"));
 assert.ok(!(desk.content ?? "").includes("AI-asistovaná"));
+{
+  const named =
+    "Cesta zpět k životu — Příběh MUDr. Nováka po infarktu. Děkujeme MUDr. Novákovi. Novák se rozhodl promluvit.";
+  const anon = anonymizeClinicianNames(named);
+  assert.equal(anon.includes("Novák"), false);
+  assert.ok(anon.includes("MUDr. L. Ř."));
+  assert.ok(anon.includes("L. Ř."));
+  const polished = applyMagazineDeskCopy({
+    slug: "verejnost-rozhovory-2026-07-03-cesta-zpet-k-zivotu-pribeh-mudr-novaka-po-infarktu",
+    title: "Příběh MUDr. Nováka po infarktu",
+    excerpt: "MUDr. Novák, praktický lékař, sdílí svůj příběh.",
+    content: "<p>MUDr. Novák se vrátil do ambulance.</p>",
+  });
+  assert.equal(polished.slug, "verejnost-rozhovory-2026-07-03-cesta-zpet-k-zivotu-pribeh-lekare-po-infarktu");
+  assert.equal(polished.title.includes("Novák"), false);
+  assert.ok(polished.title.includes("MUDr. L. Ř."));
+  assert.equal(polished.excerpt.includes("Novák"), false);
+  assert.equal(polished.content?.includes("Novák"), false);
+  assert.equal(
+    resolveCanonicalArticleSlug(polished.slug ?? ""),
+    "verejnost-rozhovory-2026-07-03-cesta-zpet-k-zivotu-pribeh-mudr-novaka-po-infarktu"
+  );
+  assert.equal(
+    publicArticleSlug(
+      "verejnost-rozhovory-2026-07-03-cesta-zpet-k-zivotu-pribeh-mudr-novaka-po-infarktu"
+    ),
+    polished.slug
+  );
+}
 assert.ok(
   Object.keys(MAGAZINE_DESK_OVERRIDES).filter((slug) => MAGAZINE_DESK_OVERRIDES[slug]?.content).length >= 8
 );

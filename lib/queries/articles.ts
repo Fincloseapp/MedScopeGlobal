@@ -370,30 +370,34 @@ export async function getArticleBySlug(
   slug: string,
   locale: LocaleCode = "cs"
 ): Promise<DisplayArticle | null> {
+  const { resolveCanonicalArticleSlug } = await import(
+    "@/lib/editorial/clinician-anonymize"
+  );
   const { getDemoMagazineArticleBySlug } = await import(
     "@/lib/verejnost/demo-magazine-articles"
   );
+  const dbSlug = resolveCanonicalArticleSlug(slug);
 
   const supabase = await createDataClient();
   if (!supabase) {
-    return getDemoMagazineArticleBySlug(slug);
+    return getDemoMagazineArticleBySlug(dbSlug);
   }
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
-    .eq("slug", slug)
+    .eq("slug", dbSlug)
     .eq("published", true)
     .maybeSingle();
 
   if (error) {
     console.error("getArticleBySlug", error);
-    return getDemoMagazineArticleBySlug(slug);
+    return getDemoMagazineArticleBySlug(dbSlug);
   }
   const row = data
     ? (mapArticleList([data as Record<string, unknown>])[0] ?? null)
     : null;
   if (!row) {
-    return getDemoMagazineArticleBySlug(slug);
+    return getDemoMagazineArticleBySlug(dbSlug);
   }
   // Listing hide is for magazine hubs. Special-access medical/doctor
   // articles must resolve so the existing VIP / physician gate can run.

@@ -379,6 +379,36 @@ export const MAGAZINE_DESK_OVERRIDES: Record<string, MagazineDeskOverride> = {
     excerpt:
       "Kardiorehabilitace, léky a postupná chůze rozhodují víc než slib, že budete jako dřív. Bolest na hrudi při zátěži patří k lékaři ihned.",
   },
+  "verejnost-rozhovory-2026-07-03-cesta-zpet-k-zivotu-pribeh-mudr-novaka-po-infarktu": {
+    title: "Příběh MUDr. L. Ř. po infarktu: první měsíce návratu",
+    excerpt:
+      "Složený příběh praktického lékaře — iniciály, ne dohledatelné jméno. Kardiorehabilitace, léky a postupná chůze rozhodují víc než slib, že budete jako dřív.",
+    content: article(`<p>MUDr. L. Ř. je složený, anonymizovaný příběh praktického lékaře středního věku z české ambulance. Jméno ani pracoviště záměrně neuvádíme. Text ukazuje, jak vypadá návrat po infarktu v běžné praxi — ne rozhovor s konkrétním, dohledatelným člověkem.</p>
+<h2>Co se stalo a co z toho plyne</h2>
+<p>Tlaky na hrudi při noční službě neodezněly v čekárně. Záchranka, katetrizace, stenty. První dny v nemocnici nejsou o „síle charakteru“. Jsou o lécích, monitoru a o tom, že i lékař je najednou pacient. Rodina slyší jiná slova než kolegové na sále. To je v pořádku.</p>
+<p>Po propuštění rozhoduje režim, ne heroický návrat do ambulance. Schody do druhého patra první týden nejsou trénink. Jsou zátěžový test, který má hodnotit kardiolog, ne kolega z pohotovosti.</p>
+<h2>První týdny: léky, chůze, spánek</h2>
+<ul>
+<li>Dvojitá protidestičková léčba a statin se neukončují, protože „už je dobře“.</li>
+<li>Kardiorehabilitace v Česku existuje. Objednejte ji dřív, než si koupíte nový pulsmetr.</li>
+<li>Bolest na hrudi při chůzi, dušnost v klidu nebo mdloba patří na 155, ne do další ambulance.</li>
+</ul>
+<p>MUDr. L. Ř. v tomto složeném příběhu začal s deseti minutami roviny denně. Až po kontrole se přidaly schody. Alkohol „na uklidnění“ a noční směna ve druhém týdnu nejsou odvaha. Jsou rizikový faktor.</p>
+<h2>Hlava, vina a návrat do práce</h2>
+<p>Lékaři po infarktu často cítí hanbu, že „selhali“. To není diagnóza, ale brání to rehabilitaci. Praktický lékař, kardiolog a někdy i psycholog patří do stejného plánu. Neschopenka není přiznání slabosti. Je to čas, kdy se hojí tepna.</p>
+<p>Návrat do ambulance po částech: kratší ordinační hodina, bez nočních služeb, bez zvedání pacientů. Zaměstnavatel v Česku má povinnost řešit způsobilost. Kolega, který říká „však to dáš“, není ošetřující lékař.</p>
+<h2>Co říkat rodině bez hrdinství</h2>
+<p>Konkrétní věty fungují líp než slib, že bude jako dřív. „Dnes jdu 15 minut po rovině. Schody až po kontrole.“ Partner, který hlídá léky a termíny, snižuje chyby v dávkování. Děti nepotřebují detaily z katetrizačního sálu. Potřebují vědět, že rodič žije a má plán.</p>
+<h2>Kdy je to znovu medicína, ne motivace</h2>
+<p>Nová bolest na hrudi, otoky nohou, náhlý nárůst hmotnosti nebo kašel vleže patří k lékaři ihned. Stejně tak myšlenky, že „už to nemá cenu“. Infarkt mění náladu. To se hlásí, nehraje se to jako únava ze směny.</p>
+<p>Příběh MUDr. L. Ř. končí tam, kde má: v kardiorehabilitaci, v lékárně a v kalendáři kontrol. Ne v běžeckém závodě ani v dohledatelném jménu na internetu.</p>
+<h2>Zdroje</h2>
+<ul>
+<li>ČKS — doporučení k infarktu myokardu a kardiorehabilitaci</li>
+<li>NZIP — život po infarktu</li>
+<li>ESC — secondary prevention after ACS</li>
+</ul>`),
+  },
   "verejnost-zivotni-styl-2026-07-02-10-minut-denne-pro-zdravejsi-vas-jak-zaneprazdneni-rodice-mohou-zustat-aktivni": {
     title: "Mikrotrénink, který se vejde do školního rána",
     excerpt:

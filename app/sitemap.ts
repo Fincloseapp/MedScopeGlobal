@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { publicArticleSlug } from "@/lib/editorial/clinician-anonymize";
 import { LONGEVITY_PROTOCOLS } from "@/lib/ecosystem/longevity-protocols";
 import { createClient } from "@/lib/supabase/server";
 
@@ -73,7 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const storyUrls: MetadataRoute.Sitemap =
       articles?.map((article) => ({
-        url: `${base}/article/${article.slug}`,
+        url: `${base}/article/${publicArticleSlug(article.slug as string)}`,
         lastModified: article.published_at
           ? new Date(article.published_at as string)
           : new Date(),
