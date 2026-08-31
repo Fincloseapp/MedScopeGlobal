@@ -106,6 +106,12 @@ export function resolveBackendTopic(slug: string | undefined): PublicTopic | nul
   return hub?.backendTopic ?? null;
 }
 
+export function hubTopicListingHref(slug: string, backendTopic = resolveBackendTopic(slug) ?? slug): string {
+  if (slug === "rozhovory") return "/verejnost/rozhovory";
+  if (slug === "dlouhovekost") return "/verejnost/clanky?topic=dlouhovekost";
+  return `/verejnost/clanky?topic=${backendTopic}`;
+}
+
 export function topicLabelForSlug(slug: string | null | undefined): string {
   if (!slug) return "Veřejné zdraví";
   const hub = VEREJNOST_HUB_TOPICS.find((t) => t.slug === slug);

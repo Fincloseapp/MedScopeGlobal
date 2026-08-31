@@ -40,7 +40,7 @@ export const NEWS_DESKS: NewsDeskDef[] = [
     id: "dlouhovekost",
     label: "Dlouhověkost",
     href: "/verejnost/clanky?topic=dlouhovekost",
-    more: "Celá oblast",
+    more: "Články k tématu",
     kicker: "Healthspan",
     blurb: "Spánek, pohyb, výživa a biomarkery — co je důkaz a co je hype.",
   },
@@ -54,8 +54,11 @@ export const NEWS_DESKS: NewsDeskDef[] = [
   },
 ];
 
-const LONGEVITY_RE =
-  /dlouhověk|dlouhovek|longevity|healthspan|stárnut|starnut|biologický věk|biologicky vek|sarkopen|vo2\s*max|žít déle|zit dele/i;
+const LONGEVITY_CORE_RE =
+  /dlouhověk|dlouhovek|longevity|healthspan|st[aá]rnut|biologick[yý]\s*v[eě]k|sarkopen|osteopor[oó]z|vo2\s*max|kostn[ií]\s*denzit|aktivn[ií]\s*st[aá]ř|zdrav[eé]\s*st[aá]rnut|zdrav[yý]ch\s*let|[žz][ií]t\s*d[eé]le|biomarker/i;
+
+const LONGEVITY_RELATED_RE =
+  /senior|senio[rř]i|ve\s*st[aá]ř[ií]|po\s*infarkt|10\s*minut\s*denn|z[uů]stat\s*fit|z[uů]stat\s*aktivn|aktivn[ií]m?\s*životu\s*po|prevence\s*osteoporoz/i;
 
 const NEWS_RE =
   /novink|zpráv|zprav|ema\b|súkl|sukl|\bwho\b|mzčr|mzcr|cdc\b|outbreak|epidem|guideline|agentur/i;
@@ -67,9 +70,26 @@ function metaRecord(metadata: unknown): Record<string, unknown> {
   return {};
 }
 
+function longevityHaystack(article: {
+  title?: string | null;
+  excerpt?: string | null;
+  slug?: string | null;
+  public_topic?: string | null;
+  metadata?: Record<string, unknown> | null;
+}): string {
+  const meta = metaRecord(article.metadata);
+  const keywords = Array.isArray(meta.keywords)
+    ? meta.keywords.join(" ")
+    : String(meta.keywords ?? "");
+  return [article.title, article.excerpt, article.slug, article.public_topic, keywords]
+    .map((value) => String(value ?? ""))
+    .join(" ");
+}
+
 export function isLongevityArticle(article: {
   title?: string | null;
   excerpt?: string | null;
+  slug?: string | null;
   public_topic?: string | null;
   metadata?: Record<string, unknown> | null;
 }): boolean {
@@ -81,7 +101,8 @@ export function isLongevityArticle(article: {
     .trim();
   if (pillar === "dlouhovekost") return true;
   if (String(article.public_topic ?? "").toLowerCase() === "dlouhovekost") return true;
-  return LONGEVITY_RE.test(`${article.title ?? ""} ${article.excerpt ?? ""}`);
+  const haystack = longevityHaystack(article);
+  return LONGEVITY_CORE_RE.test(haystack) || LONGEVITY_RELATED_RE.test(haystack);
 }
 
 export function isNovinkyArticle(article: {
@@ -171,6 +192,18 @@ export function mixListableFeed(articles: DisplayArticle[], limit: number): Disp
   const listable = articles.filter((article) => isListableNewsArticle(article));
   const resurface = selectResurfaceCandidates(listable, Math.max(4, Math.ceil(limit / 3)));
   return mixFreshFeed(listable, resurface, limit);
+}
+
+/** Keep longevity cards in the homepage pool even when newer news crowds them out. */
+export function pinLongevityIntoFeed(articles: DisplayArticle[], limit: number): DisplayArticle[] {
+  const listable = articles.filter((article) => isListableNewsArticle(article));
+  const longevity = listable.filter((article) => isLongevityArticle(article));
+  const mixed = mixListableFeed(listable, limit);
+  if (longevity.length === 0) return mixed;
+  const pinned = longevity.slice(0, 4);
+  const pinnedIds = new Set(pinned.map((article) => article.id));
+  const rest = mixed.filter((article) => !pinnedIds.has(article.id));
+  return [...pinned, ...rest].slice(0, Math.max(limit, pinned.length));
 }
 
 export function filterArticlesForDesk(

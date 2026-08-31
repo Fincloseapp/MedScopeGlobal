@@ -5,7 +5,7 @@ import {
   MagazineSectionHub,
 } from "@/components/portal/magazine-section-hub";
 import { TEMATA_MAGAZINE_HUB } from "@/lib/portal/magazine-section-hub";
-import { VEREJNOST_HUB_TOPICS } from "@/lib/config/verejnost-topics";
+import { hubTopicListingHref, VEREJNOST_HUB_TOPICS } from "@/lib/config/verejnost-topics";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 3600;
@@ -16,10 +16,6 @@ export async function generateMetadata(): Promise<Metadata> {
     description: TEMATA_MAGAZINE_HUB.heroDeck,
     path: "/verejnost/temata",
   });
-}
-
-function topicHref(slug: string, backendTopic: string) {
-  return slug === "rozhovory" ? "/verejnost/rozhovory" : `/verejnost/clanky?topic=${backendTopic}`;
 }
 
 export default function VerejnostTemataPage() {
@@ -40,7 +36,7 @@ export default function VerejnostTemataPage() {
               slug={t.slug}
               label={t.label}
               description={t.description}
-              href={topicHref(t.slug, t.backendTopic)}
+              href={hubTopicListingHref(t.slug, t.backendTopic)}
             />
           ))}
         </div>

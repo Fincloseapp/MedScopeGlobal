@@ -38,6 +38,12 @@ import {
 } from "../../lib/ecosystem/editorial/images";
 import { getImageCuratorForLocale } from "../../lib/ecosystem/editorial/personas";
 import { polishCzechFields } from "../../lib/v22/translate";
+import {
+  classifyNewsDesk,
+  isLongevityArticle,
+  splitNewsDesks,
+} from "../../lib/v271/news-desks";
+import { hubTopicListingHref } from "../../lib/config/verejnost-topics";
 import { formatEditorialUnitDisplay, publicEditorialByline } from "../../lib/editorial/units";
 import {
   applyMagazineDeskCopy,
@@ -715,6 +721,66 @@ assert.ok(
   Object.keys(MAGAZINE_DESK_OVERRIDES).filter((slug) => MAGAZINE_DESK_OVERRIDES[slug]?.content).length >= 8
 );
 console.log("✓ magazine desk byline and copy checks passed");
+
+{
+  assert.equal(true, isLongevityArticle({
+    title: "Prevence osteoporózy u žen i mužů: vápník, vitamin D, pohyb",
+    slug: "verejnost-prevence-2026-07-02-prevence-osteoporozy-u-zen-i-muzu-vapnik-vitamin-d-pohyb",
+  }));
+  assert.equal(true, isLongevityArticle({
+    title: "10 minut denně: jak zaneprázdnění rodiče mohou zůstat fit",
+    slug: "verejnost-zivotni-styl-2026-07-02-10-minut-denne-jak-zaneprazdneni-rodice-mohou-zustat-fit-bez-posilovny",
+  }));
+  assert.equal(true, isLongevityArticle({
+    title: "Cesta zpět k životu po infarktu",
+    slug: "verejnost-rozhovory-2026-07-02-cesta-zpet-k-zivotu-jak-se-vratit-k-aktivnimu-zivotu-po-infarktu",
+  }));
+  assert.equal(false, isLongevityArticle({
+    title: "Jak se účinně bránit sezónním alergiím",
+    slug: "verejnost-nemoci-2026-07-02-jaro-v-plnem-rozkvetu-jak-se-ucinne-branit-sezonnim-alergiim",
+  }));
+  assert.equal(
+    classifyNewsDesk({
+      title: "Prevence osteoporózy u žen i mužů",
+      slug: "osteo-desk",
+      excerpt: "Vápník, vitamin D a pohyb.",
+    } as never),
+    "dlouhovekost"
+  );
+  const longBody = Array.from({ length: 820 }, () => "slovo").join(" ");
+  const desks = splitNewsDesks([
+    {
+      id: "osteo-1",
+      title: "Prevence osteoporózy u žen i mužů",
+      slug: "verejnost-prevence-2026-07-02-osteoporozy",
+      excerpt: "Vápník, vitamin D a pohyb pro zdravé kosti.",
+      content: longBody,
+      published: true,
+      published_at: "2026-07-02T10:00:00.000Z",
+      vip_only: false,
+      locale: "cs",
+      audience: "public",
+      public_topic: "prevence",
+    } as never,
+    {
+      id: "alergie-1",
+      title: "Jak se bránit sezónním alergiím",
+      slug: "verejnost-nemoci-2026-07-02-alergie",
+      excerpt: "Pyl a antihistaminika v praxi.",
+      content: longBody,
+      published: true,
+      published_at: "2026-07-02T10:00:00.000Z",
+      vip_only: false,
+      locale: "cs",
+      audience: "public",
+      public_topic: "nemoci",
+    } as never,
+  ]);
+  assert.equal(desks.dlouhovekost.length, 1);
+  assert.equal(desks.dlouhovekost[0]?.slug, "verejnost-prevence-2026-07-02-osteoporozy");
+  assert.equal(hubTopicListingHref("dlouhovekost", "zivotni-styl"), "/verejnost/clanky?topic=dlouhovekost");
+  console.log("✓ longevity desk classification keeps topic articles on the homepage");
+}
 
 console.log("✓ editorial image pipeline checks passed");
 console.log(

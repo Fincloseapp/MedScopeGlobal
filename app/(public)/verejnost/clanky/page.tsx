@@ -50,7 +50,7 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
   const longevity = topic === "dlouhovekost";
   const backendTopic = longevity ? null : resolveBackendTopic(topic);
   const fetched = await listPublicArticles({
-    limit: 48,
+    limit: 80,
     topic: backendTopic,
     ensureContent: true,
     mode: "full",

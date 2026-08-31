@@ -3,7 +3,7 @@ import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
 import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-audit";
 import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rules";
-import { mixListableFeed } from "@/lib/v271/news-desks";
+import { pinLongevityIntoFeed } from "@/lib/v271/news-desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import { normalizeLocale } from "@/lib/i18n/config";
@@ -51,7 +51,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
 
   const supabase = tryCreateServiceRoleClient();
   if (!supabase) {
-    return mixListableFeed(getDemoMagazineArticles(), 36);
+    return pinLongevityIntoFeed(getDemoMagazineArticles(), 36);
   }
 
   const { data, error } = await supabase
@@ -59,11 +59,11 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     .select(articleSelect)
     .eq("published", true)
     .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(72);
+    .limit(160);
 
   if (error) {
     console.error("loadArticlesPublic", error);
-    return mixListableFeed(getDemoMagazineArticles(), 36);
+    return pinLongevityIntoFeed(getDemoMagazineArticles(), 36);
   }
 
   const mapped = mapArticleList(data as Record<string, unknown>[] | null);
@@ -76,9 +76,9 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     maxTranslate: 16,
   });
   if (prepared.length === 0) {
-    return mixListableFeed(getDemoMagazineArticles(), 36);
+    return pinLongevityIntoFeed(getDemoMagazineArticles(), 36);
   }
-  return mixListableFeed(prepared, 36);
+  return pinLongevityIntoFeed(prepared, 36);
 }
 
 async function loadHomepageData(locale: string): Promise<{
@@ -99,7 +99,7 @@ async function loadHomepageData(locale: string): Promise<{
 export function getHomepageCachedData(locale = "cs") {
   return unstable_cache(
     () => loadHomepageData(locale),
-    ["v22-homepage-public-v8-vialongevita", locale],
+    ["v22-homepage-public-v9-longevity-desk", locale],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

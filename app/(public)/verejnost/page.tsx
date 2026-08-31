@@ -3,7 +3,7 @@ import Link from "next/link";
 import { DailyTipBanner } from "@/components/verejnost/daily-tip-banner";
 import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-disclaimer";
 import { VerejnostArticleCard } from "@/components/verejnost/verejnost-article-card";
-import { VEREJNOST_HUB_TOPICS } from "@/lib/config/verejnost-topics";
+import { hubTopicListingHref, VEREJNOST_HUB_TOPICS } from "@/lib/config/verejnost-topics";
 import { listPublicArticles } from "@/lib/queries/verejnost";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
@@ -179,11 +179,7 @@ export default async function VerejnostHubPage() {
             {topics.map((t) => (
               <Link
                 key={t.slug}
-                href={
-                  t.slug === "rozhovory"
-                    ? "/verejnost/rozhovory"
-                    : `/verejnost/clanky?topic=${t.backendTopic}`
-                }
+                href={hubTopicListingHref(t.slug, t.backendTopic)}
                 prefetch
                 className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-[#005B96]/40 hover:shadow-sm"
               >

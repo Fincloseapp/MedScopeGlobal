@@ -76,9 +76,16 @@ function DeskColumn({
   const def = NEWS_DESKS.find((item) => item.id === desk)!;
   const lead = featured ? articles[0] : null;
   const rows = featured ? articles.slice(1, 4) : articles.slice(0, 4);
+  const longevity = desk === "dlouhovekost";
 
   return (
-    <div>
+    <div
+      className={
+        longevity
+          ? "rounded-xl bg-gradient-to-b from-[#e8f3fb] via-white to-white p-3 ring-1 ring-[#005B96]/15"
+          : undefined
+      }
+    >
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
           <span className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-[#050b1d]">
@@ -90,16 +97,24 @@ function DeskColumn({
               sizes="28px"
             />
           </span>
-          <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#005B96]">{def.label}</h3>
+          <div className="min-w-0">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#005B96]">{def.label}</h3>
+            {longevity ? (
+              <p className="text-[10px] font-medium leading-4 text-slate-500">{def.kicker}</p>
+            ) : null}
+          </div>
         </div>
-        <Link href={def.href} className="text-[11px] font-medium text-[#005B96] hover:underline">
+        <Link href={def.href} className="shrink-0 text-[11px] font-medium text-[#005B96] hover:underline">
           {def.more} →
         </Link>
       </div>
       {lead ? (
         <Link href={`/article/${lead.slug}`} className="group mb-2 block">
           <NewsArticleThumb article={lead} large sizes="(max-width: 768px) 100vw, 40vw" />
-          <h4 className="mt-2 font-display text-base font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
+          <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#005B96]">
+            {def.kicker}
+          </p>
+          <h4 className="mt-0.5 font-display text-base font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
             {lead.title}
           </h4>
           {lead.excerpt ? (
