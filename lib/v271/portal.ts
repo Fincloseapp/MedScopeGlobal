@@ -26,7 +26,7 @@ export const PORTAL_SEARCH_TABS = [
 export const PORTAL_TRENDING = [
   { label: "dlouhověkost", href: "/verejnost/clanky?topic=dlouhovekost" },
   { label: "MediFlow", href: "/app/mediflow" },
-  { label: "VIP protokoly", href: "/vip/protokoly" },
+  { label: "dnešní tip", href: "/verejnost/osveta" },
   { label: "MeDipacient", href: "/app/pacient" },
   { label: "OrdiZapis", href: "/app/dokumentace" },
 ] as const;
@@ -40,7 +40,13 @@ export const PORTAL_SERVICES = [
     href: "/app/mediflow",
     image: "/assets/mediflow/icon-192.png",
   },
-  { id: "vip", label: "VIP", hint: "protokoly", href: "/vip/protokoly", icon: "spark" },
+  {
+    id: "vip",
+    label: "Dlouhověkost",
+    hint: "články",
+    href: "/verejnost/clanky?topic=dlouhovekost",
+    icon: "spark",
+  },
   {
     id: "medipacient",
     label: "MeDipacient",
@@ -96,7 +102,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
   en: {
     articles: MAGAZINE.name,
     mediflow: "journal",
-    vip: "protocols",
+    vip: "articles",
     medipacient: "records",
     ordizapis: "notes",
     academy: "learning",
@@ -108,7 +114,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
   de: {
     articles: MAGAZINE.name,
     mediflow: "Tagebuch",
-    vip: "Protokolle",
+    vip: "Artikel",
     medipacient: "Berichte",
     ordizapis: "Notizen",
     academy: "Bildung",
@@ -120,7 +126,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
   fr: {
     articles: MAGAZINE.name,
     mediflow: "journal",
-    vip: "protocoles",
+    vip: "articles",
     medipacient: "dossiers",
     ordizapis: "notes",
     academy: "formation",
@@ -132,9 +138,9 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
 };
 
 const SERVICE_LABELS: Record<string, Record<string, string>> = {
-  en: { articles: "Articles", trial: "14 days", leky: "Drugs", academy: "Academy", ai: "AI" },
-  de: { articles: "Artikel", trial: "14 Tage", leky: "Arznei", academy: "Academy", ai: "KI" },
-  fr: { articles: "Articles", trial: "14 jours", leky: "Médicaments", academy: "Academy", ai: "IA" },
+  en: { articles: "Articles", trial: "14 days", leky: "Drugs", academy: "Academy", ai: "AI", vip: "Longevity" },
+  de: { articles: "Artikel", trial: "14 Tage", leky: "Arznei", academy: "Academy", ai: "KI", vip: "Langlebigkeit" },
+  fr: { articles: "Articles", trial: "14 jours", leky: "Médicaments", academy: "Academy", ai: "IA", vip: "Longévité" },
 };
 
 const NEWS_TAB_LABELS: Record<string, string[]> = {
@@ -155,7 +161,7 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
     inNumbers: "In numbers",
     more: "more",
     newTab: "new tab",
-    trialCta: "14 days free",
+    trialCta: "Try 14 days free",
     servicesNav: "MedScopeGlobal services",
     footerLegal: `${MAGAZINE.name} on ${MAGAZINE.platform} is an educational health and longevity magazine — not an admissions board or official medical-school textbook. Content does not replace individual medical advice.`,
   },
@@ -166,7 +172,7 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
     inNumbers: "In Zahlen",
     more: "mehr",
     newTab: "neuer Tab",
-    trialCta: "14 Tage kostenlos",
+    trialCta: "14 Tage kostenlos testen",
     servicesNav: "MedScopeGlobal-Dienste",
     footerLegal: `${MAGAZINE.name} auf ${MAGAZINE.platform} ist ein Bildungs-Magazin für Gesundheit und Langlebigkeit — keine Zulassungskommission und kein offizielles Lehrbuch. Der Inhalt ersetzt keine individuelle ärztliche Beratung.`,
   },
@@ -177,7 +183,7 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
     inNumbers: "En chiffres",
     more: "plus",
     newTab: "nouvel onglet",
-    trialCta: "14 jours gratuits",
+    trialCta: "Essayer 14 jours",
     servicesNav: "Services MedScopeGlobal",
     footerLegal: `${MAGAZINE.name} sur ${MAGAZINE.platform} est un magazine éducatif de santé et de longévité — ce n’est ni un jury d’admission ni un manuel officiel. Le contenu ne remplace pas un avis médical individuel.`,
   },
@@ -188,7 +194,7 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
     inNumbers: "V číslech",
     more: "více",
     newTab: "nová karta",
-    trialCta: "14 dní zdarma",
+    trialCta: "Vyzkoušet 14 dní zdarma",
     servicesNav: "Služby MedScopeGlobal",
     footerLegal: `${MAGAZINE.name} na ${MAGAZINE.platform} je vzdělávací magazín zdraví a dlouhověkosti — není přijímací komise ani oficiální učebnice LF. Obsah nenahrazuje individuální lékařskou radu.`,
   },

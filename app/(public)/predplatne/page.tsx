@@ -149,11 +149,16 @@ export default async function PredplatnePage({
                   {localized.name}
                 </h3>
                 <p className="mt-2">
-                  <span className="text-3xl font-bold">{plan.monthlyCzk} Kč</span>
+                  <span className="text-3xl font-bold">
+                    {plan.monthlyCzk} {copy.currencyLabel}
+                  </span>
                   <span className="text-muted-foreground"> {copy.perMonth}</span>
                 </p>
                 <p className="mt-1 text-sm text-slate-600">
-                  {copy.yearly} <span className="font-semibold text-[#005B96]">{plan.annualCzk} Kč</span>{" "}
+                  {copy.yearly}{" "}
+                  <span className="font-semibold text-[#005B96]">
+                    {plan.annualCzk} {copy.currencyLabel}
+                  </span>{" "}
                   {copy.perYear}{" "}
                   <span className="text-emerald-700">{copy.twoMonthsFree}</span>
                 </p>
@@ -181,12 +186,12 @@ export default async function PredplatnePage({
                   <V27CheckoutButton
                     kind="subscription"
                     productId={subscriptionProductId(plan.tier, "year")}
-                    label={`${copy.startTrialYear} (${plan.annualCzk} Kč)`}
+                    label={`${copy.startTrialYear} (${plan.annualCzk} ${copy.currencyLabel})`}
                     className="w-full border border-[#005B96]/30 bg-white text-[#005B96] hover:bg-[#005B96]/5"
                   />
                 </div>
                 <p className="mt-3 text-center text-xs text-slate-500">
-                  {copy.afterTrial} {plan.monthlyCzk} Kč/měs. · {copy.cancelAnytime}
+                  {copy.afterTrial} {plan.monthlyCzk} {copy.afterTrialUnit} · {copy.cancelAnytime}
                 </p>
               </div>
             );
@@ -197,6 +202,25 @@ export default async function PredplatnePage({
       <SubscriptionComparisonTable locale={locale} />
       <SubscriptionTrustBadges locale={locale} />
       <SubscriptionFaq locale={locale} />
+
+      <div className="mt-12 rounded-2xl border border-[#cfe1f3] bg-white px-6 py-8 text-center">
+        <h2 className="font-display text-xl font-semibold text-[#021d33]">{copy.supportTitle}</h2>
+        <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">{copy.supportLead}</p>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href={localizePublicHref("/verejnost/clanky?topic=dlouhovekost", locale)}
+            className="inline-flex items-center justify-center rounded-lg bg-[#005B96] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
+          >
+            {copy.supportCta}
+          </Link>
+          <Link
+            href={localizePublicHref("/verejnost/clanky", locale)}
+            className="inline-flex items-center justify-center rounded-lg border border-[#005B96]/30 bg-white px-6 py-2.5 text-sm font-semibold text-[#005B96] hover:bg-[#005B96]/5"
+          >
+            {copy.keepReading}
+          </Link>
+        </div>
+      </div>
 
       <div className="mt-12 rounded-2xl border border-[#005B96]/15 bg-[#f0f7ff]/50 px-6 py-8 text-center">
         <h2 className="font-display text-xl font-semibold text-[#021d33]">{copy.noAccountTitle}</h2>

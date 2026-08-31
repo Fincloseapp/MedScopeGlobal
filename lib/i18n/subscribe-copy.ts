@@ -37,7 +37,13 @@ export type SubscribeCopy = {
   startTrialYear: string;
   startOrdiZapis: string;
   afterTrial: string;
+  afterTrialUnit: string;
+  currencyLabel: string;
   cancelAnytime: string;
+  supportTitle: string;
+  supportLead: string;
+  supportCta: string;
+  keepReading: string;
   comparisonTitle: string;
   comparisonLead: string;
   featureCol: string;
@@ -68,12 +74,12 @@ function pack(locale?: string | null): string {
 
 const COPY: Record<string, SubscribeCopy> = {
   cs: {
-    metaTitle: "Předplatné | MedScopeGlobal",
+    metaTitle: "Předplatné | ViaLongeVita",
     metaDescription:
-      "14denní zkušební verze zdarma. Tarify 99 / 149 / 390 / 490 Kč měsíčně — včetně OrdiZapis. Platba kartou přes Stripe.",
+      "Čtěte o dlouhověkosti zdarma. 14 dní na vyzkoušení tarifů 99 / 149 / 390 / 490 Kč — zrušení kdykoli. Platba kartou přes Stripe.",
     eyebrow: "Předplatné",
-    title: "Prémiový přístup k medicínskému obsahu",
-    lead: "Měsíční nebo roční plány pro veřejnost (MeDipacient), studenty (MeDiprep), ordinace (OrdiZapis) a lékaře. Stažení na mobil u všech tří aplikací. Bez reklam, s AI asistenty — platba přes Stripe.",
+    title: "Dlouhověkost srozumitelně — vyzkoušejte 14 dní",
+    lead: "Články o healthspanu zůstávají čitelné. Předplatné je pro ty, kdo chtějí deník, aplikace nebo podporovat redakci — 14 dní zdarma, zrušení kdykoli. Veřejnost, studenti, ordinace (OrdiZapis) a lékaři.",
     trialFromCta: "Přicházíte z trial CTA — níže je zvýrazněný tarif",
     studentPlan: "Student LF",
     trialFromCtaRest: "(příprava na přijímačky i studium). Rodiče: účet založte na jméno studenta.",
@@ -81,7 +87,7 @@ const COPY: Record<string, SubscribeCopy> = {
     parentsBodyBefore: "Tarif Student LF (149 Kč/měsíc) otevírá Academy, AI tutor a kvízy. Nejdřív vyzkoušejte",
     selfTest: "self-test",
     parentsBodyMid: "a jednu lekci zdarma — pak dává trial smysl.",
-    parentsMore: "Více pro rodiče na /studenti",
+    parentsMore: "Více pro rodiče",
     openApp: "Otevřít →",
     downloadApp: "Stáhnout na mobil",
     choosePlan: "Vyberte plán",
@@ -97,7 +103,14 @@ const COPY: Record<string, SubscribeCopy> = {
     startTrialYear: "Začít trial — ročně",
     startOrdiZapis: "Začít 14 dní zdarma — 390 Kč",
     afterTrial: "Po 14 dnech",
+    afterTrialUnit: "Kč/měs.",
+    currencyLabel: "Kč",
     cancelAnytime: "zrušení kdykoli",
+    supportTitle: "Nechcete předplatné? Stačí číst dál",
+    supportLead:
+      "Magazín zůstává otevřený. Pokud vám po dočtení článku dává smysl redakci podpořit, můžete přispět jednorázově — bez účtu a bez závazku. Předplatné je volitelné.",
+    supportCta: "Otevřít články o dlouhověkosti",
+    keepReading: "Číst dál zdarma",
     comparisonTitle: "Srovnání tarifů",
     comparisonLead:
       "Přehled funkcí podle cílové skupiny — tarify Veřejnost, Student LF a Lékař mají 14denní zkušební verzi. OrdiZapis (390 Kč) je samostatný nástroj pro zápisy; Lékař v praxi (490 Kč) přidává CME, Research Hub a klinický AI navíc.",
@@ -152,7 +165,12 @@ const COPY: Record<string, SubscribeCopy> = {
     plans: {
       public: {
         name: "Veřejnost",
-        features: ["Prevence a životní styl", "MeDipacient — zprávy v telefonu", "AI asistent pro veřejnost", "Bez reklam v článcích"],
+        features: [
+          "Články o dlouhověkosti, spánku, pohybu a stravě",
+          "MeDipacient — zprávy v telefonu",
+          "AI asistent pro veřejnost",
+          "Bez reklam v článcích",
+        ],
       },
       student: {
         name: "Student LF",
@@ -161,7 +179,7 @@ const COPY: Record<string, SubscribeCopy> = {
           "Celá Academy včetně přípravných kurzů na přijímačky",
           "AI tutor a studijní materiály",
           "Kvízy, hry a modelové otázky",
-          "149 Kč = Student LF (Academy) — není VIP longevity protokoly",
+          "149 Kč = Student LF (Academy) — longevity články zůstávají v magazínu zdarma",
         ],
       },
       dokumentace: {
@@ -215,12 +233,12 @@ const COPY: Record<string, SubscribeCopy> = {
     },
   },
   en: {
-    metaTitle: "Subscription | MedScopeGlobal",
+    metaTitle: "Subscription | ViaLongeVita",
     metaDescription:
-      "14-day free trial. Plans 99 / 149 / 390 / 490 CZK per month — including OrdiZapis. Card payment via Stripe.",
+      "Read about longevity for free. Try plans 99 / 149 / 390 / 490 CZK for 14 days — cancel anytime. Card payment via Stripe.",
     eyebrow: "Subscription",
-    title: "Premium access to medical content",
-    lead: "Monthly or yearly plans for everyone (MeDipacient), students (MeDiprep), clinics (OrdiZapis) and physicians. Install the apps on your phone. Ad-free reading, AI assistants — checkout via Stripe.",
+    title: "Longevity in plain language — try 14 days",
+    lead: "Healthspan articles stay readable. A plan is for people who want the journal, the apps, or to support the desk — 14 days free, cancel anytime. Public, students, clinics (OrdiZapis) and physicians.",
     trialFromCta: "You came from a trial CTA — the highlighted plan below is",
     studentPlan: "Medical student",
     trialFromCtaRest: "(admissions prep and study). Parents: create the account in the student’s name.",
@@ -228,7 +246,7 @@ const COPY: Record<string, SubscribeCopy> = {
     parentsBodyBefore: "The Medical student plan (149 CZK/month) opens Academy, the AI tutor and quizzes. First try the",
     selfTest: "self-test",
     parentsBodyMid: "and one free lesson — then the trial makes sense.",
-    parentsMore: "More for parents on /studenti",
+    parentsMore: "More for parents",
     openApp: "Open →",
     downloadApp: "Install on mobile",
     choosePlan: "Choose a plan",
@@ -244,7 +262,14 @@ const COPY: Record<string, SubscribeCopy> = {
     startTrialYear: "Start the trial — yearly",
     startOrdiZapis: "Start 14 days free — 390 CZK",
     afterTrial: "After 14 days",
+    afterTrialUnit: "CZK/month",
+    currencyLabel: "CZK",
     cancelAnytime: "cancel anytime",
+    supportTitle: "No plan needed — keep reading",
+    supportLead:
+      "The magazine stays open. If an article helped, you can leave a one-off contribution — no account, no commitment. A subscription is optional.",
+    supportCta: "Open longevity articles",
+    keepReading: "Keep reading free",
     comparisonTitle: "Compare plans",
     comparisonLead:
       "Features by audience — Public, Medical student and Physician include a 14-day trial. OrdiZapis (390 CZK) is the documentation app; Physician (490 CZK) adds CME, Research Hub and clinical AI.",
@@ -299,7 +324,12 @@ const COPY: Record<string, SubscribeCopy> = {
     plans: {
       public: {
         name: "Public",
-        features: ["Prevention and lifestyle", "MeDipacient — reports on your phone", "Public AI assistant", "Ad-free articles"],
+        features: [
+          "Articles on longevity, sleep, movement and food",
+          "MeDipacient — reports on your phone",
+          "Public AI assistant",
+          "Ad-free articles",
+        ],
       },
       student: {
         name: "Medical student",
@@ -308,7 +338,7 @@ const COPY: Record<string, SubscribeCopy> = {
           "Full Academy including admissions prep",
           "AI tutor and study materials",
           "Quizzes, games and model questions",
-          "149 CZK = Academy student — not VIP longevity protocols",
+          "149 CZK = Academy student — magazine longevity stays free to read",
         ],
       },
       dokumentace: {
@@ -362,12 +392,12 @@ const COPY: Record<string, SubscribeCopy> = {
     },
   },
   de: {
-    metaTitle: "Abo | MedScopeGlobal",
+    metaTitle: "Abo | ViaLongeVita",
     metaDescription:
-      "14 Tage kostenlos testen. Tarife 99 / 149 / 390 / 490 CZK pro Monat — inkl. OrdiZapis. Zahlung per Stripe.",
+      "Langlebigkeit frei lesen. Tarife 99 / 149 / 390 / 490 CZK 14 Tage testen — jederzeit kündbar. Zahlung per Stripe.",
     eyebrow: "Abo",
-    title: "Premium-Zugang zu medizinischen Inhalten",
-    lead: "Monats- oder Jahrestarife für die Öffentlichkeit (MeDipacient), Studierende (MeDiprep), Praxen (OrdiZapis) und Ärztinnen und Ärzte. Apps aufs Handy. Werbefrei, mit KI-Assistenten — Zahlung über Stripe.",
+    title: "Langlebigkeit verständlich — 14 Tage testen",
+    lead: "Healthspan-Artikel bleiben lesbar. Ein Tarif ist für alle, die das Tagebuch, die Apps oder die Redaktion unterstützen möchten — 14 Tage kostenlos, jederzeit kündbar. Öffentlichkeit, Studierende, Praxen (OrdiZapis) und Ärztinnen und Ärzte.",
     trialFromCta: "Sie kommen vom Test-CTA — hervorgehoben ist der Tarif",
     studentPlan: "Medizinstudium",
     trialFromCtaRest: "(Aufnahmeprüfung und Studium). Eltern: Konto auf den Namen der oder des Studierenden anlegen.",
@@ -375,7 +405,7 @@ const COPY: Record<string, SubscribeCopy> = {
     parentsBodyBefore: "Der Tarif Medizinstudium (149 CZK/Monat) öffnet Academy, KI-Tutor und Quiz. Zuerst den",
     selfTest: "Selbsttest",
     parentsBodyMid: "und eine kostenlose Lektion ausprobieren — dann lohnt sich der Testzeitraum.",
-    parentsMore: "Mehr für Eltern unter /studenti",
+    parentsMore: "Mehr für Eltern",
     openApp: "Öffnen →",
     downloadApp: "Aufs Handy laden",
     choosePlan: "Tarif wählen",
@@ -391,7 +421,14 @@ const COPY: Record<string, SubscribeCopy> = {
     startTrialYear: "Test starten — jährlich",
     startOrdiZapis: "14 Tage kostenlos starten — 390 CZK",
     afterTrial: "Nach 14 Tagen",
+    afterTrialUnit: "CZK/Monat",
+    currencyLabel: "CZK",
     cancelAnytime: "jederzeit kündbar",
+    supportTitle: "Kein Abo nötig — weiterlesen",
+    supportLead:
+      "Das Magazin bleibt offen. Wenn ein Artikel geholfen hat, können Sie einmalig beitragen — ohne Konto, ohne Verpflichtung. Ein Abo ist freiwillig.",
+    supportCta: "Artikel zur Langlebigkeit öffnen",
+    keepReading: "Kostenlos weiterlesen",
     comparisonTitle: "Tarifvergleich",
     comparisonLead:
       "Funktionen nach Zielgruppe — Öffentlichkeit, Medizinstudium und Arzt enthalten 14 Tage Test. OrdiZapis (390 CZK) ist die Dokumentations-App; Arzt in der Praxis (490 CZK) ergänzt CME, Research Hub und klinische KI.",
@@ -446,7 +483,12 @@ const COPY: Record<string, SubscribeCopy> = {
     plans: {
       public: {
         name: "Öffentlichkeit",
-        features: ["Prävention und Lebensstil", "MeDipacient — Berichte am Handy", "KI-Assistent für alle", "Artikel ohne Werbung"],
+        features: [
+          "Artikel zu Langlebigkeit, Schlaf, Bewegung und Ernährung",
+          "MeDipacient — Berichte am Handy",
+          "KI-Assistent für alle",
+          "Artikel ohne Werbung",
+        ],
       },
       student: {
         name: "Medizinstudium",
@@ -455,7 +497,7 @@ const COPY: Record<string, SubscribeCopy> = {
           "Gesamte Academy inkl. Aufnahmevorbereitung",
           "KI-Tutor und Lernmaterial",
           "Quiz, Spiele und Modellfragen",
-          "149 CZK = Academy-Student — keine VIP-Langlebigkeitsprotokolle",
+          "149 CZK = Academy-Student — Langlebigkeitsartikel bleiben im Magazin frei lesbar",
         ],
       },
       dokumentace: {
@@ -509,12 +551,12 @@ const COPY: Record<string, SubscribeCopy> = {
     },
   },
   fr: {
-    metaTitle: "Abonnement | MedScopeGlobal",
+    metaTitle: "Abonnement | ViaLongeVita",
     metaDescription:
-      "Essai gratuit de 14 jours. Formules 99 / 149 / 390 / 490 CZK par mois — dont OrdiZapis. Paiement par carte via Stripe.",
+      "Lisez la longévité librement. Formules 99 / 149 / 390 / 490 CZK pendant 14 jours — résiliation à tout moment. Paiement par carte via Stripe.",
     eyebrow: "Abonnement",
-    title: "Accès premium aux contenus médicaux",
-    lead: "Formules mensuelles ou annuelles pour le grand public (MeDipacient), les étudiants (MeDiprep), les cabinets (OrdiZapis) et les médecins. Applications sur mobile. Sans publicité, avec assistants IA — paiement via Stripe.",
+    title: "La longévité en clair — 14 jours d’essai",
+    lead: "Les articles healthspan restent lisibles. Une formule est pour celles et ceux qui veulent le journal, les applis ou soutenir la rédaction — 14 jours gratuits, résiliation à tout moment. Grand public, étudiants, cabinets (OrdiZapis) et médecins.",
     trialFromCta: "Vous arrivez depuis un CTA d’essai — la formule mise en avant est",
     studentPlan: "Étudiant en médecine",
     trialFromCtaRest: "(préparation aux concours et études). Parents : créez le compte au nom de l’étudiant.",
@@ -522,7 +564,7 @@ const COPY: Record<string, SubscribeCopy> = {
     parentsBodyBefore: "La formule Étudiant en médecine (149 CZK/mois) ouvre l’Academy, le tuteur IA et les quiz. Essayez d’abord le",
     selfTest: "auto-test",
     parentsBodyMid: "et une leçon gratuite — l’essai a alors du sens.",
-    parentsMore: "Plus pour les parents sur /studenti",
+    parentsMore: "Plus pour les parents",
     openApp: "Ouvrir →",
     downloadApp: "Installer sur mobile",
     choosePlan: "Choisir une formule",
@@ -538,7 +580,14 @@ const COPY: Record<string, SubscribeCopy> = {
     startTrialYear: "Démarrer l’essai — annuel",
     startOrdiZapis: "Démarrer 14 jours gratuits — 390 CZK",
     afterTrial: "Après 14 jours",
+    afterTrialUnit: "CZK/mois",
+    currencyLabel: "CZK",
     cancelAnytime: "résiliation à tout moment",
+    supportTitle: "Pas d’abonnement ? Continuez à lire",
+    supportLead:
+      "Le magazine reste ouvert. Si un article vous a aidé, vous pouvez contribuer une fois — sans compte, sans engagement. L’abonnement est facultatif.",
+    supportCta: "Ouvrir les articles sur la longévité",
+    keepReading: "Continuer à lire gratuitement",
     comparisonTitle: "Comparer les formules",
     comparisonLead:
       "Fonctions par public — Grand public, Étudiant et Médecin incluent 14 jours d’essai. OrdiZapis (390 CZK) est l’appli de notes ; Médecin en exercice (490 CZK) ajoute FMC, Research Hub et IA clinique.",
@@ -593,7 +642,12 @@ const COPY: Record<string, SubscribeCopy> = {
     plans: {
       public: {
         name: "Grand public",
-        features: ["Prévention et mode de vie", "MeDipacient — comptes rendus sur mobile", "Assistant IA grand public", "Articles sans publicité"],
+        features: [
+          "Articles sur la longévité, le sommeil, le mouvement et l’alimentation",
+          "MeDipacient — comptes rendus sur mobile",
+          "Assistant IA grand public",
+          "Articles sans publicité",
+        ],
       },
       student: {
         name: "Étudiant en médecine",
@@ -602,7 +656,7 @@ const COPY: Record<string, SubscribeCopy> = {
           "Toute l’Academy y compris la prépa concours",
           "Tuteur IA et supports d’étude",
           "Quiz, jeux et questions types",
-          "149 CZK = étudiant Academy — pas les protocoles VIP de longévité",
+          "149 CZK = étudiant Academy — les articles longévité restent libres à lire",
         ],
       },
       dokumentace: {

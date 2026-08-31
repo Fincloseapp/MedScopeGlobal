@@ -18,7 +18,7 @@ import {
   publicEditorialByline,
   type EditorialAssignment,
 } from "@/lib/editorial/units";
-import { resolveEditorialCover } from "@/lib/editorial/image-policy";
+import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
 import { applyMagazineDeskCopy } from "@/lib/editorial/magazine-desk-copy";
 
 export type DisplayArticle = ArticleWithRelations & {
@@ -43,13 +43,14 @@ function attachEditorialDisplay(
       ? applyMagazineDeskCopy({ ...article, ...extra })
       : { ...article, ...extra };
   const merged = { ...article, ...extra, ...desk };
-  const cover_image_url = resolveEditorialCover({
-    coverUrl: merged.cover_image_url,
-    title: merged.title,
-    excerpt: merged.excerpt,
+  const cover_image_url = resolveArticleCoverUrl({
+    title: merged.title ?? "",
     slug: merged.slug,
-    public_topic: merged.public_topic,
+    excerpt: merged.excerpt,
     category: merged.categories?.name,
+    publicTopic: merged.public_topic,
+    coverImageUrl: merged.cover_image_url,
+    preferCurated: true,
   });
   return {
     ...merged,

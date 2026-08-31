@@ -50,6 +50,8 @@ import { topicLabelForSlug } from "../lib/config/verejnost-topics";
 import { localizeMagazineHubConfig } from "../lib/i18n/localize-magazine-hub";
 import { OSVETA_MAGAZINE_HUB } from "../lib/portal/magazine-section-hub";
 import { getVerejnostNavStripCopy } from "../lib/v38/conversion-copy";
+import { getHomepageLongevityCopy } from "../lib/i18n/homepage-longevity";
+import { classifyCoverTopic } from "../lib/ecosystem/editorial/images/cover";
 
 // --- unit checks (no server required) ---
 assert.equal(localeToPathSegment("en-US"), "en-us");
@@ -182,7 +184,7 @@ assert.equal(getPortalChrome("de").newsTabs[0]?.label, "News");
 assert.equal(getPortalChrome("fr").trialCta.includes("14"), true);
 assert.ok(getPortalChrome("de").footerLegal.includes("Langlebigkeit"));
 assert.equal(getPortalChrome("sk").forWhom, "Who it's for");
-assert.equal(getPortalChrome("ru").trialCta, "14 days free");
+assert.equal(getPortalChrome("ru").trialCta, "Try 14 days free");
 assert.equal(getPortalChrome("ja").news, "Newsroom");
 
 assert.equal(getSurfaceCopy("cs").searchTab, "Hledat");
@@ -207,8 +209,12 @@ assert.equal(getSurfaceCopy("fr").mainNav, "Navigation principale");
 assert.equal(getSurfaceCopy("fr").signIn, "Connexion");
 assert.equal(getSurfaceCopy("fr").register, "Inscription");
 assert.equal(getSurfaceCopy("de").signIn, "Anmelden");
-assert.equal(getSubscribeCopy("fr").title, "Accès premium aux contenus médicaux");
+assert.equal(getSubscribeCopy("fr").title, "La longévité en clair — 14 jours d’essai");
 assert.ok(!getSubscribeCopy("fr").title.includes("Předplatné"));
+assert.ok(!getSubscribeCopy("cs").title.includes("Prémiový"));
+assert.ok(getSubscribeCopy("de").supportTitle.includes("weiterlesen"));
+assert.ok(!getSubscribeCopy("en").parentsMore.includes("/studenti"));
+assert.ok(getSubscribeCopy("fr").afterTrialUnit.includes("mois"));
 assert.ok(!getSubscribeCopy("de").faqTitle.includes("Časté"));
 assert.equal(getSubscribeCopy("sk").eyebrow, "Subscription");
 assert.equal(localizePublicHref("/predplatne", "fr"), "/fr/predplatne");
@@ -230,6 +236,30 @@ assert.deepEqual(
 assert.equal(frHeader[0]?.label, "Grand public");
 assert.equal(frHeader[4]?.label, "Abonnement");
 assert.equal(getDesktopHeaderMenu("de")[2]?.label, "Ärzte");
+assert.equal(csHeader[0]?.children?.[0]?.href.includes("dlouhovekost"), true);
+assert.equal(csHeader[0]?.children?.[0]?.label, "Dlouhověkost");
+assert.equal(frHeader[0]?.children?.[0]?.label, "Longévité");
+assert.equal(getDesktopHeaderMenu("de")[0]?.children?.[0]?.label, "Langlebigkeit");
+assert.ok((frHeader[4]?.children?.length ?? 0) >= 4);
+assert.ok(getPortalChrome("cs").trialCta.includes("zdarma"));
+assert.ok(getPortalChrome("fr").services.some((s) => s.id === "vip" && s.label === "Longévité"));
+assert.equal(getMarketingCopy("de").publicHub.topics["zivotni-styl"]?.label, "Lebensstil");
+assert.equal(getMarketingCopy("fr").publicHub.topics["zivotni-styl"]?.label, "Mode de vie");
+assert.ok(getHomepageLongevityCopy("cs").title.includes("kroky"));
+assert.ok(getHomepageLongevityCopy("fr").softCta.includes("14"));
+assert.ok(!getHomepageLongevityCopy("de").closer.includes("zdarma"));
+assert.equal(classifyCoverTopic({ title: "Mediterranean diet at home", slug: "mediterranean-diet" }), "food");
+assert.equal(classifyCoverTopic({ title: "Sommeil et rythme circadien", slug: "sommeil-rythme" }), "sleep");
+assert.equal(classifyCoverTopic({ title: "Langlebigkeit und Healthspan", slug: "langlebigkeit-healthspan" }), "seniors");
+assert.equal(classifyCoverTopic({ title: "WHO and EMA guideline on air quality", slug: "who-ema-guideline" }), "research");
+assert.equal(
+  classifyCoverTopic({
+    title: "Rozhovor: jak pečovat o klidný podvečer",
+    slug: "verejnost-rozhovory-klidny-podvecer",
+    publicTopic: "rozhovory",
+  }),
+  "calm"
+);
 assert.equal(getMarketingCopy("fr").apps.title, "Applis");
 assert.ok(!getMarketingCopy("fr").apps.trialCta.includes("zdarma"));
 assert.equal(getMarketingCopy("de").about.eyebrow, "Über uns");
@@ -275,9 +305,11 @@ assert.ok(!getArticleChrome("fr").related.includes("Související"));
 assert.ok(!getArticleChrome("en").recsTitle.includes("dlouhověkost"));
 
 assert.equal(topicLabelForSlug("zivotni-styl", "cs"), "Životní styl");
-assert.equal(topicLabelForSlug("zivotni-styl", "fr"), "Lifestyle");
-assert.equal(topicLabelForSlug("zivotni-styl", "de"), "Lifestyle");
+assert.equal(topicLabelForSlug("zivotni-styl", "fr"), "Mode de vie");
+assert.equal(topicLabelForSlug("zivotni-styl", "de"), "Lebensstil");
 assert.equal(topicLabelForSlug("dlouhovekost", "en"), "Longevity");
+assert.equal(topicLabelForSlug("dlouhovekost", "fr"), "Longévité");
+assert.equal(topicLabelForSlug("dlouhovekost", "de"), "Langlebigkeit");
 assert.equal(getVerejnostChrome("cs").dailyTipBadge, "Dnešní tip");
 assert.equal(getVerejnostChrome("fr").dailyTipBadge, "Conseil du jour");
 assert.equal(getVerejnostChrome("de").dailyTipBadge, "Tipp des Tages");

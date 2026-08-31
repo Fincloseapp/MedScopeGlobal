@@ -23,7 +23,7 @@ const NAV_BUTTON = cn(
 );
 
 const DROPDOWN_PANEL = cn(
-  "z-[60] min-w-64 max-w-[min(20rem,calc(100vw-1rem))] rounded-md border border-black/[0.06] bg-white py-1.5 shadow-lg",
+  "z-[60] min-w-72 max-w-[min(24rem,calc(100vw-1rem))] rounded-md border border-black/[0.06] bg-white py-1.5 shadow-lg",
   "max-h-[min(70dvh,28rem)] overflow-y-auto overscroll-contain",
   "dark:border-white/10 dark:bg-slate-900"
 );

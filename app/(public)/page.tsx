@@ -5,6 +5,7 @@ import {
   V271B2bBlock,
   V272WhyTrustBlock,
 } from "@/components/v271/homepage-sections";
+import { HomepageLongevityStrip } from "@/components/v271/homepage-longevity-strip";
 import { PortalHome } from "@/components/v271/portal-home";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { medicalWebPageJsonLd, webSiteJsonLd, softwareApplicationJsonLd } from "@/lib/seo/json-ld";
@@ -94,6 +95,7 @@ export default async function HomePage() {
 
       {/* Story: ViaLongeVita hero → magazín → apps/VIP → CTA (PortalHome). Pricing lives on /predplatne — not duplicated under the portal. */}
       <PortalHome articles={articles} copy={philosophy} locale={locale} />
+      <HomepageLongevityStrip articles={articles} locale={locale} />
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
       <V272WhyTrustBlock locale={locale} />
       {isCzechSurface(locale) ? <V272AcademyHomeSections /> : null}

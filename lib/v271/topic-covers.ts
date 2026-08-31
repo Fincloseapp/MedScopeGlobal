@@ -1,4 +1,4 @@
-import { resolveEditorialCover } from "@/lib/editorial/image-policy";
+import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
 
 type CoverInput = {
   title?: string | null;
@@ -11,23 +11,25 @@ type CoverInput = {
 
 /** Prefer stored cover after editorial gate; else topic-safe fallback. */
 export function resolveDisplayCover(input: CoverInput): string | null {
-  return resolveEditorialCover({
-    title: input.title,
-    category: input.category,
+  return resolveArticleCoverUrl({
+    title: input.title ?? "",
+    slug: input.slug ?? undefined,
     excerpt: input.excerpt,
-    coverUrl: input.coverUrl,
-    slug: input.slug,
-    public_topic: input.public_topic,
+    category: input.category,
+    publicTopic: input.public_topic,
+    coverImageUrl: input.coverUrl,
+    preferCurated: true,
   });
 }
 
 export function resolveTopicFallbackCover(input: CoverInput): string | null {
-  return resolveEditorialCover({
-    title: input.title,
-    category: input.category,
+  return resolveArticleCoverUrl({
+    title: input.title ?? "",
+    slug: input.slug ?? undefined,
     excerpt: input.excerpt,
-    coverUrl: null,
-    slug: input.slug,
-    public_topic: input.public_topic,
+    category: input.category,
+    publicTopic: input.public_topic,
+    coverImageUrl: null,
+    preferCurated: true,
   });
 }

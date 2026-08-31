@@ -522,6 +522,20 @@ ${"<p>Další praktický odstavec o nákupním seznamu, týdenním plánu a mýt
     }),
     "seniors"
   );
+  assert.equal(classifyCoverTopic({ title: "Mediterranean plate without extremes", slug: "mediterranean-plate" }), "food");
+  assert.equal(classifyCoverTopic({ title: "Longévité et healthspan au quotidien", slug: "longevite-healthspan" }), "seniors");
+  assert.equal(
+    classifyCoverTopic({
+      title: "Rozhovor: jak pečovat o klidný podvečer",
+      slug: "verejnost-rozhovory-klidny-podvecer",
+      publicTopic: "rozhovory",
+    }),
+    "calm"
+  );
+  assert.equal(
+    classifyCoverTopic({ title: "WHO and EMA recommendation on air quality", slug: "who-ema-air" }),
+    "research"
+  );
 
   const diabetesFromCalmAbs = resolveArticleCoverUrl({
     title: "Cukrovka 2. typ: klíčová zjištění a praktický průvodce",

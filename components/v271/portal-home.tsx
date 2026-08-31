@@ -20,6 +20,7 @@ import { AppOpenLink, isStandaloneAppHref } from "@/components/apps/app-origin-b
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { VITASCOPE, VITASCOPE_DESK_LOGO } from "@/lib/brand/vitascope";
 import { BookOpen, Gift, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
 
 function ServiceGlyph({ icon }: { icon?: string }) {
@@ -221,7 +222,7 @@ export function PortalHome({
               return (
               <li key={svc.id}>
                 <Item
-                  href={svc.href}
+                  href={openApp ? svc.href : localizePublicHref(svc.href, locale)}
                   className="flex flex-col items-center gap-1 rounded-md px-1 py-1.5 text-center hover:bg-slate-50"
                 >
                   {"image" in svc && svc.image ? (
@@ -300,7 +301,7 @@ export function PortalHome({
                 ))}
               </ul>
               <Link
-                href="/predplatne?trial=1"
+                href={localizePublicHref("/predplatne?trial=1", locale)}
                 className="mt-3 flex w-full items-center justify-center rounded-md bg-[#005B96] px-3 py-2 text-sm font-semibold text-white hover:bg-[#004a7a]"
               >
                 {chrome.trialCta}

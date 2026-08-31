@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
-import { isBannedCoverUrl, resolveEditorialCover } from "@/lib/editorial/image-policy";
+import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
+import { isBannedCoverUrl } from "@/lib/editorial/image-policy";
 
 type Props = {
   title: string;
@@ -28,13 +29,14 @@ export function V20ArticleCover({
 }: Props) {
   const coverStyles = getArticleCoverStyles(title, category ?? undefined);
   const coverMeta = getArticleCoverLabel(title, category ?? undefined);
-  const gated = resolveEditorialCover({
-    coverUrl: coverUrl && !isBannedCoverUrl(coverUrl) ? coverUrl : null,
+  const gated = resolveArticleCoverUrl({
     title,
-    category,
-    slug,
+    slug: slug ?? undefined,
     excerpt,
-    public_topic: publicTopic,
+    category,
+    publicTopic,
+    coverImageUrl: coverUrl && !isBannedCoverUrl(coverUrl) ? coverUrl : null,
+    preferCurated: true,
   });
   const safeCover = gated && !isBannedCoverUrl(gated) ? gated : null;
 

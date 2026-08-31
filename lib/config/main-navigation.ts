@@ -28,13 +28,18 @@ const menuCs: NavItem[] = [
     label: "Pro veřejnost",
     href: "/verejnost",
     children: [
-      { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu — i offline" },
-      { label: "Najdi svůj problém", href: "/verejnost/temata", description: "Symptomy, prevence, nemoci — začněte zde" },
-      { label: "Zeptej se AI", href: "/ai-asistent/verejnost", description: "Odpovědi o zdraví — nenahrazuje lékaře" },
+      {
+        label: "Dlouhověkost",
+        href: "/verejnost/clanky?topic=dlouhovekost",
+        description: "Healthspan, spánek, pohyb a strava — čtěte zdarma",
+      },
+      { label: "Články redakce", href: "/verejnost/clanky", description: "Krátké texty bez žargonu" },
+      { label: "Dnešní tip", href: "/verejnost/osveta", description: "Jeden praktický krok na dnes" },
+      { label: "Témata", href: "/verejnost/temata", description: "Prevence, výživa, spánek, stres" },
+      { label: "Rozhovory", href: "/verejnost/rozhovory", description: "Odborníci srozumitelně" },
+      { label: "AI poradna", href: "/ai-asistent/verejnost", description: "Odpovědi o zdraví — nenahrazuje lékaře" },
       { label: "Přehled sekce", href: "/verejnost", description: "Vše pro veřejnost na jednom místě" },
-      { label: "Články", href: "/verejnost/clanky", description: "Krátké srozumitelné články v češtině" },
-      { label: "Denní videa", href: "/verejnost/osveta", description: "Zdravotní tipy s avatary a kvízy" },
-      { label: "Rozhovory", href: "/verejnost/rozhovory", description: "Rozhovory s lékaři a odborníky" },
+      { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu — i offline" },
       { label: "Žebříček", href: "/verejnost/zebricek", description: "XP za sledování a kvízy" },
     ],
   },
@@ -221,6 +226,13 @@ const menuCs: NavItem[] = [
   {
     label: "Předplatné",
     href: "/predplatne",
+    children: [
+      { label: "Prohlédnout tarify", href: "/predplatne", description: "14 dní zdarma · zrušení kdykoli" },
+      { label: "Veřejnost", href: "/predplatne#public", description: "Články, prevence, MeDipacient" },
+      { label: "Student LF", href: "/predplatne#student", description: "Academy a AI tutor" },
+      { label: "OrdiZapis", href: "/predplatne#dokumentace", description: "AI zápisy pro ordinaci" },
+      { label: "Lékař v praxi", href: "/predplatne#physician", description: "CME a Research Hub" },
+    ],
   },
 ];
 
@@ -357,7 +369,13 @@ export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
   const lekari = find("Pro lékaře");
   const predplatne = find("Předplatné");
   const tree: NavItem[] = [
-    verejnost ? { ...verejnost, label: "Veřejnost" } : { label: "Veřejnost", href: "/verejnost" },
+    verejnost
+      ? {
+          ...verejnost,
+          label: "Veřejnost",
+          children: verejnost.children?.filter((child) => child.href !== "/verejnost/zebricek"),
+        }
+      : { label: "Veřejnost", href: "/verejnost" },
     studenti ? { ...studenti, label: "Studenti" } : { label: "Studenti", href: "/studenti" },
     lekari ? { ...lekari, label: "Lékaři" } : { label: "Lékaři", href: "/lekari" },
     {

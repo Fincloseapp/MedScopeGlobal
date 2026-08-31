@@ -100,12 +100,63 @@ export const VISUAL_TOPIC_KEYWORDS: Record<CoverVisualTopic, readonly string[]> 
     "výživa",
     "nutrition",
   ],
-  sleep: ["spánek", "spanek", "sleep", "odpočinek", "odpocinek", "postel", "unava", "únava"],
-  calm: ["stres", "stress", "mindful", "meditac", "relax", "klid", "wellness"],
-  movement: ["pohyb", "cvič", "cvic", "fitness", "sport", "chůze", "chuze", "walk", "trenink"],
-  seniors: ["senior", "stárnut", "starnut", "aging", "menopauz", "důchod", "duchod"],
+  sleep: [
+    "spánek",
+    "spanek",
+    "sleep",
+    "sommeil",
+    "schlaf",
+    "insomni",
+    "odpočinek",
+    "odpocinek",
+    "postel",
+    "unava",
+    "únava",
+  ],
+  calm: ["stres", "stress", "mindful", "meditac", "relax", "klid", "wellness", "entretien", "interview"],
+  movement: [
+    "pohyb",
+    "cvič",
+    "cvic",
+    "fitness",
+    "sport",
+    "chůze",
+    "chuze",
+    "walk",
+    "trenink",
+    "bewegung",
+    "mouvement",
+    "sedent",
+  ],
+  seniors: [
+    "senior",
+    "stárnut",
+    "starnut",
+    "aging",
+    "ageing",
+    "menopauz",
+    "důchod",
+    "duchod",
+    "longevity",
+    "healthspan",
+    "langleb",
+    "longévité",
+    "dlouhovek",
+  ],
   clinical: ["klinick", "nemoc", "chorob", "lékař", "lekar", "hospital", "ordinac", "diagn"],
-  research: ["studie", "výzkum", "vyzkum", "research", "biomarker", "guideline", "prevence"],
+  research: [
+    "studie",
+    "výzkum",
+    "vyzkum",
+    "research",
+    "biomarker",
+    "guideline",
+    "prevence",
+    "who",
+    "ema",
+    "súkl",
+    "sukl",
+  ],
   tech: ["digitáln", "digital", "aplikac", "telemedic", "wearable", "ai"],
   vitals: ["glukóz", "glukoz", "tlak", "srdce", "cholesterol", "vitamin", "krev"],
   walk: ["chůze", "chuze", "walk", "příroda", "priroda", "outdoor"],
@@ -224,19 +275,24 @@ const LOCAL_COVER_TOPICS: Partial<
 };
 
 const FOOD_RE =
-  /tal[ií][rř]|st[rř]edo\s*mo[rř]|stredomorsk|kuchyn|strav|j[ií]dl|meal|diet|v[yý][zž]iv|sal[aá]t|olive|zelenin|protein|b[ií]lkovin|sytost|recept|j[ií]deln[ií][cč]ek|nutrition|hydrat|pitn[yý]\s+re[zž]im|pitn[eé]\s+re[zž]im|ovoce|sn[ií]dan|ve[cč]e[rř]|potravin/i;
+  /tal[ií][rř]|st[rř]edo\s*mo[rř]|stredomorsk|mediterran|m[eé]diterran[eé]|kuchyn|strav|j[ií]dl|meal|diet|v[yý][zž]iv|sal[aá]t|olive|zelenin|protein|prot[eé]in|b[ií]lkovin|sytost|recept|j[ií]deln[ií][cč]ek|nutrition|ern[aä]hrung|nahrung|hydrat|pitn[yý]\s+re[zž]im|pitn[eé]\s+re[zž]im|ovoce|sn[ií]dan|ve[cč]e[rř]e|potravin|je[uû]ne|fasting|omega/i;
 
 const SLEEP_RE =
-  /sp[aá]nek|sleep|apnoe|insomni|odpo[cč]ink|no[cč]n[ií]|polar|postel|unava|únava|jarn[ií]\s+unava|zimn[ií]\s+unava/i;
+  /sp[aá]nek|sleep|sommeil|schlaf|apnoe|insomni|circadian|circadien|odpo[cč]ink|no[cč]n[ií]|polar|postel|unava|únava|jarn[ií]\s+unava|zimn[ií]\s+unava/i;
 
 const CALM_RE =
   /stres|stress|mindful|meditac|dechov|relax|pohoda|imunit.*pr[aá]ce|wellness|klid/i;
 
 const MOVEMENT_RE =
-  /pohyb|cvi[cč]|fitness|sport|ch[uů]ze|walk|cvik|trenink|tr[eé]nink|svalov|svaly|posilov|sedav|sedent|neat\b|schod|st[aá]n[ií]|zam[eě]stn|kancel[aá][řr]|office/i;
+  /pohyb|cvi[cč]|fitness|sport|ch[uů]ze|walk|walking|marche|gehen|bewegung|mouvement|exercise|cvik|trenink|tr[eé]nink|svalov|svaly|posilov|sedav|sedent|s[eé]dentaire|sitzend|neat\b|schod|st[aá]n[ií]|zam[eě]stn|kancel[aá][řr]|office|bureau/i;
 
 const SENIORS_RE =
-  /senior|st[aá][rř]nut|aging|menopauz|osteopor|hrt|d[uů]chod|kostn[ií]|[rř][ií]dnut[ií]\s+kost/i;
+  /senior|st[aá][rř]nut|aging|ageing|menopauz|menopause|hormon|osteopor|hrt|d[uů]chod|kostn[ií]|[rř][ií]dnut[ií]\s+kost|longevity|healthspan|langleb|long[eé]vit|dlouhov[eě]k/i;
+
+const INSTITUTIONAL_RE =
+  /\bwho\b|world health|ema\b|fda\b|s[uú]kl|sukl|guideline|doporu[cč]en|recommendation|regulat|institu|diplomat|legal|\bz[aá]kon\b|\bdroit\b|\brecht\b|\bpolicy\b|politik/i;
+
+const INTERVIEW_RE = /rozhovor|interview|entretien|gespr[aä]ch/i;
 
 const KIDS_RE = /d[eě]t[ií]|[sš]kol|imunit.*d[eě]t|pediatr/i;
 
@@ -303,9 +359,12 @@ export function classifyCoverTopic(input: {
   if (VITALS_RE.test(titleSlug)) return "vitals";
   if (MOVEMENT_RE.test(titleSlug)) return "movement";
   if (TECH_RE.test(titleSlug)) return "tech";
-  if (RESEARCH_RE.test(titleSlug) || topic.includes("prevence")) return "research";
-  if (CLINICAL_RE.test(titleSlug) || topic.includes("nemoci")) return "clinical";
+  if (RESEARCH_RE.test(titleSlug) || INSTITUTIONAL_RE.test(titleSlug) || topic.includes("prevence")) {
+    return "research";
+  }
   if (CALM_RE.test(titleSlug)) return "calm";
+  if (INTERVIEW_RE.test(titleSlug) || topic.includes("rozhovor")) return "calm";
+  if (CLINICAL_RE.test(titleSlug) || topic.includes("nemoci")) return "clinical";
 
   // Weaker excerpt / category signals
   if (SLEEP_RE.test(hay)) return "sleep";
@@ -316,12 +375,14 @@ export function classifyCoverTopic(input: {
   if (KIDS_RE.test(hay)) return "walk";
   if (VITALS_RE.test(hay)) return "vitals";
   if (TECH_RE.test(hay)) return "tech";
-  if (RESEARCH_RE.test(hay) || topic.includes("prevence")) return "research";
+  if (RESEARCH_RE.test(hay) || INSTITUTIONAL_RE.test(hay) || topic.includes("prevence")) {
+    return "research";
+  }
   if (CLINICAL_RE.test(hay) || topic.includes("nemoci")) return "clinical";
   // Slug/title movement beats generic zivotni-styl → calm (e.g. sedavé zaměstnání / NEAT).
   if (MOVEMENT_RE.test(titleSlug)) return "movement";
   if (topic.includes("zivotni")) return "calm";
-  if (topic.includes("rozhovor")) return "clinical";
+  if (INTERVIEW_RE.test(hay) || topic.includes("rozhovor")) return "calm";
   return "research";
 }
 
