@@ -8,6 +8,7 @@ import type { AccessLevelId } from "@/lib/config/access-levels";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/client";
 import { mergedArticleSearch } from "@/utils/merged-article-search";
+import { sanitizeSearchInput } from "@/utils/search";
 import { formatPublicDate } from "@/lib/i18n/format-date";
 
 export function SearchClient({

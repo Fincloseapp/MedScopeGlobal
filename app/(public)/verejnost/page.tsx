@@ -8,6 +8,7 @@ import { listPublicArticles } from "@/lib/queries/verejnost";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getMarketingCopy } from "@/lib/i18n/marketing-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { formatPublicDateTime } from "@/lib/i18n/format-date";
 
 export const revalidate = 45;

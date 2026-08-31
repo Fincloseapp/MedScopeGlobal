@@ -7,6 +7,7 @@ import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { publicEditorialByline } from "@/lib/editorial/units";
 import type { ArticleWithRelations } from "@/types/database";
+import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
 import { formatPublicDate } from "@/lib/i18n/format-date";
 
 export function ArticleCard({ article }: { article: DisplayArticle | ArticleWithRelations }) {
