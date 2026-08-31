@@ -59,6 +59,15 @@ function attachEditorialDisplay(
   };
 }
 
+function withoutCzechListingCopy(row: DisplayArticle, locale: LocaleCode): DisplayArticle | null {
+  if (primaryArticleLocale(locale) === "cs") return row;
+  let title = row.title;
+  let excerpt = row.excerpt;
+  if (looksLikeCzech(excerpt)) excerpt = looksLikeCzech(title) ? null : title;
+  if (looksLikeCzech(title)) return null;
+  return { ...row, excerpt };
+}
+
 function sortByLocalePreference(
   articles: ArticleWithRelations[],
   locale: LocaleCode
@@ -248,7 +257,12 @@ export async function prepareArticlesForDisplay(
         if (hit && !looksLikeCzech(hit.title)) {
           return attachEditorialDisplay(item.article, locale, {
             title: hit.title,
-            excerpt: hit.excerpt ?? item.article.excerpt,
+            excerpt:
+              hit.excerpt && !looksLikeCzech(hit.excerpt)
+                ? hit.excerpt
+                : looksLikeCzech(item.article.excerpt)
+                  ? hit.title
+                  : item.article.excerpt,
             displayLocale: primaryArticleLocale(locale),
             translatedFrom: item.article.locale ?? null,
             translation_provider: hit.translation_provider,
@@ -265,7 +279,12 @@ export async function prepareArticlesForDisplay(
     if (cached?.title) {
       return attachEditorialDisplay(item.article, locale, {
         title: cached.title,
-        excerpt: cached.excerpt ?? item.article.excerpt,
+        excerpt:
+          cached.excerpt && !looksLikeCzech(cached.excerpt)
+            ? cached.excerpt
+            : looksLikeCzech(item.article.excerpt)
+              ? cached.title
+              : item.article.excerpt,
         displayLocale: primaryArticleLocale(locale),
         translatedFrom: item.article.locale ?? null,
         translation_provider: cached.translation_provider,
@@ -290,12 +309,17 @@ export async function prepareArticlesForDisplay(
 
   if (missIndexes.length === 0 || mode !== "card") {
     if (missIndexes.length && mode === "full") {
-      return mapPool(firstPass, 2, async (display, index) => {
+      const full = await mapPool(firstPass, 2, async (display, index) => {
         if (!missIndexes.includes(index)) return display;
         return prepareArticleForDisplay(plan[index]!.article, locale, mode, { live: true });
       });
+      return full
+        .map((row) => withoutCzechListingCopy(row, locale))
+        .filter((row): row is DisplayArticle => Boolean(row));
     }
-    return firstPass;
+    return firstPass
+      .map((row) => withoutCzechListingCopy(row, locale))
+      .filter((row): row is DisplayArticle => Boolean(row));
   }
 
   const fill = mapPool(missIndexes, 8, async (index) => {
@@ -316,7 +340,12 @@ export async function prepareArticlesForDisplay(
       index,
       display: attachEditorialDisplay(firstPass[index]!, locale, {
         title: hit.title,
-        excerpt: hit.excerpt ?? firstPass[index]!.excerpt,
+        excerpt:
+          hit.excerpt && !looksLikeCzech(hit.excerpt)
+            ? hit.excerpt
+            : looksLikeCzech(firstPass[index]!.excerpt)
+              ? hit.title
+              : firstPass[index]!.excerpt,
         displayLocale: primaryArticleLocale(locale),
         translatedFrom: article.locale ?? null,
         translation_provider: hit.translation_provider,
@@ -335,7 +364,9 @@ export async function prepareArticlesForDisplay(
   }
 
   if (primaryArticleLocale(locale) !== "cs") {
-    return firstPass.filter((row) => !looksLikeCzech(row.title));
+    return firstPass
+      .map((row) => withoutCzechListingCopy(row, locale))
+      .filter((row): row is DisplayArticle => Boolean(row));
   }
   return firstPass;
 }
