@@ -37,6 +37,7 @@ export function V20ArticleCover({
     publicTopic,
     coverImageUrl: coverUrl && !isBannedCoverUrl(coverUrl) ? coverUrl : null,
     preferCurated: true,
+    keepAssignedCover: true,
   });
   const safeCover = gated && !isBannedCoverUrl(gated) ? gated : null;
 

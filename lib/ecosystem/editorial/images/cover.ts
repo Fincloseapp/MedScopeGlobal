@@ -279,12 +279,12 @@ const LOCAL_COVER_TOPICS: Partial<
   "/assets/covers/food-4.webp": ["food"],
   "/assets/covers/produce.webp": ["food"],
   "/assets/covers/sleep.webp": ["sleep", "calm"],
-  "/assets/covers/calm.webp": ["calm", "seniors", "sleep"],
+  "/assets/covers/calm.webp": ["calm", "seniors", "sleep", "movement"],
   "/assets/covers/calm-2.webp": ["calm", "sleep", "seniors"],
   "/assets/covers/movement.webp": ["movement", "walk", "seniors"],
   "/assets/covers/movement-2.webp": ["movement", "walk", "seniors"],
   "/assets/covers/walk.webp": ["walk", "movement", "seniors"],
-  "/assets/covers/seniors.webp": ["seniors"],
+  "/assets/covers/seniors.webp": ["seniors", "movement"],
   "/assets/covers/clinical.webp": ["clinical"],
   "/assets/covers/clinical-2.webp": ["clinical", "research", "vitals"],
   "/assets/covers/clinical-3.webp": ["clinical", "research"],
@@ -292,7 +292,7 @@ const LOCAL_COVER_TOPICS: Partial<
   "/assets/covers/research-2.webp": ["research", "clinical"],
   "/assets/covers/science.webp": ["research", "tech"],
   "/assets/covers/tech.webp": ["tech"],
-  "/assets/covers/vitals.webp": ["vitals", "clinical", "tech", "seniors"],
+  "/assets/covers/vitals.webp": ["vitals", "clinical", "tech", "seniors", "movement"],
 };
 
 /**
@@ -303,7 +303,12 @@ const COVER_OVERFLOW: Record<CoverVisualTopic, readonly string[]> = {
   food: [],
   sleep: ["/assets/covers/calm.webp"],
   calm: ["/assets/covers/sleep.webp", "/assets/covers/walk.webp"],
-  movement: ["/assets/covers/walk.webp", "/assets/covers/seniors.webp"],
+  movement: [
+    "/assets/covers/walk.webp",
+    "/assets/covers/seniors.webp",
+    "/assets/covers/calm.webp",
+    "/assets/covers/vitals.webp",
+  ],
   seniors: [
     "/assets/covers/movement.webp",
     "/assets/covers/movement-2.webp",
@@ -543,11 +548,25 @@ export function resolveArticleCoverUrl(input: {
   coverImageUrl?: string | null;
   /** When true, never return null — always a curated asset. */
   preferCurated?: boolean;
+  /** Keep an already assigned local cover (listing uniqueness). */
+  keepAssignedCover?: boolean;
 }): string | null {
   const raw = input.coverImageUrl?.trim() || null;
   const topic = classifyCoverTopic(input);
   const seed = input.slug || input.title;
   const curated = withCoverCacheBust(pickCuratedCover(topic, seed));
+  const localPath = normalizeLocalCoverPath(raw);
+
+  if (
+    input.keepAssignedCover &&
+    localPath &&
+    !isBrokenCoverUrl(raw) &&
+    !isDeniedStockUrl(raw) &&
+    !isBrainScanCoverUrl(localPath) &&
+    !(topic === "food" && !isFoodCoverUrl(localPath))
+  ) {
+    return withCoverCacheBust(localPath);
+  }
 
   if (
     isBrokenCoverUrl(raw) ||
@@ -562,7 +581,6 @@ export function resolveArticleCoverUrl(input: {
   }
 
   // Local covers (relative or absolute site URL): keep only when topic-appropriate
-  const localPath = normalizeLocalCoverPath(raw);
   if (localPath) {
     if (isBrainScanCoverUrl(localPath)) return curated;
     return isMismatchedLocalCover(localPath, topic)

@@ -89,7 +89,7 @@ export function assignUniqueListingCovers<T extends ListingCoverArticle>(
   articles: T[],
   options?: { neighbourWindow?: number }
 ): T[] {
-  const windowSize = options?.neighbourWindow ?? 5;
+  const windowSize = options?.neighbourWindow ?? 8;
   const recent: string[] = [];
   const coverById = new Map<string, string>();
 

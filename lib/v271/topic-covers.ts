@@ -19,6 +19,7 @@ export function resolveDisplayCover(input: CoverInput): string | null {
     publicTopic: input.public_topic,
     coverImageUrl: input.coverUrl,
     preferCurated: true,
+    keepAssignedCover: true,
   });
 }
 
