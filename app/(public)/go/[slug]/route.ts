@@ -4,6 +4,11 @@ import { getAffiliateRedirectDestination } from "@/lib/ecosystem/monetization";
 import { logMonetizationEvent } from "@/lib/monetization/log-event";
 import { LOCALE_COOKIE, REGION_COOKIE } from "@/lib/i18n/config";
 import { resolveLocalePath } from "@/lib/i18n/locale-path";
+import {
+  getHeurekaPositionId,
+  heurekaHopHtml,
+  heurekaMarketFromUrl,
+} from "@/lib/monetization/heureka-affiliate";
 
 export const dynamic = "force-dynamic";
 
@@ -41,13 +46,27 @@ export async function GET(request: Request, { params }: Params) {
     return NextResponse.json({ error: "Unknown affiliate link" }, { status: 404 });
   }
 
+  const heurekaMarket = heurekaMarketFromUrl(destination);
+  const positionId = heurekaMarket ? await getHeurekaPositionId(heurekaMarket) : null;
+
   await logMonetizationEvent("affiliate_click", {
     slug: slug.trim().toLowerCase(),
     destination,
     locale,
     region,
     referer,
+    heureka: Boolean(positionId),
   });
+
+  if (positionId && heurekaMarket) {
+    return new NextResponse(heurekaHopHtml({ destination, positionId }), {
+      status: 200,
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-store",
+      },
+    });
+  }
 
   return NextResponse.redirect(destination, 302);
 }

@@ -269,11 +269,8 @@ export function amazonTagForHost(hostname: string): string {
 }
 
 /**
- * Optional Heureka Affiliate wrap.
- * After approval, paste the tracking URL from Heureka admin:
- *   AFFILIATE_HEUREKA_CZ_TEMPLATE=https://…?dest={url}
- *   or a search template with {q}
- * Without a template we still send readers to Heureka — but you earn nothing.
+ * Optional legacy wrap (`{url}` / `{q}`). Official earning path is Trixam
+ * (`/go` hop + data-trixam-positionid). HTML snippets are not URL templates.
  */
 export function applyHeurekaTracking(url: string): string {
   try {
@@ -285,7 +282,7 @@ export function applyHeurekaTracking(url: string): string {
     const template = (
       isSk ? process.env.AFFILIATE_HEUREKA_SK_TEMPLATE : process.env.AFFILIATE_HEUREKA_CZ_TEMPLATE
     )?.trim();
-    if (!template) return url;
+    if (!template || /data-trixam-positionid|heureka-affiliate-link/i.test(template)) return url;
     if (template.includes("{url}")) {
       return template.split("{url}").join(encodeURIComponent(url));
     }

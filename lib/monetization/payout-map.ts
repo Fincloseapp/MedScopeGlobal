@@ -43,7 +43,7 @@ export const PAYOUT_CHANNELS: PayoutChannel[] = [
     payoutTo: "Účet, který zadáte v Heureka Affiliate. Fakturu vystaví oni, peníze do 14 dnů.",
     signupUrl: "https://affiliate.heureka.cz/register",
     signupLabel: "Založit Heureka Affiliate (CZ)",
-    envVars: ["AFFILIATE_HEUREKA_CZ_TEMPLATE"],
+    envVars: ["AFFILIATE_HEUREKA_CZ_POSITION_ID"],
     priority: 1,
   },
   {
@@ -54,7 +54,7 @@ export const PAYOUT_CHANNELS: PayoutChannel[] = [
     payoutTo: "Účet zadaný ve slovenské administraci Heureka Affiliate.",
     signupUrl: "https://affiliate.heurekashopping.sk/register",
     signupLabel: "Založit Heureka Affiliate (SK)",
-    envVars: ["AFFILIATE_HEUREKA_SK_TEMPLATE"],
+    envVars: ["AFFILIATE_HEUREKA_SK_POSITION_ID"],
     priority: 2,
   },
   {
@@ -148,8 +148,8 @@ export function getPayoutReadiness(): PayoutReadiness {
   };
   return {
     stripe: envOn("STRIPE_SECRET_KEY") && envOn("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"),
-    heurekaCz: envOn("AFFILIATE_HEUREKA_CZ_TEMPLATE"),
-    heurekaSk: envOn("AFFILIATE_HEUREKA_SK_TEMPLATE"),
+    heurekaCz: envOn("AFFILIATE_HEUREKA_CZ_POSITION_ID") || envOn("AFFILIATE_HEUREKA_CZ_TEMPLATE"),
+    heurekaSk: envOn("AFFILIATE_HEUREKA_SK_POSITION_ID") || envOn("AFFILIATE_HEUREKA_SK_TEMPLATE"),
     amazonAny: Object.values(amazonStores).some(Boolean),
     amazonStores,
     adsense: envOn("NEXT_PUBLIC_ADSENSE_CLIENT_ID") && envOn("NEXT_PUBLIC_ADS_ENABLED"),

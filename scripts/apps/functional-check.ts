@@ -33,6 +33,11 @@ import { NEWSLETTER_SUBSCRIBERS_SQL } from "../../lib/monetization/apply-schema"
 import { applyHeurekaTracking } from "../../lib/monetization/affiliate-geo";
 import { getPayoutReadiness, PAYOUT_CHANNELS } from "../../lib/monetization/payout-map";
 import {
+  parseHeurekaPositionId,
+  heurekaHopHtml,
+  heurekaMarketFromUrl,
+} from "../../lib/monetization/heureka-affiliate";
+import {
   inferArticleTopic,
   inferVisualTopic,
   matchImageForArticleSync,
@@ -246,6 +251,20 @@ assert.ok(PAYOUT_CHANNELS.some((channel) => channel.id === "heureka-cz"));
 assert.equal(getPayoutReadiness().amazonAny, false);
 file("app/(admin)/admin/vydelky/page.tsx");
 file("lib/monetization/payout-map.ts");
+file("lib/monetization/heureka-affiliate.ts");
+file("supabase/migrations/20260901193000_monetization_settings.sql");
+assert.equal(parseHeurekaPositionId('data-trixam-positionid="18420"'), "18420");
+assert.equal(
+  parseHeurekaPositionId('<a class="heureka-affiliate-link" data-trixam-positionid="18420" href="https://www.heureka.cz/">x</a>'),
+  "18420"
+);
+assert.equal(parseHeurekaPositionId("18420"), "18420");
+assert.equal(parseHeurekaPositionId("not-an-id"), null);
+assert.equal(heurekaMarketFromUrl("https://www.heureka.cz/?h=x"), "cz");
+assert.equal(heurekaMarketFromUrl("https://www.heureka.sk/?h=x"), "sk");
+assert.ok(heurekaHopHtml({ destination: "https://www.heureka.cz/", positionId: "18420" }).includes("heureka-affiliate-link"));
+assert.ok(heurekaHopHtml({ destination: "https://www.heureka.cz/", positionId: "18420" }).includes("18420"));
+assert.ok(heurekaHopHtml({ destination: "https://www.heureka.cz/", positionId: "18420" }).includes("trixam.min.js"));
 
 assert.equal(
   classifyRevenueSurface({ title: "Spánek po padesátce", public_topic: "dlouhovekost" }),

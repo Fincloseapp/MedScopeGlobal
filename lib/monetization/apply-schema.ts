@@ -73,3 +73,42 @@ export async function applyNewsletterSubscriberSchema(): Promise<SchemaApplyResu
 export function markNewsletterSchemaReady(): void {
   schemaReady = true;
 }
+
+export const MONETIZATION_SETTINGS_SQL = `
+create table if not exists public.monetization_settings (
+  key text primary key,
+  value text not null,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.monetization_settings enable row level security;
+
+drop policy if exists monetization_settings_admin_all on public.monetization_settings;
+
+do $$
+begin
+  if exists (
+    select 1
+    from pg_proc p
+    join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public' and p.proname = 'is_admin'
+  ) then
+    create policy monetization_settings_admin_all on public.monetization_settings
+      for all to authenticated
+      using (public.is_admin())
+      with check (public.is_admin());
+  end if;
+end $$;
+`;
+
+let settingsReady = false;
+
+export async function applyMonetizationSettingsSchema(): Promise<SchemaApplyResult> {
+  if (settingsReady) return { ok: true, skipped: true };
+  const outcome = await runManagementQuery(MONETIZATION_SETTINGS_SQL);
+  if (outcome.ok || /already exists|duplicate key/i.test(outcome.message)) {
+    settingsReady = true;
+    return { ok: true };
+  }
+  return { ok: false, error: outcome.message };
+}

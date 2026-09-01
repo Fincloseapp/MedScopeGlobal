@@ -1,6 +1,9 @@
 import { ECOSYSTEM_MIGRATION_SQL } from "@/lib/ecosystem/embedded-migrations";
 import { runManagementQuery } from "@/lib/supabase/management-api";
-import { applyNewsletterSubscriberSchema } from "@/lib/monetization/apply-schema";
+import {
+  applyNewsletterSubscriberSchema,
+  applyMonetizationSettingsSchema,
+} from "@/lib/monetization/apply-schema";
 
 export type MigrationApplyResult = {
   name: string;
@@ -69,8 +72,16 @@ export async function applyEcosystemMigrations(): Promise<ApplyEcosystemMigratio
     error: revenue.error,
   });
 
+  const settings = await applyMonetizationSettingsSchema();
+  results.push({
+    name: "20260901193000_monetization_settings.sql",
+    ok: settings.ok,
+    skipped: settings.skipped,
+    error: settings.error,
+  });
+
   return {
-    ok: revenue.ok,
+    ok: revenue.ok && settings.ok,
     projectRef,
     results,
     timestamp: new Date().toISOString(),

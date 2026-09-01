@@ -9,6 +9,13 @@ import {
   channelReady,
   getPayoutReadiness,
 } from "@/lib/monetization/payout-map";
+import { requireAdmin } from "@/lib/auth/admin";
+import {
+  getHeurekaPositionId,
+  saveHeurekaPositionId,
+} from "@/lib/monetization/heureka-affiliate";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +24,32 @@ type ClickRow = {
   locale?: string | null;
   destination?: string;
 };
+
+async function saveCzPosition(formData: FormData) {
+  "use server";
+  const gate = await requireAdmin();
+  if (!gate.ok) return;
+  const result = await saveHeurekaPositionId("cz", String(formData.get("snippet") ?? ""));
+  revalidatePath("/admin/vydelky");
+  redirect(
+    result.ok
+      ? `/admin/vydelky?heureka=cz-ok&id=${encodeURIComponent(result.id ?? "")}`
+      : `/admin/vydelky?heureka=cz-err&msg=${encodeURIComponent(result.error ?? "uložení selhalo")}`
+  );
+}
+
+async function saveSkPosition(formData: FormData) {
+  "use server";
+  const gate = await requireAdmin();
+  if (!gate.ok) return;
+  const result = await saveHeurekaPositionId("sk", String(formData.get("snippet") ?? ""));
+  revalidatePath("/admin/vydelky");
+  redirect(
+    result.ok
+      ? `/admin/vydelky?heureka=sk-ok&id=${encodeURIComponent(result.id ?? "")}`
+      : `/admin/vydelky?heureka=sk-err&msg=${encodeURIComponent(result.error ?? "uložení selhalo")}`
+  );
+}
 
 async function loadOpsCounts() {
   const admin = tryCreateServiceRoleClient();
@@ -70,9 +103,19 @@ function StatusPill({ ready }: { ready: boolean | "n/a" }) {
   );
 }
 
-export default async function AdminVydelkyPage() {
+export default async function AdminVydelkyPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ heureka?: string; id?: string; msg?: string }>;
+}) {
+  const notice = await searchParams;
   const readiness = getPayoutReadiness();
   const { clicks, clickCount, subscribers } = await loadOpsCounts();
+  const [heurekaCzId, heurekaSkId] = await Promise.all([
+    getHeurekaPositionId("cz"),
+    getHeurekaPositionId("sk"),
+  ]);
+  const heurekaReady = Boolean(heurekaCzId) || readiness.heurekaCz;
 
   return (
     <div className="space-y-8">
@@ -121,15 +164,68 @@ export default async function AdminVydelkyPage() {
       </div>
 
       <section className="rounded-2xl border border-amber-200 bg-amber-50/70 p-5">
-        <h2 className="font-display text-lg font-semibold text-[#021d33]">Co otevřít jako první</h2>
-        <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-slate-700">
+        <h2 className="font-display text-lg font-semibold text-[#021d33]">1. Heureka — dokončit z otevřeného webmastera</h2>
+        <p className="mt-2 text-sm leading-relaxed text-slate-700">
+          Účet máte. Heureka <strong>nepočítá přímý odkaz na heureka.cz</strong>. V{" "}
+          <a className="font-medium text-[#005B96] hover:underline" href="https://affiliate.heureka.cz/webmaster#/" target="_blank" rel="noreferrer">
+            webmaster panelu
+          </a>{" "}
+          teď: Weby → medscopeglobal.com (schválený). Pak <strong>Vybrat prvek → Textový odkaz</strong>.
+          Do URL dejte třeba{" "}
+          <code className="rounded bg-white px-1">https://www.heureka.cz/?h[fraze]=magnesium+glycinát</code>.
+          Z vygenerovaného kódu zkopírujte celé HTML nebo číslo{" "}
+          <code>data-trixam-positionid</code> a vložte sem. Pak /go u CZ začne vydělávat.
+        </p>
+        {notice.heureka?.endsWith("-ok") ? (
+          <p className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
+            Uloženo. Position ID {notice.id}. CZ/SK /go teď jde přes Trixam — Heureka může počítat klik.
+          </p>
+        ) : null}
+        {notice.heureka?.endsWith("-err") ? (
+          <p className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-900">
+            {notice.msg || "Uložení selhalo."}
+          </p>
+        ) : null}
+        <p className="mt-2 text-sm text-slate-600">
+          Stav CZ pozice:{" "}
+          <strong>{heurekaCzId ? `propojeno (${heurekaCzId})` : "ještě chybí — vložte kód níže"}</strong>
+        </p>
+        <form action={saveCzPosition} className="mt-3 space-y-2">
+          <textarea
+            name="snippet"
+            required
+            rows={4}
+            placeholder='<a class="heureka-affiliate-link" data-trixam-positionid="12345" href="https://www.heureka.cz/...">'
+            className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm text-[#021d33]"
+          />
+          <button
+            type="submit"
+            className="rounded-full bg-[#005B96] px-4 py-2 text-sm font-semibold text-white hover:bg-[#004a7a]"
+          >
+            Uložit Heureka CZ pozici
+          </button>
+        </form>
+        <form action={saveSkPosition} className="mt-4 space-y-2">
+          <p className="text-xs text-slate-500">
+            SK volitelně (Heureka.sk). Stav: {heurekaSkId ? `propojeno (${heurekaSkId})` : "zatím ne"}
+          </p>
+          <textarea
+            name="snippet"
+            rows={2}
+            placeholder="data-trixam-positionid z affiliate.heurekashopping.sk"
+            className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm text-[#021d33]"
+          />
+          <button type="submit" className="text-sm font-medium text-[#005B96] hover:underline">
+            Uložit SK pozici
+          </button>
+        </form>
+        <ol className="mt-5 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-slate-700">
           <li>
-            <a className="font-medium text-[#005B96] hover:underline" href={HEUREKA_DOCS.registerCz} target="_blank" rel="noreferrer">
-              Heureka Affiliate CZ
-            </a>{" "}
-            — web medscopeglobal.com, po schválení si v jejich adminu vygenerujte měřicí odkaz a
-            vložte ho do Worker secretu <code>AFFILIATE_HEUREKA_CZ_TEMPLATE</code> (s{" "}
-            <code>{"{url}"}</code> nebo <code>{"{q}"}</code>).
+            Heureka CZ výše. Program:{" "}
+            <a className="font-medium text-[#005B96] hover:underline" href={HEUREKA_DOCS.program} target="_blank" rel="noreferrer">
+              heureka.group/cs/affiliate-program
+            </a>
+            .
           </li>
           <li>
             <a className="font-medium text-[#005B96] hover:underline" href="https://affiliate-program.amazon.com/" target="_blank" rel="noreferrer">
@@ -154,7 +250,12 @@ export default async function AdminVydelkyPage() {
 
       <div className="space-y-4">
         {PAYOUT_CHANNELS.map((channel) => {
-          const ready = channelReady(channel.id, readiness);
+          const ready =
+            channel.id === "heureka-cz"
+              ? heurekaReady
+              : channel.id === "heureka-sk"
+                ? Boolean(heurekaSkId) || readiness.heurekaSk
+                : channelReady(channel.id, readiness);
           return (
             <Card key={channel.id}>
               <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
