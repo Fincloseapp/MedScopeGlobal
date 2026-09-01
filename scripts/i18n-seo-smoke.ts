@@ -356,7 +356,7 @@ assert.equal(getRevenueCopy("fr").newsletterCta.includes("brief") || getRevenueC
 assert.ok(!looksLikeCzech(getRevenueCopy("fr").partnerTitle));
 assert.ok(!looksLikeCzech(getRevenueCopy("de").subscribeTitle));
 assert.ok(getRevenueCopy("en").newsletterBody);
-assert.ok(getRevenueCopy("ja").newsletterTitle.includes("ViaLongeVita") || getRevenueCopy("ja").kicker === "ViaLongeVita" || getRevenueCopy("ja").newsletterKicker === "ViaLongeVita");
+assert.ok(getRevenueCopy("ja").newsletterKicker === "ViaLongeVita");
 assert.ok(!looksLikeCzech(getRevenueCopy("ja").newsletterBody));
 assert.ok(!looksLikeCzech(getRevenueCopy("it").newsletterTitle));
 assert.ok(getRevenueCopy("pl").newsletterBody.toLowerCase().includes("tygodniu") || getRevenueCopy("pl").newsletterCta.includes("brief"));
