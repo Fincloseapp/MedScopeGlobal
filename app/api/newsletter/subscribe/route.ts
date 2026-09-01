@@ -59,6 +59,12 @@ export async function POST(request: Request) {
     } else if (error.code === "23505") {
       stored = true;
       duplicate = true;
+    } else {
+      const { error: fallbackError } = await admin.from("analytics").insert({
+        event: "newsletter_subscribe",
+        payload: { email, locale, segment, source, pending_table: true },
+      });
+      if (!fallbackError) stored = true;
     }
   }
 
