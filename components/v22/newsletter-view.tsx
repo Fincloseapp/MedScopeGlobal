@@ -5,15 +5,21 @@ import { NewsletterHero } from "@/components/newsletter/Hero";
 import { V22_NEWSLETTER_HERO } from "@/lib/v22/newsletter";
 import { Button } from "@/components/ui/button";
 import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
+import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
+import { MAGAZINE } from "@/lib/brand/magazine";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
-export function V22NewsletterHub() {
+export function V22NewsletterHub({ locale = "cs" }: { locale?: string }) {
+  const copy = getNewsletterCopy(locale);
+  const latestHref = localizePublicHref("/newsletter/posledni", locale);
+  const archiveHref = localizePublicHref("/newsletter/posledni", locale);
   return (
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white">
         <div className="relative min-h-[380px] bg-[#021d33] sm:min-h-[420px]">
           <Image
             src={V22_NEWSLETTER_HERO}
-            alt="Odborný medicínský newsletter MedScopeGlobal"
+            alt={copy.hubTitle}
             fill
             className="object-cover opacity-35"
             sizes="100vw"
@@ -22,18 +28,19 @@ export function V22NewsletterHub() {
           <div className="absolute inset-0 bg-gradient-to-b from-[#021d33]/80 via-[#021d33]/88 to-[#021d33]/95" />
           <div className="relative flex min-h-[380px] flex-col items-center justify-center sm:min-h-[420px]">
             <NewsletterHero
-              href="/newsletter"
-              title="Medicínský přehled týdně"
-              subhead="Studie, legislativa, léky, digitální zdravotnictví a univerzitní novinky — v češtině, s odborným layoutem."
+              href={localizePublicHref("/newsletter", locale)}
+              title={copy.hubTitle}
+              subhead={copy.hubDescription}
+              tagline={copy.kicker}
               className="w-full text-white"
             />
             <div className="mt-2 flex flex-wrap justify-center gap-2 px-6 pb-10 sm:px-8">
-            <NewsletterCapture locale="cs" source="newsletter-hub-hero" className="mt-4 w-full max-w-lg" />
+            <NewsletterCapture locale={locale} source="newsletter-hub-hero" className="mt-4 w-full max-w-lg" />
               <Button asChild variant="outline" className="rounded-full border-white/40 text-white hover:bg-white/10">
-                <Link href="/newsletter/posledni">Poslední vydání</Link>
+                <Link href={latestHref}>{copy.hubLatest}</Link>
               </Button>
               <Button asChild variant="outline" className="rounded-full border-white/40 text-white hover:bg-white/10">
-                <Link href="/newsletter/archiv">Archiv</Link>
+                <Link href={archiveHref}>{copy.hubArchive}</Link>
               </Button>
             </div>
           </div>
@@ -42,9 +49,9 @@ export function V22NewsletterHub() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         {[
-          { title: "Studie a evidence", desc: "RCT, meta-analýzy, klinický dopad" },
-          { title: "Legislativa a úhrady", desc: "MZČR, SÚKL, DRG, metodiky" },
-          { title: "Léky a digital health", desc: "Registrace, eHealth, AI ve zdravotnictví" },
+          { title: copy.hubPillar1Title, desc: copy.hubPillar1Body },
+          { title: copy.hubPillar2Title, desc: copy.hubPillar2Body },
+          { title: copy.hubPillar3Title, desc: copy.hubPillar3Body },
         ].map((b) => (
           <div key={b.title} className="rounded-2xl border border-slate-200 bg-white p-5">
             <h3 className="font-semibold text-[#021d33]">{b.title}</h3>
@@ -69,7 +76,7 @@ export function V22NewsletterIssue({ issue }: { issue: NewsletterRow }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#021d33]/80 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-          <p className="text-xs uppercase tracking-wider text-sky-200">Vydání</p>
+          <p className="text-xs uppercase tracking-wider text-sky-200">{MAGAZINE.name}</p>
           <h1 className="font-display text-2xl font-bold sm:text-3xl">{issue.title}</h1>
           <p className="mt-1 text-sm text-white/80">
             {new Date(issue.issue_date).toLocaleDateString("cs-CZ", {
@@ -90,7 +97,7 @@ export function V22NewsletterIssue({ issue }: { issue: NewsletterRow }) {
           <NewsletterCapture locale="cs" source="newsletter-issue" />
           <div className="mt-4">
             <Button asChild variant="outline" className="rounded-full">
-              <Link href="/newsletter">← Přehled</Link>
+              <Link href="/newsletter">← {MAGAZINE.name}</Link>
             </Button>
           </div>
         </div>

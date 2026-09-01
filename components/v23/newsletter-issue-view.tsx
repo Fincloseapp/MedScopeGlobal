@@ -128,7 +128,13 @@ function NewsletterItemCard({
   );
 }
 
-export function V23NewsletterIssueView({ issue }: { issue: NewsletterRow }) {
+export function V23NewsletterIssueView({
+  issue,
+  locale = "cs",
+}: {
+  issue: NewsletterRow;
+  locale?: string;
+}) {
   const layout = parseLayout(issue);
   const dateLabel = formatIssueDateCs(issue.issue_date);
   const heroUrl = layout?.heroImageUrl?.startsWith("http") ? layout.heroImageUrl : V23_NEWSLETTER_IMAGE;
@@ -224,7 +230,7 @@ export function V23NewsletterIssueView({ issue }: { issue: NewsletterRow }) {
         ) : null}
 
         <div className="mt-10 rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50 to-white p-6">
-          <NewsletterCapture locale="cs" source="newsletter-issue-v23" />
+          <NewsletterCapture locale={locale} source="newsletter-issue-v23" />
         </div>
 
         <div className="mt-10 flex flex-col items-center border-t border-slate-100 pt-8">

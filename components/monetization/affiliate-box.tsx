@@ -10,6 +10,7 @@ import {
   matchAffiliateProducts,
   type RevenueArticle,
 } from "@/lib/monetization/revenue-mix";
+import { affiliateGoPath } from "@/lib/monetization/affiliate-geo";
 
 type Props = {
   locale?: GlobalLocaleCode;
@@ -26,14 +27,18 @@ function localizedField(record: Record<string, string>, locale: string): string 
   return record.en ?? record["en-US"] ?? "";
 }
 
-function affiliateHref(url: string): string {
+function affiliateHref(productId: string, locale: string, fallbackUrl?: string): string {
+  if (productId) return affiliateGoPath(productId, locale);
+  if (!fallbackUrl) return "#";
   try {
-    const parsed = new URL(url, "https://medscopeglobal.com");
-    if (parsed.pathname.startsWith("/go/")) return parsed.pathname;
+    const parsed = new URL(fallbackUrl, "https://medscopeglobal.com");
+    if (parsed.pathname.startsWith("/go/")) {
+      return `${parsed.pathname}${parsed.search || `?locale=${encodeURIComponent(locale)}`}`;
+    }
   } catch {
     /* keep original */
   }
-  return url;
+  return fallbackUrl;
 }
 
 export function AffiliateBox({ locale = "cs", category, title, products: productsProp }: Props) {
@@ -67,7 +72,7 @@ function AffiliateProductCard({
   product: AffiliateProduct;
   locale: GlobalLocaleCode;
 }) {
-  const url = affiliateHref(localizedField(product.affiliateUrl, locale));
+  const url = affiliateHref(product.id, locale, localizedField(product.affiliateUrl, locale));
   const name = localizedField(product.name, locale);
   const description = localizedField(product.description, locale);
   const chrome = getArticleChrome(locale);

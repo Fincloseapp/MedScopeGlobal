@@ -1,6 +1,14 @@
 /** Global monetization configuration — ads, donations, affiliate, VIP */
 
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import {
+  applyAmazonAssociateTag as applyAmazonAssociateTagGeo,
+  resolveAffiliateDestination,
+  type AffiliateContext,
+} from "@/lib/monetization/affiliate-geo";
+
+export { applyAmazonAssociateTagGeo as applyAmazonAssociateTag };
+export type { AffiliateContext };
 
 export type AdProvider =
   | "adsense"
@@ -21,21 +29,6 @@ export const AD_PROVIDERS_BY_REGION: Record<string, AdProvider[]> = {
   ASIA: ["baidu", "naver", "adsense"],
   GLOBAL: ["adsense", "native"],
 };
-
-export function applyAmazonAssociateTag(url: string, tag?: string | null): string {
-  const affiliateTag = (tag ?? process.env.AFFILIATE_AMAZON_TAG ?? "").trim();
-  if (!affiliateTag) return url;
-  try {
-    const parsed = new URL(url);
-    if (!/(^|\.)amazon\.(com|co\.uk|de|fr|it|es|pl)\b/i.test(parsed.hostname)) {
-      return url;
-    }
-    parsed.searchParams.set("tag", affiliateTag);
-    return parsed.toString();
-  } catch {
-    return url;
-  }
-}
 
 export function getAdProvidersForLocale(locale: GlobalLocaleCode): AdProvider[] {
   const regionMap: Record<string, string> = {
@@ -112,26 +105,38 @@ export const AFFILIATE_PRODUCTS: AffiliateProduct[] = [
       cs: "Magnesium glycinát",
       sk: "Magnézium glycinát",
       en: "Magnesium Glycinate",
-      "en-US": "Magnesium Glycinate (USA)",
+      "en-US": "Magnesium Glycinate",
       de: "Magnesiumglycinat",
+      fr: "Magnésium glycinate",
+      it: "Magnesio glicinato",
+      es: "Magnesio glicinato",
       pl: "Magnez bisglicynian",
+      ja: "マグネシウムグリシネート",
     },
     description: {
-      cs: "Podpora spánku a regenerace",
-      sk: "Podpora spánku a regenerácie",
-      en: "Sleep and recovery support",
-      "en-US": "Premium sleep support",
-      de: "Schlaf- und Regenerationssupport",
-      pl: "Wsparcie snu i regeneracji",
+      cs: "Večer, kdy chcete opravdu usnout — bez kofeinu v krvi.",
+      sk: "Večer, keď chcete naozaj zaspať.",
+      en: "The evening mineral people reach for when sleep will not come.",
+      "en-US": "The evening mineral people reach for when sleep will not come.",
+      de: "Das Mineral, nach dem greifen, die abends zur Ruhe kommen wollen.",
+      fr: "Le minéral du soir, quand le sommeil ne vient pas.",
+      it: "Il minerale della sera, quando il sonno non arriva.",
+      es: "El mineral de la noche, cuando el sueño no llega.",
+      pl: "Minerał na wieczór, gdy sen nie przychodzi.",
+      ja: "夜、眠りたいときに手に取るミネラル。",
     },
     category: "supplements",
     affiliateUrl: {
-      cs: "https://medscopeglobal.com/go/mg-cz",
-      sk: "https://medscopeglobal.com/go/mg-cz",
-      en: "https://medscopeglobal.com/go/mg-en",
-      "en-US": "https://medscopeglobal.com/go/mg-us",
-      de: "https://medscopeglobal.com/go/mg-de",
-      pl: "https://medscopeglobal.com/go/mg-pl",
+      cs: "/go/magnesium-glycinate?locale=cs",
+      sk: "/go/magnesium-glycinate?locale=sk",
+      en: "/go/magnesium-glycinate?locale=en",
+      "en-US": "/go/magnesium-glycinate?locale=en-US",
+      de: "/go/magnesium-glycinate?locale=de",
+      fr: "/go/magnesium-glycinate?locale=fr",
+      it: "/go/magnesium-glycinate?locale=it",
+      es: "/go/magnesium-glycinate?locale=es",
+      pl: "/go/magnesium-glycinate?locale=pl",
+      ja: "/go/magnesium-glycinate?locale=ja",
     },
     imageUrl: "/assets/affiliate/magnesium.svg",
     regions: ["EU", "USA", "GLOBAL"],
@@ -139,29 +144,41 @@ export const AFFILIATE_PRODUCTS: AffiliateProduct[] = [
   {
     id: "omega-3-test",
     name: {
-      cs: "Omega-3 laboratorní test",
-      sk: "Omega-3 laboratórny test",
-      en: "Omega-3 Lab Test",
+      cs: "Omega-3",
+      sk: "Omega-3",
+      en: "Omega-3",
       "en-US": "Omega-3 Index Test",
-      de: "Omega-3 Labortest",
-      pl: "Test Omega-3",
+      de: "Omega-3",
+      fr: "Oméga-3",
+      it: "Omega-3",
+      es: "Omega-3",
+      pl: "Omega-3",
+      ja: "オメガ3",
     },
     description: {
-      cs: "Domácí test indexu omega-3",
-      sk: "Domáci test indexu omega-3",
-      en: "At-home omega-3 index test",
-      "en-US": "CLIA-certified omega-3 test",
-      de: "Omega-3-Index-Heimtest",
-      pl: "Domowy test indeksu omega-3",
+      cs: "To, co čtenáři hledají u textů o srdci a zánětu — v místním obchodě.",
+      sk: "To, čo čitatelia hľadajú pri textoch o srdci.",
+      en: "What readers look up after pieces on the heart and inflammation.",
+      "en-US": "Know your omega-3 index — then decide what to buy.",
+      de: "Wonach Leser nach Texten zu Herz und Entzündung greifen.",
+      fr: "Ce que les lecteurs cherchent après un texte sur le cœur.",
+      it: "Quello che i lettori cercano dopo un testo sul cuore.",
+      es: "Lo que buscan los lectores tras un texto sobre el corazón.",
+      pl: "To, czego szukają czytelnicy po tekście o sercu.",
+      ja: "心臓や炎症の記事のあとで読者が探すもの。",
     },
     category: "lab-tests",
     affiliateUrl: {
-      cs: "https://medscopeglobal.com/go/omega-cz",
-      sk: "https://medscopeglobal.com/go/omega-cz",
-      en: "https://medscopeglobal.com/go/omega-en",
-      "en-US": "https://medscopeglobal.com/go/omega-us",
-      de: "https://medscopeglobal.com/go/omega-de",
-      pl: "https://medscopeglobal.com/go/omega-pl",
+      cs: "/go/omega-3-test?locale=cs",
+      sk: "/go/omega-3-test?locale=sk",
+      en: "/go/omega-3-test?locale=en",
+      "en-US": "/go/omega-3-test?locale=en-US",
+      de: "/go/omega-3-test?locale=de",
+      fr: "/go/omega-3-test?locale=fr",
+      it: "/go/omega-3-test?locale=it",
+      es: "/go/omega-3-test?locale=es",
+      pl: "/go/omega-3-test?locale=pl",
+      ja: "/go/omega-3-test?locale=ja",
     },
     imageUrl: "/assets/affiliate/omega-test.svg",
     regions: ["EU", "USA"],
@@ -169,29 +186,41 @@ export const AFFILIATE_PRODUCTS: AffiliateProduct[] = [
   {
     id: "sleep-tracker",
     name: {
-      cs: "Chytrý sleep tracker",
-      sk: "Smart sleep tracker",
-      en: "Smart Sleep Tracker",
-      "en-US": "Oura Ring / Whoop",
-      de: "Smart Sleep Tracker",
-      pl: "Inteligentny tracker snu",
+      cs: "Sledování spánku",
+      sk: "Sledovanie spánku",
+      en: "Sleep tracker",
+      "en-US": "Oura Ring",
+      de: "Schlaftracker",
+      fr: "Tracker de sommeil",
+      it: "Tracker del sonno",
+      es: "Tracker de sueño",
+      pl: "Tracker snu",
+      ja: "スリープトラッカー",
     },
     description: {
-      cs: "Sledování spánku a HRV",
-      sk: "Sledovanie spánku a HRV",
-      en: "Sleep and HRV monitoring",
-      "en-US": "Advanced biohacking wearable",
-      de: "Schlaf- und HRV-Monitoring",
-      pl: "Monitorowanie snu i HRV",
+      cs: "Vidět vlastní noc — HRV, hloubku, pravidelnost — ne jen dojem.",
+      sk: "Vidieť vlastnú noc — HRV, hĺbku, pravidelnosť.",
+      en: "See your own night — HRV, depth, regularity — not just a feeling.",
+      "en-US": "See your own night — HRV, depth, regularity.",
+      de: "Die eigene Nacht sehen — HRV, Tiefe, Regelmäßigkeit.",
+      fr: "Voir sa propre nuit — HRV, profondeur, régularité.",
+      it: "Vedere la propria notte — HRV, profondità, regolarità.",
+      es: "Ver tu propia noche — HRV, profundidad, regularidad.",
+      pl: "Zobaczyć własną noc — HRV, głębokość, regularność.",
+      ja: "自分の夜を見る。HRV、深さ、規則性。",
     },
     category: "sleep",
     affiliateUrl: {
-      cs: "https://medscopeglobal.com/go/sleep-cz",
-      sk: "https://medscopeglobal.com/go/sleep-cz",
-      en: "https://medscopeglobal.com/go/sleep-en",
-      "en-US": "https://medscopeglobal.com/go/sleep-us",
-      de: "https://medscopeglobal.com/go/sleep-de",
-      pl: "https://medscopeglobal.com/go/sleep-pl",
+      cs: "/go/sleep-tracker?locale=cs",
+      sk: "/go/sleep-tracker?locale=sk",
+      en: "/go/sleep-tracker?locale=en",
+      "en-US": "/go/sleep-tracker?locale=en-US",
+      de: "/go/sleep-tracker?locale=de",
+      fr: "/go/sleep-tracker?locale=fr",
+      it: "/go/sleep-tracker?locale=it",
+      es: "/go/sleep-tracker?locale=es",
+      pl: "/go/sleep-tracker?locale=pl",
+      ja: "/go/sleep-tracker?locale=ja",
     },
     imageUrl: "/assets/affiliate/sleep-tracker.svg",
     regions: ["EU", "USA", "GLOBAL"],
@@ -204,68 +233,61 @@ export const AFFILIATE_PRODUCTS: AffiliateProduct[] = [
       en: "Vitamin D3 + K2",
       "en-US": "Vitamin D3 + K2",
       de: "Vitamin D3 + K2",
+      fr: "Vitamine D3 + K2",
+      it: "Vitamina D3 + K2",
+      es: "Vitamina D3 + K2",
       pl: "Witamina D3 + K2",
+      ja: "ビタミンD3 + K2",
     },
     description: {
-      cs: "Podpora imunity a kostí",
-      sk: "Podpora imunity a kostí",
-      en: "Immune and bone support",
-      "en-US": "Immune and bone support",
-      de: "Immun- und Knochenunterstützung",
-      pl: "Wsparcie odporności i kości",
+      cs: "Zimní reflex — když slunce nestačí a kosti i nálada to poznají.",
+      sk: "Zimný reflex — keď slnko nestačí.",
+      en: "The winter reflex — when the sun is not enough.",
+      "en-US": "The winter reflex — when the sun is not enough.",
+      de: "Der Winterreflex — wenn die Sonne nicht reicht.",
+      fr: "Le réflexe d’hiver — quand le soleil ne suffit pas.",
+      it: "Il riflesso d’inverno — quando il sole non basta.",
+      es: "El reflejo de invierno — cuando el sol no basta.",
+      pl: "Zimowy odruch — gdy słońca za mało.",
+      ja: "冬の反射。太陽だけでは足りないとき。",
     },
     category: "supplements",
     affiliateUrl: {
-      cs: "https://medscopeglobal.com/go/d3-cz",
-      sk: "https://medscopeglobal.com/go/d3-cz",
-      en: "https://medscopeglobal.com/go/d3-en",
-      "en-US": "https://medscopeglobal.com/go/d3-us",
-      de: "https://medscopeglobal.com/go/d3-de",
-      pl: "https://medscopeglobal.com/go/d3-pl",
+      cs: "/go/vitamin-d3-k2?locale=cs",
+      sk: "/go/vitamin-d3-k2?locale=sk",
+      en: "/go/vitamin-d3-k2?locale=en",
+      "en-US": "/go/vitamin-d3-k2?locale=en-US",
+      de: "/go/vitamin-d3-k2?locale=de",
+      fr: "/go/vitamin-d3-k2?locale=fr",
+      it: "/go/vitamin-d3-k2?locale=it",
+      es: "/go/vitamin-d3-k2?locale=es",
+      pl: "/go/vitamin-d3-k2?locale=pl",
+      ja: "/go/vitamin-d3-k2?locale=ja",
     },
     imageUrl: "/assets/affiliate/magnesium.svg",
     regions: ["EU", "USA", "GLOBAL"],
   },
 ];
 
-/** Outbound affiliate destinations keyed by /go/[slug] */
+/**
+ * Legacy static map — kept for smoke tests and operators.
+ * Runtime redirects go through `resolveAffiliateDestination` (locale + region).
+ */
 export const AFFILIATE_REDIRECT_DESTINATIONS: Record<string, string> = {
-  "mg-cz": "https://www.heureka.cz/?h%5Bfraze%5D=magnesium+glycinát",
-  "mg-en": "https://www.amazon.co.uk/s?k=magnesium+glycinate",
-  "mg-us": "https://www.amazon.com/s?k=magnesium+glycinate",
-  "mg-de": "https://www.amazon.de/s?k=magnesium+glycinat",
-  "mg-pl": "https://www.amazon.pl/s?k=magnez+bisglicynian",
-  /** Friendly aliases (product id / marketing short links) */
-  magnesium: "https://www.heureka.cz/?h%5Bfraze%5D=magnesium+glycinát",
-  "magnesium-glycinate": "https://www.heureka.cz/?h%5Bfraze%5D=magnesium+glycinát",
-  "omega-cz": "https://www.heureka.cz/?h%5Bfraze%5D=omega+3+test",
-  "omega-en": "https://www.amazon.co.uk/s?k=omega+3+index+test",
-  "omega-us": "https://www.amazon.com/s?k=omega+3+index+test",
-  "omega-de": "https://www.amazon.de/s?k=omega+3+index+test",
-  "omega-pl": "https://www.amazon.pl/s?k=omega+3+test",
-  omega: "https://www.heureka.cz/?h%5Bfraze%5D=omega+3+test",
-  "omega-3-test": "https://www.heureka.cz/?h%5Bfraze%5D=omega+3+test",
-  "sleep-cz": "https://www.heureka.cz/?h%5Bfraze%5D=sleep+tracker",
-  "sleep-en": "https://www.amazon.co.uk/s?k=sleep+tracker+hrv",
-  "sleep-us": "https://www.amazon.com/s?k=oura+ring+whoop",
-  "sleep-de": "https://www.amazon.de/s?k=sleep+tracker+hrv",
-  "sleep-pl": "https://www.amazon.pl/s?k=tracker+snu",
-  sleep: "https://www.heureka.cz/?h%5Bfraze%5D=sleep+tracker",
-  "sleep-tracker": "https://www.heureka.cz/?h%5Bfraze%5D=sleep+tracker",
-  "d3-cz": "https://www.heureka.cz/?h%5Bfraze%5D=vitamin+d3+k2",
-  "d3-en": "https://www.amazon.co.uk/s?k=vitamin+d3+k2",
-  "d3-us": "https://www.amazon.com/s?k=vitamin+d3+k2",
-  "d3-de": "https://www.amazon.de/s?k=vitamin+d3+k2",
-  "d3-pl": "https://www.amazon.pl/s?k=witamina+d3+k2",
-  "vitamin-d3-k2": "https://www.heureka.cz/?h%5Bfraze%5D=vitamin+d3+k2",
-  d3: "https://www.heureka.cz/?h%5Bfraze%5D=vitamin+d3+k2",
+  "mg-cz": "https://www.heureka.cz/?h%5Bfraze%5D=magnesium%20glycin%C3%A1t",
+  "mg-sk": "https://www.heureka.sk/?h%5Bfraze%5D=hor%C4%8D%C3%ADk%20glycin%C3%A1t",
+  "mg-en": "https://www.amazon.co.uk/s?k=magnesium%20glycinate",
+  "mg-us": "https://www.amazon.com/s?k=magnesium%20glycinate",
+  "mg-de": "https://www.amazon.de/s?k=Magnesiumglycinat",
+  "mg-fr": "https://www.amazon.fr/s?k=magn%C3%A9sium%20glycinate",
+  "mg-pl": "https://www.amazon.pl/s?k=magnez%20bisglicynian",
 };
 
-export function getAffiliateRedirectDestination(slug: string): string | null {
-  const key = slug.trim().toLowerCase();
-  const destination = AFFILIATE_REDIRECT_DESTINATIONS[key] ?? null;
-  if (!destination) return null;
-  return applyAmazonAssociateTag(destination);
+export function getAffiliateRedirectDestination(
+  slug: string,
+  ctx: AffiliateContext = {}
+): string | null {
+  return resolveAffiliateDestination(slug, ctx);
 }
 
 export const HIGH_CTR_PLACEMENTS: AdPlacement[] = ["below-title", "in-content", "sticky"];

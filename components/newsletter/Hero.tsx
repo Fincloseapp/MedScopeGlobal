@@ -1,18 +1,20 @@
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { cn } from "@/lib/utils";
+import { MAGAZINE } from "@/lib/brand/magazine";
 
-export const NEWSLETTER_HERO_TAGLINE = "Medical Intelligence Network";
+export const NEWSLETTER_HERO_TAGLINE = MAGAZINE.name;
 
 type Props = {
   title: string;
   subhead?: string;
   href?: string;
+  tagline?: string;
   className?: string;
   priority?: boolean;
 };
 
-/** v23.3.2 — BMJ / Lancet / NEJM premium newsletter hero */
-export function NewsletterHero({ title, subhead, href = "", className, priority = true }: Props) {
+/** ViaLongeVita magazine brief hero */
+export function NewsletterHero({ title, subhead, href = "", tagline, className, priority = true }: Props) {
   return (
     <header
       className={cn(
@@ -25,7 +27,7 @@ export function NewsletterHero({ title, subhead, href = "", className, priority 
       </div>
 
       <p className="mb-5 text-[15px] font-light tracking-[0.35px] opacity-80 sm:mb-6">
-        {NEWSLETTER_HERO_TAGLINE}
+        {tagline ?? NEWSLETTER_HERO_TAGLINE}
       </p>
 
       <h1 className="mx-auto mb-6 max-w-[720px] text-[26px] font-semibold leading-[1.25] sm:mb-8 sm:text-[30px]">

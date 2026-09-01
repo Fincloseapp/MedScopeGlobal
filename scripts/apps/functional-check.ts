@@ -202,11 +202,27 @@ file("public/assets/affiliate/magnesium.svg");
 file("public/assets/affiliate/omega-test.svg");
 file("public/assets/affiliate/sleep-tracker.svg");
 
-assert.equal(getAffiliateRedirectDestination("mg-cz")?.includes("heureka"), true);
+assert.equal(getAffiliateRedirectDestination("mg-cz")?.includes("heureka.cz"), true);
 assert.equal(getAffiliateRedirectDestination("mg-us")?.includes("amazon.com"), true);
 assert.equal(getAffiliateRedirectDestination("unknown"), null);
+assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "fr" })?.includes("amazon.fr"));
+assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "de" })?.includes("amazon.de"));
+assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "cs" })?.includes("heureka.cz"));
+assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "sk" })?.includes("heureka.sk"));
+assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "it" })?.includes("amazon.it"));
+assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "es" })?.includes("amazon.es"));
+assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "ja" })?.includes("amazon.co.jp"));
+assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "en", region: "USA" })?.includes("amazon.com"));
+assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "en", region: "UK" })?.includes("amazon.co.uk"));
+assert.equal(
+  Boolean(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "fr" })?.includes("heureka")),
+  false
+);
 assert.ok(
   applyAmazonAssociateTag("https://www.amazon.com/s?k=x", "tag-20").includes("tag=tag-20")
+);
+assert.ok(
+  applyAmazonAssociateTag("https://www.amazon.co.jp/s?k=x", "jp-20").includes("tag=jp-20")
 );
 assert.equal(
   applyAmazonAssociateTag("https://www.heureka.cz/?h=x", "tag-20").includes("tag="),
@@ -232,7 +248,7 @@ assert.deepEqual(
   ["sleep-tracker", "magnesium-glycinate"]
 );
 assert.ok(matchAffiliateProductIds({ title: "Vitamin D3 v zimě", slug: "vitamin-d3" }).includes("vitamin-d3-k2"));
-assert.equal(matchAffiliateProductIds({ title: "Spánek", slug: "x" }).length, 2);
+assert.ok(matchAffiliateProductIds({ title: "Sommeil et HRV", slug: "sommeil" }).includes("sleep-tracker"));
 assert.ok(LONGEVITY_MEDIA_KIT.some((item) => item.id === "native-banner" && item.priceCzk === 5000));
 assert.ok(LONGEVITY_MEDIA_KIT.some((item) => item.id === "sponsored-article" && item.priceCzk === 15000));
 
@@ -245,8 +261,15 @@ file("lib/monetization/revenue-mix.ts");
 file("lib/monetization/apply-schema.ts");
 file("lib/monetization/revenue-ops.ts");
 file("app/api/cron/revenue-ops/route.ts");
+file("app/api/cron/vialongevita-brief/route.ts");
+file("app/api/newsletter/unsubscribe/route.ts");
+file("lib/monetization/affiliate-geo.ts");
+file("lib/i18n/newsletter-copy.ts");
+file("lib/monetization/vialongevita-brief.ts");
 assert.ok(NEWSLETTER_SUBSCRIBERS_SQL.includes("newsletter_subscribers"));
 assert.ok(NEWSLETTER_SUBSCRIBERS_SQL.includes("create table if not exists"));
+assert.ok(NEWSLETTER_SUBSCRIBERS_SQL.includes("unsubscribed_at"));
+assert.ok(NEWSLETTER_SUBSCRIBERS_SQL.includes("last_brief_sent_at"));
 
 assert.ok(AD_INVENTORY.some((e) => e.id === "article-below-title"));
 assert.ok(AD_INVENTORY.some((e) => e.surface === "homepage"));

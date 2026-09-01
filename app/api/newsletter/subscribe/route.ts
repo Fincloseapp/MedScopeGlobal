@@ -6,6 +6,7 @@ import { isSendGridConfigured, upsertSendGridContact } from "@/lib/email/sendgri
 import { logMonetizationEvent } from "@/lib/monetization/log-event";
 import { applyNewsletterSubscriberSchema } from "@/lib/monetization/apply-schema";
 import { notifyNewsletterSignup } from "@/lib/monetization/revenue-ops";
+import { sendViaLongeVitaWelcome } from "@/lib/monetization/vialongevita-brief";
 
 export const dynamic = "force-dynamic";
 
@@ -120,6 +121,7 @@ export async function POST(request: Request) {
       destination,
     });
     void notifyNewsletterSignup({ email, locale, segment, source }).catch(() => undefined);
+    void sendViaLongeVitaWelcome({ email, locale }).catch(() => undefined);
   }
 
   return NextResponse.json({

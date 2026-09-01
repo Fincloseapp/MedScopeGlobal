@@ -14,8 +14,17 @@ create table if not exists public.newsletter_subscribers (
   constraint newsletter_subscribers_email_segment_key unique (email, segment)
 );
 
+alter table public.newsletter_subscribers
+  add column if not exists unsubscribed_at timestamptz;
+
+alter table public.newsletter_subscribers
+  add column if not exists last_brief_sent_at timestamptz;
+
 create index if not exists newsletter_subscribers_created_idx
   on public.newsletter_subscribers (created_at desc);
+
+create index if not exists newsletter_subscribers_locale_idx
+  on public.newsletter_subscribers (locale);
 
 alter table public.newsletter_subscribers enable row level security;
 

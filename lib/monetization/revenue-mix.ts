@@ -102,16 +102,16 @@ export function matchAffiliateProductIds(article: RevenueArticle): string[] {
   const text = haystack(article);
   const ids: string[] = [];
 
-  if (/spán|spanek|sleep|insomni|nespav|hrv|oura|whoop|circadian/.test(text)) {
+  if (/spán|spanek|sleep|insomni|nespav|hrv|oura|whoop|circadian|sommeil|schlaf|sueñ|sonno|seno\b|sen i |alvás/.test(text)) {
     ids.push("sleep-tracker");
   }
-  if (/magnes|hořčí|horcik|glycinát|glycinat/.test(text)) {
+  if (/magnes|hořčí|horcik|horčík|glycinát|glycinat|magnésium|magnez/.test(text)) {
     ids.push("magnesium-glycinate");
   }
-  if (/omega|rybí tuk|rybi tuk|srdc|lipid|cholesterol|epa|dha/.test(text)) {
+  if (/omega|rybí tuk|rybi tuk|srdc|lipid|cholesterol|epa|dha|cœur|herz|cuore|serce/.test(text)) {
     ids.push("omega-3-test");
   }
-  if (/vitamin d|vitamín d|d3\b|k2\b|kostí|kosti|imunit|osteopor/.test(text)) {
+  if (/vitamin d|vitamín d|vitamine d|witamina d|d3\b|k2\b|kostí|kosti|imunit|osteopor/.test(text)) {
     ids.push("vitamin-d3-k2");
   }
 
