@@ -17,9 +17,18 @@ import { generateSelfTest } from "../../lib/prijimacky/quiz-from-bank";
 import { FACULTIES_ADMISSIONS_2026 } from "../../lib/prijimacky/faculties-admissions";
 import {
   getAffiliateRedirectDestination,
+  applyAmazonAssociateTag,
   AD_INVENTORY,
   getClientAdConfig,
 } from "../../lib/ecosystem/monetization";
+import {
+  classifyRevenueSurface,
+  matchAffiliateProductIds,
+  shouldShowAffiliate,
+  shouldShowOrdiZapisCta,
+  shouldShowPublicSubscribeNudge,
+  LONGEVITY_MEDIA_KIT,
+} from "../../lib/monetization/revenue-mix";
 import {
   inferArticleTopic,
   inferVisualTopic,
@@ -195,6 +204,44 @@ file("public/assets/affiliate/sleep-tracker.svg");
 assert.equal(getAffiliateRedirectDestination("mg-cz")?.includes("heureka"), true);
 assert.equal(getAffiliateRedirectDestination("mg-us")?.includes("amazon.com"), true);
 assert.equal(getAffiliateRedirectDestination("unknown"), null);
+assert.ok(
+  applyAmazonAssociateTag("https://www.amazon.com/s?k=x", "tag-20").includes("tag=tag-20")
+);
+assert.equal(
+  applyAmazonAssociateTag("https://www.heureka.cz/?h=x", "tag-20").includes("tag="),
+  false
+);
+
+assert.equal(
+  classifyRevenueSurface({ title: "Spánek po padesátce", public_topic: "dlouhovekost" }),
+  "public"
+);
+assert.equal(
+  classifyRevenueSurface({ title: "Guidelines 2026", min_access_level: "physician" }),
+  "physician"
+);
+assert.equal(classifyRevenueSurface({ med_track: "priprava", title: "Přijímačky" }), "student");
+assert.equal(shouldShowAffiliate("public"), true);
+assert.equal(shouldShowAffiliate("physician"), false);
+assert.equal(shouldShowOrdiZapisCta("physician"), true);
+assert.equal(shouldShowPublicSubscribeNudge("public", false), true);
+assert.equal(shouldShowPublicSubscribeNudge("public", true), false);
+assert.deepEqual(
+  matchAffiliateProductIds({ title: "Poruchy spánku a HRV", slug: "spanek-hrv" }),
+  ["sleep-tracker", "magnesium-glycinate"]
+);
+assert.ok(matchAffiliateProductIds({ title: "Vitamin D3 v zimě", slug: "vitamin-d3" }).includes("vitamin-d3-k2"));
+assert.equal(matchAffiliateProductIds({ title: "Spánek", slug: "x" }).length, 2);
+assert.ok(LONGEVITY_MEDIA_KIT.some((item) => item.id === "native-banner" && item.priceCzk === 5000));
+assert.ok(LONGEVITY_MEDIA_KIT.some((item) => item.id === "sponsored-article" && item.priceCzk === 15000));
+
+file("app/api/newsletter/subscribe/route.ts");
+file("components/monetization/newsletter-capture.tsx");
+file("components/monetization/house-partner-slot.tsx");
+file("components/monetization/article-subscribe-nudge.tsx");
+file("lib/i18n/revenue-copy.ts");
+file("lib/monetization/revenue-mix.ts");
+file("supabase/migrations/20260901160000_newsletter_subscribers.sql");
 
 assert.ok(AD_INVENTORY.some((e) => e.id === "article-below-title"));
 assert.ok(AD_INVENTORY.some((e) => e.surface === "homepage"));

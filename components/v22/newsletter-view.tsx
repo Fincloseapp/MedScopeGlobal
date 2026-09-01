@@ -4,6 +4,7 @@ import type { NewsletterRow } from "@/lib/queries/v4c/newsletters";
 import { NewsletterHero } from "@/components/newsletter/Hero";
 import { V22_NEWSLETTER_HERO } from "@/lib/v22/newsletter";
 import { Button } from "@/components/ui/button";
+import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
 
 export function V22NewsletterHub() {
   return (
@@ -27,9 +28,7 @@ export function V22NewsletterHub() {
               className="w-full text-white"
             />
             <div className="mt-2 flex flex-wrap justify-center gap-2 px-6 pb-10 sm:px-8">
-              <Button asChild className="rounded-full bg-white text-[#021d33] hover:bg-sky-50">
-                <Link href="/subscribe">Přihlásit k odběru</Link>
-              </Button>
+            <NewsletterCapture locale="cs" source="newsletter-hub-hero" className="mt-4 w-full max-w-lg" />
               <Button asChild variant="outline" className="rounded-full border-white/40 text-white hover:bg-white/10">
                 <Link href="/newsletter/posledni">Poslední vydání</Link>
               </Button>
@@ -87,13 +86,13 @@ export function V22NewsletterIssue({ issue }: { issue: NewsletterRow }) {
         ) : (
           <p className="text-slate-600">Obsah vydání bude brzy doplněn.</p>
         )}
-        <div className="mt-8 flex flex-wrap gap-3 border-t border-slate-100 pt-6">
-          <Button asChild className="rounded-full">
-            <Link href="/subscribe">Odebírat newsletter</Link>
-          </Button>
-          <Button asChild variant="outline" className="rounded-full">
-            <Link href="/newsletter">← Přehled</Link>
-          </Button>
+        <div className="mt-8 border-t border-slate-100 pt-6">
+          <NewsletterCapture locale="cs" source="newsletter-issue" />
+          <div className="mt-4">
+            <Button asChild variant="outline" className="rounded-full">
+              <Link href="/newsletter">← Přehled</Link>
+            </Button>
+          </div>
         </div>
       </div>
     </article>

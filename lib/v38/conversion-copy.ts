@@ -83,11 +83,11 @@ const STATIC_POOL: Record<ConversionSlot, ConversionCopy[]> = {
   article_inline: [
     {
       slot: "article_inline",
-      eyebrow: "Pro váš zájem",
-      headline: "Líbí se vám tento obsah?",
-      body: "S předplatným získáte neomezený přístup k VIP článkům, prioritní alerty a AI tutor.",
-      ctaLabel: "Zobrazit předplatné",
-      ctaHref: "/predplatne",
+      eyebrow: "Volitelné předplatné",
+      headline: "Číst dál bez reklam",
+      body: "14 dní zdarma, potom tarif Veřejnost 99 Kč. Tipy v článcích zůstávají dobrovolné.",
+      ctaLabel: "Vyzkoušet 14 dní",
+      ctaHref: "/predplatne?trial=1",
     },
   ],
   video_overlay: [

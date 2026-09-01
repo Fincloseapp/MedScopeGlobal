@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import {
   getClientAdConfig,
   resolveAdProvider,
@@ -7,6 +8,7 @@ import {
   type AdProvider,
 } from "@/lib/ecosystem/monetization";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { readConsent } from "@/components/legal/cookie-banner";
 
 type Props = {
   provider?: AdProvider;
@@ -41,7 +43,8 @@ const PLACEHOLDER_STYLES: Record<AdPlacement, string> = {
 
 /**
  * Feature-flagged display ad unit.
- * Renders nothing until `NEXT_PUBLIC_ADS_ENABLED` + a provider key are set.
+ * Renders nothing until `NEXT_PUBLIC_ADS_ENABLED` + a provider key are set
+ * AND marketing cookies are accepted.
  * Set `NEXT_PUBLIC_ADS_SHOW_PLACEHOLDERS=1` for local layout preview only.
  */
 export function GlobalAdSlot({
@@ -54,6 +57,25 @@ export function GlobalAdSlot({
   const config = getClientAdConfig();
   const provider = providerProp ?? resolveAdProvider(locale, config);
   const style = PLACEMENT_STYLES[placement] ?? PLACEMENT_STYLES["in-content"];
+  const pushed = useRef(false);
+  const [marketingOk, setMarketingOk] = useState(false);
+
+  useEffect(() => {
+    setMarketingOk(Boolean(readConsent()?.marketing));
+  }, []);
+
+  useEffect(() => {
+    if (!marketingOk || !config.enabled || provider !== "adsense" || !config.adsenseClientId) {
+      return;
+    }
+    if (pushed.current) return;
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      pushed.current = true;
+    } catch {
+      /* loader may still be fetching */
+    }
+  }, [marketingOk, config.enabled, config.adsenseClientId, provider]);
 
   if (!config.enabled || !provider) {
     if (!config.showPlaceholders) return null;
@@ -69,6 +91,10 @@ export function GlobalAdSlot({
         </span>
       </div>
     );
+  }
+
+  if (!marketingOk) {
+    return null;
   }
 
   if (provider === "adsense" && config.adsenseClientId) {

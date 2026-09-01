@@ -13,6 +13,7 @@ import {
   tipLocale,
 } from "@/lib/ecosystem/tip-copy";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
 
 type Props = {
   articleSlug: string;
@@ -160,14 +161,17 @@ export function ArticleContribution({
       className="article-contribute scroll-mt-24"
       aria-labelledby={`contribution-heading-${articleSlug}`}
     >
-      {showSuccess ? (
-        <p
-          className="mb-4 border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900"
-          role="status"
-        >
-          {showSuccess === "tip" ? tipCopy.success : donateCopy.success}
-        </p>
-      ) : null}
+          {showSuccess ? (
+            <>
+              <p
+                className="mb-4 border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900"
+                role="status"
+              >
+                {showSuccess === "tip" ? tipCopy.success : donateCopy.success}
+              </p>
+              <NewsletterCapture locale={locale} source="tip-success" variant="followup" />
+            </>
+          ) : null}
 
       <div className="flex items-start gap-3">
         <Heart className="mt-1 h-5 w-5 shrink-0 text-[#005B96]" aria-hidden />

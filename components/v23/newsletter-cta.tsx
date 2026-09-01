@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { V23_NEWSLETTER_IMAGE } from "@/lib/v23/images";
+import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
 
 export function V23NewsletterCta() {
   return (
@@ -31,12 +32,8 @@ export function V23NewsletterCta() {
               Studie, legislativa, léky a digitální zdravotnictví v profesionálním layoutu — česky,
               s klíčovými body a odkazy na zdroje.
             </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Button asChild className="rounded-full">
-                <Link href="/subscribe" prefetch>
-                  Přihlásit k odběru
-                </Link>
-              </Button>
+            <NewsletterCapture locale="cs" source="v23-cta" className="mt-6" />
+            <div className="mt-4">
               <Button asChild variant="outline" className="rounded-full">
                 <Link href="/newsletter/posledni" prefetch>
                   Poslední vydání

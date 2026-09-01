@@ -7,6 +7,7 @@ import {
 } from "@/components/v271/homepage-sections";
 import { HomepageLongevityStrip } from "@/components/v271/homepage-longevity-strip";
 import { PortalHome } from "@/components/v271/portal-home";
+import { HomepageRevenueMix } from "@/components/monetization/homepage-revenue-mix";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { medicalWebPageJsonLd, webSiteJsonLd, softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { APP_PRODUCTS, appSeoDescription } from "@/lib/apps/catalog";
@@ -15,6 +16,7 @@ import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { localeToPathSegment } from "@/lib/i18n/locale-path";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getHomepageCachedData } from "@/lib/v22/homepage-cache";
+import { getReaderContext } from "@/lib/auth/reader-context";
 import { getPortalChrome, getPortalPhilosophy } from "@/lib/v271/portal";
 import { isCzechSurface, getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import {
@@ -63,7 +65,10 @@ export default async function HomePage() {
   const locale = await getServerLocale();
   const philosophy = getPortalPhilosophy(locale);
   const chrome = getPortalChrome(locale);
-  const { articles, topAds, midAds, bottomAds } = await getHomepageCachedData(locale);
+  const [{ articles, topAds, midAds, bottomAds }, { isVip }] = await Promise.all([
+    getHomepageCachedData(locale),
+    getReaderContext(),
+  ]);
 
   const homeLd = medicalWebPageJsonLd({
     title: philosophy.claim,
@@ -97,6 +102,7 @@ export default async function HomePage() {
       <PortalHome articles={articles} copy={philosophy} locale={locale} />
       <HomepageLongevityStrip articles={articles} locale={locale} />
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
+      <HomepageRevenueMix locale={locale} isVip={isVip} />
       <V272WhyTrustBlock locale={locale} />
       {isCzechSurface(locale) ? <V272AcademyHomeSections /> : null}
       <V271B2bBlock locale={locale} />

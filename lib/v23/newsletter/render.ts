@@ -49,7 +49,7 @@ export function renderNewsletterHtml(layout: V23NewsletterLayout): string {
   <section class="nl-section nl-cta">
     <h2>Doporučujeme</h2>
     <ul>${recHtml}</ul>
-    <p><a href="/subscribe" class="nl-cta-link">Přihlásit se k odběru newsletteru →</a></p>
+    <p><a href="/newsletter" class="nl-cta-link">Přihlásit se k odběru newsletteru →</a></p>
   </section>
 </article>`;
 }
@@ -63,6 +63,6 @@ export function renderNewsletterPdfText(layout: V23NewsletterLayout): string {
     }
     lines.push("");
   }
-  lines.push("Přihlášení: https://www.medscopeglobal.com/subscribe");
+  lines.push("Přihlášení: https://www.medscopeglobal.com/newsletter");
   return lines.join("\n");
 }

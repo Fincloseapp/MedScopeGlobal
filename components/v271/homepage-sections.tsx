@@ -8,7 +8,6 @@ import { getArticlesByMetadataSection } from "@/lib/queries/articles";
 import {
   V271_AUDIENCES,
   V271_AKTUALNI,
-  V271_B2B,
   V271_DOKUMENTACE_APP,
   V271_SOCIAL_PROOF_STATS,
   V271_SUBSCRIPTION_PLANS,
@@ -21,6 +20,8 @@ import { APP_PRODUCTS } from "@/lib/apps/catalog";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { AppOpenLink } from "@/components/apps/app-origin-bar";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { getRevenueCopy } from "@/lib/i18n/revenue-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export function V272SocialProofBlock() {
   return (
@@ -216,6 +217,8 @@ export function V271AudienceSections() {
 
 export function V271B2bBlock({ locale = "cs" }: { locale?: string }) {
   const surface = getSurfaceCopy(locale);
+  const revenue = getRevenueCopy(locale);
+  const formHref = localizePublicHref("/inzerce/formular", locale);
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="rounded-3xl border border-[#005B96]/15 bg-[#005B96]/5 px-6 py-8">
@@ -226,12 +229,26 @@ export function V271B2bBlock({ locale = "cs" }: { locale?: string }) {
             <p className="mt-2 text-sm text-slate-600">{surface.b2bDescription}</p>
           </div>
           <Link
-            href={V271_B2B.href}
+            href={formHref}
             className="rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
           >
-            {surface.b2bCta}
+            {revenue.mediaKitCta}
           </Link>
         </div>
+        <dl className="mt-6 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
+            <dt className="text-xs text-slate-500">{revenue.bannerName}</dt>
+            <dd className="font-display text-lg font-semibold text-[#021d33]">5 000 Kč</dd>
+          </div>
+          <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
+            <dt className="text-xs text-slate-500">{revenue.sponsoredName}</dt>
+            <dd className="font-display text-lg font-semibold text-[#021d33]">15 000 Kč</dd>
+          </div>
+          <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
+            <dt className="text-xs text-slate-500">{revenue.newsletterName}</dt>
+            <dd className="font-display text-lg font-semibold text-[#021d33]">3 500 Kč</dd>
+          </div>
+        </dl>
       </div>
     </section>
   );

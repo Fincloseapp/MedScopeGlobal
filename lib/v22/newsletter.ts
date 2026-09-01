@@ -24,7 +24,7 @@ export const V22_FALLBACK_NEWSLETTER: NewsletterRow = {
     </article>
   `,
   pdf_text:
-    "MedScopeGlobal Newsletter — 10. června 2026\n\nStudie, legislativa, léky, digital health.\nPřihlášení k odběru: medscopeglobal.com/subscribe",
+    "MedScopeGlobal Newsletter — 10. června 2026\n\nStudie, legislativa, léky, digital health.\nPřihlášení k odběru: medscopeglobal.com/newsletter",
   pdf_url: null,
   layout_json: null,
   published: true,

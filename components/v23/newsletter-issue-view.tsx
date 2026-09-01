@@ -14,6 +14,7 @@ import { V23_NEWSLETTER_IMAGE } from "@/lib/v23/images";
 import { formatIssueDateCs, isJsonLikeText, sanitizeNewsletterText } from "@/lib/v23/newsletter/sanitize";
 import { newsletterHeadline } from "@/lib/v23/newsletter/title";
 import { Button } from "@/components/ui/button";
+import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
 
 function resolveItemImage(
   sectionId: string,
@@ -222,14 +223,8 @@ export function V23NewsletterIssueView({ issue }: { issue: NewsletterRow }) {
           </section>
         ) : null}
 
-        <div className="mt-10 rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50 to-white p-6 text-center">
-          <h2 className="font-display text-lg font-bold text-[#021d33]">Přihlásit se k odběru</h2>
-          <p className="mt-2 text-sm text-slate-600">
-            Týdenní odborný přehled studií, legislativy a novinek přímo do e-mailu.
-          </p>
-          <Button asChild className="mt-4 rounded-full">
-            <Link href="/subscribe">Přihlásit se k odběru</Link>
-          </Button>
+        <div className="mt-10 rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50 to-white p-6">
+          <NewsletterCapture locale="cs" source="newsletter-issue-v23" />
         </div>
 
         <div className="mt-10 flex flex-col items-center border-t border-slate-100 pt-8">

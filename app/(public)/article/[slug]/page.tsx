@@ -21,8 +21,7 @@ import {
   type EditorialLocale,
 } from "@/lib/editorial/units";
 import { articleJsonLdGlobal, buildGlobalHreflang } from "@/lib/ecosystem/seo";
-import { canAccessContent } from "@/lib/config/access-levels";
-import type { AccessLevelId } from "@/lib/config/access-levels";
+import { resolveArticleBodyLock } from "@/lib/auth/article-eligibility";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getActiveAds, getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { AdPlacement } from "@/components/ads/ad-placement";
@@ -50,7 +49,18 @@ import {
   getArticleHeroAltText,
   resolveArticleCoverUrl,
 } from "@/lib/ecosystem/editorial/images";
-import { TopLongevityProducts } from "@/components/monetization/affiliate-box";
+import { TopicAffiliateBox } from "@/components/monetization/affiliate-box";
+import { ArticleSubscribeNudge } from "@/components/monetization/article-subscribe-nudge";
+import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
+import { HousePartnerSlot } from "@/components/monetization/house-partner-slot";
+import { OrdiZapisPromoBanner } from "@/components/lekari/ordizapis-promo-banner";
+import {
+  classifyRevenueSurface,
+  shouldShowAffiliate,
+  shouldShowHousePartner,
+  shouldShowOrdiZapisCta,
+  shouldShowPublicSubscribeNudge,
+} from "@/lib/monetization/revenue-mix";
 import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { MAGAZINE, getOgLocale } from "@/lib/brand/magazine";
@@ -134,12 +144,22 @@ export default async function ArticlePage({ params }: Props) {
 
   const { isVip, accessLevel } = await getReaderContext();
 
-  const minLevel = (article.min_access_level ?? "public") as AccessLevelId;
-  const locked =
-    (article.vip_only && !isVip) ||
-    !canAccessContent(accessLevel, minLevel);
+  const revenueArticle = {
+    vip_only: article.vip_only,
+    min_access_level: article.min_access_level,
+    audience: (article as { audience?: string | null }).audience,
+    rubric_slug: article.rubric_slug,
+    public_topic: article.public_topic,
+    title: article.title,
+    slug: article.slug,
+    excerpt: article.excerpt,
+    category: article.categories?.name,
+    med_track: (article as { med_track?: string | null }).med_track,
+  };
+  const revenueSurface = classifyRevenueSurface(revenueArticle);
+  const { locked } = resolveArticleBodyLock(article, { isVip, accessLevel });
 
-  // Gate copy only when the body is locked — open articles get no subscription nudge.
+  // Paywall copy only when the body is locked. Public magazine stays free + soft subscribe nudge.
   const articleGateCopy =
     locked && !isVip
       ? await resolveConversionCopy("article_gate", locale)
@@ -442,6 +462,10 @@ export default async function ArticlePage({ params }: Props) {
             />
           ) : null}
 
+          {!locked && shouldShowAffiliate(revenueSurface) ? (
+            <TopicAffiliateBox locale={supportLocale} article={revenueArticle} />
+          ) : null}
+
           {showContribution ? (
             <Suspense
               fallback={
@@ -466,8 +490,27 @@ export default async function ArticlePage({ params }: Props) {
             />
           ) : null}
 
+          {!locked && shouldShowOrdiZapisCta(revenueSurface) ? (
+            <div className="my-8">
+              <OrdiZapisPromoBanner variant="hub" />
+            </div>
+          ) : null}
+
+          {!locked && shouldShowPublicSubscribeNudge(revenueSurface, isVip) ? (
+            <ArticleSubscribeNudge locale={locale} />
+          ) : null}
+
           {!locked ? (
-            <TopLongevityProducts locale={supportLocale} />
+            <NewsletterCapture
+              locale={locale}
+              source="article"
+              segment={revenueSurface === "physician" ? "doctors" : "public"}
+              className="my-8"
+            />
+          ) : null}
+
+          {!locked && shouldShowHousePartner(revenueSurface, isVip) ? (
+            <HousePartnerSlot locale={locale} source="article-footer" className="my-8" />
           ) : null}
 
           {!locked ? (

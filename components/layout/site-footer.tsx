@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
 
 export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
   const copy = getSurfaceCopy(locale);
@@ -16,6 +17,9 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
           <p className="mt-3 text-xs font-medium uppercase tracking-wider text-[#005B96]">
             {footer.evidence}
           </p>
+          <div className="mt-5 max-w-sm">
+            <NewsletterCapture locale={locale} source="footer" variant="compact" />
+          </div>
         </div>
 
         <div>

@@ -16,7 +16,8 @@ import { Label } from "@/components/ui/label";
 
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 
-const COOKIE_KEY = "msg_cookie_consent";
+export const COOKIE_KEY = "msg_cookie_consent";
+export const CONSENT_EVENT = "msg-consent";
 
 type Consent = {
   necessary: true;
@@ -25,7 +26,7 @@ type Consent = {
   decidedAt: string;
 };
 
-function readConsent(): Consent | null {
+export function readConsent(): Consent | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(COOKIE_KEY);
@@ -39,6 +40,7 @@ function saveConsent(consent: Consent) {
   localStorage.setItem(COOKIE_KEY, JSON.stringify(consent));
   document.cookie = `msg_analytics=${consent.analytics ? "1" : "0"};path=/;max-age=31536000;SameSite=Lax`;
   document.cookie = `msg_marketing=${consent.marketing ? "1" : "0"};path=/;max-age=31536000;SameSite=Lax`;
+  window.dispatchEvent(new Event(CONSENT_EVENT));
 }
 
 export function CookieBanner({ locale = "cs" }: { locale?: string }) {

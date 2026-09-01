@@ -22,6 +22,21 @@ export const AD_PROVIDERS_BY_REGION: Record<string, AdProvider[]> = {
   GLOBAL: ["adsense", "native"],
 };
 
+export function applyAmazonAssociateTag(url: string, tag?: string | null): string {
+  const affiliateTag = (tag ?? process.env.AFFILIATE_AMAZON_TAG ?? "").trim();
+  if (!affiliateTag) return url;
+  try {
+    const parsed = new URL(url);
+    if (!/(^|\.)amazon\.(com|co\.uk|de|fr|it|es|pl)\b/i.test(parsed.hostname)) {
+      return url;
+    }
+    parsed.searchParams.set("tag", affiliateTag);
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+}
+
 export function getAdProvidersForLocale(locale: GlobalLocaleCode): AdProvider[] {
   const regionMap: Record<string, string> = {
     "en-US": "USA", en: "GLOBAL", cs: "EU", sk: "EU", pl: "EU", de: "EU",
@@ -248,7 +263,9 @@ export const AFFILIATE_REDIRECT_DESTINATIONS: Record<string, string> = {
 
 export function getAffiliateRedirectDestination(slug: string): string | null {
   const key = slug.trim().toLowerCase();
-  return AFFILIATE_REDIRECT_DESTINATIONS[key] ?? null;
+  const destination = AFFILIATE_REDIRECT_DESTINATIONS[key] ?? null;
+  if (!destination) return null;
+  return applyAmazonAssociateTag(destination);
 }
 
 export const HIGH_CTR_PLACEMENTS: AdPlacement[] = ["below-title", "in-content", "sticky"];
