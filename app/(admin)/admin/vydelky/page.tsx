@@ -160,7 +160,7 @@ export default async function AdminVydelkyPage({
             <p className="text-3xl font-bold">{readiness.amazonAny ? "ano" : "ne"}</p>
             <p className="text-xs text-slate-500">
               {readiness.amazonAny
-                ? "US −20 · DE −21 · ES vialongevit04-21. FR/UK/IT ještě ne."
+                ? "US −20 · DE −21 · ES / FR lokální ID. UK/IT ještě ne."
                 : "Bez tagu Amazon nákup nepřipíše vám."}
             </p>
           </CardContent>
@@ -235,8 +235,8 @@ export default async function AdminVydelkyPage({
             <a className="font-medium text-[#005B96] hover:underline" href="https://affiliate-program.amazon.com/" target="_blank" rel="noreferrer">
               Amazon Associates
             </a>
-            : US <code>vialongevita-20</code>, DE <code>vialongevita-21</code>, ES <code>vialongevit04-21</code>
-            jsou v Workeru. FR / UK / IT ještě chybí.
+            : US <code>vialongevita-20</code>, DE <code>vialongevita-21</code>, ES <code>vialongevit04-21</code>,
+            FR <code>vialongevit0b-21</code> jsou v Workeru. UK / IT ještě chybí.
           </li>
           <li>
             Stripe už na projektu je — tipy a předplatné uvidíte v{" "}

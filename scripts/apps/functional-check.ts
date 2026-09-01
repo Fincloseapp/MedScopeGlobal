@@ -262,7 +262,9 @@ assert.equal(getPayoutReadiness().amazonAny, false);
   process.env.AFFILIATE_AMAZON_TAG = "vialongevita-20";
   process.env.AFFILIATE_AMAZON_TAG_DE = "vialongevita-21";
   const prevEs = process.env.AFFILIATE_AMAZON_TAG_ES;
+  const prevFr = process.env.AFFILIATE_AMAZON_TAG_FR;
   process.env.AFFILIATE_AMAZON_TAG_ES = "vialongevit04-21";
+  process.env.AFFILIATE_AMAZON_TAG_FR = "vialongevit0b-21";
   const de = applyAmazonAssociateTag("https://www.amazon.de/s?k=Magnesiumglycinat");
   const us = applyAmazonAssociateTag("https://www.amazon.com/s?k=magnesium+glycinate");
   const fr = applyAmazonAssociateTag("https://www.amazon.fr/s?k=x");
@@ -270,13 +272,15 @@ assert.equal(getPayoutReadiness().amazonAny, false);
   assert.ok(de.includes("tag=vialongevita-21"), "DE PartnerNet ID must win on amazon.de");
   assert.ok(us.includes("tag=vialongevita-20"), "US store keeps -20");
   assert.ok(es.includes("tag=vialongevit04-21"), "ES Associates ID must win on amazon.es");
-  assert.ok(fr.includes("tag=vialongevita-20"), "FR falls back to US until local ID exists");
+  assert.ok(fr.includes("tag=vialongevit0b-21"), "FR Club Partenaires ID must win on amazon.fr");
   if (prevFallback === undefined) delete process.env.AFFILIATE_AMAZON_TAG;
   else process.env.AFFILIATE_AMAZON_TAG = prevFallback;
   if (prevDe === undefined) delete process.env.AFFILIATE_AMAZON_TAG_DE;
   else process.env.AFFILIATE_AMAZON_TAG_DE = prevDe;
   if (prevEs === undefined) delete process.env.AFFILIATE_AMAZON_TAG_ES;
   else process.env.AFFILIATE_AMAZON_TAG_ES = prevEs;
+  if (prevFr === undefined) delete process.env.AFFILIATE_AMAZON_TAG_FR;
+  else process.env.AFFILIATE_AMAZON_TAG_FR = prevFr;
 }
 assert.ok(
   getRevenueCopy("en").affiliateDisclosure.includes("As an Amazon Associate I earn from qualifying purchases.")
