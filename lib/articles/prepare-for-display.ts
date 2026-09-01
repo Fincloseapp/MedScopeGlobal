@@ -19,6 +19,7 @@ import {
   type EditorialAssignment,
 } from "@/lib/editorial/units";
 import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
+import { assignUniqueListingCovers } from "@/lib/ecosystem/editorial/images/unique-listing-covers";
 import { applyMagazineDeskCopy } from "@/lib/editorial/magazine-desk-copy";
 
 export type DisplayArticle = ArticleWithRelations & {
@@ -214,6 +215,16 @@ export async function prepareArticleForDisplay(
   });
 }
 
+function finalizePreparedListing(
+  rows: DisplayArticle[],
+  locale: LocaleCode
+): DisplayArticle[] {
+  const cleaned = rows
+    .map((row) => withoutCzechListingCopy(row, locale))
+    .filter((row): row is DisplayArticle => Boolean(row));
+  return assignUniqueListingCovers(cleaned);
+}
+
 export async function prepareArticlesForDisplay(
   articles: ArticleWithRelations[],
   locale: LocaleCode,
@@ -314,13 +325,9 @@ export async function prepareArticlesForDisplay(
         if (!missIndexes.includes(index)) return display;
         return prepareArticleForDisplay(plan[index]!.article, locale, mode, { live: true });
       });
-      return full
-        .map((row) => withoutCzechListingCopy(row, locale))
-        .filter((row): row is DisplayArticle => Boolean(row));
+      return finalizePreparedListing(full, locale);
     }
-    return firstPass
-      .map((row) => withoutCzechListingCopy(row, locale))
-      .filter((row): row is DisplayArticle => Boolean(row));
+    return finalizePreparedListing(firstPass, locale);
   }
 
   const fill = mapPool(missIndexes, 8, async (index) => {
@@ -364,10 +371,5 @@ export async function prepareArticlesForDisplay(
     }
   }
 
-  if (primaryArticleLocale(locale) !== "cs") {
-    return firstPass
-      .map((row) => withoutCzechListingCopy(row, locale))
-      .filter((row): row is DisplayArticle => Boolean(row));
-  }
-  return firstPass;
+  return finalizePreparedListing(firstPass, locale);
 }

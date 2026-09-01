@@ -30,6 +30,8 @@ import {
   getArticleHeroAltText,
   resolveArticleCoverUrl,
   classifyCoverTopic,
+  assignUniqueListingCovers,
+  coverIdentity,
   isFoodCoverUrl,
   isClinicalOrBrainCoverUrl,
   isDeniedEditorialImageUrl,
@@ -698,6 +700,65 @@ assert.ok(isDeniedEditorialImageUrl(BRAIN_ON_STICK), "brain-on-stick in deny hel
 assert.ok(isDeniedEditorialImageUrl(SAGITTAL_BRAIN), "sagittal brain-on-stick in deny helper");
 assert.ok(isDeniedEditorialImageUrl(DOCTOR_PHONE_UNSPLASH), "doctor-on-phone unsplash in deny helper");
 assert.ok(isDeniedEditorialImageUrl(DOCTOR_PHONE), "doctor-phone in deny helper");
+
+{
+  const sharedSeniors = "/assets/covers/seniors.webp";
+  const unique = assignUniqueListingCovers([
+    {
+      id: "bone-1",
+      title: "Kosti ve středním věku: pohyb, pád a vitamin D",
+      slug: "kosti-ve-strednim-veku",
+      excerpt: "Osteoporóza a zdraví kostí.",
+      cover_image_url: sharedSeniors,
+    },
+    {
+      id: "osteo-2",
+      title: "Silné kosti pro celý život — Jak předcházet osteoporóze",
+      slug: "silne-kosti-osteoporoza",
+      excerpt: "Prevence osteoporózy u žen i mužů.",
+      cover_image_url: sharedSeniors,
+    },
+    {
+      id: "senior-3",
+      title: "Péče o seniora s duševní nemocí",
+      slug: "pece-o-seniora",
+      excerpt: "Rodina a stárnutí bez zázračných slibů.",
+      cover_image_url: sharedSeniors,
+    },
+  ]);
+  const keys = unique.map((article) => coverIdentity(article.cover_image_url));
+  assert.equal(new Set(keys).size, 3, `neighbouring longevity cards must get distinct covers, got ${keys.join(", ")}`);
+  assert.equal(unique[0]?.metadata?.editorial_image_review, "ai_editor");
+  const foodPair = assignUniqueListingCovers([
+    {
+      id: "food-a",
+      title: "Středomořský talíř v české kuchyni",
+      slug: "talir-a",
+      cover_image_url: "/assets/covers/food.webp",
+    },
+    {
+      id: "food-b",
+      title: "Středomořská snídaně bez extrémů",
+      slug: "talir-b",
+      cover_image_url: "/assets/covers/food.webp",
+    },
+  ]);
+  assert.ok(isFoodCoverUrl(foodPair[0]!.cover_image_url ?? ""), "food stays in food pool");
+  assert.ok(isFoodCoverUrl(foodPair[1]!.cover_image_url ?? ""), "second food card stays food");
+  assert.notEqual(
+    coverIdentity(foodPair[0]?.cover_image_url),
+    coverIdentity(foodPair[1]?.cover_image_url),
+    "adjacent food cards must not share the same plate photo"
+  );
+  const skippedSleep = matchImageForArticleSync(longevityArticle, undefined, {
+    excludeUrls: ["/assets/covers/sleep.webp", "/assets/covers/calm-2.webp"],
+  });
+  assert.ok(skippedSleep?.url, "matcher still returns a cover when first pool images are taken");
+  assert.ok(
+    !skippedSleep!.url.includes("sleep.webp"),
+    `excluded sleep.webp must not win, got ${skippedSleep!.url}`
+  );
+}
 
 const policyFoodMatched = matchImageForArticleSync(foodArticle);
 assert.ok(policyFoodMatched?.url, "matcher returns food hero");

@@ -7,6 +7,7 @@ import { getJournalistForTopic, getReviewPipeline } from "@/lib/ecosystem/editor
 import type { EditorialTopic } from "@/lib/ecosystem/editorial/desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { runV26ForeignNewsIngest } from "@/lib/v26/foreign-news-ingest";
+import { processEditorialImageBatch } from "@/lib/ecosystem/editorial/images";
 
 export type ProcessEditorialQueueResult = {
   ok: true;
@@ -18,6 +19,8 @@ export type ProcessEditorialQueueResult = {
   created: number;
   skipped: number;
   ingestErrors: string[];
+  imagesSuggested?: number;
+  imagesApplied?: number;
   note: string;
   timestamp: string;
 };
@@ -47,6 +50,19 @@ function asLocale(value: string | null | undefined): GlobalLocaleCode {
 
 function prefersLongevityTopic(topic: EditorialTopic): boolean {
   return topic === "longevity" || topic === "seniors";
+}
+
+async function refreshEditorialCovers(): Promise<{ suggested: number; applied: number }> {
+  try {
+    const batch = await processEditorialImageBatch({ limit: 4, apply: true, dryRun: false });
+    return { suggested: batch.result.suggested, applied: batch.result.applied };
+  } catch (err) {
+    console.warn(
+      "[editorial-process] image refresh:",
+      err instanceof Error ? err.message : "image batch failed"
+    );
+    return { suggested: 0, applied: 0 };
+  }
 }
 
 /**
@@ -160,6 +176,7 @@ export async function processEditorialQueue(options?: {
 
   if (jobs.length === 0) {
     const fallback = await runIngestForJob(null);
+    const images = await refreshEditorialCovers();
     return {
       ok: true,
       task: "editorial-process",
@@ -170,7 +187,9 @@ export async function processEditorialQueue(options?: {
       created,
       skipped,
       ingestErrors: ingestErrors.slice(0, 8),
-      note: `Queue empty — longevity-biased ingest created ${fallback.ingest.created} (review: ${CONTENT_GUARDRAILS.requireEditorialReview ? "recorded" : "off"})`,
+      imagesSuggested: images.suggested,
+      imagesApplied: images.applied,
+      note: `Queue empty — longevity-biased ingest created ${fallback.ingest.created}; image curator suggested ${images.suggested}`,
       timestamp,
     };
   }
@@ -240,6 +259,8 @@ export async function processEditorialQueue(options?: {
     }
   }
 
+  const images = await refreshEditorialCovers();
+
   return {
     ok: true,
     task: "editorial-process",
@@ -250,7 +271,9 @@ export async function processEditorialQueue(options?: {
     created,
     skipped,
     ingestErrors: ingestErrors.slice(0, 8),
-    note: `Processed ${jobs.length} desk job(s); AI journalists ingested ${created} article(s) under editor review`,
+    imagesSuggested: images.suggested,
+    imagesApplied: images.applied,
+    note: `Processed ${jobs.length} desk job(s); ingested ${created}; image curator applied ${images.applied}`,
     timestamp,
   };
 }

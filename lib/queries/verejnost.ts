@@ -104,7 +104,12 @@ export async function listPublicArticles(options?: {
     maxTranslate: limit,
   });
   const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
-  return prepared.map((a) => ({ ...a, cover_image_url: resolveVerejnostCoverUrl(a) }));
+  const { assignUniqueListingCovers } = await import(
+    "@/lib/ecosystem/editorial/images/unique-listing-covers"
+  );
+  return assignUniqueListingCovers(
+    prepared.map((a) => ({ ...a, cover_image_url: resolveVerejnostCoverUrl(a) }))
+  );
 }
 
 export async function getPublicArticleBySlug(

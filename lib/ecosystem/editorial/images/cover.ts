@@ -166,6 +166,27 @@ export function getCoverPoolForTopic(topic: CoverVisualTopic): readonly string[]
   return COVER_POOL[topic] ?? COVER_POOL.research;
 }
 
+/** Compare covers without cache-bust query strings. */
+export function coverIdentity(url: string | null | undefined): string {
+  const local = normalizeLocalCoverPath(url);
+  if (local) return local;
+  return String(url ?? "").trim().split("?")[0]!.toLowerCase();
+}
+
+/** Primary topic pool plus editor-approved overflow for unique listings. */
+export function listingCoverOptionsForTopic(topic: CoverVisualTopic): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const url of [...getCoverPoolForTopic(topic), ...(COVER_OVERFLOW[topic] ?? [])]) {
+    const key = coverIdentity(url);
+    if (!key || seen.has(key)) continue;
+    if (isMismatchedLocalCover(url, topic)) continue;
+    seen.add(key);
+    out.push(url);
+  }
+  return out;
+}
+
 /** Map fine-grained visual topic → editorial desk topic (DB / alt-text metadata). */
 export function mapCoverVisualTopicToEditorialTopic(
   visual: CoverVisualTopic
@@ -257,11 +278,11 @@ const LOCAL_COVER_TOPICS: Partial<
   "/assets/covers/food-3.webp": ["food"],
   "/assets/covers/food-4.webp": ["food"],
   "/assets/covers/produce.webp": ["food"],
-  "/assets/covers/sleep.webp": ["sleep"],
-  "/assets/covers/calm.webp": ["calm"],
-  "/assets/covers/calm-2.webp": ["calm", "sleep"],
-  "/assets/covers/movement.webp": ["movement", "walk"],
-  "/assets/covers/movement-2.webp": ["movement", "walk"],
+  "/assets/covers/sleep.webp": ["sleep", "calm"],
+  "/assets/covers/calm.webp": ["calm", "seniors", "sleep"],
+  "/assets/covers/calm-2.webp": ["calm", "sleep", "seniors"],
+  "/assets/covers/movement.webp": ["movement", "walk", "seniors"],
+  "/assets/covers/movement-2.webp": ["movement", "walk", "seniors"],
   "/assets/covers/walk.webp": ["walk", "movement", "seniors"],
   "/assets/covers/seniors.webp": ["seniors"],
   "/assets/covers/clinical.webp": ["clinical"],
@@ -271,7 +292,38 @@ const LOCAL_COVER_TOPICS: Partial<
   "/assets/covers/research-2.webp": ["research", "clinical"],
   "/assets/covers/science.webp": ["research", "tech"],
   "/assets/covers/tech.webp": ["tech"],
-  "/assets/covers/vitals.webp": ["vitals", "clinical", "tech"],
+  "/assets/covers/vitals.webp": ["vitals", "clinical", "tech", "seniors"],
+};
+
+/**
+ * Extra local covers an editor may use when the primary topic pool is already
+ * taken by a neighbouring card. Food stays food-only.
+ */
+const COVER_OVERFLOW: Record<CoverVisualTopic, readonly string[]> = {
+  food: [],
+  sleep: ["/assets/covers/calm.webp"],
+  calm: ["/assets/covers/sleep.webp", "/assets/covers/walk.webp"],
+  movement: ["/assets/covers/walk.webp", "/assets/covers/seniors.webp"],
+  seniors: [
+    "/assets/covers/movement.webp",
+    "/assets/covers/movement-2.webp",
+    "/assets/covers/calm.webp",
+    "/assets/covers/calm-2.webp",
+    "/assets/covers/vitals.webp",
+  ],
+  clinical: [
+    "/assets/covers/research-2.webp",
+    "/assets/covers/science.webp",
+    "/assets/covers/vitals.webp",
+  ],
+  research: [
+    "/assets/covers/clinical-2.webp",
+    "/assets/covers/science.webp",
+    "/assets/covers/tech.webp",
+  ],
+  tech: ["/assets/covers/science.webp", "/assets/covers/research-2.webp"],
+  vitals: ["/assets/covers/clinical-2.webp", "/assets/covers/research.webp"],
+  walk: ["/assets/covers/movement-2.webp", "/assets/covers/seniors.webp"],
 };
 
 const FOOD_RE =
@@ -406,7 +458,8 @@ export function normalizeLocalCoverPath(
 
 export function pickCuratedCover(
   topic: CoverVisualTopic,
-  seed: string
+  seed: string,
+  excludeUrls: Iterable<string> = []
 ): string {
   const pool = COVER_POOL[topic] ?? COVER_POOL.research;
   const allowed = pool.filter((path) => {
@@ -414,7 +467,10 @@ export function pickCuratedCover(
     return !topics || topics.includes(topic);
   });
   const use = allowed.length > 0 ? allowed : pool;
-  return use[hashString(seed) % use.length]!;
+  const excluded = new Set([...excludeUrls].map((url) => coverIdentity(url)).filter(Boolean));
+  const unused = use.filter((path) => !excluded.has(coverIdentity(path)));
+  const pickFrom = unused.length > 0 ? unused : use;
+  return pickFrom[hashString(seed) % pickFrom.length]!;
 }
 
 export function isDeniedStockUrl(url: string | null | undefined): boolean {
