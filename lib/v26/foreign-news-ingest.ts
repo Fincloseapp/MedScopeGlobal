@@ -27,6 +27,15 @@ export interface V26ForeignSource {
   locale?: string;
   section?: string;
   region?: string;
+  contentPillar?: string;
+}
+
+const LONGEVITY_SOURCE_RE = /aging|ageing|longevity|healthspan|geriatr|nia\.nih|nataging/i;
+const LONGEVITY_ITEM_RE =
+  /aging|ageing|longevity|healthspan|alzheimer|frailty|geriatr|senescence|long.?lived/i;
+
+export function isLongevityForeignSource(src: V26ForeignSource): boolean {
+  return src.contentPillar === "dlouhovekost" || LONGEVITY_SOURCE_RE.test(`${src.name} ${src.url}`);
 }
 
 export interface V26ForeignIngestResult {
@@ -44,17 +53,38 @@ function buildHash(title: string, sourceUrl: string, description: string) {
     .digest("hex");
 }
 
+function itemLooksLongevity(title: string, summary?: string | null, link?: string | null): boolean {
+  return LONGEVITY_ITEM_RE.test(`${title} ${summary ?? ""} ${link ?? ""}`);
+}
+
 export function getV26ForeignSources(): V26ForeignSource[] {
   return sourcesV26 as V26ForeignSource[];
+}
+
+/** Longevity RSS first so Aktuality stays current on aging / healthspan. */
+export function rankV26ForeignSources(
+  sources: V26ForeignSource[],
+  preferLongevity = true
+): V26ForeignSource[] {
+  if (!preferLongevity) return sources;
+  return [...sources].sort(
+    (a, b) => Number(isLongevityForeignSource(b)) - Number(isLongevityForeignSource(a))
+  );
 }
 
 export async function runV26ForeignNewsIngest(options?: {
   maxArticles?: number;
   itemsPerSource?: number;
+  preferLongevity?: boolean;
+  journalistId?: string;
+  editorId?: string;
 }): Promise<V26ForeignIngestResult> {
   const admin = createServiceRoleClient();
   const maxArticles = options?.maxArticles ?? Number(process.env.V26_FOREIGN_MAX ?? 12);
   const itemsPerSource = options?.itemsPerSource ?? 3;
+  const preferLongevity = options?.preferLongevity ?? true;
+  const journalistId = options?.journalistId;
+  const editorId = options?.editorId;
   const errors: string[] = [];
   let created = 0;
   let skipped = 0;
@@ -67,10 +97,17 @@ export async function runV26ForeignNewsIngest(options?: {
   const { data: categories } = await admin.from("categories").select("id, slug");
   const categoryMap = new Map((categories ?? []).map((c) => [c.slug, c.id as string]));
 
-  for (const src of getV26ForeignSources()) {
+  for (const src of rankV26ForeignSources(getV26ForeignSources(), preferLongevity)) {
     if (created >= maxArticles) break;
     try {
-      const items = await fetchRssItems(src.url, src.name, itemsPerSource);
+      const fetched = await fetchRssItems(src.url, src.name, itemsPerSource);
+      const items = preferLongevity
+        ? [...fetched].sort(
+            (a, b) =>
+              Number(itemLooksLongevity(b.title, b.description, b.link)) -
+              Number(itemLooksLongevity(a.title, a.description, a.link))
+          )
+        : fetched;
       for (const item of items) {
         if (created >= maxArticles) break;
 
@@ -92,6 +129,10 @@ export async function runV26ForeignNewsIngest(options?: {
           continue;
         }
 
+        const longevity =
+          isLongevityForeignSource(src) ||
+          itemLooksLongevity(item.title, cleanDescription, item.link);
+
         const rewritten = await rewriteToV26Standard({
           title: item.title,
           excerpt: cleanDescription.slice(0, 400),
@@ -99,6 +140,7 @@ export async function runV26ForeignNewsIngest(options?: {
           audience: src.minAccessLevel === "physician" ? "physician" : "public",
           sourceCitation: { name: src.name, url: item.link, originalTitle: item.title },
           seed: item.link,
+          topic: longevity ? "dlouhovekost" : src.section ?? "aktuální-zprávy",
         });
 
         // Hard guard: never persist English/hybrid titles into Czech news section.
@@ -131,17 +173,29 @@ export async function runV26ForeignNewsIngest(options?: {
         const { data: slugClash } = await admin.from("articles").select("id").eq("slug", slug).maybeSingle();
         if (slugClash) slug = `${slug}-${crypto.randomBytes(2).toString("hex")}`;
 
-        const metadata = mergeV26Metadata(null, {
-          ...rewritten.metadata,
-          section: src.section ?? "aktuální-zprávy",
-          editorial_version: V26_EDITORIAL_VERSION,
-          source_citation: {
-            name: src.name,
-            url: item.link,
-            originalTitle: item.title,
-          },
-          czech_only: true,
-        });
+        const metadata = {
+          ...mergeV26Metadata(null, {
+            ...rewritten.metadata,
+            section: src.section ?? "aktuální-zprávy",
+            editorial_version: V26_EDITORIAL_VERSION,
+            source_citation: {
+              name: src.name,
+              url: item.link,
+              originalTitle: item.title,
+            },
+            czech_only: true,
+          }),
+          editorial_review: "ai_editor",
+          journalist_id: journalistId ?? null,
+          editor_id: editorId ?? null,
+          ...(longevity
+            ? {
+                content_pillar: src.contentPillar ?? "dlouhovekost",
+                public_topic: "dlouhovekost",
+                editorial_desk: "longevity",
+              }
+            : {}),
+        };
 
         const payload = {
           title,
@@ -157,6 +211,7 @@ export async function runV26ForeignNewsIngest(options?: {
           rubric_slug: src.rubric,
           min_access_level: src.minAccessLevel,
           locale: "cs",
+          public_topic: longevity ? "dlouhovekost" : null,
           source_url: item.link,
           source_name: `${src.name} · MedScopeGlobal v26`,
           ingested_at: new Date().toISOString(),

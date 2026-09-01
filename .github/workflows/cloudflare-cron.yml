@@ -37,6 +37,7 @@ jobs:
             /api/cron/v43-health-monitor
             /api/cron/ecosystem-mediflow
             /api/cron/ecosystem-editorial-queue
+            /api/cron/ecosystem-editorial-process
             /api/cron/ecosystem-generate-articles
             /api/cron/ecosystem-syndicate
             /api/ecosystem/editorial/images

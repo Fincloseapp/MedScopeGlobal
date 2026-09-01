@@ -143,7 +143,7 @@ export const V271_B2B = {
 export const V271_AKTUALNI = {
   title: "Aktuální zprávy",
   description:
-    "Domácí i zahraniční zdravotnické události — redakčně zpracované, s kontextem pro českou praxi.",
+    "Dlouhověkost a zdravotnické události — redakčně zpracované, s kontextem pro českou praxi.",
   href: "/aktualni-zpravy",
   cta: "Číst zprávy",
   links: [

@@ -119,7 +119,7 @@ export async function runV26AutonomousEngine(options?: {
   };
   if (rewrite.errors.length) errors.push(...rewrite.errors.slice(0, 3));
 
-  const foreign = await runV26ForeignNewsIngest({ maxArticles: 6 });
+  const foreign = await runV26ForeignNewsIngest({ maxArticles: 6, preferLongevity: true });
   phases.foreignIngest = {
     ok: foreign.errors.length === 0 || foreign.created > 0,
     detail: `created ${foreign.created}, skipped ${foreign.skipped}`,

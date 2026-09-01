@@ -5,6 +5,7 @@ import {
   getImageCuratorForLocale,
 } from "@/lib/ecosystem/editorial/personas";
 import {
+  processEditorialQueue,
   runAddImagesCron,
   runAuxiliaryEditorialCron,
   runEditorialQueueCron,
@@ -81,6 +82,27 @@ export async function POST(request: Request) {
       queued: result.queued,
       persisted: result.persisted,
       cronEndpoint: "/api/cron/ecosystem-editorial-queue",
+      timestamp: result.timestamp,
+    });
+  }
+
+  if (task === "editorial-process") {
+    const result = await processEditorialQueue({
+      maxJobs: body.limit ?? 2,
+      maxArticles: 2,
+    });
+    return NextResponse.json({
+      task,
+      status: result.status,
+      description: schedule.description,
+      jobsClaimed: result.jobsClaimed,
+      jobsPublished: result.jobsPublished,
+      jobsFailed: result.jobsFailed,
+      created: result.created,
+      skipped: result.skipped,
+      ingestErrors: result.ingestErrors,
+      note: result.note,
+      cronEndpoint: "/api/cron/ecosystem-editorial-process",
       timestamp: result.timestamp,
     });
   }
@@ -225,6 +247,7 @@ export async function POST(request: Request) {
 const CRON_ENDPOINT_BY_TASK: Partial<Record<string, string>> = {
   "mediflow-daily-reset": "/api/cron/ecosystem-mediflow",
   "editorial-queue": "/api/cron/ecosystem-editorial-queue",
+  "editorial-process": "/api/cron/ecosystem-editorial-process",
   "editorial-images": "/api/ecosystem/editorial/images",
   "add-images": "/api/ecosystem/editorial/images",
   "generate-articles": "/api/cron/ecosystem-generate-articles",

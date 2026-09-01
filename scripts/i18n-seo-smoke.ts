@@ -248,7 +248,7 @@ assert.equal(getPortalChrome("cs").services.find((s) => s.id === "ai")?.hint, "z
 assert.ok(!getPortalChrome("cs").services.some((s) => s.label === "Drugs" || s.hint === "ask"));
 assert.deepEqual(
   getPortalChrome("cs").newsTabs.map((tab) => tab.label),
-  ["Novinky", "Veřejnost", "Dlouhověkost", "Články"]
+  ["Aktuality", "Veřejnost", "Dlouhověkost", "Články"]
 );
 assert.equal(getSurfaceCopy("cs").searchPlaceholder.includes("Dlouhověkost"), true);
 assert.ok(!getSurfaceCopy("cs").searchPlaceholder.includes("Longevity"));

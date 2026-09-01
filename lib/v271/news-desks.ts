@@ -25,10 +25,10 @@ export const NEWS_DESKS: NewsDeskDef[] = [
   {
     id: "novinky",
     label: "Novinky",
-    href: "/novinky",
-    more: "Všechny novinky",
+    href: "/aktualni-zpravy",
+    more: "Všechny aktuality",
     kicker: "Aktuálně",
-    blurb: "Zdravotnické události s kontextem pro Česko — bez senzace.",
+    blurb: "Zdravotnické události a novinky o dlouhověkosti — s kontextem pro Česko, bez senzace.",
   },
   {
     id: "verejnost",
@@ -139,8 +139,11 @@ export function isVerejnostArticle(article: {
 }
 
 export function classifyNewsDesk(article: DisplayArticle): NewsDeskId {
-  if (isLongevityArticle(article)) return "dlouhovekost";
-  if (isNovinkyArticle(article)) return "novinky";
+  const longevity = isLongevityArticle(article);
+  const news = isNovinkyArticle(article);
+  if (longevity && news) return "novinky";
+  if (longevity) return "dlouhovekost";
+  if (news) return "novinky";
   if (isVerejnostArticle(article)) return "verejnost";
   return "clanky";
 }
@@ -173,12 +176,23 @@ export function splitNewsDesks(
     if (desks[desk].length < cap[desk]) desks[desk].push(article);
   }
 
+  const used = new Set(
+    [...desks.novinky, ...desks.verejnost, ...desks.dlouhovekost, ...desks.clanky].map(
+      (article) => article.id
+    )
+  );
+
+  if (desks.novinky.length < cap.novinky) {
+    for (const article of listable) {
+      if (desks.novinky.length >= cap.novinky) break;
+      if (desks.novinky.some((item) => item.id === article.id)) continue;
+      if (!isLongevityArticle(article)) continue;
+      desks.novinky.push(article);
+      used.add(article.id);
+    }
+  }
+
   if (desks.clanky.length < cap.clanky) {
-    const used = new Set(
-      [...desks.novinky, ...desks.verejnost, ...desks.dlouhovekost, ...desks.clanky].map(
-        (article) => article.id
-      )
-    );
     for (const article of listable) {
       if (desks.clanky.length >= cap.clanky) break;
       if (used.has(article.id)) continue;
@@ -208,6 +222,32 @@ export function pinLongevityIntoFeed(articles: DisplayArticle[], limit: number):
   return [...pinned, ...rest].slice(0, Math.max(limit, pinned.length));
 }
 
+/** Mix section news with longevity so Aktuality always reads current and healthspan-first. */
+export function mergeAktualityListing<T extends { id: string; published_at?: string | null }>(
+  sectionArticles: T[],
+  longevityArticles: T[],
+  limit = 48
+): T[] {
+  const pinned = longevityArticles.slice(0, 6);
+  const byId = new Map<string, T>();
+  for (const article of pinned) byId.set(article.id, article);
+  for (const article of sectionArticles) {
+    if (!byId.has(article.id)) byId.set(article.id, article);
+  }
+  for (const article of longevityArticles) {
+    if (!byId.has(article.id)) byId.set(article.id, article);
+  }
+  const pinnedIds = new Set(pinned.map((article) => article.id));
+  const rest = [...byId.values()]
+    .filter((article) => !pinnedIds.has(article.id))
+    .sort((a, b) => {
+      const aTime = a.published_at ? Date.parse(a.published_at) : 0;
+      const bTime = b.published_at ? Date.parse(b.published_at) : 0;
+      return bTime - aTime;
+    });
+  return [...pinned, ...rest].slice(0, limit);
+}
+
 export function filterArticlesForDesk(
   articles: DisplayArticle[],
   desk: NewsDeskId | null
@@ -223,9 +263,9 @@ const DESK_COPY: Record<string, Record<NewsDeskId, DeskCopy>> = {
   en: {
     novinky: {
       label: "News",
-      more: "All news",
+      more: "All updates",
       kicker: "Now",
-      blurb: "Health news with context — no sensationalism.",
+      blurb: "Health news and longevity briefings — with context, no sensationalism.",
     },
     verejnost: {
       label: "Public health",
@@ -248,10 +288,10 @@ const DESK_COPY: Record<string, Record<NewsDeskId, DeskCopy>> = {
   },
   de: {
     novinky: {
-      label: "News",
-      more: "Alle News",
+      label: "Nachrichten",
+      more: "Alle Aktualitäten",
       kicker: "Aktuell",
-      blurb: "Gesundheitsmeldungen mit Kontext — ohne Sensationslust.",
+      blurb: "Gesundheitsmeldungen und Langlebigkeit — mit Kontext, ohne Sensationslust.",
     },
     verejnost: {
       label: "Öffentlichkeit",
@@ -275,9 +315,9 @@ const DESK_COPY: Record<string, Record<NewsDeskId, DeskCopy>> = {
   fr: {
     novinky: {
       label: "Actualités",
-      more: "Toutes les actus",
+      more: "Toutes les actualités",
       kicker: "En ce moment",
-      blurb: "L’actualité santé avec du contexte — sans sensationnalisme.",
+      blurb: "L’actualité santé et la longévité — avec du contexte, sans sensationnalisme.",
     },
     verejnost: {
       label: "Grand public",

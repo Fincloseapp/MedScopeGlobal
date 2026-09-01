@@ -76,7 +76,7 @@ export const PORTAL_SERVICES = [
 ] as const;
 
 export const PORTAL_NEWS_TABS = [
-  { label: "Novinky", href: "/novinky" },
+  { label: "Aktuality", href: "/aktualni-zpravy" },
   { label: "Veřejnost", href: "/verejnost/clanky" },
   { label: "Dlouhověkost", href: "/verejnost/clanky?topic=dlouhovekost" },
   { label: "Články", href: "/articles" },
@@ -164,7 +164,7 @@ const SERVICE_LABELS: Record<string, Record<string, string>> = {
 };
 
 const NEWS_TAB_LABELS: Record<string, string[]> = {
-  cs: ["Novinky", "Veřejnost", "Dlouhověkost", "Články"],
+  cs: ["Aktuality", "Veřejnost", "Dlouhověkost", "Články"],
   en: ["News", "Public", "Longevity", "Articles"],
   de: ["Nachrichten", "Öffentlichkeit", "Langlebigkeit", "Artikel"],
   fr: ["Actualités", "Grand public", "Longévité", "Articles"],

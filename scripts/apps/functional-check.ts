@@ -41,8 +41,13 @@ import { polishCzechFields } from "../../lib/v22/translate";
 import {
   classifyNewsDesk,
   isLongevityArticle,
+  mergeAktualityListing,
   splitNewsDesks,
 } from "../../lib/v271/news-desks";
+import {
+  isLongevityForeignSource,
+  rankV26ForeignSources,
+} from "../../lib/v26/foreign-news-ingest";
 import { hubTopicListingHref } from "../../lib/config/verejnost-topics";
 import { formatEditorialUnitDisplay, publicEditorialByline } from "../../lib/editorial/units";
 import {
@@ -827,6 +832,118 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.equal(desks.dlouhovekost.length, 1);
   assert.equal(desks.dlouhovekost[0]?.slug, "verejnost-prevence-2026-07-02-osteoporozy");
   assert.equal(hubTopicListingHref("dlouhovekost", "zivotni-styl"), "/verejnost/clanky?topic=dlouhovekost");
+  assert.equal(
+    classifyNewsDesk({
+      title: "NIH: nová zpráva o stárnutí a healthspanu",
+      slug: "nih-aging-news",
+      excerpt: "WHO guideline k biologickému věku.",
+      metadata: { section: "aktuální-zprávy", content_pillar: "dlouhovekost" },
+    } as never),
+    "novinky"
+  );
+  const newsLongevityDesks = splitNewsDesks([
+    {
+      id: "longevity-news-1",
+      title: "Nová zpráva NIH o stárnutí",
+      slug: "nih-starnuti-zprava",
+      excerpt: "Guideline WHO k healthspanu.",
+      content: longBody,
+      published: true,
+      published_at: "2026-09-01T08:00:00.000Z",
+      vip_only: false,
+      locale: "cs",
+      audience: "public",
+      public_topic: "dlouhovekost",
+      metadata: { section: "aktuální-zprávy", content_pillar: "dlouhovekost" },
+    } as never,
+    {
+      id: "alergie-news-1",
+      title: "Jak se bránit sezónním alergiím",
+      slug: "alergie-news",
+      excerpt: "Pyl a antihistaminika v praxi.",
+      content: longBody,
+      published: true,
+      published_at: "2026-09-01T09:00:00.000Z",
+      vip_only: false,
+      locale: "cs",
+      audience: "public",
+      public_topic: "nemoci",
+    } as never,
+  ]);
+  assert.ok(
+    newsLongevityDesks.novinky.some((article) => article.id === "longevity-news-1"),
+    "Aktuality / Novinky must include longevity news"
+  );
+  const toppedUp = splitNewsDesks([
+    {
+      id: "only-osteo",
+      title: "Prevence osteoporózy u žen i mužů",
+      slug: "osteo-topup",
+      excerpt: "Vápník, vitamin D a pohyb.",
+      content: longBody,
+      published: true,
+      published_at: "2026-09-01T10:00:00.000Z",
+      vip_only: false,
+      locale: "cs",
+      audience: "public",
+      public_topic: "prevence",
+    } as never,
+  ]);
+  assert.equal(toppedUp.novinky.length, 1);
+  assert.equal(toppedUp.novinky[0]?.id, "only-osteo");
+  assert.equal(toppedUp.dlouhovekost[0]?.id, "only-osteo");
+  const merged = mergeAktualityListing(
+    [{ id: "who-1", published_at: "2026-09-01T12:00:00.000Z" }],
+    [
+      { id: "long-1", published_at: "2026-08-01T12:00:00.000Z" },
+      { id: "who-1", published_at: "2026-09-01T12:00:00.000Z" },
+    ],
+    8
+  );
+  assert.equal(merged[0]?.id, "long-1");
+  assert.equal(merged.filter((item) => item.id === "who-1").length, 1);
+  assert.equal(
+    isLongevityForeignSource({
+      name: "Nature Aging",
+      url: "https://www.nature.com/nataging.rss",
+      categorySlug: "internal-medicine",
+      rubric: "ai-study-summary",
+      minAccessLevel: "public",
+      contentPillar: "dlouhovekost",
+    }),
+    true
+  );
+  assert.equal(
+    isLongevityForeignSource({
+      name: "WHO News",
+      url: "https://www.who.int/rss-feeds/news-english.xml",
+      categorySlug: "general-practice",
+      rubric: "ai-guideline-summary",
+      minAccessLevel: "public",
+    }),
+    false
+  );
+  const ranked = rankV26ForeignSources(
+    [
+      {
+        name: "WHO News",
+        url: "https://www.who.int/rss-feeds/news-english.xml",
+        categorySlug: "general-practice",
+        rubric: "ai-guideline-summary",
+        minAccessLevel: "public",
+      },
+      {
+        name: "NIH National Institute on Aging",
+        url: "https://www.nia.nih.gov/newsroom/rss.xml",
+        categorySlug: "internal-medicine",
+        rubric: "ai-study-summary",
+        minAccessLevel: "public",
+        contentPillar: "dlouhovekost",
+      },
+    ],
+    true
+  );
+  assert.equal(ranked[0]?.name, "NIH National Institute on Aging");
   console.log("✓ longevity desk classification keeps topic articles on the homepage");
 }
 
