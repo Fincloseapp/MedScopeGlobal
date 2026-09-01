@@ -24,7 +24,7 @@ export type NewsDeskDef = {
 export const NEWS_DESKS: NewsDeskDef[] = [
   {
     id: "novinky",
-    label: "Novinky",
+    label: "Aktuality",
     href: "/aktualni-zpravy",
     more: "Všechny aktuality",
     kicker: "Aktuálně",
@@ -222,19 +222,36 @@ export function pinLongevityIntoFeed(articles: DisplayArticle[], limit: number):
   return [...pinned, ...rest].slice(0, Math.max(limit, pinned.length));
 }
 
+const GENERIC_NEWS_TITLE_RE =
+  /^(zdravotní zpráva|epidemiologická zpráva|odborný přehled|klinická studie|komentář)\b/i;
+
+export function isProfessionalAktualityTitle(title?: string | null): boolean {
+  const clean = String(title ?? "").replace(/<[^>]+>/g, " ").trim();
+  if (clean.length < 18) return false;
+  if (GENERIC_NEWS_TITLE_RE.test(clean)) return false;
+  if (/zahraniční zdravotnická zpráva/i.test(clean)) return false;
+  return true;
+}
+
 /** Mix section news with longevity so Aktuality always reads current and healthspan-first. */
-export function mergeAktualityListing<T extends { id: string; published_at?: string | null }>(
+export function mergeAktualityListing<T extends { id: string; title?: string | null; published_at?: string | null }>(
   sectionArticles: T[],
   longevityArticles: T[],
   limit = 48
 ): T[] {
-  const pinned = longevityArticles.slice(0, 6);
+  const professionalSection = sectionArticles.filter((article) =>
+    isProfessionalAktualityTitle(article.title)
+  );
+  const professionalLongevity = longevityArticles.filter((article) =>
+    isProfessionalAktualityTitle(article.title)
+  );
+  const pinned = professionalLongevity.slice(0, 6);
   const byId = new Map<string, T>();
   for (const article of pinned) byId.set(article.id, article);
-  for (const article of sectionArticles) {
+  for (const article of professionalSection) {
     if (!byId.has(article.id)) byId.set(article.id, article);
   }
-  for (const article of longevityArticles) {
+  for (const article of professionalLongevity) {
     if (!byId.has(article.id)) byId.set(article.id, article);
   }
   const pinnedIds = new Set(pinned.map((article) => article.id));

@@ -41,6 +41,7 @@ import { polishCzechFields } from "../../lib/v22/translate";
 import {
   classifyNewsDesk,
   isLongevityArticle,
+  isProfessionalAktualityTitle,
   mergeAktualityListing,
   splitNewsDesks,
 } from "../../lib/v271/news-desks";
@@ -892,16 +893,23 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.equal(toppedUp.novinky.length, 1);
   assert.equal(toppedUp.novinky[0]?.id, "only-osteo");
   assert.equal(toppedUp.dlouhovekost[0]?.id, "only-osteo");
+  assert.equal(isProfessionalAktualityTitle("Kosti ve středním věku: pohyb a vitamin D"), true);
+  assert.equal(isProfessionalAktualityTitle("Zdravotní zpráva — Zahraniční zdravotnická zpráva"), false);
+  assert.equal(isProfessionalAktualityTitle("Epidemiologická zpráva — USA"), false);
   const merged = mergeAktualityListing(
-    [{ id: "who-1", published_at: "2026-09-01T12:00:00.000Z" }],
     [
-      { id: "long-1", published_at: "2026-08-01T12:00:00.000Z" },
-      { id: "who-1", published_at: "2026-09-01T12:00:00.000Z" },
+      { id: "who-1", title: "WHO: nová doporučení k očkování seniorů", published_at: "2026-09-01T12:00:00.000Z" },
+      { id: "stub-1", title: "Zdravotní zpráva — Zahraniční zdravotnická zpráva", published_at: "2026-09-01T13:00:00.000Z" },
+    ],
+    [
+      { id: "long-1", title: "Kognitivní rezerva: pohyb, lidé a učení", published_at: "2026-08-01T12:00:00.000Z" },
+      { id: "who-1", title: "WHO: nová doporučení k očkování seniorů", published_at: "2026-09-01T12:00:00.000Z" },
     ],
     8
   );
   assert.equal(merged[0]?.id, "long-1");
   assert.equal(merged.filter((item) => item.id === "who-1").length, 1);
+  assert.equal(merged.some((item) => item.id === "stub-1"), false);
   assert.equal(
     isLongevityForeignSource({
       name: "Nature Aging",
