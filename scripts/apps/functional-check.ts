@@ -29,6 +29,7 @@ import {
   shouldShowPublicSubscribeNudge,
   LONGEVITY_MEDIA_KIT,
 } from "../../lib/monetization/revenue-mix";
+import { NEWSLETTER_SUBSCRIBERS_SQL } from "../../lib/monetization/apply-schema";
 import {
   inferArticleTopic,
   inferVisualTopic,
@@ -241,7 +242,11 @@ file("components/monetization/house-partner-slot.tsx");
 file("components/monetization/article-subscribe-nudge.tsx");
 file("lib/i18n/revenue-copy.ts");
 file("lib/monetization/revenue-mix.ts");
-file("supabase/migrations/20260901160000_newsletter_subscribers.sql");
+file("lib/monetization/apply-schema.ts");
+file("lib/monetization/revenue-ops.ts");
+file("app/api/cron/revenue-ops/route.ts");
+assert.ok(NEWSLETTER_SUBSCRIBERS_SQL.includes("newsletter_subscribers"));
+assert.ok(NEWSLETTER_SUBSCRIBERS_SQL.includes("create table if not exists"));
 
 assert.ok(AD_INVENTORY.some((e) => e.id === "article-below-title"));
 assert.ok(AD_INVENTORY.some((e) => e.surface === "homepage"));

@@ -107,6 +107,18 @@ export async function POST(request: Request) {
     });
   }
 
+  if (task === "revenue-ops") {
+    const { runRevenueOps } = await import("@/lib/monetization/revenue-ops");
+    const result = await runRevenueOps();
+    return NextResponse.json({
+      task,
+      status: result.ok ? "completed" : "error",
+      description: schedule.description,
+      cronEndpoint: "/api/cron/revenue-ops",
+      ...result,
+    }, { status: result.ok ? 200 : 500 });
+  }
+
   if (task === "generate-articles") {
     const result = await runGenerateArticlesCron();
     return NextResponse.json({
@@ -252,6 +264,7 @@ const CRON_ENDPOINT_BY_TASK: Partial<Record<string, string>> = {
   "add-images": "/api/ecosystem/editorial/images",
   "generate-articles": "/api/cron/ecosystem-generate-articles",
   "syndicate-articles": "/api/cron/ecosystem-syndicate",
+  "revenue-ops": "/api/cron/revenue-ops",
 };
 
 export async function GET() {

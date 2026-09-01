@@ -4,6 +4,8 @@ import { withApiGuard } from "@/lib/security/api-guard";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { isSendGridConfigured, upsertSendGridContact } from "@/lib/email/sendgrid";
 import { logMonetizationEvent } from "@/lib/monetization/log-event";
+import { applyNewsletterSubscriberSchema } from "@/lib/monetization/apply-schema";
+import { notifyNewsletterSignup } from "@/lib/monetization/revenue-ops";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +27,8 @@ function listIdForSegment(segment: "public" | "doctors"): string | undefined {
   );
 }
 
+type Destination = "subscribers" | "analytics" | "sendgrid";
+
 export async function POST(request: Request) {
   const guard = await withApiGuard(request, {
     requireCaptcha: false,
@@ -44,27 +48,51 @@ export async function POST(request: Request) {
   const segment = body.segment ?? "public";
   const source = (body.source ?? "site").trim() || "site";
 
+  const schemaApply = await applyNewsletterSubscriberSchema();
+
   let stored = false;
   let duplicate = false;
+  let destination: Destination | null = null;
   const admin = tryCreateServiceRoleClient();
-  if (admin) {
+
+  async function insertSubscriber(): Promise<"ok" | "dup" | "missing" | "fail"> {
+    if (!admin) return "fail";
     const { error } = await admin.from("newsletter_subscribers").insert({
       email,
       locale,
       segment,
       source,
     });
-    if (!error) {
+    if (!error) return "ok";
+    if (error.code === "23505") return "dup";
+    if (error.code === "PGRST205" || /newsletter_subscribers/i.test(error.message)) {
+      return "missing";
+    }
+    return "fail";
+  }
+
+  if (admin) {
+    let result = await insertSubscriber();
+    if (result === "missing") {
+      await applyNewsletterSubscriberSchema();
+      result = await insertSubscriber();
+    }
+    if (result === "ok") {
       stored = true;
-    } else if (error.code === "23505") {
+      destination = "subscribers";
+    } else if (result === "dup") {
       stored = true;
       duplicate = true;
+      destination = "subscribers";
     } else {
       const { error: fallbackError } = await admin.from("analytics").insert({
         event: "newsletter_subscribe",
         payload: { email, locale, segment, source, pending_table: true },
       });
-      if (!fallbackError) stored = true;
+      if (!fallbackError) {
+        stored = true;
+        destination = "analytics";
+      }
     }
   }
 
@@ -72,10 +100,14 @@ export async function POST(request: Request) {
   if (isSendGridConfigured()) {
     const sg = await upsertSendGridContact(email, listIdForSegment(segment));
     mailed = sg.ok;
+    if (mailed && !destination) destination = "sendgrid";
   }
 
   if (!stored && !mailed) {
-    return NextResponse.json({ error: "unavailable" }, { status: 503 });
+    return NextResponse.json(
+      { error: "unavailable", schema: schemaApply },
+      { status: 503 }
+    );
   }
 
   if (!duplicate) {
@@ -85,7 +117,9 @@ export async function POST(request: Request) {
       source,
       stored,
       mailed,
+      destination,
     });
+    void notifyNewsletterSignup({ email, locale, segment, source }).catch(() => undefined);
   }
 
   return NextResponse.json({
@@ -93,5 +127,7 @@ export async function POST(request: Request) {
     already: duplicate,
     stored,
     mailed,
+    destination,
+    schema: schemaApply.ok,
   });
 }

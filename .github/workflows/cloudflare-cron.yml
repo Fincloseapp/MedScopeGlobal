@@ -41,6 +41,7 @@ jobs:
             /api/cron/ecosystem-generate-articles
             /api/cron/ecosystem-syndicate
             /api/ecosystem/editorial/images
+            /api/cron/revenue-ops
           )
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             paths=("${{ github.event.inputs.path }}")

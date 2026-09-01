@@ -1,5 +1,6 @@
 import { ECOSYSTEM_MIGRATION_SQL } from "@/lib/ecosystem/embedded-migrations";
 import { runManagementQuery } from "@/lib/supabase/management-api";
+import { applyNewsletterSubscriberSchema } from "@/lib/monetization/apply-schema";
 
 export type MigrationApplyResult = {
   name: string;
@@ -60,8 +61,16 @@ export async function applyEcosystemMigrations(): Promise<ApplyEcosystemMigratio
     };
   }
 
+  const revenue = await applyNewsletterSubscriberSchema();
+  results.push({
+    name: "20260901160000_newsletter_subscribers.sql",
+    ok: revenue.ok,
+    skipped: revenue.skipped,
+    error: revenue.error,
+  });
+
   return {
-    ok: true,
+    ok: revenue.ok,
     projectRef,
     results,
     timestamp: new Date().toISOString(),

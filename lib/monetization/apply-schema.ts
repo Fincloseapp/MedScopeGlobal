@@ -1,22 +1,7 @@
--- Public longevity brief signups (variant F). Service role writes; no public read.
-create table if not exists public.newsletter_subscribers (
-  id uuid primary key default gen_random_uuid(),
-  email text not null,
-  locale text not null default 'cs',
-  segment text not null default 'public',
-  source text,
-  created_at timestamptz not null default now(),
-  constraint newsletter_subscribers_segment_chk
-    check (segment in ('public', 'doctors')),
-  constraint newsletter_subscribers_email_segment_key unique (email, segment)
-);
+import { runManagementQuery } from "@/lib/supabase/management-api";
 
-create index if not exists newsletter_subscribers_created_idx
-  on public.newsletter_subscribers (created_at desc);
-
-alter table public.newsletter_subscribers enable row level security;
-
--- Public longevity brief signups (variant F). Service role writes; no public read.
+/** Idempotent DDL — applied from Worker cron / first newsletter signup. */
+export const NEWSLETTER_SUBSCRIBERS_SQL = `
 create table if not exists public.newsletter_subscribers (
   id uuid primary key default gen_random_uuid(),
   email text not null,
@@ -49,4 +34,33 @@ begin
       using (public.is_admin());
   end if;
 end $$;
+`;
 
+export type SchemaApplyResult = {
+  ok: boolean;
+  skipped?: boolean;
+  error?: string;
+};
+
+let schemaReady = false;
+
+export async function applyNewsletterSubscriberSchema(): Promise<SchemaApplyResult> {
+  if (schemaReady) return { ok: true, skipped: true };
+
+  const outcome = await runManagementQuery(NEWSLETTER_SUBSCRIBERS_SQL);
+  if (outcome.ok) {
+    schemaReady = true;
+    return { ok: true };
+  }
+
+  if (/already exists|duplicate key|relation .* already exists/i.test(outcome.message)) {
+    schemaReady = true;
+    return { ok: true, skipped: true };
+  }
+
+  return { ok: false, error: outcome.message };
+}
+
+export function markNewsletterSchemaReady(): void {
+  schemaReady = true;
+}

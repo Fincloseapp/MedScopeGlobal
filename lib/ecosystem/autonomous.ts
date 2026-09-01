@@ -16,7 +16,8 @@ export type AutonomousTask =
   | "editorial-queue"
   | "editorial-process"
   | "editorial-images"
-  | "syndicate-articles";
+  | "syndicate-articles"
+  | "revenue-ops";
 
 export const AUTONOMOUS_SCHEDULE: Record<AutonomousTask, { cron: string; description: string }> = {
   "generate-articles": {
@@ -74,6 +75,10 @@ export const AUTONOMOUS_SCHEDULE: Record<AutonomousTask, { cron: string; descrip
   "syndicate-articles": {
     cron: "0 14 * * *",
     description: "Syndikace článků mezi locale redakcemi (adaptace, ne duplikace)",
+  },
+  "revenue-ops": {
+    cron: "15 5,13,21 * * *",
+    description: "A–F výdělek: tabulka briefu, přesun e-mailů z analytics, schema",
   },
 };
 
