@@ -9,6 +9,16 @@ import { applyMonetizationSettingsSchema } from "@/lib/monetization/apply-schema
 import { MAGAZINE } from "@/lib/brand/magazine";
 
 export const HEUREKA_TRIXAM_SCRIPT = "https://serve.affiliate.heureka.cz/js/trixam.min.js";
+export const HEUREKA_HOP_CSP = [
+  "default-src 'none'",
+  "script-src 'unsafe-inline' https://serve.affiliate.heureka.cz",
+  "style-src 'unsafe-inline'",
+  "img-src https: data:",
+  "connect-src https://serve.affiliate.heureka.cz",
+  "form-action https://www.heureka.cz https://www.heureka.sk",
+  "base-uri 'none'",
+  "frame-ancestors 'none'",
+].join("; ");
 export const HEUREKA_CZ_POSITION_KEY = "heureka_cz_position_id";
 export const HEUREKA_SK_POSITION_KEY = "heureka_sk_position_id";
 

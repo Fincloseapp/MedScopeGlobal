@@ -5,6 +5,7 @@ import { logMonetizationEvent } from "@/lib/monetization/log-event";
 import { LOCALE_COOKIE, REGION_COOKIE } from "@/lib/i18n/config";
 import { resolveLocalePath } from "@/lib/i18n/locale-path";
 import {
+  HEUREKA_HOP_CSP,
   getHeurekaPositionId,
   heurekaHopHtml,
   heurekaMarketFromUrl,
@@ -63,10 +64,13 @@ export async function GET(request: Request, { params }: Params) {
       status: 200,
       headers: {
         "Content-Type": "text/html; charset=utf-8",
-        "Cache-Control": "no-store",
+        "Cache-Control": "private, no-cache, no-store, must-revalidate",
+        "Content-Security-Policy": HEUREKA_HOP_CSP,
       },
     });
   }
 
-  return NextResponse.redirect(destination, 302);
+  const redirect = NextResponse.redirect(destination, 302);
+  redirect.headers.set("Cache-Control", "private, no-cache, no-store, must-revalidate");
+  return redirect;
 }

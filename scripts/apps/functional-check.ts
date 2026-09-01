@@ -4,7 +4,7 @@
  * Run via: pnpm exec tsx scripts/apps/functional-check.ts
  */
 import assert from "node:assert/strict";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { APP_PRODUCTS, MEDIFLOW, ORDIZAPIS_APP, MEDIPACIENT, MEDIPREP } from "../../lib/apps/catalog";
@@ -36,6 +36,7 @@ import {
   parseHeurekaPositionId,
   heurekaHopHtml,
   heurekaMarketFromUrl,
+  HEUREKA_HOP_CSP,
 } from "../../lib/monetization/heureka-affiliate";
 import {
   inferArticleTopic,
@@ -265,6 +266,12 @@ assert.equal(heurekaMarketFromUrl("https://www.heureka.sk/?h=x"), "sk");
 assert.ok(heurekaHopHtml({ destination: "https://www.heureka.cz/", positionId: "18420" }).includes("heureka-affiliate-link"));
 assert.ok(heurekaHopHtml({ destination: "https://www.heureka.cz/", positionId: "18420" }).includes("18420"));
 assert.ok(heurekaHopHtml({ destination: "https://www.heureka.cz/", positionId: "18420" }).includes("trixam.min.js"));
+assert.ok(HEUREKA_HOP_CSP.includes("serve.affiliate.heureka.cz"));
+file("lib/v30/security/headers.ts");
+assert.ok(
+  readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes("serve.affiliate.heureka.cz"),
+  "magazine CSP must allow Trixam"
+);
 
 assert.equal(
   classifyRevenueSurface({ title: "Spánek po padesátce", public_topic: "dlouhovekost" }),
