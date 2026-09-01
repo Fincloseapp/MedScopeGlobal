@@ -710,6 +710,7 @@ assert.ok(isDeniedEditorialImageUrl(DOCTOR_PHONE), "doctor-phone in deny helper"
       slug: "kosti-ve-strednim-veku",
       excerpt: "Osteoporóza a zdraví kostí.",
       cover_image_url: sharedSeniors,
+      metadata: {},
     },
     {
       id: "osteo-2",
@@ -717,6 +718,7 @@ assert.ok(isDeniedEditorialImageUrl(DOCTOR_PHONE), "doctor-phone in deny helper"
       slug: "silne-kosti-osteoporoza",
       excerpt: "Prevence osteoporózy u žen i mužů.",
       cover_image_url: sharedSeniors,
+      metadata: {},
     },
     {
       id: "senior-3",
@@ -724,6 +726,7 @@ assert.ok(isDeniedEditorialImageUrl(DOCTOR_PHONE), "doctor-phone in deny helper"
       slug: "pece-o-seniora",
       excerpt: "Rodina a stárnutí bez zázračných slibů.",
       cover_image_url: sharedSeniors,
+      metadata: {},
     },
   ]);
   const keys = unique.map((article) => coverIdentity(article.cover_image_url));
