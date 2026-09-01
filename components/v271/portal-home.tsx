@@ -11,6 +11,7 @@ import {
 } from "@/lib/v271/portal";
 import { getSurfaceCopy, isCzechSurface } from "@/lib/i18n/surface-copy";
 import type { getMagazineCopy } from "@/lib/brand/magazine";
+import { assignUniqueListingCovers } from "@/lib/ecosystem/editorial/images/unique-listing-covers";
 import { NEWS_DESKS, newsDesksForLocale, splitNewsDesks, type NewsDeskId } from "@/lib/v271/news-desks";
 import { NewsArticleThumb, NewsDeskFallback, NewsHeadlineRow } from "@/components/articles/news-article-card";
 import { VitascopeMark } from "@/components/articles/vitascope-mark";
@@ -157,7 +158,22 @@ function PortalNewsFeed({
   locale: string;
   todayNote: string;
 }) {
-  const split = splitNewsDesks(articles);
+  const raw = splitNewsDesks(articles);
+  const uniqueVisible = assignUniqueListingCovers([
+    ...raw.novinky,
+    ...raw.verejnost,
+    ...raw.dlouhovekost,
+    ...raw.clanky,
+  ]);
+  const byId = new Map(uniqueVisible.map((article) => [article.id, article]));
+  const remap = (list: typeof raw.novinky) =>
+    list.map((article) => byId.get(article.id) ?? article);
+  const split = {
+    novinky: remap(raw.novinky),
+    verejnost: remap(raw.verejnost),
+    dlouhovekost: remap(raw.dlouhovekost),
+    clanky: remap(raw.clanky),
+  };
 
   return (
     <>

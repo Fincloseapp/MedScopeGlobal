@@ -6,6 +6,7 @@ import { getReaderContext } from "@/lib/auth/reader-context";
 import { getArticlesByMetadataSection } from "@/lib/queries/articles";
 import { listPublicArticles } from "@/lib/queries/verejnost";
 import { getServerLocale } from "@/lib/i18n/server-locale";
+import { assignUniqueListingCovers } from "@/lib/ecosystem/editorial/images/unique-listing-covers";
 import { isLongevityArticle, mergeAktualityListing } from "@/lib/v271/news-desks";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { V27_EDITORIAL_COPY_LABEL } from "@/lib/v27/version";
@@ -30,7 +31,9 @@ export default async function AktualniZpravyPage() {
     listPublicArticles({ limit: 48, ensureContent: false, mode: "card", locale }),
   ]);
   const longevity = publicPool.filter((article) => isLongevityArticle(article));
-  const articles = mergeAktualityListing(sectionArticles, longevity, 48);
+  const articles = assignUniqueListingCovers(
+    mergeAktualityListing(sectionArticles, longevity, 48)
+  );
 
   return (
     <ModulePageShell

@@ -83,21 +83,30 @@ export function pickUnusedListingCover(
 /**
  * Assign distinct covers among articles shown together.
  * Same article id keeps one image if it appears twice (homepage desk overlap).
+ * Uniqueness is a sliding window so far-apart cards may reuse a photo.
  */
-export function assignUniqueListingCovers<T extends ListingCoverArticle>(articles: T[]): T[] {
-  const used = new Set<string>();
+export function assignUniqueListingCovers<T extends ListingCoverArticle>(
+  articles: T[],
+  options?: { neighbourWindow?: number }
+): T[] {
+  const windowSize = options?.neighbourWindow ?? 5;
+  const recent: string[] = [];
   const coverById = new Map<string, string>();
 
   return articles.map((article) => {
     if (article.id && coverById.has(article.id)) {
       const reused = coverById.get(article.id)!;
-      used.add(coverIdentity(reused));
+      recent.push(coverIdentity(reused));
+      if (recent.length > windowSize) recent.shift();
       return { ...article, cover_image_url: reused };
     }
 
-    const next = pickUnusedListingCover(article, used);
+    const next = pickUnusedListingCover(article, recent);
     const key = coverIdentity(next);
-    if (key) used.add(key);
+    if (key) {
+      recent.push(key);
+      if (recent.length > windowSize) recent.shift();
+    }
     if (article.id) coverById.set(article.id, next);
 
     return {
