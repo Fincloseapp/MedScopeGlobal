@@ -333,13 +333,6 @@ const nextConfig = {
       },
 
       {
-        source: "/go/:path*",
-        headers: [
-          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
-        ],
-      },
-
-      {
 
         source: "/:path*",
 
@@ -365,6 +358,13 @@ const nextConfig = {
 
         ],
 
+      },
+
+      {
+        source: "/go/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
       },
 
     ];
