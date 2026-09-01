@@ -6,6 +6,7 @@
 import {
   classifyCoverTopic,
   coverIdentity,
+  coverVisualFamily,
   listingCoverOptionsForTopic,
   pickCuratedCover,
   resolveArticleCoverUrl,
@@ -47,7 +48,7 @@ export function pickUnusedListingCover(
     category: article.categories?.name,
     publicTopic: article.public_topic,
   });
-  const excluded = [...used].map((url) => coverIdentity(url)).filter(Boolean);
+  const excluded = [...used].map((url) => coverVisualFamily(url)).filter(Boolean);
   const preferred = resolveArticleCoverUrl({
     title: article.title ?? "",
     slug: article.slug ?? undefined,
@@ -56,15 +57,16 @@ export function pickUnusedListingCover(
     publicTopic: article.public_topic,
     coverImageUrl: article.cover_image_url,
     preferCurated: true,
+    keepAssignedCover: true,
   });
-  const preferredKey = coverIdentity(preferred);
-  if (preferred && !excluded.includes(preferredKey)) {
+  const preferredFamily = coverVisualFamily(preferred);
+  if (preferred && !excluded.includes(preferredFamily)) {
     return preferred;
   }
 
   for (const url of listingCoverOptionsForTopic(topic)) {
-    const key = coverIdentity(url);
-    if (excluded.includes(key)) continue;
+    const family = coverVisualFamily(url);
+    if (excluded.includes(family)) continue;
     if (isDeniedEditorialImageUrl(url)) continue;
     const mismatch = validateVisualTopicMatch({
       url,
@@ -96,15 +98,15 @@ export function assignUniqueListingCovers<T extends ListingCoverArticle>(
   return articles.map((article) => {
     if (article.id && coverById.has(article.id)) {
       const reused = coverById.get(article.id)!;
-      recent.push(coverIdentity(reused));
+      recent.push(coverVisualFamily(reused));
       if (recent.length > windowSize) recent.shift();
       return { ...article, cover_image_url: reused };
     }
 
     const next = pickUnusedListingCover(article, recent);
-    const key = coverIdentity(next);
-    if (key) {
-      recent.push(key);
+    const family = coverVisualFamily(next);
+    if (family) {
+      recent.push(family);
       if (recent.length > windowSize) recent.shift();
     }
     if (article.id) coverById.set(article.id, next);

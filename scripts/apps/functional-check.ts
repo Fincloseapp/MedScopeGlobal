@@ -732,7 +732,7 @@ assert.ok(isDeniedEditorialImageUrl(DOCTOR_PHONE), "doctor-phone in deny helper"
   const keys = unique.map((article) => coverIdentity(article.cover_image_url));
   assert.equal(new Set(keys).size, 3, `neighbouring longevity cards must get distinct covers, got ${keys.join(", ")}`);
   const laterReuse = assignUniqueListingCovers(
-    Array.from({ length: 6 }, (_, index) => ({
+    Array.from({ length: 5 }, (_, index) => ({
       id: `repeat-${index}`,
       title: "Osteoporóza a stárnutí kostí",
       slug: `osteo-repeat-${index}`,

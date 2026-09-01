@@ -173,6 +173,21 @@ export function coverIdentity(url: string | null | undefined): string {
   return String(url ?? "").trim().split("?")[0]!.toLowerCase();
 }
 
+/** Group visually similar covers so neighbours are not two gym shots or two silhouettes. */
+export function coverVisualFamily(url: string | null | undefined): string {
+  const path = coverIdentity(url);
+  if (/\/calm(?:-\d+)?\.webp$/.test(path)) return "silhouette-calm";
+  if (/\/movement(?:-\d+)?\.webp$/.test(path)) return "gym-movement";
+  if (/\/food(?:-\d+)?\.webp$/.test(path) || path.includes("/produce.webp")) return "food-plate";
+  if (/\/clinical(?:-\d+)?\.webp$/.test(path)) return "clinical-care";
+  if (/\/research(?:-\d+)?\.webp$/.test(path) || path.includes("/science.webp")) return "research-lab";
+  if (path.includes("/sleep.webp")) return "sleep";
+  if (path.includes("/walk.webp")) return "walk-outdoors";
+  if (path.includes("/seniors.webp")) return "seniors-people";
+  if (path.includes("/vitals.webp") || path.includes("/tech.webp")) return "vitals-tech";
+  return path;
+}
+
 /** Primary topic pool plus editor-approved overflow for unique listings. */
 export function listingCoverOptionsForTopic(topic: CoverVisualTopic): string[] {
   const seen = new Set<string>();
