@@ -88,6 +88,13 @@ export default async function AdminDashboardPage() {
         v25.1 System Dashboard — testy, opravy, CRONy
       </Link>
 
+      <Link
+        href="/admin/vydelky"
+        className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-[#021d33] hover:bg-emerald-100"
+      >
+        Kam jdou peníze — Stripe, Heureka, Amazon, inzerce
+      </Link>
+
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((s) => {
           const Icon = s.icon;

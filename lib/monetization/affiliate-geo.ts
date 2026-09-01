@@ -268,6 +268,40 @@ export function amazonTagForHost(hostname: string): string {
   return (process.env.AFFILIATE_AMAZON_TAG ?? "").trim();
 }
 
+/**
+ * Optional Heureka Affiliate wrap.
+ * After approval, paste the tracking URL from Heureka admin:
+ *   AFFILIATE_HEUREKA_CZ_TEMPLATE=https://…?dest={url}
+ *   or a search template with {q}
+ * Without a template we still send readers to Heureka — but you earn nothing.
+ */
+export function applyHeurekaTracking(url: string): string {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    const isCz = /(^|\.)heureka\.cz$/i.test(host);
+    const isSk = /(^|\.)heureka\.sk$/i.test(host);
+    if (!isCz && !isSk) return url;
+    const template = (
+      isSk ? process.env.AFFILIATE_HEUREKA_SK_TEMPLATE : process.env.AFFILIATE_HEUREKA_CZ_TEMPLATE
+    )?.trim();
+    if (!template) return url;
+    if (template.includes("{url}")) {
+      return template.split("{url}").join(encodeURIComponent(url));
+    }
+    if (template.includes("{q}")) {
+      const q =
+        parsed.searchParams.get("h[fraze]") ??
+        parsed.searchParams.get("h%5Bfraze%5D") ??
+        "";
+      return template.split("{q}").join(encodeURIComponent(q));
+    }
+    return url;
+  } catch {
+    return url;
+  }
+}
+
 export function applyAmazonAssociateTag(url: string, tag?: string | null): string {
   try {
     const parsed = new URL(url);
@@ -288,7 +322,8 @@ export function affiliateDestinationForProduct(
 ): string {
   const market = marketOverride ?? resolveAffiliateMarket(ctx);
   const query = PRODUCT_QUERIES[productId][market];
-  return applyAmazonAssociateTag(marketplaceSearchUrl(market, query));
+  const raw = marketplaceSearchUrl(market, query);
+  return applyAmazonAssociateTag(applyHeurekaTracking(raw));
 }
 
 export function resolveAffiliateDestination(

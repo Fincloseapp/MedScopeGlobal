@@ -38,6 +38,12 @@ export default async function AdminRevenuePage() {
         <p className="text-muted-foreground">
           MedScope v27 · {V27_ENGINE_VERSION} — mini-produkty, předplatné, PDF a B2B
         </p>
+        <Link
+          href="/admin/vydelky"
+          className="mt-3 inline-block text-sm font-medium text-[#005B96] hover:underline"
+        >
+          Kam uvidíte peníze (Stripe, Heureka, Amazon, inzerce) →
+        </Link>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -30,6 +30,8 @@ import {
   LONGEVITY_MEDIA_KIT,
 } from "../../lib/monetization/revenue-mix";
 import { NEWSLETTER_SUBSCRIBERS_SQL } from "../../lib/monetization/apply-schema";
+import { applyHeurekaTracking } from "../../lib/monetization/affiliate-geo";
+import { getPayoutReadiness, PAYOUT_CHANNELS } from "../../lib/monetization/payout-map";
 import {
   inferArticleTopic,
   inferVisualTopic,
@@ -228,6 +230,22 @@ assert.equal(
   applyAmazonAssociateTag("https://www.heureka.cz/?h=x", "tag-20").includes("tag="),
   false
 );
+{
+  const prev = process.env.AFFILIATE_HEUREKA_CZ_TEMPLATE;
+  process.env.AFFILIATE_HEUREKA_CZ_TEMPLATE = "https://track.example/go?u={url}";
+  const wrapped = getAffiliateRedirectDestination("mg-cz");
+  assert.ok(wrapped?.includes("track.example"), "Heureka template must wrap CZ hops");
+  assert.ok(
+    applyHeurekaTracking("https://www.heureka.cz/?h%5Bfraze%5D=x")?.includes("track.example")
+  );
+  if (prev === undefined) delete process.env.AFFILIATE_HEUREKA_CZ_TEMPLATE;
+  else process.env.AFFILIATE_HEUREKA_CZ_TEMPLATE = prev;
+}
+assert.ok(PAYOUT_CHANNELS.some((channel) => channel.id === "amazon"));
+assert.ok(PAYOUT_CHANNELS.some((channel) => channel.id === "heureka-cz"));
+assert.equal(getPayoutReadiness().amazonAny, false);
+file("app/(admin)/admin/vydelky/page.tsx");
+file("lib/monetization/payout-map.ts");
 
 assert.equal(
   classifyRevenueSurface({ title: "Spánek po padesátce", public_topic: "dlouhovekost" }),
