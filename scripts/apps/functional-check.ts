@@ -731,7 +731,10 @@ assert.ok(isDeniedEditorialImageUrl(DOCTOR_PHONE), "doctor-phone in deny helper"
   ]);
   const keys = unique.map((article) => coverIdentity(article.cover_image_url));
   assert.equal(new Set(keys).size, 3, `neighbouring longevity cards must get distinct covers, got ${keys.join(", ")}`);
-  assert.equal(unique[0]?.metadata?.editorial_image_review, "ai_editor");
+  assert.equal(
+    (unique[0]?.metadata as Record<string, unknown> | undefined)?.editorial_image_review,
+    "ai_editor"
+  );
   const foodPair = assignUniqueListingCovers([
     {
       id: "food-a",
