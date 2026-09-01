@@ -186,6 +186,9 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
       <div className="border-t py-6 text-center text-xs text-muted-foreground">
         © {new Date().getFullYear()} MedScopeGlobal · Al Synaptica Research Institute s.r.o., IČO
         06024963 — {footer.copyright}
+        <span className="mt-2 block">
+          As an Amazon Associate I earn from qualifying purchases.
+        </span>
       </div>
     </footer>
   );

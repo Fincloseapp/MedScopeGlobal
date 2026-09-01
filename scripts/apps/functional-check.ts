@@ -32,6 +32,7 @@ import {
 import { NEWSLETTER_SUBSCRIBERS_SQL } from "../../lib/monetization/apply-schema";
 import { applyHeurekaTracking } from "../../lib/monetization/affiliate-geo";
 import { getPayoutReadiness, PAYOUT_CHANNELS } from "../../lib/monetization/payout-map";
+import { getRevenueCopy } from "../../lib/i18n/revenue-copy";
 import {
   parseHeurekaPositionId,
   heurekaHopHtml,
@@ -250,6 +251,16 @@ assert.equal(
 assert.ok(PAYOUT_CHANNELS.some((channel) => channel.id === "amazon"));
 assert.ok(PAYOUT_CHANNELS.some((channel) => channel.id === "heureka-cz"));
 assert.equal(getPayoutReadiness().amazonAny, false);
+{
+  const tagged = applyAmazonAssociateTag(
+    "https://www.amazon.com/s?k=magnesium+glycinate",
+    "vialongevita-20"
+  );
+  assert.ok(tagged.includes("tag=vialongevita-20"), "US Store ID must attach to amazon.com");
+}
+assert.ok(
+  getRevenueCopy("en").affiliateDisclosure.includes("As an Amazon Associate I earn from qualifying purchases.")
+);
 file("app/(admin)/admin/vydelky/page.tsx");
 file("lib/monetization/payout-map.ts");
 file("lib/monetization/heureka-affiliate.ts");

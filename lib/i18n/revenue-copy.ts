@@ -76,7 +76,7 @@ const COPY: Record<Pack, RevenueCopy> = {
     affiliateKicker: "K tomuto textu se hodí",
     affiliateTitle: "Čtenáři u tohoto tématu často hledají",
     affiliateDisclosure:
-      "Odkazy mohou být affiliate. Nakupujete u prodejce, ne u redakce. Nejde o lékařské doporučení.",
+      "Odkazy mohou být affiliate (Heureka / Amazon). Nakupujete u prodejce, ne u redakce. Nejde o lékařské doporučení. As an Amazon Associate I earn from qualifying purchases.",
     tipsFollowup: "Chcete dostávat podobné texty e-mailem?",
     mediaKitEyebrow: "ViaLongeVita · mediakit",
     mediaKitTitle: "Inzerce u čtenářů dlouhověkosti",
@@ -116,7 +116,7 @@ const COPY: Record<Pack, RevenueCopy> = {
     affiliateKicker: "Passend zu diesem Text",
     affiliateTitle: "Wonach Leser bei diesem Thema greifen",
     affiliateDisclosure:
-      "Links können Affiliate-Links sein. Kauf beim Händler, nicht bei der Redaktion. Keine medizinische Empfehlung.",
+      "Links können Affiliate-Links sein. Kauf beim Händler, nicht bei der Redaktion. Keine medizinische Empfehlung. As an Amazon Associate I earn from qualifying purchases.",
     tipsFollowup: "Ähnliche Texte per E-Mail?",
     mediaKitEyebrow: "ViaLongeVita · Media-Kit",
     mediaKitTitle: "Werbung bei Longevity-Lesern",
@@ -156,7 +156,7 @@ const COPY: Record<Pack, RevenueCopy> = {
     affiliateKicker: "Dans le prolongement de ce texte",
     affiliateTitle: "Ce que les lecteurs cherchent sur ce sujet",
     affiliateDisclosure:
-      "Les liens peuvent être affiliés. Achat chez le marchand, pas chez la rédaction. Pas un avis médical.",
+      "Les liens peuvent être affiliés. Achat chez le marchand, pas chez la rédaction. Pas un avis médical. As an Amazon Associate I earn from qualifying purchases.",
     tipsFollowup: "Recevoir des textes similaires par e-mail ?",
     mediaKitEyebrow: "ViaLongeVita · kit média",
     mediaKitTitle: "Publicité auprès des lecteurs longévité",
@@ -196,7 +196,7 @@ const COPY: Record<Pack, RevenueCopy> = {
     affiliateKicker: "A natural next step",
     affiliateTitle: "What readers look up after this piece",
     affiliateDisclosure:
-      "Links may be affiliate. You buy from the retailer, not the newsroom. Not medical advice.",
+      "Links may be affiliate. You buy from the retailer, not the newsroom. Not medical advice. As an Amazon Associate I earn from qualifying purchases.",
     tipsFollowup: "Want similar pieces by email?",
     mediaKitEyebrow: "ViaLongeVita · media kit",
     mediaKitTitle: "Advertise to longevity readers",

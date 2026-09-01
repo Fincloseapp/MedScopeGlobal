@@ -158,7 +158,11 @@ export default async function AdminVydelkyPage({
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{readiness.amazonAny ? "ano" : "ne"}</p>
-            <p className="text-xs text-slate-500">Bez tagu Amazon nákup nepřipíše vám.</p>
+            <p className="text-xs text-slate-500">
+              {readiness.amazonAny
+                ? "US tag je v Worker secretu. DE/FR/UK účty můžete přidat později."
+                : "Bez tagu Amazon nákup nepřipíše vám."}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -230,13 +234,9 @@ export default async function AdminVydelkyPage({
           <li>
             <a className="font-medium text-[#005B96] hover:underline" href="https://affiliate-program.amazon.com/" target="_blank" rel="noreferrer">
               Amazon Associates
-            </a>{" "}
-            — začněte US účtem (OneLink umí EU), ideálně rovnou i{" "}
-            <a className="text-[#005B96] hover:underline" href="https://partnernet.amazon.de/" target="_blank" rel="noreferrer">
-              Německo
             </a>
-            . Po schválení zkopírujte Tracking ID (vypadá jako <code>vasejmeno-21</code>) do{" "}
-            <code>AFFILIATE_AMAZON_TAG</code> nebo do tagu konkrétního obchodu.
+            : US Store ID <code>vialongevita-20</code> je v Workeru. /go na amazon.com / .de / .fr už nese{" "}
+            <code>tag=vialongevita-20</code>. Lokální DE/UK účty (−21) můžete přidat později pro čistší přiřazení.
           </li>
           <li>
             Stripe už na projektu je — tipy a předplatné uvidíte v{" "}
