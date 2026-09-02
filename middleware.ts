@@ -140,6 +140,6 @@ export const config = {
     "/admin/:path*",
     "/stav-systemu",
     "/academy/lekari/:path*",
-    "/((?!_next|favicon.ico|robots.txt|ads.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?|ttf|eot|txt)$).*)",
+    "/((?!_next|__ms|favicon.ico|robots.txt|ads.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?|ttf|eot|txt)$).*)",
   ],
 };

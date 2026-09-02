@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { trackPageView } from "@/lib/analytics";
+import { grantAnalyticsConsent, trackPageView } from "@/lib/analytics";
 import { getClientAdConfig } from "@/lib/ecosystem/monetization";
 import { adsAllowedOnPath } from "@/lib/monetization/adsense";
 
@@ -27,13 +27,18 @@ export function ConsentScripts() {
 
   useEffect(() => {
     if (!pathname) return;
+    const send = () => {
+      grantAnalyticsConsent();
+      trackPageView(pathname);
+    };
     if (countedPath.current === null) {
       countedPath.current = pathname;
-      return;
+      const t = window.setTimeout(send, 800);
+      return () => window.clearTimeout(t);
     }
     if (countedPath.current === pathname) return;
     countedPath.current = pathname;
-    trackPageView(pathname);
+    send();
   }, [pathname]);
 
   useEffect(() => {

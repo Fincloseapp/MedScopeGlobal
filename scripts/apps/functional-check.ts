@@ -837,9 +837,24 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(
-    "gtag/js?id="
+    "GA_FIRST_PARTY_PREFIX"
+  ) &&
+    readFileSync(join(root, "lib/analytics/ga.ts"), "utf8").includes('"/__ms"'),
+  "Google tag must load through the first-party hop"
+);
+assert.ok(
+  readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(
+    "transport_url"
   ),
-  "Google tag must be the official gtag.js snippet"
+  "collect must stay on medscopeglobal.com so ad blockers miss it"
+);
+assert.ok(
+  existsSync(join(root, "app/__ms/[...path]/route.ts")),
+  "first-party GA hop route must exist"
+);
+assert.ok(
+  readFileSync(join(root, "middleware.ts"), "utf8").includes("__ms"),
+  "locale middleware must not rewrite the GA hop"
 );
 assert.ok(
   readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(

@@ -6,6 +6,9 @@
 /** Canonical GA4 property — David / Al Synaptica. Env may override, never invent. */
 export const GA_MEASUREMENT_ID = "G-6DX8RC4VZ1";
 
+/** Same-origin path so ad blockers do not drop gtag.js / collect. */
+export const GA_FIRST_PARTY_PREFIX = "/__ms";
+
 const GA_RE = /^G-[A-Z0-9]{6,20}$/;
 
 function envFlag(name: string): string {

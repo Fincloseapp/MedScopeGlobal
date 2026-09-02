@@ -186,6 +186,8 @@ assert.equal(isSearchEngineBot("Mozilla/5.0 (iPhone)"), false);
 assert.ok(isLocaleRoutingExcluded("/feed/de"));
 assert.ok(isLocaleRoutingExcluded("/sitemap-de.xml"));
 assert.ok(isLocaleRoutingExcluded("/api/health"));
+assert.ok(isLocaleRoutingExcluded("/__ms/js"));
+assert.ok(isLocaleRoutingExcluded("/__ms/g/collect"));
 
 const deDesks = newsDesksForLocale("de");
 assert.equal(deDesks.find((d) => d.id === "dlouhovekost")?.label, "Langlebigkeit");

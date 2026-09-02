@@ -140,6 +140,7 @@ const LOCALE_EXCLUDED_PREFIXES = [
   "/auth/",
   "/dashboard",
   "/go/",
+  "/__ms/",
   "/_next/",
   "/sw-",
   "/feed/",

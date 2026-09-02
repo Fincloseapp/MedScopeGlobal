@@ -13,7 +13,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: ["/", "/_next/static/", "/ads.txt"],
-        disallow: ["/admin", "/auth/callback", "/dashboard", "/api/"],
+        disallow: ["/admin", "/auth/callback", "/dashboard", "/api/", "/__ms/"],
       },
       {
         userAgent: "Googlebot",
