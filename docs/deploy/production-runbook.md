@@ -178,7 +178,7 @@ NEXT_PUBLIC_SITE_URL=https://medscopeglobal.com
 ### Preferred: Cloudflare Workers Builds
 
 Connect GitHub repo → **Create and deploy** → project name **`medscopeglobal`**, branch **`main`**.  
-Push to `main` triggers build + deploy. No Vercel project or `vercel.json` required (`vercel.json.bak` is archived).
+Push to `main` triggers build + deploy. `vercel.json` exists only to **turn Vercel Git deploys off** (`git.deploymentEnabled: false`). Do not reconnect the Vercel GitHub app — the Vercel account is blocked and would post a failing PR check.
 
 ### Alternative: GitHub Actions
 

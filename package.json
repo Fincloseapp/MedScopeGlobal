@@ -19,7 +19,7 @@
     "env:setup": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-env.ps1",
     "env:validate": "node scripts/validate-production-env.mjs",
     "env:verify": "node scripts/verify-env.mjs",
-    "env:diff": "node scripts/diff-vercel-env.mjs",
+    "env:diff": "node scripts/cloudflare/refuse-vercel.mjs",
     "db:setup": "node scripts/apply-migrations.mjs",
     "db:migrate": "node scripts/apply-migrations.mjs",
     "db:apply-ecosystem": "node scripts/apply-ecosystem-migrations.mjs",

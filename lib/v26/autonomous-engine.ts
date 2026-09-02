@@ -38,7 +38,7 @@ async function runSmokeOnProduction(): Promise<V26AutonomousPhase> {
 
 function runLocalPredeploy(): V26AutonomousPhase {
   if (process.env.VERCEL === "1") {
-    return { ok: true, detail: "skipped on Vercel" };
+    return { ok: false, detail: "Vercel runtime is disabled — use Cloudflare Workers" };
   }
   const script = projectPath("scripts/run-predeploy-gates.mjs");
   const result = spawnSync(process.execPath, [script], {
@@ -54,7 +54,7 @@ function runLocalPredeploy(): V26AutonomousPhase {
 
 function runLocalPush(): V26AutonomousPhase & { sha?: string } {
   if (process.env.VERCEL === "1") {
-    return { ok: true, detail: "push via CI only" };
+    return { ok: false, detail: "Vercel runtime is disabled — use Cloudflare Workers" };
   }
   const msg = process.env.DEPLOY_COMMIT_MESSAGE ?? "feat: MedScope v26 autonomous deploy";
   const ps1 = projectPath("scripts/push-d-to-github.ps1");
@@ -76,24 +76,8 @@ function runLocalPush(): V26AutonomousPhase & { sha?: string } {
   };
 }
 
-async function pollVercelReady(): Promise<V26AutonomousPhase> {
-  if (process.env.VERCEL === "1") {
-    return { ok: true, detail: "running on Vercel" };
-  }
-  try {
-    const script = projectPath("scripts/trigger-vercel-production.mjs");
-    const result = spawnSync(process.execPath, [script], {
-      encoding: "utf8",
-      timeout: 900_000,
-      cwd: MEDSCOPE_PROJECT_ROOT,
-    });
-    return {
-      ok: result.status === 0,
-      detail: result.stdout?.includes("READY") ? "Vercel READY" : result.stderr?.slice(0, 200),
-    };
-  } catch (e) {
-    return { ok: false, detail: (e as Error).message };
-  }
+async function confirmCloudflareProduction(): Promise<V26AutonomousPhase> {
+  return { ok: true, detail: "Vercel retired — production is Cloudflare Workers" };
 }
 
 export async function runV26AutonomousEngine(options?: {
@@ -149,10 +133,10 @@ export async function runV26AutonomousEngine(options?: {
         continue;
       }
 
-      const vercel = await pollVercelReady();
-      phases[`vercel_${retries}`] = vercel;
-      if (!vercel.ok) {
-        errors.push("vercel not ready");
+      const cloudflare = await confirmCloudflareProduction();
+      phases[`cloudflare_${retries}`] = cloudflare;
+      if (!cloudflare.ok) {
+        errors.push("cloudflare production not confirmed");
         retries++;
         continue;
       }
@@ -160,7 +144,7 @@ export async function runV26AutonomousEngine(options?: {
       deployOk = true;
     }
   } else {
-    phases.deploy = { ok: true, detail: "deploy skipped or Vercel runtime" };
+    phases.deploy = { ok: true, detail: "deploy skipped or already on Cloudflare" };
   }
 
   const smoke = await runSmokeOnProduction();

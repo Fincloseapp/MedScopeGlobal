@@ -110,4 +110,4 @@ if (!ok) {
 }
 
 console.log("\nPre-deploy gates PASSED");
-console.log("Tip: npm run env:diff — compare local vs Vercel env keys\n");
+console.log("Tip: pnpm cf:env:sync — sync env to Cloudflare Workers (Vercel is retired)\n");

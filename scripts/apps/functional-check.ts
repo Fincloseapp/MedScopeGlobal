@@ -250,6 +250,16 @@ file("app/api/apps/qr/route.ts");
 
 file("app/(public)/go/[slug]/route.ts");
 file("lib/monetization/affiliate-hop.ts");
+file("vercel.json");
+{
+  const vercel = JSON.parse(readFileSync(join(root, "vercel.json"), "utf8")) as {
+    git?: { deploymentEnabled?: boolean };
+    github?: { enabled?: boolean; silent?: boolean };
+  };
+  assert.equal(vercel.git?.deploymentEnabled, false, "Vercel git deploys must stay off");
+  assert.equal(vercel.github?.enabled, false);
+  assert.equal(vercel.github?.silent, true);
+}
 file("public/assets/affiliate/magnesium.svg");
 file("public/assets/affiliate/omega-test.svg");
 file("public/assets/affiliate/sleep-tracker.svg");
