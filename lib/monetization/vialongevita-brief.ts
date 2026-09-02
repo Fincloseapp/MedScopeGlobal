@@ -288,9 +288,9 @@ async function localizeBriefArticles(articles: BriefArticle[], locale: string): 
     const hit = await fallbackTranslateFields({
       title: row.title,
       excerpt: row.excerpt,
-      content: row.excerpt,
+      content: row.excerpt ?? undefined,
       sourceLocale: "cs",
-      targetLocale: locale,
+      targetLocale: normalizeLocale(locale),
       mode: "card",
     }).catch(() => null);
     if (!hit || looksLikeCzech(hit.title)) continue;
