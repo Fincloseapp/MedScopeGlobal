@@ -11,6 +11,8 @@ import { articleTopicLabel, verejnostDateLabel } from "@/lib/verejnost/helpers";
 import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
+import { TopicAffiliateBox } from "@/components/monetization/affiliate-box";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export function VerejnostArticleDetail({
   article,
@@ -96,6 +98,16 @@ export function VerejnostArticleDetail({
             ) : (
               <p className="mt-8 text-slate-500">{chrome.contentComing}</p>
             )}
+
+            <TopicAffiliateBox
+              locale={uiLocale as GlobalLocaleCode}
+              article={{
+                title: article.title,
+                excerpt: article.excerpt,
+                slug: article.slug,
+                public_topic: article.public_topic,
+              }}
+            />
 
             <PublicAdBlocks campaigns={inlineAds} variant="inline" />
 

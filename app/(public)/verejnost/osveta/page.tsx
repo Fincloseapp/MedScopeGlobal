@@ -22,6 +22,8 @@ import {
   listPublicHealthTopics,
   listPublicHealthVideos,
 } from "@/lib/verejnost/osveta/db";
+import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export const revalidate = 120;
 
@@ -144,6 +146,9 @@ export default async function OsvetaHubPage() {
           <PublicLeaderboard entries={leaderboard} locale={locale} />
           <p className="mt-4 text-xs leading-relaxed text-slate-400">{chrome.xpAsideLead}</p>
         </aside>
+      </div>
+      <div className="mt-10">
+        <ListingAffiliateBox locale={locale as GlobalLocaleCode} topic="dlouhovekost" />
       </div>
     </MagazineSectionHub>
   );

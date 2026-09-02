@@ -49,7 +49,7 @@ import {
   getArticleHeroAltText,
   resolveArticleCoverUrl,
 } from "@/lib/ecosystem/editorial/images";
-import { TopicAffiliateBox } from "@/components/monetization/affiliate-box";
+import { MidArticleAffiliate, TopicAffiliateBox } from "@/components/monetization/affiliate-box";
 import { ArticleSubscribeNudge } from "@/components/monetization/article-subscribe-nudge";
 import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
 import { HousePartnerSlot } from "@/components/monetization/house-partner-slot";
@@ -450,6 +450,11 @@ export default async function ArticlePage({ params }: Props) {
                   locked={locked}
                   title={article.title}
                   gateCopy={articleGateCopy ?? undefined}
+                  midSlot={
+                    !locked && shouldShowAffiliate(revenueSurface) ? (
+                      <MidArticleAffiliate locale={supportLocale} article={revenueArticle} />
+                    ) : null
+                  }
                 />
               </>
             )}

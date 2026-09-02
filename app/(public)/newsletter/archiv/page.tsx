@@ -3,6 +3,8 @@ import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { getNewsletterArchive } from "@/lib/queries/v4c/newsletters";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { formatPublicDate } from "@/lib/i18n/format-date";
+import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export const revalidate = 3600;
 
@@ -37,6 +39,9 @@ export default async function NewsletterArchivPage() {
           ))
         )}
       </ul>
+      <div className="mt-8">
+        <ListingAffiliateBox locale={locale as GlobalLocaleCode} />
+      </div>
       <Link href="/newsletter" className="mt-6 inline-block text-sm text-[#005B96] hover:underline">
         ← Newsletter
       </Link>

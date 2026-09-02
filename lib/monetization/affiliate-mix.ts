@@ -14,10 +14,11 @@ export type MixArticle = {
   category?: string | null;
 };
 
-export type AffiliateSurface = "article" | "homepage" | "listing" | "newsletter";
+export type AffiliateSurface = "article" | "articleMid" | "homepage" | "listing" | "newsletter";
 
 export const AFFILIATE_SLOT_COUNTS: Record<AffiliateSurface, number> = {
   article: 4,
+  articleMid: 2,
   homepage: 6,
   listing: 4,
   newsletter: 3,
@@ -41,6 +42,10 @@ export const PRODUCT_WEIGHT: Record<string, number> = {
   "foam-roller": 4,
   "yoga-mat": 4,
   "glass-water-bottle": 3,
+  "blue-light-glasses": 6,
+  "weighted-blanket": 6,
+  coq10: 6,
+  "grip-strengthener": 5,
 };
 
 const CATEGORY_OF: Record<string, AffiliateProduct["category"]> = Object.fromEntries(
@@ -71,6 +76,8 @@ export function topicMatchedProductIds(article?: MixArticle | null, topic?: stri
     push("sleep-tracker");
     push("sleep-mask");
     push("magnesium-glycinate");
+    push("weighted-blanket");
+    push("blue-light-glasses");
   }
   if (/magnes|hořčí|horcik|horčík|glycinát|glycinat|magnésium|magnez/.test(text)) {
     push("magnesium-glycinate");
@@ -97,12 +104,14 @@ export function topicMatchedProductIds(article?: MixArticle | null, topic?: stri
   if (/srdc|heart|herz|cœur|cuore|serce/.test(text)) {
     push("omega-3-test");
     push("blood-pressure-monitor");
+    push("coq10");
   }
-  if (/pohyb|exercise|fitness|workout|posilov|resistance|jóga|joga|yoga/.test(text)) {
+  if (/pohyb|exercise|fitness|workout|posilov|resistance|jóga|joga|yoga|úchop|grip|sarkopen/.test(text)) {
     push("resistance-bands");
     push("creatine-monohydrate");
     push("yoga-mat");
     push("foam-roller");
+    push("grip-strengthener");
   }
   if (/protein|bílkovin|bilkovin|svalov|regener/.test(text)) {
     push("protein-powder");
@@ -118,6 +127,15 @@ export function topicMatchedProductIds(article?: MixArticle | null, topic?: stri
   if (/hydrat|voda|water|lahev|flasche|bouteille/.test(text)) {
     push("glass-water-bottle");
     push("electrolyte-powder");
+  }
+  if (/obrazov|screen|modré světlo|blue light|brille|lunette/.test(text)) {
+    push("blue-light-glasses");
+  }
+  if (/přikrýv|deka|blanket|ťažk|weighted/.test(text)) {
+    push("weighted-blanket");
+  }
+  if (/coq10|koenzym|ubiquinol|ubiquinon/.test(text)) {
+    push("coq10");
   }
   if (
     article &&

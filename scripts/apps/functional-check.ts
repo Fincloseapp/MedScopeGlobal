@@ -36,6 +36,7 @@ import {
   AFFILIATE_PRODUCT_IDS,
 } from "../../lib/monetization/affiliate-geo";
 import { pickAffiliateProducts, AFFILIATE_SLOT_COUNTS } from "../../lib/monetization/affiliate-mix";
+import { splitHtmlAfterParagraphs } from "../../lib/monetization/split-article-html";
 import { getPayoutReadiness, PAYOUT_CHANNELS } from "../../lib/monetization/payout-map";
 import { getRevenueCopy } from "../../lib/i18n/revenue-copy";
 import {
@@ -233,7 +234,7 @@ assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "sk" 
   assert.ok(getAffiliateRedirectDestination("creatine-monohydrate", { locale: "de" })?.includes("amazon.de"));
   assert.ok(getAffiliateRedirectDestination("protein-powder", { locale: "fr" })?.includes("amazon.fr"));
   assert.ok(getAffiliateRedirectDestination("yoga-mat", { locale: "it" })?.includes("amazon.it"));
-  assert.equal(AFFILIATE_PRODUCT_IDS.length, 16);
+  assert.equal(AFFILIATE_PRODUCT_IDS.length, 20);
 }
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "it" })?.includes("amazon.it"));
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "es" })?.includes("amazon.es"));
@@ -360,11 +361,20 @@ assert.ok(matchAffiliateProductIds({ title: "Vitamin D3 v zimě", slug: "vitamin
 assert.ok(matchAffiliateProductIds({ title: "Sommeil et HRV", slug: "sommeil" }).includes("sleep-tracker"));
 assert.equal(AFFILIATE_SLOT_COUNTS.homepage, 6);
 assert.equal(AFFILIATE_SLOT_COUNTS.article, 4);
+assert.equal(AFFILIATE_SLOT_COUNTS.articleMid, 2);
 assert.equal(AFFILIATE_SLOT_COUNTS.listing, 4);
 assert.equal(AFFILIATE_SLOT_COUNTS.newsletter, 3);
 assert.equal(pickAffiliateProducts({ surface: "homepage", locale: "fr" }).length, AFFILIATE_SLOT_COUNTS.homepage);
 assert.equal(pickAffiliateProducts({ surface: "listing", locale: "cs", topic: "dlouhovekost" }).length, AFFILIATE_SLOT_COUNTS.listing);
 assert.equal(pickAffiliateProducts({ surface: "newsletter", locale: "de" }).length, AFFILIATE_SLOT_COUNTS.newsletter);
+assert.equal(pickAffiliateProducts({ surface: "articleMid", locale: "cs", article: { title: "Spánek" } }).length, 2);
+{
+  const [lead, rest] = splitHtmlAfterParagraphs("<p>one</p><p>two</p><p>three</p>", 2);
+  assert.ok(lead.includes("two"));
+  assert.ok(rest.includes("three"));
+}
+assert.ok(getAffiliateRedirectDestination("coq10", { locale: "de" })?.includes("amazon.de"));
+assert.ok(getAffiliateRedirectDestination("blue-light-glasses", { locale: "fr" })?.includes("amazon.fr"));
 assert.ok(LONGEVITY_MEDIA_KIT.some((item) => item.id === "native-banner" && item.priceCzk === 5000));
 assert.ok(LONGEVITY_MEDIA_KIT.some((item) => item.id === "sponsored-article" && item.priceCzk === 15000));
 
@@ -387,6 +397,11 @@ file("public/assets/affiliate/bottle.svg");
 file("public/assets/affiliate/device.svg");
 file("public/assets/affiliate/powder.svg");
 file("public/assets/affiliate/wellness.svg");
+file("public/assets/affiliate/glasses.svg");
+file("public/assets/affiliate/blanket.svg");
+file("public/assets/affiliate/coq10.svg");
+file("public/assets/affiliate/grip.svg");
+file("lib/monetization/split-article-html.ts");
 assert.ok(
   readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("HomepageAffiliateShelf"),
   "homepage must show the product shelf above ads"

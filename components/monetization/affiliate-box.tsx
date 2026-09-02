@@ -126,29 +126,52 @@ function AffiliateProductCard({
   const chrome = getArticleChrome(locale);
   const shelf = variant === "shelf";
 
+  if (shelf) {
+    return (
+      <Link
+        href={url}
+        rel="noopener noreferrer sponsored"
+        className="group relative overflow-hidden rounded-2xl border border-[#cfe1f3] bg-[#e8f3fb] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      >
+        <div className="relative aspect-[3/4]">
+          <Image
+            src={product.imageUrl}
+            alt={name}
+            fill
+            sizes="180px"
+            unoptimized
+            className="object-cover transition duration-300 group-hover:scale-[1.04]"
+          />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#021d33]/90 via-[#021d33]/55 to-transparent px-3 pb-3 pt-12">
+            <p className="font-semibold leading-snug text-white">{name}</p>
+            <span className="mt-1 inline-block text-xs font-medium text-white/85 group-hover:underline">
+              {chrome.moreInfo}
+            </span>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
   return (
     <Link
       href={url}
       rel="noopener noreferrer sponsored"
-      className={
-        shelf
-          ? "group overflow-hidden rounded-2xl border border-[#cfe1f3] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-          : "group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-[#005B96]/40 hover:shadow-sm"
-      }
+      className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-[#005B96]/40 hover:shadow-sm"
     >
-      <div className={shelf ? "relative aspect-[4/5] bg-[#e8f3fb]" : "relative aspect-[5/4] bg-[#f4f7fb]"}>
+      <div className="relative aspect-[5/4] bg-[#f4f7fb]">
         <Image
           src={product.imageUrl}
-          alt=""
+          alt={name}
           fill
-          sizes={shelf ? "160px" : "220px"}
+          sizes="220px"
           unoptimized
           className="object-cover transition duration-300 group-hover:scale-[1.03]"
         />
       </div>
-      <div className={shelf ? "px-3 py-3" : "p-3"}>
+      <div className="p-3">
         <p className="font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">{name}</p>
-        {shelf ? null : <p className="mt-1 text-xs leading-relaxed text-slate-600">{description}</p>}
+        <p className="mt-1 text-xs leading-relaxed text-slate-600">{description}</p>
         <span className="mt-2 inline-block text-xs font-medium text-[#005B96] group-hover:underline">
           {chrome.moreInfo}
         </span>
@@ -215,4 +238,16 @@ export function TopicAffiliateBox({
 }) {
   const products = matchAffiliateProducts(article);
   return <AffiliateBox locale={locale} variant="quiet" products={products} />;
+}
+
+/** Two image cards after the first paragraphs — visible, not a hard sell. */
+export function MidArticleAffiliate({
+  locale = "cs",
+  article,
+}: {
+  locale?: GlobalLocaleCode | string;
+  article: RevenueArticle;
+}) {
+  const products = pickAffiliateProducts({ surface: "articleMid", locale, article });
+  return <AffiliateBox locale={locale as GlobalLocaleCode} variant="quiet" products={products} />;
 }

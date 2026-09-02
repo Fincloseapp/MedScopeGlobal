@@ -8,6 +8,8 @@ import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 import { createClient } from "@/lib/supabase/server";
 import { mergedArticleSearch } from "@/utils/merged-article-search";
 import { sanitizeSearchInput } from "@/utils/search";
+import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export async function generateMetadata(): Promise<Metadata> {
   return await buildLocalizedPageMetadata({
@@ -90,6 +92,12 @@ export default async function HledatPage({
             Pro dotaz „{query}“ nebyly nalezeny žádné články.
           </p>
         )}
+
+        {query.length >= 2 ? (
+          <div className="mb-8">
+            <ListingAffiliateBox locale={locale as GlobalLocaleCode} topic={query} />
+          </div>
+        ) : null}
 
         {results.map((article) => (
           <Link

@@ -6,6 +6,8 @@ import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { V20_ARCHIVE_CUTOFF } from "@/lib/v20/content-rules";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { formatPublicDate } from "@/lib/i18n/format-date";
+import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export const revalidate = 300;
 
@@ -40,6 +42,10 @@ export default async function ArticlesArchivePage() {
         Starší obsah (před {cutoffLabel}) a expirované briefy zůstávají dostupné. Jednotlivé články
         načtete přímo přes odkaz nebo vyhledávání.
       </p>
+
+      <div className="mt-8">
+        <ListingAffiliateBox locale={locale as GlobalLocaleCode} />
+      </div>
 
       {articles.length > 0 ? (
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
