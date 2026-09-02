@@ -1,10 +1,9 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { AffiliateProduct } from "@/lib/ecosystem/monetization";
 import { AFFILIATE_PRODUCTS } from "@/lib/ecosystem/monetization";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
-import { getArticleChrome } from "@/lib/i18n/article-chrome";
 import { getRevenueCopy } from "@/lib/i18n/revenue-copy";
+import { affiliateHopCopy } from "@/lib/monetization/affiliate-hop";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import {
@@ -33,7 +32,7 @@ function localizedField(record: Record<string, string>, locale: string): string 
 }
 
 function affiliateHref(productId: string, locale: string, fallbackUrl?: string): string {
-  if (productId) return affiliateGoPath(productId, locale);
+  if (productId) return affiliateGoPath(productId);
   if (!fallbackUrl) return "#";
   try {
     const parsed = new URL(fallbackUrl, "https://medscopeglobal.com");
@@ -128,15 +127,14 @@ function AffiliateProductCard({
   const url = affiliateHref(product.id, locale, localizedField(product.affiliateUrl, locale));
   const name = localizedField(product.name, locale);
   const description = localizedField(product.description, locale);
-  const chrome = getArticleChrome(locale);
+  const cta = affiliateHopCopy(locale).cta;
   const shelf = variant === "shelf";
   const compact = variant === "compact";
 
   if (compact) {
     return (
-      <Link
+      <a
         href={url}
-        rel="noopener noreferrer sponsored"
         className="group flex overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-[#005B96]/40"
       >
         <div className="relative h-20 w-20 shrink-0 bg-[#e8f3fb]">
@@ -144,17 +142,16 @@ function AffiliateProductCard({
         </div>
         <div className="min-w-0 px-3 py-2">
           <p className="font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">{name}</p>
-          <span className="mt-1 inline-block text-xs font-medium text-[#005B96]">{chrome.moreInfo}</span>
+          <span className="mt-1 inline-block text-xs font-medium text-[#005B96]">{cta}</span>
         </div>
-      </Link>
+      </a>
     );
   }
 
   if (shelf) {
     return (
-      <Link
+      <a
         href={url}
-        rel="noopener noreferrer sponsored"
         className="group relative overflow-hidden rounded-2xl border border-[#cfe1f3] bg-[#e8f3fb] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
       >
         <div className="relative aspect-[3/4]">
@@ -169,18 +166,17 @@ function AffiliateProductCard({
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#021d33]/90 via-[#021d33]/55 to-transparent px-3 pb-3 pt-12">
             <p className="font-semibold leading-snug text-white">{name}</p>
             <span className="mt-1 inline-block text-xs font-medium text-white/85 group-hover:underline">
-              {chrome.moreInfo}
+              {cta}
             </span>
           </div>
         </div>
-      </Link>
+      </a>
     );
   }
 
   return (
-    <Link
+    <a
       href={url}
-      rel="noopener noreferrer sponsored"
       className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-[#005B96]/40 hover:shadow-sm"
     >
       <div className="relative aspect-[5/4] bg-[#f4f7fb]">
@@ -197,19 +193,19 @@ function AffiliateProductCard({
         <p className="font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">{name}</p>
         <p className="mt-1 text-xs leading-relaxed text-slate-600">{description}</p>
         <span className="mt-2 inline-block text-xs font-medium text-[#005B96] group-hover:underline">
-          {chrome.moreInfo}
+          {cta}
         </span>
       </div>
-    </Link>
+    </a>
   );
 }
 
 export function LongevityProductsSection({ locale = "cs" }: { locale?: GlobalLocaleCode }) {
-  const chrome = getArticleChrome(locale);
+  const revenue = getRevenueCopy(locale);
   return (
     <AffiliateBox
       locale={locale}
-      title={chrome.recsTitle}
+      title={revenue.affiliateShelfTitle}
       variant="shelf"
       products={pickAffiliateProducts({ surface: "homepage", locale })}
     />

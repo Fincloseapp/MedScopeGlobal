@@ -49,7 +49,7 @@ export function renderNewsletterHtml(layout: V23NewsletterLayout): string {
   const affiliateHtml = pickAffiliateProducts({ surface: "newsletter", locale: "cs" })
     .map((product) => {
       const name = product.name.cs ?? product.name.en ?? product.id;
-      const href = `${SITE.url}${affiliateGoPath(product.id, "cs")}`;
+      const href = `${SITE.url}${affiliateGoPath(product.id, "cs", { carryLocale: true })}`;
       const image = product.imageUrl.startsWith("http")
         ? product.imageUrl
         : `${SITE.url}${product.imageUrl}`;

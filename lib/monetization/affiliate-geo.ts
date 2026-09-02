@@ -671,10 +671,21 @@ export function resolveAffiliateDestination(
   return affiliateDestinationForProduct(parsed.productId, ctx, parsed.market);
 }
 
-/** In-site tracked hop — locale query keeps /go/ on the local storefront. */
-export function affiliateGoPath(productId: string, locale: string): string {
-  const loc = encodeURIComponent(locale || "en");
-  return `/go/${productId}?locale=${loc}`;
+/**
+ * Public card href. Keep it on-site and clean — no Heureka/Amazon query string.
+ * Pass `{ carryLocale: true }` for email, where cookies are missing.
+ */
+export function affiliateGoPath(
+  productId: string,
+  locale?: string,
+  options?: { carryLocale?: boolean }
+): string {
+  const id = String(productId || "").trim().toLowerCase();
+  if (!id) return "/";
+  if (options?.carryLocale && locale) {
+    return `/go/${encodeURIComponent(id)}?locale=${encodeURIComponent(locale)}`;
+  }
+  return `/go/${encodeURIComponent(id)}`;
 }
 
 export function isLocalCheckoutMarket(market: AffiliateMarketId): boolean {

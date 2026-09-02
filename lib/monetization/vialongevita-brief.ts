@@ -113,7 +113,7 @@ function productImageUrl(product: AffiliateProduct): string {
 
 function affiliateCardHtml(product: AffiliateProduct, locale: string, cta: string): string {
   const label = productLabel(product, locale);
-  const go = `${SITE.url}${affiliateGoPath(product.id, locale)}`;
+  const go = `${SITE.url}${affiliateGoPath(product.id, locale, { carryLocale: true })}`;
   const image = productImageUrl(product);
   return `<td style="width:33%;padding:0 6px 8px;vertical-align:top;">
     <a href="${escapeHtml(go)}" style="display:block;text-decoration:none;color:#021d33;">

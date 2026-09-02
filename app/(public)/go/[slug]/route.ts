@@ -2,6 +2,13 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getAffiliateRedirectDestination } from "@/lib/ecosystem/monetization";
 import { fallbackUntrackedHeurekaToAmazonDe } from "@/lib/monetization/affiliate-geo";
+import {
+  isDirectAffiliateHop,
+  productDisplayName,
+  productIdFromGoSlug,
+  productImageForHop,
+  renderAffiliateHopHtml,
+} from "@/lib/monetization/affiliate-hop";
 import { logMonetizationEvent } from "@/lib/monetization/log-event";
 import { LOCALE_COOKIE, REGION_COOKIE } from "@/lib/i18n/config";
 import { resolveLocalePath } from "@/lib/i18n/locale-path";
@@ -25,7 +32,7 @@ function localeFromReferer(referer: string | null): string | null {
   }
 }
 
-/** Tracked affiliate outbound redirect — local marketplace by locale / region. */
+/** In-site hop first; tracking query stays off the public card URL. */
 export async function GET(request: Request, { params }: Params) {
   const { slug } = await params;
   const url = new URL(request.url);
@@ -71,7 +78,26 @@ export async function GET(request: Request, { params }: Params) {
         : "amazon",
   });
 
-  const redirect = NextResponse.redirect(destination, 302);
-  redirect.headers.set("Cache-Control", "private, no-cache, no-store, must-revalidate");
-  return redirect;
+  const noStore = "private, no-cache, no-store, must-revalidate";
+
+  if (isDirectAffiliateHop(url)) {
+    const redirect = NextResponse.redirect(destination, 302);
+    redirect.headers.set("Cache-Control", noStore);
+    return redirect;
+  }
+
+  const productId = productIdFromGoSlug(slug) ?? slug;
+  const html = renderAffiliateHopHtml({
+    destination,
+    locale,
+    productName: productDisplayName(productId, locale),
+    imageUrl: productImageForHop(productId),
+  });
+  return new NextResponse(html, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": noStore,
+    },
+  });
 }

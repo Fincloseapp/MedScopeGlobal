@@ -35,7 +35,7 @@ const COPY: Record<Pack, ArticleChrome> = {
     recsKicker: "ViaLongeVita",
     recsTitle: "Co čtenáři berou dál",
     moreInfo: "Více informací →",
-    sponsored: "Affiliate · Sponzorováno",
+    sponsored: "Doporučeno",
   },
   de: {
     save: "Speichern",
@@ -47,7 +47,7 @@ const COPY: Record<Pack, ArticleChrome> = {
     recsKicker: "ViaLongeVita",
     recsTitle: "Wonach Leser als Nächstes greifen",
     moreInfo: "Mehr erfahren →",
-    sponsored: "Affiliate · Gesponsert",
+    sponsored: "Empfohlen",
   },
   fr: {
     save: "Enregistrer",
@@ -59,7 +59,7 @@ const COPY: Record<Pack, ArticleChrome> = {
     recsKicker: "ViaLongeVita",
     recsTitle: "Ce que les lecteurs cherchent ensuite",
     moreInfo: "En savoir plus →",
-    sponsored: "Affiliation · Sponsorisé",
+    sponsored: "Recommandé",
   },
   en: {
     save: "Save",
@@ -71,7 +71,7 @@ const COPY: Record<Pack, ArticleChrome> = {
     recsKicker: "ViaLongeVita",
     recsTitle: "What readers reach for next",
     moreInfo: "Learn more →",
-    sponsored: "Affiliate · Sponsored",
+    sponsored: "Recommended",
   },
 };
 

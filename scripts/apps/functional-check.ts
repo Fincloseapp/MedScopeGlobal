@@ -31,10 +31,16 @@ import {
 } from "../../lib/monetization/revenue-mix";
 import { NEWSLETTER_SUBSCRIBERS_SQL } from "../../lib/monetization/apply-schema";
 import {
+  affiliateGoPath,
   applyHeurekaTracking,
   fallbackUntrackedHeurekaToAmazonDe,
   AFFILIATE_PRODUCT_IDS,
 } from "../../lib/monetization/affiliate-geo";
+import {
+  affiliateHopCopy,
+  hopHtmlHidesTracking,
+  renderAffiliateHopHtml,
+} from "../../lib/monetization/affiliate-hop";
 import { pickAffiliateProducts, AFFILIATE_SLOT_COUNTS } from "../../lib/monetization/affiliate-mix";
 import { splitHtmlAfterParagraphs } from "../../lib/monetization/split-article-html";
 import { getPayoutReadiness, PAYOUT_CHANNELS } from "../../lib/monetization/payout-map";
@@ -243,6 +249,7 @@ file("app/api/mediprep/test/route.ts");
 file("app/api/apps/qr/route.ts");
 
 file("app/(public)/go/[slug]/route.ts");
+file("lib/monetization/affiliate-hop.ts");
 file("public/assets/affiliate/magnesium.svg");
 file("public/assets/affiliate/omega-test.svg");
 file("public/assets/affiliate/sleep-tracker.svg");
@@ -253,6 +260,31 @@ assert.equal(getAffiliateRedirectDestination("unknown"), null);
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "fr" })?.includes("amazon.fr"));
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "de" })?.includes("amazon.de"));
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "cs" })?.includes("heureka.cz"));
+assert.equal(affiliateGoPath("vitamin-d3-k2", "cs"), "/go/vitamin-d3-k2");
+assert.equal(affiliateGoPath("vitamin-d3-k2", "cs", { carryLocale: true }), "/go/vitamin-d3-k2?locale=cs");
+assert.equal(affiliateHopCopy("cs").cta, "Porovnat ceny");
+{
+  const dest = "https://www.heureka.cz/?h%5Bfraze%5D=vitamin+d3+k2&haff=282255&utm_medium=affiliate";
+  const hop = renderAffiliateHopHtml({
+    destination: dest,
+    locale: "cs",
+    productName: "Vitamin D3 + K2",
+    imageUrl: "/assets/affiliate/d3.svg",
+  });
+  assert.ok(hop.includes("Otevíráme srovnání cen"));
+  assert.ok(hop.includes("ViaLongeVita"));
+  assert.ok(hop.includes("Vitamin D3 + K2"));
+  assert.ok(!hop.includes('href="https://www.heureka.cz'));
+  assert.ok(hopHtmlHidesTracking(hop));
+  assert.ok(hop.includes("haff=282255"), "payload still carries Přímý odkaz for the hop");
+}
+assert.ok(
+  !getRevenueCopy("cs").affiliateDisclosure.toLowerCase().includes("affiliate (heureka"),
+  "public disclosure must not name the affiliate networks first"
+);
+assert.ok(
+  getRevenueCopy("en").affiliateDisclosure.includes("As an Amazon Associate I earn from qualifying purchases.")
+);
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "sk" })?.includes("heureka.sk"));
 {
   const czLive = getAffiliateRedirectDestination("magnesium-glycinate", { locale: "cs" })!;

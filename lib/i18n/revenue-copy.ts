@@ -80,7 +80,7 @@ const COPY: Record<Pack, RevenueCopy> = {
     affiliateShelfKicker: "ViaLongeVita",
     affiliateShelfTitle: "Co čtenáři berou dál",
     affiliateDisclosure:
-      "Odkazy mohou být affiliate (Heureka / Amazon). Nakupujete u prodejce, ne u redakce. Nejde o lékařské doporučení. As an Amazon Associate I earn from qualifying purchases.",
+      "Nákup probíhá u obchodníka, ne u redakce. Z nákupu můžeme dostat provizi. Nejde o lékařské doporučení. As an Amazon Associate I earn from qualifying purchases.",
     tipsFollowup: "Chcete dostávat podobné texty e-mailem?",
     mediaKitEyebrow: "ViaLongeVita · mediakit",
     mediaKitTitle: "Inzerce u čtenářů dlouhověkosti",
@@ -122,7 +122,7 @@ const COPY: Record<Pack, RevenueCopy> = {
     affiliateShelfKicker: "ViaLongeVita",
     affiliateShelfTitle: "Wonach Leser als Nächstes greifen",
     affiliateDisclosure:
-      "Links können Affiliate-Links sein. Kauf beim Händler, nicht bei der Redaktion. Keine medizinische Empfehlung. As an Amazon Associate I earn from qualifying purchases.",
+      "Der Kauf erfolgt beim Händler, nicht bei der Redaktion. Aus dem Kauf kann eine Provision entstehen. Keine medizinische Empfehlung. As an Amazon Associate I earn from qualifying purchases.",
     tipsFollowup: "Ähnliche Texte per E-Mail?",
     mediaKitEyebrow: "ViaLongeVita · Media-Kit",
     mediaKitTitle: "Werbung bei Longevity-Lesern",
@@ -164,7 +164,7 @@ const COPY: Record<Pack, RevenueCopy> = {
     affiliateShelfKicker: "ViaLongeVita",
     affiliateShelfTitle: "Ce que les lecteurs cherchent ensuite",
     affiliateDisclosure:
-      "Les liens peuvent être affiliés. Achat chez le marchand, pas chez la rédaction. Pas un avis médical. As an Amazon Associate I earn from qualifying purchases.",
+      "L’achat se fait chez le commerçant, pas chez la rédaction. Un achat peut générer une commission. Pas un avis médical. As an Amazon Associate I earn from qualifying purchases.",
     tipsFollowup: "Recevoir des textes similaires par e-mail ?",
     mediaKitEyebrow: "ViaLongeVita · kit média",
     mediaKitTitle: "Publicité auprès des lecteurs longévité",
@@ -206,7 +206,7 @@ const COPY: Record<Pack, RevenueCopy> = {
     affiliateShelfKicker: "ViaLongeVita",
     affiliateShelfTitle: "What readers reach for next",
     affiliateDisclosure:
-      "Links may be affiliate. You buy from the retailer, not the newsroom. Not medical advice. As an Amazon Associate I earn from qualifying purchases.",
+      "You buy from the retailer, not the newsroom. A purchase may earn us a commission. Not medical advice. As an Amazon Associate I earn from qualifying purchases.",
     tipsFollowup: "Want similar pieces by email?",
     mediaKitEyebrow: "ViaLongeVita · media kit",
     mediaKitTitle: "Advertise to longevity readers",
