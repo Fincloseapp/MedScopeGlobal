@@ -2,7 +2,6 @@ import { HousePartnerSlot } from "@/components/monetization/house-partner-slot";
 import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
 import { ArticleSubscribeNudge } from "@/components/monetization/article-subscribe-nudge";
 import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
-import { TopLongevityProducts } from "@/components/monetization/affiliate-box";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 type Props = {
@@ -23,7 +22,6 @@ export async function HomepageRevenueMix({ locale, isVip = false }: Props) {
         {!isVip ? <HousePartnerSlot locale={locale} source="home-mid" /> : null}
         {!isVip ? <ArticleSubscribeNudge locale={locale} /> : null}
       </div>
-      <TopLongevityProducts locale={(locale as GlobalLocaleCode) ?? "cs"} />
       <NewsletterCapture locale={locale} source="home" />
       {!isVip ? (
         <GlobalAdSlot

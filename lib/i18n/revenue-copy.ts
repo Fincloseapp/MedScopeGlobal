@@ -35,6 +35,8 @@ export type RevenueCopy = {
   newsletterInvalid: string;
   affiliateKicker: string;
   affiliateTitle: string;
+  affiliateShelfKicker: string;
+  affiliateShelfTitle: string;
   affiliateDisclosure: string;
   tipsFollowup: string;
   mediaKitEyebrow: string;
@@ -75,6 +77,8 @@ const COPY: Record<Pack, RevenueCopy> = {
     newsletterInvalid: "Zadejte platný e-mail.",
     affiliateKicker: "K tomuto textu se hodí",
     affiliateTitle: "Čtenáři u tohoto tématu často hledají",
+    affiliateShelfKicker: "ViaLongeVita",
+    affiliateShelfTitle: "Co čtenáři berou dál",
     affiliateDisclosure:
       "Odkazy mohou být affiliate (Heureka / Amazon). Nakupujete u prodejce, ne u redakce. Nejde o lékařské doporučení. As an Amazon Associate I earn from qualifying purchases.",
     tipsFollowup: "Chcete dostávat podobné texty e-mailem?",
@@ -115,6 +119,8 @@ const COPY: Record<Pack, RevenueCopy> = {
     newsletterInvalid: "Bitte eine gültige E-Mail eingeben.",
     affiliateKicker: "Passend zu diesem Text",
     affiliateTitle: "Wonach Leser bei diesem Thema greifen",
+    affiliateShelfKicker: "ViaLongeVita",
+    affiliateShelfTitle: "Wonach Leser als Nächstes greifen",
     affiliateDisclosure:
       "Links können Affiliate-Links sein. Kauf beim Händler, nicht bei der Redaktion. Keine medizinische Empfehlung. As an Amazon Associate I earn from qualifying purchases.",
     tipsFollowup: "Ähnliche Texte per E-Mail?",
@@ -155,6 +161,8 @@ const COPY: Record<Pack, RevenueCopy> = {
     newsletterInvalid: "Indiquez un e-mail valide.",
     affiliateKicker: "Dans le prolongement de ce texte",
     affiliateTitle: "Ce que les lecteurs cherchent sur ce sujet",
+    affiliateShelfKicker: "ViaLongeVita",
+    affiliateShelfTitle: "Ce que les lecteurs cherchent ensuite",
     affiliateDisclosure:
       "Les liens peuvent être affiliés. Achat chez le marchand, pas chez la rédaction. Pas un avis médical. As an Amazon Associate I earn from qualifying purchases.",
     tipsFollowup: "Recevoir des textes similaires par e-mail ?",
@@ -195,6 +203,8 @@ const COPY: Record<Pack, RevenueCopy> = {
     newsletterInvalid: "Enter a valid email.",
     affiliateKicker: "A natural next step",
     affiliateTitle: "What readers look up after this piece",
+    affiliateShelfKicker: "ViaLongeVita",
+    affiliateShelfTitle: "What readers reach for next",
     affiliateDisclosure:
       "Links may be affiliate. You buy from the retailer, not the newsroom. Not medical advice. As an Amazon Associate I earn from qualifying purchases.",
     tipsFollowup: "Want similar pieces by email?",
@@ -233,36 +243,46 @@ export function getRevenueCopy(locale?: string | null): RevenueCopy {
 
 function affiliateOverlay(
   locale?: string | null
-): Partial<Pick<RevenueCopy, "affiliateKicker" | "affiliateTitle">> {
+): Partial<Pick<RevenueCopy, "affiliateKicker" | "affiliateTitle" | "affiliateShelfKicker" | "affiliateShelfTitle">> {
   const primary = primaryArticleLocale(normalizeLocale(locale ?? "en"));
   if (primary === "sk") {
     return {
       affiliateKicker: "K tomuto textu sa hodí",
       affiliateTitle: "Čitatelia pri tejto téme často hľadajú",
+      affiliateShelfKicker: "ViaLongeVita",
+      affiliateShelfTitle: "Čo čitatelia berú ďalej",
     };
   }
   if (primary === "pl") {
     return {
       affiliateKicker: "Pasuje do tego tekstu",
       affiliateTitle: "Czego szukają czytelnicy przy tym temacie",
+      affiliateShelfKicker: "ViaLongeVita",
+      affiliateShelfTitle: "Po co sięgają czytelnicy dalej",
     };
   }
   if (primary === "it") {
     return {
       affiliateKicker: "In linea con questo testo",
       affiliateTitle: "Cosa cercano i lettori su questo tema",
+      affiliateShelfKicker: "ViaLongeVita",
+      affiliateShelfTitle: "Cosa scelgono i lettori dopo",
     };
   }
   if (primary === "es") {
     return {
       affiliateKicker: "En la línea de este texto",
       affiliateTitle: "Lo que buscan los lectores en este tema",
+      affiliateShelfKicker: "ViaLongeVita",
+      affiliateShelfTitle: "Lo que los lectores eligen después",
     };
   }
   if (primary === "ja") {
     return {
       affiliateKicker: "この記事の続きとして",
       affiliateTitle: "読者がこのテーマでよく探すもの",
+      affiliateShelfKicker: "ViaLongeVita",
+      affiliateShelfTitle: "読者が次に手に取るもの",
     };
   }
   return {};

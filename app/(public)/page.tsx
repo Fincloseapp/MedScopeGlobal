@@ -7,6 +7,7 @@ import {
 } from "@/components/v271/homepage-sections";
 import { HomepageLongevityStrip } from "@/components/v271/homepage-longevity-strip";
 import { PortalHome } from "@/components/v271/portal-home";
+import { HomepageAffiliateShelf } from "@/components/monetization/affiliate-box";
 import { HomepageRevenueMix } from "@/components/monetization/homepage-revenue-mix";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { medicalWebPageJsonLd, webSiteJsonLd, softwareApplicationJsonLd } from "@/lib/seo/json-ld";
@@ -101,6 +102,7 @@ export default async function HomePage() {
       {/* Story: ViaLongeVita hero → magazín → apps/VIP → CTA (PortalHome). Pricing lives on /predplatne — not duplicated under the portal. */}
       <PortalHome articles={articles} copy={philosophy} locale={locale} />
       <HomepageLongevityStrip articles={articles} locale={locale} />
+      <HomepageAffiliateShelf locale={locale} />
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
       <HomepageRevenueMix locale={locale} isVip={isVip} />
       <V272WhyTrustBlock locale={locale} />

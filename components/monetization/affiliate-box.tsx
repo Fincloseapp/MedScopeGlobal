@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { AffiliateProduct } from "@/lib/ecosystem/monetization";
 import { AFFILIATE_PRODUCTS } from "@/lib/ecosystem/monetization";
@@ -13,11 +14,14 @@ import {
 import { affiliateGoPath } from "@/lib/monetization/affiliate-geo";
 import { pickAffiliateProducts } from "@/lib/monetization/affiliate-mix";
 
+type Variant = "quiet" | "shelf";
+
 type Props = {
   locale?: GlobalLocaleCode;
   category?: AffiliateProduct["category"];
   title?: string;
   products?: AffiliateProduct[];
+  variant?: Variant;
 };
 
 function localizedField(record: Record<string, string>, locale: string): string {
@@ -42,23 +46,64 @@ function affiliateHref(productId: string, locale: string, fallbackUrl?: string):
   return fallbackUrl;
 }
 
-export function AffiliateBox({ locale = "cs", category, title, products: productsProp }: Props) {
+export function AffiliateBox({
+  locale = "cs",
+  category,
+  title,
+  products: productsProp,
+  variant = "quiet",
+}: Props) {
   const products =
     productsProp ?? AFFILIATE_PRODUCTS.filter((p) => !category || p.category === category);
   const revenue = getRevenueCopy(locale);
-  const heading = title ?? revenue.affiliateTitle;
+  const heading =
+    title ?? (variant === "shelf" ? revenue.affiliateShelfTitle : revenue.affiliateTitle);
+  const kicker = variant === "shelf" ? revenue.affiliateShelfKicker : revenue.affiliateKicker;
 
   if (!products.length) return null;
 
+  const shelf = variant === "shelf";
+
   return (
-    <section className="my-8 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-5">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-        {revenue.affiliateKicker}
+    <section
+      className={
+        shelf
+          ? "my-2"
+          : "my-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+      }
+    >
+      <p
+        className={
+          shelf
+            ? "text-[11px] font-semibold uppercase tracking-[0.2em] text-[#005B96]"
+            : "text-[10px] font-semibold uppercase tracking-wider text-slate-500"
+        }
+      >
+        {kicker}
       </p>
-      <h3 className="mt-1 font-display text-lg font-semibold text-[#021d33]">{heading}</h3>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+      <h3
+        className={
+          shelf
+            ? "mt-1 font-display text-2xl font-semibold text-[#021d33]"
+            : "mt-1 font-display text-lg font-semibold text-[#021d33]"
+        }
+      >
+        {heading}
+      </h3>
+      <div
+        className={
+          shelf
+            ? "mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6"
+            : "mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+        }
+      >
         {products.map((product) => (
-          <AffiliateProductCard key={product.id} product={product} locale={locale} />
+          <AffiliateProductCard
+            key={product.id}
+            product={product}
+            locale={locale}
+            variant={variant}
+          />
         ))}
       </div>
       <p className="mt-3 text-[11px] leading-relaxed text-slate-500">{revenue.affiliateDisclosure}</p>
@@ -69,26 +114,45 @@ export function AffiliateBox({ locale = "cs", category, title, products: product
 function AffiliateProductCard({
   product,
   locale,
+  variant,
 }: {
   product: AffiliateProduct;
   locale: GlobalLocaleCode;
+  variant: Variant;
 }) {
   const url = affiliateHref(product.id, locale, localizedField(product.affiliateUrl, locale));
   const name = localizedField(product.name, locale);
   const description = localizedField(product.description, locale);
   const chrome = getArticleChrome(locale);
+  const shelf = variant === "shelf";
 
   return (
     <Link
       href={url}
       rel="noopener noreferrer sponsored"
-      className="group rounded-xl border border-emerald-200 bg-white p-4 shadow-sm transition hover:shadow-md"
+      className={
+        shelf
+          ? "group overflow-hidden rounded-2xl border border-[#cfe1f3] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          : "group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-[#005B96]/40 hover:shadow-sm"
+      }
     >
-      <p className="font-semibold text-[#021d33] group-hover:text-emerald-700">{name}</p>
-      <p className="mt-1 text-xs text-slate-600">{description}</p>
-      <span className="mt-2 inline-block text-xs font-medium text-emerald-600 group-hover:underline">
-        {chrome.moreInfo}
-      </span>
+      <div className={shelf ? "relative aspect-[4/5] bg-[#e8f3fb]" : "relative aspect-[5/4] bg-[#f4f7fb]"}>
+        <Image
+          src={product.imageUrl}
+          alt=""
+          fill
+          sizes={shelf ? "160px" : "220px"}
+          unoptimized
+          className="object-cover transition duration-300 group-hover:scale-[1.03]"
+        />
+      </div>
+      <div className={shelf ? "px-3 py-3" : "p-3"}>
+        <p className="font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">{name}</p>
+        {shelf ? null : <p className="mt-1 text-xs leading-relaxed text-slate-600">{description}</p>}
+        <span className="mt-2 inline-block text-xs font-medium text-[#005B96] group-hover:underline">
+          {chrome.moreInfo}
+        </span>
+      </div>
     </Link>
   );
 }
@@ -99,18 +163,30 @@ export function LongevityProductsSection({ locale = "cs" }: { locale?: GlobalLoc
     <AffiliateBox
       locale={locale}
       title={chrome.recsTitle}
+      variant="shelf"
       products={pickAffiliateProducts({ surface: "homepage", locale })}
     />
   );
 }
 
-/** Rotating mix for homepage / magazine rails — never the full catalogue. */
 export function TopLongevityProducts({ locale = "cs" }: { locale?: GlobalLocaleCode }) {
   return (
     <AffiliateBox
       locale={locale}
+      variant="shelf"
       products={pickAffiliateProducts({ surface: "homepage", locale })}
     />
+  );
+}
+
+/** High-visibility homepage rail — after editorial, before display ads. */
+export function HomepageAffiliateShelf({ locale = "cs" }: { locale?: GlobalLocaleCode | string }) {
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <div className="rounded-xl border border-[#cfe1f3] bg-gradient-to-b from-[#e8f3fb] via-white to-white px-5 py-6 sm:px-7">
+        <TopLongevityProducts locale={locale as GlobalLocaleCode} />
+      </div>
+    </div>
   );
 }
 
@@ -124,12 +200,12 @@ export function ListingAffiliateBox({
   return (
     <AffiliateBox
       locale={locale as GlobalLocaleCode}
+      variant="quiet"
       products={pickAffiliateProducts({ surface: "listing", locale, topic })}
     />
   );
 }
 
-/** Topic-matched affiliate — at most two products for the article. */
 export function TopicAffiliateBox({
   locale = "cs",
   article,
@@ -138,5 +214,5 @@ export function TopicAffiliateBox({
   article: RevenueArticle;
 }) {
   const products = matchAffiliateProducts(article);
-  return <AffiliateBox locale={locale} products={products} />;
+  return <AffiliateBox locale={locale} variant="quiet" products={products} />;
 }

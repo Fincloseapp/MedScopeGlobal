@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { V20ArticleCard } from "@/components/v20/article-card";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { getReaderContext } from "@/lib/auth/reader-context";
@@ -55,6 +57,10 @@ export default async function AktualniZpravyPage() {
         {articles.map((a) => (
           <V20ArticleCard key={a.slug} article={a} />
         ))}
+      </div>
+
+      <div className="mt-8">
+        <ListingAffiliateBox locale={locale as GlobalLocaleCode} topic="dlouhovekost" />
       </div>
 
       {articles.length === 0 && (

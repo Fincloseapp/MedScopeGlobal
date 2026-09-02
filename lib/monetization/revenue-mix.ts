@@ -82,7 +82,7 @@ export function shouldShowHousePartner(surface: RevenueSurface, isVip: boolean):
   return surface === "public" && !isVip;
 }
 
-/** Topic + rotating high-EPC filler — 3 on articles, never the full catalogue. */
+/** Topic + rotating high-EPC filler — never dump the full catalogue. */
 export function matchAffiliateProductIds(article: RevenueArticle): string[] {
   return pickAffiliateProductIds({ surface: "article", article });
 }

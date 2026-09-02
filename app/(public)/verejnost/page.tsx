@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { DailyTipBanner } from "@/components/verejnost/daily-tip-banner";
 import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-disclaimer";
 import { VerejnostArticleCard } from "@/components/verejnost/verejnost-article-card";
@@ -163,6 +165,10 @@ export default async function VerejnostHubPage() {
             })}
           </div>
         </section>
+
+        <div className="mt-12">
+          <ListingAffiliateBox locale={locale as GlobalLocaleCode} topic="dlouhovekost" />
+        </div>
 
         <section className="mt-12">
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">

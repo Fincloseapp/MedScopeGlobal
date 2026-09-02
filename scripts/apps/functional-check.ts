@@ -231,7 +231,9 @@ assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "sk" 
   assert.ok(czLive.includes("amazon.de"), "CZ must earn on Amazon.de until Heureka position ID exists");
   assert.ok(czLive.includes("language=cs"), "Amazon.de must use the Czech UI for CZ readers");
   assert.ok(getAffiliateRedirectDestination("creatine-monohydrate", { locale: "de" })?.includes("amazon.de"));
-  assert.equal(AFFILIATE_PRODUCT_IDS.length, 10);
+  assert.ok(getAffiliateRedirectDestination("protein-powder", { locale: "fr" })?.includes("amazon.fr"));
+  assert.ok(getAffiliateRedirectDestination("yoga-mat", { locale: "it" })?.includes("amazon.it"));
+  assert.equal(AFFILIATE_PRODUCT_IDS.length, 16);
 }
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "it" })?.includes("amazon.it"));
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "es" })?.includes("amazon.es"));
@@ -356,8 +358,13 @@ assert.equal(shouldShowPublicSubscribeNudge("public", true), false);
 }
 assert.ok(matchAffiliateProductIds({ title: "Vitamin D3 v zimě", slug: "vitamin-d3" }).includes("vitamin-d3-k2"));
 assert.ok(matchAffiliateProductIds({ title: "Sommeil et HRV", slug: "sommeil" }).includes("sleep-tracker"));
+assert.equal(AFFILIATE_SLOT_COUNTS.homepage, 6);
+assert.equal(AFFILIATE_SLOT_COUNTS.article, 4);
+assert.equal(AFFILIATE_SLOT_COUNTS.listing, 4);
+assert.equal(AFFILIATE_SLOT_COUNTS.newsletter, 3);
 assert.equal(pickAffiliateProducts({ surface: "homepage", locale: "fr" }).length, AFFILIATE_SLOT_COUNTS.homepage);
 assert.equal(pickAffiliateProducts({ surface: "listing", locale: "cs", topic: "dlouhovekost" }).length, AFFILIATE_SLOT_COUNTS.listing);
+assert.equal(pickAffiliateProducts({ surface: "newsletter", locale: "de" }).length, AFFILIATE_SLOT_COUNTS.newsletter);
 assert.ok(LONGEVITY_MEDIA_KIT.some((item) => item.id === "native-banner" && item.priceCzk === 5000));
 assert.ok(LONGEVITY_MEDIA_KIT.some((item) => item.id === "sponsored-article" && item.priceCzk === 15000));
 
@@ -375,6 +382,21 @@ file("app/api/newsletter/unsubscribe/route.ts");
 file("lib/monetization/affiliate-geo.ts");
 file("lib/i18n/newsletter-copy.ts");
 file("lib/monetization/vialongevita-brief.ts");
+file("public/assets/affiliate/supplement.svg");
+file("public/assets/affiliate/bottle.svg");
+file("public/assets/affiliate/device.svg");
+file("public/assets/affiliate/powder.svg");
+file("public/assets/affiliate/wellness.svg");
+assert.ok(
+  readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("HomepageAffiliateShelf"),
+  "homepage must show the product shelf above ads"
+);
+assert.ok(
+  !readFileSync(join(root, "components/monetization/homepage-revenue-mix.tsx"), "utf8").includes(
+    "TopLongevityProducts"
+  ),
+  "homepage must not repeat the product rail below ads"
+);
 assert.ok(NEWSLETTER_SUBSCRIBERS_SQL.includes("newsletter_subscribers"));
 assert.ok(NEWSLETTER_SUBSCRIBERS_SQL.includes("create table if not exists"));
 assert.ok(NEWSLETTER_SUBSCRIBERS_SQL.includes("unsubscribed_at"));

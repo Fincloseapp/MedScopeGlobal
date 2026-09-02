@@ -14,12 +14,13 @@ export type MixArticle = {
   category?: string | null;
 };
 
-export type AffiliateSurface = "article" | "homepage" | "listing";
+export type AffiliateSurface = "article" | "homepage" | "listing" | "newsletter";
 
 export const AFFILIATE_SLOT_COUNTS: Record<AffiliateSurface, number> = {
-  article: 3,
-  homepage: 4,
-  listing: 3,
+  article: 4,
+  homepage: 6,
+  listing: 4,
+  newsletter: 3,
 };
 
 /** Relative EPC / AOV heuristic — wearables and devices first, then staples, then volume add-ons. */
@@ -34,6 +35,12 @@ export const PRODUCT_WEIGHT: Record<string, number> = {
   "electrolyte-powder": 5,
   "resistance-bands": 4,
   "sleep-mask": 4,
+  "protein-powder": 6,
+  probiotic: 5,
+  zinc: 5,
+  "foam-roller": 4,
+  "yoga-mat": 4,
+  "glass-water-bottle": 3,
 };
 
 const CATEGORY_OF: Record<string, AffiliateProduct["category"]> = Object.fromEntries(
@@ -94,6 +101,23 @@ export function topicMatchedProductIds(article?: MixArticle | null, topic?: stri
   if (/pohyb|exercise|fitness|workout|posilov|resistance|jóga|joga|yoga/.test(text)) {
     push("resistance-bands");
     push("creatine-monohydrate");
+    push("yoga-mat");
+    push("foam-roller");
+  }
+  if (/protein|bílkovin|bilkovin|svalov|regener/.test(text)) {
+    push("protein-powder");
+    push("creatine-monohydrate");
+  }
+  if (/střev|strev|gut|mikrobiom|probiot|digest/.test(text)) {
+    push("probiotic");
+  }
+  if (/\bzinek\b|\bzinc\b|imunit/.test(text)) {
+    push("zinc");
+    push("vitamin-d3-k2");
+  }
+  if (/hydrat|voda|water|lahev|flasche|bouteille/.test(text)) {
+    push("glass-water-bottle");
+    push("electrolyte-powder");
   }
   if (
     article &&

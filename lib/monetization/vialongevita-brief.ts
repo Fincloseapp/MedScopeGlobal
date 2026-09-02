@@ -14,8 +14,8 @@ import {
   affiliateGoPath,
   resolveAffiliateMarket,
 } from "@/lib/monetization/affiliate-geo";
-import { matchAffiliateProductIds, type RevenueArticle } from "@/lib/monetization/revenue-mix";
-import { AFFILIATE_PRODUCTS } from "@/lib/ecosystem/monetization";
+import { pickAffiliateProducts } from "@/lib/monetization/affiliate-mix";
+import type { AffiliateProduct } from "@/lib/ecosystem/monetization";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 
 const FROM_NAME = MAGAZINE.name;
@@ -93,12 +93,10 @@ function articleHref(locale: string, slug: string): string {
   return `${SITE.url}${buildLocalePath(locale, `/article/${slug}`)}`;
 }
 
-function productLabel(productId: string, locale: string): { name: string; description: string } {
-  const product = AFFILIATE_PRODUCTS.find((row) => row.id === productId);
-  if (!product) return { name: productId, description: "" };
+function productLabel(product: AffiliateProduct, locale: string): { name: string; description: string } {
   const primary = primaryArticleLocale(normalizeLocale(locale));
   const name =
-    product.name[locale] ?? product.name[primary] ?? product.name.en ?? product.name.cs ?? productId;
+    product.name[locale] ?? product.name[primary] ?? product.name.en ?? product.name.cs ?? product.id;
   const description =
     product.description[locale] ??
     product.description[primary] ??
@@ -106,6 +104,25 @@ function productLabel(productId: string, locale: string): { name: string; descri
     product.description.cs ??
     "";
   return { name, description };
+}
+
+function productImageUrl(product: AffiliateProduct): string {
+  if (product.imageUrl.startsWith("http")) return product.imageUrl;
+  return `${SITE.url}${product.imageUrl}`;
+}
+
+function affiliateCardHtml(product: AffiliateProduct, locale: string, cta: string): string {
+  const label = productLabel(product, locale);
+  const go = `${SITE.url}${affiliateGoPath(product.id, locale)}`;
+  const image = productImageUrl(product);
+  return `<td style="width:33%;padding:0 6px 8px;vertical-align:top;">
+    <a href="${escapeHtml(go)}" style="display:block;text-decoration:none;color:#021d33;">
+      <img src="${escapeHtml(image)}" alt="" width="160" height="200" style="display:block;width:100%;height:auto;border-radius:12px;border:1px solid #cfe1f3;background:#e8f3fb;" />
+      <p style="margin:10px 0 4px;font-size:14px;font-weight:600;line-height:1.3;">${escapeHtml(label.name)}</p>
+      <p style="margin:0 0 8px;font-size:12px;line-height:1.4;color:#475569;">${escapeHtml(label.description)}</p>
+      <span style="font-size:12px;color:#005B96;">${escapeHtml(cta)} →</span>
+    </a>
+  </td>`;
 }
 
 function emailShell(locale: string, inner: string): { html: string; text: string } {
@@ -142,12 +159,25 @@ export async function sendViaLongeVitaWelcome(input: {
   const copy = getNewsletterCopy(input.locale);
   const home = magazineHome(input.locale);
   const unsub = newsletterUnsubUrl(input.email, input.locale);
+  const welcomeProducts = pickAffiliateProducts({
+    surface: "newsletter",
+    locale: input.locale,
+  }).slice(0, 2);
+  const welcomeCards = welcomeProducts
+    .map((product) => affiliateCardHtml(product, input.locale, copy.briefAffiliateCta))
+    .join("");
   const inner = `
     <p style="margin:0 0 12px;font-size:18px;">${escapeHtml(copy.welcomeIntro)}</p>
     <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#334155;">${escapeHtml(copy.welcomeBody)}</p>
     <p style="margin:0 0 24px;">
       <a href="${escapeHtml(home)}" style="display:inline-block;background:#005B96;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:999px;font-size:14px;">${escapeHtml(copy.welcomeCta)}</a>
     </p>
+    ${
+      welcomeCards
+        ? `<p style="margin:0 0 8px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#005B96;">${escapeHtml(copy.briefAffiliateKicker)}</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px;"><tr>${welcomeCards}</tr></table>`
+        : ""
+    }
     <p style="margin:0;font-size:12px;color:#64748b;">
       <a href="${escapeHtml(unsub)}" style="color:#64748b;">${escapeHtml(copy.unsub)}</a>
     </p>`;
@@ -164,21 +194,23 @@ export async function sendViaLongeVitaWelcome(input: {
   return result.ok;
 }
 
-function pickAffiliateId(articles: BriefArticle[]): string {
-  const hay: RevenueArticle = {
-    title: articles.map((a) => a.title).join(" "),
-    excerpt: articles.map((a) => a.excerpt ?? "").join(" "),
-    slug: articles.map((a) => a.slug).join(" "),
-    public_topic: articles.map((a) => a.public_topic ?? "").join(" "),
-  };
-  return matchAffiliateProductIds(hay)[0] ?? "magnesium-glycinate";
+function pickBriefProducts(articles: BriefArticle[], locale: string) {
+  return pickAffiliateProducts({
+    surface: "newsletter",
+    locale,
+    article: {
+      title: articles.map((a) => a.title).join(" "),
+      excerpt: articles.map((a) => a.excerpt ?? "").join(" "),
+      slug: articles.map((a) => a.slug).join(" "),
+      public_topic: articles.map((a) => a.public_topic ?? "").join(" "),
+    },
+  });
 }
 
 function briefHtml(locale: string, email: string, articles: BriefArticle[]): { subject: string; html: string; text: string } {
   const copy = getNewsletterCopy(locale);
-  const productId = pickAffiliateId(articles);
-  const label = productLabel(productId, locale);
-  const go = `${SITE.url}${affiliateGoPath(productId, locale)}`;
+  const products = pickBriefProducts(articles, locale);
+  const cards = products.map((product) => affiliateCardHtml(product, locale, copy.briefAffiliateCta)).join("");
   const unsub = newsletterUnsubUrl(email, locale);
   const market = resolveAffiliateMarket({ locale });
 
@@ -196,11 +228,9 @@ function briefHtml(locale: string, email: string, articles: BriefArticle[]): { s
   const inner = `
     <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">${escapeHtml(copy.briefIntro)}</p>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${items}</table>
-    <div style="margin:8px 0 20px;padding:16px;border:1px solid #bbf7d0;background:#f0fdf4;border-radius:12px;">
-      <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#047857;">${escapeHtml(copy.briefAffiliateKicker)}</p>
-      <p style="margin:0 0 6px;font-size:16px;font-weight:600;">${escapeHtml(label.name)}</p>
-      <p style="margin:0 0 12px;font-size:13px;color:#475569;">${escapeHtml(label.description)}</p>
-      <a href="${escapeHtml(go)}" style="color:#047857;font-size:14px;">${escapeHtml(copy.briefAffiliateCta)} →</a>
+    <div style="margin:8px 0 20px;padding:16px;border:1px solid #cfe1f3;background:#f4f8fc;border-radius:12px;">
+      <p style="margin:0 0 10px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#005B96;">${escapeHtml(copy.briefAffiliateKicker)}</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${cards}</tr></table>
       <p style="margin:10px 0 0;font-size:11px;color:#64748b;">${escapeHtml(market)}</p>
     </div>
     <p style="margin:0;font-size:12px;color:#64748b;">
