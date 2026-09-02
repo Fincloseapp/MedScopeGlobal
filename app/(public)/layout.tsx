@@ -1,6 +1,5 @@
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeaderWithConversion } from "@/components/v38/site-header-with-conversion";
-import { AdSenseHead } from "@/components/monetization/adsense-head";
 import { resolveConversionCopy } from "@/lib/v38/conversion-engine";
 import { REGIONS } from "@/lib/i18n/config";
 import { getServerLocale } from "@/lib/i18n/server-locale";
@@ -21,7 +20,6 @@ export default async function PublicLayout({
 
   return (
     <div className="flex min-h-screen flex-col bg-background" lang={locale}>
-      <AdSenseHead />
       <SiteHeaderWithConversion
         categories={categories}
         locale={locale}

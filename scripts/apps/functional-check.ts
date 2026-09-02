@@ -809,7 +809,14 @@ assert.ok(
   "AdSense head must stay off when pathname is missing or blocked"
 );
 assert.ok(
-  readFileSync(join(root, "app/(public)/layout.tsx"), "utf8").includes("AdSenseHead")
+  readFileSync(join(root, "app/layout.tsx"), "utf8").includes("AdSenseHead"),
+  "official AdSense snippet must sit in the document head"
+);
+assert.ok(
+  !readFileSync(join(root, "components/monetization/adsense-head.tsx"), "utf8").includes(
+    "next/script"
+  ),
+  "do not hide the snippet behind Next.js Script preload"
 );
 assert.ok(
   !readFileSync(join(root, "components/analytics/consent-scripts.tsx"), "utf8").includes(
