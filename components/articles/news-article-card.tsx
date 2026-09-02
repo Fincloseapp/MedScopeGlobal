@@ -31,7 +31,7 @@ function coverOf(article: DisplayArticle) {
 function kickerOf(article: DisplayArticle, locale = "cs"): string {
   const surface = getSurfaceCopy(locale);
   const agent = resolveWriterAgent(article);
-  if (agent) return surface.writers[agent.id]?.topicLabel ?? agent.topicLabel;
+  if (agent) return surface.writers[agent.deskId]?.topicLabel ?? agent.topicLabel;
   const desk = newsDesksForLocale(locale).find((item) => item.id === classifyNewsDesk(article));
   return article.categories?.name ?? desk?.label ?? surface.newsroom;
 }

@@ -89,6 +89,7 @@ import {
 import { shouldBlockBot } from "../../lib/v30/security/bot-shield";
 import { V20_NZIP_CATEGORIES } from "../../lib/v20/categories";
 import { getRevenueCopy } from "../../lib/i18n/revenue-copy";
+import { getSurfaceCopy } from "../../lib/i18n/surface-copy";
 import {
   parseHeurekaPositionId,
   heurekaHopHtml,
@@ -1858,6 +1859,12 @@ assert.equal(
   resolveWriterAgent({ metadata: { writer_id: "writer3-trends" } })?.topic,
   "prevence"
 );
+{
+  const specialist = resolveWriterAgent({ metadata: { writer_id: "writer1-trends" } });
+  assert.ok(specialist);
+  assert.equal(specialist.deskId, "writer1");
+  assert.equal(getSurfaceCopy("cs").writers[specialist.deskId].topicLabel, "Životní styl");
+}
 assert.equal(
   resolveWriterAgent({ metadata: { writer_id: "writer1" } })?.deskId,
   "writer1"
