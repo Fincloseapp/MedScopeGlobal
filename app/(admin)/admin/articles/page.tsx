@@ -10,11 +10,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminReadClient } from "@/lib/auth/require-admin-access";
 import type { Article } from "@/types/database";
 
 export default async function AdminArticlesPage() {
-  const supabase = await createClient();
+  const supabase = await createAdminReadClient();
   const { data, error } = await supabase
     .from("articles")
     .select(
@@ -38,14 +38,14 @@ export default async function AdminArticlesPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl font-bold text-medical-navy">
-            Articles
+            Články
           </h1>
           <p className="text-muted-foreground">
-            Draft, publish, and route clinical coverage.
+            Koncepty, publikace a zařazení do kategorií.
           </p>
         </div>
         <Button asChild>
-          <Link href="/admin/articles/new">New article</Link>
+          <Link href="/admin/articles/new">Nový článek</Link>
         </Button>
       </div>
 
@@ -53,10 +53,10 @@ export default async function AdminArticlesPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>Titulek</TableHead>
+              <TableHead>Kategorie</TableHead>
+              <TableHead>Stav</TableHead>
+              <TableHead className="text-right">Akce</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -74,7 +74,7 @@ export default async function AdminArticlesPage() {
                       value={(!article.published).toString()}
                     />
                     <Button type="submit" variant="outline" size="sm">
-                      {article.published ? "Published" : "Draft"}
+                      {article.published ? "Publikováno" : "Koncept"}
                     </Button>
                   </form>
                 </TableCell>
@@ -108,7 +108,7 @@ export default async function AdminArticlesPage() {
         </Table>
         {articles.length === 0 && (
           <p className="p-6 text-sm text-muted-foreground">
-            No articles yet. Create your first briefing.
+            Zatím žádné články. Vytvořte první.
           </p>
         )}
       </div>

@@ -28,7 +28,7 @@ export default async function AdminLayout({
             <MedScopeLogo href="/admin" preset="admin-sidebar" />
           </div>
           <Button variant="outline" size="sm" asChild>
-            <Link href="/">View site</Link>
+            <Link href="/">Otevřít web</Link>
           </Button>
         </header>
         <div className="flex flex-1 justify-center px-4 py-8 sm:px-6 lg:ml-0">

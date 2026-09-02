@@ -38,6 +38,21 @@ import {
 import { pickAffiliateProducts, AFFILIATE_SLOT_COUNTS } from "../../lib/monetization/affiliate-mix";
 import { splitHtmlAfterParagraphs } from "../../lib/monetization/split-article-html";
 import { getPayoutReadiness, PAYOUT_CHANNELS } from "../../lib/monetization/payout-map";
+import {
+  ADMIN_NAV_GROUPS,
+  ADMIN_NAV_ITEMS,
+} from "../../components/admin/admin-nav-config";
+import { isAdminNavActive } from "../../lib/admin/nav-active";
+import { aggregateAffiliateClicks } from "../../lib/admin/click-stats";
+import {
+  DESK_SLUGS,
+  EDITORIAL_TAXONOMY,
+  SPECIALTY_SLUGS,
+  classifyCategoryRow,
+  missingEditorialSlugs,
+  slugifyCategory,
+} from "../../lib/admin/taxonomy";
+import { V20_NZIP_CATEGORIES } from "../../lib/v20/categories";
 import { getRevenueCopy } from "../../lib/i18n/revenue-copy";
 import {
   parseHeurekaPositionId,
@@ -316,7 +331,56 @@ assert.ok(
   getRevenueCopy("en").affiliateDisclosure.includes("As an Amazon Associate I earn from qualifying purchases.")
 );
 file("app/(admin)/admin/vydelky/page.tsx");
+file("app/(admin)/admin/page.tsx");
+file("app/(admin)/admin/categories/page.tsx");
+file("lib/admin/taxonomy.ts");
+file("lib/admin/overview.ts");
+file("lib/auth/require-admin-access.ts");
 file("lib/monetization/payout-map.ts");
+
+{
+  const hrefs = ADMIN_NAV_GROUPS.flatMap((group) => group.items.map((item) => item.href));
+  assert.equal(new Set(hrefs).size, hrefs.length, "admin nav hrefs must be unique");
+  assert.equal(ADMIN_NAV_ITEMS.length, hrefs.length);
+  assert.ok(hrefs.includes("/admin/categories"));
+  assert.ok(hrefs.includes("/admin/vydelky"));
+  assert.ok(hrefs.includes("/admin/revenue"));
+  assert.ok(hrefs.includes("/admin/articles"));
+  assert.equal(isAdminNavActive("/admin/ads-public", "/admin/ads"), false);
+  assert.equal(isAdminNavActive("/admin/ads", "/admin/ads"), true);
+  assert.equal(isAdminNavActive("/admin/articles/new", "/admin/articles"), true);
+  assert.equal(isAdminNavActive("/admin", "/admin"), true);
+  assert.equal(isAdminNavActive("/admin/categories", "/admin"), false);
+}
+
+assert.equal(slugifyCategory("Dlouhověkost"), "dlouhovekost");
+assert.equal(slugifyCategory("Revmatologie"), "revmatologie");
+assert.ok(EDITORIAL_TAXONOMY.some((item) => item.slug === "dlouhovekost"));
+assert.ok(EDITORIAL_TAXONOMY.some((item) => item.slug === "kardiologie"));
+assert.ok(EDITORIAL_TAXONOMY.some((item) => item.slug === "cardiology"));
+for (const desk of V20_NZIP_CATEGORIES) {
+  assert.ok(DESK_SLUGS.has(desk.slug), `missing desk ${desk.slug}`);
+}
+assert.ok(SPECIALTY_SLUGS.has("rheumatology"));
+assert.equal(classifyCategoryRow({ slug: "kardiologie", published: 0, drafts: 0 }), "editorial-empty");
+assert.equal(classifyCategoryRow({ slug: "kardiologie", published: 2, drafts: 1 }), "editorial-used");
+assert.equal(classifyCategoryRow({ slug: "cardiology", published: 0, drafts: 3 }), "drafts-only");
+assert.deepEqual(missingEditorialSlugs(["kardiologie"]), EDITORIAL_TAXONOMY.filter((item) => item.slug !== "kardiologie").map((item) => item.slug));
+{
+  const now = Date.parse("2026-09-02T12:00:00.000Z");
+  const stats = aggregateAffiliateClicks(
+    [
+      { slug: "magnesium-glycinate", createdAt: "2026-09-01T12:00:00.000Z" },
+      { slug: "magnesium-glycinate", createdAt: "2026-08-20T12:00:00.000Z" },
+      { slug: "sleep-tracker", createdAt: "2026-07-01T12:00:00.000Z" },
+    ],
+    now
+  );
+  assert.equal(stats.last7, 1);
+  assert.equal(stats.last30, 2);
+  assert.equal(stats.top[0]?.slug, "magnesium-glycinate");
+  assert.equal(stats.top[0]?.count, 2);
+}
 file("lib/monetization/heureka-affiliate.ts");
 file("supabase/migrations/20260901193000_monetization_settings.sql");
 assert.equal(parseHeurekaPositionId('data-trixam-positionid="18420"'), "18420");

@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminReadClient } from "@/lib/auth/require-admin-access";
 import type { AdRow } from "@/types/database";
 
 async function createAd(formData: FormData) {
@@ -49,7 +49,7 @@ async function toggleActive(formData: FormData) {
 }
 
 export default async function AdminAdsPage() {
-  const supabase = await createClient();
+  const supabase = await createAdminReadClient();
   const { data } = await supabase
     .from("ads")
     .select("*")

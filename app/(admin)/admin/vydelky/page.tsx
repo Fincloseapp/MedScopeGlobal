@@ -9,7 +9,7 @@ import {
   channelReady,
   getPayoutReadiness,
 } from "@/lib/monetization/payout-map";
-import { requireAdmin } from "@/lib/auth/admin";
+import { requireAdminAccess } from "@/lib/auth/require-admin-access";
 import {
   getHeurekaPositionId,
   saveHeurekaPositionId,
@@ -27,8 +27,7 @@ type ClickRow = {
 
 async function saveCzPosition(formData: FormData) {
   "use server";
-  const gate = await requireAdmin();
-  if (!gate.ok) return;
+  await requireAdminAccess();
   const result = await saveHeurekaPositionId("cz", String(formData.get("snippet") ?? ""));
   revalidatePath("/admin/vydelky");
   redirect(
@@ -40,8 +39,7 @@ async function saveCzPosition(formData: FormData) {
 
 async function saveSkPosition(formData: FormData) {
   "use server";
-  const gate = await requireAdmin();
-  if (!gate.ok) return;
+  await requireAdminAccess();
   const result = await saveHeurekaPositionId("sk", String(formData.get("snippet") ?? ""));
   revalidatePath("/admin/vydelky");
   redirect(
