@@ -17,6 +17,7 @@ export function adminGateCookieValue(): string {
 
 export {
   ADMIN_GATE_COOKIE,
+  ADMIN_GATE_COOKIE_LEGACY,
   getAdminGatePassword,
   hasValidAdminGateCookie,
   isAdminLoginPath,

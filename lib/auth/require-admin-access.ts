@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 /**
- * Admin mutations: cookie gate (`ms_admin_gate`) or a Supabase user with role=admin.
+ * Admin mutations: cookie gate (`ms_admin_session`) or a Supabase user with role=admin.
  * Layout already uses the gate; actions must match so David can save from /admin.
  */
 export async function requireAdminAccess(): Promise<{

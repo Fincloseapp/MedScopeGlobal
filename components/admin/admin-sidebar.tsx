@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
+import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import { AdminNavLinks } from "@/components/admin/admin-nav-links";
 
 export function AdminSidebar() {
@@ -17,9 +18,12 @@ export function AdminSidebar() {
         <AdminNavLinks pathname={pathname} />
       </div>
       <div className="border-t px-4 py-4 text-xs text-muted-foreground">
-        <Link href="/" className="font-medium text-[#005B96] hover:underline">
-          Otevřít web
-        </Link>
+        <div className="flex flex-col gap-2">
+          <Link href="/" className="font-medium text-[#005B96] hover:underline">
+            Otevřít web
+          </Link>
+          <AdminLogoutButton className="w-fit" />
+        </div>
         <p className="mt-2 leading-relaxed">
           Každá změna se zapisuje do auditu <code>logs</code>.
         </p>

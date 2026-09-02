@@ -1,7 +1,9 @@
 /** Heslo admin brány — `ADMIN_GATE_PASSWORD` v env, jinak výchozí `David`. */
 
 const DEFAULT_ADMIN_GATE_PASSWORD = "David";
-export const ADMIN_GATE_COOKIE = "ms_admin_gate";
+export const ADMIN_GATE_COOKIE = "ms_admin_session";
+/** Previous cookie — cleared on login/logout so an old 8h session cannot skip the form. */
+export const ADMIN_GATE_COOKIE_LEGACY = "ms_admin_gate";
 
 export function getAdminGatePassword(): string {
   const configured = process.env.ADMIN_GATE_PASSWORD?.trim();

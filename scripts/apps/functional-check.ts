@@ -61,6 +61,8 @@ import {
 import { editorialRowsToInsert } from "../../lib/admin/ensure-taxonomy";
 import { formatStripeMinor } from "../../lib/admin/stripe-snapshot";
 import {
+  ADMIN_GATE_COOKIE,
+  ADMIN_GATE_COOKIE_LEGACY,
   getAdminGatePassword,
   hasValidAdminGateCookie,
   isAdminLoginPath,
@@ -441,8 +443,21 @@ file("lib/monetization/payout-map.ts");
   assert.equal(isAdminLoginPath("/admin/login"), true);
   assert.equal(isAdminLoginPath("/admin"), false);
   assert.equal(hasValidAdminGateCookie({ get: () => undefined }), false);
-  assert.equal(hasValidAdminGateCookie({ get: () => ({ value: "David" }) }), true);
+  assert.equal(
+    hasValidAdminGateCookie({
+      get: (name) => (name === ADMIN_GATE_COOKIE ? { value: "David" } : undefined),
+    }),
+    true
+  );
+  assert.equal(
+    hasValidAdminGateCookie({
+      get: (name) => (name === ADMIN_GATE_COOKIE_LEGACY ? { value: "David" } : undefined),
+    }),
+    false,
+    "legacy 8h cookie must not unlock /admin"
+  );
   assert.equal(hasValidAdminGateCookie({ get: () => ({ value: "x" }) }), false);
+  assert.equal(ADMIN_GATE_COOKIE, "ms_admin_session");
   assert.equal(shouldBlockBot("curl/8.0", "/admin/login"), false);
   assert.equal(shouldBlockBot("curl/8.0", "/admin"), true);
   assert.equal(shouldBlockBot("Mozilla/5.0 (Windows NT 10.0) Chrome/120.0.0.0", "/admin"), false);

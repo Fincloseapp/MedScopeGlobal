@@ -31,13 +31,18 @@ export function AdminGateForm() {
 
   return (
     <form onSubmit={submit} className="mt-6 space-y-4">
+      <label htmlFor="admin-password" className="block text-sm font-medium text-[#021d33]">
+        Heslo
+      </label>
       <Input
+        id="admin-password"
         type="password"
         name="password"
-        placeholder="Heslo"
+        placeholder="Zadejte heslo"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         autoComplete="current-password"
+        autoFocus
         required
         className="rounded-xl"
       />
