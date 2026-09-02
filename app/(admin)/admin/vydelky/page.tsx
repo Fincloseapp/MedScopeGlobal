@@ -168,10 +168,10 @@ export default async function AdminVydelkyPage({
       <section className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5">
         <h2 className="font-display text-lg font-semibold text-[#021d33]">1. Heureka CZ — Přímý odkaz</h2>
         <p className="mt-2 text-sm leading-relaxed text-slate-700">
-          Webmaster: web <strong>Medscopeglobal</strong>, pozice <strong>Přímý odkaz</strong>.
-          Parametr <code>haff=282255&amp;utm_medium=affiliate</code> je v /go zapojený.
-          Český čtenář jde na Heureka.cz (hledání produktu) s tímto <code>haff</code> — Heureka
-          si ho načte sama. Bez <code>haff</code> by odkaz nevydělával; SK zatím padá na Amazon.de.
+          Webmaster: web <strong>Medscopeglobal</strong>. Dvě živé pozice:
+          <strong>Přímý odkaz</strong> <code>haff=282255</code> na produktových /go a
+          textový odkaz <strong>HEU2</strong> <code>data-trixam-positionid=&quot;282256&quot;</code>{" "}
+          v patičce (Trixam). SK zatím padá na Amazon.de.
         </p>
         {notice.heureka?.endsWith("-ok") ? (
           <p className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
@@ -187,7 +187,7 @@ export default async function AdminVydelkyPage({
           Stav CZ pozice:{" "}
           <strong>
             {heurekaCzId
-              ? `propojeno — Přímý odkaz haff=${heurekaCzId}`
+              ? `propojeno — Přímý odkaz haff=${heurekaCzId} · HEU2 Trixam 282256`
               : "ještě chybí — vložte haff= z webmastera"}
           </strong>
         </p>

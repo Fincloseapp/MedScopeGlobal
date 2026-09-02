@@ -7,7 +7,7 @@
  * Trixam.HaffCampaignExecuter and attributes the visit.
  *
  * Untagged heureka.cz search URLs do not pay — those still fall back to Amazon.de.
- * Widget HTML (`data-trixam-positionid`) remains accepted as an override.
+ * Widget HTML (`data-trixam-positionid`) is the HEU2 text link on the site.
  */
 
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
@@ -31,6 +31,16 @@ export const HEUREKA_SK_POSITION_KEY = "heureka_sk_position_id";
 /** Webmaster → Přímý odkaz for medscopeglobal.com. Not invented. */
 export const DEFAULT_HEUREKA_CZ_HAFF = "282255";
 export const HEUREKA_HAFF_UTM = "affiliate";
+
+/** Webmaster → HEU2 textový odkaz. Not invented. */
+export const DEFAULT_HEUREKA_CZ_TRIXAM = "282256";
+export const HEUREKA_CZ_TEXT_LINK = {
+  name: "HEU2",
+  label: "Heureka.cz - porovnání cen a srovnání produktů",
+  href: "https://www.heureka.cz/#utm_source=medscopeglobal.com&utm_medium=affiliate&utm_campaign=26020&utm_content=Text%20link",
+  className: "heureka-hn-link",
+  positionId: DEFAULT_HEUREKA_CZ_TRIXAM,
+} as const;
 
 const cache = new Map<string, { id: string | null; at: number }>();
 const CACHE_MS = 30_000;

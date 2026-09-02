@@ -62,8 +62,11 @@ import {
   heurekaMarketFromUrl,
   applyHeurekaHaff,
   DEFAULT_HEUREKA_CZ_HAFF,
+  DEFAULT_HEUREKA_CZ_TRIXAM,
+  HEUREKA_CZ_TEXT_LINK,
   HEUREKA_HOP_CSP,
 } from "../../lib/monetization/heureka-affiliate";
+import { shouldShowHeurekaTextLink } from "../../components/monetization/heureka-text-link";
 import {
   inferArticleTopic,
   inferVisualTopic,
@@ -404,6 +407,8 @@ assert.deepEqual(missingEditorialSlugs(["kardiologie"]), EDITORIAL_TAXONOMY.filt
 file("lib/admin/ensure-taxonomy.ts");
 file("lib/admin/stripe-snapshot.ts");
 file("lib/monetization/heureka-affiliate.ts");
+file("components/monetization/heureka-text-link.tsx");
+file("components/layout/site-footer.tsx");
 file("supabase/migrations/20260901193000_monetization_settings.sql");
 assert.equal(parseHeurekaPositionId("haff=282255&utm_medium=affiliate"), "282255");
 assert.equal(parseHeurekaPositionId('data-trixam-positionid="18420"'), "18420");
@@ -420,6 +425,18 @@ assert.ok(heurekaHopHtml({ destination: "https://www.heureka.cz/", positionId: "
 assert.ok(heurekaHopHtml({ destination: "https://www.heureka.cz/", positionId: "18420" }).includes("trixam.min.js"));
 assert.ok(HEUREKA_HOP_CSP.includes("serve.affiliate.heureka.cz"));
 assert.equal(DEFAULT_HEUREKA_CZ_HAFF, "282255");
+assert.equal(DEFAULT_HEUREKA_CZ_TRIXAM, "282256");
+assert.equal(HEUREKA_CZ_TEXT_LINK.positionId, "282256");
+assert.equal(HEUREKA_CZ_TEXT_LINK.className, "heureka-hn-link");
+assert.ok(HEUREKA_CZ_TEXT_LINK.href.includes("utm_campaign=26020"));
+assert.equal(
+  parseHeurekaPositionId(
+    '<a href="http://www.heureka.cz#utm_source=medscopeglobal.com" class="heureka-hn-link" data-trixam-positionid="282256" target="_blank">Heureka.cz</a>'
+  ),
+  "282256"
+);
+assert.equal(shouldShowHeurekaTextLink("cs"), true);
+assert.equal(shouldShowHeurekaTextLink("de"), false);
 assert.ok(
   applyHeurekaHaff("https://www.heureka.cz/?h%5Bfraze%5D=magnesium", "282255").includes("haff=282255")
 );

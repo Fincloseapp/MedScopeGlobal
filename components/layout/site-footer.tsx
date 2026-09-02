@@ -3,6 +3,10 @@ import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
+import {
+  HeurekaTextLink,
+  shouldShowHeurekaTextLink,
+} from "@/components/monetization/heureka-text-link";
 
 export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
   const copy = getSurfaceCopy(locale);
@@ -189,6 +193,11 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
         <span className="mt-2 block">
           As an Amazon Associate I earn from qualifying purchases.
         </span>
+        {shouldShowHeurekaTextLink(locale) ? (
+          <span className="mt-2 block">
+            <HeurekaTextLink />
+          </span>
+        ) : null}
       </div>
     </footer>
   );
