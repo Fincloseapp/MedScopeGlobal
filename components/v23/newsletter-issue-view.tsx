@@ -20,6 +20,7 @@ import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { looksLikeCzech } from "@/lib/i18n/czech-detect";
 
 function resolveItemImage(
   sectionId: string,
@@ -65,7 +66,7 @@ function sanitizeSection(sec: V23NewsletterSection): V23NewsletterSection {
   };
 }
 
-function parseLayout(issue: NewsletterRow): V23NewsletterLayout | null {
+function parseLayout(issue: NewsletterRow, locale = "cs"): V23NewsletterLayout | null {
   const lj = issue.layout_json;
   if (!lj || typeof lj !== "object") return null;
   const layout = lj as V23NewsletterLayout;
@@ -78,7 +79,7 @@ function parseLayout(issue: NewsletterRow): V23NewsletterLayout | null {
 
   return {
     ...withImages,
-    headline: newsletterHeadline(issue.issue_date),
+    headline: newsletterHeadline(issue.issue_date, locale),
     intro: sanitizeNewsletterText(withImages.intro),
     sections,
     recommended: (withImages.recommended ?? [])
@@ -96,13 +97,16 @@ function NewsletterItemCard({
   sectionId,
   sectionTitle,
   index,
+  locale,
 }: {
   item: V23NewsletterSection["items"][number];
   sectionId: string;
   sectionTitle: string;
   index: number;
+  locale: string;
 }) {
   const img = resolveItemImage(sectionId, sectionTitle, item, index);
+  const href = item.href?.startsWith("/") ? localizePublicHref(item.href, locale) : item.href;
 
   return (
     <li className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition hover:border-sky-100 hover:shadow-md">
@@ -120,8 +124,8 @@ function NewsletterItemCard({
         </div>
       ) : null}
       <div className="p-4">
-        {item.href ? (
-          <Link href={item.href} className="font-semibold text-[#005B96] hover:underline">
+        {href ? (
+          <Link href={href} className="font-semibold text-[#005B96] hover:underline">
             {item.title}
           </Link>
         ) : (
@@ -140,7 +144,7 @@ export function V23NewsletterIssueView({
   issue: NewsletterRow;
   locale?: string;
 }) {
-  const layout = parseLayout(issue);
+  const layout = parseLayout(issue, locale);
   const copy = getNewsletterCopy(locale);
   const dateLabel = formatPublicDate(issue.issue_date, locale);
   const primary = primaryArticleLocale(normalizeLocale(locale));
@@ -154,6 +158,19 @@ export function V23NewsletterIssueView({
         : primary === "fr"
           ? "Ce numéro sera bientôt complété."
           : "This issue will be filled in shortly.";
+  const czechBody = primary !== "cs";
+  const languageNote =
+    primary === "de"
+      ? "Diese medizinische Ausgabe erscheint auf Tschechisch. Der ViaLongeVita-Brief in Ihrem Postfach kommt in Ihrer Sprache."
+      : primary === "fr"
+        ? "Ce digest médical est publié en tchèque. Le brief ViaLongeVita arrive dans votre langue."
+        : primary === "cs"
+          ? null
+          : "This medical digest is published in Czech. The ViaLongeVita brief in your inbox is in your language.";
+  const subhead =
+    layout?.intro && !(czechBody && looksLikeCzech(layout.intro))
+      ? layout.intro
+      : `${copy.hubDescription}${dateLabel ? ` — ${dateLabel}` : ""}`;
   const heroUrl = layout?.heroImageUrl?.startsWith("http") ? layout.heroImageUrl : V23_NEWSLETTER_IMAGE;
   const heroAlt = layout?.heroImageAlt ?? copy.hubTitle;
   const showHtmlFallback =
@@ -174,13 +191,18 @@ export function V23NewsletterIssueView({
         <div className="relative flex min-h-[360px] items-center justify-center sm:min-h-[400px]">
           <NewsletterHero
             title={layout?.headline ?? `MedScopeGlobal Newsletter — ${dateLabel}`}
-            subhead={layout?.intro ?? `${copy.hubDescription} — ${dateLabel}`}
+            subhead={subhead}
             className="w-full text-white"
           />
         </div>
       </div>
 
       <div className="p-6 sm:p-8">
+        {languageNote ? (
+          <p className="rounded-xl border border-[#cfe1f3] bg-[#e8f3fb] px-4 py-3 text-sm text-[#021d33]">
+            {languageNote}
+          </p>
+        ) : null}
         {layout?.sections?.length ? (
           <div className="mt-8 space-y-10">
             {layout.sections.map((sec) => {
@@ -207,6 +229,7 @@ export function V23NewsletterIssueView({
                         sectionId={sec.id}
                         sectionTitle={sec.title}
                         index={i}
+                        locale={locale}
                       />
                     ))}
                   </ul>
@@ -230,7 +253,10 @@ export function V23NewsletterIssueView({
               {layout.recommended.map((r, i) => (
                 <li key={`rec-${i}`} className="text-sm text-slate-700">
                   {r.href ? (
-                    <Link href={r.href} className="font-semibold text-[#005B96] hover:underline">
+                    <Link
+                      href={r.href.startsWith("/") ? localizePublicHref(r.href, locale) : r.href}
+                      className="font-semibold text-[#005B96] hover:underline"
+                    >
                       {r.title}
                     </Link>
                   ) : (

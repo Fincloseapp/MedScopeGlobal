@@ -13,6 +13,8 @@ import {
   newsletterIssueDescription,
   newsletterIssueTitle,
 } from "@/lib/v23/newsletter/page-meta";
+import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export const revalidate = 3600;
 
@@ -23,9 +25,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function NewsletterPosledniPage() {
   const locale = await getServerLocale();
+  const copy = getNewsletterCopy(locale);
   const issue = await getV22LatestNewsletter();
-  const pageTitle = newsletterIssueTitle(issue);
-  const description = newsletterIssueDescription(issue);
+  const pageTitle = newsletterIssueTitle(issue, locale);
+  const description = newsletterIssueDescription(issue, locale);
 
   const ld = medicalWebPageJsonLd({
     title: pageTitle,
@@ -34,14 +37,14 @@ export default async function NewsletterPosledniPage() {
   });
 
   return (
-    <ModulePageShell eyebrow="MedScopeGlobal Newsletter" title={pageTitle} description={description}>
+    <ModulePageShell eyebrow={copy.hubEyebrow} title={pageTitle} description={description}>
       <JsonLdScript data={ld} />
       <V23NewsletterIssueView issue={issue} locale={locale} />
       <div className="mt-8">
         <ListingAffiliateBox locale={locale as GlobalLocaleCode} />
       </div>
-      <Link href="/newsletter" className="mt-6 inline-block text-sm font-medium text-primary hover:underline">
-        ← Newsletter
+      <Link href={localizePublicHref("/newsletter", locale)} className="mt-6 inline-block text-sm font-medium text-primary hover:underline">
+        ← {copy.hubTitle}
       </Link>
     </ModulePageShell>
   );

@@ -15,6 +15,8 @@ import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export const revalidate = 3600;
 
@@ -24,9 +26,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const issue = await getNewsletterBySlug(slug);
   if (!issue) {
+    const locale = await getServerLocale();
+    const copy = getNewsletterCopy(locale);
     return await buildLocalizedV20PageMetadata({
-      title: "MedScopeGlobal Newsletter",
-      description: "Odborný medicínský newsletter v češtině.",
+      title: copy.hubTitle,
+      description: copy.hubDescription,
       path: `/newsletter/${slug}`,
     });
   }
@@ -39,8 +43,9 @@ export default async function NewsletterIssuePage({ params }: Props) {
   const issue = await getNewsletterBySlug(slug);
   if (!issue) notFound();
 
-  const pageTitle = newsletterIssueTitle(issue);
-  const description = newsletterIssueDescription(issue);
+  const copy = getNewsletterCopy(locale);
+  const pageTitle = newsletterIssueTitle(issue, locale);
+  const description = newsletterIssueDescription(issue, locale);
 
   const ld = medicalWebPageJsonLd({
     title: pageTitle,
@@ -49,14 +54,14 @@ export default async function NewsletterIssuePage({ params }: Props) {
   });
 
   return (
-    <ModulePageShell eyebrow="MedScopeGlobal Newsletter" title={pageTitle} description={description}>
+    <ModulePageShell eyebrow={copy.hubEyebrow} title={pageTitle} description={description}>
       <JsonLdScript data={ld} />
       <V23NewsletterIssueView issue={issue} locale={locale} />
       <div className="mt-8">
         <ListingAffiliateBox locale={locale as GlobalLocaleCode} />
       </div>
-      <Link href="/newsletter/archiv" className="mt-6 inline-block text-sm font-medium text-primary hover:underline">
-        Archiv vydání →
+      <Link href={localizePublicHref("/newsletter/archiv", locale)} className="mt-6 inline-block text-sm font-medium text-primary hover:underline">
+        {copy.hubArchive} →
       </Link>
     </ModulePageShell>
   );

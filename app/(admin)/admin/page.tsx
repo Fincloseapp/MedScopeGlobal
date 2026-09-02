@@ -74,9 +74,9 @@ export default async function AdminDashboardPage() {
       icon: Megaphone,
     },
     {
-      label: "VIP + brief",
-      value: overview.vipActive,
-      hint: `${overview.newsletterSubscribers} odběratelů newsletteru`,
+      label: "Odběratelé briefu",
+      value: overview.newsletterSubscribers,
+      hint: "ViaLongeVita e-mail · otevřít přehled",
       href: "/admin/newsletter",
       icon: Crown,
     },

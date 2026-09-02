@@ -43,6 +43,7 @@ import {
 } from "../../lib/monetization/affiliate-hop";
 import { pickAffiliateProducts, AFFILIATE_SLOT_COUNTS } from "../../lib/monetization/affiliate-mix";
 import { composeBriefLead, composeBriefSubject } from "../../lib/monetization/brief-marketing";
+import { newsletterHeadline } from "../../lib/v23/newsletter/title";
 import { splitHtmlAfterParagraphs } from "../../lib/monetization/split-article-html";
 import { getPayoutReadiness, PAYOUT_CHANNELS } from "../../lib/monetization/payout-map";
 import {
@@ -704,6 +705,16 @@ assert.ok(
 assert.ok(
   readFileSync(join(root, "lib/v23/newsletter/render.ts"), "utf8").includes("locale = \"cs\""),
   "HTML render must accept locale for affiliate /go links"
+);
+assert.ok(!/srpna|srpen/i.test(newsletterHeadline("2026-08-03", "de")));
+assert.ok(!/srpna|srpen/i.test(newsletterHeadline("2026-08-03", "en")));
+assert.ok(/srpna|8/i.test(newsletterHeadline("2026-08-03", "cs")));
+assert.ok(
+  readFileSync(join(root, "app/(public)/newsletter/[slug]/page.tsx"), "utf8").includes("copy.hubArchive"),
+  "issue page archive link must follow locale copy"
+);
+assert.ok(
+  readFileSync(join(root, "app/(admin)/admin/page.tsx"), "utf8").includes("Odběratelé briefu")
 );
 file("public/assets/affiliate/supplement.svg");
 file("public/assets/affiliate/bottle.svg");

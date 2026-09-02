@@ -1,8 +1,9 @@
-import { formatIssueDateCs } from "@/lib/v23/newsletter/sanitize";
+import { formatPublicDate } from "@/lib/i18n/format-date";
 
-/** Jednotný název vydání: MedScopeGlobal Newsletter — 3. června 2026 */
-export function newsletterHeadline(issueDate: string): string {
-  return `MedScopeGlobal Newsletter — ${formatIssueDateCs(issueDate)}`;
+/** Public issue title — date follows the page locale, never forced Czech. */
+export function newsletterHeadline(issueDate: string, locale = "cs"): string {
+  const date = formatPublicDate(issueDate, locale) ?? issueDate;
+  return `MedScopeGlobal Newsletter — ${date}`;
 }
 
 const LEGACY_TITLE =
