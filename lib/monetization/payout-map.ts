@@ -4,6 +4,7 @@
  */
 
 import { DEFAULT_HEUREKA_CZ_HAFF } from "@/lib/monetization/heureka-affiliate";
+import { isAdSenseEnabled } from "@/lib/monetization/adsense";
 
 export type PayoutChannelId =
   | "stripe"
@@ -82,14 +83,15 @@ export const PAYOUT_CHANNELS: PayoutChannel[] = [
   },
   {
     id: "adsense",
-    title: "Google AdSense (volitelné)",
-    whatEarns: "Zbytkové display sloty po souhlasu s cookies. Bez ID se sloty mění na vlastní inzerci.",
+    title: "Google AdSense",
+    whatEarns:
+      "Auto ads na veřejném magazínu ViaLongeVita (všechny jazykové mutace) po souhlasu s marketingovými cookies. Lékařské a studentské plochy bez reklam.",
     whereYouSeeMoney: "https://www.google.com/adsense — přehled a platby.",
     payoutTo: "Účet v AdSense (minimum výplaty dle Google).",
     signupUrl: "https://www.google.com/adsense/",
     signupLabel: "Otevřít AdSense",
     envVars: ["NEXT_PUBLIC_ADSENSE_CLIENT_ID", "NEXT_PUBLIC_ADS_ENABLED"],
-    priority: 3,
+    priority: 1,
   },
   {
     id: "b2b",
@@ -157,7 +159,7 @@ export function getPayoutReadiness(): PayoutReadiness {
     heurekaSk: envOn("AFFILIATE_HEUREKA_SK_POSITION_ID") || envOn("AFFILIATE_HEUREKA_SK_TEMPLATE"),
     amazonAny: Object.values(amazonStores).some(Boolean),
     amazonStores,
-    adsense: envOn("NEXT_PUBLIC_ADSENSE_CLIENT_ID") && envOn("NEXT_PUBLIC_ADS_ENABLED"),
+    adsense: isAdSenseEnabled(),
     ga: envOn("NEXT_PUBLIC_GA_MEASUREMENT_ID"),
   };
 }

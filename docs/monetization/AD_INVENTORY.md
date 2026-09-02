@@ -1,12 +1,14 @@
 # Display ad inventory
 
 Source of truth: `AD_INVENTORY` in `lib/ecosystem/monetization.ts`.
-Slots render via `GlobalAdSlot` and stay **empty** until:
+Slots render via `GlobalAdSlot`. Auto ads use the owner publisher
+`ca-pub-6820104998820692` (baked in). Manual `<ins>` units only when a numeric
+slot env is set. Turn off with `NEXT_PUBLIC_ADS_ENABLED=false`.
 
 ```bash
 NEXT_PUBLIC_ADS_ENABLED=true
-# plus one of:
-NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-…
+NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-6820104998820692
+# optional later:
 NEXT_PUBLIC_MEDIAVINE_SITE_ID=…
 NEXT_PUBLIC_EZOIC_SITE_ID=…
 ```

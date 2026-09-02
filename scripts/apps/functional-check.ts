@@ -25,10 +25,19 @@ import {
   classifyRevenueSurface,
   matchAffiliateProductIds,
   shouldShowAffiliate,
+  shouldShowDisplayAds,
   shouldShowOrdiZapisCta,
   shouldShowPublicSubscribeNudge,
   LONGEVITY_MEDIA_KIT,
 } from "../../lib/monetization/revenue-mix";
+import {
+  ADSENSE_ADS_TXT,
+  ADSENSE_PUBLISHER_ID,
+  adsAllowedOnPath,
+  isAdSenseEnabled,
+  resolveAdSenseClientId,
+  resolveAdSenseSlotId,
+} from "../../lib/monetization/adsense";
 import { NEWSLETTER_SUBSCRIBERS_SQL } from "../../lib/monetization/apply-schema";
 import {
   affiliateGoPath,
@@ -756,7 +765,39 @@ assert.ok(AD_INVENTORY.some((e) => e.surface === "homepage"));
 assert.ok(AD_INVENTORY.some((e) => e.surface === "app-landing"));
 const adCfg = getClientAdConfig();
 assert.equal(typeof adCfg.enabled, "boolean");
-assert.equal(adCfg.enabled, false); // no keys in CI / default env
+assert.equal(isAdSenseEnabled(), true);
+assert.equal(resolveAdSenseClientId(), "ca-pub-6820104998820692");
+assert.equal(adCfg.enabled, true);
+assert.equal(adCfg.adsenseClientId, ADSENSE_PUBLISHER_ID);
+assert.equal(resolveAdSenseSlotId("below-title"), null);
+assert.equal(adsAllowedOnPath("/de"), true);
+assert.equal(adsAllowedOnPath("/en/article/sleep"), true);
+assert.equal(adsAllowedOnPath("/cs/newsletter"), true);
+assert.equal(adsAllowedOnPath("/verejnost/osveta"), true);
+assert.equal(adsAllowedOnPath("/admin"), false);
+assert.equal(adsAllowedOnPath("/de/lekari/dokumentace"), false);
+assert.equal(adsAllowedOnPath("/ordizaznam"), false);
+assert.equal(adsAllowedOnPath("/studenti"), false);
+assert.equal(adsAllowedOnPath("/go/vitamin-d3"), false);
+assert.ok(ADSENSE_ADS_TXT.includes("pub-6820104998820692"));
+assert.ok(existsSync(join(root, "public/ads.txt")));
+assert.ok(readFileSync(join(root, "public/ads.txt"), "utf8").includes("pub-6820104998820692"));
+assert.ok(
+  readFileSync(join(root, "app/layout.tsx"), "utf8").includes("google-adsense-account")
+);
+assert.ok(
+  readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes(
+    "pagead2.googlesyndication.com"
+  )
+);
+assert.ok(
+  !readFileSync(join(root, "app/(public)/ordizaznam/page.tsx"), "utf8").includes("GlobalAdSlot"),
+  "physician landing must stay AdSense-free"
+);
+assert.equal(shouldShowDisplayAds("public", false), true);
+assert.equal(shouldShowDisplayAds("public", true), false);
+assert.equal(shouldShowDisplayAds("physician", false), false);
+assert.equal(shouldShowDisplayAds("student", false), false);
 
 file("app/api/ecosystem/editorial/images/route.ts");
 file("lib/ecosystem/editorial/images/policy.ts");

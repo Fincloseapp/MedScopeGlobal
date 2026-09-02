@@ -54,8 +54,12 @@ Without Stripe, Tringelt returns 503 and shows “unavailable”.
 
 ```bash
 NEXT_PUBLIC_ADS_ENABLED=true
-NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-xxxxxxxxxxxxxxxx
+NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-6820104998820692
 ```
+
+Owner pub is already live in code + `ads.txt`. In the AdSense dashboard enable
+**Auto ads** (in-page + anchor). Block unsuitable categories (miracle cures,
+unlicensed pharma). Do not invent extra slot IDs.
 
 Optional local layout preview (never enable in production):
 

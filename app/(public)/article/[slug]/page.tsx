@@ -61,6 +61,7 @@ import { OrdiZapisPromoBanner } from "@/components/lekari/ordizapis-promo-banner
 import {
   classifyRevenueSurface,
   shouldShowAffiliate,
+  shouldShowDisplayAds,
   shouldShowHousePartner,
   shouldShowOrdiZapisCta,
   shouldShowPublicSubscribeNudge,
@@ -406,7 +407,7 @@ export default async function ArticlePage({ params }: Props) {
             articleSlug={article.slug}
           />
 
-          {!isVip ? (
+          {shouldShowDisplayAds(revenueSurface, isVip) ? (
             <GlobalAdSlot
               placement="below-title"
               locale={(locale as GlobalLocaleCode) ?? "cs"}
@@ -464,7 +465,7 @@ export default async function ArticlePage({ params }: Props) {
             )}
           </div>
 
-          {!locked ? (
+          {!locked && shouldShowDisplayAds(revenueSurface, isVip) ? (
             <GlobalAdSlot
               placement="in-content"
               locale={(locale as GlobalLocaleCode) ?? "cs"}
@@ -522,7 +523,7 @@ export default async function ArticlePage({ params }: Props) {
             <HousePartnerSlot locale={locale} source="article-footer" className="my-8" />
           ) : null}
 
-          {!locked ? (
+          {!locked && shouldShowDisplayAds(revenueSurface, isVip) ? (
             <GlobalAdSlot
               placement="footer"
               locale={(locale as GlobalLocaleCode) ?? "cs"}

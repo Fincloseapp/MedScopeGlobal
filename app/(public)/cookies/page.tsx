@@ -26,7 +26,9 @@ export default function CookiesPage() {
           <strong>Analytické</strong> — anonymní statistiky návštěvnosti
         </li>
         <li>
-          <strong>Marketingové</strong> — personalizace reklam (pouze se souhlasem)
+          <strong>Marketingové</strong> — Google AdSense (ca-pub-6820104998820692) na veřejném
+          magazínu ViaLongeVita a jazykových mutacích, pouze se souhlasem. Lékařské, studentské
+          a admin plochy reklamy nenačítají.
         </li>
       </ul>
 

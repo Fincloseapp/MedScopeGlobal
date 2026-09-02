@@ -32,7 +32,9 @@
   },
   "vars": {
     "MEDSCOPE_RUNTIME": "cloudflare-workers",
-    "NEXT_PUBLIC_SITE_URL": "https://medscopeglobal.com"
+    "NEXT_PUBLIC_SITE_URL": "https://medscopeglobal.com",
+    "NEXT_PUBLIC_ADS_ENABLED": "true",
+    "NEXT_PUBLIC_ADSENSE_CLIENT_ID": "ca-pub-6820104998820692"
   },
   "routes": [
     { "pattern": "medscopeglobal.com/*", "zone_name": "medscopeglobal.com" },

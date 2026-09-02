@@ -8,6 +8,7 @@ import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { MAGAZINE, getSiteDefaultTitle } from "@/lib/brand/magazine";
 import { SITE } from "@/lib/config/site";
 import { getSiteUrl } from "@/lib/config/site-url";
+import { ADSENSE_PUBLISHER_ID } from "@/lib/monetization/adsense";
 import { organizationJsonLd, newsletterJsonLd, publicationJsonLd } from "@/lib/seo/json-ld";
 import { OG_ALTERNATE_LOCALES } from "@/lib/seo/metadata";
 import "./globals.css";
@@ -69,6 +70,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     creator: "@MedScopeGlobal",
     site: "@MedScopeGlobal",
+  },
+  other: {
+    "google-adsense-account": ADSENSE_PUBLISHER_ID,
   },
   alternates: {
     canonical: rootHreflang.canonical,

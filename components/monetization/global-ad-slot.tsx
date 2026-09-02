@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import {
   getClientAdConfig,
   resolveAdProvider,
@@ -8,6 +9,7 @@ import {
   type AdProvider,
 } from "@/lib/ecosystem/monetization";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { adsAllowedOnPath, resolveAdSenseSlotId } from "@/lib/monetization/adsense";
 import { readConsent } from "@/components/legal/cookie-banner";
 
 type Props = {
@@ -15,7 +17,7 @@ type Props = {
   placement: AdPlacement;
   locale?: GlobalLocaleCode;
   className?: string;
-  /** Optional AdSense slot id override (defaults to placement name) */
+  /** Numeric AdSense unit id only — never a placement name. */
   slotId?: string;
 };
 
@@ -42,10 +44,9 @@ const PLACEHOLDER_STYLES: Record<AdPlacement, string> = {
 };
 
 /**
- * Feature-flagged display ad unit.
- * Renders nothing until `NEXT_PUBLIC_ADS_ENABLED` + a provider key are set
- * AND marketing cookies are accepted.
- * Set `NEXT_PUBLIC_ADS_SHOW_PLACEHOLDERS=1` for local layout preview only.
+ * Manual display unit when a numeric AdSense slot exists.
+ * Otherwise Auto ads (page-level) fill the magazine — this renders nothing
+ * so we never ship fake slot names like "below-title".
  */
 export function GlobalAdSlot({
   provider: providerProp,
@@ -54,18 +55,28 @@ export function GlobalAdSlot({
   className = "",
   slotId,
 }: Props) {
+  const pathname = usePathname();
   const config = getClientAdConfig();
   const provider = providerProp ?? resolveAdProvider(locale, config);
   const style = PLACEMENT_STYLES[placement] ?? PLACEMENT_STYLES["in-content"];
+  const numericSlot = resolveAdSenseSlotId(placement, slotId);
   const pushed = useRef(false);
   const [marketingOk, setMarketingOk] = useState(false);
+  const allowed = adsAllowedOnPath(pathname);
 
   useEffect(() => {
     setMarketingOk(Boolean(readConsent()?.marketing));
   }, []);
 
   useEffect(() => {
-    if (!marketingOk || !config.enabled || provider !== "adsense" || !config.adsenseClientId) {
+    if (
+      !allowed ||
+      !marketingOk ||
+      !config.enabled ||
+      provider !== "adsense" ||
+      !config.adsenseClientId ||
+      !numericSlot
+    ) {
       return;
     }
     if (pushed.current) return;
@@ -75,9 +86,9 @@ export function GlobalAdSlot({
     } catch {
       /* loader may still be fetching */
     }
-  }, [marketingOk, config.enabled, config.adsenseClientId, provider]);
+  }, [allowed, marketingOk, config.enabled, config.adsenseClientId, provider, numericSlot]);
 
-  if (!config.enabled || !provider) {
+  if (!allowed || !config.enabled || !provider) {
     if (!config.showPlaceholders) return null;
     const ph = PLACEHOLDER_STYLES[placement] ?? PLACEHOLDER_STYLES["in-content"];
     return (
@@ -97,7 +108,7 @@ export function GlobalAdSlot({
     return null;
   }
 
-  if (provider === "adsense" && config.adsenseClientId) {
+  if (provider === "adsense" && config.adsenseClientId && numericSlot) {
     return (
       <div
         className={`${style} ${className}`}
@@ -109,7 +120,7 @@ export function GlobalAdSlot({
           className="adsbygoogle block w-full"
           style={{ display: "block" }}
           data-ad-client={config.adsenseClientId}
-          data-ad-slot={slotId ?? placement}
+          data-ad-slot={numericSlot}
           data-ad-format="auto"
           data-full-width-responsive="true"
         />

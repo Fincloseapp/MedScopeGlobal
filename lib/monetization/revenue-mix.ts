@@ -74,6 +74,11 @@ export function shouldShowAffiliate(surface: RevenueSurface): boolean {
   return surface === "public";
 }
 
+/** AdSense / display — public ViaLongeVita only; VIP and pro/student stay clean. */
+export function shouldShowDisplayAds(surface: RevenueSurface, isVip: boolean): boolean {
+  return surface === "public" && !isVip;
+}
+
 export function shouldShowOrdiZapisCta(surface: RevenueSurface): boolean {
   return surface === "physician";
 }

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import { usePathname } from "next/navigation";
 import { CONSENT_EVENT, readConsent } from "@/components/legal/cookie-banner";
 import { getClientAdConfig } from "@/lib/ecosystem/monetization";
+import { adsAllowedOnPath } from "@/lib/monetization/adsense";
 
 declare global {
   interface Window {
@@ -31,7 +32,7 @@ function pushPageView(path: string) {
 
 /**
  * Loads GA and AdSense only after cookie consent (analytics / marketing).
- * No-ops when measurement / client IDs are unset.
+ * Auto ads (page-level) run on public ViaLongeVita locales; professional paths stay clean.
  */
 export function ConsentScripts() {
   const pathname = usePathname();
@@ -39,6 +40,8 @@ export function ConsentScripts() {
   const [marketing, setMarketing] = useState(false);
   const measurementId = gaId();
   const ads = getClientAdConfig();
+  const allowAds = adsAllowedOnPath(pathname);
+  const pageLevelPushed = useRef(false);
 
   useEffect(() => {
     function sync() {
@@ -57,13 +60,26 @@ export function ConsentScripts() {
   }, [analytics, pathname]);
 
   useEffect(() => {
-    if (!marketing || !ads.enabled || !ads.adsenseClientId) return;
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch {
-      /* AdSense may not be ready yet */
+    if (
+      pageLevelPushed.current ||
+      !marketing ||
+      !allowAds ||
+      !ads.enabled ||
+      !ads.adsenseClientId
+    ) {
+      return;
     }
-  }, [marketing, ads.enabled, ads.adsenseClientId, pathname]);
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: ads.adsenseClientId,
+        enable_page_level_ads: true,
+        overlays: { bottom: true },
+      });
+      pageLevelPushed.current = true;
+    } catch {
+      /* script may still be fetching */
+    }
+  }, [marketing, allowAds, ads.enabled, ads.adsenseClientId]);
 
   return (
     <>
@@ -78,8 +94,9 @@ export function ConsentScripts() {
           </Script>
         </>
       ) : null}
-      {marketing && ads.enabled && ads.adsenseClientId ? (
+      {marketing && allowAds && ads.enabled && ads.adsenseClientId ? (
         <Script
+          id="adsense-auto"
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ads.adsenseClientId}`}
           strategy="afterInteractive"
           crossOrigin="anonymous"

@@ -6,6 +6,7 @@ import {
   resolveAffiliateDestination,
   type AffiliateContext,
 } from "@/lib/monetization/affiliate-geo";
+import { isAdSenseEnabled, resolveAdSenseClientId } from "@/lib/monetization/adsense";
 
 export { applyAmazonAssociateTagGeo as applyAmazonAssociateTag };
 export type { AffiliateContext };
@@ -739,7 +740,7 @@ export type AdInventoryEntry = {
 
 /**
  * Canonical ad placements — wire via `GlobalAdSlot`.
- * Empty in production until `NEXT_PUBLIC_ADS_ENABLED` + provider keys are set.
+ * Auto ads run from the owner pub id; manual <ins> only when a numeric slot exists.
  */
 export const AD_INVENTORY: AdInventoryEntry[] = [
   {
@@ -830,7 +831,7 @@ export const AD_INVENTORY: AdInventoryEntry[] = [
     sizes: ["728x90", "300x250"],
     format: "display",
     incomePriority: 3,
-    notes: "Physician landing — lighter inventory; prefer B2B later.",
+    notes: "Physician landing — no AdSense; keep affiliate-free.",
   },
 ];
 
@@ -846,13 +847,13 @@ export type ClientAdConfig = {
 
 /** Read public ad env (inlined at build for client components). */
 export function getClientAdConfig(): ClientAdConfig {
-  const adsenseClientId = (process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID ?? "").trim() || null;
+  const adsenseClientId = isAdSenseEnabled() ? resolveAdSenseClientId() : null;
   const mediavineSiteId = (process.env.NEXT_PUBLIC_MEDIAVINE_SITE_ID ?? "").trim() || null;
   const ezoicSiteId = (process.env.NEXT_PUBLIC_EZOIC_SITE_ID ?? "").trim() || null;
   const hasProvider = Boolean(adsenseClientId || mediavineSiteId || ezoicSiteId);
   const flag = (process.env.NEXT_PUBLIC_ADS_ENABLED ?? "").trim().toLowerCase();
-  const enabled =
-    (flag === "1" || flag === "true" || flag === "yes") && hasProvider;
+  const forcedOff = flag === "0" || flag === "false" || flag === "off" || flag === "no";
+  const enabled = !forcedOff && hasProvider;
   const showPlaceholders =
     (process.env.NEXT_PUBLIC_ADS_SHOW_PLACEHOLDERS ?? "").trim().toLowerCase() === "1" ||
     (process.env.NEXT_PUBLIC_ADS_SHOW_PLACEHOLDERS ?? "").trim().toLowerCase() === "true";
