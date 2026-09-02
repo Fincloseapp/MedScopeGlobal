@@ -4,7 +4,7 @@ import {
   HEUREKA_TRIXAM_SCRIPT,
 } from "@/lib/monetization/heureka-affiliate";
 
-/** Official HEU2 Trixam text link. Do not change class or data-trixam-positionid. */
+/** Official HEU2 Trixam text link. Visible href stays https://www.heureka.cz/. Do not change class or data-trixam-positionid. */
 export function HeurekaTextLink({ className }: { className?: string }) {
   return (
     <span className={className ?? "inline-flex flex-col items-center gap-1"}>

@@ -5,7 +5,7 @@
  * Global catalogue (magnesium, D3+K2, sleep tracker) is shown everywhere;
  * the outbound URL is always the local marketplace so checkout friction stays low.
  *
- * CZ → Heureka.cz with haff=282255 (Přímý odkaz). SK still waits for its own haff.
+ * CZ → Heureka.cz (Trixam 282255 on a clean search URL). SK still waits for its own id.
  * Untagged Heureka URLs fall back to Amazon.de with language=cs (Czech UI).
  * PL/DE/FR/IT/ES/UK/US/JP → Amazon local storefront.
  * Other EU locales (RO, HU, NL) → Amazon.de (ships across the EU).

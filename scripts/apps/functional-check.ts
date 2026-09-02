@@ -77,6 +77,8 @@ import {
   heurekaHopHtml,
   heurekaMarketFromUrl,
   applyHeurekaHaff,
+  publicMarketplaceUrl,
+  marketplaceUrlShowsTracking,
   DEFAULT_HEUREKA_CZ_HAFF,
   DEFAULT_HEUREKA_CZ_TRIXAM,
   HEUREKA_CZ_TEXT_LINK,
@@ -281,6 +283,7 @@ assert.equal(affiliateHopCopy("cs").cta, "Porovnat ceny");
   const dest = "https://www.heureka.cz/?h%5Bfraze%5D=vitamin+d3+k2&haff=282255&utm_medium=affiliate";
   const hop = renderAffiliateHopHtml({
     destination: dest,
+    heurekaTrixamId: "282255",
     locale: "cs",
     productName: "Vitamin D3 + K2",
     imageUrl: "/assets/affiliate/d3.svg",
@@ -288,11 +291,33 @@ assert.equal(affiliateHopCopy("cs").cta, "Porovnat ceny");
   assert.ok(hop.includes("Otevíráme srovnání cen"));
   assert.ok(hop.includes("ViaLongeVita"));
   assert.ok(hop.includes("Vitamin D3 + K2"));
-  assert.ok(!hop.includes('href="https://www.heureka.cz'));
+  assert.ok(hop.includes("heureka-affiliate-link"));
+  assert.ok(hop.includes('data-trixam-positionid="282255"'));
+  assert.ok(!hop.includes("haff="), "hop must not expose Přímý odkaz query");
+  assert.ok(!hop.includes("utm_medium=affiliate"));
   assert.ok(hopHtmlHidesTracking(hop));
-  assert.ok(hop.includes("haff=282255"), "payload still carries Přímý odkaz for the hop");
+  const sunrise = renderAffiliateHopHtml({
+    destination:
+      "https://www.heureka.cz/?h%5Bfraze%5D=sv%C4%9Bteln%C3%BD+bud%C3%ADk&haff=282255&utm_medium=affiliate",
+    heurekaTrixamId: "282255",
+    locale: "cs",
+    productName: "Světelný budík",
+  });
+  assert.ok(hopHtmlHidesTracking(sunrise));
+  assert.ok(!sunrise.includes("haff="));
+  const amazonHop = renderAffiliateHopHtml({
+    destination: "https://www.amazon.de/s?k=x&tag=vialongevita-21",
+    leavePath: "/go/sunrise-alarm?leave=1",
+    locale: "de",
+    productName: "Sunrise alarm",
+  });
+  assert.ok(amazonHop.includes("/go/sunrise-alarm?leave=1"));
+  assert.ok(!amazonHop.includes("amazon.de"));
+  assert.ok(!amazonHop.includes("tag="));
+  assert.ok(hopHtmlHidesTracking(amazonHop));
   const preview = renderAffiliateHopHtml({
     destination: dest,
+    heurekaTrixamId: "282255",
     locale: "cs",
     productName: "Vitamin D3 + K2",
     autoLeaveMs: 0,
@@ -524,12 +549,30 @@ assert.equal(heurekaMarketFromUrl("https://www.heureka.sk/?h=x"), "sk");
 assert.ok(heurekaHopHtml({ destination: "https://www.heureka.cz/", positionId: "18420" }).includes("heureka-affiliate-link"));
 assert.ok(heurekaHopHtml({ destination: "https://www.heureka.cz/", positionId: "18420" }).includes("18420"));
 assert.ok(heurekaHopHtml({ destination: "https://www.heureka.cz/", positionId: "18420" }).includes("trixam.min.js"));
+assert.ok(
+  !heurekaHopHtml({
+    destination: "https://www.heureka.cz/?h%5Bfraze%5D=x&haff=282255&utm_medium=affiliate",
+    positionId: "282255",
+  }).includes("haff=")
+);
 assert.ok(HEUREKA_HOP_CSP.includes("serve.affiliate.heureka.cz"));
 assert.equal(DEFAULT_HEUREKA_CZ_HAFF, "282255");
 assert.equal(DEFAULT_HEUREKA_CZ_TRIXAM, "282256");
 assert.equal(HEUREKA_CZ_TEXT_LINK.positionId, "282256");
 assert.equal(HEUREKA_CZ_TEXT_LINK.className, "heureka-hn-link");
-assert.ok(HEUREKA_CZ_TEXT_LINK.href.includes("utm_campaign=26020"));
+assert.equal(HEUREKA_CZ_TEXT_LINK.href, "https://www.heureka.cz/");
+assert.ok(!HEUREKA_CZ_TEXT_LINK.href.includes("utm_"));
+{
+  const tagged =
+    "https://www.heureka.cz/?h%5Bfraze%5D=vitamin+d3+k2&haff=282255&utm_medium=affiliate";
+  const clean = publicMarketplaceUrl(tagged);
+  assert.ok(!clean.includes("haff="));
+  assert.ok(!clean.includes("utm_medium"));
+  assert.ok(clean.includes("heureka.cz"));
+  assert.equal(marketplaceUrlShowsTracking(clean), false);
+  assert.equal(marketplaceUrlShowsTracking(tagged), true);
+  assert.ok(!publicMarketplaceUrl("https://www.amazon.de/s?k=x&tag=vialongevita-21").includes("tag="));
+}
 assert.equal(
   parseHeurekaPositionId(
     '<a href="http://www.heureka.cz#utm_source=medscopeglobal.com" class="heureka-hn-link" data-trixam-positionid="282256" target="_blank">Heureka.cz</a>'

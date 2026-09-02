@@ -1,11 +1,17 @@
 /**
- * Public /go hop — the reader stays on medscopeglobal.com until we
- * hand off. Tracking (haff, Amazon tag) is attached only on the outbound URL.
+ * Public /go hop — the reader stays on medscopeglobal.com until we hand off.
+ * Heureka: official Trixam click on a clean heureka.cz search URL (no haff).
+ * Amazon: hop HTML never embeds amazon.* or tag=; leave goes through /go?leave=1.
  */
 
 import { AFFILIATE_PRODUCTS } from "@/lib/ecosystem/monetization";
 import { MAGAZINE } from "@/lib/brand/magazine";
 import { parseAffiliateSlug } from "@/lib/monetization/affiliate-geo";
+import {
+  HEUREKA_TRIXAM_SCRIPT,
+  parseHeurekaPositionId,
+  publicMarketplaceUrl,
+} from "@/lib/monetization/heureka-affiliate";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 
@@ -100,6 +106,10 @@ export function publicAssetUrl(path: string | null | undefined): string | null {
 
 export function renderAffiliateHopHtml(input: {
   destination: string;
+  /** Same-origin leave (Amazon). Hop HTML must not embed amazon.* or tag=. */
+  leavePath?: string | null;
+  /** Heureka Trixam position. Click the official <a>, never location.replace(haff). */
+  heurekaTrixamId?: string | null;
   locale?: string | null;
   productName: string;
   imageUrl?: string | null;
@@ -111,13 +121,23 @@ export function renderAffiliateHopHtml(input: {
   const image = imageSrc
     ? `<img src="${escapeHtml(imageSrc)}" alt="" width="160" height="200" style="width:160px;height:200px;object-fit:cover;border-radius:18px;border:1px solid #cfe1f3;background:#e8f3fb;box-shadow:0 12px 40px rgba(2,29,51,.12);"/>`
     : "";
-  const destJson = JSON.stringify(input.destination);
+  const publicDest = publicMarketplaceUrl(input.destination);
+  const leavePath = (input.leavePath ?? "").trim();
+  const navTarget = leavePath || publicDest;
+  const destJson = JSON.stringify(navTarget);
+  const trixamId = parseHeurekaPositionId(input.heurekaTrixamId ?? "");
+  const trixamHref = escapeHtml(publicDest);
+  const trixam = trixamId
+    ? `<a id="vlv-trixam" class="heureka-affiliate-link" data-trixam-positionid="${escapeHtml(trixamId)}" href="${trixamHref}" target="_top" rel="noopener noreferrer sponsored"> </a>`
+    : "";
   const delay =
     input.autoLeaveMs === 0
       ? 0
       : Number.isFinite(input.autoLeaveMs)
         ? Math.max(400, input.autoLeaveMs as number)
-        : 1800;
+        : trixamId
+          ? 2200
+          : 1800;
 
   return `<!doctype html>
 <html lang="${escapeHtml((input.locale || "cs").slice(0, 2))}">
@@ -126,6 +146,7 @@ export function renderAffiliateHopHtml(input: {
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="robots" content="noindex,nofollow"/>
   <title>${escapeHtml(MAGAZINE.name)} · ${name}</title>
+  ${trixamId ? `<script src="${HEUREKA_TRIXAM_SCRIPT}"></script>` : ""}
   <style>
     :root { color-scheme: light; }
     html,body { margin:0; min-height:100%; background:linear-gradient(180deg,#e8f3fb 0%,#f7fafc 42%,#ffffff 100%); }
@@ -138,6 +159,7 @@ export function renderAffiliateHopHtml(input: {
     button:hover { background:#005B96; }
     .back { display:inline-block; margin-top:16px; font:14px/1.4 system-ui,sans-serif; color:#64748b; text-decoration:none; }
     .back:hover { color:#021d33; }
+    #vlv-trixam { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
   </style>
 </head>
 <body>
@@ -149,9 +171,11 @@ export function renderAffiliateHopHtml(input: {
     <button type="button" id="vlv-go-btn">${escapeHtml(copy.continueLabel)}</button>
     <a class="back" href="/">${escapeHtml(copy.backLabel)}</a>
   </main>
+  ${trixam}
   <script type="application/json" id="vlv-go">${destJson}</script>
   <script>
     (function () {
+      var hopped = false;
       function dest() {
         try {
           var el = document.getElementById("vlv-go");
@@ -159,6 +183,13 @@ export function renderAffiliateHopHtml(input: {
         } catch (e) { return ""; }
       }
       function go() {
+        if (hopped) return;
+        hopped = true;
+        var a = document.getElementById("vlv-trixam");
+        if (a) {
+          try { a.click(); } catch (e) {}
+          return;
+        }
         var next = dest();
         if (next) window.location.replace(next);
       }
@@ -172,15 +203,13 @@ export function renderAffiliateHopHtml(input: {
 }
 
 export function hopHtmlHidesTracking(html: string): boolean {
-  const withoutPayload = html.replace(
-    /<script type="application\/json" id="vlv-go">[\s\S]*?<\/script>/,
-    ""
-  );
   return (
-    !/haff=/i.test(withoutPayload) &&
-    !/utm_medium=affiliate/i.test(withoutPayload) &&
-    !/tag=vialongevita/i.test(withoutPayload) &&
-    !/heureka\.cz\/\?/i.test(withoutPayload) &&
-    !/amazon\.(com|de|fr|es|it|co\.uk)/i.test(withoutPayload)
+    !/haff=/i.test(html) &&
+    !/utm_medium=affiliate/i.test(html) &&
+    !/utm_source=/i.test(html) &&
+    !/utm_campaign=/i.test(html) &&
+    !/tag=vialongevita/i.test(html) &&
+    !/[?&]tag=/i.test(html) &&
+    !/amazon\.(com|de|fr|es|it|co\.uk|co\.jp|pl)/i.test(html)
   );
 }

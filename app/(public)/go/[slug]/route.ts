@@ -15,8 +15,10 @@ import { resolveLocalePath } from "@/lib/i18n/locale-path";
 import {
   applyHeurekaHaff,
   getHeurekaPositionId,
+  HEUREKA_HOP_CSP,
   heurekaMarketFromUrl,
   heurekaUrlHasHaff,
+  publicMarketplaceUrl,
 } from "@/lib/monetization/heureka-affiliate";
 
 export const dynamic = "force-dynamic";
@@ -32,7 +34,23 @@ function localeFromReferer(referer: string | null): string | null {
   }
 }
 
-/** In-site hop first; tracking query stays off the public card URL. */
+function isAmazonStoreUrl(url: string): boolean {
+  try {
+    return /(?:^|\.)amazon\.(?:com|de|fr|es|it|pl|co\.uk|co\.jp)$/i.test(new URL(url).hostname);
+  } catch {
+    return false;
+  }
+}
+
+function leavePathFromRequest(url: URL): string {
+  const next = new URL(url.href);
+  next.searchParams.set("leave", "1");
+  next.searchParams.delete("direct");
+  next.searchParams.delete("stay");
+  return `${next.pathname}${next.search}`;
+}
+
+/** In-site hop first; tracking query stays off the public card URL and hop HTML. */
 export async function GET(request: Request, { params }: Params) {
   const { slug } = await params;
   const url = new URL(request.url);
@@ -63,24 +81,32 @@ export async function GET(request: Request, { params }: Params) {
       : fallbackUntrackedHeurekaToAmazonDe(intended, locale)
     : intended;
 
+  const publicUrl = publicMarketplaceUrl(destination);
+  const onHeureka = Boolean(heurekaMarket && haff && heurekaUrlHasHaff(destination));
+  const onAmazon = isAmazonStoreUrl(destination);
+  const leaving = url.searchParams.get("leave") === "1";
+
   await logMonetizationEvent("affiliate_click", {
     slug: slug.trim().toLowerCase(),
     destination,
+    publicUrl,
     locale,
     region,
     referer,
-    heureka: heurekaUrlHasHaff(destination),
+    heureka: onHeureka,
     haff: haff ?? null,
-    checkout: heurekaUrlHasHaff(destination)
-      ? "heureka-haff"
-      : heurekaMarket
-        ? "amazon-de"
-        : "amazon",
+    checkout: onHeureka ? "heureka-trixam" : onAmazon ? "amazon" : "other",
   });
 
   const noStore = "private, no-cache, no-store, must-revalidate";
 
-  if (isDirectAffiliateHop(url)) {
+  if (leaving) {
+    const redirect = NextResponse.redirect(onHeureka ? publicUrl : destination, 302);
+    redirect.headers.set("Cache-Control", noStore);
+    return redirect;
+  }
+
+  if (isDirectAffiliateHop(url) && onAmazon) {
     const redirect = NextResponse.redirect(destination, 302);
     redirect.headers.set("Cache-Control", noStore);
     return redirect;
@@ -89,17 +115,18 @@ export async function GET(request: Request, { params }: Params) {
   const productId = productIdFromGoSlug(slug) ?? slug;
   const stay = url.searchParams.get("stay") === "1";
   const html = renderAffiliateHopHtml({
-    destination,
+    destination: publicUrl,
+    leavePath: onAmazon ? leavePathFromRequest(url) : null,
+    heurekaTrixamId: onHeureka ? haff : null,
     locale,
     productName: productDisplayName(productId, locale),
     imageUrl: productImageForHop(productId),
-    autoLeaveMs: stay ? 0 : 1800,
+    autoLeaveMs: stay ? 0 : onHeureka ? 2200 : 1800,
   });
-  return new NextResponse(html, {
-    status: 200,
-    headers: {
-      "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": noStore,
-    },
-  });
+  const headers: Record<string, string> = {
+    "Content-Type": "text/html; charset=utf-8",
+    "Cache-Control": noStore,
+  };
+  if (onHeureka) headers["Content-Security-Policy"] = HEUREKA_HOP_CSP;
+  return new NextResponse(html, { status: 200, headers });
 }

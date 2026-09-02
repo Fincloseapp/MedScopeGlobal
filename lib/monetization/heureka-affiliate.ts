@@ -1,13 +1,13 @@
 /**
  * Heureka Affiliate.
  *
- * Official earning path for this site is **Přímý odkaz** (`haff=` on heureka.cz).
- * Webmaster: web Medscopeglobal, pozice „Přímý odkaz“, parametr
- * `haff=282255&utm_medium=affiliate`. Heureka.cz itself runs
- * Trixam.HaffCampaignExecuter and attributes the visit.
+ * Public pages never show `haff=` or UTM affiliate query strings. Earnings for
+ * product hops use the official Trixam click (`heureka-affiliate-link` +
+ * `data-trixam-positionid=282255`) on a **clean** heureka.cz search URL.
+ * Footer HEU2 keeps `heureka-hn-link` + position `282256` on `https://www.heureka.cz/`.
  *
- * Untagged heureka.cz search URLs do not pay — those still fall back to Amazon.de.
- * Widget HTML (`data-trixam-positionid`) is the HEU2 text link on the site.
+ * `applyHeurekaHaff` stays for server-side logging and admin. Untagged
+ * heureka.cz search URLs still fall back to Amazon.de when no position exists.
  */
 
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
@@ -37,10 +37,58 @@ export const DEFAULT_HEUREKA_CZ_TRIXAM = "282256";
 export const HEUREKA_CZ_TEXT_LINK = {
   name: "HEU2",
   label: "Heureka.cz - porovnání cen a srovnání produktů",
-  href: "https://www.heureka.cz/#utm_source=medscopeglobal.com&utm_medium=affiliate&utm_campaign=26020&utm_content=Text%20link",
+  href: "https://www.heureka.cz/",
   className: "heureka-hn-link",
   positionId: DEFAULT_HEUREKA_CZ_TRIXAM,
 } as const;
+
+const PUBLIC_TRACKING_KEYS = new Set([
+  "haff",
+  "tag",
+  "ascsubtag",
+  "linkcode",
+  "creative",
+  "camp",
+  "ref",
+  "ref_",
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+]);
+
+/** Address-bar / hover URL — marketplace search only, no affiliate query. */
+export function publicMarketplaceUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    for (const key of [...parsed.searchParams.keys()]) {
+      const normalized = key.toLowerCase();
+      if (PUBLIC_TRACKING_KEYS.has(normalized) || normalized.startsWith("utm_")) {
+        parsed.searchParams.delete(key);
+      }
+    }
+    if (parsed.hash && /(?:utm_|haff=|tag=)/i.test(parsed.hash)) {
+      parsed.hash = "";
+    }
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+}
+
+export function marketplaceUrlShowsTracking(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    for (const key of parsed.searchParams.keys()) {
+      const normalized = key.toLowerCase();
+      if (PUBLIC_TRACKING_KEYS.has(normalized) || normalized.startsWith("utm_")) return true;
+    }
+    return Boolean(parsed.hash && /(?:utm_|haff=|tag=)/i.test(parsed.hash));
+  } catch {
+    return /haff=|utm_medium=affiliate|tag=vialongevita/i.test(url);
+  }
+}
 
 const cache = new Map<string, { id: string | null; at: number }>();
 const CACHE_MS = 30_000;
@@ -174,7 +222,7 @@ function escapeHtml(value: string): string {
 
 /** Official Trixam hop — Heureka counts the click, then the reader lands on search. */
 export function heurekaHopHtml(input: { destination: string; positionId: string }): string {
-  const dest = escapeHtml(input.destination);
+  const dest = escapeHtml(publicMarketplaceUrl(input.destination));
   const pos = escapeHtml(input.positionId);
   return `<!doctype html>
 <html lang="cs">
