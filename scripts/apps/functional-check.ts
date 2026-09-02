@@ -843,6 +843,12 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(
+    "analytics_storage: 'granted'"
+  ),
+  "EEA visits must send page_view before Funding Choices CMP exists"
+);
+assert.ok(
+  readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(
     "G-6DX8RC4VZ1"
   ) ||
     readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(

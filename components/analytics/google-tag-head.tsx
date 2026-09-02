@@ -18,8 +18,15 @@ export function GoogleTagHead() {
         dangerouslySetInnerHTML={{
           __html: `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
+gtag('consent', 'default', {
+  analytics_storage: 'granted',
+  ad_storage: 'denied',
+  ad_user_data: 'denied',
+  ad_personalization: 'denied',
+  wait_for_update: 500
+});
 gtag('js', new Date());
-gtag('config', '${id}');`,
+gtag('config', '${id}', { send_page_view: true });`,
         }}
       />
     </>
