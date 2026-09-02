@@ -791,6 +791,27 @@ assert.ok(
   )
 );
 assert.ok(
+  readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes(
+    "fundingchoicesmessages.google.com"
+  ),
+  "CSP must allow Google Funding Choices CMP"
+);
+const consentScripts = readFileSync(join(root, "components/analytics/consent-scripts.tsx"), "utf8");
+assert.ok(
+  consentScripts.includes("adsbygoogle.js?client="),
+  "AdSense snippet must load for verification + CMP"
+);
+assert.ok(
+  !consentScripts.includes("marketing && allowAds"),
+  "homemade marketing gate must not block Google CMP"
+);
+assert.ok(
+  readFileSync(join(root, "components/legal/cookie-banner.tsx"), "utf8").includes(
+    "googleCmpOwnsAds"
+  ),
+  "first-party banner must yield to Google CMP on magazine paths"
+);
+assert.ok(
   !readFileSync(join(root, "app/(public)/ordizaznam/page.tsx"), "utf8").includes("GlobalAdSlot"),
   "physician landing must stay AdSense-free"
 );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +16,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { adsAllowedOnPath } from "@/lib/monetization/adsense";
 
 export const COOKIE_KEY = "msg_cookie_consent";
 export const CONSENT_EVENT = "msg-consent";
@@ -45,11 +47,17 @@ function saveConsent(consent: Consent) {
 
 export function CookieBanner({ locale = "cs" }: { locale?: string }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
   const copy = getSurfaceCopy(locale);
+  const googleCmpOwnsAds = adsAllowedOnPath(pathname);
 
   useEffect(() => {
+    if (googleCmpOwnsAds) {
+      setOpen(false);
+      return;
+    }
     if (!readConsent()) setOpen(true);
-  }, []);
+  }, [googleCmpOwnsAds]);
 
   function acceptAll() {
     saveConsent({

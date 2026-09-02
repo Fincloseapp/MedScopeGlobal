@@ -27,8 +27,9 @@ export default function CookiesPage() {
         </li>
         <li>
           <strong>Marketingové</strong> — Google AdSense (ca-pub-6820104998820692) na veřejném
-          magazínu ViaLongeVita a jazykových mutacích, pouze se souhlasem. Lékařské, studentské
-          a admin plochy reklamy nenačítají.
+          magazínu ViaLongeVita. Souhlas v EHP / UK / Švýcarsku řeší certifikovaná CMP od Googlu
+          (Souhlasím / Nesouhlasím / Spravovat možnosti). Lékařské, studentské a admin plochy
+          reklamy nenačítají.
         </li>
       </ul>
 

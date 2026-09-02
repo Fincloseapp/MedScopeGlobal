@@ -31,13 +31,14 @@ function pushPageView(path: string) {
 }
 
 /**
- * Loads GA and AdSense only after cookie consent (analytics / marketing).
- * Auto ads (page-level) run on public ViaLongeVita locales; professional paths stay clean.
+ * GA still waits for first-party analytics consent.
+ * AdSense + Google Funding Choices CMP load on public magazine paths without
+ * our homemade marketing gate — otherwise the EU consent message never appears
+ * and AdSense cannot finish site verification via the code snippet.
  */
 export function ConsentScripts() {
   const pathname = usePathname();
   const [analytics, setAnalytics] = useState(false);
-  const [marketing, setMarketing] = useState(false);
   const measurementId = gaId();
   const ads = getClientAdConfig();
   const allowAds = adsAllowedOnPath(pathname);
@@ -47,7 +48,6 @@ export function ConsentScripts() {
     function sync() {
       const consent = readConsent();
       setAnalytics(Boolean(consent?.analytics));
-      setMarketing(Boolean(consent?.marketing));
     }
     sync();
     window.addEventListener(CONSENT_EVENT, sync);
@@ -60,13 +60,7 @@ export function ConsentScripts() {
   }, [analytics, pathname]);
 
   useEffect(() => {
-    if (
-      pageLevelPushed.current ||
-      !marketing ||
-      !allowAds ||
-      !ads.enabled ||
-      !ads.adsenseClientId
-    ) {
+    if (pageLevelPushed.current || !allowAds || !ads.enabled || !ads.adsenseClientId) {
       return;
     }
     try {
@@ -79,7 +73,7 @@ export function ConsentScripts() {
     } catch {
       /* script may still be fetching */
     }
-  }, [marketing, allowAds, ads.enabled, ads.adsenseClientId]);
+  }, [allowAds, ads.enabled, ads.adsenseClientId]);
 
   return (
     <>
@@ -94,7 +88,7 @@ export function ConsentScripts() {
           </Script>
         </>
       ) : null}
-      {marketing && allowAds && ads.enabled && ads.adsenseClientId ? (
+      {allowAds && ads.enabled && ads.adsenseClientId ? (
         <Script
           id="adsense-auto"
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ads.adsenseClientId}`}

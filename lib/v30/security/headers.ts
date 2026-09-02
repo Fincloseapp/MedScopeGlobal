@@ -2,13 +2,13 @@ import type { NextResponse } from "next/server";
 
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://serve.affiliate.heureka.cz https://pagead2.googlesyndication.com https://partner.googleadservices.com https://www.googletagmanager.com https://www.google.com https://www.gstatic.com https://adservice.google.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://serve.affiliate.heureka.cz https://pagead2.googlesyndication.com https://partner.googleadservices.com https://www.googletagmanager.com https://www.google.com https://www.gstatic.com https://adservice.google.com https://fundingchoicesmessages.google.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://images.unsplash.com https://source.unsplash.com https://*.supabase.co https: http:",
   "font-src 'self' data:",
   "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://serve.affiliate.heureka.cz https://*.googlesyndication.com https://*.google.com https://*.doubleclick.net https://*.adtrafficquality.google https://www.google-analytics.com https://www.googletagmanager.com",
   "media-src 'self' blob: data: https://*.supabase.co https://storage.googleapis.com https://www.w3schools.com https:",
-  "frame-src 'self' https://js.stripe.com https://www.youtube.com https://player.vimeo.com https://*.googlesyndication.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://www.googletagmanager.com",
+  "frame-src 'self' https://js.stripe.com https://www.youtube.com https://player.vimeo.com https://*.googlesyndication.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://www.googletagmanager.com https://fundingchoicesmessages.google.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
