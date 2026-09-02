@@ -12,6 +12,11 @@ import {
 import { getHeurekaPositionId } from "@/lib/monetization/heureka-affiliate";
 import { getPayoutReadiness, type PayoutReadiness } from "@/lib/monetization/payout-map";
 import { createAdminReadClient } from "@/lib/auth/require-admin-access";
+import { ensureMissingEditorialCategories } from "@/lib/admin/ensure-taxonomy";
+import {
+  loadStripeMoneySnapshot,
+  type StripeMoneySnapshot,
+} from "@/lib/admin/stripe-snapshot";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import type { Category } from "@/types/database";
 
@@ -42,6 +47,8 @@ export type AdminOverview = {
   heurekaCzId: string | null;
   heurekaSkId: string | null;
   categoryRows: AdminCategoryRow[];
+  stripeMoney: StripeMoneySnapshot;
+  taxonomyInserted: number;
 };
 
 type CountResult = { count: number | null; error: { message: string } | null };
@@ -62,6 +69,7 @@ export function affiliateProductLabel(slug: string): string {
 }
 
 export async function loadAdminCategoriesForForm(): Promise<Category[]> {
+  await ensureMissingEditorialCategories();
   const client = await createAdminReadClient();
   if (!client) return [];
   const { data, error } = await client
@@ -72,7 +80,12 @@ export async function loadAdminCategoriesForForm(): Promise<Category[]> {
   return data as Category[];
 }
 
-export async function loadAdminCategoryRows(): Promise<AdminCategoryRow[]> {
+export async function loadAdminCategoryRows(opts?: {
+  skipEnsure?: boolean;
+}): Promise<AdminCategoryRow[]> {
+  if (!opts?.skipEnsure) {
+    await ensureMissingEditorialCategories();
+  }
   const client = await createAdminReadClient();
   if (!client) return [];
   const { data: categories, error } = await client
@@ -139,6 +152,8 @@ function emptyOverview(): AdminOverview {
     heurekaCzId: null,
     heurekaSkId: null,
     categoryRows: [],
+    stripeMoney: { configured: false, available: [], pending: [] },
+    taxonomyInserted: 0,
   };
 }
 
@@ -146,6 +161,7 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
   const client = await createAdminReadClient();
   if (!client) return emptyOverview();
   const dataSource = tryCreateServiceRoleClient() ? "service-role" : "user-session";
+  const taxonomyInserted = await ensureMissingEditorialCategories();
 
   const [
     articlesTotal,
@@ -158,6 +174,7 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
     categoryRows,
     heurekaCzId,
     heurekaSkId,
+    stripeMoney,
   ] = await Promise.all([
     countSafe(client.from("articles").select("id", { count: "exact", head: true })),
     countSafe(
@@ -172,9 +189,10 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
     countSafe(
       client.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "active")
     ),
-    loadAdminCategoryRows(),
+    loadAdminCategoryRows({ skipEnsure: true }),
     getHeurekaPositionId("cz"),
     getHeurekaPositionId("sk"),
+    loadStripeMoneySnapshot(),
   ]);
 
   const since = new Date(Date.now() - 30 * 86_400_000).toISOString();
@@ -242,5 +260,7 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
     heurekaCzId,
     heurekaSkId,
     categoryRows,
+    stripeMoney,
+    taxonomyInserted,
   };
 }

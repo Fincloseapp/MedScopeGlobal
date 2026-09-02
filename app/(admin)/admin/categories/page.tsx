@@ -103,7 +103,10 @@ export default async function AdminCategoriesPage() {
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
           <p className="font-medium">V databázi chybí {missing.length} kanonických kategorií.</p>
           <p className="mt-1 text-amber-800">{missing.join(", ")}</p>
-          <p className="mt-1">Tlačítko nahoře je doplní česky a nic použitého nesmaže.</p>
+          <p className="mt-1">
+            Chybějící řádky se doplní při otevření této stránky. Tlačítko nahoře sjednotí české
+            názvy a nic použitého nesmaže.
+          </p>
         </div>
       ) : (
         <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">

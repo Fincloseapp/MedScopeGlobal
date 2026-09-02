@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import { affiliateProductLabel, loadAdminOverview } from "@/lib/admin/overview";
 import { categoryHealthLabel, categoryKindLabel } from "@/lib/admin/taxonomy";
+import { formatStripeMinor } from "@/lib/admin/stripe-snapshot";
 import { channelReady } from "@/lib/monetization/payout-map";
 
 export const dynamic = "force-dynamic";
@@ -164,9 +165,23 @@ export default async function AdminDashboardPage() {
             <p className="text-xs text-slate-500">{overview.v27PaidOrders} zaplacených objednávek</p>
           </div>
           <div className="rounded-xl border bg-white p-4">
-            <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Stripe předplatné</p>
-            <p className="mt-1 text-2xl font-bold">{overview.stripeSubscriptions}</p>
-            <p className="text-xs text-slate-500">aktivní v tabulce subscriptions</p>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Stripe zůstatek</p>
+            <p className="mt-1 text-2xl font-bold">
+              {overview.stripeMoney.available.length > 0
+                ? overview.stripeMoney.available
+                    .map((line) => formatStripeMinor(line.amount, line.currency))
+                    .join(" · ")
+                : overview.stripeMoney.configured
+                  ? "0"
+                  : "—"}
+            </p>
+            <p className="text-xs text-slate-500">
+              {overview.stripeMoney.error
+                ? overview.stripeMoney.error
+                : overview.stripeMoney.pending.length > 0
+                  ? `čeká ${overview.stripeMoney.pending.map((line) => formatStripeMinor(line.amount, line.currency)).join(" · ")}`
+                  : `${overview.stripeSubscriptions} aktivních předplatných v DB`}
+            </p>
           </div>
         </div>
 
@@ -202,6 +217,14 @@ export default async function AdminDashboardPage() {
             Zatím žádné affiliate kliky za 30 dní, nebo chybí tabulka analytics.
           </p>
         )}
+        {overview.clicks.byLocale.length > 0 ? (
+          <p className="mt-2 text-xs text-slate-500">
+            Locale 30 dní:{" "}
+            {overview.clicks.byLocale
+              .map((row) => `${row.locale} ${row.count}`)
+              .join(" · ")}
+          </p>
+        ) : null}
 
         <p className="mt-3 text-xs text-slate-500">
           <a className="font-medium text-[#005B96] hover:underline" href="https://dashboard.stripe.com/balance" target="_blank" rel="noreferrer">
@@ -234,10 +257,15 @@ export default async function AdminDashboardPage() {
             Spravovat kategorie →
           </Link>
         </div>
-        {overview.categories.missingEditorial.length > 0 ? (
+        {overview.taxonomyInserted > 0 ? (
+          <p className="mb-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
+            Právě doplněno {overview.taxonomyInserted} kanonických kategorií. Nic použitého se
+            nemazalo.
+          </p>
+        ) : overview.categories.missingEditorial.length > 0 ? (
           <p className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            Chybí v databázi: {overview.categories.missingEditorial.join(", ")}. Doplníte je jedním
-            tlačítkem na stránce kategorií.
+            Ještě chybí: {overview.categories.missingEditorial.join(", ")}. Zkuste stránku obnovit
+            nebo tlačítko na stránce kategorií.
           </p>
         ) : null}
         <div className="overflow-x-auto rounded-xl border bg-white">

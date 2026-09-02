@@ -52,6 +52,8 @@ import {
   missingEditorialSlugs,
   slugifyCategory,
 } from "../../lib/admin/taxonomy";
+import { editorialRowsToInsert } from "../../lib/admin/ensure-taxonomy";
+import { formatStripeMinor } from "../../lib/admin/stripe-snapshot";
 import { V20_NZIP_CATEGORIES } from "../../lib/v20/categories";
 import { getRevenueCopy } from "../../lib/i18n/revenue-copy";
 import {
@@ -381,6 +383,17 @@ assert.deepEqual(missingEditorialSlugs(["kardiologie"]), EDITORIAL_TAXONOMY.filt
   assert.equal(stats.top[0]?.slug, "magnesium-glycinate");
   assert.equal(stats.top[0]?.count, 2);
 }
+{
+  const missing = editorialRowsToInsert(["kardiologie", "cardiology"]);
+  assert.ok(missing.some((row) => row.slug === "dlouhovekost"));
+  assert.ok(!missing.some((row) => row.slug === "kardiologie"));
+  assert.equal(editorialRowsToInsert(EDITORIAL_TAXONOMY.map((item) => item.slug)).length, 0);
+  assert.equal(formatStripeMinor(14900, "czk"), "149,00 CZK");
+  assert.equal(formatStripeMinor(250, "eur"), "2,50 EUR");
+  assert.equal(formatStripeMinor(600, "jpy"), "600 JPY");
+}
+file("lib/admin/ensure-taxonomy.ts");
+file("lib/admin/stripe-snapshot.ts");
 file("lib/monetization/heureka-affiliate.ts");
 file("supabase/migrations/20260901193000_monetization_settings.sql");
 assert.equal(parseHeurekaPositionId('data-trixam-positionid="18420"'), "18420");

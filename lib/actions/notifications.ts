@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/auth/admin";
+import { requireAdminAccess } from "@/lib/auth/require-admin-access";
 import { logAdminEvent } from "@/lib/logging";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 
@@ -11,8 +11,7 @@ export async function sendNotificationToUser(input: {
   body: string | null;
   priority?: boolean;
 }) {
-  const gate = await requireAdmin();
-  if (!gate.ok) throw new Error("Unauthorized");
+  await requireAdminAccess();
 
   const admin = createServiceRoleClient();
   const { error } = await admin.from("notifications").insert({
@@ -37,8 +36,7 @@ export async function broadcastNotificationToVip(input: {
   title: string;
   body: string | null;
 }) {
-  const gate = await requireAdmin();
-  if (!gate.ok) throw new Error("Unauthorized");
+  await requireAdminAccess();
 
   const admin = createServiceRoleClient();
   const { data: subs, error: subErr } = await admin
