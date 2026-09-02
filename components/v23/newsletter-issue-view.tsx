@@ -11,10 +11,15 @@ import {
 } from "@/lib/v23/newsletter/images";
 import type { V23NewsletterLayout, V23NewsletterSection } from "@/lib/v23/newsletter/types";
 import { V23_NEWSLETTER_IMAGE } from "@/lib/v23/images";
-import { formatIssueDateCs, isJsonLikeText, sanitizeNewsletterText } from "@/lib/v23/newsletter/sanitize";
+import { isJsonLikeText, sanitizeNewsletterText } from "@/lib/v23/newsletter/sanitize";
 import { newsletterHeadline } from "@/lib/v23/newsletter/title";
 import { Button } from "@/components/ui/button";
 import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
+import { formatPublicDate } from "@/lib/i18n/format-date";
+import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { normalizeLocale } from "@/lib/i18n/config";
 
 function resolveItemImage(
   sectionId: string,
@@ -136,9 +141,21 @@ export function V23NewsletterIssueView({
   locale?: string;
 }) {
   const layout = parseLayout(issue);
-  const dateLabel = formatIssueDateCs(issue.issue_date);
+  const copy = getNewsletterCopy(locale);
+  const dateLabel = formatPublicDate(issue.issue_date, locale);
+  const primary = primaryArticleLocale(normalizeLocale(locale));
+  const recommendedLabel =
+    primary === "cs" ? "Doporučujeme" : primary === "de" ? "Empfohlen" : primary === "fr" ? "À lire" : "Worth a look";
+  const emptyLabel =
+    primary === "cs"
+      ? "Obsah vydání bude brzy doplněn."
+      : primary === "de"
+        ? "Diese Ausgabe wird in Kürze ergänzt."
+        : primary === "fr"
+          ? "Ce numéro sera bientôt complété."
+          : "This issue will be filled in shortly.";
   const heroUrl = layout?.heroImageUrl?.startsWith("http") ? layout.heroImageUrl : V23_NEWSLETTER_IMAGE;
-  const heroAlt = layout?.heroImageAlt ?? "MedScopeGlobal Newsletter — odborný medicínský přehled";
+  const heroAlt = layout?.heroImageAlt ?? copy.hubTitle;
   const showHtmlFallback =
     !layout && issue.html_content && !isJsonLikeText(issue.html_content) && !issue.html_content.includes('"sections"');
 
@@ -157,10 +174,7 @@ export function V23NewsletterIssueView({
         <div className="relative flex min-h-[360px] items-center justify-center sm:min-h-[400px]">
           <NewsletterHero
             title={layout?.headline ?? `MedScopeGlobal Newsletter — ${dateLabel}`}
-            subhead={
-              layout?.intro ??
-              `Týdenní odborný přehled studií, legislativy a novinek ve zdravotnictví — ${dateLabel}`
-            }
+            subhead={layout?.intro ?? `${copy.hubDescription} — ${dateLabel}`}
             className="w-full text-white"
           />
         </div>
@@ -206,12 +220,12 @@ export function V23NewsletterIssueView({
             dangerouslySetInnerHTML={{ __html: issue.html_content! }}
           />
         ) : (
-          <p className="mt-6 text-slate-600">Obsah vydání bude brzy doplněn.</p>
+          <p className="mt-6 text-slate-600">{emptyLabel}</p>
         )}
 
         {layout?.recommended && layout.recommended.length > 0 ? (
           <section className="mt-10 rounded-2xl border border-slate-200 bg-slate-50/50 p-6">
-            <h2 className="font-display text-lg font-bold text-[#021d33]">Doporučujeme</h2>
+            <h2 className="font-display text-lg font-bold text-[#021d33]">{recommendedLabel}</h2>
             <ul className="mt-4 space-y-3">
               {layout.recommended.map((r, i) => (
                 <li key={`rec-${i}`} className="text-sm text-slate-700">
@@ -234,13 +248,13 @@ export function V23NewsletterIssueView({
         </div>
 
         <div className="mt-10 flex flex-col items-center border-t border-slate-100 pt-8">
-          <NewsletterFooterLogo href="/" />
+          <NewsletterFooterLogo href={localizePublicHref("/", locale)} />
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Button asChild variant="outline" className="rounded-full">
-              <Link href="/newsletter/archiv">Archiv vydání</Link>
+              <Link href={localizePublicHref("/newsletter/archiv", locale)}>{copy.hubArchive}</Link>
             </Button>
             <Button asChild variant="outline" className="rounded-full">
-              <Link href="/newsletter">← Přehled</Link>
+              <Link href={localizePublicHref("/newsletter", locale)}>← {copy.hubTitle}</Link>
             </Button>
           </div>
         </div>

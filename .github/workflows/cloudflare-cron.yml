@@ -42,6 +42,7 @@ jobs:
             /api/cron/ecosystem-syndicate
             /api/ecosystem/editorial/images
             /api/cron/revenue-ops
+            /api/cron/newsletter-generate
             /api/cron/vialongevita-brief
           )
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then

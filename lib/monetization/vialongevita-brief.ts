@@ -10,13 +10,12 @@ import { buildLocalePath } from "@/lib/i18n/locale-path";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { applyNewsletterSubscriberSchema } from "@/lib/monetization/apply-schema";
-import {
-  affiliateGoPath,
-  resolveAffiliateMarket,
-} from "@/lib/monetization/affiliate-geo";
+import { affiliateGoPath } from "@/lib/monetization/affiliate-geo";
 import { pickAffiliateProducts } from "@/lib/monetization/affiliate-mix";
 import type { AffiliateProduct } from "@/lib/ecosystem/monetization";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { composeBriefLead, composeBriefSubject } from "@/lib/monetization/brief-marketing";
+import { looksLikeCzech } from "@/lib/i18n/czech-detect";
 
 const FROM_NAME = MAGAZINE.name;
 const WEEK_MS = 6 * 24 * 60 * 60 * 1000;
@@ -212,7 +211,8 @@ function briefHtml(locale: string, email: string, articles: BriefArticle[]): { s
   const products = pickBriefProducts(articles, locale);
   const cards = products.map((product) => affiliateCardHtml(product, locale, copy.briefAffiliateCta)).join("");
   const unsub = newsletterUnsubUrl(email, locale);
-  const market = resolveAffiliateMarket({ locale });
+  const titles = articles.map((article) => article.title);
+  const lead = composeBriefLead(locale, titles);
 
   const items = articles
     .map((article) => {
@@ -226,18 +226,17 @@ function briefHtml(locale: string, email: string, articles: BriefArticle[]): { s
     .join("");
 
   const inner = `
-    <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">${escapeHtml(copy.briefIntro)}</p>
+    <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">${escapeHtml(lead)}</p>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${items}</table>
     <div style="margin:8px 0 20px;padding:16px;border:1px solid #cfe1f3;background:#f4f8fc;border-radius:12px;">
       <p style="margin:0 0 10px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#005B96;">${escapeHtml(copy.briefAffiliateKicker)}</p>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${cards}</tr></table>
-      <p style="margin:10px 0 0;font-size:11px;color:#64748b;">${escapeHtml(market)}</p>
     </div>
     <p style="margin:0;font-size:12px;color:#64748b;">
       <a href="${escapeHtml(unsub)}" style="color:#64748b;">${escapeHtml(copy.unsub)}</a>
     </p>`;
   const { html, text } = emailShell(locale, inner);
-  return { subject: copy.briefSubject, html, text };
+  return { subject: composeBriefSubject(locale, titles), html, text };
 }
 
 async function loadBriefArticles(locale: string): Promise<BriefArticle[]> {
@@ -273,7 +272,57 @@ async function loadBriefArticles(locale: string): Promise<BriefArticle[]> {
     })
   );
   const picked = (longevity.length >= 3 ? longevity : rows).slice(0, 3);
-  return picked;
+  return localizeBriefArticles(picked, locale);
+}
+
+async function localizeBriefArticles(articles: BriefArticle[], locale: string): Promise<BriefArticle[]> {
+  const primary = primaryArticleLocale(normalizeLocale(locale));
+  if (primary === "cs") return articles;
+  const { fallbackTranslateFields } = await import("@/lib/i18n/translate-fallback");
+  const localized: BriefArticle[] = [];
+  for (const row of articles) {
+    if (!looksLikeCzech(row.title) && !looksLikeCzech(row.excerpt ?? "")) {
+      localized.push(row);
+      continue;
+    }
+    const hit = await fallbackTranslateFields({
+      title: row.title,
+      excerpt: row.excerpt,
+      content: row.excerpt,
+      sourceLocale: "cs",
+      targetLocale: locale,
+      mode: "card",
+    }).catch(() => null);
+    if (!hit || looksLikeCzech(hit.title)) continue;
+    localized.push({
+      ...row,
+      title: hit.title,
+      excerpt: hit.excerpt && !looksLikeCzech(hit.excerpt) ? hit.excerpt : null,
+    });
+  }
+  return localized;
+}
+
+export async function sendViaLongeVitaTestBrief(input: {
+  email: string;
+  locale?: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  if (!mailReady()) return { ok: false, error: "mail_not_configured" };
+  if (skipAddress(input.email)) return { ok: false, error: "skip_address" };
+  const locale = (input.locale ?? "cs").trim() || "cs";
+  const articles = await loadBriefArticles(locale);
+  if (articles.length === 0) return { ok: false, error: "no_articles" };
+  const payload = briefHtml(locale, input.email, articles);
+  const result = await sendEmail({
+    to: input.email,
+    subject: `[test] ${payload.subject}`,
+    html: payload.html,
+    text: payload.text,
+    category: "marketing",
+    fromName: FROM_NAME,
+    metadata: { kind: "vialongevita-brief-test", locale },
+  });
+  return result.ok ? { ok: true } : { ok: false, error: result.error ?? "send_failed" };
 }
 
 type SubscriberRow = {

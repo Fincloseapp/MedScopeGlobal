@@ -42,6 +42,7 @@ import {
   renderAffiliateHopHtml,
 } from "../../lib/monetization/affiliate-hop";
 import { pickAffiliateProducts, AFFILIATE_SLOT_COUNTS } from "../../lib/monetization/affiliate-mix";
+import { composeBriefLead, composeBriefSubject } from "../../lib/monetization/brief-marketing";
 import { splitHtmlAfterParagraphs } from "../../lib/monetization/split-article-html";
 import { getPayoutReadiness, PAYOUT_CHANNELS } from "../../lib/monetization/payout-map";
 import {
@@ -677,6 +678,33 @@ file("app/api/newsletter/unsubscribe/route.ts");
 file("lib/monetization/affiliate-geo.ts");
 file("lib/i18n/newsletter-copy.ts");
 file("lib/monetization/vialongevita-brief.ts");
+file("lib/monetization/brief-marketing.ts");
+file("lib/admin/newsletter-ops.ts");
+file("app/api/admin/newsletter/brief/route.ts");
+file("app/(admin)/admin/newsletter/page.tsx");
+file("components/admin/newsletter-ops-strip.tsx");
+assert.ok(composeBriefLead("cs", ["Spánek po padesátce", "Chůze"]).includes("Spánek po padesátce"));
+assert.ok(composeBriefLead("de", ["Schlaf", "Bewegung"]).includes("Diese Woche"));
+assert.ok(composeBriefLead("en", []).includes("Three") || composeBriefLead("en", []).length > 10);
+assert.ok(composeBriefSubject("cs", ["Světelný budík a spánek"]).startsWith("ViaLongeVita"));
+assert.ok(
+  !readFileSync(join(root, "lib/monetization/vialongevita-brief.ts"), "utf8").includes("escapeHtml(market)"),
+  "brief must not show heureka-cz / amazon market labels"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/newsletter/page.tsx"), "utf8").includes("/newsletter/archiv"),
+  "hub archive must point at /newsletter/archiv"
+);
+assert.ok(
+  readFileSync(join(root, ".github/workflows/cloudflare-cron.yml"), "utf8").includes(
+    "/api/cron/newsletter-generate"
+  ),
+  "web issue must publish on Cloudflare cron"
+);
+assert.ok(
+  readFileSync(join(root, "lib/v23/newsletter/render.ts"), "utf8").includes("locale = \"cs\""),
+  "HTML render must accept locale for affiliate /go links"
+);
 file("public/assets/affiliate/supplement.svg");
 file("public/assets/affiliate/bottle.svg");
 file("public/assets/affiliate/device.svg");

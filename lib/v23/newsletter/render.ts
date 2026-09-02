@@ -13,7 +13,7 @@ function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-export function renderNewsletterHtml(layout: V23NewsletterLayout): string {
+export function renderNewsletterHtml(layout: V23NewsletterLayout, locale = "cs"): string {
   const sectionsHtml = layout.sections
     .map((sec) => {
       const items = sec.items
@@ -45,15 +45,17 @@ export function renderNewsletterHtml(layout: V23NewsletterLayout): string {
     .map((r) => `<li><strong>${escapeHtml(r.title)}</strong> — ${escapeHtml(r.summary)}</li>`)
     .join("");
 
-  const copy = getNewsletterCopy("cs");
-  const affiliateHtml = pickAffiliateProducts({ surface: "newsletter", locale: "cs" })
+  const copy = getNewsletterCopy(locale);
+  const affiliateHtml = pickAffiliateProducts({ surface: "newsletter", locale })
     .map((product) => {
-      const name = product.name.cs ?? product.name.en ?? product.id;
-      const href = `${SITE.url}${affiliateGoPath(product.id, "cs", { carryLocale: true })}`;
+      const name = product.name[locale] ?? product.name.en ?? product.name.cs ?? product.id;
+      const href = `${SITE.url}${affiliateGoPath(product.id, locale, { carryLocale: true })}`;
       const image = product.imageUrl.startsWith("http")
         ? product.imageUrl
         : `${SITE.url}${product.imageUrl}`;
-      return `<li class="nl-item"><img src="${escapeHtml(image)}" alt="" width="120" height="150" class="nl-item-img" /><div class="nl-item-body"><a href="${escapeHtml(href)}"><strong>${escapeHtml(name)}</strong></a><p>${escapeHtml(product.description.cs ?? product.description.en ?? "")}</p></div></li>`;
+      const description =
+        product.description[locale] ?? product.description.en ?? product.description.cs ?? "";
+      return `<li class="nl-item"><img src="${escapeHtml(image)}" alt="" width="120" height="150" class="nl-item-img" /><div class="nl-item-body"><a href="${escapeHtml(href)}"><strong>${escapeHtml(name)}</strong></a><p>${escapeHtml(description)}</p></div></li>`;
     })
     .join("");
 
@@ -63,9 +65,9 @@ export function renderNewsletterHtml(layout: V23NewsletterLayout): string {
   <p class="nl-lead">${escapeHtml(layout.intro)}</p>
   ${sectionsHtml}
   <section class="nl-section nl-cta">
-    <h2>Doporučujeme</h2>
+    <h2>${escapeHtml(copy.hubLatest)}</h2>
     <ul>${recHtml}</ul>
-    <p><a href="/newsletter" class="nl-cta-link">Přihlásit se k odběru newsletteru →</a></p>
+    <p><a href="/newsletter" class="nl-cta-link">${escapeHtml(copy.cta)} →</a></p>
   </section>
   <section class="nl-section">
     <h2>${escapeHtml(copy.briefAffiliateKicker)}</h2>

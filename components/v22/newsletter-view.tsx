@@ -12,7 +12,7 @@ import { localizePublicHref } from "@/lib/i18n/nav-copy";
 export function V22NewsletterHub({ locale = "cs" }: { locale?: string }) {
   const copy = getNewsletterCopy(locale);
   const latestHref = localizePublicHref("/newsletter/posledni", locale);
-  const archiveHref = localizePublicHref("/newsletter/posledni", locale);
+  const archiveHref = localizePublicHref("/newsletter/archiv", locale);
   return (
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white">

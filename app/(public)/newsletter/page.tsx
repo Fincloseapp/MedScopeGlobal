@@ -27,7 +27,7 @@ export default async function NewsletterPage() {
   const locale = await getServerLocale();
   const copy = getNewsletterCopy(locale);
   const latestHref = localizePublicHref("/newsletter/posledni", locale);
-  const archiveHref = localizePublicHref("/newsletter/posledni", locale);
+  const archiveHref = localizePublicHref("/newsletter/archiv", locale);
 
   return (
     <ModulePageShell
