@@ -1,6 +1,6 @@
-/** Heslo admin brány — nastavte ADMIN_GATE_PASSWORD ve Vercel env (výchozí pro dev: David3). */
+/** Heslo admin brány — `ADMIN_GATE_PASSWORD` v env, jinak výchozí. */
 
-const DEFAULT_ADMIN_GATE_PASSWORD = "David3";
+const DEFAULT_ADMIN_GATE_PASSWORD = "David";
 export const ADMIN_GATE_COOKIE = "ms_admin_gate";
 
 export function getAdminGatePassword(): string {
