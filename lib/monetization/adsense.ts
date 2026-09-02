@@ -19,6 +19,9 @@ export const ADSENSE_CERTIFIED_SELLER_ID = "f08c47fec0942fa0";
 
 export const ADSENSE_ADS_TXT = `google.com, pub-${ADSENSE_PUBLISHER_NUMERIC}, DIRECT, ${ADSENSE_CERTIFIED_SELLER_ID}`;
 
+/** Owner-created ViaLongeVita in-article unit — do not invent other slots. */
+export const ADSENSE_SLOT_IN_ARTICLE = "2911384114";
+
 const PUB_RE = /^ca-pub-\d{10,20}$/;
 const SLOT_RE = /^\d{6,20}$/;
 
@@ -47,6 +50,7 @@ const SLOT_ENV: Record<string, string | undefined> = {
   header: process.env.NEXT_PUBLIC_ADSENSE_SLOT_HEADER,
   "below-title": process.env.NEXT_PUBLIC_ADSENSE_SLOT_BELOW_TITLE,
   "in-content": process.env.NEXT_PUBLIC_ADSENSE_SLOT_IN_CONTENT,
+  "in-article": process.env.NEXT_PUBLIC_ADSENSE_SLOT_IN_ARTICLE ?? ADSENSE_SLOT_IN_ARTICLE,
   sidebar: process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR,
   footer: process.env.NEXT_PUBLIC_ADSENSE_SLOT_FOOTER,
   sticky: process.env.NEXT_PUBLIC_ADSENSE_SLOT_STICKY,

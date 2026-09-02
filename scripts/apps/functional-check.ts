@@ -33,6 +33,7 @@ import {
 import {
   ADSENSE_ADS_TXT,
   ADSENSE_PUBLISHER_ID,
+  ADSENSE_SLOT_IN_ARTICLE,
   adsAllowedOnPath,
   isAdSenseEnabled,
   resolveAdSenseClientId,
@@ -770,6 +771,9 @@ assert.equal(resolveAdSenseClientId(), "ca-pub-6820104998820692");
 assert.equal(adCfg.enabled, true);
 assert.equal(adCfg.adsenseClientId, ADSENSE_PUBLISHER_ID);
 assert.equal(resolveAdSenseSlotId("below-title"), null);
+assert.equal(resolveAdSenseSlotId("in-content"), null);
+assert.equal(resolveAdSenseSlotId("in-article"), ADSENSE_SLOT_IN_ARTICLE);
+assert.equal(ADSENSE_SLOT_IN_ARTICLE, "2911384114");
 assert.equal(adsAllowedOnPath("/de"), true);
 assert.equal(adsAllowedOnPath("/en/article/sleep"), true);
 assert.equal(adsAllowedOnPath("/cs/newsletter"), true);
@@ -842,6 +846,42 @@ assert.ok(
   !readFileSync(join(root, "app/(public)/ordizaznam/page.tsx"), "utf8").includes("GlobalAdSlot"),
   "physician landing must stay AdSense-free"
 );
+const articlePageSrc = readFileSync(join(root, "app/(public)/article/[slug]/page.tsx"), "utf8");
+assert.ok(
+  articlePageSrc.includes("ADSENSE_SLOT_IN_ARTICLE"),
+  "public article must use the owner in-article slot"
+);
+assert.ok(
+  articlePageSrc.includes('placement="in-article"'),
+  "article unit must be the official in-article placement"
+);
+assert.ok(
+  readFileSync(join(root, "lib/monetization/adsense.ts"), "utf8").includes("2911384114"),
+  "owner in-article slot id must stay 2911384114"
+);
+assert.ok(
+  readFileSync(join(root, "components/monetization/global-ad-slot.tsx"), "utf8").includes(
+    '"data-ad-layout": "in-article"'
+  ),
+  "in-article unit must keep Google layout=in-article + fluid"
+);
+assert.ok(
+  !readFileSync(join(root, "components/monetization/global-ad-slot.tsx"), "utf8").includes(
+    "marketingOk"
+  ),
+  "homemade marketing cookie must not gate the in-article unit"
+);
+for (const guarded of [
+  "components/monetization/homepage-revenue-mix.tsx",
+  "app/(public)/mediflow/page.tsx",
+  "app/(public)/medipacient/page.tsx",
+  "app/(public)/ordizaznam/page.tsx",
+]) {
+  assert.ok(
+    !readFileSync(join(root, guarded), "utf8").includes("2911384114"),
+    `${guarded} must not reuse the in-article slot`
+  );
+}
 assert.equal(shouldShowDisplayAds("public", false), true);
 assert.equal(shouldShowDisplayAds("public", true), false);
 assert.equal(shouldShowDisplayAds("physician", false), false);

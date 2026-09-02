@@ -39,6 +39,7 @@ import { listStudentAdCampaignsForArticle } from "@/lib/queries/marketing";
 import { ArticleCtaBlocks } from "@/components/articles/article-cta-blocks";
 import { StudentAdBlocks } from "@/components/student/student-ad-blocks";
 import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
+import { ADSENSE_SLOT_IN_ARTICLE } from "@/lib/monetization/adsense";
 import {
   SaveToMediFlowButton,
   ArticleShareButton,
@@ -424,22 +425,32 @@ export default async function ArticlePage({ params }: Props) {
 
           <div className="article-body-column">
             {article.rubric_slug === V19_RUBRIC_SLUG && !locked ? (
-              <V19ArticleBody
-                locale={locale}
-                article={{
-                  title: article.title,
-                  date: article.published_at ?? new Date().toISOString(),
-                  summary: article.excerpt ?? "",
-                  keyPoints: (v19Quiz.keyPoints as string[]) ?? [],
-                  clinicalImpact: (v19Quiz.clinicalImpact as string) ?? "",
-                  scientificContext: (v19Quiz.scientificContext as string) ?? "",
-                  patientEducation: (v19Quiz.patientEducation as string) ?? "",
-                  nzipContext: (v19Quiz.nzipContext as string) ?? undefined,
-                  specialty: v19Quiz.specialty as string | undefined,
-                  sourceUrl: article.source_url ?? undefined,
-                  sourceName: article.source_name ?? undefined,
-                }}
-              />
+              <>
+                <V19ArticleBody
+                  locale={locale}
+                  article={{
+                    title: article.title,
+                    date: article.published_at ?? new Date().toISOString(),
+                    summary: article.excerpt ?? "",
+                    keyPoints: (v19Quiz.keyPoints as string[]) ?? [],
+                    clinicalImpact: (v19Quiz.clinicalImpact as string) ?? "",
+                    scientificContext: (v19Quiz.scientificContext as string) ?? "",
+                    patientEducation: (v19Quiz.patientEducation as string) ?? "",
+                    nzipContext: (v19Quiz.nzipContext as string) ?? undefined,
+                    specialty: v19Quiz.specialty as string | undefined,
+                    sourceUrl: article.source_url ?? undefined,
+                    sourceName: article.source_name ?? undefined,
+                  }}
+                />
+                {shouldShowDisplayAds(revenueSurface, isVip) ? (
+                  <GlobalAdSlot
+                    placement="in-article"
+                    layout="in-article"
+                    slotId={ADSENSE_SLOT_IN_ARTICLE}
+                    locale={(locale as GlobalLocaleCode) ?? "cs"}
+                  />
+                ) : null}
+              </>
             ) : (
               <>
                 {!locked ? (
@@ -456,21 +467,28 @@ export default async function ArticlePage({ params }: Props) {
                   title={article.title}
                   gateCopy={articleGateCopy ?? undefined}
                   midSlot={
-                    !locked && shouldShowAffiliate(revenueSurface) ? (
-                      <MidArticleAffiliate locale={supportLocale} article={revenueArticle} />
+                    !locked &&
+                    (shouldShowDisplayAds(revenueSurface, isVip) ||
+                      shouldShowAffiliate(revenueSurface)) ? (
+                      <>
+                        {shouldShowDisplayAds(revenueSurface, isVip) ? (
+                          <GlobalAdSlot
+                            placement="in-article"
+                            layout="in-article"
+                            slotId={ADSENSE_SLOT_IN_ARTICLE}
+                            locale={(locale as GlobalLocaleCode) ?? "cs"}
+                          />
+                        ) : null}
+                        {shouldShowAffiliate(revenueSurface) ? (
+                          <MidArticleAffiliate locale={supportLocale} article={revenueArticle} />
+                        ) : null}
+                      </>
                     ) : null
                   }
                 />
               </>
             )}
           </div>
-
-          {!locked && shouldShowDisplayAds(revenueSurface, isVip) ? (
-            <GlobalAdSlot
-              placement="in-content"
-              locale={(locale as GlobalLocaleCode) ?? "cs"}
-            />
-          ) : null}
 
           {!locked && shouldShowAffiliate(revenueSurface) ? (
             <TopicAffiliateBox locale={supportLocale} article={revenueArticle} />

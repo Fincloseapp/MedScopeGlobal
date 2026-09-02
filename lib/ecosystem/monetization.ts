@@ -21,7 +21,14 @@ export type AdProvider =
   | "baidu"
   | "native";
 
-export type AdPlacement = "header" | "below-title" | "in-content" | "sidebar" | "footer" | "sticky";
+export type AdPlacement =
+  | "header"
+  | "below-title"
+  | "in-content"
+  | "in-article"
+  | "sidebar"
+  | "footer"
+  | "sticky";
 
 export const AD_PROVIDERS_BY_REGION: Record<string, AdProvider[]> = {
   USA: ["mediavine", "ezoic", "adthrive", "adsense"],
