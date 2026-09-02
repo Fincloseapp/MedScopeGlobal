@@ -585,7 +585,7 @@ assert.equal(shouldShowHeurekaTextLink("de"), false);
   const footerSrc = readFileSync(join(root, "components/monetization/heureka-text-link.tsx"), "utf8");
   assert.ok(footerSrc.includes('id="heureka-heu2"'), "footer keeps a hidden official HEU2 target");
   assert.ok(footerSrc.includes("HEUREKA_CZ_TEXT_LINK.className"), "official class stays on the hidden link");
-  assert.ok(footerSrc.includes("preventDefault"));
+  assert.ok(footerSrc.includes("preventDefault") || footerSrc.includes("e.preventDefault"));
   assert.ok(!footerSrc.includes("utm_campaign=26020"));
 }
 assert.ok(

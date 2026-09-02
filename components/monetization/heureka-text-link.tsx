@@ -1,5 +1,3 @@
-"use client";
-
 import Script from "next/script";
 import {
   HEUREKA_CZ_TEXT_LINK,
@@ -19,18 +17,10 @@ export function HeurekaTextLink({ className }: { className?: string }) {
         Srovnání cen
       </span>
       <a
+        id="heureka-heu2-visible"
         href={HEUREKA_CZ_TEXT_LINK.href}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={(event) => {
-          event.preventDefault();
-          const official = document.getElementById("heureka-heu2");
-          if (official instanceof HTMLAnchorElement) {
-            official.click();
-            return;
-          }
-          window.open(HEUREKA_CZ_TEXT_LINK.href, "_blank", "noopener,noreferrer");
-        }}
       >
         {HEUREKA_CZ_TEXT_LINK.label}
       </a>
@@ -44,6 +34,12 @@ export function HeurekaTextLink({ className }: { className?: string }) {
         tabIndex={-1}
         aria-hidden
         style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}
+      />
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            'document.getElementById("heureka-heu2-visible")?.addEventListener("click",function(e){e.preventDefault();var a=document.getElementById("heureka-heu2");if(a)a.click();else window.open("https://www.heureka.cz/","_blank","noopener,noreferrer");});',
+        }}
       />
     </span>
   );
