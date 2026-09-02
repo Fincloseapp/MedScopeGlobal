@@ -106,7 +106,10 @@ export async function middleware(request: NextRequest) {
   // lock the apex domain to English when the phone is Czech.
   const acceptLanguage = request.headers.get("accept-language");
   const bot = isSearchEngineBot(request.headers.get("user-agent"));
-  const target = localeForUnprefixedEntry(acceptLanguage, bot);
+  const country =
+    request.headers.get("cf-ipcountry") ||
+    request.headers.get("x-vercel-ip-country");
+  const target = localeForUnprefixedEntry(acceptLanguage, bot, country);
 
   const prefix = `/${localeToPathSegment(target)}`;
   const destPath = pathname === "/" ? prefix : `${prefix}${pathname.startsWith("/") ? pathname : `/${pathname}`}`;
@@ -117,14 +120,14 @@ export async function middleware(request: NextRequest) {
     dest.pathname = pathname === "/" ? "/cs" : `/cs${pathname.startsWith("/") ? pathname : `/${pathname}`}`;
     const redirect = NextResponse.redirect(dest, 308);
     copyResponseCookies(response, redirect);
-    redirect.headers.set("Vary", "Accept-Language, User-Agent");
+    redirect.headers.set("Vary", "Accept-Language, User-Agent, CF-IPCountry");
     redirect.headers.set("Cache-Control", "public, max-age=300");
     return wrapWithSecurityHeaders(redirect, pathname);
   }
 
   const redirect = NextResponse.redirect(dest, 302);
   copyResponseCookies(response, redirect);
-  redirect.headers.set("Vary", "Accept-Language, User-Agent");
+  redirect.headers.set("Vary", "Accept-Language, User-Agent, CF-IPCountry");
   redirect.headers.set("Cache-Control", "private, no-store, must-revalidate");
   redirect.cookies.set(LOCALE_COOKIE, normalizeLocale(target), LOCALE_COOKIE_OPTS);
   return wrapWithSecurityHeaders(redirect, pathname);

@@ -887,6 +887,10 @@ assert.ok(
   "locale rewrite must pass the original path so AdSense stays off pro routes"
 );
 assert.ok(
+  readFileSync(join(root, "middleware.ts"), "utf8").includes("cf-ipcountry"),
+  "apex locale must use Cloudflare country as a tie-breaker for US English"
+);
+assert.ok(
   readFileSync(join(root, "components/legal/cookie-banner.tsx"), "utf8").includes(
     "googleCmpOwnsAds"
   ),

@@ -1,3 +1,4 @@
+import { localeFromCountry } from "@/lib/ecosystem/locales";
 import {
   DEFAULT_LOCALE,
   LOCALES,
@@ -14,7 +15,37 @@ import {
 export function detectLocaleFromAcceptLanguage(
   acceptLanguage: string | null | undefined
 ): LocaleCode {
-  if (!acceptLanguage?.trim()) return DEFAULT_LOCALE;
+  return firstMatchingLocale(acceptLanguage) ?? DEFAULT_LOCALE;
+}
+
+/**
+ * Bare domain / unprefixed public URLs follow the device language first.
+ * Cloudflare country is only a tie-breaker: generic `en` or a missing
+ * Accept-Language from the US/CA opens English (USA). A Czech phone in
+ * the US stays `/cs`. Search bots stay on the Czech x-default edition.
+ * Explicit prefixes (`/cs`, `/en-us`) are never rewritten here.
+ */
+export function localeForUnprefixedEntry(
+  acceptLanguage: string | null | undefined,
+  isBot: boolean,
+  countryCode?: string | null
+): LocaleCode {
+  if (isBot) return DEFAULT_LOCALE;
+
+  const matched = firstMatchingLocale(acceptLanguage);
+  const geo = countryCode?.trim()
+    ? (localeFromCountry(countryCode) as LocaleCode)
+    : null;
+
+  if (matched && matched !== "en") return matched;
+  if (geo && (!matched || matched === "en")) return geo;
+  return matched ?? DEFAULT_LOCALE;
+}
+
+function firstMatchingLocale(
+  acceptLanguage: string | null | undefined
+): LocaleCode | null {
+  if (!acceptLanguage?.trim()) return null;
 
   const preferences = acceptLanguage
     .split(",")
@@ -32,19 +63,7 @@ export function detectLocaleFromAcceptLanguage(
     if (matched) return matched;
   }
 
-  return DEFAULT_LOCALE;
-}
-
-/**
- * Bare domain / unprefixed public URLs always follow the device language.
- * Search bots stay on the Czech x-default edition.
- */
-export function localeForUnprefixedEntry(
-  acceptLanguage: string | null | undefined,
-  isBot: boolean
-): LocaleCode {
-  if (isBot) return DEFAULT_LOCALE;
-  return detectLocaleFromAcceptLanguage(acceptLanguage);
+  return null;
 }
 
 function matchLocaleTag(tag: string): LocaleCode | null {
