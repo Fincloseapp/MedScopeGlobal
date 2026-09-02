@@ -120,7 +120,25 @@ import {
   isBrainScanCoverUrl,
   articleNeedsCoverRemediation,
 } from "../../lib/ecosystem/editorial/images";
-import { getImageCuratorForLocale } from "../../lib/ecosystem/editorial/personas";
+import {
+  EDITORIAL_PERSONAS,
+  getImageCuratorForLocale,
+  getReviewPipeline,
+} from "../../lib/ecosystem/editorial/personas";
+import {
+  WRITER_AGENTS,
+  WRITER_DESKS,
+  WRITER_SPECIALISTS,
+  WRITERS_PER_CATEGORY,
+  resolveWriterAgent,
+} from "../../lib/editorial/writer-agents";
+import {
+  DAILY_PUBLIC_ARTICLE_TARGET,
+  DEFAULT_PUBLIC_WRITER_LIMIT,
+  PUBLIC_WRITER_COUNT,
+  PUBLIC_WRITERS_PER_CATEGORY,
+} from "../../lib/v25/config/public-writers";
+import { reviewPublicArticle } from "../../lib/v25/writers/editorial-review.mjs";
 import { polishCzechFields } from "../../lib/v22/translate";
 import {
   classifyNewsDesk,
@@ -1828,6 +1846,38 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.equal(ranked[0]?.name, "NIH National Institute on Aging");
   console.log("✓ longevity desk classification keeps topic articles on the homepage");
 }
+
+assert.equal(WRITER_DESKS.length, 5, "five magazine category desks");
+assert.equal(WRITERS_PER_CATEGORY, 4, "four senior specialists per category");
+assert.equal(WRITER_SPECIALISTS.length, 20, "20 deployed public writers");
+assert.equal(WRITER_AGENTS.length, 20, "WRITER_AGENTS is the specialist roster");
+assert.equal(PUBLIC_WRITERS_PER_CATEGORY, 4);
+assert.equal(PUBLIC_WRITER_COUNT, 20);
+assert.equal(DAILY_PUBLIC_ARTICLE_TARGET, DEFAULT_PUBLIC_WRITER_LIMIT * 20);
+assert.equal(
+  resolveWriterAgent({ metadata: { writer_id: "writer3-trends" } })?.topic,
+  "prevence"
+);
+assert.equal(
+  resolveWriterAgent({ metadata: { writer_id: "writer1" } })?.deskId,
+  "writer1"
+);
+assert.equal(EDITORIAL_PERSONAS.filter((p) => p.active).length, 28);
+assert.equal(EDITORIAL_PERSONAS.filter((p) => p.role === "editor").length, 8);
+assert.ok(getReviewPipeline("cs").length >= 6, "multiple MedScopeGlobal editors on CS bench");
+{
+  const reviewed = reviewPublicArticle({
+    title: "Spánek v zimě",
+    excerpt: "Praktický přehled.",
+    bodyHtml: "<p>Staňte se VIP ještě dnes.</p><p>Užitečné tipy na režim.</p>",
+  });
+  assert.equal(reviewed.editors.length >= 4, true, "multi-editor bench");
+  assert.ok(!/staňte se\s+vip/i.test(reviewed.bodyHtml), "hard-sell VIP stripped");
+  assert.ok(/155/.test(reviewed.bodyHtml), "medical disclaimer present");
+}
+console.log(
+  `✓ public writers=${WRITER_AGENTS.length} desks=${WRITER_DESKS.length} editors=${getReviewPipeline("cs").length}`
+);
 
 console.log("✓ editorial image pipeline checks passed");
 console.log(

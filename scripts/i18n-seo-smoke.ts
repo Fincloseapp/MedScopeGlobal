@@ -32,7 +32,12 @@ import {
 import { isSearchEngineBot } from "../lib/i18n/search-bots";
 import { newsDesksForLocale } from "../lib/v271/news-desks";
 import { getPortalChrome } from "../lib/v271/portal";
-import { getSurfaceCopy, isCzechSurface } from "../lib/i18n/surface-copy";
+import {
+  getSurfaceCopy,
+  isCzechSurface,
+  writerAgentsForLocale,
+  writerDesksForLocale,
+} from "../lib/i18n/surface-copy";
 import { getSubscribeCopy } from "../lib/i18n/subscribe-copy";
 import { getMarketingCopy } from "../lib/i18n/marketing-copy";
 import { localizePublicHref } from "../lib/i18n/nav-copy";
@@ -206,6 +211,13 @@ assert.equal(getSurfaceCopy("en-US").searchTab, "Search");
 assert.equal(getSurfaceCopy("ru").searchTab, "Search");
 assert.equal(getSurfaceCopy("ja").searchTab, "Search");
 assert.equal(getSurfaceCopy("sk").writersTitle, "Editorial desks");
+assert.equal(writerDesksForLocale("cs").length, 5);
+assert.equal(writerAgentsForLocale("cs").length, 20);
+assert.equal(writerAgentsForLocale("de").length, 20);
+assert.ok(writerAgentsForLocale("cs")[0]?.label.includes("Životní styl"));
+assert.ok(writerAgentsForLocale("en")[0]?.label.includes("Lifestyle"));
+assert.ok(!writerAgentsForLocale("de").some((agent) => /Životní/.test(agent.label)));
+assert.ok(!writerAgentsForLocale("fr").some((agent) => /Životní/.test(agent.label)));
 assert.equal(getSurfaceCopy("pl").why[0]?.title.includes("Magazine"), true);
 assert.equal(isCzechSurface("cs"), true);
 assert.equal(isCzechSurface("de"), false);

@@ -2,7 +2,13 @@ import { MAGAZINE } from "@/lib/brand/magazine";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import type { AppProductId } from "@/lib/apps/catalog";
-import { WRITER_AGENTS, type WriterAgent, type WriterAgentId } from "@/lib/editorial/writer-agents";
+import {
+  WRITER_DESKS,
+  WRITER_SPECIALISTS,
+  writerSpecialtyCopy,
+  type WriterAgent,
+  type WriterDeskId,
+} from "@/lib/editorial/writer-agents";
 
 function pack(locale?: string | null): string {
   const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
@@ -65,7 +71,7 @@ export type SurfaceCopy = {
   trending: { label: string; href: string }[];
   writersTitle: string;
   writersAll: string;
-  writers: Record<WriterAgentId, WriterCopy>;
+  writers: Record<WriterDeskId, WriterCopy>;
   appTaglines: Record<AppProductId, string>;
   stats: { value: string; label: string }[];
   audiences: Audience[];
@@ -759,12 +765,31 @@ export function isCzechSurface(locale?: string | null): boolean {
   return pack(locale) === "cs";
 }
 
+export function writerDesksForLocale(locale?: string | null): WriterAgent[] {
+  const surface = getSurfaceCopy(locale);
+  return WRITER_DESKS.map((desk) => ({
+    ...desk,
+    label: surface.writers[desk.deskId].label,
+    hint: surface.writers[desk.deskId].hint,
+    topicLabel: surface.writers[desk.deskId].topicLabel,
+  }));
+}
+
+/** 20 senior specialists — 4 per magazine category. */
 export function writerAgentsForLocale(locale?: string | null): WriterAgent[] {
   const surface = getSurfaceCopy(locale);
-  return WRITER_AGENTS.map((agent) => ({
-    ...agent,
-    label: surface.writers[agent.id].label,
-    hint: surface.writers[agent.id].hint,
-    topicLabel: surface.writers[agent.id].topicLabel,
-  }));
+  const key = pack(locale);
+  return WRITER_SPECIALISTS.map((agent) => {
+    const desk = surface.writers[agent.deskId];
+    const spec = writerSpecialtyCopy(
+      agent.specialty === "desk" ? "practice" : agent.specialty,
+      key === "cs" ? "cs" : key
+    );
+    return {
+      ...agent,
+      label: `${desk.label} · ${spec.label}`,
+      hint: spec.hint,
+      topicLabel: desk.topicLabel,
+    };
+  });
 }

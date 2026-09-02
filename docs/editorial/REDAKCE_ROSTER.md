@@ -9,12 +9,12 @@ Exact counts from source of truth in the repo (branch audit). Cross-check:
 | Layer | Count | Source |
 |-------|------:|--------|
 | Ecosystem journalists | **9** | `EDITORIAL_PERSONAS` role=`journalist` |
-| Ecosystem editors | **3** | role=`editor` |
+| Ecosystem editors | **8** | role=`editor` |
 | Language reviewers | **6** | role=`language_reviewer` |
 | Compliance reviewers | **3** | role=`compliance_reviewer` |
 | Image curators | **2** | role=`image_curator` |
-| **Ecosystem personas (total)** | **23** | all active |
-| Public daily writers (cron) | **5** | `WRITER_AGENTS` writer1–5 → `/api/cron/public-articles` |
+| **Ecosystem personas (total)** | **28** | all active |
+| Public daily writers (cron) | **20** | 5 categories × 4 senior specialists → `/api/cron/public-articles` |
 | v27 audience AI writers | **4** | `V27_AI_WRITERS` (public/student/physician/b2b) |
 | v26 writing-style personas | **7** | `AUTHOR_PERSONAS` (tone styles, not bylines) |
 | Editorial author units | **14** | `EDITORIAL_UNITS` (public bylines) |
@@ -25,14 +25,14 @@ Exact counts from source of truth in the repo (branch audit). Cross-check:
 ### How to read “writers”
 
 - **Journalists (9)** — autonomous multi-locale content personas in the ecosystem redakce.
-- **Public writers (5)** — production daily article generators on `/api/cron/public-articles`.
+- **Public writers (20)** — 4 senior specialists per magazine category on `/api/cron/public-articles`.
 - **v27 writers (4)** — audience-scoped AI prompts (not the daily cron roster).
 - Do **not** sum all layers as unique humans; they overlap by role. For “who writes every day”:
-  **5 public writers + 9 ecosystem journalists** (enqueue/persona assignment).
+  **20 public writers + 9 ecosystem journalists** (enqueue/persona assignment).
 
 ---
 
-## Ecosystem personas (23)
+## Ecosystem personas (28)
 
 ### Journalists — 9
 
@@ -48,13 +48,18 @@ Exact counts from source of truth in the repo (branch audit). Cross-check:
 | `journalist-east-asia` | zh-CN, ja, ko, vi, id | all 4 topics | medscope_global_health |
 | `journalist-slavic` | ru, uk, be | all 4 topics | medscope_global_health |
 
-### Editors — 3
+### Editors — 8
 
 | ID | Locales | Unit |
 |----|---------|------|
 | `editor-chief-cz` | cs, sk | medscope_global_editorial_board |
 | `editor-chief-en` | en, en-US, fr, es, it, pl, de, ru, uk, zh-CN, ja | medscope_global_editorial_board |
 | `editor-longevity` | cs, en, en-US, de, fr, es, pl, ru | medscope_evidence_synthesis |
+| `editor-lifestyle` | cs, sk, en, en-US | medscope_cz_odborna |
+| `editor-clinical` | cs, sk, en | medscope_cz_klinicka |
+| `editor-prevention` | cs, sk, en, en-US | medscope_clinical_insights |
+| `editor-interviews` | cs, sk, en | medscope_cz_info_team |
+| `editor-diplomacy-cz` | cs, sk | medscope_global_editorial_board |
 
 ### Language reviewers — 6
 
@@ -84,17 +89,22 @@ Exact counts from source of truth in the repo (branch audit). Cross-check:
 
 ---
 
-## Public writers (5) — daily production cron
+## Public writers (20) — daily production cron
 
-| ID | Topic | Endpoint |
-|----|-------|----------|
-| `writer1` | Životní styl | `/api/cron/public-articles` |
-| `writer2` | Nemoci | same |
-| `writer3` | Prevence | same |
-| `writer4` | Rozhovory | same |
-| `writer5` | Dlouhověkost | same |
+Four senior specialists per category (`practice`, `research`, `trends`, `field`).
+No personal portraits or bylines — editorial geometry only.
 
-Default: `DEFAULT_PUBLIC_WRITER_LIMIT` = 4 articles/writer → target **20**/day (`DAILY_PUBLIC_ARTICLE_TARGET`).
+| Desk | Topic | Specialist IDs |
+|------|-------|----------------|
+| `writer1` | Životní styl | `writer1-practice` … `writer1-field` |
+| `writer2` | Nemoci | `writer2-practice` … `writer2-field` |
+| `writer3` | Prevence | `writer3-practice` … `writer3-field` |
+| `writer4` | Rozhovory | `writer4-practice` … `writer4-field` |
+| `writer5` | Dlouhověkost | `writer5-practice` … `writer5-field` |
+
+Endpoint: `/api/cron/public-articles`.
+Default: `DEFAULT_PUBLIC_WRITER_LIMIT` = 4 articles/writer → target **80**/day (`DAILY_PUBLIC_ARTICLE_TARGET`).
+Each article is reviewed by multiple MedScopeGlobal editors (diplomatic, legal, medical, language).
 
 ---
 
@@ -146,7 +156,7 @@ Schedules (UTC): `0 4/6/7/8/12/16/20 * * *` + `workflow_dispatch`.
 | Path | Method | Role |
 |------|--------|------|
 | `/api/cron/ingest` | GET | Ingest pipeline |
-| `/api/cron/public-articles` | GET | **5 public writers** generate articles |
+| `/api/cron/public-articles` | GET | **20 public writers** generate articles |
 | `/api/cron/public-osveta-daily` | GET | Public health video/osvěta |
 | `/api/cron/v25-enterprise` | GET | Enterprise content |
 | `/api/cron/marketing` | GET | Marketing |

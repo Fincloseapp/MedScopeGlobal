@@ -146,6 +146,51 @@ export const EDITORIAL_PERSONAS: EditorialPersona[] = [
     editorialUnitId: "medscope_evidence_synthesis",
     active: true,
   },
+  {
+    id: "editor-lifestyle",
+    displayName: { cs: "Odborný editor životního stylu", en: "Lifestyle Section Editor" },
+    role: "editor",
+    locales: ["cs", "sk", "en", "en-US"],
+    topics: ["lifestyle"],
+    editorialUnitId: "medscope_cz_odborna",
+    active: true,
+  },
+  {
+    id: "editor-clinical",
+    displayName: { cs: "Odborný editor klinických témat", en: "Clinical Section Editor" },
+    role: "editor",
+    locales: ["cs", "sk", "en"],
+    topics: ["seniors", "lifestyle"],
+    editorialUnitId: "medscope_cz_klinicka",
+    active: true,
+  },
+  {
+    id: "editor-prevention",
+    displayName: { cs: "Odborný editor prevence", en: "Prevention Section Editor" },
+    role: "editor",
+    locales: ["cs", "sk", "en", "en-US"],
+    topics: ["lifestyle", "seniors", "longevity"],
+    editorialUnitId: "medscope_clinical_insights",
+    active: true,
+  },
+  {
+    id: "editor-interviews",
+    displayName: { cs: "Editor rozhovorů", en: "Interviews Editor" },
+    role: "editor",
+    locales: ["cs", "sk", "en"],
+    topics: ["trending", "lifestyle"],
+    editorialUnitId: "medscope_cz_info_team",
+    active: true,
+  },
+  {
+    id: "editor-diplomacy-cz",
+    displayName: { cs: "Diplomatický editor", en: "Diplomatic Editor" },
+    role: "editor",
+    locales: ["cs", "sk"],
+    topics: ["longevity", "lifestyle", "seniors", "trending"],
+    editorialUnitId: "medscope_global_editorial_board",
+    active: true,
+  },
   // Language reviewers — locale QA
   {
     id: "lang-reviewer-cz",
@@ -272,12 +317,25 @@ export function getJournalistForTopic(
   return journalists[Math.floor(Math.random() * journalists.length)];
 }
 
-export function getReviewPipeline(locale: GlobalLocaleCode): EditorialPersona[] {
-  return [
-    ...getPersonasByRole(locale, "editor").slice(0, 1),
-    ...getPersonasByRole(locale, "language_reviewer").slice(0, 1),
-    ...getPersonasByRole(locale, "compliance_reviewer").slice(0, 1),
-  ];
+export function getReviewPipeline(
+  locale: GlobalLocaleCode,
+  topic?: EditorialTopic
+): EditorialPersona[] {
+  const editors = getPersonasByRole(locale, "editor");
+  const topicEditors = topic ? editors.filter((persona) => persona.topics.includes(topic)) : editors;
+  const seen = new Set<string>();
+  const pipeline: EditorialPersona[] = [];
+  for (const persona of [
+    ...topicEditors,
+    ...editors,
+    ...getPersonasByRole(locale, "language_reviewer"),
+    ...getPersonasByRole(locale, "compliance_reviewer"),
+  ]) {
+    if (seen.has(persona.id)) continue;
+    seen.add(persona.id);
+    pipeline.push(persona);
+  }
+  return pipeline;
 }
 
 export function getImageCuratorForLocale(
