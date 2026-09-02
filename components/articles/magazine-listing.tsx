@@ -167,10 +167,22 @@ export function MagazineListing({
             {copy.more}
           </p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {rest.map((article) => (
+            {rest.slice(0, 3).map((article) => (
               <NewsMagazineCard key={article.id} article={article} locale={locale} />
             ))}
           </div>
+          {rest.length > 3 ? (
+            <div className="mt-8">
+              <ListingAffiliateBox locale={locale as GlobalLocaleCode} topic={activeDesk} />
+            </div>
+          ) : null}
+          {rest.length > 3 ? (
+            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {rest.slice(3).map((article) => (
+                <NewsMagazineCard key={article.id} article={article} locale={locale} />
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : null}
 

@@ -49,7 +49,11 @@ import {
   getArticleHeroAltText,
   resolveArticleCoverUrl,
 } from "@/lib/ecosystem/editorial/images";
-import { MidArticleAffiliate, TopicAffiliateBox } from "@/components/monetization/affiliate-box";
+import {
+  AsideAffiliate,
+  MidArticleAffiliate,
+  TopicAffiliateBox,
+} from "@/components/monetization/affiliate-box";
 import { ArticleSubscribeNudge } from "@/components/monetization/article-subscribe-nudge";
 import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
 import { HousePartnerSlot } from "@/components/monetization/house-partner-slot";
@@ -539,10 +543,16 @@ export default async function ArticlePage({ params }: Props) {
           ) : null}
 
           <ContentRecommendations locale={locale} currentSlug={article.slug} />
+          {!locked && shouldShowAffiliate(revenueSurface) ? (
+            <MidArticleAffiliate locale={supportLocale} article={revenueArticle} />
+          ) : null}
           <EditorialFooter locale={editorialLocale} />
         </div>
 
         <aside className="article-reading-aside">
+          {!locked && shouldShowAffiliate(revenueSurface) ? (
+            <AsideAffiliate locale={supportLocale} article={revenueArticle} />
+          ) : null}
           {studentSidebarAds.length > 0 ? (
             <StudentAdBlocks campaigns={studentSidebarAds} variant="sidebar" />
           ) : (

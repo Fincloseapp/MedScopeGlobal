@@ -18,6 +18,8 @@ import { getArticleChrome } from "@/lib/i18n/article-chrome";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { topicLabelForSlug } from "@/lib/config/verejnost-topics";
 import { translatePublicTitle } from "@/lib/verejnost/translate-public-text";
+import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export const revalidate = 120;
 
@@ -116,6 +118,13 @@ export default async function OsvetaVideoPage({ params }: Props) {
           >
             {chrome.xpLeaderboard}
           </Link>
+        </div>
+
+        <div className="mt-10">
+          <ListingAffiliateBox
+            locale={locale as GlobalLocaleCode}
+            topic={video.topic?.category ?? title}
+          />
         </div>
 
         {relatedFiltered.length ? (

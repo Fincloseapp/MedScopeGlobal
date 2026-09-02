@@ -12,6 +12,8 @@ import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { localizeMagazineHubConfig } from "@/lib/i18n/localize-magazine-hub";
+import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export const revalidate = 120;
 
@@ -62,6 +64,9 @@ export default async function VerejnostRozhovoryPage() {
           </div>
         )}
       </section>
+      <div className="mt-10">
+        <ListingAffiliateBox locale={locale as GlobalLocaleCode} topic="dlouhovekost" />
+      </div>
     </MagazineSectionHub>
   );
 }

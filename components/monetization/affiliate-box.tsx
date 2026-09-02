@@ -14,7 +14,7 @@ import {
 import { affiliateGoPath } from "@/lib/monetization/affiliate-geo";
 import { pickAffiliateProducts } from "@/lib/monetization/affiliate-mix";
 
-type Variant = "quiet" | "shelf";
+type Variant = "quiet" | "shelf" | "compact";
 
 type Props = {
   locale?: GlobalLocaleCode;
@@ -59,6 +59,7 @@ export function AffiliateBox({
   const heading =
     title ?? (variant === "shelf" ? revenue.affiliateShelfTitle : revenue.affiliateTitle);
   const kicker = variant === "shelf" ? revenue.affiliateShelfKicker : revenue.affiliateKicker;
+  const compact = variant === "compact";
 
   if (!products.length) return null;
 
@@ -69,7 +70,9 @@ export function AffiliateBox({
       className={
         shelf
           ? "my-2"
-          : "my-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+          : compact
+            ? "my-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+            : "my-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
       }
     >
       <p
@@ -94,7 +97,9 @@ export function AffiliateBox({
         className={
           shelf
             ? "mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6"
-            : "mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+            : compact
+              ? "mt-3 grid gap-3"
+              : "mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
         }
       >
         {products.map((product) => (
@@ -125,6 +130,25 @@ function AffiliateProductCard({
   const description = localizedField(product.description, locale);
   const chrome = getArticleChrome(locale);
   const shelf = variant === "shelf";
+  const compact = variant === "compact";
+
+  if (compact) {
+    return (
+      <Link
+        href={url}
+        rel="noopener noreferrer sponsored"
+        className="group flex overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-[#005B96]/40"
+      >
+        <div className="relative h-20 w-20 shrink-0 bg-[#e8f3fb]">
+          <Image src={product.imageUrl} alt={name} fill sizes="80px" unoptimized className="object-cover" />
+        </div>
+        <div className="min-w-0 px-3 py-2">
+          <p className="font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">{name}</p>
+          <span className="mt-1 inline-block text-xs font-medium text-[#005B96]">{chrome.moreInfo}</span>
+        </div>
+      </Link>
+    );
+  }
 
   if (shelf) {
     return (
@@ -238,6 +262,17 @@ export function TopicAffiliateBox({
 }) {
   const products = matchAffiliateProducts(article);
   return <AffiliateBox locale={locale} variant="quiet" products={products} />;
+}
+
+export function AsideAffiliate({
+  locale = "cs",
+  article,
+}: {
+  locale?: GlobalLocaleCode | string;
+  article: RevenueArticle;
+}) {
+  const products = pickAffiliateProducts({ surface: "articleMid", locale, article });
+  return <AffiliateBox locale={locale as GlobalLocaleCode} variant="compact" products={products} />;
 }
 
 /** Two image cards after the first paragraphs — visible, not a hard sell. */

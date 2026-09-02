@@ -46,6 +46,10 @@ export const PRODUCT_WEIGHT: Record<string, number> = {
   "weighted-blanket": 6,
   coq10: 6,
   "grip-strengthener": 5,
+  "sunrise-alarm": 7,
+  "walking-pad": 9,
+  "tart-cherry": 5,
+  "kitchen-scale": 4,
 };
 
 const CATEGORY_OF: Record<string, AffiliateProduct["category"]> = Object.fromEntries(
@@ -78,6 +82,8 @@ export function topicMatchedProductIds(article?: MixArticle | null, topic?: stri
     push("magnesium-glycinate");
     push("weighted-blanket");
     push("blue-light-glasses");
+    push("sunrise-alarm");
+    push("tart-cherry");
   }
   if (/magnes|hořčí|horcik|horčík|glycinát|glycinat|magnésium|magnez/.test(text)) {
     push("magnesium-glycinate");
@@ -112,10 +118,12 @@ export function topicMatchedProductIds(article?: MixArticle | null, topic?: stri
     push("yoga-mat");
     push("foam-roller");
     push("grip-strengthener");
+    push("walking-pad");
   }
-  if (/protein|bílkovin|bilkovin|svalov|regener/.test(text)) {
+  if (/protein|bílkovin|bilkovin|svalov|regener|výživ|vyziv|nutrition|strav/.test(text)) {
     push("protein-powder");
     push("creatine-monohydrate");
+    push("kitchen-scale");
   }
   if (/střev|strev|gut|mikrobiom|probiot|digest/.test(text)) {
     push("probiotic");
@@ -136,6 +144,15 @@ export function topicMatchedProductIds(article?: MixArticle | null, topic?: stri
   }
   if (/coq10|koenzym|ubiquinol|ubiquinon/.test(text)) {
     push("coq10");
+  }
+  if (/chůz|chuze|walk|krok|sedav|desk|kancelář/.test(text)) {
+    push("walking-pad");
+  }
+  if (/budík|budik|alarm|cirkadi|circadian|ráno|světelný bud/.test(text)) {
+    push("sunrise-alarm");
+  }
+  if (/višn|visn|cherry|melatonin/.test(text)) {
+    push("tart-cherry");
   }
   if (
     article &&

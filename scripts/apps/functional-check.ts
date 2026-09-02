@@ -234,7 +234,7 @@ assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "sk" 
   assert.ok(getAffiliateRedirectDestination("creatine-monohydrate", { locale: "de" })?.includes("amazon.de"));
   assert.ok(getAffiliateRedirectDestination("protein-powder", { locale: "fr" })?.includes("amazon.fr"));
   assert.ok(getAffiliateRedirectDestination("yoga-mat", { locale: "it" })?.includes("amazon.it"));
-  assert.equal(AFFILIATE_PRODUCT_IDS.length, 20);
+  assert.equal(AFFILIATE_PRODUCT_IDS.length, 24);
 }
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "it" })?.includes("amazon.it"));
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "es" })?.includes("amazon.es"));
@@ -375,6 +375,8 @@ assert.equal(pickAffiliateProducts({ surface: "articleMid", locale: "cs", articl
 }
 assert.ok(getAffiliateRedirectDestination("coq10", { locale: "de" })?.includes("amazon.de"));
 assert.ok(getAffiliateRedirectDestination("blue-light-glasses", { locale: "fr" })?.includes("amazon.fr"));
+assert.ok(getAffiliateRedirectDestination("walking-pad", { locale: "de" })?.includes("amazon.de"));
+assert.ok(getAffiliateRedirectDestination("sunrise-alarm", { locale: "it" })?.includes("amazon.it"));
 assert.ok(LONGEVITY_MEDIA_KIT.some((item) => item.id === "native-banner" && item.priceCzk === 5000));
 assert.ok(LONGEVITY_MEDIA_KIT.some((item) => item.id === "sponsored-article" && item.priceCzk === 15000));
 
@@ -401,6 +403,12 @@ file("public/assets/affiliate/glasses.svg");
 file("public/assets/affiliate/blanket.svg");
 file("public/assets/affiliate/coq10.svg");
 file("public/assets/affiliate/grip.svg");
+file("public/assets/affiliate/ring.svg");
+file("public/assets/affiliate/bp.svg");
+file("public/assets/affiliate/alarm.svg");
+file("public/assets/affiliate/walk.svg");
+file("public/assets/affiliate/cherry.svg");
+file("public/assets/affiliate/scale.svg");
 file("lib/monetization/split-article-html.ts");
 assert.ok(
   readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("HomepageAffiliateShelf"),
