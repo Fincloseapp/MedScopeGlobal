@@ -803,6 +803,12 @@ assert.ok(
   "AdSense snippet must load in public layout for verification + CMP"
 );
 assert.ok(
+  readFileSync(join(root, "components/monetization/adsense-head.tsx"), "utf8").includes(
+    "!path || !adsAllowedOnPath(path)"
+  ),
+  "AdSense head must stay off when pathname is missing or blocked"
+);
+assert.ok(
   readFileSync(join(root, "app/(public)/layout.tsx"), "utf8").includes("AdSenseHead")
 );
 assert.ok(

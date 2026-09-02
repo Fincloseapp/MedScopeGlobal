@@ -15,7 +15,7 @@ import {
 export async function AdSenseHead() {
   if (!isAdSenseEnabled()) return null;
   const path = (await headers()).get(PATHNAME_REQUEST_HEADER);
-  if (path && !adsAllowedOnPath(path)) return null;
+  if (!path || !adsAllowedOnPath(path)) return null;
   const client = resolveAdSenseClientId();
   return (
     <Script
