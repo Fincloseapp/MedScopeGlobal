@@ -264,19 +264,23 @@ assert.equal(getPayoutReadiness().amazonAny, false);
   const prevEs = process.env.AFFILIATE_AMAZON_TAG_ES;
   const prevFr = process.env.AFFILIATE_AMAZON_TAG_FR;
   const prevUk = process.env.AFFILIATE_AMAZON_TAG_UK;
+  const prevIt = process.env.AFFILIATE_AMAZON_TAG_IT;
   process.env.AFFILIATE_AMAZON_TAG_ES = "vialongevit04-21";
   process.env.AFFILIATE_AMAZON_TAG_FR = "vialongevit0b-21";
   process.env.AFFILIATE_AMAZON_TAG_UK = "vialongevi074-21";
+  process.env.AFFILIATE_AMAZON_TAG_IT = "vialongevi07b-21";
   const de = applyAmazonAssociateTag("https://www.amazon.de/s?k=Magnesiumglycinat");
   const us = applyAmazonAssociateTag("https://www.amazon.com/s?k=magnesium+glycinate");
   const fr = applyAmazonAssociateTag("https://www.amazon.fr/s?k=x");
   const es = applyAmazonAssociateTag("https://www.amazon.es/s?k=x");
   const uk = applyAmazonAssociateTag("https://www.amazon.co.uk/s?k=x");
+  const it = applyAmazonAssociateTag("https://www.amazon.it/s?k=x");
   assert.ok(de.includes("tag=vialongevita-21"), "DE PartnerNet ID must win on amazon.de");
   assert.ok(us.includes("tag=vialongevita-20"), "US store keeps -20");
   assert.ok(es.includes("tag=vialongevit04-21"), "ES Associates ID must win on amazon.es");
   assert.ok(fr.includes("tag=vialongevit0b-21"), "FR Club Partenaires ID must win on amazon.fr");
   assert.ok(uk.includes("tag=vialongevi074-21"), "UK Associates ID must win on amazon.co.uk");
+  assert.ok(it.includes("tag=vialongevi07b-21"), "IT Affiliates ID must win on amazon.it");
   if (prevFallback === undefined) delete process.env.AFFILIATE_AMAZON_TAG;
   else process.env.AFFILIATE_AMAZON_TAG = prevFallback;
   if (prevDe === undefined) delete process.env.AFFILIATE_AMAZON_TAG_DE;
@@ -287,6 +291,8 @@ assert.equal(getPayoutReadiness().amazonAny, false);
   else process.env.AFFILIATE_AMAZON_TAG_FR = prevFr;
   if (prevUk === undefined) delete process.env.AFFILIATE_AMAZON_TAG_UK;
   else process.env.AFFILIATE_AMAZON_TAG_UK = prevUk;
+  if (prevIt === undefined) delete process.env.AFFILIATE_AMAZON_TAG_IT;
+  else process.env.AFFILIATE_AMAZON_TAG_IT = prevIt;
 }
 assert.ok(
   getRevenueCopy("en").affiliateDisclosure.includes("As an Amazon Associate I earn from qualifying purchases.")
