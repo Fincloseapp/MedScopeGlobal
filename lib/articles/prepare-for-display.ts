@@ -257,32 +257,9 @@ export async function prepareArticlesForDisplay(
       return prepareArticleForDisplay(item.article, locale, mode, { live: false });
     }
     if (item.kind === "passthrough") {
-      if (primaryArticleLocale(locale) !== "cs" && looksLikeCzech(item.article.title)) {
-        const hit = await fallbackTranslateFields({
-          title: item.article.title,
-          excerpt: item.article.excerpt,
-          content: item.article.content,
-          sourceLocale: item.article.locale ?? "cs",
-          targetLocale: locale,
-          mode: "card",
-        });
-        if (hit && !looksLikeCzech(hit.title)) {
-          return attachEditorialDisplay(item.article, locale, {
-            title: hit.title,
-            excerpt:
-              hit.excerpt && !looksLikeCzech(hit.excerpt)
-                ? hit.excerpt
-                : looksLikeCzech(item.article.excerpt)
-                  ? hit.title
-                  : item.article.excerpt,
-            displayLocale: primaryArticleLocale(locale),
-            translatedFrom: item.article.locale ?? null,
-            translation_provider: hit.translation_provider,
-            machine_translated: true,
-            reviewed: false,
-          });
-        }
-      }
+      // Over the maxTranslate cap: never call live MT. Czech leftovers
+      // are dropped in finalizePreparedListing — that keeps /de /en /fr
+      // off a 50s translation storm and off Czech chrome.
       return attachEditorialDisplay(item.article, locale, {
         displayLocale: primaryArticleLocale(locale),
       });
@@ -314,7 +291,10 @@ export async function prepareArticlesForDisplay(
     const czechLeak =
       primaryArticleLocale(locale) !== "cs" &&
       (looksLikeCzech(display.title) || looksLikeCzech(display.excerpt));
-    if ((plan[index]?.kind === "translate" && !display.machine_translated) || czechLeak) {
+    if (
+      plan[index]?.kind === "translate" &&
+      (!display.machine_translated || czechLeak)
+    ) {
       missIndexes.push(index);
     }
   });

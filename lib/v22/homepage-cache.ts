@@ -7,6 +7,7 @@ import { pinLongevityIntoFeed } from "@/lib/v271/news-desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import type { AdRow } from "@/types/database";
 
 const articleSelect = `
@@ -71,7 +72,9 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
   const publicOnly = filterMagazineListableArticles(
     active.filter((a) => !a.vip_only)
   );
-  const prepared = await prepareArticlesForDisplay(publicOnly, normalizeLocale(locale), {
+  const localeKey = normalizeLocale(locale);
+  const feed = primaryArticleLocale(localeKey) === "cs" ? publicOnly : publicOnly.slice(0, 40);
+  const prepared = await prepareArticlesForDisplay(feed, localeKey, {
     mode: "card",
     maxTranslate: 12,
     maxLive: 0,
@@ -100,7 +103,7 @@ async function loadHomepageData(locale: string): Promise<{
 export function getHomepageCachedData(locale = "cs") {
   return unstable_cache(
     () => loadHomepageData(locale),
-    ["v22-homepage-public-v15-fast-i18n", locale],
+    ["v22-homepage-public-v16-fast-i18n", locale],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

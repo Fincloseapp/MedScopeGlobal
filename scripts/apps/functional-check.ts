@@ -254,6 +254,23 @@ file("app/api/apps/qr/route.ts");
 
 file("app/(public)/go/[slug]/route.ts");
 file("lib/monetization/affiliate-hop.ts");
+file("lib/articles/prepare-for-display.ts");
+file("lib/v22/homepage-cache.ts");
+{
+  const prep = readFileSync(join(root, "lib/articles/prepare-for-display.ts"), "utf8");
+  const passthrough = prep.split('item.kind === "passthrough"')[1] ?? "";
+  const passthroughBlock = passthrough.split("const cached")[0] ?? "";
+  assert.ok(
+    !passthroughBlock.includes("fallbackTranslateFields"),
+    "passthrough cards must not call live MT (that made /de /en /fr take ~50s)"
+  );
+  assert.ok(
+    prep.includes('plan[index]?.kind === "translate"'),
+    "live MT fill is only for the translate cap, not every Czech leftover"
+  );
+  const home = readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8");
+  assert.ok(home.includes("slice(0, 40)"), "non-CS homepage prepares a short feed");
+}
 {
   const box = readFileSync(join(root, "components/monetization/affiliate-box.tsx"), "utf8");
   assert.ok(
