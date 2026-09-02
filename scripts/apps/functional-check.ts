@@ -864,6 +864,18 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(
+    "ad_storage: 'granted'"
+  ),
+  "AdSense must not start with ad_storage denied"
+);
+assert.ok(
+  !readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(
+    "ad_storage: 'denied'"
+  ),
+  "do not block AdSense behind a denied default"
+);
+assert.ok(
+  readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(
     "G-6DX8RC4VZ1"
   ) ||
     readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(

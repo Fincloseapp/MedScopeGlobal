@@ -12,7 +12,12 @@ export function grantAnalyticsConsent() {
   if (typeof window === "undefined" || typeof window.gtag !== "function") {
     return;
   }
-  window.gtag("consent", "update", { analytics_storage: "granted" });
+  window.gtag("consent", "update", {
+    analytics_storage: "granted",
+    ad_storage: "granted",
+    ad_user_data: "granted",
+    ad_personalization: "granted",
+  });
 }
 
 export function trackEvent(
