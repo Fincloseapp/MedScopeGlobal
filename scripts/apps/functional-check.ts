@@ -807,6 +807,12 @@ assert.ok(
   "CSP must allow Google Funding Choices CMP"
 );
 assert.ok(
+  readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes(
+    "*.google-analytics.com"
+  ),
+  "CSP must allow GA4 regional collect hosts, not only www"
+);
+assert.ok(
   readFileSync(join(root, "components/monetization/adsense-head.tsx"), "utf8").includes(
     "adsbygoogle.js?client="
   ),
