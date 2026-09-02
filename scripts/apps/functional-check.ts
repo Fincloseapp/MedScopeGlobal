@@ -39,6 +39,11 @@ import {
   resolveAdSenseClientId,
   resolveAdSenseSlotId,
 } from "../../lib/monetization/adsense";
+import {
+  GA_MEASUREMENT_ID,
+  isGoogleAnalyticsEnabled,
+  resolveGaMeasurementId,
+} from "../../lib/analytics/ga";
 import { NEWSLETTER_SUBSCRIBERS_SQL } from "../../lib/monetization/apply-schema";
 import {
   affiliateGoPath,
@@ -420,6 +425,7 @@ assert.ok(PAYOUT_CHANNELS.some((channel) => channel.id === "amazon"));
 assert.ok(PAYOUT_CHANNELS.some((channel) => channel.id === "heureka-cz"));
 assert.equal(getPayoutReadiness().amazonAny, false);
 assert.equal(getPayoutReadiness().heurekaCz, true);
+assert.equal(getPayoutReadiness().ga, true);
 {
   const tagged = applyAmazonAssociateTag(
     "https://www.amazon.com/s?k=magnesium+glycinate",
@@ -815,6 +821,44 @@ assert.ok(
 assert.ok(
   readFileSync(join(root, "app/layout.tsx"), "utf8").includes("AdSenseHead"),
   "official AdSense snippet must sit in the document head"
+);
+assert.equal(isGoogleAnalyticsEnabled(), true);
+assert.equal(resolveGaMeasurementId(), "G-6DX8RC4VZ1");
+assert.equal(GA_MEASUREMENT_ID, "G-6DX8RC4VZ1");
+assert.ok(
+  readFileSync(join(root, "app/layout.tsx"), "utf8").includes("GoogleTagHead"),
+  "official Google tag must sit in the document head"
+);
+assert.ok(
+  readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(
+    "gtag/js?id="
+  ),
+  "Google tag must be the official gtag.js snippet"
+);
+assert.ok(
+  readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(
+    "G-6DX8RC4VZ1"
+  ) ||
+    readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(
+      "resolveGaMeasurementId"
+    ),
+  "Google tag must use the owner measurement id"
+);
+assert.ok(
+  !readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(
+    "next/script"
+  ),
+  "do not hide gtag behind Next.js Script preload"
+);
+assert.ok(
+  !readFileSync(join(root, "components/analytics/consent-scripts.tsx"), "utf8").includes(
+    "googletagmanager.com/gtag/js"
+  ),
+  "do not load a second Google tag from ConsentScripts"
+);
+assert.ok(
+  readFileSync(join(root, "wrangler.jsonc"), "utf8").includes("G-6DX8RC4VZ1"),
+  "Cloudflare vars must carry the owner GA id"
 );
 assert.ok(
   !readFileSync(join(root, "components/monetization/adsense-head.tsx"), "utf8").includes(

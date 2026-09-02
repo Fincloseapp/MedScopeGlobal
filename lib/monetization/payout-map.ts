@@ -5,6 +5,7 @@
 
 import { DEFAULT_HEUREKA_CZ_HAFF } from "@/lib/monetization/heureka-affiliate";
 import { isAdSenseEnabled } from "@/lib/monetization/adsense";
+import { isGoogleAnalyticsEnabled } from "@/lib/analytics/ga";
 
 export type PayoutChannelId =
   | "stripe"
@@ -160,7 +161,7 @@ export function getPayoutReadiness(): PayoutReadiness {
     amazonAny: Object.values(amazonStores).some(Boolean),
     amazonStores,
     adsense: isAdSenseEnabled(),
-    ga: envOn("NEXT_PUBLIC_GA_MEASUREMENT_ID"),
+    ga: isGoogleAnalyticsEnabled(),
   };
 }
 

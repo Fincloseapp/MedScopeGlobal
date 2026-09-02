@@ -3,6 +3,7 @@ import { Inter, Libre_Baskerville } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { PublicEnvScript } from "@/components/system/public-env-script";
 import { AdSenseHead } from "@/components/monetization/adsense-head";
+import { GoogleTagHead } from "@/components/analytics/google-tag-head";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { buildGlobalHreflang } from "@/lib/ecosystem/seo";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
@@ -100,6 +101,7 @@ export default async function RootLayout({
               'typeof __name!="function"&&(globalThis.__name=function(t,n){try{Object.defineProperty(t,"name",{value:n,configurable:!0})}catch(e){}return t});',
           }}
         />
+        <GoogleTagHead />
         <AdSenseHead />
       </head>
       <body

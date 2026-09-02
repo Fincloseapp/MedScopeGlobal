@@ -1,3 +1,5 @@
+import { resolveGaMeasurementId } from "@/lib/analytics/ga";
+
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
@@ -17,7 +19,7 @@ export function trackEvent(
 }
 
 export function trackPageView(path: string) {
-  const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  const measurementId = resolveGaMeasurementId();
   if (typeof window === "undefined" || typeof window.gtag !== "function" || !measurementId) {
     return;
   }
