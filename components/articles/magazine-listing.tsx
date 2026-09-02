@@ -11,6 +11,8 @@ import {
 } from "@/lib/brand/magazine";
 import { VITASCOPE_DESK_LOGO, VITASCOPE_TRACK_LOGO } from "@/lib/brand/vitascope";
 import { NEWS_DESKS, type NewsDeskId } from "@/lib/v271/news-desks";
+import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export function MagazineListing({
   articles,
@@ -35,6 +37,13 @@ export function MagazineListing({
         title={activeDesk ? desk.label : MAGAZINE.name}
         blurb={activeDesk ? desk.blurb : copy.intro}
       />
+
+      <div className="mt-5">
+        <ListingAffiliateBox
+          locale={locale as GlobalLocaleCode}
+          topic={activeDesk}
+        />
+      </div>
 
       <div className="mt-5 rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm sm:px-6">
         <div className="flex flex-wrap items-end justify-between gap-3">

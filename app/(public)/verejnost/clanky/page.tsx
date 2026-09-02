@@ -19,6 +19,8 @@ import { isListableNewsArticle, isLongevityArticle } from "@/lib/v271/news-desks
 import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { localizeMagazineHubConfig } from "@/lib/i18n/localize-magazine-hub";
+import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export const revalidate = 120;
 
@@ -102,6 +104,10 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
               {topicLabelForSlug(slug, locale)}
             </Link>
           ))}
+        </div>
+
+        <div className="mb-8">
+          <ListingAffiliateBox locale={locale as GlobalLocaleCode} topic={topic} />
         </div>
 
         {articles.length ? (

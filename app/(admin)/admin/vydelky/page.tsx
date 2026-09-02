@@ -170,7 +170,9 @@ export default async function AdminVydelkyPage({
       <section className="rounded-2xl border border-amber-200 bg-amber-50/70 p-5">
         <h2 className="font-display text-lg font-semibold text-[#021d33]">1. Heureka — dokončit z otevřeného webmastera</h2>
         <p className="mt-2 text-sm leading-relaxed text-slate-700">
-          Účet máte. Heureka <strong>nepočítá přímý odkaz na heureka.cz</strong>. V{" "}
+          Účet máte. Do schválení Heureky CZ čtenáři jdou na <strong>Amazon.de s českým rozhraním</strong>
+          {" "}(<code>language=cs</code>, tag <code>vialongevita-21</code>). Po vložení position ID
+          se /go přepne na Trixam. Heureka <strong>nepočítá přímý odkaz na heureka.cz</strong>. V{" "}
           <a className="font-medium text-[#005B96] hover:underline" href="https://affiliate.heureka.cz/webmaster#/" target="_blank" rel="noreferrer">
             webmaster panelu
           </a>{" "}

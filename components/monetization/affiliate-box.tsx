@@ -11,6 +11,7 @@ import {
   type RevenueArticle,
 } from "@/lib/monetization/revenue-mix";
 import { affiliateGoPath } from "@/lib/monetization/affiliate-geo";
+import { pickAffiliateProducts } from "@/lib/monetization/affiliate-mix";
 
 type Props = {
   locale?: GlobalLocaleCode;
@@ -94,15 +95,38 @@ function AffiliateProductCard({
 
 export function LongevityProductsSection({ locale = "cs" }: { locale?: GlobalLocaleCode }) {
   const chrome = getArticleChrome(locale);
-  return <AffiliateBox locale={locale} category="longevity" title={chrome.recsTitle} />;
+  return (
+    <AffiliateBox
+      locale={locale}
+      title={chrome.recsTitle}
+      products={pickAffiliateProducts({ surface: "homepage", locale })}
+    />
+  );
 }
 
-/** Fallback: show all supplement + sleep products for longevity section */
+/** Rotating mix for homepage / magazine rails — never the full catalogue. */
 export function TopLongevityProducts({ locale = "cs" }: { locale?: GlobalLocaleCode }) {
-  const products = AFFILIATE_PRODUCTS.filter(
-    (p) => p.category === "supplements" || p.category === "sleep" || p.category === "lab-tests"
+  return (
+    <AffiliateBox
+      locale={locale}
+      products={pickAffiliateProducts({ surface: "homepage", locale })}
+    />
   );
-  return <AffiliateBox locale={locale} products={products} />;
+}
+
+export function ListingAffiliateBox({
+  locale = "cs",
+  topic,
+}: {
+  locale?: GlobalLocaleCode | string;
+  topic?: string | null;
+}) {
+  return (
+    <AffiliateBox
+      locale={locale as GlobalLocaleCode}
+      products={pickAffiliateProducts({ surface: "listing", locale, topic })}
+    />
+  );
 }
 
 /** Topic-matched affiliate — at most two products for the article. */

@@ -30,7 +30,12 @@ import {
   LONGEVITY_MEDIA_KIT,
 } from "../../lib/monetization/revenue-mix";
 import { NEWSLETTER_SUBSCRIBERS_SQL } from "../../lib/monetization/apply-schema";
-import { applyHeurekaTracking } from "../../lib/monetization/affiliate-geo";
+import {
+  applyHeurekaTracking,
+  fallbackUntrackedHeurekaToAmazonDe,
+  AFFILIATE_PRODUCT_IDS,
+} from "../../lib/monetization/affiliate-geo";
+import { pickAffiliateProducts, AFFILIATE_SLOT_COUNTS } from "../../lib/monetization/affiliate-mix";
 import { getPayoutReadiness, PAYOUT_CHANNELS } from "../../lib/monetization/payout-map";
 import { getRevenueCopy } from "../../lib/i18n/revenue-copy";
 import {
@@ -218,6 +223,16 @@ assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "fr" 
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "de" })?.includes("amazon.de"));
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "cs" })?.includes("heureka.cz"));
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "sk" })?.includes("heureka.sk"));
+{
+  const czLive = fallbackUntrackedHeurekaToAmazonDe(
+    getAffiliateRedirectDestination("magnesium-glycinate", { locale: "cs" })!,
+    "cs"
+  );
+  assert.ok(czLive.includes("amazon.de"), "CZ must earn on Amazon.de until Heureka position ID exists");
+  assert.ok(czLive.includes("language=cs"), "Amazon.de must use the Czech UI for CZ readers");
+  assert.ok(getAffiliateRedirectDestination("creatine-monohydrate", { locale: "de" })?.includes("amazon.de"));
+  assert.equal(AFFILIATE_PRODUCT_IDS.length, 10);
+}
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "it" })?.includes("amazon.it"));
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "es" })?.includes("amazon.es"));
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "ja" })?.includes("amazon.co.jp"));
@@ -334,12 +349,15 @@ assert.equal(shouldShowAffiliate("physician"), false);
 assert.equal(shouldShowOrdiZapisCta("physician"), true);
 assert.equal(shouldShowPublicSubscribeNudge("public", false), true);
 assert.equal(shouldShowPublicSubscribeNudge("public", true), false);
-assert.deepEqual(
-  matchAffiliateProductIds({ title: "Poruchy spánku a HRV", slug: "spanek-hrv" }),
-  ["sleep-tracker", "magnesium-glycinate"]
-);
+{
+  const sleepMix = matchAffiliateProductIds({ title: "Poruchy spánku a HRV", slug: "spanek-hrv" });
+  assert.equal(sleepMix.length, AFFILIATE_SLOT_COUNTS.article);
+  assert.ok(sleepMix.includes("sleep-tracker"));
+}
 assert.ok(matchAffiliateProductIds({ title: "Vitamin D3 v zimě", slug: "vitamin-d3" }).includes("vitamin-d3-k2"));
 assert.ok(matchAffiliateProductIds({ title: "Sommeil et HRV", slug: "sommeil" }).includes("sleep-tracker"));
+assert.equal(pickAffiliateProducts({ surface: "homepage", locale: "fr" }).length, AFFILIATE_SLOT_COUNTS.homepage);
+assert.equal(pickAffiliateProducts({ surface: "listing", locale: "cs", topic: "dlouhovekost" }).length, AFFILIATE_SLOT_COUNTS.listing);
 assert.ok(LONGEVITY_MEDIA_KIT.some((item) => item.id === "native-banner" && item.priceCzk === 5000));
 assert.ok(LONGEVITY_MEDIA_KIT.some((item) => item.id === "sponsored-article" && item.priceCzk === 15000));
 

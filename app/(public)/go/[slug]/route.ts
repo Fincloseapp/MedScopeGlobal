@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getAffiliateRedirectDestination } from "@/lib/ecosystem/monetization";
+import { fallbackUntrackedHeurekaToAmazonDe } from "@/lib/monetization/affiliate-geo";
 import { logMonetizationEvent } from "@/lib/monetization/log-event";
 import { LOCALE_COOKIE, REGION_COOKIE } from "@/lib/i18n/config";
 import { resolveLocalePath } from "@/lib/i18n/locale-path";
@@ -41,14 +42,18 @@ export async function GET(request: Request, { params }: Params) {
   }
   if (!locale) locale = localeFromReferer(referer);
 
-  const destination = getAffiliateRedirectDestination(slug, { locale, region });
+  const intended = getAffiliateRedirectDestination(slug, { locale, region });
 
-  if (!destination) {
+  if (!intended) {
     return NextResponse.json({ error: "Unknown affiliate link" }, { status: 404 });
   }
 
-  const heurekaMarket = heurekaMarketFromUrl(destination);
+  const heurekaMarket = heurekaMarketFromUrl(intended);
   const positionId = heurekaMarket ? await getHeurekaPositionId(heurekaMarket) : null;
+  const destination =
+    heurekaMarket && !positionId
+      ? fallbackUntrackedHeurekaToAmazonDe(intended, locale)
+      : intended;
 
   await logMonetizationEvent("affiliate_click", {
     slug: slug.trim().toLowerCase(),
@@ -57,10 +62,11 @@ export async function GET(request: Request, { params }: Params) {
     region,
     referer,
     heureka: Boolean(positionId),
+    checkout: heurekaMarket && !positionId ? "amazon-de" : heurekaMarket ? "heureka" : "amazon",
   });
 
   if (positionId && heurekaMarket) {
-    return new NextResponse(heurekaHopHtml({ destination, positionId }), {
+    return new NextResponse(heurekaHopHtml({ destination: intended, positionId }), {
       status: 200,
       headers: {
         "Content-Type": "text/html; charset=utf-8",

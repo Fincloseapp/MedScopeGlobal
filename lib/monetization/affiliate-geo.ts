@@ -5,7 +5,8 @@
  * Global catalogue (magnesium, D3+K2, sleep tracker) is shown everywhere;
  * the outbound URL is always the local marketplace so checkout friction stays low.
  *
- * CZ/SK → Heureka (Amazon has no .cz/.sk store).
+ * CZ/SK → Heureka only after a Trixam position ID exists.
+ * Until then CZ/SK checkout is Amazon.de with language=cs (Czech UI).
  * PL/DE/FR/IT/ES/UK/US/JP → Amazon local storefront.
  * Other EU locales (RO, HU, NL) → Amazon.de (ships across the EU).
  * Remaining locales → Amazon.com (widest catalogue, highest typical EPC).
@@ -37,6 +38,12 @@ export const AFFILIATE_PRODUCT_IDS = [
   "omega-3-test",
   "sleep-tracker",
   "vitamin-d3-k2",
+  "creatine-monohydrate",
+  "collagen-peptides",
+  "electrolyte-powder",
+  "sleep-mask",
+  "blood-pressure-monitor",
+  "resistance-bands",
 ] as const;
 
 export type AffiliateProductId = (typeof AFFILIATE_PRODUCT_IDS)[number];
@@ -117,6 +124,19 @@ const SLUG_TO_PRODUCT: Record<string, AffiliateProductId> = {
   d3: "vitamin-d3-k2",
   "vitamin-d3-k2": "vitamin-d3-k2",
   "d3-k2": "vitamin-d3-k2",
+  creatine: "creatine-monohydrate",
+  "creatine-monohydrate": "creatine-monohydrate",
+  collagen: "collagen-peptides",
+  "collagen-peptides": "collagen-peptides",
+  electrolyte: "electrolyte-powder",
+  "electrolyte-powder": "electrolyte-powder",
+  "sleep-mask": "sleep-mask",
+  mask: "sleep-mask",
+  "blood-pressure-monitor": "blood-pressure-monitor",
+  "blood-pressure": "blood-pressure-monitor",
+  tlak: "blood-pressure-monitor",
+  "resistance-bands": "resistance-bands",
+  bands: "resistance-bands",
 };
 
 /** Local search queries — what people actually type on that storefront. */
@@ -168,6 +188,78 @@ const PRODUCT_QUERIES: Record<AffiliateProductId, Record<AffiliateMarketId, stri
     "amazon-uk": "vitamin D3 K2",
     "amazon-us": "vitamin D3 K2",
     "amazon-jp": "vitamin D3 K2",
+  },
+  "creatine-monohydrate": {
+    "heureka-cz": "kreatin monohydrát",
+    "heureka-sk": "kreatín monohydrát",
+    "amazon-de": "Kreatin Monohydrat",
+    "amazon-fr": "créatine monohydrate",
+    "amazon-it": "creatina monoidrato",
+    "amazon-es": "creatina monohidrato",
+    "amazon-pl": "kreatyna monohydrat",
+    "amazon-uk": "creatine monohydrate",
+    "amazon-us": "creatine monohydrate",
+    "amazon-jp": "creatine monohydrate",
+  },
+  "collagen-peptides": {
+    "heureka-cz": "kolagen peptidy",
+    "heureka-sk": "kolagén peptidy",
+    "amazon-de": "Kollagen Peptide",
+    "amazon-fr": "collagène peptides",
+    "amazon-it": "collagene peptidi",
+    "amazon-es": "colágeno péptidos",
+    "amazon-pl": "kolagen peptydy",
+    "amazon-uk": "collagen peptides",
+    "amazon-us": "collagen peptides",
+    "amazon-jp": "collagen peptides",
+  },
+  "electrolyte-powder": {
+    "heureka-cz": "elektrolyty prášek",
+    "heureka-sk": "elektrolyty prášok",
+    "amazon-de": "Elektrolyte Pulver",
+    "amazon-fr": "électrolytes poudre",
+    "amazon-it": "elettroliti polvere",
+    "amazon-es": "electrolitos polvo",
+    "amazon-pl": "elektrolity proszek",
+    "amazon-uk": "electrolyte powder",
+    "amazon-us": "electrolyte powder",
+    "amazon-jp": "electrolyte powder",
+  },
+  "sleep-mask": {
+    "heureka-cz": "maska na spaní",
+    "heureka-sk": "maska na spanie",
+    "amazon-de": "Schlafmaske",
+    "amazon-fr": "masque de sommeil",
+    "amazon-it": "mascherina sonno",
+    "amazon-es": "antifaz dormir",
+    "amazon-pl": "opaska na oczy sen",
+    "amazon-uk": "sleep mask",
+    "amazon-us": "sleep mask",
+    "amazon-jp": "sleep mask",
+  },
+  "blood-pressure-monitor": {
+    "heureka-cz": "tlakoměr paže",
+    "heureka-sk": "tlakomer rameno",
+    "amazon-de": "Blutdruckmessgerät Oberarm",
+    "amazon-fr": "tensiomètre bras",
+    "amazon-it": "misuratore pressione braccio",
+    "amazon-es": "tensiómetro brazo",
+    "amazon-pl": "ciśnieniomierz ramię",
+    "amazon-uk": "blood pressure monitor upper arm",
+    "amazon-us": "blood pressure monitor upper arm",
+    "amazon-jp": "blood pressure monitor",
+  },
+  "resistance-bands": {
+    "heureka-cz": "odporové gumy",
+    "heureka-sk": "odporové gumy",
+    "amazon-de": "Fitnessbänder Widerstand",
+    "amazon-fr": "élastiques musculation",
+    "amazon-it": "bande elastiche fitness",
+    "amazon-es": "bandas elásticas fitness",
+    "amazon-pl": "taśmy oporowe",
+    "amazon-uk": "resistance bands",
+    "amazon-us": "resistance bands",
+    "amazon-jp": "resistance bands",
   },
 };
 
@@ -248,7 +340,16 @@ export function parseAffiliateSlug(slug: string): {
   return null;
 }
 
-function marketplaceSearchUrl(market: AffiliateMarketId, query: string): string {
+function wantsAmazonDeCzechUi(locale?: string | null): boolean {
+  const key = (locale ?? "").toLowerCase();
+  return key === "cs" || key.startsWith("cs-") || key === "sk" || key.startsWith("sk-");
+}
+
+function marketplaceSearchUrl(
+  market: AffiliateMarketId,
+  query: string,
+  locale?: string | null
+): string {
   const encoded = encodeURIComponent(query);
   if (market === "heureka-cz") {
     return `https://www.heureka.cz/?h%5Bfraze%5D=${encoded}`;
@@ -257,7 +358,30 @@ function marketplaceSearchUrl(market: AffiliateMarketId, query: string): string 
     return `https://www.heureka.sk/?h%5Bfraze%5D=${encoded}`;
   }
   const host = AMAZON_HOST[market];
-  return `https://${host}/s?k=${encoded}`;
+  const url = new URL(`https://${host}/s`);
+  url.searchParams.set("k", query);
+  if (market === "amazon-de" && wantsAmazonDeCzechUi(locale)) {
+    url.searchParams.set("language", "cs");
+  }
+  return url.toString();
+}
+
+/** Untracked Heureka search → Amazon.de (Czech UI) until Trixam position ID exists. */
+export function fallbackUntrackedHeurekaToAmazonDe(
+  url: string,
+  locale?: string | null
+): string {
+  try {
+    const parsed = new URL(url);
+    if (!/(^|\.)heureka\.(cz|sk)$/i.test(parsed.hostname)) return url;
+    const query =
+      parsed.searchParams.get("h[fraze]") ||
+      parsed.searchParams.get("h%5Bfraze%5D") ||
+      "magnesium glycinate";
+    return applyAmazonAssociateTag(marketplaceSearchUrl("amazon-de", query, locale ?? "cs"));
+  } catch {
+    return url;
+  }
 }
 
 export function amazonTagForHost(hostname: string): string {
@@ -319,7 +443,7 @@ export function affiliateDestinationForProduct(
 ): string {
   const market = marketOverride ?? resolveAffiliateMarket(ctx);
   const query = PRODUCT_QUERIES[productId][market];
-  const raw = marketplaceSearchUrl(market, query);
+  const raw = marketplaceSearchUrl(market, query, ctx.locale);
   return applyAmazonAssociateTag(applyHeurekaTracking(raw));
 }
 

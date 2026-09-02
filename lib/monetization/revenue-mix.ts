@@ -1,13 +1,10 @@
-import {
-  AFFILIATE_PRODUCTS,
-  type AffiliateProduct,
-} from "@/lib/ecosystem/monetization";
+import { type AffiliateProduct } from "@/lib/ecosystem/monetization";
 export { applyAmazonAssociateTag } from "@/lib/ecosystem/monetization";
 import {
   isSpecialAccessArticle,
   type ArticleEligibilityFields,
 } from "@/lib/auth/article-eligibility";
-import { isLongevityArticle } from "@/lib/v271/news-desks";
+import { pickAffiliateProductIds, pickAffiliateProducts } from "@/lib/monetization/affiliate-mix";
 
 export type RevenueSurface = "public" | "physician" | "student";
 
@@ -85,59 +82,12 @@ export function shouldShowHousePartner(surface: RevenueSurface, isVip: boolean):
   return surface === "public" && !isVip;
 }
 
-function haystack(article: RevenueArticle): string {
-  return [
-    article.title,
-    article.excerpt,
-    article.slug,
-    article.public_topic,
-    article.category,
-  ]
-    .map((value) => String(value ?? "").toLowerCase())
-    .join(" ");
-}
-
-/** Max two products, matched to the article — never dump the full catalogue. */
+/** Topic + rotating high-EPC filler — 3 on articles, never the full catalogue. */
 export function matchAffiliateProductIds(article: RevenueArticle): string[] {
-  const text = haystack(article);
-  const ids: string[] = [];
-
-  if (/spán|spanek|sleep|insomni|nespav|hrv|oura|whoop|circadian|sommeil|schlaf|sueñ|sonno|seno\b|sen i |alvás/.test(text)) {
-    ids.push("sleep-tracker");
-  }
-  if (/magnes|hořčí|horcik|horčík|glycinát|glycinat|magnésium|magnez/.test(text)) {
-    ids.push("magnesium-glycinate");
-  }
-  if (/omega|rybí tuk|rybi tuk|srdc|lipid|cholesterol|epa|dha|cœur|herz|cuore|serce/.test(text)) {
-    ids.push("omega-3-test");
-  }
-  if (/vitamin d|vitamín d|vitamine d|witamina d|d3\b|k2\b|kostí|kosti|imunit|osteopor/.test(text)) {
-    ids.push("vitamin-d3-k2");
-  }
-
-  const unique = [...new Set(ids)];
-  if (unique.length >= 2) return unique.slice(0, 2);
-  if (unique.length === 1) {
-    const fallback = unique[0] === "sleep-tracker" ? "magnesium-glycinate" : "sleep-tracker";
-    return [...unique, fallback];
-  }
-
-  if (
-    isLongevityArticle({
-      title: article.title,
-      excerpt: article.excerpt,
-      slug: article.slug,
-      public_topic: article.public_topic,
-    })
-  ) {
-    return ["magnesium-glycinate", "vitamin-d3-k2"];
-  }
-
-  return ["magnesium-glycinate", "sleep-tracker"];
+  return pickAffiliateProductIds({ surface: "article", article });
 }
 
 export function matchAffiliateProducts(article: RevenueArticle): AffiliateProduct[] {
-  const ids = new Set(matchAffiliateProductIds(article));
-  return AFFILIATE_PRODUCTS.filter((product) => ids.has(product.id));
+  return pickAffiliateProducts({ surface: "article", article });
 }
 
