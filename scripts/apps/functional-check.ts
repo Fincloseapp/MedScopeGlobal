@@ -60,6 +60,8 @@ import {
   parseHeurekaPositionId,
   heurekaHopHtml,
   heurekaMarketFromUrl,
+  applyHeurekaHaff,
+  DEFAULT_HEUREKA_CZ_HAFF,
   HEUREKA_HOP_CSP,
 } from "../../lib/monetization/heureka-affiliate";
 import {
@@ -242,12 +244,18 @@ assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "de" 
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "cs" })?.includes("heureka.cz"));
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "sk" })?.includes("heureka.sk"));
 {
-  const czLive = fallbackUntrackedHeurekaToAmazonDe(
-    getAffiliateRedirectDestination("magnesium-glycinate", { locale: "cs" })!,
-    "cs"
+  const czLive = getAffiliateRedirectDestination("magnesium-glycinate", { locale: "cs" })!;
+  assert.ok(czLive.includes("heureka.cz"), "CZ must open Heureka with Přímý odkaz");
+  assert.ok(czLive.includes("haff=282255"), "CZ Heureka must carry webmaster haff");
+  assert.ok(czLive.includes("utm_medium=affiliate"));
+  assert.equal(
+    fallbackUntrackedHeurekaToAmazonDe(czLive, "cs").includes("heureka.cz"),
+    true,
+    "tagged haff must not fall back to Amazon"
   );
-  assert.ok(czLive.includes("amazon.de"), "CZ must earn on Amazon.de until Heureka position ID exists");
-  assert.ok(czLive.includes("language=cs"), "Amazon.de must use the Czech UI for CZ readers");
+  const untagged = fallbackUntrackedHeurekaToAmazonDe("https://www.heureka.cz/?h%5Bfraze%5D=x", "cs");
+  assert.ok(untagged.includes("amazon.de"), "untagged Heureka still falls back to Amazon.de");
+  assert.ok(untagged.includes("language=cs"), "Amazon.de must use the Czech UI for CZ readers");
   assert.ok(getAffiliateRedirectDestination("creatine-monohydrate", { locale: "de" })?.includes("amazon.de"));
   assert.ok(getAffiliateRedirectDestination("protein-powder", { locale: "fr" })?.includes("amazon.fr"));
   assert.ok(getAffiliateRedirectDestination("yoga-mat", { locale: "it" })?.includes("amazon.it"));
@@ -286,6 +294,7 @@ assert.equal(
 assert.ok(PAYOUT_CHANNELS.some((channel) => channel.id === "amazon"));
 assert.ok(PAYOUT_CHANNELS.some((channel) => channel.id === "heureka-cz"));
 assert.equal(getPayoutReadiness().amazonAny, false);
+assert.equal(getPayoutReadiness().heurekaCz, true);
 {
   const tagged = applyAmazonAssociateTag(
     "https://www.amazon.com/s?k=magnesium+glycinate",
@@ -396,6 +405,7 @@ file("lib/admin/ensure-taxonomy.ts");
 file("lib/admin/stripe-snapshot.ts");
 file("lib/monetization/heureka-affiliate.ts");
 file("supabase/migrations/20260901193000_monetization_settings.sql");
+assert.equal(parseHeurekaPositionId("haff=282255&utm_medium=affiliate"), "282255");
 assert.equal(parseHeurekaPositionId('data-trixam-positionid="18420"'), "18420");
 assert.equal(
   parseHeurekaPositionId('<a class="heureka-affiliate-link" data-trixam-positionid="18420" href="https://www.heureka.cz/">x</a>'),
@@ -409,6 +419,10 @@ assert.ok(heurekaHopHtml({ destination: "https://www.heureka.cz/", positionId: "
 assert.ok(heurekaHopHtml({ destination: "https://www.heureka.cz/", positionId: "18420" }).includes("18420"));
 assert.ok(heurekaHopHtml({ destination: "https://www.heureka.cz/", positionId: "18420" }).includes("trixam.min.js"));
 assert.ok(HEUREKA_HOP_CSP.includes("serve.affiliate.heureka.cz"));
+assert.equal(DEFAULT_HEUREKA_CZ_HAFF, "282255");
+assert.ok(
+  applyHeurekaHaff("https://www.heureka.cz/?h%5Bfraze%5D=magnesium", "282255").includes("haff=282255")
+);
 file("lib/v30/security/headers.ts");
 assert.ok(
   readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes("serve.affiliate.heureka.cz"),

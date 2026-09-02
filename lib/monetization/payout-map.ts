@@ -3,6 +3,8 @@
  * Admin UI only — never invent live Amazon / Heureka / AdSense IDs.
  */
 
+import { DEFAULT_HEUREKA_CZ_HAFF } from "@/lib/monetization/heureka-affiliate";
+
 export type PayoutChannelId =
   | "stripe"
   | "heureka-cz"
@@ -148,7 +150,10 @@ export function getPayoutReadiness(): PayoutReadiness {
   };
   return {
     stripe: envOn("STRIPE_SECRET_KEY") && envOn("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"),
-    heurekaCz: envOn("AFFILIATE_HEUREKA_CZ_POSITION_ID") || envOn("AFFILIATE_HEUREKA_CZ_TEMPLATE"),
+    heurekaCz:
+      envOn("AFFILIATE_HEUREKA_CZ_POSITION_ID") ||
+      envOn("AFFILIATE_HEUREKA_CZ_TEMPLATE") ||
+      Boolean(DEFAULT_HEUREKA_CZ_HAFF),
     heurekaSk: envOn("AFFILIATE_HEUREKA_SK_POSITION_ID") || envOn("AFFILIATE_HEUREKA_SK_TEMPLATE"),
     amazonAny: Object.values(amazonStores).some(Boolean),
     amazonStores,

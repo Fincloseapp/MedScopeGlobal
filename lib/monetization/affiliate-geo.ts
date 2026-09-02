@@ -5,8 +5,8 @@
  * Global catalogue (magnesium, D3+K2, sleep tracker) is shown everywhere;
  * the outbound URL is always the local marketplace so checkout friction stays low.
  *
- * CZ/SK → Heureka only after a Trixam position ID exists.
- * Until then CZ/SK checkout is Amazon.de with language=cs (Czech UI).
+ * CZ → Heureka.cz with haff=282255 (Přímý odkaz). SK still waits for its own haff.
+ * Untagged Heureka URLs fall back to Amazon.de with language=cs (Czech UI).
  * PL/DE/FR/IT/ES/UK/US/JP → Amazon local storefront.
  * Other EU locales (RO, HU, NL) → Amazon.de (ships across the EU).
  * Remaining locales → Amazon.com (widest catalogue, highest typical EPC).
@@ -14,6 +14,11 @@
 
 import { normalizeLocale, type RegionCode } from "@/lib/i18n/config";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import {
+  applyHeurekaHaff,
+  heurekaUrlHasHaff,
+  resolveHeurekaHaffSync,
+} from "@/lib/monetization/heureka-affiliate";
 
 export type AffiliateMarketId =
   | "heureka-cz"
@@ -574,7 +579,7 @@ function marketplaceSearchUrl(
   return url.toString();
 }
 
-/** Untracked Heureka search → Amazon.de (Czech UI) until Trixam position ID exists. */
+/** Untracked Heureka search → Amazon.de (Czech UI). Tagged haff URLs stay on Heureka. */
 export function fallbackUntrackedHeurekaToAmazonDe(
   url: string,
   locale?: string | null
@@ -582,6 +587,7 @@ export function fallbackUntrackedHeurekaToAmazonDe(
   try {
     const parsed = new URL(url);
     if (!/(^|\.)heureka\.(cz|sk)$/i.test(parsed.hostname)) return url;
+    if (heurekaUrlHasHaff(url)) return url;
     const query =
       parsed.searchParams.get("h[fraze]") ||
       parsed.searchParams.get("h%5Bfraze%5D") ||
@@ -601,8 +607,7 @@ export function amazonTagForHost(hostname: string): string {
 }
 
 /**
- * Optional legacy wrap (`{url}` / `{q}`). Official earning path is Trixam
- * (`/go` hop + data-trixam-positionid). HTML snippets are not URL templates.
+ * Optional legacy wrap (`{url}` / `{q}`), then official Přímý odkaz (`haff=`).
  */
 export function applyHeurekaTracking(url: string): string {
   try {
@@ -614,18 +619,20 @@ export function applyHeurekaTracking(url: string): string {
     const template = (
       isSk ? process.env.AFFILIATE_HEUREKA_SK_TEMPLATE : process.env.AFFILIATE_HEUREKA_CZ_TEMPLATE
     )?.trim();
-    if (!template || /data-trixam-positionid|heureka-affiliate-link/i.test(template)) return url;
-    if (template.includes("{url}")) {
-      return template.split("{url}").join(encodeURIComponent(url));
+    if (template && !/data-trixam-positionid|heureka-affiliate-link|haff=/i.test(template)) {
+      if (template.includes("{url}")) {
+        return template.split("{url}").join(encodeURIComponent(url));
+      }
+      if (template.includes("{q}")) {
+        const q =
+          parsed.searchParams.get("h[fraze]") ??
+          parsed.searchParams.get("h%5Bfraze%5D") ??
+          "";
+        return template.split("{q}").join(encodeURIComponent(q));
+      }
     }
-    if (template.includes("{q}")) {
-      const q =
-        parsed.searchParams.get("h[fraze]") ??
-        parsed.searchParams.get("h%5Bfraze%5D") ??
-        "";
-      return template.split("{q}").join(encodeURIComponent(q));
-    }
-    return url;
+    const haff = resolveHeurekaHaffSync(isSk ? "sk" : "cz");
+    return haff ? applyHeurekaHaff(url, haff) : url;
   } catch {
     return url;
   }

@@ -1,7 +1,13 @@
 /**
- * Official Heureka Affiliate tracking (Trixam).
- * Direct heureka.cz search URLs do not pay — clicks must go through
- * `heureka-affiliate-link` + data-trixam-positionid + serve.affiliate.heureka.cz.
+ * Heureka Affiliate.
+ *
+ * Official earning path for this site is **Přímý odkaz** (`haff=` on heureka.cz).
+ * Webmaster: web Medscopeglobal, pozice „Přímý odkaz“, parametr
+ * `haff=282255&utm_medium=affiliate`. Heureka.cz itself runs
+ * Trixam.HaffCampaignExecuter and attributes the visit.
+ *
+ * Untagged heureka.cz search URLs do not pay — those still fall back to Amazon.de.
+ * Widget HTML (`data-trixam-positionid`) remains accepted as an override.
  */
 
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
@@ -22,18 +28,50 @@ export const HEUREKA_HOP_CSP = [
 export const HEUREKA_CZ_POSITION_KEY = "heureka_cz_position_id";
 export const HEUREKA_SK_POSITION_KEY = "heureka_sk_position_id";
 
+/** Webmaster → Přímý odkaz for medscopeglobal.com. Not invented. */
+export const DEFAULT_HEUREKA_CZ_HAFF = "282255";
+export const HEUREKA_HAFF_UTM = "affiliate";
+
 const cache = new Map<string, { id: string | null; at: number }>();
 const CACHE_MS = 30_000;
 
 export function parseHeurekaPositionId(raw: string): string | null {
   const text = raw.trim();
   if (!text) return null;
+  const haff = text.match(/(?:^|[?&#])haff=(\d{2,12})\b/i) || text.match(/\bhaff=(\d{2,12})\b/i);
+  if (haff?.[1]) return haff[1];
   const attr = text.match(/data-trixam-positionid\s*=\s*["']?(\d{2,12})/i);
   if (attr?.[1]) return attr[1];
   const txpos = text.match(/txpos_(\d{2,12})/i);
   if (txpos?.[1]) return txpos[1];
   if (/^\d{2,12}$/.test(text)) return text;
   return null;
+}
+
+export function resolveHeurekaHaffSync(market: "cz" | "sk"): string | null {
+  return envPosition(market) ?? (market === "cz" ? DEFAULT_HEUREKA_CZ_HAFF : null);
+}
+
+export function applyHeurekaHaff(url: string, haff: string): string {
+  const id = parseHeurekaPositionId(haff);
+  if (!id) return url;
+  try {
+    const parsed = new URL(url);
+    if (!/(^|\.)heureka\.(cz|sk)$/i.test(parsed.hostname)) return url;
+    parsed.searchParams.set("haff", id);
+    parsed.searchParams.set("utm_medium", HEUREKA_HAFF_UTM);
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+}
+
+export function heurekaUrlHasHaff(url: string): boolean {
+  try {
+    return Boolean(parseHeurekaPositionId(new URL(url).searchParams.get("haff") ?? ""));
+  } catch {
+    return false;
+  }
 }
 
 function envPosition(market: "cz" | "sk"): string | null {
@@ -51,8 +89,8 @@ function envPosition(market: "cz" | "sk"): string | null {
 }
 
 export async function getHeurekaPositionId(market: "cz" | "sk"): Promise<string | null> {
-  const fromEnv = envPosition(market);
-  if (fromEnv) return fromEnv;
+  const fromSync = resolveHeurekaHaffSync(market);
+  if (fromSync) return fromSync;
 
   const cached = cache.get(market);
   if (cached && Date.now() - cached.at < CACHE_MS) return cached.id;
@@ -84,7 +122,7 @@ export async function saveHeurekaPositionId(
 ): Promise<{ ok: boolean; id?: string; error?: string }> {
   const id = parseHeurekaPositionId(raw);
   if (!id) {
-    return { ok: false, error: "Vložte číslo data-trixam-positionid nebo celý HTML kód z webmastera." };
+    return { ok: false, error: "Vložte haff=… z Přímého odkazu, číslo pozice, nebo HTML s data-trixam-positionid." };
   }
 
   const schema = await applyMonetizationSettingsSchema();

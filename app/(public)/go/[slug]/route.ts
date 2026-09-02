@@ -6,10 +6,10 @@ import { logMonetizationEvent } from "@/lib/monetization/log-event";
 import { LOCALE_COOKIE, REGION_COOKIE } from "@/lib/i18n/config";
 import { resolveLocalePath } from "@/lib/i18n/locale-path";
 import {
-  HEUREKA_HOP_CSP,
+  applyHeurekaHaff,
   getHeurekaPositionId,
-  heurekaHopHtml,
   heurekaMarketFromUrl,
+  heurekaUrlHasHaff,
 } from "@/lib/monetization/heureka-affiliate";
 
 export const dynamic = "force-dynamic";
@@ -49,11 +49,12 @@ export async function GET(request: Request, { params }: Params) {
   }
 
   const heurekaMarket = heurekaMarketFromUrl(intended);
-  const positionId = heurekaMarket ? await getHeurekaPositionId(heurekaMarket) : null;
-  const destination =
-    heurekaMarket && !positionId
-      ? fallbackUntrackedHeurekaToAmazonDe(intended, locale)
-      : intended;
+  const haff = heurekaMarket ? await getHeurekaPositionId(heurekaMarket) : null;
+  const destination = heurekaMarket
+    ? haff
+      ? applyHeurekaHaff(intended, haff)
+      : fallbackUntrackedHeurekaToAmazonDe(intended, locale)
+    : intended;
 
   await logMonetizationEvent("affiliate_click", {
     slug: slug.trim().toLowerCase(),
@@ -61,20 +62,14 @@ export async function GET(request: Request, { params }: Params) {
     locale,
     region,
     referer,
-    heureka: Boolean(positionId),
-    checkout: heurekaMarket && !positionId ? "amazon-de" : heurekaMarket ? "heureka" : "amazon",
+    heureka: heurekaUrlHasHaff(destination),
+    haff: haff ?? null,
+    checkout: heurekaUrlHasHaff(destination)
+      ? "heureka-haff"
+      : heurekaMarket
+        ? "amazon-de"
+        : "amazon",
   });
-
-  if (positionId && heurekaMarket) {
-    return new NextResponse(heurekaHopHtml({ destination: intended, positionId }), {
-      status: 200,
-      headers: {
-        "Content-Type": "text/html; charset=utf-8",
-        "Cache-Control": "private, no-cache, no-store, must-revalidate",
-        "Content-Security-Policy": HEUREKA_HOP_CSP,
-      },
-    });
-  }
 
   const redirect = NextResponse.redirect(destination, 302);
   redirect.headers.set("Cache-Control", "private, no-cache, no-store, must-revalidate");

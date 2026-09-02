@@ -165,24 +165,17 @@ export default async function AdminVydelkyPage({
         </Card>
       </div>
 
-      <section className="rounded-2xl border border-amber-200 bg-amber-50/70 p-5">
-        <h2 className="font-display text-lg font-semibold text-[#021d33]">1. Heureka — dokončit z otevřeného webmastera</h2>
+      <section className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5">
+        <h2 className="font-display text-lg font-semibold text-[#021d33]">1. Heureka CZ — Přímý odkaz</h2>
         <p className="mt-2 text-sm leading-relaxed text-slate-700">
-          Účet máte. Do schválení Heureky CZ čtenáři jdou na <strong>Amazon.de s českým rozhraním</strong>
-          {" "}(<code>language=cs</code>, tag <code>vialongevita-21</code>). Po vložení position ID
-          se /go přepne na Trixam. Heureka <strong>nepočítá přímý odkaz na heureka.cz</strong>. V{" "}
-          <a className="font-medium text-[#005B96] hover:underline" href="https://affiliate.heureka.cz/webmaster#/" target="_blank" rel="noreferrer">
-            webmaster panelu
-          </a>{" "}
-          teď: Weby → medscopeglobal.com (schválený). Pak <strong>Vybrat prvek → Textový odkaz</strong>.
-          Do URL dejte třeba{" "}
-          <code className="rounded bg-white px-1">https://www.heureka.cz/?h[fraze]=magnesium+glycinát</code>.
-          Z vygenerovaného kódu zkopírujte celé HTML nebo číslo{" "}
-          <code>data-trixam-positionid</code> a vložte sem. Pak /go u CZ začne vydělávat.
+          Webmaster: web <strong>Medscopeglobal</strong>, pozice <strong>Přímý odkaz</strong>.
+          Parametr <code>haff=282255&amp;utm_medium=affiliate</code> je v /go zapojený.
+          Český čtenář jde na Heureka.cz (hledání produktu) s tímto <code>haff</code> — Heureka
+          si ho načte sama. Bez <code>haff</code> by odkaz nevydělával; SK zatím padá na Amazon.de.
         </p>
         {notice.heureka?.endsWith("-ok") ? (
           <p className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
-            Uloženo. Position ID {notice.id}. CZ/SK /go teď jde přes Trixam — Heureka může počítat klik.
+            Uloženo. haff={notice.id}. CZ /go teď nese Přímý odkaz.
           </p>
         ) : null}
         {notice.heureka?.endsWith("-err") ? (
@@ -192,14 +185,18 @@ export default async function AdminVydelkyPage({
         ) : null}
         <p className="mt-2 text-sm text-slate-600">
           Stav CZ pozice:{" "}
-          <strong>{heurekaCzId ? `propojeno (${heurekaCzId})` : "ještě chybí — vložte kód níže"}</strong>
+          <strong>
+            {heurekaCzId
+              ? `propojeno — Přímý odkaz haff=${heurekaCzId}`
+              : "ještě chybí — vložte haff= z webmastera"}
+          </strong>
         </p>
         <form action={saveCzPosition} className="mt-3 space-y-2">
           <textarea
             name="snippet"
             required
             rows={4}
-            placeholder='<a class="heureka-affiliate-link" data-trixam-positionid="12345" href="https://www.heureka.cz/...">'
+            placeholder="haff=282255&utm_medium=affiliate"
             className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm text-[#021d33]"
           />
           <button
