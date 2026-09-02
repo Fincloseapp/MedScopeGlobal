@@ -32,7 +32,7 @@ function localizedField(record: Record<string, string>, locale: string): string 
 }
 
 function affiliateHref(productId: string, locale: string, fallbackUrl?: string): string {
-  if (productId) return affiliateGoPath(productId);
+  if (productId) return affiliateGoPath(productId, locale, { carryLocale: true });
   if (!fallbackUrl) return "#";
   try {
     const parsed = new URL(fallbackUrl, "https://medscopeglobal.com");

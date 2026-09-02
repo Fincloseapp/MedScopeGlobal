@@ -254,6 +254,13 @@ file("app/api/apps/qr/route.ts");
 
 file("app/(public)/go/[slug]/route.ts");
 file("lib/monetization/affiliate-hop.ts");
+{
+  const box = readFileSync(join(root, "components/monetization/affiliate-box.tsx"), "utf8");
+  assert.ok(
+    box.includes("carryLocale: true"),
+    "public cards must pass locale so /de /fr /en open the right store"
+  );
+}
 file("vercel.json");
 file("scripts/cloudflare/assert-live-host.mjs");
 file("scripts/cloudflare/refuse-vercel.mjs");
