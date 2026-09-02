@@ -88,14 +88,6 @@ export function ConsentScripts() {
           </Script>
         </>
       ) : null}
-      {allowAds && ads.enabled && ads.adsenseClientId ? (
-        <Script
-          id="adsense-auto"
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ads.adsenseClientId}`}
-          strategy="afterInteractive"
-          crossOrigin="anonymous"
-        />
-      ) : null}
     </>
   );
 }

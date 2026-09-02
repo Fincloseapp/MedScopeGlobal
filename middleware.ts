@@ -7,6 +7,7 @@ import {
 import {
   LOCALE_COOKIE,
   LOCALE_REQUEST_HEADER,
+  PATHNAME_REQUEST_HEADER,
   normalizeLocale,
 } from "@/lib/i18n/config";
 import { localeForUnprefixedEntry } from "@/lib/i18n/detect-locale";
@@ -88,6 +89,7 @@ export async function middleware(request: NextRequest) {
       url.pathname = stripped;
       const requestHeaders = new Headers(request.headers);
       requestHeaders.set(LOCALE_REQUEST_HEADER, normalizeLocale(pathLocale));
+      requestHeaders.set(PATHNAME_REQUEST_HEADER, pathname);
       const rewrite = NextResponse.rewrite(url, {
         request: { headers: requestHeaders },
       });
@@ -135,6 +137,6 @@ export const config = {
     "/admin/:path*",
     "/stav-systemu",
     "/academy/lekari/:path*",
-    "/((?!_next|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?|ttf|eot)$).*)",
+    "/((?!_next|favicon.ico|robots.txt|ads.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?|ttf|eot|txt)$).*)",
   ],
 };

@@ -796,14 +796,28 @@ assert.ok(
   ),
   "CSP must allow Google Funding Choices CMP"
 );
-const consentScripts = readFileSync(join(root, "components/analytics/consent-scripts.tsx"), "utf8");
 assert.ok(
-  consentScripts.includes("adsbygoogle.js?client="),
-  "AdSense snippet must load for verification + CMP"
+  readFileSync(join(root, "components/monetization/adsense-head.tsx"), "utf8").includes(
+    "adsbygoogle.js?client="
+  ),
+  "AdSense snippet must load in public layout for verification + CMP"
 );
 assert.ok(
-  !consentScripts.includes("marketing && allowAds"),
+  readFileSync(join(root, "app/(public)/layout.tsx"), "utf8").includes("AdSenseHead")
+);
+assert.ok(
+  !readFileSync(join(root, "components/analytics/consent-scripts.tsx"), "utf8").includes(
+    "marketing && allowAds"
+  ),
   "homemade marketing gate must not block Google CMP"
+);
+assert.ok(
+  readFileSync(join(root, "app/robots.ts"), "utf8").includes("/ads.txt"),
+  "robots must allow ads.txt"
+);
+assert.ok(
+  readFileSync(join(root, "middleware.ts"), "utf8").includes("PATHNAME_REQUEST_HEADER"),
+  "locale rewrite must pass the original path so AdSense stays off pro routes"
 );
 assert.ok(
   readFileSync(join(root, "components/legal/cookie-banner.tsx"), "utf8").includes(
