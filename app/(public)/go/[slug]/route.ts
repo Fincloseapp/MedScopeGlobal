@@ -87,11 +87,13 @@ export async function GET(request: Request, { params }: Params) {
   }
 
   const productId = productIdFromGoSlug(slug) ?? slug;
+  const stay = url.searchParams.get("stay") === "1";
   const html = renderAffiliateHopHtml({
     destination,
     locale,
     productName: productDisplayName(productId, locale),
     imageUrl: productImageForHop(productId),
+    autoLeaveMs: stay ? 0 : 1800,
   });
   return new NextResponse(html, {
     status: 200,

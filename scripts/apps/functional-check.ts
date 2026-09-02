@@ -277,6 +277,13 @@ assert.equal(affiliateHopCopy("cs").cta, "Porovnat ceny");
   assert.ok(!hop.includes('href="https://www.heureka.cz'));
   assert.ok(hopHtmlHidesTracking(hop));
   assert.ok(hop.includes("haff=282255"), "payload still carries Přímý odkaz for the hop");
+  const preview = renderAffiliateHopHtml({
+    destination: dest,
+    locale: "cs",
+    productName: "Vitamin D3 + K2",
+    autoLeaveMs: 0,
+  });
+  assert.ok(!preview.includes("setTimeout(go"));
 }
 assert.ok(
   !getRevenueCopy("cs").affiliateDisclosure.toLowerCase().includes("affiliate (heureka"),

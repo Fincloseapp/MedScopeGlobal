@@ -91,18 +91,33 @@ function escapeHtml(value: string): string {
 }
 
 /** Magazine interstitial. Destination is not shown as a link or in visible copy. */
+export function publicAssetUrl(path: string | null | undefined): string | null {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  const origin = (process.env.NEXT_PUBLIC_SITE_URL || "https://medscopeglobal.com").replace(/\/$/, "");
+  return `${origin}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
 export function renderAffiliateHopHtml(input: {
   destination: string;
   locale?: string | null;
   productName: string;
   imageUrl?: string | null;
+  autoLeaveMs?: number;
 }): string {
   const copy = affiliateHopCopy(input.locale);
   const name = escapeHtml(input.productName);
-  const image = input.imageUrl
-    ? `<img src="${escapeHtml(input.imageUrl)}" alt="" width="160" height="200" style="width:160px;height:200px;object-fit:cover;border-radius:18px;border:1px solid #cfe1f3;background:#e8f3fb;box-shadow:0 12px 40px rgba(2,29,51,.12);"/>`
+  const imageSrc = publicAssetUrl(input.imageUrl);
+  const image = imageSrc
+    ? `<img src="${escapeHtml(imageSrc)}" alt="" width="160" height="200" style="width:160px;height:200px;object-fit:cover;border-radius:18px;border:1px solid #cfe1f3;background:#e8f3fb;box-shadow:0 12px 40px rgba(2,29,51,.12);"/>`
     : "";
   const destJson = JSON.stringify(input.destination);
+  const delay =
+    input.autoLeaveMs === 0
+      ? 0
+      : Number.isFinite(input.autoLeaveMs)
+        ? Math.max(400, input.autoLeaveMs as number)
+        : 1800;
 
   return `<!doctype html>
 <html lang="${escapeHtml((input.locale || "cs").slice(0, 2))}">
@@ -149,7 +164,7 @@ export function renderAffiliateHopHtml(input: {
       }
       var btn = document.getElementById("vlv-go-btn");
       if (btn) btn.addEventListener("click", go);
-      window.setTimeout(go, 650);
+      ${delay > 0 ? `window.setTimeout(go, ${delay});` : ""}
     })();
   </script>
 </body>
