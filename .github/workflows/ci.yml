@@ -48,3 +48,11 @@ jobs:
           NEXT_PUBLIC_SITE_URL: https://medscopeglobal.com
           MEDSCOPE_RUNTIME: cloudflare-workers
         run: pnpm run build
+
+  cloudflare-production:
+    name: live Cloudflare host
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert medscopeglobal.com is Cloudflare, not Vercel
+        run: node scripts/cloudflare/assert-live-host.mjs

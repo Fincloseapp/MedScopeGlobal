@@ -98,6 +98,7 @@
     "cf:env:sync": "node scripts/cloudflare/sync-env-from-dotenv.mjs",
     "cf:dns": "node scripts/cloudflare/dns-point-workers.mjs",
     "cf:smoke": "node scripts/cloudflare/smoke-production.mjs",
+    "cf:assert-host": "node scripts/cloudflare/assert-live-host.mjs",
     "smoke:production": "node scripts/smoke-production.mjs",
     "smoke:ecosystem": "pnpm exec tsx scripts/ecosystem-smoke.ts",
     "smoke:ecosystem:production": "MEDSCOPE_ORIGIN=https://medscopeglobal.com pnpm exec tsx scripts/ecosystem-smoke.ts",

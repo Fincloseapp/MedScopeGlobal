@@ -251,6 +251,8 @@ file("app/api/apps/qr/route.ts");
 file("app/(public)/go/[slug]/route.ts");
 file("lib/monetization/affiliate-hop.ts");
 file("vercel.json");
+file("scripts/cloudflare/assert-live-host.mjs");
+file("scripts/cloudflare/refuse-vercel.mjs");
 {
   const vercel = JSON.parse(readFileSync(join(root, "vercel.json"), "utf8")) as {
     git?: { deploymentEnabled?: boolean };
