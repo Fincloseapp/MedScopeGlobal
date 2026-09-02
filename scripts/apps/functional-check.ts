@@ -904,6 +904,23 @@ assert.ok(
   "robots must allow ads.txt"
 );
 assert.ok(
+  readFileSync(join(root, "app/robots.ts"), "utf8").includes("GPTBot"),
+  "AI training crawlers must stay off the magazine"
+);
+assert.ok(
+  readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes(
+    "X-Robots-Tag"
+  ),
+  "admin must not be indexed"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/pravo/page.tsx"), "utf8").includes(
+    "Povolení k užití"
+  ),
+  "reuse permission stays with the operator only"
+);
+assert.ok(existsSync(join(root, "COPYRIGHT")));
+assert.ok(
   readFileSync(join(root, "middleware.ts"), "utf8").includes("PATHNAME_REQUEST_HEADER"),
   "locale rewrite must pass the original path so AdSense stays off pro routes"
 );

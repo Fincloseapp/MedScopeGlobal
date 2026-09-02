@@ -60,6 +60,10 @@ export function applySecurityHeaders(response: NextResponse, pathname?: string):
       "Cache-Control",
       "private, no-cache, no-store, must-revalidate"
     );
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  }
+  if (pathname?.startsWith("/__ms")) {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
   }
   return response;
 }

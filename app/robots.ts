@@ -40,6 +40,19 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: ["/admin", "/auth/callback"],
       },
+      {
+        userAgent: [
+          "GPTBot",
+          "Google-Extended",
+          "CCBot",
+          "anthropic-ai",
+          "ClaudeBot",
+          "Bytespider",
+          "PerplexityBot",
+          "Amazonbot",
+        ],
+        disallow: ["/"],
+      },
     ],
     sitemap: [`${base}/sitemap.xml`, ...localeSitemaps],
   };

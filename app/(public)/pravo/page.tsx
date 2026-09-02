@@ -26,9 +26,15 @@ export default function PravoPage() {
 
       <h2>2. Licenční podmínky obsahu</h2>
       <p>
-        Autorská práva k originálnímu obsahu náleží MedScopeGlobal nebo uvedeným autorům.
-        Citace třetích stran jsou řádně označeny. Kopírování pro komerční účely bez souhlasu
-        je zakázáno.
+        Autorská práva k originálnímu obsahu, designu a kódu náleží provozovateli
+        (Al Synaptica Research Institute s.r.o. / MedScopeGlobal) nebo uvedeným autorům.
+        Citace třetích stran jsou řádně označeny.
+      </p>
+      <p>
+        <strong>Povolení k užití, kopírování, scrapování nebo úpravám uděluje pouze
+        provozovatel.</strong> Bez písemného souhlasu je zakázáno hromadné stahování,
+        republishing i komerční přetisk. Běžné čtení webu, vyhledávače (Google, Seznam)
+        a zobrazení reklam tím není omezeno.
       </p>
 
       <h2>3. Podmínky pro AI obsah</h2>
