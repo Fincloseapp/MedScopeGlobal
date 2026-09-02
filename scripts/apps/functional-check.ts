@@ -714,6 +714,10 @@ assert.ok(
   "issue page archive link must follow locale copy"
 );
 assert.ok(
+  readFileSync(join(root, "app/(public)/newsletter/archiv/page.tsx"), "utf8").includes("newsletterHeadline"),
+  "archive titles must follow page locale, not stored Czech issue.title"
+);
+assert.ok(
   readFileSync(join(root, "app/(admin)/admin/page.tsx"), "utf8").includes("Odběratelé briefu")
 );
 file("public/assets/affiliate/supplement.svg");
