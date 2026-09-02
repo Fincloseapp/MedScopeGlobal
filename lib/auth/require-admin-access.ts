@@ -25,11 +25,18 @@ export async function getAuthorizedAdminClient() {
   await requireAdminAccess();
   const service = tryCreateServiceRoleClient();
   if (service) return service;
-  return createClient();
+  const user = await createClient();
+  if (!user) {
+    throw new Error("Chybí připojení k databázi (Supabase service role).");
+  }
+  return user;
 }
 
 export async function createAdminReadClient() {
-  return tryCreateServiceRoleClient() ?? (await createClient());
+  const service = tryCreateServiceRoleClient();
+  if (service) return service;
+  const user = await createClient();
+  return user ?? null;
 }
 
 /** author_id for inserts when the operator is on the password gate only. */

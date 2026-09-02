@@ -95,8 +95,11 @@ export default async function AdminDashboardPage() {
           Přehled provozu
         </h1>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-          Živá data ze Supabase ({overview.dataSource === "service-role" ? "service role" : "session"}).
-          Stav k {loaded}. Provize Amazonu a Heureky sem nenačítáme — ty jsou v jejich dashboardech.
+          {overview.dataSource === "unavailable"
+            ? "Databáze teď není napojená — čísla se doplní, jakmile poběží Supabase service role."
+            : `Živá data ze Supabase (${overview.dataSource === "service-role" ? "service role" : "session"}). Stav k ${loaded}.`}
+          {" "}
+          Provize Amazonu a Heureky sem nenačítáme — ty jsou v jejich dashboardech.
         </p>
       </div>
 

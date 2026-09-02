@@ -28,7 +28,7 @@ export type AdminCategoryRow = {
 
 export type AdminOverview = {
   loadedAt: string;
-  dataSource: "service-role" | "user-session";
+  dataSource: "service-role" | "user-session" | "unavailable";
   articles: { total: number; published: number; drafts: number };
   categories: { total: number; emptyDesks: number; missingEditorial: string[] };
   ads: { total: number; active: number };
@@ -63,6 +63,7 @@ export function affiliateProductLabel(slug: string): string {
 
 export async function loadAdminCategoriesForForm(): Promise<Category[]> {
   const client = await createAdminReadClient();
+  if (!client) return [];
   const { data, error } = await client
     .from("categories")
     .select("id, name, slug, description, created_at")
@@ -73,6 +74,7 @@ export async function loadAdminCategoriesForForm(): Promise<Category[]> {
 
 export async function loadAdminCategoryRows(): Promise<AdminCategoryRow[]> {
   const client = await createAdminReadClient();
+  if (!client) return [];
   const { data: categories, error } = await client
     .from("categories")
     .select("id, name, slug, description")
@@ -116,8 +118,33 @@ export async function loadAdminCategoryRows(): Promise<AdminCategoryRow[]> {
   });
 }
 
+function emptyOverview(): AdminOverview {
+  return {
+    loadedAt: new Date().toISOString(),
+    dataSource: "unavailable",
+    articles: { total: 0, published: 0, drafts: 0 },
+    categories: {
+      total: 0,
+      emptyDesks: 0,
+      missingEditorial: missingEditorialSlugs([]),
+    },
+    ads: { total: 0, active: 0 },
+    vipActive: 0,
+    newsletterSubscribers: 0,
+    stripeSubscriptions: 0,
+    v27PaidCzk: 0,
+    v27PaidOrders: 0,
+    clicks: aggregateAffiliateClicks([]),
+    readiness: getPayoutReadiness(),
+    heurekaCzId: null,
+    heurekaSkId: null,
+    categoryRows: [],
+  };
+}
+
 export async function loadAdminOverview(): Promise<AdminOverview> {
   const client = await createAdminReadClient();
+  if (!client) return emptyOverview();
   const dataSource = tryCreateServiceRoleClient() ? "service-role" : "user-session";
 
   const [

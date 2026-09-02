@@ -15,6 +15,13 @@ import type { Article } from "@/types/database";
 
 export default async function AdminArticlesPage() {
   const supabase = await createAdminReadClient();
+  if (!supabase) {
+    return (
+      <div className="rounded-xl border bg-amber-50 p-6 text-sm text-amber-900">
+        Databáze teď není napojená. Články se načtou po obnovení Supabase service role.
+      </div>
+    );
+  }
   const { data, error } = await supabase
     .from("articles")
     .select(
