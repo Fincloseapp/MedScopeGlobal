@@ -36,6 +36,15 @@ export const V30_SECURITY_HEADERS: Record<string, string> = {
   "X-XSS-Protection": "1; mode=block",
 };
 
+function isPrivateAdminPath(pathname?: string): boolean {
+  if (!pathname) return false;
+  return (
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/api/admin") ||
+    pathname === "/api/v21/admin-gate"
+  );
+}
+
 export function applySecurityHeaders(response: NextResponse, pathname?: string): NextResponse {
   for (const [key, value] of Object.entries(V30_SECURITY_HEADERS)) {
     if (key === "Permissions-Policy") {
@@ -45,6 +54,12 @@ export function applySecurityHeaders(response: NextResponse, pathname?: string):
     if (!response.headers.has(key)) {
       response.headers.set(key, value);
     }
+  }
+  if (isPrivateAdminPath(pathname)) {
+    response.headers.set(
+      "Cache-Control",
+      "private, no-cache, no-store, must-revalidate"
+    );
   }
   return response;
 }

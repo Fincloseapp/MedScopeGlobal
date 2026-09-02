@@ -1,4 +1,8 @@
 import type { NextRequest } from "next/server";
+import {
+  hasValidAdminGateCookie,
+  isAdminLoginPath,
+} from "@/lib/auth/admin-gate-config";
 import { getClientIp } from "@/lib/security/client-ip";
 
 function parseAllowlist(): string[] {
@@ -15,6 +19,18 @@ export function isAdminIpAllowed(request: NextRequest): boolean {
   if (allowlist.length === 0) return true;
   const ip = getClientIp(request);
   return allowlist.includes(ip) || allowlist.includes("*");
+}
+
+/**
+ * HTML /admin: password cookie is the only lock. Login is always reachable.
+ * /api/admin: password cookie unlocks from any IP; otherwise honor allowlist.
+ */
+export function canAccessAdminSurface(request: NextRequest): boolean {
+  const { pathname } = request.nextUrl;
+  if (isAdminLoginPath(pathname)) return true;
+  if (hasValidAdminGateCookie(request.cookies)) return true;
+  if (pathname.startsWith("/admin")) return true;
+  return isAdminIpAllowed(request);
 }
 
 export function getAdminGuardStatus() {

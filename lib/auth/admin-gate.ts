@@ -18,5 +18,8 @@ export function adminGateCookieValue(): string {
 export {
   ADMIN_GATE_COOKIE,
   getAdminGatePassword,
+  hasValidAdminGateCookie,
+  isAdminLoginPath,
   isValidAdminGateCookie,
+  requiresAdminGate,
 } from "@/lib/auth/admin-gate-config";

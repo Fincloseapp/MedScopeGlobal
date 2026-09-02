@@ -107,7 +107,7 @@ Production secrets live on the **Worker**, not in git. Source of truth for local
 | Variable | Notes |
 |----------|-------|
 | `GROQ_API_KEY` | Primary LLM for ingestion / editorial (`gsk_…`) |
-| `ADMIN_GATE_PASSWORD` | `/admin/login` gate |
+| `ADMIN_GATE_PASSWORD` | `/admin/login` gate (default `David` if unset) |
 | `SENDGRID_API_KEY` / SMTP vars | Email engine (see `.env.example`) |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` | Anti-bot |
 

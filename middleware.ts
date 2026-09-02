@@ -17,7 +17,10 @@ import {
   resolveLocalePath,
 } from "@/lib/i18n/locale-path";
 import { isSearchEngineBot } from "@/lib/i18n/search-bots";
-import { isValidAdminGateCookie, ADMIN_GATE_COOKIE } from "@/lib/auth/admin-gate-config";
+import {
+  hasValidAdminGateCookie,
+  requiresAdminGate,
+} from "@/lib/auth/admin-gate-config";
 import {
   enforceLekarskaZonaMiddleware,
   isLekarskaZonaPath,
@@ -45,21 +48,14 @@ function adminGateRedirect(request: NextRequest): NextResponse {
   return redirect;
 }
 
-function requiresAdminGate(pathname: string): boolean {
-  return pathname.startsWith("/admin") && !pathname.startsWith("/admin/login");
-}
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const securityBlock = await applyV30SecurityMiddleware(request);
   if (securityBlock) return securityBlock;
 
-  if (requiresAdminGate(pathname)) {
-    const gate = request.cookies.get(ADMIN_GATE_COOKIE)?.value;
-    if (!isValidAdminGateCookie(gate)) {
-      return adminGateRedirect(request);
-    }
+  if (requiresAdminGate(pathname) && !hasValidAdminGateCookie(request.cookies)) {
+    return adminGateRedirect(request);
   }
 
   if (pathname === "/stav-systemu") {

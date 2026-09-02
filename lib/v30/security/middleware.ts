@@ -6,7 +6,7 @@ import { writeAuditLog } from "@/lib/v30/security/audit-log";
 import { checkApiRateLimit, isApiRateLimitExempt } from "@/lib/v30/security/rate-limit";
 import { applySecurityHeaders } from "@/lib/v30/security/headers";
 import { scanQueryString } from "@/lib/v30/security/waf";
-import { isAdminIpAllowed } from "@/lib/v30/security/admin-guard";
+import { canAccessAdminSurface } from "@/lib/v30/security/admin-guard";
 import { checkIpBan, recordThreatStrike, scanForThreats } from "@/lib/v46/security/threat-detector";
 
 /** v30 security layer — runs before legacy security + locale middleware. */
@@ -51,7 +51,12 @@ export async function applyV30SecurityMiddleware(
     return new NextResponse("Bad Request", { status: 400 });
   }
 
-  if (pathname.startsWith("/admin") && !isAdminIpAllowed(request)) {
+  // /admin is unlocked only by password cookie (`David`). Do not IP-block the
+  // login form or the dashboard — that would hide the password prompt.
+  if (
+    (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) &&
+    !canAccessAdminSurface(request)
+  ) {
     await writeAuditLog({
       type: "admin:ip_denied",
       ip,

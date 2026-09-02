@@ -54,6 +54,14 @@ import {
 } from "../../lib/admin/taxonomy";
 import { editorialRowsToInsert } from "../../lib/admin/ensure-taxonomy";
 import { formatStripeMinor } from "../../lib/admin/stripe-snapshot";
+import {
+  getAdminGatePassword,
+  hasValidAdminGateCookie,
+  isAdminLoginPath,
+  isValidAdminGateCookie,
+  requiresAdminGate,
+} from "../../lib/auth/admin-gate-config";
+import { shouldBlockBot } from "../../lib/v30/security/bot-shield";
 import { V20_NZIP_CATEGORIES } from "../../lib/v20/categories";
 import { getRevenueCopy } from "../../lib/i18n/revenue-copy";
 import {
@@ -365,6 +373,33 @@ file("lib/monetization/payout-map.ts");
   assert.equal(isAdminNavActive("/admin/articles/new", "/admin/articles"), true);
   assert.equal(isAdminNavActive("/admin", "/admin"), true);
   assert.equal(isAdminNavActive("/admin/categories", "/admin"), false);
+}
+
+{
+  const prev = process.env.ADMIN_GATE_PASSWORD;
+  delete process.env.ADMIN_GATE_PASSWORD;
+  assert.equal(getAdminGatePassword(), "David");
+  assert.equal(isValidAdminGateCookie("David"), true);
+  assert.equal(isValidAdminGateCookie("David3"), false);
+  assert.equal(isValidAdminGateCookie(""), false);
+  assert.equal(isValidAdminGateCookie(undefined), false);
+  assert.equal(requiresAdminGate("/admin"), true);
+  assert.equal(requiresAdminGate("/admin/categories"), true);
+  assert.equal(requiresAdminGate("/admin/articles/new"), true);
+  assert.equal(requiresAdminGate("/admin/login"), false);
+  assert.equal(isAdminLoginPath("/admin/login"), true);
+  assert.equal(isAdminLoginPath("/admin"), false);
+  assert.equal(hasValidAdminGateCookie({ get: () => undefined }), false);
+  assert.equal(hasValidAdminGateCookie({ get: () => ({ value: "David" }) }), true);
+  assert.equal(hasValidAdminGateCookie({ get: () => ({ value: "x" }) }), false);
+  assert.equal(shouldBlockBot("curl/8.0", "/admin/login"), false);
+  assert.equal(shouldBlockBot("curl/8.0", "/admin"), true);
+  assert.equal(shouldBlockBot("Mozilla/5.0 (Windows NT 10.0) Chrome/120.0.0.0", "/admin"), false);
+  const nextConfig = readFileSync(join(root, "next.config.mjs"), "utf8");
+  assert.ok(nextConfig.includes('source: "/admin"'));
+  assert.ok(nextConfig.includes("private, no-cache, no-store, must-revalidate"));
+  if (prev === undefined) delete process.env.ADMIN_GATE_PASSWORD;
+  else process.env.ADMIN_GATE_PASSWORD = prev;
 }
 
 assert.equal(slugifyCategory("Dlouhověkost"), "dlouhovekost");

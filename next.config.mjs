@@ -361,6 +361,24 @@ const nextConfig = {
       },
 
       {
+        source: "/admin",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/admin/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/api/v21/admin-gate",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
         source: "/go/:path*",
         headers: [
           { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },

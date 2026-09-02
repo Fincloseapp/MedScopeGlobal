@@ -33,10 +33,12 @@ export function AdminGateForm() {
     <form onSubmit={submit} className="mt-6 space-y-4">
       <Input
         type="password"
+        name="password"
         placeholder="Heslo"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         autoComplete="current-password"
+        required
         className="rounded-xl"
       />
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
