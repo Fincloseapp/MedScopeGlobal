@@ -27,13 +27,20 @@ type PublicAdEngineModule = {
   runPublicAdEngine: (opts?: object) => Promise<AdEngineStepResult | undefined>;
 };
 
+function runPublicWritersInProcess(): boolean {
+  if (process.env.VERCEL === "1") return true;
+  if (process.env.MEDSCOPE_RUNTIME === "cloudflare-workers") return true;
+  if (process.env.CF_PAGES) return true;
+  return false;
+}
+
 export async function runPublicArticlesFetch(options?: {
   limitPerWriter?: number;
   skipAds?: boolean;
 }): Promise<PublicArticlesFetchResult> {
   const t0 = Date.now();
 
-  if (process.env.VERCEL === "1") {
+  if (runPublicWritersInProcess()) {
     const writersMod = (await import("../writers/run-public-writers.mjs")) as unknown as PublicWritersModule;
     const report = await writersMod.runPublicWriters({
       limitPerWriter: options?.limitPerWriter ?? DEFAULT_PUBLIC_WRITER_LIMIT,

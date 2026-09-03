@@ -62,7 +62,11 @@ async function loadOpsCounts() {
       .eq("event", "affiliate_click")
       .order("created_at", { ascending: false })
       .limit(80),
-    admin.from("newsletter_subscribers").select("id", { count: "exact", head: true }),
+    admin
+      .from("newsletter_subscribers")
+      .select("id", { count: "exact", head: true })
+      .eq("segment", "public")
+      .is("unsubscribed_at", null),
   ]);
 
   const clicks = ((clickRes.data ?? []) as { payload?: ClickRow }[])

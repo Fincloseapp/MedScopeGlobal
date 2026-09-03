@@ -41,6 +41,8 @@ import { ImageTests } from "./components/ImageTests";
 import { ApiTable } from "./components/TestTable";
 
 import { RunTestsButton } from "./components/RunTestsButton";
+import { EditorialPulseStrip } from "@/components/admin/editorial-pulse-strip";
+import { loadEditorialPulse } from "@/lib/admin/editorial-pulse";
 
 
 
@@ -56,9 +58,11 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminSystemPage() {
 
-  const state = await loadV25SystemStateAsync();
-
-  const live = await verifyV25Apis();
+  const [state, live, pulse] = await Promise.all([
+    loadV25SystemStateAsync(),
+    verifyV25Apis(),
+    loadEditorialPulse(),
+  ]);
 
   const universities = state.universities ?? loadUniversitiesReport() ?? undefined;
 
@@ -126,11 +130,14 @@ export default async function AdminSystemPage() {
 
         <p className="mt-1 text-sm text-muted-foreground">
 
-          QA · SEO · Legal · Universities · ImageTest · LinkTest · Screenshots · NavMonitor · Autofix ·
-
-          Redeploy · Rollback
+          Živá redakce (články, writery, e-mail) je nahoře. Tabulka CRON níže je stav z posledního
+          uloženého běhu — nesmí se plést s plánovaným rosterem 20 writerů × 21 jazyků.
 
         </p>
+
+        <div className="mt-4">
+          <EditorialPulseStrip pulse={pulse} />
+        </div>
 
         <div className="mt-4 flex flex-wrap gap-2 text-sm">
 

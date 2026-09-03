@@ -38,8 +38,14 @@ export type BriefSendResult = {
   errors: string[];
 };
 
-function mailReady(): boolean {
+export function mailReady(): boolean {
   return isSendGridConfigured() || isSmtpConfigured();
+}
+
+export function mailTransportLabel(): "sendgrid" | "smtp" | "none" {
+  if (isSendGridConfigured()) return "sendgrid";
+  if (isSmtpConfigured()) return "smtp";
+  return "none";
 }
 
 function skipAddress(email: string): boolean {
@@ -89,7 +95,37 @@ function magazineHome(locale: string): string {
 }
 
 function articleHref(locale: string, slug: string): string {
+  if (slug.startsWith("__pillar")) {
+    return `${SITE.url}${buildLocalePath(locale, "/verejnost/clanky")}`;
+  }
   return `${SITE.url}${buildLocalePath(locale, `/article/${slug}`)}`;
+}
+
+function pillarBriefArticles(locale: string): BriefArticle[] {
+  const copy = getNewsletterCopy(locale);
+  return [
+    {
+      slug: "__pillar_1",
+      title: copy.hubPillar1Title,
+      excerpt: copy.hubPillar1Body,
+      locale,
+      public_topic: "zivotni-styl",
+    },
+    {
+      slug: "__pillar_2",
+      title: copy.hubPillar2Title,
+      excerpt: copy.hubPillar2Body,
+      locale,
+      public_topic: "prevence",
+    },
+    {
+      slug: "__pillar_3",
+      title: copy.hubPillar3Title,
+      excerpt: copy.hubPillar3Body,
+      locale,
+      public_topic: "dlouhovekost",
+    },
+  ];
 }
 
 function productLabel(product: AffiliateProduct, locale: string): { name: string; description: string } {
@@ -191,6 +227,54 @@ export async function sendViaLongeVitaWelcome(input: {
     metadata: { kind: "vialongevita-welcome", locale: input.locale },
   });
   return result.ok;
+}
+
+export async function sendViaLongeVitaFirstBrief(input: {
+  email: string;
+  locale?: string;
+  force?: boolean;
+}): Promise<{ ok: boolean; error?: string; usedFallback?: boolean; skipped?: boolean }> {
+  if (!mailReady()) return { ok: false, error: "mail_not_configured" };
+  if (skipAddress(input.email)) return { ok: false, error: "skip_address" };
+  const locale = (input.locale ?? "cs").trim() || "cs";
+  const email = input.email.trim().toLowerCase();
+  const admin = tryCreateServiceRoleClient();
+  if (admin && !input.force) {
+    const { data } = await admin
+      .from("newsletter_subscribers")
+      .select("last_brief_sent_at")
+      .eq("email", email)
+      .eq("segment", "public")
+      .is("unsubscribed_at", null)
+      .maybeSingle();
+    if (data?.last_brief_sent_at) {
+      return { ok: true, skipped: true };
+    }
+  }
+  const live = await loadBriefArticles(locale);
+  const usedFallback = live.length === 0;
+  const articles = usedFallback ? pillarBriefArticles(locale) : live;
+  const payload = briefHtml(locale, email, articles);
+  const result = await sendEmail({
+    to: email,
+    subject: payload.subject,
+    html: payload.html,
+    text: payload.text,
+    category: "marketing",
+    fromName: FROM_NAME,
+    metadata: { kind: "vialongevita-brief-first", locale, usedFallback },
+  });
+  if (!result.ok) return { ok: false, error: result.error ?? "send_failed", usedFallback };
+
+  if (admin) {
+    await admin
+      .from("newsletter_subscribers")
+      .update({ last_brief_sent_at: new Date().toISOString() })
+      .eq("email", email)
+      .eq("segment", "public")
+      .is("unsubscribed_at", null);
+  }
+  return { ok: true, usedFallback };
 }
 
 function pickBriefProducts(articles: BriefArticle[], locale: string) {
@@ -316,8 +400,8 @@ export async function sendViaLongeVitaTestBrief(input: {
   if (!mailReady()) return { ok: false, error: "mail_not_configured" };
   if (skipAddress(input.email)) return { ok: false, error: "skip_address" };
   const locale = (input.locale ?? "cs").trim() || "cs";
-  const articles = await loadBriefArticles(locale);
-  if (articles.length === 0) return { ok: false, error: "no_articles" };
+  const live = await loadBriefArticles(locale);
+  const articles = live.length ? live : pillarBriefArticles(locale);
   const payload = briefHtml(locale, input.email, articles);
   const result = await sendEmail({
     to: input.email,
@@ -388,11 +472,8 @@ export async function sendViaLongeVitaWeeklyBrief(options?: {
     if (!articleCache.has(locale)) {
       articleCache.set(locale, await loadBriefArticles(locale));
     }
-    const articles = articleCache.get(locale) ?? [];
-    if (articles.length === 0) {
-      skipped += 1;
-      continue;
-    }
+    const live = articleCache.get(locale) ?? [];
+    const articles = live.length ? live : pillarBriefArticles(locale);
     if (dryRun) {
       sent += 1;
       continue;

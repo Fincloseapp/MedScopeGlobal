@@ -5,6 +5,8 @@ import { getNewsletterOpsSnapshot } from "@/lib/admin/newsletter-ops";
 import { getNewsletterDraftForAdmin, getPendingNewsletterTopics } from "@/lib/queries/v4c/newsletters";
 import { gatherNewsletterSources } from "@/lib/v23/newsletter/sources";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminNewsletterPage() {
   const [draft, topics, sources, ops] = await Promise.all([
     getNewsletterDraftForAdmin(),
@@ -19,9 +21,9 @@ export default async function AdminNewsletterPage() {
         <MedScopeLogo href="/admin/newsletter" width={160} height={40} className="mb-3" imageClassName="max-h-10" />
         <h1 className="font-display text-2xl font-bold text-[#021d33]">Newsletter a ViaLongeVita brief</h1>
         <p className="mt-1 text-sm text-slate-600">
-          Každá jazyková mutace dostane vlastní webové vydání (stejných 5 kategorií magazínu, nativní text).
-          E-mailový brief jde každému odběrateli v jazyce stránky, na které se přihlásil — z aktuálních
-          článků, bez affiliate parametrů v odkazech.
+          Po přihlášení se hned odešle uvítání a první brief (ne až týdenní cron). Webové vydání je
+          zvlášť pro každý jazyk. Čísla writerů dole jsou živá za 24 h — 20 writerů na jazyk je
+          roster, ne denní produkce (česky každý den + jeden rotující cizí desk).
         </p>
       </div>
       <NewsletterOpsStrip ops={ops} />

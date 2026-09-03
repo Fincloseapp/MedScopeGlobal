@@ -124,8 +124,9 @@ export function NewsletterAdminPanel({
         <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6">
           <h2 className="font-display text-lg font-bold text-[#021d33]">Příští newsletter</h2>
           <p className="text-sm text-slate-600">
-            Webové vydání je český medicínský přehled. Po publikaci (nebo nočním cronu) se nasadí na
-            /cs /de /en /fr… E-mailový brief ViaLongeVita skládá aktuální články v jazyce odběratele.
+            Webové vydání má vlastní nativní text na každém desk. E-mailový brief skládá aktuální
+            články v jazyce přihlášení; když v daném jazyce ještě nic není, jde první číslo z
+            pilířů magazínu, ať odběratel nedostane prázdnou schránku.
           </p>
 
           <div className="flex flex-wrap gap-2">

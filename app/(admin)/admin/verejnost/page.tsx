@@ -9,6 +9,8 @@ import {
   listPublicArticles,
 } from "@/lib/queries/verejnost";
 import { computePublicAdStats } from "@/lib/verejnost/helpers";
+import { EditorialPulseStrip } from "@/components/admin/editorial-pulse-strip";
+import { loadEditorialPulse } from "@/lib/admin/editorial-pulse";
 
 export const metadata: Metadata = {
   title: "Veřejnost — Observabilita | Admin",
@@ -17,10 +19,11 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminVerejnostPage() {
-  const [latest, counts, campaigns] = await Promise.all([
+  const [latest, counts, campaigns, pulse] = await Promise.all([
     listPublicArticles({ limit: 8, locale: "cs" }),
     countPublicArticlesByTopic(),
     listPublicAdCampaigns({ activeOnly: false }),
+    loadEditorialPulse(),
   ]);
 
   const adStats = computePublicAdStats(campaigns);
@@ -33,7 +36,7 @@ export default async function AdminVerejnostPage() {
         <MedScopeLogo href="/admin/verejnost" width={160} height={40} className="mb-3" />
         <h1 className="font-display text-2xl font-bold text-[#021d33]">Veřejné zdraví — observabilita</h1>
         <p className="mt-1 text-sm text-slate-600">
-          Přehled článků a statistik reklam pro sekci /verejnost.
+          Živá data: datum posledního článku, cover, kolik writerů dnes opravdu psalo.
         </p>
         <div className="mt-3 flex flex-wrap gap-2 text-sm">
           <Link href="/admin/ads-public" className="rounded-lg border px-3 py-1.5 hover:bg-muted">
@@ -47,6 +50,8 @@ export default async function AdminVerejnostPage() {
           </Link>
         </div>
       </div>
+
+      <EditorialPulseStrip pulse={pulse} />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[

@@ -20,6 +20,7 @@ import { affiliateProductLabel, loadAdminOverview } from "@/lib/admin/overview";
 import { categoryHealthLabel, categoryKindLabel } from "@/lib/admin/taxonomy";
 import { formatStripeMinor } from "@/lib/admin/stripe-snapshot";
 import { channelReady } from "@/lib/monetization/payout-map";
+import { EditorialPulseStrip } from "@/components/admin/editorial-pulse-strip";
 
 export const dynamic = "force-dynamic";
 
@@ -76,7 +77,9 @@ export default async function AdminDashboardPage() {
     {
       label: "Odběratelé briefu",
       value: overview.newsletterSubscribers,
-      hint: "ViaLongeVita e-mail · otevřít přehled",
+      hint: overview.pulse.mailReady
+        ? `${overview.pulse.waitingFirstBrief} čeká na první e-mail`
+        : "e-mail není nastavený — brief neodejde",
       href: "/admin/newsletter",
       icon: Crown,
     },
@@ -103,6 +106,8 @@ export default async function AdminDashboardPage() {
           Provize Amazonu a Heureky sem nenačítáme — ty jsou v jejich dashboardech.
         </p>
       </div>
+
+      <EditorialPulseStrip pulse={overview.pulse} />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((item) => {

@@ -18,6 +18,7 @@ import {
   type StripeMoneySnapshot,
 } from "@/lib/admin/stripe-snapshot";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
+import { loadEditorialPulse, type EditorialPulse } from "@/lib/admin/editorial-pulse";
 import type { Category } from "@/types/database";
 
 export type AdminCategoryRow = {
@@ -49,6 +50,7 @@ export type AdminOverview = {
   categoryRows: AdminCategoryRow[];
   stripeMoney: StripeMoneySnapshot;
   taxonomyInserted: number;
+  pulse: EditorialPulse;
 };
 
 type CountResult = { count: number | null; error: { message: string } | null };
@@ -131,7 +133,7 @@ export async function loadAdminCategoryRows(opts?: {
   });
 }
 
-function emptyOverview(): AdminOverview {
+async function emptyOverview(): Promise<AdminOverview> {
   return {
     loadedAt: new Date().toISOString(),
     dataSource: "unavailable",
@@ -154,6 +156,7 @@ function emptyOverview(): AdminOverview {
     categoryRows: [],
     stripeMoney: { configured: false, available: [], pending: [] },
     taxonomyInserted: 0,
+    pulse: await loadEditorialPulse(),
   };
 }
 
@@ -175,6 +178,7 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
     heurekaCzId,
     heurekaSkId,
     stripeMoney,
+    pulse,
   ] = await Promise.all([
     countSafe(client.from("articles").select("id", { count: "exact", head: true })),
     countSafe(
@@ -185,7 +189,13 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
     countSafe(
       client.from("vip_subscriptions").select("id", { count: "exact", head: true }).eq("active", true)
     ),
-    countSafe(client.from("newsletter_subscribers").select("id", { count: "exact", head: true })),
+    countSafe(
+      client
+        .from("newsletter_subscribers")
+        .select("id", { count: "exact", head: true })
+        .eq("segment", "public")
+        .is("unsubscribed_at", null)
+    ),
     countSafe(
       client.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "active")
     ),
@@ -193,6 +203,7 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
     getHeurekaPositionId("cz"),
     getHeurekaPositionId("sk"),
     loadStripeMoneySnapshot(),
+    loadEditorialPulse(),
   ]);
 
   const since = new Date(Date.now() - 30 * 86_400_000).toISOString();
@@ -262,5 +273,6 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
     categoryRows,
     stripeMoney,
     taxonomyInserted,
+    pulse,
   };
 }

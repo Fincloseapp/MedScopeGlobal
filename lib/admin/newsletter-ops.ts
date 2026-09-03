@@ -1,26 +1,30 @@
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { getNewsletterArchive, getPendingNewsletterTopics, newsletterRowLocale } from "@/lib/queries/v4c/newsletters";
 import { GLOBAL_LOCALES } from "@/lib/ecosystem/locales";
-import {
-  MAGAZINE_EDITORS_PER_LOCALE,
-  MAGAZINE_WRITERS_PER_LOCALE,
-} from "@/lib/editorial/locale-magazine-desks";
+import { MAGAZINE_EDITORS_PER_LOCALE, MAGAZINE_WRITERS_PER_LOCALE } from "@/lib/editorial/locale-magazine-desks";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { newsletterEditionLocales, parseNewsletterIssueSlug } from "@/lib/v23/newsletter/locale-editions";
+import { loadEditorialPulse, type EditorialPulse } from "@/lib/admin/editorial-pulse";
+import { mailReady, mailTransportLabel } from "@/lib/monetization/vialongevita-brief";
 
 export type NewsletterLocaleCount = { locale: string; count: number };
 
 export type NewsletterLocaleDeskRow = {
   locale: string;
   label: string;
-  writers: number;
+  writersPlanned: number;
+  writersProduced24h: number;
   editors: number;
   subscribers: number;
+  waitingFirstBrief: number;
+  articles24h: number;
+  articles7d: number;
   briefTitle: string;
 };
 
 export type NewsletterOpsSnapshot = {
   subscribers: number;
+  waitingFirstBrief: number;
   byLocale: NewsletterLocaleCount[];
   pendingTopics: number;
   localeDesks: NewsletterLocaleDeskRow[];
@@ -35,22 +39,36 @@ export type NewsletterOpsSnapshot = {
   latestPublishedSlug: string | null;
   editionLocales: string[];
   editionsToday: number;
+  mailReady: boolean;
+  mailTransport: "sendgrid" | "smtp" | "none";
+  lastEmail: EditorialPulse["lastEmail"];
+  todayLocales: string[];
+  rotatingLocale: string;
+  expectedArticlesToday: number;
+  writersProduced24h: number;
+  writersRosterPerLocale: number;
 };
 
-function plannedLocaleDesks(subMap: Map<string, number> = new Map()): NewsletterLocaleDeskRow[] {
+function plannedLocaleDesks(): NewsletterLocaleDeskRow[] {
   return GLOBAL_LOCALES.map((item) => ({
     locale: item.code,
     label: item.label,
-    writers: MAGAZINE_WRITERS_PER_LOCALE,
+    writersPlanned: MAGAZINE_WRITERS_PER_LOCALE,
+    writersProduced24h: 0,
     editors: MAGAZINE_EDITORS_PER_LOCALE,
-    subscribers: subMap.get(item.code) ?? 0,
+    subscribers: 0,
+    waitingFirstBrief: 0,
+    articles24h: 0,
+    articles7d: 0,
     briefTitle: getNewsletterCopy(item.code).briefSubject,
   }));
 }
 
 export async function getNewsletterOpsSnapshot(): Promise<NewsletterOpsSnapshot> {
+  const pulse = await loadEditorialPulse();
   const empty: NewsletterOpsSnapshot = {
-    subscribers: 0,
+    subscribers: pulse.subscribers,
+    waitingFirstBrief: pulse.waitingFirstBrief,
     byLocale: [],
     pendingTopics: 0,
     localeDesks: plannedLocaleDesks(),
@@ -58,40 +76,45 @@ export async function getNewsletterOpsSnapshot(): Promise<NewsletterOpsSnapshot>
     latestPublishedSlug: null,
     editionLocales: newsletterEditionLocales(),
     editionsToday: 0,
+    mailReady: mailReady(),
+    mailTransport: mailTransportLabel(),
+    lastEmail: pulse.lastEmail,
+    todayLocales: pulse.todayLocales,
+    rotatingLocale: pulse.rotatingLocale,
+    expectedArticlesToday: pulse.expectedArticlesToday,
+    writersProduced24h: pulse.writersProduced24h,
+    writersRosterPerLocale: pulse.writersRosterPerLocale,
   };
 
   const admin = tryCreateServiceRoleClient();
   if (!admin) return empty;
 
-  const [topics, issues, subs] = await Promise.all([
-    getPendingNewsletterTopics(),
-    getNewsletterArchive(true),
-    admin
-      .from("newsletter_subscribers")
-      .select("locale, unsubscribed_at")
-      .eq("segment", "public"),
-  ]);
+  const [topics, issues] = await Promise.all([getPendingNewsletterTopics(), getNewsletterArchive(true)]);
 
-  const rows = (subs.data ?? []) as { locale: string | null; unsubscribed_at: string | null }[];
-  const active = rows.filter((row) => !row.unsubscribed_at);
-  const tally = new Map<string, number>();
-  for (const row of active) {
-    const locale = (row.locale ?? "en").trim() || "en";
-    tally.set(locale, (tally.get(locale) ?? 0) + 1);
-  }
-  const byLocale = [...tally.entries()]
-    .map(([locale, count]) => ({ locale, count }))
-    .sort((a, b) => b.count - a.count);
+  const pulseByLocale = new Map(pulse.byLocale.map((row) => [row.locale, row]));
+  const localeDesks = plannedLocaleDesks().map((desk) => {
+    const live = pulseByLocale.get(desk.locale);
+    return {
+      ...desk,
+      writersProduced24h: live?.writersProduced24h ?? 0,
+      subscribers: live?.subscribers ?? 0,
+      waitingFirstBrief: live?.waitingFirstBrief ?? 0,
+      articles24h: live?.articles24h ?? 0,
+      articles7d: live?.articles7d ?? 0,
+    };
+  });
 
   const published = issues.find((issue) => issue.published && !issue.admin_only);
-  const subMap = new Map(byLocale.map((row) => [row.locale, row.count]));
-  const localeDesks = plannedLocaleDesks(subMap);
   const today = new Date().toISOString().slice(0, 10);
   const editionsToday = issues.filter((issue) => parseNewsletterIssueSlug(issue.slug).issueDate === today).length;
 
   return {
-    subscribers: active.length,
-    byLocale,
+    subscribers: pulse.subscribers,
+    waitingFirstBrief: pulse.waitingFirstBrief,
+    byLocale: pulse.byLocale
+      .filter((row) => row.subscribers > 0)
+      .map((row) => ({ locale: row.locale, count: row.subscribers }))
+      .sort((a, b) => b.count - a.count),
     pendingTopics: topics.length,
     localeDesks,
     issues: issues.slice(0, 42).map((issue) => ({
@@ -105,5 +128,13 @@ export async function getNewsletterOpsSnapshot(): Promise<NewsletterOpsSnapshot>
     latestPublishedSlug: published?.slug ?? null,
     editionLocales: newsletterEditionLocales(),
     editionsToday,
+    mailReady: pulse.mailReady,
+    mailTransport: pulse.mailTransport,
+    lastEmail: pulse.lastEmail,
+    todayLocales: pulse.todayLocales,
+    rotatingLocale: pulse.rotatingLocale,
+    expectedArticlesToday: pulse.expectedArticlesToday,
+    writersProduced24h: pulse.writersProduced24h,
+    writersRosterPerLocale: pulse.writersRosterPerLocale,
   };
 }

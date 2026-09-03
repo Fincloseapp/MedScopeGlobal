@@ -187,6 +187,7 @@ import { translateNavHref } from "../../lib/i18n/nav-copy";
 import {
   FOREIGN_WRITER_ROTATION,
   defaultPublicWriterLocales,
+  describeDailyWriterPlan,
   rotatingForeignWriterLocale,
 } from "../../lib/v25/config/public-writers";
 import { looksLikeCzech } from "../../lib/i18n/czech-detect";
@@ -744,6 +745,8 @@ file("lib/i18n/newsletter-copy.ts");
 file("lib/monetization/vialongevita-brief.ts");
 file("lib/monetization/brief-marketing.ts");
 file("lib/admin/newsletter-ops.ts");
+file("lib/admin/editorial-pulse.ts");
+file("components/admin/editorial-pulse-strip.tsx");
 file("app/api/admin/newsletter/brief/route.ts");
 file("app/(admin)/admin/newsletter/page.tsx");
 file("components/admin/newsletter-ops-strip.tsx");
@@ -794,6 +797,28 @@ assert.ok(
   ),
   "admin must not claim one Czech issue covers every locale"
 );
+{
+  const subscribeSrc = readFileSync(join(root, "app/api/newsletter/subscribe/route.ts"), "utf8");
+  assert.ok(
+    !subscribeSrc.includes("void sendViaLongeVitaWelcome"),
+    "welcome mail must be awaited on Workers"
+  );
+  assert.ok(subscribeSrc.includes("sendViaLongeVitaFirstBrief"), "signup must send first brief now");
+  const briefSrc = readFileSync(join(root, "lib/monetization/vialongevita-brief.ts"), "utf8");
+  assert.ok(briefSrc.includes("export function mailReady"), "admin needs honest mail status");
+  assert.ok(briefSrc.includes("__pillar"), "empty locale still gets a first brief");
+  const publicRunner = readFileSync(join(root, "lib/v25/runners/public.ts"), "utf8");
+  assert.ok(
+    publicRunner.includes("cloudflare-workers"),
+    "public writers must run in-process on Cloudflare, not spawnSync"
+  );
+  const opsSrc = readFileSync(join(root, "lib/admin/newsletter-ops.ts"), "utf8");
+  assert.ok(opsSrc.includes("writersProduced24h"), "admin must show live writers, not roster as daily");
+  assert.ok(opsSrc.includes("waitingFirstBrief"), "admin must show unsent first briefs");
+  const articlesAdmin = readFileSync(join(root, "app/(admin)/admin/articles/page.tsx"), "utf8");
+  assert.ok(articlesAdmin.includes("published_at"), "admin article list must show dates");
+  assert.ok(articlesAdmin.includes("cover_image_url"), "admin article list must show covers");
+}
 file("lib/v23/newsletter/locale-editions.ts");
 file("lib/v23/newsletter/locale-layout.ts");
 file("lib/editorial/magazine-category-copy.ts");
@@ -1989,6 +2014,10 @@ assert.ok(FOREIGN_WRITER_ROTATION.includes("pt-BR"));
   assert.equal(locales.length, 2);
   assert.equal(locales[1], rotatingForeignWriterLocale(new Date("2026-09-03T00:00:00Z")));
   assert.notEqual(locales[1], "cs");
+  const plan = describeDailyWriterPlan(new Date("2026-09-03T00:00:00Z"));
+  assert.ok(plan.locales.includes("cs"));
+  assert.equal(plan.rotatingLocale, locales[1]);
+  assert.ok(plan.expectedArticles < MAGAZINE_WRITERS_PER_LOCALE * GLOBAL_LOCALES.length * 4);
 }
 assert.equal(EDITORIAL_PERSONAS.filter((p) => p.active).length, 29);
 assert.equal(EDITORIAL_PERSONAS.filter((p) => p.role === "editor").length, 8);

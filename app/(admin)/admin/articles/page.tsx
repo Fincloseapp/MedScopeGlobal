@@ -11,7 +11,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { createAdminReadClient } from "@/lib/auth/require-admin-access";
+import { EditorialPulseStrip } from "@/components/admin/editorial-pulse-strip";
+import { loadEditorialPulse } from "@/lib/admin/editorial-pulse";
 import type { Article } from "@/types/database";
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminArticlesPage() {
   const supabase = await createAdminReadClient();
@@ -26,11 +30,14 @@ export default async function AdminArticlesPage() {
     .from("articles")
     .select(
       `
-      *,
+      id, title, slug, published, published_at, locale, cover_image_url, created_at,
       categories ( name )
     `
     )
-    .order("created_at", { ascending: false });
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .limit(200);
+
+  const pulse = await loadEditorialPulse();
 
   if (error) {
     throw error;
@@ -48,7 +55,7 @@ export default async function AdminArticlesPage() {
             Články
           </h1>
           <p className="text-muted-foreground">
-            Koncepty, publikace a zařazení do kategorií.
+            Posledních 200 podle data publikace — datum, jazyk a jestli má cover.
           </p>
         </div>
         <Button asChild>
@@ -56,11 +63,16 @@ export default async function AdminArticlesPage() {
         </Button>
       </div>
 
+      <EditorialPulseStrip pulse={pulse} />
+
       <div className="rounded-xl border bg-white">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Titulek</TableHead>
+              <TableHead>Datum</TableHead>
+              <TableHead>Jazyk</TableHead>
+              <TableHead>Cover</TableHead>
               <TableHead>Kategorie</TableHead>
               <TableHead>Stav</TableHead>
               <TableHead className="text-right">Akce</TableHead>
@@ -70,6 +82,17 @@ export default async function AdminArticlesPage() {
             {articles.map((article) => (
               <TableRow key={article.id}>
                 <TableCell className="font-medium">{article.title}</TableCell>
+                <TableCell className="whitespace-nowrap text-slate-600">
+                  {article.published_at
+                    ? new Date(article.published_at).toLocaleString("cs-CZ")
+                    : article.created_at
+                      ? new Date(article.created_at).toLocaleString("cs-CZ")
+                      : "—"}
+                </TableCell>
+                <TableCell className="text-slate-600">{article.locale ?? "cs"}</TableCell>
+                <TableCell className="text-slate-600">
+                  {article.cover_image_url ? "ano" : "chybí"}
+                </TableCell>
                 <TableCell>{article.categories?.name ?? "—"}</TableCell>
                 <TableCell>
                   <form action={articleListAction}>

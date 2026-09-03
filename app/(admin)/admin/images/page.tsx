@@ -5,6 +5,8 @@ import { ImageFixLog } from "./components/ImageFixLog";
 import { ImageHistory } from "./components/ImageHistory";
 import { ImageCenterClient } from "./components/ImageCenterClient";
 import { RunImageBackfillButton } from "./components/RunImageBackfillButton";
+import { EditorialPulseStrip } from "@/components/admin/editorial-pulse-strip";
+import { loadEditorialPulse } from "@/lib/admin/editorial-pulse";
 
 export const metadata: Metadata = {
   title: "Image Center — Admin",
@@ -30,7 +32,7 @@ function aggregateFailureReasons(
 }
 
 export default async function AdminImagesPage() {
-  const report = await loadImageReportAsync();
+  const [report, pulse] = await Promise.all([loadImageReportAsync(), loadEditorialPulse()]);
   const localFixLog = loadImageFixLogLocal();
   const fixLog = (report?.fixLog?.length ? report.fixLog : localFixLog) ?? [];
   const images: V25ImageRegistryEntry[] = report?.images ?? [];
@@ -55,12 +57,14 @@ export default async function AdminImagesPage() {
           <p className="text-xs font-semibold uppercase tracking-wide text-primary">Image pipeline</p>
           <h1 className="font-display text-3xl font-bold text-[#021d33]">AI Image Center</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Dynamické přiřazování obrázků — selector, generator, style filter. Neutrální evropský profesionální
-            styl bez stereotypizace.
+            Živý stav coverů z databáze (ne jen starý souborový report). Registry níže může být
+            z posledního pipeline běhu.
           </p>
         </div>
         <RunImageBackfillButton />
       </div>
+
+      <EditorialPulseStrip pulse={pulse} />
 
       {pipelineBroken ? (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">

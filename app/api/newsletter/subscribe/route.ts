@@ -6,7 +6,10 @@ import { isSendGridConfigured, upsertSendGridContact } from "@/lib/email/sendgri
 import { logMonetizationEvent } from "@/lib/monetization/log-event";
 import { applyNewsletterSubscriberSchema } from "@/lib/monetization/apply-schema";
 import { notifyNewsletterSignup } from "@/lib/monetization/revenue-ops";
-import { sendViaLongeVitaWelcome } from "@/lib/monetization/vialongevita-brief";
+import {
+  sendViaLongeVitaFirstBrief,
+  sendViaLongeVitaWelcome,
+} from "@/lib/monetization/vialongevita-brief";
 
 export const dynamic = "force-dynamic";
 
@@ -117,17 +120,46 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!duplicate) {
-    await logMonetizationEvent("newsletter_subscribe", {
-      locale,
-      segment,
-      source,
-      stored,
-      mailed,
-      destination,
-    });
-    void notifyNewsletterSignup({ email, locale, segment, source }).catch(() => undefined);
-    void sendViaLongeVitaWelcome({ email, locale }).catch(() => undefined);
+  let welcome = false;
+  let firstBrief = false;
+  let mailError: string | null = null;
+
+  const shouldMail = stored || mailed;
+  let needsFirstBrief = segment === "public" && !duplicate;
+  if (shouldMail && duplicate && admin && segment === "public") {
+    const { data: existing } = await admin
+      .from("newsletter_subscribers")
+      .select("last_brief_sent_at")
+      .eq("email", email)
+      .eq("segment", segment)
+      .is("unsubscribed_at", null)
+      .maybeSingle();
+    needsFirstBrief = !existing?.last_brief_sent_at;
+  }
+
+  if (shouldMail) {
+    if (!duplicate) {
+      await logMonetizationEvent("newsletter_subscribe", {
+        locale,
+        segment,
+        source,
+        stored,
+        mailed,
+        destination,
+      });
+      await notifyNewsletterSignup({ email, locale, segment, source }).catch(() => undefined);
+      welcome = await sendViaLongeVitaWelcome({ email, locale }).catch(() => false);
+    }
+    if (needsFirstBrief) {
+      const brief = await sendViaLongeVitaFirstBrief({ email, locale }).catch((error) => ({
+        ok: false,
+        error: error instanceof Error ? error.message : "brief_failed",
+      }));
+      firstBrief = brief.ok && !("skipped" in brief && brief.skipped);
+      if (!brief.ok) {
+        mailError = brief.error ?? "brief_failed";
+      }
+    }
   }
 
   return NextResponse.json({
@@ -135,6 +167,9 @@ export async function POST(request: Request) {
     already: duplicate,
     stored,
     mailed,
+    welcome,
+    firstBrief,
+    mailError,
     destination,
     schema: schemaApply.ok,
   });
