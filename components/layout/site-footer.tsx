@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
+import { ViaLongeVitaMark } from "@/components/brand/vialongevita-mark";
 import { getSurfaceCopy, isCzechSurface } from "@/lib/i18n/surface-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
@@ -17,6 +18,9 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-5">
         <div className="sm:col-span-2 lg:col-span-2">
           <MedScopeLogo href={href("/")} preset="footer" />
+          <div className="mt-4">
+            <ViaLongeVitaMark variant="footer" locale={locale} />
+          </div>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{footer.tagline}</p>
           <p className="mt-3 text-xs font-medium uppercase tracking-wider text-[#005B96]">
             {footer.evidence}

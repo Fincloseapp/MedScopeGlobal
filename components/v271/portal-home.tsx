@@ -21,6 +21,7 @@ import { WriterAgentsStrip } from "@/components/editorial/writer-agents-strip";
 import { AppOpenLink, isStandaloneAppHref } from "@/components/apps/app-origin-bar";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { VITASCOPE_DESK_LOGO } from "@/lib/brand/vitascope";
+import { ViaLongeVitaMark } from "@/components/brand/vialongevita-mark";
 import { BookOpen, Gift, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
@@ -51,7 +52,7 @@ function Box({
   moreLabel,
   children,
 }: {
-  title: string;
+  title: React.ReactNode;
   href?: string;
   moreLabel: string;
   children: React.ReactNode;
@@ -220,33 +221,35 @@ export function PortalHome({
   return (
     <div className="border-b border-slate-200 bg-[#e8eef3]">
       <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5">
-        <div className="rounded-lg border border-slate-200 bg-white px-4 py-4 shadow-sm sm:px-6 sm:py-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">
-            {philosophy.eyebrow}
-          </p>
-          <h1 className="mt-1 font-display text-2xl font-bold text-[#021d33] sm:text-3xl">
-            {philosophy.claim}
-          </h1>
-          <p className="mt-1 max-w-3xl text-sm text-slate-600">{philosophy.subtitle}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Link
-              href={localizePublicHref("/newsletter", locale)}
-              className="inline-flex items-center justify-center rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
-            >
-              {brief.cta}
-            </Link>
-            <Link
-              href={localizePublicHref("/articles", locale)}
-              className="inline-flex items-center justify-center rounded-full border border-[#005B96]/35 px-5 py-2.5 text-sm font-semibold text-[#005B96] hover:bg-[#e8f3fb]"
-            >
-              {chrome.readMagazine}
-            </Link>
+        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div className="bg-[#050b1d] px-4 py-5 sm:px-8 sm:py-7">
+            <ViaLongeVitaMark variant="hero" locale={locale} priority />
           </div>
-          <div className="mt-3 max-w-xl">
-            <NewsletterCapture locale={locale} source="home-hero" variant="compact" />
-          </div>
-          <div className="mt-4">
-            <PortalSearch copy={surface} />
+          <div className="px-4 py-4 sm:px-6 sm:py-5">
+            <h1 className="font-display text-2xl font-bold text-[#021d33] sm:text-3xl">
+              {philosophy.claim}
+            </h1>
+            <p className="mt-1 max-w-3xl text-sm text-slate-600">{philosophy.subtitle}</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link
+                href={localizePublicHref("/newsletter", locale)}
+                className="inline-flex items-center justify-center rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
+              >
+                {brief.cta}
+              </Link>
+              <Link
+                href={localizePublicHref("/articles", locale)}
+                className="inline-flex items-center justify-center rounded-full border border-[#005B96]/35 px-5 py-2.5 text-sm font-semibold text-[#005B96] hover:bg-[#e8f3fb]"
+              >
+                {chrome.readMagazine}
+              </Link>
+            </div>
+            <div className="mt-3 max-w-xl">
+              <NewsletterCapture locale={locale} source="home-hero" variant="compact" />
+            </div>
+            <div className="mt-4">
+              <PortalSearch copy={surface} />
+            </div>
           </div>
         </div>
 
@@ -287,7 +290,11 @@ export function PortalHome({
         {isCzechSurface(locale) ? <WriterAgentsStrip locale={locale} /> : null}
 
         <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <Box title={chrome.news} href={localizePublicHref("/articles", locale)} moreLabel={chrome.more}>
+          <Box
+            title={<ViaLongeVitaMark variant="compact" locale={locale} />}
+            href={localizePublicHref("/articles", locale)}
+            moreLabel={chrome.more}
+          >
             <PortalNewsFeed
               articles={articles}
               chrome={chrome}

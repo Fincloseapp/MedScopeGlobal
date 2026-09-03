@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { MagazineListing } from "@/components/articles/magazine-listing";
-import { VitascopeMastheadBanner } from "@/components/articles/vitascope-mark";
+import { ViaLongeVitaMasthead } from "@/components/brand/vialongevita-mark";
 import { V20ArticleCard } from "@/components/v20/article-card";
 import { getLatestArticles } from "@/lib/queries/articles";
 import { getMedicalArticles } from "@/lib/queries/medicina";
@@ -89,7 +89,7 @@ export default async function ArticlesPage({
 
     return (
       <div className="v20-articles mx-auto max-w-7xl px-4 py-10 sm:px-6">
-        <VitascopeMastheadBanner track={medTrack} title={title} blurb={blurb} />
+        <ViaLongeVitaMasthead locale={locale} title={title} blurb={blurb} />
         <nav aria-label={copy.studyLabel} className="mt-6 flex flex-wrap gap-2">
           <Link href="/articles" className="rounded-full border bg-white px-3 py-1.5 text-sm">
             {copy.all}

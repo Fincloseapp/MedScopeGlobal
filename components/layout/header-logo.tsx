@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
+import { MAGAZINE } from "@/lib/brand/magazine";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { cn } from "@/lib/utils";
 
-export const HEADER_TAGLINE = "ViaLongeVita · MediFlow · MeDipacient · OrdiZapis";
+export const HEADER_TAGLINE = `${MAGAZINE.name} · MediFlow · MeDipacient · OrdiZapis`;
 
 export const HEADER_LOGO_HEIGHT = { mobile: 56, tablet: 56, desktop: 70 } as const;
 
@@ -55,14 +56,14 @@ export function HeaderLogo({
       </span>
       <p
         className={cn(
-          "tagline font-extralight leading-tight",
-          "text-xs tracking-[0.35px] opacity-80",
-          "lg:mt-1 lg:text-[13px] lg:opacity-75",
-          centered ? "text-center" : "hidden text-left xl:block",
-          "text-[#6A6A6A] dark:text-[#A0A0A0] dark:opacity-85"
+          "tagline font-medium leading-tight",
+          "text-[11px] tracking-[0.18em]",
+          "lg:mt-0.5 lg:text-xs",
+          centered ? "text-center" : "text-left",
+          "text-[#021d33] dark:text-[#E8EEF4]"
         )}
       >
-        {HEADER_TAGLINE}
+        {MAGAZINE.name}
       </p>
     </Link>
   );

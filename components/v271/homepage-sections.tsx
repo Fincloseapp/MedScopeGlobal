@@ -21,6 +21,7 @@ import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { AppOpenLink } from "@/components/apps/app-origin-bar";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { getRevenueCopy } from "@/lib/i18n/revenue-copy";
+import { localizeListedCzk } from "@/lib/i18n/payment-currency";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 /** Not mounted on the live homepage — counts and quotes are unverified. Do not re-wire. */
@@ -239,15 +240,21 @@ export function V271B2bBlock({ locale = "cs" }: { locale?: string }) {
         <dl className="mt-6 grid gap-3 sm:grid-cols-3">
           <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
             <dt className="text-xs text-slate-500">{revenue.bannerName}</dt>
-            <dd className="font-display text-lg font-semibold text-[#021d33]">5 000 Kč</dd>
+            <dd className="font-display text-lg font-semibold text-[#021d33]">
+              {localizeListedCzk("5 000 Kč", locale)}
+            </dd>
           </div>
           <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
             <dt className="text-xs text-slate-500">{revenue.sponsoredName}</dt>
-            <dd className="font-display text-lg font-semibold text-[#021d33]">15 000 Kč</dd>
+            <dd className="font-display text-lg font-semibold text-[#021d33]">
+              {localizeListedCzk("15 000 Kč", locale)}
+            </dd>
           </div>
           <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
             <dt className="text-xs text-slate-500">{revenue.newsletterName}</dt>
-            <dd className="font-display text-lg font-semibold text-[#021d33]">3 500 Kč</dd>
+            <dd className="font-display text-lg font-semibold text-[#021d33]">
+              {localizeListedCzk("3 500 Kč", locale)}
+            </dd>
           </div>
         </dl>
       </div>

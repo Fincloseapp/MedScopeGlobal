@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NewsMagazineCard } from "@/components/articles/news-article-card";
-import { VitascopeMastheadBanner } from "@/components/articles/vitascope-mark";
+import { ViaLongeVitaMasthead } from "@/components/brand/vialongevita-mark";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import {
   EDITORIAL_PILLARS,
@@ -13,6 +13,7 @@ import { VITASCOPE_DESK_LOGO, VITASCOPE_TRACK_LOGO } from "@/lib/brand/vitascope
 import { NEWS_DESKS, type NewsDeskId } from "@/lib/v271/news-desks";
 import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export function MagazineListing({
   articles,
@@ -32,8 +33,8 @@ export function MagazineListing({
 
   return (
     <div className="v20-articles mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <VitascopeMastheadBanner
-        desk={activeDesk}
+      <ViaLongeVitaMasthead
+        locale={locale}
         title={activeDesk ? desk.label : MAGAZINE.name}
         blurb={activeDesk ? desk.blurb : copy.intro}
       />
@@ -53,7 +54,7 @@ export function MagazineListing({
             </p>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{brand.tagline}</p>
           </div>
-          <Link href="/articles/archiv" className="text-sm font-medium text-primary hover:underline">
+          <Link href={localizePublicHref("/articles/archiv", locale)} className="text-sm font-medium text-primary hover:underline">
             {copy.archive}
           </Link>
         </div>

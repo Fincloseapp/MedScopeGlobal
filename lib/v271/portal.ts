@@ -177,7 +177,7 @@ const NEWS_TAB_LABELS: Record<string, string[]> = {
 
 const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
   en: {
-    news: "Newsroom",
+    news: MAGAZINE.name,
     apps: "Apps",
     forWhom: "Who it's for",
     inNumbers: "In numbers",
@@ -189,7 +189,7 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
     footerLegal: `${MAGAZINE.name} on ${MAGAZINE.platform} is an educational health and longevity magazine — not an admissions board or official medical-school textbook. Content does not replace individual medical advice.`,
   },
   de: {
-    news: "Nachrichten",
+    news: MAGAZINE.name,
     apps: "Apps",
     forWhom: "Für wen",
     inNumbers: "In Zahlen",
@@ -201,7 +201,7 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
     footerLegal: `${MAGAZINE.name} auf ${MAGAZINE.platform} ist ein Bildungs-Magazin für Gesundheit und Langlebigkeit — keine Zulassungskommission und kein offizielles Lehrbuch. Der Inhalt ersetzt keine individuelle ärztliche Beratung.`,
   },
   fr: {
-    news: "Rédaction",
+    news: MAGAZINE.name,
     apps: "Applis",
     forWhom: "Pour qui",
     inNumbers: "En chiffres",
@@ -213,7 +213,7 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
     footerLegal: `${MAGAZINE.name} sur ${MAGAZINE.platform} est un magazine éducatif de santé et de longévité — ce n’est ni un jury d’admission ni un manuel officiel. Le contenu ne remplace pas un avis médical individuel.`,
   },
   cs: {
-    news: "Zpravodajství",
+    news: MAGAZINE.name,
     apps: "Aplikace",
     forWhom: "Pro koho",
     inNumbers: "V číslech",

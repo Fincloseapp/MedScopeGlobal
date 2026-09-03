@@ -22,7 +22,7 @@ function pack(locale?: string | null): string {
 
 const COPY: Record<string, HomepageLongevityCopy> = {
   cs: {
-    eyebrow: "Dlouhověkost · každý den",
+    eyebrow: "ViaLongeVita · dlouhověkost",
     title: "Tři klidné kroky, které redakce opakuje",
     lead: "Nejsou to sliby ani protokoly. Jsou to návyky ze článků, které už na ViaLongeVita vycházejí — spánek, pohyb, který vydržíte, a jídlo bez honu za zázrakem.",
     steps: [
@@ -55,7 +55,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     contributeHint: "Po dočtení článku můžete přispět — jen pokud chcete.",
   },
   en: {
-    eyebrow: "Longevity · every day",
+    eyebrow: "ViaLongeVita · longevity",
     title: "Three quiet steps the desk keeps repeating",
     lead: "Not promises and not protocols. Habits from pieces already published on ViaLongeVita — sleep, movement you can keep, and food without a miracle hunt.",
     steps: [
@@ -88,7 +88,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     contributeHint: "After you finish an article you can contribute — only if you want to.",
   },
   de: {
-    eyebrow: "Langlebigkeit · jeden Tag",
+    eyebrow: "ViaLongeVita · Langlebigkeit",
     title: "Drei ruhige Schritte, die die Redaktion wiederholt",
     lead: "Keine Versprechen und keine Protokolle. Gewohnheiten aus Texten, die ViaLongeVita schon veröffentlicht — Schlaf, Bewegung zum Durchhalten und Essen ohne Wundersuche.",
     steps: [
@@ -121,7 +121,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     contributeHint: "Nach dem Lesen können Sie beitragen — nur wenn Sie möchten.",
   },
   fr: {
-    eyebrow: "Longévité · chaque jour",
+    eyebrow: "ViaLongeVita · longévité",
     title: "Trois gestes calmes que la rédaction répète",
     lead: "Ni promesses ni protocoles. Des habitudes déjà publiées sur ViaLongeVita — le sommeil, un mouvement tenable, une assiette sans chasse au miracle.",
     steps: [
@@ -154,7 +154,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     contributeHint: "Après lecture, vous pouvez contribuer — seulement si vous le souhaitez.",
   },
   pt: {
-    eyebrow: "Longevidade · todos os dias",
+    eyebrow: "ViaLongeVita · longevidade",
     title: "Três gestos calmos que a redação repete",
     lead: "Não são promessas nem protocolos. São hábitos já publicados na ViaLongeVita — sono, movimento que se aguenta e comida sem caça ao milagre.",
     steps: [
@@ -187,7 +187,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     contributeHint: "Depois de ler pode contribuir — só se quiser.",
   },
   "pt-BR": {
-    eyebrow: "Longevidade · todos os dias",
+    eyebrow: "ViaLongeVita · longevidade",
     title: "Três gestos calmos que a redação repete",
     lead: "Não são promessas nem protocolos. São hábitos já publicados na ViaLongeVita — sono, movimento que dá para manter e comida sem caça ao milagre.",
     steps: [

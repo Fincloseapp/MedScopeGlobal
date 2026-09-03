@@ -793,8 +793,24 @@ assert.ok(
   "homepage hero must capture the ViaLongeVita brief"
 );
 assert.ok(
+  readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes("ViaLongeVitaMark"),
+  "homepage hero and news box must show the ViaLongeVita lockup"
+);
+assert.ok(
   !readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes("VITASCOPE.name"),
   "homepage news box must not still say Vitascope"
+);
+assert.ok(
+  readFileSync(join(root, "components/layout/header-logo.tsx"), "utf8").includes("MAGAZINE.name"),
+  "header tagline must keep ViaLongeVita visible on every breakpoint"
+);
+assert.ok(
+  !readFileSync(join(root, "components/layout/header-logo.tsx"), "utf8").includes("hidden text-left xl:block"),
+  "ViaLongeVita must not hide behind the xl breakpoint"
+);
+assert.ok(
+  readFileSync(join(root, "components/v271/homepage-sections.tsx"), "utf8").includes("localizeListedCzk"),
+  "B2B list prices must convert off Czech pages"
 );
 assert.ok(
   !readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes("surface.stats"),
