@@ -3,7 +3,8 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { V27Audience } from "@/lib/v27/config";
 import { V27_AUDIENCES } from "@/lib/v27/config";
-import { getV27AudienceHubCopy } from "@/lib/i18n/v27-audience-copy";
+import { getV27AudienceGridCopy, getV27AudienceHubCopy } from "@/lib/i18n/v27-audience-copy";
+import { isCzechSurface } from "@/lib/i18n/surface-copy";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
@@ -73,16 +74,20 @@ export async function V27AudienceHub({ audience, variant = "card" }: Props) {
   );
 }
 
-export function V27AudienceGrid() {
-  const keys: V27Audience[] = ["public", "student", "physician", "b2b"];
+export async function V27AudienceGrid() {
+  const locale = await getServerLocale();
+  const grid = getV27AudienceGridCopy(locale);
+  const keys: V27Audience[] = isCzechSurface(locale)
+    ? ["public", "student", "physician", "b2b"]
+    : ["public", "physician", "b2b"];
   return (
     <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
       <div className="mb-8 text-center">
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-          MedScope v27
+          {grid.eyebrow}
         </p>
         <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
-          Tři cílové skupiny, jedna platforma
+          {grid.title}
         </h2>
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

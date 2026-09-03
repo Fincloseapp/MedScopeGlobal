@@ -54,7 +54,8 @@ import { getArticleChrome } from "../lib/i18n/article-chrome";
 import { getRevenueCopy } from "../lib/i18n/revenue-copy";
 import { getB2BLandingCopy } from "../lib/i18n/b2b-landing-copy";
 import { chromePack } from "../lib/i18n/chrome-pack";
-import { getV27AudienceHubCopy } from "../lib/i18n/v27-audience-copy";
+import { getV27AudienceGridCopy, getV27AudienceHubCopy } from "../lib/i18n/v27-audience-copy";
+import { mergeNativeDeskFeed, nativeDeskArticlesForLocale } from "../lib/editorial/native-desk-articles";
 import { tipLocale, ARTICLE_TIP_COPY } from "../lib/ecosystem/tip-copy";
 import { formatSyndicatedByline, publicEditorialByline } from "../lib/editorial/units";
 import { filterArticlesForLocale } from "../lib/i18n/filter-articles-for-locale";
@@ -630,6 +631,21 @@ assert.ok(!geopoliticalDeskBrief("en-US").includes("Piš česky pro české"));
 assert.ok(buildNativeLocalePrompt("en-US").includes("American English"));
 assert.ok(buildNativeLocalePrompt("en-US").includes("biohacking"));
 assert.ok(!buildNativeLocalePrompt("fr").includes("Čeština s diakritikou"));
+
+const usDesk = nativeDeskArticlesForLocale("en-US");
+assert.ok(usDesk.length >= 4);
+assert.ok(usDesk.every((article) => article.locale === "en-US"));
+assert.ok(usDesk.some((article) => /GLP-1|PCP|911/.test(`${article.title} ${article.excerpt}`)));
+assert.ok(!usDesk.some((article) => /VZP|SÚKL|přijímač/.test(`${article.title} ${article.excerpt}`)));
+assert.ok(nativeDeskArticlesForLocale("fr").some((article) => /médecin traitant|ANSM/.test(`${article.title} ${article.excerpt}`)));
+assert.ok(nativeDeskArticlesForLocale("it").some((article) => /medico di base|AIFA/.test(`${article.title} ${article.excerpt}`)));
+assert.equal(nativeDeskArticlesForLocale("cs").length, 0);
+assert.equal(mergeNativeDeskFeed([] as { locale?: string | null }[], "en-US")[0]?.locale, "en-US");
+assert.equal(getV27AudienceHubCopy("physician", "it").label, "Per i medici");
+assert.ok(!getV27AudienceHubCopy("public", "fr").label.includes("veřejnost"));
+assert.ok(!getV27AudienceGridCopy("it").title.includes("Tři"));
+assert.ok(getHomepageLongevityCopy("en-US").steps.some((step) => /slim|weight|GLP/i.test(`${step.title} ${step.desc}`)));
+assert.ok(!getSurfaceCopy("it").why[0]?.title.includes("Magazine + apps on one platform"));
 
 console.log("✓ i18n/SEO unit checks passed");
 

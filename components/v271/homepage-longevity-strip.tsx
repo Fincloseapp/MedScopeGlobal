@@ -24,7 +24,7 @@ export function HomepageLongevityStrip({
         </h2>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-600">{copy.lead}</p>
 
-        <ol className="mt-5 grid gap-3 md:grid-cols-3">
+        <ol className={`mt-5 grid gap-3 ${copy.steps.length > 3 ? "md:grid-cols-2 xl:grid-cols-4" : "md:grid-cols-3"}`}>
           {copy.steps.map((step, index) => (
             <li key={step.href} className="rounded-lg border border-[#d9e8f4] bg-white px-4 py-4">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">

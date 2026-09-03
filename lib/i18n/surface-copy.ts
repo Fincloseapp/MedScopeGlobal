@@ -864,6 +864,32 @@ COPY.it = {
   cookieTitle: "Cookie e privacy",
   cookieNecessary: "Solo i necessari",
   cookieAcceptAll: "Accetta tutti",
+  why: [
+    {
+      title: "Magazine + app su una piattaforma",
+      description: `${MAGAZINE.name} per la longevità, MediFlow come diario, MeDipacient e OrdiZapis come PWA.`,
+    },
+    {
+      title: "Basato sulle evidenze, non clickbait",
+      description: "I testi citano PubMed, AIFA, EMA e OMS — con revisione, senza fonti inventate.",
+    },
+    {
+      title: "Cosa significano le evidenze",
+      description: "Non solo cosa dice uno studio, ma cosa cambia in pratica.",
+    },
+    {
+      title: "Una piattaforma, più pubblici",
+      description: "Lettori, medici e studenti hanno ciascuno un percorso chiaro.",
+    },
+    {
+      title: "Academy con certificati",
+      description: "Corsi e quiz per chi studia, contenuti di tipo ECM per i clinici.",
+    },
+    {
+      title: "14 giorni per provare",
+      description: "Accesso completo senza vincolo. La fatturazione inizia dopo la prova.",
+    },
+  ],
   footer: {
     ...COPY.en.footer,
     aria: "Piè di pagina",

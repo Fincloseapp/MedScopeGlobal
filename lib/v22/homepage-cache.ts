@@ -9,6 +9,7 @@ import type { DisplayArticle } from "@/lib/queries/articles";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
+import { mergeNativeDeskFeed } from "@/lib/editorial/native-desk-articles";
 import type { AdRow } from "@/types/database";
 
 const articleSelect = `
@@ -53,7 +54,11 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
 
   const supabase = tryCreateServiceRoleClient();
   if (!supabase) {
-    return pinLongevityIntoFeed(getDemoMagazineArticles(), 36, locale);
+    return pinLongevityIntoFeed(
+      mergeNativeDeskFeed(getDemoMagazineArticles(), locale),
+      36,
+      locale
+    );
   }
 
   const { data, error } = await supabase
@@ -65,7 +70,11 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
 
   if (error) {
     console.error("loadArticlesPublic", error);
-    return pinLongevityIntoFeed(getDemoMagazineArticles(), 36, locale);
+    return pinLongevityIntoFeed(
+      mergeNativeDeskFeed(getDemoMagazineArticles(), locale),
+      36,
+      locale
+    );
   }
 
   const mapped = mapArticleList(data as Record<string, unknown>[] | null);
@@ -74,14 +83,19 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
   const publicOnly = filterMagazineListableArticles(
     active.filter((a) => !a.vip_only)
   );
-  const feed = primaryArticleLocale(localeKey) === "cs" ? publicOnly : publicOnly.slice(0, 48);
+  const withDesk = mergeNativeDeskFeed(publicOnly, localeKey);
+  const feed = primaryArticleLocale(localeKey) === "cs" ? withDesk : withDesk.slice(0, 48);
   const prepared = await prepareArticlesForDisplay(feed, localeKey, {
     mode: "card",
     maxTranslate: 12,
     maxLive: 0,
   });
   if (prepared.length === 0) {
-    return pinLongevityIntoFeed(getDemoMagazineArticles(), 36, localeKey);
+    return pinLongevityIntoFeed(
+      mergeNativeDeskFeed(getDemoMagazineArticles(), localeKey),
+      36,
+      localeKey
+    );
   }
   return pinLongevityIntoFeed(prepared, 36, localeKey);
 }
@@ -104,7 +118,7 @@ async function loadHomepageData(locale: string): Promise<{
 export function getHomepageCachedData(locale = "cs") {
   return unstable_cache(
     () => loadHomepageData(locale),
-    ["v22-homepage-public-v17-native-desks", locale],
+    ["v22-homepage-public-v18-native-desk-feed", locale],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

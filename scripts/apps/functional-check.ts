@@ -341,6 +341,7 @@ file("lib/v22/homepage-cache.ts");
   );
   const home = readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8");
   assert.ok(home.includes("filterArticlesForLocale"), "homepage listings are native-first per locale");
+  assert.ok(home.includes("mergeNativeDeskFeed"), "homepage pins native desk pieces");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
 }
 {

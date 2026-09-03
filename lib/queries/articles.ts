@@ -22,6 +22,7 @@ import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-
 import type { LocaleCode } from "@/lib/i18n/config";
 import { createDataClient } from "@/lib/supabase/data";
 import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
+import { getNativeDeskArticleBySlug, mergeNativeDeskFeed } from "@/lib/editorial/native-desk-articles";
 import {
   filterActiveArticles,
   isArchivedArticle,
@@ -150,7 +151,7 @@ export async function getLatestArticles(
 
   const supabase = await createDataClient();
   if (!supabase) {
-    return getDemoMagazineArticles().slice(offset, offset + limit);
+    return mergeNativeDeskFeed(getDemoMagazineArticles(), locale).slice(offset, offset + limit);
   }
   const fetchLimit = limit * 12;
   const { data, error } = await supabase
@@ -162,13 +163,16 @@ export async function getLatestArticles(
 
   if (error) {
     console.error("getLatestArticles", error);
-    return getDemoMagazineArticles().slice(offset, offset + limit);
+    return mergeNativeDeskFeed(getDemoMagazineArticles(), locale).slice(offset, offset + limit);
   }
   // Include lay/public Czech articles so /articles "Vše" matches the live portal feed
   // (recent pipeline output is mostly audience=public / rubric verejnost).
   const rows = mapArticleList(data as Record<string, unknown>[] | null);
-  const filtered = filterMagazineListableArticles(
-    filterForReader(rows, isVip, accessLevel, locale)
+  const filtered = mergeNativeDeskFeed(
+    filterMagazineListableArticles(
+      filterForReader(rows, isVip, accessLevel, locale)
+    ),
+    locale
   );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
@@ -376,6 +380,10 @@ export async function getArticleBySlug(
     "@/lib/verejnost/demo-magazine-articles"
   );
   const dbSlug = resolveCanonicalArticleSlug(slug);
+  const nativeDesk = getNativeDeskArticleBySlug(dbSlug);
+  if (nativeDesk) {
+    return prepareArticleForDisplay(nativeDesk, locale, "full");
+  }
 
   const supabase = await createDataClient();
   if (!supabase) {

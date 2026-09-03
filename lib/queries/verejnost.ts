@@ -9,6 +9,7 @@ import {
 import { filterMagazineListableArticles, shouldHideFromPublicListing } from "@/lib/editorial/article-quality-audit";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
+import { getNativeDeskArticleBySlug, mergeNativeDeskFeed } from "@/lib/editorial/native-desk-articles";
 import type { ArticleWithRelations } from "@/types/database";
 
 export type PublicTopic = "zivotni-styl" | "nemoci" | "prevence" | "rozhovory";
@@ -65,10 +66,14 @@ export async function listPublicArticles(options?: {
       demo = demo.filter((a) => a.public_topic === options.topic);
     }
     const mode = options?.mode ?? "card";
-    return prepareArticlesForDisplay(demo.slice(offset, offset + limit), locale, {
-      mode,
-      maxTranslate: limit,
-    });
+    return prepareArticlesForDisplay(
+      mergeNativeDeskFeed(demo, locale, options?.topic).slice(offset, offset + limit),
+      locale,
+      {
+        mode,
+        maxTranslate: limit,
+      }
+    );
   };
 
   const supabase = await createDataClient();
@@ -94,11 +99,15 @@ export async function listPublicArticles(options?: {
     return demoSlice();
   }
 
-  const rows = filterArticlesForLocale(
-    filterMagazineListableArticles(
-      mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[]
+  const rows = mergeNativeDeskFeed(
+    filterArticlesForLocale(
+      filterMagazineListableArticles(
+        mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[]
+      ),
+      locale
     ),
-    locale
+    locale,
+    options?.topic
   );
   if (rows.length === 0) return demoSlice();
 
@@ -131,6 +140,8 @@ export async function getPublicArticleBySlug(
   );
   const dbSlug = resolveCanonicalArticleSlug(slug);
   const demoHit = async () => {
+    const native = getNativeDeskArticleBySlug(dbSlug);
+    if (native) return prepareArticleForDisplay(native, uiLocale, "full");
     const demo = getDemoMagazineArticleBySlug(dbSlug);
     if (!demo) return null;
     return prepareArticleForDisplay(demo, uiLocale, "full");

@@ -11,6 +11,124 @@ type HubOverlay = {
   enter: string;
 };
 
+const PUBLIC: Record<ChromePack, HubOverlay> = {
+  cs: {
+    label: "Pro veřejnost",
+    shortLabel: "Veřejnost",
+    description: "Krátké články, prevence, výživa, spánek, fitness a životní styl.",
+    ctaPrimary: "Najdi svůj problém",
+    ctaSecondary: "Zeptej se AI",
+    enter: "Vstoupit",
+  },
+  de: {
+    label: "Für die Öffentlichkeit",
+    shortLabel: "Öffentlichkeit",
+    description: "Kurze Texte zu Prävention, Ernährung, Schlaf, Fitness und Lebensstil.",
+    ctaPrimary: "Thema finden",
+    ctaSecondary: "KI fragen",
+    enter: "Öffnen",
+  },
+  fr: {
+    label: "Grand public",
+    shortLabel: "Public",
+    description: "Textes courts sur la prévention, l’alimentation, le sommeil et le mode de vie.",
+    ctaPrimary: "Trouver un thème",
+    ctaSecondary: "Demander à l’IA",
+    enter: "Entrer",
+  },
+  it: {
+    label: "Per il pubblico",
+    shortLabel: "Pubblico",
+    description: "Testi brevi su prevenzione, alimentazione, sonno e stile di vita.",
+    ctaPrimary: "Trova un tema",
+    ctaSecondary: "Chiedi all’IA",
+    enter: "Entra",
+  },
+  es: {
+    label: "Para el público",
+    shortLabel: "Público",
+    description: "Textos cortos de prevención, alimentación, sueño y estilo de vida.",
+    ctaPrimary: "Encontrar un tema",
+    ctaSecondary: "Preguntar a la IA",
+    enter: "Entrar",
+  },
+  "pt-BR": {
+    label: "Para o público",
+    shortLabel: "Público",
+    description: "Textos curtos de prevenção, alimentação, sono e estilo de vida.",
+    ctaPrimary: "Encontrar um tema",
+    ctaSecondary: "Perguntar à IA",
+    enter: "Entrar",
+  },
+  en: {
+    label: "For everyone",
+    shortLabel: "Public",
+    description: "Short pieces on prevention, food, sleep, fitness and lifestyle.",
+    ctaPrimary: "Find a topic",
+    ctaSecondary: "Ask AI",
+    enter: "Enter",
+  },
+};
+
+const PHYSICIAN: Record<ChromePack, HubOverlay> = {
+  cs: {
+    label: "Pro lékaře",
+    shortLabel: "Lékaři",
+    description: "Guidelines, souhrny studií, diagnostické algoritmy, CME a Research Hub.",
+    ctaPrimary: "Odborná sekce",
+    ctaSecondary: "Dokumentace",
+    enter: "Vstoupit",
+  },
+  de: {
+    label: "Für Ärztinnen und Ärzte",
+    shortLabel: "Ärzteschaft",
+    description: "Leitlinien, Studienkurzberichte, CME und Research Hub.",
+    ctaPrimary: "Fachbereich",
+    ctaSecondary: "Dokumentation",
+    enter: "Öffnen",
+  },
+  fr: {
+    label: "Pour les médecins",
+    shortLabel: "Médecins",
+    description: "Guidelines, synthèses d’études, FMC et Research Hub.",
+    ctaPrimary: "Espace pro",
+    ctaSecondary: "Documentation",
+    enter: "Entrer",
+  },
+  it: {
+    label: "Per i medici",
+    shortLabel: "Medici",
+    description: "Guidelines, sintesi di studi, ECM e Research Hub.",
+    ctaPrimary: "Area professionale",
+    ctaSecondary: "Documentazione",
+    enter: "Entra",
+  },
+  es: {
+    label: "Para médicos",
+    shortLabel: "Médicos",
+    description: "Guidelines, síntesis de estudios, FMC y Research Hub.",
+    ctaPrimary: "Área profesional",
+    ctaSecondary: "Documentación",
+    enter: "Entrar",
+  },
+  "pt-BR": {
+    label: "Para médicos",
+    shortLabel: "Médicos",
+    description: "Guidelines, sínteses de estudos, educação continuada e Research Hub.",
+    ctaPrimary: "Área profissional",
+    ctaSecondary: "Documentação",
+    enter: "Entrar",
+  },
+  en: {
+    label: "For physicians",
+    shortLabel: "Physicians",
+    description: "Guidelines, study briefs, CME and Research Hub.",
+    ctaPrimary: "Professional desk",
+    ctaSecondary: "Documentation",
+    enter: "Enter",
+  },
+};
+
 const B2B: Record<ChromePack, HubOverlay> = {
   cs: {
     label: "Pro firmy",
@@ -70,10 +188,22 @@ const B2B: Record<ChromePack, HubOverlay> = {
   },
 };
 
+export function getV27AudienceGridCopy(locale?: string | null): { eyebrow: string; title: string } {
+  const pack = chromePack(locale);
+  if (pack === "cs") return { eyebrow: "MedScope v27", title: "Tři cílové skupiny, jedna platforma" };
+  if (pack === "de") return { eyebrow: "MedScope v27", title: "Drei Zielgruppen, eine Plattform" };
+  if (pack === "fr") return { eyebrow: "MedScope v27", title: "Trois publics, une plateforme" };
+  if (pack === "it") return { eyebrow: "MedScope v27", title: "Tre pubblici, una piattaforma" };
+  if (pack === "es") return { eyebrow: "MedScope v27", title: "Tres públicos, una plataforma" };
+  if (pack === "pt-BR") return { eyebrow: "MedScope v27", title: "Três públicos, uma plataforma" };
+  return { eyebrow: "MedScope v27", title: "Three audiences, one platform" };
+}
+
 export function getV27AudienceHubCopy(audience: V27Audience, locale?: string | null) {
   const cfg = V27_AUDIENCES[audience];
   const pack = chromePack(locale);
-  const overlay = audience === "b2b" ? B2B[pack] : null;
+  const overlay =
+    audience === "b2b" ? B2B[pack] : audience === "public" ? PUBLIC[pack] : audience === "physician" ? PHYSICIAN[pack] : null;
   return {
     label: overlay?.label ?? cfg.label,
     shortLabel: overlay?.shortLabel ?? cfg.shortLabel,
