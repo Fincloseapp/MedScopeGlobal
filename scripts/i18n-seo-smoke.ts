@@ -15,7 +15,8 @@ import {
 } from "../lib/i18n/locale-path";
 import { normalizeLocale } from "../lib/i18n/config";
 import { getHomepageTitle, getOgLocale } from "../lib/brand/magazine";
-import { buildGlobalHreflang } from "../lib/ecosystem/seo";
+import { articleJsonLdGlobal, buildGlobalHreflang } from "../lib/ecosystem/seo";
+import { renderLlmsTxt } from "../lib/seo/llms-txt";
 import { buildPageMetadata } from "../lib/seo/metadata";
 import { allLocaleFeedUrls, allLocaleSitemapUrls, localeArticleUrl } from "../lib/seo/locale-sitemap";
 import { GLOBAL_LOCALES } from "../lib/ecosystem/locales";
@@ -196,7 +197,11 @@ assert.equal(localizePublicHref("/", "cs"), "/cs");
 assert.ok(isSearchEngineBot("Mozilla/5.0 (compatible; Googlebot/2.1)"));
 assert.ok(isSearchEngineBot("SeznamBot/3.0"));
 assert.ok(isSearchEngineBot("YandexBot/3.0"));
+assert.ok(isSearchEngineBot("Mozilla/5.0 AppleWebKit/537.36 (compatible; GPTBot/1.2)"));
+assert.ok(isSearchEngineBot("PerplexityBot/1.0"));
+assert.ok(isSearchEngineBot("ClaudeBot/1.0"));
 assert.equal(isSearchEngineBot("Mozilla/5.0 (iPhone)"), false);
+assert.ok(isLocaleRoutingExcluded("/llms.txt"));
 assert.ok(isLocaleRoutingExcluded("/feed/de"));
 assert.ok(isLocaleRoutingExcluded("/sitemap-de.xml"));
 assert.ok(isLocaleRoutingExcluded("/api/health"));
@@ -379,6 +384,29 @@ assert.equal(tipLocale("fr"), "fr");
 assert.equal(tipLocale("cs"), "cs");
 assert.ok(!ARTICLE_TIP_COPY[tipLocale("fr")].tipSection.includes("Příspěvek"));
 assert.equal(ARTICLE_TIP_COPY.cs.tipSection, "Příspěvek");
+assert.ok(ARTICLE_TIP_COPY.cs.nudgeLine.includes("Pomohl"));
+assert.ok(ARTICLE_TIP_COPY.en.nudgeTip.includes("next reader"));
+assert.ok(!ARTICLE_TIP_COPY.de.blurb.includes("Příspěvek"));
+assert.ok(getHomepageLongevityCopy("cs").contributeHint.includes("dalšímu čtenáři"));
+{
+  const llms = renderLlmsTxt();
+  assert.ok(llms.includes("ViaLongeVita"));
+  assert.ok(llms.includes("How to cite"));
+  assert.ok(llms.includes("/de"));
+  assert.ok(!llms.includes("2 800+"));
+}
+{
+  const ld = articleJsonLdGlobal({
+    title: "Sleep",
+    excerpt: "Rest",
+    slug: "sleep",
+    locale: "de",
+    isAccessibleForFree: true,
+  });
+  assert.equal(ld.publisher.name, "ViaLongeVita");
+  assert.ok(String(ld.url).includes("/de/article/"));
+  assert.equal(ld.isAccessibleForFree, true);
+}
 assert.equal(publicEditorialByline("fr"), "Rédaction MedScopeGlobal");
 assert.equal(publicEditorialByline("cs"), "Redakce MedScopeGlobal");
 assert.ok(!publicEditorialByline("de").includes("Redakce"));

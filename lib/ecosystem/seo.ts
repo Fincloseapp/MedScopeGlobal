@@ -67,6 +67,7 @@ export function articleJsonLdGlobal(article: {
   publishedAt?: string | null;
   authorName?: string | null;
   coverImage?: string | null;
+  isAccessibleForFree?: boolean;
 }) {
   const localePrefix = article.locale
     ? `/${localeToPathSegment(article.locale)}`
@@ -76,23 +77,40 @@ export function articleJsonLdGlobal(article: {
     GLOBAL_LOCALES.find((item) => item.code === article.locale)?.hreflang ??
     article.locale ??
     "cs-CZ";
+  const pageUrl = `${SITE.url}${localePrefix}/article/${slug}`;
   return {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     headline: article.title,
     description: article.excerpt,
     inLanguage,
-    isAccessibleForFree: true,
-    author: { "@type": "Person", name: article.authorName ?? SITE.name },
+    isAccessibleForFree: article.isAccessibleForFree ?? true,
+    author: { "@type": "Person", name: article.authorName ?? MAGAZINE.name },
     publisher: {
       "@type": "NewsMediaOrganization",
+      name: MAGAZINE.name,
+      alternateName: MAGAZINE.formerName,
+      url: SITE.url,
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE.url}${MAGAZINE.emailLockup}`,
+      },
+      parentOrganization: { "@type": "Organization", name: SITE.name, url: SITE.url },
+    },
+    isPartOf: {
+      "@type": "Periodical",
       name: MAGAZINE.name,
       url: SITE.url,
     },
     datePublished: article.publishedAt,
-    mainEntityOfPage: `${SITE.url}${localePrefix}/article/${slug}`,
-    url: `${SITE.url}${localePrefix}/article/${slug}`,
-    image: article.coverImage ?? `${SITE.url}/og-default.png`,
+    mainEntityOfPage: pageUrl,
+    url: pageUrl,
+    image: article.coverImage ?? `${SITE.url}${MAGAZINE.emailLockup}`,
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "article p"],
+    },
+    citation: pageUrl,
     medicalAudience: {
       "@type": "MedicalAudience",
       audienceType: "Patient",

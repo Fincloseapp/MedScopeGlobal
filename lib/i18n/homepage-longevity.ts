@@ -52,7 +52,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     closer:
       "Číst můžete dál zdarma. Pokud vám po dočtení dává smysl redakci podpořit, můžete přispět u článku — nebo si 14 dní v klidu vyzkoušet a kdykoli skončit. Není to podmínka.",
     softCta: "Vyzkoušet 14 dní",
-    contributeHint: "Po dočtení článku můžete přispět — jen pokud chcete.",
+    contributeHint: "Po dočtení můžete přispět — jen pokud chcete. Držíte tím text přístupný dalšímu čtenáři.",
   },
   en: {
     eyebrow: "ViaLongeVita · longevity",
@@ -85,7 +85,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     closer:
       "You can keep reading free. If a piece helped, you can leave a tip on the article — or try 14 days and cancel anytime. Neither is required.",
     softCta: "Try 14 days",
-    contributeHint: "After you finish an article you can contribute — only if you want to.",
+    contributeHint: "After you finish an article you can contribute — only if you want to. That keeps the next reader reading.",
   },
   de: {
     eyebrow: "ViaLongeVita · Langlebigkeit",
@@ -118,7 +118,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     closer:
       "Sie können kostenlos weiterlesen. Wenn ein Text geholfen hat, können Sie am Artikel einen Beitrag hinterlassen — oder 14 Tage testen und jederzeit kündigen. Beides ist freiwillig.",
     softCta: "14 Tage testen",
-    contributeHint: "Nach dem Lesen können Sie beitragen — nur wenn Sie möchten.",
+    contributeHint: "Nach dem Lesen können Sie beitragen — nur wenn Sie möchten. So bleibt der Text für die nächste Person offen.",
   },
   fr: {
     eyebrow: "ViaLongeVita · longévité",
@@ -151,7 +151,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     closer:
       "Vous pouvez continuer à lire gratuitement. Si un texte vous a aidé, vous pouvez laisser une contribution sur l’article — ou essayer 14 jours et résilier à tout moment. Rien n’est obligatoire.",
     softCta: "Essayer 14 jours",
-    contributeHint: "Après lecture, vous pouvez contribuer — seulement si vous le souhaitez.",
+    contributeHint: "Après lecture, vous pouvez contribuer — seulement si vous le souhaitez. Cela garde le texte ouvert pour la personne suivante.",
   },
   pt: {
     eyebrow: "ViaLongeVita · longevidade",
@@ -184,7 +184,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     closer:
       "Pode continuar a ler de graça. Se um texto ajudou, pode deixar um contributo no artigo — ou experimentar 14 dias e cancelar quando quiser. Nada é obrigatório.",
     softCta: "Experimentar 14 dias",
-    contributeHint: "Depois de ler pode contribuir — só se quiser.",
+    contributeHint: "Depois de ler pode contribuir — só se quiser. Assim o texto fica aberto para a pessoa seguinte.",
   },
   "pt-BR": {
     eyebrow: "ViaLongeVita · longevidade",
@@ -217,7 +217,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     closer:
       "Você pode continuar lendo de graça. Se um texto ajudou, pode deixar um contributo no artigo — ou experimentar 14 dias e cancelar quando quiser. Nada é obrigatório.",
     softCta: "Experimentar 14 dias",
-    contributeHint: "Depois de ler você pode contribuir — só se quiser.",
+    contributeHint: "Depois de ler você pode contribuir — só se quiser. Assim o texto fica aberto para a próxima pessoa.",
   },
 };
 

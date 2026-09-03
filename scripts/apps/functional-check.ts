@@ -1184,9 +1184,28 @@ assert.ok(
   readFileSync(join(root, "app/robots.ts"), "utf8").includes("/ads.txt"),
   "robots must allow ads.txt"
 );
+{
+  const robotsSrc = readFileSync(join(root, "app/robots.ts"), "utf8");
+  const crawlerSrc = readFileSync(join(root, "lib/seo/ai-crawlers.ts"), "utf8");
+  assert.ok(robotsSrc.includes("AI_CRAWLER_NAMES"), "robots must invite assistant crawlers");
+  assert.ok(crawlerSrc.includes("GPTBot"), "GPTBot must be on the allow list");
+  assert.ok(crawlerSrc.includes("PerplexityBot"), "PerplexityBot must be on the allow list");
+  assert.ok(robotsSrc.includes("/llms.txt"), "robots must allow the citation card");
+  assert.ok(
+    !robotsSrc.includes('disallow: ["/"]'),
+    "assistant crawlers must be allowed to read ViaLongeVita"
+  );
+}
+file("app/llms.txt/route.ts");
 assert.ok(
-  readFileSync(join(root, "app/robots.ts"), "utf8").includes("GPTBot"),
-  "AI training crawlers must stay off the magazine"
+  readFileSync(join(root, "lib/seo/llms-txt.ts"), "utf8").includes("How to cite"),
+  "llms.txt must tell assistants how to cite ViaLongeVita"
+);
+assert.ok(
+  readFileSync(join(root, "lib/ecosystem/tip-copy.ts"), "utf8").includes(
+    "další čtenář"
+  ),
+  "Czech tip copy must frame a gift as helping the next reader"
 );
 assert.ok(
   readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes(

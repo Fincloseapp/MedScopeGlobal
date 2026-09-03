@@ -250,6 +250,7 @@ export default async function ArticlePage({ params }: Props) {
     publishedAt: article.published_at,
     authorName: authorDisplay,
     coverImage: coverUrl,
+    isAccessibleForFree: !locked,
   });
 
   const jsonLd = isV19Article

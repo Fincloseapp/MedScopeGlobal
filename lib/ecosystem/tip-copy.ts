@@ -44,18 +44,18 @@ export const ARTICLE_TIP_COPY: Record<TipPack, TipStrings> = {
     title: (author?: string) =>
       author ? `Podpořit autora (${author}) · Příspěvek` : "Podpořit autora · Příspěvek",
     blurb:
-      "Volitelný mikro-příspěvek — jako spropitné. Pomáhá redakci ViaLongeVita. Nejde o VIP ani předplatné.",
+      "Dobrovolný mikro-příspěvek — jako spropitné. Když přispějete, pomáháte, aby další čtenář dostal srozumitelný text o zdraví. Nejde o VIP ani předplatné.",
     custom: "Vlastní",
     unavailable: "Příspěvky momentálně nejsou k dispozici — Stripe není nakonfigurován (API 503).",
     success:
-      "Děkujeme za váš příspěvek. Podporuje redakci ViaLongeVita — nejde o VIP, členství ani předplatné.",
+      "Děkujeme. Díky vám může další čtenář číst dál — udělali jste něco dobrého pro veřejné zdraví. Nejde o VIP, členství ani předplatné.",
     redirecting: "Přesměrování na Stripe…",
     minError: (amount: string, symbol: string) => `Minimální příspěvek je ${amount} ${symbol}`,
     lineItemName: (title?: string) =>
       title?.trim() ? `Příspěvek: ${title.trim().slice(0, 80)}` : "Příspěvek pro autora",
     lineItemDescription: "Dobrovolný příspěvek autorovi článku (ne VIP / předplatné)",
-    nudgeTip: "Podpořte redakci příspěvkem",
-    nudgeLine: "Líbí se vám tento článek?",
+    nudgeTip: "Přispět — další čtenář díky tomu čte dál",
+    nudgeLine: "Pomohl vám tento článek?",
     clarifying:
       "Příspěvek není předplatné VIP a neodemkne placený obsah — je to dobrovolná podpora redakce.",
     tipSection: "Příspěvek",
@@ -69,17 +69,19 @@ export const ARTICLE_TIP_COPY: Record<TipPack, TipStrings> = {
   de: {
     title: (author?: string) =>
       author ? `Autor unterstützen (${author}) · Beitrag` : "Autor unterstützen · Beitrag",
-    blurb: "Freiwilliger Mikrobeitrag — wie ein Trinkgeld. Unterstützt die Redaktion ViaLongeVita. Kein VIP, kein Abo.",
+    blurb:
+      "Freiwilliger Mikrobeitrag — wie ein Trinkgeld. Wenn Sie beitragen, kann die nächste Leserin denselben verständlichen Gesundheitstext lesen. Kein VIP, kein Abo.",
     custom: "Eigener Betrag",
     unavailable: "Beiträge sind derzeit nicht verfügbar — Stripe ist nicht konfiguriert.",
-    success: "Danke für Ihren Beitrag. Er unterstützt die Redaktion ViaLongeVita — kein VIP, keine Mitgliedschaft, kein Abo.",
+    success:
+      "Danke. Dank Ihnen kann die nächste Person weiterlesen — Sie haben etwas Gutes für die öffentliche Gesundheit getan. Kein VIP, keine Mitgliedschaft, kein Abo.",
     redirecting: "Weiterleitung zu Stripe…",
     minError: (amount: string, symbol: string) => `Mindestbeitrag ist ${amount} ${symbol}`,
     lineItemName: (title?: string) =>
       title?.trim() ? `Beitrag: ${title.trim().slice(0, 80)}` : "Beitrag für den Autor",
     lineItemDescription: "Freiwilliger Beitrag an den Autor (kein VIP / Abo)",
-    nudgeTip: "Unterstützen Sie die Redaktion mit einem Beitrag",
-    nudgeLine: "Gefällt Ihnen dieser Artikel?",
+    nudgeTip: "Beitragen — die nächste Person liest dadurch weiter",
+    nudgeLine: "Hat Ihnen dieser Artikel geholfen?",
     clarifying: "Ein Beitrag ist kein VIP-Abo und schaltet keine bezahlten Inhalte frei.",
     tipSection: "Beitrag",
     tipAction: "Beitragen",
@@ -92,17 +94,19 @@ export const ARTICLE_TIP_COPY: Record<TipPack, TipStrings> = {
   fr: {
     title: (author?: string) =>
       author ? `Soutenir l’auteur (${author}) · Contribution` : "Soutenir l’auteur · Contribution",
-    blurb: "Micro-contribution facultative — comme un pourboire. Elle aide la rédaction ViaLongeVita. Ni VIP ni abonnement.",
+    blurb:
+      "Micro-contribution facultative — comme un pourboire. En contribuant, vous aidez le prochain lecteur à recevoir le même texte de santé, clairement. Ni VIP ni abonnement.",
     custom: "Montant libre",
     unavailable: "Les contributions sont indisponibles — Stripe n’est pas configuré.",
-    success: "Merci pour votre contribution. Elle soutient la rédaction ViaLongeVita — ce n’est ni un VIP, ni un abonnement.",
+    success:
+      "Merci. Grâce à vous, quelqu’un d’autre peut continuer à lire — vous avez fait quelque chose de bien pour la santé publique. Ce n’est ni un VIP, ni un abonnement.",
     redirecting: "Redirection vers Stripe…",
     minError: (amount: string, symbol: string) => `Le minimum est ${amount} ${symbol}`,
     lineItemName: (title?: string) =>
       title?.trim() ? `Contribution : ${title.trim().slice(0, 80)}` : "Contribution pour l’auteur",
     lineItemDescription: "Contribution facultative à l’auteur (pas VIP / abonnement)",
-    nudgeTip: "Soutenez la rédaction par une contribution",
-    nudgeLine: "Cet article vous plaît ?",
+    nudgeTip: "Contribuer — le prochain lecteur continue grâce à vous",
+    nudgeLine: "Cet article vous a aidé ?",
     clarifying: "Une contribution n’est pas un abonnement VIP et ne débloque pas de contenu payant.",
     tipSection: "Contribution",
     tipAction: "Contribuer",
@@ -115,18 +119,19 @@ export const ARTICLE_TIP_COPY: Record<TipPack, TipStrings> = {
   en: {
     title: (author?: string) =>
       author ? `Support the author (${author}) · Tip` : "Support the author · Tip",
-    blurb: "Optional micro-contribution — like a tip. Funds ViaLongeVita editorial. Not VIP or a subscription.",
+    blurb:
+      "Optional micro-contribution — like a tip. When you give, the next reader still gets a clear health text. Not VIP or a subscription.",
     custom: "Custom",
     unavailable: "Tips are unavailable — Stripe is not configured (API 503).",
     success:
-      "Thank you for your tip. It supports ViaLongeVita editorial — this is not VIP, membership, or a subscription.",
+      "Thank you. Because of you, the next reader can keep going — you did something good for public health. This is not VIP, membership, or a subscription.",
     redirecting: "Redirecting to Stripe…",
     minError: (amount: string, symbol: string) => `Minimum tip is ${amount} ${symbol}`,
     lineItemName: (title?: string) =>
       title?.trim() ? `Tip: ${title.trim().slice(0, 80)}` : "Tip for the author",
     lineItemDescription: "Optional contribution to the article author (not VIP / subscription)",
-    nudgeTip: "Support the editorial team with a tip",
-    nudgeLine: "Enjoying this article?",
+    nudgeTip: "Leave a tip — you keep the next reader reading",
+    nudgeLine: "Did this article help?",
     clarifying: "A tip is not a VIP subscription and does not unlock paid content — it is optional support for the desk.",
     tipSection: "Contribution",
     tipAction: "Contribute",
@@ -142,9 +147,11 @@ export const DONATION_COPY = {
   cs: {
     title: (author?: string) =>
       author ? `Podpořit autora (${author}) · Dar` : "Podpořit autora · Dar",
-    blurb: "Mikro-dar pomůže pokračovat v tvorbě kvalitního obsahu. Nejde o VIP ani předplatné.",
+    blurb:
+      "Mikro-dar drží srozumitelné texty o zdraví přístupné dalšímu člověku. Nejde o VIP ani předplatné.",
     unavailable: "Dary momentálně nejsou k dispozici — Stripe není nakonfigurován (API 503).",
-    success: "Děkujeme za váš dar. Podporuje tvorbu obsahu — nejde o VIP, členství ani předplatné.",
+    success:
+      "Děkujeme. Dar drží další článek přístupný — udělali jste něco dobrého. Nejde o VIP, členství ani předplatné.",
     redirecting: "Přesměrování na Stripe…",
     lineItemName: (title?: string) =>
       title?.trim() ? `Dar autorovi: ${title.trim().slice(0, 80)}` : "Podpora MedScopeGlobal",
@@ -153,9 +160,11 @@ export const DONATION_COPY = {
   de: {
     title: (author?: string) =>
       author ? `Autor unterstützen (${author}) · Spende` : "Autor unterstützen · Spende",
-    blurb: "Eine Mikrospende hilft uns, weiter qualitativ hochwertige Inhalte zu veröffentlichen. Kein VIP, kein Abo.",
+    blurb:
+      "Eine Mikrospende hält verständliche Gesundheitstexte für die nächste Person offen. Kein VIP, kein Abo.",
     unavailable: "Spenden sind derzeit nicht verfügbar — Stripe ist nicht konfiguriert.",
-    success: "Danke für Ihre Spende. Sie unterstützt unsere Inhalte — kein VIP, keine Mitgliedschaft, kein Abo.",
+    success:
+      "Danke. Ihre Spende hält den nächsten Text offen — Sie haben etwas Gutes getan. Kein VIP, keine Mitgliedschaft, kein Abo.",
     redirecting: "Weiterleitung zu Stripe…",
     lineItemName: (title?: string) =>
       title?.trim() ? `Spende: ${title.trim().slice(0, 80)}` : "Unterstützung für MedScopeGlobal",
@@ -164,9 +173,11 @@ export const DONATION_COPY = {
   fr: {
     title: (author?: string) =>
       author ? `Soutenir l’auteur (${author}) · Don` : "Soutenir l’auteur · Don",
-    blurb: "Un micro-don nous aide à continuer à publier des contenus de qualité. Ni VIP ni abonnement.",
+    blurb:
+      "Un micro-don garde des textes de santé clairs ouverts pour la personne suivante. Ni VIP ni abonnement.",
     unavailable: "Les dons sont indisponibles — Stripe n’est pas configuré.",
-    success: "Merci pour votre don. Il soutient nos contenus — ce n’est ni un VIP, ni un abonnement.",
+    success:
+      "Merci. Votre don garde le prochain texte ouvert — vous avez fait quelque chose de bien. Ce n’est ni un VIP, ni un abonnement.",
     redirecting: "Redirection vers Stripe…",
     lineItemName: (title?: string) =>
       title?.trim() ? `Don : ${title.trim().slice(0, 80)}` : "Soutien à MedScopeGlobal",
@@ -175,10 +186,11 @@ export const DONATION_COPY = {
   en: {
     title: (author?: string) =>
       author ? `Support the author (${author}) · Donation` : "Support the author · Donation",
-    blurb: "A micro-donation helps us keep publishing quality content. Not VIP or a subscription.",
+    blurb:
+      "A micro-donation keeps clear health writing open for the next person. Not VIP or a subscription.",
     unavailable: "Donations are unavailable — Stripe is not configured (API 503).",
     success:
-      "Thank you for your donation. It supports our content — this is not VIP, membership, or a subscription.",
+      "Thank you. Your gift keeps the next piece open — you did something good. This is not VIP, membership, or a subscription.",
     redirecting: "Redirecting to Stripe…",
     lineItemName: (title?: string) =>
       title?.trim() ? `Donation: ${title.trim().slice(0, 80)}` : "Support MedScopeGlobal",

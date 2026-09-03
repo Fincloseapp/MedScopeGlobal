@@ -48,6 +48,7 @@ export function publicationJsonLd() {
       url: SITE.url,
     },
     publishingPrinciples: `${SITE.url}/info`,
+    logo: `${SITE.url}${MAGAZINE.emailLockup}`,
     inLanguage: ["en", "cs", "de", "fr", "es", "it", "pl", "sk", "ru", "zh-CN", "ja", "ko"],
   };
 }
