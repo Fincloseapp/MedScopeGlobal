@@ -5,16 +5,18 @@ import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { getB2BLandingCopy } from "@/lib/i18n/b2b-landing-copy";
 import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
 import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getV27AudienceHubCopy } from "@/lib/i18n/v27-audience-copy";
 import { V27_B2B_PACKAGES } from "@/lib/v27/config";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const hub = getV27AudienceHubCopy("b2b", locale);
   return await buildLocalizedV20PageMetadata({
-    title: "Pro firmy | MedScopeGlobal B2B",
-    description:
-      "Reklamní formáty, pharma balíčky, kliniky, laboratoře a univerzitní partnerství na MedScopeGlobal.",
+    title: `${hub.label} | MedScopeGlobal B2B`,
+    description: hub.description,
     path: "/pro-firmy",
   });
 }

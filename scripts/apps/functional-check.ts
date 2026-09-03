@@ -837,6 +837,12 @@ assert.ok(
   "B2B landing chrome must not stay Czech on /de"
 );
 assert.ok(
+  readFileSync(join(root, "app/(public)/pro-firmy/page.tsx"), "utf8").includes(
+    "getV27AudienceHubCopy"
+  ),
+  "B2B landing title must follow the request locale"
+);
+assert.ok(
   readFileSync(join(root, "lib/i18n/chrome-pack.ts"), "utf8").includes('"it"'),
   "Italian must have a dedicated chrome pack like German"
 );
