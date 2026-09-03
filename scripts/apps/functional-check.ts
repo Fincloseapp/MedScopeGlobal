@@ -201,6 +201,7 @@ import { buildLocaleMagazineLayout } from "../../lib/v23/newsletter/locale-layou
 import type { LocaleMagazineSources } from "../../lib/v23/newsletter/locale-layout";
 import { SYNDICATION_RULES, getSyndicationTargets } from "../../lib/ecosystem/editorial/syndication";
 import { APP_MARKETING_IMAGE, MARKETING_VISUALS } from "../../lib/brand/marketing-visuals";
+import { getMagazineCopy } from "../../lib/brand/magazine";
 import {
   MAGAZINE_LISTING_MIN_WORDS,
   shouldHideFromPublicListing,
@@ -1973,6 +1974,9 @@ assert.ok(getNewsletterCopy("pt-BR").welcomeIntro.includes("Você"));
 assert.ok(!looksLikeCzech(getHomepageLongevityCopy("pt").title));
 assert.ok(!looksLikeCzech(getHomepageLongevityCopy("pt-BR").lead));
 assert.ok(getHomepageLongevityCopy("pt-BR").steps[1]!.title.includes("você"));
+assert.ok(!looksLikeCzech(getMagazineCopy("pt").claim));
+assert.ok(getMagazineCopy("pt").claim.toLowerCase().includes("longevidade"));
+assert.ok(getMagazineCopy("pt-BR").claim.toLowerCase().includes("longevidade"));
 assert.equal(getSurfaceCopy("pt").writers.writer1.topicLabel, "Estilo de vida");
 assert.equal(getSurfaceCopy("pt-BR").writers.writer5.topicLabel, "Longevidade");
 assert.ok(!looksLikeCzech(getSurfaceCopy("pt").writersTitle));

@@ -27,7 +27,9 @@ type CopyLocale =
   | "vi"
   | "id"
   | "ja"
-  | "zh-CN";
+  | "zh-CN"
+  | "pt"
+  | "pt-BR";
 
 const COPY_KEYS = [
   "cs",
@@ -48,6 +50,8 @@ const COPY_KEYS = [
   "id",
   "ja",
   "zh-CN",
+  "pt",
+  "pt-BR",
 ] as const;
 
 export const MAGAZINE = {
@@ -79,6 +83,8 @@ export const MAGAZINE = {
     id: "Majalah kesehatan & umur panjang global — hidup lebih baik, lebih lama",
     ja: "グローバルな健康・長寿マガジン — どの年代でも、より良く、より長く",
     "zh-CN": "全球健康与长寿杂志 — 每个年龄都活得更好、更久",
+    pt: "Revista global de saúde e longevidade — viver melhor e mais tempo em qualquer idade",
+    "pt-BR": "Revista global de saúde e longevidade — viver melhor e por mais tempo em qualquer idade",
   },
   tagline: {
     en: "See life clearly. Live it longer.",
@@ -99,6 +105,8 @@ export const MAGAZINE = {
     id: "Jelas soal kesehatan. Hidup lebih lama dan lebih baik.",
     ja: "健康を見通す。より長く生きる。",
     "zh-CN": "看清健康。活得更久。",
+    pt: "Ver a saúde com clareza. Viver mais tempo.",
+    "pt-BR": "Ver a saúde com clareza. Viver por mais tempo.",
   },
   subtitle: {
     en: "Longevity, wellness, and healthy lifestyle for everyone who wants to improve — MediFlow journal, VIP protocols, and MeDipacient · OrdiZapis on one platform. MeDiprep (LF prep) remains as a legacy app.",
@@ -119,6 +127,8 @@ export const MAGAZINE = {
     id: "Umur panjang, wellness, dan gaya hidup sehat — jurnal MediFlow, protokol VIP, serta MeDipacient · OrdiZapis di satu platform.",
     ja: "長寿・ウェルネス・健康的なライフスタイル — MediFlow日記、VIPプロトコル、MeDipacient · OrdiZapisを一つのプラットフォームで。",
     "zh-CN": "长寿、健康与生活方式 — MediFlow日记、VIP方案以及 MeDipacient · OrdiZapis 同在一个平台。",
+    pt: "Longevidade, bem-estar e estilo de vida saudável — diário MediFlow, protocolos VIP e MeDipacient · OrdiZapis numa só plataforma.",
+    "pt-BR": "Longevidade, bem-estar e estilo de vida saudável — diário MediFlow, protocolos VIP e MeDipacient · OrdiZapis numa só plataforma.",
   },
   heroClaim: {
     en: "Health, longevity & lifestyle — for everyone",
@@ -139,6 +149,8 @@ export const MAGAZINE = {
     id: "Kesehatan, umur panjang & gaya hidup — untuk semua",
     ja: "健康・長寿・ライフスタイル — すべての人へ",
     "zh-CN": "健康、长寿与生活方式 — 面向每个人",
+    pt: "Saúde, longevidade e estilo de vida — para todos",
+    "pt-BR": "Saúde, longevidade e estilo de vida — para todos",
   },
   heroEyebrow: {
     en: "ViaLongeVita · powered by MedScopeGlobal",
@@ -159,6 +171,8 @@ export const MAGAZINE = {
     id: "ViaLongeVita · powered by MedScopeGlobal",
     ja: "ViaLongeVita · powered by MedScopeGlobal",
     "zh-CN": "ViaLongeVita · powered by MedScopeGlobal",
+    pt: "ViaLongeVita · plataforma MedScopeGlobal",
+    "pt-BR": "ViaLongeVita · plataforma MedScopeGlobal",
   },
   whatsNew: {
     en: "New: global ecosystem — MediFlow journal, VIP longevity, autonomous editorial, 21 locales",
@@ -179,6 +193,8 @@ export const MAGAZINE = {
     id: "Baru: ekosistem global — MediFlow, umur panjang VIP, redaksi otonom, 19 bahasa",
     ja: "新機能: グローバルエコシステム — MediFlow、VIP長寿、自律編集、19言語",
     "zh-CN": "新上线：全球生态 — MediFlow、VIP长寿、自主编辑、19种语言",
+    pt: "Novo: ecossistema global — MediFlow, longevidade VIP, redação autónoma, 21 idiomas",
+    "pt-BR": "Novo: ecossistema global — MediFlow, longevidade VIP, redação autônoma, 21 idiomas",
   },
 } as const;
 
@@ -233,6 +249,8 @@ export function getOgLocale(locale?: LocaleCode | string): string {
     id: "id_ID",
     en: "en_US",
     "en-US": "en_US",
+    pt: "pt_PT",
+    "pt-BR": "pt_BR",
   };
   if (!locale) return "cs_CZ";
   try {
