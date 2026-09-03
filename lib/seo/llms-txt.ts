@@ -53,6 +53,7 @@ ${editions}
 - Brief / newsletter: ${SITE.url}/cs/newsletter
 - About: ${SITE.url}/cs/o-nas
 - Root sitemap: ${SITE.url}/sitemap.xml
+- Google News (last 48 hours): ${SITE.url}/news-sitemap.xml
 ${sitemaps}
 
 ## Feeds

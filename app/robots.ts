@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getSiteUrl } from "@/lib/config/site-url";
 import { allLocaleSitemapUrls } from "@/lib/seo/locale-sitemap";
+import { newsSitemapUrl } from "@/lib/seo/news-sitemap";
 import { AI_CRAWLER_NAMES } from "@/lib/seo/ai-crawlers";
 
 const base = getSiteUrl();
@@ -15,7 +16,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/_next/static/", "/ads.txt", "/llms.txt"],
+        allow: ["/", "/_next/static/", "/ads.txt", "/llms.txt", "/news-sitemap.xml"],
         disallow: PUBLIC_DISALLOW,
       },
       {
@@ -49,7 +50,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: PUBLIC_DISALLOW,
       },
     ],
-    sitemap: [`${base}/sitemap.xml`, ...localeSitemaps],
+    sitemap: [`${base}/sitemap.xml`, newsSitemapUrl(), ...localeSitemaps],
     host: base.replace(/^https?:\/\//, ""),
   };
 }

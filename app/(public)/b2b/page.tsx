@@ -4,17 +4,24 @@ import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V271B2BPricingTable } from "@/components/v271/b2b-pricing-table";
 import { SITE } from "@/lib/config/site";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
+import { localizeListedCzk } from "@/lib/i18n/payment-currency";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
   return await buildLocalizedPageMetadata({
-  title: "B2B a pharma partnerství",
-  description:
-    "Měřitelné B2B kampaně, reklama a lead generation pro medicínské partnery — transparentní ceník od 5 000 Kč/měs.",
-  path: "/b2b",
-});
+    title: "B2B a pharma partnerství",
+    description: localizeListedCzk(
+      "Měřitelné B2B kampaně, reklama a lead generation pro medicínské partnery — transparentní ceník od 5 000 Kč/měs.",
+      locale
+    ),
+    path: "/b2b",
+    locale,
+  });
 }
 
-export default function B2BPage() {
+export default async function B2BPage() {
+  const locale = await getServerLocale();
   return (
     <ModulePageShell
       eyebrow="B2B"
@@ -33,8 +40,8 @@ export default function B2BPage() {
 
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
         {[
-          { value: "5 000 Kč", label: "Banner / měsíc", desc: "Cílená viditelnost u lékařů a studentů" },
-          { value: "15 000 Kč", label: "Sponzorovaný článek", desc: "Editoriálně zpracovaný odborný obsah" },
+          { value: localizeListedCzk("5 000 Kč", locale), label: "Banner / měsíc", desc: "Cílená viditelnost u lékařů a studentů" },
+          { value: localizeListedCzk("15 000 Kč", locale), label: "Sponzorovaný článek", desc: "Editoriálně zpracovaný odborný obsah" },
           { value: "2 dny", label: "Odpověď na poptávku", desc: "Individuální nabídka pro enterprise" },
         ].map((m) => (
           <div key={m.label} className="rounded-2xl border border-[#cfe1f3] bg-white p-4">
@@ -45,7 +52,7 @@ export default function B2BPage() {
         ))}
       </div>
 
-      <V271B2BPricingTable />
+      <V271B2BPricingTable locale={locale} />
 
       <p className="mt-6 text-sm">
         <Link href="/firmy/cenik" className="font-medium text-[#005B96] underline underline-offset-2">

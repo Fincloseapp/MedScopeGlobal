@@ -813,6 +813,22 @@ assert.ok(
   "B2B list prices must convert off Czech pages"
 );
 assert.ok(
+  readFileSync(join(root, "lib/v271/b2b-pricing.ts"), "utf8").includes("b2bPricingForLocale"),
+  "B2B pricing table must convert listed CZK off Czech pages"
+);
+assert.ok(
+  !readFileSync(join(root, "app/(public)/pro-firmy/page.tsx"), "utf8").includes("180 000"),
+  "B2B landing must not invent monthly traffic"
+);
+assert.ok(
+  !readFileSync(join(root, "app/(public)/pro-firmy/page.tsx"), "utf8").includes("12 000"),
+  "B2B landing must not invent newsletter counts"
+);
+assert.ok(
+  !readFileSync(join(root, "lib/i18n/revenue-copy.ts"), "utf8").includes("1 300"),
+  "media kit must not invent daily uniques"
+);
+assert.ok(
   !readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes("surface.stats"),
   "homepage must not show invented social-proof counts"
 );
@@ -1211,6 +1227,25 @@ assert.ok(
   );
 }
 file("app/llms.txt/route.ts");
+file("app/news-sitemap.xml/route.ts");
+assert.ok(
+  !readFileSync(join(root, "app/news-sitemap.xml/route.ts"), "utf8").includes(
+    'runtime = "edge"'
+  ),
+  "news sitemap must stay on the Workers server runtime"
+);
+assert.ok(
+  readFileSync(join(root, "lib/seo/news-sitemap.ts"), "utf8").includes("news:news"),
+  "Google News sitemap must emit news:news entries"
+);
+assert.ok(
+  readFileSync(join(root, "lib/seo/news-sitemap.ts"), "utf8").includes("MAGAZINE.name"),
+  "Google News publication name must be ViaLongeVita"
+);
+assert.ok(
+  readFileSync(join(root, "app/robots.ts"), "utf8").includes("newsSitemapUrl()"),
+  "robots must list the Google News sitemap"
+);
 assert.ok(
   readFileSync(join(root, "lib/seo/llms-txt.ts"), "utf8").includes("How to cite"),
   "llms.txt must tell assistants how to cite ViaLongeVita"

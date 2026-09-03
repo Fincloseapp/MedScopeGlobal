@@ -1,9 +1,16 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { V271_B2B_PRICING, V271_B2B_PRICING_NOTE } from "@/lib/v271/b2b-pricing";
+import { b2bPricingForLocale, V271_B2B_PRICING_NOTE } from "@/lib/v271/b2b-pricing";
 
-export function V271B2BPricingTable({ compact = false }: { compact?: boolean }) {
+export function V271B2BPricingTable({
+  compact = false,
+  locale,
+}: {
+  compact?: boolean;
+  locale?: string;
+}) {
+  const tiers = b2bPricingForLocale(locale);
   return (
     <section className={compact ? "mt-8" : "mt-0"} aria-labelledby="b2b-pricing-heading">
       <h2
@@ -17,7 +24,7 @@ export function V271B2BPricingTable({ compact = false }: { compact?: boolean }) 
       </p>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        {V271_B2B_PRICING.map((tier) => (
+        {tiers.map((tier) => (
           <article
             key={tier.id}
             className={`flex flex-col rounded-2xl border p-5 ${

@@ -302,7 +302,7 @@ export function localizeV271Page(
     page: {
       ...page,
       title: overlay?.title ?? page.title,
-      description: overlay?.description ?? page.description,
+      description: localizeListedCzk(overlay?.description ?? page.description, locale),
       ctaLabel: overlay?.ctaLabel
         ? localizeListedCzk(overlay.ctaLabel, locale)
         : page.ctaLabel

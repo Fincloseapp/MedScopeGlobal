@@ -3,18 +3,25 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V271B2BPricingTable } from "@/components/v271/b2b-pricing-table";
 import { SITE } from "@/lib/config/site";
+import { localizeListedCzk } from "@/lib/i18n/payment-currency";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
   return await buildLocalizedPageMetadata({
-  title: "B2B ceník pro firmy",
-  description:
-    "Transparentní ceník pro pharma, kliniky a univerzity — banner od 5 000 Kč/měs., sponzorovaný článek 15 000 Kč, enterprise na míru.",
-  path: "/firmy/cenik",
-});
+    title: "B2B ceník pro firmy",
+    description: localizeListedCzk(
+      "Transparentní ceník pro pharma, kliniky a univerzity — banner od 5 000 Kč/měs., sponzorovaný článek 15 000 Kč, enterprise na míru.",
+      locale
+    ),
+    path: "/firmy/cenik",
+    locale,
+  });
 }
 
-export default function FirmyCenikPage() {
+export default async function FirmyCenikPage() {
+  const locale = await getServerLocale();
   return (
     <ModulePageShell
       eyebrow="B2B ceník"
@@ -35,7 +42,7 @@ export default function FirmyCenikPage() {
         <span>Ceník</span>
       </nav>
 
-      <V271B2BPricingTable />
+      <V271B2BPricingTable locale={locale} />
 
       <div className="mt-10 rounded-2xl border border-[#cfe1f3] bg-[#f8fbff] p-6">
         <h2 className="font-display text-lg font-semibold text-[#021d33]">Proč inzerovat u nás?</h2>

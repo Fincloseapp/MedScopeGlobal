@@ -86,8 +86,8 @@ const COPY: Record<Pack, RevenueCopy> = {
     mediaKitEyebrow: "ViaLongeVita · mediakit",
     mediaKitTitle: "Inzerce u čtenářů dlouhověkosti",
     mediaKitLead:
-      "Magazín čte zhruba 1 300–1 900 lidí denně (špičky přes 3 000). Reálná longevity audience 40+, ne boti.",
-    mediaKitReach: "~1 500 unique / den",
+      "Inzerce u čtenářů dlouhověkosti — prevence, spánek, pohyb a výživa. Reálná audience 40+, ne boti.",
+    mediaKitReach: "Longevity audience",
     mediaKitAudience: "Prevence, spánek, pohyb, výživa",
     mediaKitCta: "Objednat kampaň",
     bannerName: "Native banner",
@@ -128,8 +128,8 @@ const COPY: Record<Pack, RevenueCopy> = {
     mediaKitEyebrow: "ViaLongeVita · Media-Kit",
     mediaKitTitle: "Werbung bei Longevity-Lesern",
     mediaKitLead:
-      "Etwa 1 300–1 900 Menschen pro Tag (Spitzen über 3 000). Echte Longevity-Leser 40+, keine Bots.",
-    mediaKitReach: "~1 500 Unique / Tag",
+      "Werbung bei Longevity-Lesern — Prävention, Schlaf, Bewegung, Ernährung. Echte Leser 40+, keine Bots.",
+    mediaKitReach: "Longevity-Leser",
     mediaKitAudience: "Prävention, Schlaf, Bewegung, Ernährung",
     mediaKitCta: "Kampagne anfragen",
     bannerName: "Native Banner",
@@ -170,8 +170,8 @@ const COPY: Record<Pack, RevenueCopy> = {
     mediaKitEyebrow: "ViaLongeVita · kit média",
     mediaKitTitle: "Publicité auprès des lecteurs longévité",
     mediaKitLead:
-      "Environ 1 300–1 900 personnes par jour (pics au-delà de 3 000). Audience longévité réelle 40+, pas des bots.",
-    mediaKitReach: "~1 500 unique / jour",
+      "Publicité auprès des lecteurs longévité — prévention, sommeil, mouvement, alimentation. Audience réelle 40+, pas des bots.",
+    mediaKitReach: "Audience longévité",
     mediaKitAudience: "Prévention, sommeil, mouvement, alimentation",
     mediaKitCta: "Commander une campagne",
     bannerName: "Bannière native",
@@ -212,8 +212,8 @@ const COPY: Record<Pack, RevenueCopy> = {
     mediaKitEyebrow: "ViaLongeVita · media kit",
     mediaKitTitle: "Advertise to longevity readers",
     mediaKitLead:
-      "About 1,300–1,900 people a day (peaks above 3,000). Real longevity readers 40+, not bots.",
-    mediaKitReach: "~1,500 uniques / day",
+      "Advertise to longevity readers — prevention, sleep, movement, nutrition. Real readers 40+, not bots.",
+    mediaKitReach: "Longevity readers",
     mediaKitAudience: "Prevention, sleep, movement, nutrition",
     mediaKitCta: "Book a campaign",
     bannerName: "Native banner",

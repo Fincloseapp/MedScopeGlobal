@@ -161,6 +161,7 @@ const LOCALE_EXCLUDED_EXACT = new Set([
   "/favicon.ico",
   "/ads.txt",
   "/llms.txt",
+  "/news-sitemap.xml",
 ]);
 
 /** Paths that must not receive locale redirect/rewrite (PWAs, API, admin, assets). */

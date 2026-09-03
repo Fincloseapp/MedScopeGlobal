@@ -48,6 +48,7 @@ import { getDesktopHeaderMenu } from "../lib/config/main-navigation";
 import { V271_LEKARI_PAGES } from "../lib/v271/routes";
 import { looksLikeCzech } from "../lib/i18n/czech-detect";
 import { convertCzkToCharge, localizeListedCzk, paymentTiersForUser } from "../lib/i18n/payment-currency";
+import { b2bPricingForLocale } from "../lib/v271/b2b-pricing";
 import { formatPublicDate, intlLocaleFor } from "../lib/i18n/format-date";
 import { getArticleChrome } from "../lib/i18n/article-chrome";
 import { getRevenueCopy } from "../lib/i18n/revenue-copy";
@@ -202,6 +203,7 @@ assert.ok(isSearchEngineBot("PerplexityBot/1.0"));
 assert.ok(isSearchEngineBot("ClaudeBot/1.0"));
 assert.equal(isSearchEngineBot("Mozilla/5.0 (iPhone)"), false);
 assert.ok(isLocaleRoutingExcluded("/llms.txt"));
+assert.ok(isLocaleRoutingExcluded("/news-sitemap.xml"));
 assert.ok(isLocaleRoutingExcluded("/feed/de"));
 assert.ok(isLocaleRoutingExcluded("/sitemap-de.xml"));
 assert.ok(isLocaleRoutingExcluded("/api/health"));
@@ -354,6 +356,7 @@ assert.ok(!localizeListedCzk("149 CZK = Academy student", "fr").includes("CZK"))
 assert.ok(!localizeListedCzk("OrdiZapis (390 CZK)", "de").includes("CZK"));
 assert.ok(!localizeListedCzk("3 500 Kč", "de").includes("Kč"));
 assert.ok(!localizeListedCzk("5 000 Kč", "de").includes("Kč"));
+assert.ok(!localizeListedCzk("od 8 000 Kč", "de").includes("Kč"));
 assert.ok(localizeListedCzk("149 Kč = Student LF", "cs").includes("Kč"));
 assert.ok(getPortalChrome("cs").news.includes("ViaLongeVita"));
 assert.ok(getPortalChrome("de").news.includes("ViaLongeVita"));
@@ -397,6 +400,7 @@ assert.ok(getHomepageLongevityCopy("cs").contributeHint.includes("dalšímu čte
   assert.ok(llms.includes("ViaLongeVita"));
   assert.ok(llms.includes("How to cite"));
   assert.ok(llms.includes("/de"));
+  assert.ok(llms.includes("/news-sitemap.xml"));
   assert.ok(!llms.includes("2 800+"));
 }
 {
@@ -422,6 +426,10 @@ assert.ok(!getArticleChrome("en").recsTitle.includes("dlouhověkost"));
 assert.equal(getRevenueCopy("cs").newsletterCta.includes("brief") || getRevenueCopy("cs").newsletterCta.includes("Chci"), true);
 assert.ok(!getRevenueCopy("de").partnerBody.includes("Kč"));
 assert.ok(!getRevenueCopy("de").partnerPrice.includes("Kč"));
+assert.ok(!getRevenueCopy("de").mediaKitLead.includes("1 300"));
+assert.ok(!getRevenueCopy("cs").mediaKitLead.includes("1 300"));
+assert.ok(!b2bPricingForLocale("de").some((tier) => /Kč|CZK/.test(tier.priceLabel)));
+assert.ok(b2bPricingForLocale("cs").some((tier) => tier.priceLabel.includes("Kč")));
 assert.ok(getRevenueCopy("cs").partnerBody.includes("Kč"));
 assert.ok(getRevenueCopy("cs").newsletterTitle.includes("ViaLongeVita"));
 assert.ok(getRevenueCopy("fr").newsletterTitle.includes("ViaLongeVita"));
