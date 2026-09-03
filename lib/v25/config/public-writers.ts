@@ -14,3 +14,9 @@ export const DEFAULT_PUBLIC_WRITER_LIMIT = Number(process.env.PUBLIC_WRITER_LIMI
 
 /** Expected daily public articles from dedicated cron: writers × limit. */
 export const DAILY_PUBLIC_ARTICLE_TARGET = DEFAULT_PUBLIC_WRITER_LIMIT * PUBLIC_WRITER_COUNT;
+
+export {
+  FOREIGN_WRITER_ROTATION,
+  defaultPublicWriterLocales,
+  rotatingForeignWriterLocale,
+} from "@/lib/v25/writers/run-public-writers.mjs";

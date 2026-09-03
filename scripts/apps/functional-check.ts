@@ -181,7 +181,14 @@ import {
   totalDeployedMagazineWriters,
 } from "../../lib/editorial/locale-magazine-desks";
 import { buildDeskComment, foreignDeskMayComment } from "../../lib/editorial/desk-comments";
+import { getHomepageLongevityCopy } from "../../lib/i18n/homepage-longevity";
 import { getNewsletterCopy } from "../../lib/i18n/newsletter-copy";
+import { translateNavHref } from "../../lib/i18n/nav-copy";
+import {
+  FOREIGN_WRITER_ROTATION,
+  defaultPublicWriterLocales,
+  rotatingForeignWriterLocale,
+} from "../../lib/v25/config/public-writers";
 import { looksLikeCzech } from "../../lib/i18n/czech-detect";
 import {
   NEWSLETTER_PRIMARY_LOCALES,
@@ -1963,6 +1970,22 @@ assert.ok(buildDeskComment({ fromLocale: "de", onLocale: "cs", kind: "borrow" })
 assert.ok(!looksLikeCzech(getNewsletterCopy("pt").body));
 assert.ok(!looksLikeCzech(getNewsletterCopy("pt-BR").title));
 assert.ok(getNewsletterCopy("pt-BR").welcomeIntro.includes("Você"));
+assert.ok(!looksLikeCzech(getHomepageLongevityCopy("pt").title));
+assert.ok(!looksLikeCzech(getHomepageLongevityCopy("pt-BR").lead));
+assert.ok(getHomepageLongevityCopy("pt-BR").steps[1]!.title.includes("você"));
+assert.equal(getSurfaceCopy("pt").writers.writer1.topicLabel, "Estilo de vida");
+assert.equal(getSurfaceCopy("pt-BR").writers.writer5.topicLabel, "Longevidade");
+assert.ok(!looksLikeCzech(getSurfaceCopy("pt").writersTitle));
+assert.equal(translateNavHref("/verejnost/clanky", "pt", { label: "Články" }).label, "Artigos da redação");
+assert.ok(FOREIGN_WRITER_ROTATION.includes("pt"));
+assert.ok(FOREIGN_WRITER_ROTATION.includes("pt-BR"));
+{
+  const locales = defaultPublicWriterLocales(new Date("2026-09-03T00:00:00Z"));
+  assert.deepEqual(locales[0], "cs");
+  assert.equal(locales.length, 2);
+  assert.equal(locales[1], rotatingForeignWriterLocale(new Date("2026-09-03T00:00:00Z")));
+  assert.notEqual(locales[1], "cs");
+}
 assert.equal(EDITORIAL_PERSONAS.filter((p) => p.active).length, 29);
 assert.equal(EDITORIAL_PERSONAS.filter((p) => p.role === "editor").length, 8);
 assert.ok(getReviewPipeline("cs").length >= 6, "multiple MedScopeGlobal editors on CS bench");

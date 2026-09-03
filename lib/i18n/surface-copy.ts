@@ -756,6 +756,102 @@ const COPY: Record<string, SurfaceCopy> = {
   },
 };
 
+COPY.pt = {
+  ...COPY.en,
+  searchPlaceholder: "Longevidade, artigos, MediFlow, medicamentos…",
+  aiPlaceholder: "Abrir o assistente de IA para o público…",
+  searchSubmit: "Pesquisar",
+  openSubmit: "Abrir",
+  searchLabel: "Pesquisar no MedScopeGlobal",
+  trendingLabel: "Frequente:",
+  trending: [
+    { label: "longevidade", href: TRENDING_HREFS[0] },
+    { label: "MediFlow", href: TRENDING_HREFS[1] },
+    { label: "dica de hoje", href: "/verejnost/osveta" },
+    { label: "MeDipacient", href: TRENDING_HREFS[3] },
+    { label: "OrdiZapis", href: TRENDING_HREFS[4] },
+  ],
+  writersTitle: "Bancas editoriais",
+  writersAll: "todos os artigos",
+  writers: {
+    writer1: { label: "Estilo de vida", hint: "sono, movimento, alimentação", topicLabel: "Estilo de vida" },
+    writer2: { label: "Doenças", hint: "linguagem clara, sem assustar", topicLabel: "Doenças" },
+    writer3: { label: "Prevenção", hint: "rastreio e hábitos", topicLabel: "Prevenção" },
+    writer4: { label: "Conversas", hint: "histórias e perguntas", topicLabel: "Conversas" },
+    writer5: { label: "Longevidade", hint: "healthspan, sem hype", topicLabel: "Longevidade" },
+  },
+  appTaglines: {
+    mediflow: "O seu diário de bem-estar",
+    medipacient: "Relatórios médicos à mão, com clareza",
+    ordizapis: "Grave no telemóvel — o OrdiZapis escreve a nota",
+    mediprep: "Encontre as falhas. Treine-as.",
+  },
+  audiences: [
+    {
+      id: "public",
+      label: "Toda a gente",
+      description: `${MAGAZINE.name} e MediFlow para longevidade e prevenção. O MeDipacient transforma relatórios numa linha do tempo.`,
+      ctaPrimary: "Ler a revista",
+      ctaSecondary: "Abrir o MediFlow",
+    },
+    {
+      id: "physician",
+      label: "Médicos",
+      description: "O OrdiZapis redige a nota a partir do ditado no telemóvel. Mais normas, estudos e Research Hub.",
+      ctaPrimary: "Obter o OrdiZapis",
+      ctaSecondary: "Sobre o OrdiZapis",
+    },
+    {
+      id: "student",
+      label: "Estudantes (legado)",
+      description: "O MeDiprep e a Academy continuam para candidatos às faculdades checas.",
+      ctaPrimary: "MeDiprep",
+      ctaSecondary: "Estudar medicina",
+    },
+  ],
+  whyEyebrow: "Porquê a MedScopeGlobal",
+  whyTitle: "Aplicações no telemóvel, conteúdo quando precisa",
+  whyLead: "Instale no ecrã inicial, experimente dados de exemplo e leia a redação com fontes — da longevidade à consulta.",
+  todayFallback: `Hoje na ${MAGAZINE.name}`,
+  newsroom: "Redação",
+  readArticle: "Ler artigo",
+  headerSearchPlaceholder: "Aplicações, artigos, temas…",
+  searching: "A pesquisar…",
+  searchNoResults: "Nada encontrado. Experimente MeDipacient, MeDiprep ou OrdiZapis.",
+  searchOpenFull: "Abrir pesquisa completa",
+  menuOpen: "Abrir menu",
+  mainNav: "Navegação principal",
+  expandMenu: "Expandir",
+  language: "Idioma",
+  signIn: "Entrar",
+  register: "Registar",
+  downloadApps: "Obter as aplicações",
+  siteDescription: `${MAGAZINE.name} — revista de saúde e longevidade em MedScopeGlobal.com. MediFlow, MeDipacient e OrdiZapis. Conteúdo com evidência. 14 dias grátis.`,
+  cookieTitle: "Cookies e privacidade",
+  cookieNecessary: "Só os necessários",
+  cookieAcceptAll: "Aceitar todos",
+};
+
+COPY["pt-BR"] = {
+  ...COPY.pt,
+  searchPlaceholder: "Longevidade, artigos, MediFlow, medicamentos…",
+  aiPlaceholder: "Abrir o assistente de IA para o público…",
+  appTaglines: {
+    mediflow: "Seu diário de bem-estar",
+    medipacient: "Relatórios médicos à mão, com clareza",
+    ordizapis: "Grave no celular — o OrdiZapis escreve a nota",
+    mediprep: "Encontre as falhas. Treine-as.",
+  },
+  whyTitle: "Apps no celular, conteúdo quando você precisa",
+  whyLead: "Instale na tela inicial, experimente dados de exemplo e leia a redação com fontes — da longevidade à consulta.",
+  headerSearchPlaceholder: "Apps, artigos, temas…",
+  searching: "Pesquisando…",
+  signIn: "Entrar",
+  register: "Cadastrar",
+  downloadApps: "Baixar os apps",
+  siteDescription: `${MAGAZINE.name} — revista de saúde e longevidade no MedScopeGlobal.com. MediFlow, MeDipacient e OrdiZapis. Conteúdo com evidência. 14 dias grátis.`,
+};
+
 export function getSurfaceCopy(locale?: string | null): SurfaceCopy {
   const key = pack(locale);
   return COPY[key] ?? COPY.en;

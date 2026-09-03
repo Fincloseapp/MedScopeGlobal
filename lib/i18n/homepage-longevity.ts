@@ -153,6 +153,72 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     softCta: "Essayer 14 jours",
     contributeHint: "Après lecture, vous pouvez contribuer — seulement si vous le souhaitez.",
   },
+  pt: {
+    eyebrow: "Longevidade · todos os dias",
+    title: "Três gestos calmos que a redação repete",
+    lead: "Não são promessas nem protocolos. São hábitos já publicados na ViaLongeVita — sono, movimento que se aguenta e comida sem caça ao milagre.",
+    steps: [
+      {
+        title: "Sono que segura o ritmo",
+        desc: "A mesma hora de acordar, escuridão à noite, sem extremos. O healthspan começa na recuperação — não num suplemento.",
+        href: "/verejnost/clanky?topic=spanek",
+        cta: "Ler sobre o sono",
+      },
+      {
+        title: "Movimento que consegue manter",
+        desc: "Caminhar, escadas, estar de pé. Menos tempo sentado todos os dias vale mais do que um treino isolado.",
+        href: "/verejnost/clanky?topic=zivotni-styl",
+        cta: "Dicas de movimento",
+      },
+      {
+        title: "Comida sem caça ao milagre",
+        desc: "Proteína, hortícolas, um prato mediterrânico em casa. A longevidade está no hábito.",
+        href: "/verejnost/clanky?topic=vyziva",
+        cta: "Artigos de alimentação",
+      },
+    ],
+    readingTitle: "Da redação sobre longevidade",
+    allArticles: "Todos os artigos de longevidade",
+    dailyTip: "Dica de hoje",
+    journal: "Diário MediFlow",
+    closer:
+      "Pode continuar a ler de graça. Se um texto ajudou, pode deixar um contributo no artigo — ou experimentar 14 dias e cancelar quando quiser. Nada é obrigatório.",
+    softCta: "Experimentar 14 dias",
+    contributeHint: "Depois de ler pode contribuir — só se quiser.",
+  },
+  "pt-BR": {
+    eyebrow: "Longevidade · todos os dias",
+    title: "Três gestos calmos que a redação repete",
+    lead: "Não são promessas nem protocolos. São hábitos já publicados na ViaLongeVita — sono, movimento que dá para manter e comida sem caça ao milagre.",
+    steps: [
+      {
+        title: "Sono que segura o ritmo",
+        desc: "A mesma hora de acordar, escuridão à noite, sem extremos. O healthspan começa na recuperação — não num suplemento.",
+        href: "/verejnost/clanky?topic=spanek",
+        cta: "Ler sobre o sono",
+      },
+      {
+        title: "Movimento que você consegue manter",
+        desc: "Caminhar, escadas, ficar em pé. Menos tempo sentado todo dia vale mais do que um treino isolado.",
+        href: "/verejnost/clanky?topic=zivotni-styl",
+        cta: "Dicas de movimento",
+      },
+      {
+        title: "Comida sem caça ao milagre",
+        desc: "Proteína, verduras, um prato mediterrâneo em casa. A longevidade está no hábito.",
+        href: "/verejnost/clanky?topic=vyziva",
+        cta: "Artigos de alimentação",
+      },
+    ],
+    readingTitle: "Da redação sobre longevidade",
+    allArticles: "Todos os artigos de longevidade",
+    dailyTip: "Dica de hoje",
+    journal: "Diário MediFlow",
+    closer:
+      "Você pode continuar lendo de graça. Se um texto ajudou, pode deixar um contributo no artigo — ou experimentar 14 dias e cancelar quando quiser. Nada é obrigatório.",
+    softCta: "Experimentar 14 dias",
+    contributeHint: "Depois de ler você pode contribuir — só se quiser.",
+  },
 };
 
 export function getHomepageLongevityCopy(locale?: string | null): HomepageLongevityCopy {
