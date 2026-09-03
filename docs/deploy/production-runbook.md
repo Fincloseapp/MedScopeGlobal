@@ -178,7 +178,7 @@ NEXT_PUBLIC_SITE_URL=https://medscopeglobal.com
 ### Preferred: Cloudflare Workers Builds
 
 Connect GitHub repo → **Create and deploy** → project name **`medscopeglobal`**, branch **`main`**.  
-Push to `main` triggers build + deploy. There is no `vercel.json`. The Vercel GitHub App, if still installed on the repo, posts a failing “Account is blocked” check — uninstall it in GitHub → Settings → Integrations. Production is Cloudflare only.
+Push to `main` triggers build + deploy. There is no `vercel.json`. The Vercel GitHub App was uninstalled from `Fincloseapp/MedScopeGlobal`; production is Cloudflare only. A red “Vercel / Account is blocked” status on older commits is leftover history and can be ignored.
 
 ### Alternative: GitHub Actions
 
