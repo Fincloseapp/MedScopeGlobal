@@ -214,6 +214,10 @@ function file(rel: string) {
   assert.ok(existsSync(join(root, rel)), `missing ${rel}`);
 }
 
+function absent(rel: string, reason: string) {
+  assert.ok(!existsSync(join(root, rel)), reason);
+}
+
 assert.equal(APP_PRODUCTS.length, 4, "four consumer apps");
 assert.equal(MEDIPACIENT.appPath, "/app/pacient");
 assert.equal(MEDIPREP.appPath, "/app/priprava");
@@ -343,17 +347,26 @@ file("lib/v22/homepage-cache.ts");
     "public cards must pass locale so /de /fr /en open the right store"
   );
 }
-file("vercel.json");
 file("scripts/cloudflare/assert-live-host.mjs");
-file("scripts/cloudflare/refuse-vercel.mjs");
+file("scripts/cloudflare/deploy.mjs");
+absent("vercel.json", "vercel.json must not exist — production is Cloudflare Workers");
+absent("vercel.json.bak", "vercel.json.bak must not exist");
+absent(
+  ".github/workflows/vercel-auto-deploy.yml",
+  "Vercel GitHub workflows must be removed"
+);
+absent("scripts/run-vercel-build.mjs", "Next.js build must not go through a Vercel wrapper");
 {
-  const vercel = JSON.parse(readFileSync(join(root, "vercel.json"), "utf8")) as {
-    git?: { deploymentEnabled?: boolean };
-    github?: { enabled?: boolean; silent?: boolean };
+  const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as {
+    scripts?: Record<string, string>;
   };
-  assert.equal(vercel.git?.deploymentEnabled, false, "Vercel git deploys must stay off");
-  assert.equal(vercel.github?.enabled, false);
-  assert.equal(vercel.github?.silent, true);
+  assert.ok(!pkg.scripts?.["vercel:env"], "package.json must not expose vercel:env");
+  assert.ok(
+    !JSON.stringify(pkg.scripts ?? {}).includes("vercel"),
+    "package.json scripts must not invoke Vercel"
+  );
+  assert.equal(pkg.scripts?.["build:next"], "node scripts/run-cloudflare-build.mjs");
+  assert.ok(pkg.scripts?.["cf:deploy"]?.includes("cloudflare"));
 }
 file("public/assets/affiliate/magnesium.svg");
 file("public/assets/affiliate/omega-test.svg");
@@ -818,9 +831,21 @@ assert.ok(
   file("lib/email/cloudflare-sending.ts");
   const publicRunner = readFileSync(join(root, "lib/v25/runners/public.ts"), "utf8");
   assert.ok(
-    publicRunner.includes("cloudflare-workers"),
+    publicRunner.includes("isCloudflareRuntime"),
     "public writers must run in-process on Cloudflare, not spawnSync"
   );
+  assert.ok(!publicRunner.includes("VERCEL"), "public writers must not key off Vercel");
+  const uniRunner = readFileSync(join(root, "lib/v25/runners/universities.ts"), "utf8");
+  assert.ok(
+    uniRunner.includes("isCloudflareRuntime"),
+    "universities cron must run in-process on Cloudflare"
+  );
+  assert.ok(!uniRunner.includes("VERCEL"), "universities cron must not key off Vercel");
+  const healthSrc = readFileSync(join(root, "app/api/health/route.ts"), "utf8");
+  assert.ok(!healthSrc.includes("VERCEL"), "/api/health must not report a Vercel runtime");
+  const mw = readFileSync(join(root, "middleware.ts"), "utf8");
+  assert.ok(mw.includes("cf-ipcountry"), "geo locale uses Cloudflare country");
+  assert.ok(!mw.includes("x-vercel-ip-country"), "geo locale must not use Vercel country header");
   const opsSrc = readFileSync(join(root, "lib/admin/newsletter-ops.ts"), "utf8");
   assert.ok(opsSrc.includes("writersProduced24h"), "admin must show live writers, not roster as daily");
   assert.ok(opsSrc.includes("waitingFirstBrief"), "admin must show unsent first briefs");

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Confirm medscopeglobal.com is Cloudflare Workers, not Vercel.
+ * Confirm medscopeglobal.com is served by Cloudflare Workers.
  */
 const origin = process.env.MEDSCOPE_ORIGIN || "https://medscopeglobal.com";
 const ua = "Mozilla/5.0 (compatible; MedScopeCloudflareAssert/1.0)";
@@ -41,4 +41,4 @@ const hop = await headers("/go/vitamin-d3-k2");
 assert(hop.status === 200, `/go/vitamin-d3-k2 → ${hop.status} (magazine hop)`);
 assert(/cloudflare/i.test(hop.headers.server || ""), "/go served by Cloudflare");
 
-console.log(`\nLive host ${origin} is Cloudflare Workers. Vercel is not in the path.\n`);
+console.log(`\nLive host ${origin} is Cloudflare Workers.\n`);

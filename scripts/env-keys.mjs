@@ -1,5 +1,5 @@
-/** Keys that belong on Cloudflare Workers production (legacy name kept for imports). */
-export const VERCEL_SYNC_KEYS = [
+/** Keys that belong on Cloudflare Workers production. */
+export const CLOUDFLARE_SYNC_KEYS = [
   "NEXT_PUBLIC_SITE_URL",
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_ANON_KEY",

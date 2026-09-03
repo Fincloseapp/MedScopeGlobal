@@ -2,16 +2,9 @@ import type { MetadataRoute } from "next";
 import { publicArticleSlug } from "@/lib/editorial/clinician-anonymize";
 import { LONGEVITY_PROTOCOLS } from "@/lib/ecosystem/longevity-protocols";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteUrl } from "@/lib/config/site-url";
 
-const base =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.CF_PAGES_URL
-    ? process.env.CF_PAGES_URL.startsWith("http")
-      ? process.env.CF_PAGES_URL
-      : `https://${process.env.CF_PAGES_URL}`
-    : process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "https://medscopeglobal.com");
+const base = getSiteUrl();
 
 const staticRoutes: MetadataRoute.Sitemap = [
   { url: base, changeFrequency: "daily", priority: 1 },

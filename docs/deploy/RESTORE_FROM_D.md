@@ -103,7 +103,7 @@ pnpm find:d
 Confirm secrets exist (names only):
 
 ```powershell
-Select-String -Path .\.env.local -Pattern '^(CLOUDFLARE_API_TOKEN|CLOUDFLARE_ACCOUNT_ID|SUPABASE_SERVICE_ROLE_KEY|CRON_SECRET|STRIPE_SECRET_KEY|VERCEL_TOKEN)=' |
+Select-String -Path .\.env.local -Pattern '^(CLOUDFLARE_API_TOKEN|CLOUDFLARE_ACCOUNT_ID|SUPABASE_SERVICE_ROLE_KEY|CRON_SECRET|STRIPE_SECRET_KEY)=' |
   ForEach-Object { ($_.Line -split '=',2)[0] }
 ```
 
@@ -205,7 +205,6 @@ Paste these from `D:\medscope.local\.env.local` (and JSON from sync):
 | `SUPABASE_SERVICE_ROLE_KEY` | `.env.local` |
 | `CLOUDFLARE_ENV_JSON` | `scripts\cloudflare\.env.cloudflare.json` (entire file) |
 | `CRON_SECRET` | `.env.local` (optional) |
-| `VERCEL_TOKEN` | `.env.local` (optional — enables cloud `vercel env pull`) |
 
 Print values to clipboard one at a time (review before paste; do not log):
 
@@ -254,24 +253,9 @@ Workers Builds / GitHub Actions on `main` also deploy after push — only if `CL
 
 ---
 
-## 7. Alternate — recover via Vercel (no D: CF token)
+## 7. Recover secrets from D: (no Cloudflare token in Cursor)
 
-If `.env.local` on D: is missing but GitHub still has `VERCEL_TOKEN` / `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID`:
-
-1. GitHub → **Actions** → **Pull Production Env Local** → **Run workflow** (branch `main`).
-2. Download artifact `medscope-env-local` (retention ~1–7 days).
-3. Copy needed keys into `D:\medscope.local\.env.local`, then redo restore / sync.
-
-From D: with `VERCEL_TOKEN` already in `.env.local`:
-
-```powershell
-cd D:\medscope.local
-$env:VERCEL_TOKEN = (Get-Content .\.env.local | Where-Object { $_ -match '^VERCEL_TOKEN=' } | ForEach-Object { ($_ -split '=',2)[1].Trim().Trim('"') })
-$env:VERCEL_ORG_ID = (Get-Content .\.env.local | Where-Object { $_ -match '^VERCEL_ORG_ID=' } | ForEach-Object { ($_ -split '=',2)[1].Trim().Trim('"') })
-$env:VERCEL_PROJECT_ID = (Get-Content .\.env.local | Where-Object { $_ -match '^VERCEL_PROJECT_ID=' } | ForEach-Object { ($_ -split '=',2)[1].Trim().Trim('"') })
-npx vercel env pull .env.vercel.local --yes --environment=production
-# merge selected keys into .env.local manually — never commit either file
-```
+If Cursor secrets are missing, copy `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and `CLOUDFLARE_ENV_JSON` from `D:\medscope.local\.env.local` / `scripts\cloudflare\.env.cloudflare.json`. Do not pull env from any other host.
 
 ---
 

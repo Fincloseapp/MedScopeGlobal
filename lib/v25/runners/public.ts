@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { projectPath } from "@/lib/config/paths";
+import { isCloudflareRuntime } from "@/lib/config/runtime";
 import { setCronStatus } from "@/lib/v25/system-state";
 import { DEFAULT_PUBLIC_WRITER_LIMIT } from "@/lib/v25/config/public-writers";
 
@@ -28,10 +29,7 @@ type PublicAdEngineModule = {
 };
 
 function runPublicWritersInProcess(): boolean {
-  if (process.env.VERCEL === "1") return true;
-  if (process.env.MEDSCOPE_RUNTIME === "cloudflare-workers") return true;
-  if (process.env.CF_PAGES) return true;
-  return false;
+  return isCloudflareRuntime();
 }
 
 export async function runPublicArticlesFetch(options?: {

@@ -26,10 +26,6 @@ function run(label, cmd, args) {
 }
 
 console.log("\n=== MedScopeGlobal build (Cloudflare Workers / OpenNext) ===\n");
-if (process.env.VERCEL === "1") {
-  console.error("Vercel builds are disabled. Deploy with pnpm cf:deploy (Cloudflare Workers).");
-  process.exit(1);
-}
 if (process.env.CF_PAGES === "1" || process.env.CLOUDFLARE) {
   console.log("Cloudflare CI environment detected\n");
 }

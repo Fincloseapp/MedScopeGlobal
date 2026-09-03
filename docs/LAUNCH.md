@@ -106,7 +106,7 @@ Bez `OPENAI_API_KEY` běží **fallback režim** (metadata + odkaz na zdroj).
 curl "http://localhost:3000/api/cron/ingest?secret=VÁŠ_CRON_SECRET"
 ```
 
-**Vercel** — soubor `vercel.json` už obsahuje cron. Po deployi nastavte v projektu env `CRON_SECRET`; Vercel posílá hlavičku `Authorization: Bearer ...`.
+**Cloudflare** — cron běží přes `.github/workflows/cloudflare-cron.yml`. Po deployi nastavte env `CRON_SECRET`; dispatcher posílá hlavičku `Authorization: Bearer ...`.
 
 V adminu **AI ingestion** lze upravit:
 

@@ -5,7 +5,7 @@ import { getVersion } from "@/lib/v17/versioning/version";
 const AUTO_DEPLOY = {
   method: "git push origin main",
   domain: "https://medscopeglobal.com",
-  provider: "Vercel Git Integration",
+  provider: "Cloudflare Workers (OpenNext)",
   productionBranch: "main",
 };
 
@@ -33,13 +33,13 @@ export async function PUT() {
   }
 }
 
-/** Deploy is handled by Vercel on push to main — no local script. */
+/** Deploy is handled by Cloudflare Workers Builds / GitHub Actions on push to main. */
 export async function POST() {
   return NextResponse.json(
     {
       deployed: false,
       status: "auto_deploy",
-      message: "Production deploys via Vercel Git Integration on push to main.",
+      message: "Production deploys via Cloudflare Workers on push to main.",
       instructions: ["git add -A", 'git commit -m "feat: update"', "git push origin main"],
       ...AUTO_DEPLOY,
     },

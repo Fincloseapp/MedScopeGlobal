@@ -13,7 +13,7 @@
 2. **Auto-translate device language** - Middleware + detection working
 3. **Professional medical magazine** - AI synthesis pipeline ready
 4. **Production ready** - Build verified, database checked
-5. **medscopeglobal.com deployment** - Vercel configuration complete
+5. **medscopeglobal.com deployment** - Cloudflare Workers (OpenNext)
 
 ### ✅ Technical Implementation
 - **Locale System**: Auto-detection + manual switcher + device revert
@@ -21,7 +21,7 @@
 - **Database**: Verified with all 30 medical categories + i18n schema
 - **Build Process**: Next.js 15.1.0 with Windows workaround
 - **Security**: Headers, CORS, rate limiting configured
-- **Deployment**: Vercel + automation scripts ready
+- **Deployment**: Cloudflare Workers (`pnpm cf:deploy`)
 
 ### ✅ Documentation Complete
 - **DEPLOY_NOW.md** - Quick start guide
@@ -57,8 +57,8 @@ npm run production:validate
 # 2. Build the production bundle
 npm run build:win
 
-# 3. Deploy to Vercel
-vercel --prod
+# 3. Deploy to Cloudflare Workers
+pnpm cf:deploy
 ```
 
 **That's it!** Your site is live at https://medscopeglobal.com
@@ -175,12 +175,12 @@ npm start
 ### Optional: OpenAI (Best quality)
 Cost: ~$0.01-0.10 per translation  
 Get: https://platform.openai.com/account/api-keys  
-Add to Vercel after deployment
+Add to Cloudflare Worker secrets after deployment
 
 ### Optional: Google Translate (Free tier)
 Cost: Free for 500k chars/month  
 Get: https://cloud.google.com/translate  
-Add to Vercel after deployment
+Add to Cloudflare Worker secrets after deployment
 
 **Note**: System works perfectly without these. Articles just won't be translated.
 
@@ -205,7 +205,7 @@ Add to Vercel after deployment
 - ✅ User authentication
 - ✅ Notifications system
 - ✅ Audit logging
-- ✅ Global CDN via Vercel
+- ✅ Global CDN via Cloudflare
 
 ---
 
@@ -217,7 +217,7 @@ After deployment, expect:
 - **Article page**: 1-2 seconds
 - **Language switch**: Instant
 - **Translation (first)**: 2-5 seconds (cached after)
-- **Uptime**: 99.99% (Vercel SLA)
+- **Uptime**: 99.99% (Cloudflare)
 
 ---
 
@@ -237,7 +237,7 @@ After deployment, expect:
 
 ### Configuration
 - **next.config.mjs** - Production optimizations
-- **vercel.json** - Vercel deployment config
+- **wrangler.jsonc** - Cloudflare Workers deploy config
 - **package.json** - Scripts & dependencies
 - **.env.local** - Environment variables
 
@@ -335,7 +335,7 @@ After deployment, verify:
 - **docs/PRODUCTION_READY.md** - Checklist
 
 ### External
-- **Vercel Docs**: https://vercel.com/docs
+- **Cloudflare Workers**: https://developers.cloudflare.com/workers/
 - **Supabase Docs**: https://supabase.com/docs
 - **OpenAI API**: https://platform.openai.com/docs
 - **Google Translate**: https://cloud.google.com/translate/docs
@@ -353,10 +353,10 @@ After deployment, verify:
 1. Read **[DEPLOY_NOW.md](DEPLOY_NOW.md)**
 2. Run `npm run production:validate`
 3. Run `npm run build:win`
-4. Deploy with `vercel --prod` or `git push`
+4. Deploy with `pnpm cf:deploy` or `git push` to `main`
 
 ### Short-term (This Week)
-1. Monitor Vercel logs for errors
+1. Monitor Cloudflare Worker logs for errors
 2. Test locale detection with different browsers
 3. Verify translation badges appear
 4. Add API keys if desired (optional)
@@ -373,10 +373,10 @@ After deployment, verify:
 
 If something goes wrong:
 
-1. **Check logs**: Vercel Dashboard → Logs
+1. **Check logs**: Cloudflare Dashboard → Workers → medscopeglobal → Logs
 2. **Validate environment**: `npm run production:validate`
 3. **Check database**: `npm run db:verify`
-4. **Re-deploy**: `vercel --prod`
+4. **Re-deploy**: `pnpm cf:deploy`
 
 ---
 

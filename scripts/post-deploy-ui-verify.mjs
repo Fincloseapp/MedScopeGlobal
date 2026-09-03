@@ -20,9 +20,6 @@ function loadSecret(name) {
 }
 
 const CRON = loadSecret("CRON_SECRET");
-const VT = loadSecret("VERCEL_TOKEN");
-const PID = "prj_xewXFpK1L2PYN9kaqPrilPluQOEj";
-const TID = "team_m1FSjvKjWV9Wgm1WhEycgHqJ";
 
 async function waitForDeploy() {
   for (let i = 0; i < 16; i++) {
@@ -37,22 +34,7 @@ async function waitForDeploy() {
 }
 
 async function purgeEdge() {
-  if (!VT) {
-    console.log("edge-purge: skipped (no VERCEL_TOKEN)");
-    return;
-  }
-  const tags = ["medscope-ui-v19.9", "medscope-pages"];
-  for (const ep of ["invalidate-by-tags", "dangerously-delete-by-tags"]) {
-    const qs = new URLSearchParams({ projectIdOrName: PID, teamId: TID });
-    const res = await fetch(`https://api.vercel.com/v1/edge-cache/${ep}?${qs}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${VT}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ tags, target: "production" }),
-    });
-    const body = await res.text();
-    console.log(`edge-purge ${ep}: ${res.status} ${body.slice(0, 120)}`);
-    if (res.ok) return;
-  }
+  console.log("edge-purge: Cloudflare Worker HTML does not need a Vercel edge purge");
 }
 
 async function invalidateIsr() {

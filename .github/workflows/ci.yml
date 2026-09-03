@@ -54,5 +54,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Assert medscopeglobal.com is Cloudflare, not Vercel
+      - name: Assert medscopeglobal.com is Cloudflare Workers
         run: node scripts/cloudflare/assert-live-host.mjs

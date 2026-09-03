@@ -60,7 +60,7 @@
 ## Block 9 — Cron & Automation
 
 - `/api/cron/academy-daily` — health check + optional content generation hook
-- Vercel cron in `vercel.json`
+- Cloudflare cron in `.github/workflows/cloudflare-cron.yml`
 
 ## Block 10 — Testing & QA
 

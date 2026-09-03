@@ -37,6 +37,5 @@ jobs:
 
       - name: Production deploy is Cloudflare Workers
         run: |
-          echo "Vercel is not used."
           echo "Deploy: GitHub Actions cloudflare-deploy.yml or pnpm cf:deploy"
           echo "Site: https://medscopeglobal.com"

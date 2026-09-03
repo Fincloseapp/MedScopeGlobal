@@ -70,7 +70,6 @@ function runLocaleGuards() {
 
 console.log("\n=== Pre-deploy gates ===\n");
 
-const isVercel = process.env.VERCEL === "1";
 const isCI = process.env.GITHUB_ACTIONS === "true";
 const hasCronSecret = (process.env.CRON_SECRET ?? "").length >= 16;
 const logoSource = MEDSCOPE_LOGO_SOURCE;
@@ -91,8 +90,8 @@ const steps = [
   ["verify-academy-v35-skeleton", "scripts/verify-academy-v35-skeleton.mjs"],
 ];
 
-if (isVercel && !canSyncLogos) {
-  console.log("(Vercel) logo source unavailable — using committed assets in public/assets/logo/\n");
+if (isCI && !canSyncLogos) {
+  console.log("(CI) logo source unavailable — using committed assets in public/assets/logo/\n");
 }
 if (isCI && !hasCronSecret) {
   console.log("(CI) CRON_SECRET not set — skipping cron env gates\n");
@@ -110,4 +109,4 @@ if (!ok) {
 }
 
 console.log("\nPre-deploy gates PASSED");
-console.log("Tip: pnpm cf:env:sync — sync env to Cloudflare Workers (Vercel is retired)\n");
+console.log("Tip: pnpm cf:env:sync — sync env to Cloudflare Workers\n");

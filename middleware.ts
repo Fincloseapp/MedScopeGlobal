@@ -106,9 +106,7 @@ export async function middleware(request: NextRequest) {
   // lock the apex domain to English when the phone is Czech.
   const acceptLanguage = request.headers.get("accept-language");
   const bot = isSearchEngineBot(request.headers.get("user-agent"));
-  const country =
-    request.headers.get("cf-ipcountry") ||
-    request.headers.get("x-vercel-ip-country");
+  const country = request.headers.get("cf-ipcountry");
   const target = localeForUnprefixedEntry(acceptLanguage, bot, country);
 
   const prefix = `/${localeToPathSegment(target)}`;

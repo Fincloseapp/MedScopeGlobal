@@ -24,7 +24,7 @@ function loadEnvFile(filePath) {
     ) {
       v = v.slice(1, -1);
     }
-    // Unwrap vercel "*****" / empty placeholders
+    // Unwrap masked / empty placeholders
     if (!v || v === "******" || v.startsWith("@")) continue;
     out[m[1].trim()] = v;
   }

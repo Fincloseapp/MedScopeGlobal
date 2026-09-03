@@ -117,7 +117,7 @@ Production secrets live on the **Worker**, not in git. Source of truth for local
 |----------|-------|
 | `UNSPLASH_ACCESS_KEY` | Enables live Unsplash search in editorial image pipeline; without it, curated static Unsplash URLs + SVG fallbacks still work |
 
-Full optional list: `.env.example` and `scripts/env-keys.mjs` (`VERCEL_SYNC_KEYS` — name is legacy; keys apply to Cloudflare too).
+Full optional list: `.env.example` and `scripts/env-keys.mjs` (`CLOUDFLARE_SYNC_KEYS`).
 
 ### Sync from D: drive `.env.local` → Cloudflare
 
@@ -173,12 +173,12 @@ NEXT_PUBLIC_SITE_URL=https://medscopeglobal.com
 
 ---
 
-## 3. Deploy (Cloudflare only — no Vercel)
+## 3. Deploy (Cloudflare Workers)
 
 ### Preferred: Cloudflare Workers Builds
 
 Connect GitHub repo → **Create and deploy** → project name **`medscopeglobal`**, branch **`main`**.  
-Push to `main` triggers build + deploy. `vercel.json` exists only to **turn Vercel Git deploys off** (`git.deploymentEnabled: false`). Do not reconnect the Vercel GitHub app — the Vercel account is blocked and would post a failing PR check.
+Push to `main` triggers build + deploy. There is no `vercel.json`. The Vercel GitHub App, if still installed on the repo, posts a failing “Account is blocked” check — uninstall it in GitHub → Settings → Integrations. Production is Cloudflare only.
 
 ### Alternative: GitHub Actions
 

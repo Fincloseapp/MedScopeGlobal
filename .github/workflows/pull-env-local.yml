@@ -1,6 +1,6 @@
 name: Pull Production Env Local
 
-# Production env lives on Cloudflare Workers, not Vercel.
+# Production env lives on Cloudflare Workers.
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Cloudflare-only env
         run: |
-          echo "Vercel env pull is disabled."
           echo "Use local .env.local / D:\\medscope.local and: pnpm cf:env:sync"
           echo "Worker: medscopeglobal (wrangler.jsonc)"
+          echo "Site: https://medscopeglobal.com"
           exit 1

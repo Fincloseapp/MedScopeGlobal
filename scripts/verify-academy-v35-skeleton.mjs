@@ -45,7 +45,7 @@ for (const rel of required) {
   }
 }
 
-const cronSources = ["vercel.json", "vercel.json.bak", ".github/workflows/cloudflare-cron.yml"];
+const cronSources = [".github/workflows/cloudflare-cron.yml"];
 const hasCron = cronSources.some((rel) => {
   const abs = path.join(root, rel);
   if (!fs.existsSync(abs)) return false;
@@ -53,7 +53,11 @@ const hasCron = cronSources.some((rel) => {
   return text.includes("/api/cron/academy-daily");
 });
 if (!hasCron) {
-  console.error("✗ academy-daily cron missing (vercel.json / Cloudflare cron workflow)");
+  console.error("✗ academy-daily cron missing (Cloudflare cron workflow)");
+  failed += 1;
+}
+if (fs.existsSync(path.join(root, "vercel.json"))) {
+  console.error("✗ vercel.json must not exist — crons live in Cloudflare workflow");
   failed += 1;
 }
 

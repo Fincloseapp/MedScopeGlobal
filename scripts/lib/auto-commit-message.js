@@ -46,7 +46,7 @@ function classifyChange({ status, path }) {
   if (
     /^scripts\//.test(lower) ||
     /^\.github\//.test(lower) ||
-    /package\.json|pnpm-lock|vercel\.json|\.gitignore|\.cursor\//.test(lower) ||
+    /package\.json|pnpm-lock|wrangler\.jsonc|\.gitignore|\.cursor\//.test(lower) ||
     /deploy|config|workflow|chore|cleanup/i.test(lower)
   ) {
     return { type: "chore", label: basename(path) };

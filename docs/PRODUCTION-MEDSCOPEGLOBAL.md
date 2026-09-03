@@ -69,37 +69,26 @@ Authentication → URL Configuration:
 
 ## 5. Doména (Cloudflare)
 
-Domény jsou přidané ve Vercel. V **Cloudflare DNS** pro `medscopeglobal.com` nastavte:
+DNS a Worker routy jsou v `wrangler.jsonc` (`medscopeglobal.com/*`, `www.medscopeglobal.com/*`).
+Proxy (oranžový mrak) zůstává zapnutá — provoz jde na Cloudflare Workers.
 
-| Typ | Název | Hodnota |
-|-----|--------|---------|
-| A | `@` | `76.76.21.21` |
-| A | `www` | `76.76.21.21` |
-
-(Vypněte proxy „oranžový mrak“ u těchto záznamů, pokud Vercel neověří doménu.)
-
-Dočasně funguje: https://medscopeglobal.vercel.app
+Live: https://medscopeglobal.com
 
 ## 6. Automatické články (cron)
 
-Na Vercel Hobby běží **1× denně** (`0 6 * * *` v `vercel.json`).
+Cron běží přes GitHub Actions `.github/workflows/cloudflare-cron.yml`.
 
-Pro častější ingest (např. každých 6 h) použijte [cron-job.org](https://cron-job.org) na:
+Pro ruční ingest:
 
-`GET https://medscopeglobal.com/api/cron/ingest?secret=CRON_SECRET`
-
-Po deploy ověřte v prohlížeči (nahraďte secret):
-
-`https://medscopeglobal.com/api/cron/ingest?secret=VÁŠ_CRON_SECRET`
+`GET https://medscopeglobal.com/api/cron/ingest` s hlavičkou `Authorization: Bearer CRON_SECRET`
 
 ## 7. Deploy
 
 ```bash
-npm run build
-npx vercel --prod
+pnpm cf:deploy
 ```
 
-Nebo push do Git repozitáře propojeného s Vercel.
+Nebo push do `main` (workflow `cloudflare-deploy.yml`).
 
 ## 8. Kontrola po spuštění
 

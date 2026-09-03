@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { projectPath } from "@/lib/config/paths";
+import { isCloudflareRuntime } from "@/lib/config/runtime";
 import { fetchAllFacultiesLive } from "@/lib/v25/universities-fetch";
 import {
   loadUniversitiesReportAsync,
@@ -8,7 +9,7 @@ import {
 import { mergeV25SystemState, setCronStatus } from "@/lib/v25/system-state";
 
 export async function runUniversitiesFetch() {
-  if (process.env.VERCEL === "1") {
+  if (isCloudflareRuntime()) {
     const previous = await loadUniversitiesReportAsync();
     const report = await fetchAllFacultiesLive(previous);
     const persisted = await persistUniversitiesReport(report);
