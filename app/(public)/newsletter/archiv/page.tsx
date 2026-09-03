@@ -14,7 +14,7 @@ export const revalidate = 3600;
 export default async function NewsletterArchivPage() {
   const locale = await getServerLocale();
   const copy = getNewsletterCopy(locale);
-  const issues = await getNewsletterArchive(false);
+  const issues = await getNewsletterArchive(false, locale);
 
   return (
     <ModulePageShell

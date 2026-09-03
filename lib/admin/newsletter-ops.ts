@@ -1,11 +1,12 @@
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
-import { getNewsletterArchive, getPendingNewsletterTopics } from "@/lib/queries/v4c/newsletters";
+import { getNewsletterArchive, getPendingNewsletterTopics, newsletterRowLocale } from "@/lib/queries/v4c/newsletters";
 import { GLOBAL_LOCALES } from "@/lib/ecosystem/locales";
 import {
   MAGAZINE_EDITORS_PER_LOCALE,
   MAGAZINE_WRITERS_PER_LOCALE,
 } from "@/lib/editorial/locale-magazine-desks";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
+import { newsletterEditionLocales, parseNewsletterIssueSlug } from "@/lib/v23/newsletter/locale-editions";
 
 export type NewsletterLocaleCount = { locale: string; count: number };
 
@@ -29,9 +30,11 @@ export type NewsletterOpsSnapshot = {
     issue_date: string;
     published: boolean;
     admin_only: boolean;
-    locale?: string;
+    locale: string;
   }[];
   latestPublishedSlug: string | null;
+  editionLocales: string[];
+  editionsToday: number;
 };
 
 function plannedLocaleDesks(subMap: Map<string, number> = new Map()): NewsletterLocaleDeskRow[] {
@@ -53,6 +56,8 @@ export async function getNewsletterOpsSnapshot(): Promise<NewsletterOpsSnapshot>
     localeDesks: plannedLocaleDesks(),
     issues: [],
     latestPublishedSlug: null,
+    editionLocales: newsletterEditionLocales(),
+    editionsToday: 0,
   };
 
   const admin = tryCreateServiceRoleClient();
@@ -81,19 +86,24 @@ export async function getNewsletterOpsSnapshot(): Promise<NewsletterOpsSnapshot>
   const published = issues.find((issue) => issue.published && !issue.admin_only);
   const subMap = new Map(byLocale.map((row) => [row.locale, row.count]));
   const localeDesks = plannedLocaleDesks(subMap);
+  const today = new Date().toISOString().slice(0, 10);
+  const editionsToday = issues.filter((issue) => parseNewsletterIssueSlug(issue.slug).issueDate === today).length;
 
   return {
     subscribers: active.length,
     byLocale,
     pendingTopics: topics.length,
     localeDesks,
-    issues: issues.slice(0, 10).map((issue) => ({
+    issues: issues.slice(0, 42).map((issue) => ({
       slug: issue.slug,
       title: issue.title,
       issue_date: issue.issue_date,
       published: issue.published,
       admin_only: issue.admin_only,
+      locale: newsletterRowLocale(issue),
     })),
     latestPublishedSlug: published?.slug ?? null,
+    editionLocales: newsletterEditionLocales(),
+    editionsToday,
   };
 }

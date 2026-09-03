@@ -19,14 +19,15 @@ import { localizePublicHref } from "@/lib/i18n/nav-copy";
 export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const issue = await getV22LatestNewsletter();
+  const locale = await getServerLocale();
+  const issue = await getV22LatestNewsletter(locale);
   return await buildNewsletterPageMetadata(issue, "/newsletter/posledni");
 }
 
 export default async function NewsletterPosledniPage() {
   const locale = await getServerLocale();
   const copy = getNewsletterCopy(locale);
-  const issue = await getV22LatestNewsletter();
+  const issue = await getV22LatestNewsletter(locale);
   const pageTitle = newsletterIssueTitle(issue, locale);
   const description = newsletterIssueDescription(issue, locale);
 

@@ -183,6 +183,15 @@ import {
 import { buildDeskComment, foreignDeskMayComment } from "../../lib/editorial/desk-comments";
 import { getNewsletterCopy } from "../../lib/i18n/newsletter-copy";
 import { looksLikeCzech } from "../../lib/i18n/czech-detect";
+import {
+  NEWSLETTER_PRIMARY_LOCALES,
+  newsletterIssueSlug,
+  parseNewsletterIssueSlug,
+  publicNewsletterSlugCandidates,
+} from "../../lib/v23/newsletter/locale-editions";
+import { magazineCategoriesForLocale } from "../../lib/editorial/magazine-category-copy";
+import { buildLocaleMagazineLayout } from "../../lib/v23/newsletter/locale-layout";
+import type { LocaleMagazineSources } from "../../lib/v23/newsletter/locale-layout";
 import { SYNDICATION_RULES, getSyndicationTargets } from "../../lib/ecosystem/editorial/syndication";
 import { APP_MARKETING_IMAGE, MARKETING_VISUALS } from "../../lib/brand/marketing-visuals";
 import {
@@ -763,6 +772,63 @@ assert.ok(
   readFileSync(join(root, "app/(public)/newsletter/archiv/page.tsx"), "utf8").includes("newsletterHeadline"),
   "archive titles must follow page locale, not stored Czech issue.title"
 );
+assert.ok(
+  readFileSync(join(root, "app/(public)/newsletter/[slug]/page.tsx"), "utf8").includes("getNewsletterForPublic"),
+  "issue page must prefer locale slug then date slug"
+);
+assert.ok(
+  readFileSync(join(root, "lib/v4c/newsletter-generate.ts"), "utf8").includes("publishNewsletterEditions"),
+  "cron must publish one web issue per locale desk"
+);
+assert.ok(
+  !readFileSync(join(root, "app/(admin)/admin/newsletter/page.tsx"), "utf8").includes(
+    "se samo nasadí na všechny jazykové mutace"
+  ),
+  "admin must not claim one Czech issue covers every locale"
+);
+file("lib/v23/newsletter/locale-editions.ts");
+file("lib/v23/newsletter/locale-layout.ts");
+file("lib/editorial/magazine-category-copy.ts");
+assert.equal(newsletterIssueSlug("2026-09-03", "cs"), "2026-09-03");
+assert.equal(newsletterIssueSlug("2026-09-03", "pt-BR"), "2026-09-03-pt-br");
+assert.equal(newsletterIssueSlug("2026-09-03", "zh-CN"), "2026-09-03-cn");
+assert.equal(parseNewsletterIssueSlug("2026-09-03").locale, "cs");
+assert.equal(parseNewsletterIssueSlug("2026-09-03-pt-br").locale, "pt-BR");
+assert.equal(parseNewsletterIssueSlug("2026-09-03-jp").locale, "ja");
+assert.deepEqual(publicNewsletterSlugCandidates("2026-09-03", "de"), ["2026-09-03-de", "2026-09-03"]);
+assert.ok(NEWSLETTER_PRIMARY_LOCALES.includes("pt"));
+assert.ok(NEWSLETTER_PRIMARY_LOCALES.includes("pt-BR"));
+assert.equal(NEWSLETTER_PRIMARY_LOCALES.length, PRIMARY_EDITORIAL_LOCALES.length);
+{
+  const cats = magazineCategoriesForLocale("pt-BR");
+  assert.equal(cats.length, 5);
+  assert.ok(cats.every((cat) => !looksLikeCzech(cat.title) && !looksLikeCzech(cat.intro)));
+  const empty: LocaleMagazineSources = {
+    locale: "pt-BR",
+    studies: [],
+    articles: [],
+    legislation: [],
+    digitalHealth: [],
+    drugs: [],
+    universities: [],
+    pendingTopics: [],
+    byCategory: {
+      "zivotni-styl": [],
+      nemoci: [],
+      prevence: [],
+      rozhovory: [],
+      dlouhovekost: [],
+    },
+  };
+  const layout = buildLocaleMagazineLayout(empty, "2026-09-03", "pt-BR");
+  assert.equal(layout.locale, "pt-BR");
+  assert.equal(layout.sections.length, 5);
+  assert.ok(!looksLikeCzech(layout.intro));
+  assert.ok(layout.sections.every((sec) => !looksLikeCzech(sec.title) && sec.items.length > 0));
+  const deLayout = buildLocaleMagazineLayout({ ...empty, locale: "de" }, "2026-09-03", "de");
+  assert.ok(!looksLikeCzech(deLayout.intro));
+  assert.ok(deLayout.sections.some((sec) => /Lebensstil|Schlaf|Prävention|Langlebigkeit/i.test(sec.title)));
+}
 assert.ok(
   readFileSync(join(root, "app/(admin)/admin/page.tsx"), "utf8").includes("Odběratelé briefu")
 );

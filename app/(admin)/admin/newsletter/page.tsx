@@ -19,8 +19,9 @@ export default async function AdminNewsletterPage() {
         <MedScopeLogo href="/admin/newsletter" width={160} height={40} className="mb-3" imageClassName="max-h-10" />
         <h1 className="font-display text-2xl font-bold text-[#021d33]">Newsletter a ViaLongeVita brief</h1>
         <p className="mt-1 text-sm text-slate-600">
-          Webové vydání se samo nasadí na všechny jazykové mutace. E-mailový brief jde každému odběrateli v jeho
-          jazyce — z aktuálních článků, bez affiliate parametrů v odkazech.
+          Každá jazyková mutace dostane vlastní webové vydání (stejných 5 kategorií magazínu, nativní text).
+          E-mailový brief jde každému odběrateli v jazyce stránky, na které se přihlásil — z aktuálních
+          článků, bez affiliate parametrů v odkazech.
         </p>
       </div>
       <NewsletterOpsStrip ops={ops} />

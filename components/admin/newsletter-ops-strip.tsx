@@ -18,7 +18,11 @@ export function NewsletterOpsStrip({ ops }: { ops: NewsletterOpsSnapshot }) {
           {ops.latestPublishedSlug ? `/${ops.latestPublishedSlug}` : "ještě nevyšlo"}
         </p>
         <p className="mt-1 text-xs text-slate-500">
-          Brief se posílá podle jazyka stránky, na které se čtenář přihlásil.
+          Dnes {ops.editionsToday ?? 0} mutací
+          {(ops.editionLocales ?? []).length
+            ? ` · cron ${ops.editionLocales.length} desků`
+            : ""}
+          . Brief podle jazyka přihlášení.
         </p>
       </article>
       <article className="rounded-2xl border border-slate-200 bg-white p-4">
@@ -29,7 +33,7 @@ export function NewsletterOpsStrip({ ops }: { ops: NewsletterOpsSnapshot }) {
       <article className="rounded-2xl border border-slate-200 bg-white p-4">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#005B96]">Archiv v adminu</p>
         <p className="mt-2 font-display text-3xl font-semibold text-[#021d33]">{ops.issues.length}</p>
-        <p className="mt-1 text-xs text-slate-500">Posledních deset řádků včetně konceptů.</p>
+        <p className="mt-1 text-xs text-slate-500">Poslední vydání včetně všech jazykových mutací.</p>
       </article>
     </section>
   );
@@ -72,6 +76,8 @@ export function NewsletterIssueTable({ ops }: { ops: NewsletterOpsSnapshot }) {
             <thead className="bg-slate-50 text-[11px] uppercase tracking-[0.14em] text-slate-500">
               <tr>
                 <th className="px-4 py-3 font-semibold">Datum</th>
+                <th className="px-4 py-3 font-semibold">Jazyk</th>
+                <th className="px-4 py-3 font-semibold">Slug</th>
                 <th className="px-4 py-3 font-semibold">Titulek</th>
                 <th className="px-4 py-3 font-semibold">Stav</th>
               </tr>
@@ -80,6 +86,8 @@ export function NewsletterIssueTable({ ops }: { ops: NewsletterOpsSnapshot }) {
               {ops.issues.map((issue) => (
                 <tr key={issue.slug} className="border-t border-slate-100">
                   <td className="px-4 py-3 text-slate-600">{issue.issue_date}</td>
+                  <td className="px-4 py-3 text-slate-600">{issue.locale ?? "cs"}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-slate-500">{issue.slug}</td>
                   <td className="px-4 py-3 font-medium text-[#021d33]">{issue.title}</td>
                   <td className="px-4 py-3 text-slate-600">
                     {issue.published && !issue.admin_only ? "veřejné" : "koncept"}

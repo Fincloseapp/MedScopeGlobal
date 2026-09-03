@@ -9,8 +9,12 @@ export function newsletterHeadline(issueDate: string, locale = "cs"): string {
 const LEGACY_TITLE =
   /MedScope\s+Newsletter|MedScope\s+Odborný|MedScopeGlobal\s+Newsletter/i;
 
-export function normalizeNewsletterHeadline(issueDate: string, _existing?: string | null): string {
-  return newsletterHeadline(issueDate);
+export function normalizeNewsletterHeadline(
+  issueDate: string,
+  _existing?: string | null,
+  locale = "cs"
+): string {
+  return newsletterHeadline(issueDate, locale);
 }
 
 export function isLegacyNewsletterTitle(title: string | null | undefined): boolean {

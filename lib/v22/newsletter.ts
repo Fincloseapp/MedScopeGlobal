@@ -1,5 +1,7 @@
+import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { getLatestNewsletter, type NewsletterRow } from "@/lib/queries/v4c/newsletters";
 import { V23_NEWSLETTER_IMAGE } from "@/lib/v23/images";
+import { newsletterHeadline } from "@/lib/v23/newsletter/title";
 
 export const V22_NEWSLETTER_HERO = V23_NEWSLETTER_IMAGE;
 
@@ -32,7 +34,32 @@ export const V22_FALLBACK_NEWSLETTER: NewsletterRow = {
   created_at: new Date().toISOString(),
 };
 
-export async function getV22LatestNewsletter(): Promise<NewsletterRow> {
-  const db = await getLatestNewsletter();
-  return db ?? V22_FALLBACK_NEWSLETTER;
+export function fallbackNewsletterRow(locale = "cs"): NewsletterRow {
+  const copy = getNewsletterCopy(locale);
+  const issueDate = "2026-06-10";
+  const headline = newsletterHeadline(issueDate, locale);
+  return {
+    id: `curated-newsletter-${locale}`,
+    title: headline,
+    slug: "medscope-prehled-cerven-2026",
+    issue_date: issueDate,
+    html_content: `
+    <article>
+      <h2>${copy.hubTitle}</h2>
+      <p>${copy.hubDescription}</p>
+    </article>
+  `,
+    pdf_text: `${headline}\n\n${copy.hubDescription}\n${copy.cta}: medscopeglobal.com/newsletter`,
+    pdf_url: null,
+    layout_json: null,
+    published: true,
+    admin_only: false,
+    created_at: new Date().toISOString(),
+  };
+}
+
+export async function getV22LatestNewsletter(locale?: string): Promise<NewsletterRow> {
+  const db = await getLatestNewsletter(locale);
+  if (db) return db;
+  return locale && locale !== "cs" ? fallbackNewsletterRow(locale) : V22_FALLBACK_NEWSLETTER;
 }

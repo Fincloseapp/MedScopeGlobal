@@ -51,7 +51,10 @@ export function NewsletterAdminPanel({
       const res = await fetch("/api/admin/newsletter/generate", { method: "POST" });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Chyba publikace");
-      setMessage(`Webové vydání je venku: /newsletter/${json.slug} (všechny jazykové prefixy).`);
+      const editionCount = Array.isArray(json.editions) ? json.editions.length : 1;
+      setMessage(
+        `Webová vydání jsou venku: /newsletter/${json.slug} + ${editionCount} jazykových mutací (nativní text, 5 kategorií).`
+      );
       if (json.draft) setDraft(json.draft);
       if (json.sources) setSources(json.sources);
     } catch (e) {

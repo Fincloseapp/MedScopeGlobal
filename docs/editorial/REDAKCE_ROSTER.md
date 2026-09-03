@@ -8,34 +8,34 @@ Exact counts from source of truth in the repo (branch audit). Cross-check:
 
 | Layer | Count | Source |
 |-------|------:|--------|
-| Ecosystem journalists | **9** | `EDITORIAL_PERSONAS` role=`journalist` |
+| Ecosystem journalists | **10** | `EDITORIAL_PERSONAS` role=`journalist` |
 | Ecosystem editors | **8** | role=`editor` |
 | Language reviewers | **6** | role=`language_reviewer` |
 | Compliance reviewers | **3** | role=`compliance_reviewer` |
 | Image curators | **2** | role=`image_curator` |
-| **Ecosystem personas (total)** | **28** | all active |
+| **Ecosystem personas (total)** | **29** | all active |
 | Public writers per locale | **20** | 5 categories × 4 senior specialists, native language |
 | Public writers total | **420** | 21 locales × 20 |
 | v27 audience AI writers | **4** | `V27_AI_WRITERS` (public/student/physician/b2b) |
 | v26 writing-style personas | **7** | `AUTHOR_PERSONAS` (tone styles, not bylines) |
 | Editorial author units | **14** | `EDITORIAL_UNITS` (public bylines) |
 | Desks (all locales) | **21** | `EDITORIAL_DESKS` = `GLOBAL_LOCALES` (incl. pt, pt-BR) |
-| Primary desks (daily enqueue) | **13** | `PRIMARY_EDITORIAL_LOCALES` |
+| Primary desks (daily enqueue) | **15** | `PRIMARY_EDITORIAL_LOCALES` (incl. pt, pt-BR) |
 | Syndication hubs | **3** | cs, en, en-US |
 
 ### How to read “writers”
 
-- **Journalists (9)** — autonomous multi-locale content personas in the ecosystem redakce.
+- **Journalists (10)** — autonomous multi-locale content personas in the ecosystem redakce.
 - **Public writers (20)** — 4 senior specialists per magazine category on `/api/cron/public-articles`.
 - **v27 writers (4)** — audience-scoped AI prompts (not the daily cron roster).
 - Do **not** sum all layers as unique humans; they overlap by role. For “who writes every day”:
-  **20 public writers + 9 ecosystem journalists** (enqueue/persona assignment).
+  **20 public writers + 10 ecosystem journalists** (enqueue/persona assignment).
 
 ---
 
-## Ecosystem personas (28)
+## Ecosystem personas (29)
 
-### Journalists — 9
+### Journalists — 10
 
 | ID | Locales | Topics | Unit |
 |----|---------|--------|------|
@@ -48,6 +48,7 @@ Exact counts from source of truth in the repo (branch audit). Cross-check:
 | `journalist-eu-romance` | fr, es, it, ro, hu, pl | all 4 topics | medscope_international_research |
 | `journalist-east-asia` | zh-CN, ja, ko, vi, id | all 4 topics | medscope_global_health |
 | `journalist-slavic` | ru, uk, be | all 4 topics | medscope_global_health |
+| `journalist-lusophone` | pt, pt-BR | all 4 topics | medscope_international_research |
 
 ### Editors — 8
 
@@ -79,13 +80,13 @@ Exact counts from source of truth in the repo (branch audit). Cross-check:
 |----|---------|------|
 | `compliance-medical-cz` | cs, sk | medscope_clinical_insights |
 | `compliance-medical-en` | en + EU/Asia set | medscope_clinical_insights |
-| `compliance-legal-global` | all 19 locales | medscope_scientific_office |
+| `compliance-legal-global` | all 21 locales | medscope_scientific_office |
 
 ### Image curators — 2
 
 | ID | Locales | Unit |
 |----|---------|------|
-| `image-curator-global` | all 19 | medscope_global_editorial_board |
+| `image-curator-global` | all 21 | medscope_global_editorial_board |
 | `image-curator-cz` | cs, sk | medscope_cz_odborna |
 
 ---
@@ -109,7 +110,7 @@ Each article is reviewed by multiple MedScopeGlobal editors (diplomatic, legal, 
 
 ---
 
-## Desks — 19 total / 13 primary
+## Desks — 21 total / 15 primary
 
 | Desk ID | Locale | Primary | Hub | max/day |
 |---------|--------|:-------:|:---:|--------:|
@@ -120,6 +121,8 @@ Each article is reviewed by multiple MedScopeGlobal editors (diplomatic, legal, 
 | `desk-fr` | fr | ✓ | | 3 |
 | `desk-it` | it | ✓ | | 3 |
 | `desk-es` | es | ✓ | | 3 |
+| `desk-pt` | pt | ✓ | | 3 |
+| `desk-pt-br` | pt-BR | ✓ | | 3 |
 | `desk-ro` | ro | | | 2 |
 | `desk-hu` | hu | | | 2 |
 | `desk-ru` | ru | ✓ | | 3 |
@@ -133,7 +136,7 @@ Each article is reviewed by multiple MedScopeGlobal editors (diplomatic, legal, 
 | `desk-en` | en | ✓ | ✓ | 4 |
 | `desk-en-us` | en-US | ✓ | ✓ | 5 |
 
-Primary list: cs, sk, pl, de, fr, es, it, en, en-US, ru, uk, zh-CN, ja.
+Primary list: cs, sk, pl, de, fr, es, pt, pt-BR, it, en, en-US, ru, uk, zh-CN, ja.
 
 ---
 

@@ -76,7 +76,8 @@ export function renderNewsletterHtml(layout: V23NewsletterLayout, locale = "cs")
 </article>`;
 }
 
-export function renderNewsletterPdfText(layout: V23NewsletterLayout): string {
+export function renderNewsletterPdfText(layout: V23NewsletterLayout, locale = "cs"): string {
+  const copy = getNewsletterCopy(layout.locale ?? locale);
   const lines = [layout.headline, "", layout.intro, ""];
   for (const s of layout.sections) {
     lines.push(`## ${s.title}`, s.intro, "");
@@ -85,6 +86,6 @@ export function renderNewsletterPdfText(layout: V23NewsletterLayout): string {
     }
     lines.push("");
   }
-  lines.push("Přihlášení: https://www.medscopeglobal.com/newsletter");
+  lines.push(`${copy.cta}: https://www.medscopeglobal.com/newsletter`);
   return lines.join("\n");
 }

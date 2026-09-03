@@ -5,7 +5,7 @@ import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { V23NewsletterIssueView } from "@/components/v23/newsletter-issue-view";
 import { medicalWebPageJsonLd } from "@/lib/seo/json-ld";
-import { getNewsletterBySlug } from "@/lib/queries/v4c/newsletters";
+import { getNewsletterForPublic } from "@/lib/queries/v4c/newsletters";
 import {
   buildNewsletterPageMetadata,
   newsletterIssueDescription,
@@ -24,9 +24,9 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const issue = await getNewsletterBySlug(slug);
+  const locale = await getServerLocale();
+  const issue = await getNewsletterForPublic(slug, locale);
   if (!issue) {
-    const locale = await getServerLocale();
     const copy = getNewsletterCopy(locale);
     return await buildLocalizedV20PageMetadata({
       title: copy.hubTitle,
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function NewsletterIssuePage({ params }: Props) {
   const { slug } = await params;
   const locale = await getServerLocale();
-  const issue = await getNewsletterBySlug(slug);
+  const issue = await getNewsletterForPublic(slug, locale);
   if (!issue) notFound();
 
   const copy = getNewsletterCopy(locale);

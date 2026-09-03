@@ -1,3 +1,4 @@
+import { resolveGlobalLocale } from "@/lib/i18n/locale-path";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { generateNewsletterLayoutWithAi } from "@/lib/v23/newsletter/ai";
 import { renderNewsletterHtml, renderNewsletterPdfText } from "@/lib/v23/newsletter/render";
@@ -6,18 +7,23 @@ import type { V23NewsletterLayout } from "@/lib/v23/newsletter/types";
 import { ensureLayoutImages } from "@/lib/v23/newsletter/images";
 import { isJsonLikeText } from "@/lib/v23/newsletter/sanitize";
 import { newsletterHeadline, normalizeNewsletterHeadline } from "@/lib/v23/newsletter/title";
+import {
+  newsletterEditionLocales,
+  newsletterIssueSlug,
+} from "@/lib/v23/newsletter/locale-editions";
+import {
+  buildLocaleMagazineLayout,
+  gatherLocaleMagazineSources,
+} from "@/lib/v23/newsletter/locale-layout";
 
 export type NewsletterGenerateResult = {
   id: string;
   slug: string;
+  locale: string;
   published: boolean;
   layout: V23NewsletterLayout;
   sources: V23NewsletterSources;
 };
-
-function issueSlug(issueDate: string): string {
-  return issueDate;
-}
 
 function isValidLayout(layout: unknown): layout is V23NewsletterLayout {
   if (!layout || typeof layout !== "object") return false;
@@ -78,76 +84,143 @@ async function saveNewsletterRow(opts: {
   return data!.id;
 }
 
-function finalizeLayout(layout: V23NewsletterLayout, issueDate: string): V23NewsletterLayout {
+function finalizeLayout(layout: V23NewsletterLayout, issueDate: string, locale: string): V23NewsletterLayout {
   const withImages = ensureLayoutImages(layout, issueDate);
   return {
     ...withImages,
     version: "v23.2.0",
-    headline: normalizeNewsletterHeadline(issueDate, withImages.headline),
+    locale,
+    headline: normalizeNewsletterHeadline(issueDate, withImages.headline, locale),
   };
 }
 
-async function generateFresh(issueDate: string): Promise<{
+async function generateFresh(
+  issueDate: string,
+  locale: string
+): Promise<{
   layout: V23NewsletterLayout;
   sources: V23NewsletterSources;
   html_content: string;
   pdf_text: string;
 }> {
-  const sources = await gatherNewsletterSources();
-  const raw = await generateNewsletterLayoutWithAi(sources, issueDate);
-  const layout = finalizeLayout(raw, issueDate);
+  const resolved = resolveGlobalLocale(locale);
+
+  if (resolved === "cs") {
+    const sources = await gatherNewsletterSources();
+    const raw = await generateNewsletterLayoutWithAi(sources, issueDate);
+    const layout = finalizeLayout({ ...raw, locale: "cs" }, issueDate, "cs");
+    return {
+      layout,
+      sources,
+      html_content: renderNewsletterHtml(layout, "cs"),
+      pdf_text: renderNewsletterPdfText(layout, "cs"),
+    };
+  }
+
+  const sources = await gatherLocaleMagazineSources(resolved);
+  const raw = buildLocaleMagazineLayout(sources, issueDate, resolved);
+  const layout = finalizeLayout(raw, issueDate, resolved);
   return {
     layout,
     sources,
-    html_content: renderNewsletterHtml(layout),
-    pdf_text: renderNewsletterPdfText(layout),
+    html_content: renderNewsletterHtml(layout, resolved),
+    pdf_text: renderNewsletterPdfText(layout, resolved),
   };
 }
 
-export async function buildNewsletterDraft(): Promise<NewsletterGenerateResult> {
-  const issueDate = new Date().toISOString().slice(0, 10);
-  const slug = issueSlug(issueDate);
-  const { layout, sources, html_content, pdf_text } = await generateFresh(issueDate);
+async function persistEdition(opts: {
+  issueDate: string;
+  locale: string;
+  published: boolean;
+  admin_only: boolean;
+}): Promise<NewsletterGenerateResult> {
+  const locale = resolveGlobalLocale(opts.locale);
+  const slug = newsletterIssueSlug(opts.issueDate, locale);
+  const { layout, sources, html_content, pdf_text } = await generateFresh(opts.issueDate, locale);
 
   const id = await saveNewsletterRow({
     slug,
-    issueDate,
-    title: newsletterHeadline(issueDate),
+    issueDate: opts.issueDate,
+    title: newsletterHeadline(opts.issueDate, locale),
     html_content,
     pdf_text,
     layout,
+    published: opts.published,
+    admin_only: opts.admin_only,
+  });
+
+  return { id, slug, locale, published: opts.published, layout, sources };
+}
+
+function todayIssueDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+export async function buildNewsletterDraft(locale = "cs"): Promise<NewsletterGenerateResult> {
+  return persistEdition({
+    issueDate: todayIssueDate(),
+    locale,
     published: false,
     admin_only: true,
   });
-
-  return { id, slug, published: false, layout, sources };
 }
 
-export async function publishNewsletterIssue(): Promise<NewsletterGenerateResult> {
-  const issueDate = new Date().toISOString().slice(0, 10);
-  const slug = issueSlug(issueDate);
-  const { layout, sources, html_content, pdf_text } = await generateFresh(issueDate);
-
-  const id = await saveNewsletterRow({
-    slug,
-    issueDate,
-    title: newsletterHeadline(issueDate),
-    html_content,
-    pdf_text,
-    layout,
+/** Czech web issue — kept for callers that still pass a single slug. */
+export async function publishNewsletterIssue(locale = "cs"): Promise<NewsletterGenerateResult> {
+  const result = await persistEdition({
+    issueDate: todayIssueDate(),
+    locale,
     published: true,
     admin_only: false,
   });
+  if (resolveGlobalLocale(locale) === "cs") {
+    await markTopicsIncorporated();
+  }
+  return result;
+}
 
-  await markTopicsIncorporated();
+export async function publishNewsletterEditions(options?: {
+  locales?: string[];
+  published?: boolean;
+}): Promise<{
+  editions: NewsletterGenerateResult[];
+  primary: NewsletterGenerateResult;
+}> {
+  const issueDate = todayIssueDate();
+  const locales = options?.locales ?? newsletterEditionLocales();
+  const published = options?.published ?? true;
+  const editions: NewsletterGenerateResult[] = [];
 
-  return { id, slug, published: true, layout, sources };
+  const ordered = [
+    ...locales.filter((item) => resolveGlobalLocale(item) === "cs"),
+    ...locales.filter((item) => resolveGlobalLocale(item) !== "cs"),
+  ];
+
+  for (const locale of ordered) {
+    const result = await persistEdition({
+      issueDate,
+      locale,
+      published,
+      admin_only: !published,
+    });
+    editions.push(result);
+  }
+
+  if (published && ordered.some((item) => resolveGlobalLocale(item) === "cs")) {
+    await markTopicsIncorporated();
+  }
+
+  const primary = editions.find((item) => item.locale === "cs") ?? editions[0];
+  if (!primary) {
+    throw new Error("newsletter_editions_empty");
+  }
+  return { editions, primary };
 }
 
 export async function getNewsletterDraftPreview(): Promise<NewsletterGenerateResult | null> {
   const admin = createServiceRoleClient();
-  const issueDate = new Date().toISOString().slice(0, 10);
-  const slug = issueSlug(issueDate);
+  const issueDate = todayIssueDate();
+  const slug = newsletterIssueSlug(issueDate, "cs");
 
   const { data } = await admin.from("newsletters").select("*").eq("slug", slug).maybeSingle();
 
@@ -158,6 +231,7 @@ export async function getNewsletterDraftPreview(): Promise<NewsletterGenerateRes
   return {
     id: data.id,
     slug: data.slug,
+    locale: "cs",
     published: data.published,
     layout: data.layout_json,
     sources,
