@@ -1243,6 +1243,14 @@ assert.ok(
   "Google News publication name must be ViaLongeVita"
 );
 assert.ok(
+  readFileSync(join(root, "lib/seo/news-sitemap.ts"), "utf8").includes("NEWS_SITEMAP_URL_CAP"),
+  "Google News sitemap must stay under the 1000-URL cap"
+);
+assert.ok(
+  readFileSync(join(root, "lib/seo/news-sitemap.ts"), "utf8").includes('.lte("published_at"'),
+  "Google News sitemap must drop future publication dates"
+);
+assert.ok(
   readFileSync(join(root, "app/robots.ts"), "utf8").includes("newsSitemapUrl()"),
   "robots must list the Google News sitemap"
 );
