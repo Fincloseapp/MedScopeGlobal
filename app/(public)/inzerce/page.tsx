@@ -8,8 +8,9 @@ import { getServerLocale } from "@/lib/i18n/server-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getServerLocale();
+  const copy = getRevenueCopy(locale);
   return {
-    title: "Inzerce a reklama",
+    title: copy.mediaKitTitle,
     description: localizeListedCzk(
       "Native banner od 5 000 Kč, sponzorovaný článek od 15 000 Kč — ViaLongeVita longevity audience.",
       locale
@@ -17,24 +18,24 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-function adOffers(locale: string) {
+function adOffers(copy: ReturnType<typeof getRevenueCopy>) {
   return [
     {
-      title: "Native banner",
-      description: localizeListedCzk("Homepage a články — 5 000 Kč / měsíc.", locale),
+      title: copy.bannerName,
+      description: copy.bannerOfferDesc,
       href: "/inzerce/formular",
     },
     {
-      title: "Sponzorovaný článek",
-      description: localizeListedCzk("Označený partnerský text — 15 000 Kč.", locale),
+      title: copy.sponsoredName,
+      description: copy.sponsoredOfferDesc,
       href: "/inzerce/formular",
     },
     {
-      title: "Newsletter",
-      description: localizeListedCzk("Mention v týdenním briefu — od 3 500 Kč.", locale),
+      title: copy.newsletterName,
+      description: copy.newsletterOfferDesc,
       href: "/inzerce/formular",
     },
-    { title: "Ceník", description: "Kompletní sazebník bannerů a balíčků.", href: "/inzerce/cenik" },
+    { title: copy.priceListName, description: copy.priceListDesc, href: "/inzerce/cenik" },
   ];
 }
 
@@ -70,13 +71,13 @@ export default async function InzercePage() {
         </div>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {adOffers(locale).map((o) => (
+        {adOffers(copy).map((o) => (
           <FeatureCard key={o.title} title={o.title} description={o.description} href={o.href} />
         ))}
       </div>
       <p className="mt-8 text-sm text-slate-600">
         <Link href="/inzerce/cenik" className="font-semibold text-[#005B96] hover:underline">
-          Kompletní ceník →
+          {copy.priceListCta} →
         </Link>
         {" · "}
         <Link href="/inzerce/formular" className="font-semibold text-[#005B96] hover:underline">

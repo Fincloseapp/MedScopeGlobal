@@ -49,6 +49,12 @@ export type RevenueCopy = {
   bannerName: string;
   sponsoredName: string;
   newsletterName: string;
+  bannerOfferDesc: string;
+  sponsoredOfferDesc: string;
+  newsletterOfferDesc: string;
+  priceListName: string;
+  priceListDesc: string;
+  priceListCta: string;
 };
 
 const COPY: Record<Pack, RevenueCopy> = {
@@ -93,6 +99,12 @@ const COPY: Record<Pack, RevenueCopy> = {
     bannerName: "Native banner",
     sponsoredName: "Sponzorovaný článek",
     newsletterName: "Mention v newsletteru",
+    bannerOfferDesc: "Homepage a články — 5 000 Kč / měsíc.",
+    sponsoredOfferDesc: "Označený partnerský text — 15 000 Kč.",
+    newsletterOfferDesc: "Mention v týdenním briefu — od 3 500 Kč.",
+    priceListName: "Ceník",
+    priceListDesc: "Kompletní sazebník bannerů a balíčků.",
+    priceListCta: "Kompletní ceník",
   },
   de: {
     partnerKicker: "Werbung",
@@ -135,6 +147,12 @@ const COPY: Record<Pack, RevenueCopy> = {
     bannerName: "Native Banner",
     sponsoredName: "Gesponserter Artikel",
     newsletterName: "Newsletter-Mention",
+    bannerOfferDesc: "Startseite und Artikel — 5 000 Kč / Monat.",
+    sponsoredOfferDesc: "Gekennzeichneter Partnertext — 15 000 Kč.",
+    newsletterOfferDesc: "Erwähnung im Wochenbrief — ab 3 500 Kč.",
+    priceListName: "Preisliste",
+    priceListDesc: "Vollständige Sätze für Banner und Pakete.",
+    priceListCta: "Vollständige Preisliste",
   },
   fr: {
     partnerKicker: "Publicité",
@@ -177,6 +195,12 @@ const COPY: Record<Pack, RevenueCopy> = {
     bannerName: "Bannière native",
     sponsoredName: "Article sponsorisé",
     newsletterName: "Mention newsletter",
+    bannerOfferDesc: "Accueil et articles — 5 000 Kč / mois.",
+    sponsoredOfferDesc: "Texte partenaire signalé — 15 000 Kč.",
+    newsletterOfferDesc: "Mention dans le brief hebdomadaire — dès 3 500 Kč.",
+    priceListName: "Tarifs",
+    priceListDesc: "Grille complète des bannières et packs.",
+    priceListCta: "Grille tarifaire",
   },
   en: {
     partnerKicker: "Advertising",
@@ -219,6 +243,12 @@ const COPY: Record<Pack, RevenueCopy> = {
     bannerName: "Native banner",
     sponsoredName: "Sponsored article",
     newsletterName: "Newsletter mention",
+    bannerOfferDesc: "Homepage and articles — 5 000 Kč / month.",
+    sponsoredOfferDesc: "Labelled partner piece — 15 000 Kč.",
+    newsletterOfferDesc: "Mention in the weekly brief — from 3 500 Kč.",
+    priceListName: "Rate card",
+    priceListDesc: "Full banner and package rates.",
+    priceListCta: "Full rate card",
   },
 };
 

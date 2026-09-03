@@ -829,6 +829,14 @@ assert.ok(
   "media kit must not invent daily uniques"
 );
 assert.ok(
+  readFileSync(join(root, "app/(public)/inzerce/page.tsx"), "utf8").includes("bannerOfferDesc"),
+  "advertising offers must follow the request locale"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/pro-firmy/page.tsx"), "utf8").includes("getB2BLandingCopy"),
+  "B2B landing chrome must not stay Czech on /de"
+);
+assert.ok(
   !readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes("surface.stats"),
   "homepage must not show invented social-proof counts"
 );
