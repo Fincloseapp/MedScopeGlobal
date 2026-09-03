@@ -12,24 +12,24 @@ import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { applyNewsletterSubscriberSchema } from "@/lib/monetization/apply-schema";
 import { affiliateGoPath } from "@/lib/monetization/affiliate-geo";
 import { pickAffiliateProducts } from "@/lib/monetization/affiliate-mix";
-import type { AffiliateProduct } from "@/lib/ecosystem/monetization";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
-import { composeBriefLead, composeBriefSubject } from "@/lib/monetization/brief-marketing";
-import { looksLikeCzech } from "@/lib/i18n/czech-detect";
 import { getDefaultFromEmail } from "@/lib/email/from";
 import { isCloudflareEmailConfigured } from "@/lib/email/cloudflare-sending";
+import { looksLikeCzech } from "@/lib/i18n/czech-detect";
+import {
+  affiliateRowHtml,
+  briefInnerHtml,
+  emailShell,
+  welcomeInnerHtml,
+  type BriefArticle,
+} from "@/lib/monetization/brief-email-layout";
+import { briefChrome } from "@/lib/monetization/brief-marketing";
+
+export type { BriefArticle };
 
 const FROM_NAME = MAGAZINE.name;
 const WEEK_MS = 6 * 24 * 60 * 60 * 1000;
 const BATCH_CAP = 80;
-
-export type BriefArticle = {
-  slug: string;
-  title: string;
-  excerpt: string | null;
-  locale: string | null;
-  public_topic: string | null;
-};
 
 export type BriefSendResult = {
   ok: boolean;
@@ -85,14 +85,6 @@ export function newsletterUnsubUrl(email: string, locale: string): string {
   return `${SITE.url}/api/newsletter/unsubscribe?${params.toString()}`;
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
 function magazineHome(locale: string): string {
   return `${SITE.url}${buildLocalePath(locale, "/")}`;
 }
@@ -131,61 +123,31 @@ function pillarBriefArticles(locale: string): BriefArticle[] {
   ];
 }
 
-function productLabel(product: AffiliateProduct, locale: string): { name: string; description: string } {
-  const primary = primaryArticleLocale(normalizeLocale(locale));
-  const name =
-    product.name[locale] ?? product.name[primary] ?? product.name.en ?? product.name.cs ?? product.id;
-  const description =
-    product.description[locale] ??
-    product.description[primary] ??
-    product.description.en ??
-    product.description.cs ??
-    "";
-  return { name, description };
+function pickBriefProducts(articles: BriefArticle[], locale: string) {
+  return pickAffiliateProducts({
+    surface: "newsletter",
+    locale,
+    article: {
+      title: articles.map((a) => a.title).join(" "),
+      excerpt: articles.map((a) => a.excerpt ?? "").join(" "),
+      slug: articles.map((a) => a.slug).join(" "),
+      public_topic: articles.map((a) => a.public_topic ?? "").join(" "),
+    },
+  }).slice(0, 2);
 }
 
-function productImageUrl(product: AffiliateProduct): string {
-  if (product.imageUrl.startsWith("http")) return product.imageUrl;
-  return `${SITE.url}${product.imageUrl}`;
-}
-
-function affiliateCardHtml(product: AffiliateProduct, locale: string, cta: string): string {
-  const label = productLabel(product, locale);
-  const go = `${SITE.url}${affiliateGoPath(product.id, locale, { carryLocale: true })}`;
-  const image = productImageUrl(product);
-  return `<td style="width:33%;padding:0 6px 8px;vertical-align:top;">
-    <a href="${escapeHtml(go)}" style="display:block;text-decoration:none;color:#021d33;">
-      <img src="${escapeHtml(image)}" alt="" width="160" height="200" style="display:block;width:100%;height:auto;border-radius:12px;border:1px solid #cfe1f3;background:#e8f3fb;" />
-      <p style="margin:10px 0 4px;font-size:14px;font-weight:600;line-height:1.3;">${escapeHtml(label.name)}</p>
-      <p style="margin:0 0 8px;font-size:12px;line-height:1.4;color:#475569;">${escapeHtml(label.description)}</p>
-      <span style="font-size:12px;color:#005B96;">${escapeHtml(cta)} →</span>
-    </a>
-  </td>`;
-}
-
-function emailShell(locale: string, inner: string): { html: string; text: string } {
-  const copy = getNewsletterCopy(locale);
-  const html = `<!doctype html>
-<html lang="${escapeHtml(locale)}">
-<body style="margin:0;background:#f4f7fb;font-family:Georgia,serif;color:#021d33;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f7fb;padding:24px 12px;">
-    <tr><td align="center">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #cfe1f3;">
-        <tr><td style="background:#021d33;padding:20px 28px;">
-          <p style="margin:0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#9ec9ea;">${escapeHtml(copy.kicker)}</p>
-          <p style="margin:6px 0 0;font-size:22px;color:#ffffff;">${escapeHtml(MAGAZINE.name)}</p>
-        </td></tr>
-        <tr><td style="padding:28px;">${inner}</td></tr>
-        <tr><td style="padding:0 28px 24px;font-size:12px;line-height:1.6;color:#64748b;">
-          <p style="margin:0;">${escapeHtml(copy.footer)}</p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
-  const text = inner.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-  return { html, text };
+function briefHtml(locale: string, email: string, articles: BriefArticle[]): { subject: string; html: string; text: string } {
+  const products = pickBriefProducts(articles, locale);
+  const affiliateHtml = affiliateRowHtml(products, locale, (product) =>
+    `${SITE.url}${affiliateGoPath(product.id, locale, { carryLocale: true })}`
+  );
+  return briefInnerHtml({
+    locale,
+    emailUnsub: newsletterUnsubUrl(email, locale),
+    articles,
+    articleHref: (slug) => articleHref(locale, slug),
+    affiliateHtml,
+  });
 }
 
 export async function sendViaLongeVitaWelcome(input: {
@@ -195,31 +157,18 @@ export async function sendViaLongeVitaWelcome(input: {
   if (!mailReady()) return false;
   if (skipAddress(input.email)) return false;
   const copy = getNewsletterCopy(input.locale);
-  const home = magazineHome(input.locale);
-  const unsub = newsletterUnsubUrl(input.email, input.locale);
-  const welcomeProducts = pickAffiliateProducts({
-    surface: "newsletter",
+  const chrome = briefChrome(input.locale);
+  const inner = welcomeInnerHtml({
     locale: input.locale,
-  }).slice(0, 2);
-  const welcomeCards = welcomeProducts
-    .map((product) => affiliateCardHtml(product, input.locale, copy.briefAffiliateCta))
-    .join("");
-  const inner = `
-    <p style="margin:0 0 12px;font-size:18px;">${escapeHtml(copy.welcomeIntro)}</p>
-    <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#334155;">${escapeHtml(copy.welcomeBody)}</p>
-    <p style="margin:0 0 24px;">
-      <a href="${escapeHtml(home)}" style="display:inline-block;background:#005B96;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:999px;font-size:14px;">${escapeHtml(copy.welcomeCta)}</a>
-    </p>
-    ${
-      welcomeCards
-        ? `<p style="margin:0 0 8px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#005B96;">${escapeHtml(copy.briefAffiliateKicker)}</p>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px;"><tr>${welcomeCards}</tr></table>`
-        : ""
-    }
-    <p style="margin:0;font-size:12px;color:#64748b;">
-      <a href="${escapeHtml(unsub)}" style="color:#64748b;">${escapeHtml(copy.unsub)}</a>
-    </p>`;
-  const { html, text } = emailShell(input.locale, inner);
+    home: magazineHome(input.locale),
+    unsub: newsletterUnsubUrl(input.email, input.locale),
+  });
+  const { html, text } = emailShell({
+    locale: input.locale,
+    inner,
+    preheader: chrome.welcomeExpect,
+    kicker: chrome.welcomeKicker,
+  });
   const result = await sendEmail({
     to: input.email,
     subject: copy.welcomeSubject,
@@ -280,52 +229,6 @@ export async function sendViaLongeVitaFirstBrief(input: {
       .is("unsubscribed_at", null);
   }
   return { ok: true, usedFallback };
-}
-
-function pickBriefProducts(articles: BriefArticle[], locale: string) {
-  return pickAffiliateProducts({
-    surface: "newsletter",
-    locale,
-    article: {
-      title: articles.map((a) => a.title).join(" "),
-      excerpt: articles.map((a) => a.excerpt ?? "").join(" "),
-      slug: articles.map((a) => a.slug).join(" "),
-      public_topic: articles.map((a) => a.public_topic ?? "").join(" "),
-    },
-  });
-}
-
-function briefHtml(locale: string, email: string, articles: BriefArticle[]): { subject: string; html: string; text: string } {
-  const copy = getNewsletterCopy(locale);
-  const products = pickBriefProducts(articles, locale);
-  const cards = products.map((product) => affiliateCardHtml(product, locale, copy.briefAffiliateCta)).join("");
-  const unsub = newsletterUnsubUrl(email, locale);
-  const titles = articles.map((article) => article.title);
-  const lead = composeBriefLead(locale, titles);
-
-  const items = articles
-    .map((article) => {
-      const href = articleHref(locale, article.slug);
-      const excerpt = article.excerpt ? `<p style="margin:6px 0 0;font-size:14px;color:#475569;">${escapeHtml(article.excerpt)}</p>` : "";
-      return `<tr><td style="padding:0 0 16px;">
-        <a href="${escapeHtml(href)}" style="color:#005B96;font-size:16px;text-decoration:none;font-weight:600;">${escapeHtml(article.title)}</a>
-        ${excerpt}
-      </td></tr>`;
-    })
-    .join("");
-
-  const inner = `
-    <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">${escapeHtml(lead)}</p>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${items}</table>
-    <div style="margin:8px 0 20px;padding:16px;border:1px solid #cfe1f3;background:#f4f8fc;border-radius:12px;">
-      <p style="margin:0 0 10px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#005B96;">${escapeHtml(copy.briefAffiliateKicker)}</p>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${cards}</tr></table>
-    </div>
-    <p style="margin:0;font-size:12px;color:#64748b;">
-      <a href="${escapeHtml(unsub)}" style="color:#64748b;">${escapeHtml(copy.unsub)}</a>
-    </p>`;
-  const { html, text } = emailShell(locale, inner);
-  return { subject: composeBriefSubject(locale, titles), html, text };
 }
 
 async function loadBriefArticles(locale: string): Promise<BriefArticle[]> {

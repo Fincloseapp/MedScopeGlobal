@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { verifyCronRequest } from "@/lib/v6/cron-auth";
-import { sendViaLongeVitaWeeklyBrief } from "@/lib/monetization/vialongevita-brief";
+import {
+  sendViaLongeVitaFirstBrief,
+  sendViaLongeVitaWeeklyBrief,
+  sendViaLongeVitaWelcome,
+} from "@/lib/monetization/vialongevita-brief";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
@@ -43,8 +47,23 @@ async function handle(request: Request) {
   const url = new URL(request.url);
   const dryRun = url.searchParams.get("dryRun") === "1";
   const force = url.searchParams.get("force") === "1";
+  const kind = url.searchParams.get("kind") ?? "weekly";
+  const email = url.searchParams.get("email")?.trim();
+  const locale = url.searchParams.get("locale")?.trim() || "cs";
 
   try {
+    if (email && kind === "welcome") {
+      const ok = await sendViaLongeVitaWelcome({ email, locale });
+      return NextResponse.json({ ok, kind: "welcome", sentTo: email }, { status: ok ? 200 : 500 });
+    }
+    if (email && (kind === "brief" || kind === "test")) {
+      const result = await sendViaLongeVitaFirstBrief({ email, locale, force: true });
+      return NextResponse.json(
+        { ok: result.ok, kind: "brief", sentTo: email, error: result.error },
+        { status: result.ok ? 200 : 500 }
+      );
+    }
+
     const outcome = await sendViaLongeVitaWeeklyBrief({ dryRun, force });
     return NextResponse.json(outcome, { status: outcome.ok ? 200 : 500 });
   } catch (err) {

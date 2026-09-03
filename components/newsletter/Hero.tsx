@@ -1,4 +1,5 @@
-import { MedScopeLogo } from "@/components/brand/medscope-logo";
+import Image from "next/image";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { MAGAZINE } from "@/lib/brand/magazine";
 
@@ -14,7 +15,18 @@ type Props = {
 };
 
 /** ViaLongeVita magazine brief hero */
-export function NewsletterHero({ title, subhead, href = "", tagline, className, priority = true }: Props) {
+export function NewsletterHero({ title, subhead, href = "/", tagline, className, priority = true }: Props) {
+  const lockup = (
+    <Image
+      src={MAGAZINE.emailLockup}
+      alt={MAGAZINE.name}
+      width={1200}
+      height={340}
+      priority={priority}
+      className="h-auto w-full max-w-[520px] object-contain"
+    />
+  );
+
   return (
     <header
       className={cn(
@@ -23,7 +35,13 @@ export function NewsletterHero({ title, subhead, href = "", tagline, className, 
       )}
     >
       <div className="newsletter-hero-logo mb-6 flex justify-center sm:mb-7">
-        <MedScopeLogo href={href} preset="newsletter-hero" priority={priority} />
+        {href ? (
+          <Link href={href} className="inline-block">
+            {lockup}
+          </Link>
+        ) : (
+          lockup
+        )}
       </div>
 
       <p className="mb-5 text-[15px] font-light tracking-[0.35px] opacity-80 sm:mb-6">
@@ -46,16 +64,32 @@ export function NewsletterHero({ title, subhead, href = "", tagline, className, 
 /** Logo-only block (legacy / compact embeds) */
 export function NewsletterHeroLogo({
   className,
-  href = "",
+  href = "/",
   priority = true,
 }: {
   className?: string;
   href?: string;
   priority?: boolean;
 }) {
+  const lockup = (
+    <Image
+      src={MAGAZINE.emailLockup}
+      alt={MAGAZINE.name}
+      width={1200}
+      height={340}
+      priority={priority}
+      className="h-auto w-full max-w-[360px] object-contain"
+    />
+  );
   return (
     <div className={cn("newsletter-hero-logo mb-6 flex justify-center sm:mb-7", className)}>
-      <MedScopeLogo href={href} preset="newsletter-hero" priority={priority} />
+      {href ? (
+        <Link href={href} className="inline-block">
+          {lockup}
+        </Link>
+      ) : (
+        lockup
+      )}
     </div>
   );
 }

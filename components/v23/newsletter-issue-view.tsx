@@ -21,6 +21,7 @@ import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { looksLikeCzech } from "@/lib/i18n/czech-detect";
+import { MAGAZINE } from "@/lib/brand/magazine";
 
 function resolveItemImage(
   sectionId: string,
@@ -190,8 +191,9 @@ export function V23NewsletterIssueView({
         <div className="absolute inset-0 bg-gradient-to-b from-[#021d33]/80 via-[#021d33]/88 to-[#021d33]/95" />
         <div className="relative flex min-h-[360px] items-center justify-center sm:min-h-[400px]">
           <NewsletterHero
-            title={layout?.headline ?? `MedScopeGlobal Newsletter — ${dateLabel}`}
+            title={layout?.headline ?? `${MAGAZINE.name} · ${dateLabel}`}
             subhead={subhead}
+            href={localizePublicHref("/", locale)}
             className="w-full text-white"
           />
         </div>
@@ -274,7 +276,7 @@ export function V23NewsletterIssueView({
         </div>
 
         <div className="mt-10 flex flex-col items-center border-t border-slate-100 pt-8">
-          <NewsletterFooterLogo href={localizePublicHref("/", locale)} />
+          <NewsletterFooterLogo href={localizePublicHref("/", locale)} caption={copy.footer} />
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Button asChild variant="outline" className="rounded-full">
               <Link href={localizePublicHref("/newsletter/archiv", locale)}>{copy.hubArchive}</Link>

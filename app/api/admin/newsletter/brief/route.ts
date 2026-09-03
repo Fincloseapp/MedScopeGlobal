@@ -4,6 +4,7 @@ import { SITE } from "@/lib/config/site";
 import {
   sendViaLongeVitaTestBrief,
   sendViaLongeVitaWeeklyBrief,
+  sendViaLongeVitaWelcome,
 } from "@/lib/monetization/vialongevita-brief";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +23,18 @@ export async function POST(request: Request) {
   const action = body.action ?? "dryRun";
 
   try {
+    if (action === "welcome") {
+      const email = (body.email ?? SITE.adminNotifyEmail).trim();
+      const ok = await sendViaLongeVitaWelcome({
+        email,
+        locale: body.locale ?? "cs",
+      });
+      if (!ok) {
+        return NextResponse.json({ ok: false, error: "welcome_failed" }, { status: 500 });
+      }
+      return NextResponse.json({ ok: true, sentTo: email, kind: "welcome" });
+    }
+
     if (action === "test") {
       const email = (body.email ?? SITE.adminNotifyEmail).trim();
       const result = await sendViaLongeVitaTestBrief({
@@ -31,7 +44,15 @@ export async function POST(request: Request) {
       if (!result.ok) {
         return NextResponse.json({ ok: false, error: result.error }, { status: 500 });
       }
-      return NextResponse.json({ ok: true, sentTo: email });
+      return NextResponse.json({ ok: true, sentTo: email, kind: "test" });
+    }
+
+    if (action === "send") {
+      const outcome = await sendViaLongeVitaWeeklyBrief({
+        dryRun: false,
+        force: true,
+      });
+      return NextResponse.json(outcome, { status: outcome.ok ? 200 : 500 });
     }
 
     const outcome = await sendViaLongeVitaWeeklyBrief({ dryRun: true });

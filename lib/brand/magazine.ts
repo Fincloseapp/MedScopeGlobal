@@ -58,6 +58,8 @@ export const MAGAZINE = {
   /** Global publication brand (EN-primary, used as proper noun in all locales) */
   name: "ViaLongeVita",
   slug: "vialongevita",
+  /** Email / web masthead lockup (navy JPEG, ~1200×340) */
+  emailLockup: "/assets/magazine/vialongevita-email-lockup.jpg",
   /** Previous magazine name — keep in SEO aliases and legacy URLs */
   formerName: "VitaScope",
   /** Platform that hosts the magazine and apps */

@@ -64,7 +64,7 @@ export function NewsletterAdminPanel({
     }
   }, []);
 
-  const runBrief = useCallback(async (action: "dryRun" | "test") => {
+  const runBrief = useCallback(async (action: "dryRun" | "test" | "welcome") => {
     setLoading("brief");
     setMessage(null);
     try {
@@ -75,6 +75,10 @@ export function NewsletterAdminPanel({
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Chyba briefu");
+      if (action === "welcome") {
+        setMessage(`Uvítání odesláno na ${json.sentTo ?? "admin e-mail"}.`);
+        return;
+      }
       if (action === "test") {
         setMessage(`Zkušební brief odeslán na ${json.sentTo ?? "admin e-mail"}.`);
         return;
@@ -170,6 +174,15 @@ export function NewsletterAdminPanel({
               className="rounded-full"
             >
               Zkušební brief na admin e-mail
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void runBrief("welcome")}
+              disabled={loading !== null}
+              className="rounded-full"
+            >
+              Uvítání na admin e-mail
             </Button>
           </div>
 

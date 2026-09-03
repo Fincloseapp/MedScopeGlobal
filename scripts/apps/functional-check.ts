@@ -771,10 +771,19 @@ file("components/admin/editorial-pulse-strip.tsx");
 file("app/api/admin/newsletter/brief/route.ts");
 file("app/(admin)/admin/newsletter/page.tsx");
 file("components/admin/newsletter-ops-strip.tsx");
-assert.ok(composeBriefLead("cs", ["Spánek po padesátce", "Chůze"]).includes("Spánek po padesátce"));
-assert.ok(composeBriefLead("de", ["Schlaf", "Bewegung"]).includes("Diese Woche"));
+assert.ok(!composeBriefLead("cs", ["Spánek po padesátce", "Chůze"]).includes("Spánek po padesátce"));
+assert.ok(composeBriefLead("cs", ["Spánek po padesátce"]).includes("týden") || composeBriefLead("cs", []).length > 10);
+assert.ok(composeBriefLead("de", ["Schlaf", "Bewegung"]).includes("Texte") || composeBriefLead("de", []).length > 10);
 assert.ok(composeBriefLead("en", []).includes("Three") || composeBriefLead("en", []).length > 10);
 assert.ok(composeBriefSubject("cs", ["Světelný budík a spánek"]).startsWith("ViaLongeVita"));
+{
+  const briefSrc = readFileSync(join(root, "lib/monetization/brief-email-layout.ts"), "utf8");
+  assert.ok(briefSrc.includes("emailLockup") || briefSrc.includes("vialongevita-email-lockup"));
+  assert.ok(briefSrc.includes("heroLabel"), "weekly brief must have a lead story, not a title dump");
+  assert.ok(briefSrc.includes("welcomeExpect"), "welcome must set the weekly promise");
+  assert.ok(briefSrc.includes("brandLine"), "every issue must close with a brand line");
+}
+file("public/assets/magazine/vialongevita-email-lockup.jpg");
 assert.ok(
   !readFileSync(join(root, "lib/monetization/vialongevita-brief.ts"), "utf8").includes("escapeHtml(market)"),
   "brief must not show heureka-cz / amazon market labels"

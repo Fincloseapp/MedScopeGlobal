@@ -1,9 +1,10 @@
+import { MAGAZINE } from "@/lib/brand/magazine";
 import { formatPublicDate } from "@/lib/i18n/format-date";
 
 /** Public issue title — date follows the page locale, never forced Czech. */
 export function newsletterHeadline(issueDate: string, locale = "cs"): string {
   const date = formatPublicDate(issueDate, locale) ?? issueDate;
-  return `MedScopeGlobal Newsletter — ${date}`;
+  return `${MAGAZINE.name} · ${date}`;
 }
 
 const LEGACY_TITLE =
@@ -19,6 +20,6 @@ export function normalizeNewsletterHeadline(
 
 export function isLegacyNewsletterTitle(title: string | null | undefined): boolean {
   if (!title?.trim()) return true;
-  if (title.includes("MedScopeGlobal Newsletter")) return false;
-  return LEGACY_TITLE.test(title) || !title.includes("MedScopeGlobal");
+  if (title.includes(MAGAZINE.name)) return false;
+  return LEGACY_TITLE.test(title) || title.includes("MedScopeGlobal");
 }

@@ -1,4 +1,4 @@
-import { MEDSCOPE_LOGO } from "@/lib/brand/logo";
+import { MAGAZINE } from "@/lib/brand/magazine";
 import { SITE } from "@/lib/config/site";
 import { pickAffiliateProducts } from "@/lib/monetization/affiliate-mix";
 import { affiliateGoPath } from "@/lib/monetization/affiliate-geo";
@@ -61,7 +61,7 @@ export function renderNewsletterHtml(layout: V23NewsletterLayout, locale = "cs")
 
   return `
 <article class="v23-newsletter-html">
-  <header class="nl-brand"><img src="${MEDSCOPE_LOGO.print}" alt="MedScopeGlobal" width="180" height="44" /></header>
+  <header class="nl-brand"><img src="${SITE.url}${MAGAZINE.emailLockup}" alt="${MAGAZINE.name}" width="480" height="320" /></header>
   <p class="nl-lead">${escapeHtml(layout.intro)}</p>
   ${sectionsHtml}
   <section class="nl-section nl-cta">
