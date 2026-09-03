@@ -355,6 +355,14 @@ absent(
   ".github/workflows/vercel-auto-deploy.yml",
   "Vercel GitHub workflows must be removed"
 );
+absent(".github/workflows/deploy-v17.yml", "V17 Vercel workflow must be removed");
+absent(".github/workflows/deploy-v18.yml", "V18 Vercel workflow must be removed");
+file(".github/workflows/cloudflare-deploy.yml");
+{
+  const v18 = readFileSync(join(root, "scripts/verify-v18.mjs"), "utf8");
+  assert.ok(v18.includes("cloudflare-deploy.yml"), "v18 verify must require Cloudflare deploy workflow");
+  assert.ok(!v18.includes("deploy-v18.yml"), "v18 verify must not require the deleted Vercel workflow");
+}
 absent("scripts/run-vercel-build.mjs", "Next.js build must not go through a Vercel wrapper");
 {
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as {
