@@ -797,6 +797,32 @@ assert.ok(
   "homepage news box must not still say Vitascope"
 );
 assert.ok(
+  !readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes("surface.stats"),
+  "homepage must not show invented social-proof counts"
+);
+assert.ok(
+  readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes('aud.id !== "student"'),
+  "non-Czech homepage must hide the MeDiprep student audience"
+);
+assert.ok(
+  readFileSync(join(root, "components/monetization/newsletter-capture.tsx"), "utf8").includes(
+    "/newsletter/dekujeme"
+  ),
+  "successful subscribe must send readers to the thank-you page"
+);
+assert.ok(
+  !readFileSync(join(root, "app/sitemap.ts"), "utf8").includes("/cs/article/"),
+  "root sitemap must not emit CS-only article URLs"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/vip/protokoly/page.tsx"), "utf8").includes("getServerLocale"),
+  "VIP protocols listing must follow the request locale"
+);
+assert.ok(
+  readFileSync(join(root, "lib/i18n/surface-copy.ts"), "utf8").includes("O redakci a zdrojích"),
+  "footer proof must be qualitative, not invented reader counts"
+);
+assert.ok(
   readFileSync(join(root, "lib/seo/locale-sitemap.ts"), "utf8").includes('path: "/newsletter"'),
   "locale sitemaps must list the newsletter hub"
 );

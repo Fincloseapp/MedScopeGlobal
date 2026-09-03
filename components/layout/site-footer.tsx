@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
-import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { getSurfaceCopy, isCzechSurface } from "@/lib/i18n/surface-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
 import {
@@ -32,7 +32,10 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
             {footer.forWhom}
           </p>
           <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
-            {footer.audiences.map((item) => (
+            {(isCzechSurface(locale)
+              ? footer.audiences
+              : footer.audiences.filter((item) => !item.href.startsWith("/studenti"))
+            ).map((item) => (
               <li key={item.href}>
                 <Link href={href(item.href)} className="hover:text-foreground">
                   {item.label}

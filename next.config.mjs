@@ -103,6 +103,12 @@ const nextConfig = {
       { source: "/tips", destination: "/articles", permanent: false },
       { source: "/tipy", destination: "/articles", permanent: false },
       { source: "/tip", destination: "/articles", permanent: false },
+      { source: "/newsletter/thank-you", destination: "/newsletter/dekujeme", permanent: false },
+      {
+        source: "/:locale/newsletter/thank-you",
+        destination: "/:locale/newsletter/dekujeme",
+        permanent: false,
+      },
       { source: "/tringelt", destination: "/articles", permanent: false },
       { source: "/prispevek", destination: "/articles", permanent: false },
       { source: "/donate", destination: "/articles", permanent: false },

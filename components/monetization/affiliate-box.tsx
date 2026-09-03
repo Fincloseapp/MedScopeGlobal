@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { AffiliateProduct } from "@/lib/ecosystem/monetization";
 import { AFFILIATE_PRODUCTS } from "@/lib/ecosystem/monetization";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
@@ -22,6 +21,26 @@ type Props = {
   products?: AffiliateProduct[];
   variant?: Variant;
 };
+
+function AffiliateProductImage({
+  src,
+  alt,
+  className,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+}) {
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      className={className ?? "h-full w-full object-cover"}
+    />
+  );
+}
 
 function localizedField(record: Record<string, string>, locale: string): string {
   if (record[locale]) return record[locale];
@@ -138,7 +157,7 @@ function AffiliateProductCard({
         className="group flex overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-[#005B96]/40"
       >
         <div className="relative h-20 w-20 shrink-0 bg-[#e8f3fb]">
-          <Image src={product.imageUrl} alt={name} fill sizes="80px" unoptimized className="object-cover" />
+          <AffiliateProductImage src={product.imageUrl} alt={name} className="h-full w-full object-cover" />
         </div>
         <div className="min-w-0 px-3 py-2">
           <p className="font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">{name}</p>
@@ -155,13 +174,10 @@ function AffiliateProductCard({
         className="group relative overflow-hidden rounded-2xl border border-[#cfe1f3] bg-[#e8f3fb] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
       >
         <div className="relative aspect-[3/4]">
-          <Image
+          <AffiliateProductImage
             src={product.imageUrl}
             alt={name}
-            fill
-            sizes="180px"
-            unoptimized
-            className="object-cover transition duration-300 group-hover:scale-[1.04]"
+            className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
           />
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#021d33]/90 via-[#021d33]/55 to-transparent px-3 pb-3 pt-12">
             <p className="font-semibold leading-snug text-white">{name}</p>
@@ -180,13 +196,10 @@ function AffiliateProductCard({
       className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-[#005B96]/40 hover:shadow-sm"
     >
       <div className="relative aspect-[5/4] bg-[#f4f7fb]">
-        <Image
+        <AffiliateProductImage
           src={product.imageUrl}
           alt={name}
-          fill
-          sizes="220px"
-          unoptimized
-          className="object-cover transition duration-300 group-hover:scale-[1.03]"
+          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
         />
       </div>
       <div className="p-3">

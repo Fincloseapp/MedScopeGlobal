@@ -10,7 +10,7 @@ import {
   PORTAL_SERVICES,
 } from "@/lib/v271/portal";
 import { getSurfaceCopy, isCzechSurface } from "@/lib/i18n/surface-copy";
-import { MAGAZINE, type getMagazineCopy } from "@/lib/brand/magazine";
+import { type getMagazineCopy } from "@/lib/brand/magazine";
 import { assignUniqueListingCovers } from "@/lib/ecosystem/editorial/images/unique-listing-covers";
 import { NEWS_DESKS, newsDesksForLocale, splitNewsDesks, type NewsDeskId } from "@/lib/v271/news-desks";
 import { NewsArticleThumb, NewsDeskFallback, NewsHeadlineRow } from "@/components/articles/news-article-card";
@@ -284,27 +284,10 @@ export function PortalHome({
           </ul>
         </nav>
 
-        <WriterAgentsStrip locale={locale} />
+        {isCzechSurface(locale) ? <WriterAgentsStrip locale={locale} /> : null}
 
         <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
           <Box title={chrome.news} href={localizePublicHref("/articles", locale)} moreLabel={chrome.more}>
-            <div className="mb-3 flex items-center gap-3 rounded-lg border border-slate-100 bg-[#021d33] px-3 py-2.5">
-              <Image
-                src={MAGAZINE.emailLockup}
-                alt={MAGAZINE.name}
-                width={200}
-                height={57}
-                className="h-10 w-auto max-w-[200px] object-contain"
-              />
-              <div className="min-w-0">
-                <p className="font-display text-sm font-semibold tracking-[0.06em] text-white">
-                  {MAGAZINE.name}
-                </p>
-                <p className="text-[11px] text-slate-300">
-                  {"tagline" in philosophy ? philosophy.tagline : MAGAZINE.tagline.en}
-                </p>
-              </div>
-            </div>
             <PortalNewsFeed
               articles={articles}
               chrome={chrome}
@@ -353,7 +336,10 @@ export function PortalHome({
 
             <Box title={chrome.forWhom} moreLabel={chrome.more}>
               <ul className="space-y-2">
-                {V271_AUDIENCES.map((aud) => {
+                {(isCzechSurface(locale)
+                  ? V271_AUDIENCES
+                  : V271_AUDIENCES.filter((aud) => aud.id !== "student")
+                ).map((aud) => {
                   const localized = surface.audiences.find((item) => item.id === aud.id);
                   const label = localized?.label ?? aud.label;
                   const description = localized?.description ?? aud.description;
@@ -387,17 +373,6 @@ export function PortalHome({
                   );
                 })}
               </ul>
-            </Box>
-
-            <Box title={chrome.inNumbers} moreLabel={chrome.more}>
-              <dl className="grid grid-cols-2 gap-2">
-                {surface.stats.map((stat) => (
-                  <div key={stat.label} className="rounded-md bg-slate-50 px-2 py-2">
-                    <dt className="font-display text-lg font-bold text-[#005B96]">{stat.value}</dt>
-                    <dd className="text-[10px] leading-snug text-slate-500">{stat.label}</dd>
-                  </div>
-                ))}
-              </dl>
             </Box>
           </div>
         </div>

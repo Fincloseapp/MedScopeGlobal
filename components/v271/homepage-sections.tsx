@@ -23,6 +23,7 @@ import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { getRevenueCopy } from "@/lib/i18n/revenue-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
+/** Not mounted on the live homepage — counts and quotes are unverified. Do not re-wire. */
 export function V272SocialProofBlock() {
   return (
     <section className="border-b border-slate-200 bg-white">

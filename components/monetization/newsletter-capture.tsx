@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { getRevenueCopy } from "@/lib/i18n/revenue-copy";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
@@ -22,9 +23,11 @@ export function NewsletterCapture({
   variant = "card",
   className = "",
 }: Props) {
+  const router = useRouter();
   const copy = getRevenueCopy(locale);
   const brief = getNewsletterCopy(locale);
   const latestHref = localizePublicHref("/newsletter/posledni", locale);
+  const thanksHref = localizePublicHref("/newsletter/dekujeme", locale);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "dup" | "err" | "invalid">(
     "idle"
@@ -53,8 +56,16 @@ export function NewsletterCapture({
         return;
       }
       trackEvent("newsletter_subscribe", { source, segment, locale });
-      setStatus(data.already ? "dup" : "ok");
       setEmail("");
+      if (data.already) {
+        setStatus("dup");
+        return;
+      }
+      if (source !== "newsletter-thanks") {
+        router.push(thanksHref);
+        return;
+      }
+      setStatus("ok");
     } catch {
       setStatus("err");
     }

@@ -168,9 +168,8 @@ export const V271_FOOTER_TRUST = {
     { label: "Studenti — MeDiprep a Academy", href: "/studenti" },
   ],
   proof: [
-    { label: "2 800+ zdravotnických profesionálů a studentů medicíny", href: "/studenti" },
-    { label: "500+ evidence-based článků", href: "/articles" },
-    { label: "Recenze čtenářů", href: "/predplatne#recenze" },
+    { label: "Články ViaLongeVita", href: "/articles" },
+    { label: "O redakci a zdrojích", href: "/o-nas" },
     { label: "14 dní zdarma", href: "/predplatne?trial=1" },
   ],
 } as const;
