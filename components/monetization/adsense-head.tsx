@@ -26,7 +26,7 @@ export async function AdSenseHead() {
       />
       <script
         dangerouslySetInnerHTML={{
-          __html: `window.adsbygoogle=window.adsbygoogle||[];`,
+          __html: `(window.adsbygoogle=window.adsbygoogle||[]).push({google_ad_client:"${client}",enable_page_level_ads:true,overlays:{bottom:true}});`,
         }}
       />
     </>

@@ -128,7 +128,7 @@ export function GlobalAdSlot({
           style={
             inArticle
               ? { display: "block", textAlign: "center" }
-              : { display: "block" }
+              : { display: "block", minHeight: 280, width: "100%" }
           }
           data-ad-client={config.adsenseClientId}
           data-ad-slot={numericSlot}
