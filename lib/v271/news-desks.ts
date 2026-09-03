@@ -7,7 +7,8 @@ import { mixFreshFeed, selectResurfaceCandidates } from "@/lib/editorial/freshne
 import { resolveWriterAgent } from "@/lib/editorial/writer-agents";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
-import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rules";
+import { isListableInLocale } from "@/lib/i18n/filter-articles-for-locale";
+import { filterActiveArticles } from "@/lib/v20/content-rules";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 
 export type NewsDeskId = "novinky" | "verejnost" | "dlouhovekost" | "clanky";
@@ -148,15 +149,21 @@ export function classifyNewsDesk(article: DisplayArticle): NewsDeskId {
   return "clanky";
 }
 
-export function isListableNewsArticle(article: DisplayArticle, now = new Date()): boolean {
+export function isListableNewsArticle(
+  article: DisplayArticle,
+  now = new Date(),
+  locale = "cs"
+): boolean {
   if (!article.slug || !article.title?.trim()) return false;
   if (shouldHideFromPublicListing(article, now)) return false;
-  return filterCzechContent(filterActiveArticles([article]), "cs").length === 1;
+  if (filterActiveArticles([article]).length !== 1) return false;
+  return isListableInLocale(article, locale);
 }
 
 export function splitNewsDesks(
   articles: DisplayArticle[],
-  limits: Partial<Record<NewsDeskId, number>> = {}
+  limits: Partial<Record<NewsDeskId, number>> = {},
+  locale = "cs"
 ): Record<NewsDeskId, DisplayArticle[]> {
   const cap: Record<NewsDeskId, number> = {
     novinky: limits.novinky ?? 4,
@@ -170,7 +177,7 @@ export function splitNewsDesks(
     dlouhovekost: [],
     clanky: [],
   };
-  const listable = articles.filter((article) => isListableNewsArticle(article));
+  const listable = articles.filter((article) => isListableNewsArticle(article, new Date(), locale));
   for (const article of listable) {
     const desk = classifyNewsDesk(article);
     if (desks[desk].length < cap[desk]) desks[desk].push(article);
@@ -204,17 +211,25 @@ export function splitNewsDesks(
   return desks;
 }
 
-export function mixListableFeed(articles: DisplayArticle[], limit: number): DisplayArticle[] {
-  const listable = articles.filter((article) => isListableNewsArticle(article));
+export function mixListableFeed(
+  articles: DisplayArticle[],
+  limit: number,
+  locale = "cs"
+): DisplayArticle[] {
+  const listable = articles.filter((article) => isListableNewsArticle(article, new Date(), locale));
   const resurface = selectResurfaceCandidates(listable, Math.max(4, Math.ceil(limit / 3)));
   return mixFreshFeed(listable, resurface, limit);
 }
 
 /** Keep longevity cards in the homepage pool even when newer news crowds them out. */
-export function pinLongevityIntoFeed(articles: DisplayArticle[], limit: number): DisplayArticle[] {
-  const listable = articles.filter((article) => isListableNewsArticle(article));
+export function pinLongevityIntoFeed(
+  articles: DisplayArticle[],
+  limit: number,
+  locale = "cs"
+): DisplayArticle[] {
+  const listable = articles.filter((article) => isListableNewsArticle(article, new Date(), locale));
   const longevity = listable.filter((article) => isLongevityArticle(article));
-  const mixed = mixListableFeed(listable, limit);
+  const mixed = mixListableFeed(listable, limit, locale);
   if (longevity.length === 0) return mixed;
   const pinned = longevity.slice(0, 4);
   const pinnedIds = new Set(pinned.map((article) => article.id));
@@ -267,9 +282,10 @@ export function mergeAktualityListing<T extends { id: string; title?: string | n
 
 export function filterArticlesForDesk(
   articles: DisplayArticle[],
-  desk: NewsDeskId | null
+  desk: NewsDeskId | null,
+  locale = "cs"
 ): DisplayArticle[] {
-  const listable = articles.filter((article) => isListableNewsArticle(article));
+  const listable = articles.filter((article) => isListableNewsArticle(article, new Date(), locale));
   if (!desk || desk === "clanky") return listable;
   return listable.filter((article) => classifyNewsDesk(article) === desk);
 }
@@ -461,10 +477,70 @@ const DESK_COPY: Record<string, Record<NewsDeskId, DeskCopy>> = {
   },
 };
 
+const DESK_COPY_EN_US: Record<NewsDeskId, DeskCopy> = {
+  novinky: {
+    label: "News",
+    more: "All updates",
+    kicker: "Now",
+    blurb: "US and global health news — FDA, CDC, NIH — plus longevity briefings. No Czech-only paperwork.",
+  },
+  verejnost: {
+    label: "Public health",
+    more: "Articles for everyone",
+    kicker: "Public health",
+    blurb: "Prevention, weight, sleep and lifestyle for US readers — PCP and 911, not VZP.",
+  },
+  dlouhovekost: {
+    label: "Longevity",
+    more: "On this topic",
+    kicker: "Healthspan",
+    blurb: "Sleep, movement, slim-metabolic health, biohacking with evidence — written for the US edition.",
+  },
+  clanky: {
+    label: "Magazine",
+    more: "Open magazine",
+    kicker: "Magazine",
+    blurb: "Native US desk plus clearly labelled pieces from other MedScopeGlobal desks.",
+  },
+};
+
+const DESK_COPY_EN_UK: Record<NewsDeskId, DeskCopy> = {
+  novinky: {
+    label: "News",
+    more: "All updates",
+    kicker: "Now",
+    blurb: "UK and global health news — MHRA, NICE, NHS — with context, no sensationalism.",
+  },
+  verejnost: {
+    label: "Public health",
+    more: "Articles for everyone",
+    kicker: "Public health",
+    blurb: "Prevention and lifestyle for UK readers — GP and NHS 111, not Czech insurance.",
+  },
+  dlouhovekost: {
+    label: "Longevity",
+    more: "On this topic",
+    kicker: "Healthspan",
+    blurb: "Sleep, movement, sustainable weight, evidence-based biohacking — for the UK edition.",
+  },
+  clanky: {
+    label: "Magazine",
+    more: "Open magazine",
+    kicker: "Magazine",
+    blurb: "Native UK desk plus attributed shares from other MedScopeGlobal desks.",
+  },
+};
+
 /** Desk chrome in the active UI language (Czech copy stays the source of truth). */
 export function newsDesksForLocale(locale?: string | null): NewsDeskDef[] {
-  const primary = primaryArticleLocale(normalizeLocale(locale));
+  const normalized = normalizeLocale(locale);
+  const primary = primaryArticleLocale(normalized);
   if (primary === "cs") return NEWS_DESKS;
-  const pack = DESK_COPY[primary] ?? DESK_COPY.en;
+  const pack =
+    normalized === "en-US"
+      ? DESK_COPY_EN_US
+      : normalized === "en-UK"
+        ? DESK_COPY_EN_UK
+        : (DESK_COPY[primary] ?? DESK_COPY.en);
   return NEWS_DESKS.map((desk) => ({ ...desk, ...pack[desk.id] }));
 }

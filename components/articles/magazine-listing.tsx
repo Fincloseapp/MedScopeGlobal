@@ -10,7 +10,7 @@ import {
   MAGAZINE,
 } from "@/lib/brand/magazine";
 import { VITASCOPE_DESK_LOGO, VITASCOPE_TRACK_LOGO } from "@/lib/brand/vitascope";
-import { NEWS_DESKS, type NewsDeskId } from "@/lib/v271/news-desks";
+import { newsDesksForLocale, type NewsDeskId } from "@/lib/v271/news-desks";
 import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
@@ -26,7 +26,8 @@ export function MagazineListing({
 }) {
   const featured = articles[0];
   const rest = articles.slice(1);
-  const desk = NEWS_DESKS.find((item) => item.id === (activeDesk ?? "clanky")) ?? NEWS_DESKS[3]!;
+  const desks = newsDesksForLocale(locale);
+  const desk = desks.find((item) => item.id === (activeDesk ?? "clanky")) ?? desks[3]!;
   const copy = getMagazineListingCopy(locale);
   const brand = getMagazineCopy(locale);
   const isCs = !locale || locale === "cs" || locale.startsWith("cs");
@@ -81,17 +82,20 @@ export function MagazineListing({
         </p>
         <div className="mt-2 flex flex-wrap gap-2">
           <Link
-            href="/articles"
+            href={localizePublicHref("/articles", locale)}
             className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm ${
               !activeDesk ? "border-[#005B96] bg-[#005B96] text-white" : "bg-white text-slate-700"
             }`}
           >
             {copy.all}
           </Link>
-          {NEWS_DESKS.map((item) => (
+          {desks.map((item) => (
             <Link
               key={item.id}
-              href={item.id === "clanky" ? "/articles?desk=clanky" : `/articles?desk=${item.id}`}
+              href={localizePublicHref(
+                item.id === "clanky" ? "/articles?desk=clanky" : `/articles?desk=${item.id}`,
+                locale
+              )}
               className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm ${
                 activeDesk === item.id
                   ? "border-[#005B96] bg-[#005B96] text-white"

@@ -185,7 +185,12 @@ export function safeKeywords(locale: GlobalLocaleCode, topic: string): string[] 
   const base: Record<string, string[]> = {
     cs: ["zdraví", "wellness", "prevence", "longevity", "životní styl"],
     "en-US": ["health", "wellness", "prevention", "longevity", "lifestyle", "biohacking"],
-    en: ["health", "wellness", "prevention", "longevity", "lifestyle"],
+    en: ["health", "wellness", "prevention", "longevity", "lifestyle", "biohacking"],
+    "en-UK": ["health", "NHS", "longevity", "lifestyle", "biohacking"],
+    fr: ["santé", "longévité", "mode de vie", "biohacking"],
+    it: ["salute", "longevità", "stile di vita", "biohacking"],
+    de: ["Gesundheit", "Langlebigkeit", "Lebensstil", "Biohacking"],
+    es: ["salud", "longevidad", "estilo de vida", "biohacking"],
     ru: ["здоровье", "wellness", "профилактика", "долголетие"],
     "zh-CN": ["健康", "养生", "预防", "长寿"],
     ko: ["건강", "웰니스", "예방", "장수"],

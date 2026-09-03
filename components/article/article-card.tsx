@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
-import { publicEditorialByline } from "@/lib/editorial/units";
+import { listingByline } from "@/lib/editorial/units";
 import type { ArticleWithRelations } from "@/types/database";
 import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
 import { formatPublicDate } from "@/lib/i18n/format-date";
@@ -16,7 +16,7 @@ export function ArticleCard({ article }: { article: DisplayArticle | ArticleWith
     "displayLocale" in article && article.displayLocale
       ? article.displayLocale
       : article.locale ?? "cs";
-  const authorLabel = publicEditorialByline(editorialLocale);
+  const authorLabel = listingByline(article, editorialLocale);
   const date = formatPublicDate(article.published_at, editorialLocale, {
     year: "numeric",
     month: "short",

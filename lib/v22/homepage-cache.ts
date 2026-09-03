@@ -2,12 +2,13 @@ import { unstable_cache } from "next/cache";
 import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
 import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-audit";
-import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rules";
+import { filterActiveArticles } from "@/lib/v20/content-rules";
 import { pinLongevityIntoFeed } from "@/lib/v271/news-desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
 import type { AdRow } from "@/types/database";
 
 const articleSelect = `
@@ -52,7 +53,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
 
   const supabase = tryCreateServiceRoleClient();
   if (!supabase) {
-    return pinLongevityIntoFeed(getDemoMagazineArticles(), 36);
+    return pinLongevityIntoFeed(getDemoMagazineArticles(), 36, locale);
   }
 
   const { data, error } = await supabase
@@ -64,25 +65,25 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
 
   if (error) {
     console.error("loadArticlesPublic", error);
-    return pinLongevityIntoFeed(getDemoMagazineArticles(), 36);
+    return pinLongevityIntoFeed(getDemoMagazineArticles(), 36, locale);
   }
 
   const mapped = mapArticleList(data as Record<string, unknown>[] | null);
-  const active = filterCzechContent(filterActiveArticles(mapped), locale);
+  const localeKey = normalizeLocale(locale);
+  const active = filterArticlesForLocale(filterActiveArticles(mapped), localeKey);
   const publicOnly = filterMagazineListableArticles(
     active.filter((a) => !a.vip_only)
   );
-  const localeKey = normalizeLocale(locale);
-  const feed = primaryArticleLocale(localeKey) === "cs" ? publicOnly : publicOnly.slice(0, 40);
+  const feed = primaryArticleLocale(localeKey) === "cs" ? publicOnly : publicOnly.slice(0, 48);
   const prepared = await prepareArticlesForDisplay(feed, localeKey, {
     mode: "card",
     maxTranslate: 12,
     maxLive: 0,
   });
   if (prepared.length === 0) {
-    return pinLongevityIntoFeed(getDemoMagazineArticles(), 36);
+    return pinLongevityIntoFeed(getDemoMagazineArticles(), 36, localeKey);
   }
-  return pinLongevityIntoFeed(prepared, 36);
+  return pinLongevityIntoFeed(prepared, 36, localeKey);
 }
 
 async function loadHomepageData(locale: string): Promise<{
@@ -103,7 +104,7 @@ async function loadHomepageData(locale: string): Promise<{
 export function getHomepageCachedData(locale = "cs") {
   return unstable_cache(
     () => loadHomepageData(locale),
-    ["v22-homepage-public-v16-fast-i18n", locale],
+    ["v22-homepage-public-v17-native-desks", locale],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

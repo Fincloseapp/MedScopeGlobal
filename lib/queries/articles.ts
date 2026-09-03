@@ -21,9 +21,9 @@ import { shouldHideFromArticleDetail } from "@/lib/auth/article-eligibility";
 import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-audit";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { createDataClient } from "@/lib/supabase/data";
+import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
 import {
   filterActiveArticles,
-  filterCzechContent,
   isArchivedArticle,
 } from "@/lib/v20/content-rules";
 import type { ArticleWithRelations } from "@/types/database";
@@ -52,7 +52,7 @@ function filterForReader(
 ): ArticleWithRelations[] {
   const allowed = new Set(allowedAccessLevels(accessLevel));
   const active = filterActiveArticles(articles);
-  const localized = filterCzechContent(active, locale);
+  const localized = filterArticlesForLocale(active, locale);
   return localized.filter((a) => {
     if (!isVip && a.vip_only) return false;
     const level = a.min_access_level ?? "public";
@@ -68,7 +68,7 @@ function filterForSectionReader(
 ): ArticleWithRelations[] {
   const allowed = allowedLevelsForSection(accessLevel);
   const active = filterActiveArticles(articles);
-  const localized = filterCzechContent(active, locale);
+  const localized = filterArticlesForLocale(active, locale);
   return localized.filter((a) => {
     if (!isVip && a.vip_only) return false;
     const level = a.min_access_level ?? "public";
@@ -82,8 +82,7 @@ function filterForMetadataRubricListing(
   locale: LocaleCode = "cs"
 ): ArticleWithRelations[] {
   const active = filterActiveArticles(articles);
-  if (locale !== "cs") return active;
-  return active.filter((a) => a.locale !== "en" && Boolean(a.title?.trim()));
+  return filterArticlesForLocale(active, locale);
 }
 
 export async function getFeaturedArticles(
@@ -512,7 +511,7 @@ export async function getArchivedArticles(
   }
 
   const rows = mapArticleList(data as Record<string, unknown>[] | null);
-  const archived = filterCzechContent(
+  const archived = filterArticlesForLocale(
     rows.filter((a) => isArchivedArticle(a)),
     locale
   );

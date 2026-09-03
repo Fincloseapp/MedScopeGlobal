@@ -2,11 +2,12 @@ import Link from "next/link";
 import { SafeArticleImage } from "@/components/media/safe-article-image";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { formatArticleDateLabel } from "@/lib/editorial/freshness";
-import { publicEditorialByline } from "@/lib/editorial/units";
+import { listingByline } from "@/lib/editorial/units";
 import { resolveWriterAgent } from "@/lib/editorial/writer-agents";
 import { resolveDisplayCover, resolveTopicFallbackCover } from "@/lib/v271/topic-covers";
 import { classifyNewsDesk, NEWS_DESKS, newsDesksForLocale, type NewsDeskDef, type NewsDeskId } from "@/lib/v271/news-desks";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
 
 function coverOf(article: DisplayArticle) {
@@ -41,8 +42,8 @@ function articleHref(slug: string, locale?: string) {
   return locale ? buildLocalePath(locale, path) : path;
 }
 
-function reviewLine(locale = "cs"): string {
-  return publicEditorialByline(locale);
+function reviewLine(article: DisplayArticle, locale = "cs"): string {
+  return listingByline(article, locale);
 }
 
 export function NewsArticleThumb({
@@ -142,7 +143,7 @@ export function NewsMagazineCard({
             {article.excerpt}
           </p>
         ) : null}
-        <p className="mt-3 text-[11px] leading-5 text-slate-500">{reviewLine(locale)}</p>
+        <p className="mt-3 text-[11px] leading-5 text-slate-500">{reviewLine(article, locale)}</p>
         {date ? (
           <p className="mt-1 text-[11px] text-slate-400">
             <time dateTime={date.dateTime}>{date.text}</time>
@@ -163,13 +164,16 @@ export function NewsMagazineCard({
 export function NewsDeskFallback({
   desk,
   desks,
+  locale,
 }: {
   desk: NewsDeskId;
   desks?: NewsDeskDef[];
+  locale?: string;
 }) {
   const def = (desks ?? NEWS_DESKS).find((item) => item.id === desk) ?? NEWS_DESKS.find((item) => item.id === desk)!;
+  const href = locale ? localizePublicHref(def.href, locale) : def.href;
   return (
-    <Link href={def.href} className="block py-2.5">
+    <Link href={href} className="block py-2.5">
       <h3 className="font-display text-sm font-semibold leading-snug text-[#021d33] hover:text-[#005B96]">
         {def.label}
       </h3>

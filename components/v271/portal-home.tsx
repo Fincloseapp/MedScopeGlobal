@@ -140,7 +140,7 @@ function DeskColumn({
               <NewsHeadlineRow key={article.id} article={article} locale={locale} />
             ))
           : !lead
-            ? <NewsDeskFallback desk={desk} desks={desks} />
+            ? <NewsDeskFallback desk={desk} desks={desks} locale={locale} />
             : null}
       </div>
     </div>
@@ -160,7 +160,7 @@ function PortalNewsFeed({
   locale: string;
   todayNote: string;
 }) {
-  const raw = splitNewsDesks(articles);
+  const raw = splitNewsDesks(articles, {}, locale);
   const uniqueVisible = assignUniqueListingCovers([
     ...raw.novinky,
     ...raw.verejnost,

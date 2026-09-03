@@ -124,6 +124,6 @@ export default async function ArticlesPage({
     );
   }
 
-  const mixed = mixListableFeed(filterArticlesForDesk(coreArticles, desk), 24);
+  const mixed = mixListableFeed(filterArticlesForDesk(coreArticles, desk, locale), 24, locale);
   return <MagazineListing articles={mixed} activeDesk={desk} locale={locale} />;
 }

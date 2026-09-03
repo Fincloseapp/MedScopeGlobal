@@ -127,6 +127,141 @@ export function publicEditorialByline(locale: EditorialLocale = "cs"): string {
   return PUBLIC_EDITORIAL_BYLINE.en;
 }
 
+const DESK_NAME: Record<string, Record<string, string>> = {
+  en: {
+    cs: "Czech desk",
+    sk: "Slovak desk",
+    pl: "Polish desk",
+    de: "German desk",
+    fr: "French desk",
+    it: "Italian desk",
+    es: "Spanish desk",
+    pt: "Portuguese desk",
+    "pt-BR": "Brazilian desk",
+    "en-US": "US desk",
+    "en-UK": "UK desk",
+    en: "English desk",
+  },
+  cs: {
+    "en-US": "americká redakce",
+    "en-UK": "britská redakce",
+    en: "anglická redakce",
+    de: "německá redakce",
+    fr: "francouzská redakce",
+    it: "italská redakce",
+    es: "španělská redakce",
+    "pt-BR": "brazilská redakce",
+  },
+  de: {
+    cs: "tschechische Redaktion",
+    "en-US": "US-Redaktion",
+    "en-UK": "britische Redaktion",
+    en: "englische Redaktion",
+    fr: "französische Redaktion",
+    it: "italienische Redaktion",
+  },
+  fr: {
+    cs: "rédaction tchèque",
+    "en-US": "rédaction américaine",
+    "en-UK": "rédaction britannique",
+    en: "rédaction anglaise",
+    de: "rédaction allemande",
+    it: "rédaction italienne",
+  },
+  it: {
+    cs: "redazione ceca",
+    "en-US": "redazione USA",
+    "en-UK": "redazione britannica",
+    en: "redazione inglese",
+    de: "redazione tedesca",
+    fr: "redazione francese",
+  },
+  es: {
+    cs: "redacción checa",
+    "en-US": "redacción de EE. UU.",
+    en: "redacción inglesa",
+    de: "redacción alemana",
+    fr: "redacción francesa",
+  },
+};
+
+function deskNamePack(locale: EditorialLocale): string {
+  const tag = String(locale).toLowerCase();
+  if (tag === "cs" || tag.startsWith("cs-")) return "cs";
+  if (tag === "de" || tag.startsWith("de-")) return "de";
+  if (tag === "fr" || tag.startsWith("fr-")) return "fr";
+  if (tag === "it" || tag.startsWith("it-")) return "it";
+  if (tag === "es" || tag.startsWith("es-")) return "es";
+  return "en";
+}
+
+function sourceDeskKey(sourceLocale?: string | null): string {
+  const tag = String(sourceLocale ?? "").trim();
+  if (!tag) return "en";
+  if (tag === "en-US" || tag === "en-UK" || tag === "pt-BR") return tag;
+  return tag.split("-")[0] ?? tag;
+}
+
+function foreignDeskName(uiLocale: EditorialLocale, sourceLocale?: string | null): string {
+  const pack = deskNamePack(uiLocale);
+  const key = sourceDeskKey(sourceLocale);
+  return DESK_NAME[pack]?.[key] ?? DESK_NAME.en?.[key] ?? DESK_NAME.en!.en!;
+}
+
+/** Diplomatic credit when a piece is shared from another language desk. */
+export function formatSyndicatedByline(
+  uiLocale: EditorialLocale,
+  sourceLocale?: string | null
+): string {
+  if (!sourceLocale) return publicEditorialByline(uiLocale);
+  const sourceKey = sourceDeskKey(sourceLocale);
+  const uiKey = deskNamePack(uiLocale);
+  if (sourceKey === uiKey || (uiKey === "en" && sourceKey.startsWith("en"))) {
+    return publicEditorialByline(uiLocale);
+  }
+  const desk = foreignDeskName(uiLocale, sourceLocale);
+  const pack = deskNamePack(uiLocale);
+  if (pack === "cs") return `Ze zahraniční redakce MedScopeGlobal (${desk})`;
+  if (pack === "de") return `Von der ${desk} von MedScopeGlobal`;
+  if (pack === "fr") return `Depuis la ${desk} de MedScopeGlobal`;
+  if (pack === "it") return `Dalla ${desk} di MedScopeGlobal`;
+  if (pack === "es") return `Desde la ${desk} de MedScopeGlobal`;
+  return `From the ${desk} of MedScopeGlobal`;
+}
+
+export function formatDeskShareNotice(
+  uiLocale: EditorialLocale,
+  sourceLocale?: string | null
+): string {
+  const byline = formatSyndicatedByline(uiLocale, sourceLocale);
+  const pack = deskNamePack(uiLocale);
+  if (pack === "cs") {
+    return `${byline}. Převzato se souhlasem — místní redakce doplnila kontext pro české čtenáře.`;
+  }
+  if (pack === "de") {
+    return `${byline}. Übernommen mit Kennzeichnung — die lokale Redaktion hat den Text für diese Ausgabe eingeordnet.`;
+  }
+  if (pack === "fr") {
+    return `${byline}. Repris avec attribution — la rédaction locale a ajouté le contexte de cette édition.`;
+  }
+  if (pack === "it") {
+    return `${byline}. Ripreso con attribuzione — la redazione locale ha aggiunto il contesto di questa edizione.`;
+  }
+  if (pack === "es") {
+    return `${byline}. Reproducido con atribución — la redacción local añadió el contexto de esta edición.`;
+  }
+  return `${byline}. Shared with attribution — the local desk added context for this edition.`;
+}
+
+export function listingByline(
+  article: { locale?: string | null; translatedFrom?: string | null; editorialPrimaryLabel?: string | null },
+  uiLocale: EditorialLocale
+): string {
+  if (article.editorialPrimaryLabel) return article.editorialPrimaryLabel;
+  const source = article.translatedFrom ?? article.locale;
+  return formatSyndicatedByline(uiLocale, source);
+}
+
 export const EDITORIAL_FOOTER_CS =
   "Obsah připravila redakce MedScopeGlobal.com — odborně zpracovaný zdravotní materiál pro veřejnost. Při zdravotních rozhodnutích se vždy obraťte na lékaře.";
 

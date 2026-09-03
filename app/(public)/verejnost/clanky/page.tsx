@@ -64,7 +64,7 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
   });
 
   const articles = fetched.filter((article) => {
-    if (!isListableNewsArticle(article)) return false;
+    if (!isListableNewsArticle(article, new Date(), locale)) return false;
     if (longevity) return isLongevityArticle(article);
     if (topic === "zivotni-styl") return !isLongevityArticle(article);
     return true;

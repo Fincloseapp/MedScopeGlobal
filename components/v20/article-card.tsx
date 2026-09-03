@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Calendar, User } from "lucide-react";
 import { V20ArticleCover } from "@/components/v20/article-cover";
 import { enrichArticleMeta } from "@/lib/v20/content-rules";
-import { publicEditorialByline } from "@/lib/editorial/units";
+import { listingByline } from "@/lib/editorial/units";
 import type { ArticleWithRelations } from "@/types/database";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { formatPublicDate } from "@/lib/i18n/format-date";
@@ -19,7 +19,7 @@ export function V20ArticleCard({
   const uiLocale =
     locale ??
     ("displayLocale" in article && article.displayLocale ? article.displayLocale : "cs");
-  const authorLabel = publicEditorialByline(uiLocale);
+  const authorLabel = listingByline(article, uiLocale);
   const meta = enrichArticleMeta({
     title: article.title,
     excerpt: article.excerpt,

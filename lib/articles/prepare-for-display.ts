@@ -15,6 +15,7 @@ import { enrichArticleBodyForDisplay } from "@/lib/articles/enrich-body";
 import { polishCzechFields } from "@/lib/v22/translate";
 import {
   assignEditorialUnits,
+  formatSyndicatedByline,
   publicEditorialByline,
   type EditorialAssignment,
 } from "@/lib/editorial/units";
@@ -30,6 +31,8 @@ export type DisplayArticle = ArticleWithRelations & {
   reviewed?: boolean;
   editorialAssignment?: EditorialAssignment;
   editorialPrimaryLabel?: string;
+  deskOrigin?: "native" | "borrowed";
+  syndicatedFromLocale?: string | null;
 };
 
 function attachEditorialDisplay(
@@ -53,11 +56,18 @@ function attachEditorialDisplay(
     coverImageUrl: merged.cover_image_url,
     preferCurated: true,
   });
+  const sourceLocale =
+    extra?.translatedFrom ?? extra?.syndicatedFromLocale ?? merged.locale ?? null;
+  const native = matchesArticleLocale(merged.locale, locale);
   return {
     ...merged,
     cover_image_url,
     editorialAssignment: assignment,
-    editorialPrimaryLabel: publicEditorialByline(locale),
+    deskOrigin: native ? "native" : "borrowed",
+    syndicatedFromLocale: native ? null : sourceLocale,
+    editorialPrimaryLabel: native
+      ? publicEditorialByline(locale)
+      : formatSyndicatedByline(locale, sourceLocale),
   };
 }
 

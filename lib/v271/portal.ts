@@ -3,6 +3,7 @@
 import { getMagazineCopy, MAGAZINE } from "@/lib/brand/magazine";
 import { chromePack } from "@/lib/i18n/chrome-pack";
 import { normalizeLocale, type LocaleCode } from "@/lib/i18n/config";
+import { localRegulatorShort } from "@/lib/i18n/local-regulator";
 
 /** Default Czech hero copy (legacy export — prefer getPortalPhilosophy(locale) on server). */
 export const PORTAL_PHILOSOPHY = {
@@ -313,10 +314,11 @@ export function getPortalChrome(locale?: LocaleCode | string): PortalChrome {
   }));
   const hints = isCs ? SERVICE_HINTS.cs : SERVICE_HINTS[primary] ?? SERVICE_HINTS.en;
   const labels = isCs ? SERVICE_LABELS.cs : SERVICE_LABELS[primary] ?? SERVICE_LABELS.en;
+  const regulator = localRegulatorShort(locale);
   const services = PORTAL_SERVICES.map((svc) => ({
     id: svc.id,
     label: labels?.[svc.id] ?? svc.label,
-    hint: hints?.[svc.id] ?? svc.hint,
+    hint: svc.id === "leky" && !isCs ? regulator : hints?.[svc.id] ?? svc.hint,
   }));
   return { ...base, newsTabs, services };
 }

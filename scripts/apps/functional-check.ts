@@ -143,6 +143,7 @@ import { reviewPublicArticle } from "../../lib/v25/writers/editorial-review.mjs"
 import { polishCzechFields } from "../../lib/v22/translate";
 import {
   classifyNewsDesk,
+  isListableNewsArticle,
   isLongevityArticle,
   isProfessionalAktualityTitle,
   mergeAktualityListing,
@@ -153,7 +154,8 @@ import {
   rankV26ForeignSources,
 } from "../../lib/v26/foreign-news-ingest";
 import { hubTopicListingHref } from "../../lib/config/verejnost-topics";
-import { formatEditorialUnitDisplay, publicEditorialByline } from "../../lib/editorial/units";
+import { formatEditorialUnitDisplay, formatSyndicatedByline, publicEditorialByline } from "../../lib/editorial/units";
+import { filterArticlesForLocale } from "../../lib/i18n/filter-articles-for-locale";
 import {
   applyMagazineDeskCopy,
   polishMagazineExcerpt,
@@ -338,7 +340,8 @@ file("lib/v22/homepage-cache.ts");
     "live MT fill is only for the translate cap, not every Czech leftover"
   );
   const home = readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8");
-  assert.ok(home.includes("slice(0, 40)"), "non-CS homepage prepares a short feed");
+  assert.ok(home.includes("filterArticlesForLocale"), "homepage listings are native-first per locale");
+  assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
 }
 {
   const box = readFileSync(join(root, "components/monetization/affiliate-box.tsx"), "utf8");
@@ -2147,6 +2150,37 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.equal(toppedUp.novinky.length, 1);
   assert.equal(toppedUp.novinky[0]?.id, "only-osteo");
   assert.equal(toppedUp.dlouhovekost[0]?.id, "only-osteo");
+  assert.deepEqual(
+    filterArticlesForLocale(
+      [
+        { id: "en-native", title: "Metabolic health and walking", locale: "en-US", public_topic: "zivotni-styl" },
+        { id: "cz-only", title: "Úhrada u VZP a SÚKL v Česku", locale: "cs", excerpt: "pro české pacienty" },
+      ],
+      "en-US"
+    ).map((a) => a.id),
+    ["en-native"]
+  );
+  assert.equal(
+    isListableNewsArticle(
+      {
+        id: "en-listable",
+        title: "Evidence-based biohacking and sleep",
+        slug: "verejnost-dlouhovekost-2026-09-01-biohack-sleep",
+        excerpt: "Wearables without the hype.",
+        content: longBody,
+        published: true,
+        published_at: "2026-09-01T10:00:00.000Z",
+        vip_only: false,
+        locale: "en-US",
+        audience: "public",
+        public_topic: "dlouhovekost",
+      } as never,
+      new Date(),
+      "en-US"
+    ),
+    true
+  );
+  assert.ok(formatSyndicatedByline("en-US", "cs").includes("Czech desk"));
   assert.equal(isProfessionalAktualityTitle("Kosti ve středním věku: pohyb a vitamin D"), true);
   assert.equal(isProfessionalAktualityTitle("Zdravotní zpráva — Zahraniční zdravotnická zpráva"), false);
   assert.equal(isProfessionalAktualityTitle("Epidemiologická zpráva — USA"), false);

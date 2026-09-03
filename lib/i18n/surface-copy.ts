@@ -1,6 +1,7 @@
 import { MAGAZINE } from "@/lib/brand/magazine";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { citedSourcesLine, rewriteCzechInstitutions } from "@/lib/i18n/local-regulator";
 import type { AppProductId } from "@/lib/apps/catalog";
 import {
   WRITER_DESKS,
@@ -311,7 +312,7 @@ const COPY: Record<string, SurfaceCopy> = {
       mediprep: "Find the gaps. Train them.",
     },
     stats: [
-      { value: "PubMed", label: "SÚKL · EMA · WHO — cited sources" },
+      { value: "PubMed", label: "FDA · EMA · WHO — cited sources" },
       { value: MAGAZINE.name, label: "longevity magazine" },
       { value: "14 days", label: "free trial access" },
       { value: "VIP", label: "protocols linked to MediFlow" },
@@ -349,7 +350,7 @@ const COPY: Record<string, SurfaceCopy> = {
       },
       {
         title: "Evidence-based, not clickbait",
-        description: "Editorial texts cite PubMed, SÚKL, EMA and WHO — with review, not invented sources.",
+        description: "Editorial texts cite PubMed, FDA, EMA and WHO — with review, not invented sources.",
       },
       {
         title: "What the evidence means",
@@ -468,7 +469,7 @@ const COPY: Record<string, SurfaceCopy> = {
       mediprep: "Lücken finden. Gezielt üben.",
     },
     stats: [
-      { value: "PubMed", label: "SÚKL · EMA · WHO — zitierte Quellen" },
+      { value: "PubMed", label: "BfArM · EMA · WHO — zitierte Quellen" },
       { value: MAGAZINE.name, label: "Magazin für Langlebigkeit" },
       { value: "14 Tage", label: "kostenlos testen" },
       { value: "VIP", label: "Protokolle mit MediFlow" },
@@ -506,7 +507,7 @@ const COPY: Record<string, SurfaceCopy> = {
       },
       {
         title: "Evidenzbasiert, kein Clickbait",
-        description: "Texte zitieren PubMed, SÚKL, EMA und WHO — mit Prüfung, ohne erfundene Quellen.",
+        description: "Texte zitieren PubMed, BfArM, EMA und WHO — mit Prüfung, ohne erfundene Quellen.",
       },
       {
         title: "Was die Evidenz bedeutet",
@@ -625,7 +626,7 @@ const COPY: Record<string, SurfaceCopy> = {
       mediprep: "Trouvez les lacunes. Entraînez-les.",
     },
     stats: [
-      { value: "PubMed", label: "SÚKL · EMA · OMS — sources citées" },
+      { value: "PubMed", label: "ANSM · EMA · OMS — sources citées" },
       { value: MAGAZINE.name, label: "magazine de longévité" },
       { value: "14 jours", label: "essai gratuit" },
       { value: "VIP", label: "protocoles liés à MediFlow" },
@@ -663,7 +664,7 @@ const COPY: Record<string, SurfaceCopy> = {
       },
       {
         title: "Fondé sur les preuves, pas le clickbait",
-        description: "Les textes citent PubMed, SÚKL, EMA et OMS — avec relecture, sans sources inventées.",
+        description: "Les textes citent PubMed, ANSM, EMA et OMS — avec relecture, sans sources inventées.",
       },
       {
         title: "Ce que signifient les preuves",
@@ -974,8 +975,16 @@ export function getSurfaceCopy(locale?: string | null): SurfaceCopy {
   const key = pack(locale);
   const copy = COPY[key] ?? COPY.en;
   if (key === "cs") return copy;
+  const sources = citedSourcesLine(locale);
   return {
     ...copy,
+    stats: copy.stats.map((item, index) =>
+      index === 0 && item.value === "PubMed" ? { ...item, label: sources } : item
+    ),
+    why: copy.why.map((item) => ({
+      ...item,
+      description: rewriteCzechInstitutions(item.description, locale),
+    })),
     searchNoResults: copy.searchNoResults
       .replace(/,?\s*MeDiprep/gi, "")
       .replace(/\s{2,}/g, " ")

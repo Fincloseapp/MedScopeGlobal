@@ -17,9 +17,11 @@ import { VipBadge } from "@/components/vip/vip-badge";
 import { EditorialAttribution } from "@/components/article/editorial-attribution";
 import { EditorialFooter } from "@/components/article/editorial-footer";
 import {
+  formatDeskShareNotice,
   publicEditorialByline,
   type EditorialLocale,
 } from "@/lib/editorial/units";
+import { matchesArticleLocale } from "@/lib/i18n/article-locale";
 import { articleJsonLdGlobal, buildGlobalHreflang } from "@/lib/ecosystem/seo";
 import { resolveArticleBodyLock } from "@/lib/auth/article-eligibility";
 import { getReaderContext } from "@/lib/auth/reader-context";
@@ -322,7 +324,11 @@ export default async function ArticlePage({ params }: Props) {
               </Link>
             ) : null}
 
-            {article.machine_translated ? (
+            {article.translatedFrom && !matchesArticleLocale(article.locale, locale) ? (
+              <p className="mt-4 border border-[#C7E3FF] bg-[#f0f7ff] px-4 py-2 text-sm text-[#005B96]">
+                {formatDeskShareNotice(locale, article.translatedFrom)}
+              </p>
+            ) : article.machine_translated ? (
               <p className="mt-4 border border-[#C7E3FF] bg-[#f0f7ff] px-4 py-2 text-sm text-[#005B96]">
                 {t(dict, "alerts.translatedArticle")}
                 {article.translation_provider ? (

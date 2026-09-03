@@ -31,7 +31,7 @@ import {
   localeForUnprefixedEntry,
 } from "../lib/i18n/detect-locale";
 import { isSearchEngineBot } from "../lib/i18n/search-bots";
-import { newsDesksForLocale } from "../lib/v271/news-desks";
+import { isListableNewsArticle, newsDesksForLocale } from "../lib/v271/news-desks";
 import { getPortalChrome } from "../lib/v271/portal";
 import {
   getSurfaceCopy,
@@ -56,7 +56,15 @@ import { getB2BLandingCopy } from "../lib/i18n/b2b-landing-copy";
 import { chromePack } from "../lib/i18n/chrome-pack";
 import { getV27AudienceHubCopy } from "../lib/i18n/v27-audience-copy";
 import { tipLocale, ARTICLE_TIP_COPY } from "../lib/ecosystem/tip-copy";
-import { publicEditorialByline } from "../lib/editorial/units";
+import { formatSyndicatedByline, publicEditorialByline } from "../lib/editorial/units";
+import { filterArticlesForLocale } from "../lib/i18n/filter-articles-for-locale";
+import {
+  geopoliticalDeskBrief,
+  isCzechOnlyInstitutional,
+  isShareableMagazineTopic,
+} from "../lib/editorial/geopolitical-topics";
+import { localRegulatorShort } from "../lib/i18n/local-regulator";
+import { buildNativeLocalePrompt } from "../lib/v25/writers/native-locale-brief.mjs";
 import { getVerejnostChrome } from "../lib/i18n/verejnost-chrome";
 import { topicLabelForSlug } from "../lib/config/verejnost-topics";
 import { localizeMagazineHubConfig } from "../lib/i18n/localize-magazine-hub";
@@ -521,6 +529,107 @@ assert.ok(frClankyHub.editorialIntro.some((p) => p.includes("ViaLongeVita")));
 const deClankyHub = localizeMagazineHubConfig(getClankyMagazineHub(), "de");
 assert.equal(deClankyHub.editorialIntroTitle, "Willkommen bei MedScopeGlobal");
 assert.ok(!looksLikeCzech(deClankyHub.editorialIntro.join(" ")));
+
+assert.equal(localRegulatorShort("cs"), "SÚKL");
+assert.equal(localRegulatorShort("en-US"), "FDA");
+assert.equal(localRegulatorShort("en-UK"), "MHRA");
+assert.equal(localRegulatorShort("it"), "AIFA");
+assert.equal(localRegulatorShort("fr"), "ANSM");
+assert.equal(getPortalChrome("en").services.find((s) => s.id === "leky")?.hint, "FDA");
+assert.equal(getPortalChrome("it").services.find((s) => s.id === "leky")?.hint, "AIFA");
+assert.equal(getPortalChrome("cs").services.find((s) => s.id === "leky")?.hint, "SÚKL");
+assert.ok(!getPortalChrome("en").services.some((s) => s.hint === "SÚKL"));
+assert.ok(!String(getSurfaceCopy("en-US").stats[0]?.label).includes("SÚKL"));
+assert.ok(String(getSurfaceCopy("en-UK").stats[0]?.label).includes("MHRA"));
+assert.ok(newsDesksForLocale("en-US").find((d) => d.id === "dlouhovekost")?.blurb.includes("US"));
+assert.ok(newsDesksForLocale("en-UK").find((d) => d.id === "novinky")?.blurb.includes("NHS"));
+
+const nativeUs = {
+  id: "us-1",
+  title: "Sleep and GLP-1: what US readers ask their PCP",
+  slug: "sleep-glp1-us",
+  excerpt: "FDA-labelled medicines and 911 — not Czech insurance.",
+  locale: "en-US",
+  public_topic: "dlouhovekost",
+};
+const czechOnly = {
+  id: "cz-vzp",
+  title: "Jak řešit úhradu u VZP a SÚKL v českém systému",
+  slug: "vzp-sukl-uhrada",
+  excerpt: "Pro české pacienty a přijímačky na 1. LF.",
+  locale: "cs",
+  public_topic: "prevence",
+};
+const czechLongevity = {
+  id: "cz-sleep",
+  title: "Zdravý spánek a healthspan",
+  slug: "zdravy-spanek-healthspan",
+  excerpt: "Longevity, sleep and biomarkers without local Czech paperwork.",
+  locale: "cs",
+  public_topic: "dlouhovekost",
+};
+assert.equal(isCzechOnlyInstitutional(czechOnly), true);
+assert.equal(isShareableMagazineTopic(czechLongevity), true);
+assert.equal(
+  filterArticlesForLocale([nativeUs, czechOnly, czechLongevity], "en-US").some((a) => a.id === "us-1"),
+  true
+);
+assert.equal(
+  filterArticlesForLocale([nativeUs, czechOnly, czechLongevity], "en-US").some((a) => a.id === "cz-vzp"),
+  false
+);
+assert.equal(
+  filterArticlesForLocale([czechOnly], "cs").some((a) => a.id === "cz-vzp"),
+  true
+);
+const longSmoke = Array.from({ length: 820 }, () => "word").join(" ");
+assert.equal(
+  isListableNewsArticle(
+    {
+      ...nativeUs,
+      slug: "verejnost-dlouhovekost-2026-09-01-sleep-glp1-us",
+      content: longSmoke,
+      published_at: "2026-09-01T10:00:00.000Z",
+    } as never,
+    new Date(),
+    "en-US"
+  ),
+  true
+);
+assert.equal(
+  isListableNewsArticle(
+    {
+      ...czechOnly,
+      slug: "verejnost-prevence-2026-09-01-vzp-sukl",
+      content: longSmoke,
+      published_at: "2026-09-01T10:00:00.000Z",
+    } as never,
+    new Date(),
+    "en-US"
+  ),
+  false
+);
+assert.equal(
+  isListableNewsArticle(
+    {
+      ...czechOnly,
+      slug: "verejnost-prevence-2026-09-01-vzp-sukl",
+      content: longSmoke,
+      published_at: "2026-09-01T10:00:00.000Z",
+    } as never,
+    new Date(),
+    "cs"
+  ),
+  true
+);
+assert.ok(formatSyndicatedByline("en-US", "cs").includes("Czech desk"));
+assert.ok(formatSyndicatedByline("it", "en-US").includes("USA"));
+assert.ok(geopoliticalDeskBrief("en-US").includes("PCP"));
+assert.ok(geopoliticalDeskBrief("en-US").includes("slim"));
+assert.ok(!geopoliticalDeskBrief("en-US").includes("Piš česky pro české"));
+assert.ok(buildNativeLocalePrompt("en-US").includes("American English"));
+assert.ok(buildNativeLocalePrompt("en-US").includes("biohacking"));
+assert.ok(!buildNativeLocalePrompt("fr").includes("Čeština s diakritikou"));
 
 console.log("✓ i18n/SEO unit checks passed");
 

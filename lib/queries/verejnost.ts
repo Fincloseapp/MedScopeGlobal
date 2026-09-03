@@ -8,6 +8,7 @@ import {
 } from "@/lib/articles/prepare-for-display";
 import { filterMagazineListableArticles, shouldHideFromPublicListing } from "@/lib/editorial/article-quality-audit";
 import type { LocaleCode } from "@/lib/i18n/config";
+import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
 import type { ArticleWithRelations } from "@/types/database";
 
 export type PublicTopic = "zivotni-styl" | "nemoci" | "prevence" | "rozhovory";
@@ -93,8 +94,11 @@ export async function listPublicArticles(options?: {
     return demoSlice();
   }
 
-  const rows = filterMagazineListableArticles(
-    mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[]
+  const rows = filterArticlesForLocale(
+    filterMagazineListableArticles(
+      mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[]
+    ),
+    locale
   );
   if (rows.length === 0) return demoSlice();
 
