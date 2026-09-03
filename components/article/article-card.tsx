@@ -9,14 +9,23 @@ import { listingByline } from "@/lib/editorial/units";
 import type { ArticleWithRelations } from "@/types/database";
 import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
 import { formatPublicDate } from "@/lib/i18n/format-date";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
-export function ArticleCard({ article }: { article: DisplayArticle | ArticleWithRelations }) {
+export function ArticleCard({
+  article,
+  locale,
+}: {
+  article: DisplayArticle | ArticleWithRelations;
+  locale?: string;
+}) {
   const cat = article.categories;
   const editorialLocale =
-    "displayLocale" in article && article.displayLocale
+    locale ??
+    ("displayLocale" in article && article.displayLocale
       ? article.displayLocale
-      : article.locale ?? "cs";
+      : article.locale ?? "cs");
   const authorLabel = listingByline(article, editorialLocale);
+  const href = localizePublicHref(`/article/${article.slug}`, editorialLocale);
   const date = formatPublicDate(article.published_at, editorialLocale, {
     year: "numeric",
     month: "short",
@@ -36,7 +45,7 @@ export function ArticleCard({ article }: { article: DisplayArticle | ArticleWith
 
   return (
     <Card className="group overflow-hidden rounded-[26px] border border-slate-200/80 bg-white/95 shadow-[0_16px_50px_-28px_rgba(2,30,57,0.55)] transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_24px_70px_-28px_rgba(0,91,150,0.6)]">
-      <Link href={`/article/${article.slug}`} className="block">
+      <Link href={href} className="block">
         <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-950">
           {coverUrl ? (
             <>

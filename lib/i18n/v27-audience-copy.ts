@@ -9,6 +9,7 @@ type HubOverlay = {
   ctaPrimary: string;
   ctaSecondary: string;
   enter: string;
+  topics: string[];
 };
 
 const PUBLIC: Record<ChromePack, HubOverlay> = {
@@ -19,6 +20,7 @@ const PUBLIC: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Najdi svůj problém",
     ctaSecondary: "Zeptej se AI",
     enter: "Vstoupit",
+    topics: ["prevence", "výživa", "spánek", "fitness"],
   },
   de: {
     label: "Für die Öffentlichkeit",
@@ -27,6 +29,7 @@ const PUBLIC: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Thema finden",
     ctaSecondary: "KI fragen",
     enter: "Öffnen",
+    topics: ["Prävention", "Ernährung", "Schlaf", "Fitness"],
   },
   fr: {
     label: "Grand public",
@@ -35,6 +38,7 @@ const PUBLIC: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Trouver un thème",
     ctaSecondary: "Demander à l’IA",
     enter: "Entrer",
+    topics: ["prévention", "alimentation", "sommeil", "fitness"],
   },
   it: {
     label: "Per il pubblico",
@@ -43,6 +47,7 @@ const PUBLIC: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Trova un tema",
     ctaSecondary: "Chiedi all’IA",
     enter: "Entra",
+    topics: ["prevenzione", "alimentazione", "sonno", "fitness"],
   },
   es: {
     label: "Para el público",
@@ -51,6 +56,7 @@ const PUBLIC: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Encontrar un tema",
     ctaSecondary: "Preguntar a la IA",
     enter: "Entrar",
+    topics: ["prevención", "alimentación", "sueño", "fitness"],
   },
   "pt-BR": {
     label: "Para o público",
@@ -59,6 +65,7 @@ const PUBLIC: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Encontrar um tema",
     ctaSecondary: "Perguntar à IA",
     enter: "Entrar",
+    topics: ["prevenção", "alimentação", "sono", "fitness"],
   },
   en: {
     label: "For everyone",
@@ -67,6 +74,7 @@ const PUBLIC: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Find a topic",
     ctaSecondary: "Ask AI",
     enter: "Enter",
+    topics: ["prevention", "nutrition", "sleep", "fitness"],
   },
 };
 
@@ -78,6 +86,7 @@ const PHYSICIAN: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Odborná sekce",
     ctaSecondary: "Dokumentace",
     enter: "Vstoupit",
+    topics: ["guidelines", "CME", "Research Hub", "diagnostika"],
   },
   de: {
     label: "Für Ärztinnen und Ärzte",
@@ -86,6 +95,7 @@ const PHYSICIAN: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Fachbereich",
     ctaSecondary: "Dokumentation",
     enter: "Öffnen",
+    topics: ["Leitlinien", "CME", "Research Hub", "Diagnostik"],
   },
   fr: {
     label: "Pour les médecins",
@@ -94,6 +104,7 @@ const PHYSICIAN: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Espace pro",
     ctaSecondary: "Documentation",
     enter: "Entrer",
+    topics: ["guidelines", "FMC", "Research Hub", "diagnostic"],
   },
   it: {
     label: "Per i medici",
@@ -102,6 +113,7 @@ const PHYSICIAN: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Area professionale",
     ctaSecondary: "Documentazione",
     enter: "Entra",
+    topics: ["linee guida", "ECM", "Research Hub", "diagnostica"],
   },
   es: {
     label: "Para médicos",
@@ -110,6 +122,7 @@ const PHYSICIAN: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Área profesional",
     ctaSecondary: "Documentación",
     enter: "Entrar",
+    topics: ["guías", "FMC", "Research Hub", "diagnóstico"],
   },
   "pt-BR": {
     label: "Para médicos",
@@ -118,6 +131,7 @@ const PHYSICIAN: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Área profissional",
     ctaSecondary: "Documentação",
     enter: "Entrar",
+    topics: ["guidelines", "educação continuada", "Research Hub", "diagnóstico"],
   },
   en: {
     label: "For physicians",
@@ -126,6 +140,7 @@ const PHYSICIAN: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Professional desk",
     ctaSecondary: "Documentation",
     enter: "Enter",
+    topics: ["guidelines", "CME", "Research Hub", "diagnostics"],
   },
 };
 
@@ -137,6 +152,7 @@ const B2B: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Ceník inzerce",
     ctaSecondary: "Kontakt",
     enter: "Vstoupit",
+    topics: ["pharma", "kliniky", "laboratoře", "univerzity"],
   },
   de: {
     label: "Für Unternehmen",
@@ -145,6 +161,7 @@ const B2B: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Werbe-Preisliste",
     ctaSecondary: "Kontakt",
     enter: "Öffnen",
+    topics: ["Pharma", "Kliniken", "Labore", "Universitäten"],
   },
   fr: {
     label: "Pour les entreprises",
@@ -153,6 +170,7 @@ const B2B: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Tarifs publicitaires",
     ctaSecondary: "Contact",
     enter: "Entrer",
+    topics: ["pharma", "cliniques", "laboratoires", "universités"],
   },
   it: {
     label: "Per le aziende",
@@ -161,6 +179,7 @@ const B2B: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Listino pubblicitario",
     ctaSecondary: "Contatti",
     enter: "Entra",
+    topics: ["pharma", "cliniche", "laboratori", "università"],
   },
   es: {
     label: "Para empresas",
@@ -169,6 +188,7 @@ const B2B: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Tarifas publicitarias",
     ctaSecondary: "Contacto",
     enter: "Entrar",
+    topics: ["pharma", "clínicas", "laboratorios", "universidades"],
   },
   "pt-BR": {
     label: "Para empresas",
@@ -177,6 +197,7 @@ const B2B: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Tabela de anúncios",
     ctaSecondary: "Contato",
     enter: "Entrar",
+    topics: ["pharma", "clínicas", "laboratórios", "universidades"],
   },
   en: {
     label: "For companies",
@@ -185,6 +206,7 @@ const B2B: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Advertising rates",
     ctaSecondary: "Contact",
     enter: "Enter",
+    topics: ["pharma", "clinics", "labs", "universities"],
   },
 };
 
@@ -214,5 +236,6 @@ export function getV27AudienceHubCopy(audience: V27Audience, locale?: string | n
     secondaryLabel: overlay?.ctaSecondary ?? cfg.ctaSecondary.label,
     hubHref: cfg.href,
     enter: overlay?.enter ?? (pack === "cs" ? "Vstoupit" : "Enter"),
+    topics: overlay?.topics ?? [...cfg.topics],
   };
 }

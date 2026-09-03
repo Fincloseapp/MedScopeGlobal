@@ -568,7 +568,7 @@ export default async function ArticlePage({ params }: Props) {
               </h2>
               <div className="mt-6 grid gap-6 md:grid-cols-3">
                 {related.map((a) => (
-                  <ArticleCard key={a.id} article={a} />
+                  <ArticleCard key={a.id} article={a} locale={locale} />
                 ))}
               </div>
             </section>

@@ -847,6 +847,32 @@ assert.ok(
   "B2B landing title must follow the request locale"
 );
 assert.ok(
+  readFileSync(join(root, "app/(public)/pro-lekare/page.tsx"), "utf8").includes(
+    "getPhysicianLandingCopy"
+  ),
+  "physician landing chrome must not stay Czech on /it"
+);
+assert.ok(
+  !readFileSync(join(root, "app/(public)/pro-lekare/page.tsx"), "utf8").includes("Sekce pro praxi"),
+  "physician practice grid must come from the locale pack"
+);
+assert.ok(
+  readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes("relatedNativeDeskArticles"),
+  "related cards must pin native desk pieces instead of Czech demo"
+);
+assert.ok(
+  readFileSync(join(root, "components/recommendations/content-recommendations.tsx"), "utf8").includes(
+    "filterArticlesForLocale"
+  ),
+  "article recs must be native-first per locale"
+);
+assert.ok(
+  readFileSync(join(root, "components/article/article-card.tsx"), "utf8").includes(
+    "localizePublicHref"
+  ),
+  "related article cards must keep the edition prefix"
+);
+assert.ok(
   readFileSync(join(root, "lib/i18n/chrome-pack.ts"), "utf8").includes('"it"'),
   "Italian must have a dedicated chrome pack like German"
 );

@@ -61,7 +61,7 @@ export async function V27AudienceHub({ audience, variant = "card" }: Props) {
       </h3>
       <p className="mt-2 text-sm text-slate-600">{copy.description}</p>
       <ul className="mt-3 flex flex-wrap gap-1.5">
-        {cfg.topics.slice(0, 4).map((t) => (
+        {(copy.topics ?? cfg.topics).slice(0, 4).map((t) => (
           <li key={t} className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs text-slate-600">
             {t}
           </li>

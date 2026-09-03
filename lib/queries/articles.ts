@@ -22,7 +22,12 @@ import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-
 import type { LocaleCode } from "@/lib/i18n/config";
 import { createDataClient } from "@/lib/supabase/data";
 import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
-import { getNativeDeskArticleBySlug, mergeNativeDeskFeed } from "@/lib/editorial/native-desk-articles";
+import {
+  getNativeDeskArticleBySlug,
+  mergeNativeDeskFeed,
+  relatedNativeDeskArticles,
+} from "@/lib/editorial/native-desk-articles";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import {
   filterActiveArticles,
   isArchivedArticle,
@@ -417,6 +422,24 @@ export async function getArticleBySlug(
   return prepareArticleForDisplay(row, locale, "full");
 }
 
+async function relatedFallback(
+  excludeId: string,
+  limit: number,
+  locale: LocaleCode
+) {
+  const native = relatedNativeDeskArticles(locale, { id: excludeId }, limit);
+  if (native.length > 0) return native;
+  if (primaryArticleLocale(locale) !== "cs") return [];
+
+  const { getDemoMagazineArticles } = await import(
+    "@/lib/verejnost/demo-magazine-articles"
+  );
+  const raw = getDemoMagazineArticles()
+    .filter((a) => a.id !== excludeId)
+    .slice(0, limit);
+  return prepareArticlesForDisplay(raw, locale, { mode: "card", maxTranslate: limit });
+}
+
 export async function getRelatedArticles(
   categoryId: string,
   excludeId: string,
@@ -425,18 +448,12 @@ export async function getRelatedArticles(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
-  const { getDemoMagazineArticles } = await import(
-    "@/lib/verejnost/demo-magazine-articles"
-  );
-  const demoRelated = async () => {
-    const raw = getDemoMagazineArticles()
-      .filter((a) => a.id !== excludeId)
-      .slice(0, limit);
-    return prepareArticlesForDisplay(raw, locale, { mode: "card", maxTranslate: limit });
-  };
+  const nativePins = relatedNativeDeskArticles(locale, { id: excludeId }, limit);
+  // Seeded native-desk rows are not in the articles.category_id table.
+  if (categoryId === "native-desk") return nativePins;
 
   const supabase = await createDataClient();
-  if (!supabase) return demoRelated();
+  if (!supabase) return relatedFallback(excludeId, limit, locale);
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -448,19 +465,26 @@ export async function getRelatedArticles(
 
   if (error) {
     console.error("getRelatedArticles", error);
-    return demoRelated();
+    return relatedFallback(excludeId, limit, locale);
   }
-  const filtered = filterForReader(
-    mapArticleList(data as Record<string, unknown>[] | null),
-    isVip,
-    accessLevel,
-    locale
-  ).filter((article) => !shouldHideFromArticleDetail(article));
-  const prepared = await prepareArticlesForDisplay(filtered, locale, {
+  const filtered = filterArticlesForLocale(
+    filterForReader(
+      mapArticleList(data as Record<string, unknown>[] | null),
+      isVip,
+      accessLevel,
+      locale
+    ).filter((article) => !shouldHideFromArticleDetail(article)),
+    locale,
+    { minNative: limit, courtesyBorrow: 0, maxBorrow: 0 }
+  );
+  const merged = mergeNativeDeskFeed(filtered, locale).filter(
+    (article) => article.id !== excludeId
+  );
+  const prepared = await prepareArticlesForDisplay(merged, locale, {
     mode: "card",
     maxTranslate: limit,
   });
-  if (prepared.length === 0) return demoRelated();
+  if (prepared.length === 0) return relatedFallback(excludeId, limit, locale);
   return prepared.slice(0, limit);
 }
 

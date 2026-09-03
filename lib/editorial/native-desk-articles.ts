@@ -800,3 +800,20 @@ export function nativeDeskDisplayArticles(locale?: string | null): DisplayArticl
   const ui = normalizeLocale(locale ?? "cs");
   return nativeDeskArticlesForLocale(ui).map((row) => toDisplay(row, ui));
 }
+
+/** Related / recs on a native article must stay in-language — never Czech demo cards. */
+export function relatedNativeDeskArticles(
+  locale?: string | null,
+  exclude?: { id?: string | null; slug?: string | null },
+  limit = 3
+): DisplayArticle[] {
+  const excludeId = exclude?.id?.trim() ?? "";
+  const excludeSlug = exclude?.slug?.trim().toLowerCase() ?? "";
+  return nativeDeskDisplayArticles(locale)
+    .filter((article) => {
+      if (excludeId && article.id === excludeId) return false;
+      if (excludeSlug && article.slug.toLowerCase() === excludeSlug) return false;
+      return true;
+    })
+    .slice(0, limit);
+}
