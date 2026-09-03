@@ -807,6 +807,15 @@ assert.ok(
   const briefSrc = readFileSync(join(root, "lib/monetization/vialongevita-brief.ts"), "utf8");
   assert.ok(briefSrc.includes("export function mailReady"), "admin needs honest mail status");
   assert.ok(briefSrc.includes("__pillar"), "empty locale still gets a first brief");
+  assert.ok(
+    readFileSync(join(root, "wrangler.jsonc"), "utf8").includes('"send_email"'),
+    "Worker must bind Cloudflare Email Sending"
+  );
+  assert.ok(
+    readFileSync(join(root, "lib/email/from.ts"), "utf8").includes("info@medscopeglobal.com"),
+    "newsletters send from info@"
+  );
+  file("lib/email/cloudflare-sending.ts");
   const publicRunner = readFileSync(join(root, "lib/v25/runners/public.ts"), "utf8");
   assert.ok(
     publicRunner.includes("cloudflare-workers"),
@@ -895,6 +904,10 @@ assert.ok(NEWSLETTER_SUBSCRIBERS_SQL.includes("newsletter_subscribers"));
 assert.ok(NEWSLETTER_SUBSCRIBERS_SQL.includes("create table if not exists"));
 assert.ok(NEWSLETTER_SUBSCRIBERS_SQL.includes("unsubscribed_at"));
 assert.ok(NEWSLETTER_SUBSCRIBERS_SQL.includes("last_brief_sent_at"));
+assert.ok(
+  readFileSync(join(root, "lib/monetization/apply-schema.ts"), "utf8").includes("cloudflare"),
+  "email_logs must accept Cloudflare provider"
+);
 
 assert.ok(AD_INVENTORY.some((e) => e.id === "article-below-title"));
 assert.ok(AD_INVENTORY.some((e) => e.surface === "homepage"));

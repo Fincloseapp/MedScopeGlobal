@@ -40,7 +40,7 @@ export type NewsletterOpsSnapshot = {
   editionLocales: string[];
   editionsToday: number;
   mailReady: boolean;
-  mailTransport: "sendgrid" | "smtp" | "none";
+  mailTransport: "cloudflare" | "sendgrid" | "smtp" | "none";
   lastEmail: EditorialPulse["lastEmail"];
   todayLocales: string[];
   rotatingLocale: string;

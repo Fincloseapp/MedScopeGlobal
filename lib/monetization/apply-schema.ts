@@ -74,6 +74,44 @@ export function markNewsletterSchemaReady(): void {
   schemaReady = true;
 }
 
+export const EMAIL_LOGS_PROVIDER_SQL = `
+do $$
+declare
+  con name;
+begin
+  if to_regclass('public.email_logs') is null then
+    return;
+  end if;
+  for con in
+    select c.conname
+    from pg_constraint c
+    join pg_class t on t.oid = c.conrelid
+    join pg_namespace n on n.oid = t.relnamespace
+    where n.nspname = 'public'
+      and t.relname = 'email_logs'
+      and c.contype = 'c'
+      and pg_get_constraintdef(c.oid) ilike '%provider%'
+  loop
+    execute format('alter table public.email_logs drop constraint %I', con);
+  end loop;
+  alter table public.email_logs
+    add constraint email_logs_provider_check
+    check (provider in ('sendgrid', 'smtp', 'none', 'cloudflare'));
+end $$;
+`;
+
+let emailLogSchemaReady = false;
+
+export async function applyEmailLogProviderSchema(): Promise<SchemaApplyResult> {
+  if (emailLogSchemaReady) return { ok: true, skipped: true };
+  const outcome = await runManagementQuery(EMAIL_LOGS_PROVIDER_SQL);
+  if (outcome.ok || /already exists|duplicate/i.test(outcome.message)) {
+    emailLogSchemaReady = true;
+    return { ok: true };
+  }
+  return { ok: false, error: outcome.message };
+}
+
 export const MONETIZATION_SETTINGS_SQL = `
 create table if not exists public.monetization_settings (
   key text primary key,

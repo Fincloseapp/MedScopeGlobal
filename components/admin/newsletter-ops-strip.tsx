@@ -3,9 +3,11 @@ import { formatPulseDate } from "@/lib/admin/editorial-pulse";
 
 export function NewsletterOpsStrip({ ops }: { ops: NewsletterOpsSnapshot }) {
   const mailLabel = ops.mailReady
-    ? ops.mailTransport === "sendgrid"
-      ? "SendGrid"
-      : "SMTP"
+    ? ops.mailTransport === "cloudflare"
+      ? "Cloudflare · info@"
+      : ops.mailTransport === "sendgrid"
+        ? "SendGrid"
+        : "SMTP"
     : "není nastavený";
 
   return (

@@ -3,9 +3,11 @@ import { formatPulseDate } from "@/lib/admin/editorial-pulse";
 
 export function EditorialPulseStrip({ pulse }: { pulse: EditorialPulse }) {
   const mailLabel = pulse.mailReady
-    ? pulse.mailTransport === "sendgrid"
-      ? "SendGrid připraven"
-      : "SMTP připraven"
+    ? pulse.mailTransport === "cloudflare"
+      ? "Cloudflare → info@medscopeglobal.com"
+      : pulse.mailTransport === "sendgrid"
+        ? "SendGrid připraven"
+        : "SMTP připraven"
     : "e-mail není nastavený";
 
   return (

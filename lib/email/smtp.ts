@@ -1,4 +1,5 @@
 import type { EmailSendRequest } from "@/lib/email/types";
+import { getDefaultFromEmail } from "@/lib/email/from";
 
 /** Cloudflare Email Sending (beta) — username is always the literal string api_token. */
 export const CLOUDFLARE_EMAIL_SMTP = {
@@ -17,15 +18,9 @@ export function isSmtpConfigured(): boolean {
 
 export function getSmtpFromEmail(): string {
   const user = process.env.SMTP_USER?.trim();
-  // Cloudflare SMTP username is "api_token" — never use it as From address
   const userAsFrom =
     user && user.toLowerCase() !== "api_token" ? user : undefined;
-  return (
-    process.env.SMTP_FROM_EMAIL?.trim() ||
-    process.env.SENDGRID_FROM_EMAIL?.trim() ||
-    userAsFrom ||
-    "noreply@mail.medscopeglobal.com"
-  );
+  return process.env.SMTP_FROM_EMAIL?.trim() || userAsFrom || getDefaultFromEmail();
 }
 
 export async function sendViaSmtp(

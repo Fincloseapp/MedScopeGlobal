@@ -39,7 +39,7 @@ export default async function AdminEmailLogsPage({
           <p className="text-xs uppercase text-muted-foreground">Transport</p>
           <p className="text-2xl font-bold text-medical-navy">{ready ? transport : "žádný"}</p>
           <p className="text-xs text-muted-foreground">
-            {ready ? "Worker může odeslat brief" : "SendGrid ani SMTP není na Workeru"}
+            {ready ? "Worker odesílá z info@medscopeglobal.com" : "e-mailový transport chybí"}
           </p>
         </div>
         <div className="rounded-xl border bg-white p-4">

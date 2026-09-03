@@ -38,7 +38,7 @@ export type EditorialPulse = {
   rotatingLocale: string;
   expectedArticlesToday: number;
   mailReady: boolean;
-  mailTransport: "sendgrid" | "smtp" | "none";
+  mailTransport: "cloudflare" | "sendgrid" | "smtp" | "none";
   subscribers: number;
   waitingFirstBrief: number;
   lastEmail: {

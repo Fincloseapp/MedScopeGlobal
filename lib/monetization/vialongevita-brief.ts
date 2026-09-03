@@ -16,6 +16,8 @@ import type { AffiliateProduct } from "@/lib/ecosystem/monetization";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { composeBriefLead, composeBriefSubject } from "@/lib/monetization/brief-marketing";
 import { looksLikeCzech } from "@/lib/i18n/czech-detect";
+import { getDefaultFromEmail } from "@/lib/email/from";
+import { isCloudflareEmailConfigured } from "@/lib/email/cloudflare-sending";
 
 const FROM_NAME = MAGAZINE.name;
 const WEEK_MS = 6 * 24 * 60 * 60 * 1000;
@@ -39,10 +41,11 @@ export type BriefSendResult = {
 };
 
 export function mailReady(): boolean {
-  return isSendGridConfigured() || isSmtpConfigured();
+  return isCloudflareEmailConfigured() || isSendGridConfigured() || isSmtpConfigured();
 }
 
-export function mailTransportLabel(): "sendgrid" | "smtp" | "none" {
+export function mailTransportLabel(): "cloudflare" | "sendgrid" | "smtp" | "none" {
+  if (isCloudflareEmailConfigured()) return "cloudflare";
   if (isSendGridConfigured()) return "sendgrid";
   if (isSmtpConfigured()) return "smtp";
   return "none";
@@ -224,6 +227,7 @@ export async function sendViaLongeVitaWelcome(input: {
     text,
     category: "marketing",
     fromName: FROM_NAME,
+    fromEmail: getDefaultFromEmail(),
     metadata: { kind: "vialongevita-welcome", locale: input.locale },
   });
   return result.ok;
@@ -262,6 +266,7 @@ export async function sendViaLongeVitaFirstBrief(input: {
     text: payload.text,
     category: "marketing",
     fromName: FROM_NAME,
+    fromEmail: getDefaultFromEmail(),
     metadata: { kind: "vialongevita-brief-first", locale, usedFallback },
   });
   if (!result.ok) return { ok: false, error: result.error ?? "send_failed", usedFallback };
@@ -410,6 +415,7 @@ export async function sendViaLongeVitaTestBrief(input: {
     text: payload.text,
     category: "marketing",
     fromName: FROM_NAME,
+    fromEmail: getDefaultFromEmail(),
     metadata: { kind: "vialongevita-brief-test", locale },
   });
   return result.ok ? { ok: true } : { ok: false, error: result.error ?? "send_failed" };
@@ -486,6 +492,7 @@ export async function sendViaLongeVitaWeeklyBrief(options?: {
       text: payload.text,
       category: "marketing",
       fromName: FROM_NAME,
+      fromEmail: getDefaultFromEmail(),
       metadata: { kind: "vialongevita-brief", locale },
     });
     if (!result.ok) {

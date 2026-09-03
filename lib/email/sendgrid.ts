@@ -1,15 +1,12 @@
 import type { EmailAttachment, EmailSendRequest } from "@/lib/email/types";
+import { getDefaultFromEmail } from "@/lib/email/from";
 
 export function isSendGridConfigured(): boolean {
   return Boolean(process.env.SENDGRID_API_KEY?.trim());
 }
 
 export function getSendGridFromEmail(): string {
-  return (
-    process.env.SENDGRID_FROM_EMAIL?.trim() ||
-    process.env.SENDGRID_FROM?.trim() ||
-    "noreply@mail.medscopeglobal.com"
-  );
+  return getDefaultFromEmail();
 }
 
 function toRecipients(to: string | string[]): { email: string }[] {
@@ -46,7 +43,7 @@ export async function sendViaSendGrid(
     }
   }
 
-  const fromEmail = request.fromEmail ?? getSendGridFromEmail();
+  const fromEmail = request.fromEmail ?? getDefaultFromEmail();
   const fromName = request.fromName ?? "MedScopeGlobal";
 
   const body: Record<string, unknown> = {
