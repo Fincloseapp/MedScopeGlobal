@@ -707,7 +707,7 @@ const PACKS: Record<string, NewsletterCopy> = {
     error: "O envio falhou. Tente de novo.",
     invalid: "Digite um e-mail válido.",
     welcomeSubject: `Bem-vindo à ${NAME}`,
-    welcomeIntro: `Bem-vindo ao brief semanal da ${NAME}.`,
+    welcomeIntro: `Bem-vindo. Você está no brief semanal da ${NAME}.`,
     welcomeBody:
       "Cada edição tem uma forma clara: um texto principal e mais dois — sono, movimento, alimentação, longevidade. Claro, sem hype e sem pressão de assinatura. A primeira edição sai já.",
     welcomeCta: "Abrir a revista",
