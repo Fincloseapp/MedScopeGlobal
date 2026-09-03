@@ -6,7 +6,7 @@ import { AI_CRAWLER_NAMES } from "@/lib/seo/ai-crawlers";
 
 const base = getSiteUrl();
 
-const PUBLIC_DISALLOW = ["/admin", "/auth/callback", "/dashboard", "/api/", "/__ms/"];
+const PUBLIC_DISALLOW = ["/admin", "/auth/callback", "/dashboard", "/api/", "/__ms/", "/relay/"];
 
 /** robots.txt — search engines + assistant crawlers may read the magazine and cite ViaLongeVita. */
 export default function robots(): MetadataRoute.Robots {

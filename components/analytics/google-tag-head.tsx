@@ -7,8 +7,9 @@ import {
 
 /**
  * Google tag in <head>. Script + collect go through the same-origin
- * /__ms hop so ad blockers (the usual reason Realtime stays empty for
- * the site owner) do not drop the hit. One tag only.
+ * /relay hop so ad blockers (the usual reason Realtime stays empty for
+ * the site owner) do not drop the hit. One tag only. Do not put this
+ * under a `_`-prefixed App Router folder — that 404s the script.
  */
 export function GoogleTagHead() {
   if (!isGoogleAnalyticsEnabled()) return null;

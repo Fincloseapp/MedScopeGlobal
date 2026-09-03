@@ -154,6 +154,7 @@ const LOCALE_EXCLUDED_PREFIXES = [
   "/dashboard",
   "/go/",
   "/__ms/",
+  "/relay/",
   "/_next/",
   "/sw-",
   "/feed/",

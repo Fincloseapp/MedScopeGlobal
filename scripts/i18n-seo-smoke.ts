@@ -224,6 +224,8 @@ assert.ok(isLocaleRoutingExcluded("/sitemap-de.xml"));
 assert.ok(isLocaleRoutingExcluded("/api/health"));
 assert.ok(isLocaleRoutingExcluded("/__ms/js"));
 assert.ok(isLocaleRoutingExcluded("/__ms/g/collect"));
+assert.ok(isLocaleRoutingExcluded("/relay/js"));
+assert.ok(isLocaleRoutingExcluded("/relay/g/collect"));
 
 const deDesks = newsDesksForLocale("de");
 assert.equal(deDesks.find((d) => d.id === "dlouhovekost")?.label, "Langlebigkeit");

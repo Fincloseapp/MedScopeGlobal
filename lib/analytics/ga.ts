@@ -6,8 +6,12 @@
 /** Canonical GA4 property — David / Al Synaptica. Env may override, never invent. */
 export const GA_MEASUREMENT_ID = "G-6DX8RC4VZ1";
 
-/** Same-origin path so ad blockers do not drop gtag.js / collect. */
-export const GA_FIRST_PARTY_PREFIX = "/__ms";
+/**
+ * Same-origin path so ad blockers do not drop gtag.js / collect.
+ * Must not start with `_` — Next.js App Router treats `_folder` as private
+ * (the old `/__ms` hop 404'd on every edition).
+ */
+export const GA_FIRST_PARTY_PREFIX = "/relay";
 
 const GA_RE = /^G-[A-Z0-9]{6,20}$/;
 

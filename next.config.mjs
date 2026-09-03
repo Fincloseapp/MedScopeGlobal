@@ -179,6 +179,10 @@ const nextConfig = {
     ];
     return [
       {
+        source: "/__ms/:path*",
+        destination: "/relay/:path*",
+      },
+      {
         source: "/sitemap-:locale.xml",
         destination: "/sitemaps/:locale",
       },

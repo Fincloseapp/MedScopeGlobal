@@ -64,7 +64,7 @@ export function applySecurityHeaders(response: NextResponse, pathname?: string):
     );
     response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   }
-  if (pathname?.startsWith("/__ms")) {
+  if (pathname?.startsWith("/__ms") || pathname?.startsWith("/relay")) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
   }
   return response;

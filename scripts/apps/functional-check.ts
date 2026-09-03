@@ -1190,7 +1190,7 @@ assert.ok(
   readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(
     "GA_FIRST_PARTY_PREFIX"
   ) &&
-    readFileSync(join(root, "lib/analytics/ga.ts"), "utf8").includes('"/__ms"'),
+    readFileSync(join(root, "lib/analytics/ga.ts"), "utf8").includes('"/relay"'),
   "Google tag must load through the first-party hop"
 );
 assert.ok(
@@ -1200,11 +1200,15 @@ assert.ok(
   "collect must stay on medscopeglobal.com so ad blockers miss it"
 );
 assert.ok(
-  existsSync(join(root, "app/__ms/[...path]/route.ts")),
+  existsSync(join(root, "app/relay/[...path]/route.ts")),
   "first-party GA hop route must exist"
 );
 assert.ok(
-  readFileSync(join(root, "middleware.ts"), "utf8").includes("__ms"),
+  !existsSync(join(root, "app/__ms/[...path]/route.ts")),
+  "do not put the GA hop under a Next.js private _folder"
+);
+assert.ok(
+  readFileSync(join(root, "middleware.ts"), "utf8").includes("relay"),
   "locale middleware must not rewrite the GA hop"
 );
 assert.ok(

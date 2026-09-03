@@ -9,6 +9,9 @@ type Params = { params: Promise<{ path: string[] }> };
  * First-party hop for GA4. Browser talks to medscopeglobal.com;
  * this route forwards to Google so uBlock/AdGuard cannot see
  * googletagmanager.com / google-analytics.com on the page.
+ *
+ * Must not live under app/__ms — Next.js treats `_`-prefixed folders
+ * as private, so that hop 404'd and Realtime stayed empty.
  */
 async function proxy(request: Request, path: string[]) {
   const incoming = new URL(request.url);
