@@ -1,6 +1,7 @@
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
+import { localizeListedCzkIn } from "@/lib/i18n/payment-currency";
 
 type Pack = "cs" | "de" | "fr" | "en";
 
@@ -225,20 +226,23 @@ export function getRevenueCopy(locale?: string | null): RevenueCopy {
   const base = COPY[revenueCopyLocale(locale)];
   const nl = getNewsletterCopy(locale);
   const overlay = affiliateOverlay(locale);
-  return {
-    ...base,
-    ...overlay,
-    newsletterKicker: nl.kicker,
-    newsletterTitle: nl.title,
-    newsletterBody: nl.body,
-    newsletterPlaceholder: nl.placeholder,
-    newsletterCta: nl.cta,
-    newsletterPrivacy: nl.privacy,
-    newsletterSuccess: nl.success,
-    newsletterDuplicate: nl.duplicate,
-    newsletterError: nl.error,
-    newsletterInvalid: nl.invalid,
-  };
+  return localizeListedCzkIn(
+    {
+      ...base,
+      ...overlay,
+      newsletterKicker: nl.kicker,
+      newsletterTitle: nl.title,
+      newsletterBody: nl.body,
+      newsletterPlaceholder: nl.placeholder,
+      newsletterCta: nl.cta,
+      newsletterPrivacy: nl.privacy,
+      newsletterSuccess: nl.success,
+      newsletterDuplicate: nl.duplicate,
+      newsletterError: nl.error,
+      newsletterInvalid: nl.invalid,
+    },
+    locale
+  );
 }
 
 function affiliateOverlay(
