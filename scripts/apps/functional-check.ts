@@ -172,6 +172,17 @@ import {
   getPrimaryDesks,
   createEditorialQueueItem,
 } from "../../lib/ecosystem/editorial";
+import { GLOBAL_LOCALES, localeFromCountry } from "../../lib/ecosystem/locales";
+import {
+  MAGAZINE_EDITORS_PER_LOCALE,
+  MAGAZINE_WRITERS_PER_LOCALE,
+  allLocaleMagazineDesks,
+  totalDeployedMagazineEditors,
+  totalDeployedMagazineWriters,
+} from "../../lib/editorial/locale-magazine-desks";
+import { buildDeskComment, foreignDeskMayComment } from "../../lib/editorial/desk-comments";
+import { getNewsletterCopy } from "../../lib/i18n/newsletter-copy";
+import { looksLikeCzech } from "../../lib/i18n/czech-detect";
 import { SYNDICATION_RULES, getSyndicationTargets } from "../../lib/ecosystem/editorial/syndication";
 import { APP_MARKETING_IMAGE, MARKETING_VISUALS } from "../../lib/brand/marketing-visuals";
 import {
@@ -1019,7 +1030,7 @@ file("app/api/cron/ecosystem-syndicate/route.ts");
 file("lib/ecosystem/editorial/desks.ts");
 file("lib/ecosystem/editorial/syndication.ts");
 
-assert.equal(EDITORIAL_DESKS.length, 19, "desk per global locale");
+assert.equal(EDITORIAL_DESKS.length, GLOBAL_LOCALES.length, "desk per global locale");
 assert.ok(PRIMARY_EDITORIAL_LOCALES.includes("fr"), "fr is primary desk");
 assert.ok(PRIMARY_EDITORIAL_LOCALES.includes("zh-CN"), "zh-CN is primary desk");
 assert.equal(getDeskForLocale("cs").id, "desk-cz");
@@ -1869,7 +1880,24 @@ assert.equal(
   resolveWriterAgent({ metadata: { writer_id: "writer1" } })?.deskId,
   "writer1"
 );
-assert.equal(EDITORIAL_PERSONAS.filter((p) => p.active).length, 28);
+assert.ok(GLOBAL_LOCALES.some((item) => item.code === "pt"));
+assert.ok(GLOBAL_LOCALES.some((item) => item.code === "pt-BR"));
+assert.equal(localeFromCountry("PT"), "pt");
+assert.equal(localeFromCountry("BR"), "pt-BR");
+assert.equal(allLocaleMagazineDesks().length, GLOBAL_LOCALES.length);
+assert.equal(MAGAZINE_WRITERS_PER_LOCALE, 20);
+assert.equal(MAGAZINE_EDITORS_PER_LOCALE, 6);
+assert.equal(totalDeployedMagazineWriters(), GLOBAL_LOCALES.length * 20);
+assert.equal(totalDeployedMagazineEditors(), GLOBAL_LOCALES.length * 6);
+assert.ok(getReviewPipeline("pt").length >= 6);
+assert.ok(getReviewPipeline("pt-BR").length >= 6);
+assert.ok(getReviewPipeline("de").length >= 6);
+assert.ok(foreignDeskMayComment("cs", "de"));
+assert.ok(buildDeskComment({ fromLocale: "de", onLocale: "cs", kind: "borrow" }));
+assert.ok(!looksLikeCzech(getNewsletterCopy("pt").body));
+assert.ok(!looksLikeCzech(getNewsletterCopy("pt-BR").title));
+assert.ok(getNewsletterCopy("pt-BR").welcomeIntro.includes("Você"));
+assert.equal(EDITORIAL_PERSONAS.filter((p) => p.active).length, 29);
 assert.equal(EDITORIAL_PERSONAS.filter((p) => p.role === "editor").length, 8);
 assert.ok(getReviewPipeline("cs").length >= 6, "multiple MedScopeGlobal editors on CS bench");
 {

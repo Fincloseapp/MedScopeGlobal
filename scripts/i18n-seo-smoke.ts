@@ -39,6 +39,7 @@ import {
   writerDesksForLocale,
 } from "../lib/i18n/surface-copy";
 import { getSubscribeCopy } from "../lib/i18n/subscribe-copy";
+import { getNewsletterCopy } from "../lib/i18n/newsletter-copy";
 import { getMarketingCopy } from "../lib/i18n/marketing-copy";
 import { localizePublicHref } from "../lib/i18n/nav-copy";
 import { localizeV271Page } from "../lib/i18n/hub-copy";
@@ -182,6 +183,14 @@ assert.equal(localeForUnprefixedEntry("", false, "CZ"), "cs");
 assert.equal(localeForUnprefixedEntry("de-DE", false, "US"), "de");
 assert.equal(localeForUnprefixedEntry("en-GB,en;q=0.9", false, "US"), "en-UK");
 assert.equal(localeForUnprefixedEntry("de-DE", true, "US"), "cs");
+assert.equal(localeForUnprefixedEntry("pt-PT,pt;q=0.9", false), "pt");
+assert.equal(localeForUnprefixedEntry("pt-BR,pt;q=0.9", false), "pt-BR");
+assert.equal(localeForUnprefixedEntry("", false, "PT"), "pt");
+assert.equal(localeForUnprefixedEntry("", false, "BR"), "pt-BR");
+assert.equal(localeToPathSegment("pt-BR"), "pt-br");
+assert.equal(pathSegmentToLocale("pt-br"), "pt-BR");
+assert.ok(!getNewsletterCopy("pt").body.includes("češtině"));
+assert.ok(!getNewsletterCopy("de").body.includes("češtině"));
 assert.equal(localizePublicHref("/", "fr"), "/fr");
 assert.equal(localizePublicHref("/", "cs"), "/cs");
 assert.ok(isSearchEngineBot("Mozilla/5.0 (compatible; Googlebot/2.1)"));

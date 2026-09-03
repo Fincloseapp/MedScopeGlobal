@@ -10,6 +10,8 @@ const LOCALE_TO_SEGMENT: Record<GlobalLocaleCode, string> = {
   fr: "fr",
   it: "it",
   es: "es",
+  pt: "pt",
+  "pt-BR": "pt-br",
   ro: "ro",
   hu: "hu",
   ru: "ru",
@@ -32,6 +34,9 @@ const SEGMENT_TO_LOCALE: Record<string, GlobalLocaleCode> = {
   fr: "fr",
   it: "it",
   es: "es",
+  pt: "pt",
+  "pt-br": "pt-BR",
+  "pt-pt": "pt",
   ro: "ro",
   hu: "hu",
   ru: "ru",
@@ -55,6 +60,7 @@ const ALIAS_SEGMENT_REDIRECT: Record<string, string> = {
   ja: "jp",
   "zh-cn": "cn",
   ko: "kr",
+  "pt-pt": "pt",
 };
 
 export const LOCALE_PATH_SEGMENTS = GLOBAL_LOCALES.map((l) => localeToPathSegment(l.code));
@@ -62,6 +68,8 @@ export const LOCALE_PATH_SEGMENTS = GLOBAL_LOCALES.map((l) => localeToPathSegmen
 export function resolveGlobalLocale(input: string): GlobalLocaleCode {
   const lower = input.toLowerCase();
   if (lower === "en-us" || lower === "en_us") return "en-US";
+  if (lower === "pt-br" || lower === "pt_br") return "pt-BR";
+  if (lower === "pt-pt" || lower === "pt_pt") return "pt";
   if (lower === "zh-cn" || lower === "cn") return "zh-CN";
   if (lower === "jp" || lower === "ja") return "ja";
   if (lower === "kr" || lower === "ko") return "ko";

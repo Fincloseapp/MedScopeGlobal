@@ -31,6 +31,8 @@ export const VIP_CTA_TEMPLATES: Record<GlobalLocaleCode, string> = {
   fr: "Pour des protocoles longevity approfondis et des recommandations personnalisées, découvrez VIP MedScopeGlobal.",
   it: "Per protocolli longevity più approfonditi e raccomandazioni personalizzate, scopri VIP MedScopeGlobal.",
   es: "Para protocolos de longevidad más profundos y recomendaciones personalizadas, descubre VIP MedScopeGlobal.",
+  pt: "Para protocolos de longevidade mais profundos e recomendações personalizadas, explore o VIP MedScopeGlobal.",
+  "pt-BR": "Para protocolos de longevidade mais profundos e recomendações personalizadas, conheça o VIP MedScopeGlobal.",
   ro: "Pentru protocoale longevity mai profunde și recomandări personalizate, descoperă VIP MedScopeGlobal.",
   hu: "Mélyebb longevity protokollokért és személyre szabott ajánlásokért fedezze fel a VIP MedScopeGlobal-t.",
   ru: "Для углублённых протоколов долголетия и персональных рекомендаций откройте VIP MedScopeGlobal.",

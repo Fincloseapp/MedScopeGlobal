@@ -1,27 +1,56 @@
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { getNewsletterArchive, getPendingNewsletterTopics } from "@/lib/queries/v4c/newsletters";
+import { GLOBAL_LOCALES } from "@/lib/ecosystem/locales";
+import {
+  MAGAZINE_EDITORS_PER_LOCALE,
+  MAGAZINE_WRITERS_PER_LOCALE,
+} from "@/lib/editorial/locale-magazine-desks";
+import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 
 export type NewsletterLocaleCount = { locale: string; count: number };
+
+export type NewsletterLocaleDeskRow = {
+  locale: string;
+  label: string;
+  writers: number;
+  editors: number;
+  subscribers: number;
+  briefTitle: string;
+};
 
 export type NewsletterOpsSnapshot = {
   subscribers: number;
   byLocale: NewsletterLocaleCount[];
   pendingTopics: number;
+  localeDesks: NewsletterLocaleDeskRow[];
   issues: {
     slug: string;
     title: string;
     issue_date: string;
     published: boolean;
     admin_only: boolean;
+    locale?: string;
   }[];
   latestPublishedSlug: string | null;
 };
+
+function plannedLocaleDesks(subMap: Map<string, number> = new Map()): NewsletterLocaleDeskRow[] {
+  return GLOBAL_LOCALES.map((item) => ({
+    locale: item.code,
+    label: item.label,
+    writers: MAGAZINE_WRITERS_PER_LOCALE,
+    editors: MAGAZINE_EDITORS_PER_LOCALE,
+    subscribers: subMap.get(item.code) ?? 0,
+    briefTitle: getNewsletterCopy(item.code).briefSubject,
+  }));
+}
 
 export async function getNewsletterOpsSnapshot(): Promise<NewsletterOpsSnapshot> {
   const empty: NewsletterOpsSnapshot = {
     subscribers: 0,
     byLocale: [],
     pendingTopics: 0,
+    localeDesks: plannedLocaleDesks(),
     issues: [],
     latestPublishedSlug: null,
   };
@@ -50,11 +79,14 @@ export async function getNewsletterOpsSnapshot(): Promise<NewsletterOpsSnapshot>
     .sort((a, b) => b.count - a.count);
 
   const published = issues.find((issue) => issue.published && !issue.admin_only);
+  const subMap = new Map(byLocale.map((row) => [row.locale, row.count]));
+  const localeDesks = plannedLocaleDesks(subMap);
 
   return {
     subscribers: active.length,
     byLocale,
     pendingTopics: topics.length,
+    localeDesks,
     issues: issues.slice(0, 10).map((issue) => ({
       slug: issue.slug,
       title: issue.title,

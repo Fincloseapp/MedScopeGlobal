@@ -85,6 +85,12 @@ export async function POST(request: Request) {
       stored = true;
       duplicate = true;
       destination = "subscribers";
+      await admin
+        .from("newsletter_subscribers")
+        .update({ locale, source })
+        .eq("email", email)
+        .eq("segment", segment)
+        .is("unsubscribed_at", null);
     } else {
       const { error: fallbackError } = await admin.from("analytics").insert({
         event: "newsletter_subscribe",

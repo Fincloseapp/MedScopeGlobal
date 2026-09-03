@@ -20,6 +20,7 @@ export const LOCALES = [
   "en-US",
   "en-UK",
   "pt",
+  "pt-BR",
   "nl",
   "jp",
   "kr",
@@ -69,6 +70,10 @@ const LOCALE_INPUT_ALIASES: Record<string, LocaleCode> = {
   cn: "zh-CN",
   jp: "ja",
   kr: "ko",
+  "pt-br": "pt-BR",
+  pt_br: "pt-BR",
+  "pt-pt": "pt",
+  pt_pt: "pt",
 };
 
 /**

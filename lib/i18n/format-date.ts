@@ -32,6 +32,8 @@ export function intlLocaleFor(locale?: string | null): string {
   if (normalized === "en-US") return "en-US";
   if (normalized === "en-UK") return "en-GB";
   if (normalized === "zh-CN") return "zh-CN";
+  if (normalized === "pt-BR") return "pt-BR";
+  if (normalized === "pt") return "pt-PT";
   const primary = primaryArticleLocale(normalized);
   return INTL_BY_PRIMARY[primary] ?? "en-GB";
 }

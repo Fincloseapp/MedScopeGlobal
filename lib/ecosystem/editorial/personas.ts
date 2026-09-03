@@ -1,6 +1,7 @@
 /** Autonomous editor/journalist personas with pipeline roles */
 
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { localeEditorBench } from "@/lib/editorial/locale-magazine-desks";
 import type { EditorialTopic } from "./desks";
 
 export type EditorialRole =
@@ -85,7 +86,7 @@ export const EDITORIAL_PERSONAS: EditorialPersona[] = [
       en: "EU Romance Longevity Journalist",
     },
     role: "journalist",
-    locales: ["fr", "es", "it", "ro", "hu", "pl"],
+    locales: ["fr", "es", "it", "pt", "pt-BR", "ro", "hu", "pl"],
     topics: ["longevity", "lifestyle", "seniors", "trending"],
     editorialUnitId: "medscope_international_research",
     active: true,
@@ -118,6 +119,19 @@ export const EDITORIAL_PERSONAS: EditorialPersona[] = [
     editorialUnitId: "medscope_global_health",
     active: true,
   },
+  {
+    id: "journalist-lusophone",
+    displayName: {
+      pt: "Jornalista de longevidade (PT)",
+      "pt-BR": "Jornalista de longevidade (BR)",
+      en: "Lusophone Longevity Journalist",
+    },
+    role: "journalist",
+    locales: ["pt", "pt-BR"],
+    topics: ["longevity", "lifestyle", "seniors", "trending"],
+    editorialUnitId: "medscope_international_research",
+    active: true,
+  },
   // Editors — review & approve
   {
     id: "editor-chief-cz",
@@ -132,7 +146,7 @@ export const EDITORIAL_PERSONAS: EditorialPersona[] = [
     id: "editor-chief-en",
     displayName: { en: "International Chief Editor" },
     role: "editor",
-    locales: ["en", "en-US", "fr", "es", "it", "pl", "de", "ru", "uk", "zh-CN", "ja"],
+    locales: ["en", "en-US", "fr", "es", "it", "pt", "pt-BR", "pl", "de", "ru", "uk", "zh-CN", "ja"],
     topics: ["longevity", "lifestyle", "seniors", "trending"],
     editorialUnitId: "medscope_global_editorial_board",
     active: true,
@@ -228,7 +242,7 @@ export const EDITORIAL_PERSONAS: EditorialPersona[] = [
     id: "lang-reviewer-eu",
     displayName: { fr: "Relecteur EU", es: "Corrector UE", en: "EU Language Reviewer" },
     role: "language_reviewer",
-    locales: ["fr", "es", "it", "pl", "ro", "hu"],
+    locales: ["fr", "es", "it", "pt", "pt-BR", "pl", "ro", "hu"],
     topics: ["longevity", "lifestyle", "seniors", "trending"],
     active: true,
   },
@@ -254,7 +268,7 @@ export const EDITORIAL_PERSONAS: EditorialPersona[] = [
     id: "compliance-medical-en",
     displayName: { en: "Medical Compliance Reviewer (EN)" },
     role: "compliance_reviewer",
-    locales: ["en", "en-US", "fr", "es", "it", "de", "pl", "ru", "uk", "zh-CN", "ja"],
+    locales: ["en", "en-US", "fr", "es", "it", "pt", "pt-BR", "de", "pl", "ru", "uk", "zh-CN", "ja"],
     topics: ["longevity", "lifestyle", "seniors", "trending"],
     editorialUnitId: "medscope_clinical_insights",
     active: true,
@@ -264,7 +278,7 @@ export const EDITORIAL_PERSONAS: EditorialPersona[] = [
     displayName: { cs: "Právní/compliance reviewer", en: "Legal & Compliance Reviewer" },
     role: "compliance_reviewer",
     locales: [
-      "cs", "sk", "en", "en-US", "de", "pl", "fr", "es", "it", "ro", "hu",
+      "cs", "sk", "en", "en-US", "de", "pl", "fr", "es", "it", "pt", "pt-BR", "ro", "hu",
       "ru", "uk", "be", "zh-CN", "ja", "ko", "vi", "id",
     ],
     topics: ["longevity", "lifestyle", "seniors", "trending"],
@@ -277,7 +291,7 @@ export const EDITORIAL_PERSONAS: EditorialPersona[] = [
     displayName: { cs: "Vizuální kurátor", en: "Visual Image Curator" },
     role: "image_curator",
     locales: [
-      "cs", "sk", "en", "en-US", "de", "pl", "fr", "es", "it", "ro", "hu",
+      "cs", "sk", "en", "en-US", "de", "pl", "fr", "es", "it", "pt", "pt-BR", "ro", "hu",
       "ru", "uk", "be", "zh-CN", "ja", "ko", "vi", "id",
     ],
     topics: ["longevity", "lifestyle", "seniors", "trending"],
@@ -317,6 +331,17 @@ export function getJournalistForTopic(
   return journalists[Math.floor(Math.random() * journalists.length)];
 }
 
+function generatedBenchPersonas(locale: GlobalLocaleCode): EditorialPersona[] {
+  return localeEditorBench(locale).map((seat) => ({
+    id: seat.id,
+    displayName: { [locale]: seat.label, en: seat.label },
+    role: seat.role,
+    locales: [locale],
+    topics: ["longevity", "lifestyle", "seniors", "trending"],
+    active: true,
+  }));
+}
+
 export function getReviewPipeline(
   locale: GlobalLocaleCode,
   topic?: EditorialTopic
@@ -330,6 +355,7 @@ export function getReviewPipeline(
     ...editors,
     ...getPersonasByRole(locale, "language_reviewer"),
     ...getPersonasByRole(locale, "compliance_reviewer"),
+    ...generatedBenchPersonas(locale),
   ]) {
     if (seen.has(persona.id)) continue;
     seen.add(persona.id);

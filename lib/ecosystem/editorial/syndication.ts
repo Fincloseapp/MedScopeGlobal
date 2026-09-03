@@ -1,6 +1,7 @@
 /** Syndication rules — meaningful sharing/adoption across locales */
 
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { attachDeskComments, buildDeskComment } from "@/lib/editorial/desk-comments";
 import { getDeskForLocale, getSyndicationHubDesks } from "./desks";
 
 export type SyndicationMode =
@@ -55,7 +56,7 @@ export const SYNDICATION_RULES: SyndicationRule[] = [
   },
   {
     sourceLocale: "en",
-    targetLocales: ["fr", "es", "it", "de", "pl", "ru", "uk", "zh-CN", "ja"],
+    targetLocales: ["fr", "es", "it", "pt", "pt-BR", "de", "pl", "ru", "uk", "zh-CN", "ja"],
     mode: "summary_adaptation",
     requiresComplianceReview: true,
     preserveAuthorAttribution: true,
@@ -98,14 +99,23 @@ export function isSyndicationHub(locale: GlobalLocaleCode): boolean {
 }
 
 export function buildSyndicationMetadata(candidate: SyndicationCandidate): Record<string, unknown> {
-  return {
-    syndicated_from: candidate.sourceArticleId,
-    syndicated_from_slug: candidate.sourceSlug,
-    syndicated_from_locale: candidate.sourceLocale,
-    syndication_mode: candidate.mode,
-    syndicated_at: new Date().toISOString(),
-    original_author_unit: candidate.sourceAuthorUnitId ?? null,
-  };
+  const comment = buildDeskComment({
+    fromLocale: candidate.targetLocale,
+    onLocale: candidate.sourceLocale,
+    kind: candidate.mode === "cross_reference" ? "cross_reference" : "borrow",
+  });
+  return attachDeskComments(
+    {
+      syndicated_from: candidate.sourceArticleId,
+      syndicated_from_slug: candidate.sourceSlug,
+      syndicated_from_locale: candidate.sourceLocale,
+      syndication_mode: candidate.mode,
+      syndicated_at: new Date().toISOString(),
+      original_author_unit: candidate.sourceAuthorUnitId ?? null,
+      native_first: true,
+    },
+    comment
+  );
 }
 
 export function getAdoptableSourceLocales(targetLocale: GlobalLocaleCode): GlobalLocaleCode[] {

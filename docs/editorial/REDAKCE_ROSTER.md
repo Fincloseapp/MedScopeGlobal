@@ -14,11 +14,12 @@ Exact counts from source of truth in the repo (branch audit). Cross-check:
 | Compliance reviewers | **3** | role=`compliance_reviewer` |
 | Image curators | **2** | role=`image_curator` |
 | **Ecosystem personas (total)** | **28** | all active |
-| Public daily writers (cron) | **20** | 5 categories × 4 senior specialists → `/api/cron/public-articles` |
+| Public writers per locale | **20** | 5 categories × 4 senior specialists, native language |
+| Public writers total | **420** | 21 locales × 20 |
 | v27 audience AI writers | **4** | `V27_AI_WRITERS` (public/student/physician/b2b) |
 | v26 writing-style personas | **7** | `AUTHOR_PERSONAS` (tone styles, not bylines) |
 | Editorial author units | **14** | `EDITORIAL_UNITS` (public bylines) |
-| Desks (all locales) | **19** | `EDITORIAL_DESKS` = `GLOBAL_LOCALES` |
+| Desks (all locales) | **21** | `EDITORIAL_DESKS` = `GLOBAL_LOCALES` (incl. pt, pt-BR) |
 | Primary desks (daily enqueue) | **13** | `PRIMARY_EDITORIAL_LOCALES` |
 | Syndication hubs | **3** | cs, en, en-US |
 

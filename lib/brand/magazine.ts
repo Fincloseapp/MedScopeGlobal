@@ -161,9 +161,9 @@ export const MAGAZINE = {
     "zh-CN": "ViaLongeVita · powered by MedScopeGlobal",
   },
   whatsNew: {
-    en: "New: global ecosystem — MediFlow journal, VIP longevity, autonomous editorial, 19 locales",
-    cs: "Nově: globální ekosystém — MediFlow deník, VIP dlouhověkost, autonomní redakce, 19 jazyků",
-    sk: "Nové: globálny ekosystém — MediFlow denník, VIP dlhovekosť, autonómna redakcia, 19 jazykov",
+    en: "New: global ecosystem — MediFlow journal, VIP longevity, autonomous editorial, 21 locales",
+    cs: "Nově: globální ekosystém — MediFlow deník, VIP dlouhověkost, autonomní redakce, 21 jazyků",
+    sk: "Nové: globálny ekosystém — MediFlow denník, VIP dlhovekosť, autonómna redakcia, 21 jazykov",
     de: "Neu: globales Ökosystem — MediFlow, VIP-Langlebigkeit, autonome Redaktion, 19 Sprachen",
     fr: "Nouveau : écosystème mondial — MediFlow, longévité VIP, rédaction autonome, 19 langues",
     es: "Nuevo: ecosistema global — MediFlow, longevidad VIP, redacción autónoma, 19 idiomas",

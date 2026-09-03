@@ -259,7 +259,13 @@ async function loadBriefArticles(locale: string): Promise<BriefArticle[]> {
     if (primary === "cs") {
       return !articleLocale || articleLocale.startsWith("cs");
     }
-    if (articleLocale.startsWith(primary) || articleLocale.startsWith("en")) return true;
+    if (primary === "pt-BR") {
+      return articleLocale.startsWith("pt-br") || articleLocale === "pt-BR";
+    }
+    if (primary === "pt") {
+      return articleLocale === "pt" || articleLocale.startsWith("pt-pt");
+    }
+    if (articleLocale.startsWith(primary)) return true;
     return false;
   });
 

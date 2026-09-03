@@ -388,7 +388,7 @@ const COPY: Record<string, SurfaceCopy> = {
     signIn: "Sign in",
     register: "Register",
     downloadApps: "Get the apps",
-    siteDescription: `${MAGAZINE.name} — health and longevity magazine on MedScopeGlobal.com. MediFlow, VIP protocols, MeDipacient and OrdiZapis. Evidence-based content in 19 languages. 14 days free.`,
+    siteDescription: `${MAGAZINE.name} — health and longevity magazine on MedScopeGlobal.com. MediFlow, VIP protocols, MeDipacient and OrdiZapis. Evidence-based content in 21 languages. 14 days free.`,
     cookieTitle: "Cookies and privacy",
     cookieBody: "We use cookies for the site to work, plus analytics and marketing.",
     cookieNecessary: "Necessary only",

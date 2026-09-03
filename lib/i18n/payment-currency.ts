@@ -26,6 +26,7 @@ const BY_LOCALE: Partial<Record<string, PaymentTiers>> = {
   es: EUR,
   nl: EUR,
   pt: EUR,
+  "pt-BR": { amounts: [990, 1990, 3990], currency: "brl", symbol: "R$", minAmount: 500 },
   pl: { amounts: [1000, 2500, 4900], currency: "pln", symbol: "zł", minAmount: 100 },
   ro: { amounts: [1000, 2500, 4900], currency: "ron", symbol: "lei", minAmount: 100 },
   hu: { amounts: [80000, 200000, 390000], currency: "huf", symbol: "Ft", minAmount: 8000 },
