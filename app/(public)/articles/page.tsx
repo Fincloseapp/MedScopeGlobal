@@ -11,7 +11,7 @@ import { MAGAZINE, getMagazineListingCopy } from "@/lib/brand/magazine";
 import { VITASCOPE_TRACK_LOGO } from "@/lib/brand/vitascope";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
-import { filterArticlesForDesk, mixListableFeed, type NewsDeskId } from "@/lib/v271/news-desks";
+import { filterArticlesForDesk, mixListableFeed, newsDesksForLocale, type NewsDeskId } from "@/lib/v271/news-desks";
 
 export const revalidate = 120;
 
@@ -29,20 +29,18 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const locale = await getServerLocale();
   const copy = getMagazineListingCopy(locale);
+  const desks = newsDesksForLocale(locale);
   const sp = await searchParams;
   const desk = parseDesk(sp.desk);
+  const magazineDesk = desks.find((item) => item.id === "clanky");
   const title =
     sp.med_track === "priprava"
       ? copy.prep
       : sp.med_track === "studium"
         ? copy.study
-        : desk === "novinky"
-          ? "Novinky"
-          : desk === "verejnost"
-            ? "Články pro veřejnost"
-            : desk === "dlouhovekost"
-              ? "Dlouhověkost"
-              : "Články";
+        : desk
+          ? (desks.find((item) => item.id === desk)?.label ?? magazineDesk?.label ?? MAGAZINE.name)
+          : (magazineDesk?.label ?? MAGAZINE.name);
   return buildV20PageMetadata({
     title: `${title} — ${MAGAZINE.name}`,
     description:

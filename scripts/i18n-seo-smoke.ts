@@ -220,6 +220,10 @@ assert.equal(getPortalChrome("ja").news, "ViaLongeVita");
 
 assert.equal(getSurfaceCopy("cs").searchTab, "Hledat");
 assert.equal(getSurfaceCopy("de").searchTab, "Suchen");
+assert.ok(!getSurfaceCopy("de").searchNoResults.includes("MeDiprep"));
+assert.ok(!getSurfaceCopy("de").audiences.some((item) => item.id === "student"));
+assert.ok(!getSurfaceCopy("fr").footer.audiences.some((item) => item.href.startsWith("/studenti")));
+assert.ok(getSurfaceCopy("cs").searchNoResults.includes("MeDiprep"));
 assert.equal(getSurfaceCopy("fr").searchTab, "Rechercher");
 assert.equal(getSurfaceCopy("en-US").searchTab, "Search");
 assert.equal(getSurfaceCopy("ru").searchTab, "Search");

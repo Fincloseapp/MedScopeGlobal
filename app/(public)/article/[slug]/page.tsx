@@ -73,6 +73,7 @@ import { MAGAZINE, getOgLocale } from "@/lib/brand/magazine";
 import { isArticleTipUiEnabled, ARTICLE_TIP_COPY, tipLocale } from "@/lib/ecosystem/tip-copy";
 import { SITE } from "@/lib/config/site";
 import { getArticleChrome } from "@/lib/i18n/article-chrome";
+import { localeToPathSegment } from "@/lib/i18n/locale-path";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -119,9 +120,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: article.title,
     description,
     keywords,
+    authors: [{ name: MAGAZINE.name, url: SITE.url }],
+    publisher: MAGAZINE.name,
     alternates: {
       canonical,
       languages,
+      types: {
+        "application/rss+xml": `${SITE.url}/feed-${localeToPathSegment(locale)}.xml`,
+      },
     },
     openGraph: {
       title: article.title,

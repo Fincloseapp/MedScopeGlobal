@@ -1049,6 +1049,20 @@ assert.ok(
   readFileSync(join(root, "app/layout.tsx"), "utf8").includes("google-adsense-account")
 );
 assert.ok(
+  readFileSync(join(root, "app/layout.tsx"), "utf8").includes("application/rss+xml"),
+  "every page must advertise the locale RSS feed"
+);
+assert.ok(
+  readFileSync(join(root, "app/layout.tsx"), "utf8").includes("/llms.txt"),
+  "every page must point assistants at llms.txt"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/articles/page.tsx"), "utf8").includes(
+    "newsDesksForLocale"
+  ),
+  "article listing titles must follow the request locale"
+);
+assert.ok(
   readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes(
     "pagead2.googlesyndication.com"
   )

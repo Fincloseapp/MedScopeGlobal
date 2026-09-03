@@ -850,7 +850,21 @@ COPY["pt-BR"] = {
 
 export function getSurfaceCopy(locale?: string | null): SurfaceCopy {
   const key = pack(locale);
-  return COPY[key] ?? COPY.en;
+  const copy = COPY[key] ?? COPY.en;
+  if (key === "cs") return copy;
+  return {
+    ...copy,
+    searchNoResults: copy.searchNoResults
+      .replace(/,?\s*MeDiprep/gi, "")
+      .replace(/\s{2,}/g, " ")
+      .replace(/,\s+(or|oder|ou)\s/gi, " $1 "),
+    audiences: copy.audiences.filter((item) => item.id !== "student"),
+    footer: {
+      ...copy.footer,
+      tagline: copy.footer.tagline.replace(/\s*MeDiprep[^.]*\./gi, "").trim(),
+      audiences: copy.footer.audiences.filter((item) => !item.href.startsWith("/studenti")),
+    },
+  };
 }
 
 export function isCzechSurface(locale?: string | null): boolean {
