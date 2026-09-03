@@ -343,6 +343,15 @@ file("lib/v22/homepage-cache.ts");
   assert.ok(home.includes("filterArticlesForLocale"), "homepage listings are native-first per locale");
   assert.ok(home.includes("mergeNativeDeskFeed"), "homepage pins native desk pieces");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
+  assert.ok(home.includes("courtesyBorrow: 2"), "non-CS homepage must not dump a Czech borrow pile");
+}
+{
+  const hop = readFileSync(join(root, "app/relay/[...path]/route.ts"), "utf8");
+  const nextCfg = readFileSync(join(root, "next.config.mjs"), "utf8");
+  assert.ok(
+    hop.includes('no-store') && nextCfg.includes('source: "/relay/:path*"'),
+    "GA collect hop must not inherit the public page s-maxage"
+  );
 }
 {
   const box = readFileSync(join(root, "components/monetization/affiliate-box.tsx"), "utf8");

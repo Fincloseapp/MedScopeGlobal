@@ -397,6 +397,24 @@ const nextConfig = {
           { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
         ],
       },
+      {
+        source: "/relay/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/relay/js",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=300, stale-while-revalidate=86400" },
+        ],
+      },
+      {
+        source: "/__ms/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
 
     ];
 

@@ -54,15 +54,21 @@ async function proxy(request: Request, path: string[]) {
   try {
     const upstream = await fetch(dest.toString(), init);
     const out = new Headers();
-    const pass = ["content-type", "cache-control", "access-control-allow-origin"];
-    for (const key of pass) {
-      const value = upstream.headers.get(key);
-      if (value) out.set(key, value);
-    }
+    const content = upstream.headers.get("content-type");
+    if (content) out.set("content-type", content);
     out.set("access-control-allow-origin", incoming.origin || "https://medscopeglobal.com");
+    // Never CDN-cache collect. The catch-all page s-maxage was swallowing hits.
+    if (first === "js") {
+      out.set("cache-control", "public, max-age=300, stale-while-revalidate=86400");
+    } else {
+      out.set("cache-control", "private, no-cache, no-store, must-revalidate");
+    }
     return new Response(upstream.body, { status: upstream.status, headers: out });
   } catch {
-    return new NextResponse(null, { status: 204 });
+    return new NextResponse(null, {
+      status: 204,
+      headers: { "cache-control": "private, no-cache, no-store, must-revalidate" },
+    });
   }
 }
 

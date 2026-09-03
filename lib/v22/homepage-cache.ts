@@ -79,7 +79,13 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
 
   const mapped = mapArticleList(data as Record<string, unknown>[] | null);
   const localeKey = normalizeLocale(locale);
-  const active = filterArticlesForLocale(filterActiveArticles(mapped), localeKey);
+  const active = filterArticlesForLocale(
+    filterActiveArticles(mapped),
+    localeKey,
+    primaryArticleLocale(localeKey) === "cs"
+      ? undefined
+      : { minNative: 8, courtesyBorrow: 2, maxBorrow: 4 }
+  );
   const publicOnly = filterMagazineListableArticles(
     active.filter((a) => !a.vip_only)
   );
@@ -118,7 +124,7 @@ async function loadHomepageData(locale: string): Promise<{
 export function getHomepageCachedData(locale = "cs") {
   return unstable_cache(
     () => loadHomepageData(locale),
-    ["v22-homepage-public-v18-native-desk-feed", locale],
+    ["v22-homepage-public-v19-native-desk-tight-borrow", locale],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }
