@@ -147,10 +147,10 @@ const COPY: Record<string, SurfaceCopy> = {
       mediprep: "Zjisti mezery. Natrénuj je.",
     },
     stats: [
-      { value: "2 800+", label: "zdravotnických profesionálů a studentů medicíny" },
-      { value: "500+", label: "odborných článků" },
-      { value: "1 200+", label: "studijních materiálů" },
+      { value: "PubMed", label: "SÚKL · EMA · WHO — citované zdroje" },
+      { value: "ViaLongeVita", label: "magazín dlouhověkosti" },
       { value: "14 dní", label: "zkušební přístup zdarma" },
+      { value: "VIP", label: "protokoly napojené na MediFlow" },
     ],
     audiences: [
       {
@@ -311,10 +311,10 @@ const COPY: Record<string, SurfaceCopy> = {
       mediprep: "Find the gaps. Train them.",
     },
     stats: [
-      { value: "2,800+", label: "healthcare professionals and medical students" },
-      { value: "500+", label: "editorial articles" },
-      { value: "1,200+", label: "study materials" },
+      { value: "PubMed", label: "SÚKL · EMA · WHO — cited sources" },
+      { value: MAGAZINE.name, label: "longevity magazine" },
       { value: "14 days", label: "free trial access" },
+      { value: "VIP", label: "protocols linked to MediFlow" },
     ],
     audiences: [
       {
@@ -468,10 +468,10 @@ const COPY: Record<string, SurfaceCopy> = {
       mediprep: "Lücken finden. Gezielt üben.",
     },
     stats: [
-      { value: "2.800+", label: "Fachkräfte und Medizinstudierende" },
-      { value: "500+", label: "redaktionelle Artikel" },
-      { value: "1.200+", label: "Lernmaterialien" },
+      { value: "PubMed", label: "SÚKL · EMA · WHO — zitierte Quellen" },
+      { value: MAGAZINE.name, label: "Magazin für Langlebigkeit" },
       { value: "14 Tage", label: "kostenlos testen" },
+      { value: "VIP", label: "Protokolle mit MediFlow" },
     ],
     audiences: [
       {
@@ -625,10 +625,10 @@ const COPY: Record<string, SurfaceCopy> = {
       mediprep: "Trouvez les lacunes. Entraînez-les.",
     },
     stats: [
-      { value: "2 800+", label: "professionnels de santé et étudiants en médecine" },
-      { value: "500+", label: "articles éditoriaux" },
-      { value: "1 200+", label: "supports d’étude" },
+      { value: "PubMed", label: "SÚKL · EMA · OMS — sources citées" },
+      { value: MAGAZINE.name, label: "magazine de longévité" },
       { value: "14 jours", label: "essai gratuit" },
+      { value: "VIP", label: "protocoles liés à MediFlow" },
     ],
     audiences: [
       {

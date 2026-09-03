@@ -823,6 +823,16 @@ assert.ok(
   "footer proof must be qualitative, not invented reader counts"
 );
 assert.ok(
+  !readFileSync(join(root, "lib/i18n/surface-copy.ts"), "utf8").includes("2 800+"),
+  "surface copy must not ship invented professional counts"
+);
+assert.ok(
+  readFileSync(join(root, "components/layout/site-footer.tsx"), "utf8").includes(
+    "isCzechSurface(locale) ?"
+  ),
+  "footer must hide MeDiprep and student links outside Czech"
+);
+assert.ok(
   readFileSync(join(root, "lib/seo/locale-sitemap.ts"), "utf8").includes('path: "/newsletter"'),
   "locale sitemaps must list the newsletter hub"
 );

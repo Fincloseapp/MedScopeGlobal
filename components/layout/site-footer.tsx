@@ -95,11 +95,13 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
                 OrdiZapis
               </Link>
             </li>
-            <li>
-              <Link href="/app/priprava" className="hover:text-foreground">
-                MeDiprep (legacy)
-              </Link>
-            </li>
+            {isCzechSurface(locale) ? (
+              <li>
+                <Link href="/app/priprava" className="hover:text-foreground">
+                  MeDiprep (legacy)
+                </Link>
+              </li>
+            ) : null}
             <li>
               <Link href={href("/verejnost/temata")} className="hover:text-foreground">
                 {footer.findProblem}
@@ -120,11 +122,13 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
                 {footer.publicOverview}
               </Link>
             </li>
-            <li>
-              <Link href={href("/studenti")} className="hover:text-foreground">
-                {footer.students}
-              </Link>
-            </li>
+            {isCzechSurface(locale) ? (
+              <li>
+                <Link href={href("/studenti")} className="hover:text-foreground">
+                  {footer.students}
+                </Link>
+              </li>
+            ) : null}
             <li>
               <Link href={href("/studie")} className="hover:text-foreground">
                 {footer.studies}

@@ -22,10 +22,10 @@ export const V271_HERO_APP_CHIPS = [
 ] as const;
 
 export const V271_SOCIAL_PROOF_STATS = [
-  { value: "2 800+", label: "zdravotnických profesionálů a studentů medicíny" },
-  { value: "500+", label: "odborných článků" },
-  { value: "1 200+", label: "studijních materiálů" },
+  { value: "PubMed", label: "SÚKL · EMA · WHO — citované zdroje" },
+  { value: "ViaLongeVita", label: "magazín dlouhověkosti" },
   { value: "14 dní", label: "zkušební přístup zdarma" },
+  { value: "VIP", label: "protokoly napojené na MediFlow" },
 ] as const;
 
 export const V271_TESTIMONIALS = [
