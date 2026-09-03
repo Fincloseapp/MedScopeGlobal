@@ -13,7 +13,9 @@ import {
 export async function AdSenseHead() {
   if (!isAdSenseEnabled()) return null;
   const path = (await headers()).get(PATHNAME_REQUEST_HEADER);
-  if (!path || !adsAllowedOnPath(path)) return null;
+  // Missing pathname (OpenNext/Workers) must still load the official snippet.
+  // Only skip when we know this is a pro / student / admin / hop surface.
+  if (path && !adsAllowedOnPath(path)) return null;
   const client = resolveAdSenseClientId();
   return (
     <script

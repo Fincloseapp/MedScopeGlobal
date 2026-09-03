@@ -1,6 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+
+declare global {
+  interface Window {
+    adsbygoogle?: unknown[];
+  }
+}
 import { usePathname } from "next/navigation";
 import {
   getClientAdConfig,
@@ -72,12 +78,25 @@ export function GlobalAdSlot({
       return;
     }
     if (pushed.current) return;
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-      pushed.current = true;
-    } catch {
-      /* loader may still be fetching */
-    }
+    let cancelled = false;
+    const request = () => {
+      if (cancelled || pushed.current) return;
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        pushed.current = true;
+      } catch {
+        /* loader may still be fetching */
+      }
+    };
+    request();
+    if (pushed.current) return;
+    const tick = window.setInterval(request, 400);
+    const stop = window.setTimeout(() => window.clearInterval(tick), 8000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(tick);
+      window.clearTimeout(stop);
+    };
   }, [allowed, config.enabled, config.adsenseClientId, provider, numericSlot]);
 
   if (!allowed || !config.enabled || !provider) {

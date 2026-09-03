@@ -257,23 +257,24 @@ assert.equal(localizePublicHref("/app/pacient", "fr"), "/app/pacient");
 const csHeader = getDesktopHeaderMenu("cs");
 const frHeader = getDesktopHeaderMenu("fr");
 assert.equal(csHeader.length, 5);
-assert.equal(frHeader.length, 5);
+assert.equal(frHeader.length, 4);
 assert.deepEqual(
   csHeader.map((item) => item.href.replace(/^\/cs(?=\/)/, "")),
   ["/verejnost", "/studenti", "/lekari", "/aplikace", "/predplatne"]
 );
 assert.deepEqual(
   frHeader.map((item) => item.href),
-  ["/fr/verejnost", "/fr/studenti", "/fr/lekari", "/fr/aplikace", "/fr/predplatne"]
+  ["/fr/verejnost", "/fr/lekari", "/fr/aplikace", "/fr/predplatne"]
 );
 assert.equal(frHeader[0]?.label, "Grand public");
-assert.equal(frHeader[4]?.label, "Abonnement");
-assert.equal(getDesktopHeaderMenu("de")[2]?.label, "Ärzte");
+assert.equal(frHeader[3]?.label, "Abonnement");
+assert.equal(getDesktopHeaderMenu("de")[1]?.label, "Ärzte");
+assert.ok(!getDesktopHeaderMenu("de").some((item) => item.href.includes("/studenti")));
 assert.equal(csHeader[0]?.children?.[0]?.href.includes("dlouhovekost"), true);
 assert.equal(csHeader[0]?.children?.[0]?.label, "Dlouhověkost");
 assert.equal(frHeader[0]?.children?.[0]?.label, "Longévité");
 assert.equal(getDesktopHeaderMenu("de")[0]?.children?.[0]?.label, "Langlebigkeit");
-assert.ok((frHeader[4]?.children?.length ?? 0) >= 4);
+assert.ok((frHeader[3]?.children?.length ?? 0) >= 4);
 assert.ok(getPortalChrome("cs").trialCta.includes("zdarma"));
 assert.ok(getPortalChrome("fr").services.some((s) => s.id === "vip" && s.label === "Longévité"));
 assert.equal(getPortalChrome("cs").services.find((s) => s.id === "leky")?.label, "Léky");
@@ -353,10 +354,13 @@ assert.ok(getSubscribeCopy("cs").metaDescription.includes("Kč"));
 assert.ok(!getSubscribeCopy("fr").afterTrialUnit.includes("CZK"));
 assert.ok(!getVerejnostNavStripCopy("fr").body.includes("CZK"));
 assert.ok(!getMarketingCopy("de").students.priceLine.includes("CZK"));
-const frStudentNav = getDesktopHeaderMenu("fr")
-  .flatMap((item) => item.children ?? [])
-  .find((child) => child.href.includes("#student"));
-assert.ok(frStudentNav?.description && !frStudentNav.description.includes("CZK"));
+const frHeaderKids = getDesktopHeaderMenu("fr").flatMap((item) => item.children ?? []);
+assert.equal(
+  frHeaderKids.find((child) => child.href.includes("/studenti") || child.href.includes("/mediprep")),
+  undefined
+);
+const frStudentPlan = frHeaderKids.find((child) => child.href.includes("#student"));
+assert.ok(!frStudentPlan?.description?.includes("CZK"));
 assert.equal(intlLocaleFor("cs"), "cs-CZ");
 assert.equal(intlLocaleFor("fr"), "fr-FR");
 assert.equal(intlLocaleFor("de"), "de-DE");

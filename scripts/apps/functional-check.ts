@@ -1057,9 +1057,25 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "components/monetization/adsense-head.tsx"), "utf8").includes(
-    "!path || !adsAllowedOnPath(path)"
+    "path && !adsAllowedOnPath(path)"
   ),
-  "AdSense head must stay off when pathname is missing or blocked"
+  "AdSense head must stay off only when the path is known and blocked"
+);
+assert.ok(
+  !readFileSync(join(root, "components/analytics/consent-scripts.tsx"), "utf8").includes(
+    "enable_page_level_ads"
+  ),
+  "legacy page-level ads push must not fight the official client= snippet"
+);
+assert.ok(
+  readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes(
+    "*.adtrafficquality.google"
+  ) &&
+    readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes(
+      "www.googletagservices.com"
+    ) &&
+    readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes("worker-src"),
+  "CSP must allow current AdSense hosts and blob workers"
 );
 assert.ok(
   readFileSync(join(root, "app/layout.tsx"), "utf8").includes("AdSenseHead"),

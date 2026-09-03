@@ -357,8 +357,29 @@ const menuEn: NavItem[] = [
   },
 ];
 
+function isCzechMedicalSchoolNav(href: string): boolean {
+  return (
+    href === "/studenti" ||
+    href.startsWith("/studenti/") ||
+    href.startsWith("/mediprep") ||
+    href.startsWith("/app/priprava") ||
+    href.startsWith("/academy") ||
+    href.startsWith("/studium")
+  );
+}
+
+function withoutCzechSchoolTrack(items: NavItem[]): NavItem[] {
+  return items
+    .filter((item) => !isCzechMedicalSchoolNav(item.href))
+    .map((item) => ({
+      ...item,
+      children: item.children?.filter((child) => !isCzechMedicalSchoolNav(child.href)),
+    }));
+}
+
 export function getMainMenu(locale: LocaleCode): NavItem[] {
-  return localizeNavTree(menuCs, locale);
+  const tree = locale === "cs" ? menuCs : withoutCzechSchoolTrack(menuCs);
+  return localizeNavTree(tree, locale);
 }
 
 /** v33 — compact desktop header: same Czech IA, translated labels. */
@@ -368,6 +389,19 @@ export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
   const studenti = find("Pro studenty");
   const lekari = find("Pro lékaře");
   const predplatne = find("Předplatné");
+  const appsChildren = [
+    { label: "Přehled aplikací", href: "/aplikace", description: "MediFlow, MeDipacient, OrdiZapis" },
+    { label: "MediFlow", href: "/mediflow", description: "Wellness deník a longevity" },
+    { label: "Stáhnout MediFlow", href: "/app/mediflow", description: "Instalace na plochu" },
+    { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu" },
+    { label: "Stáhnout MeDipacient", href: "/app/pacient", description: "Instalace na plochu" },
+    { label: "OrdiZapis", href: "/lekari/dokumentace", description: "AI zápisy pro lékaře" },
+    { label: "Stáhnout OrdiZapis", href: "/app/dokumentace", description: "Nahrávání v mobilu" },
+    ...(locale === "cs"
+      ? [{ label: "MeDiprep (legacy)", href: "/mediprep", description: "Přijímačky LF — sekundární" }]
+      : []),
+    { label: "Můj dashboard", href: "/dashboard", description: "Zprávy, deník a zápisy" },
+  ];
   const tree: NavItem[] = [
     verejnost
       ? {
@@ -376,22 +410,14 @@ export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
           children: verejnost.children?.filter((child) => child.href !== "/verejnost/zebricek"),
         }
       : { label: "Veřejnost", href: "/verejnost" },
-    studenti ? { ...studenti, label: "Studenti" } : { label: "Studenti", href: "/studenti" },
+    ...(locale === "cs"
+      ? [studenti ? { ...studenti, label: "Studenti" } : { label: "Studenti", href: "/studenti" }]
+      : []),
     lekari ? { ...lekari, label: "Lékaři" } : { label: "Lékaři", href: "/lekari" },
     {
       label: "Aplikace",
       href: "/aplikace",
-      children: [
-        { label: "Přehled aplikací", href: "/aplikace", description: "MediFlow, MeDipacient, OrdiZapis" },
-        { label: "MediFlow", href: "/mediflow", description: "Wellness deník a longevity" },
-        { label: "Stáhnout MediFlow", href: "/app/mediflow", description: "Instalace na plochu" },
-        { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu" },
-        { label: "Stáhnout MeDipacient", href: "/app/pacient", description: "Instalace na plochu" },
-        { label: "OrdiZapis", href: "/lekari/dokumentace", description: "AI zápisy pro lékaře" },
-        { label: "Stáhnout OrdiZapis", href: "/app/dokumentace", description: "Nahrávání v mobilu" },
-        { label: "MeDiprep (legacy)", href: "/mediprep", description: "Přijímačky LF — sekundární" },
-        { label: "Můj dashboard", href: "/dashboard", description: "Zprávy, deník a zápisy" },
-      ],
+      children: appsChildren,
     },
     predplatne ?? { label: "Předplatné", href: "/predplatne" },
   ];
