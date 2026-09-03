@@ -42,7 +42,7 @@ export async function generateMetadata({
           ? (desks.find((item) => item.id === desk)?.label ?? magazineDesk?.label ?? MAGAZINE.name)
           : (magazineDesk?.label ?? MAGAZINE.name);
   return buildV20PageMetadata({
-    title: `${title} — ${MAGAZINE.name}`,
+    title,
     description:
       locale === "cs"
         ? `Aktuální zdravotnické články: novinky, veřejné zdraví, dlouhověkost a redakční magazín ${MAGAZINE.name}.`
