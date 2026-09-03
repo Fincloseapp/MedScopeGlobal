@@ -22,12 +22,13 @@ export const GLOBAL_LOCALES = [
   { code: "id", hreflang: "id-ID", label: "Bahasa Indonesia", region: "ASIA", currency: "IDR", searchEngine: "google" },
   { code: "en", hreflang: "en", label: "English (International)", region: "GLOBAL", currency: "USD", searchEngine: "google" },
   { code: "en-US", hreflang: "en-US", label: "English (USA)", region: "USA", currency: "USD", searchEngine: "google" },
+  { code: "en-UK", hreflang: "en-GB", label: "English (UK)", region: "UK", currency: "GBP", searchEngine: "google" },
 ] as const;
 
 export type GlobalLocaleCode = (typeof GLOBAL_LOCALES)[number]["code"];
 
 export const GEO_LOCALE_MAP: Record<string, GlobalLocaleCode> = {
-  US: "en-US", CA: "en-US", GB: "en", AU: "en", NZ: "en", IE: "en",
+  US: "en-US", CA: "en-US", GB: "en-UK", AU: "en", NZ: "en", IE: "en",
   CZ: "cs", SK: "sk", PL: "pl", DE: "de", AT: "de", CH: "de",
   FR: "fr", BE: "fr", IT: "it", ES: "es", PT: "pt", BR: "pt-BR",
   RO: "ro", HU: "hu",
@@ -67,4 +68,5 @@ export const MEDICAL_DISCLAIMER: Record<GlobalLocaleCode, string> = {
   id: "Konten ini bukan diagnosis medis atau rekomendasi pengobatan. Selalu konsultasikan dengan dokter Anda.",
   en: "Content is not medical diagnosis or treatment advice. Always consult your physician.",
   "en-US": "This content is not medical advice, diagnosis, or treatment. Always consult your healthcare provider.",
+  "en-UK": "This content is not medical advice, diagnosis, or treatment. Always consult your GP or clinician.",
 };

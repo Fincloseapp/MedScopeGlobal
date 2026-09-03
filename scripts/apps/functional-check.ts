@@ -837,6 +837,14 @@ assert.ok(
   "B2B landing chrome must not stay Czech on /de"
 );
 assert.ok(
+  readFileSync(join(root, "lib/i18n/chrome-pack.ts"), "utf8").includes('"it"'),
+  "Italian must have a dedicated chrome pack like German"
+);
+assert.ok(
+  readFileSync(join(root, "lib/ecosystem/locales.ts"), "utf8").includes('"en-UK"'),
+  "UK English must be a first-class edition with GBP"
+);
+assert.ok(
   !readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes("surface.stats"),
   "homepage must not show invented social-proof counts"
 );

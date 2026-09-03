@@ -71,6 +71,7 @@ export const DONATION_TIERS: Record<GlobalLocaleCode, { amounts: number[]; curre
   id: { amounts: [3000000, 7500000, 14900000], currency: "idr", symbol: "Rp" },
   en: { amounts: [200, 500, 999], currency: "usd", symbol: "$" },
   "en-US": { amounts: [299, 499, 999], currency: "usd", symbol: "$" },
+  "en-UK": { amounts: [200, 500, 900], currency: "gbp", symbol: "£" },
 };
 
 /** VIP pricing by locale */
@@ -96,6 +97,7 @@ export const VIP_PRICING: Record<GlobalLocaleCode, { monthly: number; currency: 
   id: { monthly: 7500000, currency: "idr", symbol: "Rp", label: "Rp 75 000/bulan" },
   en: { monthly: 499, currency: "usd", symbol: "$", label: "$4.99/month" },
   "en-US": { monthly: 699, currency: "usd", symbol: "$", label: "$6.99/month" },
+  "en-UK": { monthly: 499, currency: "gbp", symbol: "£", label: "£4.99/month" },
 };
 
 export type AffiliateCategory = "supplements" | "lab-tests" | "fitness" | "sleep" | "longevity";
@@ -926,6 +928,7 @@ export const ARTICLE_TIP_TIERS: Record<
   id: { amounts: [300000, 750000, 1500000, 3000000, 7500000], currency: "idr", symbol: "Rp", minAmount: 300000 },
   en: { amounts: [200, 500, 1000], currency: "usd", symbol: "$", minAmount: 50 },
   "en-US": { amounts: [200, 500, 1000], currency: "usd", symbol: "$", minAmount: 50 },
+  "en-UK": { amounts: [200, 500, 1000], currency: "gbp", symbol: "£", minAmount: 50 },
 };
 
 const ZERO_DECIMAL_CCY = new Set(["jpy", "krw", "vnd", "idr", "huf"]);

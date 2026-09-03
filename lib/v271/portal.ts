@@ -1,7 +1,7 @@
 /** Homepage portal IA — ViaLongeVita magazine-first marketing story (hero → news → apps/VIP). */
 
 import { getMagazineCopy, MAGAZINE } from "@/lib/brand/magazine";
-import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { chromePack } from "@/lib/i18n/chrome-pack";
 import { normalizeLocale, type LocaleCode } from "@/lib/i18n/config";
 
 /** Default Czech hero copy (legacy export — prefer getPortalPhilosophy(locale) on server). */
@@ -148,6 +148,42 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     leky: "SÚKL",
     mediprep: "legacy",
   },
+  it: {
+    articles: MAGAZINE.name,
+    mediflow: "diario",
+    vip: "articoli",
+    medipacient: "referti",
+    ordizapis: "note",
+    academy: "formazione",
+    ai: "chiedi",
+    trial: "gratis",
+    leky: "SÚKL",
+    mediprep: "legacy",
+  },
+  es: {
+    articles: MAGAZINE.name,
+    mediflow: "diario",
+    vip: "artículos",
+    medipacient: "informes",
+    ordizapis: "notas",
+    academy: "formación",
+    ai: "preguntar",
+    trial: "gratis",
+    leky: "SÚKL",
+    mediprep: "legacy",
+  },
+  "pt-BR": {
+    articles: MAGAZINE.name,
+    mediflow: "diário",
+    vip: "artigos",
+    medipacient: "laudos",
+    ordizapis: "notas",
+    academy: "formação",
+    ai: "perguntar",
+    trial: "grátis",
+    leky: "SÚKL",
+    mediprep: "legado",
+  },
 };
 
 const SERVICE_LABELS: Record<string, Record<string, string>> = {
@@ -162,6 +198,9 @@ const SERVICE_LABELS: Record<string, Record<string, string>> = {
   en: { articles: "Articles", trial: "14 days", leky: "Medicines", academy: "Academy", ai: "AI", vip: "Longevity" },
   de: { articles: "Artikel", trial: "14 Tage", leky: "Arznei", academy: "Academy", ai: "KI", vip: "Langlebigkeit" },
   fr: { articles: "Articles", trial: "14 jours", leky: "Médicaments", academy: "Academy", ai: "IA", vip: "Longévité" },
+  it: { articles: "Articoli", trial: "14 giorni", leky: "Farmaci", academy: "Academy", ai: "IA", vip: "Longevità" },
+  es: { articles: "Artículos", trial: "14 días", leky: "Medicamentos", academy: "Academy", ai: "IA", vip: "Longevidad" },
+  "pt-BR": { articles: "Artigos", trial: "14 dias", leky: "Medicamentos", academy: "Academy", ai: "IA", vip: "Longevidade" },
 };
 
 const NEWS_TAB_LABELS: Record<string, string[]> = {
@@ -171,6 +210,7 @@ const NEWS_TAB_LABELS: Record<string, string[]> = {
   fr: ["Actualités", "Grand public", "Longévité", "Articles"],
   es: ["Noticias", "Público", "Longevidad", "Artículos"],
   it: ["Notizie", "Pubblico", "Longevità", "Articoli"],
+  "pt-BR": ["Notícias", "Público", "Longevidade", "Artigos"],
   pl: ["Aktualności", "Dla wszystkich", "Długowieczność", "Artykuły"],
   sk: ["Novinky", "Verejnosť", "Dlhovekosť", "Články"],
 };
@@ -212,6 +252,42 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
     servicesNav: "Services MedScopeGlobal",
     footerLegal: `${MAGAZINE.name} sur ${MAGAZINE.platform} est un magazine éducatif de santé et de longévité — ce n’est ni un jury d’admission ni un manuel officiel. Le contenu ne remplace pas un avis médical individuel.`,
   },
+  it: {
+    news: MAGAZINE.name,
+    apps: "App",
+    forWhom: "Per chi",
+    inNumbers: "In cifre",
+    more: "altro",
+    newTab: "nuova scheda",
+    trialCta: "Prova 14 giorni",
+    readMagazine: "Apri la rivista",
+    servicesNav: "Servizi MedScopeGlobal",
+    footerLegal: `${MAGAZINE.name} su ${MAGAZINE.platform} è una rivista educativa di salute e longevità — non è una commissione d’ammissione né un manuale ufficiale. Il contenuto non sostituisce un parere medico individuale.`,
+  },
+  es: {
+    news: MAGAZINE.name,
+    apps: "Apps",
+    forWhom: "Para quién",
+    inNumbers: "En cifras",
+    more: "más",
+    newTab: "nueva pestaña",
+    trialCta: "Probar 14 días",
+    readMagazine: "Abrir la revista",
+    servicesNav: "Servicios MedScopeGlobal",
+    footerLegal: `${MAGAZINE.name} en ${MAGAZINE.platform} es una revista educativa de salud y longevidad — no es un tribunal de admisión ni un manual oficial. El contenido no sustituye un consejo médico individual.`,
+  },
+  "pt-BR": {
+    news: MAGAZINE.name,
+    apps: "Apps",
+    forWhom: "Para quem",
+    inNumbers: "Em números",
+    more: "mais",
+    newTab: "nova aba",
+    trialCta: "Experimentar 14 dias",
+    readMagazine: "Abrir a revista",
+    servicesNav: "Serviços MedScopeGlobal",
+    footerLegal: `${MAGAZINE.name} no ${MAGAZINE.platform} é uma revista educativa de saúde e longevidade — não é banca de vestibular nem manual oficial. O conteúdo não substitui orientação médica individual.`,
+  },
   cs: {
     news: MAGAZINE.name,
     apps: "Aplikace",
@@ -227,7 +303,7 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
 };
 
 export function getPortalChrome(locale?: LocaleCode | string): PortalChrome {
-  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const primary = chromePack(locale);
   const isCs = primary === "cs";
   const base = CHROME[primary] ?? CHROME.en ?? CHROME.cs;
   const tabLabels = isCs ? NEWS_TAB_LABELS.cs : NEWS_TAB_LABELS[primary] ?? NEWS_TAB_LABELS.en;

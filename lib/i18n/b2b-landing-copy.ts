@@ -1,15 +1,10 @@
-import { primaryArticleLocale } from "@/lib/i18n/article-locale";
-import { normalizeLocale } from "@/lib/i18n/config";
+import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
 import { localizeListedCzkIn } from "@/lib/i18n/payment-currency";
 
-type Pack = "cs" | "de" | "fr" | "en";
+type Pack = ChromePack;
 
 export function b2bLandingLocale(locale?: string | null): Pack {
-  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
-  if (primary === "cs") return "cs";
-  if (primary === "de") return "de";
-  if (primary === "fr") return "fr";
-  return "en";
+  return chromePack(locale);
 }
 
 export type B2BLandingCopy = {
@@ -107,6 +102,69 @@ const COPY: Record<Pack, B2BLandingCopy> = {
       { name: "Sponsored article", reach: "Newsletter + SEO", price: "from 15 000 Kč" },
       { name: "Newsletter slot", reach: "Weekly brief", price: "from 5 000 Kč" },
       { name: "Audience segments", reach: "Physicians / students / public", price: "in the package" },
+    ],
+  },
+  it: {
+    audienceTitle: "Pubblico",
+    formatsTitle: "Formati pubblicitari",
+    packagesTitle: "Pacchetti",
+    individualPrice: "Su richiesta",
+    customCampaign: "Una campagna su misura?",
+    formCta: "Compila il modulo pubblicitario",
+    partnershipCta: "partnership universitaria",
+    audience: [
+      { title: "Lettori di longevità", body: "Prevenzione, sonno, movimento e alimentazione." },
+      { title: "Medici e studenti", body: "Spazi professionali separati, senza affiliate." },
+      { title: "Brief settimanale", body: "La stessa redazione ViaLongeVita in casella." },
+      { title: "Contenuto segnalato", body: "I testi partner sono sempre chiaramente marcati." },
+    ],
+    formats: [
+      { name: "Banner homepage", reach: "Home e articoli", price: "da 8 000 Kč" },
+      { name: "Articolo sponsorizzato", reach: "Newsletter + SEO", price: "da 15 000 Kč" },
+      { name: "Slot newsletter", reach: "Brief settimanale", price: "da 5 000 Kč" },
+      { name: "Segmenti di pubblico", reach: "Medici / studenti / pubblico", price: "nel pacchetto" },
+    ],
+  },
+  es: {
+    audienceTitle: "Audiencia",
+    formatsTitle: "Formatos publicitarios",
+    packagesTitle: "Paquetes",
+    individualPrice: "Bajo petición",
+    customCampaign: "¿Una campaña a medida?",
+    formCta: "Rellenar el formulario",
+    partnershipCta: "alianza universitaria",
+    audience: [
+      { title: "Lectores de longevidad", body: "Prevención, sueño, movimiento y alimentación." },
+      { title: "Médicos y estudiantes", body: "Espacios profesionales separados, sin afiliados." },
+      { title: "Brief semanal", body: "La misma redacción ViaLongeVita en la bandeja." },
+      { title: "Contenido señalado", body: "Los textos de partner van siempre marcados." },
+    ],
+    formats: [
+      { name: "Banner de portada", reach: "Portada y artículos", price: "desde 8 000 Kč" },
+      { name: "Artículo patrocinado", reach: "Newsletter + SEO", price: "desde 15 000 Kč" },
+      { name: "Espacio newsletter", reach: "Brief semanal", price: "desde 5 000 Kč" },
+      { name: "Segmentos de audiencia", reach: "Médicos / estudiantes / público", price: "en el paquete" },
+    ],
+  },
+  "pt-BR": {
+    audienceTitle: "Público",
+    formatsTitle: "Formatos publicitários",
+    packagesTitle: "Pacotes",
+    individualPrice: "Sob consulta",
+    customCampaign: "Uma campanha sob medida?",
+    formCta: "Preencher o formulário",
+    partnershipCta: "parceria universitária",
+    audience: [
+      { title: "Leitores de longevidade", body: "Prevenção, sono, movimento e alimentação." },
+      { title: "Médicos e estudantes", body: "Espaços profissionais separados, sem afiliados." },
+      { title: "Brief semanal", body: "A mesma redação ViaLongeVita na caixa de entrada." },
+      { title: "Conteúdo sinalizado", body: "Textos de parceiro vêm sempre marcados." },
+    ],
+    formats: [
+      { name: "Banner da home", reach: "Home e artigos", price: "a partir de 8 000 Kč" },
+      { name: "Artigo patrocinado", reach: "Newsletter + SEO", price: "a partir de 15 000 Kč" },
+      { name: "Espaço na newsletter", reach: "Brief semanal", price: "a partir de 5 000 Kč" },
+      { name: "Segmentos de público", reach: "Médicos / estudantes / público", price: "no pacote" },
     ],
   },
 };

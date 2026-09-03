@@ -1,14 +1,9 @@
-import { primaryArticleLocale } from "@/lib/i18n/article-locale";
-import { normalizeLocale } from "@/lib/i18n/config";
+import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
 
-type Pack = "cs" | "de" | "fr" | "en";
+type Pack = ChromePack;
 
 export function articleChromeLocale(locale?: string | null): Pack {
-  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
-  if (primary === "cs") return "cs";
-  if (primary === "de") return "de";
-  if (primary === "fr") return "fr";
-  return "en";
+  return chromePack(locale);
 }
 
 type ArticleChrome = {
@@ -72,6 +67,42 @@ const COPY: Record<Pack, ArticleChrome> = {
     recsTitle: "What readers reach for next",
     moreInfo: "Learn more →",
     sponsored: "Recommended",
+  },
+  it: {
+    save: "Salva",
+    saved: "Salvato",
+    share: "Condividi",
+    related: "Letture correlate",
+    recommended: "Contenuti consigliati",
+    articlesLabel: "Articoli",
+    recsKicker: "ViaLongeVita",
+    recsTitle: "Cosa cercano i lettori dopo",
+    moreInfo: "Scopri di più →",
+    sponsored: "Consigliato",
+  },
+  es: {
+    save: "Guardar",
+    saved: "Guardado",
+    share: "Compartir",
+    related: "Lecturas relacionadas",
+    recommended: "Contenido recomendado",
+    articlesLabel: "Artículos",
+    recsKicker: "ViaLongeVita",
+    recsTitle: "Qué buscan los lectores después",
+    moreInfo: "Saber más →",
+    sponsored: "Recomendado",
+  },
+  "pt-BR": {
+    save: "Salvar",
+    saved: "Salvo",
+    share: "Compartilhar",
+    related: "Leitura relacionada",
+    recommended: "Conteúdo recomendado",
+    articlesLabel: "Artigos",
+    recsKicker: "ViaLongeVita",
+    recsTitle: "O que os leitores buscam depois",
+    moreInfo: "Saiba mais →",
+    sponsored: "Recomendado",
   },
 };
 

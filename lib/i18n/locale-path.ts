@@ -24,6 +24,7 @@ const LOCALE_TO_SEGMENT: Record<GlobalLocaleCode, string> = {
   id: "id",
   en: "en",
   "en-US": "en-us",
+  "en-UK": "en-uk",
 };
 
 const SEGMENT_TO_LOCALE: Record<string, GlobalLocaleCode> = {
@@ -52,7 +53,8 @@ const SEGMENT_TO_LOCALE: Record<string, GlobalLocaleCode> = {
   id: "id",
   en: "en",
   "en-us": "en-US",
-  "en-uk": "en",
+  "en-uk": "en-UK",
+  "en-gb": "en-UK",
 };
 
 /** Non-canonical path segments that should 308 to the canonical prefix. */
@@ -68,6 +70,9 @@ export const LOCALE_PATH_SEGMENTS = GLOBAL_LOCALES.map((l) => localeToPathSegmen
 export function resolveGlobalLocale(input: string): GlobalLocaleCode {
   const lower = input.toLowerCase();
   if (lower === "en-us" || lower === "en_us") return "en-US";
+  if (lower === "en-uk" || lower === "en_uk" || lower === "en-gb" || lower === "en_gb") {
+    return "en-UK";
+  }
   if (lower === "pt-br" || lower === "pt_br") return "pt-BR";
   if (lower === "pt-pt" || lower === "pt_pt") return "pt";
   if (lower === "zh-cn" || lower === "cn") return "zh-CN";

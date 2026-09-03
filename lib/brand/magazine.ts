@@ -216,7 +216,7 @@ function pickCopyLocale(locale?: string): CopyLocale {
     if ((COPY_KEYS as readonly string[]).includes(resolved)) {
       return resolved as CopyLocale;
     }
-    if (resolved === "en-US" || resolved === "en") return "en";
+    if (resolved === "en-US" || resolved === "en" || resolved === "en-UK") return "en";
   } catch {
     // fall through
   }
@@ -251,6 +251,7 @@ export function getOgLocale(locale?: LocaleCode | string): string {
     id: "id_ID",
     en: "en_US",
     "en-US": "en_US",
+    "en-UK": "en_GB",
     pt: "pt_PT",
     "pt-BR": "pt_BR",
   };

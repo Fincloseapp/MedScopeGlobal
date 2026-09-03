@@ -1,5 +1,4 @@
-import { primaryArticleLocale } from "@/lib/i18n/article-locale";
-import { normalizeLocale } from "@/lib/i18n/config";
+import { chromePack } from "@/lib/i18n/chrome-pack";
 
 export type HomepageLongevityCopy = {
   eyebrow: string;
@@ -16,8 +15,7 @@ export type HomepageLongevityCopy = {
 };
 
 function pack(locale?: string | null): string {
-  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
-  return primary === "cs" ? "cs" : primary;
+  return chromePack(locale);
 }
 
 const COPY: Record<string, HomepageLongevityCopy> = {
@@ -218,6 +216,72 @@ const COPY: Record<string, HomepageLongevityCopy> = {
       "Você pode continuar lendo de graça. Se um texto ajudou, pode deixar um contributo no artigo — ou experimentar 14 dias e cancelar quando quiser. Nada é obrigatório.",
     softCta: "Experimentar 14 dias",
     contributeHint: "Depois de ler você pode contribuir — só se quiser. Assim o texto fica aberto para a próxima pessoa.",
+  },
+  it: {
+    eyebrow: "ViaLongeVita · longevità",
+    title: "Tre gesti calmi che la redazione ripete",
+    lead: "Non sono promesse né protocolli. Abitudini già pubblicate su ViaLongeVita — sonno, movimento sostenibile e cibo senza caccia al miracolo.",
+    steps: [
+      {
+        title: "Un sonno che tiene il ritmo",
+        desc: "La stessa ora di sveglia, buio di notte, niente estremi. L’healthspan inizia dal recupero — non da un integratore.",
+        href: "/verejnost/clanky?topic=spanek",
+        cta: "Leggi sul sonno",
+      },
+      {
+        title: "Un movimento che reggi",
+        desc: "Camminare, scale, stare in piedi. Meno seduta ogni giorno vale più di un allenamento isolato.",
+        href: "/verejnost/clanky?topic=zivotni-styl",
+        cta: "Consigli sul movimento",
+      },
+      {
+        title: "Cibo senza caccia al miracolo",
+        desc: "Proteine, verdure, un piatto mediterraneo a casa. La longevità sta nell’abitudine.",
+        href: "/verejnost/clanky?topic=vyziva",
+        cta: "Articoli sull’alimentazione",
+      },
+    ],
+    readingTitle: "Dalla redazione sulla longevità",
+    allArticles: "Tutti gli articoli sulla longevità",
+    dailyTip: "Consiglio di oggi",
+    journal: "Diario MediFlow",
+    closer:
+      "Puoi continuare a leggere gratis. Se un testo ti ha aiutato, puoi lasciare un contributo sull’articolo — o provare 14 giorni e disdire quando vuoi. Niente è obbligatorio.",
+    softCta: "Prova 14 giorni",
+    contributeHint: "Dopo la lettura puoi contribuire — solo se vuoi. Così il testo resta aperto per la persona successiva.",
+  },
+  es: {
+    eyebrow: "ViaLongeVita · longevidad",
+    title: "Tres gestos calmos que la redacción repite",
+    lead: "No son promesas ni protocolos. Hábitos ya publicados en ViaLongeVita — sueño, movimiento sostenible y comida sin caza del milagro.",
+    steps: [
+      {
+        title: "Un sueño que sostiene el ritmo",
+        desc: "La misma hora de levantarse, oscuridad por la noche, sin extremos. El healthspan empieza en la recuperación — no en un suplemento.",
+        href: "/verejnost/clanky?topic=spanek",
+        cta: "Leer sobre el sueño",
+      },
+      {
+        title: "Un movimiento que puedes mantener",
+        desc: "Caminar, escaleras, estar de pie. Sentarse menos cada día vale más que un entrenamiento aislado.",
+        href: "/verejnost/clanky?topic=zivotni-styl",
+        cta: "Consejos de movimiento",
+      },
+      {
+        title: "Comida sin caza del milagro",
+        desc: "Proteína, verduras, un plato mediterráneo en casa. La longevidad está en el hábito.",
+        href: "/verejnost/clanky?topic=vyziva",
+        cta: "Artículos de nutrición",
+      },
+    ],
+    readingTitle: "De la redacción sobre longevidad",
+    allArticles: "Todos los artículos de longevidad",
+    dailyTip: "Consejo de hoy",
+    journal: "Diario MediFlow",
+    closer:
+      "Puedes seguir leyendo gratis. Si un texto te ayudó, puedes dejar una contribución en el artículo — o probar 14 días y cancelar cuando quieras. Nada es obligatorio.",
+    softCta: "Probar 14 días",
+    contributeHint: "Después de leer puedes contribuir — solo si quieres. Así el texto queda abierto para la siguiente persona.",
   },
 };
 

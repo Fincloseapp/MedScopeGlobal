@@ -173,6 +173,9 @@ const nextConfig = {
       "id",
       "en",
       "en-us",
+      "en-uk",
+      "pt",
+      "pt-br",
     ];
     return [
       {

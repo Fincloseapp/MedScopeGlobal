@@ -1,16 +1,13 @@
+import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { localizeListedCzkIn } from "@/lib/i18n/payment-currency";
 
-type Pack = "cs" | "de" | "fr" | "en";
+type Pack = ChromePack;
 
 export function revenueCopyLocale(locale?: string | null): Pack {
-  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
-  if (primary === "cs") return "cs";
-  if (primary === "de") return "de";
-  if (primary === "fr") return "fr";
-  return "en";
+  return chromePack(locale);
 }
 
 export type RevenueCopy = {
@@ -249,6 +246,150 @@ const COPY: Record<Pack, RevenueCopy> = {
     priceListName: "Rate card",
     priceListDesc: "Full banner and package rates.",
     priceListCta: "Full rate card",
+  },
+  it: {
+    partnerKicker: "Pubblicità",
+    partnerTitle: "Questo spazio è prenotabile",
+    partnerBody:
+      "Banner nativo tra i lettori di longevità — da 5 000 Kč/mese. Articolo sponsorizzato da 15 000 Kč, sempre segnalato.",
+    partnerCta: "Prenota lo spazio",
+    partnerPrice: "da 5 000 Kč/mese",
+    subscribeKicker: "Abbonamento facoltativo",
+    subscribeTitle: "Continua a leggere senza pubblicità",
+    subscribeBody:
+      "14 giorni gratis, poi il piano per i lettori. Le mance restano volontarie — non è un club VIP.",
+    subscribeCta: "Prova 14 giorni",
+    subscribeHint: "Disdici quando vuoi prima della fine della prova.",
+    newsletterKicker: "ViaLongeVita",
+    newsletterTitle: "ViaLongeVita nella tua casella",
+    newsletterBody:
+      "Una volta a settimana: sonno, movimento, cibo e longevità — in italiano, gratis.",
+    newsletterPlaceholder: "tu@email.it",
+    newsletterCta: "Inviami il brief",
+    newsletterPrivacy: "Usiamo l’indirizzo solo per il brief ViaLongeVita. Disiscrizione in ogni numero.",
+    newsletterSuccess: "Grazie — il brief ViaLongeVita arriverà nella tua lingua.",
+    newsletterDuplicate: "Questo indirizzo è già iscritto.",
+    newsletterError: "Invio non riuscito. Riprova.",
+    newsletterInvalid: "Inserisci un’e-mail valida.",
+    affiliateKicker: "Il passo successivo",
+    affiliateTitle: "Cosa cercano i lettori su questo tema",
+    affiliateShelfKicker: "ViaLongeVita",
+    affiliateShelfTitle: "Cosa prendono i lettori dopo",
+    affiliateDisclosure:
+      "L’acquisto avviene dal commerciante, non dalla redazione. Un acquisto può generare una commissione. Non è un parere medico. As an Amazon Associate I earn from qualifying purchases.",
+    tipsFollowup: "Testi simili per e-mail?",
+    mediaKitEyebrow: "ViaLongeVita · media kit",
+    mediaKitTitle: "Pubblicità ai lettori di longevità",
+    mediaKitLead:
+      "Pubblicità ai lettori di longevità — prevenzione, sonno, movimento, alimentazione. Lettori reali over 40, non bot.",
+    mediaKitReach: "Lettori di longevità",
+    mediaKitAudience: "Prevenzione, sonno, movimento, alimentazione",
+    mediaKitCta: "Prenota una campagna",
+    bannerName: "Banner nativo",
+    sponsoredName: "Articolo sponsorizzato",
+    newsletterName: "Menzione newsletter",
+    bannerOfferDesc: "Home e articoli — 5 000 Kč / mese.",
+    sponsoredOfferDesc: "Testo partner segnalato — 15 000 Kč.",
+    newsletterOfferDesc: "Menzione nel brief settimanale — da 3 500 Kč.",
+    priceListName: "Listino",
+    priceListDesc: "Tariffe complete di banner e pacchetti.",
+    priceListCta: "Listino completo",
+  },
+  es: {
+    partnerKicker: "Publicidad",
+    partnerTitle: "Este espacio está disponible",
+    partnerBody:
+      "Banner nativo entre lectores de longevidad — desde 5 000 Kč/mes. Artículo patrocinado desde 15 000 Kč, siempre señalado.",
+    partnerCta: "Reservar el espacio",
+    partnerPrice: "desde 5 000 Kč/mes",
+    subscribeKicker: "Suscripción opcional",
+    subscribeTitle: "Seguir leyendo sin anuncios",
+    subscribeBody:
+      "14 días gratis, luego el plan para lectores. Las propinas siguen siendo voluntarias — no es un club VIP.",
+    subscribeCta: "Probar 14 días",
+    subscribeHint: "Cancela cuando quieras antes de que termine la prueba.",
+    newsletterKicker: "ViaLongeVita",
+    newsletterTitle: "ViaLongeVita en tu bandeja",
+    newsletterBody:
+      "Una vez por semana: sueño, movimiento, comida y longevidad — en español, gratis.",
+    newsletterPlaceholder: "tu@email.es",
+    newsletterCta: "Quiero el brief",
+    newsletterPrivacy: "Usamos el correo solo para el brief ViaLongeVita. Baja en cada número.",
+    newsletterSuccess: "Gracias — el brief ViaLongeVita llegará en tu idioma.",
+    newsletterDuplicate: "Este correo ya está en la lista.",
+    newsletterError: "No se pudo enviar. Inténtalo de nuevo.",
+    newsletterInvalid: "Introduce un correo válido.",
+    affiliateKicker: "El siguiente paso",
+    affiliateTitle: "Qué buscan los lectores en este tema",
+    affiliateShelfKicker: "ViaLongeVita",
+    affiliateShelfTitle: "Qué toman los lectores después",
+    affiliateDisclosure:
+      "Compras en el comercio, no en la redacción. Una compra puede generar comisión. No es consejo médico. As an Amazon Associate I earn from qualifying purchases.",
+    tipsFollowup: "¿Textos similares por correo?",
+    mediaKitEyebrow: "ViaLongeVita · media kit",
+    mediaKitTitle: "Publicidad para lectores de longevidad",
+    mediaKitLead:
+      "Publicidad para lectores de longevidad — prevención, sueño, movimiento, alimentación. Lectores reales +40, no bots.",
+    mediaKitReach: "Lectores de longevidad",
+    mediaKitAudience: "Prevención, sueño, movimiento, alimentación",
+    mediaKitCta: "Reservar una campaña",
+    bannerName: "Banner nativo",
+    sponsoredName: "Artículo patrocinado",
+    newsletterName: "Mención newsletter",
+    bannerOfferDesc: "Portada y artículos — 5 000 Kč / mes.",
+    sponsoredOfferDesc: "Texto de partner señalado — 15 000 Kč.",
+    newsletterOfferDesc: "Mención en el brief semanal — desde 3 500 Kč.",
+    priceListName: "Tarifas",
+    priceListDesc: "Tarifas completas de banners y packs.",
+    priceListCta: "Tarifas completas",
+  },
+  "pt-BR": {
+    partnerKicker: "Publicidade",
+    partnerTitle: "Este espaço está disponível",
+    partnerBody:
+      "Banner nativo entre leitores de longevidade — a partir de 5 000 Kč/mês. Artigo patrocinado a partir de 15 000 Kč, sempre sinalizado.",
+    partnerCta: "Reservar o espaço",
+    partnerPrice: "a partir de 5 000 Kč/mês",
+    subscribeKicker: "Assinatura opcional",
+    subscribeTitle: "Continuar lendo sem anúncios",
+    subscribeBody:
+      "14 dias grátis, depois o plano para leitores. Gorjetas continuam voluntárias — não é clube VIP.",
+    subscribeCta: "Experimentar 14 dias",
+    subscribeHint: "Cancele quando quiser antes do fim do teste.",
+    newsletterKicker: "ViaLongeVita",
+    newsletterTitle: "ViaLongeVita na sua caixa",
+    newsletterBody:
+      "Uma vez por semana: sono, movimento, comida e longevidade — no seu idioma, grátis.",
+    newsletterPlaceholder: "voce@email.com",
+    newsletterCta: "Quero o brief",
+    newsletterPrivacy: "Usamos o e-mail só para o brief ViaLongeVita. Descadastrar em cada edição.",
+    newsletterSuccess: "Obrigado — o brief ViaLongeVita chega no seu idioma.",
+    newsletterDuplicate: "Este e-mail já está na lista.",
+    newsletterError: "Não foi possível enviar. Tente de novo.",
+    newsletterInvalid: "Digite um e-mail válido.",
+    affiliateKicker: "O próximo passo",
+    affiliateTitle: "O que os leitores buscam neste tema",
+    affiliateShelfKicker: "ViaLongeVita",
+    affiliateShelfTitle: "O que os leitores pegam depois",
+    affiliateDisclosure:
+      "A compra é no varejista, não na redação. Uma compra pode gerar comissão. Não é conselho médico. As an Amazon Associate I earn from qualifying purchases.",
+    tipsFollowup: "Textos parecidos por e-mail?",
+    mediaKitEyebrow: "ViaLongeVita · media kit",
+    mediaKitTitle: "Publicidade para leitores de longevidade",
+    mediaKitLead:
+      "Publicidade para leitores de longevidade — prevenção, sono, movimento, alimentação. Leitores reais 40+, não bots.",
+    mediaKitReach: "Leitores de longevidade",
+    mediaKitAudience: "Prevenção, sono, movimento, alimentação",
+    mediaKitCta: "Reservar uma campanha",
+    bannerName: "Banner nativo",
+    sponsoredName: "Artigo patrocinado",
+    newsletterName: "Menção na newsletter",
+    bannerOfferDesc: "Home e artigos — 5 000 Kč / mês.",
+    sponsoredOfferDesc: "Texto de parceiro sinalizado — 15 000 Kč.",
+    newsletterOfferDesc: "Menção no brief semanal — a partir de 3 500 Kč.",
+    priceListName: "Tabela",
+    priceListDesc: "Tabela completa de banners e pacotes.",
+    priceListCta: "Tabela completa",
   },
 };
 

@@ -63,6 +63,7 @@ const LOCAL_HEALTH_HINT: Record<string, string> = {
   id: "Indonesia: puskesmas, 118/119",
   en: "International English: GP / family doctor, 112 or local emergency",
   "en-US": "USA: PCP, insurance networks, 911",
+  "en-UK": "UK: GP, NHS, 999/111",
 };
 
 export function localHealthHint(locale: GlobalLocaleCode): string {

@@ -46,6 +46,8 @@ export const VIP_CTA_TEMPLATES: Record<GlobalLocaleCode, string> = {
   en: "For deeper longevity protocols and personalized recommendations, explore VIP MedScopeGlobal.",
   "en-US":
     "For deeper longevity protocols and personalized recommendations, explore VIP MedScopeGlobal.",
+  "en-UK":
+    "For deeper longevity protocols and personalised recommendations, explore VIP MedScopeGlobal.",
 };
 
 export function getMedicalDisclaimer(locale: GlobalLocaleCode): string {
