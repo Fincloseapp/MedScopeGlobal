@@ -1205,6 +1205,19 @@ assert.ok(
 );
 const articlePageSrc = readFileSync(join(root, "app/(public)/article/[slug]/page.tsx"), "utf8");
 assert.ok(
+  readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("MagazineAdUnit"),
+  "homepage /cs must render a real AdSense unit, not an empty placement"
+);
+assert.ok(
+  readFileSync(join(root, "components/monetization/magazine-ad-unit.tsx"), "utf8").includes(
+    "2911384114"
+  ) ||
+    readFileSync(join(root, "components/monetization/magazine-ad-unit.tsx"), "utf8").includes(
+      "ADSENSE_SLOT_IN_ARTICLE"
+    ),
+  "homepage magazine unit must use the owner AdSense slot"
+);
+assert.ok(
   articlePageSrc.includes("ADSENSE_SLOT_IN_ARTICLE"),
   "public article must use the owner in-article slot"
 );

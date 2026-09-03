@@ -18,10 +18,17 @@ export async function AdSenseHead() {
   if (path && !adsAllowedOnPath(path)) return null;
   const client = resolveAdSenseClientId();
   return (
-    <script
-      async
-      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`}
-      crossOrigin="anonymous"
-    />
+    <>
+      <script
+        async
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`}
+        crossOrigin="anonymous"
+      />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `window.adsbygoogle=window.adsbygoogle||[];`,
+        }}
+      />
+    </>
   );
 }
