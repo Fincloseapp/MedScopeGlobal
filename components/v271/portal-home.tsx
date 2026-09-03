@@ -10,16 +10,17 @@ import {
   PORTAL_SERVICES,
 } from "@/lib/v271/portal";
 import { getSurfaceCopy, isCzechSurface } from "@/lib/i18n/surface-copy";
-import type { getMagazineCopy } from "@/lib/brand/magazine";
+import { MAGAZINE, type getMagazineCopy } from "@/lib/brand/magazine";
 import { assignUniqueListingCovers } from "@/lib/ecosystem/editorial/images/unique-listing-covers";
 import { NEWS_DESKS, newsDesksForLocale, splitNewsDesks, type NewsDeskId } from "@/lib/v271/news-desks";
 import { NewsArticleThumb, NewsDeskFallback, NewsHeadlineRow } from "@/components/articles/news-article-card";
-import { VitascopeMark } from "@/components/articles/vitascope-mark";
+import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
+import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { PortalSearch } from "@/components/v271/portal-search";
 import { WriterAgentsStrip } from "@/components/editorial/writer-agents-strip";
 import { AppOpenLink, isStandaloneAppHref } from "@/components/apps/app-origin-bar";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
-import { VITASCOPE, VITASCOPE_DESK_LOGO } from "@/lib/brand/vitascope";
+import { VITASCOPE_DESK_LOGO } from "@/lib/brand/vitascope";
 import { BookOpen, Gift, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
@@ -114,7 +115,7 @@ function DeskColumn({
             ) : null}
           </div>
         </div>
-        <Link href={def.href} className="shrink-0 text-[11px] font-medium text-[#005B96] hover:underline">
+        <Link href={localizePublicHref(def.href, locale)} className="shrink-0 text-[11px] font-medium text-[#005B96] hover:underline">
           {def.more} →
         </Link>
       </div>
@@ -181,7 +182,7 @@ function PortalNewsFeed({
         {chrome.newsTabs.map((tab) => (
           <Link
             key={tab.href}
-            href={tab.href}
+            href={localizePublicHref(tab.href, locale)}
             className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-700 hover:bg-[#e8f3fb] hover:text-[#005B96]"
           >
             {tab.label}
@@ -213,6 +214,9 @@ export function PortalHome({
   const desks = newsDesksForLocale(locale);
   const surface = getSurfaceCopy(locale);
   const todayNote = isCzechSurface(locale) ? getPortalNewsNote() : surface.todayFallback;
+  const brief = getNewsletterCopy(locale);
+  const publicApps = APP_PRODUCTS.filter((app) => isCzechSurface(locale) || app.id !== "mediprep");
+  const publicServices = PORTAL_SERVICES.filter((svc) => isCzechSurface(locale) || svc.id !== "mediprep");
   return (
     <div className="border-b border-slate-200 bg-[#e8eef3]">
       <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5">
@@ -224,6 +228,23 @@ export function PortalHome({
             {philosophy.claim}
           </h1>
           <p className="mt-1 max-w-3xl text-sm text-slate-600">{philosophy.subtitle}</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link
+              href={localizePublicHref("/newsletter", locale)}
+              className="inline-flex items-center justify-center rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
+            >
+              {brief.cta}
+            </Link>
+            <Link
+              href={localizePublicHref("/articles", locale)}
+              className="inline-flex items-center justify-center rounded-full border border-[#005B96]/35 px-5 py-2.5 text-sm font-semibold text-[#005B96] hover:bg-[#e8f3fb]"
+            >
+              {chrome.readMagazine}
+            </Link>
+          </div>
+          <div className="mt-3 max-w-xl">
+            <NewsletterCapture locale={locale} source="home-hero" variant="compact" />
+          </div>
           <div className="mt-4">
             <PortalSearch copy={surface} />
           </div>
@@ -231,7 +252,7 @@ export function PortalHome({
 
         <nav aria-label={chrome.servicesNav} className="mt-3 rounded-lg border border-slate-200 bg-white px-2 py-3 shadow-sm sm:px-3">
           <ul className="grid grid-cols-5 gap-1 sm:grid-cols-10">
-            {PORTAL_SERVICES.map((svc) => {
+            {publicServices.map((svc) => {
               const openApp = isStandaloneAppHref(svc.href);
               const Item = openApp ? AppOpenLink : Link;
               const localized = chrome.services.find((item) => item.id === svc.id);
@@ -266,15 +287,21 @@ export function PortalHome({
         <WriterAgentsStrip locale={locale} />
 
         <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <Box title={chrome.news} href="/articles" moreLabel={chrome.more}>
-            <div className="mb-3 flex items-center gap-3 rounded-lg border border-slate-100 bg-[#050b1d] px-3 py-2.5">
-              <VitascopeMark desk="clanky" size="sm" />
+          <Box title={chrome.news} href={localizePublicHref("/articles", locale)} moreLabel={chrome.more}>
+            <div className="mb-3 flex items-center gap-3 rounded-lg border border-slate-100 bg-[#021d33] px-3 py-2.5">
+              <Image
+                src={MAGAZINE.emailLockup}
+                alt={MAGAZINE.name}
+                width={200}
+                height={57}
+                className="h-10 w-auto max-w-[200px] object-contain"
+              />
               <div className="min-w-0">
-                <p className="font-display text-sm font-semibold tracking-[0.06em] text-[#7dd3fc]">
-                  {VITASCOPE.name}
+                <p className="font-display text-sm font-semibold tracking-[0.06em] text-white">
+                  {MAGAZINE.name}
                 </p>
                 <p className="text-[11px] text-slate-300">
-                  {"tagline" in philosophy ? philosophy.tagline : VITASCOPE.tagline}
+                  {"tagline" in philosophy ? philosophy.tagline : MAGAZINE.tagline.en}
                 </p>
               </div>
             </div>
@@ -288,9 +315,9 @@ export function PortalHome({
           </Box>
 
           <div className="space-y-3">
-            <Box title={chrome.apps} href="/aplikace" moreLabel={chrome.more}>
+            <Box title={chrome.apps} href={localizePublicHref("/aplikace", locale)} moreLabel={chrome.more}>
               <ul className="space-y-2">
-                {APP_PRODUCTS.map((app) => (
+                {publicApps.map((app) => (
                   <li key={app.id}>
                       <AppOpenLink
                         href={app.appPath}
@@ -334,7 +361,7 @@ export function PortalHome({
                   const ctaSecondary = localized?.ctaSecondary ?? aud.ctaSecondary.label;
                   return (
                   <li key={aud.id}>
-                    <Link href={aud.href} className="block rounded-md p-1.5 hover:bg-slate-50">
+                    <Link href={localizePublicHref(aud.href, locale)} className="block rounded-md p-1.5 hover:bg-slate-50">
                       <span className="text-sm font-semibold text-[#021d33]">{label}</span>
                       <span className="mt-0.5 block text-xs leading-snug text-slate-500">{description}</span>
                     </Link>
@@ -347,12 +374,12 @@ export function PortalHome({
                           {ctaPrimary}
                         </AppOpenLink>
                       ) : (
-                        <Link href={aud.ctaPrimary.href} className="text-[11px] font-semibold text-[#005B96] hover:underline">
+                        <Link href={localizePublicHref(aud.ctaPrimary.href, locale)} className="text-[11px] font-semibold text-[#005B96] hover:underline">
                           {ctaPrimary}
                         </Link>
                       )}
                       <span className="text-slate-300">·</span>
-                      <Link href={aud.ctaSecondary.href} className="text-[11px] text-slate-500 hover:underline">
+                      <Link href={localizePublicHref(aud.ctaSecondary.href, locale)} className="text-[11px] text-slate-500 hover:underline">
                         {ctaSecondary}
                       </Link>
                     </div>

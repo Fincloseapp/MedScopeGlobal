@@ -1,7 +1,10 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { getRevenueCopy } from "@/lib/i18n/revenue-copy";
+import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { trackEvent } from "@/lib/analytics";
 
 type Props = {
@@ -20,6 +23,8 @@ export function NewsletterCapture({
   className = "",
 }: Props) {
   const copy = getRevenueCopy(locale);
+  const brief = getNewsletterCopy(locale);
+  const latestHref = localizePublicHref("/newsletter/posledni", locale);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "dup" | "err" | "invalid">(
     "idle"
@@ -91,6 +96,15 @@ export function NewsletterCapture({
     </form>
   );
 
+  const nextStep =
+    status === "ok" ? (
+      <p className="mt-2 text-xs">
+        <Link href={latestHref} className="font-semibold text-[#005B96] hover:underline">
+          {brief.hubLatest} →
+        </Link>
+      </p>
+    ) : null;
+
   if (variant === "compact") {
     return (
       <div className={className}>
@@ -103,6 +117,7 @@ export function NewsletterCapture({
             {message}
           </p>
         ) : null}
+        {nextStep}
       </div>
     );
   }
@@ -143,6 +158,7 @@ export function NewsletterCapture({
           {message}
         </p>
       ) : null}
+      {nextStep}
     </section>
   );
 }

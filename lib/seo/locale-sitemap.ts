@@ -45,6 +45,9 @@ function staticRoutesForLocale(base: string, locale: GlobalLocaleCode): LocaleSi
     { path: "/ordizaznam", changeFrequency: "weekly" as const, priority: 0.85 },
     { path: "/vip/protokoly", changeFrequency: "weekly" as const, priority: 0.8 },
     { path: "/predplatne", changeFrequency: "weekly" as const, priority: 0.9 },
+    { path: "/newsletter", changeFrequency: "weekly" as const, priority: 0.88 },
+    { path: "/newsletter/posledni", changeFrequency: "weekly" as const, priority: 0.8 },
+    { path: "/newsletter/dekujeme", changeFrequency: "monthly" as const, priority: 0.4 },
     { path: "/o-nas", changeFrequency: "monthly" as const, priority: 0.5 },
     ...LONGEVITY_PROTOCOLS.map((protocol) => ({
       path: `/vip/protokoly/${protocol.slug}`,

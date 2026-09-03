@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { WriterAgentMark } from "@/components/editorial/writer-agent-mark";
 import { getSurfaceCopy, writerAgentsForLocale, writerDesksForLocale } from "@/lib/i18n/surface-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export function WriterAgentsStrip({ locale = "cs" }: { locale?: string }) {
   const surface = getSurfaceCopy(locale);
@@ -10,7 +11,7 @@ export function WriterAgentsStrip({ locale = "cs" }: { locale?: string }) {
     <section className="mt-3 rounded-lg border border-slate-200 bg-white px-3 py-3 shadow-sm sm:px-4">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <h2 className="text-sm font-bold text-[#021d33]">{surface.writersTitle}</h2>
-        <Link href="/verejnost/clanky" className="text-xs font-medium text-[#005B96] hover:underline">
+        <Link href={localizePublicHref("/verejnost/clanky", locale)} className="text-xs font-medium text-[#005B96] hover:underline">
           {surface.writersAll}
         </Link>
       </div>
@@ -20,7 +21,7 @@ export function WriterAgentsStrip({ locale = "cs" }: { locale?: string }) {
           return (
             <li key={desk.id}>
               <Link
-                href={desk.href}
+                href={localizePublicHref(desk.href, locale)}
                 className="flex items-center gap-2 rounded-md px-1.5 py-1.5 hover:bg-slate-50"
               >
                 <WriterAgentMark agent={desk} size={36} />

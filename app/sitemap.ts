@@ -20,6 +20,8 @@ const staticRoutes: MetadataRoute.Sitemap = [
   { url: `${base}/app/dokumentace`, changeFrequency: "weekly", priority: 0.82 },
   { url: `${base}/ordizaznam`, changeFrequency: "weekly", priority: 0.8 },
   { url: `${base}/predplatne`, changeFrequency: "weekly", priority: 0.9 },
+  { url: `${base}/newsletter`, changeFrequency: "weekly", priority: 0.88 },
+  { url: `${base}/newsletter/posledni`, changeFrequency: "weekly", priority: 0.8 },
   { url: `${base}/verejnost`, changeFrequency: "daily", priority: 0.85 },
   { url: `${base}/lekari`, changeFrequency: "weekly", priority: 0.82 },
   { url: `${base}/dashboard`, changeFrequency: "weekly", priority: 0.75 },

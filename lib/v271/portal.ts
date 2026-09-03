@@ -92,6 +92,7 @@ export type PortalChrome = {
   more: string;
   newTab: string;
   trialCta: string;
+  readMagazine: string;
   servicesNav: string;
   newsTabs: { label: string; href: string }[];
   services: { id: string; label: string; hint: string }[];
@@ -183,6 +184,7 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
     more: "more",
     newTab: "new tab",
     trialCta: "Try 14 days free",
+    readMagazine: "Open the magazine",
     servicesNav: "MedScopeGlobal services",
     footerLegal: `${MAGAZINE.name} on ${MAGAZINE.platform} is an educational health and longevity magazine — not an admissions board or official medical-school textbook. Content does not replace individual medical advice.`,
   },
@@ -194,6 +196,7 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
     more: "mehr",
     newTab: "neuer Tab",
     trialCta: "14 Tage kostenlos testen",
+    readMagazine: "Magazin öffnen",
     servicesNav: "MedScopeGlobal-Dienste",
     footerLegal: `${MAGAZINE.name} auf ${MAGAZINE.platform} ist ein Bildungs-Magazin für Gesundheit und Langlebigkeit — keine Zulassungskommission und kein offizielles Lehrbuch. Der Inhalt ersetzt keine individuelle ärztliche Beratung.`,
   },
@@ -205,6 +208,7 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
     more: "plus",
     newTab: "nouvel onglet",
     trialCta: "Essayer 14 jours",
+    readMagazine: "Ouvrir le magazine",
     servicesNav: "Services MedScopeGlobal",
     footerLegal: `${MAGAZINE.name} sur ${MAGAZINE.platform} est un magazine éducatif de santé et de longévité — ce n’est ni un jury d’admission ni un manuel officiel. Le contenu ne remplace pas un avis médical individuel.`,
   },
@@ -216,6 +220,7 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
     more: "více",
     newTab: "nová karta",
     trialCta: "Vyzkoušet 14 dní zdarma",
+    readMagazine: "Otevřít magazín",
     servicesNav: "Služby MedScopeGlobal",
     footerLegal: `${MAGAZINE.name} na ${MAGAZINE.platform} je vzdělávací magazín zdraví a dlouhověkosti — není přijímací komise ani oficiální učebnice LF. Obsah nenahrazuje individuální lékařskou radu.`,
   },

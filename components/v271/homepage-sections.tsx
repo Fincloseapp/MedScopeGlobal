@@ -105,13 +105,13 @@ export function V272WhyTrustBlock({ locale = "cs" }: { locale?: string }) {
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/predplatne?trial=1"
+            href={localizePublicHref("/predplatne?trial=1", locale)}
             className="rounded-full bg-[#005B96] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
           >
             {surface.whyTrial}
           </Link>
           <Link
-            href="/predplatne"
+            href={localizePublicHref("/predplatne", locale)}
             className="rounded-full border border-[#005B96]/30 px-6 py-2.5 text-sm font-semibold text-[#005B96] hover:bg-[#005B96]/5"
           >
             {surface.whySubscribe}

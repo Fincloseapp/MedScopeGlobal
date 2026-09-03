@@ -53,11 +53,20 @@ export async function generateMetadata(): Promise<Metadata> {
       locale: getOgLocale(locale),
       siteName: `${MAGAZINE.name} · ${MAGAZINE.platform}`,
       type: "website",
+      images: [
+        {
+          url: `${SITE.url}${MAGAZINE.emailLockup}`,
+          width: 1200,
+          height: 340,
+          alt: MAGAZINE.name,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [`${SITE.url}${MAGAZINE.emailLockup}`],
     },
   };
 }
@@ -99,12 +108,12 @@ export default async function HomePage() {
         />
       ))}
 
-      {/* Story: ViaLongeVita hero → magazín → apps/VIP → CTA (PortalHome). Pricing lives on /predplatne — not duplicated under the portal. */}
+      {/* Story: ViaLongeVita hero (brief + magazine) → news → apps. Affiliate after newsletter. */}
       <PortalHome articles={articles} copy={philosophy} locale={locale} />
       <HomepageLongevityStrip articles={articles} locale={locale} />
-      <HomepageAffiliateShelf locale={locale} />
-      <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
       <HomepageRevenueMix locale={locale} isVip={isVip} />
+      {!isVip ? <HomepageAffiliateShelf locale={locale} /> : null}
+      <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
       <V272WhyTrustBlock locale={locale} />
       {isCzechSurface(locale) ? <V272AcademyHomeSections /> : null}
       <V271B2bBlock locale={locale} />

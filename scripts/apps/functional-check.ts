@@ -789,9 +789,22 @@ assert.ok(
   "brief must not show heureka-cz / amazon market labels"
 );
 assert.ok(
-  readFileSync(join(root, "app/(public)/newsletter/page.tsx"), "utf8").includes("/newsletter/archiv"),
-  "hub archive must point at /newsletter/archiv"
+  readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes('source="home-hero"'),
+  "homepage hero must capture the ViaLongeVita brief"
 );
+assert.ok(
+  !readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes("VITASCOPE.name"),
+  "homepage news box must not still say Vitascope"
+);
+assert.ok(
+  readFileSync(join(root, "lib/seo/locale-sitemap.ts"), "utf8").includes('path: "/newsletter"'),
+  "locale sitemaps must list the newsletter hub"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/tip/page.tsx"), "utf8").includes('redirect("/articles")'),
+  "/tip must not send readers to VIP protocols"
+);
+file("app/(public)/newsletter/dekujeme/page.tsx");
 assert.ok(
   readFileSync(join(root, ".github/workflows/cloudflare-cron.yml"), "utf8").includes(
     "/api/cron/newsletter-generate"
