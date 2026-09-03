@@ -819,6 +819,10 @@ assert.ok(
   "VIP protocols listing must follow the request locale"
 );
 assert.ok(
+  readFileSync(join(root, "lib/v38/conversion-copy.ts"), "utf8").includes("10 Protokolle"),
+  "VIP nav strip must not stay Czech on German pages"
+);
+assert.ok(
   readFileSync(join(root, "lib/i18n/surface-copy.ts"), "utf8").includes("O redakci a zdrojích"),
   "footer proof must be qualitative, not invented reader counts"
 );

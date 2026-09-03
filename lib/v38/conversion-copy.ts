@@ -301,6 +301,49 @@ export function getMediFlowNavStripCopy(): ConversionCopy {
 }
 
 export function getVipNavStripCopy(locale = "cs"): ConversionCopy {
+  const primary = primaryArticleLocale(normalizeLocale(locale));
+  if (primary === "de") {
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "VIP Longevity",
+        headline: "10 Protokolle · 14 Tage kostenlos",
+        body: "Schlaf, Stoffwechsel, Bewegung. Dann 149 Kč/Monat — getrennt von Academy und MeDipacient.",
+        ctaLabel: "VIP-Test starten",
+        ctaHref: "/predplatne?trial=1&plan=vip",
+        hint: "14 Tage zum Testen",
+      },
+      locale
+    );
+  }
+  if (primary === "fr") {
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "VIP Longevity",
+        headline: "10 protocoles · 14 jours gratuits",
+        body: "Sommeil, métabolisme, mouvement. Puis 149 Kč/mois — distinct de l’Academy et de MeDipacient.",
+        ctaLabel: "Commencer l’essai VIP",
+        ctaHref: "/predplatne?trial=1&plan=vip",
+        hint: "14 jours pour essayer",
+      },
+      locale
+    );
+  }
+  if (primary !== "cs") {
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "VIP Longevity",
+        headline: "10 protocols · 14 days free",
+        body: "Sleep, metabolism, movement. Then 149 Kč/month — separate from Academy and MeDipacient.",
+        ctaLabel: "Start the VIP trial",
+        ctaHref: "/predplatne?trial=1&plan=vip",
+        hint: "14 days to try",
+      },
+      locale
+    );
+  }
   return withLocalPrices(
     {
       slot: "nav_strip",
