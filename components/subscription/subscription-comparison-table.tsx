@@ -6,6 +6,7 @@ import {
 } from "@/lib/v27/config";
 import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
 import { getSubscribeCopy } from "@/lib/i18n/subscribe-copy";
+import { studentMonthlyCharge } from "@/lib/studenti/pricing";
 
 function CellValue({ included, includedLabel, missingLabel }: { included: boolean; includedLabel: string; missingLabel: string }) {
   if (included) {
@@ -56,7 +57,9 @@ export function SubscriptionComparisonTable({
                 >
                   <span className="block">{copy.plans[plan.tier].name}</span>
                   <span className="mt-1 block text-lg font-bold text-[#021d33]">
-                    {formatCzkListPrice(plan.monthlyCzk, locale, region)}
+                    {plan.tier === "student"
+                      ? studentMonthlyCharge(locale, region).formatted
+                      : formatCzkListPrice(plan.monthlyCzk, locale, region)}
                   </span>
                   <span className="text-xs font-normal text-muted-foreground">{copy.perMonth}</span>
                 </th>
