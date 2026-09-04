@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { DokAppShell } from "@/components/lekari/dok-app/dok-app-shell";
 import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { normalizeLocale } from "@/lib/i18n/config";
 
 export const metadata: Metadata = {
   title: ORDIZAPIS.pwaName,
@@ -27,6 +29,14 @@ export const metadata: Metadata = {
   themeColor: "#005B96",
 };
 
-export default function DokumentaceAppPage() {
-  return <DokAppShell />;
+export default async function DokumentaceAppPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ locale?: string }>;
+}) {
+  const params = await searchParams;
+  const locale = params.locale?.trim()
+    ? normalizeLocale(params.locale)
+    : await getServerLocale();
+  return <DokAppShell locale={locale} />;
 }

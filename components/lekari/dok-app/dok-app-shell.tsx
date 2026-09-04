@@ -47,13 +47,13 @@ function initialTab(): TabId {
   return "zapis";
 }
 
-export function DokAppShell() {
+export function DokAppShell({ locale: localeProp }: { locale?: string }) {
   const [tab, setTab] = useState<TabId>(initialTab);
   const [online, setOnline] = useState(true);
   const [elig, setElig] = useState<EligibilityState | null>(null);
   const [loading, setLoading] = useState(true);
   const [linkHint, setLinkHint] = useState<string | null>(null);
-  const [locale, setLocale] = useState("cs");
+  const [locale, setLocale] = useState(localeProp ?? "cs");
   const copy = getOrdiZapisAppCopy(locale);
   const tabs = [
     { id: "zapis" as const, label: copy.tabNote, icon: FilePlus2 },
@@ -63,8 +63,8 @@ export function DokAppShell() {
   ];
 
   useEffect(() => {
-    setLocale(getClientLocale());
-  }, []);
+    setLocale(localeProp ?? getClientLocale());
+  }, [localeProp]);
 
   useEffect(() => {
     const t = new URLSearchParams(window.location.search).get("tab");

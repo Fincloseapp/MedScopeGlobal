@@ -864,6 +864,12 @@ assert.ok(
   "OrdiZapis marketing workspace must receive the edition locale"
 );
 assert.ok(
+  readFileSync(join(root, "app/(dok-app)/app/dokumentace/page.tsx"), "utf8").includes(
+    "getServerLocale"
+  ),
+  "OrdiZapis PWA must receive the edition locale on first paint"
+);
+assert.ok(
   readFileSync(join(root, "components/lekari/dokumentace-workspace.tsx"), "utf8").includes(
     "dokumentaceLocaleHeaders"
   ),
