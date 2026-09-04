@@ -2497,6 +2497,103 @@ console.log(
   `✓ public writers=${WRITER_AGENTS.length} desks=${WRITER_DESKS.length} editors=${getReviewPipeline("cs").length}`
 );
 
+{
+  const notesSql = readFileSync(
+    join(root, "supabase/migrations/20260808000000_dokumentace_notes.sql"),
+    "utf8"
+  );
+  const hardenSql = readFileSync(
+    join(root, "supabase/migrations/20260904000000_dokumentace_notes_rls_harden.sql"),
+    "utf8"
+  );
+  const notesSrc = readFileSync(join(root, "lib/lekari/dokumentace/notes.ts"), "utf8");
+  const notesRoute = readFileSync(
+    join(root, "app/api/lekari/dokumentace/notes/route.ts"),
+    "utf8"
+  );
+  const processRoute = readFileSync(
+    join(root, "app/api/lekari/dokumentace/process/route.ts"),
+    "utf8"
+  );
+  const structureRoute = readFileSync(
+    join(root, "app/api/lekari/dokumentace/structure/route.ts"),
+    "utf8"
+  );
+  for (const [label, sql] of [
+    ["create", notesSql],
+    ["harden", hardenSql],
+  ] as const) {
+    assert.ok(
+      sql.includes("enable row level security"),
+      `${label} migration must enable RLS on dokumentace_notes`
+    );
+    assert.ok(
+      sql.includes("force row level security"),
+      `${label} migration must FORCE RLS so table owners cannot dump transcripts`
+    );
+    assert.ok(
+      sql.includes("auth.uid() = user_id"),
+      `${label} migration must isolate rows to auth.uid()`
+    );
+    assert.ok(
+      /for select[\s\S]*using \(auth\.uid\(\) = user_id\)/.test(sql),
+      `${label} must have SELECT policy auth.uid() = user_id`
+    );
+    assert.ok(
+      /for insert[\s\S]*with check \(auth\.uid\(\) = user_id\)/.test(sql),
+      `${label} must have INSERT WITH CHECK auth.uid() = user_id`
+    );
+    assert.ok(
+      /for update[\s\S]*using \(auth\.uid\(\) = user_id\)[\s\S]*with check \(auth\.uid\(\) = user_id\)/.test(
+        sql
+      ),
+      `${label} must block user_id reassignment on UPDATE`
+    );
+    assert.ok(
+      /for delete[\s\S]*using \(auth\.uid\(\) = user_id\)/.test(sql),
+      `${label} must have DELETE policy auth.uid() = user_id`
+    );
+    assert.ok(
+      /revoke all on table public\.dokumentace_notes from anon/i.test(sql),
+      `${label} must revoke anon on transcript table`
+    );
+    assert.ok(
+      /to authenticated/.test(sql),
+      `${label} policies must be granted only to authenticated`
+    );
+  }
+  assert.ok(
+    notesSrc.includes("createDokumentaceUserClient"),
+    "OrdiZapis notes must use a user-JWT client so RLS is enforced"
+  );
+  assert.ok(
+    notesSrc.includes("assertSamePhysician"),
+    "notes helpers must refuse a session / userId mismatch"
+  );
+  assert.ok(
+    notesSrc.includes('.eq("user_id", userId)'),
+    "notes queries must also filter user_id in application code"
+  );
+  assert.ok(
+    !notesSrc.includes("createServiceRoleClient();\n  const { data, error } = await admin\n    .from(\"dokumentace_notes\")"),
+    "primary dokumentace_notes path must not use service role"
+  );
+  for (const [label, src] of [
+    ["notes POST", notesRoute],
+    ["process", processRoute],
+    ["structure", structureRoute],
+  ] as const) {
+    assert.ok(
+      !src.includes("createServiceRoleClient"),
+      `${label} must not save transcripts with the service-role client`
+    );
+    assert.ok(
+      src.includes("saveDokumentaceNote({"),
+      `${label} must save via the user-scoped helper`
+    );
+  }
+}
+
 console.log("✓ editorial image pipeline checks passed");
 console.log(
   `  MeDipacient demo: ${dash.stats.reports} zpráv, ${dash.stats.diagnoses} dg, ${dash.stats.meds} léků`

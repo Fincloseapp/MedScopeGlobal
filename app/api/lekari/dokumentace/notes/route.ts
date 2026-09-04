@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { createServiceRoleClient } from "@/lib/supabase/service";
 import { withApiGuard } from "@/lib/security/api-guard";
 import {
   listDokumentaceNotes,
@@ -93,8 +92,7 @@ export async function POST(request: Request) {
   const source = body.source ?? sourceHeader ?? "web";
 
   try {
-    const admin = createServiceRoleClient();
-    const row = await saveDokumentaceNote(admin, {
+    const row = await saveDokumentaceNote({
       userId: user.id,
       note: body.note,
       transcript: body.transcript,
