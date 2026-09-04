@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import { StudentLink as Link } from "@/components/studenti/student-link";
 import { generateSelfTest } from "@/lib/prijimacky/quiz-from-bank";
 import type { PrepSubject } from "@/lib/prijimacky/faculties-admissions";
 import { V27CheckoutButton } from "@/components/v27/checkout-button";

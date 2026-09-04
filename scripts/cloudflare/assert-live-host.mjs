@@ -5,17 +5,25 @@
 const origin = process.env.MEDSCOPE_ORIGIN || "https://medscopeglobal.com";
 const ua = "Mozilla/5.0 (compatible; MedScopeCloudflareAssert/1.0)";
 
-async function headers(path) {
-  const res = await fetch(`${origin}${path}`, {
-    method: "HEAD",
-    redirect: "manual",
-    headers: { "user-agent": ua, "accept-language": "cs" },
-  });
-  const out = {};
-  res.headers.forEach((value, key) => {
-    out[key.toLowerCase()] = value;
-  });
-  return { status: res.status, headers: out };
+async function headers(path, attempt = 0) {
+  try {
+    const res = await fetch(`${origin}${path}`, {
+      method: "HEAD",
+      redirect: "manual",
+      headers: { "user-agent": ua, "accept-language": "cs" },
+    });
+    const out = {};
+    res.headers.forEach((value, key) => {
+      out[key.toLowerCase()] = value;
+    });
+    return { status: res.status, headers: out };
+  } catch (err) {
+    if (attempt < 2) {
+      await new Promise((resolve) => setTimeout(resolve, 4000 * (attempt + 1)));
+      return headers(path, attempt + 1);
+    }
+    throw err;
+  }
 }
 
 function assert(cond, message) {

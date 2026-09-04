@@ -167,6 +167,7 @@ import {
 import { studentClubOpenFromProfile } from "../../lib/billing/student-entitlement";
 import { isPhysicianGrantProduct, isStudentGrantProduct } from "../../lib/v27/config";
 import { studentIntroCharge, studentMonthlyCharge, STUDENT_FREE_TESTS, isStudentChromePath } from "../../lib/studenti/pricing";
+import { studentPublicHref } from "../../lib/studenti/href";
 import { facultiesForLocale, facultyCountryForLocale } from "../../lib/prijimacky/faculties-by-country";
 import { articlePageKey, rollEvergreenListingDate } from "../../lib/editorial/freshness";
 import {
@@ -842,8 +843,18 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.25"),
-  "page cache tag must bust after student room atelier shell"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.26"),
+  "page cache tag must bust after student hub links stay on /cs"
+);
+assert.ok(
+  readFileSync(join(root, "lib/studenti/href.ts"), "utf8").includes("studentPublicHref") &&
+    readFileSync(join(root, "components/studenti/student-section-nav.tsx"), "utf8").includes("StudentLink") &&
+    readFileSync(join(root, "components/studenti/student-studio-desk.tsx"), "utf8").includes('href: "/studenti/klub"'),
+  "student hub nav and desk chrome must be real /cs links, not dead labels"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/studenti/hry/page.tsx"), "utf8").includes("resolveStudyGameImageUrlSync"),
+  "games room must not block on a remote image report per card"
 );
 assert.ok(
   readFileSync(join(root, "components/studenti/student-atelier-shell.tsx"), "utf8").includes("bg-[#f3eee6]"),
@@ -888,6 +899,10 @@ assert.ok(
 );
 assert.equal(isStudentChromePath("/cs/studenti"), true);
 assert.equal(isStudentChromePath("/de/predplatne"), false);
+assert.equal(studentPublicHref("/studenti/klub"), "/cs/studenti/klub");
+assert.equal(studentPublicHref("/cs/studenti/testy"), "/cs/studenti/testy");
+assert.equal(studentPublicHref("/app/priprava"), "/app/priprava");
+assert.equal(studentPublicHref("/predplatne#student"), "/cs/predplatne#student");
 assert.ok(
   readFileSync(join(root, "app/(public)/predplatne/page.tsx"), "utf8").includes("studentIntroCharge"),
   "subscribe page must price the student card with the intro month, not FX on 149"

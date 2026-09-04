@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { StudentLink as Link } from "@/components/studenti/student-link";
 import { ArrowRight, Gamepad2 } from "lucide-react";
 import {
   StudentAtelierShell,
@@ -7,7 +7,7 @@ import {
   atelierPrimaryLink,
 } from "@/components/studenti/student-atelier-shell";
 import { PublicModuleImage } from "@/components/v25/public-module-image";
-import { resolveStudyGameImageUrl } from "@/lib/v22/game-images";
+import { resolveStudyGameImageUrlSync } from "@/lib/v22/game-images";
 import { V22_STUDY_GAMES } from "@/lib/v22/games";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
@@ -54,7 +54,7 @@ export default async function StudentiHryPage() {
   const games = await Promise.all(
     V22_STUDY_GAMES.map(async (game) => ({
       ...game,
-      imageUrl: await resolveStudyGameImageUrl(game.slug),
+      imageUrl: await resolveStudyGameImageUrlSync(game.slug),
     }))
   );
 

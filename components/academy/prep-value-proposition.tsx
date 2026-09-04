@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { StudentLink as Link } from "@/components/studenti/student-link";
 import {
   ArrowRight,
   BookOpen,

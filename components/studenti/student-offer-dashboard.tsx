@@ -4,6 +4,8 @@ import { ArrowUpRight, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { StudentStudioDesk } from "@/components/studenti/student-studio-desk";
+import { StudentSectionNav } from "@/components/studenti/student-section-nav";
+import { studentPublicHref } from "@/lib/studenti/href";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { chromePack } from "@/lib/i18n/chrome-pack";
 import {
@@ -42,7 +44,7 @@ const ROOMS = [
   },
   {
     href: "/app/priprava",
-    csHref: "/cs/app/priprava",
+    csHref: "/app/priprava",
     image: APP_MARKETING_IMAGE.mediprep,
     featured: true,
     title: { cs: "MeDiprep desk", en: "MeDiprep desk", de: "MeDiprep-Desk", fr: "Bureau MeDiprep" },
@@ -51,6 +53,18 @@ const ROOMS = [
       en: "1 free test. Drills and mocks from faculty requirements.",
       de: "1 Test frei. Übungen nach Fakultätsanforderungen.",
       fr: "1 test offert. Exercices selon les exigences facultaires.",
+    },
+  },
+  {
+    href: "/studenti/testy",
+    csHref: "/cs/studenti/testy",
+    image: PHOTO.notes,
+    title: { cs: "Testy", en: "Tests", de: "Tests", fr: "Tests" },
+    body: {
+      cs: "Self-test, klub a hry — jedna mapa k procvičení.",
+      en: "Self-test, club and games — one map for drills.",
+      de: "Selbsttest, Club und Spiele — eine Karte zum Üben.",
+      fr: "Auto-test, club et jeux — une carte d’entraînement.",
     },
   },
   {
@@ -278,7 +292,7 @@ export function StudentOfferDashboard({ locale }: { locale: string }) {
   const monthly = studentMonthlyCharge(locale);
   const faculties = facultiesForLocale(locale);
   const productHref = (path: string, csHref: string) =>
-    pack === "cs" ? localizePublicHref(path, locale) : csHref;
+    pack === "cs" ? studentPublicHref(path, locale) : csHref;
   const featured = ROOMS.filter((r) => "featured" in r && r.featured);
   const rest = ROOMS.filter((r) => !("featured" in r && r.featured));
   const preview = generateSelfTest({ count: 1, seed: "atelier-desk" }).questions[0];
@@ -321,7 +335,7 @@ export function StudentOfferDashboard({ locale }: { locale: string }) {
                 variant="ghost"
                 className="rounded-full text-[#f6f1e8] hover:bg-white/10 hover:text-white"
               >
-                <Link href={productHref("/app/priprava", "/cs/app/priprava")}>
+                <Link href={productHref("/app/priprava", "/app/priprava")}>
                   {copy.test}
                   <ArrowUpRight className="ml-1 h-4 w-4" />
                 </Link>
@@ -373,6 +387,9 @@ export function StudentOfferDashboard({ locale }: { locale: string }) {
           {copy.roomsTitle}
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-[#5c564c]">{copy.roomsLead}</p>
+        <div className="mt-6">
+          <StudentSectionNav current="/studenti" />
+        </div>
 
         <div className="mt-8 grid gap-4 lg:grid-cols-2">
           {featured.map((item) => (

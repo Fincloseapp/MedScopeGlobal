@@ -156,7 +156,12 @@ export async function listStudentMaterials(
     dbQuery = dbQuery.or(`title.ilike.%${query.q}%,subject.ilike.%${query.q}%`);
   }
 
-  const { data, error, count } = await dbQuery;
+  const { data, error, count } = await Promise.race([
+    dbQuery,
+    new Promise<{ data: null; error: { message: string }; count: null }>((resolve) =>
+      setTimeout(() => resolve({ data: null, error: { message: "materials-timeout" }, count: null }), 2500)
+    ),
+  ]);
   if (!error && (data?.length ?? 0) > 0) {
     const raw = (data ?? []) as StudentMaterial[];
     return {

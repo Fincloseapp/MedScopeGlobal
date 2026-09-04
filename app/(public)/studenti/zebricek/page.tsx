@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { StudentLink as Link } from "@/components/studenti/student-link";
 import {
   StudentAtelierShell,
   atelierGhostLink,

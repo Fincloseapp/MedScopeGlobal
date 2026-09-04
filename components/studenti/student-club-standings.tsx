@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { StudentLink as Link } from "@/components/studenti/student-link";
 import {
   STUDENT_CLUB_HREF,
   STUDENT_CLUB_STORAGE_SCORES,

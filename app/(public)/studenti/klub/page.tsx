@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { StudentLink as Link } from "@/components/studenti/student-link";
 import { ArrowUpRight } from "lucide-react";
 import { StudentClubBoard } from "@/components/studenti/student-club-board";
 import { StudentSectionNav } from "@/components/studenti/student-section-nav";

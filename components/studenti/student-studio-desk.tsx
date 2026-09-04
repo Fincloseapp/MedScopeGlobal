@@ -1,6 +1,14 @@
 import Image from "next/image";
+import { StudentLink } from "@/components/studenti/student-link";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import type { FacultyAdmissions } from "@/lib/prijimacky/faculties-admissions";
+
+const DESK_NAV = [
+  { href: "/studenti/klub", cs: "Kvíz", en: "Quiz" },
+  { href: "/app/priprava", cs: "Simulace", en: "Mocks" },
+  { href: "/studenti/chci-studovat", cs: "Fakulty", en: "Faculties" },
+  { href: "/studenti/ai-tutor", cs: "Tutor", en: "Tutor" },
+] as const;
 
 export function StudentStudioDesk({
   cs,
@@ -38,18 +46,16 @@ export function StudentStudioDesk({
             <p className="px-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#d4af37]/80">
               Desk
             </p>
-            {(cs
-              ? ["Kvíz", "Simulace", "Fakulty", "Tutor"]
-              : ["Quiz", "Mocks", "Faculties", "Tutor"]
-            ).map((item, i) => (
-              <div
-                key={item}
-                className={`rounded-lg px-2 py-1.5 text-[10px] ${
+            {DESK_NAV.map((item, i) => (
+              <StudentLink
+                key={item.href}
+                href={item.href}
+                className={`block rounded-lg px-2 py-1.5 text-[10px] hover:bg-white/10 hover:text-white ${
                   i === 0 ? "bg-white/10 text-white" : "text-white/45"
                 }`}
               >
-                {item}
-              </div>
+                {cs ? item.cs : item.en}
+              </StudentLink>
             ))}
           </aside>
 
@@ -93,12 +99,16 @@ export function StudentStudioDesk({
               </p>
               <ul className="mt-1 space-y-0.5">
                 {row.map((f) => (
-                  <li
-                    key={f.slug}
-                    className="flex items-baseline justify-between gap-2 text-[10px] text-white/70"
-                  >
-                    <span className="truncate font-medium text-white/90">{f.shortName}</span>
-                    <span className="shrink-0 text-white/35">{f.city}</span>
+                  <li key={f.slug}>
+                    <a
+                      href={f.applicationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-baseline justify-between gap-2 text-[10px] text-white/70 no-underline hover:text-white"
+                    >
+                      <span className="truncate font-medium text-white/90">{f.shortName}</span>
+                      <span className="shrink-0 text-white/35">{f.city}</span>
+                    </a>
                   </li>
                 ))}
               </ul>

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { StudentLink } from "@/components/studenti/student-link";
 import { STUDENT_CLUB_PLAN_HREF, STUDENT_SECTION_NAV } from "@/lib/studenti/club";
 
 export function StudentSectionNav({ current }: { current?: string }) {
@@ -7,7 +7,7 @@ export function StudentSectionNav({ current }: { current?: string }) {
       {STUDENT_SECTION_NAV.map((item) => {
         const active = current === item.href;
         return (
-          <Link
+          <StudentLink
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
@@ -18,15 +18,15 @@ export function StudentSectionNav({ current }: { current?: string }) {
             }
           >
             {item.label}
-          </Link>
+          </StudentLink>
         );
       })}
-      <Link
+      <StudentLink
         href={STUDENT_CLUB_PLAN_HREF}
         className="rounded-full border border-[#8a6d32]/40 px-3 py-1.5 font-semibold text-[#8a6d32] hover:bg-[#8a6d32]/10"
       >
         Student tarif
-      </Link>
+      </StudentLink>
     </nav>
   );
 }
