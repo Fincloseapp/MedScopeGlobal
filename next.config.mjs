@@ -30,7 +30,7 @@ try {
 
 
 
-const CACHE_TAGS = "medscope-ui-v23.26,medscope-pages,v23-content";
+const CACHE_TAGS = "medscope-ui-v23.27,medscope-pages,v23-content";
 
 
 
@@ -371,6 +371,18 @@ const nextConfig = {
 
         ],
 
+      },
+      {
+        source: "/studenti",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/studenti/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
       },
 
       {

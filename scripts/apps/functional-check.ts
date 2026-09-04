@@ -843,8 +843,12 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.26"),
-  "page cache tag must bust after student hub links stay on /cs"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.27"),
+  "page cache tag must bust after student catch-all route is removed"
+);
+assert.ok(
+  !existsSync(join(root, "app/(public)/studenti/[slug]/page.tsx")),
+  "student [slug] catch-all must not steal klub/hry/materialy from their dedicated pages"
 );
 assert.ok(
   readFileSync(join(root, "lib/studenti/href.ts"), "utf8").includes("studentPublicHref") &&

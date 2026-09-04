@@ -31,10 +31,18 @@ const PATHS = [
   "/studenti",
   "/studenti/klub",
   "/studenti/zebricek",
+  "/studenti/testy",
+  "/studenti/hry",
+  "/studenti/materialy",
+  "/studenti/ai-tutor",
+  "/studenti/leky",
+  "/studenti/zkousky",
+  "/studenti/chci-studovat",
+  "/studenti/darkove",
 ] as const;
 
 const TAGS = [
-  "medscope-ui-v23.26",
+  "medscope-ui-v23.27",
   "medscope-ui-v23.23",
   "medscope-ui-v23.22",
   "medscope-ui-v23.21",
