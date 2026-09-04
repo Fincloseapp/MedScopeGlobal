@@ -5,6 +5,7 @@ import { logAiAgentUsage } from "@/lib/security/ai-abuse";
 import { assertDokumentaceAccess } from "@/lib/lekari/dokumentace/access";
 import { DOKUMENTACE_MAX_UPLOAD_BYTES } from "@/lib/lekari/dokumentace/templates";
 import { transcribeAudio } from "@/lib/lekari/dokumentace/stt";
+import { dokumentaceLocaleFromForm } from "@/lib/lekari/dokumentace/request-locale";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -56,7 +57,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { text, provider } = await transcribeAudio(buffer, mimeType);
+    const locale = dokumentaceLocaleFromForm(request, form);
+    const { text, provider } = await transcribeAudio(buffer, mimeType, undefined, locale);
 
     await logAiAgentUsage({
       userId: user!.id,

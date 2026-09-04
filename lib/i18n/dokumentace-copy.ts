@@ -256,7 +256,7 @@ const PACK: Record<ChromePack, Pack> = {
     showSubscribe: "Abo anzeigen",
     workspaceTitle: "Arbeitsbereich",
     workspaceLead:
-      "Das interaktive Tool bleibt in der tschechischen Praxisausgabe. Öffnen Sie OrdiZapis, um Diktat oder Gespräch aufzunehmen.",
+      "Diktieren oder Gespräch aufnehmen — der Notizentwurf erscheint hier zur Prüfung.",
     workspaceCta: "OrdiZapis öffnen",
     legalTitle: "Rechtlicher Rahmen",
     legal: [
@@ -350,7 +350,7 @@ const PACK: Record<ChromePack, Pack> = {
     showSubscribe: "Voir l’abonnement",
     workspaceTitle: "Espace de travail",
     workspaceLead:
-      "L’outil interactif reste dans l’édition tchèque pour la pratique. Ouvrez OrdiZapis pour enregistrer une dictée ou une consultation.",
+      "Dictez ou enregistrez une consultation — le brouillon de note s’affiche ici pour relecture.",
     workspaceCta: "Ouvrir OrdiZapis",
     legalTitle: "Cadre juridique",
     legal: [
@@ -444,7 +444,7 @@ const PACK: Record<ChromePack, Pack> = {
     showSubscribe: "Vedi l’abbonamento",
     workspaceTitle: "Area di lavoro",
     workspaceLead:
-      "Lo strumento interattivo resta nell’edizione ceca per lo studio. Apri OrdiZapis per registrare un dettato o una visita.",
+      "Detta o registra una visita — la bozza della nota compare qui per il controllo.",
     workspaceCta: "Apri OrdiZapis",
     legalTitle: "Quadro giuridico",
     legal: [
@@ -538,7 +538,7 @@ const PACK: Record<ChromePack, Pack> = {
     showSubscribe: "Ver la suscripción",
     workspaceTitle: "Espacio de trabajo",
     workspaceLead:
-      "La herramienta interactiva se queda en la edición checa para la consulta. Abre OrdiZapis para grabar un dictado o una visita.",
+      "Dicte o grabe una consulta — el borrador de la nota aparece aquí para revisarlo.",
     workspaceCta: "Abrir OrdiZapis",
     legalTitle: "Marco legal",
     legal: [
@@ -632,7 +632,7 @@ const PACK: Record<ChromePack, Pack> = {
     showSubscribe: "Ver a assinatura",
     workspaceTitle: "Área de trabalho",
     workspaceLead:
-      "A ferramenta interativa fica na edição tcheca para o consultório. Abra o OrdiZapis para gravar um ditado ou uma consulta.",
+      "Dite ou grave uma consulta — o rascunho da nota aparece aqui para rever.",
     workspaceCta: "Abrir o OrdiZapis",
     legalTitle: "Quadro jurídico",
     legal: [
@@ -726,7 +726,7 @@ const PACK: Record<ChromePack, Pack> = {
     showSubscribe: "View subscription",
     workspaceTitle: "Workspace",
     workspaceLead:
-      "The interactive tool stays on the Czech clinic edition. Open OrdiZapis to record a dictation or a consult.",
+      "Dictate or record a consult — the draft note appears here for review.",
     workspaceCta: "Open OrdiZapis",
     legalTitle: "Legal frame",
     legal: [

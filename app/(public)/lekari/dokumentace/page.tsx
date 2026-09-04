@@ -13,6 +13,7 @@ import { getDokumentaceCopy } from "@/lib/i18n/dokumentace-copy";
 import { getServerLocale, getServerRegion } from "@/lib/i18n/server-locale";
 import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { ordizapisAppHref } from "@/lib/i18n/ordizapis-app-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getServerLocale();
@@ -180,19 +181,16 @@ export default async function LekariDokumentacePage() {
         <h2 className="mb-6 font-display text-2xl font-bold text-[#021d33]">
           {copy.workspaceTitle}
         </h2>
-        {locale === "cs" ? (
-          <DokumentaceWorkspace />
-        ) : (
-          <div className="rounded-3xl border border-[#cfe1f3] bg-white p-6 shadow-sm">
-            <p className="max-w-2xl text-sm leading-6 text-slate-600">{copy.workspaceLead}</p>
-            <Link
-              href={localizePublicHref("/app/dokumentace", locale)}
-              className="mt-4 inline-flex rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white"
-            >
-              {copy.workspaceCta}
-            </Link>
-          </div>
-        )}
+        <p className="mb-4 max-w-2xl text-sm leading-6 text-slate-600">{copy.workspaceLead}</p>
+        <DokumentaceWorkspace locale={locale} />
+        <p className="mt-4">
+          <Link
+            href={ordizapisAppHref(locale)}
+            className="inline-flex rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white"
+          >
+            {copy.workspaceCta}
+          </Link>
+        </p>
       </section>
 
       <section className="border-t border-[#d9e8f4] bg-white">

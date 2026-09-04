@@ -60,6 +60,12 @@ import { mergeNativeDeskFeed, nativeDeskArticlesForLocale, nativeDeskPinDate, re
 import { getPhysicianLandingCopy } from "../lib/i18n/physician-landing-copy";
 import { getOrdiZaznamCopy } from "../lib/i18n/ordizaznam-copy";
 import { getDokumentaceCopy } from "../lib/i18n/dokumentace-copy";
+import { getOrdiZapisAppCopy } from "../lib/i18n/ordizapis-app-copy";
+import {
+  dokumentaceNoteLanguage,
+  sttPromptFor,
+  structureSystemPrompt,
+} from "../lib/lekari/dokumentace/note-language";
 import { getMedipacientCopy } from "../lib/i18n/medipacient-copy";
 import { getMediflowCopy } from "../lib/i18n/mediflow-copy";
 import { getInstallPwaCopy } from "../lib/i18n/install-pwa-copy";
@@ -747,7 +753,18 @@ assert.equal(getPhysicianLandingCopy("en-US").verifyAdminHref, undefined);
   assert.ok(frB2b.bannerMonth.toLowerCase().includes("bannière") || frB2b.bannerMonth.toLowerCase().includes("banniere"));
   assert.ok(getB2bPublicCopy("cs").sponsoredLabel.includes("Sponzorovaný"));
   assert.ok(!getDokumentaceCopy("fr").workspaceLead.includes("Nahrajte"));
+  assert.ok(!getDokumentaceCopy("fr").workspaceLead.includes("édition tchèque"));
   assert.ok(getDokumentaceCopy("cs").workspaceCta.includes("OrdiZapis"));
+  assert.equal(dokumentaceNoteLanguage("fr").whisper, "fr");
+  assert.equal(dokumentaceNoteLanguage("cs").whisper, "cs");
+  assert.ok(structureSystemPrompt("fr").includes("French") || structureSystemPrompt("fr").includes("français"));
+  assert.ok(!structureSystemPrompt("fr").includes("češtinou"));
+  assert.ok(structureSystemPrompt("cs").includes("češtinou"));
+  assert.ok(sttPromptFor("fr").includes("français"));
+  assert.ok(!sttPromptFor("fr").includes("češtině"));
+  assert.equal(getOrdiZapisAppCopy("fr").dictate, "Dicter");
+  assert.equal(getOrdiZapisAppCopy("cs").tabNote, "Zápis");
+  assert.ok(!getOrdiZapisAppCopy("fr").upload.includes("Nahrát"));
   assert.equal(isCzechFacultyLocale("fr"), false);
   assert.equal(isCzechFacultyLocale("cs"), true);
   assert.ok(!getCzechFacultyOnlyCopy("de").lead.includes("přijímačky"));

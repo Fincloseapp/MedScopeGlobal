@@ -4,6 +4,7 @@ import { withApiGuard } from "@/lib/security/api-guard";
 import { getDokumentaceEligibility } from "@/lib/lekari/dokumentace/eligibility";
 import { DOKUMENTACE_MAX_UPLOAD_BYTES } from "@/lib/lekari/dokumentace/templates";
 import { transcribeAudio } from "@/lib/lekari/dokumentace/stt";
+import { dokumentaceLocaleFromForm } from "@/lib/lekari/dokumentace/request-locale";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -84,7 +85,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { text, provider } = await transcribeAudio(buffer, mimeType, uploadedName);
+    const locale = dokumentaceLocaleFromForm(request, form);
+    const { text, provider } = await transcribeAudio(buffer, mimeType, uploadedName, locale);
     return NextResponse.json({
       transcript: text,
       provider,

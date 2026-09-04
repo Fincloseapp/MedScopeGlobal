@@ -11,6 +11,7 @@ import {
 import { transcribeAudio } from "@/lib/lekari/dokumentace/stt";
 import { structureDokumentaceNote } from "@/lib/lekari/dokumentace/structure";
 import { saveDokumentaceNote } from "@/lib/lekari/dokumentace/notes";
+import { dokumentaceLocaleFromForm } from "@/lib/lekari/dokumentace/request-locale";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -82,6 +83,7 @@ export async function POST(request: Request) {
     modeRaw === "dictation" || modeRaw === "verbatim" ? modeRaw : "consultation";
   const template = getDokumentaceTemplate(templateId);
   const source = resolveSource(request, form);
+  const locale = dokumentaceLocaleFromForm(request, form);
 
   const parts: string[] = [];
   const providers: string[] = [];
@@ -102,7 +104,7 @@ export async function POST(request: Request) {
         );
       }
 
-      const { text, provider } = await transcribeAudio(buffer, mimeType);
+      const { text, provider } = await transcribeAudio(buffer, mimeType, undefined, locale);
       if (text) {
         parts.push(text);
         providers.push(provider);
@@ -122,6 +124,7 @@ export async function POST(request: Request) {
       mode,
       templateId: template.id,
       specialty,
+      locale,
     });
 
     await logAiAgentUsage({

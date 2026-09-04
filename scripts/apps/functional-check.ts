@@ -90,6 +90,7 @@ import { shouldBlockBot } from "../../lib/v30/security/bot-shield";
 import { V20_NZIP_CATEGORIES } from "../../lib/v20/categories";
 import { getRevenueCopy } from "../../lib/i18n/revenue-copy";
 import { getSurfaceCopy } from "../../lib/i18n/surface-copy";
+import { getOrdiZapisAppCopy } from "../../lib/i18n/ordizapis-app-copy";
 import {
   parseHeurekaPositionId,
   heurekaHopHtml,
@@ -817,8 +818,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.6"),
-  "page cache tag must bust after B2B / MeDiprep / workspace i18n"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.7"),
+  "page cache tag must bust after OrdiZapis FR language"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
@@ -858,10 +859,29 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
-    'locale === "cs"'
+    "locale={locale}"
   ),
-  "OrdiZapis marketing must not dump the Czech workspace on other editions"
+  "OrdiZapis marketing workspace must receive the edition locale"
 );
+assert.ok(
+  readFileSync(join(root, "components/lekari/dokumentace-workspace.tsx"), "utf8").includes(
+    "dokumentaceLocaleHeaders"
+  ),
+  "OrdiZapis workspace must send the edition locale to STT/structure"
+);
+assert.ok(
+  readFileSync(join(root, "lib/lekari/dokumentace/stt.ts"), "utf8").includes("whisperLanguage"),
+  "Whisper must follow the edition language, not hard-coded Czech"
+);
+assert.ok(
+  readFileSync(join(root, "lib/lekari/dokumentace/structure.ts"), "utf8").includes(
+    "structureSystemPrompt"
+  ),
+  "Note structure must follow the edition language"
+);
+assert.equal(getOrdiZapisAppCopy("fr").dictate, "Dicter");
+assert.ok(!getOrdiZapisAppCopy("fr").upload.includes("Nahrát"));
+assert.equal(getOrdiZapisAppCopy("cs").tabNote, "Zápis");
 assert.ok(
   readFileSync(join(root, "lib/i18n/filter-articles-for-locale.ts"), "utf8").includes(
     "relatedScore(article, ui) > 0"

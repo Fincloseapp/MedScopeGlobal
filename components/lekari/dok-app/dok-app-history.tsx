@@ -8,6 +8,8 @@ import {
   downloadOrdiZapisDoc,
   shareOrdiZapisDoc,
 } from "@/components/lekari/ordizapis-export";
+import { getOrdiZapisAppCopy } from "@/lib/i18n/ordizapis-app-copy";
+import { intlLocaleFor } from "@/lib/i18n/format-date";
 
 type NoteListItem = {
   id: string;
@@ -20,7 +22,8 @@ type NoteListItem = {
   source: string | null;
 };
 
-export function DokAppHistory() {
+export function DokAppHistory({ locale }: { locale?: string }) {
+  const copy = getOrdiZapisAppCopy(locale);
   const [notes, setNotes] = useState<NoteListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,23 +42,23 @@ export function DokAppHistory() {
       if (res.status === 401) {
         setNotes([]);
         setAuthHint(true);
-        setError("Pro historii se přihlaste.");
+        setError(copy.historyLogin);
         return;
       }
       if (!res.ok) {
-        setError("Nepodařilo se načíst zápisy.");
+        setError(copy.historyError);
         setNotes([]);
         return;
       }
       const json = (await res.json()) as { notes?: NoteListItem[] };
       setNotes(json.notes ?? []);
     } catch {
-      setError("Síťová chyba.");
+      setError(copy.historyNetwork);
       setNotes([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [copy.historyError, copy.historyLogin, copy.historyNetwork]);
 
   useEffect(() => {
     void load();
@@ -67,7 +70,7 @@ export function DokAppHistory() {
       setFlash(true);
       window.setTimeout(() => setFlash(false), 1400);
     } catch {
-      setError("Kopírování selhalo.");
+      setError(copy.copyFail);
     }
   }
 
@@ -94,8 +97,8 @@ export function DokAppHistory() {
     <div className="mx-auto w-full max-w-3xl space-y-3 px-3 pb-4 pt-2 sm:px-4">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <h2 className="text-base font-semibold text-[#021d33]">Historie zápisů</h2>
-          <p className="text-xs text-slate-500">Sync mobil ↔ web pod stejným účtem.</p>
+          <h2 className="text-base font-semibold text-[#021d33]">{copy.historyTitle}</h2>
+          <p className="text-xs text-slate-500">{copy.savedSync}</p>
         </div>
         <Button
           type="button"
@@ -105,12 +108,12 @@ export function DokAppHistory() {
           onClick={() => void load()}
         >
           <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
-          Obnovit
+          {copy.refresh}
         </Button>
       </div>
 
       {flash ? (
-        <p className="text-xs font-medium text-[#005B96]">Zkopírováno</p>
+        <p className="text-xs font-medium text-[#005B96]">{copy.copied}</p>
       ) : null}
       {error ? (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
@@ -118,7 +121,7 @@ export function DokAppHistory() {
           {authHint ? (
             <p className="mt-1">
               <Link href="/login?next=/app/dokumentace" className="font-semibold underline">
-                Přihlásit se
+                {copy.signInBtn}
               </Link>
             </p>
           ) : null}
@@ -160,10 +163,10 @@ Lékař schvaluje finální znění. OrdiZapis není zdravotnický prostředek.`
                 onClick={() => setSelected(selected?.id === item.id ? null : item)}
               >
                 <p className="truncate text-sm font-semibold text-[#021d33]">
-                  {item.title || "Zápis"}
+                  {item.title || copy.emptyNote}
                 </p>
                 <p className="mt-0.5 text-xs text-slate-500">
-                  {new Date(item.created_at).toLocaleString("cs-CZ")}
+                  {new Date(item.created_at).toLocaleString(intlLocaleFor(locale ?? "cs"))}
                   {item.source ? ` · ${item.source}` : ""}
                   {item.template_id ? ` · ${item.template_id}` : ""}
                 </p>
@@ -177,7 +180,7 @@ Lékař schvaluje finální znění. OrdiZapis není zdravotnický prostředek.`
                   onClick={() => void copyText(item.note)}
                 >
                   <Copy className="mr-1 h-3.5 w-3.5" />
-                  Kopírovat
+                  {copy.copyBtn}
                 </Button>
                 <Button
                   type="button"
@@ -189,7 +192,7 @@ Lékař schvaluje finální znění. OrdiZapis není zdravotnický prostředek.`
                   }
                 >
                   <Share2 className="mr-1 h-3.5 w-3.5" />
-                  Sdílet
+                  {copy.shareBtn}
                 </Button>
                 <Button
                   type="button"

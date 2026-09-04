@@ -9,6 +9,7 @@ import { OrdiZapisMark } from "@/components/lekari/ordizapis-mark";
 import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
 import { getDokumentaceCopy } from "@/lib/i18n/dokumentace-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { ordizapisAppHref } from "@/lib/i18n/ordizapis-app-copy";
 
 type EligibilityResponse = {
   eligible: boolean;
@@ -124,7 +125,7 @@ export function DokumentaceDownloadPanel({
               <div className="mt-3 flex flex-wrap items-center gap-3">
                 <InstallAppButton gated canInstall />
                 <Button asChild variant="outline" className="h-9 rounded-full border-white/40 bg-transparent text-white hover:bg-white/10">
-                  <Link href={localizePublicHref("/app/dokumentace", locale ?? "cs")}>{copy.openApp}</Link>
+                  <Link href={ordizapisAppHref(locale)}>{copy.openApp}</Link>
                 </Button>
               </div>
             </div>

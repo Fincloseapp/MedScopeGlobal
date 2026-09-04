@@ -6,6 +6,7 @@ import { withApiGuard } from "@/lib/security/api-guard";
 import { logAiAgentUsage } from "@/lib/security/ai-abuse";
 import { getDokumentaceEligibility } from "@/lib/lekari/dokumentace/eligibility";
 import { transcribeAudio } from "@/lib/lekari/dokumentace/stt";
+import { dokumentaceLocaleFromRequest } from "@/lib/lekari/dokumentace/request-locale";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -22,6 +23,7 @@ const bodySchema = z
     total: z.number().int().min(1).max(40).optional(),
     filename: z.string().min(1).max(180),
     mimeType: z.string().min(1).max(120),
+    locale: z.string().max(16).optional(),
   })
   .refine((b) => Boolean(b.path) || Boolean(b.sessionId && b.total), {
     message: "path or sessionId+total required",
@@ -122,10 +124,12 @@ export async function POST(request: Request) {
       ? await downloadFromPath(body.path)
       : await downloadAssembled(user.id, body.sessionId!, body.total!);
 
+    const locale = dokumentaceLocaleFromRequest(request, body.locale);
     const { text: transcript, provider } = await transcribeAudio(
       buffer,
       body.mimeType,
-      body.filename
+      body.filename,
+      locale
     );
     if (!transcript.trim()) {
       return NextResponse.json(

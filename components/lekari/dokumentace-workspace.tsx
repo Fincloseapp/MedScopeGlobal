@@ -22,11 +22,17 @@ import {
   DOKUMENTACE_MAX_RECORD_MS,
   DOKUMENTACE_SEGMENT_MS,
   DOKUMENTACE_SOFT_UPLOAD_BYTES,
-  DOKUMENTACE_MODES,
-  DOKUMENTACE_TEMPLATES,
   type DokumentaceMode,
   type DokumentaceTemplateId,
 } from "@/lib/lekari/dokumentace/templates";
+import {
+  dokumentaceModesForLocale,
+  dokumentaceTemplatesForLocale,
+} from "@/lib/lekari/dokumentace/note-language";
+import { dokumentaceLocaleHeaders } from "@/lib/lekari/dokumentace/request-locale";
+import { getClientLocale } from "@/lib/i18n/client-dictionary";
+import { getOrdiZapisAppCopy } from "@/lib/i18n/ordizapis-app-copy";
+import { intlLocaleFor } from "@/lib/i18n/format-date";
 import {
   ORDIZAPIS_FILE_ACCEPT,
   ORDIZAPIS_MAX_FILE_BYTES,
@@ -103,10 +109,22 @@ async function ensureMicPermission(): Promise<MediaStream> {
 
 type DokumentaceWorkspaceProps = {
   variant?: "default" | "app";
+  locale?: string;
 };
 
-export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspaceProps) {
+export function DokumentaceWorkspace({
+  variant = "default",
+  locale: localeProp,
+}: DokumentaceWorkspaceProps) {
   const isApp = variant === "app";
+  const [locale, setLocale] = useState(localeProp ?? "cs");
+  const copy = getOrdiZapisAppCopy(locale);
+  const modes = dokumentaceModesForLocale(locale);
+  const templates = dokumentaceTemplatesForLocale(locale);
+
+  useEffect(() => {
+    setLocale(localeProp ?? getClientLocale());
+  }, [localeProp]);
   const [consent, setConsent] = useState(false);
   const [mode, setMode] = useState<DokumentaceMode>("dictation");
   const [templateId, setTemplateId] =
@@ -303,10 +321,11 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             : new File([blob], meta.filename, { type: meta.mime || blob.type || "audio/wav" });
         form.append("audio", part, meta.filename);
 
+        form.append("locale", locale);
         const res = await fetch("/api/lekari/dokumentace/stt-chunk", {
           method: "POST",
           credentials: "same-origin",
-          headers: { "x-dokumentace-source": source },
+          headers: { "x-dokumentace-source": source, ...dokumentaceLocaleHeaders(locale) },
           body: form,
         });
         const json = await readApiJson(res);
@@ -333,6 +352,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         headers: {
           "Content-Type": "application/json",
           "x-dokumentace-source": source,
+          ...dokumentaceLocaleHeaders(locale),
         },
         body: JSON.stringify({
           transcript,
@@ -340,6 +360,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
           templateId,
           specialty: specialty.trim() || undefined,
           source,
+          locale,
         }),
       });
       const structJson = await readApiJson(structRes);
@@ -553,13 +574,14 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       }
 
       // Always storage/signed upload for picked files (no browser decode, avoids Vercel body kills).
-      const stt = await uploadAndTranscribePhoneFile({ file });
+      const stt = await uploadAndTranscribePhoneFile({ file, locale });
       const structRes = await fetch("/api/lekari/dokumentace/structure", {
         method: "POST",
         credentials: "same-origin",
         headers: {
           "Content-Type": "application/json",
           "x-dokumentace-source": source,
+          ...dokumentaceLocaleHeaders(locale),
         },
         body: JSON.stringify({
           transcript: stt.transcript,
@@ -567,6 +589,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
           templateId,
           specialty: specialty.trim() || undefined,
           source,
+          locale,
         }),
       });
       const structJson = await readApiJson(structRes);
@@ -688,7 +711,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
               onChange={(e) => setConsent(e.target.checked)}
             />
             <span>
-              Jde o diktát, nebo jsem informoval/a pacienta / pacientku o nahrávání konzultace
+              {copy.consentLong}
             </span>
           </label>
           <Button
@@ -706,18 +729,18 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             ) : (
               <Mic className="mr-1.5 h-4 w-4" />
             )}
-            {micReady ? "Mikrofon povolen" : "1. Povolit mikrofon"}
+            {micReady ? copy.micOn : copy.allowMic}
           </Button>
         </div>
 
         <p className="mt-3 text-xs leading-5 text-slate-500">
-          Postup: povolit mikrofon → nahrát v mobilu diktát nebo konzultaci s pacientem / pacientkou → Stop a zpracovat. Až 60 min (dělení po 2 min). Zápis se uloží do účtu.
+          {copy.howTo}
         </p>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <div>
             <label className="text-xs font-semibold uppercase tracking-wide text-[#005B96]">
-              Režim
+              {copy.mode}
             </label>
             <select
               className="mt-1.5 h-12 w-full rounded-md border border-input bg-background px-3 text-base"
@@ -725,19 +748,19 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
               onChange={(e) => setMode(e.target.value as DokumentaceMode)}
               disabled={recording || processing}
             >
-              {DOKUMENTACE_MODES.map((m) => (
+              {modes.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.label}
                 </option>
               ))}
             </select>
             <p className="mt-1 text-xs text-slate-500">
-              {DOKUMENTACE_MODES.find((m) => m.id === mode)?.description}
+              {modes.find((m) => m.id === mode)?.description}
             </p>
           </div>
           <div>
             <label className="text-xs font-semibold uppercase tracking-wide text-[#005B96]">
-              Šablona
+              {copy.template}
             </label>
             <select
               className="mt-1.5 h-12 w-full rounded-md border border-input bg-background px-3 text-base"
@@ -747,26 +770,26 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
               }
               disabled={recording || processing || mode === "verbatim"}
             >
-              {DOKUMENTACE_TEMPLATES.map((t) => (
+              {templates.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.label}
                 </option>
               ))}
             </select>
             <p className="mt-1 text-xs text-slate-500">
-              {DOKUMENTACE_TEMPLATES.find((t) => t.id === templateId)?.description}
+              {templates.find((t) => t.id === templateId)?.description}
             </p>
           </div>
         </div>
 
         <div className="mt-4">
           <label className="text-xs font-semibold uppercase tracking-wide text-[#005B96]">
-            Specializace (volitelné)
+            {copy.specialty}
           </label>
           <input
             type="text"
             className="mt-1.5 h-12 w-full rounded-md border border-input bg-background px-3 text-base"
-            placeholder="např. praktické lékařství, kardiologie"
+            placeholder={copy.specialtyPh}
             value={specialty}
             onChange={(e) => setSpecialty(e.target.value)}
             disabled={recording || processing}
@@ -793,11 +816,11 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
               <p className="text-sm font-semibold text-[#021d33]">
                 {recording
                   ? paused
-                    ? "Pozastaveno"
-                    : "Nahrávání…"
+                    ? copy.paused
+                    : copy.recording
                   : processing
-                    ? "Zpracování…"
-                    : "Připraveno k nahrání"}
+                    ? copy.processing
+                    : copy.ready}
               </p>
               <p className="font-mono text-lg text-[#005B96]">
                 {formatMs(elapsedMs)}
@@ -823,11 +846,11 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                 <Mic className="mr-2 h-5 w-5" />
                 {micReady
                   ? mode === "consultation"
-                    ? "2. Nahrávat konzultaci"
-                    : "2. Diktovat"
+                    ? copy.consultStep
+                    : copy.dictateStep
                   : mode === "consultation"
-                    ? "Nahrávat konzultaci"
-                    : "Diktovat"}
+                    ? copy.recordConsult
+                    : copy.dictate}
               </Button>
             ) : (
               <>
@@ -839,7 +862,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                   onClick={() => (paused ? resumeRecording() : pauseRecording())}
                 >
                   <Pause className="mr-2 h-4 w-4" />
-                  {paused ? "Pokračovat" : "Pauza"}
+                  {paused ? copy.resume : copy.pause}
                 </Button>
                 <Button
                   type="button"
@@ -848,7 +871,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                   onClick={stopRecording}
                 >
                   <Square className="mr-2 h-4 w-4" />
-                  Stop a zpracovat
+                  {copy.stopProcess}
                 </Button>
               </>
             )}
@@ -861,7 +884,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="mr-2 h-4 w-4" />
-              Nahrát soubor
+              {copy.upload}
             </Button>
             <input
               ref={fileInputRef}
@@ -879,7 +902,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         {processing ? (
           <p className="mt-3 flex items-center gap-2 text-sm text-slate-600">
             <Loader2 className="h-4 w-4 animate-spin text-[#005B96]" />
-            Odesílám a přepisuji nahrávku (včetně M4A z telefonu), pak sestavím zápis… Audio se neukládá trvale.
+            {copy.processingHint}
           </p>
         ) : null}
       </div>
@@ -892,7 +915,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             {gateHint === "login" ? (
               <p className="mt-2">
                 <Link href={isApp ? "/login?next=/app/dokumentace" : "/login"} className="font-semibold text-[#005B96] underline">
-                  Přihlásit se
+                  {copy.signInBtn}
                 </Link>
               </p>
             ) : null}
@@ -921,7 +944,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
           <div className="rounded-2xl border border-[#cfe1f3] bg-white p-4 sm:p-5">
             <div className="mb-2 flex items-center justify-between">
               <h3 className="font-display text-lg font-semibold text-[#021d33]">
-                Přepis
+                {copy.transcript}
               </h3>
               {provider ? (
                 <span className="text-xs text-slate-400">{provider}</span>
@@ -936,7 +959,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
           <div className="rounded-2xl border border-[#cfe1f3] bg-white p-4 sm:p-5">
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <h3 className="font-display text-lg font-semibold text-[#021d33]">
-                Klinický zápis
+                {copy.noteTitle}
               </h3>
               <div className="flex flex-wrap gap-2">
                 <Button
@@ -947,7 +970,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                   disabled={!note}
                 >
                   <Copy className="mr-1.5 h-3.5 w-3.5" />
-                  Kopírovat
+                  {copy.copyBtn}
                 </Button>
                 {typeof navigator !== "undefined" && "share" in navigator ? (
                   <Button
@@ -958,7 +981,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                     disabled={!note}
                   >
                     <Share2 className="mr-1.5 h-3.5 w-3.5" />
-                    Sdílet
+                    {copy.shareBtn}
                   </Button>
                 ) : null}
                 <Button
@@ -976,21 +999,21 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             {savedInAccount ? (
               <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-emerald-700">
                 <CheckCircle2 className="h-3.5 w-3.5" />
-                Uloženo v účtu
+                {copy.saved}
               </p>
             ) : null}
             {copyFlash ? (
-              <p className="mb-2 text-xs font-medium text-[#005B96]">Zkopírováno</p>
+              <p className="mb-2 text-xs font-medium text-[#005B96]">{copy.copied}</p>
             ) : null}
             <textarea
               className="min-h-[220px] w-full rounded-md border border-input px-3 py-2 text-sm leading-6"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="Zde se zobrazí návrh zápisu ke kontrole…"
+              placeholder={copy.notePh}
             />
             {remaining != null ? (
               <p className="mt-2 text-xs text-slate-500">
-                Zbývající zápisy dnes: {remaining}
+                {copy.remainingToday}: {remaining}
               </p>
             ) : null}
           </div>
@@ -1005,7 +1028,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="font-display text-lg font-semibold text-[#021d33]">
-            Moje zápisy
+            {copy.myNotes}
           </h3>
           <Button
             type="button"
@@ -1017,11 +1040,11 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             }}
           >
             <History className="mr-1.5 h-3.5 w-3.5" />
-            {historyOpen ? "Skrýt" : "Historie"}
+            {historyOpen ? copy.hide : copy.history}
           </Button>
         </div>
         <p className="mt-1 text-xs text-slate-500">
-          Sync mobil ↔ web pod stejným účtem.
+          {copy.savedSync}
         </p>
         {(historyOpen || history.length > 0) && (
           <div className="mt-4 space-y-2">
@@ -1031,7 +1054,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                 Načítám…
               </p>
             ) : history.length === 0 ? (
-              <p className="text-sm text-slate-500">Zatím žádné uložené zápisy.</p>
+              <p className="text-sm text-slate-500">{copy.historyEmpty}</p>
             ) : (
               history.map((item) => (
                 <div
@@ -1044,10 +1067,10 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                     onClick={() => openHistoryNote(item)}
                   >
                     <p className="truncate text-sm font-semibold text-[#021d33]">
-                      {item.title || "Zápis"}
+                      {item.title || copy.emptyNote}
                     </p>
                     <p className="mt-0.5 text-xs text-slate-500">
-                      {new Date(item.created_at).toLocaleString("cs-CZ")}
+                      {new Date(item.created_at).toLocaleString(intlLocaleFor(locale))}
                       {item.source ? ` · ${item.source}` : ""}
                       {item.template_id ? ` · ${item.template_id}` : ""}
                     </p>
@@ -1083,9 +1106,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       ) : null}
 
       <div className="rounded-xl border border-[#d9e8f4] bg-[#f4f9fc] px-4 py-3 text-xs leading-5 text-slate-600">
-        OrdiZapis od MedScopeGlobal není zdravotnický prostředek. Výstup je návrh AI —
-        konečnou odpovědnost za obsah nese lékař. Audio se po zpracování
-        neukládá (ephemeral). Před nahráváním rozhovoru informujte pacienta / pacientku.
+        {copy.legalFooter}
       </div>
 
       {/* Mobile sticky bottom bar */}
@@ -1109,7 +1130,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             onClick={scrollToHistory}
           >
             <History className="h-5 w-5 text-[#005B96]" />
-            Historie
+            {copy.history}
           </Button>
           <Button
             type="button"
@@ -1118,7 +1139,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             onClick={() => void copyLastFromHistory()}
           >
             <Copy className="h-5 w-5 text-[#005B96]" />
-            Kopírovat
+            {copy.copyBtn}
           </Button>
         </div>
       </div>

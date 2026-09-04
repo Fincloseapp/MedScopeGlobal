@@ -11,6 +11,7 @@ import {
   DOKUMENTACE_TEMPLATES,
 } from "@/lib/lekari/dokumentace/templates";
 import { saveDokumentaceNote } from "@/lib/lekari/dokumentace/notes";
+import { dokumentaceLocaleFromRequest } from "@/lib/lekari/dokumentace/request-locale";
 
 export const runtime = "nodejs";
 export const maxDuration = 180;
@@ -28,6 +29,7 @@ const bodySchema = z.object({
   ]),
   specialty: z.string().max(120).optional(),
   source: z.string().max(40).optional(),
+  locale: z.string().max(16).optional(),
 });
 
 export async function POST(request: Request) {
@@ -73,11 +75,13 @@ export async function POST(request: Request) {
   const source = body.source ?? sourceHeader ?? "web";
 
   try {
+    const locale = dokumentaceLocaleFromRequest(request, body.locale);
     const note = await structureDokumentaceNote({
       transcript: body.transcript,
       mode: body.mode,
       templateId: body.templateId,
       specialty: body.specialty,
+      locale,
     });
 
     await logAiAgentUsage({

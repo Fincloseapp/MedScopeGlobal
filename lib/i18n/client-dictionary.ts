@@ -2,6 +2,7 @@ import cs from "@/locales/cs/common.json";
 import en from "@/locales/en/common.json";
 import { LOCALE_COOKIE, normalizeLocale } from "@/lib/i18n/config";
 import { detectLocaleFromAcceptLanguage } from "@/lib/i18n/detect-locale";
+import { resolveLocalePath } from "@/lib/i18n/locale-path";
 
 function localeFromNavigator(): string {
   if (typeof navigator === "undefined") return "cs";
@@ -12,6 +13,12 @@ function localeFromNavigator(): string {
 }
 
 export function getClientLocale(): string {
+  if (typeof window !== "undefined") {
+    const fromPath = resolveLocalePath(window.location.pathname).locale;
+    if (fromPath) return normalizeLocale(fromPath);
+    const query = new URLSearchParams(window.location.search).get("locale");
+    if (query?.trim()) return normalizeLocale(query);
+  }
   if (typeof document === "undefined") return "cs";
   const match = document.cookie.match(
     new RegExp(`${LOCALE_COOKIE}=([^;]+)`)

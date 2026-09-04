@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
 import { getDokumentaceCopy } from "@/lib/i18n/dokumentace-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { ordizapisAppHref } from "@/lib/i18n/ordizapis-app-copy";
 
 type StepId = "nahrat" | "zpracovat" | "zkontrolovat";
 
@@ -239,7 +240,7 @@ export function DokumentaceTutorial({
 
             <div className="mt-6 flex flex-wrap gap-2">
               <Button asChild className="h-11 rounded-full bg-[#005B96] px-5">
-                <Link href={localizePublicHref("/app/dokumentace", locale ?? "cs")}>{copy.tryInApp}</Link>
+                <Link href={ordizapisAppHref(locale)}>{copy.tryInApp}</Link>
               </Button>
               <Button
                 asChild

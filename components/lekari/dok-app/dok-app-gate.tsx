@@ -3,18 +3,24 @@
 import Link from "next/link";
 import { LogIn, ShieldAlert, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getOrdiZapisAppCopy } from "@/lib/i18n/ordizapis-app-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export function DokAppGate({
   message,
   loginUrl = "/login?next=/app/dokumentace",
   verifyUrl = "/academy/lekari/overeni",
   linkedHint,
+  locale,
 }: {
   message: string;
   loginUrl?: string;
   verifyUrl?: string;
   linkedHint?: string | null;
+  locale?: string;
 }) {
+  const copy = getOrdiZapisAppCopy(locale);
+  const marketingHref = localizePublicHref("/lekari/dokumentace", locale ?? "cs");
   return (
     <div className="mx-auto flex min-h-full max-w-lg flex-col justify-center px-4 py-10">
       <div className="rounded-2xl border border-[#cfe1f3] bg-white p-6 shadow-sm">
@@ -22,7 +28,7 @@ export function DokAppGate({
           <ShieldAlert className="h-6 w-6" />
         </div>
         <h2 className="mt-4 font-display text-xl font-bold text-[#021d33]">
-          Jen pro ověřené lékaře
+          {copy.gateTitle}
         </h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">{message}</p>
         {linkedHint ? (
@@ -35,14 +41,14 @@ export function DokAppGate({
           <Button asChild className="h-11 rounded-full bg-[#005B96]">
             <Link href={loginUrl}>
               <LogIn className="mr-2 h-4 w-4" />
-              Přihlásit se lékařským účtem
+              {copy.gateLogin}
             </Link>
           </Button>
           <Button asChild variant="outline" className="h-11 rounded-full border-[#cfe1f3]">
-            <Link href={verifyUrl}>Požádat o ověření lékaře</Link>
+            <Link href={verifyUrl}>{copy.gateVerify}</Link>
           </Button>
           <Button asChild variant="ghost" className="h-10 rounded-full text-[#005B96]">
-            <Link href="/lekari/dokumentace">Zjistit více o Dokumentaci</Link>
+            <Link href={marketingHref}>{copy.gateMore}</Link>
           </Button>
         </div>
       </div>

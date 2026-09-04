@@ -255,6 +255,7 @@ async function uploadViaChunks(
  */
 export async function uploadAndTranscribePhoneFile(opts: {
   file: File;
+  locale?: string;
   onProgress?: (ratio: number, label: string) => void;
 }): Promise<PhoneTranscribeResult> {
   const { file } = opts;
@@ -281,20 +282,26 @@ export async function uploadAndTranscribePhoneFile(opts: {
   }
 
   opts.onProgress?.(0.65, "Přepisuji nahrávku…");
+  const locale = opts.locale || "cs";
   const processRes = await fetchWithRetry(
     "/api/lekari/dokumentace/process-file",
     {
       method: "POST",
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-medscope-locale": locale,
+        "x-dokumentace-locale": locale,
+      },
       body: JSON.stringify(
         path
-          ? { path, filename, mimeType: mime }
+          ? { path, filename, mimeType: mime, locale }
           : {
               sessionId: session!.sessionId,
               total: session!.total,
               filename,
               mimeType: mime,
+              locale,
             }
       ),
     },
@@ -326,6 +333,7 @@ export async function uploadAndProcessPhoneFile(opts: {
   templateId: string;
   specialty?: string;
   source?: string;
+  locale?: string;
   onProgress?: (ratio: number, label: string) => void;
 }): Promise<{
   transcript: string;
@@ -337,14 +345,18 @@ export async function uploadAndProcessPhoneFile(opts: {
 }> {
   const stt = await uploadAndTranscribePhoneFile({
     file: opts.file,
+    locale: opts.locale,
     onProgress: opts.onProgress,
   });
+  const locale = opts.locale || "cs";
   const structRes = await fetchWithRetry("/api/lekari/dokumentace/structure", {
     method: "POST",
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
       "x-dokumentace-source": opts.source || "mobile-file",
+      "x-medscope-locale": locale,
+      "x-dokumentace-locale": locale,
     },
     body: JSON.stringify({
       transcript: stt.transcript,
@@ -352,6 +364,7 @@ export async function uploadAndProcessPhoneFile(opts: {
       templateId: opts.templateId,
       specialty: opts.specialty || undefined,
       source: opts.source || "mobile-file",
+      locale,
     }),
   });
   const structJson = await readJson(structRes);
