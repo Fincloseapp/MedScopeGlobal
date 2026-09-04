@@ -361,6 +361,7 @@ file("lib/v22/homepage-cache.ts");
   assert.ok(home.includes("filterArticlesForLocale"), "homepage listings are native-first per locale");
   assert.ok(home.includes("mergeNativeDeskFeed"), "homepage pins native desk pieces");
   assert.ok(
+    readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("getArticlesByMetadataSection") &&
     readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("uniqueHomepageLayout") &&
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"

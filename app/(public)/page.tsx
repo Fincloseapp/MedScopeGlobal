@@ -17,8 +17,10 @@ import { buildGlobalHreflang } from "@/lib/ecosystem/seo";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { localeToPathSegment } from "@/lib/i18n/locale-path";
 import { getServerLocale } from "@/lib/i18n/server-locale";
+import { normalizeLocale } from "@/lib/i18n/config";
 import { getHomepageCachedData } from "@/lib/v22/homepage-cache";
-import { uniqueHomepageLayout } from "@/lib/v271/news-desks";
+import { prependUniqueArticles, uniqueHomepageLayout } from "@/lib/v271/news-desks";
+import { getArticlesByMetadataSection } from "@/lib/queries/articles";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getPortalChrome, getPortalPhilosophy } from "@/lib/v271/portal";
 import { isCzechSurface, getSurfaceCopy } from "@/lib/i18n/surface-copy";
@@ -77,12 +79,13 @@ export default async function HomePage() {
   const locale = await getServerLocale();
   const philosophy = getPortalPhilosophy(locale);
   const chrome = getPortalChrome(locale);
-  const [{ articles, topAds, midAds, bottomAds }, { isVip }] = await Promise.all([
+  const [{ articles, topAds, midAds, bottomAds }, { isVip }, sectionNews] = await Promise.all([
     getHomepageCachedData(locale),
     getReaderContext(),
+    getArticlesByMetadataSection("aktuální-zprávy", 12, false, "public", normalizeLocale(locale)),
   ]);
 
-  const homeLayout = uniqueHomepageLayout(articles, locale);
+  const homeLayout = uniqueHomepageLayout(prependUniqueArticles(sectionNews, articles), locale);
 
   const homeLd = medicalWebPageJsonLd({
     title: philosophy.claim,

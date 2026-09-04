@@ -179,7 +179,6 @@ export function isHomepageDeskArticle(
   if (!isNovinkyArticle(article) || !isProfessionalAktualityTitle(article.title)) return false;
   const words = countArticleWords(article.content);
   if (words > 0 && words < 80) return false;
-  if (filterActiveArticles([article]).length !== 1) return false;
   return isListableInLocale(article, locale);
 }
 
