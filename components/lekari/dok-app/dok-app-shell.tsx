@@ -217,6 +217,7 @@ export function DokAppShell({ locale: localeProp }: { locale?: string }) {
         access={access}
         accent="#005B96"
         onOpenAccount={() => setTab("ucet")}
+        labels={{ signIn: copy.signIn, account: copy.tabAccount }}
       />
 
       <AppSectionNav
