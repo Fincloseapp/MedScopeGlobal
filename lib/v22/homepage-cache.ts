@@ -1,9 +1,12 @@
 import { unstable_cache } from "next/cache";
 import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
-import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-audit";
 import { filterActiveArticles } from "@/lib/v20/content-rules";
-import { pinHomepageDesks, prependUniqueArticles } from "@/lib/v271/news-desks";
+import {
+  isHomepageDeskArticle,
+  pinHomepageDesks,
+  prependUniqueArticles,
+} from "@/lib/v271/news-desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import { normalizeLocale } from "@/lib/i18n/config";
@@ -98,8 +101,8 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
       ? undefined
       : { minNative: 8, courtesyBorrow: 2, maxBorrow: 4 }
   );
-  const publicOnly = filterMagazineListableArticles(
-    active.filter((a) => !a.vip_only)
+  const publicOnly = active.filter(
+    (article) => !article.vip_only && isHomepageDeskArticle(article, new Date(), localeKey)
   );
   const withDesk = mergeNativeDeskFeed(publicOnly, localeKey);
   const feed = primaryArticleLocale(localeKey) === "cs" ? withDesk : withDesk.slice(0, 48);
@@ -137,7 +140,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageData(locale),
-    ["v22-homepage-public-v21-related-borrow-v23-17-news-section", locale, day],
+    ["v22-homepage-public-v21-related-borrow-v23-17-news-briefs", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

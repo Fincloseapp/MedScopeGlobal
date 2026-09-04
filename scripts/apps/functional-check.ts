@@ -151,6 +151,7 @@ import {
   isLongevityArticle,
   isProfessionalAktualityTitle,
   mergeAktualityListing,
+  isHomepageDeskArticle,
   pinHomepageDesks,
   prependUniqueArticles,
   splitNewsDesks,
@@ -2710,6 +2711,22 @@ console.log("✓ magazine desk byline and copy checks passed");
     ).map((article) => article.id),
     ["who-keep", "snack-1"]
   );
+  const shortNews = {
+    id: "who-short",
+    title: "WHO: nová doporučení k očkování seniorů v Evropě",
+    slug: "who-short-brief",
+    excerpt: "Aktuální guideline.",
+    content: Array.from({ length: 120 }, () => "slovo").join(" "),
+    published: true,
+    published_at: "2026-09-04T08:00:00.000Z",
+    vip_only: false,
+    locale: "cs",
+    audience: "public",
+    rubric_slug: "aktualni-zpravy",
+  } as never;
+  assert.equal(isListableNewsArticle(shortNews, new Date(), "cs"), false);
+  assert.equal(isHomepageDeskArticle(shortNews, new Date(), "cs"), true);
+  assert.equal(splitNewsDesks([shortNews]).novinky[0]?.id, "who-short");
   assert.deepEqual(
     filterArticlesForLocale(
       [

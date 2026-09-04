@@ -2,7 +2,10 @@
  * Homepage + magazine desks: Novinky, Veřejnost, Dlouhověkost, Články.
  * Classification is exclusive (longevity → news → public → magazine).
  */
-import { shouldHideFromPublicListing } from "@/lib/editorial/article-quality-audit";
+import {
+  countArticleWords,
+  shouldHideFromPublicListing,
+} from "@/lib/editorial/article-quality-audit";
 import {
   articlePageKey,
   mixFreshFeed,
@@ -165,6 +168,21 @@ export function isListableNewsArticle(
   return isListableInLocale(article, locale);
 }
 
+/** Homepage desks: magazine longform plus shorter professional news briefs. */
+export function isHomepageDeskArticle(
+  article: DisplayArticle,
+  now = new Date(),
+  locale = "cs"
+): boolean {
+  if (isListableNewsArticle(article, now, locale)) return true;
+  if (!article.slug || !article.title?.trim() || article.vip_only) return false;
+  if (!isNovinkyArticle(article) || !isProfessionalAktualityTitle(article.title)) return false;
+  const words = countArticleWords(article.content);
+  if (words > 0 && words < 80) return false;
+  if (filterActiveArticles([article]).length !== 1) return false;
+  return isListableInLocale(article, locale);
+}
+
 function takeUnused(
   pool: DisplayArticle[],
   used: Set<string>,
@@ -201,7 +219,7 @@ export function splitNewsDesks(
     clanky: [],
   };
   const used = new Set<string>();
-  const listable = articles.filter((article) => isListableNewsArticle(article, new Date(), locale));
+  const listable = articles.filter((article) => isHomepageDeskArticle(article, new Date(), locale));
   const isNewsPriority = (article: DisplayArticle) => isNovinkyArticle(article);
 
   desks.novinky.push(...takeUnused(listable, used, cap.novinky, isNewsPriority));
@@ -269,7 +287,7 @@ export function uniqueHomepageLayout(
       .filter(Boolean)
   );
   const longevityReading = takeUnused(
-    articles.filter((article) => isListableNewsArticle(article, new Date(), locale)),
+    articles.filter((article) => isHomepageDeskArticle(article, new Date(), locale)),
     used,
     3,
     isLongevityArticle
@@ -282,7 +300,7 @@ export function mixListableFeed(
   limit: number,
   locale = "cs"
 ): DisplayArticle[] {
-  const listable = articles.filter((article) => isListableNewsArticle(article, new Date(), locale));
+  const listable = articles.filter((article) => isHomepageDeskArticle(article, new Date(), locale));
   const resurface = selectResurfaceCandidates(listable, Math.max(4, Math.ceil(limit / 3)));
   return mixFreshFeed(listable, resurface, limit);
 }
@@ -318,7 +336,7 @@ export function pinHomepageDesks(
   limit: number,
   locale = "cs"
 ): DisplayArticle[] {
-  const listable = articles.filter((article) => isListableNewsArticle(article, new Date(), locale));
+  const listable = articles.filter((article) => isHomepageDeskArticle(article, new Date(), locale));
   const used = new Set<string>();
   const news = takeUnused(listable, used, Math.min(8, limit), isNovinkyArticle);
   const longevity = takeUnused(listable, used, Math.min(8, limit), isLongevityArticle);
