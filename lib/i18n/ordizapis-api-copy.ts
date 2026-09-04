@@ -32,6 +32,7 @@ export type OrdiZapisApiCopy = {
   quotaVip: string;
   qrVerifiedOnly: string;
   errLoginRequired: string;
+  errStructure: string;
   errInvalidInput: string;
   errNoteNotFound: string;
   errSaveFailed: string;
@@ -74,6 +75,7 @@ const PACK: Record<ChromePack, OrdiZapisApiCopy> = {
     quotaVip: "Vyčerpán denní limit OrdiZapis (40 zápisů / 24 h). Zkuste později.",
     qrVerifiedOnly: "QR pro stažení je jen pro ověřené lékaře.",
     errLoginRequired: "Přihlášení vyžadováno.",
+    errStructure: "Sestavení zápisu selhalo.",
     errInvalidInput: "Neplatný vstup.",
     errNoteNotFound: "Zápis nenalezen.",
     errSaveFailed: "Uložení zápisu selhalo.",
@@ -115,6 +117,7 @@ const PACK: Record<ChromePack, OrdiZapisApiCopy> = {
     quotaVip: "Tageslimit OrdiZapis erreicht (40 Notizen / 24 h). Später erneut versuchen.",
     qrVerifiedOnly: "Der Download-QR ist nur für verifizierte Ärztinnen und Ärzte.",
     errLoginRequired: "Anmeldung erforderlich.",
+    errStructure: "Die Notiz konnte nicht erstellt werden.",
     errInvalidInput: "Ungültige Eingabe.",
     errNoteNotFound: "Notiz nicht gefunden.",
     errSaveFailed: "Speichern der Notiz fehlgeschlagen.",
@@ -156,6 +159,7 @@ const PACK: Record<ChromePack, OrdiZapisApiCopy> = {
     quotaVip: "Quota OrdiZapis du jour atteint (40 notes / 24 h). Réessayez plus tard.",
     qrVerifiedOnly: "Le QR de téléchargement est réservé aux médecins vérifiés.",
     errLoginRequired: "Connexion requise.",
+    errStructure: "Échec de l’assemblage de la note.",
     errInvalidInput: "Entrée invalide.",
     errNoteNotFound: "Note introuvable.",
     errSaveFailed: "Échec de l’enregistrement de la note.",
@@ -197,6 +201,7 @@ const PACK: Record<ChromePack, OrdiZapisApiCopy> = {
     quotaVip: "Quota OrdiZapis del giorno esaurita (40 note / 24 h). Riprovate più tardi.",
     qrVerifiedOnly: "Il QR per il download è solo per medici verificati.",
     errLoginRequired: "Accesso richiesto.",
+    errStructure: "Assemblaggio della nota non riuscito.",
     errInvalidInput: "Dati non validi.",
     errNoteNotFound: "Nota non trovata.",
     errSaveFailed: "Salvataggio della nota non riuscito.",
@@ -238,6 +243,7 @@ const PACK: Record<ChromePack, OrdiZapisApiCopy> = {
     quotaVip: "Cupo OrdiZapis del día agotado (40 notas / 24 h). Reintente más tarde.",
     qrVerifiedOnly: "El QR de descarga es solo para médicos verificados.",
     errLoginRequired: "Inicio de sesión requerido.",
+    errStructure: "No se pudo armar la nota.",
     errInvalidInput: "Entrada no válida.",
     errNoteNotFound: "Nota no encontrada.",
     errSaveFailed: "No se pudo guardar la nota.",
@@ -279,6 +285,7 @@ const PACK: Record<ChromePack, OrdiZapisApiCopy> = {
     quotaVip: "Limite OrdiZapis do dia esgotado (40 notas / 24 h). Tente mais tarde.",
     qrVerifiedOnly: "O QR de transferência é só para médicos verificados.",
     errLoginRequired: "Início de sessão necessário.",
+    errStructure: "Falha ao montar a nota.",
     errInvalidInput: "Entrada inválida.",
     errNoteNotFound: "Nota não encontrada.",
     errSaveFailed: "Falha ao guardar a nota.",
@@ -320,6 +327,7 @@ const PACK: Record<ChromePack, OrdiZapisApiCopy> = {
     quotaVip: "Daily OrdiZapis limit reached (40 notes / 24 h). Try again later.",
     qrVerifiedOnly: "The download QR is for verified physicians only.",
     errLoginRequired: "Sign-in required.",
+    errStructure: "Failed to assemble the note.",
     errInvalidInput: "Invalid input.",
     errNoteNotFound: "Note not found.",
     errSaveFailed: "Could not save the note.",
