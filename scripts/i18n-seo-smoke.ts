@@ -59,6 +59,7 @@ import { getV27AudienceGridCopy, getV27AudienceHubCopy } from "../lib/i18n/v27-a
 import { mergeNativeDeskFeed, nativeDeskArticlesForLocale, nativeDeskPinDate, relatedNativeDeskArticles } from "../lib/editorial/native-desk-articles";
 import { getPhysicianLandingCopy } from "../lib/i18n/physician-landing-copy";
 import { getOrdiZaznamCopy } from "../lib/i18n/ordizaznam-copy";
+import { getDokumentaceCopy } from "../lib/i18n/dokumentace-copy";
 import { getPhysicianHubExtrasCopy } from "../lib/i18n/physician-hub-extras-copy";
 import { tipLocale, ARTICLE_TIP_COPY } from "../lib/ecosystem/tip-copy";
 import { formatSyndicatedByline, publicEditorialByline } from "../lib/editorial/units";
@@ -703,6 +704,13 @@ assert.equal(getPhysicianLandingCopy("en-US").verifyAdminHref, undefined);
   assert.equal(getOrdiZaznamCopy("cs").brand, "OrdiZáznam");
   assert.ok(!getOrdiZaznamCopy("fr").hero.includes("Nahrajte"));
   assert.ok(!getOrdiZaznamCopy("en-US").priceEyebrow.includes("Ceník"));
+}
+{
+  const itDok = getDokumentaceCopy("it");
+  assert.ok(!/českou ordinaci|Nahrajte|Pro lékaře|Kč|NIS/.test(JSON.stringify(itDok)));
+  assert.ok(itDok.eyebrow.toLowerCase().includes("medic"));
+  assert.ok(!getDokumentaceCopy("fr").stepsLead.includes("české"));
+  assert.ok(getDokumentaceCopy("cs").valueProps.some((item) => item.text.includes("ordinaci")));
 }
 const itLekari = getPhysicianHubExtrasCopy("it");
 assert.ok(!/ČLK|Kč|Pro lékaře|Důvěryhodnost/.test(JSON.stringify(itLekari)));

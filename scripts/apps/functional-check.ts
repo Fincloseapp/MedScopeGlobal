@@ -817,8 +817,14 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.2"),
-  "page cache tag must bust after related-borrow and OrdiZapis copy"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.3"),
+  "page cache tag must bust after dokumentace i18n"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
+    "getDokumentaceCopy"
+  ),
+  "/lekari/dokumentace must follow the edition language"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/ordizaznam/page.tsx"), "utf8").includes("getOrdiZaznamCopy"),

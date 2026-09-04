@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { InstallAppButton } from "@/components/lekari/dok-app/install-app-button";
 import { OrdiZapisMark } from "@/components/lekari/ordizapis-mark";
 import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
+import { getDokumentaceCopy } from "@/lib/i18n/dokumentace-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 type EligibilityResponse = {
   eligible: boolean;
@@ -27,10 +29,13 @@ type Variant = "homepage" | "marketing" | "app";
 export function DokumentaceDownloadPanel({
   variant = "marketing",
   className,
+  locale,
 }: {
   variant?: Variant;
   className?: string;
+  locale?: string;
 }) {
+  const copy = getDokumentaceCopy(locale);
   const [data, setData] = useState<EligibilityResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -83,9 +88,9 @@ export function DokumentaceDownloadPanel({
             <OrdiZapisMark size="md" className="rounded-[22%] ring-2 ring-white/25" />
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-sky-200">
-                Aplikace pro ověřené lékaře · {ORDIZAPIS.domain}
+                {copy.downloadKicker} · {ORDIZAPIS.domain}
               </p>
-              <p className="text-sm font-medium text-sky-100/90">{ORDIZAPIS.tagline}</p>
+              <p className="text-sm font-medium text-sky-100/90">{copy.tagline}</p>
             </div>
           </div>
           <h2
@@ -93,22 +98,22 @@ export function DokumentaceDownloadPanel({
               variant === "homepage" ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl"
             }`}
           >
-            {"Stáhnout "}{ORDIZAPIS.shortName}
+            {copy.downloadTitle}
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-sky-100/95">
-            {ORDIZAPIS.pitch} Instalovatelná aplikace propojená s účtem {ORDIZAPIS.provider}.
+            {copy.pitch} {copy.downloadPitch}
           </p>
 
           {loading ? (
             <p className="mt-4 inline-flex items-center gap-2 text-xs text-sky-100/80">
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              Ověřuji přístup…
+                {copy.checkingAccess}
             </p>
           ) : canInstall ? (
             <div className="mt-4 space-y-2">
               <p className="inline-flex items-center gap-2 rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-medium text-emerald-100">
                 <ShieldCheck className="h-3.5 w-3.5" />
-                {data?.displayName || data?.email || "Ověřený lékař"} — stažení odemčeno
+                {data?.displayName || data?.email || copy.eyebrow} — {copy.unlocked}
               </p>
               {data?.facilities?.length ? (
                 <p className="inline-flex items-center gap-2 text-xs text-sky-100/90">
@@ -119,21 +124,20 @@ export function DokumentaceDownloadPanel({
               <div className="mt-3 flex flex-wrap items-center gap-3">
                 <InstallAppButton gated canInstall />
                 <Button asChild variant="outline" className="h-9 rounded-full border-white/40 bg-transparent text-white hover:bg-white/10">
-                  <Link href="/app/dokumentace">Otevřít aplikaci</Link>
+                  <Link href={localizePublicHref("/app/dokumentace", locale ?? "cs")}>{copy.openApp}</Link>
                 </Button>
               </div>
             </div>
           ) : (
             <div className="mt-4 space-y-3">
               <p className="text-xs leading-5 text-amber-100/95">
-                {data?.message ||
-                  "Stažení je dostupné jen ověřeným lékařům. Přihlaste se a dokončete ověření."}
+                {data?.message || copy.downloadGate}
               </p>
               <div className="flex flex-wrap gap-2">
                 <Button asChild className="h-10 rounded-full bg-white px-5 text-[#021d33] hover:bg-sky-50">
                   <Link href={data?.loginUrl || "/login?next=/app/dokumentace"}>
                     <LogIn className="mr-2 h-4 w-4" />
-                    Přihlásit se
+                    {copy.signIn}
                   </Link>
                 </Button>
                 <Button
@@ -142,7 +146,7 @@ export function DokumentaceDownloadPanel({
                   className="h-10 rounded-full border-white/40 bg-transparent px-5 text-white hover:bg-white/10"
                 >
                   <Link href={data?.verifyUrl || "/academy/lekari/overeni"}>
-                    Ověřit lékařský účet
+                    {copy.verifyAccount}
                   </Link>
                 </Button>
                 <Button
@@ -150,7 +154,7 @@ export function DokumentaceDownloadPanel({
                   variant="outline"
                   className="h-10 rounded-full border-white/40 bg-transparent px-5 text-white hover:bg-white/10"
                 >
-                  <Link href="/lekari/dokumentace">Více o OrdiZapisu</Link>
+                  <Link href={localizePublicHref("/lekari/dokumentace", locale ?? "cs")}>{copy.moreAbout}</Link>
                 </Button>
               </div>
             </div>
@@ -162,7 +166,7 @@ export function DokumentaceDownloadPanel({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={qrSrc}
-              alt={`QR kód pro stažení ${ORDIZAPIS.fullName}`}
+              alt={copy.qrAlt}
               width={180}
               height={180}
               className="h-[160px] w-[160px] sm:h-[180px] sm:w-[180px]"
@@ -170,14 +174,12 @@ export function DokumentaceDownloadPanel({
           </div>
           <p className="flex items-center gap-1.5 text-center text-[11px] text-sky-100/85">
             <QrCode className="h-3.5 w-3.5" />
-            {canInstall
-              ? "Naskenujte telefonem — odkaz je vázaný na váš účet"
-              : "Naskenujte a přihlaste se ověřeným lékařským účtem"}
+            {canInstall ? copy.qrLinked : copy.qrLogin}
           </p>
           {canInstall ? (
             <p className="max-w-[200px] text-center text-[10px] text-sky-100/70">
               <Download className="mr-1 inline h-3 w-3" />
-              Android: Instalovat · iOS Safari: Sdílet → Na plochu
+              {copy.installHint}
             </p>
           ) : null}
         </div>

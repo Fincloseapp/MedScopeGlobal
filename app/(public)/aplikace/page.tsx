@@ -184,7 +184,7 @@ export default async function AplikaceHubPage() {
                   </div>
                   <div className="mt-8">
                     {app.id === "ordizapis" ? (
-                      <DokumentaceDownloadPanel />
+                      <DokumentaceDownloadPanel locale={locale} />
                     ) : (
                       <AppDownloadPanel app={app} locale={locale} />
                     )}
