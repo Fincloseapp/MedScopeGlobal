@@ -92,6 +92,7 @@ import { getRevenueCopy } from "../../lib/i18n/revenue-copy";
 import { getSurfaceCopy } from "../../lib/i18n/surface-copy";
 import { getOrdiZapisAppCopy } from "../../lib/i18n/ordizapis-app-copy";
 import { getOrdiZapisApiCopy } from "../../lib/i18n/ordizapis-api-copy";
+import { getDokumentaceCopy } from "../../lib/i18n/dokumentace-copy";
 import {
   parseHeurekaPositionId,
   heurekaHopHtml,
@@ -819,8 +820,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.11"),
-  "page cache tag must bust after OrdiZapis API i18n"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.12"),
+  "page cache tag must bust after leftover OrdiZapis chrome i18n"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
@@ -949,6 +950,70 @@ assert.ok(
     "copy.errConsent"
   ),
   "OrdiZapis workspace errors must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "components/lekari/dokumentace-workspace.tsx"), "utf8").includes(
+    "copy.installTipTitle"
+  ) &&
+    readFileSync(join(root, "components/lekari/dokumentace-workspace.tsx"), "utf8").includes(
+      "copy.historyLoading"
+    ) &&
+    !readFileSync(join(root, "components/lekari/dokumentace-workspace.tsx"), "utf8").includes(
+      "OrdiZapis od 390 Kč"
+    ),
+  "OrdiZapis workspace install tip, history, and subscribe strip must follow the edition"
+);
+assert.ok(
+  readFileSync(join(root, "components/lekari/ordizapis-mark.tsx"), "utf8").includes(
+    "getDokumentaceCopy"
+  ),
+  "OrdiZapis lockup tagline must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "app/(dok-app)/app/dokumentace/page.tsx"), "utf8").includes(
+    "generateMetadata"
+  ),
+  "OrdiZapis PWA metadata must follow the edition language"
+);
+assert.ok(
+  !readFileSync(join(root, "components/lekari/ordizapis-audio.ts"), "utf8").includes(
+    "Připravuji bezpečný upload"
+  ),
+  "OrdiZapis upload progress must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "lib/lekari/dokumentace/install-link.ts"), "utf8").includes(
+    "ordizapisAppHref"
+  ),
+  "OrdiZapis QR/install URLs must carry the edition locale"
+);
+assert.equal(getOrdiZapisAppCopy("fr").installTipTitle, "Ajouter à l’écran d’accueil");
+assert.ok(!getOrdiZapisAppCopy("de").gateDemo.includes("zápisy"));
+assert.ok(getDokumentaceCopy("fr").trialLine.includes("jours"));
+assert.ok(!getDokumentaceCopy("en").facilitiesLabel.includes("Zařízení"));
+assert.ok(
+  readFileSync(join(root, "components/lekari/ordizapis-promo-banner.tsx"), "utf8").includes(
+    "ordizapisAppHref"
+  ) &&
+    readFileSync(join(root, "components/lekari/ordizapis-promo-banner.tsx"), "utf8").includes(
+      "getDokumentaceCopy"
+    ),
+  "physician promo banner must open the edition PWA and use edition copy"
+);
+assert.ok(
+  readFileSync(join(root, "components/v271/homepage-sections.tsx"), "utf8").includes(
+    "copy.trialLine"
+  ) &&
+    !readFileSync(join(root, "components/v271/homepage-sections.tsx"), "utf8").includes(
+      "Detail pro lékaře"
+    ),
+  "homepage OrdiZapis spotlight must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "app/api/lekari/dokumentace/manifest/route.ts"), "utf8").includes(
+    "ordizapisAppHref"
+  ),
+  "PWA manifest must follow the edition language"
 );
 assert.ok(
   readFileSync(join(root, "lib/i18n/filter-articles-for-locale.ts"), "utf8").includes(

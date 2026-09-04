@@ -31,7 +31,14 @@ import {
 } from "@/lib/lekari/dokumentace/note-language";
 import { dokumentaceLocaleHeaders } from "@/lib/lekari/dokumentace/request-locale";
 import { getClientLocale } from "@/lib/i18n/client-dictionary";
-import { getOrdiZapisAppCopy } from "@/lib/i18n/ordizapis-app-copy";
+import {
+  fillOrdiApp,
+  getOrdiZapisAppCopy,
+  ordizapisLoginHref,
+  ordizapisSubscribeHref,
+} from "@/lib/i18n/ordizapis-app-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
 import { intlLocaleFor } from "@/lib/i18n/format-date";
 import {
   ORDIZAPIS_FILE_ACCEPT,
@@ -697,11 +704,8 @@ export function DokumentaceWorkspace({
         <div className="flex gap-3 rounded-xl border border-[#cfe1f3] bg-[#eef6fb] px-4 py-3 text-sm text-[#021d33]">
           <Smartphone className="mt-0.5 h-5 w-5 shrink-0 text-[#005B96]" />
           <div>
-            <p className="font-semibold">Přidat na plochu</p>
-            <p className="mt-0.5 text-slate-600">
-              iOS: Sdílet → Přidat na Domovskou obrazovku. Android: nabídka prohlížeče →
-              Instalovat aplikaci. Nahrajte na mobilu → zápis se objeví i na PC.
-            </p>
+            <p className="font-semibold">{copy.installTipTitle}</p>
+            <p className="mt-0.5 text-slate-600">{copy.installTipBody}</p>
           </div>
         </div>
       ) : null}
@@ -919,7 +923,10 @@ export function DokumentaceWorkspace({
             <p>{error}</p>
             {gateHint === "login" ? (
               <p className="mt-2">
-                <Link href={isApp ? "/login?next=/app/dokumentace" : "/login"} className="font-semibold text-[#005B96] underline">
+                <Link
+                  href={isApp ? ordizapisLoginHref(locale) : localizePublicHref("/login", locale)}
+                  className="font-semibold text-[#005B96] underline"
+                >
                   {copy.signInBtn}
                 </Link>
               </p>
@@ -927,17 +934,17 @@ export function DokumentaceWorkspace({
             {gateHint === "subscribe" ? (
               <p className="mt-2">
                 <Link
-                  href="/predplatne#dokumentace"
+                  href={ordizapisSubscribeHref(locale)}
                   className="font-semibold text-[#005B96] underline"
                 >
-                  OrdiZapis od 390 Kč
+                  {fillOrdiApp(copy.gateFromPrice, { price: formatCzkListPrice(390, locale) })}
                 </Link>
                 {" · "}
-                <Link href="/predplatne#physician" className="underline">
-                  Lékař 490 Kč
+                <Link href={localizePublicHref("/predplatne#physician", locale)} className="underline">
+                  {fillOrdiApp(copy.gatePhysician, { price: formatCzkListPrice(490, locale) })}
                 </Link>
                 {" · "}
-                demo 3 zápisy/den · 14 dní trial
+                {copy.gateDemo}
               </p>
             ) : null}
           </div>
@@ -1056,7 +1063,7 @@ export function DokumentaceWorkspace({
             {historyLoading ? (
               <p className="flex items-center gap-2 text-sm text-slate-500">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Načítám…
+                {copy.historyLoading}
               </p>
             ) : history.length === 0 ? (
               <p className="text-sm text-slate-500">{copy.historyEmpty}</p>
@@ -1088,7 +1095,7 @@ export function DokumentaceWorkspace({
                       onClick={() => void copyText(item.note)}
                     >
                       <Copy className="h-3.5 w-3.5" />
-                      <span className="sr-only">Kopírovat</span>
+                      <span className="sr-only">{copy.copyBtn}</span>
                     </Button>
                     {typeof navigator !== "undefined" && "share" in navigator ? (
                       <Button
@@ -1098,7 +1105,7 @@ export function DokumentaceWorkspace({
                         onClick={() => void shareNote(item.note, item.title)}
                       >
                         <Share2 className="h-3.5 w-3.5" />
-                        <span className="sr-only">Sdílet</span>
+                        <span className="sr-only">{copy.shareBtn}</span>
                       </Button>
                     ) : null}
                   </div>

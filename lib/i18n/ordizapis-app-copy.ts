@@ -128,6 +128,20 @@ export type OrdiZapisAppCopy = {
   errTranscribe: string;
   errEmptyTranscript: string;
   noteShareTitle: string;
+  installTipTitle: string;
+  installTipBody: string;
+  historyLoading: string;
+  gateFromPrice: string;
+  gatePhysician: string;
+  gateDemo: string;
+  progressPrepareUpload: string;
+  progressSendingFile: string;
+  progressFileUploaded: string;
+  progressPrepareChunks: string;
+  progressSendingChunk: string;
+  progressTranscribing: string;
+  errStartUpload: string;
+  errChunkSend: string;
 };
 
 type OrdiZapisChromeCopy = Omit<
@@ -178,6 +192,20 @@ type OrdiZapisChromeCopy = Omit<
   | "errTranscribe"
   | "errEmptyTranscript"
   | "noteShareTitle"
+  | "installTipTitle"
+  | "installTipBody"
+  | "historyLoading"
+  | "gateFromPrice"
+  | "gatePhysician"
+  | "gateDemo"
+  | "progressPrepareUpload"
+  | "progressSendingFile"
+  | "progressFileUploaded"
+  | "progressPrepareChunks"
+  | "progressSendingChunk"
+  | "progressTranscribing"
+  | "errStartUpload"
+  | "errChunkSend"
 >;
 
 const PACK: Record<ChromePack, OrdiZapisChromeCopy> = {
@@ -218,7 +246,7 @@ const PACK: Record<ChromePack, OrdiZapisChromeCopy> = {
       },
       {
         title: "4. Právní rámec",
-        text: "Asistent, ne zdravotnický prostředek. Lékař schvaluje finální znění. Před nardávkou konzultace informujte pacienta.",
+        text: "Asistent, ne zdravotnický prostředek. Lékař schvaluje finální znění. Před nahrávkou konzultace informujte pacienta.",
       },
     ],
     micHelpTitle: "Když telefon mikrofon nepovolí",
@@ -972,6 +1000,21 @@ const ACCOUNT: Record<ChromePack, Omit<OrdiZapisAppCopy, keyof OrdiZapisChromeCo
     errTranscribe: "Přepis souboru selhal.",
     errEmptyTranscript: "Přepis je prázdný — soubor se nepodařilo rozpoznat.",
     noteShareTitle: "OrdiZapis zápis",
+    installTipTitle: "Přidat na plochu",
+    installTipBody:
+      "iOS: Sdílet → Přidat na Domovskou obrazovku. Android: nabídka prohlížeče → Instalovat aplikaci. Nahrajte na mobilu → zápis se objeví i na PC.",
+    historyLoading: "Načítám…",
+    gateFromPrice: "OrdiZapis od {price}",
+    gatePhysician: "Lékař {price}",
+    gateDemo: "demo 3 zápisy/den · 14 dní trial",
+    progressPrepareUpload: "Připravuji bezpečný upload…",
+    progressSendingFile: "Odesílám soubor…",
+    progressFileUploaded: "Soubor nahrán…",
+    progressPrepareChunks: "Připravuji nahrávku po částech…",
+    progressSendingChunk: "Odesílám {n}/{total}…",
+    progressTranscribing: "Přepisuji nahrávku…",
+    errStartUpload: "Nepodařilo se zahájit nahrání souboru.",
+    errChunkSend: "Odeslání části {n}/{total} selhalo.",
   },
   de: {
     accessLabel: "Zugang",
@@ -1025,6 +1068,21 @@ const ACCOUNT: Record<ChromePack, Omit<OrdiZapisAppCopy, keyof OrdiZapisChromeCo
     errTranscribe: "Transkription der Datei fehlgeschlagen.",
     errEmptyTranscript: "Transkription ist leer — die Datei wurde nicht erkannt.",
     noteShareTitle: "OrdiZapis-Notiz",
+    installTipTitle: "Zum Home-Bildschirm",
+    installTipBody:
+      "iOS: Teilen → Zum Home-Bildschirm. Android: Browser-Menü → App installieren. Am Handy aufnehmen — die Notiz erscheint auch am PC.",
+    historyLoading: "Wird geladen…",
+    gateFromPrice: "OrdiZapis ab {price}",
+    gatePhysician: "Arztangebot {price}",
+    gateDemo: "Demo 3 Notizen/Tag · 14 Tage Test",
+    progressPrepareUpload: "Sicherer Upload wird vorbereitet…",
+    progressSendingFile: "Datei wird gesendet…",
+    progressFileUploaded: "Datei hochgeladen…",
+    progressPrepareChunks: "Aufnahme wird in Teile geteilt…",
+    progressSendingChunk: "Sende {n}/{total}…",
+    progressTranscribing: "Aufnahme wird transkribiert…",
+    errStartUpload: "Der Datei-Upload konnte nicht gestartet werden.",
+    errChunkSend: "Teil {n}/{total} konnte nicht gesendet werden.",
   },
   fr: {
     accessLabel: "Accès",
@@ -1078,6 +1136,21 @@ const ACCOUNT: Record<ChromePack, Omit<OrdiZapisAppCopy, keyof OrdiZapisChromeCo
     errTranscribe: "Échec de la transcription du fichier.",
     errEmptyTranscript: "Transcription vide — le fichier n’a pas été reconnu.",
     noteShareTitle: "Note OrdiZapis",
+    installTipTitle: "Ajouter à l’écran d’accueil",
+    installTipBody:
+      "iOS : Partager → Sur l’écran d’accueil. Android : menu du navigateur → Installer l’appli. Enregistrez sur mobile — la note apparaît aussi sur l’ordinateur.",
+    historyLoading: "Chargement…",
+    gateFromPrice: "OrdiZapis dès {price}",
+    gatePhysician: "Offre médecin {price}",
+    gateDemo: "démo 3 notes/jour · 14 jours d’essai",
+    progressPrepareUpload: "Préparation de l’envoi sécurisé…",
+    progressSendingFile: "Envoi du fichier…",
+    progressFileUploaded: "Fichier envoyé…",
+    progressPrepareChunks: "Préparation de l’envoi par morceaux…",
+    progressSendingChunk: "Envoi {n}/{total}…",
+    progressTranscribing: "Transcription de l’enregistrement…",
+    errStartUpload: "Impossible de démarrer l’envoi du fichier.",
+    errChunkSend: "Échec de l’envoi du morceau {n}/{total}.",
   },
   it: {
     accessLabel: "Accesso",
@@ -1131,6 +1204,21 @@ const ACCOUNT: Record<ChromePack, Omit<OrdiZapisAppCopy, keyof OrdiZapisChromeCo
     errTranscribe: "Trascrizione del file non riuscita.",
     errEmptyTranscript: "Trascrizione vuota — il file non è stato riconosciuto.",
     noteShareTitle: "Nota OrdiZapis",
+    installTipTitle: "Aggiungi alla schermata Home",
+    installTipBody:
+      "iOS: Condividi → Aggiungi a Home. Android: menu del browser → Installa l’app. Registrate sul telefono — la nota compare anche sul PC.",
+    historyLoading: "Caricamento…",
+    gateFromPrice: "OrdiZapis da {price}",
+    gatePhysician: "Offerta medico {price}",
+    gateDemo: "demo 3 note/giorno · 14 giorni di prova",
+    progressPrepareUpload: "Preparazione dell’invio sicuro…",
+    progressSendingFile: "Invio del file…",
+    progressFileUploaded: "File inviato…",
+    progressPrepareChunks: "Preparazione dell’invio a pezzi…",
+    progressSendingChunk: "Invio {n}/{total}…",
+    progressTranscribing: "Trascrizione della registrazione…",
+    errStartUpload: "Impossibile avviare l’invio del file.",
+    errChunkSend: "Invio del pezzo {n}/{total} non riuscito.",
   },
   es: {
     accessLabel: "Acceso",
@@ -1184,6 +1272,21 @@ const ACCOUNT: Record<ChromePack, Omit<OrdiZapisAppCopy, keyof OrdiZapisChromeCo
     errTranscribe: "Falló la transcripción del archivo.",
     errEmptyTranscript: "Transcripción vacía — no se reconoció el archivo.",
     noteShareTitle: "Nota OrdiZapis",
+    installTipTitle: "Añadir a la pantalla de inicio",
+    installTipBody:
+      "iOS: Compartir → Añadir a inicio. Android: menú del navegador → Instalar la app. Grabe en el móvil — la nota aparece también en el PC.",
+    historyLoading: "Cargando…",
+    gateFromPrice: "OrdiZapis desde {price}",
+    gatePhysician: "Oferta médico {price}",
+    gateDemo: "demo 3 notas/día · 14 días de prueba",
+    progressPrepareUpload: "Preparando el envío seguro…",
+    progressSendingFile: "Enviando el archivo…",
+    progressFileUploaded: "Archivo enviado…",
+    progressPrepareChunks: "Preparando el envío por partes…",
+    progressSendingChunk: "Enviando {n}/{total}…",
+    progressTranscribing: "Transcribiendo la grabación…",
+    errStartUpload: "No se pudo iniciar el envío del archivo.",
+    errChunkSend: "Falló el envío de la parte {n}/{total}.",
   },
   "pt-BR": {
     accessLabel: "Acesso",
@@ -1237,6 +1340,21 @@ const ACCOUNT: Record<ChromePack, Omit<OrdiZapisAppCopy, keyof OrdiZapisChromeCo
     errTranscribe: "A transcrição do ficheiro falhou.",
     errEmptyTranscript: "Transcrição vazia — o ficheiro não foi reconhecido.",
     noteShareTitle: "Nota OrdiZapis",
+    installTipTitle: "Adicionar ao ecrã inicial",
+    installTipBody:
+      "iOS: Partilhar → Adicionar ao ecrã inicial. Android: menu do browser → Instalar a app. Grave no telemóvel — a nota aparece também no PC.",
+    historyLoading: "A carregar…",
+    gateFromPrice: "OrdiZapis a partir de {price}",
+    gatePhysician: "Oferta médico {price}",
+    gateDemo: "demo 3 notas/dia · 14 dias de teste",
+    progressPrepareUpload: "A preparar o envio seguro…",
+    progressSendingFile: "A enviar o ficheiro…",
+    progressFileUploaded: "Ficheiro enviado…",
+    progressPrepareChunks: "A preparar o envio por partes…",
+    progressSendingChunk: "A enviar {n}/{total}…",
+    progressTranscribing: "A transcrever a gravação…",
+    errStartUpload: "Não foi possível iniciar o envio do ficheiro.",
+    errChunkSend: "O envio da parte {n}/{total} falhou.",
   },
   en: {
     accessLabel: "Access",
@@ -1290,6 +1408,21 @@ const ACCOUNT: Record<ChromePack, Omit<OrdiZapisAppCopy, keyof OrdiZapisChromeCo
     errTranscribe: "File transcription failed.",
     errEmptyTranscript: "Transcript is empty — the file was not recognised.",
     noteShareTitle: "OrdiZapis note",
+    installTipTitle: "Add to Home Screen",
+    installTipBody:
+      "iOS: Share → Add to Home Screen. Android: browser menu → Install app. Record on your phone — the note also appears on the PC.",
+    historyLoading: "Loading…",
+    gateFromPrice: "OrdiZapis from {price}",
+    gatePhysician: "Physician plan {price}",
+    gateDemo: "demo 3 notes/day · 14-day trial",
+    progressPrepareUpload: "Preparing a secure upload…",
+    progressSendingFile: "Sending the file…",
+    progressFileUploaded: "File uploaded…",
+    progressPrepareChunks: "Preparing a chunked upload…",
+    progressSendingChunk: "Sending {n}/{total}…",
+    progressTranscribing: "Transcribing the recording…",
+    errStartUpload: "Could not start the file upload.",
+    errChunkSend: "Sending part {n}/{total} failed.",
   },
 };
 
@@ -1298,10 +1431,25 @@ export function getOrdiZapisAppCopy(locale?: string | null): OrdiZapisAppCopy {
   return { ...PACK[pack], ...ACCOUNT[pack] };
 }
 
-export function ordizapisAppHref(locale?: string | null): string {
+export function fillOrdiApp(template: string, vars: Record<string, string | number>): string {
+  return Object.entries(vars).reduce(
+    (out, [key, value]) => out.replaceAll(`{${key}}`, String(value)),
+    template
+  );
+}
+
+export function ordizapisAppHref(
+  locale?: string | null,
+  extras?: { source?: string; tab?: string; link?: string }
+): string {
   const loc = normalizeLocale(locale || "cs");
-  if (chromePack(loc) === "cs") return "/app/dokumentace";
-  return `/app/dokumentace?locale=${encodeURIComponent(loc)}`;
+  const params = new URLSearchParams();
+  if (extras?.source) params.set("source", extras.source);
+  if (extras?.tab) params.set("tab", extras.tab);
+  if (extras?.link) params.set("link", extras.link);
+  if (chromePack(loc) !== "cs") params.set("locale", loc);
+  const qs = params.toString();
+  return qs ? `/app/dokumentace?${qs}` : "/app/dokumentace";
 }
 
 export function ordizapisLoginHref(locale?: string | null): string {

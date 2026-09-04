@@ -77,6 +77,8 @@ export type DokumentaceCopy = {
   qrLinked: string;
   qrLogin: string;
   installHint: string;
+  trialLine: string;
+  facilitiesLabel: string;
 };
 
 type Pack = Omit<
@@ -218,6 +220,8 @@ const PACK: Record<ChromePack, Pack> = {
     qrLinked: "Naskenujte telefonem — odkaz je vázaný na váš účet",
     qrLogin: "Naskenujte a přihlaste se ověřeným lékařským účtem",
     installHint: "Android: Instalovat · iOS Safari: Sdílet → Na plochu",
+    trialLine: "14 dní zdarma.",
+    facilitiesLabel: "Zařízení",
   },
   de: {
     metaTitle: "OrdiZapis — KI-Notizen für die Praxis | MedScopeGlobal",
@@ -312,6 +316,8 @@ const PACK: Record<ChromePack, Pack> = {
     qrLinked: "Mit dem Telefon scannen — der Link gehört zu Ihrem Konto",
     qrLogin: "Scannen und mit einem verifizierten Konto anmelden",
     installHint: "Android: Installieren · iOS Safari: Teilen → Zum Home-Bildschirm",
+    trialLine: "14 Tage kostenlos.",
+    facilitiesLabel: "Einrichtung",
   },
   fr: {
     metaTitle: "OrdiZapis — Notes IA pour le cabinet | MedScopeGlobal",
@@ -406,6 +412,8 @@ const PACK: Record<ChromePack, Pack> = {
     qrLinked: "Scannez avec le téléphone — le lien est lié à votre compte",
     qrLogin: "Scannez et connectez-vous avec un compte médecin vérifié",
     installHint: "Android : Installer · iOS Safari : Partager → Sur l’écran d’accueil",
+    trialLine: "14 jours gratuits.",
+    facilitiesLabel: "Établissement",
   },
   it: {
     metaTitle: "OrdiZapis — Note IA per lo studio | MedScopeGlobal",
@@ -500,6 +508,8 @@ const PACK: Record<ChromePack, Pack> = {
     qrLinked: "Inquadrate con il telefono — il link è legato al vostro account",
     qrLogin: "Inquadrate e accedete con un account medico verificato",
     installHint: "Android: Installa · iOS Safari: Condividi → Alla schermata Home",
+    trialLine: "14 giorni gratis.",
+    facilitiesLabel: "Struttura",
   },
   es: {
     metaTitle: "OrdiZapis — Notas con IA para la consulta | MedScopeGlobal",
@@ -594,6 +604,8 @@ const PACK: Record<ChromePack, Pack> = {
     qrLinked: "Escanee con el teléfono — el enlace está ligado a su cuenta",
     qrLogin: "Escanee e inicie sesión con una cuenta médica verificada",
     installHint: "Android: Instalar · iOS Safari: Compartir → En la pantalla de inicio",
+    trialLine: "14 días gratis.",
+    facilitiesLabel: "Centro",
   },
   "pt-BR": {
     metaTitle: "OrdiZapis — Notas com IA para o consultório | MedScopeGlobal",
@@ -688,6 +700,8 @@ const PACK: Record<ChromePack, Pack> = {
     qrLinked: "Escaneie com o telefone — o link está ligado à sua conta",
     qrLogin: "Escaneie e entre com uma conta médica verificada",
     installHint: "Android: Instalar · iOS Safari: Compartilhar → Na Tela de Início",
+    trialLine: "14 dias grátis.",
+    facilitiesLabel: "Unidade",
   },
   en: {
     metaTitle: "OrdiZapis — AI notes for the clinic | MedScopeGlobal",
@@ -782,6 +796,8 @@ const PACK: Record<ChromePack, Pack> = {
     qrLinked: "Scan with your phone — the link is tied to your account",
     qrLogin: "Scan and sign in with a verified physician account",
     installHint: "Android: Install · iOS Safari: Share → Add to Home Screen",
+    trialLine: "14 days free.",
+    facilitiesLabel: "Facility",
   },
 };
 

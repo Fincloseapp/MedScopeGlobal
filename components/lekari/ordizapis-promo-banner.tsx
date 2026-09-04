@@ -3,10 +3,10 @@ import { ArrowRight, Mic } from "lucide-react";
 import { OrdiZapisMark } from "@/components/lekari/ordizapis-mark";
 import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
 import { getServerLocale } from "@/lib/i18n/server-locale";
-import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { getDokumentaceCopy } from "@/lib/i18n/dokumentace-copy";
 import { getV27AudienceHubCopy } from "@/lib/i18n/v27-audience-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
-import { chromePack } from "@/lib/i18n/chrome-pack";
+import { ordizapisAppHref } from "@/lib/i18n/ordizapis-app-copy";
 
 export async function OrdiZapisPromoBanner({
   variant = "homepage",
@@ -14,14 +14,8 @@ export async function OrdiZapisPromoBanner({
   variant?: "homepage" | "hub";
 }) {
   const locale = await getServerLocale();
-  const surface = getSurfaceCopy(locale);
+  const copy = getDokumentaceCopy(locale);
   const physician = getV27AudienceHubCopy("physician", locale);
-  const cs = chromePack(locale) === "cs";
-  const physicianAudience = surface.audiences.find((item) => item.id === "physician");
-  const tagline = surface.appTaglines.ordizapis;
-  const pitch = cs ? ORDIZAPIS.pitch : physicianAudience?.description ?? tagline;
-  const primary = cs ? "Stáhnout a nahrávat" : physicianAudience?.ctaPrimary ?? physician.enter;
-  const secondary = cs ? "Jak to funguje" : physicianAudience?.ctaSecondary ?? physician.enter;
 
   return (
     <section
@@ -49,24 +43,24 @@ export async function OrdiZapisPromoBanner({
               </p>
               <p className="mt-1 font-display text-lg font-bold text-white sm:text-xl">
                 {ORDIZAPIS.shortName}
-                <span className="font-semibold text-sky-200"> — {tagline}</span>
+                <span className="font-semibold text-sky-200"> — {copy.tagline}</span>
               </p>
-              <p className="mt-1 max-w-2xl text-sm leading-5 text-sky-100/90">{pitch}</p>
+              <p className="mt-1 max-w-2xl text-sm leading-5 text-sky-100/90">{copy.pitch}</p>
             </div>
           </div>
           <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
             <Link
-              href={localizePublicHref(ORDIZAPIS.routes.app, locale)}
+              href={ordizapisAppHref(locale)}
               className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-[#021d33] hover:bg-sky-50"
             >
               <Mic className="h-4 w-4 text-[#005B96]" />
-              {primary}
+              {copy.openApp}
             </Link>
             <Link
               href={localizePublicHref(ORDIZAPIS.routes.marketing, locale)}
               className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-white/35 px-5 text-sm font-semibold text-white hover:bg-white/10"
             >
-              {secondary}
+              {copy.howItWorks}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

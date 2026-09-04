@@ -19,12 +19,13 @@ export async function GET(request: Request) {
   let installUrl: string | null = null;
   let linkedInstallUrl: string | null = null;
   if (eligibility.eligible && eligibility.userId) {
-    installUrl = dokumentaceAppUrl({ source: "qr", absolute: true });
+    installUrl = dokumentaceAppUrl({ source: "qr", absolute: true, locale });
     const token = createDokumentaceInstallToken(eligibility.userId);
     linkedInstallUrl = dokumentaceAppUrl({
       source: "qr-link",
       link: token,
       absolute: true,
+      locale,
     });
   }
 

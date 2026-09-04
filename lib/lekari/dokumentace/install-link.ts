@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { ordizapisAppHref } from "@/lib/i18n/ordizapis-app-copy";
 
 const DEFAULT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -61,13 +62,12 @@ export function dokumentaceAppUrl(opts?: {
   source?: string;
   link?: string;
   absolute?: boolean;
+  locale?: string | null;
 }): string {
-  const path = "/app/dokumentace";
-  const params = new URLSearchParams();
-  if (opts?.source) params.set("source", opts.source);
-  if (opts?.link) params.set("link", opts.link);
-  const qs = params.toString();
-  const rel = qs ? `${path}?${qs}` : path;
+  const rel = ordizapisAppHref(opts?.locale, {
+    source: opts?.source,
+    link: opts?.link,
+  });
   if (!opts?.absolute) return rel;
   const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://medscopeglobal.com").replace(
     /\/$/,

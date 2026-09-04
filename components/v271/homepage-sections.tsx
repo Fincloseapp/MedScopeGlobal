@@ -8,7 +8,6 @@ import { getArticlesByMetadataSection } from "@/lib/queries/articles";
 import {
   V271_AUDIENCES,
   V271_AKTUALNI,
-  V271_DOKUMENTACE_APP,
   V271_SOCIAL_PROOF_STATS,
   V271_SUBSCRIPTION_PLANS,
   V271_TESTIMONIALS,
@@ -21,8 +20,10 @@ import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { AppOpenLink } from "@/components/apps/app-origin-bar";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { getRevenueCopy } from "@/lib/i18n/revenue-copy";
-import { localizeListedCzk } from "@/lib/i18n/payment-currency";
+import { formatCzkListPrice, localizeListedCzk } from "@/lib/i18n/payment-currency";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getDokumentaceCopy } from "@/lib/i18n/dokumentace-copy";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 
 /** Not mounted on the live homepage — counts and quotes are unverified. Do not re-wire. */
 export function V272SocialProofBlock() {
@@ -124,36 +125,39 @@ export function V272WhyTrustBlock({ locale = "cs" }: { locale?: string }) {
   );
 }
 
-export function V272DokumentaceAppBlock() {
+export async function V272DokumentaceAppBlock({ locale }: { locale?: string } = {}) {
+  const loc = locale ?? (await getServerLocale());
+  const copy = getDokumentaceCopy(loc);
+  const clinic = formatCzkListPrice(390, loc);
   return (
     <section className="border-b border-slate-200 bg-gradient-to-b from-[#eef6fb] to-white">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
         <div className="mb-6 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
             <div className="mb-4">
-              <OrdiZapisLockup showTagline />
+              <OrdiZapisLockup showTagline locale={loc} />
             </div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
-              {V271_DOKUMENTACE_APP.eyebrow}
+              {copy.eyebrow} · medscopeglobal.com
             </p>
             <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33] sm:text-4xl">
-              {V271_DOKUMENTACE_APP.title}
+              OrdiZapis — {copy.tagline}
             </h2>
             <p className="mt-3 text-sm leading-6 text-slate-600 sm:text-base">
-              {V271_DOKUMENTACE_APP.description}{" "}
-              <span className="font-semibold text-[#005B96]">{V271_DOKUMENTACE_APP.price}</span>
+              {copy.pitch}{" "}
+              <span className="font-semibold text-[#005B96]">{copy.monthlyCta(clinic)}</span>
               {" · "}
-              14 dní zdarma.
+              {copy.trialLine}
             </p>
           </div>
           <Link
-            href={V271_DOKUMENTACE_APP.href}
+            href={localizePublicHref("/lekari/dokumentace", loc)}
             className="inline-flex h-11 shrink-0 items-center justify-center rounded-full border border-[#005B96]/30 bg-white px-5 text-sm font-semibold text-[#005B96] hover:bg-[#005B96]/5"
           >
-            Detail pro lékaře →
+            {copy.moreAbout} →
           </Link>
         </div>
-        <DokumentaceDownloadPanel variant="homepage" />
+        <DokumentaceDownloadPanel variant="homepage" locale={loc} />
       </div>
     </section>
   );

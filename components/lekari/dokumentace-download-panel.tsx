@@ -9,7 +9,7 @@ import { OrdiZapisMark } from "@/components/lekari/ordizapis-mark";
 import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
 import { getDokumentaceCopy } from "@/lib/i18n/dokumentace-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
-import { ordizapisAppHref } from "@/lib/i18n/ordizapis-app-copy";
+import { ordizapisAppHref, ordizapisLoginHref } from "@/lib/i18n/ordizapis-app-copy";
 import { dokumentaceLocaleHeaders } from "@/lib/lekari/dokumentace/request-locale";
 
 type EligibilityResponse = {
@@ -62,9 +62,10 @@ export function DokumentaceDownloadPanel({
   }, [locale]);
 
   const canInstall = Boolean(data?.canInstall);
+  const loc = locale ?? "cs";
   const qrSrc = canInstall
-    ? `/api/lekari/dokumentace/qr?linked=1&t=${Date.now()}`
-    : "/api/lekari/dokumentace/qr?public=1";
+    ? `/api/lekari/dokumentace/qr?linked=1&locale=${encodeURIComponent(loc)}&t=${Date.now()}`
+    : `/api/lekari/dokumentace/qr?public=1&locale=${encodeURIComponent(loc)}`;
 
   const compact = variant === "app";
 
@@ -121,7 +122,7 @@ export function DokumentaceDownloadPanel({
               {data?.facilities?.length ? (
                 <p className="inline-flex items-center gap-2 text-xs text-sky-100/90">
                   <Building2 className="h-3.5 w-3.5" />
-                  Zařízení: {data.facilities.map((f) => f.name).join(", ")}
+                  {copy.facilitiesLabel}: {data.facilities.map((f) => f.name).join(", ")}
                 </p>
               ) : null}
               <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -138,7 +139,7 @@ export function DokumentaceDownloadPanel({
               </p>
               <div className="flex flex-wrap gap-2">
                 <Button asChild className="h-10 rounded-full bg-white px-5 text-[#021d33] hover:bg-sky-50">
-                  <Link href={data?.loginUrl || "/login?next=/app/dokumentace"}>
+                  <Link href={data?.loginUrl || ordizapisLoginHref(loc)}>
                     <LogIn className="mr-2 h-4 w-4" />
                     {copy.signIn}
                   </Link>
@@ -148,7 +149,7 @@ export function DokumentaceDownloadPanel({
                   variant="outline"
                   className="h-10 rounded-full border-white/40 bg-transparent px-5 text-white hover:bg-white/10"
                 >
-                  <Link href={data?.verifyUrl || "/academy/lekari/overeni"}>
+                  <Link href={data?.verifyUrl || localizePublicHref("/academy/lekari/overeni", loc)}>
                     {copy.verifyAccount}
                   </Link>
                 </Button>

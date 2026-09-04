@@ -43,7 +43,11 @@ export async function GET(request: NextRequest) {
         },
       });
     } catch {
-      const url = dokumentaceAppUrl({ source: "qr", absolute: true });
+      const url = dokumentaceAppUrl({
+        source: "qr",
+        absolute: true,
+        locale: dokumentaceLocaleFromUrl(request),
+      });
       const buf = await proxyQrPng(url);
       return new NextResponse(new Uint8Array(buf), {
         headers: {
@@ -73,6 +77,7 @@ export async function GET(request: NextRequest) {
     source: "qr-link",
     link: token,
     absolute: true,
+    locale,
   });
   const buf = await proxyQrPng(target);
   return new NextResponse(new Uint8Array(buf), {
