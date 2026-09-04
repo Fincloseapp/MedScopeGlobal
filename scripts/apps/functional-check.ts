@@ -908,6 +908,10 @@ assert.ok(
   "root sitemap must not emit CS-only article URLs"
 );
 assert.ok(
+  readFileSync(join(root, "app/sitemap.ts"), "utf8").includes("buildRootSitemapStaticEntries"),
+  "root sitemap must emit locale-prefixed magazine hubs"
+);
+assert.ok(
   readFileSync(join(root, "app/(public)/vip/protokoly/page.tsx"), "utf8").includes("getServerLocale"),
   "VIP protocols listing must follow the request locale"
 );

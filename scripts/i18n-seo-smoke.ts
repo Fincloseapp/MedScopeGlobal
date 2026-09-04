@@ -19,6 +19,7 @@ import { articleJsonLdGlobal, buildGlobalHreflang } from "../lib/ecosystem/seo";
 import { renderLlmsTxt } from "../lib/seo/llms-txt";
 import { buildPageMetadata } from "../lib/seo/metadata";
 import { allLocaleFeedUrls, allLocaleSitemapUrls, localeArticleUrl } from "../lib/seo/locale-sitemap";
+import { buildRootSitemapStaticEntries } from "../lib/seo/root-sitemap";
 import { GLOBAL_LOCALES } from "../lib/ecosystem/locales";
 import {
   detectClientLanguage,
@@ -157,6 +158,15 @@ assert.equal(sitemaps.length, GLOBAL_LOCALES.length);
 assert.ok(sitemaps.some((u) => u.endsWith("/sitemap-cs.xml")));
 assert.ok(sitemaps.some((u) => u.endsWith("/sitemap-en-us.xml")));
 assert.ok(sitemaps.some((u) => u.endsWith("/sitemap-de.xml")));
+
+const rootStatic = buildRootSitemapStaticEntries("https://medscopeglobal.com");
+assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/en-us/articles"));
+assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/it/predplatne"));
+assert.ok(!rootStatic.some((row) => row.url === "https://medscopeglobal.com/articles"));
+assert.ok(!rootStatic.some((row) => row.url.includes("/cs/article/")));
+assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/cs/studenti"));
+assert.ok(!rootStatic.some((row) => row.url === "https://medscopeglobal.com/en-us/studenti"));
+assert.ok(!rootStatic.some((row) => row.url === "https://medscopeglobal.com/de/mediprep"));
 
 const feeds = allLocaleFeedUrls();
 assert.equal(feeds.length, GLOBAL_LOCALES.length);
