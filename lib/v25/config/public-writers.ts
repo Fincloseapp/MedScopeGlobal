@@ -3,9 +3,17 @@ import {
   FOREIGN_WRITER_ROTATION,
   defaultPublicWriterLocales,
   rotatingForeignWriterLocale,
+  publicWriterSliceForHour,
+  CLOUDFLARE_CRON_HOUR_SLOTS,
 } from "@/lib/v25/writers/run-public-writers.mjs";
 
-export { FOREIGN_WRITER_ROTATION, defaultPublicWriterLocales, rotatingForeignWriterLocale };
+export {
+  FOREIGN_WRITER_ROTATION,
+  defaultPublicWriterLocales,
+  rotatingForeignWriterLocale,
+  publicWriterSliceForHour,
+  CLOUDFLARE_CRON_HOUR_SLOTS,
+};
 
 /** Magazine categories on the daily public cron (lifestyle, illness, prevention, interviews, longevity). */
 export const PUBLIC_WRITER_CATEGORY_COUNT = 5;

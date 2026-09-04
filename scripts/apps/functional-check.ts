@@ -138,6 +138,7 @@ import {
   DEFAULT_PUBLIC_WRITER_LIMIT,
   PUBLIC_WRITER_COUNT,
   PUBLIC_WRITERS_PER_CATEGORY,
+  publicWriterSliceForHour,
 } from "../../lib/v25/config/public-writers";
 import { reviewPublicArticle } from "../../lib/v25/writers/editorial-review.mjs";
 import { polishCzechFields } from "../../lib/v22/translate";
@@ -342,6 +343,7 @@ file("lib/v22/homepage-cache.ts");
   const home = readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8");
   assert.ok(home.includes("filterArticlesForLocale"), "homepage listings are native-first per locale");
   assert.ok(home.includes("mergeNativeDeskFeed"), "homepage pins native desk pieces");
+  assert.ok(home.includes("v20-rolling-dates"), "homepage cache key must bust when native dates roll");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
   assert.ok(home.includes("courtesyBorrow: 2"), "non-CS homepage must not dump a Czech borrow pile");
 }
@@ -958,12 +960,14 @@ assert.ok(
   "/tip must not send readers to VIP protocols"
 );
 file("app/(public)/newsletter/dekujeme/page.tsx");
-assert.ok(
-  readFileSync(join(root, ".github/workflows/cloudflare-cron.yml"), "utf8").includes(
-    "/api/cron/newsletter-generate"
-  ),
-  "web issue must publish on Cloudflare cron"
-);
+{
+  const cronYml = readFileSync(join(root, ".github/workflows/cloudflare-cron.yml"), "utf8");
+  assert.ok(cronYml.includes("/api/cron/newsletter-generate"), "web issue must publish on Cloudflare cron");
+  assert.ok(cronYml.includes("/api/cron/conversion-renewals"), "conversion copy renewals must run on Cloudflare cron");
+  assert.ok(cronYml.includes("skipAds=1") && cronYml.includes("skipCovers=1"), "public-articles cron must stay inside the Worker budget");
+  assert.ok(cronYml.includes("v25-enterprise?mode=quick"), "enterprise cron must use the Worker-safe quick mode");
+  assert.ok(cronYml.includes("CRITICAL FAIL"), "ingest and public-articles must fail the dispatcher when they 503");
+}
 assert.ok(
   readFileSync(join(root, "lib/v23/newsletter/render.ts"), "utf8").includes("locale = \"cs\""),
   "HTML render must accept locale for affiliate /go links"
@@ -2310,6 +2314,13 @@ assert.equal(WRITER_AGENTS.length, 20, "WRITER_AGENTS is the specialist roster")
 assert.equal(PUBLIC_WRITERS_PER_CATEGORY, 4);
 assert.equal(PUBLIC_WRITER_COUNT, 20);
 assert.equal(DAILY_PUBLIC_ARTICLE_TARGET, DEFAULT_PUBLIC_WRITER_LIMIT * 20);
+{
+  const morning = publicWriterSliceForHour(6, 20);
+  const evening = publicWriterSliceForHour(20, 20);
+  assert.ok(morning.limit >= 2 && morning.limit <= 4);
+  assert.notEqual(evening.offset, morning.offset);
+  assert.equal(evening.offset + evening.limit, 20);
+}
 assert.equal(
   resolveWriterAgent({ metadata: { writer_id: "writer3-trends" } })?.topic,
   "prevence"

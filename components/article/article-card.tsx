@@ -120,7 +120,7 @@ export function ArticleCard({
         {date && (
           <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 font-medium text-slate-500">
             <Calendar className="h-3.5 w-3.5" />
-            {date}
+            <time dateTime={article.published_at ?? undefined}>{date}</time>
           </span>
         )}
       </CardFooter>

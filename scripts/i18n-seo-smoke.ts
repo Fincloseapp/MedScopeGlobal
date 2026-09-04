@@ -56,7 +56,7 @@ import { getRevenueCopy } from "../lib/i18n/revenue-copy";
 import { getB2BLandingCopy } from "../lib/i18n/b2b-landing-copy";
 import { chromePack } from "../lib/i18n/chrome-pack";
 import { getV27AudienceGridCopy, getV27AudienceHubCopy } from "../lib/i18n/v27-audience-copy";
-import { mergeNativeDeskFeed, nativeDeskArticlesForLocale, relatedNativeDeskArticles } from "../lib/editorial/native-desk-articles";
+import { mergeNativeDeskFeed, nativeDeskArticlesForLocale, nativeDeskPinDate, relatedNativeDeskArticles } from "../lib/editorial/native-desk-articles";
 import { getPhysicianLandingCopy } from "../lib/i18n/physician-landing-copy";
 import { getPhysicianHubExtrasCopy } from "../lib/i18n/physician-hub-extras-copy";
 import { tipLocale, ARTICLE_TIP_COPY } from "../lib/ecosystem/tip-copy";
@@ -655,6 +655,20 @@ assert.ok(nativeDeskArticlesForLocale("fr").some((article) => /médecin traitant
 assert.ok(nativeDeskArticlesForLocale("it").some((article) => /medico di base|AIFA/.test(`${article.title} ${article.excerpt}`)));
 assert.equal(nativeDeskArticlesForLocale("cs").length, 0);
 assert.equal(mergeNativeDeskFeed([] as { locale?: string | null }[], "en-US")[0]?.locale, "en-US");
+{
+  const lead = usDesk[0];
+  const second = usDesk[1];
+  assert.ok(lead && second);
+  const today = nativeDeskPinDate(0).toISOString().slice(0, 10);
+  assert.equal(String(lead.published_at).slice(0, 10), today);
+  assert.ok(String(second.published_at) < String(lead.published_at));
+  const noon = nativeDeskPinDate(0);
+  noon.setUTCHours(12, 0, 0, 0);
+  const cronRow = { slug: "cron-fresh", locale: "en-US", published_at: noon.toISOString() };
+  assert.equal(mergeNativeDeskFeed([cronRow], "en-US")[0]?.slug, "cron-fresh");
+  const stale = { slug: "old-db", locale: "en-US", published_at: "2026-08-01T10:00:00.000Z" };
+  assert.notEqual(mergeNativeDeskFeed([stale], "en-US")[0]?.slug, "old-db");
+}
 assert.equal(getV27AudienceHubCopy("physician", "it").label, "Per i medici");
 assert.ok(!getV27AudienceHubCopy("public", "fr").label.includes("veřejnost"));
 assert.ok(!getV27AudienceHubCopy("physician", "it").topics.some((topic) => /léčebné|ČLK|SÚKL/.test(topic)));

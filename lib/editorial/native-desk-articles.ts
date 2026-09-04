@@ -36,8 +36,20 @@ function htmlFromSections(intro: string, sections: NativeSeed["sections"], close
   return `<p>${intro}</p>${body}<p><em>${closer}</em></p>`;
 }
 
+/** Rolling UTC calendar day so native pins never freeze on a ship date. Slugs stay stable. */
+export function nativeDeskPinDate(index: number, now = new Date()): Date {
+  return new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - index, 8, 0, 0)
+  );
+}
+
+function publishedMs(article: { published_at?: string | null }): number {
+  const value = article.published_at ? Date.parse(article.published_at) : 0;
+  return Number.isFinite(value) ? value : 0;
+}
+
 function buildRow(locale: string, seed: NativeSeed, index: number): ArticleWithRelations {
-  const published = new Date(Date.UTC(2026, 8, 3 - index, 8, 0, 0)).toISOString();
+  const published = nativeDeskPinDate(index).toISOString();
   const slug = `verejnost-${seed.topic}-2026-09-03-${locale.toLowerCase()}-${seed.slugTail}`;
   const content = htmlFromSections(seed.excerpt, seed.sections, seed.excerpt);
   const id = `native-desk-${locale}-${seed.slugTail}`;
@@ -777,7 +789,7 @@ export function getNativeDeskArticleBySlug(slug: string): ArticleWithRelations |
   return null;
 }
 
-export function mergeNativeDeskFeed<T extends { id?: string; slug?: string | null; locale?: string | null; public_topic?: string | null; metadata?: Record<string, unknown> | null }>(
+export function mergeNativeDeskFeed<T extends { id?: string; slug?: string | null; locale?: string | null; public_topic?: string | null; published_at?: string | null; metadata?: Record<string, unknown> | null }>(
   articles: T[],
   locale?: string | null,
   topic?: string | null
@@ -793,7 +805,7 @@ export function mergeNativeDeskFeed<T extends { id?: string; slug?: string | nul
   if (native.length === 0) return articles;
   const seen = new Set(native.map((article) => String(article.slug ?? article.id)));
   const rest = articles.filter((article) => !seen.has(String(article.slug ?? article.id)));
-  return [...native, ...rest];
+  return [...native, ...rest].sort((a, b) => publishedMs(b) - publishedMs(a));
 }
 
 export function nativeDeskDisplayArticles(locale?: string | null): DisplayArticle[] {

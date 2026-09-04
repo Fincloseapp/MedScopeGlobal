@@ -85,7 +85,11 @@ export function NewsHeadlineRow({ article, locale = "cs" }: { article: DisplayAr
         <h3 className="font-display text-sm font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
           {article.title}
         </h3>
-        {date ? <p className="mt-1 text-[11px] text-slate-500">{date.text}</p> : null}
+        {date ? (
+          <p className="mt-1 text-[11px] text-slate-500">
+            <time dateTime={date.dateTime}>{date.text}</time>
+          </p>
+        ) : null}
       </div>
     </Link>
   );
