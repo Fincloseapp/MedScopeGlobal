@@ -851,6 +851,10 @@ assert.ok(
   "homepage cache must reserve news before lifestyle"
 );
 assert.ok(
+  readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes('mode: "card"'),
+  "/verejnost/clanky must list cards, not 80 full bodies (Worker 1102)"
+);
+assert.ok(
   readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
     "getDokumentaceCopy"
   ),
