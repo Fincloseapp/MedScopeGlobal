@@ -2,12 +2,27 @@ import Link from "next/link";
 import { ArrowRight, Mic } from "lucide-react";
 import { OrdiZapisMark } from "@/components/lekari/ordizapis-mark";
 import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { getV27AudienceHubCopy } from "@/lib/i18n/v27-audience-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { chromePack } from "@/lib/i18n/chrome-pack";
 
-export function OrdiZapisPromoBanner({
+export async function OrdiZapisPromoBanner({
   variant = "homepage",
 }: {
   variant?: "homepage" | "hub";
 }) {
+  const locale = await getServerLocale();
+  const surface = getSurfaceCopy(locale);
+  const physician = getV27AudienceHubCopy("physician", locale);
+  const cs = chromePack(locale) === "cs";
+  const physicianAudience = surface.audiences.find((item) => item.id === "physician");
+  const tagline = surface.appTaglines.ordizapis;
+  const pitch = cs ? ORDIZAPIS.pitch : physicianAudience?.description ?? tagline;
+  const primary = cs ? "Stáhnout a nahrávat" : physicianAudience?.ctaPrimary ?? physician.enter;
+  const secondary = cs ? "Jak to funguje" : physicianAudience?.ctaSecondary ?? physician.enter;
+
   return (
     <section
       className={
@@ -15,7 +30,7 @@ export function OrdiZapisPromoBanner({
           ? "border-b border-[#cfe1f3] bg-[#021d33]"
           : "rounded-2xl border border-[#005B96]/25 bg-[#021d33]"
       }
-      aria-label={`${ORDIZAPIS.shortName} pro lékaře`}
+      aria-label={`${ORDIZAPIS.shortName} · ${physician.shortLabel}`}
     >
       <div
         className={
@@ -30,30 +45,28 @@ export function OrdiZapisPromoBanner({
             <OrdiZapisMark size="md" priority className="shrink-0 rounded-[22%] ring-2 ring-white/20" />
             <div className="min-w-0">
               <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-200">
-                Pro lékaře · {ORDIZAPIS.domain}
+                {physician.shortLabel} · {ORDIZAPIS.domain}
               </p>
               <p className="mt-1 font-display text-lg font-bold text-white sm:text-xl">
                 {ORDIZAPIS.shortName}
-                <span className="font-semibold text-sky-200"> — {ORDIZAPIS.tagline}</span>
+                <span className="font-semibold text-sky-200"> — {tagline}</span>
               </p>
-              <p className="mt-1 max-w-2xl text-sm leading-5 text-sky-100/90">
-                {ORDIZAPIS.pitch}
-              </p>
+              <p className="mt-1 max-w-2xl text-sm leading-5 text-sky-100/90">{pitch}</p>
             </div>
           </div>
           <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
             <Link
-              href={ORDIZAPIS.routes.app}
+              href={localizePublicHref(ORDIZAPIS.routes.app, locale)}
               className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-[#021d33] hover:bg-sky-50"
             >
               <Mic className="h-4 w-4 text-[#005B96]" />
-              Stáhnout a nahrávat
+              {primary}
             </Link>
             <Link
-              href={ORDIZAPIS.routes.marketing}
+              href={localizePublicHref(ORDIZAPIS.routes.marketing, locale)}
               className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-white/35 px-5 text-sm font-semibold text-white hover:bg-white/10"
             >
-              Jak to funguje
+              {secondary}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

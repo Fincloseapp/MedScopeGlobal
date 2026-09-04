@@ -862,6 +862,22 @@ assert.ok(
   "physician landing chrome must not stay Czech on /it"
 );
 assert.ok(
+  readFileSync(join(root, "app/(public)/aktualni-zpravy/page.tsx"), "utf8").includes(
+    "newsDesksForLocale"
+  ),
+  "news listing chrome must follow the edition desk labels"
+);
+assert.ok(
+  readFileSync(join(root, "components/v271/lekari-landing-extras.tsx"), "utf8").includes(
+    "getPhysicianHubExtrasCopy"
+  ),
+  "physician hub extras must not stay Czech on /it/lekari"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/lekari/page.tsx"), "utf8").includes("isCzechSurface"),
+  "ČLK-accredited CME panel is Czech-only"
+);
+assert.ok(
   !readFileSync(join(root, "app/(public)/pro-lekare/page.tsx"), "utf8").includes("Sekce pro praxi"),
   "physician practice grid must come from the locale pack"
 );

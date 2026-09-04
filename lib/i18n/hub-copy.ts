@@ -2,6 +2,7 @@ import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { localizePublicHref, translateNavHref } from "@/lib/i18n/nav-copy";
 import { localizeListedCzk, localizeListedCzkIn } from "@/lib/i18n/payment-currency";
+import { rewriteCzechInstitutions } from "@/lib/i18n/local-regulator";
 import type { V271HubPage } from "@/lib/v271/routes";
 
 export type HubSection = "studenti" | "lekari" | "firmy";
@@ -301,12 +302,15 @@ export function localizeV271Page(
     homeHref: localizePublicHref(`/${section}`, locale),
     page: {
       ...page,
-      title: overlay?.title ?? page.title,
-      description: localizeListedCzk(overlay?.description ?? page.description, locale),
+      title: rewriteCzechInstitutions(overlay?.title ?? page.title, locale),
+      description: rewriteCzechInstitutions(
+        localizeListedCzk(overlay?.description ?? page.description, locale),
+        locale
+      ),
       ctaLabel: overlay?.ctaLabel
-        ? localizeListedCzk(overlay.ctaLabel, locale)
+        ? rewriteCzechInstitutions(localizeListedCzk(overlay.ctaLabel, locale), locale)
         : page.ctaLabel
-          ? localizeListedCzk(page.ctaLabel, locale)
+          ? rewriteCzechInstitutions(localizeListedCzk(page.ctaLabel, locale), locale)
           : page.ctaLabel,
       ctaHref: page.ctaHref ? localizePublicHref(page.ctaHref, locale) : undefined,
       links: page.links.map((link) => {
@@ -317,8 +321,10 @@ export function localizeV271Page(
         return {
           ...link,
           href: localizePublicHref(link.href, locale),
-          label: translated.label,
-          description: translated.description,
+          label: rewriteCzechInstitutions(translated.label, locale),
+          description: translated.description
+            ? rewriteCzechInstitutions(translated.description, locale)
+            : translated.description,
         };
       }),
     },

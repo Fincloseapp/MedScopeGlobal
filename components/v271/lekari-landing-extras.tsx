@@ -1,19 +1,26 @@
 import Link from "next/link";
 import { Award, BadgeCheck, BookOpen, ExternalLink, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  V271_LEKARI_CREDIBILITY,
-  V271_PHYSICIAN_TIER,
-  V271_SCIENTIFIC_RIGOR,
-} from "@/lib/v271/lekari-credibility";
+import { getPhysicianHubExtrasCopy } from "@/lib/i18n/physician-hub-extras-copy";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 
 const BADGE_ICONS = {
   CME: BookOpen,
-  "ČLK": ShieldCheck,
+  FMC: BookOpen,
+  ECM: BookOpen,
+  ČLK: ShieldCheck,
+  Access: ShieldCheck,
+  Zugang: ShieldCheck,
+  Accès: ShieldCheck,
+  Accesso: ShieldCheck,
+  Acceso: ShieldCheck,
+  Acesso: ShieldCheck,
   "Peer review": BadgeCheck,
 } as const;
 
-export function V271LekariCredibilitySection() {
+export async function V271LekariCredibilitySection() {
+  const locale = await getServerLocale();
+  const copy = getPhysicianHubExtrasCopy(locale);
   return (
     <>
       <section className="mb-10" aria-labelledby="lekari-credibility-heading">
@@ -21,15 +28,12 @@ export function V271LekariCredibilitySection() {
           id="lekari-credibility-heading"
           className="font-display text-2xl font-semibold text-[#021d33]"
         >
-          Důvěryhodnost pro klinickou praxi
+          {copy.credibilityTitle}
         </h2>
-        <p className="mt-2 max-w-3xl text-sm text-slate-600">
-          MedScopeGlobal staví odborný obsah na ověřitelných zdrojích a transparentních
-          standardech — ne na generických shrnutích.
-        </p>
+        <p className="mt-2 max-w-3xl text-sm text-slate-600">{copy.credibilityLead}</p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          {V271_LEKARI_CREDIBILITY.map((item) => {
+          {copy.cards.map((item) => {
             const Icon = BADGE_ICONS[item.badge as keyof typeof BADGE_ICONS] ?? Award;
             return (
               <article
@@ -50,13 +54,13 @@ export function V271LekariCredibilitySection() {
         </div>
 
         <p className="mt-4 text-xs text-slate-500">
-          Partnerství s ČLK: ověření evidenčního čísla pro přístup do{" "}
-          <Link href="/odborna" className="text-primary hover:underline">
-            odborné sekce
+          {copy.clkNote}{" "}
+          <Link href={copy.clkHref} className="text-primary hover:underline">
+            {copy.clkLinkLabel}
           </Link>
           .{" "}
-          <Link href="/academy/lekari" className="font-medium text-primary hover:underline">
-            Akreditované CME testy jsou k dispozici v Lékařské zóně Academy
+          <Link href={copy.cmeHref} className="font-medium text-primary hover:underline">
+            {copy.cmeLinkLabel}
           </Link>
           .
         </p>
@@ -70,11 +74,11 @@ export function V271LekariCredibilitySection() {
           id="scientific-rigor-heading"
           className="font-display text-xl font-semibold text-[#021d33]"
         >
-          {V271_SCIENTIFIC_RIGOR.headline}
+          {copy.rigorHeadline}
         </h2>
-        <p className="mt-2 text-sm text-slate-700">{V271_SCIENTIFIC_RIGOR.description}</p>
+        <p className="mt-2 text-sm text-slate-700">{copy.rigorDescription}</p>
         <div className="mt-3 flex flex-wrap gap-2">
-          {V271_SCIENTIFIC_RIGOR.identifiers.map((id) => (
+          {copy.identifiers.map((id) => (
             <span
               key={id}
               className="rounded-full border border-[#005B96]/30 bg-white px-3 py-1 text-xs font-semibold text-[#005B96]"
@@ -84,10 +88,10 @@ export function V271LekariCredibilitySection() {
           ))}
         </div>
         <Link
-          href="/studie"
+          href={copy.studiesHref}
           className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
         >
-          Prohlédnout kurátorované studie
+          {copy.studiesLabel}
           <ExternalLink className="h-3.5 w-3.5" aria-hidden />
         </Link>
       </section>
@@ -95,35 +99,35 @@ export function V271LekariCredibilitySection() {
   );
 }
 
-export function V271PhysicianTierCard() {
+export async function V271PhysicianTierCard() {
+  const locale = await getServerLocale();
+  const copy = getPhysicianHubExtrasCopy(locale);
   return (
     <section
       className="rounded-2xl border border-[#005B96] bg-white p-6 shadow-[0_12px_30px_-24px_rgba(0,91,150,0.55)]"
       aria-labelledby="physician-tier-heading"
     >
       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">
-        {V271_PHYSICIAN_TIER.tagline}
+        {copy.tierTagline}
       </p>
       <h2
         id="physician-tier-heading"
         className="mt-2 font-display text-2xl font-bold text-[#021d33]"
       >
-        {V271_PHYSICIAN_TIER.name} — {V271_PHYSICIAN_TIER.priceMonthly} Kč/měs.
+        {copy.tierName} — {copy.monthlyLine}
       </h2>
-      <p className="mt-1 text-sm text-slate-500">
-        Roční plán {V271_PHYSICIAN_TIER.priceAnnual.toLocaleString("cs-CZ")} Kč (~2 měsíce zdarma)
-      </p>
+      <p className="mt-1 text-sm text-slate-500">{copy.annualLine}</p>
       <ul className="mt-4 space-y-2 text-sm text-slate-700">
-        {V271_PHYSICIAN_TIER.valueProps.map((prop) => (
+        {copy.valueProps.map((prop) => (
           <li key={prop} className="flex gap-2">
             <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
             {prop}
           </li>
         ))}
       </ul>
-      <p className="mt-4 text-xs text-slate-500">{V271_PHYSICIAN_TIER.comparisonNote}</p>
+      <p className="mt-4 text-xs text-slate-500">{copy.comparisonNote}</p>
       <Button asChild className="mt-5 rounded-full bg-[#005B96]">
-        <Link href={V271_PHYSICIAN_TIER.ctaHref}>{V271_PHYSICIAN_TIER.ctaLabel}</Link>
+        <Link href={copy.ctaHref}>{copy.ctaLabel}</Link>
       </Button>
     </section>
   );

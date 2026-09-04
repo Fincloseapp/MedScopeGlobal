@@ -1,6 +1,7 @@
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { localizeCurrencyToken, localizeListedCzkIn } from "@/lib/i18n/payment-currency";
+import { rewriteCzechInstitutions } from "@/lib/i18n/local-regulator";
 import type { V27SubscriptionTier } from "@/lib/v27/config";
 
 export type SubscribePlanCopy = {
@@ -720,5 +721,5 @@ export function getSubscribeCopy(
   const localized = localizeListedCzkIn(COPY[key] ?? COPY.en, locale, region);
   localized.afterTrialUnit = localizeCurrencyToken(localized.afterTrialUnit, locale, region);
   localized.currencyLabel = localizeCurrencyToken(localized.currencyLabel, locale, region);
-  return localized;
+  return JSON.parse(rewriteCzechInstitutions(JSON.stringify(localized), locale)) as SubscribeCopy;
 }
