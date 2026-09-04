@@ -842,8 +842,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.21"),
-  "page cache tag must bust after student comparison €10"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.22"),
+  "page cache tag must bust after student atelier desk"
 );
 file("app/(public)/studenti/klub/page.tsx");
 file("app/(public)/studenti/zebricek/page.tsx");
@@ -852,6 +852,15 @@ file("lib/studenti/club.ts");
 assert.ok(
   readFileSync(join(root, "app/(public)/studenti/page.tsx"), "utf8").includes("/studenti/klub"),
   "student hub must link the quiz club"
+);
+assert.ok(
+  readFileSync(join(root, "components/studenti/student-studio-desk.tsx"), "utf8").includes('data-studio="desk"'),
+  "student hub must show a product desk, not only stock photos"
+);
+assert.ok(
+  readFileSync(join(root, "components/studenti/student-offer-dashboard.tsx"), "utf8").includes("Ateliér Student LF") ||
+    readFileSync(join(root, "components/studenti/student-offer-dashboard.tsx"), "utf8").includes("Atelier Student LF"),
+  "student hub copy must read as an atelier, not a discount bin"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/predplatne/page.tsx"), "utf8").includes("studentIntroCharge"),

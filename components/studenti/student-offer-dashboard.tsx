@@ -1,430 +1,486 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowRight,
-  CheckCircle2,
-  Gift,
-  GraduationCap,
-  ShieldCheck,
-} from "lucide-react";
+import { ArrowUpRight, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { V27CheckoutButton } from "@/components/v27/checkout-button";
-import { FacultyDeadlinesBoard } from "@/components/prijimacky/faculty-deadlines-board";
+import { StudentStudioDesk } from "@/components/studenti/student-studio-desk";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
-import { isCzechFacultyLocale } from "@/lib/i18n/czech-faculty-only-copy";
+import { chromePack } from "@/lib/i18n/chrome-pack";
 import {
   facultiesForLocale,
   facultyCountryLabel,
-  isCzechFacultySlug,
 } from "@/lib/prijimacky/faculties-by-country";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
-import { MAGAZINE } from "@/lib/brand/magazine";
 import {
   STUDENT_GIFT_HREF,
   studentIntroCharge,
   studentMonthlyCharge,
-  studentPriceLine,
 } from "@/lib/studenti/pricing";
 
 const PHOTO = {
-  hero: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1600&h=1100&fit=crop&q=80&auto=format",
-  study: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&h=800&fit=crop&q=80&auto=format",
-  lab: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=900&h=700&fit=crop&q=80&auto=format",
-  peers: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&h=800&fit=crop&q=80&auto=format",
-  clinic: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=900&h=700&fit=crop&q=80&auto=format",
-  books: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=900&h=700&fit=crop&q=80&auto=format",
-  parent: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&h=800&fit=crop&q=80&auto=format",
+  cover: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1800&h=1200&fit=crop&q=80&auto=format",
+  lab: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&h=900&fit=crop&q=80&auto=format",
+  notes: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&h=900&fit=crop&q=80&auto=format",
+  anatomy: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=900&h=700&fit=crop&q=80&auto=format",
 } as const;
 
-const CATEGORIES = [
+const ROOMS = [
   {
     href: "/studenti/klub",
     csHref: "/cs/studenti/klub",
     image: PHOTO.lab,
-    titleCs: "Klub kvízů B/C/F",
-    titleEn: "B/C/F quiz club",
-    bodyCs: "Osm otázek z banky přijímaček. Na tabuli jen přezdívka.",
-    bodyEn: "Eight admissions questions. Nickname on the board only.",
+    featured: true,
+    title: { cs: "Klub B/C/F", en: "B/C/F club", de: "B/C/F-Club", fr: "Club B/C/F" },
+    body: {
+      cs: "Osm otázek z banky přijímaček. Na tabuli jen přezdívka.",
+      en: "Eight admissions questions. Nickname on the board only.",
+      de: "Acht Aufnahmefragen. Nur ein Spitzname auf der Tafel.",
+      fr: "Huit questions d’admission. Surnom uniquement.",
+    },
   },
   {
     href: "/app/priprava",
     csHref: "/cs/app/priprava",
     image: APP_MARKETING_IMAGE.mediprep,
-    titleCs: "MeDiprep simulace",
-    titleEn: "MeDiprep mocks",
-    bodyCs: "1 test zdarma. Cvičení, drill i simulace podle LF.",
-    bodyEn: "1 free test. Drills and faculty-style mocks.",
+    featured: true,
+    title: { cs: "MeDiprep desk", en: "MeDiprep desk", de: "MeDiprep-Desk", fr: "Bureau MeDiprep" },
+    body: {
+      cs: "1 test zdarma. Cvičení a simulace podle požadavků LF.",
+      en: "1 free test. Drills and mocks from faculty requirements.",
+      de: "1 Test frei. Übungen nach Fakultätsanforderungen.",
+      fr: "1 test offert. Exercices selon les exigences facultaires.",
+    },
   },
   {
     href: "/academy/courses?category=prijimacky",
     csHref: "/cs/academy/courses?category=prijimacky",
-    image: PHOTO.clinic,
-    titleCs: "Academy přijímačky",
-    titleEn: "Admissions Academy",
-    bodyCs: "Biologie, chemie, fyzika — první lekce k nahlédnutí.",
-    bodyEn: "Biology, chemistry, physics — first lesson as a preview.",
+    image: PHOTO.anatomy,
+    title: { cs: "Academy", en: "Academy", de: "Academy", fr: "Academy" },
+    body: {
+      cs: "Biologie, chemie, fyzika — první lekce k nahlédnutí.",
+      en: "Biology, chemistry, physics — first lesson as a preview.",
+      de: "Biologie, Chemie, Physik — erste Lektion zum Einblick.",
+      fr: "Biologie, chimie, physique — première leçon en aperçu.",
+    },
   },
   {
     href: "/studenti/materialy",
     csHref: "/cs/studenti/materialy",
-    image: PHOTO.books,
-    titleCs: "Materiály a semestr",
-    titleEn: "Materials & semester",
-    bodyCs: "Knihovna témat, zkoušky, studijní plány.",
-    bodyEn: "Topic library, exams, study plans.",
-  },
-  {
-    href: "/studenti/hry",
-    csHref: "/cs/studenti/hry",
-    image: PHOTO.study,
-    titleCs: "Odbornost a hry",
-    titleEn: "Clinical games",
-    bodyCs: "Anatomie, fyziologie, patologie — krátké opakování.",
-    bodyEn: "Anatomy, physiology, pathology — short revision.",
+    image: PHOTO.notes,
+    title: { cs: "Materiály", en: "Materials", de: "Material", fr: "Supports" },
+    body: {
+      cs: "Témata, zkoušky, semestr — knihovna, ne skládka souborů.",
+      en: "Topics, exams, semester — a library, not a file dump.",
+      de: "Themen, Prüfungen, Semester — Bibliothek, kein Dateiordner.",
+      fr: "Sujets, examens, semestre — une bibliothèque.",
+    },
   },
   {
     href: "/studenti/ai-tutor",
     csHref: "/cs/studenti/ai-tutor",
     image: "/assets/ai/assistant-brunette.webp",
-    titleCs: "AI tutor",
-    titleEn: "AI tutor",
-    bodyCs: "Dotaz k látce, když seminář nemůže počkat.",
-    bodyEn: "Ask about a topic when a seminar cannot wait.",
+    title: { cs: "AI tutor", en: "AI tutor", de: "KI-Tutor", fr: "Tuteur IA" },
+    body: {
+      cs: "Vysvětlení látky. Nevymýšlí fakta ani slib přijetí.",
+      en: "Explains the topic. Does not invent facts or promise admission.",
+      de: "Erklärt das Thema. Erfindet keine Fakten, verspricht keine Zulassung.",
+      fr: "Explique le sujet. N’invente pas de faits, ne promet pas l’admission.",
+    },
+  },
+  {
+    href: "/studenti/hry",
+    csHref: "/cs/studenti/hry",
+    image: PHOTO.cover,
+    title: { cs: "Odbornost", en: "Revision", de: "Wiederholung", fr: "Révision" },
+    body: {
+      cs: "Krátké opakování anatomie, fyziologie, patologie.",
+      en: "Short revision of anatomy, physiology, pathology.",
+      de: "Kurze Wiederholung Anatomie, Physiologie, Pathologie.",
+      fr: "Révision courte : anatomie, physiologie, pathologie.",
+    },
   },
   {
     href: "/studenti/zebricek",
     csHref: "/cs/studenti/zebricek",
-    image: PHOTO.peers,
-    titleCs: "Žebříček přezdívek",
-    titleEn: "Nickname board",
-    bodyCs: "Jen nicky. Žádná falešná jména, žádný e-mail.",
-    bodyEn: "Nicknames only. No fake names, no email.",
+    image: PHOTO.notes,
+    title: { cs: "Žebříček", en: "Board", de: "Tafel", fr: "Tableau" },
+    body: {
+      cs: "Jen přezdívky. Žádný e-mail, žádná falešná jména.",
+      en: "Nicknames only. No email, no invented names.",
+      de: "Nur Spitznamen. Keine E-Mail, keine erfundenen Namen.",
+      fr: "Surnoms seulement. Pas d’e-mail, pas de faux noms.",
+    },
   },
   {
     href: "/studenti/chci-studovat",
     csHref: "/cs/studenti/chci-studovat",
-    image: PHOTO.hero,
-    titleCs: "Chci na medicínu",
-    titleEn: "I want medicine",
-    bodyCs: "Mapa uchazeče — self-test, fakulty, příprava.",
-    bodyEn: "Applicant map — self-test, faculties, prep.",
+    image: PHOTO.lab,
+    title: { cs: "Chci na medicínu", en: "I want medicine", de: "Ich will Medizin", fr: "Je veux la médecine" },
+    body: {
+      cs: "Self-test, fakulty, příprava — jedna osa uchazeče.",
+      en: "Self-test, faculties, prep — one applicant axis.",
+      de: "Selbsttest, Fakultäten, Vorbereitung — eine Achse.",
+      fr: "Auto-test, facultés, prépa — un seul axe.",
+    },
   },
 ] as const;
 
+type Pack = "cs" | "en" | "de" | "fr";
+
+function packOf(locale: string): Pack {
+  const key = chromePack(locale);
+  if (key === "cs" || key === "de" || key === "fr") return key;
+  return "en";
+}
+
+const COPY: Record<
+  Pack,
+  {
+    kicker: string;
+    title: [string, string];
+    lead: string;
+    open: string;
+    test: string;
+    gift: string;
+    methodKicker: string;
+    methodTitle: string;
+    method: [string, string, string][];
+    roomsKicker: string;
+    roomsTitle: string;
+    roomsLead: string;
+    facultyKicker: string;
+    facultyLead: string;
+    official: string;
+    parentKicker: string;
+    parentTitle: string;
+    parentLead: string;
+    parentCta: string;
+    footnote: string;
+  }
+> = {
+  cs: {
+    kicker: "Ateliér Student LF",
+    title: ["Jedna mapa.", "Od požadavků fakult k dennímu kvízu."],
+    lead: "Sestaveno podle oficiálních požadavků lékařských fakult, banky B/C/F a toho, co uchazeči i studenti LF opravdu otevírají. Žádné vymyšlené recenze. Přijetí neslibujeme.",
+    open: "Otevřít desk",
+    test: "Nejdřív 1 test",
+    gift: "Poslat jako dárek",
+    methodKicker: "Jak to vzniklo",
+    methodTitle: "Fakulty, pedagogika, studenti — ve stejném pořadí.",
+    method: [
+      ["01  Fakulty", "Oficiální weby škol ve vaší zemi. Termíny jen z nich — nic si nevymýšlíme.", ""],
+      ["02  Pedagogika", "Stejné předměty jako u přijímaček: biologie, chemie, fyzika. Banka B/C/F.", ""],
+      ["03  Studenti", "Desk ukazuje místnosti, které se skutečně používají — kvíz, simulace, tutor, semestr.", ""],
+    ],
+    roomsKicker: "Desk",
+    roomsTitle: "Místnosti, ne slevy.",
+    roomsLead: "Přehled toho, co otevřete po prvním testu. Kvízy MeDiprep zůstávají české B/C/F.",
+    facultyKicker: "Konzultace s weby škol",
+    facultyLead: "Stejný formát jako u českých LF. Zahraniční termíny neuvádíme odhadem.",
+    official: "Oficiální web",
+    parentKicker: "Rodiče",
+    parentTitle: "Zaplatíte. Odkaz pošlete.",
+    parentLead: "Jedna platba, jeden účet. Student ho aktivuje po přihlášení. Veřejně zůstane přezdívka. 18+ nebo se souhlasem zákonného zástupce.",
+    parentCta: "Jak odkaz funguje",
+    footnote: "Uchazeč · student LF · rodič — bez slibu přijetí.",
+  },
+  en: {
+    kicker: "Student LF atelier",
+    title: ["One map.", "From faculty requirements to the daily quiz."],
+    lead: "Built from official faculty requirements, the B/C/F bank, and the rooms applicants and faculty students actually open. No invented reviews. We do not promise admission.",
+    open: "Open the desk",
+    test: "Try 1 free test",
+    gift: "Send as a gift",
+    methodKicker: "How it was made",
+    methodTitle: "Faculties, pedagogy, students — in that order.",
+    method: [
+      ["01  Faculties", "Official school sites in your country. Dates only from them — we invent none.", ""],
+      ["02  Pedagogy", "The same subjects as admissions: biology, chemistry, physics. The B/C/F bank.", ""],
+      ["03  Students", "The desk shows rooms people actually use — quiz, mocks, tutor, semester.", ""],
+    ],
+    roomsKicker: "Desk",
+    roomsTitle: "Rooms, not coupons.",
+    roomsLead: "What you open after the free test. MeDiprep quizzes stay Czech B/C/F.",
+    facultyKicker: "Read from the school sites",
+    facultyLead: "Same format as the Czech faculties. We do not invent foreign deadlines.",
+    official: "Official site",
+    parentKicker: "Parents",
+    parentTitle: "You pay. They get the link.",
+    parentLead: "One payment, one account. The student activates it after sign-in. Public board shows a nickname. 18+ or with a guardian.",
+    parentCta: "How the link works",
+    footnote: "Applicant · faculty student · parent — no admission promise.",
+  },
+  de: {
+    kicker: "Atelier Student LF",
+    title: ["Eine Karte.", "Von Fakultätsanforderungen zum täglichen Quiz."],
+    lead: "Gebaut aus offiziellen Fakultätsanforderungen, der B/C/F-Bank und den Räumen, die Bewerber und Studierende wirklich öffnen. Keine erfundenen Rezensionen. Keine Zulassungsversprechen.",
+    open: "Desk öffnen",
+    test: "Zuerst 1 Test",
+    gift: "Als Geschenk senden",
+    methodKicker: "Wie es entstand",
+    methodTitle: "Fakultäten, Pädagogik, Studierende — in dieser Reihenfolge.",
+    method: [
+      ["01  Fakultäten", "Offizielle Hochschulseiten in Ihrem Land. Termine nur von dort.", ""],
+      ["02  Pädagogik", "Dieselben Fächer wie in der Aufnahme: Biologie, Chemie, Physik. B/C/F-Bank.", ""],
+      ["03  Studierende", "Der Desk zeigt Räume, die wirklich genutzt werden — Quiz, Simulation, Tutor, Semester.", ""],
+    ],
+    roomsKicker: "Desk",
+    roomsTitle: "Räume, keine Coupons.",
+    roomsLead: "Was nach dem freien Test offen ist. MeDiprep-Quiz bleibt tschechisches B/C/F.",
+    facultyKicker: "Von den Hochschulseiten gelesen",
+    facultyLead: "Gleiches Format wie die tschechischen Fakultäten. Keine erfundenen Auslandsfristen.",
+    official: "Offizielle Seite",
+    parentKicker: "Eltern",
+    parentTitle: "Sie zahlen. Den Link senden.",
+    parentLead: "Eine Zahlung, ein Konto. Die Studentin aktiviert ihn nach der Anmeldung. Öffentlich nur ein Spitzname. 18+ oder mit Erziehungsberechtigten.",
+    parentCta: "So funktioniert der Link",
+    footnote: "Bewerber · Fakultätsstudium · Eltern — kein Zulassungsversprechen.",
+  },
+  fr: {
+    kicker: "Atelier Student LF",
+    title: ["Une carte.", "Des exigences facultaires au quiz du jour."],
+    lead: "Construit à partir des exigences officielles des facultés, de la banque B/C/F et des salles que les candidats et les étudiants ouvrent vraiment. Pas d’avis inventés. Pas de promesse d’admission.",
+    open: "Ouvrir le bureau",
+    test: "D’abord 1 test",
+    gift: "Offrir le mois",
+    methodKicker: "Comment c’est fait",
+    methodTitle: "Facultés, pédagogie, étudiants — dans cet ordre.",
+    method: [
+      ["01  Facultés", "Sites officiels des écoles de votre pays. Dates uniquement de là.", ""],
+      ["02  Pédagogie", "Les mêmes matières qu’aux concours : biologie, chimie, physique. Banque B/C/F.", ""],
+      ["03  Étudiants", "Le bureau montre les salles vraiment utilisées — quiz, simulations, tuteur, semestre.", ""],
+    ],
+    roomsKicker: "Bureau",
+    roomsTitle: "Des salles, pas des coupons.",
+    roomsLead: "Ce que vous ouvrez après le test offert. Les quiz MeDiprep restent en B/C/F tchèque.",
+    facultyKicker: "Lu sur les sites des écoles",
+    facultyLead: "Même format que les facultés tchèques. Pas de dates étrangères inventées.",
+    official: "Site officiel",
+    parentKicker: "Parents",
+    parentTitle: "Vous payez. Ils reçoivent le lien.",
+    parentLead: "Un paiement, un compte. L’étudiant l’active après connexion. Tableau public : surnom. 18+ ou avec tuteur légal.",
+    parentCta: "Comment fonctionne le lien",
+    footnote: "Candidat · étudiant · parent — pas de promesse d’admission.",
+  },
+};
+
+function t(pack: Pack, rec: { cs: string; en: string; de: string; fr: string }) {
+  return rec[pack];
+}
+
 export function StudentOfferDashboard({ locale }: { locale: string }) {
-  const cs = isCzechFacultyLocale(locale);
+  const pack = packOf(locale);
+  const cs = pack === "cs";
+  const copy = COPY[pack];
   const intro = studentIntroCharge(locale);
   const monthly = studentMonthlyCharge(locale);
-  const productHref = (path: string, csHref: string) =>
-    cs ? localizePublicHref(path, locale) : csHref;
   const faculties = facultiesForLocale(locale);
-  const showDetail = faculties.every((f) => isCzechFacultySlug(f.slug));
+  const productHref = (path: string, csHref: string) =>
+    pack === "cs" ? localizePublicHref(path, locale) : csHref;
+  const featured = ROOMS.filter((r) => "featured" in r && r.featured);
+  const rest = ROOMS.filter((r) => !("featured" in r && r.featured));
 
   return (
-    <div className="space-y-14">
-      <section className="relative overflow-hidden rounded-[2rem] bg-[#021d33] text-white shadow-[0_40px_80px_-40px_rgba(2,29,51,0.65)]">
+    <div className="overflow-hidden bg-[#f3eee6] text-[#1b1712]">
+      <section className="relative isolate overflow-hidden bg-[#14110e] text-[#f6f1e8]">
         <Image
-          src={PHOTO.hero}
-          alt={cs ? "Příprava na lékařskou fakultu" : "Preparing for medical school"}
+          src={PHOTO.cover}
+          alt=""
           fill
           priority
-          className="object-cover opacity-35"
-          sizes="(max-width: 1024px) 100vw, 1100px"
+          className="object-cover opacity-[0.18]"
+          sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#021d33] via-[#021d33]/88 to-[#021d33]/35" />
-        <div className="relative grid gap-10 px-6 py-12 sm:px-10 lg:grid-cols-[1.15fr_0.85fr] lg:py-16">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#14110e] via-[#14110e]/92 to-[#14110e]/70" />
+        <div className="relative mx-auto grid max-w-7xl gap-12 px-5 py-14 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-20">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#d4af37]">
-              {cs ? "Student LF · ViaLongeVita" : "Student plan · ViaLongeVita"}
+            <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#c6a15b]">
+              {copy.kicker}
             </p>
-            <h2 className="mt-4 max-w-xl font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl">
-              {cs ? (
-                <>
-                  Příprava, která vypadá
-                  <span className="mt-1 block text-[#9fd4ff]">jako studium — ne jako sleva.</span>
-                </>
-              ) : (
-                <>
-                  Prep that looks like
-                  <span className="mt-1 block text-[#9fd4ff]">study — not a discount bin.</span>
-                </>
-              )}
-            </h2>
-            <p className="mt-5 max-w-lg text-base leading-7 text-sky-100/90">
-              {cs
-                ? "Sestaveno podle oficiálních požadavků lékařských fakult a banky B/C/F. 1 test zdarma. Dnes 89 Kč, další měsíc 149 Kč. V EU 10 €. Zrušíte kdykoli. Přijetí nepředstíráme."
-                : "Built from official faculty requirements and the B/C/F bank. 1 free test. Intro month, then the regular month (€10 in EU editions). Cancel anytime. We do not promise admission."}
+            <h1 className="mt-5 max-w-xl font-display text-[2.6rem] font-semibold leading-[1.05] tracking-tight sm:text-6xl">
+              {copy.title[0]}
+              <span className="mt-2 block font-normal text-[#e7d3a4]">{copy.title[1]}</span>
+            </h1>
+            <p className="mt-6 max-w-lg text-[15px] leading-7 text-[#d8d0c4]">{copy.lead}</p>
+            <p className="mt-4 font-mono text-[12px] tracking-wide text-[#c6a15b]">
+              1 · {intro.formatted} · {monthly.formatted}
             </p>
-            <p className="mt-3 text-sm font-medium text-[#d4af37]">{studentPriceLine(locale)}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <V27CheckoutButton
                 kind="subscription"
                 productId="student-month"
                 locale={locale}
-                label={cs ? `Otevřít měsíc · ${intro.formatted}` : `Open the month · ${intro.formatted}`}
-                className="rounded-full bg-white px-6 text-[#021d33] hover:bg-sky-50"
+                label={`${copy.open} · ${intro.formatted}`}
+                className="rounded-full bg-[#f6f1e8] px-6 text-[#14110e] hover:bg-white"
               />
+              <Button
+                asChild
+                variant="ghost"
+                className="rounded-full text-[#f6f1e8] hover:bg-white/10 hover:text-white"
+              >
+                <Link href={productHref("/app/priprava", "/cs/app/priprava")}>
+                  {copy.test}
+                  <ArrowUpRight className="ml-1 h-4 w-4" />
+                </Link>
+              </Button>
               <V27CheckoutButton
                 kind="subscription"
                 productId="student-month"
                 locale={locale}
                 gift
-                label={cs ? "Koupit jako dárek" : "Buy as a gift"}
-                className="rounded-full border border-white/35 bg-transparent px-6 text-white hover:bg-white/10"
-              />
-              <Button asChild variant="ghost" className="rounded-full text-sky-100 hover:bg-white/10 hover:text-white">
-                <Link href={productHref("/app/priprava", "/cs/app/priprava")}>
-                  {cs ? "Nejdřív 1 test" : "Try 1 free test"}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-          <div className="relative hidden min-h-[320px] lg:block">
-            <div className="absolute right-0 top-0 h-[78%] w-[78%] overflow-hidden rounded-[1.6rem] border border-white/15 shadow-2xl">
-              <Image
-                src={PHOTO.study}
-                alt=""
-                fill
-                className="object-cover"
-                sizes="420px"
-              />
-            </div>
-            <div className="absolute bottom-0 left-0 h-[58%] w-[48%] overflow-hidden rounded-[1.4rem] border border-white/20 shadow-2xl">
-              <Image
-                src={APP_MARKETING_IMAGE.mediprep}
-                alt="MeDiprep"
-                fill
-                className="object-cover object-top"
-                sizes="240px"
+                label={copy.gift}
+                className="rounded-full border border-white/20 bg-transparent px-5 text-[#f6f1e8] hover:bg-white/10"
               />
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="grid gap-3 sm:grid-cols-3">
-        {(cs
-          ? [
-              ["B/C/F", "Stejné předměty jako u českých přijímaček"],
-              ["Oficiální fakulty", "Odkazy na weby škol ve vaší zemi — termíny jen z nich"],
-              ["Bez hry na drahé", `${intro.formatted} dnes · ${monthly.formatted} dál · zrušíte kdykoli`],
-            ]
-          : [
-              ["B/C/F", "The same science subjects as Czech admissions"],
-              ["Official faculties", "School sites in your country — dates only from them"],
-              ["Priced like one lesson", `${intro.formatted} today · then ${monthly.formatted} · cancel anytime`],
-            ]
-        ).map(([title, body]) => (
-          <div
-            key={title}
-            className="rounded-2xl border border-[#d7e6f3] bg-white px-5 py-4 shadow-[0_16px_40px_-28px_rgba(2,29,51,0.35)]"
-          >
-            <p className="font-display text-lg font-semibold text-[#021d33]">{title}</p>
-            <p className="mt-1 text-sm leading-relaxed text-slate-600">{body}</p>
-          </div>
-        ))}
-      </section>
-
-      <section>
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
-              {cs ? "Mapa místností" : "Room map"}
-            </p>
-            <h3 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
-              {cs ? "Vše, co student opravdu otevře" : "Everything a student actually opens"}
-            </h3>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
-              {cs
-                ? "Přehled kategorií — ne seznam slev. Kvízy MeDiprep jsou české B/C/F. Fakulty níže jsou oficiální odkazy vaší země."
-                : "A map of rooms — not a coupon list. MeDiprep quizzes are Czech B/C/F. Faculties below are official links in your country."}
-            </p>
-          </div>
-          <Image
-            src={MAGAZINE.emailLockup}
-            alt={MAGAZINE.name}
-            width={220}
-            height={62}
-            className="h-10 w-auto object-contain opacity-80"
+          <StudentStudioDesk
+            cs={cs}
+            faculties={faculties}
+            introLabel={intro.formatted}
+            monthlyLabel={monthly.formatted}
           />
         </div>
-        <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {CATEGORIES.map((item) => (
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#8a6d32]">
+          {copy.methodKicker}
+        </p>
+        <h2 className="mt-3 max-w-3xl font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+          {copy.methodTitle}
+        </h2>
+        <div className="mt-10 grid gap-10 md:grid-cols-3">
+          {copy.method.map(([title, body]) => (
+            <div key={title} className="border-t border-[#1b1712]/15 pt-5">
+              <p className="font-display text-xl">{title}</p>
+              <p className="mt-3 text-sm leading-7 text-[#5c564c]">{body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 pb-6 sm:px-8">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#8a6d32]">
+          {copy.roomsKicker}
+        </p>
+        <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+          {copy.roomsTitle}
+        </h2>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-[#5c564c]">{copy.roomsLead}</p>
+
+        <div className="mt-8 grid gap-4 lg:grid-cols-2">
+          {featured.map((item) => (
             <Link
               key={item.href}
               href={productHref(item.href, item.csHref)}
-              className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_18px_40px_-32px_rgba(2,29,51,0.45)] transition hover:-translate-y-0.5 hover:border-[#005B96]/35"
+              className="group relative min-h-[280px] overflow-hidden rounded-[1.6rem] bg-[#14110e] text-[#f6f1e8]"
             >
-              <div className="relative aspect-[5/3] overflow-hidden bg-[#0a2a44]">
+              <Image
+                src={item.image}
+                alt=""
+                fill
+                className="object-cover opacity-55 transition duration-700 group-hover:scale-[1.03] group-hover:opacity-65"
+                sizes="(max-width: 1024px) 100vw, 560px"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#14110e] via-[#14110e]/35 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-6">
+                <p className="font-display text-3xl">{t(pack, item.title)}</p>
+                <p className="mt-2 max-w-md text-sm leading-6 text-[#ddd4c6]">{t(pack, item.body)}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {rest.map((item, index) => (
+            <Link
+              key={item.href}
+              href={productHref(item.href, item.csHref)}
+              className="group overflow-hidden rounded-[1.3rem] border border-[#1b1712]/10 bg-[#faf7f1]"
+            >
+              <div className="relative aspect-[16/9] overflow-hidden bg-[#14110e]">
                 <Image
                   src={item.image}
                   alt=""
                   fill
-                  className="object-cover transition duration-500 group-hover:scale-[1.04]"
-                  sizes="(max-width: 640px) 100vw, 280px"
+                  className="object-cover transition duration-700 group-hover:scale-[1.04]"
+                  sizes="(max-width: 640px) 100vw, 320px"
                 />
               </div>
               <div className="px-4 py-4">
-                <p className="font-display text-lg font-semibold text-[#021d33]">
-                  {cs ? item.titleCs : item.titleEn}
+                <p className="font-mono text-[10px] tracking-[0.2em] text-[#8a6d32]">
+                  {String(index + 3).padStart(2, "0")}
                 </p>
-                <p className="mt-1 text-xs leading-relaxed text-slate-500">
-                  {cs ? item.bodyCs : item.bodyEn}
-                </p>
+                <p className="mt-1 font-display text-xl">{t(pack, item.title)}</p>
+                <p className="mt-1 text-sm leading-6 text-[#5c564c]">{t(pack, item.body)}</p>
               </div>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-[2rem] border border-[#cfe1f3] bg-[#f4f8fc]">
-        <div className="grid lg:grid-cols-2">
-          <div className="relative min-h-[280px]">
-            <Image
-              src={PHOTO.peers}
-              alt={cs ? "Studenti u přípravy" : "Students preparing"}
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 560px"
-            />
-          </div>
-          <div className="flex flex-col justify-center px-6 py-10 sm:px-10">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
-              {cs ? "Cena jako jedno doučování" : "Priced like one tutoring hour"}
+      <section className="mx-auto max-w-7xl px-5 py-12 sm:px-8">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#8a6d32]">
+              {copy.facultyKicker}
             </p>
-            <div className="mt-5 flex flex-wrap items-end gap-8">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-slate-500">
-                  {cs ? "Dnes / po testu" : "Today / after the test"}
-                </p>
-                <p className="font-display text-5xl font-bold tracking-tight text-[#005B96]">
-                  {intro.formatted}
-                </p>
-              </div>
-              <ArrowRight className="mb-3 h-6 w-6 text-slate-300" aria-hidden />
-              <div>
-                <p className="text-xs uppercase tracking-wide text-slate-500">
-                  {cs ? "Další měsíc" : "Following months"}
-                </p>
-                <p className="font-display text-5xl font-bold tracking-tight text-[#021d33]">
-                  {monthly.formatted}
-                </p>
-              </div>
-            </div>
-            <ul className="mt-6 space-y-2">
-              {(cs
-                ? [
-                    "Zrušení kdykoli v účtu / Stripe",
-                    "18+ nebo koupě rodičem s předáním odkazu",
-                    "Veřejný žebříček jen s přezdívkou",
-                  ]
-                : [
-                    "Cancel anytime in your account / Stripe",
-                    "18+ or a parent purchase that forwards the link",
-                    "Public board shows a nickname only",
-                  ]
-              ).map((line) => (
-                <li key={line} className="flex items-start gap-2 text-sm text-slate-600">
-                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#005B96]" aria-hidden />
-                  {line}
-                </li>
-              ))}
-            </ul>
+            <h2 className="mt-2 font-display text-3xl font-semibold">{facultyCountryLabel(locale)}</h2>
+            <p className="mt-2 max-w-xl text-sm leading-7 text-[#5c564c]">{copy.facultyLead}</p>
           </div>
         </div>
+        <ul className="mt-8 divide-y divide-[#1b1712]/10 border-y border-[#1b1712]/10">
+          {faculties.map((f) => (
+            <li key={f.slug}>
+              <a
+                href={f.applicationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-wrap items-baseline justify-between gap-2 py-3.5 text-[#1b1712] no-underline transition hover:text-[#8a6d32]"
+              >
+                <span className="font-display text-lg">{f.shortName}</span>
+                <span className="text-sm text-[#5c564c]">{f.city}</span>
+                <span className="ml-auto text-xs uppercase tracking-[0.16em] text-[#8a6d32]">
+                  {copy.official}
+                  <ArrowUpRight className="ml-1 inline h-3 w-3" />
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </section>
-
-      <FacultyDeadlinesBoard
-        compact
-        faculties={faculties}
-        showFacultyDetail={showDetail}
-        cycleLabel={facultyCountryLabel(locale)}
-        title={
-          cs
-            ? `Oficiální weby — ${facultyCountryLabel(locale)}`
-            : `Official sites — ${facultyCountryLabel(locale)}`
-        }
-        lead={
-          cs
-            ? "Stejný formát jako u českých LF. Zahraniční termíny neuvádíme odhadem — vždy ověřte na webu fakulty."
-            : "Same format as the Czech faculties. We do not invent foreign deadlines — always verify on the faculty site."
-        }
-      />
 
       <section
         id="pro-rodice"
-        className="scroll-mt-24 overflow-hidden rounded-[2rem] border border-[#cfe1f3] bg-white"
+        className="mx-auto max-w-7xl scroll-mt-24 px-5 pb-16 sm:px-8"
       >
-        <div className="grid lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="relative min-h-[260px]">
-            <Image
-              src={PHOTO.parent}
-              alt={cs ? "Příprava, kterou může koupit i rodič" : "Prep a parent can buy"}
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 480px"
-            />
+        <div className="grid gap-10 border-t border-[#1b1712]/15 pt-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#8a6d32]">
+              {copy.parentKicker}
+            </p>
+            <h2 className="mt-3 font-display text-3xl font-semibold">{copy.parentTitle}</h2>
+            <p className="mt-3 max-w-xl text-sm leading-7 text-[#5c564c]">{copy.parentLead}</p>
           </div>
-          <div className="px-6 py-10 sm:px-10">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
-              {cs ? "Pro rodiče" : "For parents"}
-            </p>
-            <h3 className="mt-3 font-display text-3xl font-semibold text-[#021d33]">
-              {cs ? "Zaplatíte vy. Odkaz pošlete." : "You pay. They get the link."}
-            </h3>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-600">
-              {cs
-                ? "První měsíc 89 Kč, další 149 Kč. Po platbě vznikne odkaz. Student ho otevře, přihlásí se a aktivuje přístup. Jedna platba = jeden účet. Není to přijímací řízení."
-                : "Intro month, then the regular month. Payment creates a link. The student signs in and activates access. One payment = one account. This is not an admissions exam."}
-            </p>
-            <ul className="mt-5 grid gap-2 sm:grid-cols-2">
-              {(cs
-                ? [
-                    "Odkaz po platbě — žádný druhý nákup",
-                    "Zrušení kdykoli",
-                    "Veřejně jen přezdívka",
-                    "Nejdřív 1 test zdarma",
-                  ]
-                : [
-                    "Link after payment — no second checkout",
-                    "Cancel anytime",
-                    "Public nickname only",
-                    "1 free test first",
-                  ]
-              ).map((line) => (
-                <li key={line} className="flex items-start gap-2 text-sm text-slate-700">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#005B96]" aria-hidden />
-                  {line}
-                </li>
-              ))}
-            </ul>
-            <div className="mt-7 flex flex-wrap gap-2">
-              <V27CheckoutButton
-                kind="subscription"
-                productId="student-month"
-                locale={locale}
-                gift
-                label={cs ? "Zaplatit dárek" : "Pay for the gift"}
-                className="rounded-full bg-[#005B96] px-6 text-white"
-              />
-              <Button asChild variant="outline" className="rounded-full">
-                <Link href={localizePublicHref(STUDENT_GIFT_HREF, locale)}>
-                  <Gift className="mr-2 h-4 w-4" />
-                  {cs ? "Jak odkaz funguje" : "How the link works"}
-                </Link>
-              </Button>
-            </div>
+          <div className="flex flex-wrap gap-3 lg:justify-end">
+            <V27CheckoutButton
+              kind="subscription"
+              productId="student-month"
+              locale={locale}
+              gift
+              label={`${copy.gift} · ${intro.formatted}`}
+              className="rounded-full bg-[#14110e] px-6 text-[#f6f1e8] hover:bg-black"
+            />
+            <Button asChild variant="outline" className="rounded-full border-[#1b1712]/20">
+              <Link href={localizePublicHref(STUDENT_GIFT_HREF, locale)}>
+                <Gift className="mr-2 h-4 w-4" />
+                {copy.parentCta}
+              </Link>
+            </Button>
           </div>
         </div>
+        <p className="mt-10 text-center text-xs tracking-wide text-[#8a8377]">{copy.footnote}</p>
       </section>
-
-      <p className="flex items-center justify-center gap-2 text-center text-xs text-slate-500">
-        <GraduationCap className="h-3.5 w-3.5" aria-hidden />
-        {cs
-          ? "Uchazeč · student LF · rodič — bez vymyšlených recenzí a bez slibu přijetí."
-          : "Applicant · faculty student · parent — no invented reviews, no admission promise."}
-      </p>
     </div>
   );
 }
