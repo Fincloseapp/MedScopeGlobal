@@ -143,10 +143,10 @@ export function StudentClubBoard({
       <section className="rounded-2xl border border-slate-200 bg-white p-5">
         {!playing ? (
           <>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#005B96]">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8a6d32]">
               Soutěžní kvíz
             </p>
-            <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">
+            <h2 className="mt-2 font-display text-2xl font-semibold text-[#1b1712]">
               {canPlay ? "Další kolo z banky přijímaček" : "Volný test je vyčerpaný — 89 Kč, pak 149 Kč"}
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-slate-600">
@@ -160,7 +160,7 @@ export function StudentClubBoard({
             </p>
             {!signedIn ? (
               <p className="mt-2 text-xs text-slate-500">
-                Po <Link href="/login" className="font-semibold text-[#005B96] hover:underline">přihlášení</Link>{" "}
+                Po <Link href="/login" className="font-semibold text-[#8a6d32] hover:underline">přihlášení</Link>{" "}
                 se e-mail předvyplní a zaplacené členství odemkne neomezená kola.
               </p>
             ) : null}
@@ -172,7 +172,7 @@ export function StudentClubBoard({
                   onClick={() => setSubject(item.id)}
                   className={
                     subject === item.id
-                      ? "rounded-full bg-[#005B96] px-3 py-1 text-xs font-semibold text-white"
+                      ? "rounded-full bg-[#1b1712] px-3 py-1 text-xs font-semibold text-[#f6f1e8]"
                       : "rounded-full border border-slate-200 px-3 py-1 text-xs text-slate-600"
                   }
                 >
@@ -207,7 +207,7 @@ export function StudentClubBoard({
                 type="button"
                 disabled={!signed || !canPlay}
                 onClick={startRun}
-                className="rounded-full bg-[#005B96] px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                className="rounded-full bg-[#1b1712] px-5 py-2 text-sm font-semibold text-[#f6f1e8] disabled:opacity-50"
               >
                 Spustit kolo
               </button>
@@ -216,7 +216,7 @@ export function StudentClubBoard({
                   kind="subscription"
                   productId="student-month"
                   label={`Klub · 89 Kč teď, pak ${STUDENT_CLUB_PRICE_CZK} Kč`}
-                  className="rounded-full border border-[#005B96]/30 bg-white px-5 py-2 text-sm font-semibold text-[#005B96]"
+                  className="rounded-full border border-[#8a6d32]/40 bg-white px-5 py-2 text-sm font-semibold text-[#8a6d32]"
                 />
               ) : null}
             </div>
@@ -255,11 +255,11 @@ export function StudentClubBoard({
           </>
         ) : (
           <>
-            <h2 className="font-display text-xl font-semibold text-[#021d33]">{quiz.title}</h2>
+            <h2 className="font-display text-xl font-semibold text-[#1b1712]">{quiz.title}</h2>
             <ol className="mt-4 space-y-4">
               {quiz.questions.map((q, qi) => (
                 <li key={q.id} className="rounded-xl border border-slate-100 p-3">
-                  <p className="text-sm font-medium text-[#021d33]">{q.question_text}</p>
+                  <p className="text-sm font-medium text-[#1b1712]">{q.question_text}</p>
                   <div className="mt-2 grid gap-1">
                     {q.options.map((opt, oi) => (
                       <label key={opt} className="flex items-center gap-2 text-sm text-slate-700">
@@ -285,16 +285,16 @@ export function StudentClubBoard({
             <button
               type="button"
               onClick={finishRun}
-              className="mt-4 rounded-full bg-[#005B96] px-5 py-2 text-sm font-semibold text-white"
+              className="mt-4 rounded-full bg-[#1b1712] px-5 py-2 text-sm font-semibold text-[#f6f1e8]"
             >
               Odevzdat kolo
             </button>
           </>
         )}
       </section>
-      <aside className="rounded-2xl border border-[#cfe1f3] bg-[#f8fbff] p-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#005B96]">Žebříček</p>
-        <h3 className="mt-1 font-display text-lg font-semibold text-[#021d33]">Nejlepší nicky</h3>
+      <aside className="rounded-2xl border border-[#1b1712]/12 bg-[#f6f1e8] p-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8a6d32]">Žebříček</p>
+        <h3 className="mt-1 font-display text-lg font-semibold text-[#1b1712]">Nejlepší nicky</h3>
         <p className="mt-1 text-xs text-slate-500">Jen přezdívky z tohoto zařízení. Žádná falešná jména.</p>
         {board.length ? (
           <ol className="mt-3 space-y-2">
@@ -303,7 +303,7 @@ export function StudentClubBoard({
                 <span>
                   {i + 1}. {row.nick}
                 </span>
-                <span className="font-semibold text-[#005B96]">
+                <span className="font-semibold text-[#8a6d32]">
                   {row.score}/{row.total}
                 </span>
               </li>
@@ -312,7 +312,7 @@ export function StudentClubBoard({
         ) : (
           <p className="mt-3 text-sm text-slate-500">Po prvním odevzdaném kole se tu objeví váš nick.</p>
         )}
-        <Link href="/studenti/zebricek" className="mt-4 inline-block text-sm font-semibold text-[#005B96] hover:underline">
+        <Link href="/studenti/zebricek" className="mt-4 inline-block text-sm font-semibold text-[#8a6d32] hover:underline">
           Celý žebříček →
         </Link>
       </aside>

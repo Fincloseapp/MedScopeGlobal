@@ -35,8 +35,8 @@ export function GiftRedeemPanel({ sessionId, locale }: { sessionId: string; loca
   const share = typeof window !== "undefined" ? window.location.href : "";
 
   return (
-    <div className="mt-8 rounded-2xl border border-[#cfe1f3] bg-[#f8fbff] p-5">
-      <p className="text-sm font-medium text-[#021d33]">
+    <div className="mt-8 rounded-2xl border border-[#1b1712]/12 bg-[#f6f1e8] p-5">
+      <p className="text-sm font-medium text-[#1b1712]">
         {cs ? "Aktivační odkaz je připravený" : "The activation link is ready"}
       </p>
       <p className="mt-1 text-xs text-slate-500">
@@ -52,7 +52,7 @@ export function GiftRedeemPanel({ sessionId, locale }: { sessionId: string; loca
           type="button"
           onClick={() => void redeem()}
           disabled={status === "loading" || status === "ok"}
-          className="rounded-full bg-[#005B96] px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="rounded-full bg-[#1b1712] px-5 py-2 text-sm font-semibold text-[#f6f1e8] disabled:opacity-50"
         >
           {status === "ok" ? (cs ? "Aktivováno" : "Activated") : cs ? "Aktivovat na tomto účtu" : "Activate on this account"}
         </button>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ModulePageShell } from "@/components/b2b/module-page-shell";
+import { StudentAtelierShell, atelierGhostLink } from "@/components/studenti/student-atelier-shell";
 import { MaterialTextReader } from "@/components/studenti/material-text-reader";
 import { getCachedMaterialText } from "@/lib/studenti/material-text";
 import { getStudentMaterialById, toPublicMaterial } from "@/lib/studenti/materials";
@@ -39,30 +39,18 @@ export default async function MaterialReadPage({ params }: Props) {
   const content = await getCachedMaterialText(id);
 
   return (
-    <ModulePageShell
-      eyebrow="Pro studenty"
-      title="Studijní materiály"
-      description="Čtení studijních materiálů — textový režim pro pohodlné studium."
-      ctaHref="/studenti/materialy"
-      ctaLabel="Zpět na přehled"
+    <StudentAtelierShell
+      current="/studenti/materialy"
+      kicker="Ateliér · Čtení"
+      title={pub.display_title}
+      lead={`${pub.subject} — textový režim pro pohodlné studium. Doplněk ke skriptům z fakulty.`}
+      actions={
+        <Link href="/studenti/materialy" className={atelierGhostLink()}>
+          Zpět na přehled
+        </Link>
+      }
     >
-      <nav className="mb-6 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground">
-          Domů
-        </Link>
-        <span className="mx-2">/</span>
-        <Link href="/studenti" className="hover:text-foreground">
-          Studenti
-        </Link>
-        <span className="mx-2">/</span>
-        <Link href="/studenti/materialy" className="hover:text-foreground">
-          Studijní materiály
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="line-clamp-1">{pub.display_title}</span>
-      </nav>
-
       <MaterialTextReader material={pub} content={content} />
-    </ModulePageShell>
+    </StudentAtelierShell>
   );
 }

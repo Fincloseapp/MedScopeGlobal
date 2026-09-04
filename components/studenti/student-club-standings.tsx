@@ -33,12 +33,12 @@ export function StudentClubStandings({ limit = 20 }: { limit?: number }) {
   if (rows.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm text-slate-600">
-        <p className="font-semibold text-[#021d33]">Zatím tu nikdo není</p>
+        <p className="font-semibold text-[#1b1712]">Zatím tu nikdo není</p>
         <p className="mt-2">
           Žebříček ukazuje jen přezdívky z tohoto zařízení — žádná vymyšlená jména. Po prvním
           odevzdaném kole se tu objeví váš nick.
         </p>
-        <Link href={STUDENT_CLUB_HREF} className="mt-3 inline-block font-semibold text-[#005B96] hover:underline">
+        <Link href={STUDENT_CLUB_HREF} className="mt-3 inline-block font-semibold text-[#8a6d32] hover:underline">
           Spustit první kolo →
         </Link>
       </div>
@@ -51,9 +51,9 @@ export function StudentClubStandings({ limit = 20 }: { limit?: number }) {
         <li key={`${row.nick}-${row.at}`} className="flex items-center justify-between gap-3 px-4 py-3">
           <span className="min-w-0">
             <span className="mr-2 text-xs font-semibold text-slate-400">{index + 1}.</span>
-            <span className="font-medium text-[#021d33]">{row.nick}</span>
+            <span className="font-medium text-[#1b1712]">{row.nick}</span>
           </span>
-          <span className="shrink-0 text-sm font-semibold text-[#005B96]">
+          <span className="shrink-0 text-sm font-semibold text-[#8a6d32]">
             {row.score}/{row.total}
           </span>
         </li>

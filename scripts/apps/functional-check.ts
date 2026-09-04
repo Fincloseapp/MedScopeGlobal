@@ -842,8 +842,27 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.24"),
-  "page cache tag must bust after student header SSR path"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.25"),
+  "page cache tag must bust after student room atelier shell"
+);
+assert.ok(
+  readFileSync(join(root, "components/studenti/student-atelier-shell.tsx"), "utf8").includes("bg-[#f3eee6]"),
+  "student rooms must share the atelier paper shell"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/studenti/testy/page.tsx"), "utf8").includes("StudentAtelierShell") &&
+    readFileSync(join(root, "app/(public)/studenti/hry/page.tsx"), "utf8").includes("StudentAtelierShell") &&
+    readFileSync(join(root, "app/(public)/studenti/materialy/page.tsx"), "utf8").includes("StudentAtelierShell") &&
+    readFileSync(join(root, "app/(public)/studenti/ai-tutor/page.tsx"), "utf8").includes("StudentAtelierShell") &&
+    readFileSync(join(root, "app/(public)/studenti/zebricek/page.tsx"), "utf8").includes("StudentAtelierShell") &&
+    readFileSync(join(root, "app/(public)/studenti/leky/page.tsx"), "utf8").includes("StudentAtelierShell") &&
+    readFileSync(join(root, "app/(public)/studenti/zkousky/page.tsx"), "utf8").includes("StudentAtelierShell") &&
+    readFileSync(join(root, "components/academy/prep-value-proposition.tsx"), "utf8").includes("StudentAtelierShell"),
+  "student rooms after the hub must stay in the atelier, not drop into blue SaaS chrome"
+);
+assert.ok(
+  !readFileSync(join(root, "app/(public)/studenti/hry/page.tsx"), "utf8").includes("5 zdarma"),
+  "games room must not advertise a 5-free-then-149 pack"
 );
 file("app/(public)/studenti/klub/page.tsx");
 file("app/(public)/studenti/zebricek/page.tsx");

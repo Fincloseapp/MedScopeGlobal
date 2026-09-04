@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { ModulePageShell } from "@/components/b2b/module-page-shell";
+import {
+  StudentAtelierShell,
+  atelierGhostLink,
+  atelierPrimaryLink,
+} from "@/components/studenti/student-atelier-shell";
 import { StudentMaterialsBrowser } from "@/components/studenti/materials-browser";
-import { Button } from "@/components/ui/button";
 import {
   computeMaterialsStats,
   listStudentMaterialSubjects,
@@ -16,11 +19,11 @@ export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   return await buildLocalizedV20PageMetadata({
-  title: "Studijní materiály | MedScopeGlobal",
-  description:
-    "Kurátorovaná knihovna studijních materiálů pro studenty medicíny — vyhledávání podle ročníku, oboru a názvu. Čtení online v prohlížeči.",
-  path: "/studenti/materialy",
-});
+    title: "Studijní materiály | MedScopeGlobal",
+    description:
+      "Kurátorovaná knihovna studijních materiálů pro studenty medicíny — vyhledávání podle ročníku, oboru a názvu. Čtení online v prohlížeči.",
+    path: "/studenti/materialy",
+  });
 }
 
 export default async function StudentiMaterialyPage() {
@@ -32,52 +35,37 @@ export default async function StudentiMaterialyPage() {
   const stats = computeMaterialsStats(listItems, total);
 
   return (
-    <ModulePageShell
-      eyebrow="Pro studenty"
+    <StudentAtelierShell
+      current="/studenti/materialy"
+      kicker="Ateliér · Materiály"
       title="Studijní materiály"
-      description="Kurátorovaná knihovna studijních materiálů — vyhledávání podle ročníku, oboru a názvu. Materiály lze číst online v prohlížeči."
-      ctaHref="/studenti"
-      ctaLabel="Zpět na studentskou sekci"
+      lead="Kurátorovaná knihovna studijních materiálů — vyhledávání podle ročníku, oboru a názvu. Materiály lze číst online v prohlížeči."
+      actions={
+        <Link href="/studenti" className={atelierGhostLink()}>
+          Zpět na studentskou sekci
+        </Link>
+      }
     >
-      <nav className="mb-6 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground">
-          Domů
-        </Link>
-        <span className="mx-2">/</span>
-        <Link href="/studenti" className="hover:text-foreground">
-          Studenti
-        </Link>
-        <span className="mx-2">/</span>
-        <span>Studijní materiály</span>
-      </nav>
-
       <StudentMaterialsBrowser materials={listItems} subjects={subjects} stats={stats} />
 
-      <section className="mt-10 rounded-2xl border border-[#cfe1f3] bg-[#f0f7ff]/70 p-5 sm:p-6">
-        <h2 className="font-display text-lg font-semibold text-[#021d33]">
+      <section className="mt-10 border-t border-[#1b1712]/10 pt-8">
+        <h2 className="font-display text-lg font-semibold text-[#1b1712]">
           Potřebujete víc než ochutnávku?
         </h2>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#5c564c]">
           Free vrstva stačí na orientaci. Studentské předplatné odemyká AI tutor a celou Academy —
-          vhodné při pravidelném opakování během semestru.
+          1 test zdarma, první měsíc 89 Kč, další 149 Kč.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
-          <Button asChild className="rounded-full bg-[#005B96]">
-            <Link
-              href="/predplatne#student"
-              data-cta="materialy-student"
-            >
-              89 Kč první měsíc
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="rounded-full">
-            <Link href="/studenti/ai-tutor" data-cta="materialy-ai-tutor">
-              AI tutor
-            </Link>
-          </Button>
+          <Link href="/predplatne#student" data-cta="materialy-student" className={atelierPrimaryLink()}>
+            89 Kč první měsíc
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+          <Link href="/studenti/ai-tutor" data-cta="materialy-ai-tutor" className={atelierGhostLink()}>
+            AI tutor
+          </Link>
         </div>
       </section>
-    </ModulePageShell>
+    </StudentAtelierShell>
   );
 }
