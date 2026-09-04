@@ -3,7 +3,7 @@ import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
 import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-audit";
 import { filterActiveArticles } from "@/lib/v20/content-rules";
-import { pinHomepageDesks } from "@/lib/v271/news-desks";
+import { pinHomepageDesks, prependUniqueArticles } from "@/lib/v271/news-desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import { normalizeLocale } from "@/lib/i18n/config";
@@ -61,12 +61,21 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     );
   }
 
-  const { data, error } = await supabase
-    .from("articles")
-    .select(articleSelect)
-    .eq("published", true)
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(160);
+  const [{ data, error }, section] = await Promise.all([
+    supabase
+      .from("articles")
+      .select(articleSelect)
+      .eq("published", true)
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(160),
+    supabase
+      .from("articles")
+      .select(articleSelect)
+      .eq("published", true)
+      .eq("metadata->>section", "aktuální-zprávy")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(24),
+  ]);
 
   if (error) {
     console.error("loadArticlesPublic", error);
@@ -77,7 +86,10 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     );
   }
 
-  const mapped = mapArticleList(data as Record<string, unknown>[] | null);
+  const mapped = prependUniqueArticles(
+    mapArticleList((section.data ?? []) as Record<string, unknown>[]),
+    mapArticleList(data as Record<string, unknown>[] | null)
+  );
   const localeKey = normalizeLocale(locale);
   const active = filterArticlesForLocale(
     filterActiveArticles(mapped),
@@ -125,7 +137,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageData(locale),
-    ["v22-homepage-public-v21-related-borrow", locale, day],
+    ["v22-homepage-public-v21-related-borrow-v23-17-news-section", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

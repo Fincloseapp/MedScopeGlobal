@@ -296,6 +296,22 @@ export function pinLongevityIntoFeed(
   return pinHomepageDesks(articles, limit, locale);
 }
 
+/** Prefer section news, then the recency pool — one slug once. */
+export function prependUniqueArticles(
+  preferred: DisplayArticle[],
+  rest: DisplayArticle[]
+): DisplayArticle[] {
+  const used = new Set<string>();
+  const out: DisplayArticle[] = [];
+  for (const article of [...preferred, ...rest]) {
+    const key = articlePageKey(article);
+    if (!key || used.has(key)) continue;
+    used.add(key);
+    out.push(article);
+  }
+  return out;
+}
+
 /** Reserve news + longevity so Aktuality is never starved by lifestyle cards. */
 export function pinHomepageDesks(
   articles: DisplayArticle[],

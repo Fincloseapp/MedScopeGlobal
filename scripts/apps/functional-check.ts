@@ -152,6 +152,7 @@ import {
   isProfessionalAktualityTitle,
   mergeAktualityListing,
   pinHomepageDesks,
+  prependUniqueArticles,
   splitNewsDesks,
   uniqueHomepageLayout,
 } from "../../lib/v271/news-desks";
@@ -851,6 +852,10 @@ assert.ok(
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes("pinHomepageDesks"),
   "homepage cache must reserve news before lifestyle"
+);
+assert.ok(
+  readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes("aktuální-zprávy"),
+  "homepage pool must include the Aktuality section query"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes('mode: "card"'),
@@ -2698,6 +2703,13 @@ console.log("✓ magazine desk byline and copy checks passed");
   ]);
   assert.equal(lifestyleOnly.novinky.some((article) => article.id === "snack-1"), false);
   assert.equal(lifestyleOnly.novinky[0]?.id, "who-keep");
+  assert.deepEqual(
+    prependUniqueArticles(
+      [{ slug: "who-keep", id: "who-keep" } as never],
+      [{ slug: "snack-1", id: "snack-1" } as never, { slug: "who-keep", id: "dup" } as never]
+    ).map((article) => article.id),
+    ["who-keep", "snack-1"]
+  );
   assert.deepEqual(
     filterArticlesForLocale(
       [
