@@ -11,7 +11,6 @@ import {
   toListMaterial,
 } from "@/lib/studenti/materials";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
-import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
 export const revalidate = 3600;
 
@@ -65,10 +64,10 @@ export default async function StudentiMaterialyPage() {
         <div className="mt-4 flex flex-wrap gap-2">
           <Button asChild className="rounded-full bg-[#005B96]">
             <Link
-              href="/predplatne?trial=1#student"
-              data-cta="materialy-trial"
+              href="/predplatne#student"
+              data-cta="materialy-student"
             >
-              {VIP_TRIAL_DAYS} dní zdarma
+              89 Kč první měsíc
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>

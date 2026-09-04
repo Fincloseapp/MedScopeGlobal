@@ -31,6 +31,11 @@ export type SubscribeCopy = {
   bestForClinic: string;
   mostPopular: string;
   daysFree: string;
+  studentBadge: string;
+  firstMonth: string;
+  thenMonthly: string;
+  startStudentMonth: string;
+  afterStudentIntro: string;
   perMonth: string;
   yearly: string;
   perYear: string;
@@ -78,17 +83,17 @@ const COPY: Record<string, SubscribeCopy> = {
   cs: {
     metaTitle: "Předplatné | ViaLongeVita",
     metaDescription:
-      "Čtěte o dlouhověkosti zdarma. 14 dní na vyzkoušení tarifů 99 / 149 / 390 / 490 Kč — zrušení kdykoli. Platba kartou přes Stripe.",
+      "Čtěte o dlouhověkosti zdarma. Veřejnost, OrdiZapis a lékař: 14 dní. Student LF: 1 test, 89 Kč, pak 149 Kč. Zrušení kdykoli. Platba kartou přes Stripe.",
     eyebrow: "Předplatné",
     title: "Dlouhověkost srozumitelně — vyzkoušejte 14 dní",
-    lead: "Články o healthspanu zůstávají čitelné. Předplatné je pro ty, kdo chtějí deník, aplikace nebo podporovat redakci — 14 dní zdarma, zrušení kdykoli. Veřejnost, studenti, ordinace (OrdiZapis) a lékaři.",
+    lead: "Články o healthspanu zůstávají čitelné. Veřejnost, OrdiZapis a lékař: 14 dní zdarma. Student LF: 1 test zdarma, první měsíc 89 Kč, další 149 Kč. Zrušení kdykoli.",
     trialFromCta: "Přicházíte z trial CTA — níže je zvýrazněný tarif",
     studentPlan: "Student LF",
     trialFromCtaRest: "(příprava na přijímačky i studium). Rodiče: účet založte na jméno studenta.",
     parentsTip: "Tip pro rodiče a uchazeče",
     parentsBodyBefore: "Tarif Student LF otevírá Academy, AI tutor a kvízy. Nejdřív vyzkoušejte",
     selfTest: "self-test",
-    parentsBodyMid: "a jednu lekci zdarma — pak dává trial smysl.",
+    parentsBodyMid: "a jeden test zdarma — pak dává předplatné smysl.",
     parentsMore: "Více pro rodiče",
     openApp: "Otevřít →",
     downloadApp: "Stáhnout na mobil",
@@ -97,6 +102,11 @@ const COPY: Record<string, SubscribeCopy> = {
     bestForClinic: "Nejvýhodnější pro ordinaci",
     mostPopular: "Nejoblíbenější",
     daysFree: "14 dní zdarma",
+    studentBadge: "1 test zdarma · 89 Kč",
+    firstMonth: "první měsíc",
+    thenMonthly: "pak",
+    startStudentMonth: "Začít první měsíc — 89 Kč",
+    afterStudentIntro: "Další měsíc",
     perMonth: "/ měsíc",
     yearly: "Roční:",
     perYear: "/ rok",
@@ -115,7 +125,7 @@ const COPY: Record<string, SubscribeCopy> = {
     keepReading: "Číst dál zdarma",
     comparisonTitle: "Srovnání tarifů",
     comparisonLead:
-      "Přehled funkcí podle cílové skupiny — tarify Veřejnost, Student LF a Lékař mají 14denní zkušební verzi. OrdiZapis (390 Kč) je samostatný nástroj pro zápisy; Lékař v praxi (490 Kč) přidává CME, Research Hub a klinický AI navíc.",
+      "Přehled funkcí podle cílové skupiny. Veřejnost, OrdiZapis a Lékař: 14denní zkušební verze. Student LF: 1 test zdarma, 89 Kč, pak 149 Kč. OrdiZapis (390 Kč) je samostatný nástroj pro zápisy; Lékař v praxi (490 Kč) přidává CME, Research Hub a klinický AI.",
     featureCol: "Funkce",
     included: "Zahrnuto",
     notIncluded: "Nezahrnuto",
@@ -230,7 +240,7 @@ const COPY: Record<string, SubscribeCopy> = {
     },
     priceNoteByApp: {
       medipacient: "14 dní zdarma, potom",
-      mediprep: "14 dní zdarma, potom",
+      mediprep: "1 test zdarma, první měsíc 89 Kč, potom 149 Kč",
       ordizapis: "14 dní zdarma, potom",
       mediflow: "14 dní zdarma s předplatným Veřejnost",
     },
@@ -238,17 +248,17 @@ const COPY: Record<string, SubscribeCopy> = {
   en: {
     metaTitle: "Subscription | ViaLongeVita",
     metaDescription:
-      "Read about longevity for free. Try plans 99 / 149 / 390 / 490 CZK for 14 days — cancel anytime. Card payment via Stripe.",
+      "Read about longevity for free. Public, OrdiZapis and physician: 14 days. Student: 1 free test, intro month, then 149 CZK / €10. Cancel anytime. Card payment via Stripe.",
     eyebrow: "Subscription",
     title: "Longevity in plain language — try 14 days",
-    lead: "Healthspan articles stay readable. A plan is for people who want the journal, the apps, or to support the desk — 14 days free, cancel anytime. Public, students, clinics (OrdiZapis) and physicians.",
+    lead: "Healthspan articles stay readable. Public, OrdiZapis and physician: 14 days free. Student: 1 free test, intro month, then 149 CZK / €10. Cancel anytime.",
     trialFromCta: "You came from a trial CTA — the highlighted plan below is",
     studentPlan: "Medical student",
     trialFromCtaRest: "(admissions prep and study). Parents: create the account in the student’s name.",
     parentsTip: "Note for parents and applicants",
     parentsBodyBefore: "The Medical student plan opens Academy, the AI tutor and quizzes. First try the",
     selfTest: "self-test",
-    parentsBodyMid: "and one free lesson — then the trial makes sense.",
+    parentsBodyMid: "and one free test — then a plan makes sense.",
     parentsMore: "More for parents",
     openApp: "Open →",
     downloadApp: "Install on mobile",
@@ -257,6 +267,11 @@ const COPY: Record<string, SubscribeCopy> = {
     bestForClinic: "Best value for the clinic",
     mostPopular: "Most popular",
     daysFree: "14 days free",
+    studentBadge: "1 free test · intro month",
+    firstMonth: "first month",
+    thenMonthly: "then",
+    startStudentMonth: "Start the intro month",
+    afterStudentIntro: "Then",
     perMonth: "/ month",
     yearly: "Yearly:",
     perYear: "/ year",
@@ -275,7 +290,7 @@ const COPY: Record<string, SubscribeCopy> = {
     keepReading: "Keep reading free",
     comparisonTitle: "Compare plans",
     comparisonLead:
-      "Features by audience — Public, Medical student and Physician include a 14-day trial. OrdiZapis (390 CZK) is the documentation app; Physician (490 CZK) adds CME, Research Hub and clinical AI.",
+      "Features by audience. Public, OrdiZapis and Physician: 14-day trial. Student: 1 free test, intro month, then 149 CZK / €10. OrdiZapis (390 CZK) is the documentation app; Physician (490 CZK) adds CME, Research Hub and clinical AI.",
     featureCol: "Feature",
     included: "Included",
     notIncluded: "Not included",
@@ -283,7 +298,7 @@ const COPY: Record<string, SubscribeCopy> = {
     faq: [
       {
         q: "How does the 14-day trial work?",
-        a: "After you register and pick a plan, you enter a card via Stripe. The first 14 days are not billed — you get full access for that plan. After the trial, monthly or yearly billing starts automatically.",
+        a: "Public, OrdiZapis and physician: after you enter a card via Stripe, the first 14 days are not billed. Student LF has no 14-day trial — 1 free test, an intro month, then 149 CZK / €10. Cancel anytime before the next charge.",
       },
       {
         q: "Can I cancel anytime?",
@@ -291,11 +306,11 @@ const COPY: Record<string, SubscribeCopy> = {
       },
       {
         q: "Which plan should I choose?",
-        a: "Public (99 CZK) — prevention, lifestyle and public AI. Medical student (149 CZK) — study materials, quizzes and AI tutor. Physician (490 CZK) — professional desk, guidelines, CME and clinical AI.",
+        a: "Public (99 CZK) — prevention, lifestyle and public AI. Medical student (intro month, then 149 CZK / €10) — study materials, quizzes and AI tutor. Physician (490 CZK) — professional desk, guidelines, CME and clinical AI.",
       },
       {
         q: "Can a parent buy a plan for a child?",
-        a: "Yes. Choose Medical student (149 CZK/month) on the account the student will use. Try the self-test and one free lesson first. A subscription does not guarantee admission to medical school.",
+        a: "Yes. On /studenti/darkove you buy Student LF (intro month, then 149 CZK / €10) and forward the activation link. The student opens it on their account. A subscription does not guarantee admission to medical school.",
       },
       {
         q: "Which payment methods do you accept?",
@@ -390,7 +405,7 @@ const COPY: Record<string, SubscribeCopy> = {
     },
     priceNoteByApp: {
       medipacient: "14 days free, then",
-      mediprep: "14 days free, then",
+      mediprep: "1 free test, intro month, then 149 CZK / €10",
       ordizapis: "14 days free, then",
       mediflow: "14 days free with the Public plan",
     },
@@ -398,25 +413,30 @@ const COPY: Record<string, SubscribeCopy> = {
   de: {
     metaTitle: "Abo | ViaLongeVita",
     metaDescription:
-      "Langlebigkeit frei lesen. Tarife 99 / 149 / 390 / 490 CZK 14 Tage testen — jederzeit kündbar. Zahlung per Stripe.",
+      "Langlebigkeit frei lesen. Öffentlichkeit, OrdiZapis und Arzt: 14 Tage. Studium: 1 Test frei, Einstiegsmonat 6 €, danach 10 €. Jederzeit kündbar. Zahlung per Stripe.",
     eyebrow: "Abo",
     title: "Langlebigkeit verständlich — 14 Tage testen",
-    lead: "Healthspan-Artikel bleiben lesbar. Ein Tarif ist für alle, die das Tagebuch, die Apps oder die Redaktion unterstützen möchten — 14 Tage kostenlos, jederzeit kündbar. Öffentlichkeit, Studierende, Praxen (OrdiZapis) und Ärztinnen und Ärzte.",
+    lead: "Healthspan-Artikel bleiben lesbar. Öffentlichkeit, OrdiZapis und Arzt: 14 Tage kostenlos. Medizinstudium: 1 Test frei, Einstiegsmonat 6 €, danach 10 €. Jederzeit kündbar.",
     trialFromCta: "Sie kommen vom Test-CTA — hervorgehoben ist der Tarif",
     studentPlan: "Medizinstudium",
     trialFromCtaRest: "(Aufnahmeprüfung und Studium). Eltern: Konto auf den Namen der oder des Studierenden anlegen.",
     parentsTip: "Hinweis für Eltern und Bewerber",
     parentsBodyBefore: "Der Tarif Medizinstudium öffnet Academy, KI-Tutor und Quiz. Zuerst den",
     selfTest: "Selbsttest",
-    parentsBodyMid: "und eine kostenlose Lektion ausprobieren — dann lohnt sich der Testzeitraum.",
+    parentsBodyMid: "und einen freien Test — dann lohnt sich das Abo.",
     parentsMore: "Mehr für Eltern",
     openApp: "Öffnen →",
     downloadApp: "Aufs Handy laden",
     choosePlan: "Tarif wählen",
-    choosePlanLead: "Jeder Tarif enthält 14 Tage kostenlos. Danach öffnet sich die sichere Stripe-Kasse.",
+    choosePlanLead: "Öffentlichkeit, OrdiZapis und Arzt: 14 Tage kostenlos. Medizinstudium: 1 Test frei, erster Monat 6 €, danach 10 €. Jederzeit kündbar. Die Kasse öffnet Stripe.",
     bestForClinic: "Bestes Preis-Leistungs-Verhältnis für die Praxis",
     mostPopular: "Beliebtester Tarif",
     daysFree: "14 Tage kostenlos",
+    studentBadge: "1 Test frei · 6 €",
+    firstMonth: "erster Monat",
+    thenMonthly: "dann",
+    startStudentMonth: "Einstiegsmonat starten — 6 €",
+    afterStudentIntro: "Danach",
     perMonth: "/ Monat",
     yearly: "Jährlich:",
     perYear: "/ Jahr",
@@ -435,7 +455,7 @@ const COPY: Record<string, SubscribeCopy> = {
     keepReading: "Kostenlos weiterlesen",
     comparisonTitle: "Tarifvergleich",
     comparisonLead:
-      "Funktionen nach Zielgruppe — Öffentlichkeit, Medizinstudium und Arzt enthalten 14 Tage Test. OrdiZapis (390 CZK) ist die Dokumentations-App; Arzt in der Praxis (490 CZK) ergänzt CME, Research Hub und klinische KI.",
+      "Funktionen nach Zielgruppe. Öffentlichkeit, OrdiZapis und Arzt: 14 Tage Test. Medizinstudium: 1 Test frei, 6 €, danach 10 €. OrdiZapis (390 CZK) ist die Dokumentations-App; Arzt in der Praxis (490 CZK) ergänzt CME, Research Hub und klinische KI.",
     featureCol: "Funktion",
     included: "Enthalten",
     notIncluded: "Nicht enthalten",
@@ -443,7 +463,7 @@ const COPY: Record<string, SubscribeCopy> = {
     faq: [
       {
         q: "Wie funktioniert die 14-tägige Testphase?",
-        a: "Nach Registrierung und Tarifwahl hinterlegen Sie eine Karte bei Stripe. Die ersten 14 Tage sind unentgeltlich. Danach startet automatisch das Monats- oder Jahresabo.",
+        a: "Öffentlichkeit, OrdiZapis und Arzt: nach Karteneingabe bei Stripe sind die ersten 14 Tage unentgeltlich. Medizinstudium hat keinen 14-Tage-Test — 1 Test frei, Einstiegsmonat 6 €, danach 10 €. Kündigung vor der nächsten Abbuchung.",
       },
       {
         q: "Kann ich jederzeit kündigen?",
@@ -451,11 +471,11 @@ const COPY: Record<string, SubscribeCopy> = {
       },
       {
         q: "Welchen Tarif soll ich wählen?",
-        a: "Öffentlichkeit (99 CZK) — Prävention, Lebensstil und öffentliche KI. Medizinstudium (149 CZK) — Lernmaterial, Quiz und KI-Tutor. Arzt in der Praxis (490 CZK) — Fachredaktion, Leitlinien, CME und klinische KI.",
+        a: "Öffentlichkeit (99 CZK) — Prävention, Lebensstil und öffentliche KI. Medizinstudium (6 €, danach 10 €) — Lernmaterial, Quiz und KI-Tutor. Arzt in der Praxis (490 CZK) — Fachredaktion, Leitlinien, CME und klinische KI.",
       },
       {
         q: "Kann ein Elternteil das Abo für ein Kind kaufen?",
-        a: "Ja. Wählen Sie Medizinstudium (149 CZK/Monat) auf dem Konto, das die oder der Studierende nutzt. Zuerst Selbsttest und eine Gratislektion. Das Abo garantiert keine Zulassung zum Medizinstudium.",
+        a: "Ja. Unter /studenti/darkove kaufen Sie Medizinstudium (6 €, danach 10 €) und leiten den Aktivierungslink weiter. Die Studentin öffnet ihn auf ihrem Konto. Das Abo garantiert keine Zulassung.",
       },
       {
         q: "Welche Zahlungsarten akzeptieren Sie?",
@@ -501,7 +521,8 @@ const COPY: Record<string, SubscribeCopy> = {
           "Gesamte Academy inkl. Aufnahmevorbereitung",
           "KI-Tutor und Lernmaterial",
           "Quiz, Spiele und Modellfragen",
-          "149 CZK = Academy-Student — Langlebigkeitsartikel bleiben im Magazin frei lesbar",
+          "1 Test frei · Einstiegsmonat 6 € · danach 10 € — jederzeit kündbar",
+          "10 € = Academy-Student — Langlebigkeitsartikel bleiben im Magazin frei lesbar",
         ],
       },
       dokumentace: {
@@ -549,7 +570,7 @@ const COPY: Record<string, SubscribeCopy> = {
     },
     priceNoteByApp: {
       medipacient: "14 Tage kostenlos, dann",
-      mediprep: "14 Tage kostenlos, dann",
+      mediprep: "1 Test frei, Einstiegsmonat 6 €, danach 10 €",
       ordizapis: "14 Tage kostenlos, dann",
       mediflow: "14 Tage kostenlos mit dem Öffentlichkeit-Tarif",
     },
@@ -557,25 +578,30 @@ const COPY: Record<string, SubscribeCopy> = {
   fr: {
     metaTitle: "Abonnement | ViaLongeVita",
     metaDescription:
-      "Lisez la longévité librement. Formules 99 / 149 / 390 / 490 CZK pendant 14 jours — résiliation à tout moment. Paiement par carte via Stripe.",
+      "Lisez la longévité librement. Grand public, OrdiZapis et médecin : 14 jours. Étudiant : 1 test offert, premier mois 6 €, puis 10 €. Résiliation à tout moment. Paiement par carte via Stripe.",
     eyebrow: "Abonnement",
     title: "La longévité en clair — 14 jours d’essai",
-    lead: "Les articles healthspan restent lisibles. Une formule est pour celles et ceux qui veulent le journal, les applis ou soutenir la rédaction — 14 jours gratuits, résiliation à tout moment. Grand public, étudiants, cabinets (OrdiZapis) et médecins.",
+    lead: "Les articles healthspan restent lisibles. Grand public, OrdiZapis et médecin : 14 jours gratuits. Étudiant : 1 test offert, premier mois 6 €, puis 10 €. Résiliation à tout moment.",
     trialFromCta: "Vous arrivez depuis un CTA d’essai — la formule mise en avant est",
     studentPlan: "Étudiant en médecine",
     trialFromCtaRest: "(préparation aux concours et études). Parents : créez le compte au nom de l’étudiant.",
     parentsTip: "Note pour les parents et candidats",
     parentsBodyBefore: "La formule Étudiant en médecine ouvre l’Academy, le tuteur IA et les quiz. Essayez d’abord le",
     selfTest: "auto-test",
-    parentsBodyMid: "et une leçon gratuite — l’essai a alors du sens.",
+    parentsBodyMid: "et un test offert — l’abonnement a alors du sens.",
     parentsMore: "Plus pour les parents",
     openApp: "Ouvrir →",
     downloadApp: "Installer sur mobile",
     choosePlan: "Choisir une formule",
-    choosePlanLead: "Chaque formule inclut 14 jours d’essai gratuit. Le paiement s’ouvre sur Stripe.",
+    choosePlanLead: "Grand public, OrdiZapis et médecin : 14 jours gratuits. Étudiant : 1 test offert, premier mois 6 €, puis 10 €. Résiliation à tout moment. Le paiement s’ouvre sur Stripe.",
     bestForClinic: "Meilleur rapport pour le cabinet",
     mostPopular: "La plus populaire",
     daysFree: "14 jours gratuits",
+    studentBadge: "1 test offert · 6 €",
+    firstMonth: "premier mois",
+    thenMonthly: "puis",
+    startStudentMonth: "Démarrer le mois d’intro — 6 €",
+    afterStudentIntro: "Ensuite",
     perMonth: "/ mois",
     yearly: "Annuel :",
     perYear: "/ an",
@@ -594,7 +620,7 @@ const COPY: Record<string, SubscribeCopy> = {
     keepReading: "Continuer à lire gratuitement",
     comparisonTitle: "Comparer les formules",
     comparisonLead:
-      "Fonctions par public — Grand public, Étudiant et Médecin incluent 14 jours d’essai. OrdiZapis (390 CZK) est l’appli de notes ; Médecin en exercice (490 CZK) ajoute FMC, Research Hub et IA clinique.",
+      "Fonctions par public. Grand public, OrdiZapis et Médecin : 14 jours d’essai. Étudiant : 1 test offert, 6 €, puis 10 €. OrdiZapis (390 CZK) est l’appli de notes ; Médecin en exercice (490 CZK) ajoute FMC, Research Hub et IA clinique.",
     featureCol: "Fonction",
     included: "Inclus",
     notIncluded: "Non inclus",
@@ -602,7 +628,7 @@ const COPY: Record<string, SubscribeCopy> = {
     faq: [
       {
         q: "Comment fonctionne l’essai de 14 jours ?",
-        a: "Après inscription et choix de formule, vous saisissez une carte via Stripe. Les 14 premiers jours ne sont pas facturés. Ensuite, l’abonnement mensuel ou annuel démarre automatiquement.",
+        a: "Grand public, OrdiZapis et médecin : après saisie de carte via Stripe, les 14 premiers jours ne sont pas facturés. L’étudiant n’a pas d’essai 14 jours — 1 test offert, premier mois 6 €, puis 10 €. Résiliation avant le prochain prélèvement.",
       },
       {
         q: "Puis-je résilier à tout moment ?",
@@ -610,11 +636,11 @@ const COPY: Record<string, SubscribeCopy> = {
       },
       {
         q: "Quelle formule choisir ?",
-        a: "Grand public (99 CZK) — prévention, mode de vie et IA grand public. Étudiant (149 CZK) — supports, quiz et tuteur IA. Médecin (490 CZK) — bureau professionnel, guidelines, FMC et IA clinique.",
+        a: "Grand public (99 CZK) — prévention, mode de vie et IA grand public. Étudiant (6 €, puis 10 €) — supports, quiz et tuteur IA. Médecin (490 CZK) — bureau professionnel, guidelines, FMC et IA clinique.",
       },
       {
         q: "Un parent peut-il acheter pour un enfant ?",
-        a: "Oui. Choisissez Étudiant en médecine (149 CZK/mois) sur le compte que l’étudiant utilisera. Commencez par l’auto-test et une leçon gratuite. L’abonnement ne garantit pas l’admission en médecine.",
+        a: "Oui. Sur /studenti/darkove vous achetez Étudiant (6 €, puis 10 €) et transmettez le lien d’activation. L’étudiant l’ouvre sur son compte. L’abonnement ne garantit pas l’admission.",
       },
       {
         q: "Quels moyens de paiement acceptez-vous ?",
@@ -660,7 +686,8 @@ const COPY: Record<string, SubscribeCopy> = {
           "Toute l’Academy y compris la prépa concours",
           "Tuteur IA et supports d’étude",
           "Quiz, jeux et questions types",
-          "149 CZK = étudiant Academy — les articles longévité restent libres à lire",
+          "1 test offert · premier mois 6 € · puis 10 € — résiliation à tout moment",
+          "10 € = étudiant Academy — les articles longévité restent libres à lire",
         ],
       },
       dokumentace: {
@@ -708,7 +735,7 @@ const COPY: Record<string, SubscribeCopy> = {
     },
     priceNoteByApp: {
       medipacient: "14 jours gratuits, puis",
-      mediprep: "14 jours gratuits, puis",
+      mediprep: "1 test offert, premier mois 6 €, puis 10 €",
       ordizapis: "14 jours gratuits, puis",
       mediflow: "14 jours gratuits avec la formule Grand public",
     },

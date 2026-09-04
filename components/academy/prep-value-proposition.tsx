@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { CourseCard } from "@/components/academy/course-card";
 import { isAcademyCoursesCatalogPromoEnabled } from "@/lib/academy/public-catalog";
 import { getCourseVideoFlags, listPublishedCourses } from "@/lib/academy/db";
-import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
 const VALUE_POINTS = [
   {
@@ -152,8 +151,8 @@ export async function PrepValueProposition() {
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Button asChild className="rounded-full bg-[#005B96]">
-              <Link href="/predplatne?trial=1#student">
-                {VIP_TRIAL_DAYS} dní zdarma — Student LF
+              <Link href="/predplatne#student">
+                89 Kč první měsíc — Student LF
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

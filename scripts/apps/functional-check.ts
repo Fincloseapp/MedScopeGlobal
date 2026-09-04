@@ -842,8 +842,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.19"),
-  "page cache tag must bust after student intro pricing"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.20"),
+  "page cache tag must bust after student studio dashboard"
 );
 file("app/(public)/studenti/klub/page.tsx");
 file("app/(public)/studenti/zebricek/page.tsx");
@@ -852,6 +852,19 @@ file("lib/studenti/club.ts");
 assert.ok(
   readFileSync(join(root, "app/(public)/studenti/page.tsx"), "utf8").includes("/studenti/klub"),
   "student hub must link the quiz club"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/predplatne/page.tsx"), "utf8").includes("studentIntroCharge"),
+  "subscribe page must price the student card with the intro month, not FX on 149"
+);
+assert.ok(
+  !readFileSync(join(root, "app/(public)/predplatne/page.tsx"), "utf8").includes("copy.daysFree") ||
+    readFileSync(join(root, "app/(public)/predplatne/page.tsx"), "utf8").includes("copy.studentBadge"),
+  "student plan card must not reuse the 14-day badge"
+);
+assert.ok(
+  !readFileSync(join(root, "app/(public)/studenti/testy/page.tsx"), "utf8").includes("trial=1#student"),
+  "student rooms must not send people to a 14-day trial"
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes("pinHomepageDesks"),

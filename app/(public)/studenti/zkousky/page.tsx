@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ArrowRight, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
-import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
 export const revalidate = 120;
 
@@ -118,18 +117,18 @@ export default function StudentiZkouskyPage() {
             Opora během semestru
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
-            Studentské předplatné (od 149 Kč/měsíc) otevírá AI tutor a plný přístup k Academy —
-            {VIP_TRIAL_DAYS} dní zdarma, bez závazku.
+            Studentské předplatné otevírá AI tutor a plný přístup k Academy — 1 test zdarma,
+            první měsíc 89 Kč, další 149 Kč. Zrušíte kdykoli.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button asChild className="rounded-full bg-[#005B96]">
-              <Link href="/predplatne?trial=1#student">
-                {VIP_TRIAL_DAYS} dní zdarma
+              <Link href="/predplatne#student">
+                89 Kč první měsíc
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="outline" className="rounded-full">
-              <Link href="/studenti#pro-studenty-lf">Zpět na Studenti</Link>
+              <Link href="/studenti">Zpět na Studenti</Link>
             </Button>
           </div>
         </section>

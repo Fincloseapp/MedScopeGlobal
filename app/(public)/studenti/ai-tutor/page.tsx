@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ArrowRight, Brain, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
-import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
 export const revalidate = 120;
 
@@ -64,8 +63,8 @@ export default function StudentiAiTutorPage() {
               </Link>
             </Button>
             <Button asChild variant="outline" className="rounded-full">
-              <Link href="/predplatne?trial=1#student">
-                {VIP_TRIAL_DAYS} dní zdarma
+              <Link href="/predplatne#student">
+                89 Kč první měsíc
               </Link>
             </Button>
           </div>

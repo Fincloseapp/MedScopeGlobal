@@ -1,378 +1,230 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import {
-  ArrowRight,
-  BookOpen,
-  CheckCircle2,
-  GraduationCap,
-  HeartHandshake,
-  Sparkles,
-  Target,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
-import { getServerLocale } from "@/lib/i18n/server-locale";
-import { getMarketingCopy } from "@/lib/i18n/marketing-copy";
-import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { ArrowRight, Gift } from "lucide-react";
+import { PageHero } from "@/components/public/page-hero";
+import { PublicPage } from "@/components/public/public-page";
+import { SiteChrome } from "@/components/public/site-chrome";
 import { StudentOfferDashboard } from "@/components/studenti/student-offer-dashboard";
+import { createMetadata, localizedAlternates } from "@/lib/seo";
+import { localizedPath } from "lib/i18n/paths";
+import { getRequestLocale } from "lib/i18n/server";
+import { withLocale } from "lib/i18n/with-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getServerLocale();
-  const copy = getMarketingCopy(locale).students;
-  return await buildLocalizedV20PageMetadata({
+  const locale = await getRequestLocale();
+  const copy = COPY[locale] ?? COPY.en;
+  return createMetadata({
     title: copy.metaTitle,
     description: copy.metaDescription,
     path: "/studenti",
     locale,
+    alternates: localizedAlternates("/studenti"),
   });
 }
 
-const APPLICANT_HREFS = [
-  "/studenti/chci-studovat",
-  "/academy/prijimacky/self-test",
-  "/studium/prijimacky",
-] as const;
-const APPLICANT_STEP_HREFS = [
-  "/app/priprava",
-  "/academy/courses?category=prijimacky",
-  "/predplatne#student",
-] as const;
-const LF_HREFS = ["/studenti/materialy", "/studenti/testy", "/studenti/ai-tutor"] as const;
-const LF_STEP_HREFS = ["/studenti/materialy", "/studenti/testy", "/studenti/ai-tutor"] as const;
-const MORE_HREFS = ["/studenti/hry", "/studenti/leky", "/studenti/zkousky", "/medicina/plany"] as const;
+export default async function StudentiPage() {
+  const locale = await getRequestLocale();
+  const copy = COPY[locale] ?? COPY.en;
+  const hrefs = MORE_HREFS.map((href) => withLocale(locale, href));
+  const predplatne = withLocale(locale, "/predplatne#student");
+  const darkove = withLocale(locale, "/studenti/darkove");
 
-function StepCards({
-  steps,
-  hrefs,
-  locale,
-}: {
-  steps: readonly { title: string; body: string; cta: string }[];
-  hrefs: readonly string[];
-  locale: string;
-}) {
   return (
-    <ol className="mt-6 grid gap-4 sm:grid-cols-3">
-      {steps.map((step, index) => (
-        <li
-          key={step.title}
-          className="flex flex-col rounded-2xl border border-white bg-white/90 p-5 shadow-[0_12px_28px_-24px_rgba(0,91,150,0.45)]"
-        >
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#005B96] text-sm font-bold text-white">
-            {index + 1}
-          </span>
-          <p className="mt-3 font-medium text-[#021d33]">{step.title}</p>
-          <p className="mt-1 flex-1 text-xs leading-relaxed text-slate-500">{step.body}</p>
-          <Link
-            href={localizePublicHref(hrefs[index] ?? "/studenti", locale)}
-            className="mt-4 inline-flex items-center text-sm font-medium text-[#005B96] hover:underline"
+    <SiteChrome>
+      <PublicPage className="space-y-6">
+        <StudentOfferDashboard locale={locale} />
+
+        <section className="overflow-hidden rounded-[2rem] border border-[var(--line)] bg-[var(--paper-2)] px-5 py-6 sm:px-8">
+          <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--gold)]">
+            <Gift className="h-4 w-4" aria-hidden />
+            {copy.parentsKicker}
+          </div>
+          <h2 className="mt-3 max-w-3xl font-serif text-3xl text-[var(--ink)]">{copy.parentsTitle}</h2>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted)]">{copy.parentsLead}</p>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted)]">{copy.parentsLegal}</p>
+          <a
+            href={darkove}
+            className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--gold)] px-5 text-sm font-semibold text-[var(--ink)]"
           >
-            {step.cta}
-            <ArrowRight className="ml-1 h-3.5 w-3.5" />
-          </Link>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-export default async function StudentiHubPage() {
-  const locale = await getServerLocale();
-  const copy = getMarketingCopy(locale).students;
-  const h = (path: string) => localizePublicHref(path, locale);
-
-  return (
-    <>
-      <section className="relative overflow-hidden border-b border-[#d9e8f4]">
-        <div
-          className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_0%,rgba(0,91,150,0.14),transparent_55%),radial-gradient(ellipse_50%_40%_at_90%_20%,rgba(14,116,144,0.08),transparent_50%),linear-gradient(180deg,#f8fbff_0%,#ffffff_70%)]"
-          aria-hidden
-        />
-        <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="msg-hero-copy text-[11px] font-semibold uppercase tracking-[0.3em] text-[#005B96]">
-            {copy.eyebrow}
-          </p>
-          <h1 className="msg-hero-copy mt-4 max-w-3xl font-display text-4xl font-bold tracking-tight text-[#021d33] sm:text-5xl">
-            {copy.title}
-            <span className="mt-1 block text-[0.85em] font-semibold text-[#005B96]">{copy.titleLine2}</span>
-          </h1>
-          <p className="msg-hero-copy mt-5 max-w-xl text-lg leading-8 text-slate-600">{copy.lead}</p>
-          <p className="msg-hero-copy mt-3 text-sm font-medium text-[#0a4a7a]/90">{copy.priceLine}</p>
-          <div className="msg-hero-cta mt-8 flex flex-wrap gap-3">
-            <Button asChild className="rounded-full bg-[#005B96] px-6">
-              <Link href="/app/priprava">
-                {copy.downloadPrep}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="rounded-full border-[#005B96]/35 px-6">
-              <Link href={h("/studenti/chci-studovat")}>{copy.wantMedicine}</Link>
-            </Button>
-            <Button asChild variant="ghost" className="rounded-full text-[#005B96]">
-              <Link href="#pro-rodice">{copy.iAmParent}</Link>
-            </Button>
-            <Button asChild variant="outline" className="rounded-full border-[#005B96]/35 px-6">
-              <Link href={h("/studenti/klub")}>Klub kvízů</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <nav className="mb-8 text-sm text-muted-foreground" aria-label={copy.crumbAria}>
-          <Link href={h("/")} className="hover:text-foreground">
-            {copy.home}
-          </Link>
-          <span className="mx-2">/</span>
-          <span>{copy.students}</span>
-        </nav>
-
-        <div className="mb-12">
-          <StudentOfferDashboard locale={locale} />
-        </div>
-
-        <section className="msg-path mb-12 rounded-3xl border border-[#cfe1f3] bg-[#f0f7ff]/70 p-6 sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#005B96]">
-            {copy.applicantEyebrow}
-          </p>
-          <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">{copy.applicantTitle}</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">{copy.applicantLead}</p>
-          <StepCards steps={copy.applicantSteps} hrefs={APPLICANT_STEP_HREFS} locale={locale} />
+            {copy.parentsCta}
+          </a>
         </section>
 
-        <section
-          id="klub-kvizu"
-          className="mb-12 scroll-mt-24 rounded-3xl border border-[#cfe1f3] bg-white p-6 sm:p-8"
-        >
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#005B96]">
-            Kvízy · odbornost · univerzity
-          </p>
-          <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">
-            Přehledná mapa klubu
-          </h2>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
-            Soutěžní kvízy z banky přijímaček, studijní hry, oficiální weby fakult a žebříček
-            přezdívek. 1 test zdarma — první měsíc 89 Kč, další 149 Kč, zrušíte kdykoli.
-          </p>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              {
-                href: "/studenti/klub",
-                title: "Soutěžní kvízy",
-                body: "8 otázek z biologie, chemie a fyziky. Nick na tabuli, e-mail jen u účtu.",
-              },
-              {
-                href: "/studenti/hry",
-                title: "Odbornost",
-                body: "Anatomie, fyziologie, patologie — existující studijní hry a materiály.",
-              },
-              {
-                href: "/studenti/chci-studovat",
-                title: "Univerzity",
-                body: "Osm českých lékařských fakult, termíny a příprava na přijímačky.",
-              },
-              {
-                href: "/studenti/zebricek",
-                title: "Žebříček",
-                body: "Kdo je teď nejlepší — jen přezdívky, žádná falešná jména.",
-              },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={h(item.href)}
-                className="rounded-2xl border border-slate-200 bg-[#f8fbff] px-4 py-4 transition hover:border-[#005B96]/35 hover:bg-white"
-              >
-                <p className="font-medium text-[#021d33]">{item.title}</p>
-                <p className="mt-1 text-xs leading-relaxed text-slate-500">{item.body}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <p className="msg-path mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-[#005B96]">
-          {copy.pickPath}
+        <PageHero kicker={copy.moreKicker} title={copy.moreTitle} lead={copy.moreLead} />
+        <div className="grid gap-3 md:grid-cols-2">
+          {copy.more.map((item, index) => (
+            <a
+              key={item.title}
+              href={hrefs[index]}
+              className="rounded-[1.4rem] border border-[var(--line)] bg-[var(--paper)] px-5 py-5 no-underline transition hover:border-[var(--gold)]"
+            >
+              <strong className="font-serif text-xl text-[var(--ink)]">{item.title}</strong>
+              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{item.body}</p>
+              <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[var(--gold)]">
+                {item.cta} <ArrowRight className="h-4 w-4" />
+              </span>
+            </a>
+          ))}
+        </div>
+        <p className="text-center text-sm text-[var(--muted)]">
+          <a href={predplatne} className="font-semibold text-[var(--gold)] no-underline">
+            {copy.cta}
+          </a>
         </p>
-
-        <div className="msg-path grid gap-6 lg:grid-cols-2">
-          <section className="rounded-3xl border border-[#cfe1f3] bg-white p-6 shadow-[0_20px_44px_-32px_rgba(0,91,150,0.5)]">
-            <div className="flex items-start gap-3">
-              <Target className="mt-0.5 h-7 w-7 shrink-0 text-[#005B96]" aria-hidden />
-              <div>
-                <h2 className="font-display text-2xl font-semibold text-[#021d33]">{copy.applicantH2}</h2>
-                <p className="mt-1 text-sm text-slate-600">{copy.applicantSub}</p>
-              </div>
-            </div>
-            <p className="mt-4 text-sm leading-relaxed text-slate-700">{copy.applicantBody}</p>
-            <ul className="mt-5 space-y-2">
-              {copy.applicant.map((item, index) => (
-                <li key={item.href}>
-                  <Link
-                    href={h(APPLICANT_HREFS[index] ?? item.href)}
-                    className="group flex items-start justify-between gap-3 rounded-xl border border-slate-200 px-4 py-3 transition hover:border-[#005B96]/45 hover:bg-[#f8fbff]"
-                  >
-                    <span>
-                      <span className="block font-medium text-[#021d33] group-hover:text-[#005B96]">
-                        {item.title}
-                      </span>
-                      <span className="mt-0.5 block text-xs leading-relaxed text-slate-500">{item.body}</span>
-                    </span>
-                    <ArrowRight
-                      className="mt-1 h-4 w-4 shrink-0 text-[#005B96] transition group-hover:translate-x-0.5"
-                      aria-hidden
-                    />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-5">
-              <Button asChild className="rounded-full bg-[#005B96]">
-                <Link href={h("/studenti/chci-studovat")}>
-                  {copy.openPrep}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </section>
-
-          <section id="pro-studenty-lf" className="scroll-mt-24 rounded-3xl border border-slate-200 bg-white p-6">
-            <div className="flex items-start gap-3">
-              <GraduationCap className="mt-0.5 h-7 w-7 shrink-0 text-[#005B96]" aria-hidden />
-              <div>
-                <h2 className="font-display text-2xl font-semibold text-[#021d33]">{copy.onLfH2}</h2>
-                <p className="mt-1 text-sm text-slate-600">{copy.onLfSub}</p>
-              </div>
-            </div>
-            <p className="mt-4 text-sm leading-relaxed text-slate-700">{copy.onLfBody}</p>
-            <ul className="mt-5 space-y-2">
-              {copy.onLf.map((item, index) => (
-                <li key={item.href}>
-                  <Link
-                    href={h(LF_HREFS[index] ?? item.href)}
-                    className="group flex items-start justify-between gap-3 rounded-xl border border-slate-200 px-4 py-3 transition hover:border-[#005B96]/45 hover:bg-[#f8fbff]"
-                  >
-                    <span>
-                      <span className="block font-medium text-[#021d33] group-hover:text-[#005B96]">
-                        {item.title}
-                      </span>
-                      <span className="mt-0.5 block text-xs leading-relaxed text-slate-500">{item.body}</span>
-                    </span>
-                    <ArrowRight
-                      className="mt-1 h-4 w-4 shrink-0 text-[#005B96] transition group-hover:translate-x-0.5"
-                      aria-hidden
-                    />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <Button asChild className="rounded-full bg-[#005B96]">
-                <Link href={h("/studenti/materialy")}>
-                  {copy.openMaterials}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="rounded-full">
-                <Link href={h("/predplatne#student")}>{copy.studentPlan}</Link>
-              </Button>
-            </div>
-          </section>
-        </div>
-
-        <section id="lf-start" className="msg-path mt-10 scroll-mt-24 rounded-3xl border border-slate-200 bg-slate-50/80 p-6 sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#005B96]">{copy.lfEyebrow}</p>
-          <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">{copy.lfTitle}</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">{copy.lfLead}</p>
-          <StepCards steps={copy.lfSteps} hrefs={LF_STEP_HREFS} locale={locale} />
-        </section>
-
-        <section id="pro-rodice" className="mt-12 scroll-mt-24 rounded-3xl border border-[#cfe1f3] bg-white p-6 sm:p-8">
-          <div className="flex flex-wrap items-start gap-4">
-            <HeartHandshake className="h-7 w-7 shrink-0 text-[#005B96]" aria-hidden />
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#005B96]">
-                {copy.parentsEyebrow}
-              </p>
-              <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">{copy.parentsTitle}</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-700">{copy.parentsBody}</p>
-              <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-                {copy.parentBullets.map((line) => (
-                  <li key={line} className="flex items-start gap-2 text-sm text-slate-700">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#005B96]" aria-hidden />
-                    {line}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-6 flex flex-wrap gap-2">
-                <Button asChild className="rounded-full bg-[#005B96]">
-                  <Link href={h("/studenti/darkove")} data-cta="studenti-parent-gift">
-                    {copy.giftTrial}
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="rounded-full">
-                  <Link href={h("/studenti/chci-studovat")} data-cta="studenti-parent-prep">
-                    {copy.showPrep}
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-12 overflow-hidden rounded-3xl border border-[#005B96]/25 bg-[linear-gradient(135deg,#005B96_0%,#0a4a7a_55%,#021d33_100%)] p-6 text-white sm:p-8">
-          <div className="flex flex-wrap items-start gap-4">
-            <Sparkles className="h-6 w-6 shrink-0 text-sky-200" aria-hidden />
-            <div className="min-w-0 flex-1">
-              <h2 className="font-display text-xl font-semibold sm:text-2xl">{copy.subTitle}</h2>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-sky-100">{copy.subLead}</p>
-              <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-                {copy.subBenefits.map((line) => (
-                  <li key={line} className="flex items-start gap-2 text-sm text-sky-50">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-sky-300" aria-hidden />
-                    {line}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-6 flex flex-wrap gap-2">
-                <Button asChild className="rounded-full bg-white text-[#005B96] hover:bg-sky-50">
-                  <Link href={h("/predplatne#student")} data-cta="studenti-sub-buy">
-                    {copy.daysFree}
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="rounded-full border-white/40 bg-transparent text-white hover:bg-white/10"
-                >
-                  <Link href={h("/predplatne#student")}>{copy.comparePlans}</Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-12">
-          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h2 className="font-display text-xl font-semibold text-[#021d33]">{copy.moreTitle}</h2>
-              <p className="mt-1 text-sm text-slate-600">{copy.moreLead}</p>
-            </div>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {copy.more.map((item, index) => (
-              <Link
-                key={item.href}
-                href={h(MORE_HREFS[index] ?? item.href)}
-                className="rounded-2xl border border-slate-200 bg-white px-4 py-4 transition hover:border-[#005B96]/35 hover:bg-[#f8fbff]"
-              >
-                <BookOpen className="h-4 w-4 text-[#005B96]" aria-hidden />
-                <p className="mt-2 font-medium text-[#021d33]">{item.title}</p>
-                <p className="mt-1 text-xs leading-relaxed text-slate-500">{item.body}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
-      </div>
-    </>
+      </PublicPage>
+    </SiteChrome>
   );
 }
+
+const MORE_HREFS = [
+  localizedPath("cs", "/studenti/klub"),
+  "/studenti/testy",
+  "/studenti/materialy",
+  "/studenti/ai-tutor",
+  "/studenti/zkousky",
+  localizedPath("cs", "/mediprep"),
+  localizedPath("cs", "/academy"),
+] as const;
+
+const COPY: Record<
+  string,
+  {
+    metaTitle: string;
+    metaDescription: string;
+    cta: string;
+    moreKicker: string;
+    moreTitle: string;
+    moreLead: string;
+    more: { title: string; body: string; cta: string }[];
+    parentsKicker: string;
+    parentsTitle: string;
+    parentsLead: string;
+    parentsLegal: string;
+    parentsCta: string;
+  }
+> = {
+  cs: {
+    metaTitle: "Studenti medicíny — 1 test zdarma, první měsíc 89 Kč",
+    metaDescription:
+      "Přijímačky, B/C/F, AI tutor a termíny fakult. Jeden test zdarma, první měsíc 89 Kč, potom 149 Kč. Rodiče můžou předplatné koupit jako dárek.",
+    cta: "Otevřít student tarif — 89 Kč první měsíc",
+    moreKicker: "Místnosti",
+    moreTitle: "Kde začít po prvním testu",
+    moreLead: "Stejný tarif otevírá každou místnost. Quiz banka MeDiprep zůstává v češtině.",
+    more: [
+      { title: "Klub kvízů", body: "Osm otázek B/C/F. Na tabuli jen přezdívka.", cta: "Otevřít klub" },
+      { title: "Testy", body: "B / C / F a nácvik pod časem.", cta: "Otevřít testy" },
+      { title: "Materiály", body: "Karty, vzorce a odkazy na oficiální weby.", cta: "Otevřít materiály" },
+      { title: "AI tutor", body: "Vysvětlení bez vymýšlení faktů.", cta: "Otevřít tutora" },
+      { title: "Zkoušky", body: "Termíny jen z oficiálních fakult.", cta: "Otevřít termíny" },
+      { title: "MeDiprep", body: "Česká banka otázek a nácvik.", cta: "Otevřít MeDiprep" },
+      { title: "Akademie", body: "Delší kurzy a certifikace.", cta: "Otevřít akademii" },
+    ],
+    parentsKicker: "Rodiče",
+    parentsTitle: "Koupit měsíc a poslat odkaz",
+    parentsLead:
+      "Zaplatíte první měsíc 89 Kč (nebo 149 Kč další). Po platbě dostanete odkaz. Student ho uplatní po přihlášení — na veřejném žebříčku zůstane přezdívka, ne e-mail.",
+    parentsLegal:
+      "Cena je na stránce před platbou. Předplatné lze zrušit. Žádné skryté poplatky. Určeno pro studenty 18+ nebo se souhlasem zákonného zástupce.",
+    parentsCta: "Koupit dárek",
+  },
+  en: {
+    metaTitle: "Medical students — 1 free test, first month 89 CZK",
+    metaDescription:
+      "Admissions, B/C/F, AI tutor and faculty dates. One free test, first month 89 CZK, then 149 CZK. Parents can buy a gift month.",
+    cta: "Open the student plan — first month 89 CZK",
+    moreKicker: "Rooms",
+    moreTitle: "Where to go after the free test",
+    moreLead: "The same plan opens every room. The MeDiprep question bank stays in Czech.",
+    more: [
+      { title: "Quiz club", body: "Eight B/C/F questions. Nickname on the board only.", cta: "Open the club" },
+      { title: "Tests", body: "B / C / F under timed conditions.", cta: "Open tests" },
+      { title: "Materials", body: "Cards, formulas, official links.", cta: "Open materials" },
+      { title: "AI tutor", body: "Explanations without invented facts.", cta: "Open the tutor" },
+      { title: "Exams", body: "Dates from official faculty pages only.", cta: "Open dates" },
+      { title: "MeDiprep", body: "Czech question bank and drills.", cta: "Open MeDiprep" },
+      { title: "Academy", body: "Longer courses and certificates.", cta: "Open the academy" },
+    ],
+    parentsKicker: "Parents",
+    parentsTitle: "Buy a month and send the link",
+    parentsLead:
+      "Pay the first month (89 CZK) or the regular month (149 CZK). After checkout you receive a link. The student redeems it after sign-in. The public board shows a nickname, not an email.",
+    parentsLegal:
+      "The price is shown before payment. Cancel anytime. No hidden charges. For students 18+ or with a guardian.",
+    parentsCta: "Buy a gift",
+  },
+  sk: {
+    metaTitle: "Študenti medicíny — 1 test zadarmo, prvý mesiac 89 Kč",
+    metaDescription:
+      "Prijímačky, B/C/F, AI tutor a termíny fakúlt. Jeden test zadarmo, prvý mesiac 89 Kč, potom 149 Kč. Rodičia môžu kúpiť darček.",
+    cta: "Otvoriť študentský tarif — 89 Kč prvý mesiac",
+    moreKicker: "Miestnosti",
+    moreTitle: "Kde začať po prvom teste",
+    moreLead: "Rovnaký tarif otvára každú miestnosť. Quiz banka MeDiprep ostáva v češtine.",
+    more: [
+      { title: "Klub kvízov", body: "Osem otázok B/C/F. Na tabuli len prezývka.", cta: "Otvoriť klub" },
+      { title: "Testy", body: "B / C / F pod časom.", cta: "Otvoriť testy" },
+      { title: "Materiály", body: "Karty, vzorce, oficiálne odkazy.", cta: "Otvoriť materiály" },
+      { title: "AI tutor", body: "Vysvetlenie bez vymýšľania faktov.", cta: "Otvoriť tutora" },
+      { title: "Skúšky", body: "Termíny len z oficiálnych fakúlt.", cta: "Otvoriť termíny" },
+      { title: "MeDiprep", body: "Česká banka otázok.", cta: "Otvoriť MeDiprep" },
+      { title: "Akadémia", body: "Dlhšie kurzy.", cta: "Otvoriť akadémiu" },
+    ],
+    parentsKicker: "Rodičia",
+    parentsTitle: "Kúpiť mesiac a poslať odkaz",
+    parentsLead:
+      "Zaplatíte prvý mesiac 89 Kč alebo ďalší 149 Kč. Po platbe dostanete odkaz. Študent ho uplatní po prihlásení. Na verejnej tabuli ostane prezývka, nie e-mail.",
+    parentsLegal:
+      "Cena je pred platbou. Predplatné možno zrušiť. Žiadne skryté poplatky. Pre študentov 18+ alebo so súhlasom zákonného zástupcu.",
+    parentsCta: "Kúpiť darček",
+  },
+  de: {
+    metaTitle: "Medizinstudierende — 1 Test frei, erster Monat 6 €",
+    metaDescription:
+      "Aufnahme, B/C/F, KI-Tutor und Fakultätstermine. Ein Test frei, erster Monat 6 €, danach 10 €. Eltern können einen Monat schenken.",
+    cta: "Studentenplan öffnen — erster Monat 6 €",
+    moreKicker: "Räume",
+    moreTitle: "Wohin nach dem freien Test",
+    moreLead: "Derselbe Plan öffnet jeden Raum. Die MeDiprep-Fragenbank bleibt Tschechisch.",
+    more: [
+      { title: "Quiz-Club", body: "Acht B/C/F-Fragen. Nur ein Spitzname auf der Tafel.", cta: "Club öffnen" },
+      { title: "Tests", body: "B / C / F unter Zeit.", cta: "Tests öffnen" },
+      { title: "Material", body: "Karten, Formeln, offizielle Links.", cta: "Material öffnen" },
+      { title: "KI-Tutor", body: "Erklärungen ohne erfundene Fakten.", cta: "Tutor öffnen" },
+      { title: "Prüfungen", body: "Termine nur von Fakultätsseiten.", cta: "Termine öffnen" },
+      { title: "MeDiprep", body: "Tschechische Fragenbank.", cta: "MeDiprep öffnen" },
+      { title: "Akademie", body: "Längere Kurse.", cta: "Akademie öffnen" },
+    ],
+    parentsKicker: "Eltern",
+    parentsTitle: "Monat kaufen und Link senden",
+    parentsLead:
+      "Zahlen Sie den ersten Monat (6 €) oder den Folgemonat (10 €). Nach der Zahlung erhalten Sie einen Link. Die Studentin löst ihn nach der Anmeldung ein. Das Board zeigt einen Spitznamen, keine E-Mail.",
+    parentsLegal:
+      "Der Preis steht vor der Zahlung. Jederzeit kündbar. Keine versteckten Kosten. Für Studierende 18+ oder mit Erziehungsberechtigten.",
+    parentsCta: "Geschenk kaufen",
+  },
+  fr: {
+    metaTitle: "Étudiants en médecine — 1 test offert, premier mois 6 €",
+    metaDescription:
+      "Concours, B/C/F, tuteur IA et dates facultaires. Un test offert, premier mois 6 €, puis 10 €. Les parents peuvent offrir un mois.",
+    cta: "Ouvrir l’offre étudiante — premier mois 6 €",
+    moreKicker: "Salles",
+    moreTitle: "Où aller après le test offert",
+    moreLead: "Le même forfait ouvre chaque salle. La banque MeDiprep reste en tchèque.",
+    more: [
+      { title: "Club quiz", body: "Huit questions B/C/F. Surnom uniquement sur le tableau.", cta: "Ouvrir le club" },
+      { title: "Tests", body: "B / C / F chronométrés.", cta: "Ouvrir les tests" },
+      { title: "Supports", body: "Fiches, formules, liens officiels.", cta: "Ouvrir les supports" },
+      { title: "Tuteur IA", body: "Explications sans faits inventés.", cta: "Ouvrir le tuteur" },
+      { title: "Examens", body: "Dates des sites facultaires uniquement.", cta: "Ouvrir les dates" },
+      { title: "MeDiprep", body: "Banque tchèque.", cta: "Ouvrir MeDiprep" },
+      { title: "Académie", body: "Cours plus longs.", cta: "Ouvrir l’académie" },
+    ],
+    parentsKicker: "Parents",
+    parentsTitle: "Acheter un mois et envoyer le lien",
+    parentsLead:
+      "Payez le premier mois (6 €) ou le mois suivant (10 €). Après le paiement vous recevez un lien. L’étudiant l’utilise après connexion. Le tableau public montre un surnom, pas un e-mail.",
+    parentsLegal:
+      "Le prix est affiché avant le paiement. Résiliable. Aucun frais caché. Pour les 18+ ou avec un tuteur légal.",
+    parentsCta: "Offrir un mois",
+  },
+};

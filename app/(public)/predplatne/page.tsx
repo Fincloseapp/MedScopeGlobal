@@ -10,6 +10,7 @@ import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { APP_PRODUCTS, type AppProductId } from "@/lib/apps/catalog";
 import { getServerLocale, getServerRegion } from "@/lib/i18n/server-locale";
 import { convertCzkToCharge } from "@/lib/i18n/payment-currency";
+import { studentIntroCharge, studentMonthlyCharge } from "@/lib/studenti/pricing";
 import { getSubscribeCopy } from "@/lib/i18n/subscribe-copy";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
@@ -40,7 +41,8 @@ export default async function PredplatnePage({
   const copy = getSubscribeCopy(locale, region);
   const surface = getSurfaceCopy(locale);
   const publicPrice = convertCzkToCharge(99, locale, region);
-  const studentPrice = convertCzkToCharge(149, locale, region);
+  const studentIntro = studentIntroCharge(locale, region);
+  const studentPrice = studentMonthlyCharge(locale, region);
   const clinicPrice = convertCzkToCharge(390, locale, region);
   const appPriceById: Record<string, string> = {
     medipacient: publicPrice.formatted,
@@ -139,7 +141,10 @@ export default async function PredplatnePage({
             const localized = copy.plans[plan.tier];
             const highlighted = plan.tier === "dokumentace";
             const studentHighlight = plan.tier === "student" && !highlighted;
-            const monthly = convertCzkToCharge(plan.monthlyCzk, locale, region);
+            const isStudent = plan.tier === "student";
+            const monthly = isStudent
+              ? studentPrice
+              : convertCzkToCharge(plan.monthlyCzk, locale, region);
             const annual = convertCzkToCharge(plan.annualCzk, locale, region);
             return (
               <div
@@ -164,21 +169,33 @@ export default async function PredplatnePage({
                   </span>
                 ) : null}
                 <span className="inline-flex w-fit rounded-full bg-[#005B96]/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#005B96]">
-                  {copy.daysFree}
+                  {isStudent ? copy.studentBadge : copy.daysFree}
                 </span>
                 <h3 className="mt-3 font-display text-xl font-semibold text-[#005B96]">
                   {localized.name}
                 </h3>
-                <p className="mt-2">
-                  <span className="text-3xl font-bold">{monthly.formatted}</span>
-                  <span className="text-muted-foreground"> {copy.perMonth}</span>
-                </p>
-                <p className="mt-1 text-sm text-slate-600">
-                  {copy.yearly}{" "}
-                  <span className="font-semibold text-[#005B96]">{annual.formatted}</span>{" "}
-                  {copy.perYear}{" "}
-                  <span className="text-emerald-700">{copy.twoMonthsFree}</span>
-                </p>
+                {isStudent ? (
+                  <p className="mt-2">
+                    <span className="text-3xl font-bold">{studentIntro.formatted}</span>
+                    <span className="text-muted-foreground"> {copy.firstMonth}</span>
+                    <span className="mt-1 block text-sm text-slate-600">
+                      {copy.thenMonthly} {studentPrice.formatted} {copy.perMonth}
+                    </span>
+                  </p>
+                ) : (
+                  <p className="mt-2">
+                    <span className="text-3xl font-bold">{monthly.formatted}</span>
+                    <span className="text-muted-foreground"> {copy.perMonth}</span>
+                  </p>
+                )}
+                {isStudent ? null : (
+                  <p className="mt-1 text-sm text-slate-600">
+                    {copy.yearly}{" "}
+                    <span className="font-semibold text-[#005B96]">{annual.formatted}</span>{" "}
+                    {copy.perYear}{" "}
+                    <span className="text-emerald-700">{copy.twoMonthsFree}</span>
+                  </p>
+                )}
                 {localized.extraNote ? (
                   <p className="mt-2 text-xs font-medium text-emerald-800">{localized.extraNote}</p>
                 ) : null}
@@ -198,21 +215,27 @@ export default async function PredplatnePage({
                     productId={subscriptionProductId(plan.tier, "month")}
                     locale={locale}
                     label={
-                      plan.tier === "dokumentace"
-                        ? `${copy.daysFree} — ${monthly.formatted}`
-                        : copy.startTrialMonth
+                      isStudent
+                        ? `${copy.startStudentMonth}`
+                        : plan.tier === "dokumentace"
+                          ? `${copy.daysFree} — ${monthly.formatted}`
+                          : copy.startTrialMonth
                     }
                   />
-                  <V27CheckoutButton
-                    kind="subscription"
-                    productId={subscriptionProductId(plan.tier, "year")}
-                    locale={locale}
-                    label={`${copy.startTrialYear} (${annual.formatted})`}
-                    className="w-full border border-[#005B96]/30 bg-white text-[#005B96] hover:bg-[#005B96]/5"
-                  />
+                  {isStudent ? null : (
+                    <V27CheckoutButton
+                      kind="subscription"
+                      productId={subscriptionProductId(plan.tier, "year")}
+                      locale={locale}
+                      label={`${copy.startTrialYear} (${annual.formatted})`}
+                      className="w-full border border-[#005B96]/30 bg-white text-[#005B96] hover:bg-[#005B96]/5"
+                    />
+                  )}
                 </div>
                 <p className="mt-3 text-center text-xs text-slate-500">
-                  {copy.afterTrial} {monthly.formatted} {copy.perMonth} · {copy.cancelAnytime}
+                  {isStudent
+                    ? `${copy.afterStudentIntro} ${studentPrice.formatted} ${copy.perMonth} · ${copy.cancelAnytime}`
+                    : `${copy.afterTrial} ${monthly.formatted} ${copy.perMonth} · ${copy.cancelAnytime}`}
                 </p>
               </div>
             );

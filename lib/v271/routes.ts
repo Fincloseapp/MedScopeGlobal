@@ -153,8 +153,8 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       },
       {
         label: "Studentské předplatné",
-        href: "/predplatne?trial=1#student",
-        description: "Plný AI tutor bez free omezení — trial zdarma",
+        href: "/predplatne#student",
+        description: "Plný AI tutor — 1 test zdarma, 89 Kč, pak 149 Kč",
       },
     ],
     ctaHref: "/ai-asistent/student",
