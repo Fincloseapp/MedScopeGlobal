@@ -28,6 +28,7 @@ export function SiteHeader({
   profile,
   isVip,
   accessLevel,
+  studentSurface,
 }: {
   categories: Category[];
   locale: string;
@@ -36,12 +37,13 @@ export function SiteHeader({
   profile: AppUser | null;
   isVip: boolean;
   accessLevel: AccessLevelId;
+  studentSurface?: boolean;
 }) {
   const pathname = usePathname();
   const navLocale = normalizeLocale(locale);
   const desktopMenu = getDesktopHeaderMenu(navLocale);
   const mobileMenu = getMobileMenu(navLocale);
-  const studentChrome = isStudentChromePath(pathname);
+  const studentChrome = studentSurface ?? isStudentChromePath(pathname);
   const subscribeHref = localizePublicHref(
     studentChrome ? "/predplatne#student" : "/predplatne?trial=1",
     navLocale

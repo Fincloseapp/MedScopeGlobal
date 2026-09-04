@@ -842,8 +842,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.23"),
-  "page cache tag must bust after student chrome CTA"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.24"),
+  "page cache tag must bust after student header SSR path"
 );
 file("app/(public)/studenti/klub/page.tsx");
 file("app/(public)/studenti/zebricek/page.tsx");
@@ -863,8 +863,9 @@ assert.ok(
   "student hub copy must read as an atelier, not a discount bin"
 );
 assert.ok(
-  readFileSync(join(root, "components/layout/site-header.tsx"), "utf8").includes("isStudentChromePath"),
-  "student routes must not reuse the magazine 14-day header CTA"
+  readFileSync(join(root, "components/layout/site-header.tsx"), "utf8").includes("studentSurface") &&
+    readFileSync(join(root, "app/(public)/layout.tsx"), "utf8").includes("initialPathname"),
+  "student header CTA must be path-aware on first HTML, not only after hydration"
 );
 assert.equal(isStudentChromePath("/cs/studenti"), true);
 assert.equal(isStudentChromePath("/de/predplatne"), false);

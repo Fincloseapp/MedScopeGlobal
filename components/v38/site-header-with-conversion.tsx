@@ -41,6 +41,7 @@ type Props = {
   locale: string;
   region: string;
   navStripCopy?: StoredNudge;
+  initialPathname?: string;
 };
 
 /** v38 — header + optional conversion strip for non-VIP */
@@ -49,8 +50,9 @@ export function SiteHeaderWithConversion({
   locale,
   region,
   navStripCopy,
+  initialPathname,
 }: Props) {
-  const pathname = usePathname();
+  const pathname = usePathname() || initialPathname || "";
   const studentPath = isStudentAudiencePath(pathname);
   const publicPath = isPublicAudiencePath(pathname);
   const physicianPath = isPhysicianAudiencePath(pathname);
@@ -116,6 +118,7 @@ export function SiteHeaderWithConversion({
         profile={reader.profile}
         isVip={reader.isVip}
         accessLevel={reader.accessLevel}
+        studentSurface={studentPath}
       />
       {!reader.isVip && !isMagazineHome ? (
         <SubscriptionNudgeStrip
