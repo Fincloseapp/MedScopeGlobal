@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import type { AppUser, Category } from "@/types/database";
 import { NotificationBell } from "@/components/layout/notification-bell";
 import { SearchCommand } from "@/components/layout/search-command";
@@ -16,6 +17,7 @@ import { getDesktopHeaderMenu, getMobileMenu } from "@/lib/config/main-navigatio
 import { normalizeLocale } from "@/lib/i18n/config";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { getPortalChrome } from "@/lib/v271/portal";
+import { isStudentChromePath, studentNavCtaLabel } from "@/lib/studenti/pricing";
 
 /** v38 — sticky header, compact nav, subscribe CTA for non-VIP */
 export function SiteHeader({
@@ -35,9 +37,18 @@ export function SiteHeader({
   isVip: boolean;
   accessLevel: AccessLevelId;
 }) {
+  const pathname = usePathname();
   const navLocale = normalizeLocale(locale);
   const desktopMenu = getDesktopHeaderMenu(navLocale);
   const mobileMenu = getMobileMenu(navLocale);
+  const studentChrome = isStudentChromePath(pathname);
+  const subscribeHref = localizePublicHref(
+    studentChrome ? "/predplatne#student" : "/predplatne?trial=1",
+    navLocale
+  );
+  const subscribeLabel = studentChrome
+    ? studentNavCtaLabel(navLocale)
+    : getPortalChrome(navLocale).trialCta;
 
   return (
     <header className="site-header sticky top-0 z-50 w-full overflow-visible border-b border-black/[0.06] bg-white/[0.98] backdrop-blur supports-[padding:max(0px)]:pt-[env(safe-area-inset-top)] dark:border-white/[0.08] dark:bg-slate-950/[0.98]">
@@ -71,8 +82,8 @@ export function SiteHeader({
               <NavSubscribeCta
                 compact
                 className="hidden lg:inline-flex"
-                label={getPortalChrome(navLocale).trialCta}
-                href={localizePublicHref("/predplatne?trial=1", navLocale)}
+                label={subscribeLabel}
+                href={subscribeHref}
               />
             ) : null}
             <SearchCommand isVip={isVip} accessLevel={accessLevel} locale={locale} />

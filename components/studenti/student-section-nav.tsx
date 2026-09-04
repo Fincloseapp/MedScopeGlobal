@@ -13,8 +13,8 @@ export function StudentSectionNav({ current }: { current?: string }) {
             aria-current={active ? "page" : undefined}
             className={
               active
-                ? "rounded-full bg-[#005B96] px-3 py-1.5 font-semibold text-white"
-                : "rounded-full border border-slate-200 px-3 py-1.5 text-slate-700 hover:border-[#005B96]/40"
+                ? "rounded-full bg-[#14110e] px-3 py-1.5 font-semibold text-[#f6f1e8]"
+                : "rounded-full border border-[#1b1712]/15 px-3 py-1.5 text-[#1b1712] hover:border-[#8a6d32]"
             }
           >
             {item.label}
@@ -23,9 +23,9 @@ export function StudentSectionNav({ current }: { current?: string }) {
       })}
       <Link
         href={STUDENT_CLUB_PLAN_HREF}
-        className="rounded-full border border-[#005B96]/30 px-3 py-1.5 font-semibold text-[#005B96] hover:bg-[#f0f7ff]"
+        className="rounded-full border border-[#8a6d32]/40 px-3 py-1.5 font-semibold text-[#8a6d32] hover:bg-[#8a6d32]/10"
       >
-        Členství
+        Student tarif
       </Link>
     </nav>
   );

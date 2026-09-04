@@ -166,7 +166,7 @@ import {
 } from "../../lib/studenti/club";
 import { studentClubOpenFromProfile } from "../../lib/billing/student-entitlement";
 import { isPhysicianGrantProduct, isStudentGrantProduct } from "../../lib/v27/config";
-import { studentIntroCharge, studentMonthlyCharge, STUDENT_FREE_TESTS } from "../../lib/studenti/pricing";
+import { studentIntroCharge, studentMonthlyCharge, STUDENT_FREE_TESTS, isStudentChromePath } from "../../lib/studenti/pricing";
 import { facultiesForLocale, facultyCountryForLocale } from "../../lib/prijimacky/faculties-by-country";
 import { articlePageKey, rollEvergreenListingDate } from "../../lib/editorial/freshness";
 import {
@@ -842,8 +842,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.22"),
-  "page cache tag must bust after student atelier desk"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.23"),
+  "page cache tag must bust after student chrome CTA"
 );
 file("app/(public)/studenti/klub/page.tsx");
 file("app/(public)/studenti/zebricek/page.tsx");
@@ -862,6 +862,12 @@ assert.ok(
     readFileSync(join(root, "components/studenti/student-offer-dashboard.tsx"), "utf8").includes("Atelier Student LF"),
   "student hub copy must read as an atelier, not a discount bin"
 );
+assert.ok(
+  readFileSync(join(root, "components/layout/site-header.tsx"), "utf8").includes("isStudentChromePath"),
+  "student routes must not reuse the magazine 14-day header CTA"
+);
+assert.equal(isStudentChromePath("/cs/studenti"), true);
+assert.equal(isStudentChromePath("/de/predplatne"), false);
 assert.ok(
   readFileSync(join(root, "app/(public)/predplatne/page.tsx"), "utf8").includes("studentIntroCharge"),
   "subscribe page must price the student card with the intro month, not FX on 149"

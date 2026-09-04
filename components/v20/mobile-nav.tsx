@@ -18,6 +18,8 @@ import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import type { NavItem } from "@/lib/config/main-navigation";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { getPortalChrome } from "@/lib/v271/portal";
+import { isStudentChromePath, studentNavCtaLabel } from "@/lib/studenti/pricing";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export function V20MobileNav({
   mainMenu,
@@ -186,8 +188,15 @@ export function V20MobileNav({
             <LocaleSwitcher currentLocale={locale} />
           </div>
           <Button asChild className="rounded-full bg-primary touch-manipulation">
-            <Link href="/predplatne?trial=1" onClick={() => setOpen(false)}>
-              {chrome.trialCta}
+            <Link
+              href={
+                isStudentChromePath(pathname)
+                  ? localizePublicHref("/predplatne#student", locale)
+                  : "/predplatne?trial=1"
+              }
+              onClick={() => setOpen(false)}
+            >
+              {isStudentChromePath(pathname) ? studentNavCtaLabel(locale) : chrome.trialCta}
             </Link>
           </Button>
           <Button asChild variant="outline" className="rounded-full touch-manipulation">

@@ -2,23 +2,22 @@ import Image from "next/image";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import type { FacultyAdmissions } from "@/lib/prijimacky/faculties-admissions";
 
-const ROOMS = [
-  ["B/C/F", "Klub"],
-  ["LF", "Simulace"],
-  ["AI", "Tutor"],
-  ["MAT", "Semestr"],
-] as const;
-
 export function StudentStudioDesk({
   cs,
   faculties,
   introLabel,
   monthlyLabel,
+  question,
+  options,
+  subject,
 }: {
   cs: boolean;
   faculties: FacultyAdmissions[];
   introLabel: string;
   monthlyLabel: string;
+  question?: string;
+  options?: string[];
+  subject?: string;
 }) {
   const row = faculties.slice(0, 4);
 
@@ -69,17 +68,24 @@ export function StudentStudioDesk({
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-1.5 px-2.5 py-2.5">
-              {ROOMS.map(([code, label]) => (
-                <div
-                  key={code}
-                  className="rounded-lg border border-white/8 bg-white/[0.04] px-2 py-1.5"
-                >
-                  <p className="font-mono text-[9px] tracking-widest text-[#9fd4ff]">{code}</p>
-                  <p className="text-[11px] text-white/85">{label}</p>
-                </div>
-              ))}
-            </div>
+            {question && options?.length ? (
+              <div className="px-2.5 py-2.5">
+                <p className="font-mono text-[9px] tracking-[0.18em] text-[#c6a15b]">
+                  {subject ?? "B/C/F"}
+                </p>
+                <p className="mt-1 line-clamp-3 text-[11px] leading-4 text-white/90">{question}</p>
+                <ul className="mt-2 space-y-1">
+                  {options.slice(0, 4).map((opt) => (
+                    <li
+                      key={opt}
+                      className="truncate rounded-md border border-white/8 bg-white/[0.04] px-2 py-1 text-[10px] text-white/65"
+                    >
+                      {opt}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
 
             <div className="border-t border-white/8 px-2.5 py-2">
               <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/35">

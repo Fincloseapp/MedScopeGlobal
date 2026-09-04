@@ -77,3 +77,17 @@ export function studentPriceLine(locale?: string | null, region?: string | null)
   }
   return `1 free test · today ${intro} · then ${monthly}/month · cancel anytime`;
 }
+
+export function isStudentChromePath(pathname?: string | null): boolean {
+  const p = pathname ?? "";
+  return /\/studenti(?:\/|$|\?)/.test(p) || /\/app\/priprava/.test(p) || /\/mediprep(?:\/|$|\?)/.test(p);
+}
+
+export function studentNavCtaLabel(locale?: string | null, region?: string | null): string {
+  const intro = studentIntroCharge(locale, region).formatted;
+  const key = (locale ?? "cs").toLowerCase();
+  if (key.startsWith("cs")) return `1 test · ${intro}`;
+  if (key.startsWith("de")) return `1 Test · ${intro}`;
+  if (key.startsWith("fr")) return `1 test · ${intro}`;
+  return `1 test · ${intro}`;
+}

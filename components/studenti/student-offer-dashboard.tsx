@@ -16,6 +16,8 @@ import {
   studentIntroCharge,
   studentMonthlyCharge,
 } from "@/lib/studenti/pricing";
+import { generateSelfTest } from "@/lib/prijimacky/quiz-from-bank";
+import { subjectLabel } from "@/lib/prijimacky/faculties-admissions";
 
 const PHOTO = {
   cover: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1800&h=1200&fit=crop&q=80&auto=format",
@@ -279,6 +281,7 @@ export function StudentOfferDashboard({ locale }: { locale: string }) {
     pack === "cs" ? localizePublicHref(path, locale) : csHref;
   const featured = ROOMS.filter((r) => "featured" in r && r.featured);
   const rest = ROOMS.filter((r) => !("featured" in r && r.featured));
+  const preview = generateSelfTest({ count: 1, seed: "atelier-desk" }).questions[0];
 
   return (
     <div className="overflow-hidden bg-[#f3eee6] text-[#1b1712]">
@@ -338,6 +341,9 @@ export function StudentOfferDashboard({ locale }: { locale: string }) {
             faculties={faculties}
             introLabel={intro.formatted}
             monthlyLabel={monthly.formatted}
+            question={preview?.question_text}
+            options={preview?.options}
+            subject={preview ? subjectLabel(preview.meta.subject) : undefined}
           />
         </div>
       </section>
