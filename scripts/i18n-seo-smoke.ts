@@ -766,6 +766,8 @@ assert.equal(getPhysicianLandingCopy("en-US").verifyAdminHref, undefined);
   assert.equal(getOrdiZapisAppCopy("cs").tabNote, "Zápis");
   assert.ok(!getOrdiZapisAppCopy("fr").upload.includes("Nahrát"));
   assert.ok(!getOrdiZapisAppCopy("fr").installGated.includes("Stažení"));
+  assert.equal(getOrdiZapisAppCopy("fr").accessLabel, "Accès");
+  assert.ok(!getOrdiZapisAppCopy("it").errConsent.includes("souhlas"));
   assert.equal(isCzechFacultyLocale("fr"), false);
   assert.equal(isCzechFacultyLocale("cs"), true);
   assert.ok(!getCzechFacultyOnlyCopy("de").lead.includes("přijímačky"));

@@ -818,8 +818,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.9"),
-  "page cache tag must bust after Academy CS-only courtesy"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.10"),
+  "page cache tag must bust after OrdiZapis account-strip i18n"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
@@ -910,6 +910,31 @@ assert.ok(
 assert.equal(getOrdiZapisAppCopy("fr").dictate, "Dicter");
 assert.ok(!getOrdiZapisAppCopy("fr").upload.includes("Nahrát"));
 assert.equal(getOrdiZapisAppCopy("cs").tabNote, "Zápis");
+assert.equal(getOrdiZapisAppCopy("fr").accessLabel, "Accès");
+assert.equal(getOrdiZapisAppCopy("it").subscribeCta, "Abbonamento");
+assert.ok(!getOrdiZapisAppCopy("fr").errConsent.includes("souhlas"));
+assert.ok(!getOrdiZapisAppCopy("es").notSignedIn.includes("Nejste"));
+assert.ok(
+  readFileSync(join(root, "components/apps/app-account-status.tsx"), "utf8").includes(
+    "labels?.access"
+  ),
+  "account strip must accept localized Access / Validity / Subscribe"
+);
+assert.ok(
+  readFileSync(join(root, "components/lekari/dok-app/dok-app-account.tsx"), "utf8").includes(
+    "locale"
+  ) &&
+    readFileSync(join(root, "components/lekari/dok-app/dok-app-shell.tsx"), "utf8").includes(
+      "locale={locale}"
+    ),
+  "OrdiZapis account tab must receive the edition locale"
+);
+assert.ok(
+  readFileSync(join(root, "components/lekari/dokumentace-workspace.tsx"), "utf8").includes(
+    "copy.errConsent"
+  ),
+  "OrdiZapis workspace errors must follow the edition language"
+);
 assert.ok(
   readFileSync(join(root, "lib/i18n/filter-articles-for-locale.ts"), "utf8").includes(
     "relatedScore(article, ui) > 0"

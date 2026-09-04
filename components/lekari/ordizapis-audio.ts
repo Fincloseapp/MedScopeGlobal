@@ -1,5 +1,7 @@
 /** Client-only helpers for OrdiZapis phone file upload. */
 
+import { getOrdiZapisAppCopy } from "@/lib/i18n/ordizapis-app-copy";
+
 export const ORDIZAPIS_FILE_ACCEPT =
   "audio/*,video/mp4,video/quicktime,.m4a,.mp3,.wav,.aac,.caf,.ogg,.webm,.mp4,.mpeg";
 
@@ -62,12 +64,13 @@ export function isFetchNetworkError(err: unknown): boolean {
   return /failed to fetch|networkerror|load failed|abort|timed out|timeout/i.test(msg);
 }
 
-export function friendlyFetchError(err: unknown, fallback: string): string {
+export function friendlyFetchError(
+  err: unknown,
+  fallback: string,
+  network?: string
+): string {
   if (isFetchNetworkError(err)) {
-    return (
-      "Spojení při odesílání nahrávky selhalo (časté u většího M4A na mobilu). " +
-      "Zkuste znovu na Wi‑Fi, nebo použijte Nahrávat přímo v OrdiZapisu."
-    );
+    return network || fallback;
   }
   const msg = err instanceof Error ? err.message : String(err);
   return msg.trim() || fallback;
@@ -259,11 +262,10 @@ export async function uploadAndTranscribePhoneFile(opts: {
   onProgress?: (ratio: number, label: string) => void;
 }): Promise<PhoneTranscribeResult> {
   const { file } = opts;
-  if (file.size <= 0) throw new Error("Soubor je prázdný.");
+  const copy = getOrdiZapisAppCopy(opts.locale);
+  if (file.size <= 0) throw new Error(copy.errEmptyFile);
   if (file.size > ORDIZAPIS_MAX_FILE_BYTES) {
-    throw new Error(
-      "Soubor je větší než 25 MB. Nahrajte kratší nahrávku nebo použijte Nahrávat v OrdiZapisu."
-    );
+    throw new Error(copy.errFileTooBig);
   }
 
   const { mime, filename } = resolveAudioMeta(file);
@@ -311,13 +313,13 @@ export async function uploadAndTranscribePhoneFile(opts: {
   if (!processRes.ok) {
     throw new Error(
       (typeof processJson.error === "string" && processJson.error) ||
-        "Přepis souboru selhal."
+        copy.errTranscribe
     );
   }
   const transcript =
     typeof processJson.transcript === "string" ? processJson.transcript.trim() : "";
   if (!transcript) {
-    throw new Error("Přepis je prázdný — soubor se nepodařilo rozpoznat.");
+    throw new Error(copy.errEmptyTranscript);
   }
   opts.onProgress?.(0.9, "Přepis hotov…");
   return {
@@ -371,11 +373,11 @@ export async function uploadAndProcessPhoneFile(opts: {
   if (!structRes.ok) {
     throw new Error(
       (typeof structJson.error === "string" && structJson.error) ||
-        "Sestavení zápisu selhalo."
+        getOrdiZapisAppCopy(locale).errStructure
     );
   }
   const note = typeof structJson.note === "string" ? structJson.note : "";
-  if (!note.trim()) throw new Error("Zápis se nepodařilo sestavit ze souboru.");
+  if (!note.trim()) throw new Error(getOrdiZapisAppCopy(locale).errStructureRetry);
   return {
     transcript: stt.transcript,
     note,

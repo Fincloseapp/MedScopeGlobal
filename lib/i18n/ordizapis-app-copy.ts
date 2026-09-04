@@ -5,6 +5,7 @@
 
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export type OrdiZapisAppCopy = {
   tabNote: string;
@@ -81,9 +82,105 @@ export type OrdiZapisAppCopy = {
   installApp: string;
   installed: string;
   iosShare: string;
+  accessLabel: string;
+  validityLabel: string;
+  subscribeCta: string;
+  accountAria: string;
+  physicianFallback: string;
+  planVip: string;
+  planBasic: string;
+  notSignedIn: string;
+  signInLead: string;
+  validityAfterLogin: string;
+  verifiedLinked: string;
+  signOut: string;
+  verifyAccount: string;
+  subscribeOrdi: string;
+  installTitle: string;
+  installLead: string;
+  backToMarketing: string;
+  loadingAccount: string;
+  statusLabel: string;
+  online: string;
+  offline: string;
+  errConsent: string;
+  errEmptyRec: string;
+  errTooLarge: string;
+  errNeedLogin: string;
+  errServerHttp: string;
+  errUnexpectedHttp: string;
+  errStructure: string;
+  errStructureRetry: string;
+  errProcessRec: string;
+  errProcessFile: string;
+  errCopy: string;
+  errNothingToCopy: string;
+  errMicBlocked: string;
+  errMicMissing: string;
+  errMicGeneric: string;
+  errConsentMic: string;
+  errFileTooBig: string;
+  errUploadConn: string;
+  errSegmentTooBig: string;
+  errSegmentFailed: string;
+  errSegmentEmpty: string;
+  errEmptyFile: string;
+  errTranscribe: string;
+  errEmptyTranscript: string;
+  noteShareTitle: string;
 };
 
-const PACK: Record<ChromePack, OrdiZapisAppCopy> = {
+type OrdiZapisChromeCopy = Omit<
+  OrdiZapisAppCopy,
+  | "accessLabel"
+  | "validityLabel"
+  | "subscribeCta"
+  | "accountAria"
+  | "physicianFallback"
+  | "planVip"
+  | "planBasic"
+  | "notSignedIn"
+  | "signInLead"
+  | "validityAfterLogin"
+  | "verifiedLinked"
+  | "signOut"
+  | "verifyAccount"
+  | "subscribeOrdi"
+  | "installTitle"
+  | "installLead"
+  | "backToMarketing"
+  | "loadingAccount"
+  | "statusLabel"
+  | "online"
+  | "offline"
+  | "errConsent"
+  | "errEmptyRec"
+  | "errTooLarge"
+  | "errNeedLogin"
+  | "errServerHttp"
+  | "errUnexpectedHttp"
+  | "errStructure"
+  | "errStructureRetry"
+  | "errProcessRec"
+  | "errProcessFile"
+  | "errCopy"
+  | "errNothingToCopy"
+  | "errMicBlocked"
+  | "errMicMissing"
+  | "errMicGeneric"
+  | "errConsentMic"
+  | "errFileTooBig"
+  | "errUploadConn"
+  | "errSegmentTooBig"
+  | "errSegmentFailed"
+  | "errSegmentEmpty"
+  | "errEmptyFile"
+  | "errTranscribe"
+  | "errEmptyTranscript"
+  | "noteShareTitle"
+>;
+
+const PACK: Record<ChromePack, OrdiZapisChromeCopy> = {
   cs: {
     tabNote: "Zápis",
     tabHistory: "Historie",
@@ -822,12 +919,397 @@ const PACK: Record<ChromePack, OrdiZapisAppCopy> = {
   },
 };
 
+const ACCOUNT: Record<ChromePack, Omit<OrdiZapisAppCopy, keyof OrdiZapisChromeCopy>> = {
+  cs: {
+    accessLabel: "Přístup",
+    validityLabel: "Platnost",
+    subscribeCta: "Předplatné",
+    accountAria: "Stav účtu a platnost",
+    physicianFallback: "Lékař",
+    planVip: "VIP / předplatné",
+    planBasic: "základní",
+    notSignedIn: "Nejste přihlášeni",
+    signInLead: "Pro stažení, zápisy a historii se přihlaste ověřeným lékařským účtem.",
+    validityAfterLogin: "po přihlášení",
+    verifiedLinked: "Ověřený lékař — aplikace propojena s tímto účtem",
+    signOut: "Odhlásit se",
+    verifyAccount: "Ověřit lékařský účet",
+    subscribeOrdi: "Předplatné OrdiZapis (390 Kč)",
+    installTitle: "Instalace aplikace",
+    installLead:
+      "Stažení OrdiZapis je vázané na váš ověřený účet MedScopeGlobal — historie se synchronizuje.",
+    backToMarketing: "Zpět na marketingovou stránku",
+    loadingAccount: "Načítám účet…",
+    statusLabel: "Stav",
+    online: "Online",
+    offline: "Offline",
+    errConsent: "Nejprve potvrďte souhlas s nahráváním.",
+    errEmptyRec: "Nahrávka je prázdná — mikrofon nic nezachytil. Povolte mikrofon a zkuste znovu.",
+    errTooLarge:
+      "Nahrávka je příliš velká pro odeslání. Zkuste kratší úsek — aplikace teď dělí nahrávku po 2 minutách.",
+    errNeedLogin: "Pro zpracování se musíte přihlásit.",
+    errServerHttp: "Zpracování na serveru selhalo (HTTP {status}). Zkuste znovu za chvíli.",
+    errUnexpectedHttp: "Neočekávaná odpověď serveru (HTTP {status}). Zkuste znovu.",
+    errStructure: "Sestavení zápisu selhalo.",
+    errStructureRetry: "Zápis se nepodařilo sestavit. Zkuste nahrávku znovu.",
+    errProcessRec: "Zpracování nahrávky selhalo. Zkuste kratší úsek nebo Nahrát soubor znovu.",
+    errProcessFile: "Zpracování souboru selhalo.",
+    errCopy: "Kopírování do schránky selhalo.",
+    errNothingToCopy: "Zatím není co kopírovat — vytvořte zápis.",
+    errMicBlocked:
+      "Mikrofon je zablokovaný. V telefonu: Nastavení → OrdiZapis / Safari / Chrome → Mikrofon → Povolit, pak znovu klepněte na „Povolit mikrofon“.",
+    errMicMissing: "Mikrofon nebyl nalezen. Zkontrolujte, že zařízení má mikrofon a není používán jinou aplikací.",
+    errMicGeneric: "Nepodařilo se získat mikrofon. Povolte přístup a zkuste znovu.",
+    errConsentMic: "Nejprve potvrďte souhlas s nahráváním (nebo povolte mikrofon).",
+    errFileTooBig: "Soubor je větší než 25 MB. Nahrajte kratší nahrávku nebo použijte Nahrávat v OrdiZapisu.",
+    errUploadConn:
+      "Spojení při odesílání nahrávky selhalo (časté u většího M4A na mobilu). Zkuste znovu na Wi‑Fi, nebo použijte Nahrávat přímo v OrdiZapisu.",
+    errSegmentTooBig:
+      "Segment {n} je příliš velký ({mb} MB). Nahrajte znovu — nahrávka se teď automaticky dělí po 2 minutách.",
+    errSegmentFailed: "Přepis segmentu {n} selhal.",
+    errSegmentEmpty: "Segment {n} se nepřepsal (prázdný výsledek). Zkontrolujte mikrofon a zkuste znovu.",
+    errEmptyFile: "Soubor je prázdný.",
+    errTranscribe: "Přepis souboru selhal.",
+    errEmptyTranscript: "Přepis je prázdný — soubor se nepodařilo rozpoznat.",
+    noteShareTitle: "OrdiZapis zápis",
+  },
+  de: {
+    accessLabel: "Zugang",
+    validityLabel: "Gültigkeit",
+    subscribeCta: "Abo",
+    accountAria: "Kontostatus und Gültigkeit",
+    physicianFallback: "Arztkonto",
+    planVip: "VIP / Abo",
+    planBasic: "Basis",
+    notSignedIn: "Sie sind nicht angemeldet",
+    signInLead: "Für Download, Notizen und Verlauf mit einem verifizierten Arztkonto anmelden.",
+    validityAfterLogin: "nach der Anmeldung",
+    verifiedLinked: "Verifiziertes Arztkonto — App mit diesem Konto verbunden",
+    signOut: "Abmelden",
+    verifyAccount: "Arztkonto verifizieren",
+    subscribeOrdi: "OrdiZapis-Abo (390 Kč)",
+    installTitle: "App installieren",
+    installLead:
+      "Der OrdiZapis-Download ist an Ihr verifiziertes MedScopeGlobal-Konto gebunden — der Verlauf bleibt synchron.",
+    backToMarketing: "Zurück zur Produktseite",
+    loadingAccount: "Konto wird geladen…",
+    statusLabel: "Status",
+    online: "Online",
+    offline: "Offline",
+    errConsent: "Bitte zuerst die Aufnahmebestätigung erteilen.",
+    errEmptyRec: "Die Aufnahme ist leer — das Mikrofon hat nichts erfasst. Mikrofon erlauben und erneut versuchen.",
+    errTooLarge:
+      "Die Aufnahme ist zu groß. Kürzer aufnehmen — die App teilt jetzt alle 2 Minuten.",
+    errNeedLogin: "Zum Verarbeiten müssen Sie sich anmelden.",
+    errServerHttp: "Serverfehler (HTTP {status}). Bitte später erneut versuchen.",
+    errUnexpectedHttp: "Unerwartete Serverantwort (HTTP {status}). Bitte erneut versuchen.",
+    errStructure: "Die Notiz konnte nicht erstellt werden.",
+    errStructureRetry: "Die Notiz konnte nicht erstellt werden. Aufnahme erneut versuchen.",
+    errProcessRec: "Verarbeiten der Aufnahme fehlgeschlagen. Kürzeren Abschnitt oder Datei-Upload versuchen.",
+    errProcessFile: "Verarbeiten der Datei fehlgeschlagen.",
+    errCopy: "Kopieren in die Zwischenablage fehlgeschlagen.",
+    errNothingToCopy: "Noch nichts zu kopieren — zuerst eine Notiz erstellen.",
+    errMicBlocked:
+      "Mikrofon ist blockiert. Am Telefon: Einstellungen → OrdiZapis / Safari / Chrome → Mikrofon → Erlauben, dann erneut „Mikrofon erlauben“.",
+    errMicMissing: "Kein Mikrofon gefunden. Prüfen, ob das Gerät eines hat und keine andere App es nutzt.",
+    errMicGeneric: "Mikrofon nicht verfügbar. Zugriff erlauben und erneut versuchen.",
+    errConsentMic: "Bitte zuerst die Aufnahme bestätigen (oder das Mikrofon erlauben).",
+    errFileTooBig: "Datei größer als 25 MB. Kürzere Aufnahme wählen oder in OrdiZapis aufnehmen.",
+    errUploadConn:
+      "Upload-Verbindung fehlgeschlagen (häufig bei größeren M4A am Handy). Auf WLAN erneut versuchen oder direkt in OrdiZapis aufnehmen.",
+    errSegmentTooBig:
+      "Segment {n} ist zu groß ({mb} MB). Erneut aufnehmen — die App teilt jetzt alle 2 Minuten.",
+    errSegmentFailed: "Transkription von Segment {n} fehlgeschlagen.",
+    errSegmentEmpty: "Segment {n} ist leer. Mikrofon prüfen und erneut versuchen.",
+    errEmptyFile: "Die Datei ist leer.",
+    errTranscribe: "Transkription der Datei fehlgeschlagen.",
+    errEmptyTranscript: "Transkription ist leer — die Datei wurde nicht erkannt.",
+    noteShareTitle: "OrdiZapis-Notiz",
+  },
+  fr: {
+    accessLabel: "Accès",
+    validityLabel: "Validité",
+    subscribeCta: "Abonnement",
+    accountAria: "État du compte et validité",
+    physicianFallback: "Compte médecin",
+    planVip: "VIP / abonnement",
+    planBasic: "base",
+    notSignedIn: "Vous n’êtes pas connecté",
+    signInLead: "Pour le téléchargement, les notes et l’historique, connectez-vous avec un compte médecin vérifié.",
+    validityAfterLogin: "après connexion",
+    verifiedLinked: "Médecin vérifié — l’appli est liée à ce compte",
+    signOut: "Se déconnecter",
+    verifyAccount: "Vérifier le compte médecin",
+    subscribeOrdi: "Abonnement OrdiZapis (390 Kč)",
+    installTitle: "Installer l’application",
+    installLead:
+      "Le téléchargement OrdiZapis est lié à votre compte MedScopeGlobal vérifié — l’historique reste synchronisé.",
+    backToMarketing: "Retour à la page produit",
+    loadingAccount: "Chargement du compte…",
+    statusLabel: "État",
+    online: "En ligne",
+    offline: "Hors ligne",
+    errConsent: "Confirmez d’abord le consentement à l’enregistrement.",
+    errEmptyRec: "L’enregistrement est vide — le micro n’a rien capté. Autorisez le micro et réessayez.",
+    errTooLarge:
+      "L’enregistrement est trop lourd. Essayez un passage plus court — l’appli découpe maintenant toutes les 2 min.",
+    errNeedLogin: "Connectez-vous pour traiter l’enregistrement.",
+    errServerHttp: "Échec serveur (HTTP {status}). Réessayez dans un instant.",
+    errUnexpectedHttp: "Réponse serveur inattendue (HTTP {status}). Réessayez.",
+    errStructure: "Échec de l’assemblage de la note.",
+    errStructureRetry: "La note n’a pas pu être assemblée. Réessayez l’enregistrement.",
+    errProcessRec: "Échec du traitement. Essayez un passage plus court ou Envoyer un fichier.",
+    errProcessFile: "Échec du traitement du fichier.",
+    errCopy: "Échec de la copie dans le presse-papiers.",
+    errNothingToCopy: "Rien à copier pour l’instant — créez une note.",
+    errMicBlocked:
+      "Le micro est bloqué. Sur le téléphone : Réglages → OrdiZapis / Safari / Chrome → Microphone → Autoriser, puis « Autoriser le micro ».",
+    errMicMissing: "Aucun micro trouvé. Vérifiez que l’appareil en a un et qu’une autre appli ne l’utilise pas.",
+    errMicGeneric: "Impossible d’accéder au micro. Autorisez l’accès et réessayez.",
+    errConsentMic: "Confirmez d’abord le consentement (ou autorisez le micro).",
+    errFileTooBig: "Fichier de plus de 25 Mo. Envoyez un enregistrement plus court ou dictez dans OrdiZapis.",
+    errUploadConn:
+      "La connexion a échoué pendant l’envoi (fréquent avec un gros M4A sur mobile). Réessayez en Wi‑Fi, ou dictez dans OrdiZapis.",
+    errSegmentTooBig:
+      "Le segment {n} est trop lourd ({mb} Mo). Réenregistrez — l’appli découpe maintenant toutes les 2 min.",
+    errSegmentFailed: "Échec de la transcription du segment {n}.",
+    errSegmentEmpty: "Le segment {n} est vide. Vérifiez le micro et réessayez.",
+    errEmptyFile: "Le fichier est vide.",
+    errTranscribe: "Échec de la transcription du fichier.",
+    errEmptyTranscript: "Transcription vide — le fichier n’a pas été reconnu.",
+    noteShareTitle: "Note OrdiZapis",
+  },
+  it: {
+    accessLabel: "Accesso",
+    validityLabel: "Validità",
+    subscribeCta: "Abbonamento",
+    accountAria: "Stato dell’account e validità",
+    physicianFallback: "Account medico",
+    planVip: "VIP / abbonamento",
+    planBasic: "base",
+    notSignedIn: "Non siete connessi",
+    signInLead: "Per download, note e cronologia accedete con un account medico verificato.",
+    validityAfterLogin: "dopo l’accesso",
+    verifiedLinked: "Medico verificato — l’app è collegata a questo account",
+    signOut: "Esci",
+    verifyAccount: "Verifica l’account medico",
+    subscribeOrdi: "Abbonamento OrdiZapis (390 Kč)",
+    installTitle: "Installa l’app",
+    installLead:
+      "Il download OrdiZapis è legato al vostro account MedScopeGlobal verificato — la cronologia resta sincronizzata.",
+    backToMarketing: "Torna alla pagina prodotto",
+    loadingAccount: "Caricamento dell’account…",
+    statusLabel: "Stato",
+    online: "Online",
+    offline: "Offline",
+    errConsent: "Confermate prima il consenso alla registrazione.",
+    errEmptyRec: "La registrazione è vuota — il microfono non ha catturato nulla. Consenti il microfono e riprova.",
+    errTooLarge:
+      "La registrazione è troppo grande. Provate un tratto più breve — l’app ora spezza ogni 2 minuti.",
+    errNeedLogin: "Per elaborare dovete accedere.",
+    errServerHttp: "Errore del server (HTTP {status}). Riprovate tra poco.",
+    errUnexpectedHttp: "Risposta del server inattesa (HTTP {status}). Riprovate.",
+    errStructure: "Assemblaggio della nota non riuscito.",
+    errStructureRetry: "Impossibile assemblare la nota. Riprovate la registrazione.",
+    errProcessRec: "Elaborazione non riuscita. Provate un tratto più breve o Carica un file.",
+    errProcessFile: "Elaborazione del file non riuscita.",
+    errCopy: "Copia negli appunti non riuscita.",
+    errNothingToCopy: "Non c’è ancora nulla da copiare — create una nota.",
+    errMicBlocked:
+      "Il microfono è bloccato. Sul telefono: Impostazioni → OrdiZapis / Safari / Chrome → Microfono → Consenti, poi di nuovo « Consenti il microfono ».",
+    errMicMissing: "Microfono non trovato. Controllate che il dispositivo ne abbia uno e che un’altra app non lo usi.",
+    errMicGeneric: "Impossibile ottenere il microfono. Consenti l’accesso e riprova.",
+    errConsentMic: "Confermate prima il consenso (o consentite il microfono).",
+    errFileTooBig: "File oltre 25 MB. Caricate una registrazione più breve o registrate in OrdiZapis.",
+    errUploadConn:
+      "Connessione persa durante l’invio (frequente con M4A grandi sul telefono). Riprovate in Wi‑Fi o registrate in OrdiZapis.",
+    errSegmentTooBig:
+      "Il segmento {n} è troppo grande ({mb} MB). Registrate di nuovo — l’app ora spezza ogni 2 minuti.",
+    errSegmentFailed: "Trascrizione del segmento {n} non riuscita.",
+    errSegmentEmpty: "Il segmento {n} è vuoto. Controllate il microfono e riprovate.",
+    errEmptyFile: "Il file è vuoto.",
+    errTranscribe: "Trascrizione del file non riuscita.",
+    errEmptyTranscript: "Trascrizione vuota — il file non è stato riconosciuto.",
+    noteShareTitle: "Nota OrdiZapis",
+  },
+  es: {
+    accessLabel: "Acceso",
+    validityLabel: "Validez",
+    subscribeCta: "Suscripción",
+    accountAria: "Estado de la cuenta y validez",
+    physicianFallback: "Cuenta médica",
+    planVip: "VIP / suscripción",
+    planBasic: "básico",
+    notSignedIn: "No ha iniciado sesión",
+    signInLead: "Para la descarga, las notas y el historial, entre con una cuenta médica verificada.",
+    validityAfterLogin: "tras iniciar sesión",
+    verifiedLinked: "Médico verificado — la app está ligada a esta cuenta",
+    signOut: "Cerrar sesión",
+    verifyAccount: "Verificar la cuenta médica",
+    subscribeOrdi: "Suscripción OrdiZapis (390 Kč)",
+    installTitle: "Instalar la app",
+    installLead:
+      "La descarga de OrdiZapis está ligada a su cuenta MedScopeGlobal verificada — el historial se sincroniza.",
+    backToMarketing: "Volver a la página del producto",
+    loadingAccount: "Cargando la cuenta…",
+    statusLabel: "Estado",
+    online: "En línea",
+    offline: "Sin conexión",
+    errConsent: "Confirme primero el consentimiento de grabación.",
+    errEmptyRec: "La grabación está vacía — el micrófono no captó nada. Permita el micrófono y reintente.",
+    errTooLarge:
+      "La grabación es demasiado grande. Pruebe un tramo más corto — la app ahora parte cada 2 minutos.",
+    errNeedLogin: "Debe iniciar sesión para procesar.",
+    errServerHttp: "Fallo del servidor (HTTP {status}). Reintente en un momento.",
+    errUnexpectedHttp: "Respuesta inesperada del servidor (HTTP {status}). Reintente.",
+    errStructure: "No se pudo armar la nota.",
+    errStructureRetry: "No se pudo armar la nota. Vuelva a grabar.",
+    errProcessRec: "Fallo al procesar. Pruebe un tramo más corto o Enviar un archivo.",
+    errProcessFile: "Fallo al procesar el archivo.",
+    errCopy: "No se pudo copiar al portapapeles.",
+    errNothingToCopy: "Aún no hay nada que copiar — cree una nota.",
+    errMicBlocked:
+      "El micrófono está bloqueado. En el teléfono: Ajustes → OrdiZapis / Safari / Chrome → Micrófono → Permitir, luego « Permitir micrófono ».",
+    errMicMissing: "No se encontró micrófono. Compruebe que el dispositivo tenga uno y que otra app no lo use.",
+    errMicGeneric: "No se pudo acceder al micrófono. Permita el acceso y reintente.",
+    errConsentMic: "Confirme primero el consentimiento (o permita el micrófono).",
+    errFileTooBig: "Archivo de más de 25 MB. Suba una grabación más corta o grabe en OrdiZapis.",
+    errUploadConn:
+      "Falló la conexión al enviar (frecuente con un M4A grande en el móvil). Reintente por Wi‑Fi o grabe en OrdiZapis.",
+    errSegmentTooBig:
+      "El segmento {n} es demasiado grande ({mb} MB). Grabe de nuevo — la app ahora parte cada 2 minutos.",
+    errSegmentFailed: "Falló la transcripción del segmento {n}.",
+    errSegmentEmpty: "El segmento {n} está vacío. Revise el micrófono y reintente.",
+    errEmptyFile: "El archivo está vacío.",
+    errTranscribe: "Falló la transcripción del archivo.",
+    errEmptyTranscript: "Transcripción vacía — no se reconoció el archivo.",
+    noteShareTitle: "Nota OrdiZapis",
+  },
+  "pt-BR": {
+    accessLabel: "Acesso",
+    validityLabel: "Validade",
+    subscribeCta: "Assinatura",
+    accountAria: "Estado da conta e validade",
+    physicianFallback: "Conta médica",
+    planVip: "VIP / assinatura",
+    planBasic: "básico",
+    notSignedIn: "Você não está conectado",
+    signInLead: "Para transferência, notas e histórico, entre com uma conta médica verificada.",
+    validityAfterLogin: "após o login",
+    verifiedLinked: "Médico verificado — a app está ligada a esta conta",
+    signOut: "Sair",
+    verifyAccount: "Verificar a conta médica",
+    subscribeOrdi: "Assinatura OrdiZapis (390 Kč)",
+    installTitle: "Instalar a app",
+    installLead:
+      "A transferência do OrdiZapis está ligada à sua conta MedScopeGlobal verificada — o histórico sincroniza.",
+    backToMarketing: "Voltar à página do produto",
+    loadingAccount: "A carregar a conta…",
+    statusLabel: "Estado",
+    online: "Online",
+    offline: "Offline",
+    errConsent: "Confirme primeiro o consentimento da gravação.",
+    errEmptyRec: "A gravação está vazia — o microfone não captou nada. Autorize o microfone e tente de novo.",
+    errTooLarge:
+      "A gravação é demasiado grande. Tente um trecho mais curto — a app agora parte a cada 2 min.",
+    errNeedLogin: "Tem de iniciar sessão para processar.",
+    errServerHttp: "Falha no servidor (HTTP {status}). Tente de novo daqui a pouco.",
+    errUnexpectedHttp: "Resposta inesperada do servidor (HTTP {status}). Tente de novo.",
+    errStructure: "Falha ao montar a nota.",
+    errStructureRetry: "Não foi possível montar a nota. Tente gravar de novo.",
+    errProcessRec: "Falha no processamento. Tente um trecho mais curto ou Enviar um ficheiro.",
+    errProcessFile: "Falha ao processar o ficheiro.",
+    errCopy: "Falha ao copiar para a área de transferência.",
+    errNothingToCopy: "Ainda não há nada para copiar — crie uma nota.",
+    errMicBlocked:
+      "O microfone está bloqueado. No telefone: Definições → OrdiZapis / Safari / Chrome → Microfone → Permitir, depois « Permitir microfone ».",
+    errMicMissing: "Microfone não encontrado. Confirme que o aparelho tem um e que outra app não o está a usar.",
+    errMicGeneric: "Não foi possível obter o microfone. Autorize o acesso e tente de novo.",
+    errConsentMic: "Confirme primeiro o consentimento (ou autorize o microfone).",
+    errFileTooBig: "Ficheiro com mais de 25 MB. Envie uma gravação mais curta ou grave no OrdiZapis.",
+    errUploadConn:
+      "A ligação falhou no envio (comum com M4A grandes no telemóvel). Tente em Wi‑Fi ou grave no OrdiZapis.",
+    errSegmentTooBig:
+      "O segmento {n} é demasiado grande ({mb} MB). Grave de novo — a app agora parte a cada 2 min.",
+    errSegmentFailed: "A transcrição do segmento {n} falhou.",
+    errSegmentEmpty: "O segmento {n} está vazio. Verifique o microfone e tente de novo.",
+    errEmptyFile: "O ficheiro está vazio.",
+    errTranscribe: "A transcrição do ficheiro falhou.",
+    errEmptyTranscript: "Transcrição vazia — o ficheiro não foi reconhecido.",
+    noteShareTitle: "Nota OrdiZapis",
+  },
+  en: {
+    accessLabel: "Access",
+    validityLabel: "Validity",
+    subscribeCta: "Subscribe",
+    accountAria: "Account status and validity",
+    physicianFallback: "Physician account",
+    planVip: "VIP / subscription",
+    planBasic: "basic",
+    notSignedIn: "You are not signed in",
+    signInLead: "To download, take notes and see history, sign in with a verified physician account.",
+    validityAfterLogin: "after sign-in",
+    verifiedLinked: "Verified physician — the app is linked to this account",
+    signOut: "Sign out",
+    verifyAccount: "Verify physician account",
+    subscribeOrdi: "OrdiZapis subscription (390 Kč)",
+    installTitle: "Install the app",
+    installLead:
+      "The OrdiZapis download is tied to your verified MedScopeGlobal account — history stays in sync.",
+    backToMarketing: "Back to the product page",
+    loadingAccount: "Loading account…",
+    statusLabel: "Status",
+    online: "Online",
+    offline: "Offline",
+    errConsent: "Confirm recording consent first.",
+    errEmptyRec: "The recording is empty — the microphone captured nothing. Allow the microphone and try again.",
+    errTooLarge:
+      "The recording is too large. Try a shorter clip — the app now splits every 2 minutes.",
+    errNeedLogin: "Sign in to process the recording.",
+    errServerHttp: "Server processing failed (HTTP {status}). Try again in a moment.",
+    errUnexpectedHttp: "Unexpected server response (HTTP {status}). Try again.",
+    errStructure: "Failed to assemble the note.",
+    errStructureRetry: "The note could not be assembled. Try recording again.",
+    errProcessRec: "Processing failed. Try a shorter clip or Upload a file.",
+    errProcessFile: "File processing failed.",
+    errCopy: "Could not copy to the clipboard.",
+    errNothingToCopy: "Nothing to copy yet — create a note first.",
+    errMicBlocked:
+      "The microphone is blocked. On the phone: Settings → OrdiZapis / Safari / Chrome → Microphone → Allow, then tap “Allow microphone” again.",
+    errMicMissing: "No microphone found. Check that the device has one and that another app is not using it.",
+    errMicGeneric: "Could not access the microphone. Allow access and try again.",
+    errConsentMic: "Confirm recording consent first (or allow the microphone).",
+    errFileTooBig: "File is larger than 25 MB. Upload a shorter recording or record in OrdiZapis.",
+    errUploadConn:
+      "The upload connection failed (common with a large M4A on mobile). Retry on Wi‑Fi, or record in OrdiZapis.",
+    errSegmentTooBig:
+      "Segment {n} is too large ({mb} MB). Record again — the app now splits every 2 minutes.",
+    errSegmentFailed: "Transcription of segment {n} failed.",
+    errSegmentEmpty: "Segment {n} came back empty. Check the microphone and try again.",
+    errEmptyFile: "The file is empty.",
+    errTranscribe: "File transcription failed.",
+    errEmptyTranscript: "Transcript is empty — the file was not recognised.",
+    noteShareTitle: "OrdiZapis note",
+  },
+};
+
 export function getOrdiZapisAppCopy(locale?: string | null): OrdiZapisAppCopy {
-  return PACK[chromePack(locale)];
+  const pack = chromePack(locale);
+  return { ...PACK[pack], ...ACCOUNT[pack] };
 }
 
 export function ordizapisAppHref(locale?: string | null): string {
   const loc = normalizeLocale(locale || "cs");
   if (chromePack(loc) === "cs") return "/app/dokumentace";
   return `/app/dokumentace?locale=${encodeURIComponent(loc)}`;
+}
+
+export function ordizapisLoginHref(locale?: string | null): string {
+  const loc = normalizeLocale(locale || "cs");
+  const login = localizePublicHref("/login", loc);
+  return `${login}?next=${encodeURIComponent(ordizapisAppHref(loc))}`;
+}
+
+export function ordizapisSubscribeHref(locale?: string | null): string {
+  return localizePublicHref("/predplatne#dokumentace", normalizeLocale(locale || "cs"));
 }

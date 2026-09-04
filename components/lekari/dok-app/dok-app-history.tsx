@@ -81,7 +81,7 @@ export function DokAppHistory({ locale }: { locale?: string }) {
   ) {
     try {
       const result = await shareOrdiZapisDoc(text, {
-        title: title || "OrdiZapis zápis",
+        title: title || copy.noteShareTitle,
         templateId,
       });
       if (result === "copied") {
@@ -201,7 +201,7 @@ Lékař schvaluje finální znění. OrdiZapis není zdravotnický prostředek.`
                   className="h-8 rounded-full"
                   onClick={() =>
                     downloadOrdiZapisDoc(item.note, {
-                      title: item.title || "OrdiZapis zápis",
+                      title: item.title || copy.noteShareTitle,
                       templateId: item.template_id,
                     })
                   }

@@ -82,15 +82,25 @@ function isMobileClient(): boolean {
 
 const CONSENT_KEY = "ordizapis_consent_v1";
 
-function micErrorMessage(err: unknown): string {
+function fill(template: string, vars: Record<string, string | number>): string {
+  return Object.entries(vars).reduce(
+    (out, [key, value]) => out.replaceAll(`{${key}}`, String(value)),
+    template
+  );
+}
+
+function micErrorMessage(
+  err: unknown,
+  copy: ReturnType<typeof getOrdiZapisAppCopy>
+): string {
   const name = err && typeof err === "object" && "name" in err ? String((err as { name: string }).name) : "";
   if (name === "NotAllowedError" || name === "PermissionDeniedError") {
-    return "Mikrofon je zablokovaný. V telefonu: Nastavení → OrdiZapis / Safari / Chrome → Mikrofon → Povolit, pak znovu klepněte na „Povolit mikrofon“.";
+    return copy.errMicBlocked;
   }
   if (name === "NotFoundError") {
-    return "Mikrofon nebyl nalezen. Zkontrolujte, že zařízení má mikrofon a není používán jinou aplikací.";
+    return copy.errMicMissing;
   }
-  return "Nepodařilo se získat mikrofon. Povolte přístup a zkuste znovu.";
+  return copy.errMicGeneric;
 }
 
 async function ensureMicPermission(): Promise<MediaStream> {
@@ -237,8 +247,8 @@ export function DokumentaceWorkspace({
       return {
         error:
           res.status === 413
-            ? "Nahrávka je příliš velká pro odeslání. Zkuste kratší úsek — aplikace teď dělí nahrávku po 2 minutách."
-            : `Server neodpověděl (HTTP ${res.status}). Zkuste znovu.`,
+            ? copy.errTooLarge
+            : fill(copy.errUnexpectedHttp, { status: res.status }),
       };
     }
     try {
@@ -255,35 +265,33 @@ export function DokumentaceWorkspace({
       if (res.status === 413 || /request entity too large|payload/i.test(raw)) {
         return {
           error:
-            "Nahrávka je příliš velká pro odeslání. Zkuste kratší úsek — aplikace teď dělí nahrávku po 2 minutách.",
+            copy.errTooLarge,
           code: "SEGMENT_TOO_LARGE",
         };
       }
       if (res.status === 401) {
-        return { error: "Pro zpracování se musíte přihlásit." };
+        return { error: copy.errNeedLogin };
       }
       if (res.status >= 500) {
         return {
-          error: `Zpracování na serveru selhalo (HTTP ${res.status}). Zkuste znovu za chvíli.`,
+          error: fill(copy.errServerHttp, { status: res.status }),
         };
       }
       return {
-        error: `Neočekávaná odpověď serveru (HTTP ${res.status}). Zkuste znovu.`,
+        error: fill(copy.errUnexpectedHttp, { status: res.status }),
       };
     }
   }
 
   async function processBlobs(blobs: Blob[]) {
     if (!consent) {
-      setError("Nejprve potvrďte souhlas s nahráváním.");
+      setError(copy.errConsent);
       setState("error");
       return;
     }
     const usable = blobs.filter((b) => b.size > 0);
     if (usable.length === 0) {
-      setError(
-        "Nahrávka je prázdná — mikrofon nic nezachytil. Povolte mikrofon a zkuste znovu."
-      );
+      setError(copy.errEmptyRec);
       setState("error");
       return;
     }
@@ -302,7 +310,10 @@ export function DokumentaceWorkspace({
         const blob = usable[i];
         if (blob.size > DOKUMENTACE_SOFT_UPLOAD_BYTES) {
           setError(
-            `Segment ${i + 1} je příliš velký (${Math.max(1, Math.round(blob.size / (1024 * 1024)))} MB). Nahrajte znovu — nahrávka se teď automaticky dělí po 2 minutách.`
+            fill(copy.errSegmentTooBig, {
+              n: i + 1,
+              mb: Math.max(1, Math.round(blob.size / (1024 * 1024))),
+            })
           );
           setState("error");
           return;
@@ -330,14 +341,12 @@ export function DokumentaceWorkspace({
         });
         const json = await readApiJson(res);
         if (!res.ok) {
-          applyGate(res.status, json.error ?? `Přepis segmentu ${i + 1} selhal.`);
+          applyGate(res.status, json.error ?? fill(copy.errSegmentFailed, { n: i + 1 }));
           return;
         }
         const piece = (json.transcript ?? "").trim();
         if (!piece) {
-          setError(
-            `Segment ${i + 1} se nepřepsal (prázdný výsledek). Zkontrolujte mikrofon a zkuste znovu.`
-          );
+          setError(fill(copy.errSegmentEmpty, { n: i + 1 }));
           setState("error");
           return;
         }
@@ -365,11 +374,11 @@ export function DokumentaceWorkspace({
       });
       const structJson = await readApiJson(structRes);
       if (!structRes.ok) {
-        applyGate(structRes.status, structJson.error ?? "Sestavení zápisu selhalo.");
+        applyGate(structRes.status, structJson.error ?? copy.errStructure);
         return;
       }
       if (!(structJson.note ?? "").trim()) {
-        setError("Zápis se nepodařilo sestavit. Zkuste nahrávku znovu.");
+        setError(copy.errStructureRetry);
         setState("error");
         return;
       }
@@ -385,10 +394,7 @@ export function DokumentaceWorkspace({
       void loadHistory();
     } catch (err) {
       setError(
-        friendlyFetchError(
-          err,
-          "Zpracování nahrávky selhalo. Zkuste kratší úsek nebo Nahrát soubor znovu."
-        )
+        friendlyFetchError(err, copy.errProcessRec, copy.errUploadConn)
       );
       setState("error");
     }
@@ -404,7 +410,7 @@ export function DokumentaceWorkspace({
       if (!consent) setConsent(true);
     } catch (err) {
       setMicReady(false);
-      setError(micErrorMessage(err));
+      setError(micErrorMessage(err, copy));
       setState("error");
     } finally {
       setMicBusy(false);
@@ -413,7 +419,7 @@ export function DokumentaceWorkspace({
 
   async function startRecording() {
     if (!consent) {
-      setError("Nejprve potvrďte souhlas s nahráváním (nebo povolte mikrofon).");
+      setError(copy.errConsentMic);
       setState("error");
       return;
     }
@@ -504,7 +510,7 @@ export function DokumentaceWorkspace({
         }
       }, 200);
     } catch (err) {
-      setError(micErrorMessage(err));
+      setError(micErrorMessage(err, copy));
       setMicReady(false);
       setState("error");
     }
@@ -566,9 +572,7 @@ export function DokumentaceWorkspace({
 
     try {
       if (file.size > ORDIZAPIS_MAX_FILE_BYTES) {
-        setError(
-          "Soubor je větší než 25 MB. Nahrajte kratší nahrávku nebo použijte Nahrávat v OrdiZapisu."
-        );
+        setError(copy.errFileTooBig);
         setState("error");
         return;
       }
@@ -594,11 +598,11 @@ export function DokumentaceWorkspace({
       });
       const structJson = await readApiJson(structRes);
       if (!structRes.ok) {
-        applyGate(structRes.status, structJson.error ?? "Sestavení zápisu selhalo.");
+        applyGate(structRes.status, structJson.error ?? copy.errStructure);
         return;
       }
       if (!(structJson.note ?? "").trim()) {
-        setError("Zápis se nepodařilo sestavit. Zkuste nahrávku znovu.");
+        setError(copy.errStructureRetry);
         setState("error");
         return;
       }
@@ -613,7 +617,7 @@ export function DokumentaceWorkspace({
       setState("done");
       void loadHistory();
     } catch (err) {
-      setError(friendlyFetchError(err, "Zpracování souboru selhalo.").slice(0, 280));
+      setError(friendlyFetchError(err, copy.errProcessFile, copy.errUploadConn).slice(0, 280));
       setState("error");
     }
   }
@@ -625,7 +629,7 @@ export function DokumentaceWorkspace({
       setCopyFlash(true);
       window.setTimeout(() => setCopyFlash(false), 1600);
     } catch {
-      setError("Kopírování do schránky selhalo.");
+      setError(copy.errCopy);
     }
   }
 
@@ -643,14 +647,14 @@ export function DokumentaceWorkspace({
       await copyText(note);
       return;
     }
-    setError("Zatím není co kopírovat — vytvořte zápis.");
+    setError(copy.errNothingToCopy);
   }
 
   async function shareNote(text: string, title?: string | null) {
     if (!text) return;
     try {
       const result = await shareOrdiZapisDoc(text, {
-        title: title || "OrdiZapis zápis",
+        title: title || copy.noteShareTitle,
         templateId,
       });
       if (result === "copied") {
@@ -678,7 +682,7 @@ export function DokumentaceWorkspace({
   function downloadNote() {
     if (!note) return;
     downloadOrdiZapisDoc(note, {
-      title: "OrdiZapis · klinický zápis",
+      title: copy.noteShareTitle,
       templateId,
     });
   }

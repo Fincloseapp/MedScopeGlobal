@@ -17,7 +17,11 @@ import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
 import { ORDIZAPIS_APP } from "@/lib/apps/catalog";
 import { guestAccess, type AppAccessInfo } from "@/lib/apps/access-status";
 import { getClientLocale } from "@/lib/i18n/client-dictionary";
-import { getOrdiZapisAppCopy } from "@/lib/i18n/ordizapis-app-copy";
+import {
+  getOrdiZapisAppCopy,
+  ordizapisLoginHref,
+  ordizapisSubscribeHref,
+} from "@/lib/i18n/ordizapis-app-copy";
 
 type TabId = "zapis" | "historie" | "navod" | "ucet";
 
@@ -34,10 +38,10 @@ type EligibilityState = {
   access?: AppAccessInfo;
 };
 
-function fallbackAccess(hostLabel: string) {
+function fallbackAccess(hostLabel: string, locale?: string) {
   return guestAccess(
-    "/login?next=/app/dokumentace",
-    "/predplatne#dokumentace",
+    ordizapisLoginHref(locale),
+    ordizapisSubscribeHref(locale),
     hostLabel
   );
 }
@@ -116,7 +120,10 @@ export function DokAppShell({ locale: localeProp }: { locale?: string }) {
             canInstall: false,
             message: getOrdiZapisAppCopy(getClientLocale()).needLogin,
             facilities: [],
-            access: fallbackAccess(getOrdiZapisAppCopy(getClientLocale()).hostLabel),
+            access: fallbackAccess(
+              getOrdiZapisAppCopy(getClientLocale()).hostLabel,
+              getClientLocale()
+            ),
           });
         }
       } catch {
@@ -125,7 +132,10 @@ export function DokAppShell({ locale: localeProp }: { locale?: string }) {
           canInstall: false,
           message: getOrdiZapisAppCopy(getClientLocale()).networkFail,
           facilities: [],
-          access: fallbackAccess(getOrdiZapisAppCopy(getClientLocale()).hostLabel),
+          access: fallbackAccess(
+            getOrdiZapisAppCopy(getClientLocale()).hostLabel,
+            getClientLocale()
+          ),
         });
       } finally {
         setLoading(false);
@@ -145,7 +155,7 @@ export function DokAppShell({ locale: localeProp }: { locale?: string }) {
     }
   }, [elig?.eligible, tab]);
 
-  const access = elig?.access ?? fallbackAccess(copy.hostLabel);
+  const access = elig?.access ?? fallbackAccess(copy.hostLabel, locale);
   const loginUrl = elig?.loginUrl || access.loginUrl;
   const sectionTabs = tabs.map((t) => ({
     ...t,
@@ -185,10 +195,10 @@ export function DokAppShell({ locale: localeProp }: { locale?: string }) {
                   ? "bg-emerald-400/20 text-emerald-100"
                   : "bg-amber-400/20 text-amber-100"
               }`}
-              title={online ? "Online" : "Offline"}
+              title={online ? copy.online : copy.offline}
             >
               {online ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
-              {online ? "Online" : "Offline"}
+              {online ? copy.online : copy.offline}
             </span>
             {access.authenticated ? (
               <button
@@ -217,7 +227,14 @@ export function DokAppShell({ locale: localeProp }: { locale?: string }) {
         access={access}
         accent="#005B96"
         onOpenAccount={() => setTab("ucet")}
-        labels={{ signIn: copy.signIn, account: copy.tabAccount }}
+        labels={{
+          signIn: copy.signIn,
+          account: copy.tabAccount,
+          access: copy.accessLabel,
+          validity: copy.validityLabel,
+          subscribe: copy.subscribeCta,
+          aria: copy.accountAria,
+        }}
       />
 
       <AppSectionNav
@@ -256,6 +273,7 @@ export function DokAppShell({ locale: localeProp }: { locale?: string }) {
             eligibility={elig}
             linkHint={linkHint}
             onEligibility={setElig}
+            locale={locale}
           />
         )}
       </main>
