@@ -2728,6 +2728,23 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.equal(isListableNewsArticle(shortNews, new Date(), "cs"), false);
   assert.equal(isHomepageDeskArticle(shortNews, new Date(), "cs"), true);
   assert.equal(splitNewsDesks([shortNews]).novinky[0]?.id, "who-short");
+  const publicNewsFill = splitNewsDesks([
+    {
+      id: "headache-fill",
+      title: "Bolesti hlavy — kdy je běžná a kdy urgentní — červené a zelené signály",
+      slug: "bolesti-hlavy-fill",
+      excerpt: "Kdy volat lékaře.",
+      content: longBody,
+      published: true,
+      published_at: "2026-09-04T11:00:00.000Z",
+      vip_only: false,
+      locale: "cs",
+      audience: "public",
+      public_topic: "nemoci",
+    } as never,
+  ]);
+  assert.equal(publicNewsFill.novinky[0]?.id, "headache-fill");
+  assert.equal(publicNewsFill.dlouhovekost.length, 0);
   assert.deepEqual(
     filterArticlesForLocale(
       [
