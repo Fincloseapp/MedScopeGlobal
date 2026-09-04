@@ -23,6 +23,7 @@ import {
   getOrdiZapisAppCopy,
   ordizapisLoginHref,
 } from "@/lib/i18n/ordizapis-app-copy";
+import { dokumentaceLocaleHeaders } from "@/lib/lekari/dokumentace/request-locale";
 
 type EligibilityState = {
   eligible: boolean;
@@ -81,7 +82,10 @@ export function DokAppAccount({
       try {
         const [ctxRes, eligRes] = await Promise.all([
           fetch("/api/v22/reader-context", { credentials: "same-origin" }),
-          fetch("/api/lekari/dokumentace/eligibility", { credentials: "same-origin" }),
+          fetch("/api/lekari/dokumentace/eligibility", {
+            credentials: "same-origin",
+            headers: dokumentaceLocaleHeaders(locale ?? "cs"),
+          }),
         ]);
         if (ctxRes.ok) {
           setCtx((await ctxRes.json()) as ReaderContext);
@@ -104,7 +108,7 @@ export function DokAppAccount({
       window.removeEventListener("online", on);
       window.removeEventListener("offline", off);
     };
-  }, [onEligibility]);
+  }, [onEligibility, locale]);
 
   async function signOut() {
     const supabase = createClient();

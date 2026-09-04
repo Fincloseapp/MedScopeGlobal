@@ -10,6 +10,7 @@ import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
 import { getDokumentaceCopy } from "@/lib/i18n/dokumentace-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { ordizapisAppHref } from "@/lib/i18n/ordizapis-app-copy";
+import { dokumentaceLocaleHeaders } from "@/lib/lekari/dokumentace/request-locale";
 
 type EligibilityResponse = {
   eligible: boolean;
@@ -45,6 +46,7 @@ export function DokumentaceDownloadPanel({
       try {
         const res = await fetch("/api/lekari/dokumentace/eligibility", {
           credentials: "same-origin",
+          headers: dokumentaceLocaleHeaders(locale ?? "cs"),
         });
         if (res.ok) {
           setData((await res.json()) as EligibilityResponse);
@@ -57,7 +59,7 @@ export function DokumentaceDownloadPanel({
         setLoading(false);
       }
     })();
-  }, []);
+  }, [locale]);
 
   const canInstall = Boolean(data?.canInstall);
   const qrSrc = canInstall

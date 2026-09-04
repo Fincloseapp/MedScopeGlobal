@@ -10,6 +10,7 @@ import {
 } from "@/components/lekari/ordizapis-export";
 import { getOrdiZapisAppCopy } from "@/lib/i18n/ordizapis-app-copy";
 import { intlLocaleFor } from "@/lib/i18n/format-date";
+import { dokumentaceLocaleHeaders } from "@/lib/lekari/dokumentace/request-locale";
 
 type NoteListItem = {
   id: string;
@@ -38,6 +39,7 @@ export function DokAppHistory({ locale }: { locale?: string }) {
     try {
       const res = await fetch("/api/lekari/dokumentace/notes?limit=40", {
         credentials: "same-origin",
+        headers: dokumentaceLocaleHeaders(locale ?? "cs"),
       });
       if (res.status === 401) {
         setNotes([]);

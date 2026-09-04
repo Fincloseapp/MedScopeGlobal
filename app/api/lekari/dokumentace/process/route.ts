@@ -10,7 +10,8 @@ import {
 import { transcribeAudio } from "@/lib/lekari/dokumentace/stt";
 import { structureDokumentaceNote } from "@/lib/lekari/dokumentace/structure";
 import { saveDokumentaceNote } from "@/lib/lekari/dokumentace/notes";
-import { dokumentaceLocaleFromForm } from "@/lib/lekari/dokumentace/request-locale";
+import { dokumentaceLocaleFromForm, dokumentaceLocaleFromRequest } from "@/lib/lekari/dokumentace/request-locale";
+import { fillOrdiApi, getOrdiZapisApiCopy } from "@/lib/i18n/ordizapis-api-copy";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -55,7 +56,8 @@ export async function POST(request: Request) {
   });
   if (!guard.ok) return guard.response;
 
-  const access = await assertDokumentaceAccess(user?.id);
+  const headerLocale = dokumentaceLocaleFromRequest(request);
+  const access = await assertDokumentaceAccess(user?.id, headerLocale);
   if (!access.ok) {
     return NextResponse.json({ error: access.error }, { status: access.status });
   }
@@ -64,13 +66,18 @@ export async function POST(request: Request) {
   try {
     form = await request.formData();
   } catch {
-    return NextResponse.json({ error: "Neplatný multipart formulář." }, { status: 400 });
+    return NextResponse.json(
+      { error: getOrdiZapisApiCopy(headerLocale).errBadForm },
+      { status: 400 }
+    );
   }
 
+  const locale = dokumentaceLocaleFromForm(request, form);
+  const copy = getOrdiZapisApiCopy(locale);
   const files = collectAudioFiles(form);
   if (files.length === 0) {
     return NextResponse.json(
-      { error: "Chybí audio soubor (pole audio nebo file)." },
+      { error: copy.errMissingAudio },
       { status: 400 }
     );
   }
@@ -82,7 +89,6 @@ export async function POST(request: Request) {
     modeRaw === "dictation" || modeRaw === "verbatim" ? modeRaw : "consultation";
   const template = getDokumentaceTemplate(templateId);
   const source = resolveSource(request, form);
-  const locale = dokumentaceLocaleFromForm(request, form);
 
   const parts: string[] = [];
   const providers: string[] = [];
@@ -97,7 +103,7 @@ export async function POST(request: Request) {
       if (buffer.byteLength > DOKUMENTACE_MAX_UPLOAD_BYTES) {
         return NextResponse.json(
           {
-            error: `Segment ${i + 1} přesahuje limit 25 MB. Nahrajte kratší úsek nebo použijte automatické dělení.`,
+            error: fillOrdiApi(copy.errSegmentLimit, { n: i + 1 }),
           },
           { status: 413 }
         );
@@ -113,7 +119,7 @@ export async function POST(request: Request) {
     const transcript = parts.join("\n\n").trim();
     if (!transcript) {
       return NextResponse.json(
-        { error: "Přepis je prázdný — nahrávka se nepřenášla nebo mikrofon nic nezachytil." },
+        { error: copy.errEmptyTranscript },
         { status: 422 }
       );
     }

@@ -25,3 +25,8 @@ export function dokumentaceLocaleHeaders(locale: string): Record<string, string>
     "x-dokumentace-locale": locale,
   };
 }
+
+export function dokumentaceLocaleFromUrl(request: Request): string {
+  const url = new URL(request.url);
+  return dokumentaceLocaleFromRequest(request, url.searchParams.get("locale"));
+}

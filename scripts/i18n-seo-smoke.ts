@@ -61,6 +61,7 @@ import { getPhysicianLandingCopy } from "../lib/i18n/physician-landing-copy";
 import { getOrdiZaznamCopy } from "../lib/i18n/ordizaznam-copy";
 import { getDokumentaceCopy } from "../lib/i18n/dokumentace-copy";
 import { getOrdiZapisAppCopy } from "../lib/i18n/ordizapis-app-copy";
+import { getOrdiZapisApiCopy } from "../lib/i18n/ordizapis-api-copy";
 import {
   dokumentaceNoteLanguage,
   sttPromptFor,
@@ -768,6 +769,8 @@ assert.equal(getPhysicianLandingCopy("en-US").verifyAdminHref, undefined);
   assert.ok(!getOrdiZapisAppCopy("fr").installGated.includes("Stažení"));
   assert.equal(getOrdiZapisAppCopy("fr").accessLabel, "Accès");
   assert.ok(!getOrdiZapisAppCopy("it").errConsent.includes("souhlas"));
+  assert.ok(getOrdiZapisApiCopy("fr").unauthMessage.toLowerCase().includes("connectez"));
+  assert.ok(!getOrdiZapisApiCopy("es").quotaDemo.includes("Vyčerpán"));
   assert.equal(isCzechFacultyLocale("fr"), false);
   assert.equal(isCzechFacultyLocale("cs"), true);
   assert.ok(!getCzechFacultyOnlyCopy("de").lead.includes("přijímačky"));

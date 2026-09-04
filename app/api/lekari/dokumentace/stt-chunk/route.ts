@@ -4,7 +4,8 @@ import { withApiGuard } from "@/lib/security/api-guard";
 import { getDokumentaceEligibility } from "@/lib/lekari/dokumentace/eligibility";
 import { DOKUMENTACE_MAX_UPLOAD_BYTES } from "@/lib/lekari/dokumentace/templates";
 import { transcribeAudio } from "@/lib/lekari/dokumentace/stt";
-import { dokumentaceLocaleFromForm } from "@/lib/lekari/dokumentace/request-locale";
+import { dokumentaceLocaleFromForm, dokumentaceLocaleFromRequest } from "@/lib/lekari/dokumentace/request-locale";
+import { getOrdiZapisApiCopy } from "@/lib/i18n/ordizapis-api-copy";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -27,11 +28,15 @@ export async function POST(request: Request) {
   });
   if (!guard.ok) return guard.response;
 
+  const headerLocale = dokumentaceLocaleFromRequest(request);
   if (!user) {
-    return NextResponse.json({ error: "Přihlášení vyžadováno." }, { status: 401 });
+    return NextResponse.json(
+      { error: getOrdiZapisApiCopy(headerLocale).errLoginRequired },
+      { status: 401 }
+    );
   }
 
-  const eligibility = await getDokumentaceEligibility(user.id);
+  const eligibility = await getDokumentaceEligibility(user.id, headerLocale);
   if (!eligibility.eligible) {
     return NextResponse.json(
       { error: eligibility.message, code: "DOCTOR_VERIFICATION_REQUIRED" },

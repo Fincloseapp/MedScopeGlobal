@@ -22,6 +22,7 @@ import {
   ordizapisLoginHref,
   ordizapisSubscribeHref,
 } from "@/lib/i18n/ordizapis-app-copy";
+import { dokumentaceLocaleHeaders } from "@/lib/lekari/dokumentace/request-locale";
 
 type TabId = "zapis" | "historie" | "navod" | "ucet";
 
@@ -105,8 +106,10 @@ export function DokAppShell({ locale: localeProp }: { locale?: string }) {
   useEffect(() => {
     void (async () => {
       try {
+        const loc = localeProp ?? getClientLocale();
         const res = await fetch("/api/lekari/dokumentace/eligibility", {
           credentials: "same-origin",
+          headers: dokumentaceLocaleHeaders(loc),
         });
         if (res.ok) {
           const data = (await res.json()) as EligibilityState & {

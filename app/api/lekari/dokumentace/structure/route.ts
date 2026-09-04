@@ -11,6 +11,7 @@ import {
 } from "@/lib/lekari/dokumentace/templates";
 import { saveDokumentaceNote } from "@/lib/lekari/dokumentace/notes";
 import { dokumentaceLocaleFromRequest } from "@/lib/lekari/dokumentace/request-locale";
+import { getOrdiZapisApiCopy } from "@/lib/i18n/ordizapis-api-copy";
 
 export const runtime = "nodejs";
 export const maxDuration = 180;
@@ -44,16 +45,12 @@ export async function POST(request: Request) {
   });
   if (!guard.ok) return guard.response;
 
+  const headerLocale = dokumentaceLocaleFromRequest(request);
   if (!user) {
     return NextResponse.json(
-      { error: "Pro OrdiZapis od MedScopeGlobal se musíte přihlásit." },
+      { error: getOrdiZapisApiCopy(headerLocale).unauthShort },
       { status: 401 }
     );
-  }
-
-  const access = await assertDokumentaceAccess(user.id);
-  if (!access.ok) {
-    return NextResponse.json({ error: access.error }, { status: access.status });
   }
 
   let body: z.infer<typeof bodySchema>;
@@ -62,7 +59,7 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json(
       {
-        error: "Neplatný vstup.",
+        error: getOrdiZapisApiCopy(headerLocale).errInvalidInput,
         modes: DOKUMENTACE_MODES.map((m) => m.id),
         templates: DOKUMENTACE_TEMPLATES.map((t) => t.id),
       },
@@ -70,11 +67,16 @@ export async function POST(request: Request) {
     );
   }
 
+  const locale = dokumentaceLocaleFromRequest(request, body.locale);
+  const access = await assertDokumentaceAccess(user.id, locale);
+  if (!access.ok) {
+    return NextResponse.json({ error: access.error }, { status: access.status });
+  }
+
   const sourceHeader = request.headers.get("x-dokumentace-source");
   const source = body.source ?? sourceHeader ?? "web";
 
   try {
-    const locale = dokumentaceLocaleFromRequest(request, body.locale);
     const note = await structureDokumentaceNote({
       transcript: body.transcript,
       mode: body.mode,
@@ -114,7 +116,7 @@ export async function POST(request: Request) {
       noteId: savedId,
     });
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Strukturování selhalo.";
+    const message = e instanceof Error ? e.message : getOrdiZapisApiCopy(locale).errStructure;
     return NextResponse.json({ error: message }, { status: 502 });
   }
 }

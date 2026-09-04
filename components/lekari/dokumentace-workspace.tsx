@@ -207,6 +207,7 @@ export function DokumentaceWorkspace({
     try {
       const res = await fetch("/api/lekari/dokumentace/notes?limit=40", {
         credentials: "same-origin",
+        headers: dokumentaceLocaleHeaders(locale),
       });
       if (!res.ok) {
         setHistory([]);
@@ -219,7 +220,7 @@ export function DokumentaceWorkspace({
     } finally {
       setHistoryLoading(false);
     }
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     void loadHistory();

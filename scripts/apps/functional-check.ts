@@ -91,6 +91,7 @@ import { V20_NZIP_CATEGORIES } from "../../lib/v20/categories";
 import { getRevenueCopy } from "../../lib/i18n/revenue-copy";
 import { getSurfaceCopy } from "../../lib/i18n/surface-copy";
 import { getOrdiZapisAppCopy } from "../../lib/i18n/ordizapis-app-copy";
+import { getOrdiZapisApiCopy } from "../../lib/i18n/ordizapis-api-copy";
 import {
   parseHeurekaPositionId,
   heurekaHopHtml,
@@ -818,8 +819,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.10"),
-  "page cache tag must bust after OrdiZapis account-strip i18n"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.11"),
+  "page cache tag must bust after OrdiZapis API i18n"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
@@ -910,6 +911,20 @@ assert.ok(
 assert.equal(getOrdiZapisAppCopy("fr").dictate, "Dicter");
 assert.ok(!getOrdiZapisAppCopy("fr").upload.includes("Nahrát"));
 assert.equal(getOrdiZapisAppCopy("cs").tabNote, "Zápis");
+assert.equal(getOrdiZapisApiCopy("fr").unauthShort.includes("Connectez"), true);
+assert.ok(!getOrdiZapisApiCopy("de").notVerifiedMessage.includes("Stažení"));
+assert.ok(
+  readFileSync(join(root, "lib/lekari/dokumentace/eligibility.ts"), "utf8").includes(
+    "getOrdiZapisApiCopy"
+  ),
+  "eligibility messages must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "app/api/lekari/dokumentace/eligibility/route.ts"), "utf8").includes(
+    "dokumentaceLocaleFromUrl"
+  ),
+  "eligibility API must read the request locale"
+);
 assert.equal(getOrdiZapisAppCopy("fr").accessLabel, "Accès");
 assert.equal(getOrdiZapisAppCopy("it").subscribeCta, "Abbonamento");
 assert.ok(!getOrdiZapisAppCopy("fr").errConsent.includes("souhlas"));

@@ -1,6 +1,7 @@
 /** Client-only helpers for OrdiZapis phone file upload. */
 
 import { getOrdiZapisAppCopy } from "@/lib/i18n/ordizapis-app-copy";
+import { dokumentaceLocaleHeaders } from "@/lib/lekari/dokumentace/request-locale";
 
 export const ORDIZAPIS_FILE_ACCEPT =
   "audio/*,video/mp4,video/quicktime,.m4a,.mp3,.wav,.aac,.caf,.ogg,.webm,.mp4,.mpeg";
@@ -123,13 +124,14 @@ async function uploadViaSignedUrl(
   file: File,
   mime: string,
   filename: string,
-  onProgress?: (ratio: number, label: string) => void
+  onProgress?: (ratio: number, label: string) => void,
+  locale?: string
 ): Promise<string | null> {
   onProgress?.(0.05, "Připravuji bezpečný upload…");
   const intentRes = await fetchWithRetry("/api/lekari/dokumentace/file-upload-url", {
     method: "POST",
     credentials: "same-origin",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...dokumentaceLocaleHeaders(locale || "cs") },
     body: JSON.stringify({
       byteLength: file.size,
       filename,
@@ -192,13 +194,14 @@ async function uploadViaChunks(
   file: File,
   mime: string,
   filename: string,
-  onProgress?: (ratio: number, label: string) => void
+  onProgress?: (ratio: number, label: string) => void,
+  locale?: string
 ): Promise<{ sessionId: string; total: number }> {
   onProgress?.(0.05, "Připravuji nahrávku po částech…");
   const sessionRes = await fetchWithRetry("/api/lekari/dokumentace/file-session", {
     method: "POST",
     credentials: "same-origin",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...dokumentaceLocaleHeaders(locale || "cs") },
     body: JSON.stringify({
       byteLength: file.size,
       filename,
@@ -235,6 +238,7 @@ async function uploadViaChunks(
       {
         method: "POST",
         credentials: "same-origin",
+        headers: dokumentaceLocaleHeaders(locale || "cs"),
         body: form,
       },
       3
@@ -274,13 +278,13 @@ export async function uploadAndTranscribePhoneFile(opts: {
   let session: { sessionId: string; total: number } | null = null;
 
   try {
-    path = await uploadViaSignedUrl(file, mime, filename, opts.onProgress);
+    path = await uploadViaSignedUrl(file, mime, filename, opts.onProgress, opts.locale);
   } catch {
     path = null;
   }
 
   if (!path) {
-    session = await uploadViaChunks(file, mime, filename, opts.onProgress);
+    session = await uploadViaChunks(file, mime, filename, opts.onProgress, opts.locale);
   }
 
   opts.onProgress?.(0.65, "Přepisuji nahrávku…");

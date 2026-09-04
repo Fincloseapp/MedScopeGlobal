@@ -3,6 +3,8 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { getSessionProfile } from "@/lib/auth/session";
 import { getDokumentaceEligibility } from "@/lib/lekari/dokumentace/eligibility";
+import { dokumentaceLocaleFromUrl } from "@/lib/lekari/dokumentace/request-locale";
+import { getOrdiZapisApiCopy } from "@/lib/i18n/ordizapis-api-copy";
 import {
   createDokumentaceInstallToken,
   dokumentaceAppUrl,
@@ -52,15 +54,14 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  const locale = dokumentaceLocaleFromUrl(request);
   const { user } = await getSessionProfile();
-  const eligibility = await getDokumentaceEligibility(user?.id);
+  const eligibility = await getDokumentaceEligibility(user?.id, locale);
   if (!eligibility.eligible || !eligibility.userId) {
     return NextResponse.json(
       {
         ok: false,
-        error:
-          eligibility.message ||
-          "QR pro stažení je jen pro ověřené lékaře.",
+        error: eligibility.message || getOrdiZapisApiCopy(locale).qrVerifiedOnly,
         code: eligibility.reason,
       },
       { status: eligibility.reason === "unauthenticated" ? 401 : 403 }
