@@ -1,9 +1,21 @@
 import Link from "next/link";
-import { getCzechFacultyOnlyCopy } from "@/lib/i18n/czech-faculty-only-copy";
+import {
+  CZECH_FACULTY_CS_HREF,
+  getCzechFacultyOnlyCopy,
+  type CzechFacultyProduct,
+} from "@/lib/i18n/czech-faculty-only-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
-export function CzechFacultyOnlyNotice({ locale }: { locale: string }) {
-  const copy = getCzechFacultyOnlyCopy(locale);
+export function CzechFacultyOnlyNotice({
+  locale,
+  product = "mediprep",
+  csHref,
+}: {
+  locale: string;
+  product?: CzechFacultyProduct;
+  csHref?: string;
+}) {
+  const copy = getCzechFacultyOnlyCopy(locale, product);
   return (
     <div className="bg-[#F8F4EA]">
       <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-24">
@@ -16,7 +28,7 @@ export function CzechFacultyOnlyNotice({ locale }: { locale: string }) {
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-600">{copy.lead}</p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
-            href="/cs/mediprep"
+            href={csHref ?? CZECH_FACULTY_CS_HREF[product]}
             className="rounded-full bg-[#C45C26] px-6 py-2.5 text-sm font-semibold text-white"
           >
             {copy.openCs}

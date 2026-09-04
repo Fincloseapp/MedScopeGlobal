@@ -208,7 +208,7 @@ export function DokAppShell({ locale: localeProp }: { locale?: string }) {
                 {copy.signIn}
               </Link>
             )}
-            <InstallAppButton gated canInstall={Boolean(elig?.canInstall)} />
+            <InstallAppButton gated canInstall={Boolean(elig?.canInstall)} locale={locale} />
           </div>
         </div>
       </header>

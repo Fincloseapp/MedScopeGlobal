@@ -77,6 +77,10 @@ export type OrdiZapisAppCopy = {
   signInBtn: string;
   processingHint: string;
   paused: string;
+  installGated: string;
+  installApp: string;
+  installed: string;
+  iosShare: string;
 };
 
 const PACK: Record<ChromePack, OrdiZapisAppCopy> = {
@@ -181,6 +185,10 @@ const PACK: Record<ChromePack, OrdiZapisAppCopy> = {
     signInBtn: "Přihlásit se",
     processingHint: "Odesílám a přepisuji nahrávku, pak sestavím zápis… Audio se neukládá trvale.",
     paused: "Pozastaveno",
+    installGated: "Stažení po ověření",
+    installApp: "Stáhnout aplikaci",
+    installed: "Aplikace nainstalována",
+    iosShare: "iOS: Sdílet → Na plochu",
   },
   de: {
     tabNote: "Notiz",
@@ -282,6 +290,10 @@ const PACK: Record<ChromePack, OrdiZapisAppCopy> = {
     signInBtn: "Anmelden",
     processingHint: "Aufnahme wird transkribiert, dann entsteht die Notiz… Audio wird nicht dauerhaft gespeichert.",
     paused: "Pausiert",
+    installGated: "Download nach Prüfung",
+    installApp: "App herunterladen",
+    installed: "App installiert",
+    iosShare: "iOS: Teilen → Zum Home-Bildschirm",
   },
   fr: {
     tabNote: "Note",
@@ -383,6 +395,10 @@ const PACK: Record<ChromePack, OrdiZapisAppCopy> = {
     signInBtn: "Se connecter",
     processingHint: "Envoi et transcription de l’enregistrement, puis assemblage de la note… L’audio n’est pas conservé.",
     paused: "En pause",
+    installGated: "Téléchargement après vérification",
+    installApp: "Télécharger l’appli",
+    installed: "Appli installée",
+    iosShare: "iOS : Partager → Écran d’accueil",
   },
   it: {
     tabNote: "Nota",
@@ -484,6 +500,10 @@ const PACK: Record<ChromePack, OrdiZapisAppCopy> = {
     signInBtn: "Accedi",
     processingHint: "Invio e trascrizione della registrazione, poi assemblaggio della nota… L’audio non viene conservato.",
     paused: "In pausa",
+    installGated: "Download dopo verifica",
+    installApp: "Scarica l’app",
+    installed: "App installata",
+    iosShare: "iOS: Condividi → Schermata Home",
   },
   es: {
     tabNote: "Nota",
@@ -585,6 +605,10 @@ const PACK: Record<ChromePack, OrdiZapisAppCopy> = {
     signInBtn: "Entrar",
     processingHint: "Envío y transcripción de la grabación, luego se arma la nota… El audio no se conserva.",
     paused: "En pausa",
+    installGated: "Descarga tras verificación",
+    installApp: "Descargar la app",
+    installed: "App instalada",
+    iosShare: "iOS: Compartir → Pantalla de inicio",
   },
   "pt-BR": {
     tabNote: "Nota",
@@ -686,6 +710,10 @@ const PACK: Record<ChromePack, OrdiZapisAppCopy> = {
     signInBtn: "Entrar",
     processingHint: "A enviar e transcrever a gravação, depois a montar a nota… O áudio não é guardado.",
     paused: "Em pausa",
+    installGated: "Transferência após verificação",
+    installApp: "Transferir a app",
+    installed: "App instalada",
+    iosShare: "iOS: Partilhar → Ecrã inicial",
   },
   en: {
     tabNote: "Note",
@@ -787,6 +815,10 @@ const PACK: Record<ChromePack, OrdiZapisAppCopy> = {
     signInBtn: "Sign in",
     processingHint: "Sending and transcribing the recording, then assembling the note… Audio is not kept.",
     paused: "Paused",
+    installGated: "Download after verification",
+    installApp: "Download the app",
+    installed: "App installed",
+    iosShare: "iOS: Share → Add to Home Screen",
   },
 };
 

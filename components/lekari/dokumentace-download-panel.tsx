@@ -123,7 +123,7 @@ export function DokumentaceDownloadPanel({
                 </p>
               ) : null}
               <div className="mt-3 flex flex-wrap items-center gap-3">
-                <InstallAppButton gated canInstall />
+                <InstallAppButton gated canInstall locale={locale} />
                 <Button asChild variant="outline" className="h-9 rounded-full border-white/40 bg-transparent text-white hover:bg-white/10">
                   <Link href={ordizapisAppHref(locale)}>{copy.openApp}</Link>
                 </Button>

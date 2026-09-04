@@ -818,8 +818,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.8"),
-  "page cache tag must bust after OrdiZapis FR language"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.9"),
+  "page cache tag must bust after Academy CS-only courtesy"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
@@ -856,6 +856,24 @@ assert.ok(
 assert.ok(
   readFileSync(join(root, "app/(public)/mediprep/page.tsx"), "utf8").includes("CzechFacultyOnlyNotice"),
   "MeDiprep must stay a Czech-faculty product outside /cs"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/academy/layout.tsx"), "utf8").includes(
+    "CzechFacultyOnlyNotice"
+  ),
+  "Academy must stay a Czech-faculty product outside /cs"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/studenti/layout.tsx"), "utf8").includes(
+    "CzechFacultyOnlyNotice"
+  ),
+  "Student hub must stay a Czech-faculty product outside /cs"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/medicina/layout.tsx"), "utf8").includes(
+    "CzechFacultyOnlyNotice"
+  ),
+  "Studium medicíny must stay a Czech-faculty product outside /cs"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(

@@ -765,10 +765,15 @@ assert.equal(getPhysicianLandingCopy("en-US").verifyAdminHref, undefined);
   assert.equal(getOrdiZapisAppCopy("fr").dictate, "Dicter");
   assert.equal(getOrdiZapisAppCopy("cs").tabNote, "Zápis");
   assert.ok(!getOrdiZapisAppCopy("fr").upload.includes("Nahrát"));
+  assert.ok(!getOrdiZapisAppCopy("fr").installGated.includes("Stažení"));
   assert.equal(isCzechFacultyLocale("fr"), false);
   assert.equal(isCzechFacultyLocale("cs"), true);
   assert.ok(!getCzechFacultyOnlyCopy("de").lead.includes("přijímačky"));
   assert.ok(getCzechFacultyOnlyCopy("it").openCs.toLowerCase().includes("ceca") || getCzechFacultyOnlyCopy("it").openCs.toLowerCase().includes("edizione"));
+  assert.ok(!getCzechFacultyOnlyCopy("fr", "academy").lead.includes("přijímačky"));
+  assert.ok(!getCzechFacultyOnlyCopy("fr", "academy").title.includes("Vzdělávání"));
+  assert.ok(getCzechFacultyOnlyCopy("fr", "academy").title.toLowerCase().includes("tchèque") || getCzechFacultyOnlyCopy("fr", "academy").lead.includes("édition tchèque"));
+  assert.ok(!getCzechFacultyOnlyCopy("de", "students").title.includes("Studenti"));
 }
 const itLekari = getPhysicianHubExtrasCopy("it");
 assert.ok(!/ČLK|Kč|Pro lékaře|Důvěryhodnost/.test(JSON.stringify(itLekari)));
