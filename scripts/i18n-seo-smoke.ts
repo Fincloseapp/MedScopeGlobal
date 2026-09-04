@@ -70,7 +70,7 @@ import { getMedipacientCopy } from "../lib/i18n/medipacient-copy";
 import { getMediflowCopy } from "../lib/i18n/mediflow-copy";
 import { getInstallPwaCopy } from "../lib/i18n/install-pwa-copy";
 import { getB2bPublicCopy } from "../lib/i18n/b2b-public-copy";
-import { getCzechFacultyOnlyCopy, isCzechFacultyLocale } from "../lib/i18n/czech-faculty-only-copy";
+import { czechFacultyProductForPath, getCzechFacultyOnlyCopy, isCzechFacultyLocale } from "../lib/i18n/czech-faculty-only-copy";
 import { getPhysicianHubExtrasCopy } from "../lib/i18n/physician-hub-extras-copy";
 import { tipLocale, ARTICLE_TIP_COPY } from "../lib/ecosystem/tip-copy";
 import { formatSyndicatedByline, publicEditorialByline } from "../lib/editorial/units";
@@ -774,6 +774,9 @@ assert.equal(getPhysicianLandingCopy("en-US").verifyAdminHref, undefined);
   assert.ok(!getCzechFacultyOnlyCopy("fr", "academy").title.includes("Vzdělávání"));
   assert.ok(getCzechFacultyOnlyCopy("fr", "academy").title.toLowerCase().includes("tchèque") || getCzechFacultyOnlyCopy("fr", "academy").lead.includes("édition tchèque"));
   assert.ok(!getCzechFacultyOnlyCopy("de", "students").title.includes("Studenti"));
+  assert.equal(czechFacultyProductForPath("/academy/lekari"), "academy");
+  assert.equal(czechFacultyProductForPath("/studenti/materialy"), "students");
+  assert.equal(czechFacultyProductForPath("/lekari/dokumentace"), null);
 }
 const itLekari = getPhysicianHubExtrasCopy("it");
 assert.ok(!/ČLK|Kč|Pro lékaře|Důvěryhodnost/.test(JSON.stringify(itLekari)));

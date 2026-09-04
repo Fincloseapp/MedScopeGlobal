@@ -224,3 +224,14 @@ export function getCzechFacultyOnlyCopy(
 export function isCzechFacultyLocale(locale?: string | null): boolean {
   return chromePack(locale) === "cs";
 }
+
+/** Paths that must not run Czech student/Academy trees on other editions. */
+export function czechFacultyProductForPath(pathname: string): CzechFacultyProduct | null {
+  const p = pathname.split("?")[0] || "/";
+  if (p === "/academy" || p.startsWith("/academy/")) return "academy";
+  if (p === "/mediprep" || p.startsWith("/mediprep/")) return "mediprep";
+  if (p === "/studenti" || p.startsWith("/studenti/")) return "students";
+  if (p === "/medicina" || p.startsWith("/medicina/")) return "students";
+  if (p === "/studium" || p.startsWith("/studium/")) return "students";
+  return null;
+}

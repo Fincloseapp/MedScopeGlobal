@@ -19,6 +19,10 @@ import {
 } from "@/lib/i18n/locale-path";
 import { isSearchEngineBot } from "@/lib/i18n/search-bots";
 import {
+  czechFacultyProductForPath,
+  isCzechFacultyLocale,
+} from "@/lib/i18n/czech-faculty-only-copy";
+import {
   hasValidAdminGateCookie,
   requiresAdminGate,
 } from "@/lib/auth/admin-gate-config";
@@ -86,10 +90,13 @@ export async function middleware(request: NextRequest) {
     const { locale: pathLocale, pathname: stripped } = resolveLocalePath(pathname);
     if (pathLocale) {
       const url = request.nextUrl.clone();
-      url.pathname = stripped;
+      const product =
+        !isCzechFacultyLocale(pathLocale) ? czechFacultyProductForPath(stripped) : null;
+      url.pathname = product ? "/czech-edition-only" : stripped;
       const requestHeaders = new Headers(request.headers);
       requestHeaders.set(LOCALE_REQUEST_HEADER, normalizeLocale(pathLocale));
       requestHeaders.set(PATHNAME_REQUEST_HEADER, pathname);
+      if (product) requestHeaders.set("x-czech-faculty-product", product);
       const rewrite = NextResponse.rewrite(url, {
         request: { headers: requestHeaders },
       });

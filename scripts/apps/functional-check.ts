@@ -876,6 +876,10 @@ assert.ok(
   "Studium medicíny must stay a Czech-faculty product outside /cs"
 );
 assert.ok(
+  readFileSync(join(root, "middleware.ts"), "utf8").includes("/czech-edition-only"),
+  "foreign Academy/student URLs must rewrite to the courtesy page, not run Czech trees"
+);
+assert.ok(
   readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
     "locale={locale}"
   ),
