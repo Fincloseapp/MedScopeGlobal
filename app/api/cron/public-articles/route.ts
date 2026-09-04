@@ -28,6 +28,7 @@ export async function GET(request: Request) {
     locales: locales?.length ? locales : undefined,
     writerOffset: writerOffsetRaw != null ? Number(writerOffsetRaw) : undefined,
     writerLimit: writerLimitRaw != null ? Number(writerLimitRaw) : undefined,
+    repairOnly: url.searchParams.get("repairOnly") === "1",
   });
   return NextResponse.json(result);
 }

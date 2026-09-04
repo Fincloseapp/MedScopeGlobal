@@ -38,6 +38,7 @@ export async function runPublicArticlesFetch(options?: {
   writerOffset?: number;
   writerLimit?: number;
   locales?: string[];
+  repairOnly?: boolean;
 }): Promise<PublicArticlesFetchResult> {
   const t0 = Date.now();
   const onCloudflare = runPublicWritersInProcess();
@@ -52,6 +53,7 @@ export async function runPublicArticlesFetch(options?: {
       writerOffset: options?.writerOffset,
       writerLimit: options?.writerLimit,
       locales: options?.locales,
+      repairOnly: options?.repairOnly,
     });
 
     let adEngine: PublicArticlesFetchResult["adEngine"];

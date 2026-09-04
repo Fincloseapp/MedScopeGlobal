@@ -820,8 +820,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.13"),
-  "page cache tag must bust after localized app JSON-LD"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.14"),
+  "page cache tag must bust after writer title-lock and locale polish"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
@@ -1028,6 +1028,42 @@ assert.ok(
       "Never add Czech headings"
     ),
   "foreign writer depth pad must not inject Czech practice sections"
+);
+assert.ok(
+  readFileSync(join(root, "lib/v25/writers/writer-base.mjs"), "utf8").includes(
+    "locale === \"cs\" ? polishCzechArticle"
+  ) &&
+    readFileSync(join(root, "lib/v25/writers/writer-base.mjs"), "utf8").includes(
+      "similarity-exhausted"
+    ) &&
+    readFileSync(join(root, "lib/v25/writers/writer-base.mjs"), "utf8").includes(
+      "lockTitleToSeed"
+    ) &&
+    readFileSync(join(root, "lib/v25/writers/writer-base.mjs"), "utf8").includes(
+      "writer_seed"
+    ),
+  "public writers must lock titles, skip exhausted dupes, and only Czech-polish /cs"
+);
+assert.ok(
+  readFileSync(join(root, "lib/v26/editorial-prompts.mjs"), "utf8").includes(
+    "Mammo-Czech"
+  ) &&
+    readFileSync(join(root, "lib/v26/editorial-prompts.mjs"), "utf8").includes(
+      "Ministerstvo zdravotníctva SR"
+    ),
+  "writer prompts must forbid invented stats and localize SK sources"
+);
+assert.ok(
+  readFileSync(join(root, "lib/v25/writers/run-public-writers.mjs"), "utf8").includes(
+    "runTodayPublicArticleRepairs"
+  ),
+  "public-writer cron must repair today's already-published rows first"
+);
+assert.ok(
+  readFileSync(join(root, "app/api/cron/public-articles/route.ts"), "utf8").includes(
+    "repairOnly"
+  ),
+  "cron must accept a repair-only pass for already-published magazine rows"
 );
 assert.ok(
   readFileSync(join(root, "lib/i18n/filter-articles-for-locale.ts"), "utf8").includes(
