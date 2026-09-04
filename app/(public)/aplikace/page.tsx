@@ -45,6 +45,7 @@ export default async function AplikaceHubPage() {
             url: localizePublicHref(app.marketingPath, locale),
             installUrl: app.downloadPath,
             category: app.id === "mediprep" ? "EducationalApplication" : "HealthApplication",
+            locale,
           })}
         />
       ))}

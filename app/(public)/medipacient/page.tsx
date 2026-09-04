@@ -50,6 +50,7 @@ export default async function MedipacientMarketingPage() {
           description: copy.metaDescription,
           url: localizePublicHref(MEDIPACIENT.marketingPath, locale),
           installUrl: MEDIPACIENT.downloadPath,
+          locale,
         })}
       />
       <section className="border-b border-[#d9e8f4] bg-gradient-to-br from-[#021d33] via-[#0a3d6b] to-[#2D7FF9] text-white">

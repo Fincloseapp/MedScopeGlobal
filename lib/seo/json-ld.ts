@@ -1,7 +1,22 @@
 import { MEDSCOPE_LOGO } from "@/lib/brand/logo";
-import { MAGAZINE } from "@/lib/brand/magazine";
+import { MAGAZINE, getOgLocale } from "@/lib/brand/magazine";
 import { SITE } from "@/lib/config/site";
+import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+
+function schemaLanguage(locale?: string): string {
+  return getOgLocale(locale).replaceAll("_", "-");
+}
+
+const APP_OFFER_COPY: Record<ChromePack, string> = {
+  cs: "Zkušební přístup; předplatné odemyká plné funkce",
+  de: "Testzugang; ein Abo schaltet die vollen Funktionen frei",
+  fr: "Accès d’essai ; l’abonnement déverrouille toutes les fonctions",
+  it: "Accesso di prova; l’abbonamento sblocca le funzioni complete",
+  es: "Acceso de prueba; la suscripción desbloquea todas las funciones",
+  "pt-BR": "Acesso de teste; a assinatura desbloqueia as funções completas",
+  en: "Trial access; a subscription unlocks the full features",
+};
 
 export function organizationJsonLd(locale?: string) {
   return {
@@ -304,7 +319,9 @@ export function softwareApplicationJsonLd(app: {
   url: string;
   installUrl: string;
   category?: string;
+  locale?: string;
 }) {
+  const pack = chromePack(app.locale);
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -318,9 +335,9 @@ export function softwareApplicationJsonLd(app: {
       "@type": "Offer",
       price: "0",
       priceCurrency: "CZK",
-      description: "Zkušební přístup; předplatné odemyká plné funkce",
+      description: APP_OFFER_COPY[pack],
     },
-    inLanguage: "cs-CZ",
-    publisher: organizationJsonLd(),
+    inLanguage: schemaLanguage(app.locale),
+    publisher: organizationJsonLd(app.locale),
   };
 }

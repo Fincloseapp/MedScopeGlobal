@@ -105,6 +105,7 @@ export default async function HomePage() {
             url: app.marketingPath,
             installUrl: app.downloadPath,
             category: app.id === "mediprep" ? "EducationalApplication" : "HealthApplication",
+            locale,
           })}
         />
       ))}

@@ -820,8 +820,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.12"),
-  "page cache tag must bust after leftover OrdiZapis chrome i18n"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.13"),
+  "page cache tag must bust after localized app JSON-LD"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
@@ -1014,6 +1014,20 @@ assert.ok(
     "ordizapisAppHref"
   ),
   "PWA manifest must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "lib/seo/json-ld.ts"), "utf8").includes("organizationJsonLd(app.locale)") &&
+    readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("locale,"),
+  "homepage app JSON-LD must pass the edition locale into the publisher"
+);
+assert.ok(
+  readFileSync(join(root, "lib/v25/writers/writer-base.mjs"), "utf8").includes(
+    "Týždenný plán v slovenskej praxi"
+  ) &&
+    readFileSync(join(root, "lib/v25/writers/writer-base.mjs"), "utf8").includes(
+      "Never add Czech headings"
+    ),
+  "foreign writer depth pad must not inject Czech practice sections"
 );
 assert.ok(
   readFileSync(join(root, "lib/i18n/filter-articles-for-locale.ts"), "utf8").includes(

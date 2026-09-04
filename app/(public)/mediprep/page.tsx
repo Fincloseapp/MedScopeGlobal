@@ -58,6 +58,7 @@ export default async function MediprepMarketingPage() {
           url: MEDIPREP.marketingPath,
           installUrl: MEDIPREP.downloadPath,
           category: "EducationalApplication",
+          locale: "cs",
         })}
       />
       <section className="border-b border-[#e0d5c4] bg-[#0A192F] text-white">
