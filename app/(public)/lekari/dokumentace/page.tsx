@@ -180,7 +180,19 @@ export default async function LekariDokumentacePage() {
         <h2 className="mb-6 font-display text-2xl font-bold text-[#021d33]">
           {copy.workspaceTitle}
         </h2>
-        <DokumentaceWorkspace />
+        {locale === "cs" ? (
+          <DokumentaceWorkspace />
+        ) : (
+          <div className="rounded-3xl border border-[#cfe1f3] bg-white p-6 shadow-sm">
+            <p className="max-w-2xl text-sm leading-6 text-slate-600">{copy.workspaceLead}</p>
+            <Link
+              href={localizePublicHref("/app/dokumentace", locale)}
+              className="mt-4 inline-flex rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white"
+            >
+              {copy.workspaceCta}
+            </Link>
+          </div>
+        )}
       </section>
 
       <section className="border-t border-[#d9e8f4] bg-white">

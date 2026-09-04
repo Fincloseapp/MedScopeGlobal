@@ -3,8 +3,23 @@ import Link from "next/link";
 import { AppDownloadPanel } from "@/components/apps/app-download-panel";
 import { MEDIPREP } from "@/lib/apps/catalog";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getCzechFacultyOnlyCopy, isCzechFacultyLocale } from "@/lib/i18n/czech-faculty-only-copy";
+import { CzechFacultyOnlyNotice } from "@/components/apps/czech-faculty-only";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  if (!isCzechFacultyLocale(locale)) {
+    const copy = getCzechFacultyOnlyCopy(locale);
+    return {
+      ...(await buildLocalizedV20PageMetadata({
+        title: copy.metaTitle,
+        description: copy.metaDescription,
+        path: MEDIPREP.downloadPath,
+      })),
+      robots: { index: false, follow: false },
+    };
+  }
   return await buildLocalizedV20PageMetadata({
     title: `Stáhnout ${MEDIPREP.shortName}`,
     description: MEDIPREP.pitch,
@@ -12,7 +27,11 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default function MediprepDownloadPage() {
+export default async function MediprepDownloadPage() {
+  const locale = await getServerLocale();
+  if (!isCzechFacultyLocale(locale)) {
+    return <CzechFacultyOnlyNotice locale={locale} />;
+  }
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
       <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#C45C26]">Instalace MeDiprep</p>
@@ -27,7 +46,7 @@ export default function MediprepDownloadPage() {
         <li>3. iPhone: Safari → Sdílet → Přidat na plochu.</li>
       </ol>
       <div className="mt-8">
-        <AppDownloadPanel app={MEDIPREP} />
+        <AppDownloadPanel app={MEDIPREP} locale="cs" />
       </div>
       <p className="mt-6 text-sm">
         <Link href={MEDIPREP.marketingPath} className="text-[#C45C26] hover:underline">

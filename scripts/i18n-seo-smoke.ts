@@ -63,6 +63,8 @@ import { getDokumentaceCopy } from "../lib/i18n/dokumentace-copy";
 import { getMedipacientCopy } from "../lib/i18n/medipacient-copy";
 import { getMediflowCopy } from "../lib/i18n/mediflow-copy";
 import { getInstallPwaCopy } from "../lib/i18n/install-pwa-copy";
+import { getB2bPublicCopy } from "../lib/i18n/b2b-public-copy";
+import { getCzechFacultyOnlyCopy, isCzechFacultyLocale } from "../lib/i18n/czech-faculty-only-copy";
 import { getPhysicianHubExtrasCopy } from "../lib/i18n/physician-hub-extras-copy";
 import { tipLocale, ARTICLE_TIP_COPY } from "../lib/ecosystem/tip-copy";
 import { formatSyndicatedByline, publicEditorialByline } from "../lib/editorial/units";
@@ -738,6 +740,18 @@ assert.equal(getPhysicianLandingCopy("en-US").verifyAdminHref, undefined);
   assert.ok(getInstallPwaCopy("cs").download.includes("Stáhnout"));
   assert.ok(getMarketingCopy("fr").apps.pitch.mediflow.includes("Journal"));
   assert.ok(!getMarketingCopy("de").apps.pitch.medipacient.includes("Photograph"));
+}
+{
+  const frB2b = getB2bPublicCopy("fr");
+  assert.ok(!/Kč|Ceník|Sponzorovaný|měsíc|Kontaktovat/.test(JSON.stringify(frB2b)));
+  assert.ok(frB2b.bannerMonth.toLowerCase().includes("bannière") || frB2b.bannerMonth.toLowerCase().includes("banniere"));
+  assert.ok(getB2bPublicCopy("cs").sponsoredLabel.includes("Sponzorovaný"));
+  assert.ok(!getDokumentaceCopy("fr").workspaceLead.includes("Nahrajte"));
+  assert.ok(getDokumentaceCopy("cs").workspaceCta.includes("OrdiZapis"));
+  assert.equal(isCzechFacultyLocale("fr"), false);
+  assert.equal(isCzechFacultyLocale("cs"), true);
+  assert.ok(!getCzechFacultyOnlyCopy("de").lead.includes("přijímačky"));
+  assert.ok(getCzechFacultyOnlyCopy("it").openCs.toLowerCase().includes("ceca") || getCzechFacultyOnlyCopy("it").openCs.toLowerCase().includes("edizione"));
 }
 const itLekari = getPhysicianHubExtrasCopy("it");
 assert.ok(!/ČLK|Kč|Pro lékaře|Důvěryhodnost/.test(JSON.stringify(itLekari)));

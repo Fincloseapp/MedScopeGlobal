@@ -9,8 +9,23 @@ import { getPrepDashboard } from "@/lib/mediprep/dashboard";
 import { FACULTIES_ADMISSIONS_2026 } from "@/lib/prijimacky/faculties-admissions";
 import { bankStats } from "@/lib/prijimacky/question-bank";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getCzechFacultyOnlyCopy, isCzechFacultyLocale } from "@/lib/i18n/czech-faculty-only-copy";
+import { CzechFacultyOnlyNotice } from "@/components/apps/czech-faculty-only";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  if (!isCzechFacultyLocale(locale)) {
+    const copy = getCzechFacultyOnlyCopy(locale);
+    return {
+      ...(await buildLocalizedV20PageMetadata({
+        title: copy.metaTitle,
+        description: copy.metaDescription,
+        path: MEDIPREP.marketingPath,
+      })),
+      robots: { index: false, follow: false },
+    };
+  }
   return {
     ...(await buildLocalizedV20PageMetadata({
       title: appSeoTitle(MEDIPREP),
@@ -21,7 +36,11 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function MediprepMarketingPage() {
+export default async function MediprepMarketingPage() {
+  const locale = await getServerLocale();
+  if (!isCzechFacultyLocale(locale)) {
+    return <CzechFacultyOnlyNotice locale={locale} />;
+  }
   const stats = bankStats();
   const dash = getPrepDashboard();
   const FEATURES = [

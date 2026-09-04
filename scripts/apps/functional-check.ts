@@ -817,8 +817,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.5"),
-  "page cache tag must bust after MeDipacient / MediFlow i18n"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.6"),
+  "page cache tag must bust after B2B / MeDiprep / workspace i18n"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
@@ -843,6 +843,24 @@ assert.ok(
     "getInstallPwaCopy"
   ),
   "PWA install button must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/b2b/page.tsx"), "utf8").includes("getB2bPublicCopy"),
+  "/b2b must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/firmy/cenik/page.tsx"), "utf8").includes("getB2bPublicCopy"),
+  "/firmy/cenik must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/mediprep/page.tsx"), "utf8").includes("CzechFacultyOnlyNotice"),
+  "MeDiprep must stay a Czech-faculty product outside /cs"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
+    'locale === "cs"'
+  ),
+  "OrdiZapis marketing must not dump the Czech workspace on other editions"
 );
 assert.ok(
   readFileSync(join(root, "lib/i18n/filter-articles-for-locale.ts"), "utf8").includes(

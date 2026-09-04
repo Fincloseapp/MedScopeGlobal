@@ -36,6 +36,8 @@ export type DokumentaceCopy = {
   barNote: (clinic: string) => string;
   showSubscribe: string;
   workspaceTitle: string;
+  workspaceLead: string;
+  workspaceCta: string;
   legalTitle: string;
   legal: string[];
   tutorialKicker: string;
@@ -140,6 +142,8 @@ const PACK: Record<ChromePack, Pack> = {
     barNote: "{clinic}/měsíc včetně celého balíčku Lékař · 14 dní trial · demo 3 zápisy/den po přihlášení",
     showSubscribe: "Zobrazit předplatné",
     workspaceTitle: "Pracovní prostor",
+    workspaceLead: "Nahrajte diktát nebo konzultaci — návrh zápisu ke kontrole.",
+    workspaceCta: "Otevřít OrdiZapis",
     legalTitle: "Právní rámec",
     legal: [
       "OrdiZapis od MedScopeGlobal je asistent pro lékaře — není zdravotnický prostředek ani diagnóza.",
@@ -251,6 +255,9 @@ const PACK: Record<ChromePack, Pack> = {
     barNote: "{clinic}/Monat inkl. Praxis-Paket · 14 Tage Test · Demo 3 Notizen/Tag nach Login",
     showSubscribe: "Abo anzeigen",
     workspaceTitle: "Arbeitsbereich",
+    workspaceLead:
+      "Das interaktive Tool bleibt in der tschechischen Praxisausgabe. Öffnen Sie OrdiZapis, um Diktat oder Gespräch aufzunehmen.",
+    workspaceCta: "OrdiZapis öffnen",
     legalTitle: "Rechtlicher Rahmen",
     legal: [
       "OrdiZapis von MedScopeGlobal ist ein Assistent — kein Medizinprodukt und keine Diagnose.",
@@ -342,6 +349,9 @@ const PACK: Record<ChromePack, Pack> = {
     barNote: "{clinic}/mois avec l’offre médecin · 14 jours d’essai · démo 3 notes/jour après connexion",
     showSubscribe: "Voir l’abonnement",
     workspaceTitle: "Espace de travail",
+    workspaceLead:
+      "L’outil interactif reste dans l’édition tchèque pour la pratique. Ouvrez OrdiZapis pour enregistrer une dictée ou une consultation.",
+    workspaceCta: "Ouvrir OrdiZapis",
     legalTitle: "Cadre juridique",
     legal: [
       "OrdiZapis (MedScopeGlobal) est un assistant — pas un dispositif médical ni un diagnostic.",
@@ -433,6 +443,9 @@ const PACK: Record<ChromePack, Pack> = {
     barNote: "{clinic}/mese con il piano medico · 14 giorni di prova · demo 3 note/giorno dopo l’accesso",
     showSubscribe: "Vedi l’abbonamento",
     workspaceTitle: "Area di lavoro",
+    workspaceLead:
+      "Lo strumento interattivo resta nell’edizione ceca per lo studio. Apri OrdiZapis per registrare un dettato o una visita.",
+    workspaceCta: "Apri OrdiZapis",
     legalTitle: "Quadro giuridico",
     legal: [
       "OrdiZapis (MedScopeGlobal) è un assistente — non un dispositivo medico né una diagnosi.",
@@ -524,6 +537,9 @@ const PACK: Record<ChromePack, Pack> = {
     barNote: "{clinic}/mes con el plan médico · 14 días de prueba · demo 3 notas/día tras iniciar sesión",
     showSubscribe: "Ver la suscripción",
     workspaceTitle: "Espacio de trabajo",
+    workspaceLead:
+      "La herramienta interactiva se queda en la edición checa para la consulta. Abre OrdiZapis para grabar un dictado o una visita.",
+    workspaceCta: "Abrir OrdiZapis",
     legalTitle: "Marco legal",
     legal: [
       "OrdiZapis (MedScopeGlobal) es un asistente — no un producto sanitario ni un diagnóstico.",
@@ -615,6 +631,9 @@ const PACK: Record<ChromePack, Pack> = {
     barNote: "{clinic}/mês com o plano médico · 14 dias de teste · demo 3 notas/dia após o login",
     showSubscribe: "Ver a assinatura",
     workspaceTitle: "Área de trabalho",
+    workspaceLead:
+      "A ferramenta interativa fica na edição tcheca para o consultório. Abra o OrdiZapis para gravar um ditado ou uma consulta.",
+    workspaceCta: "Abrir o OrdiZapis",
     legalTitle: "Quadro jurídico",
     legal: [
       "O OrdiZapis (MedScopeGlobal) é um assistente — não é dispositivo médico nem diagnóstico.",
@@ -706,6 +725,9 @@ const PACK: Record<ChromePack, Pack> = {
     barNote: "{clinic}/month with the physician bundle · 14-day trial · demo 3 notes/day after sign-in",
     showSubscribe: "View subscription",
     workspaceTitle: "Workspace",
+    workspaceLead:
+      "The interactive tool stays on the Czech clinic edition. Open OrdiZapis to record a dictation or a consult.",
+    workspaceCta: "Open OrdiZapis",
     legalTitle: "Legal frame",
     legal: [
       "OrdiZapis from MedScopeGlobal is an assistant — not a medical device and not a diagnosis.",
