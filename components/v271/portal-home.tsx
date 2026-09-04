@@ -160,14 +160,16 @@ function PortalNewsFeed({
   desks,
   locale,
   todayNote,
+  deskArticles,
 }: {
   articles: DisplayArticle[];
   chrome: ReturnType<typeof getPortalChrome>;
   desks: ReturnType<typeof newsDesksForLocale>;
   locale: string;
   todayNote: string;
+  deskArticles?: ReturnType<typeof splitNewsDesks>;
 }) {
-  const raw = splitNewsDesks(articles, {}, locale);
+  const raw = deskArticles ?? splitNewsDesks(articles, {}, locale);
   const uniqueVisible = assignUniqueListingCovers([
     ...raw.novinky,
     ...raw.verejnost,
@@ -212,10 +214,12 @@ export function PortalHome({
   articles,
   copy,
   locale = "cs",
+  deskArticles,
 }: {
   articles: DisplayArticle[];
   copy?: ReturnType<typeof getMagazineCopy>;
   locale?: string;
+  deskArticles?: ReturnType<typeof splitNewsDesks>;
 }) {
   const philosophy = copy ?? PORTAL_PHILOSOPHY;
   const chrome = getPortalChrome(locale);
@@ -308,6 +312,7 @@ export function PortalHome({
               desks={desks}
               locale={locale}
               todayNote={todayNote}
+              deskArticles={deskArticles}
             />
           </Box>
 

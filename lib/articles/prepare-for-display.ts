@@ -33,6 +33,8 @@ export type DisplayArticle = ArticleWithRelations & {
   editorialPrimaryLabel?: string;
   deskOrigin?: "native" | "borrowed";
   syndicatedFromLocale?: string | null;
+  /** Listing-only date for resurfaced evergreen cards. Article pages keep published_at. */
+  listing_published_at?: string | null;
 };
 
 function attachEditorialDisplay(

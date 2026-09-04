@@ -3,7 +3,12 @@
  * Classification is exclusive (longevity → news → public → magazine).
  */
 import { shouldHideFromPublicListing } from "@/lib/editorial/article-quality-audit";
-import { mixFreshFeed, selectResurfaceCandidates } from "@/lib/editorial/freshness";
+import {
+  articlePageKey,
+  mixFreshFeed,
+  selectResurfaceCandidates,
+  withCategoryListingDate,
+} from "@/lib/editorial/freshness";
 import { resolveWriterAgent } from "@/lib/editorial/writer-agents";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
@@ -160,6 +165,24 @@ export function isListableNewsArticle(
   return isListableInLocale(article, locale);
 }
 
+function takeUnused(
+  pool: DisplayArticle[],
+  used: Set<string>,
+  limit: number,
+  pred?: (article: DisplayArticle) => boolean
+): DisplayArticle[] {
+  const out: DisplayArticle[] = [];
+  for (const article of pool) {
+    if (out.length >= limit) break;
+    const key = articlePageKey(article);
+    if (!key || used.has(key)) continue;
+    if (pred && !pred(article)) continue;
+    used.add(key);
+    out.push(article);
+  }
+  return out;
+}
+
 export function splitNewsDesks(
   articles: DisplayArticle[],
   limits: Partial<Record<NewsDeskId, number>> = {},
@@ -177,38 +200,75 @@ export function splitNewsDesks(
     dlouhovekost: [],
     clanky: [],
   };
+  const used = new Set<string>();
   const listable = articles.filter((article) => isListableNewsArticle(article, new Date(), locale));
+
   for (const article of listable) {
     const desk = classifyNewsDesk(article);
-    if (desks[desk].length < cap[desk]) desks[desk].push(article);
+    if (desks[desk].length >= cap[desk]) continue;
+    const key = articlePageKey(article);
+    if (!key || used.has(key)) continue;
+    used.add(key);
+    desks[desk].push(article);
   }
 
-  const used = new Set(
-    [...desks.novinky, ...desks.verejnost, ...desks.dlouhovekost, ...desks.clanky].map(
-      (article) => article.id
+  const olderFirst = selectResurfaceCandidates(listable, listable.length);
+
+  desks.dlouhovekost.push(
+    ...takeUnused(
+      olderFirst,
+      used,
+      cap.dlouhovekost - desks.dlouhovekost.length,
+      isLongevityArticle
     )
   );
+  desks.verejnost.push(
+    ...takeUnused(
+      olderFirst,
+      used,
+      cap.verejnost - desks.verejnost.length,
+      (article) => isVerejnostArticle(article) && !isNovinkyArticle(article)
+    )
+  );
+  desks.clanky.push(
+    ...takeUnused(olderFirst, used, cap.clanky - desks.clanky.length)
+  );
+  desks.novinky.push(
+    ...takeUnused(listable, used, cap.novinky - desks.novinky.length, isNovinkyArticle)
+  );
 
-  if (desks.novinky.length < cap.novinky) {
-    for (const article of listable) {
-      if (desks.novinky.length >= cap.novinky) break;
-      if (desks.novinky.some((item) => item.id === article.id)) continue;
-      if (!isLongevityArticle(article)) continue;
-      desks.novinky.push(article);
-      used.add(article.id);
-    }
-  }
+  return {
+    novinky: desks.novinky,
+    verejnost: desks.verejnost.map((article) => withCategoryListingDate(article, "verejnost")),
+    dlouhovekost: desks.dlouhovekost.map((article) =>
+      withCategoryListingDate(article, "dlouhovekost")
+    ),
+    clanky: desks.clanky.map((article) => withCategoryListingDate(article, "clanky")),
+  };
+}
 
-  if (desks.clanky.length < cap.clanky) {
-    for (const article of listable) {
-      if (desks.clanky.length >= cap.clanky) break;
-      if (used.has(article.id)) continue;
-      desks.clanky.push(article);
-      used.add(article.id);
-    }
-  }
-
-  return desks;
+/** Homepage boxes + longevity strip — one article, one slot, same moment. */
+export function uniqueHomepageLayout(
+  articles: DisplayArticle[],
+  locale = "cs"
+): {
+  desks: Record<NewsDeskId, DisplayArticle[]>;
+  longevityReading: DisplayArticle[];
+  usedKeys: string[];
+} {
+  const desks = splitNewsDesks(articles, {}, locale);
+  const used = new Set(
+    [...desks.novinky, ...desks.verejnost, ...desks.dlouhovekost, ...desks.clanky]
+      .map((article) => articlePageKey(article))
+      .filter(Boolean)
+  );
+  const longevityReading = takeUnused(
+    articles.filter((article) => isListableNewsArticle(article, new Date(), locale)),
+    used,
+    3,
+    isLongevityArticle
+  ).map((article) => withCategoryListingDate(article, "dlouhovekost"));
+  return { desks, longevityReading, usedKeys: [...used] };
 }
 
 export function mixListableFeed(

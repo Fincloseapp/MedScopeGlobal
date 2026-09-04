@@ -152,7 +152,9 @@ import {
   isProfessionalAktualityTitle,
   mergeAktualityListing,
   splitNewsDesks,
+  uniqueHomepageLayout,
 } from "../../lib/v271/news-desks";
+import { articlePageKey, rollEvergreenListingDate } from "../../lib/editorial/freshness";
 import {
   isLongevityForeignSource,
   rankV26ForeignSources,
@@ -346,6 +348,11 @@ file("lib/v22/homepage-cache.ts");
   const home = readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8");
   assert.ok(home.includes("filterArticlesForLocale"), "homepage listings are native-first per locale");
   assert.ok(home.includes("mergeNativeDeskFeed"), "homepage pins native desk pieces");
+  assert.ok(
+    readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("uniqueHomepageLayout") &&
+      readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
+    "homepage must assign each story to one slot"
+  );
   assert.ok(home.includes("v21-related-borrow"), "homepage cache key must bust when borrow rules tighten");
   assert.ok(home.includes("toISOString().slice(0, 10)"), "homepage data cache must roll with the UTC day");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
@@ -820,8 +827,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.14"),
-  "page cache tag must bust after writer title-lock and locale polish"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.15"),
+  "page cache tag must bust after unique homepage desks"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
@@ -2471,9 +2478,97 @@ console.log("✓ magazine desk byline and copy checks passed");
       public_topic: "prevence",
     } as never,
   ]);
-  assert.equal(toppedUp.novinky.length, 1);
-  assert.equal(toppedUp.novinky[0]?.id, "only-osteo");
+  assert.equal(toppedUp.novinky.length, 0);
   assert.equal(toppedUp.dlouhovekost[0]?.id, "only-osteo");
+  const pageKeys = [
+    ...toppedUp.novinky,
+    ...toppedUp.verejnost,
+    ...toppedUp.dlouhovekost,
+    ...toppedUp.clanky,
+  ].map((article) => article.id);
+  assert.equal(new Set(pageKeys).size, pageKeys.length, "homepage desks must not repeat a story");
+  const olderAllergy = {
+    id: "old-alergie",
+    title: "Jak se bránit sezónním alergiím v domácnosti",
+    slug: "verejnost-nemoci-2026-06-01-alergie-doma",
+    excerpt: "Pyl a antihistaminika v praxi.",
+    content: longBody,
+    published: true,
+    published_at: "2026-06-01T10:00:00.000Z",
+    vip_only: false,
+    locale: "cs",
+    audience: "public",
+    public_topic: "nemoci",
+  } as never;
+  const filled = splitNewsDesks([
+    {
+      id: "who-now",
+      title: "WHO: nová doporučení k očkování seniorů",
+      slug: "who-ockovani-2026-09-04",
+      excerpt: "Aktuální guideline.",
+      content: longBody,
+      published: true,
+      published_at: "2026-09-04T08:00:00.000Z",
+      vip_only: false,
+      locale: "cs",
+      audience: "public",
+      rubric_slug: "aktualni-zpravy",
+    } as never,
+    olderAllergy,
+  ]);
+  assert.equal(filled.novinky[0]?.id, "who-now");
+  assert.equal(filled.verejnost.some((article) => article.id === "old-alergie"), true);
+  assert.ok(
+    !filled.novinky.some((article) => article.id === "old-alergie"),
+    "older category pieces must not also sit in news"
+  );
+  assert.ok(filled.verejnost.find((article) => article.id === "old-alergie")?.listing_published_at);
+  assert.equal(filled.novinky[0]?.listing_published_at, undefined);
+  const rolled = rollEvergreenListingDate(
+    { slug: "old-piece", published_at: "2026-06-01T10:00:00.000Z" },
+    new Date("2026-09-04T12:00:00.000Z")
+  );
+  assert.ok(rolled && rolled.slice(0, 10) >= "2026-08-28" && rolled.slice(0, 10) <= "2026-09-04");
+  const layout = uniqueHomepageLayout(
+    [
+      {
+        id: "long-a",
+        title: "Prevence osteoporózy u žen i mužů",
+        slug: "osteo-a",
+        excerpt: "Vápník a pohyb.",
+        content: longBody,
+        published: true,
+        published_at: "2026-09-04T10:00:00.000Z",
+        vip_only: false,
+        locale: "cs",
+        audience: "public",
+        public_topic: "prevence",
+      } as never,
+      {
+        id: "long-b",
+        title: "Healthspan: spánek a biologický věk",
+        slug: "healthspan-b",
+        excerpt: "Spánek jako pilíř dlouhověkosti.",
+        content: longBody,
+        published: true,
+        published_at: "2026-08-01T10:00:00.000Z",
+        vip_only: false,
+        locale: "cs",
+        audience: "public",
+        public_topic: "dlouhovekost",
+      } as never,
+    ],
+    "cs"
+  );
+  const visible = [
+    ...layout.desks.novinky,
+    ...layout.desks.verejnost,
+    ...layout.desks.dlouhovekost,
+    ...layout.desks.clanky,
+    ...layout.longevityReading,
+  ].map((article) => articlePageKey(article));
+  assert.equal(new Set(visible).size, visible.length, "homepage + longevity strip must be unique at the same time");
+  assert.ok(layout.desks.dlouhovekost.length + layout.longevityReading.length >= 2);
   assert.deepEqual(
     filterArticlesForLocale(
       [

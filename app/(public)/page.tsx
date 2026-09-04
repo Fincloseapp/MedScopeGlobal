@@ -18,6 +18,7 @@ import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { localeToPathSegment } from "@/lib/i18n/locale-path";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getHomepageCachedData } from "@/lib/v22/homepage-cache";
+import { uniqueHomepageLayout } from "@/lib/v271/news-desks";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getPortalChrome, getPortalPhilosophy } from "@/lib/v271/portal";
 import { isCzechSurface, getSurfaceCopy } from "@/lib/i18n/surface-copy";
@@ -81,6 +82,8 @@ export default async function HomePage() {
     getReaderContext(),
   ]);
 
+  const homeLayout = uniqueHomepageLayout(articles, locale);
+
   const homeLd = medicalWebPageJsonLd({
     title: philosophy.claim,
     description: philosophy.subtitle,
@@ -111,9 +114,13 @@ export default async function HomePage() {
       ))}
 
       {/* Story: ViaLongeVita hero (brief + magazine) → news → apps. Affiliate after newsletter. */}
-      <PortalHome articles={articles} copy={philosophy} locale={locale} />
+      <PortalHome articles={articles} copy={philosophy} locale={locale} deskArticles={homeLayout.desks} />
       <MagazineAdUnit locale={locale} className="py-2 sm:px-6" />
-      <HomepageLongevityStrip articles={articles} locale={locale} />
+      <HomepageLongevityStrip
+        articles={homeLayout.longevityReading}
+        locale={locale}
+        exclusive
+      />
       <HomepageRevenueMix locale={locale} isVip={isVip} />
       {!isVip ? <HomepageAffiliateShelf locale={locale} /> : null}
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />

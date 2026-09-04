@@ -8,12 +8,16 @@ import { isLongevityArticle } from "@/lib/v271/news-desks";
 export function HomepageLongevityStrip({
   articles,
   locale,
+  exclusive = false,
 }: {
   articles: DisplayArticle[];
   locale: string;
+  exclusive?: boolean;
 }) {
   const copy = getHomepageLongevityCopy(locale);
-  const reading = articles.filter(isLongevityArticle).slice(0, 3);
+  const reading = exclusive
+    ? articles.slice(0, 3)
+    : articles.filter(isLongevityArticle).slice(0, 3);
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6" aria-labelledby="homepage-longevity-title">
