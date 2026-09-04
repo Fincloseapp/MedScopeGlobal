@@ -343,7 +343,7 @@ file("lib/v22/homepage-cache.ts");
   const home = readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8");
   assert.ok(home.includes("filterArticlesForLocale"), "homepage listings are native-first per locale");
   assert.ok(home.includes("mergeNativeDeskFeed"), "homepage pins native desk pieces");
-  assert.ok(home.includes("v20-rolling-dates"), "homepage cache key must bust when native dates roll");
+  assert.ok(home.includes("v21-related-borrow"), "homepage cache key must bust when borrow rules tighten");
   assert.ok(home.includes("toISOString().slice(0, 10)"), "homepage data cache must roll with the UTC day");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
   assert.ok(home.includes("courtesyBorrow: 2"), "non-CS homepage must not dump a Czech borrow pile");
@@ -817,8 +817,18 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.1"),
-  "page cache tag must bust after rolling dates"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.2"),
+  "page cache tag must bust after related-borrow and OrdiZapis copy"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/ordizaznam/page.tsx"), "utf8").includes("getOrdiZaznamCopy"),
+  "/ordizaznam must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "lib/i18n/filter-articles-for-locale.ts"), "utf8").includes(
+    "relatedScore(article, ui) > 0"
+  ),
+  "courtesy borrow must stay on related desks, not Japanese leftovers"
 );
 assert.ok(
   !readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes("VITASCOPE.name"),

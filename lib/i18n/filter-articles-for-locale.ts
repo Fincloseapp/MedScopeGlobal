@@ -135,7 +135,7 @@ export function filterArticlesForLocale<T extends LocaleListingArticle>(
       syndicated.push(article);
       continue;
     }
-    if (isShareableMagazineTopic(article)) {
+    if (isShareableMagazineTopic(article) && relatedScore(article, ui) > 0) {
       borrowable.push(article);
     }
   }
