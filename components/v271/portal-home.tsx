@@ -14,6 +14,7 @@ import { type getMagazineCopy } from "@/lib/brand/magazine";
 import { assignUniqueListingCovers } from "@/lib/ecosystem/editorial/images/unique-listing-covers";
 import { NEWS_DESKS, newsDesksForLocale, splitNewsDesks, type NewsDeskId } from "@/lib/v271/news-desks";
 import { NewsArticleThumb, NewsDeskFallback, NewsHeadlineRow } from "@/components/articles/news-article-card";
+import { formatArticleDateLabel } from "@/lib/editorial/freshness";
 import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { PortalSearch } from "@/components/v271/portal-search";
@@ -87,6 +88,7 @@ function DeskColumn({
 }) {
   const def = desks.find((item) => item.id === desk) ?? NEWS_DESKS.find((item) => item.id === desk)!;
   const lead = featured ? articles[0] : null;
+  const leadDate = lead ? formatArticleDateLabel(lead, locale) : null;
   const rows = featured ? articles.slice(1, 4) : articles.slice(0, 4);
   const longevity = desk === "dlouhovekost";
 
@@ -131,6 +133,11 @@ function DeskColumn({
           </h4>
           {lead.excerpt ? (
             <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-600">{lead.excerpt}</p>
+          ) : null}
+          {leadDate ? (
+            <p className="mt-1 text-[11px] text-slate-500">
+              <time dateTime={leadDate.dateTime}>{leadDate.text}</time>
+            </p>
           ) : null}
         </Link>
       ) : null}

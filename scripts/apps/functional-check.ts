@@ -344,6 +344,7 @@ file("lib/v22/homepage-cache.ts");
   assert.ok(home.includes("filterArticlesForLocale"), "homepage listings are native-first per locale");
   assert.ok(home.includes("mergeNativeDeskFeed"), "homepage pins native desk pieces");
   assert.ok(home.includes("v20-rolling-dates"), "homepage cache key must bust when native dates roll");
+  assert.ok(home.includes("toISOString().slice(0, 10)"), "homepage data cache must roll with the UTC day");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
   assert.ok(home.includes("courtesyBorrow: 2"), "non-CS homepage must not dump a Czech borrow pile");
 }
@@ -810,6 +811,14 @@ assert.ok(
 assert.ok(
   readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes("ViaLongeVitaMark"),
   "homepage hero and news box must show the ViaLongeVita lockup"
+);
+assert.ok(
+  readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes("leadDate"),
+  "homepage featured story must show a live publication date"
+);
+assert.ok(
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.1"),
+  "page cache tag must bust after rolling dates"
 );
 assert.ok(
   !readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes("VITASCOPE.name"),
