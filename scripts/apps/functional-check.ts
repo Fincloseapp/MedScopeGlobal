@@ -817,8 +817,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.3"),
-  "page cache tag must bust after dokumentace i18n"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.4"),
+  "page cache tag must bust after MeDipacient / MediFlow i18n"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
@@ -829,6 +829,14 @@ assert.ok(
 assert.ok(
   readFileSync(join(root, "app/(public)/ordizaznam/page.tsx"), "utf8").includes("getOrdiZaznamCopy"),
   "/ordizaznam must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/medipacient/page.tsx"), "utf8").includes("getMedipacientCopy"),
+  "/medipacient must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/mediflow/page.tsx"), "utf8").includes("getMediflowCopy"),
+  "/mediflow must follow the edition language"
 );
 assert.ok(
   readFileSync(join(root, "lib/i18n/filter-articles-for-locale.ts"), "utf8").includes(

@@ -60,6 +60,8 @@ import { mergeNativeDeskFeed, nativeDeskArticlesForLocale, nativeDeskPinDate, re
 import { getPhysicianLandingCopy } from "../lib/i18n/physician-landing-copy";
 import { getOrdiZaznamCopy } from "../lib/i18n/ordizaznam-copy";
 import { getDokumentaceCopy } from "../lib/i18n/dokumentace-copy";
+import { getMedipacientCopy } from "../lib/i18n/medipacient-copy";
+import { getMediflowCopy } from "../lib/i18n/mediflow-copy";
 import { getPhysicianHubExtrasCopy } from "../lib/i18n/physician-hub-extras-copy";
 import { tipLocale, ARTICLE_TIP_COPY } from "../lib/ecosystem/tip-copy";
 import { formatSyndicatedByline, publicEditorialByline } from "../lib/editorial/units";
@@ -711,6 +713,22 @@ assert.equal(getPhysicianLandingCopy("en-US").verifyAdminHref, undefined);
   assert.ok(itDok.eyebrow.toLowerCase().includes("medic"));
   assert.ok(!getDokumentaceCopy("fr").stepsLead.includes("české"));
   assert.ok(getDokumentaceCopy("cs").valueProps.some((item) => item.text.includes("ordinaci")));
+}
+{
+  const itPatient = getMedipacientCopy("it", { premium: "3,96 €" });
+  assert.ok(!/Kč|Stáhnout|Nahrát|Zdarma|Předplatné|zprávy/.test(JSON.stringify(itPatient)));
+  assert.equal(itPatient.showDemoReports, false);
+  assert.ok(itPatient.premiumTitle.includes("3,96 €"));
+  assert.ok(getMedipacientCopy("cs").showDemoReports);
+  assert.ok(getMedipacientCopy("cs").downloadCta.includes("Stáhnout"));
+  assert.ok(!getMedipacientCopy("fr").pitch.includes("Vyfoťte"));
+}
+{
+  const itFlow = getMediflowCopy("it");
+  assert.ok(!/Kč|Vyzkoušet|Spustit|deník|zdarma/.test(JSON.stringify(itFlow)));
+  assert.ok(itFlow.startCta.toLowerCase().includes("mediflow"));
+  assert.ok(getMediflowCopy("cs").tryCta.includes("Vyzkoušet"));
+  assert.ok(!getMediflowCopy("de").lead.includes("Osobní"));
 }
 const itLekari = getPhysicianHubExtrasCopy("it");
 assert.ok(!/ČLK|Kč|Pro lékaře|Důvěryhodnost/.test(JSON.stringify(itLekari)));
