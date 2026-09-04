@@ -818,7 +818,7 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.7"),
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.8"),
   "page cache tag must bust after OrdiZapis FR language"
 );
 assert.ok(
