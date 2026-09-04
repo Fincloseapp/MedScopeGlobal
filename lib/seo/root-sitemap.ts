@@ -5,7 +5,7 @@
  */
 
 import type { MetadataRoute } from "next";
-import { buildLocalePath, localeToPathSegment } from "@/lib/i18n/locale-path";
+import { buildLocalePath } from "@/lib/i18n/locale-path";
 import { LONGEVITY_PROTOCOLS } from "@/lib/ecosystem/longevity-protocols";
 
 export const ROOT_SITEMAP_EDITIONS = [
@@ -112,10 +112,4 @@ export function buildRootSitemapStaticEntries(base: string): MetadataRoute.Sitem
   }
 
   return out;
-}
-
-export function isPrefixedSitemapUrl(url: string, origin: string): boolean {
-  const path = url.startsWith(origin) ? url.slice(origin.length) : url;
-  const segment = path.split("/").filter(Boolean)[0] ?? "";
-  return Boolean(segment && localeToPathSegment(segment) === segment);
 }
