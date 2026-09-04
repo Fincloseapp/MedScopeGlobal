@@ -817,7 +817,7 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.4"),
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.5"),
   "page cache tag must bust after MeDipacient / MediFlow i18n"
 );
 assert.ok(
@@ -837,6 +837,12 @@ assert.ok(
 assert.ok(
   readFileSync(join(root, "app/(public)/mediflow/page.tsx"), "utf8").includes("getMediflowCopy"),
   "/mediflow must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "components/apps/install-pwa-button.tsx"), "utf8").includes(
+    "getInstallPwaCopy"
+  ),
+  "PWA install button must follow the edition language"
 );
 assert.ok(
   readFileSync(join(root, "lib/i18n/filter-articles-for-locale.ts"), "utf8").includes(

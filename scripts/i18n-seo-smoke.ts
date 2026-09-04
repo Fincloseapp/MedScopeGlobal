@@ -62,6 +62,7 @@ import { getOrdiZaznamCopy } from "../lib/i18n/ordizaznam-copy";
 import { getDokumentaceCopy } from "../lib/i18n/dokumentace-copy";
 import { getMedipacientCopy } from "../lib/i18n/medipacient-copy";
 import { getMediflowCopy } from "../lib/i18n/mediflow-copy";
+import { getInstallPwaCopy } from "../lib/i18n/install-pwa-copy";
 import { getPhysicianHubExtrasCopy } from "../lib/i18n/physician-hub-extras-copy";
 import { tipLocale, ARTICLE_TIP_COPY } from "../lib/ecosystem/tip-copy";
 import { formatSyndicatedByline, publicEditorialByline } from "../lib/editorial/units";
@@ -729,6 +730,14 @@ assert.equal(getPhysicianLandingCopy("en-US").verifyAdminHref, undefined);
   assert.ok(itFlow.startCta.toLowerCase().includes("mediflow"));
   assert.ok(getMediflowCopy("cs").tryCta.includes("Vyzkoušet"));
   assert.ok(!getMediflowCopy("de").lead.includes("Osobní"));
+}
+{
+  const itInstall = getInstallPwaCopy("it", { name: "MeDipacient", path: "/app/pacient" });
+  assert.ok(!/Stáhnout|Nainstalovat|Sdílet|ploše/.test(JSON.stringify(itInstall)));
+  assert.ok(itInstall.downloadNamed.includes("MeDipacient"));
+  assert.ok(getInstallPwaCopy("cs").download.includes("Stáhnout"));
+  assert.ok(getMarketingCopy("fr").apps.pitch.mediflow.includes("Journal"));
+  assert.ok(!getMarketingCopy("de").apps.pitch.medipacient.includes("Photograph"));
 }
 const itLekari = getPhysicianHubExtrasCopy("it");
 assert.ok(!/ČLK|Kč|Pro lékaře|Důvěryhodnost/.test(JSON.stringify(itLekari)));

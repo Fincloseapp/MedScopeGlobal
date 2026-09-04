@@ -9,6 +9,7 @@ import { appFullName, appLockline, type AppProduct } from "@/lib/apps/catalog";
 import { getMarketingCopy } from "@/lib/i18n/marketing-copy";
 import { getSubscribeCopy } from "@/lib/i18n/subscribe-copy";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export function AppDownloadPanel({
   app,
@@ -83,13 +84,13 @@ export function AppDownloadPanel({
             <li>{apps.stepDesktop}</li>
           </ol>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <InstallPwaButton app={app} />
+            <InstallPwaButton app={app} locale={locale} />
             <Button
               asChild
               variant="outline"
               className="h-9 rounded-full border-white/40 bg-transparent text-white hover:bg-white/10"
             >
-              <Link href={app.appPath}>
+              <Link href={localizePublicHref(app.appPath, locale)}>
                 {apps.openInstalled}
               </Link>
             </Button>

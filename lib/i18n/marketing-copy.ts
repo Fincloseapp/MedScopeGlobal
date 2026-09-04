@@ -667,6 +667,14 @@ const DE: MarketingCopy = {
     stepDesktop: "3. PC: Chrome/Edge → ⊕ in der Adressleiste",
     scanInstall: "Scannen und installieren",
     eyebrowApps: "Apps",
+    pitch: {
+      medipacient:
+        "Fotografieren Sie ein PDF oder einen Arztbericht — auch offline. Nach der Verbindung liest OCR Diagnosen, Medikamente und Kontrolltermine.",
+      mediprep:
+        "Vorbereitung auf die Aufnahme an 8 tschechischen medizinischen Fakultäten. Originaltests in Biologie, Chemie und Physik. E-Mail + Code, kein Passwort. Erster Test kostenlos.",
+      ordizapis: "Am Handy aufnehmen — Diktat oder Gespräch. Die KI entwirft die Notiz nach Vorlage.",
+      mediflow: "Persönliches Wellness-Tagebuch — Artikel, Symptome, Supplemente und Longevity-Protokolle.",
+    },
   },
   about: {
     ...EN.about,
@@ -800,6 +808,14 @@ const FR: MarketingCopy = {
     stepDesktop: "3. PC : Chrome/Edge → icône ⊕ dans la barre d’adresse",
     scanInstall: "Scanner et installer",
     eyebrowApps: "Applis",
+    pitch: {
+      medipacient:
+        "Photographiez un PDF ou un compte rendu — même hors ligne. Une fois reconnecté, l’OCR extrait diagnostics, médicaments et contrôles.",
+      mediprep:
+        "Prépa pour les concours de 8 facultés de médecine tchèques. Tests originaux de biologie, chimie et physique. E-mail + code, sans mot de passe. Premier test gratuit.",
+      ordizapis: "Enregistrez sur mobile — dictée ou consultation. L’IA prépare la note selon le modèle.",
+      mediflow: "Journal wellness personnel — articles, symptômes, compléments et protocoles de longévité.",
+    },
   },
   about: {
     ...EN.about,
