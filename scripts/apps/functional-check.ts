@@ -842,8 +842,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.20"),
-  "page cache tag must bust after student studio dashboard"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.21"),
+  "page cache tag must bust after student comparison €10"
 );
 file("app/(public)/studenti/klub/page.tsx");
 file("app/(public)/studenti/zebricek/page.tsx");
