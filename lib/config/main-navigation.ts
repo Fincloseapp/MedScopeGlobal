@@ -60,7 +60,7 @@ const menuCs: NavItem[] = [
         description: "Knihovna podle ročníku a oboru",
       },
       { label: "Testy", href: "/studenti/testy", description: "Self-test a modelové otázky" },
-      { label: "Klub kvízů", href: "/studenti/klub", description: "Soutěžní kvízy — 5 kol zdarma" },
+      { label: "Klub kvízů", href: "/studenti/klub", description: "Soutěžní kvízy — 1 test zdarma" },
       { label: "Žebříček", href: "/studenti/zebricek", description: "Nejlepší přezdívky z kvízů" },
       { label: "Kvízy a hry", href: "/studenti/hry", description: "Studijní hry a kvízy" },
       { label: "AI tutor", href: "/studenti/ai-tutor", description: "Studentský AI asistent" },

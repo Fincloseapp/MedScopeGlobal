@@ -1,7 +1,9 @@
-/** Student quiz club — CS faculty product. 5 free runs, then existing student plan. */
+/** Student quiz club — CS faculty product. 1 free test, then intro + monthly plan. */
 
-export const STUDENT_CLUB_FREE_RUNS = 5;
-export const STUDENT_CLUB_PRICE_CZK = 149;
+import { STUDENT_FREE_TESTS, STUDENT_MONTHLY_CZK } from "@/lib/studenti/pricing";
+
+export const STUDENT_CLUB_FREE_RUNS = STUDENT_FREE_TESTS;
+export const STUDENT_CLUB_PRICE_CZK = STUDENT_MONTHLY_CZK;
 export const STUDENT_CLUB_STORAGE_RUNS = "ms_student_club_runs";
 export const STUDENT_CLUB_STORAGE_NICK = "ms_student_club_nick";
 export const STUDENT_CLUB_STORAGE_EMAIL = "ms_student_club_email";

@@ -21,7 +21,7 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       {
         label: "Klub kvízů",
         href: "/studenti/klub",
-        description: "Soutěžní kvízy, žebříček přezdívek — 5 kol zdarma",
+        description: "Soutěžní kvízy, žebříček přezdívek — 1 test zdarma",
       },
       {
         label: "Žebříček",
@@ -59,7 +59,7 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       { label: "Studijní plány", href: "/medicina/plany", description: "Harmonogramy 1.–6. ročník" },
     ],
     ctaHref: "/predplatne",
-    ctaLabel: "Studentské předplatné 149 Kč",
+    ctaLabel: "Studentské předplatné 89 / 149 Kč",
   },
   testy: {
     slug: "testy",
@@ -70,7 +70,7 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       {
         label: "Klub kvízů a žebříček",
         href: "/studenti/klub",
-        description: "Soutěžní kola z banky přijímaček — 5 zdarma",
+        description: "Soutěžní kola z banky přijímaček — 1 test zdarma",
       },
       {
         label: "Self-test přijímaček",
@@ -95,8 +95,8 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       { label: "Chci studovat medicínu", href: "/studenti/chci-studovat" },
       {
         label: "Studentské předplatné",
-        href: "/predplatne?trial=1#student",
-        description: "Neomezené procvičení — od 149 Kč/měsíc, trial zdarma",
+        href: "/predplatne#student",
+        description: "Neomezené procvičení — 89 Kč, pak 149 Kč",
       },
     ],
     ctaHref: "/academy/prijimacky/self-test",
@@ -128,8 +128,8 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       { label: "AI tutor", href: "/studenti/ai-tutor", description: "Dotazy k látce" },
       {
         label: "Studentské předplatné",
-        href: "/predplatne?trial=1#student",
-        description: "Plný přístup během semestru — od 149 Kč/měsíc",
+        href: "/predplatne#student",
+        description: "Plný přístup během semestru — 89 Kč, pak 149 Kč",
       },
     ],
     ctaHref: "/medicina/plany",

@@ -198,7 +198,7 @@ export function getStudentiNavStripCopy(seed = 0, locale = "cs"): ConversionCopy
       slot: "nav_strip",
       eyebrow: "Pro váš zájem",
       headline: "Pokračujte v přípravě s MeDiprep",
-      body: "První test zdarma, pak simulace 8 českých LF. Student 149 Kč · 14 dní zdarma.",
+      body: "První test zdarma, pak simulace 8 českých LF. Student 89 Kč, další měsíc 149 Kč.",
       ctaLabel: "Otevřít MeDiprep",
       ctaHref: "/app/priprava",
       hint: "14 dní na vyzkoušení",

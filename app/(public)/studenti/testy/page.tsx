@@ -20,7 +20,7 @@ const PATHS = [
   {
     href: "/studenti/klub",
     title: "Klub kvízů a žebříček",
-    body: "Soutěžní kola z banky přijímaček pod přezdívkou. 5 kol zdarma, pak 149 Kč/měsíc — zrušíte kdykoli.",
+    body: "Soutěžní kola z banky přijímaček pod přezdívkou. 1 test zdarma, první měsíc 89 Kč, pak 149 Kč — zrušíte kdykoli.",
     cta: "Otevřít klub",
     primary: true,
   },

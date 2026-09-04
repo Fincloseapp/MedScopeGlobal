@@ -5,6 +5,8 @@ import { createStripeClient, getStripeSecretKey } from "@/lib/stripe/client";
 import { resolveV27CheckoutItem, type V27CheckoutKind } from "@/lib/v27/stripe-products";
 import { convertCzkToCharge } from "@/lib/i18n/payment-currency";
 import { VIP_TRIAL_DAYS } from "@/lib/vip";
+import { isStudentGrantProduct } from "@/lib/v27/config";
+import { studentIntroCharge, studentMonthlyCharge } from "@/lib/studenti/pricing";
 
 export type V27CheckoutBody = {
   kind?: V27CheckoutKind;
@@ -12,6 +14,7 @@ export type V27CheckoutBody = {
   userId?: string;
   locale?: string | null;
   region?: string | null;
+  gift?: boolean;
 };
 
 const STRIPE_LOCALES = new Set([
@@ -51,7 +54,7 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
     };
   }
 
-  const { kind, productId, userId, locale, region } = body;
+  const { kind, productId, userId, locale, region, gift } = body;
   if (!kind || !productId) {
     return { status: 400 as const, body: { error: "Chybí kind nebo productId" } };
   }
@@ -62,13 +65,35 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
   }
 
   const stripe = createStripeClient(secret);
-  const charge = convertCzkToCharge(item.priceCzk, locale, region);
+  const studentMonth = kind === "subscription" && isStudentGrantProduct(productId) && item.billingInterval !== "year";
+  const charge = studentMonth
+    ? studentMonthlyCharge(locale, region)
+    : convertCzkToCharge(item.priceCzk, locale, region);
+  const intro = studentMonth ? studentIntroCharge(locale, region) : null;
   const recurringInterval = item.billingInterval === "year" ? "year" : "month";
+  const student = isStudentGrantProduct(productId);
+  const description = student
+    ? gift
+      ? `MedScopeGlobal — ${item.name} · dárek: první měsíc ${intro?.formatted ?? charge.formatted}, další ${charge.formatted}`
+      : `MedScopeGlobal — ${item.name} · 1 test zdarma, první měsíc ${intro?.formatted ?? charge.formatted}, další ${charge.formatted}`
+    : `MedScopeGlobal — ${item.name} · ${VIP_TRIAL_DAYS}denní zkušební verze`;
+
+  const discounts: Stripe.Checkout.SessionCreateParams.Discount[] = [];
+  if (studentMonth && intro && intro.unitAmount < charge.unitAmount) {
+    const coupon = await stripe.coupons.create({
+      amount_off: charge.unitAmount - intro.unitAmount,
+      currency: charge.currency,
+      duration: "once",
+      name: "Student first month",
+      redeem_by: Math.floor(Date.now() / 1000) + 86400,
+    });
+    discounts.push({ coupon: coupon.id });
+  }
 
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode: item.mode,
     locale: stripeCheckoutLocale(locale),
-    success_url: `${SITE.url}/checkout/uspesne?session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `${SITE.url}/checkout/uspesne?session_id={CHECKOUT_SESSION_ID}${gift ? "&gift=1" : ""}`,
     cancel_url: `${SITE.url}/predplatne?canceled=1`,
     payment_method_types: ["card"],
     metadata: {
@@ -80,6 +105,8 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
       currency: charge.currency,
       unit_amount: String(charge.unitAmount),
       ...(userId ? { user_id: userId } : {}),
+      ...(gift ? { gift: "1" } : {}),
+      ...(studentMonth && intro ? { intro_unit_amount: String(intro.unitAmount) } : {}),
     },
     line_items: [
       {
@@ -88,8 +115,8 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
           currency: charge.currency,
           unit_amount: charge.unitAmount,
           product_data: {
-            name: item.name,
-            description: `MedScopeGlobal — ${item.name} · ${VIP_TRIAL_DAYS}denní zkušební verze`,
+            name: gift ? `${item.name} — dárek` : item.name,
+            description,
           },
           ...(item.mode === "subscription"
             ? { recurring: { interval: recurringInterval } }
@@ -97,14 +124,18 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
         },
       },
     ],
+    ...(discounts.length ? { discounts } : {}),
     ...(item.mode === "subscription"
       ? {
           subscription_data: {
-            trial_period_days: VIP_TRIAL_DAYS,
+            ...(student
+              ? {}
+              : { trial_period_days: VIP_TRIAL_DAYS }),
             metadata: {
-              v27_trial_days: String(VIP_TRIAL_DAYS),
+              v27_trial_days: student ? "0" : String(VIP_TRIAL_DAYS),
               product_id: productId,
               ...(userId ? { user_id: userId } : {}),
+              ...(gift ? { gift: "1" } : {}),
             },
           },
         }

@@ -51,7 +51,7 @@ const NAV: Record<string, NavStrings> = {
     "/studenti/testy": { label: "Tests", description: "Self-test and model questions" },
     "/studenti/hry": { label: "Quizzes and games", description: "Study games and quizzes" },
     "/studenti/ai-tutor": { label: "AI tutor", description: "Student AI assistant" },
-    "/predplatne#student": { label: "Student plan", description: "149 CZK/month · free trial" },
+    "/predplatne#student": { label: "Student plan", description: "1 free test · intro then 149 CZK / €10" },
     "/studenti#pro-rodice": { label: "For parents", description: "How to support preparation" },
     "/studenti/zkousky": { label: "Exams", description: "Orientation for faculty exams" },
     "/studenti/leky": { label: "Medicines", description: "SÚKL — not a pharmacology course" },

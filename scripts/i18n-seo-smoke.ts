@@ -49,6 +49,7 @@ import { getDesktopHeaderMenu } from "../lib/config/main-navigation";
 import { V271_LEKARI_PAGES } from "../lib/v271/routes";
 import { looksLikeCzech } from "../lib/i18n/czech-detect";
 import { convertCzkToCharge, localizeListedCzk, paymentTiersForUser } from "../lib/i18n/payment-currency";
+import { studentMonthlyCharge } from "../lib/studenti/pricing";
 import { b2bPricingForLocale } from "../lib/v271/b2b-pricing";
 import { formatPublicDate, intlLocaleFor } from "../lib/i18n/format-date";
 import { getArticleChrome } from "../lib/i18n/article-chrome";
@@ -180,7 +181,8 @@ assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/it/pr
 assert.ok(!rootStatic.some((row) => row.url === "https://medscopeglobal.com/articles"));
 assert.ok(!rootStatic.some((row) => row.url.includes("/cs/article/")));
 assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/cs/studenti"));
-assert.ok(!rootStatic.some((row) => row.url === "https://medscopeglobal.com/en-us/studenti"));
+assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/en-us/studenti"));
+assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/de/studenti/darkove"));
 assert.ok(!rootStatic.some((row) => row.url === "https://medscopeglobal.com/de/mediprep"));
 
 const feeds = allLocaleFeedUrls();
@@ -389,6 +391,8 @@ assert.equal(frCharge.unitAmount, 396);
 assert.ok(frCharge.formatted.includes("€") || frCharge.formatted.toLowerCase().includes("eur"));
 const deCharge = convertCzkToCharge(149, "de");
 assert.equal(deCharge.currency, "eur");
+assert.equal(studentMonthlyCharge("de").unitAmount, 1000);
+assert.equal(studentMonthlyCharge("cs").unitAmount, 14900);
 assert.equal(convertCzkToCharge(99, "en-US").currency, "usd");
 assert.equal(convertCzkToCharge(99, "en-UK").currency, "gbp");
 assert.equal(convertCzkToCharge(99, "ja").currency, "jpy");
@@ -785,6 +789,8 @@ assert.equal(getPhysicianLandingCopy("en-US").verifyAdminHref, undefined);
   assert.ok(!getCzechFacultyOnlyCopy("de", "students").title.includes("Studenti"));
   assert.equal(czechFacultyProductForPath("/academy/lekari"), "academy");
   assert.equal(czechFacultyProductForPath("/studenti/materialy"), "students");
+  assert.equal(czechFacultyProductForPath("/studenti"), null);
+  assert.equal(czechFacultyProductForPath("/studenti/darkove"), null);
   assert.equal(czechFacultyProductForPath("/lekari/dokumentace"), null);
 }
 const itLekari = getPhysicianHubExtrasCopy("it");

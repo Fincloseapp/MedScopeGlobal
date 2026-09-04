@@ -8,7 +8,7 @@ import { getServerLocale, getServerRegion } from "@/lib/i18n/server-locale";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
-  let body: { kind?: V27CheckoutKind; productId?: string; userId?: string; locale?: string };
+  let body: { kind?: V27CheckoutKind; productId?: string; userId?: string; locale?: string; gift?: boolean };
   try {
     body = await request.json();
   } catch {
@@ -37,6 +37,7 @@ export async function POST(request: Request) {
     userId,
     locale,
     region,
+    gift: Boolean(body.gift),
   });
 
   return NextResponse.json(result.body, { status: result.status });

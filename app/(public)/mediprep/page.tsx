@@ -47,7 +47,7 @@ export default async function MediprepMarketingPage() {
     { title: "Simulace s odpočtem", body: "Bloky B/C/F podle fakulty — tréninkový formát, ne oficiální zadání." },
     { title: "Drill slabých míst", body: "Po testu vidíte témata pod 70 %. Další sada jde přesně tam." },
     { title: "Týdenní plán", body: "Sedm konkrétních kroků: kapitola, mini test, simulace, opakování." },
-    { title: "E-mail + kód", body: "Bez hesla. První test zdarma. Pak Student 149 Kč / 14 dní zdarma." },
+    { title: "E-mail + kód", body: "Bez hesla. První test zdarma. Pak Student 89 Kč, další měsíc 149 Kč." },
   ] as const;
   return (
     <div className="bg-[#F8F4EA]">
@@ -163,7 +163,7 @@ export default async function MediprepMarketingPage() {
       <section className="mx-auto max-w-5xl px-4 pb-16 sm:px-6">
         <AppDownloadPanel
           app={MEDIPREP}
-          extraCta={{ href: "/predplatne#student", label: "149 Kč/měsíc · 14 dní zdarma" }}
+          extraCta={{ href: "/predplatne#student", label: "1 test zdarma · 89 Kč, pak 149 Kč" }}
         />
       </section>
     </div>

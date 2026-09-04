@@ -147,12 +147,12 @@ export function StudentClubBoard({
               Soutěžní kvíz
             </p>
             <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">
-              {canPlay ? "Další kolo z banky přijímaček" : "5 kol zdarma je vyčerpaných"}
+              {canPlay ? "Další kolo z banky přijímaček" : "Volný test je vyčerpaný — 89 Kč, pak 149 Kč"}
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-slate-600">
               {clubOpen
                 ? "Klub je otevřený — hrajte dál, žebříček ukazuje jen přezdívku."
-                : `${STUDENT_CLUB_FREE_RUNS} kol zdarma. Pak Klub studentů za ${STUDENT_CLUB_PRICE_CZK} Kč/měsíc, zrušíte kdykoli. Žádné skryté platby.`}
+                : `1 test zdarma. Pak první měsíc 89 Kč a další ${STUDENT_CLUB_PRICE_CZK} Kč — zrušíte kdykoli. Žádné skryté platby.`}
             </p>
             <p className="mt-1 text-xs text-slate-500">
               Zbývá {clubOpen ? "neomezeně" : left} {clubOpen ? "" : "volných kol"}. E-mail slouží
@@ -215,7 +215,7 @@ export function StudentClubBoard({
                 <V27CheckoutButton
                   kind="subscription"
                   productId="student-month"
-                  label={`Klub · ${STUDENT_CLUB_PRICE_CZK} Kč/měsíc`}
+                  label={`Klub · 89 Kč teď, pak ${STUDENT_CLUB_PRICE_CZK} Kč`}
                   className="rounded-full border border-[#005B96]/30 bg-white px-5 py-2 text-sm font-semibold text-[#005B96]"
                 />
               ) : null}

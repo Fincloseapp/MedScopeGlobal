@@ -14,6 +14,7 @@ import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getMarketingCopy } from "@/lib/i18n/marketing-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { StudentOfferDashboard } from "@/components/studenti/student-offer-dashboard";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getServerLocale();
@@ -34,7 +35,7 @@ const APPLICANT_HREFS = [
 const APPLICANT_STEP_HREFS = [
   "/app/priprava",
   "/academy/courses?category=prijimacky",
-  "/predplatne?trial=1#student",
+  "/predplatne#student",
 ] as const;
 const LF_HREFS = ["/studenti/materialy", "/studenti/testy", "/studenti/ai-tutor"] as const;
 const LF_STEP_HREFS = ["/studenti/materialy", "/studenti/testy", "/studenti/ai-tutor"] as const;
@@ -125,6 +126,10 @@ export default async function StudentiHubPage() {
           <span>{copy.students}</span>
         </nav>
 
+        <div className="mb-12">
+          <StudentOfferDashboard locale={locale} />
+        </div>
+
         <section className="msg-path mb-12 rounded-3xl border border-[#cfe1f3] bg-[#f0f7ff]/70 p-6 sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#005B96]">
             {copy.applicantEyebrow}
@@ -145,8 +150,8 @@ export default async function StudentiHubPage() {
             Přehledná mapa klubu
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
-            Soutěžní kvízy z banky přijímaček, studijní hry, oficiální weby osmi LF a žebříček
-            přezdívek. Pět kol zdarma — pak 149 Kč/měsíc, zrušíte kdykoli.
+            Soutěžní kvízy z banky přijímaček, studijní hry, oficiální weby fakult a žebříček
+            přezdívek. 1 test zdarma — první měsíc 89 Kč, další 149 Kč, zrušíte kdykoli.
           </p>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
@@ -298,7 +303,7 @@ export default async function StudentiHubPage() {
               </ul>
               <div className="mt-6 flex flex-wrap gap-2">
                 <Button asChild className="rounded-full bg-[#005B96]">
-                  <Link href={h("/predplatne?trial=1#student")} data-cta="studenti-parent-trial">
+                  <Link href={h("/studenti/darkove")} data-cta="studenti-parent-gift">
                     {copy.giftTrial}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
@@ -329,7 +334,7 @@ export default async function StudentiHubPage() {
               </ul>
               <div className="mt-6 flex flex-wrap gap-2">
                 <Button asChild className="rounded-full bg-white text-[#005B96] hover:bg-sky-50">
-                  <Link href={h("/predplatne?trial=1#student")} data-cta="studenti-sub-trial">
+                  <Link href={h("/predplatne#student")} data-cta="studenti-sub-buy">
                     {copy.daysFree}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>

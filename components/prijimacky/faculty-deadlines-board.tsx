@@ -25,7 +25,7 @@ function deadlineLabel(days: number | null): string {
   return `Zbývá ${days} dní`;
 }
 
-function FacultyCard({ f }: { f: FacultyAdmissions }) {
+function FacultyCard({ f, showFacultyDetail = true }: { f: FacultyAdmissions; showFacultyDetail?: boolean }) {
   const days = daysUntilDeadline(f.applicationDeadline);
   return (
     <article className="flex flex-col rounded-2xl border border-[#cfe1f3] bg-white p-5 shadow-sm">
@@ -87,9 +87,20 @@ function FacultyCard({ f }: { f: FacultyAdmissions }) {
           Oficiální přihláška
           <ExternalLink className="h-3.5 w-3.5" aria-hidden />
         </a>
-        <Link href={`/studium/univerzity/${f.slug}`} className="text-slate-600 hover:underline">
-          Detail fakulty
-        </Link>
+        {showFacultyDetail ? (
+          <Link href={`/studium/univerzity/${f.slug}`} className="text-slate-600 hover:underline">
+            Detail fakulty
+          </Link>
+        ) : (
+          <a
+            href={f.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-slate-600 hover:underline"
+          >
+            Web fakulty
+          </a>
+        )}
       </div>
     </article>
   );
@@ -97,24 +108,34 @@ function FacultyCard({ f }: { f: FacultyAdmissions }) {
 
 export function FacultyDeadlinesBoard({
   compact = false,
+  faculties,
+  title,
+  lead,
+  cycleLabel,
+  showFacultyDetail = true,
 }: {
   compact?: boolean;
+  faculties?: FacultyAdmissions[];
+  title?: string;
+  lead?: string;
+  cycleLabel?: string;
+  showFacultyDetail?: boolean;
 }) {
-  const faculties = sortFacultiesByDeadline(FACULTIES_ADMISSIONS_2026);
+  const list = sortFacultiesByDeadline(faculties ?? FACULTIES_ADMISSIONS_2026);
   return (
     <section className="rounded-3xl border border-[#cfe1f3] bg-gradient-to-br from-[#f4f9ff] via-white to-[#eef6ff] p-6 sm:p-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="max-w-2xl">
           <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
             <CalendarClock className="h-3.5 w-3.5" aria-hidden />
-            {PRIJIMACKY_CYCLE_LABEL}
+            {cycleLabel ?? PRIJIMACKY_CYCLE_LABEL}
           </p>
           <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33] sm:text-3xl">
-            Termíny přihlášek na lékařské fakulty
+            {title ?? "Termíny přihlášek na lékařské fakulty"}
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">
-            Přehled pro maturanty gymnázií — kdy otevřít přihlášku, dokdy ji podat a kdy čekat zkoušky.
-            Vždy ověřte finální data na oficiálním webu fakulty.
+            {lead ??
+              "Přehled pro maturanty gymnázií — kdy otevřít přihlášku, dokdy ji podat a kdy čekat zkoušky. Vždy ověřte finální data na oficiálním webu fakulty."}
           </p>
         </div>
         {!compact ? (
@@ -128,8 +149,8 @@ export function FacultyDeadlinesBoard({
       </div>
 
       <div className={`mt-6 grid gap-4 ${compact ? "md:grid-cols-2" : "md:grid-cols-2 xl:grid-cols-2"}`}>
-        {faculties.map((f) => (
-          <FacultyCard key={f.slug} f={f} />
+        {list.map((f) => (
+          <FacultyCard key={f.slug} f={f} showFacultyDetail={showFacultyDetail} />
         ))}
       </div>
     </section>

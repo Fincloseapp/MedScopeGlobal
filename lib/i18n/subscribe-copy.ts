@@ -93,7 +93,7 @@ const COPY: Record<string, SubscribeCopy> = {
     openApp: "Otevřít →",
     downloadApp: "Stáhnout na mobil",
     choosePlan: "Vyberte plán",
-    choosePlanLead: "Všechny tarify zahrnují 14 dní zkušební verze zdarma. Po kliknutí přejdete na zabezpečenou Stripe pokladnu.",
+    choosePlanLead: "Veřejnost, OrdiZapis a lékař: 14 dní zdarma. Student LF: 1 test zdarma, první měsíc 89 Kč, další 149 Kč. Zrušíte kdykoli. Po kliknutí přejdete na Stripe.",
     bestForClinic: "Nejvýhodnější pro ordinaci",
     mostPopular: "Nejoblíbenější",
     daysFree: "14 dní zdarma",
@@ -123,7 +123,7 @@ const COPY: Record<string, SubscribeCopy> = {
     faq: [
       {
         q: "Jak funguje 14denní zkušební verze?",
-        a: "Po registraci a výběru tarifu zadáte platební kartu přes Stripe. Prvních 14 dní neúčtujeme nic — máte plný přístup k obsahu daného tarifu. Po skončení zkušební doby se automaticky spustí měsíční nebo roční předplatné podle zvoleného plánu.",
+        a: "Veřejnost, OrdiZapis a lékař: po zadání karty máte 14 dní zdarma, pak se spustí předplatné. Student LF nemá 14denní trial — 1 test zdarma, první měsíc 89 Kč, další měsíce 149 Kč. Zrušíte kdykoli před dalším inkasem.",
       },
       {
         q: "Mohu předplatné kdykoli zrušit?",
@@ -131,11 +131,11 @@ const COPY: Record<string, SubscribeCopy> = {
       },
       {
         q: "Jaký tarif zvolit?",
-        a: "Veřejnost (99 Kč) — prevence, životní styl a AI pro laiky. Student LF (149 Kč) — studijní materiály, kvízy a AI tutor. Lékař v praxi (490 Kč) — odborná sekce, guidelines, CME a klinický AI.",
+        a: "Veřejnost (99 Kč) — prevence, životní styl a AI pro laiky. Student LF (89 Kč první měsíc, pak 149 Kč / v EU 10 €) — materiály, kvízy a AI tutor. Lékař v praxi (490 Kč) — odborná sekce, guidelines, CME a klinický AI.",
       },
       {
         q: "Mohu předplatné koupit jako rodič pro dítě?",
-        a: "Ano. Zvolte tarif Student LF (149 Kč/měsíc) a účet, který bude dítě používat. Nejdřív doporučujeme self-test a jednu free lekci. Předplatné nezaručuje přijetí na medicínu; dává strukturovaný trénink a zpětnou vazbu.",
+        a: "Ano. Na /studenti/darkove koupíte Student LF (89 Kč, pak 149 Kč) a po platbě přepošlete aktivační odkaz. Student ho otevře na svém účtu. Nezaručuje přijetí na medicínu.",
       },
       {
         q: "Jaké platební metody podporujete?",
@@ -181,7 +181,7 @@ const COPY: Record<string, SubscribeCopy> = {
           "Celá Academy včetně přípravných kurzů na přijímačky",
           "AI tutor a studijní materiály",
           "Kvízy, hry a modelové otázky",
-          "Klub kvízů bez limitu — 5 kol zdarma, pak tento tarif, zrušíte kdykoli",
+          "1 test zdarma · první měsíc 89 Kč · další měsíce 149 Kč, zrušíte kdykoli",
           "149 Kč = Student LF (Academy) — longevity články zůstávají v magazínu zdarma",
         ],
       },
@@ -253,7 +253,7 @@ const COPY: Record<string, SubscribeCopy> = {
     openApp: "Open →",
     downloadApp: "Install on mobile",
     choosePlan: "Choose a plan",
-    choosePlanLead: "Every plan includes a 14-day free trial. Checkout opens a secure Stripe payment page.",
+    choosePlanLead: "Public, OrdiZapis and physician: 14-day trial. Student LF: 1 free test, intro month, then 149 CZK / €10. Cancel anytime. Checkout opens Stripe.",
     bestForClinic: "Best value for the clinic",
     mostPopular: "Most popular",
     daysFree: "14 days free",
@@ -341,7 +341,7 @@ const COPY: Record<string, SubscribeCopy> = {
           "Full Academy including admissions prep",
           "AI tutor and study materials",
           "Quizzes, games and model questions",
-          "Unlimited quiz club after 5 free rounds — cancel anytime",
+          "1 free test · intro month · then 149 CZK / €10 — cancel anytime",
           "149 CZK = Academy student — magazine longevity stays free to read",
         ],
       },

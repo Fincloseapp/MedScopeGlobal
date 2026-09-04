@@ -166,6 +166,8 @@ import {
 } from "../../lib/studenti/club";
 import { studentClubOpenFromProfile } from "../../lib/billing/student-entitlement";
 import { isPhysicianGrantProduct, isStudentGrantProduct } from "../../lib/v27/config";
+import { studentIntroCharge, studentMonthlyCharge, STUDENT_FREE_TESTS } from "../../lib/studenti/pricing";
+import { facultiesForLocale, facultyCountryForLocale } from "../../lib/prijimacky/faculties-by-country";
 import { articlePageKey, rollEvergreenListingDate } from "../../lib/editorial/freshness";
 import {
   isLongevityForeignSource,
@@ -840,8 +842,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.18"),
-  "page cache tag must bust after official GA collect"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.19"),
+  "page cache tag must bust after student intro pricing"
 );
 file("app/(public)/studenti/klub/page.tsx");
 file("app/(public)/studenti/zebricek/page.tsx");
@@ -2655,10 +2657,20 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.equal(pinned[0]?.id, "who-pin", "pinHomepageDesks must reserve news first");
   assert.equal(new Set(pinned.map((article) => article.id)).size, pinned.length);
   assert.equal(normalizeStudentNick(" BioChem@18!! "), "BioChem18");
-  assert.equal(canStartClubRun(4, false), true);
+  assert.equal(STUDENT_CLUB_FREE_RUNS, 1);
+  assert.equal(STUDENT_FREE_TESTS, 1);
+  assert.equal(canStartClubRun(0, false), true);
+  assert.equal(canStartClubRun(1, false), false);
   assert.equal(canStartClubRun(5, false), false);
   assert.equal(canStartClubRun(99, true), true);
-  assert.equal(remainingFreeRuns(2, false), STUDENT_CLUB_FREE_RUNS - 2);
+  assert.equal(remainingFreeRuns(0, false), 1);
+  assert.equal(studentIntroCharge("cs").unitAmount, 8900);
+  assert.equal(studentMonthlyCharge("cs").unitAmount, 14900);
+  assert.equal(studentMonthlyCharge("de").unitAmount, 1000);
+  assert.equal(studentIntroCharge("fr").unitAmount, 600);
+  assert.equal(facultyCountryForLocale("de"), "de");
+  assert.ok(facultiesForLocale("sk").length >= 3);
+  assert.ok(facultiesForLocale("fr").some((f) => f.applicationUrl.includes("parcoursup")));
   assert.deepEqual(
     rankClubScores([
       { nick: "Alpha", score: 3, total: 8, at: "2026-09-01T10:00:00.000Z" },

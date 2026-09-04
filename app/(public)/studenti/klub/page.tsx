@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return await buildLocalizedV20PageMetadata({
     title: "Klub studentů — kvízy a žebříček",
     description:
-      "Soutěžní kvízy z banky přijímaček, žebříček přezdívek a materiály 8 českých LF. 5 kol zdarma, pak 149 Kč/měsíc.",
+      "Soutěžní kvízy z banky přijímaček, žebříček přezdívek a materiály 8 českých LF. 1 test zdarma, první měsíc 89 Kč, pak 149 Kč.",
     path: "/studenti/klub",
   });
 }
@@ -32,8 +32,8 @@ export default async function StudentClubPage() {
       </p>
       <h1 className="mt-3 font-display text-4xl font-bold text-[#021d33]">Klub kvízů a žebříčku</h1>
       <p className="mt-3 max-w-2xl text-lg text-slate-600">
-        Přehledně: soutěžní kvízy, odbornost, odkazy na fakulty. Pět kol zdarma. Další pokračování v
-        klubu za {STUDENT_CLUB_PRICE_CZK} Kč/měsíc — zrušíte kdykoli, bez skrytých poplatků.
+        Přehledně: soutěžní kvízy, odbornost, odkazy na fakulty. 1 test zdarma, první měsíc 89 Kč,
+        další {STUDENT_CLUB_PRICE_CZK} Kč — zrušíte kdykoli, bez skrytých poplatků.
       </p>
 
       <div className="mt-6">

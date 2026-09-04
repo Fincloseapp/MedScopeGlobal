@@ -11,6 +11,7 @@ type Props = {
   label?: string;
   className?: string;
   locale?: string;
+  gift?: boolean;
 };
 
 export function V27CheckoutButton({
@@ -19,6 +20,7 @@ export function V27CheckoutButton({
   label = "Přejít na Stripe pokladnu",
   className,
   locale,
+  gift = false,
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +51,7 @@ export function V27CheckoutButton({
           productId,
           ...(userId ? { userId } : {}),
           ...(locale ? { locale } : {}),
+          ...(gift ? { gift: true } : {}),
         }),
       });
       const data = (await res.json()) as {

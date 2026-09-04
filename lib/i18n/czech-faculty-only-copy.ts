@@ -230,7 +230,10 @@ export function czechFacultyProductForPath(pathname: string): CzechFacultyProduc
   const p = pathname.split("?")[0] || "/";
   if (p === "/academy" || p.startsWith("/academy/")) return "academy";
   if (p === "/mediprep" || p.startsWith("/mediprep/")) return "mediprep";
-  if (p === "/studenti" || p.startsWith("/studenti/")) return "students";
+  if (p === "/studenti" || p === "/studenti/darkove" || p.startsWith("/studenti/darkove/")) {
+    return null;
+  }
+  if (p.startsWith("/studenti/")) return "students";
   if (p === "/medicina" || p.startsWith("/medicina/")) return "students";
   if (p === "/studium" || p.startsWith("/studium/")) return "students";
   return null;

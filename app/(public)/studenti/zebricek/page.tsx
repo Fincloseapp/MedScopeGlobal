@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return await buildLocalizedV20PageMetadata({
     title: "Žebříček kvízů — Klub studentů",
     description:
-      "Přezdívky z kvízů přijímaček. E-mail zůstává u účtu — na žebříčku je jen nick. 5 kol zdarma, pak 149 Kč/měsíc.",
+      "Přezdívky z kvízů přijímaček. E-mail zůstává u účtu — na žebříčku je jen nick. 1 test zdarma, pak 89 / 149 Kč.",
     path: "/studenti/zebricek",
   });
 }
@@ -36,7 +36,7 @@ export default function StudentClubLeaderboardPage() {
         <StudentClubStandings />
       </div>
       <p className="mt-6 text-sm text-slate-600">
-        5 kol zdarma. Další pokračování v klubu za {STUDENT_CLUB_PRICE_CZK} Kč/měsíc — zrušíte
+        1 test zdarma. Další pokračování v klubu za 89 Kč, pak {STUDENT_CLUB_PRICE_CZK} Kč — zrušíte
         kdykoli, bez skrytých poplatků. Pro uchazeče od 18 let.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
