@@ -19,6 +19,16 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       "Dvě cesty: příprava na přijímačky LF, nebo materiály a testy pro studenty fakulty. Začněte zdarma.",
     links: [
       {
+        label: "Klub kvízů",
+        href: "/studenti/klub",
+        description: "Soutěžní kvízy, žebříček přezdívek — 5 kol zdarma",
+      },
+      {
+        label: "Žebříček",
+        href: "/studenti/zebricek",
+        description: "Nejlepší nicky z kvízů — bez falešných jmen",
+      },
+      {
         label: "Chci na medicínu",
         href: "/studenti/chci-studovat",
         description: "Přijímačky, přípravné kurzy a self-test",
@@ -57,6 +67,11 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
     description:
       "Self-test přijímaček, Academy kvízy a studijní hry — s okamžitou zpětnou vazbou. Nejde o oficiální fakultní zkoušku.",
     links: [
+      {
+        label: "Klub kvízů a žebříček",
+        href: "/studenti/klub",
+        description: "Soutěžní kola z banky přijímaček — 5 zdarma",
+      },
       {
         label: "Self-test přijímaček",
         href: "/academy/prijimacky/self-test",

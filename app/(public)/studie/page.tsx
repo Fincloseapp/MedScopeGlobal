@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { V20StudyCard } from "@/components/v20/study-card";
 import { getV20StudiesList } from "@/lib/v20/studies/query";
+import { listPublicArticles } from "@/lib/queries/verejnost";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { V20ArticleCard } from "@/components/v20/article-card";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { V20_STUDY_SOURCES } from "@/lib/v20/studies/sources";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
@@ -17,7 +21,16 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function StudiePage() {
-  const studies = await getV20StudiesList(12);
+  const locale = await getServerLocale();
+  const [studies, magazine] = await Promise.all([
+    getV20StudiesList(12),
+    listPublicArticles({ limit: 12, ensureContent: false, mode: "card", locale }),
+  ]);
+  const research = magazine.filter((article) =>
+    /studi|výzkum|vyzkum|guideline|WHO|screening|eviden/i.test(
+      `${article.title} ${article.excerpt} ${article.public_topic}`
+    )
+  );
 
   return (
     <div className="v20-studies-page mx-auto max-w-7xl px-4 py-12 sm:px-6">
@@ -43,11 +56,14 @@ export default async function StudiePage() {
       </div>
 
       <div className="mt-6 flex flex-wrap gap-2 text-sm">
-        <Link href="/studie/nejnovejsi" className="rounded-full bg-primary px-3 py-1 text-white">
+        <Link
+          href={localizePublicHref("/studie/nejnovejsi", locale)}
+          className="rounded-full bg-primary px-3 py-1 text-white"
+        >
           Nejnovější
         </Link>
         <Link
-          href="/studie/archiv"
+          href={localizePublicHref("/studie/archiv", locale)}
           className="rounded-full border border-slate-200 px-3 py-1 text-primary"
         >
           Archiv
@@ -61,11 +77,25 @@ export default async function StudiePage() {
           ))}
         </div>
       ) : (
-        <div className="mt-8 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-sm text-slate-600">
-          <p className="font-semibold text-[#021d33]">Kurátorované studie se načítají</p>
-          <p className="mt-2">
-            Generické placeholdery byly odstraněny. Zobrazujeme pouze ověřené souhrny s DOI/PMID.
-          </p>
+        <div className="mt-8 space-y-6">
+          <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm text-slate-600">
+            <p className="font-semibold text-[#021d33]">Kurátorované studie s DOI/PMID se doplňují</p>
+            <p className="mt-2">
+              Placeholdery neukazujeme. Mezitím čtěte redakční články k výzkumu a screeningu — nebo
+              otevřete{" "}
+              <Link href={localizePublicHref("/aktualni-zpravy", locale)} className="font-semibold text-primary hover:underline">
+                aktuality
+              </Link>
+              .
+            </p>
+          </div>
+          {research.length > 0 ? (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {research.map((article) => (
+                <V20ArticleCard key={article.slug} article={article} locale={locale} />
+              ))}
+            </div>
+          ) : null}
         </div>
       )}
 

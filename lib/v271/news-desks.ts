@@ -202,9 +202,13 @@ export function splitNewsDesks(
   };
   const used = new Set<string>();
   const listable = articles.filter((article) => isListableNewsArticle(article, new Date(), locale));
+  const isNewsPriority = (article: DisplayArticle) => isNovinkyArticle(article);
+
+  desks.novinky.push(...takeUnused(listable, used, cap.novinky, isNewsPriority));
 
   for (const article of listable) {
     const desk = classifyNewsDesk(article);
+    if (desk === "novinky") continue;
     if (desks[desk].length >= cap[desk]) continue;
     const key = articlePageKey(article);
     if (!key || used.has(key)) continue;
@@ -233,9 +237,11 @@ export function splitNewsDesks(
   desks.clanky.push(
     ...takeUnused(olderFirst, used, cap.clanky - desks.clanky.length)
   );
-  desks.novinky.push(
-    ...takeUnused(listable, used, cap.novinky - desks.novinky.length, isNovinkyArticle)
-  );
+  if (desks.novinky.length < cap.novinky) {
+    desks.novinky.push(
+      ...takeUnused(listable, used, cap.novinky - desks.novinky.length)
+    );
+  }
 
   return {
     novinky: desks.novinky,
@@ -287,14 +293,21 @@ export function pinLongevityIntoFeed(
   limit: number,
   locale = "cs"
 ): DisplayArticle[] {
+  return pinHomepageDesks(articles, limit, locale);
+}
+
+/** Reserve news + longevity so Aktuality is never starved by lifestyle cards. */
+export function pinHomepageDesks(
+  articles: DisplayArticle[],
+  limit: number,
+  locale = "cs"
+): DisplayArticle[] {
   const listable = articles.filter((article) => isListableNewsArticle(article, new Date(), locale));
-  const longevity = listable.filter((article) => isLongevityArticle(article));
-  const mixed = mixListableFeed(listable, limit, locale);
-  if (longevity.length === 0) return mixed;
-  const pinned = longevity.slice(0, 4);
-  const pinnedIds = new Set(pinned.map((article) => article.id));
-  const rest = mixed.filter((article) => !pinnedIds.has(article.id));
-  return [...pinned, ...rest].slice(0, Math.max(limit, pinned.length));
+  const used = new Set<string>();
+  const news = takeUnused(listable, used, Math.min(8, limit), isNovinkyArticle);
+  const longevity = takeUnused(listable, used, Math.min(8, limit), isLongevityArticle);
+  const rest = takeUnused(listable, used, Math.max(0, limit - news.length - longevity.length));
+  return [...news, ...longevity, ...rest].slice(0, limit);
 }
 
 const GENERIC_NEWS_TITLE_RE =

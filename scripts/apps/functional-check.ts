@@ -151,9 +151,17 @@ import {
   isLongevityArticle,
   isProfessionalAktualityTitle,
   mergeAktualityListing,
+  pinHomepageDesks,
   splitNewsDesks,
   uniqueHomepageLayout,
 } from "../../lib/v271/news-desks";
+import {
+  canStartClubRun,
+  normalizeStudentNick,
+  rankClubScores,
+  remainingFreeRuns,
+  STUDENT_CLUB_FREE_RUNS,
+} from "../../lib/studenti/club";
 import { articlePageKey, rollEvergreenListingDate } from "../../lib/editorial/freshness";
 import {
   isLongevityForeignSource,
@@ -827,8 +835,20 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.15"),
-  "page cache tag must bust after unique homepage desks"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.16"),
+  "page cache tag must bust after Aktuality fill and student club"
+);
+file("app/(public)/studenti/klub/page.tsx");
+file("app/(public)/studenti/zebricek/page.tsx");
+file("components/studenti/student-club-board.tsx");
+file("lib/studenti/club.ts");
+assert.ok(
+  readFileSync(join(root, "app/(public)/studenti/page.tsx"), "utf8").includes("/studenti/klub"),
+  "student hub must link the quiz club"
+);
+assert.ok(
+  readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes("pinHomepageDesks"),
+  "homepage cache must reserve news before lifestyle"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/lekari/dokumentace/page.tsx"), "utf8").includes(
@@ -2569,6 +2589,66 @@ console.log("✓ magazine desk byline and copy checks passed");
   ].map((article) => articlePageKey(article));
   assert.equal(new Set(visible).size, visible.length, "homepage + longevity strip must be unique at the same time");
   assert.ok(layout.desks.dlouhovekost.length + layout.longevityReading.length >= 2);
+  const pinned = pinHomepageDesks(
+    [
+      {
+        id: "who-pin",
+        title: "WHO: nová doporučení k očkování seniorů",
+        slug: "who-pin-2026-09-04",
+        excerpt: "Aktuální guideline.",
+        content: longBody,
+        published: true,
+        published_at: "2026-09-04T08:00:00.000Z",
+        vip_only: false,
+        locale: "cs",
+        audience: "public",
+        rubric_slug: "aktualni-zpravy",
+      } as never,
+      {
+        id: "osteo-pin",
+        title: "Prevence osteoporózy u žen i mužů",
+        slug: "osteo-pin",
+        excerpt: "Vápník a pohyb.",
+        content: longBody,
+        published: true,
+        published_at: "2026-09-04T09:00:00.000Z",
+        vip_only: false,
+        locale: "cs",
+        audience: "public",
+        public_topic: "prevence",
+      } as never,
+      {
+        id: "alergie-pin",
+        title: "Jak se bránit sezónním alergiím v domácnosti",
+        slug: "alergie-pin",
+        excerpt: "Pyl a antihistaminika.",
+        content: longBody,
+        published: true,
+        published_at: "2026-09-04T10:00:00.000Z",
+        vip_only: false,
+        locale: "cs",
+        audience: "public",
+        public_topic: "nemoci",
+      } as never,
+    ],
+    8,
+    "cs"
+  );
+  assert.equal(pinned[0]?.id, "who-pin", "pinHomepageDesks must reserve news first");
+  assert.equal(new Set(pinned.map((article) => article.id)).size, pinned.length);
+  assert.equal(normalizeStudentNick(" BioChem@18!! "), "BioChem18");
+  assert.equal(canStartClubRun(4, false), true);
+  assert.equal(canStartClubRun(5, false), false);
+  assert.equal(canStartClubRun(99, true), true);
+  assert.equal(remainingFreeRuns(2, false), STUDENT_CLUB_FREE_RUNS - 2);
+  assert.deepEqual(
+    rankClubScores([
+      { nick: "Alpha", score: 3, total: 8, at: "2026-09-01T10:00:00.000Z" },
+      { nick: "alpha", score: 7, total: 8, at: "2026-09-02T10:00:00.000Z" },
+      { nick: "Beta", score: 6, total: 8, at: "2026-09-03T10:00:00.000Z" },
+    ]).map((row) => row.nick),
+    ["Alpha", "Beta"]
+  );
   assert.deepEqual(
     filterArticlesForLocale(
       [

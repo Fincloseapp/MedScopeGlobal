@@ -3,7 +3,7 @@ import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
 import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-audit";
 import { filterActiveArticles } from "@/lib/v20/content-rules";
-import { pinLongevityIntoFeed } from "@/lib/v271/news-desks";
+import { pinHomepageDesks } from "@/lib/v271/news-desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import { normalizeLocale } from "@/lib/i18n/config";
@@ -54,9 +54,9 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
 
   const supabase = tryCreateServiceRoleClient();
   if (!supabase) {
-    return pinLongevityIntoFeed(
+    return pinHomepageDesks(
       mergeNativeDeskFeed(getDemoMagazineArticles(), locale),
-      36,
+      48,
       locale
     );
   }
@@ -70,9 +70,9 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
 
   if (error) {
     console.error("loadArticlesPublic", error);
-    return pinLongevityIntoFeed(
+    return pinHomepageDesks(
       mergeNativeDeskFeed(getDemoMagazineArticles(), locale),
-      36,
+      48,
       locale
     );
   }
@@ -97,13 +97,13 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     maxLive: 0,
   });
   if (prepared.length === 0) {
-    return pinLongevityIntoFeed(
+    return pinHomepageDesks(
       mergeNativeDeskFeed(getDemoMagazineArticles(), localeKey),
-      36,
+      48,
       localeKey
     );
   }
-  return pinLongevityIntoFeed(prepared, 36, localeKey);
+  return pinHomepageDesks(prepared, 48, localeKey);
 }
 
 async function loadHomepageData(locale: string): Promise<{

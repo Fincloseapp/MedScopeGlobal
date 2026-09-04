@@ -76,6 +76,8 @@ const CZECH_ONLY_PATHS: StaticSpec[] = [
   { path: "/mediprep/stahnout", changeFrequency: "monthly", priority: 0.5 },
   { path: "/app/priprava", changeFrequency: "monthly", priority: 0.5 },
   { path: "/studenti", changeFrequency: "monthly", priority: 0.55 },
+  { path: "/studenti/klub", changeFrequency: "weekly", priority: 0.5 },
+  { path: "/studenti/zebricek", changeFrequency: "weekly", priority: 0.45 },
   { path: "/medicina", changeFrequency: "monthly", priority: 0.55 },
   { path: "/medicina/priprava", changeFrequency: "monthly", priority: 0.5 },
   { path: "/medicina/studium", changeFrequency: "monthly", priority: 0.55 },

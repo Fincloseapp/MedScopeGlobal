@@ -109,6 +109,9 @@ export default async function StudentiHubPage() {
             <Button asChild variant="ghost" className="rounded-full text-[#005B96]">
               <Link href="#pro-rodice">{copy.iAmParent}</Link>
             </Button>
+            <Button asChild variant="outline" className="rounded-full border-[#005B96]/35 px-6">
+              <Link href={h("/studenti/klub")}>Klub kvízů</Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -129,6 +132,55 @@ export default async function StudentiHubPage() {
           <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">{copy.applicantTitle}</h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">{copy.applicantLead}</p>
           <StepCards steps={copy.applicantSteps} hrefs={APPLICANT_STEP_HREFS} locale={locale} />
+        </section>
+
+        <section
+          id="klub-kvizu"
+          className="mb-12 scroll-mt-24 rounded-3xl border border-[#cfe1f3] bg-white p-6 sm:p-8"
+        >
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#005B96]">
+            Kvízy · odbornost · univerzity
+          </p>
+          <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">
+            Přehledná mapa klubu
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
+            Soutěžní kvízy z banky přijímaček, studijní hry, oficiální weby osmi LF a žebříček
+            přezdívek. Pět kol zdarma — pak 149 Kč/měsíc, zrušíte kdykoli.
+          </p>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                href: "/studenti/klub",
+                title: "Soutěžní kvízy",
+                body: "8 otázek z biologie, chemie a fyziky. Nick na tabuli, e-mail jen u účtu.",
+              },
+              {
+                href: "/studenti/hry",
+                title: "Odbornost",
+                body: "Anatomie, fyziologie, patologie — existující studijní hry a materiály.",
+              },
+              {
+                href: "/studenti/chci-studovat",
+                title: "Univerzity",
+                body: "Osm českých lékařských fakult, termíny a příprava na přijímačky.",
+              },
+              {
+                href: "/studenti/zebricek",
+                title: "Žebříček",
+                body: "Kdo je teď nejlepší — jen přezdívky, žádná falešná jména.",
+              },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={h(item.href)}
+                className="rounded-2xl border border-slate-200 bg-[#f8fbff] px-4 py-4 transition hover:border-[#005B96]/35 hover:bg-white"
+              >
+                <p className="font-medium text-[#021d33]">{item.title}</p>
+                <p className="mt-1 text-xs leading-relaxed text-slate-500">{item.body}</p>
+              </Link>
+            ))}
+          </div>
         </section>
 
         <p className="msg-path mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-[#005B96]">

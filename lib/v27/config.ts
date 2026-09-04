@@ -25,8 +25,8 @@ export const V27_AUDIENCES = {
     href: "/studenti",
     description: "Příprava na přijímačky LF, studijní materiály, kvízy a AI tutor.",
     ctaPrimary: { label: "Chci studovat medicínu", href: "/studenti/chci-studovat" },
-    ctaSecondary: { label: "AI tutor", href: "/studenti/ai-tutor" },
-    topics: ["přijímačky", "studijní materiály", "kvízy", "modelové otázky", "AI tutor"],
+    ctaSecondary: { label: "Klub kvízů", href: "/studenti/klub" },
+    topics: ["přijímačky", "studijní materiály", "kvízy", "žebříček", "AI tutor"],
     aiRoute: "/ai-asistent/student",
   },
   physician: {

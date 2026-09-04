@@ -18,11 +18,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const PATHS = [
   {
+    href: "/studenti/klub",
+    title: "Klub kvízů a žebříček",
+    body: "Soutěžní kola z banky přijímaček pod přezdívkou. 5 kol zdarma, pak 149 Kč/měsíc — zrušíte kdykoli.",
+    cta: "Otevřít klub",
+    primary: true,
+  },
+  {
     href: "/academy/prijimacky/self-test",
     title: "Self-test přijímaček",
     body: "Biologie, chemie, fyzika — losované otázky a vysvětlení po odevzdání. Ideální první krok pro gymnazisty.",
     cta: "Spustit self-test",
-    primary: true,
+    primary: false,
   },
   {
     href: "/academy/quizzes",
@@ -64,8 +71,8 @@ export default function StudentiTestyPage() {
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Button asChild className="rounded-full bg-[#005B96]">
-              <Link href="/academy/prijimacky/self-test">
-                Spustit self-test
+              <Link href="/studenti/klub">
+                Otevřít klub kvízů
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

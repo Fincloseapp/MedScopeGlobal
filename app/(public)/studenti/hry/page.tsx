@@ -20,6 +20,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const EXTRA_TOOLS = [
   {
+    href: "/studenti/klub",
+    title: "Klub kvízů a žebříček",
+    body: "Soutěžní kola z banky přijímaček. 5 zdarma, pak 149 Kč/měsíc.",
+  },
+  {
     href: "/academy/quizzes",
     title: "Academy kvízy",
     body: "Kvízy vázané na kurzy Academy — se zpětnou vazbou.",
@@ -69,6 +74,9 @@ export default async function StudentiHryPage() {
                 Otevřít všechny hry
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
+            </Button>
+            <Button asChild variant="outline" className="rounded-full">
+              <Link href="/studenti/klub">Klub kvízů</Link>
             </Button>
             <Button asChild variant="outline" className="rounded-full">
               <Link href="/academy/quizzes">Academy kvízy</Link>
