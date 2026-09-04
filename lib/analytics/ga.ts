@@ -7,9 +7,10 @@
 export const GA_MEASUREMENT_ID = "G-6DX8RC4VZ1";
 
 /**
- * Same-origin path so ad blockers do not drop gtag.js / collect.
- * Must not start with `_` — Next.js App Router treats `_folder` as private
- * (the old `/__ms` hop 404'd on every edition).
+ * Same-origin path used only as a gtag.js fallback when
+ * googletagmanager.com is blocked. Do not use this as transport_url —
+ * that is server-side GTM and a Worker proxy makes Realtime stay at 0.
+ * Must not start with `_` — Next.js treats `_folder` as private.
  */
 export const GA_FIRST_PARTY_PREFIX = "/relay";
 

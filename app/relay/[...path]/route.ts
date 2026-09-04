@@ -6,12 +6,13 @@ export const dynamic = "force-dynamic";
 type Params = { params: Promise<{ path: string[] }> };
 
 /**
- * First-party hop for GA4. Browser talks to medscopeglobal.com;
- * this route forwards to Google so uBlock/AdGuard cannot see
- * googletagmanager.com / google-analytics.com on the page.
+ * Script fallback for GA4 when googletagmanager.com is blocked.
+ * Do not point gtag transport_url here — a Worker reverse-proxy is
+ * not server-side GTM. Collect then arrives from Cloudflare IPs and
+ * GA4 Realtime stays at 0. Collect must leave the browser.
  *
  * Must not live under app/__ms — Next.js treats `_`-prefixed folders
- * as private, so that hop 404'd and Realtime stayed empty.
+ * as private, so that hop 404'd.
  */
 async function proxy(request: Request, path: string[]) {
   const incoming = new URL(request.url);

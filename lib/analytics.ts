@@ -1,5 +1,4 @@
-import { GA_FIRST_PARTY_PREFIX, resolveGaMeasurementId } from "@/lib/analytics/ga";
-import { getSiteUrl } from "@/lib/config/site-url";
+import { resolveGaMeasurementId } from "@/lib/analytics/ga";
 
 declare global {
   interface Window {
@@ -37,10 +36,12 @@ export function trackPageView(path: string) {
     return;
   }
 
+  const search = window.location.search || "";
   window.gtag("config", measurementId, {
     page_path: path,
+    page_location: `${window.location.origin}${path}${search}`,
     send_page_view: true,
-    transport_url: `${getSiteUrl()}${GA_FIRST_PARTY_PREFIX}`,
-    first_party_collection: true,
+    cookie_domain: "medscopeglobal.com",
+    cookie_flags: "SameSite=Lax;Secure",
   });
 }

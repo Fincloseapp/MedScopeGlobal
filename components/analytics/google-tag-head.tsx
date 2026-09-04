@@ -1,4 +1,3 @@
-import { getSiteUrl } from "@/lib/config/site-url";
 import {
   GA_FIRST_PARTY_PREFIX,
   isGoogleAnalyticsEnabled,
@@ -6,18 +5,22 @@ import {
 } from "@/lib/analytics/ga";
 
 /**
- * Google tag in <head>. Script + collect go through the same-origin
- * /relay hop so ad blockers (the usual reason Realtime stays empty for
- * the site owner) do not drop the hit. One tag only. Do not put this
- * under a `_`-prefixed App Router folder — that 404s the script.
+ * Official Google tag in <head>. Collect must leave the browser and hit
+ * google-analytics.com directly — that is what Realtime actually counts.
+ *
+ * The old /relay transport_url + first_party_collection setup is server-side
+ * GTM, not a dumb Worker reverse-proxy. Hits then arrive from Cloudflare
+ * datacenter IPs and GA4 drops them as bots, so Realtime stays at 0 even
+ * while you are on the page. Keep /relay only as a script fallback when
+ * googletagmanager.com is blocked.
  */
 export function GoogleTagHead() {
   if (!isGoogleAnalyticsEnabled()) return null;
   const id = resolveGaMeasurementId();
-  const transport = `${getSiteUrl()}${GA_FIRST_PARTY_PREFIX}`;
+  const fallback = `${GA_FIRST_PARTY_PREFIX}/js?id=${id}`;
   return (
     <>
-      <script async src={`${GA_FIRST_PARTY_PREFIX}/js?id=${id}`} />
+      <script async src={`https://www.googletagmanager.com/gtag/js?id=${id}`} />
       <script
         dangerouslySetInnerHTML={{
           __html: `window.dataLayer = window.dataLayer || [];
@@ -31,9 +34,20 @@ gtag('consent', 'default', {
 gtag('js', new Date());
 gtag('config', '${id}', {
   send_page_view: true,
-  transport_url: '${transport}',
-  first_party_collection: true
-});`,
+  cookie_domain: 'medscopeglobal.com',
+  cookie_flags: 'SameSite=Lax;Secure'
+});
+(function(){
+  var nodes=document.querySelectorAll('script[src*="googletagmanager.com/gtag/js"]');
+  var s=nodes[nodes.length-1];
+  if(!s) return;
+  s.addEventListener('error', function(){
+    var f=document.createElement('script');
+    f.async=true;
+    f.src='${fallback}';
+    document.head.appendChild(f);
+  });
+})();`,
         }}
       />
     </>

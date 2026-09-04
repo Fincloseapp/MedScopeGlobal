@@ -840,8 +840,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.17"),
-  "page cache tag must bust after student entitlement and news last-resort"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.18"),
+  "page cache tag must bust after official GA collect"
 );
 file("app/(public)/studenti/klub/page.tsx");
 file("app/(public)/studenti/zebricek/page.tsx");
@@ -1521,16 +1521,21 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(
-    "GA_FIRST_PARTY_PREFIX"
-  ) &&
-    readFileSync(join(root, "lib/analytics/ga.ts"), "utf8").includes('"/relay"'),
-  "Google tag must load through the first-party hop"
+    "www.googletagmanager.com/gtag/js"
+  ),
+  "Google tag must load the official gtag.js so collect leaves the browser"
 );
 assert.ok(
-  readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(
-    "transport_url"
-  ),
-  "collect must stay on medscopeglobal.com so ad blockers miss it"
+  !readFileSync(join(root, "components/analytics/google-tag-head.tsx"), "utf8").includes(
+    "transport_url:"
+  ) &&
+    !readFileSync(join(root, "lib/analytics.ts"), "utf8").includes("transport_url:") &&
+    !readFileSync(join(root, "lib/analytics.ts"), "utf8").includes("first_party_collection"),
+  "do not send collect through the Worker hop — GA4 drops Cloudflare IPs as bots"
+);
+assert.ok(
+  readFileSync(join(root, "lib/analytics/ga.ts"), "utf8").includes('"/relay"'),
+  "same-origin gtag.js fallback path must stay available"
 );
 assert.ok(
   existsSync(join(root, "app/relay/[...path]/route.ts")),
