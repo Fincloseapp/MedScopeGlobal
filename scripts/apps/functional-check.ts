@@ -162,6 +162,8 @@ import {
   remainingFreeRuns,
   STUDENT_CLUB_FREE_RUNS,
 } from "../../lib/studenti/club";
+import { studentClubOpenFromProfile } from "../../lib/billing/student-entitlement";
+import { isPhysicianGrantProduct, isStudentGrantProduct } from "../../lib/v27/config";
 import { articlePageKey, rollEvergreenListingDate } from "../../lib/editorial/freshness";
 import {
   isLongevityForeignSource,
@@ -835,8 +837,8 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.16"),
-  "page cache tag must bust after Aktuality fill and student club"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.17"),
+  "page cache tag must bust after student entitlement and news last-resort"
 );
 file("app/(public)/studenti/klub/page.tsx");
 file("app/(public)/studenti/zebricek/page.tsx");
@@ -2653,6 +2655,49 @@ console.log("✓ magazine desk byline and copy checks passed");
     ]).map((row) => row.nick),
     ["Alpha", "Beta"]
   );
+  assert.equal(studentClubOpenFromProfile({ isVip: false, accessLevel: "public" }), false);
+  assert.equal(studentClubOpenFromProfile({ isVip: false, accessLevel: "student" }), true);
+  assert.equal(studentClubOpenFromProfile({ isVip: true, accessLevel: "public" }), true);
+  assert.equal(isStudentGrantProduct("student-month"), true);
+  assert.equal(isStudentGrantProduct("physician-month"), false);
+  assert.equal(isPhysicianGrantProduct("dokumentace-year"), true);
+  assert.ok(
+    readFileSync(join(root, "app/api/stripe/webhook/route.ts"), "utf8").includes(
+      "grantStudentClubAccess"
+    ),
+    "Stripe webhook must unlock the student quiz club"
+  );
+  file("components/novinky/novinky-tag-listing.tsx");
+  const lifestyleOnly = splitNewsDesks([
+    {
+      id: "snack-1",
+      title: "Svačiny ve směnném provozu — energie bez cukrového kolotoče",
+      slug: "svaciny-smena",
+      excerpt: "Jídlo mezi směnami.",
+      content: longBody,
+      published: true,
+      published_at: "2026-09-04T11:00:00.000Z",
+      vip_only: false,
+      locale: "cs",
+      audience: "public",
+      public_topic: "vyziva",
+    } as never,
+    {
+      id: "who-keep",
+      title: "WHO: nová doporučení k očkování seniorů",
+      slug: "who-keep",
+      excerpt: "Guideline.",
+      content: longBody,
+      published: true,
+      published_at: "2026-09-04T08:00:00.000Z",
+      vip_only: false,
+      locale: "cs",
+      audience: "public",
+      rubric_slug: "aktualni-zpravy",
+    } as never,
+  ]);
+  assert.equal(lifestyleOnly.novinky.some((article) => article.id === "snack-1"), false);
+  assert.equal(lifestyleOnly.novinky[0]?.id, "who-keep");
   assert.deepEqual(
     filterArticlesForLocale(
       [

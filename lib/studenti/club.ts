@@ -19,6 +19,7 @@ export const STUDENT_SECTION_NAV = [
   { href: "/studenti/chci-studovat", label: "Univerzity" },
   { href: STUDENT_CLUB_BOARD_HREF, label: "Žebříček" },
   { href: "/studenti/testy", label: "Testy" },
+  { href: "/studenti/materialy", label: "Materiály" },
 ] as const;
 
 export type StudentClubScore = {

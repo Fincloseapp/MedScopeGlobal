@@ -72,6 +72,7 @@ export const V27_SUBSCRIPTION_PLANS = [
       "Celá Academy včetně přípravných kurzů na přijímačky",
       "AI tutor a studijní materiály",
       "Kvízy, hry a modelové otázky",
+      "Klub kvízů bez limitu — 5 kol zdarma, pak tento tarif",
       "149 Kč = Student LF (Academy) — není VIP longevity protokoly",
     ],
   },
@@ -157,6 +158,15 @@ export const V27_B2B_PACKAGES = [
   { id: "sponsored-article", name: "Sponzorovaný článek", priceCzk: 15000, desc: "Editoriální článek s označením partnera" },
   { id: "enterprise", name: "Enterprise", priceCzk: 0, desc: "White-label, API a kampaně na míru — individuální cena" },
 ] as const;
+
+export function isStudentGrantProduct(productId?: string | null): boolean {
+  return Boolean(productId && parseSubscriptionProductId(productId)?.tier === "student");
+}
+
+export function isPhysicianGrantProduct(productId?: string | null): boolean {
+  const parsed = productId ? parseSubscriptionProductId(productId) : null;
+  return parsed?.tier === "physician" || parsed?.tier === "dokumentace";
+}
 
 export function parseSubscriptionProductId(productId: string): {
   tier: V27SubscriptionTier;

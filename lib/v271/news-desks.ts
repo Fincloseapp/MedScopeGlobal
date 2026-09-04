@@ -239,7 +239,7 @@ export function splitNewsDesks(
   );
   if (desks.novinky.length < cap.novinky) {
     desks.novinky.push(
-      ...takeUnused(listable, used, cap.novinky - desks.novinky.length)
+      ...takeUnused(listable, used, cap.novinky - desks.novinky.length, isNewsPriority)
     );
   }
 
