@@ -1,4 +1,5 @@
 import type { NextResponse } from "next/server";
+import { resolveLocalePath } from "@/lib/i18n/locale-path";
 
 const CSP = [
   "default-src 'self'",
@@ -63,6 +64,13 @@ export function applySecurityHeaders(response: NextResponse, pathname?: string):
       "private, no-cache, no-store, must-revalidate"
     );
     response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  }
+  const stripped = pathname ? resolveLocalePath(pathname).pathname : "";
+  if (stripped === "/studenti" || stripped.startsWith("/studenti/")) {
+    response.headers.set(
+      "Cache-Control",
+      "private, no-cache, no-store, must-revalidate"
+    );
   }
   if (pathname?.startsWith("/__ms") || pathname?.startsWith("/relay")) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");

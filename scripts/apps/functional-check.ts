@@ -851,6 +851,11 @@ assert.ok(
   "student [slug] catch-all must not steal klub/hry/materialy from their dedicated pages"
 );
 assert.ok(
+  readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes('stripped === "/studenti"') &&
+    readFileSync(join(root, "next.config.mjs"), "utf8").includes("/:locale/studenti"),
+  "locale-prefixed /cs/studenti HTML must be no-store so rooms do not reuse one cached body"
+);
+assert.ok(
   readFileSync(join(root, "lib/studenti/href.ts"), "utf8").includes("studentPublicHref") &&
     readFileSync(join(root, "components/studenti/student-section-nav.tsx"), "utf8").includes("StudentLink") &&
     readFileSync(join(root, "components/studenti/student-studio-desk.tsx"), "utf8").includes('href: "/studenti/klub"'),
