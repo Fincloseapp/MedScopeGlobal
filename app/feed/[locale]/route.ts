@@ -7,6 +7,7 @@ import { MAGAZINE } from "@/lib/brand/magazine";
 import { resolveSitemapLocale } from "@/lib/seo/locale-sitemap";
 import { localeToPathSegment } from "@/lib/i18n/locale-path";
 import { createClient } from "@/lib/supabase/server";
+import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
 
 export const dynamic = "force-dynamic";
 
@@ -39,14 +40,16 @@ export async function GET(_request: Request, { params }: Params) {
     if (supabase) {
       const { data: articles } = await supabase
         .from("articles")
-        .select("title, slug, excerpt, published_at, locale")
+        .select("title, slug, excerpt, published_at, locale, metadata")
         .eq("published", true)
         .order("published_at", { ascending: false, nullsFirst: false })
         .limit(80);
 
+      const filtered = filterArticlesForLocale(articles ?? [], locale);
+
       itemsXml =
-        articles
-          ?.map((article) => {
+        filtered
+          .map((article) => {
             const item = rssItem({
               title: String(article.title ?? ""),
               slug: publicArticleSlug(article.slug as string),

@@ -41,12 +41,12 @@ export async function listPublicArticles(options?: {
   limit?: number;
   offset?: number;
   locale?: LocaleCode;
-  /** Spustí seed/cron pokud je DB prázdná (default true u hubu). */
+  /** Seed only from cron/admin — never on a public listing request. */
   ensureContent?: boolean;
   /** full = načte celý obsah článku (pro expand-on-click). */
   mode?: "card" | "full";
 }): Promise<DisplayArticle[]> {
-  if (options?.ensureContent !== false) {
+  if (options?.ensureContent === true) {
     const { ensurePublicArticlesSeeded } = await import("@/lib/verejnost/ensure-content");
     await ensurePublicArticlesSeeded();
   }
@@ -79,50 +79,66 @@ export async function listPublicArticles(options?: {
   const supabase = await createDataClient();
   if (!supabase) return demoSlice();
 
-  // Over-fetch then drop short/seed stubs so hubs stay magazine-depth after filter.
-  const fetchLimit = Math.max(limit * 8, limit + 24);
-  let q = supabase
-    .from("articles")
-    .select(articleSelect)
-    .eq("published", true)
-    .eq("audience", "public")
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .range(offset, offset + fetchLimit - 1);
+  const fetchLimit = Math.min(Math.max(limit * 2, limit + 8), 64);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const load = (async () => {
+      let q = supabase
+        .from("articles")
+        .select(articleSelect)
+        .eq("published", true)
+        .eq("audience", "public")
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .range(offset, offset + fetchLimit - 1);
 
-  if (options?.topic) {
-    q = q.eq("public_topic", options.topic);
-  }
+      if (options?.topic) {
+        q = q.eq("public_topic", options.topic);
+      }
 
-  const { data, error } = await q;
-  if (error) {
+      const { data, error } = await q;
+      if (error) {
+        console.error("listPublicArticles", error);
+        return demoSlice();
+      }
+
+      const rows = mergeNativeDeskFeed(
+        filterArticlesForLocale(
+          filterMagazineListableArticles(
+            mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[]
+          ),
+          locale
+        ),
+        locale,
+        options?.topic
+      );
+      if (rows.length === 0) return demoSlice();
+
+      const mode = options?.mode ?? "card";
+      const prepared = await prepareArticlesForDisplay(rows.slice(0, limit), locale, {
+        mode,
+        maxTranslate: Math.min(limit, 8),
+      });
+      const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
+      const { assignUniqueListingCovers } = await import(
+        "@/lib/ecosystem/editorial/images/unique-listing-covers"
+      );
+      return assignUniqueListingCovers(
+        prepared.map((a) => ({ ...a, cover_image_url: resolveVerejnostCoverUrl(a) }))
+      );
+    })();
+
+    return await Promise.race([
+      load,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("public-articles-timeout")), 8_000);
+      }),
+    ]);
+  } catch (error) {
     console.error("listPublicArticles", error);
     return demoSlice();
+  } finally {
+    if (timer) clearTimeout(timer);
   }
-
-  const rows = mergeNativeDeskFeed(
-    filterArticlesForLocale(
-      filterMagazineListableArticles(
-        mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[]
-      ),
-      locale
-    ),
-    locale,
-    options?.topic
-  );
-  if (rows.length === 0) return demoSlice();
-
-  const mode = options?.mode ?? "card";
-  const prepared = await prepareArticlesForDisplay(rows.slice(0, limit), locale, {
-    mode,
-    maxTranslate: limit,
-  });
-  const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
-  const { assignUniqueListingCovers } = await import(
-    "@/lib/ecosystem/editorial/images/unique-listing-covers"
-  );
-  return assignUniqueListingCovers(
-    prepared.map((a) => ({ ...a, cover_image_url: resolveVerejnostCoverUrl(a) }))
-  );
 }
 
 export async function getPublicArticleBySlug(

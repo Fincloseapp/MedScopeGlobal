@@ -70,7 +70,7 @@ export default async function ArticlesPage({
   const medTrack = isCzechSurface(locale) ? medTrackRaw : null;
   const year = sp.rok ? Number(sp.rok) : undefined;
 
-  const coreArticles = await getLatestArticles(48, 0, isVip, accessLevel, locale);
+  const coreArticles = await getLatestArticles(24, 0, isVip, accessLevel, locale);
   const medArticles = medTrack
     ? await getMedicalArticles({
         medTrack,

@@ -321,5 +321,45 @@ export function getMagazineListingCopy(locale?: LocaleCode | string) {
     featured: cs ? "Hlavní článek" : "Featured",
     more: cs ? "Další čtení" : "More to read",
     openMagazine: cs ? "Otevřít magazín" : "Open magazine",
+    articlesNav: cs ? "Články" : "Articles",
+    archiveEyebrow: cs ? "Archiv" : "Archive",
+    archivePageTitle: cs ? "Archiv článků" : "Article archive",
+    archiveMetaDescription: cs
+      ? "Starší odborné články a briefy — stále dostupné ke čtení."
+      : "Older articles and briefs — still available to read.",
+    archiveLeadBefore: cs ? "Starší obsah (před" : "Older pieces (before",
+    archiveLeadAfter: cs
+      ? ") a expirované briefy zůstávají dostupné. Jednotlivé články načtete přímo přes odkaz nebo vyhledávání."
+      : ") and expired briefs stay available. Open any story from a link or search.",
+    archiveEmpty: cs
+      ? "V archivu zatím nejsou zobrazené žádné články."
+      : "No archived articles are listed yet.",
+  };
+}
+
+/** Search page chrome — Czech default, English for other UI locales */
+export function getMagazineSearchCopy(locale?: LocaleCode | string) {
+  const cs = pickCopyLocale(locale) === "cs";
+  return {
+    metaTitle: cs ? "Vyhledávání" : "Search",
+    metaDescription: cs
+      ? "Vyhledávejte články, studie a odborný obsah v archivu MedScopeGlobal."
+      : "Search articles, studies, and editorial pieces in the MedScopeGlobal archive.",
+    eyebrow: cs ? "Vyhledávání" : "Search",
+    title: cs ? "Hledat v archivu" : "Search the archive",
+    lead: cs
+      ? "Prohledávejte nadpisy, perexy a texty článků (minimálně 2 znaky)."
+      : "Search titles, standfirsts, and article text (at least 2 characters).",
+    placeholder: cs
+      ? "Např. diabetes, hypertenze, očkování…"
+      : "e.g. diabetes, hypertension, vaccination…",
+    queryLabel: cs ? "Hledaný výraz" : "Search query",
+    formLabel: cs ? "Vyhledávání článků" : "Article search",
+    submit: cs ? "Hledat" : "Search",
+    submitAria: cs ? "Spustit vyhledávání" : "Run search",
+    empty: (query: string) =>
+      cs
+        ? `Pro dotaz „${query}“ nebyly nalezeny žádné články.`
+        : `No articles matched “${query}”.`,
   };
 }

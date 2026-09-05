@@ -4,6 +4,8 @@ import { Search } from "lucide-react";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { formatPublicDate } from "@/lib/i18n/format-date";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getMagazineSearchCopy } from "@/lib/brand/magazine";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 import { createClient } from "@/lib/supabase/server";
 import { mergedArticleSearch } from "@/utils/merged-article-search";
@@ -12,12 +14,14 @@ import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getMagazineSearchCopy(locale);
   return await buildLocalizedPageMetadata({
-  title: "Vyhledávání",
-  description:
-    "Vyhledávejte články, studie a odborný obsah v archivu MedScopeGlobal.",
-  path: "/hledat",
-});
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    path: "/hledat",
+    locale,
+  });
 }
 
 export default async function HledatPage({
@@ -29,6 +33,7 @@ export default async function HledatPage({
   const query = sanitizeSearchInput(sp.q ?? "");
   const { isVip, accessLevel } = await getReaderContext();
   const locale = await getServerLocale();
+  const copy = getMagazineSearchCopy(locale);
 
   const results =
     query.length >= 2
@@ -45,24 +50,20 @@ export default async function HledatPage({
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-        Vyhledávání
+        {copy.eyebrow}
       </p>
-      <h1 className="font-display text-4xl font-bold text-[#021d33]">
-        Hledat v archivu
-      </h1>
-      <p className="mt-2 text-muted-foreground">
-        Prohledávejte nadpisy, perexy a texty článků (minimálně 2 znaky).
-      </p>
+      <h1 className="font-display text-4xl font-bold text-[#021d33]">{copy.title}</h1>
+      <p className="mt-2 text-muted-foreground">{copy.lead}</p>
 
       <form
         method="get"
-        action="/hledat"
+        action={localizePublicHref("/hledat", locale)}
         className="mt-8"
         role="search"
-        aria-label="Vyhledávání článků"
+        aria-label={copy.formLabel}
       >
         <label htmlFor="search-q" className="sr-only">
-          Hledaný výraz
+          {copy.queryLabel}
         </label>
         <div className="flex gap-2">
           <input
@@ -70,27 +71,25 @@ export default async function HledatPage({
             name="q"
             type="search"
             defaultValue={query}
-            placeholder="Např. diabetes, hypertenze, očkování…"
+            placeholder={copy.placeholder}
             className="flex h-12 w-full rounded-md border border-input bg-background px-4 text-lg ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label="Hledaný výraz"
+            aria-label={copy.queryLabel}
             autoComplete="off"
           />
           <button
             type="submit"
             className="inline-flex h-12 shrink-0 items-center gap-2 rounded-md bg-primary px-5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-            aria-label="Spustit vyhledávání"
+            aria-label={copy.submitAria}
           >
             <Search className="h-4 w-4" aria-hidden />
-            Hledat
+            {copy.submit}
           </button>
         </div>
       </form>
 
       <div className="mt-10 space-y-4" aria-live="polite">
         {query.length >= 2 && results.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            Pro dotaz „{query}“ nebyly nalezeny žádné články.
-          </p>
+          <p className="text-sm text-muted-foreground">{copy.empty(query)}</p>
         )}
 
         {query.length >= 2 ? (
@@ -102,7 +101,7 @@ export default async function HledatPage({
         {results.map((article) => (
           <Link
             key={article.slug}
-            href={`/article/${article.slug}`}
+            href={localizePublicHref(`/article/${article.slug}`, locale)}
             className="block rounded-xl border bg-card p-4 shadow-sm transition hover:border-primary/40"
           >
             <p className="font-display text-lg font-semibold text-[#021d33]">

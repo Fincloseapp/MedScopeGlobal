@@ -15,7 +15,7 @@ import {
   localeFromRequestHints,
 } from "../lib/i18n/locale-path";
 import { normalizeLocale } from "../lib/i18n/config";
-import { getHomepageTitle, getOgLocale } from "../lib/brand/magazine";
+import { getHomepageTitle, getMagazineListingCopy, getMagazineSearchCopy, getOgLocale } from "../lib/brand/magazine";
 import { articleJsonLdGlobal, buildGlobalHreflang } from "../lib/ecosystem/seo";
 import { renderLlmsTxt } from "../lib/seo/llms-txt";
 import { buildPageMetadata } from "../lib/seo/metadata";
@@ -566,6 +566,12 @@ assert.equal(
   "de"
 );
 assert.equal(localeFromRequestHints({ cookie: "fr" }), "fr");
+assert.equal(getMagazineListingCopy("cs").archivePageTitle, "Archiv článků");
+assert.equal(getMagazineListingCopy("fr").archivePageTitle, "Article archive");
+assert.ok(!looksLikeCzech(getMagazineListingCopy("de").archiveLeadAfter));
+assert.equal(getMagazineSearchCopy("cs").title, "Hledat v archivu");
+assert.equal(getMagazineSearchCopy("fr").title, "Search the archive");
+assert.ok(!looksLikeCzech(getMagazineSearchCopy("de").empty("glucose")));
 assert.equal(
   translateNavHref("/odborne/briefy", "fr", { label: "Odborné briefy" }).label,
   "Briefs cliniques"

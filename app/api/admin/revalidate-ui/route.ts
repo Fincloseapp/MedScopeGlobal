@@ -42,6 +42,7 @@ const PATHS = [
 ] as const;
 
 const TAGS = [
+  "medscope-ui-v23.36",
   "medscope-ui-v23.35",
   "medscope-ui-v23.34",
   "medscope-ui-v23.33",

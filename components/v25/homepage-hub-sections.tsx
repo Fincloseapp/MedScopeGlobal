@@ -61,7 +61,7 @@ export async function V25HomepageHubSections({
   professionalArticles: DisplayArticle[];
 }) {
   const locale = await getServerLocale();
-  const publicArticles = await listPublicArticles({ limit: 3, ensureContent: true, locale });
+  const publicArticles = await listPublicArticles({ limit: 3, ensureContent: false, locale });
 
   return (
     <>

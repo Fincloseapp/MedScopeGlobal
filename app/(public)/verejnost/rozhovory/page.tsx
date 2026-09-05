@@ -34,7 +34,7 @@ export default async function VerejnostRozhovoryPage() {
   const interviews = await listPublicArticles({
     topic: "rozhovory",
     limit: 24,
-    ensureContent: true,
+    ensureContent: false,
     locale,
   });
 

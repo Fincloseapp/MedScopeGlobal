@@ -47,7 +47,7 @@ export default async function OsvetaHubPage() {
     listPublicHealthVideos({ limit: 20 }),
     listPublicHealthTopics(),
     getPublicOsvetaLeaderboard(5),
-    listPublicArticles({ limit: 3, ensureContent: true, mode: "card", locale }),
+    listPublicArticles({ limit: 3, ensureContent: false, mode: "card", locale }),
   ]);
 
   const archive = videos.filter((v) => v.id !== today?.id);

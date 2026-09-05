@@ -84,7 +84,7 @@ export function SiteHeaderWithConversion({
       .catch(() => {});
 
     if (!audienceStrip && !navStripCopy) {
-      fetch("/api/v38/conversion-copy?slot=nav_strip")
+      fetch(`/api/v38/conversion-copy?slot=nav_strip&locale=${encodeURIComponent(locale)}`)
         .then((r) => (r.ok ? r.json() : null))
         .then((data: StoredNudge | null) => {
           if (!cancelled && data) setStripCopy(data);
@@ -95,7 +95,7 @@ export function SiteHeaderWithConversion({
     return () => {
       cancelled = true;
     };
-  }, [navStripCopy, audienceStrip]);
+  }, [navStripCopy, audienceStrip, locale]);
 
   const effectiveStrip = audienceStrip ?? stripCopy;
 

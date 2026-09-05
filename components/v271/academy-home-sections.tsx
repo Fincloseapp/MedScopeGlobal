@@ -27,14 +27,31 @@ export async function V272AcademyHomeSections() {
   let leaderboard: Awaited<ReturnType<typeof getLeaderboard>> = [];
 
   try {
-    [courses, prepCourses, simulations, textbooks, listings, leaderboard] = await Promise.all([
-      promo ? listPublishedCourses(3) : Promise.resolve([]),
-      promo ? listPublishedCourses(6, { prepOnly: true }) : Promise.resolve([]),
-      listClinicalSimulations(2),
-      listTextbooks(2),
-      listMarketplaceListings(2),
-      getLeaderboard("all_time", 5),
-    ]);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      [
+        courses,
+        prepCourses,
+        simulations,
+        textbooks,
+        listings,
+        leaderboard,
+      ] = await Promise.race([
+        Promise.all([
+          promo ? listPublishedCourses(3) : Promise.resolve([]),
+          promo ? listPublishedCourses(6, { prepOnly: true }) : Promise.resolve([]),
+          listClinicalSimulations(2),
+          listTextbooks(2),
+          listMarketplaceListings(2),
+          getLeaderboard("all_time", 5),
+        ]),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(() => reject(new Error("academy-home-timeout")), 8_000);
+        }),
+      ]);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
   } catch (error) {
     console.error("[academy] V272AcademyHomeSections", error);
   }

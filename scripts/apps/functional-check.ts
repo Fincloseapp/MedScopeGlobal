@@ -382,7 +382,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v21-related-borrow"), "homepage cache key must bust when borrow rules tighten");
+  assert.ok(home.includes("v23-36-single-pool"), "homepage cache key must bust when the listing pool slims");
   assert.ok(home.includes("toISOString().slice(0, 10)"), "homepage data cache must roll with the UTC day");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
   assert.ok(home.includes("courtesyBorrow: 2"), "non-CS homepage must not dump a Czech borrow pile");
@@ -878,8 +878,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.35"),
-  "page cache tag must bust after student catch-all route is removed"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.36"),
+  "page cache tag must bust after the homepage listing pool slim"
 );
 assert.ok(
   !existsSync(join(root, "app/(public)/studenti/[slug]/page.tsx")),
@@ -1005,8 +1005,28 @@ assert.ok(
   "homepage cache must reserve news before lifestyle"
 );
 assert.ok(
-  readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes("aktuální-zprávy"),
-  "homepage pool must include the Aktuality section query"
+  readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
+    "v22-homepage-public-v23-36-single-pool"
+  ) &&
+    !readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
+      "getArticlesByMetadataSection"
+    ),
+  "homepage cache must use one listing pool, not a second Aktuality query"
+);
+assert.ok(
+  readFileSync(join(root, "components/v271/academy-home-sections.tsx"), "utf8").includes(
+    "academy-home-timeout"
+  ),
+  "homepage Academy fan-out must bail before the Worker CPU budget"
+);
+assert.ok(
+  readFileSync(join(root, "lib/queries/verejnost.ts"), "utf8").includes(
+    "public-articles-timeout"
+  ) &&
+    readFileSync(join(root, "lib/queries/verejnost.ts"), "utf8").includes(
+      "options?.ensureContent === true"
+    ),
+  "public listings must not seed the DB on every page load"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes('mode: "card"'),
@@ -1360,6 +1380,33 @@ assert.ok(
       "ensurePublicArticlesSeeded"
     ),
   "article listing must not seed the DB or wait past the Worker budget"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/articles/page.tsx"), "utf8").includes(
+    "getLatestArticles(24"
+  ),
+  "/articles must fetch one listing page, not 48 rows"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/articles/archiv/page.tsx"), "utf8").includes(
+    "getMagazineListingCopy"
+  ) &&
+    readFileSync(join(root, "app/(public)/hledat/page.tsx"), "utf8").includes(
+      "getMagazineSearchCopy"
+    ),
+  "archive and search chrome must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "app/feed/[locale]/route.ts"), "utf8").includes(
+    "filterArticlesForLocale"
+  ),
+  "locale feeds must not mix Czech titles into every edition"
+);
+assert.ok(
+  readFileSync(join(root, "app/api/v38/conversion-copy/route.ts"), "utf8").includes(
+    "searchParams.get(\"locale\")"
+  ),
+  "conversion-copy API must take the edition locale, not default to Czech"
 );
 assert.ok(
   readFileSync(join(root, "components/lekari/physician-offer-dashboard.tsx"), "utf8").includes(
