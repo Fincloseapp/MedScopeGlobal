@@ -43,7 +43,7 @@ import {
 import { getSubscribeCopy } from "../lib/i18n/subscribe-copy";
 import { getNewsletterCopy } from "../lib/i18n/newsletter-copy";
 import { getMarketingCopy } from "../lib/i18n/marketing-copy";
-import { localizePublicHref } from "../lib/i18n/nav-copy";
+import { localizePublicHref, translateNavHref } from "../lib/i18n/nav-copy";
 import { localizeV271Page } from "../lib/i18n/hub-copy";
 import { getDesktopHeaderMenu } from "../lib/config/main-navigation";
 import { V271_LEKARI_PAGES } from "../lib/v271/routes";
@@ -88,7 +88,7 @@ import { getVerejnostChrome } from "../lib/i18n/verejnost-chrome";
 import { topicLabelForSlug } from "../lib/config/verejnost-topics";
 import { localizeMagazineHubConfig } from "../lib/i18n/localize-magazine-hub";
 import { getClankyMagazineHub, OSVETA_MAGAZINE_HUB } from "../lib/portal/magazine-section-hub";
-import { getVerejnostNavStripCopy } from "../lib/v38/conversion-copy";
+import { getLekariNavStripCopy, getVerejnostNavStripCopy } from "../lib/v38/conversion-copy";
 import { getHomepageLongevityCopy } from "../lib/i18n/homepage-longevity";
 import { classifyCoverTopic } from "../lib/ecosystem/editorial/images/cover";
 
@@ -547,6 +547,13 @@ assert.equal(getVerejnostChrome("cs").interviewBadge, "Rozhovor");
 assert.ok(!looksLikeCzech(getVerejnostNavStripCopy("fr").headline));
 assert.ok(!looksLikeCzech(getVerejnostNavStripCopy("de").ctaLabel));
 assert.equal(getVerejnostNavStripCopy("cs").ctaLabel, "Otevřít MeDipacient");
+assert.ok(!looksLikeCzech(getLekariNavStripCopy("fr").headline));
+assert.ok(!looksLikeCzech(getLekariNavStripCopy("de").eyebrow));
+assert.equal(getLekariNavStripCopy("cs").ctaLabel, "Stáhnout OrdiZapis");
+assert.equal(
+  translateNavHref("/odborne/briefy", "fr", { label: "Odborné briefy" }).label,
+  "Briefs cliniques"
+);
 assert.ok(!looksLikeCzech(getVerejnostChrome("fr").hubs.osveta.title));
 assert.ok(!looksLikeCzech(getVerejnostChrome("de").hubs.clanky.heroDeck));
 const frOsvetaHub = localizeMagazineHubConfig(OSVETA_MAGAZINE_HUB, "fr");

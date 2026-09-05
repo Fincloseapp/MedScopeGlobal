@@ -274,6 +274,46 @@ export function getVerejnostNavStripCopy(locale?: string | null): ConversionCopy
 }
 
 export function getLekariNavStripCopy(locale = "cs"): ConversionCopy {
+  const primary = primaryArticleLocale(normalizeLocale(locale));
+  if (primary === "de") {
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "Für geprüfte Ärzte",
+        headline: "OrdiZapis schreibt die Notiz aus dem Diktat",
+        body: "Aufnahme am Handy. Download nach Kontoprüfung. 390 Kč/Monat · 14 Tage kostenlos.",
+        ctaLabel: "OrdiZapis herunterladen",
+        ctaHref: "/lekari/dokumentace",
+      },
+      locale
+    );
+  }
+  if (primary === "fr") {
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "Pour les médecins vérifiés",
+        headline: "OrdiZapis rédige la note à partir de la dictée",
+        body: "Enregistrez sur mobile. Téléchargement après vérification du compte. 390 Kč/mois · 14 jours gratuits.",
+        ctaLabel: "Télécharger OrdiZapis",
+        ctaHref: "/lekari/dokumentace",
+      },
+      locale
+    );
+  }
+  if (primary !== "cs") {
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "For verified physicians",
+        headline: "OrdiZapis writes the note from dictation",
+        body: "Record on your phone. Download after account verification. 390 Kč/month · 14 days free.",
+        ctaLabel: "Download OrdiZapis",
+        ctaHref: "/lekari/dokumentace",
+      },
+      locale
+    );
+  }
   return withLocalPrices(
     {
       slot: "nav_strip",

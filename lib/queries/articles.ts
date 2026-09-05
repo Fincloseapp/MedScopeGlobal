@@ -175,7 +175,8 @@ export async function getLatestArticles(
         mode: "card",
         maxTranslate: Math.min(limit, 8),
       });
-      return prepared.slice(0, limit);
+      const slice = prepared.slice(0, limit);
+      return slice.length > 0 ? slice : demo();
     })();
 
     return await Promise.race([
