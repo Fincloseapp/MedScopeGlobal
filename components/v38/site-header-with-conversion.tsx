@@ -8,18 +8,13 @@ import type { AppUser, Category } from "@/types/database";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import type { StoredNudge } from "@/lib/v38/conversion-engine";
 import {
-  daySeed,
   getStaticCopy,
-  getStudentiNavStripCopy,
-  getVerejnostNavStripCopy,
-  getLekariNavStripCopy,
-  getMediFlowNavStripCopy,
-  getVipNavStripCopy,
-  isStudentAudiencePath,
-  isPublicAudiencePath,
-  isPhysicianAudiencePath,
   isMediFlowAudiencePath,
+  isPhysicianAudiencePath,
+  isPublicAudiencePath,
+  isStudentAudiencePath,
   isVipAudiencePath,
+  navStripForPath,
 } from "@/lib/v38/conversion-copy";
 
 type ReaderPayload = {
@@ -70,13 +65,9 @@ export function SiteHeaderWithConversion({
     );
   }, [pathname]);
   const audienceStrip = useMemo(() => {
-    if (mediflowPath) return { ...getMediFlowNavStripCopy(), generatedBy: "static" as const };
-    if (vipPath) return { ...getVipNavStripCopy(locale), generatedBy: "static" as const };
-    if (studentPath) return { ...getStudentiNavStripCopy(daySeed(), locale), generatedBy: "static" as const };
-    if (publicPath) return { ...getVerejnostNavStripCopy(locale), generatedBy: "static" as const };
-    if (physicianPath) return { ...getLekariNavStripCopy(locale), generatedBy: "static" as const };
-    return null;
-  }, [studentPath, publicPath, physicianPath, mediflowPath, vipPath, locale]);
+    const copy = navStripForPath(pathname, locale);
+    return copy ? { ...copy, generatedBy: "static" as const } : null;
+  }, [pathname, locale]);
 
   const [reader, setReader] = useState<ReaderPayload>(DEFAULT_READER);
   const [stripCopy, setStripCopy] = useState<StoredNudge>(
@@ -132,7 +123,9 @@ export function SiteHeaderWithConversion({
                   ? "nav-strip-student-trial"
                   : publicPath
                     ? "nav-strip-public-app"
-                    : "nav-strip-trial"
+                    : physicianPath
+                      ? "nav-strip-physician"
+                      : "nav-strip-trial"
           }
         />
       ) : null}

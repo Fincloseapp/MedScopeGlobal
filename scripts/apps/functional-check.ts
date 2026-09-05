@@ -877,7 +877,7 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.31"),
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.32"),
   "page cache tag must bust after student catch-all route is removed"
 );
 assert.ok(
@@ -1396,6 +1396,13 @@ assert.ok(
       "Pour les médecins vérifiés"
     ),
   "VIP and physician nav strips must not stay Czech on non-CS pages"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/layout.tsx"), "utf8").includes("navStripForPath") &&
+    readFileSync(join(root, "lib/v38/conversion-copy.ts"), "utf8").includes(
+      "export function navStripForPath"
+    ),
+  "physician header strip must be chosen on the server from the request path"
 );
 assert.ok(
   readFileSync(join(root, "lib/i18n/surface-copy.ts"), "utf8").includes("O redakci a zdrojích"),

@@ -88,7 +88,11 @@ import { getVerejnostChrome } from "../lib/i18n/verejnost-chrome";
 import { topicLabelForSlug } from "../lib/config/verejnost-topics";
 import { localizeMagazineHubConfig } from "../lib/i18n/localize-magazine-hub";
 import { getClankyMagazineHub, OSVETA_MAGAZINE_HUB } from "../lib/portal/magazine-section-hub";
-import { getLekariNavStripCopy, getVerejnostNavStripCopy } from "../lib/v38/conversion-copy";
+import {
+  getLekariNavStripCopy,
+  getVerejnostNavStripCopy,
+  navStripForPath,
+} from "../lib/v38/conversion-copy";
 import { getHomepageLongevityCopy } from "../lib/i18n/homepage-longevity";
 import { classifyCoverTopic } from "../lib/ecosystem/editorial/images/cover";
 
@@ -550,6 +554,8 @@ assert.equal(getVerejnostNavStripCopy("cs").ctaLabel, "Otevřít MeDipacient");
 assert.ok(!looksLikeCzech(getLekariNavStripCopy("fr").headline));
 assert.ok(!looksLikeCzech(getLekariNavStripCopy("de").eyebrow));
 assert.equal(getLekariNavStripCopy("cs").ctaLabel, "Stáhnout OrdiZapis");
+assert.equal(navStripForPath("/fr/lekari/guidelines", "fr")?.eyebrow, "Pour les médecins vérifiés");
+assert.equal(navStripForPath("/cs/lekari/studie", "cs")?.ctaLabel, "Stáhnout OrdiZapis");
 assert.equal(
   translateNavHref("/odborne/briefy", "fr", { label: "Odborné briefy" }).label,
   "Briefs cliniques"

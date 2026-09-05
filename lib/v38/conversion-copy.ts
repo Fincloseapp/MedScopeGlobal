@@ -458,3 +458,16 @@ export function daySeed(): number {
   const d = new Date();
   return d.getFullYear() * 1000 + d.getMonth() * 50 + d.getDate();
 }
+
+/** Path-aware header strip so SSR and the client pick the same audience copy. */
+export function navStripForPath(
+  pathname: string | null | undefined,
+  locale = "cs"
+): ConversionCopy | null {
+  if (isMediFlowAudiencePath(pathname)) return getMediFlowNavStripCopy();
+  if (isVipAudiencePath(pathname)) return getVipNavStripCopy(locale);
+  if (isStudentAudiencePath(pathname)) return getStudentiNavStripCopy(daySeed(), locale);
+  if (isPublicAudiencePath(pathname)) return getVerejnostNavStripCopy(locale);
+  if (isPhysicianAudiencePath(pathname)) return getLekariNavStripCopy(locale);
+  return null;
+}
