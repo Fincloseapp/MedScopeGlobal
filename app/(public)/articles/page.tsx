@@ -10,6 +10,8 @@ import { getReaderContext } from "@/lib/auth/reader-context";
 import { MAGAZINE, getMagazineListingCopy } from "@/lib/brand/magazine";
 import { VITASCOPE_TRACK_LOGO } from "@/lib/brand/vitascope";
 import { getServerLocale } from "@/lib/i18n/server-locale";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { isCzechSurface } from "@/lib/i18n/surface-copy";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
 import { assignUniqueListingCovers } from "@/lib/ecosystem/editorial/images/unique-listing-covers";
 import { filterArticlesForDesk, mixListableFeed, newsDesksForLocale, type NewsDeskId } from "@/lib/v271/news-desks";
@@ -64,7 +66,8 @@ export default async function ArticlesPage({
   const { isVip, accessLevel } = await getReaderContext();
   const desk = parseDesk(sp.desk);
 
-  const medTrack = sp.med_track === "priprava" || sp.med_track === "studium" ? sp.med_track : null;
+  const medTrackRaw = sp.med_track === "priprava" || sp.med_track === "studium" ? sp.med_track : null;
+  const medTrack = isCzechSurface(locale) ? medTrackRaw : null;
   const year = sp.rok ? Number(sp.rok) : undefined;
 
   const coreArticles = await getLatestArticles(48, 0, isVip, accessLevel, locale);
@@ -90,11 +93,11 @@ export default async function ArticlesPage({
       <div className="v20-articles mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <ViaLongeVitaMasthead locale={locale} title={title} blurb={blurb} />
         <nav aria-label={copy.studyLabel} className="mt-6 flex flex-wrap gap-2">
-          <Link href="/articles" className="rounded-full border bg-white px-3 py-1.5 text-sm">
+          <Link href={localizePublicHref("/articles", locale)} className="rounded-full border bg-white px-3 py-1.5 text-sm">
             {copy.all}
           </Link>
           <Link
-            href="/articles?med_track=priprava"
+            href={localizePublicHref("/articles?med_track=priprava", locale)}
             className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm ${
               medTrack === "priprava" ? "border-[#005B96] bg-primary text-white" : "bg-white"
             }`}
@@ -105,7 +108,7 @@ export default async function ArticlesPage({
             {copy.prep}
           </Link>
           <Link
-            href="/articles?med_track=studium"
+            href={localizePublicHref("/articles?med_track=studium", locale)}
             className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm ${
               medTrack === "studium" ? "border-[#005B96] bg-primary text-white" : "bg-white"
             }`}

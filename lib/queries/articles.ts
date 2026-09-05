@@ -143,47 +143,53 @@ export async function getLatestArticles(
   const { getDemoMagazineArticles } = await import(
     "@/lib/verejnost/demo-magazine-articles"
   );
-
-  // When DB exists but is empty, try the same static seed as /verejnost hubs.
-  try {
-    const { ensurePublicArticlesSeeded } = await import(
-      "@/lib/verejnost/ensure-content"
-    );
-    await ensurePublicArticlesSeeded();
-  } catch {
-    // Seed requires service role; demo fallback covers placeholder env.
-  }
+  const demo = () =>
+    mergeNativeDeskFeed(getDemoMagazineArticles(), locale).slice(offset, offset + limit);
 
   const supabase = await createDataClient();
-  if (!supabase) {
-    return mergeNativeDeskFeed(getDemoMagazineArticles(), locale).slice(offset, offset + limit);
-  }
-  const fetchLimit = Math.min(Math.max(limit * 3, limit), 96);
-  const { data, error } = await supabase
-    .from("articles")
-    .select(articleSelect)
-    .eq("published", true)
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .range(offset, offset + fetchLimit - 1);
+  if (!supabase) return demo();
 
-  if (error) {
+  const fetchLimit = Math.min(Math.max(limit * 2, limit), 48);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const load = (async () => {
+      const { data, error } = await supabase
+        .from("articles")
+        .select(articleSelect)
+        .eq("published", true)
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .range(offset, offset + fetchLimit - 1);
+
+      if (error) {
+        console.error("getLatestArticles", error);
+        return demo();
+      }
+      const rows = mapArticleList(data as Record<string, unknown>[] | null);
+      const filtered = mergeNativeDeskFeed(
+        filterMagazineListableArticles(
+          filterForReader(rows, isVip, accessLevel, locale)
+        ),
+        locale
+      );
+      const prepared = await prepareArticlesForDisplay(filtered, locale, {
+        mode: "card",
+        maxTranslate: Math.min(limit, 8),
+      });
+      return prepared.slice(0, limit);
+    })();
+
+    return await Promise.race([
+      load,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("latest-articles-timeout")), 8_000);
+      }),
+    ]);
+  } catch (error) {
     console.error("getLatestArticles", error);
-    return mergeNativeDeskFeed(getDemoMagazineArticles(), locale).slice(offset, offset + limit);
+    return demo();
+  } finally {
+    if (timer) clearTimeout(timer);
   }
-  // Include lay/public Czech articles so /articles "Vše" matches the live portal feed
-  // (recent pipeline output is mostly audience=public / rubric verejnost).
-  const rows = mapArticleList(data as Record<string, unknown>[] | null);
-  const filtered = mergeNativeDeskFeed(
-    filterMagazineListableArticles(
-      filterForReader(rows, isVip, accessLevel, locale)
-    ),
-    locale
-  );
-  const prepared = await prepareArticlesForDisplay(filtered, locale, {
-    mode: "card",
-    maxTranslate: limit,
-  });
-  return prepared.slice(0, limit);
 }
 
 export async function getArticlesBySection(

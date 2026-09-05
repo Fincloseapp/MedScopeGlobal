@@ -14,6 +14,7 @@ import { newsDesksForLocale, type NewsDeskId } from "@/lib/v271/news-desks";
 import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { isCzechSurface } from "@/lib/i18n/surface-copy";
 
 export function MagazineListing({
   articles,
@@ -117,13 +118,14 @@ export function MagazineListing({
         </div>
       </nav>
 
+      {isCzechSurface(locale) ? (
       <nav aria-label={copy.studyLabel} className="mt-4">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
           {copy.studyLabel}
         </p>
         <div className="mt-2 flex flex-wrap gap-2">
           <Link
-            href="/articles?med_track=priprava"
+            href={localizePublicHref("/articles?med_track=priprava", locale)}
             className="inline-flex items-center gap-2 rounded-full border border-dashed border-slate-300 bg-slate-50 px-3 py-1.5 text-sm text-slate-600 hover:border-[#005B96]/40 hover:text-[#005B96]"
           >
             <span className="relative h-5 w-5 overflow-hidden rounded-full bg-[#050b1d]">
@@ -138,7 +140,7 @@ export function MagazineListing({
             {copy.prep}
           </Link>
           <Link
-            href="/articles?med_track=studium"
+            href={localizePublicHref("/articles?med_track=studium", locale)}
             className="inline-flex items-center gap-2 rounded-full border border-dashed border-slate-300 bg-slate-50 px-3 py-1.5 text-sm text-slate-600 hover:border-[#005B96]/40 hover:text-[#005B96]"
           >
             <span className="relative h-5 w-5 overflow-hidden rounded-full bg-[#050b1d]">
@@ -154,6 +156,7 @@ export function MagazineListing({
           </Link>
         </div>
       </nav>
+      ) : null}
 
       {featured ? (
         <div className="mt-8">

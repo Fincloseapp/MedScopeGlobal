@@ -877,7 +877,7 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.29"),
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.30"),
   "page cache tag must bust after student catch-all route is removed"
 );
 assert.ok(
@@ -1290,6 +1290,36 @@ assert.ok(
 );
 file("components/lekari/physician-offer-dashboard.tsx");
 file("lib/i18n/physician-hub-dashboard-copy.ts");
+file("components/lekari/physician-room-page.tsx");
+file("lib/i18n/physician-room-copy.ts");
+assert.ok(
+  readFileSync(join(root, "app/(public)/lekari/[slug]/page.tsx"), "utf8").includes(
+    "PhysicianRoomPage"
+  ) &&
+    readFileSync(join(root, "components/lekari/physician-room-page.tsx"), "utf8").includes(
+      'data-studio="physician-room"'
+    ) &&
+    readFileSync(join(root, "components/lekari/physician-section-nav.tsx"), "utf8").includes(
+      "translateNavHref(item.href, locale, { label: item.fallback })"
+    ),
+  "physician rooms must use the clinical desk, not the generic link grid"
+);
+assert.ok(
+  readFileSync(join(root, "components/articles/magazine-listing.tsx"), "utf8").includes(
+    'localizePublicHref("/articles?med_track=priprava"'
+  ) &&
+    readFileSync(join(root, "components/articles/magazine-listing.tsx"), "utf8").includes(
+      "isCzechSurface"
+    ),
+  "magazine study chips must stay Czech and keep the locale prefix"
+);
+assert.ok(
+  readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes("latest-articles-timeout") &&
+    !readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes(
+      "ensurePublicArticlesSeeded"
+    ),
+  "article listing must not seed the DB or wait past the Worker budget"
+);
 assert.ok(
   readFileSync(join(root, "components/lekari/physician-offer-dashboard.tsx"), "utf8").includes(
     'data-studio="physician-desk"'

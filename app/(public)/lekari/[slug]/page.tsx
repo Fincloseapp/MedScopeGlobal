@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { V271HubPageView } from "@/components/v271/hub-page";
+import { PhysicianRoomPage } from "@/components/lekari/physician-room-page";
+import type { PhysicianRoomId } from "@/lib/i18n/physician-room-copy";
 import { V271_LEKARI_PAGES, buildV271HubMetadata } from "@/lib/v271/routes";
 
 export const revalidate = 120;
@@ -21,5 +22,16 @@ export default async function LekariSubPage({ params }: { params: Promise<{ slug
   const { slug } = await params;
   const page = V271_LEKARI_PAGES[slug];
   if (!page) notFound();
-  return <V271HubPageView page={page} section="lekari" />;
+  if (!isPhysicianRoom(slug)) notFound();
+  return <PhysicianRoomPage page={page} slug={slug} />;
+}
+
+function isPhysicianRoom(slug: string): slug is PhysicianRoomId {
+  return (
+    slug === "guidelines" ||
+    slug === "prehledy" ||
+    slug === "studie" ||
+    slug === "research-hub" ||
+    slug === "ai-asistent"
+  );
 }
