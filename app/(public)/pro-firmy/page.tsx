@@ -3,6 +3,7 @@ import Link from "next/link";
 import { V27AudienceHub } from "@/components/v27/audience-hub-section";
 import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { getB2BLandingCopy } from "@/lib/i18n/b2b-landing-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getV27AudienceHubCopy } from "@/lib/i18n/v27-audience-copy";
@@ -57,29 +58,38 @@ export default async function ProFirmyPage() {
         <section id="ceny" className="mt-12">
           <h2 className="font-display text-2xl font-bold text-[#021d33]">{copy.packagesTitle}</h2>
           <div className="mt-4 grid gap-4 lg:grid-cols-3">
-            {V27_B2B_PACKAGES.map((pkg) => (
-              <div key={pkg.id} className="rounded-2xl border border-slate-200 bg-white p-6">
-                <h3 className="font-display text-xl font-semibold text-[#021d33]">{pkg.name}</h3>
-                <p className="mt-2 text-3xl font-bold text-[#005B96]">
-                  {pkg.priceCzk > 0 ? formatCzkListPrice(pkg.priceCzk, locale) : copy.individualPrice}
-                </p>
-                <p className="mt-2 text-sm text-slate-600">{pkg.desc}</p>
-                <div className="mt-4">
-                  <V27CheckoutButton kind="b2b_package" productId={pkg.id} label="Objednat balíček" />
+            {V27_B2B_PACKAGES.map((pkg) => {
+              const pkgCopy = copy.packageCopy[pkg.id] ?? { name: pkg.name, desc: pkg.desc };
+              return (
+                <div key={pkg.id} className="rounded-2xl border border-slate-200 bg-white p-6">
+                  <h3 className="font-display text-xl font-semibold text-[#021d33]">{pkgCopy.name}</h3>
+                  <p className="mt-2 text-3xl font-bold text-[#005B96]">
+                    {pkg.priceCzk > 0 ? formatCzkListPrice(pkg.priceCzk, locale) : copy.individualPrice}
+                  </p>
+                  <p className="mt-2 text-sm text-slate-600">{pkgCopy.desc}</p>
+                  <div className="mt-4">
+                    <V27CheckoutButton kind="b2b_package" productId={pkg.id} label={copy.orderCta} />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
         <section className="mt-12 text-center">
           <p className="text-sm text-slate-600">
             {copy.customCampaign}{" "}
-            <Link href="/inzerce/formular" className="font-medium text-[#005B96] hover:underline">
+            <Link
+              href={localizePublicHref("/inzerce/formular", locale)}
+              className="font-medium text-[#005B96] hover:underline"
+            >
               {copy.formCta}
             </Link>{" "}
-            nebo{" "}
-            <Link href="/organizace/partnerstvi" className="font-medium text-[#005B96] hover:underline">
+            {copy.orWord}{" "}
+            <Link
+              href={localizePublicHref("/organizace/partnerstvi", locale)}
+              className="font-medium text-[#005B96] hover:underline"
+            >
               {copy.partnershipCta}
             </Link>
             .

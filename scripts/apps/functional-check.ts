@@ -878,8 +878,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.39"),
-  "page cache tag must bust after the header utility strip"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.40"),
+  "page cache tag must bust after odborne and firmy chrome"
 );
 assert.ok(
   !existsSync(join(root, "app/(public)/studenti/[slug]/page.tsx")),
@@ -1378,8 +1378,22 @@ assert.ok(
   "advertising offers must follow the request locale"
 );
 assert.ok(
-  readFileSync(join(root, "app/(public)/pro-firmy/page.tsx"), "utf8").includes("getB2BLandingCopy"),
+  readFileSync(join(root, "app/(public)/pro-firmy/page.tsx"), "utf8").includes("getB2BLandingCopy") &&
+    readFileSync(join(root, "app/(public)/pro-firmy/page.tsx"), "utf8").includes("orderCta") &&
+    !readFileSync(join(root, "app/(public)/pro-firmy/page.tsx"), "utf8").includes("Objednat balíček"),
   "B2B landing chrome must not stay Czech on /de"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/odborne/kategorie/page.tsx"), "utf8").includes(
+    "getOdborneHubCopy"
+  ) &&
+    readFileSync(join(root, "app/(public)/odborne/ai/page.tsx"), "utf8").includes(
+      "getOdborneHubCopy"
+    ) &&
+    readFileSync(join(root, "app/(public)/odborne/[id]/page.tsx"), "utf8").includes(
+      "getOdborneHubCopy"
+    ),
+  "odborne child desks must follow the edition language"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/pro-firmy/page.tsx"), "utf8").includes(

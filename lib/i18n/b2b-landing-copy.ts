@@ -15,6 +15,9 @@ export type B2BLandingCopy = {
   customCampaign: string;
   formCta: string;
   partnershipCta: string;
+  orderCta: string;
+  orWord: string;
+  packageCopy: Record<string, { name: string; desc: string }>;
   audience: { title: string; body: string }[];
   formats: { name: string; reach: string; price: string }[];
 };
@@ -28,6 +31,13 @@ const COPY: Record<Pack, B2BLandingCopy> = {
     customCampaign: "Vlastní kampaň?",
     formCta: "Vyplňte formulář inzerce",
     partnershipCta: "univerzitní partnerství",
+    orderCta: "Objednat balíček",
+    orWord: "nebo",
+    packageCopy: {
+      banner: { name: "Banner", desc: "Měsíční rotace banneru — segmentace lékaři / studenti" },
+      "sponsored-article": { name: "Sponzorovaný článek", desc: "Editoriální článek s označením partnera" },
+      enterprise: { name: "Enterprise", desc: "White-label, API a kampaně na míru — individuální cena" },
+    },
     audience: [
       { title: "Čtenáři dlouhověkosti", body: "Prevence, spánek, pohyb a výživa." },
       { title: "Lékaři a studenti", body: "Samostatné odborné plochy, bez affiliate." },
@@ -49,6 +59,13 @@ const COPY: Record<Pack, B2BLandingCopy> = {
     customCampaign: "Eigene Kampagne?",
     formCta: "Werbeformular ausfüllen",
     partnershipCta: "Universitätspartnerschaft",
+    orderCta: "Paket bestellen",
+    orWord: "oder",
+    packageCopy: {
+      banner: { name: "Banner", desc: "Monatliche Bannerrotation — Segmente Ärzte / Studierende" },
+      "sponsored-article": { name: "Gesponserter Artikel", desc: "Redaktioneller Artikel mit Partnerkennzeichnung" },
+      enterprise: { name: "Enterprise", desc: "White-label, API und Kampagnen nach Maß — individueller Preis" },
+    },
     audience: [
       { title: "Longevity-Leser", body: "Prävention, Schlaf, Bewegung und Ernährung." },
       { title: "Ärztinnen und Studierende", body: "Eigene Fachflächen, ohne Affiliate." },
@@ -70,6 +87,13 @@ const COPY: Record<Pack, B2BLandingCopy> = {
     customCampaign: "Campagne sur mesure ?",
     formCta: "Remplir le formulaire",
     partnershipCta: "partenariat universitaire",
+    orderCta: "Commander l’offre",
+    orWord: "ou",
+    packageCopy: {
+      banner: { name: "Bannière", desc: "Rotation mensuelle — segments médecins / étudiants" },
+      "sponsored-article": { name: "Article sponsorisé", desc: "Article éditorial clairement marqué partenaire" },
+      enterprise: { name: "Enterprise", desc: "White-label, API et campagnes sur mesure — tarif sur devis" },
+    },
     audience: [
       { title: "Lecteurs longévité", body: "Prévention, sommeil, mouvement et alimentation." },
       { title: "Médecins et étudiants", body: "Espaces professionnels séparés, sans affiliation." },
@@ -91,6 +115,13 @@ const COPY: Record<Pack, B2BLandingCopy> = {
     customCampaign: "A custom campaign?",
     formCta: "Fill in the advertising form",
     partnershipCta: "university partnership",
+    orderCta: "Order package",
+    orWord: "or",
+    packageCopy: {
+      banner: { name: "Banner", desc: "Monthly banner rotation — physician / student segments" },
+      "sponsored-article": { name: "Sponsored article", desc: "Editorial article with a partner label" },
+      enterprise: { name: "Enterprise", desc: "White-label, API and custom campaigns — priced on request" },
+    },
     audience: [
       { title: "Longevity readers", body: "Prevention, sleep, movement and nutrition." },
       { title: "Physicians and students", body: "Separate professional surfaces, no affiliates." },
@@ -112,6 +143,13 @@ const COPY: Record<Pack, B2BLandingCopy> = {
     customCampaign: "Una campagna su misura?",
     formCta: "Compila il modulo pubblicitario",
     partnershipCta: "partnership universitaria",
+    orderCta: "Ordina il pacchetto",
+    orWord: "oppure",
+    packageCopy: {
+      banner: { name: "Banner", desc: "Rotazione mensile — segmenti medici / studenti" },
+      "sponsored-article": { name: "Articolo sponsorizzato", desc: "Articolo editoriale con etichetta partner" },
+      enterprise: { name: "Enterprise", desc: "White-label, API e campagne su misura — prezzo su richiesta" },
+    },
     audience: [
       { title: "Lettori di longevità", body: "Prevenzione, sonno, movimento e alimentazione." },
       { title: "Medici e studenti", body: "Spazi professionali separati, senza affiliate." },
@@ -133,6 +171,13 @@ const COPY: Record<Pack, B2BLandingCopy> = {
     customCampaign: "¿Una campaña a medida?",
     formCta: "Rellenar el formulario",
     partnershipCta: "alianza universitaria",
+    orderCta: "Pedir el paquete",
+    orWord: "o",
+    packageCopy: {
+      banner: { name: "Banner", desc: "Rotación mensual — segmentos médicos / estudiantes" },
+      "sponsored-article": { name: "Artículo patrocinado", desc: "Artículo editorial con marca de partner" },
+      enterprise: { name: "Enterprise", desc: "White-label, API y campañas a medida — precio bajo petición" },
+    },
     audience: [
       { title: "Lectores de longevidad", body: "Prevención, sueño, movimiento y alimentación." },
       { title: "Médicos y estudiantes", body: "Espacios profesionales separados, sin afiliados." },
@@ -154,6 +199,13 @@ const COPY: Record<Pack, B2BLandingCopy> = {
     customCampaign: "Uma campanha sob medida?",
     formCta: "Preencher o formulário",
     partnershipCta: "parceria universitária",
+    orderCta: "Encomendar o pacote",
+    orWord: "ou",
+    packageCopy: {
+      banner: { name: "Banner", desc: "Rotação mensal — segmentos médicos / estudantes" },
+      "sponsored-article": { name: "Artigo patrocinado", desc: "Artigo editorial com marca de parceiro" },
+      enterprise: { name: "Enterprise", desc: "White-label, API e campanhas à medida — preço sob consulta" },
+    },
     audience: [
       { title: "Leitores de longevidade", body: "Prevenção, sono, movimento e alimentação." },
       { title: "Médicos e estudantes", body: "Espaços profissionais separados, sem afiliados." },
