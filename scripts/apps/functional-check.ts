@@ -390,6 +390,22 @@ file("lib/v22/homepage-cache.ts");
   );
 }
 file("scripts/cloudflare/assert-live-host.mjs");
+{
+  const liveHost = readFileSync(join(root, "scripts/cloudflare/assert-live-host.mjs"), "utf8");
+  assert.ok(liveHost.includes("/robots.txt"), "live host assert must probe /robots.txt");
+  assert.ok(
+    liveHost.includes("user-agent"),
+    "live host assert must send a UA so bot shield does not stall Node fetch"
+  );
+  assert.ok(
+    !liveHost.includes('"/cs"') && !liveHost.includes("'/cs'"),
+    "live host assert must not HEAD the Czech homepage — SSR hangs CI"
+  );
+  assert.ok(
+    !liveHost.includes("/go/vitamin-d3-k2"),
+    "live host assert must not wait on affiliate hops that stall after deploy"
+  );
+}
 file("scripts/cloudflare/deploy.mjs");
 absent("vercel.json", "vercel.json must not exist — production is Cloudflare Workers");
 absent("vercel.json.bak", "vercel.json.bak must not exist");

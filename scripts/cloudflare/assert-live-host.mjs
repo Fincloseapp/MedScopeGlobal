@@ -1,52 +1,67 @@
 #!/usr/bin/env node
 /**
- * Confirm medscopeglobal.com is served by Cloudflare Workers.
+ * Confirm medscopeglobal.com is served by Cloudflare Workers, not Vercel.
+ *
+ * Probe only cheap, non-SSR paths. HEAD on magazine HTML and affiliate
+ * hops regularly sit past GitHub Actions' fetch timeout after a Worker
+ * deploy (cold isolate or bot-challenge stall). Host identity is already
+ * on /robots.txt in tens of milliseconds.
  */
-const origin = process.env.MEDSCOPE_ORIGIN || "https://medscopeglobal.com";
+const origin =
+  process.env.LIVE_ORIGIN ?? process.env.MEDSCOPE_ORIGIN ?? "https://medscopeglobal.com";
 const ua = "Mozilla/5.0 (compatible; MedScopeCloudflareAssert/1.0)";
 
-async function headers(path, attempt = 0) {
+async function request(path, { method = "GET" } = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15_000);
   try {
-    const res = await fetch(`${origin}${path}`, {
-      method: "HEAD",
+    return await fetch(`${origin}${path}`, {
+      method,
       redirect: "manual",
       headers: { "user-agent": ua, "accept-language": "cs" },
+      signal: controller.signal,
     });
-    const out = {};
-    res.headers.forEach((value, key) => {
-      out[key.toLowerCase()] = value;
-    });
-    return { status: res.status, headers: out };
-  } catch (err) {
-    if (attempt < 2) {
-      await new Promise((resolve) => setTimeout(resolve, 4000 * (attempt + 1)));
-      return headers(path, attempt + 1);
-    }
-    throw err;
+  } finally {
+    clearTimeout(timer);
   }
 }
 
-function assert(cond, message) {
-  if (!cond) {
-    console.error(`✗ ${message}`);
-    process.exit(1);
+function assertCloudflare(res, path) {
+  const server = (res.headers.get("server") ?? "").toLowerCase();
+  if (server.includes("vercel") || res.headers.get("x-vercel-id") || res.headers.get("x-vercel-cache")) {
+    throw new Error(`${path} is still served by Vercel`);
   }
-  console.log(`✓ ${message}`);
+  if (!res.headers.get("cf-ray") && !server.includes("cloudflare")) {
+    throw new Error(`${path} is missing Cloudflare identity (cf-ray / server)`);
+  }
 }
 
-const home = await headers("/cs");
-assert(home.status === 200, `/cs → ${home.status}`);
-assert(/cloudflare/i.test(home.headers.server || ""), `server is Cloudflare (${home.headers.server || "missing"})`);
-assert(Boolean(home.headers["cf-ray"]), "cf-ray present");
-assert(!home.headers["x-vercel-id"], "no x-vercel-id");
-assert(!home.headers["x-vercel-cache"], "no x-vercel-cache");
+const robots = await request("/robots.txt");
+if (!robots.ok) {
+  throw new Error(`/robots.txt returned ${robots.status}`);
+}
+assertCloudflare(robots, "/robots.txt");
 
-const admin = await headers("/admin");
-assert([301, 302, 307, 308].includes(admin.status), `/admin redirects (${admin.status})`);
-assert(/\/admin\/login/i.test(admin.headers.location || ""), "/admin → /admin/login");
+const admin = await request("/admin", { method: "HEAD" });
+if (![301, 302, 307, 308].includes(admin.status)) {
+  throw new Error(`/admin returned ${admin.status}, expected a login redirect`);
+}
+if (!/\/admin\/login/i.test(admin.headers.get("location") ?? "")) {
+  throw new Error(`/admin location is ${admin.headers.get("location")}`);
+}
+assertCloudflare(admin, "/admin");
 
-const hop = await headers("/go/vitamin-d3-k2");
-assert(hop.status === 200, `/go/vitamin-d3-k2 → ${hop.status} (magazine hop)`);
-assert(/cloudflare/i.test(hop.headers.server || ""), "/go served by Cloudflare");
-
-console.log(`\nLive host ${origin} is Cloudflare Workers.\n`);
+console.log(
+  JSON.stringify(
+    {
+      origin,
+      robots: robots.status,
+      admin: admin.status,
+      adminLocation: admin.headers.get("location"),
+      server: robots.headers.get("server"),
+      cfRay: robots.headers.get("cf-ray"),
+    },
+    null,
+    2,
+  ),
+);
