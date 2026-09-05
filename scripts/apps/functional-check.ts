@@ -878,8 +878,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.40"),
-  "page cache tag must bust after odborne and firmy chrome"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.41"),
+  "page cache tag must bust after odborne and 404 chrome"
 );
 assert.ok(
   !existsSync(join(root, "app/(public)/studenti/[slug]/page.tsx")),
@@ -1394,6 +1394,11 @@ assert.ok(
       "getOdborneHubCopy"
     ),
   "odborne child desks must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "app/not-found.tsx"), "utf8").includes("getNotFoundCopy") &&
+    !readFileSync(join(root, "app/not-found.tsx"), "utf8").includes("Stránka nebyla nalezena"),
+  "root 404 chrome must follow the edition language"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/pro-firmy/page.tsx"), "utf8").includes(

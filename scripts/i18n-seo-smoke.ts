@@ -19,6 +19,7 @@ import { getHomepageTitle, getMagazineListingCopy, getMagazineSearchCopy, getOgL
 import { getFirmyDeskCopy } from "../lib/i18n/firmy-desk-copy";
 import { getProMeCopy } from "../lib/i18n/pro-me-copy";
 import { getOdborneHubCopy } from "../lib/i18n/odborne-hub-copy";
+import { getNotFoundCopy } from "../lib/i18n/not-found-copy";
 import { getNovinkyCopy, novinkyTagsForLocale } from "../lib/i18n/novinky-copy";
 import { getPhysicianRoomDestinations } from "../lib/i18n/physician-room-copy";
 import { articleJsonLdGlobal, buildGlobalHreflang } from "../lib/ecosystem/seo";
@@ -603,6 +604,9 @@ assert.ok(!looksLikeCzech(getOdborneHubCopy("fr").back));
 assert.equal(getB2BLandingCopy("fr").orderCta, "Commander l’offre");
 assert.ok(!looksLikeCzech(getB2BLandingCopy("de").packageCopy.banner.desc));
 assert.ok(!getB2BLandingCopy("fr").orWord.includes("nebo"));
+assert.ok(!looksLikeCzech(getNotFoundCopy("fr").title));
+assert.ok(!looksLikeCzech(getNotFoundCopy("de").body));
+assert.equal(getNotFoundCopy("cs").title, "Stránka nebyla nalezena");
 assert.ok(!novinkyTagsForLocale("fr").some((tag) => tag.href.includes("revmatologie")));
 assert.ok(novinkyTagsForLocale("cs").some((tag) => tag.href.includes("revmatologie")));
 assert.ok(!looksLikeCzech(getNovinkyCopy("de").tags.univerzity.title));
