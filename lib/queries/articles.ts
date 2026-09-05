@@ -158,7 +158,7 @@ export async function getLatestArticles(
   if (!supabase) {
     return mergeNativeDeskFeed(getDemoMagazineArticles(), locale).slice(offset, offset + limit);
   }
-  const fetchLimit = limit * 12;
+  const fetchLimit = Math.min(Math.max(limit * 3, limit), 96);
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)

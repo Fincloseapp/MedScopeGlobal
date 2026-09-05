@@ -118,6 +118,7 @@ import {
   classifyCoverTopic,
   assignUniqueListingCovers,
   coverIdentity,
+  coverVisualFamily,
   isFoodCoverUrl,
   isClinicalOrBrainCoverUrl,
   isDeniedEditorialImageUrl,
@@ -370,8 +371,13 @@ file("lib/v22/homepage-cache.ts");
   assert.ok(home.includes("filterArticlesForLocale"), "homepage listings are native-first per locale");
   assert.ok(home.includes("mergeNativeDeskFeed"), "homepage pins native desk pieces");
   assert.ok(
-    readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("getArticlesByMetadataSection") &&
+    !readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes(
+      "getArticlesByMetadataSection"
+    ) &&
     readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("uniqueHomepageLayout") &&
+    readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
+      "homepage-timeout"
+    ) &&
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
@@ -865,7 +871,13 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.28"),
+  readFileSync(join(root, "app/(public)/articles/page.tsx"), "utf8").includes(
+    "assignUniqueListingCovers"
+  ),
+  "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
+);
+assert.ok(
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.29"),
   "page cache tag must bust after student catch-all route is removed"
 );
 assert.ok(
@@ -2412,6 +2424,35 @@ assert.ok(isDeniedEditorialImageUrl(DOCTOR_PHONE), "doctor-phone in deny helper"
   assert.equal(
     (unique[0]?.metadata as Record<string, unknown> | undefined)?.editorial_image_review,
     "ai_editor"
+  );
+  const interviews = assignUniqueListingCovers([
+    {
+      id: "qa-1",
+      title: "Q&A s lékárníkem — volně prodejná rada",
+      slug: "qa-lekarnik",
+      excerpt: "Klid a stres v lékárně.",
+      cover_image_url: "/assets/covers/calm.webp",
+    },
+    {
+      id: "qa-2",
+      title: "Mindfulness po noční směně",
+      slug: "mindfulness-smena",
+      excerpt: "Relaxace a stres u sester.",
+      cover_image_url: "/assets/covers/calm.webp",
+    },
+    {
+      id: "qa-3",
+      title: "Pohoda po práci v ambulanci",
+      slug: "pohoda-ambulance",
+      excerpt: "Wellness bez zázračných slibů.",
+      cover_image_url: "/assets/covers/calm.webp",
+    },
+  ]);
+  const interviewFamilies = interviews.map((article) => coverVisualFamily(article.cover_image_url));
+  assert.equal(
+    new Set(interviewFamilies).size,
+    3,
+    `neighbouring calm/interview cards must not share one photo, got ${interviewFamilies.join(", ")}`
   );
   const foodPair = assignUniqueListingCovers([
     {

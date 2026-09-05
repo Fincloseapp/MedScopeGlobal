@@ -136,11 +136,44 @@ async function loadHomepageData(locale: string): Promise<{
   return { articles, topAds, midAds, bottomAds };
 }
 
+async function loadHomepageDataOrFallback(locale: string) {
+  const fallback = async () => {
+    const { getDemoMagazineArticles } = await import(
+      "@/lib/verejnost/demo-magazine-articles"
+    );
+    return {
+      articles: pinHomepageDesks(
+        mergeNativeDeskFeed(getDemoMagazineArticles(), locale),
+        48,
+        locale
+      ),
+      topAds: [] as AdRow[],
+      midAds: [] as AdRow[],
+      bottomAds: [] as AdRow[],
+    };
+  };
+
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      loadHomepageData(locale),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("homepage-timeout")), 8_000);
+      }),
+    ]);
+  } catch (error) {
+    console.error("getHomepageCachedData", error);
+    return fallback();
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
-    () => loadHomepageData(locale),
-    ["v22-homepage-public-v21-related-borrow-v23-17-news-briefs", locale, day],
+    () => loadHomepageDataOrFallback(locale),
+    ["v22-homepage-public-v21-related-borrow-v23-18-no-double-section", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

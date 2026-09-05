@@ -11,6 +11,7 @@ import { MAGAZINE, getMagazineListingCopy } from "@/lib/brand/magazine";
 import { VITASCOPE_TRACK_LOGO } from "@/lib/brand/vitascope";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
+import { assignUniqueListingCovers } from "@/lib/ecosystem/editorial/images/unique-listing-covers";
 import { filterArticlesForDesk, mixListableFeed, newsDesksForLocale, type NewsDeskId } from "@/lib/v271/news-desks";
 
 export const revalidate = 120;
@@ -124,6 +125,8 @@ export default async function ArticlesPage({
     );
   }
 
-  const mixed = mixListableFeed(filterArticlesForDesk(coreArticles, desk, locale), 24, locale);
+  const mixed = assignUniqueListingCovers(
+    mixListableFeed(filterArticlesForDesk(coreArticles, desk, locale), 24, locale)
+  );
   return <MagazineListing articles={mixed} activeDesk={desk} locale={locale} />;
 }

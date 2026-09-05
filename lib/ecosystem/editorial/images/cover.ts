@@ -176,8 +176,10 @@ export function coverIdentity(url: string | null | undefined): string {
 /** Group visually similar covers so neighbours are not two gym shots or two silhouettes. */
 export function coverVisualFamily(url: string | null | undefined): string {
   const path = coverIdentity(url);
-  if (/\/calm(?:-\d+)?\.webp$/.test(path)) return "silhouette-calm";
-  if (/\/movement(?:-\d+)?\.webp$/.test(path)) return "gym-movement";
+  if (/\/calm-2\.webp$/.test(path)) return "window-calm";
+  if (/\/calm\.webp$/.test(path)) return "silhouette-calm";
+  if (/\/movement-2\.webp$/.test(path)) return "gym-movement-alt";
+  if (/\/movement\.webp$/.test(path)) return "gym-movement";
   if (/\/food(?:-\d+)?\.webp$/.test(path) || path.includes("/produce.webp")) return "food-plate";
   if (/\/clinical(?:-\d+)?\.webp$/.test(path)) return "clinical-care";
   if (/\/research(?:-\d+)?\.webp$/.test(path) || path.includes("/science.webp")) return "research-lab";
@@ -296,9 +298,9 @@ const LOCAL_COVER_TOPICS: Partial<
   "/assets/covers/sleep.webp": ["sleep", "calm"],
   "/assets/covers/calm.webp": ["calm", "seniors", "sleep", "movement"],
   "/assets/covers/calm-2.webp": ["calm", "sleep", "seniors"],
-  "/assets/covers/movement.webp": ["movement", "walk", "seniors"],
+  "/assets/covers/movement.webp": ["movement", "walk", "seniors", "calm"],
   "/assets/covers/movement-2.webp": ["movement", "walk", "seniors"],
-  "/assets/covers/walk.webp": ["walk", "movement", "seniors"],
+  "/assets/covers/walk.webp": ["walk", "movement", "seniors", "calm"],
   "/assets/covers/seniors.webp": ["seniors", "movement"],
   "/assets/covers/clinical.webp": ["clinical"],
   "/assets/covers/clinical-2.webp": ["clinical", "research", "vitals"],
@@ -316,8 +318,12 @@ const LOCAL_COVER_TOPICS: Partial<
  */
 const COVER_OVERFLOW: Record<CoverVisualTopic, readonly string[]> = {
   food: [],
-  sleep: ["/assets/covers/calm.webp"],
-  calm: ["/assets/covers/sleep.webp", "/assets/covers/walk.webp"],
+  sleep: ["/assets/covers/calm.webp", "/assets/covers/calm-2.webp"],
+  calm: [
+    "/assets/covers/sleep.webp",
+    "/assets/covers/walk.webp",
+    "/assets/covers/movement.webp",
+  ],
   movement: [
     "/assets/covers/walk.webp",
     "/assets/covers/seniors.webp",
@@ -487,10 +493,24 @@ export function pickCuratedCover(
     return !topics || topics.includes(topic);
   });
   const use = allowed.length > 0 ? allowed : pool;
-  const excluded = new Set([...excludeUrls].map((url) => coverIdentity(url)).filter(Boolean));
-  const unused = use.filter((path) => !excluded.has(coverIdentity(path)));
-  const pickFrom = unused.length > 0 ? unused : use;
-  return pickFrom[hashString(seed) % pickFrom.length]!;
+  const excluded = new Set(
+    [...excludeUrls]
+      .flatMap((url) => [coverIdentity(url), coverVisualFamily(url)])
+      .filter(Boolean)
+  );
+  const unused = use.filter(
+    (path) => !excluded.has(coverIdentity(path)) && !excluded.has(coverVisualFamily(path))
+  );
+  if (unused.length > 0) {
+    return unused[hashString(seed) % unused.length]!;
+  }
+  const overflow = (COVER_OVERFLOW[topic] ?? []).filter(
+    (path) => !excluded.has(coverIdentity(path)) && !excluded.has(coverVisualFamily(path))
+  );
+  if (overflow.length > 0) {
+    return overflow[hashString(seed) % overflow.length]!;
+  }
+  return use[hashString(seed) % use.length]!;
 }
 
 export function isDeniedStockUrl(url: string | null | undefined): boolean {

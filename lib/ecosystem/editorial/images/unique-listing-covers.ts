@@ -79,7 +79,11 @@ export function pickUnusedListingCover(
     return url;
   }
 
-  return pickCuratedCover(topic, articleSeed(article), excluded);
+  const blockedPaths = listingCoverOptionsForTopic(topic).filter((url) =>
+    excluded.includes(coverVisualFamily(url))
+  );
+  if (preferred) blockedPaths.push(preferred);
+  return pickCuratedCover(topic, articleSeed(article), blockedPaths);
 }
 
 /**
