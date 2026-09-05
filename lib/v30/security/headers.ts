@@ -72,6 +72,12 @@ export function applySecurityHeaders(response: NextResponse, pathname?: string):
       "private, no-cache, no-store, must-revalidate"
     );
   }
+  if (stripped === "/lekari" || stripped.startsWith("/lekari/")) {
+    response.headers.set(
+      "Cache-Control",
+      "private, no-cache, no-store, must-revalidate"
+    );
+  }
   if (pathname?.startsWith("/__ms") || pathname?.startsWith("/relay")) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
   }

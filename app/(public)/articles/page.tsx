@@ -131,5 +131,11 @@ export default async function ArticlesPage({
   const mixed = assignUniqueListingCovers(
     mixListableFeed(filterArticlesForDesk(coreArticles, desk, locale), 24, locale)
   );
-  return <MagazineListing articles={mixed} activeDesk={desk} locale={locale} />;
+  if (mixed.length > 0) {
+    return <MagazineListing articles={mixed} activeDesk={desk} locale={locale} />;
+  }
+
+  const { getDemoMagazineArticles } = await import("@/lib/verejnost/demo-magazine-articles");
+  const fallback = assignUniqueListingCovers(getDemoMagazineArticles().slice(0, 12));
+  return <MagazineListing articles={fallback} activeDesk={desk} locale={locale} />;
 }

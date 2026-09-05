@@ -112,6 +112,21 @@ export function canonicalLocalePathname(pathname: string): string | null {
   return rest.length === 0 ? `/${canonicalSeg}` : `/${canonicalSeg}/${rest.join("/")}`;
 }
 
+/** Path prefix wins over a leftover language-switcher cookie. */
+export function localeFromRequestHints(input: {
+  localeHeader?: string | null;
+  pathname?: string | null;
+  cookie?: string | null;
+}): ReturnType<typeof normalizeLocale> {
+  if (input.localeHeader) return normalizeLocale(input.localeHeader);
+  if (input.pathname) {
+    const { locale } = resolveLocalePath(input.pathname);
+    if (locale) return normalizeLocale(locale);
+  }
+  if (input.cookie) return normalizeLocale(input.cookie);
+  return normalizeLocale("cs");
+}
+
 export function resolveLocalePath(pathname: string): {
   locale: GlobalLocaleCode | null;
   pathname: string;

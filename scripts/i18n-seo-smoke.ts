@@ -12,6 +12,7 @@ import {
   pathSegmentToLocale,
   resolveLocalePath,
   isLocaleRoutingExcluded,
+  localeFromRequestHints,
 } from "../lib/i18n/locale-path";
 import { normalizeLocale } from "../lib/i18n/config";
 import { getHomepageTitle, getOgLocale } from "../lib/brand/magazine";
@@ -556,6 +557,15 @@ assert.ok(!looksLikeCzech(getLekariNavStripCopy("de").eyebrow));
 assert.equal(getLekariNavStripCopy("cs").ctaLabel, "Stáhnout OrdiZapis");
 assert.equal(navStripForPath("/fr/lekari/guidelines", "fr")?.eyebrow, "Pour les médecins vérifiés");
 assert.equal(navStripForPath("/cs/lekari/studie", "cs")?.ctaLabel, "Stáhnout OrdiZapis");
+assert.equal(
+  localeFromRequestHints({ pathname: "/cs/lekari/guidelines", cookie: "fr" }),
+  "cs"
+);
+assert.equal(
+  localeFromRequestHints({ localeHeader: "de", pathname: "/fr/lekari", cookie: "cs" }),
+  "de"
+);
+assert.equal(localeFromRequestHints({ cookie: "fr" }), "fr");
 assert.equal(
   translateNavHref("/odborne/briefy", "fr", { label: "Odborné briefy" }).label,
   "Briefs cliniques"

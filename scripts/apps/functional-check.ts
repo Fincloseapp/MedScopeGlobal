@@ -877,7 +877,7 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.32"),
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.33"),
   "page cache tag must bust after student catch-all route is removed"
 );
 assert.ok(
@@ -888,6 +888,23 @@ assert.ok(
   readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes('stripped === "/studenti"') &&
     readFileSync(join(root, "next.config.mjs"), "utf8").includes("/:locale/studenti"),
   "locale-prefixed /cs/studenti HTML must be no-store so rooms do not reuse one cached body"
+);
+assert.ok(
+  readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes('stripped === "/lekari"') &&
+    readFileSync(join(root, "next.config.mjs"), "utf8").includes("/:locale/lekari"),
+  "physician rooms must be no-store so /cs and /fr do not share one cached body"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/articles/page.tsx"), "utf8").includes(
+    "getDemoMagazineArticles"
+  ),
+  "empty /articles must fall back to the demo magazine instead of a blank listing"
+);
+assert.ok(
+  readFileSync(join(root, "lib/i18n/server-locale.ts"), "utf8").includes(
+    "localeFromRequestHints"
+  ),
+  "request locale must prefer the path prefix over a leftover cookie"
 );
 assert.ok(
   readFileSync(join(root, "lib/studenti/href.ts"), "utf8").includes("studentPublicHref") &&
