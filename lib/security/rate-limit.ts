@@ -58,11 +58,13 @@ export async function persistentRateLimit(
   try {
     const admin = createServiceRoleClient();
     const { data, error } = await withBudget(
-      admin.rpc("check_rate_limit", {
-        p_key: key,
-        p_limit: limit,
-        p_window_ms: windowMs,
-      }),
+      Promise.resolve(
+        admin.rpc("check_rate_limit", {
+          p_key: key,
+          p_limit: limit,
+          p_window_ms: windowMs,
+        })
+      ) as Promise<{ data: unknown; error: unknown }>,
       RPC_BUDGET_MS
     );
 
