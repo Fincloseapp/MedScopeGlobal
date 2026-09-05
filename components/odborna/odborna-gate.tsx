@@ -11,37 +11,30 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { OdbornaGateReason } from "@/lib/auth/odborna-access";
-
-const REASON_COPY: Record<OdbornaGateReason, { title: string; body: string }> = {
-  login: {
-    title: "Přihlášení vyžadováno",
-    body: "Odborná sekce je dostupná pouze registrovaným uživatelům.",
-  },
-  verify: {
-    title: "Ověření ČLK",
-    body: "Pro přístup k odbornému obsahu ověřte evidenční číslo v registru ČLK.",
-  },
-  pending: {
-    title: "Čeká na schválení",
-    body: "Vaše žádost o ověření ČLK byla přijata a čeká na kontrolu.",
-  },
-  rejected: {
-    title: "Ověření zamítnuto",
-    body: "Evidenční číslo nebylo potvrzeno. Kontaktujte podporu nebo zkuste znovu.",
-  },
-};
+import { getOdbornaHubCopy } from "@/lib/i18n/odborna-hub-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export function OdbornaGate({
   reason,
   clkStatus,
+  locale = "cs",
 }: {
   reason: OdbornaGateReason;
   clkStatus?: {
     status: string;
     clkNumber?: string;
   } | null;
+  locale?: string;
 }) {
-  const copy = REASON_COPY[reason];
+  const pack = getOdbornaHubCopy(locale);
+  const copy =
+    reason === "login"
+      ? { title: pack.gateLoginTitle, body: pack.gateLoginBody }
+      : reason === "verify"
+        ? { title: pack.gateVerifyTitle, body: pack.gateVerifyBody }
+        : reason === "pending"
+          ? { title: pack.gatePendingTitle, body: pack.gatePendingBody }
+          : { title: pack.gateRejectedTitle, body: pack.gateRejectedBody };
 
   return (
     <div className="space-y-6">
@@ -57,10 +50,10 @@ export function OdbornaGate({
           {reason === "login" && (
             <div className="flex flex-wrap gap-3">
               <Button asChild>
-                <Link href="/login?next=/odborna">Přihlásit se</Link>
+                <Link href={localizePublicHref("/login?next=/odborna", locale)}>{pack.signIn}</Link>
               </Button>
               <Button asChild variant="outline">
-                <Link href="/signup">Registrace</Link>
+                <Link href={localizePublicHref("/signup", locale)}>{pack.register}</Link>
               </Button>
             </div>
           )}
@@ -71,7 +64,7 @@ export function OdbornaGate({
             />
           )}
           <Button asChild variant="link" className="h-auto p-0">
-            <Link href="/access-levels#overeni">Jak fungují úrovně přístupu →</Link>
+            <Link href={localizePublicHref("/access-levels#overeni", locale)}>{pack.accessHow}</Link>
           </Button>
         </CardContent>
       </Card>

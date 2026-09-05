@@ -52,7 +52,7 @@ export default async function OdbornaHubPage() {
         ))}
       </div>
       {!access.allowed ? (
-        <OdbornaGate reason={access.reason!} clkStatus={access.clk} />
+        <OdbornaGate reason={access.reason!} clkStatus={access.clk} locale={locale} />
       ) : (
         <>
           <div className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">

@@ -618,6 +618,7 @@ assert.ok(!looksLikeCzech(getLekyHubCopy("fr").title));
 assert.ok(!getLekyHubCopy("de").lead.includes("češtině"));
 assert.ok(!looksLikeCzech(getAdRequestCopy("fr").submit));
 assert.ok(!looksLikeCzech(getOdbornaHubCopy("fr").title));
+assert.ok(!looksLikeCzech(getOdbornaHubCopy("de").gateLoginBody));
 assert.ok(!novinkyTagsForLocale("fr").some((tag) => tag.href.includes("revmatologie")));
 assert.ok(novinkyTagsForLocale("cs").some((tag) => tag.href.includes("revmatologie")));
 assert.ok(!looksLikeCzech(getNovinkyCopy("de").tags.univerzity.title));

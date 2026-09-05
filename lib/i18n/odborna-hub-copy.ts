@@ -15,6 +15,17 @@ export type OdbornaHubCopy = {
   publicLabel: string;
   home: string;
   accessLevels: string;
+  gateLoginTitle: string;
+  gateLoginBody: string;
+  gateVerifyTitle: string;
+  gateVerifyBody: string;
+  gatePendingTitle: string;
+  gatePendingBody: string;
+  gateRejectedTitle: string;
+  gateRejectedBody: string;
+  signIn: string;
+  register: string;
+  accessHow: string;
 };
 
 const PACK: Record<ChromePack, OdbornaHubCopy> = {
@@ -32,6 +43,17 @@ const PACK: Record<ChromePack, OdbornaHubCopy> = {
     publicLabel: "Veřejný obsah:",
     home: "domovská stránka",
     accessLevels: "úrovně přístupu",
+    gateLoginTitle: "Přihlášení vyžadováno",
+    gateLoginBody: "Odborná sekce je dostupná pouze registrovaným uživatelům.",
+    gateVerifyTitle: "Ověření ČLK",
+    gateVerifyBody: "Pro přístup k odbornému obsahu ověřte evidenční číslo v registru ČLK.",
+    gatePendingTitle: "Čeká na schválení",
+    gatePendingBody: "Vaše žádost o ověření ČLK byla přijata a čeká na kontrolu.",
+    gateRejectedTitle: "Ověření zamítnuto",
+    gateRejectedBody: "Evidenční číslo nebylo potvrzeno. Kontaktujte podporu nebo zkuste znovu.",
+    signIn: "Přihlásit se",
+    register: "Registrace",
+    accessHow: "Jak fungují úrovně přístupu →",
   },
   de: {
     metaTitle: "Fachbereich",
@@ -47,6 +69,17 @@ const PACK: Record<ChromePack, OdbornaHubCopy> = {
     publicLabel: "Öffentliche Inhalte:",
     home: "Startseite",
     accessLevels: "Zugangsstufen",
+    gateLoginTitle: "Anmeldung erforderlich",
+    gateLoginBody: "Der Fachbereich ist nur für registrierte Nutzerinnen und Nutzer.",
+    gateVerifyTitle: "ČLK-Prüfung",
+    gateVerifyBody: "Für den Fachinhalt prüfen Sie die Registernummer bei der tschechischen Ärztekammer (ČLK).",
+    gatePendingTitle: "Wartet auf Freigabe",
+    gatePendingBody: "Ihre ČLK-Anfrage ist eingegangen und wartet auf Prüfung.",
+    gateRejectedTitle: "Prüfung abgelehnt",
+    gateRejectedBody: "Die Registernummer wurde nicht bestätigt. Schreiben Sie dem Support oder versuchen Sie es erneut.",
+    signIn: "Anmelden",
+    register: "Registrieren",
+    accessHow: "So funktionieren die Zugangsstufen →",
   },
   fr: {
     metaTitle: "Espace professionnel",
@@ -62,6 +95,17 @@ const PACK: Record<ChromePack, OdbornaHubCopy> = {
     publicLabel: "Contenus publics :",
     home: "accueil",
     accessLevels: "niveaux d’accès",
+    gateLoginTitle: "Connexion requise",
+    gateLoginBody: "L’espace professionnel est réservé aux comptes enregistrés.",
+    gateVerifyTitle: "Vérification ČLK",
+    gateVerifyBody: "Pour le contenu professionnel, vérifiez le numéro d’enregistrement auprès de l’ordre tchèque (ČLK).",
+    gatePendingTitle: "En attente de validation",
+    gatePendingBody: "Votre demande ČLK a été reçue et attend contrôle.",
+    gateRejectedTitle: "Vérification refusée",
+    gateRejectedBody: "Le numéro n’a pas été confirmé. Contactez le support ou réessayez.",
+    signIn: "Connexion",
+    register: "Inscription",
+    accessHow: "Comment fonctionnent les niveaux d’accès →",
   },
   en: {
     metaTitle: "Professional desk",
@@ -77,6 +121,17 @@ const PACK: Record<ChromePack, OdbornaHubCopy> = {
     publicLabel: "Public content:",
     home: "homepage",
     accessLevels: "access levels",
+    gateLoginTitle: "Sign-in required",
+    gateLoginBody: "The professional desk is available to registered users only.",
+    gateVerifyTitle: "ČLK verification",
+    gateVerifyBody: "To open professional content, verify the registration number with the Czech Medical Chamber (ČLK).",
+    gatePendingTitle: "Waiting for approval",
+    gatePendingBody: "Your ČLK request was received and is waiting for review.",
+    gateRejectedTitle: "Verification rejected",
+    gateRejectedBody: "The registration number was not confirmed. Contact support or try again.",
+    signIn: "Sign in",
+    register: "Register",
+    accessHow: "How access levels work →",
   },
   it: {
     metaTitle: "Area professionale",
@@ -92,6 +147,17 @@ const PACK: Record<ChromePack, OdbornaHubCopy> = {
     publicLabel: "Contenuti pubblici:",
     home: "home",
     accessLevels: "livelli di accesso",
+    gateLoginTitle: "Accesso richiesto",
+    gateLoginBody: "L’area professionale è riservata agli utenti registrati.",
+    gateVerifyTitle: "Verifica ČLK",
+    gateVerifyBody: "Per i contenuti professionali verificate il numero di iscrizione presso l’ordine ceco (ČLK).",
+    gatePendingTitle: "In attesa di approvazione",
+    gatePendingBody: "La richiesta ČLK è stata ricevuta e attende controllo.",
+    gateRejectedTitle: "Verifica rifiutata",
+    gateRejectedBody: "Il numero non è stato confermato. Contattate il supporto o riprovate.",
+    signIn: "Accedi",
+    register: "Registrati",
+    accessHow: "Come funzionano i livelli di accesso →",
   },
   es: {
     metaTitle: "Área profesional",
@@ -107,6 +173,17 @@ const PACK: Record<ChromePack, OdbornaHubCopy> = {
     publicLabel: "Contenido público:",
     home: "inicio",
     accessLevels: "niveles de acceso",
+    gateLoginTitle: "Inicio de sesión necesario",
+    gateLoginBody: "El área profesional está reservada a usuarios registrados.",
+    gateVerifyTitle: "Verificación ČLK",
+    gateVerifyBody: "Para el contenido profesional, verifique el número de registro en el colegio checo (ČLK).",
+    gatePendingTitle: "Pendiente de aprobación",
+    gatePendingBody: "Su solicitud ČLK se recibió y espera revisión.",
+    gateRejectedTitle: "Verificación rechazada",
+    gateRejectedBody: "El número no se confirmó. Contacte con soporte o inténtelo de nuevo.",
+    signIn: "Entrar",
+    register: "Registrarse",
+    accessHow: "Cómo funcionan los niveles de acceso →",
   },
   "pt-BR": {
     metaTitle: "Área profissional",
@@ -122,6 +199,17 @@ const PACK: Record<ChromePack, OdbornaHubCopy> = {
     publicLabel: "Conteúdo público:",
     home: "início",
     accessLevels: "níveis de acesso",
+    gateLoginTitle: "Início de sessão necessário",
+    gateLoginBody: "A área profissional está reservada a utilizadores registados.",
+    gateVerifyTitle: "Verificação ČLK",
+    gateVerifyBody: "Para o conteúdo profissional, verifique o número de registo na ordem checa (ČLK).",
+    gatePendingTitle: "A aguardar aprovação",
+    gatePendingBody: "O pedido ČLK foi recebido e aguarda revisão.",
+    gateRejectedTitle: "Verificação recusada",
+    gateRejectedBody: "O número não foi confirmado. Contacte o suporte ou tente de novo.",
+    signIn: "Entrar",
+    register: "Registar",
+    accessHow: "Como funcionam os níveis de acesso →",
   },
 };
 
@@ -134,5 +222,8 @@ export function getOdbornaHubCopy(locale?: string | null): OdbornaHubCopy {
     lead: rewriteCzechInstitutions(copy.lead, locale),
     badges: copy.badges.map((badge) => rewriteCzechInstitutions(badge, locale)),
     verified: rewriteCzechInstitutions(copy.verified, locale),
+    gateVerifyTitle: rewriteCzechInstitutions(copy.gateVerifyTitle, locale),
+    gateVerifyBody: rewriteCzechInstitutions(copy.gateVerifyBody, locale),
+    gatePendingBody: rewriteCzechInstitutions(copy.gatePendingBody, locale),
   };
 }
