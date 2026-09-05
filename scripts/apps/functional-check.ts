@@ -878,8 +878,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.36"),
-  "page cache tag must bust after the homepage listing pool slim"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.37"),
+  "page cache tag must bust after the firmy desk and leftover chrome"
 );
 assert.ok(
   !existsSync(join(root, "app/(public)/studenti/[slug]/page.tsx")),
@@ -1063,6 +1063,35 @@ assert.ok(
 assert.ok(
   readFileSync(join(root, "app/(public)/firmy/cenik/page.tsx"), "utf8").includes("getB2bPublicCopy"),
   "/firmy/cenik must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/firmy/page.tsx"), "utf8").includes("FirmyDesk") &&
+    readFileSync(join(root, "components/firmy/firmy-desk.tsx"), "utf8").includes(
+      "getFirmyDeskCopy"
+    ) &&
+    !readFileSync(join(root, "app/(public)/firmy/page.tsx"), "utf8").includes(
+      "V271HubPageView"
+    ),
+  "/firmy must use the company desk, not the leftover FeatureCard hub"
+);
+assert.ok(
+  readFileSync(join(root, "components/lekari/physician-room-page.tsx"), "utf8").includes(
+    "getPhysicianRoomDestinations"
+  ) &&
+    !readFileSync(join(root, "components/lekari/physician-room-page.tsx"), "utf8").includes(
+      "localized.page.links"
+    ),
+  "physician rooms must end on clinical destinations, not the V271 link grid"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/pro-me/page.tsx"), "utf8").includes("getProMeCopy") &&
+    readFileSync(join(root, "app/(public)/odborne/page.tsx"), "utf8").includes(
+      "getOdborneHubCopy"
+    ) &&
+    readFileSync(join(root, "app/(public)/novinky/page.tsx"), "utf8").includes(
+      "novinkyTagsForLocale"
+    ),
+  "/pro-me, /odborne and /novinky chrome must follow the edition language"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/mediprep/page.tsx"), "utf8").includes("CzechFacultyOnlyNotice"),

@@ -408,3 +408,169 @@ const PACK: Record<ChromePack, RoomPack> = {
 export function getPhysicianRoomCopy(locale?: string | null): RoomPack {
   return PACK[chromePack(locale)];
 }
+
+export type PhysicianRoomDest = { href: string; label: string; body: string };
+
+const DESTINATIONS: Record<ChromePack, Record<PhysicianRoomId, PhysicianRoomDest[]>> = {
+  cs: {
+    guidelines: [
+      { href: "/odborne/briefy", label: "Odborné briefy", body: "Krátký brief s DOI nebo PMID. Není to náhrada guidelines společnosti." },
+      { href: "/lekari", label: "Lékařský desk", body: "OrdiZapis a zbytek zóny. Reklama sem nepatří." },
+    ],
+    prehledy: [
+      { href: "/odborne/briefy", label: "Odborné briefy", body: "Struktura pro pauzu mezi pacienty — identifikátor zůstává vidět." },
+      { href: "/studie", label: "Studie", body: "RCT a meta-analýzy jen s DOI nebo PMID." },
+    ],
+    studie: [
+      { href: "/studie", label: "Přehled studií", body: "Identifikátor v záhlaví. Bez vymyšlených p-hodnot." },
+      { href: "/lekari/research-hub", label: "Research Hub", body: "PubMed vedle AI. Nástroj nediagnostikuje." },
+    ],
+    "research-hub": [
+      { href: "/lekari/studie", label: "Studie na desk", body: "Stejný účet, stejné pravidlo identifikátoru." },
+      { href: "/studie", label: "Veřejný přehled studií", body: "Čtení primárního záznamu zůstává nad chatem." },
+    ],
+    "ai-asistent": [
+      { href: "/lekari/dokumentace", label: "OrdiZapis", body: "Dokumentace z ambulance. 14 dní zdarma. Není to asistent diagnózy." },
+      { href: "/lekari", label: "Lékařský desk", body: "Guidelines a studie vedle zápisu. Bez reklam." },
+    ],
+  },
+  en: {
+    guidelines: [
+      { href: "/odborne/briefy", label: "Clinical briefs", body: "A short brief with a DOI or PMID. Not a substitute for a society guideline." },
+      { href: "/lekari", label: "Physician desk", body: "OrdiZapis and the rest of the zone. Ads do not belong here." },
+    ],
+    prehledy: [
+      { href: "/odborne/briefy", label: "Clinical briefs", body: "A structure for a gap between patients — the identifier stays visible." },
+      { href: "/studie", label: "Studies", body: "RCTs and meta-analyses only with a DOI or PMID." },
+    ],
+    studie: [
+      { href: "/studie", label: "Study list", body: "Identifier in the header. No invented p-values." },
+      { href: "/lekari/research-hub", label: "Research Hub", body: "PubMed beside AI. The tool does not diagnose." },
+    ],
+    "research-hub": [
+      { href: "/lekari/studie", label: "Studies on the desk", body: "Same account, same identifier rule." },
+      { href: "/studie", label: "Public study list", body: "Reading the primary record stays above the chat." },
+    ],
+    "ai-asistent": [
+      { href: "/lekari/dokumentace", label: "OrdiZapis", body: "The clinic note. 14 days free. Not a diagnostic assistant." },
+      { href: "/lekari", label: "Physician desk", body: "Guidelines and studies beside the note. No ads." },
+    ],
+  },
+  de: {
+    guidelines: [
+      { href: "/odborne/briefy", label: "Fachbriefs", body: "Kurzer Brief mit DOI oder PMID. Kein Ersatz für Leitlinien der Fachgesellschaft." },
+      { href: "/lekari", label: "Arzt-Desk", body: "OrdiZapis und der Rest der Zone. Werbung gehört nicht hierher." },
+    ],
+    prehledy: [
+      { href: "/odborne/briefy", label: "Fachbriefs", body: "Struktur für die Pause zwischen Patienten — der Identifikator bleibt sichtbar." },
+      { href: "/studie", label: "Studien", body: "RCTs und Metaanalysen nur mit DOI oder PMID." },
+    ],
+    studie: [
+      { href: "/studie", label: "Studienliste", body: "Identifikator im Kopf. Keine erfundenen p-Werte." },
+      { href: "/lekari/research-hub", label: "Research Hub", body: "PubMed neben der KI. Das Werkzeug diagnostiziert nicht." },
+    ],
+    "research-hub": [
+      { href: "/lekari/studie", label: "Studien auf dem Desk", body: "Dasselbe Konto, dieselbe Identifikatorregel." },
+      { href: "/studie", label: "Öffentliche Studienliste", body: "Das Lesen des Primärdatensatzes bleibt über dem Chat." },
+    ],
+    "ai-asistent": [
+      { href: "/lekari/dokumentace", label: "OrdiZapis", body: "Die Praxisnotiz. 14 Tage kostenlos. Kein Diagnoseassistent." },
+      { href: "/lekari", label: "Arzt-Desk", body: "Leitlinien und Studien neben der Notiz. Keine Werbung." },
+    ],
+  },
+  fr: {
+    guidelines: [
+      { href: "/odborne/briefy", label: "Briefs cliniques", body: "Un brief court avec DOI ou PMID. Pas un substitut aux guidelines de société." },
+      { href: "/lekari", label: "Bureau médecin", body: "OrdiZapis et le reste de la zone. La publicité n’a pas sa place ici." },
+    ],
+    prehledy: [
+      { href: "/odborne/briefy", label: "Briefs cliniques", body: "Une structure entre deux patients — l’identifiant reste visible." },
+      { href: "/studie", label: "Études", body: "ECR et méta-analyses seulement avec DOI ou PMID." },
+    ],
+    studie: [
+      { href: "/studie", label: "Liste des études", body: "Identifiant en-tête. Pas de p-values inventées." },
+      { href: "/lekari/research-hub", label: "Research Hub", body: "PubMed à côté de l’IA. L’outil ne diagnostique pas." },
+    ],
+    "research-hub": [
+      { href: "/lekari/studie", label: "Études sur le bureau", body: "Même compte, même règle d’identifiant." },
+      { href: "/studie", label: "Liste publique d’études", body: "La lecture de l’enregistrement primaire reste au-dessus du chat." },
+    ],
+    "ai-asistent": [
+      { href: "/lekari/dokumentace", label: "OrdiZapis", body: "La note de cabinet. 14 jours gratuits. Pas un assistant de diagnostic." },
+      { href: "/lekari", label: "Bureau médecin", body: "Guidelines et études à côté de la note. Sans publicité." },
+    ],
+  },
+  it: {
+    guidelines: [
+      { href: "/odborne/briefy", label: "Brief clinici", body: "Un brief breve con DOI o PMID. Non sostituisce le linee guida della società." },
+      { href: "/lekari", label: "Desk medico", body: "OrdiZapis e il resto della zona. La pubblicità non sta qui." },
+    ],
+    prehledy: [
+      { href: "/odborne/briefy", label: "Brief clinici", body: "Struttura tra un paziente e l’altro — l’identificatore resta visibile." },
+      { href: "/studie", label: "Studi", body: "RCT e meta-analisi solo con DOI o PMID." },
+    ],
+    studie: [
+      { href: "/studie", label: "Elenco studi", body: "Identificatore in intestazione. Niente p-value inventati." },
+      { href: "/lekari/research-hub", label: "Research Hub", body: "PubMed accanto all’IA. Lo strumento non diagnostica." },
+    ],
+    "research-hub": [
+      { href: "/lekari/studie", label: "Studi sul desk", body: "Stesso account, stessa regola dell’identificatore." },
+      { href: "/studie", label: "Elenco pubblico di studi", body: "La lettura del record primario resta sopra la chat." },
+    ],
+    "ai-asistent": [
+      { href: "/lekari/dokumentace", label: "OrdiZapis", body: "La nota ambulatoriale. 14 giorni gratis. Non è un assistente diagnostico." },
+      { href: "/lekari", label: "Desk medico", body: "Linee guida e studi accanto alla nota. Senza pubblicità." },
+    ],
+  },
+  es: {
+    guidelines: [
+      { href: "/odborne/briefy", label: "Briefs clínicos", body: "Un brief corto con DOI o PMID. No sustituye una guía de sociedad." },
+      { href: "/lekari", label: "Escritorio médico", body: "OrdiZapis y el resto de la zona. La publicidad no pertenece aquí." },
+    ],
+    prehledy: [
+      { href: "/odborne/briefy", label: "Briefs clínicos", body: "Una estructura entre pacientes — el identificador sigue visible." },
+      { href: "/studie", label: "Estudios", body: "ECA y metaanálisis solo con DOI o PMID." },
+    ],
+    studie: [
+      { href: "/studie", label: "Lista de estudios", body: "Identificador en el encabezado. Sin p-valores inventados." },
+      { href: "/lekari/research-hub", label: "Research Hub", body: "PubMed junto a la IA. La herramienta no diagnostica." },
+    ],
+    "research-hub": [
+      { href: "/lekari/studie", label: "Estudios en el escritorio", body: "Misma cuenta, misma regla de identificador." },
+      { href: "/studie", label: "Lista pública de estudios", body: "Leer el registro primario sigue por encima del chat." },
+    ],
+    "ai-asistent": [
+      { href: "/lekari/dokumentace", label: "OrdiZapis", body: "La nota de consulta. 14 días gratis. No es un asistente de diagnóstico." },
+      { href: "/lekari", label: "Escritorio médico", body: "Guías y estudios junto a la nota. Sin anuncios." },
+    ],
+  },
+  "pt-BR": {
+    guidelines: [
+      { href: "/odborne/briefy", label: "Briefs clínicos", body: "Um brief curto com DOI ou PMID. Não substitui guideline de sociedade." },
+      { href: "/lekari", label: "Desk médico", body: "OrdiZapis e o resto da zona. Publicidade não fica aqui." },
+    ],
+    prehledy: [
+      { href: "/odborne/briefy", label: "Briefs clínicos", body: "Estrutura entre pacientes — o identificador permanece visível." },
+      { href: "/studie", label: "Estudos", body: "ECR e metanálises só com DOI ou PMID." },
+    ],
+    studie: [
+      { href: "/studie", label: "Lista de estudos", body: "Identificador no cabeçalho. Sem p-valores inventados." },
+      { href: "/lekari/research-hub", label: "Research Hub", body: "PubMed ao lado da IA. A ferramenta não diagnostica." },
+    ],
+    "research-hub": [
+      { href: "/lekari/studie", label: "Estudos no desk", body: "A mesma conta, a mesma regra de identificador." },
+      { href: "/studie", label: "Lista pública de estudos", body: "A leitura do registro primário permanece acima do chat." },
+    ],
+    "ai-asistent": [
+      { href: "/lekari/dokumentace", label: "OrdiZapis", body: "A nota do consultório. 14 dias grátis. Não é assistente de diagnóstico." },
+      { href: "/lekari", label: "Desk médico", body: "Guidelines e estudos ao lado da nota. Sem anúncios." },
+    ],
+  },
+};
+
+export function getPhysicianRoomDestinations(
+  locale: string | null | undefined,
+  slug: PhysicianRoomId
+): PhysicianRoomDest[] {
+  return DESTINATIONS[chromePack(locale)][slug];
+}

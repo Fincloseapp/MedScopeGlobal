@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { PhysicianSectionNav } from "@/components/lekari/physician-section-nav";
 import { getPhysicianHubDashboardCopy } from "@/lib/i18n/physician-hub-dashboard-copy";
-import { getPhysicianRoomCopy, type PhysicianRoomId } from "@/lib/i18n/physician-room-copy";
+import {
+  getPhysicianRoomCopy,
+  getPhysicianRoomDestinations,
+  type PhysicianRoomId,
+} from "@/lib/i18n/physician-room-copy";
 import { localizeV271Page } from "@/lib/i18n/hub-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { getServerLocale } from "@/lib/i18n/server-locale";
@@ -31,6 +35,7 @@ export async function PhysicianRoomPage({
   const copy = getPhysicianRoomCopy(locale);
   const hub = getPhysicianHubDashboardCopy(locale);
   const room = copy.rooms[slug];
+  const destinations = getPhysicianRoomDestinations(locale, slug);
 
   return (
     <div className="min-h-screen bg-[#f4f8fc] text-[#021d33]" data-studio="physician-room">
@@ -97,19 +102,15 @@ export async function PhysicianRoomPage({
           </p>
           <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight">{copy.destTitle}</h2>
           <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-            {localized.page.links.map((link) => (
+            {destinations.map((link) => (
               <li key={link.href}>
                 <Link
-                  href={link.href}
+                  href={localizePublicHref(link.href, locale)}
                   className="flex h-full items-start justify-between gap-4 rounded-2xl border border-[#cfe1f3] bg-white px-5 py-5 transition hover:border-[#005B96]/40 hover:shadow-sm"
                 >
                   <span>
                     <span className="block font-display text-lg font-semibold">{link.label}</span>
-                    {link.description ? (
-                      <span className="mt-1 block text-sm leading-6 text-slate-600">
-                        {link.description}
-                      </span>
-                    ) : null}
+                    <span className="mt-1 block text-sm leading-6 text-slate-600">{link.body}</span>
                   </span>
                   <ArrowUpRight className="mt-1 h-4 w-4 shrink-0 text-[#005B96]" aria-hidden />
                 </Link>

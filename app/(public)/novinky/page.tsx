@@ -9,35 +9,32 @@ import { getArticlesByMetadataSection } from "@/lib/queries/articles";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { newsDesksForLocale } from "@/lib/v271/news-desks";
+import { novinkyTagsForLocale } from "@/lib/i18n/novinky-copy";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
 
-const TAGS = [
-  { href: "/novinky/revmatologie", tag: "revmatologie", label: "Revmatologie" },
-  { href: "/novinky/univerzity", tag: "univerzity", label: "Univerzity" },
-  { href: "/novinky/vyzkum", tag: "vyzkum", label: "Výzkum" },
-  { href: "/novinky/kalendar", tag: "kalendar", label: "Kalendář" },
-];
-
 function hrefForItem(tag: string, slug: string) {
   if (tag === "univerzity") return `/novinky/univerzity/${slug}`;
-  const section = TAGS.find((x) => x.tag === tag)?.href;
-  return section ?? `/novinky/univerzity/${slug}`;
+  return `/novinky/${tag}`;
 }
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getServerLocale();
   const news = newsDesksForLocale(locale).find((desk) => desk.id === "novinky");
-  return {
+  return await buildLocalizedV20PageMetadata({
     title: news?.label ?? "News",
     description: news?.blurb ?? "University and research news.",
-  };
+    path: "/novinky",
+    locale,
+  });
 }
 
 export default async function NovinkyPage() {
   const locale = await getServerLocale();
   const desks = newsDesksForLocale(locale);
   const newsDesk = desks.find((desk) => desk.id === "novinky")!;
+  const tags = novinkyTagsForLocale(locale);
   const [university, magazineNews] = await Promise.all([
     resolveManyImages(await getUniversityNewsList(), "university_news"),
     getArticlesByMetadataSection("aktuální-zprávy", 24, false, "public", locale),
@@ -53,7 +50,7 @@ export default async function NovinkyPage() {
       ctaLabel={newsDesk.more}
     >
       <div className="mb-6 flex flex-wrap gap-2">
-        {TAGS.map((t) => (
+        {tags.map((t) => (
           <Link
             key={t.href}
             href={h(t.href)}

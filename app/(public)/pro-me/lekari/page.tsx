@@ -1,21 +1,10 @@
 import type { Metadata } from "next";
-import { ModulePageShell } from "@/components/b2b/module-page-shell";
-import { ProMeFeed } from "@/components/v6/pro-me-feed";
-import { getPersonalizedFeed } from "@/lib/queries/v6/personalization";
+import { ProMeAudiencePage, proMeAudienceMetadata } from "@/components/pro-me/pro-me-audience-page";
 
-export const metadata: Metadata = {
-  title: "Pro mě — lékaři",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return proMeAudienceMetadata("lekari");
+}
 
 export default async function ProMeLekariPage() {
-  const items = await getPersonalizedFeed("lekari");
-  return (
-    <ModulePageShell
-      eyebrow="V6 · Personalizace"
-      title="Feed pro lékaře"
-      description="AI kategorizace, evidence scoring a doporučení pro klinickou praxi."
-    >
-      <ProMeFeed items={items} audience="lekari" />
-    </ModulePageShell>
-  );
+  return <ProMeAudiencePage audience="lekari" />;
 }

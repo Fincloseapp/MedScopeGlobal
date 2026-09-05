@@ -16,6 +16,11 @@ import {
 } from "../lib/i18n/locale-path";
 import { normalizeLocale } from "../lib/i18n/config";
 import { getHomepageTitle, getMagazineListingCopy, getMagazineSearchCopy, getOgLocale } from "../lib/brand/magazine";
+import { getFirmyDeskCopy } from "../lib/i18n/firmy-desk-copy";
+import { getProMeCopy } from "../lib/i18n/pro-me-copy";
+import { getOdborneHubCopy } from "../lib/i18n/odborne-hub-copy";
+import { getNovinkyCopy, novinkyTagsForLocale } from "../lib/i18n/novinky-copy";
+import { getPhysicianRoomDestinations } from "../lib/i18n/physician-room-copy";
 import { articleJsonLdGlobal, buildGlobalHreflang } from "../lib/ecosystem/seo";
 import { renderLlmsTxt } from "../lib/seo/llms-txt";
 import { buildPageMetadata } from "../lib/seo/metadata";
@@ -572,6 +577,18 @@ assert.ok(!looksLikeCzech(getMagazineListingCopy("de").archiveLeadAfter));
 assert.equal(getMagazineSearchCopy("cs").title, "Hledat v archivu");
 assert.equal(getMagazineSearchCopy("fr").title, "Search the archive");
 assert.ok(!looksLikeCzech(getMagazineSearchCopy("de").empty("glucose")));
+assert.equal(getFirmyDeskCopy("cs").title, "Inzerce na ViaLongeVita");
+assert.ok(!looksLikeCzech(getFirmyDeskCopy("fr").title));
+assert.ok(!looksLikeCzech(getFirmyDeskCopy("de").rooms.reklama.lead));
+assert.equal(getProMeCopy("cs").audiences.lekari.href, "/lekari");
+assert.ok(!looksLikeCzech(getProMeCopy("fr").title));
+assert.ok(!looksLikeCzech(getOdborneHubCopy("fr").briefyTitle));
+assert.ok(!novinkyTagsForLocale("fr").some((tag) => tag.href.includes("revmatologie")));
+assert.ok(novinkyTagsForLocale("cs").some((tag) => tag.href.includes("revmatologie")));
+assert.ok(!looksLikeCzech(getNovinkyCopy("de").tags.univerzity.title));
+assert.ok(
+  getPhysicianRoomDestinations("fr", "guidelines").every((item) => !looksLikeCzech(item.label))
+);
 assert.equal(
   translateNavHref("/odborne/briefy", "fr", { label: "Odborné briefy" }).label,
   "Briefs cliniques"

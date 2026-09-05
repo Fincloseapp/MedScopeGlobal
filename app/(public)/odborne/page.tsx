@@ -3,20 +3,33 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V19ArticleBriefFeedLazy } from "@/components/v19/article-brief-feed";
 import { V4cContentCard } from "@/components/v4c/content-card";
+import { getOdborneHubCopy } from "@/lib/i18n/odborne-hub-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { isCzechSurface } from "@/lib/i18n/surface-copy";
 import { getMedicalAiTexts, getStudySources } from "@/lib/queries/v4d/medical-ai";
 import { SPECIALTY_LABELS_CS } from "@/lib/v4d/constants";
 import type { V4dSpecialty } from "@/lib/v4d/constants";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
-export const metadata: Metadata = {
-  title: "Odborné AI texty",
-  description:
-    "Automatické odborné texty z univerzit CZ/SK/EU/svět — filtrace oborů, kvalita, překlady do češtiny.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getOdborneHubCopy(locale);
+  return await buildLocalizedV20PageMetadata({
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    path: "/odborne",
+    locale,
+  });
+}
 
 export default async function OdbornePage() {
+  const locale = await getServerLocale();
+  const copy = getOdborneHubCopy(locale);
+  const czech = isCzechSurface(locale);
   const [texts, sources] = await Promise.all([
     getMedicalAiTexts({ limit: 12 }),
-    getStudySources(),
+    czech ? getStudySources() : Promise.resolve([]),
   ]);
 
   const byRegion = {
@@ -28,63 +41,44 @@ export default async function OdbornePage() {
 
   return (
     <ModulePageShell
-      eyebrow="V4d · Odborné texty"
-      title="Odborné AI texty"
-      description="V5+: Groq AI, automatické citace (Vancouver/APA/Harvard), DOI, PubMed/FDA/EMA/SÚKL, evidence scoring A–D."
-      ctaHref="/odborne/ai"
-      ctaLabel="AI asistent"
+      eyebrow={copy.eyebrow}
+      title={copy.title}
+      description={copy.lead}
+      ctaHref={localizePublicHref("/odborne/ai", locale)}
+      ctaLabel={copy.cta}
+      homeHref={localizePublicHref("/", locale)}
     >
-      <div className="flex flex-wrap gap-2 text-sm mb-6">
-        <Link
-          href="/odborne/nejnovejsi"
-          className="rounded-full bg-[#005B96] px-3 py-1 text-white"
-        >
-          Nejnovější
-        </Link>
-        <Link
-          href="/odborne/kategorie"
-          className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]"
-        >
-          Kategorie
-        </Link>
-        <Link href="/odborne/citace" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
-          Citace
-        </Link>
-        <Link href="/odborne/zdroje" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
-          Zdroje
-        </Link>
-        <Link href="/odborne/doi" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
-          DOI
-        </Link>
-        <Link href="/odborne/pubmed" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
-          PubMed
-        </Link>
-        <Link href="/odborne/evidence" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
-          Evidence
-        </Link>
-        <Link href="/dashboard" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
-          V6 Dashboard
-        </Link>
-        <Link href="/autopilot" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
-          Autopilot
-        </Link>
-        <Link href="/odborne/briefy" className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]">
-          v19 Briefy
-        </Link>
+      <div className="mb-6 flex flex-wrap gap-2 text-sm">
+        {copy.nav.map((item) => (
+          <Link
+            key={item.href}
+            href={localizePublicHref(item.href, locale)}
+            className="rounded-full border border-[#8dc4ea] px-3 py-1 text-[#005B96]"
+          >
+            {item.label}
+          </Link>
+        ))}
       </div>
-      <V19ArticleBriefFeedLazy title="MedScope v19 — odborné briefy" limit={4} />
+      {czech ? (
+        <V19ArticleBriefFeedLazy title={copy.briefyFeedTitle} limit={4} locale="cs" />
+      ) : (
+        <p className="mb-6 rounded-2xl border border-dashed border-slate-200 bg-white p-5 text-sm text-slate-600">
+          {copy.briefyCsOnly}{" "}
+          <Link href="/cs/odborne/briefy" className="font-semibold text-[#005B96] hover:underline">
+            {copy.openCsBriefs}
+          </Link>
+        </p>
+      )}
       <div className="grid gap-4 sm:grid-cols-2">
         {texts.map((t) => (
           <V4cContentCard
             key={t.id}
-            href={`/odborne/${t.id}`}
+            href={localizePublicHref(`/odborne/${t.id}`, locale)}
             title={t.title}
             meta={[
-              t.specialty
-                ? SPECIALTY_LABELS_CS[t.specialty as V4dSpecialty] ?? t.specialty
-                : null,
+              t.specialty ? SPECIALTY_LABELS_CS[t.specialty as V4dSpecialty] ?? t.specialty : null,
               t.source_name,
-              t.quality_passed ? "✓ kvalita" : "review",
+              t.quality_passed ? copy.qualityOk : copy.qualityReview,
             ]
               .filter(Boolean)
               .join(" · ")}
@@ -93,26 +87,26 @@ export default async function OdbornePage() {
           />
         ))}
       </div>
-      {texts.length === 0 ? (
-        <p className="text-sm text-slate-600">
-          Zatím žádné texty — spusťte cron <code>medical-ai-fetch</code> nebo počkejte na denní běh (9:00 UTC).
-        </p>
+      {texts.length === 0 ? <p className="text-sm text-slate-600">{copy.empty}</p> : null}
+      {czech && sources.length > 0 ? (
+        <div className="mt-10 space-y-3 rounded-xl border border-dashed border-[#8dc4ea] bg-[#f8fcff] p-4 text-xs text-slate-600">
+          <p className="font-semibold text-[#021d33]">{copy.sourcesTitle}</p>
+          <p>
+            <strong>ČR:</strong> {byRegion.cz.map((s) => s.name).join(", ")}
+          </p>
+          <p>
+            <strong>SK:</strong> {byRegion.sk.map((s) => s.name).join(", ")}
+          </p>
+          <p>
+            <strong>EU:</strong> {byRegion.eu.map((s) => s.name).join(", ")}
+          </p>
+          <p>
+            <strong>Svět:</strong> {byRegion.world.map((s) => s.name).join(", ")}
+          </p>
+        </div>
+      ) : !czech ? (
+        <p className="mt-8 text-xs text-slate-500">{copy.sourcesNote}</p>
       ) : null}
-      <div className="mt-10 rounded-xl border border-dashed border-[#8dc4ea] bg-[#f8fcff] p-4 text-xs text-slate-600 space-y-3">
-        <p className="font-semibold text-[#021d33]">Monitorované instituce</p>
-        <p>
-          <strong>ČR:</strong> {byRegion.cz.map((s) => s.name).join(", ")}
-        </p>
-        <p>
-          <strong>SK:</strong> {byRegion.sk.map((s) => s.name).join(", ")}
-        </p>
-        <p>
-          <strong>EU:</strong> {byRegion.eu.map((s) => s.name).join(", ")}
-        </p>
-        <p>
-          <strong>Svět:</strong> {byRegion.world.map((s) => s.name).join(", ")}
-        </p>
-      </div>
     </ModulePageShell>
   );
 }

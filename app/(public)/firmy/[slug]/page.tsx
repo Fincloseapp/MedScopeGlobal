@@ -1,35 +1,30 @@
 import { notFound } from "next/navigation";
-import { V271HubPageView } from "@/components/v271/hub-page";
-import { V271B2BPricingTable } from "@/components/v271/b2b-pricing-table";
+import { FirmyDesk } from "@/components/firmy/firmy-desk";
+import { FIRMY_ROOM_SLUGS, getFirmyDeskCopy, isFirmyRoomId } from "@/lib/i18n/firmy-desk-copy";
 import { getServerLocale } from "@/lib/i18n/server-locale";
-import { V271_FIRMY_PAGES, buildV271HubMetadata } from "@/lib/v271/routes";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
 
-const SLUGS = Object.keys(V271_FIRMY_PAGES).filter((k) => k !== "index");
-
 export function generateStaticParams() {
-  return SLUGS.map((slug) => ({ slug }));
+  return FIRMY_ROOM_SLUGS.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const page = V271_FIRMY_PAGES[slug];
-  if (!page) return {};
-  return await buildV271HubMetadata("firmy", page);
+  if (!isFirmyRoomId(slug)) return {};
+  const locale = await getServerLocale();
+  const room = getFirmyDeskCopy(locale).rooms[slug];
+  return await buildLocalizedV20PageMetadata({
+    title: `${room.metaTitle} | MedScopeGlobal`,
+    description: room.metaDescription,
+    path: `/firmy/${slug}`,
+    locale,
+  });
 }
 
 export default async function FirmySubPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const page = V271_FIRMY_PAGES[slug];
-  if (!page) notFound();
-  const locale = await getServerLocale();
-
-  return (
-    <V271HubPageView
-      page={page}
-      section="firmy"
-      afterLinks={slug === "cenik" ? <V271B2BPricingTable locale={locale} /> : undefined}
-    />
-  );
+  if (!isFirmyRoomId(slug)) notFound();
+  return <FirmyDesk slug={slug} />;
 }

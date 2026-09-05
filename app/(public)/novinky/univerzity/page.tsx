@@ -1,16 +1,5 @@
-import { ModulePageShell } from "@/components/b2b/module-page-shell";
-import { NovinkyTagListing } from "@/components/novinky/novinky-tag-listing";
-import { getServerLocale } from "@/lib/i18n/server-locale";
+import { NovinkyTagPage } from "@/components/novinky/novinky-tag-page";
 
 export default async function Page() {
-  const locale = await getServerLocale();
-  return (
-    <ModulePageShell eyebrow="Novinky" title="Univerzity" description="Novinky z českých a zahraničních LF.">
-      <NovinkyTagListing
-        tag="univerzity"
-        locale={locale}
-        hrefForItem={(slug) => `/novinky/univerzity/${slug}`}
-      />
-    </ModulePageShell>
-  );
+  return <NovinkyTagPage tag="univerzity" hrefForItem={(slug) => `/novinky/univerzity/${slug}`} />;
 }
