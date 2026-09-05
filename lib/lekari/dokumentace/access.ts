@@ -1,6 +1,7 @@
 import { getVipStatus } from "@/lib/vip";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { getDokumentaceEligibility } from "@/lib/lekari/dokumentace/eligibility";
+import { getOrdiZapisApiCopy } from "@/lib/i18n/ordizapis-api-copy";
 
 const FREE_DAILY_LIMIT = 3;
 const VIP_DAILY_LIMIT = 40;
@@ -58,18 +59,20 @@ async function hasPhysicianAccessLevel(userId: string): Promise<boolean> {
  * 2) daily quota (3 non-VIP / 40 VIP)
  */
 export async function assertDokumentaceAccess(
-  userId: string | undefined
+  userId: string | undefined,
+  locale?: string | null
 ): Promise<DokumentaceAccessResult> {
+  const copy = getOrdiZapisApiCopy(locale);
   if (!userId) {
     return {
       ok: false,
       status: 401,
-      error: "Pro OrdiZapis od MedScopeGlobal se musíte přihlásit.",
+      error: copy.unauthShort,
       code: "UNAUTHENTICATED",
     };
   }
 
-  const eligibility = await getDokumentaceEligibility(userId);
+  const eligibility = await getDokumentaceEligibility(userId, locale);
   if (!eligibility.eligible) {
     return {
       ok: false,
@@ -94,15 +97,14 @@ export async function assertDokumentaceAccess(
       return {
         ok: false,
         status: 402,
-        error:
-          "Vyčerpán denní demo limit (3 zápisy). Předplatné OrdiZapis nebo Lékař v praxi odemyká až 40 zápisů denně.",
+        error: copy.quotaDemo,
         code: "PAYMENT_REQUIRED",
       };
     }
     return {
       ok: false,
       status: 429,
-      error: "Vyčerpán denní limit OrdiZapis (40 zápisů / 24 h). Zkuste později.",
+      error: copy.quotaVip,
       code: "RATE_LIMITED",
     };
   }

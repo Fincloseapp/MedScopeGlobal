@@ -10,6 +10,8 @@ const LOCALE_TO_SEGMENT: Record<GlobalLocaleCode, string> = {
   fr: "fr",
   it: "it",
   es: "es",
+  pt: "pt",
+  "pt-BR": "pt-br",
   ro: "ro",
   hu: "hu",
   ru: "ru",
@@ -22,6 +24,7 @@ const LOCALE_TO_SEGMENT: Record<GlobalLocaleCode, string> = {
   id: "id",
   en: "en",
   "en-US": "en-us",
+  "en-UK": "en-uk",
 };
 
 const SEGMENT_TO_LOCALE: Record<string, GlobalLocaleCode> = {
@@ -32,6 +35,9 @@ const SEGMENT_TO_LOCALE: Record<string, GlobalLocaleCode> = {
   fr: "fr",
   it: "it",
   es: "es",
+  pt: "pt",
+  "pt-br": "pt-BR",
+  "pt-pt": "pt",
   ro: "ro",
   hu: "hu",
   ru: "ru",
@@ -47,7 +53,8 @@ const SEGMENT_TO_LOCALE: Record<string, GlobalLocaleCode> = {
   id: "id",
   en: "en",
   "en-us": "en-US",
-  "en-uk": "en",
+  "en-uk": "en-UK",
+  "en-gb": "en-UK",
 };
 
 /** Non-canonical path segments that should 308 to the canonical prefix. */
@@ -55,6 +62,7 @@ const ALIAS_SEGMENT_REDIRECT: Record<string, string> = {
   ja: "jp",
   "zh-cn": "cn",
   ko: "kr",
+  "pt-pt": "pt",
 };
 
 export const LOCALE_PATH_SEGMENTS = GLOBAL_LOCALES.map((l) => localeToPathSegment(l.code));
@@ -62,6 +70,11 @@ export const LOCALE_PATH_SEGMENTS = GLOBAL_LOCALES.map((l) => localeToPathSegmen
 export function resolveGlobalLocale(input: string): GlobalLocaleCode {
   const lower = input.toLowerCase();
   if (lower === "en-us" || lower === "en_us") return "en-US";
+  if (lower === "en-uk" || lower === "en_uk" || lower === "en-gb" || lower === "en_gb") {
+    return "en-UK";
+  }
+  if (lower === "pt-br" || lower === "pt_br") return "pt-BR";
+  if (lower === "pt-pt" || lower === "pt_pt") return "pt";
   if (lower === "zh-cn" || lower === "cn") return "zh-CN";
   if (lower === "jp" || lower === "ja") return "ja";
   if (lower === "kr" || lower === "ko") return "ko";
@@ -97,6 +110,21 @@ export function canonicalLocalePathname(pathname: string): string | null {
   if (!canonicalSeg) return null;
   const rest = segments.slice(1);
   return rest.length === 0 ? `/${canonicalSeg}` : `/${canonicalSeg}/${rest.join("/")}`;
+}
+
+/** Path prefix wins over a leftover language-switcher cookie. */
+export function localeFromRequestHints(input: {
+  localeHeader?: string | null;
+  pathname?: string | null;
+  cookie?: string | null;
+}): ReturnType<typeof normalizeLocale> {
+  if (input.localeHeader) return normalizeLocale(input.localeHeader);
+  if (input.pathname) {
+    const { locale } = resolveLocalePath(input.pathname);
+    if (locale) return normalizeLocale(locale);
+  }
+  if (input.cookie) return normalizeLocale(input.cookie);
+  return normalizeLocale("cs");
 }
 
 export function resolveLocalePath(pathname: string): {
@@ -140,14 +168,21 @@ const LOCALE_EXCLUDED_PREFIXES = [
   "/auth/",
   "/dashboard",
   "/go/",
+  "/__ms/",
+  "/relay/",
   "/_next/",
   "/sw-",
+  "/feed/",
+  "/sitemaps/",
 ];
 
 const LOCALE_EXCLUDED_EXACT = new Set([
   "/robots.txt",
   "/sitemap.xml",
   "/favicon.ico",
+  "/ads.txt",
+  "/llms.txt",
+  "/news-sitemap.xml",
 ]);
 
 /** Paths that must not receive locale redirect/rewrite (PWAs, API, admin, assets). */

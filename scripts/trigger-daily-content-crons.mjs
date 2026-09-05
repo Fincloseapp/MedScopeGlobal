@@ -26,17 +26,17 @@ if (!secret || secret.length < 16) {
 }
 
 const base = env.PRODUCTION_URL ?? "https://medscopeglobal.com";
-const writerLimit = env.PUBLIC_WRITER_LIMIT ?? "4";
 
 const jobs = [
   { name: "ingest", path: "/api/cron/ingest" },
   { name: "v4c-drugs", path: "/api/cron/v4c-drugs" },
-  { name: "public-articles", path: `/api/cron/public-articles?limit=${writerLimit}` },
+  { name: "public-articles", path: `/api/cron/public-articles?limit=1&skipAds=1&skipCovers=1` },
   { name: "v19-daily-briefs", path: "/api/cron/v19-daily-briefs" },
   { name: "daily-pubmed-update", path: "/api/cron/daily-pubmed-update" },
   { name: "daily-autopublish", path: "/api/cron/daily-autopublish" },
   { name: "v24-ultra", path: "/api/cron/v24-ultra" },
-  { name: "v25-enterprise", path: "/api/cron/v25-enterprise" },
+  { name: "v25-enterprise", path: "/api/cron/v25-enterprise?mode=quick" },
+  { name: "conversion-renewals", path: "/api/cron/conversion-renewals" },
   { name: "v26-rewrite", path: "/api/cron/v26-rewrite?batch=6" },
   { name: "v26-autonomous", path: "/api/cron/v26-autonomous?skipDeploy=1" },
   { name: "v25-images", path: "/api/cron/v25-images" },

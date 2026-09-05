@@ -1,12 +1,18 @@
 import { unstable_cache } from "next/cache";
 import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
-import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-audit";
-import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rules";
-import { mixListableFeed } from "@/lib/v271/news-desks";
+import { filterActiveArticles } from "@/lib/v20/content-rules";
+import {
+  isHomepageDeskArticle,
+  pinHomepageDesks,
+  prependUniqueArticles,
+} from "@/lib/v271/news-desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
+import { mergeNativeDeskFeed } from "@/lib/editorial/native-desk-articles";
 import type { AdRow } from "@/types/database";
 
 const articleSelect = `
@@ -51,34 +57,68 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
 
   const supabase = tryCreateServiceRoleClient();
   if (!supabase) {
-    return mixListableFeed(getDemoMagazineArticles(), 36);
+    return pinHomepageDesks(
+      mergeNativeDeskFeed(getDemoMagazineArticles(), locale),
+      48,
+      locale
+    );
   }
 
-  const { data, error } = await supabase
-    .from("articles")
-    .select(articleSelect)
-    .eq("published", true)
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(72);
+  const [{ data, error }, section] = await Promise.all([
+    supabase
+      .from("articles")
+      .select(articleSelect)
+      .eq("published", true)
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(160),
+    supabase
+      .from("articles")
+      .select(articleSelect)
+      .eq("published", true)
+      .eq("metadata->>section", "aktuální-zprávy")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(24),
+  ]);
 
   if (error) {
     console.error("loadArticlesPublic", error);
-    return mixListableFeed(getDemoMagazineArticles(), 36);
+    return pinHomepageDesks(
+      mergeNativeDeskFeed(getDemoMagazineArticles(), locale),
+      48,
+      locale
+    );
   }
 
-  const mapped = mapArticleList(data as Record<string, unknown>[] | null);
-  const active = filterCzechContent(filterActiveArticles(mapped), locale);
-  const publicOnly = filterMagazineListableArticles(
-    active.filter((a) => !a.vip_only)
+  const mapped = prependUniqueArticles(
+    mapArticleList((section.data ?? []) as Record<string, unknown>[]),
+    mapArticleList(data as Record<string, unknown>[] | null)
   );
-  const prepared = await prepareArticlesForDisplay(publicOnly, normalizeLocale(locale), {
+  const localeKey = normalizeLocale(locale);
+  const active = filterArticlesForLocale(
+    filterActiveArticles(mapped),
+    localeKey,
+    primaryArticleLocale(localeKey) === "cs"
+      ? undefined
+      : { minNative: 8, courtesyBorrow: 2, maxBorrow: 4 }
+  );
+  const publicOnly = active.filter(
+    (article) => !article.vip_only && isHomepageDeskArticle(article, new Date(), localeKey)
+  );
+  const withDesk = mergeNativeDeskFeed(publicOnly, localeKey);
+  const feed = primaryArticleLocale(localeKey) === "cs" ? withDesk : withDesk.slice(0, 48);
+  const prepared = await prepareArticlesForDisplay(feed, localeKey, {
     mode: "card",
-    maxTranslate: 16,
+    maxTranslate: 12,
+    maxLive: 0,
   });
   if (prepared.length === 0) {
-    return mixListableFeed(getDemoMagazineArticles(), 36);
+    return pinHomepageDesks(
+      mergeNativeDeskFeed(getDemoMagazineArticles(), localeKey),
+      48,
+      localeKey
+    );
   }
-  return mixListableFeed(prepared, 36);
+  return pinHomepageDesks(prepared, 48, localeKey);
 }
 
 async function loadHomepageData(locale: string): Promise<{
@@ -96,10 +136,44 @@ async function loadHomepageData(locale: string): Promise<{
   return { articles, topAds, midAds, bottomAds };
 }
 
+async function loadHomepageDataOrFallback(locale: string) {
+  const fallback = async () => {
+    const { getDemoMagazineArticles } = await import(
+      "@/lib/verejnost/demo-magazine-articles"
+    );
+    return {
+      articles: pinHomepageDesks(
+        mergeNativeDeskFeed(getDemoMagazineArticles(), locale),
+        48,
+        locale
+      ),
+      topAds: [] as AdRow[],
+      midAds: [] as AdRow[],
+      bottomAds: [] as AdRow[],
+    };
+  };
+
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      loadHomepageData(locale),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("homepage-timeout")), 8_000);
+      }),
+    ]);
+  } catch (error) {
+    console.error("getHomepageCachedData", error);
+    return fallback();
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 export function getHomepageCachedData(locale = "cs") {
+  const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
-    () => loadHomepageData(locale),
-    ["v22-homepage-public-v8-vialongevita", locale],
+    () => loadHomepageDataOrFallback(locale),
+    ["v22-homepage-public-v21-related-borrow-v23-18-no-double-section", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

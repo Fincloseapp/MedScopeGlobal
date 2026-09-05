@@ -2,8 +2,17 @@ import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { isValidClkId } from "@/lib/academy/b2b/verification";
 import { listPartnerMemberships } from "@/lib/academy/b2b/db";
 import { getVipSubscription } from "@/lib/vip";
-import { buildValidityLabel, guestAccess } from "@/lib/apps/access-status";
+import { guestAccess } from "@/lib/apps/access-status";
 import type { AppAccessInfo } from "@/lib/apps/access-status";
+import {
+  fillOrdiApi,
+  getOrdiZapisApiCopy,
+  ordiZapisValidityLabel,
+} from "@/lib/i18n/ordizapis-api-copy";
+import {
+  ordizapisLoginHref,
+  ordizapisSubscribeHref,
+} from "@/lib/i18n/ordizapis-app-copy";
 
 export type DokumentaceEligibility = {
   eligible: boolean;
@@ -90,22 +99,28 @@ async function loadUserRow(userId: string): Promise<UserEligibilityRow | null> {
  * TestD qualifies via verified_doctor + admin + physician access_level.
  */
 export async function getDokumentaceEligibility(
-  userId: string | undefined
+  userId: string | undefined,
+  locale?: string | null
 ): Promise<DokumentaceEligibility> {
-  const loginUrl = "/login?next=/app/dokumentace";
-  const subscribeUrl = "/predplatne#dokumentace";
+  const copy = getOrdiZapisApiCopy(locale);
+  const loginUrl = ordizapisLoginHref(locale);
+  const subscribeUrl = ordizapisSubscribeHref(locale);
 
   if (!userId) {
+    const access = guestAccess(loginUrl, subscribeUrl, copy.hostLabel);
     return {
       eligible: false,
       canInstall: false,
       reason: "unauthenticated",
       verifiedDoctor: false,
       facilities: [],
-      message:
-        "Pro stažení a používání OrdiZapis od MedScopeGlobal se přihlaste ověřeným lékařským účtem.",
+      message: copy.unauthMessage,
       isVip: false,
-      access: guestAccess(loginUrl, subscribeUrl, "Host · vyžaduje ověřeného lékaře"),
+      access: {
+        ...access,
+        accountLabel: copy.notSignedIn,
+        validityLabel: copy.validityAfterLogin,
+      },
     };
   }
 
@@ -118,16 +133,16 @@ export async function getDokumentaceEligibility(
       userId,
       verifiedDoctor: false,
       facilities: [],
-      message: "Nepodařilo se ověřit účet. Zkuste to znovu.",
+      message: copy.accountUnavailable,
       isVip: false,
       access: {
         authenticated: true,
-        accountLabel: "Účet MedScope",
+        accountLabel: copy.accountMedscope,
         email: null,
-        planLabel: "Nelze ověřit",
+        planLabel: copy.cannotVerify,
         entitled: false,
         validUntil: null,
-        validityLabel: "zkontrolujte připojení",
+        validityLabel: copy.checkConnection,
         loginUrl,
         subscribeUrl,
       },
@@ -148,7 +163,7 @@ export async function getDokumentaceEligibility(
 
   const vip = await getVipSubscription(userId);
   const eligible = isEligibleFromRow(row, facilities.length > 0);
-  const accountLabel = row.full_name || row.email || "Účet MedScope";
+  const accountLabel = row.full_name || row.email || copy.accountMedscope;
 
   if (!eligible) {
     return {
@@ -163,17 +178,17 @@ export async function getDokumentaceEligibility(
       role: row.role,
       clkId: row.clk_id,
       facilities,
-      message:
-        "Stažení a plné používání OrdiZapis je jen pro ověřené lékaře (nebo účet zdravotnického zařízení). Dokončete ověření v Lékařské zóně.",
+      message: copy.notVerifiedMessage,
       isVip: vip.active,
       access: {
         authenticated: true,
         accountLabel,
         email: row.email,
-        planLabel: "Čeká na ověření lékaře",
+        planLabel: copy.waitingVerification,
         entitled: false,
         validUntil: vip.endsAt,
-        validityLabel: buildValidityLabel({
+        validityLabel: ordiZapisValidityLabel({
+          locale,
           authenticated: true,
           entitled: false,
           endsAt: vip.endsAt,
@@ -184,9 +199,7 @@ export async function getDokumentaceEligibility(
     };
   }
 
-  const planLabel = vip.active
-    ? "Lékař · předplatné OrdiZapis"
-    : "Ověřený lékařský účet";
+  const planLabel = vip.active ? copy.planPhysicianSub : copy.planVerified;
 
   return {
     eligible: true,
@@ -202,8 +215,13 @@ export async function getDokumentaceEligibility(
     facilities,
     message:
       facilities.length > 0
-        ? `Účet propojen: ${row.full_name || "lékař"} · ${facilities.map((f) => f.name).join(", ")}`
-        : `Účet propojen: ${row.full_name || row.email || "ověřený lékař"}`,
+        ? fillOrdiApi(copy.linkedFacilities, {
+            name: row.full_name || copy.physicianName,
+            facilities: facilities.map((f) => f.name).join(", "),
+          })
+        : fillOrdiApi(copy.linkedNamed, {
+            name: row.full_name || row.email || copy.verifiedPhysicianName,
+          }),
     isVip: vip.active,
     access: {
       authenticated: true,
@@ -212,7 +230,8 @@ export async function getDokumentaceEligibility(
       planLabel,
       entitled: true,
       validUntil: vip.endsAt,
-      validityLabel: buildValidityLabel({
+      validityLabel: ordiZapisValidityLabel({
+        locale,
         authenticated: true,
         entitled: true,
         endsAt: vip.endsAt,

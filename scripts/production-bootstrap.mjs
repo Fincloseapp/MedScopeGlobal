@@ -62,8 +62,8 @@ console.log(`\n✓ Categories: ${cat ?? 0}`);
 console.log(`✓ Published articles: ${art ?? 0} (cs: ${cs ?? 0})`);
 console.log(`
 Next for https://medscopeglobal.com:
-  1. Vercel env: NEXT_PUBLIC_SITE_URL=https://medscopeglobal.com
+  1. Cloudflare Worker env: NEXT_PUBLIC_SITE_URL=https://medscopeglobal.com
   2. Supabase Auth redirect: https://medscopeglobal.com/auth/callback
-  3. Vercel cron uses CRON_SECRET (already in vercel.json every 6h)
-  4. Deploy: vercel --prod  (or push to connected Git repo)
+  3. GitHub Actions cloudflare-cron.yml uses CRON_SECRET
+  4. Deploy: pnpm cf:deploy  (or push to main)
 `);

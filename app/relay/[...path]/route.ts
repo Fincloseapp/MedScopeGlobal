@@ -1,0 +1,84 @@
+import { NextResponse } from "next/server";
+import { resolveGaMeasurementId } from "@/lib/analytics/ga";
+
+export const dynamic = "force-dynamic";
+
+type Params = { params: Promise<{ path: string[] }> };
+
+/**
+ * Script fallback for GA4 when googletagmanager.com is blocked.
+ * Do not point gtag transport_url here — a Worker reverse-proxy is
+ * not server-side GTM. Collect then arrives from Cloudflare IPs and
+ * GA4 Realtime stays at 0. Collect must leave the browser.
+ *
+ * Must not live under app/__ms — Next.js treats `_`-prefixed folders
+ * as private, so that hop 404'd.
+ */
+async function proxy(request: Request, path: string[]) {
+  const incoming = new URL(request.url);
+  const segments = path.filter(Boolean);
+  const first = segments[0] ?? "";
+  const rest = segments.join("/");
+
+  let dest: URL;
+  if (first === "js") {
+    dest = new URL("https://www.googletagmanager.com/gtag/js");
+    dest.search = incoming.search;
+    if (!dest.searchParams.get("id")) {
+      dest.searchParams.set("id", resolveGaMeasurementId());
+    }
+  } else {
+    dest = new URL(`https://www.google-analytics.com/${rest || "g/collect"}`);
+    dest.search = incoming.search;
+  }
+
+  const headers = new Headers();
+  const contentType = request.headers.get("content-type");
+  if (contentType) headers.set("content-type", contentType);
+  const ua = request.headers.get("user-agent");
+  if (ua) headers.set("user-agent", ua);
+  const ip =
+    request.headers.get("cf-connecting-ip") ||
+    request.headers.get("x-forwarded-for") ||
+    request.headers.get("x-real-ip");
+  if (ip) headers.set("x-forwarded-for", ip.split(",")[0]!.trim());
+
+  const init: RequestInit = {
+    method: request.method,
+    headers,
+    redirect: "follow",
+  };
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    init.body = await request.arrayBuffer();
+  }
+
+  try {
+    const upstream = await fetch(dest.toString(), init);
+    const out = new Headers();
+    const content = upstream.headers.get("content-type");
+    if (content) out.set("content-type", content);
+    out.set("access-control-allow-origin", incoming.origin || "https://medscopeglobal.com");
+    // Never CDN-cache collect. The catch-all page s-maxage was swallowing hits.
+    if (first === "js") {
+      out.set("cache-control", "public, max-age=300, stale-while-revalidate=86400");
+    } else {
+      out.set("cache-control", "private, no-cache, no-store, must-revalidate");
+    }
+    return new Response(upstream.body, { status: upstream.status, headers: out });
+  } catch {
+    return new NextResponse(null, {
+      status: 204,
+      headers: { "cache-control": "private, no-cache, no-store, must-revalidate" },
+    });
+  }
+}
+
+export async function GET(request: Request, { params }: Params) {
+  const { path } = await params;
+  return proxy(request, path);
+}
+
+export async function POST(request: Request, { params }: Params) {
+  const { path } = await params;
+  return proxy(request, path);
+}

@@ -75,6 +75,17 @@ export default function PrivacyPage() {
         spravujete na stránce{" "}
         <Link href="/cookies">Cookies</Link>.
       </p>
+      <p>
+        Na veřejném magazínu ViaLongeVita (včetně jazykových mutací) zobrazujeme reklamy přes
+        Google AdSense (vydavatel <code>ca-pub-6820104998820692</code>). V EHP, UK a Švýcarsku
+        souhlas řeší certifikovaná CMP od Googlu (Funding Choices), ne naše vlastní marketingové
+        cookie. Google může zpracovávat identifikátory zařízení a měřit zobrazení dle svých{" "}
+        <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">
+          zásad ochrany soukromí
+        </a>
+        . Reklamy nenačítáme v administraci, v aplikacích lékaře/studenta ani na affiliate
+        přesměrování.
+      </p>
 
       <h2>4. Newsletter</h2>
       <p>

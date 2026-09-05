@@ -1,5 +1,5 @@
 /**
- * Apply dokumentace_notes migration via Supabase Management API (service / access token).
+ * Apply dokumentace_notes + RLS harden via Supabase Management API.
  * Fallback: prints SQL for Dashboard SQL Editor.
  */
 import fs from "node:fs";
@@ -7,8 +7,10 @@ import path from "node:path";
 import { projectPath } from "../lib/config/paths.mjs";
 
 const root = projectPath();
-const migrationRel = "supabase/migrations/20260808000000_dokumentace_notes.sql";
-const migrationPath = path.join(root, migrationRel);
+const migrationRels = [
+  "supabase/migrations/20260808000000_dokumentace_notes.sql",
+  "supabase/migrations/20260904000000_dokumentace_notes_rls_harden.sql",
+];
 
 function loadEnv() {
   const env = {};
@@ -32,8 +34,14 @@ async function getTokenFromFile() {
   return null;
 }
 
+function accessOk(t, r) {
+  return Boolean(t && r);
+}
+
 const env = loadEnv();
-const sql = fs.readFileSync(migrationPath, "utf8");
+const sql = migrationRels
+  .map((rel) => fs.readFileSync(path.join(root, rel), "utf8"))
+  .join("\n\n");
 const ref =
   env.SUPABASE_PROJECT_REF ||
   env.NEXT_PUBLIC_SUPABASE_URL?.match(/https:\/\/([^.]+)/)?.[1];
@@ -59,8 +67,4 @@ if (!res.ok) {
   console.error("Failed:", res.status, text.slice(0, 400));
   process.exit(1);
 }
-console.log("✓ dokumentace_notes table applied");
-
-function accessOk(t, r) {
-  return Boolean(t && r);
-}
+console.log("✓ dokumentace_notes RLS applied");

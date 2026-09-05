@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Force UI rebuild + ISR invalidation + Vercel edge purge + production verify (v19.9).
+ * Force UI rebuild + ISR invalidation + production verify (v19.9).
  * Run: node scripts/fix-ui-v19.9-production.mjs
  */
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -33,9 +33,6 @@ function loadEnv() {
 
 const env = loadEnv();
 const CRON_SECRET = env.CRON_SECRET;
-const VERCEL_TOKEN = env.VERCEL_TOKEN;
-const PROJECT_ID = env.VERCEL_PROJECT_ID || "prj_xewXFpK1L2PYN9kaqPrilPluQOEj";
-const TEAM_ID = env.VERCEL_ORG_ID || env.VERCEL_TEAM_ID || "team_m1FSjvKjWV9Wgm1WhEycgHqJ";
 
 const report = { steps: [], failed: false, timestamp: new Date().toISOString() };
 
@@ -84,7 +81,7 @@ async function checkUi(phase) {
       skeleton: /ArticleBriefSkeleton|animate-pulse/i.test(text),
       deepLinkAttr: /data-v19-deep-link/i.test(text),
       v19BriefCard: /v19-brief-card/i.test(text),
-      cache: res.headers.get("x-vercel-cache"),
+      cache: res.headers.get("cf-cache-status"),
     };
     const ok =
       markers.status === 200 &&
@@ -128,36 +125,7 @@ async function checkApi(phase) {
 }
 
 async function purgeEdgeCache() {
-  if (!VERCEL_TOKEN) {
-    log("edge-purge", true, "skipped — no VERCEL_TOKEN (deploy invalidates static chunks)");
-    return;
-  }
-  const tags = ["medscope-ui-v19.9", "medscope-pages"];
-  for (const endpoint of [
-    "invalidate-by-tags",
-    "dangerously-delete-by-tags",
-  ]) {
-    try {
-      const qs = new URLSearchParams({ projectIdOrName: PROJECT_ID, teamId: TEAM_ID });
-      const res = await fetch(`https://api.vercel.com/v1/edge-cache/${endpoint}?${qs}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${VERCEL_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ tags, target: "production" }),
-        signal: AbortSignal.timeout(30_000),
-      });
-      const body = await res.text();
-      if (res.ok) {
-        log("edge-purge", true, `${endpoint} OK tags=${tags.join(",")}`);
-        return;
-      }
-      log("edge-purge-try", res.status !== 404, `${endpoint} ${res.status}: ${body.slice(0, 120)}`);
-    } catch (e) {
-      log("edge-purge-try", false, `${endpoint}: ${e.message}`);
-    }
-  }
+  log("edge-purge", true, "Cloudflare Worker HTML — no third-party edge purge");
 }
 
 async function invalidateIsr() {

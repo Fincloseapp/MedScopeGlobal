@@ -131,4 +131,4 @@ Never commit secrets. Use Cursor Secrets, D: `.env.local`, or Cloudflare dashboa
 
 ### Repo hygiene note
 - The repo root is cluttered with transient scratch/log files (`_poll-*.mjs`, `*-log.txt`,
-  `*-audit*.md`, `tmp-*`, `vercel.json.bak`). These are not part of the app.
+  `*-audit*.md`, `tmp-*`). These are not part of the app.

@@ -12,6 +12,11 @@ import {
   getStripeSecretKey,
   stripeWebhookCryptoProvider,
 } from "@/lib/stripe/client";
+import { isPhysicianGrantProduct, isStudentGrantProduct } from "@/lib/v27/config";
+import {
+  grantStudentClubAccess,
+  revokeStudentClubAccess,
+} from "@/lib/billing/student-entitlement";
 
 export const dynamic = "force-dynamic";
 
@@ -62,11 +67,6 @@ function extractObjectId(obj: unknown): string | undefined {
   if (!obj || typeof obj !== "object") return undefined;
   const id = (obj as { id?: string }).id;
   return typeof id === "string" ? id : undefined;
-}
-
-function isPhysicianGrantProduct(productId: string | undefined | null): boolean {
-  if (!productId) return false;
-  return productId.startsWith("physician-") || productId.startsWith("dokumentace-");
 }
 
 async function resolveV27UserId(
@@ -285,16 +285,23 @@ export async function POST(request: Request) {
         event.type === "customer.subscription.deleted" ||
         sub.status === "canceled"
       ) {
-        if (subUserId) {
+        if (subUserId && isPhysicianGrantProduct(productId)) {
           await deactivateVipForUser(admin, subUserId);
+        }
+        if (subUserId && isStudentGrantProduct(productId)) {
+          await revokeStudentClubAccess(subUserId);
         }
       } else if (
         (sub.status === "active" || sub.status === "trialing") &&
-        isPhysicianGrantProduct(productId) &&
         subUserId &&
         productId
       ) {
-        await grantV27PhysicianAccess(admin, subUserId, productId, periodEndIso);
+        if (isPhysicianGrantProduct(productId)) {
+          await grantV27PhysicianAccess(admin, subUserId, productId, periodEndIso);
+        }
+        if (isStudentGrantProduct(productId)) {
+          await grantStudentClubAccess(subUserId);
+        }
       }
 
       await logSecurityEvent({
@@ -386,7 +393,11 @@ export async function POST(request: Request) {
 
         const kind = session.metadata?.kind ?? "";
         const productId = session.metadata?.product_id;
-        if (kind.includes("subscription") && isPhysicianGrantProduct(productId) && productId) {
+        if (
+          kind.includes("subscription") &&
+          productId &&
+          (isPhysicianGrantProduct(productId) || isStudentGrantProduct(productId))
+        ) {
           let periodEndIso: string | null = null;
           let subscriptionUserId: string | null = null;
           if (subscriptionId) {
@@ -405,8 +416,11 @@ export async function POST(request: Request) {
             subscriptionUserId,
             sessionId: session.id,
           });
-          if (resolvedUserId) {
+          if (resolvedUserId && isPhysicianGrantProduct(productId)) {
             await grantV27PhysicianAccess(admin, resolvedUserId, productId, periodEndIso);
+          }
+          if (resolvedUserId && isStudentGrantProduct(productId)) {
+            await grantStudentClubAccess(resolvedUserId);
           }
         }
 

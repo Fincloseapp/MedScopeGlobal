@@ -8,18 +8,13 @@ import type { AppUser, Category } from "@/types/database";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import type { StoredNudge } from "@/lib/v38/conversion-engine";
 import {
-  daySeed,
   getStaticCopy,
-  getStudentiNavStripCopy,
-  getVerejnostNavStripCopy,
-  getLekariNavStripCopy,
-  getMediFlowNavStripCopy,
-  getVipNavStripCopy,
-  isStudentAudiencePath,
-  isPublicAudiencePath,
-  isPhysicianAudiencePath,
   isMediFlowAudiencePath,
+  isPhysicianAudiencePath,
+  isPublicAudiencePath,
+  isStudentAudiencePath,
   isVipAudiencePath,
+  navStripForPath,
 } from "@/lib/v38/conversion-copy";
 
 type ReaderPayload = {
@@ -41,6 +36,7 @@ type Props = {
   locale: string;
   region: string;
   navStripCopy?: StoredNudge;
+  initialPathname?: string;
 };
 
 /** v38 — header + optional conversion strip for non-VIP */
@@ -49,8 +45,9 @@ export function SiteHeaderWithConversion({
   locale,
   region,
   navStripCopy,
+  initialPathname,
 }: Props) {
-  const pathname = usePathname();
+  const pathname = usePathname() || initialPathname || "";
   const studentPath = isStudentAudiencePath(pathname);
   const publicPath = isPublicAudiencePath(pathname);
   const physicianPath = isPhysicianAudiencePath(pathname);
@@ -68,17 +65,13 @@ export function SiteHeaderWithConversion({
     );
   }, [pathname]);
   const audienceStrip = useMemo(() => {
-    if (mediflowPath) return { ...getMediFlowNavStripCopy(), generatedBy: "static" as const };
-    if (vipPath) return { ...getVipNavStripCopy(), generatedBy: "static" as const };
-    if (studentPath) return { ...getStudentiNavStripCopy(daySeed()), generatedBy: "static" as const };
-    if (publicPath) return { ...getVerejnostNavStripCopy(), generatedBy: "static" as const };
-    if (physicianPath) return { ...getLekariNavStripCopy(), generatedBy: "static" as const };
-    return null;
-  }, [studentPath, publicPath, physicianPath, mediflowPath, vipPath]);
+    const copy = navStripForPath(pathname, locale);
+    return copy ? { ...copy, generatedBy: "static" as const } : null;
+  }, [pathname, locale]);
 
   const [reader, setReader] = useState<ReaderPayload>(DEFAULT_READER);
   const [stripCopy, setStripCopy] = useState<StoredNudge>(
-    navStripCopy ?? { ...getStaticCopy("nav_strip"), generatedBy: "static" }
+    navStripCopy ?? { ...getStaticCopy("nav_strip", 0, locale), generatedBy: "static" }
   );
 
   useEffect(() => {
@@ -116,6 +109,7 @@ export function SiteHeaderWithConversion({
         profile={reader.profile}
         isVip={reader.isVip}
         accessLevel={reader.accessLevel}
+        studentSurface={studentPath}
       />
       {!reader.isVip && !isMagazineHome ? (
         <SubscriptionNudgeStrip
@@ -129,7 +123,9 @@ export function SiteHeaderWithConversion({
                   ? "nav-strip-student-trial"
                   : publicPath
                     ? "nav-strip-public-app"
-                    : "nav-strip-trial"
+                    : physicianPath
+                      ? "nav-strip-physician"
+                      : "nav-strip-trial"
           }
         />
       ) : null}

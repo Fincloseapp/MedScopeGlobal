@@ -19,6 +19,16 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       "Dvě cesty: příprava na přijímačky LF, nebo materiály a testy pro studenty fakulty. Začněte zdarma.",
     links: [
       {
+        label: "Klub kvízů",
+        href: "/studenti/klub",
+        description: "Soutěžní kvízy, žebříček přezdívek — 1 test zdarma",
+      },
+      {
+        label: "Žebříček",
+        href: "/studenti/zebricek",
+        description: "Nejlepší nicky z kvízů — bez falešných jmen",
+      },
+      {
         label: "Chci na medicínu",
         href: "/studenti/chci-studovat",
         description: "Přijímačky, přípravné kurzy a self-test",
@@ -49,7 +59,7 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       { label: "Studijní plány", href: "/medicina/plany", description: "Harmonogramy 1.–6. ročník" },
     ],
     ctaHref: "/predplatne",
-    ctaLabel: "Studentské předplatné 149 Kč",
+    ctaLabel: "Studentské předplatné 89 / 149 Kč",
   },
   testy: {
     slug: "testy",
@@ -57,6 +67,11 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
     description:
       "Self-test přijímaček, Academy kvízy a studijní hry — s okamžitou zpětnou vazbou. Nejde o oficiální fakultní zkoušku.",
     links: [
+      {
+        label: "Klub kvízů a žebříček",
+        href: "/studenti/klub",
+        description: "Soutěžní kola z banky přijímaček — 1 test zdarma",
+      },
       {
         label: "Self-test přijímaček",
         href: "/academy/prijimacky/self-test",
@@ -80,8 +95,8 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       { label: "Chci studovat medicínu", href: "/studenti/chci-studovat" },
       {
         label: "Studentské předplatné",
-        href: "/predplatne?trial=1#student",
-        description: "Neomezené procvičení — od 149 Kč/měsíc, trial zdarma",
+        href: "/predplatne#student",
+        description: "Neomezené procvičení — 89 Kč, pak 149 Kč",
       },
     ],
     ctaHref: "/academy/prijimacky/self-test",
@@ -113,8 +128,8 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       { label: "AI tutor", href: "/studenti/ai-tutor", description: "Dotazy k látce" },
       {
         label: "Studentské předplatné",
-        href: "/predplatne?trial=1#student",
-        description: "Plný přístup během semestru — od 149 Kč/měsíc",
+        href: "/predplatne#student",
+        description: "Plný přístup během semestru — 89 Kč, pak 149 Kč",
       },
     ],
     ctaHref: "/medicina/plany",
@@ -138,8 +153,8 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       },
       {
         label: "Studentské předplatné",
-        href: "/predplatne?trial=1#student",
-        description: "Plný AI tutor bez free omezení — trial zdarma",
+        href: "/predplatne#student",
+        description: "Plný AI tutor — 1 test zdarma, 89 Kč, pak 149 Kč",
       },
     ],
     ctaHref: "/ai-asistent/student",
@@ -150,15 +165,10 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
 export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
   index: {
     slug: "",
-    title: "Pro lékaře a vědce",
+    title: "Pro lékaře v praxi",
     description:
-      "Evidence-based guidelines, kurátorované studie s DOI/PMID, CME přehledy, Research Hub a klinický AI — ověřený přístup přes ČLK.",
+      "OrdiZapis, guidelines s DOI/PMID a odborná sekce. 14 dní zdarma. Lékařská zóna je bez reklam.",
     links: [
-      {
-        label: "CME revmatologie",
-        href: "/academy/lekari",
-        description: "Akreditované testy výhradně pro revmatology",
-      },
       {
         label: "OrdiZapis",
         href: "/lekari/dokumentace",
@@ -181,9 +191,14 @@ export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
       { label: "AI asistent", href: "/lekari/ai-asistent", description: "Klinický AI pro praxi" },
       { label: "Odborná sekce (ČLK)", href: "/odborna", description: "Ověření evidenčním číslem ČLK" },
       { label: "Léky", href: "/leky", description: "SÚKL databáze a novinky" },
+      {
+        label: "CME revmatologie",
+        href: "/academy/lekari",
+        description: "Akreditované testy výhradně pro revmatology",
+      },
     ],
-    ctaHref: "/academy/lekari",
-    ctaLabel: "CME revmatologie",
+    ctaHref: "/lekari/dokumentace",
+    ctaLabel: "OrdiZapis — 14 dní zdarma",
   },
   guidelines: {
     slug: "guidelines",
@@ -300,12 +315,15 @@ export async function buildV271HubMetadata(
   section: "studenti" | "lekari" | "firmy",
   page: V271HubPage
 ): Promise<Metadata> {
-  const prefix =
-    section === "studenti" ? "Studenti" : section === "lekari" ? "Lékaři" : "Firmy";
+  const { getServerLocale } = await import("@/lib/i18n/server-locale");
+  const { localizeV271Page } = await import("@/lib/i18n/hub-copy");
+  const locale = await getServerLocale();
+  const localized = localizeV271Page(page, section, locale);
   const path = page.slug ? `/${section}/${page.slug}` : `/${section}`;
   return buildLocalizedV20PageMetadata({
-    title: `${page.title} | ${prefix} — MedScopeGlobal`,
-    description: page.description,
+    title: `${localized.page.title} | ${localized.sectionLabel} — MedScopeGlobal`,
+    description: localized.page.description,
     path,
+    locale,
   });
 }

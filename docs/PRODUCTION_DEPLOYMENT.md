@@ -62,20 +62,19 @@ npm run build
 npm start
 ```
 
-**With Vercel:**
-- Set build command: `npm run build`
-- Set start command: `npm start`
-- Or use Vercel's default (auto-detected)
+**With Cloudflare Workers:**
+- Build: `pnpm cf:build` (`opennextjs-cloudflare build`)
+- Deploy: `pnpm cf:deploy`
 
 ### 4. Deployment Platforms
 
-#### Vercel (Recommended)
+#### Cloudflare Workers (production)
 ```bash
-vercel --prod
+pnpm cf:deploy
 ```
-- Automatically uses Next.js optimizations
-- Sets `NEXT_PUBLIC_SITE_URL` automatically
-- Supports automatic deployments from Git
+- OpenNext packages Next.js for Workers
+- Set `NEXT_PUBLIC_SITE_URL=https://medscopeglobal.com`
+- Automatic deploys from GitHub Actions on `main`
 
 #### Docker
 ```dockerfile
@@ -276,7 +275,7 @@ npm run db:verify  # Verify schema
 
 ## 📚 Additional Resources
 
-- **Vercel Deployment**: https://vercel.com/docs/frameworks/nextjs
+- **Cloudflare Workers**: https://developers.cloudflare.com/workers/
 - **Supabase Production**: https://supabase.com/docs/guides/resources/best-practices
 - **OpenAI API**: https://platform.openai.com/docs/guides/production-best-practices
 - **Google Translate API**: https://cloud.google.com/translate/docs

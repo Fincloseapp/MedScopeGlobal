@@ -44,12 +44,12 @@ Monetization on articles: display ads, VIP CTA, tringelt micro-tip, affiliate bo
 | **VIP** | Stripe checkout `/vip/protokoly` | Live Stripe keys on Workers |
 | **Tringelt** | `ArticleTringeltTip` + `/api/ecosystem/article-tip` | Same Stripe keys |
 | **Donations** | `AuthorDonationButton` + `/api/ecosystem/donate` | Same Stripe keys |
-| **Display ads** | `GlobalAdSlot` + `AD_INVENTORY` — **empty until env** | AdSense → then Mediavine; see setup doc |
+| **Display ads** | `GlobalAdSlot` + Auto ads — owner `ca-pub-6820104998820692` | AdSense → then Mediavine; see setup doc |
 | **Affiliate** | `/go/[slug]` + homepage/article boxes | Replace destinations with tagged links |
 | **CMS / B2B ads** | `components/ads/*`, `/admin/ads` | Sales later |
 
-Display ads require `NEXT_PUBLIC_ADS_ENABLED=true` **and** a provider id
-(`NEXT_PUBLIC_ADSENSE_CLIENT_ID` / Mediavine / Ezoic). Without them, slots render nothing.
+Display ads use owner AdSense `ca-pub-6820104998820692` (Auto ads) on public magazine locales.
+Disable with `NEXT_PUBLIC_ADS_ENABLED=false`. Physician / student / admin paths stay ad-free.
 
 Operator runbooks:
 

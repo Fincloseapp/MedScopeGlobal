@@ -88,5 +88,38 @@
     "locale": "en",
     "section": "aktuální-zprávy",
     "region": "global"
+  },
+  {
+    "name": "Nature Aging",
+    "url": "https://www.nature.com/nataging.rss",
+    "categorySlug": "internal-medicine",
+    "rubric": "ai-study-summary",
+    "minAccessLevel": "public",
+    "locale": "en",
+    "section": "aktuální-zprávy",
+    "region": "global",
+    "contentPillar": "dlouhovekost"
+  },
+  {
+    "name": "ScienceDaily Aging & Geriatrics",
+    "url": "https://www.sciencedaily.com/rss/health_medicine/aging.xml",
+    "categorySlug": "internal-medicine",
+    "rubric": "ai-patient-education",
+    "minAccessLevel": "public",
+    "locale": "en",
+    "section": "aktuální-zprávy",
+    "region": "global",
+    "contentPillar": "dlouhovekost"
+  },
+  {
+    "name": "NIH National Institute on Aging",
+    "url": "https://www.nia.nih.gov/newsroom/rss.xml",
+    "categorySlug": "internal-medicine",
+    "rubric": "ai-study-summary",
+    "minAccessLevel": "public",
+    "locale": "en",
+    "section": "aktuální-zprávy",
+    "region": "us",
+    "contentPillar": "dlouhovekost"
   }
 ]

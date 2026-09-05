@@ -1,17 +1,16 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/auth/admin";
+import { requireAdminAccess } from "@/lib/auth/require-admin-access";
 import { runIngestionPipeline } from "@/lib/ingestion/pipeline";
 import { isAiConfigured } from "@/lib/ingestion/ai";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 
 export async function triggerIngestionNow() {
-  const gate = await requireAdmin();
-  if (!gate.ok) throw new Error("Unauthorized");
+  const access = await requireAdminAccess();
 
   const result = await runIngestionPipeline({
-    triggeredBy: `admin:${gate.user.id}`,
+    triggeredBy: `admin:${access.supabaseUserId ?? "gate"}`,
     maxArticles: Number(process.env.INGEST_MAX_ARTICLES ?? 80),
   });
 
@@ -24,8 +23,7 @@ export async function triggerIngestionNow() {
 }
 
 export async function getIngestionStatus() {
-  const gate = await requireAdmin();
-  if (!gate.ok) return null;
+  await requireAdminAccess();
 
   const admin = createServiceRoleClient();
   const [schedule, lastRuns] = await Promise.all([
@@ -49,8 +47,7 @@ export async function updateIngestionSchedule(input: {
   intervalHours: number;
   maxPerRun: number;
 }) {
-  const gate = await requireAdmin();
-  if (!gate.ok) throw new Error("Unauthorized");
+  await requireAdminAccess();
 
   const admin = createServiceRoleClient();
   const { error } = await admin

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
+import { getDokumentaceCopy } from "@/lib/i18n/dokumentace-copy";
 
 type Size = "sm" | "md" | "lg" | "xl";
 
@@ -39,14 +40,17 @@ export function OrdiZapisLockup({
   tone = "dark",
   showTagline = true,
   className,
+  locale,
 }: {
   tone?: "dark" | "light";
   showTagline?: boolean;
   className?: string;
+  locale?: string | null;
 }) {
   const title = tone === "light" ? "text-white" : "text-[#021d33]";
   const sub = tone === "light" ? "text-sky-200" : "text-[#005B96]";
   const muted = tone === "light" ? "text-sky-100/85" : "text-slate-600";
+  const tagline = getDokumentaceCopy(locale).tagline;
 
   return (
     <div className={`flex items-center gap-3 sm:gap-4 ${className ?? ""}`}>
@@ -57,7 +61,7 @@ export function OrdiZapisLockup({
         </p>
         <p className={`text-xs font-semibold sm:text-sm ${sub}`}>{ORDIZAPIS.lockline}</p>
         {showTagline ? (
-          <p className={`mt-1 text-sm leading-5 ${muted}`}>{ORDIZAPIS.tagline}</p>
+          <p className={`mt-1 text-sm leading-5 ${muted}`}>{tagline}</p>
         ) : null}
       </div>
     </div>

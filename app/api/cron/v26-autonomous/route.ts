@@ -10,7 +10,9 @@ export async function GET(request: Request) {
   if (denied) return denied;
 
   const url = new URL(request.url);
-  const skipDeploy = url.searchParams.get("skipDeploy") === "1" || process.env.VERCEL === "1";
+  const skipDeploy =
+    url.searchParams.get("skipDeploy") === "1" ||
+    process.env.MEDSCOPE_RUNTIME === "cloudflare-workers";
 
   const result = await runV26AutonomousEngine({
     skipDeploy,

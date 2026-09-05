@@ -4,8 +4,9 @@ import {
   matchesArticleLocale,
   primaryArticleLocale,
 } from "@/lib/i18n/article-locale";
+import { isUsableTargetText, looksLikeCzech } from "@/lib/i18n/czech-detect";
 import type { LocaleCode } from "@/lib/i18n/config";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 export interface TranslatedFields {
   title: string;
@@ -20,27 +21,40 @@ export async function getCachedTranslation(
   articleId: string,
   targetLocale: LocaleCode
 ): Promise<TranslatedFields | null> {
-  const target = primaryArticleLocale(targetLocale);
-  const admin = createServiceRoleClient();
-  const { data, error } = await admin
-    .from("article_translations")
-    .select("title, excerpt, content, translation_provider, machine_translated, reviewed")
-    .eq("article_id", articleId)
-    .eq("locale", target)
-    .maybeSingle();
+  const map = await getCachedTranslations([articleId], targetLocale);
+  return map.get(articleId) ?? null;
+}
 
-  if (error?.code === "PGRST205" || error?.message?.includes("article_translations")) {
-    return null;
+export async function getCachedTranslations(
+  articleIds: string[],
+  targetLocale: LocaleCode
+): Promise<Map<string, TranslatedFields>> {
+  const out = new Map<string, TranslatedFields>();
+  if (articleIds.length === 0) return out;
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return out;
+  const target = primaryArticleLocale(targetLocale);
+  try {
+    const { data, error } = await admin
+      .from("article_translations")
+      .select("article_id, title, excerpt, content, translation_provider, machine_translated, reviewed")
+      .in("article_id", articleIds)
+      .eq("locale", target);
+    if (error || !data) return out;
+    for (const row of data) {
+      out.set(row.article_id as string, {
+        title: row.title as string,
+        excerpt: (row.excerpt as string | null) ?? null,
+        content: (row.content as string | undefined) ?? undefined,
+        translation_provider: (row.translation_provider as string | null) ?? undefined,
+        machine_translated: (row.machine_translated as boolean | null) ?? undefined,
+        reviewed: (row.reviewed as boolean | null) ?? undefined,
+      });
+    }
+  } catch {
+    return out;
   }
-  if (!data) return null;
-  return {
-    title: data.title as string,
-    excerpt: (data.excerpt as string | null) ?? null,
-    content: data.content as string | undefined,
-    translation_provider: (data.translation_provider as string | null) ?? undefined,
-    machine_translated: (data.machine_translated as boolean | null) ?? undefined,
-    reviewed: (data.reviewed as boolean | null) ?? undefined,
-  };
+  return out;
 }
 
 export async function saveCachedTranslation(
@@ -49,7 +63,8 @@ export async function saveCachedTranslation(
   fields: TranslatedFields
 ) {
   const target = primaryArticleLocale(targetLocale);
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return;
   try {
     await admin.from("article_translations").upsert(
       {
@@ -94,20 +109,27 @@ Excerpt: ${input.excerpt ?? ""}`
       : `Translate to ${target} (medical journalism). Preserve HTML structure. Return JSON: {"title":"...","excerpt":"...","content":"..."}
 Title: ${input.title}
 Excerpt: ${input.excerpt ?? ""}
-Content HTML: ${(input.content ?? "").slice(0, 12000)}`;
+Content HTML: ${(input.content ?? "").slice(0, 3500)}`;
 
   try {
-    const raw = await generateJsonFromLlm({
-      system: "You are a medical translator. Output valid JSON only. Do not invent clinical facts.",
-      user: body,
-      temperature: 0.2,
-      maxTokens: 4096,
-    });
+    const raw = await Promise.race([
+      generateJsonFromLlm({
+        system: "You are a medical translator. Output valid JSON only. Do not invent clinical facts.",
+        user: body,
+        temperature: 0.2,
+        maxTokens: input.mode === "card" ? 800 : 4096,
+      }),
+      new Promise<null>((resolve) => {
+        setTimeout(() => resolve(null), input.mode === "card" ? 6000 : 9000);
+      }),
+    ]);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as TranslatedFields;
+    const title = parsed.title?.trim() ? parsed.title.slice(0, 300) : "";
+    if (!title) return null;
     return {
-      title: parsed.title?.slice(0, 300) ?? input.title,
-      excerpt: parsed.excerpt?.slice(0, 500) ?? input.excerpt,
+      title,
+      excerpt: parsed.excerpt?.trim() ? parsed.excerpt.slice(0, 500) : input.excerpt,
       content: parsed.content ?? input.content,
       translation_provider: "groq",
       machine_translated: true,
@@ -171,6 +193,48 @@ async function googleTranslateFields(
   };
 }
 
+function mergeTranslation(
+  cached: TranslatedFields | null | undefined,
+  live: TranslatedFields | null | undefined,
+  target: string,
+  mode: "card" | "full"
+): TranslatedFields | null {
+  const title = isUsableTargetText(live?.title, target)
+    ? live!.title
+    : isUsableTargetText(cached?.title, target)
+      ? cached!.title
+      : (live?.title?.trim() || cached?.title?.trim() || "");
+  if (!title) return null;
+
+  const excerpt = isUsableTargetText(live?.excerpt, target)
+    ? live!.excerpt ?? null
+    : isUsableTargetText(cached?.excerpt, target)
+      ? cached!.excerpt ?? null
+      : live?.excerpt ?? cached?.excerpt ?? null;
+
+  let content =
+    mode === "full"
+      ? isUsableTargetText(live?.content, target)
+        ? live!.content
+        : isUsableTargetText(cached?.content, target)
+          ? cached!.content
+          : live?.content ?? cached?.content
+      : undefined;
+
+  if (mode === "full" && target !== "cs" && looksLikeCzech(content)) {
+    content = excerpt && !looksLikeCzech(excerpt) ? `<p>${excerpt}</p>` : "";
+  }
+
+  return {
+    title,
+    excerpt,
+    content,
+    translation_provider: live?.translation_provider ?? cached?.translation_provider,
+    machine_translated: live?.machine_translated ?? cached?.machine_translated ?? true,
+    reviewed: cached?.reviewed ?? false,
+  };
+}
+
 export async function resolveArticleTranslation(
   articleId: string,
   fields: {
@@ -180,48 +244,161 @@ export async function resolveArticleTranslation(
     locale?: string | null;
   },
   uiLocale: LocaleCode,
-  mode: "card" | "full"
+  mode: "card" | "full",
+  options?: { live?: boolean }
 ): Promise<TranslatedFields | null> {
   if (matchesArticleLocale(fields.locale, uiLocale)) return null;
 
+  const target = primaryArticleLocale(uiLocale);
   const cached = await getCachedTranslation(articleId, uiLocale);
-  if (cached) {
-    if (mode === "card") return { title: cached.title, excerpt: cached.excerpt };
+  const cacheTitleOk = isUsableTargetText(cached?.title, target);
+  const cacheBodyOk =
+    mode === "card" ||
+    isUsableTargetText(cached?.content, target) ||
+    (target === "cs" && Boolean(cached?.content));
+
+  if (mode === "card" && cacheTitleOk) {
+    return {
+      title: cached!.title,
+      excerpt: cached!.excerpt,
+      translation_provider: cached!.translation_provider,
+      machine_translated: cached!.machine_translated ?? true,
+      reviewed: cached!.reviewed,
+    };
+  }
+  if (mode === "full" && cacheTitleOk && cacheBodyOk) {
     return cached;
   }
 
-  let translated: TranslatedFields | null = null;
+  if (options?.live === false && mode === "card") {
+    return cacheTitleOk ? cached : null;
+  }
 
-  // Try Groq LLM first
-  translated = await translateArticleFields({
-    title: fields.title,
-    excerpt: fields.excerpt,
-    content: fields.content,
-    sourceLocale: fields.locale,
-    targetLocale: uiLocale,
-    mode,
-  }).catch(() => null);
+  const { fallbackTranslateFields } = await import("@/lib/i18n/translate-fallback");
 
-  // If Groq not available or returned null, try Google Translate fallback
-  if (!translated && process.env.GOOGLE_TRANSLATE_KEY) {
-    const target = primaryArticleLocale(uiLocale);
+  // Title first so a full-body timeout can never blank the H1.
+  let live: TranslatedFields | null = null;
+  if (!cacheTitleOk) {
+    live = await fallbackTranslateFields({
+      title: fields.title,
+      excerpt: fields.excerpt,
+      content: fields.content,
+      sourceLocale: fields.locale ?? "cs",
+      targetLocale: uiLocale,
+      mode: "card",
+    }).catch(() => null);
+  }
+
+  if (mode === "full" && !cacheBodyOk) {
+    const body = await fallbackTranslateFields({
+      title: fields.title,
+      excerpt: fields.excerpt,
+      content: fields.content,
+      sourceLocale: fields.locale ?? "cs",
+      targetLocale: uiLocale,
+      mode: "full",
+      deadlineMs: 7500,
+      maxBlocks: 12,
+    }).catch(() => null);
+    live = mergeTranslation(live ?? cached, body, target, "full") ?? body ?? live;
+  }
+
+  if (!isUsableTargetText(live?.title ?? cached?.title, target)) {
+    const llm = await translateArticleFields({
+      title: fields.title,
+      excerpt: fields.excerpt,
+      content: mode === "card" ? undefined : fields.content,
+      sourceLocale: fields.locale,
+      targetLocale: uiLocale,
+      mode: "card",
+    }).catch(() => null);
+    if (llm) live = mergeTranslation(live ?? cached, llm, target, mode) ?? llm;
+  }
+
+  if (
+    !isUsableTargetText(live?.title ?? cached?.title, target) &&
+    process.env.GOOGLE_TRANSLATE_KEY
+  ) {
     try {
-      translated = await googleTranslateFields(
-        { title: fields.title, excerpt: fields.excerpt, content: fields.content },
+      const google = await googleTranslateFields(
+        {
+          title: fields.title,
+          excerpt: fields.excerpt,
+          content: mode === "full" ? fields.content : undefined,
+        },
         target,
         process.env.GOOGLE_TRANSLATE_KEY
       );
+      live = mergeTranslation(live ?? cached, google, target, mode) ?? google;
     } catch {
-      translated = null;
+      /* ignore */
     }
   }
 
-  if (translated) {
+  const merged = mergeTranslation(cached, live, target, mode);
+  if (merged && isUsableTargetText(merged.title, target)) {
     await saveCachedTranslation(articleId, uiLocale, {
-      ...translated,
-      content: mode === "full" ? translated.content : undefined,
+      ...merged,
+      content: mode === "full" ? merged.content : cached?.content ?? merged.content,
     }).catch(() => {});
   }
 
-  return translated;
+  return merged;
+}
+
+/** One Groq call for many listing cards — avoids N sequential LLM timeouts on Workers. */
+export async function translateCardsBatch(
+  items: { id: string; title: string; excerpt: string | null; locale?: string | null }[],
+  uiLocale: LocaleCode
+): Promise<Map<string, TranslatedFields>> {
+  const out = new Map<string, TranslatedFields>();
+  if (items.length === 0 || !isAiConfigured()) return out;
+
+  const target = primaryArticleLocale(uiLocale);
+  const limited = items.slice(0, 24);
+
+  for (let offset = 0; offset < limited.length; offset += 12) {
+    const chunk = limited.slice(offset, offset + 12);
+    const payload = chunk.map((item, index) => ({
+      i: index,
+      title: item.title.slice(0, 220),
+      excerpt: (item.excerpt ?? "").slice(0, 280),
+    }));
+    try {
+      const raw = await Promise.race([
+        generateJsonFromLlm({
+          system:
+            "You are a medical translator. Output valid JSON only. Do not invent clinical facts.",
+          user: `Translate each item to ${target} (medical journalism). Return {"items":[{"i":0,"title":"...","excerpt":"..."}]}
+${JSON.stringify(payload)}`,
+          temperature: 0.15,
+          maxTokens: 2800,
+        }),
+        new Promise<null>((resolve) => {
+          setTimeout(() => resolve(null), 8000);
+        }),
+      ]);
+      if (!raw) continue;
+      const parsed = JSON.parse(raw) as {
+        items?: { i?: number; title?: string; excerpt?: string }[];
+      };
+      for (const row of parsed.items ?? []) {
+        const index = typeof row.i === "number" ? row.i : -1;
+        const source = chunk[index];
+        if (!source || !row.title) continue;
+        const fields: TranslatedFields = {
+          title: row.title.slice(0, 300),
+          excerpt: row.excerpt?.slice(0, 500) ?? source.excerpt,
+          translation_provider: "groq",
+          machine_translated: true,
+          reviewed: false,
+        };
+        out.set(source.id, fields);
+        void saveCachedTranslation(source.id, uiLocale, fields);
+      }
+    } catch {
+      continue;
+    }
+  }
+  return out;
 }

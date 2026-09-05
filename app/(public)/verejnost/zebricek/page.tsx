@@ -7,18 +7,26 @@ import {
 import { ZEBRICEK_MAGAZINE_HUB } from "@/lib/portal/magazine-section-hub";
 import { getPublicOsvetaLeaderboard } from "@/lib/verejnost/osveta/db";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
+import { localizeMagazineHubConfig } from "@/lib/i18n/localize-magazine-hub";
 
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const hub = localizeMagazineHubConfig(ZEBRICEK_MAGAZINE_HUB, locale);
   return await buildLocalizedV20PageMetadata({
-    title: "Žebříček uživatelů | Veřejnost | MedScopeGlobal",
-    description: ZEBRICEK_MAGAZINE_HUB.heroDeck,
+    title: `${hub.title} | MedScopeGlobal`,
+    description: hub.heroDeck,
     path: "/verejnost/zebricek",
+    locale,
   });
 }
 
 export default async function VerejnostZebricekPage() {
+  const locale = await getServerLocale();
+  const chrome = getVerejnostChrome(locale);
   const entries = await getPublicOsvetaLeaderboard(20);
 
   return (
@@ -26,23 +34,14 @@ export default async function VerejnostZebricekPage() {
       <section id="zebricek-grid" className="scroll-mt-24">
         <MagazineHubSectionHeader
           eyebrow="Top 20"
-          title="Žebříček uživatelů"
-          description="Nejaktivnější uživatelé ve veřejné osvětě — XP za poslech lekcí a kvízy."
+          title={chrome.hubs.zebricek.title}
+          description={chrome.hubs.zebricek.heroDeck}
         />
-        <PublicLeaderboard entries={entries} />
+        <PublicLeaderboard entries={entries} locale={locale} />
 
         <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5">
-          <h2 className="font-display text-lg font-semibold text-[#021d33]">Odznaky</h2>
-          <ul className="mt-3 space-y-2 text-sm text-slate-600">
-            <li>🏅 První lekce — dokončete první poslechovou lekci</li>
-            <li>🧠 Kvízový mistr — dokončete mini-kvíz</li>
-            <li>📅 Týden prevence — pravidelné sledování osvěty</li>
-            <li>⭐ Osvětový nadšenec — 10+ dokončených lekcí</li>
-          </ul>
-          <p className="mt-4 text-xs leading-relaxed text-slate-400">
-            +10 XP za poslech · +20 XP za kvíz. Body jsou volitelná hra — ne odemykají VIP ani
-            předplatné.
-          </p>
+          <h2 className="font-display text-lg font-semibold text-[#021d33]">{chrome.badgesTitle}</h2>
+          <p className="mt-4 text-xs leading-relaxed text-slate-400">{chrome.xpAsideLead}</p>
         </div>
       </section>
     </MagazineSectionHub>

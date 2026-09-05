@@ -1,18 +1,32 @@
-import { MedScopeLogo } from "@/components/brand/medscope-logo";
+import Image from "next/image";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { MAGAZINE } from "@/lib/brand/magazine";
 
-export const NEWSLETTER_HERO_TAGLINE = "Medical Intelligence Network";
+export const NEWSLETTER_HERO_TAGLINE = MAGAZINE.name;
 
 type Props = {
   title: string;
   subhead?: string;
   href?: string;
+  tagline?: string;
   className?: string;
   priority?: boolean;
 };
 
-/** v23.3.2 — BMJ / Lancet / NEJM premium newsletter hero */
-export function NewsletterHero({ title, subhead, href = "", className, priority = true }: Props) {
+/** ViaLongeVita magazine brief hero */
+export function NewsletterHero({ title, subhead, href = "/", tagline, className, priority = true }: Props) {
+  const lockup = (
+    <Image
+      src={MAGAZINE.emailLockup}
+      alt={MAGAZINE.name}
+      width={1200}
+      height={340}
+      priority={priority}
+      className="h-auto w-full max-w-[520px] object-contain"
+    />
+  );
+
   return (
     <header
       className={cn(
@@ -21,11 +35,17 @@ export function NewsletterHero({ title, subhead, href = "", className, priority 
       )}
     >
       <div className="newsletter-hero-logo mb-6 flex justify-center sm:mb-7">
-        <MedScopeLogo href={href} preset="newsletter-hero" priority={priority} />
+        {href ? (
+          <Link href={href} className="inline-block">
+            {lockup}
+          </Link>
+        ) : (
+          lockup
+        )}
       </div>
 
       <p className="mb-5 text-[15px] font-light tracking-[0.35px] opacity-80 sm:mb-6">
-        {NEWSLETTER_HERO_TAGLINE}
+        {tagline ?? NEWSLETTER_HERO_TAGLINE}
       </p>
 
       <h1 className="mx-auto mb-6 max-w-[720px] text-[26px] font-semibold leading-[1.25] sm:mb-8 sm:text-[30px]">
@@ -44,16 +64,32 @@ export function NewsletterHero({ title, subhead, href = "", className, priority 
 /** Logo-only block (legacy / compact embeds) */
 export function NewsletterHeroLogo({
   className,
-  href = "",
+  href = "/",
   priority = true,
 }: {
   className?: string;
   href?: string;
   priority?: boolean;
 }) {
+  const lockup = (
+    <Image
+      src={MAGAZINE.emailLockup}
+      alt={MAGAZINE.name}
+      width={1200}
+      height={340}
+      priority={priority}
+      className="h-auto w-full max-w-[360px] object-contain"
+    />
+  );
   return (
     <div className={cn("newsletter-hero-logo mb-6 flex justify-center sm:mb-7", className)}>
-      <MedScopeLogo href={href} preset="newsletter-hero" priority={priority} />
+      {href ? (
+        <Link href={href} className="inline-block">
+          {lockup}
+        </Link>
+      ) : (
+        lockup
+      )}
     </div>
   );
 }

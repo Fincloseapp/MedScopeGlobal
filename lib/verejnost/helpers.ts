@@ -1,26 +1,35 @@
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import type { PublicAdCampaign } from "@/lib/queries/verejnost";
 import { topicLabelForSlug } from "@/lib/config/verejnost-topics";
+import { formatPublicDate } from "@/lib/i18n/format-date";
 
-export function verejnostDateLabel(article: Pick<DisplayArticle, "published_at" | "created_at">): string {
+export function verejnostDateLabel(
+  article: Pick<DisplayArticle, "published_at" | "created_at" | "displayLocale">,
+  locale?: string | null
+): string {
   const iso = article.published_at ?? article.created_at;
-  if (!iso) return "";
-  return new Date(iso).toLocaleDateString("cs-CZ", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  return (
+    formatPublicDate(iso, locale ?? article.displayLocale ?? "cs", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }) ?? ""
+  );
 }
 
-export function articleTopicLabel(article: DisplayArticle): string {
+export function articleTopicLabel(
+  article: DisplayArticle,
+  locale?: string | null
+): string {
+  const loc = locale ?? article.displayLocale ?? "cs";
   const meta = article.metadata ?? {};
   const pillar = String(meta.content_pillar ?? meta.internal_topic ?? "")
     .toLowerCase()
     .trim();
   if (pillar === "dlouhovekost" || String(article.public_topic ?? "") === "dlouhovekost") {
-    return "Dlouhověkost";
+    return topicLabelForSlug("dlouhovekost", loc);
   }
-  return topicLabelForSlug(article.public_topic ?? undefined);
+  return topicLabelForSlug(article.public_topic ?? undefined, loc);
 }
 
 export function computePublicAdStats(campaigns: PublicAdCampaign[]) {

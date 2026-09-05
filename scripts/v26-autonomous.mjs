@@ -56,7 +56,7 @@ while (attempt <= MAX_RETRIES && !success) {
     continue;
   }
 
-  if (!run("poll Vercel READY", node, [path.join(root, "scripts/trigger-vercel-production.mjs")])) {
+  if (!run("assert Cloudflare host", node, [path.join(root, "scripts/cloudflare/assert-live-host.mjs")])) {
     attempt++;
     continue;
   }

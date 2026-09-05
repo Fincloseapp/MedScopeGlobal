@@ -1,14 +1,16 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/auth/admin";
+import {
+  getAuthorizedAdminClient,
+  resolveAdminWriterId,
+} from "@/lib/auth/require-admin-access";
 import {
   buildEditorialMetadataPatch,
   formatEditorialUnitDisplay,
   type EditorialUnitId,
 } from "@/lib/editorial/units";
 import { logAdminEvent } from "@/lib/logging";
-import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/utils";
 
 export async function saveArticle(input: {
@@ -25,10 +27,7 @@ export async function saveArticle(input: {
   editorial_unit_reviewer?: EditorialUnitId | null;
   ai_assisted?: boolean;
 }) {
-  const gate = await requireAdmin();
-  if (!gate.ok) throw new Error("Unauthorized");
-
-  const supabase = await createClient();
+  const supabase = await getAuthorizedAdminClient();
   const slug = input.slug?.trim() || slugify(input.title);
   const published_at = input.published ? new Date().toISOString() : null;
 
@@ -80,7 +79,7 @@ export async function saveArticle(input: {
       .from("articles")
       .insert({
         ...basePayload,
-        author_id: gate.user.id,
+        author_id: await resolveAdminWriterId(),
         metadata: editorialMeta,
       })
       .select("id")
@@ -97,9 +96,7 @@ export async function saveArticle(input: {
 }
 
 export async function deleteArticle(id: string) {
-  const gate = await requireAdmin();
-  if (!gate.ok) throw new Error("Unauthorized");
-  const supabase = await createClient();
+  const supabase = await getAuthorizedAdminClient();
   const { error } = await supabase.from("articles").delete().eq("id", id);
   if (error) throw error;
   await logAdminEvent("ARTICLE_DELETE", { article_id: id });
@@ -124,9 +121,7 @@ export async function articleListAction(formData: FormData) {
 }
 
 export async function toggleArticlePublished(id: string, published: boolean) {
-  const gate = await requireAdmin();
-  if (!gate.ok) throw new Error("Unauthorized");
-  const supabase = await createClient();
+  const supabase = await getAuthorizedAdminClient();
   const { error } = await supabase
     .from("articles")
     .update({

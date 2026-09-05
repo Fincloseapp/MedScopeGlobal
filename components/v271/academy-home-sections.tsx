@@ -11,8 +11,13 @@ import {
   listPublishedCourses,
   listTextbooks,
 } from "@/lib/academy/db";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { isCzechSurface } from "@/lib/i18n/surface-copy";
 
 export async function V272AcademyHomeSections() {
+  if (!isCzechSurface(await getServerLocale())) {
+    return null;
+  }
   const promo = isAcademyCoursesCatalogPromoEnabled();
   let courses: Awaited<ReturnType<typeof listPublishedCourses>> = [];
   let prepCourses: Awaited<ReturnType<typeof listPublishedCourses>> = [];

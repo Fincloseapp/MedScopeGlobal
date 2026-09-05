@@ -1,23 +1,30 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { V271_B2B_PRICING, V271_B2B_PRICING_NOTE } from "@/lib/v271/b2b-pricing";
+import { getB2bPublicCopy } from "@/lib/i18n/b2b-public-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
-export function V271B2BPricingTable({ compact = false }: { compact?: boolean }) {
+export function V271B2BPricingTable({
+  compact = false,
+  locale,
+}: {
+  compact?: boolean;
+  locale?: string;
+}) {
+  const copy = getB2bPublicCopy(locale);
+  const formHref = localizePublicHref("/inzerce/formular", locale ?? "cs");
   return (
     <section className={compact ? "mt-8" : "mt-0"} aria-labelledby="b2b-pricing-heading">
       <h2
         id="b2b-pricing-heading"
         className="font-display text-2xl font-semibold text-[#021d33]"
       >
-        Transparentní B2B ceník
+        {copy.pricingTitle}
       </h2>
-      <p className="mt-2 max-w-3xl text-sm text-slate-600">
-        Orientační ceny pro pharma, kliniky, laboratoře a univerzity. Bez skrytých poplatků.
-      </p>
+      <p className="mt-2 max-w-3xl text-sm text-slate-600">{copy.pricingLead}</p>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        {V271_B2B_PRICING.map((tier) => (
+        {copy.tiers.map((tier) => (
           <article
             key={tier.id}
             className={`flex flex-col rounded-2xl border p-5 ${
@@ -49,13 +56,13 @@ export function V271B2BPricingTable({ compact = false }: { compact?: boolean }) 
               variant={tier.highlighted ? "default" : "outline"}
               className={`mt-5 rounded-full ${tier.highlighted ? "bg-[#005B96]" : ""}`}
             >
-              <Link href={tier.ctaHref}>{tier.ctaLabel}</Link>
+              <Link href={formHref}>{tier.ctaLabel}</Link>
             </Button>
           </article>
         ))}
       </div>
 
-      <p className="mt-4 text-xs text-slate-500">{V271_B2B_PRICING_NOTE}</p>
+      <p className="mt-4 text-xs text-slate-500">{copy.pricingNote}</p>
     </section>
   );
 }

@@ -1,6 +1,6 @@
 import Image from "next/image";
+import { getMagazineCopy, MAGAZINE } from "@/lib/brand/magazine";
 import {
-  VITASCOPE,
   vitascopeLogoForDesk,
   vitascopeLogoForTrack,
   type VitascopeMedTrack,
@@ -21,14 +21,17 @@ export function VitascopeMark({
   size = "md",
   showWordmark = false,
   className = "",
+  locale,
 }: {
   desk?: NewsDeskId | null;
   track?: VitascopeMedTrack | null;
   size?: Size;
   showWordmark?: boolean;
   className?: string;
+  locale?: string;
 }) {
   const src = track ? vitascopeLogoForTrack(track) : vitascopeLogoForDesk(desk);
+  const brand = getMagazineCopy(locale);
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       <span
@@ -36,7 +39,7 @@ export function VitascopeMark({
       >
         <Image
           src={src}
-          alt={`${VITASCOPE.name} — ${VITASCOPE.tagline}`}
+          alt={`${MAGAZINE.name} — ${brand.tagline}`}
           fill
           className="object-cover object-center"
           sizes={size === "lg" ? "96px" : size === "md" ? "64px" : "40px"}
@@ -46,9 +49,9 @@ export function VitascopeMark({
       {showWordmark ? (
         <span className="min-w-0">
           <span className="block font-display text-sm font-semibold tracking-[0.04em] text-[#7dd3fc] sm:text-base">
-            {VITASCOPE.name}
+            {MAGAZINE.name}
           </span>
-          <span className="mt-0.5 block text-xs text-slate-300">{VITASCOPE.tagline}</span>
+          <span className="mt-0.5 block text-xs text-slate-300">{brand.tagline}</span>
         </span>
       ) : null}
     </div>
@@ -60,11 +63,13 @@ export function VitascopeMastheadBanner({
   track,
   title,
   blurb,
+  locale,
 }: {
   desk?: NewsDeskId | null;
   track?: VitascopeMedTrack | null;
   title: string;
   blurb: string;
+  locale?: string;
 }) {
   const src = track ? vitascopeLogoForTrack(track) : vitascopeLogoForDesk(desk);
   return (
@@ -81,10 +86,10 @@ export function VitascopeMastheadBanner({
         <div className="absolute inset-0 bg-gradient-to-r from-[#050b1d] via-[#050b1d]/92 to-[#050b1d]/55" />
       </div>
       <div className="relative flex flex-wrap items-center gap-4 px-5 py-6 sm:px-8 sm:py-8">
-        <VitascopeMark desk={desk} track={track} size="lg" />
+        <VitascopeMark desk={desk} track={track} size="lg" locale={locale} />
         <div className="min-w-0 flex-1">
           <p className="font-display text-sm font-semibold tracking-[0.08em] text-[#7dd3fc] sm:text-base">
-            {VITASCOPE.name}
+            {MAGAZINE.name}
           </p>
           <h1 className="mt-1 font-display text-3xl font-bold text-white sm:text-4xl">{title}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">{blurb}</p>

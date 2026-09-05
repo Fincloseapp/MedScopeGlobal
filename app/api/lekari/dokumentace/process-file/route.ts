@@ -6,6 +6,8 @@ import { withApiGuard } from "@/lib/security/api-guard";
 import { logAiAgentUsage } from "@/lib/security/ai-abuse";
 import { getDokumentaceEligibility } from "@/lib/lekari/dokumentace/eligibility";
 import { transcribeAudio } from "@/lib/lekari/dokumentace/stt";
+import { dokumentaceLocaleFromRequest } from "@/lib/lekari/dokumentace/request-locale";
+import { getOrdiZapisApiCopy } from "@/lib/i18n/ordizapis-api-copy";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -22,6 +24,7 @@ const bodySchema = z
     total: z.number().int().min(1).max(40).optional(),
     filename: z.string().min(1).max(180),
     mimeType: z.string().min(1).max(120),
+    locale: z.string().max(16).optional(),
   })
   .refine((b) => Boolean(b.path) || Boolean(b.sessionId && b.total), {
     message: "path or sessionId+total required",
@@ -97,11 +100,13 @@ export async function POST(request: Request) {
     action: "dokumentace_process_file",
   });
   if (!guard.ok) return guard.response;
+  const headerLocale = dokumentaceLocaleFromRequest(request);
+  const headerCopy = getOrdiZapisApiCopy(headerLocale);
   if (!user) {
-    return NextResponse.json({ error: "Přihlášení vyžadováno." }, { status: 401 });
+    return NextResponse.json({ error: headerCopy.errLoginRequired }, { status: 401 });
   }
 
-  const eligibility = await getDokumentaceEligibility(user.id);
+  const eligibility = await getDokumentaceEligibility(user.id, headerLocale);
   if (!eligibility.eligible) {
     return NextResponse.json({ error: eligibility.message }, { status: 403 });
   }
@@ -110,11 +115,11 @@ export async function POST(request: Request) {
   try {
     body = bodySchema.parse(await request.json());
   } catch {
-    return NextResponse.json({ error: "Neplatný vstup process-file." }, { status: 400 });
+    return NextResponse.json({ error: headerCopy.errBadProcessFile }, { status: 400 });
   }
 
   if (body.path && !assertOwnedPath(user.id, body.path)) {
-    return NextResponse.json({ error: "Neplatná cesta souboru." }, { status: 403 });
+    return NextResponse.json({ error: headerCopy.errBadPath }, { status: 403 });
   }
 
   try {
@@ -122,14 +127,16 @@ export async function POST(request: Request) {
       ? await downloadFromPath(body.path)
       : await downloadAssembled(user.id, body.sessionId!, body.total!);
 
+    const locale = dokumentaceLocaleFromRequest(request, body.locale);
     const { text: transcript, provider } = await transcribeAudio(
       buffer,
       body.mimeType,
-      body.filename
+      body.filename,
+      locale
     );
     if (!transcript.trim()) {
       return NextResponse.json(
-        { error: "Přepis je prázdný — soubor se nepodařilo rozpoznat." },
+        { error: getOrdiZapisApiCopy(locale).errEmptyFile },
         { status: 422 }
       );
     }

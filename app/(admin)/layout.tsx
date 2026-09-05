@@ -4,6 +4,7 @@ import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { AdminMobileNav } from "@/components/admin/admin-mobile-nav";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { isAdminGateOpen } from "@/lib/auth/admin-gate";
+import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
@@ -27,9 +28,12 @@ export default async function AdminLayout({
             <AdminMobileNav />
             <MedScopeLogo href="/admin" preset="admin-sidebar" />
           </div>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/">View site</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/">Otevřít web</Link>
+            </Button>
+            <AdminLogoutButton />
+          </div>
         </header>
         <div className="flex flex-1 justify-center px-4 py-8 sm:px-6 lg:ml-0">
           <div className="w-full max-w-6xl">{children}</div>

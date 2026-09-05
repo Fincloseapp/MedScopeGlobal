@@ -25,6 +25,7 @@ export * from "./syndication";
 export * from "./compliance";
 export * from "./images";
 export * from "./article-length";
+export * from "./process-queue";
 
 export type EditorialQueueItem = {
   id: string;

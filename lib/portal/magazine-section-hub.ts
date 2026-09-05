@@ -509,11 +509,13 @@ export function getClankyMagazineHub(topic?: string | null): MagazineSectionHubC
     heroDeck:
       "Aktuální texty o prevenci, nemocích, životním stylu a dlouhověkosti — srozumitelná čeština, redakční kontrola, ověřitelné zdroje.",
     editorialIntro: [
-      "Veřejný magazín MedScopeGlobal publikuje dlouhé články pro širokou veřejnost. Každý text prochází redakční kontrolou: ověřitelné zdroje, srozumitelný jazyk a jasné oddělení vzdělávání od diagnózy.",
-      "Rubriky pokrývají prevenci, nemoci a symptomy, životní styl i dlouhověkost. Filtrujte podle tématu nebo procházejte všechny články — obsah je volně dostupný, není to VIP sekce.",
-      "Informace slouží k obecnému vzdělávání a nenahrazují konzultaci s lékařem. U závažných příznaků vždy vyhledejte odbornou péči.",
+      "Vítejte v MedScopeGlobal – komplexním prostředí, které spojuje moderní medicínu, prevenci, dlouhověkost a odborné vzdělávání. medscopeglobal.com je platforma, která přináší jistotu tam, kde ji lidé nejvíce potřebují: kvalitní informace, odborné přehledy, vzdělávací materiály a praktické návody, které pomáhají žít zdravěji, vědoměji a sebevědoměji.",
+      "Součástí našeho ekosystému je ViaLongeVita – prémiový magazín zaměřený na dlouhověkost, vitalitu a moderní wellness. ViaLongeVita není jen magazín. Je to místo, kde se inspirace mění v každodenní praxi, kde exkluzivní články, rozhovory a analýzy otevírají dveře k životu, který je kvalitnější, vyrovnanější a dlouhodobě udržitelný.",
+      "Pro studenty medicíny, zdravotníky a odbornou veřejnost nabízíme také přehled lékařských učebnic, odborných knih, kurzů a školení. Vzdělávání je pilířem našeho projektu – a proto vytváříme prostředí, které podporuje profesní růst, jistotu a dlouhodobou odbornou kompetenci.",
+      "Každý článek, každá publikace a každý vzdělávací materiál vzniká s cílem přinést skutečnou hodnotu. Pokud chcete být součástí komunity, která si cení kvalitních informací, podporuje naši práci a získává přístup k prémiovým materiálům, předplatné je ideální cestou. Umožňuje nám tvořit obsah, který má smysl – a vám poskytuje výhody, které jinde nenajdete.",
+      "Děkujeme, že jste součástí MedScopeGlobal a ViaLongeVita. Vaše zdraví, vzdělání a dlouhodobá vitalita jsou naším posláním – a společně budujeme prostor, který inspiruje, vzdělává a posouvá kupředu.",
     ],
-    editorialIntroTitle: "Veřejný magazín ViaLongeVita",
+    editorialIntroTitle: "Vítejte v MedScopeGlobal",
     heroCoverImage: "/assets/covers/produce.webp",
     heroCoverAlt: "Zdravá strava — ilustrace veřejného magazínu",
     heroBadge: {

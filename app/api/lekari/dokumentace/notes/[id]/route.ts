@@ -7,6 +7,8 @@ import {
   getDokumentaceNote,
   updateDokumentaceNote,
 } from "@/lib/lekari/dokumentace/notes";
+import { dokumentaceLocaleFromUrl } from "@/lib/lekari/dokumentace/request-locale";
+import { getOrdiZapisApiCopy } from "@/lib/i18n/ordizapis-api-copy";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,6 +26,7 @@ type Ctx = { params: Promise<{ id: string }> };
 
 export async function GET(request: Request, ctx: Ctx) {
   const { id } = await ctx.params;
+  const copy = getOrdiZapisApiCopy(dokumentaceLocaleFromUrl(request));
   const supabase = await createClient();
   const {
     data: { user },
@@ -36,21 +39,22 @@ export async function GET(request: Request, ctx: Ctx) {
   });
   if (!guard.ok) return guard.response;
   if (!user) {
-    return NextResponse.json({ error: "Přihlášení vyžadováno." }, { status: 401 });
+    return NextResponse.json({ error: copy.errLoginRequired }, { status: 401 });
   }
 
   try {
     const note = await getDokumentaceNote(user.id, id);
-    if (!note) return NextResponse.json({ error: "Zápis nenalezen." }, { status: 404 });
+    if (!note) return NextResponse.json({ error: copy.errNoteNotFound }, { status: 404 });
     return NextResponse.json({ note });
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Načtení selhalo.";
+    const message = e instanceof Error ? e.message : copy.errSaveFailed;
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
 export async function PATCH(request: Request, ctx: Ctx) {
   const { id } = await ctx.params;
+  const copy = getOrdiZapisApiCopy(dokumentaceLocaleFromUrl(request));
   const supabase = await createClient();
   const {
     data: { user },
@@ -63,29 +67,30 @@ export async function PATCH(request: Request, ctx: Ctx) {
   });
   if (!guard.ok) return guard.response;
   if (!user) {
-    return NextResponse.json({ error: "Přihlášení vyžadováno." }, { status: 401 });
+    return NextResponse.json({ error: copy.errLoginRequired }, { status: 401 });
   }
 
   let body: z.infer<typeof patchSchema>;
   try {
     body = patchSchema.parse(await request.json());
   } catch {
-    return NextResponse.json({ error: "Neplatný vstup." }, { status: 400 });
+    return NextResponse.json({ error: copy.errInvalidInput }, { status: 400 });
   }
 
   try {
     const existing = await getDokumentaceNote(user.id, id);
-    if (!existing) return NextResponse.json({ error: "Zápis nenalezen." }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: copy.errNoteNotFound }, { status: 404 });
     const note = await updateDokumentaceNote(user.id, id, body);
     return NextResponse.json({ note });
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Aktualizace selhala.";
+    const message = e instanceof Error ? e.message : copy.errSaveFailed;
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
 export async function DELETE(request: Request, ctx: Ctx) {
   const { id } = await ctx.params;
+  const copy = getOrdiZapisApiCopy(dokumentaceLocaleFromUrl(request));
   const supabase = await createClient();
   const {
     data: { user },
@@ -98,16 +103,16 @@ export async function DELETE(request: Request, ctx: Ctx) {
   });
   if (!guard.ok) return guard.response;
   if (!user) {
-    return NextResponse.json({ error: "Přihlášení vyžadováno." }, { status: 401 });
+    return NextResponse.json({ error: copy.errLoginRequired }, { status: 401 });
   }
 
   try {
     const existing = await getDokumentaceNote(user.id, id);
-    if (!existing) return NextResponse.json({ error: "Zápis nenalezen." }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: copy.errNoteNotFound }, { status: 404 });
     await deleteDokumentaceNote(user.id, id);
     return NextResponse.json({ ok: true });
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Smazání selhalo.";
+    const message = e instanceof Error ? e.message : copy.errSaveFailed;
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -9,6 +9,7 @@ import type { LocaleCode } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/client";
 import { mergedArticleSearch } from "@/utils/merged-article-search";
 import { sanitizeSearchInput } from "@/utils/search";
+import { formatPublicDate } from "@/lib/i18n/format-date";
 
 export function SearchClient({
   initialQ,
@@ -95,7 +96,11 @@ export function SearchClient({
               )}
               {r.published_at && (
                 <p className="mt-3 text-xs text-muted-foreground">
-                  {new Date(r.published_at).toLocaleDateString()}
+                  {formatPublicDate(r.published_at, locale, {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "numeric",
+                  })}
                 </p>
               )}
             </Link>

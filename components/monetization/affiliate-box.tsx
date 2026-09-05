@@ -1,88 +1,297 @@
-import Link from "next/link";
 import type { AffiliateProduct } from "@/lib/ecosystem/monetization";
 import { AFFILIATE_PRODUCTS } from "@/lib/ecosystem/monetization";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { getRevenueCopy } from "@/lib/i18n/revenue-copy";
+import { affiliateHopCopy } from "@/lib/monetization/affiliate-hop";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { normalizeLocale } from "@/lib/i18n/config";
+import {
+  matchAffiliateProducts,
+  type RevenueArticle,
+} from "@/lib/monetization/revenue-mix";
+import { affiliateGoPath } from "@/lib/monetization/affiliate-geo";
+import { pickAffiliateProducts } from "@/lib/monetization/affiliate-mix";
+
+type Variant = "quiet" | "shelf" | "compact";
 
 type Props = {
   locale?: GlobalLocaleCode;
   category?: AffiliateProduct["category"];
   title?: string;
+  products?: AffiliateProduct[];
+  variant?: Variant;
 };
 
-function localizedField(record: Record<string, string>, locale: string): string {
-  return record[locale] ?? record["en"] ?? record["cs"] ?? Object.values(record)[0] ?? "";
-}
-
-export function AffiliateBox({ locale = "cs", category, title = "Doporučené produkty" }: Props) {
-  const products = AFFILIATE_PRODUCTS.filter((p) => !category || p.category === category);
-
-  if (!products.length) return null;
-
+function AffiliateProductImage({
+  src,
+  alt,
+  className,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+}) {
   return (
-    <section className="my-8 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-5">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-        Affiliate · Sponzorováno
-      </p>
-      <h3 className="mt-1 font-display text-lg font-semibold text-[#021d33]">{title}</h3>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {products.map((product) => (
-          <AffiliateProductCard key={product.id} product={product} locale={locale} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function AffiliateProductCard({ product, locale }: { product: AffiliateProduct; locale: GlobalLocaleCode }) {
-  const url = localizedField(product.affiliateUrl, locale);
-  const name = localizedField(product.name, locale);
-  const description = localizedField(product.description, locale);
-
-  return (
-    <Link
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer sponsored"
-      className="group rounded-xl border border-emerald-200 bg-white p-4 shadow-sm transition hover:shadow-md"
-    >
-      <p className="font-semibold text-[#021d33] group-hover:text-emerald-700">{name}</p>
-      <p className="mt-1 text-xs text-slate-600">{description}</p>
-      <span className="mt-2 inline-block text-xs font-medium text-emerald-600 group-hover:underline">
-        Více informací →
-      </span>
-    </Link>
-  );
-}
-
-export function LongevityProductsSection({ locale = "cs" }: { locale?: GlobalLocaleCode }) {
-  return (
-    <AffiliateBox
-      locale={locale}
-      category="longevity"
-      title="Top produkty pro dlouhověkost"
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      className={className ?? "h-full w-full object-cover"}
     />
   );
 }
 
-/** Fallback: show all supplement + sleep products for longevity section */
-export function TopLongevityProducts({ locale = "cs" }: { locale?: GlobalLocaleCode }) {
-  const products = AFFILIATE_PRODUCTS.filter(
-    (p) => p.category === "supplements" || p.category === "sleep" || p.category === "lab-tests"
-  );
+function localizedField(record: Record<string, string>, locale: string): string {
+  if (record[locale]) return record[locale];
+  const primary = primaryArticleLocale(normalizeLocale(locale));
+  if (record[primary]) return record[primary];
+  if (primary === "cs") return record.cs ?? Object.values(record)[0] ?? "";
+  return record.en ?? record["en-US"] ?? "";
+}
+
+function affiliateHref(productId: string, locale: string, fallbackUrl?: string): string {
+  if (productId) return affiliateGoPath(productId, locale, { carryLocale: true });
+  if (!fallbackUrl) return "#";
+  try {
+    const parsed = new URL(fallbackUrl, "https://medscopeglobal.com");
+    if (parsed.pathname.startsWith("/go/")) {
+      return `${parsed.pathname}${parsed.search || `?locale=${encodeURIComponent(locale)}`}`;
+    }
+  } catch {
+    /* keep original */
+  }
+  return fallbackUrl;
+}
+
+export function AffiliateBox({
+  locale = "cs",
+  category,
+  title,
+  products: productsProp,
+  variant = "quiet",
+}: Props) {
+  const products =
+    productsProp ?? AFFILIATE_PRODUCTS.filter((p) => !category || p.category === category);
+  const revenue = getRevenueCopy(locale);
+  const heading =
+    title ?? (variant === "shelf" ? revenue.affiliateShelfTitle : revenue.affiliateTitle);
+  const kicker = variant === "shelf" ? revenue.affiliateShelfKicker : revenue.affiliateKicker;
+  const compact = variant === "compact";
+
+  if (!products.length) return null;
+
+  const shelf = variant === "shelf";
 
   return (
-    <section className="my-8 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-5">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-        Doporučené · Affiliate
+    <section
+      className={
+        shelf
+          ? "my-2"
+          : compact
+            ? "my-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+            : "my-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+      }
+    >
+      <p
+        className={
+          shelf
+            ? "text-[11px] font-semibold uppercase tracking-[0.2em] text-[#005B96]"
+            : "text-[10px] font-semibold uppercase tracking-wider text-slate-500"
+        }
+      >
+        {kicker}
       </p>
-      <h3 className="mt-1 font-display text-lg font-semibold text-[#021d33]">
-        Top produkty pro dlouhověkost
+      <h3
+        className={
+          shelf
+            ? "mt-1 font-display text-2xl font-semibold text-[#021d33]"
+            : "mt-1 font-display text-lg font-semibold text-[#021d33]"
+        }
+      >
+        {heading}
       </h3>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div
+        className={
+          shelf
+            ? "mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6"
+            : compact
+              ? "mt-3 grid gap-3"
+              : "mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+        }
+      >
         {products.map((product) => (
-          <AffiliateProductCard key={product.id} product={product} locale={locale} />
+          <AffiliateProductCard
+            key={product.id}
+            product={product}
+            locale={locale}
+            variant={variant}
+          />
         ))}
       </div>
+      <p className="mt-3 text-[11px] leading-relaxed text-slate-500">{revenue.affiliateDisclosure}</p>
     </section>
   );
+}
+
+function AffiliateProductCard({
+  product,
+  locale,
+  variant,
+}: {
+  product: AffiliateProduct;
+  locale: GlobalLocaleCode;
+  variant: Variant;
+}) {
+  const url = affiliateHref(product.id, locale, localizedField(product.affiliateUrl, locale));
+  const name = localizedField(product.name, locale);
+  const description = localizedField(product.description, locale);
+  const cta = affiliateHopCopy(locale).cta;
+  const shelf = variant === "shelf";
+  const compact = variant === "compact";
+
+  if (compact) {
+    return (
+      <a
+        href={url}
+        className="group flex overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-[#005B96]/40"
+      >
+        <div className="relative h-20 w-20 shrink-0 bg-[#e8f3fb]">
+          <AffiliateProductImage src={product.imageUrl} alt={name} className="h-full w-full object-cover" />
+        </div>
+        <div className="min-w-0 px-3 py-2">
+          <p className="font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">{name}</p>
+          <span className="mt-1 inline-block text-xs font-medium text-[#005B96]">{cta}</span>
+        </div>
+      </a>
+    );
+  }
+
+  if (shelf) {
+    return (
+      <a
+        href={url}
+        className="group relative overflow-hidden rounded-2xl border border-[#cfe1f3] bg-[#e8f3fb] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      >
+        <div className="relative aspect-[3/4]">
+          <AffiliateProductImage
+            src={product.imageUrl}
+            alt={name}
+            className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
+          />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#021d33]/90 via-[#021d33]/55 to-transparent px-3 pb-3 pt-12">
+            <p className="font-semibold leading-snug text-white">{name}</p>
+            <span className="mt-1 inline-block text-xs font-medium text-white/85 group-hover:underline">
+              {cta}
+            </span>
+          </div>
+        </div>
+      </a>
+    );
+  }
+
+  return (
+    <a
+      href={url}
+      className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-[#005B96]/40 hover:shadow-sm"
+    >
+      <div className="relative aspect-[5/4] bg-[#f4f7fb]">
+        <AffiliateProductImage
+          src={product.imageUrl}
+          alt={name}
+          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+        />
+      </div>
+      <div className="p-3">
+        <p className="font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">{name}</p>
+        <p className="mt-1 text-xs leading-relaxed text-slate-600">{description}</p>
+        <span className="mt-2 inline-block text-xs font-medium text-[#005B96] group-hover:underline">
+          {cta}
+        </span>
+      </div>
+    </a>
+  );
+}
+
+export function LongevityProductsSection({ locale = "cs" }: { locale?: GlobalLocaleCode }) {
+  const revenue = getRevenueCopy(locale);
+  return (
+    <AffiliateBox
+      locale={locale}
+      title={revenue.affiliateShelfTitle}
+      variant="shelf"
+      products={pickAffiliateProducts({ surface: "homepage", locale })}
+    />
+  );
+}
+
+export function TopLongevityProducts({ locale = "cs" }: { locale?: GlobalLocaleCode }) {
+  return (
+    <AffiliateBox
+      locale={locale}
+      variant="shelf"
+      products={pickAffiliateProducts({ surface: "homepage", locale })}
+    />
+  );
+}
+
+/** High-visibility homepage rail — after editorial, before display ads. */
+export function HomepageAffiliateShelf({ locale = "cs" }: { locale?: GlobalLocaleCode | string }) {
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <div className="rounded-xl border border-[#cfe1f3] bg-gradient-to-b from-[#e8f3fb] via-white to-white px-5 py-6 sm:px-7">
+        <TopLongevityProducts locale={locale as GlobalLocaleCode} />
+      </div>
+    </div>
+  );
+}
+
+export function ListingAffiliateBox({
+  locale = "cs",
+  topic,
+}: {
+  locale?: GlobalLocaleCode | string;
+  topic?: string | null;
+}) {
+  return (
+    <AffiliateBox
+      locale={locale as GlobalLocaleCode}
+      variant="quiet"
+      products={pickAffiliateProducts({ surface: "listing", locale, topic })}
+    />
+  );
+}
+
+export function TopicAffiliateBox({
+  locale = "cs",
+  article,
+}: {
+  locale?: GlobalLocaleCode;
+  article: RevenueArticle;
+}) {
+  const products = matchAffiliateProducts(article);
+  return <AffiliateBox locale={locale} variant="quiet" products={products} />;
+}
+
+export function AsideAffiliate({
+  locale = "cs",
+  article,
+}: {
+  locale?: GlobalLocaleCode | string;
+  article: RevenueArticle;
+}) {
+  const products = pickAffiliateProducts({ surface: "articleMid", locale, article });
+  return <AffiliateBox locale={locale as GlobalLocaleCode} variant="compact" products={products} />;
+}
+
+/** Two image cards after the first paragraphs — visible, not a hard sell. */
+export function MidArticleAffiliate({
+  locale = "cs",
+  article,
+}: {
+  locale?: GlobalLocaleCode | string;
+  article: RevenueArticle;
+}) {
+  const products = pickAffiliateProducts({ surface: "articleMid", locale, article });
+  return <AffiliateBox locale={locale as GlobalLocaleCode} variant="quiet" products={products} />;
 }

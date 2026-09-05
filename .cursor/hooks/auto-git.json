@@ -5,7 +5,7 @@
   "branch": "main",
   "remote": "origin",
   "deploy": {
-    "provider": "vercel",
+    "provider": "cloudflare",
     "domain": "https://medscopeglobal.com"
   },
   "retry": {

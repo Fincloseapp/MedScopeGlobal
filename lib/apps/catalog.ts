@@ -68,7 +68,7 @@ export const MEDIPREP: AppProduct = {
     "Příprava na přijímačky 8 českých lékařských fakult. Originální testy biologie, chemie a fyziky. E-mail + kód, bez hesla. První test zdarma.",
   audience: "Uchazeči a studenti LF",
   priceMonthlyCzk: 149,
-  priceNote: "první test zdarma · tarif Student LF 149 Kč/měsíc (Academy — ne VIP protokoly) · 14 dní zdarma",
+  priceNote: "první test zdarma · první měsíc 89 Kč · další měsíce 149 Kč (EU ~10 €) · Academy — ne VIP protokoly",
   marketingPath: "/mediprep",
   downloadPath: "/mediprep/stahnout",
   appPath: "/app/priprava",

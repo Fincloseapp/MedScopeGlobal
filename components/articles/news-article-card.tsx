@@ -2,10 +2,13 @@ import Link from "next/link";
 import { SafeArticleImage } from "@/components/media/safe-article-image";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { formatArticleDateLabel } from "@/lib/editorial/freshness";
-import { publicEditorialByline } from "@/lib/editorial/units";
+import { listingByline } from "@/lib/editorial/units";
 import { resolveWriterAgent } from "@/lib/editorial/writer-agents";
 import { resolveDisplayCover, resolveTopicFallbackCover } from "@/lib/v271/topic-covers";
-import { classifyNewsDesk, NEWS_DESKS, type NewsDeskId } from "@/lib/v271/news-desks";
+import { classifyNewsDesk, NEWS_DESKS, newsDesksForLocale, type NewsDeskDef, type NewsDeskId } from "@/lib/v271/news-desks";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { buildLocalePath } from "@/lib/i18n/locale-path";
 
 function coverOf(article: DisplayArticle) {
   const src = resolveDisplayCover({
@@ -26,15 +29,21 @@ function coverOf(article: DisplayArticle) {
   return { src, fallbackSrc };
 }
 
-function kickerOf(article: DisplayArticle): string {
+function kickerOf(article: DisplayArticle, locale = "cs"): string {
+  const surface = getSurfaceCopy(locale);
   const agent = resolveWriterAgent(article);
-  if (agent) return agent.topicLabel;
-  const desk = NEWS_DESKS.find((item) => item.id === classifyNewsDesk(article));
-  return article.categories?.name ?? desk?.label ?? "Redakce";
+  if (agent) return surface.writers[agent.deskId]?.topicLabel ?? agent.topicLabel;
+  const desk = newsDesksForLocale(locale).find((item) => item.id === classifyNewsDesk(article));
+  return article.categories?.name ?? desk?.label ?? surface.newsroom;
 }
 
-function reviewLine(_article: DisplayArticle): string {
-  return publicEditorialByline("cs");
+function articleHref(slug: string, locale?: string) {
+  const path = `/article/${slug}`;
+  return locale ? buildLocalePath(locale, path) : path;
+}
+
+function reviewLine(article: DisplayArticle, locale = "cs"): string {
+  return listingByline(article, locale);
 }
 
 export function NewsArticleThumb({
@@ -64,19 +73,23 @@ export function NewsArticleThumb({
   );
 }
 
-export function NewsHeadlineRow({ article }: { article: DisplayArticle }) {
-  const date = formatArticleDateLabel(article);
+export function NewsHeadlineRow({ article, locale = "cs" }: { article: DisplayArticle; locale?: string }) {
+  const date = formatArticleDateLabel(article, locale);
   return (
-    <Link href={`/article/${article.slug}`} className="group flex gap-3 py-2.5">
+    <Link href={articleHref(article.slug, locale)} className="group flex gap-3 py-2.5">
       <NewsArticleThumb article={article} sizes="96px" />
       <div className="min-w-0">
         <p className="text-[10px] font-semibold uppercase tracking-wide text-[#005B96]">
-          {kickerOf(article)}
+          {kickerOf(article, locale)}
         </p>
         <h3 className="font-display text-sm font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
           {article.title}
         </h3>
-        {date ? <p className="mt-1 text-[11px] text-slate-500">{date.text}</p> : null}
+        {date ? (
+          <p className="mt-1 text-[11px] text-slate-500">
+            <time dateTime={date.dateTime}>{date.text}</time>
+          </p>
+        ) : null}
       </div>
     </Link>
   );
@@ -85,13 +98,17 @@ export function NewsHeadlineRow({ article }: { article: DisplayArticle }) {
 export function NewsMagazineCard({
   article,
   featured = false,
+  locale = "cs",
 }: {
   article: DisplayArticle;
   featured?: boolean;
+  locale?: string;
 }) {
-  const date = formatArticleDateLabel(article);
+  const date = formatArticleDateLabel(article, locale);
   const { src, fallbackSrc } = coverOf(article);
   const desk = classifyNewsDesk(article);
+  const surface = getSurfaceCopy(locale);
+  const deskLabel = newsDesksForLocale(locale).find((item) => item.id === desk)?.label ?? desk;
 
   return (
     <article
@@ -100,7 +117,7 @@ export function NewsMagazineCard({
       }`}
     >
       <Link
-        href={`/article/${article.slug}`}
+        href={articleHref(article.slug, locale)}
         className={`relative overflow-hidden bg-slate-100 ${
           featured ? "aspect-[16/9] lg:w-[58%] lg:aspect-auto lg:min-h-[22rem]" : "aspect-[16/10]"
         }`}
@@ -116,33 +133,33 @@ export function NewsMagazineCard({
       </Link>
       <div className={`flex flex-1 flex-col p-5 ${featured ? "lg:w-[42%] lg:justify-center lg:p-8" : ""}`}>
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">
-          {kickerOf(article)}
+          {kickerOf(article, locale)}
         </p>
         <h2
           className={`mt-2 font-display font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96] ${
             featured ? "text-2xl sm:text-3xl" : "text-lg"
           }`}
         >
-          <Link href={`/article/${article.slug}`}>{article.title}</Link>
+          <Link href={articleHref(article.slug, locale)}>{article.title}</Link>
         </h2>
         {article.excerpt ? (
           <p className={`mt-2 text-sm leading-6 text-slate-600 ${featured ? "line-clamp-5" : "line-clamp-3"}`}>
             {article.excerpt}
           </p>
         ) : null}
-        <p className="mt-3 text-[11px] leading-5 text-slate-500">{reviewLine(article)}</p>
+        <p className="mt-3 text-[11px] leading-5 text-slate-500">{reviewLine(article, locale)}</p>
         {date ? (
           <p className="mt-1 text-[11px] text-slate-400">
             <time dateTime={date.dateTime}>{date.text}</time>
           </p>
         ) : null}
         <Link
-          href={`/article/${article.slug}`}
+          href={articleHref(article.slug, locale)}
           className="mt-4 inline-flex text-sm font-semibold text-[#005B96] hover:underline"
         >
-          Číst článek →
+          {surface.readArticle} →
         </Link>
-        <span className="sr-only">Oblast {desk}</span>
+        <span className="sr-only">{deskLabel}</span>
       </div>
     </article>
   );
@@ -150,12 +167,17 @@ export function NewsMagazineCard({
 
 export function NewsDeskFallback({
   desk,
+  desks,
+  locale,
 }: {
   desk: NewsDeskId;
+  desks?: NewsDeskDef[];
+  locale?: string;
 }) {
-  const def = NEWS_DESKS.find((item) => item.id === desk)!;
+  const def = (desks ?? NEWS_DESKS).find((item) => item.id === desk) ?? NEWS_DESKS.find((item) => item.id === desk)!;
+  const href = locale ? localizePublicHref(def.href, locale) : def.href;
   return (
-    <Link href={def.href} className="block py-2.5">
+    <Link href={href} className="block py-2.5">
       <h3 className="font-display text-sm font-semibold leading-snug text-[#021d33] hover:text-[#005B96]">
         {def.label}
       </h3>

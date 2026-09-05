@@ -9,6 +9,10 @@ import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import type { PublicAdCampaign } from "@/lib/queries/verejnost";
 import { articleTopicLabel, verejnostDateLabel } from "@/lib/verejnost/helpers";
 import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
+import { TopicAffiliateBox } from "@/components/monetization/affiliate-box";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export function VerejnostArticleDetail({
   article,
@@ -21,16 +25,21 @@ export function VerejnostArticleDetail({
   inlineAds: PublicAdCampaign[];
   sidebarAds: PublicAdCampaign[];
 }) {
-  const dateLabel = verejnostDateLabel(article);
-  const topicLabel = articleTopicLabel(article);
+  const uiLocale = article.displayLocale ?? "cs";
+  const chrome = getVerejnostChrome(uiLocale);
+  const dateLabel = verejnostDateLabel(article, uiLocale);
+  const topicLabel = articleTopicLabel(article, uiLocale);
   const isInterview = article.public_topic === "rozhovory";
   const coverUrl = resolveVerejnostCoverUrl(article);
 
   return (
     <div className="min-h-screen bg-[#f4f8fc]">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <Link href="/verejnost/clanky" className="text-sm font-medium text-[#005B96] hover:underline">
-          ← Veřejné zdraví — články
+        <Link
+          href={localizePublicHref("/verejnost/clanky", uiLocale)}
+          className="text-sm font-medium text-[#005B96] hover:underline"
+        >
+          {chrome.articlesBack}
         </Link>
 
         <div className="mt-6 grid gap-10 lg:grid-cols-[1fr_280px]">
@@ -43,7 +52,7 @@ export function VerejnostArticleDetail({
                 {article.title}
               </h1>
               {isInterview ? (
-                <p className="mt-2 text-sm font-medium text-slate-600">Rozhovor s odborníkem</p>
+                <p className="mt-2 text-sm font-medium text-slate-600">{chrome.interviewLead}</p>
               ) : null}
               {dateLabel ? (
                 <p className="mt-2 inline-flex items-center gap-1 text-sm text-slate-500">
@@ -52,7 +61,7 @@ export function VerejnostArticleDetail({
                 </p>
               ) : null}
               <div className="mt-3 text-sm">
-                <EditorialAttribution article={article} locale="cs" />
+                <EditorialAttribution article={article} locale={uiLocale} />
               </div>
             </header>
 
@@ -87,8 +96,18 @@ export function VerejnostArticleDetail({
                 dangerouslySetInnerHTML={{ __html: article.content }}
               />
             ) : (
-              <p className="mt-8 text-slate-500">Obsah článku bude brzy doplněn.</p>
+              <p className="mt-8 text-slate-500">{chrome.contentComing}</p>
             )}
+
+            <TopicAffiliateBox
+              locale={uiLocale as GlobalLocaleCode}
+              article={{
+                title: article.title,
+                excerpt: article.excerpt,
+                slug: article.slug,
+                public_topic: article.public_topic,
+              }}
+            />
 
             <PublicAdBlocks campaigns={inlineAds} variant="inline" />
 
@@ -100,18 +119,17 @@ export function VerejnostArticleDetail({
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-[#005B96] hover:underline"
                 >
-                  Odborný zdroj
+                  {chrome.expertSource}
                   <ExternalLink className="h-3.5 w-3.5" />
                 </a>
               </p>
             ) : null}
 
             <p className="mt-10 rounded-xl border border-amber-200/80 bg-amber-50/80 p-4 text-xs leading-relaxed text-amber-950">
-              Informace na medscopeglobal.com slouží k obecnému vzdělávání a nenahrazují konzultaci s
-              lékařem. Při akutních potížích vyhledejte odbornou pomoc.
+              {chrome.articleDisclaimer}
             </p>
 
-            <EditorialFooter locale="cs" />
+            <EditorialFooter locale={uiLocale} />
           </article>
 
           {sidebarAds.length > 0 ? (

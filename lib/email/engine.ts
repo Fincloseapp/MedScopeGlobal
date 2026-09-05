@@ -1,4 +1,5 @@
 import { persistEmailLog } from "@/lib/email/log";
+import { isCloudflareEmailConfigured, sendViaCloudflareEmail } from "@/lib/email/cloudflare-sending";
 import { isSendGridConfigured, sendViaSendGrid } from "@/lib/email/sendgrid";
 import { isSmtpConfigured, sendViaSmtp } from "@/lib/email/smtp";
 import type { EmailProvider, EmailSendRequest, EmailSendResponse } from "@/lib/email/types";
@@ -44,7 +45,7 @@ async function logSend(
   return response;
 }
 
-/** Prefer SendGrid; auto-fallback to SMTP on failure. */
+/** Prefer Cloudflare Email Sending on the Worker; then SendGrid; SMTP last. */
 export async function sendEmail(request: EmailSendRequest): Promise<EmailSendResponse> {
   const recipient = primaryRecipient(request.to);
   if (!recipient) {
@@ -54,6 +55,61 @@ export async function sendEmail(request: EmailSendRequest): Promise<EmailSendRes
       provider: "none",
       fallbackUsed: false,
       error: "Missing recipient",
+    });
+  }
+
+  if (isCloudflareEmailConfigured()) {
+    const cf = await sendViaCloudflareEmail(request);
+    if (cf.ok) {
+      return logSend(request, {
+        ok: true,
+        status: "sent",
+        provider: "cloudflare",
+        fallbackUsed: false,
+        statusCode: cf.statusCode,
+        messageId: cf.messageId,
+        raw: cf.raw,
+      });
+    }
+    console.warn("[email] Cloudflare Email Sending failed, trying fallbacks", cf.error);
+
+    if (isSendGridConfigured()) {
+      const sg = await sendViaSendGrid(request);
+      if (sg.ok) {
+        return logSend(request, {
+          ok: true,
+          status: "sent",
+          provider: "sendgrid",
+          fallbackUsed: true,
+          statusCode: sg.statusCode,
+          messageId: sg.messageId,
+          raw: { cloudflareError: cf.error, sendgrid: sg.raw },
+        });
+      }
+    }
+
+    if (isSmtpConfigured()) {
+      const smtp = await sendViaSmtp(request);
+      return logSend(request, {
+        ok: smtp.ok,
+        status: smtp.ok ? "sent" : "failed",
+        provider: "smtp",
+        fallbackUsed: true,
+        statusCode: smtp.statusCode,
+        messageId: smtp.messageId,
+        error: smtp.ok ? undefined : smtp.error ?? cf.error,
+        raw: { cloudflareError: cf.error, smtp: smtp.raw },
+      });
+    }
+
+    return logSend(request, {
+      ok: false,
+      status: "failed",
+      provider: "cloudflare",
+      fallbackUsed: false,
+      statusCode: cf.statusCode,
+      error: cf.error,
+      raw: cf.raw,
     });
   }
 
@@ -123,8 +179,8 @@ export async function sendEmail(request: EmailSendRequest): Promise<EmailSendRes
     status: "skipped",
     provider: "none",
     fallbackUsed: false,
-    error: "No email provider configured (SENDGRID_API_KEY or SMTP)",
+    error: "No email provider configured (Cloudflare Email, SENDGRID_API_KEY, or SMTP)",
   });
 }
 
-export { isSendGridConfigured, isSmtpConfigured };
+export { isSendGridConfigured, isSmtpConfigured, isCloudflareEmailConfigured };

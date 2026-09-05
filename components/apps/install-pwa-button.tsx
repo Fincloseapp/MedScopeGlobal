@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Download, CheckCircle2, Share, Lock, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { AppProduct } from "@/lib/apps/catalog";
+import { getInstallPwaCopy } from "@/lib/i18n/install-pwa-copy";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -42,6 +43,7 @@ export function InstallPwaButton({
   loginHref,
   label,
   compact = false,
+  locale = "cs",
 }: {
   app: AppProduct;
   className?: string;
@@ -50,7 +52,9 @@ export function InstallPwaButton({
   loginHref?: string;
   label?: string;
   compact?: boolean;
+  locale?: string;
 }) {
+  const copy = getInstallPwaCopy(locale, { name: app.shortName, path: app.appPath });
   const pathname = usePathname() || "/";
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
@@ -131,7 +135,7 @@ export function InstallPwaButton({
         className={`inline-flex items-center gap-2 rounded-full bg-emerald-500/15 px-3 py-1.5 text-xs font-medium text-emerald-200 ${className ?? ""}`}
       >
         <CheckCircle2 className="h-3.5 w-3.5" />
-        Aplikace nainstalována
+        {copy.installed}
       </div>
     );
   }
@@ -146,7 +150,7 @@ export function InstallPwaButton({
       >
         <Link href={loginHref || `/login?next=${encodeURIComponent(app.appPath)}`}>
           <Lock className="mr-1.5 h-3.5 w-3.5" />
-          Stažení po přihlášení
+          {copy.gated}
         </Link>
       </Button>
     );
@@ -161,7 +165,7 @@ export function InstallPwaButton({
         className="h-9 rounded-full bg-white px-3.5 text-xs font-semibold text-[#021d33] hover:bg-sky-50"
       >
         <Download className="mr-1.5 h-3.5 w-3.5" />
-        {label || (compact ? "Stáhnout" : `Stáhnout ${app.shortName}`)}
+        {label || (compact ? copy.download : copy.downloadNamed)}
       </Button>
 
       {showHelp ? (
@@ -173,31 +177,31 @@ export function InstallPwaButton({
         >
           <p className="mb-1.5 flex items-center gap-1.5 font-semibold text-white">
             <Smartphone className="h-3.5 w-3.5" />
-            Jak nainstalovat na mobil
+            {copy.howTitle}
           </p>
           {ios ? (
             <ol className="list-decimal space-y-1 pl-4 text-sky-100/95">
               <li>
-                Klepněte na <Share className="mx-0.5 inline h-3 w-3" /> <strong>Sdílet</strong> v Safari
+                {copy.ios1} <Share className="mx-0.5 inline h-3 w-3" />
               </li>
-              <li>Zvolte <strong>Přidat na plochu</strong></li>
-              <li>Potvrďte <strong>Přidat</strong> — ikona {app.shortName} se objeví na ploše</li>
+              <li>{copy.ios2}</li>
+              <li>{copy.ios3}</li>
             </ol>
           ) : android ? (
             <ol className="list-decimal space-y-1 pl-4 text-sky-100/95">
-              <li>V Chrome otevřete menu <strong>⋮</strong> vpravo nahoře</li>
-              <li>Zvolte <strong>Nainstalovat aplikaci</strong> / <strong>Přidat na plochu</strong></li>
-              <li>Potvrďte instalaci — {app.shortName} se otevře jako aplikace</li>
+              <li>{copy.android1}</li>
+              <li>{copy.android2}</li>
+              <li>{copy.android3}</li>
             </ol>
           ) : (
             <ol className="list-decimal space-y-1 pl-4 text-sky-100/95">
-              <li>Chrome/Edge: ikona <strong>⊕</strong> v adresním řádku, nebo menu → Instalovat</li>
-              <li>Nebo otevřete {app.shortName} a klepněte znovu na Stáhnout</li>
+              <li>{copy.desktop1}</li>
+              <li>{copy.desktop2}</li>
             </ol>
           )}
           {!inScope ? (
             <p className="mt-2 text-[10px] text-amber-100/90">
-              Instalace probíhá z aplikace — přesměrováváme na {app.appPath}…
+              {copy.redirect}
             </p>
           ) : null}
           <button
@@ -205,16 +209,12 @@ export function InstallPwaButton({
             className="mt-2 text-[10px] font-medium text-sky-200 underline"
             onClick={() => setShowHelp(false)}
           >
-            Skrýt tip
+            {copy.hideTip}
           </button>
         </div>
       ) : compact ? null : (
         <p className="max-w-[240px] text-right text-[10px] leading-4 text-sky-100/80">
-          {ios
-            ? "iPhone: Sdílet → Přidat na plochu"
-            : android
-              ? "Android: Chrome → Nainstalovat aplikaci"
-              : "PC: Chrome/Edge → Nainstalovat aplikaci"}
+          {ios ? copy.hintIos : android ? copy.hintAndroid : copy.hintDesktop}
         </p>
       )}
     </div>

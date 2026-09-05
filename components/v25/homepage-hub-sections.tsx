@@ -5,6 +5,7 @@ import { VerejnostArticleCard } from "@/components/verejnost/verejnost-article-c
 import { V20ArticleCard } from "@/components/v20/article-card";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { listPublicArticles } from "@/lib/queries/verejnost";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 
 const HUB_SECTIONS = [
   {
@@ -59,7 +60,8 @@ export async function V25HomepageHubSections({
 }: {
   professionalArticles: DisplayArticle[];
 }) {
-  const publicArticles = await listPublicArticles({ limit: 3, ensureContent: true });
+  const locale = await getServerLocale();
+  const publicArticles = await listPublicArticles({ limit: 3, ensureContent: true, locale });
 
   return (
     <>
@@ -121,7 +123,7 @@ export async function V25HomepageHubSections({
           </div>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {publicArticles.map((article) => (
-              <VerejnostArticleCard key={article.id} article={article} variant="compact" />
+              <VerejnostArticleCard key={article.id} article={article} variant="compact" locale={locale} />
             ))}
           </div>
           {publicArticles.length === 0 ? (
@@ -160,7 +162,7 @@ export async function V25HomepageHubSections({
           </div>
           <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {professionalArticles.slice(0, 3).map((article) => (
-              <V20ArticleCard key={article.id} article={article} />
+              <V20ArticleCard key={article.id} article={article} locale={locale} />
             ))}
           </div>
           {professionalArticles.length === 0 ? (

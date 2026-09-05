@@ -16,6 +16,10 @@ import type { Category } from "@/types/database";
 import { HeaderLogo, HEADER_TAGLINE } from "@/components/layout/header-logo";
 import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import type { NavItem } from "@/lib/config/main-navigation";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { getPortalChrome } from "@/lib/v271/portal";
+import { isStudentChromePath, studentNavCtaLabel } from "@/lib/studenti/pricing";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export function V20MobileNav({
   mainMenu,
@@ -39,6 +43,8 @@ export function V20MobileNav({
     href === "/" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
 
   const topCategories = categories.slice(0, 8);
+  const surface = getSurfaceCopy(locale);
+  const chrome = getPortalChrome(locale);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -47,7 +53,7 @@ export function V20MobileNav({
           variant="outline"
           size="icon"
           className="md:hidden touch-manipulation border-black/[0.06] dark:border-white/10"
-          aria-label="Otevřít menu"
+          aria-label={surface.menuOpen}
         >
           <Menu className="h-5 w-5" />
         </Button>
@@ -57,15 +63,15 @@ export function V20MobileNav({
         className="flex w-[min(100vw-1rem,380px)] flex-col overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]"
       >
         <SheetHeader className="shrink-0 text-left">
-          <HeaderLogo className="mb-2 items-start" />
+          <HeaderLogo locale={locale} className="mb-2 items-start" />
           <SheetTitle className="font-display text-lg text-[#021d33] dark:text-[#E0E0E0]">
             {HEADER_TAGLINE}
           </SheetTitle>
         </SheetHeader>
 
-        <nav className="mt-4 flex-1 space-y-2" aria-label="Mobilní navigace">
+        <nav className="mt-4 flex-1 space-y-2" aria-label={surface.menuOpen}>
           <div className="rounded-xl border border-[#005B96]/20 bg-[#f4f9fc] p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">Aplikace</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">{surface.footer.apps}</p>
             <div className="mt-2 grid grid-cols-2 gap-1.5">
               <Link
                 href="/app/mediflow"
@@ -125,7 +131,7 @@ export function V20MobileNav({
                     <button
                       type="button"
                       aria-expanded={isExpanded}
-                      aria-label={`Rozbalit ${item.label}`}
+                      aria-label={`${surface.expandMenu} ${item.label}`}
                       className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100"
                       onClick={() => setExpanded(isExpanded ? null : item.label)}
                     >
@@ -177,23 +183,30 @@ export function V20MobileNav({
         <div className="mt-4 shrink-0 flex flex-col gap-2 border-t border-slate-200 pt-4">
           <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
             <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">
-              Jazyk
+              {surface.language}
             </p>
             <LocaleSwitcher currentLocale={locale} />
           </div>
           <Button asChild className="rounded-full bg-primary touch-manipulation">
-            <Link href="/predplatne?trial=1" onClick={() => setOpen(false)}>
-              14 dní zdarma
+            <Link
+              href={
+                isStudentChromePath(pathname)
+                  ? localizePublicHref("/predplatne#student", locale)
+                  : "/predplatne?trial=1"
+              }
+              onClick={() => setOpen(false)}
+            >
+              {isStudentChromePath(pathname) ? studentNavCtaLabel(locale) : chrome.trialCta}
             </Link>
           </Button>
           <Button asChild variant="outline" className="rounded-full touch-manipulation">
             <Link href="/aplikace" onClick={() => setOpen(false)}>
-              Stáhnout aplikace
+              {surface.downloadApps}
             </Link>
           </Button>
           <Button asChild variant="outline" className="rounded-full touch-manipulation">
             <Link href="/login" onClick={() => setOpen(false)}>
-              Přihlášení
+              {surface.signIn}
             </Link>
           </Button>
         </div>

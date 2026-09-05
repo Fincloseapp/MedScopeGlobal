@@ -43,6 +43,8 @@ export async function runV26RewriteBackfill(options?: {
   audience?: "public" | "student" | "physician" | "all";
   /** Only include articles published within the last N days. */
   days?: number;
+  /** Refresh the least-recently-touched published rows, not only boilerplate. */
+  rotate?: boolean;
 }): Promise<V26BackfillResult> {
   const admin = createServiceRoleClient();
   const batchSize = options?.batchSize ?? Number(process.env.V26_REWRITE_BATCH ?? 8);
@@ -62,6 +64,8 @@ export async function runV26RewriteBackfill(options?: {
     source_url: string | null;
     source_name: string | null;
     public_topic: string | null;
+    updated_at?: string | null;
+    published_at?: string | null;
   };
 
   const batch: ArticleRow[] = [];
@@ -81,7 +85,7 @@ export async function runV26RewriteBackfill(options?: {
     let query = admin
       .from("articles")
       .select(
-        "id, title, slug, excerpt, content, metadata, min_access_level, audience, source_url, source_name, public_topic"
+        "id, title, slug, excerpt, content, metadata, min_access_level, audience, source_url, source_name, public_topic, updated_at, published_at"
       )
       .eq("published", true);
 
@@ -98,7 +102,10 @@ export async function runV26RewriteBackfill(options?: {
     }
 
     const { data: page, error: fetchErr } = await query
-      .order("published_at", { ascending: false })
+      .order(options?.rotate ? "updated_at" : "published_at", {
+        ascending: Boolean(options?.rotate),
+        nullsFirst: Boolean(options?.rotate),
+      })
       .range(offset, offset + BACKFILL_PAGE_SIZE - 1);
 
     if (fetchErr) {
@@ -115,11 +122,18 @@ export async function runV26RewriteBackfill(options?: {
     if (!page?.length) break;
 
     scanned += page.length;
+    const staleCutoff = Date.now() - 7 * 86_400_000;
     for (const article of page as ArticleRow[]) {
-      if (needsV26Rewrite(article.metadata, article.content, article.title, article.excerpt)) {
+      if (options?.rotate) {
+        const meta = (article.metadata ?? {}) as Record<string, unknown>;
+        const refreshed = typeof meta.content_refreshed_at === "string" ? meta.content_refreshed_at : null;
+        const touch = Date.parse(refreshed || article.updated_at || article.published_at || "");
+        if (Number.isFinite(touch) && touch > staleCutoff) continue;
         batch.push(article);
-        if (batch.length >= batchSize) break;
+      } else if (needsV26Rewrite(article.metadata, article.content, article.title, article.excerpt)) {
+        batch.push(article);
       }
+      if (batch.length >= batchSize) break;
     }
 
     if (page.length < BACKFILL_PAGE_SIZE) break;
@@ -152,10 +166,14 @@ export async function runV26RewriteBackfill(options?: {
         seed: article.slug,
       });
 
-      const metadata = mergeV26Metadata(
-        (article.metadata ?? {}) as Record<string, unknown>,
-        rewritten.metadata
-      );
+      const now = new Date().toISOString();
+      const metadata = {
+        ...mergeV26Metadata(
+          (article.metadata ?? {}) as Record<string, unknown>,
+          rewritten.metadata
+        ),
+        content_refreshed_at: now,
+      };
 
       const { error } = await admin
         .from("articles")
@@ -165,7 +183,7 @@ export async function runV26RewriteBackfill(options?: {
           content: rewritten.content,
           meta_description: rewritten.excerpt.slice(0, 160),
           metadata,
-          updated_at: new Date().toISOString(),
+          updated_at: now,
         })
         .eq("id", article.id);
 

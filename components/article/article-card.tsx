@@ -5,21 +5,28 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
-import { publicEditorialByline } from "@/lib/editorial/units";
+import { listingByline } from "@/lib/editorial/units";
 import type { ArticleWithRelations } from "@/types/database";
 import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
+import { formatArticleDateLabel } from "@/lib/editorial/freshness";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
-export function ArticleCard({ article }: { article: DisplayArticle | ArticleWithRelations }) {
+export function ArticleCard({
+  article,
+  locale,
+}: {
+  article: DisplayArticle | ArticleWithRelations;
+  locale?: string;
+}) {
   const cat = article.categories;
-  const editorialLocale = article.locale === "en" ? "en" : "cs";
-  const authorLabel = publicEditorialByline(editorialLocale);
-  const date =
-    article.published_at &&
-    new Date(article.published_at).toLocaleDateString("cs-CZ", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+  const editorialLocale =
+    locale ??
+    ("displayLocale" in article && article.displayLocale
+      ? article.displayLocale
+      : article.locale ?? "cs");
+  const authorLabel = listingByline(article, editorialLocale);
+  const href = localizePublicHref(`/article/${article.slug}`, editorialLocale);
+  const dateLabel = formatArticleDateLabel(article, editorialLocale);
   const coverMeta = getArticleCoverLabel(article.title, cat?.name);
   const coverStyles = getArticleCoverStyles(article.title, cat?.name);
   const coverUrl = resolveArticleCoverUrl({
@@ -34,7 +41,7 @@ export function ArticleCard({ article }: { article: DisplayArticle | ArticleWith
 
   return (
     <Card className="group overflow-hidden rounded-[26px] border border-slate-200/80 bg-white/95 shadow-[0_16px_50px_-28px_rgba(2,30,57,0.55)] transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_24px_70px_-28px_rgba(0,91,150,0.6)]">
-      <Link href={`/article/${article.slug}`} className="block">
+      <Link href={href} className="block">
         <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-950">
           {coverUrl ? (
             <>
@@ -106,12 +113,12 @@ export function ArticleCard({ article }: { article: DisplayArticle | ArticleWith
       </Link>
       <CardFooter className="flex items-center justify-between border-t border-slate-100 bg-slate-50/90 px-5 py-3 text-xs text-muted-foreground">
         <span className="font-medium text-slate-700 line-clamp-1">{authorLabel}</span>
-        {date && (
+        {dateLabel?.text ? (
           <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 font-medium text-slate-500">
             <Calendar className="h-3.5 w-3.5" />
-            {date}
+            <time dateTime={dateLabel.dateTime}>{dateLabel.text}</time>
           </span>
-        )}
+        ) : null}
       </CardFooter>
     </Card>
   );

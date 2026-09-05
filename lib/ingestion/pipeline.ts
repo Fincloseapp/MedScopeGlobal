@@ -235,6 +235,7 @@ export async function runIngestionPipeline(options: {
   try {
     v26Foreign = await runV26ForeignNewsIngest({
       maxArticles: Math.min(8, Math.max(maxArticles - created, 0) || 6),
+      preferLongevity: true,
     });
     created += v26Foreign.created;
     skipped += v26Foreign.skipped;

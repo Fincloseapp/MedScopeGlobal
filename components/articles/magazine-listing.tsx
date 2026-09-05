@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NewsMagazineCard } from "@/components/articles/news-article-card";
-import { VitascopeMastheadBanner } from "@/components/articles/vitascope-mark";
+import { ViaLongeVitaMasthead } from "@/components/brand/vialongevita-mark";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import {
   EDITORIAL_PILLARS,
@@ -10,7 +10,11 @@ import {
   MAGAZINE,
 } from "@/lib/brand/magazine";
 import { VITASCOPE_DESK_LOGO, VITASCOPE_TRACK_LOGO } from "@/lib/brand/vitascope";
-import { NEWS_DESKS, type NewsDeskId } from "@/lib/v271/news-desks";
+import { newsDesksForLocale, type NewsDeskId } from "@/lib/v271/news-desks";
+import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { isCzechSurface } from "@/lib/i18n/surface-copy";
 
 export function MagazineListing({
   articles,
@@ -23,18 +27,26 @@ export function MagazineListing({
 }) {
   const featured = articles[0];
   const rest = articles.slice(1);
-  const desk = NEWS_DESKS.find((item) => item.id === (activeDesk ?? "clanky")) ?? NEWS_DESKS[3]!;
+  const desks = newsDesksForLocale(locale);
+  const desk = desks.find((item) => item.id === (activeDesk ?? "clanky")) ?? desks[3]!;
   const copy = getMagazineListingCopy(locale);
   const brand = getMagazineCopy(locale);
   const isCs = !locale || locale === "cs" || locale.startsWith("cs");
 
   return (
     <div className="v20-articles mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <VitascopeMastheadBanner
-        desk={activeDesk}
+      <ViaLongeVitaMasthead
+        locale={locale}
         title={activeDesk ? desk.label : MAGAZINE.name}
         blurb={activeDesk ? desk.blurb : copy.intro}
       />
+
+      <div className="mt-5">
+        <ListingAffiliateBox
+          locale={locale as GlobalLocaleCode}
+          topic={activeDesk}
+        />
+      </div>
 
       <div className="mt-5 rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm sm:px-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
@@ -44,7 +56,7 @@ export function MagazineListing({
             </p>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{brand.tagline}</p>
           </div>
-          <Link href="/articles/archiv" className="text-sm font-medium text-primary hover:underline">
+          <Link href={localizePublicHref("/articles/archiv", locale)} className="text-sm font-medium text-primary hover:underline">
             {copy.archive}
           </Link>
         </div>
@@ -71,17 +83,20 @@ export function MagazineListing({
         </p>
         <div className="mt-2 flex flex-wrap gap-2">
           <Link
-            href="/articles"
+            href={localizePublicHref("/articles", locale)}
             className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm ${
               !activeDesk ? "border-[#005B96] bg-[#005B96] text-white" : "bg-white text-slate-700"
             }`}
           >
             {copy.all}
           </Link>
-          {NEWS_DESKS.map((item) => (
+          {desks.map((item) => (
             <Link
               key={item.id}
-              href={item.id === "clanky" ? "/articles?desk=clanky" : `/articles?desk=${item.id}`}
+              href={localizePublicHref(
+                item.id === "clanky" ? "/articles?desk=clanky" : `/articles?desk=${item.id}`,
+                locale
+              )}
               className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm ${
                 activeDesk === item.id
                   ? "border-[#005B96] bg-[#005B96] text-white"
@@ -103,13 +118,14 @@ export function MagazineListing({
         </div>
       </nav>
 
+      {isCzechSurface(locale) ? (
       <nav aria-label={copy.studyLabel} className="mt-4">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
           {copy.studyLabel}
         </p>
         <div className="mt-2 flex flex-wrap gap-2">
           <Link
-            href="/articles?med_track=priprava"
+            href={localizePublicHref("/articles?med_track=priprava", locale)}
             className="inline-flex items-center gap-2 rounded-full border border-dashed border-slate-300 bg-slate-50 px-3 py-1.5 text-sm text-slate-600 hover:border-[#005B96]/40 hover:text-[#005B96]"
           >
             <span className="relative h-5 w-5 overflow-hidden rounded-full bg-[#050b1d]">
@@ -124,7 +140,7 @@ export function MagazineListing({
             {copy.prep}
           </Link>
           <Link
-            href="/articles?med_track=studium"
+            href={localizePublicHref("/articles?med_track=studium", locale)}
             className="inline-flex items-center gap-2 rounded-full border border-dashed border-slate-300 bg-slate-50 px-3 py-1.5 text-sm text-slate-600 hover:border-[#005B96]/40 hover:text-[#005B96]"
           >
             <span className="relative h-5 w-5 overflow-hidden rounded-full bg-[#050b1d]">
@@ -140,13 +156,14 @@ export function MagazineListing({
           </Link>
         </div>
       </nav>
+      ) : null}
 
       {featured ? (
         <div className="mt-8">
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
             {copy.featured}
           </p>
-          <NewsMagazineCard article={featured} featured />
+          <NewsMagazineCard article={featured} featured locale={locale} />
         </div>
       ) : (
         <p className="mt-8 text-sm text-slate-500">{copy.empty}</p>
@@ -158,10 +175,22 @@ export function MagazineListing({
             {copy.more}
           </p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {rest.map((article) => (
-              <NewsMagazineCard key={article.id} article={article} />
+            {rest.slice(0, 3).map((article) => (
+              <NewsMagazineCard key={article.id} article={article} locale={locale} />
             ))}
           </div>
+          {rest.length > 3 ? (
+            <div className="mt-8">
+              <ListingAffiliateBox locale={locale as GlobalLocaleCode} topic={activeDesk} />
+            </div>
+          ) : null}
+          {rest.length > 3 ? (
+            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {rest.slice(3).map((article) => (
+                <NewsMagazineCard key={article.id} article={article} locale={locale} />
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : null}
 

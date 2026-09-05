@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Download, CheckCircle2, Share, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getOrdiZapisAppCopy } from "@/lib/i18n/ordizapis-app-copy";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -26,12 +27,15 @@ export function InstallAppButton({
   className,
   gated = false,
   canInstall = true,
+  locale,
 }: {
   className?: string;
   /** When true, requires canInstall=true (verified physician). */
   gated?: boolean;
   canInstall?: boolean;
+  locale?: string;
 }) {
+  const copy = getOrdiZapisAppCopy(locale);
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [iosTip, setIosTip] = useState(false);
@@ -89,7 +93,7 @@ export function InstallAppButton({
         className={`inline-flex items-center gap-2 rounded-full bg-emerald-500/15 px-3 py-1.5 text-xs font-medium text-emerald-200 ${className ?? ""}`}
       >
         <CheckCircle2 className="h-3.5 w-3.5" />
-        Aplikace nainstalována
+        {copy.installed}
       </div>
     );
   }
@@ -104,7 +108,7 @@ export function InstallAppButton({
       >
         <Link href="/login?next=/app/dokumentace">
           <Lock className="mr-1.5 h-3.5 w-3.5" />
-          Stažení po ověření
+          {copy.installGated}
         </Link>
       </Button>
     );
@@ -119,12 +123,12 @@ export function InstallAppButton({
         className="h-8 rounded-full bg-white px-3 text-xs font-semibold text-[#021d33] hover:bg-sky-50"
       >
         <Download className="mr-1.5 h-3.5 w-3.5" />
-        Stáhnout aplikaci
+        {copy.installApp}
       </Button>
       {iosTip || (!deferred && isIos()) ? (
         <p className="max-w-[220px] text-right text-[10px] leading-4 text-sky-100/90">
           <Share className="mr-0.5 inline h-3 w-3" />
-          iOS: Sdílet → Na plochu
+          {copy.iosShare}
         </p>
       ) : null}
     </div>

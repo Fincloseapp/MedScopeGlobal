@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { createServiceRoleClient } from "@/lib/supabase/service";
 import { withApiGuard } from "@/lib/security/api-guard";
 import { logAiAgentUsage } from "@/lib/security/ai-abuse";
 import { assertDokumentaceAccess } from "@/lib/lekari/dokumentace/access";
@@ -11,6 +10,8 @@ import {
   DOKUMENTACE_TEMPLATES,
 } from "@/lib/lekari/dokumentace/templates";
 import { saveDokumentaceNote } from "@/lib/lekari/dokumentace/notes";
+import { dokumentaceLocaleFromRequest } from "@/lib/lekari/dokumentace/request-locale";
+import { getOrdiZapisApiCopy } from "@/lib/i18n/ordizapis-api-copy";
 
 export const runtime = "nodejs";
 export const maxDuration = 180;
@@ -28,6 +29,7 @@ const bodySchema = z.object({
   ]),
   specialty: z.string().max(120).optional(),
   source: z.string().max(40).optional(),
+  locale: z.string().max(16).optional(),
 });
 
 export async function POST(request: Request) {
@@ -43,16 +45,12 @@ export async function POST(request: Request) {
   });
   if (!guard.ok) return guard.response;
 
+  const headerLocale = dokumentaceLocaleFromRequest(request);
   if (!user) {
     return NextResponse.json(
-      { error: "Pro OrdiZapis od MedScopeGlobal se musíte přihlásit." },
+      { error: getOrdiZapisApiCopy(headerLocale).unauthShort },
       { status: 401 }
     );
-  }
-
-  const access = await assertDokumentaceAccess(user.id);
-  if (!access.ok) {
-    return NextResponse.json({ error: access.error }, { status: access.status });
   }
 
   let body: z.infer<typeof bodySchema>;
@@ -61,12 +59,18 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json(
       {
-        error: "Neplatný vstup.",
+        error: getOrdiZapisApiCopy(headerLocale).errInvalidInput,
         modes: DOKUMENTACE_MODES.map((m) => m.id),
         templates: DOKUMENTACE_TEMPLATES.map((t) => t.id),
       },
       { status: 400 }
     );
+  }
+
+  const locale = dokumentaceLocaleFromRequest(request, body.locale);
+  const access = await assertDokumentaceAccess(user.id, locale);
+  if (!access.ok) {
+    return NextResponse.json({ error: access.error }, { status: access.status });
   }
 
   const sourceHeader = request.headers.get("x-dokumentace-source");
@@ -78,6 +82,7 @@ export async function POST(request: Request) {
       mode: body.mode,
       templateId: body.templateId,
       specialty: body.specialty,
+      locale,
     });
 
     await logAiAgentUsage({
@@ -89,8 +94,7 @@ export async function POST(request: Request) {
 
     let savedId: string | null = null;
     try {
-      const admin = createServiceRoleClient();
-      const saved = await saveDokumentaceNote(admin, {
+      const saved = await saveDokumentaceNote({
         userId: user.id,
         note,
         transcript: body.transcript,
@@ -112,7 +116,7 @@ export async function POST(request: Request) {
       noteId: savedId,
     });
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Strukturování selhalo.";
+    const message = e instanceof Error ? e.message : getOrdiZapisApiCopy(locale).errStructure;
     return NextResponse.json({ error: message }, { status: 502 });
   }
 }

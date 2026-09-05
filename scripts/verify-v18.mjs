@@ -25,7 +25,7 @@ const required = [
   "app/api/v18/clinical-check/route.ts",
   "app/api/v18/health/route.ts",
   "app/api/v18/monitoring/route.ts",
-  ".github/workflows/deploy-v18.yml",
+  ".github/workflows/cloudflare-deploy.yml",
 ];
 
 let ok = true;

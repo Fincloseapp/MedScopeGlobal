@@ -119,7 +119,7 @@ git push origin main
 
 Option B: **Manual deployment**
 ```bash
-vercel --prod
+pnpm cf:deploy
 ```
 
 ### Step 6: Post-Deployment Verification
@@ -148,7 +148,7 @@ SUPABASE_PROJECT_REF=xcydgqnivxfhprbmdyym
 ```env
 INGESTION_LOCALE=cs              # New articles ingested in Czech
 DEFAULT_SITE_LOCALE=cs           # Homepage in Czech
-NEXT_PUBLIC_SITE_URL=https://medscopeglobal.vercel.app
+NEXT_PUBLIC_SITE_URL=https://medscopeglobal.com
 ```
 
 ### Translation (🔴 NEEDS ACTION)
@@ -295,11 +295,11 @@ After deployment, verify:
 
 If you need to add the API keys later:
 
-**On Vercel**:
-1. Go to vercel.com → medscopeglobal project
-2. Settings → Environment Variables
+**On Cloudflare**:
+1. Go to dash.cloudflare.com → Workers → medscopeglobal
+2. Settings → Variables and Secrets
 3. Add `OPENAI_API_KEY` and `GOOGLE_TRANSLATE_KEY`
-4. Redeploy
+4. Redeploy (`pnpm cf:deploy`)
 
 **Locally**:
 1. Edit `.env.local`

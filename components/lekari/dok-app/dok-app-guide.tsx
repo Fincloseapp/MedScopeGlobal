@@ -2,74 +2,58 @@
 
 import Link from "next/link";
 import { Mic, Sparkles, FileCheck2, Shield } from "lucide-react";
+import { getOrdiZapisAppCopy } from "@/lib/i18n/ordizapis-app-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
-const STEPS = [
-  {
-    icon: Mic,
-    title: "1. Povolte mikrofon",
-    text: "Jednou klepněte na „Povolit mikrofon“ v telefonu. Nahráváte přímo v mobilu — diktát i konzultaci.",
-  },
-  {
-    icon: Sparkles,
-    title: "2. Nahrajte diktát nebo konzultaci",
-    text: "Režim Diktát (po vyšetření) nebo Konzultace (rozhovor s pacientem / pacientkou). Zvolte šablonu → Stop a zpracovat.",
-  },
-  {
-    icon: FileCheck2,
-    title: "3. Zkontrolujte a zkopírujte",
-    text: "Upravte návrh, zkopírujte do NIS. Historie je pod stejným účtem na mobilu i PC.",
-  },
-  {
-    icon: Shield,
-    title: "4. Právní rámec",
-    text: "Asistent, ne zdravotnický prostředek. Lékař schvaluje finální znění. Před nahrávkou konzultace informujte pacienta / pacientku.",
-  },
-] as const;
+const STEP_ICONS = [Mic, Sparkles, FileCheck2, Shield] as const;
 
-export function DokAppGuide() {
+export function DokAppGuide({ locale }: { locale?: string }) {
+  const copy = getOrdiZapisAppCopy(locale);
+  const marketingHref = localizePublicHref("/lekari/dokumentace", locale ?? "cs");
   return (
     <div className="mx-auto w-full max-w-3xl space-y-4 px-3 pb-4 pt-2 sm:px-4">
       <div>
-        <h2 className="text-base font-semibold text-[#021d33]">Návod</h2>
-        <p className="mt-1 text-xs text-slate-500">
-          Po stažení: mikrofon → nahrát (diktát nebo konzultace) → hotový zápis.
-        </p>
+        <h2 className="text-base font-semibold text-[#021d33]">{copy.guideTitle}</h2>
+        <p className="mt-1 text-xs text-slate-500">{copy.guideLead}</p>
       </div>
 
       <ol className="space-y-3">
-        {STEPS.map(({ icon: Icon, title, text }) => (
-          <li
-            key={title}
-            className="flex gap-3 rounded-2xl border border-[#cfe1f3] bg-white p-4"
-          >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e8f2f9] text-[#005B96]">
-              <Icon className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-[#021d33]">{title}</h3>
-              <p className="mt-1 text-sm leading-6 text-slate-600">{text}</p>
-            </div>
-          </li>
-        ))}
+        {copy.guideSteps.map(({ title, text }, index) => {
+          const Icon = STEP_ICONS[index] ?? Mic;
+          return (
+            <li
+              key={title}
+              className="flex gap-3 rounded-2xl border border-[#cfe1f3] bg-white p-4"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e8f2f9] text-[#005B96]">
+                <Icon className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-[#021d33]">{title}</h3>
+                <p className="mt-1 text-sm leading-6 text-slate-600">{text}</p>
+              </div>
+            </li>
+          );
+        })}
       </ol>
 
       <div className="rounded-2xl border border-[#d9e8f4] bg-[#f4f9fc] p-4 text-xs leading-5 text-slate-600">
-        <p className="font-semibold text-[#021d33]">Když telefon mikrofon nepovolí</p>
+        <p className="font-semibold text-[#021d33]">{copy.micHelpTitle}</p>
         <ul className="mt-2 list-disc space-y-1.5 pl-4">
-          <li>iPhone: Nastavení → Safari (nebo OrdiZapis) → Mikrofon → Povolit</li>
-          <li>Android: Nastavení → Aplikace → Chrome / OrdiZapis → Oprávnění → Mikrofon</li>
-          <li>Pak v aplikaci znovu „Povolit mikrofon“</li>
+          {copy.micHelp.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
         </ul>
-        <p className="mt-3 font-semibold text-[#021d33]">Právní upozornění</p>
+        <p className="mt-3 font-semibold text-[#021d33]">{copy.legalTitle}</p>
         <ul className="mt-2 list-disc space-y-1.5 pl-4">
-          <li>OrdiZapis od MedScopeGlobal není zdravotnický prostředek ani diagnóza.</li>
-          <li>Lékař odpovídá za kontrolu a schválení zápisu.</li>
-          <li>Audio se po zpracování neukládá (ephemeral).</li>
+          {copy.legal.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
         </ul>
         <p className="mt-3">
-          Marketing a předplatné:{" "}
-          <Link href="/lekari/dokumentace" className="font-medium text-[#005B96] underline">
-            /lekari/dokumentace
+          {copy.marketing}:{" "}
+          <Link href={marketingHref} className="font-medium text-[#005B96] underline">
+            {marketingHref}
           </Link>
         </p>
       </div>

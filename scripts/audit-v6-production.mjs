@@ -115,44 +115,38 @@ function auditEdgeFunctions() {
 }
 
 function auditCrons() {
-  console.log("\n=== 4) Vercel cron jobs ===");
-  const vercel = JSON.parse(fs.readFileSync(path.join(root, "vercel.json"), "utf8"));
-  const cronPaths = (vercel.crons ?? []).map((c) => c.path);
+  console.log("\n=== 4) Cloudflare cron dispatcher ===");
+  const cronFile = path.join(root, ".github/workflows/cloudflare-cron.yml");
+  if (!fs.existsSync(cronFile)) {
+    fail("missing .github/workflows/cloudflare-cron.yml");
+    return;
+  }
+  const cronText = fs.readFileSync(cronFile, "utf8");
+  const cronPaths = [...cronText.matchAll(/\/api\/cron\/[A-Za-z0-9/_-]+/g)].map((m) => m[0]);
 
   for (const cronPath of cronPaths) {
     const rel = cronPath.replace(/^\/api\/cron\//, "");
     const routeFile = path.join(root, "app/api/cron", rel, "route.ts");
     if (!fs.existsSync(routeFile)) {
-      fail(`vercel.json cron points to missing route: ${cronPath}`);
+      fail(`cloudflare-cron.yml points to missing route: ${cronPath}`);
       continue;
     }
     const src = fs.readFileSync(routeFile, "utf8");
     if (!src.includes("export async function GET")) {
-      fail(`Cron route ${cronPath} missing GET handler (Vercel crons invoke GET)`);
+      fail(`Cron route ${cronPath} missing GET handler`);
     } else {
       pass(`Cron ${cronPath} → route exists (GET)`);
-    }
-  }
-
-  for (const cfg of Object.values(V6_ROUTES)) {
-    if (!cronPaths.includes(cfg.cronPath)) {
-      fail(`V6 cron not in vercel.json: ${cfg.cronPath}`);
     }
   }
 }
 
 function auditBuildConfig() {
-  console.log("\n=== 6) Vercel / Next config ===");
-  const vercel = JSON.parse(fs.readFileSync(path.join(root, "vercel.json"), "utf8"));
-  if ("outputDirectory" in vercel) fail("vercel.json has invalid outputDirectory");
-  else pass("vercel.json: no outputDirectory conflict");
-
-  const rewrites = vercel.rewrites ?? [];
-  const badRewrite = rewrites.some(
-    (r) => r.source?.includes("/api") && !r.destination?.includes("/api")
-  );
-  if (badRewrite) fail("vercel.json rewrites /api to frontend");
-  else pass("vercel.json: no /api rewrites to frontend");
+  console.log("\n=== 6) Cloudflare / Next config ===");
+  if (fs.existsSync(path.join(root, "vercel.json"))) {
+    fail("vercel.json must not exist");
+  } else {
+    pass("no vercel.json");
+  }
 
   const nextSrc = fs.readFileSync(path.join(root, "next.config.mjs"), "utf8");
   if (nextSrc.includes("i18n:")) fail("next.config.mjs contains legacy i18n");

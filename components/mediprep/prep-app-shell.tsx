@@ -165,6 +165,10 @@ export function PrepAppShell() {
       const res = await fetch(`/api/mediprep/test?${qs.toString()}`, {
         credentials: "same-origin",
       });
+      if (res.status === 402) {
+        window.location.href = "/predplatne#student";
+        return;
+      }
       if (!res.ok) {
         setTest(fallback());
       } else {
@@ -737,7 +741,7 @@ export function PrepAppShell() {
               </form>
             )}
             <Link href="/predplatne#student" className="block text-sm font-medium text-[#C45C26]">
-              Student LF 149 Kč · 14 dní zdarma →
+              Student LF · 1 test zdarma · 89 Kč, pak 149 Kč →
             </Link>
           </div>
         )}

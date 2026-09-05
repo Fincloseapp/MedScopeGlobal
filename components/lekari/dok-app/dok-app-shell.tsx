@@ -16,15 +16,15 @@ import { AppBrandVisual } from "@/components/apps/app-brand-visual";
 import { ORDIZAPIS } from "@/lib/lekari/dokumentace/branding";
 import { ORDIZAPIS_APP } from "@/lib/apps/catalog";
 import { guestAccess, type AppAccessInfo } from "@/lib/apps/access-status";
+import { getClientLocale } from "@/lib/i18n/client-dictionary";
+import {
+  getOrdiZapisAppCopy,
+  ordizapisLoginHref,
+  ordizapisSubscribeHref,
+} from "@/lib/i18n/ordizapis-app-copy";
+import { dokumentaceLocaleHeaders } from "@/lib/lekari/dokumentace/request-locale";
 
 type TabId = "zapis" | "historie" | "navod" | "ucet";
-
-const TABS = [
-  { id: "zapis" as const, label: "Zápis", icon: FilePlus2 },
-  { id: "historie" as const, label: "Historie", icon: History },
-  { id: "navod" as const, label: "Návod", icon: BookOpen },
-  { id: "ucet" as const, label: "Účet", icon: UserRound },
-];
 
 type EligibilityState = {
   eligible: boolean;
@@ -39,23 +39,37 @@ type EligibilityState = {
   access?: AppAccessInfo;
 };
 
-const FALLBACK_ACCESS = guestAccess(
-  "/login?next=/app/dokumentace",
-  "/predplatne#dokumentace",
-  "Host · vyžaduje ověřeného lékaře"
-);
+function fallbackAccess(hostLabel: string, locale?: string) {
+  return guestAccess(
+    ordizapisLoginHref(locale),
+    ordizapisSubscribeHref(locale),
+    hostLabel
+  );
+}
 
 function initialTab(): TabId {
   // Always same on server + first client paint (avoid hydration mismatch).
   return "zapis";
 }
 
-export function DokAppShell() {
+export function DokAppShell({ locale: localeProp }: { locale?: string }) {
   const [tab, setTab] = useState<TabId>(initialTab);
   const [online, setOnline] = useState(true);
   const [elig, setElig] = useState<EligibilityState | null>(null);
   const [loading, setLoading] = useState(true);
   const [linkHint, setLinkHint] = useState<string | null>(null);
+  const [locale, setLocale] = useState(localeProp ?? "cs");
+  const copy = getOrdiZapisAppCopy(locale);
+  const tabs = [
+    { id: "zapis" as const, label: copy.tabNote, icon: FilePlus2 },
+    { id: "historie" as const, label: copy.tabHistory, icon: History },
+    { id: "navod" as const, label: copy.tabGuide, icon: BookOpen },
+    { id: "ucet" as const, label: copy.tabAccount, icon: UserRound },
+  ];
+
+  useEffect(() => {
+    setLocale(localeProp ?? getClientLocale());
+  }, [localeProp]);
 
   useEffect(() => {
     const t = new URLSearchParams(window.location.search).get("tab");
@@ -82,13 +96,9 @@ export function DokAppShell() {
     if (link) {
       try {
         sessionStorage.setItem("dokumentace_install_link", link);
-        setLinkHint(
-          "QR odkaz je vázaný na lékařský účet. Přihlaste se stejným účtem — zápisy a historie se propojí."
-        );
+        setLinkHint(getOrdiZapisAppCopy(getClientLocale()).qrHint);
       } catch {
-        setLinkHint(
-          "QR odkaz je vázaný na lékařský účet. Přihlaste se stejným účtem pro synchronizaci."
-        );
+        setLinkHint(getOrdiZapisAppCopy(getClientLocale()).qrHintShort);
       }
     }
   }, []);
@@ -96,8 +106,10 @@ export function DokAppShell() {
   useEffect(() => {
     void (async () => {
       try {
+        const loc = localeProp ?? getClientLocale();
         const res = await fetch("/api/lekari/dokumentace/eligibility", {
           credentials: "same-origin",
+          headers: dokumentaceLocaleHeaders(loc),
         });
         if (res.ok) {
           const data = (await res.json()) as EligibilityState & {
@@ -109,18 +121,24 @@ export function DokAppShell() {
           setElig({
             eligible: false,
             canInstall: false,
-            message: "Pro aplikaci se přihlaste ověřeným lékařským účtem.",
+            message: getOrdiZapisAppCopy(getClientLocale()).needLogin,
             facilities: [],
-            access: FALLBACK_ACCESS,
+            access: fallbackAccess(
+              getOrdiZapisAppCopy(getClientLocale()).hostLabel,
+              getClientLocale()
+            ),
           });
         }
       } catch {
         setElig({
           eligible: false,
           canInstall: false,
-          message: "Nepodařilo se ověřit přístup. Zkontrolujte připojení.",
+          message: getOrdiZapisAppCopy(getClientLocale()).networkFail,
           facilities: [],
-          access: FALLBACK_ACCESS,
+          access: fallbackAccess(
+            getOrdiZapisAppCopy(getClientLocale()).hostLabel,
+            getClientLocale()
+          ),
         });
       } finally {
         setLoading(false);
@@ -140,9 +158,9 @@ export function DokAppShell() {
     }
   }, [elig?.eligible, tab]);
 
-  const access = elig?.access ?? FALLBACK_ACCESS;
+  const access = elig?.access ?? fallbackAccess(copy.hostLabel, locale);
   const loginUrl = elig?.loginUrl || access.loginUrl;
-  const sectionTabs = TABS.map((t) => ({
+  const sectionTabs = tabs.map((t) => ({
     ...t,
     locked: !elig?.eligible && (t.id === "zapis" || t.id === "historie"),
   }));
@@ -180,10 +198,10 @@ export function DokAppShell() {
                   ? "bg-emerald-400/20 text-emerald-100"
                   : "bg-amber-400/20 text-amber-100"
               }`}
-              title={online ? "Online" : "Offline"}
+              title={online ? copy.online : copy.offline}
             >
               {online ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
-              {online ? "Online" : "Offline"}
+              {online ? copy.online : copy.offline}
             </span>
             {access.authenticated ? (
               <button
@@ -200,10 +218,10 @@ export function DokAppShell() {
                 className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1.5 text-[11px] font-bold text-[#005B96] shadow-sm touch-manipulation hover:bg-sky-50 sm:px-3 sm:text-xs"
               >
                 <LogIn className="h-3.5 w-3.5" />
-                Přihlášení
+                {copy.signIn}
               </Link>
             )}
-            <InstallAppButton gated canInstall={Boolean(elig?.canInstall)} />
+            <InstallAppButton gated canInstall={Boolean(elig?.canInstall)} locale={locale} />
           </div>
         </div>
       </header>
@@ -212,6 +230,14 @@ export function DokAppShell() {
         access={access}
         accent="#005B96"
         onOpenAccount={() => setTab("ucet")}
+        labels={{
+          signIn: copy.signIn,
+          account: copy.tabAccount,
+          access: copy.accessLabel,
+          validity: copy.validityLabel,
+          subscribe: copy.subscribeCta,
+          aria: copy.accountAria,
+        }}
       />
 
       <AppSectionNav
@@ -219,7 +245,7 @@ export function DokAppShell() {
         active={tab}
         onChange={setTab}
         accent="#005B96"
-        ariaLabel={`${ORDIZAPIS.shortName} sekce`}
+        ariaLabel={copy.sectionsAria}
       />
 
       <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-[#f4f9fc] pb-[calc(4.25rem+env(safe-area-inset-bottom))] md:pb-0">
@@ -230,25 +256,27 @@ export function DokAppShell() {
           />
         </div>
         {loading ? (
-          <p className="px-4 py-16 text-center text-sm text-slate-500">Načítám aplikaci…</p>
+          <p className="px-4 py-16 text-center text-sm text-slate-500">{copy.loading}</p>
         ) : !elig?.eligible && (tab === "zapis" || tab === "historie") ? (
           <DokAppGate
-            message={elig?.message || "Stažení a zápisy jsou jen pro ověřené lékaře."}
+            message={elig?.message || copy.gateDefault}
             loginUrl={elig?.loginUrl}
             verifyUrl={elig?.verifyUrl}
             linkedHint={linkHint}
+            locale={locale}
           />
         ) : tab === "zapis" ? (
-          <DokAppRecord />
+          <DokAppRecord locale={locale} />
         ) : tab === "historie" ? (
-          <DokAppHistory />
+          <DokAppHistory locale={locale} />
         ) : tab === "navod" ? (
-          <DokAppGuide />
+          <DokAppGuide locale={locale} />
         ) : (
           <DokAppAccount
             eligibility={elig}
             linkHint={linkHint}
             onEligibility={setElig}
+            locale={locale}
           />
         )}
       </main>

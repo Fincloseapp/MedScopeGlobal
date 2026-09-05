@@ -28,14 +28,12 @@ const NEEDED = [
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_ANON_KEY",
   "SUPABASE_ACCESS_TOKEN",
-  "VERCEL_TOKEN",
   "CLOUDFLARE_ENV_JSON",
 ];
 
 const ENV_BASENAMES = new Set([
   ".env.local",
   ".env.production.local",
-  ".env.vercel.local",
   ".dev.vars",
   ".env.cloudflare.json",
   ".env",

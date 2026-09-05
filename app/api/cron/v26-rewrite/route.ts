@@ -12,10 +12,12 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const batchSize = Number(url.searchParams.get("batch") ?? process.env.V26_REWRITE_BATCH ?? 8);
   const audience = url.searchParams.get("audience") as "public" | "student" | "physician" | "all" | null;
+  const rotate = url.searchParams.get("rotate") === "1";
 
   const result = await runV26RewriteBackfill({
     batchSize,
     audience: audience ?? "all",
+    rotate,
   });
 
   return NextResponse.json({ ok: result.errors.length === 0 || result.updated > 0, ...result });

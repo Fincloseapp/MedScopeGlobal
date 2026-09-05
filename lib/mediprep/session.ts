@@ -4,6 +4,7 @@ import { getVipSubscription } from "@/lib/vip";
 import { MEDIPREP } from "@/lib/apps/catalog";
 import { buildValidityLabel, type AppAccessInfo } from "@/lib/apps/access-status";
 import type { PrepSession } from "@/lib/mediprep/types";
+import { MEDIPREP_FREE_TEST_COOKIE } from "@/lib/studenti/pricing";
 
 export const MEDIPREP_OTP_COOKIE = "mediprep_otp_email";
 
@@ -16,6 +17,7 @@ export async function getPrepSession(): Promise<PrepSession> {
   const loginUrl = `/login?next=${encodeURIComponent(MEDIPREP.appPath)}`;
   const jar = await cookies();
   const otpEmail = jar.get(MEDIPREP_OTP_COOKIE)?.value ?? null;
+  const freeUsed = jar.get(MEDIPREP_FREE_TEST_COOKIE)?.value === "1";
 
   if (!user) {
     if (otpEmail) {
@@ -36,8 +38,10 @@ export async function getPrepSession(): Promise<PrepSession> {
         userId: null,
         entitled: false,
         displayName: otpEmail,
-        firstTestUsed: false,
-        message: "E-mail ověřen kódem. První test zdarma — předplatné Student odemyká simulace.",
+        firstTestUsed: freeUsed,
+        message: freeUsed
+          ? "Volný test je vyčerpaný. Student LF: první měsíc 89 Kč, další 149 Kč."
+          : "E-mail ověřen kódem. První test zdarma — předplatné Student odemyká simulace.",
         loginUrl,
         access,
       };
@@ -59,8 +63,10 @@ export async function getPrepSession(): Promise<PrepSession> {
       userId: null,
       entitled: false,
       displayName: null,
-      firstTestUsed: false,
-      message: "Stačí e-mail a ověřovací kód — bez hesla. První test zdarma.",
+      firstTestUsed: freeUsed,
+      message: freeUsed
+        ? "Volný test je vyčerpaný. Student LF: první měsíc 89 Kč, další 149 Kč."
+        : "Stačí e-mail a ověřovací kód — bez hesla. První test zdarma.",
       loginUrl,
       access,
     };
@@ -102,10 +108,12 @@ export async function getPrepSession(): Promise<PrepSession> {
     userId: user.id,
     entitled: Boolean(studentLike),
     displayName,
-    firstTestUsed: false,
+    firstTestUsed: studentLike ? false : freeUsed,
     message: studentLike
       ? "Předplatné Student je aktivní — simulace a drill jsou odemčené."
-      : "Přihlášeni. První test zdarma, další simulace v tarifu Student 149 Kč.",
+      : freeUsed
+        ? "Přihlášeni. Volný test je vyčerpaný — další simulace v tarifu Student (89 Kč, pak 149 Kč)."
+        : "Přihlášeni. První test zdarma, další simulace v tarifu Student 89 Kč / 149 Kč.",
     loginUrl,
     access,
   };

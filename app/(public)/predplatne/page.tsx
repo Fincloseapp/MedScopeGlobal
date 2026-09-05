@@ -7,16 +7,25 @@ import { SubscriptionTrialBanner } from "@/components/subscription/subscription-
 import { SubscriptionTrustBadges } from "@/components/subscription/subscription-trust-badges";
 import { V27_SUBSCRIPTION_PLANS, subscriptionProductId } from "@/lib/v27/config";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
-import { VIP_TRIAL_DAYS } from "@/lib/vip";
-import { APP_PRODUCTS } from "@/lib/apps/catalog";
+import { APP_PRODUCTS, type AppProductId } from "@/lib/apps/catalog";
+import { getServerLocale, getServerRegion } from "@/lib/i18n/server-locale";
+import { convertCzkToCharge } from "@/lib/i18n/payment-currency";
+import { studentIntroCharge, studentMonthlyCharge } from "@/lib/studenti/pricing";
+import { getSubscribeCopy } from "@/lib/i18n/subscribe-copy";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const region = await getServerRegion();
+  const copy = getSubscribeCopy(locale, region);
   return await buildLocalizedV20PageMetadata({
-    title: "Předplatné | MedScopeGlobal",
-    description: `${VIP_TRIAL_DAYS}denní zkušební verze zdarma. Tarify 99 / 149 / 390 / 490 Kč měsíčně — včetně OrdiZapis od MedScopeGlobal. Platba kartou přes Stripe.`,
+    title: copy.metaTitle,
+    description: copy.metaDescription,
     path: "/predplatne",
+    locale,
   });
 }
 
@@ -27,33 +36,44 @@ export default async function PredplatnePage({
 }) {
   const { trial } = await searchParams;
   const highlightTrial = trial === "1";
+  const locale = await getServerLocale();
+  const region = await getServerRegion();
+  const copy = getSubscribeCopy(locale, region);
+  const surface = getSurfaceCopy(locale);
+  const publicPrice = convertCzkToCharge(99, locale, region);
+  const studentIntro = studentIntroCharge(locale, region);
+  const studentPrice = studentMonthlyCharge(locale, region);
+  const clinicPrice = convertCzkToCharge(390, locale, region);
+  const appPriceById: Record<string, string> = {
+    medipacient: publicPrice.formatted,
+    mediflow: publicPrice.formatted,
+    mediprep: studentPrice.formatted,
+    ordizapis: clinicPrice.formatted,
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <div className="text-center">
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-          Předplatné
+          {copy.eyebrow}
         </p>
         <h1 className="mt-2 font-display text-4xl font-bold text-[#021d33]">
-          Prémiový přístup k medicínskému obsahu
+          {copy.title}
         </h1>
-        <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-          Měsíční nebo roční plány pro veřejnost (MeDipacient), studenty (MeDiprep), ordinace (OrdiZapis) a
-          lékaře. Stažení na mobil u všech tří aplikací. Bez reklam, s AI asistenty — platba přes Stripe.
-        </p>
+        <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">{copy.lead}</p>
       </div>
 
       <div className="mt-10">
-        <SubscriptionTrialBanner />
+        <SubscriptionTrialBanner locale={locale} />
       </div>
 
       {highlightTrial ? (
         <p className="mt-6 rounded-2xl border border-[#cfe1f3] bg-[#f0f7ff]/80 px-4 py-3 text-center text-sm text-slate-700">
-          Přicházíte z trial CTA — níže je zvýrazněný tarif{" "}
+          {copy.trialFromCta}{" "}
           <Link href="#student" className="font-semibold text-[#005B96] hover:underline">
-            Student LF
+            {copy.studentPlan}
           </Link>{" "}
-          (příprava na přijímačky i studium). Rodiče: účet založte na jméno studenta.
+          {copy.trialFromCtaRest}
         </p>
       ) : null}
 
@@ -62,16 +82,22 @@ export default async function PredplatnePage({
         className="mt-8 scroll-mt-24 rounded-2xl border border-[#cfe1f3] bg-white px-5 py-5 sm:px-6"
       >
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#005B96]">
-          Tip pro rodiče a uchazeče
+          {copy.parentsTip}
         </p>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-700">
-          Tarif Student LF (149 Kč/měsíc) otevírá Academy, AI tutor a kvízy. Nejdřív vyzkoušejte{" "}
-          <Link href="/academy/prijimacky/self-test" className="text-[#005B96] hover:underline">
-            self-test
+          {copy.parentsBodyBefore}{" "}
+          <Link
+            href={localizePublicHref("/academy/prijimacky/self-test", locale)}
+            className="text-[#005B96] hover:underline"
+          >
+            {copy.selfTest}
           </Link>{" "}
-          a jednu lekci zdarma — pak dává trial smysl.{" "}
-          <Link href="/studenti#pro-rodice" className="text-[#005B96] hover:underline">
-            Více pro rodiče na /studenti
+          {copy.parentsBodyMid}{" "}
+          <Link
+            href={localizePublicHref("/studenti#pro-rodice", locale)}
+            className="text-[#005B96] hover:underline"
+          >
+            {copy.parentsMore}
           </Link>
           .
         </p>
@@ -80,16 +106,27 @@ export default async function PredplatnePage({
       <section className="mt-10 grid gap-4 md:grid-cols-3">
         {APP_PRODUCTS.map((app) => (
           <article key={app.id} className="rounded-2xl border border-[#d9e8f4] bg-white p-5">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">{app.audience}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">
+              {copy.audienceByApp[app.id] ?? app.audience}
+            </p>
             <h2 className="mt-1 font-display text-lg font-semibold">{app.shortName}</h2>
-            <p className="mt-1 text-sm text-slate-600">{app.tagline}</p>
-            <p className="mt-2 text-xs text-slate-500">{app.priceNote}</p>
+            <p className="mt-1 text-sm text-slate-600">
+              {surface.appTaglines[app.id as AppProductId] ?? app.tagline}
+            </p>
+            <p className="mt-2 text-xs text-slate-500">
+              {(() => {
+                const note = copy.priceNoteByApp[app.id] ?? app.priceNote;
+                const amount = appPriceById[app.id];
+                const needsAmount = Boolean(amount && /(?:potom|then|dann|puis)$/i.test(note.trim()));
+                return needsAmount ? `${note} ${amount} ${copy.perMonth}` : note;
+              })()}
+            </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Link href={app.appPath} className="text-sm font-semibold text-[#005B96]">
-                Otevřít →
+                {copy.openApp}
               </Link>
               <Link href={app.downloadPath} className="text-sm text-slate-500">
-                Stáhnout na mobil
+                {copy.downloadApp}
               </Link>
             </div>
           </article>
@@ -97,15 +134,18 @@ export default async function PredplatnePage({
       </section>
 
       <section className="mt-12">
-        <h2 className="font-display text-2xl font-semibold text-[#021d33]">Vyberte plán</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Všechny tarify zahrnují {VIP_TRIAL_DAYS} dní zkušební verze zdarma. Po kliknutí přejdete
-          na zabezpečenou Stripe pokladnu.
-        </p>
+        <h2 className="font-display text-2xl font-semibold text-[#021d33]">{copy.choosePlan}</h2>
+        <p className="mt-2 text-sm text-muted-foreground">{copy.choosePlanLead}</p>
         <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {V27_SUBSCRIPTION_PLANS.map((plan) => {
+            const localized = copy.plans[plan.tier];
             const highlighted = plan.tier === "dokumentace";
             const studentHighlight = plan.tier === "student" && !highlighted;
+            const isStudent = plan.tier === "student";
+            const monthly = isStudent
+              ? studentPrice
+              : convertCzkToCharge(plan.monthlyCzk, locale, region);
+            const annual = convertCzkToCharge(plan.annualCzk, locale, region);
             return (
               <div
                 key={plan.tier}
@@ -120,36 +160,47 @@ export default async function PredplatnePage({
               >
                 {highlighted ? (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-emerald-700 px-3 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
-                    Nejvýhodnější pro ordinaci — 390 Kč
+                    {copy.bestForClinic} — {clinicPrice.formatted}
                   </span>
                 ) : null}
                 {studentHighlight ? (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#005B96] px-3 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
-                    Nejoblíbenější
+                    {copy.mostPopular}
                   </span>
                 ) : null}
                 <span className="inline-flex w-fit rounded-full bg-[#005B96]/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#005B96]">
-                  {VIP_TRIAL_DAYS} dní zdarma
+                  {isStudent ? copy.studentBadge : copy.daysFree}
                 </span>
                 <h3 className="mt-3 font-display text-xl font-semibold text-[#005B96]">
-                  {plan.name}
+                  {localized.name}
                 </h3>
-                <p className="mt-2">
-                  <span className="text-3xl font-bold">{plan.monthlyCzk} Kč</span>
-                  <span className="text-muted-foreground"> / měsíc</span>
-                </p>
-                <p className="mt-1 text-sm text-slate-600">
-                  Roční: <span className="font-semibold text-[#005B96]">{plan.annualCzk} Kč</span>{" "}
-                  / rok{" "}
-                  <span className="text-emerald-700">(≈ 2 měsíce zdarma)</span>
-                </p>
-                {plan.tier === "dokumentace" ? (
-                  <p className="mt-2 text-xs font-medium text-emerald-800">
-                    Stejná práva lékaře jako tarif 490 Kč — levnější vstup s AI zápisy.
+                {isStudent ? (
+                  <p className="mt-2">
+                    <span className="text-3xl font-bold">{studentIntro.formatted}</span>
+                    <span className="text-muted-foreground"> {copy.firstMonth}</span>
+                    <span className="mt-1 block text-sm text-slate-600">
+                      {copy.thenMonthly} {studentPrice.formatted} {copy.perMonth}
+                    </span>
                   </p>
+                ) : (
+                  <p className="mt-2">
+                    <span className="text-3xl font-bold">{monthly.formatted}</span>
+                    <span className="text-muted-foreground"> {copy.perMonth}</span>
+                  </p>
+                )}
+                {isStudent ? null : (
+                  <p className="mt-1 text-sm text-slate-600">
+                    {copy.yearly}{" "}
+                    <span className="font-semibold text-[#005B96]">{annual.formatted}</span>{" "}
+                    {copy.perYear}{" "}
+                    <span className="text-emerald-700">{copy.twoMonthsFree}</span>
+                  </p>
+                )}
+                {localized.extraNote ? (
+                  <p className="mt-2 text-xs font-medium text-emerald-800">{localized.extraNote}</p>
                 ) : null}
                 <ul className="mt-4 flex-1 space-y-2 text-sm text-slate-600">
-                  {plan.features.map((f) => (
+                  {localized.features.map((f) => (
                     <li key={f} className="flex gap-2">
                       <span className="text-emerald-600" aria-hidden>
                         ✓
@@ -162,21 +213,29 @@ export default async function PredplatnePage({
                   <V27CheckoutButton
                     kind="subscription"
                     productId={subscriptionProductId(plan.tier, "month")}
+                    locale={locale}
                     label={
-                      plan.tier === "dokumentace"
-                        ? `Začít ${VIP_TRIAL_DAYS} dní zdarma — 390 Kč`
-                        : `Začít ${VIP_TRIAL_DAYS}denní trial — měsíčně`
+                      isStudent
+                        ? `${copy.startStudentMonth}`
+                        : plan.tier === "dokumentace"
+                          ? `${copy.daysFree} — ${monthly.formatted}`
+                          : copy.startTrialMonth
                     }
                   />
-                  <V27CheckoutButton
-                    kind="subscription"
-                    productId={subscriptionProductId(plan.tier, "year")}
-                    label={`Začít trial — ročně (${plan.annualCzk} Kč)`}
-                    className="w-full border border-[#005B96]/30 bg-white text-[#005B96] hover:bg-[#005B96]/5"
-                  />
+                  {isStudent ? null : (
+                    <V27CheckoutButton
+                      kind="subscription"
+                      productId={subscriptionProductId(plan.tier, "year")}
+                      locale={locale}
+                      label={`${copy.startTrialYear} (${annual.formatted})`}
+                      className="w-full border border-[#005B96]/30 bg-white text-[#005B96] hover:bg-[#005B96]/5"
+                    />
+                  )}
                 </div>
                 <p className="mt-3 text-center text-xs text-slate-500">
-                  Po {VIP_TRIAL_DAYS} dnech {plan.monthlyCzk} Kč/měs. · zrušení kdykoli
+                  {isStudent
+                    ? `${copy.afterStudentIntro} ${studentPrice.formatted} ${copy.perMonth} · ${copy.cancelAnytime}`
+                    : `${copy.afterTrial} ${monthly.formatted} ${copy.perMonth} · ${copy.cancelAnytime}`}
                 </p>
               </div>
             );
@@ -184,33 +243,48 @@ export default async function PredplatnePage({
         </div>
       </section>
 
-      <SubscriptionComparisonTable />
-      <SubscriptionTrustBadges />
-      <SubscriptionFaq />
+      <SubscriptionComparisonTable locale={locale} region={region} />
+      <SubscriptionTrustBadges locale={locale} />
+      <SubscriptionFaq locale={locale} region={region} />
+
+      <div className="mt-12 rounded-2xl border border-[#cfe1f3] bg-white px-6 py-8 text-center">
+        <h2 className="font-display text-xl font-semibold text-[#021d33]">{copy.supportTitle}</h2>
+        <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">{copy.supportLead}</p>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href={localizePublicHref("/verejnost/clanky?topic=dlouhovekost", locale)}
+            className="inline-flex items-center justify-center rounded-lg bg-[#005B96] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
+          >
+            {copy.supportCta}
+          </Link>
+          <Link
+            href={localizePublicHref("/verejnost/clanky", locale)}
+            className="inline-flex items-center justify-center rounded-lg border border-[#005B96]/30 bg-white px-6 py-2.5 text-sm font-semibold text-[#005B96] hover:bg-[#005B96]/5"
+          >
+            {copy.keepReading}
+          </Link>
+        </div>
+      </div>
 
       <div className="mt-12 rounded-2xl border border-[#005B96]/15 bg-[#f0f7ff]/50 px-6 py-8 text-center">
-        <h2 className="font-display text-xl font-semibold text-[#021d33]">
-          Ještě nemáte účet?
-        </h2>
-        <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
-          Zaregistrujte se zdarma, poté se vraťte sem a aktivujte zkušební verzi vybraného tarifu.
-        </p>
+        <h2 className="font-display text-xl font-semibold text-[#021d33]">{copy.noAccountTitle}</h2>
+        <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">{copy.noAccountLead}</p>
         <Link
-          href="/signup"
+          href={localizePublicHref("/signup", locale)}
           className="mt-4 inline-flex items-center justify-center rounded-lg border border-[#005B96]/30 bg-white px-6 py-2.5 text-sm font-semibold text-[#005B96] hover:bg-[#005B96]/5"
         >
-          Vytvořit účet zdarma
+          {copy.createAccount}
         </Link>
       </div>
 
       <p className="mt-12 text-center text-sm text-muted-foreground">
-        B2B nabídka pro firmy na{" "}
-        <Link href="/firmy" className="text-[#005B96] underline">
+        {copy.b2bNote}{" "}
+        <Link href={localizePublicHref("/firmy", locale)} className="text-[#005B96] underline">
           /firmy
         </Link>
-        . Dotazy:{" "}
-        <Link href="/kontakt" className="text-[#005B96] underline">
-          kontakt
+        . {copy.contact}:{" "}
+        <Link href={localizePublicHref("/kontakt", locale)} className="text-[#005B96] underline">
+          {copy.contact}
         </Link>
         .
       </p>

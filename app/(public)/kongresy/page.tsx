@@ -4,6 +4,8 @@ import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { getV21UpcomingCongresses } from "@/lib/v21/congresses";
 import { AdPlacement } from "@/components/ads/ad-placement";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { formatPublicDate } from "@/lib/i18n/format-date";
 
 export const metadata: Metadata = {
   title: "Kongresy a školení",
@@ -11,6 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function KongresyPage() {
+  const locale = await getServerLocale();
   const events = await getV21UpcomingCongresses(12);
   const topAds = await getActiveAdsByPlacement("congress_top", 1);
 
@@ -45,7 +48,11 @@ export default async function KongresyPage() {
                 <h3 className="font-display text-lg font-semibold text-[#021d33]">{ev.title}</h3>
                 {ev.starts_at ? (
                   <time className="text-xs text-[#005B96] font-semibold">
-                    {new Date(ev.starts_at).toLocaleDateString("cs-CZ")}
+                    {formatPublicDate(ev.starts_at, locale, {
+                      year: "numeric",
+                      month: "numeric",
+                      day: "numeric",
+                    })}
                   </time>
                 ) : null}
               </div>

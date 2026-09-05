@@ -5,6 +5,8 @@ import { logAiAgentUsage } from "@/lib/security/ai-abuse";
 import { assertDokumentaceAccess } from "@/lib/lekari/dokumentace/access";
 import { DOKUMENTACE_MAX_UPLOAD_BYTES } from "@/lib/lekari/dokumentace/templates";
 import { transcribeAudio } from "@/lib/lekari/dokumentace/stt";
+import { dokumentaceLocaleFromForm, dokumentaceLocaleFromRequest } from "@/lib/lekari/dokumentace/request-locale";
+import { getOrdiZapisApiCopy } from "@/lib/i18n/ordizapis-api-copy";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -22,7 +24,8 @@ export async function POST(request: Request) {
   });
   if (!guard.ok) return guard.response;
 
-  const access = await assertDokumentaceAccess(user?.id);
+  const headerLocale = dokumentaceLocaleFromRequest(request);
+  const access = await assertDokumentaceAccess(user?.id, headerLocale);
   if (!access.ok) {
     return NextResponse.json({ error: access.error }, { status: access.status });
   }
@@ -31,13 +34,17 @@ export async function POST(request: Request) {
   try {
     form = await request.formData();
   } catch {
-    return NextResponse.json({ error: "Neplatný multipart formulář." }, { status: 400 });
+    return NextResponse.json(
+      { error: getOrdiZapisApiCopy(headerLocale).errBadForm },
+      { status: 400 }
+    );
   }
 
+  const copy = getOrdiZapisApiCopy(dokumentaceLocaleFromForm(request, form));
   const file = form.get("audio") ?? form.get("file");
   if (!file || typeof file === "string") {
     return NextResponse.json(
-      { error: "Chybí audio soubor (pole audio nebo file)." },
+      { error: copy.errMissingAudio },
       { status: 400 }
     );
   }
@@ -56,7 +63,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { text, provider } = await transcribeAudio(buffer, mimeType);
+    const locale = dokumentaceLocaleFromForm(request, form);
+    const { text, provider } = await transcribeAudio(buffer, mimeType, undefined, locale);
 
     await logAiAgentUsage({
       userId: user!.id,

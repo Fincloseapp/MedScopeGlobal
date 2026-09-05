@@ -1,6 +1,7 @@
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import type { EmailCategory, EmailProvider, EmailSendStatus } from "@/lib/email/types";
 import { logAdminEvent } from "@/lib/logging";
+import { applyEmailLogProviderSchema } from "@/lib/monetization/apply-schema";
 
 export interface EmailLogRow {
   id?: string;
@@ -19,6 +20,7 @@ export interface EmailLogRow {
 
 export async function persistEmailLog(row: EmailLogRow): Promise<void> {
   try {
+    await applyEmailLogProviderSchema();
     const admin = createServiceRoleClient();
     const { error } = await admin.from("email_logs").insert({
       sent_at: row.sent_at,

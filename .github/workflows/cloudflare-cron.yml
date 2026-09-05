@@ -29,21 +29,28 @@ jobs:
           auth="Authorization: Bearer ${CRON_SECRET}"
           paths=(
             /api/cron/ingest
-            /api/cron/public-articles
+            /api/cron/public-articles?limit=1&skipAds=1&skipCovers=1
             /api/cron/public-osveta-daily
-            /api/cron/v25-enterprise
+            /api/cron/v25-enterprise?mode=quick
             /api/cron/marketing
             /api/cron/academy-daily
             /api/cron/v43-health-monitor
             /api/cron/ecosystem-mediflow
             /api/cron/ecosystem-editorial-queue
+            /api/cron/ecosystem-editorial-process
             /api/cron/ecosystem-generate-articles
             /api/cron/ecosystem-syndicate
             /api/ecosystem/editorial/images
+            /api/cron/revenue-ops
+            /api/cron/newsletter-generate
+            /api/cron/vialongevita-brief
+            /api/cron/v26-rewrite?batch=2&rotate=1
+            /api/cron/conversion-renewals
           )
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             paths=("${{ github.event.inputs.path }}")
           fi
+          fail=0
           # Most /api/cron/* routes export GET only (POST → 405). Ecosystem
           # routes accept both; editorial/images is POST-only for the batch.
           for p in "${paths[@]}"; do
@@ -51,8 +58,29 @@ jobs:
             if [ "$p" = "/api/ecosystem/editorial/images" ]; then
               method=POST
             fi
-            code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X "$method" -H "$auth" "$BASE$p" || true)
-            echo "$code $method $p"
-            head -c 200 /tmp/cron.out || true
-            echo
+            code=000
+            try=1
+            while [ "$try" -le 3 ]; do
+              code=$(curl -s -o /tmp/cron.out -w "%{http_code}" --max-time 120 -X "$method" -H "$auth" "$BASE$p" || true)
+              echo "$code $method $p (try $try)"
+              head -c 200 /tmp/cron.out || true
+              echo
+              if [ "$code" = "200" ] || [ "$code" = "204" ]; then
+                break
+              fi
+              if [ "$code" != "502" ] && [ "$code" != "503" ] && [ "$code" != "529" ]; then
+                break
+              fi
+              sleep $((try * 8))
+              try=$((try + 1))
+            done
+            case "$p" in
+              /api/cron/ingest*|/api/cron/public-articles*)
+                if [ "$code" != "200" ] && [ "$code" != "204" ]; then
+                  echo "CRITICAL FAIL $p $code"
+                  fail=1
+                fi
+                ;;
+            esac
           done
+          exit "$fail"

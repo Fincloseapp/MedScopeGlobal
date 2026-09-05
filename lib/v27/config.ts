@@ -25,8 +25,8 @@ export const V27_AUDIENCES = {
     href: "/studenti",
     description: "Příprava na přijímačky LF, studijní materiály, kvízy a AI tutor.",
     ctaPrimary: { label: "Chci studovat medicínu", href: "/studenti/chci-studovat" },
-    ctaSecondary: { label: "AI tutor", href: "/studenti/ai-tutor" },
-    topics: ["přijímačky", "studijní materiály", "kvízy", "modelové otázky", "AI tutor"],
+    ctaSecondary: { label: "Klub kvízů", href: "/studenti/klub" },
+    topics: ["přijímačky", "studijní materiály", "kvízy", "žebříček", "AI tutor"],
     aiRoute: "/ai-asistent/student",
   },
   physician: {
@@ -67,11 +67,13 @@ export const V27_SUBSCRIPTION_PLANS = [
     name: "Student LF",
     monthlyCzk: 149,
     annualCzk: 1490,
+    introMonthlyCzk: 89,
     features: [
       "MeDiprep: testy B/C/F a simulace 8 českých LF",
       "Celá Academy včetně přípravných kurzů na přijímačky",
       "AI tutor a studijní materiály",
       "Kvízy, hry a modelové otázky",
+      "1 test zdarma · první měsíc 89 Kč · další měsíce 149 Kč (EU ~10 €)",
       "149 Kč = Student LF (Academy) — není VIP longevity protokoly",
     ],
   },
@@ -157,6 +159,15 @@ export const V27_B2B_PACKAGES = [
   { id: "sponsored-article", name: "Sponzorovaný článek", priceCzk: 15000, desc: "Editoriální článek s označením partnera" },
   { id: "enterprise", name: "Enterprise", priceCzk: 0, desc: "White-label, API a kampaně na míru — individuální cena" },
 ] as const;
+
+export function isStudentGrantProduct(productId?: string | null): boolean {
+  return Boolean(productId && parseSubscriptionProductId(productId)?.tier === "student");
+}
+
+export function isPhysicianGrantProduct(productId?: string | null): boolean {
+  const parsed = productId ? parseSubscriptionProductId(productId) : null;
+  return parsed?.tier === "physician" || parsed?.tier === "dokumentace";
+}
 
 export function parseSubscriptionProductId(productId: string): {
   tier: V27SubscriptionTier;

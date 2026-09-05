@@ -31,7 +31,7 @@ export default async function DashboardLayout({
         accessLevel={readerContext.accessLevel}
       />
       <main className="flex-1">{children}</main>
-      <SiteFooter />
+      <SiteFooter locale={locale} />
     </div>
   );
 }

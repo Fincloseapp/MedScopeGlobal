@@ -10,12 +10,9 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const message =
   process.env.COMMIT_MESSAGE ??
-  "feat(v17): activate auto-deploy pipeline with GitHub Actions, Vercel deploy, rollback, and monitoring";
+  "feat(v17): activate auto-deploy pipeline with GitHub Actions and Cloudflare Workers";
 
-process.env.COMMIT_ONLY = "1";
-process.env.DEPLOY_COMMIT_MESSAGE = message;
-
-const result = spawnSync(process.execPath, [join(root, "scripts/deploy-vercel-production.mjs")], {
+const result = spawnSync("git", ["commit", "-am", message], {
   cwd: root,
   stdio: "inherit",
   env: process.env,

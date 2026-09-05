@@ -22,11 +22,24 @@ import {
   DOKUMENTACE_MAX_RECORD_MS,
   DOKUMENTACE_SEGMENT_MS,
   DOKUMENTACE_SOFT_UPLOAD_BYTES,
-  DOKUMENTACE_MODES,
-  DOKUMENTACE_TEMPLATES,
   type DokumentaceMode,
   type DokumentaceTemplateId,
 } from "@/lib/lekari/dokumentace/templates";
+import {
+  dokumentaceModesForLocale,
+  dokumentaceTemplatesForLocale,
+} from "@/lib/lekari/dokumentace/note-language";
+import { dokumentaceLocaleHeaders } from "@/lib/lekari/dokumentace/request-locale";
+import { getClientLocale } from "@/lib/i18n/client-dictionary";
+import {
+  fillOrdiApp,
+  getOrdiZapisAppCopy,
+  ordizapisLoginHref,
+  ordizapisSubscribeHref,
+} from "@/lib/i18n/ordizapis-app-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
+import { intlLocaleFor } from "@/lib/i18n/format-date";
 import {
   ORDIZAPIS_FILE_ACCEPT,
   ORDIZAPIS_MAX_FILE_BYTES,
@@ -76,15 +89,25 @@ function isMobileClient(): boolean {
 
 const CONSENT_KEY = "ordizapis_consent_v1";
 
-function micErrorMessage(err: unknown): string {
+function fill(template: string, vars: Record<string, string | number>): string {
+  return Object.entries(vars).reduce(
+    (out, [key, value]) => out.replaceAll(`{${key}}`, String(value)),
+    template
+  );
+}
+
+function micErrorMessage(
+  err: unknown,
+  copy: ReturnType<typeof getOrdiZapisAppCopy>
+): string {
   const name = err && typeof err === "object" && "name" in err ? String((err as { name: string }).name) : "";
   if (name === "NotAllowedError" || name === "PermissionDeniedError") {
-    return "Mikrofon je zablokovaný. V telefonu: Nastavení → OrdiZapis / Safari / Chrome → Mikrofon → Povolit, pak znovu klepněte na „Povolit mikrofon“.";
+    return copy.errMicBlocked;
   }
   if (name === "NotFoundError") {
-    return "Mikrofon nebyl nalezen. Zkontrolujte, že zařízení má mikrofon a není používán jinou aplikací.";
+    return copy.errMicMissing;
   }
-  return "Nepodařilo se získat mikrofon. Povolte přístup a zkuste znovu.";
+  return copy.errMicGeneric;
 }
 
 async function ensureMicPermission(): Promise<MediaStream> {
@@ -103,10 +126,22 @@ async function ensureMicPermission(): Promise<MediaStream> {
 
 type DokumentaceWorkspaceProps = {
   variant?: "default" | "app";
+  locale?: string;
 };
 
-export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspaceProps) {
+export function DokumentaceWorkspace({
+  variant = "default",
+  locale: localeProp,
+}: DokumentaceWorkspaceProps) {
   const isApp = variant === "app";
+  const [locale, setLocale] = useState(localeProp ?? "cs");
+  const copy = getOrdiZapisAppCopy(locale);
+  const modes = dokumentaceModesForLocale(locale);
+  const templates = dokumentaceTemplatesForLocale(locale);
+
+  useEffect(() => {
+    setLocale(localeProp ?? getClientLocale());
+  }, [localeProp]);
   const [consent, setConsent] = useState(false);
   const [mode, setMode] = useState<DokumentaceMode>("dictation");
   const [templateId, setTemplateId] =
@@ -179,6 +214,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     try {
       const res = await fetch("/api/lekari/dokumentace/notes?limit=40", {
         credentials: "same-origin",
+        headers: dokumentaceLocaleHeaders(locale),
       });
       if (!res.ok) {
         setHistory([]);
@@ -191,7 +227,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
     } finally {
       setHistoryLoading(false);
     }
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     void loadHistory();
@@ -219,8 +255,8 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       return {
         error:
           res.status === 413
-            ? "Nahrávka je příliš velká pro odeslání. Zkuste kratší úsek — aplikace teď dělí nahrávku po 2 minutách."
-            : `Server neodpověděl (HTTP ${res.status}). Zkuste znovu.`,
+            ? copy.errTooLarge
+            : fill(copy.errUnexpectedHttp, { status: res.status }),
       };
     }
     try {
@@ -237,35 +273,33 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       if (res.status === 413 || /request entity too large|payload/i.test(raw)) {
         return {
           error:
-            "Nahrávka je příliš velká pro odeslání. Zkuste kratší úsek — aplikace teď dělí nahrávku po 2 minutách.",
+            copy.errTooLarge,
           code: "SEGMENT_TOO_LARGE",
         };
       }
       if (res.status === 401) {
-        return { error: "Pro zpracování se musíte přihlásit." };
+        return { error: copy.errNeedLogin };
       }
       if (res.status >= 500) {
         return {
-          error: `Zpracování na serveru selhalo (HTTP ${res.status}). Zkuste znovu za chvíli.`,
+          error: fill(copy.errServerHttp, { status: res.status }),
         };
       }
       return {
-        error: `Neočekávaná odpověď serveru (HTTP ${res.status}). Zkuste znovu.`,
+        error: fill(copy.errUnexpectedHttp, { status: res.status }),
       };
     }
   }
 
   async function processBlobs(blobs: Blob[]) {
     if (!consent) {
-      setError("Nejprve potvrďte souhlas s nahráváním.");
+      setError(copy.errConsent);
       setState("error");
       return;
     }
     const usable = blobs.filter((b) => b.size > 0);
     if (usable.length === 0) {
-      setError(
-        "Nahrávka je prázdná — mikrofon nic nezachytil. Povolte mikrofon a zkuste znovu."
-      );
+      setError(copy.errEmptyRec);
       setState("error");
       return;
     }
@@ -284,7 +318,10 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         const blob = usable[i];
         if (blob.size > DOKUMENTACE_SOFT_UPLOAD_BYTES) {
           setError(
-            `Segment ${i + 1} je příliš velký (${Math.max(1, Math.round(blob.size / (1024 * 1024)))} MB). Nahrajte znovu — nahrávka se teď automaticky dělí po 2 minutách.`
+            fill(copy.errSegmentTooBig, {
+              n: i + 1,
+              mb: Math.max(1, Math.round(blob.size / (1024 * 1024))),
+            })
           );
           setState("error");
           return;
@@ -303,22 +340,21 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             : new File([blob], meta.filename, { type: meta.mime || blob.type || "audio/wav" });
         form.append("audio", part, meta.filename);
 
+        form.append("locale", locale);
         const res = await fetch("/api/lekari/dokumentace/stt-chunk", {
           method: "POST",
           credentials: "same-origin",
-          headers: { "x-dokumentace-source": source },
+          headers: { "x-dokumentace-source": source, ...dokumentaceLocaleHeaders(locale) },
           body: form,
         });
         const json = await readApiJson(res);
         if (!res.ok) {
-          applyGate(res.status, json.error ?? `Přepis segmentu ${i + 1} selhal.`);
+          applyGate(res.status, json.error ?? fill(copy.errSegmentFailed, { n: i + 1 }));
           return;
         }
         const piece = (json.transcript ?? "").trim();
         if (!piece) {
-          setError(
-            `Segment ${i + 1} se nepřepsal (prázdný výsledek). Zkontrolujte mikrofon a zkuste znovu.`
-          );
+          setError(fill(copy.errSegmentEmpty, { n: i + 1 }));
           setState("error");
           return;
         }
@@ -333,6 +369,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         headers: {
           "Content-Type": "application/json",
           "x-dokumentace-source": source,
+          ...dokumentaceLocaleHeaders(locale),
         },
         body: JSON.stringify({
           transcript,
@@ -340,15 +377,16 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
           templateId,
           specialty: specialty.trim() || undefined,
           source,
+          locale,
         }),
       });
       const structJson = await readApiJson(structRes);
       if (!structRes.ok) {
-        applyGate(structRes.status, structJson.error ?? "Sestavení zápisu selhalo.");
+        applyGate(structRes.status, structJson.error ?? copy.errStructure);
         return;
       }
       if (!(structJson.note ?? "").trim()) {
-        setError("Zápis se nepodařilo sestavit. Zkuste nahrávku znovu.");
+        setError(copy.errStructureRetry);
         setState("error");
         return;
       }
@@ -364,10 +402,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       void loadHistory();
     } catch (err) {
       setError(
-        friendlyFetchError(
-          err,
-          "Zpracování nahrávky selhalo. Zkuste kratší úsek nebo Nahrát soubor znovu."
-        )
+        friendlyFetchError(err, copy.errProcessRec, copy.errUploadConn)
       );
       setState("error");
     }
@@ -383,7 +418,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       if (!consent) setConsent(true);
     } catch (err) {
       setMicReady(false);
-      setError(micErrorMessage(err));
+      setError(micErrorMessage(err, copy));
       setState("error");
     } finally {
       setMicBusy(false);
@@ -392,7 +427,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
 
   async function startRecording() {
     if (!consent) {
-      setError("Nejprve potvrďte souhlas s nahráváním (nebo povolte mikrofon).");
+      setError(copy.errConsentMic);
       setState("error");
       return;
     }
@@ -483,7 +518,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         }
       }, 200);
     } catch (err) {
-      setError(micErrorMessage(err));
+      setError(micErrorMessage(err, copy));
       setMicReady(false);
       setState("error");
     }
@@ -545,21 +580,20 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
 
     try {
       if (file.size > ORDIZAPIS_MAX_FILE_BYTES) {
-        setError(
-          "Soubor je větší než 25 MB. Nahrajte kratší nahrávku nebo použijte Nahrávat v OrdiZapisu."
-        );
+        setError(copy.errFileTooBig);
         setState("error");
         return;
       }
 
       // Always storage/signed upload for picked files (no browser decode, avoids Vercel body kills).
-      const stt = await uploadAndTranscribePhoneFile({ file });
+      const stt = await uploadAndTranscribePhoneFile({ file, locale });
       const structRes = await fetch("/api/lekari/dokumentace/structure", {
         method: "POST",
         credentials: "same-origin",
         headers: {
           "Content-Type": "application/json",
           "x-dokumentace-source": source,
+          ...dokumentaceLocaleHeaders(locale),
         },
         body: JSON.stringify({
           transcript: stt.transcript,
@@ -567,15 +601,16 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
           templateId,
           specialty: specialty.trim() || undefined,
           source,
+          locale,
         }),
       });
       const structJson = await readApiJson(structRes);
       if (!structRes.ok) {
-        applyGate(structRes.status, structJson.error ?? "Sestavení zápisu selhalo.");
+        applyGate(structRes.status, structJson.error ?? copy.errStructure);
         return;
       }
       if (!(structJson.note ?? "").trim()) {
-        setError("Zápis se nepodařilo sestavit. Zkuste nahrávku znovu.");
+        setError(copy.errStructureRetry);
         setState("error");
         return;
       }
@@ -590,7 +625,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       setState("done");
       void loadHistory();
     } catch (err) {
-      setError(friendlyFetchError(err, "Zpracování souboru selhalo.").slice(0, 280));
+      setError(friendlyFetchError(err, copy.errProcessFile, copy.errUploadConn).slice(0, 280));
       setState("error");
     }
   }
@@ -602,7 +637,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       setCopyFlash(true);
       window.setTimeout(() => setCopyFlash(false), 1600);
     } catch {
-      setError("Kopírování do schránky selhalo.");
+      setError(copy.errCopy);
     }
   }
 
@@ -620,14 +655,14 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       await copyText(note);
       return;
     }
-    setError("Zatím není co kopírovat — vytvořte zápis.");
+    setError(copy.errNothingToCopy);
   }
 
   async function shareNote(text: string, title?: string | null) {
     if (!text) return;
     try {
       const result = await shareOrdiZapisDoc(text, {
-        title: title || "OrdiZapis zápis",
+        title: title || copy.noteShareTitle,
         templateId,
       });
       if (result === "copied") {
@@ -655,7 +690,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
   function downloadNote() {
     if (!note) return;
     downloadOrdiZapisDoc(note, {
-      title: "OrdiZapis · klinický zápis",
+      title: copy.noteShareTitle,
       templateId,
     });
   }
@@ -669,11 +704,8 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         <div className="flex gap-3 rounded-xl border border-[#cfe1f3] bg-[#eef6fb] px-4 py-3 text-sm text-[#021d33]">
           <Smartphone className="mt-0.5 h-5 w-5 shrink-0 text-[#005B96]" />
           <div>
-            <p className="font-semibold">Přidat na plochu</p>
-            <p className="mt-0.5 text-slate-600">
-              iOS: Sdílet → Přidat na Domovskou obrazovku. Android: nabídka prohlížeče →
-              Instalovat aplikaci. Nahrajte na mobilu → zápis se objeví i na PC.
-            </p>
+            <p className="font-semibold">{copy.installTipTitle}</p>
+            <p className="mt-0.5 text-slate-600">{copy.installTipBody}</p>
           </div>
         </div>
       ) : null}
@@ -688,7 +720,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
               onChange={(e) => setConsent(e.target.checked)}
             />
             <span>
-              Jde o diktát, nebo jsem informoval/a pacienta / pacientku o nahrávání konzultace
+              {copy.consentLong}
             </span>
           </label>
           <Button
@@ -706,18 +738,18 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             ) : (
               <Mic className="mr-1.5 h-4 w-4" />
             )}
-            {micReady ? "Mikrofon povolen" : "1. Povolit mikrofon"}
+            {micReady ? copy.micOn : copy.allowMic}
           </Button>
         </div>
 
         <p className="mt-3 text-xs leading-5 text-slate-500">
-          Postup: povolit mikrofon → nahrát v mobilu diktát nebo konzultaci s pacientem / pacientkou → Stop a zpracovat. Až 60 min (dělení po 2 min). Zápis se uloží do účtu.
+          {copy.howTo}
         </p>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <div>
             <label className="text-xs font-semibold uppercase tracking-wide text-[#005B96]">
-              Režim
+              {copy.mode}
             </label>
             <select
               className="mt-1.5 h-12 w-full rounded-md border border-input bg-background px-3 text-base"
@@ -725,19 +757,19 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
               onChange={(e) => setMode(e.target.value as DokumentaceMode)}
               disabled={recording || processing}
             >
-              {DOKUMENTACE_MODES.map((m) => (
+              {modes.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.label}
                 </option>
               ))}
             </select>
             <p className="mt-1 text-xs text-slate-500">
-              {DOKUMENTACE_MODES.find((m) => m.id === mode)?.description}
+              {modes.find((m) => m.id === mode)?.description}
             </p>
           </div>
           <div>
             <label className="text-xs font-semibold uppercase tracking-wide text-[#005B96]">
-              Šablona
+              {copy.template}
             </label>
             <select
               className="mt-1.5 h-12 w-full rounded-md border border-input bg-background px-3 text-base"
@@ -747,26 +779,26 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
               }
               disabled={recording || processing || mode === "verbatim"}
             >
-              {DOKUMENTACE_TEMPLATES.map((t) => (
+              {templates.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.label}
                 </option>
               ))}
             </select>
             <p className="mt-1 text-xs text-slate-500">
-              {DOKUMENTACE_TEMPLATES.find((t) => t.id === templateId)?.description}
+              {templates.find((t) => t.id === templateId)?.description}
             </p>
           </div>
         </div>
 
         <div className="mt-4">
           <label className="text-xs font-semibold uppercase tracking-wide text-[#005B96]">
-            Specializace (volitelné)
+            {copy.specialty}
           </label>
           <input
             type="text"
             className="mt-1.5 h-12 w-full rounded-md border border-input bg-background px-3 text-base"
-            placeholder="např. praktické lékařství, kardiologie"
+            placeholder={copy.specialtyPh}
             value={specialty}
             onChange={(e) => setSpecialty(e.target.value)}
             disabled={recording || processing}
@@ -793,11 +825,11 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
               <p className="text-sm font-semibold text-[#021d33]">
                 {recording
                   ? paused
-                    ? "Pozastaveno"
-                    : "Nahrávání…"
+                    ? copy.paused
+                    : copy.recording
                   : processing
-                    ? "Zpracování…"
-                    : "Připraveno k nahrání"}
+                    ? copy.processing
+                    : copy.ready}
               </p>
               <p className="font-mono text-lg text-[#005B96]">
                 {formatMs(elapsedMs)}
@@ -823,11 +855,11 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                 <Mic className="mr-2 h-5 w-5" />
                 {micReady
                   ? mode === "consultation"
-                    ? "2. Nahrávat konzultaci"
-                    : "2. Diktovat"
+                    ? copy.consultStep
+                    : copy.dictateStep
                   : mode === "consultation"
-                    ? "Nahrávat konzultaci"
-                    : "Diktovat"}
+                    ? copy.recordConsult
+                    : copy.dictate}
               </Button>
             ) : (
               <>
@@ -839,7 +871,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                   onClick={() => (paused ? resumeRecording() : pauseRecording())}
                 >
                   <Pause className="mr-2 h-4 w-4" />
-                  {paused ? "Pokračovat" : "Pauza"}
+                  {paused ? copy.resume : copy.pause}
                 </Button>
                 <Button
                   type="button"
@@ -848,7 +880,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                   onClick={stopRecording}
                 >
                   <Square className="mr-2 h-4 w-4" />
-                  Stop a zpracovat
+                  {copy.stopProcess}
                 </Button>
               </>
             )}
@@ -861,7 +893,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="mr-2 h-4 w-4" />
-              Nahrát soubor
+              {copy.upload}
             </Button>
             <input
               ref={fileInputRef}
@@ -879,7 +911,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
         {processing ? (
           <p className="mt-3 flex items-center gap-2 text-sm text-slate-600">
             <Loader2 className="h-4 w-4 animate-spin text-[#005B96]" />
-            Odesílám a přepisuji nahrávku (včetně M4A z telefonu), pak sestavím zápis… Audio se neukládá trvale.
+            {copy.processingHint}
           </p>
         ) : null}
       </div>
@@ -891,25 +923,28 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             <p>{error}</p>
             {gateHint === "login" ? (
               <p className="mt-2">
-                <Link href={isApp ? "/login?next=/app/dokumentace" : "/login"} className="font-semibold text-[#005B96] underline">
-                  Přihlásit se
+                <Link
+                  href={isApp ? ordizapisLoginHref(locale) : localizePublicHref("/login", locale)}
+                  className="font-semibold text-[#005B96] underline"
+                >
+                  {copy.signInBtn}
                 </Link>
               </p>
             ) : null}
             {gateHint === "subscribe" ? (
               <p className="mt-2">
                 <Link
-                  href="/predplatne#dokumentace"
+                  href={ordizapisSubscribeHref(locale)}
                   className="font-semibold text-[#005B96] underline"
                 >
-                  OrdiZapis od 390 Kč
+                  {fillOrdiApp(copy.gateFromPrice, { price: formatCzkListPrice(390, locale) })}
                 </Link>
                 {" · "}
-                <Link href="/predplatne#physician" className="underline">
-                  Lékař 490 Kč
+                <Link href={localizePublicHref("/predplatne#physician", locale)} className="underline">
+                  {fillOrdiApp(copy.gatePhysician, { price: formatCzkListPrice(490, locale) })}
                 </Link>
                 {" · "}
-                demo 3 zápisy/den · 14 dní trial
+                {copy.gateDemo}
               </p>
             ) : null}
           </div>
@@ -921,7 +956,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
           <div className="rounded-2xl border border-[#cfe1f3] bg-white p-4 sm:p-5">
             <div className="mb-2 flex items-center justify-between">
               <h3 className="font-display text-lg font-semibold text-[#021d33]">
-                Přepis
+                {copy.transcript}
               </h3>
               {provider ? (
                 <span className="text-xs text-slate-400">{provider}</span>
@@ -936,7 +971,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
           <div className="rounded-2xl border border-[#cfe1f3] bg-white p-4 sm:p-5">
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <h3 className="font-display text-lg font-semibold text-[#021d33]">
-                Klinický zápis
+                {copy.noteTitle}
               </h3>
               <div className="flex flex-wrap gap-2">
                 <Button
@@ -947,7 +982,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                   disabled={!note}
                 >
                   <Copy className="mr-1.5 h-3.5 w-3.5" />
-                  Kopírovat
+                  {copy.copyBtn}
                 </Button>
                 {typeof navigator !== "undefined" && "share" in navigator ? (
                   <Button
@@ -958,7 +993,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                     disabled={!note}
                   >
                     <Share2 className="mr-1.5 h-3.5 w-3.5" />
-                    Sdílet
+                    {copy.shareBtn}
                   </Button>
                 ) : null}
                 <Button
@@ -976,21 +1011,21 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             {savedInAccount ? (
               <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-emerald-700">
                 <CheckCircle2 className="h-3.5 w-3.5" />
-                Uloženo v účtu
+                {copy.saved}
               </p>
             ) : null}
             {copyFlash ? (
-              <p className="mb-2 text-xs font-medium text-[#005B96]">Zkopírováno</p>
+              <p className="mb-2 text-xs font-medium text-[#005B96]">{copy.copied}</p>
             ) : null}
             <textarea
               className="min-h-[220px] w-full rounded-md border border-input px-3 py-2 text-sm leading-6"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="Zde se zobrazí návrh zápisu ke kontrole…"
+              placeholder={copy.notePh}
             />
             {remaining != null ? (
               <p className="mt-2 text-xs text-slate-500">
-                Zbývající zápisy dnes: {remaining}
+                {copy.remainingToday}: {remaining}
               </p>
             ) : null}
           </div>
@@ -1005,7 +1040,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="font-display text-lg font-semibold text-[#021d33]">
-            Moje zápisy
+            {copy.myNotes}
           </h3>
           <Button
             type="button"
@@ -1017,21 +1052,21 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             }}
           >
             <History className="mr-1.5 h-3.5 w-3.5" />
-            {historyOpen ? "Skrýt" : "Historie"}
+            {historyOpen ? copy.hide : copy.history}
           </Button>
         </div>
         <p className="mt-1 text-xs text-slate-500">
-          Sync mobil ↔ web pod stejným účtem.
+          {copy.savedSync}
         </p>
         {(historyOpen || history.length > 0) && (
           <div className="mt-4 space-y-2">
             {historyLoading ? (
               <p className="flex items-center gap-2 text-sm text-slate-500">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Načítám…
+                {copy.historyLoading}
               </p>
             ) : history.length === 0 ? (
-              <p className="text-sm text-slate-500">Zatím žádné uložené zápisy.</p>
+              <p className="text-sm text-slate-500">{copy.historyEmpty}</p>
             ) : (
               history.map((item) => (
                 <div
@@ -1044,10 +1079,10 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                     onClick={() => openHistoryNote(item)}
                   >
                     <p className="truncate text-sm font-semibold text-[#021d33]">
-                      {item.title || "Zápis"}
+                      {item.title || copy.emptyNote}
                     </p>
                     <p className="mt-0.5 text-xs text-slate-500">
-                      {new Date(item.created_at).toLocaleString("cs-CZ")}
+                      {new Date(item.created_at).toLocaleString(intlLocaleFor(locale))}
                       {item.source ? ` · ${item.source}` : ""}
                       {item.template_id ? ` · ${item.template_id}` : ""}
                     </p>
@@ -1060,7 +1095,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                       onClick={() => void copyText(item.note)}
                     >
                       <Copy className="h-3.5 w-3.5" />
-                      <span className="sr-only">Kopírovat</span>
+                      <span className="sr-only">{copy.copyBtn}</span>
                     </Button>
                     {typeof navigator !== "undefined" && "share" in navigator ? (
                       <Button
@@ -1070,7 +1105,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
                         onClick={() => void shareNote(item.note, item.title)}
                       >
                         <Share2 className="h-3.5 w-3.5" />
-                        <span className="sr-only">Sdílet</span>
+                        <span className="sr-only">{copy.shareBtn}</span>
                       </Button>
                     ) : null}
                   </div>
@@ -1083,9 +1118,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
       ) : null}
 
       <div className="rounded-xl border border-[#d9e8f4] bg-[#f4f9fc] px-4 py-3 text-xs leading-5 text-slate-600">
-        OrdiZapis od MedScopeGlobal není zdravotnický prostředek. Výstup je návrh AI —
-        konečnou odpovědnost za obsah nese lékař. Audio se po zpracování
-        neukládá (ephemeral). Před nahráváním rozhovoru informujte pacienta / pacientku.
+        {copy.legalFooter}
       </div>
 
       {/* Mobile sticky bottom bar */}
@@ -1109,7 +1142,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             onClick={scrollToHistory}
           >
             <History className="h-5 w-5 text-[#005B96]" />
-            Historie
+            {copy.history}
           </Button>
           <Button
             type="button"
@@ -1118,7 +1151,7 @@ export function DokumentaceWorkspace({ variant = "default" }: DokumentaceWorkspa
             onClick={() => void copyLastFromHistory()}
           >
             <Copy className="h-5 w-5 text-[#005B96]" />
-            Kopírovat
+            {copy.copyBtn}
           </Button>
         </div>
       </div>

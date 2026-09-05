@@ -18,36 +18,84 @@ import {
   TrendingUp,
   FlaskConical,
   IdCard,
+  Wallet,
 } from "lucide-react";
 
-export const ADMIN_NAV_ITEMS: {
+export type AdminNavItem = {
   href: string;
   label: string;
   icon: LucideIcon;
-}[] = [
-  { href: "/admin", label: "Overview", icon: LayoutDashboard },
-  { href: "/admin/system", label: "Stav systému", icon: Activity },
-  { href: "/admin/tests", label: "Testy", icon: FlaskConical },
-  { href: "/admin/articles", label: "Articles", icon: Newspaper },
-  { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
-  { href: "/admin/email-logs", label: "Email logs", icon: Mail },
-  { href: "/admin/stripe-webhook-logs", label: "Stripe webhooks", icon: ShieldCheck },
-  { href: "/admin/brand", label: "Brand & logo", icon: Palette },
-  { href: "/admin/autopilot", label: "V6 Autopilot", icon: Bot },
-  { href: "/admin/ingestion", label: "AI ingestion", icon: Bot },
-  { href: "/admin/verification", label: "Verification", icon: ShieldCheck },
-  { href: "/admin/clk-verifications", label: "ČLK ověření", icon: IdCard },
-  { href: "/admin/categories", label: "Categories", icon: Tags },
-  { href: "/admin/media", label: "Media", icon: ImageIcon },
-  { href: "/admin/images", label: "Image Center", icon: ImageIcon },
-  { href: "/admin/ads", label: "Ads", icon: Megaphone },
-  { href: "/admin/ads-public", label: "Veřejné reklamy", icon: Megaphone },
-  { href: "/admin/ads-students", label: "Studentské reklamy", icon: GraduationCap },
-  { href: "/admin/marketing-hub", label: "Marketing hub", icon: BarChart3 },
-  { href: "/admin/revenue", label: "Revenue v27", icon: TrendingUp },
-  { href: "/admin/v27-pipeline", label: "Pipeline v27", icon: Bot },
-  { href: "/admin/ads-overview", label: "Ads overview", icon: TrendingUp },
-  { href: "/admin/verejnost", label: "Veřejnost", icon: Heart },
-  { href: "/admin/vip", label: "VIP members", icon: Crown },
-  { href: "/admin/notifications", label: "Notifications", icon: Bell },
+};
+
+export type AdminNavGroup = {
+  id: string;
+  label: string;
+  items: AdminNavItem[];
+};
+
+export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
+  {
+    id: "rizeni",
+    label: "Řízení",
+    items: [
+      { href: "/admin", label: "Přehled", icon: LayoutDashboard },
+      { href: "/admin/system", label: "Stav systému", icon: Activity },
+      { href: "/admin/tests", label: "Testy", icon: FlaskConical },
+    ],
+  },
+  {
+    id: "penize",
+    label: "Peníze",
+    items: [
+      { href: "/admin/vydelky", label: "Výdělky", icon: Wallet },
+      { href: "/admin/revenue", label: "Tržby v27", icon: TrendingUp },
+      { href: "/admin/stripe-webhook-logs", label: "Stripe webhooky", icon: ShieldCheck },
+      { href: "/admin/ads-overview", label: "Přehled reklam", icon: TrendingUp },
+      { href: "/admin/v27-pipeline", label: "Pipeline v27", icon: Bot },
+    ],
+  },
+  {
+    id: "obsah",
+    label: "Obsah",
+    items: [
+      { href: "/admin/articles", label: "Články", icon: Newspaper },
+      { href: "/admin/categories", label: "Kategorie", icon: Tags },
+      { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
+      { href: "/admin/media", label: "Média", icon: ImageIcon },
+      { href: "/admin/images", label: "Image Center", icon: ImageIcon },
+      { href: "/admin/verejnost", label: "Veřejnost", icon: Heart },
+    ],
+  },
+  {
+    id: "marketing",
+    label: "Marketing",
+    items: [
+      { href: "/admin/ads", label: "Reklamy", icon: Megaphone },
+      { href: "/admin/ads-public", label: "Veřejné reklamy", icon: Megaphone },
+      { href: "/admin/ads-students", label: "Studentské reklamy", icon: GraduationCap },
+      { href: "/admin/marketing-hub", label: "Marketing hub", icon: BarChart3 },
+    ],
+  },
+  {
+    id: "lide",
+    label: "Lidé",
+    items: [
+      { href: "/admin/clk-verifications", label: "ČLK ověření", icon: IdCard },
+      { href: "/admin/verification", label: "Verifikace", icon: ShieldCheck },
+      { href: "/admin/vip", label: "VIP členové", icon: Crown },
+      { href: "/admin/notifications", label: "Notifikace", icon: Bell },
+    ],
+  },
+  {
+    id: "system",
+    label: "Systém",
+    items: [
+      { href: "/admin/brand", label: "Značka a logo", icon: Palette },
+      { href: "/admin/autopilot", label: "Autopilot", icon: Bot },
+      { href: "/admin/ingestion", label: "AI ingestion", icon: Bot },
+      { href: "/admin/email-logs", label: "E-mailové logy", icon: Mail },
+    ],
+  },
 ];
+
+export const ADMIN_NAV_ITEMS: AdminNavItem[] = ADMIN_NAV_GROUPS.flatMap((group) => group.items);

@@ -21,9 +21,15 @@ import { shouldHideFromArticleDetail } from "@/lib/auth/article-eligibility";
 import { filterMagazineListableArticles } from "@/lib/editorial/article-quality-audit";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { createDataClient } from "@/lib/supabase/data";
+import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
+import {
+  getNativeDeskArticleBySlug,
+  mergeNativeDeskFeed,
+  relatedNativeDeskArticles,
+} from "@/lib/editorial/native-desk-articles";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import {
   filterActiveArticles,
-  filterCzechContent,
   isArchivedArticle,
 } from "@/lib/v20/content-rules";
 import type { ArticleWithRelations } from "@/types/database";
@@ -52,7 +58,7 @@ function filterForReader(
 ): ArticleWithRelations[] {
   const allowed = new Set(allowedAccessLevels(accessLevel));
   const active = filterActiveArticles(articles);
-  const localized = filterCzechContent(active, locale);
+  const localized = filterArticlesForLocale(active, locale);
   return localized.filter((a) => {
     if (!isVip && a.vip_only) return false;
     const level = a.min_access_level ?? "public";
@@ -68,7 +74,7 @@ function filterForSectionReader(
 ): ArticleWithRelations[] {
   const allowed = allowedLevelsForSection(accessLevel);
   const active = filterActiveArticles(articles);
-  const localized = filterCzechContent(active, locale);
+  const localized = filterArticlesForLocale(active, locale);
   return localized.filter((a) => {
     if (!isVip && a.vip_only) return false;
     const level = a.min_access_level ?? "public";
@@ -82,8 +88,7 @@ function filterForMetadataRubricListing(
   locale: LocaleCode = "cs"
 ): ArticleWithRelations[] {
   const active = filterActiveArticles(articles);
-  if (locale !== "cs") return active;
-  return active.filter((a) => a.locale !== "en" && Boolean(a.title?.trim()));
+  return filterArticlesForLocale(active, locale);
 }
 
 export async function getFeaturedArticles(
@@ -138,44 +143,54 @@ export async function getLatestArticles(
   const { getDemoMagazineArticles } = await import(
     "@/lib/verejnost/demo-magazine-articles"
   );
-
-  // When DB exists but is empty, try the same static seed as /verejnost hubs.
-  try {
-    const { ensurePublicArticlesSeeded } = await import(
-      "@/lib/verejnost/ensure-content"
-    );
-    await ensurePublicArticlesSeeded();
-  } catch {
-    // Seed requires service role; demo fallback covers placeholder env.
-  }
+  const demo = () =>
+    mergeNativeDeskFeed(getDemoMagazineArticles(), locale).slice(offset, offset + limit);
 
   const supabase = await createDataClient();
-  if (!supabase) {
-    return getDemoMagazineArticles().slice(offset, offset + limit);
-  }
-  const fetchLimit = limit * 12;
-  const { data, error } = await supabase
-    .from("articles")
-    .select(articleSelect)
-    .eq("published", true)
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .range(offset, offset + fetchLimit - 1);
+  if (!supabase) return demo();
 
-  if (error) {
+  const fetchLimit = Math.min(Math.max(limit * 2, limit), 48);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const load = (async () => {
+      const { data, error } = await supabase
+        .from("articles")
+        .select(articleSelect)
+        .eq("published", true)
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .range(offset, offset + fetchLimit - 1);
+
+      if (error) {
+        console.error("getLatestArticles", error);
+        return demo();
+      }
+      const rows = mapArticleList(data as Record<string, unknown>[] | null);
+      const filtered = mergeNativeDeskFeed(
+        filterMagazineListableArticles(
+          filterForReader(rows, isVip, accessLevel, locale)
+        ),
+        locale
+      );
+      const prepared = await prepareArticlesForDisplay(filtered, locale, {
+        mode: "card",
+        maxTranslate: Math.min(limit, 8),
+      });
+      const slice = prepared.slice(0, limit);
+      return slice.length > 0 ? slice : demo();
+    })();
+
+    return await Promise.race([
+      load,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("latest-articles-timeout")), 8_000);
+      }),
+    ]);
+  } catch (error) {
     console.error("getLatestArticles", error);
-    return getDemoMagazineArticles().slice(offset, offset + limit);
+    return demo();
+  } finally {
+    if (timer) clearTimeout(timer);
   }
-  // Include lay/public Czech articles so /articles "Vše" matches the live portal feed
-  // (recent pipeline output is mostly audience=public / rubric verejnost).
-  const rows = mapArticleList(data as Record<string, unknown>[] | null);
-  const filtered = filterMagazineListableArticles(
-    filterForReader(rows, isVip, accessLevel, locale)
-  );
-  const prepared = await prepareArticlesForDisplay(filtered, locale, {
-    mode: "card",
-    maxTranslate: limit,
-  });
-  return prepared.slice(0, limit);
 }
 
 export async function getArticlesBySection(
@@ -370,30 +385,41 @@ export async function getArticleBySlug(
   slug: string,
   locale: LocaleCode = "cs"
 ): Promise<DisplayArticle | null> {
+  const { resolveCanonicalArticleSlug } = await import(
+    "@/lib/editorial/clinician-anonymize"
+  );
   const { getDemoMagazineArticleBySlug } = await import(
     "@/lib/verejnost/demo-magazine-articles"
   );
+  const dbSlug = resolveCanonicalArticleSlug(slug);
+  const nativeDesk = getNativeDeskArticleBySlug(dbSlug);
+  if (nativeDesk) {
+    return prepareArticleForDisplay(nativeDesk, locale, "full");
+  }
 
   const supabase = await createDataClient();
   if (!supabase) {
-    return getDemoMagazineArticleBySlug(slug);
+    const demo = getDemoMagazineArticleBySlug(dbSlug);
+    return demo ? prepareArticleForDisplay(demo, locale, "full") : null;
   }
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
-    .eq("slug", slug)
+    .eq("slug", dbSlug)
     .eq("published", true)
     .maybeSingle();
 
   if (error) {
     console.error("getArticleBySlug", error);
-    return getDemoMagazineArticleBySlug(slug);
+    const demo = getDemoMagazineArticleBySlug(dbSlug);
+    return demo ? prepareArticleForDisplay(demo, locale, "full") : null;
   }
   const row = data
     ? (mapArticleList([data as Record<string, unknown>])[0] ?? null)
     : null;
   if (!row) {
-    return getDemoMagazineArticleBySlug(slug);
+    const demo = getDemoMagazineArticleBySlug(dbSlug);
+    return demo ? prepareArticleForDisplay(demo, locale, "full") : null;
   }
   // Listing hide is for magazine hubs. Special-access medical/doctor
   // articles must resolve so the existing VIP / physician gate can run.
@@ -401,6 +427,24 @@ export async function getArticleBySlug(
     return null;
   }
   return prepareArticleForDisplay(row, locale, "full");
+}
+
+async function relatedFallback(
+  excludeId: string,
+  limit: number,
+  locale: LocaleCode
+) {
+  const native = relatedNativeDeskArticles(locale, { id: excludeId }, limit);
+  if (native.length > 0) return native;
+  if (primaryArticleLocale(locale) !== "cs") return [];
+
+  const { getDemoMagazineArticles } = await import(
+    "@/lib/verejnost/demo-magazine-articles"
+  );
+  const raw = getDemoMagazineArticles()
+    .filter((a) => a.id !== excludeId)
+    .slice(0, limit);
+  return prepareArticlesForDisplay(raw, locale, { mode: "card", maxTranslate: limit });
 }
 
 export async function getRelatedArticles(
@@ -411,16 +455,12 @@ export async function getRelatedArticles(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
-  const { getDemoMagazineArticles } = await import(
-    "@/lib/verejnost/demo-magazine-articles"
-  );
-  const demoRelated = () =>
-    getDemoMagazineArticles()
-      .filter((a) => a.id !== excludeId)
-      .slice(0, limit);
+  const nativePins = relatedNativeDeskArticles(locale, { id: excludeId }, limit);
+  // Seeded native-desk rows are not in the articles.category_id table.
+  if (categoryId === "native-desk") return nativePins;
 
   const supabase = await createDataClient();
-  if (!supabase) return demoRelated();
+  if (!supabase) return relatedFallback(excludeId, limit, locale);
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
@@ -432,19 +472,26 @@ export async function getRelatedArticles(
 
   if (error) {
     console.error("getRelatedArticles", error);
-    return demoRelated();
+    return relatedFallback(excludeId, limit, locale);
   }
-  const filtered = filterForReader(
-    mapArticleList(data as Record<string, unknown>[] | null),
-    isVip,
-    accessLevel,
-    locale
-  ).filter((article) => !shouldHideFromArticleDetail(article));
-  const prepared = await prepareArticlesForDisplay(filtered, locale, {
+  const filtered = filterArticlesForLocale(
+    filterForReader(
+      mapArticleList(data as Record<string, unknown>[] | null),
+      isVip,
+      accessLevel,
+      locale
+    ).filter((article) => !shouldHideFromArticleDetail(article)),
+    locale,
+    { minNative: limit, courtesyBorrow: 0, maxBorrow: 0 }
+  );
+  const merged = mergeNativeDeskFeed(filtered, locale).filter(
+    (article) => article.id !== excludeId
+  );
+  const prepared = await prepareArticlesForDisplay(merged, locale, {
     mode: "card",
     maxTranslate: limit,
   });
-  if (prepared.length === 0) return demoRelated();
+  if (prepared.length === 0) return relatedFallback(excludeId, limit, locale);
   return prepared.slice(0, limit);
 }
 
@@ -503,7 +550,7 @@ export async function getArchivedArticles(
   }
 
   const rows = mapArticleList(data as Record<string, unknown>[] | null);
-  const archived = filterCzechContent(
+  const archived = filterArticlesForLocale(
     rows.filter((a) => isArchivedArticle(a)),
     locale
   );

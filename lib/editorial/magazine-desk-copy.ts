@@ -4,6 +4,10 @@
  * editorial even when the database still holds writer-template copy.
  */
 import { MAGAZINE_DESK_OVERRIDES } from "@/lib/editorial/magazine-desk-overrides";
+import {
+  anonymizeClinicianNames,
+  publicArticleSlug,
+} from "@/lib/editorial/clinician-anonymize";
 
 const TEMPLATE_PHRASE_RE =
   /srozumitelně a bez zbytečného strašení|srozumitelný průvodce pro každého(?:[^.]*chce)?|bez zbytečného strašení|praktické rady pro každého|zjistěte,?\s+jak|přečtěte si|čtěte o tom|přijďte zjistit|v tomto článku (?:najdete|se podíváme|se dozvíte)|pojďme se podívat/gi;
@@ -70,14 +74,18 @@ export function applyMagazineDeskCopy<
 >(article: T): T {
   const slug = String(article.slug ?? "");
   const override = MAGAZINE_DESK_OVERRIDES[slug];
-  const title = override?.title ?? polishMagazineTitle(article.title);
-  const excerpt = override?.excerpt ?? polishMagazineExcerpt(article.excerpt, title);
-  const content = override?.content
+  const title = anonymizeClinicianNames(override?.title ?? polishMagazineTitle(article.title));
+  const excerpt = anonymizeClinicianNames(
+    override?.excerpt ?? polishMagazineExcerpt(article.excerpt, title)
+  );
+  const rawContent = override?.content
     ? override.content
     : article.content
       ? stripEditorialChrome(article.content)
       : article.content;
-  return { ...article, title, excerpt, content };
+  const content =
+    rawContent == null ? rawContent : anonymizeClinicianNames(rawContent);
+  return { ...article, slug: publicArticleSlug(slug), title, excerpt, content };
 }
 
 function collapseRepeatedChunks(text: string, sep: RegExp): string {

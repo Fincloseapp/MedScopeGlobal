@@ -1,19 +1,11 @@
 import { resolveOpenAiKey } from "@/lib/ai/openai-key";
 import { resolveGroqKey } from "@/lib/ai/groq";
+import { sttPromptFor, whisperLanguage } from "@/lib/lekari/dokumentace/note-language";
 
 export type TranscribeResult = {
   text: string;
   provider: string;
 };
-
-/** Bias Whisper toward Czech clinical vocabulary (dialogue + anamnesis). */
-const MEDICAL_STT_PROMPT =
-  "Ambulantní vyšetření ve spisovné češtině. Rozhovor lékaře s pacientem. " +
-  "Anamnéza, nynější onemocnění, osobní anamnéza, rodinná anamnéza, " +
-  "farmakologická anamnéza, alergie, abúzus, objektivní nález, diagnóza, " +
-  "terapie, doporučení, kontrola. Léky: Paralen, Ibalgin, Prednison, Warfarin, " +
-  "Metformin, Amlodipin, Bisoprolol, Atorvastatin, Omeprazol. " +
-  "Jednotky: mmHg, tepů/min, °C, mg, tbl.";
 
 const STT_TIMEOUT_MS = 280_000;
 
@@ -21,15 +13,16 @@ async function transcribeWithOpenAi(
   buffer: Buffer,
   mimeType: string,
   apiKey: string,
-  originalName?: string
+  originalName?: string,
+  locale?: string | null
 ): Promise<TranscribeResult> {
   const form = new FormData();
   const filename = guessFilename(mimeType, originalName);
   const blob = new Blob([new Uint8Array(buffer)], { type: mimeType || "audio/mp4" });
   form.append("file", blob, filename);
   form.append("model", "whisper-1"); // filename via mime
-  form.append("language", "cs");
-  form.append("prompt", MEDICAL_STT_PROMPT);
+  form.append("language", whisperLanguage(locale));
+  form.append("prompt", sttPromptFor(locale));
   form.append("temperature", "0");
   form.append("response_format", "json");
 
@@ -55,15 +48,16 @@ async function transcribeWithGroq(
   buffer: Buffer,
   mimeType: string,
   apiKey: string,
-  originalName?: string
+  originalName?: string,
+  locale?: string | null
 ): Promise<TranscribeResult> {
   const form = new FormData();
   const filename = guessFilename(mimeType, originalName);
   const blob = new Blob([new Uint8Array(buffer)], { type: mimeType || "audio/mp4" });
   form.append("file", blob, filename);
   form.append("model", "whisper-large-v3");
-  form.append("language", "cs");
-  form.append("prompt", MEDICAL_STT_PROMPT);
+  form.append("language", whisperLanguage(locale));
+  form.append("prompt", sttPromptFor(locale));
   form.append("temperature", "0");
   form.append("response_format", "json");
 
@@ -103,23 +97,24 @@ function guessFilename(mimeType: string, originalName?: string): string {
 }
 
 /**
- * Czech clinical speech-to-text.
- * Prefers OpenAI Whisper for medical Czech quality, falls back to Groq large-v3.
+ * Clinical speech-to-text in the edition language (Czech default).
+ * Prefers OpenAI Whisper, falls back to Groq large-v3.
  * Audio is never persisted — caller must discard the buffer after use.
  */
 export async function transcribeAudio(
   buffer: Buffer,
   mimeType: string,
-  originalName?: string
+  originalName?: string,
+  locale: string = "cs"
 ): Promise<TranscribeResult> {
   const openAiKey = resolveOpenAiKey();
   const groqKey = resolveGroqKey();
   const errors: string[] = [];
 
-  // Prefer OpenAI for Czech clinical quality; Groq as fast fallback.
+  // Prefer OpenAI for clinical quality; Groq as fast fallback.
   if (openAiKey) {
     try {
-      return await transcribeWithOpenAi(buffer, mimeType, openAiKey, originalName);
+      return await transcribeWithOpenAi(buffer, mimeType, openAiKey, originalName, locale);
     } catch (e) {
       errors.push(e instanceof Error ? e.message : String(e));
     }
@@ -127,7 +122,7 @@ export async function transcribeAudio(
 
   if (groqKey) {
     try {
-      return await transcribeWithGroq(buffer, mimeType, groqKey, originalName);
+      return await transcribeWithGroq(buffer, mimeType, groqKey, originalName, locale);
     } catch (e) {
       errors.push(e instanceof Error ? e.message : String(e));
     }

@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { withApiGuard } from "@/lib/security/api-guard";
 import { getDokumentaceEligibility } from "@/lib/lekari/dokumentace/eligibility";
+import { dokumentaceLocaleFromRequest } from "@/lib/lekari/dokumentace/request-locale";
+import { getOrdiZapisApiCopy } from "@/lib/i18n/ordizapis-api-copy";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -23,11 +25,15 @@ export async function POST(request: Request) {
     action: "dokumentace_file_chunk",
   });
   if (!guard.ok) return guard.response;
+  const locale = dokumentaceLocaleFromRequest(request);
   if (!user) {
-    return NextResponse.json({ error: "Přihlášení vyžadováno." }, { status: 401 });
+    return NextResponse.json(
+      { error: getOrdiZapisApiCopy(locale).errLoginRequired },
+      { status: 401 }
+    );
   }
 
-  const eligibility = await getDokumentaceEligibility(user.id);
+  const eligibility = await getDokumentaceEligibility(user.id, locale);
   if (!eligibility.eligible) {
     return NextResponse.json({ error: eligibility.message }, { status: 403 });
   }

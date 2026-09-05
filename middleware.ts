@@ -5,19 +5,27 @@ import {
   wrapWithSecurityHeaders,
 } from "@/lib/v30/security/middleware";
 import {
-  DEFAULT_LOCALE,
   LOCALE_COOKIE,
-  LOCALE_MANUAL_COOKIE,
   LOCALE_REQUEST_HEADER,
+  PATHNAME_REQUEST_HEADER,
   normalizeLocale,
 } from "@/lib/i18n/config";
-import { detectLocaleFromAcceptLanguage } from "@/lib/i18n/detect-locale";
+import { localeForUnprefixedEntry } from "@/lib/i18n/detect-locale";
 import {
   canonicalLocalePathname,
   isLocaleRoutingExcluded,
+  localeToPathSegment,
   resolveLocalePath,
 } from "@/lib/i18n/locale-path";
-import { isValidAdminGateCookie, ADMIN_GATE_COOKIE } from "@/lib/auth/admin-gate-config";
+import { isSearchEngineBot } from "@/lib/i18n/search-bots";
+import {
+  czechFacultyProductForPath,
+  isCzechFacultyLocale,
+} from "@/lib/i18n/czech-faculty-only-copy";
+import {
+  hasValidAdminGateCookie,
+  requiresAdminGate,
+} from "@/lib/auth/admin-gate-config";
 import {
   enforceLekarskaZonaMiddleware,
   isLekarskaZonaPath,
@@ -28,6 +36,18 @@ const LOCALE_COOKIE_OPTS = {
   maxAge: 60 * 60 * 24 * 365,
   sameSite: "lax" as const,
 };
+
+/** Overlay the path locale onto the incoming Cookie header so RSC sees it now. */
+function cookieHeaderWithLocale(raw: string | null, locale: string): string {
+  const next = `${LOCALE_COOKIE}=${normalizeLocale(locale)}`;
+  if (!raw) return next;
+  const parts = raw
+    .split(";")
+    .map((part) => part.trim())
+    .filter((part) => part && !part.startsWith(`${LOCALE_COOKIE}=`));
+  parts.push(next);
+  return parts.join("; ");
+}
 
 function copyResponseCookies(from: NextResponse, to: NextResponse) {
   from.cookies.getAll().forEach((cookie) => {
@@ -45,21 +65,14 @@ function adminGateRedirect(request: NextRequest): NextResponse {
   return redirect;
 }
 
-function requiresAdminGate(pathname: string): boolean {
-  return pathname.startsWith("/admin") && !pathname.startsWith("/admin/login");
-}
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const securityBlock = await applyV30SecurityMiddleware(request);
   if (securityBlock) return securityBlock;
 
-  if (requiresAdminGate(pathname)) {
-    const gate = request.cookies.get(ADMIN_GATE_COOKIE)?.value;
-    if (!isValidAdminGateCookie(gate)) {
-      return adminGateRedirect(request);
-    }
+  if (requiresAdminGate(pathname) && !hasValidAdminGateCookie(request.cookies)) {
+    return adminGateRedirect(request);
   }
 
   if (pathname === "/stav-systemu") {
@@ -89,36 +102,53 @@ export async function middleware(request: NextRequest) {
     const { locale: pathLocale, pathname: stripped } = resolveLocalePath(pathname);
     if (pathLocale) {
       const url = request.nextUrl.clone();
-      url.pathname = stripped;
+      const product =
+        !isCzechFacultyLocale(pathLocale) ? czechFacultyProductForPath(stripped) : null;
+      url.pathname = product ? "/czech-edition-only" : stripped;
       const requestHeaders = new Headers(request.headers);
       requestHeaders.set(LOCALE_REQUEST_HEADER, normalizeLocale(pathLocale));
+      requestHeaders.set(PATHNAME_REQUEST_HEADER, pathname);
+      requestHeaders.set("cookie", cookieHeaderWithLocale(request.headers.get("cookie"), pathLocale));
+      if (product) requestHeaders.set("x-czech-faculty-product", product);
       const rewrite = NextResponse.rewrite(url, {
         request: { headers: requestHeaders },
       });
       copyResponseCookies(response, rewrite);
       rewrite.cookies.set(LOCALE_COOKIE, normalizeLocale(pathLocale), LOCALE_COOKIE_OPTS);
-      rewrite.cookies.set(LOCALE_MANUAL_COOKIE, "1", LOCALE_COOKIE_OPTS);
       return wrapWithSecurityHeaders(rewrite, pathname);
     }
+  } else {
+    return wrapWithSecurityHeaders(response, pathname);
   }
 
-  const manual = request.cookies.get(LOCALE_MANUAL_COOKIE)?.value === "1";
+  // Typing medscopeglobal.com (or any unprefixed public URL) always follows
+  // the device/browser language. A previous locale-switcher cookie must not
+  // lock the apex domain to English when the phone is Czech.
   const acceptLanguage = request.headers.get("accept-language");
-  // Unprefixed URLs stay Czech unless the reader picked a language (header or /de/…).
-  const autoLocale = DEFAULT_LOCALE;
-  void detectLocaleFromAcceptLanguage(acceptLanguage);
+  const bot = isSearchEngineBot(request.headers.get("user-agent"));
+  const country = request.headers.get("cf-ipcountry");
+  const target = localeForUnprefixedEntry(acceptLanguage, bot, country);
 
-  if (!manual) {
-    const current = request.cookies.get(LOCALE_COOKIE)?.value;
-    const next = normalizeLocale(autoLocale);
-    if (!current || normalizeLocale(current) !== next) {
-      response.cookies.set(LOCALE_COOKIE, next, LOCALE_COOKIE_OPTS);
-    }
-  } else if (!request.cookies.get(LOCALE_COOKIE)?.value) {
-    response.cookies.set(LOCALE_COOKIE, DEFAULT_LOCALE, LOCALE_COOKIE_OPTS);
+  const prefix = `/${localeToPathSegment(target)}`;
+  const destPath = pathname === "/" ? prefix : `${prefix}${pathname.startsWith("/") ? pathname : `/${pathname}`}`;
+  const dest = request.nextUrl.clone();
+  dest.pathname = destPath;
+
+  if (bot) {
+    dest.pathname = pathname === "/" ? "/cs" : `/cs${pathname.startsWith("/") ? pathname : `/${pathname}`}`;
+    const redirect = NextResponse.redirect(dest, 308);
+    copyResponseCookies(response, redirect);
+    redirect.headers.set("Vary", "Accept-Language, User-Agent, CF-IPCountry");
+    redirect.headers.set("Cache-Control", "public, max-age=300");
+    return wrapWithSecurityHeaders(redirect, pathname);
   }
 
-  return wrapWithSecurityHeaders(response, pathname);
+  const redirect = NextResponse.redirect(dest, 302);
+  copyResponseCookies(response, redirect);
+  redirect.headers.set("Vary", "Accept-Language, User-Agent, CF-IPCountry");
+  redirect.headers.set("Cache-Control", "private, no-store, must-revalidate");
+  redirect.cookies.set(LOCALE_COOKIE, normalizeLocale(target), LOCALE_COOKIE_OPTS);
+  return wrapWithSecurityHeaders(redirect, pathname);
 }
 
 export const config = {
@@ -128,6 +158,6 @@ export const config = {
     "/admin/:path*",
     "/stav-systemu",
     "/academy/lekari/:path*",
-    "/((?!_next|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?|ttf|eot)$).*)",
+    "/((?!_next|__ms|relay|favicon.ico|robots.txt|ads.txt|llms.txt|news-sitemap.xml|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?|ttf|eot|txt)$).*)",
   ],
 };

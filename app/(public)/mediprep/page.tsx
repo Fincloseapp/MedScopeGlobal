@@ -9,8 +9,23 @@ import { getPrepDashboard } from "@/lib/mediprep/dashboard";
 import { FACULTIES_ADMISSIONS_2026 } from "@/lib/prijimacky/faculties-admissions";
 import { bankStats } from "@/lib/prijimacky/question-bank";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getCzechFacultyOnlyCopy, isCzechFacultyLocale } from "@/lib/i18n/czech-faculty-only-copy";
+import { CzechFacultyOnlyNotice } from "@/components/apps/czech-faculty-only";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  if (!isCzechFacultyLocale(locale)) {
+    const copy = getCzechFacultyOnlyCopy(locale);
+    return {
+      ...(await buildLocalizedV20PageMetadata({
+        title: copy.metaTitle,
+        description: copy.metaDescription,
+        path: MEDIPREP.marketingPath,
+      })),
+      robots: { index: false, follow: false },
+    };
+  }
   return {
     ...(await buildLocalizedV20PageMetadata({
       title: appSeoTitle(MEDIPREP),
@@ -21,14 +36,18 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function MediprepMarketingPage() {
+export default async function MediprepMarketingPage() {
+  const locale = await getServerLocale();
+  if (!isCzechFacultyLocale(locale)) {
+    return <CzechFacultyOnlyNotice locale={locale} />;
+  }
   const stats = bankStats();
   const dash = getPrepDashboard();
   const FEATURES = [
     { title: "Simulace s odpočtem", body: "Bloky B/C/F podle fakulty — tréninkový formát, ne oficiální zadání." },
     { title: "Drill slabých míst", body: "Po testu vidíte témata pod 70 %. Další sada jde přesně tam." },
     { title: "Týdenní plán", body: "Sedm konkrétních kroků: kapitola, mini test, simulace, opakování." },
-    { title: "E-mail + kód", body: "Bez hesla. První test zdarma. Pak Student 149 Kč / 14 dní zdarma." },
+    { title: "E-mail + kód", body: "Bez hesla. První test zdarma. Pak Student 89 Kč, další měsíc 149 Kč." },
   ] as const;
   return (
     <div className="bg-[#F8F4EA]">
@@ -39,6 +58,7 @@ export default function MediprepMarketingPage() {
           url: MEDIPREP.marketingPath,
           installUrl: MEDIPREP.downloadPath,
           category: "EducationalApplication",
+          locale: "cs",
         })}
       />
       <section className="border-b border-[#e0d5c4] bg-[#0A192F] text-white">
@@ -143,7 +163,7 @@ export default function MediprepMarketingPage() {
       <section className="mx-auto max-w-5xl px-4 pb-16 sm:px-6">
         <AppDownloadPanel
           app={MEDIPREP}
-          extraCta={{ href: "/predplatne#student", label: "149 Kč/měsíc · 14 dní zdarma" }}
+          extraCta={{ href: "/predplatne#student", label: "1 test zdarma · 89 Kč, pak 149 Kč" }}
         />
       </section>
     </div>

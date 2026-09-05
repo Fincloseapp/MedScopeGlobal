@@ -68,11 +68,11 @@ export function StudentMaterialsBrowser({
 
   return (
     <div className="space-y-8">
-      <div className="rounded-2xl border border-[#cfe1f3] bg-white p-5">
-        <p className="text-sm leading-7 text-slate-600">
+      <div className="rounded-2xl border border-[#1b1712]/12 bg-white/80 p-5">
+        <p className="text-sm leading-7 text-[#5c564c]">
           Kurátorovaná knihovna studijních materiálů pro studenty medicíny — vyhledávání
           podle ročníku, oboru a názvu. Materiály lze{" "}
-          <span className="font-medium text-[#005B96]">číst online</span> přímo v prohlížeči.
+          <span className="font-medium text-[#8a6d32]">číst online</span> přímo v prohlížeči.
         </p>
         <p className="mt-2 text-xs text-slate-500">
           {PUBLIC_SOURCE_LABEL} · celkem {stats.total} materiálů · filtr: {filtered.length}
@@ -81,12 +81,12 @@ export function StudentMaterialsBrowser({
       </div>
 
       <Tabs value={rocnik} onValueChange={setRocnik}>
-        <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 bg-[#eef4fb] p-1">
+        <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 bg-[#e8e2d6] p-1">
           {ROCNIK_TABS.map((tab) => (
             <TabsTrigger
               key={tab.value}
               value={tab.value}
-              className="rounded-full px-3 py-1.5 text-xs data-[state=active]:bg-[#005B96] data-[state=active]:text-white"
+              className="rounded-full px-3 py-1.5 text-xs data-[state=active]:bg-[#1b1712] data-[state=active]:text-[#f6f1e8]"
             >
               {tab.label}
               {tab.value !== "all" && stats.byRocnik[tab.value] ? (
@@ -123,7 +123,7 @@ export function StudentMaterialsBrowser({
       </div>
 
       {filtered.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-[#cfe1f3] bg-white p-8 text-center text-sm text-slate-500">
+        <p className="rounded-xl border border-dashed border-[#1b1712]/20 bg-white/70 p-8 text-center text-sm text-[#5c564c]">
           Žádné materiály pro zvolené filtry.
         </p>
       ) : (
@@ -133,18 +133,18 @@ export function StudentMaterialsBrowser({
               <Link
                 key={m.id}
                 href={m.read_path}
-                className="group flex flex-col rounded-2xl border border-[#cfe1f3] bg-white p-5 transition hover:border-[#005B96]/40"
+                className="group flex flex-col rounded-2xl border border-[#1b1712]/12 bg-white/80 p-5 transition hover:border-[#8a6d32]/50"
               >
-                <h3 className="font-display text-base font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
+                <h3 className="font-display text-base font-semibold leading-snug text-[#1b1712] group-hover:text-[#8a6d32]">
                   {m.display_title}
                 </h3>
-                <p className="mt-2 text-xs font-medium text-[#005B96]/80">{m.subject}</p>
+                <p className="mt-2 text-xs font-medium text-[#8a6d32]">{m.subject}</p>
                 {m.rocnik !== null && m.rocnik > 0 ? (
                   <p className="mt-1 text-xs text-slate-500">{m.rocnik}. ročník</p>
                 ) : m.category === "recent" ? (
                   <p className="mt-1 text-xs text-slate-500">Naposled přidané</p>
                 ) : null}
-                <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-[#005B96]">
+                <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-[#8a6d32]">
                   <BookOpen className="h-3.5 w-3.5" />
                   Číst
                 </span>
@@ -166,12 +166,12 @@ export function StudentMaterialsBrowser({
         </>
       )}
 
-      <footer className="rounded-2xl border border-[#cfe1f3] bg-[#eef4fb]/50 p-5 text-sm leading-7 text-slate-700">
-        <p className="font-semibold text-[#021d33]">Podmínky použití</p>
+      <footer className="rounded-2xl border border-[#1b1712]/12 bg-[#f6f1e8] p-5 text-sm leading-7 text-[#1b1712]/80">
+        <p className="font-semibold text-[#1b1712]">Podmínky použití</p>
         <p className="mt-2">{PUBLIC_LEGAL_NOTICE}</p>
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-3 text-xs text-[#8a8377]">
           Máte dotaz nebo nenašli jste materiál?{" "}
-          <Link href="/kontakt" className="text-[#005B96] underline-offset-2 hover:underline">
+          <Link href="/kontakt" className="text-[#8a6d32] underline-offset-2 hover:underline">
             Kontaktujte nás
           </Link>
           .

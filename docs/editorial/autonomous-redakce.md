@@ -26,12 +26,12 @@ Autonomní redakční persony mají čtyři role (+ image curator):
 | Role | Úloha | Počet |
 |------|-------|------:|
 | **journalist** | Píše články podle tématu a locale | 9 |
-| **editor** | Reviduje obsah, schvaluje publikaci | 3 |
+| **editor** | Reviduje obsah, schvaluje publikaci | 8 |
 | **language_reviewer** | Jazyková QA (gramatika, terminologie) | 6 |
 | **compliance_reviewer** | Lékařské disclaimery, guardrails pro health claims | 3 |
 | **image_curator** | Hero imagery, alt text, compliance | 2 |
 
-**Celkem ecosystem personas: 23.** Denní produkční writers: **5** (`writer1`–`writer5` → `/api/cron/public-articles`).
+**Celkem ecosystem personas: 28.** Denní produkční writers: **20** (5 kategorií × 4 seniorní specialisté → `/api/cron/public-articles`).
 
 Plný roster + cron mapa: [`REDAKCE_ROSTER.md`](./REDAKCE_ROSTER.md).
 

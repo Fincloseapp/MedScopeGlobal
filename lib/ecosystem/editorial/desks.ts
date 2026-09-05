@@ -83,6 +83,19 @@ const DESK_OVERRIDES: Partial<
     vipCtaWeight: 0.8,
     maxArticlesPerDay: 3,
   },
+  pt: {
+    region: "PT",
+    label: { pt: "Redação portuguesa", en: "Portuguese Editorial Desk" },
+    vipCtaWeight: 0.8,
+    maxArticlesPerDay: 4,
+  },
+  "pt-BR": {
+    region: "BR",
+    label: { "pt-BR": "Redação brasileira", pt: "Redação brasileira", en: "Brazilian Editorial Desk" },
+    topicWeights: { longevity: 0.35, lifestyle: 0.3, seniors: 0.15, trending: 0.2 },
+    vipCtaWeight: 0.8,
+    maxArticlesPerDay: 4,
+  },
   ro: {
     region: "RO",
     label: { ro: "Redacția română", en: "Romanian Editorial Desk" },
@@ -182,7 +195,7 @@ function buildDesk(locale: GlobalLocaleCode): EditorialDesk {
   };
 }
 
-/** One desk per global locale (19) — hubs: cs, en, en-US */
+/** One desk per global locale — hubs: cs, en, en-US */
 export const EDITORIAL_DESKS: EditorialDesk[] = GLOBAL_LOCALES.map((l) => buildDesk(l.code));
 
 /** High-traffic desks that run daily article enqueue */
@@ -193,6 +206,8 @@ export const PRIMARY_EDITORIAL_LOCALES: GlobalLocaleCode[] = [
   "de",
   "fr",
   "es",
+  "pt",
+  "pt-BR",
   "it",
   "en",
   "en-US",
