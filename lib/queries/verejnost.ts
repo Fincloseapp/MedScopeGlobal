@@ -60,18 +60,20 @@ export async function listPublicArticles(options?: {
     getDemoMagazineArticles,
   } = await import("@/lib/verejnost/demo-magazine-articles");
 
-  const demoSlice = async () => {
+  const demoSlice = async (opts?: { translate?: boolean }) => {
     let demo = getDemoMagazineArticles();
     if (options?.topic) {
       demo = demo.filter((a) => a.public_topic === options.topic);
     }
     const mode = options?.mode ?? "card";
+    const translate = opts?.translate !== false;
     return prepareArticlesForDisplay(
       mergeNativeDeskFeed(demo, locale, options?.topic).slice(offset, offset + limit),
       locale,
       {
         mode,
-        maxTranslate: limit,
+        maxTranslate: translate ? Math.min(limit, 8) : 0,
+        maxLive: 0,
       }
     );
   };
@@ -130,12 +132,12 @@ export async function listPublicArticles(options?: {
     return await Promise.race([
       load,
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("public-articles-timeout")), 8_000);
+        timer = setTimeout(() => reject(new Error("public-articles-timeout")), 3_000);
       }),
     ]);
   } catch (error) {
     console.error("listPublicArticles", error);
-    return demoSlice();
+    return demoSlice({ translate: false });
   } finally {
     if (timer) clearTimeout(timer);
   }

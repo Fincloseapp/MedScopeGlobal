@@ -8,7 +8,7 @@ import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { translatePublicTitle } from "@/lib/verejnost/translate-public-text";
 
-export async function DailyTipBanner() {
+async function renderDailyTipBanner() {
   const locale = await getServerLocale();
   const chrome = getVerejnostChrome(locale);
   const video = await getTodayPublicHealthVideo();
@@ -59,4 +59,21 @@ export async function DailyTipBanner() {
       </Link>
     </section>
   );
+}
+
+export async function DailyTipBanner() {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      renderDailyTipBanner(),
+      new Promise<null>((resolve) => {
+        timer = setTimeout(() => resolve(null), 1_500);
+      }),
+    ]);
+  } catch (error) {
+    console.error("[osveta] DailyTipBanner", error);
+    return null;
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }

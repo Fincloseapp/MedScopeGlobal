@@ -1056,7 +1056,13 @@ assert.ok(
     readFileSync(join(root, "lib/queries/verejnost.ts"), "utf8").includes(
       "options?.ensureContent === true"
     ),
-  "public listings must not seed the DB on every page load"
+    "public listings must not seed the DB on every page load"
+);
+assert.ok(
+  readFileSync(join(root, "components/verejnost/daily-tip-banner.tsx"), "utf8").includes(
+    "1_500"
+  ),
+  "Veřejnost daily tip must not block the hub when osveta video/DB hangs"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes('mode: "card"'),
