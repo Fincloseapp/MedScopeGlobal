@@ -12,24 +12,29 @@ import {
   type AiMedicalOutputType,
 } from "@/lib/ai-medical/types";
 import { V4D_SPECIALTIES, SPECIALTY_LABELS_CS } from "@/lib/v4d/constants";
+import { getAiAssistantCopy } from "@/lib/i18n/ai-assistant-copy";
+import { isCzechSurface } from "@/lib/i18n/surface-copy";
 
 type Props = {
   defaultAssistant?: AiMedicalAssistant;
   title?: string;
   /** Zjednodušené rozhraní pro veřejnost — bez klinických filtrů a přepínačů oborů */
   publicMode?: boolean;
+  locale?: string;
 };
 
 export function IntelligenceConsole({
   defaultAssistant = "doctor",
   title,
   publicMode = false,
+  locale = "cs",
 }: Props) {
+  const copy = getAiAssistantCopy(locale);
   const [assistant, setAssistant] = useState<AiMedicalAssistant>(
     publicMode ? "patient" : defaultAssistant,
   );
   const [query, setQuery] = useState("");
-  const [language, setLanguage] = useState<AiMedicalLanguage>("cs");
+  const [language, setLanguage] = useState<AiMedicalLanguage>(isCzechSurface(locale) ? "cs" : "en");
   const [outputType, setOutputType] = useState<AiMedicalOutputType>(publicMode ? "patient" : "professional");
   const [specialty, setSpecialty] = useState("rheumatology");
   const [diagnosis, setDiagnosis] = useState("");
@@ -85,10 +90,7 @@ export function IntelligenceConsole({
       ) : null}
 
       {publicMode ? (
-        <p className="text-sm text-muted-foreground">
-          Napište dotaz jednoduchou češtinou. Odpověď bude srozumitelná pro laiky — bez výběru
-          lékařského oboru.
-        </p>
+        <p className="text-sm text-muted-foreground">{copy.publicHint}</p>
       ) : (
         <div className="flex flex-wrap gap-2 text-xs">
           {AI_MEDICAL_ASSISTANTS.map((a) => (
@@ -110,7 +112,7 @@ export function IntelligenceConsole({
       <div className={`grid gap-4 ${publicMode ? "sm:grid-cols-1 max-w-xs" : "sm:grid-cols-2 lg:grid-cols-4"}`}>
         {!publicMode ? (
           <label className="block text-sm">
-            <span className="font-medium text-slate-700">Asistent</span>
+            <span className="font-medium text-slate-700">{copy.assistantLabel}</span>
             <select
               className="mt-1 w-full rounded-md border border-input px-3 py-2 text-sm"
               value={assistant}
@@ -126,22 +128,22 @@ export function IntelligenceConsole({
         ) : null}
 
         <label className="block text-sm">
-          <span className="font-medium text-slate-700">Jazyk</span>
+          <span className="font-medium text-slate-700">{copy.languageLabel}</span>
           <select
             className="mt-1 w-full rounded-md border border-input px-3 py-2 text-sm"
             value={language}
             onChange={(e) => setLanguage(e.target.value as AiMedicalLanguage)}
           >
-            <option value="cs">Čeština</option>
-            <option value="sk">Slovenština</option>
-            <option value="en">Angličtina</option>
+            <option value="cs">{copy.langCs}</option>
+            <option value="sk">{copy.langSk}</option>
+            <option value="en">{copy.langEn}</option>
           </select>
         </label>
 
         {!publicMode ? (
           <>
             <label className="block text-sm">
-              <span className="font-medium text-slate-700">Obor</span>
+              <span className="font-medium text-slate-700">{copy.specialtyLabel}</span>
               <select
                 className="mt-1 w-full rounded-md border border-input px-3 py-2 text-sm"
                 value={specialty}
@@ -156,14 +158,14 @@ export function IntelligenceConsole({
             </label>
 
             <label className="block text-sm">
-              <span className="font-medium text-slate-700">Typ výstupu</span>
+              <span className="font-medium text-slate-700">{copy.outputLabel}</span>
               <select
                 className="mt-1 w-full rounded-md border border-input px-3 py-2 text-sm"
                 value={outputType}
                 onChange={(e) => setOutputType(e.target.value as AiMedicalOutputType)}
               >
-                <option value="professional">Odborný</option>
-                <option value="patient">Pacientský</option>
+                <option value="professional">{copy.outputProfessional}</option>
+                <option value="patient">{copy.outputPatient}</option>
               </select>
             </label>
           </>
@@ -174,25 +176,25 @@ export function IntelligenceConsole({
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <input
             className="rounded-md border border-input px-3 py-2 text-sm"
-            placeholder="Diagnóza (ra, psa, as…)"
+            placeholder={copy.phDiagnosis}
             value={diagnosis}
             onChange={(e) => setDiagnosis(e.target.value)}
           />
           <input
             className="rounded-md border border-input px-3 py-2 text-sm"
-            placeholder="Typ studie (rct, meta-analysis…)"
+            placeholder={copy.phStudy}
             value={studyType}
             onChange={(e) => setStudyType(e.target.value)}
           />
           <input
             className="rounded-md border border-input px-3 py-2 text-sm"
-            placeholder="Název léku"
+            placeholder={copy.phDrug}
             value={drugName}
             onChange={(e) => setDrugName(e.target.value)}
           />
           <input
             className="rounded-md border border-input px-3 py-2 text-sm"
-            placeholder="Kategorie legislativy"
+            placeholder={copy.phLaw}
             value={legislationCategory}
             onChange={(e) => setLegislationCategory(e.target.value)}
           />
@@ -200,14 +202,10 @@ export function IntelligenceConsole({
       ) : null}
 
       <label className="block">
-        <span className="text-sm font-medium text-slate-700">Váš dotaz</span>
+        <span className="text-sm font-medium text-slate-700">{copy.queryLabel}</span>
         <textarea
           className="mt-2 min-h-[140px] w-full rounded-xl border border-[#cfe1f3] px-4 py-3 text-sm"
-          placeholder={
-            publicMode
-              ? "Např.: Co dělat při bolesti hlavy? Jak zlepšit spánek? Jaké jsou příznaky chřipky?"
-              : "Zadejte klinický dotaz, požadavek na shrnutí, přehled studií…"
-          }
+          placeholder={publicMode ? copy.publicPlaceholder : copy.clinicalPlaceholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -218,7 +216,7 @@ export function IntelligenceConsole({
         disabled={loading}
         className="rounded-full bg-[#005B96] px-8"
       >
-        {loading ? "Připravuji odpověď…" : publicMode ? "Zeptat se" : "Spustit asistenta"}
+        {loading ? copy.loading : publicMode ? copy.ask : copy.run}
       </Button>
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
@@ -226,18 +224,18 @@ export function IntelligenceConsole({
       {result ? (
         <div className="space-y-4 rounded-2xl border border-[#cfe1f3] bg-white p-6">
           <section>
-            <h3 className="font-semibold text-[#005B96]">Odpověď</h3>
+            <h3 className="font-semibold text-[#005B96]">{copy.answer}</h3>
             <p className="mt-2 whitespace-pre-wrap text-sm text-slate-800">{result.reply}</p>
           </section>
           {result.summary ? (
             <section>
-              <h3 className="font-semibold text-[#005B96]">Shrnutí</h3>
+              <h3 className="font-semibold text-[#005B96]">{copy.summary}</h3>
               <p className="mt-2 text-sm text-slate-700">{result.summary}</p>
             </section>
           ) : null}
           {result.recommendations?.length > 0 ? (
             <section>
-              <h3 className="font-semibold text-[#005B96]">Doporučení</h3>
+              <h3 className="font-semibold text-[#005B96]">{copy.recommendations}</h3>
               <ul className="mt-2 list-disc pl-5 text-sm text-slate-700">
                 {result.recommendations.map((r, i) => (
                   <li key={i}>{r}</li>
@@ -247,7 +245,7 @@ export function IntelligenceConsole({
           ) : null}
           {result.clinicalConclusions?.length > 0 ? (
             <section>
-              <h3 className="font-semibold text-[#005B96]">Klinické závěry</h3>
+              <h3 className="font-semibold text-[#005B96]">{copy.conclusions}</h3>
               <ul className="mt-2 list-disc pl-5 text-sm text-slate-700">
                 {result.clinicalConclusions.map((r, i) => (
                   <li key={i}>{r}</li>
@@ -257,7 +255,7 @@ export function IntelligenceConsole({
           ) : null}
           {result.graphicSummary ? (
             <section>
-              <h3 className="font-semibold text-[#005B96]">Grafické shrnutí (text)</h3>
+              <h3 className="font-semibold text-[#005B96]">{copy.graphic}</h3>
               <pre className="mt-2 whitespace-pre-wrap rounded-lg bg-slate-50 p-4 text-xs text-slate-800">
                 {result.graphicSummary}
               </pre>
@@ -265,7 +263,7 @@ export function IntelligenceConsole({
           ) : null}
           {result.sources?.length > 0 ? (
             <section>
-              <h3 className="font-semibold text-[#005B96]">Zdroje z databáze</h3>
+              <h3 className="font-semibold text-[#005B96]">{copy.sources}</h3>
               <ul className="mt-2 space-y-2 text-sm">
                 {result.sources.map((s, i) => (
                   <li key={i} className="rounded-lg bg-slate-50 p-3">
