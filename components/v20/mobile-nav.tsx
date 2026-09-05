@@ -16,7 +16,8 @@ import type { Category } from "@/types/database";
 import { HeaderLogo, HEADER_TAGLINE } from "@/components/layout/header-logo";
 import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import type { NavItem } from "@/lib/config/main-navigation";
-import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { getSurfaceCopy, isCzechSurface } from "@/lib/i18n/surface-copy";
+import { getMagazineListingCopy } from "@/lib/brand/magazine";
 import { getPortalChrome } from "@/lib/v271/portal";
 import { isStudentChromePath, studentNavCtaLabel } from "@/lib/studenti/pricing";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
@@ -74,33 +75,35 @@ export function V20MobileNav({
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">{surface.footer.apps}</p>
             <div className="mt-2 grid grid-cols-2 gap-1.5">
               <Link
-                href="/app/mediflow"
+                href={localizePublicHref("/app/mediflow", locale)}
                 onClick={() => setOpen(false)}
                 className="rounded-lg bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#021d33]"
               >
                 MediFlow
               </Link>
               <Link
-                href="/app/pacient"
+                href={localizePublicHref("/app/pacient", locale)}
                 onClick={() => setOpen(false)}
                 className="rounded-lg bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#021d33]"
               >
                 MeDipacient
               </Link>
               <Link
-                href="/app/dokumentace"
+                href={localizePublicHref("/app/dokumentace", locale)}
                 onClick={() => setOpen(false)}
                 className="rounded-lg bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#021d33]"
               >
                 OrdiZapis
               </Link>
-              <Link
-                href="/app/priprava"
-                onClick={() => setOpen(false)}
-                className="rounded-lg bg-slate-50 px-2 py-2 text-center text-[10px] font-medium text-slate-600"
-              >
-                MeDiprep · legacy
-              </Link>
+              {isCzechSurface(locale) ? (
+                <Link
+                  href="/app/priprava"
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg bg-slate-50 px-2 py-2 text-center text-[10px] font-medium text-slate-600"
+                >
+                  MeDiprep
+                </Link>
+              ) : null}
             </div>
           </div>
           {mainMenu.map((item) => {
@@ -109,24 +112,13 @@ export function V20MobileNav({
             return (
               <div key={item.label} className="rounded-xl border border-slate-200 p-3">
                 <div className="flex items-center justify-between gap-2">
-                  {hasChildren ? (
-                    <button
-                      type="button"
-                      aria-expanded={isExpanded}
-                      className={`flex-1 text-left text-sm font-semibold ${isActive(item.href) ? "text-primary" : "text-[#021d33]"}`}
-                      onClick={() => setExpanded(isExpanded ? null : item.label)}
-                    >
-                      {item.label}
-                    </button>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      onClick={() => setOpen(false)}
-                      className={`flex-1 text-sm font-semibold ${isActive(item.href) ? "text-primary" : "text-[#021d33]"}`}
-                    >
-                      {item.label}
-                    </Link>
-                  )}
+                  <Link
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className={`flex-1 text-sm font-semibold ${isActive(item.href) ? "text-primary" : "text-[#021d33]"}`}
+                  >
+                    {item.label}
+                  </Link>
                   {hasChildren && (
                     <button
                       type="button"
@@ -162,7 +154,7 @@ export function V20MobileNav({
           {topCategories.length > 0 && (
             <div className="rounded-xl border border-slate-200 p-3">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-                Obory
+                {getMagazineListingCopy(locale).desksLabel}
               </p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {topCategories.map((cat) => (
@@ -192,7 +184,7 @@ export function V20MobileNav({
               href={
                 isStudentChromePath(pathname)
                   ? localizePublicHref("/predplatne#student", locale)
-                  : "/predplatne?trial=1"
+                  : localizePublicHref("/predplatne?trial=1", locale)
               }
               onClick={() => setOpen(false)}
             >
@@ -200,12 +192,12 @@ export function V20MobileNav({
             </Link>
           </Button>
           <Button asChild variant="outline" className="rounded-full touch-manipulation">
-            <Link href="/aplikace" onClick={() => setOpen(false)}>
+            <Link href={localizePublicHref("/aplikace", locale)} onClick={() => setOpen(false)}>
               {surface.downloadApps}
             </Link>
           </Button>
           <Button asChild variant="outline" className="rounded-full touch-manipulation">
-            <Link href="/login" onClick={() => setOpen(false)}>
+            <Link href={localizePublicHref("/login", locale)} onClick={() => setOpen(false)}>
               {surface.signIn}
             </Link>
           </Button>

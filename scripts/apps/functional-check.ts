@@ -878,8 +878,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.37"),
-  "page cache tag must bust after the firmy desk and leftover chrome"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.38"),
+  "page cache tag must bust after the header IA rebuild"
 );
 assert.ok(
   !existsSync(join(root, "app/(public)/studenti/[slug]/page.tsx")),
@@ -1092,6 +1092,29 @@ assert.ok(
       "novinkyTagsForLocale"
     ),
   "/pro-me, /odborne and /novinky chrome must follow the edition language"
+);
+assert.ok(
+  readFileSync(join(root, "lib/config/main-navigation.ts"), "utf8").includes("magazineNav") &&
+    readFileSync(join(root, "lib/config/main-navigation.ts"), "utf8").includes("firmyNav") &&
+    readFileSync(join(root, "lib/config/main-navigation.ts"), "utf8").includes(
+      "getHeaderUtilityLinks"
+    ) &&
+    readFileSync(join(root, "components/layout/site-header.tsx"), "utf8").includes(
+      "getHeaderUtilityLinks"
+    ) &&
+    readFileSync(join(root, "components/layout/header-navigation.tsx"), "utf8").includes(
+      'data-nav="primary"'
+    ) &&
+    !readFileSync(join(root, "components/layout/header-navigation.tsx"), "utf8").includes(
+      "overflow-x-auto"
+    ),
+  "top bar must show magazine, firms and every primary hub without a hidden scroll"
+);
+assert.ok(
+  readFileSync(join(root, "lib/config/main-navigation.ts"), "utf8").includes(
+    "1 test zdarma · 89 Kč, další měsíc 149 Kč"
+  ),
+  "student plan in the header must not sell a 14-day trial"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/mediprep/page.tsx"), "utf8").includes("CzechFacultyOnlyNotice"),

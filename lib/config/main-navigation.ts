@@ -69,7 +69,7 @@ const menuCs: NavItem[] = [
       {
         label: "Předplatné Student",
         href: "/predplatne#student",
-        description: "149 Kč/měsíc · trial zdarma",
+        description: "1 test zdarma · 89 Kč, další měsíc 149 Kč",
       },
       {
         label: "Pro rodiče",
@@ -384,7 +384,53 @@ export function getMainMenu(locale: LocaleCode): NavItem[] {
   return localizeNavTree(tree, locale);
 }
 
-/** v33 — compact desktop header: same Czech IA, translated labels. */
+function magazineNav(): NavItem {
+  return {
+    label: "Magazín",
+    href: "/articles",
+    children: [
+      { label: "Všechny články", href: "/articles", description: "Novinky, veřejné zdraví a dlouhověkost" },
+      {
+        label: "Dlouhověkost",
+        href: "/verejnost/clanky?topic=dlouhovekost",
+        description: "Healthspan, spánek, pohyb a strava",
+      },
+      { label: "Aktuality", href: "/novinky", description: "Zdravotnické události bez senzace" },
+      { label: "Archiv", href: "/articles/archiv", description: "Starší články a briefy" },
+      { label: "Hledat", href: "/hledat", description: "Hledání v archivu magazínu" },
+      { label: "Newsletter", href: "/newsletter", description: "Týdenní brief do schránky" },
+    ],
+  };
+}
+
+function firmyNav(): NavItem {
+  return {
+    label: "Firmy",
+    href: "/firmy",
+    children: [
+      { label: "Pro firmy", href: "/firmy", description: "Bannery a partnerství v magazínu" },
+      { label: "Ceník", href: "/firmy/cenik", description: "Orientační ceny bez skrytých poplatků" },
+      { label: "Reklama", href: "/firmy/reklama", description: "Bannery a newsletter — ne v lékařské zóně" },
+      { label: "Partnerství", href: "/firmy/partnerstvi", description: "Univerzity a instituce" },
+      { label: "Kampaně", href: "/firmy/kampane", description: "Segmentace magazín / veřejnost" },
+      { label: "Poptávka", href: "/inzerce/formular", description: "Nabídka do 2 pracovních dnů" },
+    ],
+  };
+}
+
+export function getHeaderUtilityLinks(locale: LocaleCode): NavItem[] {
+  return localizeNavTree(
+    [
+      { label: "Hledat", href: "/hledat" },
+      { label: "Newsletter", href: "/newsletter" },
+      { label: "O nás", href: "/o-nas" },
+      { label: "Kontakt", href: "/kontakt" },
+    ],
+    locale
+  );
+}
+
+/** Desktop + mobile: audience-first IA, every primary surface visible. */
 export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
   const find = (label: string) => menuCs.find((item) => item.label === label);
   const verejnost = find("Pro veřejnost");
@@ -394,11 +440,11 @@ export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
   const appsChildren = [
     { label: "Přehled aplikací", href: "/aplikace", description: "MediFlow, MeDipacient, OrdiZapis" },
     { label: "MediFlow", href: "/mediflow", description: "Wellness deník a longevity" },
-    { label: "Stáhnout MediFlow", href: "/app/mediflow", description: "Instalace na plochu" },
+    { label: "Otevřít MediFlow", href: "/app/mediflow", description: "Instalace na plochu" },
     { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu" },
-    { label: "Stáhnout MeDipacient", href: "/app/pacient", description: "Instalace na plochu" },
+    { label: "Otevřít MeDipacient", href: "/app/pacient", description: "Instalace na plochu" },
     { label: "OrdiZapis", href: "/lekari/dokumentace", description: "AI zápisy pro lékaře" },
-    { label: "Stáhnout OrdiZapis", href: "/app/dokumentace", description: "Nahrávání v mobilu" },
+    { label: "Otevřít OrdiZapis", href: "/app/dokumentace", description: "Nahrávání v mobilu" },
     ...(locale === "cs"
       ? [{ label: "MeDiprep (legacy)", href: "/mediprep", description: "Přijímačky LF — sekundární" }]
       : []),
@@ -416,19 +462,21 @@ export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
       ? [studenti ? { ...studenti, label: "Studenti" } : { label: "Studenti", href: "/studenti" }]
       : []),
     lekari ? { ...lekari, label: "Lékaři" } : { label: "Lékaři", href: "/lekari" },
+    magazineNav(),
     {
       label: "Aplikace",
       href: "/aplikace",
       children: appsChildren,
     },
+    firmyNav(),
     predplatne ?? { label: "Předplatné", href: "/predplatne" },
   ];
   return localizeNavTree(tree, locale);
 }
 
-/** v33 — mobile drawer shows full menu */
+/** Same IA as the desktop bar so mobile is not a leftover dump of 20 top-level items. */
 export function getMobileMenu(locale: LocaleCode): NavItem[] {
-  return getMainMenu(locale);
+  return getDesktopHeaderMenu(locale);
 }
 
 export function getHeaderTagline(locale: LocaleCode): string {
