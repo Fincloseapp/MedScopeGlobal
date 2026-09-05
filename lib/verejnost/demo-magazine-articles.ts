@@ -184,6 +184,7 @@ function buildDemoRow(seed: DemoSeed, index: number): ArticleWithRelations {
     keywords: seed.keywords ?? [],
     seed: true,
     demo: true,
+    listing_fallback: true,
   };
   if (seed.deskHint === "dlouhovekost") {
     metadata.content_pillar = "dlouhovekost";

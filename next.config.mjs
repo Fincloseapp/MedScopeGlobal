@@ -30,7 +30,7 @@ try {
 
 
 
-const CACHE_TAGS = "medscope-ui-v23.34,medscope-pages,v23-content";
+const CACHE_TAGS = "medscope-ui-v23.35,medscope-pages,v23-content";
 
 
 
@@ -127,6 +127,9 @@ const nextConfig = {
       { source: "/mediprep/app", destination: "/app/priprava", permanent: false },
 
       { source: "/pro-lekare", destination: "/lekari", permanent: true },
+      { source: "/:locale/pro-lekare", destination: "/:locale/lekari", permanent: true },
+      { source: "/pro-me/lekari", destination: "/lekari", permanent: true },
+      { source: "/:locale/pro-me/lekari", destination: "/:locale/lekari", permanent: true },
 
       { source: "/pro-firmy", destination: "/firmy", permanent: true },
 

@@ -100,6 +100,14 @@ export async function middleware(request: NextRequest) {
     }
 
     const { locale: pathLocale, pathname: stripped } = resolveLocalePath(pathname);
+    if (stripped === "/pro-lekare" || stripped === "/pro-me/lekari") {
+      const destPath = pathLocale
+        ? `/${localeToPathSegment(pathLocale)}/lekari`
+        : "/lekari";
+      const redirect = NextResponse.redirect(new URL(destPath, request.url), 308);
+      copyResponseCookies(response, redirect);
+      return wrapWithSecurityHeaders(redirect, pathname);
+    }
     if (pathLocale) {
       const url = request.nextUrl.clone();
       const product =

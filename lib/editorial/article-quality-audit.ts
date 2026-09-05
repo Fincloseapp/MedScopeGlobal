@@ -96,7 +96,10 @@ export function shouldHideFromPublicListing(
   if (!article.slug?.trim() || !article.title?.trim()) return true;
   if (article.vip_only) return true;
 
-  const nativeDesk = metaRecord(article.metadata).native_desk === true;
+  const meta = metaRecord(article.metadata);
+  if (meta.listing_fallback === true) return false;
+
+  const nativeDesk = meta.native_desk === true;
   if (isSeedOrDemoArticle(article) && !nativeDesk) return true;
   if (nativeDesk) {
     return countArticleWords(article.content) < 60;

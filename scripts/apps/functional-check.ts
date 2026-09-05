@@ -238,6 +238,7 @@ import {
   shouldHideFromPublicListing,
   filterMagazineListableArticles,
 } from "../../lib/editorial/article-quality-audit";
+import { getDemoMagazineArticles } from "../../lib/verejnost/demo-magazine-articles";
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 function file(rel: string) {
@@ -877,7 +878,7 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.34"),
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.35"),
   "page cache tag must bust after student catch-all route is removed"
 );
 assert.ok(
@@ -909,6 +910,25 @@ assert.ok(
 assert.ok(
   readFileSync(join(root, "middleware.ts"), "utf8").includes("cookieHeaderWithLocale"),
   "middleware must stamp the path locale onto the request Cookie header"
+);
+assert.ok(
+  readFileSync(join(root, "middleware.ts"), "utf8").includes('stripped === "/pro-lekare"') &&
+    readFileSync(join(root, "next.config.mjs"), "utf8").includes("/:locale/pro-lekare"),
+  "legacy /pro-lekare must 308 to the clinical desk"
+);
+assert.ok(
+  readFileSync(join(root, "lib/v22/categories-cache.ts"), "utf8").includes(
+    "header-categories-timeout"
+  ) &&
+    !readFileSync(join(root, "lib/v22/categories-cache.ts"), "utf8").includes(
+      "ensureMedicalCategories"
+    ),
+  "header categories must not seed the DB or wait past the Worker budget"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/layout.tsx"), "utf8").includes("getStaticCopy") &&
+    !readFileSync(join(root, "app/(public)/layout.tsx"), "utf8").includes("resolveConversionCopy"),
+  "public layout must not hit Supabase for the nav strip on every page"
 );
 assert.ok(
   readFileSync(join(root, "lib/studenti/href.ts"), "utf8").includes("studentPublicHref") &&
@@ -2020,6 +2040,11 @@ assert.equal(
     }),
     false,
     "800+ word magazine article stays listable"
+  );
+  assert.equal(
+    shouldHideFromPublicListing(getDemoMagazineArticles()[0]!),
+    false,
+    "demo magazine fallback cards must stay listable when the DB times out"
   );
   assert.deepEqual(
     filterMagazineListableArticles([
