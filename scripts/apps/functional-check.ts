@@ -156,6 +156,7 @@ import {
   prependUniqueArticles,
   splitNewsDesks,
   uniqueHomepageLayout,
+  mixListableFeed,
 } from "../../lib/v271/news-desks";
 import {
   canStartClubRun,
@@ -169,7 +170,12 @@ import { isPhysicianGrantProduct, isStudentGrantProduct } from "../../lib/v27/co
 import { studentIntroCharge, studentMonthlyCharge, STUDENT_FREE_TESTS, isStudentChromePath } from "../../lib/studenti/pricing";
 import { studentPublicHref } from "../../lib/studenti/href";
 import { facultiesForLocale, facultyCountryForLocale } from "../../lib/prijimacky/faculties-by-country";
-import { articlePageKey, rollEvergreenListingDate } from "../../lib/editorial/freshness";
+import {
+  articleDisplayDate,
+  articlePageKey,
+  articleWasRefreshed,
+  rollEvergreenListingDate,
+} from "../../lib/editorial/freshness";
 import {
   isLongevityForeignSource,
   rankV26ForeignSources,
@@ -859,7 +865,7 @@ assert.ok(
   "homepage featured story must show a live publication date"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.27"),
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.28"),
   "page cache tag must bust after student catch-all route is removed"
 );
 assert.ok(
@@ -1266,8 +1272,27 @@ assert.ok(
   "physician hub extras must not stay Czech on /it/lekari"
 );
 assert.ok(
-  readFileSync(join(root, "app/(public)/lekari/page.tsx"), "utf8").includes("isCzechSurface"),
+  readFileSync(join(root, "app/(public)/lekari/page.tsx"), "utf8").includes("isCzechSurface") &&
+    readFileSync(join(root, "app/(public)/lekari/page.tsx"), "utf8").includes("PhysicianOfferDashboard"),
   "ČLK-accredited CME panel is Czech-only"
+);
+file("components/lekari/physician-offer-dashboard.tsx");
+file("lib/i18n/physician-hub-dashboard-copy.ts");
+assert.ok(
+  readFileSync(join(root, "components/lekari/physician-offer-dashboard.tsx"), "utf8").includes(
+    'data-studio="physician-desk"'
+  ),
+  "physician hub must render the clinical desk"
+);
+assert.ok(
+  readFileSync(join(root, "lib/ecosystem/seo.ts"), "utf8").includes("dateModified") &&
+    readFileSync(join(root, "app/(public)/article/[slug]/page.tsx"), "utf8").includes("modifiedAt"),
+  "article pages must expose dateModified when the desk refreshes a story"
+);
+assert.ok(
+  readFileSync(join(root, "lib/v26/backfill.ts"), "utf8").includes("content_refreshed_at") &&
+    readFileSync(join(root, "app/api/cron/v26-rewrite/route.ts"), "utf8").includes("rotate"),
+  "v26 rewrite must stamp refreshed articles so listing dates stay current"
 );
 assert.ok(
   !readFileSync(join(root, "app/(public)/pro-lekare/page.tsx"), "utf8").includes("Sekce pro praxi"),
@@ -1357,6 +1382,10 @@ file("app/(public)/newsletter/dekujeme/page.tsx");
   assert.ok(cronYml.includes("skipAds=1") && cronYml.includes("skipCovers=1"), "public-articles cron must stay inside the Worker budget");
   assert.ok(cronYml.includes("v25-enterprise?mode=quick"), "enterprise cron must use the Worker-safe quick mode");
   assert.ok(cronYml.includes("CRITICAL FAIL"), "ingest and public-articles must fail the dispatcher when they 503");
+  assert.ok(
+    cronYml.includes("/api/cron/v26-rewrite") && cronYml.includes("rotate=1"),
+    "existing magazine articles must rotate on Cloudflare cron, not only new drafts"
+  );
 }
 assert.ok(
   readFileSync(join(root, "lib/v23/newsletter/render.ts"), "utf8").includes("locale = \"cs\""),
@@ -2657,6 +2686,42 @@ console.log("✓ magazine desk byline and copy checks passed");
     new Date("2026-09-04T12:00:00.000Z")
   );
   assert.ok(rolled && rolled.slice(0, 10) >= "2026-08-28" && rolled.slice(0, 10) <= "2026-09-04");
+  assert.equal(
+    articleDisplayDate({
+      published_at: "2026-06-01T10:00:00.000Z",
+      updated_at: "2026-09-04T08:00:00.000Z",
+    }),
+    "2026-09-04T08:00:00.000Z"
+  );
+  assert.equal(
+    articleWasRefreshed({
+      published_at: "2026-06-01T10:00:00.000Z",
+      updated_at: "2026-09-04T08:00:00.000Z",
+    }),
+    true
+  );
+  const mixed = mixListableFeed(
+    [
+      {
+        id: "old-lifestyle",
+        title: "Spánek a krevní tlak u dospělých",
+        slug: "spanek-tlak",
+        excerpt: "Pravidelný spánek.",
+        content: longBody,
+        published: true,
+        published_at: "2026-06-01T10:00:00.000Z",
+        vip_only: false,
+        locale: "cs",
+        audience: "public",
+        public_topic: "zivotni-styl",
+      } as never,
+    ],
+    4
+  );
+  assert.ok(
+    mixed[0]?.listing_published_at,
+    "/articles feed must roll evergreen listing dates like the homepage"
+  );
   const layout = uniqueHomepageLayout(
     [
       {

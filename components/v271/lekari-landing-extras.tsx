@@ -32,7 +32,7 @@ export async function V271LekariCredibilitySection() {
         </h2>
         <p className="mt-2 max-w-3xl text-sm text-slate-600">{copy.credibilityLead}</p>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {copy.cards.map((item) => {
             const Icon = BADGE_ICONS[item.badge as keyof typeof BADGE_ICONS] ?? Award;
             return (
@@ -109,6 +109,9 @@ export async function V271PhysicianTierCard() {
     >
       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">
         {copy.tierTagline}
+      </p>
+      <p className="mt-2 inline-flex rounded-full bg-[#005B96]/10 px-3 py-1 text-xs font-semibold text-[#005B96]">
+        {copy.trialLine}
       </p>
       <h2
         id="physician-tier-heading"

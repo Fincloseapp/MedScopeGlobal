@@ -46,6 +46,9 @@ export async function OrdiZapisPromoBanner({
                 <span className="font-semibold text-sky-200"> — {copy.tagline}</span>
               </p>
               <p className="mt-1 max-w-2xl text-sm leading-5 text-sky-100/90">{copy.pitch}</p>
+              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-sky-200">
+                {copy.trialLine}
+              </p>
             </div>
           </div>
           <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">

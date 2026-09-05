@@ -37,6 +37,8 @@ export type PhysicianHubExtrasCopy = {
   comparisonNote: string;
   ctaLabel: string;
   ctaHref: string;
+  trialLine: string;
+  trialHref: string;
 };
 
 type Pack = {
@@ -54,6 +56,7 @@ type Pack = {
   valueProps: string[];
   comparisonNote: (monthly: string, annual: string) => string;
   ctaLabel: (monthly: string) => string;
+  trialLine: string;
 };
 
 const PACK: Record<ChromePack, Pack> = {
@@ -110,6 +113,7 @@ const PACK: Record<ChromePack, Pack> = {
     comparisonNote: (monthly, annual) =>
       `${monthly}/měsíc — srovnáno s ročním přístupem k specializovaným databázím. Roční plán ${annual} ušetří 2 měsíce.`,
     ctaLabel: (monthly) => `Profesionální předplatné ${monthly}/měs.`,
+    trialLine: "14 dní zdarma — bez reklam v lékařské zóně.",
   },
   en: {
     credibilityTitle: "Trust for clinical practice",
@@ -160,6 +164,7 @@ const PACK: Record<ChromePack, Pack> = {
     comparisonNote: (monthly, annual) =>
       `${monthly}/month versus a yearly specialist-database fee. The annual plan ${annual} saves two months.`,
     ctaLabel: (monthly) => `Physician plan ${monthly}/month`,
+    trialLine: "14 days free — no ads in the physician zone.",
   },
   de: {
     credibilityTitle: "Vertrauen für die Praxis",
@@ -210,6 +215,7 @@ const PACK: Record<ChromePack, Pack> = {
     comparisonNote: (monthly, annual) =>
       `${monthly}/Monat gegenüber einer Jahresgebühr für Fachdatenbanken. Der Jahresplan ${annual} spart zwei Monate.`,
     ctaLabel: (monthly) => `Arzt-Abo ${monthly}/Monat`,
+    trialLine: "14 Tage kostenlos — keine Werbung in der Arztzone.",
   },
   fr: {
     credibilityTitle: "Confiance pour la pratique",
@@ -260,6 +266,7 @@ const PACK: Record<ChromePack, Pack> = {
     comparisonNote: (monthly, annual) =>
       `${monthly}/mois face à un abonnement annuel à une base spécialisée. L’offre annuelle ${annual} économise deux mois.`,
     ctaLabel: (monthly) => `Formule médecin ${monthly}/mois`,
+    trialLine: "14 jours gratuits — pas de publicité dans l’espace médecins.",
   },
   it: {
     credibilityTitle: "Fiducia per la pratica",
@@ -310,6 +317,7 @@ const PACK: Record<ChromePack, Pack> = {
     comparisonNote: (monthly, annual) =>
       `${monthly}/mese rispetto a un abbonamento annuale a una banca dati. Il piano annuale ${annual} risparmia due mesi.`,
     ctaLabel: (monthly) => `Abbonamento medico ${monthly}/mese`,
+    trialLine: "14 giorni gratis — nessuna pubblicità nella zona medici.",
   },
   es: {
     credibilityTitle: "Confianza para la consulta",
@@ -360,6 +368,7 @@ const PACK: Record<ChromePack, Pack> = {
     comparisonNote: (monthly, annual) =>
       `${monthly}/mes frente a una cuota anual de base especializada. El plan anual ${annual} ahorra dos meses.`,
     ctaLabel: (monthly) => `Plan médico ${monthly}/mes`,
+    trialLine: "14 días gratis — sin anuncios en la zona médica.",
   },
   "pt-BR": {
     credibilityTitle: "Confiança para a prática",
@@ -410,6 +419,7 @@ const PACK: Record<ChromePack, Pack> = {
     comparisonNote: (monthly, annual) =>
       `${monthly}/mês frente a uma assinatura anual de base especializada. O plano anual ${annual} economiza dois meses.`,
     ctaLabel: (monthly) => `Plano médico ${monthly}/mês`,
+    trialLine: "14 dias grátis — sem anúncios na zona médica.",
   },
 };
 
@@ -449,6 +459,8 @@ export function getPhysicianHubExtrasCopy(locale?: string | null): PhysicianHubE
     valueProps: raw.valueProps,
     comparisonNote: raw.comparisonNote(monthly, annual),
     ctaLabel: raw.ctaLabel(monthly),
-    ctaHref: localizePublicHref("/predplatne", locale ?? "cs"),
+    ctaHref: localizePublicHref("/predplatne?trial=1", locale ?? "cs"),
+    trialLine: raw.trialLine,
+    trialHref: localizePublicHref("/predplatne?trial=1", locale ?? "cs"),
   };
 }

@@ -34,6 +34,7 @@ import {
 import { getDictionary, t } from "@/lib/i18n/get-dictionary";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { formatPublicDate } from "@/lib/i18n/format-date";
+import { articleDisplayDate, articleWasRefreshed } from "@/lib/editorial/freshness";
 import { ContentRecommendations } from "@/components/recommendations/content-recommendations";
 import { resolveConversionCopy } from "@/lib/v38/conversion-engine";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
@@ -136,6 +137,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       type: "article",
       publishedTime: article.published_at ?? undefined,
+      modifiedTime: article.updated_at ?? article.published_at ?? undefined,
       url: canonical,
       locale: getOgLocale(locale),
       images: [{ url: ogImage }],
@@ -256,6 +258,7 @@ export default async function ArticlePage({ params }: Props) {
     slug: article.slug,
     locale,
     publishedAt: article.published_at,
+    modifiedAt: article.updated_at ?? article.published_at,
     authorName: authorDisplay,
     coverImage: coverUrl,
     isAccessibleForFree: !locked,
@@ -291,7 +294,9 @@ export default async function ArticlePage({ params }: Props) {
     : globalJsonLd;
 
   const chrome = getArticleChrome(locale);
-  const publishedLabel = formatPublicDate(article.published_at, locale);
+  const displayIso = articleDisplayDate(article);
+  const publishedLabel = formatPublicDate(displayIso, locale);
+  const refreshed = articleWasRefreshed(article);
 
   return (
     <>
@@ -368,7 +373,9 @@ export default async function ArticlePage({ params }: Props) {
               <div className="min-w-0">
                 <EditorialAttribution article={article} locale={editorialLocale} />
                 {publishedLabel ? (
-                  <p className="mt-0.5 text-sm text-slate-500">{publishedLabel}</p>
+                  <p className="mt-0.5 text-sm text-slate-500">
+                    {refreshed ? `${chrome.updated} ${publishedLabel}` : publishedLabel}
+                  </p>
                 ) : null}
               </div>
               <div className="flex flex-wrap items-center gap-2">

@@ -8,7 +8,7 @@ import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { listingByline } from "@/lib/editorial/units";
 import type { ArticleWithRelations } from "@/types/database";
 import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
-import { formatPublicDate } from "@/lib/i18n/format-date";
+import { formatArticleDateLabel } from "@/lib/editorial/freshness";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export function ArticleCard({
@@ -26,11 +26,7 @@ export function ArticleCard({
       : article.locale ?? "cs");
   const authorLabel = listingByline(article, editorialLocale);
   const href = localizePublicHref(`/article/${article.slug}`, editorialLocale);
-  const date = formatPublicDate(article.published_at, editorialLocale, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  const dateLabel = formatArticleDateLabel(article, editorialLocale);
   const coverMeta = getArticleCoverLabel(article.title, cat?.name);
   const coverStyles = getArticleCoverStyles(article.title, cat?.name);
   const coverUrl = resolveArticleCoverUrl({
@@ -117,12 +113,12 @@ export function ArticleCard({
       </Link>
       <CardFooter className="flex items-center justify-between border-t border-slate-100 bg-slate-50/90 px-5 py-3 text-xs text-muted-foreground">
         <span className="font-medium text-slate-700 line-clamp-1">{authorLabel}</span>
-        {date && (
+        {dateLabel?.text ? (
           <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 font-medium text-slate-500">
             <Calendar className="h-3.5 w-3.5" />
-            <time dateTime={article.published_at ?? undefined}>{date}</time>
+            <time dateTime={dateLabel.dateTime}>{dateLabel.text}</time>
           </span>
-        )}
+        ) : null}
       </CardFooter>
     </Card>
   );

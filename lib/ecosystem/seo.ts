@@ -65,6 +65,7 @@ export function articleJsonLdGlobal(article: {
   slug: string;
   locale?: string;
   publishedAt?: string | null;
+  modifiedAt?: string | null;
   authorName?: string | null;
   coverImage?: string | null;
   isAccessibleForFree?: boolean;
@@ -103,6 +104,7 @@ export function articleJsonLdGlobal(article: {
       url: SITE.url,
     },
     datePublished: article.publishedAt,
+    dateModified: article.modifiedAt ?? article.publishedAt,
     mainEntityOfPage: pageUrl,
     url: pageUrl,
     image: article.coverImage ?? `${SITE.url}${MAGAZINE.emailLockup}`,
@@ -115,7 +117,7 @@ export function articleJsonLdGlobal(article: {
       "@type": "MedicalAudience",
       audienceType: "Patient",
     },
-    lastReviewed: article.publishedAt,
+    lastReviewed: article.modifiedAt ?? article.publishedAt,
     disclaimer: "Content is not medical diagnosis or treatment advice.",
   };
 }

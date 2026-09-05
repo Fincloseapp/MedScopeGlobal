@@ -78,7 +78,7 @@ export async function buildLocaleSitemapEntries(
     }
     const { data: articles } = await supabase
       .from("articles")
-      .select("slug, published_at")
+      .select("slug, published_at, updated_at")
       .eq("published", true)
       .limit(5000);
 
@@ -87,9 +87,11 @@ export async function buildLocaleSitemapEntries(
         const publicSlug = publicArticleSlug(article.slug as string);
         return {
           url: `${base}${prefix}/article/${publicSlug}`,
-          lastModified: article.published_at
-            ? new Date(article.published_at as string)
-            : new Date(),
+          lastModified: article.updated_at
+            ? new Date(article.updated_at as string)
+            : article.published_at
+              ? new Date(article.published_at as string)
+              : new Date(),
           changeFrequency: "daily" as const,
           priority: 1,
           alternates: {

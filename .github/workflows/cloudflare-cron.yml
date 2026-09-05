@@ -44,6 +44,7 @@ jobs:
             /api/cron/revenue-ops
             /api/cron/newsletter-generate
             /api/cron/vialongevita-brief
+            /api/cron/v26-rewrite?batch=2&rotate=1
             /api/cron/conversion-renewals
           )
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then

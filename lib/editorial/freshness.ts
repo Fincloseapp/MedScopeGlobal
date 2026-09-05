@@ -20,8 +20,36 @@ export function articlePageKey(article: {
   return article.id ? `id:${article.id}` : "";
 }
 
+export type ArticleDateFields = {
+  published_at?: string | null;
+  updated_at?: string | null;
+  listing_published_at?: string | null;
+};
+
 /**
- * Evergreen category cards older than two weeks get a deterministic listing
+ * Visible date for cards and article chrome.
+ * Listing roll wins on desks; otherwise a real rewrite (`updated_at`) beats publish.
+ */
+export function articleDisplayDate(article: ArticleDateFields): string | null {
+  if (article.listing_published_at) return article.listing_published_at;
+  const published = article.published_at ?? null;
+  const updated = article.updated_at ?? null;
+  if (updated && published) {
+    const u = Date.parse(updated);
+    const p = Date.parse(published);
+    if (Number.isFinite(u) && Number.isFinite(p) && u > p + 60_000) return updated;
+  }
+  return published ?? updated ?? null;
+}
+
+export function articleWasRefreshed(article: ArticleDateFields): boolean {
+  const published = article.published_at ? Date.parse(article.published_at) : NaN;
+  const updated = article.updated_at ? Date.parse(article.updated_at) : NaN;
+  return Number.isFinite(published) && Number.isFinite(updated) && updated > published + 12 * 3_600_000;
+}
+
+/**
+ * Evergreen category cards older than a week get a deterministic listing
  * date in the last week. News keeps the real published_at.
  */
 export function rollEvergreenListingDate(
@@ -31,7 +59,7 @@ export function rollEvergreenListingDate(
   const published = article.published_at ? Date.parse(article.published_at) : NaN;
   if (!Number.isFinite(published)) return article.published_at ?? null;
   const ageDays = (now.getTime() - published) / 86_400_000;
-  if (ageDays < 14) return article.published_at ?? null;
+  if (ageDays < 7) return article.published_at ?? null;
   const token = String(article.slug || article.id || "");
   let hash = 0;
   for (let i = 0; i < token.length; i += 1) hash = (hash + token.charCodeAt(i)) % 7;
@@ -46,6 +74,13 @@ export function withCategoryListingDate<T extends DisplayArticle>(
   now = new Date()
 ): T {
   if (desk === "novinky") return article;
+  if (articleWasRefreshed(article)) {
+    const updated = article.updated_at ?? null;
+    const ageDays = updated ? (now.getTime() - Date.parse(updated)) / 86_400_000 : Infinity;
+    if (updated && ageDays < 7) {
+      return { ...article, listing_published_at: updated };
+    }
+  }
   const listing = rollEvergreenListingDate(article, now);
   if (!listing || listing === article.published_at) return article;
   return { ...article, listing_published_at: listing };
@@ -58,7 +93,9 @@ export function formatArticleDateLabel(
   const iso =
     typeof articleOrIso === "string"
       ? articleOrIso
-      : articleOrIso?.listing_published_at ?? articleOrIso?.published_at ?? null;
+      : articleOrIso
+        ? articleDisplayDate(articleOrIso)
+        : null;
   if (!iso) return null;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;

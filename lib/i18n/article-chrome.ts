@@ -17,6 +17,7 @@ type ArticleChrome = {
   recsTitle: string;
   moreInfo: string;
   sponsored: string;
+  updated: string;
 };
 
 const COPY: Record<Pack, ArticleChrome> = {
@@ -31,6 +32,7 @@ const COPY: Record<Pack, ArticleChrome> = {
     recsTitle: "Co čtenáři berou dál",
     moreInfo: "Více informací →",
     sponsored: "Doporučeno",
+    updated: "Aktualizováno",
   },
   de: {
     save: "Speichern",
@@ -43,6 +45,7 @@ const COPY: Record<Pack, ArticleChrome> = {
     recsTitle: "Wonach Leser als Nächstes greifen",
     moreInfo: "Mehr erfahren →",
     sponsored: "Empfohlen",
+    updated: "Aktualisiert",
   },
   fr: {
     save: "Enregistrer",
@@ -55,6 +58,7 @@ const COPY: Record<Pack, ArticleChrome> = {
     recsTitle: "Ce que les lecteurs cherchent ensuite",
     moreInfo: "En savoir plus →",
     sponsored: "Recommandé",
+    updated: "Mis à jour",
   },
   en: {
     save: "Save",
@@ -67,6 +71,7 @@ const COPY: Record<Pack, ArticleChrome> = {
     recsTitle: "What readers reach for next",
     moreInfo: "Learn more →",
     sponsored: "Recommended",
+    updated: "Updated",
   },
   it: {
     save: "Salva",
@@ -79,6 +84,7 @@ const COPY: Record<Pack, ArticleChrome> = {
     recsTitle: "Cosa cercano i lettori dopo",
     moreInfo: "Scopri di più →",
     sponsored: "Consigliato",
+    updated: "Aggiornato",
   },
   es: {
     save: "Guardar",
@@ -91,6 +97,7 @@ const COPY: Record<Pack, ArticleChrome> = {
     recsTitle: "Qué buscan los lectores después",
     moreInfo: "Saber más →",
     sponsored: "Recomendado",
+    updated: "Actualizado",
   },
   "pt-BR": {
     save: "Salvar",
@@ -103,6 +110,7 @@ const COPY: Record<Pack, ArticleChrome> = {
     recsTitle: "O que os leitores buscam depois",
     moreInfo: "Saiba mais →",
     sponsored: "Recomendado",
+    updated: "Atualizado",
   },
 };
 

@@ -312,7 +312,10 @@ export function mixListableFeed(
 ): DisplayArticle[] {
   const listable = articles.filter((article) => isHomepageDeskArticle(article, new Date(), locale));
   const resurface = selectResurfaceCandidates(listable, Math.max(4, Math.ceil(limit / 3)));
-  return mixFreshFeed(listable, resurface, limit);
+  return mixFreshFeed(listable, resurface, limit).map((article) => {
+    const desk = classifyNewsDesk(article);
+    return desk === "novinky" ? article : withCategoryListingDate(article, desk);
+  });
 }
 
 /** Keep longevity cards in the homepage pool even when newer news crowds them out. */

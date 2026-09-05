@@ -165,15 +165,10 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
 export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
   index: {
     slug: "",
-    title: "Pro lékaře a vědce",
+    title: "Pro lékaře v praxi",
     description:
-      "Evidence-based guidelines, kurátorované studie s DOI/PMID, CME přehledy, Research Hub a klinický AI — ověřený přístup přes ČLK.",
+      "OrdiZapis, guidelines s DOI/PMID a odborná sekce. 14 dní zdarma. Lékařská zóna je bez reklam.",
     links: [
-      {
-        label: "CME revmatologie",
-        href: "/academy/lekari",
-        description: "Akreditované testy výhradně pro revmatology",
-      },
       {
         label: "OrdiZapis",
         href: "/lekari/dokumentace",
@@ -196,9 +191,14 @@ export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
       { label: "AI asistent", href: "/lekari/ai-asistent", description: "Klinický AI pro praxi" },
       { label: "Odborná sekce (ČLK)", href: "/odborna", description: "Ověření evidenčním číslem ČLK" },
       { label: "Léky", href: "/leky", description: "SÚKL databáze a novinky" },
+      {
+        label: "CME revmatologie",
+        href: "/academy/lekari",
+        description: "Akreditované testy výhradně pro revmatology",
+      },
     ],
-    ctaHref: "/academy/lekari",
-    ctaLabel: "CME revmatologie",
+    ctaHref: "/lekari/dokumentace",
+    ctaLabel: "OrdiZapis — 14 dní zdarma",
   },
   guidelines: {
     slug: "guidelines",

@@ -54,10 +54,10 @@ const EN: HubPack = {
       ctaLabel: "Ask AI",
     },
     "/lekari": {
-      title: "For physicians and researchers",
+      title: "For practising physicians",
       description:
-        "Evidence-based guidelines, curated studies with DOI/PMID, CME briefs, Research Hub and clinical AI — verified via ČLK.",
-      ctaLabel: "Rheumatology CME",
+        "OrdiZapis, cited guidelines with DOI/PMID, and a professional desk. 14 days free. No ads in the physician zone.",
+      ctaLabel: "OrdiZapis — 14 days free",
     },
     "/lekari/guidelines": {
       title: "Guidelines",
@@ -137,10 +137,10 @@ const DE: HubPack = {
       ctaLabel: "KI fragen",
     },
     "/lekari": {
-      title: "Für Ärztinnen, Ärzte und Forschung",
+      title: "Für die Praxis",
       description:
-        "Evidenzbasierte Leitlinien, kuratierte Studien mit DOI/PMID, CME-Überblicke, Research Hub und klinische KI — geprüft über ČLK.",
-      ctaLabel: "CME Rheumatologie",
+        "OrdiZapis, Leitlinien mit DOI/PMID und Fachbereich. 14 Tage kostenlos. Keine Werbung in der Arztzone.",
+      ctaLabel: "OrdiZapis — 14 Tage kostenlos",
     },
     "/lekari/guidelines": {
       title: "Leitlinien",
@@ -220,10 +220,10 @@ const FR: HubPack = {
       ctaLabel: "Demander à l’IA",
     },
     "/lekari": {
-      title: "Pour les médecins et chercheurs",
+      title: "Pour les médecins en exercice",
       description:
-        "Guidelines fondées sur les preuves, études curatées avec DOI/PMID, brèves FMC, Research Hub et IA clinique — accès vérifié via ČLK.",
-      ctaLabel: "FMC rhumatologie",
+        "OrdiZapis, guidelines avec DOI/PMID et espace professionnel. 14 jours gratuits. Pas de publicité dans l’espace médecins.",
+      ctaLabel: "OrdiZapis — 14 jours gratuits",
     },
     "/lekari/guidelines": {
       title: "Guidelines",

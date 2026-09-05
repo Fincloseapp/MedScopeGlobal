@@ -5,7 +5,7 @@ import { enrichArticleMeta } from "@/lib/v20/content-rules";
 import { listingByline } from "@/lib/editorial/units";
 import type { ArticleWithRelations } from "@/types/database";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
-import { formatPublicDate } from "@/lib/i18n/format-date";
+import { formatArticleDateLabel } from "@/lib/editorial/freshness";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export function V20ArticleCard({
@@ -25,7 +25,7 @@ export function V20ArticleCard({
     excerpt: article.excerpt,
     categories: cat,
   });
-  const date = formatPublicDate(article.published_at, uiLocale);
+  const dateLabel = formatArticleDateLabel(article, uiLocale);
 
   return (
     <article className="v20-article-card group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md">
@@ -57,12 +57,12 @@ export function V20ArticleCard({
           <User className="h-3.5 w-3.5 shrink-0" aria-hidden />
           {authorLabel}
         </span>
-        {date && (
-          <time className="inline-flex shrink-0 items-center gap-1" dateTime={article.published_at!}>
+        {dateLabel?.text ? (
+          <time className="inline-flex shrink-0 items-center gap-1" dateTime={dateLabel.dateTime}>
             <Calendar className="h-3.5 w-3.5" aria-hidden />
-            {date}
+            {dateLabel.text}
           </time>
-        )}
+        ) : null}
       </footer>
     </article>
   );

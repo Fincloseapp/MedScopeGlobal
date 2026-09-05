@@ -457,12 +457,18 @@ assert.ok(getHomepageLongevityCopy("cs").contributeHint.includes("dalšímu čte
     excerpt: "Rest",
     slug: "sleep",
     locale: "de",
+    publishedAt: "2026-06-01T08:00:00.000Z",
+    modifiedAt: "2026-09-04T08:00:00.000Z",
     isAccessibleForFree: true,
   });
   assert.equal(ld.publisher.name, "ViaLongeVita");
   assert.ok(String(ld.url).includes("/de/article/"));
   assert.equal(ld.isAccessibleForFree, true);
+  assert.equal(ld.datePublished, "2026-06-01T08:00:00.000Z");
+  assert.equal(ld.dateModified, "2026-09-04T08:00:00.000Z");
 }
+assert.equal(getArticleChrome("cs").updated, "Aktualizováno");
+assert.equal(getArticleChrome("en").updated, "Updated");
 assert.equal(publicEditorialByline("fr"), "Rédaction MedScopeGlobal");
 assert.equal(publicEditorialByline("cs"), "Redakce MedScopeGlobal");
 assert.ok(!publicEditorialByline("de").includes("Redakce"));
