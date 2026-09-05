@@ -17,7 +17,7 @@ export async function applySecurityMiddleware(
   const pathname = request.nextUrl.pathname;
 
   if (shouldBlockScraper(ua, pathname)) {
-    await logSecurityEvent({
+    void logSecurityEvent({
       ip,
       action: "middleware:scraper_blocked",
       status: "blocked",
@@ -34,7 +34,7 @@ export async function applySecurityMiddleware(
   ) {
     const limit = await checkPublicPageRateLimit(ip, pathname);
     if (!limit.ok) {
-      await logSecurityEvent({
+      void logSecurityEvent({
         ip,
         action: "middleware:public_rate_limit",
         status: "blocked",

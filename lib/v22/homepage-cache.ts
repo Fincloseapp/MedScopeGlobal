@@ -145,7 +145,7 @@ async function loadHomepageDataOrFallback(locale: string) {
     return await Promise.race([
       loadHomepageData(locale),
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("homepage-timeout")), 8_000);
+        timer = setTimeout(() => reject(new Error("homepage-timeout")), 3_000);
       }),
     ]);
   } catch (error) {

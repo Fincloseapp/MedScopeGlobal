@@ -878,8 +878,38 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.42"),
-  "page cache tag must bust after header destination chrome"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.43"),
+  "page cache tag must bust after the public TTFB unblock"
+);
+assert.ok(
+  readFileSync(join(root, "lib/security/rate-limit.ts"), "utf8").includes(
+    "memoryRateLimit(`public:${ip}`"
+  ) &&
+    readFileSync(join(root, "lib/security/rate-limit.ts"), "utf8").includes(
+      "rate-limit-rpc-timeout"
+    ),
+  "public HTML rate limit must stay in-memory; API RPC must have a hard budget"
+);
+assert.ok(
+  readFileSync(join(root, "lib/auth/reader-context.ts"), "utf8").includes("800") &&
+    readFileSync(join(root, "lib/auth/reader-context.ts"), "utf8").includes("ANONYMOUS"),
+  "reader VIP lookup must fall back to anonymous instead of hanging magazine HTML"
+);
+assert.ok(
+  readFileSync(join(root, "lib/i18n/server-locale.ts"), "utf8").includes(
+    "Skip it when middleware already stamped the locale"
+  ),
+  "public locale must not call cookies() when the path/header already resolved"
+);
+assert.ok(
+  existsSync(join(root, "public/favicon.svg")) &&
+    existsSync(join(root, "public/favicon.ico")) &&
+    existsSync(join(root, "app/icon.svg")),
+  "browsers must get a real favicon instead of the 8s HTML 404"
+);
+assert.ok(
+  readFileSync(join(root, "app/sitemap.ts"), "utf8").includes("2_000"),
+  "root sitemap must not wait on Supabase past two seconds"
 );
 assert.ok(
   !existsSync(join(root, "app/(public)/studenti/[slug]/page.tsx")),

@@ -10,20 +10,29 @@ import {
   type LocaleCode,
   type RegionCode,
 } from "@/lib/i18n/config";
-import { localeFromRequestHints } from "@/lib/i18n/locale-path";
+import { localeFromRequestHints, resolveLocalePath } from "@/lib/i18n/locale-path";
 
 export { LOCALE_REQUEST_HEADER, localeFromRequestHints };
 
 /** Locale for server components — path prefix (same request) then cookie. */
 export async function getServerLocale(): Promise<LocaleCode> {
   const headerStore = await headers();
+  const localeHeader = headerStore.get(LOCALE_REQUEST_HEADER);
+  const pathname =
+    headerStore.get(PATHNAME_REQUEST_HEADER) ??
+    headerStore.get("next-url") ??
+    headerStore.get("x-url");
+  // cookies() dynamizes every page. Skip it when middleware already stamped the locale.
+  if (localeHeader) {
+    return localeFromRequestHints({ localeHeader, pathname, cookie: undefined });
+  }
+  if (pathname && resolveLocalePath(pathname).locale) {
+    return localeFromRequestHints({ localeHeader, pathname, cookie: undefined });
+  }
   const cookieStore = await cookies();
   return localeFromRequestHints({
-    localeHeader: headerStore.get(LOCALE_REQUEST_HEADER),
-    pathname:
-      headerStore.get(PATHNAME_REQUEST_HEADER) ??
-      headerStore.get("next-url") ??
-      headerStore.get("x-url"),
+    localeHeader,
+    pathname,
     cookie: cookieStore.get(LOCALE_COOKIE)?.value,
   });
 }

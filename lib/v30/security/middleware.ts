@@ -28,7 +28,7 @@ export async function applyV30SecurityMiddleware(
   const waf = scanQueryString(search);
   if (waf.blocked) {
     recordThreatStrike(ip);
-    await writeAuditLog({
+    void writeAuditLog({
       type: "waf:blocked",
       ip,
       endpoint: pathname,
@@ -41,7 +41,7 @@ export async function applyV30SecurityMiddleware(
   const threatScan = scanForThreats(pathname, search);
   if (threatScan.blocked) {
     recordThreatStrike(ip);
-    await writeAuditLog({
+    void writeAuditLog({
       type: "v46:threat_blocked",
       ip,
       endpoint: pathname,
@@ -57,7 +57,7 @@ export async function applyV30SecurityMiddleware(
     (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) &&
     !canAccessAdminSurface(request)
   ) {
-    await writeAuditLog({
+    void writeAuditLog({
       type: "admin:ip_denied",
       ip,
       endpoint: pathname,
@@ -67,7 +67,7 @@ export async function applyV30SecurityMiddleware(
   }
 
   if (shouldBlockBot(ua, pathname)) {
-    await writeAuditLog({
+    void writeAuditLog({
       type: "bot:blocked",
       ip,
       endpoint: pathname,
@@ -80,7 +80,7 @@ export async function applyV30SecurityMiddleware(
   if (pathname.startsWith("/api/") && !isApiRateLimitExempt(pathname)) {
     const limit = await checkApiRateLimit(ip, pathname);
     if (!limit.ok) {
-      await writeAuditLog({
+      void writeAuditLog({
         type: "rate_limit:api",
         ip,
         endpoint: pathname,

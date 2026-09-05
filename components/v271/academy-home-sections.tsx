@@ -46,7 +46,7 @@ export async function V272AcademyHomeSections() {
           getLeaderboard("all_time", 5),
         ]),
         new Promise<never>((_, reject) => {
-          timer = setTimeout(() => reject(new Error("academy-home-timeout")), 8_000);
+          timer = setTimeout(() => reject(new Error("academy-home-timeout")), 2_000);
         }),
       ]);
     } finally {

@@ -116,6 +116,7 @@ export default async function RootLayout({
           }}
         />
         <link rel="alternate" type="application/rss+xml" title={MAGAZINE.name} href={feedHref} />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="describedby" title="llms.txt" href={`${siteUrl}/llms.txt`} />
         <GoogleTagHead />
         <AdSenseHead />

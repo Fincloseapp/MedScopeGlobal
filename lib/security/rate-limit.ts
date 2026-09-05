@@ -33,7 +33,23 @@ export function memoryRateLimit(
   return { ok: true, remaining: limit - current.count };
 }
 
-/** Persistent rate limit via Supabase RPC (production). */
+const RPC_BUDGET_MS = 250;
+
+async function withBudget<T>(promise: Promise<T>, ms: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("rate-limit-rpc-timeout")), ms);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+/** Persistent rate limit via Supabase RPC (API / auth). Never block past RPC_BUDGET_MS. */
 export async function persistentRateLimit(
   key: string,
   limit: number,
@@ -41,11 +57,14 @@ export async function persistentRateLimit(
 ): Promise<{ ok: boolean; remaining: number; retryAfter?: number }> {
   try {
     const admin = createServiceRoleClient();
-    const { data, error } = await admin.rpc("check_rate_limit", {
-      p_key: key,
-      p_limit: limit,
-      p_window_ms: windowMs,
-    });
+    const { data, error } = await withBudget(
+      admin.rpc("check_rate_limit", {
+        p_key: key,
+        p_limit: limit,
+        p_window_ms: windowMs,
+      }),
+      RPC_BUDGET_MS
+    );
 
     if (error || !data) {
       return memoryRateLimit(key, limit, windowMs);
@@ -110,8 +129,11 @@ export async function checkUserRateLimit(userId: string) {
   return persistentRateLimit(`user:${userId}`, 100, 3_600_000);
 }
 
-/** Public HTML navigations — relaxed routes get a higher budget than the rest. */
+/**
+ * Public HTML navigations. Memory only — a hung Supabase RPC here made
+ * every magazine URL (including `/` redirects) wait until the edge timed out.
+ */
 export async function checkPublicPageRateLimit(ip: string, pathname: string) {
   const limit = isRelaxedPublicPath(pathname) ? 300 : 120;
-  return persistentRateLimit(`public:${ip}`, limit, 60_000);
+  return memoryRateLimit(`public:${ip}`, limit, 60_000);
 }

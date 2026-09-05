@@ -114,7 +114,7 @@ export async function getPublicHeaderCategories(locale: LocaleCode = "cs") {
     return await Promise.race([
       getPublicHeaderCategoriesCached(locale),
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("header-categories-timeout")), 8_000);
+        timer = setTimeout(() => reject(new Error("header-categories-timeout")), 2_000);
       }),
     ]);
   } catch (error) {
