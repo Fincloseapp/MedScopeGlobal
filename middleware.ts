@@ -37,6 +37,18 @@ const LOCALE_COOKIE_OPTS = {
   sameSite: "lax" as const,
 };
 
+/** Overlay the path locale onto the incoming Cookie header so RSC sees it now. */
+function cookieHeaderWithLocale(raw: string | null, locale: string): string {
+  const next = `${LOCALE_COOKIE}=${normalizeLocale(locale)}`;
+  if (!raw) return next;
+  const parts = raw
+    .split(";")
+    .map((part) => part.trim())
+    .filter((part) => part && !part.startsWith(`${LOCALE_COOKIE}=`));
+  parts.push(next);
+  return parts.join("; ");
+}
+
 function copyResponseCookies(from: NextResponse, to: NextResponse) {
   from.cookies.getAll().forEach((cookie) => {
     to.cookies.set(cookie.name, cookie.value);
@@ -96,6 +108,7 @@ export async function middleware(request: NextRequest) {
       const requestHeaders = new Headers(request.headers);
       requestHeaders.set(LOCALE_REQUEST_HEADER, normalizeLocale(pathLocale));
       requestHeaders.set(PATHNAME_REQUEST_HEADER, pathname);
+      requestHeaders.set("cookie", cookieHeaderWithLocale(request.headers.get("cookie"), pathLocale));
       if (product) requestHeaders.set("x-czech-faculty-product", product);
       const rewrite = NextResponse.rewrite(url, {
         request: { headers: requestHeaders },

@@ -877,7 +877,7 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.33"),
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.34"),
   "page cache tag must bust after student catch-all route is removed"
 );
 assert.ok(
@@ -905,6 +905,10 @@ assert.ok(
     "localeFromRequestHints"
   ),
   "request locale must prefer the path prefix over a leftover cookie"
+);
+assert.ok(
+  readFileSync(join(root, "middleware.ts"), "utf8").includes("cookieHeaderWithLocale"),
+  "middleware must stamp the path locale onto the request Cookie header"
 );
 assert.ok(
   readFileSync(join(root, "lib/studenti/href.ts"), "utf8").includes("studentPublicHref") &&
