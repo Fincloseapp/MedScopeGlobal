@@ -16,11 +16,13 @@ import type { Category } from "@/types/database";
 import { HeaderLogo, HEADER_TAGLINE } from "@/components/layout/header-logo";
 import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import type { NavItem } from "@/lib/config/main-navigation";
+import { getHeaderUtilityLinks, headerUtilityAria } from "@/lib/config/main-navigation";
 import { getSurfaceCopy, isCzechSurface } from "@/lib/i18n/surface-copy";
 import { getMagazineListingCopy } from "@/lib/brand/magazine";
 import { getPortalChrome } from "@/lib/v271/portal";
 import { isStudentChromePath, studentNavCtaLabel } from "@/lib/studenti/pricing";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { normalizeLocale } from "@/lib/i18n/config";
 
 export function V20MobileNav({
   mainMenu,
@@ -44,8 +46,10 @@ export function V20MobileNav({
     href === "/" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
 
   const topCategories = categories.slice(0, 8);
-  const surface = getSurfaceCopy(locale);
-  const chrome = getPortalChrome(locale);
+  const navLocale = normalizeLocale(locale);
+  const surface = getSurfaceCopy(navLocale);
+  const chrome = getPortalChrome(navLocale);
+  const utilities = getHeaderUtilityLinks(navLocale);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -71,31 +75,48 @@ export function V20MobileNav({
         </SheetHeader>
 
         <nav className="mt-4 flex-1 space-y-2" aria-label={surface.menuOpen}>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">
+              {headerUtilityAria(navLocale)}
+            </p>
+            <div className="mt-2 grid grid-cols-2 gap-1.5">
+              {utilities.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#021d33]"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
           <div className="rounded-xl border border-[#005B96]/20 bg-[#f4f9fc] p-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">{surface.footer.apps}</p>
             <div className="mt-2 grid grid-cols-2 gap-1.5">
               <Link
-                href={localizePublicHref("/app/mediflow", locale)}
+                href={localizePublicHref("/app/mediflow", navLocale)}
                 onClick={() => setOpen(false)}
                 className="rounded-lg bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#021d33]"
               >
                 MediFlow
               </Link>
               <Link
-                href={localizePublicHref("/app/pacient", locale)}
+                href={localizePublicHref("/app/pacient", navLocale)}
                 onClick={() => setOpen(false)}
                 className="rounded-lg bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#021d33]"
               >
                 MeDipacient
               </Link>
               <Link
-                href={localizePublicHref("/app/dokumentace", locale)}
+                href={localizePublicHref("/app/dokumentace", navLocale)}
                 onClick={() => setOpen(false)}
                 className="rounded-lg bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#021d33]"
               >
                 OrdiZapis
               </Link>
-              {isCzechSurface(locale) ? (
+              {isCzechSurface(navLocale) ? (
                 <Link
                   href="/app/priprava"
                   onClick={() => setOpen(false)}
@@ -137,12 +158,17 @@ export function V20MobileNav({
                   <div className="mt-2 space-y-1 border-t border-slate-100 pt-2">
                     {item.children!.map((child) => (
                       <Link
-                        key={child.href}
+                        key={`${child.href}-${child.label}`}
                         href={child.href}
                         onClick={() => setOpen(false)}
                         className={`block rounded-lg px-2 py-2 text-sm ${pathname === child.href ? "bg-primary/10 font-medium text-primary" : "text-slate-600"}`}
                       >
-                        {child.label}
+                        <span className="block font-medium">{child.label}</span>
+                        {child.description ? (
+                          <span className="mt-0.5 block text-xs font-normal leading-5 text-slate-500">
+                            {child.description}
+                          </span>
+                        ) : null}
                       </Link>
                     ))}
                   </div>
@@ -160,7 +186,7 @@ export function V20MobileNav({
                 {topCategories.map((cat) => (
                   <Link
                     key={cat.slug}
-                    href={`/category/${cat.slug}`}
+                    href={localizePublicHref(`/category/${cat.slug}`, navLocale)}
                     onClick={() => setOpen(false)}
                     className="rounded-full border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-700 hover:border-primary/40 hover:text-primary"
                   >
@@ -177,27 +203,27 @@ export function V20MobileNav({
             <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">
               {surface.language}
             </p>
-            <LocaleSwitcher currentLocale={locale} />
+            <LocaleSwitcher currentLocale={navLocale} />
           </div>
           <Button asChild className="rounded-full bg-primary touch-manipulation">
             <Link
               href={
                 isStudentChromePath(pathname)
-                  ? localizePublicHref("/predplatne#student", locale)
-                  : localizePublicHref("/predplatne?trial=1", locale)
+                  ? localizePublicHref("/predplatne#student", navLocale)
+                  : localizePublicHref("/predplatne?trial=1", navLocale)
               }
               onClick={() => setOpen(false)}
             >
-              {isStudentChromePath(pathname) ? studentNavCtaLabel(locale) : chrome.trialCta}
+              {isStudentChromePath(pathname) ? studentNavCtaLabel(navLocale) : chrome.trialCta}
             </Link>
           </Button>
           <Button asChild variant="outline" className="rounded-full touch-manipulation">
-            <Link href={localizePublicHref("/aplikace", locale)} onClick={() => setOpen(false)}>
+            <Link href={localizePublicHref("/aplikace", navLocale)} onClick={() => setOpen(false)}>
               {surface.downloadApps}
             </Link>
           </Button>
           <Button asChild variant="outline" className="rounded-full touch-manipulation">
-            <Link href={localizePublicHref("/login", locale)} onClick={() => setOpen(false)}>
+            <Link href={localizePublicHref("/login", navLocale)} onClick={() => setOpen(false)}>
               {surface.signIn}
             </Link>
           </Button>

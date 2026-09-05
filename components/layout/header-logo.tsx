@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { MAGAZINE } from "@/lib/brand/magazine";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { cn } from "@/lib/utils";
 
 export const HEADER_TAGLINE = `${MAGAZINE.name} · MediFlow · MeDipacient · OrdiZapis`;
@@ -22,6 +23,7 @@ export function HeaderLogo({
   priority = true,
   locale = "cs",
 }: Props) {
+  const home = getSurfaceCopy(locale).footer.home;
   return (
     <Link
       href={localizePublicHref("/", locale)}
@@ -31,7 +33,7 @@ export function HeaderLogo({
         centered ? "items-center pr-0 text-center" : "items-start pr-2 text-left lg:pr-3",
         className
       )}
-      aria-label="MedScopeGlobal — domů"
+      aria-label={`MedScopeGlobal — ${home}`}
     >
       <span
         className={cn(

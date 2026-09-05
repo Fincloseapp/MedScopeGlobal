@@ -51,7 +51,7 @@ import { getNewsletterCopy } from "../lib/i18n/newsletter-copy";
 import { getMarketingCopy } from "../lib/i18n/marketing-copy";
 import { localizePublicHref, translateNavHref } from "../lib/i18n/nav-copy";
 import { localizeV271Page } from "../lib/i18n/hub-copy";
-import { getDesktopHeaderMenu } from "../lib/config/main-navigation";
+import { getDesktopHeaderMenu, getHeaderUtilityLinks } from "../lib/config/main-navigation";
 import { V271_LEKARI_PAGES } from "../lib/v271/routes";
 import { looksLikeCzech } from "../lib/i18n/czech-detect";
 import { convertCzkToCharge, localizeListedCzk, paymentTiersForUser } from "../lib/i18n/payment-currency";
@@ -342,6 +342,18 @@ assert.equal(csHeader[0]?.children?.[0]?.label, "Dlouhověkost");
 assert.equal(frHeader[0]?.children?.[0]?.label, "Longévité");
 assert.equal(getDesktopHeaderMenu("de")[0]?.children?.[0]?.label, "Langlebigkeit");
 assert.ok((frHeader[5]?.children?.length ?? 0) >= 4);
+assert.ok(
+  !(frHeader.find((item) => item.href === "/fr/lekari")?.children ?? []).some((child) =>
+    child.href.includes("/academy")
+  )
+);
+const frUtilities = getHeaderUtilityLinks("fr");
+assert.deepEqual(
+  frUtilities.map((item) => item.href),
+  ["/fr/hledat", "/fr/newsletter", "/fr/o-nas", "/fr/kontakt"]
+);
+assert.equal(frUtilities[0]?.label, "Recherche");
+assert.equal(getHeaderUtilityLinks("cs")[2]?.label, "O nás");
 assert.ok(getPortalChrome("cs").trialCta.includes("zdarma"));
 assert.ok(getPortalChrome("fr").services.some((s) => s.id === "vip" && s.label === "Longévité"));
 assert.equal(getPortalChrome("cs").services.find((s) => s.id === "leky")?.label, "Léky");

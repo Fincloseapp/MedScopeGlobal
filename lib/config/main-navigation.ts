@@ -231,7 +231,7 @@ const menuCs: NavItem[] = [
     children: [
       { label: "Prohlédnout tarify", href: "/predplatne", description: "14 dní zdarma · zrušení kdykoli" },
       { label: "Veřejnost", href: "/predplatne#public", description: "Články, prevence, MeDipacient" },
-      { label: "Student LF", href: "/predplatne#student", description: "Academy a AI tutor" },
+      { label: "Student LF", href: "/predplatne#student", description: "1 test zdarma · 89 Kč, další měsíc 149 Kč" },
       { label: "OrdiZapis", href: "/predplatne#dokumentace", description: "AI zápisy pro ordinaci" },
       { label: "Lékař v praxi", href: "/predplatne#physician", description: "CME a Research Hub" },
     ],
@@ -430,6 +430,16 @@ export function getHeaderUtilityLinks(locale: LocaleCode): NavItem[] {
   );
 }
 
+export function headerUtilityAria(locale: LocaleCode): string {
+  if (locale === "cs") return "Rychlé odkazy";
+  if (locale === "de") return "Schnellzugriff";
+  if (locale === "fr") return "Accès rapide";
+  if (locale === "it") return "Collegamenti rapidi";
+  if (locale === "es") return "Accesos rápidos";
+  if (locale === "pt" || locale === "pt-BR") return "Atalhos";
+  return "Quick links";
+}
+
 /** Desktop + mobile: audience-first IA, every primary surface visible. */
 export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
   const find = (label: string) => menuCs.find((item) => item.label === label);
@@ -450,18 +460,25 @@ export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
       : []),
     { label: "Můj dashboard", href: "/dashboard", description: "Zprávy, deník a zápisy" },
   ];
+  const publicChildren = verejnost?.children?.filter((child) => child.href !== "/verejnost/zebricek");
+  const physicianChildren =
+    locale === "cs"
+      ? lekari?.children
+      : lekari?.children?.filter((child) => !isCzechMedicalSchoolNav(child.href));
   const tree: NavItem[] = [
     verejnost
       ? {
           ...verejnost,
           label: "Veřejnost",
-          children: verejnost.children?.filter((child) => child.href !== "/verejnost/zebricek"),
+          children: publicChildren,
         }
       : { label: "Veřejnost", href: "/verejnost" },
     ...(locale === "cs"
       ? [studenti ? { ...studenti, label: "Studenti" } : { label: "Studenti", href: "/studenti" }]
       : []),
-    lekari ? { ...lekari, label: "Lékaři" } : { label: "Lékaři", href: "/lekari" },
+    lekari
+      ? { ...lekari, label: "Lékaři", children: physicianChildren }
+      : { label: "Lékaři", href: "/lekari" },
     magazineNav(),
     {
       label: "Aplikace",

@@ -878,8 +878,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.38"),
-  "page cache tag must bust after the header IA rebuild"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.39"),
+  "page cache tag must bust after the header utility strip"
 );
 assert.ok(
   !existsSync(join(root, "app/(public)/studenti/[slug]/page.tsx")),
@@ -1100,13 +1100,22 @@ assert.ok(
       "getHeaderUtilityLinks"
     ) &&
     readFileSync(join(root, "components/layout/site-header.tsx"), "utf8").includes(
-      "getHeaderUtilityLinks"
+      'data-nav="utility"'
+    ) &&
+    !readFileSync(join(root, "components/layout/site-header.tsx"), "utf8").includes(
+      "xl:flex"
     ) &&
     readFileSync(join(root, "components/layout/header-navigation.tsx"), "utf8").includes(
       'data-nav="primary"'
     ) &&
     !readFileSync(join(root, "components/layout/header-navigation.tsx"), "utf8").includes(
       "overflow-x-auto"
+    ) &&
+    readFileSync(join(root, "components/layout/header-logo.tsx"), "utf8").includes(
+      "getSurfaceCopy"
+    ) &&
+    !readFileSync(join(root, "components/layout/header-logo.tsx"), "utf8").includes(
+      'aria-label="MedScopeGlobal — domů"'
     ),
   "top bar must show magazine, firms and every primary hub without a hidden scroll"
 );

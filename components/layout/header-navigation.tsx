@@ -75,6 +75,12 @@ export function HeaderNavigation({ mainMenu, locale = "cs" }: { mainMenu: NavIte
             className="relative flex items-stretch"
             onMouseEnter={() => hasChildren && open(item.label)}
             onMouseLeave={scheduleClose}
+            onFocus={() => hasChildren && open(item.label)}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+                scheduleClose();
+              }
+            }}
           >
             <Link
               href={item.href}
