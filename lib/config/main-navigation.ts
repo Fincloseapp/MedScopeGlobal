@@ -31,7 +31,7 @@ const menuCs: NavItem[] = [
       {
         label: "Dlouhověkost",
         href: "/verejnost/clanky?topic=dlouhovekost",
-        description: "Healthspan, spánek, pohyb a strava — čtěte zdarma",
+        description: "Healthspan, spánek, pohyb a strava — náhled a Redakce",
       },
       {
         label: "Pohyb a cvičení",

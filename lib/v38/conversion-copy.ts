@@ -1,3 +1,4 @@
+import { editorialMonthlyCharge } from "@/lib/editorial/pricing";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { localizeListedCzk } from "@/lib/i18n/payment-currency";
@@ -178,6 +179,66 @@ function withLocalPrices(copy: ConversionCopy, locale?: string | null): Conversi
     body: localizeListedCzk(copy.body, locale),
     ctaLabel: localizeListedCzk(copy.ctaLabel, locale),
   };
+}
+
+/** Redakce teaser on public magazine — not the physician VIP gate. */
+export function getEditorialArticleGateCopy(locale?: string | null): ConversionCopy {
+  const price = editorialMonthlyCharge(locale).formatted;
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  if (primary === "de") {
+    return withLocalPrices(
+      {
+        slot: "article_gate",
+        eyebrow: "ViaLongeVita Redaktion",
+        headline: "Weiterlesen mit dem Redaktionsabo",
+        body: `Die ersten Absätze bleiben offen. Den ganzen Text öffnet das Redaktionsabo — 14 Tage, dann ${price}. Kein VIP-Zwang.`,
+        ctaLabel: "14 Tage testen",
+        ctaHref: "/predplatne?trial=1#public",
+        hint: "Artikelanfang — der Rest nach der Aktivierung",
+      },
+      locale
+    );
+  }
+  if (primary === "fr") {
+    return withLocalPrices(
+      {
+        slot: "article_gate",
+        eyebrow: "Rédaction ViaLongeVita",
+        headline: "Continuer avec l’abonnement Rédaction",
+        body: `Les premiers paragraphes restent ouverts. Le texte entier s’ouvre avec l’abonnement Rédaction — 14 jours, puis ${price}. Ce n’est pas un club VIP.`,
+        ctaLabel: "Essayer 14 jours",
+        ctaHref: "/predplatne?trial=1#public",
+        hint: "Début de l’article — le reste après activation",
+      },
+      locale
+    );
+  }
+  if (primary !== "cs") {
+    return withLocalPrices(
+      {
+        slot: "article_gate",
+        eyebrow: "ViaLongeVita editorial",
+        headline: "Continue with the Editorial plan",
+        body: `The opening stays readable. The rest opens with Editorial — 14 days, then ${price}. This is not a VIP club.`,
+        ctaLabel: "Try 14 days",
+        ctaHref: "/predplatne?trial=1#public",
+        hint: "Article opening — the rest after activation",
+      },
+      locale
+    );
+  }
+  return withLocalPrices(
+    {
+      slot: "article_gate",
+      eyebrow: "Redakce ViaLongeVita",
+      headline: "Pokračujte s tarifem Redakce",
+      body: `Úvodní odstavce zůstávají čitelné. Zbytek textu otevírá tarif Redakce — 14 dní, potom ${price}. Toto není VIP členství.`,
+      ctaLabel: "Vyzkoušet 14 dní",
+      ctaHref: "/predplatne?trial=1#public",
+      hint: "Náhled níže — zbytek po aktivaci",
+    },
+    locale
+  );
 }
 
 export function getStaticCopy(slot: ConversionSlot, seed = 0, locale = "cs"): ConversionCopy {

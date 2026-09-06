@@ -48,7 +48,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     dailyTip: "Dnešní tip",
     journal: "MediFlow deník",
     closer:
-      "Číst můžete dál zdarma. Pokud vám po dočtení dává smysl redakci podpořit, můžete přispět u článku — nebo si 14 dní v klidu vyzkoušet a kdykoli skončit. Není to podmínka.",
+      "Úvod článku zůstává čitelný. Zbytek otevírá tarif Redakce — 14 dní, pak 25 Kč (v zahraničí 1 € nebo 1 $). Tip u článku je dobrovolný.",
     softCta: "Vyzkoušet 14 dní",
     contributeHint: "Po dočtení můžete přispět — jen pokud chcete. Držíte tím text přístupný dalšímu čtenáři.",
   },
@@ -87,7 +87,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     dailyTip: "Today’s tip",
     journal: "MediFlow journal",
     closer:
-      "You can keep reading free. If a piece helped, you can leave a tip on the article — or try 14 days and cancel anytime. Neither is required.",
+      "The opening stays readable. The rest opens with the Editorial plan — 14 days, then 25 CZK / €1 / $1. A tip on the article stays voluntary.",
     softCta: "Try 14 days",
     contributeHint: "After you finish an article you can contribute — only if you want to. That keeps the next reader reading.",
   },
@@ -126,7 +126,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     dailyTip: "Tipp des Tages",
     journal: "MediFlow-Tagebuch",
     closer:
-      "Sie können kostenlos weiterlesen. Wenn ein Text geholfen hat, können Sie am Artikel einen Beitrag hinterlassen — oder 14 Tage testen und jederzeit kündigen. Beides ist freiwillig.",
+      "Der Artikelanfang bleibt lesbar. Den Rest öffnet das Redaktionsabo — 14 Tage, dann 1 €. Ein Tipp am Artikel bleibt freiwillig.",
     softCta: "14 Tage testen",
     contributeHint: "Nach dem Lesen können Sie beitragen — nur wenn Sie möchten. So bleibt der Text für die nächste Person offen.",
   },
@@ -165,7 +165,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     dailyTip: "Conseil du jour",
     journal: "Journal MediFlow",
     closer:
-      "Vous pouvez continuer à lire gratuitement. Si un texte vous a aidé, vous pouvez laisser une contribution sur l’article — ou essayer 14 jours et résilier à tout moment. Rien n’est obligatoire.",
+      "Le début de l’article reste lisible. Le reste s’ouvre avec l’abonnement Rédaction — 14 jours, puis 1 €. Le pourboire reste volontaire.",
     softCta: "Essayer 14 jours",
     contributeHint: "Après lecture, vous pouvez contribuer — seulement si vous le souhaitez. Cela garde le texte ouvert pour la personne suivante.",
   },
@@ -198,7 +198,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     dailyTip: "Dica de hoje",
     journal: "Diário MediFlow",
     closer:
-      "Pode continuar a ler de graça. Se um texto ajudou, pode deixar um contributo no artigo — ou experimentar 14 dias e cancelar quando quiser. Nada é obrigatório.",
+      "O início do artigo continua legível. O resto abre com o plano Editorial — 14 dias, depois 1 €. A gorjeta no artigo continua voluntária.",
     softCta: "Experimentar 14 dias",
     contributeHint: "Depois de ler pode contribuir — só se quiser. Assim o texto fica aberto para a pessoa seguinte.",
   },
@@ -231,7 +231,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     dailyTip: "Dica de hoje",
     journal: "Diário MediFlow",
     closer:
-      "Você pode continuar lendo de graça. Se um texto ajudou, pode deixar um contributo no artigo — ou experimentar 14 dias e cancelar quando quiser. Nada é obrigatório.",
+      "O início do artigo continua legível. O resto abre com o plano Editorial — 14 dias, depois 1 €. A gorjeta no artigo continua voluntária.",
     softCta: "Experimentar 14 dias",
     contributeHint: "Depois de ler você pode contribuir — só se quiser. Assim o texto fica aberto para a próxima pessoa.",
   },
@@ -270,7 +270,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     dailyTip: "Consiglio di oggi",
     journal: "Diario MediFlow",
     closer:
-      "Puoi continuare a leggere gratis. Se un testo ti ha aiutato, puoi lasciare un contributo sull’articolo — o provare 14 giorni e disdire quando vuoi. Niente è obbligatorio.",
+      "L’inizio dell’articolo resta leggibile. Il resto si apre con il piano Redazione — 14 giorni, poi 1 €. La mancia resta volontaria.",
     softCta: "Prova 14 giorni",
     contributeHint: "Dopo la lettura puoi contribuire — solo se vuoi. Così il testo resta aperto per la persona successiva.",
   },
@@ -309,7 +309,7 @@ const COPY: Record<string, HomepageLongevityCopy> = {
     dailyTip: "Consejo de hoy",
     journal: "Diario MediFlow",
     closer:
-      "Puedes seguir leyendo gratis. Si un texto te ayudó, puedes dejar una contribución en el artículo — o probar 14 días y cancelar cuando quieras. Nada es obligatorio.",
+      "El comienzo del artículo sigue legible. El resto se abre con el plan Redacción — 14 días, luego 1 €. La propina sigue siendo voluntaria.",
     softCta: "Probar 14 días",
     contributeHint: "Después de leer puedes contribuir — solo si quieres. Así el texto queda abierto para la siguiente persona.",
   },

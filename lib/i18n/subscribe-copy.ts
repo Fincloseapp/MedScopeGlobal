@@ -83,10 +83,10 @@ const COPY: Record<string, SubscribeCopy> = {
   cs: {
     metaTitle: "Předplatné | ViaLongeVita",
     metaDescription:
-      "Čtěte o dlouhověkosti zdarma. Veřejnost, OrdiZapis a lékař: 14 dní. Student LF: 1 test, 89 Kč, pak 149 Kč. Zrušení kdykoli. Platba kartou přes Stripe.",
+      "Náhled článků o dlouhověkosti. Redakce 25 Kč (1 € / 1 $), 14 dní. OrdiZapis a lékař: 14 dní. Student LF: 1 test, 89 Kč, pak 149 Kč. Zrušení kdykoli. Platba kartou přes Stripe.",
     eyebrow: "Předplatné",
     title: "Dlouhověkost srozumitelně — vyzkoušejte 14 dní",
-    lead: "Články o healthspanu zůstávají čitelné. Veřejnost, OrdiZapis a lékař: 14 dní zdarma. Student LF: 1 test zdarma, první měsíc 89 Kč, další 149 Kč. Zrušení kdykoli.",
+    lead: "Veřejnost: úvod článku zdarma, zbytek s tarifem Redakce (25 Kč, 14 dní). OrdiZapis a lékař: 14 dní zdarma. Student LF: 1 test zdarma, první měsíc 89 Kč, další 149 Kč. Zrušení kdykoli.",
     trialFromCta: "Přicházíte z trial CTA — níže je zvýrazněný tarif",
     studentPlan: "Student LF",
     trialFromCtaRest: "(příprava na přijímačky i studium). Rodiče: účet založte na jméno studenta.",
@@ -118,11 +118,11 @@ const COPY: Record<string, SubscribeCopy> = {
     afterTrialUnit: "Kč/měs.",
     currencyLabel: "Kč",
     cancelAnytime: "zrušení kdykoli",
-    supportTitle: "Nechcete předplatné? Stačí číst dál",
+    supportTitle: "Nechcete předplatné hned? Stačí náhled",
     supportLead:
-      "Magazín zůstává otevřený. Pokud vám po dočtení článku dává smysl redakci podpořit, můžete přispět jednorázově — bez účtu a bez závazku. Předplatné je volitelné.",
+      "Úvod článku zůstává čitelný. Zbytek textu otevírá tarif Redakce — 14 dní, pak 25 Kč (1 € / 1 $). Tip u článku je pořád dobrovolný.",
     supportCta: "Otevřít články o dlouhověkosti",
-    keepReading: "Číst dál zdarma",
+    keepReading: "Číst náhled",
     comparisonTitle: "Srovnání tarifů",
     comparisonLead:
       "Přehled funkcí podle cílové skupiny. Veřejnost, OrdiZapis a Lékař: 14denní zkušební verze. Student LF: 1 test zdarma, 89 Kč, pak 149 Kč. OrdiZapis (390 Kč) je samostatný nástroj pro zápisy; Lékař v praxi (490 Kč) přidává CME, Research Hub a klinický AI.",
@@ -193,7 +193,7 @@ const COPY: Record<string, SubscribeCopy> = {
           "AI tutor a studijní materiály",
           "Kvízy, hry a modelové otázky",
           "1 test zdarma · první měsíc 89 Kč · další měsíce 149 Kč, zrušíte kdykoli",
-          "149 Kč = Student LF (Academy) — longevity články zůstávají v magazínu zdarma",
+          "149 Kč = Student LF (Academy) — magazín otevírá tarif Redakce nebo vyšší plán",
         ],
       },
       dokumentace: {
@@ -249,10 +249,10 @@ const COPY: Record<string, SubscribeCopy> = {
   en: {
     metaTitle: "Subscription | ViaLongeVita",
     metaDescription:
-      "Read about longevity for free. Public, OrdiZapis and physician: 14 days. Student: 1 free test, intro month, then 149 CZK / €10. Cancel anytime. Card payment via Stripe.",
+      "Longevity articles open with a preview. Editorial plan 25 CZK / €1 / $1, 14 days. OrdiZapis and physician: 14 days. Student: 1 free test, intro month, then 149 CZK / €10. Cancel anytime. Card payment via Stripe.",
     eyebrow: "Subscription",
     title: "Longevity in plain language — try 14 days",
-    lead: "Healthspan articles stay readable. Public, OrdiZapis and physician: 14 days free. Student: 1 free test, intro month, then 149 CZK / €10. Cancel anytime.",
+    lead: "Public magazine: a preview, then the Editorial plan. OrdiZapis and physician: 14 days free. Student: 1 free test, intro month, then 149 CZK / €10. Cancel anytime.",
     trialFromCta: "You came from a trial CTA — the highlighted plan below is",
     studentPlan: "Medical student",
     trialFromCtaRest: "(admissions prep and study). Parents: create the account in the student’s name.",
@@ -284,11 +284,11 @@ const COPY: Record<string, SubscribeCopy> = {
     afterTrialUnit: "CZK/month",
     currencyLabel: "CZK",
     cancelAnytime: "cancel anytime",
-    supportTitle: "No plan needed — keep reading",
+    supportTitle: "No plan yet — keep the preview",
     supportLead:
-      "The magazine stays open. If an article helped, you can leave a one-off contribution — no account, no commitment. A subscription is optional.",
+      "The opening stays readable. The rest opens with the Editorial plan — 14 days, then 25 CZK / €1 / $1. Tips stay voluntary.",
     supportCta: "Open longevity articles",
-    keepReading: "Keep reading free",
+    keepReading: "Read the preview",
     comparisonTitle: "Compare plans",
     comparisonLead:
       "Features by audience. Public, OrdiZapis and Physician: 14-day trial. Student: 1 free test, intro month, then 149 CZK / €10. OrdiZapis (390 CZK) is the documentation app; Physician (490 CZK) adds CME, Research Hub and clinical AI.",
@@ -359,7 +359,7 @@ const COPY: Record<string, SubscribeCopy> = {
           "AI tutor and study materials",
           "Quizzes, games and model questions",
           "1 free test · intro month · then 149 CZK / €10 — cancel anytime",
-          "149 CZK = Academy student — magazine longevity stays free to read",
+          "149 CZK = Academy student — the magazine opens with Editorial or a higher plan",
         ],
       },
       dokumentace: {
@@ -415,10 +415,10 @@ const COPY: Record<string, SubscribeCopy> = {
   de: {
     metaTitle: "Abo | ViaLongeVita",
     metaDescription:
-      "Langlebigkeit frei lesen. Öffentlichkeit, OrdiZapis und Arzt: 14 Tage. Studium: 1 Test frei, Einstiegsmonat 6 €, danach 10 €. Jederzeit kündbar. Zahlung per Stripe.",
+      "Langlebigkeitsartikel beginnen mit einer Vorschau. Redaktion 1 €, 14 Tage. OrdiZapis und Arzt: 14 Tage. Studium: 1 Test frei, Einstiegsmonat 6 €, danach 10 €. Jederzeit kündbar. Zahlung per Stripe.",
     eyebrow: "Abo",
     title: "Langlebigkeit verständlich — 14 Tage testen",
-    lead: "Healthspan-Artikel bleiben lesbar. Öffentlichkeit, OrdiZapis und Arzt: 14 Tage kostenlos. Medizinstudium: 1 Test frei, Einstiegsmonat 6 €, danach 10 €. Jederzeit kündbar.",
+    lead: "Magazin: Artikelanfang offen, Rest mit Redaktionsabo. OrdiZapis und Arzt: 14 Tage kostenlos. Medizinstudium: 1 Test frei, Einstiegsmonat 6 €, danach 10 €. Jederzeit kündbar.",
     trialFromCta: "Sie kommen vom Test-CTA — hervorgehoben ist der Tarif",
     studentPlan: "Medizinstudium",
     trialFromCtaRest: "(Aufnahmeprüfung und Studium). Eltern: Konto auf den Namen der oder des Studierenden anlegen.",
@@ -450,11 +450,11 @@ const COPY: Record<string, SubscribeCopy> = {
     afterTrialUnit: "CZK/Monat",
     currencyLabel: "CZK",
     cancelAnytime: "jederzeit kündbar",
-    supportTitle: "Kein Abo nötig — weiterlesen",
+    supportTitle: "Noch kein Abo — Vorschau weiterlesen",
     supportLead:
-      "Das Magazin bleibt offen. Wenn ein Artikel geholfen hat, können Sie einmalig beitragen — ohne Konto, ohne Verpflichtung. Ein Abo ist freiwillig.",
+      "Der Artikelanfang bleibt lesbar. Den Rest öffnet das Redaktionsabo — 14 Tage, dann 1 €. Ein Tipp am Artikel bleibt freiwillig.",
     supportCta: "Artikel zur Langlebigkeit öffnen",
-    keepReading: "Kostenlos weiterlesen",
+    keepReading: "Vorschau lesen",
     comparisonTitle: "Tarifvergleich",
     comparisonLead:
       "Funktionen nach Zielgruppe. Öffentlichkeit, OrdiZapis und Arzt: 14 Tage Test. Medizinstudium: 1 Test frei, 6 €, danach 10 €. OrdiZapis (390 CZK) ist die Dokumentations-App; Arzt in der Praxis (490 CZK) ergänzt CME, Research Hub und klinische KI.",
@@ -525,7 +525,7 @@ const COPY: Record<string, SubscribeCopy> = {
           "KI-Tutor und Lernmaterial",
           "Quiz, Spiele und Modellfragen",
           "1 Test frei · Einstiegsmonat 6 € · danach 10 € — jederzeit kündbar",
-          "10 € = Academy-Student — Langlebigkeitsartikel bleiben im Magazin frei lesbar",
+          "10 € = Academy-Student — das Magazin öffnet das Redaktionsabo oder ein höherer Tarif",
         ],
       },
       dokumentace: {
@@ -581,10 +581,10 @@ const COPY: Record<string, SubscribeCopy> = {
   fr: {
     metaTitle: "Abonnement | ViaLongeVita",
     metaDescription:
-      "Lisez la longévité librement. Grand public, OrdiZapis et médecin : 14 jours. Étudiant : 1 test offert, premier mois 6 €, puis 10 €. Résiliation à tout moment. Paiement par carte via Stripe.",
+      "Les articles longévité s’ouvrent par un aperçu. Rédaction 1 €, 14 jours. OrdiZapis et médecin : 14 jours. Étudiant : 1 test offert, premier mois 6 €, puis 10 €. Résiliation à tout moment. Paiement par carte via Stripe.",
     eyebrow: "Abonnement",
     title: "La longévité en clair — 14 jours d’essai",
-    lead: "Les articles healthspan restent lisibles. Grand public, OrdiZapis et médecin : 14 jours gratuits. Étudiant : 1 test offert, premier mois 6 €, puis 10 €. Résiliation à tout moment.",
+    lead: "Magazine : l’ouverture reste lisible, le reste avec l’abonnement Rédaction. OrdiZapis et médecin : 14 jours gratuits. Étudiant : 1 test offert, premier mois 6 €, puis 10 €. Résiliation à tout moment.",
     trialFromCta: "Vous arrivez depuis un CTA d’essai — la formule mise en avant est",
     studentPlan: "Étudiant en médecine",
     trialFromCtaRest: "(préparation aux concours et études). Parents : créez le compte au nom de l’étudiant.",
@@ -616,11 +616,11 @@ const COPY: Record<string, SubscribeCopy> = {
     afterTrialUnit: "CZK/mois",
     currencyLabel: "CZK",
     cancelAnytime: "résiliation à tout moment",
-    supportTitle: "Pas d’abonnement ? Continuez à lire",
+    supportTitle: "Pas d’abonnement ? Lisez l’aperçu",
     supportLead:
-      "Le magazine reste ouvert. Si un article vous a aidé, vous pouvez contribuer une fois — sans compte, sans engagement. L’abonnement est facultatif.",
+      "Le début de l’article reste lisible. Le reste s’ouvre avec l’abonnement Rédaction — 14 jours, puis 1 €. Le pourboire reste volontaire.",
     supportCta: "Ouvrir les articles sur la longévité",
-    keepReading: "Continuer à lire gratuitement",
+    keepReading: "Lire l’aperçu",
     comparisonTitle: "Comparer les formules",
     comparisonLead:
       "Fonctions par public. Grand public, OrdiZapis et Médecin : 14 jours d’essai. Étudiant : 1 test offert, 6 €, puis 10 €. OrdiZapis (390 CZK) est l’appli de notes ; Médecin en exercice (490 CZK) ajoute FMC, Research Hub et IA clinique.",
@@ -691,7 +691,7 @@ const COPY: Record<string, SubscribeCopy> = {
           "Tuteur IA et supports d’étude",
           "Quiz, jeux et questions types",
           "1 test offert · premier mois 6 € · puis 10 € — résiliation à tout moment",
-          "10 € = étudiant Academy — les articles longévité restent libres à lire",
+          "10 € = étudiant Academy — le magazine s’ouvre avec la Rédaction ou une formule supérieure",
         ],
       },
       dokumentace: {

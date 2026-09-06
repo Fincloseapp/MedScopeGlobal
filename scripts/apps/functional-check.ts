@@ -239,6 +239,13 @@ import { getAiMedicalHubCopy } from "../../lib/i18n/ai-medical-hub-copy";
 import { getOdbornaHubCopy } from "../../lib/i18n/odborna-hub-copy";
 import { getLegalChromeCopy } from "../../lib/i18n/legal-chrome-copy";
 import { getInzerceCenikCopy } from "../../lib/i18n/inzerce-cenik-copy";
+import { getMediaKitCopy } from "../../lib/i18n/media-kit-copy";
+import {
+  isFreeNewsDeskArticle,
+  resolveArticleBodyLock,
+} from "../../lib/auth/article-eligibility";
+import { getEditorialArticleGateCopy } from "../../lib/v38/conversion-copy";
+import { getPaywallPreviewHtml } from "../../lib/monetization/paywall-preview";
 import {
   NEWSLETTER_PRIMARY_LOCALES,
   newsletterIssueSlug,
@@ -400,7 +407,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-75-open"), "homepage cache key must bust when the Plus desk stays pinned");
+  assert.ok(home.includes("v23-76-open"), "homepage cache key must bust when magazine teaser locks");
   assert.ok(
     readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes('dynamic = "force-dynamic"'),
     "homepage must render Aktuality live, not from a 10-minute HTML cache"
@@ -903,7 +910,7 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.75"),
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.76"),
   "page cache tag must bust after the Plus desk stays pinned"
 );
 assert.ok(
@@ -1194,7 +1201,7 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-75-open"
+    "v22-homepage-public-v23-76-open"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "listAktualitySection"
@@ -1588,6 +1595,35 @@ assert.ok(
 assert.ok(
   readFileSync(join(root, "app/(public)/inzerce/page.tsx"), "utf8").includes("bannerOfferDesc"),
   "advertising offers must follow the request locale"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/inzerce/page.tsx"), "utf8").includes("getMediaKitCopy") &&
+    readFileSync(join(root, "app/(public)/inzerce/page.tsx"), "utf8").includes("formatsTitle"),
+  "inzerce must ship a media-kit letter and format table"
+);
+assert.ok(
+  !readFileSync(join(root, "lib/i18n/media-kit-copy.ts"), "utf8").includes("1,8") &&
+    !readFileSync(join(root, "lib/i18n/media-kit-copy.ts"), "utf8").includes("4900") &&
+    !readFileSync(join(root, "lib/i18n/media-kit-copy.ts"), "utf8").includes("forum24"),
+  "media kit must not copy Forum24 reach or print numbers"
+);
+assert.ok(
+  readFileSync(join(root, "components/verejnost/verejnost-article-expandable.tsx"), "utf8").includes(
+    "getPaywallPreviewHtml"
+  ) &&
+    !readFileSync(join(root, "components/verejnost/verejnost-article-expandable.tsx"), "utf8").includes(
+      "__html: article.content"
+    ),
+  "listing expand must tease, not dump the full magazine body"
+);
+assert.ok(
+  readFileSync(join(root, "components/verejnost/verejnost-article-detail.tsx"), "utf8").includes(
+    "ArticleBody"
+  ) &&
+    readFileSync(join(root, "app/(public)/verejnost/clanky/[slug]/page.tsx"), "utf8").includes(
+      "resolveArticleBodyLock"
+    ),
+  "verejnost article detail must apply the Redakce teaser lock"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/pro-firmy/page.tsx"), "utf8").includes("getB2BLandingCopy") &&
@@ -3433,6 +3469,52 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.equal(editorialAnnualCharge("de").unitAmount, 1000);
   assert.equal(isEditorialGrantProduct("public-month"), true);
   assert.equal(isEditorialGrantProduct("student-month"), false);
+  assert.equal(
+    resolveArticleBodyLock(
+      { slug: "verejnost-zivotni-styl-demo", audience: "public" },
+      { isVip: false, accessLevel: "public", hasEditorialAccess: false }
+    ).locked,
+    true,
+    "guest must see a magazine teaser"
+  );
+  assert.equal(
+    resolveArticleBodyLock(
+      { slug: "verejnost-zivotni-styl-demo", audience: "public", metadata: { fully_open: true } },
+      { isVip: false, accessLevel: "public", hasEditorialAccess: false }
+    ).locked,
+    true,
+    "native fully_open must not bypass the magazine teaser"
+  );
+  assert.equal(
+    resolveArticleBodyLock(
+      { slug: "zpravy-who-rsv" },
+      { isVip: false, accessLevel: "public", hasEditorialAccess: false }
+    ).locked,
+    false,
+    "Aktuality stay fully readable"
+  );
+  assert.equal(isFreeNewsDeskArticle({ slug: "zpravy-who-rsv" }), true);
+  assert.equal(
+    resolveArticleBodyLock(
+      { slug: "verejnost-zivotni-styl-demo", audience: "public" },
+      { isVip: false, accessLevel: "public", hasEditorialAccess: true }
+    ).locked,
+    false
+  );
+  assert.equal(
+    resolveArticleBodyLock({ vip_only: true }, { isVip: false, accessLevel: "public" }).locked,
+    true
+  );
+  assert.equal(
+    resolveArticleBodyLock({ vip_only: true }, { isVip: true, accessLevel: "physician" }).locked,
+    false
+  );
+  assert.ok(getEditorialArticleGateCopy("cs").ctaHref.includes("#public"));
+  assert.ok(getEditorialArticleGateCopy("de").ctaHref.includes("predplatne"));
+  assert.ok(!getEditorialArticleGateCopy("en").headline.includes("VIP"));
+  assert.ok(getPaywallPreviewHtml("<p>alpha</p><p>bravo</p>", 8).includes("alpha"));
+  assert.ok(!getMediaKitCopy("de").letterTitle.includes("Kč"));
+  assert.ok(getMediaKitCopy("cs").formats.length === 4);
   {
     const csDesk = nativeDeskArticlesForLocale("cs");
     assert.ok(csDesk.some((article) => article.slug.includes("glp1-odmena-alkohol")));

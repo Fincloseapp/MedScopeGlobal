@@ -56,6 +56,8 @@ export type VerejnostChrome = {
   hideArticle: string;
   expandArticle: string;
   openFullArticle: string;
+  teaserContinue: string;
+  teaserCta: string;
   contentComing: string;
   expertSource: string;
   articleDisclaimer: string;
@@ -131,9 +133,11 @@ const CS: VerejnostChrome = {
     pageOf: "Strana {page} z {pages}",
   eduLongevityNote:
     "Informace slouží k obecnému vzdělávání a nenahrazují konzultaci s lékařem. Dlouhověkost popisujeme jako více zdravých let (healthspan), nikoli jako zaručené prodloužení života.",
-  hideArticle: "Skrýt článek",
-  expandArticle: "Klikněte pro celý článek",
-  openFullArticle: "Otevřít celý článek na samostatné stránce →",
+  hideArticle: "Skrýt náhled",
+  expandArticle: "Zobrazit náhled",
+  openFullArticle: "Otevřít článek na samostatné stránce →",
+  teaserContinue: "Úvod zůstává čitelný. Zbytek textu otevírá tarif Redakce.",
+  teaserCta: "Pokračovat s Redakcí",
   contentComing: "Obsah článku bude brzy doplněn.",
   expertSource: "Odborný zdroj",
   articleDisclaimer:
@@ -322,9 +326,11 @@ const EN: VerejnostChrome = {
     pageOf: "Page {page} of {pages}",
   eduLongevityNote:
     "This information is for general education and does not replace a physician. We describe longevity as more healthy years (healthspan), not a guaranteed longer life.",
-  hideArticle: "Hide article",
-  expandArticle: "Click for the full article",
-  openFullArticle: "Open the full article on its own page →",
+  hideArticle: "Hide preview",
+  expandArticle: "Show the preview",
+  openFullArticle: "Open the article on its own page →",
+  teaserContinue: "The opening stays readable. The rest opens with the Editorial plan.",
+  teaserCta: "Continue with Editorial",
   contentComing: "The article body will be added soon.",
   expertSource: "Expert source",
   articleDisclaimer:
@@ -511,9 +517,11 @@ const DE: VerejnostChrome = {
     pageOf: "Seite {page} von {pages}",
   eduLongevityNote:
     "Die Informationen dienen der allgemeinen Bildung und ersetzen keine Ärztin oder keinen Arzt. Langlebigkeit meinen wir als mehr gesunde Jahre (Healthspan), nicht als garantierte Lebensverlängerung.",
-  hideArticle: "Artikel ausblenden",
-  expandArticle: "Klicken für den ganzen Artikel",
+  hideArticle: "Vorschau ausblenden",
+  expandArticle: "Vorschau anzeigen",
   openFullArticle: "Artikel auf eigener Seite öffnen →",
+  teaserContinue: "Der Anfang bleibt lesbar. Den Rest öffnet das Redaktionsabo.",
+  teaserCta: "Mit der Redaktion weiterlesen",
   contentComing: "Der Artikeltext folgt in Kürze.",
   expertSource: "Fachquelle",
   articleDisclaimer:
@@ -700,9 +708,11 @@ const FR: VerejnostChrome = {
     pageOf: "Page {page} sur {pages}",
   eduLongevityNote:
     "Ces informations servent à l’éducation générale et ne remplacent pas un médecin. La longévité désigne davantage d’années en bonne santé (healthspan), pas une vie plus longue garantie.",
-  hideArticle: "Masquer l’article",
-  expandArticle: "Cliquer pour l’article entier",
-  openFullArticle: "Ouvrir l’article entier sur sa page →",
+  hideArticle: "Masquer l’aperçu",
+  expandArticle: "Afficher l’aperçu",
+  openFullArticle: "Ouvrir l’article sur sa page →",
+  teaserContinue: "Le début reste lisible. Le reste s’ouvre avec l’abonnement Rédaction.",
+  teaserCta: "Continuer avec la Rédaction",
   contentComing: "Le corps de l’article sera bientôt ajouté.",
   expertSource: "Source experte",
   articleDisclaimer:

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, ExternalLink } from "lucide-react";
+import { ArticleBody } from "@/components/article/article-body";
 import { ArticleTtsButton } from "@/components/article/article-tts-button";
 import { PublicAdBlocks } from "@/components/verejnost/public-ad-block";
 import { EditorialAttribution } from "@/components/article/editorial-attribution";
@@ -14,17 +15,22 @@ import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
 import { TopicAffiliateBox } from "@/components/monetization/affiliate-box";
 import { ArticleSubscribeNudge } from "@/components/monetization/article-subscribe-nudge";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import type { StoredNudge } from "@/lib/v38/conversion-engine";
 
 export function VerejnostArticleDetail({
   article,
   bannerAds,
   inlineAds,
   sidebarAds,
+  locked = false,
+  gateCopy,
 }: {
   article: DisplayArticle;
   bannerAds: PublicAdCampaign[];
   inlineAds: PublicAdCampaign[];
   sidebarAds: PublicAdCampaign[];
+  locked?: boolean;
+  gateCopy?: StoredNudge;
 }) {
   const uiLocale = article.displayLocale ?? "cs";
   const chrome = getVerejnostChrome(uiLocale);
@@ -83,7 +89,7 @@ export function VerejnostArticleDetail({
               <p className="mt-6 text-lg leading-relaxed text-slate-700">{article.excerpt}</p>
             ) : null}
 
-            {article.content ? (
+            {article.content && !locked ? (
               <ArticleTtsButton
                 title={article.title}
                 excerpt={article.excerpt ?? undefined}
@@ -92,10 +98,15 @@ export function VerejnostArticleDetail({
             ) : null}
 
             {article.content ? (
-              <div
-                className="prose prose-slate mt-6 max-w-none prose-headings:font-display prose-headings:text-[#021d33] prose-p:text-[1.05rem] prose-p:leading-[1.8] prose-p:text-slate-700"
-                dangerouslySetInnerHTML={{ __html: article.content }}
-              />
+              <div className="mt-6">
+                <ArticleBody
+                  html={article.content}
+                  locked={locked}
+                  title={article.title}
+                  locale={uiLocale}
+                  gateCopy={gateCopy}
+                />
+              </div>
             ) : (
               <p className="mt-8 text-slate-500">{chrome.contentComing}</p>
             )}
@@ -112,9 +123,11 @@ export function VerejnostArticleDetail({
 
             <PublicAdBlocks campaigns={inlineAds} variant="inline" />
 
-            <div className="mt-8">
-              <ArticleSubscribeNudge locale={uiLocale} />
-            </div>
+            {!locked ? (
+              <div className="mt-8">
+                <ArticleSubscribeNudge locale={uiLocale} />
+              </div>
+            ) : null}
 
             {article.source_url ? (
               <p className="mt-8 text-sm">

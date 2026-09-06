@@ -80,7 +80,7 @@ export const V27_SUBSCRIPTION_PLANS = [
       "AI tutor a studijní materiály",
       "Kvízy, hry a modelové otázky",
       "1 test zdarma · první měsíc 89 Kč · další měsíce 149 Kč (EU ~10 €)",
-      "149 Kč = Student LF (Academy) — není VIP longevity protokoly",
+      "149 Kč = Student LF (Academy) — magazín otevírá Redakce nebo vyšší plán",
     ],
   },
   {

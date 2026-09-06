@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { ArticleConversionGate } from "@/components/v38/article-conversion-gate";
 import type { StoredNudge } from "@/lib/v38/conversion-engine";
 import { getStaticCopy } from "@/lib/v38/conversion-copy";
-import { getPaywallPreviewHtml } from "@/lib/vip";
+import { getPaywallPreviewHtml } from "@/lib/monetization/paywall-preview";
 import { splitHtmlAfterParagraphs } from "@/lib/monetization/split-article-html";
 
 export function ArticleBody({
@@ -11,15 +11,17 @@ export function ArticleBody({
   title,
   gateCopy,
   midSlot,
+  locale,
 }: {
   html: string;
   locked: boolean;
   title?: string;
   gateCopy?: StoredNudge;
   midSlot?: ReactNode;
+  locale?: string | null;
 }) {
   if (locked) {
-    const copy = gateCopy ?? { ...getStaticCopy("article_gate"), generatedBy: "static" as const };
+    const copy = gateCopy ?? { ...getStaticCopy("article_gate", 0, locale ?? "cs"), generatedBy: "static" as const };
     const previewHtml = getPaywallPreviewHtml(html);
     return (
       <>
@@ -36,7 +38,7 @@ export function ArticleBody({
           </div>
         ) : null}
         <div className={previewHtml ? "mt-6" : undefined}>
-          <ArticleConversionGate copy={copy} title={title} />
+          <ArticleConversionGate copy={copy} title={title} locale={locale} />
         </div>
       </>
     );

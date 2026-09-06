@@ -28,6 +28,8 @@ import {
 import { MagazineAdUnit } from "@/components/monetization/magazine-ad-unit";
 import { ArticleSubscribeNudge } from "@/components/monetization/article-subscribe-nudge";
 import { shouldShowDisplayAds, shouldShowPublicSubscribeNudge } from "@/lib/monetization/revenue-mix";
+import { getPaywallPreviewHtml } from "@/lib/monetization/paywall-preview";
+import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 
 export const revalidate = 120;
 
@@ -108,7 +110,10 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
-  const articles = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const articles = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE).map(
+    (article): DisplayArticle =>
+      article.content ? { ...article, content: getPaywallPreviewHtml(article.content) } : article
+  );
   const topicTitle = topic ? topicLabelForSlug(topic, locale) : chrome.allArticles;
   const listingHref = (nextPage: number) => {
     const params = new URLSearchParams();

@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { VerejnostArticleDetail } from "@/components/verejnost/verejnost-article-detail";
+import { resolveArticleBodyLock } from "@/lib/auth/article-eligibility";
+import { getReaderContext } from "@/lib/auth/reader-context";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getEditorialArticleGateCopy } from "@/lib/v38/conversion-copy";
 import {
   getPublicArticleBySlug,
   listPublicAdCampaigns,
@@ -25,6 +29,14 @@ export default async function VerejnostClanekDetailPage({ params }: Props) {
   const article = await getPublicArticleBySlug(slug);
   if (!article) notFound();
 
+  const locale = await getServerLocale();
+  const { isVip, accessLevel, hasEditorialAccess } = await getReaderContext();
+  const { locked } = resolveArticleBodyLock(article, {
+    isVip,
+    accessLevel,
+    hasEditorialAccess,
+  });
+
   const topic = (article.public_topic ?? null) as PublicTopic | null;
   const campaigns = await listPublicAdCampaigns({ topic });
 
@@ -38,6 +50,10 @@ export default async function VerejnostClanekDetailPage({ params }: Props) {
       bannerAds={bannerAds}
       inlineAds={inlineAds}
       sidebarAds={sidebarAds}
+      locked={locked}
+      gateCopy={
+        locked ? { ...getEditorialArticleGateCopy(locale), generatedBy: "static" } : undefined
+      }
     />
   );
 }

@@ -25,6 +25,7 @@ import { matchesArticleLocale } from "@/lib/i18n/article-locale";
 import { articleJsonLdGlobal, buildGlobalHreflang } from "@/lib/ecosystem/seo";
 import { resolveArticleBodyLock } from "@/lib/auth/article-eligibility";
 import { getReaderContext } from "@/lib/auth/reader-context";
+import { getEditorialArticleGateCopy } from "@/lib/v38/conversion-copy";
 import { getActiveAds, getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { AdPlacement } from "@/components/ads/ad-placement";
 import {
@@ -158,7 +159,7 @@ export default async function ArticlePage({ params }: Props) {
   const article = await getArticleBySlug(slug, locale);
   if (!article) notFound();
 
-  const { isVip, accessLevel } = await getReaderContext();
+  const { isVip, accessLevel, hasEditorialAccess } = await getReaderContext();
 
   const revenueArticle = {
     vip_only: article.vip_only,
@@ -173,13 +174,17 @@ export default async function ArticlePage({ params }: Props) {
     med_track: (article as { med_track?: string | null }).med_track,
   };
   const revenueSurface = classifyRevenueSurface(revenueArticle);
-  const { locked } = resolveArticleBodyLock(article, { isVip, accessLevel });
+  const { locked, specialAccess } = resolveArticleBodyLock(article, {
+    isVip,
+    accessLevel,
+    hasEditorialAccess,
+  });
 
-  // Paywall copy only when the body is locked. Public magazine stays free + soft subscribe nudge.
-  const articleGateCopy =
-    locked && !isVip
+  const articleGateCopy = !locked
+    ? null
+    : specialAccess
       ? await resolveConversionCopy("article_gate", locale)
-      : null;
+      : { ...getEditorialArticleGateCopy(locale), generatedBy: "static" as const };
 
   const related =
     article.category_id &&
@@ -485,6 +490,7 @@ export default async function ArticlePage({ params }: Props) {
                   html={article.content}
                   locked={locked}
                   title={article.title}
+                  locale={locale}
                   gateCopy={articleGateCopy ?? undefined}
                   midSlot={
                     !locked &&

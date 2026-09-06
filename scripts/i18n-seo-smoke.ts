@@ -66,6 +66,9 @@ import { b2bPricingForLocale } from "../lib/v271/b2b-pricing";
 import { formatPublicDate, intlLocaleFor } from "../lib/i18n/format-date";
 import { getArticleChrome } from "../lib/i18n/article-chrome";
 import { getRevenueCopy } from "../lib/i18n/revenue-copy";
+import { getMediaKitCopy } from "../lib/i18n/media-kit-copy";
+import { getEditorialArticleGateCopy } from "../lib/v38/conversion-copy";
+import { resolveArticleBodyLock } from "../lib/auth/article-eligibility";
 import { getB2BLandingCopy } from "../lib/i18n/b2b-landing-copy";
 import { chromePack } from "../lib/i18n/chrome-pack";
 import { getV27AudienceGridCopy, getV27AudienceHubCopy } from "../lib/i18n/v27-audience-copy";
@@ -494,6 +497,16 @@ assert.ok(getHomepageLongevityCopy("cs").contributeHint.includes("dalšímu čte
   assert.equal(ld.publisher.name, "ViaLongeVita");
   assert.ok(String(ld.url).includes("/de/article/"));
   assert.equal(ld.isAccessibleForFree, true);
+  assert.equal(
+    articleJsonLdGlobal({
+      title: "Sleep",
+      excerpt: "Rest",
+      slug: "verejnost-sleep",
+      locale: "cs",
+      isAccessibleForFree: false,
+    }).isAccessibleForFree,
+    false
+  );
   assert.equal(ld.datePublished, "2026-06-01T08:00:00.000Z");
   assert.equal(ld.dateModified, "2026-09-04T08:00:00.000Z");
 }
@@ -514,6 +527,18 @@ assert.ok(!getRevenueCopy("de").mediaKitLead.includes("1 300"));
 assert.ok(!getRevenueCopy("cs").mediaKitLead.includes("1 300"));
 assert.ok(!getRevenueCopy("de").bannerOfferDesc.includes("Kč"));
 assert.ok(!getRevenueCopy("de").bannerOfferDesc.includes("články"));
+assert.ok(!getMediaKitCopy("de").letterTitle.includes("tištěný"));
+assert.ok(!getMediaKitCopy("fr").formatsTitle.includes("Inzertní"));
+assert.ok(getMediaKitCopy("cs").digitalTitle.includes("digitál"));
+assert.ok(getEditorialArticleGateCopy("fr").ctaHref.includes("#public"));
+assert.ok(!getEditorialArticleGateCopy("de").headline.includes("VIP"));
+assert.equal(
+  resolveArticleBodyLock(
+    { slug: "verejnost-demo", audience: "public" },
+    { isVip: false, accessLevel: "public", hasEditorialAccess: false }
+  ).locked,
+  true
+);
 assert.ok(!getRevenueCopy("de").priceListName.includes("Ceník"));
 assert.ok(getRevenueCopy("cs").priceListName.includes("Ceník"));
 assert.ok(!getB2BLandingCopy("de").formats.some((item) => /Kč|Sponzorovaný/.test(`${item.name} ${item.price}`)));
