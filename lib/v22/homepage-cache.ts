@@ -81,14 +81,22 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     );
   }
 
-  const fetchPrefix = async (prefix: string, limit: number) => {
-    const { data, error } = await supabase
+  const fetchPrefix = async (
+    prefix: string,
+    limit: number,
+    localeFilter?: "cs"
+  ) => {
+    let query = supabase
       .from("articles")
       .select(homepageCardSelect)
       .eq("published", true)
       .like("slug", `${prefix}%`)
       .order("published_at", { ascending: false, nullsFirst: false })
       .limit(limit);
+    if (localeFilter === "cs") {
+      query = query.or("locale.eq.cs,locale.is.null");
+    }
+    const { data, error } = await query;
     if (error) {
       console.error("loadArticlesPublic", prefix, error);
       return [];
@@ -96,9 +104,10 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     return ((data ?? []) as unknown as Record<string, unknown>[]);
   };
 
+  const csHome = primaryArticleLocale(normalizeLocale(locale)) === "cs";
   const [magazine, news] = await Promise.all([
-    fetchPrefix("verejnost-", 32),
-    fetchPrefix("zpravy-", 12),
+    fetchPrefix("verejnost-", 32, csHome ? "cs" : undefined),
+    fetchPrefix("zpravy-", 24, csHome ? "cs" : undefined),
   ]);
   if (magazine.length === 0 && news.length === 0) {
     return pinHomepageDesks(
@@ -193,7 +202,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-51-news-zpravy", locale, day],
+    ["v22-homepage-public-v23-52-zpravy-cs", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

@@ -119,9 +119,12 @@ export function isLongevityArticle(article: {
 export function isNovinkyArticle(article: {
   title?: string | null;
   excerpt?: string | null;
+  slug?: string | null;
   rubric_slug?: string | null;
   metadata?: Record<string, unknown> | null;
 }): boolean {
+  const slug = String(article.slug ?? "").toLowerCase();
+  if (slug.startsWith("zpravy-")) return true;
   const rubric = String(article.rubric_slug ?? "").toLowerCase();
   if (
     /novink|aktualni|aktuální|zprav|news|foreign/.test(rubric) ||
@@ -178,7 +181,8 @@ export function isHomepageDeskArticle(
   if (!article.slug || !article.title?.trim() || article.vip_only) return false;
   if (!isNovinkyArticle(article) || !isProfessionalAktualityTitle(article.title)) return false;
   const words = countArticleWords(article.content);
-  if (words > 0 && words < 80) return false;
+  const newsFloor = String(article.slug ?? "").toLowerCase().startsWith("zpravy-") ? 40 : 80;
+  if (words > 0 && words < newsFloor) return false;
   return isListableInLocale(article, locale);
 }
 
