@@ -511,16 +511,22 @@ export async function listWireZpravyCards(
     .eq("published", true)
     .like("slug", "zpravy-%")
     .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(Math.max(limit, 32));
+    .limit(80);
 
   if (error) {
     console.error("listWireZpravyCards", error);
     return [];
   }
 
+  const { isProfessionalAktualityTitle } = await import("@/lib/v271/news-desks");
   const rows = filterActiveArticles(
     mapArticleList(data as Record<string, unknown>[] | null)
-  ).filter((article) => !article.vip_only && String(article.slug ?? "").startsWith("zpravy-"));
+  ).filter(
+    (article) =>
+      !article.vip_only &&
+      String(article.slug ?? "").startsWith("zpravy-") &&
+      isProfessionalAktualityTitle(article.title)
+  );
   const prepared = await prepareArticlesForDisplay(rows, locale, {
     mode: "card",
     maxTranslate: Math.min(limit, 4),
