@@ -968,6 +968,8 @@ assert.ok(
 );
 assert.equal(getKarieraHubCopy("fr").filters.specialty, "Spécialité");
 assert.equal(getKarieraHubCopy("fr").filters.all, "Tous");
+assert.equal(getKarieraHubCopy("fr").filters.specialties["interní"], "Médecine interne");
+assert.equal(getKarieraHubCopy("de").filters.specialties["interní"], "Innere Medizin");
 assert.equal(getKarieraHubCopy("de").form.title, "Stellenbezeichnung");
 assert.equal(getKongresyHubCopy("fr").form.extract, "Extraction IA");
 assert.equal(getOrganizaceHubCopy("fr").form.company, "Entreprise");

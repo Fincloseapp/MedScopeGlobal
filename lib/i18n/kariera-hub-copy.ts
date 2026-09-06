@@ -74,7 +74,7 @@ const PACK: Record<ChromePack, KarieraHubCopy> = {
       contract: "Úvazek",
       all: "Vše",
       specialties: {
-        interná: "interní",
+        interní: "interní",
         chirurgie: "chirurgie",
         pediatrie: "pediatrie",
         výzkum: "výzkum",
@@ -123,7 +123,7 @@ const PACK: Record<ChromePack, KarieraHubCopy> = {
       contract: "Anstellung",
       all: "Alle",
       specialties: {
-        interná: "Innere Medizin",
+        interní: "Innere Medizin",
         chirurgie: "Chirurgie",
         pediatrie: "Pädiatrie",
         výzkum: "Forschung",
@@ -172,7 +172,7 @@ const PACK: Record<ChromePack, KarieraHubCopy> = {
       contract: "Contrat",
       all: "Tous",
       specialties: {
-        interná: "Médecine interne",
+        interní: "Médecine interne",
         chirurgie: "Chirurgie",
         pediatrie: "Pédiatrie",
         výzkum: "Recherche",
@@ -221,7 +221,7 @@ const PACK: Record<ChromePack, KarieraHubCopy> = {
       contract: "Contract",
       all: "All",
       specialties: {
-        interná: "Internal medicine",
+        interní: "Internal medicine",
         chirurgie: "Surgery",
         pediatrie: "Paediatrics",
         výzkum: "Research",
@@ -270,7 +270,7 @@ const PACK: Record<ChromePack, KarieraHubCopy> = {
       contract: "Contratto",
       all: "Tutti",
       specialties: {
-        interná: "Medicina interna",
+        interní: "Medicina interna",
         chirurgie: "Chirurgia",
         pediatrie: "Pediatria",
         výzkum: "Ricerca",
@@ -319,7 +319,7 @@ const PACK: Record<ChromePack, KarieraHubCopy> = {
       contract: "Contrato",
       all: "Todos",
       specialties: {
-        interná: "Medicina interna",
+        interní: "Medicina interna",
         chirurgie: "Cirugía",
         pediatrie: "Pediatría",
         výzkum: "Investigación",
@@ -368,7 +368,7 @@ const PACK: Record<ChromePack, KarieraHubCopy> = {
       contract: "Contrato",
       all: "Todos",
       specialties: {
-        interná: "Medicina interna",
+        interní: "Medicina interna",
         chirurgie: "Cirurgia",
         pediatrie: "Pediatria",
         výzkum: "Investigação",
