@@ -12,6 +12,8 @@ import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getMarketingCopy } from "@/lib/i18n/marketing-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { formatPublicDateTime } from "@/lib/i18n/format-date";
+import { ArticleSubscribeNudge } from "@/components/monetization/article-subscribe-nudge";
+import { shouldShowPublicSubscribeNudge } from "@/lib/monetization/revenue-mix";
 
 export const revalidate = 45;
 
@@ -27,6 +29,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const START_HREFS = ["/verejnost/temata", "/verejnost/clanky", "/ai-asistent/verejnost"] as const;
+const FEATURED_DESKS = [
+  { slug: "pohyb", cover: "/assets/covers/movement.webp" },
+  { slug: "joga", cover: "/assets/covers/calm.webp" },
+  { slug: "kosmetika", cover: "/assets/covers/seniors.webp" },
+] as const;
 
 export default async function VerejnostHubPage() {
   const locale = await getServerLocale();
@@ -116,6 +123,40 @@ export default async function VerejnostHubPage() {
         </section>
 
         <section className="mb-12">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+            {copy.featuredEyebrow}
+          </p>
+          <h2 className="font-display text-2xl font-bold text-[#021d33]">{copy.featuredTitle}</h2>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            {FEATURED_DESKS.map((desk) => {
+              const localized = copy.topics[desk.slug];
+              return (
+                <Link
+                  key={desk.slug}
+                  href={localizePublicHref(`/verejnost/clanky?topic=${desk.slug}`, locale)}
+                  prefetch
+                  className="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-[#005B96]/40 hover:shadow-md"
+                >
+                  <div className="relative h-36 overflow-hidden bg-slate-100">
+                    <img
+                      src={desk.cover}
+                      alt=""
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <p className="font-semibold text-[#021d33]">{localized?.label ?? desk.slug}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-slate-500">
+                      {localized?.description ?? ""}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="mb-12">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">{copy.linksEyebrow}</p>
           <h2 className="font-display text-2xl font-bold text-[#021d33]">{copy.linksTitle}</h2>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -169,6 +210,12 @@ export default async function VerejnostHubPage() {
         <div className="mt-12">
           <ListingAffiliateBox locale={locale as GlobalLocaleCode} topic="dlouhovekost" />
         </div>
+
+        {shouldShowPublicSubscribeNudge("public", false) ? (
+          <div className="mt-12">
+            <ArticleSubscribeNudge locale={locale} />
+          </div>
+        ) : null}
 
         <section className="mt-12">
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">

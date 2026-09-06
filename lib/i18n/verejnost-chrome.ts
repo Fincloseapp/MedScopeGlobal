@@ -45,6 +45,8 @@ export type VerejnostChrome = {
   filterEyebrow: string;
   topicFilterLead: string;
   allArticlesLead: string;
+  resultsCount: string;
+  relatedHubsTitle: string;
   topicEmpty: string;
   emptyListing: string;
   prevPage: string;
@@ -119,6 +121,8 @@ const CS: VerejnostChrome = {
   filterEyebrow: "Filtr",
   topicFilterLead: "Články v této rubrice — srozumitelně v češtině, s redakční kontrolou.",
   allArticlesLead: "Procházejte podle tématu nebo zobrazte všechny publikované články.",
+  resultsCount: "{count} redakčních textů",
+  relatedHubsTitle: "Další rubriky",
   topicEmpty:
     "V tématu „{topic}“ zatím nejsou publikované články, které by splnily redakční pravidla.",
   emptyListing: "Články pro veřejnost se brzy objeví — sledujte medscopeglobal.com.",
@@ -309,6 +313,8 @@ const EN: VerejnostChrome = {
   filterEyebrow: "Filter",
   topicFilterLead: "Articles in this section — plain language, editorially reviewed.",
   allArticlesLead: "Browse by topic or see every published article.",
+  resultsCount: "{count} editorial pieces",
+  relatedHubsTitle: "More desks",
   topicEmpty: "There are no published articles in “{topic}” yet that meet editorial standards.",
   emptyListing: "Public articles will appear here soon — follow medscopeglobal.com.",
     prevPage: "← Newer",
@@ -496,6 +502,8 @@ const DE: VerejnostChrome = {
   filterEyebrow: "Filter",
   topicFilterLead: "Artikel in dieser Rubrik — verständlich, redaktionell geprüft.",
   allArticlesLead: "Nach Thema filtern oder alle veröffentlichten Artikel anzeigen.",
+  resultsCount: "{count} redaktionelle Texte",
+  relatedHubsTitle: "Weitere Rubriken",
   topicEmpty: "In „{topic}“ gibt es noch keine Artikel, die die redaktionellen Regeln erfüllen.",
   emptyListing: "Öffentliche Artikel erscheinen in Kürze — folgen Sie medscopeglobal.com.",
     prevPage: "← Neuere",
@@ -683,6 +691,8 @@ const FR: VerejnostChrome = {
   filterEyebrow: "Filtrer",
   topicFilterLead: "Articles de cette rubrique — en langage clair, relus par la rédaction.",
   allArticlesLead: "Parcourez par sujet ou affichez tous les articles publiés.",
+  resultsCount: "{count} textes rédactionnels",
+  relatedHubsTitle: "Autres rubriques",
   topicEmpty: "Il n’y a pas encore d’articles publiés dans « {topic} » qui répondent aux règles éditoriales.",
   emptyListing: "Les articles grand public arriveront bientôt — suivez medscopeglobal.com.",
     prevPage: "← Plus récents",

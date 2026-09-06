@@ -234,6 +234,85 @@ const EN_US: NativeSeed[] = [
       },
     ],
   },
+  {
+    slugTail: "movement-strength-us",
+    title: "Strength and walking for US readers: muscle as prevention, not a transformation ad",
+    excerpt:
+      "Resistance work, daily walking and recovery — editorial, not a personal training plan. Talk to a clinician after injury or if you have heart disease.",
+    topic: "zivotni-styl",
+    keywords: ["exercise", "strength", "walking", "sarcopenia", "movement"],
+    sections: [
+      {
+        h2: "What the evidence actually supports",
+        paras: [
+          "Muscle mass and a walking habit are among the strongest everyday levers for healthspan. That is not a promise you will look like a campaign. It is a reason to keep a simple pattern you can repeat on a Tuesday: a short strength session two or three times a week, and most days on your feet.",
+          "US readers do not need Czech gym culture or a 155 number. If you have chest pain, fainting, or known heart disease, the path is your PCP or 911 — not a new programme from a feed.",
+        ],
+        list: [
+          "Two or three short strength sessions beat an unused annual membership.",
+          "Walking most days is still the most repeatable dose.",
+          "Pain that changes how you walk belongs with a clinician or physical therapist.",
+        ],
+      },
+      {
+        h2: "What this desk will not do",
+        paras: [
+          "We do not prescribe sets and reps for your joints. We do not sell a miracle body. Educational text is not a substitute for rehabilitation after surgery or a fall.",
+        ],
+      },
+    ],
+  },
+  {
+    slugTail: "yoga-mobility-us",
+    title: "Yoga in the US edition: mobility and breath, not energy diagnosis",
+    excerpt:
+      "Range of motion, calmer breathing, less stiffness — without esoterics or a promise to treat disease. Start with an instructor if you are pregnant, dizzy, or injured.",
+    topic: "zivotni-styl",
+    keywords: ["yoga", "mobility", "breath", "pilates", "stretching"],
+    sections: [
+      {
+        h2: "A movement practice, not a clinic",
+        paras: [
+          "Yoga on ViaLongeVita is mobility, breath and a quieter nervous system. Reviews support those outcomes in some groups for back stiffness and anxiety. That is not a licence to treat autoimmune disease or to skip the PCP.",
+          "Skip studio marketing that diagnoses chakras. If a pose hurts a joint or you feel faint, stop. Pregnancy, glaucoma, recent surgery and vertigo belong with a qualified teacher or physician first.",
+        ],
+      },
+      {
+        h2: "How to read a class description",
+        paras: [
+          "Look for a teacher who names contraindications. A mat and a clear floor are enough to start. This page is not a remote class and it is not physical therapy.",
+        ],
+      },
+    ],
+  },
+  {
+    slugTail: "skincare-spf-us",
+    title: "US skincare without miracle creams: SPF, retinoids, barrier",
+    excerpt:
+      "Photoprotection and evidence-level dermocosmetics. Not a prescription and not a substitute for a dermatologist. FDA-regulated products — not grey-market imports.",
+    topic: "zivotni-styl",
+    keywords: ["skincare", "SPF", "retinoid", "ceramide", "sunscreen", "dermatologist"],
+    sections: [
+      {
+        h2: "What has a mechanism",
+        paras: [
+          "Broad-spectrum SPF is still the intervention with the clearest effect on photoageing and some skin cancers. A retinoid and a ceramide moisturiser are reasonable next steps for many adults. None of them erase years on a timeline in an advert.",
+          "Acne, eczema, changing moles and sudden pigment belong with a dermatologist. This desk does not diagnose from a selfie and it does not treat with a serum.",
+        ],
+        list: [
+          "Mineral or hybrid SPF 30–50 on exposed skin, reapplied outdoors.",
+          "Retinoid: start slow; stop if the barrier breaks down.",
+          "Ceramides and a bland moisturiser when the skin is tight or reactive.",
+        ],
+      },
+      {
+        h2: "Premium is a label, not a diagnosis",
+        paras: [
+          "An expensive jar can be a well-formulated product. It is still a cosmetic or OTC unless a clinician prescribed it. Affiliate links on public pages are marked. The physician zone stays clean.",
+        ],
+      },
+    ],
+  },
 ];
 
 const EN_UK: NativeSeed[] = [
@@ -339,6 +418,85 @@ const EN_UK: NativeSeed[] = [
       },
     ],
   },
+  {
+    slugTail: "movement-strength-uk",
+    title: "Strength and walking for UK readers: muscle as prevention, not a transformation ad",
+    excerpt:
+      "Resistance work, daily walking and recovery — editorial, not a personal training plan. GP after injury or known heart disease. 111 or 999 when it is urgent.",
+    topic: "zivotni-styl",
+    keywords: ["exercise", "strength", "walking", "sarcopenia", "movement"],
+    sections: [
+      {
+        h2: "What the evidence actually supports",
+        paras: [
+          "Muscle mass and a walking habit are among the strongest everyday levers for healthspan. That is not a promise you will look like a campaign. It is a reason to keep a simple pattern: two or three short strength sessions, and most days on your feet.",
+          "UK readers do not need Czech gym culture or a 155 number. Chest pain, fainting or known heart disease belongs with the GP, 111 or 999 — not a new programme from a feed.",
+        ],
+        list: [
+          "Two or three short strength sessions beat an unused annual membership.",
+          "Walking most days is still the most repeatable dose on UK pavements.",
+          "Pain that changes how you walk belongs with a GP or physiotherapist.",
+        ],
+      },
+      {
+        h2: "What this desk will not do",
+        paras: [
+          "We do not prescribe sets and reps for your joints. We do not sell a miracle body. Educational text is not a substitute for rehabilitation after surgery or a fall.",
+        ],
+      },
+    ],
+  },
+  {
+    slugTail: "yoga-mobility-uk",
+    title: "Yoga in the UK edition: mobility and breath, not energy diagnosis",
+    excerpt:
+      "Range of motion, calmer breathing, less stiffness — without esoterics or a promise to treat disease. Start with an instructor if you are pregnant, dizzy or injured.",
+    topic: "zivotni-styl",
+    keywords: ["yoga", "mobility", "breath", "pilates", "stretching"],
+    sections: [
+      {
+        h2: "A movement practice, not a clinic",
+        paras: [
+          "Yoga on ViaLongeVita is mobility, breath and a quieter nervous system. Reviews support those outcomes in some groups for back stiffness and anxiety. That is not a licence to treat autoimmune disease or to skip the GP.",
+          "Skip studio marketing that diagnoses chakras. If a pose hurts a joint or you feel faint, stop. Pregnancy, glaucoma, recent surgery and vertigo belong with a qualified teacher or the GP first.",
+        ],
+      },
+      {
+        h2: "How to read a class description",
+        paras: [
+          "Look for a teacher who names contraindications. A mat and a clear floor are enough to start. This page is not a remote class and it is not physiotherapy.",
+        ],
+      },
+    ],
+  },
+  {
+    slugTail: "skincare-spf-uk",
+    title: "UK skincare without miracle creams: SPF, retinoids, barrier",
+    excerpt:
+      "Photoprotection and evidence-level dermocosmetics. Not a prescription and not a substitute for a dermatologist. MHRA-regulated products — not grey-market imports.",
+    topic: "zivotni-styl",
+    keywords: ["skincare", "SPF", "retinoid", "ceramide", "sunscreen", "dermatologist"],
+    sections: [
+      {
+        h2: "What has a mechanism",
+        paras: [
+          "Broad-spectrum SPF is still the intervention with the clearest effect on photoageing and some skin cancers. A retinoid and a ceramide moisturiser are reasonable next steps for many adults. None of them erase years on a timeline in an advert.",
+          "Acne, eczema, changing moles and sudden pigment belong with a dermatologist or the GP. This desk does not diagnose from a selfie and it does not treat with a serum.",
+        ],
+        list: [
+          "Mineral or hybrid SPF 30–50 on exposed skin, reapplied outdoors.",
+          "Retinoid: start slow; stop if the barrier breaks down.",
+          "Ceramides and a bland moisturiser when the skin is tight or reactive.",
+        ],
+      },
+      {
+        h2: "Premium is a label, not a diagnosis",
+        paras: [
+          "An expensive jar can be a well-formulated product. It is still a cosmetic or OTC unless a clinician prescribed it. Affiliate links on public pages are marked. The physician zone stays clean.",
+        ],
+      },
+    ],
+  },
 ];
 
 const FR: NativeSeed[] = [
@@ -423,6 +581,85 @@ const FR: NativeSeed[] = [
         paras: [
           "La rentrée et l’automne mélangent virus respiratoires et rythme scolaire. La question utile : qui est à risque dans le foyer, et ce que le médecin traitant a déjà recommandé.",
           "Les médicaments autorisés en France s’inscrivent dans le cadre ANSM. Ce n’est pas une revue SÚKL.",
+        ],
+      },
+    ],
+  },
+  {
+    slugTail: "mouvement-marche-fr",
+    title: "Mouvement et exercice : la force et la marche comme prévention, pas un plan d’entraînement",
+    excerpt:
+      "Muscle, marche quotidienne et récupération — éditorial, pas un coaching. Médecin traitant après une douleur ou une maladie cardiaque. 15/112 en urgence.",
+    topic: "zivotni-styl",
+    keywords: ["exercice", "mouvement", "marche", "force", "sarcopénie"],
+    sections: [
+      {
+        h2: "Ce que les revues soutiennent",
+        paras: [
+          "La masse musculaire et la marche restent parmi les leviers les plus solides du healthspan. Ce n’est pas la promesse d’un corps de campagne. C’est une raison de tenir un schéma simple : deux ou trois séances de force courtes, et marcher la plupart des jours.",
+          "Un lecteur à Lyon n’a pas besoin d’un 155 tchèque. Douleur thoracique, malaise, maladie cardiaque connue : médecin traitant, 15 ou 112 — pas un nouveau programme vu en ligne.",
+        ],
+        list: [
+          "Deux ou trois séances courtes valent mieux qu’un abonnement inutilisé.",
+          "La marche presque tous les jours reste la dose la plus tenable.",
+          "Une douleur qui change la démarche appartient au cabinet ou au kinésithérapeute.",
+        ],
+      },
+      {
+        h2: "Ce que cette rédaction ne fait pas",
+        paras: [
+          "Nous ne prescrivons pas vos séries. Nous ne vendons pas une transformation. Un texte n’est pas une rééducation après une opération.",
+        ],
+      },
+    ],
+  },
+  {
+    slugTail: "yoga-mobilite-fr",
+    title: "Yoga : mobilité et souffle, pas un diagnostic énergétique",
+    excerpt:
+      "Amplitude, respiration plus calme, moins de raideur — sans ésotérisme ni promesse de soigner une maladie. Instructeur ou médecin si grossesse, vertige ou blessure.",
+    topic: "zivotni-styl",
+    keywords: ["yoga", "mobilité", "souffle", "pilates", "étirement"],
+    sections: [
+      {
+        h2: "Une pratique de mouvement",
+        paras: [
+          "Le yoga ici, c’est la mobilité, le souffle et un système nerveux plus calme. Certaines revues le soutiennent pour la raideur du dos et l’anxiété chez des groupes choisis. Ce n’est pas un traitement d’une maladie auto-immune.",
+          "Laissez de côté le marketing des chakras. Si une posture fait mal à une articulation ou si vous avez un malaise, arrêtez. Grossesse, glaucome, chirurgie récente : d’abord un enseignant qualifié ou le médecin traitant.",
+        ],
+      },
+      {
+        h2: "Lire une fiche de cours",
+        paras: [
+          "Cherchez des contre-indications nommées. Un tapis et un sol dégagé suffisent pour commencer. Cette page n’est pas un cours à distance.",
+        ],
+      },
+    ],
+  },
+  {
+    slugTail: "soin-peau-fr",
+    title: "Soin de la peau sans crème miracle : SPF, rétinoïdes, barrière",
+    excerpt:
+      "Photoprotection et dermocosmétique au niveau des preuves. Pas une ordonnance et pas un substitut au dermatologue. Cadre ANSM — pas un import gris.",
+    topic: "zivotni-styl",
+    keywords: ["soin de la peau", "SPF", "rétinol", "céramide", "cosmétique", "dermatologue"],
+    sections: [
+      {
+        h2: "Ce qui a un mécanisme",
+        paras: [
+          "Un SPF large spectre reste l’intervention la plus claire contre le photovieillissement. Un rétinoïde et une crème aux céramides sont des suites raisonnables pour beaucoup d’adultes. Aucun pot n’efface des années en quinze jours.",
+          "Acné sévère, eczéma, grain de beauté qui change : dermatologue. Cette rédaction ne diagnostique pas sur une photo.",
+        ],
+        list: [
+          "SPF 30–50 sur la peau exposée, renouvelé dehors.",
+          "Rétinoïde : commencer lentement ; arrêter si la barrière lâche.",
+          "Céramides et crème simple si la peau tire.",
+        ],
+      },
+      {
+        h2: "Le premium est une étiquette",
+        paras: [
+          "Un pot cher peut être bien formulé. C’est encore un cosmétique tant qu’un clinicien n’a rien prescrit. Les liens d’affiliation sur les pages grand public sont marqués. La zone médecins reste propre.",
         ],
       },
     ],
@@ -588,6 +825,85 @@ const DE: NativeSeed[] = [
         paras: [
           "Herbst und Schulstart mischen Atemwegsviren und Alltag. Die nützliche Frage: wer im Haushalt ein höheres Risiko hat und was die Praxis schon empfohlen hat.",
           "Zugelassene Arzneimittel in DACH stehen im Rahmen von BfArM/EMA. Das ist kein SÚKL-Ticker.",
+        ],
+      },
+    ],
+  },
+  {
+    slugTail: "bewegung-gehen-de",
+    title: "Bewegung und Training: Kraft und Gehen als Prävention, kein Personal Training",
+    excerpt:
+      "Muskel, Alltagsschritte und Regeneration — redaktionell, kein Trainingsplan. Hausarzt nach Schmerz oder bekannter Herzkrankheit. 112 im Notfall.",
+    topic: "zivotni-styl",
+    keywords: ["Bewegung", "Training", "Gehen", "Kraft", "Sarkopenie"],
+    sections: [
+      {
+        h2: "Was die Übersichten tragen",
+        paras: [
+          "Muskelmasse und Gehen gehören zu den stärksten Alltagshebeln der Healthspan. Das ist kein Versprechen auf ein Kampagnenbild. Es ist ein Grund, ein einfaches Muster zu halten: zwei oder drei kurze Krafttermine, die meisten Tage zu Fuß.",
+          "Wer in München liest, braucht keine 155. Brustschmerz, Ohnmacht, bekannte Herzkrankheit: Hausarzt oder 112 — kein neues Programm aus dem Feed.",
+        ],
+        list: [
+          "Zwei oder drei kurze Krafttermine schlagen eine ungenutzte Jahreskarte.",
+          "Die meisten Tage gehen bleibt die haltbarste Dosis.",
+          "Schmerz, der den Gang ändert, gehört in die Praxis oder zur Physiotherapie.",
+        ],
+      },
+      {
+        h2: "Was diese Redaktion nicht tut",
+        paras: [
+          "Wir verordnen keine Sätze für Ihre Gelenke. Wir verkaufen keine Verwandlung. Ein Text ist keine Reha nach einer Operation.",
+        ],
+      },
+    ],
+  },
+  {
+    slugTail: "yoga-mobilitaet-de",
+    title: "Yoga: Mobilität und Atem, keine energetische Diagnose",
+    excerpt:
+      "Bewegungsumfang, ruhigerer Atem, weniger Steifheit — ohne Esoterik und ohne Heilversprechen. Instructor oder Arzt bei Schwangerschaft, Schwindel oder Verletzung.",
+    topic: "zivotni-styl",
+    keywords: ["Yoga", "Mobilität", "Atem", "Pilates", "Dehnung"],
+    sections: [
+      {
+        h2: "Eine Bewegungspraxis",
+        paras: [
+          "Yoga in diesem Magazin ist Mobilität, Atem und ein ruhigeres Nervensystem. Übersichten stützen das bei manchen Gruppen für Rückensteifheit und Angst. Das ist keine Therapie einer Autoimmunerkrankung.",
+          "Lassen Sie Studio-Marketing, das Chakren diagnostiziert. Tut eine Haltung einem Gelenk weh oder wird Ihnen schwindlig: aufhören. Schwangerschaft, Glaukom, frische Operation: zuerst qualifizierte Lehrkraft oder Hausarzt.",
+        ],
+      },
+      {
+        h2: "Kursbeschreibungen lesen",
+        paras: [
+          "Achten Sie auf genannte Kontraindikationen. Eine Matte und ein freier Boden reichen zum Start. Diese Seite ist kein Fernkurs.",
+        ],
+      },
+    ],
+  },
+  {
+    slugTail: "hautpflege-de",
+    title: "Hautpflege ohne Wundercreme: Lichtschutz, Retinoide, Barriere",
+    excerpt:
+      "Photoprotektion und Dermokosmetik auf Evidenzniveau. Kein Rezept und kein Ersatz für die Dermatologie. Rahmen BfArM — kein Grauimport.",
+    topic: "zivotni-styl",
+    keywords: ["Hautpflege", "SPF", "Retinol", "Ceramide", "Kosmetik", "Dermatologe"],
+    sections: [
+      {
+        h2: "Was einen Mechanismus hat",
+        paras: [
+          "Breitband-SPF bleibt die klarste Alltagsmaßnahme gegen Lichtalterung. Ein Retinoid und eine Ceramidcreme sind für viele Erwachsene vernünftige nächste Schritte. Keine Dose löscht Jahre in zwei Wochen.",
+          "Schwere Akne, Ekzem, ein sich veränderndes Muttermal: Dermatologie. Diese Redaktion diagnostiziert nicht vom Selfie.",
+        ],
+        list: [
+          "SPF 30–50 auf unbedeckter Haut, draußen nachcremen.",
+          "Retinoid: langsam beginnen; stoppen, wenn die Barriere reißt.",
+          "Ceramides und eine schlichte Creme, wenn die Haut spannt.",
+        ],
+      },
+      {
+        h2: "Premium ist ein Etikett",
+        paras: [
+          "Ein teures Glas kann gut formuliert sein. Es bleibt Kosmetik, solange niemand etwas verordnet hat. Affiliate-Links auf öffentlichen Seiten sind gekennzeichnet. Die Arztzone bleibt frei davon.",
         ],
       },
     ],

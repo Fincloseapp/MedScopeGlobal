@@ -891,8 +891,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.50"),
-  "page cache tag must bust after default lifestyle listing"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.51"),
+  "page cache tag must bust after native desks and listing UX"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/kongresy/page.tsx"), "utf8").includes(
@@ -3044,6 +3044,15 @@ console.log("✓ magazine desk byline and copy checks passed");
     matchesLifestyleHub({ title: "Strength training and walking", slug: "movement-desk" }, "pohyb"),
     true
   );
+  assert.equal(
+    matchesLifestyleHub({ title: "Yoga : mobilité et souffle", excerpt: "sans ésotérisme" }, "joga"),
+    true
+  );
+  assert.equal(
+    matchesLifestyleHub({ title: "Hautpflege ohne Wundercreme", excerpt: "Lichtschutz" }, "kosmetika"),
+    true
+  );
+  assert.equal(matchesLifestyleHub({ excerpt: "marche quotidienne" }, "pohyb"), true);
   assert.equal(getClankyMagazineHub("pohyb").title, "Pohyb a cvičení");
   assert.equal(getClankyMagazineHub("kosmetika").id, "clanky-kosmetika");
   assert.ok(FIRMY_ROOM_SLUGS.includes("kosmetika"));
@@ -3052,6 +3061,20 @@ console.log("✓ magazine desk byline and copy checks passed");
   );
   assert.ok(
     readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes("ensureContent: false")
+  );
+  assert.ok(
+    readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes("resultsCount") &&
+      readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes(
+        "ArticleSubscribeNudge"
+      ) &&
+      readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes(
+        "relatedHubsTitle"
+      ) &&
+      readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes("slimListing ? 24 : 48")
+  );
+  assert.ok(
+    readFileSync(join(root, "app/(public)/verejnost/page.tsx"), "utf8").includes("FEATURED_DESKS") &&
+      readFileSync(join(root, "app/(public)/verejnost/page.tsx"), "utf8").includes("featuredTitle")
   );
   assert.ok(
     !readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes(

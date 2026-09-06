@@ -26,7 +26,8 @@ import {
   matchesLifestyleHub,
 } from "@/lib/verejnost/lifestyle-topics";
 import { MagazineAdUnit } from "@/components/monetization/magazine-ad-unit";
-import { shouldShowDisplayAds } from "@/lib/monetization/revenue-mix";
+import { ArticleSubscribeNudge } from "@/components/monetization/article-subscribe-nudge";
+import { shouldShowDisplayAds, shouldShowPublicSubscribeNudge } from "@/lib/monetization/revenue-mix";
 
 export const revalidate = 120;
 
@@ -41,6 +42,8 @@ const TOPIC_CHIP_SLUGS = [
 ] as const;
 
 const PAGE_SIZE = 24;
+const RELATED_HUB_SLUGS = ["pohyb", "joga", "kosmetika", "vyziva", "spanek"] as const;
+const SLIM_BACKEND_TOPICS = new Set(["prevence", "nemoci", "rozhovory"]);
 
 export async function generateMetadata({
   searchParams,
@@ -75,8 +78,9 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
   const backendTopic = longevity || lifestyleHub || !topic
     ? "zivotni-styl"
     : resolveBackendTopic(topic);
+  const slimListing = Boolean(backendTopic && SLIM_BACKEND_TOPICS.has(backendTopic));
   const fetched = await listPublicArticles({
-    limit: 48,
+    limit: slimListing ? 24 : 48,
     topic: backendTopic,
     ensureContent: false,
     mode: "card",
@@ -158,9 +162,25 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
           </div>
         ) : null}
 
+        <p className="mb-4 text-sm text-slate-500">
+          {chrome.resultsCount.replace("{count}", String(filtered.length))}
+        </p>
+
         {articles.length ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {articles.map((item) => (
+            {articles.slice(0, 6).map((item) => (
+              <VerejnostArticleExpandable
+                key={item.id}
+                article={item}
+                coverUrl={resolveVerejnostCoverUrl(item)}
+              />
+            ))}
+            {shouldShowPublicSubscribeNudge("public", false) && safePage === 1 ? (
+              <div className="sm:col-span-2 lg:col-span-3">
+                <ArticleSubscribeNudge locale={locale} />
+              </div>
+            ) : null}
+            {articles.slice(6).map((item) => (
               <VerejnostArticleExpandable
                 key={item.id}
                 article={item}
@@ -199,6 +219,21 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
             )}
           </nav>
         ) : null}
+
+        <section className="mt-10">
+          <h2 className="font-display text-xl font-bold text-[#021d33]">{chrome.relatedHubsTitle}</h2>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {RELATED_HUB_SLUGS.filter((slug) => slug !== topic).map((slug) => (
+              <Link
+                key={slug}
+                href={localizePublicHref(`/verejnost/clanky?topic=${slug}`, locale)}
+                className="rounded-full border border-[#005B96]/30 px-3 py-1 text-sm text-[#005B96] hover:bg-[#005B96]/5"
+              >
+                {topicLabelForSlug(slug, locale)}
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <p className="mt-8 rounded-xl border border-amber-200/80 bg-amber-50/90 p-4 text-sm leading-6 text-amber-950">
           {chrome.eduLongevityNote}

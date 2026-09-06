@@ -22,7 +22,7 @@ const CZECH_ONLY_INSTITUTIONAL_RE =
 
 /** Shared pillars a foreign desk may borrow when the piece is not Czech-only. */
 const MAGAZINE_TOPIC_RE =
-  /longev|healthspan|biohack|wearable|glp-?1|semaglut|tirzepat|metabol|obes|weight|hubnut|štíhl|stihl|\bslim\b|životn[íi]\s*styl|zivotni\s*styl|lifestyle|sleep|spánek|spanek|nutrition|výživ|vyziv|exercise|pohyb|prevenc|screening|\bwho\b|\bema\b|\bfda\b|\bcdc\b|\bnih\b|biomarker|sarcopen|sarkopen|osteopor|circadian|intermittent|fasting|mediterranean|středomoř|stredomor|wellness|healthspan|zdrav[ýy]\s+život|healthy\s+liv/i;
+  /longev|healthspan|biohack|wearable|glp-?1|semaglut|tirzepat|metabol|obes|weight|hubnut|štíhl|stihl|\bslim\b|životn[íi]\s*styl|zivotni\s*styl|lifestyle|sleep|spánek|spanek|nutrition|výživ|vyziv|exercise|pohyb|jóga|\byoga\b|kosmetik|skincare|hautpflege|soin de la peau|spf\b|retinoid|prevenc|screening|\bwho\b|\bema\b|\bfda\b|\bcdc\b|\bnih\b|biomarker|sarcopen|sarkopen|osteopor|circadian|intermittent|fasting|mediterranean|středomoř|stredomor|wellness|healthspan|zdrav[ýy]\s+život|healthy\s+liv/i;
 
 const LOCAL_ANGLES: Record<string, string[]> = {
   cs: [

@@ -77,6 +77,8 @@ export type MarketingCopy = {
     showAll: string;
     empty: string;
     emptyHint: string;
+    featuredEyebrow: string;
+    featuredTitle: string;
     steps: { title: string; desc: string; cta: string }[];
     quick: { href: string; label: string; desc: string }[];
     topics: Record<string, { label: string; description: string }>;
@@ -251,6 +253,8 @@ const CS: MarketingCopy = {
     showAll: "Zobrazit vše →",
     empty: "První články pro veřejnost se připravují — obsah doplní AI redakce medscopeglobal.com.",
     emptyHint: "Prevence · pohyb · jóga · kosmetika · výživa · spánek · rozhovory",
+    featuredEyebrow: "Rubriky",
+    featuredTitle: "Pohyb, jóga a kosmetika",
     steps: [
       {
         title: "Najděte své téma",
@@ -504,6 +508,8 @@ const EN: MarketingCopy = {
     showAll: "See all →",
     empty: "The first public articles are being prepared by the medscopeglobal.com desk.",
     emptyHint: "Prevention · movement · yoga · skincare · nutrition · sleep · interviews",
+    featuredEyebrow: "Desks",
+    featuredTitle: "Movement, yoga and skincare",
     steps: [
       { title: "Find your topic", desc: "Browse categories by health area — prevention, nutrition, sleep and more.", cta: "Browse topics" },
       { title: "Read an article or tip", desc: "Editorial articles without jargon. A daily video tip with a quiz.", cta: "Show articles" },
@@ -736,6 +742,8 @@ const DE: MarketingCopy = {
     latestTitle: "Neueste Artikel",
     showAll: "Alles anzeigen →",
     emptyHint: "Prävention · Bewegung · Yoga · Hautpflege · Ernährung · Schlaf · Gespräche",
+    featuredEyebrow: "Rubriken",
+    featuredTitle: "Bewegung, Yoga und Hautpflege",
     quick: [
       { href: "/verejnost/temata", label: "Thema finden", desc: "Symptome, Prävention, Krankheit — hier starten" },
       { href: "/verejnost/clanky", label: "Artikel für alle", desc: "Verständliche Texte" },
@@ -895,6 +903,8 @@ const FR: MarketingCopy = {
     latestTitle: "Derniers articles",
     showAll: "Tout voir →",
     emptyHint: "Prévention · mouvement · yoga · soin de la peau · nutrition · sommeil · entretiens",
+    featuredEyebrow: "Rubriques",
+    featuredTitle: "Mouvement, yoga et soin de la peau",
     quick: [
       { href: "/verejnost/temata", label: "Trouver un sujet", desc: "Symptômes, prévention, maladie — commencez ici" },
       { href: "/verejnost/clanky", label: "Articles pour tous", desc: "Textes en langage clair" },

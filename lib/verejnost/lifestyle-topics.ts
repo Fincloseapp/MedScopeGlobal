@@ -17,9 +17,9 @@ export type LifestyleHubSlug = (typeof LIFESTYLE_HUB_SLUGS)[number];
 
 const HUB_RE: Record<LifestyleHubSlug, RegExp> = {
   joga:
-    /jóga|joga|\byoga\b|pilates|asana|vinyasa|pránájám|pranayam|mobilita páteře|yin yoga|mobilité|atmung|souffle/i,
+    /jóga|joga|\byoga\b|pilates|asana|vinyasa|pránájám|pranayam|mobilita páteře|yin yoga|mobilité|atmung|souffle|stretch|étirement|dehnung|mobility/i,
   pohyb:
-    /pohyb|exercise|fitness|workout|posilov|resistance|síla sval|svalov|sarkopen|chůz|chuze|\bwalk\b|krok|běh|\brun\b|kruhový trénink|strength training|walking.?pad|kondic|mouvement|exercice|bewegung|training|krafttraining|sarcop[eé]n/i,
+    /pohyb|exercise|fitness|workout|posilov|resistance|síla sval|svalov|sarkopen|chůz|chuze|\bwalk\b|walking|marche|gehen|krok|běh|\brun\b|kruhový trénink|strength training|walking.?pad|kondic|mouvement|exercice|bewegung|training|krafttraining|sarcop[eé]n/i,
   kosmetika:
     /kosmetik|cosmetic|cosmétique|dermokosmet|skincare|hautpflege|soin de la peau|péče o plet|pece o plet|pleťov|pleť |krása|\bbeauty\b|spf\b|sunscreen|fotoprotek|photoprotection|lichtschutz|retinoid|retinol|niacinamid|ceramid|sérum|serum|hydratace plet|anti.?age|vrásk|wrinkle|dermatolog/i,
   vyziva:

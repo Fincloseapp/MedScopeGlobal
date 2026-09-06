@@ -784,6 +784,25 @@ assert.ok(!usDesk.some((article) => /VZP|SÚKL|přijímač/.test(`${article.titl
 assert.ok(nativeDeskArticlesForLocale("fr").some((article) => /médecin traitant|ANSM/.test(`${article.title} ${article.excerpt}`)));
 assert.ok(nativeDeskArticlesForLocale("it").some((article) => /medico di base|AIFA/.test(`${article.title} ${article.excerpt}`)));
 assert.equal(nativeDeskArticlesForLocale("cs").length, 0);
+{
+  const frDesk = nativeDeskArticlesForLocale("fr");
+  const deDesk = nativeDeskArticlesForLocale("de");
+  const ukDesk = nativeDeskArticlesForLocale("en-UK");
+  assert.ok(frDesk.some((article) => /Yoga/.test(article.title)));
+  assert.ok(frDesk.some((article) => /soin de la peau/i.test(`${article.title} ${article.excerpt}`)));
+  assert.ok(frDesk.some((article) => /Mouvement/.test(article.title)));
+  assert.ok(frDesk.every((article) => !looksLikeCzech(article.title)));
+  assert.ok(deDesk.some((article) => /Yoga/.test(article.title)));
+  assert.ok(deDesk.some((article) => /Hautpflege/.test(article.title)));
+  assert.ok(deDesk.some((article) => /Bewegung/.test(article.title)));
+  assert.ok(deDesk.every((article) => !looksLikeCzech(article.title)));
+  assert.ok(ukDesk.some((article) => /Yoga/.test(article.title)));
+  assert.ok(ukDesk.some((article) => /skincare/i.test(`${article.title} ${article.excerpt}`)));
+  assert.ok(!looksLikeCzech(getVerejnostChrome("fr").resultsCount));
+  assert.ok(!looksLikeCzech(getVerejnostChrome("de").relatedHubsTitle));
+  assert.ok(!looksLikeCzech(getMarketingCopy("fr").publicHub.featuredTitle));
+  assert.ok(!looksLikeCzech(getMarketingCopy("de").publicHub.featuredTitle));
+}
 assert.equal(mergeNativeDeskFeed([] as { locale?: string | null }[], "en-US")[0]?.locale, "en-US");
 {
   const lead = usDesk[0];
