@@ -93,7 +93,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
       console.error("loadArticlesPublic", prefix, error);
       return [];
     }
-    return (data ?? []) as Record<string, unknown>[];
+    return ((data ?? []) as unknown as Record<string, unknown>[]);
   };
 
   const [magazine, news] = await Promise.all([
