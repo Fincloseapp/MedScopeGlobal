@@ -891,8 +891,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.47"),
-  "page cache tag must bust after public hub listing"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.48"),
+  "page cache tag must bust after public listing timeout fix"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/kongresy/page.tsx"), "utf8").includes(
