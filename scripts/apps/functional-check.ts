@@ -153,6 +153,7 @@ import {
   isNovinkyArticle,
   isProfessionalAktualityTitle,
   mergeAktualityListing,
+  rankAktualityByDate,
   isHomepageDeskArticle,
   pinHomepageDesks,
   prependUniqueArticles,
@@ -393,7 +394,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-58-zpravy-window"), "homepage cache key must bust when Aktuality scans a wider zpravy window");
+  assert.ok(home.includes("v23-59-date-first"), "homepage cache key must bust when Aktuality ranks by date");
   assert.ok(home.includes("toISOString().slice(0, 10)"), "homepage data cache must roll with the UTC day");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
   assert.ok(home.includes("courtesyBorrow: 2"), "non-CS homepage must not dump a Czech borrow pile");
@@ -892,8 +893,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.59"),
-  "page cache tag must bust after wider zpravy window"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.60"),
+  "page cache tag must bust after date-first Aktuality"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/kongresy/page.tsx"), "utf8").includes(
@@ -1177,15 +1178,20 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-58-zpravy-window"
+    "v22-homepage-public-v23-59-date-first"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "listWireZpravyCards"
     ) &&
+    readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
+      "rankAktualityByDate"
+    ) &&
     !readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "getArticlesByMetadataSection"
-    ),
-  "homepage cache must pin zpravy cards, not the heavy helper name"
+    ) &&
+    readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes(".limit(200)") &&
+    readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes("rankAktualityByDate"),
+  "homepage cache must pin dated zpravy cards, not the heavy helper name"
 );
 assert.ok(
   readFileSync(join(root, "components/v271/academy-home-sections.tsx"), "utf8").includes(
@@ -3508,9 +3514,52 @@ console.log("✓ magazine desk byline and copy checks passed");
     ],
     8
   );
-  assert.equal(merged[0]?.id, "long-1");
+  assert.equal(merged[0]?.id, "who-1", "Aktuality listing must put the newest professional row first");
   assert.equal(merged.filter((item) => item.id === "who-1").length, 1);
   assert.equal(merged.some((item) => item.id === "stub-1"), false);
+  assert.equal(merged.some((item) => item.id === "long-1"), true);
+  const dated = rankAktualityByDate(
+    [
+      {
+        id: "ebola-old",
+        title: "Ebola v Kongu a Ugandě — Jak se připravit na globální rizika",
+        slug: "zpravy-ebola-v-kongu",
+        published_at: "2026-06-18T20:30:00.000Z",
+      },
+      {
+        id: "bma-now",
+        title: "Nová výkonná ředitelka BMA Clare Bannon je zvolena",
+        slug: "zpravy-new-bma-gp-committee-chair-clare-bannon-is-elected",
+        published_at: "2026-08-16T12:23:40.000Z",
+      },
+      {
+        id: "demo-sleep",
+        title: "Zdravý spánek — praktické rady pro každodenní režim",
+        slug: "demo-novinky-spanek",
+        published_at: "2026-09-06T14:52:16.000Z",
+      },
+      {
+        id: "anticoag",
+        title: "Dvojí antikoagulační léčba u pacientů s fibrilací síní",
+        slug: "zpravy-dvoj-antikoagulan-lba",
+        published_at: "2026-08-30T09:50:27.000Z",
+      },
+    ],
+    4,
+    new Date("2026-09-06T12:00:00.000Z")
+  );
+  assert.equal(dated[0]?.id, "anticoag");
+  assert.equal(dated[1]?.id, "bma-now");
+  assert.equal(
+    dated.some((item) => item.id === "demo-sleep"),
+    false,
+    "date-first Aktuality must drop demo pads"
+  );
+  assert.equal(
+    dated.some((item) => item.id === "ebola-old"),
+    false,
+    "June leftovers must not fill the column when newer professional rows exist"
+  );
   assert.equal(
     isLongevityForeignSource({
       name: "Nature Aging",

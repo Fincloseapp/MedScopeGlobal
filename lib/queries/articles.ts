@@ -496,36 +496,54 @@ export async function getRelatedArticles(
   return prepared.slice(0, limit);
 }
 
-/** Card rows for homepage Aktuality — slug prefix only, no invented titles. */
+const wireCardSelect =
+  "id, title, slug, excerpt, published, published_at, created_at, locale, vip_only, metadata, rubric_slug, cover_image_url, source_name";
+
+/** Card rows for homepage Aktuality — wide date window, no invented titles. */
 export async function listWireZpravyCards(
   limit = 8,
   locale: LocaleCode = "cs"
 ): Promise<DisplayArticle[]> {
   const supabase = await createDataClient();
   if (!supabase) return [];
-  const { data, error } = await supabase
-    .from("articles")
-    .select(
-      "id, title, slug, excerpt, published, published_at, created_at, locale, vip_only, metadata, rubric_slug, cover_image_url"
-    )
-    .eq("published", true)
-    .like("slug", "zpravy-%")
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(80);
+  const [bySlug, section] = await Promise.all([
+    supabase
+      .from("articles")
+      .select(wireCardSelect)
+      .eq("published", true)
+      .like("slug", "zpravy-%")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(200),
+    supabase
+      .from("articles")
+      .select(wireCardSelect)
+      .eq("published", true)
+      .eq("metadata->>section", "aktuální-zprávy")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(80),
+  ]);
 
-  if (error) {
-    console.error("listWireZpravyCards", error);
-    return [];
+  if (bySlug.error) console.error("listWireZpravyCards", "zpravy", bySlug.error);
+  if (section.error) console.error("listWireZpravyCards", "section", section.error);
+
+  const merged = new Map<string, Record<string, unknown>>();
+  for (const row of [
+    ...((bySlug.data ?? []) as Record<string, unknown>[]),
+    ...((section.data ?? []) as Record<string, unknown>[]),
+  ]) {
+    const key = String(row.slug ?? row.id ?? "");
+    if (key && !merged.has(key)) merged.set(key, row);
   }
 
-  const { isProfessionalAktualityTitle } = await import("@/lib/v271/news-desks");
-  const rows = filterActiveArticles(
-    mapArticleList(data as Record<string, unknown>[] | null)
-  ).filter(
-    (article) =>
-      !article.vip_only &&
-      String(article.slug ?? "").startsWith("zpravy-") &&
-      isProfessionalAktualityTitle(article.title)
+  const { isSeedOrDemoArticle } = await import("@/lib/editorial/article-quality-audit");
+  const { rankAktualityByDate } = await import("@/lib/v271/news-desks");
+  const rows = rankAktualityByDate(
+    filterActiveArticles(mapArticleList([...merged.values()])).filter(
+      (article) => !article.vip_only && !isSeedOrDemoArticle(article)
+    ),
+    Math.max(limit, 12),
+    new Date(),
+    { rotate: true }
   );
   const prepared = await prepareArticlesForDisplay(rows, locale, {
     mode: "card",
@@ -577,7 +595,13 @@ export async function listAktualitySection(
     active.filter((article) => !String(article.slug ?? "").startsWith("zpravy-")),
     locale
   );
-  const filtered = [...zpravy, ...rest];
+  const { isSeedOrDemoArticle } = await import("@/lib/editorial/article-quality-audit");
+  const { rankAktualityByDate } = await import("@/lib/v271/news-desks");
+  const filtered = rankAktualityByDate(
+    [...zpravy, ...rest].filter((article) => !article.vip_only && !isSeedOrDemoArticle(article)),
+    limit,
+    new Date()
+  );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
     maxTranslate: Math.min(limit, 8),

@@ -5,9 +5,9 @@ import { filterActiveArticles } from "@/lib/v20/content-rules";
 import { isSeedOrDemoArticle } from "@/lib/editorial/article-quality-audit";
 import {
   isHomepageDeskArticle,
-  isProfessionalAktualityTitle,
   pinHomepageDesks,
   prependUniqueArticles,
+  rankAktualityByDate,
 } from "@/lib/v271/news-desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { listWireZpravyCards, type DisplayArticle } from "@/lib/queries/articles";
@@ -108,14 +108,16 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     fetchMagazine(),
     listWireZpravyCards(32, localeKey),
   ]);
-  const wire = aktuality.filter((article) => {
-    const slug = String(article.slug ?? "");
-    if (!slug.startsWith("zpravy-") || article.vip_only || isSeedOrDemoArticle(article)) {
-      return false;
-    }
-    if (!isProfessionalAktualityTitle(article.title)) return false;
-    return true;
-  });
+  const wire = rankAktualityByDate(
+    aktuality.filter((article) => {
+      const slug = String(article.slug ?? "");
+      if (article.vip_only || isSeedOrDemoArticle(article)) return false;
+      return slug.startsWith("zpravy-") || String(article.rubric_slug ?? "").includes("zprav");
+    }),
+    12,
+    new Date(),
+    { rotate: true }
+  );
 
   if (magazine.length === 0 && wire.length === 0) {
     return pinHomepageDesks(
@@ -209,7 +211,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-58-zpravy-window", locale, day],
+    ["v22-homepage-public-v23-59-date-first", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

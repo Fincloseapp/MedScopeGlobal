@@ -4,6 +4,7 @@
  */
 import {
   countArticleWords,
+  isSeedOrDemoArticle,
   shouldHideFromPublicListing,
 } from "@/lib/editorial/article-quality-audit";
 import {
@@ -236,7 +237,12 @@ export function splitNewsDesks(
 
   desks.novinky.push(
     ...takeUnused(
-      wire.filter((article) => isProfessionalAktualityTitle(article.title)),
+      rankAktualityByDate(
+        wire.filter((article) => isProfessionalAktualityTitle(article.title)),
+        cap.novinky,
+        new Date(),
+        { rotate: true }
+      ),
       used,
       cap.novinky
     )
@@ -359,15 +365,19 @@ export function pinHomepageDesks(
   locale = "cs"
 ): DisplayArticle[] {
   const listable = articles.filter((article) => isHomepageDeskArticle(article, new Date(), locale));
+  const dated = [...listable].sort((a, b) => articlePublishedMs(b) - articlePublishedMs(a));
   const used = new Set<string>();
-  const news = takeUnused(listable, used, Math.min(8, limit), isNovinkyArticle);
-  const longevity = takeUnused(listable, used, Math.min(8, limit), isLongevityArticle);
-  const rest = takeUnused(listable, used, Math.max(0, limit - news.length - longevity.length));
+  const news = takeUnused(dated, used, Math.min(8, limit), isNovinkyArticle);
+  const longevity = takeUnused(dated, used, Math.min(8, limit), isLongevityArticle);
+  const rest = takeUnused(dated, used, Math.max(0, limit - news.length - longevity.length));
   return [...news, ...longevity, ...rest].slice(0, limit);
 }
 
 const GENERIC_NEWS_TITLE_RE =
   /^(zdravotní zpráva|epidemiologická zpráva|odborný přehled|klinická studie|komentář)\b/i;
+
+/** Prefer last 45 days so June leftovers cannot sit on the homepage for months. */
+export const AKTUALITY_FRESH_DAYS = 45;
 
 export function isProfessionalAktualityTitle(title?: string | null): boolean {
   const clean = String(title ?? "").replace(/<[^>]+>/g, " ").trim();
@@ -377,36 +387,68 @@ export function isProfessionalAktualityTitle(title?: string | null): boolean {
   return true;
 }
 
-/** Mix section news with longevity so Aktuality always reads current and healthspan-first. */
-export function mergeAktualityListing<T extends { id: string; title?: string | null; published_at?: string | null }>(
-  sectionArticles: T[],
-  longevityArticles: T[],
-  limit = 48
-): T[] {
-  const professionalSection = sectionArticles.filter((article) =>
-    isProfessionalAktualityTitle(article.title)
-  );
-  const professionalLongevity = longevityArticles.filter((article) =>
-    isProfessionalAktualityTitle(article.title)
-  );
-  const pinned = professionalLongevity.slice(0, 6);
+export function articlePublishedMs(article: { published_at?: string | null }): number {
+  const time = article.published_at ? Date.parse(article.published_at) : NaN;
+  return Number.isFinite(time) ? time : 0;
+}
+
+function isAktualityCandidate(article: {
+  title?: string | null;
+  slug?: string | null;
+  metadata?: unknown;
+  source_name?: string | null;
+}): boolean {
+  if (!isProfessionalAktualityTitle(article.title)) return false;
+  if (isSeedOrDemoArticle(article)) return false;
+  return true;
+}
+
+/**
+ * Date-first Aktuality: professional titles only, real published_at, prefer the last
+ * 45 days. Optional daily rotation among the newest window so the same four slugs
+ * do not sit when newer desk rows exist.
+ */
+export function rankAktualityByDate<
+  T extends {
+    title?: string | null;
+    published_at?: string | null;
+    slug?: string | null;
+    metadata?: unknown;
+    source_name?: string | null;
+  },
+>(articles: T[], limit: number, now = new Date(), options?: { rotate?: boolean }): T[] {
+  const cutoff = now.getTime() - AKTUALITY_FRESH_DAYS * 86_400_000;
+  const dated = articles.filter(isAktualityCandidate).sort((a, b) => articlePublishedMs(b) - articlePublishedMs(a));
+  const recent = dated.filter((article) => articlePublishedMs(article) >= cutoff);
+  const pool = recent.length > 0 ? recent : dated;
+  if (pool.length <= limit) return pool.slice(0, limit);
+  if (!options?.rotate) return pool.slice(0, limit);
+
+  const window = pool.slice(0, Math.min(pool.length, Math.max(limit * 3, 12)));
+  if (window.length <= limit) return window;
+  const dayIndex = Math.floor(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) / 86_400_000);
+  const maxStart = window.length - limit;
+  const start = ((dayIndex % (maxStart + 1)) + (maxStart + 1)) % (maxStart + 1);
+  return window.slice(start, start + limit);
+}
+
+/** Mix section news with longevity — newest professional rows first, no demo pads. */
+export function mergeAktualityListing<
+  T extends {
+    id: string;
+    title?: string | null;
+    published_at?: string | null;
+    slug?: string | null;
+    metadata?: unknown;
+    source_name?: string | null;
+  },
+>(sectionArticles: T[], longevityArticles: T[], limit = 48): T[] {
   const byId = new Map<string, T>();
-  for (const article of pinned) byId.set(article.id, article);
-  for (const article of professionalSection) {
+  for (const article of [...sectionArticles, ...longevityArticles]) {
+    if (!isAktualityCandidate(article)) continue;
     if (!byId.has(article.id)) byId.set(article.id, article);
   }
-  for (const article of professionalLongevity) {
-    if (!byId.has(article.id)) byId.set(article.id, article);
-  }
-  const pinnedIds = new Set(pinned.map((article) => article.id));
-  const rest = [...byId.values()]
-    .filter((article) => !pinnedIds.has(article.id))
-    .sort((a, b) => {
-      const aTime = a.published_at ? Date.parse(a.published_at) : 0;
-      const bTime = b.published_at ? Date.parse(b.published_at) : 0;
-      return bTime - aTime;
-    });
-  return [...pinned, ...rest].slice(0, limit);
+  return rankAktualityByDate([...byId.values()], limit, new Date());
 }
 
 export function filterArticlesForDesk(

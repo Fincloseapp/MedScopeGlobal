@@ -169,6 +169,15 @@ export async function runV26ForeignNewsIngest(options?: {
         excerpt = polished.excerpt ?? excerpt;
         content = polished.content ?? content;
 
+        const { isProfessionalAktualityTitle } = await import("@/lib/v271/news-desks");
+        if (!isProfessionalAktualityTitle(title) && isProfessionalAktualityTitle(item.title)) {
+          title = item.title.trim();
+        }
+        if (!isProfessionalAktualityTitle(title)) {
+          skipped++;
+          continue;
+        }
+
         let slug = slugify(`zpravy-${title}`).slice(0, 100);
         const { data: slugClash } = await admin.from("articles").select("id").eq("slug", slug).maybeSingle();
         if (slugClash) slug = `${slug}-${crypto.randomBytes(2).toString("hex")}`;
