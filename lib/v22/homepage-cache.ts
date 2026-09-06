@@ -107,7 +107,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
   const csHome = primaryArticleLocale(normalizeLocale(locale)) === "cs";
   const [magazine, news] = await Promise.all([
     fetchPrefix("verejnost-", 32, csHome ? "cs" : undefined),
-    fetchPrefix("zpravy-", 24, csHome ? "cs" : undefined),
+    fetchPrefix("zpravy-", 24),
   ]);
   if (magazine.length === 0 && news.length === 0) {
     return pinHomepageDesks(
@@ -117,15 +117,16 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     );
   }
 
-  const mapped = mapArticleList([...news, ...magazine]);
   const localeKey = normalizeLocale(locale);
-  const active = filterArticlesForLocale(
-    filterActiveArticles(mapped),
+  const mappedNews = filterActiveArticles(mapArticleList(news));
+  const mappedMagazine = filterArticlesForLocale(
+    filterActiveArticles(mapArticleList(magazine)),
     localeKey,
     primaryArticleLocale(localeKey) === "cs"
       ? undefined
       : { minNative: 8, courtesyBorrow: 2, maxBorrow: 4 }
   );
+  const active = [...mappedNews, ...mappedMagazine];
   const publicOnly = active.filter(
     (article) => !article.vip_only && isHomepageDeskArticle(article, new Date(), localeKey)
   );
@@ -137,7 +138,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
   );
   const prepared = await prepareArticlesForDisplay(pinned, localeKey, {
     mode: "card",
-    maxTranslate: primaryArticleLocale(localeKey) === "cs" ? 0 : 4,
+    maxTranslate: 4,
     maxLive: 0,
   });
   if (prepared.length === 0) {
@@ -202,7 +203,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-52-zpravy-cs", locale, day],
+    ["v22-homepage-public-v23-53-zpravy-wire", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

@@ -181,8 +181,12 @@ export function isHomepageDeskArticle(
   if (!article.slug || !article.title?.trim() || article.vip_only) return false;
   if (!isNovinkyArticle(article) || !isProfessionalAktualityTitle(article.title)) return false;
   const words = countArticleWords(article.content);
-  const newsFloor = String(article.slug ?? "").toLowerCase().startsWith("zpravy-") ? 40 : 80;
+  const zpravy = String(article.slug ?? "").toLowerCase().startsWith("zpravy-");
+  const newsFloor = zpravy ? 40 : 80;
   if (words > 0 && words < newsFloor) return false;
+  if (zpravy) {
+    return filterActiveArticles([article as never]).length === 1;
+  }
   return isListableInLocale(article, locale);
 }
 

@@ -393,7 +393,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-52-zpravy-cs"), "homepage cache key must bust when Aktuality prefers Czech zpravy");
+  assert.ok(home.includes("v23-53-zpravy-wire"), "homepage cache key must bust when Aktuality keeps wire slugs");
   assert.ok(home.includes("toISOString().slice(0, 10)"), "homepage data cache must roll with the UTC day");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
   assert.ok(home.includes("courtesyBorrow: 2"), "non-CS homepage must not dump a Czech borrow pile");
@@ -892,8 +892,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.53"),
-  "page cache tag must bust after Czech zpravy homepage pin"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.54"),
+  "page cache tag must bust after wire slugs stay on Aktuality"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/kongresy/page.tsx"), "utf8").includes(
@@ -1177,7 +1177,7 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-52-zpravy-cs"
+    "v22-homepage-public-v23-53-zpravy-wire"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       'like("slug", `${prefix}%`)'
@@ -3188,6 +3188,23 @@ console.log("✓ magazine desk byline and copy checks passed");
       slug: "zpravy-dvoj-antikoagulan-lba",
       title: "Dvojí antikoagulační léčba u pacientů s fibrilací síní",
     }),
+    true
+  );
+  assert.equal(
+    isHomepageDeskArticle(
+      {
+        slug: "zpravy-australia-increases-penalties",
+        title: "Australia increases penalties for social media companies",
+        excerpt: "A regulator update from the desk.",
+        content: `<p>${"word ".repeat(60)}</p>`,
+        published: true,
+        published_at: "2026-09-01T08:00:00.000Z",
+        locale: "en",
+        vip_only: false,
+      } as never,
+      new Date(),
+      "cs"
+    ),
     true
   );
   assert.equal(filled.novinky[0]?.id, "who-now");
