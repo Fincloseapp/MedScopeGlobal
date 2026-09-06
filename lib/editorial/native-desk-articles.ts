@@ -37,10 +37,13 @@ function htmlFromSections(intro: string, sections: NativeSeed["sections"], close
   return `<p>${intro}</p>${body}<p><em>${closer}</em></p>`;
 }
 
-/** Rolling UTC calendar day so native pins never freeze on a ship date. Slugs stay stable. */
+/** Rolling UTC calendar day so native pins never freeze on a ship date. Slugs stay stable.
+ *  Lead pin is 23:59 UTC so prepare/dedupe date-sort cannot hide it behind same-day magazine rows. */
 export function nativeDeskPinDate(index: number, now = new Date()): Date {
+  const hour = index === 0 ? 23 : 8;
+  const minute = index === 0 ? 59 : 0;
   return new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - index, 8, 0, 0)
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - index, hour, minute, 0)
   );
 }
 

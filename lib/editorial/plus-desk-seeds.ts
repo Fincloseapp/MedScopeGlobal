@@ -18,7 +18,7 @@ export const PLUS_GLP1_REWARD: Record<string, PlusDeskSeed> = {
     title: "GLP-1 léky a odměna v mozku: méně chuti na alkohol, někdy i plošší nálada",
     excerpt:
       "Semaglutid a příbuzné léky tlumí „šum“ kolem jídla. Čtenáři i studie popisují i slabší chuť na alkohol. Někteří lidé hlásí, že je méně baví věci, které dřív těšily. Redakce shrnuje, co je známo — bez zázraků a bez rady vysadit lék.",
-    topic: "prevence",
+    topic: "zivotni-styl",
     keywords: ["GLP-1", "semaglutid", "alkohol", "odměna", "SÚKL", "praktický lékař"],
     sections: [
       {
@@ -65,7 +65,7 @@ export const PLUS_GLP1_REWARD: Record<string, PlusDeskSeed> = {
     title: "GLP-1 shots and the reward system: less interest in alcohol, sometimes less joy",
     excerpt:
       "Semaglutide-class medicines can quiet food noise. Some people also drink less. A smaller group describes a flatter mood. The US desk explains what is known — FDA labels, a PCP, 911 — not a miracle, not a shopping tip.",
-    topic: "prevence",
+    topic: "zivotni-styl",
     keywords: ["GLP-1", "semaglutide", "alcohol", "reward", "FDA", "PCP"],
     sections: [
       {
@@ -112,7 +112,7 @@ export const PLUS_GLP1_REWARD: Record<string, PlusDeskSeed> = {
     title: "GLP-1 injections and reward: less pull toward alcohol, sometimes less pleasure",
     excerpt:
       "Some people on semaglutide-class medicines drink less. A few describe a flatter mood. The UK desk keeps MHRA, a GP, 111 and 999 in the frame — no miracle, no grey-market pen.",
-    topic: "prevence",
+    topic: "zivotni-styl",
     keywords: ["GLP-1", "semaglutide", "alcohol", "MHRA", "GP", "NHS"],
     sections: [
       {
@@ -159,7 +159,7 @@ export const PLUS_GLP1_REWARD: Record<string, PlusDeskSeed> = {
     title: "GLP-1 medicines and reward: less interest in alcohol, sometimes less joy",
     excerpt:
       "Semaglutide-class drugs can quiet food noise. Some people also drink less. A smaller group describes a flatter mood. International desk: evidence, a family doctor, local emergency care — no miracle claim.",
-    topic: "prevence",
+    topic: "zivotni-styl",
     keywords: ["GLP-1", "semaglutide", "alcohol", "reward"],
     sections: [
       {
@@ -206,7 +206,7 @@ export const PLUS_GLP1_REWARD: Record<string, PlusDeskSeed> = {
     title: "GLP-1-Arzneimittel und Belohnung: weniger Lust auf Alkohol, manchmal weniger Freude",
     excerpt:
       "Semaglutid und verwandte Stoffe können den „Lärm“ ums Essen dämpfen. Manche trinken weniger. Einige beschreiben eine flachere Stimmung. Deutsche Redaktion: Hausarzt, BfArM, 112 — kein Wundermittel.",
-    topic: "prevence",
+    topic: "zivotni-styl",
     keywords: ["GLP-1", "Semaglutid", "Alkohol", "Hausarzt", "BfArM"],
     sections: [
       {
@@ -253,7 +253,7 @@ export const PLUS_GLP1_REWARD: Record<string, PlusDeskSeed> = {
     title: "Médicaments GLP-1 et récompense : moins d’envie d’alcool, parfois moins de plaisir",
     excerpt:
       "Le sémaglutide et ses proches peuvent calmer le bruit autour de la nourriture. Certains boivent moins. D’autres décrivent une humeur plus plate. Bureau français : médecin traitant, ANSM, 15/112 — pas de miracle.",
-    topic: "prevence",
+    topic: "zivotni-styl",
     keywords: ["GLP-1", "sémaglutide", "alcool", "médecin traitant", "ANSM"],
     sections: [
       {
@@ -300,7 +300,7 @@ export const PLUS_GLP1_REWARD: Record<string, PlusDeskSeed> = {
     title: "Farmaci GLP-1 e ricompensa: meno voglia di alcol, a volte meno piacere",
     excerpt:
       "Semaglutide e analoghi possono spegnere il rumore sul cibo. Alcuni bevono di meno. Qualcuno descrive un umore più piatto. Desk italiano: medico di base, AIFA, 118 — nessun miracolo.",
-    topic: "prevence",
+    topic: "zivotni-styl",
     keywords: ["GLP-1", "semaglutide", "alcol", "medico di base", "AIFA"],
     sections: [
       {
@@ -347,7 +347,7 @@ export const PLUS_GLP1_REWARD: Record<string, PlusDeskSeed> = {
     title: "Fármacos GLP-1 y recompensa: menos ganas de alcohol, a veces menos alegría",
     excerpt:
       "La semaglutida y sus parientes pueden callar el ruido en torno a la comida. Algunos beben menos. Otros describen un ánimo más plano. Mesa española: médico de cabecera, AEMPS, 112 — sin milagro.",
-    topic: "prevence",
+    topic: "zivotni-styl",
     keywords: ["GLP-1", "semaglutida", "alcohol", "médico de cabecera", "AEMPS"],
     sections: [
       {
@@ -394,7 +394,7 @@ export const PLUS_GLP1_REWARD: Record<string, PlusDeskSeed> = {
     title: "Remédios GLP-1 e recompensa: menos vontade de álcool, às vezes menos alegria",
     excerpt:
       "Semaglutida e semelhantes podem reduzir o ruído em torno da comida. Alguns bebem menos. Outros descrevem um humor mais plano. Mesa brasileira: UBS, ANVISA, 192 — sem milagre.",
-    topic: "prevence",
+    topic: "zivotni-styl",
     keywords: ["GLP-1", "semaglutida", "álcool", "UBS", "ANVISA"],
     sections: [
       {
