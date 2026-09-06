@@ -21,7 +21,7 @@ export default async function KarieraPridatPage() {
   const copy = getKarieraHubCopy(locale);
   return (
     <ModulePageShell eyebrow={copy.eyebrow} title={copy.addTitle} description={copy.addLead}>
-      <JobPostForm />
+      <JobPostForm locale={locale} />
     </ModulePageShell>
   );
 }

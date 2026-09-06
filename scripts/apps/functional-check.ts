@@ -221,6 +221,13 @@ import {
   rotatingForeignWriterLocale,
 } from "../../lib/v25/config/public-writers";
 import { looksLikeCzech } from "../../lib/i18n/czech-detect";
+import { getKarieraHubCopy, JOB_FILTER_VALUES } from "../../lib/i18n/kariera-hub-copy";
+import { getKongresyHubCopy } from "../../lib/i18n/kongresy-hub-copy";
+import { getOrganizaceHubCopy } from "../../lib/i18n/organizace-hub-copy";
+import { getAiMedicalHubCopy } from "../../lib/i18n/ai-medical-hub-copy";
+import { getOdbornaHubCopy } from "../../lib/i18n/odborna-hub-copy";
+import { getLegalChromeCopy } from "../../lib/i18n/legal-chrome-copy";
+import { getInzerceCenikCopy } from "../../lib/i18n/inzerce-cenik-copy";
 import {
   NEWSLETTER_PRIMARY_LOCALES,
   newsletterIssueSlug,
@@ -878,8 +885,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.45"),
-  "page cache tag must bust after kongresy/kariera/ai-medical chrome"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.46"),
+  "page cache tag must bust after form/filter chrome"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/kongresy/page.tsx"), "utf8").includes(
@@ -903,11 +910,75 @@ assert.ok(
   readFileSync(join(root, "app/(public)/inzerce/cenik/page.tsx"), "utf8").includes(
     "getInzerceCenikCopy"
   ) &&
+    readFileSync(join(root, "app/(public)/inzerce/cenik/page.tsx"), "utf8").includes(
+      "copy.catalog"
+    ) &&
     readFileSync(join(root, "app/(public)/organizace/page.tsx"), "utf8").includes(
       "getOrganizaceHubCopy"
     ),
   "ad rate card and organizace hub must not stay Czech on /fr"
 );
+assert.ok(
+  readFileSync(join(root, "components/career/job-filters.tsx"), "utf8").includes(
+    "localizePublicHref"
+  ) &&
+    readFileSync(join(root, "components/career/job-filters.tsx"), "utf8").includes(
+      "copy.filters"
+    ) &&
+    !readFileSync(join(root, "components/career/job-filters.tsx"), "utf8").includes(
+      'label="Specializace"'
+    ) &&
+    readFileSync(join(root, "components/forms/job-post-form.tsx"), "utf8").includes(
+      "getKarieraHubCopy"
+    ) &&
+    readFileSync(join(root, "components/forms/congress-form.tsx"), "utf8").includes(
+      "getKongresyHubCopy"
+    ) &&
+    readFileSync(join(root, "components/forms/b2b-partner-form.tsx"), "utf8").includes(
+      "getOrganizaceHubCopy"
+    ) &&
+    readFileSync(join(root, "components/ai-medical/intelligence-console.tsx"), "utf8").includes(
+      "medical.specialties"
+    ) &&
+    !readFileSync(join(root, "components/ai-medical/intelligence-console.tsx"), "utf8").includes(
+      "SPECIALTY_LABELS_CS"
+    ) &&
+    readFileSync(join(root, "components/odborna/clk-verify-form.tsx"), "utf8").includes(
+      "clkNumberLabel"
+    ) &&
+    readFileSync(join(root, "components/odborna/professional-disclaimer.tsx"), "utf8").includes(
+      "disclaimerTitle"
+    ),
+  "job/congress/B2B/AI/ČLK form chrome must follow the edition"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/znacka/page.tsx"), "utf8").includes(
+    "getLegalChromeCopy"
+  ) &&
+    readFileSync(join(root, "app/(public)/gdpr/page.tsx"), "utf8").includes(
+      "getLegalChromeCopy"
+    ) &&
+    readFileSync(join(root, "app/(public)/pravo/page.tsx"), "utf8").includes(
+      "getLegalChromeCopy"
+    ) &&
+    readFileSync(join(root, "app/(public)/pravni-checklist/page.tsx"), "utf8").includes(
+      "getLegalChromeCopy"
+    ),
+  "extra legal pages must localize chrome titles, not keep hardcoded Czech breadcrumbs"
+);
+assert.equal(getKarieraHubCopy("fr").filters.specialty, "Spécialité");
+assert.equal(getKarieraHubCopy("fr").filters.all, "Tous");
+assert.equal(getKarieraHubCopy("de").form.title, "Stellenbezeichnung");
+assert.equal(getKongresyHubCopy("fr").form.extract, "Extraction IA");
+assert.equal(getOrganizaceHubCopy("fr").form.company, "Entreprise");
+assert.equal(getAiMedicalHubCopy("fr").specialties.internal, "Médecine interne");
+assert.equal(getOdbornaHubCopy("en").clkNumberLabel, "ČLK registration number");
+assert.ok(getOdbornaHubCopy("fr").clkNumberLabel.includes("ČLK"));
+assert.equal(getLegalChromeCopy("fr").brandTitle, "Marque et propriété intellectuelle");
+assert.equal(getInzerceCenikCopy("fr").catalog.article_inline, "Articles — inline");
+assert.equal(getKarieraHubCopy("cs").filters.specialty, "Specializace");
+assert.ok(JOB_FILTER_VALUES.specialties.includes("interní"));
+assert.ok(JOB_FILTER_VALUES.contracts.includes("HPP"));
 assert.ok(
   !readFileSync(join(root, "app/(public)/articles/page.tsx"), "utf8").includes(
     "getReaderContext"

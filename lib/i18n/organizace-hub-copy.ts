@@ -38,6 +38,17 @@ export type OrganizaceHubCopy = {
   featuresEnterprise: string[];
   integrationTitle: string;
   integrationLead: string;
+  form: {
+    company: string;
+    contact: string;
+    email: string;
+    phone: string;
+    message: string;
+    submit: string;
+    sending: string;
+    success: string;
+    error: string;
+  };
 };
 
 const PACK: Record<ChromePack, OrganizaceHubCopy> = {
@@ -102,6 +113,17 @@ const PACK: Record<ChromePack, OrganizaceHubCopy> = {
     integrationTitle: "Možnosti integrace",
     integrationLead:
       "SAML/OIDC SSO, export citací, webhook notifikace, SCIM provisioning (Enterprise) a napojení na interní LMS.",
+    form: {
+      company: "Firma",
+      contact: "Kontakt",
+      email: "E-mail",
+      phone: "Telefon",
+      message: "Zpráva",
+      submit: "Odeslat",
+      sending: "Odesílám…",
+      success: "Děkujeme — ozveme se na uvedený e-mail.",
+      error: "Odeslání selhalo.",
+    },
   },
   de: {
     metaTitle: "Organisationen und B2B",
@@ -164,6 +186,17 @@ const PACK: Record<ChromePack, OrganizaceHubCopy> = {
     integrationTitle: "Integrationsoptionen",
     integrationLead:
       "SAML/OIDC-SSO, Zitateexport, Webhook-Benachrichtigungen, SCIM (Enterprise) und Anbindung an das interne LMS.",
+    form: {
+      company: "Firma",
+      contact: "Kontakt",
+      email: "E-Mail",
+      phone: "Telefon",
+      message: "Nachricht",
+      submit: "Senden",
+      sending: "Senden…",
+      success: "Danke — wir schreiben an die angegebene E-Mail.",
+      error: "Senden fehlgeschlagen.",
+    },
   },
   fr: {
     metaTitle: "Organisations et B2B",
@@ -226,6 +259,17 @@ const PACK: Record<ChromePack, OrganizaceHubCopy> = {
     integrationTitle: "Options d’intégration",
     integrationLead:
       "SSO SAML/OIDC, export de citations, webhooks, provisioning SCIM (Enterprise) et liaison au LMS interne.",
+    form: {
+      company: "Entreprise",
+      contact: "Contact",
+      email: "E-mail",
+      phone: "Téléphone",
+      message: "Message",
+      submit: "Envoyer",
+      sending: "Envoi…",
+      success: "Merci — nous répondrons à l’e-mail indiqué.",
+      error: "L’envoi a échoué.",
+    },
   },
   en: {
     metaTitle: "Organizations and B2B",
@@ -288,6 +332,17 @@ const PACK: Record<ChromePack, OrganizaceHubCopy> = {
     integrationTitle: "Integration options",
     integrationLead:
       "SAML/OIDC SSO, citation export, webhook alerts, SCIM provisioning (Enterprise) and a hook into the internal LMS.",
+    form: {
+      company: "Company",
+      contact: "Contact",
+      email: "Email",
+      phone: "Phone",
+      message: "Message",
+      submit: "Send",
+      sending: "Sending…",
+      success: "Thank you — we will write to the email you gave.",
+      error: "Sending failed.",
+    },
   },
   it: {
     metaTitle: "Organizzazioni e B2B",
@@ -349,6 +404,17 @@ const PACK: Record<ChromePack, OrganizaceHubCopy> = {
     featuresEnterprise: ["Integrazione API", "Reporting su misura", "Account dedicato"],
     integrationTitle: "Opzioni di integrazione",
     integrationLead: "SSO SAML/OIDC, export citazioni, webhook, SCIM (Enterprise) e collegamento all’LMS interno.",
+    form: {
+      company: "Azienda",
+      contact: "Contatto",
+      email: "E-mail",
+      phone: "Telefono",
+      message: "Messaggio",
+      submit: "Invia",
+      sending: "Invio…",
+      success: "Grazie — risponderemo all’e-mail indicata.",
+      error: "Invio non riuscito.",
+    },
   },
   es: {
     metaTitle: "Organizaciones y B2B",
@@ -410,6 +476,17 @@ const PACK: Record<ChromePack, OrganizaceHubCopy> = {
     featuresEnterprise: ["Integración API", "Informes a medida", "Cuenta dedicada"],
     integrationTitle: "Opciones de integración",
     integrationLead: "SSO SAML/OIDC, exportación de citas, webhooks, SCIM (Enterprise) y enlace al LMS interno.",
+    form: {
+      company: "Empresa",
+      contact: "Contacto",
+      email: "Correo",
+      phone: "Teléfono",
+      message: "Mensaje",
+      submit: "Enviar",
+      sending: "Enviando…",
+      success: "Gracias — responderemos al correo indicado.",
+      error: "El envío falló.",
+    },
   },
   "pt-BR": {
     metaTitle: "Organizações e B2B",
@@ -471,6 +548,17 @@ const PACK: Record<ChromePack, OrganizaceHubCopy> = {
     featuresEnterprise: ["Integração API", "Reporting à medida", "Conta dedicada"],
     integrationTitle: "Opções de integração",
     integrationLead: "SSO SAML/OIDC, exportação de citações, webhooks, SCIM (Enterprise) e ligação ao LMS interno.",
+    form: {
+      company: "Empresa",
+      contact: "Contacto",
+      email: "E-mail",
+      phone: "Telefone",
+      message: "Mensagem",
+      submit: "Enviar",
+      sending: "A enviar…",
+      success: "Obrigado — responderemos ao e-mail indicado.",
+      error: "O envio falhou.",
+    },
   },
 };
 

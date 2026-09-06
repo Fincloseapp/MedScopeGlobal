@@ -9,16 +9,21 @@ import {
   getOdbornaSection,
   ODBORNA_SECTIONS,
 } from "@/lib/config/odborna-sections";
+import { getOdbornaHubCopy } from "@/lib/i18n/odborna-hub-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { logSecurityEvent } from "@/lib/security/security-log";
 
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getOdbornaHubCopy(locale);
   const { slug } = await params;
   const section = getOdbornaSection(slug);
-  if (!section) return { title: "Odborná sekce" };
+  if (!section) return { title: copy.metaTitle };
   return {
-    title: `${section.title} — Odborná sekce`,
+    title: `${section.title} — ${copy.eyebrow}`,
     description: section.description,
   };
 }
@@ -26,6 +31,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export const dynamic = "force-dynamic";
 
 export default async function OdbornaSlugPage({ params }: Props) {
+  const locale = await getServerLocale();
+  const copy = getOdbornaHubCopy(locale);
+  const hubHref = localizePublicHref("/odborna", locale);
   const { slug } = await params;
   const section = getOdbornaSection(slug);
   if (!section) notFound();
@@ -33,7 +41,7 @@ export default async function OdbornaSlugPage({ params }: Props) {
   const access = await getOdbornaAccess();
 
   if (!access.user) {
-    redirect(`/login?next=/odborna/${slug}`);
+    redirect(localizePublicHref(`/login?next=/odborna/${slug}`, locale));
   }
 
   if (!access.allowed) {
@@ -46,19 +54,19 @@ export default async function OdbornaSlugPage({ params }: Props) {
 
     return (
       <ModulePageShell
-        eyebrow="Odborná sekce"
+        eyebrow={copy.eyebrow}
         title={section.title}
         description={section.description}
-        ctaHref="/odborna"
-        ctaLabel="Zpět na hub"
+        ctaHref={hubHref}
+        ctaLabel={copy.backHub}
       >
         <Link
-          href="/odborna"
+          href={hubHref}
           className="mb-6 inline-block text-sm text-primary hover:underline"
         >
-          ← Odborná sekce
+          ← {copy.eyebrow}
         </Link>
-        <OdbornaGate reason={access.reason!} clkStatus={access.clk} />
+        <OdbornaGate reason={access.reason!} clkStatus={access.clk} locale={locale} />
       </ModulePageShell>
     );
   }
@@ -72,20 +80,20 @@ export default async function OdbornaSlugPage({ params }: Props) {
 
   return (
     <ModulePageShell
-      eyebrow="Odborná sekce"
+      eyebrow={copy.eyebrow}
       title={section.title}
       description={section.description}
-      ctaHref="/odborna"
-      ctaLabel="Všechny oblasti"
+      ctaHref={hubHref}
+      ctaLabel={copy.allAreas}
     >
       <Link
-        href="/odborna"
+        href={hubHref}
         className="mb-6 inline-block text-sm text-primary hover:underline"
       >
-        ← Odborná sekce
+        ← {copy.eyebrow}
       </Link>
 
-      <ProfessionalDisclaimer className="mb-8" />
+      <ProfessionalDisclaimer className="mb-8" locale={locale} />
 
       <article className="prose prose-slate max-w-none">
         <p>
@@ -109,13 +117,13 @@ export default async function OdbornaSlugPage({ params }: Props) {
 
       <section className="mt-12 border-t pt-8">
         <h2 className="text-sm font-semibold uppercase text-muted-foreground">
-          Další oblasti
+          {copy.moreAreas}
         </h2>
         <ul className="mt-3 flex flex-wrap gap-2">
           {ODBORNA_SECTIONS.filter((s) => s.slug !== slug).map((s) => (
             <li key={s.slug}>
               <Link
-                href={`/odborna/${s.slug}`}
+                href={localizePublicHref(`/odborna/${s.slug}`, locale)}
                 className="rounded-full border px-3 py-1 text-sm hover:bg-muted"
               >
                 {s.title}

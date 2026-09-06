@@ -2,17 +2,24 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
 import { getLegalEntity, isLegalEntityComplete } from "@/lib/config/legal-entity";
+import { getLegalChromeCopy } from "@/lib/i18n/legal-chrome-copy";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
   return await buildLocalizedPageMetadata({
-  title: "Značka a ochrana duševního vlastnictví",
-  description: "MedScopeGlobal — prohlášení o značce, autorských právech a nezávislosti na Medscape, WebMD a dalších zahraničních portálech.",
-  path: "/znacka",
-});
+    title: copy.brandTitle,
+    description: copy.brandDescription,
+    path: "/znacka",
+    locale,
+  });
 }
 
-export default function BrandLegalPage() {
+export default async function BrandLegalPage() {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
   const entity = getLegalEntity();
   const complete = isLegalEntityComplete(entity);
   const mailHref = (email: string) => "mailto:" + email;
@@ -20,9 +27,11 @@ export default function BrandLegalPage() {
 
   return (
     <LegalPageLayout
-      title={"Značka a ochrana duševního vlastnictví"}
-      description={"Právní postavení značky MedScopeGlobal, domény medscopeglobal.com a oddělení od zahraničních medicínských portálů."}
+      locale={locale}
+      title={copy.brandTitle}
+      description={copy.brandLead}
     >
+      {copy.officialNote ? <p><em>{copy.officialNote}</em></p> : null}
       <h2>1. Provozovatel a označení</h2>
       <p>
         Platformu na doméně <strong>{entity.domain}</strong> provozuje{" "}

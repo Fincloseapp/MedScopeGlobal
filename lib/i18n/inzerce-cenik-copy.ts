@@ -18,6 +18,7 @@ export type InzerceCenikCopy = {
   packages: string;
   from: string;
   form: string;
+  catalog: Record<string, string>;
 };
 
 const PACK: Record<ChromePack, InzerceCenikCopy> = {
@@ -39,6 +40,19 @@ const PACK: Record<ChromePack, InzerceCenikCopy> = {
     packages: "Kombinované balíčky",
     from: "od",
     form: "Přejít na formulář →",
+    catalog: {
+      homepage_top: "Homepage — top banner",
+      homepage_mid: "Homepage — mid banner",
+      homepage_bottom: "Homepage — bottom banner",
+      article_inline: "Články — inline",
+      diagnosis_sidebar: "Diagnózy — sidebar",
+      header: "Newsletter — hlavička",
+      mid: "Newsletter — střed",
+      footer: "Newsletter — patička",
+      starter: "Starter (banner 30 dní + newsletter)",
+      clinical: "Clinical (diagnóza + článek + newsletter)",
+      congress: "Congress (kongres + homepage mid)",
+    },
   },
   de: {
     metaTitle: "Anzeigenpreise",
@@ -58,6 +72,19 @@ const PACK: Record<ChromePack, InzerceCenikCopy> = {
     packages: "Kombinationspakete",
     from: "ab",
     form: "Zum Formular →",
+    catalog: {
+      homepage_top: "Startseite — Banner oben",
+      homepage_mid: "Startseite — Banner Mitte",
+      homepage_bottom: "Startseite — Banner unten",
+      article_inline: "Artikel — inline",
+      diagnosis_sidebar: "Diagnosen — Sidebar",
+      header: "Newsletter — Kopf",
+      mid: "Newsletter — Mitte",
+      footer: "Newsletter — Fuß",
+      starter: "Starter (Banner 30 Tage + Newsletter)",
+      clinical: "Clinical (Diagnose + Artikel + Newsletter)",
+      congress: "Congress (Kongress + Startseite Mitte)",
+    },
   },
   fr: {
     metaTitle: "Tarifs publicitaires",
@@ -77,6 +104,19 @@ const PACK: Record<ChromePack, InzerceCenikCopy> = {
     packages: "Packs combinés",
     from: "à partir de",
     form: "Aller au formulaire →",
+    catalog: {
+      homepage_top: "Accueil — bannière haut",
+      homepage_mid: "Accueil — bannière milieu",
+      homepage_bottom: "Accueil — bannière bas",
+      article_inline: "Articles — inline",
+      diagnosis_sidebar: "Diagnostics — barre latérale",
+      header: "Newsletter — en-tête",
+      mid: "Newsletter — milieu",
+      footer: "Newsletter — pied",
+      starter: "Starter (bannière 30 jours + newsletter)",
+      clinical: "Clinical (diagnostic + article + newsletter)",
+      congress: "Congress (congrès + accueil milieu)",
+    },
   },
   en: {
     metaTitle: "Ad pricing",
@@ -96,6 +136,19 @@ const PACK: Record<ChromePack, InzerceCenikCopy> = {
     packages: "Combined packs",
     from: "from",
     form: "Go to the form →",
+    catalog: {
+      homepage_top: "Homepage — top banner",
+      homepage_mid: "Homepage — mid banner",
+      homepage_bottom: "Homepage — bottom banner",
+      article_inline: "Articles — inline",
+      diagnosis_sidebar: "Diagnoses — sidebar",
+      header: "Newsletter — header",
+      mid: "Newsletter — middle",
+      footer: "Newsletter — footer",
+      starter: "Starter (banner 30 days + newsletter)",
+      clinical: "Clinical (diagnosis + article + newsletter)",
+      congress: "Congress (congress + homepage mid)",
+    },
   },
   it: {
     metaTitle: "Listino pubblicità",
@@ -115,6 +168,19 @@ const PACK: Record<ChromePack, InzerceCenikCopy> = {
     packages: "Pacchetti combinati",
     from: "da",
     form: "Vai al modulo →",
+    catalog: {
+      homepage_top: "Home — banner alto",
+      homepage_mid: "Home — banner centrale",
+      homepage_bottom: "Home — banner basso",
+      article_inline: "Articoli — inline",
+      diagnosis_sidebar: "Diagnosi — barra laterale",
+      header: "Newsletter — intestazione",
+      mid: "Newsletter — centro",
+      footer: "Newsletter — pie",
+      starter: "Starter (banner 30 giorni + newsletter)",
+      clinical: "Clinical (diagnosi + articolo + newsletter)",
+      congress: "Congress (congresso + home centrale)",
+    },
   },
   es: {
     metaTitle: "Tarifas publicitarias",
@@ -134,6 +200,19 @@ const PACK: Record<ChromePack, InzerceCenikCopy> = {
     packages: "Packs combinados",
     from: "desde",
     form: "Ir al formulario →",
+    catalog: {
+      homepage_top: "Inicio — banner superior",
+      homepage_mid: "Inicio — banner medio",
+      homepage_bottom: "Inicio — banner inferior",
+      article_inline: "Artículos — inline",
+      diagnosis_sidebar: "Diagnósticos — barra lateral",
+      header: "Boletín — cabecera",
+      mid: "Boletín — medio",
+      footer: "Boletín — pie",
+      starter: "Starter (banner 30 días + boletín)",
+      clinical: "Clinical (diagnóstico + artículo + boletín)",
+      congress: "Congress (congreso + inicio medio)",
+    },
   },
   "pt-BR": {
     metaTitle: "Preçário de publicidade",
@@ -153,6 +232,19 @@ const PACK: Record<ChromePack, InzerceCenikCopy> = {
     packages: "Packs combinados",
     from: "desde",
     form: "Ir ao formulário →",
+    catalog: {
+      homepage_top: "Início — banner topo",
+      homepage_mid: "Início — banner meio",
+      homepage_bottom: "Início — banner fundo",
+      article_inline: "Artigos — inline",
+      diagnosis_sidebar: "Diagnósticos — barra lateral",
+      header: "Newsletter — cabeçalho",
+      mid: "Newsletter — meio",
+      footer: "Newsletter — rodapé",
+      starter: "Starter (banner 30 dias + newsletter)",
+      clinical: "Clinical (diagnóstico + artigo + newsletter)",
+      congress: "Congress (congresso + início meio)",
+    },
   },
 };
 

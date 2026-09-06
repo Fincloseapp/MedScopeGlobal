@@ -26,6 +26,21 @@ export type OdbornaHubCopy = {
   signIn: string;
   register: string;
   accessHow: string;
+  backHub: string;
+  allAreas: string;
+  moreAreas: string;
+  clkActive: string;
+  clkNumberLabel: string;
+  clkNumberHint: string;
+  clkSubmit: string;
+  clkSubmitting: string;
+  clkPending: string;
+  clkSent: string;
+  clkNeedLogin: string;
+  clkNeedNumber: string;
+  clkFailed: string;
+  disclaimerTitle: string;
+  disclaimerItems: [string, string, string, string];
 };
 
 const PACK: Record<ChromePack, OdbornaHubCopy> = {
@@ -54,6 +69,26 @@ const PACK: Record<ChromePack, OdbornaHubCopy> = {
     signIn: "Přihlásit se",
     register: "Registrace",
     accessHow: "Jak fungují úrovně přístupu →",
+    backHub: "Zpět na hub",
+    allAreas: "Všechny oblasti",
+    moreAreas: "Další oblasti",
+    clkActive: "Ověření ČLK je aktivní",
+    clkNumberLabel: "Evidenční číslo ČLK",
+    clkNumberHint: "Údaje ověřujeme proti registru České lékařské komory nebo ručně administrátorem.",
+    clkSubmit: "Ověřit přes ČLK",
+    clkSubmitting: "Ověřuji…",
+    clkPending: "Vaše žádost čeká na schválení administrátorem.",
+    clkSent: "Žádost odeslána.",
+    clkNeedLogin: "Přihlaste se pro ověření ČLK.",
+    clkNeedNumber: "Zadejte evidenční číslo ČLK.",
+    clkFailed: "Ověření se nezdařilo.",
+    disclaimerTitle: "Právní upozornění — odborný obsah (úroveň 3)",
+    disclaimerItems: [
+      "Obsah je určen výhradně zdravotnickým pracovníkům s platným ověřením v registru ČLK dle zákona č. 95/2004 Sb.",
+      "Nepředstavuje individuální lékařskou radu ani náhradu klinického rozhodování — rozhodnutí vždy náleží ošetřujícímu lékaři.",
+      "Přístup je auditován (logy v Supabase a lokálním úložišti) v souladu s požadavky GDPR a interními směrnicemi MedScope.",
+      "Šíření mimo ověřenou odbornou skupinu je zakázáno.",
+    ],
   },
   de: {
     metaTitle: "Fachbereich",
@@ -80,6 +115,27 @@ const PACK: Record<ChromePack, OdbornaHubCopy> = {
     signIn: "Anmelden",
     register: "Registrieren",
     accessHow: "So funktionieren die Zugangsstufen →",
+    backHub: "Zurück zum Hub",
+    allAreas: "Alle Bereiche",
+    moreAreas: "Weitere Bereiche",
+    clkActive: "ČLK-Prüfung ist aktiv",
+    clkNumberLabel: "ČLK-Registernummer",
+    clkNumberHint:
+      "Wir prüfen gegen das Register der tschechischen Ärztekammer (ČLK) oder manuell durch einen Administrator. Das ist kein Ersatz für eine lokale Kammer.",
+    clkSubmit: "Über ČLK prüfen",
+    clkSubmitting: "Prüfung…",
+    clkPending: "Ihre Anfrage wartet auf Freigabe durch einen Administrator.",
+    clkSent: "Anfrage gesendet.",
+    clkNeedLogin: "Melden Sie sich an, um die ČLK-Nummer zu prüfen.",
+    clkNeedNumber: "Geben Sie die ČLK-Registernummer ein.",
+    clkFailed: "Die Prüfung ist fehlgeschlagen.",
+    disclaimerTitle: "Rechtlicher Hinweis — Fachinhalt (Stufe 3)",
+    disclaimerItems: [
+      "Der Inhalt richtet sich an Gesundheitsfachkräfte mit gültiger Prüfung im Register der tschechischen Ärztekammer (ČLK) nach Gesetz Nr. 95/2004 Sb. Das ist ein tschechisches Kammerprodukt.",
+      "Er ersetzt keine individuelle medizinische Beratung und keine klinische Entscheidung — die liegt beim behandelnden Arzt.",
+      "Der Zugang wird protokolliert (Supabase und lokales Speicher) gemäß DSGVO und internen MedScope-Richtlinien.",
+      "Weitergabe außerhalb der geprüften Fachgruppe ist untersagt.",
+    ],
   },
   fr: {
     metaTitle: "Espace professionnel",
@@ -106,6 +162,27 @@ const PACK: Record<ChromePack, OdbornaHubCopy> = {
     signIn: "Connexion",
     register: "Inscription",
     accessHow: "Comment fonctionnent les niveaux d’accès →",
+    backHub: "Retour au hub",
+    allAreas: "Tous les domaines",
+    moreAreas: "Autres domaines",
+    clkActive: "Vérification ČLK active",
+    clkNumberLabel: "Numéro d’enregistrement ČLK",
+    clkNumberHint:
+      "Nous vérifions auprès du registre de l’ordre des médecins tchèque (ČLK) ou manuellement par un administrateur. Ce n’est pas un ordre local.",
+    clkSubmit: "Vérifier via ČLK",
+    clkSubmitting: "Vérification…",
+    clkPending: "Votre demande attend la validation d’un administrateur.",
+    clkSent: "Demande envoyée.",
+    clkNeedLogin: "Connectez-vous pour vérifier le numéro ČLK.",
+    clkNeedNumber: "Saisissez le numéro d’enregistrement ČLK.",
+    clkFailed: "La vérification a échoué.",
+    disclaimerTitle: "Mention légale — contenu professionnel (niveau 3)",
+    disclaimerItems: [
+      "Le contenu s’adresse aux professionnels de santé avec une vérification valide au registre de l’ordre tchèque (ČLK) selon la loi n° 95/2004 Sb. C’est un produit d’ordre tchèque.",
+      "Il ne remplace pas un avis médical individuel ni une décision clinique — celle-ci appartient au médecin traitant.",
+      "L’accès est journalisé (Supabase et stockage local) conformément au RGPD et aux règles internes MedScope.",
+      "La diffusion hors du groupe professionnel vérifié est interdite.",
+    ],
   },
   en: {
     metaTitle: "Professional desk",
@@ -132,6 +209,27 @@ const PACK: Record<ChromePack, OdbornaHubCopy> = {
     signIn: "Sign in",
     register: "Register",
     accessHow: "How access levels work →",
+    backHub: "Back to the hub",
+    allAreas: "All areas",
+    moreAreas: "More areas",
+    clkActive: "ČLK verification is active",
+    clkNumberLabel: "ČLK registration number",
+    clkNumberHint:
+      "We check against the Czech Medical Chamber (ČLK) register or manually by an administrator. This is not a local-board product.",
+    clkSubmit: "Verify via ČLK",
+    clkSubmitting: "Checking…",
+    clkPending: "Your request is waiting for administrator approval.",
+    clkSent: "Request sent.",
+    clkNeedLogin: "Sign in to verify a ČLK number.",
+    clkNeedNumber: "Enter the ČLK registration number.",
+    clkFailed: "Verification failed.",
+    disclaimerTitle: "Legal notice — professional content (level 3)",
+    disclaimerItems: [
+      "The content is for health professionals with a valid check in the Czech Medical Chamber (ČLK) register under Act No. 95/2004 Sb. It is a Czech-chamber product.",
+      "It is not individual medical advice and does not replace clinical judgement — that stays with the treating physician.",
+      "Access is audited (Supabase and local storage) under GDPR and MedScope internal rules.",
+      "Sharing outside the verified professional group is forbidden.",
+    ],
   },
   it: {
     metaTitle: "Area professionale",
@@ -158,6 +256,27 @@ const PACK: Record<ChromePack, OdbornaHubCopy> = {
     signIn: "Accedi",
     register: "Registrati",
     accessHow: "Come funzionano i livelli di accesso →",
+    backHub: "Torna all’hub",
+    allAreas: "Tutte le aree",
+    moreAreas: "Altre aree",
+    clkActive: "Verifica ČLK attiva",
+    clkNumberLabel: "Numero di iscrizione ČLK",
+    clkNumberHint:
+      "Verifichiamo sul registro dell’ordine dei medici ceco (ČLK) o manualmente da un amministratore. Non è un ordine locale.",
+    clkSubmit: "Verifica tramite ČLK",
+    clkSubmitting: "Verifica…",
+    clkPending: "La richiesta attende l’approvazione di un amministratore.",
+    clkSent: "Richiesta inviata.",
+    clkNeedLogin: "Accedete per verificare il numero ČLK.",
+    clkNeedNumber: "Inserite il numero di iscrizione ČLK.",
+    clkFailed: "La verifica non è riuscita.",
+    disclaimerTitle: "Avviso legale — contenuti professionali (livello 3)",
+    disclaimerItems: [
+      "I contenuti sono destinati ai professionisti sanitari con verifica valida nel registro dell’ordine ceco (ČLK) ai sensi della legge n. 95/2004 Sb. È un prodotto dell’ordine ceco.",
+      "Non sostituiscono un parere medico individuale né una decisione clinica — che resta del medico curante.",
+      "L’accesso è registrato (Supabase e archivio locale) in conformità al GDPR e alle regole interne MedScope.",
+      "La diffusione fuori dal gruppo professionale verificato è vietata.",
+    ],
   },
   es: {
     metaTitle: "Área profesional",
@@ -184,6 +303,27 @@ const PACK: Record<ChromePack, OdbornaHubCopy> = {
     signIn: "Entrar",
     register: "Registrarse",
     accessHow: "Cómo funcionan los niveles de acceso →",
+    backHub: "Volver al hub",
+    allAreas: "Todas las áreas",
+    moreAreas: "Más áreas",
+    clkActive: "Verificación ČLK activa",
+    clkNumberLabel: "Número de registro ČLK",
+    clkNumberHint:
+      "Comprobamos el registro del colegio médico checo (ČLK) o de forma manual un administrador. No es un colegio local.",
+    clkSubmit: "Verificar por ČLK",
+    clkSubmitting: "Verificando…",
+    clkPending: "Su solicitud espera la aprobación de un administrador.",
+    clkSent: "Solicitud enviada.",
+    clkNeedLogin: "Inicie sesión para verificar el número ČLK.",
+    clkNeedNumber: "Introduzca el número de registro ČLK.",
+    clkFailed: "La verificación falló.",
+    disclaimerTitle: "Aviso legal — contenido profesional (nivel 3)",
+    disclaimerItems: [
+      "El contenido es para profesionales sanitarios con verificación válida en el registro del colegio checo (ČLK) según la ley n.º 95/2004 Sb. Es un producto de colegio checo.",
+      "No sustituye un consejo médico individual ni una decisión clínica — esa corresponde al médico responsable.",
+      "El acceso se registra (Supabase y almacenamiento local) conforme al RGPD y a las normas internas de MedScope.",
+      "Queda prohibida la difusión fuera del grupo profesional verificado.",
+    ],
   },
   "pt-BR": {
     metaTitle: "Área profissional",
@@ -210,6 +350,27 @@ const PACK: Record<ChromePack, OdbornaHubCopy> = {
     signIn: "Entrar",
     register: "Registar",
     accessHow: "Como funcionam os níveis de acesso →",
+    backHub: "Voltar ao hub",
+    allAreas: "Todas as áreas",
+    moreAreas: "Outras áreas",
+    clkActive: "Verificação ČLK ativa",
+    clkNumberLabel: "Número de registo ČLK",
+    clkNumberHint:
+      "Verificamos no registo da ordem médica checa (ČLK) ou manualmente por um administrador. Não é uma ordem local.",
+    clkSubmit: "Verificar via ČLK",
+    clkSubmitting: "A verificar…",
+    clkPending: "O pedido aguarda aprovação de um administrador.",
+    clkSent: "Pedido enviado.",
+    clkNeedLogin: "Inicie sessão para verificar o número ČLK.",
+    clkNeedNumber: "Introduza o número de registo ČLK.",
+    clkFailed: "A verificação falhou.",
+    disclaimerTitle: "Aviso legal — conteúdo profissional (nível 3)",
+    disclaimerItems: [
+      "O conteúdo destina-se a profissionais de saúde com verificação válida no registo da ordem checa (ČLK) nos termos da lei n.º 95/2004 Sb. É um produto da ordem checa.",
+      "Não substitui aconselhamento médico individual nem uma decisão clínica — essa cabe ao médico responsável.",
+      "O acesso é registado (Supabase e armazenamento local) em conformidade com o RGPD e as regras internas MedScope.",
+      "É proibida a divulgação fora do grupo profissional verificado.",
+    ],
   },
 };
 

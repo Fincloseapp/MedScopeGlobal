@@ -61,6 +61,7 @@ export function OdbornaGate({
             <ClkVerifyForm
               initialStatus={clkStatus?.status}
               clkNumber={clkStatus?.clkNumber}
+              locale={locale}
             />
           )}
           <Button asChild variant="link" className="h-auto p-0">
@@ -68,7 +69,7 @@ export function OdbornaGate({
           </Button>
         </CardContent>
       </Card>
-      <ProfessionalDisclaimer />
+      <ProfessionalDisclaimer locale={locale} />
     </div>
   );
 }

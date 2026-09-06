@@ -21,7 +21,7 @@ export default async function KongresyPridatPage() {
   const copy = getKongresyHubCopy(locale);
   return (
     <ModulePageShell eyebrow={copy.eyebrow} title={copy.addTitle} description={copy.addLead}>
-      <CongressForm />
+      <CongressForm locale={locale} />
     </ModulePageShell>
   );
 }

@@ -20,6 +20,18 @@ export type LegalChromeCopy = {
   helpLinksTitle: string;
   helpAccount: string;
   faqs: { q: string; a: string }[];
+  brandTitle: string;
+  brandDescription: string;
+  brandLead: string;
+  gdprTitle: string;
+  gdprDescription: string;
+  gdprLead: string;
+  noticeTitle: string;
+  noticeDescription: string;
+  noticeLead: string;
+  checklistTitle: string;
+  checklistDescription: string;
+  checklistLead: string;
 };
 
 const PACK: Record<ChromePack, LegalChromeCopy> = {
@@ -63,6 +75,19 @@ const PACK: Record<ChromePack, LegalChromeCopy> = {
         a: "Napište na info@medscopeglobal.com, volejte +420 736 532 952, nebo využijte kontaktní formulář.",
       },
     ],
+    brandTitle: "Značka a ochrana duševního vlastnictví",
+    brandDescription:
+      "MedScopeGlobal — prohlášení o značce, autorských právech a nezávislosti na Medscape, WebMD a dalších zahraničních portálech.",
+    brandLead: "Právní postavení značky MedScopeGlobal, domény medscopeglobal.com a oddělení od zahraničních medicínských portálů.",
+    gdprTitle: "Ochrana osobních údajů (GDPR)",
+    gdprDescription: "Zpracování osobních údajů, cookies, analytika, newsletter a AI zpracování dat na MedScopeGlobal.",
+    gdprLead: "Informace o zpracování osobních údajů dle nařízení EU 2016/679.",
+    noticeTitle: "Právní upozornění",
+    noticeDescription: "Právní upozornění, licenční podmínky a podmínky pro AI obsah MedScopeGlobal.",
+    noticeLead: "Licenční podmínky, disclaimer a pravidla pro AI generovaný obsah.",
+    checklistTitle: "Právní checklist",
+    checklistDescription: "Akční checklist ochrany značky MedScopeGlobal — imprint, ochranná známka ÚPV/EUIPO, monitoring.",
+    checklistLead: "Co je hotové na webu a co zbývá u advokáta / registrátora.",
   },
   de: {
     officialNote:
@@ -105,6 +130,19 @@ const PACK: Record<ChromePack, LegalChromeCopy> = {
         a: "Schreiben Sie an info@medscopeglobal.com, rufen Sie +420 736 532 952 an oder nutzen Sie das Kontaktformular.",
       },
     ],
+    brandTitle: "Marke und geistiges Eigentum",
+    brandDescription:
+      "MedScopeGlobal — Markenerklärung, Urheberrecht und Unabhängigkeit von Medscape, WebMD und anderen Portalen.",
+    brandLead: "Rechtliche Stellung der Marke MedScopeGlobal, der Domain medscopeglobal.com und die Trennung von ausländischen Medizinportalen.",
+    gdprTitle: "Datenschutz (DSGVO)",
+    gdprDescription: "Verarbeitung personenbezogener Daten, Cookies, Analytik, Newsletter und KI auf MedScopeGlobal.",
+    gdprLead: "Informationen zur Verarbeitung personenbezogener Daten nach der EU-Verordnung 2016/679.",
+    noticeTitle: "Rechtliche Hinweise",
+    noticeDescription: "Rechtliche Hinweise, Lizenzbedingungen und Regeln für KI-Inhalte auf MedScopeGlobal.",
+    noticeLead: "Lizenzbedingungen, Disclaimer und Regeln für KI-generierte Inhalte.",
+    checklistTitle: "Rechtliche Checkliste",
+    checklistDescription: "Checkliste zum Markenschutz von MedScopeGlobal — Impressum, Marke ÚPV/EUIPO, Monitoring.",
+    checklistLead: "Was auf der Website steht und was beim Anwalt / Registrar bleibt.",
   },
   fr: {
     officialNote:
@@ -147,6 +185,19 @@ const PACK: Record<ChromePack, LegalChromeCopy> = {
         a: "Écrivez à info@medscopeglobal.com, appelez le +420 736 532 952 ou utilisez le formulaire de contact.",
       },
     ],
+    brandTitle: "Marque et propriété intellectuelle",
+    brandDescription:
+      "MedScopeGlobal — déclaration de marque, droits d’auteur et indépendance vis-à-vis de Medscape, WebMD et d’autres portails.",
+    brandLead: "Statut juridique de la marque MedScopeGlobal, du domaine medscopeglobal.com et séparation des portails médicaux étrangers.",
+    gdprTitle: "Protection des données (RGPD)",
+    gdprDescription: "Traitement des données, cookies, analytique, newsletter et IA sur MedScopeGlobal.",
+    gdprLead: "Informations sur le traitement des données personnelles selon le règlement UE 2016/679.",
+    noticeTitle: "Mentions légales",
+    noticeDescription: "Mentions légales, licences et règles pour le contenu IA de MedScopeGlobal.",
+    noticeLead: "Conditions de licence, disclaimer et règles pour le contenu généré par IA.",
+    checklistTitle: "Checklist juridique",
+    checklistDescription: "Checklist de protection de la marque MedScopeGlobal — mentions, marque ÚPV/EUIPO, suivi.",
+    checklistLead: "Ce qui est en place sur le site et ce qui reste chez l’avocat / le registrar.",
   },
   en: {
     officialNote:
@@ -189,6 +240,19 @@ const PACK: Record<ChromePack, LegalChromeCopy> = {
         a: "Write to info@medscopeglobal.com, call +420 736 532 952, or use the contact form.",
       },
     ],
+    brandTitle: "Brand and intellectual property",
+    brandDescription:
+      "MedScopeGlobal — brand statement, copyright and independence from Medscape, WebMD and other portals.",
+    brandLead: "Legal standing of the MedScopeGlobal brand, the medscopeglobal.com domain, and separation from foreign medical portals.",
+    gdprTitle: "Personal-data protection (GDPR)",
+    gdprDescription: "Personal-data processing, cookies, analytics, newsletter and AI on MedScopeGlobal.",
+    gdprLead: "Information on personal-data processing under EU regulation 2016/679.",
+    noticeTitle: "Legal notice",
+    noticeDescription: "Legal notice, licence terms and rules for MedScopeGlobal AI content.",
+    noticeLead: "Licence terms, disclaimer and rules for AI-generated content.",
+    checklistTitle: "Legal checklist",
+    checklistDescription: "Brand-protection checklist for MedScopeGlobal — imprint, ÚPV/EUIPO mark, monitoring.",
+    checklistLead: "What is live on the site and what remains with counsel / the registrar.",
   },
   it: {
     officialNote:
@@ -231,6 +295,19 @@ const PACK: Record<ChromePack, LegalChromeCopy> = {
         a: "Scrivi a info@medscopeglobal.com, chiama +420 736 532 952 o usa il modulo di contatto.",
       },
     ],
+    brandTitle: "Marchio e proprietà intellettuale",
+    brandDescription:
+      "MedScopeGlobal — dichiarazione di marchio, diritti d’autore e indipendenza da Medscape, WebMD e altri portali.",
+    brandLead: "Posizione giuridica del marchio MedScopeGlobal, del dominio medscopeglobal.com e separazione dai portali medici esteri.",
+    gdprTitle: "Protezione dei dati (GDPR)",
+    gdprDescription: "Trattamento dei dati, cookie, analitica, newsletter e IA su MedScopeGlobal.",
+    gdprLead: "Informazioni sul trattamento dei dati personali ai sensi del regolamento UE 2016/679.",
+    noticeTitle: "Avvertenze legali",
+    noticeDescription: "Avvertenze, licenze e regole per i contenuti IA di MedScopeGlobal.",
+    noticeLead: "Condizioni di licenza, disclaimer e regole per i contenuti generati da IA.",
+    checklistTitle: "Checklist legale",
+    checklistDescription: "Checklist di tutela del marchio MedScopeGlobal — imprint, marchio ÚPV/EUIPO, monitoraggio.",
+    checklistLead: "Cosa è già sul sito e cosa resta all’avvocato / al registrar.",
   },
   es: {
     officialNote:
@@ -273,6 +350,19 @@ const PACK: Record<ChromePack, LegalChromeCopy> = {
         a: "Escriba a info@medscopeglobal.com, llame al +420 736 532 952 o use el formulario de contacto.",
       },
     ],
+    brandTitle: "Marca y propiedad intelectual",
+    brandDescription:
+      "MedScopeGlobal — declaración de marca, derechos de autor e independencia de Medscape, WebMD y otros portales.",
+    brandLead: "Posición jurídica de la marca MedScopeGlobal, el dominio medscopeglobal.com y la separación de portales médicos extranjeros.",
+    gdprTitle: "Protección de datos (RGPD)",
+    gdprDescription: "Tratamiento de datos, cookies, analítica, boletín e IA en MedScopeGlobal.",
+    gdprLead: "Información sobre el tratamiento de datos personales según el reglamento UE 2016/679.",
+    noticeTitle: "Aviso legal",
+    noticeDescription: "Aviso legal, licencias y reglas para el contenido de IA de MedScopeGlobal.",
+    noticeLead: "Condiciones de licencia, descargo y reglas para el contenido generado por IA.",
+    checklistTitle: "Lista legal",
+    checklistDescription: "Lista de protección de marca MedScopeGlobal — imprint, marca ÚPV/EUIPO, seguimiento.",
+    checklistLead: "Lo que ya está en el sitio y lo que queda con el abogado / el registrador.",
   },
   "pt-BR": {
     officialNote:
@@ -315,6 +405,19 @@ const PACK: Record<ChromePack, LegalChromeCopy> = {
         a: "Escreva para info@medscopeglobal.com, ligue +420 736 532 952 ou use o formulário de contacto.",
       },
     ],
+    brandTitle: "Marca e propriedade intelectual",
+    brandDescription:
+      "MedScopeGlobal — declaração de marca, direitos de autor e independência face a Medscape, WebMD e outros portais.",
+    brandLead: "Posição jurídica da marca MedScopeGlobal, do domínio medscopeglobal.com e separação dos portais médicos estrangeiros.",
+    gdprTitle: "Proteção de dados (RGPD)",
+    gdprDescription: "Tratamento de dados, cookies, analítica, newsletter e IA no MedScopeGlobal.",
+    gdprLead: "Informação sobre o tratamento de dados pessoais ao abrigo do regulamento UE 2016/679.",
+    noticeTitle: "Aviso legal",
+    noticeDescription: "Aviso legal, licenças e regras para conteúdos de IA do MedScopeGlobal.",
+    noticeLead: "Condições de licença, disclaimer e regras para conteúdos gerados por IA.",
+    checklistTitle: "Lista jurídica",
+    checklistDescription: "Lista de proteção da marca MedScopeGlobal — imprint, marca ÚPV/EUIPO, monitorização.",
+    checklistLead: "O que já está no sítio e o que fica com o advogado / o registador.",
   },
 };
 

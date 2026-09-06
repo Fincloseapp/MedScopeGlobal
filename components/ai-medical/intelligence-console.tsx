@@ -10,7 +10,7 @@ import {
   type AiMedicalLanguage,
   type AiMedicalOutputType,
 } from "@/lib/ai-medical/types";
-import { V4D_SPECIALTIES, SPECIALTY_LABELS_CS } from "@/lib/v4d/constants";
+import { V4D_SPECIALTIES } from "@/lib/v4d/constants";
 import { getAiAssistantCopy } from "@/lib/i18n/ai-assistant-copy";
 import { getAiMedicalHubCopy } from "@/lib/i18n/ai-medical-hub-copy";
 import { isCzechSurface } from "@/lib/i18n/surface-copy";
@@ -153,7 +153,7 @@ export function IntelligenceConsole({
               >
                 {V4D_SPECIALTIES.map((s) => (
                   <option key={s} value={s}>
-                    {SPECIALTY_LABELS_CS[s]}
+                    {medical.specialties[s]}
                   </option>
                 ))}
               </select>

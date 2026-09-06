@@ -1,40 +1,49 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import {
+  getKarieraHubCopy,
+  JOB_FILTER_VALUES,
+} from "@/lib/i18n/kariera-hub-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
-const SPECIALIZATIONS = ["interní", "chirurgie", "pediatrie", "výzkum", "sestra"];
-const REGIONS = ["Praha", "Brno", "Ostrava", "ČR", "SK"];
-const TYPES = ["HPP", "DPP", "DPČ", "externí"];
-
-export function JobFilters() {
+export function JobFilters({ locale = "cs" }: { locale?: string }) {
   const router = useRouter();
   const params = useSearchParams();
+  const copy = getKarieraHubCopy(locale);
 
   function update(key: string, value: string) {
     const next = new URLSearchParams(params.toString());
     if (value) next.set(key, value);
     else next.delete(key);
-    router.push(`/kariera?${next.toString()}`);
+    const query = next.toString();
+    router.push(localizePublicHref(query ? `/kariera?${query}` : "/kariera", locale));
   }
 
   return (
     <div className="flex flex-wrap gap-3 rounded-2xl border border-[#cfe1f3] bg-white p-4">
       <FilterSelect
-        label="Specializace"
+        label={copy.filters.specialty}
+        allLabel={copy.filters.all}
         value={params.get("specialization") ?? ""}
-        options={SPECIALIZATIONS}
+        options={JOB_FILTER_VALUES.specialties}
+        optionLabels={copy.filters.specialties}
         onChange={(v) => update("specialization", v)}
       />
       <FilterSelect
-        label="Region"
+        label={copy.filters.region}
+        allLabel={copy.filters.all}
         value={params.get("region") ?? ""}
-        options={REGIONS}
+        options={JOB_FILTER_VALUES.regions}
+        optionLabels={copy.filters.regions}
         onChange={(v) => update("region", v)}
       />
       <FilterSelect
-        label="Úvazek"
+        label={copy.filters.contract}
+        allLabel={copy.filters.all}
         value={params.get("employment_type") ?? ""}
-        options={TYPES}
+        options={JOB_FILTER_VALUES.contracts}
+        optionLabels={copy.filters.contracts}
         onChange={(v) => update("employment_type", v)}
       />
     </div>
@@ -43,13 +52,17 @@ export function JobFilters() {
 
 function FilterSelect({
   label,
+  allLabel,
   value,
   options,
+  optionLabels,
   onChange,
 }: {
   label: string;
+  allLabel: string;
   value: string;
-  options: string[];
+  options: readonly string[];
+  optionLabels: Record<string, string>;
   onChange: (v: string) => void;
 }) {
   return (
@@ -60,10 +73,10 @@ function FilterSelect({
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
-        <option value="">Vše</option>
+        <option value="">{allLabel}</option>
         {options.map((o) => (
           <option key={o} value={o}>
-            {o}
+            {optionLabels[o] ?? o}
           </option>
         ))}
       </select>

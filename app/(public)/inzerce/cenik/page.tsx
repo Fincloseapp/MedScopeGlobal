@@ -54,7 +54,7 @@ export default async function InzerceCenikPage() {
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {PRICING_CATALOG.banners.map((b) => (
           <div key={b.placement} className="rounded-xl border border-[#cfe1f3] bg-white p-4 flex justify-between">
-            <span className="text-sm text-slate-700">{b.label}</span>
+            <span className="text-sm text-slate-700">{copy.catalog[b.placement] ?? b.label}</span>
             <span className="font-semibold text-[#005B96]">{formatCzkListPrice(b.price, locale)}</span>
           </div>
         ))}
@@ -64,7 +64,7 @@ export default async function InzerceCenikPage() {
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {PRICING_CATALOG.newsletter.map((n) => (
           <div key={n.position} className="rounded-xl border border-[#cfe1f3] bg-white p-4 flex justify-between">
-            <span className="text-sm">{n.label}</span>
+            <span className="text-sm">{copy.catalog[n.position] ?? n.label}</span>
             <span className="font-semibold text-[#005B96]">{formatCzkListPrice(n.price, locale)}</span>
           </div>
         ))}
@@ -74,7 +74,7 @@ export default async function InzerceCenikPage() {
       <div className="mt-4 space-y-3">
         {PRICING_CATALOG.packages.map((p) => (
           <div key={p.id} className="rounded-xl border border-[#cfe1f3] bg-white p-4">
-            <p className="font-semibold">{p.label}</p>
+            <p className="font-semibold">{copy.catalog[p.id] ?? p.label}</p>
             <p className="text-[#005B96]">
               {copy.from} {formatCzkListPrice(p.from, locale)}
             </p>

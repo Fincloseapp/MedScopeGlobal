@@ -78,11 +78,12 @@ export default async function OdbornaHubPage() {
               <ClkVerifyForm
                 initialStatus={access.clk?.status}
                 clkNumber={access.clk?.clkNumber}
+                locale={locale}
               />
             </div>
           </section>
 
-          <ProfessionalDisclaimer className="mt-8" />
+          <ProfessionalDisclaimer className="mt-8" locale={locale} />
 
           <p className="mt-6 text-xs text-muted-foreground">
             {copy.publicLabel}{" "}

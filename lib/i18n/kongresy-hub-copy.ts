@@ -22,6 +22,22 @@ export type KongresyHubCopy = {
   organizer: string;
   register: string;
   fallbackTitle: string;
+  form: {
+    url: string;
+    extract: string;
+    extracting: string;
+    title: string;
+    summary: string;
+    start: string;
+    place: string;
+    price: string;
+    registerUrl: string;
+    organizer: string;
+    submit: string;
+    sending: string;
+    success: string;
+    error: string;
+  };
 };
 
 const PACK: Record<ChromePack, KongresyHubCopy> = {
@@ -48,6 +64,22 @@ const PACK: Record<ChromePack, KongresyHubCopy> = {
     organizer: "Pořadatel",
     register: "Registrace",
     fallbackTitle: "Kongres",
+    form: {
+      url: "URL zdroje (univerzita, společnost, databáze)",
+      extract: "AI extrakce",
+      extracting: "AI…",
+      title: "Název",
+      summary: "Shrnutí (AI)",
+      start: "Datum začátku (ISO)",
+      place: "Místo",
+      price: "Cena",
+      registerUrl: "Registrace URL",
+      organizer: "Pořadatel",
+      submit: "Odeslat ke schválení",
+      sending: "Odesílám…",
+      success: "Akce přijata ke schválení.",
+      error: "Odeslání nebo extrakce selhaly.",
+    },
   },
   de: {
     metaTitle: "Kongresse und Fortbildung",
@@ -72,6 +104,22 @@ const PACK: Record<ChromePack, KongresyHubCopy> = {
     organizer: "Veranstalter",
     register: "Anmeldung",
     fallbackTitle: "Kongress",
+    form: {
+      url: "Quell-URL (Hochschule, Fachgesellschaft, Datenbank)",
+      extract: "KI-Extraktion",
+      extracting: "KI…",
+      title: "Titel",
+      summary: "Kurzfassung (KI)",
+      start: "Beginn (ISO)",
+      place: "Ort",
+      price: "Preis",
+      registerUrl: "Anmelde-URL",
+      organizer: "Veranstalter",
+      submit: "Zur Prüfung senden",
+      sending: "Senden…",
+      success: "Der Termin wurde zur Prüfung angenommen.",
+      error: "Senden oder Extraktion fehlgeschlagen.",
+    },
   },
   fr: {
     metaTitle: "Congrès et formations",
@@ -96,6 +144,22 @@ const PACK: Record<ChromePack, KongresyHubCopy> = {
     organizer: "Organisateur",
     register: "Inscription",
     fallbackTitle: "Congrès",
+    form: {
+      url: "URL source (université, société, base)",
+      extract: "Extraction IA",
+      extracting: "IA…",
+      title: "Titre",
+      summary: "Résumé (IA)",
+      start: "Début (ISO)",
+      place: "Lieu",
+      price: "Prix",
+      registerUrl: "URL d’inscription",
+      organizer: "Organisateur",
+      submit: "Envoyer pour validation",
+      sending: "Envoi…",
+      success: "L’événement a été reçu pour validation.",
+      error: "L’envoi ou l’extraction a échoué.",
+    },
   },
   en: {
     metaTitle: "Congresses and training",
@@ -120,6 +184,22 @@ const PACK: Record<ChromePack, KongresyHubCopy> = {
     organizer: "Organizer",
     register: "Register",
     fallbackTitle: "Congress",
+    form: {
+      url: "Source URL (university, society, database)",
+      extract: "AI extract",
+      extracting: "AI…",
+      title: "Title",
+      summary: "Summary (AI)",
+      start: "Start date (ISO)",
+      place: "Place",
+      price: "Price",
+      registerUrl: "Registration URL",
+      organizer: "Organizer",
+      submit: "Submit for review",
+      sending: "Sending…",
+      success: "The event was received for review.",
+      error: "Sending or extraction failed.",
+    },
   },
   it: {
     metaTitle: "Congressi e formazione",
@@ -143,6 +223,22 @@ const PACK: Record<ChromePack, KongresyHubCopy> = {
     organizer: "Organizzatore",
     register: "Iscrizione",
     fallbackTitle: "Congresso",
+    form: {
+      url: "URL fonte (università, società, banca dati)",
+      extract: "Estrazione IA",
+      extracting: "IA…",
+      title: "Titolo",
+      summary: "Sintesi (IA)",
+      start: "Inizio (ISO)",
+      place: "Luogo",
+      price: "Prezzo",
+      registerUrl: "URL di iscrizione",
+      organizer: "Organizzatore",
+      submit: "Invia per approvazione",
+      sending: "Invio…",
+      success: "L’evento è stato ricevuto per approvazione.",
+      error: "Invio o estrazione non riusciti.",
+    },
   },
   es: {
     metaTitle: "Congresos y formación",
@@ -166,6 +262,22 @@ const PACK: Record<ChromePack, KongresyHubCopy> = {
     organizer: "Organizador",
     register: "Inscripción",
     fallbackTitle: "Congreso",
+    form: {
+      url: "URL de origen (universidad, sociedad, base)",
+      extract: "Extracción IA",
+      extracting: "IA…",
+      title: "Título",
+      summary: "Resumen (IA)",
+      start: "Inicio (ISO)",
+      place: "Lugar",
+      price: "Precio",
+      registerUrl: "URL de inscripción",
+      organizer: "Organizador",
+      submit: "Enviar para revisión",
+      sending: "Enviando…",
+      success: "El evento se recibió para revisión.",
+      error: "El envío o la extracción falló.",
+    },
   },
   "pt-BR": {
     metaTitle: "Congressos e formação",
@@ -189,6 +301,22 @@ const PACK: Record<ChromePack, KongresyHubCopy> = {
     organizer: "Organizador",
     register: "Inscrição",
     fallbackTitle: "Congresso",
+    form: {
+      url: "URL de origem (universidade, sociedade, base)",
+      extract: "Extração IA",
+      extracting: "IA…",
+      title: "Título",
+      summary: "Resumo (IA)",
+      start: "Início (ISO)",
+      place: "Local",
+      price: "Preço",
+      registerUrl: "URL de inscrição",
+      organizer: "Organizador",
+      submit: "Enviar para revisão",
+      sending: "A enviar…",
+      success: "O evento foi recebido para revisão.",
+      error: "O envio ou a extração falhou.",
+    },
   },
 };
 

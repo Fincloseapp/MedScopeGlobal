@@ -57,7 +57,7 @@ export default async function PartnerstviPage() {
         <div>
           <h2 className="font-display text-xl font-semibold text-[#021d33]">{copy.partnerFormTitle}</h2>
           <div className="mt-4">
-            <B2bPartnerForm inquiryType="partnerstvi" />
+            <B2bPartnerForm inquiryType="partnerstvi" locale={locale} />
           </div>
         </div>
       </div>

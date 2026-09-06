@@ -62,7 +62,7 @@ export default async function OrganizacePage() {
             </Link>
           </p>
         </div>
-        <B2bPartnerForm inquiryType="organizace" />
+        <B2bPartnerForm inquiryType="organizace" locale={locale} />
       </div>
     </ModulePageShell>
   );

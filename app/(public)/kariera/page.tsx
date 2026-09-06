@@ -47,7 +47,7 @@ export default async function KarieraPage({ searchParams }: Props) {
       ctaLabel={copy.addCta}
     >
       <Suspense fallback={<div className="h-14 rounded-2xl bg-slate-100 animate-pulse" />}>
-        <JobFilters />
+        <JobFilters locale={locale} />
       </Suspense>
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         {jobs.length === 0 ? (

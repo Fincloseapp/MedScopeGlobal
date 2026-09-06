@@ -1,5 +1,6 @@
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
 import type { AiMedicalAssistant } from "@/lib/ai-medical/types";
+import type { V4dSpecialty } from "@/lib/v4d/constants";
 
 export type AiMedicalDesk = {
   title: string;
@@ -14,6 +15,7 @@ export type AiMedicalHubCopy = {
   lead: string;
   assistants: Record<AiMedicalAssistant, string>;
   desks: Record<AiMedicalAssistant, AiMedicalDesk>;
+  specialties: Record<V4dSpecialty, string>;
   errorAi: string;
   errorGeneric: string;
 };
@@ -65,6 +67,16 @@ const PACK: Record<ChromePack, AiMedicalHubCopy> = {
         lead: "Novinky z lékařských fakult a výzkumných center.",
       },
     },
+    specialties: {
+      rheumatology: "Revmatologie",
+      immunology: "Imunologie",
+      internal: "Interní medicína",
+      pharmacology: "Farmakologie",
+      orthopedics: "Ortopedie",
+      neurology: "Neurologie",
+      dermatology: "Dermatologie",
+      endocrinology: "Endokrinologie",
+    },
     errorAi: "Chyba AI",
     errorGeneric: "Chyba",
   },
@@ -113,6 +125,16 @@ const PACK: Record<ChromePack, AiMedicalHubCopy> = {
         title: "KI-Assistent für Hochschulforschung",
         lead: "Nachrichten von medizinischen Fakultäten und Forschungszentren.",
       },
+    },
+    specialties: {
+      rheumatology: "Rheumatologie",
+      immunology: "Immunologie",
+      internal: "Innere Medizin",
+      pharmacology: "Pharmakologie",
+      orthopedics: "Orthopädie",
+      neurology: "Neurologie",
+      dermatology: "Dermatologie",
+      endocrinology: "Endokrinologie",
     },
     errorAi: "KI-Fehler",
     errorGeneric: "Fehler",
@@ -163,6 +185,16 @@ const PACK: Record<ChromePack, AiMedicalHubCopy> = {
         lead: "Actualités des facultés de médecine et des centres de recherche.",
       },
     },
+    specialties: {
+      rheumatology: "Rhumatologie",
+      immunology: "Immunologie",
+      internal: "Médecine interne",
+      pharmacology: "Pharmacologie",
+      orthopedics: "Orthopédie",
+      neurology: "Neurologie",
+      dermatology: "Dermatologie",
+      endocrinology: "Endocrinologie",
+    },
     errorAi: "Erreur IA",
     errorGeneric: "Erreur",
   },
@@ -211,6 +243,16 @@ const PACK: Record<ChromePack, AiMedicalHubCopy> = {
         title: "AI assistant for university research",
         lead: "News from medical faculties and research centres.",
       },
+    },
+    specialties: {
+      rheumatology: "Rheumatology",
+      immunology: "Immunology",
+      internal: "Internal medicine",
+      pharmacology: "Pharmacology",
+      orthopedics: "Orthopaedics",
+      neurology: "Neurology",
+      dermatology: "Dermatology",
+      endocrinology: "Endocrinology",
     },
     errorAi: "AI error",
     errorGeneric: "Error",
@@ -261,6 +303,16 @@ const PACK: Record<ChromePack, AiMedicalHubCopy> = {
         lead: "Novità dalle facoltà di medicina e dai centri di ricerca.",
       },
     },
+    specialties: {
+      rheumatology: "Reumatologia",
+      immunology: "Immunologia",
+      internal: "Medicina interna",
+      pharmacology: "Farmacologia",
+      orthopedics: "Ortopedia",
+      neurology: "Neurologia",
+      dermatology: "Dermatologia",
+      endocrinology: "Endocrinologia",
+    },
     errorAi: "Errore IA",
     errorGeneric: "Errore",
   },
@@ -310,6 +362,16 @@ const PACK: Record<ChromePack, AiMedicalHubCopy> = {
         lead: "Novedades de facultades de medicina y centros de investigación.",
       },
     },
+    specialties: {
+      rheumatology: "Reumatología",
+      immunology: "Inmunología",
+      internal: "Medicina interna",
+      pharmacology: "Farmacología",
+      orthopedics: "Ortopedia",
+      neurology: "Neurología",
+      dermatology: "Dermatología",
+      endocrinology: "Endocrinología",
+    },
     errorAi: "Error de IA",
     errorGeneric: "Error",
   },
@@ -358,6 +420,16 @@ const PACK: Record<ChromePack, AiMedicalHubCopy> = {
         title: "Assistente IA para investigação universitária",
         lead: "Novidades de faculdades de medicina e centros de investigação.",
       },
+    },
+    specialties: {
+      rheumatology: "Reumatologia",
+      immunology: "Imunologia",
+      internal: "Medicina interna",
+      pharmacology: "Farmacologia",
+      orthopedics: "Ortopedia",
+      neurology: "Neurologia",
+      dermatology: "Dermatologia",
+      endocrinology: "Endocrinologia",
     },
     errorAi: "Erro de IA",
     errorGeneric: "Erro",
