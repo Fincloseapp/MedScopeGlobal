@@ -81,34 +81,60 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     );
   }
 
-  const fetchPrefix = async (
-    prefix: string,
-    limit: number,
-    localeFilter?: "cs"
+  const fetchRows = async (
+    label: string,
+    build: (
+      client: NonNullable<ReturnType<typeof tryCreateServiceRoleClient>>
+    ) => PromiseLike<{ data: unknown; error: { message?: string } | null }>
   ) => {
-    let query = supabase
-      .from("articles")
-      .select(homepageCardSelect)
-      .eq("published", true)
-      .like("slug", `${prefix}%`)
-      .order("published_at", { ascending: false, nullsFirst: false })
-      .limit(limit);
-    if (localeFilter === "cs") {
-      query = query.or("locale.eq.cs,locale.is.null");
-    }
-    const { data, error } = await query;
+    const { data, error } = await build(supabase);
     if (error) {
-      console.error("loadArticlesPublic", prefix, error);
+      console.error("loadArticlesPublic", label, error);
       return [];
     }
     return ((data ?? []) as unknown as Record<string, unknown>[]);
   };
 
   const csHome = primaryArticleLocale(normalizeLocale(locale)) === "cs";
-  const [magazine, news] = await Promise.all([
-    fetchPrefix("verejnost-", 32, csHome ? "cs" : undefined),
-    fetchPrefix("zpravy-", 24),
+  const newsSelect = homepageCardSelect.replace("content, ", "");
+  const [magazine, newsBySlug, newsBySection] = await Promise.all([
+    fetchRows("verejnost-", (client) => {
+      let query = client
+        .from("articles")
+        .select(homepageCardSelect)
+        .eq("published", true)
+        .like("slug", "verejnost-%")
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .limit(32);
+      if (csHome) query = query.or("locale.eq.cs,locale.is.null");
+      return query;
+    }),
+    fetchRows("zpravy-", (client) =>
+      client
+        .from("articles")
+        .select(newsSelect)
+        .eq("published", true)
+        .like("slug", "zpravy-%")
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .limit(24)
+    ),
+    fetchRows("section-aktuality", (client) =>
+      client
+        .from("articles")
+        .select(newsSelect)
+        .eq("published", true)
+        .eq("metadata->>section", "aktuální-zprávy")
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .limit(24)
+    ),
   ]);
+  const seenNews = new Set<string>();
+  const news = [...newsBySection, ...newsBySlug].filter((row) => {
+    const key = String(row.slug ?? row.id ?? "");
+    if (!key || seenNews.has(key)) return false;
+    seenNews.add(key);
+    return true;
+  });
   if (magazine.length === 0 && news.length === 0) {
     return pinHomepageDesks(
       mergeNativeDeskFeed(getDemoMagazineArticles(), locale),
@@ -203,7 +229,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-53-zpravy-wire", locale, day],
+    ["v22-homepage-public-v23-54-zpravy-section", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }
