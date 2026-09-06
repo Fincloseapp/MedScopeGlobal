@@ -9,7 +9,7 @@ import {
   prependUniqueArticles,
 } from "@/lib/v271/news-desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
-import { listAktualitySection, type DisplayArticle } from "@/lib/queries/articles";
+import { listWireZpravyCards, type DisplayArticle } from "@/lib/queries/articles";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
@@ -105,7 +105,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
 
   const [magazine, aktuality] = await Promise.all([
     fetchMagazine(),
-    listAktualitySection(8, localeKey),
+    listWireZpravyCards(8, localeKey),
   ]);
   const wire = aktuality.filter((article) => {
     const slug = String(article.slug ?? "");
@@ -207,7 +207,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-55-aktuality-wire", locale, day],
+    ["v22-homepage-public-v23-56-zpravy-pin", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

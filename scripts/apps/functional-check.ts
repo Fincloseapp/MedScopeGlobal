@@ -393,7 +393,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-55-aktuality-wire"), "homepage cache key must bust when Aktuality uses the news page pool");
+  assert.ok(home.includes("v23-56-zpravy-pin"), "homepage cache key must bust when Aktuality pins zpravy slugs");
   assert.ok(home.includes("toISOString().slice(0, 10)"), "homepage data cache must roll with the UTC day");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
   assert.ok(home.includes("courtesyBorrow: 2"), "non-CS homepage must not dump a Czech borrow pile");
@@ -892,8 +892,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.56"),
-  "page cache tag must bust after Aktuality uses the news page pool"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.57"),
+  "page cache tag must bust after zpravy pin on Aktuality"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/kongresy/page.tsx"), "utf8").includes(
@@ -1177,15 +1177,15 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-55-aktuality-wire"
+    "v22-homepage-public-v23-56-zpravy-pin"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-      "listAktualitySection"
+      "listWireZpravyCards"
     ) &&
     !readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "getArticlesByMetadataSection"
     ),
-  "homepage cache must reuse the Aktuality section pool, not the heavy helper name"
+  "homepage cache must pin zpravy cards, not the heavy helper name"
 );
 assert.ok(
   readFileSync(join(root, "components/v271/academy-home-sections.tsx"), "utf8").includes(
@@ -3203,6 +3203,22 @@ console.log("✓ magazine desk byline and copy checks passed");
       "cs"
     ),
     true
+  );
+  assert.equal(
+    splitNewsDesks([
+      {
+        id: "wire-bma",
+        title: "Nová výkonná ředitelka BMA Clare Bannon je zvolena",
+        slug: "zpravy-new-bma-gp-committee-chair-clare-bannon-is-elected",
+        excerpt: "Volba předsedkyně výboru BMA.",
+        content: "<p>Krátká zpráva.</p>",
+        published: true,
+        published_at: "2026-09-01T08:00:00.000Z",
+        vip_only: false,
+        locale: "en",
+      } as never,
+    ]).novinky[0]?.id,
+    "wire-bma"
   );
   assert.equal(filled.novinky[0]?.id, "who-now");
   assert.equal(filled.verejnost.some((article) => article.id === "old-alergie"), true);

@@ -226,10 +226,16 @@ export function splitNewsDesks(
     clanky: [],
   };
   const used = new Set<string>();
-  const listable = articles.filter((article) => isHomepageDeskArticle(article, new Date(), locale));
+  const wire = articles.filter((article) => String(article.slug ?? "").toLowerCase().startsWith("zpravy-"));
+  const listable = articles.filter(
+    (article) =>
+      !String(article.slug ?? "").toLowerCase().startsWith("zpravy-") &&
+      isHomepageDeskArticle(article, new Date(), locale)
+  );
   const isNewsPriority = (article: DisplayArticle) => isNovinkyArticle(article);
 
-  desks.novinky.push(...takeUnused(listable, used, cap.novinky, isNewsPriority));
+  desks.novinky.push(...takeUnused(wire, used, cap.novinky));
+  desks.novinky.push(...takeUnused(listable, used, cap.novinky - desks.novinky.length, isNewsPriority));
 
   for (const article of listable) {
     const desk = classifyNewsDesk(article);

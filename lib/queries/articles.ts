@@ -496,6 +496,39 @@ export async function getRelatedArticles(
   return prepared.slice(0, limit);
 }
 
+/** Card rows for homepage Aktuality — slug prefix only, no invented titles. */
+export async function listWireZpravyCards(
+  limit = 8,
+  locale: LocaleCode = "cs"
+): Promise<DisplayArticle[]> {
+  const supabase = await createDataClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from("articles")
+    .select(
+      "id, title, slug, excerpt, published, published_at, created_at, locale, vip_only, metadata, rubric_slug, cover_image_url"
+    )
+    .eq("published", true)
+    .like("slug", "zpravy-%")
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("listWireZpravyCards", error);
+    return [];
+  }
+
+  const rows = filterActiveArticles(
+    mapArticleList(data as Record<string, unknown>[] | null)
+  ).filter((article) => !article.vip_only && String(article.slug ?? "").startsWith("zpravy-"));
+  const prepared = await prepareArticlesForDisplay(rows, locale, {
+    mode: "card",
+    maxTranslate: Math.min(limit, 4),
+    maxLive: 0,
+  });
+  return prepared.slice(0, limit);
+}
+
 /** Same pool as `/aktualni-zpravy` — no invented titles. */
 export async function listAktualitySection(
   limit = 24,
@@ -531,10 +564,14 @@ export async function listAktualitySection(
     if (key && !merged.has(key)) merged.set(key, row);
   }
 
-  const filtered = filterForMetadataRubricListing(
-    mapArticleList([...merged.values()]),
+  const mapped = mapArticleList([...merged.values()]);
+  const active = filterActiveArticles(mapped);
+  const zpravy = active.filter((article) => String(article.slug ?? "").startsWith("zpravy-"));
+  const rest = filterForMetadataRubricListing(
+    active.filter((article) => !String(article.slug ?? "").startsWith("zpravy-")),
     locale
   );
+  const filtered = [...zpravy, ...rest];
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
     maxTranslate: Math.min(limit, 8),
