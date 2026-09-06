@@ -519,7 +519,8 @@ export async function listWireZpravyCards(
 ): Promise<DisplayArticle[]> {
   const supabase = await createDataClient();
   if (!supabase) return [];
-  const freshFrom = new Date(Date.now() - 45 * 86_400_000).toISOString();
+  const { AKTUALITY_FRESH_DAYS } = await import("@/lib/v271/news-desks");
+  const freshFrom = new Date(Date.now() - AKTUALITY_FRESH_DAYS * 86_400_000).toISOString();
   const scan = Math.max(limit * 6, 80);
 
   const fetchPair = async (since?: string) => {
@@ -592,7 +593,8 @@ export async function listAktualitySection(
   const supabase = await createDataClient();
   if (!supabase) return [];
   const scan = Math.max(limit * 4, 80);
-  const freshFrom = new Date(Date.now() - 45 * 86_400_000).toISOString();
+  const { AKTUALITY_FRESH_DAYS } = await import("@/lib/v271/news-desks");
+  const freshFrom = new Date(Date.now() - AKTUALITY_FRESH_DAYS * 86_400_000).toISOString();
   const [section, bySlug] = await Promise.all([
     supabase
       .from("articles")

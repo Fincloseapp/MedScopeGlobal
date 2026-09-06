@@ -377,8 +377,8 @@ export function pinHomepageDesks(
 const GENERIC_NEWS_TITLE_RE =
   /^(zdravotní zpráva|epidemiologická zpráva|odborný přehled|klinická studie|komentář)\b/i;
 
-/** Prefer last 45 days so June leftovers cannot sit on the homepage for months. */
-export const AKTUALITY_FRESH_DAYS = 45;
+/** Prefer last 70 days so July desk wire stays, but June leftovers drop. */
+export const AKTUALITY_FRESH_DAYS = 70;
 
 export function isProfessionalAktualityTitle(title?: string | null): boolean {
   const clean = String(title ?? "").replace(/<[^>]+>/g, " ").trim();

@@ -394,7 +394,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-62-wire-vip"), "homepage cache key must bust when Aktuality keeps desk wire");
+  assert.ok(home.includes("v23-63-70d"), "homepage cache key must bust when Aktuality uses a 70-day window");
   assert.ok(home.includes("toISOString().slice(0, 10)"), "homepage data cache must roll with the UTC day");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
   assert.ok(home.includes("courtesyBorrow: 2"), "non-CS homepage must not dump a Czech borrow pile");
@@ -893,8 +893,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.63"),
-  "page cache tag must bust after Aktuality keeps desk wire"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.64"),
+  "page cache tag must bust after 70-day Aktuality window"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/kongresy/page.tsx"), "utf8").includes(
@@ -1178,7 +1178,7 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-62-wire-vip"
+    "v22-homepage-public-v23-63-70d"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "listWireZpravyCards"
@@ -1190,7 +1190,7 @@ assert.ok(
       "getArticlesByMetadataSection"
     ) &&
     readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes(
-      "45 * 86_400_000"
+      "AKTUALITY_FRESH_DAYS"
     ) &&
     readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes("rankAktualityByDate"),
   "homepage cache must pin dated zpravy cards, not the heavy helper name"
@@ -3564,12 +3564,22 @@ console.log("✓ magazine desk byline and copy checks passed");
         slug: "zpravy-dvoj-antikoagulan-lba",
         published_at: "2026-08-30T09:50:27.000Z",
       },
+      {
+        id: "bma-july",
+        title: "Nová výkonná ředitelka BMA Clare Bannon je zvolena",
+        slug: "zpravy-new-bma-gp-committee-chair-clare-bannon-is-elected",
+        published_at: "2026-07-04T05:19:29.000Z",
+      },
     ],
     4,
     new Date("2026-09-06T12:00:00.000Z")
   );
   assert.equal(dated[0]?.id, "anticoag");
   assert.equal(dated[1]?.id, "bma-now");
+  assert.ok(
+    dated.some((item) => item.id === "bma-july"),
+    "70-day window must keep July desk wire"
+  );
   assert.equal(
     dated.some((item) => item.id === "demo-sleep"),
     false,
