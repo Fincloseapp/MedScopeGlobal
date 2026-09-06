@@ -538,7 +538,7 @@ async function fetchEnoughWireRows(
     .limit(80);
   const sectionResult = await section;
   if (sectionResult.error) console.error("listWireZpravyCards", "section", sectionResult.error);
-  rows = mergeArticleRows(sectionResult.data as Record<string, unknown>[] | null);
+  rows = mergeArticleRows(sectionResult.data as unknown as Record<string, unknown>[] | null);
 
   for (let page = 0; page < pages; page += 1) {
     const from = page * WIRE_SCAN_PAGE;
@@ -555,7 +555,7 @@ async function fetchEnoughWireRows(
       console.error("listWireZpravyCards", "zpravy", page, error);
       break;
     }
-    const batch = (data ?? []) as Record<string, unknown>[];
+    const batch = (data ?? []) as unknown as Record<string, unknown>[];
     if (batch.length === 0) break;
     rows = mergeArticleRows(rows, batch);
     const ranked = rankAktualityByDate(
