@@ -394,7 +394,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-71-serial"), "homepage cache key must bust when Aktuality loads before reader context");
+  assert.ok(home.includes("v23-72-open"), "homepage cache key must bust when Aktuality skips a sticky data cache");
   assert.ok(
     readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes('dynamic = "force-dynamic"'),
     "homepage must render Aktuality live, not from a 10-minute HTML cache"
@@ -897,8 +897,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.71"),
-  "page cache tag must bust after serial homepage Aktuality load"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.72"),
+  "page cache tag must bust after open homepage Aktuality load"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/kongresy/page.tsx"), "utf8").includes(
@@ -1182,7 +1182,7 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-71-serial"
+    "v22-homepage-public-v23-72-open"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "listAktualitySection"

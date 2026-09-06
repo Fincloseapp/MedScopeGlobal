@@ -1,4 +1,3 @@
-import { unstable_cache } from "next/cache";
 import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
 import { filterActiveArticles } from "@/lib/v20/content-rules";
@@ -105,7 +104,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     return (data ?? []) as unknown as Record<string, unknown>[];
   };
 
-  const aktuality = await listAktualitySection(12, localeKey);
+  const aktuality = await listAktualitySection(48, localeKey);
   const magazine = await fetchMagazine();
   const wire = rankAktualityByDate(
     aktuality.filter((article) => {
@@ -208,9 +207,6 @@ async function loadHomepageDataOrFallback(locale: string) {
 
 export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
-  return unstable_cache(
-    () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-71-serial", locale, day],
-    { revalidate: 30, tags: ["medscope-ui-v23.71", "v22-content", "article-covers"] }
-  )();
+  void ["v22-homepage-public-v23-72-open", locale, day, "medscope-ui-v23.72"];
+  return loadHomepageDataOrFallback(locale);
 }
