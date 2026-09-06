@@ -14,11 +14,29 @@ import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
 import { mergeNativeDeskFeed } from "@/lib/editorial/native-desk-articles";
 import type { AdRow } from "@/types/database";
 
-const articleSelect = `
-  *,
-  categories ( id, name, slug ),
-  users!author_id ( id, full_name, avatar_url )
-`;
+/** Card columns only — `*` plus joins is what pushed the homepage into the demo fallback. */
+const homepageCardSelect = [
+  "id",
+  "title",
+  "slug",
+  "excerpt",
+  "content",
+  "cover_image_url",
+  "published",
+  "published_at",
+  "created_at",
+  "updated_at",
+  "locale",
+  "vip_only",
+  "audience",
+  "public_topic",
+  "rubric_slug",
+  "metadata",
+  "category_id",
+  "author_id",
+  "min_access_level",
+  "source_name",
+].join(", ");
 
 function isWithinSchedule(row: AdRow): boolean {
   const today = new Date().toISOString().slice(0, 10);
@@ -63,16 +81,26 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     );
   }
 
-  const { data, error } = await supabase
-    .from("articles")
-    .select(articleSelect)
-    .eq("published", true)
-    .like("slug", "verejnost-%")
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(160);
+  const fetchPrefix = async (prefix: string, limit: number) => {
+    const { data, error } = await supabase
+      .from("articles")
+      .select(homepageCardSelect)
+      .eq("published", true)
+      .like("slug", `${prefix}%`)
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(limit);
+    if (error) {
+      console.error("loadArticlesPublic", prefix, error);
+      return [];
+    }
+    return (data ?? []) as Record<string, unknown>[];
+  };
 
-  if (error) {
-    console.error("loadArticlesPublic", error);
+  const [magazine, news] = await Promise.all([
+    fetchPrefix("verejnost-", 32),
+    fetchPrefix("zpravy-", 12),
+  ]);
+  if (magazine.length === 0 && news.length === 0) {
     return pinHomepageDesks(
       mergeNativeDeskFeed(getDemoMagazineArticles(), locale),
       48,
@@ -80,7 +108,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     );
   }
 
-  const mapped = mapArticleList(data as Record<string, unknown>[] | null);
+  const mapped = mapArticleList([...news, ...magazine]);
   const localeKey = normalizeLocale(locale);
   const active = filterArticlesForLocale(
     filterActiveArticles(mapped),
@@ -93,10 +121,14 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     (article) => !article.vip_only && isHomepageDeskArticle(article, new Date(), localeKey)
   );
   const withDesk = mergeNativeDeskFeed(publicOnly, localeKey);
-  const feed = primaryArticleLocale(localeKey) === "cs" ? withDesk : withDesk.slice(0, 48);
-  const prepared = await prepareArticlesForDisplay(feed, localeKey, {
+  const pinned = pinHomepageDesks(
+    primaryArticleLocale(localeKey) === "cs" ? withDesk : withDesk.slice(0, 48),
+    48,
+    localeKey
+  );
+  const prepared = await prepareArticlesForDisplay(pinned, localeKey, {
     mode: "card",
-    maxTranslate: 12,
+    maxTranslate: primaryArticleLocale(localeKey) === "cs" ? 0 : 4,
     maxLive: 0,
   });
   if (prepared.length === 0) {
@@ -106,7 +138,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
       localeKey
     );
   }
-  return pinHomepageDesks(prepared, 48, localeKey);
+  return prepared;
 }
 
 async function loadHomepageData(locale: string): Promise<{
@@ -146,7 +178,7 @@ async function loadHomepageDataOrFallback(locale: string) {
     return await Promise.race([
       loadHomepageData(locale),
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("homepage-timeout")), 3_000);
+        timer = setTimeout(() => reject(new Error("homepage-timeout")), 4_000);
       }),
     ]);
   } catch (error) {
@@ -161,7 +193,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-49-magazine-slugs", locale, day],
+    ["v22-homepage-public-v23-51-news-zpravy", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }
