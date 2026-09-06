@@ -72,11 +72,9 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
   const longevity = topic === "dlouhovekost";
   const lifestyleHub = isLifestyleHubSlug(topic);
   const page = Math.max(1, Number.parseInt(pageRaw ?? "1", 10) || 1);
-  const backendTopic = longevity
-    ? null
-    : lifestyleHub
-      ? "zivotni-styl"
-      : resolveBackendTopic(topic);
+  const backendTopic = longevity || lifestyleHub || !topic
+    ? "zivotni-styl"
+    : resolveBackendTopic(topic);
   const fetched = await listPublicArticles({
     limit: 48,
     topic: backendTopic,

@@ -31,7 +31,7 @@ const START_HREFS = ["/verejnost/temata", "/verejnost/clanky", "/ai-asistent/ver
 export default async function VerejnostHubPage() {
   const locale = await getServerLocale();
   const copy = getMarketingCopy(locale).publicHub;
-  const latest = await listPublicArticles({ limit: 18, locale });
+  const latest = await listPublicArticles({ limit: 18, locale, topic: "zivotni-styl" });
   const topics = VEREJNOST_HUB_TOPICS;
   const lastUpdate = latest[0]?.published_at ?? latest[0]?.created_at ?? null;
   const lastUpdateLabel = formatPublicDateTime(lastUpdate, locale);
