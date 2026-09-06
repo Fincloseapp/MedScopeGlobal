@@ -394,7 +394,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-69-live"), "homepage cache key must bust when Aktuality HTML is not ISR-stale");
+  assert.ok(home.includes("v23-70-desk"), "homepage cache key must bust when Aktuality uses the live desk listing");
   assert.ok(
     readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes('dynamic = "force-dynamic"'),
     "homepage must render Aktuality live, not from a 10-minute HTML cache"
@@ -897,8 +897,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.69"),
-  "page cache tag must bust after live homepage Aktuality"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.70"),
+  "page cache tag must bust after homepage uses the dated desk listing"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/kongresy/page.tsx"), "utf8").includes(
@@ -1182,10 +1182,10 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-69-live"
+    "v22-homepage-public-v23-70-desk"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-      "listWireZpravyCards"
+      "listAktualitySection"
     ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "rankAktualityByDate"
