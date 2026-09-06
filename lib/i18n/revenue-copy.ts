@@ -67,7 +67,7 @@ const COPY: Record<Pack, RevenueCopy> = {
     subscribeKicker: "Volitelné předplatné",
     subscribeTitle: "Číst dál bez reklam",
     subscribeBody:
-      "14 dní zdarma, potom tarif Veřejnost. Tipy v článcích zůstávají dobrovolné — toto není VIP členství.",
+      "14 dní zdarma, potom redakce za 25 Kč (v zahraničí 1 € nebo 1 $). Tipy v článcích zůstávají dobrovolné — toto není VIP členství.",
     subscribeCta: "Vyzkoušet 14 dní",
     subscribeHint: "Zrušíte kdykoli před koncem zkušební doby.",
     newsletterKicker: "ViaLongeVita",
@@ -117,7 +117,7 @@ const COPY: Record<Pack, RevenueCopy> = {
     subscribeKicker: "Optionales Abo",
     subscribeTitle: "Weiterlesen ohne Werbung",
     subscribeBody:
-      "14 Tage kostenlos, danach der Tarif für Leser. Trinkgelder in Artikeln bleiben freiwillig — kein VIP-Zwang.",
+      "14 Tage kostenlos, danach die Redaktion für 25 Kč (1 € / 1 $). Trinkgelder in Artikeln bleiben freiwillig — kein VIP-Zwang.",
     subscribeCta: "14 Tage testen",
     subscribeHint: "Jederzeit vor Ende der Testphase kündbar.",
     newsletterKicker: "ViaLongeVita",
@@ -167,7 +167,7 @@ const COPY: Record<Pack, RevenueCopy> = {
     subscribeKicker: "Abonnement facultatif",
     subscribeTitle: "Lire sans publicité",
     subscribeBody:
-      "14 jours offerts, puis le tarif grand public. Les pourboires restent volontaires — ce n’est pas un club VIP.",
+      "14 jours offerts, puis la rédaction à 25 Kč (1 € / 1 $). Les pourboires restent volontaires — ce n’est pas un club VIP.",
     subscribeCta: "Essayer 14 jours",
     subscribeHint: "Résiliable avant la fin de l’essai.",
     newsletterKicker: "ViaLongeVita",
@@ -217,7 +217,7 @@ const COPY: Record<Pack, RevenueCopy> = {
     subscribeKicker: "Optional subscription",
     subscribeTitle: "Keep reading without ads",
     subscribeBody:
-      "14 days free, then the public plan. Article tips stay voluntary — this is not a VIP club.",
+      "14 days free, then the editorial plan (25 CZK / €1 / $1). Article tips stay voluntary — this is not a VIP club.",
     subscribeCta: "Try 14 days",
     subscribeHint: "Cancel any time before the trial ends.",
     newsletterKicker: "ViaLongeVita",

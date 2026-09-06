@@ -5,7 +5,8 @@ import { createStripeClient, getStripeSecretKey } from "@/lib/stripe/client";
 import { resolveV27CheckoutItem, type V27CheckoutKind } from "@/lib/v27/stripe-products";
 import { convertCzkToCharge } from "@/lib/i18n/payment-currency";
 import { VIP_TRIAL_DAYS } from "@/lib/vip";
-import { isStudentGrantProduct } from "@/lib/v27/config";
+import { isEditorialGrantProduct, isStudentGrantProduct } from "@/lib/v27/config";
+import { editorialAnnualCharge, editorialMonthlyCharge } from "@/lib/editorial/pricing";
 import { studentIntroCharge, studentMonthlyCharge } from "@/lib/studenti/pricing";
 
 export type V27CheckoutBody = {
@@ -66,9 +67,17 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
 
   const stripe = createStripeClient(secret);
   const studentMonth = kind === "subscription" && isStudentGrantProduct(productId) && item.billingInterval !== "year";
+  const editorialMonth =
+    kind === "subscription" && isEditorialGrantProduct(productId) && item.billingInterval !== "year";
+  const editorialYear =
+    kind === "subscription" && isEditorialGrantProduct(productId) && item.billingInterval === "year";
   const charge = studentMonth
     ? studentMonthlyCharge(locale, region)
-    : convertCzkToCharge(item.priceCzk, locale, region);
+    : editorialMonth
+      ? editorialMonthlyCharge(locale, region)
+      : editorialYear
+        ? editorialAnnualCharge(locale, region)
+        : convertCzkToCharge(item.priceCzk, locale, region);
   const intro = studentMonth ? studentIntroCharge(locale, region) : null;
   const recurringInterval = item.billingInterval === "year" ? "year" : "month";
   const student = isStudentGrantProduct(productId);

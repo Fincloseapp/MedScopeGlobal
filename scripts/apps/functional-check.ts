@@ -169,8 +169,14 @@ import {
   STUDENT_CLUB_FREE_RUNS,
 } from "../../lib/studenti/club";
 import { studentClubOpenFromProfile } from "../../lib/billing/student-entitlement";
-import { isPhysicianGrantProduct, isStudentGrantProduct } from "../../lib/v27/config";
+import { isEditorialGrantProduct, isPhysicianGrantProduct, isStudentGrantProduct, V27_SUBSCRIPTION_PLANS } from "../../lib/v27/config";
 import { studentIntroCharge, studentMonthlyCharge, STUDENT_FREE_TESTS, isStudentChromePath } from "../../lib/studenti/pricing";
+import {
+  EDITORIAL_MONTHLY_CZK,
+  editorialAnnualCharge,
+  editorialMonthlyCharge,
+} from "../../lib/editorial/pricing";
+import { nativeDeskArticlesForLocale } from "../../lib/editorial/native-desk-articles";
 import { studentPublicHref } from "../../lib/studenti/href";
 import { facultiesForLocale, facultyCountryForLocale } from "../../lib/prijimacky/faculties-by-country";
 import {
@@ -394,7 +400,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-73-open"), "homepage cache key must bust when wire cards keep the real published date");
+  assert.ok(home.includes("v23-74-open"), "homepage cache key must bust when editorial Plus is 25 Kč / €1 / $1");
   assert.ok(
     readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes('dynamic = "force-dynamic"'),
     "homepage must render Aktuality live, not from a 10-minute HTML cache"
@@ -897,8 +903,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.73"),
-  "page cache tag must bust after wire cards keep the real published date"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.74"),
+  "page cache tag must bust after editorial Plus is 25 Kč / €1 / $1"
 );
 assert.ok(
   readFileSync(join(root, "lib/editorial/freshness.ts"), "utf8").includes(
@@ -1188,7 +1194,7 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-73-open"
+    "v22-homepage-public-v23-74-open"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "listAktualitySection"
@@ -3418,6 +3424,26 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.equal(studentMonthlyCharge("cs").unitAmount, 14900);
   assert.equal(studentMonthlyCharge("de").unitAmount, 1000);
   assert.equal(studentIntroCharge("fr").unitAmount, 600);
+  assert.equal(EDITORIAL_MONTHLY_CZK, 25);
+  assert.equal(V27_SUBSCRIPTION_PLANS.find((plan) => plan.tier === "public")?.monthlyCzk, 25);
+  assert.equal(V27_SUBSCRIPTION_PLANS.find((plan) => plan.tier === "student")?.monthlyCzk, 149);
+  assert.equal(editorialMonthlyCharge("cs").unitAmount, 2500);
+  assert.equal(editorialMonthlyCharge("fr").unitAmount, 100);
+  assert.equal(editorialMonthlyCharge("en-US").unitAmount, 100);
+  assert.equal(editorialAnnualCharge("de").unitAmount, 1000);
+  assert.equal(isEditorialGrantProduct("public-month"), true);
+  assert.equal(isEditorialGrantProduct("student-month"), false);
+  {
+    const csDesk = nativeDeskArticlesForLocale("cs");
+    assert.ok(csDesk.some((article) => article.slug.includes("glp1-odmena-alkohol")));
+    assert.ok(csDesk.every((article) => /GLP-1|odměna|alkohol/.test(`${article.title} ${article.excerpt}`)));
+    assert.ok(!csDesk.some((article) => article.slug.startsWith("zpravy-")));
+    const usPlus = nativeDeskArticlesForLocale("en-US").find((article) =>
+      article.slug.includes("glp1-reward-alcohol")
+    );
+    assert.ok(usPlus && /FDA|PCP|911/.test(`${usPlus.title} ${usPlus.excerpt} ${usPlus.content}`));
+    assert.ok(!/Alena|Seznam Zprávy/.test(`${csDesk[0]?.content ?? ""}`));
+  }
   assert.equal(facultyCountryForLocale("de"), "de");
   assert.ok(facultiesForLocale("sk").length >= 3);
   assert.ok(facultiesForLocale("fr").some((f) => f.applicationUrl.includes("parcoursup")));

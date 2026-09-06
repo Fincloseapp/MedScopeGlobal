@@ -60,6 +60,7 @@ import { getDesktopHeaderMenu, getHeaderUtilityLinks } from "../lib/config/main-
 import { V271_LEKARI_PAGES } from "../lib/v271/routes";
 import { looksLikeCzech } from "../lib/i18n/czech-detect";
 import { convertCzkToCharge, localizeListedCzk, paymentTiersForUser } from "../lib/i18n/payment-currency";
+import { editorialMonthlyCharge } from "../lib/editorial/pricing";
 import { studentIntroCharge, studentMonthlyCharge } from "../lib/studenti/pricing";
 import { b2bPricingForLocale } from "../lib/v271/b2b-pricing";
 import { formatPublicDate, intlLocaleFor } from "../lib/i18n/format-date";
@@ -783,7 +784,12 @@ assert.ok(usDesk.some((article) => /GLP-1|PCP|911/.test(`${article.title} ${arti
 assert.ok(!usDesk.some((article) => /VZP|SÚKL|přijímač/.test(`${article.title} ${article.excerpt}`)));
 assert.ok(nativeDeskArticlesForLocale("fr").some((article) => /médecin traitant|ANSM/.test(`${article.title} ${article.excerpt}`)));
 assert.ok(nativeDeskArticlesForLocale("it").some((article) => /medico di base|AIFA/.test(`${article.title} ${article.excerpt}`)));
-assert.equal(nativeDeskArticlesForLocale("cs").length, 0);
+assert.ok(nativeDeskArticlesForLocale("cs").length >= 1);
+assert.ok(nativeDeskArticlesForLocale("cs").every((article) => looksLikeCzech(article.title)));
+assert.ok(nativeDeskArticlesForLocale("cs").some((article) => /GLP-1|alkohol/.test(article.title)));
+assert.equal(editorialMonthlyCharge("cs").major, 25);
+assert.equal(editorialMonthlyCharge("de").major, 1);
+assert.equal(editorialMonthlyCharge("en-US").major, 1);
 {
   const frDesk = nativeDeskArticlesForLocale("fr");
   const deDesk = nativeDeskArticlesForLocale("de");

@@ -185,7 +185,7 @@ export function formatCzkListPrice(
 }
 
 /** Editorial CZK list prices that appear in public copy. Largest first. */
-const LISTED_CZK_AMOUNTS = [15000, 8000, 5000, 4900, 3900, 3500, 1788, 1490, 490, 390, 149, 99, 89] as const;
+const LISTED_CZK_AMOUNTS = [15000, 8000, 5000, 4900, 3900, 3500, 1788, 1490, 490, 390, 250, 149, 99, 89, 25] as const;
 
 function listedAmountPattern(czk: number): string {
   const raw = String(czk);

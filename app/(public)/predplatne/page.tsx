@@ -10,6 +10,7 @@ import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { APP_PRODUCTS, type AppProductId } from "@/lib/apps/catalog";
 import { getServerLocale, getServerRegion } from "@/lib/i18n/server-locale";
 import { convertCzkToCharge } from "@/lib/i18n/payment-currency";
+import { editorialAnnualCharge, editorialMonthlyCharge } from "@/lib/editorial/pricing";
 import { studentIntroCharge, studentMonthlyCharge } from "@/lib/studenti/pricing";
 import { getSubscribeCopy } from "@/lib/i18n/subscribe-copy";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
@@ -144,8 +145,13 @@ export default async function PredplatnePage({
             const isStudent = plan.tier === "student";
             const monthly = isStudent
               ? studentPrice
-              : convertCzkToCharge(plan.monthlyCzk, locale, region);
-            const annual = convertCzkToCharge(plan.annualCzk, locale, region);
+              : plan.tier === "public"
+                ? editorialMonthlyCharge(locale, region)
+                : convertCzkToCharge(plan.monthlyCzk, locale, region);
+            const annual =
+              plan.tier === "public"
+                ? editorialAnnualCharge(locale, region)
+                : convertCzkToCharge(plan.annualCzk, locale, region);
             return (
               <div
                 key={plan.tier}

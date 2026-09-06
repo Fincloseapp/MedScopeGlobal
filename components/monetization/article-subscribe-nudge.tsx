@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { getRevenueCopy } from "@/lib/i18n/revenue-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
-import { convertCzkToCharge } from "@/lib/i18n/payment-currency";
+import { editorialMonthlyCharge } from "@/lib/editorial/pricing";
 import { getServerRegion } from "@/lib/i18n/server-locale";
-import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 type Props = {
   locale?: string;
@@ -13,8 +12,8 @@ type Props = {
 export async function ArticleSubscribeNudge({ locale = "cs" }: Props) {
   const copy = getRevenueCopy(locale);
   const region = await getServerRegion();
-  const price = convertCzkToCharge(99, locale as GlobalLocaleCode, region);
-  const href = localizePublicHref("/predplatne?trial=1", locale);
+  const price = editorialMonthlyCharge(locale, region);
+  const href = localizePublicHref("/predplatne?trial=1#public", locale);
 
   return (
     <section className="rounded-2xl border border-[#cfe1f3] bg-[#f7fbff] px-5 py-5">

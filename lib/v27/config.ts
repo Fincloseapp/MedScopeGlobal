@@ -57,10 +57,16 @@ export const V27_AUDIENCES = {
 export const V27_SUBSCRIPTION_PLANS = [
   {
     tier: "public" as const,
-    name: "Veřejnost",
-    monthlyCzk: 99,
-    annualCzk: 990,
-    features: ["Prevence a životní styl", "MeDipacient — zprávy v telefonu", "AI asistent pro veřejnost", "Bez reklam v článcích"],
+    name: "Redakce",
+    monthlyCzk: 25,
+    annualCzk: 250,
+    features: [
+      "Aktuální texty redakce — Česko i zahraniční desk",
+      "Prevence a životní styl",
+      "MeDipacient — zprávy v telefonu",
+      "AI asistent pro veřejnost",
+      "Bez reklam v článcích",
+    ],
   },
   {
     tier: "student" as const,
@@ -135,7 +141,7 @@ export const V27_MINI_PRODUCTS = [] as const;
 
 /** Legacy monthly-only map for smoke tests */
 export const V27_SUBSCRIPTIONS = {
-  public: { id: "public", name: "Veřejnost", priceCzk: 99, interval: "month" as const },
+  public: { id: "public", name: "Redakce", priceCzk: 25, interval: "month" as const },
   student: { id: "student", name: "Student LF", priceCzk: 149, interval: "month" as const },
   dokumentace: {
     id: "dokumentace",
@@ -167,6 +173,10 @@ export function isStudentGrantProduct(productId?: string | null): boolean {
 export function isPhysicianGrantProduct(productId?: string | null): boolean {
   const parsed = productId ? parseSubscriptionProductId(productId) : null;
   return parsed?.tier === "physician" || parsed?.tier === "dokumentace";
+}
+
+export function isEditorialGrantProduct(productId?: string | null): boolean {
+  return Boolean(productId && parseSubscriptionProductId(productId)?.tier === "public");
 }
 
 export function parseSubscriptionProductId(productId: string): {

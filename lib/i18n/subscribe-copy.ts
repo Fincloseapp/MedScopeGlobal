@@ -141,7 +141,7 @@ const COPY: Record<string, SubscribeCopy> = {
       },
       {
         q: "Jaký tarif zvolit?",
-        a: "Veřejnost (99 Kč) — prevence, životní styl a AI pro laiky. Student LF (89 Kč první měsíc, pak 149 Kč / v EU 10 €) — materiály, kvízy a AI tutor. Lékař v praxi (490 Kč) — odborná sekce, guidelines, CME a klinický AI.",
+        a: "Redakce (25 Kč, v zahraničí 1 € nebo 1 $) — aktuální zdravotní texty, prevence a AI pro laiky. Student LF (89 Kč první měsíc, pak 149 Kč / v EU 10 €) — materiály, kvízy a AI tutor. Lékař v praxi (490 Kč) — odborná sekce, guidelines, CME a klinický AI.",
       },
       {
         q: "Mohu předplatné koupit jako rodič pro dítě?",
@@ -176,8 +176,9 @@ const COPY: Record<string, SubscribeCopy> = {
     contact: "kontakt",
     plans: {
       public: {
-        name: "Veřejnost",
+        name: "Redakce",
         features: [
+          "Aktuální zdravotní texty české i zahraniční redakce",
           "Články o dlouhověkosti, spánku, pohybu a stravě",
           "MeDipacient — zprávy v telefonu",
           "AI asistent pro veřejnost",
@@ -306,7 +307,7 @@ const COPY: Record<string, SubscribeCopy> = {
       },
       {
         q: "Which plan should I choose?",
-        a: "Public (99 CZK) — prevention, lifestyle and public AI. Medical student (intro month, then 149 CZK / €10) — study materials, quizzes and AI tutor. Physician (490 CZK) — professional desk, guidelines, CME and clinical AI.",
+        a: "Editorial (25 CZK / €1 / $1) — current health desk, prevention and public AI. Medical student (intro month, then 149 CZK / €10) — study materials, quizzes and AI tutor. Physician (490 CZK) — professional desk, guidelines, CME and clinical AI.",
       },
       {
         q: "Can a parent buy a plan for a child?",
@@ -341,8 +342,9 @@ const COPY: Record<string, SubscribeCopy> = {
     contact: "contact",
     plans: {
       public: {
-        name: "Public",
+        name: "Editorial",
         features: [
+          "Current health desk in your edition language",
           "Articles on longevity, sleep, movement and food",
           "MeDipacient — reports on your phone",
           "Public AI assistant",
@@ -471,7 +473,7 @@ const COPY: Record<string, SubscribeCopy> = {
       },
       {
         q: "Welchen Tarif soll ich wählen?",
-        a: "Öffentlichkeit (99 CZK) — Prävention, Lebensstil und öffentliche KI. Medizinstudium (6 €, danach 10 €) — Lernmaterial, Quiz und KI-Tutor. Arzt in der Praxis (490 CZK) — Fachredaktion, Leitlinien, CME und klinische KI.",
+        a: "Redaktion (25 CZK / 1 € / 1 $) — aktuelle Gesundheitstexte, Prävention und öffentliche KI. Medizinstudium (6 €, danach 10 €) — Lernmaterial, Quiz und KI-Tutor. Arzt in der Praxis (490 CZK) — Fachredaktion, Leitlinien, CME und klinische KI.",
       },
       {
         q: "Kann ein Elternteil das Abo für ein Kind kaufen?",
@@ -506,8 +508,9 @@ const COPY: Record<string, SubscribeCopy> = {
     contact: "Kontakt",
     plans: {
       public: {
-        name: "Öffentlichkeit",
+        name: "Redaktion",
         features: [
+          "Aktuelle Gesundheitstexte der lokalen Redaktion",
           "Artikel zu Langlebigkeit, Schlaf, Bewegung und Ernährung",
           "MeDipacient — Berichte am Handy",
           "KI-Assistent für alle",
@@ -636,7 +639,7 @@ const COPY: Record<string, SubscribeCopy> = {
       },
       {
         q: "Quelle formule choisir ?",
-        a: "Grand public (99 CZK) — prévention, mode de vie et IA grand public. Étudiant (6 €, puis 10 €) — supports, quiz et tuteur IA. Médecin (490 CZK) — bureau professionnel, guidelines, FMC et IA clinique.",
+        a: "Rédaction (25 CZK / 1 € / 1 $) — textes santé du desk, prévention et IA grand public. Étudiant (6 €, puis 10 €) — supports, quiz et tuteur IA. Médecin (490 CZK) — bureau professionnel, guidelines, FMC et IA clinique.",
       },
       {
         q: "Un parent peut-il acheter pour un enfant ?",
@@ -671,8 +674,9 @@ const COPY: Record<string, SubscribeCopy> = {
     contact: "contact",
     plans: {
       public: {
-        name: "Grand public",
+        name: "Rédaction",
         features: [
+          "Textes santé du desk dans la langue de l’édition",
           "Articles sur la longévité, le sommeil, le mouvement et l’alimentation",
           "MeDipacient — comptes rendus sur mobile",
           "Assistant IA grand public",

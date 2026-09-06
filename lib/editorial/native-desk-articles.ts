@@ -7,6 +7,7 @@
 
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
+import { PLUS_GLP1_REWARD } from "@/lib/editorial/plus-desk-seeds";
 import { assignEditorialUnits, publicEditorialByline } from "@/lib/editorial/units";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale, type LocaleCode } from "@/lib/i18n/config";
@@ -1069,23 +1070,28 @@ const EN: NativeSeed[] = EN_US.map((seed) => ({
     .replace("911", "local emergency"),
 }));
 
+function withPlusDesk(locale: string, seeds: NativeSeed[]): NativeSeed[] {
+  const plus = PLUS_GLP1_REWARD[locale];
+  return plus ? [plus, ...seeds] : seeds;
+}
+
 const PACKS: Record<string, NativeSeed[]> = {
-  "en-US": EN_US,
-  "en-UK": EN_UK,
-  en: EN,
-  fr: FR,
-  it: IT,
-  de: DE,
-  es: ES,
-  "pt-BR": PT_BR,
+  cs: withPlusDesk("cs", []),
+  "en-US": withPlusDesk("en-US", EN_US),
+  "en-UK": withPlusDesk("en-UK", EN_UK),
+  en: withPlusDesk("en", EN),
+  fr: withPlusDesk("fr", FR),
+  it: withPlusDesk("it", IT),
+  de: withPlusDesk("de", DE),
+  es: withPlusDesk("es", ES),
+  "pt-BR": withPlusDesk("pt-BR", PT_BR),
 };
 
 function seedsForLocale(locale: LocaleCode): { tag: string; seeds: NativeSeed[] } | null {
-  if (primaryArticleLocale(locale) === "cs") return null;
   if (PACKS[locale]) return { tag: locale, seeds: PACKS[locale]! };
   const primary = primaryArticleLocale(locale);
   if (PACKS[primary]) return { tag: primary, seeds: PACKS[primary]! };
-  return { tag: "en", seeds: EN };
+  return { tag: "en", seeds: PACKS.en ?? EN };
 }
 
 export function nativeDeskArticlesForLocale(locale?: string | null): ArticleWithRelations[] {
