@@ -78,10 +78,8 @@ export default async function HomePage() {
   const locale = await getServerLocale();
   const philosophy = getPortalPhilosophy(locale);
   const chrome = getPortalChrome(locale);
-  const [{ articles, topAds, midAds, bottomAds }, { isVip }] = await Promise.all([
-    getHomepageCachedData(locale),
-    getReaderContext(),
-  ]);
+  const { articles, topAds, midAds, bottomAds } = await getHomepageCachedData(locale);
+  const { isVip } = await getReaderContext();
 
   const homeLayout = uniqueHomepageLayout(articles, locale);
 
