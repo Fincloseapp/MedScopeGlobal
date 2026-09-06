@@ -107,7 +107,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
 
   const [magazine, aktuality] = await Promise.all([
     fetchMagazine(),
-    listWireZpravyCards(32, localeKey),
+    listWireZpravyCards(12, localeKey),
   ]);
   const wire = rankAktualityByDate(
     aktuality.filter((article) => {
@@ -117,7 +117,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     }),
     12,
     new Date(),
-    { rotate: true }
+    { preferLocale: localeKey }
   );
 
   if (magazine.length === 0 && wire.length === 0) {
@@ -212,7 +212,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-63-70d", locale, day],
+    ["v22-homepage-public-v23-64-scan", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

@@ -499,6 +499,10 @@ export async function getRelatedArticles(
 const wireCardSelect =
   "id, title, slug, excerpt, published, published_at, created_at, locale, vip_only, metadata, rubric_slug, cover_image_url, source_name";
 
+/** Pages of newest `zpravy-%` so generic ingest stubs cannot hide dated desk wire. */
+export const WIRE_SCAN_PAGE = 100;
+export const WIRE_SCAN_PAGES = 4;
+
 function mergeArticleRows(
   ...groups: Array<Record<string, unknown>[] | null | undefined>
 ): Record<string, unknown>[] {
@@ -512,6 +516,47 @@ function mergeArticleRows(
   return [...merged.values()];
 }
 
+async function fetchWireCardPages(
+  supabase: NonNullable<Awaited<ReturnType<typeof createDataClient>>>,
+  select: string,
+  since?: string,
+  pages = WIRE_SCAN_PAGES
+): Promise<Record<string, unknown>[]> {
+  const zpravyPages = Array.from({ length: pages }, (_, page) => {
+    const from = page * WIRE_SCAN_PAGE;
+    const to = from + WIRE_SCAN_PAGE - 1;
+    let query = supabase
+      .from("articles")
+      .select(select)
+      .eq("published", true)
+      .like("slug", "zpravy-%")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .range(from, to);
+    if (since) query = query.gte("published_at", since);
+    return query;
+  });
+  const sectionPages = [0, 1].map((page) => {
+    const from = page * WIRE_SCAN_PAGE;
+    const to = from + WIRE_SCAN_PAGE - 1;
+    let query = supabase
+      .from("articles")
+      .select(select)
+      .eq("published", true)
+      .eq("metadata->>section", "aktuální-zprávy")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .range(from, to);
+    if (since) query = query.gte("published_at", since);
+    return query;
+  });
+  const results = await Promise.all([...zpravyPages, ...sectionPages]);
+  for (const result of results) {
+    if (result.error) console.error("listWireZpravyCards", result.error);
+  }
+  return mergeArticleRows(
+    ...results.map((result) => result.data as Record<string, unknown>[] | null)
+  );
+}
+
 /** Card rows for homepage Aktuality — date window first, then professional titles. */
 export async function listWireZpravyCards(
   limit = 8,
@@ -521,62 +566,18 @@ export async function listWireZpravyCards(
   if (!supabase) return [];
   const { AKTUALITY_FRESH_DAYS } = await import("@/lib/v271/news-desks");
   const freshFrom = new Date(Date.now() - AKTUALITY_FRESH_DAYS * 86_400_000).toISOString();
-  const scan = Math.max(limit * 6, 80);
-
-  const fetchPair = async (since?: string) => {
-    let zpravy = supabase
-      .from("articles")
-      .select(wireCardSelect)
-      .eq("published", true)
-      .like("slug", "zpravy-%")
-      .order("published_at", { ascending: false, nullsFirst: false })
-      .limit(scan);
-    let section = supabase
-      .from("articles")
-      .select(wireCardSelect)
-      .eq("published", true)
-      .eq("metadata->>section", "aktuální-zprávy")
-      .order("published_at", { ascending: false, nullsFirst: false })
-      .limit(scan);
-    if (since) {
-      zpravy = zpravy.gte("published_at", since);
-      section = section.gte("published_at", since);
-    }
-    return Promise.all([zpravy, section]);
-  };
-
-  const [freshSlug, freshSection] = await fetchPair(freshFrom);
-  if (freshSlug.error) console.error("listWireZpravyCards", "zpravy", freshSlug.error);
-  if (freshSection.error) console.error("listWireZpravyCards", "section", freshSection.error);
-  let rows = mergeArticleRows(
-    freshSlug.data as Record<string, unknown>[] | null,
-    freshSection.data as Record<string, unknown>[] | null
-  );
+  const rows = await fetchWireCardPages(supabase, wireCardSelect, freshFrom);
 
   const { isSeedOrDemoArticle } = await import("@/lib/editorial/article-quality-audit");
   const { rankAktualityByDate } = await import("@/lib/v271/news-desks");
-  const toRanked = (pool: Record<string, unknown>[]) =>
-    rankAktualityByDate(
-      filterActiveArticles(mapArticleList(pool)).filter(
-        (article) => !isSeedOrDemoArticle(article)
-      ),
-      Math.max(limit, 12),
-      new Date(),
-      { rotate: true }
-    );
-
-  let ranked = toRanked(rows);
-  if (ranked.length < limit) {
-    const [olderSlug, olderSection] = await fetchPair();
-    if (olderSlug.error) console.error("listWireZpravyCards", "zpravy-older", olderSlug.error);
-    if (olderSection.error) console.error("listWireZpravyCards", "section-older", olderSection.error);
-    rows = mergeArticleRows(
-      rows,
-      olderSlug.data as Record<string, unknown>[] | null,
-      olderSection.data as Record<string, unknown>[] | null
-    );
-    ranked = toRanked(rows);
-  }
+  const ranked = rankAktualityByDate(
+    filterActiveArticles(mapArticleList(rows)).filter(
+      (article) => !isSeedOrDemoArticle(article)
+    ),
+    Math.max(limit, 12),
+    new Date(),
+    { preferLocale: locale }
+  );
   const prepared = await prepareArticlesForDisplay(ranked, locale, {
     mode: "card",
     maxTranslate: Math.min(limit, 4),
@@ -592,40 +593,11 @@ export async function listAktualitySection(
 ): Promise<DisplayArticle[]> {
   const supabase = await createDataClient();
   if (!supabase) return [];
-  const scan = Math.max(limit * 4, 80);
   const { AKTUALITY_FRESH_DAYS } = await import("@/lib/v271/news-desks");
   const freshFrom = new Date(Date.now() - AKTUALITY_FRESH_DAYS * 86_400_000).toISOString();
-  const [section, bySlug] = await Promise.all([
-    supabase
-      .from("articles")
-      .select(articleSelect)
-      .eq("published", true)
-      .eq("metadata->>section", "aktuální-zprávy")
-      .gte("published_at", freshFrom)
-      .order("published_at", { ascending: false, nullsFirst: false })
-      .limit(scan),
-    supabase
-      .from("articles")
-      .select(articleSelect)
-      .eq("published", true)
-      .like("slug", "zpravy-%")
-      .gte("published_at", freshFrom)
-      .order("published_at", { ascending: false, nullsFirst: false })
-      .limit(scan),
-  ]);
-  if (section.error) console.error("listAktualitySection", "section", section.error);
-  if (bySlug.error) console.error("listAktualitySection", "zpravy", bySlug.error);
+  const rows = await fetchWireCardPages(supabase, articleSelect, freshFrom, 3);
 
-  const merged = new Map<string, Record<string, unknown>>();
-  for (const row of [
-    ...((bySlug.data ?? []) as Record<string, unknown>[]),
-    ...((section.data ?? []) as Record<string, unknown>[]),
-  ]) {
-    const key = String(row.slug ?? row.id ?? "");
-    if (key && !merged.has(key)) merged.set(key, row);
-  }
-
-  const mapped = mapArticleList([...merged.values()]);
+  const mapped = mapArticleList(rows);
   const active = filterActiveArticles(mapped);
   const zpravy = active.filter((article) => String(article.slug ?? "").startsWith("zpravy-"));
   const rest = filterForMetadataRubricListing(
@@ -634,25 +606,12 @@ export async function listAktualitySection(
   );
   const { isSeedOrDemoArticle } = await import("@/lib/editorial/article-quality-audit");
   const { rankAktualityByDate } = await import("@/lib/v271/news-desks");
-  let filtered = rankAktualityByDate(
+  const filtered = rankAktualityByDate(
     [...zpravy, ...rest].filter((article) => !isSeedOrDemoArticle(article)),
     limit,
-    new Date()
+    new Date(),
+    { preferLocale: locale }
   );
-  if (filtered.length < Math.min(limit, 8)) {
-    const older = await supabase
-      .from("articles")
-      .select(articleSelect)
-      .eq("published", true)
-      .like("slug", "zpravy-%")
-      .order("published_at", { ascending: false, nullsFirst: false })
-      .limit(scan);
-    if (older.error) console.error("listAktualitySection", "zpravy-older", older.error);
-    const olderMapped = filterActiveArticles(
-      mapArticleList((older.data ?? []) as Record<string, unknown>[])
-    ).filter((article) => !isSeedOrDemoArticle(article));
-    filtered = rankAktualityByDate([...filtered, ...olderMapped], limit, new Date());
-  }
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
     maxTranslate: Math.min(limit, 8),

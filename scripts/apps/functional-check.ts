@@ -394,7 +394,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-63-70d"), "homepage cache key must bust when Aktuality uses a 70-day window");
+  assert.ok(home.includes("v23-64-scan"), "homepage cache key must bust when Aktuality pages past ingest stubs");
   assert.ok(home.includes("toISOString().slice(0, 10)"), "homepage data cache must roll with the UTC day");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
   assert.ok(home.includes("courtesyBorrow: 2"), "non-CS homepage must not dump a Czech borrow pile");
@@ -893,7 +893,7 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.64"),
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.65"),
   "page cache tag must bust after 70-day Aktuality window"
 );
 assert.ok(
@@ -1178,7 +1178,7 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-63-70d"
+    "v22-homepage-public-v23-64-scan"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "listWireZpravyCards"
@@ -1186,12 +1186,17 @@ assert.ok(
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "rankAktualityByDate"
     ) &&
+    readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
+      "preferLocale"
+    ) &&
     !readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "getArticlesByMetadataSection"
     ) &&
     readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes(
       "AKTUALITY_FRESH_DAYS"
     ) &&
+    readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes("WIRE_SCAN_PAGES") &&
+    readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes(".range(") &&
     readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes("rankAktualityByDate"),
   "homepage cache must pin dated zpravy cards, not the heavy helper name"
 );
@@ -3551,6 +3556,7 @@ console.log("✓ magazine desk byline and copy checks passed");
         title: "Nová výkonná ředitelka BMA Clare Bannon je zvolena",
         slug: "zpravy-new-bma-gp-committee-chair-clare-bannon-is-elected",
         published_at: "2026-08-16T12:23:40.000Z",
+        locale: "cs",
       },
       {
         id: "demo-sleep",
@@ -3563,22 +3569,37 @@ console.log("✓ magazine desk byline and copy checks passed");
         title: "Dvojí antikoagulační léčba u pacientů s fibrilací síní",
         slug: "zpravy-dvoj-antikoagulan-lba",
         published_at: "2026-08-30T09:50:27.000Z",
+        locale: "cs",
       },
       {
         id: "bma-july",
         title: "Nová výkonná ředitelka BMA Clare Bannon je zvolena",
         slug: "zpravy-new-bma-gp-committee-chair-clare-bannon-is-elected",
         published_at: "2026-07-04T05:19:29.000Z",
+        locale: "cs",
+      },
+      {
+        id: "cdc-en",
+        title: "Cyclospora Infections Linked to Fresh Produce",
+        slug: "zpravy-cyclospora-infections-linked-to-fresh-produce",
+        published_at: "2026-07-24T12:00:00.000Z",
+        locale: "en",
       },
     ],
     4,
-    new Date("2026-09-06T12:00:00.000Z")
+    new Date("2026-09-06T12:00:00.000Z"),
+    { preferLocale: "cs" }
   );
   assert.equal(dated[0]?.id, "anticoag");
   assert.equal(dated[1]?.id, "bma-now");
   assert.ok(
     dated.some((item) => item.id === "bma-july"),
     "70-day window must keep July desk wire"
+  );
+  assert.ok(
+    dated.findIndex((item) => item.id === "bma-july") <
+      dated.findIndex((item) => item.id === "cdc-en"),
+    "Czech desk wire must stay ahead of English leftovers in the same window"
   );
   assert.equal(
     dated.some((item) => item.id === "demo-sleep"),

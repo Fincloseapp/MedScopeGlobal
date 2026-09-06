@@ -242,7 +242,7 @@ export function splitNewsDesks(
         wire.filter((article) => isProfessionalAktualityTitle(article.title)),
         cap.novinky,
         new Date(),
-        { rotate: true }
+        { preferLocale: locale }
       ),
       used,
       cap.novinky
@@ -380,6 +380,15 @@ const GENERIC_NEWS_TITLE_RE =
 /** Prefer last 70 days so July desk wire stays, but June leftovers drop. */
 export const AKTUALITY_FRESH_DAYS = 70;
 
+function isPreferredAktualityLocale(
+  locale: string | null | undefined,
+  prefer: string
+): boolean {
+  const loc = String(locale ?? "").trim().toLowerCase();
+  if (!loc) return prefer === "cs";
+  return loc === prefer || loc.startsWith(`${prefer}-`);
+}
+
 export function isProfessionalAktualityTitle(title?: string | null): boolean {
   const clean = String(title ?? "").replace(/<[^>]+>/g, " ").trim();
   if (clean.length < 18) return false;
@@ -405,9 +414,9 @@ function isAktualityCandidate(article: {
 }
 
 /**
- * Date-first Aktuality: professional titles only, real published_at, prefer the last
- * 45 days. Optional daily rotation among the newest window so the same four slugs
- * do not sit when newer desk rows exist.
+ * Date-first Aktuality: professional titles only, real published_at, last 70 days.
+ * Native-locale rows stay ahead of foreign leftovers in the same window. Optional
+ * daily rotation is off by default so the newest date always leads.
  */
 export function rankAktualityByDate<
   T extends {
@@ -416,21 +425,35 @@ export function rankAktualityByDate<
     slug?: string | null;
     metadata?: unknown;
     source_name?: string | null;
+    locale?: string | null;
   },
->(articles: T[], limit: number, now = new Date(), options?: { rotate?: boolean }): T[] {
+>(
+  articles: T[],
+  limit: number,
+  now = new Date(),
+  options?: { rotate?: boolean; preferLocale?: string | null }
+): T[] {
   const cutoff = now.getTime() - AKTUALITY_FRESH_DAYS * 86_400_000;
   const dated = articles.filter(isAktualityCandidate).sort((a, b) => articlePublishedMs(b) - articlePublishedMs(a));
   const recent = dated.filter((article) => articlePublishedMs(article) >= cutoff);
-  const pool = recent.length > 0 ? recent : dated;
+  const freshPool = recent.length > 0 ? recent : dated;
+  const prefer = options?.preferLocale ? primaryArticleLocale(normalizeLocale(options.preferLocale)) : "";
+  const pool =
+    prefer && freshPool.some((article) => isPreferredAktualityLocale(article.locale, prefer))
+      ? [
+          ...freshPool.filter((article) => isPreferredAktualityLocale(article.locale, prefer)),
+          ...freshPool.filter((article) => !isPreferredAktualityLocale(article.locale, prefer)),
+        ]
+      : freshPool;
   if (pool.length <= limit) return pool.slice(0, limit);
   if (!options?.rotate) return pool.slice(0, limit);
 
-  const window = pool.slice(0, Math.min(pool.length, Math.max(limit * 3, 12)));
-  if (window.length <= limit) return window;
+  const rotatePool = pool.slice(0, Math.min(pool.length, Math.max(limit * 3, 12)));
+  if (rotatePool.length <= limit) return rotatePool;
   const dayIndex = Math.floor(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) / 86_400_000);
-  const maxStart = window.length - limit;
+  const maxStart = rotatePool.length - limit;
   const start = ((dayIndex % (maxStart + 1)) + (maxStart + 1)) % (maxStart + 1);
-  return window.slice(start, start + limit);
+  return rotatePool.slice(start, start + limit);
 }
 
 /** Mix section news with longevity — newest professional rows first, no demo pads. */
