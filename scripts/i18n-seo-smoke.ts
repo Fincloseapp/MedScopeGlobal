@@ -820,7 +820,9 @@ assert.equal(mergeNativeDeskFeed([] as { locale?: string | null }[], "en-US")[0]
   const noon = nativeDeskPinDate(0);
   noon.setUTCHours(12, 0, 0, 0);
   const cronRow = { slug: "cron-fresh", locale: "en-US", published_at: noon.toISOString() };
-  assert.equal(mergeNativeDeskFeed([cronRow], "en-US")[0]?.slug, "cron-fresh");
+  const withCron = mergeNativeDeskFeed([cronRow], "en-US");
+  assert.ok(withCron[0]?.slug?.includes("glp1-reward-alcohol"), "edition plus desk stays pinned");
+  assert.equal(withCron[usDesk.length]?.slug, "cron-fresh");
   const stale = { slug: "old-db", locale: "en-US", published_at: "2026-08-01T10:00:00.000Z" };
   assert.notEqual(mergeNativeDeskFeed([stale], "en-US")[0]?.slug, "old-db");
 }

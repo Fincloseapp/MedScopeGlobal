@@ -1126,8 +1126,11 @@ export function mergeNativeDeskFeed<T extends { id?: string; slug?: string | nul
   }
   if (native.length === 0) return articles;
   const seen = new Set(native.map((article) => String(article.slug ?? article.id)));
-  const rest = articles.filter((article) => !seen.has(String(article.slug ?? article.id)));
-  return [...native, ...rest].sort((a, b) => publishedMs(b) - publishedMs(a));
+  const rest = articles
+    .filter((article) => !seen.has(String(article.slug ?? article.id)))
+    .sort((a, b) => publishedMs(b) - publishedMs(a));
+  // Keep the edition desk in front so a full same-day magazine pool cannot hide it.
+  return [...native, ...rest];
 }
 
 export function nativeDeskDisplayArticles(locale?: string | null): DisplayArticle[] {

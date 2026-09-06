@@ -400,7 +400,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-74-open"), "homepage cache key must bust when editorial Plus is 25 Kč / €1 / $1");
+  assert.ok(home.includes("v23-75-open"), "homepage cache key must bust when the Plus desk stays pinned");
   assert.ok(
     readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes('dynamic = "force-dynamic"'),
     "homepage must render Aktuality live, not from a 10-minute HTML cache"
@@ -903,8 +903,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.74"),
-  "page cache tag must bust after editorial Plus is 25 Kč / €1 / $1"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.75"),
+  "page cache tag must bust after the Plus desk stays pinned"
 );
 assert.ok(
   readFileSync(join(root, "lib/editorial/freshness.ts"), "utf8").includes(
@@ -1194,7 +1194,7 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-74-open"
+    "v22-homepage-public-v23-75-open"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "listAktualitySection"

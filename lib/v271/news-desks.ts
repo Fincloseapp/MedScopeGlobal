@@ -370,8 +370,16 @@ export function pinHomepageDesks(
   const used = new Set<string>();
   const news = takeUnused(dated, used, Math.min(8, limit), isNovinkyArticle);
   const longevity = takeUnused(dated, used, Math.min(8, limit), isLongevityArticle);
-  const rest = takeUnused(dated, used, Math.max(0, limit - news.length - longevity.length));
-  return [...news, ...longevity, ...rest].slice(0, limit);
+  const plusDesk = takeUnused(dated, used, Math.min(4, limit), (article) => {
+    const meta = article.metadata;
+    return Boolean(meta && typeof meta === "object" && (meta as { native_desk?: unknown }).native_desk === true);
+  });
+  const rest = takeUnused(
+    dated,
+    used,
+    Math.max(0, limit - news.length - longevity.length - plusDesk.length)
+  );
+  return [...news, ...longevity, ...plusDesk, ...rest].slice(0, limit);
 }
 
 const GENERIC_NEWS_TITLE_RE =
