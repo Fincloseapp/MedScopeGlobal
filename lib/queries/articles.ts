@@ -511,7 +511,7 @@ export async function listWireZpravyCards(
     .eq("published", true)
     .like("slug", "zpravy-%")
     .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(limit);
+    .limit(Math.max(limit, 32));
 
   if (error) {
     console.error("listWireZpravyCards", error);

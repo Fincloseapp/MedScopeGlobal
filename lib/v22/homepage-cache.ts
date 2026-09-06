@@ -5,6 +5,7 @@ import { filterActiveArticles } from "@/lib/v20/content-rules";
 import { isSeedOrDemoArticle } from "@/lib/editorial/article-quality-audit";
 import {
   isHomepageDeskArticle,
+  isProfessionalAktualityTitle,
   pinHomepageDesks,
   prependUniqueArticles,
 } from "@/lib/v271/news-desks";
@@ -105,13 +106,14 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
 
   const [magazine, aktuality] = await Promise.all([
     fetchMagazine(),
-    listWireZpravyCards(8, localeKey),
+    listWireZpravyCards(32, localeKey),
   ]);
   const wire = aktuality.filter((article) => {
     const slug = String(article.slug ?? "");
     if (!slug.startsWith("zpravy-") || article.vip_only || isSeedOrDemoArticle(article)) {
       return false;
     }
+    if (!isProfessionalAktualityTitle(article.title)) return false;
     return true;
   });
 
@@ -207,7 +209,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-56-zpravy-pin", locale, day],
+    ["v22-homepage-public-v23-57-zpravy-professional", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

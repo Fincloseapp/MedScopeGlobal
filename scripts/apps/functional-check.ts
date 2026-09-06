@@ -393,7 +393,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-56-zpravy-pin"), "homepage cache key must bust when Aktuality pins zpravy slugs");
+  assert.ok(home.includes("v23-57-zpravy-professional"), "homepage cache key must bust when Aktuality drops generic wire stubs");
   assert.ok(home.includes("toISOString().slice(0, 10)"), "homepage data cache must roll with the UTC day");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
   assert.ok(home.includes("courtesyBorrow: 2"), "non-CS homepage must not dump a Czech borrow pile");
@@ -892,8 +892,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.57"),
-  "page cache tag must bust after zpravy pin on Aktuality"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.58"),
+  "page cache tag must bust after professional zpravy filter"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/kongresy/page.tsx"), "utf8").includes(
@@ -1177,7 +1177,7 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-56-zpravy-pin"
+    "v22-homepage-public-v23-57-zpravy-professional"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "listWireZpravyCards"

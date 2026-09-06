@@ -234,7 +234,13 @@ export function splitNewsDesks(
   );
   const isNewsPriority = (article: DisplayArticle) => isNovinkyArticle(article);
 
-  desks.novinky.push(...takeUnused(wire, used, cap.novinky));
+  desks.novinky.push(
+    ...takeUnused(
+      wire.filter((article) => isProfessionalAktualityTitle(article.title)),
+      used,
+      cap.novinky
+    )
+  );
   desks.novinky.push(...takeUnused(listable, used, cap.novinky - desks.novinky.length, isNewsPriority));
 
   for (const article of listable) {
