@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   AI_MEDICAL_ASSISTANTS,
-  ASSISTANT_LABELS_CS,
   ASSISTANT_ROUTES,
   type AiMedicalAssistant,
   type AiMedicalLanguage,
@@ -13,7 +12,9 @@ import {
 } from "@/lib/ai-medical/types";
 import { V4D_SPECIALTIES, SPECIALTY_LABELS_CS } from "@/lib/v4d/constants";
 import { getAiAssistantCopy } from "@/lib/i18n/ai-assistant-copy";
+import { getAiMedicalHubCopy } from "@/lib/i18n/ai-medical-hub-copy";
 import { isCzechSurface } from "@/lib/i18n/surface-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 type Props = {
   defaultAssistant?: AiMedicalAssistant;
@@ -30,6 +31,7 @@ export function IntelligenceConsole({
   locale = "cs",
 }: Props) {
   const copy = getAiAssistantCopy(locale);
+  const medical = getAiMedicalHubCopy(locale);
   const [assistant, setAssistant] = useState<AiMedicalAssistant>(
     publicMode ? "patient" : defaultAssistant,
   );
@@ -74,10 +76,10 @@ export function IntelligenceConsole({
         }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Chyba AI");
+      if (!res.ok) throw new Error(json.error ?? medical.errorAi);
       setResult(json);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Chyba");
+      setError(e instanceof Error ? e.message : medical.errorGeneric);
     } finally {
       setLoading(false);
     }
@@ -96,14 +98,14 @@ export function IntelligenceConsole({
           {AI_MEDICAL_ASSISTANTS.map((a) => (
             <Link
               key={a}
-              href={ASSISTANT_ROUTES[a]}
+              href={localizePublicHref(ASSISTANT_ROUTES[a], locale)}
               className={`rounded-full px-3 py-1 border ${
                 a === assistant
                   ? "bg-[#005B96] text-white border-[#005B96]"
                   : "border-[#8dc4ea] text-[#005B96]"
               }`}
             >
-              {ASSISTANT_LABELS_CS[a]}
+              {medical.assistants[a]}
             </Link>
           ))}
         </div>
@@ -120,7 +122,7 @@ export function IntelligenceConsole({
             >
               {AI_MEDICAL_ASSISTANTS.map((a) => (
                 <option key={a} value={a}>
-                  {ASSISTANT_LABELS_CS[a]}
+                  {medical.assistants[a]}
                 </option>
               ))}
             </select>

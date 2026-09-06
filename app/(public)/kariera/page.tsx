@@ -4,11 +4,10 @@ import { Suspense } from "react";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { getJobPostings } from "@/lib/queries/career";
 import { JobFilters } from "@/components/career/job-filters";
-
-export const metadata: Metadata = {
-  title: "Kariéra",
-  description: "Nabídky práce v medicíně s filtrováním podle specializace, regionu a úvazku.",
-};
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getKarieraHubCopy } from "@/lib/i18n/kariera-hub-copy";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 type Props = {
   searchParams: Promise<{
@@ -18,7 +17,20 @@ type Props = {
   }>;
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getKarieraHubCopy(locale);
+  return await buildLocalizedV20PageMetadata({
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    path: "/kariera",
+    locale,
+  });
+}
+
 export default async function KarieraPage({ searchParams }: Props) {
+  const locale = await getServerLocale();
+  const copy = getKarieraHubCopy(locale);
   const sp = await searchParams;
   const jobs = await getJobPostings({
     specialization: sp.specialization,
@@ -28,11 +40,11 @@ export default async function KarieraPage({ searchParams }: Props) {
 
   return (
     <ModulePageShell
-      eyebrow="Kariéra"
-      title="Nábor a pracovní pozice"
-      description="Odborné pozice pro lékaře, sestry, výzkumníky a studenty medicíny."
-      ctaHref="/kariera/pridat"
-      ctaLabel="Přidat nabídku (zaměstnavatel)"
+      eyebrow={copy.eyebrow}
+      title={copy.title}
+      description={copy.lead}
+      ctaHref={localizePublicHref("/kariera/pridat", locale)}
+      ctaLabel={copy.addCta}
     >
       <Suspense fallback={<div className="h-14 rounded-2xl bg-slate-100 animate-pulse" />}>
         <JobFilters />
@@ -40,9 +52,9 @@ export default async function KarieraPage({ searchParams }: Props) {
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         {jobs.length === 0 ? (
           <p className="text-sm text-slate-600 col-span-2">
-            Zatím žádné publikované pozice.{" "}
-            <Link href="/kariera/pridat" className="text-[#005B96] font-semibold">
-              Přidejte první nabídku
+            {copy.empty}{" "}
+            <Link href={localizePublicHref("/kariera/pridat", locale)} className="text-[#005B96] font-semibold">
+              {copy.emptyAdd}
             </Link>
             .
           </p>
@@ -50,7 +62,7 @@ export default async function KarieraPage({ searchParams }: Props) {
           jobs.map((job) => (
             <Link
               key={job.id}
-              href={`/kariera/${job.id}`}
+              href={localizePublicHref(`/kariera/${job.id}`, locale)}
               className="rounded-2xl border border-[#cfe1f3] bg-white p-5 transition hover:shadow-md"
             >
               <p className="text-[10px] uppercase tracking-wider text-[#005B96]">{job.company}</p>

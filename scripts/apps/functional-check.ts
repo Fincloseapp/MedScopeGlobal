@@ -878,8 +878,35 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.44"),
-  "page cache tag must bust after the articles TTFB cap and footer chrome"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.45"),
+  "page cache tag must bust after kongresy/kariera/ai-medical chrome"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/kongresy/page.tsx"), "utf8").includes(
+    "getKongresyHubCopy"
+  ) &&
+    readFileSync(join(root, "app/(public)/kariera/page.tsx"), "utf8").includes(
+      "getKarieraHubCopy"
+    ) &&
+    readFileSync(join(root, "app/(public)/ai-medical/page.tsx"), "utf8").includes(
+      "getAiMedicalHubCopy"
+    ) &&
+    readFileSync(join(root, "components/ai-medical/intelligence-console.tsx"), "utf8").includes(
+      "medical.assistants"
+    ) &&
+    !readFileSync(join(root, "components/ai-medical/intelligence-console.tsx"), "utf8").includes(
+      "ASSISTANT_LABELS_CS"
+    ),
+  "kongresy, kariera and AI medical chrome must follow the edition"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/inzerce/cenik/page.tsx"), "utf8").includes(
+    "getInzerceCenikCopy"
+  ) &&
+    readFileSync(join(root, "app/(public)/organizace/page.tsx"), "utf8").includes(
+      "getOrganizaceHubCopy"
+    ),
+  "ad rate card and organizace hub must not stay Czech on /fr"
 );
 assert.ok(
   !readFileSync(join(root, "app/(public)/articles/page.tsx"), "utf8").includes(

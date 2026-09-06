@@ -2,39 +2,41 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { IntelligenceConsole } from "@/components/ai-medical/intelligence-console";
-import {
-  AI_MEDICAL_ASSISTANTS,
-  ASSISTANT_LABELS_CS,
-  ASSISTANT_ROUTES,
-} from "@/lib/ai-medical/types";
+import { AI_MEDICAL_ASSISTANTS, ASSISTANT_ROUTES } from "@/lib/ai-medical/types";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getAiMedicalHubCopy } from "@/lib/i18n/ai-medical-hub-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
-export const metadata: Metadata = {
-  title: "AI Medical Intelligence",
-  description:
-    "Sedm specializovaných AI asistentů — lékař, pacient, výzkum, legislativa, léky, studie, univerzity.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getAiMedicalHubCopy(locale);
+  return await buildLocalizedV20PageMetadata({
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    path: "/ai-medical",
+    locale,
+  });
+}
 
-export default function AiMedicalPage() {
+export default async function AiMedicalPage() {
+  const locale = await getServerLocale();
+  const copy = getAiMedicalHubCopy(locale);
+
   return (
-    <ModulePageShell
-      eyebrow="AI Medical Intelligence"
-      title="AI Medical Intelligence"
-      description="Vyhledávání v Supabase, generování odborných textů přes Groq (V5, zdarma). Překlady CZ/SK/EN. Engine: Groq → Gemini → OpenAI."
-    >
+    <ModulePageShell eyebrow={copy.eyebrow} title={copy.title} description={copy.lead}>
       <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {AI_MEDICAL_ASSISTANTS.map((a) => (
           <Link
             key={a}
-            href={ASSISTANT_ROUTES[a]}
+            href={localizePublicHref(ASSISTANT_ROUTES[a], locale)}
             className="rounded-xl border border-[#cfe1f3] bg-white p-4 hover:shadow-md transition-shadow"
           >
-            <p className="font-semibold text-[#021d33] text-sm">
-              {ASSISTANT_LABELS_CS[a]}
-            </p>
+            <p className="font-semibold text-[#021d33] text-sm">{copy.assistants[a]}</p>
           </Link>
         ))}
       </div>
-      <IntelligenceConsole defaultAssistant="doctor" />
+      <IntelligenceConsole defaultAssistant="doctor" locale={locale} />
     </ModulePageShell>
   );
 }

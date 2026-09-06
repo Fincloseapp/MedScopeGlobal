@@ -1,19 +1,26 @@
 import type { Metadata } from "next";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { CongressForm } from "@/components/forms/congress-form";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getKongresyHubCopy } from "@/lib/i18n/kongresy-hub-copy";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
-export const metadata: Metadata = {
-  title: "Přidat kongres",
-  description: "AI extrahuje datum, místo, cenu a registrační odkaz ze zdrojové URL.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getKongresyHubCopy(locale);
+  return await buildLocalizedV20PageMetadata({
+    title: copy.addMetaTitle,
+    description: copy.addMetaDescription,
+    path: "/kongresy/pridat",
+    locale,
+  });
+}
 
-export default function KongresyPridatPage() {
+export default async function KongresyPridatPage() {
+  const locale = await getServerLocale();
+  const copy = getKongresyHubCopy(locale);
   return (
-    <ModulePageShell
-      eyebrow="Kongresy"
-      title="Přidat kongres nebo školení"
-      description="Automatické vyhledávání v českých a evropských zdrojích (univerzity, společnosti, databáze) při zadání URL — AI doplní metadata."
-    >
+    <ModulePageShell eyebrow={copy.eyebrow} title={copy.addTitle} description={copy.addLead}>
       <CongressForm />
     </ModulePageShell>
   );
