@@ -33,7 +33,22 @@ const menuCs: NavItem[] = [
         href: "/verejnost/clanky?topic=dlouhovekost",
         description: "Healthspan, spánek, pohyb a strava — čtěte zdarma",
       },
-      { label: "Články redakce", href: "/verejnost/clanky", description: "Krátké texty bez žargonu" },
+      {
+        label: "Pohyb a cvičení",
+        href: "/verejnost/clanky?topic=pohyb",
+        description: "Síla, chůze a regenerace — redakčně",
+      },
+      {
+        label: "Jóga",
+        href: "/verejnost/clanky?topic=joga",
+        description: "Mobilita a dech — bez ezoteriky",
+      },
+      {
+        label: "Kosmetika",
+        href: "/verejnost/clanky?topic=kosmetika",
+        description: "Dermokosmetika a fotoprotekce",
+      },
+      { label: "Články redakce", href: "/verejnost/clanky", description: "Redakční texty bez žargonu" },
       { label: "Dnešní tip", href: "/verejnost/osveta", description: "Jeden praktický krok na dnes" },
       { label: "Témata", href: "/verejnost/temata", description: "Prevence, výživa, spánek, stres" },
       { label: "Rozhovory", href: "/verejnost/rozhovory", description: "Odborníci srozumitelně" },
@@ -413,6 +428,7 @@ function firmyNav(): NavItem {
       { label: "Reklama", href: "/firmy/reklama", description: "Bannery a newsletter — ne v lékařské zóně" },
       { label: "Partnerství", href: "/firmy/partnerstvi", description: "Univerzity a instituce" },
       { label: "Kampaně", href: "/firmy/kampane", description: "Segmentace magazín / veřejnost" },
+      { label: "Kosmetické značky", href: "/firmy/kosmetika", description: "Prémiová dermokosmetika ve veřejné rubrice" },
       { label: "Poptávka", href: "/inzerce/formular", description: "Nabídka do 2 pracovních dnů" },
     ],
   };

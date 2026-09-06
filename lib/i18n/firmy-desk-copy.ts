@@ -6,7 +6,7 @@
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
 import { localizeListedCzkIn } from "@/lib/i18n/payment-currency";
 
-export type FirmyRoomId = "reklama" | "partnerstvi" | "kampane";
+export type FirmyRoomId = "reklama" | "partnerstvi" | "kampane" | "kosmetika";
 
 export type FirmyDeskCopy = {
   metaTitle: string;
@@ -65,6 +65,14 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
         metaDescription: "Segmentované kampaně na ViaLongeVita pro veřejnost a magazín.",
         lead: "Kampaně cílí magazín a veřejnost. Odborné plochy lékařů zůstávají bez affiliate.",
       },
+      kosmetika: {
+        href: "/firmy/kosmetika",
+        title: "Kosmetické značky",
+        body: "Prémiová dermokosmetika v rubrice Kosmetika — označené partnerství, ne lékařská zóna.",
+        metaTitle: "Partnerství pro kosmetické značky",
+        metaDescription: "Cílení prémiové kosmetiky ve veřejném magazínu ViaLongeVita.",
+        lead: "Bannery, sponzorovaný článek a cílení na /verejnost/clanky?topic=kosmetika. Lékaři a studenti zůstávají bez affiliate.",
+      },
     },
   },
   de: {
@@ -108,6 +116,14 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
         metaTitle: "Kampagnen für Unternehmen",
         metaDescription: "Segmentierte Kampagnen auf ViaLongeVita für Öffentlichkeit und Magazin.",
         lead: "Kampagnen zielen auf Magazin und Öffentlichkeit. Fachflächen bleiben ohne Affiliate.",
+      },
+      kosmetika: {
+        href: "/firmy/kosmetika",
+        title: "Kosmetikmarken",
+        body: "Premium-Dermokosmetik in der Rubrik Hautpflege — gekennzeichnete Partnerschaft, nicht die Arztzone.",
+        metaTitle: "Partnerschaft für Kosmetikmarken",
+        metaDescription: "Premium-Kosmetik im öffentlichen Magazin ViaLongeVita.",
+        lead: "Banner, Partnerartikel und Targeting auf /verejnost/clanky?topic=kosmetika. Ärztinnen und Studierende bleiben ohne Affiliate.",
       },
     },
   },
@@ -153,6 +169,14 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
         metaDescription: "Campagnes segmentées sur ViaLongeVita pour le public et le magazine.",
         lead: "Les campagnes ciblent le magazine et le public. Les espaces professionnels restent sans affiliation.",
       },
+      kosmetika: {
+        href: "/firmy/kosmetika",
+        title: "Marques de cosmétique",
+        body: "Dermocosmétique premium dans Soin de la peau — partenariat signalé, hors espace médecins.",
+        metaTitle: "Partenariat pour marques de cosmétique",
+        metaDescription: "Ciblage cosmétique premium dans le magazine public ViaLongeVita.",
+        lead: "Bannières, article partenaire et ciblage /verejnost/clanky?topic=kosmetika. Médecins et étudiants restent sans affiliation.",
+      },
     },
   },
   it: {
@@ -196,6 +220,14 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
         metaTitle: "Campagne per le aziende",
         metaDescription: "Campagne segmentate su ViaLongeVita per il pubblico e il magazine.",
         lead: "Le campagne puntano al magazine e al pubblico. Gli spazi professionali restano senza affiliate.",
+      },
+      kosmetika: {
+        href: "/firmy/kosmetika",
+        title: "Marchi di cosmetica",
+        body: "Dermocosmesi premium in Cura della pelle — partnership segnalata, non zona medici.",
+        metaTitle: "Partnership per marchi di cosmetica",
+        metaDescription: "Targeting cosmetico premium nel magazine pubblico ViaLongeVita.",
+        lead: "Banner, articolo partner e targeting su /verejnost/clanky?topic=kosmetika. Medici e studenti restano senza affiliate.",
       },
     },
   },
@@ -241,6 +273,14 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
         metaDescription: "Campañas segmentadas en ViaLongeVita para el público y la revista.",
         lead: "Las campañas apuntan a la revista y al público. Los espacios profesionales siguen sin afiliados.",
       },
+      kosmetika: {
+        href: "/firmy/kosmetika",
+        title: "Marcas de cosmética",
+        body: "Dermocosmética premium en Cuidado de la piel — alianza señalada, no zona médica.",
+        metaTitle: "Alianza para marcas de cosmética",
+        metaDescription: "Segmentación cosmética premium en la revista pública ViaLongeVita.",
+        lead: "Banners, artículo partner y targeting en /verejnost/clanky?topic=kosmetika. Médicos y estudiantes siguen sin afiliados.",
+      },
     },
   },
   "pt-BR": {
@@ -284,6 +324,14 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
         metaTitle: "Campanhas para empresas",
         metaDescription: "Campanhas segmentadas na ViaLongeVita para o público e a revista.",
         lead: "As campanhas miram a revista e o público. Os espaços profissionais continuam sem afiliados.",
+      },
+      kosmetika: {
+        href: "/firmy/kosmetika",
+        title: "Marcas de cosmética",
+        body: "Dermocosmética premium em Cuidado da pele — parceria sinalizada, não zona médica.",
+        metaTitle: "Parceria para marcas de cosmética",
+        metaDescription: "Segmentação cosmética premium na revista pública ViaLongeVita.",
+        lead: "Banners, artigo parceiro e targeting em /verejnost/clanky?topic=kosmetika. Médicos e estudantes ficam sem afiliados.",
       },
     },
   },
@@ -329,6 +377,14 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
         metaDescription: "Segmented campaigns on ViaLongeVita for the public and the magazine.",
         lead: "Campaigns target the magazine and the public. Professional surfaces stay affiliate-free.",
       },
+      kosmetika: {
+        href: "/firmy/kosmetika",
+        title: "Beauty brands",
+        body: "Premium dermocosmetics in Skincare — labelled partnership, not the physician zone.",
+        metaTitle: "Partnership for cosmetics brands",
+        metaDescription: "Premium cosmetics targeting in the ViaLongeVita public magazine.",
+        lead: "Banners, a partner article and targeting on /verejnost/clanky?topic=kosmetika. Physicians and students stay affiliate-free.",
+      },
     },
   },
 };
@@ -337,7 +393,7 @@ export function getFirmyDeskCopy(locale?: string | null): FirmyDeskCopy {
   return localizeListedCzkIn(PACK[chromePack(locale)], locale);
 }
 
-export const FIRMY_ROOM_SLUGS: FirmyRoomId[] = ["reklama", "partnerstvi", "kampane"];
+export const FIRMY_ROOM_SLUGS: FirmyRoomId[] = ["reklama", "partnerstvi", "kampane", "kosmetika"];
 
 export function isFirmyRoomId(slug: string): slug is FirmyRoomId {
   return FIRMY_ROOM_SLUGS.includes(slug as FirmyRoomId);

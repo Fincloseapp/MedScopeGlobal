@@ -62,7 +62,7 @@ export function VerejnostArticleExpandable({
             />
           </div>
           {article.excerpt ? (
-            <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-600">{article.excerpt}</p>
+            <p className="mt-2 line-clamp-4 text-sm leading-relaxed text-slate-600">{article.excerpt}</p>
           ) : null}
           {dateLabel ? <p className="mt-2 text-xs text-slate-400">{dateLabel}</p> : null}
           <p className="mt-3 text-xs font-medium text-[#005B96]">

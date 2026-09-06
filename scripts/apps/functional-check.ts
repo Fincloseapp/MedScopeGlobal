@@ -181,7 +181,10 @@ import {
   isLongevityForeignSource,
   rankV26ForeignSources,
 } from "../../lib/v26/foreign-news-ingest";
-import { hubTopicListingHref } from "../../lib/config/verejnost-topics";
+import { hubTopicListingHref, topicLabelForSlug } from "../../lib/config/verejnost-topics";
+import { matchesLifestyleHub } from "../../lib/verejnost/lifestyle-topics";
+import { getClankyMagazineHub } from "../../lib/portal/magazine-section-hub";
+import { FIRMY_ROOM_SLUGS } from "../../lib/i18n/firmy-desk-copy";
 import { formatEditorialUnitDisplay, formatSyndicatedByline, publicEditorialByline } from "../../lib/editorial/units";
 import { filterArticlesForLocale } from "../../lib/i18n/filter-articles-for-locale";
 import {
@@ -536,7 +539,9 @@ assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "sk" 
   assert.ok(getAffiliateRedirectDestination("creatine-monohydrate", { locale: "de" })?.includes("amazon.de"));
   assert.ok(getAffiliateRedirectDestination("protein-powder", { locale: "fr" })?.includes("amazon.fr"));
   assert.ok(getAffiliateRedirectDestination("yoga-mat", { locale: "it" })?.includes("amazon.it"));
-  assert.equal(AFFILIATE_PRODUCT_IDS.length, 24);
+  assert.equal(AFFILIATE_PRODUCT_IDS.length, 28);
+  assert.ok(getAffiliateRedirectDestination("mineral-spf", { locale: "cs" })?.includes("heureka.cz"));
+  assert.ok(getAffiliateRedirectDestination("retinoid-serum", { locale: "fr" })?.includes("amazon.fr"));
 }
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "it" })?.includes("amazon.it"));
 assert.ok(getAffiliateRedirectDestination("magnesium-glycinate", { locale: "es" })?.includes("amazon.es"));
@@ -827,6 +832,7 @@ assert.ok(getAffiliateRedirectDestination("walking-pad", { locale: "de" })?.incl
 assert.ok(getAffiliateRedirectDestination("sunrise-alarm", { locale: "it" })?.includes("amazon.it"));
 assert.ok(LONGEVITY_MEDIA_KIT.some((item) => item.id === "native-banner" && item.priceCzk === 5000));
 assert.ok(LONGEVITY_MEDIA_KIT.some((item) => item.id === "sponsored-article" && item.priceCzk === 15000));
+assert.ok(LONGEVITY_MEDIA_KIT.some((item) => item.id === "cosmetics-hub" && item.priceCzk === 22000));
 
 file("app/api/newsletter/subscribe/route.ts");
 file("components/monetization/newsletter-capture.tsx");
@@ -885,8 +891,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.46"),
-  "page cache tag must bust after form/filter chrome"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.47"),
+  "page cache tag must bust after public hub listing"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/kongresy/page.tsx"), "utf8").includes(
@@ -1170,7 +1176,7 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-36-single-pool"
+    "v22-homepage-public-v23-47-wider-pool"
   ) &&
     !readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "getArticlesByMetadataSection"
@@ -3015,6 +3021,40 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.equal(desks.dlouhovekost.length, 1);
   assert.equal(desks.dlouhovekost[0]?.slug, "verejnost-prevence-2026-07-02-osteoporozy");
   assert.equal(hubTopicListingHref("dlouhovekost", "zivotni-styl"), "/verejnost/clanky?topic=dlouhovekost");
+  assert.equal(hubTopicListingHref("pohyb"), "/verejnost/clanky?topic=pohyb");
+  assert.equal(hubTopicListingHref("joga"), "/verejnost/clanky?topic=joga");
+  assert.equal(hubTopicListingHref("kosmetika"), "/verejnost/clanky?topic=kosmetika");
+  assert.equal(topicLabelForSlug("pohyb", "fr"), "Mouvement et exercice");
+  assert.equal(topicLabelForSlug("joga", "de"), "Yoga");
+  assert.equal(topicLabelForSlug("kosmetika", "fr"), "Soin de la peau");
+  assert.equal(topicLabelForSlug("kosmetika", "de"), "Hautpflege");
+  assert.equal(topicLabelForSlug("pohyb", "cs"), "Pohyb a cvičení");
+  assert.equal(
+    matchesLifestyleHub({ title: "Jóga pro mobilitu páteře", slug: "joga-mobilita" }, "joga"),
+    true
+  );
+  assert.equal(
+    matchesLifestyleHub({ title: "Minerální SPF a bariéra kůže", excerpt: "fotoprotekce" }, "kosmetika"),
+    true
+  );
+  assert.equal(
+    matchesLifestyleHub({ title: "Strength training and walking", slug: "movement-desk" }, "pohyb"),
+    true
+  );
+  assert.equal(getClankyMagazineHub("pohyb").title, "Pohyb a cvičení");
+  assert.equal(getClankyMagazineHub("kosmetika").id, "clanky-kosmetika");
+  assert.ok(FIRMY_ROOM_SLUGS.includes("kosmetika"));
+  assert.ok(
+    readFileSync(join(root, "lib/editorial/magazine-desk-copy.ts"), "utf8").includes("slice(0, 480)")
+  );
+  assert.ok(
+    readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes("ensureContent: false")
+  );
+  assert.ok(
+    !readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes(
+      "options?.ensureContent === true"
+    )
+  );
   assert.equal(
     classifyNewsDesk({
       title: "NIH: nová zpráva o stárnutí a healthspanu",

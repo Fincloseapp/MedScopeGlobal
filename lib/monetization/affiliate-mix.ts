@@ -50,6 +50,10 @@ export const PRODUCT_WEIGHT: Record<string, number> = {
   "walking-pad": 9,
   "tart-cherry": 5,
   "kitchen-scale": 4,
+  "mineral-spf": 9,
+  "retinoid-serum": 8,
+  "vitamin-c-serum": 7,
+  "ceramide-moisturizer": 8,
 };
 
 const CATEGORY_OF: Record<string, AffiliateProduct["category"]> = Object.fromEntries(
@@ -99,6 +103,18 @@ export function topicMatchedProductIds(article?: MixArticle | null, topic?: stri
     push("resistance-bands");
   }
   if (/kolagen|collagen|kůže|kuze|kloub|skin|joint|wrinkle|vrásk/.test(text)) {
+    push("collagen-peptides");
+    push("ceramide-moisturizer");
+  }
+  if (
+    /kosmetik|cosmetic|dermokosmet|skincare|spf\b|sunscreen|fotoprotek|retinoid|retinol|niacinamid|ceramid|sérum|serum|krása|\bbeauty\b|pleť|plet /.test(
+      text
+    )
+  ) {
+    push("mineral-spf");
+    push("retinoid-serum");
+    push("vitamin-c-serum");
+    push("ceramide-moisturizer");
     push("collagen-peptides");
   }
   if (/elektrolyt|electrolyte|hydrat|pot\b|sportovní nápoj|heat|hork/.test(text)) {

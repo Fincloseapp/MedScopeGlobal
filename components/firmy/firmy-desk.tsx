@@ -18,6 +18,8 @@ export async function FirmyDesk({ slug }: { slug?: FirmyRoomId }) {
   const contactHref = localizePublicHref("/kontakt", locale);
   const banner = formatCzkListPrice(5000, locale, region);
   const article = formatCzkListPrice(15000, locale, region);
+  const cosmetics = formatCzkListPrice(22000, locale, region);
+  const cosmeticsHubHref = localizePublicHref("/verejnost/clanky?topic=kosmetika", locale);
 
   return (
     <ModulePageShell
@@ -44,10 +46,11 @@ export async function FirmyDesk({ slug }: { slug?: FirmyRoomId }) {
         ) : null}
       </nav>
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-3">
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { value: banner, label: publicCopy.bannerMonth, desc: publicCopy.bannerDesc },
           { value: article, label: publicCopy.sponsoredLabel, desc: publicCopy.sponsoredDesc },
+          { value: cosmetics, label: desk.rooms.kosmetika.title, desc: desk.rooms.kosmetika.body },
           { value: publicCopy.replyValue, label: publicCopy.replyLabel, desc: publicCopy.replyDesc },
         ].map((item) => (
           <div key={item.label} className="rounded-2xl border border-[#cfe1f3] bg-white p-4">
@@ -57,6 +60,15 @@ export async function FirmyDesk({ slug }: { slug?: FirmyRoomId }) {
           </div>
         ))}
       </div>
+
+      {slug === "kosmetika" ? (
+        <p className="mb-8 rounded-2xl border border-[#cfe1f3] bg-[#f7fbff] px-5 py-4 text-sm leading-6 text-slate-600">
+          {desk.rooms.kosmetika.lead}{" "}
+          <Link href={cosmeticsHubHref} className="font-semibold text-[#005B96] hover:underline">
+            {desk.rooms.kosmetika.title} →
+          </Link>
+        </p>
+      ) : null}
 
       <V271B2BPricingTable compact locale={locale} />
 

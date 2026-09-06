@@ -68,7 +68,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     .select(articleSelect)
     .eq("published", true)
     .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(64);
+    .limit(160);
 
   if (error) {
     console.error("loadArticlesPublic", error);
@@ -160,7 +160,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-36-single-pool", locale, day],
+    ["v22-homepage-public-v23-47-wider-pool", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

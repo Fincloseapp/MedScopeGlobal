@@ -30,6 +30,11 @@ export const LONGEVITY_MEDIA_KIT = [
     priceCzk: 3500,
     interval: "issue" as const,
   },
+  {
+    id: "cosmetics-hub",
+    priceCzk: 22000,
+    interval: "month" as const,
+  },
 ] as const;
 
 export function classifyRevenueSurface(article: RevenueArticle): RevenueSurface {

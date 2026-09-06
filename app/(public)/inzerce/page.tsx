@@ -5,6 +5,7 @@ import { getRevenueCopy } from "@/lib/i18n/revenue-copy";
 import { LONGEVITY_MEDIA_KIT } from "@/lib/monetization/revenue-mix";
 import { formatCzkListPrice, localizeListedCzk } from "@/lib/i18n/payment-currency";
 import { getServerLocale } from "@/lib/i18n/server-locale";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getServerLocale();
@@ -34,6 +35,11 @@ function adOffers(copy: ReturnType<typeof getRevenueCopy>) {
       title: copy.newsletterName,
       description: copy.newsletterOfferDesc,
       href: "/inzerce/formular",
+    },
+    {
+      title: copy.cosmeticsName,
+      description: copy.cosmeticsOfferDesc,
+      href: "/firmy/kosmetika",
     },
     { title: copy.priceListName, description: copy.priceListDesc, href: "/inzerce/cenik" },
   ];
@@ -72,7 +78,12 @@ export default async function InzercePage() {
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {adOffers(copy).map((o) => (
-          <FeatureCard key={o.title} title={o.title} description={o.description} href={o.href} />
+          <FeatureCard
+            key={o.title}
+            title={o.title}
+            description={o.description}
+            href={localizePublicHref(o.href, locale)}
+          />
         ))}
       </div>
       <p className="mt-8 text-sm text-slate-600">

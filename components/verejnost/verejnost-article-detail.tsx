@@ -12,6 +12,7 @@ import { resolveVerejnostCoverUrl } from "@/lib/verejnost/resolve-cover";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
 import { TopicAffiliateBox } from "@/components/monetization/affiliate-box";
+import { ArticleSubscribeNudge } from "@/components/monetization/article-subscribe-nudge";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export function VerejnostArticleDetail({
@@ -110,6 +111,10 @@ export function VerejnostArticleDetail({
             />
 
             <PublicAdBlocks campaigns={inlineAds} variant="inline" />
+
+            <div className="mt-8">
+              <ArticleSubscribeNudge locale={uiLocale} />
+            </div>
 
             {article.source_url ? (
               <p className="mt-8 text-sm">

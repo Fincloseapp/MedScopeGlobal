@@ -56,7 +56,7 @@ export function polishMagazineExcerpt(excerpt: string | null | undefined, title:
     const cut = text.lastIndexOf(" ");
     text = `${(cut > 80 ? text.slice(0, cut) : text).trim()}…`;
   }
-  return text.slice(0, 320);
+  return text.slice(0, 480);
 }
 
 export function stripEditorialChrome(html: string): string {

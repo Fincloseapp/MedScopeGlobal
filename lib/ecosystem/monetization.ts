@@ -100,7 +100,7 @@ export const VIP_PRICING: Record<GlobalLocaleCode, { monthly: number; currency: 
   "en-UK": { monthly: 499, currency: "gbp", symbol: "£", label: "£4.99/month" },
 };
 
-export type AffiliateCategory = "supplements" | "lab-tests" | "fitness" | "sleep" | "longevity";
+export type AffiliateCategory = "supplements" | "lab-tests" | "fitness" | "sleep" | "longevity" | "skincare";
 
 export type AffiliateProduct = {
   id: string;
@@ -709,6 +709,90 @@ export const AFFILIATE_PRODUCTS: AffiliateProduct[] = [
     imageUrl: "/assets/affiliate/scale.svg",
     regions: ["EU", "USA", "GLOBAL"],
   },
+  {
+    id: "mineral-spf",
+    name: { cs: "Minerální SPF 50", en: "Mineral SPF 50", de: "Mineralisches SPF 50", fr: "SPF 50 minéral" },
+    description: {
+      cs: "Fotoprotekce — u textů o kůži, stárnutí a slunci. Není léčivý přípravek.",
+      en: "Photoprotection — after pieces on skin, ageing and sun. Not a medicine.",
+      de: "Lichtschutz — nach Texten zu Haut, Altern und Sonne. Kein Arzneimittel.",
+    },
+    category: "skincare",
+    affiliateUrl: {
+      cs: "/go/mineral-spf?locale=cs",
+      en: "/go/mineral-spf?locale=en",
+      de: "/go/mineral-spf?locale=de",
+      fr: "/go/mineral-spf?locale=fr",
+      it: "/go/mineral-spf?locale=it",
+      es: "/go/mineral-spf?locale=es",
+      pl: "/go/mineral-spf?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/skincare.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "retinoid-serum",
+    name: { cs: "Retinol sérum", en: "Retinol serum", de: "Retinol-Serum", fr: "Sérum rétinol" },
+    description: {
+      cs: "Dermokosmetika — u textů o obnově pleti. Není lékařský předpis.",
+      en: "Dermocosmetic — after pieces on skin renewal. Not a prescription.",
+      de: "Dermokosmetik — nach Texten zur Hauterneuerung. Kein Rezept.",
+    },
+    category: "skincare",
+    affiliateUrl: {
+      cs: "/go/retinoid-serum?locale=cs",
+      en: "/go/retinoid-serum?locale=en",
+      de: "/go/retinoid-serum?locale=de",
+      fr: "/go/retinoid-serum?locale=fr",
+      it: "/go/retinoid-serum?locale=it",
+      es: "/go/retinoid-serum?locale=es",
+      pl: "/go/retinoid-serum?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/skincare.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "vitamin-c-serum",
+    name: { cs: "Sérum vitamin C", en: "Vitamin C serum", de: "Vitamin-C-Serum", fr: "Sérum vitamine C" },
+    description: {
+      cs: "Antioxidant v péči o pleť — u textů o fotostárnutí.",
+      en: "Antioxidant skincare — after pieces on photoageing.",
+      de: "Antioxidative Hautpflege — nach Texten zur Lichtalterung.",
+    },
+    category: "skincare",
+    affiliateUrl: {
+      cs: "/go/vitamin-c-serum?locale=cs",
+      en: "/go/vitamin-c-serum?locale=en",
+      de: "/go/vitamin-c-serum?locale=de",
+      fr: "/go/vitamin-c-serum?locale=fr",
+      it: "/go/vitamin-c-serum?locale=it",
+      es: "/go/vitamin-c-serum?locale=es",
+      pl: "/go/vitamin-c-serum?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/skincare.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "ceramide-moisturizer",
+    name: { cs: "Krém s ceramidy", en: "Ceramide moisturizer", de: "Ceramide-Creme", fr: "Crème céramides" },
+    description: {
+      cs: "Bariéra kůže — u textů o suchosti a citlivé pleti.",
+      en: "Skin barrier — after pieces on dryness and sensitive skin.",
+      de: "Hautbarriere — nach Texten zu Trockenheit und empfindlicher Haut.",
+    },
+    category: "skincare",
+    affiliateUrl: {
+      cs: "/go/ceramide-moisturizer?locale=cs",
+      en: "/go/ceramide-moisturizer?locale=en",
+      de: "/go/ceramide-moisturizer?locale=de",
+      fr: "/go/ceramide-moisturizer?locale=fr",
+      it: "/go/ceramide-moisturizer?locale=it",
+      es: "/go/ceramide-moisturizer?locale=es",
+      pl: "/go/ceramide-moisturizer?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/skincare.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
 ];
 
 /**
@@ -765,6 +849,16 @@ export const AD_INVENTORY: AdInventoryEntry[] = [
     format: "display",
     incomePriority: 1,
     notes: "Below magazine feed, above apps — high viewability, not in hero.",
+  },
+  {
+    id: "verejnost-listing",
+    surface: "homepage",
+    routes: ["/verejnost/clanky", "/{locale}/verejnost/clanky"],
+    placement: "in-content",
+    sizes: ["728x90", "300x250", "responsive"],
+    format: "display",
+    incomePriority: 1,
+    notes: "Public magazine listing only — never /lekari or /studenti.",
   },
   {
     id: "home-footer",

@@ -76,6 +76,24 @@ export const VEREJNOST_HUB_TOPICS: VerejnostHubTopic[] = [
     description: "Healthspan, prevence stárnutí, spánek, pohyb a biomarkery.",
     backendTopic: "zivotni-styl",
   },
+  {
+    slug: "pohyb",
+    label: "Pohyb a cvičení",
+    description: "Síla, chůze a regenerace — redakční texty, ne tréninkový plán na míru.",
+    backendTopic: "zivotni-styl",
+  },
+  {
+    slug: "joga",
+    label: "Jóga",
+    description: "Mobilita, dech a kloubní zdraví — bez ezoteriky a zázračných slibů.",
+    backendTopic: "zivotni-styl",
+  },
+  {
+    slug: "kosmetika",
+    label: "Kosmetika a pleť",
+    description: "Dermokosmetika, fotoprotekce a péče o bariéru kůže — na úrovni důkazů.",
+    backendTopic: "zivotni-styl",
+  },
 ];
 
 export const BACKEND_PUBLIC_TOPICS: {
@@ -113,10 +131,9 @@ export function resolveBackendTopic(slug: string | undefined): PublicTopic | nul
   return hub?.backendTopic ?? null;
 }
 
-export function hubTopicListingHref(slug: string, backendTopic = resolveBackendTopic(slug) ?? slug): string {
+export function hubTopicListingHref(slug: string, _backendTopic?: string): string {
   if (slug === "rozhovory") return "/verejnost/rozhovory";
-  if (slug === "dlouhovekost") return "/verejnost/clanky?topic=dlouhovekost";
-  return `/verejnost/clanky?topic=${backendTopic}`;
+  return `/verejnost/clanky?topic=${slug}`;
 }
 
 export function topicLabelForSlug(slug: string | null | undefined, locale?: string | null): string {

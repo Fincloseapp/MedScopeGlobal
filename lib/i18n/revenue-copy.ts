@@ -46,9 +46,11 @@ export type RevenueCopy = {
   bannerName: string;
   sponsoredName: string;
   newsletterName: string;
+  cosmeticsName: string;
   bannerOfferDesc: string;
   sponsoredOfferDesc: string;
   newsletterOfferDesc: string;
+  cosmeticsOfferDesc: string;
   priceListName: string;
   priceListDesc: string;
   priceListCta: string;
@@ -91,14 +93,16 @@ const COPY: Record<Pack, RevenueCopy> = {
     mediaKitLead:
       "Inzerce u čtenářů dlouhověkosti — prevence, spánek, pohyb a výživa. Reálná audience 40+, ne boti.",
     mediaKitReach: "Longevity audience",
-    mediaKitAudience: "Prevence, spánek, pohyb, výživa",
+    mediaKitAudience: "Prevence, spánek, pohyb, výživa, kosmetika",
     mediaKitCta: "Objednat kampaň",
     bannerName: "Native banner",
     sponsoredName: "Sponzorovaný článek",
     newsletterName: "Mention v newsletteru",
+    cosmeticsName: "Kosmetický hub",
     bannerOfferDesc: "Homepage a články — 5 000 Kč / měsíc.",
     sponsoredOfferDesc: "Označený partnerský text — 15 000 Kč.",
     newsletterOfferDesc: "Mention v týdenním briefu — od 3 500 Kč.",
+    cosmeticsOfferDesc: "Cílení na /verejnost/clanky?topic=kosmetika — 22 000 Kč / měsíc, označené.",
     priceListName: "Ceník",
     priceListDesc: "Kompletní sazebník bannerů a balíčků.",
     priceListCta: "Kompletní ceník",
@@ -144,9 +148,11 @@ const COPY: Record<Pack, RevenueCopy> = {
     bannerName: "Native Banner",
     sponsoredName: "Gesponserter Artikel",
     newsletterName: "Newsletter-Mention",
+    cosmeticsName: "Kosmetik-Hub",
     bannerOfferDesc: "Startseite und Artikel — 5 000 Kč / Monat.",
     sponsoredOfferDesc: "Gekennzeichneter Partnertext — 15 000 Kč.",
     newsletterOfferDesc: "Erwähnung im Wochenbrief — ab 3 500 Kč.",
+    cosmeticsOfferDesc: "Targeting auf /verejnost/clanky?topic=kosmetika — 22 000 Kč/Monat, gekennzeichnet.",
     priceListName: "Preisliste",
     priceListDesc: "Vollständige Sätze für Banner und Pakete.",
     priceListCta: "Vollständige Preisliste",
@@ -192,9 +198,11 @@ const COPY: Record<Pack, RevenueCopy> = {
     bannerName: "Bannière native",
     sponsoredName: "Article sponsorisé",
     newsletterName: "Mention newsletter",
+    cosmeticsName: "Hub cosmétique",
     bannerOfferDesc: "Accueil et articles — 5 000 Kč / mois.",
     sponsoredOfferDesc: "Texte partenaire signalé — 15 000 Kč.",
     newsletterOfferDesc: "Mention dans le brief hebdomadaire — dès 3 500 Kč.",
+    cosmeticsOfferDesc: "Ciblage /verejnost/clanky?topic=kosmetika — 22 000 Kč/mois, marqué.",
     priceListName: "Tarifs",
     priceListDesc: "Grille complète des bannières et packs.",
     priceListCta: "Grille tarifaire",
@@ -240,9 +248,11 @@ const COPY: Record<Pack, RevenueCopy> = {
     bannerName: "Native banner",
     sponsoredName: "Sponsored article",
     newsletterName: "Newsletter mention",
+    cosmeticsName: "Skincare hub",
     bannerOfferDesc: "Homepage and articles — 5 000 Kč / month.",
     sponsoredOfferDesc: "Labelled partner piece — 15 000 Kč.",
     newsletterOfferDesc: "Mention in the weekly brief — from 3 500 Kč.",
+    cosmeticsOfferDesc: "Targeting /verejnost/clanky?topic=kosmetika — 22 000 Kč/month, labeled.",
     priceListName: "Rate card",
     priceListDesc: "Full banner and package rates.",
     priceListCta: "Full rate card",
@@ -288,9 +298,11 @@ const COPY: Record<Pack, RevenueCopy> = {
     bannerName: "Banner nativo",
     sponsoredName: "Articolo sponsorizzato",
     newsletterName: "Menzione newsletter",
+    cosmeticsName: "Hub cosmetico",
     bannerOfferDesc: "Home e articoli — 5 000 Kč / mese.",
     sponsoredOfferDesc: "Testo partner segnalato — 15 000 Kč.",
     newsletterOfferDesc: "Menzione nel brief settimanale — da 3 500 Kč.",
+    cosmeticsOfferDesc: "Targeting su /verejnost/clanky?topic=kosmetika — 22 000 Kč/mese, etichettato.",
     priceListName: "Listino",
     priceListDesc: "Tariffe complete di banner e pacchetti.",
     priceListCta: "Listino completo",
@@ -336,9 +348,11 @@ const COPY: Record<Pack, RevenueCopy> = {
     bannerName: "Banner nativo",
     sponsoredName: "Artículo patrocinado",
     newsletterName: "Mención newsletter",
+    cosmeticsName: "Hub cosmética",
     bannerOfferDesc: "Portada y artículos — 5 000 Kč / mes.",
     sponsoredOfferDesc: "Texto de partner señalado — 15 000 Kč.",
     newsletterOfferDesc: "Mención en el brief semanal — desde 3 500 Kč.",
+    cosmeticsOfferDesc: "Segmentación en /verejnost/clanky?topic=kosmetika — 22 000 Kč/mes, etiquetado.",
     priceListName: "Tarifas",
     priceListDesc: "Tarifas completas de banners y packs.",
     priceListCta: "Tarifas completas",
@@ -384,9 +398,11 @@ const COPY: Record<Pack, RevenueCopy> = {
     bannerName: "Banner nativo",
     sponsoredName: "Artigo patrocinado",
     newsletterName: "Menção na newsletter",
+    cosmeticsName: "Hub de cosmética",
     bannerOfferDesc: "Home e artigos — 5 000 Kč / mês.",
     sponsoredOfferDesc: "Texto de parceiro sinalizado — 15 000 Kč.",
     newsletterOfferDesc: "Menção no brief semanal — a partir de 3 500 Kč.",
+    cosmeticsOfferDesc: "Segmentação em /verejnost/clanky?topic=kosmetika — 22 000 Kč/mês, identificado.",
     priceListName: "Tabela",
     priceListDesc: "Tabela completa de banners e pacotes.",
     priceListCta: "Tabela completa",

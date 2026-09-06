@@ -149,7 +149,7 @@ export async function getLatestArticles(
   const supabase = await createDataClient();
   if (!supabase) return demo();
 
-  const fetchLimit = Math.min(Math.max(limit * 2, limit), 32);
+  const fetchLimit = Math.min(Math.max(limit * 3, limit + 24), 200);
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     const load = (async () => {

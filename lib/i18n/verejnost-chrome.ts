@@ -47,6 +47,9 @@ export type VerejnostChrome = {
   allArticlesLead: string;
   topicEmpty: string;
   emptyListing: string;
+  prevPage: string;
+  nextPage: string;
+  pageOf: string;
   eduLongevityNote: string;
   hideArticle: string;
   expandArticle: string;
@@ -119,6 +122,9 @@ const CS: VerejnostChrome = {
   topicEmpty:
     "V tématu „{topic}“ zatím nejsou publikované články, které by splnily redakční pravidla.",
   emptyListing: "Články pro veřejnost se brzy objeví — sledujte medscopeglobal.com.",
+    prevPage: "← Novější",
+    nextPage: "Starší →",
+    pageOf: "Strana {page} z {pages}",
   eduLongevityNote:
     "Informace slouží k obecnému vzdělávání a nenahrazují konzultaci s lékařem. Dlouhověkost popisujeme jako více zdravých let (healthspan), nikoli jako zaručené prodloužení života.",
   hideArticle: "Skrýt článek",
@@ -232,14 +238,14 @@ const CS: VerejnostChrome = {
     temata: {
       title: "Najděte své téma ve zdraví",
       heroDeck:
-        "Deset oblastí od prevence po rozhovory s odborníky — každá s články srozumitelně pro širokou veřejnost.",
+        "Třináct oblastí od prevence po jógu a kosmetiku — každá s články srozumitelně pro širokou veřejnost.",
       introTitle: "Jak se orientovat v tématech",
       intro: [
         "Témata jsou vstupní brána do veřejného magazínu. Vyberte oblast, která vás právě zajímá — prevence, symptomy, výživa nebo dlouhověkost.",
       ],
       coverAlt: "Vědecký kontext veřejného zdraví — ilustrace katalogu témat",
       badge: {
-        label: "10 oblastí",
+        label: "13 oblastí",
         description: "Od průvodce nemocemi po rozhovory — každé téma má vlastní články.",
       },
       pillarsTitle: "Čtyři pilíře veřejného zdraví",
@@ -305,6 +311,9 @@ const EN: VerejnostChrome = {
   allArticlesLead: "Browse by topic or see every published article.",
   topicEmpty: "There are no published articles in “{topic}” yet that meet editorial standards.",
   emptyListing: "Public articles will appear here soon — follow medscopeglobal.com.",
+    prevPage: "← Newer",
+    nextPage: "Older →",
+    pageOf: "Page {page} of {pages}",
   eduLongevityNote:
     "This information is for general education and does not replace a physician. We describe longevity as more healthy years (healthspan), not a guaranteed longer life.",
   hideArticle: "Hide article",
@@ -415,14 +424,14 @@ const EN: VerejnostChrome = {
     temata: {
       title: "Find your health topic",
       heroDeck:
-        "Ten areas from prevention to expert interviews — each with plain-language articles for everyone.",
+        "Thirteen areas from prevention to yoga and skincare — each with plain-language articles for everyone.",
       introTitle: "How to find your way around the topics",
       intro: [
         "Topics are the doorway into the public magazine. Pick the area you care about now — prevention, symptoms, nutrition or longevity.",
       ],
       coverAlt: "Scientific public-health context — topic catalogue illustration",
       badge: {
-        label: "10 areas",
+        label: "13 areas",
         description: "From disease guides to interviews — each topic has its own articles.",
       },
       pillarsTitle: "Four pillars of public health",
@@ -489,6 +498,9 @@ const DE: VerejnostChrome = {
   allArticlesLead: "Nach Thema filtern oder alle veröffentlichten Artikel anzeigen.",
   topicEmpty: "In „{topic}“ gibt es noch keine Artikel, die die redaktionellen Regeln erfüllen.",
   emptyListing: "Öffentliche Artikel erscheinen in Kürze — folgen Sie medscopeglobal.com.",
+    prevPage: "← Neuere",
+    nextPage: "Ältere →",
+    pageOf: "Seite {page} von {pages}",
   eduLongevityNote:
     "Die Informationen dienen der allgemeinen Bildung und ersetzen keine Ärztin oder keinen Arzt. Langlebigkeit meinen wir als mehr gesunde Jahre (Healthspan), nicht als garantierte Lebensverlängerung.",
   hideArticle: "Artikel ausblenden",
@@ -599,14 +611,14 @@ const DE: VerejnostChrome = {
     temata: {
       title: "Finden Sie Ihr Gesundheitsthema",
       heroDeck:
-        "Zehn Bereiche von Prävention bis Experteninterviews — jeweils mit verständlichen Artikeln für alle.",
+        "Dreizehn Bereiche von Prävention bis Yoga und Hautpflege — jeweils mit verständlichen Artikeln für alle.",
       introTitle: "So finden Sie sich in den Themen zurecht",
       intro: [
         "Themen sind der Einstieg ins öffentliche Magazin. Wählen Sie den Bereich, der Sie gerade beschäftigt — Prävention, Symptome, Ernährung oder Langlebigkeit.",
       ],
       coverAlt: "Wissenschaftlicher Kontext öffentlicher Gesundheit — Illustration des Themenkatalogs",
       badge: {
-        label: "10 Bereiche",
+        label: "13 Bereiche",
         description: "Von Krankheitsführern bis Interviews — jedes Thema hat eigene Artikel.",
       },
       pillarsTitle: "Vier Säulen der öffentlichen Gesundheit",
@@ -673,6 +685,9 @@ const FR: VerejnostChrome = {
   allArticlesLead: "Parcourez par sujet ou affichez tous les articles publiés.",
   topicEmpty: "Il n’y a pas encore d’articles publiés dans « {topic} » qui répondent aux règles éditoriales.",
   emptyListing: "Les articles grand public arriveront bientôt — suivez medscopeglobal.com.",
+    prevPage: "← Plus récents",
+    nextPage: "Plus anciens →",
+    pageOf: "Page {page} sur {pages}",
   eduLongevityNote:
     "Ces informations servent à l’éducation générale et ne remplacent pas un médecin. La longévité désigne davantage d’années en bonne santé (healthspan), pas une vie plus longue garantie.",
   hideArticle: "Masquer l’article",
@@ -783,14 +798,14 @@ const FR: VerejnostChrome = {
     temata: {
       title: "Trouvez votre sujet santé",
       heroDeck:
-        "Dix domaines, de la prévention aux entretiens — chacun avec des articles en langage clair.",
+        "Treize domaines, de la prévention au yoga et au soin de la peau — chacun avec des articles en langage clair.",
       introTitle: "Comment s’orienter dans les sujets",
       intro: [
         "Les sujets sont la porte d’entrée du magazine grand public. Choisissez le domaine qui vous concerne — prévention, symptômes, nutrition ou longévité.",
       ],
       coverAlt: "Contexte scientifique de la santé publique — illustration du catalogue",
       badge: {
-        label: "10 domaines",
+        label: "13 domaines",
         description: "Des guides de maladies aux entretiens — chaque sujet a ses articles.",
       },
       pillarsTitle: "Quatre piliers de la santé publique",
