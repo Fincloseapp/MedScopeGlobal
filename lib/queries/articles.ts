@@ -173,7 +173,8 @@ export async function getLatestArticles(
       );
       const prepared = await prepareArticlesForDisplay(filtered, locale, {
         mode: "card",
-        maxTranslate: Math.min(limit, 8),
+        maxTranslate: Math.min(limit, 4),
+        maxLive: 0,
       });
       const slice = prepared.slice(0, limit);
       return slice.length > 0 ? slice : demo();
@@ -182,7 +183,7 @@ export async function getLatestArticles(
     return await Promise.race([
       load,
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("latest-articles-timeout")), 8_000);
+        timer = setTimeout(() => reject(new Error("latest-articles-timeout")), 3_000);
       }),
     ]);
   } catch (error) {

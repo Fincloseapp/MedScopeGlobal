@@ -3,25 +3,33 @@ import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
 import { getLegalEntity, isLegalEntityComplete } from "@/lib/config/legal-entity";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getLegalChromeCopy } from "@/lib/i18n/legal-chrome-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
   return await buildLocalizedPageMetadata({
-  title: "Ochrana soukromí",
-  description:
-    "Zásady ochrany osobních údajů, cookies, analytika, newsletter a AI zpracování dat na MedScopeGlobal.",
-  path: "/privacy",
-});
+    title: copy.privacyTitle,
+    description: copy.privacyDescription,
+    path: "/privacy",
+    locale,
+  });
 }
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
   const entity = getLegalEntity();
   const complete = isLegalEntityComplete(entity);
 
   return (
     <LegalPageLayout
-      title="Ochrana soukromí"
-      description="Informace o zpracování osobních údajů dle nařízení EU 2016/679 (GDPR)."
+      locale={locale}
+      title={copy.privacyTitle}
+      description={copy.privacyLead}
     >
+      {copy.officialNote ? <p><em>{copy.officialNote}</em></p> : null}
       <h2>1. Správce údajů</h2>
       <p>
         Správcem osobních údajů je <strong>{entity.name}</strong>

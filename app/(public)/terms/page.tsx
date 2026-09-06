@@ -3,24 +3,32 @@ import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
 import { getLegalEntity } from "@/lib/config/legal-entity";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getLegalChromeCopy } from "@/lib/i18n/legal-chrome-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
   return await buildLocalizedPageMetadata({
-  title: "Obchodní podmínky",
-  description:
-    "Obchodní podmínky MedScopeGlobal — předplatné, odpovědnost, záruky, reklamace a ukončení služby.",
-  path: "/terms",
-});
+    title: copy.termsTitle,
+    description: copy.termsDescription,
+    path: "/terms",
+    locale,
+  });
 }
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
   const entity = getLegalEntity();
 
   return (
     <LegalPageLayout
-      title="Obchodní podmínky"
-      description="Platné pro všechny uživatele platformy MedScopeGlobal."
+      locale={locale}
+      title={copy.termsTitle}
+      description={copy.termsLead}
     >
+      {copy.officialNote ? <p><em>{copy.officialNote}</em></p> : null}
       <h2>1. Úvodní ustanovení</h2>
       <p>
         Tyto obchodní podmínky upravují vztah mezi provozovatelem ({entity.name}

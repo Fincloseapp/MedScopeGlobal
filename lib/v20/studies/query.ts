@@ -29,7 +29,7 @@ export async function getV20StudyBySlugOrId(idOrSlug: string): Promise<V20StudyD
   return getCuratedStudyByIdOrSlug(idOrSlug);
 }
 
-export async function getV20StudiesList(limit = 12): Promise<V20StudyDisplay[]> {
+async function loadV20StudiesList(limit: number): Promise<V20StudyDisplay[]> {
   const rows = await getStudiesList({ limit: limit * 3 });
   const enriched = rows.map(enrichStudy).filter(isValidV20Study);
 
@@ -57,6 +57,24 @@ export async function getV20StudiesList(limit = 12): Promise<V20StudyDisplay[]> 
       return b.publishedDate.localeCompare(a.publishedDate);
     })
     .slice(0, limit);
+}
+
+export async function getV20StudiesList(limit = 12): Promise<V20StudyDisplay[]> {
+  const curated = V20_CURATED_STUDIES.slice(0, limit);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      loadV20StudiesList(limit),
+      new Promise<V20StudyDisplay[]>((resolve) => {
+        timer = setTimeout(() => resolve(curated), 2_000);
+      }),
+    ]);
+  } catch (error) {
+    console.error("getV20StudiesList", error);
+    return curated;
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 export async function getV20LatestStudies(limit = 4): Promise<V20StudyDisplay[]> {

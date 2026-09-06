@@ -878,8 +878,42 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.43"),
-  "page cache tag must bust after the public TTFB unblock"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.44"),
+  "page cache tag must bust after the articles TTFB cap and footer chrome"
+);
+assert.ok(
+  !readFileSync(join(root, "app/(public)/articles/page.tsx"), "utf8").includes(
+    "getReaderContext"
+  ),
+  "/articles must not wait on Auth/VIP before the magazine listing"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/studie/page.tsx"), "utf8").includes(
+    "getStudieHubCopy"
+  ) &&
+    readFileSync(join(root, "app/(public)/studie/nejnovejsi/page.tsx"), "utf8").includes(
+      "getStudieHubCopy"
+    ) &&
+    readFileSync(join(root, "app/(public)/studie/archiv/page.tsx"), "utf8").includes(
+      "getStudieHubCopy"
+    ),
+  "studie hub chrome must follow the edition, not stay Czech on /fr"
+);
+assert.ok(
+  readFileSync(join(root, "components/legal/legal-page-layout.tsx"), "utf8").includes(
+    "footer.home"
+  ) &&
+    readFileSync(join(root, "app/(public)/privacy/page.tsx"), "utf8").includes(
+      "getLegalChromeCopy"
+    ) &&
+    readFileSync(join(root, "app/(public)/help/page.tsx"), "utf8").includes(
+      "getLegalChromeCopy"
+    ),
+  "legal and help chrome must not hard-code Domů / Ochrana soukromí"
+);
+assert.ok(
+  readFileSync(join(root, "lib/v20/studies/query.ts"), "utf8").includes("2_000"),
+  "studie listing must not wait on Supabase past two seconds"
 );
 assert.ok(
   readFileSync(join(root, "lib/security/rate-limit.ts"), "utf8").includes(

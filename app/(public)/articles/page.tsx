@@ -6,7 +6,6 @@ import { ViaLongeVitaMasthead } from "@/components/brand/vialongevita-mark";
 import { V20ArticleCard } from "@/components/v20/article-card";
 import { getLatestArticles } from "@/lib/queries/articles";
 import { getMedicalArticles } from "@/lib/queries/medicina";
-import { getReaderContext } from "@/lib/auth/reader-context";
 import { MAGAZINE, getMagazineListingCopy } from "@/lib/brand/magazine";
 import { VITASCOPE_TRACK_LOGO } from "@/lib/brand/vitascope";
 import { getServerLocale } from "@/lib/i18n/server-locale";
@@ -63,21 +62,18 @@ export default async function ArticlesPage({
   const sp = await searchParams;
   const locale = await getServerLocale();
   const copy = getMagazineListingCopy(locale);
-  const { isVip, accessLevel } = await getReaderContext();
   const desk = parseDesk(sp.desk);
 
   const medTrackRaw = sp.med_track === "priprava" || sp.med_track === "studium" ? sp.med_track : null;
   const medTrack = isCzechSurface(locale) ? medTrackRaw : null;
   const year = sp.rok ? Number(sp.rok) : undefined;
 
-  const coreArticles = await getLatestArticles(24, 0, isVip, accessLevel, locale);
+  const coreArticles = await getLatestArticles(24, 0, false, "public", locale);
   const medArticles = medTrack
     ? await getMedicalArticles({
         medTrack,
         studyYear: Number.isFinite(year) ? year : undefined,
         limit: 12,
-        isVip,
-        accessLevel,
         locale,
       })
     : [];

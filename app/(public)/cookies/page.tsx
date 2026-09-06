@@ -2,21 +2,30 @@ import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
 import { CookiePreferenceCenter } from "@/components/legal/cookie-banner";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getLegalChromeCopy } from "@/lib/i18n/legal-chrome-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
   return await buildLocalizedPageMetadata({
-  title: "Cookies a preference",
-  description: "Informace o cookies a centrum preferencí MedScopeGlobal.",
-  path: "/cookies",
-});
+    title: copy.cookiesTitle,
+    description: copy.cookiesDescription,
+    path: "/cookies",
+    locale,
+  });
 }
 
-export default function CookiesPage() {
+export default async function CookiesPage() {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
   return (
     <LegalPageLayout
-      title="Cookies a preference"
-      description="Jak používáme cookies a jak spravovat své preference."
+      locale={locale}
+      title={copy.cookiesTitle}
+      description={copy.cookiesLead}
     >
+      {copy.officialNote ? <p><em>{copy.officialNote}</em></p> : null}
       <h2>Typy cookies</h2>
       <ul>
         <li>

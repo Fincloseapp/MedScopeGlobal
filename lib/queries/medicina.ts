@@ -54,17 +54,37 @@ export async function getMedicalArticles({
     query = query.eq("study_year", studyYear);
   }
 
-  const { data, error } = await query;
-  if (error) {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      (async () => {
+        const { data, error } = await query;
+        if (error) {
+          console.error("getMedicalArticles", error);
+          return [];
+        }
+
+        const filtered = filterForReader(
+          mapArticleList(data as Record<string, unknown>[] | null),
+          isVip,
+          accessLevel
+        );
+        const prepared = await prepareArticlesForDisplay(filtered, locale, {
+          mode: "card",
+          maxTranslate: Math.min(limit, 4),
+          maxLive: 0,
+        });
+
+        return prepared.slice(0, limit);
+      })(),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("medical-articles-timeout")), 2_000);
+      }),
+    ]);
+  } catch (error) {
     console.error("getMedicalArticles", error);
     return [];
+  } finally {
+    if (timer) clearTimeout(timer);
   }
-
-  const filtered = filterForReader(mapArticleList(data as Record<string, unknown>[] | null), isVip, accessLevel);
-  const prepared = await prepareArticlesForDisplay(filtered, locale, {
-    mode: "card",
-    maxTranslate: limit,
-  });
-
-  return prepared.slice(0, limit);
 }
