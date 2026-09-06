@@ -11,7 +11,7 @@ import {
   rankAktualityByDate,
 } from "@/lib/v271/news-desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
-import { listAktualitySection, type DisplayArticle } from "@/lib/queries/articles";
+import { listWireZpravyCards, type DisplayArticle } from "@/lib/queries/articles";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
@@ -105,10 +105,8 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     return (data ?? []) as unknown as Record<string, unknown>[];
   };
 
-  const [magazine, aktuality] = await Promise.all([
-    fetchMagazine(),
-    listAktualitySection(12, localeKey),
-  ]);
+  const aktuality = await listWireZpravyCards(12, localeKey);
+  const magazine = await fetchMagazine();
   const wire = rankAktualityByDate(
     aktuality.filter((article) => {
       const slug = String(article.slug ?? "");
@@ -166,8 +164,8 @@ async function loadHomepageData(locale: string): Promise<{
   midAds: AdRow[];
   bottomAds: AdRow[];
 }> {
-  const [articles, topAds, midAds, bottomAds] = await Promise.all([
-    loadArticlesPublic(locale),
+  const articles = await loadArticlesPublic(locale);
+  const [topAds, midAds, bottomAds] = await Promise.all([
     loadAds("homepage_top", 1),
     loadAds("homepage_mid", 1),
     loadAds("homepage_bottom", 1),
@@ -212,7 +210,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-67-seq", locale, day],
-    { revalidate: 60, tags: ["medscope-ui-v23.67", "v22-content", "article-covers"] }
+    ["v22-homepage-public-v23-68-first", locale, day],
+    { revalidate: 60, tags: ["medscope-ui-v23.68", "v22-content", "article-covers"] }
   )();
 }
