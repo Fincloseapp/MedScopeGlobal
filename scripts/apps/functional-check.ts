@@ -394,7 +394,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-72-open"), "homepage cache key must bust when Aktuality skips a sticky data cache");
+  assert.ok(home.includes("v23-73-open"), "homepage cache key must bust when wire cards keep the real published date");
   assert.ok(
     readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes('dynamic = "force-dynamic"'),
     "homepage must render Aktuality live, not from a 10-minute HTML cache"
@@ -897,8 +897,14 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.72"),
-  "page cache tag must bust after open homepage Aktuality load"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.73"),
+  "page cache tag must bust after wire cards keep the real published date"
+);
+assert.ok(
+  readFileSync(join(root, "lib/editorial/freshness.ts"), "utf8").includes(
+    'slug.startsWith("zpravy-")'
+  ),
+  "Aktuality wire dates must stay on published_at, not rewrite stamps"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/kongresy/page.tsx"), "utf8").includes(
@@ -1182,7 +1188,7 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-72-open"
+    "v22-homepage-public-v23-73-open"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "listAktualitySection"
@@ -3274,6 +3280,15 @@ console.log("✓ magazine desk byline and copy checks passed");
       updated_at: "2026-09-04T08:00:00.000Z",
     }),
     "2026-09-04T08:00:00.000Z"
+  );
+  assert.equal(
+    articleDisplayDate({
+      slug: "zpravy-new-bma-gp-committee-chair-clare-bannon-is-elected",
+      published_at: "2026-07-04T05:19:29.000Z",
+      updated_at: "2026-08-16T12:23:40.000Z",
+    }),
+    "2026-07-04T05:19:29.000Z",
+    "Aktuality wire must show the real published date, not a rewrite stamp"
   );
   assert.equal(
     articleWasRefreshed({

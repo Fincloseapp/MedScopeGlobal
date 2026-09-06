@@ -21,6 +21,7 @@ export function articlePageKey(article: {
 }
 
 export type ArticleDateFields = {
+  slug?: string | null;
   published_at?: string | null;
   updated_at?: string | null;
   listing_published_at?: string | null;
@@ -28,9 +29,14 @@ export type ArticleDateFields = {
 
 /**
  * Visible date for cards and article chrome.
- * Listing roll wins on desks; otherwise a real rewrite (`updated_at`) beats publish.
+ * Wire news keeps the real published_at so rewrites cannot make July look like August.
+ * Other desks: listing roll wins; otherwise a real rewrite (`updated_at`) beats publish.
  */
 export function articleDisplayDate(article: ArticleDateFields): string | null {
+  const slug = String(article.slug ?? "").toLowerCase();
+  if (slug.startsWith("zpravy-")) {
+    return article.published_at ?? article.updated_at ?? null;
+  }
   if (article.listing_published_at) return article.listing_published_at;
   const published = article.published_at ?? null;
   const updated = article.updated_at ?? null;
