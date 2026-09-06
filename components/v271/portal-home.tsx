@@ -201,7 +201,7 @@ function PortalNewsFeed({
       </div>
       <p className="mb-3 text-[11px] leading-relaxed text-slate-500">{todayNote}</p>
       <div className="grid gap-5 sm:grid-cols-2">
-        <DeskColumn desk="novinky" articles={split.novinky} featured desks={desks} locale={locale} />
+        <DeskColumn desk="novinky" articles={split.novinky} desks={desks} locale={locale} />
         <DeskColumn desk="verejnost" articles={split.verejnost} featured desks={desks} locale={locale} />
         <DeskColumn desk="dlouhovekost" articles={split.dlouhovekost} featured desks={desks} locale={locale} />
         <DeskColumn desk="clanky" articles={split.clanky} featured desks={desks} locale={locale} />

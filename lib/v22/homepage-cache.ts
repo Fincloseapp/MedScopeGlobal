@@ -2,12 +2,14 @@ import { unstable_cache } from "next/cache";
 import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
 import { filterActiveArticles } from "@/lib/v20/content-rules";
+import { isSeedOrDemoArticle } from "@/lib/editorial/article-quality-audit";
 import {
   isHomepageDeskArticle,
   pinHomepageDesks,
+  prependUniqueArticles,
 } from "@/lib/v271/news-desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
-import type { DisplayArticle } from "@/lib/queries/articles";
+import { listAktualitySection, type DisplayArticle } from "@/lib/queries/articles";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
@@ -81,61 +83,39 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     );
   }
 
-  const fetchRows = async (
-    label: string,
-    build: (
-      client: NonNullable<ReturnType<typeof tryCreateServiceRoleClient>>
-    ) => PromiseLike<{ data: unknown; error: { message?: string } | null }>
-  ) => {
-    const { data, error } = await build(supabase);
+  const localeKey = normalizeLocale(locale);
+  const csHome = primaryArticleLocale(localeKey) === "cs";
+
+  const fetchMagazine = async () => {
+    let query = supabase
+      .from("articles")
+      .select(homepageCardSelect)
+      .eq("published", true)
+      .like("slug", "verejnost-%")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(24);
+    if (csHome) query = query.or("locale.eq.cs,locale.is.null");
+    const { data, error } = await query;
     if (error) {
-      console.error("loadArticlesPublic", label, error);
+      console.error("loadArticlesPublic", "verejnost-", error);
       return [];
     }
-    return ((data ?? []) as unknown as Record<string, unknown>[]);
+    return (data ?? []) as unknown as Record<string, unknown>[];
   };
 
-  const csHome = primaryArticleLocale(normalizeLocale(locale)) === "cs";
-  const newsSelect = homepageCardSelect.replace("content, ", "");
-  const [magazine, newsBySlug, newsBySection] = await Promise.all([
-    fetchRows("verejnost-", (client) => {
-      let query = client
-        .from("articles")
-        .select(homepageCardSelect)
-        .eq("published", true)
-        .like("slug", "verejnost-%")
-        .order("published_at", { ascending: false, nullsFirst: false })
-        .limit(32);
-      if (csHome) query = query.or("locale.eq.cs,locale.is.null");
-      return query;
-    }),
-    fetchRows("zpravy-", (client) =>
-      client
-        .from("articles")
-        .select(newsSelect)
-        .eq("published", true)
-        .like("slug", "zpravy-%")
-        .order("published_at", { ascending: false, nullsFirst: false })
-        .limit(24)
-    ),
-    fetchRows("section-aktuality", (client) =>
-      client
-        .from("articles")
-        .select(newsSelect)
-        .eq("published", true)
-        .eq("metadata->>section", "aktuální-zprávy")
-        .order("published_at", { ascending: false, nullsFirst: false })
-        .limit(24)
-    ),
+  const [magazine, aktuality] = await Promise.all([
+    fetchMagazine(),
+    listAktualitySection(8, localeKey),
   ]);
-  const seenNews = new Set<string>();
-  const news = [...newsBySection, ...newsBySlug].filter((row) => {
-    const key = String(row.slug ?? row.id ?? "");
-    if (!key || seenNews.has(key)) return false;
-    seenNews.add(key);
+  const wire = aktuality.filter((article) => {
+    const slug = String(article.slug ?? "");
+    if (!slug.startsWith("zpravy-") || article.vip_only || isSeedOrDemoArticle(article)) {
+      return false;
+    }
     return true;
   });
-  if (magazine.length === 0 && news.length === 0) {
+
+  if (magazine.length === 0 && wire.length === 0) {
     return pinHomepageDesks(
       mergeNativeDeskFeed(getDemoMagazineArticles(), locale),
       48,
@@ -143,8 +123,6 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     );
   }
 
-  const localeKey = normalizeLocale(locale);
-  const mappedNews = filterActiveArticles(mapArticleList(news));
   const mappedMagazine = filterArticlesForLocale(
     filterActiveArticles(mapArticleList(magazine)),
     localeKey,
@@ -152,29 +130,29 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
       ? undefined
       : { minNative: 8, courtesyBorrow: 2, maxBorrow: 4 }
   );
-  const active = [...mappedNews, ...mappedMagazine];
-  const publicOnly = active.filter(
+  const publicMagazine = mappedMagazine.filter(
     (article) => !article.vip_only && isHomepageDeskArticle(article, new Date(), localeKey)
   );
-  const withDesk = mergeNativeDeskFeed(publicOnly, localeKey);
-  const pinned = pinHomepageDesks(
+  const withDesk = mergeNativeDeskFeed(publicMagazine, localeKey);
+  const pinnedMagazine = pinHomepageDesks(
     primaryArticleLocale(localeKey) === "cs" ? withDesk : withDesk.slice(0, 48),
     48,
     localeKey
   );
-  const prepared = await prepareArticlesForDisplay(pinned, localeKey, {
+  const preparedMagazine = await prepareArticlesForDisplay(pinnedMagazine, localeKey, {
     mode: "card",
-    maxTranslate: 4,
+    maxTranslate: primaryArticleLocale(localeKey) === "cs" ? 0 : 4,
     maxLive: 0,
   });
-  if (prepared.length === 0) {
+  const feed = prependUniqueArticles(wire, preparedMagazine);
+  if (feed.length === 0) {
     return pinHomepageDesks(
       mergeNativeDeskFeed(getDemoMagazineArticles(), localeKey),
       48,
       localeKey
     );
   }
-  return prepared;
+  return feed;
 }
 
 async function loadHomepageData(locale: string): Promise<{
@@ -229,7 +207,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-54-zpravy-section", locale, day],
+    ["v22-homepage-public-v23-55-aktuality-wire", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

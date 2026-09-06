@@ -393,7 +393,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-54-zpravy-section"), "homepage cache key must bust when Aktuality uses the news section");
+  assert.ok(home.includes("v23-55-aktuality-wire"), "homepage cache key must bust when Aktuality uses the news page pool");
   assert.ok(home.includes("toISOString().slice(0, 10)"), "homepage data cache must roll with the UTC day");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
   assert.ok(home.includes("courtesyBorrow: 2"), "non-CS homepage must not dump a Czech borrow pile");
@@ -892,8 +892,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.55"),
-  "page cache tag must bust after Aktuality section fetch"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.56"),
+  "page cache tag must bust after Aktuality uses the news page pool"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/kongresy/page.tsx"), "utf8").includes(
@@ -1177,18 +1177,15 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-54-zpravy-section"
+    "v22-homepage-public-v23-55-aktuality-wire"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-      'like("slug", "zpravy-%")'
-    ) &&
-    readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-      'eq("metadata->>section", "aktuální-zprávy")'
+      "listAktualitySection"
     ) &&
     !readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "getArticlesByMetadataSection"
     ),
-  "homepage cache must load zpravy slugs plus the Aktuality section, not the heavy helper"
+  "homepage cache must reuse the Aktuality section pool, not the heavy helper name"
 );
 assert.ok(
   readFileSync(join(root, "components/v271/academy-home-sections.tsx"), "utf8").includes(
@@ -3447,7 +3444,8 @@ console.log("✓ magazine desk byline and copy checks passed");
       public_topic: "nemoci",
     } as never,
   ]);
-  assert.equal(publicNewsFill.novinky[0]?.id, "headache-fill");
+  assert.equal(publicNewsFill.novinky.length, 0);
+  assert.equal(publicNewsFill.verejnost[0]?.id, "headache-fill");
   assert.equal(publicNewsFill.dlouhovekost.length, 0);
   assert.deepEqual(
     filterArticlesForLocale(

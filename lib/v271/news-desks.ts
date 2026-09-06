@@ -230,17 +230,6 @@ export function splitNewsDesks(
   const isNewsPriority = (article: DisplayArticle) => isNovinkyArticle(article);
 
   desks.novinky.push(...takeUnused(listable, used, cap.novinky, isNewsPriority));
-  if (desks.novinky.length === 0) {
-    desks.novinky.push(
-      ...takeUnused(
-        listable,
-        used,
-        cap.novinky,
-        (article) =>
-          isProfessionalAktualityTitle(article.title) && !isLongevityArticle(article)
-      )
-    );
-  }
 
   for (const article of listable) {
     const desk = classifyNewsDesk(article);
@@ -360,17 +349,6 @@ export function pinHomepageDesks(
   const listable = articles.filter((article) => isHomepageDeskArticle(article, new Date(), locale));
   const used = new Set<string>();
   const news = takeUnused(listable, used, Math.min(8, limit), isNovinkyArticle);
-  if (news.length === 0) {
-    news.push(
-      ...takeUnused(
-        listable,
-        used,
-        Math.min(8, limit),
-        (article) =>
-          isProfessionalAktualityTitle(article.title) && !isLongevityArticle(article)
-      )
-    );
-  }
   const longevity = takeUnused(listable, used, Math.min(8, limit), isLongevityArticle);
   const rest = takeUnused(listable, used, Math.max(0, limit - news.length - longevity.length));
   return [...news, ...longevity, ...rest].slice(0, limit);

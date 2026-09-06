@@ -496,6 +496,53 @@ export async function getRelatedArticles(
   return prepared.slice(0, limit);
 }
 
+/** Same pool as `/aktualni-zpravy` — no invented titles. */
+export async function listAktualitySection(
+  limit = 24,
+  locale: LocaleCode = "cs"
+): Promise<DisplayArticle[]> {
+  const supabase = await createDataClient();
+  if (!supabase) return [];
+  const [section, bySlug] = await Promise.all([
+    supabase
+      .from("articles")
+      .select(articleSelect)
+      .eq("published", true)
+      .eq("metadata->>section", "aktuální-zprávy")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(limit),
+    supabase
+      .from("articles")
+      .select(articleSelect)
+      .eq("published", true)
+      .like("slug", "zpravy-%")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(limit),
+  ]);
+  if (section.error) console.error("listAktualitySection", "section", section.error);
+  if (bySlug.error) console.error("listAktualitySection", "zpravy", bySlug.error);
+
+  const merged = new Map<string, Record<string, unknown>>();
+  for (const row of [
+    ...((bySlug.data ?? []) as Record<string, unknown>[]),
+    ...((section.data ?? []) as Record<string, unknown>[]),
+  ]) {
+    const key = String(row.slug ?? row.id ?? "");
+    if (key && !merged.has(key)) merged.set(key, row);
+  }
+
+  const filtered = filterForMetadataRubricListing(
+    mapArticleList([...merged.values()]),
+    locale
+  );
+  const prepared = await prepareArticlesForDisplay(filtered, locale, {
+    mode: "card",
+    maxTranslate: Math.min(limit, 8),
+    maxLive: 0,
+  });
+  return prepared.slice(0, limit);
+}
+
 /** Articles tagged with metadata.section (e.g. v26 foreign news rubric). */
 export async function getArticlesByMetadataSection(
   section: string,
@@ -504,6 +551,9 @@ export async function getArticlesByMetadataSection(
   accessLevel: AccessLevelId = "public",
   locale: LocaleCode = "cs"
 ) {
+  if (section === "aktuální-zprávy") {
+    return listAktualitySection(limit, locale);
+  }
   const supabase = await createDataClient();
   if (!supabase) return [];
   const { data, error } = await supabase
