@@ -6,17 +6,28 @@ import { ProfessionalDisclaimer } from "@/components/odborna/professional-discla
 import { ClkVerifyForm } from "@/components/odborna/clk-verify-form";
 import { getOdbornaAccess } from "@/lib/auth/odborna-access";
 import { ODBORNA_SECTIONS } from "@/lib/config/odborna-sections";
+import { getOdbornaHubCopy } from "@/lib/i18n/odborna-hub-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { logSecurityEvent } from "@/lib/security/security-log";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
-export const metadata: Metadata = {
-  title: "Odborná sekce",
-  description:
-    "Obsah pro ověřené lékaře — klinické algoritmy, farmakoterapie a směrnice.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getOdbornaHubCopy(locale);
+  return await buildLocalizedV20PageMetadata({
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    path: "/odborna",
+    locale,
+  });
+}
 
 export const dynamic = "force-dynamic";
 
 export default async function OdbornaHubPage() {
+  const locale = await getServerLocale();
+  const copy = getOdbornaHubCopy(locale);
   const access = await getOdbornaAccess();
 
   if (access.user && !access.allowed) {
@@ -29,13 +40,9 @@ export default async function OdbornaHubPage() {
   }
 
   return (
-    <ModulePageShell
-      eyebrow="Odborná sekce"
-      title="Obsah pro ověřené lékaře"
-      description="Přístup úroveň 3 — vyžaduje ověření evidenčního čísla v registru České lékařské komory (ČLK). Obsah prochází peer review kontrolou s odkazy na primární zdroje (DOI, PMID)."
-    >
+    <ModulePageShell eyebrow={copy.eyebrow} title={copy.title} description={copy.lead}>
       <div className="mb-6 flex flex-wrap gap-2">
-        {["ČLK ověření", "Peer review", "CME připravováno", "DOI / PMID"].map((badge) => (
+        {copy.badges.map((badge) => (
           <span
             key={badge}
             className="rounded-full border border-[#005B96]/30 bg-[#005B96]/5 px-3 py-1 text-xs font-semibold text-[#005B96]"
@@ -45,13 +52,12 @@ export default async function OdbornaHubPage() {
         ))}
       </div>
       {!access.allowed ? (
-        <OdbornaGate reason={access.reason!} clkStatus={access.clk} />
+        <OdbornaGate reason={access.reason!} clkStatus={access.clk} locale={locale} />
       ) : (
         <>
           <div className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
-            Ověření ČLK aktivní
-            {access.clk?.clkNumber ? ` · č. ${access.clk.clkNumber}` : ""}.
-            Přístup je auditován.
+            {copy.verified}
+            {access.clk?.clkNumber ? ` · ${access.clk.clkNumber}` : ""}. {copy.audited}
           </div>
 
           <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -60,36 +66,33 @@ export default async function OdbornaHubPage() {
                 key={section.slug}
                 title={section.title}
                 description={section.description}
-                href={`/odborna/${section.slug}`}
+                href={localizePublicHref(`/odborna/${section.slug}`, locale)}
               />
             ))}
           </div>
 
           <section className="mb-8 rounded-xl border bg-white p-5">
-            <h2 className="font-display text-lg font-semibold text-[#021d33]">
-              Správa ověření
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Evidenční číslo můžete aktualizovat po změně registrace.
-            </p>
+            <h2 className="font-display text-lg font-semibold text-[#021d33]">{copy.manageTitle}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{copy.manageLead}</p>
             <div className="mt-4 max-w-md">
               <ClkVerifyForm
                 initialStatus={access.clk?.status}
                 clkNumber={access.clk?.clkNumber}
+                locale={locale}
               />
             </div>
           </section>
 
-          <ProfessionalDisclaimer className="mt-8" />
+          <ProfessionalDisclaimer className="mt-8" locale={locale} />
 
           <p className="mt-6 text-xs text-muted-foreground">
-            Veřejný obsah:{" "}
-            <Link href="/" className="text-primary hover:underline">
-              domovská stránka
+            {copy.publicLabel}{" "}
+            <Link href={localizePublicHref("/", locale)} className="text-primary hover:underline">
+              {copy.home}
             </Link>
             {" · "}
-            <Link href="/access-levels" className="text-primary hover:underline">
-              úrovně přístupu
+            <Link href={localizePublicHref("/access-levels", locale)} className="text-primary hover:underline">
+              {copy.accessLevels}
             </Link>
           </p>
         </>

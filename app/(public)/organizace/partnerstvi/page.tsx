@@ -1,40 +1,51 @@
 import type { Metadata } from "next";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
-import { PARTNERSHIP_BENEFITS } from "@/lib/b2b/content";
 import { B2bPartnerForm } from "@/components/forms/b2b-partner-form";
-import { formatCzk } from "@/lib/ads/pricing";
+import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getOrganizaceHubCopy } from "@/lib/i18n/organizace-hub-copy";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
-export const metadata: Metadata = {
-  title: "B2B partnerství",
-  description: "Výhody partnerství, ceník a formulář pro firmy.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getOrganizaceHubCopy(locale);
+  return await buildLocalizedV20PageMetadata({
+    title: copy.partnerMetaTitle,
+    description: copy.partnerMetaDescription,
+    path: "/organizace/partnerstvi",
+    locale,
+  });
+}
 
-const PRICING = [
-  { name: "Partner Start", price: formatCzk(89000), note: "Sekce + newsletter 1× měsíčně" },
-  { name: "Partner Clinical", price: formatCzk(149000), note: "Diagnóza + studie + reporting" },
-  { name: "Partner Enterprise", price: "individuálně", note: "Multi-sekce + AI reporting" },
-];
+export default async function PartnerstviPage() {
+  const locale = await getServerLocale();
+  const copy = getOrganizaceHubCopy(locale);
+  const pricing = [
+    { name: "Partner Start", price: formatCzkListPrice(89000, locale), note: copy.partnerNotes[0] },
+    { name: "Partner Clinical", price: formatCzkListPrice(149000, locale), note: copy.partnerNotes[1] },
+    { name: "Partner Enterprise", price: copy.individual, note: copy.partnerNotes[2] },
+  ];
 
-export default function PartnerstviPage() {
   return (
     <ModulePageShell
-      eyebrow="Partnerství"
-      title="B2B partnerství"
-      description="Etické sponzorství obsahu, měřitelný dosah a transparentní označení partnerů."
-      ctaHref="/inzerce/formular"
-      ctaLabel="Reklamní formulář"
+      eyebrow={copy.partnerEyebrow}
+      title={copy.partnerTitle}
+      description={copy.partnerLead}
+      ctaHref={localizePublicHref("/inzerce/formular", locale)}
+      ctaLabel={copy.partnerCta}
     >
       <div className="grid gap-8 lg:grid-cols-2">
         <div>
-          <h2 className="font-display text-xl font-semibold text-[#021d33]">Výhody</h2>
+          <h2 className="font-display text-xl font-semibold text-[#021d33]">{copy.benefitsTitle}</h2>
           <ul className="mt-4 space-y-2 text-sm text-slate-600">
-            {PARTNERSHIP_BENEFITS.map((b) => (
+            {copy.benefits.map((b) => (
               <li key={b}>• {b}</li>
             ))}
           </ul>
-          <h2 className="mt-8 font-display text-xl font-semibold text-[#021d33]">Ceník partnerství</h2>
+          <h2 className="mt-8 font-display text-xl font-semibold text-[#021d33]">{copy.partnerPricingTitle}</h2>
           <div className="mt-4 space-y-3">
-            {PRICING.map((p) => (
+            {pricing.map((p) => (
               <div key={p.name} className="rounded-xl border border-[#cfe1f3] bg-white p-4">
                 <p className="font-semibold text-[#021d33]">{p.name}</p>
                 <p className="text-[#005B96] font-semibold">{p.price}</p>
@@ -44,9 +55,9 @@ export default function PartnerstviPage() {
           </div>
         </div>
         <div>
-          <h2 className="font-display text-xl font-semibold text-[#021d33]">Formulář pro firmy</h2>
+          <h2 className="font-display text-xl font-semibold text-[#021d33]">{copy.partnerFormTitle}</h2>
           <div className="mt-4">
-            <B2bPartnerForm inquiryType="partnerstvi" />
+            <B2bPartnerForm inquiryType="partnerstvi" locale={locale} />
           </div>
         </div>
       </div>

@@ -2,106 +2,28 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import type { NavItem } from "@/lib/config/main-navigation";
 import { cn } from "@/lib/utils";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 
-const NAV_ITEM =
-  "inline-flex shrink-0 items-center whitespace-nowrap py-1 text-sm font-medium leading-none tracking-[0.1px]";
-
-const NAV_LINK = cn(
-  NAV_ITEM,
-  "text-slate-800 underline-offset-[3px] transition-colors hover:text-[#0055CC] hover:underline dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF]"
-);
-
-const NAV_LINK_ACTIVE = "font-medium text-[#0055CC] underline dark:text-[#7CC4FF]";
-
-const NAV_BUTTON = cn(
-  NAV_ITEM,
-  "text-slate-800 underline-offset-[3px] transition-colors hover:text-[#0055CC] hover:underline after:ml-0.5 after:text-[10px] after:opacity-60 after:content-['▾'] dark:text-[#E0E0E0] dark:hover:text-[#7CC4FF]"
-);
-
-const DROPDOWN_PANEL = cn(
-  "z-[60] min-w-64 max-w-[min(20rem,calc(100vw-1rem))] rounded-md border border-black/[0.06] bg-white py-1.5 shadow-lg",
-  "max-h-[min(70dvh,28rem)] overflow-y-auto overscroll-contain",
-  "dark:border-white/10 dark:bg-slate-900"
-);
-
-function NavDropdownPanel({
-  open,
-  anchorEl,
-  children,
-}: {
-  open: boolean;
-  anchorEl: HTMLButtonElement | null;
-  children: React.ReactNode;
-}) {
-  const panelRef = useRef<HTMLDivElement>(null);
-  const [style, setStyle] = useState<CSSProperties>({ visibility: "hidden" });
-
-  useLayoutEffect(() => {
-    if (!open || !anchorEl) return;
-
-    const update = () => {
-      const anchor = anchorEl.getBoundingClientRect();
-      const panel = panelRef.current;
-      if (!panel) return;
-
-      const margin = 8;
-      const gap = 6;
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const panelW = panel.offsetWidth || 256;
-      const panelH = panel.offsetHeight || 320;
-      const maxTop = Math.max(margin, vh - panelH - margin);
-
-      let top = anchor.bottom + gap;
-      let left = anchor.right - panelW;
-
-      if (top + panelH > vh - margin) {
-        const topAbove = anchor.top - panelH - gap;
-        top = topAbove >= margin ? topAbove : margin;
-      }
-
-      top = Math.max(margin, Math.min(top, maxTop));
-
-      if (left < margin) left = margin;
-      if (left + panelW > vw - margin) left = Math.max(margin, vw - panelW - margin);
-
-      setStyle({
-        position: "fixed",
-        top: Math.round(top),
-        left: Math.round(left),
-        maxHeight: `min(70dvh, calc(100dvh - ${margin * 2}px))`,
-        visibility: "visible",
-      });
-    };
-
-    update();
-    requestAnimationFrame(update);
-    window.addEventListener("resize", update);
-    window.addEventListener("scroll", update, true);
-    return () => {
-      window.removeEventListener("resize", update);
-      window.removeEventListener("scroll", update, true);
-    };
-  }, [open, anchorEl, children]);
-
-  if (!open) return null;
-
-  return (
-    <div ref={panelRef} style={style} className={DROPDOWN_PANEL} role="menu">
-      {children}
-    </div>
-  );
+function pathOf(href: string) {
+  return href.split("#")[0]?.split("?")[0] ?? href;
 }
 
-/** v27.2 — viewport-safe dropdowns + horizontal scroll for overflow */
-export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
+function matchesPath(pathname: string, href: string) {
+  const path = pathOf(href);
+  if (path === "/") return pathname === "/" || pathname === "";
+  return pathname === path || pathname.startsWith(`${path}/`);
+}
+
+export function HeaderNavigation({ mainMenu, locale = "cs" }: { mainMenu: NavItem[]; locale?: string }) {
   const pathname = usePathname() ?? "";
   const [openLabel, setOpenLabel] = useState<string | null>(null);
   const navRef = useRef<HTMLElement>(null);
-  const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const surface = getSurfaceCopy(locale);
 
   useEffect(() => {
     setOpenLabel(null);
@@ -124,67 +46,102 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
     };
   }, []);
 
-  const hasActiveParent = (href: string) =>
-    href === "/" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
-
-  const isActiveChild = (href: string) => pathname === href;
+  const open = (label: string) => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setOpenLabel(label);
+  };
+  const scheduleClose = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setOpenLabel(null), 160);
+  };
 
   return (
     <nav
       ref={navRef}
-      className="header-nav-scroll hidden min-w-0 flex-1 flex-nowrap items-center justify-end gap-1 overflow-x-auto overflow-y-visible md:flex lg:gap-2 xl:gap-3"
-      aria-label="Hlavní navigace"
+      className="header-nav-bar relative flex w-full min-w-0 flex-wrap items-stretch justify-start gap-x-0.5"
+      aria-label={surface.mainNav}
+      data-nav="primary"
     >
       {mainMenu.map((item) => {
         const isOpen = openLabel === item.label;
         const hasChildren = Boolean(item.children?.length);
-        const active = hasActiveParent(item.href);
-
-        if (!hasChildren) {
-          return (
-            <Link key={item.label} href={item.href} className={cn(NAV_LINK, active && NAV_LINK_ACTIVE)}>
-              {item.label}
-            </Link>
-          );
-        }
+        const active =
+          matchesPath(pathname, item.href) ||
+          Boolean(item.children?.some((child) => matchesPath(pathname, child.href)));
 
         return (
-          <div key={item.label} className="relative shrink-0">
-            <button
-              ref={(el) => {
-                buttonRefs.current[item.label] = el;
-              }}
-              type="button"
-              aria-expanded={isOpen}
-              aria-haspopup="menu"
-              onClick={() => setOpenLabel(isOpen ? null : item.label)}
-              className={cn(NAV_BUTTON, active && NAV_LINK_ACTIVE, isOpen && "text-[#0055CC] dark:text-[#7CC4FF]")}
+          <div
+            key={item.label}
+            className="relative flex items-stretch"
+            onMouseEnter={() => hasChildren && open(item.label)}
+            onMouseLeave={scheduleClose}
+            onFocus={() => hasChildren && open(item.label)}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+                scheduleClose();
+              }
+            }}
+          >
+            <Link
+              href={item.href}
+              className={cn(
+                "inline-flex items-center whitespace-nowrap px-2.5 py-2 text-[13px] font-semibold tracking-[0.01em] transition-colors xl:px-3 xl:text-sm",
+                active
+                  ? "text-[#005B96] underline decoration-[#005B96]/40 underline-offset-4"
+                  : "text-[#021d33] hover:text-[#005B96] dark:text-slate-100"
+              )}
             >
               {item.label}
-            </button>
-            <NavDropdownPanel open={isOpen} anchorEl={buttonRefs.current[item.label]}>
-              {item.children!.map((child) => (
-                <Link
-                  key={child.href}
-                  href={child.href}
-                  role="menuitem"
-                  onClick={() => setOpenLabel(null)}
-                  className={cn(
-                    "block whitespace-normal px-5 py-2.5 text-[15px] tracking-[0.2px] transition-colors hover:text-[#0055CC] dark:hover:text-[#7CC4FF]",
-                    isActiveChild(child.href)
-                      ? "font-medium text-[#0055CC] dark:text-[#7CC4FF]"
-                      : "text-slate-700 dark:text-[#E0E0E0]"
-                  )}
-                >
-                  {child.label}
-                  {child.description ? (
-                    <span className="mt-0.5 block text-xs font-normal text-slate-500 dark:text-slate-400">
-                      {child.description}
-                    </span>
-                  ) : null}
-                </Link>
-              ))}
-            </NavDropdownPanel>
+            </Link>
+            {hasChildren ? (
+              <button
+                type="button"
+                aria-expanded={isOpen}
+                aria-haspopup="menu"
+                aria-label={`${surface.expandMenu} ${item.label}`}
+                onClick={() => setOpenLabel(isOpen ? null : item.label)}
+                className={cn(
+                  "-ml-1 inline-flex items-center px-1 text-[#021d33] hover:text-[#005B96] dark:text-slate-100",
+                  isOpen && "text-[#005B96]"
+                )}
+              >
+                <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", isOpen && "rotate-180")} />
+              </button>
+            ) : null}
+
+            {hasChildren && isOpen ? (
+              <div
+                role="menu"
+                className="absolute left-0 top-full z-[70] mt-0 min-w-[20rem] max-w-[min(36rem,calc(100vw-1.5rem))] rounded-xl border border-[#d9e8f4] bg-white p-3 shadow-xl dark:border-white/10 dark:bg-slate-950"
+              >
+                <p className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#005B96]">
+                  {item.label}
+                </p>
+                <div className={cn("grid gap-1", (item.children?.length ?? 0) > 4 ? "sm:grid-cols-2" : "grid-cols-1")}>
+                  {item.children!.map((child) => (
+                    <Link
+                      key={`${child.href}-${child.label}`}
+                      href={child.href}
+                      role="menuitem"
+                      onClick={() => setOpenLabel(null)}
+                      className={cn(
+                        "rounded-lg px-3 py-2.5 transition-colors hover:bg-[#f4f8fc] dark:hover:bg-white/5",
+                        matchesPath(pathname, child.href)
+                          ? "bg-[#f0f7ff] text-[#005B96]"
+                          : "text-[#021d33] dark:text-slate-100"
+                      )}
+                    >
+                      <span className="block text-sm font-semibold leading-5">{child.label}</span>
+                      {child.description ? (
+                        <span className="mt-0.5 block text-xs font-normal leading-5 text-slate-500 dark:text-slate-400">
+                          {child.description}
+                        </span>
+                      ) : null}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </div>
         );
       })}
@@ -192,6 +149,6 @@ export function HeaderNavigation({ mainMenu }: { mainMenu: NavItem[] }) {
   );
 }
 
-export function V21DesktopNav({ mainMenu }: { mainMenu: NavItem[] }) {
-  return <HeaderNavigation mainMenu={mainMenu} />;
+export function V21DesktopNav({ mainMenu, locale = "cs" }: { mainMenu: NavItem[]; locale?: string }) {
+  return <HeaderNavigation mainMenu={mainMenu} locale={locale} />;
 }

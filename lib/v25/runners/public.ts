@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { projectPath } from "@/lib/config/paths";
+import { isCloudflareRuntime } from "@/lib/config/runtime";
 import { setCronStatus } from "@/lib/v25/system-state";
-import { DEFAULT_PUBLIC_WRITER_LIMIT } from "@/lib/v25/config/public-writers";
 
 export type PublicArticlesFetchResult = {
   ok: boolean;
@@ -27,21 +27,37 @@ type PublicAdEngineModule = {
   runPublicAdEngine: (opts?: object) => Promise<AdEngineStepResult | undefined>;
 };
 
+function runPublicWritersInProcess(): boolean {
+  return isCloudflareRuntime();
+}
+
 export async function runPublicArticlesFetch(options?: {
   limitPerWriter?: number;
   skipAds?: boolean;
+  skipCovers?: boolean;
+  writerOffset?: number;
+  writerLimit?: number;
+  locales?: string[];
+  repairOnly?: boolean;
 }): Promise<PublicArticlesFetchResult> {
   const t0 = Date.now();
+  const onCloudflare = runPublicWritersInProcess();
+  const skipAds = options?.skipAds ?? onCloudflare;
 
-  if (process.env.VERCEL === "1") {
+  if (onCloudflare) {
     const writersMod = (await import("../writers/run-public-writers.mjs")) as unknown as PublicWritersModule;
     const report = await writersMod.runPublicWriters({
-      limitPerWriter: options?.limitPerWriter ?? DEFAULT_PUBLIC_WRITER_LIMIT,
-      skipAds: options?.skipAds ?? false,
+      limitPerWriter: options?.limitPerWriter ?? 1,
+      skipAds,
+      skipCovers: options?.skipCovers ?? true,
+      writerOffset: options?.writerOffset,
+      writerLimit: options?.writerLimit,
+      locales: options?.locales,
+      repairOnly: options?.repairOnly,
     });
 
     let adEngine: PublicArticlesFetchResult["adEngine"];
-    if (!options?.skipAds) {
+    if (!skipAds) {
       const adsMod = (await import("../ads/public-ad-engine.mjs")) as unknown as PublicAdEngineModule;
       adEngine = await adsMod.runPublicAdEngine({ limit: 24 });
     }

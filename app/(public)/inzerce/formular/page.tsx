@@ -1,20 +1,27 @@
 import type { Metadata } from "next";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { AdRequestForm } from "@/components/forms/ad-request-form";
+import { getAdRequestCopy } from "@/lib/i18n/ad-request-copy";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
-export const metadata: Metadata = {
-  title: "Formulář inzerce",
-  description: "Objednávka reklamy s automatickým naceněním a GDPR souhlasem.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getAdRequestCopy(locale);
+  return await buildLocalizedV20PageMetadata({
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    path: "/inzerce/formular",
+    locale,
+  });
+}
 
-export default function InzerceFormularPage() {
+export default async function InzerceFormularPage() {
+  const locale = await getServerLocale();
+  const copy = getAdRequestCopy(locale);
   return (
-    <ModulePageShell
-      eyebrow="Formulář"
-      title="Objednávka reklamy"
-      description="Po odeslání obdržíte potvrzení na info@medscopeglobal.com. Po schválení administrátorem dostanete platební odkaz Stripe."
-    >
-      <AdRequestForm />
+    <ModulePageShell eyebrow={copy.eyebrow} title={copy.title} description={copy.lead}>
+      <AdRequestForm locale={locale} />
     </ModulePageShell>
   );
 }

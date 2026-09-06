@@ -9,6 +9,9 @@ import { getCategoryBySlug } from "@/lib/queries/categories";
 import { getV20CategoryBySlug } from "@/lib/v20/categories";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { SITE } from "@/lib/config/site";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export const revalidate = 120;
 
@@ -42,6 +45,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const page = Math.max(1, Number(sp.page) || 1);
   const offset = (page - 1) * PAGE_SIZE;
   const { isVip, accessLevel } = await getReaderContext();
+  const locale = await getServerLocale();
 
   const { articles, total } = await getArticlesByCategory(
     slug,
@@ -79,6 +83,10 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         </p>
         <h1 className="mt-2 font-display text-4xl font-bold text-[#021d33]">{category.name}</h1>
         {desc && <p className="mt-4 max-w-3xl text-slate-600">{desc}</p>}
+
+        <div className="mt-8">
+          <ListingAffiliateBox locale={(locale as GlobalLocaleCode) ?? "cs"} topic={category.name} />
+        </div>
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {articles.map((a) => (

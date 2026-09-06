@@ -37,7 +37,9 @@ const BLUEPRINT_FILES = [
 ];
 
 function isServerlessRuntime(): boolean {
-  return process.env.VERCEL === "1" || Boolean(process.env.VERCEL_ENV);
+  return (
+    process.env.MEDSCOPE_RUNTIME === "cloudflare-workers" || Boolean(process.env.CF_PAGES)
+  );
 }
 
 function fileExists(relativePath: string): boolean {

@@ -25,7 +25,15 @@ export async function writeAuditLog(entry: AuditLogEntry): Promise<void> {
 
   try {
     const admin = createServiceRoleClient();
-    const { error } = await admin.from("security_audit_logs").insert(row);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const { error } = await Promise.race([
+      admin.from("security_audit_logs").insert(row),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("audit-timeout")), 400);
+      }),
+    ]).finally(() => {
+      if (timer) clearTimeout(timer);
+    });
     if (!error) return;
 
     await admin.from("security_logs").insert({

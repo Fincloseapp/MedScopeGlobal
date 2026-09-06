@@ -1,5 +1,5 @@
-/** Keys synced to Vercel production — shared by sync/diff deploy scripts. */
-export const VERCEL_SYNC_KEYS = [
+/** Keys that belong on Cloudflare Workers production. */
+export const CLOUDFLARE_SYNC_KEYS = [
   "NEXT_PUBLIC_SITE_URL",
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_ANON_KEY",
@@ -57,4 +57,10 @@ export const VERCEL_SYNC_KEYS = [
   "NEWSLETTER_PUBLIC_TO",
   "NEWSLETTER_STUDENTS_TO",
   "NEWSLETTER_DOCTORS_TO",
+  "NEWSLETTER_PUBLIC_LIST",
+  "NEWSLETTER_DOCTORS_LIST",
+  "NEXT_PUBLIC_GA_MEASUREMENT_ID",
+  "NEXT_PUBLIC_ADS_ENABLED",
+  "NEXT_PUBLIC_ADSENSE_CLIENT_ID",
+  "AFFILIATE_AMAZON_TAG",
 ];

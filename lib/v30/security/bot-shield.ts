@@ -36,6 +36,10 @@ export function shouldBlockBot(
   userAgent: string | null,
   pathname: string
 ): boolean {
+  // Login must stay reachable so the operator can type the password.
+  if (pathname === "/admin/login" || pathname.startsWith("/admin/login/")) {
+    return false;
+  }
   const sensitive = SENSITIVE_PREFIXES.some((p) => pathname.startsWith(p));
   if (!sensitive) return false;
   // Block only obvious automation — browsers with a real UA always pass.

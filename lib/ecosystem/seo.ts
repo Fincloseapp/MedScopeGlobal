@@ -2,6 +2,7 @@
 
 import { SITE } from "@/lib/config/site";
 import { MAGAZINE } from "@/lib/brand/magazine";
+import { publicArticleSlug } from "@/lib/editorial/clinician-anonymize";
 import { GLOBAL_LOCALES, type GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { localeToPathSegment } from "@/lib/i18n/locale-path";
 
@@ -64,32 +65,59 @@ export function articleJsonLdGlobal(article: {
   slug: string;
   locale?: string;
   publishedAt?: string | null;
+  modifiedAt?: string | null;
   authorName?: string | null;
   coverImage?: string | null;
+  isAccessibleForFree?: boolean;
 }) {
   const localePrefix = article.locale
     ? `/${localeToPathSegment(article.locale)}`
     : "/cs";
+  const slug = publicArticleSlug(article.slug);
+  const inLanguage =
+    GLOBAL_LOCALES.find((item) => item.code === article.locale)?.hreflang ??
+    article.locale ??
+    "cs-CZ";
+  const pageUrl = `${SITE.url}${localePrefix}/article/${slug}`;
   return {
     "@context": "https://schema.org",
-    "@type": "MedicalWebPage",
+    "@type": "NewsArticle",
     headline: article.title,
     description: article.excerpt,
-    inLanguage: article.locale ?? "cs",
-    author: { "@type": "Person", name: article.authorName ?? SITE.name },
+    inLanguage,
+    isAccessibleForFree: article.isAccessibleForFree ?? true,
+    author: { "@type": "Person", name: article.authorName ?? MAGAZINE.name },
     publisher: {
       "@type": "NewsMediaOrganization",
+      name: MAGAZINE.name,
+      alternateName: MAGAZINE.formerName,
+      url: SITE.url,
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE.url}${MAGAZINE.emailLockup}`,
+      },
+      parentOrganization: { "@type": "Organization", name: SITE.name, url: SITE.url },
+    },
+    isPartOf: {
+      "@type": "Periodical",
       name: MAGAZINE.name,
       url: SITE.url,
     },
     datePublished: article.publishedAt,
-    mainEntityOfPage: `${SITE.url}${localePrefix}/article/${article.slug}`,
-    image: article.coverImage ?? `${SITE.url}/og-default.png`,
+    dateModified: article.modifiedAt ?? article.publishedAt,
+    mainEntityOfPage: pageUrl,
+    url: pageUrl,
+    image: article.coverImage ?? `${SITE.url}${MAGAZINE.emailLockup}`,
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "article p"],
+    },
+    citation: pageUrl,
     medicalAudience: {
       "@type": "MedicalAudience",
       audienceType: "Patient",
     },
-    lastReviewed: article.publishedAt,
+    lastReviewed: article.modifiedAt ?? article.publishedAt,
     disclaimer: "Content is not medical diagnosis or treatment advice.",
   };
 }
@@ -159,7 +187,12 @@ export function safeKeywords(locale: GlobalLocaleCode, topic: string): string[] 
   const base: Record<string, string[]> = {
     cs: ["zdraví", "wellness", "prevence", "longevity", "životní styl"],
     "en-US": ["health", "wellness", "prevention", "longevity", "lifestyle", "biohacking"],
-    en: ["health", "wellness", "prevention", "longevity", "lifestyle"],
+    en: ["health", "wellness", "prevention", "longevity", "lifestyle", "biohacking"],
+    "en-UK": ["health", "NHS", "longevity", "lifestyle", "biohacking"],
+    fr: ["santé", "longévité", "mode de vie", "biohacking"],
+    it: ["salute", "longevità", "stile di vita", "biohacking"],
+    de: ["Gesundheit", "Langlebigkeit", "Lebensstil", "Biohacking"],
+    es: ["salud", "longevidad", "estilo de vida", "biohacking"],
     ru: ["здоровье", "wellness", "профилактика", "долголетие"],
     "zh-CN": ["健康", "养生", "预防", "长寿"],
     ko: ["건강", "웰니스", "예방", "장수"],

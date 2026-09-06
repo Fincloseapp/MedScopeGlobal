@@ -2,16 +2,18 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { MagazineListing } from "@/components/articles/magazine-listing";
-import { VitascopeMastheadBanner } from "@/components/articles/vitascope-mark";
+import { ViaLongeVitaMasthead } from "@/components/brand/vialongevita-mark";
 import { V20ArticleCard } from "@/components/v20/article-card";
 import { getLatestArticles } from "@/lib/queries/articles";
 import { getMedicalArticles } from "@/lib/queries/medicina";
-import { getReaderContext } from "@/lib/auth/reader-context";
 import { MAGAZINE, getMagazineListingCopy } from "@/lib/brand/magazine";
 import { VITASCOPE_TRACK_LOGO } from "@/lib/brand/vitascope";
 import { getServerLocale } from "@/lib/i18n/server-locale";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { isCzechSurface } from "@/lib/i18n/surface-copy";
 import { buildV20PageMetadata } from "@/lib/v20/seo";
-import { filterArticlesForDesk, mixListableFeed, type NewsDeskId } from "@/lib/v271/news-desks";
+import { assignUniqueListingCovers } from "@/lib/ecosystem/editorial/images/unique-listing-covers";
+import { filterArticlesForDesk, mixListableFeed, newsDesksForLocale, type NewsDeskId } from "@/lib/v271/news-desks";
 
 export const revalidate = 120;
 
@@ -29,22 +31,20 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const locale = await getServerLocale();
   const copy = getMagazineListingCopy(locale);
+  const desks = newsDesksForLocale(locale);
   const sp = await searchParams;
   const desk = parseDesk(sp.desk);
+  const magazineDesk = desks.find((item) => item.id === "clanky");
   const title =
     sp.med_track === "priprava"
       ? copy.prep
       : sp.med_track === "studium"
         ? copy.study
-        : desk === "novinky"
-          ? "Novinky"
-          : desk === "verejnost"
-            ? "Články pro veřejnost"
-            : desk === "dlouhovekost"
-              ? "Dlouhověkost"
-              : "Články";
+        : desk
+          ? (desks.find((item) => item.id === desk)?.label ?? magazineDesk?.label ?? MAGAZINE.name)
+          : (magazineDesk?.label ?? MAGAZINE.name);
   return buildV20PageMetadata({
-    title: `${title} — ${MAGAZINE.name}`,
+    title,
     description:
       locale === "cs"
         ? `Aktuální zdravotnické články: novinky, veřejné zdraví, dlouhověkost a redakční magazín ${MAGAZINE.name}.`
@@ -62,20 +62,18 @@ export default async function ArticlesPage({
   const sp = await searchParams;
   const locale = await getServerLocale();
   const copy = getMagazineListingCopy(locale);
-  const { isVip, accessLevel } = await getReaderContext();
   const desk = parseDesk(sp.desk);
 
-  const medTrack = sp.med_track === "priprava" || sp.med_track === "studium" ? sp.med_track : null;
+  const medTrackRaw = sp.med_track === "priprava" || sp.med_track === "studium" ? sp.med_track : null;
+  const medTrack = isCzechSurface(locale) ? medTrackRaw : null;
   const year = sp.rok ? Number(sp.rok) : undefined;
 
-  const coreArticles = await getLatestArticles(48, 0, isVip, accessLevel, locale);
+  const coreArticles = await getLatestArticles(24, 0, false, "public", locale);
   const medArticles = medTrack
     ? await getMedicalArticles({
         medTrack,
         studyYear: Number.isFinite(year) ? year : undefined,
         limit: 12,
-        isVip,
-        accessLevel,
         locale,
       })
     : [];
@@ -89,13 +87,13 @@ export default async function ArticlesPage({
 
     return (
       <div className="v20-articles mx-auto max-w-7xl px-4 py-10 sm:px-6">
-        <VitascopeMastheadBanner track={medTrack} title={title} blurb={blurb} />
+        <ViaLongeVitaMasthead locale={locale} title={title} blurb={blurb} />
         <nav aria-label={copy.studyLabel} className="mt-6 flex flex-wrap gap-2">
-          <Link href="/articles" className="rounded-full border bg-white px-3 py-1.5 text-sm">
+          <Link href={localizePublicHref("/articles", locale)} className="rounded-full border bg-white px-3 py-1.5 text-sm">
             {copy.all}
           </Link>
           <Link
-            href="/articles?med_track=priprava"
+            href={localizePublicHref("/articles?med_track=priprava", locale)}
             className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm ${
               medTrack === "priprava" ? "border-[#005B96] bg-primary text-white" : "bg-white"
             }`}
@@ -106,7 +104,7 @@ export default async function ArticlesPage({
             {copy.prep}
           </Link>
           <Link
-            href="/articles?med_track=studium"
+            href={localizePublicHref("/articles?med_track=studium", locale)}
             className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm ${
               medTrack === "studium" ? "border-[#005B96] bg-primary text-white" : "bg-white"
             }`}
@@ -119,13 +117,21 @@ export default async function ArticlesPage({
         </nav>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {medArticles.map((article) => (
-            <V20ArticleCard key={article.slug} article={article} />
+            <V20ArticleCard key={article.slug} article={article} locale={locale} />
           ))}
         </div>
       </div>
     );
   }
 
-  const mixed = mixListableFeed(filterArticlesForDesk(coreArticles, desk), 24);
-  return <MagazineListing articles={mixed} activeDesk={desk} locale={locale} />;
+  const mixed = assignUniqueListingCovers(
+    mixListableFeed(filterArticlesForDesk(coreArticles, desk, locale), 24, locale)
+  );
+  if (mixed.length > 0) {
+    return <MagazineListing articles={mixed} activeDesk={desk} locale={locale} />;
+  }
+
+  const { getDemoMagazineArticles } = await import("@/lib/verejnost/demo-magazine-articles");
+  const fallback = assignUniqueListingCovers(getDemoMagazineArticles().slice(0, 12));
+  return <MagazineListing articles={fallback} activeDesk={desk} locale={locale} />;
 }

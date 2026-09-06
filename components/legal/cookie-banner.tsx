@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +15,11 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
-const COOKIE_KEY = "msg_cookie_consent";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { adsAllowedOnPath } from "@/lib/monetization/adsense";
+
+export const COOKIE_KEY = "msg_cookie_consent";
+export const CONSENT_EVENT = "msg-consent";
 
 type Consent = {
   necessary: true;
@@ -23,7 +28,7 @@ type Consent = {
   decidedAt: string;
 };
 
-function readConsent(): Consent | null {
+export function readConsent(): Consent | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(COOKIE_KEY);
@@ -37,14 +42,22 @@ function saveConsent(consent: Consent) {
   localStorage.setItem(COOKIE_KEY, JSON.stringify(consent));
   document.cookie = `msg_analytics=${consent.analytics ? "1" : "0"};path=/;max-age=31536000;SameSite=Lax`;
   document.cookie = `msg_marketing=${consent.marketing ? "1" : "0"};path=/;max-age=31536000;SameSite=Lax`;
+  window.dispatchEvent(new Event(CONSENT_EVENT));
 }
 
-export function CookieBanner() {
+export function CookieBanner({ locale = "cs" }: { locale?: string }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const copy = getSurfaceCopy(locale);
+  const googleCmpOwnsAds = adsAllowedOnPath(pathname);
 
   useEffect(() => {
+    if (googleCmpOwnsAds) {
+      setOpen(false);
+      return;
+    }
     if (!readConsent()) setOpen(true);
-  }, []);
+  }, [googleCmpOwnsAds]);
 
   function acceptAll() {
     saveConsent({
@@ -72,13 +85,13 @@ export function CookieBanner() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-lg" aria-describedby="cookie-desc">
         <DialogHeader>
-          <DialogTitle>Cookies a soukromí</DialogTitle>
+          <DialogTitle>{copy.cookieTitle}</DialogTitle>
           <DialogDescription id="cookie-desc">
-            Používáme cookies pro fungování webu, analytiku a marketing. Více v{" "}
+            {copy.cookieBody}{" "}
             <Link href="/gdpr" className="text-primary underline">
               GDPR
             </Link>{" "}
-            a{" "}
+            ·{" "}
             <Link href="/cookies" className="text-primary underline">
               Cookies
             </Link>
@@ -87,10 +100,10 @@ export function CookieBanner() {
         </DialogHeader>
         <DialogFooter className="flex-col gap-2 sm:flex-row">
           <Button variant="outline" onClick={acceptNecessary}>
-            Pouze nezbytné
+            {copy.cookieNecessary}
           </Button>
           <Button onClick={acceptAll} className="bg-[#005B96] hover:bg-[#004874]">
-            Přijmout vše
+            {copy.cookieAcceptAll}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -78,7 +78,7 @@ npm run content:seed
 npm run content:ingest
 ```
 
-Browse specialties at `/categories`, `/medicina/priprava`, and `/medicina/studium`. On Vercel, ingestion runs daily via `vercel.json` cron (`CRON_SECRET` required) and uses `scripts/supabase-dedup.mjs` for hash-based duplicate prevention.
+Browse specialties at `/categories`, `/medicina/priprava`, and `/medicina/studium`. Ingestion runs via GitHub Actions `.github/workflows/cloudflare-cron.yml` (`CRON_SECRET` required) and uses `scripts/supabase-dedup.mjs` for hash-based duplicate prevention.
 
 ## Scripts
 
@@ -172,17 +172,14 @@ DEFAULT_SITE_LOCALE=cs        # Homepage default language
 
 **Note**: At least one translation engine is required for production.
 
-## Deploy (Vercel)
+## Deploy (Cloudflare Workers)
 
-1. Import the repo and set environment variables:
-   - All required variables from `.env.example`
-   - **Translation keys** (see Locale & Translation System above)
-   - `NEXT_PUBLIC_SITE_URL` = your production domain
-2. Add production callback URL in Supabase Auth settings.
-3. Apply any pending migrations: `npm run db:migrate`
+1. Push to `main` or run `pnpm cf:deploy`.
+2. Set Worker variables/secrets (see [docs/deploy/production-runbook.md](docs/deploy/production-runbook.md)).
+3. Add production callback URL in Supabase Auth settings.
+4. Apply any pending migrations: `npm run db:migrate`
 
-**For production deployment details, see [docs/PRODUCTION_DEPLOYMENT.md](docs/PRODUCTION_DEPLOYMENT.md)**
-4. Run the SQL migration on your production Supabase project.
+**For production deployment details, see [docs/deploy/production-runbook.md](docs/deploy/production-runbook.md)**
 
 ## Security notes
 

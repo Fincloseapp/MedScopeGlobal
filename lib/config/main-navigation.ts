@@ -1,4 +1,5 @@
 import type { LocaleCode } from "@/lib/i18n/config";
+import { localizeNavTree } from "@/lib/i18n/nav-copy";
 
 export type NavItem = {
   label: string;
@@ -27,13 +28,33 @@ const menuCs: NavItem[] = [
     label: "Pro veřejnost",
     href: "/verejnost",
     children: [
-      { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu — i offline" },
-      { label: "Najdi svůj problém", href: "/verejnost/temata", description: "Symptomy, prevence, nemoci — začněte zde" },
-      { label: "Zeptej se AI", href: "/ai-asistent/verejnost", description: "Odpovědi o zdraví — nenahrazuje lékaře" },
+      {
+        label: "Dlouhověkost",
+        href: "/verejnost/clanky?topic=dlouhovekost",
+        description: "Healthspan, spánek, pohyb a strava — náhled a Redakce",
+      },
+      {
+        label: "Pohyb a cvičení",
+        href: "/verejnost/clanky?topic=pohyb",
+        description: "Síla, chůze a regenerace — redakčně",
+      },
+      {
+        label: "Jóga",
+        href: "/verejnost/clanky?topic=joga",
+        description: "Mobilita a dech — bez ezoteriky",
+      },
+      {
+        label: "Kosmetika",
+        href: "/verejnost/clanky?topic=kosmetika",
+        description: "Dermokosmetika a fotoprotekce",
+      },
+      { label: "Články redakce", href: "/verejnost/clanky", description: "Redakční texty bez žargonu" },
+      { label: "Dnešní tip", href: "/verejnost/osveta", description: "Jeden praktický krok na dnes" },
+      { label: "Témata", href: "/verejnost/temata", description: "Prevence, výživa, spánek, stres" },
+      { label: "Rozhovory", href: "/verejnost/rozhovory", description: "Odborníci srozumitelně" },
+      { label: "AI poradna", href: "/ai-asistent/verejnost", description: "Odpovědi o zdraví — nenahrazuje lékaře" },
       { label: "Přehled sekce", href: "/verejnost", description: "Vše pro veřejnost na jednom místě" },
-      { label: "Články", href: "/verejnost/clanky", description: "Krátké srozumitelné články v češtině" },
-      { label: "Denní videa", href: "/verejnost/osveta", description: "Zdravotní tipy s avatary a kvízy" },
-      { label: "Rozhovory", href: "/verejnost/rozhovory", description: "Rozhovory s lékaři a odborníky" },
+      { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu — i offline" },
       { label: "Žebříček", href: "/verejnost/zebricek", description: "XP za sledování a kvízy" },
     ],
   },
@@ -54,6 +75,8 @@ const menuCs: NavItem[] = [
         description: "Knihovna podle ročníku a oboru",
       },
       { label: "Testy", href: "/studenti/testy", description: "Self-test a modelové otázky" },
+      { label: "Klub kvízů", href: "/studenti/klub", description: "Soutěžní kvízy — 1 test zdarma" },
+      { label: "Žebříček", href: "/studenti/zebricek", description: "Nejlepší přezdívky z kvízů" },
       { label: "Kvízy a hry", href: "/studenti/hry", description: "Studijní hry a kvízy" },
       { label: "AI tutor", href: "/studenti/ai-tutor", description: "Studentský AI asistent" },
       // Soft-gated: restore “Přípravné kurzy Academy” → /academy/courses?category=prijimacky
@@ -61,7 +84,7 @@ const menuCs: NavItem[] = [
       {
         label: "Předplatné Student",
         href: "/predplatne#student",
-        description: "149 Kč/měsíc · trial zdarma",
+        description: "1 test zdarma · 89 Kč, další měsíc 149 Kč",
       },
       {
         label: "Pro rodiče",
@@ -220,6 +243,13 @@ const menuCs: NavItem[] = [
   {
     label: "Předplatné",
     href: "/predplatne",
+    children: [
+      { label: "Prohlédnout tarify", href: "/predplatne", description: "14 dní zdarma · zrušení kdykoli" },
+      { label: "Veřejnost", href: "/predplatne#public", description: "Články, prevence, MeDipacient" },
+      { label: "Student LF", href: "/predplatne#student", description: "1 test zdarma · 89 Kč, další měsíc 149 Kč" },
+      { label: "OrdiZapis", href: "/predplatne#dokumentace", description: "AI zápisy pro ordinaci" },
+      { label: "Lékař v praxi", href: "/predplatne#physician", description: "CME a Research Hub" },
+    ],
   },
 ];
 
@@ -344,46 +374,142 @@ const menuEn: NavItem[] = [
   },
 ];
 
-export function getMainMenu(locale: LocaleCode): NavItem[] {
-  return locale === "cs" ? menuCs : menuEn;
+function isCzechMedicalSchoolNav(href: string): boolean {
+  return (
+    href === "/studenti" ||
+    href.startsWith("/studenti/") ||
+    href.startsWith("/mediprep") ||
+    href.startsWith("/app/priprava") ||
+    href.startsWith("/academy") ||
+    href.startsWith("/studium")
+  );
 }
 
-/** v33 — compact desktop header: 6 primary items, all visible without overflow */
+function withoutCzechSchoolTrack(items: NavItem[]): NavItem[] {
+  return items
+    .filter((item) => !isCzechMedicalSchoolNav(item.href))
+    .map((item) => ({
+      ...item,
+      children: item.children?.filter((child) => !isCzechMedicalSchoolNav(child.href)),
+    }));
+}
+
+export function getMainMenu(locale: LocaleCode): NavItem[] {
+  const tree = locale === "cs" ? menuCs : withoutCzechSchoolTrack(menuCs);
+  return localizeNavTree(tree, locale);
+}
+
+function magazineNav(): NavItem {
+  return {
+    label: "Magazín",
+    href: "/articles",
+    children: [
+      { label: "Všechny články", href: "/articles", description: "Novinky, veřejné zdraví a dlouhověkost" },
+      {
+        label: "Dlouhověkost",
+        href: "/verejnost/clanky?topic=dlouhovekost",
+        description: "Healthspan, spánek, pohyb a strava",
+      },
+      { label: "Aktuality", href: "/novinky", description: "Zdravotnické události bez senzace" },
+      { label: "Archiv", href: "/articles/archiv", description: "Starší články a briefy" },
+      { label: "Hledat", href: "/hledat", description: "Hledání v archivu magazínu" },
+      { label: "Newsletter", href: "/newsletter", description: "Týdenní brief do schránky" },
+    ],
+  };
+}
+
+function firmyNav(): NavItem {
+  return {
+    label: "Firmy",
+    href: "/firmy",
+    children: [
+      { label: "Pro firmy", href: "/firmy", description: "Bannery a partnerství v magazínu" },
+      { label: "Ceník", href: "/firmy/cenik", description: "Orientační ceny bez skrytých poplatků" },
+      { label: "Reklama", href: "/firmy/reklama", description: "Bannery a newsletter — ne v lékařské zóně" },
+      { label: "Partnerství", href: "/firmy/partnerstvi", description: "Univerzity a instituce" },
+      { label: "Kampaně", href: "/firmy/kampane", description: "Segmentace magazín / veřejnost" },
+      { label: "Kosmetické značky", href: "/firmy/kosmetika", description: "Prémiová dermokosmetika ve veřejné rubrice" },
+      { label: "Poptávka", href: "/inzerce/formular", description: "Nabídka do 2 pracovních dnů" },
+    ],
+  };
+}
+
+export function getHeaderUtilityLinks(locale: LocaleCode): NavItem[] {
+  return localizeNavTree(
+    [
+      { label: "Hledat", href: "/hledat" },
+      { label: "Newsletter", href: "/newsletter" },
+      { label: "O nás", href: "/o-nas" },
+      { label: "Kontakt", href: "/kontakt" },
+    ],
+    locale
+  );
+}
+
+export function headerUtilityAria(locale: LocaleCode): string {
+  if (locale === "cs") return "Rychlé odkazy";
+  if (locale === "de") return "Schnellzugriff";
+  if (locale === "fr") return "Accès rapide";
+  if (locale === "it") return "Collegamenti rapidi";
+  if (locale === "es") return "Accesos rápidos";
+  if (locale === "pt" || locale === "pt-BR") return "Atalhos";
+  return "Quick links";
+}
+
+/** Desktop + mobile: audience-first IA, every primary surface visible. */
 export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
-  if (locale !== "cs") {
-    return getMainMenu(locale).slice(0, 6);
-  }
   const find = (label: string) => menuCs.find((item) => item.label === label);
   const verejnost = find("Pro veřejnost");
   const studenti = find("Pro studenty");
   const lekari = find("Pro lékaře");
   const predplatne = find("Předplatné");
-  return [
-    verejnost ? { ...verejnost, label: "Veřejnost" } : { label: "Veřejnost", href: "/verejnost" },
-    studenti ? { ...studenti, label: "Studenti" } : { label: "Studenti", href: "/studenti" },
-    lekari ? { ...lekari, label: "Lékaři" } : { label: "Lékaři", href: "/lekari" },
+  const appsChildren = [
+    { label: "Přehled aplikací", href: "/aplikace", description: "MediFlow, MeDipacient, OrdiZapis" },
+    { label: "MediFlow", href: "/mediflow", description: "Wellness deník a longevity" },
+    { label: "Otevřít MediFlow", href: "/app/mediflow", description: "Instalace na plochu" },
+    { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu" },
+    { label: "Otevřít MeDipacient", href: "/app/pacient", description: "Instalace na plochu" },
+    { label: "OrdiZapis", href: "/lekari/dokumentace", description: "AI zápisy pro lékaře" },
+    { label: "Otevřít OrdiZapis", href: "/app/dokumentace", description: "Nahrávání v mobilu" },
+    ...(locale === "cs"
+      ? [{ label: "MeDiprep (legacy)", href: "/mediprep", description: "Přijímačky LF — sekundární" }]
+      : []),
+    { label: "Můj dashboard", href: "/dashboard", description: "Zprávy, deník a zápisy" },
+  ];
+  const publicChildren = verejnost?.children?.filter((child) => child.href !== "/verejnost/zebricek");
+  const physicianChildren =
+    locale === "cs"
+      ? lekari?.children
+      : lekari?.children?.filter((child) => !isCzechMedicalSchoolNav(child.href));
+  const tree: NavItem[] = [
+    verejnost
+      ? {
+          ...verejnost,
+          label: "Veřejnost",
+          children: publicChildren,
+        }
+      : { label: "Veřejnost", href: "/verejnost" },
+    ...(locale === "cs"
+      ? [studenti ? { ...studenti, label: "Studenti" } : { label: "Studenti", href: "/studenti" }]
+      : []),
+    lekari
+      ? { ...lekari, label: "Lékaři", children: physicianChildren }
+      : { label: "Lékaři", href: "/lekari" },
+    magazineNav(),
     {
       label: "Aplikace",
       href: "/aplikace",
-      children: [
-        { label: "Přehled aplikací", href: "/aplikace", description: "MediFlow, MeDipacient, OrdiZapis" },
-        { label: "MediFlow", href: "/mediflow", description: "Wellness deník a longevity" },
-        { label: "Stáhnout MediFlow", href: "/app/mediflow", description: "Instalace na plochu" },
-        { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu" },
-        { label: "Stáhnout MeDipacient", href: "/app/pacient", description: "Instalace na plochu" },
-        { label: "OrdiZapis", href: "/lekari/dokumentace", description: "AI zápisy pro lékaře" },
-        { label: "Stáhnout OrdiZapis", href: "/app/dokumentace", description: "Nahrávání v mobilu" },
-        { label: "MeDiprep (legacy)", href: "/mediprep", description: "Přijímačky LF — sekundární" },
-        { label: "Můj dashboard", href: "/dashboard", description: "Zprávy, deník a zápisy" },
-      ],
+      children: appsChildren,
     },
+    firmyNav(),
     predplatne ?? { label: "Předplatné", href: "/predplatne" },
   ];
+  return localizeNavTree(tree, locale);
 }
 
-/** v33 — mobile drawer shows full menu */
+/** Same IA as the desktop bar so mobile is not a leftover dump of 20 top-level items. */
 export function getMobileMenu(locale: LocaleCode): NavItem[] {
-  return getMainMenu(locale);
+  return getDesktopHeaderMenu(locale);
 }
 
 export function getHeaderTagline(locale: LocaleCode): string {

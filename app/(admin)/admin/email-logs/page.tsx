@@ -2,6 +2,7 @@ import Link from "next/link";
 import { EmailLogDetail } from "@/components/admin/email-log-detail";
 import { EmailLogTable } from "@/components/admin/email-log-table";
 import { getEmailLog, listEmailLogs } from "@/lib/email/log";
+import { mailReady, mailTransportLabel } from "@/lib/monetization/vialongevita-brief";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,8 @@ export default async function AdminEmailLogsPage({
   const detail = params.detail ? await getEmailLog(params.detail) : null;
   const sent = logs.filter((l) => l.status === "sent").length;
   const failed = logs.filter((l) => l.status === "failed").length;
+  const transport = mailTransportLabel();
+  const ready = mailReady();
 
   return (
     <div className="space-y-8">
@@ -31,7 +34,14 @@ export default async function AdminEmailLogsPage({
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-4">
+        <div className="rounded-xl border bg-white p-4">
+          <p className="text-xs uppercase text-muted-foreground">Transport</p>
+          <p className="text-2xl font-bold text-medical-navy">{ready ? transport : "žádný"}</p>
+          <p className="text-xs text-muted-foreground">
+            {ready ? "Worker odesílá z info@medscopeglobal.com" : "e-mailový transport chybí"}
+          </p>
+        </div>
         <div className="rounded-xl border bg-white p-4">
           <p className="text-xs uppercase text-muted-foreground">Celkem</p>
           <p className="text-2xl font-bold text-medical-navy">{logs.length}</p>

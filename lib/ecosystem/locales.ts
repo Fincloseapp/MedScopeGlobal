@@ -8,6 +8,8 @@ export const GLOBAL_LOCALES = [
   { code: "fr", hreflang: "fr-FR", label: "Français", region: "EU", currency: "EUR", searchEngine: "google" },
   { code: "it", hreflang: "it-IT", label: "Italiano", region: "EU", currency: "EUR", searchEngine: "google" },
   { code: "es", hreflang: "es-ES", label: "Español", region: "EU", currency: "EUR", searchEngine: "google" },
+  { code: "pt", hreflang: "pt-PT", label: "Português (Portugal)", region: "EU", currency: "EUR", searchEngine: "google" },
+  { code: "pt-BR", hreflang: "pt-BR", label: "Português (Brasil)", region: "LATAM", currency: "BRL", searchEngine: "google" },
   { code: "ro", hreflang: "ro-RO", label: "Română", region: "EU", currency: "RON", searchEngine: "google" },
   { code: "hu", hreflang: "hu-HU", label: "Magyar", region: "EU", currency: "HUF", searchEngine: "google" },
   { code: "ru", hreflang: "ru-RU", label: "Русский", region: "RU", currency: "RUB", searchEngine: "yandex" },
@@ -20,14 +22,15 @@ export const GLOBAL_LOCALES = [
   { code: "id", hreflang: "id-ID", label: "Bahasa Indonesia", region: "ASIA", currency: "IDR", searchEngine: "google" },
   { code: "en", hreflang: "en", label: "English (International)", region: "GLOBAL", currency: "USD", searchEngine: "google" },
   { code: "en-US", hreflang: "en-US", label: "English (USA)", region: "USA", currency: "USD", searchEngine: "google" },
+  { code: "en-UK", hreflang: "en-GB", label: "English (UK)", region: "UK", currency: "GBP", searchEngine: "google" },
 ] as const;
 
 export type GlobalLocaleCode = (typeof GLOBAL_LOCALES)[number]["code"];
 
 export const GEO_LOCALE_MAP: Record<string, GlobalLocaleCode> = {
-  US: "en-US", CA: "en-US", GB: "en", AU: "en", NZ: "en", IE: "en",
+  US: "en-US", CA: "en-US", GB: "en-UK", AU: "en", NZ: "en", IE: "en",
   CZ: "cs", SK: "sk", PL: "pl", DE: "de", AT: "de", CH: "de",
-  FR: "fr", BE: "fr", IT: "it", ES: "es", PT: "es",
+  FR: "fr", BE: "fr", IT: "it", ES: "es", PT: "pt", BR: "pt-BR",
   RO: "ro", HU: "hu",
   RU: "ru", BY: "be", UA: "uk", KZ: "ru",
   CN: "zh-CN", TW: "zh-CN", HK: "zh-CN",
@@ -51,6 +54,8 @@ export const MEDICAL_DISCLAIMER: Record<GlobalLocaleCode, string> = {
   fr: "Le contenu ne constitue pas un diagnostic médical ni une recommandation thérapeutique. Consultez toujours votre médecin.",
   it: "Il contenuto non costituisce una diagnosi medica né una raccomandazione terapeutica. Consultare sempre il proprio medico.",
   es: "El contenido no constituye un diagnóstico médico ni una recomendación terapéutica. Consulte siempre a su médico.",
+  pt: "Este conteúdo não é um diagnóstico médico nem uma recomendação terapêutica. Consulte sempre o seu médico.",
+  "pt-BR": "Este conteúdo não é diagnóstico médico nem recomendação de tratamento. Consulte sempre o seu médico ou o SUS.",
   ro: "Conținutul nu reprezintă un diagnostic medical sau o recomandare terapeutică. Consultați întotdeauna medicul.",
   hu: "A tartalom nem minősül orvosi diagnózisnak vagy kezelési javaslatnak. Mindig konzultáljon orvosával.",
   ru: "Контент не является медицинским диагнозом или рекомендацией по лечению. Всегда консультируйтесь с врачом.",
@@ -63,4 +68,5 @@ export const MEDICAL_DISCLAIMER: Record<GlobalLocaleCode, string> = {
   id: "Konten ini bukan diagnosis medis atau rekomendasi pengobatan. Selalu konsultasikan dengan dokter Anda.",
   en: "Content is not medical diagnosis or treatment advice. Always consult your physician.",
   "en-US": "This content is not medical advice, diagnosis, or treatment. Always consult your healthcare provider.",
+  "en-UK": "This content is not medical advice, diagnosis, or treatment. Always consult your GP or clinician.",
 };

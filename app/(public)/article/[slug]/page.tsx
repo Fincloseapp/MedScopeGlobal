@@ -17,13 +17,15 @@ import { VipBadge } from "@/components/vip/vip-badge";
 import { EditorialAttribution } from "@/components/article/editorial-attribution";
 import { EditorialFooter } from "@/components/article/editorial-footer";
 import {
+  formatDeskShareNotice,
   publicEditorialByline,
   type EditorialLocale,
 } from "@/lib/editorial/units";
+import { matchesArticleLocale } from "@/lib/i18n/article-locale";
 import { articleJsonLdGlobal, buildGlobalHreflang } from "@/lib/ecosystem/seo";
-import { canAccessContent } from "@/lib/config/access-levels";
-import type { AccessLevelId } from "@/lib/config/access-levels";
+import { resolveArticleBodyLock } from "@/lib/auth/article-eligibility";
 import { getReaderContext } from "@/lib/auth/reader-context";
+import { getEditorialArticleGateCopy } from "@/lib/v38/conversion-copy";
 import { getActiveAds, getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { AdPlacement } from "@/components/ads/ad-placement";
 import {
@@ -32,6 +34,8 @@ import {
 } from "@/lib/queries/articles";
 import { getDictionary, t } from "@/lib/i18n/get-dictionary";
 import { getServerLocale } from "@/lib/i18n/server-locale";
+import { formatPublicDate } from "@/lib/i18n/format-date";
+import { articleDisplayDate, articleWasRefreshed } from "@/lib/editorial/freshness";
 import { ContentRecommendations } from "@/components/recommendations/content-recommendations";
 import { resolveConversionCopy } from "@/lib/v38/conversion-engine";
 import { getArticleCoverLabel, getArticleCoverStyles } from "@/lib/utils/article-visuals";
@@ -39,6 +43,7 @@ import { listStudentAdCampaignsForArticle } from "@/lib/queries/marketing";
 import { ArticleCtaBlocks } from "@/components/articles/article-cta-blocks";
 import { StudentAdBlocks } from "@/components/student/student-ad-blocks";
 import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
+import { ADSENSE_SLOT_IN_ARTICLE } from "@/lib/monetization/adsense";
 import {
   SaveToMediFlowButton,
   ArticleShareButton,
@@ -49,12 +54,30 @@ import {
   getArticleHeroAltText,
   resolveArticleCoverUrl,
 } from "@/lib/ecosystem/editorial/images";
-import { TopLongevityProducts } from "@/components/monetization/affiliate-box";
+import {
+  AsideAffiliate,
+  MidArticleAffiliate,
+  TopicAffiliateBox,
+} from "@/components/monetization/affiliate-box";
+import { ArticleSubscribeNudge } from "@/components/monetization/article-subscribe-nudge";
+import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
+import { HousePartnerSlot } from "@/components/monetization/house-partner-slot";
+import { OrdiZapisPromoBanner } from "@/components/lekari/ordizapis-promo-banner";
+import {
+  classifyRevenueSurface,
+  shouldShowAffiliate,
+  shouldShowDisplayAds,
+  shouldShowHousePartner,
+  shouldShowOrdiZapisCta,
+  shouldShowPublicSubscribeNudge,
+} from "@/lib/monetization/revenue-mix";
 import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { MAGAZINE, getOgLocale } from "@/lib/brand/magazine";
-import { isArticleTipUiEnabled } from "@/lib/ecosystem/tip-copy";
+import { isArticleTipUiEnabled, ARTICLE_TIP_COPY, tipLocale } from "@/lib/ecosystem/tip-copy";
 import { SITE } from "@/lib/config/site";
+import { getArticleChrome } from "@/lib/i18n/article-chrome";
+import { localeToPathSegment } from "@/lib/i18n/locale-path";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -101,15 +124,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: article.title,
     description,
     keywords,
+    authors: [{ name: MAGAZINE.name, url: SITE.url }],
+    publisher: MAGAZINE.name,
     alternates: {
       canonical,
       languages,
+      types: {
+        "application/rss+xml": `${SITE.url}/feed-${localeToPathSegment(locale)}.xml`,
+      },
     },
     openGraph: {
       title: article.title,
       description,
       type: "article",
       publishedTime: article.published_at ?? undefined,
+      modifiedTime: article.updated_at ?? article.published_at ?? undefined,
       url: canonical,
       locale: getOgLocale(locale),
       images: [{ url: ogImage }],
@@ -130,18 +159,32 @@ export default async function ArticlePage({ params }: Props) {
   const article = await getArticleBySlug(slug, locale);
   if (!article) notFound();
 
-  const { isVip, accessLevel } = await getReaderContext();
+  const { isVip, accessLevel, hasEditorialAccess } = await getReaderContext();
 
-  const minLevel = (article.min_access_level ?? "public") as AccessLevelId;
-  const locked =
-    (article.vip_only && !isVip) ||
-    !canAccessContent(accessLevel, minLevel);
+  const revenueArticle = {
+    vip_only: article.vip_only,
+    min_access_level: article.min_access_level,
+    audience: (article as { audience?: string | null }).audience,
+    rubric_slug: article.rubric_slug,
+    public_topic: article.public_topic,
+    title: article.title,
+    slug: article.slug,
+    excerpt: article.excerpt,
+    category: article.categories?.name,
+    med_track: (article as { med_track?: string | null }).med_track,
+  };
+  const revenueSurface = classifyRevenueSurface(revenueArticle);
+  const { locked, specialAccess } = resolveArticleBodyLock(article, {
+    isVip,
+    accessLevel,
+    hasEditorialAccess,
+  });
 
-  // Gate copy only when the body is locked — open articles get no subscription nudge.
-  const articleGateCopy =
-    locked && !isVip
+  const articleGateCopy = !locked
+    ? null
+    : specialAccess
       ? await resolveConversionCopy("article_gate", locale)
-      : null;
+      : { ...getEditorialArticleGateCopy(locale), generatedBy: "static" as const };
 
   const related =
     article.category_id &&
@@ -185,8 +228,8 @@ export default async function ArticlePage({ params }: Props) {
   const studentSidebarAds = studentCampaigns.filter((c) => c.type === "sidebar").slice(0, 3);
 
   const category = article.categories;
-  const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
-  const authorDisplay = publicEditorialByline(editorialLocale);
+  const editorialLocale: EditorialLocale = locale;
+  const authorDisplay = publicEditorialByline(locale);
   const heroAlt = getArticleHeroAltText(
     {
       title: article.title,
@@ -211,16 +254,8 @@ export default async function ArticlePage({ params }: Props) {
   const v19Quiz = (article.quiz_json ?? {}) as Record<string, unknown>;
   const showContribution = isArticleTipUiEnabled(locked);
 
-  /**
-   * Tip / Darovat chrome follows the *article* language, not browser geo.
-   * Czech magazine pieces (verejnost-* / locale cs) must stay Kč + Czech copy
-   * even when the site UI cookie resolves to en.
-   */
-  const articleLocaleTag = String(article.locale ?? "").toLowerCase();
   const supportLocale: GlobalLocaleCode =
-    articleLocaleTag.startsWith("cs") || article.slug.startsWith("verejnost-")
-      ? "cs"
-      : (((locale as GlobalLocaleCode) || "cs") as GlobalLocaleCode);
+    ((locale as GlobalLocaleCode) || "cs") as GlobalLocaleCode;
 
   const globalJsonLd = articleJsonLdGlobal({
     title: article.title,
@@ -228,8 +263,10 @@ export default async function ArticlePage({ params }: Props) {
     slug: article.slug,
     locale,
     publishedAt: article.published_at,
+    modifiedAt: article.updated_at ?? article.published_at,
     authorName: authorDisplay,
     coverImage: coverUrl,
+    isAccessibleForFree: !locked,
   });
 
   const jsonLd = isV19Article
@@ -261,12 +298,10 @@ export default async function ArticlePage({ params }: Props) {
       ).jsonLd
     : globalJsonLd;
 
-  const publishedLabel =
-    article.published_at &&
-    new Date(article.published_at).toLocaleDateString(
-      locale === "en" || locale === "en-US" ? "en-GB" : "cs-CZ",
-      { year: "numeric", month: "long", day: "numeric" }
-    );
+  const chrome = getArticleChrome(locale);
+  const displayIso = articleDisplayDate(article);
+  const publishedLabel = formatPublicDate(displayIso, locale);
+  const refreshed = articleWasRefreshed(article);
 
   return (
     <>
@@ -299,7 +334,11 @@ export default async function ArticlePage({ params }: Props) {
               </Link>
             ) : null}
 
-            {article.translatedFrom ? (
+            {article.translatedFrom && !matchesArticleLocale(article.locale, locale) ? (
+              <p className="mt-4 border border-[#C7E3FF] bg-[#f0f7ff] px-4 py-2 text-sm text-[#005B96]">
+                {formatDeskShareNotice(locale, article.translatedFrom)}
+              </p>
+            ) : article.machine_translated ? (
               <p className="mt-4 border border-[#C7E3FF] bg-[#f0f7ff] px-4 py-2 text-sm text-[#005B96]">
                 {t(dict, "alerts.translatedArticle")}
                 {article.translation_provider ? (
@@ -339,15 +378,18 @@ export default async function ArticlePage({ params }: Props) {
               <div className="min-w-0">
                 <EditorialAttribution article={article} locale={editorialLocale} />
                 {publishedLabel ? (
-                  <p className="mt-0.5 text-sm text-slate-500">{publishedLabel}</p>
+                  <p className="mt-0.5 text-sm text-slate-500">
+                    {refreshed ? `${chrome.updated} ${publishedLabel}` : publishedLabel}
+                  </p>
                 ) : null}
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <SaveToMediFlowButton
                   articleSlug={article.slug}
                   articleTitle={article.title}
+                  locale={locale}
                 />
-                <ArticleShareButton title={article.title} slug={article.slug} />
+                <ArticleShareButton title={article.title} slug={article.slug} locale={locale} />
               </div>
             </div>
 
@@ -391,7 +433,7 @@ export default async function ArticlePage({ params }: Props) {
             articleSlug={article.slug}
           />
 
-          {!isVip ? (
+          {shouldShowDisplayAds(revenueSurface, isVip) ? (
             <GlobalAdSlot
               placement="below-title"
               locale={(locale as GlobalLocaleCode) ?? "cs"}
@@ -408,22 +450,32 @@ export default async function ArticlePage({ params }: Props) {
 
           <div className="article-body-column">
             {article.rubric_slug === V19_RUBRIC_SLUG && !locked ? (
-              <V19ArticleBody
-                locale={locale}
-                article={{
-                  title: article.title,
-                  date: article.published_at ?? new Date().toISOString(),
-                  summary: article.excerpt ?? "",
-                  keyPoints: (v19Quiz.keyPoints as string[]) ?? [],
-                  clinicalImpact: (v19Quiz.clinicalImpact as string) ?? "",
-                  scientificContext: (v19Quiz.scientificContext as string) ?? "",
-                  patientEducation: (v19Quiz.patientEducation as string) ?? "",
-                  nzipContext: (v19Quiz.nzipContext as string) ?? undefined,
-                  specialty: v19Quiz.specialty as string | undefined,
-                  sourceUrl: article.source_url ?? undefined,
-                  sourceName: article.source_name ?? undefined,
-                }}
-              />
+              <>
+                <V19ArticleBody
+                  locale={locale}
+                  article={{
+                    title: article.title,
+                    date: article.published_at ?? new Date().toISOString(),
+                    summary: article.excerpt ?? "",
+                    keyPoints: (v19Quiz.keyPoints as string[]) ?? [],
+                    clinicalImpact: (v19Quiz.clinicalImpact as string) ?? "",
+                    scientificContext: (v19Quiz.scientificContext as string) ?? "",
+                    patientEducation: (v19Quiz.patientEducation as string) ?? "",
+                    nzipContext: (v19Quiz.nzipContext as string) ?? undefined,
+                    specialty: v19Quiz.specialty as string | undefined,
+                    sourceUrl: article.source_url ?? undefined,
+                    sourceName: article.source_name ?? undefined,
+                  }}
+                />
+                {shouldShowDisplayAds(revenueSurface, isVip) ? (
+                  <GlobalAdSlot
+                    placement="in-article"
+                    layout="in-article"
+                    slotId={ADSENSE_SLOT_IN_ARTICLE}
+                    locale={(locale as GlobalLocaleCode) ?? "cs"}
+                  />
+                ) : null}
+              </>
             ) : (
               <>
                 {!locked ? (
@@ -431,30 +483,48 @@ export default async function ArticlePage({ params }: Props) {
                     title={article.title}
                     excerpt={article.excerpt ?? undefined}
                     content={article.content}
+                    locale={locale}
                   />
                 ) : null}
                 <ArticleBody
                   html={article.content}
                   locked={locked}
                   title={article.title}
+                  locale={locale}
                   gateCopy={articleGateCopy ?? undefined}
+                  midSlot={
+                    !locked &&
+                    (shouldShowDisplayAds(revenueSurface, isVip) ||
+                      shouldShowAffiliate(revenueSurface)) ? (
+                      <>
+                        {shouldShowDisplayAds(revenueSurface, isVip) ? (
+                          <GlobalAdSlot
+                            placement="in-article"
+                            layout="in-article"
+                            slotId={ADSENSE_SLOT_IN_ARTICLE}
+                            locale={(locale as GlobalLocaleCode) ?? "cs"}
+                          />
+                        ) : null}
+                        {shouldShowAffiliate(revenueSurface) ? (
+                          <MidArticleAffiliate locale={supportLocale} article={revenueArticle} />
+                        ) : null}
+                      </>
+                    ) : null
+                  }
                 />
               </>
             )}
           </div>
 
-          {!locked ? (
-            <GlobalAdSlot
-              placement="in-content"
-              locale={(locale as GlobalLocaleCode) ?? "cs"}
-            />
+          {!locked && shouldShowAffiliate(revenueSurface) ? (
+            <TopicAffiliateBox locale={supportLocale} article={revenueArticle} />
           ) : null}
 
           {showContribution ? (
             <Suspense
               fallback={
                 <section className="article-contribute scroll-mt-24">
-                  <p className="text-sm text-slate-500">Načítání příspěvků…</p>
+                  <p className="text-sm text-slate-500">{ARTICLE_TIP_COPY[tipLocale(locale)].loading}</p>
                 </section>
               }
             >
@@ -474,11 +544,30 @@ export default async function ArticlePage({ params }: Props) {
             />
           ) : null}
 
-          {!locked ? (
-            <TopLongevityProducts locale={supportLocale} />
+          {!locked && shouldShowOrdiZapisCta(revenueSurface) ? (
+            <div className="my-8">
+              <OrdiZapisPromoBanner variant="hub" />
+            </div>
+          ) : null}
+
+          {!locked && shouldShowPublicSubscribeNudge(revenueSurface, isVip) ? (
+            <ArticleSubscribeNudge locale={locale} />
           ) : null}
 
           {!locked ? (
+            <NewsletterCapture
+              locale={locale}
+              source="article"
+              segment={revenueSurface === "physician" ? "doctors" : "public"}
+              className="my-8"
+            />
+          ) : null}
+
+          {!locked && shouldShowHousePartner(revenueSurface, isVip) ? (
+            <HousePartnerSlot locale={locale} source="article-footer" className="my-8" />
+          ) : null}
+
+          {!locked && shouldShowDisplayAds(revenueSurface, isVip) ? (
             <GlobalAdSlot
               placement="footer"
               locale={(locale as GlobalLocaleCode) ?? "cs"}
@@ -488,21 +577,27 @@ export default async function ArticlePage({ params }: Props) {
           {related && related.length > 0 ? (
             <section className="article-related">
               <h2 className="font-display text-2xl font-semibold text-[#021d33]">
-                Související čtení
+                {chrome.related}
               </h2>
               <div className="mt-6 grid gap-6 md:grid-cols-3">
                 {related.map((a) => (
-                  <ArticleCard key={a.id} article={a} />
+                  <ArticleCard key={a.id} article={a} locale={locale} />
                 ))}
               </div>
             </section>
           ) : null}
 
           <ContentRecommendations locale={locale} currentSlug={article.slug} />
+          {!locked && shouldShowAffiliate(revenueSurface) ? (
+            <MidArticleAffiliate locale={supportLocale} article={revenueArticle} />
+          ) : null}
           <EditorialFooter locale={editorialLocale} />
         </div>
 
         <aside className="article-reading-aside">
+          {!locked && shouldShowAffiliate(revenueSurface) ? (
+            <AsideAffiliate locale={supportLocale} article={revenueArticle} />
+          ) : null}
           {studentSidebarAds.length > 0 ? (
             <StudentAdBlocks campaigns={studentSidebarAds} variant="sidebar" />
           ) : (

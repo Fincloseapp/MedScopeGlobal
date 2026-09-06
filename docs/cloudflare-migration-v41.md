@@ -2,7 +2,6 @@
 
 ## Status
 - Runtime target: Cloudflare Workers via `@opennextjs/cloudflare`
-- Vercel config archived as `vercel.json.bak`
 - Auto-deploy: `.github/workflows/cloudflare-deploy.yml` on push to `main`
 - Cron: `.github/workflows/cloudflare-cron.yml` (HTTP dispatcher with `CRON_SECRET`)
 
@@ -27,10 +26,8 @@ set CLOUDFLARE_WORKER_HOST=medscopeglobal.<subdomain>.workers.dev
 npm run cf:dns
 ```
 
-## Disable Vercel safely
-1. Confirm medscopeglobal.com resolves to Cloudflare (orange cloud) and smoke passes.
-2. Remove Vercel production domain aliases.
-3. Pause/delete Vercel project when traffic is stable.
+## Production host
+Production DNS and the Worker already point at Cloudflare (`medscopeglobal.com`). Do not add another origin.
 
 ## Supabase
 No schema/policy changes. Same `NEXT_PUBLIC_SUPABASE_*` and `SUPABASE_SERVICE_ROLE_KEY`.

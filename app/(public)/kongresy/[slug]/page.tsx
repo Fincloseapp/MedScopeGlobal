@@ -5,27 +5,35 @@ import { notFound } from "next/navigation";
 import { getV21CongressBySlug } from "@/lib/v21/congresses";
 import { AdPlacement } from "@/components/ads/ad-placement";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { formatPublicDate } from "@/lib/i18n/format-date";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getKongresyHubCopy } from "@/lib/i18n/kongresy-hub-copy";
 
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const ev = await getV21CongressBySlug(slug);
-  return { title: ev?.title ?? "Kongres" };
+  const locale = await getServerLocale();
+  const copy = getKongresyHubCopy(locale);
+  return { title: ev?.title ?? copy.fallbackTitle };
 }
 
 export default async function KongresDetailPage({ params }: Props) {
   const { slug } = await params;
   const ev = await getV21CongressBySlug(slug);
   if (!ev) notFound();
+  const locale = await getServerLocale();
+  const copy = getKongresyHubCopy(locale);
 
   const detailAds = await getActiveAdsByPlacement("congress_detail", 1);
 
   return (
     <div className="bg-[#fafcff]">
       <div className="mx-auto max-w-4xl px-4 py-14 sm:px-6">
-        <Link href="/kongresy" className="text-sm text-[#005B96] hover:underline">
-          ← Kongresy
+        <Link href={localizePublicHref("/kongresy", locale)} className="text-sm text-[#005B96] hover:underline">
+          {copy.back}
         </Link>
         <AdPlacement ads={detailAds} variant="banner" />
         {ev.image_url ? (
@@ -35,13 +43,21 @@ export default async function KongresDetailPage({ params }: Props) {
         ) : null}
         <h1 className="mt-6 font-display text-3xl font-bold text-[#021d33]">{ev.title}</h1>
         <p className="mt-2 text-sm text-slate-500">
-          {[ev.starts_at && new Date(ev.starts_at).toLocaleString("cs-CZ"), ev.location, ev.price_hint]
+          {[
+            ev.starts_at && formatPublicDate(ev.starts_at, locale, { year: "numeric", month: "numeric", day: "numeric" }),
+            ev.location,
+            ev.price_hint,
+          ]
             .filter(Boolean)
             .join(" · ")}
         </p>
         {ev.summary ? <p className="mt-6 text-lg text-slate-700">{ev.summary}</p> : null}
         {ev.body ? <div className="mt-4 prose prose-slate max-w-none whitespace-pre-wrap">{ev.body}</div> : null}
-        {ev.organizer ? <p className="mt-4 text-sm text-slate-500">Pořadatel: {ev.organizer}</p> : null}
+        {ev.organizer ? (
+          <p className="mt-4 text-sm text-slate-500">
+            {copy.organizer}: {ev.organizer}
+          </p>
+        ) : null}
         {ev.registration_url ? (
           <a
             href={ev.registration_url}
@@ -49,7 +65,7 @@ export default async function KongresDetailPage({ params }: Props) {
             rel="noopener noreferrer"
             className="mt-8 inline-block rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white"
           >
-            Registrace
+            {copy.register}
           </a>
         ) : null}
       </div>

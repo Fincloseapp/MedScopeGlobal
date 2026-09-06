@@ -1,15 +1,12 @@
 import type { EmailAttachment, EmailSendRequest } from "@/lib/email/types";
+import { getDefaultFromEmail } from "@/lib/email/from";
 
 export function isSendGridConfigured(): boolean {
   return Boolean(process.env.SENDGRID_API_KEY?.trim());
 }
 
 export function getSendGridFromEmail(): string {
-  return (
-    process.env.SENDGRID_FROM_EMAIL?.trim() ||
-    process.env.SENDGRID_FROM?.trim() ||
-    "noreply@mail.medscopeglobal.com"
-  );
+  return getDefaultFromEmail();
 }
 
 function toRecipients(to: string | string[]): { email: string }[] {
@@ -46,7 +43,7 @@ export async function sendViaSendGrid(
     }
   }
 
-  const fromEmail = request.fromEmail ?? getSendGridFromEmail();
+  const fromEmail = request.fromEmail ?? getDefaultFromEmail();
   const fromName = request.fromName ?? "MedScopeGlobal";
 
   const body: Record<string, unknown> = {
@@ -91,6 +88,46 @@ export async function sendViaSendGrid(
     }
 
     return { ok: true, statusCode: res.status, messageId, raw: { status: res.status, messageId } };
+  } catch (e) {
+    return { ok: false, statusCode: 0, error: (e as Error).message };
+  }
+}
+
+/** Upsert a marketing contact. List ID is optional (falls back to all contacts). */
+export async function upsertSendGridContact(
+  email: string,
+  listId?: string | null
+): Promise<{ ok: boolean; statusCode: number; error?: string }> {
+  const apiKey = process.env.SENDGRID_API_KEY?.trim();
+  if (!apiKey) {
+    return { ok: false, statusCode: 0, error: "SENDGRID_API_KEY not configured" };
+  }
+
+  const body: Record<string, unknown> = {
+    contacts: [{ email: email.trim().toLowerCase() }],
+  };
+  const list = listId?.trim();
+  if (list) body.list_ids = [list];
+
+  try {
+    const res = await fetch("https://api.sendgrid.com/v3/marketing/contacts", {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      return {
+        ok: false,
+        statusCode: res.status,
+        error: text.slice(0, 400) || `SendGrid ${res.status}`,
+      };
+    }
+    return { ok: true, statusCode: res.status };
   } catch (e) {
     return { ok: false, statusCode: 0, error: (e as Error).message };
   }

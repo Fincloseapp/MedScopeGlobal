@@ -22,10 +22,10 @@ export const V271_HERO_APP_CHIPS = [
 ] as const;
 
 export const V271_SOCIAL_PROOF_STATS = [
-  { value: "2 800+", label: "zdravotnických profesionálů a studentů medicíny" },
-  { value: "500+", label: "odborných článků" },
-  { value: "1 200+", label: "studijních materiálů" },
+  { value: "PubMed", label: "SÚKL · EMA · WHO — citované zdroje" },
+  { value: "ViaLongeVita", label: "magazín dlouhověkosti" },
   { value: "14 dní", label: "zkušební přístup zdarma" },
+  { value: "VIP", label: "protokoly napojené na MediFlow" },
 ] as const;
 
 export const V271_TESTIMONIALS = [
@@ -143,7 +143,7 @@ export const V271_B2B = {
 export const V271_AKTUALNI = {
   title: "Aktuální zprávy",
   description:
-    "Domácí i zahraniční zdravotnické události — redakčně zpracované, s kontextem pro českou praxi.",
+    "Dlouhověkost a zdravotnické události — redakčně zpracované, s kontextem pro českou praxi.",
   href: "/aktualni-zpravy",
   cta: "Číst zprávy",
   links: [
@@ -168,9 +168,8 @@ export const V271_FOOTER_TRUST = {
     { label: "Studenti — MeDiprep a Academy", href: "/studenti" },
   ],
   proof: [
-    { label: "2 800+ zdravotnických profesionálů a studentů medicíny", href: "/studenti" },
-    { label: "500+ evidence-based článků", href: "/articles" },
-    { label: "Recenze čtenářů", href: "/predplatne#recenze" },
+    { label: "Články ViaLongeVita", href: "/articles" },
+    { label: "O redakci a zdrojích", href: "/o-nas" },
     { label: "14 dní zdarma", href: "/predplatne?trial=1" },
   ],
 } as const;

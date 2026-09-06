@@ -30,7 +30,7 @@ try {
 
 
 
-const CACHE_TAGS = "medscope-ui-v23.0,medscope-pages,v23-content";
+const CACHE_TAGS = "medscope-ui-v23.76,medscope-pages,v23-content";
 
 
 
@@ -86,6 +86,16 @@ const nextConfig = {
       // MASTER_PROMPT ecosystem aliases (unprefixed; locale pages also redirect)
       { source: "/vip", destination: "/vip/protokoly", permanent: false },
       { source: "/vitascope", destination: "/", permanent: false },
+      {
+        source: "/article/verejnost-rozhovory-2026-07-03-cesta-zpet-k-zivotu-pribeh-mudr-novaka-po-infarktu",
+        destination: "/article/verejnost-rozhovory-2026-07-03-cesta-zpet-k-zivotu-pribeh-lekare-po-infarktu",
+        permanent: false,
+      },
+      {
+        source: "/verejnost/clanky/verejnost-rozhovory-2026-07-03-cesta-zpet-k-zivotu-pribeh-mudr-novaka-po-infarktu",
+        destination: "/verejnost/clanky/verejnost-rozhovory-2026-07-03-cesta-zpet-k-zivotu-pribeh-lekare-po-infarktu",
+        permanent: false,
+      },
       { source: "/vialongevita", destination: "/", permanent: false },
       { source: "/magazine", destination: "/articles", permanent: false },
       { source: "/affiliate", destination: "/aplikace", permanent: false },
@@ -93,6 +103,12 @@ const nextConfig = {
       { source: "/tips", destination: "/articles", permanent: false },
       { source: "/tipy", destination: "/articles", permanent: false },
       { source: "/tip", destination: "/articles", permanent: false },
+      { source: "/newsletter/thank-you", destination: "/newsletter/dekujeme", permanent: false },
+      {
+        source: "/:locale/newsletter/thank-you",
+        destination: "/:locale/newsletter/dekujeme",
+        permanent: false,
+      },
       { source: "/tringelt", destination: "/articles", permanent: false },
       { source: "/prispevek", destination: "/articles", permanent: false },
       { source: "/donate", destination: "/articles", permanent: false },
@@ -111,6 +127,9 @@ const nextConfig = {
       { source: "/mediprep/app", destination: "/app/priprava", permanent: false },
 
       { source: "/pro-lekare", destination: "/lekari", permanent: true },
+      { source: "/:locale/pro-lekare", destination: "/:locale/lekari", permanent: true },
+      { source: "/pro-me/lekari", destination: "/lekari", permanent: true },
+      { source: "/:locale/pro-me/lekari", destination: "/:locale/lekari", permanent: true },
 
       { source: "/pro-firmy", destination: "/firmy", permanent: true },
 
@@ -157,11 +176,22 @@ const nextConfig = {
       "id",
       "en",
       "en-us",
+      "en-uk",
+      "pt",
+      "pt-br",
     ];
     return [
       {
+        source: "/__ms/:path*",
+        destination: "/relay/:path*",
+      },
+      {
         source: "/sitemap-:locale.xml",
         destination: "/sitemaps/:locale",
+      },
+      {
+        source: "/feed-:locale.xml",
+        destination: "/feed/:locale",
       },
       ...localeSegments.flatMap((segment) => [
         { source: `/${segment}`, destination: "/" },
@@ -345,6 +375,109 @@ const nextConfig = {
         ],
 
       },
+      {
+        source: "/",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/cs",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/studenti",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/studenti/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/:locale/studenti",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/:locale/studenti/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/lekari",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/lekari/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/:locale/lekari",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/:locale/lekari/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+
+      {
+        source: "/admin",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/admin/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/api/v21/admin-gate",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/go/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/relay/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/relay/js",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=300, stale-while-revalidate=86400" },
+        ],
+      },
+      {
+        source: "/__ms/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
 
     ];
 
@@ -375,6 +508,13 @@ const nextConfig = {
 
 export default nextConfig;
 
-// OpenNext Cloudflare local bindings for next dev
+// OpenNext local bindings for `next dev` only. The Workers `AI` binding makes
+// wrangler open a remote proxy; CI `next build` has no CLOUDFLARE_API_TOKEN.
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
-initOpenNextCloudflareForDev();
+const skipCloudflareDevInit =
+  process.env.CI === "true" ||
+  process.env.NEXTJS_ENV === "production" ||
+  process.env.npm_lifecycle_event === "build";
+if (!skipCloudflareDevInit) {
+  initOpenNextCloudflareForDev();
+}

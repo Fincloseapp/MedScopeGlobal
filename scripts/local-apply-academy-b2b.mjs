@@ -70,7 +70,7 @@ const report = {
   has_pg_host: usable(env.POSTGRES_HOST),
   has_pg_pass: usable(env.POSTGRES_PASSWORD),
   has_supabase_token: usable(env.SUPABASE_ACCESS_TOKEN),
-  has_vercel_token: usable(env.VERCEL_TOKEN),
+  has_cloudflare_token: usable(env.CLOUDFLARE_API_TOKEN),
 };
 console.log(JSON.stringify(report));
 

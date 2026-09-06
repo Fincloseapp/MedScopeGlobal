@@ -1,9 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/auth/admin";
+import { requireAdminAccess } from "@/lib/auth/require-admin-access";
 import { logAdminEvent } from "@/lib/logging";
-import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 
 export async function upsertVip(input: {
@@ -12,8 +11,7 @@ export async function upsertVip(input: {
   starts_at: string | null;
   ends_at: string | null;
 }) {
-  const gate = await requireAdmin();
-  if (!gate.ok) throw new Error("Unauthorized");
+  await requireAdminAccess();
 
   const admin = createServiceRoleClient();
   const { data: existing } = await admin
@@ -55,8 +53,7 @@ export async function upsertVip(input: {
 }
 
 export async function deactivateVip(userId: string) {
-  const gate = await requireAdmin();
-  if (!gate.ok) throw new Error("Unauthorized");
+  await requireAdminAccess();
   const admin = createServiceRoleClient();
   const { error } = await admin
     .from("vip_subscriptions")

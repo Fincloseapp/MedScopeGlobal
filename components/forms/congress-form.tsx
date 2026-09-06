@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getKongresyHubCopy } from "@/lib/i18n/kongresy-hub-copy";
 
-export function CongressForm() {
+export function CongressForm({ locale = "cs" }: { locale?: string }) {
+  const copy = getKongresyHubCopy(locale).form;
   const [status, setStatus] = useState<"idle" | "loading" | "extracting" | "ok" | "error">("idle");
   const [sourceUrl, setSourceUrl] = useState("");
   const [form, setForm] = useState({
@@ -55,23 +57,25 @@ export function CongressForm() {
   }
 
   if (status === "ok") {
-    return <p className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm">Akce přijata ke schválení.</p>;
+    return (
+      <p className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm">{copy.success}</p>
+    );
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-[#cfe1f3] bg-white p-6">
-      <Field label="URL zdroje (univerzita, společnost, databáze)">
+      <Field label={copy.url}>
         <div className="flex gap-2">
           <Input type="url" value={sourceUrl} onChange={(e) => setSourceUrl(e.target.value)} placeholder="https://..." />
           <Button type="button" variant="outline" onClick={extractFromUrl} disabled={status === "extracting"}>
-            {status === "extracting" ? "AI…" : "AI extrakce"}
+            {status === "extracting" ? copy.extracting : copy.extract}
           </Button>
         </div>
       </Field>
-      <Field label="Název">
+      <Field label={copy.title}>
         <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
       </Field>
-      <Field label="Shrnutí (AI)">
+      <Field label={copy.summary}>
         <textarea
           className="min-h-[80px] w-full rounded-md border border-input px-3 py-2 text-sm"
           value={form.summary}
@@ -79,24 +83,25 @@ export function CongressForm() {
         />
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Datum začátku (ISO)">
+        <Field label={copy.start}>
           <Input value={form.starts_at} onChange={(e) => setForm({ ...form, starts_at: e.target.value })} />
         </Field>
-        <Field label="Místo">
+        <Field label={copy.place}>
           <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
         </Field>
-        <Field label="Cena">
+        <Field label={copy.price}>
           <Input value={form.price_hint} onChange={(e) => setForm({ ...form, price_hint: e.target.value })} />
         </Field>
-        <Field label="Registrace URL">
+        <Field label={copy.registerUrl}>
           <Input value={form.registration_url} onChange={(e) => setForm({ ...form, registration_url: e.target.value })} />
         </Field>
       </div>
-      <Field label="Pořadatel">
+      <Field label={copy.organizer}>
         <Input value={form.organizer} onChange={(e) => setForm({ ...form, organizer: e.target.value })} />
       </Field>
+      {status === "error" ? <p className="text-sm text-red-600">{copy.error}</p> : null}
       <Button type="submit" className="rounded-full bg-[#005B96]" disabled={status === "loading"}>
-        Odeslat ke schválení
+        {status === "loading" ? copy.sending : copy.submit}
       </Button>
     </form>
   );

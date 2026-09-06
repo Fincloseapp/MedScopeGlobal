@@ -6,27 +6,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AD_TYPES, NEWSLETTER_POSITIONS } from "@/lib/ads/placements";
-import { calculateAdPrice, formatCzk } from "@/lib/ads/pricing";
+import { calculateAdPrice } from "@/lib/ads/pricing";
+import { getAdRequestCopy } from "@/lib/i18n/ad-request-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
 
-const POSITIONS = [
-  { id: "homepage_top", label: "Homepage — top" },
-  { id: "homepage_mid", label: "Homepage — střed" },
-  { id: "homepage_bottom", label: "Homepage — spodek" },
-  { id: "article_inline", label: "Články — inline" },
-  { id: "diagnosis_sidebar", label: "Diagnózy — sidebar" },
-  { id: "study_inline", label: "Studie — inline" },
-  { id: "congress_top", label: "Kongresy — banner" },
-];
+const POSITION_IDS = [
+  "homepage_top",
+  "homepage_mid",
+  "homepage_bottom",
+  "article_inline",
+  "diagnosis_sidebar",
+  "study_inline",
+  "congress_top",
+] as const;
 
-const DURATIONS = [
-  { id: "7", label: "7 dní" },
-  { id: "14", label: "14 dní" },
-  { id: "30", label: "30 dní" },
-  { id: "60", label: "60 dní" },
-  { id: "90", label: "90 dní" },
-];
+const DURATION_IDS = ["7", "14", "30", "60", "90"] as const;
 
-export function AdRequestForm() {
+export function AdRequestForm({ locale = "cs" }: { locale?: string }) {
+  const copy = getAdRequestCopy(locale);
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [form, setForm] = useState({
     company: "",
@@ -82,7 +80,7 @@ export function AdRequestForm() {
   if (status === "ok") {
     return (
       <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-sm text-emerald-900">
-        Děkujeme. Žádost byla odeslána na info@medscopeglobal.com. Po schválení obdržíte platební odkaz.
+        {copy.thanks}
       </div>
     );
   }
@@ -90,32 +88,32 @@ export function AdRequestForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-5 rounded-2xl border border-[#cfe1f3] bg-white p-6">
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Název firmy" required>
+        <Field label={copy.company} required>
           <Input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} required />
         </Field>
-        <Field label="Kontaktní osoba" required>
+        <Field label={copy.contact} required>
           <Input
             value={form.contact_person}
             onChange={(e) => setForm({ ...form, contact_person: e.target.value })}
             required
           />
         </Field>
-        <Field label="IČO">
+        <Field label={copy.ico}>
           <Input value={form.ico} onChange={(e) => setForm({ ...form, ico: e.target.value })} />
         </Field>
-        <Field label="DIČ">
+        <Field label={copy.dic}>
           <Input value={form.dic} onChange={(e) => setForm({ ...form, dic: e.target.value })} />
         </Field>
-        <Field label="E-mail" required>
+        <Field label={copy.email} required>
           <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
         </Field>
-        <Field label="Telefon">
+        <Field label={copy.phone}>
           <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
         </Field>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Typ reklamy" required>
+        <Field label={copy.type} required>
           <select
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             value={form.type}
@@ -123,25 +121,25 @@ export function AdRequestForm() {
           >
             {AD_TYPES.map((t) => (
               <option key={t.id} value={t.id}>
-                {t.label}
+                {copy.types[t.id] ?? t.label}
               </option>
             ))}
           </select>
         </Field>
-        <Field label="Pozice na webu">
+        <Field label={copy.position}>
           <select
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             value={form.position}
             onChange={(e) => setForm({ ...form, position: e.target.value })}
           >
-            {POSITIONS.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.label}
+            {POSITION_IDS.map((id) => (
+              <option key={id} value={id}>
+                {copy.positions[id] ?? id}
               </option>
             ))}
           </select>
         </Field>
-        <Field label="Pozice v newsletteru">
+        <Field label={copy.newsletterPosition}>
           <select
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             value={form.position_newsletter}
@@ -150,33 +148,33 @@ export function AdRequestForm() {
             <option value="">—</option>
             {NEWSLETTER_POSITIONS.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.label}
+                {copy.newsletterSlots[p.id] ?? p.label}
               </option>
             ))}
           </select>
         </Field>
-        <Field label="Doba zobrazení">
+        <Field label={copy.duration}>
           <select
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             value={form.duration}
             onChange={(e) => setForm({ ...form, duration: e.target.value })}
           >
-            {DURATIONS.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.label}
+            {DURATION_IDS.map((id) => (
+              <option key={id} value={id}>
+                {copy.durations[id] ?? id}
               </option>
             ))}
           </select>
         </Field>
       </div>
 
-      <Field label="URL cílové stránky">
+      <Field label={copy.targetUrl}>
         <Input type="url" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
       </Field>
-      <Field label="URL banneru (po nahrání do storage)">
+      <Field label={copy.bannerUrl}>
         <Input value={form.banner_url} onChange={(e) => setForm({ ...form, banner_url: e.target.value })} />
       </Field>
-      <Field label="Text reklamy">
+      <Field label={copy.adText}>
         <textarea
           className="min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
           value={form.ad_text}
@@ -190,18 +188,18 @@ export function AdRequestForm() {
           checked={form.include_newsletter}
           onChange={(e) => setForm({ ...form, include_newsletter: e.target.checked })}
         />
-        Zahrnout newsletter
+        {copy.includeNewsletter}
       </label>
 
       <p className="rounded-xl bg-[#f0f8ff] px-4 py-3 text-sm font-semibold text-[#005B96]">
-        Automatické nacenění: {formatCzk(price)}
+        {copy.quote} {formatCzkListPrice(price, locale)}
       </p>
 
       <label className="flex items-start gap-2 text-sm">
         <input type="checkbox" checked={form.gdpr} onChange={(e) => setForm({ ...form, gdpr: e.target.checked })} required />
         <span>
-          Souhlasím se zpracováním údajů dle{" "}
-          <Link href="/gdpr" className="text-[#005B96] underline">
+          {copy.gdpr}{" "}
+          <Link href={localizePublicHref("/gdpr", locale)} className="text-[#005B96] underline">
             GDPR
           </Link>
           .
@@ -210,20 +208,20 @@ export function AdRequestForm() {
       <label className="flex items-start gap-2 text-sm">
         <input type="checkbox" checked={form.vop} onChange={(e) => setForm({ ...form, vop: e.target.checked })} required />
         <span>
-          Souhlasím s{" "}
-          <Link href="/vop" className="text-[#005B96] underline">
-            obchodními podmínkami
+          {copy.terms}{" "}
+          <Link href={localizePublicHref("/vop", locale)} className="text-[#005B96] underline">
+            {copy.termsLink}
           </Link>
           .
         </span>
       </label>
 
       {status === "error" ? (
-        <p className="text-sm text-red-600">Odeslání se nezdařilo nebo chybí souhlasy.</p>
+        <p className="text-sm text-red-600">{copy.error}</p>
       ) : null}
 
       <Button type="submit" disabled={status === "loading"} className="rounded-full bg-[#005B96]">
-        {status === "loading" ? "Odesílám…" : "Odeslat žádost"}
+        {status === "loading" ? copy.sending : copy.submit}
       </Button>
     </form>
   );

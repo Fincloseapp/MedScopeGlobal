@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Crown, TrendingUp, Sparkles, ArrowRight } from "lucide-react";
 import { LONGEVITY_PROTOCOLS, localizedText } from "@/lib/ecosystem/longevity-protocols";
 import { TopLongevityProducts } from "@/components/monetization/affiliate-box";
+import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 /** Trendy 2026–2027 section */
 export function TrendySection() {
@@ -118,6 +119,6 @@ export function RecommendedToolsSection() {
 }
 
 /** Affiliate longevity products for homepage sidebar */
-export function HomepageAffiliateSection() {
-  return <TopLongevityProducts locale="cs" />;
+export function HomepageAffiliateSection({ locale = "cs" }: { locale?: string }) {
+  return <TopLongevityProducts locale={locale as GlobalLocaleCode} />;
 }

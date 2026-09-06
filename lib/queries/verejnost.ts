@@ -8,6 +8,8 @@ import {
 } from "@/lib/articles/prepare-for-display";
 import { filterMagazineListableArticles, shouldHideFromPublicListing } from "@/lib/editorial/article-quality-audit";
 import type { LocaleCode } from "@/lib/i18n/config";
+import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
+import { getNativeDeskArticleBySlug, mergeNativeDeskFeed } from "@/lib/editorial/native-desk-articles";
 import type { ArticleWithRelations } from "@/types/database";
 
 export type PublicTopic = "zivotni-styl" | "nemoci" | "prevence" | "rozhovory";
@@ -39,78 +41,129 @@ export async function listPublicArticles(options?: {
   limit?: number;
   offset?: number;
   locale?: LocaleCode;
-  /** Spustí seed/cron pokud je DB prázdná (default true u hubu). */
+  /** Seed only from cron/admin — never on a public listing request. */
   ensureContent?: boolean;
   /** full = načte celý obsah článku (pro expand-on-click). */
   mode?: "card" | "full";
 }): Promise<DisplayArticle[]> {
-  if (options?.ensureContent !== false) {
+  if (options?.ensureContent === true) {
     const { ensurePublicArticlesSeeded } = await import("@/lib/verejnost/ensure-content");
     await ensurePublicArticlesSeeded();
   }
 
   const limit = options?.limit ?? 12;
   const offset = options?.offset ?? 0;
-  const locale = options?.locale ?? "cs";
+  const locale: LocaleCode =
+    options?.locale ??
+    (await import("@/lib/i18n/server-locale").then((m) => m.getServerLocale()).catch(() => "cs" as LocaleCode));
   const {
     getDemoMagazineArticles,
   } = await import("@/lib/verejnost/demo-magazine-articles");
 
-  const demoSlice = () => {
+  const demoSlice = async (opts?: { translate?: boolean }) => {
     let demo = getDemoMagazineArticles();
     if (options?.topic) {
       demo = demo.filter((a) => a.public_topic === options.topic);
     }
-    return demo.slice(offset, offset + limit);
+    const mode = options?.mode ?? "card";
+    const translate = opts?.translate !== false;
+    return prepareArticlesForDisplay(
+      mergeNativeDeskFeed(demo, locale, options?.topic).slice(offset, offset + limit),
+      locale,
+      {
+        mode,
+        maxTranslate: translate ? Math.min(limit, 8) : 0,
+        maxLive: 0,
+      }
+    );
   };
 
   const supabase = await createDataClient();
   if (!supabase) return demoSlice();
 
-  // Over-fetch then drop short/seed stubs so hubs stay magazine-depth after filter.
-  const fetchLimit = Math.max(limit * 8, limit + 24);
-  let q = supabase
-    .from("articles")
-    .select(articleSelect)
-    .eq("published", true)
-    .eq("audience", "public")
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .range(offset, offset + fetchLimit - 1);
+  const fetchLimit = Math.min(Math.max(limit * 2, limit + 24), 192);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const load = (async () => {
+      let q = supabase
+        .from("articles")
+        .select(articleSelect)
+        .eq("published", true)
+        .eq("audience", "public")
+        .like("slug", "verejnost-%")
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .range(offset, offset + fetchLimit - 1);
 
-  if (options?.topic) {
-    q = q.eq("public_topic", options.topic);
-  }
+      if (options?.topic) {
+        q = q.eq("public_topic", options.topic);
+      }
 
-  const { data, error } = await q;
-  if (error) {
+      const { data, error } = await q;
+      if (error) {
+        console.error("listPublicArticles", error);
+        return demoSlice();
+      }
+
+      const rows = mergeNativeDeskFeed(
+        filterArticlesForLocale(
+          filterMagazineListableArticles(
+            mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[]
+          ),
+          locale
+        ),
+        locale,
+        options?.topic
+      );
+      if (rows.length === 0) return demoSlice();
+
+      const mode = options?.mode ?? "card";
+      const prepared = await prepareArticlesForDisplay(rows.slice(0, limit), locale, {
+        mode,
+        maxTranslate: Math.min(limit, 8),
+      });
+      const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
+      const { assignUniqueListingCovers } = await import(
+        "@/lib/ecosystem/editorial/images/unique-listing-covers"
+      );
+      return assignUniqueListingCovers(
+        prepared.map((a) => ({ ...a, cover_image_url: resolveVerejnostCoverUrl(a) }))
+      );
+    })();
+
+    return await Promise.race([
+      load,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("public-articles-timeout")), 4_000);
+      }),
+    ]);
+  } catch (error) {
     console.error("listPublicArticles", error);
-    return demoSlice();
+    return demoSlice({ translate: false });
+  } finally {
+    if (timer) clearTimeout(timer);
   }
-
-  const rows = filterMagazineListableArticles(
-    mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[]
-  );
-  if (rows.length === 0) return demoSlice();
-
-  const mode = options?.mode ?? "card";
-  const prepared = await prepareArticlesForDisplay(rows.slice(0, limit), locale, {
-    mode,
-    maxTranslate: limit,
-  });
-  const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
-  return prepared.map((a) => ({ ...a, cover_image_url: resolveVerejnostCoverUrl(a) }));
 }
 
 export async function getPublicArticleBySlug(
   slug: string,
-  locale: LocaleCode = "cs"
+  locale?: LocaleCode
 ): Promise<DisplayArticle | null> {
+  const uiLocale =
+    locale ??
+    (await import("@/lib/i18n/server-locale").then((m) => m.getServerLocale()).catch(() => "cs" as LocaleCode));
+  const { resolveCanonicalArticleSlug } = await import(
+    "@/lib/editorial/clinician-anonymize"
+  );
   const { getDemoMagazineArticleBySlug } = await import(
     "@/lib/verejnost/demo-magazine-articles"
   );
-  const demoHit = () => {
-    const demo = getDemoMagazineArticleBySlug(slug);
-    return demo;
+  const dbSlug = resolveCanonicalArticleSlug(slug);
+  const demoHit = async () => {
+    const native = getNativeDeskArticleBySlug(dbSlug);
+    if (native) return prepareArticleForDisplay(native, uiLocale, "full");
+    const demo = getDemoMagazineArticleBySlug(dbSlug);
+    if (!demo) return null;
+    return prepareArticleForDisplay(demo, uiLocale, "full");
   };
 
   const supabase = await createDataClient();
@@ -118,7 +171,7 @@ export async function getPublicArticleBySlug(
   const { data, error } = await supabase
     .from("articles")
     .select(articleSelect)
-    .eq("slug", slug)
+    .eq("slug", dbSlug)
     .eq("published", true)
     .eq("audience", "public")
     .maybeSingle();
@@ -131,7 +184,7 @@ export async function getPublicArticleBySlug(
   const row = data ? (mapArticleList([data as Record<string, unknown>])[0] ?? null) : null;
   if (!row) return demoHit();
   if (shouldHideFromPublicListing(row)) return null;
-  const article = await prepareArticleForDisplay(row, locale, "full");
+  const article = await prepareArticleForDisplay(row, uiLocale, "full");
   const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
   return { ...article, cover_image_url: resolveVerejnostCoverUrl(article) };
 }

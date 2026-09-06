@@ -6,6 +6,7 @@ import {
   isMissingOrStaleHeroImage,
   validateImageCompliance,
 } from "./policy";
+import { articleNeedsCoverRemediation, coverIdentity } from "./cover";
 import { matchImageForArticle, inferVisualTopic } from "./matcher";
 import type {
   ArticleForImageMatch,
@@ -39,15 +40,42 @@ export async function findArticlesNeedingImages(
     return [];
   }
 
-  return (data as ArticleForImageMatch[])
-    .filter((a) => isMissingOrStaleHeroImage(a.cover_image_url))
+  const rows = data as ArticleForImageMatch[];
+  const coverCounts = new Map<string, number>();
+  for (const article of rows) {
+    const key = coverIdentity(article.cover_image_url);
+    if (!key) continue;
+    coverCounts.set(key, (coverCounts.get(key) ?? 0) + 1);
+  }
+  const seenDuplicate = new Set<string>();
+
+  return rows
+    .filter((article) => {
+      const key = coverIdentity(article.cover_image_url);
+      const duplicate = Boolean(key) && (coverCounts.get(key) ?? 0) > 1;
+      const firstDuplicate = duplicate && !seenDuplicate.has(key);
+      if (firstDuplicate) seenDuplicate.add(key);
+      return (
+        isMissingOrStaleHeroImage(article.cover_image_url) ||
+        articleNeedsCoverRemediation({
+          title: article.title,
+          slug: article.slug,
+          excerpt: article.excerpt,
+          coverImageUrl: article.cover_image_url,
+        }) ||
+        (duplicate && !firstDuplicate)
+      );
+    })
     .slice(0, limit);
 }
 
 export async function suggestImageForArticle(
-  article: ArticleForImageMatch
+  article: ArticleForImageMatch,
+  options?: { excludeUrls?: Iterable<string> }
 ): Promise<ArticleImageSuggestionRecord | null> {
-  const candidate = await matchImageForArticle(article);
+  const candidate = await matchImageForArticle(article, undefined, {
+    excludeUrls: options?.excludeUrls,
+  });
   if (!candidate) return null;
 
   const visualTopic = inferVisualTopic(article);
@@ -94,7 +122,11 @@ async function persistSuggestion(
       source_type: suggestion.sourceType,
       compliance_passed: suggestion.compliancePassed,
       compliance_notes: suggestion.complianceNotes,
-      metadata: { persona_id: IMAGE_CURATOR_PERSONA_ID },
+      metadata: {
+        persona_id: IMAGE_CURATOR_PERSONA_ID,
+        editor_review: "ai_editor",
+        unique_among_neighbours: true,
+      },
     },
     { onConflict: "article_id,suggested_url" }
   );
@@ -130,6 +162,9 @@ async function applySuggestion(
     editorial_image_visual_topic: suggestion.visualTopic,
     editorial_image_source: suggestion.sourceType,
     editorial_image_applied_at: new Date().toISOString(),
+    editorial_image_review: "ai_editor",
+    editorial_image_persona: IMAGE_CURATOR_PERSONA_ID,
+    editorial_image_unique_in_listing: true,
   };
 
   const { error: articleError } = await admin
@@ -258,6 +293,21 @@ export async function processEditorialImageBatch(
   const apply = options.apply === true && options.dryRun !== true;
 
   const candidates = await findArticlesNeedingImages(limit);
+  const usedCovers = new Set<string>();
+  const admin = tryCreateServiceRoleClient();
+  if (admin) {
+    const { data: recent } = await admin
+      .from("articles")
+      .select("cover_image_url")
+      .eq("published", true)
+      .order("published_at", { ascending: false })
+      .limit(48);
+    for (const row of recent ?? []) {
+      const key = coverIdentity((row as { cover_image_url?: string | null }).cover_image_url);
+      if (key) usedCovers.add(key);
+    }
+  }
+
   const suggestions: ArticleImageSuggestionRecord[] = [];
   const result: ImagePipelineBatchResult = {
     processed: 0,
@@ -270,7 +320,10 @@ export async function processEditorialImageBatch(
   for (const article of candidates) {
     result.processed += 1;
     try {
-      const suggestion = await suggestImageForArticle(article);
+      const suggestion = await suggestImageForArticle(article, { excludeUrls: usedCovers });
+      if (suggestion?.suggestedUrl) {
+        usedCovers.add(coverIdentity(suggestion.suggestedUrl));
+      }
       if (!suggestion) {
         result.skipped += 1;
         continue;

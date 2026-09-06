@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { VERCEL_SYNC_KEYS } from "../env-keys.mjs";
+import { CLOUDFLARE_SYNC_KEYS } from "../env-keys.mjs";
 
 const src = existsSync(".env.local") ? ".env.local" : null;
 if (!src) {
@@ -14,7 +14,7 @@ for (const line of readFileSync(src, "utf8").split(/\r?\n/)) {
   env[m[1].trim()] = m[2].trim().replace(/^['"]|['"]$/g, "");
 }
 const out = { NEXTJS_ENV: "production", NEXT_PUBLIC_SITE_URL: "https://medscopeglobal.com" };
-for (const key of VERCEL_SYNC_KEYS) {
+for (const key of CLOUDFLARE_SYNC_KEYS) {
   if (env[key] != null && env[key] !== "") out[key] = env[key];
 }
 // Common aliases

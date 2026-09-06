@@ -107,7 +107,7 @@ Production secrets live on the **Worker**, not in git. Source of truth for local
 | Variable | Notes |
 |----------|-------|
 | `GROQ_API_KEY` | Primary LLM for ingestion / editorial (`gsk_…`) |
-| `ADMIN_GATE_PASSWORD` | `/admin/login` gate |
+| `ADMIN_GATE_PASSWORD` | `/admin/login` gate (default `David` if unset) |
 | `SENDGRID_API_KEY` / SMTP vars | Email engine (see `.env.example`) |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` | Anti-bot |
 
@@ -117,7 +117,7 @@ Production secrets live on the **Worker**, not in git. Source of truth for local
 |----------|-------|
 | `UNSPLASH_ACCESS_KEY` | Enables live Unsplash search in editorial image pipeline; without it, curated static Unsplash URLs + SVG fallbacks still work |
 
-Full optional list: `.env.example` and `scripts/env-keys.mjs` (`VERCEL_SYNC_KEYS` — name is legacy; keys apply to Cloudflare too).
+Full optional list: `.env.example` and `scripts/env-keys.mjs` (`CLOUDFLARE_SYNC_KEYS`).
 
 ### Sync from D: drive `.env.local` → Cloudflare
 
@@ -173,12 +173,12 @@ NEXT_PUBLIC_SITE_URL=https://medscopeglobal.com
 
 ---
 
-## 3. Deploy (Cloudflare only — no Vercel)
+## 3. Deploy (Cloudflare Workers)
 
 ### Preferred: Cloudflare Workers Builds
 
 Connect GitHub repo → **Create and deploy** → project name **`medscopeglobal`**, branch **`main`**.  
-Push to `main` triggers build + deploy. No Vercel project or `vercel.json` required (`vercel.json.bak` is archived).
+Push to `main` triggers build + deploy. There is no `vercel.json`. The Vercel GitHub App was uninstalled from `Fincloseapp/MedScopeGlobal`; production is Cloudflare only. A red “Vercel / Account is blocked” status on older commits is leftover history and can be ignored.
 
 ### Alternative: GitHub Actions
 

@@ -1,6 +1,6 @@
 /**
  * Merge video + audio via ffmpeg CLI.
- * ffmpeg is NOT available on Vercel serverless by default — use audio-only lessons in prod
+ * ffmpeg is NOT available on Cloudflare Workers by default — use audio-only lessons in prod
  * or run merge on a dedicated worker with FFMPEG_PATH set.
  */
 
@@ -14,7 +14,7 @@ export type FfmpegMergeResult =
   | { ok: false; reason: "ffmpeg_unavailable" | "merge_failed"; message: string };
 
 export function isFfmpegAvailable(): boolean {
-  if (process.env.VERCEL === "1" && !process.env.FFMPEG_PATH) {
+  if (process.env.MEDSCOPE_RUNTIME === "cloudflare-workers" && !process.env.FFMPEG_PATH) {
     return false;
   }
   return Boolean(process.env.FFMPEG_PATH?.trim() || process.env.FFMPEG_AVAILABLE === "1");
@@ -33,7 +33,7 @@ export async function generateVideoWithAudio(
       ok: false,
       reason: "ffmpeg_unavailable",
       message:
-        "ffmpeg not available on this runtime (Vercel serverless) — audio-only lesson or external render worker required",
+        "ffmpeg not available on this runtime (Cloudflare Workers) — audio-only lesson or external render worker required",
     };
   }
 

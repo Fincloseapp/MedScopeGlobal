@@ -2,25 +2,33 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
 import { getLegalEntity } from "@/lib/config/legal-entity";
+import { getLegalChromeCopy } from "@/lib/i18n/legal-chrome-copy";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
   return await buildLocalizedPageMetadata({
-  title: "Právní checklist a brief pro IP advokáta",
-  description:
-    "Akční checklist ochrany značky MedScopeGlobal — imprint, ochranná známka ÚPV/EUIPO, monitoring.",
-  path: "/pravni-checklist",
-});
+    title: copy.checklistTitle,
+    description: copy.checklistDescription,
+    path: "/pravni-checklist",
+    locale,
+  });
 }
 
-export default function PravniChecklistPage() {
+export default async function PravniChecklistPage() {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
   const entity = getLegalEntity();
 
   return (
     <LegalPageLayout
-      title="Právní checklist"
-      description="Co je hotové na webu a co zbývá u advokáta / registrátora."
+      locale={locale}
+      title={copy.checklistTitle}
+      description={copy.checklistLead}
     >
+      {copy.officialNote ? <p><em>{copy.officialNote}</em></p> : null}
       <h2>1. Hotovo na medscopeglobal.com</h2>
       <ul>
         <li>

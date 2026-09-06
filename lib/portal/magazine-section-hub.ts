@@ -183,13 +183,42 @@ const CORE_TOPIC_PILLARS: readonly MagazineHubPillar[] = [
   },
 ];
 
+const LIFESTYLE_TOPIC_PILLARS: readonly MagazineHubPillar[] = [
+  {
+    slug: "pohyb",
+    label: "Pohyb a cvičení",
+    description: "Síla, chůze a regenerace — redakčně, ne trénink na míru.",
+    coverImage: "/assets/covers/movement.webp",
+    href: "/verejnost/clanky?topic=pohyb",
+  },
+  {
+    slug: "joga",
+    label: "Jóga",
+    description: "Mobilita a dech — bez ezoteriky a zázračných slibů.",
+    coverImage: "/assets/covers/calm.webp",
+    href: "/verejnost/clanky?topic=joga",
+  },
+  {
+    slug: "kosmetika",
+    label: "Kosmetika a pleť",
+    description: "Dermokosmetika a fotoprotekce na úrovni důkazů.",
+    coverImage: "/assets/covers/seniors.webp",
+    href: "/verejnost/clanky?topic=kosmetika",
+  },
+];
+
+const CLANKY_PILLARS: readonly MagazineHubPillar[] = [
+  ...CORE_TOPIC_PILLARS,
+  ...LIFESTYLE_TOPIC_PILLARS,
+];
+
 /** Témata hub — katalog oblastí veřejného zdraví. */
 export const TEMATA_MAGAZINE_HUB: MagazineSectionHubConfig = {
   id: "temata",
   eyebrow: "Veřejnost · Témata · ViaLongeVita",
   title: "Najděte své téma ve zdraví",
   heroDeck:
-    "Deset oblastí od prevence po rozhovory s odborníky — každá s články srozumitelně pro širokou veřejnost, bez odborného žargonu.",
+    "Třináct oblastí od prevence po jógu a kosmetiku — každá s články srozumitelně pro širokou veřejnost, bez odborného žargonu.",
   editorialIntro: [
     "Témata na MedScopeGlobal jsou vstupní brána do veřejného magazínu. Místo procházení náhodných článků si vyberte oblast, která vás právě zajímá — prevence, symptomy, výživa nebo dlouhověkost.",
     "Každé téma obsahuje dlouhé texty prošlé redakční kontrolou. Informace slouží k vzdělávání a nenahrazují konzultaci s lékařem — u závažných příznaků vždy vyhledejte odbornou péči.",
@@ -199,8 +228,8 @@ export const TEMATA_MAGAZINE_HUB: MagazineSectionHubConfig = {
   heroCoverImage: "/assets/covers/science.webp",
   heroCoverAlt: "Vědecký kontext veřejného zdraví — ilustrace katalogu témat",
   heroBadge: {
-    label: "10 oblastí",
-    description: "Od průvodce nemocemi po rozhovory — každé téma má vlastní články a ilustrace.",
+    label: "13 oblastí",
+    description: "Od průvodce nemocemi po jógu a kosmetiku — každé téma má vlastní články a ilustrace.",
   },
   pillarsEyebrow: "Hlavní rubriky",
   pillarsTitle: "Čtyři pilíře veřejného zdraví",
@@ -358,6 +387,11 @@ type ClankyHubTopic =
   | "zivotni-styl"
   | "dlouhovekost"
   | "rozhovory"
+  | "pohyb"
+  | "joga"
+  | "kosmetika"
+  | "vyziva"
+  | "spanek"
   | null;
 
 const CLANKY_TOPIC_HUBS: Record<
@@ -463,6 +497,95 @@ const CLANKY_TOPIC_HUBS: Record<
     },
     pillarsTitle: "Související rubriky",
   },
+  pohyb: {
+    title: "Pohyb a cvičení",
+    heroDeck:
+      "Síla, chůze a regenerace — redakční texty o pohybu jako prevenci, ne osobní tréninkový plán ani slib výkonu.",
+    editorialIntro: [
+      "Pohyb je jeden z nejsilnějších faktorů healthspan. Rubrika popisuje sílu, chůzi a regeneraci tak, aby dávaly smysl v běžném týdnu — bez extrémních protokolů.",
+      "Nepředepisujeme trénink. Vysvětlujeme, proč svalová hmota chrání ve stáří, jak sedavý režim zvyšuje riziko a kdy je na místě fyzioterapeut nebo lékař.",
+      "Doporučení jsou obecná. Při bolesti, zranění nebo chronickém onemocnění vždy konzultujte odborníka.",
+    ],
+    editorialIntroTitle: "Pohyb jako prevence, ne výkonnostní kult",
+    heroCoverImage: "/assets/covers/movement.webp",
+    heroCoverAlt: "Pohyb a cvičení — ilustrace rubriky",
+    heroBadge: {
+      label: "Síla · chůze",
+      description: "Redakční rámec — bez zázračných transformací.",
+    },
+    pillarsTitle: "Související oblasti",
+  },
+  joga: {
+    title: "Jóga",
+    heroDeck:
+      "Mobilita, dech a kloubní zdraví — bez ezoteriky, bez slibů zázračného léčení a bez náhrady rehabilitace.",
+    editorialIntro: [
+      "Jóga v tomto magazínu je pohybová praxe: rozsah pohybu, dech a klid nervového systému. Nepopisujeme energetické diagnostiky ani zaručené vyléčení.",
+      "Oddělujeme to, co má oporu v klinických přehledech (mobilita, úzkost, bolest zad u vybraných skupin), od marketingových tvrzení studií o józe.",
+      "Při zranění, těhotenství nebo závratích začněte s instruktorem nebo lékařem — text není hodina jógy na dálku.",
+    ],
+    editorialIntroTitle: "Jóga jako pohyb, ne ezoterika",
+    heroCoverImage: "/assets/covers/calm.webp",
+    heroCoverAlt: "Jóga a mobilita — ilustrace rubriky",
+    heroBadge: {
+      label: "Mobilita · dech",
+      description: "Praxe bez zázračných slibů.",
+    },
+    pillarsTitle: "Související oblasti",
+  },
+  kosmetika: {
+    title: "Kosmetika a pleť",
+    heroDeck:
+      "Dermokosmetika a fotoprotekce na úrovni důkazů — SPF, retinoidy, bariéra kůže. Ne zázračné krémy a ne náhrada dermatologa.",
+    editorialIntro: [
+      "Rubrika kosmetiky patří do veřejného zdraví kůže: slunce, bariéra, podráždění a stárnutí pleti. Popisujeme účinné látky, ne zaručené omlazení.",
+      "Prémiové přípravky zde smí být cílené jen jako označená inzerce nebo affiliate — nikdy jako skrytá doporučení lékaře. Lékařská zóna zůstává bez affiliate.",
+      "Při akné, ekzému, pigmentacích nebo podezření na nádor kůže vyhledejte dermatologa. Text nenahrazuje vyšetření.",
+    ],
+    editorialIntroTitle: "Pleť podle důkazů, ne podle hype",
+    heroCoverImage: "/assets/covers/seniors.webp",
+    heroCoverAlt: "Péče o pleť — ilustrace rubriky",
+    heroBadge: {
+      label: "SPF · bariéra",
+      description: "Dermokosmetika srozumitelně, bez zázračných slibů.",
+    },
+    pillarsTitle: "Související oblasti",
+  },
+  vyziva: {
+    title: "Výživa",
+    heroDeck:
+      "Vyvážená strava a mýty o jídle — redakční texty, ne jídelníček na míru ani zázračná dieta.",
+    editorialIntro: [
+      "Výživa v tomto magazínu vysvětluje, co má oporu v důkazech: bílkoviny, zeleninu, středomořský talíř a kalorickou rovnováhu — bez extrémních protokolů.",
+      "Doplňky popisujeme jen tam, kde dávají smysl jako doplněk stravy, ne jako náhrada jídla nebo léku.",
+      "Při diabetu, poruchách příjmu potravy nebo po bariatrické operaci vždy konzultujte lékaře nebo nutričního terapeuta.",
+    ],
+    editorialIntroTitle: "Strava bez extrémů",
+    heroCoverImage: "/assets/covers/food.webp",
+    heroCoverAlt: "Výživa — ilustrace rubriky",
+    heroBadge: {
+      label: "Talíř · důkazy",
+      description: "Bez zázračných diet.",
+    },
+    pillarsTitle: "Související oblasti",
+  },
+  spanek: {
+    title: "Spánek",
+    heroDeck:
+      "Hygiena spánku a cirkadiánní rytmus — redakčně, bez slibů zaručeného vyléčení nespavosti.",
+    editorialIntro: [
+      "Spánek je jeden z nejsilnějších faktorů healthspan. Rubrika popisuje světlo, kofein, směny a regeneraci tak, aby dávaly smysl v běžném týdnu.",
+      "Nespavost a apnoe patří k lékaři. Text není diagnostika ani předpis hypnotik.",
+    ],
+    editorialIntroTitle: "Spánek jako prevence",
+    heroCoverImage: "/assets/covers/sleep.webp",
+    heroCoverAlt: "Spánek — ilustrace rubriky",
+    heroBadge: {
+      label: "Rytmus · hygiena",
+      description: "Bez zázračných protokolů.",
+    },
+    pillarsTitle: "Související oblasti",
+  },
 };
 
 /** Články hub — default or topic-filtered listing. */
@@ -486,7 +609,7 @@ export function getClankyMagazineHub(topic?: string | null): MagazineSectionHubC
       heroBadge: topicHub.heroBadge,
       pillarsEyebrow: "Další rubriky",
       pillarsTitle: topicHub.pillarsTitle,
-      pillars: CORE_TOPIC_PILLARS.filter((p) => p.slug !== normalized),
+      pillars: CLANKY_PILLARS.filter((p) => p.slug !== normalized),
       primaryCta: {
         label: "Prohlédnout články",
         href: "#clanky-grid",
@@ -509,11 +632,13 @@ export function getClankyMagazineHub(topic?: string | null): MagazineSectionHubC
     heroDeck:
       "Aktuální texty o prevenci, nemocích, životním stylu a dlouhověkosti — srozumitelná čeština, redakční kontrola, ověřitelné zdroje.",
     editorialIntro: [
-      "Veřejný magazín MedScopeGlobal publikuje dlouhé články pro širokou veřejnost. Každý text prochází redakční kontrolou: ověřitelné zdroje, srozumitelný jazyk a jasné oddělení vzdělávání od diagnózy.",
-      "Rubriky pokrývají prevenci, nemoci a symptomy, životní styl i dlouhověkost. Filtrujte podle tématu nebo procházejte všechny články — obsah je volně dostupný, není to VIP sekce.",
-      "Informace slouží k obecnému vzdělávání a nenahrazují konzultaci s lékařem. U závažných příznaků vždy vyhledejte odbornou péči.",
+      "Vítejte v MedScopeGlobal – komplexním prostředí, které spojuje moderní medicínu, prevenci, dlouhověkost a odborné vzdělávání. medscopeglobal.com je platforma, která přináší jistotu tam, kde ji lidé nejvíce potřebují: kvalitní informace, odborné přehledy, vzdělávací materiály a praktické návody, které pomáhají žít zdravěji, vědoměji a sebevědoměji.",
+      "Součástí našeho ekosystému je ViaLongeVita – prémiový magazín zaměřený na dlouhověkost, vitalitu a moderní wellness. ViaLongeVita není jen magazín. Je to místo, kde se inspirace mění v každodenní praxi, kde exkluzivní články, rozhovory a analýzy otevírají dveře k životu, který je kvalitnější, vyrovnanější a dlouhodobě udržitelný.",
+      "Pro studenty medicíny, zdravotníky a odbornou veřejnost nabízíme také přehled lékařských učebnic, odborných knih, kurzů a školení. Vzdělávání je pilířem našeho projektu – a proto vytváříme prostředí, které podporuje profesní růst, jistotu a dlouhodobou odbornou kompetenci.",
+      "Každý článek, každá publikace a každý vzdělávací materiál vzniká s cílem přinést skutečnou hodnotu. Pokud chcete být součástí komunity, která si cení kvalitních informací, podporuje naši práci a získává přístup k prémiovým materiálům, předplatné je ideální cestou. Umožňuje nám tvořit obsah, který má smysl – a vám poskytuje výhody, které jinde nenajdete.",
+      "Děkujeme, že jste součástí MedScopeGlobal a ViaLongeVita. Vaše zdraví, vzdělání a dlouhodobá vitalita jsou naším posláním – a společně budujeme prostor, který inspiruje, vzdělává a posouvá kupředu.",
     ],
-    editorialIntroTitle: "Veřejný magazín ViaLongeVita",
+    editorialIntroTitle: "Vítejte v MedScopeGlobal",
     heroCoverImage: "/assets/covers/produce.webp",
     heroCoverAlt: "Zdravá strava — ilustrace veřejného magazínu",
     heroBadge: {
@@ -522,7 +647,7 @@ export function getClankyMagazineHub(topic?: string | null): MagazineSectionHubC
     },
     pillarsEyebrow: "Rubriky",
     pillarsTitle: "Procházejte podle tématu",
-    pillars: CORE_TOPIC_PILLARS,
+    pillars: CLANKY_PILLARS,
     primaryCta: {
       label: "Prohlédnout články",
       href: "#clanky-grid",

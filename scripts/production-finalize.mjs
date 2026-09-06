@@ -55,12 +55,10 @@ console.log("\n→ Building production bundle...");
 await run("npm", ["run", "build:win"]);
 
 console.log(`
-=== Deploy (requires Vercel login) ===
-  npx vercel login
-  npx vercel link
-  npx vercel env pull .env.vercel.local
-  npx vercel --prod
+=== Deploy (Cloudflare Workers) ===
+  pnpm cf:env:sync
+  pnpm cf:deploy
 
-Set Vercel env (Production): same keys as .env.local
-Domain: medscopeglobal.com + www → Vercel → Settings → Domains
+Set Worker secrets via Cloudflare dashboard or CLOUDFLARE_ENV_JSON.
+Domain: medscopeglobal.com + www → wrangler.jsonc routes
 `);

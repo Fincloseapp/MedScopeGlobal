@@ -25,8 +25,8 @@ export const V27_AUDIENCES = {
     href: "/studenti",
     description: "Příprava na přijímačky LF, studijní materiály, kvízy a AI tutor.",
     ctaPrimary: { label: "Chci studovat medicínu", href: "/studenti/chci-studovat" },
-    ctaSecondary: { label: "AI tutor", href: "/studenti/ai-tutor" },
-    topics: ["přijímačky", "studijní materiály", "kvízy", "modelové otázky", "AI tutor"],
+    ctaSecondary: { label: "Klub kvízů", href: "/studenti/klub" },
+    topics: ["přijímačky", "studijní materiály", "kvízy", "žebříček", "AI tutor"],
     aiRoute: "/ai-asistent/student",
   },
   physician: {
@@ -57,22 +57,30 @@ export const V27_AUDIENCES = {
 export const V27_SUBSCRIPTION_PLANS = [
   {
     tier: "public" as const,
-    name: "Veřejnost",
-    monthlyCzk: 99,
-    annualCzk: 990,
-    features: ["Prevence a životní styl", "MeDipacient — zprávy v telefonu", "AI asistent pro veřejnost", "Bez reklam v článcích"],
+    name: "Redakce",
+    monthlyCzk: 25,
+    annualCzk: 250,
+    features: [
+      "Aktuální texty redakce — Česko i zahraniční desk",
+      "Prevence a životní styl",
+      "MeDipacient — zprávy v telefonu",
+      "AI asistent pro veřejnost",
+      "Bez reklam v článcích",
+    ],
   },
   {
     tier: "student" as const,
     name: "Student LF",
     monthlyCzk: 149,
     annualCzk: 1490,
+    introMonthlyCzk: 89,
     features: [
       "MeDiprep: testy B/C/F a simulace 8 českých LF",
       "Celá Academy včetně přípravných kurzů na přijímačky",
       "AI tutor a studijní materiály",
       "Kvízy, hry a modelové otázky",
-      "149 Kč = Student LF (Academy) — není VIP longevity protokoly",
+      "1 test zdarma · první měsíc 89 Kč · další měsíce 149 Kč (EU ~10 €)",
+      "149 Kč = Student LF (Academy) — magazín otevírá Redakce nebo vyšší plán",
     ],
   },
   {
@@ -133,7 +141,7 @@ export const V27_MINI_PRODUCTS = [] as const;
 
 /** Legacy monthly-only map for smoke tests */
 export const V27_SUBSCRIPTIONS = {
-  public: { id: "public", name: "Veřejnost", priceCzk: 99, interval: "month" as const },
+  public: { id: "public", name: "Redakce", priceCzk: 25, interval: "month" as const },
   student: { id: "student", name: "Student LF", priceCzk: 149, interval: "month" as const },
   dokumentace: {
     id: "dokumentace",
@@ -157,6 +165,19 @@ export const V27_B2B_PACKAGES = [
   { id: "sponsored-article", name: "Sponzorovaný článek", priceCzk: 15000, desc: "Editoriální článek s označením partnera" },
   { id: "enterprise", name: "Enterprise", priceCzk: 0, desc: "White-label, API a kampaně na míru — individuální cena" },
 ] as const;
+
+export function isStudentGrantProduct(productId?: string | null): boolean {
+  return Boolean(productId && parseSubscriptionProductId(productId)?.tier === "student");
+}
+
+export function isPhysicianGrantProduct(productId?: string | null): boolean {
+  const parsed = productId ? parseSubscriptionProductId(productId) : null;
+  return parsed?.tier === "physician" || parsed?.tier === "dokumentace";
+}
+
+export function isEditorialGrantProduct(productId?: string | null): boolean {
+  return Boolean(productId && parseSubscriptionProductId(productId)?.tier === "public");
+}
 
 export function parseSubscriptionProductId(productId: string): {
   tier: V27SubscriptionTier;

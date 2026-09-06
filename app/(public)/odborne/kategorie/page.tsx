@@ -1,23 +1,27 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
+import { getOdborneHubCopy } from "@/lib/i18n/odborne-hub-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getMedicalAiCategories } from "@/lib/queries/v4d/medical-ai";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
-export const metadata: Metadata = {
-  title: "Kategorie — odborné texty",
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  diagnosis: "Diagnózy",
-  study_type: "Typ studie",
-  evidence_level: "Úroveň důkazů",
-  clinical_impact: "Klinický dopad",
-  practice: "Doporučení pro praxi",
-  specialty: "Obory",
-  language: "Jazyky",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getOdborneHubCopy(locale);
+  return await buildLocalizedV20PageMetadata({
+    title: copy.desk.kategorie.metaTitle,
+    description: copy.desk.kategorie.lead,
+    path: "/odborne/kategorie",
+    locale,
+  });
+}
 
 export default async function OdborneKategoriePage() {
+  const locale = await getServerLocale();
+  const copy = getOdborneHubCopy(locale);
+  const page = copy.desk.kategorie;
   const categories = await getMedicalAiCategories();
   const grouped = categories.reduce<Record<string, typeof categories>>(
     (acc, c) => {
@@ -28,19 +32,15 @@ export default async function OdborneKategoriePage() {
   );
 
   return (
-    <ModulePageShell
-      eyebrow="Odborné texty"
-      title="Kategorie"
-      description="Automatická AI kategorizace: diagnóza, typ studie, úroveň důkazů, klinický dopad a doporučení."
-    >
-      <Link href="/odborne" className="text-sm text-[#005B96] mb-6 inline-block">
-        ← Odborné texty
+    <ModulePageShell eyebrow={page.eyebrow} title={page.title} description={page.lead}>
+      <Link href={localizePublicHref("/odborne", locale)} className="mb-6 inline-block text-sm text-[#005B96]">
+        {copy.back}
       </Link>
       <div className="space-y-8">
         {Object.entries(grouped).map(([type, items]) => (
           <section key={type}>
             <h2 className="font-display text-lg font-bold text-[#021d33]">
-              {TYPE_LABELS[type] ?? type}
+              {copy.typeLabels[type] ?? type}
             </h2>
             <ul className="mt-3 flex flex-wrap gap-2">
               {items.map((c) => (

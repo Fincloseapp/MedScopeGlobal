@@ -1,15 +1,31 @@
 import { MEDSCOPE_LOGO } from "@/lib/brand/logo";
-import { MAGAZINE } from "@/lib/brand/magazine";
+import { MAGAZINE, getOgLocale } from "@/lib/brand/magazine";
 import { SITE } from "@/lib/config/site";
+import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 
-export function organizationJsonLd() {
+function schemaLanguage(locale?: string): string {
+  return getOgLocale(locale).replaceAll("_", "-");
+}
+
+const APP_OFFER_COPY: Record<ChromePack, string> = {
+  cs: "Zkušební přístup; předplatné odemyká plné funkce",
+  de: "Testzugang; ein Abo schaltet die vollen Funktionen frei",
+  fr: "Accès d’essai ; l’abonnement déverrouille toutes les fonctions",
+  it: "Accesso di prova; l’abbonamento sblocca le funzioni complete",
+  es: "Acceso de prueba; la suscripción desbloquea todas las funciones",
+  "pt-BR": "Acesso de teste; a assinatura desbloqueia as funções completas",
+  en: "Trial access; a subscription unlocks the full features",
+};
+
+export function organizationJsonLd(locale?: string) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: SITE.name,
     alternateName: MAGAZINE.name,
     url: SITE.url,
-    description: SITE.description,
+    description: getSurfaceCopy(locale).siteDescription,
     email: SITE.supportEmail,
     logo: `${SITE.url}${MEDSCOPE_LOGO.transparent}`,
     contactPoint: [
@@ -17,7 +33,16 @@ export function organizationJsonLd() {
         "@type": "ContactPoint",
         email: SITE.supportEmail,
         contactType: "customer support",
-        availableLanguage: ["Czech", "English", "German", "Polish", "Slovak"],
+        availableLanguage: [
+          "Czech",
+          "Slovak",
+          "Polish",
+          "English",
+          "German",
+          "French",
+          "Spanish",
+          "Italian",
+        ],
       },
     ],
   };
@@ -38,7 +63,8 @@ export function publicationJsonLd() {
       url: SITE.url,
     },
     publishingPrinciples: `${SITE.url}/info`,
-    inLanguage: ["en", "cs", "de", "fr", "es", "pl", "sk"],
+    logo: `${SITE.url}${MAGAZINE.emailLockup}`,
+    inLanguage: ["en", "cs", "de", "fr", "es", "it", "pl", "sk", "ru", "zh-CN", "ja", "ko"],
   };
 }
 
@@ -179,6 +205,8 @@ export function medicalWebPageJsonLd(page: {
   description: string;
   path: string;
   dateModified?: string;
+  inLanguage?: string;
+  locale?: string;
 }) {
   return {
     "@context": "https://schema.org",
@@ -186,10 +214,10 @@ export function medicalWebPageJsonLd(page: {
     name: page.title,
     description: page.description,
     url: `${SITE.url}${page.path}`,
-    inLanguage: "cs-CZ",
-    isPartOf: webSiteJsonLd(),
+    inLanguage: page.inLanguage ?? "cs-CZ",
+    isPartOf: webSiteJsonLd(page.locale),
     dateModified: page.dateModified,
-    publisher: organizationJsonLd(),
+    publisher: organizationJsonLd(page.locale),
     audience: {
       "@type": "MedicalAudience",
       audienceType: "Physician, MedicalStudent, Researcher",
@@ -197,15 +225,29 @@ export function medicalWebPageJsonLd(page: {
   };
 }
 
-export function webSiteJsonLd() {
+export function webSiteJsonLd(locale?: string) {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: SITE.name,
     alternateName: MAGAZINE.name,
     url: SITE.url,
-    description: SITE.description,
-    inLanguage: ["cs-CZ", "en-US"],
+    description: getSurfaceCopy(locale).siteDescription,
+    inLanguage: [
+      "cs-CZ",
+      "sk-SK",
+      "pl-PL",
+      "de-DE",
+      "fr-FR",
+      "it-IT",
+      "es-ES",
+      "en",
+      "en-US",
+      "ru-RU",
+      "zh-CN",
+      "ja-JP",
+      "ko-KR",
+    ],
     about: publicationJsonLd(),
     potentialAction: {
       "@type": "SearchAction",
@@ -277,7 +319,9 @@ export function softwareApplicationJsonLd(app: {
   url: string;
   installUrl: string;
   category?: string;
+  locale?: string;
 }) {
+  const pack = chromePack(app.locale);
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -291,9 +335,9 @@ export function softwareApplicationJsonLd(app: {
       "@type": "Offer",
       price: "0",
       priceCurrency: "CZK",
-      description: "Zkušební přístup; předplatné odemyká plné funkce",
+      description: APP_OFFER_COPY[pack],
     },
-    inLanguage: "cs-CZ",
-    publisher: organizationJsonLd(),
+    inLanguage: schemaLanguage(app.locale),
+    publisher: organizationJsonLd(app.locale),
   };
 }

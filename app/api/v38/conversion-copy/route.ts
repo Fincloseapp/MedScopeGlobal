@@ -18,6 +18,10 @@ export async function GET(request: Request) {
   if (!slot || !VALID_SLOTS.includes(slot)) {
     return NextResponse.json({ error: "Invalid slot" }, { status: 400 });
   }
-  const copy = await resolveConversionCopy(slot);
+  const locale =
+    url.searchParams.get("locale") ??
+    request.headers.get("x-medscope-locale") ??
+    "en";
+  const copy = await resolveConversionCopy(slot, locale);
   return NextResponse.json(copy);
 }

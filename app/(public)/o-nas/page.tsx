@@ -4,59 +4,59 @@ import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-disclaimer";
 import { SITE } from "@/lib/config/site";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getMarketingCopy } from "@/lib/i18n/marketing-copy";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getMarketingCopy(locale).about;
   return await buildLocalizedPageMetadata({
-  title: "O nás | MedScopeGlobal",
-  description:
-    "MedScopeGlobal je český odborný medicínský portál pro laiky, studenty medicíny, lékaře a výzkumníky.",
-  path: "/o-nas",
-});
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    path: "/o-nas",
+    locale,
+  });
 }
 
-const AUDIENCE_LINKS = [
-  { href: "/verejnost", label: "Veřejnost", desc: "Prevence, symptomy a životní styl srozumitelně" },
-  { href: "/studenti", label: "Studenti", desc: "Anatomie, farmakologie a příprava na LF" },
-  { href: "/lekari", label: "Lékaři", desc: "Guidelines, studie a klinické briefy" },
-  { href: "/studie", label: "Výzkum", desc: "Přehled studií a evidence-based obsah" },
-];
+export default async function ONasPage() {
+  const locale = await getServerLocale();
+  const copy = getMarketingCopy(locale).about;
+  const surface = getSurfaceCopy(locale);
 
-export default function ONasPage() {
   return (
     <ModulePageShell
-      eyebrow="O nás"
-      title="MedScopeGlobal — odborný medicínský portál pro ČR"
-      description={SITE.description}
-      ctaHref="/kontakt"
-      ctaLabel="Kontaktujte nás"
+      eyebrow={copy.eyebrow}
+      title={copy.title}
+      description={surface.siteDescription || SITE.description}
+      ctaHref={localizePublicHref("/kontakt", locale)}
+      ctaLabel={copy.cta}
+      homeHref={localizePublicHref("/", locale)}
     >
       <nav className="mb-6 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground">
-          Domů
+        <Link href={localizePublicHref("/", locale)} className="hover:text-foreground">
+          {copy.home}
         </Link>
         <span className="mx-2">/</span>
-        <span>O nás</span>
+        <span>{copy.eyebrow}</span>
       </nav>
 
       <PublicTrustDisclaimer className="mb-8" />
 
       <div className="prose prose-slate max-w-none">
-        <h2>Naše mise</h2>
-        <p>
-          MedScopeGlobal propojuje klinickou praxi, vědecký výzkum a vzdělávání v medicíně.
-          Kurátorský obsah, citace zdrojů a odborné rubriky pomáhají lékařům, studentům i
-          veřejnosti orientovat se v rychle se měnící medicíně.
-        </p>
+        <h2>{copy.missionTitle}</h2>
+        <p>{copy.mission}</p>
 
-        <h2>Pro koho jsme tu</h2>
-        <p>Vyberte sekci podle toho, kdo jste — každá cesta má vlastní obsah a nástroje.</p>
+        <h2>{copy.forWhomTitle}</h2>
+        <p>{copy.forWhom}</p>
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
-        {AUDIENCE_LINKS.map((item) => (
+        {copy.audiences.map((item) => (
           <Link
             key={item.href}
-            href={item.href}
+            href={localizePublicHref(item.href, locale)}
             className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-[#005B96]/40 hover:shadow-sm"
           >
             <p className="font-semibold text-[#021d33]">{item.label}</p>
@@ -66,24 +66,20 @@ export default function ONasPage() {
       </div>
 
       <div className="prose prose-slate mt-10 max-w-none">
-        <h2>Nezávislost značky</h2>
+        <h2>{copy.independenceTitle}</h2>
         <p>
-          MedScopeGlobal je nezávislá platforma na doméně medscopeglobal.com.{" "}
-          <strong>Nejsme spřízněni s Medscape, WebMD</strong> ani s jinými zahraničními
-          medicínskými portály se podobným názvem. Nejsme jejich českou mutací ani licencí.
-          Podrobnosti: <Link href="/znacka">Značka a duševní vlastnictví</Link>.
+          {copy.independence}{" "}
+          <Link href={localizePublicHref("/znacka", locale)}>{copy.brandLink}</Link>.
         </p>
 
-        <h2>Kvalita a bezpečnost</h2>
-        <p>
-          Obsah prochází redakční kontrolou. AI nástroje jsou auditovány a nepředstavují
-          náhradu odborné zdravotní péče. V akutních případech volejte linku 155 nebo 112.
-        </p>
+        <h2>{copy.qualityTitle}</h2>
+        <p>{copy.quality}</p>
 
-        <h2>Kontakt a spolupráce</h2>
+        <h2>{copy.contactTitle}</h2>
         <p>
-          Máte dotaz k obsahu, chcete navázat partnerství nebo inzerci? Navštivte stránku{" "}
-          <Link href="/kontakt">Kontakt</Link> — odpovídáme obvykle do 24 hodin.
+          {copy.contactBefore}{" "}
+          <Link href={localizePublicHref("/kontakt", locale)}>{copy.contactLink}</Link>{" "}
+          {copy.contactAfter}
         </p>
       </div>
     </ModulePageShell>

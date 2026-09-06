@@ -35,7 +35,7 @@ const headers = {
 };
 
 const wfRes = await fetch(
-  "https://api.github.com/repos/Fincloseapp/MedScopeGlobal/actions/workflows/deploy-v17.yml/runs?per_page=5",
+  "https://api.github.com/repos/Fincloseapp/MedScopeGlobal/actions/workflows/cloudflare-deploy.yml/runs?per_page=5",
   { headers }
 );
 const wfData = await wfRes.json();
@@ -55,7 +55,7 @@ if (pollSeconds > 0 && sha) {
     if (match && match.status === "completed") break;
     await new Promise((r) => setTimeout(r, 20_000));
     const again = await fetch(
-      "https://api.github.com/repos/Fincloseapp/MedScopeGlobal/actions/workflows/deploy-v17.yml/runs?per_page=5",
+      "https://api.github.com/repos/Fincloseapp/MedScopeGlobal/actions/workflows/cloudflare-deploy.yml/runs?per_page=5",
       { headers }
     );
     const againData = await again.json();
@@ -89,7 +89,7 @@ console.log(
     {
       commit: sha ?? match?.head_sha ?? null,
       commitMessage,
-      workflow: "deploy-v17.yml",
+      workflow: "cloudflare-deploy.yml",
       triggered: Boolean(match),
       latestRun: match
         ? {

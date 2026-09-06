@@ -3,6 +3,7 @@ import Image from "next/image";
 import { getLatestArticles } from "@/lib/queries/articles";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import type { LocaleCode } from "@/lib/i18n/config";
+import { formatPublicDate } from "@/lib/i18n/format-date";
 import { getV21UpcomingCongresses } from "@/lib/v21/congresses";
 import { getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { AdPlacement } from "@/components/ads/ad-placement";
@@ -128,7 +129,7 @@ export async function HomepageAutomation({
                 key={c.id}
                 href={`/kongresy/${c.slug}`}
                 title={c.title}
-                meta={c.starts_at ? new Date(c.starts_at).toLocaleDateString("cs-CZ") : undefined}
+                meta={c.starts_at ? formatPublicDate(c.starts_at, locale, { year: "numeric", month: "numeric", day: "numeric" }) ?? undefined : undefined}
                 summary={c.summary}
               />
             ))}

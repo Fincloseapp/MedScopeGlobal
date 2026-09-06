@@ -27,7 +27,9 @@ type CopyLocale =
   | "vi"
   | "id"
   | "ja"
-  | "zh-CN";
+  | "zh-CN"
+  | "pt"
+  | "pt-BR";
 
 const COPY_KEYS = [
   "cs",
@@ -48,12 +50,16 @@ const COPY_KEYS = [
   "id",
   "ja",
   "zh-CN",
+  "pt",
+  "pt-BR",
 ] as const;
 
 export const MAGAZINE = {
   /** Global publication brand (EN-primary, used as proper noun in all locales) */
   name: "ViaLongeVita",
   slug: "vialongevita",
+  /** Email / web masthead lockup (navy JPEG, ~1200×340) */
+  emailLockup: "/assets/magazine/vialongevita-email-lockup.jpg",
   /** Previous magazine name — keep in SEO aliases and legacy URLs */
   formerName: "VitaScope",
   /** Platform that hosts the magazine and apps */
@@ -79,6 +85,8 @@ export const MAGAZINE = {
     id: "Majalah kesehatan & umur panjang global — hidup lebih baik, lebih lama",
     ja: "グローバルな健康・長寿マガジン — どの年代でも、より良く、より長く",
     "zh-CN": "全球健康与长寿杂志 — 每个年龄都活得更好、更久",
+    pt: "Revista global de saúde e longevidade — viver melhor e mais tempo em qualquer idade",
+    "pt-BR": "Revista global de saúde e longevidade — viver melhor e por mais tempo em qualquer idade",
   },
   tagline: {
     en: "See life clearly. Live it longer.",
@@ -99,6 +107,8 @@ export const MAGAZINE = {
     id: "Jelas soal kesehatan. Hidup lebih lama dan lebih baik.",
     ja: "健康を見通す。より長く生きる。",
     "zh-CN": "看清健康。活得更久。",
+    pt: "Ver a saúde com clareza. Viver mais tempo.",
+    "pt-BR": "Ver a saúde com clareza. Viver por mais tempo.",
   },
   subtitle: {
     en: "Longevity, wellness, and healthy lifestyle for everyone who wants to improve — MediFlow journal, VIP protocols, and MeDipacient · OrdiZapis on one platform. MeDiprep (LF prep) remains as a legacy app.",
@@ -119,6 +129,8 @@ export const MAGAZINE = {
     id: "Umur panjang, wellness, dan gaya hidup sehat — jurnal MediFlow, protokol VIP, serta MeDipacient · OrdiZapis di satu platform.",
     ja: "長寿・ウェルネス・健康的なライフスタイル — MediFlow日記、VIPプロトコル、MeDipacient · OrdiZapisを一つのプラットフォームで。",
     "zh-CN": "长寿、健康与生活方式 — MediFlow日记、VIP方案以及 MeDipacient · OrdiZapis 同在一个平台。",
+    pt: "Longevidade, bem-estar e estilo de vida saudável — diário MediFlow, protocolos VIP e MeDipacient · OrdiZapis numa só plataforma.",
+    "pt-BR": "Longevidade, bem-estar e estilo de vida saudável — diário MediFlow, protocolos VIP e MeDipacient · OrdiZapis numa só plataforma.",
   },
   heroClaim: {
     en: "Health, longevity & lifestyle — for everyone",
@@ -139,6 +151,8 @@ export const MAGAZINE = {
     id: "Kesehatan, umur panjang & gaya hidup — untuk semua",
     ja: "健康・長寿・ライフスタイル — すべての人へ",
     "zh-CN": "健康、长寿与生活方式 — 面向每个人",
+    pt: "Saúde, longevidade e estilo de vida — para todos",
+    "pt-BR": "Saúde, longevidade e estilo de vida — para todos",
   },
   heroEyebrow: {
     en: "ViaLongeVita · powered by MedScopeGlobal",
@@ -159,11 +173,13 @@ export const MAGAZINE = {
     id: "ViaLongeVita · powered by MedScopeGlobal",
     ja: "ViaLongeVita · powered by MedScopeGlobal",
     "zh-CN": "ViaLongeVita · powered by MedScopeGlobal",
+    pt: "ViaLongeVita · plataforma MedScopeGlobal",
+    "pt-BR": "ViaLongeVita · plataforma MedScopeGlobal",
   },
   whatsNew: {
-    en: "New: global ecosystem — MediFlow journal, VIP longevity, autonomous editorial, 19 locales",
-    cs: "Nově: globální ekosystém — MediFlow deník, VIP dlouhověkost, autonomní redakce, 19 jazyků",
-    sk: "Nové: globálny ekosystém — MediFlow denník, VIP dlhovekosť, autonómna redakcia, 19 jazykov",
+    en: "New: global ecosystem — MediFlow journal, VIP longevity, autonomous editorial, 21 locales",
+    cs: "Nově: globální ekosystém — MediFlow deník, VIP dlouhověkost, autonomní redakce, 21 jazyků",
+    sk: "Nové: globálny ekosystém — MediFlow denník, VIP dlhovekosť, autonómna redakcia, 21 jazykov",
     de: "Neu: globales Ökosystem — MediFlow, VIP-Langlebigkeit, autonome Redaktion, 19 Sprachen",
     fr: "Nouveau : écosystème mondial — MediFlow, longévité VIP, rédaction autonome, 19 langues",
     es: "Nuevo: ecosistema global — MediFlow, longevidad VIP, redacción autónoma, 19 idiomas",
@@ -179,6 +195,8 @@ export const MAGAZINE = {
     id: "Baru: ekosistem global — MediFlow, umur panjang VIP, redaksi otonom, 19 bahasa",
     ja: "新機能: グローバルエコシステム — MediFlow、VIP長寿、自律編集、19言語",
     "zh-CN": "新上线：全球生态 — MediFlow、VIP长寿、自主编辑、19种语言",
+    pt: "Novo: ecossistema global — MediFlow, longevidade VIP, redação autónoma, 21 idiomas",
+    "pt-BR": "Novo: ecossistema global — MediFlow, longevidade VIP, redação autônoma, 21 idiomas",
   },
 } as const;
 
@@ -198,7 +216,7 @@ function pickCopyLocale(locale?: string): CopyLocale {
     if ((COPY_KEYS as readonly string[]).includes(resolved)) {
       return resolved as CopyLocale;
     }
-    if (resolved === "en-US" || resolved === "en") return "en";
+    if (resolved === "en-US" || resolved === "en" || resolved === "en-UK") return "en";
   } catch {
     // fall through
   }
@@ -233,6 +251,9 @@ export function getOgLocale(locale?: LocaleCode | string): string {
     id: "id_ID",
     en: "en_US",
     "en-US": "en_US",
+    "en-UK": "en_GB",
+    pt: "pt_PT",
+    "pt-BR": "pt_BR",
   };
   if (!locale) return "cs_CZ";
   try {
@@ -300,5 +321,45 @@ export function getMagazineListingCopy(locale?: LocaleCode | string) {
     featured: cs ? "Hlavní článek" : "Featured",
     more: cs ? "Další čtení" : "More to read",
     openMagazine: cs ? "Otevřít magazín" : "Open magazine",
+    articlesNav: cs ? "Články" : "Articles",
+    archiveEyebrow: cs ? "Archiv" : "Archive",
+    archivePageTitle: cs ? "Archiv článků" : "Article archive",
+    archiveMetaDescription: cs
+      ? "Starší odborné články a briefy — stále dostupné ke čtení."
+      : "Older articles and briefs — still available to read.",
+    archiveLeadBefore: cs ? "Starší obsah (před" : "Older pieces (before",
+    archiveLeadAfter: cs
+      ? ") a expirované briefy zůstávají dostupné. Jednotlivé články načtete přímo přes odkaz nebo vyhledávání."
+      : ") and expired briefs stay available. Open any story from a link or search.",
+    archiveEmpty: cs
+      ? "V archivu zatím nejsou zobrazené žádné články."
+      : "No archived articles are listed yet.",
+  };
+}
+
+/** Search page chrome — Czech default, English for other UI locales */
+export function getMagazineSearchCopy(locale?: LocaleCode | string) {
+  const cs = pickCopyLocale(locale) === "cs";
+  return {
+    metaTitle: cs ? "Vyhledávání" : "Search",
+    metaDescription: cs
+      ? "Vyhledávejte články, studie a odborný obsah v archivu MedScopeGlobal."
+      : "Search articles, studies, and editorial pieces in the MedScopeGlobal archive.",
+    eyebrow: cs ? "Vyhledávání" : "Search",
+    title: cs ? "Hledat v archivu" : "Search the archive",
+    lead: cs
+      ? "Prohledávejte nadpisy, perexy a texty článků (minimálně 2 znaky)."
+      : "Search titles, standfirsts, and article text (at least 2 characters).",
+    placeholder: cs
+      ? "Např. diabetes, hypertenze, očkování…"
+      : "e.g. diabetes, hypertension, vaccination…",
+    queryLabel: cs ? "Hledaný výraz" : "Search query",
+    formLabel: cs ? "Vyhledávání článků" : "Article search",
+    submit: cs ? "Hledat" : "Search",
+    submitAria: cs ? "Spustit vyhledávání" : "Run search",
+    empty: (query: string) =>
+      cs
+        ? `Pro dotaz „${query}“ nebyly nalezeny žádné články.`
+        : `No articles matched “${query}”.`,
   };
 }

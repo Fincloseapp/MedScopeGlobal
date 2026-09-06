@@ -7,6 +7,7 @@ const cache = new Map<LocaleCode, Dictionary>();
 /** Locale codes that share another locale's dictionary file. */
 const LOCALE_ALIASES: Partial<Record<LocaleCode, string>> = {
   "en-UK": "en",
+  "pt-BR": "pt",
   jp: "ja",
   kr: "ko",
   cn: "zh-CN",

@@ -1,9 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/auth/admin";
+import { getAuthorizedAdminClient } from "@/lib/auth/require-admin-access";
 import { logAdminEvent } from "@/lib/logging";
-import { createClient } from "@/lib/supabase/server";
 
 export async function saveAd(input: {
   id?: string;
@@ -13,9 +12,7 @@ export async function saveAd(input: {
   active: boolean;
   placement: string | null;
 }) {
-  const gate = await requireAdmin();
-  if (!gate.ok) throw new Error("Unauthorized");
-  const supabase = await createClient();
+  const supabase = await getAuthorizedAdminClient();
   const payload = {
     title: input.title.trim(),
     image_url: input.image_url.trim(),
@@ -39,27 +36,26 @@ export async function saveAd(input: {
   }
 
   revalidatePath("/");
+  revalidatePath("/admin");
   revalidatePath("/admin/ads");
 }
 
 export async function deleteAd(id: string) {
-  const gate = await requireAdmin();
-  if (!gate.ok) throw new Error("Unauthorized");
-  const supabase = await createClient();
+  const supabase = await getAuthorizedAdminClient();
   const { error } = await supabase.from("ads").delete().eq("id", id);
   if (error) throw error;
   await logAdminEvent("AD_DELETE", { ad_id: id });
   revalidatePath("/");
+  revalidatePath("/admin");
   revalidatePath("/admin/ads");
 }
 
 export async function setAdActive(id: string, active: boolean) {
-  const gate = await requireAdmin();
-  if (!gate.ok) throw new Error("Unauthorized");
-  const supabase = await createClient();
+  const supabase = await getAuthorizedAdminClient();
   const { error } = await supabase.from("ads").update({ active }).eq("id", id);
   if (error) throw error;
   await logAdminEvent("AD_ACTIVATE", { ad_id: id, active });
   revalidatePath("/");
+  revalidatePath("/admin");
   revalidatePath("/admin/ads");
 }

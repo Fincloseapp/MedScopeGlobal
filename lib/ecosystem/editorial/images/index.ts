@@ -7,5 +7,6 @@ export * from "./sources";
 export * from "./matcher";
 export * from "./processor";
 export * from "./cover";
+export * from "./unique-listing-covers";
 
 export { getArticleHeroAltText } from "./alt-text";

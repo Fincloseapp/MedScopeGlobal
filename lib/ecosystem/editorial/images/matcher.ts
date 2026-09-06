@@ -13,6 +13,7 @@ import {
 import { isDeniedEditorialImageUrl, validateImageCompliance } from "./policy";
 import {
   classifyCoverTopic,
+  listingCoverOptionsForTopic,
   mapCoverVisualTopicToEditorialTopic,
   type CoverVisualTopic,
 } from "./cover";
@@ -181,9 +182,14 @@ function scoreCandidate(
   return score;
 }
 
+export type MatchImageOptions = {
+  excludeUrls?: Iterable<string>;
+};
+
 export function rankCuratedCandidates(
   article: ArticleForImageMatch,
-  visualTopic: CoverVisualTopic
+  visualTopic: CoverVisualTopic,
+  options?: MatchImageOptions
 ): ArticleImageCandidate[] {
   const editorialTopic = mapCoverVisualTopicToEditorialTopic(visualTopic);
   const candidates = listCuratedCandidatesForVisualTopic(visualTopic).map((c) => {
@@ -198,20 +204,26 @@ export function rankCuratedCandidates(
     return scored;
   });
 
-  return candidates.sort((a, b) => b.score - a.score);
+  const excluded = new Set(
+    [...(options?.excludeUrls ?? [])].map((url) => url.split("?")[0]!.toLowerCase()).filter(Boolean)
+  );
+  return candidates
+    .filter((candidate) => !excluded.has(candidate.url.split("?")[0]!.toLowerCase()))
+    .sort((a, b) => b.score - a.score);
 }
 
 /** Select best compliant image for an article */
 export async function matchImageForArticle(
   article: ArticleForImageMatch,
-  topicOverride?: EditorialTopic
+  topicOverride?: EditorialTopic,
+  options?: MatchImageOptions
 ): Promise<ArticleImageCandidate | null> {
   const visualTopic = inferVisualTopic(article);
   const editorialTopic =
     topicOverride ?? mapCoverVisualTopicToEditorialTopic(visualTopic);
   const brief = buildImageBrief(article, editorialTopic);
 
-  const ranked = rankCuratedCandidates(article, visualTopic);
+  const ranked = rankCuratedCandidates(article, visualTopic, options);
 
   for (const candidate of ranked) {
     if (isDeniedEditorialImageUrl(candidate.url)) continue;
@@ -226,6 +238,14 @@ export async function matchImageForArticle(
       visualTopic,
     });
     if (compliance.passed) return { ...candidate, topic: editorialTopic };
+  }
+
+  for (const url of listingCoverOptionsForTopic(visualTopic)) {
+    if (options?.excludeUrls && [...options.excludeUrls].some((taken) => taken.split("?")[0] === url.split("?")[0])) {
+      continue;
+    }
+    if (isDeniedEditorialImageUrl(url)) continue;
+    return buildCandidateFromUrl(url, editorialTopic, "curated", article, 1, brief.searchKeywords);
   }
 
   const unsplashUrl = await fetchUnsplashIfAvailable(brief.searchKeywords.slice(0, 3).join(" "));
@@ -275,12 +295,13 @@ export async function matchImageForArticle(
 
 export function matchImageForArticleSync(
   article: ArticleForImageMatch,
-  topicOverride?: EditorialTopic
+  topicOverride?: EditorialTopic,
+  options?: MatchImageOptions
 ): ArticleImageCandidate | null {
   const visualTopic = inferVisualTopic(article);
   const editorialTopic =
     topicOverride ?? mapCoverVisualTopicToEditorialTopic(visualTopic);
-  const ranked = rankCuratedCandidates(article, visualTopic);
+  const ranked = rankCuratedCandidates(article, visualTopic, options);
 
   for (const candidate of ranked) {
     if (isDeniedEditorialImageUrl(candidate.url)) continue;
@@ -295,6 +316,14 @@ export function matchImageForArticleSync(
       visualTopic,
     });
     if (compliance.passed) return { ...candidate, topic: editorialTopic };
+  }
+
+  for (const url of listingCoverOptionsForTopic(visualTopic)) {
+    if (options?.excludeUrls && [...options.excludeUrls].some((taken) => taken.split("?")[0] === url.split("?")[0])) {
+      continue;
+    }
+    if (isDeniedEditorialImageUrl(url)) continue;
+    return buildCandidateFromUrl(url, editorialTopic, "curated", article, 1, []);
   }
 
   const fallbackUrl = getPlaceholderFallback(visualTopic);

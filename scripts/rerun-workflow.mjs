@@ -36,7 +36,7 @@ const headers = {
 
 async function getLatestRun() {
   const res = await fetch(
-    "https://api.github.com/repos/Fincloseapp/MedScopeGlobal/actions/workflows/deploy-v17.yml/runs?per_page=1",
+    "https://api.github.com/repos/Fincloseapp/MedScopeGlobal/actions/workflows/cloudflare-deploy.yml/runs?per_page=1",
     { headers }
   );
   const data = await res.json();

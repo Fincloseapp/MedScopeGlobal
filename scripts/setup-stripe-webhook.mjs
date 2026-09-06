@@ -1,16 +1,14 @@
 #!/usr/bin/env node
 /**
- * Create Stripe webhook endpoint + optional Vercel env sync.
+ * Create Stripe webhook endpoint for Cloudflare production.
  * Reads STRIPE_SECRET_KEY from .env.local — never commits secrets.
  *
  * Usage: node scripts/setup-stripe-webhook.mjs
  */
 import fs from "node:fs";
 import path from "node:path";
-import { execSync } from "node:child_process";
 import { dataPath, projectPath } from "../lib/config/paths.mjs";
 
-const root = projectPath();
 const envPath = projectPath(".env.local");
 const secretFile = dataPath("secrets", "stripe-webhook-secret.txt");
 const stripeDocPath = dataPath("docs", "v29-stripe-setup.md");
@@ -45,8 +43,6 @@ const EVENTS = [
 async function main() {
   const env = loadEnv();
   const stripeKey = env.STRIPE_SECRET_KEY?.trim();
-  const vercelToken = env.VERCEL_TOKEN?.trim();
-  const projectId = env.VERCEL_PROJECT_ID?.trim() ?? "prj_xewXFpK1L2PYN9kaqPrilPluQOEj";
 
   if (!stripeKey) {
     console.error("STRIPE_SECRET_KEY missing in .env.local");
@@ -110,25 +106,8 @@ async function main() {
       fs.writeFileSync(docPath, doc.trim() + "\n");
     }
 
-    if (vercelToken) {
-      for (const target of ["production", "preview", "development"]) {
-        try {
-          execSync(
-            `npx vercel env add STRIPE_WEBHOOK_SECRET ${target} --force`,
-            {
-              cwd: root,
-              env: { ...process.env, VERCEL_TOKEN: vercelToken, STRIPE_WEBHOOK_SECRET: signingSecret },
-              input: signingSecret,
-              stdio: ["pipe", "pipe", "pipe"],
-            }
-          );
-          console.log(`Vercel env STRIPE_WEBHOOK_SECRET set for ${target}`);
-        } catch (e) {
-          console.warn(`Vercel env add failed for ${target}:`, e.message?.slice(0, 200));
-        }
-      }
-    } else {
-      console.log("VERCEL_TOKEN not set — add STRIPE_WEBHOOK_SECRET to Vercel manually");
+    if (signingSecret) {
+      console.log("Set STRIPE_WEBHOOK_SECRET on the Cloudflare Worker (pnpm cf:env:sync or dashboard).");
     }
   }
 

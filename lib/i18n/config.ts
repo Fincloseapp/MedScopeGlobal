@@ -20,6 +20,7 @@ export const LOCALES = [
   "en-US",
   "en-UK",
   "pt",
+  "pt-BR",
   "nl",
   "jp",
   "kr",
@@ -36,6 +37,9 @@ export const LOCALE_COOKIE = "medscope_locale";
 
 /** Middleware → RSC: path-prefix locale for the current rewritten request. */
 export const LOCALE_REQUEST_HEADER = "x-medscope-locale";
+
+/** Original URL path (with locale prefix) so AdSense can stay off pro/admin routes. */
+export const PATHNAME_REQUEST_HEADER = "x-medscope-pathname";
 
 /** Set when user picks language in the header — stops auto-sync from device language. */
 export const LOCALE_MANUAL_COOKIE = "medscope_locale_manual";
@@ -66,16 +70,23 @@ const LOCALE_INPUT_ALIASES: Record<string, LocaleCode> = {
   cn: "zh-CN",
   jp: "ja",
   kr: "ko",
+  "pt-br": "pt-BR",
+  pt_br: "pt-BR",
+  "pt-pt": "pt",
+  pt_pt: "pt",
 };
 
 /**
- * Normalize a locale string to a supported LocaleCode.
- * Exact / alias matches win; otherwise longest hyphen-prefix match so `en-US`
- * is not collapsed to `en` (LOCALES lists both).
+ * Map a BCP-47 / URL tag onto a supported locale, or `null` when unknown.
+ * Exact and alias matches win; otherwise the longest hyphen-prefix so
+ * `en-US-x-foo` stays `en-US` instead of collapsing to `en`.
  */
-export function normalizeLocale(input: string | null | undefined): LocaleCode {
-  if (!input) return DEFAULT_LOCALE;
-  const lower = input.toLowerCase().replace(/_/g, "-");
+export function resolveSupportedLocale(
+  input: string | null | undefined
+): LocaleCode | null {
+  if (!input?.trim()) return null;
+  const lower = input.trim().toLowerCase().replace(/_/g, "-");
+  if (lower === "*") return null;
 
   const aliased = LOCALE_INPUT_ALIASES[lower];
   if (aliased) return aliased;
@@ -85,5 +96,13 @@ export function normalizeLocale(input: string | null | undefined): LocaleCode {
 
   const ordered = [...LOCALES].sort((a, b) => b.length - a.length);
   const prefix = ordered.find((l) => lower.startsWith(`${l.toLowerCase()}-`));
-  return prefix ?? DEFAULT_LOCALE;
+  return prefix ?? null;
+}
+
+/**
+ * Normalize a locale string to a supported LocaleCode.
+ * Unknown values fall back to the Czech default edition.
+ */
+export function normalizeLocale(input: string | null | undefined): LocaleCode {
+  return resolveSupportedLocale(input) ?? DEFAULT_LOCALE;
 }

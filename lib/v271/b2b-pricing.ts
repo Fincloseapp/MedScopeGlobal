@@ -1,3 +1,5 @@
+import { localizeListedCzk } from "@/lib/i18n/payment-currency";
+
 /** Transparent B2B ceník — /firmy, /firmy/cenik */
 
 export type V271B2BTier = {
@@ -62,3 +64,10 @@ export const V271_B2B_PRICING: V271B2BTier[] = [
 
 export const V271_B2B_PRICING_NOTE =
   "Uvedené ceny jsou orientační bez DPH. Finální nabídku připravíme do 2 pracovních dnů.";
+
+export function b2bPricingForLocale(locale?: string | null) {
+  return V271_B2B_PRICING.map((tier) => ({
+    ...tier,
+    priceLabel: localizeListedCzk(tier.priceLabel, locale),
+  }));
+}

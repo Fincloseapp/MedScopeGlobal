@@ -1,5 +1,8 @@
 /** Client-only helpers for OrdiZapis phone file upload. */
 
+import { fillOrdiApp, getOrdiZapisAppCopy } from "@/lib/i18n/ordizapis-app-copy";
+import { dokumentaceLocaleHeaders } from "@/lib/lekari/dokumentace/request-locale";
+
 export const ORDIZAPIS_FILE_ACCEPT =
   "audio/*,video/mp4,video/quicktime,.m4a,.mp3,.wav,.aac,.caf,.ogg,.webm,.mp4,.mpeg";
 
@@ -62,12 +65,13 @@ export function isFetchNetworkError(err: unknown): boolean {
   return /failed to fetch|networkerror|load failed|abort|timed out|timeout/i.test(msg);
 }
 
-export function friendlyFetchError(err: unknown, fallback: string): string {
+export function friendlyFetchError(
+  err: unknown,
+  fallback: string,
+  network?: string
+): string {
   if (isFetchNetworkError(err)) {
-    return (
-      "Spojení při odesílání nahrávky selhalo (časté u většího M4A na mobilu). " +
-      "Zkuste znovu na Wi‑Fi, nebo použijte Nahrávat přímo v OrdiZapisu."
-    );
+    return network || fallback;
   }
   const msg = err instanceof Error ? err.message : String(err);
   return msg.trim() || fallback;
@@ -120,13 +124,15 @@ async function uploadViaSignedUrl(
   file: File,
   mime: string,
   filename: string,
-  onProgress?: (ratio: number, label: string) => void
+  onProgress?: (ratio: number, label: string) => void,
+  locale?: string
 ): Promise<string | null> {
-  onProgress?.(0.05, "Připravuji bezpečný upload…");
+  const copy = getOrdiZapisAppCopy(locale);
+  onProgress?.(0.05, copy.progressPrepareUpload);
   const intentRes = await fetchWithRetry("/api/lekari/dokumentace/file-upload-url", {
     method: "POST",
     credentials: "same-origin",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...dokumentaceLocaleHeaders(locale || "cs") },
     body: JSON.stringify({
       byteLength: file.size,
       filename,
@@ -144,7 +150,7 @@ async function uploadViaSignedUrl(
   const signedUrl = typeof intent.signedUrl === "string" ? intent.signedUrl : "";
   if (!path || (!token && !signedUrl)) return null;
 
-  onProgress?.(0.15, "Odesílám soubor…");
+  onProgress?.(0.15, copy.progressSendingFile);
 
   // Official Supabase signed upload (FormData PUT) — most reliable on mobile
   if (token) {
@@ -155,7 +161,7 @@ async function uploadViaSignedUrl(
         .from("media")
         .uploadToSignedUrl(path, token, file, { contentType: mime, upsert: true });
       if (!error) {
-        onProgress?.(0.55, "Soubor nahrán…");
+        onProgress?.(0.55, copy.progressFileUploaded);
         return path;
       }
     } catch {
@@ -177,7 +183,7 @@ async function uploadViaSignedUrl(
       2
     );
     if (putRes.ok) {
-      onProgress?.(0.55, "Soubor nahrán…");
+      onProgress?.(0.55, copy.progressFileUploaded);
       return path;
     }
   }
@@ -189,13 +195,15 @@ async function uploadViaChunks(
   file: File,
   mime: string,
   filename: string,
-  onProgress?: (ratio: number, label: string) => void
+  onProgress?: (ratio: number, label: string) => void,
+  locale?: string
 ): Promise<{ sessionId: string; total: number }> {
-  onProgress?.(0.05, "Připravuji nahrávku po částech…");
+  const copy = getOrdiZapisAppCopy(locale);
+  onProgress?.(0.05, copy.progressPrepareChunks);
   const sessionRes = await fetchWithRetry("/api/lekari/dokumentace/file-session", {
     method: "POST",
     credentials: "same-origin",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...dokumentaceLocaleHeaders(locale || "cs") },
     body: JSON.stringify({
       byteLength: file.size,
       filename,
@@ -207,7 +215,7 @@ async function uploadViaChunks(
   if (!sessionRes.ok || !sessionId) {
     throw new Error(
       (typeof sessionJson.error === "string" && sessionJson.error) ||
-        "Nepodařilo se zahájit nahrání souboru."
+        copy.errStartUpload
     );
   }
 
@@ -232,6 +240,7 @@ async function uploadViaChunks(
       {
         method: "POST",
         credentials: "same-origin",
+        headers: dokumentaceLocaleHeaders(locale || "cs"),
         body: form,
       },
       3
@@ -240,10 +249,13 @@ async function uploadViaChunks(
     if (!chunkRes.ok) {
       throw new Error(
         (typeof chunkJson.error === "string" && chunkJson.error) ||
-          `Odeslání části ${i + 1}/${total} selhalo.`
+          fillOrdiApp(copy.errChunkSend, { n: i + 1, total })
       );
     }
-    onProgress?.(0.1 + (0.45 * (i + 1)) / total, `Odesílám ${i + 1}/${total}…`);
+    onProgress?.(
+      0.1 + (0.45 * (i + 1)) / total,
+      fillOrdiApp(copy.progressSendingChunk, { n: i + 1, total })
+    );
   }
 
   return { sessionId, total };
@@ -255,14 +267,14 @@ async function uploadViaChunks(
  */
 export async function uploadAndTranscribePhoneFile(opts: {
   file: File;
+  locale?: string;
   onProgress?: (ratio: number, label: string) => void;
 }): Promise<PhoneTranscribeResult> {
   const { file } = opts;
-  if (file.size <= 0) throw new Error("Soubor je prázdný.");
+  const copy = getOrdiZapisAppCopy(opts.locale);
+  if (file.size <= 0) throw new Error(copy.errEmptyFile);
   if (file.size > ORDIZAPIS_MAX_FILE_BYTES) {
-    throw new Error(
-      "Soubor je větší než 25 MB. Nahrajte kratší nahrávku nebo použijte Nahrávat v OrdiZapisu."
-    );
+    throw new Error(copy.errFileTooBig);
   }
 
   const { mime, filename } = resolveAudioMeta(file);
@@ -271,30 +283,36 @@ export async function uploadAndTranscribePhoneFile(opts: {
   let session: { sessionId: string; total: number } | null = null;
 
   try {
-    path = await uploadViaSignedUrl(file, mime, filename, opts.onProgress);
+    path = await uploadViaSignedUrl(file, mime, filename, opts.onProgress, opts.locale);
   } catch {
     path = null;
   }
 
   if (!path) {
-    session = await uploadViaChunks(file, mime, filename, opts.onProgress);
+    session = await uploadViaChunks(file, mime, filename, opts.onProgress, opts.locale);
   }
 
-  opts.onProgress?.(0.65, "Přepisuji nahrávku…");
+  opts.onProgress?.(0.65, copy.progressTranscribing);
+  const locale = opts.locale || "cs";
   const processRes = await fetchWithRetry(
     "/api/lekari/dokumentace/process-file",
     {
       method: "POST",
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-medscope-locale": locale,
+        "x-dokumentace-locale": locale,
+      },
       body: JSON.stringify(
         path
-          ? { path, filename, mimeType: mime }
+          ? { path, filename, mimeType: mime, locale }
           : {
               sessionId: session!.sessionId,
               total: session!.total,
               filename,
               mimeType: mime,
+              locale,
             }
       ),
     },
@@ -304,13 +322,13 @@ export async function uploadAndTranscribePhoneFile(opts: {
   if (!processRes.ok) {
     throw new Error(
       (typeof processJson.error === "string" && processJson.error) ||
-        "Přepis souboru selhal."
+        copy.errTranscribe
     );
   }
   const transcript =
     typeof processJson.transcript === "string" ? processJson.transcript.trim() : "";
   if (!transcript) {
-    throw new Error("Přepis je prázdný — soubor se nepodařilo rozpoznat.");
+    throw new Error(copy.errEmptyTranscript);
   }
   opts.onProgress?.(0.9, "Přepis hotov…");
   return {
@@ -326,6 +344,7 @@ export async function uploadAndProcessPhoneFile(opts: {
   templateId: string;
   specialty?: string;
   source?: string;
+  locale?: string;
   onProgress?: (ratio: number, label: string) => void;
 }): Promise<{
   transcript: string;
@@ -337,14 +356,18 @@ export async function uploadAndProcessPhoneFile(opts: {
 }> {
   const stt = await uploadAndTranscribePhoneFile({
     file: opts.file,
+    locale: opts.locale,
     onProgress: opts.onProgress,
   });
+  const locale = opts.locale || "cs";
   const structRes = await fetchWithRetry("/api/lekari/dokumentace/structure", {
     method: "POST",
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
       "x-dokumentace-source": opts.source || "mobile-file",
+      "x-medscope-locale": locale,
+      "x-dokumentace-locale": locale,
     },
     body: JSON.stringify({
       transcript: stt.transcript,
@@ -352,17 +375,18 @@ export async function uploadAndProcessPhoneFile(opts: {
       templateId: opts.templateId,
       specialty: opts.specialty || undefined,
       source: opts.source || "mobile-file",
+      locale,
     }),
   });
   const structJson = await readJson(structRes);
   if (!structRes.ok) {
     throw new Error(
       (typeof structJson.error === "string" && structJson.error) ||
-        "Sestavení zápisu selhalo."
+        getOrdiZapisAppCopy(locale).errStructure
     );
   }
   const note = typeof structJson.note === "string" ? structJson.note : "";
-  if (!note.trim()) throw new Error("Zápis se nepodařilo sestavit ze souboru.");
+  if (!note.trim()) throw new Error(getOrdiZapisAppCopy(locale).errStructureRetry);
   return {
     transcript: stt.transcript,
     note,

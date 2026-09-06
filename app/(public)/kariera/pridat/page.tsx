@@ -1,20 +1,27 @@
 import type { Metadata } from "next";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { JobPostForm } from "@/components/forms/job-post-form";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getKarieraHubCopy } from "@/lib/i18n/kariera-hub-copy";
+import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
-export const metadata: Metadata = {
-  title: "Přidat pracovní pozici",
-  description: "Formulář pro zaměstnavatele — publikace po schválení.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getKarieraHubCopy(locale);
+  return await buildLocalizedV20PageMetadata({
+    title: copy.addMetaTitle,
+    description: copy.addMetaDescription,
+    path: "/kariera/pridat",
+    locale,
+  });
+}
 
-export default function KarieraPridatPage() {
+export default async function KarieraPridatPage() {
+  const locale = await getServerLocale();
+  const copy = getKarieraHubCopy(locale);
   return (
-    <ModulePageShell
-      eyebrow="Kariéra"
-      title="Přidat nabídku práce"
-      description="Nabídka bude po kontrole publikována v sekci Kariéra."
-    >
-      <JobPostForm />
+    <ModulePageShell eyebrow={copy.eyebrow} title={copy.addTitle} description={copy.addLead}>
+      <JobPostForm locale={locale} />
     </ModulePageShell>
   );
 }

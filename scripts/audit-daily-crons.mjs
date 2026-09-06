@@ -32,6 +32,7 @@ const DAILY_CRONS = [
   "/api/cron/daily-autopublish",
   "/api/cron/v24-ultra",
   "/api/cron/v25-enterprise",
+  "/api/cron/conversion-renewals",
   "/api/cron/v26-rewrite",
   "/api/cron/academy-daily",
 ];

@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { createServiceRoleClient } from "@/lib/supabase/service";
 import { withApiGuard } from "@/lib/security/api-guard";
 import {
   listDokumentaceNotes,
   saveDokumentaceNote,
 } from "@/lib/lekari/dokumentace/notes";
 import { getDokumentaceEligibility } from "@/lib/lekari/dokumentace/eligibility";
+import { dokumentaceLocaleFromUrl } from "@/lib/lekari/dokumentace/request-locale";
+import { getOrdiZapisApiCopy } from "@/lib/i18n/ordizapis-api-copy";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,6 +24,8 @@ const createSchema = z.object({
 });
 
 export async function GET(request: Request) {
+  const locale = dokumentaceLocaleFromUrl(request);
+  const copy = getOrdiZapisApiCopy(locale);
   const supabase = await createClient();
   const {
     data: { user },
@@ -35,10 +38,10 @@ export async function GET(request: Request) {
   });
   if (!guard.ok) return guard.response;
   if (!user) {
-    return NextResponse.json({ error: "Přihlášení vyžadováno." }, { status: 401 });
+    return NextResponse.json({ error: copy.errLoginRequired }, { status: 401 });
   }
 
-  const eligibility = await getDokumentaceEligibility(user.id);
+  const eligibility = await getDokumentaceEligibility(user.id, locale);
   if (!eligibility.eligible) {
     return NextResponse.json(
       { error: eligibility.message, code: "DOCTOR_VERIFICATION_REQUIRED" },
@@ -59,6 +62,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const locale = dokumentaceLocaleFromUrl(request);
+  const copy = getOrdiZapisApiCopy(locale);
   const supabase = await createClient();
   const {
     data: { user },
@@ -71,10 +76,10 @@ export async function POST(request: Request) {
   });
   if (!guard.ok) return guard.response;
   if (!user) {
-    return NextResponse.json({ error: "Přihlášení vyžadováno." }, { status: 401 });
+    return NextResponse.json({ error: copy.errLoginRequired }, { status: 401 });
   }
 
-  const eligibility = await getDokumentaceEligibility(user.id);
+  const eligibility = await getDokumentaceEligibility(user.id, locale);
   if (!eligibility.eligible) {
     return NextResponse.json(
       { error: eligibility.message, code: "DOCTOR_VERIFICATION_REQUIRED" },
@@ -86,15 +91,14 @@ export async function POST(request: Request) {
   try {
     body = createSchema.parse(await request.json());
   } catch {
-    return NextResponse.json({ error: "Neplatný vstup." }, { status: 400 });
+    return NextResponse.json({ error: copy.errInvalidInput }, { status: 400 });
   }
 
   const sourceHeader = request.headers.get("x-dokumentace-source");
   const source = body.source ?? sourceHeader ?? "web";
 
   try {
-    const admin = createServiceRoleClient();
-    const row = await saveDokumentaceNote(admin, {
+    const row = await saveDokumentaceNote({
       userId: user.id,
       note: body.note,
       transcript: body.transcript,
@@ -106,7 +110,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ note: row }, { status: 201 });
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Uložení selhalo.";
+    const message = e instanceof Error ? e.message : copy.errSaveFailed;
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -1,8 +1,9 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminReadClient } from "@/lib/auth/require-admin-access";
 import type { Article } from "@/types/database";
 
 export async function getArticleForAdmin(id: string) {
-  const supabase = await createClient();
+  const supabase = await createAdminReadClient();
+  if (!supabase) return null;
   const { data, error } = await supabase
     .from("articles")
     .select("*")

@@ -1,4 +1,11 @@
 import type { PublicTopic } from "@/lib/queries/verejnost";
+import { getMarketingCopy } from "@/lib/i18n/marketing-copy";
+import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
+
+const TOPIC_ALIASES: Record<string, string> = {
+  nemoci: "pruvodce-nemocemi",
+  nemoc: "pruvodce-nemocemi",
+};
 
 export type VerejnostHubTopic = {
   slug: string;
@@ -69,6 +76,24 @@ export const VEREJNOST_HUB_TOPICS: VerejnostHubTopic[] = [
     description: "Healthspan, prevence stárnutí, spánek, pohyb a biomarkery.",
     backendTopic: "zivotni-styl",
   },
+  {
+    slug: "pohyb",
+    label: "Pohyb a cvičení",
+    description: "Síla, chůze a regenerace — redakční texty, ne tréninkový plán na míru.",
+    backendTopic: "zivotni-styl",
+  },
+  {
+    slug: "joga",
+    label: "Jóga",
+    description: "Mobilita, dech a kloubní zdraví — bez ezoteriky a zázračných slibů.",
+    backendTopic: "zivotni-styl",
+  },
+  {
+    slug: "kosmetika",
+    label: "Kosmetika a pleť",
+    description: "Dermokosmetika, fotoprotekce a péče o bariéru kůže — na úrovni důkazů.",
+    backendTopic: "zivotni-styl",
+  },
 ];
 
 export const BACKEND_PUBLIC_TOPICS: {
@@ -106,10 +131,34 @@ export function resolveBackendTopic(slug: string | undefined): PublicTopic | nul
   return hub?.backendTopic ?? null;
 }
 
-export function topicLabelForSlug(slug: string | null | undefined): string {
-  if (!slug) return "Veřejné zdraví";
+export function hubTopicListingHref(slug: string, _backendTopic?: string): string {
+  if (slug === "rozhovory") return "/verejnost/rozhovory";
+  return `/verejnost/clanky?topic=${slug}`;
+}
+
+export function topicLabelForSlug(slug: string | null | undefined, locale?: string | null): string {
+  const loc = locale ?? "cs";
+  if (!slug) return getVerejnostChrome(loc).fallbackTopic;
+  const key = TOPIC_ALIASES[slug] ?? slug;
+  const localized = getMarketingCopy(loc).publicHub.topics[key]?.label;
+  if (localized) return localized;
   const hub = VEREJNOST_HUB_TOPICS.find((t) => t.slug === slug);
   if (hub) return hub.label;
   const backend = BACKEND_PUBLIC_TOPICS.find((t) => t.slug === slug);
   return backend?.label ?? slug;
+}
+
+export function topicDescriptionForSlug(
+  slug: string | null | undefined,
+  locale?: string | null
+): string {
+  if (!slug) return "";
+  const key = TOPIC_ALIASES[slug] ?? slug;
+  const localized = getMarketingCopy(locale ?? "cs").publicHub.topics[key]?.description;
+  if (localized) return localized;
+  return (
+    VEREJNOST_HUB_TOPICS.find((t) => t.slug === slug)?.description ??
+    BACKEND_PUBLIC_TOPICS.find((t) => t.slug === slug)?.description ??
+    ""
+  );
 }

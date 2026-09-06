@@ -2,32 +2,41 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
 import { getLegalEntity } from "@/lib/config/legal-entity";
+import { getLegalChromeCopy } from "@/lib/i18n/legal-chrome-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
   return await buildLocalizedPageMetadata({
-  title: "Ochrana osobních údajů (GDPR)",
-  description:
-    "Zpracování osobních údajů, cookies, analytika, newsletter a AI zpracování dat na MedScopeGlobal.",
-  path: "/gdpr",
-});
+    title: copy.gdprTitle,
+    description: copy.gdprDescription,
+    path: "/gdpr",
+    locale,
+  });
 }
 
-export default function GdprPage() {
+export default async function GdprPage() {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
   const entity = getLegalEntity();
 
   return (
     <LegalPageLayout
-      title="Ochrana osobních údajů (GDPR)"
-      description="Informace o zpracování osobních údajů dle nařízení EU 2016/679."
+      locale={locale}
+      title={copy.gdprTitle}
+      description={copy.gdprLead}
     >
+      {copy.officialNote ? <p><em>{copy.officialNote}</em></p> : null}
       <h2>1. Správce údajů</h2>
       <p>
         Správcem osobních údajů je <strong>{entity.name}</strong>
         {entity.ico ? <> (IČO {entity.ico})</> : null}
         {entity.address ? <>, sídlo: {entity.address}</> : null}. Kontakt:{" "}
         <a href={`mailto:${entity.legalEmail}`}>{entity.legalEmail}</a>. Úplné znění:{" "}
-        <Link href="/privacy">Ochrana soukromí</Link>.
+        <Link href={localizePublicHref("/privacy", locale)}>{copy.privacyTitle}</Link>.
       </p>
 
       <h2>2. Rozsah zpracování</h2>
@@ -43,7 +52,7 @@ export default function GdprPage() {
       <p>
         Používáme nezbytné cookies pro přihlášení a jazykové preference. Analytické cookies
         Preference můžete spravovat na stránce{" "}
-        <Link href="/cookies">Cookies</Link>.
+        <Link href={localizePublicHref("/cookies", locale)}>{copy.cookiesTitle}</Link>.
       </p>
 
       <h2>4. Newsletter</h2>

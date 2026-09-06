@@ -4,19 +4,23 @@ import {
   matchesArticleLocale,
   primaryArticleLocale,
 } from "@/lib/i18n/article-locale";
+import { looksLikeCzech } from "@/lib/i18n/czech-detect";
 import type { LocaleCode } from "@/lib/i18n/config";
-import { resolveArticleTranslation } from "@/lib/i18n/translate-article";
+import { mapPool } from "@/lib/i18n/map-pool";
+import { getCachedTranslations, resolveArticleTranslation, saveCachedTranslation } from "@/lib/i18n/translate-article";
+import { fallbackTranslateFields } from "@/lib/i18n/translate-fallback";
 import type { ArticleWithRelations } from "@/types/database";
 import { dedupeArticlesByTitle } from "@/lib/articles/dedupe";
 import { enrichArticleBodyForDisplay } from "@/lib/articles/enrich-body";
 import { polishCzechFields } from "@/lib/v22/translate";
 import {
   assignEditorialUnits,
+  formatSyndicatedByline,
   publicEditorialByline,
   type EditorialAssignment,
-  type EditorialLocale,
 } from "@/lib/editorial/units";
-import { resolveEditorialCover } from "@/lib/editorial/image-policy";
+import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
+import { assignUniqueListingCovers } from "@/lib/ecosystem/editorial/images/unique-listing-covers";
 import { applyMagazineDeskCopy } from "@/lib/editorial/magazine-desk-copy";
 
 export type DisplayArticle = ArticleWithRelations & {
@@ -27,6 +31,10 @@ export type DisplayArticle = ArticleWithRelations & {
   reviewed?: boolean;
   editorialAssignment?: EditorialAssignment;
   editorialPrimaryLabel?: string;
+  deskOrigin?: "native" | "borrowed";
+  syndicatedFromLocale?: string | null;
+  /** Listing-only date for resurfaced evergreen cards. Article pages keep published_at. */
+  listing_published_at?: string | null;
 };
 
 function attachEditorialDisplay(
@@ -34,27 +42,44 @@ function attachEditorialDisplay(
   locale: LocaleCode,
   extra?: Partial<DisplayArticle>
 ): DisplayArticle {
-  const editorialLocale: EditorialLocale = locale === "en" ? "en" : "cs";
   const assignment = assignEditorialUnits(article ?? {});
+  // Czech magazine desk overrides must not clobber DE/FR/IT/… translations.
   const desk =
-    editorialLocale === "cs"
+    primaryArticleLocale(locale) === "cs"
       ? applyMagazineDeskCopy({ ...article, ...extra })
       : { ...article, ...extra };
   const merged = { ...article, ...extra, ...desk };
-  const cover_image_url = resolveEditorialCover({
-    coverUrl: merged.cover_image_url,
-    title: merged.title,
-    excerpt: merged.excerpt,
+  const cover_image_url = resolveArticleCoverUrl({
+    title: merged.title ?? "",
     slug: merged.slug,
-    public_topic: merged.public_topic,
+    excerpt: merged.excerpt,
     category: merged.categories?.name,
+    publicTopic: merged.public_topic,
+    coverImageUrl: merged.cover_image_url,
+    preferCurated: true,
   });
+  const sourceLocale =
+    extra?.translatedFrom ?? extra?.syndicatedFromLocale ?? merged.locale ?? null;
+  const native = matchesArticleLocale(merged.locale, locale);
   return {
     ...merged,
     cover_image_url,
     editorialAssignment: assignment,
-    editorialPrimaryLabel: publicEditorialByline(editorialLocale),
+    deskOrigin: native ? "native" : "borrowed",
+    syndicatedFromLocale: native ? null : sourceLocale,
+    editorialPrimaryLabel: native
+      ? publicEditorialByline(locale)
+      : formatSyndicatedByline(locale, sourceLocale),
   };
+}
+
+function withoutCzechListingCopy(row: DisplayArticle, locale: LocaleCode): DisplayArticle | null {
+  if (primaryArticleLocale(locale) === "cs") return row;
+  let title = row.title;
+  let excerpt = row.excerpt;
+  if (looksLikeCzech(excerpt)) excerpt = looksLikeCzech(title) ? null : title;
+  if (looksLikeCzech(title)) return null;
+  return { ...row, excerpt };
 }
 
 function sortByLocalePreference(
@@ -91,7 +116,8 @@ async function applyCategoryLabels(
 export async function prepareArticleForDisplay(
   article: ArticleWithRelations,
   locale: LocaleCode,
-  mode: "card" | "full" = "full"
+  mode: "card" | "full" = "full",
+  options?: { live?: boolean }
 ): Promise<DisplayArticle> {
   let base = await applyCategoryLabels(article, locale);
   const target = primaryArticleLocale(locale);
@@ -99,7 +125,7 @@ export async function prepareArticleForDisplay(
   if (matchesArticleLocale(base.locale, locale)) {
     const polished = locale === "cs" ? polishCzechFields(base, locale) : base;
     const display = attachEditorialDisplay(polished, locale, { displayLocale: target });
-    if (mode === "full") {
+    if (mode === "full" && target === "cs") {
       return { ...display, content: enrichArticleBodyForDisplay(display) };
     }
     return display;
@@ -114,12 +140,12 @@ export async function prepareArticleForDisplay(
       locale: base.locale,
     },
     locale,
-    mode
+    mode,
+    { live: options?.live }
   );
 
   if (!translated) {
     if (locale === "cs") {
-      // English / mismatched locale: still polish so RSS CDATA bodies get a Czech teaser.
       const polished = polishCzechFields(base, "cs");
       return attachEditorialDisplay(base, locale, {
         title: polished.title,
@@ -132,22 +158,55 @@ export async function prepareArticleForDisplay(
         translatedFrom: base.locale ?? "en",
       });
     }
+    const lastResort = await fallbackTranslateFields({
+      title: base.title,
+      excerpt: base.excerpt,
+      content: base.content,
+      sourceLocale: base.locale ?? "cs",
+      targetLocale: locale,
+      mode: "card",
+    }).catch(() => null);
+    const rescueTitle =
+      lastResort && !looksLikeCzech(lastResort.title) ? lastResort.title : "";
+    const rescueExcerpt =
+      lastResort && lastResort.excerpt && !looksLikeCzech(lastResort.excerpt)
+        ? lastResort.excerpt
+        : null;
     return attachEditorialDisplay(base, locale, {
-      displayLocale: base.locale ?? undefined,
-      translatedFrom: base.locale ?? "en",
+      title: rescueTitle || (looksLikeCzech(base.title) ? rescueExcerpt ?? "" : base.title),
+      excerpt: rescueExcerpt,
+      content: rescueExcerpt ? `<p>${rescueExcerpt}</p>` : "",
+      displayLocale: target,
+      translatedFrom: base.locale ?? null,
+      translation_provider: lastResort?.translation_provider,
+      machine_translated: Boolean(rescueTitle),
+      reviewed: false,
     });
   }
 
-  const content = translated.content ?? base.content;
+  let title = translated.title;
+  let excerpt = translated.excerpt ?? base.excerpt;
+  let content =
+    translated.content ??
+    (target === "cs" ? base.content : translated.excerpt ? `<p>${translated.excerpt}</p>` : "");
+
+  if (target !== "cs") {
+    if (looksLikeCzech(title)) title = excerpt && !looksLikeCzech(excerpt) ? excerpt : title;
+    if (looksLikeCzech(excerpt)) excerpt = looksLikeCzech(title) ? null : title;
+    if (looksLikeCzech(content)) {
+      content = excerpt && !looksLikeCzech(excerpt) ? `<p>${excerpt}</p>` : "";
+    }
+    if (!title.trim() && excerpt && !looksLikeCzech(excerpt)) title = excerpt;
+  }
   const merged = {
     ...base,
-    title: translated.title,
-    excerpt: translated.excerpt ?? base.excerpt,
+    title,
+    excerpt,
     content,
   };
   const polished = locale === "cs" ? polishCzechFields(merged, locale) : merged;
   const enriched =
-    mode === "full"
+    mode === "full" && target === "cs"
       ? enrichArticleBodyForDisplay({
           ...polished,
           title: polished.title,
@@ -168,51 +227,141 @@ export async function prepareArticleForDisplay(
   });
 }
 
+function finalizePreparedListing(
+  rows: DisplayArticle[],
+  locale: LocaleCode
+): DisplayArticle[] {
+  const cleaned = rows
+    .map((row) => withoutCzechListingCopy(row, locale))
+    .filter((row): row is DisplayArticle => Boolean(row));
+  return assignUniqueListingCovers(cleaned);
+}
+
 export async function prepareArticlesForDisplay(
   articles: ArticleWithRelations[],
   locale: LocaleCode,
-  options?: { mode?: "card" | "full"; maxTranslate?: number }
+  options?: { mode?: "card" | "full"; maxTranslate?: number; maxLive?: number }
 ): Promise<DisplayArticle[]> {
   const sorted = sortByLocalePreference(dedupeArticlesByTitle(articles), locale);
   const mode = options?.mode ?? "card";
-  const maxTranslate = options?.maxTranslate ?? 8;
-  let translated = 0;
+  const maxTranslate = options?.maxTranslate ?? 24;
 
-  const out: DisplayArticle[] = [];
-  for (const article of sorted) {
+  let translateUsed = 0;
+  const plan = sorted.map((article) => {
+    const needsTranslation = !matchesArticleLocale(article.locale, locale);
+    if (!needsTranslation) {
+      return { article, kind: "native" as const };
+    }
+    if (translateUsed >= maxTranslate) {
+      return { article, kind: "passthrough" as const };
+    }
+    translateUsed += 1;
+    return { article, kind: "translate" as const };
+  });
+
+  const translateIds = plan
+    .filter((item) => item.kind === "translate")
+    .map((item) => item.article.id);
+  const cachedMap = await getCachedTranslations(translateIds, locale);
+
+  const firstPass = await mapPool(plan, 10, async (item) => {
+    if (item.kind === "native") {
+      return prepareArticleForDisplay(item.article, locale, mode, { live: false });
+    }
+    if (item.kind === "passthrough") {
+      // Over the maxTranslate cap: never call live MT. Czech leftovers
+      // are dropped in finalizePreparedListing — that keeps /de /en /fr
+      // off a 50s translation storm and off Czech chrome.
+      return attachEditorialDisplay(item.article, locale, {
+        displayLocale: primaryArticleLocale(locale),
+      });
+    }
+    const cached = cachedMap.get(item.article.id);
+    if (cached?.title) {
+      return attachEditorialDisplay(item.article, locale, {
+        title: cached.title,
+        excerpt:
+          cached.excerpt && !looksLikeCzech(cached.excerpt)
+            ? cached.excerpt
+            : looksLikeCzech(item.article.excerpt)
+              ? cached.title
+              : item.article.excerpt,
+        displayLocale: primaryArticleLocale(locale),
+        translatedFrom: item.article.locale ?? null,
+        translation_provider: cached.translation_provider,
+        machine_translated: true,
+        reviewed: cached.reviewed,
+      });
+    }
+    return attachEditorialDisplay(item.article, locale, {
+      displayLocale: primaryArticleLocale(locale),
+    });
+  });
+
+  const missIndexes: number[] = [];
+  firstPass.forEach((display, index) => {
+    const czechLeak =
+      primaryArticleLocale(locale) !== "cs" &&
+      (looksLikeCzech(display.title) || looksLikeCzech(display.excerpt));
     if (
-      !matchesArticleLocale(article.locale, locale) &&
-      translated < maxTranslate
+      plan[index]?.kind === "translate" &&
+      (!display.machine_translated || czechLeak)
     ) {
-      out.push(await prepareArticleForDisplay(article, locale, mode));
-      translated++;
-    } else if (matchesArticleLocale(article.locale, locale)) {
-      out.push(await prepareArticleForDisplay(article, locale, mode));
-    } else if (locale === "cs") {
-      const withCat = await applyCategoryLabels(article, locale);
-      const polished = polishCzechFields(withCat, "cs");
-      out.push(
-        attachEditorialDisplay(withCat, locale, {
-          title: polished.title,
-          excerpt: polished.excerpt,
-          content: polished.content,
-          displayLocale: targetLocaleOrUndefined(withCat.locale),
-          translatedFrom: withCat.locale ?? null,
-        })
-      );
-    } else {
-      const withCat = await applyCategoryLabels(article, locale);
-      out.push(
-        attachEditorialDisplay(withCat, locale, {
-          displayLocale: withCat.locale ?? undefined,
-          translatedFrom: withCat.locale ?? null,
-        })
-      );
+      missIndexes.push(index);
+    }
+  });
+
+  if (missIndexes.length === 0 || mode !== "card") {
+    if (missIndexes.length && mode === "full") {
+      const full = await mapPool(firstPass, 2, async (display, index) => {
+        if (!missIndexes.includes(index)) return display;
+        return prepareArticleForDisplay(plan[index]!.article, locale, mode, { live: true });
+      });
+      return finalizePreparedListing(full, locale);
+    }
+    return finalizePreparedListing(firstPass, locale);
+  }
+
+  const fill = mapPool(missIndexes, 8, async (index) => {
+    const article = plan[index]!.article;
+    const hit = await fallbackTranslateFields({
+      title: article.title,
+      excerpt: article.excerpt,
+      content: article.content,
+      sourceLocale: article.locale ?? "cs",
+      targetLocale: locale,
+      mode: "card",
+    });
+    if (!hit) {
+      return { index, display: firstPass[index]! };
+    }
+    void saveCachedTranslation(article.id, locale, hit);
+    return {
+      index,
+      display: attachEditorialDisplay(firstPass[index]!, locale, {
+        title: hit.title,
+        excerpt:
+          hit.excerpt && !looksLikeCzech(hit.excerpt)
+            ? hit.excerpt
+            : looksLikeCzech(firstPass[index]!.excerpt)
+              ? hit.title
+              : firstPass[index]!.excerpt,
+        displayLocale: primaryArticleLocale(locale),
+        translatedFrom: article.locale ?? null,
+        translation_provider: hit.translation_provider,
+        machine_translated: true,
+        reviewed: false,
+      }),
+    };
+  });
+
+  const filled = await fill;
+
+  if (filled) {
+    for (const row of filled) {
+      firstPass[row.index] = row.display;
     }
   }
-  return out;
-}
 
-function targetLocaleOrUndefined(locale: string | null | undefined): string | undefined {
-  return locale ?? undefined;
+  return finalizePreparedListing(firstPass, locale);
 }

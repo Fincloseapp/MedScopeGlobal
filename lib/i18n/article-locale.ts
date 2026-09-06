@@ -10,7 +10,8 @@ export function resolveArticleLocales(locale: LocaleCode): string[] {
   if (locale === "fr") return ["fr", "fr-FR"];
   if (locale === "es") return ["es", "es-ES"];
   if (locale === "it") return ["it", "it-IT"];
-  if (locale === "pt") return ["pt", "pt-PT", "pt-BR"];
+  if (locale === "pt") return ["pt", "pt-PT"];
+  if (locale === "pt-BR") return ["pt-BR", "pt-br"];
   if (locale === "pl") return ["pl", "pl-PL"];
   if (locale === "sk") return ["sk", "sk-SK"];
   if (locale === "hu") return ["hu", "hu-HU"];
@@ -31,6 +32,7 @@ export function primaryArticleLocale(locale: LocaleCode): string {
   if (locale === "fr") return "fr";
   if (locale === "es") return "es";
   if (locale === "it") return "it";
+  if (locale === "pt-BR") return "pt-BR";
   if (locale === "pt") return "pt";
   if (locale === "pl") return "pl";
   if (locale === "sk") return "sk";

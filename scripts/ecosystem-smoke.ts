@@ -118,15 +118,15 @@ const CASES: SmokeCase[] = [
   },
   {
     path: "/go/magnesium",
-    label: "Affiliate alias redirect",
-    expectStatus: [302, 307],
-    allowRedirect: true,
+    label: "Affiliate hop page",
+    expectStatus: 200,
+    expectBody: /ViaLongeVita|Porovnat|Otevíráme|Compare prices/i,
   },
   {
     path: "/go/d3-cz",
-    label: "Affiliate vitamin D3 redirect",
-    expectStatus: [302, 307],
-    allowRedirect: true,
+    label: "Affiliate vitamin D3 hop",
+    expectStatus: 200,
+    expectBody: /ViaLongeVita|Otevíráme|Compare prices/i,
   },
   {
     path: "/go/unknown-affiliate-slug",

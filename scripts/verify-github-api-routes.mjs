@@ -33,7 +33,7 @@ for (const path of REQUIRED) {
 
 if (missing.length) {
   console.error(`\n✗ ${missing.length} required route(s) missing on GitHub ${branch}.`);
-  console.error("Run: node scripts/deploy-vercel-production.mjs");
+  console.error("Run: pnpm cf:deploy");
   process.exit(1);
 }
 

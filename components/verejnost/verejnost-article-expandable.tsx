@@ -7,6 +7,9 @@ import { useState } from "react";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { articleTopicLabel, verejnostDateLabel } from "@/lib/verejnost/helpers";
 import { cn } from "@/lib/utils";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
+import { getPaywallPreviewHtml } from "@/lib/monetization/paywall-preview";
 
 export function VerejnostArticleExpandable({
   article,
@@ -16,9 +19,12 @@ export function VerejnostArticleExpandable({
   coverUrl: string;
 }) {
   const [open, setOpen] = useState(false);
-  const dateLabel = verejnostDateLabel(article);
-  const topicLabel = articleTopicLabel(article);
+  const uiLocale = article.displayLocale ?? "cs";
+  const chrome = getVerejnostChrome(uiLocale);
+  const dateLabel = verejnostDateLabel(article, uiLocale);
+  const topicLabel = articleTopicLabel(article, uiLocale);
   const isInterview = article.public_topic === "rozhovory";
+  const previewHtml = article.content ? getPaywallPreviewHtml(article.content) : "";
 
   const toggle = () => setOpen((v) => !v);
 
@@ -39,7 +45,7 @@ export function VerejnostArticleExpandable({
           <Image src={coverUrl} alt="" fill className="object-cover" sizes="50vw" loading="lazy" />
           {isInterview ? (
             <span className="absolute bottom-3 left-3 rounded-full bg-[#021d33]/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
-              Rozhovor
+              {chrome.interviewBadge}
             </span>
           ) : null}
         </div>
@@ -58,33 +64,48 @@ export function VerejnostArticleExpandable({
             />
           </div>
           {article.excerpt ? (
-            <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-600">{article.excerpt}</p>
+            <p className="mt-2 line-clamp-4 text-sm leading-relaxed text-slate-600">{article.excerpt}</p>
           ) : null}
           {dateLabel ? <p className="mt-2 text-xs text-slate-400">{dateLabel}</p> : null}
           <p className="mt-3 text-xs font-medium text-[#005B96]">
-            {open ? "Skrýt článek" : "Klikněte pro celý článek"}
+            {open ? chrome.hideArticle : chrome.expandArticle}
           </p>
         </div>
       </button>
 
       {open ? (
         <div className="border-t border-slate-100 px-5 pb-6 pt-4">
-          {article.content ? (
-            <div
-              className="prose prose-slate max-w-none prose-headings:font-display prose-headings:text-[#021d33] prose-p:leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: article.content }}
-            />
+          {previewHtml ? (
+            <div className="relative">
+              <div
+                className="prose prose-slate max-w-none prose-headings:font-display prose-headings:text-[#021d33] prose-p:leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: previewHtml }}
+              />
+              <div
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent"
+                aria-hidden
+              />
+            </div>
           ) : (
-            <p className="text-sm text-slate-500">Obsah článku bude brzy doplněn.</p>
+            <p className="text-sm text-slate-500">{chrome.contentComing}</p>
           )}
-          <Link
-            href={`/verejnost/clanky/${article.slug}`}
-            className="mt-4 inline-block text-sm font-medium text-[#005B96] hover:underline"
-          >
-            Otevřít celý článek na samostatné stránce →
-          </Link>
+          <p className="mt-4 text-sm text-slate-600">{chrome.teaserContinue}</p>
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium">
+            <Link
+              href={localizePublicHref(`/verejnost/clanky/${article.slug}`, uiLocale)}
+              className="text-[#005B96] hover:underline"
+            >
+              {chrome.openFullArticle}
+            </Link>
+            <Link
+              href={localizePublicHref("/predplatne?trial=1#public", uiLocale)}
+              className="text-[#005B96] hover:underline"
+            >
+              {chrome.teaserCta} →
+            </Link>
+          </div>
           <p className="mt-6 rounded-xl border border-amber-200/80 bg-amber-50/80 p-3 text-xs leading-relaxed text-amber-950">
-            Informace slouží k obecnému vzdělávání a nenahrazují konzultaci s lékařem.
+            {chrome.articleDisclaimer}
           </p>
         </div>
       ) : null}

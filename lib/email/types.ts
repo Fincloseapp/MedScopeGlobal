@@ -2,7 +2,7 @@ export type EmailCategory = "transactional" | "system" | "marketing";
 
 export type EmailSendStatus = "sent" | "failed" | "skipped";
 
-export type EmailProvider = "sendgrid" | "smtp" | "none";
+export type EmailProvider = "cloudflare" | "sendgrid" | "smtp" | "none";
 
 export interface EmailAttachment {
   filename: string;

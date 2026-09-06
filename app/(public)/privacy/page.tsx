@@ -3,25 +3,33 @@ import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
 import { getLegalEntity, isLegalEntityComplete } from "@/lib/config/legal-entity";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getLegalChromeCopy } from "@/lib/i18n/legal-chrome-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
   return await buildLocalizedPageMetadata({
-  title: "Ochrana soukromí",
-  description:
-    "Zásady ochrany osobních údajů, cookies, analytika, newsletter a AI zpracování dat na MedScopeGlobal.",
-  path: "/privacy",
-});
+    title: copy.privacyTitle,
+    description: copy.privacyDescription,
+    path: "/privacy",
+    locale,
+  });
 }
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
   const entity = getLegalEntity();
   const complete = isLegalEntityComplete(entity);
 
   return (
     <LegalPageLayout
-      title="Ochrana soukromí"
-      description="Informace o zpracování osobních údajů dle nařízení EU 2016/679 (GDPR)."
+      locale={locale}
+      title={copy.privacyTitle}
+      description={copy.privacyLead}
     >
+      {copy.officialNote ? <p><em>{copy.officialNote}</em></p> : null}
       <h2>1. Správce údajů</h2>
       <p>
         Správcem osobních údajů je <strong>{entity.name}</strong>
@@ -74,6 +82,17 @@ export default function PrivacyPage() {
         Používáme nezbytné cookies pro přihlášení a jazykové preference. Analytické cookies
         spravujete na stránce{" "}
         <Link href="/cookies">Cookies</Link>.
+      </p>
+      <p>
+        Na veřejném magazínu ViaLongeVita (včetně jazykových mutací) zobrazujeme reklamy přes
+        Google AdSense (vydavatel <code>ca-pub-6820104998820692</code>). V EHP, UK a Švýcarsku
+        souhlas řeší certifikovaná CMP od Googlu (Funding Choices), ne naše vlastní marketingové
+        cookie. Google může zpracovávat identifikátory zařízení a měřit zobrazení dle svých{" "}
+        <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">
+          zásad ochrany soukromí
+        </a>
+        . Reklamy nenačítáme v administraci, v aplikacích lékaře/studenta ani na affiliate
+        přesměrování.
       </p>
 
       <h2>4. Newsletter</h2>

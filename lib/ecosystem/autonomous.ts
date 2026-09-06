@@ -14,8 +14,10 @@ export type AutonomousTask =
   | "switch-locale"
   | "mediflow-daily-reset"
   | "editorial-queue"
+  | "editorial-process"
   | "editorial-images"
-  | "syndicate-articles";
+  | "syndicate-articles"
+  | "revenue-ops";
 
 export const AUTONOMOUS_SCHEDULE: Record<AutonomousTask, { cron: string; description: string }> = {
   "generate-articles": {
@@ -62,6 +64,10 @@ export const AUTONOMOUS_SCHEDULE: Record<AutonomousTask, { cron: string; descrip
     cron: "0 5 * * *",
     description: "Autonomní redakční fronta — téma, persona, compliance review",
   },
+  "editorial-process": {
+    cron: "30 6,12,16 * * *",
+    description: "Zpracování fronty: AI novináři ingestují zdroje, editoři kontrolují, publikace do Aktualit",
+  },
   "editorial-images": {
     cron: "0 10 * * *",
     description: "Autonomní vizuální redakce — hero obrázky, alt text, compliance",
@@ -69,6 +75,10 @@ export const AUTONOMOUS_SCHEDULE: Record<AutonomousTask, { cron: string; descrip
   "syndicate-articles": {
     cron: "0 14 * * *",
     description: "Syndikace článků mezi locale redakcemi (adaptace, ne duplikace)",
+  },
+  "revenue-ops": {
+    cron: "15 5,13,21 * * *",
+    description: "A–F výdělek: tabulka briefu, přesun e-mailů z analytics, schema",
   },
 };
 

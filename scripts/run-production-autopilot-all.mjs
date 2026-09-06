@@ -14,7 +14,7 @@ for (const line of fs.readFileSync(path.join(root, ".env.local"), "utf8").split(
 }
 
 const secret = env.CRON_SECRET;
-const bases = ["https://www.medscopeglobal.com", "https://medscopeglobal.vercel.app"];
+const bases = ["https://www.medscopeglobal.com", "https://medscopeglobal.com"];
 
 const httpJobs = [
   { job: "hourly_pubmed_monitor", paths: ["/api/cron/hourly-pubmed-monitor", "/api/cron/daily-pubmed-update"] },

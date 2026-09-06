@@ -1,23 +1,13 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ModulePageShell } from "@/components/b2b/module-page-shell";
-import { IntelligenceConsole } from "@/components/ai-medical/intelligence-console";
+import {
+  AiMedicalDeskPage,
+  generateAiMedicalDeskMetadata,
+} from "@/components/ai-medical/ai-medical-desk-page";
 
-export const metadata: Metadata = {
-  title: "AI asistent pro pacienty",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return generateAiMedicalDeskMetadata("patient");
+}
 
 export default function AiMedicalPatientPage() {
-  return (
-    <ModulePageShell
-      eyebrow="AI Medical Intelligence"
-      title="AI asistent pro pacienty"
-      description="Srozumitelná shrnutí, doporučení a přehledy — vždy s konzultací lékaře."
-    >
-      <Link href="/ai-medical" className="text-sm text-[#005B96] mb-4 inline-block">
-        ← Všechny asistenti
-      </Link>
-      <IntelligenceConsole defaultAssistant="patient" />
-    </ModulePageShell>
-  );
+  return <AiMedicalDeskPage assistant="patient" />;
 }

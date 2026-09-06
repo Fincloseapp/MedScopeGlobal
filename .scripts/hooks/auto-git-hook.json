@@ -1,7 +1,7 @@
 {
   "name": "medscope-auto-git-hook",
   "version": 1,
-  "description": "Cursor automation — auto commit + push + Vercel deploy on file save",
+  "description": "Cursor automation — auto commit + push + Cloudflare deploy on file save",
   "trigger": "onFileSave",
   "action": "node scripts/auto-git-commit-push.js",
   "debounceMs": 8000,
@@ -21,7 +21,7 @@
     "pushRetryDelaySeconds": 10
   },
   "deploy": {
-    "provider": "vercel",
+    "provider": "cloudflare",
     "productionBranch": "main",
     "domain": "https://medscopeglobal.com"
   },

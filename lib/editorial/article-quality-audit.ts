@@ -1,5 +1,3 @@
-import type { ArticleWithRelations } from "@/types/database";
-
 /** Magazine listing minimum — aligns with audit THRESHOLD_MAGAZINE (800w). */
 export const MAGAZINE_LISTING_MIN_WORDS = 800;
 
@@ -8,10 +6,15 @@ const SEED_STATIC_SLUG_RE =
 
 const PUBLIC_CRON_SLUG_RE = /verejnost-[a-z0-9-]+-\d{4}-\d{2}-\d{2}-/;
 
-type ListingArticle = Pick<
-  ArticleWithRelations,
-  "title" | "slug" | "vip_only" | "content" | "metadata" | "rubric_slug" | "source_name"
->;
+type ListingArticle = {
+  title?: string | null;
+  slug?: string | null;
+  vip_only?: boolean | null;
+  content?: string | null;
+  metadata?: unknown;
+  rubric_slug?: string | null;
+  source_name?: string | null;
+};
 
 function metaRecord(metadata: unknown): Record<string, unknown> {
   if (metadata && typeof metadata === "object" && !Array.isArray(metadata)) {
@@ -93,7 +96,14 @@ export function shouldHideFromPublicListing(
   if (!article.slug?.trim() || !article.title?.trim()) return true;
   if (article.vip_only) return true;
 
-  if (isSeedOrDemoArticle(article)) return true;
+  const meta = metaRecord(article.metadata);
+  if (meta.listing_fallback === true) return false;
+
+  const nativeDesk = meta.native_desk === true;
+  if (isSeedOrDemoArticle(article) && !nativeDesk) return true;
+  if (nativeDesk) {
+    return countArticleWords(article.content) < 60;
+  }
 
   const words = countArticleWords(article.content);
   // Hide short stubs from magazine hubs until expanded to longform (800–1500).

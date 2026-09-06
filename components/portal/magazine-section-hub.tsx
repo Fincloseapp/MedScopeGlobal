@@ -3,6 +3,10 @@ import Link from "next/link";
 import { ArrowRight, Headphones } from "lucide-react";
 import type { MagazineSectionHubConfig } from "@/lib/portal/magazine-section-hub";
 import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-disclaimer";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
+import { localizeMagazineHubConfig } from "@/lib/i18n/localize-magazine-hub";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 type Props = {
   config: MagazineSectionHubConfig;
@@ -15,8 +19,13 @@ type Props = {
  * Reusable premium magazine hub shell — hero, editorial intro, topic pillars, content slot.
  * Section pages (osvěta today) compose dynamic blocks as `children`.
  */
-export function MagazineSectionHub({ config, children, primaryCtaHref }: Props) {
-  const primaryHref = primaryCtaHref ?? config.primaryCta.href;
+export async function MagazineSectionHub({ config, children, primaryCtaHref }: Props) {
+  const locale = await getServerLocale();
+  const chrome = getVerejnostChrome(locale);
+  const localized = localizeMagazineHubConfig(config, locale);
+  const primaryHref = primaryCtaHref
+    ? localizePublicHref(primaryCtaHref, locale)
+    : localized.primaryCta.href;
 
   return (
     <div className="min-h-screen bg-[#f4f8fc]">
@@ -25,23 +34,23 @@ export function MagazineSectionHub({ config, children, primaryCtaHref }: Props) 
         <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 sm:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/60">
-              {config.eyebrow}
+              {localized.eyebrow}
             </p>
             <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
-              {config.title}
+              {localized.title}
             </h1>
-            <p className="mt-4 max-w-xl text-lg leading-relaxed text-white/85">{config.heroDeck}</p>
+            <p className="mt-4 max-w-xl text-lg leading-relaxed text-white/85">{localized.heroDeck}</p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
                 href={primaryHref}
                 className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#005B96] shadow-sm transition hover:bg-white/90"
               >
-                {config.id === "osveta" ? (
+                {localized.id === "osveta" ? (
                   <Headphones className="h-4 w-4" aria-hidden />
                 ) : null}
-                {config.primaryCta.label}
+                {localized.primaryCta.label}
               </Link>
-              {config.secondaryCtas.map((cta) => (
+              {localized.secondaryCtas.map((cta) => (
                 <Link
                   key={cta.href}
                   href={cta.href}
@@ -55,21 +64,21 @@ export function MagazineSectionHub({ config, children, primaryCtaHref }: Props) 
           <div className="relative mx-auto w-full max-w-md lg:mx-0 lg:max-w-none">
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-[0_28px_70px_rgba(0,0,0,0.35)] ring-1 ring-white/20">
               <Image
-                src={config.heroCoverImage}
-                alt={config.heroCoverAlt}
+                src={localized.heroCoverImage}
+                alt={localized.heroCoverAlt}
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 90vw, 420px"
                 priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#021d33]/60 via-transparent to-transparent" />
-              {config.heroBadge ? (
+              {localized.heroBadge ? (
                 <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-white/20 bg-[#021d33]/75 px-4 py-3 backdrop-blur-sm">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9fd0f5]">
-                    {config.heroBadge.label}
+                    {localized.heroBadge.label}
                   </p>
                   <p className="mt-1 text-sm leading-relaxed text-white/90">
-                    {config.heroBadge.description}
+                    {localized.heroBadge.description}
                   </p>
                 </div>
               ) : null}
@@ -83,13 +92,13 @@ export function MagazineSectionHub({ config, children, primaryCtaHref }: Props) 
 
         <section className="mb-12">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">
-            Redakční úvod
+            {chrome.editorialIntroEyebrow}
           </p>
           <h2 className="mt-1 font-display text-2xl font-bold text-[#021d33]">
-            {config.editorialIntroTitle}
+            {localized.editorialIntroTitle}
           </h2>
           <div className="mt-4 max-w-3xl space-y-4 text-base leading-relaxed text-slate-600">
-            {config.editorialIntro.map((paragraph) => (
+            {localized.editorialIntro.map((paragraph) => (
               <p key={paragraph.slice(0, 48)}>{paragraph}</p>
             ))}
           </div>
@@ -97,13 +106,13 @@ export function MagazineSectionHub({ config, children, primaryCtaHref }: Props) 
 
         <section className="mb-12">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
-            {config.pillarsEyebrow}
+            {localized.pillarsEyebrow}
           </p>
           <h2 className="mt-1 font-display text-2xl font-bold text-[#021d33]">
-            {config.pillarsTitle}
+            {localized.pillarsTitle}
           </h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {config.pillars.map((pillar) => (
+            {localized.pillars.map((pillar) => (
               <Link
                 key={pillar.slug}
                 href={pillar.href}
@@ -136,20 +145,20 @@ export function MagazineSectionHub({ config, children, primaryCtaHref }: Props) 
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="max-w-xl">
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">
-                Podpora redakce
+                {chrome.supportEyebrow}
               </p>
               <h2 className="mt-1 font-display text-xl font-bold text-[#021d33]">
-                {config.contribution.title}
+                {localized.contribution.title}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                {config.contribution.description}
+                {localized.contribution.description}
               </p>
             </div>
             <Link
-              href={config.contribution.href}
+              href={localized.contribution.href}
               className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#004a78]"
             >
-              {config.contribution.ctaLabel}
+              {localized.contribution.ctaLabel}
               <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
           </div>

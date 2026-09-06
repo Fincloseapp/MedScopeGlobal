@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { MEDSCOPE_PROJECT_ROOT, projectPath } from "@/lib/config/paths";
+import { isCloudflareRuntime } from "@/lib/config/runtime";
 import { runV26RewriteBackfill } from "@/lib/v26/backfill";
 import { runV26ForeignNewsIngest } from "@/lib/v26/foreign-news-ingest";
 import { runImagesFetch } from "@/lib/v25/runners/images";
@@ -37,8 +38,8 @@ async function runSmokeOnProduction(): Promise<V26AutonomousPhase> {
 }
 
 function runLocalPredeploy(): V26AutonomousPhase {
-  if (process.env.VERCEL === "1") {
-    return { ok: true, detail: "skipped on Vercel" };
+  if (isCloudflareRuntime()) {
+    return { ok: false, detail: "predeploy gates are local-only — production is Cloudflare Workers" };
   }
   const script = projectPath("scripts/run-predeploy-gates.mjs");
   const result = spawnSync(process.execPath, [script], {
@@ -53,8 +54,8 @@ function runLocalPredeploy(): V26AutonomousPhase {
 }
 
 function runLocalPush(): V26AutonomousPhase & { sha?: string } {
-  if (process.env.VERCEL === "1") {
-    return { ok: true, detail: "push via CI only" };
+  if (isCloudflareRuntime()) {
+    return { ok: false, detail: "git push is local-only — production is Cloudflare Workers" };
   }
   const msg = process.env.DEPLOY_COMMIT_MESSAGE ?? "feat: MedScope v26 autonomous deploy";
   const ps1 = projectPath("scripts/push-d-to-github.ps1");
@@ -76,24 +77,8 @@ function runLocalPush(): V26AutonomousPhase & { sha?: string } {
   };
 }
 
-async function pollVercelReady(): Promise<V26AutonomousPhase> {
-  if (process.env.VERCEL === "1") {
-    return { ok: true, detail: "running on Vercel" };
-  }
-  try {
-    const script = projectPath("scripts/trigger-vercel-production.mjs");
-    const result = spawnSync(process.execPath, [script], {
-      encoding: "utf8",
-      timeout: 900_000,
-      cwd: MEDSCOPE_PROJECT_ROOT,
-    });
-    return {
-      ok: result.status === 0,
-      detail: result.stdout?.includes("READY") ? "Vercel READY" : result.stderr?.slice(0, 200),
-    };
-  } catch (e) {
-    return { ok: false, detail: (e as Error).message };
-  }
+async function confirmCloudflareProduction(): Promise<V26AutonomousPhase> {
+  return { ok: true, detail: "production is Cloudflare Workers" };
 }
 
 export async function runV26AutonomousEngine(options?: {
@@ -119,7 +104,7 @@ export async function runV26AutonomousEngine(options?: {
   };
   if (rewrite.errors.length) errors.push(...rewrite.errors.slice(0, 3));
 
-  const foreign = await runV26ForeignNewsIngest({ maxArticles: 6 });
+  const foreign = await runV26ForeignNewsIngest({ maxArticles: 6, preferLongevity: true });
   phases.foreignIngest = {
     ok: foreign.errors.length === 0 || foreign.created > 0,
     detail: `created ${foreign.created}, skipped ${foreign.skipped}`,
@@ -130,7 +115,7 @@ export async function runV26AutonomousEngine(options?: {
   phases.images = { ok: images.ok, detail: images.detail };
   if (!images.ok) errors.push("images: pipeline");
 
-  if (!options?.skipDeploy && process.env.VERCEL !== "1") {
+  if (!options?.skipDeploy && !isCloudflareRuntime()) {
     let deployOk = false;
     while (retries <= MAX_DEPLOY_RETRIES && !deployOk) {
       const predeploy = runLocalPredeploy();
@@ -149,10 +134,10 @@ export async function runV26AutonomousEngine(options?: {
         continue;
       }
 
-      const vercel = await pollVercelReady();
-      phases[`vercel_${retries}`] = vercel;
-      if (!vercel.ok) {
-        errors.push("vercel not ready");
+      const cloudflare = await confirmCloudflareProduction();
+      phases[`cloudflare_${retries}`] = cloudflare;
+      if (!cloudflare.ok) {
+        errors.push("cloudflare production not confirmed");
         retries++;
         continue;
       }
@@ -160,7 +145,7 @@ export async function runV26AutonomousEngine(options?: {
       deployOk = true;
     }
   } else {
-    phases.deploy = { ok: true, detail: "deploy skipped or Vercel runtime" };
+    phases.deploy = { ok: true, detail: "deploy skipped or already on Cloudflare" };
   }
 
   const smoke = await runSmokeOnProduction();

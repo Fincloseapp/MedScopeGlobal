@@ -3,12 +3,20 @@ import {
   isPublicMagazineRecommendable,
   isSpecialAccessArticle,
 } from "@/lib/auth/article-eligibility";
+import { mergeNativeDeskFeed, relatedNativeDeskArticles } from "@/lib/editorial/native-desk-articles";
 import { createDataClient } from "@/lib/supabase/data";
+import { getArticleChrome } from "@/lib/i18n/article-chrome";
+import { looksLikeCzech } from "@/lib/i18n/czech-detect";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 
 type RecArticle = {
   slug: string;
   title: string;
   excerpt: string | null;
+  locale?: string | null;
   vip_only?: boolean | null;
   min_access_level?: string | null;
   audience?: string | null;
@@ -26,7 +34,8 @@ export async function ContentRecommendations({
   /** Public magazine pages only recommend free magazine pieces (no 404 / gate links). */
   magazineOnly?: boolean;
 }) {
-  const isCs = locale === "cs";
+  const isCs = locale === "cs" || locale.startsWith("cs");
+  const chrome = getArticleChrome(locale);
   const supabase = await createDataClient();
 
   let articles: RecArticle[] = [];
@@ -38,7 +47,7 @@ export async function ContentRecommendations({
       supabase
         .from("articles")
         .select(
-          "slug, title, excerpt, vip_only, min_access_level, audience, rubric_slug, public_topic"
+          "slug, title, excerpt, locale, vip_only, min_access_level, audience, rubric_slug, public_topic"
         )
         .eq("published", true)
         .neq("slug", currentSlug ?? "")
@@ -66,15 +75,64 @@ export async function ContentRecommendations({
   }
 
   if (!articles.length) {
-    const { getDemoMagazineArticles } = await import(
-      "@/lib/verejnost/demo-magazine-articles"
-    );
-    articles = getDemoMagazineArticles()
-      .filter((a) => a.slug !== currentSlug && !isSpecialAccessArticle(a))
-      .slice(0, 4)
-      .map((a) => ({ slug: a.slug, title: a.title, excerpt: a.excerpt }));
+    const native = relatedNativeDeskArticles(locale, { slug: currentSlug }, 4).map((a) => ({
+      slug: a.slug,
+      title: a.title,
+      excerpt: a.excerpt,
+      locale: a.locale,
+    }));
+    if (native.length) {
+      articles = native;
+    } else if (isCs) {
+      const { getDemoMagazineArticles } = await import(
+        "@/lib/verejnost/demo-magazine-articles"
+      );
+      articles = getDemoMagazineArticles()
+        .filter((a) => a.slug !== currentSlug && !isSpecialAccessArticle(a))
+        .slice(0, 4)
+        .map((a) => ({ slug: a.slug, title: a.title, excerpt: a.excerpt, locale: a.locale }));
+    }
   } else {
-    articles = articles.slice(0, 4);
+    const localized = filterArticlesForLocale(articles, locale, {
+      minNative: 4,
+      courtesyBorrow: 0,
+      maxBorrow: 0,
+    });
+    articles = mergeNativeDeskFeed(localized, locale)
+      .filter((a) => a.slug !== currentSlug)
+      .slice(0, 4)
+      .map((a) => ({
+        slug: a.slug,
+        title: a.title,
+        excerpt: a.excerpt,
+        locale: a.locale,
+      }));
+  }
+
+  if (!isCs && articles.length > 0 && primaryArticleLocale(normalizeLocale(locale)) !== "cs") {
+    const nativeEnough = articles.filter((item) => !looksLikeCzech(item.title));
+    if (nativeEnough.length >= 2) {
+      articles = nativeEnough.slice(0, 4);
+    } else {
+      const { fallbackTranslateFields } = await import("@/lib/i18n/translate-fallback");
+      const target = normalizeLocale(locale);
+      articles = (
+        await Promise.all(
+          articles.map(async (item) => {
+            if (!looksLikeCzech(item.title)) return item;
+            const hit = await fallbackTranslateFields({
+              title: item.title,
+              excerpt: item.excerpt,
+              sourceLocale: "cs",
+              targetLocale: target,
+              mode: "card",
+            });
+            if (!hit || looksLikeCzech(hit.title)) return null;
+            return { ...item, title: hit.title, excerpt: hit.excerpt ?? item.excerpt };
+          })
+        )
+      ).filter((row): row is RecArticle => Boolean(row));
+    }
   }
 
   if (!articles.length && !studies.length && !diagnoses.length) return null;
@@ -82,23 +140,23 @@ export async function ContentRecommendations({
   return (
     <section
       className="mt-12 space-y-8 rounded-2xl border bg-medical-light/50 p-6 dark:bg-muted/30"
-      aria-label={isCs ? "Doporučený obsah" : "Recommended content"}
+      aria-label={chrome.recommended}
     >
       <h2 className="font-display text-xl font-semibold text-medical-navy dark:text-foreground">
-        {isCs ? "Doporučený obsah" : "Recommended content"}
+        {chrome.recommended}
       </h2>
 
       <div className="grid gap-6 md:grid-cols-3">
         {articles.length > 0 && (
           <div>
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              {isCs ? "Články" : "Articles"}
+              {chrome.articlesLabel}
             </h3>
             <ul className="space-y-2 text-sm">
               {articles.map((a) => (
                 <li key={a.slug}>
                   <Link
-                    href={`/article/${a.slug}`}
+                    href={localizePublicHref(`/article/${a.slug}`, locale)}
                     className="text-primary hover:underline"
                   >
                     {a.title}
@@ -118,7 +176,7 @@ export async function ContentRecommendations({
               {studies.map((s) => (
                 <li key={s.slug}>
                   <Link
-                    href={`/study/${s.slug}`}
+                    href={localizePublicHref(`/study/${s.slug}`, locale)}
                     className="text-primary hover:underline"
                   >
                     {s.title}
@@ -138,7 +196,7 @@ export async function ContentRecommendations({
               {diagnoses.map((d) => (
                 <li key={d.slug}>
                   <Link
-                    href={`/diagnosis/${d.slug}`}
+                    href={localizePublicHref(`/diagnosis/${d.slug}`, locale)}
                     className="text-primary hover:underline"
                   >
                     {d.name}

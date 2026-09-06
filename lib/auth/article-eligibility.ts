@@ -2,14 +2,16 @@ import {
   canAccessContent,
   type AccessLevelId,
 } from "@/lib/config/access-levels";
+import { editorialAccessFromFlags } from "@/lib/auth/editorial-access";
 import { shouldHideFromPublicListing } from "@/lib/editorial/article-quality-audit";
 
 /**
- * Existing special-access flags only — do not invent a second paywall.
+ * Two existing gates only:
+ * - wire / Aktuality (`zpravy-*`, news rubric) stay fully open
+ * - physician VIP (`vip_only` / min_access_level=physician) uses the VIP gate
+ * - public magazine shows a teaser, then Redakce (25 Kč / €1 / $1, 14 days)
  *
- * Subscriptions stay voluntary. Public magazine is free + optional donate.
- * Only medical / doctor articles (vip_only or min_access_level=physician)
- * use the existing VIP + access_level gate.
+ * `fully_open` on native desk seeds does not bypass the magazine teaser.
  */
 export type ArticleEligibilityFields = {
   vip_only?: boolean | null;
@@ -27,6 +29,12 @@ export type ArticleEligibilityFields = {
 export type ArticleLockDecision = {
   locked: boolean;
   specialAccess: boolean;
+};
+
+export type ArticleLockReader = {
+  isVip: boolean;
+  accessLevel: AccessLevelId | string;
+  hasEditorialAccess?: boolean;
 };
 
 /** Medical / doctor articles already flagged for the existing eligibility gate. */
@@ -51,7 +59,29 @@ function isLayMagazineSurface(article: ArticleEligibilityFields): boolean {
   return String(article.slug ?? "").startsWith("verejnost-");
 }
 
-/** Public magazine / osvěta — never a subscription gate. */
+/**
+ * Wire / Aktuality — full text without Redakce.
+ * Uses slug, rubric and metadata.section only (not a title regex).
+ */
+export function isFreeNewsDeskArticle(article: ArticleEligibilityFields): boolean {
+  const slug = String(article.slug ?? "").toLowerCase();
+  if (slug.startsWith("zpravy-")) return true;
+  const rubric = String(article.rubric_slug ?? "").toLowerCase();
+  if (
+    /novink|aktualni|aktuální|zprav|news|foreign/.test(rubric) ||
+    rubric === "aktualni-zpravy"
+  ) {
+    return true;
+  }
+  const meta =
+    article.metadata && typeof article.metadata === "object"
+      ? (article.metadata as Record<string, unknown>)
+      : null;
+  const section = String(meta?.section ?? "").toLowerCase();
+  return /news|zprav|aktual/.test(section);
+}
+
+/** Public magazine / osvěta — teaser + Redakce unless the reader already has access. */
 export function isPublicMagazineArticle(
   article: ArticleEligibilityFields
 ): boolean {
@@ -59,24 +89,40 @@ export function isPublicMagazineArticle(
   return isLayMagazineSurface(article);
 }
 
+function readerHasEditorialAccess(reader: ArticleLockReader): boolean {
+  if (typeof reader.hasEditorialAccess === "boolean") return reader.hasEditorialAccess;
+  return editorialAccessFromFlags({
+    isVip: reader.isVip,
+    accessLevel: reader.accessLevel,
+  });
+}
+
 /**
- * Body lock uses the existing vip_only + min_access_level checks only.
- * Magazine pieces stay unlocked even if a reader is a guest.
+ * News stays open. Physician VIP keeps the existing lock.
+ * Public magazine locks for guests; Redakce / student / physician / VIP unlock.
  */
 export function resolveArticleBodyLock(
   article: ArticleEligibilityFields,
-  reader: { isVip: boolean; accessLevel: AccessLevelId | string }
+  reader: ArticleLockReader
 ): ArticleLockDecision {
-  if (isPublicMagazineArticle(article) || !isSpecialAccessArticle(article)) {
+  if (isFreeNewsDeskArticle(article)) {
     return { locked: false, specialAccess: false };
   }
 
-  const minLevel = (article.min_access_level ?? "public") as AccessLevelId;
-  const locked =
-    (Boolean(article.vip_only) && !reader.isVip) ||
-    !canAccessContent(reader.accessLevel, minLevel);
+  if (isSpecialAccessArticle(article)) {
+    const minLevel = (article.min_access_level ?? "public") as AccessLevelId;
+    const locked =
+      (Boolean(article.vip_only) && !reader.isVip) ||
+      !canAccessContent(reader.accessLevel, minLevel);
 
-  return { locked, specialAccess: true };
+    return { locked, specialAccess: true };
+  }
+
+  if (isPublicMagazineArticle(article)) {
+    return { locked: !readerHasEditorialAccess(reader), specialAccess: false };
+  }
+
+  return { locked: false, specialAccess: false };
 }
 
 /**
@@ -90,7 +136,7 @@ export function shouldHideFromArticleDetail(
   return shouldHideFromPublicListing(article);
 }
 
-/** Safe to link from a public magazine page (guest, no new paywall). */
+/** Safe to link from a public magazine listing (title + excerpt; body may still lock). */
 export function isPublicMagazineRecommendable(
   article: ArticleEligibilityFields
 ): boolean {

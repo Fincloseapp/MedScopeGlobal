@@ -11,12 +11,20 @@ export async function logSecurityEvent(params: {
 }) {
   try {
     const admin = createServiceRoleClient();
-    await admin.from("security_logs").insert({
-      ip: params.ip ?? null,
-      user_id: params.userId ?? null,
-      action: params.action,
-      status: params.status,
-      details: params.details ?? {},
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    await Promise.race([
+      admin.from("security_logs").insert({
+        ip: params.ip ?? null,
+        user_id: params.userId ?? null,
+        action: params.action,
+        status: params.status,
+        details: params.details ?? {},
+      }),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("security-log-timeout")), 400);
+      }),
+    ]).finally(() => {
+      if (timer) clearTimeout(timer);
     });
   } catch (e) {
     console.error("logSecurityEvent failed", params.action, e);

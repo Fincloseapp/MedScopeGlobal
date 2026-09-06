@@ -24,7 +24,7 @@ export function NewsletterAdminPanel({
   const [sources, setSources] = useState(initialSources);
   const [topics, setTopics] = useState(initialTopics);
   const [topicText, setTopicText] = useState("");
-  const [loading, setLoading] = useState<"preview" | "publish" | "topic" | null>(null);
+  const [loading, setLoading] = useState<"preview" | "publish" | "topic" | "brief" | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   const refreshPreview = useCallback(async () => {
@@ -51,9 +51,44 @@ export function NewsletterAdminPanel({
       const res = await fetch("/api/admin/newsletter/generate", { method: "POST" });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Chyba publikace");
-      setMessage(`Newsletter publikován: /newsletter/${json.slug}`);
+      const editionCount = Array.isArray(json.editions) ? json.editions.length : 1;
+      setMessage(
+        `Webová vydání jsou venku: /newsletter/${json.slug} + ${editionCount} jazykových mutací (nativní text, 5 kategorií).`
+      );
       if (json.draft) setDraft(json.draft);
       if (json.sources) setSources(json.sources);
+    } catch (e) {
+      setMessage((e as Error).message);
+    } finally {
+      setLoading(null);
+    }
+  }, []);
+
+  const runBrief = useCallback(async (action: "dryRun" | "test" | "welcome") => {
+    setLoading("brief");
+    setMessage(null);
+    try {
+      const res = await fetch("/api/admin/newsletter/brief", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Chyba briefu");
+      if (action === "welcome") {
+        setMessage(`Uvítání odesláno na ${json.sentTo ?? "admin e-mail"}.`);
+        return;
+      }
+      if (action === "test") {
+        setMessage(`Zkušební brief odeslán na ${json.sentTo ?? "admin e-mail"}.`);
+        return;
+      }
+      const locales = json.locales
+        ? Object.entries(json.locales as Record<string, number>)
+            .map(([locale, count]) => `${locale} ${count}`)
+            .join(", ")
+        : "nikdo ve frontě";
+      setMessage(`Dry-run briefu: ${json.sent ?? 0} by šlo odeslat (${locales}). Přeskočeno ${json.skipped ?? 0}.`);
     } catch (e) {
       setMessage((e as Error).message);
     } finally {
@@ -93,7 +128,9 @@ export function NewsletterAdminPanel({
         <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6">
           <h2 className="font-display text-lg font-bold text-[#021d33]">Příští newsletter</h2>
           <p className="text-sm text-slate-600">
-            AI doplní úvodní texty a zapracuje ruční témata. Obsah sekcí vždy vychází z reálných zdrojů výše.
+            Webové vydání má vlastní nativní text na každém desk. E-mailový brief skládá aktuální
+            články v jazyce přihlášení; když v daném jazyce ještě nic není, jde první číslo z
+            pilířů magazínu, ať odběratel nedostane prázdnou schránku.
           </p>
 
           <div className="flex flex-wrap gap-2">
@@ -118,6 +155,34 @@ export function NewsletterAdminPanel({
                 <Send className="mr-2 h-4 w-4" />
               )}
               Vytvořit newsletter
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void runBrief("dryRun")}
+              disabled={loading !== null}
+              className="rounded-full"
+            >
+              {loading === "brief" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Dry-run e-mail briefu
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void runBrief("test")}
+              disabled={loading !== null}
+              className="rounded-full"
+            >
+              Zkušební brief na admin e-mail
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void runBrief("welcome")}
+              disabled={loading !== null}
+              className="rounded-full"
+            >
+              Uvítání na admin e-mail
             </Button>
           </div>
 

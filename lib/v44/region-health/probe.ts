@@ -11,7 +11,7 @@ export type RegionProbe = {
 
 const PROBE_TARGETS = [
   { region: "edge-primary", url: "https://medscopeglobal.com/api/v40/health" },
-  { region: "vercel-app", url: "https://medscopeglobal.vercel.app/api/v40/health" },
+  { region: "www", url: "https://www.medscopeglobal.com/api/v40/health" },
 ];
 
 export async function probeRegions(): Promise<{

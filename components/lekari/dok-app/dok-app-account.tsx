@@ -17,6 +17,13 @@ import { createClient } from "@/lib/supabase/client";
 import { InstallAppButton } from "@/components/lekari/dok-app/install-app-button";
 import { DokumentaceDownloadPanel } from "@/components/lekari/dokumentace-download-panel";
 import type { AppAccessInfo } from "@/lib/apps/access-status";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { localizeListedCzk } from "@/lib/i18n/payment-currency";
+import {
+  getOrdiZapisAppCopy,
+  ordizapisLoginHref,
+} from "@/lib/i18n/ordizapis-app-copy";
+import { dokumentaceLocaleHeaders } from "@/lib/lekari/dokumentace/request-locale";
 
 type EligibilityState = {
   eligible: boolean;
@@ -42,11 +49,19 @@ export function DokAppAccount({
   eligibility,
   linkHint,
   onEligibility,
+  locale,
 }: {
   eligibility?: EligibilityState | null;
   linkHint?: string | null;
   onEligibility?: (e: EligibilityState) => void;
+  locale?: string;
 }) {
+  const copy = getOrdiZapisAppCopy(locale);
+  const loginHref = ordizapisLoginHref(locale);
+  const marketingHref = localizePublicHref("/lekari/dokumentace", locale ?? "cs");
+  const verifyHref =
+    eligibility?.verifyUrl || localizePublicHref("/academy/lekari/overeni", locale ?? "cs");
+  const subscribeHref = localizePublicHref("/predplatne#dokumentace", locale ?? "cs");
   const [ctx, setCtx] = useState<ReaderContext | null>(null);
   const [elig, setElig] = useState<EligibilityState | null>(eligibility ?? null);
   const [loading, setLoading] = useState(true);
@@ -67,7 +82,10 @@ export function DokAppAccount({
       try {
         const [ctxRes, eligRes] = await Promise.all([
           fetch("/api/v22/reader-context", { credentials: "same-origin" }),
-          fetch("/api/lekari/dokumentace/eligibility", { credentials: "same-origin" }),
+          fetch("/api/lekari/dokumentace/eligibility", {
+            credentials: "same-origin",
+            headers: dokumentaceLocaleHeaders(locale ?? "cs"),
+          }),
         ]);
         if (ctxRes.ok) {
           setCtx((await ctxRes.json()) as ReaderContext);
@@ -90,19 +108,19 @@ export function DokAppAccount({
       window.removeEventListener("online", on);
       window.removeEventListener("offline", off);
     };
-  }, [onEligibility]);
+  }, [onEligibility, locale]);
 
   async function signOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
-    window.location.href = "/login?next=/app/dokumentace";
+    window.location.href = loginHref;
   }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center gap-2 px-4 py-16 text-sm text-slate-500">
         <Loader2 className="h-4 w-4 animate-spin" />
-        Načítám účet…
+        {copy.loadingAccount}
       </div>
     );
   }
@@ -113,11 +131,11 @@ export function DokAppAccount({
   return (
     <div className="mx-auto w-full max-w-3xl space-y-4 px-3 pb-4 pt-2 sm:px-4">
       <div>
-        <h2 className="text-base font-semibold text-[#021d33]">Účet</h2>
+        <h2 className="text-base font-semibold text-[#021d33]">{copy.tabAccount}</h2>
         <p className="mt-1 text-xs text-slate-500">
-          Stav:{" "}
+          {copy.statusLabel}:{" "}
           <span className={online ? "text-emerald-600" : "text-amber-600"}>
-            {online ? "online" : "offline"}
+            {online ? copy.online : copy.offline}
           </span>
         </p>
       </div>
@@ -134,23 +152,23 @@ export function DokAppAccount({
                   {elig?.access?.accountLabel ||
                     ctx?.profile?.full_name ||
                     elig?.displayName ||
-                    "Lékař"}
+                    copy.physicianFallback}
                 </p>
                 <p className="truncate text-xs text-slate-500">{ctx?.user?.email || elig?.email}</p>
                 <p className="mt-1 text-xs text-slate-500">
-                  Přístup:{" "}
+                  {copy.accessLabel}:{" "}
                   <strong>
                     {elig?.access?.planLabel ||
-                      (ctx?.isVip ? "VIP / předplatné" : ctx?.accessLevel || "základní")}
+                      (ctx?.isVip ? copy.planVip : ctx?.accessLevel || copy.planBasic)}
                   </strong>
                 </p>
                 <p className="mt-0.5 text-xs text-slate-500">
-                  Platnost: <strong>{elig?.access?.validityLabel || "—"}</strong>
+                  {copy.validityLabel}: <strong>{elig?.access?.validityLabel || "—"}</strong>
                 </p>
                 {canInstall ? (
                   <p className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-emerald-700">
                     <ShieldCheck className="h-3.5 w-3.5" />
-                    Ověřený lékař — aplikace propojena s tímto účtem
+                    {copy.verifiedLinked}
                   </p>
                 ) : (
                   <p className="mt-1 text-xs text-amber-700">{elig?.message}</p>
@@ -164,12 +182,11 @@ export function DokAppAccount({
               </>
             ) : (
               <>
-                <p className="text-sm font-semibold text-[#021d33]">Nejste přihlášeni</p>
-                <p className="mt-0.5 text-xs text-slate-500">
-                  Pro stažení, zápisy a historii se přihlaste ověřeným lékařským účtem.
-                </p>
+                <p className="text-sm font-semibold text-[#021d33]">{copy.notSignedIn}</p>
+                <p className="mt-0.5 text-xs text-slate-500">{copy.signInLead}</p>
                 <p className="mt-1 text-xs text-slate-500">
-                  Platnost: <strong>{elig?.access?.validityLabel || "po přihlášení"}</strong>
+                  {copy.validityLabel}:{" "}
+                  <strong>{elig?.access?.validityLabel || copy.validityAfterLogin}</strong>
                 </p>
               </>
             )}
@@ -186,9 +203,9 @@ export function DokAppAccount({
         <div className="mt-4 flex flex-col gap-2">
           {!loggedIn ? (
             <Button asChild className="h-11 rounded-full bg-[#005B96]">
-              <Link href="/login?next=/app/dokumentace">
+              <Link href={elig?.loginUrl || loginHref}>
                 <LogIn className="mr-2 h-4 w-4" />
-                Přihlásit se
+                {copy.signInBtn}
               </Link>
             </Button>
           ) : (
@@ -199,20 +216,20 @@ export function DokAppAccount({
               onClick={() => void signOut()}
             >
               <LogOut className="mr-2 h-4 w-4" />
-              Odhlásit se
+              {copy.signOut}
             </Button>
           )}
 
           {!canInstall ? (
             <Button asChild variant="outline" className="h-11 rounded-full border-[#cfe1f3]">
-              <Link href="/academy/lekari/overeni">Ověřit lékařský účet</Link>
+              <Link href={elig?.verifyUrl || verifyHref}>{copy.verifyAccount}</Link>
             </Button>
           ) : null}
 
           <Button asChild variant="outline" className="h-11 rounded-full border-[#cfe1f3]">
-            <Link href="/predplatne#dokumentace">
+            <Link href={subscribeHref}>
               <CreditCard className="mr-2 h-4 w-4" />
-              Předplatné OrdiZapis (390 Kč)
+              {localizeListedCzk(copy.subscribeOrdi, locale)}
             </Link>
           </Button>
         </div>
@@ -220,21 +237,19 @@ export function DokAppAccount({
 
       {canInstall ? (
         <div className="rounded-2xl border border-[#cfe1f3] bg-[#021d33] p-4 text-white">
-          <p className="text-sm font-semibold">Instalace aplikace</p>
-          <p className="mt-1 text-xs text-sky-100/90">
-            Stažení OrdiZapis je vázané na váš ověřený účet MedScopeGlobal — historie se synchronizuje.
-          </p>
+          <p className="text-sm font-semibold">{copy.installTitle}</p>
+          <p className="mt-1 text-xs text-sky-100/90">{copy.installLead}</p>
           <div className="mt-3">
-            <InstallAppButton gated canInstall />
+            <InstallAppButton gated canInstall locale={locale} />
           </div>
         </div>
       ) : (
-        <DokumentaceDownloadPanel variant="app" />
+        <DokumentaceDownloadPanel variant="app" locale={locale} />
       )}
 
       <p className="text-center text-xs text-slate-500">
-        <Link href="/lekari/dokumentace" className="text-[#005B96] underline">
-          Zpět na marketingovou stránku
+        <Link href={marketingHref} className="text-[#005B96] underline">
+          {copy.backToMarketing}
         </Link>
       </p>
     </div>

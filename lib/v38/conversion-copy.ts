@@ -1,4 +1,7 @@
-/** v38 — static conversion copy pool with "pro váš zájem" framing */
+import { editorialMonthlyCharge } from "@/lib/editorial/pricing";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { localizeListedCzk } from "@/lib/i18n/payment-currency";
 
 export type ConversionSlot = "article_gate" | "article_inline" | "video_overlay" | "nav_strip" | "nav_cta";
 
@@ -45,18 +48,18 @@ const STATIC_POOL: Record<ConversionSlot, ConversionCopy[]> = {
       slot: "nav_strip",
       eyebrow: "Pro váš zájem",
       headline: "Obsah šitý na míru vašemu studiu medicíny",
-      body: "Academy kurzy, AI tutor a materiály bez limitů free vrstvy — od 149 Kč/měsíc.",
-      ctaLabel: "Zobrazit plány",
-      ctaHref: "/predplatne?trial=1#student",
-      hint: "14 dní na vyzkoušení",
+      body: "Academy kurzy, AI tutor a materiály — 1 test zdarma, první měsíc 89 Kč, pak 149 Kč.",
+      ctaLabel: "Zobrazit student tarif",
+      ctaHref: "/predplatne#student",
+      hint: "1 test zdarma · 89 Kč",
     },
     {
       slot: "nav_strip",
       eyebrow: "Doporučeno pro vás",
       headline: "Pokračujte v přípravě na medicínu",
-      body: "Přípravné kurzy, self-test a AI tutor — studentské předplatné od 149 Kč/měsíc.",
-      ctaLabel: "14 dní zdarma",
-      ctaHref: "/predplatne?trial=1#student",
+      body: "Přípravné kurzy, self-test a AI tutor — 1 test zdarma, první měsíc 89 Kč, pak 149 Kč.",
+      ctaLabel: "Otevřít student tarif",
+      ctaHref: "/predplatne#student",
     },
   ],
   article_gate: [
@@ -81,11 +84,11 @@ const STATIC_POOL: Record<ConversionSlot, ConversionCopy[]> = {
   article_inline: [
     {
       slot: "article_inline",
-      eyebrow: "Pro váš zájem",
-      headline: "Líbí se vám tento obsah?",
-      body: "S předplatným získáte neomezený přístup k VIP článkům, prioritní alerty a AI tutor.",
-      ctaLabel: "Zobrazit předplatné",
-      ctaHref: "/predplatne",
+      eyebrow: "Volitelné předplatné",
+      headline: "Číst dál bez reklam",
+      body: "14 dní zdarma, potom tarif Veřejnost 99 Kč. Tipy v článcích zůstávají dobrovolné.",
+      ctaLabel: "Vyzkoušet 14 dní",
+      ctaHref: "/predplatne?trial=1",
     },
   ],
   video_overlay: [
@@ -109,56 +112,280 @@ const STATIC_POOL: Record<ConversionSlot, ConversionCopy[]> = {
   ],
 };
 
-export function getStaticCopy(slot: ConversionSlot, seed = 0): ConversionCopy {
+const I18N_STATIC: Record<string, Partial<Record<ConversionSlot, ConversionCopy>>> = {
+  en: {
+    nav_cta: {
+      slot: "nav_cta",
+      eyebrow: "For you",
+      headline: "MedScope Premium",
+      body: "MeDipacient, MediFlow and OrdiZapis plus VIP articles. 14 days free.",
+      ctaLabel: "14 days free",
+      ctaHref: "/predplatne?trial=1",
+    },
+    nav_strip: {
+      slot: "nav_strip",
+      eyebrow: "For you",
+      headline: "Apps on your home screen",
+      body: "MeDipacient, MediFlow and OrdiZapis — open the trial dashboard now. 14 days free.",
+      ctaLabel: "Get the apps",
+      ctaHref: "/aplikace",
+      hint: "14-day trial",
+    },
+  },
+  de: {
+    nav_cta: {
+      slot: "nav_cta",
+      eyebrow: "Für Sie",
+      headline: "MedScope Premium",
+      body: "MeDipacient, MediFlow und OrdiZapis plus VIP-Artikel. 14 Tage kostenlos.",
+      ctaLabel: "14 Tage kostenlos",
+      ctaHref: "/predplatne?trial=1",
+    },
+    nav_strip: {
+      slot: "nav_strip",
+      eyebrow: "Für Sie",
+      headline: "Apps auf dem Homescreen",
+      body: "MeDipacient, MediFlow und OrdiZapis — Testdashboard sofort. 14 Tage kostenlos.",
+      ctaLabel: "Apps laden",
+      ctaHref: "/aplikace",
+      hint: "14 Tage testen",
+    },
+  },
+  fr: {
+    nav_cta: {
+      slot: "nav_cta",
+      eyebrow: "Pour vous",
+      headline: "MedScope Premium",
+      body: "MeDipacient, MediFlow et OrdiZapis plus articles VIP. 14 jours gratuits.",
+      ctaLabel: "14 jours gratuits",
+      ctaHref: "/predplatne?trial=1",
+    },
+    nav_strip: {
+      slot: "nav_strip",
+      eyebrow: "Pour vous",
+      headline: "Des applis sur l’écran d’accueil",
+      body: "MeDipacient, MediFlow et OrdiZapis — tableau d’essai immédiat. 14 jours gratuits.",
+      ctaLabel: "Télécharger les applis",
+      ctaHref: "/aplikace",
+      hint: "Essai de 14 jours",
+    },
+  },
+};
+
+function withLocalPrices(copy: ConversionCopy, locale?: string | null): ConversionCopy {
+  return {
+    ...copy,
+    headline: localizeListedCzk(copy.headline, locale),
+    body: localizeListedCzk(copy.body, locale),
+    ctaLabel: localizeListedCzk(copy.ctaLabel, locale),
+  };
+}
+
+/** Redakce teaser on public magazine — not the physician VIP gate. */
+export function getEditorialArticleGateCopy(locale?: string | null): ConversionCopy {
+  const price = editorialMonthlyCharge(locale).formatted;
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  if (primary === "de") {
+    return withLocalPrices(
+      {
+        slot: "article_gate",
+        eyebrow: "ViaLongeVita Redaktion",
+        headline: "Weiterlesen mit dem Redaktionsabo",
+        body: `Die ersten Absätze bleiben offen. Den ganzen Text öffnet das Redaktionsabo — 14 Tage, dann ${price}. Kein VIP-Zwang.`,
+        ctaLabel: "14 Tage testen",
+        ctaHref: "/predplatne?trial=1#public",
+        hint: "Artikelanfang — der Rest nach der Aktivierung",
+      },
+      locale
+    );
+  }
+  if (primary === "fr") {
+    return withLocalPrices(
+      {
+        slot: "article_gate",
+        eyebrow: "Rédaction ViaLongeVita",
+        headline: "Continuer avec l’abonnement Rédaction",
+        body: `Les premiers paragraphes restent ouverts. Le texte entier s’ouvre avec l’abonnement Rédaction — 14 jours, puis ${price}. Ce n’est pas un club VIP.`,
+        ctaLabel: "Essayer 14 jours",
+        ctaHref: "/predplatne?trial=1#public",
+        hint: "Début de l’article — le reste après activation",
+      },
+      locale
+    );
+  }
+  if (primary !== "cs") {
+    return withLocalPrices(
+      {
+        slot: "article_gate",
+        eyebrow: "ViaLongeVita editorial",
+        headline: "Continue with the Editorial plan",
+        body: `The opening stays readable. The rest opens with Editorial — 14 days, then ${price}. This is not a VIP club.`,
+        ctaLabel: "Try 14 days",
+        ctaHref: "/predplatne?trial=1#public",
+        hint: "Article opening — the rest after activation",
+      },
+      locale
+    );
+  }
+  return withLocalPrices(
+    {
+      slot: "article_gate",
+      eyebrow: "Redakce ViaLongeVita",
+      headline: "Pokračujte s tarifem Redakce",
+      body: `Úvodní odstavce zůstávají čitelné. Zbytek textu otevírá tarif Redakce — 14 dní, potom ${price}. Toto není VIP členství.`,
+      ctaLabel: "Vyzkoušet 14 dní",
+      ctaHref: "/predplatne?trial=1#public",
+      hint: "Náhled níže — zbytek po aktivaci",
+    },
+    locale
+  );
+}
+
+export function getStaticCopy(slot: ConversionSlot, seed = 0, locale = "cs"): ConversionCopy {
+  const primary = primaryArticleLocale(normalizeLocale(locale));
+  if (primary !== "cs") {
+    const pack = I18N_STATIC[primary] ?? I18N_STATIC.en;
+    const localized = pack?.[slot];
+    if (localized) return withLocalPrices(localized, locale);
+  }
   const pool = STATIC_POOL[slot];
-  return pool[Math.abs(seed) % pool.length] ?? pool[0]!;
+  return withLocalPrices(pool[Math.abs(seed) % pool.length] ?? pool[0]!, locale);
 }
 
 /** Path-aware nav strip for student / academy prep surfaces. */
-export function getStudentiNavStripCopy(seed = 0): ConversionCopy {
+export function getStudentiNavStripCopy(seed = 0, locale = "cs"): ConversionCopy {
   const student: ConversionCopy[] = [
     {
       slot: "nav_strip",
       eyebrow: "Pro váš zájem",
       headline: "Pokračujte v přípravě s MeDiprep",
-      body: "První test zdarma, pak simulace 8 českých LF. Student 149 Kč · 14 dní zdarma.",
+      body: "První test zdarma, pak simulace 8 českých LF. Student 89 Kč, další měsíc 149 Kč.",
       ctaLabel: "Otevřít MeDiprep",
       ctaHref: "/app/priprava",
-      hint: "14 dní na vyzkoušení",
+      hint: "1 test zdarma · 89 Kč",
     },
     {
       slot: "nav_strip",
       eyebrow: "Doporučeno pro vás",
       headline: "Pokračujte v přípravě na medicínu",
-      body: "Přípravné kurzy, self-test a AI tutor — studentské předplatné od 149 Kč/měsíc.",
-      ctaLabel: "14 dní zdarma",
-      ctaHref: "/predplatne?trial=1#student",
+      body: "Přípravné kurzy, self-test a AI tutor — 1 test zdarma, první měsíc 89 Kč, pak 149 Kč.",
+      ctaLabel: "Otevřít student tarif",
+      ctaHref: "/predplatne#student",
     },
   ];
-  return student[Math.abs(seed) % student.length] ?? student[0]!;
+  return withLocalPrices(student[Math.abs(seed) % student.length] ?? student[0]!, locale);
 }
 
-export function getVerejnostNavStripCopy(): ConversionCopy {
-  return {
-    slot: "nav_strip",
-    eyebrow: "Pro váš zájem",
-    headline: "MeDipacient: zprávy v telefonu",
-    body: "Zkušební časová osa je otevřená. Nahrání vlastních zpráv po přihlášení — 99 Kč/měsíc.",
-    ctaLabel: "Otevřít MeDipacient",
-    ctaHref: "/app/pacient",
-    hint: "Stažení na plochu jako OrdiZapis",
-  };
+export function getVerejnostNavStripCopy(locale?: string | null): ConversionCopy {
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  if (primary === "de") {
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "Für Sie",
+        headline: "MeDipacient: Befunde auf dem Handy",
+        body: "Die Test-Zeitachse ist offen. Eigene Befunde nach der Anmeldung hochladen — 99 CZK/Monat.",
+        ctaLabel: "MeDipacient öffnen",
+        ctaHref: "/app/pacient",
+        hint: "Als App auf den Bildschirm legen",
+      },
+      locale
+    );
+  }
+  if (primary === "fr") {
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "Pour vous",
+        headline: "MeDipacient : comptes rendus sur le téléphone",
+        body: "La frise d’essai est ouverte. Déposez vos propres comptes rendus après connexion — 99 CZK/mois.",
+        ctaLabel: "Ouvrir MeDipacient",
+        ctaHref: "/app/pacient",
+        hint: "Installer sur l’écran d’accueil",
+      },
+      locale
+    );
+  }
+  if (primary !== "cs") {
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "For you",
+        headline: "MeDipacient: reports on your phone",
+        body: "The trial timeline is open. Upload your own reports after sign-in — 99 CZK/month.",
+        ctaLabel: "Open MeDipacient",
+        ctaHref: "/app/pacient",
+        hint: "Add to the home screen",
+      },
+      locale
+    );
+  }
+  return withLocalPrices(
+    {
+      slot: "nav_strip",
+      eyebrow: "Pro váš zájem",
+      headline: "MeDipacient: zprávy v telefonu",
+      body: "Zkušební časová osa je otevřená. Nahrání vlastních zpráv po přihlášení — 99 Kč/měsíc.",
+      ctaLabel: "Otevřít MeDipacient",
+      ctaHref: "/app/pacient",
+      hint: "Stažení na plochu jako OrdiZapis",
+    },
+    locale
+  );
 }
 
-export function getLekariNavStripCopy(): ConversionCopy {
-  return {
-    slot: "nav_strip",
-    eyebrow: "Pro ověřené lékaře",
-    headline: "OrdiZapis napíše zápis z diktátu",
-    body: "Nahrávejte v mobilu. Stažení po ověření účtu. 390 Kč/měsíc · 14 dní zdarma.",
-    ctaLabel: "Stáhnout OrdiZapis",
-    ctaHref: "/lekari/dokumentace",
-  };
+export function getLekariNavStripCopy(locale = "cs"): ConversionCopy {
+  const primary = primaryArticleLocale(normalizeLocale(locale));
+  if (primary === "de") {
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "Für geprüfte Ärzte",
+        headline: "OrdiZapis schreibt die Notiz aus dem Diktat",
+        body: "Aufnahme am Handy. Download nach Kontoprüfung. 390 Kč/Monat · 14 Tage kostenlos.",
+        ctaLabel: "OrdiZapis herunterladen",
+        ctaHref: "/lekari/dokumentace",
+      },
+      locale
+    );
+  }
+  if (primary === "fr") {
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "Pour les médecins vérifiés",
+        headline: "OrdiZapis rédige la note à partir de la dictée",
+        body: "Enregistrez sur mobile. Téléchargement après vérification du compte. 390 Kč/mois · 14 jours gratuits.",
+        ctaLabel: "Télécharger OrdiZapis",
+        ctaHref: "/lekari/dokumentace",
+      },
+      locale
+    );
+  }
+  if (primary !== "cs") {
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "For verified physicians",
+        headline: "OrdiZapis writes the note from dictation",
+        body: "Record on your phone. Download after account verification. 390 Kč/month · 14 days free.",
+        ctaLabel: "Download OrdiZapis",
+        ctaHref: "/lekari/dokumentace",
+      },
+      locale
+    );
+  }
+  return withLocalPrices(
+    {
+      slot: "nav_strip",
+      eyebrow: "Pro ověřené lékaře",
+      headline: "OrdiZapis napíše zápis z diktátu",
+      body: "Nahrávejte v mobilu. Stažení po ověření účtu. 390 Kč/měsíc · 14 dní zdarma.",
+      ctaLabel: "Stáhnout OrdiZapis",
+      ctaHref: "/lekari/dokumentace",
+    },
+    locale
+  );
 }
 
 /** MediFlow surfaces — never push MeDipacient 99 Kč here */
@@ -174,16 +401,62 @@ export function getMediFlowNavStripCopy(): ConversionCopy {
   };
 }
 
-export function getVipNavStripCopy(): ConversionCopy {
-  return {
-    slot: "nav_strip",
-    eyebrow: "VIP Longevity",
-    headline: "10 protokolů · 14 dní zdarma",
-    body: "Spánek, metabolismus, pohyb. Pak 149 Kč/měsíc — odděleně od Student LF (Academy) a MeDipacient.",
-    ctaLabel: "Začít zkušební VIP",
-    ctaHref: "/predplatne?trial=1&plan=vip",
-    hint: "14 dní na vyzkoušení",
-  };
+export function getVipNavStripCopy(locale = "cs"): ConversionCopy {
+  const primary = primaryArticleLocale(normalizeLocale(locale));
+  if (primary === "de") {
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "VIP Longevity",
+        headline: "10 Protokolle · 14 Tage kostenlos",
+        body: "Schlaf, Stoffwechsel, Bewegung. Dann 149 Kč/Monat — getrennt von Academy und MeDipacient.",
+        ctaLabel: "VIP-Test starten",
+        ctaHref: "/predplatne?trial=1&plan=vip",
+        hint: "14 Tage zum Testen",
+      },
+      locale
+    );
+  }
+  if (primary === "fr") {
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "VIP Longevity",
+        headline: "10 protocoles · 14 jours gratuits",
+        body: "Sommeil, métabolisme, mouvement. Puis 149 Kč/mois — distinct de l’Academy et de MeDipacient.",
+        ctaLabel: "Commencer l’essai VIP",
+        ctaHref: "/predplatne?trial=1&plan=vip",
+        hint: "14 jours pour essayer",
+      },
+      locale
+    );
+  }
+  if (primary !== "cs") {
+    return withLocalPrices(
+      {
+        slot: "nav_strip",
+        eyebrow: "VIP Longevity",
+        headline: "10 protocols · 14 days free",
+        body: "Sleep, metabolism, movement. Then 149 Kč/month — separate from Academy and MeDipacient.",
+        ctaLabel: "Start the VIP trial",
+        ctaHref: "/predplatne?trial=1&plan=vip",
+        hint: "14 days to try",
+      },
+      locale
+    );
+  }
+  return withLocalPrices(
+    {
+      slot: "nav_strip",
+      eyebrow: "VIP Longevity",
+      headline: "10 protokolů · 14 dní zdarma",
+      body: "Spánek, metabolismus, pohyb. Pak 149 Kč/měsíc — odděleně od Student LF (Academy) a MeDipacient.",
+      ctaLabel: "Začít zkušební VIP",
+      ctaHref: "/predplatne?trial=1&plan=vip",
+      hint: "14 dní na vyzkoušení",
+    },
+    locale
+  );
 }
 
 /** Strip `/cs`, `/en`, … so audience path checks work with locale-prefixed URLs. */
@@ -245,4 +518,17 @@ export function isVipAudiencePath(pathname: string | null | undefined): boolean 
 export function daySeed(): number {
   const d = new Date();
   return d.getFullYear() * 1000 + d.getMonth() * 50 + d.getDate();
+}
+
+/** Path-aware header strip so SSR and the client pick the same audience copy. */
+export function navStripForPath(
+  pathname: string | null | undefined,
+  locale = "cs"
+): ConversionCopy | null {
+  if (isMediFlowAudiencePath(pathname)) return getMediFlowNavStripCopy();
+  if (isVipAudiencePath(pathname)) return getVipNavStripCopy(locale);
+  if (isStudentAudiencePath(pathname)) return getStudentiNavStripCopy(daySeed(), locale);
+  if (isPublicAudiencePath(pathname)) return getVerejnostNavStripCopy(locale);
+  if (isPhysicianAudiencePath(pathname)) return getLekariNavStripCopy(locale);
+  return null;
 }

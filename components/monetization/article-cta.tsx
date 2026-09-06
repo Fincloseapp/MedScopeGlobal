@@ -3,8 +3,10 @@
 import { useEffect, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { Heart, Share2, BookmarkPlus, Crown } from "lucide-react";
-import { DONATION_TIERS, formatDonationAmount } from "@/lib/ecosystem/monetization";
-import { DONATION_COPY, tipLocale } from "@/lib/ecosystem/tip-copy";
+import { formatDonationAmount } from "@/lib/ecosystem/monetization";
+import { paymentTiersForUser } from "@/lib/i18n/payment-currency";
+import { getArticleChrome } from "@/lib/i18n/article-chrome";
+import { DONATION_COPY, ARTICLE_TIP_COPY, tipLocale } from "@/lib/ecosystem/tip-copy";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { MEDIFLOW_STORAGE_KEY, demoMediFlowDashboard } from "@/lib/mediflow/types";
 
@@ -26,10 +28,9 @@ export function AuthorDonationButton({
   const [unavailable, setUnavailable] = useState(false);
   const [customAmount, setCustomAmount] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const tiers = DONATION_TIERS[locale] ?? DONATION_TIERS.cs;
+  const tiers = paymentTiersForUser(locale);
   const copy = DONATION_COPY[tipLocale(locale)];
-  const zeroDecimal =
-    locale === "ja" || locale === "ko" || locale === "vi" || locale === "id" || locale === "hu";
+  const zeroDecimal = new Set(["jpy", "krw", "vnd", "idr", "huf"]).has(tiers.currency);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -58,6 +59,7 @@ export function AuthorDonationButton({
           currency: tiers.currency,
           articleSlug,
           articleTitle,
+          locale,
         }),
       });
       const data = (await res.json()) as {
@@ -130,7 +132,7 @@ export function AuthorDonationButton({
         <div className="flex items-center gap-1">
           <input
             type="number"
-            placeholder="Vlastní"
+            placeholder={ARTICLE_TIP_COPY[tipLocale(locale)].custom}
             value={customAmount}
             onChange={(e) => setCustomAmount(e.target.value)}
             className="w-20 rounded-full border border-rose-300 px-3 py-1.5 text-sm"
@@ -151,8 +153,17 @@ export function AuthorDonationButton({
   );
 }
 
-export function SaveToMediFlowButton({ articleSlug, articleTitle }: { articleSlug: string; articleTitle: string }) {
+export function SaveToMediFlowButton({
+  articleSlug,
+  articleTitle,
+  locale = "cs",
+}: {
+  articleSlug: string;
+  articleTitle: string;
+  locale?: string;
+}) {
   const [saved, setSaved] = useState(false);
+  const chrome = getArticleChrome(locale);
 
   const saveLocal = () => {
     try {
@@ -204,12 +215,21 @@ export function SaveToMediFlowButton({ articleSlug, articleTitle }: { articleSlu
       className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 underline-offset-2 hover:text-[#005B96] hover:underline"
     >
       <BookmarkPlus className="h-3.5 w-3.5" />
-      {saved ? "Uloženo" : "Uložit"}
+      {saved ? chrome.saved : chrome.save}
     </Link>
   );
 }
 
-export function ArticleShareButton({ title, slug }: { title: string; slug: string }) {
+export function ArticleShareButton({
+  title,
+  slug,
+  locale = "cs",
+}: {
+  title: string;
+  slug: string;
+  locale?: string;
+}) {
+  const chrome = getArticleChrome(locale);
   const share = async () => {
     const url = `${window.location.origin}/article/${slug}`;
     if (navigator.share) {
@@ -226,7 +246,7 @@ export function ArticleShareButton({ title, slug }: { title: string; slug: strin
       className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 underline-offset-2 hover:text-[#005B96] hover:underline"
     >
       <Share2 className="h-3.5 w-3.5" />
-      Sdílet
+      {chrome.share}
     </button>
   );
 }

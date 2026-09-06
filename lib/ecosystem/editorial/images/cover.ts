@@ -100,12 +100,63 @@ export const VISUAL_TOPIC_KEYWORDS: Record<CoverVisualTopic, readonly string[]> 
     "výživa",
     "nutrition",
   ],
-  sleep: ["spánek", "spanek", "sleep", "odpočinek", "odpocinek", "postel", "unava", "únava"],
-  calm: ["stres", "stress", "mindful", "meditac", "relax", "klid", "wellness"],
-  movement: ["pohyb", "cvič", "cvic", "fitness", "sport", "chůze", "chuze", "walk", "trenink"],
-  seniors: ["senior", "stárnut", "starnut", "aging", "menopauz", "důchod", "duchod"],
+  sleep: [
+    "spánek",
+    "spanek",
+    "sleep",
+    "sommeil",
+    "schlaf",
+    "insomni",
+    "odpočinek",
+    "odpocinek",
+    "postel",
+    "unava",
+    "únava",
+  ],
+  calm: ["stres", "stress", "mindful", "meditac", "relax", "klid", "wellness", "entretien", "interview"],
+  movement: [
+    "pohyb",
+    "cvič",
+    "cvic",
+    "fitness",
+    "sport",
+    "chůze",
+    "chuze",
+    "walk",
+    "trenink",
+    "bewegung",
+    "mouvement",
+    "sedent",
+  ],
+  seniors: [
+    "senior",
+    "stárnut",
+    "starnut",
+    "aging",
+    "ageing",
+    "menopauz",
+    "důchod",
+    "duchod",
+    "longevity",
+    "healthspan",
+    "langleb",
+    "longévité",
+    "dlouhovek",
+  ],
   clinical: ["klinick", "nemoc", "chorob", "lékař", "lekar", "hospital", "ordinac", "diagn"],
-  research: ["studie", "výzkum", "vyzkum", "research", "biomarker", "guideline", "prevence"],
+  research: [
+    "studie",
+    "výzkum",
+    "vyzkum",
+    "research",
+    "biomarker",
+    "guideline",
+    "prevence",
+    "who",
+    "ema",
+    "súkl",
+    "sukl",
+  ],
   tech: ["digitáln", "digital", "aplikac", "telemedic", "wearable", "ai"],
   vitals: ["glukóz", "glukoz", "tlak", "srdce", "cholesterol", "vitamin", "krev"],
   walk: ["chůze", "chuze", "walk", "příroda", "priroda", "outdoor"],
@@ -113,6 +164,44 @@ export const VISUAL_TOPIC_KEYWORDS: Record<CoverVisualTopic, readonly string[]> 
 
 export function getCoverPoolForTopic(topic: CoverVisualTopic): readonly string[] {
   return COVER_POOL[topic] ?? COVER_POOL.research;
+}
+
+/** Compare covers without cache-bust query strings. */
+export function coverIdentity(url: string | null | undefined): string {
+  const local = normalizeLocalCoverPath(url);
+  if (local) return local;
+  return String(url ?? "").trim().split("?")[0]!.toLowerCase();
+}
+
+/** Group visually similar covers so neighbours are not two gym shots or two silhouettes. */
+export function coverVisualFamily(url: string | null | undefined): string {
+  const path = coverIdentity(url);
+  if (/\/calm-2\.webp$/.test(path)) return "window-calm";
+  if (/\/calm\.webp$/.test(path)) return "silhouette-calm";
+  if (/\/movement-2\.webp$/.test(path)) return "gym-movement-alt";
+  if (/\/movement\.webp$/.test(path)) return "gym-movement";
+  if (/\/food(?:-\d+)?\.webp$/.test(path) || path.includes("/produce.webp")) return "food-plate";
+  if (/\/clinical(?:-\d+)?\.webp$/.test(path)) return "clinical-care";
+  if (/\/research(?:-\d+)?\.webp$/.test(path) || path.includes("/science.webp")) return "research-lab";
+  if (path.includes("/sleep.webp")) return "sleep";
+  if (path.includes("/walk.webp")) return "walk-outdoors";
+  if (path.includes("/seniors.webp")) return "seniors-people";
+  if (path.includes("/vitals.webp") || path.includes("/tech.webp")) return "vitals-tech";
+  return path;
+}
+
+/** Primary topic pool plus editor-approved overflow for unique listings. */
+export function listingCoverOptionsForTopic(topic: CoverVisualTopic): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const url of [...getCoverPoolForTopic(topic), ...(COVER_OVERFLOW[topic] ?? [])]) {
+    const key = coverIdentity(url);
+    if (!key || seen.has(key)) continue;
+    if (isMismatchedLocalCover(url, topic)) continue;
+    seen.add(key);
+    out.push(url);
+  }
+  return out;
 }
 
 /** Map fine-grained visual topic → editorial desk topic (DB / alt-text metadata). */
@@ -206,13 +295,13 @@ const LOCAL_COVER_TOPICS: Partial<
   "/assets/covers/food-3.webp": ["food"],
   "/assets/covers/food-4.webp": ["food"],
   "/assets/covers/produce.webp": ["food"],
-  "/assets/covers/sleep.webp": ["sleep"],
-  "/assets/covers/calm.webp": ["calm"],
-  "/assets/covers/calm-2.webp": ["calm", "sleep"],
-  "/assets/covers/movement.webp": ["movement", "walk"],
-  "/assets/covers/movement-2.webp": ["movement", "walk"],
-  "/assets/covers/walk.webp": ["walk", "movement", "seniors"],
-  "/assets/covers/seniors.webp": ["seniors"],
+  "/assets/covers/sleep.webp": ["sleep", "calm"],
+  "/assets/covers/calm.webp": ["calm", "seniors", "sleep", "movement"],
+  "/assets/covers/calm-2.webp": ["calm", "sleep", "seniors"],
+  "/assets/covers/movement.webp": ["movement", "walk", "seniors", "calm"],
+  "/assets/covers/movement-2.webp": ["movement", "walk", "seniors"],
+  "/assets/covers/walk.webp": ["walk", "movement", "seniors", "calm"],
+  "/assets/covers/seniors.webp": ["seniors", "movement"],
   "/assets/covers/clinical.webp": ["clinical"],
   "/assets/covers/clinical-2.webp": ["clinical", "research", "vitals"],
   "/assets/covers/clinical-3.webp": ["clinical", "research"],
@@ -220,23 +309,68 @@ const LOCAL_COVER_TOPICS: Partial<
   "/assets/covers/research-2.webp": ["research", "clinical"],
   "/assets/covers/science.webp": ["research", "tech"],
   "/assets/covers/tech.webp": ["tech"],
-  "/assets/covers/vitals.webp": ["vitals", "clinical", "tech"],
+  "/assets/covers/vitals.webp": ["vitals", "clinical", "tech", "seniors", "movement"],
+};
+
+/**
+ * Extra local covers an editor may use when the primary topic pool is already
+ * taken by a neighbouring card. Food stays food-only.
+ */
+const COVER_OVERFLOW: Record<CoverVisualTopic, readonly string[]> = {
+  food: [],
+  sleep: ["/assets/covers/calm.webp", "/assets/covers/calm-2.webp"],
+  calm: [
+    "/assets/covers/sleep.webp",
+    "/assets/covers/walk.webp",
+    "/assets/covers/movement.webp",
+  ],
+  movement: [
+    "/assets/covers/walk.webp",
+    "/assets/covers/seniors.webp",
+    "/assets/covers/calm.webp",
+    "/assets/covers/vitals.webp",
+  ],
+  seniors: [
+    "/assets/covers/movement.webp",
+    "/assets/covers/movement-2.webp",
+    "/assets/covers/calm.webp",
+    "/assets/covers/calm-2.webp",
+    "/assets/covers/vitals.webp",
+  ],
+  clinical: [
+    "/assets/covers/research-2.webp",
+    "/assets/covers/science.webp",
+    "/assets/covers/vitals.webp",
+  ],
+  research: [
+    "/assets/covers/clinical-2.webp",
+    "/assets/covers/science.webp",
+    "/assets/covers/tech.webp",
+  ],
+  tech: ["/assets/covers/science.webp", "/assets/covers/research-2.webp"],
+  vitals: ["/assets/covers/clinical-2.webp", "/assets/covers/research.webp"],
+  walk: ["/assets/covers/movement-2.webp", "/assets/covers/seniors.webp"],
 };
 
 const FOOD_RE =
-  /tal[ií][rř]|st[rř]edo\s*mo[rř]|stredomorsk|kuchyn|strav|j[ií]dl|meal|diet|v[yý][zž]iv|sal[aá]t|olive|zelenin|protein|b[ií]lkovin|sytost|recept|j[ií]deln[ií][cč]ek|nutrition|hydrat|pitn[yý]\s+re[zž]im|pitn[eé]\s+re[zž]im|ovoce|sn[ií]dan|ve[cč]e[rř]|potravin/i;
+  /tal[ií][rř]|st[rř]edo\s*mo[rř]|stredomorsk|mediterran|m[eé]diterran[eé]|kuchyn|strav|j[ií]dl|meal|diet|v[yý][zž]iv|sal[aá]t|olive|zelenin|protein|prot[eé]in|b[ií]lkovin|sytost|recept|j[ií]deln[ií][cč]ek|nutrition|ern[aä]hrung|nahrung|hydrat|pitn[yý]\s+re[zž]im|pitn[eé]\s+re[zž]im|ovoce|sn[ií]dan|ve[cč]e[rř]e|potravin|je[uû]ne|fasting|omega/i;
 
 const SLEEP_RE =
-  /sp[aá]nek|sleep|apnoe|insomni|odpo[cč]ink|no[cč]n[ií]|polar|postel|unava|únava|jarn[ií]\s+unava|zimn[ií]\s+unava/i;
+  /sp[aá]nek|sleep|sommeil|schlaf|apnoe|insomni|circadian|circadien|odpo[cč]ink|no[cč]n[ií]|polar|postel|unava|únava|jarn[ií]\s+unava|zimn[ií]\s+unava/i;
 
 const CALM_RE =
   /stres|stress|mindful|meditac|dechov|relax|pohoda|imunit.*pr[aá]ce|wellness|klid/i;
 
 const MOVEMENT_RE =
-  /pohyb|cvi[cč]|fitness|sport|ch[uů]ze|walk|cvik|trenink|tr[eé]nink|svalov|svaly|posilov|sedav|sedent|neat\b|schod|st[aá]n[ií]|zam[eě]stn|kancel[aá][řr]|office/i;
+  /pohyb|cvi[cč]|fitness|sport|ch[uů]ze|walk|walking|marche|gehen|bewegung|mouvement|exercise|cvik|trenink|tr[eé]nink|svalov|svaly|posilov|sedav|sedent|s[eé]dentaire|sitzend|neat\b|schod|st[aá]n[ií]|zam[eě]stn|kancel[aá][řr]|office|bureau/i;
 
 const SENIORS_RE =
-  /senior|st[aá][rř]nut|aging|menopauz|osteopor|hrt|d[uů]chod|kostn[ií]|[rř][ií]dnut[ií]\s+kost/i;
+  /senior|st[aá][rř]nut|aging|ageing|menopauz|menopause|hormon|osteopor|hrt|d[uů]chod|kostn[ií]|[rř][ií]dnut[ií]\s+kost|longevity|healthspan|langleb|long[eé]vit|dlouhov[eě]k/i;
+
+const INSTITUTIONAL_RE =
+  /\bwho\b|world health|ema\b|fda\b|s[uú]kl|sukl|guideline|doporu[cč]en|recommendation|regulat|institu|diplomat|legal|\bz[aá]kon\b|\bdroit\b|\brecht\b|\bpolicy\b|politik/i;
+
+const INTERVIEW_RE = /rozhovor|interview|entretien|gespr[aä]ch/i;
 
 const KIDS_RE = /d[eě]t[ií]|[sš]kol|imunit.*d[eě]t|pediatr/i;
 
@@ -303,9 +437,12 @@ export function classifyCoverTopic(input: {
   if (VITALS_RE.test(titleSlug)) return "vitals";
   if (MOVEMENT_RE.test(titleSlug)) return "movement";
   if (TECH_RE.test(titleSlug)) return "tech";
-  if (RESEARCH_RE.test(titleSlug) || topic.includes("prevence")) return "research";
-  if (CLINICAL_RE.test(titleSlug) || topic.includes("nemoci")) return "clinical";
+  if (RESEARCH_RE.test(titleSlug) || INSTITUTIONAL_RE.test(titleSlug) || topic.includes("prevence")) {
+    return "research";
+  }
   if (CALM_RE.test(titleSlug)) return "calm";
+  if (INTERVIEW_RE.test(titleSlug) || topic.includes("rozhovor")) return "calm";
+  if (CLINICAL_RE.test(titleSlug) || topic.includes("nemoci")) return "clinical";
 
   // Weaker excerpt / category signals
   if (SLEEP_RE.test(hay)) return "sleep";
@@ -316,12 +453,14 @@ export function classifyCoverTopic(input: {
   if (KIDS_RE.test(hay)) return "walk";
   if (VITALS_RE.test(hay)) return "vitals";
   if (TECH_RE.test(hay)) return "tech";
-  if (RESEARCH_RE.test(hay) || topic.includes("prevence")) return "research";
+  if (RESEARCH_RE.test(hay) || INSTITUTIONAL_RE.test(hay) || topic.includes("prevence")) {
+    return "research";
+  }
   if (CLINICAL_RE.test(hay) || topic.includes("nemoci")) return "clinical";
   // Slug/title movement beats generic zivotni-styl → calm (e.g. sedavé zaměstnání / NEAT).
   if (MOVEMENT_RE.test(titleSlug)) return "movement";
   if (topic.includes("zivotni")) return "calm";
-  if (topic.includes("rozhovor")) return "clinical";
+  if (INTERVIEW_RE.test(hay) || topic.includes("rozhovor")) return "calm";
   return "research";
 }
 
@@ -345,7 +484,8 @@ export function normalizeLocalCoverPath(
 
 export function pickCuratedCover(
   topic: CoverVisualTopic,
-  seed: string
+  seed: string,
+  excludeUrls: Iterable<string> = []
 ): string {
   const pool = COVER_POOL[topic] ?? COVER_POOL.research;
   const allowed = pool.filter((path) => {
@@ -353,6 +493,23 @@ export function pickCuratedCover(
     return !topics || topics.includes(topic);
   });
   const use = allowed.length > 0 ? allowed : pool;
+  const excluded = new Set(
+    [...excludeUrls]
+      .flatMap((url) => [coverIdentity(url), coverVisualFamily(url)])
+      .filter(Boolean)
+  );
+  const unused = use.filter(
+    (path) => !excluded.has(coverIdentity(path)) && !excluded.has(coverVisualFamily(path))
+  );
+  if (unused.length > 0) {
+    return unused[hashString(seed) % unused.length]!;
+  }
+  const overflow = (COVER_OVERFLOW[topic] ?? []).filter(
+    (path) => !excluded.has(coverIdentity(path)) && !excluded.has(coverVisualFamily(path))
+  );
+  if (overflow.length > 0) {
+    return overflow[hashString(seed) % overflow.length]!;
+  }
   return use[hashString(seed) % use.length]!;
 }
 
@@ -426,11 +583,25 @@ export function resolveArticleCoverUrl(input: {
   coverImageUrl?: string | null;
   /** When true, never return null — always a curated asset. */
   preferCurated?: boolean;
+  /** Keep an already assigned local cover (listing uniqueness). */
+  keepAssignedCover?: boolean;
 }): string | null {
   const raw = input.coverImageUrl?.trim() || null;
   const topic = classifyCoverTopic(input);
   const seed = input.slug || input.title;
   const curated = withCoverCacheBust(pickCuratedCover(topic, seed));
+  const localPath = normalizeLocalCoverPath(raw);
+
+  if (
+    input.keepAssignedCover &&
+    localPath &&
+    !isBrokenCoverUrl(raw) &&
+    !isDeniedStockUrl(raw) &&
+    !isBrainScanCoverUrl(localPath) &&
+    !(topic === "food" && !isFoodCoverUrl(localPath))
+  ) {
+    return withCoverCacheBust(localPath);
+  }
 
   if (
     isBrokenCoverUrl(raw) ||
@@ -445,7 +616,6 @@ export function resolveArticleCoverUrl(input: {
   }
 
   // Local covers (relative or absolute site URL): keep only when topic-appropriate
-  const localPath = normalizeLocalCoverPath(raw);
   if (localPath) {
     if (isBrainScanCoverUrl(localPath)) return curated;
     return isMismatchedLocalCover(localPath, topic)

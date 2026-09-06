@@ -1,6 +1,15 @@
 /** Global monetization configuration — ads, donations, affiliate, VIP */
 
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
+import {
+  applyAmazonAssociateTag as applyAmazonAssociateTagGeo,
+  resolveAffiliateDestination,
+  type AffiliateContext,
+} from "@/lib/monetization/affiliate-geo";
+import { isAdSenseEnabled, resolveAdSenseClientId } from "@/lib/monetization/adsense";
+
+export { applyAmazonAssociateTagGeo as applyAmazonAssociateTag };
+export type { AffiliateContext };
 
 export type AdProvider =
   | "adsense"
@@ -12,7 +21,14 @@ export type AdProvider =
   | "baidu"
   | "native";
 
-export type AdPlacement = "header" | "below-title" | "in-content" | "sidebar" | "footer" | "sticky";
+export type AdPlacement =
+  | "header"
+  | "below-title"
+  | "in-content"
+  | "in-article"
+  | "sidebar"
+  | "footer"
+  | "sticky";
 
 export const AD_PROVIDERS_BY_REGION: Record<string, AdProvider[]> = {
   USA: ["mediavine", "ezoic", "adthrive", "adsense"],
@@ -41,6 +57,8 @@ export const DONATION_TIERS: Record<GlobalLocaleCode, { amounts: number[]; curre
   fr: { amounts: [200, 500, 990], currency: "eur", symbol: "€" },
   it: { amounts: [200, 500, 990], currency: "eur", symbol: "€" },
   es: { amounts: [200, 500, 990], currency: "eur", symbol: "€" },
+  pt: { amounts: [200, 500, 990], currency: "eur", symbol: "€" },
+  "pt-BR": { amounts: [990, 1990, 3990], currency: "brl", symbol: "R$" },
   ro: { amounts: [1000, 2500, 4900], currency: "ron", symbol: "lei" },
   hu: { amounts: [80000, 200000, 390000], currency: "huf", symbol: "Ft" },
   ru: { amounts: [10000, 25000, 49000], currency: "rub", symbol: "₽" },
@@ -53,6 +71,7 @@ export const DONATION_TIERS: Record<GlobalLocaleCode, { amounts: number[]; curre
   id: { amounts: [3000000, 7500000, 14900000], currency: "idr", symbol: "Rp" },
   en: { amounts: [200, 500, 999], currency: "usd", symbol: "$" },
   "en-US": { amounts: [299, 499, 999], currency: "usd", symbol: "$" },
+  "en-UK": { amounts: [200, 500, 900], currency: "gbp", symbol: "£" },
 };
 
 /** VIP pricing by locale */
@@ -64,6 +83,8 @@ export const VIP_PRICING: Record<GlobalLocaleCode, { monthly: number; currency: 
   fr: { monthly: 599, currency: "eur", symbol: "€", label: "5,99 €/mois" },
   it: { monthly: 599, currency: "eur", symbol: "€", label: "5,99 €/mese" },
   es: { monthly: 599, currency: "eur", symbol: "€", label: "5,99 €/mes" },
+  pt: { monthly: 599, currency: "eur", symbol: "€", label: "5,99 €/mês" },
+  "pt-BR": { monthly: 1990, currency: "brl", symbol: "R$", label: "R$ 19,90/mês" },
   ro: { monthly: 2900, currency: "ron", symbol: "lei", label: "29 lei/lună" },
   hu: { monthly: 199000, currency: "huf", symbol: "Ft", label: "1 990 Ft/hó" },
   ru: { monthly: 29900, currency: "rub", symbol: "₽", label: "299 ₽/мес" },
@@ -76,9 +97,10 @@ export const VIP_PRICING: Record<GlobalLocaleCode, { monthly: number; currency: 
   id: { monthly: 7500000, currency: "idr", symbol: "Rp", label: "Rp 75 000/bulan" },
   en: { monthly: 499, currency: "usd", symbol: "$", label: "$4.99/month" },
   "en-US": { monthly: 699, currency: "usd", symbol: "$", label: "$6.99/month" },
+  "en-UK": { monthly: 499, currency: "gbp", symbol: "£", label: "£4.99/month" },
 };
 
-export type AffiliateCategory = "supplements" | "lab-tests" | "fitness" | "sleep" | "longevity";
+export type AffiliateCategory = "supplements" | "lab-tests" | "fitness" | "sleep" | "longevity" | "skincare";
 
 export type AffiliateProduct = {
   id: string;
@@ -97,26 +119,38 @@ export const AFFILIATE_PRODUCTS: AffiliateProduct[] = [
       cs: "Magnesium glycinát",
       sk: "Magnézium glycinát",
       en: "Magnesium Glycinate",
-      "en-US": "Magnesium Glycinate (USA)",
+      "en-US": "Magnesium Glycinate",
       de: "Magnesiumglycinat",
+      fr: "Magnésium glycinate",
+      it: "Magnesio glicinato",
+      es: "Magnesio glicinato",
       pl: "Magnez bisglicynian",
+      ja: "マグネシウムグリシネート",
     },
     description: {
-      cs: "Podpora spánku a regenerace",
-      sk: "Podpora spánku a regenerácie",
-      en: "Sleep and recovery support",
-      "en-US": "Premium sleep support",
-      de: "Schlaf- und Regenerationssupport",
-      pl: "Wsparcie snu i regeneracji",
+      cs: "Večer, kdy chcete opravdu usnout — bez kofeinu v krvi.",
+      sk: "Večer, keď chcete naozaj zaspať.",
+      en: "The evening mineral people reach for when sleep will not come.",
+      "en-US": "The evening mineral people reach for when sleep will not come.",
+      de: "Das Mineral, nach dem greifen, die abends zur Ruhe kommen wollen.",
+      fr: "Le minéral du soir, quand le sommeil ne vient pas.",
+      it: "Il minerale della sera, quando il sonno non arriva.",
+      es: "El mineral de la noche, cuando el sueño no llega.",
+      pl: "Minerał na wieczór, gdy sen nie przychodzi.",
+      ja: "夜、眠りたいときに手に取るミネラル。",
     },
     category: "supplements",
     affiliateUrl: {
-      cs: "https://medscopeglobal.com/go/mg-cz",
-      sk: "https://medscopeglobal.com/go/mg-cz",
-      en: "https://medscopeglobal.com/go/mg-en",
-      "en-US": "https://medscopeglobal.com/go/mg-us",
-      de: "https://medscopeglobal.com/go/mg-de",
-      pl: "https://medscopeglobal.com/go/mg-pl",
+      cs: "/go/magnesium-glycinate?locale=cs",
+      sk: "/go/magnesium-glycinate?locale=sk",
+      en: "/go/magnesium-glycinate?locale=en",
+      "en-US": "/go/magnesium-glycinate?locale=en-US",
+      de: "/go/magnesium-glycinate?locale=de",
+      fr: "/go/magnesium-glycinate?locale=fr",
+      it: "/go/magnesium-glycinate?locale=it",
+      es: "/go/magnesium-glycinate?locale=es",
+      pl: "/go/magnesium-glycinate?locale=pl",
+      ja: "/go/magnesium-glycinate?locale=ja",
     },
     imageUrl: "/assets/affiliate/magnesium.svg",
     regions: ["EU", "USA", "GLOBAL"],
@@ -124,29 +158,41 @@ export const AFFILIATE_PRODUCTS: AffiliateProduct[] = [
   {
     id: "omega-3-test",
     name: {
-      cs: "Omega-3 laboratorní test",
-      sk: "Omega-3 laboratórny test",
-      en: "Omega-3 Lab Test",
+      cs: "Omega-3",
+      sk: "Omega-3",
+      en: "Omega-3",
       "en-US": "Omega-3 Index Test",
-      de: "Omega-3 Labortest",
-      pl: "Test Omega-3",
+      de: "Omega-3",
+      fr: "Oméga-3",
+      it: "Omega-3",
+      es: "Omega-3",
+      pl: "Omega-3",
+      ja: "オメガ3",
     },
     description: {
-      cs: "Domácí test indexu omega-3",
-      sk: "Domáci test indexu omega-3",
-      en: "At-home omega-3 index test",
-      "en-US": "CLIA-certified omega-3 test",
-      de: "Omega-3-Index-Heimtest",
-      pl: "Domowy test indeksu omega-3",
+      cs: "To, co čtenáři hledají u textů o srdci a zánětu — v místním obchodě.",
+      sk: "To, čo čitatelia hľadajú pri textoch o srdci.",
+      en: "What readers look up after pieces on the heart and inflammation.",
+      "en-US": "Know your omega-3 index — then decide what to buy.",
+      de: "Wonach Leser nach Texten zu Herz und Entzündung greifen.",
+      fr: "Ce que les lecteurs cherchent après un texte sur le cœur.",
+      it: "Quello che i lettori cercano dopo un testo sul cuore.",
+      es: "Lo que buscan los lectores tras un texto sobre el corazón.",
+      pl: "To, czego szukają czytelnicy po tekście o sercu.",
+      ja: "心臓や炎症の記事のあとで読者が探すもの。",
     },
     category: "lab-tests",
     affiliateUrl: {
-      cs: "https://medscopeglobal.com/go/omega-cz",
-      sk: "https://medscopeglobal.com/go/omega-cz",
-      en: "https://medscopeglobal.com/go/omega-en",
-      "en-US": "https://medscopeglobal.com/go/omega-us",
-      de: "https://medscopeglobal.com/go/omega-de",
-      pl: "https://medscopeglobal.com/go/omega-pl",
+      cs: "/go/omega-3-test?locale=cs",
+      sk: "/go/omega-3-test?locale=sk",
+      en: "/go/omega-3-test?locale=en",
+      "en-US": "/go/omega-3-test?locale=en-US",
+      de: "/go/omega-3-test?locale=de",
+      fr: "/go/omega-3-test?locale=fr",
+      it: "/go/omega-3-test?locale=it",
+      es: "/go/omega-3-test?locale=es",
+      pl: "/go/omega-3-test?locale=pl",
+      ja: "/go/omega-3-test?locale=ja",
     },
     imageUrl: "/assets/affiliate/omega-test.svg",
     regions: ["EU", "USA"],
@@ -154,31 +200,43 @@ export const AFFILIATE_PRODUCTS: AffiliateProduct[] = [
   {
     id: "sleep-tracker",
     name: {
-      cs: "Chytrý sleep tracker",
-      sk: "Smart sleep tracker",
-      en: "Smart Sleep Tracker",
-      "en-US": "Oura Ring / Whoop",
-      de: "Smart Sleep Tracker",
-      pl: "Inteligentny tracker snu",
+      cs: "Sledování spánku",
+      sk: "Sledovanie spánku",
+      en: "Sleep tracker",
+      "en-US": "Oura Ring",
+      de: "Schlaftracker",
+      fr: "Tracker de sommeil",
+      it: "Tracker del sonno",
+      es: "Tracker de sueño",
+      pl: "Tracker snu",
+      ja: "スリープトラッカー",
     },
     description: {
-      cs: "Sledování spánku a HRV",
-      sk: "Sledovanie spánku a HRV",
-      en: "Sleep and HRV monitoring",
-      "en-US": "Advanced biohacking wearable",
-      de: "Schlaf- und HRV-Monitoring",
-      pl: "Monitorowanie snu i HRV",
+      cs: "Vidět vlastní noc — HRV, hloubku, pravidelnost — ne jen dojem.",
+      sk: "Vidieť vlastnú noc — HRV, hĺbku, pravidelnosť.",
+      en: "See your own night — HRV, depth, regularity — not just a feeling.",
+      "en-US": "See your own night — HRV, depth, regularity.",
+      de: "Die eigene Nacht sehen — HRV, Tiefe, Regelmäßigkeit.",
+      fr: "Voir sa propre nuit — HRV, profondeur, régularité.",
+      it: "Vedere la propria notte — HRV, profondità, regolarità.",
+      es: "Ver tu propia noche — HRV, profundidad, regularidad.",
+      pl: "Zobaczyć własną noc — HRV, głębokość, regularność.",
+      ja: "自分の夜を見る。HRV、深さ、規則性。",
     },
     category: "sleep",
     affiliateUrl: {
-      cs: "https://medscopeglobal.com/go/sleep-cz",
-      sk: "https://medscopeglobal.com/go/sleep-cz",
-      en: "https://medscopeglobal.com/go/sleep-en",
-      "en-US": "https://medscopeglobal.com/go/sleep-us",
-      de: "https://medscopeglobal.com/go/sleep-de",
-      pl: "https://medscopeglobal.com/go/sleep-pl",
+      cs: "/go/sleep-tracker?locale=cs",
+      sk: "/go/sleep-tracker?locale=sk",
+      en: "/go/sleep-tracker?locale=en",
+      "en-US": "/go/sleep-tracker?locale=en-US",
+      de: "/go/sleep-tracker?locale=de",
+      fr: "/go/sleep-tracker?locale=fr",
+      it: "/go/sleep-tracker?locale=it",
+      es: "/go/sleep-tracker?locale=es",
+      pl: "/go/sleep-tracker?locale=pl",
+      ja: "/go/sleep-tracker?locale=ja",
     },
-    imageUrl: "/assets/affiliate/sleep-tracker.svg",
+    imageUrl: "/assets/affiliate/ring.svg",
     regions: ["EU", "USA", "GLOBAL"],
   },
   {
@@ -189,66 +247,573 @@ export const AFFILIATE_PRODUCTS: AffiliateProduct[] = [
       en: "Vitamin D3 + K2",
       "en-US": "Vitamin D3 + K2",
       de: "Vitamin D3 + K2",
+      fr: "Vitamine D3 + K2",
+      it: "Vitamina D3 + K2",
+      es: "Vitamina D3 + K2",
       pl: "Witamina D3 + K2",
+      ja: "ビタミンD3 + K2",
     },
     description: {
-      cs: "Podpora imunity a kostí",
-      sk: "Podpora imunity a kostí",
-      en: "Immune and bone support",
-      "en-US": "Immune and bone support",
-      de: "Immun- und Knochenunterstützung",
-      pl: "Wsparcie odporności i kości",
+      cs: "Zimní reflex — když slunce nestačí a kosti i nálada to poznají.",
+      sk: "Zimný reflex — keď slnko nestačí.",
+      en: "The winter reflex — when the sun is not enough.",
+      "en-US": "The winter reflex — when the sun is not enough.",
+      de: "Der Winterreflex — wenn die Sonne nicht reicht.",
+      fr: "Le réflexe d’hiver — quand le soleil ne suffit pas.",
+      it: "Il riflesso d’inverno — quando il sole non basta.",
+      es: "El reflejo de invierno — cuando el sol no basta.",
+      pl: "Zimowy odruch — gdy słońca za mało.",
+      ja: "冬の反射。太陽だけでは足りないとき。",
     },
     category: "supplements",
     affiliateUrl: {
-      cs: "https://medscopeglobal.com/go/d3-cz",
-      sk: "https://medscopeglobal.com/go/d3-cz",
-      en: "https://medscopeglobal.com/go/d3-en",
-      "en-US": "https://medscopeglobal.com/go/d3-us",
-      de: "https://medscopeglobal.com/go/d3-de",
-      pl: "https://medscopeglobal.com/go/d3-pl",
+      cs: "/go/vitamin-d3-k2?locale=cs",
+      sk: "/go/vitamin-d3-k2?locale=sk",
+      en: "/go/vitamin-d3-k2?locale=en",
+      "en-US": "/go/vitamin-d3-k2?locale=en-US",
+      de: "/go/vitamin-d3-k2?locale=de",
+      fr: "/go/vitamin-d3-k2?locale=fr",
+      it: "/go/vitamin-d3-k2?locale=it",
+      es: "/go/vitamin-d3-k2?locale=es",
+      pl: "/go/vitamin-d3-k2?locale=pl",
+      ja: "/go/vitamin-d3-k2?locale=ja",
     },
-    imageUrl: "/assets/affiliate/magnesium.svg",
+    imageUrl: "/assets/affiliate/supplement.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "creatine-monohydrate",
+    name: { cs: "Kreatin monohydrát", en: "Creatine monohydrate", de: "Kreatin-Monohydrat" },
+    description: {
+      cs: "Síla a svaly — to, co čtenáři hledají u textů o pohybu a stárnutí.",
+      en: "Strength and muscle — what readers look up after pieces on movement and aging.",
+      de: "Kraft und Muskel — wonach Leser nach Texten zu Bewegung und Altern greifen.",
+    },
+    category: "supplements",
+    affiliateUrl: {
+      cs: "/go/creatine-monohydrate?locale=cs",
+      sk: "/go/creatine-monohydrate?locale=sk",
+      en: "/go/creatine-monohydrate?locale=en",
+      de: "/go/creatine-monohydrate?locale=de",
+      fr: "/go/creatine-monohydrate?locale=fr",
+      it: "/go/creatine-monohydrate?locale=it",
+      es: "/go/creatine-monohydrate?locale=es",
+      pl: "/go/creatine-monohydrate?locale=pl",
+      ja: "/go/creatine-monohydrate?locale=ja",
+    },
+    imageUrl: "/assets/affiliate/powder.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "collagen-peptides",
+    name: { cs: "Kolagenové peptidy", en: "Collagen peptides", de: "Kollagenpeptide" },
+    description: {
+      cs: "Kůže a klouby — běžné hledání po textech o stárnutí pleti.",
+      en: "Skin and joints — a common next search after aging-skin pieces.",
+      de: "Haut und Gelenke — oft gesucht nach Texten zum Altern der Haut.",
+    },
+    category: "supplements",
+    affiliateUrl: {
+      cs: "/go/collagen-peptides?locale=cs",
+      sk: "/go/collagen-peptides?locale=sk",
+      en: "/go/collagen-peptides?locale=en",
+      de: "/go/collagen-peptides?locale=de",
+      fr: "/go/collagen-peptides?locale=fr",
+      it: "/go/collagen-peptides?locale=it",
+      es: "/go/collagen-peptides?locale=es",
+      pl: "/go/collagen-peptides?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/powder.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "electrolyte-powder",
+    name: { cs: "Elektrolyty", en: "Electrolyte powder", de: "Elektrolyt-Pulver" },
+    description: {
+      cs: "Hydratace po výkonu nebo v horku — bez sladkého nápoje z automatu.",
+      en: "Hydration after effort or heat — not a vending-machine drink.",
+      de: "Hydration nach Belastung oder Hitze.",
+    },
+    category: "fitness",
+    affiliateUrl: {
+      cs: "/go/electrolyte-powder?locale=cs",
+      sk: "/go/electrolyte-powder?locale=sk",
+      en: "/go/electrolyte-powder?locale=en",
+      de: "/go/electrolyte-powder?locale=de",
+      fr: "/go/electrolyte-powder?locale=fr",
+      it: "/go/electrolyte-powder?locale=it",
+      es: "/go/electrolyte-powder?locale=es",
+      pl: "/go/electrolyte-powder?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/powder.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "sleep-mask",
+    name: { cs: "Maska na spaní", en: "Sleep mask", de: "Schlafmaske" },
+    description: {
+      cs: "Tma, když město nespí — levný doplněk k textům o spánku.",
+      en: "Darkness when the city will not sleep.",
+      de: "Dunkelheit, wenn die Stadt nicht schläft.",
+    },
+    category: "sleep",
+    affiliateUrl: {
+      cs: "/go/sleep-mask?locale=cs",
+      sk: "/go/sleep-mask?locale=sk",
+      en: "/go/sleep-mask?locale=en",
+      de: "/go/sleep-mask?locale=de",
+      fr: "/go/sleep-mask?locale=fr",
+      it: "/go/sleep-mask?locale=it",
+      es: "/go/sleep-mask?locale=es",
+      pl: "/go/sleep-mask?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/sleep-tracker.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "blood-pressure-monitor",
+    name: { cs: "Tlakoměr na paži", en: "Upper-arm blood pressure monitor", de: "Oberarm-Blutdruckmessgerät" },
+    description: {
+      cs: "Vidět vlastní čísla doma — u textů o srdci a tlaku.",
+      en: "See your own numbers at home — after pieces on the heart.",
+      de: "Die eigenen Zahlen zu Hause sehen.",
+    },
+    category: "lab-tests",
+    affiliateUrl: {
+      cs: "/go/blood-pressure-monitor?locale=cs",
+      sk: "/go/blood-pressure-monitor?locale=sk",
+      en: "/go/blood-pressure-monitor?locale=en",
+      de: "/go/blood-pressure-monitor?locale=de",
+      fr: "/go/blood-pressure-monitor?locale=fr",
+      it: "/go/blood-pressure-monitor?locale=it",
+      es: "/go/blood-pressure-monitor?locale=es",
+      pl: "/go/blood-pressure-monitor?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/bp.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "resistance-bands",
+    name: { cs: "Odporové gumy", en: "Resistance bands", de: "Fitnessbänder" },
+    description: {
+      cs: "Pohyb doma — bez posilovny, u textů o sarkopenii a stárnutí.",
+      en: "Home movement — after pieces on muscle and aging.",
+      de: "Bewegung zu Hause — nach Texten zu Muskel und Altern.",
+    },
+    category: "fitness",
+    affiliateUrl: {
+      cs: "/go/resistance-bands?locale=cs",
+      sk: "/go/resistance-bands?locale=sk",
+      en: "/go/resistance-bands?locale=en",
+      de: "/go/resistance-bands?locale=de",
+      fr: "/go/resistance-bands?locale=fr",
+      it: "/go/resistance-bands?locale=it",
+      es: "/go/resistance-bands?locale=es",
+      pl: "/go/resistance-bands?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/wellness.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "protein-powder",
+    name: { cs: "Protein", en: "Protein powder", de: "Proteinpulver" },
+    description: {
+      cs: "Po pohybu — to, co čtenáři hledají u textů o svalu a regeneraci.",
+      en: "After movement — what readers look up after pieces on muscle.",
+      de: "Nach der Bewegung — wonach Leser nach Texten zum Muskel greifen.",
+    },
+    category: "fitness",
+    affiliateUrl: {
+      cs: "/go/protein-powder?locale=cs",
+      sk: "/go/protein-powder?locale=sk",
+      en: "/go/protein-powder?locale=en",
+      de: "/go/protein-powder?locale=de",
+      fr: "/go/protein-powder?locale=fr",
+      it: "/go/protein-powder?locale=it",
+      es: "/go/protein-powder?locale=es",
+      pl: "/go/protein-powder?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/powder.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "probiotic",
+    name: { cs: "Probiotika", en: "Probiotic", de: "Probiotika" },
+    description: {
+      cs: "Střevo a každodenní rytmus — bez slibů zázraku.",
+      en: "Gut rhythm — no miracle claims.",
+      de: "Darmrhythmus — ohne Wunderversprechen.",
+    },
+    category: "supplements",
+    affiliateUrl: {
+      cs: "/go/probiotic?locale=cs",
+      en: "/go/probiotic?locale=en",
+      de: "/go/probiotic?locale=de",
+      fr: "/go/probiotic?locale=fr",
+      it: "/go/probiotic?locale=it",
+      es: "/go/probiotic?locale=es",
+      pl: "/go/probiotic?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/supplement.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "zinc",
+    name: { cs: "Zinek", en: "Zinc", de: "Zink" },
+    description: {
+      cs: "Zimní doplněk, který lidé hledají vedle D3.",
+      en: "The winter mineral people look up next to D3.",
+      de: "Das Wintermineral neben D3.",
+    },
+    category: "supplements",
+    affiliateUrl: {
+      cs: "/go/zinc?locale=cs",
+      en: "/go/zinc?locale=en",
+      de: "/go/zinc?locale=de",
+      fr: "/go/zinc?locale=fr",
+      it: "/go/zinc?locale=it",
+      es: "/go/zinc?locale=es",
+      pl: "/go/zinc?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/supplement.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "foam-roller",
+    name: { cs: "Foam roller", en: "Foam roller", de: "Faszienrolle" },
+    description: {
+      cs: "Po výkonu — uvolnění, ne diagnostika.",
+      en: "After effort — release, not a diagnosis.",
+      de: "Nach der Belastung — lösen, nicht diagnostizieren.",
+    },
+    category: "fitness",
+    affiliateUrl: {
+      cs: "/go/foam-roller?locale=cs",
+      en: "/go/foam-roller?locale=en",
+      de: "/go/foam-roller?locale=de",
+      fr: "/go/foam-roller?locale=fr",
+      it: "/go/foam-roller?locale=it",
+      es: "/go/foam-roller?locale=es",
+      pl: "/go/foam-roller?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/wellness.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "yoga-mat",
+    name: { cs: "Podložka na jógu", en: "Yoga mat", de: "Yogamatte" },
+    description: {
+      cs: "Místo na podlaze — u textů o pohybu a spánku.",
+      en: "A place on the floor — after pieces on movement and sleep.",
+      de: "Ein Platz auf dem Boden — nach Texten zu Bewegung und Schlaf.",
+    },
+    category: "fitness",
+    affiliateUrl: {
+      cs: "/go/yoga-mat?locale=cs",
+      en: "/go/yoga-mat?locale=en",
+      de: "/go/yoga-mat?locale=de",
+      fr: "/go/yoga-mat?locale=fr",
+      it: "/go/yoga-mat?locale=it",
+      es: "/go/yoga-mat?locale=es",
+      pl: "/go/yoga-mat?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/wellness.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "glass-water-bottle",
+    name: { cs: "Skleněná lahev", en: "Glass water bottle", de: "Glasflasche" },
+    description: {
+      cs: "Voda po ruce — tichý návyk, ne kampaň.",
+      en: "Water at hand — a quiet habit, not a campaign.",
+      de: "Wasser greifbar — eine stille Gewohnheit.",
+    },
+    category: "longevity",
+    affiliateUrl: {
+      cs: "/go/glass-water-bottle?locale=cs",
+      en: "/go/glass-water-bottle?locale=en",
+      de: "/go/glass-water-bottle?locale=de",
+      fr: "/go/glass-water-bottle?locale=fr",
+      it: "/go/glass-water-bottle?locale=it",
+      es: "/go/glass-water-bottle?locale=es",
+      pl: "/go/glass-water-bottle?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/bottle.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "blue-light-glasses",
+    name: { cs: "Brýle proti modrému světlu", en: "Blue-light glasses", de: "Blaulichtfilter-Brille" },
+    description: {
+      cs: "Večer u obrazovky — když chcete ještě usnout.",
+      en: "Evening screens — when you still want to sleep.",
+      de: "Abends am Bildschirm — wenn der Schlaf noch kommen soll.",
+    },
+    category: "sleep",
+    affiliateUrl: {
+      cs: "/go/blue-light-glasses?locale=cs",
+      en: "/go/blue-light-glasses?locale=en",
+      de: "/go/blue-light-glasses?locale=de",
+      fr: "/go/blue-light-glasses?locale=fr",
+      it: "/go/blue-light-glasses?locale=it",
+      es: "/go/blue-light-glasses?locale=es",
+      pl: "/go/blue-light-glasses?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/glasses.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "weighted-blanket",
+    name: { cs: "Zátěžová deka", en: "Weighted blanket", de: "Gewichtsdecke" },
+    description: {
+      cs: "Tíha, která večer zklidní — u textů o spánku.",
+      en: "Weight that settles the evening — after pieces on sleep.",
+      de: "Gewicht, das den Abend beruhigt.",
+    },
+    category: "sleep",
+    affiliateUrl: {
+      cs: "/go/weighted-blanket?locale=cs",
+      en: "/go/weighted-blanket?locale=en",
+      de: "/go/weighted-blanket?locale=de",
+      fr: "/go/weighted-blanket?locale=fr",
+      it: "/go/weighted-blanket?locale=it",
+      es: "/go/weighted-blanket?locale=es",
+      pl: "/go/weighted-blanket?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/blanket.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "coq10",
+    name: { cs: "Koenzym Q10", en: "CoQ10", de: "Coenzym Q10" },
+    description: {
+      cs: "U textů o srdci a energii — bez zázračných slibů.",
+      en: "After pieces on the heart and energy — no miracle claims.",
+      de: "Nach Texten zu Herz und Energie — ohne Wunder.",
+    },
+    category: "supplements",
+    affiliateUrl: {
+      cs: "/go/coq10?locale=cs",
+      en: "/go/coq10?locale=en",
+      de: "/go/coq10?locale=de",
+      fr: "/go/coq10?locale=fr",
+      it: "/go/coq10?locale=it",
+      es: "/go/coq10?locale=es",
+      pl: "/go/coq10?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/coq10.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "grip-strengthener",
+    name: { cs: "Posilovač stisku", en: "Grip strengthener", de: "Handtrainer" },
+    description: {
+      cs: "Síla úchopu — u textů o sarkopenii a stárnutí.",
+      en: "Grip strength — after pieces on muscle and aging.",
+      de: "Griffkraft — nach Texten zu Muskel und Altern.",
+    },
+    category: "fitness",
+    affiliateUrl: {
+      cs: "/go/grip-strengthener?locale=cs",
+      en: "/go/grip-strengthener?locale=en",
+      de: "/go/grip-strengthener?locale=de",
+      fr: "/go/grip-strengthener?locale=fr",
+      it: "/go/grip-strengthener?locale=it",
+      es: "/go/grip-strengthener?locale=es",
+      pl: "/go/grip-strengthener?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/grip.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "sunrise-alarm",
+    name: { cs: "Světelný budík", en: "Sunrise alarm", de: "Lichtwecker" },
+    description: {
+      cs: "Ráno bez sirény — u textů o cirkadiánním rytmu.",
+      en: "A morning without a siren — after pieces on circadian rhythm.",
+      de: "Morgen ohne Sirene — nach Texten zum circadianen Rhythmus.",
+    },
+    category: "sleep",
+    affiliateUrl: {
+      cs: "/go/sunrise-alarm?locale=cs",
+      en: "/go/sunrise-alarm?locale=en",
+      de: "/go/sunrise-alarm?locale=de",
+      fr: "/go/sunrise-alarm?locale=fr",
+      it: "/go/sunrise-alarm?locale=it",
+      es: "/go/sunrise-alarm?locale=es",
+      pl: "/go/sunrise-alarm?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/alarm.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "walking-pad",
+    name: { cs: "Walking pad", en: "Walking pad", de: "Walking Pad" },
+    description: {
+      cs: "Kroky při práci — u textů o pohybu a sedavém dni.",
+      en: "Steps while you work — after pieces on movement.",
+      de: "Schritte bei der Arbeit — nach Texten zur Bewegung.",
+    },
+    category: "fitness",
+    affiliateUrl: {
+      cs: "/go/walking-pad?locale=cs",
+      en: "/go/walking-pad?locale=en",
+      de: "/go/walking-pad?locale=de",
+      fr: "/go/walking-pad?locale=fr",
+      it: "/go/walking-pad?locale=it",
+      es: "/go/walking-pad?locale=es",
+      pl: "/go/walking-pad?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/walk.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "tart-cherry",
+    name: { cs: "Višňový extrakt", en: "Tart cherry", de: "Sauerkirsche" },
+    description: {
+      cs: "Večerní hledání u textů o spánku — bez zázraku.",
+      en: "An evening search after pieces on sleep.",
+      de: "Abends gesucht nach Texten zum Schlaf.",
+    },
+    category: "supplements",
+    affiliateUrl: {
+      cs: "/go/tart-cherry?locale=cs",
+      en: "/go/tart-cherry?locale=en",
+      de: "/go/tart-cherry?locale=de",
+      fr: "/go/tart-cherry?locale=fr",
+      it: "/go/tart-cherry?locale=it",
+      es: "/go/tart-cherry?locale=es",
+      pl: "/go/tart-cherry?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/cherry.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "kitchen-scale",
+    name: { cs: "Kuchyňská váha", en: "Kitchen scale", de: "Küchenwaage" },
+    description: {
+      cs: "Vidět porci — u textů o výživě a bílkovinách.",
+      en: "See the portion — after pieces on food and protein.",
+      de: "Die Portion sehen — nach Texten zu Ernährung.",
+    },
+    category: "longevity",
+    affiliateUrl: {
+      cs: "/go/kitchen-scale?locale=cs",
+      en: "/go/kitchen-scale?locale=en",
+      de: "/go/kitchen-scale?locale=de",
+      fr: "/go/kitchen-scale?locale=fr",
+      it: "/go/kitchen-scale?locale=it",
+      es: "/go/kitchen-scale?locale=es",
+      pl: "/go/kitchen-scale?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/scale.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "mineral-spf",
+    name: { cs: "Minerální SPF 50", en: "Mineral SPF 50", de: "Mineralisches SPF 50", fr: "SPF 50 minéral" },
+    description: {
+      cs: "Fotoprotekce — u textů o kůži, stárnutí a slunci. Není léčivý přípravek.",
+      en: "Photoprotection — after pieces on skin, ageing and sun. Not a medicine.",
+      de: "Lichtschutz — nach Texten zu Haut, Altern und Sonne. Kein Arzneimittel.",
+    },
+    category: "skincare",
+    affiliateUrl: {
+      cs: "/go/mineral-spf?locale=cs",
+      en: "/go/mineral-spf?locale=en",
+      de: "/go/mineral-spf?locale=de",
+      fr: "/go/mineral-spf?locale=fr",
+      it: "/go/mineral-spf?locale=it",
+      es: "/go/mineral-spf?locale=es",
+      pl: "/go/mineral-spf?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/skincare.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "retinoid-serum",
+    name: { cs: "Retinol sérum", en: "Retinol serum", de: "Retinol-Serum", fr: "Sérum rétinol" },
+    description: {
+      cs: "Dermokosmetika — u textů o obnově pleti. Není lékařský předpis.",
+      en: "Dermocosmetic — after pieces on skin renewal. Not a prescription.",
+      de: "Dermokosmetik — nach Texten zur Hauterneuerung. Kein Rezept.",
+    },
+    category: "skincare",
+    affiliateUrl: {
+      cs: "/go/retinoid-serum?locale=cs",
+      en: "/go/retinoid-serum?locale=en",
+      de: "/go/retinoid-serum?locale=de",
+      fr: "/go/retinoid-serum?locale=fr",
+      it: "/go/retinoid-serum?locale=it",
+      es: "/go/retinoid-serum?locale=es",
+      pl: "/go/retinoid-serum?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/skincare.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "vitamin-c-serum",
+    name: { cs: "Sérum vitamin C", en: "Vitamin C serum", de: "Vitamin-C-Serum", fr: "Sérum vitamine C" },
+    description: {
+      cs: "Antioxidant v péči o pleť — u textů o fotostárnutí.",
+      en: "Antioxidant skincare — after pieces on photoageing.",
+      de: "Antioxidative Hautpflege — nach Texten zur Lichtalterung.",
+    },
+    category: "skincare",
+    affiliateUrl: {
+      cs: "/go/vitamin-c-serum?locale=cs",
+      en: "/go/vitamin-c-serum?locale=en",
+      de: "/go/vitamin-c-serum?locale=de",
+      fr: "/go/vitamin-c-serum?locale=fr",
+      it: "/go/vitamin-c-serum?locale=it",
+      es: "/go/vitamin-c-serum?locale=es",
+      pl: "/go/vitamin-c-serum?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/skincare.svg",
+    regions: ["EU", "USA", "GLOBAL"],
+  },
+  {
+    id: "ceramide-moisturizer",
+    name: { cs: "Krém s ceramidy", en: "Ceramide moisturizer", de: "Ceramide-Creme", fr: "Crème céramides" },
+    description: {
+      cs: "Bariéra kůže — u textů o suchosti a citlivé pleti.",
+      en: "Skin barrier — after pieces on dryness and sensitive skin.",
+      de: "Hautbarriere — nach Texten zu Trockenheit und empfindlicher Haut.",
+    },
+    category: "skincare",
+    affiliateUrl: {
+      cs: "/go/ceramide-moisturizer?locale=cs",
+      en: "/go/ceramide-moisturizer?locale=en",
+      de: "/go/ceramide-moisturizer?locale=de",
+      fr: "/go/ceramide-moisturizer?locale=fr",
+      it: "/go/ceramide-moisturizer?locale=it",
+      es: "/go/ceramide-moisturizer?locale=es",
+      pl: "/go/ceramide-moisturizer?locale=pl",
+    },
+    imageUrl: "/assets/affiliate/skincare.svg",
     regions: ["EU", "USA", "GLOBAL"],
   },
 ];
 
-/** Outbound affiliate destinations keyed by /go/[slug] */
+/**
+ * Legacy static map — kept for smoke tests and operators.
+ * Runtime redirects go through `resolveAffiliateDestination` (locale + region).
+ */
 export const AFFILIATE_REDIRECT_DESTINATIONS: Record<string, string> = {
-  "mg-cz": "https://www.heureka.cz/?h%5Bfraze%5D=magnesium+glycinát",
-  "mg-en": "https://www.amazon.co.uk/s?k=magnesium+glycinate",
-  "mg-us": "https://www.amazon.com/s?k=magnesium+glycinate",
-  "mg-de": "https://www.amazon.de/s?k=magnesium+glycinat",
-  "mg-pl": "https://www.amazon.pl/s?k=magnez+bisglicynian",
-  /** Friendly aliases (product id / marketing short links) */
-  magnesium: "https://www.heureka.cz/?h%5Bfraze%5D=magnesium+glycinát",
-  "magnesium-glycinate": "https://www.heureka.cz/?h%5Bfraze%5D=magnesium+glycinát",
-  "omega-cz": "https://www.heureka.cz/?h%5Bfraze%5D=omega+3+test",
-  "omega-en": "https://www.amazon.co.uk/s?k=omega+3+index+test",
-  "omega-us": "https://www.amazon.com/s?k=omega+3+index+test",
-  "omega-de": "https://www.amazon.de/s?k=omega+3+index+test",
-  "omega-pl": "https://www.amazon.pl/s?k=omega+3+test",
-  omega: "https://www.heureka.cz/?h%5Bfraze%5D=omega+3+test",
-  "omega-3-test": "https://www.heureka.cz/?h%5Bfraze%5D=omega+3+test",
-  "sleep-cz": "https://www.heureka.cz/?h%5Bfraze%5D=sleep+tracker",
-  "sleep-en": "https://www.amazon.co.uk/s?k=sleep+tracker+hrv",
-  "sleep-us": "https://www.amazon.com/s?k=oura+ring+whoop",
-  "sleep-de": "https://www.amazon.de/s?k=sleep+tracker+hrv",
-  "sleep-pl": "https://www.amazon.pl/s?k=tracker+snu",
-  sleep: "https://www.heureka.cz/?h%5Bfraze%5D=sleep+tracker",
-  "sleep-tracker": "https://www.heureka.cz/?h%5Bfraze%5D=sleep+tracker",
-  "d3-cz": "https://www.heureka.cz/?h%5Bfraze%5D=vitamin+d3+k2",
-  "d3-en": "https://www.amazon.co.uk/s?k=vitamin+d3+k2",
-  "d3-us": "https://www.amazon.com/s?k=vitamin+d3+k2",
-  "d3-de": "https://www.amazon.de/s?k=vitamin+d3+k2",
-  "d3-pl": "https://www.amazon.pl/s?k=witamina+d3+k2",
-  "vitamin-d3-k2": "https://www.heureka.cz/?h%5Bfraze%5D=vitamin+d3+k2",
-  d3: "https://www.heureka.cz/?h%5Bfraze%5D=vitamin+d3+k2",
+  "mg-cz": "https://www.heureka.cz/?h%5Bfraze%5D=magnesium%20glycin%C3%A1t",
+  "mg-sk": "https://www.heureka.sk/?h%5Bfraze%5D=hor%C4%8D%C3%ADk%20glycin%C3%A1t",
+  "mg-en": "https://www.amazon.co.uk/s?k=magnesium%20glycinate",
+  "mg-us": "https://www.amazon.com/s?k=magnesium%20glycinate",
+  "mg-de": "https://www.amazon.de/s?k=Magnesiumglycinat",
+  "mg-fr": "https://www.amazon.fr/s?k=magn%C3%A9sium%20glycinate",
+  "mg-pl": "https://www.amazon.pl/s?k=magnez%20bisglicynian",
 };
 
-export function getAffiliateRedirectDestination(slug: string): string | null {
-  const key = slug.trim().toLowerCase();
-  return AFFILIATE_REDIRECT_DESTINATIONS[key] ?? null;
+export function getAffiliateRedirectDestination(
+  slug: string,
+  ctx: AffiliateContext = {}
+): string | null {
+  return resolveAffiliateDestination(slug, ctx);
 }
 
 export const HIGH_CTR_PLACEMENTS: AdPlacement[] = ["below-title", "in-content", "sticky"];
@@ -272,7 +837,7 @@ export type AdInventoryEntry = {
 
 /**
  * Canonical ad placements — wire via `GlobalAdSlot`.
- * Empty in production until `NEXT_PUBLIC_ADS_ENABLED` + provider keys are set.
+ * Auto ads run from the owner pub id; manual <ins> only when a numeric slot exists.
  */
 export const AD_INVENTORY: AdInventoryEntry[] = [
   {
@@ -284,6 +849,16 @@ export const AD_INVENTORY: AdInventoryEntry[] = [
     format: "display",
     incomePriority: 1,
     notes: "Below magazine feed, above apps — high viewability, not in hero.",
+  },
+  {
+    id: "verejnost-listing",
+    surface: "homepage",
+    routes: ["/verejnost/clanky", "/{locale}/verejnost/clanky"],
+    placement: "in-content",
+    sizes: ["728x90", "300x250", "responsive"],
+    format: "display",
+    incomePriority: 1,
+    notes: "Public magazine listing only — never /lekari or /studenti.",
   },
   {
     id: "home-footer",
@@ -363,7 +938,7 @@ export const AD_INVENTORY: AdInventoryEntry[] = [
     sizes: ["728x90", "300x250"],
     format: "display",
     incomePriority: 3,
-    notes: "Physician landing — lighter inventory; prefer B2B later.",
+    notes: "Physician landing — no AdSense; keep affiliate-free.",
   },
 ];
 
@@ -379,13 +954,13 @@ export type ClientAdConfig = {
 
 /** Read public ad env (inlined at build for client components). */
 export function getClientAdConfig(): ClientAdConfig {
-  const adsenseClientId = (process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID ?? "").trim() || null;
+  const adsenseClientId = isAdSenseEnabled() ? resolveAdSenseClientId() : null;
   const mediavineSiteId = (process.env.NEXT_PUBLIC_MEDIAVINE_SITE_ID ?? "").trim() || null;
   const ezoicSiteId = (process.env.NEXT_PUBLIC_EZOIC_SITE_ID ?? "").trim() || null;
   const hasProvider = Boolean(adsenseClientId || mediavineSiteId || ezoicSiteId);
   const flag = (process.env.NEXT_PUBLIC_ADS_ENABLED ?? "").trim().toLowerCase();
-  const enabled =
-    (flag === "1" || flag === "true" || flag === "yes") && hasProvider;
+  const forcedOff = flag === "0" || flag === "false" || flag === "off" || flag === "no";
+  const enabled = !forcedOff && hasProvider;
   const showPlaceholders =
     (process.env.NEXT_PUBLIC_ADS_SHOW_PLACEHOLDERS ?? "").trim().toLowerCase() === "1" ||
     (process.env.NEXT_PUBLIC_ADS_SHOW_PLACEHOLDERS ?? "").trim().toLowerCase() === "true";
@@ -427,12 +1002,14 @@ export const ARTICLE_TIP_TIERS: Record<
   { amounts: number[]; currency: string; symbol: string; minAmount: number }
 > = {
   cs: { amounts: [1500, 2000, 5000], currency: "czk", symbol: "Kč", minAmount: 1500 },
-  sk: { amounts: [10, 25, 50, 100, 250], currency: "eur", symbol: "€", minAmount: 10 },
-  pl: { amounts: [100, 250, 500, 1000, 2500], currency: "pln", symbol: "zł", minAmount: 100 },
-  de: { amounts: [10, 25, 50, 100, 250], currency: "eur", symbol: "€", minAmount: 10 },
-  fr: { amounts: [10, 25, 50, 100, 250], currency: "eur", symbol: "€", minAmount: 10 },
-  it: { amounts: [10, 25, 50, 100, 250], currency: "eur", symbol: "€", minAmount: 10 },
-  es: { amounts: [10, 25, 50, 100, 250], currency: "eur", symbol: "€", minAmount: 10 },
+  sk: { amounts: [200, 500, 1000], currency: "eur", symbol: "€", minAmount: 50 },
+  pl: { amounts: [1000, 2500, 4900], currency: "pln", symbol: "zł", minAmount: 100 },
+  de: { amounts: [200, 500, 1000], currency: "eur", symbol: "€", minAmount: 50 },
+  fr: { amounts: [200, 500, 1000], currency: "eur", symbol: "€", minAmount: 50 },
+  it: { amounts: [200, 500, 1000], currency: "eur", symbol: "€", minAmount: 50 },
+  es: { amounts: [200, 500, 1000], currency: "eur", symbol: "€", minAmount: 50 },
+  pt: { amounts: [200, 500, 1000], currency: "eur", symbol: "€", minAmount: 50 },
+  "pt-BR": { amounts: [500, 990, 1990], currency: "brl", symbol: "R$", minAmount: 500 },
   ro: { amounts: [50, 125, 250, 500, 1250], currency: "ron", symbol: "lei", minAmount: 50 },
   hu: { amounts: [8000, 20000, 40000, 80000, 200000], currency: "huf", symbol: "Ft", minAmount: 8000 },
   ru: { amounts: [1000, 2500, 5000, 10000, 25000], currency: "rub", symbol: "₽", minAmount: 1000 },
@@ -443,23 +1020,37 @@ export const ARTICLE_TIP_TIERS: Record<
   ko: { amounts: [30000, 60000, 120000, 240000, 600000], currency: "krw", symbol: "₩", minAmount: 30000 },
   vi: { amounts: [500000, 1250000, 2500000, 5000000, 12500000], currency: "vnd", symbol: "₫", minAmount: 500000 },
   id: { amounts: [300000, 750000, 1500000, 3000000, 7500000], currency: "idr", symbol: "Rp", minAmount: 300000 },
-  en: { amounts: [10, 25, 50, 100, 250], currency: "usd", symbol: "$", minAmount: 10 },
-  "en-US": { amounts: [10, 25, 50, 100, 250], currency: "usd", symbol: "$", minAmount: 10 },
+  en: { amounts: [200, 500, 1000], currency: "usd", symbol: "$", minAmount: 50 },
+  "en-US": { amounts: [200, 500, 1000], currency: "usd", symbol: "$", minAmount: 50 },
+  "en-UK": { amounts: [200, 500, 1000], currency: "gbp", symbol: "£", minAmount: 50 },
 };
+
+const ZERO_DECIMAL_CCY = new Set(["jpy", "krw", "vnd", "idr", "huf"]);
 
 export function formatMinorAmount(
   amountMinor: number,
   locale: GlobalLocaleCode,
-  symbol?: string
+  symbol?: string,
+  currency?: string
 ): string {
   const tier = ARTICLE_TIP_TIERS[locale] ?? ARTICLE_TIP_TIERS.en;
   const sym = symbol ?? tier.symbol;
+  const ccy = (currency ?? tier.currency).toLowerCase();
   const zeroDecimal =
-    locale === "ja" || locale === "ko" || locale === "vi" || locale === "id" || locale === "hu";
+    ZERO_DECIMAL_CCY.has(ccy) ||
+    locale === "ja" ||
+    locale === "ko" ||
+    locale === "vi" ||
+    locale === "id" ||
+    locale === "hu";
   const major = zeroDecimal ? amountMinor : amountMinor / 100;
   return `${major} ${sym}`;
 }
 
-export function formatTipAmount(amountMinor: number, locale: GlobalLocaleCode): string {
-  return formatMinorAmount(amountMinor, locale);
+export function formatTipAmount(
+  amountMinor: number,
+  locale: GlobalLocaleCode,
+  symbol?: string
+): string {
+  return formatMinorAmount(amountMinor, locale, symbol);
 }

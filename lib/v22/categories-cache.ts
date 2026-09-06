@@ -2,7 +2,6 @@ import { unstable_cache } from "next/cache";
 import { MEDICAL_CATEGORIES } from "@/lib/config/categories-seed";
 import { localizeCategories } from "@/lib/i18n/category-label";
 import type { LocaleCode } from "@/lib/i18n/config";
-import { ensureMedicalCategories } from "@/lib/setup/ensure-medical-data";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { buildV20CategoryList } from "@/lib/v20/categories";
 import { V20_ARCHIVE_CUTOFF } from "@/lib/v20/content-rules";
@@ -22,8 +21,6 @@ async function loadCategoriesRaw(): Promise<Category[]> {
       updated_at: new Date().toISOString(),
     })) as Category[];
   }
-
-  await ensureMedicalCategories();
 
   const { data, error } = await supabase
     .from("categories")
@@ -99,6 +96,31 @@ const getPublicHeaderCategoriesCached = unstable_cache(
   { revalidate: 120, tags: ["medscope-ui-v22.4", "v22-content", "categories"] }
 );
 
+function seedHeaderCategories(locale: LocaleCode): Category[] {
+  const isCs = locale === "cs" || locale.toLowerCase().startsWith("cs");
+  return MEDICAL_CATEGORIES.map((c) => ({
+    id: `seed-${c.slug}`,
+    name: isCs ? c.nameCs : c.name,
+    slug: c.slug,
+    description: null,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  })) as Category[];
+}
+
 export async function getPublicHeaderCategories(locale: LocaleCode = "cs") {
-  return getPublicHeaderCategoriesCached(locale);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      getPublicHeaderCategoriesCached(locale),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("header-categories-timeout")), 2_000);
+      }),
+    ]);
+  } catch (error) {
+    console.error("getPublicHeaderCategories", error);
+    return seedHeaderCategories(locale);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }

@@ -1,5 +1,5 @@
 import {
-  publicEditorialByline,
+  listingByline,
   type ArticleForEditorialUnits,
   type EditorialLocale,
 } from "@/lib/editorial/units";
@@ -19,7 +19,7 @@ export function EditorialAttribution({
 }: Props) {
   if (!article) return null;
 
-  const primary = publicEditorialByline(locale);
+  const primary = listingByline(article, locale);
 
   if (variant === "compact") {
     return <span className={className}>{primary}</span>;

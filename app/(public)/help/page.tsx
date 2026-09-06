@@ -2,54 +2,45 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
+import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getLegalChromeCopy } from "@/lib/i18n/legal-chrome-copy";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
   return await buildLocalizedPageMetadata({
-  title: "Nápověda",
-  description:
-    "Časté dotazy k MedScopeGlobal — účet, předplatné, obsah, AI asistent a technická podpora.",
-  path: "/help",
-});
+    title: copy.helpMetaTitle,
+    description: copy.helpMetaDescription,
+    path: "/help",
+    locale,
+  });
 }
 
-const FAQ = [
-  {
-    q: "Jak se zaregistruji?",
-    a: "Registraci spustíte na stránce Registrace. Po potvrzení e-mailu získáte přístup k veřejnému obsahu.",
-  },
-  {
-    q: "Jak funguje předplatné?",
-    a: "Tarify a platby najdete v sekci Předplatné. Předplatné spravujete ve svém účtu; platby zpracovává Stripe.",
-  },
-  {
-    q: "Mohu používat obsah v praxi?",
-    a: "Obsah slouží ke vzdělávání a informování. Nepředstavuje individuální lékařskou radu ani diagnózu.",
-  },
-  {
-    q: "Jak kontaktovat podporu?",
-    a: "Napište na info@medscopeglobal.com, volejte +420 736 532 952, nebo využijte kontaktní formulář.",
-  },
-];
+export default async function HelpPage() {
+  const locale = await getServerLocale();
+  const copy = getLegalChromeCopy(locale);
+  const footer = getSurfaceCopy(locale).footer;
 
-export default function HelpPage() {
   return (
     <ModulePageShell
-      eyebrow="Nápověda"
-      title="Jak vám můžeme pomoci"
-      description="Odpovědi na nejčastější dotazy k účtu, předplatnému a obsahu MedScopeGlobal."
-      ctaHref="/kontakt"
-      ctaLabel="Kontaktovat podporu"
+      eyebrow={copy.helpEyebrow}
+      title={copy.helpTitle}
+      description={copy.helpLead}
+      ctaHref={localizePublicHref("/kontakt", locale)}
+      ctaLabel={copy.helpContactCta}
     >
       <nav className="mb-6 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground">
-          Domů
+        <Link href={localizePublicHref("/", locale)} className="hover:text-foreground">
+          {footer.home}
         </Link>
         <span className="mx-2">/</span>
-        <span>Nápověda</span>
+        <span>{copy.helpEyebrow}</span>
       </nav>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {FAQ.map((item) => (
+        {copy.faqs.map((item) => (
           <article
             key={item.q}
             className="rounded-2xl border border-[#dfeaf5] bg-white p-5 shadow-sm"
@@ -62,27 +53,27 @@ export default function HelpPage() {
 
       <section className="mt-10 rounded-xl border bg-[#f8fbff] p-5">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Užitečné odkazy
+          {copy.helpLinksTitle}
         </h2>
         <ul className="mt-3 flex flex-wrap gap-2 text-sm">
           <li>
-            <Link href="/predplatne" className="rounded-full border px-3 py-1 hover:bg-muted">
-              Předplatné
+            <Link href={localizePublicHref("/predplatne", locale)} className="rounded-full border px-3 py-1 hover:bg-muted">
+              {footer.subscribe}
             </Link>
           </li>
           <li>
             <Link href="/account" className="rounded-full border px-3 py-1 hover:bg-muted">
-              Můj účet
+              {copy.helpAccount}
             </Link>
           </li>
           <li>
-            <Link href="/privacy" className="rounded-full border px-3 py-1 hover:bg-muted">
-              Ochrana soukromí
+            <Link href={localizePublicHref("/privacy", locale)} className="rounded-full border px-3 py-1 hover:bg-muted">
+              {copy.privacyTitle}
             </Link>
           </li>
           <li>
-            <Link href="/terms" className="rounded-full border px-3 py-1 hover:bg-muted">
-              Obchodní podmínky
+            <Link href={localizePublicHref("/terms", locale)} className="rounded-full border px-3 py-1 hover:bg-muted">
+              {copy.termsTitle}
             </Link>
           </li>
         </ul>

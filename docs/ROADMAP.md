@@ -79,7 +79,7 @@ Project name: **MedScopeGlobal** (all branding, docs, and UI).
 | Automated RSS + PubMed ingestion | ✅ |
 | AI article synthesis (OpenAI) | ✅ with key |
 | Fallback without OpenAI | ✅ |
-| Cron every 6h (`vercel.json`) | ✅ |
+| Cron via GitHub Actions (`cloudflare-cron.yml`) | ✅ |
 | Admin `/admin/ingestion` | ✅ |
 | Per-category source config | ✅ `lib/ingestion/sources.ts` |
 | Study / quiz / chatbot generators | ⬜ |

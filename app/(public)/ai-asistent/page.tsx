@@ -1,49 +1,34 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getAiAssistantCopy } from "@/lib/i18n/ai-assistant-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const copy = getAiAssistantCopy(locale);
   return await buildLocalizedV20PageMetadata({
-    title: "AI asistenti | MedScopeGlobal",
-    description: "Veřejný, studentský a klinický AI asistent — tři specializované nástroje.",
+    title: copy.hubMetaTitle,
+    description: copy.hubMetaDescription,
     path: "/ai-asistent",
+    locale,
   });
 }
 
-const ASSISTANTS = [
-  {
-    href: "/ai-asistent/verejnost",
-    label: "AI pro veřejnost",
-    desc: "Prevence, symptomy, životní styl — srozumitelné odpovědi",
-    color: "from-emerald-600 to-teal-700",
-  },
-  {
-    href: "/ai-asistent/student",
-    label: "AI tutor pro studenty",
-    desc: "Anatomie, farmakologie, příprava na zkoušky",
-    color: "from-blue-600 to-indigo-700",
-  },
-  {
-    href: "/ai-asistent/lekar",
-    label: "Klinický AI pro lékaře",
-    desc: "Guidelines, diferenciální diagnostika, studie",
-    color: "from-[#021d33] to-[#005B96]",
-  },
-];
+export default async function AiAsistentHubPage() {
+  const locale = await getServerLocale();
+  const copy = getAiAssistantCopy(locale);
 
-export default function AiAsistentHubPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-      <h1 className="font-display text-4xl font-bold text-[#021d33]">AI asistenti MedScope</h1>
-      <p className="mt-3 text-muted-foreground">
-        Tři specializované asistenty napojené na AI Medical engine. Neposkytují diagnózu — slouží ke
-        vzdělávání.
-      </p>
+      <h1 className="font-display text-4xl font-bold text-[#021d33]">{copy.hubTitle}</h1>
+      <p className="mt-3 text-muted-foreground">{copy.hubLead}</p>
       <div className="mt-10 grid gap-4">
-        {ASSISTANTS.map((a) => (
+        {copy.cards.map((a) => (
           <Link
             key={a.href}
-            href={a.href}
+            href={localizePublicHref(a.href, locale)}
             className={`block rounded-2xl bg-gradient-to-r ${a.color} p-6 text-white transition hover:opacity-95`}
           >
             <p className="font-display text-xl font-semibold">{a.label}</p>

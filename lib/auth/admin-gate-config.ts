@@ -1,7 +1,9 @@
-/** Heslo admin brány — nastavte ADMIN_GATE_PASSWORD ve Vercel env (výchozí pro dev: David3). */
+/** Heslo admin brány — `ADMIN_GATE_PASSWORD` v env, jinak výchozí `David`. */
 
-const DEFAULT_ADMIN_GATE_PASSWORD = "David3";
-export const ADMIN_GATE_COOKIE = "ms_admin_gate";
+const DEFAULT_ADMIN_GATE_PASSWORD = "David";
+export const ADMIN_GATE_COOKIE = "ms_admin_session";
+/** Previous cookie — cleared on login/logout so an old 8h session cannot skip the form. */
+export const ADMIN_GATE_COOKIE_LEGACY = "ms_admin_gate";
 
 export function getAdminGatePassword(): string {
   const configured = process.env.ADMIN_GATE_PASSWORD?.trim();
@@ -11,6 +13,21 @@ export function getAdminGatePassword(): string {
 export function isValidAdminGateCookie(value: string | undefined): boolean {
   if (!value) return false;
   return value === getAdminGatePassword();
+}
+
+export function isAdminLoginPath(pathname: string): boolean {
+  return pathname === "/admin/login" || pathname.startsWith("/admin/login/");
+}
+
+/** Dashboard and every /admin page except the password form. */
+export function requiresAdminGate(pathname: string): boolean {
+  return pathname.startsWith("/admin") && !isAdminLoginPath(pathname);
+}
+
+export function hasValidAdminGateCookie(cookies: {
+  get(name: string): { value: string } | undefined;
+}): boolean {
+  return isValidAdminGateCookie(cookies.get(ADMIN_GATE_COOKIE)?.value);
 }
 
 

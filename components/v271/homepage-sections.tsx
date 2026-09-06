@@ -8,12 +8,9 @@ import { getArticlesByMetadataSection } from "@/lib/queries/articles";
 import {
   V271_AUDIENCES,
   V271_AKTUALNI,
-  V271_B2B,
-  V271_DOKUMENTACE_APP,
   V271_SOCIAL_PROOF_STATS,
   V271_SUBSCRIPTION_PLANS,
   V271_TESTIMONIALS,
-  V271_WHY_TRUST,
 } from "@/lib/v271/homepage";
 import { subscriptionProductId } from "@/lib/v27/config";
 import { DokumentaceDownloadPanel } from "@/components/lekari/dokumentace-download-panel";
@@ -21,7 +18,14 @@ import { OrdiZapisLockup } from "@/components/lekari/ordizapis-mark";
 import { APP_PRODUCTS } from "@/lib/apps/catalog";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { AppOpenLink } from "@/components/apps/app-origin-bar";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { getRevenueCopy } from "@/lib/i18n/revenue-copy";
+import { formatCzkListPrice, localizeListedCzk } from "@/lib/i18n/payment-currency";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getDokumentaceCopy } from "@/lib/i18n/dokumentace-copy";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 
+/** Not mounted on the live homepage — counts and quotes are unverified. Do not re-wire. */
 export function V272SocialProofBlock() {
   return (
     <section className="border-b border-slate-200 bg-white">
@@ -73,24 +77,25 @@ export function V272SocialProofBlock() {
   );
 }
 
-export function V272WhyTrustBlock() {
+export function V272WhyTrustBlock({ locale = "cs" }: { locale?: string }) {
+  const surface = getSurfaceCopy(locale);
   return (
     <section className="border-b border-slate-200 bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <div className="text-center">
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-            Proč MedScopeGlobal
+            {surface.whyEyebrow}
           </p>
           <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33]">
-            Aplikace na mobilu, obsah když ho potřebujete
+            {surface.whyTitle}
           </h2>
           <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-600">
-            Stažení na plochu, zkušební data v dashboardu a ověřené zdroje — od longevity magazínu po klinickou praxi.
+            {surface.whyLead}
           </p>
         </div>
 
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {V271_WHY_TRUST.map((point) => (
+          {surface.why.map((point) => (
             <article
               key={point.title}
               className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
@@ -103,16 +108,16 @@ export function V272WhyTrustBlock() {
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/predplatne?trial=1"
+            href={localizePublicHref("/predplatne?trial=1", locale)}
             className="rounded-full bg-[#005B96] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
           >
-            Vyzkoušet 14 dní zdarma
+            {surface.whyTrial}
           </Link>
           <Link
-            href="/predplatne"
+            href={localizePublicHref("/predplatne", locale)}
             className="rounded-full border border-[#005B96]/30 px-6 py-2.5 text-sm font-semibold text-[#005B96] hover:bg-[#005B96]/5"
           >
-            Předplatit
+            {surface.whySubscribe}
           </Link>
         </div>
       </div>
@@ -120,36 +125,39 @@ export function V272WhyTrustBlock() {
   );
 }
 
-export function V272DokumentaceAppBlock() {
+export async function V272DokumentaceAppBlock({ locale }: { locale?: string } = {}) {
+  const loc = locale ?? (await getServerLocale());
+  const copy = getDokumentaceCopy(loc);
+  const clinic = formatCzkListPrice(390, loc);
   return (
     <section className="border-b border-slate-200 bg-gradient-to-b from-[#eef6fb] to-white">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
         <div className="mb-6 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
             <div className="mb-4">
-              <OrdiZapisLockup showTagline />
+              <OrdiZapisLockup showTagline locale={loc} />
             </div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
-              {V271_DOKUMENTACE_APP.eyebrow}
+              {copy.eyebrow} · medscopeglobal.com
             </p>
             <h2 className="mt-2 font-display text-3xl font-semibold text-[#021d33] sm:text-4xl">
-              {V271_DOKUMENTACE_APP.title}
+              OrdiZapis — {copy.tagline}
             </h2>
             <p className="mt-3 text-sm leading-6 text-slate-600 sm:text-base">
-              {V271_DOKUMENTACE_APP.description}{" "}
-              <span className="font-semibold text-[#005B96]">{V271_DOKUMENTACE_APP.price}</span>
+              {copy.pitch}{" "}
+              <span className="font-semibold text-[#005B96]">{copy.monthlyCta(clinic)}</span>
               {" · "}
-              14 dní zdarma.
+              {copy.trialLine}
             </p>
           </div>
           <Link
-            href={V271_DOKUMENTACE_APP.href}
+            href={localizePublicHref("/lekari/dokumentace", loc)}
             className="inline-flex h-11 shrink-0 items-center justify-center rounded-full border border-[#005B96]/30 bg-white px-5 text-sm font-semibold text-[#005B96] hover:bg-[#005B96]/5"
           >
-            Detail pro lékaře →
+            {copy.moreAbout} →
           </Link>
         </div>
-        <DokumentaceDownloadPanel variant="homepage" />
+        <DokumentaceDownloadPanel variant="homepage" locale={loc} />
       </div>
     </section>
   );
@@ -213,23 +221,46 @@ export function V271AudienceSections() {
   );
 }
 
-export function V271B2bBlock() {
+export function V271B2bBlock({ locale = "cs" }: { locale?: string }) {
+  const surface = getSurfaceCopy(locale);
+  const revenue = getRevenueCopy(locale);
+  const formHref = localizePublicHref("/inzerce/formular", locale);
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="rounded-3xl border border-[#005B96]/15 bg-[#005B96]/5 px-6 py-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">B2B</p>
-            <h3 className="mt-1 font-display text-xl font-semibold text-[#021d33]">{V271_B2B.title}</h3>
-            <p className="mt-2 text-sm text-slate-600">{V271_B2B.description}</p>
+            <h3 className="mt-1 font-display text-xl font-semibold text-[#021d33]">{surface.b2bTitle}</h3>
+            <p className="mt-2 text-sm text-slate-600">{surface.b2bDescription}</p>
           </div>
           <Link
-            href={V271_B2B.href}
+            href={formHref}
             className="rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
           >
-            {V271_B2B.cta}
+            {revenue.mediaKitCta}
           </Link>
         </div>
+        <dl className="mt-6 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
+            <dt className="text-xs text-slate-500">{revenue.bannerName}</dt>
+            <dd className="font-display text-lg font-semibold text-[#021d33]">
+              {localizeListedCzk("5 000 Kč", locale)}
+            </dd>
+          </div>
+          <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
+            <dt className="text-xs text-slate-500">{revenue.sponsoredName}</dt>
+            <dd className="font-display text-lg font-semibold text-[#021d33]">
+              {localizeListedCzk("15 000 Kč", locale)}
+            </dd>
+          </div>
+          <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
+            <dt className="text-xs text-slate-500">{revenue.newsletterName}</dt>
+            <dd className="font-display text-lg font-semibold text-[#021d33]">
+              {localizeListedCzk("3 500 Kč", locale)}
+            </dd>
+          </div>
+        </dl>
       </div>
     </section>
   );

@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { GLOBAL_LOCALES } from "@/lib/ecosystem/locales";
+import { normalizeLocale } from "@/lib/i18n/config";
 import { buildLocalePath, resolveLocalePath } from "@/lib/i18n/locale-path";
 import { setPreferredLocale, clearPreferredLocale } from "@/lib/i18n/detect-language";
 
@@ -52,9 +53,19 @@ export function LocaleSwitcher({
   async function syncDeviceLanguage() {
     setSaving(true);
     clearPreferredLocale();
-    await fetch("/api/locale/use-device", { method: "POST" });
-    setSaving(false);
-    router.refresh();
+    try {
+      const res = await fetch("/api/locale/use-device", { method: "POST" });
+      const data = (await res.json().catch(() => ({}))) as { locale?: string };
+      const next = normalizeLocale(
+        data.locale ||
+          (typeof navigator !== "undefined" ? navigator.language : currentLocale)
+      );
+      setLocale(next);
+      router.push(buildLocalePath(next, pathWithoutLocale()));
+    } finally {
+      setSaving(false);
+      router.refresh();
+    }
   }
 
   return (

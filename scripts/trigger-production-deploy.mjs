@@ -1,33 +1,13 @@
 #!/usr/bin/env node
 /**
- * Trigger Vercel production deployment from GitHub ref.
+ * Trigger Cloudflare production deploy from GitHub ref.
  * Usage: node scripts/trigger-production-deploy.mjs [ref]
+ *
+ * Production deploys on push to main via .github/workflows/cloudflare-deploy.yml
+ * or locally: pnpm cf:deploy
  */
-import {
-  triggerProductionDeploy,
-  waitForDeploymentReady,
-  loadDeployEnv,
-} from "./deploy/vercel-api.mjs";
-
 const ref = process.argv[2] ?? "main";
-const env = loadDeployEnv();
-env.VERCEL_GIT_REF = ref;
-
-console.log(`Triggering production deploy from ref: ${ref}`);
-const deployment = await triggerProductionDeploy(env);
-const id = deployment.id ?? deployment.uid;
-const sha = deployment.meta?.githubCommitSha ?? deployment.gitSource?.sha ?? null;
-
-console.log(JSON.stringify({ id, sha, url: deployment.url, state: deployment.readyState }, null, 2));
-
-if (id) {
-  console.log("Waiting for deployment to become READY...");
-  const result = await waitForDeploymentReady(id, env);
-  if (result.ok) {
-    console.log(`DEPLOY_READY=https://${result.deployment.url}`);
-    console.log(`DEPLOY_SHA=${result.deployment.meta?.githubCommitSha ?? sha ?? "unknown"}`);
-  } else {
-    console.error("Deploy failed:", result.error);
-    process.exit(1);
-  }
-}
+console.log(`Production deploy is Cloudflare Workers (OpenNext).`);
+console.log(`Push ${ref} to origin, or run: pnpm cf:deploy`);
+console.log(`Workflow: .github/workflows/cloudflare-deploy.yml`);
+console.log(`Site: https://medscopeglobal.com`);

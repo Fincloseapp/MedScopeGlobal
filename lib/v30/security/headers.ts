@@ -1,14 +1,17 @@
 import type { NextResponse } from "next/server";
+import { resolveLocalePath } from "@/lib/i18n/locale-path";
 
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://js.stripe.com https://serve.affiliate.heureka.cz https://pagead2.googlesyndication.com https://tpc.googlesyndication.com https://partner.googleadservices.com https://www.googleadservices.com https://www.googletagservices.com https://www.googletagmanager.com https://www.google.com https://www.gstatic.com https://adservice.google.com https://*.doubleclick.net https://*.adtrafficquality.google https://fundingchoicesmessages.google.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://images.unsplash.com https://source.unsplash.com https://*.supabase.co https: http:",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://serve.affiliate.heureka.cz https://*.googlesyndication.com https://*.google.com https://*.google.cz https://*.doubleclick.net https://*.adtrafficquality.google https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://www.googletagmanager.com",
   "media-src 'self' blob: data: https://*.supabase.co https://storage.googleapis.com https://www.w3schools.com https:",
-  "frame-src 'self' https://js.stripe.com https://www.youtube.com https://player.vimeo.com",
+  "frame-src 'self' https://js.stripe.com https://www.youtube.com https://player.vimeo.com https://*.googlesyndication.com https://*.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://www.googletagmanager.com https://*.adtrafficquality.google https://fundingchoicesmessages.google.com",
+  "worker-src 'self' blob:",
+  "child-src 'self' blob: https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://www.google.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -36,6 +39,15 @@ export const V30_SECURITY_HEADERS: Record<string, string> = {
   "X-XSS-Protection": "1; mode=block",
 };
 
+function isPrivateAdminPath(pathname?: string): boolean {
+  if (!pathname) return false;
+  return (
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/api/admin") ||
+    pathname === "/api/v21/admin-gate"
+  );
+}
+
 export function applySecurityHeaders(response: NextResponse, pathname?: string): NextResponse {
   for (const [key, value] of Object.entries(V30_SECURITY_HEADERS)) {
     if (key === "Permissions-Policy") {
@@ -45,6 +57,29 @@ export function applySecurityHeaders(response: NextResponse, pathname?: string):
     if (!response.headers.has(key)) {
       response.headers.set(key, value);
     }
+  }
+  if (isPrivateAdminPath(pathname)) {
+    response.headers.set(
+      "Cache-Control",
+      "private, no-cache, no-store, must-revalidate"
+    );
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  }
+  const stripped = pathname ? resolveLocalePath(pathname).pathname : "";
+  if (stripped === "/studenti" || stripped.startsWith("/studenti/")) {
+    response.headers.set(
+      "Cache-Control",
+      "private, no-cache, no-store, must-revalidate"
+    );
+  }
+  if (stripped === "/lekari" || stripped.startsWith("/lekari/")) {
+    response.headers.set(
+      "Cache-Control",
+      "private, no-cache, no-store, must-revalidate"
+    );
+  }
+  if (pathname?.startsWith("/__ms") || pathname?.startsWith("/relay")) {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
   }
   return response;
 }
