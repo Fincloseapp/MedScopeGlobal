@@ -31,7 +31,8 @@ import {
 import { SITE } from "@/lib/config/site";
 import { publicationJsonLd } from "@/lib/seo/json-ld";
 
-export const revalidate = 40;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getServerLocale()) as GlobalLocaleCode;

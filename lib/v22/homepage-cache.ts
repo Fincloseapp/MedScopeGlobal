@@ -210,7 +210,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-68-first", locale, day],
-    { revalidate: 60, tags: ["medscope-ui-v23.68", "v22-content", "article-covers"] }
+    ["v22-homepage-public-v23-69-live", locale, day],
+    { revalidate: 60, tags: ["medscope-ui-v23.69", "v22-content", "article-covers"] }
   )();
 }
