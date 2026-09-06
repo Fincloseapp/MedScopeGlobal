@@ -11,7 +11,7 @@ import {
   rankAktualityByDate,
 } from "@/lib/v271/news-desks";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
-import { listWireZpravyCards, type DisplayArticle } from "@/lib/queries/articles";
+import { listAktualitySection, type DisplayArticle } from "@/lib/queries/articles";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { filterArticlesForLocale } from "@/lib/i18n/filter-articles-for-locale";
@@ -107,7 +107,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
 
   const [magazine, aktuality] = await Promise.all([
     fetchMagazine(),
-    listWireZpravyCards(12, localeKey),
+    listAktualitySection(12, localeKey),
   ]);
   const wire = rankAktualityByDate(
     aktuality.filter((article) => {
@@ -197,7 +197,7 @@ async function loadHomepageDataOrFallback(locale: string) {
     return await Promise.race([
       loadHomepageData(locale),
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("homepage-timeout")), 4_000);
+        timer = setTimeout(() => reject(new Error("homepage-timeout")), 8_000);
       }),
     ]);
   } catch (error) {
@@ -212,7 +212,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-64-scan", locale, day],
-    { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
+    ["v22-homepage-public-v23-66-desk", locale, day],
+    { revalidate: 60, tags: ["medscope-ui-v23.66", "v22-content", "article-covers"] }
   )();
 }
