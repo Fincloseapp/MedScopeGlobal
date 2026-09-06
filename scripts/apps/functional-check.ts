@@ -394,7 +394,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-59-date-first"), "homepage cache key must bust when Aktuality ranks by date");
+  assert.ok(home.includes("v23-60-sql-filter"), "homepage cache key must bust when Aktuality filters generic titles in SQL");
   assert.ok(home.includes("toISOString().slice(0, 10)"), "homepage data cache must roll with the UTC day");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
   assert.ok(home.includes("courtesyBorrow: 2"), "non-CS homepage must not dump a Czech borrow pile");
@@ -893,8 +893,8 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.60"),
-  "page cache tag must bust after date-first Aktuality"
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.61"),
+  "page cache tag must bust after SQL-filtered Aktuality"
 );
 assert.ok(
   readFileSync(join(root, "app/(public)/kongresy/page.tsx"), "utf8").includes(
@@ -1178,7 +1178,7 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-59-date-first"
+    "v22-homepage-public-v23-60-sql-filter"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "listWireZpravyCards"
@@ -1189,7 +1189,9 @@ assert.ok(
     !readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "getArticlesByMetadataSection"
     ) &&
-    readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes(".limit(200)") &&
+    readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes(
+      "excludeGenericAktualityTitles"
+    ) &&
     readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes("rankAktualityByDate"),
   "homepage cache must pin dated zpravy cards, not the heavy helper name"
 );

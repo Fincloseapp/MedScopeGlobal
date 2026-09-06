@@ -5,6 +5,7 @@ import { filterActiveArticles } from "@/lib/v20/content-rules";
 import { isSeedOrDemoArticle } from "@/lib/editorial/article-quality-audit";
 import {
   isHomepageDeskArticle,
+  isNovinkyArticle,
   pinHomepageDesks,
   prependUniqueArticles,
   rankAktualityByDate,
@@ -112,7 +113,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     aktuality.filter((article) => {
       const slug = String(article.slug ?? "");
       if (article.vip_only || isSeedOrDemoArticle(article)) return false;
-      return slug.startsWith("zpravy-") || String(article.rubric_slug ?? "").includes("zprav");
+      return slug.startsWith("zpravy-") || isNovinkyArticle(article);
     }),
     12,
     new Date(),
@@ -211,7 +212,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-59-date-first", locale, day],
+    ["v22-homepage-public-v23-60-sql-filter", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }
