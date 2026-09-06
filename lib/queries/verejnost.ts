@@ -81,7 +81,7 @@ export async function listPublicArticles(options?: {
   const supabase = await createDataClient();
   if (!supabase) return demoSlice();
 
-  const fetchLimit = Math.min(Math.max(limit * 2, limit + 24), 256);
+  const fetchLimit = Math.min(Math.max(limit * 2, limit + 24), 192);
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     const load = (async () => {

@@ -78,20 +78,31 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
       ? "zivotni-styl"
       : resolveBackendTopic(topic);
   const fetched = await listPublicArticles({
-    limit: 120,
+    limit: 48,
     topic: backendTopic,
     ensureContent: false,
     mode: "card",
     locale,
   });
 
-  const filtered = fetched.filter((article) => {
-    if (!isListableNewsArticle(article, new Date(), locale)) return false;
+  const listable = fetched.filter((article) =>
+    isListableNewsArticle(article, new Date(), locale)
+  );
+  let filtered = listable.filter((article) => {
     if (longevity) return isLongevityArticle(article);
     if (topic === "zivotni-styl") return !isLongevityArticle(article);
     if (lifestyleHub) return matchesLifestyleHub(article, topic);
     return true;
   });
+  if (lifestyleHub && filtered.length < PAGE_SIZE) {
+    const seen = new Set(filtered.map((article) => article.id));
+    for (const article of listable) {
+      if (filtered.length >= PAGE_SIZE) break;
+      if (seen.has(article.id) || isLongevityArticle(article)) continue;
+      seen.add(article.id);
+      filtered.push(article);
+    }
+  }
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
