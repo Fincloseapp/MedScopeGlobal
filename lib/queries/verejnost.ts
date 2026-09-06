@@ -90,6 +90,7 @@ export async function listPublicArticles(options?: {
         .select(articleSelect)
         .eq("published", true)
         .eq("audience", "public")
+        .like("slug", "verejnost-%")
         .order("published_at", { ascending: false, nullsFirst: false })
         .range(offset, offset + fetchLimit - 1);
 
@@ -132,7 +133,7 @@ export async function listPublicArticles(options?: {
     return await Promise.race([
       load,
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("public-articles-timeout")), 3_000);
+        timer = setTimeout(() => reject(new Error("public-articles-timeout")), 4_000);
       }),
     ]);
   } catch (error) {
