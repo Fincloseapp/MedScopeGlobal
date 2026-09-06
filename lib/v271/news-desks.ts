@@ -179,7 +179,8 @@ export function isHomepageDeskArticle(
   locale = "cs"
 ): boolean {
   if (isListableNewsArticle(article, now, locale)) return true;
-  if (!article.slug || !article.title?.trim() || article.vip_only) return false;
+  if (!article.slug || !article.title?.trim()) return false;
+  if (article.vip_only && !isNovinkyArticle(article)) return false;
   if (!isNovinkyArticle(article) || !isProfessionalAktualityTitle(article.title)) return false;
   const words = countArticleWords(article.content);
   const zpravy = String(article.slug ?? "").toLowerCase().startsWith("zpravy-");

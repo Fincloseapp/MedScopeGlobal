@@ -112,7 +112,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
   const wire = rankAktualityByDate(
     aktuality.filter((article) => {
       const slug = String(article.slug ?? "");
-      if (article.vip_only || isSeedOrDemoArticle(article)) return false;
+      if (isSeedOrDemoArticle(article)) return false;
       return slug.startsWith("zpravy-") || isNovinkyArticle(article);
     }),
     12,
@@ -212,7 +212,7 @@ export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
   return unstable_cache(
     () => loadHomepageDataOrFallback(locale),
-    ["v22-homepage-public-v23-61-fresh-window", locale, day],
+    ["v22-homepage-public-v23-62-wire-vip", locale, day],
     { revalidate: 60, tags: ["medscope-ui-v22.5", "v22-content", "article-covers"] }
   )();
 }

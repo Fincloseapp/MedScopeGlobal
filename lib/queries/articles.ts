@@ -557,7 +557,7 @@ export async function listWireZpravyCards(
   const toRanked = (pool: Record<string, unknown>[]) =>
     rankAktualityByDate(
       filterActiveArticles(mapArticleList(pool)).filter(
-        (article) => !article.vip_only && !isSeedOrDemoArticle(article)
+        (article) => !isSeedOrDemoArticle(article)
       ),
       Math.max(limit, 12),
       new Date(),
@@ -633,7 +633,7 @@ export async function listAktualitySection(
   const { isSeedOrDemoArticle } = await import("@/lib/editorial/article-quality-audit");
   const { rankAktualityByDate } = await import("@/lib/v271/news-desks");
   let filtered = rankAktualityByDate(
-    [...zpravy, ...rest].filter((article) => !article.vip_only && !isSeedOrDemoArticle(article)),
+    [...zpravy, ...rest].filter((article) => !isSeedOrDemoArticle(article)),
     limit,
     new Date()
   );
@@ -648,7 +648,7 @@ export async function listAktualitySection(
     if (older.error) console.error("listAktualitySection", "zpravy-older", older.error);
     const olderMapped = filterActiveArticles(
       mapArticleList((older.data ?? []) as Record<string, unknown>[])
-    ).filter((article) => !article.vip_only && !isSeedOrDemoArticle(article));
+    ).filter((article) => !isSeedOrDemoArticle(article));
     filtered = rankAktualityByDate([...filtered, ...olderMapped], limit, new Date());
   }
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
