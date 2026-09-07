@@ -117,6 +117,7 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
       ...(userId ? { user_id: userId } : {}),
       ...(gift ? { gift: "1" } : {}),
       ...(studentMonth && intro ? { intro_unit_amount: String(intro.unitAmount) } : {}),
+      ...(locale ? { locale } : {}),
       ...(aiRef ? { ai_ref: aiRef, utm_source: aiRef, utm_medium: "ai", utm_campaign: "agent-coop" } : {}),
     },
     line_items: [

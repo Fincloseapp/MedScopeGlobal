@@ -54,8 +54,7 @@ export default async function AdminAiAgentsPage() {
           <CardContent>
             <p className="text-2xl font-bold">{pct(live, AI_AGENT_GOAL_NEAR.count)}</p>
             <p className="text-xs text-muted-foreground">
-              {formatInt(live)} / {formatInt(AI_AGENT_GOAL_NEAR.count)} · chybí {formatInt(snap.goals.near.remaining)} ·{" "}
-              {snap.goals.near.daysLeft} dní · potřeba {formatInt(snap.goals.near.dailyNeeded)} / den
+              {formatInt(live)} / {formatInt(AI_AGENT_GOAL_NEAR.count)} · {snap.goals.near.label}
             </p>
           </CardContent>
         </Card>
@@ -67,8 +66,7 @@ export default async function AdminAiAgentsPage() {
           <CardContent>
             <p className="text-2xl font-bold">{pct(live, AI_AGENT_GOAL_SEP27.count)}</p>
             <p className="text-xs text-muted-foreground">
-              {formatInt(live)} / {formatInt(AI_AGENT_GOAL_SEP27.count)} · chybí {formatInt(snap.goals.sep27.remaining)} ·{" "}
-              {snap.goals.sep27.daysLeft} dní · potřeba {formatInt(snap.goals.sep27.dailyNeeded)} / den
+              {formatInt(live)} / {formatInt(AI_AGENT_GOAL_SEP27.count)} · {snap.goals.sep27.label}
             </p>
           </CardContent>
         </Card>
@@ -90,6 +88,12 @@ export default async function AdminAiAgentsPage() {
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           <p className="font-medium text-[#021d33]">{snap.visibility.label}</p>
+          <p className={snap.goals.near.onTrack ? "text-emerald-800" : "text-amber-800"}>
+            Cíl 10. 9.: {snap.goals.near.onTrack ? "na cestě" : "mimo tempo"} — {snap.goals.near.label}
+          </p>
+          <p className={snap.goals.sep27.onTrack ? "text-emerald-800" : "text-amber-800"}>
+            Cíl 27. 9.: {snap.goals.sep27.onTrack ? "na cestě" : "mimo tempo"} — {snap.goals.sep27.label}
+          </p>
           <p className="text-muted-foreground">
             Poslední 3 dny: {formatInt(snap.visibility.last3)} nových · předchozí 3 dny: {formatInt(snap.visibility.prev3)}.
             Tempo 7 dní: {formatInt(snap.pace.last7)} ({snap.pace.dailyAvg7} / den). Newsletter:{" "}

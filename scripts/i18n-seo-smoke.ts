@@ -268,6 +268,7 @@ assert.ok(isSearchEngineBot("ClaudeBot/1.0"));
 assert.equal(isSearchEngineBot("Mozilla/5.0 (iPhone)"), false);
 assert.ok(isLocaleRoutingExcluded("/llms.txt"));
 assert.ok(isLocaleRoutingExcluded("/.well-known/ai.txt"));
+assert.ok(isLocaleRoutingExcluded("/r/ai"));
 assert.ok(isLocaleRoutingExcluded("/llms.txt"));
 assert.ok(isLocaleRoutingExcluded("/news-sitemap.xml"));
 assert.ok(isLocaleRoutingExcluded("/feed/de"));

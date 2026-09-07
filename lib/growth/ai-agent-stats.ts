@@ -1,13 +1,18 @@
 import { createAdminReadClient } from "@/lib/auth/require-admin-access";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import {
-  AI_AGENT_GOAL_NEAR,
-  AI_AGENT_GOAL_SEP27,
   AI_AGENT_SLUGS,
   legalChannels,
   normalizeAiAgentSlug,
   type AiAgentSlug,
 } from "@/lib/growth/ai-agent-program";
+import {
+  addUtcDays,
+  evaluateProgramGoals,
+  evaluateVisibility,
+  sumDailyRange,
+  type GoalPace,
+} from "@/lib/growth/ai-agent-eval";
 
 export type DailyCount = { date: string; count: number };
 
@@ -34,8 +39,8 @@ export type AiAgentGrowthSnapshot = {
     v27PaidCzk: number;
   };
   goals: {
-    near: { target: number; by: string; remaining: number; daysLeft: number; dailyNeeded: number };
-    sep27: { target: number; by: string; remaining: number; daysLeft: number; dailyNeeded: number };
+    near: GoalPace;
+    sep27: GoalPace;
   };
   pace: {
     last7: number;
@@ -52,64 +57,8 @@ export type AiAgentGrowthSnapshot = {
   channels: { id: string; label: string }[];
 };
 
-function daysUntil(iso: string, now = new Date()): number {
-  const end = new Date(iso).getTime();
-  const diff = end - now.getTime();
-  return Math.max(0, Math.ceil(diff / 86_400_000));
-}
-
 function dayKey(iso: string): string {
   return iso.slice(0, 10);
-}
-
-function sumRange(daily: DailyCount[], from: string, to: string): number {
-  return daily
-    .filter((row) => row.date >= from && row.date <= to)
-    .reduce((sum, row) => sum + row.count, 0);
-}
-
-function addDays(isoDay: string, delta: number): string {
-  const d = new Date(`${isoDay}T12:00:00.000Z`);
-  d.setUTCDate(d.getUTCDate() + delta);
-  return d.toISOString().slice(0, 10);
-}
-
-function visibilityOf(daily: DailyCount[], today: string): AiAgentGrowthSnapshot["visibility"] {
-  const last3from = addDays(today, -2);
-  const prev3to = addDays(today, -3);
-  const prev3from = addDays(today, -5);
-  const last3 = sumRange(daily, last3from, today);
-  const prev3 = sumRange(daily, prev3from, prev3to);
-  if (last3 === 0 && prev3 === 0) {
-    return {
-      visible: false,
-      last3,
-      prev3,
-      label: "Nárůst zatím není vidět — v posledních 6 dnech nepřibylo žádné nové předplatné.",
-    };
-  }
-  if (last3 > prev3) {
-    return {
-      visible: true,
-      last3,
-      prev3,
-      label: `Nárůst je vidět: poslední 3 dny ${last3} > předchozí 3 dny ${prev3}.`,
-    };
-  }
-  if (last3 === prev3) {
-    return {
-      visible: false,
-      last3,
-      prev3,
-      label: `Předplatné přibývají, ale tempo se nemění (${last3} za 3 dny).`,
-    };
-  }
-  return {
-    visible: false,
-    last3,
-    prev3,
-    label: `Nárůst není vidět: poslední 3 dny ${last3} < předchozí 3 dny ${prev3}.`,
-  };
 }
 
 async function countSafe(
@@ -125,6 +74,30 @@ async function countSafe(
 }
 
 export async function loadAiAgentGrowthSnapshot(): Promise<AiAgentGrowthSnapshot> {
+  try {
+    return await loadAiAgentGrowthSnapshotUnsafe();
+  } catch {
+    return buildSnapshot({
+      dataSource: "unavailable",
+      active: 0,
+      trialing: 0,
+      newsletter: 0,
+      vip: 0,
+      paidOrders: 0,
+      paidCzk: 0,
+      daily: [],
+      leaderboard: AI_AGENT_SLUGS.map((agent) => ({
+        agent,
+        visits: 0,
+        checkouts: 0,
+        paid: 0,
+        newsletters: 0,
+      })),
+    });
+  }
+}
+
+async function loadAiAgentGrowthSnapshotUnsafe(): Promise<AiAgentGrowthSnapshot> {
   const service = tryCreateServiceRoleClient();
   const session = service ? null : await createAdminReadClient();
   const client = service ?? session;
@@ -212,7 +185,7 @@ export async function loadAiAgentGrowthSnapshot(): Promise<AiAgentGrowthSnapshot
     const { data } = await client
       .from("analytics")
       .select("event, payload, created_at")
-      .in("event", ["ai_agent_visit", "ai_agent_checkout", "ai_agent_newsletter"])
+      .in("event", ["ai_agent_visit", "ai_agent_checkout", "ai_agent_newsletter", "ai_agent_paid"])
       .gte("created_at", since)
       .limit(4000);
     for (const row of data ?? []) {
@@ -224,6 +197,7 @@ export async function loadAiAgentGrowthSnapshot(): Promise<AiAgentGrowthSnapshot
       if (row.event === "ai_agent_visit") item.visits += 1;
       if (row.event === "ai_agent_checkout") item.checkouts += 1;
       if (row.event === "ai_agent_newsletter") item.newsletters += 1;
+      if (row.event === "ai_agent_paid") item.paid += 1;
     }
   } catch {
     /* analytics may be missing */
@@ -265,12 +239,10 @@ function buildSnapshot(input: {
   const now = new Date();
   const today = now.toISOString().slice(0, 10);
   const totalLive = input.active + input.trialing;
-  const last7from = addDays(today, -6);
-  const last7 = sumRange(input.daily, last7from, today);
-  const nearDays = daysUntil(AI_AGENT_GOAL_NEAR.by, now);
-  const farDays = daysUntil(AI_AGENT_GOAL_SEP27.by, now);
-  const nearRemain = Math.max(0, AI_AGENT_GOAL_NEAR.count - totalLive);
-  const farRemain = Math.max(0, AI_AGENT_GOAL_SEP27.count - totalLive);
+  const last7from = addUtcDays(today, -6);
+  const last7 = sumDailyRange(input.daily, last7from, today);
+  const dailyAvg7 = Math.round((last7 / 7) * 10) / 10;
+  const goals = evaluateProgramGoals(totalLive, dailyAvg7, now);
 
   return {
     loadedAt: now.toISOString(),
@@ -286,27 +258,12 @@ function buildSnapshot(input: {
       v27PaidOrders: input.paidOrders,
       v27PaidCzk: input.paidCzk,
     },
-    goals: {
-      near: {
-        target: AI_AGENT_GOAL_NEAR.count,
-        by: AI_AGENT_GOAL_NEAR.by,
-        remaining: nearRemain,
-        daysLeft: nearDays,
-        dailyNeeded: nearDays > 0 ? Math.ceil(nearRemain / nearDays) : nearRemain,
-      },
-      sep27: {
-        target: AI_AGENT_GOAL_SEP27.count,
-        by: AI_AGENT_GOAL_SEP27.by,
-        remaining: farRemain,
-        daysLeft: farDays,
-        dailyNeeded: farDays > 0 ? Math.ceil(farRemain / farDays) : farRemain,
-      },
-    },
+    goals,
     pace: {
       last7,
-      dailyAvg7: Math.round((last7 / 7) * 10) / 10,
+      dailyAvg7,
     },
-    visibility: visibilityOf(input.daily, today),
+    visibility: evaluateVisibility(input.daily, today),
     daily: input.daily,
     leaderboard: input.leaderboard,
     channels: legalChannels(),

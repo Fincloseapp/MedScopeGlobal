@@ -166,6 +166,6 @@ export const config = {
     "/admin/:path*",
     "/stav-systemu",
     "/academy/lekari/:path*",
-    "/((?!_next|__ms|relay|favicon.ico|robots.txt|ads.txt|llms.txt|news-sitemap.xml|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?|ttf|eot|txt)$).*)",
+    "/((?!_next|__ms|relay|r/|favicon.ico|robots.txt|ads.txt|llms.txt|news-sitemap.xml|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?|ttf|eot|txt)$).*)",
   ],
 };

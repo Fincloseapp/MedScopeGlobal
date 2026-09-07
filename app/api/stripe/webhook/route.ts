@@ -5,6 +5,7 @@ import { logSecurityEvent } from "@/lib/security/security-log";
 import { getClientIp } from "@/lib/security/client-ip";
 import { activateAdFromCheckout } from "@/lib/ads/activate-from-payment";
 import { persistStripeWebhookLog } from "@/lib/billing/stripe-webhook-log";
+import { logMonetizationEvent } from "@/lib/monetization/log-event";
 import { notifySubscriptionConfirmed } from "@/lib/notifications/engine";
 import { updateUserProgress } from "@/lib/academy/db";
 import {
@@ -424,6 +425,16 @@ export async function POST(request: Request) {
           }
         }
 
+        const aiRef = session.metadata?.ai_ref;
+        if (aiRef) {
+          await logMonetizationEvent("ai_agent_paid", {
+            agent: aiRef,
+            locale: session.metadata?.locale ?? "",
+            productId: session.metadata?.product_id,
+            sessionId: session.id,
+          });
+        }
+
         await logSecurityEvent({
           ip,
           action: "stripe:v27_checkout_completed",
@@ -432,6 +443,7 @@ export async function POST(request: Request) {
             sessionId: session.id,
             kind: session.metadata?.kind,
             productId: session.metadata?.product_id,
+            aiRef: aiRef ?? null,
           },
         });
       }

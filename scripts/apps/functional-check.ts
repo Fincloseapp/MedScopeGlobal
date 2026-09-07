@@ -248,6 +248,7 @@ import {
   normalizeAiAgentSlug,
   parseAiAgentFromSearch,
 } from "../../lib/growth/ai-agent-program";
+import { evaluateGoalPace, evaluateVisibility } from "../../lib/growth/ai-agent-eval";
 import { renderLlmsTxt, renderWellKnownAiTxt } from "../../lib/seo/llms-txt";
 import {
   isFreeNewsDeskArticle,
@@ -2305,6 +2306,27 @@ assert.ok(
       "ai_agent_newsletter"
     )
   );
+  assert.ok(existsSync(join(root, "app/r/ai/route.ts")));
+  assert.ok(readFileSync(join(root, "app/robots.ts"), "utf8").includes("/r/ai"));
+  {
+    const now = new Date("2026-09-07T12:00:00.000Z");
+    const missed = evaluateGoalPace(10, 0, AI_AGENT_GOAL_NEAR, now);
+    assert.equal(missed.onTrack, false);
+    assert.ok(missed.dailyNeeded > 1000);
+    const done = evaluateGoalPace(170_000, 0, AI_AGENT_GOAL_NEAR, now);
+    assert.equal(done.onTrack, true);
+    const hidden = evaluateVisibility([], "2026-09-07");
+    assert.equal(hidden.visible, false);
+    const rising = evaluateVisibility(
+      [
+        { date: "2026-09-02", count: 1 },
+        { date: "2026-09-06", count: 4 },
+        { date: "2026-09-07", count: 5 },
+      ],
+      "2026-09-07"
+    );
+    assert.equal(rising.visible, true);
+  }
   assert.ok(
     !readFileSync(join(root, "app/(public)/pro-ai/page.tsx"), "utf8").includes("1 300")
   );
