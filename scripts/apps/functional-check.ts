@@ -4358,9 +4358,11 @@ console.log("✓ magazine desk byline and copy checks passed");
     const nextCfg = readFileSync(join(root, "next.config.mjs"), "utf8");
     assert.ok(nextCfg.includes("/:locale/article/:path*"), "locale article HTML must not inherit public s-maxage");
     assert.ok(nextCfg.includes("/article/:path*"));
+    assert.ok(nextCfg.includes("/api/v27/claim-editorial"));
     const headerSrc = readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8");
     assert.ok(headerSrc.includes('stripped.startsWith("/article/")'));
     assert.ok(headerSrc.includes('stripped.startsWith("/checkout/")'));
+    assert.ok(headerSrc.includes('stripped.startsWith("/api/v27/claim-editorial")'));
     assert.ok(
       readFileSync(join(root, "app/(public)/article/[slug]/page.tsx"), "utf8").includes(
         'export const dynamic = "force-dynamic"'

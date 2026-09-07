@@ -460,6 +460,12 @@ const nextConfig = {
         ],
       },
       {
+        source: "/api/v27/claim-editorial",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
         source: "/checkout/:path*",
         headers: [
           { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },

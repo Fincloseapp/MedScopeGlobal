@@ -73,7 +73,8 @@ export function applySecurityHeaders(response: NextResponse, pathname?: string):
     stripped.startsWith("/lekari/") ||
     stripped.startsWith("/article/") ||
     stripped.startsWith("/checkout/") ||
-    stripped.startsWith("/verejnost/clanky/")
+    stripped.startsWith("/verejnost/clanky/") ||
+    stripped.startsWith("/api/v27/claim-editorial")
   ) {
     response.headers.set(
       "Cache-Control",
