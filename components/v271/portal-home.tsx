@@ -347,10 +347,10 @@ export function PortalHome({
                 ))}
               </ul>
               <Link
-                href={localizePublicHref("/predplatne?trial=1", locale)}
+                href={localizePublicHref("/predplatne#public", locale)}
                 className="mt-3 flex w-full items-center justify-center rounded-md bg-[#005B96] px-3 py-2 text-sm font-semibold text-white hover:bg-[#004a7a]"
               >
-                {chrome.trialCta}
+                {surface.whyTrial}
               </Link>
             </Box>
 
