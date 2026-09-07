@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Info, X } from "lucide-react";
+import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export type VideoSourceKind = "medscope" | "fallback_w3schools" | "external_cdn" | "supabase";
 
@@ -14,6 +16,8 @@ type Props = {
   sourceLabel?: string;
   dismissible?: boolean;
   className?: string;
+  /** Public osveta pages pass the edition locale; academy stays Czech. */
+  locale?: string;
 };
 
 const STORAGE_KEY = "ms_video_legal_notice_dismissed";
@@ -46,6 +50,7 @@ export function VideoLegalNotice({
   sourceLabel,
   dismissible = true,
   className,
+  locale = "cs",
 }: Props) {
   const [dismissed, setDismissed] = useState(true);
 
@@ -74,22 +79,28 @@ export function VideoLegalNotice({
         sourceKind === "external_cdn" ||
         sourceKind === "supabase";
 
-  const brand = variant === "osveta" ? "MedScope Osvěta" : "MedScope Academy";
+  const chrome = variant === "osveta" ? getVerejnostChrome(locale) : null;
+  const brand = chrome?.legalBrand ?? (variant === "osveta" ? "MedScope Osvěta" : "MedScope Academy");
+  const termsHref = chrome ? localizePublicHref("/terms#video-content", locale) : "/terms#video-content";
+  const shownSource =
+    sourceKind === "fallback_w3schools" && chrome
+      ? chrome.legalFallbackSource
+      : sourceLabel;
 
   return (
     <div className={className}>
       {!dismissed ? (
-        variant === "osveta" ? (
+        variant === "osveta" && chrome ? (
           <aside
             role="note"
-            aria-label="Právní upozornění k lekci"
+            aria-label={chrome.legalNoteAria}
             className="mb-3 flex items-start gap-2 rounded-xl border border-[#d7e6f4] bg-[#f4f8fc] px-3.5 py-2.5 text-xs leading-relaxed text-slate-600"
           >
             <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#005B96]" aria-hidden />
             <p className="min-w-0 flex-1">
-              Obecná zdravotní osvěta — nenahrazuje radu lékaře.{" "}
-              <Link href="/terms#video-content" className="font-medium text-[#005B96] underline-offset-2 hover:underline">
-                Podmínky
+              {chrome.legalNote}{" "}
+              <Link href={termsHref} className="font-medium text-[#005B96] underline-offset-2 hover:underline">
+                {chrome.legalTerms}
               </Link>
             </p>
             {dismissible ? (
@@ -97,7 +108,7 @@ export function VideoLegalNotice({
                 type="button"
                 onClick={dismiss}
                 className="shrink-0 rounded p-1 text-slate-500 hover:bg-white"
-                aria-label="Skrýt upozornění"
+                aria-label={chrome.legalDismiss}
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -161,14 +172,16 @@ export function VideoLegalNotice({
 
       <footer className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-500">
         <span>© {brand}</span>
-        <Link href="/terms#video-content" className="underline hover:text-slate-700">
-          Licence obsahu
+        <Link href={termsHref} className="underline hover:text-slate-700">
+          {chrome?.legalLicence ?? "Licence obsahu"}
         </Link>
         {lessonTitle ? (
           <span className="sr-only"> — {lessonTitle}</span>
         ) : null}
-        {showSource && sourceLabel ? (
-          <span className="text-slate-400">Zdroj videa: {sourceLabel}</span>
+        {showSource && shownSource ? (
+          <span className="text-slate-400">
+            {chrome ? chrome.legalSource.replace("{source}", shownSource) : `Zdroj videa: ${shownSource}`}
+          </span>
         ) : null}
       </footer>
     </div>

@@ -10,12 +10,14 @@ import { initSessionVoice } from "@/lib/tts/voice-session";
 import { DEFAULT_SLIDE_IMAGE, SLIDE_IMAGE_FALLBACKS } from "@/lib/v25/video/slide-images";
 import { resolveStoredSlideImage } from "@/lib/v25/video/slide-image-matcher";
 import type { ContentSlideshowManifest } from "@/lib/v25/video/content-slideshow";
+import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
 
 type Props = {
   manifest: ContentSlideshowManifest;
   lessonTitle: string;
   className?: string;
   lang?: string | null;
+  locale?: string;
 };
 
 function slideUrl(
@@ -31,7 +33,14 @@ function slideUrl(
   );
 }
 
-export function TopicSlideshowPlayer({ manifest, lessonTitle, className, lang }: Props) {
+export function TopicSlideshowPlayer({
+  manifest,
+  lessonTitle,
+  className,
+  lang,
+  locale = "cs",
+}: Props) {
+  const chrome = getVerejnostChrome(locale);
   const slides = manifest.slides;
   const speechLang = resolveSpeechLang(lang);
   const [index, setIndex] = useState(0);
@@ -150,7 +159,7 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className, lang }:
   const captionCs = slide.captionCs || slide.imageDescription;
 
   return (
-    <div className={className} role="region" aria-label={`Prezentace lekce: ${lessonTitle}`}>
+    <div className={className} role="region" aria-label={`${chrome.slideshowRegionAria}: ${lessonTitle}`}>
       <div className="mb-3 flex flex-wrap items-center justify-end gap-2">
         <span className="text-xs font-medium text-slate-500" aria-live="polite">
           Slide {index + 1} / {slides.length}
@@ -215,7 +224,7 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className, lang }:
                 setIndex((i) => Math.max(0, i - 1));
               }}
               disabled={index === 0}
-              aria-label="Předchozí slide"
+              aria-label={chrome.slideshowPrev}
             >
               <ChevronLeft className="h-5 w-5" />
             </Button>
@@ -225,7 +234,7 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className, lang }:
               variant="ghost"
               className="h-10 w-10 text-white hover:bg-white/10 sm:h-9 sm:w-9"
               onClick={togglePlay}
-              aria-label={playing ? "Pozastavit" : "Přehrát slideshow"}
+              aria-label={playing ? chrome.listenPause : chrome.slideshowPlay}
             >
               {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
             </Button>
@@ -240,7 +249,7 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className, lang }:
                 setIndex((i) => Math.min(slides.length - 1, i + 1));
               }}
               disabled={index >= slides.length - 1}
-              aria-label="Další slide"
+              aria-label={chrome.slideshowNext}
             >
               <ChevronRight className="h-5 w-5" />
             </Button>
@@ -250,7 +259,7 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className, lang }:
               variant="ghost"
               className="h-10 w-10 text-white hover:bg-white/10 sm:h-9 sm:w-9"
               onClick={() => void toggleSpeech()}
-              aria-label="Přečíst slide"
+              aria-label={chrome.slideshowRead}
             >
               <Volume2 className="h-5 w-5" />
             </Button>
@@ -277,7 +286,9 @@ export function TopicSlideshowPlayer({ manifest, lessonTitle, className, lang }:
       </div>
 
       <p className="mt-2 text-xs text-slate-600">
-        Slideshow: {lessonTitle} · shoda {Math.round((manifest.alignmentScore ?? 0.8) * 100)} %
+        {chrome.slideshowFooter
+          .replace("{title}", lessonTitle)
+          .replace("{score}", String(Math.round((manifest.alignmentScore ?? 0.8) * 100)))}
       </p>
     </div>
   );

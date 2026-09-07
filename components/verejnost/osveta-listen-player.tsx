@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Headphones, Pause, Play } from "lucide-react";
+import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
 
 function formatTime(sec: number): string {
   if (!Number.isFinite(sec) || sec < 0) return "0:00";
@@ -19,6 +20,7 @@ type Props = {
   onTimeUpdate?: (current: number, duration: number) => void;
   onEnded?: () => void;
   mediaRef?: React.RefObject<HTMLAudioElement | null>;
+  locale?: string;
 };
 
 /** Podcast-style audio lesson player for veřejnost osvěta. */
@@ -31,6 +33,7 @@ export function OsvetaListenPlayer({
   onTimeUpdate,
   onEnded,
   mediaRef: externalRef,
+  locale = "cs",
 }: Props) {
   const internalRef = useRef<HTMLAudioElement>(null);
   const audioRef = externalRef ?? internalRef;
@@ -70,6 +73,7 @@ export function OsvetaListenPlayer({
   }, [audioRef, durationSeconds, onEnded, onTimeUpdate]);
 
   const progress = duration > 0 ? Math.min(100, (current / duration) * 100) : 0;
+  const chrome = getVerejnostChrome(locale);
 
   const toggle = () => {
     const el = audioRef.current;
@@ -106,14 +110,14 @@ export function OsvetaListenPlayer({
           <div className="min-w-0 flex-1 text-center sm:text-left">
             <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#9fd0f5]">
               <Headphones className="h-3.5 w-3.5" aria-hidden />
-              Poslechová lekce
+              {chrome.listenLessonEyebrow}
             </p>
             <h2 className="mt-2 font-display text-xl font-semibold leading-snug text-white sm:text-2xl">
               {title}
             </h2>
             <p className="mt-1.5 text-sm text-white/70">{byline}</p>
             <p className="mt-1 text-xs text-white/50">
-              {formatTime(duration || durationSeconds)} · čeština · MedScope Osvěta
+              {formatTime(duration || durationSeconds)} · {chrome.legalBrand}
             </p>
 
             <audio
@@ -122,7 +126,7 @@ export function OsvetaListenPlayer({
               preload="auto"
               playsInline
               className="sr-only"
-              aria-label={`Audio lekce: ${title}`}
+              aria-label={`${chrome.audioLessonAria}: ${title}`}
             />
 
             <div className="mt-5 flex items-center gap-3">
@@ -130,7 +134,7 @@ export function OsvetaListenPlayer({
                 type="button"
                 onClick={toggle}
                 className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-[#021d33] shadow-md transition hover:bg-[#e8f4fc]"
-                aria-label={playing ? "Pozastavit" : "Přehrát"}
+                aria-label={playing ? chrome.listenPause : chrome.listenPlay}
               >
                 {playing ? (
                   <Pause className="h-5 w-5 fill-current" />
@@ -143,7 +147,7 @@ export function OsvetaListenPlayer({
                 <button
                   type="button"
                   className="group relative flex h-2 w-full items-center rounded-full bg-white/15"
-                  aria-label="Posunout přehrávání"
+                  aria-label={chrome.listenSeek}
                   onClick={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect();
                     const ratio = (e.clientX - rect.left) / rect.width;

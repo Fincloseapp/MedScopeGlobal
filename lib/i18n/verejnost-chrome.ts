@@ -96,6 +96,45 @@ export type VerejnostChrome = {
   ctaPublic: string;
   ctaMagazine: string;
   ctaArticles: string;
+  listenTextCta: string;
+  videoPlayerAria: string;
+  transcriptEyebrow: string;
+  transcriptTitle: string;
+  listenXpThanks: string;
+  listenXpHint: string;
+  quizEyebrow: string;
+  quizMeta: string;
+  quizSubmitting: string;
+  quizSubmit: string;
+  quizPassed: string;
+  quizRetry: string;
+  quizXpAwarded: string;
+  legalNoteAria: string;
+  legalNote: string;
+  legalTerms: string;
+  legalDismiss: string;
+  legalBrand: string;
+  legalLicence: string;
+  legalSource: string;
+  legalFallbackSource: string;
+  listenLessonEyebrow: string;
+  listenPlay: string;
+  listenPause: string;
+  listenSeek: string;
+  audioLessonAria: string;
+  videoGateAria: string;
+  videoGateContinue: string;
+  videoOverlayEyebrow: string;
+  videoOverlayHeadline: string;
+  videoOverlayBody: string;
+  videoOverlayCta: string;
+  videoOverlayHint: string;
+  slideshowRegionAria: string;
+  slideshowPrev: string;
+  slideshowNext: string;
+  slideshowPlay: string;
+  slideshowRead: string;
+  slideshowFooter: string;
   pillarExtras: Record<string, { label: string; description: string }>;
   hubs: Record<"osveta" | "clanky" | "temata" | "rozhovory" | "zebricek", MagazineHubOverlay>;
 };
@@ -183,6 +222,46 @@ const CS: VerejnostChrome = {
   ctaPublic: "Veřejné zdraví",
   ctaMagazine: "Články magazínu",
   ctaArticles: "Články",
+  listenTextCta: "Poslechnout text",
+  videoPlayerAria: "Přehrávač videa",
+  transcriptEyebrow: "Text k poslechu",
+  transcriptTitle: "Číst spolu s lekcí",
+  listenXpThanks: "Děkujeme za poslech — připsali jsme vám +10 XP.",
+  listenXpHint: "Po přihlášení získáte +10 XP za poslech alespoň poloviny lekce.",
+  quizEyebrow: "Ověření porozumění",
+  quizMeta: "3 otázky · +20 XP za úspěšné dokončení",
+  quizSubmitting: "Odesílám…",
+  quizSubmit: "Odeslat odpovědi",
+  quizPassed: "Výborně!",
+  quizRetry: "Zkuste to znovu",
+  quizXpAwarded: "+{xp} XP za kvíz",
+  legalNoteAria: "Právní upozornění k lekci",
+  legalNote: "Obecná zdravotní osvěta — nenahrazuje radu lékaře.",
+  legalTerms: "Podmínky",
+  legalDismiss: "Skrýt upozornění",
+  legalBrand: "MedScope Osvěta",
+  legalLicence: "Licence obsahu",
+  legalSource: "Zdroj videa: {source}",
+  legalFallbackSource: "w3schools.com (ukázkové záložní video)",
+  listenLessonEyebrow: "Poslechová lekce",
+  listenPlay: "Přehrát",
+  listenPause: "Pozastavit",
+  listenSeek: "Posunout přehrávání",
+  audioLessonAria: "Audio lekce",
+  videoGateAria: "Nabídka předplatného pro video",
+  videoGateContinue: "Pokračovat v náhledu",
+  videoOverlayEyebrow: "Redakce ViaLongeVita",
+  videoOverlayHeadline: "Pokračujte s tarifem Redakce",
+  videoOverlayBody:
+    "Úvod lekce zůstává otevřený. Celý magazín a další texty otevírá tarif Redakce.",
+  videoOverlayCta: "Otevřít tarif Redakce",
+  videoOverlayHint: "Náhled — zbytek po aktivaci",
+  slideshowRegionAria: "Prezentace lekce",
+  slideshowPrev: "Předchozí slide",
+  slideshowNext: "Další slide",
+  slideshowPlay: "Přehrát slideshow",
+  slideshowRead: "Přečíst slide",
+  slideshowFooter: "Slideshow: {title} · shoda {score} %",
   pillarExtras: {
     osveta: {
       label: "Poslechová osvěta",
@@ -373,6 +452,46 @@ const EN: VerejnostChrome = {
   ctaPublic: "Public health",
   ctaMagazine: "Magazine articles",
   ctaArticles: "Articles",
+  listenTextCta: "Listen to the text",
+  videoPlayerAria: "Video player",
+  transcriptEyebrow: "Listen-along text",
+  transcriptTitle: "Read with the lesson",
+  listenXpThanks: "Thanks for listening — we added +10 XP.",
+  listenXpHint: "Sign in to earn +10 XP for listening to at least half the lesson.",
+  quizEyebrow: "Check your understanding",
+  quizMeta: "3 questions · +20 XP for finishing",
+  quizSubmitting: "Sending…",
+  quizSubmit: "Send answers",
+  quizPassed: "Well done!",
+  quizRetry: "Try again",
+  quizXpAwarded: "+{xp} XP for the quiz",
+  legalNoteAria: "Legal notice for this lesson",
+  legalNote: "General health education — this does not replace a physician’s advice.",
+  legalTerms: "Terms",
+  legalDismiss: "Hide notice",
+  legalBrand: "MedScope Education",
+  legalLicence: "Content licence",
+  legalSource: "Video source: {source}",
+  legalFallbackSource: "w3schools.com (sample fallback video)",
+  listenLessonEyebrow: "Audio lesson",
+  listenPlay: "Play",
+  listenPause: "Pause",
+  listenSeek: "Seek",
+  audioLessonAria: "Audio lesson",
+  videoGateAria: "Subscription offer for this video",
+  videoGateContinue: "Continue the preview",
+  videoOverlayEyebrow: "ViaLongeVita editorial",
+  videoOverlayHeadline: "Continue with the Editorial plan",
+  videoOverlayBody:
+    "The start of the lesson stays open. The magazine and further reading open with Editorial.",
+  videoOverlayCta: "Open Editorial",
+  videoOverlayHint: "Preview — the rest after activation",
+  slideshowRegionAria: "Lesson slideshow",
+  slideshowPrev: "Previous slide",
+  slideshowNext: "Next slide",
+  slideshowPlay: "Play slideshow",
+  slideshowRead: "Read slide",
+  slideshowFooter: "Slideshow: {title} · match {score} %",
   pillarExtras: {
     osveta: {
       label: "Listen lessons",
@@ -564,6 +683,46 @@ const DE: VerejnostChrome = {
   ctaPublic: "Öffentliche Gesundheit",
   ctaMagazine: "Magazinartikel",
   ctaArticles: "Artikel",
+  listenTextCta: "Text anhören",
+  videoPlayerAria: "Videoplayer",
+  transcriptEyebrow: "Text zum Mitlesen",
+  transcriptTitle: "Mit der Lektion lesen",
+  listenXpThanks: "Danke fürs Zuhören — wir haben +10 XP gutgeschrieben.",
+  listenXpHint: "Melden Sie sich an, um +10 XP für das Anhören der Hälfte der Lektion zu erhalten.",
+  quizEyebrow: "Verständnis prüfen",
+  quizMeta: "3 Fragen · +20 XP für den Abschluss",
+  quizSubmitting: "Sende…",
+  quizSubmit: "Antworten senden",
+  quizPassed: "Sehr gut!",
+  quizRetry: "Noch einmal versuchen",
+  quizXpAwarded: "+{xp} XP für das Quiz",
+  legalNoteAria: "Rechtlicher Hinweis zur Lektion",
+  legalNote: "Allgemeine Gesundheitsaufklärung — ersetzt keine ärztliche Beratung.",
+  legalTerms: "Bedingungen",
+  legalDismiss: "Hinweis ausblenden",
+  legalBrand: "MedScope Aufklärung",
+  legalLicence: "Inhaltslizenz",
+  legalSource: "Videoquelle: {source}",
+  legalFallbackSource: "w3schools.com (Beispiel-Ersatzvideo)",
+  listenLessonEyebrow: "Hörlektion",
+  listenPlay: "Abspielen",
+  listenPause: "Pause",
+  listenSeek: "Wiedergabe verschieben",
+  audioLessonAria: "Audiolektion",
+  videoGateAria: "Abo-Hinweis zum Video",
+  videoGateContinue: "Vorschau fortsetzen",
+  videoOverlayEyebrow: "ViaLongeVita Redaktion",
+  videoOverlayHeadline: "Weiter mit dem Redaktionsabo",
+  videoOverlayBody:
+    "Der Anfang der Lektion bleibt offen. Das Magazin und weitere Texte öffnet das Redaktionsabo.",
+  videoOverlayCta: "Redaktionsabo öffnen",
+  videoOverlayHint: "Vorschau — der Rest nach der Aktivierung",
+  slideshowRegionAria: "Lektions-Diashow",
+  slideshowPrev: "Vorherige Folie",
+  slideshowNext: "Nächste Folie",
+  slideshowPlay: "Diashow abspielen",
+  slideshowRead: "Folie vorlesen",
+  slideshowFooter: "Diashow: {title} · Übereinstimmung {score} %",
   pillarExtras: {
     osveta: {
       label: "Hörlektionen",
@@ -755,6 +914,46 @@ const FR: VerejnostChrome = {
   ctaPublic: "Santé publique",
   ctaMagazine: "Articles du magazine",
   ctaArticles: "Articles",
+  listenTextCta: "Écouter le texte",
+  videoPlayerAria: "Lecteur vidéo",
+  transcriptEyebrow: "Texte à suivre",
+  transcriptTitle: "Lire avec la leçon",
+  listenXpThanks: "Merci pour l’écoute — nous avons ajouté +10 XP.",
+  listenXpHint: "Connectez-vous pour gagner +10 XP en écoutant au moins la moitié de la leçon.",
+  quizEyebrow: "Vérifier la compréhension",
+  quizMeta: "3 questions · +20 XP pour terminer",
+  quizSubmitting: "Envoi…",
+  quizSubmit: "Envoyer les réponses",
+  quizPassed: "Très bien !",
+  quizRetry: "Réessayez",
+  quizXpAwarded: "+{xp} XP pour le quiz",
+  legalNoteAria: "Mention légale de la leçon",
+  legalNote: "Éducation santé générale — ne remplace pas l’avis d’un médecin.",
+  legalTerms: "Conditions",
+  legalDismiss: "Masquer l’avis",
+  legalBrand: "MedScope Éducation",
+  legalLicence: "Licence du contenu",
+  legalSource: "Source vidéo : {source}",
+  legalFallbackSource: "w3schools.com (vidéo de secours d’exemple)",
+  listenLessonEyebrow: "Leçon audio",
+  listenPlay: "Lecture",
+  listenPause: "Pause",
+  listenSeek: "Déplacer la lecture",
+  audioLessonAria: "Leçon audio",
+  videoGateAria: "Offre d’abonnement pour la vidéo",
+  videoGateContinue: "Continuer l’aperçu",
+  videoOverlayEyebrow: "Rédaction ViaLongeVita",
+  videoOverlayHeadline: "Continuer avec l’abonnement Rédaction",
+  videoOverlayBody:
+    "Le début de la leçon reste ouvert. Le magazine et les autres textes s’ouvrent avec l’abonnement Rédaction.",
+  videoOverlayCta: "Ouvrir la rédaction",
+  videoOverlayHint: "Aperçu — le reste après activation",
+  slideshowRegionAria: "Diaporama de la leçon",
+  slideshowPrev: "Diapositive précédente",
+  slideshowNext: "Diapositive suivante",
+  slideshowPlay: "Lancer le diaporama",
+  slideshowRead: "Lire la diapositive",
+  slideshowFooter: "Diaporama : {title} · correspondance {score} %",
   pillarExtras: {
     osveta: {
       label: "Leçons à écouter",

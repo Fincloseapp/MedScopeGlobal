@@ -13,6 +13,9 @@ import {
   type ContentSlideshowManifest,
 } from "@/lib/v25/video/content-slideshow";
 import { resolveOsvetaThumb } from "@/lib/verejnost/osveta/resolve-thumb";
+import { looksLikeCzech } from "@/lib/i18n/czech-detect";
+import { intlLocaleFor } from "@/lib/i18n/format-date";
+import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
 import type { PublicHealthQuiz, PublicHealthVideoWithTopic } from "@/types/public-osveta";
 
 const GTV_HOST = "storage.googleapis.com/gtv-videos-bucket";
@@ -49,8 +52,11 @@ function scriptToParagraphs(script: string): string[] {
   return paras;
 }
 
-function buildOsvetaSlideshow(video: PublicHealthVideoWithTopic): ContentSlideshowManifest {
-  const topic = video.topic?.title ?? "Zdravotní osvěta";
+function buildOsvetaSlideshow(
+  video: PublicHealthVideoWithTopic,
+  fallbackTopic: string
+): ContentSlideshowManifest {
+  const topic = video.topic?.title ?? fallbackTopic;
   const paragraphs = scriptToParagraphs(video.script || video.title).slice(0, 6);
 
   const slides =
@@ -86,10 +92,13 @@ function buildOsvetaSlideshow(video: PublicHealthVideoWithTopic): ContentSlidesh
 export function OsvetaVideoPlayer({
   video,
   quiz,
+  locale = "cs",
 }: {
   video: PublicHealthVideoWithTopic;
   quiz: PublicHealthQuiz | null;
+  locale?: string;
 }) {
+  const chrome = getVerejnostChrome(locale);
   const editorialLabel = getVideoEditorialLabel({
     avatarType: video.avatar_type,
     category: video.topic?.category,
@@ -107,7 +116,10 @@ export function OsvetaVideoPlayer({
   const isAudio = (video.metadata?.lesson_format as string) === "audio_lesson";
   const mediaUrl = resolveMediaUrl(video.video_url);
   const showSlideshow = !isAudio && needsSlideshow(video.video_url);
-  const slideshow = useMemo(() => buildOsvetaSlideshow(video), [video]);
+  const slideshow = useMemo(
+    () => buildOsvetaSlideshow(video, chrome.fallbackTopic),
+    [video, chrome.fallbackTopic]
+  );
   const source = detectVideoSource(mediaUrl, mediaUrl.includes("w3schools.com"));
   // Treat hosted osveta media as first-party — never surface CDN hostnames publicly.
   const publicSourceKind =
@@ -129,6 +141,7 @@ export function OsvetaVideoPlayer({
     title: video.title,
     script: video.script || video.title,
   });
+  const speechLang = looksLikeCzech(listenText) ? "cs-CZ" : intlLocaleFor(locale);
   const readingParagraphs = useMemo(
     () => scriptToParagraphs(video.script || ""),
     [video.script]
@@ -180,9 +193,9 @@ export function OsvetaVideoPlayer({
       {!isAudio && listenText ? (
         <TtsListenButton
           text={listenText}
-          label="Poslechnout text"
+          label={chrome.listenTextCta}
           className="not-prose"
-          lang="cs-CZ"
+          lang={speechLang}
           variant="editorial"
         />
       ) : null}
@@ -193,11 +206,13 @@ export function OsvetaVideoPlayer({
           variant="osveta"
           sourceKind="medscope"
           dismissible
+          locale={locale}
         >
           <TopicSlideshowPlayer
             manifest={slideshow}
             lessonTitle={video.title}
-            lang="cs-CZ"
+            lang={speechLang}
+            locale={locale}
           />
         </VideoLegalNotice>
       ) : (
@@ -207,6 +222,7 @@ export function OsvetaVideoPlayer({
           sourceKind={publicSourceKind}
           sourceLabel={publicSourceLabel}
           dismissible
+          locale={locale}
         >
           {isAudio ? (
             <OsvetaListenPlayer
@@ -216,6 +232,7 @@ export function OsvetaVideoPlayer({
               coverUrl={coverUrl}
               durationSeconds={video.duration_seconds}
               mediaRef={mediaRef as React.RefObject<HTMLAudioElement | null>}
+              locale={locale}
               onTimeUpdate={(current, duration) => {
                 if (watchAwarded || !duration) return;
                 if (current / duration >= 0.5) void awardWatch();
@@ -233,7 +250,7 @@ export function OsvetaVideoPlayer({
                 preload="auto"
                 className="aspect-video w-full"
                 style={{ width: "100%", height: "auto", display: "block" }}
-                aria-label={`Přehrávač videa: ${video.title}`}
+                aria-label={`${chrome.videoPlayerAria}: ${video.title}`}
                 onTimeUpdate={onTimeUpdate}
                 onEnded={awardWatch}
               >
@@ -250,13 +267,13 @@ export function OsvetaVideoPlayer({
           aria-labelledby="osveta-transcript-heading"
         >
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#005B96]">
-            Text k poslechu
+            {chrome.transcriptEyebrow}
           </p>
           <h3
             id="osveta-transcript-heading"
             className="mt-1 font-display text-xl font-semibold text-[#021d33]"
           >
-            Číst spolu s lekcí
+            {chrome.transcriptTitle}
           </h3>
           <div className="mt-5 space-y-4 text-[1.05rem] leading-[1.75] text-slate-700">
             {readingParagraphs.map((p, i) => (
@@ -268,21 +285,21 @@ export function OsvetaVideoPlayer({
 
       {watchAwarded ? (
         <p className="rounded-xl border border-emerald-200/80 bg-emerald-50/90 px-4 py-2.5 text-sm text-emerald-900">
-          Děkujeme za poslech — připsali jsme vám +10 XP.
+          {chrome.listenXpThanks}
         </p>
       ) : (
         <p className="text-xs text-slate-500">
-          Po přihlášení získáte +10 XP za poslech alespoň poloviny lekce.
+          {chrome.listenXpHint}
         </p>
       )}
 
       {quiz && !quizResult ? (
         <div className="rounded-2xl border border-[#d7e6f4] bg-white p-5 sm:p-6">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">
-            Ověření porozumění
+            {chrome.quizEyebrow}
           </p>
           <h3 className="mt-1 font-display text-lg font-semibold text-[#021d33]">{quiz.title}</h3>
-          <p className="mt-1 text-xs text-slate-500">3 otázky · +20 XP za úspěšné dokončení</p>
+          <p className="mt-1 text-xs text-slate-500">{chrome.quizMeta}</p>
           <div className="mt-5 space-y-5">
             {(quiz.questions ?? []).map((q, qi) => (
               <fieldset key={qi} className="space-y-2">
@@ -322,7 +339,7 @@ export function OsvetaVideoPlayer({
             onClick={submitQuiz}
             className="mt-5 rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#004a7a] disabled:opacity-50"
           >
-            {quizSubmitting ? "Odesílám…" : "Odeslat odpovědi"}
+            {quizSubmitting ? chrome.quizSubmitting : chrome.quizSubmit}
           </button>
         </div>
       ) : null}
@@ -334,10 +351,12 @@ export function OsvetaVideoPlayer({
           }`}
         >
           <p className="font-semibold text-[#021d33]">
-            {quizResult.passed ? "Výborně!" : "Zkuste to znovu"} — {quizResult.score} %
+            {quizResult.passed ? chrome.quizPassed : chrome.quizRetry} — {quizResult.score} %
           </p>
           {quizResult.xpAwarded > 0 ? (
-            <p className="mt-1 text-sm text-emerald-700">+{quizResult.xpAwarded} XP za kvíz</p>
+            <p className="mt-1 text-sm text-emerald-700">
+              {chrome.quizXpAwarded.replace("{xp}", String(quizResult.xpAwarded))}
+            </p>
           ) : null}
         </div>
       ) : null}

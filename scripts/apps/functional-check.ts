@@ -258,6 +258,7 @@ import {
   rotatingForeignWriterLocale,
 } from "../../lib/v25/config/public-writers";
 import { looksLikeCzech } from "../../lib/i18n/czech-detect";
+import { getVerejnostChrome } from "../../lib/i18n/verejnost-chrome";
 import {
   EDITION_COVERS,
   clustersForLocale,
@@ -2722,6 +2723,26 @@ assert.ok(
     assert.ok(getPromoTeasers("ja")[0]?.line.includes("読む"));
     assert.ok(!getPromoTeasers("ja").some((row) => row.line.includes("He reads")));
     assert.ok(!looksLikeCzech(getPromoTeasers("pl")[0]?.line));
+    assert.equal(getVerejnostChrome("cs").listenTextCta, "Poslechnout text");
+    assert.equal(getVerejnostChrome("fr").listenTextCta, "Écouter le texte");
+    assert.equal(getVerejnostChrome("de").transcriptTitle, "Mit der Lektion lesen");
+    assert.ok(!looksLikeCzech(getVerejnostChrome("fr").legalNote));
+    assert.ok(!looksLikeCzech(getVerejnostChrome("de").videoOverlayHeadline));
+    assert.ok(!looksLikeCzech(getVerejnostChrome("en").videoGateContinue));
+    const osvetaPlayerSrc = readFileSync(join(root, "components/verejnost/osveta-video-player.tsx"), "utf8");
+    assert.ok(!osvetaPlayerSrc.includes('label="Poslechnout text"'));
+    assert.ok(!osvetaPlayerSrc.includes("Číst spolu s lekcí"));
+    assert.ok(osvetaPlayerSrc.includes("locale={locale}"));
+    assert.ok(
+      readFileSync(join(root, "components/v38/osveta-video-with-conversion.tsx"), "utf8").includes(
+        "locale={locale}"
+      )
+    );
+    assert.ok(
+      readFileSync(join(root, "app/(public)/verejnost/osveta/[slug]/page.tsx"), "utf8").includes(
+        "locale={locale}"
+      )
+    );
     assert.ok(drafts.some((row) => row.headline.includes("he reads") && row.body.includes("/assets/ads/teasers/")));
     assert.ok(readFileSync(join(root, "app/(public)/predplatne/page.tsx"), "utf8").includes("SocialShareStrip"));
     assert.ok(readFileSync(join(root, "app/(public)/predplatne/page.tsx"), "utf8").includes("/firmy/reklama/nova"));

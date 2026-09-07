@@ -15,6 +15,8 @@ type Props = {
   /** When true, show soft gate after preview (non-VIP academy/osveta) */
   enabled?: boolean;
   lessonIndex?: number;
+  dialogAria?: string;
+  continueLabel?: string;
 };
 
 /** v38 — soft video paywall hint with preview window */
@@ -23,6 +25,8 @@ export function VideoConversionOverlay({
   children,
   enabled = true,
   lessonIndex = 0,
+  dialogAria = "Nabídka předplatného pro video",
+  continueLabel = "Pokračovat v náhledu",
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [gated, setGated] = useState(false);
@@ -79,7 +83,7 @@ export function VideoConversionOverlay({
         <div
           className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-xl bg-slate-950/85 px-6 text-center backdrop-blur-sm"
           role="dialog"
-          aria-label="Nabídka předplatného pro video"
+          aria-label={dialogAria}
         >
           <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white">
             <Lock className="h-6 w-6" aria-hidden />
@@ -101,7 +105,7 @@ export function VideoConversionOverlay({
               onClick={dismiss}
             >
               <Play className="mr-2 h-4 w-4" />
-              Pokračovat v náhledu
+              {continueLabel}
             </Button>
           </div>
         </div>

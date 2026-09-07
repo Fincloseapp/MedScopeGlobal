@@ -105,7 +105,7 @@ export default async function OsvetaVideoPage({ params }: Props) {
         </header>
 
         <div className="mt-7">
-          <OsvetaVideoWithConversion video={video} quiz={quiz} isVip={isVip} />
+          <OsvetaVideoWithConversion video={video} quiz={quiz} isVip={isVip} locale={locale} />
         </div>
 
         <div className="mt-8 space-y-3">
