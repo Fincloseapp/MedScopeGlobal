@@ -340,6 +340,8 @@ import {
 } from "../../lib/v23/newsletter/locale-editions";
 import { magazineCategoriesForLocale } from "../../lib/editorial/magazine-category-copy";
 import { buildLocaleMagazineLayout } from "../../lib/v23/newsletter/locale-layout";
+import { classifyNewsletterIssues, mergeNewsletterIssues } from "../../lib/v23/newsletter/stand";
+import { getNewsletterStandCopy } from "../../lib/i18n/newsletter-stand-copy";
 import type { LocaleMagazineSources } from "../../lib/v23/newsletter/locale-layout";
 import { SYNDICATION_RULES, getSyndicationTargets } from "../../lib/ecosystem/editorial/syndication";
 import { APP_MARKETING_IMAGE, MARKETING_VISUALS } from "../../lib/brand/marketing-visuals";
@@ -1035,13 +1037,14 @@ file("public/assets/magazine/vialongevita-email-lockup.jpg");
   assert.ok(readFileSync(join(root, "components/magazine/magazine-title-spread.tsx"), "utf8").includes("object-top"));
   assert.ok(readFileSync(join(root, "app/(public)/newsletter/page.tsx"), "utf8").includes("hideIntro"));
   assert.ok(readFileSync(join(root, "app/(public)/newsletter/posledni/page.tsx"), "utf8").includes("hideIntro"));
+  assert.ok(readFileSync(join(root, "app/(public)/newsletter/posledni/page.tsx"), "utf8").includes("NewsletterNewsstand"));
   assert.ok(readFileSync(join(root, "components/v22/newsletter-view.tsx"), "utf8").includes("showLockup={false}"));
   assert.ok(
     readFileSync(join(root, "app/(public)/promo/klipy/page.tsx"), "utf8").includes("pickEditionCover"),
     "promo clips page must open with an edition portrait"
   );
   assert.ok(
-    readFileSync(join(root, "app/(public)/newsletter/archiv/page.tsx"), "utf8").includes("pickEditionCover"),
+    readFileSync(join(root, "components/v23/newsletter-newsstand.tsx"), "utf8").includes("pickEditionCover"),
     "newsletter archive must open with an edition portrait"
   );
   assert.ok(!GLOBAL_LOCALES.some((row) => String(row.code) === "ar"));
@@ -2042,9 +2045,76 @@ assert.ok(
   "issue page archive link must follow locale copy"
 );
 assert.ok(
-  readFileSync(join(root, "app/(public)/newsletter/archiv/page.tsx"), "utf8").includes("newsletterHeadline"),
+  readFileSync(join(root, "components/v23/newsletter-newsstand.tsx"), "utf8").includes("newsletterHeadline"),
   "archive titles must follow page locale, not stored Czech issue.title"
 );
+assert.ok(
+  readFileSync(join(root, "app/(public)/newsletter/archiv/page.tsx"), "utf8").includes("NewsletterNewsstand")
+);
+{
+  const standSrc = readFileSync(join(root, "components/v23/newsletter-newsstand.tsx"), "utf8");
+  assert.ok(standSrc.includes("EditorialPayButtons"));
+  assert.ok(standSrc.includes("/firmy/reklama/nova"));
+  assert.ok(standSrc.includes("Aktuální") === false);
+  assert.ok(standSrc.includes("getNewsletterStandCopy"));
+  assert.ok(!standSrc.includes("170 000"));
+  assert.ok(!standSrc.includes("170000"));
+  const classified = classifyNewsletterIssues(
+    mergeNewsletterIssues(
+      [
+        {
+          id: "future",
+          title: "x",
+          slug: "future",
+          issue_date: "2026-12-01",
+          html_content: null,
+          pdf_text: null,
+          pdf_url: null,
+          layout_json: null,
+          published: true,
+          admin_only: false,
+          created_at: "2026-09-07",
+        },
+        {
+          id: "old",
+          title: "x",
+          slug: "old",
+          issue_date: "2026-06-10",
+          html_content: null,
+          pdf_text: null,
+          pdf_url: null,
+          layout_json: null,
+          published: true,
+          admin_only: false,
+          created_at: "2026-06-10",
+        },
+        {
+          id: "now",
+          title: "x",
+          slug: "now",
+          issue_date: "2026-09-07",
+          html_content: null,
+          pdf_text: null,
+          pdf_url: null,
+          layout_json: null,
+          published: true,
+          admin_only: false,
+          created_at: "2026-09-07",
+        },
+      ],
+      null
+    ),
+    new Date("2026-09-07T12:00:00.000Z")
+  );
+  assert.equal(classified.current?.slug, "now");
+  assert.deepEqual(classified.upcoming.map((row) => row.slug), ["future"]);
+  assert.deepEqual(classified.previous.map((row) => row.slug), ["old"]);
+  assert.equal(getNewsletterStandCopy("cs").current, "Aktuální vydání");
+  assert.ok(!getNewsletterStandCopy("fr").title.includes("aktuální"));
+  assert.ok(!getNewsletterStandCopy("fr").lead.includes("Redakce"));
+  assert.ok(!getNewsletterStandCopy("de").current.includes("Aktuální"));
+  assert.equal(getNewsletterStandCopy("ja").current, "Current issue");
+}
 assert.ok(
   readFileSync(join(root, "app/(public)/newsletter/[slug]/page.tsx"), "utf8").includes("getNewsletterForPublic"),
   "issue page must prefer locale slug then date slug"

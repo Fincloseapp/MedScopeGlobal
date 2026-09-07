@@ -13,6 +13,7 @@ type Props = {
   className?: string;
   priority?: boolean;
   showLockup?: boolean;
+  headingLevel?: "h1" | "h2";
 };
 
 /** ViaLongeVita magazine brief hero */
@@ -24,6 +25,7 @@ export function NewsletterHero({
   className,
   priority = true,
   showLockup = true,
+  headingLevel = "h1",
 }: Props) {
   const lockup = (
     <Image
@@ -60,9 +62,15 @@ export function NewsletterHero({
         {tagline ?? NEWSLETTER_HERO_TAGLINE}
       </p>
 
-      <h1 className="mx-auto mb-6 max-w-[720px] text-[26px] font-semibold leading-[1.25] sm:mb-8 sm:text-[30px]">
-        {title}
-      </h1>
+      {headingLevel === "h2" ? (
+        <h2 className="mx-auto mb-6 max-w-[720px] text-[26px] font-semibold leading-[1.25] sm:mb-8 sm:text-[30px]">
+          {title}
+        </h2>
+      ) : (
+        <h1 className="mx-auto mb-6 max-w-[720px] text-[26px] font-semibold leading-[1.25] sm:mb-8 sm:text-[30px]">
+          {title}
+        </h1>
+      )}
 
       {subhead ? (
         <p className="mx-auto mb-8 max-w-[760px] text-[17px] font-light leading-[1.45] opacity-85 sm:mb-10 sm:text-lg sm:font-normal">

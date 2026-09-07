@@ -142,9 +142,11 @@ function NewsletterItemCard({
 export function V23NewsletterIssueView({
   issue,
   locale = "cs",
+  headingLevel = "h1",
 }: {
   issue: NewsletterRow;
   locale?: string;
+  headingLevel?: "h1" | "h2";
 }) {
   const layout = parseLayout(issue, locale);
   const copy = getNewsletterCopy(locale);
@@ -185,6 +187,7 @@ export function V23NewsletterIssueView({
         href={localizePublicHref("/", locale)}
         className="w-full text-[#021d33]"
         showLockup={false}
+        headingLevel={headingLevel}
       />
 
       <div className="p-6 sm:p-8">
