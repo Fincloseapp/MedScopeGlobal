@@ -21,6 +21,7 @@ import { getSurfaceCopy, isCzechSurface } from "@/lib/i18n/surface-copy";
 import { getMagazineListingCopy } from "@/lib/brand/magazine";
 import { isStudentChromePath, studentNavCtaLabel } from "@/lib/studenti/pricing";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { NavSubscribeCta } from "@/components/v38/nav-subscribe-cta";
 import { normalizeLocale } from "@/lib/i18n/config";
 
 export function V20MobileNav({
@@ -203,18 +204,23 @@ export function V20MobileNav({
             </p>
             <LocaleSwitcher currentLocale={navLocale} />
           </div>
-          <Button asChild className="rounded-full bg-primary touch-manipulation">
-            <Link
-              href={
-                isStudentChromePath(pathname)
-                  ? localizePublicHref("/predplatne#student", navLocale)
-                  : localizePublicHref("/predplatne#public", navLocale)
-              }
-              onClick={() => setOpen(false)}
-            >
-              {isStudentChromePath(pathname) ? studentNavCtaLabel(navLocale) : surface.whyTrial}
-            </Link>
-          </Button>
+          {isStudentChromePath(pathname) ? (
+            <Button asChild className="rounded-full bg-primary touch-manipulation">
+              <Link
+                href={localizePublicHref("/predplatne#student", navLocale)}
+                onClick={() => setOpen(false)}
+              >
+                {studentNavCtaLabel(navLocale)}
+              </Link>
+            </Button>
+          ) : (
+            <NavSubscribeCta
+              className="w-full justify-center rounded-full py-2.5 text-sm"
+              label={surface.whyTrial}
+              href={localizePublicHref("/predplatne#public", navLocale)}
+              locale={navLocale}
+            />
+          )}
           <Button asChild variant="outline" className="rounded-full touch-manipulation">
             <Link href={localizePublicHref("/aplikace", navLocale)} onClick={() => setOpen(false)}>
               {surface.downloadApps}

@@ -7,6 +7,7 @@ import { getPromoTeasers } from "@/lib/ads/promo-teasers";
 import { getShareCopy } from "@/lib/i18n/share-copy";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { EditorialPayButtons } from "@/components/subscription/editorial-pay-buttons";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 300;
@@ -39,7 +40,10 @@ export default async function PromoKlipyPage() {
           <PromoTeaserCard key={teaser.id} teaser={teaser} locale={locale} />
         ))}
       </div>
-      <nav className="mt-8 flex flex-wrap gap-3">
+      <div className="mt-8">
+        <EditorialPayButtons locale={locale} className="flex max-w-xl flex-col gap-2 sm:flex-row" />
+      </div>
+      <nav className="mt-4 flex flex-wrap gap-3">
         <Link
           href={localizePublicHref("/predplatne#public", locale)}
           className="inline-flex rounded-full bg-[#005B96] px-4 py-2 text-sm font-semibold text-white hover:bg-[#004a7a]"

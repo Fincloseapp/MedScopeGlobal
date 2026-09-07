@@ -4266,6 +4266,7 @@ console.log("✓ magazine desk byline and copy checks passed");
     const monthAt = paySrc.indexOf('productId="public-month"');
     assert.ok(yearAt > 0, "Editorial pay buttons must start Stripe year first");
     assert.ok(monthAt > yearAt, "annual Editorial CTA still comes before monthly");
+    assert.ok(!paySrc.includes("@/lib/v27/config"), "client pay buttons must not import server v27 config");
     assert.ok(
       readFileSync(join(root, "components/v38/article-conversion-gate.tsx"), "utf8").includes(
         "EditorialPayButtons"
@@ -4299,6 +4300,17 @@ console.log("✓ magazine desk byline and copy checks passed");
     assert.ok(successSrc.includes('localizePublicHref("/articles"'));
     const distSrc = readFileSync(join(root, "lib/growth/arena/distribution-agent.ts"), "utf8");
     assert.ok(distSrc.indexOf("predplatne") < distSrc.indexOf('section: "dokscope"'));
+    const navCta = readFileSync(join(root, "components/v38/nav-subscribe-cta.tsx"), "utf8");
+    assert.ok(navCta.includes('productId: "public-year"'));
+    assert.ok(!navCta.includes("@/lib/v27/config"));
+    assert.ok(navCta.includes("#student") || navCta.includes("!editorial"));
+    assert.ok(
+      readFileSync(join(root, "components/layout/site-header.tsx"), "utf8").includes("locale={navLocale}")
+    );
+    assert.ok(readFileSync(join(root, "components/v20/mobile-nav.tsx"), "utf8").includes("NavSubscribeCta"));
+    assert.ok(
+      readFileSync(join(root, "app/(public)/promo/klipy/page.tsx"), "utf8").includes("EditorialPayButtons")
+    );
   }
   {
     const entity = getLegalEntity();

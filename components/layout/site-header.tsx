@@ -68,6 +68,7 @@ export function SiteHeader({
               className="max-[360px]:px-2 max-[360px]:text-[10px]"
               label={subscribeLabel}
               href={subscribeHref}
+              locale={navLocale}
             />
           ) : null}
         </div>
@@ -98,7 +99,7 @@ export function SiteHeader({
           <div className="ml-auto flex shrink-0 items-center gap-1 lg:gap-1.5">
             <LocaleSwitcher currentLocale={locale} compact />
             {!isVip ? (
-              <NavSubscribeCta compact label={subscribeLabel} href={subscribeHref} />
+              <NavSubscribeCta compact label={subscribeLabel} href={subscribeHref} locale={navLocale} />
             ) : null}
             <SearchCommand isVip={isVip} accessLevel={accessLevel} locale={locale} />
             <ThemeToggle />
