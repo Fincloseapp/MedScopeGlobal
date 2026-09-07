@@ -6,6 +6,7 @@ import { normalizeLocale } from "@/lib/i18n/config";
 import { getServerLocale, getServerRegion } from "@/lib/i18n/server-locale";
 import { normalizeAiAgentSlug } from "@/lib/growth/ai-agent-program";
 import { readAiRefFromCookieHeader } from "@/lib/growth/ai-ref-cookie";
+import { requestCountry } from "@/lib/growth/request-country";
 import { logMonetizationEvent } from "@/lib/monetization/log-event";
 
 export const dynamic = "force-dynamic";
@@ -54,7 +55,13 @@ export async function POST(request: Request) {
     aiRef,
   });
   if (result.status === 200 && aiRef) {
-    await logMonetizationEvent("ai_agent_checkout", { agent: aiRef, locale, productId: body.productId });
+    const country = requestCountry(request.headers);
+    await logMonetizationEvent("ai_agent_checkout", {
+      agent: aiRef,
+      locale,
+      productId: body.productId,
+      ...(country ? { country } : {}),
+    });
   }
 
   return NextResponse.json(result.body, { status: result.status });

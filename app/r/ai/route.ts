@@ -6,6 +6,7 @@ import {
   normalizeAiAgentSlug,
 } from "@/lib/growth/ai-agent-program";
 import { parseArenaRef, arenaHopPath } from "@/lib/growth/arena/refs";
+import { requestCountry } from "@/lib/growth/request-country";
 import { logMonetizationEvent } from "@/lib/monetization/log-event";
 
 export const dynamic = "force-dynamic";
@@ -29,15 +30,13 @@ export async function GET(request: Request) {
         : "/predplatne";
 
   if (agent) {
-    const country = (request.headers.get("cf-ipcountry") ?? request.headers.get("x-vercel-ip-country") ?? "")
-      .trim()
-      .toUpperCase();
+    const country = requestCountry(request.headers);
     await logMonetizationEvent("ai_agent_visit", {
       agent,
       locale,
       path: dest,
       via: "hop",
-      ...(country && country !== "XX" ? { country } : {}),
+      ...(country ? { country } : {}),
       ...(arena
         ? { team: arena.team, section: arena.section, role: arena.role ?? "distribution" }
         : {}),

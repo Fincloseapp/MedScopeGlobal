@@ -223,8 +223,11 @@ import {
   arenaMarkets,
   countriesForLocale,
   parseEditionLocale,
+  scoreCountryMarkets,
+  scoreCountryTraffic,
   scoreLocaleMarkets,
 } from "../../lib/growth/arena/markets";
+import { requestCountry } from "../../lib/growth/request-country";
 import {
   MAGAZINE_EDITORS_PER_LOCALE,
   MAGAZINE_WRITERS_PER_LOCALE,
@@ -2604,9 +2607,42 @@ assert.ok(
     assert.equal(de?.alfa.conversions, 2);
     assert.equal(ja?.leader, "beta");
     assert.equal(cs?.leader, "tie");
+    const countryScores = scoreCountryMarkets([
+      { event: "ai_agent_visit", payload: { agent: "alfa", country: "DE" } },
+      { event: "ai_agent_checkout", payload: { agent: "alfa", country: "DE" } },
+      { event: "ai_agent_visit", payload: { agent: "beta", country: "AT" } },
+    ]);
+    const deCountry = countryScores.find((row) => row.country === "DE");
+    const atCountry = countryScores.find((row) => row.country === "AT");
+    assert.equal(deCountry?.leader, "alfa");
+    assert.equal(deCountry?.alfa.visits, 1);
+    assert.equal(deCountry?.alfa.checkouts, 1);
+    assert.equal(atCountry?.leader, "beta");
+    assert.equal(atCountry?.beta.visits, 1);
+    const traffic = scoreCountryTraffic([
+      { event: "ai_agent_visit", payload: { agent: "perplexity", country: "DE" } },
+      { event: "ai_agent_visit", payload: { agent: "chatgpt", country: "DE" } },
+      { event: "ai_agent_visit", payload: { agent: "chatgpt", country: "DE" } },
+    ]);
+    assert.equal(traffic[0]?.country, "DE");
+    assert.equal(traffic[0]?.topAgent, "chatgpt");
+    assert.equal(traffic[0]?.visits, 3);
+    assert.equal(requestCountry(new Headers({ "cf-ipcountry": "JP" })), "JP");
+    assert.equal(requestCountry(new Headers({ "cf-ipcountry": "XX" })), null);
     assert.ok(
-      readFileSync(join(root, "app/r/ai/route.ts"), "utf8").includes("cf-ipcountry"),
+      readFileSync(join(root, "app/r/ai/route.ts"), "utf8").includes("requestCountry"),
       "hops must attribute the visitor country into the locale contest"
+    );
+    assert.ok(
+      readFileSync(join(root, "lib/growth/arena/tick.ts"), "utf8").includes("scoreCountryMarkets"),
+      "each arena tick must persist country scores"
+    );
+    assert.ok(
+      readFileSync(join(root, "lib/growth/arena/dashboard.ts"), "utf8").includes("scoreCountryTraffic"),
+      "admin /ai-teams must load real country traffic"
+    );
+    assert.ok(
+      readFileSync(join(root, "components/admin/arena-battle.tsx"), "utf8").includes("Hodnocení podle zemí")
     );
     assert.ok(
       readFileSync(join(root, "lib/growth/arena/tick.ts"), "utf8").includes("scoreLocaleMarkets"),

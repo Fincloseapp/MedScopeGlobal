@@ -1,7 +1,12 @@
 import { K_FACTOR_WINDOW_MS, REACH_QUOTA_DEFAULT } from "@/lib/growth/arena/config";
 import { ARENA_DISCOVERY_LOCALES } from "@/lib/growth/arena/locales";
 import { loadArenaEvents, reportFromWindow } from "@/lib/growth/arena/analyst-agent";
-import { scoreLocaleMarkets, windowFromEvents, type ArenaMarketScore } from "@/lib/growth/arena/markets";
+import {
+  scoreCountryMarkets,
+  scoreLocaleMarkets,
+  windowFromEvents,
+  type ArenaMarketScore,
+} from "@/lib/growth/arena/markets";
 import { generateTeamDrafts } from "@/lib/growth/arena/content-agent";
 import { distributeTeamReach } from "@/lib/growth/arena/distribution-agent";
 import { decideEvolution, type TeamRuntime } from "@/lib/growth/arena/evolution";
@@ -296,8 +301,72 @@ export async function runArenaTick(): Promise<ArenaTickResult> {
       }
     }
   }
+  const countryScores = scoreCountryMarkets(hourEvents).filter((row) => row.activity > 0);
+  let countryDecided = 0;
+  for (const row of countryScores) {
+    const alfaPts = scoreArenaWindow({
+      window: row.alfa,
+      actualK: row.alfa.kFactor,
+      section3Users: row.alfa.paid,
+      spam: false,
+      alreadyAwardedMilestone: true,
+    });
+    const betaPts = scoreArenaWindow({
+      window: row.beta,
+      actualK: row.beta.kFactor,
+      section3Users: row.beta.paid,
+      spam: false,
+      alreadyAwardedMilestone: true,
+    });
+    await writeMetric({
+      teamSlug: "alfa",
+      agentRole: "market",
+      section: `country:${row.country}`,
+      windowStart: hourStart,
+      windowMinutes: 60,
+      visits: row.alfa.visits,
+      checkouts: row.alfa.checkouts,
+      paid: row.alfa.paid,
+      newsletters: row.alfa.newsletters,
+      ctr: ctrOf(row.alfa),
+      kFactor: row.alfa.kFactor,
+      predictedK: null,
+      reachUsed: 1,
+      pointsDelta: alfaPts.teamPointsDelta,
+      spamFlag: false,
+    });
+    await writeMetric({
+      teamSlug: "beta",
+      agentRole: "market",
+      section: `country:${row.country}`,
+      windowStart: hourStart,
+      windowMinutes: 60,
+      visits: row.beta.visits,
+      checkouts: row.beta.checkouts,
+      paid: row.beta.paid,
+      newsletters: row.beta.newsletters,
+      ctr: ctrOf(row.beta),
+      kFactor: row.beta.kFactor,
+      predictedK: null,
+      reachUsed: 1,
+      pointsDelta: betaPts.teamPointsDelta,
+      spamFlag: false,
+    });
+    if (row.leader !== "tie") {
+      countryDecided += 1;
+      const winner = row.leader === "alfa" ? row.alfa : row.beta;
+      const loser = row.leader === "alfa" ? row.beta : row.alfa;
+      await writeEvolution({
+        action: "country",
+        winnerSlug: row.leader,
+        loserSlug: row.leader === "alfa" ? "beta" : "alfa",
+        detail: `${row.country}: ${row.leader} ${winner.visits}/${winner.conversions} > ${loser.visits}/${loser.conversions}`,
+      });
+    }
+  }
+
   actions.push(
-    `autonomní souboj ${markets.length} mutací · ${decided} rozhodnutých · země ${markets.flatMap((row) => row.countries).length}`
+    `autonomní souboj ${markets.length} mutací · ${decided} rozhodnutých · země ${countryScores.length} s provozem · ${countryDecided} vedení`
   );
 
   return {

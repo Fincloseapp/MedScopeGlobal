@@ -7,6 +7,18 @@ function formatInt(value: number): string {
   return value.toLocaleString("cs-CZ");
 }
 
+function countryName(code: string): string {
+  try {
+    return new Intl.DisplayNames(["cs"], { type: "region" }).of(code) ?? code;
+  } catch {
+    return code;
+  }
+}
+
+function scoreCell(input: { visits: number; checkouts: number; paid: number }): string {
+  return `${formatInt(input.visits)} / ${formatInt(input.checkouts)} / ${formatInt(input.paid)}`;
+}
+
 export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
   const [dash, setDash] = useState(initial);
   const [busy, setBusy] = useState(false);
@@ -112,33 +124,163 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
       </div>
 
       <section>
-        <h2 className="mb-2 font-display text-xl font-semibold">Souboj podle mutací a zemí</h2>
+        <h2 className="mb-2 font-display text-xl font-semibold">Hodnocení podle zemí</h2>
         <p className="mb-2 text-xs text-muted-foreground">
-          Autonomně každých 5 minut. Země se počítají do jazykové edice (AT/CH → DE, CA → EN-US).
+          Posledních 7 dní · sloupce Alfa/Beta = návštěvy / checkout / zaplaceno z ISO země
+          návštěvníka (<code>cf-ipcountry</code>). Nula znamená, že z té země zatím nepřišel hop
+          daného týmu — cron čísla nevymýšlí.
+          {dash.windowStart ? ` Okno od ${new Date(dash.windowStart).toLocaleString("cs-CZ")}.` : ""}
+        </p>
+        {(() => {
+          const liveCountries = (dash.countries ?? []).filter((row) => row.activity > 0);
+          const traffic = dash.countryTraffic ?? [];
+          const alfaLead = liveCountries.filter((row) => row.leader === "alfa").length;
+          const betaLead = liveCountries.filter((row) => row.leader === "beta").length;
+          return (
+            <div className="mb-3 grid gap-2 sm:grid-cols-3 text-sm">
+              <p className="rounded-lg border bg-white px-3 py-2">
+                Země s Alfa/Beta provozem: <strong>{formatInt(liveCountries.length)}</strong>
+              </p>
+              <p className="rounded-lg border bg-white px-3 py-2">
+                Vede Alfa / Beta: <strong>{formatInt(alfaLead)}</strong> / <strong>{formatInt(betaLead)}</strong>
+              </p>
+              <p className="rounded-lg border bg-white px-3 py-2">
+                Země s jakýmkoli agentem: <strong>{formatInt(traffic.length)}</strong>
+              </p>
+            </div>
+          );
+        })()}
+        <div className="overflow-x-auto rounded-xl border">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="px-3 py-2 text-left">Země</th>
+                <th className="px-3 py-2 text-left">Edice</th>
+                <th className="px-3 py-2 text-right">Alfa V/C/P</th>
+                <th className="px-3 py-2 text-right">Beta V/C/P</th>
+                <th className="px-3 py-2 text-left">Vede</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(dash.countries ?? [])
+                .filter((row) => row.activity > 0)
+                .map((row) => (
+                  <tr key={row.country} className="border-t bg-emerald-50/30">
+                    <td className="px-3 py-2 font-medium">
+                      {row.country} · {countryName(row.country)}
+                    </td>
+                    <td className="px-3 py-2 text-xs text-slate-600">{row.locale ?? "—"}</td>
+                    <td className="px-3 py-2 text-right tabular-nums">{scoreCell(row.alfa)}</td>
+                    <td className="px-3 py-2 text-right tabular-nums">{scoreCell(row.beta)}</td>
+                    <td className="px-3 py-2">{row.leader === "tie" ? "remíza" : row.leader}</td>
+                  </tr>
+                ))}
+              {(dash.countries ?? []).filter((row) => row.activity > 0).length === 0 ? (
+                <tr className="border-t">
+                  <td className="px-3 py-3 text-sm text-muted-foreground" colSpan={5}>
+                    Za 7 dní žádná Alfa/Beta událost s ISO zemí. Hop a checkout teď zemi zapisují;
+                    starší návštěvy bez <code>country</code> se sem nepočítají.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+
+        <h3 className="mb-2 mt-5 font-display text-lg font-semibold">Reálný provoz všech agentů podle země</h3>
+        <p className="mb-2 text-xs text-muted-foreground">
+          Stejné analytics okno. Sem spadne i ChatGPT / Perplexity, nejen Alfa a Beta.
+        </p>
+        {(dash.countryTraffic ?? []).length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            Žádná událost s ISO zemí. Bez <code>cf-ipcountry</code> nejde zemi přiřadit.
+          </p>
+        ) : (
+          <div className="overflow-x-auto rounded-xl border">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50">
+                <tr>
+                  <th className="px-3 py-2 text-left">Země</th>
+                  <th className="px-3 py-2 text-left">Edice</th>
+                  <th className="px-3 py-2 text-right">Návštěvy</th>
+                  <th className="px-3 py-2 text-right">Checkout</th>
+                  <th className="px-3 py-2 text-right">Zaplaceno</th>
+                  <th className="px-3 py-2 text-left">Nejčastější agent</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(dash.countryTraffic ?? []).map((row) => (
+                  <tr key={`traffic-${row.country}`} className="border-t">
+                    <td className="px-3 py-2 font-medium">
+                      {row.country} · {countryName(row.country)}
+                    </td>
+                    <td className="px-3 py-2 text-xs text-slate-600">{row.locale ?? "—"}</td>
+                    <td className="px-3 py-2 text-right">{formatInt(row.visits)}</td>
+                    <td className="px-3 py-2 text-right">{formatInt(row.checkouts)}</td>
+                    <td className="px-3 py-2 text-right">{formatInt(row.paid)}</td>
+                    <td className="px-3 py-2">
+                      {row.topAgent ?? "—"}
+                      {row.agents.length > 1 ? (
+                        <span className="block text-[11px] text-slate-500">
+                          {row.agents
+                            .slice(0, 4)
+                            .map((agent) => `${agent.agent} ${agent.visits}`)
+                            .join(" · ")}
+                        </span>
+                      ) : null}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <h3 className="mb-2 mt-5 font-display text-lg font-semibold">Souboj podle jazykových mutací</h3>
+        <p className="mb-2 text-xs text-muted-foreground">
+          AT/CH se sčítají do <code>/de</code>, CA do <code>/en-us</code>. Sloupce znovu V/C/P.
         </p>
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full text-sm">
             <thead className="bg-muted/50">
               <tr>
                 <th className="px-3 py-2 text-left">Mutace</th>
-                <th className="px-3 py-2 text-left">Země</th>
-                <th className="px-3 py-2 text-right">Alfa</th>
-                <th className="px-3 py-2 text-right">Beta</th>
+                <th className="px-3 py-2 text-left">Mapované země</th>
+                <th className="px-3 py-2 text-right">Alfa V/C/P</th>
+                <th className="px-3 py-2 text-right">Beta V/C/P</th>
                 <th className="px-3 py-2 text-left">Vede</th>
               </tr>
             </thead>
             <tbody>
-              {(dash.markets ?? []).map((row) => (
-                <tr key={row.locale} className="border-t">
-                  <td className="px-3 py-2 font-medium">
-                    {row.locale} · {row.label}
-                  </td>
-                  <td className="px-3 py-2 text-xs text-slate-600">{row.countries.join(", ") || "—"}</td>
-                  <td className="px-3 py-2 text-right">{row.alfa.conversions}</td>
-                  <td className="px-3 py-2 text-right">{row.beta.conversions}</td>
-                  <td className="px-3 py-2">{row.leader === "tie" ? "remíza" : row.leader}</td>
-                </tr>
-              ))}
+              {(dash.markets ?? [])
+                .slice()
+                .sort((a, b) => {
+                  const actA =
+                    a.alfa.visits + a.alfa.checkouts + a.alfa.paid + a.beta.visits + a.beta.checkouts + a.beta.paid;
+                  const actB =
+                    b.alfa.visits + b.alfa.checkouts + b.alfa.paid + b.beta.visits + b.beta.checkouts + b.beta.paid;
+                  return actB - actA || a.locale.localeCompare(b.locale);
+                })
+                .map((row) => {
+                  const activity =
+                    row.alfa.visits +
+                    row.alfa.checkouts +
+                    row.alfa.paid +
+                    row.beta.visits +
+                    row.beta.checkouts +
+                    row.beta.paid;
+                  return (
+                    <tr key={row.locale} className={`border-t ${activity > 0 ? "bg-emerald-50/30" : ""}`}>
+                      <td className="px-3 py-2 font-medium">
+                        {row.locale} · {row.label}
+                      </td>
+                      <td className="px-3 py-2 text-xs text-slate-600">{row.countries.join(", ") || "—"}</td>
+                      <td className="px-3 py-2 text-right tabular-nums">{scoreCell(row.alfa)}</td>
+                      <td className="px-3 py-2 text-right tabular-nums">{scoreCell(row.beta)}</td>
+                      <td className="px-3 py-2">{row.leader === "tie" ? "remíza" : row.leader}</td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>
@@ -199,6 +341,7 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
               <thead className="bg-muted/50">
                 <tr>
                   <th className="px-3 py-2 text-left">Tým</th>
+                  <th className="px-3 py-2 text-left">Řez</th>
                   <th className="px-3 py-2 text-right">Visit</th>
                   <th className="px-3 py-2 text-right">Checkout</th>
                   <th className="px-3 py-2 text-right">Paid</th>
@@ -210,6 +353,7 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
                 {dash.metrics.slice(0, 12).map((row, index) => (
                   <tr key={`${row.teamSlug}-${row.createdAt}-${index}`} className="border-t">
                     <td className="px-3 py-2">{row.teamSlug}</td>
+                    <td className="px-3 py-2 text-xs text-slate-600">{row.section ?? "—"}</td>
                     <td className="px-3 py-2 text-right">{row.visits}</td>
                     <td className="px-3 py-2 text-right">{row.checkouts}</td>
                     <td className="px-3 py-2 text-right">{row.paid}</td>

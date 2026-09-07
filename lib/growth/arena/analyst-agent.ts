@@ -1,3 +1,4 @@
+import { createAdminReadClient } from "@/lib/auth/require-admin-access";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import {
   K_FACTOR_SHARE_THRESHOLD,
@@ -24,7 +25,14 @@ export type AnalystReport = {
 };
 
 export async function loadArenaEvents(sinceIso: string): Promise<ArenaAnalyticsEvent[]> {
-  const admin = tryCreateServiceRoleClient();
+  let admin = tryCreateServiceRoleClient();
+  if (!admin) {
+    try {
+      admin = await createAdminReadClient();
+    } catch {
+      admin = null;
+    }
+  }
   if (!admin) return [];
   try {
     const rows: { event: unknown; payload: unknown }[] = [];

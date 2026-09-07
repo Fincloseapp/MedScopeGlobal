@@ -11,6 +11,7 @@ import {
   sendViaLongeVitaWelcome,
 } from "@/lib/monetization/vialongevita-brief";
 import { readAiRefFromCookieHeader } from "@/lib/growth/ai-ref-cookie";
+import { requestCountry } from "@/lib/growth/request-country";
 
 export const dynamic = "force-dynamic";
 
@@ -151,7 +152,14 @@ export async function POST(request: Request) {
         ...(aiRef ? { agent: aiRef } : {}),
       });
       if (aiRef) {
-        await logMonetizationEvent("ai_agent_newsletter", { agent: aiRef, locale, segment, source });
+        const country = requestCountry(request.headers);
+        await logMonetizationEvent("ai_agent_newsletter", {
+          agent: aiRef,
+          locale,
+          segment,
+          source,
+          ...(country ? { country } : {}),
+        });
       }
       await notifyNewsletterSignup({ email, locale, segment, source }).catch(() => undefined);
       welcome = await sendViaLongeVitaWelcome({ email, locale }).catch(() => false);

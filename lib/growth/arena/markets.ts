@@ -1,9 +1,11 @@
 import { GEO_LOCALE_MAP, GLOBAL_LOCALES, localeFromCountry, type GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { pathSegmentToLocale, resolveGlobalLocale } from "@/lib/i18n/locale-path";
 import { resolveSupportedLocale } from "@/lib/i18n/config";
+import { normalizeAiAgentSlug } from "@/lib/growth/ai-agent-program";
 import { ARENA_DISCOVERY_LOCALES } from "@/lib/growth/arena/locales";
 import { estimateKFactor, type ConversionWindow } from "@/lib/growth/arena/metrics";
 import { isArenaTeamSlug, type ArenaTeamSlug } from "@/lib/growth/arena/config";
+import { payloadCountry } from "@/lib/growth/request-country";
 
 export type ArenaMarket = {
   locale: GlobalLocaleCode;
@@ -60,11 +62,13 @@ export function eventEditionLocale(payload: Record<string, unknown>): GlobalLoca
   const raw = payload.locale ?? payload.lang ?? payload.edition;
   const fromLocale = parseEditionLocale(raw == null ? null : String(raw));
   if (fromLocale) return fromLocale;
-  const country = payload.country ?? payload.cfCountry ?? payload.cf_ipcountry;
-  if (country != null && String(country).trim() && String(country).toUpperCase() !== "XX") {
-    return localeFromCountry(String(country));
-  }
+  const country = payloadCountry(payload);
+  if (country) return localeFromCountry(country);
   return null;
+}
+
+export function eventCountryCode(payload: Record<string, unknown>): string | null {
+  return payloadCountry(payload);
 }
 
 export function eventMatchesTeam(payload: Record<string, unknown>, team: ArenaTeamSlug): boolean {
@@ -110,9 +114,131 @@ export function scoreLocaleMarkets(events: ArenaAnalyticsEvent[]): ArenaMarketSc
   return arenaMarkets().map((market) => {
     const alfa = withK(windowFromEvents(events, "alfa", market.locale));
     const beta = withK(windowFromEvents(events, "beta", market.locale));
-    let leader: ArenaMarketScore["leader"] = "tie";
-    if (alfa.conversions > beta.conversions) leader = "alfa";
-    if (beta.conversions > alfa.conversions) leader = "beta";
-    return { ...market, alfa, beta, leader };
+    return { ...market, alfa, beta, leader: leaderOf(alfa, beta) };
   });
+}
+
+export type ArenaTeamWindow = ConversionWindow & { conversions: number; kFactor: number };
+
+export type ArenaCountryScore = {
+  country: string;
+  locale: GlobalLocaleCode | null;
+  alfa: ArenaTeamWindow;
+  beta: ArenaTeamWindow;
+  leader: ArenaTeamSlug | "tie";
+  activity: number;
+};
+
+export type CountryAgentCell = ConversionWindow & { agent: string };
+
+export type CountryTrafficRow = {
+  country: string;
+  locale: GlobalLocaleCode | null;
+  visits: number;
+  checkouts: number;
+  paid: number;
+  newsletters: number;
+  topAgent: string | null;
+  agents: CountryAgentCell[];
+};
+
+function activityOf(window: ConversionWindow): number {
+  return window.visits + window.checkouts + window.paid + window.newsletters;
+}
+
+function leaderOf(alfa: ArenaTeamWindow, beta: ArenaTeamWindow): ArenaTeamSlug | "tie" {
+  if (alfa.conversions !== beta.conversions) {
+    return alfa.conversions > beta.conversions ? "alfa" : "beta";
+  }
+  if (alfa.visits !== beta.visits) {
+    return alfa.visits > beta.visits ? "alfa" : "beta";
+  }
+  return "tie";
+}
+
+export function knownArenaCountries(): string[] {
+  return [...new Set(Object.keys(GEO_LOCALE_MAP))].sort();
+}
+
+export function windowFromCountryEvents(
+  events: ArenaAnalyticsEvent[],
+  team: ArenaTeamSlug,
+  country: string
+): ConversionWindow {
+  const window = emptyWindow();
+  for (const row of events) {
+    if (!eventMatchesTeam(row.payload, team)) continue;
+    if (eventCountryCode(row.payload) !== country) continue;
+    if (row.event === "ai_agent_visit") window.visits += 1;
+    if (row.event === "ai_agent_checkout") window.checkouts += 1;
+    if (row.event === "ai_agent_newsletter") window.newsletters += 1;
+    if (row.event === "ai_agent_paid") window.paid += 1;
+  }
+  return window;
+}
+
+export function scoreCountryMarkets(events: ArenaAnalyticsEvent[]): ArenaCountryScore[] {
+  const seen = new Set<string>();
+  for (const row of events) {
+    const code = eventCountryCode(row.payload);
+    if (code) seen.add(code);
+  }
+  const countries = new Set([...knownArenaCountries(), ...seen]);
+  return [...countries]
+    .map((country) => {
+      const alfa = withK(windowFromCountryEvents(events, "alfa", country));
+      const beta = withK(windowFromCountryEvents(events, "beta", country));
+      return {
+        country,
+        locale: GEO_LOCALE_MAP[country] ?? (seen.has(country) ? localeFromCountry(country) : null),
+        alfa,
+        beta,
+        leader: leaderOf(alfa, beta),
+        activity: activityOf(alfa) + activityOf(beta),
+      };
+    })
+    .sort((a, b) => b.activity - a.activity || a.country.localeCompare(b.country));
+}
+
+export function scoreCountryTraffic(events: ArenaAnalyticsEvent[]): CountryTrafficRow[] {
+  const byCountry = new Map<string, Map<string, ConversionWindow>>();
+  for (const row of events) {
+    const country = eventCountryCode(row.payload);
+    if (!country) continue;
+    const agent =
+      normalizeAiAgentSlug(String(row.payload.agent ?? row.payload.ref ?? row.payload.team ?? "")) ??
+      "other";
+    if (!byCountry.has(country)) byCountry.set(country, new Map());
+    const agents = byCountry.get(country)!;
+    const cell = agents.get(agent) ?? emptyWindow();
+    if (row.event === "ai_agent_visit") cell.visits += 1;
+    if (row.event === "ai_agent_checkout") cell.checkouts += 1;
+    if (row.event === "ai_agent_newsletter") cell.newsletters += 1;
+    if (row.event === "ai_agent_paid") cell.paid += 1;
+    agents.set(agent, cell);
+  }
+  const rows: CountryTrafficRow[] = [];
+  for (const [country, agents] of byCountry) {
+    const list: CountryAgentCell[] = [...agents.entries()]
+      .map(([agent, window]) => ({ agent, ...window }))
+      .sort((a, b) => activityOf(b) - activityOf(a) || a.agent.localeCompare(b.agent));
+    const totals = list.reduce(
+      (acc, row) => {
+        acc.visits += row.visits;
+        acc.checkouts += row.checkouts;
+        acc.paid += row.paid;
+        acc.newsletters += row.newsletters;
+        return acc;
+      },
+      emptyWindow()
+    );
+    rows.push({
+      country,
+      locale: GEO_LOCALE_MAP[country] ?? localeFromCountry(country),
+      ...totals,
+      topAgent: list[0]?.agent ?? null,
+      agents: list,
+    });
+  }
+  return rows.sort((a, b) => activityOf(b) - activityOf(a) || a.country.localeCompare(b.country));
 }
