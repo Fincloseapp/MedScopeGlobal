@@ -1,4 +1,6 @@
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { EDITORIAL_PAID_COOKIE, isEditorialCookieValid } from "@/lib/auth/editorial-cookie";
 
 export function editorialAccessFromFlags(input: {
   isVip?: boolean;
@@ -34,6 +36,16 @@ export async function hasActiveReaderSubscription(userId: string | undefined): P
       const end = new Date(String(raw)).getTime();
       return Number.isNaN(end) || end > now;
     });
+  } catch {
+    return false;
+  }
+}
+
+/** Guest Editorial unlock after Stripe — cookie set by /api/v27/claim-editorial. */
+export async function hasEditorialCookieAccess(): Promise<boolean> {
+  try {
+    const jar = await cookies();
+    return isEditorialCookieValid(jar.get(EDITORIAL_PAID_COOKIE)?.value);
   } catch {
     return false;
   }

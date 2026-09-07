@@ -66,13 +66,15 @@ export function applySecurityHeaders(response: NextResponse, pathname?: string):
     response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   }
   const stripped = pathname ? resolveLocalePath(pathname).pathname : "";
-  if (stripped === "/studenti" || stripped.startsWith("/studenti/")) {
-    response.headers.set(
-      "Cache-Control",
-      "private, no-cache, no-store, must-revalidate"
-    );
-  }
-  if (stripped === "/lekari" || stripped.startsWith("/lekari/")) {
+  if (
+    stripped === "/studenti" ||
+    stripped.startsWith("/studenti/") ||
+    stripped === "/lekari" ||
+    stripped.startsWith("/lekari/") ||
+    stripped.startsWith("/article/") ||
+    stripped.startsWith("/checkout/") ||
+    stripped.startsWith("/verejnost/clanky/")
+  ) {
     response.headers.set(
       "Cache-Control",
       "private, no-cache, no-store, must-revalidate"

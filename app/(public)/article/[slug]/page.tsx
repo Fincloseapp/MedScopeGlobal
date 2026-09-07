@@ -83,6 +83,8 @@ import { aktualityChip } from "@/lib/i18n/aktuality-chrome";
 import { isNovinkyArticle } from "@/lib/v271/news-desks";
 import { localeToPathSegment } from "@/lib/i18n/locale-path";
 
+export const dynamic = "force-dynamic";
+
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

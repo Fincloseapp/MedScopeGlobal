@@ -435,6 +435,42 @@ const nextConfig = {
           { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
         ],
       },
+      {
+        source: "/article/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/:locale/article/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/verejnost/clanky/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/:locale/verejnost/clanky/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/checkout/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/:locale/checkout/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
 
       {
         source: "/admin",

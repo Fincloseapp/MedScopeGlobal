@@ -3,6 +3,8 @@ import { Suspense } from "react";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { CheckoutSuccessPanel } from "@/components/checkout/checkout-success-panel";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   return await buildLocalizedV20PageMetadata({
     title: "Platba úspěšná | MedScopeGlobal",

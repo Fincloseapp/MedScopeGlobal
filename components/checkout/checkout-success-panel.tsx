@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
@@ -12,7 +12,12 @@ function editorialSuccessCopy(locale: string) {
   if (primary === "de") {
     return {
       title: "Zahlung erfolgreich",
-      body: "Danke. Die Redaktion ist jetzt offen — weiterlesen, wann Sie wollen.",
+      body: "Danke. Die Redaktion wird jetzt auf diesem Gerät geöffnet.",
+      opening: "Redaktion wird auf diesem Gerät geöffnet…",
+      opened: "Dieses Gerät hat jetzt Zugang. Sie können die Artikel sofort lesen — das Stripe-Konto legen wir im Hintergrund an.",
+      failed: "Die Zahlung ist durch, aber dieses Gerät ließ sich nicht entsperren. Erneut versuchen oder mit derselben E-Mail anmelden.",
+      retry: "Erneut entsperren",
+      unlocking: "Zugang wird geöffnet…",
       read: "Artikel weiterlesen",
       plans: "Tarife",
     };
@@ -20,7 +25,12 @@ function editorialSuccessCopy(locale: string) {
   if (primary === "fr") {
     return {
       title: "Paiement réussi",
-      body: "Merci. La rédaction est ouverte — continuez votre lecture.",
+      body: "Merci. La rédaction s’ouvre maintenant sur cet appareil.",
+      opening: "Ouverture de la rédaction sur cet appareil…",
+      opened: "Cet appareil a maintenant accès. Vous pouvez lire les articles tout de suite — le compte Stripe sera rattaché en arrière-plan.",
+      failed: "Le paiement a réussi, mais cet appareil n’a pas pu être déverrouillé. Réessayez, ou connectez-vous avec le même e-mail.",
+      retry: "Réessayer le déverrouillage",
+      unlocking: "Déverrouillage…",
       read: "Continuer l’article",
       plans: "Formules",
     };
@@ -28,14 +38,26 @@ function editorialSuccessCopy(locale: string) {
   if (primary !== "cs") {
     return {
       title: "Payment successful",
-      body: "Thank you. Editorial is open — continue reading whenever you like.",
+      body: "Thank you. Editorial is opening on this device now.",
+      opening: "Opening the magazine on this device…",
+      opened: "This device now has access. You can read articles now; we will attach the Stripe email in the background.",
+      failed: "Payment succeeded, but this device could not be unlocked. Retry, or sign in with the same email.",
+      retry: "Retry unlock",
+      unlocking: "Unlocking access…",
       read: "Continue reading",
       plans: "Plans",
     };
   }
   return {
     title: "Platba proběhla úspěšně",
-    body: "Děkujeme. Redakce je teď otevřená — čtěte dál, kdy chcete.",
+    body: "Děkujeme. Redakce se na tomto zařízení právě otevírá.",
+    opening: "Otevíráme Redakci na tomto zařízení…",
+    opened:
+      "Toto zařízení má přístup. Články můžete číst hned — účet z e-mailu Stripe přidáme na pozadí.",
+    failed:
+      "Platba prošla, ale toto zařízení se nepodařilo odemknout. Zkuste to znovu, nebo se přihlaste stejným e-mailem.",
+    retry: "Odemknout znovu",
+    unlocking: "Odemykáme přístup…",
     read: "Pokračovat ve čtení",
     plans: "Ceník",
   };
@@ -56,6 +78,50 @@ export function CheckoutSuccessPanel() {
   const editorialCopy = editorial ? editorialSuccessCopy(locale) : null;
   const articlesHref = localizePublicHref("/articles", locale);
   const plansHref = localizePublicHref("/predplatne#public", locale);
+  const [claimed, setClaimed] = useState(!editorial);
+  const [claimFailed, setClaimFailed] = useState(false);
+  const [claiming, setClaiming] = useState(editorial && Boolean(sessionId));
+
+  const claimEditorial = useCallback(async () => {
+    if (!sessionId) {
+      setClaimFailed(true);
+      setClaiming(false);
+      return;
+    }
+    setClaiming(true);
+    setClaimFailed(false);
+    try {
+      const res = await fetch("/api/v27/claim-editorial", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      });
+      if (!res.ok) {
+        setClaimFailed(true);
+        return;
+      }
+      setClaimed(true);
+    } catch {
+      setClaimFailed(true);
+    } finally {
+      setClaiming(false);
+    }
+  }, [sessionId]);
+
+  useEffect(() => {
+    if (!editorial) {
+      setClaimed(true);
+      setClaiming(false);
+      return;
+    }
+    if (!sessionId) {
+      setClaimFailed(true);
+      setClaiming(false);
+      return;
+    }
+    void claimEditorial();
+  }, [editorial, sessionId, claimEditorial]);
 
   return (
     <div className="mx-auto max-w-lg px-4 py-20 text-center">
@@ -64,9 +130,26 @@ export function CheckoutSuccessPanel() {
           {editorialCopy?.title ?? "Platba proběhla úspěšně"}
         </h1>
         <p className="mt-3 text-sm text-green-800">
-          {editorialCopy?.body ??
-            "Děkujeme za nákup. Potvrzení obdržíte e-mailem. Přístup k obsahu bude aktivován během několika minut."}
+          {editorial
+            ? claiming
+              ? editorialCopy?.opening
+              : claimed
+                ? editorialCopy?.opened
+                : editorialCopy?.body
+            : "Děkujeme za nákup. Potvrzení obdržíte e-mailem. Přístup k obsahu bude aktivován během několika minut."}
         </p>
+        {claimFailed ? (
+          <div className="mt-4 space-y-2">
+            <p className="text-sm text-amber-800">{editorialCopy?.failed}</p>
+            <button
+              type="button"
+              onClick={() => void claimEditorial()}
+              className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-950"
+            >
+              {editorialCopy?.retry}
+            </button>
+          </div>
+        ) : null}
         {gift && share ? (
           <div className="mt-5 rounded-2xl border border-green-200 bg-white p-4 text-left">
             <p className="text-sm font-semibold text-[#021d33]">Odkaz pro studenta</p>
@@ -85,12 +168,22 @@ export function CheckoutSuccessPanel() {
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           {editorial ? (
             <>
-              <Link
-                href={articlesHref}
-                className="rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
-              >
-                {editorialCopy?.read}
-              </Link>
+              {claimed ? (
+                <Link
+                  href={articlesHref}
+                  className="rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
+                >
+                  {editorialCopy?.read}
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="cursor-wait rounded-full bg-[#005B96]/50 px-5 py-2.5 text-sm font-semibold text-white"
+                >
+                  {editorialCopy?.unlocking}
+                </button>
+              )}
               <Link
                 href={plansHref}
                 className="rounded-full border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"

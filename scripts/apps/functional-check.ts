@@ -316,6 +316,7 @@ import {
   isFreeNewsDeskArticle,
   resolveArticleBodyLock,
 } from "../../lib/auth/article-eligibility";
+import { isEditorialCookieValid } from "../../lib/auth/editorial-cookie";
 import { getEditorialArticleGateCopy } from "../../lib/v38/conversion-copy";
 import { getSubscribeCopy } from "../../lib/i18n/subscribe-copy";
 import {
@@ -4298,6 +4299,42 @@ console.log("✓ magazine desk byline and copy checks passed");
     const successSrc = readFileSync(join(root, "components/checkout/checkout-success-panel.tsx"), "utf8");
     assert.ok(successSrc.includes('product.startsWith("public-")'));
     assert.ok(successSrc.includes('localizePublicHref("/articles"'));
+    assert.ok(successSrc.includes("/api/v27/claim-editorial"));
+    assert.ok(successSrc.includes("claimed"));
+    assert.ok(existsSync(join(root, "app/api/v27/claim-editorial/route.ts")));
+    const claimSrc = readFileSync(join(root, "app/api/v27/claim-editorial/route.ts"), "utf8");
+    assert.ok(claimSrc.includes("isEditorialGrantProduct"));
+    assert.ok(claimSrc.includes("EDITORIAL_PAID_COOKIE"));
+    assert.ok(claimSrc.includes('startsWith("cs_")'));
+    const readerCtx = readFileSync(join(root, "lib/auth/reader-context.ts"), "utf8");
+    assert.ok(readerCtx.includes("hasEditorialCookieAccess"));
+    assert.ok(readerCtx.includes("withCookie"));
+    assert.ok(
+      readFileSync(join(root, "lib/auth/editorial-access.ts"), "utf8").includes("hasEditorialCookieAccess")
+    );
+    assert.equal(isEditorialCookieValid(""), false);
+    assert.equal(isEditorialCookieValid("abc"), false);
+    assert.equal(isEditorialCookieValid(String(Date.now() - 1000)), false);
+    assert.equal(isEditorialCookieValid(String(Date.now() + 86_400_000)), true);
+    assert.equal(isEditorialCookieValid(String(Date.now() + 500 * 86_400_000)), false);
+    const nextCfg = readFileSync(join(root, "next.config.mjs"), "utf8");
+    assert.ok(nextCfg.includes("/:locale/article/:path*"), "locale article HTML must not inherit public s-maxage");
+    assert.ok(nextCfg.includes("/article/:path*"));
+    const headerSrc = readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8");
+    assert.ok(headerSrc.includes('stripped.startsWith("/article/")'));
+    assert.ok(headerSrc.includes('stripped.startsWith("/checkout/")'));
+    assert.ok(
+      readFileSync(join(root, "app/(public)/article/[slug]/page.tsx"), "utf8").includes(
+        'export const dynamic = "force-dynamic"'
+      )
+    );
+    assert.ok(
+      readFileSync(join(root, "app/(public)/verejnost/clanky/[slug]/page.tsx"), "utf8").includes(
+        'export const dynamic = "force-dynamic"'
+      )
+    );
+    assert.ok(webhookSrc.includes("findAuthUserIdByEmail"));
+    assert.ok(webhookSrc.includes("auth/v1/admin/users"));
     const distSrc = readFileSync(join(root, "lib/growth/arena/distribution-agent.ts"), "utf8");
     assert.ok(distSrc.indexOf("predplatne") < distSrc.indexOf('section: "dokscope"'));
     const navCta = readFileSync(join(root, "components/v38/nav-subscribe-cta.tsx"), "utf8");

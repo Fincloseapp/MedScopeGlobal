@@ -92,6 +92,38 @@ async function resolveV27UserId(
   return null;
 }
 
+async function upsertPublicUser(admin: AdminClient, userId: string, email: string) {
+  await admin.from("users").upsert(
+    {
+      id: userId,
+      email,
+      role: "user",
+      access_level: "public",
+      verification_status: "approved",
+    },
+    { onConflict: "id" }
+  );
+}
+
+/** Auth user may exist without a public.users row — GoTrue filter finds the id. */
+async function findAuthUserIdByEmail(email: string): Promise<string | null> {
+  const url = (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || "").replace(/\/$/, "");
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
+  if (!url || !key) return null;
+  try {
+    const res = await fetch(
+      `${url}/auth/v1/admin/users?page=1&per_page=5&filter=${encodeURIComponent(email)}`,
+      { headers: { Authorization: `Bearer ${key}`, apikey: key } }
+    );
+    if (!res.ok) return null;
+    const body = (await res.json()) as { users?: Array<{ id?: string; email?: string }> };
+    const match = body.users?.find((row) => String(row.email ?? "").toLowerCase() === email);
+    return match?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function findOrCreateReaderByEmail(admin: AdminClient, email?: string | null): Promise<string | null> {
   const normalized = String(email ?? "").trim().toLowerCase();
   if (!normalized.includes("@")) return null;
@@ -102,22 +134,19 @@ async function findOrCreateReaderByEmail(admin: AdminClient, email?: string | nu
     email_confirm: true,
     user_metadata: { access_level: "public", source: "stripe-editorial" },
   });
-  if (created.user?.id) {
-    await admin.from("users").upsert(
-      {
-        id: created.user.id,
-        email: normalized,
-        role: "user",
-        access_level: "public",
-        verification_status: "approved",
-      },
-      { onConflict: "id" }
-    );
+  if (created?.user?.id) {
+    await upsertPublicUser(admin, created.user.id, normalized);
     return created.user.id;
   }
+  const existingId =
+    (await admin.from("users").select("id").eq("email", normalized).maybeSingle()).data?.id ??
+    (await findAuthUserIdByEmail(normalized));
+  if (existingId) {
+    await upsertPublicUser(admin, existingId as string, normalized);
+    return existingId as string;
+  }
   if (error) {
-    const { data: again } = await admin.from("users").select("id").eq("email", normalized).maybeSingle();
-    if (again?.id) return again.id as string;
+    console.error("findOrCreateReaderByEmail", error.message);
   }
   return null;
 }
