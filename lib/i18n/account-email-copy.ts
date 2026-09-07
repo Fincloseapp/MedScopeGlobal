@@ -10,6 +10,8 @@ export type AccountEmailCopy = {
   signupExpiry: string;
   subscriptionSubject: (plan: string) => string;
   subscriptionBody: (plan: string) => string;
+  subscriptionSignInCta: string;
+  subscriptionSignInHint: string;
   openSite: string;
 };
 
@@ -23,6 +25,8 @@ const PACKS: Record<ChromePack, AccountEmailCopy> = {
     signupExpiry: "Odkaz platí omezenou dobu.",
     subscriptionSubject: (plan) => `Předplatné ${plan} aktivováno`,
     subscriptionBody: (plan) => `Vaše předplatné ${SITE.name} (${plan}) je aktivní.`,
+    subscriptionSignInCta: "Otevřít Redakci na tomto zařízení",
+    subscriptionSignInHint: "Odkaz otevře účet z e-mailu, kterým jste platili.",
     openSite: `Otevřít ${SITE.name}`,
   },
   de: {
@@ -34,6 +38,8 @@ const PACKS: Record<ChromePack, AccountEmailCopy> = {
     signupExpiry: "Der Link ist nur begrenzt gültig.",
     subscriptionSubject: (plan) => `Abo ${plan} aktiviert`,
     subscriptionBody: (plan) => `Ihr ${SITE.name}-Abo (${plan}) ist aktiv.`,
+    subscriptionSignInCta: "Redaktion auf diesem Gerät öffnen",
+    subscriptionSignInHint: "Der Link öffnet das Konto der E-Mail, mit der Sie bezahlt haben.",
     openSite: `${SITE.name} öffnen`,
   },
   fr: {
@@ -45,6 +51,8 @@ const PACKS: Record<ChromePack, AccountEmailCopy> = {
     signupExpiry: "Le lien expire après un délai limité.",
     subscriptionSubject: (plan) => `Abonnement ${plan} activé`,
     subscriptionBody: (plan) => `Votre abonnement ${SITE.name} (${plan}) est actif.`,
+    subscriptionSignInCta: "Ouvrir la rédaction sur cet appareil",
+    subscriptionSignInHint: "Le lien ouvre le compte de l’e-mail utilisé pour payer.",
     openSite: `Ouvrir ${SITE.name}`,
   },
   it: {
@@ -56,6 +64,8 @@ const PACKS: Record<ChromePack, AccountEmailCopy> = {
     signupExpiry: "Il link è valido per un tempo limitato.",
     subscriptionSubject: (plan) => `Abbonamento ${plan} attivato`,
     subscriptionBody: (plan) => `Il tuo abbonamento ${SITE.name} (${plan}) è attivo.`,
+    subscriptionSignInCta: "Apri la redazione su questo dispositivo",
+    subscriptionSignInHint: "Il link apre l’account dell’e-mail usata per il pagamento.",
     openSite: `Apri ${SITE.name}`,
   },
   es: {
@@ -67,6 +77,8 @@ const PACKS: Record<ChromePack, AccountEmailCopy> = {
     signupExpiry: "El enlace caduca en un plazo limitado.",
     subscriptionSubject: (plan) => `Suscripción ${plan} activada`,
     subscriptionBody: (plan) => `Su suscripción ${SITE.name} (${plan}) está activa.`,
+    subscriptionSignInCta: "Abrir la redacción en este dispositivo",
+    subscriptionSignInHint: "El enlace abre la cuenta del correo con el que pagó.",
     openSite: `Abrir ${SITE.name}`,
   },
   "pt-BR": {
@@ -78,6 +90,8 @@ const PACKS: Record<ChromePack, AccountEmailCopy> = {
     signupExpiry: "O link vale por tempo limitado.",
     subscriptionSubject: (plan) => `Assinatura ${plan} ativada`,
     subscriptionBody: (plan) => `Sua assinatura ${SITE.name} (${plan}) está ativa.`,
+    subscriptionSignInCta: "Abrir a redação neste aparelho",
+    subscriptionSignInHint: "O link abre a conta do e-mail usado no pagamento.",
     openSite: `Abrir ${SITE.name}`,
   },
   en: {
@@ -89,6 +103,8 @@ const PACKS: Record<ChromePack, AccountEmailCopy> = {
     signupExpiry: "The link expires after a limited time.",
     subscriptionSubject: (plan) => `${plan} subscription activated`,
     subscriptionBody: (plan) => `Your ${SITE.name} subscription (${plan}) is active.`,
+    subscriptionSignInCta: "Open Editorial on this device",
+    subscriptionSignInHint: "The link opens the account for the email you paid with.",
     openSite: `Open ${SITE.name}`,
   },
 };

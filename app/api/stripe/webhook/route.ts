@@ -19,6 +19,7 @@ import {
   grantStudentClubAccess,
   revokeStudentClubAccess,
 } from "@/lib/billing/student-entitlement";
+import { createEditorialMagicLink } from "@/lib/auth/editorial-signin-link";
 
 export const dynamic = "force-dynamic";
 
@@ -445,16 +446,18 @@ export async function POST(request: Request) {
           })
           .eq("stripe_session_id", session.id);
 
-        if (customerEmail && session.metadata?.product_id) {
+        const kind = session.metadata?.kind ?? "";
+        const productId = session.metadata?.product_id;
+        const waitForEditorialLink = Boolean(
+          customerEmail && productId && isEditorialGrantProduct(productId)
+        );
+        if (customerEmail && productId && !waitForEditorialLink) {
           void notifySubscriptionConfirmed(
             customerEmail,
-            session.metadata.product_id.replace(/-month|-year/g, ""),
+            productId.replace(/-month|-year/g, ""),
             session.metadata?.locale
           );
         }
-
-        const kind = session.metadata?.kind ?? "";
-        const productId = session.metadata?.product_id;
         if (kind.includes("subscription") && productId) {
           let periodEndIso: string | null = null;
           let subscriptionUserId: string | null = null;
@@ -492,6 +495,20 @@ export async function POST(request: Request) {
           }
           if (resolvedUserId && isStudentGrantProduct(productId)) {
             await grantStudentClubAccess(resolvedUserId);
+          }
+          if (waitForEditorialLink && customerEmail && productId) {
+            const signInUrl = await createEditorialMagicLink(
+              admin,
+              customerEmail,
+              session.metadata?.locale,
+              session.metadata?.return_path
+            );
+            void notifySubscriptionConfirmed(
+              customerEmail,
+              productId.replace(/-month|-year/g, ""),
+              session.metadata?.locale,
+              signInUrl
+            );
           }
         }
 

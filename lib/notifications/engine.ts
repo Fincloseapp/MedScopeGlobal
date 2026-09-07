@@ -46,8 +46,16 @@ export async function dispatchNotification(payload: NotificationPayload) {
 
   const locale = resolveEmailLocale(String(payload.metadata?.locale ?? ""));
   const copy = getAccountEmailCopy(locale);
+  const ctaLabel =
+    typeof payload.metadata?.ctaLabel === "string" && payload.metadata.ctaLabel
+      ? payload.metadata.ctaLabel
+      : copy.openSite;
+  const hint =
+    typeof payload.metadata?.ctaHint === "string" && payload.metadata.ctaHint
+      ? `<p>${payload.metadata.ctaHint}</p>`
+      : "";
   const html = payload.url
-    ? `${generated.html}<p><a href="${payload.url}">${copy.openSite}</a></p>`
+    ? `${generated.html}${hint}<p><a href="${payload.url}">${ctaLabel}</a></p>`
     : generated.html;
 
   const category = payload.kind === "subscription" ? "transactional" : "system";
@@ -82,15 +90,22 @@ export async function notifyNewStudy(recipient: string, title: string, url: stri
 export async function notifySubscriptionConfirmed(
   recipient: string,
   planName: string,
-  locale?: string | null
+  locale?: string | null,
+  signInUrl?: string | null
 ) {
   const pack = getAccountEmailCopy(resolveEmailLocale(locale));
+  const link = signInUrl?.trim();
   return dispatchNotification({
     kind: "subscription",
     recipient,
     title: pack.subscriptionSubject(planName),
     body: pack.subscriptionBody(planName),
-    url: SITE.url,
-    metadata: { locale: resolveEmailLocale(locale) },
+    url: link || SITE.url,
+    metadata: {
+      locale: resolveEmailLocale(locale),
+      ...(link
+        ? { ctaLabel: pack.subscriptionSignInCta, ctaHint: pack.subscriptionSignInHint }
+        : {}),
+    },
   });
 }

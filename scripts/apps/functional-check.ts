@@ -4300,7 +4300,18 @@ console.log("✓ magazine desk byline and copy checks passed");
     const webhookSrc = readFileSync(join(root, "app/api/stripe/webhook/route.ts"), "utf8");
     assert.ok(webhookSrc.includes("isEditorialGrantProduct"));
     assert.ok(webhookSrc.includes("findOrCreateReaderByEmail"));
+    assert.ok(webhookSrc.includes("createEditorialMagicLink"));
+    assert.ok(webhookSrc.includes("waitForEditorialLink"));
     assert.ok(webhookSrc.includes('?? "other"'));
+    assert.ok(
+      readFileSync(join(root, "lib/notifications/engine.ts"), "utf8").includes("signInUrl")
+    );
+    assert.ok(
+      readFileSync(join(root, "lib/auth/editorial-signin-link.ts"), "utf8").includes("magiclink")
+    );
+    assert.ok(getAccountEmailCopy("de").subscriptionSignInCta.includes("Redaktion"));
+    assert.ok(!getAccountEmailCopy("fr").subscriptionSignInCta.includes("Redakci"));
+    assert.ok(getAccountEmailCopy("sk").subscriptionSignInCta.includes("Editorial"));
     const checkoutSrc = readFileSync(join(root, "lib/stripe/v27-checkout.ts"), "utf8");
     assert.ok(checkoutSrc.includes('localizePublicHref("/predplatne?canceled=1"'));
     assert.ok(checkoutSrc.includes("&product="));
@@ -4317,6 +4328,7 @@ console.log("✓ magazine desk byline and copy checks passed");
     assert.ok(successSrc.includes("claimed"));
     assert.ok(successSrc.includes("safeEditorialReturnPath"));
     assert.ok(successSrc.includes("alreadyClaimed"));
+    assert.ok(successSrc.includes("Stripe"));
     assert.equal(safeEditorialReturnPath("/article/verejnost-demo"), "/article/verejnost-demo");
     assert.equal(safeEditorialReturnPath("/verejnost/clanky/foo"), "/verejnost/clanky/foo");
     assert.equal(safeEditorialReturnPath("https://evil.example/article/x"), null);
