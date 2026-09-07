@@ -2,7 +2,6 @@
 
 import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { editorialPayLabels } from "@/lib/editorial/pay-labels";
-import { subscriptionProductId } from "@/lib/v27/config";
 
 type Props = {
   locale?: string | null;
@@ -17,13 +16,13 @@ export function EditorialPayButtons({ locale, className }: Props) {
     <div className={className ?? "flex w-full max-w-sm flex-col gap-2"}>
       <V27CheckoutButton
         kind="subscription"
-        productId={subscriptionProductId("public", "year")}
+        productId="public-year"
         locale={loc}
         label={pay.year}
       />
       <V27CheckoutButton
         kind="subscription"
-        productId={subscriptionProductId("public", "month")}
+        productId="public-month"
         locale={loc}
         label={pay.month}
         className="w-full border border-[#005B96]/30 bg-white text-[#005B96] hover:bg-[#f0f7ff]"

@@ -4262,8 +4262,8 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.ok(!getEditorialArticleGateCopy("en").headline.includes("VIP"));
   {
     const paySrc = readFileSync(join(root, "components/subscription/editorial-pay-buttons.tsx"), "utf8");
-    const yearAt = paySrc.indexOf('subscriptionProductId("public", "year")');
-    const monthAt = paySrc.indexOf('subscriptionProductId("public", "month")');
+    const yearAt = paySrc.indexOf('productId="public-year"');
+    const monthAt = paySrc.indexOf('productId="public-month"');
     assert.ok(yearAt > 0, "Editorial pay buttons must start Stripe year first");
     assert.ok(monthAt > yearAt, "annual Editorial CTA still comes before monthly");
     assert.ok(
