@@ -15,10 +15,10 @@ export function SubscriptionTrialBanner({ locale = "cs" }: { locale?: string }) 
       <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-3">
         <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] backdrop-blur">
           <Sparkles className="h-3.5 w-3.5" aria-hidden />
-          {copy.bannerTitle}
+          {copy.bannerKicker}
         </span>
         <p className="font-display text-3xl font-bold sm:text-4xl">{copy.bannerTitle}</p>
-        <p className="max-w-2xl text-sm text-white/90 sm:text-base">{copy.choosePlanLead}</p>
+        <p className="max-w-2xl text-sm text-white/90 sm:text-base">{copy.bannerLead}</p>
       </div>
     </div>
   );

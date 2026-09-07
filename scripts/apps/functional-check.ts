@@ -279,6 +279,7 @@ import {
   resolveArticleBodyLock,
 } from "../../lib/auth/article-eligibility";
 import { getEditorialArticleGateCopy } from "../../lib/v38/conversion-copy";
+import { getSubscribeCopy } from "../../lib/i18n/subscribe-copy";
 import { getPaywallPreviewHtml } from "../../lib/monetization/paywall-preview";
 import {
   NEWSLETTER_PRIMARY_LOCALES,
@@ -3736,6 +3737,11 @@ console.log("✓ magazine desk byline and copy checks passed");
     const yearIdx = predplatneSrc.indexOf('subscriptionProductId(plan.tier, "year")');
     const monthIdx = predplatneSrc.indexOf('subscriptionProductId(plan.tier, "month")');
     assert.ok(yearIdx > -1 && monthIdx > -1 && yearIdx < monthIdx, "Editorial annual checkout button must render before monthly");
+    const bannerSrc = readFileSync(join(root, "components/subscription/subscription-trial-banner.tsx"), "utf8");
+    assert.ok(bannerSrc.includes("bannerKicker"), "subscribe banner chip must not repeat the command headline");
+    assert.ok(bannerSrc.includes("bannerLead"), "subscribe banner must sell the benefit, not dump all four plans");
+    assert.notEqual(getSubscribeCopy("cs").editorialBadge, getSubscribeCopy("cs").daysFree);
+    assert.ok(!/platí hned/i.test(getSubscribeCopy("cs").bannerTitle));
   }
   assert.ok(!getEditorialArticleGateCopy("cs").ctaHref.includes("trial=1"));
   assert.ok(!getEditorialArticleGateCopy("de").body.includes("14 Tage"));

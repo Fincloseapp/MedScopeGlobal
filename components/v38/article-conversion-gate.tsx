@@ -19,7 +19,7 @@ function gateFooter(locale?: string | null, editorial = false) {
   if (primary === "de") {
     return {
       trial: editorial
-        ? "Sofortzahlung — jederzeit kündbar"
+        ? "Sofort zugänglich — jederzeit kündbar"
         : `${VIP_TRIAL_DAYS} Tage zum Testen — jederzeit kündbar`,
       haveAccount: "Schon ein Konto?",
       signIn: "Anmelden",
@@ -29,7 +29,7 @@ function gateFooter(locale?: string | null, editorial = false) {
   if (primary === "fr") {
     return {
       trial: editorial
-        ? "Paiement immédiat — résiliable à tout moment"
+        ? "S’ouvre tout de suite — résiliable à tout moment"
         : `${VIP_TRIAL_DAYS} jours d’essai — résiliable à tout moment`,
       haveAccount: "Vous avez déjà un compte ?",
       signIn: "Se connecter",
@@ -39,7 +39,7 @@ function gateFooter(locale?: string | null, editorial = false) {
   if (primary !== "cs") {
     return {
       trial: editorial
-        ? "Billed now — cancel anytime"
+        ? "Opens immediately — cancel anytime"
         : `${VIP_TRIAL_DAYS}-day trial — cancel anytime`,
       haveAccount: "Already have an account?",
       signIn: "Sign in",
@@ -48,7 +48,7 @@ function gateFooter(locale?: string | null, editorial = false) {
   }
   return {
     trial: editorial
-      ? "Platba ihned — zrušíte kdykoli"
+      ? "Otevře se hned — zrušíte kdykoli"
       : `${VIP_TRIAL_DAYS} dní zkušební verze — zrušíte kdykoli`,
     haveAccount: "Již máte účet?",
     signIn: "Přihlásit se",
