@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EditorialPayButtons } from "@/components/subscription/editorial-pay-buttons";
 import { getRevenueCopy } from "@/lib/i18n/revenue-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { editorialMonthlyCharge } from "@/lib/editorial/pricing";
@@ -26,14 +27,14 @@ export async function ArticleSubscribeNudge({ locale = "cs" }: Props) {
       <p className="mt-1 text-sm leading-relaxed text-slate-600">
         {copy.subscribeBody} {price.formatted}.
       </p>
-      <div className="mt-3 flex flex-wrap items-center gap-3">
-        <Link
-          href={href}
-          className="inline-flex h-10 items-center rounded-full bg-[#005B96] px-4 text-sm font-semibold text-white hover:bg-[#004a7a]"
-        >
-          {copy.subscribeCta}
-        </Link>
-        <p className="text-xs text-slate-500">{copy.subscribeHint}</p>
+      <div className="mt-3 flex flex-col gap-3">
+        <EditorialPayButtons locale={locale} />
+        <div className="flex flex-wrap items-center gap-3">
+          <Link href={href} className="text-sm font-medium text-[#005B96] hover:underline">
+            {copy.subscribeCta}
+          </Link>
+          <p className="text-xs text-slate-500">{copy.subscribeHint}</p>
+        </div>
       </div>
     </section>
   );

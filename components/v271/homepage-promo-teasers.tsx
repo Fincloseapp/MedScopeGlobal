@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PromoTeaserCard } from "@/components/ads/promo-teaser-card";
+import { EditorialPayButtons } from "@/components/subscription/editorial-pay-buttons";
 import { getPromoTeasers } from "@/lib/ads/promo-teasers";
 import { getShareCopy } from "@/lib/i18n/share-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
@@ -20,7 +21,10 @@ export function HomepagePromoTeasers({ locale }: { locale: string }) {
             <PromoTeaserCard key={teaser.id} teaser={teaser} locale={locale} autoPlay={index === 0} />
           ))}
         </div>
-        <nav className="mt-5 flex flex-wrap gap-2" aria-label={copy.clipsTitle}>
+        <div className="mt-5">
+          <EditorialPayButtons locale={locale} className="flex max-w-xl flex-col gap-2 sm:flex-row" />
+        </div>
+        <nav className="mt-4 flex flex-wrap gap-2" aria-label={copy.clipsTitle}>
           <Link
             href={localizePublicHref("/predplatne#public", locale)}
             className="inline-flex items-center rounded-full bg-[#005B96] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#004a7a]"

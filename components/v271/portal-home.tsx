@@ -23,6 +23,7 @@ import { AppOpenLink, isStandaloneAppHref } from "@/components/apps/app-origin-b
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { VITASCOPE_DESK_LOGO } from "@/lib/brand/vitascope";
 import { ViaLongeVitaMark } from "@/components/brand/vialongevita-mark";
+import { EditorialPayButtons } from "@/components/subscription/editorial-pay-buttons";
 import { editionCoverAlt, isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
 import { BookOpen, Gift, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
@@ -359,9 +360,12 @@ export function PortalHome({
                   </li>
                 ))}
               </ul>
+              <div className="mt-3">
+                <EditorialPayButtons locale={locale} className="flex w-full flex-col gap-2" />
+              </div>
               <Link
                 href={localizePublicHref("/predplatne#public", locale)}
-                className="mt-3 flex w-full items-center justify-center rounded-md bg-[#005B96] px-3 py-2 text-sm font-semibold text-white hover:bg-[#004a7a]"
+                className="mt-2 flex w-full items-center justify-center text-sm font-medium text-[#005B96] hover:underline"
               >
                 {surface.whyTrial}
               </Link>

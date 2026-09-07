@@ -36,22 +36,25 @@ export async function distributeTeamReach(input: {
   }
 
   const origin = getSiteUrl();
-  const urls = new Set<string>();
+  const predplatne = new Set<string>();
+  const rest = new Set<string>();
   for (const locale of ARENA_DISCOVERY_LOCALES) {
-    urls.add(arenaHopUrl({ team: input.team, section: "vialongevita", locale, base: origin }));
+    predplatne.add(arenaHopUrl({ team: input.team, section: "vialongevita", locale, base: origin }));
+  }
+  for (const locale of AFRICA_DISCOVERY_LOCALES) {
+    predplatne.add(`${origin}/${localeToPathSegment(locale)}/predplatne`);
   }
   for (const locale of ARENA_DISCOVERY_LOCALES) {
-    urls.add(arenaHopUrl({ team: input.team, section: "dokscope", locale, base: origin }));
+    rest.add(arenaHopUrl({ team: input.team, section: "dokscope", locale, base: origin }));
   }
-  urls.add(arenaHopUrl({ team: input.team, section: "mediprep", locale: "cs", base: origin }));
+  rest.add(arenaHopUrl({ team: input.team, section: "mediprep", locale: "cs", base: origin }));
   for (const locale of AFRICA_DISCOVERY_LOCALES) {
     const prefix = `${origin}/${localeToPathSegment(locale)}`;
-    urls.add(`${prefix}/predplatne`);
-    urls.add(`${prefix}/verejnost/osveta`);
-    urls.add(`${prefix}/promo/klipy`);
-    urls.add(`${prefix}/firmy/reklama/nova`);
+    rest.add(`${prefix}/verejnost/osveta`);
+    rest.add(`${prefix}/promo/klipy`);
+    rest.add(`${prefix}/firmy/reklama/nova`);
   }
-  const list = [...urls].slice(0, Math.max(ARENA_DISCOVERY_LOCALES.length, input.quota));
+  const list = [...predplatne, ...rest].slice(0, Math.max(ARENA_DISCOVERY_LOCALES.length, input.quota));
   const ping = await submitIndexNow(list);
   return {
     team: input.team,

@@ -54,10 +54,10 @@ export async function POST(request: Request) {
     gift: Boolean(body.gift),
     aiRef,
   });
-  if (result.status === 200 && aiRef) {
+  if (result.status === 200) {
     const country = requestCountry(request.headers);
     await logMonetizationEvent("ai_agent_checkout", {
-      agent: aiRef,
+      agent: aiRef ?? "other",
       locale,
       productId: body.productId,
       ...(country ? { country } : {}),

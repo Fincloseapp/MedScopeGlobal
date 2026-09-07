@@ -4261,12 +4261,29 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.ok(getEditorialArticleGateCopy("de").ctaHref.includes("predplatne"));
   assert.ok(!getEditorialArticleGateCopy("en").headline.includes("VIP"));
   {
-    const gateSrc = readFileSync(join(root, "components/v38/article-conversion-gate.tsx"), "utf8");
-    const yearAt = gateSrc.indexOf('subscriptionProductId("public", "year")');
-    const monthAt = gateSrc.indexOf('subscriptionProductId("public", "month")');
-    assert.ok(yearAt > 0, "article gate must one-click pay Editorial year");
+    const paySrc = readFileSync(join(root, "components/subscription/editorial-pay-buttons.tsx"), "utf8");
+    const yearAt = paySrc.indexOf('subscriptionProductId("public", "year")');
+    const monthAt = paySrc.indexOf('subscriptionProductId("public", "month")');
+    assert.ok(yearAt > 0, "Editorial pay buttons must start Stripe year first");
     assert.ok(monthAt > yearAt, "annual Editorial CTA still comes before monthly");
-    assert.ok(gateSrc.includes("localizePublicHref"));
+    assert.ok(
+      readFileSync(join(root, "components/v38/article-conversion-gate.tsx"), "utf8").includes(
+        "EditorialPayButtons"
+      )
+    );
+    assert.ok(
+      readFileSync(join(root, "components/monetization/article-subscribe-nudge.tsx"), "utf8").includes(
+        "EditorialPayButtons"
+      )
+    );
+    assert.ok(
+      readFileSync(join(root, "components/v271/homepage-promo-teasers.tsx"), "utf8").includes(
+        "EditorialPayButtons"
+      )
+    );
+    assert.ok(
+      readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes("EditorialPayButtons")
+    );
     const webhookSrc = readFileSync(join(root, "app/api/stripe/webhook/route.ts"), "utf8");
     assert.ok(webhookSrc.includes("isEditorialGrantProduct"));
     assert.ok(webhookSrc.includes("findOrCreateReaderByEmail"));
@@ -4274,9 +4291,14 @@ console.log("✓ magazine desk byline and copy checks passed");
     const checkoutSrc = readFileSync(join(root, "lib/stripe/v27-checkout.ts"), "utf8");
     assert.ok(checkoutSrc.includes('localizePublicHref("/predplatne?canceled=1"'));
     assert.ok(checkoutSrc.includes("&product="));
+    assert.ok(
+      readFileSync(join(root, "app/api/v27/checkout/route.ts"), "utf8").includes('aiRef ?? "other"')
+    );
     const successSrc = readFileSync(join(root, "components/checkout/checkout-success-panel.tsx"), "utf8");
     assert.ok(successSrc.includes('product.startsWith("public-")'));
     assert.ok(successSrc.includes('localizePublicHref("/articles"'));
+    const distSrc = readFileSync(join(root, "lib/growth/arena/distribution-agent.ts"), "utf8");
+    assert.ok(distSrc.indexOf("predplatne") < distSrc.indexOf('section: "dokscope"'));
   }
   {
     const entity = getLegalEntity();
