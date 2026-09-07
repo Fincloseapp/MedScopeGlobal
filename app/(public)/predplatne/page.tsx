@@ -17,6 +17,8 @@ import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { SocialShareStrip } from "@/components/social/social-share-strip";
 import { getShareCopy } from "@/lib/i18n/share-copy";
+import { ViaLongeVitaMasthead } from "@/components/brand/vialongevita-mark";
+import { isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
 
 export const revalidate = 60;
 
@@ -56,17 +58,14 @@ export default async function PredplatnePage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <div className="text-center">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
-          {copy.eyebrow}
-        </p>
-        <h1 className="mt-2 font-display text-4xl font-bold text-[#021d33]">
-          {copy.title}
-        </h1>
-        <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">{copy.lead}</p>
-        <div className="mx-auto mt-5 flex justify-center">
-          <SocialShareStrip title={copy.title} path="/predplatne" locale={locale} />
-        </div>
+      <ViaLongeVitaMasthead
+        locale={locale}
+        title={copy.title}
+        blurb={copy.lead}
+        cover={pickEditionCover(locale, isoWeekSeed())}
+      />
+      <div className="mt-5 flex justify-center">
+        <SocialShareStrip title={copy.title} path="/predplatne" locale={locale} />
       </div>
 
       <div className="mt-10">

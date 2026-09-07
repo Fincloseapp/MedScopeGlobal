@@ -9,6 +9,7 @@ import {
   getMagazineListingCopy,
   MAGAZINE,
 } from "@/lib/brand/magazine";
+import { isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
 import { VITASCOPE_DESK_LOGO, VITASCOPE_TRACK_LOGO } from "@/lib/brand/vitascope";
 import { newsDesksForLocale, type NewsDeskId } from "@/lib/v271/news-desks";
 import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
@@ -39,6 +40,7 @@ export function MagazineListing({
         locale={locale}
         title={activeDesk ? desk.label : MAGAZINE.name}
         blurb={activeDesk ? desk.blurb : copy.intro}
+        cover={pickEditionCover(locale, isoWeekSeed())}
       />
 
       <div className="mt-5">

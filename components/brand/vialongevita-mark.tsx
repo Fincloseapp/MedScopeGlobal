@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { MAGAZINE, getMagazineCopy } from "@/lib/brand/magazine";
+import { editionCoverAlt, type EditionCover } from "@/lib/brand/edition-covers";
 import { cn } from "@/lib/utils";
 
 type MarkVariant = "hero" | "compact" | "footer";
@@ -71,45 +72,56 @@ export function ViaLongeVitaMasthead({
   blurb,
   locale,
   className,
+  cover,
 }: {
   title: string;
   blurb: string;
   locale?: string;
   className?: string;
+  cover?: EditionCover | null;
 }) {
   const copy = getMagazineCopy(locale);
   return (
     <header
       className={cn(
-        "relative overflow-hidden rounded-2xl border border-[#0b1f3a] bg-[#050b1d] shadow-md",
+        "overflow-hidden rounded-2xl border border-[#0b1f3a] bg-[#050b1d] shadow-md",
         className
       )}
     >
-      <div className="absolute inset-0">
-        <Image
-          src={MAGAZINE.emailLockup}
-          alt=""
-          fill
-          className="object-cover object-center opacity-40"
-          sizes="(max-width: 1280px) 100vw, 1280px"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#050b1d] via-[#050b1d]/88 to-[#050b1d]/50" />
-      </div>
-      <div className="relative px-5 py-6 sm:px-8 sm:py-8">
-        <Image
-          src={MAGAZINE.emailLockup}
-          alt={MAGAZINE.name}
-          width={1200}
-          height={340}
-          priority
-          className="h-auto w-full max-w-[420px] object-contain"
-        />
-        <p className="mt-3 text-xs font-medium uppercase tracking-[0.2em] text-[#9ec9e8]">
-          {copy.tagline}
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">{title}</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">{blurb}</p>
+      <div
+        className={
+          cover
+            ? "grid md:min-h-[28rem] md:grid-cols-[minmax(0,1.15fr)_minmax(12rem,0.85fr)]"
+            : undefined
+        }
+      >
+        <div className="flex flex-col justify-center px-5 py-6 sm:px-8 sm:py-8">
+          <Image
+            src={MAGAZINE.emailLockup}
+            alt={MAGAZINE.name}
+            width={1200}
+            height={340}
+            priority
+            className="h-auto w-full max-w-[420px] object-contain"
+          />
+          <p className="mt-3 text-xs font-medium uppercase tracking-[0.2em] text-[#9ec9e8]">
+            {copy.tagline}
+          </p>
+          <h1 className="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">{title}</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">{blurb}</p>
+        </div>
+        {cover ? (
+          <div className="relative aspect-[3/4] min-h-[280px] md:aspect-auto md:min-h-full">
+            <Image
+              src={cover.src}
+              alt={editionCoverAlt(locale)}
+              fill
+              priority
+              className="object-cover object-top"
+              sizes="(max-width:768px) 100vw, 420px"
+            />
+          </div>
+        ) : null}
       </div>
     </header>
   );
