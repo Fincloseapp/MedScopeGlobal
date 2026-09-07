@@ -106,7 +106,7 @@ export function decideEvolution(alfa: TeamRuntime, beta: TeamRuntime): Evolution
       loser: behind.slug,
       winnerQuota: alfa.reachQuota,
       loserQuota: beta.reachQuota,
-      detail: "Souboj hodiny: 0–0. Bez konverze se kvóta ani série proher nemění.",
+      detail: "0 zaplacených předplatných — bez platícího není výhra, kvóta se nemění.",
     };
   }
 
@@ -131,7 +131,7 @@ export function decideEvolution(alfa: TeamRuntime, beta: TeamRuntime): Evolution
         styleBias: mutateStyle(leader.styleBias, trailer.generation),
         reachQuota: Math.max(REACH_QUOTA_MIN, Math.round(leader.reachQuota * 0.8)),
       },
-      detail: `Evoluce: ${trailer.slug} usmrcen po ${LOSING_STREAK_KILL} prázdných hodinách. Klon z ${leader.slug}.`,
+      detail: `Evoluce: ${trailer.slug} usmrcen po ${LOSING_STREAK_KILL} hodinách bez platícího. Klon z ${leader.slug}.`,
     };
   }
 
@@ -141,6 +141,6 @@ export function decideEvolution(alfa: TeamRuntime, beta: TeamRuntime): Evolution
     loser: trailer.slug,
     winnerQuota: quotas.winnerQuota,
     loserQuota: quotas.loserQuota,
-    detail: `Souboj hodiny: ${leader.slug} ${leader.hourConversions} konverzí > ${trailer.slug} ${trailer.hourConversions}. Vyšší organický kvót.`,
+    detail: `Souboj hodiny: ${leader.slug} ${leader.hourConversions} platících > ${trailer.slug} ${trailer.hourConversions}. Kvóta jen za zaplacené.`,
   };
 }

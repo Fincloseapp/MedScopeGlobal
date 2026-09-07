@@ -120,10 +120,8 @@ export default async function AdminAiAgentsPage() {
       <section>
         <h2 className="mb-3 font-display text-xl font-semibold">Žebříček AI agentů</h2>
         <p className="mb-4 text-sm text-muted-foreground">
-          Skóre = <code>ai_agent_paid</code> × 100 + checkout × 10 + newsletter × 5 + návštěvy.
-          Stav „čeká na první ?ref=“ není rozbitý agent — zatím nula inbound hopů a žádný
-          GPTBot / PerplexityBot / Gemini na veřejné stránce. Cron každou 5. minutu posílá
-          IndexNow (Bing), neself-pinguje hop a nevolá API asistentů.
+          Pořadí: nejdřív <code>ai_agent_paid</code>, až potom košík a návštěvy. Návštěva
+          crawlera není úspěch. Cron každou 5. minutu posílá IndexNow, nevolá API asistentů.
         </p>
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full text-sm">
@@ -140,13 +138,20 @@ export default async function AdminAiAgentsPage() {
             </thead>
             <tbody>
               {snap.leaderboard.map((row, index) => {
-                const hits = row.visits + row.checkouts + row.newsletters + row.paid;
+                const status =
+                  row.paid > 0
+                    ? "úspěch — platí"
+                    : row.checkouts > 0
+                      ? "košík, neplatí"
+                      : row.visits + row.newsletters > 0
+                        ? "crawler čte — neplatí"
+                        : "čeká na první ?ref= nebo crawler";
                 return (
                   <tr key={row.agent} className="border-t">
                     <td className="px-4 py-2">{index + 1}</td>
                     <td className="px-4 py-2 font-medium">{row.agent}</td>
                     <td className="px-4 py-2 text-muted-foreground">
-                      {hits > 0 ? "atribuce běží" : "čeká na první ?ref= nebo crawler"}
+                      {status}
                     </td>
                     <td className="px-4 py-2 text-right">{formatInt(row.visits)}</td>
                     <td className="px-4 py-2 text-right">{formatInt(row.checkouts)}</td>

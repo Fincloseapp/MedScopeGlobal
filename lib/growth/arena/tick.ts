@@ -85,7 +85,7 @@ export async function runArenaTick(): Promise<ArenaTickResult> {
     const hourWindow = windowFromEvents(hourEvents, team.slug);
     const ten = reportFromWindow(team.slug, tenWindow, 0);
     const hour = reportFromWindow(team.slug, hourWindow, 0);
-    hourConv[team.slug] = hour.window.paid + hour.window.checkouts;
+    hourConv[team.slug] = hour.window.paid;
 
     if (ten.shareWorthy && ten.insight) {
       await writeKnowledge({

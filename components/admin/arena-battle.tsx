@@ -76,40 +76,45 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
       </div>
       {tickMsg ? <p className="text-sm text-slate-700">{tickMsg}</p> : null}
 
-      <section className="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-5">
+      <section
+        className={`rounded-2xl border p-5 ${
+          dash.verdict?.win
+            ? "border-emerald-200 bg-emerald-50/40"
+            : "border-amber-300 bg-amber-50/50"
+        }`}
+      >
         <h2 className="font-display text-xl font-semibold">Vyhodnocení závodu — 7 dní</h2>
         <p className="mt-1 text-xs text-muted-foreground">
-          Vede tým s více zeměmi s reálným hopem. 0–0 kolo není výhra a nemění kvótu.
+          Úspěch a výhra jen za platící předplatitele. Návštěva, crawler, hop a košík jsou pipeline.
         </p>
         <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4 text-sm">
           <p className="rounded-lg border bg-white px-3 py-2">
-            Vítěz okna
+            Verdikt
             <strong className="mt-1 block text-lg capitalize">
-              {(dash.verdict?.countriesLive || dash.verdict?.localesLive)
+              {dash.verdict?.win
                 ? dash.verdict.leader === "tie"
-                  ? "remíza"
+                  ? "remíza platících"
                   : dash.verdict.leader
-                : "bez provozu"}
+                : "není výhra"}
             </strong>
           </p>
           <p className="rounded-lg border bg-white px-3 py-2">
-            Body celkem Alfa / Beta
+            Platící teď / 7 dní Alfa–Beta
+            <strong className="mt-1 block text-lg">
+              {formatInt(dash.payingSubscribers ?? 0)} / {formatInt(dash.verdict?.paidAlfa7d ?? 0)}–
+              {formatInt(dash.verdict?.paidBeta7d ?? 0)}
+            </strong>
+          </p>
+          <p className="rounded-lg border bg-white px-3 py-2">
+            Pipeline visit / checkout
+            <strong className="mt-1 block text-lg">
+              {formatInt(dash.pipeline?.visits7d ?? 0)} / {formatInt(dash.pipeline?.checkouts7d ?? 0)}
+            </strong>
+          </p>
+          <p className="rounded-lg border bg-white px-3 py-2">
+            Historické body Alfa / Beta
             <strong className="mt-1 block text-lg">
               {formatInt(alfa?.teamPoints ?? 0)} / {formatInt(beta?.teamPoints ?? 0)}
-            </strong>
-          </p>
-          <p className="rounded-lg border bg-white px-3 py-2">
-            Země s vedením
-            <strong className="mt-1 block text-lg">
-              {formatInt(dash.verdict?.alfaLeadCountries ?? 0)} /{" "}
-              {formatInt(dash.verdict?.betaLeadCountries ?? 0)}
-            </strong>
-          </p>
-          <p className="rounded-lg border bg-white px-3 py-2">
-            Mutace s vedením
-            <strong className="mt-1 block text-lg">
-              {formatInt(dash.verdict?.alfaLeadLocales ?? 0)} /{" "}
-              {formatInt(dash.verdict?.betaLeadLocales ?? 0)}
             </strong>
           </p>
         </div>
@@ -119,15 +124,17 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
       </section>
 
       <section className="rounded-2xl border border-[#005B96]/20 bg-white p-5">
-        <h2 className="font-display text-xl font-semibold">Růstový kanál — ne vymyšlené nuly</h2>
+        <h2 className="font-display text-xl font-semibold">Strategie — výhra jen platící</h2>
         <p className="mt-1 text-xs text-muted-foreground">
-          Cron, IndexNow a hopy nenahradí Stripe. Nula zaplacených je pravda, dokud někdo nezaplatí.
-          Níže je živá fronta: mapa Afriky, sociální drafty, locale hopy.
+          Cron, IndexNow a hopy nenahradí Stripe. Dokud paid = 0, týmy nedostávají body, kvótu ani
+          klony. Níže je pipeline, ne skóre.
         </p>
         <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6 text-sm">
           <p className="rounded-lg border bg-slate-50 px-3 py-2">
-            Předplatná teď
-            <strong className="mt-1 block text-lg">{formatInt(dash.liveSubscribers)}</strong>
+            Platící / živá vč. trial
+            <strong className="mt-1 block text-lg">
+              {formatInt(dash.payingSubscribers ?? 0)} / {formatInt(dash.liveSubscribers)}
+            </strong>
           </p>
           <p className="rounded-lg border bg-slate-50 px-3 py-2">
             7 dní visit / checkout / paid
@@ -239,7 +246,7 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
             <article
               key={team.slug}
               className={`rounded-2xl border p-5 ${
-                team.slug === dash.leaderboard[0]?.slug
+                dash.verdict?.win && team.slug === dash.verdict.leader
                   ? "border-emerald-300 bg-emerald-50/40"
                   : "border-slate-200 bg-white"
               }`}
@@ -280,9 +287,8 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
       <section>
         <h2 className="mb-2 font-display text-xl font-semibold">Hodnocení podle zemí</h2>
         <p className="mb-2 text-xs text-muted-foreground">
-          Posledních 7 dní · sloupce Alfa/Beta = návštěvy / checkout / zaplaceno z ISO země
-          návštěvníka (<code>cf-ipcountry</code>). Nula znamená, že z té země zatím nepřišel hop
-          daného týmu — cron čísla nevymýšlí.
+          Posledních 7 dní · sloupce Alfa/Beta = návštěvy / checkout / zaplaceno. Vede jen tým s
+          více <em>zaplacenými</em> — visit/checkout = remíza.
           {dash.windowStart ? ` Okno od ${new Date(dash.windowStart).toLocaleString("cs-CZ")}.` : ""}
         </p>
         {(() => {

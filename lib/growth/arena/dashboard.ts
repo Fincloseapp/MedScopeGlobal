@@ -1,5 +1,5 @@
 import { AI_AGENT_GOAL_NEAR, AI_AGENT_GOAL_SEP27 } from "@/lib/growth/ai-agent-program";
-import { countLiveSubscriptions } from "@/lib/growth/ai-agent-stats";
+import { countSubscriptionHeads } from "@/lib/growth/ai-agent-stats";
 import { evaluateProgramGoals } from "@/lib/growth/ai-agent-eval";
 import {
   ensureArenaSeeded,
@@ -13,22 +13,29 @@ import {
 import { sectionsByPriority } from "@/lib/growth/arena/config";
 import { generateTeamDrafts } from "@/lib/growth/arena/content-agent";
 import { loadArenaEvents } from "@/lib/growth/arena/analyst-agent";
-import { scoreCountryMarkets, scoreCountryTraffic, scoreLocaleMarkets } from "@/lib/growth/arena/markets";
+import {
+  scoreCountryMarkets,
+  scoreCountryTraffic,
+  scoreLocaleMarkets,
+  windowFromEvents,
+} from "@/lib/growth/arena/markets";
 import { africaCountryCodes, isAfricaCountry } from "@/lib/growth/africa-markets";
 
 const DASHBOARD_WINDOW_MS = 7 * 86_400_000;
 
 export async function loadArenaDashboard() {
   await ensureArenaSeeded();
-  const [teams, members, knowledge, metrics, evolution, bus, liveSubscribers] = await Promise.all([
+  const [teams, members, knowledge, metrics, evolution, bus, subscriptionHeads] = await Promise.all([
     loadTeams(),
     loadMembers(),
     listKnowledge(16),
     listMetrics(24, "team"),
     listEvolution(16),
     listBus(16),
-    countLiveSubscriptions(),
+    countSubscriptionHeads(),
   ]);
+  const payingSubscribers = subscriptionHeads.active;
+  const liveSubscribers = subscriptionHeads.active + subscriptionHeads.trialing;
 
   const leaderboard = [...teams].sort((a, b) => b.teamPoints - a.teamPoints);
   const weekStart = new Date(Date.now() - DASHBOARD_WINDOW_MS).toISOString();
@@ -72,45 +79,46 @@ export async function loadArenaDashboard() {
       row.alfa.visits + row.alfa.checkouts + row.alfa.paid + row.beta.visits + row.beta.checkouts + row.beta.paid;
     return activity > 0;
   });
+  const alfaPaid7d = windowFromEvents(events, "alfa").paid;
+  const betaPaid7d = windowFromEvents(events, "beta").paid;
+  const payingNow = payingSubscribers > 0 || trafficTotals.paid > 0 || alfaPaid7d + betaPaid7d > 0;
   const alfaLeadCountries = countries.filter((row) => row.leader === "alfa").length;
   const betaLeadCountries = countries.filter((row) => row.leader === "beta").length;
   const alfaLeadLocales = localesLive.filter((row) => row.leader === "alfa").length;
   const betaLeadLocales = localesLive.filter((row) => row.leader === "beta").length;
   const traffic7d = trafficTotals.visits + trafficTotals.checkouts + trafficTotals.paid;
-  const pointsLeader =
-    (leaderboard[0]?.teamPoints ?? 0) === (leaderboard[1]?.teamPoints ?? 0)
-      ? "tie"
-      : (leaderboard[0]?.slug ?? "tie");
-  const raceDecided = alfaLeadCountries + betaLeadCountries + alfaLeadLocales + betaLeadLocales;
   const raceLeader =
-    raceDecided === 0
+    alfaPaid7d <= 0 && betaPaid7d <= 0
       ? "tie"
-      : alfaLeadCountries === betaLeadCountries
-        ? alfaLeadLocales === betaLeadLocales
-          ? "tie"
-          : alfaLeadLocales > betaLeadLocales
-            ? "alfa"
-            : "beta"
-        : alfaLeadCountries > betaLeadCountries
+      : alfaPaid7d === betaPaid7d
+        ? "tie"
+        : alfaPaid7d > betaPaid7d
           ? "alfa"
           : "beta";
-  const nextActions = [
-    trafficTotals.paid === 0
-      ? "Zaplacené předplatné je 0 — cron ho nevymyslí. Růst: sdílení klipů, locale hopy, B2B /firmy/reklama/nova."
-      : `Za 7 dní ${trafficTotals.paid} zaplacených událostí — držet stejný kanál.`,
-    "3 reklamní 8s shoty: /promo/klipy (man, woman, alike). Lidský upload do IG/FB/WA — cron neposílá.",
-    "Instagram/Facebook/WhatsApp/LinkedIn: fronta draftů níže. Cron neposílá — lidský účet.",
-    `Afrika: ${africaMapped} zemí namapováno na fr/en/pt/es. Provoz v ${africaWithTraffic} z nich.`,
-    "IndexNow + hop /predplatne na všech 22 mutacích běží každých 5 minut.",
-  ];
+  const nextActions = payingNow
+    ? [
+        `Úspěch: ${payingSubscribers} platících, ${liveSubscribers} živých včetně trial. Za 7 dní ${trafficTotals.paid} zaplacených hopů.`,
+        "Další platící jen přes /predplatne — návštěvy a košík zůstávají pipeline.",
+        "3 reklamní 8s shoty: /promo/klipy. Lidský upload do IG/FB/WA — cron neposílá.",
+        `Afrika: ${africaMapped} zemí namapováno. Platící v ${africa.filter((row) => row.paid > 0).length} z nich.`,
+        "IndexNow + hop jen jako distribuce, ne jako skóre.",
+      ]
+    : [
+        "Vyhodnocení: neúspěch. 0 platících předplatitelů — to jediné je výhra.",
+        "Crawler čtení, hop, IndexNow a košík jsou mezikrok. Body, kvóta ani klon za ně nejdou.",
+        "Jediný cíl: první platící Redakce (25 Kč / €1 / $1 / £1), ne 170 000 návštěv.",
+        "Lidský post IG/FB/WA/LI z fronty draftů na /predplatne. Cron neposílá.",
+        "B2B /firmy/reklama/nova je druhý příjem — do souboje Alfa/Beta se nepočítá, dokud někdo nezaplatí předplatné.",
+      ];
   const pace = evaluateProgramGoals(liveSubscribers, 0, new Date());
 
   return {
     loadedAt: new Date().toISOString(),
     windowStart: weekStart,
     honesty:
-      "Závod se počítá z reálných hopů (ISO země + mutace). 0–0 kolo nemění kvótu ani body. IndexNow + hop /predplatne, žádný auto-post. 170 000 / 500 000 je programový cíl, ne aktuální stav.",
+      "Výhra = zaplacené předplatné (ai_agent_paid nebo živý Stripe active). Návštěva crawlera, hop, košík a IndexNow jsou pipeline, ne úspěch. 0 platících = remíza, 0 bodů, žádná kvóta. 170 000 / 500 000 je programový cíl, ne stav.",
     liveSubscribers,
+    payingSubscribers,
     goals: {
       near: AI_AGENT_GOAL_NEAR,
       sep27: AI_AGENT_GOAL_SEP27,
@@ -123,7 +131,10 @@ export async function loadArenaDashboard() {
     leaderboard,
     verdict: {
       leader: raceLeader,
-      pointsLeader,
+      pointsLeader: raceLeader,
+      win: payingNow,
+      paidAlfa7d: alfaPaid7d,
+      paidBeta7d: betaPaid7d,
       traffic7d,
       countriesLive: countries.length,
       localesLive: localesLive.length,
@@ -131,12 +142,11 @@ export async function loadArenaDashboard() {
       betaLeadCountries,
       alfaLeadLocales,
       betaLeadLocales,
-      emptyReason:
-        raceDecided === 0
-          ? traffic7d === 0
-            ? "Za 7 dní žádný hop s ISO zemí. Průběžné body jsou historické — prázdné kolo není výhra."
-            : "Za 7 dní je provoz od jiných agentů, ale Alfa/Beta ještě nemají hop se zemí ani mutací. To není výhra."
-          : null,
+      emptyReason: payingNow
+        ? null
+        : traffic7d === 0
+          ? "0 platících a 0 hopů. Bez zaplaceného předplatného není výhra."
+          : "Jsou návštěvy (crawleři / hopy / košík), ale 0 zaplacených předplatných — to není výhra.",
     },
     markets: localesLive,
     countries,

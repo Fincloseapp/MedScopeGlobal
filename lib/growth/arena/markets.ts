@@ -146,13 +146,10 @@ function activityOf(window: ConversionWindow): number {
   return window.visits + window.checkouts + window.paid + window.newsletters;
 }
 
-function leaderOf(alfa: ArenaTeamWindow, beta: ArenaTeamWindow): ArenaTeamSlug | "tie" {
-  if (alfa.conversions !== beta.conversions) {
-    return alfa.conversions > beta.conversions ? "alfa" : "beta";
-  }
-  if (alfa.visits !== beta.visits) {
-    return alfa.visits > beta.visits ? "alfa" : "beta";
-  }
+/** Výhra jen když má tým víc zaplacených předplatných. Návštěva / košík = remíza. */
+export function leaderOf(alfa: ArenaTeamWindow, beta: ArenaTeamWindow): ArenaTeamSlug | "tie" {
+  if (alfa.paid <= 0 && beta.paid <= 0) return "tie";
+  if (alfa.paid !== beta.paid) return alfa.paid > beta.paid ? "alfa" : "beta";
   return "tie";
 }
 

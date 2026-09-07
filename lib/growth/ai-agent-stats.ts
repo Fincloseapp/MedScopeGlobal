@@ -96,16 +96,28 @@ async function countSafe(
   }
 }
 
-export async function countLiveSubscriptions(): Promise<number> {
+export async function countSubscriptionHeads(): Promise<{ active: number; trialing: number }> {
   const service = tryCreateServiceRoleClient();
   const session = service ? null : await createAdminReadClient().catch(() => null);
   const client = service ?? session;
-  if (!client) return 0;
+  if (!client) return { active: 0, trialing: 0 };
   const [active, trialing] = await Promise.all([
     countSafe(client.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "active")),
     countSafe(client.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "trialing")),
   ]);
+  return { active, trialing };
+}
+
+/** Aktivní + trial — tempo programu, ne výhra. */
+export async function countLiveSubscriptions(): Promise<number> {
+  const { active, trialing } = await countSubscriptionHeads();
   return active + trialing;
+}
+
+/** Jen status=active. Trial a návštěva nejsou platící. */
+export async function countPayingSubscriptions(): Promise<number> {
+  const { active } = await countSubscriptionHeads();
+  return active;
 }
 
 export async function loadAiAgentGrowthSnapshot(): Promise<AiAgentGrowthSnapshot> {
@@ -231,8 +243,10 @@ async function loadAiAgentGrowthSnapshotUnsafe(): Promise<AiAgentGrowthSnapshot>
     .sort((a, b) => a.date.localeCompare(b.date));
 
   const leaderboard = [...boardMap.values()].sort((a, b) => {
-    const score = (row: AgentRow) => row.paid * 100 + row.checkouts * 10 + row.newsletters * 5 + row.visits;
-    return score(b) - score(a);
+    if (a.paid !== b.paid) return b.paid - a.paid;
+    if (a.checkouts !== b.checkouts) return b.checkouts - a.checkouts;
+    if (a.newsletters !== b.newsletters) return b.newsletters - a.newsletters;
+    return b.visits - a.visits;
   });
 
   return buildSnapshot({

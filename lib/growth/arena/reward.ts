@@ -3,7 +3,7 @@ import {
   SECTION3_MILESTONE_POINTS,
   SPAM_TEAM_PENALTY,
 } from "@/lib/growth/arena/config";
-import { analystAccuracy, ctrOf, type ConversionWindow } from "@/lib/growth/arena/metrics";
+import { analystAccuracy, type ConversionWindow } from "@/lib/growth/arena/metrics";
 
 export type RoleScores = {
   content: number;
@@ -38,9 +38,7 @@ export function scoreArenaWindow(input: {
   }
 
   const { window } = input;
-  const empty =
-    window.visits + window.checkouts + window.paid + window.newsletters === 0;
-  if (empty) {
+  if (window.paid <= 0) {
     return {
       teamPointsDelta: 0,
       roles: { content: 0, distribution: 0, analyst: 0 },
@@ -49,17 +47,10 @@ export function scoreArenaWindow(input: {
       disqualified: false,
     };
   }
-  const ctr = ctrOf(window);
-  const content = Math.round(ctr * 1000 + window.checkouts * 4);
-  const distribution = window.visits + window.newsletters * 3;
+  const content = Math.min(40, window.paid * 8);
+  const distribution = Math.min(40, window.paid * 10);
   const analyst = Math.round(analystAccuracy(input.predictedK, input.actualK));
-  let team =
-    window.paid * 100 +
-    window.checkouts * 10 +
-    window.newsletters * 5 +
-    window.visits +
-    content +
-    analyst;
+  let team = window.paid * 100;
 
   let milestoneAwarded = false;
   if (!input.alreadyAwardedMilestone && input.section3Users >= SECTION3_MILESTONE) {

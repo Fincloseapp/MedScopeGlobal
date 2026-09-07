@@ -35,11 +35,12 @@ export default async function AdminAiTeamsPage() {
         </h1>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">{dash.honesty}</p>
         <p className="mt-2 text-sm">
-          Živá předplatná {live.toLocaleString("cs-CZ")} / {AI_AGENT_GOAL_NEAR.count.toLocaleString("cs-CZ")} do
-          10. 9. · {dash.goals.nearPace.onTrack ? "na cestě" : "mimo tempo"} — {dash.goals.nearPace.label}
+          Platící {dash.payingSubscribers.toLocaleString("cs-CZ")} · živá vč. trial{" "}
+          {live.toLocaleString("cs-CZ")} / {AI_AGENT_GOAL_NEAR.count.toLocaleString("cs-CZ")} do 10. 9. ·{" "}
+          {dash.goals.nearPace.onTrack ? "na cestě" : "mimo tempo"} — {dash.goals.nearPace.label}
         </p>
         <p className="mt-2 text-sm">
-          Priorita: předplatitelé Redakce, potom B2B inzerce, až pak souboj Alfa/Beta.
+          Úspěch jen zaplacené předplatné. Návštěvy a košík nejsou výhra.
           {" · "}
           <Link href="/admin/ai-agents" className="font-medium text-[#005B96] hover:underline">
             Externí AI agenti

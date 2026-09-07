@@ -2637,6 +2637,24 @@ assert.ok(
     });
     assert.equal(emptyScore.teamPointsDelta, 0);
     assert.equal(emptyScore.roles.analyst, 0);
+    const unpaidTraffic = scoreArenaWindow({
+      window: { visits: 4000, checkouts: 12, paid: 0, newsletters: 3 },
+      predictedK: 1.5,
+      actualK: 0.2,
+      section3Users: 0,
+      spam: false,
+      alreadyAwardedMilestone: false,
+    });
+    assert.equal(unpaidTraffic.teamPointsDelta, 0, "visits and checkout are not a win");
+    const paidWin = scoreArenaWindow({
+      window: { visits: 0, checkouts: 0, paid: 3, newsletters: 0 },
+      predictedK: 1.5,
+      actualK: 1.5,
+      section3Users: 0,
+      spam: false,
+      alreadyAwardedMilestone: false,
+    });
+    assert.equal(paidWin.teamPointsDelta, 300);
     const idle = decideEvolution(
       {
         slug: "alfa",
@@ -2665,6 +2683,10 @@ assert.ok(
     assert.equal(idle.winnerQuota, 240);
     assert.equal(idle.loserQuota, 22);
     assert.ok(readFileSync(join(root, "components/admin/arena-battle.tsx"), "utf8").includes("Vyhodnocení závodu"));
+    assert.ok(readFileSync(join(root, "components/admin/arena-battle.tsx"), "utf8").includes("není výhra"));
+    assert.ok(readFileSync(join(root, "lib/growth/arena/dashboard.ts"), "utf8").includes("payingNow"));
+    assert.ok(readFileSync(join(root, "lib/growth/arena/tick.ts"), "utf8").includes("hour.window.paid"));
+    assert.ok(!readFileSync(join(root, "lib/growth/arena/tick.ts"), "utf8").includes("hour.window.paid + hour.window.checkouts"));
     const drafts = generateTeamDrafts({
       team: "alfa",
       styleBias: "clinical-short",
@@ -2807,20 +2829,24 @@ assert.ok(
     const cs = marketScores.find((row) => row.locale === "cs");
     assert.equal(de?.leader, "alfa");
     assert.equal(de?.alfa.conversions, 2);
-    assert.equal(ja?.leader, "beta");
+    assert.equal(ja?.leader, "tie", "checkout without paid is not a win");
     assert.equal(cs?.leader, "tie");
     const countryScores = scoreCountryMarkets([
       { event: "ai_agent_visit", payload: { agent: "alfa", country: "DE" } },
       { event: "ai_agent_checkout", payload: { agent: "alfa", country: "DE" } },
+      { event: "ai_agent_paid", payload: { agent: "alfa", country: "CH" } },
       { event: "ai_agent_visit", payload: { agent: "beta", country: "AT" } },
     ]);
     const deCountry = countryScores.find((row) => row.country === "DE");
     const atCountry = countryScores.find((row) => row.country === "AT");
-    assert.equal(deCountry?.leader, "alfa");
+    const chCountry = countryScores.find((row) => row.country === "CH");
+    assert.equal(deCountry?.leader, "tie", "visits+checkout without paid stay a tie");
     assert.equal(deCountry?.alfa.visits, 1);
     assert.equal(deCountry?.alfa.checkouts, 1);
-    assert.equal(atCountry?.leader, "beta");
+    assert.equal(atCountry?.leader, "tie");
     assert.equal(atCountry?.beta.visits, 1);
+    assert.equal(chCountry?.leader, "alfa");
+    assert.equal(chCountry?.alfa.paid, 1);
     const traffic = scoreCountryTraffic([
       { event: "ai_agent_visit", payload: { agent: "perplexity", country: "DE" } },
       { event: "ai_agent_visit", payload: { agent: "chatgpt", country: "DE" } },
