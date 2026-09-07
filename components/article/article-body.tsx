@@ -12,6 +12,7 @@ export function ArticleBody({
   gateCopy,
   midSlot,
   locale,
+  returnPath,
 }: {
   html: string;
   locked: boolean;
@@ -19,6 +20,7 @@ export function ArticleBody({
   gateCopy?: StoredNudge;
   midSlot?: ReactNode;
   locale?: string | null;
+  returnPath?: string;
 }) {
   if (locked) {
     const copy = gateCopy ?? { ...getStaticCopy("article_gate", 0, locale ?? "cs"), generatedBy: "static" as const };
@@ -38,7 +40,7 @@ export function ArticleBody({
           </div>
         ) : null}
         <div className={previewHtml ? "mt-6" : undefined}>
-          <ArticleConversionGate copy={copy} title={title} locale={locale} />
+          <ArticleConversionGate copy={copy} title={title} locale={locale} returnPath={returnPath} />
         </div>
       </>
     );

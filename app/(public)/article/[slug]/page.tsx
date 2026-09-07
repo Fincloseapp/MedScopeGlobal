@@ -505,6 +505,7 @@ export default async function ArticlePage({ params }: Props) {
                   locked={locked}
                   title={article.title}
                   locale={locale}
+                  returnPath={`/article/${article.slug}`}
                   gateCopy={articleGateCopy ?? undefined}
                   midSlot={
                     !locked &&

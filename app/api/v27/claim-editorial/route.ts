@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
-import { createStripeClient, getStripeSecretKey } from "@/lib/stripe/client";
-import { isEditorialGrantProduct } from "@/lib/v27/config";
+import { claimEditorialSession } from "@/lib/auth/claim-editorial";
 import {
   EDITORIAL_PAID_COOKIE,
   editorialCookieMaxAgeSec,
 } from "@/lib/auth/editorial-cookie";
+import { safeEditorialReturnPath } from "@/lib/editorial/return-path";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { normalizeLocale } from "@/lib/i18n/config";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +22,16 @@ function cookieBase(maxAge: number) {
   };
 }
 
+function attachClaimCookie(res: NextResponse, periodEndMs: number) {
+  res.headers.set("Cache-Control", NO_STORE);
+  res.cookies.set(
+    EDITORIAL_PAID_COOKIE,
+    String(periodEndMs),
+    cookieBase(editorialCookieMaxAgeSec(periodEndMs))
+  );
+  return res;
+}
+
 export async function POST(request: Request) {
   let sessionId = "";
   try {
@@ -28,37 +40,37 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: "invalid" }, { status: 400 });
   }
-  if (!sessionId.startsWith("cs_")) {
-    return NextResponse.json({ error: "missing_session" }, { status: 400 });
+
+  const claimed = await claimEditorialSession(sessionId);
+  if (!claimed.ok) {
+    return NextResponse.json({ error: claimed.error }, { status: claimed.status });
   }
+  const res = NextResponse.json({ ok: true, until: new Date(claimed.periodEndMs).toISOString() });
+  return attachClaimCookie(res, claimed.periodEndMs);
+}
 
-  const secret = getStripeSecretKey();
-  if (!secret) {
-    return NextResponse.json({ error: "stripe_missing", enabled: false }, { status: 503 });
-  }
+/** Stripe success_url lands here so the cookie is set before JS. */
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const sessionId = String(url.searchParams.get("session_id") ?? "").trim();
+  const locale = normalizeLocale(url.searchParams.get("locale") ?? "cs");
+  const product = String(url.searchParams.get("product") ?? "");
+  const gift = url.searchParams.get("gift") === "1";
+  const ret = safeEditorialReturnPath(url.searchParams.get("return"));
 
-  try {
-    const stripe = createStripeClient(secret);
-    const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ["subscription"],
-    });
-    const productId = String(session.metadata?.product_id ?? "");
-    const paid = session.payment_status === "paid" || session.status === "complete";
-    if (!paid || !isEditorialGrantProduct(productId)) {
-      return NextResponse.json({ error: "not_editorial" }, { status: 403 });
-    }
+  const claimed = await claimEditorialSession(sessionId);
+  const next = new URLSearchParams();
+  if (sessionId) next.set("session_id", sessionId);
+  if (gift) next.set("gift", "1");
+  if (product) next.set("product", product);
+  else if (claimed.ok) next.set("product", claimed.productId);
+  next.set("locale", locale);
+  if (ret) next.set("return", ret);
+  if (claimed.ok) next.set("claimed", "1");
 
-    let periodEndMs = Date.now() + (productId.endsWith("-year") ? 366 : 31) * 86_400_000;
-    const sub = session.subscription;
-    if (sub && typeof sub !== "string" && sub.current_period_end) {
-      periodEndMs = sub.current_period_end * 1000;
-    }
-
-    const res = NextResponse.json({ ok: true, until: new Date(periodEndMs).toISOString() });
-    res.headers.set("Cache-Control", NO_STORE);
-    res.cookies.set(EDITORIAL_PAID_COOKIE, String(periodEndMs), cookieBase(editorialCookieMaxAgeSec(periodEndMs)));
-    return res;
-  } catch {
-    return NextResponse.json({ error: "claim_failed" }, { status: 400 });
-  }
+  const dest = localizePublicHref(`/checkout/uspesne?${next.toString()}`, locale);
+  const res = NextResponse.redirect(new URL(dest, url.origin), 303);
+  if (claimed.ok) attachClaimCookie(res, claimed.periodEndMs);
+  else res.headers.set("Cache-Control", NO_STORE);
+  return res;
 }

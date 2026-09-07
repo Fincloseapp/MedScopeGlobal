@@ -318,6 +318,8 @@ import {
   resolveArticleBodyLock,
 } from "../../lib/auth/article-eligibility";
 import { isEditorialCookieValid } from "../../lib/auth/editorial-cookie";
+import { safeEditorialReturnPath } from "../../lib/editorial/return-path";
+import { isApiRateLimitExempt } from "../../lib/v30/security/rate-limit";
 import { getEditorialArticleGateCopy } from "../../lib/v38/conversion-copy";
 import { getSubscribeCopy } from "../../lib/i18n/subscribe-copy";
 import {
@@ -4294,14 +4296,35 @@ console.log("✓ magazine desk byline and copy checks passed");
     const checkoutSrc = readFileSync(join(root, "lib/stripe/v27-checkout.ts"), "utf8");
     assert.ok(checkoutSrc.includes('localizePublicHref("/predplatne?canceled=1"'));
     assert.ok(checkoutSrc.includes("&product="));
+    assert.ok(checkoutSrc.includes("/api/v27/claim-editorial?session_id={CHECKOUT_SESSION_ID}"));
+    assert.ok(checkoutSrc.includes("returnPath"));
+    assert.ok(checkoutSrc.includes("safeEditorialReturnPath"));
     assert.ok(
       readFileSync(join(root, "app/api/v27/checkout/route.ts"), "utf8").includes('aiRef ?? "other"')
     );
     const successSrc = readFileSync(join(root, "components/checkout/checkout-success-panel.tsx"), "utf8");
     assert.ok(successSrc.includes('product.startsWith("public-")'));
-    assert.ok(successSrc.includes('localizePublicHref("/articles"'));
+    assert.ok(successSrc.includes('localizePublicHref(returnPath ?? "/articles"'));
     assert.ok(successSrc.includes("/api/v27/claim-editorial"));
     assert.ok(successSrc.includes("claimed"));
+    assert.ok(successSrc.includes("safeEditorialReturnPath"));
+    assert.ok(successSrc.includes("alreadyClaimed"));
+    assert.equal(safeEditorialReturnPath("/article/verejnost-demo"), "/article/verejnost-demo");
+    assert.equal(safeEditorialReturnPath("/verejnost/clanky/foo"), "/verejnost/clanky/foo");
+    assert.equal(safeEditorialReturnPath("https://evil.example/article/x"), null);
+    assert.equal(safeEditorialReturnPath("/lekari/tajne"), null);
+    assert.equal(isApiRateLimitExempt("/api/v27/claim-editorial"), true);
+    const claimRoute = readFileSync(join(root, "app/api/v27/claim-editorial/route.ts"), "utf8");
+    assert.ok(claimRoute.includes("export async function GET"));
+    assert.ok(claimRoute.includes("claimEditorialSession"));
+    assert.ok(
+      readFileSync(join(root, "components/subscription/editorial-pay-buttons.tsx"), "utf8").includes(
+        "returnPath"
+      )
+    );
+    assert.ok(
+      readFileSync(join(root, "components/article/article-body.tsx"), "utf8").includes("returnPath")
+    );
     assert.equal(isStripeSessionQuery("?session_id=cs_live_abc123&product=public-year"), true);
     assert.equal(scanQueryString("?session_id=cs_live_abc123&product=public-year&locale=cs").blocked, false);
     assert.equal(scanQueryString("?session_id=cs_test_x").blocked, false);
@@ -4315,9 +4338,12 @@ console.log("✓ magazine desk byline and copy checks passed");
     );
     assert.ok(existsSync(join(root, "app/api/v27/claim-editorial/route.ts")));
     const claimSrc = readFileSync(join(root, "app/api/v27/claim-editorial/route.ts"), "utf8");
-    assert.ok(claimSrc.includes("isEditorialGrantProduct"));
+    assert.ok(claimSrc.includes("claimEditorialSession"));
     assert.ok(claimSrc.includes("EDITORIAL_PAID_COOKIE"));
-    assert.ok(claimSrc.includes('startsWith("cs_")'));
+    assert.ok(claimSrc.includes("export async function GET"));
+    const claimLib = readFileSync(join(root, "lib/auth/claim-editorial.ts"), "utf8");
+    assert.ok(claimLib.includes("isEditorialGrantProduct"));
+    assert.ok(claimLib.includes('startsWith("cs_")'));
     const readerCtx = readFileSync(join(root, "lib/auth/reader-context.ts"), "utf8");
     assert.ok(readerCtx.includes("hasEditorialCookieAccess"));
     assert.ok(readerCtx.includes("withCookie"));

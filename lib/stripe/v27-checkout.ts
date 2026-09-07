@@ -6,6 +6,7 @@ import { resolveV27CheckoutItem, type V27CheckoutKind } from "@/lib/v27/stripe-p
 import { convertCzkToCharge } from "@/lib/i18n/payment-currency";
 import { isEditorialGrantProduct, isStudentGrantProduct, subscriptionTrialDays } from "@/lib/v27/config";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { safeEditorialReturnPath } from "@/lib/editorial/return-path";
 import { editorialAnnualCharge, editorialMonthlyCharge } from "@/lib/editorial/pricing";
 import { studentIntroCharge, studentMonthlyCharge } from "@/lib/studenti/pricing";
 
@@ -17,6 +18,7 @@ export type V27CheckoutBody = {
   region?: string | null;
   gift?: boolean;
   aiRef?: string | null;
+  returnPath?: string | null;
 };
 
 const STRIPE_LOCALES = new Set([
@@ -57,6 +59,7 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
   }
 
   const { kind, productId, userId, locale, region, gift, aiRef } = body;
+  const returnPath = safeEditorialReturnPath(body.returnPath);
   if (!kind || !productId) {
     return { status: 400 as const, body: { error: "Chybí kind nebo productId" } };
   }
@@ -106,9 +109,11 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode: item.mode,
     locale: stripeCheckoutLocale(locale),
-    success_url: `${SITE.url}/checkout/uspesne?session_id={CHECKOUT_SESSION_ID}${gift ? "&gift=1" : ""}${
-      isEditorialGrantProduct(productId) ? `&product=${encodeURIComponent(productId)}` : ""
-    }${locale ? `&locale=${encodeURIComponent(locale)}` : ""}`,
+    success_url: `${SITE.url}${
+      isEditorialGrantProduct(productId)
+        ? `/api/v27/claim-editorial?session_id={CHECKOUT_SESSION_ID}${gift ? "&gift=1" : ""}&product=${encodeURIComponent(productId)}${locale ? `&locale=${encodeURIComponent(locale)}` : ""}${returnPath ? `&return=${encodeURIComponent(returnPath)}` : ""}`
+        : `/checkout/uspesne?session_id={CHECKOUT_SESSION_ID}${gift ? "&gift=1" : ""}${locale ? `&locale=${encodeURIComponent(locale)}` : ""}`
+    }`,
     cancel_url: `${SITE.url}${localizePublicHref("/predplatne?canceled=1", locale ?? "cs")}`,
     payment_method_types: ["card"],
     after_expiration: {
@@ -130,6 +135,7 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
       ...(studentMonth && intro ? { intro_unit_amount: String(intro.unitAmount) } : {}),
       ...(locale ? { locale } : {}),
       ...(aiRef ? { ai_ref: aiRef, utm_source: aiRef, utm_medium: "ai", utm_campaign: "agent-coop" } : {}),
+      ...(returnPath ? { return_path: returnPath } : {}),
     },
     line_items: [
       {

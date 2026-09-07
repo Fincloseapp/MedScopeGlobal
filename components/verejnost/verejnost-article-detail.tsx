@@ -104,6 +104,7 @@ export function VerejnostArticleDetail({
                   locked={locked}
                   title={article.title}
                   locale={uiLocale}
+                  returnPath={`/verejnost/clanky/${article.slug}`}
                   gateCopy={gateCopy}
                 />
               </div>

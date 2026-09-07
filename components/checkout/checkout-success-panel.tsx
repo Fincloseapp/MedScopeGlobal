@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { safeEditorialReturnPath } from "@/lib/editorial/return-path";
 
 function editorialSuccessCopy(locale: string) {
   const primary = primaryArticleLocale(normalizeLocale(locale));
@@ -69,18 +70,26 @@ export function CheckoutSuccessPanel() {
   const gift = params.get("gift") === "1";
   const product = params.get("product") ?? "";
   const locale = params.get("locale") ?? "cs";
-  const editorial = product.startsWith("public-");
+  const alreadyClaimed = params.get("claimed") === "1";
+  const knownEditorial = product.startsWith("public-") || alreadyClaimed;
+  const shouldProbe =
+    Boolean(sessionId) &&
+    !gift &&
+    !alreadyClaimed &&
+    !/^(student|physician|dokumentace)-/.test(product);
+  const [editorial, setEditorial] = useState(knownEditorial);
+  const returnPath = safeEditorialReturnPath(params.get("return"));
   const share = useMemo(() => {
     if (!sessionId) return "";
     if (typeof window === "undefined") return "";
     return `${window.location.origin}/studenti/darkove?session=${encodeURIComponent(sessionId)}`;
   }, [sessionId]);
   const editorialCopy = editorial ? editorialSuccessCopy(locale) : null;
-  const articlesHref = localizePublicHref("/articles", locale);
+  const articlesHref = localizePublicHref(returnPath ?? "/articles", locale);
   const plansHref = localizePublicHref("/predplatne#public", locale);
-  const [claimed, setClaimed] = useState(!editorial);
+  const [claimed, setClaimed] = useState(!knownEditorial || alreadyClaimed);
   const [claimFailed, setClaimFailed] = useState(false);
-  const [claiming, setClaiming] = useState(editorial && Boolean(sessionId));
+  const [claiming, setClaiming] = useState(knownEditorial && Boolean(sessionId) && !alreadyClaimed);
 
   const claimEditorial = useCallback(async () => {
     if (!sessionId) {
@@ -98,30 +107,37 @@ export function CheckoutSuccessPanel() {
         body: JSON.stringify({ sessionId }),
       });
       if (!res.ok) {
+        if (res.status === 403 && !product.startsWith("public-")) {
+          setEditorial(false);
+          setClaimed(true);
+          return;
+        }
         setClaimFailed(true);
         return;
       }
+      setEditorial(true);
       setClaimed(true);
     } catch {
       setClaimFailed(true);
     } finally {
       setClaiming(false);
     }
-  }, [sessionId]);
+  }, [sessionId, product]);
 
   useEffect(() => {
-    if (!editorial) {
+    if (alreadyClaimed) {
+      setEditorial(true);
       setClaimed(true);
       setClaiming(false);
       return;
     }
-    if (!sessionId) {
-      setClaimFailed(true);
-      setClaiming(false);
+    if (knownEditorial || shouldProbe) {
+      void claimEditorial();
       return;
     }
-    void claimEditorial();
-  }, [editorial, sessionId, claimEditorial]);
+    setClaimed(true);
+    setClaiming(false);
+  }, [alreadyClaimed, knownEditorial, shouldProbe, claimEditorial]);
 
   return (
     <div className="mx-auto max-w-lg px-4 py-20 text-center">

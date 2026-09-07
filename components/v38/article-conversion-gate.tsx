@@ -14,6 +14,7 @@ type Props = {
   teaserHtml?: string;
   title?: string;
   locale?: string | null;
+  returnPath?: string;
 };
 
 function gateFooter(locale?: string | null, editorial = false) {
@@ -59,7 +60,7 @@ function gateFooter(locale?: string | null, editorial = false) {
 }
 
 /** Paywall gate with content teaser — VIP or Redakce copy is passed in. */
-export function ArticleConversionGate({ copy, teaserHtml, title, locale }: Props) {
+export function ArticleConversionGate({ copy, teaserHtml, title, locale, returnPath }: Props) {
   const teaserText = teaserHtml ? getPaywallPreviewText(teaserHtml) : null;
   const editorial = Boolean(copy.ctaHref?.includes("#public"));
   const footer = gateFooter(locale, editorial);
@@ -104,7 +105,7 @@ export function ArticleConversionGate({ copy, teaserHtml, title, locale }: Props
           <p className="text-sm font-medium text-emerald-700">{footer.trial}</p>
         </div>
         {editorial ? (
-          <EditorialPayButtons locale={loc} />
+          <EditorialPayButtons locale={loc} returnPath={returnPath} />
         ) : (
           <Button asChild size="lg" className="bg-[#005B96] hover:bg-[#004a7a]">
             <Link href={compareHref}>

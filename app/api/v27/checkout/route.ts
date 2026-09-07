@@ -19,6 +19,7 @@ export async function POST(request: Request) {
     locale?: string;
     gift?: boolean;
     aiRef?: string;
+    returnPath?: string;
   };
   try {
     body = await request.json();
@@ -53,6 +54,7 @@ export async function POST(request: Request) {
     region,
     gift: Boolean(body.gift),
     aiRef,
+    returnPath: body.returnPath,
   });
   if (result.status === 200) {
     const country = requestCountry(request.headers);

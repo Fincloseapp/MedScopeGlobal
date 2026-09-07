@@ -14,6 +14,7 @@ type Props = {
   className?: string;
   locale?: string;
   gift?: boolean;
+  returnPath?: string;
   icon?: boolean;
   busyLabel?: string;
   errorClassName?: string;
@@ -26,6 +27,7 @@ export function V27CheckoutButton({
   className,
   locale,
   gift = false,
+  returnPath,
   icon,
   busyLabel,
   errorClassName,
@@ -63,6 +65,7 @@ export function V27CheckoutButton({
           ...(locale ? { locale } : {}),
           ...(gift ? { gift: true } : {}),
           ...(aiRef ? { aiRef } : {}),
+          ...(returnPath ? { returnPath } : {}),
         }),
       });
       const data = (await res.json()) as {

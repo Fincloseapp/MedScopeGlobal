@@ -6,10 +6,11 @@ import { editorialPayLabels } from "@/lib/editorial/pay-labels";
 type Props = {
   locale?: string | null;
   className?: string;
+  returnPath?: string;
 };
 
 /** Redakce Stripe — roční první, pak měsíc. */
-export function EditorialPayButtons({ locale, className }: Props) {
+export function EditorialPayButtons({ locale, className, returnPath }: Props) {
   const loc = locale ?? "cs";
   const pay = editorialPayLabels(loc);
   return (
@@ -19,12 +20,14 @@ export function EditorialPayButtons({ locale, className }: Props) {
         productId="public-year"
         locale={loc}
         label={pay.year}
+        returnPath={returnPath}
       />
       <V27CheckoutButton
         kind="subscription"
         productId="public-month"
         locale={loc}
         label={pay.month}
+        returnPath={returnPath}
         className="w-full border border-[#005B96]/30 bg-white text-[#005B96] hover:bg-[#f0f7ff]"
       />
     </div>

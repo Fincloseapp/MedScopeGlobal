@@ -130,6 +130,7 @@ export function isApiRateLimitExempt(pathname: string): boolean {
   if (pathname.includes("/health")) return true;
   if (pathname.startsWith("/api/cron/")) return true;
   if (pathname.startsWith("/api/mobile/health")) return true;
+  if (pathname.startsWith("/api/v27/claim-editorial")) return true;
   return false;
 }
 
