@@ -191,7 +191,7 @@ export function V23NewsletterIssueView({
           src={heroUrl}
           alt={heroAlt}
           fill
-          className="object-cover opacity-35"
+          className="object-cover opacity-55"
           sizes="(max-width: 896px) 100vw, 896px"
           priority
         />

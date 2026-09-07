@@ -993,7 +993,7 @@ file("public/assets/magazine/vialongevita-email-lockup.jpg");
     assert.ok(existsSync(join(root, "public", cover.src.replace(/^\//, ""))), cover.src);
   }
   assert.ok(readFileSync(join(root, "app/(public)/article/[slug]/page.tsx"), "utf8").includes("MagazineTitleSpread"));
-  assert.ok(!GLOBAL_LOCALES.includes("ar" as (typeof GLOBAL_LOCALES)[number]));
+  assert.ok(!GLOBAL_LOCALES.some((row) => String(row.code) === "ar"));
 }
 assert.ok(
   !readFileSync(join(root, "lib/monetization/vialongevita-brief.ts"), "utf8").includes("escapeHtml(market)"),

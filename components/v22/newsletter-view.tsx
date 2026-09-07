@@ -23,7 +23,7 @@ export function V22NewsletterHub({ locale = "cs" }: { locale?: string }) {
             src={pickEditionCover(locale, isoWeekSeed()).src}
             alt={editionCoverAlt(locale)}
             fill
-            className="object-cover opacity-35"
+            className="object-cover opacity-55"
             sizes="100vw"
             priority
           />
@@ -79,10 +79,10 @@ export function V22NewsletterIssue({
     <article className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
       <div className="relative aspect-[3/1] bg-slate-100">
         <Image
-          src={V22_NEWSLETTER_HERO}
-          alt={headline}
+          src={pickEditionCover(locale, issue.issue_date).src}
+          alt={editionCoverAlt(locale)}
           fill
-          className="object-cover opacity-90"
+          className="object-cover opacity-70"
           sizes="896px"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#021d33]/80 to-transparent" />
