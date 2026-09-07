@@ -436,6 +436,18 @@ const nextConfig = {
         ],
       },
       {
+        source: "/predplatne",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/:locale/predplatne",
+        headers: [
+          { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
         source: "/article/:path*",
         headers: [
           { key: "Cache-Control", value: "private, no-cache, no-store, must-revalidate" },

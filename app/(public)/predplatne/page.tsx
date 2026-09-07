@@ -4,6 +4,7 @@ import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { SubscriptionComparisonTable } from "@/components/subscription/subscription-comparison-table";
 import { SubscriptionFaq } from "@/components/subscription/subscription-faq";
 import { SubscriptionTrialBanner } from "@/components/subscription/subscription-trial-banner";
+import { SubscriptionCanceledBanner } from "@/components/subscription/subscription-canceled-banner";
 import { SubscriptionTrustBadges } from "@/components/subscription/subscription-trust-badges";
 import { V27_SUBSCRIPTION_PLANS, subscriptionProductId } from "@/lib/v27/config";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
@@ -37,10 +38,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PredplatnePage({
   searchParams,
 }: {
-  searchParams: Promise<{ trial?: string }>;
+  searchParams: Promise<{ trial?: string; canceled?: string }>;
 }) {
-  const { trial } = await searchParams;
+  const { trial, canceled } = await searchParams;
   const highlightTrial = trial === "1";
+  const showCanceled = canceled === "1";
   const locale = await getServerLocale();
   const region = await getServerRegion();
   const copy = getSubscribeCopy(locale, region);
@@ -69,7 +71,10 @@ export default async function PredplatnePage({
       </div>
 
       <div className="mt-10">
-        <SubscriptionTrialBanner locale={locale} region={region} />
+        {showCanceled ? <SubscriptionCanceledBanner locale={locale} /> : null}
+        <div className={showCanceled ? "mt-6" : undefined}>
+          <SubscriptionTrialBanner locale={locale} region={region} />
+        </div>
       </div>
 
       {highlightTrial ? (

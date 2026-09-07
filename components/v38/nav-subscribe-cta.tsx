@@ -6,6 +6,8 @@ import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { readAiRefFromDocumentCookie } from "@/lib/growth/ai-ref-cookie";
 import { getCheckoutButtonCopy, readerCheckoutError } from "@/lib/i18n/checkout-chrome";
+import { safeEditorialReturnPath } from "@/lib/editorial/return-path";
+import { resolveLocalePath } from "@/lib/i18n/locale-path";
 
 type Props = {
   label?: string;
@@ -31,6 +33,7 @@ export function NavSubscribeCta({
     setLoading(true);
     try {
       const aiRef = readAiRefFromDocumentCookie();
+      const returnPath = safeEditorialReturnPath(resolveLocalePath(window.location.pathname).pathname);
       const res = await fetch("/api/v27/checkout", {
         method: "POST",
         credentials: "same-origin",
@@ -40,6 +43,7 @@ export function NavSubscribeCta({
           productId: "public-year",
           ...(locale ? { locale } : {}),
           ...(aiRef ? { aiRef } : {}),
+          ...(returnPath ? { returnPath } : {}),
         }),
       });
       const data = (await res.json()) as { url?: string; error?: string; enabled?: boolean };

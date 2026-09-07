@@ -17,3 +17,30 @@ export function editorialPayLabels(locale?: string | null): { year: string; mont
   }
   return { year: `Ročně ${annual.formatted}`, month: `Měsíčně ${monthly.formatted}` };
 }
+
+/** Copy when Stripe checkout is abandoned — no fake discount. */
+export function editorialCanceledCopy(locale?: string | null): { title: string; body: string } {
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  if (primary === "de") {
+    return {
+      title: "Zahlung nicht abgeschlossen",
+      body: "Die Redaktion öffnet sich erst nach der Zahlung. Jahresabo zuerst — jederzeit kündbar.",
+    };
+  }
+  if (primary === "fr") {
+    return {
+      title: "Paiement non terminé",
+      body: "La rédaction s’ouvre seulement après le paiement. L’abonnement annuel d’abord — résiliable à tout moment.",
+    };
+  }
+  if (primary !== "cs") {
+    return {
+      title: "Payment not completed",
+      body: "Editorial opens after you pay. Yearly first — cancel anytime.",
+    };
+  }
+  return {
+    title: "Platba se nedokončila",
+    body: "Redakce se otevře až po zaplacení. Nejdřív roční přístup — zrušíte kdykoli.",
+  };
+}

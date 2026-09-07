@@ -71,6 +71,8 @@ export function applySecurityHeaders(response: NextResponse, pathname?: string):
     stripped.startsWith("/studenti/") ||
     stripped === "/lekari" ||
     stripped.startsWith("/lekari/") ||
+    stripped === "/predplatne" ||
+    stripped.startsWith("/predplatne/") ||
     stripped.startsWith("/article/") ||
     stripped.startsWith("/checkout/") ||
     stripped.startsWith("/verejnost/clanky/") ||

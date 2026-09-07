@@ -319,6 +319,7 @@ import {
 } from "../../lib/auth/article-eligibility";
 import { isEditorialCookieValid } from "../../lib/auth/editorial-cookie";
 import { safeEditorialReturnPath } from "../../lib/editorial/return-path";
+import { editorialCanceledCopy } from "../../lib/editorial/pay-labels";
 import { isApiRateLimitExempt } from "../../lib/v30/security/rate-limit";
 import { getEditorialArticleGateCopy } from "../../lib/v38/conversion-copy";
 import { getSubscribeCopy } from "../../lib/i18n/subscribe-copy";
@@ -4146,6 +4147,13 @@ console.log("✓ magazine desk byline and copy checks passed");
     const yearIdx = predplatneSrc.indexOf('subscriptionProductId(plan.tier, "year")');
     const monthIdx = predplatneSrc.indexOf('subscriptionProductId(plan.tier, "month")');
     assert.ok(yearIdx > -1 && monthIdx > -1 && yearIdx < monthIdx, "Editorial annual checkout button must render before monthly");
+    assert.ok(predplatneSrc.includes("SubscriptionCanceledBanner"));
+    assert.ok(predplatneSrc.includes('canceled === "1"'));
+    assert.ok(
+      readFileSync(join(root, "components/subscription/subscription-canceled-banner.tsx"), "utf8").includes(
+        "EditorialPayButtons"
+      )
+    );
     const bannerSrc = readFileSync(join(root, "components/subscription/subscription-trial-banner.tsx"), "utf8");
     assert.ok(bannerSrc.includes("bannerKicker"), "subscribe banner chip must not repeat the command headline");
     assert.ok(bannerSrc.includes("bannerLead"), "subscribe banner must sell the benefit, not dump all four plans");
@@ -4379,7 +4387,14 @@ console.log("✓ magazine desk byline and copy checks passed");
     assert.ok(distSrc.indexOf("predplatne") < distSrc.indexOf('section: "dokscope"'));
     const navCta = readFileSync(join(root, "components/v38/nav-subscribe-cta.tsx"), "utf8");
     assert.ok(navCta.includes('productId: "public-year"'));
+    assert.ok(navCta.includes("returnPath"));
+    assert.ok(navCta.includes("safeEditorialReturnPath"));
     assert.ok(!navCta.includes("@/lib/v27/config"));
+    assert.equal(editorialCanceledCopy("cs").title.includes("nedokončila"), true);
+    assert.ok(!editorialCanceledCopy("de").title.includes("nedokončila"));
+    assert.ok(!editorialCanceledCopy("fr").body.includes("Redakce"));
+    assert.ok(nextCfg.includes("/:locale/predplatne"));
+    assert.ok(headerSrc.includes('stripped === "/predplatne"'));
     assert.ok(navCta.includes("#student") || navCta.includes("!editorial"));
     assert.ok(
       readFileSync(join(root, "components/layout/site-header.tsx"), "utf8").includes("locale={navLocale}")
