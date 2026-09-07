@@ -3755,6 +3755,14 @@ console.log("✓ magazine desk byline and copy checks passed");
     assert.notEqual(getSubscribeCopy("cs").editorialBadge, getSubscribeCopy("cs").daysFree);
     assert.ok(!/platí hned/i.test(getSubscribeCopy("cs").bannerTitle));
   }
+  {
+    const pricingSrc = readFileSync(join(root, "app/(public)/pricing/page.tsx"), "utf8");
+    assert.ok(pricingSrc.includes("permanentRedirect"), "/pricing must not keep the legacy Basic/VIP table");
+    assert.ok(pricingSrc.includes("/predplatne"));
+    assert.ok(!pricingSrc.includes("basicMonthlyCzk"));
+    assert.ok(!pricingSrc.includes("STRIPE_SECRET_KEY is set"));
+    assert.ok(!pricingSrc.includes("499"));
+  }
   assert.ok(!getEditorialArticleGateCopy("cs").ctaHref.includes("trial=1"));
   assert.ok(!getEditorialArticleGateCopy("de").body.includes("14 Tage"));
   assert.ok(!getEditorialArticleGateCopy("fr").ctaLabel.includes("14"));
