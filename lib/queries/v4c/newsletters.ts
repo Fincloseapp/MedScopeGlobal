@@ -25,6 +25,26 @@ export type NewsletterRow = {
 
 export const NEWSLETTER_ISR_SECONDS = 3600;
 
+/** Cards / locale pick — never pull html_content or layout_json for the whole table. */
+export const NEWSLETTER_INDEX_COLUMNS =
+  "id, title, slug, issue_date, published, admin_only, created_at";
+
+function asIndexRow(row: Partial<NewsletterRow> & Pick<NewsletterRow, "id" | "slug" | "issue_date">): NewsletterRow {
+  return {
+    id: row.id,
+    title: row.title ?? "",
+    slug: row.slug,
+    issue_date: row.issue_date,
+    html_content: row.html_content ?? null,
+    pdf_text: row.pdf_text ?? null,
+    pdf_url: row.pdf_url ?? null,
+    layout_json: row.layout_json ?? null,
+    published: row.published ?? true,
+    admin_only: row.admin_only ?? false,
+    created_at: row.created_at ?? row.issue_date,
+  };
+}
+
 export function newsletterRowLocale(row: Pick<NewsletterRow, "slug" | "layout_json">): string {
   const layout = row.layout_json as V23NewsletterLayout | null;
   if (layout?.locale) return resolveGlobalLocale(layout.locale);
@@ -35,21 +55,25 @@ export async function getLatestNewsletter(locale?: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("newsletters")
-    .select("*")
+    .select(locale ? NEWSLETTER_INDEX_COLUMNS : "*")
     .eq("published", true)
     .eq("admin_only", false)
     .order("issue_date", { ascending: false })
     .limit(locale ? 48 : 1);
   if (error || !data?.length) return null;
-  const rows = data as NewsletterRow[];
+  const rows = (data as NewsletterRow[]).map((row) => asIndexRow(row));
   if (!locale) return rows[0] ?? null;
   const resolved = resolveGlobalLocale(locale);
   const preferredSlug = newsletterIssueSlug(new Date().toISOString().slice(0, 10), resolved);
-  const exact = rows.find((row) => row.slug === preferredSlug);
-  if (exact) return exact;
-  const matching = rows.find((row) => newsletterRowLocale(row) === resolved);
-  if (matching) return matching;
-  return rows.find((row) => newsletterRowLocale(row) === "cs") ?? rows[0] ?? null;
+  const picked =
+    rows.find((row) => row.slug === preferredSlug) ??
+    rows.find((row) => newsletterRowLocale(row) === resolved) ??
+    rows.find((row) => newsletterRowLocale(row) === "cs") ??
+    rows[0] ??
+    null;
+  if (!picked) return null;
+  const full = await getNewsletterBySlug(picked.slug);
+  return full ?? picked;
 }
 
 export async function getNewsletterBySlug(slug: string) {
@@ -97,13 +121,16 @@ export async function getPendingNewsletterTopics() {
 
 export async function getNewsletterArchive(admin = false, locale?: string) {
   const supabase = admin ? createServiceRoleClient() : await createClient();
-  let q = supabase.from("newsletters").select("*").order("issue_date", { ascending: false });
+  let q = supabase
+    .from("newsletters")
+    .select(admin ? "*" : NEWSLETTER_INDEX_COLUMNS)
+    .order("issue_date", { ascending: false });
   if (!admin) {
-    q = q.eq("published", true).eq("admin_only", false);
+    q = q.eq("published", true).eq("admin_only", false).limit(40);
   }
   const { data, error } = await q;
   if (error) return [];
-  const rows = (data ?? []) as NewsletterRow[];
+  const rows = ((data ?? []) as NewsletterRow[]).map((row) => asIndexRow(row));
   if (admin || !locale) return rows;
   const resolved = resolveGlobalLocale(locale);
   const matching = rows.filter((row) => newsletterRowLocale(row) === resolved);

@@ -2167,6 +2167,13 @@ assert.ok(
     readFileSync(join(root, "app/(public)/newsletter/page.tsx"), "utf8").includes("coverSeed={latest?.issue_date}")
   );
 }
+{
+  const archiveSrc = readFileSync(join(root, "lib/queries/v4c/newsletters.ts"), "utf8");
+  assert.ok(archiveSrc.includes("NEWSLETTER_INDEX_COLUMNS"));
+  assert.ok(archiveSrc.includes("admin ? \"*\" : NEWSLETTER_INDEX_COLUMNS"));
+  assert.ok(archiveSrc.includes(".limit(40)"));
+  assert.ok(archiveSrc.includes("getNewsletterBySlug(picked.slug)"));
+}
 assert.ok(
   readFileSync(join(root, "app/(public)/newsletter/[slug]/page.tsx"), "utf8").includes("getNewsletterForPublic"),
   "issue page must prefer locale slug then date slug"
