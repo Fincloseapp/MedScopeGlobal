@@ -312,6 +312,8 @@ import {
   scoreArenaWindow,
   decideEvolution,
   generateTeamDrafts,
+  ARENA_POINTS_PER_PAID,
+  ARENA_RACE_RULES,
 } from "../../lib/growth/arena";
 import {
   isFreeNewsDeskArticle,
@@ -2659,7 +2661,10 @@ assert.ok(
       spam: false,
       alreadyAwardedMilestone: false,
     });
-    assert.equal(paidWin.teamPointsDelta, 300);
+    assert.equal(ARENA_POINTS_PER_PAID, 100);
+    assert.equal(paidWin.teamPointsDelta, 3 * ARENA_POINTS_PER_PAID);
+    assert.equal(ARENA_RACE_RULES.title, "Jak závod týmů pokračuje");
+    assert.ok(ARENA_RACE_RULES.steps.some((step) => step.includes("ms_ai_ref")));
     const idle = decideEvolution(
       {
         slug: "alfa",
@@ -2685,8 +2690,76 @@ assert.ok(
       }
     );
     assert.equal(idle.action, "none");
+    assert.equal(idle.tied, true);
     assert.equal(idle.winnerQuota, 240);
     assert.equal(idle.loserQuota, 22);
+    assert.ok(idle.detail.includes("remíza"));
+    const leftoverDoesNotCrown = decideEvolution(
+      {
+        slug: "alfa",
+        generation: 1,
+        status: "active",
+        teamPoints: 1,
+        reachQuota: 80,
+        messageLimit: 80,
+        losingStreak: 0,
+        hourConversions: 0,
+        styleBias: "clinical-short",
+      },
+      {
+        slug: "beta",
+        generation: 1,
+        status: "active",
+        teamPoints: 99_999,
+        reachQuota: 80,
+        messageLimit: 80,
+        losingStreak: 0,
+        hourConversions: 0,
+        styleBias: "sleep-focus",
+      }
+    );
+    assert.equal(leftoverDoesNotCrown.tied, true);
+    assert.equal(leftoverDoesNotCrown.action, "none");
+    assert.equal(leftoverDoesNotCrown.winner, "alfa", "leftover teamPoints must not crown a winner");
+    const paidTie = decideEvolution(
+      {
+        slug: "alfa",
+        generation: 1,
+        status: "active",
+        teamPoints: 0,
+        reachQuota: 80,
+        messageLimit: 80,
+        losingStreak: 0,
+        hourConversions: 2,
+        styleBias: "clinical-short",
+      },
+      {
+        slug: "beta",
+        generation: 1,
+        status: "active",
+        teamPoints: 0,
+        reachQuota: 80,
+        messageLimit: 80,
+        losingStreak: 0,
+        hourConversions: 2,
+        styleBias: "sleep-focus",
+      }
+    );
+    assert.equal(paidTie.action, "none");
+    assert.equal(paidTie.tied, true);
+    assert.ok(
+      readFileSync(join(root, "lib/growth/arena/race-rules.ts"), "utf8").includes(
+        "Jak závod týmů pokračuje"
+      )
+    );
+    assert.ok(
+      readFileSync(join(root, "components/admin/arena-battle.tsx"), "utf8").includes(
+        "Jak závod týmů pokračuje"
+      )
+    );
+    assert.ok(
+      readFileSync(join(root, "lib/growth/arena/dashboard.ts"), "utf8").includes("ARENA_RACE_RULES")
+    );
     assert.ok(readFileSync(join(root, "components/admin/arena-battle.tsx"), "utf8").includes("Vyhodnocení závodu"));
     assert.ok(readFileSync(join(root, "components/admin/arena-battle.tsx"), "utf8").includes("není výhra"));
     assert.ok(readFileSync(join(root, "lib/growth/arena/dashboard.ts"), "utf8").includes("payingNow"));

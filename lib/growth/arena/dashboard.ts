@@ -20,6 +20,7 @@ import {
   windowFromEvents,
 } from "@/lib/growth/arena/markets";
 import { africaCountryCodes, isAfricaCountry } from "@/lib/growth/africa-markets";
+import { ARENA_RACE_RULES } from "@/lib/growth/arena/race-rules";
 
 const DASHBOARD_WINDOW_MS = 7 * 86_400_000;
 
@@ -37,7 +38,6 @@ export async function loadArenaDashboard() {
   const payingSubscribers = subscriptionHeads.active;
   const liveSubscribers = subscriptionHeads.active + subscriptionHeads.trialing;
 
-  const leaderboard = [...teams].sort((a, b) => b.teamPoints - a.teamPoints);
   const weekStart = new Date(Date.now() - DASHBOARD_WINDOW_MS).toISOString();
   const events = await loadArenaEvents(weekStart);
   const markets = scoreLocaleMarkets(events);
@@ -81,6 +81,12 @@ export async function loadArenaDashboard() {
   });
   const alfaPaid7d = windowFromEvents(events, "alfa").paid;
   const betaPaid7d = windowFromEvents(events, "beta").paid;
+  const paidBySlug = { alfa: alfaPaid7d, beta: betaPaid7d } as const;
+  const leaderboard = [...teams].sort((a, b) => {
+    const paidDelta = (paidBySlug[b.slug] ?? 0) - (paidBySlug[a.slug] ?? 0);
+    if (paidDelta !== 0) return paidDelta;
+    return a.slug.localeCompare(b.slug);
+  });
   const payingNow = payingSubscribers > 0 || trafficTotals.paid > 0 || alfaPaid7d + betaPaid7d > 0;
   const alfaLeadCountries = countries.filter((row) => row.leader === "alfa").length;
   const betaLeadCountries = countries.filter((row) => row.leader === "beta").length;
@@ -117,6 +123,11 @@ export async function loadArenaDashboard() {
     windowStart: weekStart,
     honesty:
       "Výhra = zaplacené předplatné (ai_agent_paid nebo živý Stripe active). Návštěva crawlera, hop, košík a IndexNow jsou pipeline, ne úspěch. 0 platících = remíza, 0 bodů, žádná kvóta. 170 000 / 500 000 je programový cíl, ne stav.",
+    race: {
+      ...ARENA_RACE_RULES,
+      paidAlfa7d: alfaPaid7d,
+      paidBeta7d: betaPaid7d,
+    },
     liveSubscribers,
     payingSubscribers,
     goals: {

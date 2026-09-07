@@ -57,7 +57,10 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
 
   const alfa = dash.teams.find((row) => row.slug === "alfa");
   const beta = dash.teams.find((row) => row.slug === "beta");
-  const maxPoints = Math.max(1, ...dash.teams.map((row) => row.teamPoints), 1);
+  const paidAlfa = dash.race?.paidAlfa7d ?? dash.verdict?.paidAlfa7d ?? 0;
+  const paidBeta = dash.race?.paidBeta7d ?? dash.verdict?.paidBeta7d ?? 0;
+  const paidBySlug = { alfa: paidAlfa, beta: paidBeta };
+  const maxPaid = Math.max(1, paidAlfa, paidBeta);
 
   return (
     <div className="space-y-6">
@@ -75,6 +78,16 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
         </button>
       </div>
       {tickMsg ? <p className="text-sm text-slate-700">{tickMsg}</p> : null}
+
+      <section className="rounded-2xl border border-[#005B96]/25 bg-[#005B96]/5 p-5">
+        <h2 className="font-display text-xl font-semibold">{dash.race?.title ?? "Jak závod týmů pokračuje"}</h2>
+        <p className="mt-2 text-sm text-slate-800">{dash.race?.goal}</p>
+        <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-slate-700">
+          {(dash.race?.steps ?? []).map((step) => (
+            <li key={step}>{step}</li>
+          ))}
+        </ol>
+      </section>
 
       <section
         className={`rounded-2xl border p-5 ${
@@ -112,7 +125,7 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
             </strong>
           </p>
           <p className="rounded-lg border bg-white px-3 py-2">
-            Historické body Alfa / Beta
+            Historické body (ne skóre)
             <strong className="mt-1 block text-lg">
               {formatInt(alfa?.teamPoints ?? 0)} / {formatInt(beta?.teamPoints ?? 0)}
             </strong>
@@ -240,7 +253,8 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
       <div className="grid gap-4 lg:grid-cols-2">
         {[alfa, beta].map((team) => {
           if (!team) return null;
-          const width = Math.round((Math.max(0, team.teamPoints) / maxPoints) * 100);
+          const paid = paidBySlug[team.slug] ?? 0;
+          const width = Math.round((Math.max(0, paid) / maxPaid) * 100);
           const members = dash.members.filter((row) => row.teamSlug === team.slug);
           return (
             <article
@@ -258,14 +272,17 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
                     gen {team.generation} · {team.status} · styl {team.styleBias}
                   </p>
                 </div>
-                <p className="text-3xl font-bold">{formatInt(team.teamPoints)}</p>
+                <div className="text-right">
+                  <p className="text-3xl font-bold">{formatInt(paid)}</p>
+                  <p className="text-[11px] text-slate-500">platících 7 dní</p>
+                </div>
               </div>
               <div className="mt-3 h-3 overflow-hidden rounded-full bg-slate-100">
                 <div className="h-full bg-[#005B96]" style={{ width: `${width}%` }} />
               </div>
               <p className="mt-2 text-xs text-slate-600">
                 Organický kvót {team.reachQuota} URL · limit {team.messageLimit} · série proher{" "}
-                {team.losingStreak}
+                {team.losingStreak} · historické body {formatInt(team.teamPoints)} (ne skóre)
               </p>
               <ul className="mt-3 grid gap-2 sm:grid-cols-3">
                 {members.map((member) => (
@@ -464,7 +481,8 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
             <thead className="bg-muted/50">
               <tr>
                 <th className="px-3 py-2 text-left">Tým</th>
-                <th className="px-3 py-2 text-right">Body</th>
+                <th className="px-3 py-2 text-right">Platících 7 dní</th>
+                <th className="px-3 py-2 text-right">Historické body</th>
                 <th className="px-3 py-2 text-right">Kvóta</th>
                 <th className="px-3 py-2 text-left">Stav</th>
               </tr>
@@ -473,6 +491,7 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
               {dash.leaderboard.map((row) => (
                 <tr key={row.slug} className="border-t">
                   <td className="px-3 py-2 font-medium">{row.name}</td>
+                  <td className="px-3 py-2 text-right">{formatInt(paidBySlug[row.slug] ?? 0)}</td>
                   <td className="px-3 py-2 text-right">{formatInt(row.teamPoints)}</td>
                   <td className="px-3 py-2 text-right">{row.reachQuota}</td>
                   <td className="px-3 py-2">{row.status}</td>

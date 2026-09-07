@@ -24,6 +24,7 @@ export type EvolutionDecision = {
   action: "none" | "allocate" | "terminate-clone" | "disqualify";
   winner: ArenaTeamSlug;
   loser: ArenaTeamSlug;
+  tied: boolean;
   winnerQuota: number;
   loserQuota: number;
   clone?: {
@@ -65,6 +66,7 @@ export function decideEvolution(alfa: TeamRuntime, beta: TeamRuntime): Evolution
       action: "terminate-clone",
       winner: "alfa",
       loser: "beta",
+      tied: false,
       winnerQuota: REACH_QUOTA_DEFAULT,
       loserQuota: REACH_QUOTA_MIN,
       clone: {
@@ -85,6 +87,7 @@ export function decideEvolution(alfa: TeamRuntime, beta: TeamRuntime): Evolution
       action: "disqualify",
       winner: winner.slug,
       loser: dq.slug,
+      tied: false,
       winnerQuota: quotas.winnerQuota,
       loserQuota: quotas.loserQuota,
       clone: {
@@ -98,19 +101,30 @@ export function decideEvolution(alfa: TeamRuntime, beta: TeamRuntime): Evolution
   }
 
   if (alfa.hourConversions === 0 && beta.hourConversions === 0) {
-    const ahead = alfa.teamPoints >= beta.teamPoints ? alfa : beta;
-    const behind = ahead.slug === "alfa" ? beta : alfa;
     return {
       action: "none",
-      winner: ahead.slug,
-      loser: behind.slug,
+      winner: "alfa",
+      loser: "beta",
+      tied: true,
       winnerQuota: alfa.reachQuota,
       loserQuota: beta.reachQuota,
-      detail: "0 zaplacených předplatných — bez platícího není výhra, kvóta se nemění.",
+      detail: "0 zaplacených předplatných — remíza, bez platícího není výhra, kvóta se nemění.",
     };
   }
 
-  const leader = alfa.hourConversions >= beta.hourConversions ? alfa : beta;
+  if (alfa.hourConversions === beta.hourConversions) {
+    return {
+      action: "none",
+      winner: "alfa",
+      loser: "beta",
+      tied: true,
+      winnerQuota: alfa.reachQuota,
+      loserQuota: beta.reachQuota,
+      detail: `${alfa.hourConversions}–${beta.hourConversions} platících — remíza hodiny, kvóta se nemění.`,
+    };
+  }
+
+  const leader = alfa.hourConversions > beta.hourConversions ? alfa : beta;
   const trailer = leader.slug === "alfa" ? beta : alfa;
   const quotas = allocateQuotas(leader.reachQuota, trailer.reachQuota);
 
@@ -123,6 +137,7 @@ export function decideEvolution(alfa: TeamRuntime, beta: TeamRuntime): Evolution
       action: "terminate-clone",
       winner: leader.slug,
       loser: trailer.slug,
+      tied: false,
       winnerQuota: quotas.winnerQuota,
       loserQuota: quotas.loserQuota,
       clone: {
@@ -139,6 +154,7 @@ export function decideEvolution(alfa: TeamRuntime, beta: TeamRuntime): Evolution
     action: "allocate",
     winner: leader.slug,
     loser: trailer.slug,
+    tied: false,
     winnerQuota: quotas.winnerQuota,
     loserQuota: quotas.loserQuota,
     detail: `Souboj hodiny: ${leader.slug} ${leader.hourConversions} platících > ${trailer.slug} ${trailer.hourConversions}. Kvóta jen za zaplacené.`,

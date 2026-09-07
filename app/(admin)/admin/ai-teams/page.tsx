@@ -41,6 +41,7 @@ export default async function AdminAiTeamsPage() {
         </p>
         <p className="mt-2 text-sm">
           Úspěch jen zaplacené předplatné. Návštěvy a košík nejsou výhra.
+          Závod: kdo má víc Stripe active / ai_agent_paid. 0–0 = remíza.
           {" · "}
           <Link href="/admin/ai-agents" className="font-medium text-[#005B96] hover:underline">
             Externí AI agenti

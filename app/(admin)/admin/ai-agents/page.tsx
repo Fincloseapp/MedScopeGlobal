@@ -122,6 +122,11 @@ export default async function AdminAiAgentsPage() {
         <p className="mb-4 text-sm text-muted-foreground">
           Pořadí: nejdřív <code>ai_agent_paid</code>, až potom košík a návštěvy. Návštěva
           crawlera není úspěch. Cron každou 5. minutu posílá IndexNow, nevolá API asistentů.
+          Souboj Alfa/Beta se rozhoduje jen podle zaplacených předplatných — pravidla jsou na{" "}
+          <Link href="/admin/ai-teams" className="font-medium text-[#005B96] hover:underline">
+            Růstové aréně
+          </Link>
+          .
         </p>
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full text-sm">
