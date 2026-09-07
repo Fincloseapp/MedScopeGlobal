@@ -993,6 +993,18 @@ file("public/assets/magazine/vialongevita-email-lockup.jpg");
     assert.ok(existsSync(join(root, "public", cover.src.replace(/^\//, ""))), cover.src);
   }
   assert.ok(readFileSync(join(root, "app/(public)/article/[slug]/page.tsx"), "utf8").includes("MagazineTitleSpread"));
+  assert.ok(readFileSync(join(root, "app/globals.css"), "utf8").includes("max-w-[42rem]"));
+  assert.ok(readFileSync(join(root, "app/globals.css"), "utf8").includes(".article-title-spread.is-full"));
+  assert.ok(readFileSync(join(root, "components/v22/newsletter-view.tsx"), "utf8").includes("MagazineTitleSpread"));
+  assert.ok(readFileSync(join(root, "components/v23/newsletter-issue-view.tsx"), "utf8").includes("MagazineTitleSpread"));
+  assert.ok(
+    !readFileSync(join(root, "components/v22/newsletter-view.tsx"), "utf8").includes("from-[#021d33]/80"),
+    "newsletter hub must not veil the edition face under a navy wash"
+  );
+  assert.ok(
+    readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes("pickEditionCover"),
+    "homepage hero must show an edition portrait next to the lockup"
+  );
   assert.ok(!GLOBAL_LOCALES.some((row) => String(row.code) === "ar"));
 }
 assert.ok(

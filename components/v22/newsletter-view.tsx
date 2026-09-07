@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { NewsletterRow } from "@/lib/queries/v4c/newsletters";
 import { NewsletterHero } from "@/components/newsletter/Hero";
-import { pickEditionCover, editionCoverAlt, isoWeekSeed } from "@/lib/brand/edition-covers";
+import { MagazineTitleSpread } from "@/components/magazine/magazine-title-spread";
+import { pickEditionCover, isoWeekSeed } from "@/lib/brand/edition-covers";
 import { Button } from "@/components/ui/button";
 import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
@@ -15,37 +15,26 @@ export function V22NewsletterHub({ locale = "cs" }: { locale?: string }) {
   const copy = getNewsletterCopy(locale);
   const latestHref = localizePublicHref("/newsletter/posledni", locale);
   const archiveHref = localizePublicHref("/newsletter/archiv", locale);
+  const cover = pickEditionCover(locale, isoWeekSeed());
   return (
     <div className="space-y-8">
-      <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white">
-        <div className="relative min-h-[380px] bg-[#021d33] sm:min-h-[420px]">
-          <Image
-            src={pickEditionCover(locale, isoWeekSeed()).src}
-            alt={editionCoverAlt(locale)}
-            fill
-            className="object-cover opacity-55"
-            sizes="100vw"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#021d33]/80 via-[#021d33]/88 to-[#021d33]/95" />
-          <div className="relative flex min-h-[380px] flex-col items-center justify-center sm:min-h-[420px]">
-            <NewsletterHero
-              href={localizePublicHref("/newsletter", locale)}
-              title={copy.hubTitle}
-              subhead={copy.hubDescription}
-              tagline={copy.kicker}
-              className="w-full text-white"
-            />
-            <div className="mt-2 flex flex-wrap justify-center gap-2 px-6 pb-10 sm:px-8">
-            <NewsletterCapture locale={locale} source="newsletter-hub-hero" className="mt-4 w-full max-w-lg" />
-              <Button asChild variant="outline" className="rounded-full border-white/40 text-white hover:bg-white/10">
-                <Link href={latestHref}>{copy.hubLatest}</Link>
-              </Button>
-              <Button asChild variant="outline" className="rounded-full border-white/40 text-white hover:bg-white/10">
-                <Link href={archiveHref}>{copy.hubArchive}</Link>
-              </Button>
-            </div>
-          </div>
+      <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+        <MagazineTitleSpread cover={cover} locale={locale} full />
+        <NewsletterHero
+          href={localizePublicHref("/newsletter", locale)}
+          title={copy.hubTitle}
+          subhead={copy.hubDescription}
+          tagline={copy.kicker}
+          className="w-full text-[#021d33]"
+        />
+        <div className="flex flex-wrap justify-center gap-2 px-6 pb-10 sm:px-8">
+          <NewsletterCapture locale={locale} source="newsletter-hub-hero" className="mt-4 w-full max-w-lg" />
+          <Button asChild variant="outline" className="rounded-full">
+            <Link href={latestHref}>{copy.hubLatest}</Link>
+          </Button>
+          <Button asChild variant="outline" className="rounded-full">
+            <Link href={archiveHref}>{copy.hubArchive}</Link>
+          </Button>
         </div>
       </div>
 
@@ -77,20 +66,11 @@ export function V22NewsletterIssue({
   const dateLabel = formatPublicDate(issue.issue_date, locale);
   return (
     <article className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-      <div className="relative aspect-[3/1] bg-slate-100">
-        <Image
-          src={pickEditionCover(locale, issue.issue_date).src}
-          alt={editionCoverAlt(locale)}
-          fill
-          className="object-cover opacity-70"
-          sizes="896px"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#021d33]/80 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-          <p className="text-xs uppercase tracking-wider text-sky-200">{MAGAZINE.name}</p>
-          <h1 className="font-display text-2xl font-bold sm:text-3xl">{headline}</h1>
-          {dateLabel ? <p className="mt-1 text-sm text-white/80">{dateLabel}</p> : null}
-        </div>
+      <MagazineTitleSpread cover={pickEditionCover(locale, issue.issue_date)} locale={locale} full />
+      <div className="px-6 pt-6 text-[#021d33] sm:px-8">
+        <p className="text-xs uppercase tracking-wider text-[#005B96]">{MAGAZINE.name}</p>
+        <h1 className="font-display text-2xl font-bold sm:text-3xl">{headline}</h1>
+        {dateLabel ? <p className="mt-1 text-sm text-slate-600">{dateLabel}</p> : null}
       </div>
       <div className="p-6 sm:p-8">
         {issue.html_content ? (

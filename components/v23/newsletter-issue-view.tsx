@@ -10,7 +10,8 @@ import {
   V23_ITEM_IMAGE_SECTIONS,
 } from "@/lib/v23/newsletter/images";
 import type { V23NewsletterLayout, V23NewsletterSection } from "@/lib/v23/newsletter/types";
-import { editionCoverAlt, isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
+import { MagazineTitleSpread } from "@/components/magazine/magazine-title-spread";
+import { isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
 import { isJsonLikeText, sanitizeNewsletterText } from "@/lib/v23/newsletter/sanitize";
 import { newsletterHeadline } from "@/lib/v23/newsletter/title";
 import { Button } from "@/components/ui/button";
@@ -172,39 +173,18 @@ export function V23NewsletterIssueView({
     layout?.intro && !(czechBody && looksLikeCzech(layout.intro))
       ? layout.intro
       : `${copy.hubDescription}${dateLabel ? ` — ${dateLabel}` : ""}`;
-  const storedHero = layout?.heroImageUrl ?? "";
-  const heroUrl = storedHero.startsWith("http")
-    ? storedHero
-    : storedHero.includes("/assets/magazine/editions/")
-      ? storedHero
-      : pickEditionCover(locale, isoWeekSeed()).src;
-  const heroAlt = storedHero.includes("/assets/magazine/editions/")
-    ? (layout?.heroImageAlt ?? editionCoverAlt(locale))
-    : editionCoverAlt(locale);
   const showHtmlFallback =
     !layout && issue.html_content && !isJsonLikeText(issue.html_content) && !issue.html_content.includes('"sections"');
 
   return (
     <article className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-      <div className="relative min-h-[360px] bg-[#021d33] sm:min-h-[400px]">
-        <Image
-          src={heroUrl}
-          alt={heroAlt}
-          fill
-          className="object-cover opacity-55"
-          sizes="(max-width: 896px) 100vw, 896px"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#021d33]/80 via-[#021d33]/88 to-[#021d33]/95" />
-        <div className="relative flex min-h-[360px] items-center justify-center sm:min-h-[400px]">
-          <NewsletterHero
-            title={layout?.headline ?? `${MAGAZINE.name} · ${dateLabel}`}
-            subhead={subhead}
-            href={localizePublicHref("/", locale)}
-            className="w-full text-white"
-          />
-        </div>
-      </div>
+      <MagazineTitleSpread cover={pickEditionCover(locale, isoWeekSeed())} locale={locale} full />
+      <NewsletterHero
+        title={layout?.headline ?? `${MAGAZINE.name} · ${dateLabel}`}
+        subhead={subhead}
+        href={localizePublicHref("/", locale)}
+        className="w-full text-[#021d33]"
+      />
 
       <div className="p-6 sm:p-8">
         {languageNote ? (

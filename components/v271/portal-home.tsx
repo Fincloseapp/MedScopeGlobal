@@ -23,6 +23,7 @@ import { AppOpenLink, isStandaloneAppHref } from "@/components/apps/app-origin-b
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { VITASCOPE_DESK_LOGO } from "@/lib/brand/vitascope";
 import { ViaLongeVitaMark } from "@/components/brand/vialongevita-mark";
+import { editionCoverAlt, isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
 import { BookOpen, Gift, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { aktualityChip } from "@/lib/i18n/aktuality-chrome";
@@ -234,8 +235,20 @@ export function PortalHome({
     <div className="border-b border-slate-200 bg-[#e8eef3]">
       <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5">
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-          <div className="bg-[#050b1d] px-4 py-5 sm:px-8 sm:py-7">
-            <ViaLongeVitaMark variant="hero" locale={locale} priority />
+          <div className="grid bg-[#050b1d] md:min-h-[32rem] md:grid-cols-[minmax(0,1.15fr)_minmax(12rem,0.85fr)]">
+            <div className="flex items-center px-4 py-5 sm:px-8 sm:py-7">
+              <ViaLongeVitaMark variant="hero" locale={locale} priority />
+            </div>
+            <div className="relative aspect-[3/4] min-h-[280px] md:aspect-auto md:min-h-full">
+              <Image
+                src={pickEditionCover(locale, isoWeekSeed()).src}
+                alt={editionCoverAlt(locale)}
+                fill
+                priority
+                className="object-cover object-top"
+                sizes="(max-width:768px) 100vw, 360px"
+              />
+            </div>
           </div>
           <div className="px-4 py-4 sm:px-6 sm:py-5">
             <h1 className="font-display text-2xl font-bold text-[#021d33] sm:text-3xl">

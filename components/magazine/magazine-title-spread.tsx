@@ -6,13 +6,19 @@ import { briefChrome } from "@/lib/monetization/brief-marketing";
 export function MagazineTitleSpread({
   cover,
   locale,
+  className,
+  full = false,
 }: {
   cover: EditionCover;
   locale: string;
+  className?: string;
+  full?: boolean;
 }) {
   const chrome = briefChrome(locale);
   return (
-    <figure className="article-title-spread">
+    <figure
+      className={["article-title-spread", full ? "is-full" : "", className].filter(Boolean).join(" ")}
+    >
       <Image
         src={cover.src}
         alt={editionCoverAlt(locale)}
