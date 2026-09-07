@@ -81,11 +81,16 @@ export async function loadArenaDashboard() {
     (leaderboard[0]?.teamPoints ?? 0) === (leaderboard[1]?.teamPoints ?? 0)
       ? "tie"
       : (leaderboard[0]?.slug ?? "tie");
+  const raceDecided = alfaLeadCountries + betaLeadCountries + alfaLeadLocales + betaLeadLocales;
   const raceLeader =
-    traffic7d === 0
+    raceDecided === 0
       ? "tie"
       : alfaLeadCountries === betaLeadCountries
-        ? pointsLeader
+        ? alfaLeadLocales === betaLeadLocales
+          ? "tie"
+          : alfaLeadLocales > betaLeadLocales
+            ? "alfa"
+            : "beta"
         : alfaLeadCountries > betaLeadCountries
           ? "alfa"
           : "beta";
@@ -127,8 +132,10 @@ export async function loadArenaDashboard() {
       alfaLeadLocales,
       betaLeadLocales,
       emptyReason:
-        traffic7d === 0
-          ? "Za 7 dní žádný hop s ISO zemí. Průběžné body jsou historické — prázdné kolo není výhra."
+        raceDecided === 0
+          ? traffic7d === 0
+            ? "Za 7 dní žádný hop s ISO zemí. Průběžné body jsou historické — prázdné kolo není výhra."
+            : "Za 7 dní je provoz od jiných agentů, ale Alfa/Beta ještě nemají hop se zemí ani mutací. To není výhra."
           : null,
     },
     markets: localesLive,

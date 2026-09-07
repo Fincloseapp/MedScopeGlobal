@@ -85,7 +85,7 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
           <p className="rounded-lg border bg-white px-3 py-2">
             Vítěz okna
             <strong className="mt-1 block text-lg capitalize">
-              {dash.verdict?.traffic7d
+              {(dash.verdict?.countriesLive || dash.verdict?.localesLive)
                 ? dash.verdict.leader === "tie"
                   ? "remíza"
                   : dash.verdict.leader
