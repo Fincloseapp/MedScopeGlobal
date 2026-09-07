@@ -18,7 +18,8 @@ export type AutonomousTask =
   | "editorial-images"
   | "syndicate-articles"
   | "revenue-ops"
-  | "growth-sprint";
+  | "growth-sprint"
+  | "agent-arena";
 
 export const AUTONOMOUS_SCHEDULE: Record<AutonomousTask, { cron: string; description: string }> = {
   "generate-articles": {
@@ -85,6 +86,10 @@ export const AUTONOMOUS_SCHEDULE: Record<AutonomousTask, { cron: string; descrip
     cron: "20 */4 * * *",
     description:
       "Legalní růst: IndexNow, reconcilace Stripe pending, výplata available, newsletter promote",
+  },
+  "agent-arena": {
+    cron: "5 * * * *",
+    description: "Souboj týmů Alfa/Beta: K-faktor, kvóty, evoluce, IndexNow hopů",
   },
 };
 

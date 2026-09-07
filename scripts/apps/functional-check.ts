@@ -260,6 +260,18 @@ import {
   priorityDiscoveryUrls,
 } from "../../lib/seo/indexnow";
 import {
+  ARENA_SECTIONS,
+  SPAM_TEAM_PENALTY,
+  K_FACTOR_SHARE_THRESHOLD,
+  parseArenaRef,
+  arenaHopPath,
+  estimateKFactor,
+  looksLikeSpam,
+  scoreArenaWindow,
+  decideEvolution,
+  generateTeamDrafts,
+} from "../../lib/growth/arena";
+import {
   isFreeNewsDeskArticle,
   resolveArticleBodyLock,
 } from "../../lib/auth/article-eligibility";
@@ -678,6 +690,7 @@ file("lib/monetization/payout-map.ts");
   assert.ok(hrefs.includes("/admin/vydelky"));
   assert.ok(hrefs.includes("/admin/revenue"));
   assert.ok(hrefs.includes("/admin/ai-agents"));
+  assert.ok(hrefs.includes("/admin/ai-teams"));
   assert.ok(hrefs.includes("/admin/articles"));
   assert.equal(isAdminNavActive("/admin/ads-public", "/admin/ads"), false);
   assert.equal(isAdminNavActive("/admin/ads", "/admin/ads"), true);
@@ -888,6 +901,9 @@ file("lib/admin/revenue-dashboard.ts");
 file("lib/growth/legal-sprint.ts");
 file("lib/seo/indexnow.ts");
 file("app/api/cron/growth-sprint/route.ts");
+file("lib/growth/arena/tick.ts");
+file("app/api/cron/agent-arena/route.ts");
+file("app/(admin)/admin/ai-teams/page.tsx");
 file("public/8f3c1a9b2e4d6f70a1c3e5b7d9f20468.txt");
 file("app/api/cron/vialongevita-brief/route.ts");
 file("app/api/newsletter/unsubscribe/route.ts");
@@ -2382,6 +2398,76 @@ assert.ok(
     );
     assert.ok(
       readFileSync(join(root, "lib/growth/ai-agent-program.ts"), "utf8").includes("indexnow")
+    );
+  }
+  {
+    const prios = ARENA_SECTIONS.map((row) => row.priority);
+    assert.deepEqual(prios, [3, 2, 1]);
+    assert.equal(parseArenaRef("alfa-content")?.team, "alfa");
+    assert.equal(parseArenaRef("team-beta", "mediprep")?.section, "mediprep");
+    assert.equal(arenaHopPath("mediprep", "de"), "/predplatne");
+    assert.equal(arenaHopPath("mediprep", "cs"), "/mediprep");
+    assert.equal(arenaHopPath("dokscope", "fr"), "/lekari");
+    assert.equal(normalizeAiAgentSlug("alfa-vialongevita"), "alfa");
+    assert.equal(estimateKFactor({ visits: 10, checkouts: 20, paid: 10, newsletters: 0 }) >= K_FACTOR_SHARE_THRESHOLD, true);
+    assert.equal(looksLikeSpam("buy now!!! crypto pump mass dm"), true);
+    const spamScore = scoreArenaWindow({
+      window: { visits: 10, checkouts: 2, paid: 1, newsletters: 0 },
+      actualK: 0.2,
+      section3Users: 0,
+      spam: true,
+      alreadyAwardedMilestone: false,
+    });
+    assert.equal(spamScore.teamPointsDelta, SPAM_TEAM_PENALTY);
+    assert.equal(spamScore.disqualified, true);
+    const evo = decideEvolution(
+      {
+        slug: "alfa",
+        generation: 1,
+        status: "active",
+        teamPoints: 10,
+        reachQuota: 24,
+        messageLimit: 20,
+        losingStreak: 6,
+        hourConversions: 0,
+        styleBias: "clinical-short",
+      },
+      {
+        slug: "beta",
+        generation: 1,
+        status: "active",
+        teamPoints: 80,
+        reachQuota: 32,
+        messageLimit: 32,
+        losingStreak: 0,
+        hourConversions: 4,
+        styleBias: "sleep-focus",
+      }
+    );
+    assert.equal(evo.action, "terminate-clone");
+    assert.equal(evo.winner, "beta");
+    const drafts = generateTeamDrafts({
+      team: "alfa",
+      styleBias: "clinical-short",
+      knowledge: {
+        id: "k1",
+        teamSlug: "alfa",
+        section: "vialongevita",
+        styleKey: "sleep-focus",
+        kFactor: 1.6,
+        insight: "sleep wins",
+        createdAt: "2026-09-07T00:00:00.000Z",
+      },
+    });
+    assert.ok(drafts.some((row) => row.style === "sleep-focus"));
+    assert.ok(drafts.every((row) => row.section !== "mediprep" || row.locale === "cs"));
+    assert.ok(!readFileSync(join(root, "lib/growth/arena/distribution-agent.ts"), "utf8").includes("reddit.com/api"));
+    assert.ok(existsSync(join(root, "app/(admin)/admin/ai-teams/page.tsx")));
+    assert.ok(existsSync(join(root, "app/api/cron/agent-arena/route.ts")));
+    assert.ok(
+      readFileSync(join(root, ".github/workflows/cloudflare-cron.yml"), "utf8").includes(
+        "/api/cron/agent-arena"
+      )
     );
   }
   assert.ok(

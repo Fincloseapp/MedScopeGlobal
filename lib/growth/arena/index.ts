@@ -1,0 +1,8 @@
+export { ARENA_SECTIONS, ARENA_TEAM_SLUGS, K_FACTOR_SHARE_THRESHOLD, SPAM_TEAM_PENALTY } from "@/lib/growth/arena/config";
+export { parseArenaRef, arenaHopPath, arenaHopUrl } from "@/lib/growth/arena/refs";
+export { estimateKFactor, looksLikeSpam, ctrOf } from "@/lib/growth/arena/metrics";
+export { scoreArenaWindow } from "@/lib/growth/arena/reward";
+export { decideEvolution, mutateStyle, allocateQuotas } from "@/lib/growth/arena/evolution";
+export { runArenaTick } from "@/lib/growth/arena/tick";
+export { loadArenaDashboard } from "@/lib/growth/arena/dashboard";
+export { generateTeamDrafts, styleFromKnowledge } from "@/lib/growth/arena/content-agent";

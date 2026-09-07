@@ -17,6 +17,7 @@ import {
   GraduationCap,
   TrendingUp,
   Trophy,
+  Swords,
   FlaskConical,
   IdCard,
   Wallet,
@@ -54,6 +55,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { href: "/admin/ads-overview", label: "Přehled reklam", icon: TrendingUp },
       { href: "/admin/v27-pipeline", label: "Pipeline v27", icon: Bot },
       { href: "/admin/ai-agents", label: "AI agenti", icon: Trophy },
+      { href: "/admin/ai-teams", label: "Týmy AI", icon: Swords },
     ],
   },
   {

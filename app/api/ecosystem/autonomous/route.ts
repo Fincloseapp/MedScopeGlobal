@@ -131,6 +131,18 @@ export async function POST(request: Request) {
     }, { status: result.ok ? 200 : 207 });
   }
 
+  if (task === "agent-arena") {
+    const { runArenaTick } = await import("@/lib/growth/arena/tick");
+    const result = await runArenaTick();
+    return NextResponse.json({
+      task,
+      status: result.ok ? "completed" : "error",
+      description: schedule.description,
+      cronEndpoint: "/api/cron/agent-arena",
+      ...result,
+    }, { status: result.ok ? 200 : 207 });
+  }
+
   if (task === "generate-articles") {
     const result = await runGenerateArticlesCron();
     return NextResponse.json({
@@ -278,6 +290,7 @@ const CRON_ENDPOINT_BY_TASK: Partial<Record<string, string>> = {
   "syndicate-articles": "/api/cron/ecosystem-syndicate",
   "revenue-ops": "/api/cron/revenue-ops",
   "growth-sprint": "/api/cron/growth-sprint",
+  "agent-arena": "/api/cron/agent-arena",
 };
 
 export async function GET() {

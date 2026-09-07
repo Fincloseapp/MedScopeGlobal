@@ -187,6 +187,10 @@ export default async function AdminAiAgentsPage() {
             well-known/ai.txt
           </Link>
           {" · "}
+          <Link href="/admin/ai-teams" className="font-medium text-[#005B96] hover:underline">
+            Souboj týmů Alfa vs Beta
+          </Link>
+          {" · "}
           <Link href="/admin/revenue" className="font-medium text-[#005B96] hover:underline">
             Tržby a výplaty — pending vs. peníze na účet
           </Link>

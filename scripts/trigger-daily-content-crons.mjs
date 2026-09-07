@@ -38,6 +38,7 @@ const jobs = [
   { name: "v25-enterprise", path: "/api/cron/v25-enterprise?mode=quick" },
   { name: "conversion-renewals", path: "/api/cron/conversion-renewals" },
   { name: "growth-sprint", path: "/api/cron/growth-sprint" },
+  { name: "agent-arena", path: "/api/cron/agent-arena" },
   { name: "v26-rewrite", path: "/api/cron/v26-rewrite?batch=6" },
   { name: "v26-autonomous", path: "/api/cron/v26-autonomous?skipDeploy=1" },
   { name: "v25-images", path: "/api/cron/v25-images" },

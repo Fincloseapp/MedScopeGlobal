@@ -2,6 +2,7 @@ import { MAGAZINE } from "@/lib/brand/magazine";
 import { SITE } from "@/lib/config/site";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
 import { localeToPathSegment } from "@/lib/i18n/locale-path";
+import { parseArenaRef } from "@/lib/growth/arena/refs";
 
 /** First sprint: 170 000 subscribers by 10 Sep 2026 (3 days from 7 Sep). */
 export const AI_AGENT_GOAL_NEAR = {
@@ -33,6 +34,8 @@ export const AI_AGENT_SLUGS = [
   "deepseek",
   "mistral",
   "cursor",
+  "alfa",
+  "beta",
   "other",
 ] as const;
 
@@ -67,6 +70,16 @@ const ALIASES: Record<string, AiAgentSlug> = {
   mistral: "mistral",
   lechat: "mistral",
   cursor: "cursor",
+  alfa: "alfa",
+  "team-alfa": "alfa",
+  "alfa-content": "alfa",
+  "alfa-distribution": "alfa",
+  "alfa-analyst": "alfa",
+  beta: "beta",
+  "team-beta": "beta",
+  "beta-content": "beta",
+  "beta-distribution": "beta",
+  "beta-analyst": "beta",
   other: "other",
 };
 
@@ -303,7 +316,10 @@ export function normalizeAiAgentSlug(raw?: string | null): AiAgentSlug | null {
     .replace(/^-+|-+$/g, "")
     .slice(0, 40);
   if (!key) return null;
-  return ALIASES[key] ?? (AI_AGENT_SLUGS.includes(key as AiAgentSlug) ? (key as AiAgentSlug) : "other");
+  return (
+    ALIASES[key] ??
+    (AI_AGENT_SLUGS.includes(key as AiAgentSlug) ? (key as AiAgentSlug) : parseArenaRef(key)?.team ?? "other")
+  );
 }
 
 export function parseAiAgentFromSearch(search: string | URLSearchParams): AiAgentSlug | null {
@@ -352,6 +368,7 @@ export function legalChannels(): { id: string; label: string }[] {
     { id: "indexnow", label: "IndexNow (Bing / Seznam / Yandex) — automatický ping" },
     { id: "stripe-recovery", label: "Stripe recovery e-mail po vypršení checkoutu" },
     { id: "reconcile", label: "Reconcilace pending objednávek + výplata available" },
+    { id: "arena", label: "Souboj týmů Alfa/Beta — hop /r/ai?ref=alfa|beta, sdílená paměť, bez spamu" },
   ];
 }
 
