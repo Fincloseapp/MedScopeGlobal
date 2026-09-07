@@ -34,8 +34,7 @@ export default async function ProAiPage() {
     >
       <article data-ai-agent-brief className="max-w-3xl space-y-6 text-sm leading-6 text-slate-700">
         <p>{brief.invite}</p>
-        <p>{brief.contest}</p>
-        <p>{brief.goals}</p>
+        <p>{brief.publicNote}</p>
         <div>
           <p className="font-semibold text-[#021d33]">{brief.cite}</p>
           <ul className="mt-2 list-disc space-y-1 pl-5">

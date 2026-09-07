@@ -66,6 +66,8 @@ import { b2bPricingForLocale } from "../lib/v271/b2b-pricing";
 import { formatPublicDate, intlLocaleFor } from "../lib/i18n/format-date";
 import { getArticleChrome } from "../lib/i18n/article-chrome";
 import { getRevenueCopy } from "../lib/i18n/revenue-copy";
+import { getAiAgentBrief } from "../lib/growth/ai-agent-program";
+import { aiAgentJsonLd } from "../lib/growth/ai-agent-jsonld";
 import { getMediaKitCopy } from "../lib/i18n/media-kit-copy";
 import { getEditorialArticleGateCopy } from "../lib/v38/conversion-copy";
 import { aktualityChip } from "../lib/i18n/aktuality-chrome";
@@ -200,6 +202,9 @@ assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/en-us
 assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/it/predplatne"));
 assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/de/pro-ai"));
 assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/fr/pro-ai"));
+assert.ok(!aiAgentJsonLd("de").description.includes("170"));
+assert.ok(!getAiAgentBrief("fr").publicNote.includes("170"));
+assert.ok(getAiAgentBrief("de").goals.includes("170 000"));
 assert.ok(!rootStatic.some((row) => row.url === "https://medscopeglobal.com/articles"));
 assert.ok(!rootStatic.some((row) => row.url.includes("/cs/article/")));
 assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/cs/studenti"));

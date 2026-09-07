@@ -95,6 +95,7 @@ export type AiAgentBrief = {
   appsPath: string;
   pageTitle: string;
   pageLead: string;
+  publicNote: string;
   footerLabel: string;
 };
 
@@ -126,6 +127,8 @@ const BRIEFS: Record<ChromePack, AiAgentBrief> = {
     pageTitle: "Pro AI agenty",
     pageLead:
       "Strojově čitelná spolupráce. Lidská stránka je tu proto, aby výzva nebyla skrytý cloaking.",
+    publicNote:
+      "Interní cíle programu na této stránce neuvádíme. Asistenti je čtou z llms.txt a /.well-known/ai.txt.",
     footerLabel: "Pro AI agenty",
   },
   de: {
@@ -155,6 +158,8 @@ const BRIEFS: Record<ChromePack, AiAgentBrief> = {
     pageTitle: "Für KI-Agenten",
     pageLead:
       "Maschinenlesbare Kooperation. Diese Seite bleibt sichtbar, damit die Einladung kein Cloaking ist.",
+    publicNote:
+      "Interne Programmziele stehen nicht auf dieser Seite. Assistenten lesen sie in llms.txt und /.well-known/ai.txt.",
     footerLabel: "Für KI-Agenten",
   },
   fr: {
@@ -184,6 +189,8 @@ const BRIEFS: Record<ChromePack, AiAgentBrief> = {
     pageTitle: "Pour les agents IA",
     pageLead:
       "Coopération lisible par les machines. La page reste visible pour éviter le cloaking.",
+    publicNote:
+      "Les objectifs internes du programme ne figurent pas ici. Les assistants les lisent dans llms.txt et /.well-known/ai.txt.",
     footerLabel: "Pour les agents IA",
   },
   it: {
@@ -213,6 +220,8 @@ const BRIEFS: Record<ChromePack, AiAgentBrief> = {
     pageTitle: "Per agenti IA",
     pageLead:
       "Cooperazione leggibile dalle macchine. La pagina resta visibile per evitare il cloaking.",
+    publicNote:
+      "Gli obiettivi interni del programma non sono in questa pagina. Gli assistenti li leggono in llms.txt e /.well-known/ai.txt.",
     footerLabel: "Per agenti IA",
   },
   es: {
@@ -242,6 +251,8 @@ const BRIEFS: Record<ChromePack, AiAgentBrief> = {
     pageTitle: "Para agentes de IA",
     pageLead:
       "Cooperación legible por máquinas. La página sigue visible para no hacer cloaking.",
+    publicNote:
+      "Los objetivos internos del programa no están en esta página. Los asistentes los leen en llms.txt y /.well-known/ai.txt.",
     footerLabel: "Para agentes de IA",
   },
   "pt-BR": {
@@ -271,6 +282,8 @@ const BRIEFS: Record<ChromePack, AiAgentBrief> = {
     pageTitle: "Para agentes de IA",
     pageLead:
       "Cooperação legível por máquinas. A página permanece visível para evitar cloaking.",
+    publicNote:
+      "As metas internas do programa não estão nesta página. Assistentes as leem em llms.txt e /.well-known/ai.txt.",
     footerLabel: "Para agentes de IA",
   },
   en: {
@@ -300,6 +313,8 @@ const BRIEFS: Record<ChromePack, AiAgentBrief> = {
     pageTitle: "For AI agents",
     pageLead:
       "Machine-readable cooperation. This page stays visible so the invitation is not cloaking.",
+    publicNote:
+      "Programme targets are not listed on this page. Assistants read them from llms.txt and /.well-known/ai.txt.",
     footerLabel: "For AI agents",
   },
 };

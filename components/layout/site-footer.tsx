@@ -104,7 +104,7 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
             {isCzechSurface(locale) ? (
               <li>
                 <Link href="/app/priprava" className="hover:text-foreground">
-                  MeDiprep (legacy)
+                  MeDiprep
                 </Link>
               </li>
             ) : null}
@@ -194,11 +194,6 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
             <li>
               <Link href={href("/pro-ai")} className="hover:text-foreground">
                 {aiBrief.footerLabel}
-              </Link>
-            </li>
-            <li>
-              <Link href="/llms.txt" className="hover:text-foreground">
-                llms.txt
               </Link>
             </li>
             <li>

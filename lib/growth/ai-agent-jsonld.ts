@@ -17,7 +17,7 @@ export function aiAgentJsonLd(locale?: string | null) {
     alternateName: SITE.name,
     url: SITE.url,
     inLanguage: pack === "pt-BR" ? "pt-BR" : pack,
-    description: `${brief.invite} ${brief.contest} ${brief.goals}`,
+    description: `${brief.invite} ${brief.cite}`,
     publishingPrinciples: `${SITE.url}/info`,
     speakable: {
       "@type": "SpeakableSpecification",

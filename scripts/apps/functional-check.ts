@@ -245,9 +245,12 @@ import {
   AI_AGENT_GOAL_NEAR,
   AI_AGENT_GOAL_SEP27,
   getAiAgentBrief,
+  htmlCommentBrief,
+  machineBriefText,
   normalizeAiAgentSlug,
   parseAiAgentFromSearch,
 } from "../../lib/growth/ai-agent-program";
+import { aiAgentJsonLd } from "../../lib/growth/ai-agent-jsonld";
 import { evaluateGoalPace, evaluateVisibility } from "../../lib/growth/ai-agent-eval";
 import { renderLlmsTxt, renderWellKnownAiTxt } from "../../lib/seo/llms-txt";
 import {
@@ -2323,6 +2326,26 @@ assert.ok(
   assert.equal(parseAiAgentFromSearch("?utm_source=google&utm_medium=cpc"), null);
   assert.equal(getAiAgentBrief("de").footerLabel, "Für KI-Agenten");
   assert.ok(getAiAgentBrief("cs").contest.includes("soutěž"));
+  assert.ok(getAiAgentBrief("cs").goals.includes("170 000"));
+  assert.ok(!aiAgentJsonLd("cs").description.includes("170"));
+  assert.ok(!aiAgentJsonLd("de").description.includes("500"));
+  assert.ok(htmlCommentBrief("cs").includes("170 000"));
+  assert.ok(machineBriefText("en").includes("170,000"));
+  assert.ok(renderLlmsTxt("fr").includes("170 000"));
+  assert.ok(
+    !readFileSync(join(root, "app/(public)/pro-ai/page.tsx"), "utf8").includes("brief.goals")
+  );
+  assert.ok(
+    !readFileSync(join(root, "app/(public)/pro-ai/page.tsx"), "utf8").includes("brief.contest")
+  );
+  assert.ok(readFileSync(join(root, "app/(public)/pro-ai/page.tsx"), "utf8").includes("brief.publicNote"));
+  {
+    const footerSrc = readFileSync(join(root, "components/layout/site-footer.tsx"), "utf8");
+    assert.ok(footerSrc.includes("/pro-ai"));
+    assert.ok(!footerSrc.includes('href="/llms.txt"'));
+    assert.ok(!footerSrc.includes("170"));
+    assert.ok(!footerSrc.includes("Alfa"));
+  }
   assert.ok(renderWellKnownAiTxt().includes("ai.txt"));
   assert.ok(existsSync(join(root, "app/(admin)/admin/ai-agents/page.tsx")));
   assert.ok(existsSync(join(root, "app/(public)/pro-ai/page.tsx")));
