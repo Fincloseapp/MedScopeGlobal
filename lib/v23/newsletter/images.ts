@@ -1,3 +1,4 @@
+import { MAGAZINE } from "@/lib/brand/magazine";
 import { V23_NEWSLETTER_IMAGE } from "@/lib/v23/images";
 import {
   generateNewsletterImage,
@@ -6,12 +7,21 @@ import {
   newsletterImageAlt,
   resolveNewsletterItemImage,
 } from "@/lib/v23/newsletter/generate-image";
+import { isUsableNewsletterImage } from "@/lib/v23/newsletter/topic-covers";
 import type { V23NewsletterItem, V23NewsletterLayout, V23NewsletterSection } from "@/lib/v23/newsletter/types";
 
 export { generateNewsletterImage, NEWSLETTER_IMAGE_FALLBACK, newsletterImageAlt, resolveNewsletterItemImage };
 
-/** Sekce s povinným obrázkem u každé položky */
-export const V23_ITEM_IMAGE_SECTIONS = new Set(["legislativa", "leky", "univerzity"]);
+/** Každá rubrika vydání má diplomatický lokální obrázek u položky. */
+export const V23_ITEM_IMAGE_SECTIONS = new Set([
+  "legislativa",
+  "leky",
+  "univerzity",
+  "studie",
+  "clanky",
+  "digital-health",
+  "doporucujeme",
+]);
 
 function hashSeed(input: string): number {
   return Math.abs(input.split("").reduce((a, c) => a + c.charCodeAt(0), 0) % 997);
@@ -42,31 +52,26 @@ export function itemImageAlt(sectionTitle: string, itemTitle: string): string {
   return newsletterImageAlt(sectionTitle, itemTitle);
 }
 
-function isValidImageUrl(url?: string | null): boolean {
-  if (!url?.trim()) return false;
-  return url.startsWith("https://") || url.startsWith("http://") || url.startsWith("/assets/");
-}
-
 export function attachItemImages(sectionId: string, items: V23NewsletterItem[], sectionTitle: string): V23NewsletterItem[] {
-  if (!V23_ITEM_IMAGE_SECTIONS.has(sectionId)) return items;
   return items.map((item, i) => {
     const resolved = resolveNewsletterItemImage({
       sectionId,
       sectionTitle,
       itemTitle: item.title,
+      excerpt: item.summary,
       existingUrl: item.imageUrl,
       index: i,
     });
     return {
       ...item,
-      imageUrl: isValidImageUrl(item.imageUrl) ? item.imageUrl! : resolved.url,
+      imageUrl: resolved.url,
       imageAlt: item.imageAlt ?? resolved.alt,
     };
   });
 }
 
 export function attachSectionImages(
-  sections: Omit<V23NewsletterSection, "imageUrl" | "imageAlt">[],
+  sections: Array<Omit<V23NewsletterSection, "imageUrl" | "imageAlt"> & Partial<Pick<V23NewsletterSection, "imageUrl" | "imageAlt">>>,
   issueDate: string
 ): V23NewsletterSection[] {
   return sections.map((s) => {
@@ -75,8 +80,8 @@ export function attachSectionImages(
     return {
       ...s,
       items,
-      imageUrl: sectionImageUrl(s.id, seed),
-      imageAlt: `${s.title} — MedScopeGlobal Newsletter`,
+      imageUrl: isUsableNewsletterImage(s.imageUrl) ? s.imageUrl! : sectionImageUrl(s.id, seed),
+      imageAlt: s.imageAlt ?? `${s.title} — ${MAGAZINE.name}`,
     };
   });
 }
@@ -88,14 +93,18 @@ export function ensureLayoutImages(layout: V23NewsletterLayout, issueDate: strin
       title: s.title,
       intro: s.intro,
       items: s.items,
+      imageUrl: s.imageUrl,
+      imageAlt: s.imageAlt,
     })),
     issueDate
   );
 
   return {
     ...layout,
-    heroImageUrl: isValidImageUrl(layout.heroImageUrl) ? layout.heroImageUrl : heroNewsletterImage(issueDate),
-    heroImageAlt: layout.heroImageAlt ?? "MedScopeGlobal Newsletter — odborný medicínský přehled",
+    heroImageUrl: isUsableNewsletterImage(layout.heroImageUrl)
+      ? layout.heroImageUrl
+      : heroNewsletterImage(issueDate),
+    heroImageAlt: layout.heroImageAlt ?? `${MAGAZINE.name} — ${MAGAZINE.positioning.en}`,
     sections,
   };
 }

@@ -1,4 +1,9 @@
 import { V21_MEDICAL_IMAGES } from "@/lib/v21/images";
+import {
+  isUsableNewsletterImage,
+  newsletterImageCaption,
+  newsletterTopicCover,
+} from "@/lib/v23/newsletter/topic-covers";
 
 /** Lokální fallback — public/assets/newsletter/fallback.webp */
 export const NEWSLETTER_IMAGE_FALLBACK = "/assets/newsletter/fallback.webp";
@@ -12,22 +17,15 @@ export type NewsletterImageSection =
   | "digital-health"
   | "doporucujeme";
 
-const BASE = "https://images.unsplash.com";
-
-/** Profesionální medicínské WebP obrázky per sekce (AI-seedované varianty) */
-const SECTION_BASE: Record<NewsletterImageSection, string> = {
-  legislativa: `${BASE}/photo-1589829545855-d10d557cf95f?w=800&h=450&fit=crop&q=85&auto=format&fm=webp`,
-  leky: `${BASE}/photo-1584308664744-24d5c474f2ae?w=800&h=450&fit=crop&q=85&auto=format&fm=webp`,
-  univerzity: `${BASE}/photo-1564981797816-026721b93eb0?w=800&h=450&fit=crop&q=85&auto=format&fm=webp`,
+const SECTION_FALLBACK: Record<NewsletterImageSection, string> = {
+  legislativa: V21_MEDICAL_IMAGES.legislation,
+  leky: V21_MEDICAL_IMAGES.drug,
+  univerzity: V21_MEDICAL_IMAGES.university,
   studie: V21_MEDICAL_IMAGES.study,
   clanky: V21_MEDICAL_IMAGES.hero,
-  "digital-health": V21_MEDICAL_IMAGES.digitalHealth,
+  "digital-health": "/assets/covers/tech.webp",
   doporucujeme: V21_MEDICAL_IMAGES.medicina,
 };
-
-function hashSeed(input: string): number {
-  return Math.abs(input.split("").reduce((a, c) => a + c.charCodeAt(0), 0) % 997);
-}
 
 function normalizeSection(section: string): NewsletterImageSection {
   const map: Record<string, NewsletterImageSection> = {
@@ -42,43 +40,39 @@ function normalizeSection(section: string): NewsletterImageSection {
   return map[section] ?? "doporucujeme";
 }
 
-/**
- * AI generovaný obrázek pro položku newsletteru.
- * Seed z názvu položky → unikátní profesionální varianta v rámci sekce.
- */
+/** Topic-matched local cover — no Unsplash, no dead stock. */
 export function generateNewsletterImage(section: string, title: string): string {
   const key = normalizeSection(section);
-  const base = SECTION_BASE[key].split("&sig=")[0];
-  const seed = hashSeed(`${key}-${title}`);
-  return `${base}&sig=${seed}`;
+  const fromTopic = newsletterTopicCover({
+    sectionId: key,
+    title,
+    seed: `${key}-${title}`,
+  });
+  if (isUsableNewsletterImage(fromTopic)) return fromTopic;
+  return SECTION_FALLBACK[key] ?? NEWSLETTER_IMAGE_FALLBACK;
 }
 
 export function newsletterImageAlt(sectionTitle: string, itemTitle: string): string {
-  return `${itemTitle} — ${sectionTitle}, MedScopeGlobal`;
+  return newsletterImageCaption(sectionTitle, itemTitle);
 }
 
 export function resolveNewsletterItemImage(opts: {
   sectionId: string;
   sectionTitle: string;
   itemTitle: string;
+  excerpt?: string | null;
   existingUrl?: string | null;
   index?: number;
 }): { url: string; alt: string; isLocal: boolean } {
   const alt = newsletterImageAlt(opts.sectionTitle, opts.itemTitle);
-
-  if (opts.existingUrl?.startsWith("http")) {
-    return { url: opts.existingUrl, alt, isLocal: false };
+  if (isUsableNewsletterImage(opts.existingUrl)) {
+    return { url: opts.existingUrl!.trim(), alt, isLocal: !opts.existingUrl!.startsWith("http") || opts.existingUrl!.includes("/assets/") };
   }
-  if (opts.existingUrl?.startsWith("/assets/")) {
-    return { url: opts.existingUrl, alt, isLocal: true };
-  }
-
-  const generated = generateNewsletterImage(opts.sectionId, `${opts.itemTitle}-${opts.index ?? 0}`);
-  if (generated) {
-    return { url: generated, alt, isLocal: false };
-  }
-
-  return { url: NEWSLETTER_IMAGE_FALLBACK, alt, isLocal: true };
+  const generated = generateNewsletterImage(
+    opts.sectionId,
+    `${opts.itemTitle}-${opts.excerpt ?? ""}-${opts.index ?? 0}`
+  );
+  return { url: generated || NEWSLETTER_IMAGE_FALLBACK, alt, isLocal: true };
 }
 
 export function generateNewsletterSectionImage(sectionId: string, seed: string): string {

@@ -6,6 +6,7 @@ import {
   pickEditionCover,
 } from "@/lib/brand/edition-covers";
 import { SITE } from "@/lib/config/site";
+import { newsletterTopicCover } from "@/lib/v23/newsletter/topic-covers";
 import { formatPublicDate } from "@/lib/i18n/format-date";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { briefChrome, composeBriefLead, composeBriefPreheader, composeBriefSubject } from "@/lib/monetization/brief-marketing";
@@ -105,6 +106,16 @@ export function emailShell(input: {
   return { html, text };
 }
 
+function articleCoverAbs(article: BriefArticle): string {
+  const path = newsletterTopicCover({
+    title: article.title,
+    excerpt: article.excerpt,
+    publicTopic: article.public_topic,
+    seed: article.slug,
+  });
+  return path.startsWith("http") ? path : `${SITE.url}${path}`;
+}
+
 function productLabel(product: AffiliateProduct, locale: string): { name: string; description: string } {
   const name = product.name[locale] ?? product.name.en ?? product.name.cs ?? product.id;
   const description =
@@ -182,6 +193,11 @@ export function briefInnerHtml(input: {
 
   const heroBlock = hero
     ? `<p style="margin:0 0 8px;font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:${BLUE};">01 · ${escapeHtml(chrome.heroLabel)}</p>
+    <p style="margin:0 0 12px;line-height:0;">
+      <a href="${escapeHtml(input.articleHref(hero.slug))}" style="text-decoration:none;border:0;">
+        <img src="${escapeHtml(articleCoverAbs(hero))}" alt="${escapeHtml(hero.title)}" width="544" style="display:block;width:100%;max-width:544px;height:auto;border-radius:12px;border:0;" />
+      </a>
+    </p>
     <p style="margin:0 0 12px;font-size:24px;line-height:1.28;color:${NAVY};">
       <a href="${escapeHtml(input.articleHref(hero.slug))}" style="color:${NAVY};text-decoration:none;">${escapeHtml(hero.title)}</a>
     </p>
@@ -201,7 +217,12 @@ export function briefInnerHtml(input: {
           ? `<p style="margin:6px 0 0;font-size:14px;line-height:1.55;color:#475569;">${escapeHtml(article.excerpt)}</p>`
           : "";
         return `<tr><td style="padding:0 0 18px;border-top:1px solid #e6eef5;">
-          <p style="margin:14px 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:0.08em;color:#94a3b8;">${n}</p>
+          <p style="margin:14px 0 8px;line-height:0;">
+            <a href="${escapeHtml(input.articleHref(article.slug))}" style="text-decoration:none;border:0;">
+              <img src="${escapeHtml(articleCoverAbs(article))}" alt="${escapeHtml(article.title)}" width="544" style="display:block;width:100%;max-width:544px;height:auto;border-radius:10px;border:0;" />
+            </a>
+          </p>
+          <p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:0.08em;color:#94a3b8;">${n}</p>
           <a href="${escapeHtml(input.articleHref(article.slug))}" style="color:${NAVY};font-size:18px;line-height:1.35;text-decoration:none;font-weight:600;">${escapeHtml(article.title)}</a>
           ${excerpt}
         </td></tr>`;

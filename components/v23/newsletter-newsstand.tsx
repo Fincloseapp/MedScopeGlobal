@@ -263,7 +263,7 @@ export function NewsletterNewsstand({
             <EditorialPayButtons
               locale={locale}
               className="flex w-full flex-col gap-2"
-              returnPath="/articles"
+              returnPath={localizePublicHref("/articles", locale)}
             />
           </div>
         </div>

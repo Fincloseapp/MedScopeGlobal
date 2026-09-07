@@ -344,6 +344,8 @@ import {
 import { magazineCategoriesForLocale } from "../../lib/editorial/magazine-category-copy";
 import { buildLocaleMagazineLayout } from "../../lib/v23/newsletter/locale-layout";
 import { classifyNewsletterIssues, mergeNewsletterIssues } from "../../lib/v23/newsletter/stand";
+import { generateNewsletterImage, resolveNewsletterItemImage } from "../../lib/v23/newsletter/generate-image";
+import { isUsableNewsletterImage, newsletterTopicCover } from "../../lib/v23/newsletter/topic-covers";
 import { getNewsletterStandCopy } from "../../lib/i18n/newsletter-stand-copy";
 import type { LocaleMagazineSources } from "../../lib/v23/newsletter/locale-layout";
 import { SYNDICATION_RULES, getSyndicationTargets } from "../../lib/ecosystem/editorial/syndication";
@@ -2057,6 +2059,7 @@ assert.ok(
 {
   const standSrc = readFileSync(join(root, "components/v23/newsletter-newsstand.tsx"), "utf8");
   assert.ok(standSrc.includes("EditorialPayButtons"));
+  assert.ok(standSrc.includes("localizePublicHref(\"/articles\""));
   assert.ok(standSrc.includes("/firmy/reklama/nova"));
   assert.ok(standSrc.includes("Aktuální") === false);
   assert.ok(standSrc.includes("getNewsletterStandCopy"));
@@ -2117,6 +2120,34 @@ assert.ok(
   assert.ok(!getNewsletterStandCopy("fr").lead.includes("Redakce"));
   assert.ok(!getNewsletterStandCopy("de").current.includes("Aktuální"));
   assert.equal(getNewsletterStandCopy("ja").current, "Current issue");
+}
+{
+  const sleepCover = generateNewsletterImage("clanky", "Zimní spánek a cirkadiánní rytmus");
+  assert.ok(sleepCover.startsWith("/assets/covers/"), `sleep cover local, got ${sleepCover}`);
+  assert.ok(!sleepCover.includes("unsplash"));
+  const leky = generateNewsletterImage("leky", "Nové SPC léčiva");
+  assert.ok(leky.startsWith("/assets/"), `leky cover local, got ${leky}`);
+  assert.ok(!leky.includes("1584308664744"));
+  const skin = newsletterTopicCover({ title: "Minerální SPF a bariéra kůže", sectionId: "clanky" });
+  assert.equal(skin, "/assets/covers/skincare.webp");
+  assert.equal(isUsableNewsletterImage("https://images.unsplash.com/photo-1584308664744-24d5c474f2ae"), false);
+  assert.equal(isUsableNewsletterImage("/assets/covers/sleep.webp"), true);
+  const articleThumb = resolveNewsletterItemImage({
+    sectionId: "clanky",
+    sectionTitle: "Články",
+    itemTitle: "Středomořský talíř v české kuchyni",
+    excerpt: "zelenina a olivový olej",
+    index: 0,
+  });
+  assert.ok(articleThumb.url.startsWith("/assets/covers/"));
+  assert.ok(articleThumb.isLocal);
+  const issueView = readFileSync(join(root, "components/v23/newsletter-issue-view.tsx"), "utf8");
+  assert.ok(issueView.includes("pickEditionCover(locale, issue.issue_date)"));
+  assert.ok(!issueView.includes("isoWeekSeed"));
+  assert.ok(issueView.includes("sm:grid-cols-2"));
+  const briefLayout = readFileSync(join(root, "lib/monetization/brief-email-layout.ts"), "utf8");
+  assert.ok(briefLayout.includes("newsletterTopicCover"));
+  assert.ok(briefLayout.includes("articleCoverAbs"));
 }
 assert.ok(
   readFileSync(join(root, "app/(public)/newsletter/[slug]/page.tsx"), "utf8").includes("getNewsletterForPublic"),

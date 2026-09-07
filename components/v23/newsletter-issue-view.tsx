@@ -7,11 +7,11 @@ import {
   ensureLayoutImages,
   resolveNewsletterItemImage,
   sectionImageUrl,
-  V23_ITEM_IMAGE_SECTIONS,
 } from "@/lib/v23/newsletter/images";
 import type { V23NewsletterLayout, V23NewsletterSection } from "@/lib/v23/newsletter/types";
 import { MagazineTitleSpread } from "@/components/magazine/magazine-title-spread";
-import { isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
+import { pickEditionCover } from "@/lib/brand/edition-covers";
+import { isUsableNewsletterImage } from "@/lib/v23/newsletter/topic-covers";
 import { isJsonLikeText, sanitizeNewsletterText } from "@/lib/v23/newsletter/sanitize";
 import { newsletterHeadline } from "@/lib/v23/newsletter/title";
 import { Button } from "@/components/ui/button";
@@ -29,12 +29,12 @@ function resolveItemImage(
   sectionTitle: string,
   item: V23NewsletterSection["items"][number],
   index: number
-): { url: string; alt: string; isLocal: boolean } | null {
-  if (!V23_ITEM_IMAGE_SECTIONS.has(sectionId)) return null;
+): { url: string; alt: string; isLocal: boolean } {
   return resolveNewsletterItemImage({
     sectionId,
     sectionTitle,
     itemTitle: item.title,
+    excerpt: item.summary,
     existingUrl: item.imageUrl,
     index,
   });
@@ -46,9 +46,10 @@ function resolveSectionImage(
   issueDate: string,
   existing?: string
 ): { url: string; alt: string } {
-  const url =
-    existing?.startsWith("http") ? existing : sectionImageUrl(sectionId, `${sectionId}-${issueDate}`);
-  return { url, alt: `${sectionTitle} — MedScopeGlobal Newsletter` };
+  const url = isUsableNewsletterImage(existing)
+    ? existing!
+    : sectionImageUrl(sectionId, `${sectionId}-${issueDate}`);
+  return { url, alt: `${sectionTitle} — ${MAGAZINE.name}` };
 }
 
 function sanitizeSection(sec: V23NewsletterSection): V23NewsletterSection {
@@ -112,19 +113,17 @@ function NewsletterItemCard({
 
   return (
     <li className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition hover:border-sky-100 hover:shadow-md">
-      {img ? (
-        <div className="relative aspect-[21/9] w-full bg-slate-200 sm:aspect-[16/10]">
-          <Image
-            src={img.url}
-            alt={img.alt}
-            fill
-            className="object-cover"
-            sizes="(max-width: 640px) 100vw, 320px"
-            loading="lazy"
-            unoptimized={img.isLocal}
-          />
-        </div>
-      ) : null}
+      <div className="relative aspect-[16/10] w-full bg-slate-100">
+        <Image
+          src={img.url}
+          alt={img.alt}
+          fill
+          className="object-cover"
+          sizes="(max-width: 640px) 100vw, 360px"
+          loading="lazy"
+          unoptimized={img.isLocal}
+        />
+      </div>
       <div className="p-4">
         {href ? (
           <Link href={href} className="font-semibold text-[#005B96] hover:underline">
@@ -180,7 +179,7 @@ export function V23NewsletterIssueView({
 
   return (
     <article className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-      <MagazineTitleSpread cover={pickEditionCover(locale, isoWeekSeed())} locale={locale} full />
+      <MagazineTitleSpread cover={pickEditionCover(locale, issue.issue_date)} locale={locale} full />
       <NewsletterHero
         title={layout?.headline ?? `${MAGAZINE.name} · ${dateLabel}`}
         subhead={subhead}
@@ -210,11 +209,12 @@ export function V23NewsletterIssueView({
                       className="object-cover"
                       sizes="(max-width: 896px) 100vw, 800px"
                       loading="lazy"
+                      unoptimized={secImg.url.startsWith("/assets/")}
                     />
                   </div>
                   <h2 className="font-display text-xl font-bold text-[#021d33] sm:text-2xl">{sec.title}</h2>
                   <p className="mt-2 text-sm leading-relaxed text-slate-600">{sec.intro}</p>
-                  <ul className="mt-4 grid gap-4 sm:grid-cols-1">
+                  <ul className="mt-4 grid gap-4 sm:grid-cols-2">
                     {sec.items.map((item, i) => (
                       <NewsletterItemCard
                         key={`${sec.id}-${i}`}
