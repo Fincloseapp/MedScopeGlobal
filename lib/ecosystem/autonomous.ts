@@ -88,8 +88,9 @@ export const AUTONOMOUS_SCHEDULE: Record<AutonomousTask, { cron: string; descrip
       "Legalní růst: IndexNow, reconcilace Stripe pending, výplata available, newsletter promote",
   },
   "agent-arena": {
-    cron: "5 * * * *",
-    description: "Souboj týmů Alfa/Beta: K-faktor, kvóty, evoluce, IndexNow hopů",
+    cron: "*/5 * * * *",
+    description:
+      "Souboj týmů Alfa/Beta: hop /predplatne na všech mutacích, IndexNow, K-faktor — bez sociálního spamu",
   },
 };
 

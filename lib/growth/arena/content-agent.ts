@@ -4,6 +4,7 @@ import {
   type ArenaTeamSlug,
   type ContentStyle,
 } from "@/lib/growth/arena/config";
+import { ARENA_DISCOVERY_LOCALES } from "@/lib/growth/arena/locales";
 import { arenaHopUrl } from "@/lib/growth/arena/refs";
 import { looksLikeSpam } from "@/lib/growth/arena/metrics";
 import type { KnowledgeRow } from "@/lib/growth/arena/store";
@@ -27,7 +28,7 @@ const COPY: Record<
   vialongevita: {
     "clinical-short": {
       headline: "ViaLongeVita — prevence bez zázraků",
-      body: "Krátké, podložené texty o spánku, pohybu a výživě. Předplatné redakce je dobrovolné po 14 dnech.",
+      body: "Krátké, podložené texty o spánku, pohybu a výživě. Redakce se platí hned — 25 Kč / 1 € / 1 $ / 1 £.",
     },
     "prevention-habit": {
       headline: "Jeden návyk, který vydrží",
@@ -116,7 +117,7 @@ export function generateTeamDrafts(input: {
   locales?: string[];
 }): ContentDraft[] {
   const style = styleFromKnowledge(input.styleBias, input.knowledge);
-  const locales = input.locales ?? ["cs", "de", "fr", "en"];
+  const locales = input.locales ?? ARENA_DISCOVERY_LOCALES;
   const drafts: ContentDraft[] = [];
   for (const section of sectionsByPriority()) {
     for (const locale of locales) {

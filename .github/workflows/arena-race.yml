@@ -1,0 +1,27 @@
+name: Arena race pulse
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  pulse:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tick Alfa vs Beta + locale IndexNow
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          BASE: https://medscopeglobal.com
+        run: |
+          set -euo pipefail
+          auth="Authorization: Bearer ${CRON_SECRET}"
+          code=$(curl -s -o /tmp/arena.out -w "%{http_code}" --max-time 90 \
+            -H "$auth" "$BASE/api/cron/agent-arena" || true)
+          echo "$code GET /api/cron/agent-arena"
+          head -c 400 /tmp/arena.out || true
+          echo
+          case "$code" in
+            200|204|207) ;;
+            *) echo "arena tick failed"; exit 1 ;;
+          esac

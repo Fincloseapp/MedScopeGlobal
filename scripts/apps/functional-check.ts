@@ -216,6 +216,9 @@ import {
   createEditorialQueueItem,
 } from "../../lib/ecosystem/editorial";
 import { GLOBAL_LOCALES, localeFromCountry } from "../../lib/ecosystem/locales";
+import { localeToPathSegment } from "../../lib/i18n/locale-path";
+import { ARENA_DISCOVERY_LOCALES } from "../../lib/growth/arena/locales";
+import { arenaPulsePaths } from "../../lib/growth/arena/worker-pulse";
 import {
   MAGAZINE_EDITORS_PER_LOCALE,
   MAGAZINE_WRITERS_PER_LOCALE,
@@ -2421,6 +2424,17 @@ assert.ok(
     assert.ok(urls.includes("https://medscopeglobal.com/de/predplatne"));
     assert.ok(urls.includes("https://medscopeglobal.com/fr/pro-ai"));
     assert.ok(urls.includes("https://medscopeglobal.com/llms.txt"));
+    assert.ok(urls.includes("https://medscopeglobal.com/jp/predplatne"));
+    assert.ok(urls.includes("https://medscopeglobal.com/cn/predplatne"));
+    assert.ok(urls.includes("https://medscopeglobal.com/sk/predplatne"));
+    assert.ok(urls.includes("https://medscopeglobal.com/en-uk/predplatne"));
+    assert.equal(
+      GLOBAL_LOCALES.every((row) =>
+        urls.includes(`https://medscopeglobal.com/${localeToPathSegment(row.code)}/predplatne`)
+      ),
+      true,
+      "IndexNow must list /predplatne for every language edition"
+    );
     const revenuePage = readFileSync(join(root, "app/(admin)/admin/revenue/page.tsx"), "utf8");
     assert.ok(revenuePage.includes("Stripe pending"));
     assert.ok(revenuePage.includes("Kolik peněz dostanete"));
@@ -2499,13 +2513,35 @@ assert.ok(
     });
     assert.ok(drafts.some((row) => row.style === "sleep-focus"));
     assert.ok(drafts.every((row) => row.section !== "mediprep" || row.locale === "cs"));
+    assert.equal(
+      new Set(drafts.filter((row) => row.section === "vialongevita" && row.channel !== "social-draft").map((row) => row.locale)).size,
+      ARENA_DISCOVERY_LOCALES.length,
+      "each edition must get a ViaLongeVita subscribe hop"
+    );
+    assert.ok(drafts.some((row) => row.locale === "ja" && row.ctaUrl.includes("locale=jp")));
+    assert.ok(!readFileSync(join(root, "lib/growth/arena/content-agent.ts"), "utf8").includes("po 14 dnech"));
     assert.ok(!readFileSync(join(root, "lib/growth/arena/distribution-agent.ts"), "utf8").includes("reddit.com/api"));
+    assert.ok(!readFileSync(join(root, "lib/growth/arena/distribution-agent.ts"), "utf8").includes("tiktok.com"));
     assert.ok(existsSync(join(root, "app/(admin)/admin/ai-teams/page.tsx")));
     assert.ok(existsSync(join(root, "app/api/cron/agent-arena/route.ts")));
     assert.ok(
       readFileSync(join(root, ".github/workflows/cloudflare-cron.yml"), "utf8").includes(
         "/api/cron/agent-arena"
       )
+    );
+    assert.ok(
+      readFileSync(join(root, ".github/workflows/arena-race.yml"), "utf8").includes(
+        "/api/cron/agent-arena"
+      )
+    );
+    const wrangler = readFileSync(join(root, "wrangler.jsonc"), "utf8");
+    assert.ok(wrangler.includes('"*/5 * * * *"'), "Worker must tick the race every 5 minutes");
+    assert.ok(wrangler.includes("cloudflare/entry.js"), "Worker entry must expose scheduled()");
+    assert.ok(arenaPulsePaths(new Date("2026-09-07T11:05:00.000Z")).includes("/api/cron/agent-arena"));
+    assert.ok(arenaPulsePaths(new Date("2026-09-07T11:00:00.000Z")).includes("/api/cron/growth-sprint?light=1"));
+    assert.ok(!arenaPulsePaths(new Date("2026-09-07T11:05:00.000Z")).includes("/api/cron/growth-sprint?light=1"));
+    assert.ok(
+      readFileSync(join(root, "app/api/cron/growth-sprint/route.ts"), "utf8").includes("includeRevenueOps")
     );
   }
   assert.ok(

@@ -1,11 +1,10 @@
 import { getSiteUrl } from "@/lib/config/site-url";
 import { submitIndexNow } from "@/lib/seo/indexnow";
 import type { ArenaTeamSlug } from "@/lib/growth/arena/config";
+import { ARENA_DISCOVERY_LOCALES } from "@/lib/growth/arena/locales";
 import { arenaHopUrl } from "@/lib/growth/arena/refs";
 import { looksLikeSpam } from "@/lib/growth/arena/metrics";
 import type { ContentDraft } from "@/lib/growth/arena/content-agent";
-
-const DISCOVERY_LOCALES = ["cs", "de", "fr", "en", "en-US", "es", "it"] as const;
 
 export type DistributionResult = {
   team: ArenaTeamSlug;
@@ -36,16 +35,14 @@ export async function distributeTeamReach(input: {
 
   const origin = getSiteUrl();
   const urls = new Set<string>();
-  urls.add(arenaHopUrl({ team: input.team, section: "vialongevita", locale: "cs", base: origin }));
-  urls.add(arenaHopUrl({ team: input.team, section: "dokscope", locale: "cs", base: origin }));
-  urls.add(arenaHopUrl({ team: input.team, section: "mediprep", locale: "cs", base: origin }));
-  for (const locale of DISCOVERY_LOCALES) {
-    urls.add(
-      arenaHopUrl({ team: input.team, section: "vialongevita", locale, base: origin })
-    );
+  for (const locale of ARENA_DISCOVERY_LOCALES) {
+    urls.add(arenaHopUrl({ team: input.team, section: "vialongevita", locale, base: origin }));
+  }
+  for (const locale of ARENA_DISCOVERY_LOCALES) {
     urls.add(arenaHopUrl({ team: input.team, section: "dokscope", locale, base: origin }));
   }
-  const list = [...urls].slice(0, Math.max(4, input.quota));
+  urls.add(arenaHopUrl({ team: input.team, section: "mediprep", locale: "cs", base: origin }));
+  const list = [...urls].slice(0, Math.max(ARENA_DISCOVERY_LOCALES.length, input.quota));
   const ping = await submitIndexNow(list);
   return {
     team: input.team,

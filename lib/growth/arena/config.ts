@@ -44,10 +44,10 @@ export const SPAM_TEAM_PENALTY = -50_000;
 export const SECTION3_MILESTONE = 50_000;
 export const SECTION3_MILESTONE_POINTS = 8_000;
 export const LOSING_STREAK_KILL = 6;
-export const REACH_QUOTA_MIN = 8;
-export const REACH_QUOTA_MAX = 80;
-export const REACH_QUOTA_DEFAULT = 24;
-export const MESSAGE_LIMIT_DEFAULT = 20;
+export const REACH_QUOTA_MIN = 22;
+export const REACH_QUOTA_MAX = 240;
+export const REACH_QUOTA_DEFAULT = 80;
+export const MESSAGE_LIMIT_DEFAULT = 80;
 
 export const CONTENT_STYLES = [
   "clinical-short",

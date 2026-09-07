@@ -41,7 +41,10 @@ async function handle(request: Request) {
   }
 
   try {
-    const outcome = await runLegalGrowthSprint();
+    const light = new URL(request.url).searchParams.get("light") === "1";
+    const outcome = await runLegalGrowthSprint({
+      includeRevenueOps: !light,
+    });
     return NextResponse.json(outcome, { status: outcome.ok ? 200 : 207 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "growth sprint failed";

@@ -28,7 +28,7 @@ export async function loadArenaDashboard() {
   return {
     loadedAt: new Date().toISOString(),
     honesty:
-      "170 000 za 3 dny je programový cíl. Souboj týmů počítá jen reálné hop/checkout/paid eventy. Sociální účty jsou kvóty dosahu, ne automatický spam.",
+      "Závod běží. Cíl je maximalizovat reálná předplatná Redakce na všech jazykových mutacích. Kola pingají hop /predplatne + IndexNow; neposílají Reddit/X/TikTok. 170 000 / 500 000 je programový cíl, ne aktuální stav.",
     liveSubscribers: growth.subscribers.totalLive,
     goals: {
       near: AI_AGENT_GOAL_NEAR,

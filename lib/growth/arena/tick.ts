@@ -1,4 +1,5 @@
-import { K_FACTOR_WINDOW_MS } from "@/lib/growth/arena/config";
+import { K_FACTOR_WINDOW_MS, REACH_QUOTA_DEFAULT } from "@/lib/growth/arena/config";
+import { ARENA_DISCOVERY_LOCALES } from "@/lib/growth/arena/locales";
 import { runAnalyst } from "@/lib/growth/arena/analyst-agent";
 import { generateTeamDrafts } from "@/lib/growth/arena/content-agent";
 import { distributeTeamReach } from "@/lib/growth/arena/distribution-agent";
@@ -45,6 +46,17 @@ export async function runArenaTick(): Promise<ArenaTickResult> {
   const errors: string[] = [];
   await ensureArenaSeeded();
   const teams = await loadTeams();
+  for (const team of teams) {
+    if (team.status === "active" && team.reachQuota < ARENA_DISCOVERY_LOCALES.length) {
+      await upsertTeam({
+        slug: team.slug,
+        reachQuota: REACH_QUOTA_DEFAULT,
+        messageLimit: Math.max(team.messageLimit, REACH_QUOTA_DEFAULT),
+      });
+      team.reachQuota = REACH_QUOTA_DEFAULT;
+      team.messageLimit = Math.max(team.messageLimit, REACH_QUOTA_DEFAULT);
+    }
+  }
   const windowStart = new Date(Date.now() - K_FACTOR_WINDOW_MS).toISOString();
   const hourStart = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
@@ -82,6 +94,7 @@ export async function runArenaTick(): Promise<ArenaTickResult> {
       team: team.slug,
       styleBias: team.styleBias,
       knowledge,
+      locales: ARENA_DISCOVERY_LOCALES,
     });
     await writeBus({
       teamSlug: team.slug,
