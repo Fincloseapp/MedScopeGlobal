@@ -321,7 +321,7 @@ export async function POST(request: Request) {
       const customerEmail = session.customer_details?.email ?? session.customer_email ?? undefined;
 
       if (adsRequestId && session.metadata?.kind === "ad_campaign") {
-        const result = await activateAdFromCheckout(session.id, adsRequestId);
+        const result = await activateAdFromCheckout(session.id, adsRequestId, "stripe");
         await logSecurityEvent({
           ip,
           action: "stripe:ad_checkout_completed",
@@ -388,7 +388,8 @@ export async function POST(request: Request) {
         if (customerEmail && session.metadata?.product_id) {
           void notifySubscriptionConfirmed(
             customerEmail,
-            session.metadata.product_id.replace(/-month|-year/g, "")
+            session.metadata.product_id.replace(/-month|-year/g, ""),
+            session.metadata?.locale
           );
         }
 

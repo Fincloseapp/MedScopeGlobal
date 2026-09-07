@@ -74,6 +74,10 @@ export default function SignupPage() {
           accessLevel: selectedAccessLevel,
           profession,
           captchaToken: captchaToken || undefined,
+          locale:
+            document.cookie.match(/(?:^|;\s*)medscope_locale=([^;]+)/)?.[1] ??
+            document.documentElement.lang ??
+            undefined,
         }),
       });
       const body = (await res.json()) as {

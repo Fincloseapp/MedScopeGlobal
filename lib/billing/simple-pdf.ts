@@ -53,13 +53,19 @@ export function invoiceHtmlToPdfBase64(params: {
   subtotalLabel: string;
   vatLabel: string;
   totalLabel: string;
+  seat?: string | null;
+  variableSymbol?: string | null;
+  buyerIco?: string | null;
 }): string {
   const lines = [
     "Al Synaptica Research Institute s.r.o. — MedScopeGlobal",
     "ICO 06024963 — neplatce DPH",
+    params.seat ? `Sidlo: ${params.seat}` : "",
     `Cislo: ${params.transactionId}`,
+    params.variableSymbol ? `VS: ${params.variableSymbol}` : "",
     `Datum: ${params.issuedAtLabel}`,
     `Odberatel: ${params.customerName}`,
+    params.buyerIco ? `ICO odberatele: ${params.buyerIco}` : "",
     `Email: ${params.customerEmail}`,
     "",
     "Polozky:",

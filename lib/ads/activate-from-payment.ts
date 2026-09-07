@@ -1,6 +1,11 @@
+import { emailAdInvoice } from "@/lib/ads/issue-ad-invoice";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 
-export async function activateAdFromCheckout(sessionId: string, requestId: string) {
+export async function activateAdFromCheckout(
+  sessionId: string,
+  requestId: string,
+  paymentMethod: "stripe" | "bank_transfer" = "stripe"
+) {
   const admin = createServiceRoleClient();
 
   const { data: req } = await admin
@@ -54,8 +59,12 @@ export async function activateAdFromCheckout(sessionId: string, requestId: strin
     .update({
       status: "active",
       paid_at: new Date().toISOString(),
+      payment_method: paymentMethod,
     })
     .eq("id", req.id);
+
+  const fresh = { ...req, payment_method: paymentMethod, status: "active" };
+  await emailAdInvoice(fresh);
 
   return { ok: true, adId: ad?.id };
 }

@@ -12,6 +12,7 @@ import {
 } from "@/lib/monetization/vialongevita-brief";
 import { readAiRefFromCookieHeader } from "@/lib/growth/ai-ref-cookie";
 import { requestCountry } from "@/lib/growth/request-country";
+import { resolveEmailLocale } from "@/lib/i18n/email-locale";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
   }
 
   const email = body.email.trim().toLowerCase();
-  const locale = (body.locale ?? "cs").trim() || "cs";
+  const locale = resolveEmailLocale(body.locale, request);
   const segment = body.segment ?? "public";
   const source = (body.source ?? "site").trim() || "site";
   const aiRef = readAiRefFromCookieHeader(request.headers.get("cookie"));

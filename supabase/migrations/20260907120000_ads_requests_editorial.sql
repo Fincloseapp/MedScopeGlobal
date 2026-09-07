@@ -1,0 +1,13 @@
+alter table if exists public.ads_requests add column if not exists buyer_address text;
+alter table if exists public.ads_requests add column if not exists locale text;
+alter table if exists public.ads_requests add column if not exists editorial_review jsonb;
+alter table if exists public.ads_requests add column if not exists decision text;
+alter table if exists public.ads_requests add column if not exists decided_at timestamptz;
+alter table if exists public.ads_requests add column if not exists decided_by text;
+alter table if exists public.ads_requests add column if not exists denial_reason text;
+alter table if exists public.ads_requests add column if not exists variable_symbol text;
+alter table if exists public.ads_requests add column if not exists payment_method text;
+alter table if exists public.ads_requests add column if not exists invoice_sent_at timestamptz;
+alter table if exists public.ads_requests add column if not exists approved_at timestamptz;
+alter table if exists public.ads_requests add column if not exists paid_at timestamptz;
+alter table if exists public.ads_requests add column if not exists stripe_session_id text;

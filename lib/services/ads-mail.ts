@@ -28,11 +28,13 @@ export async function sendAdRequestNotification(req: AdsRequestRow) {
 }
 
 export async function sendAdApprovalEmail(req: AdsRequestRow, approveUrl: string) {
+  const orderUrl = buildCompanyOrderUrl(req.id, req.approval_token);
   const subject = `Schválení reklamy — ${req.company}`;
   const html = `
     <h2>Vaše reklama byla schválena</h2>
-    <p>Pro aktivaci dokončete platbu:</p>
-    <p><a href="${approveUrl}">Přejít na platbu (Stripe)</a></p>
+    <p>Pro aktivaci dokončete platbu kartou (Stripe) nebo bankovním převodem s QR a variabilním symbolem ${req.variable_symbol ?? "—" }.</p>
+    <p><a href="${orderUrl}">Náhled faktury a platba</a></p>
+    <p>Nebo rovnou Stripe: <a href="${approveUrl}">Zaplatit kartou</a></p>
     <p>Cena: ${req.price ?? "dle nabídky"} Kč</p>
   `;
 
@@ -41,7 +43,7 @@ export async function sendAdApprovalEmail(req: AdsRequestRow, approveUrl: string
     recipient: req.email,
     subject,
     html,
-    text: `Reklama schválena. Platba: ${approveUrl}`,
+    text: `Reklama schválena. Platba: ${orderUrl} · VS ${req.variable_symbol ?? ""}`,
     payload: { requestId: req.id },
   });
 }
@@ -66,4 +68,22 @@ export function buildApprovalUrl(token: string): string {
 export function buildPaymentUrl(requestId: string): string {
   const base = SITE.url.replace(/\/$/, "");
   return `${base}/api/ads/checkout?request_id=${encodeURIComponent(requestId)}`;
+}
+
+export function buildCompanyOrderUrl(requestId: string, token?: string | null): string {
+  const base = SITE.url.replace(/\/$/, "");
+  const url = new URL(`${base}/firmy/reklama/objednavka/${requestId}`);
+  if (token) url.searchParams.set("token", token);
+  return url.toString();
+}
+
+export async function sendAdDeniedEmail(req: AdsRequestRow, reason: string) {
+  return sendContactEmail({
+    kind: "partner",
+    recipient: req.email,
+    subject: `Inzerce neschválena — ${req.company}`,
+    html: `<p>Vaše kreativa nebyla schválena třemi editory MedScopeGlobal.</p><p>${reason || "Obsah nesplnil právní, bezpečnostní nebo diplomatická pravidla."}</p>`,
+    text: `Inzerce neschválena. ${reason}`,
+    payload: { requestId: req.id, decision: "denied" },
+  });
 }

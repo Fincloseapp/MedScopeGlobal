@@ -1,6 +1,9 @@
 import { sendEmail } from "@/lib/email/engine";
 import { generateEmailContent } from "@/lib/email/ai-generator";
 import { logAdminEvent } from "@/lib/logging";
+import { getAccountEmailCopy } from "@/lib/i18n/account-email-copy";
+import { resolveEmailLocale } from "@/lib/i18n/email-locale";
+import { SITE } from "@/lib/config/site";
 
 export type NotificationKind =
   | "new_article"
@@ -41,8 +44,10 @@ export async function dispatchNotification(payload: NotificationPayload) {
     context: { body: payload.body, url: payload.url, ...payload.metadata },
   });
 
+  const locale = resolveEmailLocale(String(payload.metadata?.locale ?? ""));
+  const copy = getAccountEmailCopy(locale);
   const html = payload.url
-    ? `${generated.html}<p><a href="${payload.url}">Otevřít v MedScopeGlobal</a></p>`
+    ? `${generated.html}<p><a href="${payload.url}">${copy.openSite}</a></p>`
     : generated.html;
 
   const category = payload.kind === "subscription" ? "transactional" : "system";
@@ -74,11 +79,18 @@ export async function notifyNewStudy(recipient: string, title: string, url: stri
   return dispatchNotification({ kind: "new_study", recipient, title, url, body: `Nová studie: ${title}` });
 }
 
-export async function notifySubscriptionConfirmed(recipient: string, planName: string) {
+export async function notifySubscriptionConfirmed(
+  recipient: string,
+  planName: string,
+  locale?: string | null
+) {
+  const pack = getAccountEmailCopy(resolveEmailLocale(locale));
   return dispatchNotification({
     kind: "subscription",
     recipient,
-    title: `Předplatné ${planName} aktivováno`,
-    body: `Vaše předplatné MedScopeGlobal (${planName}) je aktivní.`,
+    title: pack.subscriptionSubject(planName),
+    body: pack.subscriptionBody(planName),
+    url: SITE.url,
+    metadata: { locale: resolveEmailLocale(locale) },
   });
 }

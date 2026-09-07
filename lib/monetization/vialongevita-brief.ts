@@ -8,6 +8,7 @@ import { isLongevityArticle } from "@/lib/v271/news-desks";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { resolveEmailLocale } from "@/lib/i18n/email-locale";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { applyNewsletterSubscriberSchema } from "@/lib/monetization/apply-schema";
 import { affiliateGoPath } from "@/lib/monetization/affiliate-geo";
@@ -189,7 +190,7 @@ export async function sendViaLongeVitaFirstBrief(input: {
 }): Promise<{ ok: boolean; error?: string; usedFallback?: boolean; skipped?: boolean }> {
   if (!mailReady()) return { ok: false, error: "mail_not_configured" };
   if (skipAddress(input.email)) return { ok: false, error: "skip_address" };
-  const locale = (input.locale ?? "cs").trim() || "cs";
+  const locale = resolveEmailLocale(input.locale);
   const email = input.email.trim().toLowerCase();
   const admin = tryCreateServiceRoleClient();
   if (admin && !input.force) {
@@ -307,7 +308,7 @@ export async function sendViaLongeVitaTestBrief(input: {
 }): Promise<{ ok: boolean; error?: string }> {
   if (!mailReady()) return { ok: false, error: "mail_not_configured" };
   if (skipAddress(input.email)) return { ok: false, error: "skip_address" };
-  const locale = (input.locale ?? "cs").trim() || "cs";
+  const locale = resolveEmailLocale(input.locale);
   const live = await loadBriefArticles(locale);
   const articles = live.length ? live : pillarBriefArticles(locale);
   const payload = briefHtml(locale, input.email, articles);

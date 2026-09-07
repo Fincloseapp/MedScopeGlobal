@@ -26,8 +26,8 @@ export async function FirmyDesk({ slug }: { slug?: FirmyRoomId }) {
       eyebrow={desk.eyebrow}
       title={room?.title ?? desk.title}
       description={room?.lead ?? desk.lead}
-      ctaHref={formHref}
-      ctaLabel={publicCopy.contactSales}
+      ctaHref={slug === "reklama" ? localizePublicHref("/firmy/reklama/nova", locale) : formHref}
+      ctaLabel={slug === "reklama" ? "Vložit reklamu" : publicCopy.contactSales}
       homeHref={localizePublicHref("/", locale)}
     >
       <nav className="mb-6 text-sm text-muted-foreground">

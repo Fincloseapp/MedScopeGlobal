@@ -2,6 +2,8 @@ import { loadEmailTemplate } from "@/lib/email/ai-generator";
 import { sendEmail } from "@/lib/email/engine";
 import { SITE } from "@/lib/config/site";
 import { getPublicEnv, getServiceRoleKey } from "@/lib/env";
+import { getAccountEmailCopy } from "@/lib/i18n/account-email-copy";
+import { resolveEmailLocale } from "@/lib/i18n/email-locale";
 
 async function sendViaResend(params: {
   to: string;
@@ -84,25 +86,39 @@ async function sendViaSupabaseAuthResend(params: {
 export function buildSignupConfirmEmail(params: {
   fullName: string;
   actionLink: string;
+  locale?: string | null;
 }): { subject: string; html: string; text: string } {
-  const subject = "Potvrďte registraci — MedScopeGlobal";
-  const greeting = params.fullName?.trim() || "vážený uživateli";
+  const locale = resolveEmailLocale(params.locale);
+  const copy = getAccountEmailCopy(locale);
+  const greeting = params.fullName?.trim() || copy.signupGreeting;
+  const subject = copy.signupSubject;
   const text = [
-    `Dobrý den, ${greeting},`,
+    `${greeting},`,
     "",
-    "děkujeme za registraci na MedScopeGlobal.",
-    "Pro aktivaci účtu potvrďte e-mailovou adresu:",
+    copy.signupIntro,
+    copy.signupCta + ":",
     params.actionLink,
     "",
-    "Odkaz platí omezenou dobu. Pokud jste se neregistrovali, e-mail ignorujte.",
+    copy.signupExpiry,
+    copy.signupIgnore,
     "",
     `— ${SITE.name}`,
   ].join("\n");
 
-  const html = loadEmailTemplate("signup-confirm", {
+  const templated = loadEmailTemplate("signup-confirm", {
     name: greeting,
     confirm_url: params.actionLink,
   });
+  const html =
+    locale === "cs"
+      ? templated
+      : `<!DOCTYPE html><html lang="${locale}"><body style="font-family:system-ui,sans-serif;color:#021d33;padding:24px">
+  <h1 style="color:#005B96">${copy.signupSubject}</h1>
+  <p>${greeting}, ${copy.signupIntro}</p>
+  <p><a href="${params.actionLink}" style="display:inline-block;background:#005B96;color:#fff;padding:10px 18px;border-radius:999px;text-decoration:none">${copy.signupCta}</a></p>
+  <p style="color:#64748b;font-size:13px">${copy.signupExpiry} ${copy.signupIgnore}</p>
+  <p>— ${SITE.name}</p>
+</body></html>`;
 
   return { subject, html, text };
 }
@@ -116,10 +132,12 @@ export async function sendSignupConfirmationEmail(params: {
   fullName: string;
   actionLink: string;
   redirectTo: string;
+  locale?: string | null;
 }): Promise<{ ok: boolean; provider?: string; error?: string }> {
   const content = buildSignupConfirmEmail({
     fullName: params.fullName,
     actionLink: params.actionLink,
+    locale: params.locale,
   });
 
   const primary = await sendEmail({
@@ -128,7 +146,7 @@ export async function sendSignupConfirmationEmail(params: {
     html: content.html,
     text: content.text,
     category: "transactional",
-    metadata: { kind: "auth_signup_confirm" },
+    metadata: { kind: "auth_signup_confirm", locale: params.locale ?? "en" },
   });
 
   if (primary.ok) {

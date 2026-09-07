@@ -72,8 +72,8 @@ export async function GET(request: Request) {
     const stripe = createStripeClient(stripeKey);
     session = await stripe.checkout.sessions.create({
       mode: "payment",
-      success_url: `${SITE.url}/inzerce/formular?paid=1`,
-      cancel_url: `${SITE.url}/inzerce/formular?paid=0`,
+      success_url: `${SITE.url}/firmy/reklama/objednavka/${req.id}?token=${encodeURIComponent(String(req.approval_token ?? ""))}&paid=1`,
+      cancel_url: `${SITE.url}/firmy/reklama/objednavka/${req.id}?token=${encodeURIComponent(String(req.approval_token ?? ""))}&paid=0`,
       customer_email: req.email ?? undefined,
       metadata: { ads_request_id: req.id, kind: "ad_campaign" },
       line_items: [

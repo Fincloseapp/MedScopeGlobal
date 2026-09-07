@@ -16,6 +16,7 @@ import {
 import { sanitizeText } from "@/lib/security/sanitize";
 import { logSecurityEvent } from "@/lib/security/security-log";
 import { createServiceRoleClient } from "@/lib/supabase/service";
+import { resolveEmailLocale } from "@/lib/i18n/email-locale";
 
 const signupSchema = z.object({
   email: z.string().email().max(320),
@@ -24,6 +25,7 @@ const signupSchema = z.object({
   accessLevel: z.string().optional(),
   profession: z.string().optional(),
   captchaToken: z.string().optional(),
+  locale: z.string().max(16).optional(),
 });
 
 function siteOrigin(request: Request): string {
@@ -64,6 +66,7 @@ export async function POST(request: Request) {
       ? body.accessLevel
       : "public";
   const profession = sanitizeText(body.profession ?? "general_public", 80);
+  const locale = resolveEmailLocale(body.locale, request);
 
   if (isDisposableEmail(email)) {
     await logSecurityEvent({
@@ -233,6 +236,7 @@ export async function POST(request: Request) {
         role: "user",
         access_level: accessLevel,
         profession,
+        preferred_locale: locale,
         verification_status: accessLevel === "physician" ? "pending" : "approved",
       },
       { onConflict: "id" }
@@ -245,6 +249,7 @@ export async function POST(request: Request) {
     fullName,
     actionLink,
     redirectTo,
+    locale,
   });
 
   if (!mailed.ok) {

@@ -59,7 +59,7 @@ export async function promoteAnalyticsNewsletterSignups(limit = 200): Promise<{
     const segment = payload.segment === "doctors" ? "doctors" : "public";
     const { error: insertError } = await admin.from("newsletter_subscribers").insert({
       email,
-      locale: payload.locale ?? "cs",
+      locale: payload.locale ?? "en",
       segment,
       source: payload.source ?? "analytics-fallback",
     });

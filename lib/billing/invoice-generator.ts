@@ -10,6 +10,13 @@ export interface InvoiceInput {
   transactionId: string;
   customerEmail: string;
   customerName?: string;
+  buyerIco?: string | null;
+  buyerDic?: string | null;
+  buyerAddress?: string | null;
+  variableSymbol?: string | null;
+  paymentMethod?: string | null;
+  bankAccount?: string | null;
+  iban?: string | null;
   lineItems: InvoiceLineItem[];
   /** Default 0 — provozovatel je dle ARES neplátce DPH. */
   vatRate?: number;
@@ -51,9 +58,26 @@ export function generateInvoiceHtml(input: InvoiceInput): InvoiceDocument {
     entity.ico ? `IČO ${entity.ico}` : null,
     entity.dic ? `DIČ ${entity.dic}` : "neplátce DPH",
     entity.address,
+    entity.courtFile ? `sp. zn. ${entity.courtFile}` : null,
   ]
     .filter(Boolean)
     .join(" · ");
+  const buyerBits = [
+    customerName,
+    input.buyerIco ? `IČO ${input.buyerIco}` : null,
+    input.buyerDic ? `DIČ ${input.buyerDic}` : null,
+    input.buyerAddress,
+  ]
+    .filter(Boolean)
+    .join("<br>");
+  const payBits = [
+    input.paymentMethod ? `Forma úhrady: ${input.paymentMethod}` : null,
+    input.variableSymbol ? `Variabilní symbol: ${input.variableSymbol}` : null,
+    input.iban ? `IBAN: ${input.iban}` : null,
+    input.bankAccount ? `Účet: ${input.bankAccount}` : null,
+  ]
+    .filter(Boolean)
+    .join("<br>");
 
   const rows = input.lineItems
     .map(
@@ -72,7 +96,9 @@ export function generateInvoiceHtml(input: InvoiceInput): InvoiceDocument {
     <p style="margin:4px 0 0;color:#64748b;font-size:13px">Faktura č. ${input.transactionId}</p>
   </header>
   <p><strong>Datum vystavení:</strong> ${formatDate(issuedAt)}</p>
-  <p><strong>Odběratel:</strong> ${customerName}<br><strong>E-mail:</strong> ${input.customerEmail}</p>
+  <p><strong>Datum zdanitelného plnění:</strong> ${formatDate(issuedAt)}</p>
+  <p><strong>Odběratel:</strong><br>${buyerBits}<br><strong>E-mail:</strong> ${input.customerEmail}</p>
+  ${payBits ? `<p>${payBits}</p>` : ""}
   <table style="width:100%;border-collapse:collapse;margin:24px 0">
     <thead><tr style="background:#f1f5f9"><th style="padding:8px;text-align:left">Položka</th><th style="padding:8px;text-align:right">Částka</th></tr></thead>
     <tbody>${rows}</tbody>
@@ -99,6 +125,9 @@ export function generateInvoiceHtml(input: InvoiceInput): InvoiceDocument {
     subtotalLabel: formatCzk(subtotalCzk),
     vatLabel: formatCzk(vatCzk),
     totalLabel: formatCzk(totalCzk),
+    seat: entity.address,
+    variableSymbol: input.variableSymbol,
+    buyerIco: input.buyerIco,
   });
 
   return {

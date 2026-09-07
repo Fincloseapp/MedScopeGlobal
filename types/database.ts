@@ -133,6 +133,16 @@ export interface AdsRequestRow {
   approval_token: string | null;
   stripe_payment_link: string | null;
   created_at: string;
+  locale?: string | null;
+  buyer_address?: string | null;
+  editorial_review?: Record<string, unknown> | null;
+  decision?: string | null;
+  decided_at?: string | null;
+  decided_by?: string | null;
+  denial_reason?: string | null;
+  variable_symbol?: string | null;
+  payment_method?: string | null;
+  invoice_sent_at?: string | null;
 }
 
 export interface JobPostingRow {

@@ -71,7 +71,7 @@ export default async function AdminDashboardPage() {
       label: "Aktivní reklamy",
       value: overview.ads.active,
       hint: `${overview.ads.total} řádků v katalogu`,
-      href: "/admin/ads",
+      href: "/admin/ads-requests",
       icon: Megaphone,
     },
     {

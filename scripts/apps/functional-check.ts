@@ -238,6 +238,13 @@ import {
 import { buildDeskComment, foreignDeskMayComment } from "../../lib/editorial/desk-comments";
 import { getHomepageLongevityCopy } from "../../lib/i18n/homepage-longevity";
 import { getNewsletterCopy } from "../../lib/i18n/newsletter-copy";
+import { resolveEmailLocale } from "../../lib/i18n/email-locale";
+import { getAccountEmailCopy } from "../../lib/i18n/account-email-copy";
+import { runAdEditorBoard } from "../../lib/ads/ad-editors";
+import { makeAdVariableSymbol } from "../../lib/ads/variable-symbol";
+import { generateInvoiceHtml } from "../../lib/billing/invoice-generator";
+import { buildSpdString } from "../../lib/billing/spd-qr";
+import { briefChrome } from "../../lib/monetization/brief-marketing";
 import { translateNavHref } from "../../lib/i18n/nav-copy";
 import {
   FOREIGN_WRITER_ROTATION,
@@ -4518,6 +4525,59 @@ console.log(
       `${label} must save via the user-scoped helper`
     );
   }
+}
+
+{
+  assert.equal(resolveEmailLocale("de"), "de");
+  assert.equal(resolveEmailLocale("jp"), "ja");
+  assert.equal(resolveEmailLocale(null), "en");
+  assert.equal(resolveEmailLocale("xyz"), "en");
+  assert.ok(getAccountEmailCopy("de").signupSubject.includes("Registrierung"));
+  assert.ok(!getAccountEmailCopy("fr").signupSubject.includes("Potvrďte"));
+  assert.ok(getAccountEmailCopy("sk").signupSubject.includes("Confirm"));
+  assert.ok(briefChrome("ja").welcomeKicker !== briefChrome("cs").welcomeKicker);
+  const clean = runAdEditorBoard({
+    company: "Klinik Nord",
+    adText: "Prevention lecture in Berlin. Educational, no diagnosis.",
+    type: "banner",
+  });
+  assert.equal(clean.recommendation, "allow");
+  const dirty = runAdEditorBoard({
+    company: "MiracleLab",
+    adText: "Guaranteed cure and instant weight loss, replace your doctor.",
+    type: "banner",
+  });
+  assert.equal(dirty.recommendation, "deny");
+  assert.equal(dirty.legal.verdict, "fail");
+  const vs = makeAdVariableSymbol("a1b2c3d4-0000-0000-0000-000000001234");
+  assert.match(vs, /^\d{10}$/);
+  const invoice = generateInvoiceHtml({
+    transactionId: "MSG-2609071234",
+    customerEmail: "firma@example.com",
+    customerName: "Firma s.r.o.",
+    buyerIco: "12345678",
+    buyerAddress: "Ulice 1, Praha",
+    variableSymbol: "2609071234",
+    lineItems: [{ description: "Banner 30 dní", amountCzk: 5000 }],
+  });
+  assert.ok(invoice.html.includes("06024963"));
+  assert.ok(invoice.html.includes("Třešňová"));
+  assert.ok(invoice.html.includes("2609071234"));
+  assert.ok(invoice.html.includes("12345678"));
+  assert.ok(invoice.html.includes("neplátce DPH"));
+  const spd = buildSpdString({
+    iban: "CZ6508000000192000145399",
+    amountCzk: 5000,
+    variableSymbol: "2609071234",
+    message: "Inzerce Firma",
+  });
+  assert.ok(spd?.startsWith("SPD*1.0*ACC:CZ6508000000192000145399"));
+  assert.ok(spd?.includes("X-VS:2609071234"));
+  assert.ok(existsSync(join(root, "app/(public)/firmy/reklama/nova/page.tsx")));
+  assert.ok(existsSync(join(root, "app/(admin)/admin/ads-requests/page.tsx")));
+  assert.ok(
+    !readFileSync(join(root, "app/(public)/firmy/reklama/nova/page.tsx"), "utf8").includes("Třešňová")
+  );
 }
 
 console.log("✓ editorial image pipeline checks passed");
