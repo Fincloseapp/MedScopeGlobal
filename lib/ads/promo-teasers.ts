@@ -1,6 +1,6 @@
 /** Advertising teasers — not odborná Osvěta lessons. Files are real MP4s for human social upload. */
 
-export type PromoTeaserId = "healthspan" | "sleep" | "lifestyle";
+export type PromoTeaserId = "man" | "woman" | "alike";
 
 export type PromoTeaser = {
   id: PromoTeaserId;
@@ -19,46 +19,46 @@ export type PromoTeaser = {
 
 export const PROMO_TEASERS: PromoTeaser[] = [
   {
-    id: "healthspan",
-    slug: "healthspan",
+    id: "man",
+    slug: "man",
     durationSeconds: 8,
     aspect: "9:16",
-    videoSrc: "/assets/ads/teasers/healthspan.mp4",
-    posterSrc: "/assets/ads/teasers/healthspan.jpg",
+    videoSrc: "/assets/ads/teasers/man.mp4",
+    posterSrc: "/assets/ads/teasers/man.jpg",
     brand: "ViaLongeVita",
     site: "medscopeglobal.com",
-    topic: "healthspan",
-    line: "Healthspan",
-    sub: "Longevity · Dlouhověkost",
-    shareTitle: "ViaLongeVita — healthspan · medscopeglobal.com",
+    topic: "longevity",
+    line: "He reads. He stays.",
+    sub: "Dlouhověkost · Longevity",
+    shareTitle: "ViaLongeVita — he reads · medscopeglobal.com",
   },
   {
-    id: "sleep",
-    slug: "sleep",
+    id: "woman",
+    slug: "woman",
     durationSeconds: 8,
     aspect: "9:16",
-    videoSrc: "/assets/ads/teasers/sleep.mp4",
-    posterSrc: "/assets/ads/teasers/sleep.jpg",
+    videoSrc: "/assets/ads/teasers/woman.mp4",
+    posterSrc: "/assets/ads/teasers/woman.jpg",
     brand: "ViaLongeVita",
     site: "medscopeglobal.com",
-    topic: "sleep",
-    line: "Healthy sleep",
-    sub: "Rest · Zdravý spánek",
-    shareTitle: "ViaLongeVita — healthy sleep · medscopeglobal.com",
+    topic: "longevity",
+    line: "She reads. She stays.",
+    sub: "Dlouhověkost · Longevity",
+    shareTitle: "ViaLongeVita — she reads · medscopeglobal.com",
   },
   {
-    id: "lifestyle",
-    slug: "lifestyle",
+    id: "alike",
+    slug: "alike",
     durationSeconds: 8,
     aspect: "9:16",
-    videoSrc: "/assets/ads/teasers/lifestyle.mp4",
-    posterSrc: "/assets/ads/teasers/lifestyle.jpg",
+    videoSrc: "/assets/ads/teasers/alike.mp4",
+    posterSrc: "/assets/ads/teasers/alike.jpg",
     brand: "ViaLongeVita",
     site: "medscopeglobal.com",
-    topic: "lifestyle",
-    line: "Healthy living",
-    sub: "Food · Movement · Style",
-    shareTitle: "ViaLongeVita — healthy living · medscopeglobal.com",
+    topic: "longevity",
+    line: "Same face. Different years.",
+    sub: "Young lives. Older reads.",
+    shareTitle: "ViaLongeVita — same face · medscopeglobal.com",
   },
 ];
 

@@ -24,7 +24,7 @@ render() {
 
   ffmpeg -y -hide_banner -loglevel error \
     -loop 1 -i "$still" \
-    -vf "scale=1400:2100:force_original_aspect_ratio=increase,crop=1400:2100,zoompan=z='min(zoom+0.0007,1.10)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=200:s=1080x1920:fps=25,fade=t=in:st=0:d=0.5,fade=t=out:st=7.4:d=0.55,drawbox=x=0:y=1460:w=1080:h=460:color=0x021d33@0.64:t=fill,drawtext=fontfile=${FONT_BOLD}:textfile=${work}/brand.txt:fontsize=62:fontcolor=0xFFFFFF:x=(w-text_w)/2:y=1508,drawtext=fontfile=${FONT_SEMI}:textfile=${work}/line.txt:fontsize=40:fontcolor=0xC7E3FF:x=(w-text_w)/2:y=1592,drawtext=fontfile=${FONT_MED}:textfile=${work}/sub.txt:fontsize=30:fontcolor=0xE8F3FB:x=(w-text_w)/2:y=1650,drawtext=fontfile=${FONT_SEMI}:textfile=${work}/url.txt:fontsize=34:fontcolor=0xFFFFFF:x=(w-text_w)/2:y=1738" \
+    -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,zoompan=z='min(zoom+0.00045,1.06)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=200:s=1080x1920:fps=25,fade=t=in:st=0:d=0.5,fade=t=out:st=7.4:d=0.55,drawbox=x=0:y=1460:w=1080:h=460:color=0x021d33@0.64:t=fill,drawtext=fontfile=${FONT_BOLD}:textfile=${work}/brand.txt:fontsize=62:fontcolor=0xFFFFFF:x=(w-text_w)/2:y=1508,drawtext=fontfile=${FONT_SEMI}:textfile=${work}/line.txt:fontsize=40:fontcolor=0xC7E3FF:x=(w-text_w)/2:y=1592,drawtext=fontfile=${FONT_MED}:textfile=${work}/sub.txt:fontsize=30:fontcolor=0xE8F3FB:x=(w-text_w)/2:y=1650,drawtext=fontfile=${FONT_SEMI}:textfile=${work}/url.txt:fontsize=34:fontcolor=0xFFFFFF:x=(w-text_w)/2:y=1738" \
     -t 8 -an -c:v libx264 -pix_fmt yuv420p -preset medium -crf 22 -movflags +faststart \
     "$OUT/${id}.mp4"
 
@@ -33,7 +33,7 @@ render() {
   echo "rendered $OUT/${id}.mp4"
 }
 
-render healthspan "$SRC/healthspan.png" "Healthspan" "Longevity · Dlouhověkost"
-render sleep "$SRC/sleep.png" "Healthy sleep" "Rest · Zdravý spánek"
-render lifestyle "$SRC/lifestyle.png" "Healthy living" "Food · Movement · Style"
+render man "$SRC/man.png" "He reads. He stays." "Dlouhověkost · Longevity"
+render woman "$SRC/woman.png" "She reads. She stays." "Dlouhověkost · Longevity"
+render alike "$SRC/alike.png" "Same face. Different years." "Young lives. Older reads."
 ls -la "$OUT"
