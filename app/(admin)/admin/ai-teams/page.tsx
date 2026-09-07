@@ -7,7 +7,20 @@ import { AI_AGENT_GOAL_NEAR } from "@/lib/growth/ai-agent-program";
 export const dynamic = "force-dynamic";
 
 export default async function AdminAiTeamsPage() {
-  const dash = await loadArenaDashboard();
+  let dash;
+  try {
+    dash = await loadArenaDashboard();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "arena dashboard failed";
+    return (
+      <div className="space-y-4">
+        <h1 className="font-display text-3xl font-bold text-medical-navy">Růstová aréna</h1>
+        <p className="text-sm text-amber-800">
+          Vyhodnocení se teď nenačetlo ({message}). Obnovte stránku — cron běží dál.
+        </p>
+      </div>
+    );
+  }
   const live = dash.liveSubscribers;
 
   return (

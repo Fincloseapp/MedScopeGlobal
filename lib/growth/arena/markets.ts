@@ -183,8 +183,7 @@ export function scoreCountryMarkets(events: ArenaAnalyticsEvent[]): ArenaCountry
     const code = eventCountryCode(row.payload);
     if (code) seen.add(code);
   }
-  const countries = new Set([...knownArenaCountries(), ...seen]);
-  return [...countries]
+  return [...seen]
     .map((country) => {
       const alfa = withK(windowFromCountryEvents(events, "alfa", country));
       const beta = withK(windowFromCountryEvents(events, "beta", country));

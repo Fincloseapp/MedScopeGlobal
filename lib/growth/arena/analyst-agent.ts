@@ -37,7 +37,7 @@ export async function loadArenaEvents(sinceIso: string): Promise<ArenaAnalyticsE
   try {
     const rows: { event: unknown; payload: unknown }[] = [];
     const page = 1000;
-    for (let from = 0; from < 12_000; from += page) {
+    for (let from = 0; from < 4_000; from += page) {
       const { data, error } = await admin
         .from("analytics")
         .select("event, payload")

@@ -194,6 +194,10 @@ export async function runArenaTick(): Promise<ArenaTickResult> {
     const winner = decision.winner === "alfa" ? alfa : beta;
     const loser = decision.loser === "alfa" ? alfa : beta;
 
+    if (decision.action === "none") {
+      actions.push(decision.detail);
+    }
+
     if (decision.action === "allocate") {
       await upsertTeam({
         slug: winner.slug,
@@ -229,17 +233,29 @@ export async function runArenaTick(): Promise<ArenaTickResult> {
       });
     }
 
-    await writeEvolution({
-      action: decision.action,
-      winnerSlug: decision.winner,
-      loserSlug: decision.loser,
-      detail: decision.detail,
-    });
-    actions.push(decision.detail);
+    if (decision.action !== "none") {
+      await writeEvolution({
+        action: decision.action,
+        winnerSlug: decision.winner,
+        loserSlug: decision.loser,
+        detail: decision.detail,
+      });
+      actions.push(decision.detail);
+    }
   }
 
   let decided = 0;
   for (const market of markets) {
+    const activity =
+      market.alfa.visits +
+      market.alfa.checkouts +
+      market.alfa.paid +
+      market.alfa.newsletters +
+      market.beta.visits +
+      market.beta.checkouts +
+      market.beta.paid +
+      market.beta.newsletters;
+    if (activity === 0) continue;
     const alfaPts = scoreArenaWindow({
       window: market.alfa,
       actualK: market.alfa.kFactor,

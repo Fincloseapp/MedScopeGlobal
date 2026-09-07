@@ -97,6 +97,19 @@ export function decideEvolution(alfa: TeamRuntime, beta: TeamRuntime): Evolution
     };
   }
 
+  if (alfa.hourConversions === 0 && beta.hourConversions === 0) {
+    const ahead = alfa.teamPoints >= beta.teamPoints ? alfa : beta;
+    const behind = ahead.slug === "alfa" ? beta : alfa;
+    return {
+      action: "none",
+      winner: ahead.slug,
+      loser: behind.slug,
+      winnerQuota: alfa.reachQuota,
+      loserQuota: beta.reachQuota,
+      detail: "Souboj hodiny: 0–0. Bez konverze se kvóta ani série proher nemění.",
+    };
+  }
+
   const leader = alfa.hourConversions >= beta.hourConversions ? alfa : beta;
   const trailer = leader.slug === "alfa" ? beta : alfa;
   const quotas = allocateQuotas(leader.reachQuota, trailer.reachQuota);

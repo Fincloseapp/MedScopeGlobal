@@ -251,6 +251,10 @@ export default async function AdminDashboardPage() {
           <Link href="/admin/ai-agents" className="font-medium text-[#005B96] hover:underline">
             AI agenti
           </Link>
+          {" · "}
+          <Link href="/admin/ai-teams" className="font-medium text-[#005B96] hover:underline">
+            Vyhodnocení závodu AI
+          </Link>
         </p>
       </section>
 

@@ -396,15 +396,17 @@ export async function writeMetric(row: Omit<MetricRow, "createdAt">): Promise<vo
   }
 }
 
-export async function listMetrics(limit = 24): Promise<MetricRow[]> {
+export async function listMetrics(limit = 24, role?: string): Promise<MetricRow[]> {
   const admin = tryCreateServiceRoleClient();
   if (admin) {
     try {
-      const { data } = await admin
+      let q = admin
         .from("ai_agent_metrics")
         .select("*")
         .order("created_at", { ascending: false })
         .limit(limit);
+      if (role) q = q.eq("agent_role", role);
+      const { data } = await q;
       if (data?.length) {
         return data.map((row) => ({
           teamSlug: row.team_slug as ArenaTeamSlug,

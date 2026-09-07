@@ -38,6 +38,17 @@ export function scoreArenaWindow(input: {
   }
 
   const { window } = input;
+  const empty =
+    window.visits + window.checkouts + window.paid + window.newsletters === 0;
+  if (empty) {
+    return {
+      teamPointsDelta: 0,
+      roles: { content: 0, distribution: 0, analyst: 0 },
+      milestoneAwarded: false,
+      spam: false,
+      disqualified: false,
+    };
+  }
   const ctr = ctrOf(window);
   const content = Math.round(ctr * 1000 + window.checkouts * 4);
   const distribution = window.visits + window.newsletters * 3;

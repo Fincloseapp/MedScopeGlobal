@@ -2627,6 +2627,44 @@ assert.ok(
     );
     assert.equal(evo.action, "terminate-clone");
     assert.equal(evo.winner, "beta");
+    const emptyScore = scoreArenaWindow({
+      window: { visits: 0, checkouts: 0, paid: 0, newsletters: 0 },
+      predictedK: 0,
+      actualK: 0,
+      section3Users: 0,
+      spam: false,
+      alreadyAwardedMilestone: false,
+    });
+    assert.equal(emptyScore.teamPointsDelta, 0);
+    assert.equal(emptyScore.roles.analyst, 0);
+    const idle = decideEvolution(
+      {
+        slug: "alfa",
+        generation: 1,
+        status: "active",
+        teamPoints: 9000,
+        reachQuota: 240,
+        messageLimit: 240,
+        losingStreak: 0,
+        hourConversions: 0,
+        styleBias: "clinical-short",
+      },
+      {
+        slug: "beta",
+        generation: 1,
+        status: "active",
+        teamPoints: 8000,
+        reachQuota: 22,
+        messageLimit: 22,
+        losingStreak: 91,
+        hourConversions: 0,
+        styleBias: "sleep-focus",
+      }
+    );
+    assert.equal(idle.action, "none");
+    assert.equal(idle.winnerQuota, 240);
+    assert.equal(idle.loserQuota, 22);
+    assert.ok(readFileSync(join(root, "components/admin/arena-battle.tsx"), "utf8").includes("Vyhodnocení závodu"));
     const drafts = generateTeamDrafts({
       team: "alfa",
       styleBias: "clinical-short",

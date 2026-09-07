@@ -76,6 +76,48 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
       </div>
       {tickMsg ? <p className="text-sm text-slate-700">{tickMsg}</p> : null}
 
+      <section className="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-5">
+        <h2 className="font-display text-xl font-semibold">Vyhodnocení závodu — 7 dní</h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Vede tým s více zeměmi s reálným hopem. 0–0 kolo není výhra a nemění kvótu.
+        </p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4 text-sm">
+          <p className="rounded-lg border bg-white px-3 py-2">
+            Vítěz okna
+            <strong className="mt-1 block text-lg capitalize">
+              {dash.verdict?.traffic7d
+                ? dash.verdict.leader === "tie"
+                  ? "remíza"
+                  : dash.verdict.leader
+                : "bez provozu"}
+            </strong>
+          </p>
+          <p className="rounded-lg border bg-white px-3 py-2">
+            Body celkem Alfa / Beta
+            <strong className="mt-1 block text-lg">
+              {formatInt(alfa?.teamPoints ?? 0)} / {formatInt(beta?.teamPoints ?? 0)}
+            </strong>
+          </p>
+          <p className="rounded-lg border bg-white px-3 py-2">
+            Země s vedením
+            <strong className="mt-1 block text-lg">
+              {formatInt(dash.verdict?.alfaLeadCountries ?? 0)} /{" "}
+              {formatInt(dash.verdict?.betaLeadCountries ?? 0)}
+            </strong>
+          </p>
+          <p className="rounded-lg border bg-white px-3 py-2">
+            Mutace s vedením
+            <strong className="mt-1 block text-lg">
+              {formatInt(dash.verdict?.alfaLeadLocales ?? 0)} /{" "}
+              {formatInt(dash.verdict?.betaLeadLocales ?? 0)}
+            </strong>
+          </p>
+        </div>
+        {dash.verdict?.emptyReason ? (
+          <p className="mt-3 text-sm text-amber-900">{dash.verdict.emptyReason}</p>
+        ) : null}
+      </section>
+
       <section className="rounded-2xl border border-[#005B96]/20 bg-white p-5">
         <h2 className="font-display text-xl font-semibold">Růstový kanál — ne vymyšlené nuly</h2>
         <p className="mt-1 text-xs text-muted-foreground">
@@ -125,6 +167,11 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
           Guinej-Rovníková → <code>/es</code>, zbytek mezinárodní <code>/en</code> — ne <code>/en-us</code>.
           Návštěvy zůstanou 0, dokud z té země nepřijde hop.
         </p>
+        {(dash.africa ?? []).length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            {formatInt(dash.pipeline?.africaMapped ?? 0)} zemí namapováno, zatím 0 s hopem.
+          </p>
+        ) : (
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full text-sm">
             <thead className="bg-muted/50">
@@ -154,6 +201,7 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
             </tbody>
           </table>
         </div>
+        )}
       </section>
 
       <section>
@@ -358,6 +406,17 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
               </tr>
             </thead>
             <tbody>
+              {(dash.markets ?? []).every((row) => {
+                const activity =
+                  row.alfa.visits + row.alfa.checkouts + row.alfa.paid + row.beta.visits + row.beta.checkouts + row.beta.paid;
+                return activity === 0;
+              }) ? (
+                <tr className="border-t">
+                  <td className="px-3 py-3 text-sm text-muted-foreground" colSpan={5}>
+                    Za 7 dní žádný Alfa/Beta hop v jazykové mutaci.
+                  </td>
+                </tr>
+              ) : null}
               {(dash.markets ?? [])
                 .slice()
                 .sort((a, b) => {

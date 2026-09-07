@@ -20,7 +20,20 @@ function pct(part: number, whole: number): string {
 }
 
 export default async function AdminAiAgentsPage() {
-  const snap = await loadAiAgentGrowthSnapshot();
+  let snap;
+  try {
+    snap = await loadAiAgentGrowthSnapshot();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "ai-agent snapshot failed";
+    return (
+      <div className="space-y-4">
+        <h1 className="font-display text-3xl font-bold text-medical-navy">AI agenti — růst a žebříček</h1>
+        <p className="text-sm text-amber-800">
+          Žebříček se teď nenačetl ({message}). Cron attribution běží dál — obnovte stránku.
+        </p>
+      </div>
+    );
+  }
   const live = snap.subscribers.totalLive;
 
   return (

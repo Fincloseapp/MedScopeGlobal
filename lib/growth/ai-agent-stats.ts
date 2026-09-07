@@ -62,7 +62,7 @@ function dayKey(iso: string): string {
 }
 
 const ANALYTICS_PAGE = 1000;
-const ANALYTICS_MAX = 20_000;
+const ANALYTICS_MAX = 4_000;
 
 async function loadAnalyticsEvents(
   client: { from: (table: string) => any },
@@ -94,6 +94,18 @@ async function countSafe(
   } catch {
     return 0;
   }
+}
+
+export async function countLiveSubscriptions(): Promise<number> {
+  const service = tryCreateServiceRoleClient();
+  const session = service ? null : await createAdminReadClient().catch(() => null);
+  const client = service ?? session;
+  if (!client) return 0;
+  const [active, trialing] = await Promise.all([
+    countSafe(client.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "active")),
+    countSafe(client.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "trialing")),
+  ]);
+  return active + trialing;
 }
 
 export async function loadAiAgentGrowthSnapshot(): Promise<AiAgentGrowthSnapshot> {
