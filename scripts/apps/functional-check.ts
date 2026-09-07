@@ -4261,6 +4261,24 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.ok(getEditorialArticleGateCopy("de").ctaHref.includes("predplatne"));
   assert.ok(!getEditorialArticleGateCopy("en").headline.includes("VIP"));
   {
+    const gateSrc = readFileSync(join(root, "components/v38/article-conversion-gate.tsx"), "utf8");
+    const yearAt = gateSrc.indexOf('subscriptionProductId("public", "year")');
+    const monthAt = gateSrc.indexOf('subscriptionProductId("public", "month")');
+    assert.ok(yearAt > 0, "article gate must one-click pay Editorial year");
+    assert.ok(monthAt > yearAt, "annual Editorial CTA still comes before monthly");
+    assert.ok(gateSrc.includes("localizePublicHref"));
+    const webhookSrc = readFileSync(join(root, "app/api/stripe/webhook/route.ts"), "utf8");
+    assert.ok(webhookSrc.includes("isEditorialGrantProduct"));
+    assert.ok(webhookSrc.includes("findOrCreateReaderByEmail"));
+    assert.ok(webhookSrc.includes('?? "other"'));
+    const checkoutSrc = readFileSync(join(root, "lib/stripe/v27-checkout.ts"), "utf8");
+    assert.ok(checkoutSrc.includes('localizePublicHref("/predplatne?canceled=1"'));
+    assert.ok(checkoutSrc.includes("&product="));
+    const successSrc = readFileSync(join(root, "components/checkout/checkout-success-panel.tsx"), "utf8");
+    assert.ok(successSrc.includes('product.startsWith("public-")'));
+    assert.ok(successSrc.includes('localizePublicHref("/articles"'));
+  }
+  {
     const entity = getLegalEntity();
     assert.ok(entity.ico === "06024963");
     assert.ok(!formatLegalEntityLine(entity).includes("Třešňová"));

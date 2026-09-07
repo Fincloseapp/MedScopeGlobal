@@ -13,7 +13,8 @@ import {
   getStripeSecretKey,
   stripeWebhookCryptoProvider,
 } from "@/lib/stripe/client";
-import { isPhysicianGrantProduct, isStudentGrantProduct } from "@/lib/v27/config";
+import { isEditorialGrantProduct, isPhysicianGrantProduct, isStudentGrantProduct } from "@/lib/v27/config";
+import { normalizeAiAgentSlug } from "@/lib/growth/ai-agent-program";
 import {
   grantStudentClubAccess,
   revokeStudentClubAccess,
@@ -87,6 +88,36 @@ async function resolveV27UserId(
       .eq("stripe_session_id", opts.sessionId)
       .maybeSingle();
     if (data?.user_id) return data.user_id as string;
+  }
+  return null;
+}
+
+async function findOrCreateReaderByEmail(admin: AdminClient, email?: string | null): Promise<string | null> {
+  const normalized = String(email ?? "").trim().toLowerCase();
+  if (!normalized.includes("@")) return null;
+  const { data: profile } = await admin.from("users").select("id").eq("email", normalized).maybeSingle();
+  if (profile?.id) return profile.id as string;
+  const { data: created, error } = await admin.auth.admin.createUser({
+    email: normalized,
+    email_confirm: true,
+    user_metadata: { access_level: "public", source: "stripe-editorial" },
+  });
+  if (created.user?.id) {
+    await admin.from("users").upsert(
+      {
+        id: created.user.id,
+        email: normalized,
+        role: "user",
+        access_level: "public",
+        verification_status: "approved",
+      },
+      { onConflict: "id" }
+    );
+    return created.user.id;
+  }
+  if (error) {
+    const { data: again } = await admin.from("users").select("id").eq("email", normalized).maybeSingle();
+    if (again?.id) return again.id as string;
   }
   return null;
 }
@@ -395,29 +426,38 @@ export async function POST(request: Request) {
 
         const kind = session.metadata?.kind ?? "";
         const productId = session.metadata?.product_id;
-        if (
-          kind.includes("subscription") &&
-          productId &&
-          (isPhysicianGrantProduct(productId) || isStudentGrantProduct(productId))
-        ) {
+        if (kind.includes("subscription") && productId) {
           let periodEndIso: string | null = null;
           let subscriptionUserId: string | null = null;
+          let stripeSub: Stripe.Subscription | null = null;
           if (subscriptionId) {
             try {
-              const sub = await stripe.subscriptions.retrieve(subscriptionId);
-              periodEndIso = sub.current_period_end
-                ? new Date(sub.current_period_end * 1000).toISOString()
+              stripeSub = await stripe.subscriptions.retrieve(subscriptionId);
+              periodEndIso = stripeSub.current_period_end
+                ? new Date(stripeSub.current_period_end * 1000).toISOString()
                 : null;
-              subscriptionUserId = sub.metadata?.user_id ?? null;
+              subscriptionUserId = stripeSub.metadata?.user_id ?? null;
             } catch {
               // period end optional
             }
           }
-          const resolvedUserId = await resolveV27UserId(admin, {
+          let resolvedUserId = await resolveV27UserId(admin, {
             sessionUserId: userId,
             subscriptionUserId,
             sessionId: session.id,
           });
+          if (!resolvedUserId && (isEditorialGrantProduct(productId) || isPhysicianGrantProduct(productId) || isStudentGrantProduct(productId))) {
+            resolvedUserId = await findOrCreateReaderByEmail(admin, customerEmail);
+          }
+          if (resolvedUserId && stripeSub) {
+            const nextMeta = { ...stripeSub.metadata, user_id: resolvedUserId, product_id: productId };
+            try {
+              await stripe.subscriptions.update(stripeSub.id, { metadata: nextMeta });
+            } catch {
+              /* metadata write is best-effort */
+            }
+            await upsertSubscription(admin, { ...stripeSub, metadata: nextMeta }, ip);
+          }
           if (resolvedUserId && isPhysicianGrantProduct(productId)) {
             await grantV27PhysicianAccess(admin, resolvedUserId, productId, periodEndIso);
           }
@@ -427,20 +467,18 @@ export async function POST(request: Request) {
         }
 
         const aiRef = session.metadata?.ai_ref;
-        if (aiRef) {
-          const paidCountry = String(session.customer_details?.address?.country ?? "")
-            .trim()
-            .toUpperCase()
-            .replace(/[^A-Z]/g, "")
-            .slice(0, 2);
-          await logMonetizationEvent("ai_agent_paid", {
-            agent: aiRef,
-            locale: session.metadata?.locale ?? "",
-            productId: session.metadata?.product_id,
-            sessionId: session.id,
-            ...(paidCountry.length === 2 ? { country: paidCountry } : {}),
-          });
-        }
+        const paidCountry = String(session.customer_details?.address?.country ?? "")
+          .trim()
+          .toUpperCase()
+          .replace(/[^A-Z]/g, "")
+          .slice(0, 2);
+        await logMonetizationEvent("ai_agent_paid", {
+          agent: normalizeAiAgentSlug(String(aiRef ?? "")) ?? "other",
+          locale: session.metadata?.locale ?? "",
+          productId: session.metadata?.product_id,
+          sessionId: session.id,
+          ...(paidCountry.length === 2 ? { country: paidCountry } : {}),
+        });
 
         await logSecurityEvent({
           ip,

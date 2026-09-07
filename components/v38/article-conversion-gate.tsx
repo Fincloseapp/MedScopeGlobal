@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { Crown, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { V27CheckoutButton } from "@/components/v27/checkout-button";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { editorialAnnualCharge, editorialMonthlyCharge } from "@/lib/editorial/pricing";
+import { subscriptionProductId } from "@/lib/v27/config";
 import type { StoredNudge } from "@/lib/v38/conversion-engine";
 import { getPaywallPreviewText } from "@/lib/monetization/paywall-preview";
 import { VIP_TRIAL_DAYS } from "@/lib/vip";
@@ -56,10 +60,31 @@ function gateFooter(locale?: string | null, editorial = false) {
   };
 }
 
+function editorialPayLabels(locale?: string | null) {
+  const monthly = editorialMonthlyCharge(locale);
+  const annual = editorialAnnualCharge(locale);
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  if (primary === "de") {
+    return { year: `Jahresabo ${annual.formatted}`, month: `Monatlich ${monthly.formatted}` };
+  }
+  if (primary === "fr") {
+    return { year: `Annuel ${annual.formatted}`, month: `Mensuel ${monthly.formatted}` };
+  }
+  if (primary !== "cs") {
+    return { year: `Yearly ${annual.formatted}`, month: `Monthly ${monthly.formatted}` };
+  }
+  return { year: `Ročně ${annual.formatted}`, month: `Měsíčně ${monthly.formatted}` };
+}
+
 /** Paywall gate with content teaser — VIP or Redakce copy is passed in. */
 export function ArticleConversionGate({ copy, teaserHtml, title, locale }: Props) {
   const teaserText = teaserHtml ? getPaywallPreviewText(teaserHtml) : null;
-  const footer = gateFooter(locale, Boolean(copy.ctaHref?.includes("#public")));
+  const editorial = Boolean(copy.ctaHref?.includes("#public"));
+  const footer = gateFooter(locale, editorial);
+  const loc = locale ?? "cs";
+  const compareHref = localizePublicHref(copy.ctaHref || "/predplatne", loc);
+  const accountHref = localizePublicHref("/account", loc);
+  const pay = editorial ? editorialPayLabels(locale) : null;
 
   return (
     <div className="overflow-hidden rounded-2xl border border-[#005B96]/20 bg-gradient-to-b from-white to-[#f0f7ff] shadow-sm dark:from-slate-900 dark:to-[#005B96]/5">
@@ -97,19 +122,37 @@ export function ArticleConversionGate({ copy, teaserHtml, title, locale }: Props
           <p className="text-sm text-muted-foreground">{copy.body}</p>
           <p className="text-sm font-medium text-emerald-700">{footer.trial}</p>
         </div>
-        <Button asChild size="lg" className="bg-[#005B96] hover:bg-[#004a7a]">
-          <Link href={copy.ctaHref || "/predplatne"}>
-            <Crown className="mr-2 h-4 w-4" />
-            {copy.ctaLabel || footer.trial}
-          </Link>
-        </Button>
+        {editorial && pay ? (
+          <div className="flex w-full max-w-sm flex-col gap-2">
+            <V27CheckoutButton
+              kind="subscription"
+              productId={subscriptionProductId("public", "year")}
+              locale={loc}
+              label={pay.year}
+            />
+            <V27CheckoutButton
+              kind="subscription"
+              productId={subscriptionProductId("public", "month")}
+              locale={loc}
+              label={pay.month}
+              className="w-full border border-[#005B96]/30 bg-white text-[#005B96] hover:bg-[#f0f7ff]"
+            />
+          </div>
+        ) : (
+          <Button asChild size="lg" className="bg-[#005B96] hover:bg-[#004a7a]">
+            <Link href={compareHref}>
+              <Crown className="mr-2 h-4 w-4" />
+              {copy.ctaLabel || footer.trial}
+            </Link>
+          </Button>
+        )}
         <p className="text-xs text-slate-500">
           {footer.haveAccount}{" "}
-          <Link href="/account" className="text-[#005B96] underline">
+          <Link href={accountHref} className="text-[#005B96] underline">
             {footer.signIn}
           </Link>
           {" · "}
-          <Link href="/predplatne" className="text-[#005B96] underline">
+          <Link href={compareHref} className="text-[#005B96] underline">
             {footer.compare}
           </Link>
         </p>

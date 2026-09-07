@@ -5,6 +5,7 @@ import { createStripeClient, getStripeSecretKey } from "@/lib/stripe/client";
 import { resolveV27CheckoutItem, type V27CheckoutKind } from "@/lib/v27/stripe-products";
 import { convertCzkToCharge } from "@/lib/i18n/payment-currency";
 import { isEditorialGrantProduct, isStudentGrantProduct, subscriptionTrialDays } from "@/lib/v27/config";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { editorialAnnualCharge, editorialMonthlyCharge } from "@/lib/editorial/pricing";
 import { studentIntroCharge, studentMonthlyCharge } from "@/lib/studenti/pricing";
 
@@ -105,8 +106,10 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode: item.mode,
     locale: stripeCheckoutLocale(locale),
-    success_url: `${SITE.url}/checkout/uspesne?session_id={CHECKOUT_SESSION_ID}${gift ? "&gift=1" : ""}`,
-    cancel_url: `${SITE.url}/predplatne?canceled=1`,
+    success_url: `${SITE.url}/checkout/uspesne?session_id={CHECKOUT_SESSION_ID}${gift ? "&gift=1" : ""}${
+      isEditorialGrantProduct(productId) ? `&product=${encodeURIComponent(productId)}` : ""
+    }${locale ? `&locale=${encodeURIComponent(locale)}` : ""}`,
+    cancel_url: `${SITE.url}${localizePublicHref("/predplatne?canceled=1", locale ?? "cs")}`,
     payment_method_types: ["card"],
     after_expiration: {
       recovery: {
