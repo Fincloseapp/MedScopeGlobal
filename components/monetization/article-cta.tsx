@@ -2,10 +2,11 @@
 
 import { useEffect, useState, type MouseEvent } from "react";
 import Link from "next/link";
-import { Heart, Share2, BookmarkPlus, Crown } from "lucide-react";
+import { Heart, BookmarkPlus, Crown } from "lucide-react";
 import { formatDonationAmount } from "@/lib/ecosystem/monetization";
 import { paymentTiersForUser } from "@/lib/i18n/payment-currency";
 import { getArticleChrome } from "@/lib/i18n/article-chrome";
+import { SocialShareStrip } from "@/components/social/social-share-strip";
 import { DONATION_COPY, ARTICLE_TIP_COPY, tipLocale } from "@/lib/ecosystem/tip-copy";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { MEDIFLOW_STORAGE_KEY, demoMediFlowDashboard } from "@/lib/mediflow/types";
@@ -230,24 +231,11 @@ export function ArticleShareButton({
   locale?: string;
 }) {
   const chrome = getArticleChrome(locale);
-  const share = async () => {
-    const url = `${window.location.origin}/article/${slug}`;
-    if (navigator.share) {
-      await navigator.share({ title, url });
-    } else {
-      await navigator.clipboard.writeText(url);
-    }
-  };
 
   return (
-    <button
-      type="button"
-      onClick={share}
-      className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 underline-offset-2 hover:text-[#005B96] hover:underline"
-    >
-      <Share2 className="h-3.5 w-3.5" />
-      {chrome.share}
-    </button>
+    <div aria-label={chrome.share}>
+      <SocialShareStrip title={title} path={`/article/${slug}`} locale={locale} />
+    </div>
   );
 }
 

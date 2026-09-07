@@ -1,3 +1,5 @@
+import { AFRICA_GEO_LOCALE_MAP } from "@/lib/growth/africa-markets";
+
 /** Global locale configuration for MedScopeGlobal ecosystem */
 
 export const GLOBAL_LOCALES = [
@@ -35,6 +37,7 @@ export const GEO_LOCALE_MAP: Record<string, GlobalLocaleCode> = {
   RU: "ru", BY: "be", UA: "uk", KZ: "ru",
   CN: "zh-CN", TW: "zh-CN", HK: "zh-CN",
   JP: "ja", KR: "ko", VN: "vi", ID: "id",
+  ...AFRICA_GEO_LOCALE_MAP,
 };
 
 export function localeFromCountry(countryCode: string | null | undefined): GlobalLocaleCode {

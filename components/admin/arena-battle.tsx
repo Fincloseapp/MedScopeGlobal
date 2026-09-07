@@ -76,6 +76,112 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
       </div>
       {tickMsg ? <p className="text-sm text-slate-700">{tickMsg}</p> : null}
 
+      <section className="rounded-2xl border border-[#005B96]/20 bg-white p-5">
+        <h2 className="font-display text-xl font-semibold">Růstový kanál — ne vymyšlené nuly</h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Cron, IndexNow a hopy nenahradí Stripe. Nula zaplacených je pravda, dokud někdo nezaplatí.
+          Níže je živá fronta: mapa Afriky, sociální drafty, locale hopy.
+        </p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6 text-sm">
+          <p className="rounded-lg border bg-slate-50 px-3 py-2">
+            Předplatná teď
+            <strong className="mt-1 block text-lg">{formatInt(dash.liveSubscribers)}</strong>
+          </p>
+          <p className="rounded-lg border bg-slate-50 px-3 py-2">
+            7 dní visit / checkout / paid
+            <strong className="mt-1 block text-lg">
+              {formatInt(dash.pipeline?.visits7d ?? 0)} / {formatInt(dash.pipeline?.checkouts7d ?? 0)} /{" "}
+              {formatInt(dash.pipeline?.paid7d ?? 0)}
+            </strong>
+          </p>
+          <p className="rounded-lg border bg-slate-50 px-3 py-2">
+            IndexNow kvóta
+            <strong className="mt-1 block text-lg">{formatInt(dash.pipeline?.indexNowQuota ?? 0)}</strong>
+          </p>
+          <p className="rounded-lg border bg-slate-50 px-3 py-2">
+            Sociální drafty
+            <strong className="mt-1 block text-lg">{formatInt(dash.pipeline?.socialDraftsHeld ?? 0)}</strong>
+          </p>
+          <p className="rounded-lg border bg-slate-50 px-3 py-2">
+            Afrika mapována
+            <strong className="mt-1 block text-lg">{formatInt(dash.pipeline?.africaMapped ?? 0)}</strong>
+          </p>
+          <p className="rounded-lg border bg-slate-50 px-3 py-2">
+            Afrika s provozem
+            <strong className="mt-1 block text-lg">{formatInt(dash.pipeline?.africaWithTraffic ?? 0)}</strong>
+          </p>
+        </div>
+        <ol className="mt-4 list-decimal space-y-1 pl-5 text-sm text-slate-700">
+          {(dash.pipeline?.nextActions ?? []).map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ol>
+      </section>
+
+      <section>
+        <h2 className="mb-2 font-display text-xl font-semibold">Afrika — hotové mutace fr / en / pt / es</h2>
+        <p className="mb-2 text-xs text-muted-foreground">
+          Žádná nová locale (žádné sw/yo/am/ar). Maghreb → <code>/fr</code>, lusofonní → <code>/pt</code>,
+          Guinej-Rovníková → <code>/es</code>, zbytek mezinárodní <code>/en</code> — ne <code>/en-us</code>.
+          Návštěvy zůstanou 0, dokud z té země nepřijde hop.
+        </p>
+        <div className="overflow-x-auto rounded-xl border">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="px-3 py-2 text-left">Země</th>
+                <th className="px-3 py-2 text-left">Edice</th>
+                <th className="px-3 py-2 text-right">Návštěvy</th>
+                <th className="px-3 py-2 text-right">Checkout</th>
+                <th className="px-3 py-2 text-right">Zaplaceno</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(dash.africa ?? []).map((row) => {
+                const live = row.visits + row.checkouts + row.paid > 0;
+                return (
+                  <tr key={row.country} className={`border-t ${live ? "bg-emerald-50/30" : ""}`}>
+                    <td className="px-3 py-2 font-medium">
+                      {row.country} · {countryName(row.country)}
+                    </td>
+                    <td className="px-3 py-2 text-xs text-slate-600">/{row.locale}</td>
+                    <td className="px-3 py-2 text-right">{formatInt(row.visits)}</td>
+                    <td className="px-3 py-2 text-right">{formatInt(row.checkouts)}</td>
+                    <td className="px-3 py-2 text-right">{formatInt(row.paid)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-2 font-display text-xl font-semibold">Sociální fronta — lidský post</h2>
+        <p className="mb-2 text-xs text-muted-foreground">
+          Instagram, Facebook, WhatsApp, LinkedIn. Cron draft drží a neodesílá. Cíl: předplatitelé
+          Redakce a B2B <code>/firmy/reklama/nova</code>.
+        </p>
+        {(dash.socialQueue ?? []).length === 0 ? (
+          <p className="text-sm text-muted-foreground">Žádný draft — spusťte kolo, nebo počkejte na cron.</p>
+        ) : (
+          <ul className="space-y-2">
+            {(dash.socialQueue ?? []).map((row, index) => (
+              <li
+                key={`${row.team}-${row.network ?? "social"}-${row.locale}-${index}`}
+                className="rounded-lg border bg-white px-3 py-2 text-sm"
+              >
+                <p className="font-medium">
+                  {row.network ?? "social"} · {row.locale} · {row.team}
+                </p>
+                <p className="text-xs text-slate-600">{row.headline}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{row.body}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       <div className="grid gap-4 lg:grid-cols-2">
         {[alfa, beta].map((team) => {
           if (!team) return null;

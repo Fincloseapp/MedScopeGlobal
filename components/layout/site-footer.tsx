@@ -4,6 +4,7 @@ import { ViaLongeVitaMark } from "@/components/brand/vialongevita-mark";
 import { getSurfaceCopy, isCzechSurface } from "@/lib/i18n/surface-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
+import { OfficialSocialLinks } from "@/components/social/official-social-links";
 import {
   HeurekaTextLink,
   shouldShowHeurekaTextLink,
@@ -30,6 +31,7 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
           <div className="mt-5 max-w-sm">
             <NewsletterCapture locale={locale} source="footer" variant="compact" />
           </div>
+          <OfficialSocialLinks locale={locale} />
         </div>
 
         <div>

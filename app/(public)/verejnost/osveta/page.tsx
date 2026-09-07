@@ -23,6 +23,8 @@ import {
   listPublicHealthVideos,
 } from "@/lib/verejnost/osveta/db";
 import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
+import { SocialShareStrip } from "@/components/social/social-share-strip";
+import { getShareCopy } from "@/lib/i18n/share-copy";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export const revalidate = 120;
@@ -71,6 +73,13 @@ export default async function OsvetaHubPage() {
             description={chrome.todayLessonLead}
           />
           <PublicHealthVideoCard video={today} featured locale={locale} />
+          <div className="mt-4">
+            <SocialShareStrip
+              title={await translatePublicTitle(today.title, locale, getShareCopy(locale).clipsTitle)}
+              path={`/verejnost/osveta/${today.slug}`}
+              locale={locale}
+            />
+          </div>
         </section>
       ) : (
         <section id="dnesni-lekce" className="mb-12 scroll-mt-24">

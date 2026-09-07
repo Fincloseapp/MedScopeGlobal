@@ -14,11 +14,13 @@ import {
 import { formatPublicDate } from "@/lib/i18n/format-date";
 import { PublicHealthVideoCard } from "@/components/verejnost/public-health-video-card";
 import { getVerejnostChrome } from "@/lib/i18n/verejnost-chrome";
-import { getArticleChrome } from "@/lib/i18n/article-chrome";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { topicLabelForSlug } from "@/lib/config/verejnost-topics";
 import { translatePublicTitle } from "@/lib/verejnost/translate-public-text";
 import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
+import { SocialShareStrip } from "@/components/social/social-share-strip";
+import { isShareableVideoUrl } from "@/lib/social/share-intents";
+import { SITE } from "@/lib/config/site";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export const revalidate = 120;
@@ -32,12 +34,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const video = await getPublicHealthVideoBySlug(slug);
   if (!video) return { title: chrome.videoNotFound };
   const title = await translatePublicTitle(video.title, locale, chrome.hubs.osveta.title);
+  const videoUrl = isShareableVideoUrl(video.video_url) ? video.video_url : undefined;
   return {
     title: `${title} | ${chrome.ctaOsveta} | MedScopeGlobal`,
     description: video.script.slice(0, 160),
     openGraph: {
       title,
       images: video.thumbnail_url ? [{ url: video.thumbnail_url }] : [],
+      ...(videoUrl
+        ? {
+            videos: [{ url: videoUrl.startsWith("http") ? videoUrl : `${SITE.url}${videoUrl}` }],
+          }
+        : {}),
     },
   };
 }
@@ -70,11 +78,8 @@ export default async function OsvetaVideoPage({ params }: Props) {
     ? topicLabelForSlug(video.topic.category, locale)
     : chrome.hubs.osveta.title;
 
-  const sharePath = localizePublicHref(`/verejnost/osveta/${slug}`, locale);
-  const shareUrl = `https://medscopeglobal.com${sharePath}`;
   const dateLabel = formatPublicDate(video.published_at, locale);
   const minutes = Math.max(1, Math.round(video.duration_seconds / 60));
-  const shareLabel = getArticleChrome(locale).share;
 
   return (
     <div className="min-h-screen bg-[#f4f8fc]">
@@ -103,18 +108,11 @@ export default async function OsvetaVideoPage({ params }: Props) {
           <OsvetaVideoWithConversion video={video} quiz={quiz} isVip={isVip} />
         </div>
 
-        <div className="mt-8 flex flex-wrap gap-3">
-          <a
-            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(shareUrl)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-[#005B96]/30"
-          >
-            {shareLabel}
-          </a>
+        <div className="mt-8 space-y-3">
+          <SocialShareStrip title={title} path={`/verejnost/osveta/${slug}`} locale={locale} />
           <Link
             href={localizePublicHref("/verejnost/zebricek", locale)}
-            className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-[#005B96] transition hover:border-[#005B96]/30"
+            className="inline-flex rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-[#005B96] transition hover:border-[#005B96]/30"
           >
             {chrome.xpLeaderboard}
           </Link>

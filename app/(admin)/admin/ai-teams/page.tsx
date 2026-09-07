@@ -18,7 +18,7 @@ export default async function AdminAiTeamsPage() {
           Multi-agent arena
         </p>
         <h1 className="mt-2 font-display text-3xl font-bold text-medical-navy">
-          Souboj týmů Alfa vs Beta
+          Růstová aréna — předplatné a inzerce
         </h1>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">{dash.honesty}</p>
         <p className="mt-2 text-sm">
@@ -26,11 +26,18 @@ export default async function AdminAiTeamsPage() {
           10. 9. · {dash.goals.nearPace.onTrack ? "na cestě" : "mimo tempo"} — {dash.goals.nearPace.label}
         </p>
         <p className="mt-2 text-sm">
-          Priorita sekcí:{" "}
-          {dash.sections.map((row) => `${row.priority}. ${row.label}`).join(" → ")}
+          Priorita: předplatitelé Redakce, potom B2B inzerce, až pak souboj Alfa/Beta.
           {" · "}
           <Link href="/admin/ai-agents" className="font-medium text-[#005B96] hover:underline">
             Externí AI agenti
+          </Link>
+          {" · "}
+          <Link href="/admin/revenue" className="font-medium text-[#005B96] hover:underline">
+            Tržby
+          </Link>
+          {" · "}
+          <Link href="/admin/ads-requests" className="font-medium text-[#005B96] hover:underline">
+            Žádosti o reklamu
           </Link>
         </p>
       </div>

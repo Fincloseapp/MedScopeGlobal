@@ -6,6 +6,7 @@ import {
   V272WhyTrustBlock,
 } from "@/components/v271/homepage-sections";
 import { HomepageLongevityStrip } from "@/components/v271/homepage-longevity-strip";
+import { HomepageClipsStrip } from "@/components/v271/homepage-clips-strip";
 import { PortalHome } from "@/components/v271/portal-home";
 import { HomepageAffiliateShelf } from "@/components/monetization/affiliate-box";
 import { HomepageRevenueMix } from "@/components/monetization/homepage-revenue-mix";
@@ -120,6 +121,7 @@ export default async function HomePage() {
         locale={locale}
         exclusive
       />
+      <HomepageClipsStrip locale={locale} />
       <HomepageRevenueMix locale={locale} isVip={isVip} />
       {!isVip ? <HomepageAffiliateShelf locale={locale} /> : null}
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />

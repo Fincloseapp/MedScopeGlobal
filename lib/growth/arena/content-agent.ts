@@ -1,9 +1,12 @@
 import {
+  HUMAN_SOCIAL_NETWORKS,
   sectionsByPriority,
   type ArenaSectionId,
   type ArenaTeamSlug,
   type ContentStyle,
+  type SocialNetwork,
 } from "@/lib/growth/arena/config";
+import { AFRICA_DISCOVERY_LOCALES } from "@/lib/growth/africa-markets";
 import { ARENA_DISCOVERY_LOCALES } from "@/lib/growth/arena/locales";
 import { arenaHopUrl } from "@/lib/growth/arena/refs";
 import { looksLikeSpam } from "@/lib/growth/arena/metrics";
@@ -15,6 +18,7 @@ export type ContentDraft = {
   style: ContentStyle;
   locale: string;
   channel: "hop" | "newsletter" | "social-draft";
+  network?: SocialNetwork;
   headline: string;
   body: string;
   ctaUrl: string;
@@ -155,6 +159,39 @@ export function generateTeamDrafts(input: {
         section: section.id,
         locale: section.czechOnly ? "cs" : "en",
       }),
+      spam: false,
+    });
+  }
+  const vialongevita = COPY.vialongevita[style];
+  for (const network of HUMAN_SOCIAL_NETWORKS) {
+    const locale = network === "whatsapp" ? "en" : network === "linkedin" ? "en" : "cs";
+    drafts.push({
+      team: input.team,
+      section: "vialongevita",
+      style,
+      locale,
+      channel: "social-draft",
+      network,
+      headline: vialongevita.headline,
+      body:
+        network === "linkedin"
+          ? `${vialongevita.body} LinkedIn draft — předplatné + /firmy/reklama/nova. Lidský účet, cron neposílá.`
+          : `${vialongevita.body} ${network} draft pro lidský účet. Cíl: předplatitelé Redakce. Systém neposílá hromadné zprávy.`,
+      ctaUrl: arenaHopUrl({ team: input.team, section: "vialongevita", locale }),
+      spam: false,
+    });
+  }
+  for (const locale of AFRICA_DISCOVERY_LOCALES) {
+    drafts.push({
+      team: input.team,
+      section: "vialongevita",
+      style,
+      locale,
+      channel: "social-draft",
+      network: "whatsapp",
+      headline: vialongevita.headline,
+      body: `${vialongevita.body} Afrika: hotová mutace /${locale} (WhatsApp). Žádný nový jazyk. Draft držen — lidský post.`,
+      ctaUrl: arenaHopUrl({ team: input.team, section: "vialongevita", locale }),
       spam: false,
     });
   }

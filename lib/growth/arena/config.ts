@@ -58,12 +58,23 @@ export const CONTENT_STYLES = [
 ] as const;
 export type ContentStyle = (typeof CONTENT_STYLES)[number];
 
+export type SocialNetwork =
+  | "x"
+  | "reddit"
+  | "tiktok"
+  | "instagram"
+  | "facebook"
+  | "whatsapp"
+  | "linkedin";
+
 export type SocialAccount = {
   id: string;
-  network: "x" | "reddit" | "tiktok";
+  network: SocialNetwork;
   handle: string;
   organicWeight: number;
 };
+
+export const HUMAN_SOCIAL_NETWORKS = ["instagram", "facebook", "whatsapp", "linkedin"] as const;
 
 export const TEAM_SEED: Record<
   ArenaTeamSlug,
@@ -76,6 +87,10 @@ export const TEAM_SEED: Record<
       { id: "alfa-x", network: "x", handle: "@vialongevita_alfa", organicWeight: 1 },
       { id: "alfa-reddit", network: "reddit", handle: "u/vialongevita_alfa", organicWeight: 0.9 },
       { id: "alfa-tiktok", network: "tiktok", handle: "@vialongevita_alfa", organicWeight: 0.7 },
+      { id: "alfa-ig", network: "instagram", handle: "instagram (fronta draftů)", organicWeight: 1.1 },
+      { id: "alfa-fb", network: "facebook", handle: "facebook (fronta draftů)", organicWeight: 1.1 },
+      { id: "alfa-wa", network: "whatsapp", handle: "whatsapp (fronta draftů)", organicWeight: 1.2 },
+      { id: "alfa-li", network: "linkedin", handle: "linkedin (fronta draftů)", organicWeight: 1 },
     ],
   },
   beta: {
@@ -85,6 +100,10 @@ export const TEAM_SEED: Record<
       { id: "beta-x", network: "x", handle: "@vialongevita_beta", organicWeight: 0.85 },
       { id: "beta-reddit", network: "reddit", handle: "u/vialongevita_beta", organicWeight: 0.8 },
       { id: "beta-tiktok", network: "tiktok", handle: "@vialongevita_beta", organicWeight: 0.6 },
+      { id: "beta-ig", network: "instagram", handle: "instagram (fronta draftů)", organicWeight: 1 },
+      { id: "beta-fb", network: "facebook", handle: "facebook (fronta draftů)", organicWeight: 1 },
+      { id: "beta-wa", network: "whatsapp", handle: "whatsapp (fronta draftů)", organicWeight: 1.15 },
+      { id: "beta-li", network: "linkedin", handle: "linkedin (fronta draftů)", organicWeight: 0.95 },
     ],
   },
 };

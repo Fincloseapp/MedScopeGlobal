@@ -7,3 +7,4 @@ export { runArenaTick } from "@/lib/growth/arena/tick";
 export { loadArenaDashboard } from "@/lib/growth/arena/dashboard";
 export { arenaMarkets, countriesForLocale, parseEditionLocale, scoreLocaleMarkets } from "@/lib/growth/arena/markets";
 export { generateTeamDrafts, styleFromKnowledge } from "@/lib/growth/arena/content-agent";
+export { AFRICA_GEO_LOCALE_MAP, africaCountryCodes, africaLocaleForCountry } from "@/lib/growth/africa-markets";

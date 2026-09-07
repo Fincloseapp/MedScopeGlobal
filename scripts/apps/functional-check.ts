@@ -216,6 +216,9 @@ import {
   createEditorialQueueItem,
 } from "../../lib/ecosystem/editorial";
 import { GLOBAL_LOCALES, localeFromCountry } from "../../lib/ecosystem/locales";
+import { africaCountryCodes, AFRICA_GEO_LOCALE_MAP } from "../../lib/growth/africa-markets";
+import { getShareCopy } from "../../lib/i18n/share-copy";
+import { buildShareIntents, isShareableVideoUrl, publicAbsoluteUrl } from "../../lib/social/share-intents";
 import { localeToPathSegment } from "../../lib/i18n/locale-path";
 import { ARENA_DISCOVERY_LOCALES } from "../../lib/growth/arena/locales";
 import { arenaPulsePaths } from "../../lib/growth/arena/worker-pulse";
@@ -2562,6 +2565,11 @@ assert.ok(
       },
     });
     assert.ok(drafts.some((row) => row.style === "sleep-focus"));
+    assert.ok(drafts.some((row) => row.channel === "social-draft" && row.network === "instagram"));
+    assert.ok(drafts.some((row) => row.channel === "social-draft" && row.network === "facebook"));
+    assert.ok(drafts.some((row) => row.channel === "social-draft" && row.network === "whatsapp" && row.locale === "fr"));
+    assert.ok(drafts.some((row) => row.channel === "social-draft" && row.network === "linkedin"));
+    assert.ok(drafts.every((row) => !/Tým Alfa|Tým Beta/.test(`${row.headline} ${row.body}`)));
     assert.ok(drafts.every((row) => row.section !== "mediprep" || row.locale === "cs"));
     assert.equal(
       new Set(drafts.filter((row) => row.section === "vialongevita" && row.channel !== "social-draft").map((row) => row.locale)).size,
@@ -2596,6 +2604,33 @@ assert.ok(
     assert.deepEqual(countriesForLocale("de").sort(), ["AT", "CH", "DE"]);
     assert.ok(countriesForLocale("en-US").includes("US"));
     assert.ok(countriesForLocale("en-US").includes("CA"));
+    assert.ok(countriesForLocale("fr").includes("SN"));
+    assert.ok(countriesForLocale("fr").includes("MA"));
+    assert.ok(countriesForLocale("en").includes("NG"));
+    assert.ok(countriesForLocale("en").includes("ZA"));
+    assert.ok(!countriesForLocale("en-US").includes("NG"));
+    assert.ok(countriesForLocale("pt").includes("AO"));
+    assert.ok(countriesForLocale("es").includes("GQ"));
+    assert.equal(localeFromCountry("NG"), "en");
+    assert.equal(localeFromCountry("SN"), "fr");
+    assert.equal(localeFromCountry("AO"), "pt");
+    assert.equal(localeFromCountry("GQ"), "es");
+    assert.equal(localeFromCountry("US"), "en-US");
+    assert.equal(AFRICA_GEO_LOCALE_MAP.EG, "en");
+    assert.ok(africaCountryCodes().includes("KE"));
+    assert.ok(publicAbsoluteUrl("/predplatne", "fr").includes("/fr/predplatne"));
+    const share = buildShareIntents({ title: "ViaLongeVita", url: "https://medscopeglobal.com/fr/predplatne" });
+    assert.ok(share.facebook.includes("facebook.com/sharer"));
+    assert.ok(share.whatsapp.includes("api.whatsapp.com/send"));
+    assert.ok(share.linkedin.includes("linkedin.com/sharing"));
+    assert.ok(isShareableVideoUrl("https://cdn.example.com/clip.mp4"));
+    assert.ok(!isShareableVideoUrl("https://cdn.example.com/voice.m4a"));
+    assert.ok(!looksLikeCzech(getShareCopy("fr").clipsLead));
+    assert.equal(getShareCopy("sk").native, "Share");
+    assert.ok(readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("HomepageClipsStrip"));
+    assert.ok(readFileSync(join(root, "components/v271/homepage-sections.tsx"), "utf8").includes("/firmy/reklama/nova"));
+    assert.ok(!readFileSync(join(root, "lib/growth/arena/distribution-agent.ts"), "utf8").includes("instagram.com/api"));
+    assert.ok(!readFileSync(join(root, "lib/growth/arena/distribution-agent.ts"), "utf8").includes("graph.facebook.com"));
     assert.equal(parseEditionLocale("jp"), "ja");
     assert.equal(parseEditionLocale("cn"), "zh-CN");
     assert.equal(parseEditionLocale("en-us"), "en-US");

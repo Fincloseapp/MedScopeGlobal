@@ -224,7 +224,7 @@ export function V271AudienceSections() {
 export function V271B2bBlock({ locale = "cs" }: { locale?: string }) {
   const surface = getSurfaceCopy(locale);
   const revenue = getRevenueCopy(locale);
-  const formHref = localizePublicHref("/inzerce/formular", locale);
+  const formHref = localizePublicHref("/firmy/reklama/nova", locale);
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="rounded-3xl border border-[#005B96]/15 bg-[#005B96]/5 px-6 py-8">
