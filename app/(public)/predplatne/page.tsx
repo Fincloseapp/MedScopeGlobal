@@ -65,7 +65,7 @@ export default async function PredplatnePage({
       </div>
 
       <div className="mt-10">
-        <SubscriptionTrialBanner locale={locale} />
+        <SubscriptionTrialBanner locale={locale} region={region} />
       </div>
 
       {highlightTrial ? (

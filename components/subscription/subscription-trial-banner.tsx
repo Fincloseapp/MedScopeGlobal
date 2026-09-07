@@ -1,8 +1,14 @@
 import { Sparkles } from "lucide-react";
 import { getSubscribeCopy } from "@/lib/i18n/subscribe-copy";
 
-export function SubscriptionTrialBanner({ locale = "cs" }: { locale?: string }) {
-  const copy = getSubscribeCopy(locale);
+export function SubscriptionTrialBanner({
+  locale = "cs",
+  region,
+}: {
+  locale?: string;
+  region?: string | null;
+}) {
+  const copy = getSubscribeCopy(locale, region);
   return (
     <div
       className="relative overflow-hidden rounded-2xl border border-[#005B96]/25 bg-gradient-to-r from-[#005B96] via-[#0077c2] to-[#005B96] px-6 py-8 text-center text-white shadow-lg"

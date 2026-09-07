@@ -3754,6 +3754,10 @@ console.log("✓ magazine desk byline and copy checks passed");
     assert.ok(bannerSrc.includes("bannerLead"), "subscribe banner must sell the benefit, not dump all four plans");
     assert.notEqual(getSubscribeCopy("cs").editorialBadge, getSubscribeCopy("cs").daysFree);
     assert.ok(!/platí hned/i.test(getSubscribeCopy("cs").bannerTitle));
+    assert.ok(getSubscribeCopy("cs").bannerTitle.includes("jen za"));
+    assert.ok(/25/.test(getSubscribeCopy("cs").bannerTitle));
+    assert.ok(getSubscribeCopy("de").bannerTitle.includes("nur"));
+    assert.ok(getSubscribeCopy("fr").bannerTitle.includes("seulement"));
   }
   {
     const pricingSrc = readFileSync(join(root, "app/(public)/pricing/page.tsx"), "utf8");

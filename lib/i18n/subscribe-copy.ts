@@ -2,6 +2,7 @@ import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { localizeCurrencyToken, localizeListedCzkIn } from "@/lib/i18n/payment-currency";
 import { rewriteCzechInstitutions } from "@/lib/i18n/local-regulator";
+import { editorialMonthlyBannerPrice } from "@/lib/editorial/pricing";
 import type { V27SubscriptionTier } from "@/lib/v27/config";
 
 export type SubscribePlanCopy = {
@@ -111,9 +112,9 @@ const COPY: Record<string, SubscribeCopy> = {
     daysFree: "14 dní zdarma",
     editorialBadge: "Hned k dispozici",
     bannerKicker: "Redakce ViaLongeVita",
-    bannerTitle: "Zbytek článku máte hned",
+    bannerTitle: "Zbytek článku máte hned — jen za {price}",
     bannerLead:
-      "Roční přístup má dva měsíce v ceně. Kartou se text otevře teď — zrušíte kdykoli.",
+      "Měsíčně jen {price}. Roční přístup má dva měsíce v ceně. Kartou se text otevře teď — zrušíte kdykoli.",
     billedNow: "Otevře se hned",
     startEditorialMonth: "Číst měsíc",
     startEditorialYear: "Číst celý rok",
@@ -285,8 +286,8 @@ const COPY: Record<string, SubscribeCopy> = {
     daysFree: "14 days free",
     editorialBadge: "Full text now",
     bannerKicker: "ViaLongeVita Editorial",
-    bannerTitle: "The rest of the article is yours now",
-    bannerLead: "The yearly plan includes two months. The text opens as soon as you pay — cancel anytime.",
+    bannerTitle: "The rest of the article is yours now — just {price}",
+    bannerLead: "Just {price} a month. The yearly plan includes two months. The text opens as soon as you pay — cancel anytime.",
     billedNow: "Opens immediately",
     startEditorialMonth: "Read for a month",
     startEditorialYear: "Read for a year",
@@ -458,9 +459,9 @@ const COPY: Record<string, SubscribeCopy> = {
     daysFree: "14 Tage kostenlos",
     editorialBadge: "Sofort lesbar",
     bannerKicker: "ViaLongeVita Redaktion",
-    bannerTitle: "Den Rest des Artikels haben Sie sofort",
+    bannerTitle: "Den Rest des Artikels haben Sie sofort — nur {price}",
     bannerLead:
-      "Im Jahresabo stecken zwei Monate. Der Text öffnet sich nach der Karte — jederzeit kündbar.",
+      "Nur {price} im Monat. Im Jahresabo stecken zwei Monate. Der Text öffnet sich nach der Karte — jederzeit kündbar.",
     billedNow: "Sofort zugänglich",
     startEditorialMonth: "Einen Monat lesen",
     startEditorialYear: "Ein Jahr lesen",
@@ -632,9 +633,9 @@ const COPY: Record<string, SubscribeCopy> = {
     daysFree: "14 jours gratuits",
     editorialBadge: "Texte complet tout de suite",
     bannerKicker: "Rédaction ViaLongeVita",
-    bannerTitle: "Le reste de l’article est à vous tout de suite",
+    bannerTitle: "Le reste de l’article est à vous tout de suite — seulement {price}",
     bannerLead:
-      "L’annuel inclut deux mois. Le texte s’ouvre dès le paiement — résiliable à tout moment.",
+      "Seulement {price} par mois. L’annuel inclut deux mois. Le texte s’ouvre dès le paiement — résiliable à tout moment.",
     billedNow: "S’ouvre tout de suite",
     startEditorialMonth: "Lire un mois",
     startEditorialYear: "Lire toute l’année",
@@ -792,5 +793,8 @@ export function getSubscribeCopy(
   const localized = localizeListedCzkIn(COPY[key] ?? COPY.en, locale, region);
   localized.afterTrialUnit = localizeCurrencyToken(localized.afterTrialUnit, locale, region);
   localized.currencyLabel = localizeCurrencyToken(localized.currencyLabel, locale, region);
+  const price = editorialMonthlyBannerPrice(locale, region);
+  localized.bannerTitle = localized.bannerTitle.replaceAll("{price}", price);
+  localized.bannerLead = localized.bannerLead.replaceAll("{price}", price);
   return JSON.parse(rewriteCzechInstitutions(JSON.stringify(localized), locale)) as SubscribeCopy;
 }
