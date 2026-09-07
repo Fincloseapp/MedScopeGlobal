@@ -8,7 +8,8 @@ export type MonetizationEventName =
   | "article_tip_start"
   | "b2b_form_submit"
   | "ai_agent_visit"
-  | "ai_agent_checkout";
+  | "ai_agent_checkout"
+  | "ai_agent_newsletter";
 
 /** Best-effort insert into public.analytics. Never throws. */
 export async function logMonetizationEvent(

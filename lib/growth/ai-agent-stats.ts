@@ -16,6 +16,7 @@ export type AgentRow = {
   visits: number;
   checkouts: number;
   paid: number;
+  newsletters: number;
 };
 
 export type AiAgentGrowthSnapshot = {
@@ -134,6 +135,7 @@ export async function loadAiAgentGrowthSnapshot(): Promise<AiAgentGrowthSnapshot
     visits: 0,
     checkouts: 0,
     paid: 0,
+    newsletters: 0,
   }));
 
   if (!client) {
@@ -165,7 +167,7 @@ export async function loadAiAgentGrowthSnapshot(): Promise<AiAgentGrowthSnapshot
   let paidOrders = 0;
   let paidCzk = 0;
   const boardMap = new Map<AiAgentSlug, AgentRow>(
-    AI_AGENT_SLUGS.map((agent) => [agent, { agent, visits: 0, checkouts: 0, paid: 0 }])
+    AI_AGENT_SLUGS.map((agent) => [agent, { agent, visits: 0, checkouts: 0, paid: 0, newsletters: 0 }])
   );
 
   try {
@@ -210,7 +212,7 @@ export async function loadAiAgentGrowthSnapshot(): Promise<AiAgentGrowthSnapshot
     const { data } = await client
       .from("analytics")
       .select("event, payload, created_at")
-      .in("event", ["ai_agent_visit", "ai_agent_checkout"])
+      .in("event", ["ai_agent_visit", "ai_agent_checkout", "ai_agent_newsletter"])
       .gte("created_at", since)
       .limit(4000);
     for (const row of data ?? []) {
@@ -221,6 +223,7 @@ export async function loadAiAgentGrowthSnapshot(): Promise<AiAgentGrowthSnapshot
       if (!item) continue;
       if (row.event === "ai_agent_visit") item.visits += 1;
       if (row.event === "ai_agent_checkout") item.checkouts += 1;
+      if (row.event === "ai_agent_newsletter") item.newsletters += 1;
     }
   } catch {
     /* analytics may be missing */
@@ -231,7 +234,7 @@ export async function loadAiAgentGrowthSnapshot(): Promise<AiAgentGrowthSnapshot
     .sort((a, b) => a.date.localeCompare(b.date));
 
   const leaderboard = [...boardMap.values()].sort((a, b) => {
-    const score = (row: AgentRow) => row.paid * 100 + row.checkouts * 10 + row.visits;
+    const score = (row: AgentRow) => row.paid * 100 + row.checkouts * 10 + row.newsletters * 5 + row.visits;
     return score(b) - score(a);
   });
 

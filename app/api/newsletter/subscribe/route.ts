@@ -10,6 +10,7 @@ import {
   sendViaLongeVitaFirstBrief,
   sendViaLongeVitaWelcome,
 } from "@/lib/monetization/vialongevita-brief";
+import { readAiRefFromCookieHeader } from "@/lib/growth/ai-ref-cookie";
 
 export const dynamic = "force-dynamic";
 
@@ -51,6 +52,7 @@ export async function POST(request: Request) {
   const locale = (body.locale ?? "cs").trim() || "cs";
   const segment = body.segment ?? "public";
   const source = (body.source ?? "site").trim() || "site";
+  const aiRef = readAiRefFromCookieHeader(request.headers.get("cookie"));
 
   const schemaApply = await applyNewsletterSubscriberSchema();
 
@@ -97,7 +99,7 @@ export async function POST(request: Request) {
     } else {
       const { error: fallbackError } = await admin.from("analytics").insert({
         event: "newsletter_subscribe",
-        payload: { email, locale, segment, source, pending_table: true },
+        payload: { email, locale, segment, source, pending_table: true, ...(aiRef ? { agent: aiRef } : {}) },
       });
       if (!fallbackError) {
         stored = true;
@@ -146,7 +148,11 @@ export async function POST(request: Request) {
         stored,
         mailed,
         destination,
+        ...(aiRef ? { agent: aiRef } : {}),
       });
+      if (aiRef) {
+        await logMonetizationEvent("ai_agent_newsletter", { agent: aiRef, locale, segment, source });
+      }
       await notifyNewsletterSignup({ email, locale, segment, source }).catch(() => undefined);
       welcome = await sendViaLongeVitaWelcome({ email, locale }).catch(() => false);
     }

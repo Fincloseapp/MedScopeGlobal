@@ -101,8 +101,8 @@ export default async function AdminAiAgentsPage() {
       <section>
         <h2 className="mb-3 font-display text-xl font-semibold">Žebříček AI agentů</h2>
         <p className="mb-4 text-sm text-muted-foreground">
-          Skóre = zaplacené objednávky s <code>ai_ref</code> × 100 + checkout start × 10 + návštěvy s{" "}
-          <code>?ref=</code>. Bez atribuce se agent nepočítá.
+          Skóre = zaplacené objednávky s <code>ai_ref</code> × 100 + checkout × 10 + newsletter × 5 +
+          návštěvy s <code>?ref=</code>. Bez atribuce se agent nepočítá.
         </p>
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full text-sm">
@@ -112,6 +112,7 @@ export default async function AdminAiAgentsPage() {
                 <th className="px-4 py-2 text-left">Agent</th>
                 <th className="px-4 py-2 text-right">Návštěvy</th>
                 <th className="px-4 py-2 text-right">Checkout</th>
+                <th className="px-4 py-2 text-right">Newsletter</th>
                 <th className="px-4 py-2 text-right">Zaplaceno</th>
               </tr>
             </thead>
@@ -122,6 +123,7 @@ export default async function AdminAiAgentsPage() {
                   <td className="px-4 py-2 font-medium">{row.agent}</td>
                   <td className="px-4 py-2 text-right">{formatInt(row.visits)}</td>
                   <td className="px-4 py-2 text-right">{formatInt(row.checkouts)}</td>
+                  <td className="px-4 py-2 text-right">{formatInt(row.newsletters)}</td>
                   <td className="px-4 py-2 text-right">{formatInt(row.paid)}</td>
                 </tr>
               ))}

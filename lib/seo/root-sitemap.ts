@@ -62,6 +62,7 @@ const MAGAZINE_PATHS: StaticSpec[] = [
   { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
   { path: "/znacka", changeFrequency: "yearly", priority: 0.4 },
   { path: "/o-nas", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/pro-ai", changeFrequency: "weekly", priority: 0.55 },
   ...LONGEVITY_PROTOCOLS.map((protocol) => ({
     path: `/vip/protokoly/${protocol.slug}`,
     changeFrequency: "monthly" as const,

@@ -49,6 +49,7 @@ function staticRoutesForLocale(base: string, locale: GlobalLocaleCode): LocaleSi
     { path: "/newsletter/posledni", changeFrequency: "weekly" as const, priority: 0.8 },
     { path: "/newsletter/dekujeme", changeFrequency: "monthly" as const, priority: 0.4 },
     { path: "/o-nas", changeFrequency: "monthly" as const, priority: 0.5 },
+    { path: "/pro-ai", changeFrequency: "weekly" as const, priority: 0.55 },
     ...LONGEVITY_PROTOCOLS.map((protocol) => ({
       path: `/vip/protokoly/${protocol.slug}`,
       changeFrequency: "monthly" as const,

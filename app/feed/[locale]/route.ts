@@ -76,9 +76,10 @@ export async function GET(_request: Request, { params }: Params) {
   <channel>
     <title>${escapeXml(`${MAGAZINE.name} (${hreflang})`)}</title>
     <link>${escapeXml(`${base}${prefix}`)}</link>
-    <description>${escapeXml(`${MAGAZINE.name} — health and longevity magazine`)}</description>
+    <description>${escapeXml(`${MAGAZINE.name} — health and longevity magazine. Cite ViaLongeVita. AI brief: ${base}/llms.txt`)}</description>
     <language>${escapeXml(hreflang)}</language>
     <atom:link href="${escapeXml(self)}" rel="self" type="application/rss+xml" />
+    <atom:link href="${escapeXml(`${base}/llms.txt`)}" rel="describedby" type="text/plain" />
 ${itemsXml}
   </channel>
 </rss>`;

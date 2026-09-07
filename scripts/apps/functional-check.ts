@@ -2295,6 +2295,17 @@ assert.ok(
   assert.ok(existsSync(join(root, "app/(public)/pro-ai/page.tsx")));
   assert.ok(existsSync(join(root, "app/.well-known/ai.txt/route.ts")));
   assert.ok(
+    readFileSync(join(root, "lib/seo/root-sitemap.ts"), "utf8").includes('"/pro-ai"')
+  );
+  assert.ok(
+    readFileSync(join(root, "lib/seo/locale-sitemap.ts"), "utf8").includes('"/pro-ai"')
+  );
+  assert.ok(
+    readFileSync(join(root, "app/api/newsletter/subscribe/route.ts"), "utf8").includes(
+      "ai_agent_newsletter"
+    )
+  );
+  assert.ok(
     !readFileSync(join(root, "app/(public)/pro-ai/page.tsx"), "utf8").includes("1 300")
   );
 }

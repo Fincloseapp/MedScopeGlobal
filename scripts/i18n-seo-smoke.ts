@@ -198,6 +198,8 @@ assert.ok(sitemaps.some((u) => u.endsWith("/sitemap-de.xml")));
 const rootStatic = buildRootSitemapStaticEntries("https://medscopeglobal.com");
 assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/en-us/articles"));
 assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/it/predplatne"));
+assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/de/pro-ai"));
+assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/fr/pro-ai"));
 assert.ok(!rootStatic.some((row) => row.url === "https://medscopeglobal.com/articles"));
 assert.ok(!rootStatic.some((row) => row.url.includes("/cs/article/")));
 assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/cs/studenti"));
