@@ -3534,6 +3534,12 @@ console.log("✓ magazine desk byline and copy checks passed");
       "aktualityChip"
     )
   );
+  assert.ok(
+    !readFileSync(join(root, "app/(public)/aktualni-zpravy/page.tsx"), "utf8").includes(
+      "V27_EDITORIAL_COPY_LABEL"
+    ),
+    "Aktuality listing must not append Czech editorial stamp on locale pages"
+  );
   {
     const csDesk = nativeDeskArticlesForLocale("cs");
     assert.ok(csDesk.some((article) => article.slug.includes("glp1-odmena-alkohol")));

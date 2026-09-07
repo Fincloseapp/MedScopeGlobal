@@ -14,7 +14,6 @@ import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { aktualityChip } from "@/lib/i18n/aktuality-chrome";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
-import { V27_EDITORIAL_COPY_LABEL } from "@/lib/v27/version";
 
 export const revalidate = 120;
 
@@ -25,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const news = newsDesksForLocale(locale).find((desk) => desk.id === "novinky");
   return await buildLocalizedV20PageMetadata({
     title: `${news?.label ?? "News"} — ${news?.blurb ?? ""}`.slice(0, 70),
-    description: `${news?.blurb ?? ""} ${V27_EDITORIAL_COPY_LABEL}`.trim(),
+    description: news?.blurb ?? "",
     path: "/aktualni-zpravy",
   });
 }
@@ -51,7 +50,7 @@ export default async function AktualniZpravyPage() {
     <ModulePageShell
       eyebrow={news.kicker}
       title={news.label}
-      description={`${news.blurb} — ${V27_EDITORIAL_COPY_LABEL}.`}
+      description={news.blurb}
       ctaHref={longevityHref}
       ctaLabel={longevity.more}
     >
