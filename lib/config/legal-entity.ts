@@ -85,10 +85,24 @@ export function isLegalEntityComplete(entity: LegalEntityConfig = getLegalEntity
   );
 }
 
+/** Public register lookup — official source of the registered office. */
+export function aresSubjectUrl(ico: string): string {
+  return `https://ares.gov.cz/ekonomicke-subjekty?ico=${encodeURIComponent(ico.replace(/\s/g, ""))}`;
+}
+
+/**
+ * Name + IČO + court file for public chrome.
+ * Street stays off this line (invoices and the seat disclosure still carry it).
+ */
 export function formatLegalEntityLine(entity: LegalEntityConfig = getLegalEntity()): string {
   const parts = [entity.name];
   if (entity.ico) parts.push("I" + String.fromCharCode(0x10c) + "O " + entity.ico);
   if (entity.dic) parts.push("DI" + String.fromCharCode(0x10c) + " " + entity.dic);
   if (entity.courtFile) parts.push("sp. zn. " + entity.courtFile);
   return parts.join(", ");
+}
+
+/** Schema.org PostalAddress without street — Google snippets must not print the seat. */
+export function publicOrganizationAddress(): { "@type": "PostalAddress"; addressCountry: "CZ" } {
+  return { "@type": "PostalAddress", addressCountry: "CZ" };
 }

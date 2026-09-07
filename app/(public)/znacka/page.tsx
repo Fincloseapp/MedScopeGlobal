@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
+import { LegalSeatDisclosure } from "@/components/legal/legal-seat-disclosure";
 import { getLegalEntity, isLegalEntityComplete } from "@/lib/config/legal-entity";
 import { getLegalChromeCopy } from "@/lib/i18n/legal-chrome-copy";
 import { getServerLocale } from "@/lib/i18n/server-locale";
@@ -43,9 +44,9 @@ export default async function BrandLegalPage() {
             {entity.dic ? ", DIČ " + entity.dic : ""})
           </>
         ) : null}
-        {entity.courtFile ? <>, sp. zn. {entity.courtFile}</> : null}
-        {entity.address ? <>. Sídlo: {entity.address}.</> : "."}
+        {entity.courtFile ? <>, sp. zn. {entity.courtFile}</> : null}.
       </p>
+      <LegalSeatDisclosure entity={entity} locale={locale} />
       <p>
         Obchodní označení pro zákazníky: <strong>{entity.tradeName}</strong>. Primární
         slovní označení značky je <strong>{entity.brandWordmark}</strong>. Související

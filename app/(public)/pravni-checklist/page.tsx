@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
+import { LegalSeatDisclosure } from "@/components/legal/legal-seat-disclosure";
 import { getLegalEntity } from "@/lib/config/legal-entity";
 import { getLegalChromeCopy } from "@/lib/i18n/legal-chrome-copy";
 import { getServerLocale } from "@/lib/i18n/server-locale";
@@ -32,7 +33,7 @@ export default async function PravniChecklistPage() {
       <h2>1. Hotovo na medscopeglobal.com</h2>
       <ul>
         <li>
-          Identita provozovatele: {entity.name}, IČO {entity.ico}, sídlo {entity.address}
+          Identita provozovatele: {entity.name}, IČO {entity.ico} (sídlo dle obchodního rejstříku)
         </li>
         <li>
           Podpora: {entity.supportEmail}
@@ -56,7 +57,8 @@ export default async function PravniChecklistPage() {
           {entity.courtFile ? ", sp. zn. " + entity.courtFile : ""}
         </li>
         <li>
-          <strong>Sídlo:</strong> {entity.address}
+          <strong>Sídlo:</strong> dle obchodního rejstříku (ARES)
+          <LegalSeatDisclosure entity={entity} locale={locale} />
         </li>
         <li>
           <strong>Označení:</strong> slovní MedScopeGlobal (+ případně logo)

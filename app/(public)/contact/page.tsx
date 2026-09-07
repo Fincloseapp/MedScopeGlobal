@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 import { ContactForm } from "@/components/contact/contact-form";
+import { LegalSeatDisclosure } from "@/components/legal/legal-seat-disclosure";
 import { PublicTrustBadges } from "@/components/verejnost/public-trust-badges";
 import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-disclaimer";
-import { getLegalEntity } from "@/lib/config/legal-entity";
+import { getLegalEntity, publicOrganizationAddress } from "@/lib/config/legal-entity";
 import { SITE } from "@/lib/config/site";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 import { getServerLocale } from "@/lib/i18n/server-locale";
@@ -34,15 +35,7 @@ export default async function ContactPage() {
     url: SITE.url,
     email: entity.supportEmail,
     telephone: entity.supportPhone ?? undefined,
-    address: entity.address
-      ? {
-          "@type": "PostalAddress",
-          streetAddress: "Třešňová 1046",
-          addressLocality: "Orlová",
-          postalCode: "73514",
-          addressCountry: "CZ",
-        }
-      : undefined,
+    address: publicOrganizationAddress(),
     identifier: entity.ico ? `ICO:${entity.ico}` : undefined,
     contactPoint: [
       {
@@ -93,7 +86,7 @@ export default async function ContactPage() {
                       <p className="mt-2 text-sm font-semibold text-[#021d33]">{entity.supportPhone}</p>
                     </a>
                   ) : null}
-                  {entity.address ? (
+                  {entity.ico ? (
                     <div className="rounded-2xl border border-[#cfe1f3] bg-white p-4 shadow-[0_12px_30px_-24px_rgba(0,91,150,0.65)]">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">{copy.operator}</p>
                       <p className="mt-2 text-sm font-semibold text-[#021d33]">{entity.name}</p>
@@ -101,7 +94,7 @@ export default async function ContactPage() {
                         IČO {entity.ico}
                         {entity.courtFile ? ` · ${entity.courtFile}` : ""}
                       </p>
-                      <p className="mt-1 text-xs text-muted-foreground">{entity.address}</p>
+                      <LegalSeatDisclosure entity={entity} locale={locale} />
                     </div>
                   ) : null}
                 </div>
@@ -143,12 +136,12 @@ export default async function ContactPage() {
                       </div>
                     </div>
                   ) : null}
-                  {entity.address ? (
+                  {entity.ico || entity.address ? (
                     <div className="flex items-start gap-3 rounded-2xl border border-[#dbeaf7] bg-[#f8fbff] p-4">
                       <MapPin className="mt-0.5 h-5 w-5 text-[#005B96]" />
-                      <div>
+                      <div className="min-w-0 flex-1">
                         <p className="text-sm font-semibold text-[#021d33]">{copy.seat}</p>
-                        <p className="mt-1 text-sm text-muted-foreground">{entity.address}</p>
+                        <LegalSeatDisclosure entity={entity} locale={locale} />
                       </div>
                     </div>
                   ) : null}

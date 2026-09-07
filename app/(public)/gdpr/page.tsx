@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
+import { LegalSeatDisclosure } from "@/components/legal/legal-seat-disclosure";
 import { getLegalEntity } from "@/lib/config/legal-entity";
 import { getLegalChromeCopy } from "@/lib/i18n/legal-chrome-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
@@ -33,11 +34,11 @@ export default async function GdprPage() {
       <h2>1. Správce údajů</h2>
       <p>
         Správcem osobních údajů je <strong>{entity.name}</strong>
-        {entity.ico ? <> (IČO {entity.ico})</> : null}
-        {entity.address ? <>, sídlo: {entity.address}</> : null}. Kontakt:{" "}
+        {entity.ico ? <> (IČO {entity.ico})</> : null}. Kontakt:{" "}
         <a href={`mailto:${entity.legalEmail}`}>{entity.legalEmail}</a>. Úplné znění:{" "}
         <Link href={localizePublicHref("/privacy", locale)}>{copy.privacyTitle}</Link>.
       </p>
+      <LegalSeatDisclosure entity={entity} locale={locale} />
 
       <h2>2. Rozsah zpracování</h2>
       <p>Zpracováváme zejména:</p>

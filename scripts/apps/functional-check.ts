@@ -280,6 +280,13 @@ import {
 } from "../../lib/auth/article-eligibility";
 import { getEditorialArticleGateCopy } from "../../lib/v38/conversion-copy";
 import { getSubscribeCopy } from "../../lib/i18n/subscribe-copy";
+import {
+  aresSubjectUrl,
+  formatLegalEntityLine,
+  getLegalEntity,
+  publicOrganizationAddress,
+} from "../../lib/config/legal-entity";
+import { generateInvoiceHtml } from "../../lib/billing/invoice-generator";
 import { getPaywallPreviewHtml } from "../../lib/monetization/paywall-preview";
 import {
   NEWSLETTER_PRIMARY_LOCALES,
@@ -3789,6 +3796,36 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.ok(getEditorialArticleGateCopy("cs").ctaHref.includes("#public"));
   assert.ok(getEditorialArticleGateCopy("de").ctaHref.includes("predplatne"));
   assert.ok(!getEditorialArticleGateCopy("en").headline.includes("VIP"));
+  {
+    const entity = getLegalEntity();
+    assert.ok(entity.ico === "06024963");
+    assert.ok(!formatLegalEntityLine(entity).includes("Třešňová"));
+    assert.ok(!formatLegalEntityLine(entity).includes("73514"));
+    assert.equal(publicOrganizationAddress().addressCountry, "CZ");
+    assert.ok(!("streetAddress" in publicOrganizationAddress()));
+    assert.ok(aresSubjectUrl(entity.ico!).includes(entity.ico!));
+    const contactSrc = readFileSync(join(root, "app/(public)/contact/page.tsx"), "utf8");
+    assert.ok(!contactSrc.includes("Třešňová"), "contact JSON-LD must not print the street");
+    assert.ok(contactSrc.includes("LegalSeatDisclosure"));
+    assert.ok(contactSrc.includes("publicOrganizationAddress"));
+    for (const rel of ["gdpr/page.tsx", "privacy/page.tsx", "znacka/page.tsx", "pravni-checklist/page.tsx"]) {
+      const src = readFileSync(join(root, `app/(public)/${rel}`), "utf8");
+      assert.ok(src.includes("LegalSeatDisclosure"), `${rel} must hide the seat behind disclosure`);
+      assert.ok(!src.includes("sídlo: {entity.address}"), `${rel} must not inline the street`);
+    }
+    const seatSrc = readFileSync(join(root, "components/legal/legal-seat-disclosure.tsx"), "utf8");
+    assert.ok(seatSrc.includes("<details"));
+    const invoice = generateInvoiceHtml({
+      transactionId: "test-seat",
+      customerEmail: "reader@example.com",
+      lineItems: [{ description: "Redakce", amountCzk: 25 }],
+    });
+    assert.ok(invoice.html.includes("Třešňová"), "tax invoice must still carry the registered office");
+    assert.ok(
+      readFileSync(join(root, "lib/billing/invoice-generator.ts"), "utf8").includes("entity.address"),
+      "invoice generator must keep the seat for accounting"
+    );
+  }
   assert.ok(getPaywallPreviewHtml("<p>alpha</p><p>bravo</p>", 8).includes("alpha"));
   assert.ok(!getMediaKitCopy("de").letterTitle.includes("Kč"));
   assert.ok(getMediaKitCopy("cs").formats.length === 4);
