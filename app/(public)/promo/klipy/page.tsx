@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PromoTeaserCard } from "@/components/ads/promo-teaser-card";
+import { ViaLongeVitaMasthead } from "@/components/brand/vialongevita-mark";
+import { isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
 import { getPromoTeasers } from "@/lib/ads/promo-teasers";
 import { getShareCopy } from "@/lib/i18n/share-copy";
 import { getServerLocale } from "@/lib/i18n/server-locale";
@@ -26,9 +28,12 @@ export default async function PromoKlipyPage() {
   const teasers = getPromoTeasers();
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#005B96]">{copy.clipsEyebrow}</p>
-      <h1 className="mt-2 font-display text-4xl font-bold text-[#021d33]">{copy.clipsTitle}</h1>
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600">{copy.clipsLead}</p>
+      <ViaLongeVitaMasthead
+        locale={locale}
+        title={copy.clipsTitle}
+        blurb={copy.clipsLead}
+        cover={pickEditionCover(locale, isoWeekSeed())}
+      />
       <div className="mt-8 grid gap-5 md:grid-cols-3">
         {teasers.map((teaser) => (
           <PromoTeaserCard key={teaser.id} teaser={teaser} locale={locale} />

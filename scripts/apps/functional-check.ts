@@ -1021,6 +1021,19 @@ file("public/assets/magazine/vialongevita-email-lockup.jpg");
     !readFileSync(join(root, "app/(public)/articles/page.tsx"), "utf8").includes("pickEditionCover"),
     "student med_track listings must not use lifestyle edition portraits"
   );
+  assert.ok(readFileSync(join(root, "app/globals.css"), "utf8").includes("mx-auto mb-10 aspect-[3/4]"));
+  assert.ok(readFileSync(join(root, "components/magazine/magazine-title-spread.tsx"), "utf8").includes("object-top"));
+  assert.ok(readFileSync(join(root, "app/(public)/newsletter/page.tsx"), "utf8").includes("hideIntro"));
+  assert.ok(readFileSync(join(root, "app/(public)/newsletter/posledni/page.tsx"), "utf8").includes("hideIntro"));
+  assert.ok(readFileSync(join(root, "components/v22/newsletter-view.tsx"), "utf8").includes("showLockup={false}"));
+  assert.ok(
+    readFileSync(join(root, "app/(public)/promo/klipy/page.tsx"), "utf8").includes("pickEditionCover"),
+    "promo clips page must open with an edition portrait"
+  );
+  assert.ok(
+    readFileSync(join(root, "app/(public)/newsletter/archiv/page.tsx"), "utf8").includes("pickEditionCover"),
+    "newsletter archive must open with an edition portrait"
+  );
   assert.ok(!GLOBAL_LOCALES.some((row) => String(row.code) === "ar"));
 }
 assert.ok(

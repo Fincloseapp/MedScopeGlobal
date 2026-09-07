@@ -275,7 +275,7 @@
 }
 
 .article-title-spread {
-  @apply relative mb-10 aspect-[3/4] w-full max-w-[42rem] overflow-hidden bg-[#021d33];
+  @apply relative mx-auto mb-10 aspect-[3/4] w-full max-w-[42rem] overflow-hidden bg-[#021d33];
 }
 
 .article-title-spread.is-full {

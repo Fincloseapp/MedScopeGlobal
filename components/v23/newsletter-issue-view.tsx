@@ -184,6 +184,7 @@ export function V23NewsletterIssueView({
         subhead={subhead}
         href={localizePublicHref("/", locale)}
         className="w-full text-[#021d33]"
+        showLockup={false}
       />
 
       <div className="p-6 sm:p-8">

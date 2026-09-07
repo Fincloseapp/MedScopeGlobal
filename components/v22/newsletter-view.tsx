@@ -26,6 +26,7 @@ export function V22NewsletterHub({ locale = "cs" }: { locale?: string }) {
           subhead={copy.hubDescription}
           tagline={copy.kicker}
           className="w-full text-[#021d33]"
+          showLockup={false}
         />
         <div className="flex flex-wrap justify-center gap-2 px-6 pb-10 sm:px-8">
           <NewsletterCapture locale={locale} source="newsletter-hub-hero" className="mt-4 w-full max-w-lg" />

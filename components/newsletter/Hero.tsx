@@ -12,10 +12,19 @@ type Props = {
   tagline?: string;
   className?: string;
   priority?: boolean;
+  showLockup?: boolean;
 };
 
 /** ViaLongeVita magazine brief hero */
-export function NewsletterHero({ title, subhead, href = "/", tagline, className, priority = true }: Props) {
+export function NewsletterHero({
+  title,
+  subhead,
+  href = "/",
+  tagline,
+  className,
+  priority = true,
+  showLockup = true,
+}: Props) {
   const lockup = (
     <Image
       src={MAGAZINE.emailLockup}
@@ -30,19 +39,22 @@ export function NewsletterHero({ title, subhead, href = "/", tagline, className,
   return (
     <header
       className={cn(
-        "newsletter-hero flex flex-col items-center px-6 py-12 text-center sm:px-8 sm:py-14 md:py-16",
+        "newsletter-hero flex flex-col items-center px-6 text-center sm:px-8",
+        showLockup ? "py-12 sm:py-14 md:py-16" : "py-8 sm:py-10",
         className
       )}
     >
-      <div className="newsletter-hero-logo mb-6 flex justify-center sm:mb-7">
-        {href ? (
-          <Link href={href} className="inline-block">
-            {lockup}
-          </Link>
-        ) : (
-          lockup
-        )}
-      </div>
+      {showLockup ? (
+        <div className="newsletter-hero-logo mb-6 flex justify-center sm:mb-7">
+          {href ? (
+            <Link href={href} className="inline-block">
+              {lockup}
+            </Link>
+          ) : (
+            lockup
+          )}
+        </div>
+      ) : null}
 
       <p className="mb-5 text-[15px] font-light tracking-[0.35px] opacity-80 sm:mb-6">
         {tagline ?? NEWSLETTER_HERO_TAGLINE}

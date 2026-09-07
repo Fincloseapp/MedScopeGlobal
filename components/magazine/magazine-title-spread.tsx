@@ -24,7 +24,7 @@ export function MagazineTitleSpread({
         alt={editionCoverAlt(locale)}
         fill
         priority
-        className="object-cover"
+        className="object-cover object-top"
         sizes="(max-width:768px) 100vw, 720px"
       />
       <div className="article-title-spread-veil" />

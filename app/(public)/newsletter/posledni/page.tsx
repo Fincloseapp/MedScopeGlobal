@@ -38,7 +38,7 @@ export default async function NewsletterPosledniPage() {
   });
 
   return (
-    <ModulePageShell eyebrow={copy.hubEyebrow} title={pageTitle} description={description}>
+    <ModulePageShell eyebrow={copy.hubEyebrow} title={pageTitle} description={description} hideIntro>
       <JsonLdScript data={ld} />
       <V23NewsletterIssueView issue={issue} locale={locale} />
       <div className="mt-8">

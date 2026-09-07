@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
+import { ViaLongeVitaMasthead } from "@/components/brand/vialongevita-mark";
+import { isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
 import { getNewsletterArchive } from "@/lib/queries/v4c/newsletters";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { formatPublicDate } from "@/lib/i18n/format-date";
@@ -21,8 +23,15 @@ export default async function NewsletterArchivPage() {
       eyebrow={copy.hubEyebrow}
       title={copy.hubArchive}
       description={copy.hubDescription}
+      hideIntro
     >
-      <ul className="space-y-3">
+      <ViaLongeVitaMasthead
+        locale={locale}
+        title={copy.hubArchive}
+        blurb={copy.hubDescription}
+        cover={pickEditionCover(locale, isoWeekSeed())}
+      />
+      <ul className="mt-8 space-y-3">
         {issues.length === 0 ? (
           <li className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-600">
             {copy.hubDescription}
