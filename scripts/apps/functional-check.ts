@@ -2719,6 +2719,9 @@ assert.ok(
     assert.ok(!looksLikeCzech(getPromoTeasers("de")[0]?.sub));
     assert.ok(!getPromoTeasers("fr").some((row) => row.sub.includes("Dlouhověkost")));
     assert.ok(!getPromoTeasers("cs").some((row) => /He reads|Longevity ·|Dlouhověkost ·/.test(`${row.line} ${row.sub}`)));
+    assert.ok(getPromoTeasers("ja")[0]?.line.includes("読む"));
+    assert.ok(!getPromoTeasers("ja").some((row) => row.line.includes("He reads")));
+    assert.ok(!looksLikeCzech(getPromoTeasers("pl")[0]?.line));
     assert.ok(drafts.some((row) => row.headline.includes("he reads") && row.body.includes("/assets/ads/teasers/")));
     assert.ok(readFileSync(join(root, "app/(public)/predplatne/page.tsx"), "utf8").includes("SocialShareStrip"));
     assert.ok(readFileSync(join(root, "app/(public)/predplatne/page.tsx"), "utf8").includes("/firmy/reklama/nova"));
