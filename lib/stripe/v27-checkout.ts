@@ -16,6 +16,7 @@ export type V27CheckoutBody = {
   locale?: string | null;
   region?: string | null;
   gift?: boolean;
+  aiRef?: string | null;
 };
 
 const STRIPE_LOCALES = new Set([
@@ -55,7 +56,7 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
     };
   }
 
-  const { kind, productId, userId, locale, region, gift } = body;
+  const { kind, productId, userId, locale, region, gift, aiRef } = body;
   if (!kind || !productId) {
     return { status: 400 as const, body: { error: "Chybí kind nebo productId" } };
   }
@@ -116,6 +117,7 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
       ...(userId ? { user_id: userId } : {}),
       ...(gift ? { gift: "1" } : {}),
       ...(studentMonth && intro ? { intro_unit_amount: String(intro.unitAmount) } : {}),
+      ...(aiRef ? { ai_ref: aiRef, utm_source: aiRef, utm_medium: "ai", utm_campaign: "agent-coop" } : {}),
     },
     line_items: [
       {
@@ -145,6 +147,7 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
               product_id: productId,
               ...(userId ? { user_id: userId } : {}),
               ...(gift ? { gift: "1" } : {}),
+              ...(aiRef ? { ai_ref: aiRef } : {}),
             },
           },
         }
@@ -167,6 +170,7 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
         billing_interval: item.billingInterval ?? "month",
         currency: charge.currency,
         unit_amount: charge.unitAmount,
+        ...(aiRef ? { ai_ref: aiRef } : {}),
       },
     });
   } catch {

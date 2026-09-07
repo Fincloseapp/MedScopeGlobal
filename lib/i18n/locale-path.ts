@@ -174,6 +174,7 @@ const LOCALE_EXCLUDED_PREFIXES = [
   "/sw-",
   "/feed/",
   "/sitemaps/",
+  "/.well-known/",
 ];
 
 const LOCALE_EXCLUDED_EXACT = new Set([
@@ -183,6 +184,7 @@ const LOCALE_EXCLUDED_EXACT = new Set([
   "/ads.txt",
   "/llms.txt",
   "/news-sitemap.xml",
+  "/.well-known/ai.txt",
 ]);
 
 /** Paths that must not receive locale redirect/rewrite (PWAs, API, admin, assets). */

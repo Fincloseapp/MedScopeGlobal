@@ -4,11 +4,21 @@ import { createV27CheckoutSession } from "@/lib/stripe/v27-checkout";
 import type { V27CheckoutKind } from "@/lib/v27/stripe-products";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { getServerLocale, getServerRegion } from "@/lib/i18n/server-locale";
+import { normalizeAiAgentSlug } from "@/lib/growth/ai-agent-program";
+import { readAiRefFromCookieHeader } from "@/lib/growth/ai-ref-cookie";
+import { logMonetizationEvent } from "@/lib/monetization/log-event";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
-  let body: { kind?: V27CheckoutKind; productId?: string; userId?: string; locale?: string; gift?: boolean };
+  let body: {
+    kind?: V27CheckoutKind;
+    productId?: string;
+    userId?: string;
+    locale?: string;
+    gift?: boolean;
+    aiRef?: string;
+  };
   try {
     body = await request.json();
   } catch {
@@ -31,6 +41,9 @@ export async function POST(request: Request) {
   const locale = body.locale ? normalizeLocale(body.locale) : await getServerLocale();
   const region = await getServerRegion();
 
+  const aiRef =
+    normalizeAiAgentSlug(body.aiRef) ?? readAiRefFromCookieHeader(request.headers.get("cookie"));
+
   const result = await createV27CheckoutSession({
     kind: body.kind,
     productId: body.productId,
@@ -38,7 +51,11 @@ export async function POST(request: Request) {
     locale,
     region,
     gift: Boolean(body.gift),
+    aiRef,
   });
+  if (result.status === 200 && aiRef) {
+    await logMonetizationEvent("ai_agent_checkout", { agent: aiRef, locale, productId: body.productId });
+  }
 
   return NextResponse.json(result.body, { status: result.status });
 }

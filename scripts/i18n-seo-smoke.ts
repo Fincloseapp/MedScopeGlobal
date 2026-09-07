@@ -265,6 +265,8 @@ assert.ok(isSearchEngineBot("PerplexityBot/1.0"));
 assert.ok(isSearchEngineBot("ClaudeBot/1.0"));
 assert.equal(isSearchEngineBot("Mozilla/5.0 (iPhone)"), false);
 assert.ok(isLocaleRoutingExcluded("/llms.txt"));
+assert.ok(isLocaleRoutingExcluded("/.well-known/ai.txt"));
+assert.ok(isLocaleRoutingExcluded("/llms-de.txt"));
 assert.ok(isLocaleRoutingExcluded("/news-sitemap.xml"));
 assert.ok(isLocaleRoutingExcluded("/feed/de"));
 assert.ok(isLocaleRoutingExcluded("/sitemap-de.xml"));
@@ -483,7 +485,10 @@ assert.ok(getHomepageLongevityCopy("cs").contributeHint.includes("dalšímu čte
   assert.ok(llms.includes("How to cite"));
   assert.ok(llms.includes("/de"));
   assert.ok(llms.includes("/news-sitemap.xml"));
+  assert.ok(llms.includes("cooperation exercise"));
   assert.ok(!llms.includes("2 800+"));
+  assert.ok(renderLlmsTxt("de").includes("Kooperationsübung"));
+  assert.ok(!renderLlmsTxt("fr").includes("cvičení spolupráce"));
 }
 {
   const ld = articleJsonLdGlobal({

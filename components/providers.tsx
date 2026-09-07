@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { CookieBanner } from "@/components/legal/cookie-banner";
 import { ConsentScripts } from "@/components/analytics/consent-scripts";
+import { AiAgentBeacon } from "@/components/growth/ai-agent-beacon";
 
 export function Providers({ children, locale = "cs" }: { children: React.ReactNode; locale?: string }) {
   const [client] = useState(() => new QueryClient());
@@ -12,6 +13,7 @@ export function Providers({ children, locale = "cs" }: { children: React.ReactNo
     <ThemeProvider>
       <QueryClientProvider client={client}>
         {children}
+        <AiAgentBeacon locale={locale} />
         <CookieBanner locale={locale} />
         <ConsentScripts />
       </QueryClientProvider>

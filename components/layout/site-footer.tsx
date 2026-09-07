@@ -8,10 +8,12 @@ import {
   HeurekaTextLink,
   shouldShowHeurekaTextLink,
 } from "@/components/monetization/heureka-text-link";
+import { getAiAgentBrief } from "@/lib/growth/ai-agent-program";
 
 export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
   const copy = getSurfaceCopy(locale);
   const footer = copy.footer;
+  const aiBrief = getAiAgentBrief(locale);
   const href = (path: string) => localizePublicHref(path, locale);
   return (
     <footer className="border-t bg-slate-50" aria-label={footer.aria}>
@@ -187,6 +189,16 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
             <li>
               <Link href={href("/o-nas")} className="hover:text-foreground">
                 {footer.about}
+              </Link>
+            </li>
+            <li>
+              <Link href={href("/pro-ai")} className="hover:text-foreground">
+                {aiBrief.footerLabel}
+              </Link>
+            </li>
+            <li>
+              <Link href="/llms.txt" className="hover:text-foreground">
+                llms.txt
               </Link>
             </li>
             <li>

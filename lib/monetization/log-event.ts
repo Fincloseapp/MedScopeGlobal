@@ -6,7 +6,9 @@ export type MonetizationEventName =
   | "house_ad_click"
   | "subscribe_nudge_click"
   | "article_tip_start"
-  | "b2b_form_submit";
+  | "b2b_form_submit"
+  | "ai_agent_visit"
+  | "ai_agent_checkout";
 
 /** Best-effort insert into public.analytics. Never throws. */
 export async function logMonetizationEvent(

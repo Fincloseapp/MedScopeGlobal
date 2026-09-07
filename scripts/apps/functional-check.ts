@@ -242,6 +242,14 @@ import { getInzerceCenikCopy } from "../../lib/i18n/inzerce-cenik-copy";
 import { getMediaKitCopy } from "../../lib/i18n/media-kit-copy";
 import { aktualityChip, aktualityCategoryLabel } from "../../lib/i18n/aktuality-chrome";
 import {
+  AI_AGENT_GOAL_NEAR,
+  AI_AGENT_GOAL_SEP27,
+  getAiAgentBrief,
+  normalizeAiAgentSlug,
+  parseAiAgentFromSearch,
+} from "../../lib/growth/ai-agent-program";
+import { renderLlmsTxt, renderWellKnownAiTxt } from "../../lib/seo/llms-txt";
+import {
   isFreeNewsDeskArticle,
   resolveArticleBodyLock,
 } from "../../lib/auth/article-eligibility";
@@ -408,7 +416,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-77-open"), "homepage cache key must bust when Aktuality chips localize");
+  assert.ok(home.includes("v23-78-open"), "homepage cache key must bust when AI-agent briefs ship");
   assert.ok(
     readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes('dynamic = "force-dynamic"'),
     "homepage must render Aktuality live, not from a 10-minute HTML cache"
@@ -659,6 +667,7 @@ file("lib/monetization/payout-map.ts");
   assert.ok(hrefs.includes("/admin/categories"));
   assert.ok(hrefs.includes("/admin/vydelky"));
   assert.ok(hrefs.includes("/admin/revenue"));
+  assert.ok(hrefs.includes("/admin/ai-agents"));
   assert.ok(hrefs.includes("/admin/articles"));
   assert.equal(isAdminNavActive("/admin/ads-public", "/admin/ads"), false);
   assert.equal(isAdminNavActive("/admin/ads", "/admin/ads"), true);
@@ -911,7 +920,7 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.77"),
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.78"),
   "page cache tag must bust after the Plus desk stays pinned"
 );
 assert.ok(
@@ -1202,7 +1211,7 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-77-open"
+    "v22-homepage-public-v23-78-open"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "listAktualitySection"
@@ -2059,6 +2068,14 @@ assert.ok(
   "every page must point assistants at llms.txt"
 );
 assert.ok(
+  readFileSync(join(root, "app/layout.tsx"), "utf8").includes("aiAgentJsonLd"),
+  "every page must carry a machine-readable AI-agent brief"
+);
+assert.ok(
+  readFileSync(join(root, "app/layout.tsx"), "utf8").includes("ai-agent-brief"),
+  "every page must include a hidden text/plain AI brief"
+);
+assert.ok(
   readFileSync(join(root, "app/(public)/articles/page.tsx"), "utf8").includes(
     "newsDesksForLocale"
   ),
@@ -2253,6 +2270,34 @@ assert.ok(
   readFileSync(join(root, "lib/seo/llms-txt.ts"), "utf8").includes("How to cite"),
   "llms.txt must tell assistants how to cite ViaLongeVita"
 );
+{
+  const en = renderLlmsTxt("en");
+  const de = renderLlmsTxt("de");
+  const fr = renderLlmsTxt("fr");
+  assert.ok(en.includes("cooperation exercise"));
+  assert.ok(de.includes("Kooperationsübung"));
+  assert.ok(!de.includes("cvičení spolupráce"));
+  assert.ok(fr.includes("concours équitable"));
+  assert.ok(en.includes("/.well-known/ai.txt"));
+  assert.ok(!en.includes("2 800+"));
+  assert.equal(AI_AGENT_GOAL_NEAR.count, 170_000);
+  assert.equal(AI_AGENT_GOAL_SEP27.count, 500_000);
+  assert.ok(AI_AGENT_GOAL_NEAR.by.startsWith("2026-09-10"));
+  assert.ok(AI_AGENT_GOAL_SEP27.by.startsWith("2026-09-27"));
+  assert.equal(normalizeAiAgentSlug("ChatGPT"), "chatgpt");
+  assert.equal(normalizeAiAgentSlug("anthropic"), "claude");
+  assert.equal(parseAiAgentFromSearch("?ref=claude"), "claude");
+  assert.equal(parseAiAgentFromSearch("?utm_source=google&utm_medium=cpc"), null);
+  assert.equal(getAiAgentBrief("de").footerLabel, "Für KI-Agenten");
+  assert.ok(getAiAgentBrief("cs").contest.includes("soutěž"));
+  assert.ok(renderWellKnownAiTxt().includes("ai.txt"));
+  assert.ok(existsSync(join(root, "app/(admin)/admin/ai-agents/page.tsx")));
+  assert.ok(existsSync(join(root, "app/(public)/pro-ai/page.tsx")));
+  assert.ok(existsSync(join(root, "app/.well-known/ai.txt/route.ts")));
+  assert.ok(
+    !readFileSync(join(root, "app/(public)/pro-ai/page.tsx"), "utf8").includes("1 300")
+  );
+}
 assert.ok(
   readFileSync(join(root, "lib/ecosystem/tip-copy.ts"), "utf8").includes(
     "další čtenář"

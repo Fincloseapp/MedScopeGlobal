@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { V27CheckoutKind } from "@/lib/v27/stripe-products";
+import { readAiRefFromDocumentCookie } from "@/lib/growth/ai-ref-cookie";
 
 type Props = {
   kind: V27CheckoutKind;
@@ -42,6 +43,7 @@ export function V27CheckoutButton({
         // Guest checkout still allowed; webhook may resolve later.
       }
 
+      const aiRef = readAiRefFromDocumentCookie();
       const res = await fetch("/api/v27/checkout", {
         method: "POST",
         credentials: "same-origin",
@@ -52,6 +54,7 @@ export function V27CheckoutButton({
           ...(userId ? { userId } : {}),
           ...(locale ? { locale } : {}),
           ...(gift ? { gift: true } : {}),
+          ...(aiRef ? { aiRef } : {}),
         }),
       });
       const data = (await res.json()) as {

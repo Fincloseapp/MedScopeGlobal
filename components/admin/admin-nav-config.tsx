@@ -16,6 +16,7 @@ import {
   BarChart3,
   GraduationCap,
   TrendingUp,
+  Trophy,
   FlaskConical,
   IdCard,
   Wallet,
@@ -52,6 +53,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { href: "/admin/stripe-webhook-logs", label: "Stripe webhooky", icon: ShieldCheck },
       { href: "/admin/ads-overview", label: "Přehled reklam", icon: TrendingUp },
       { href: "/admin/v27-pipeline", label: "Pipeline v27", icon: Bot },
+      { href: "/admin/ai-agents", label: "AI agenti", icon: Trophy },
     ],
   },
   {

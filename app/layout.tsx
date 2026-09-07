@@ -13,6 +13,9 @@ import { getSiteUrl } from "@/lib/config/site-url";
 import { localeToPathSegment } from "@/lib/i18n/locale-path";
 import { ADSENSE_PUBLISHER_ID } from "@/lib/monetization/adsense";
 import { organizationJsonLd, newsletterJsonLd, publicationJsonLd } from "@/lib/seo/json-ld";
+import { aiAgentJsonLd } from "@/lib/growth/ai-agent-jsonld";
+import { chromePack } from "@/lib/i18n/chrome-pack";
+import { htmlCommentBrief } from "@/lib/growth/ai-agent-program";
 import { OG_ALTERNATE_LOCALES } from "@/lib/seo/metadata";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import "./globals.css";
@@ -90,6 +93,7 @@ export async function generateMetadata(): Promise<Metadata> {
       types: {
         "application/rss+xml": feed,
         "text/plain": `${siteUrl}/llms.txt`,
+        "text/ai": `${siteUrl}/.well-known/ai.txt`,
       },
     },
   };
@@ -118,6 +122,8 @@ export default async function RootLayout({
         <link rel="alternate" type="application/rss+xml" title={MAGAZINE.name} href={feedHref} />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="describedby" title="llms.txt" href={`${siteUrl}/llms.txt`} />
+        <link rel="alternate" type="text/plain" title="ai.txt" href={`${siteUrl}/.well-known/ai.txt`} />
+        <link rel="alternate" type="text/plain" title="llms locale" href={`${siteUrl}/llms-${chromePack(locale)}.txt`} />
         <GoogleTagHead />
         <AdSenseHead />
       </head>
@@ -128,6 +134,15 @@ export default async function RootLayout({
         <JsonLdScript data={organizationJsonLd(locale)} />
         <JsonLdScript data={publicationJsonLd()} />
         <JsonLdScript data={newsletterJsonLd()} />
+        <JsonLdScript data={aiAgentJsonLd(locale)} />
+        <script
+          type="text/plain"
+          id="ai-agent-brief"
+          data-ai-agent-brief
+          hidden
+        >
+          {htmlCommentBrief(locale)}
+        </script>
         <Providers locale={locale}>{children}</Providers>
       </body>
     </html>
