@@ -67,6 +67,7 @@ export async function loadArenaDashboard() {
     trafficTotals.paid === 0
       ? "Zaplacené předplatné je 0 — cron ho nevymyslí. Růst: sdílení klipů, locale hopy, B2B /firmy/reklama/nova."
       : `Za 7 dní ${trafficTotals.paid} zaplacených událostí — držet stejný kanál.`,
+    "3 reklamní 8s shoty: /promo/klipy (healthspan, sleep, lifestyle). Lidský upload do IG/FB/WA — cron neposílá.",
     "Instagram/Facebook/WhatsApp/LinkedIn: fronta draftů níže. Cron neposílá — lidský účet.",
     `Afrika: ${africaCountryCodes().length} zemí namapováno na fr/en/pt/es. Provoz v ${africaWithTraffic} z nich.`,
     "IndexNow + hop /predplatne na všech 22 mutacích běží každých 5 minut.",

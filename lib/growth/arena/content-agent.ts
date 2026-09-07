@@ -7,6 +7,7 @@ import {
   type SocialNetwork,
 } from "@/lib/growth/arena/config";
 import { AFRICA_DISCOVERY_LOCALES } from "@/lib/growth/africa-markets";
+import { getPromoTeasers } from "@/lib/ads/promo-teasers";
 import { ARENA_DISCOVERY_LOCALES } from "@/lib/growth/arena/locales";
 import { arenaHopUrl } from "@/lib/growth/arena/refs";
 import { looksLikeSpam } from "@/lib/growth/arena/metrics";
@@ -178,6 +179,20 @@ export function generateTeamDrafts(input: {
           ? `${vialongevita.body} LinkedIn draft — předplatné + /firmy/reklama/nova. Lidský účet, cron neposílá.`
           : `${vialongevita.body} ${network} draft pro lidský účet. Cíl: předplatitelé Redakce. Systém neposílá hromadné zprávy.`,
       ctaUrl: arenaHopUrl({ team: input.team, section: "vialongevita", locale }),
+      spam: false,
+    });
+  }
+  for (const teaser of getPromoTeasers()) {
+    drafts.push({
+      team: input.team,
+      section: "vialongevita",
+      style,
+      locale: "en",
+      channel: "social-draft",
+      network: "instagram",
+      headline: teaser.shareTitle,
+      body: `Reklamní 8s 9:16 ${teaser.videoSrc}. ViaLongeVita + medscopeglobal.com na záběru. Lidský upload do IG/FB/WA — cron neposílá.`,
+      ctaUrl: arenaHopUrl({ team: input.team, section: "vialongevita", locale: "en" }),
       spam: false,
     });
   }

@@ -48,6 +48,7 @@ export async function distributeTeamReach(input: {
     const prefix = `${origin}/${localeToPathSegment(locale)}`;
     urls.add(`${prefix}/predplatne`);
     urls.add(`${prefix}/verejnost/osveta`);
+    urls.add(`${prefix}/promo/klipy`);
     urls.add(`${prefix}/firmy/reklama/nova`);
   }
   const list = [...urls].slice(0, Math.max(ARENA_DISCOVERY_LOCALES.length, input.quota));

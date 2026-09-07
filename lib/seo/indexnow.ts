@@ -40,6 +40,7 @@ export function priorityDiscoveryUrls(base = getSiteUrl()): string[] {
     urls.add(prefix);
     urls.add(`${prefix}/predplatne`);
     urls.add(`${prefix}/verejnost/osveta`);
+    urls.add(`${prefix}/promo/klipy`);
     urls.add(`${prefix}/firmy/reklama/nova`);
     urls.add(`${prefix}/pro-ai`);
     urls.add(`${prefix}/newsletter`);
