@@ -87,6 +87,7 @@ import {
   requiresAdminGate,
 } from "../../lib/auth/admin-gate-config";
 import { shouldBlockBot } from "../../lib/v30/security/bot-shield";
+import { isStripeSessionQuery, scanQueryString } from "../../lib/v30/security/waf";
 import { V20_NZIP_CATEGORIES } from "../../lib/v20/categories";
 import { getRevenueCopy } from "../../lib/i18n/revenue-copy";
 import { getSurfaceCopy } from "../../lib/i18n/surface-copy";
@@ -4301,6 +4302,17 @@ console.log("✓ magazine desk byline and copy checks passed");
     assert.ok(successSrc.includes('localizePublicHref("/articles"'));
     assert.ok(successSrc.includes("/api/v27/claim-editorial"));
     assert.ok(successSrc.includes("claimed"));
+    assert.equal(isStripeSessionQuery("?session_id=cs_live_abc123&product=public-year"), true);
+    assert.equal(scanQueryString("?session_id=cs_live_abc123&product=public-year&locale=cs").blocked, false);
+    assert.equal(scanQueryString("?session_id=cs_test_x").blocked, false);
+    assert.equal(scanQueryString("?q=<script>alert(1)</script>").blocked, true);
+    assert.equal(scanQueryString("?x=onclick=alert(1)").blocked, true);
+    assert.ok(
+      readFileSync(join(root, "lib/v30/security/waf.ts"), "utf8").includes("isStripeSessionQuery")
+    );
+    assert.ok(
+      readFileSync(join(root, "lib/v30/security/middleware.ts"), "utf8").includes("isStripeSessionQuery")
+    );
     assert.ok(existsSync(join(root, "app/api/v27/claim-editorial/route.ts")));
     const claimSrc = readFileSync(join(root, "app/api/v27/claim-editorial/route.ts"), "utf8");
     assert.ok(claimSrc.includes("isEditorialGrantProduct"));

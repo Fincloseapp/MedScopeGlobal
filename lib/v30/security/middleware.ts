@@ -5,7 +5,7 @@ import { shouldBlockBot } from "@/lib/v30/security/bot-shield";
 import { writeAuditLog } from "@/lib/v30/security/audit-log";
 import { checkApiRateLimit, isApiRateLimitExempt } from "@/lib/v30/security/rate-limit";
 import { applySecurityHeaders } from "@/lib/v30/security/headers";
-import { scanQueryString } from "@/lib/v30/security/waf";
+import { isStripeSessionQuery, scanQueryString } from "@/lib/v30/security/waf";
 import { canAccessAdminSurface } from "@/lib/v30/security/admin-guard";
 import { checkIpBan, recordThreatStrike, scanForThreats } from "@/lib/v46/security/threat-detector";
 
@@ -25,7 +25,8 @@ export async function applyV30SecurityMiddleware(
     });
   }
 
-  const waf = scanQueryString(search);
+  const stripeReturn = isStripeSessionQuery(search);
+  const waf = stripeReturn ? { blocked: false as const } : scanQueryString(search);
   if (waf.blocked) {
     recordThreatStrike(ip);
     void writeAuditLog({
@@ -38,7 +39,9 @@ export async function applyV30SecurityMiddleware(
     return new NextResponse("Bad Request", { status: 400 });
   }
 
-  const threatScan = scanForThreats(pathname, search);
+  const threatScan = stripeReturn
+    ? { blocked: false as const }
+    : scanForThreats(pathname, search);
   if (threatScan.blocked) {
     recordThreatStrike(ip);
     void writeAuditLog({

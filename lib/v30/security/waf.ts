@@ -15,10 +15,16 @@ const SQL_PATTERNS = [
 const XSS_PATTERNS = [
   /<script[\s>]/i,
   /javascript:/i,
-  /on\w+\s*=/i,
+  // Word-boundary + letters only: onclick= / onerror=. Do not match session_id=.
+  /\bon[a-z]+\s*=/i,
   /<iframe/i,
   /data:text\/html/i,
 ];
+
+/** Stripe success / claim return — must not be treated as XSS or `--` SQL. */
+export function isStripeSessionQuery(search: string): boolean {
+  return /(?:^|[?&])session_id=cs_(?:live|test)_[A-Za-z0-9]+/.test(search);
+}
 
 export type WafResult = { blocked: boolean; reason?: string; pattern?: string };
 
@@ -33,6 +39,7 @@ function matchesPatterns(value: string, patterns: RegExp[]): WafResult {
 
 export function scanQueryString(search: string): WafResult {
   if (!search || search === "?") return { blocked: false };
+  if (isStripeSessionQuery(search)) return { blocked: false };
   const decoded = decodeURIComponent(search);
   const sql = matchesPatterns(decoded, SQL_PATTERNS);
   if (sql.blocked) return { ...sql, reason: "sql_injection_query" };
