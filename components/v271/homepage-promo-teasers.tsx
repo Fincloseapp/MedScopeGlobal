@@ -6,7 +6,7 @@ import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export function HomepagePromoTeasers({ locale }: { locale: string }) {
   const copy = getShareCopy(locale);
-  const teasers = getPromoTeasers();
+  const teasers = getPromoTeasers(locale);
   return (
     <section className="mx-auto max-w-7xl px-4 pb-2 sm:px-6" aria-labelledby="homepage-promo-title">
       <div className="rounded-xl border border-[#d7e6f4] bg-white px-5 py-6 sm:px-7">

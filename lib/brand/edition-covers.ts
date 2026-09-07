@@ -2,7 +2,8 @@ import { MAGAZINE } from "@/lib/brand/magazine";
 import { SITE } from "@/lib/config/site";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
 
-export type EditionCluster = "europe" | "east-asia" | "south-asia" | "africa" | "mena";
+/** Peaceful magazine editions only — no conflict-region travel covers. */
+export type EditionCluster = "europe" | "east-asia" | "south-asia" | "africa" | "atlantic";
 
 export type EditionCover = {
   id: string;
@@ -20,8 +21,8 @@ export const EDITION_COVERS: EditionCover[] = [
   { id: "india-man", src: "/assets/magazine/editions/india-man.jpg", cluster: "south-asia", gender: "man" },
   { id: "africa-woman", src: "/assets/magazine/editions/africa-woman.jpg", cluster: "africa", gender: "woman" },
   { id: "africa-man", src: "/assets/magazine/editions/africa-man.jpg", cluster: "africa", gender: "man" },
-  { id: "mena-woman", src: "/assets/magazine/editions/mena-woman.jpg", cluster: "mena", gender: "woman" },
-  { id: "mena-man", src: "/assets/magazine/editions/mena-man.jpg", cluster: "mena", gender: "man" },
+  { id: "portugal-woman", src: "/assets/magazine/editions/portugal-woman.jpg", cluster: "atlantic", gender: "woman" },
+  { id: "portugal-man", src: "/assets/magazine/editions/portugal-man.jpg", cluster: "atlantic", gender: "man" },
 ];
 
 const ALT: Record<ChromePack, string> = {
@@ -47,13 +48,13 @@ export function clustersForLocale(locale?: string | null): EditionCluster[] {
   if (key === "ja" || key === "ko" || key === "zh-cn" || key === "vi" || key === "id") {
     return ["east-asia", "south-asia"];
   }
-  if (key === "fr") return ["africa", "mena", "europe"];
-  if (key === "pt" || key === "pt-br") return ["africa", "south-asia", "europe"];
+  if (key === "fr") return ["africa", "atlantic", "europe"];
+  if (key === "pt" || key === "pt-br") return ["atlantic", "africa", "south-asia", "europe"];
   if (key === "en" || key === "en-us" || key === "en-uk") {
-    return ["south-asia", "africa", "mena", "east-asia", "europe"];
+    return ["south-asia", "africa", "atlantic", "east-asia", "europe"];
   }
-  if (key === "es") return ["mena", "africa", "europe"];
-  return ["europe", "east-asia", "south-asia", "africa", "mena"];
+  if (key === "es") return ["atlantic", "africa", "europe"];
+  return ["europe", "atlantic", "east-asia", "south-asia", "africa"];
 }
 
 export function pickEditionCover(locale?: string | null, seed = "week"): EditionCover {

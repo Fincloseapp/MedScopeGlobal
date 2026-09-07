@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PromoKlipyPage() {
   const locale = await getServerLocale();
   const copy = getShareCopy(locale);
-  const teasers = getPromoTeasers();
+  const teasers = getPromoTeasers(locale);
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
       <ViaLongeVitaMasthead

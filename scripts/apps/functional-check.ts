@@ -982,10 +982,12 @@ file("public/assets/magazine/vialongevita-email-lockup.jpg");
 {
   assert.equal(EDITION_COVERS.length, 10);
   assert.ok(clustersForLocale("ja").includes("east-asia"));
-  assert.ok(clustersForLocale("fr").includes("africa") && clustersForLocale("fr").includes("mena"));
+  assert.ok(clustersForLocale("fr").includes("africa") && clustersForLocale("fr").includes("atlantic"));
   assert.ok(clustersForLocale("en").includes("south-asia"));
   assert.equal(pickEditionCover("ja", "fixed").cluster, "east-asia");
-  assert.ok(["africa", "mena", "europe"].includes(pickEditionCover("fr", "fixed").cluster));
+  assert.ok(["africa", "atlantic", "europe"].includes(pickEditionCover("fr", "fixed").cluster));
+  assert.ok(!EDITION_COVERS.some((cover) => cover.src.includes("mena-")));
+  assert.ok(EDITION_COVERS.some((cover) => cover.id === "portugal-woman"));
   assert.ok(!looksLikeCzech(editionCoverAlt("fr")));
   assert.ok(!looksLikeCzech(editionCoverAlt("en")));
   assert.ok(editionCoverAlt("cs").includes("ViaLongeVita"));
@@ -2711,6 +2713,12 @@ assert.ok(
     assert.ok(promo.every((row) => row.site === "medscopeglobal.com" && row.brand === "ViaLongeVita"));
     assert.ok(promo.every((row) => row.durationSeconds === 8 && row.aspect === "9:16"));
     assert.deepEqual(promo.map((row) => row.id), ["man", "woman", "alike"]);
+    assert.equal(getPromoTeasers("cs")[0]?.line, "Čte. Zůstává.");
+    assert.equal(getPromoTeasers("fr")[0]?.sub, "Longévité");
+    assert.ok(!looksLikeCzech(getPromoTeasers("fr")[0]?.line));
+    assert.ok(!looksLikeCzech(getPromoTeasers("de")[0]?.sub));
+    assert.ok(!getPromoTeasers("fr").some((row) => row.sub.includes("Dlouhověkost")));
+    assert.ok(!getPromoTeasers("cs").some((row) => /He reads|Longevity ·|Dlouhověkost ·/.test(`${row.line} ${row.sub}`)));
     assert.ok(drafts.some((row) => row.headline.includes("he reads") && row.body.includes("/assets/ads/teasers/")));
     assert.ok(readFileSync(join(root, "app/(public)/predplatne/page.tsx"), "utf8").includes("SocialShareStrip"));
     assert.ok(readFileSync(join(root, "app/(public)/predplatne/page.tsx"), "utf8").includes("/firmy/reklama/nova"));
