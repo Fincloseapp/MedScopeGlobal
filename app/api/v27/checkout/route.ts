@@ -6,6 +6,7 @@ import { normalizeLocale } from "@/lib/i18n/config";
 import { getServerLocale, getServerRegion } from "@/lib/i18n/server-locale";
 import { normalizeAiAgentSlug } from "@/lib/growth/ai-agent-program";
 import { readAiRefFromCookieHeader } from "@/lib/growth/ai-ref-cookie";
+import { detectAiReferrer } from "@/lib/growth/ai-referrer";
 import { requestCountry } from "@/lib/growth/request-country";
 import { logMonetizationEvent } from "@/lib/monetization/log-event";
 
@@ -44,7 +45,9 @@ export async function POST(request: Request) {
   const region = await getServerRegion();
 
   const aiRef =
-    normalizeAiAgentSlug(body.aiRef) ?? readAiRefFromCookieHeader(request.headers.get("cookie"));
+    normalizeAiAgentSlug(body.aiRef) ??
+    readAiRefFromCookieHeader(request.headers.get("cookie")) ??
+    detectAiReferrer(request.headers.get("referer"));
 
   const result = await createV27CheckoutSession({
     kind: body.kind,

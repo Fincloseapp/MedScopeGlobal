@@ -27,9 +27,13 @@ export async function handleAiHop(request: Request, pathAgent?: string): Promise
   const dest =
     toParam === "apps"
       ? "/aplikace"
-      : arena
-        ? arenaHopPath(arena.section, locale)
-        : "/predplatne";
+      : toParam === "newsletter"
+        ? "/newsletter/posledni"
+        : toParam === "articles"
+          ? "/articles"
+          : arena
+            ? arenaHopPath(arena.section, locale)
+            : "/predplatne";
 
   if (agent) {
     const country = requestCountry(request.headers);

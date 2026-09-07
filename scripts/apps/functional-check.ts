@@ -288,6 +288,7 @@ import {
   agentHopPathUrl,
 } from "../../lib/growth/ai-agent-program";
 import { detectAiCrawler } from "../../lib/growth/ai-crawler";
+import { detectAiReferrer } from "../../lib/growth/ai-referrer";
 import { conversionHopUrls, rotatedRankedAgentHopUrls } from "../../lib/growth/ai-agent-hops";
 import { agentPipelineStatus } from "../../lib/growth/ai-agent-stats";
 import { aiAgentJsonLd } from "../../lib/growth/ai-agent-jsonld";
@@ -2552,9 +2553,29 @@ assert.ok(
     assert.ok(hops.some((url) => url.includes("/r/ai/claude")));
     assert.ok(hops.some((url) => url.includes("ref=alfa")));
     assert.ok(hops.some((url) => url.includes("locale=cs")));
+    assert.ok(hops.some((url) => url.includes("to=newsletter")));
+    assert.ok(hops.some((url) => url.includes("to=articles")));
   }
-  assert.equal(agentPipelineStatus({ visits: 3646, checkouts: 0, newsletters: 0, paid: 0 }), "crawler/hop čte — neplatí");
-  assert.equal(agentPipelineStatus({ visits: 0, checkouts: 0, newsletters: 0, paid: 0 }), "IndexNow pingá — čeká na první hop nebo crawler");
+  assert.equal(detectAiReferrer("https://chatgpt.com/"), "chatgpt");
+  assert.equal(detectAiReferrer("https://claude.ai/chat/abc"), "claude");
+  assert.equal(detectAiReferrer("https://gemini.google.com/app"), "gemini");
+  assert.equal(detectAiReferrer("https://www.perplexity.ai/search"), "perplexity");
+  assert.equal(detectAiReferrer("https://www.bing.com/chat"), "copilot");
+  assert.equal(detectAiReferrer("https://www.google.com/search?q=longevity"), null);
+  assert.equal(detectAiReferrer("https://www.facebook.com/"), null);
+  assert.equal(detectAiReferrer("https://www.amazon.com/dp/B0"), null);
+  assert.equal(
+    agentPipelineStatus({ visits: 3646, checkouts: 0, newsletters: 0, paid: 0 }),
+    "crawler/hop/referer — neplatí"
+  );
+  assert.equal(
+    agentPipelineStatus({ visits: 0, checkouts: 0, newsletters: 0, paid: 0 }),
+    "IndexNow pingá — čeká na první hop, referer nebo crawler"
+  );
+  assert.equal(
+    agentPipelineStatus({ agent: "other", visits: 0, checkouts: 0, newsletters: 0, paid: 0 }),
+    "organika bez ?ref= — až někdo zaplatí bez hopu"
+  );
   assert.equal(agentPipelineStatus({ visits: 0, checkouts: 0, newsletters: 0, paid: 1 }), "úspěch — platí");
   assert.ok(
     readFileSync(join(root, "lib/growth/legal-sprint.ts"), "utf8").includes("conversionHopUrls")
@@ -3035,10 +3056,14 @@ assert.ok(
       readFileSync(join(root, "lib/growth/ai-hop-handler.ts"), "utf8").includes("requestCountry"),
       "hops must attribute the visitor country into the locale contest"
     );
+    assert.ok(
+      readFileSync(join(root, "lib/growth/ai-hop-handler.ts"), "utf8").includes('toParam === "newsletter"'),
+      "hops must be able to land on the newsstand, not only /predplatne"
+    );
     assert.ok(existsSync(join(root, "app/r/ai/[agent]/route.ts")));
     assert.ok(
       readFileSync(join(root, "components/growth/ai-agent-beacon.tsx"), "utf8").includes(
-        "existing === fromUrl"
+        "existing === fresh"
       ),
       "hop+beacon must not double-count the same visit"
     );
@@ -3053,6 +3078,18 @@ assert.ok(
     assert.ok(
       readFileSync(join(root, "middleware.ts"), "utf8").includes("detectAiCrawler"),
       "named assistant crawlers on public pages must score without inventing visits"
+    );
+    assert.ok(
+      readFileSync(join(root, "middleware.ts"), "utf8").includes("detectAiReferrer"),
+      "human clicks from chat UIs must set ms_ai_ref even without ?ref="
+    );
+    assert.ok(
+      readFileSync(join(root, "app/api/v27/checkout/route.ts"), "utf8").includes("detectAiReferrer"),
+      "Stripe checkout must attribute chat Referer when cookie is missing"
+    );
+    assert.ok(
+      readFileSync(join(root, "components/growth/ai-agent-beacon.tsx"), "utf8").includes("document.referrer"),
+      "beacon must capture chat Referer as well as ?ref="
     );
     assert.ok(
       readFileSync(join(root, "lib/growth/arena/tick.ts"), "utf8").includes("scoreCountryMarkets"),

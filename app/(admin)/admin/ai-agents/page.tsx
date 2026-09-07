@@ -45,9 +45,10 @@ export default async function AdminAiAgentsPage() {
       <div>
         <h1 className="font-display text-3xl font-bold text-medical-navy">AI agenti — růst a žebříček</h1>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-          Cron nevolá ChatGPT, Claude ani Gemini. Žebříček jen přiřazuje příchozí{" "}
-          <code>?ref=</code>, hop <code>/r/ai</code> a známý crawler UA. 0 checkout / 0 zaplaceno
-          znamená, že nikdo s cookie <code>ms_ai_ref</code> nedokončil Stripe — cron to nevymyslí.
+          Cron nevolá ChatGPT, Claude ani Gemini. Žebříček přiřazuje{" "}
+          <code>?ref=</code>, hop <code>/r/ai</code>, známý crawler UA a lidský klik z chatu
+          (Referer). 0 checkout / 0 zaplaceno znamená, že nikdo s cookie{" "}
+          <code>ms_ai_ref</code> nedokončil Stripe — cron to nevymyslí.
           Zdroj: {snap.dataSource}. Aktualizováno {new Date(snap.loadedAt).toLocaleString("cs-CZ")}.
         </p>
       </div>
@@ -125,9 +126,10 @@ export default async function AdminAiAgentsPage() {
         <h2 className="mb-3 font-display text-xl font-semibold">Žebříček AI agentů</h2>
         <p className="mb-4 text-sm text-muted-foreground">
           Pořadí: nejdřív <code>ai_agent_paid</code>, až potom košík a návštěvy. Návštěva
-          crawlera není úspěch. Cron každou 5. minutu pingá IndexNow hop všech 16 agentů na
-          /predplatne — nevolá API asistentů. Souboj Alfa/Beta se rozhoduje jen podle
-          zaplacených předplatných — pravidla jsou na{" "}
+          crawlera není úspěch.           Cron každou 5. minutu pingá IndexNow hop všech 16 agentů na
+          /predplatne, brief i články — nevolá API asistentů. Lidský klik z chatu
+          (Referer) nastaví cookie i bez <code>?ref=</code>. Souboj Alfa/Beta se
+          rozhoduje jen podle zaplacených předplatných — pravidla jsou na{" "}
           <Link href="/admin/ai-teams" className="font-medium text-[#005B96] hover:underline">
             Růstové aréně
           </Link>
@@ -171,7 +173,8 @@ export default async function AdminAiAgentsPage() {
       <section className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5">
         <h2 className="font-display text-xl font-semibold">Náprava — cíl je zaplacené předplatné</h2>
         <p className="mt-1 text-sm text-amber-950">
-          Tři crawleři čtou a neplatí. Ostatní neměli první hop. IndexNow teď pingá všech 16.
+          Tři crawleři čtou a neplatí. Ostatní čekali na první hop, protože lidský klik
+          z chatu bez <code>?ref=</code> padal do other. Teď Referer + hop na brief/články.
           Výhra až někdo dokončí Stripe.
         </p>
         <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-slate-800">

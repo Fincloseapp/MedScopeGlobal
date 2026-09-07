@@ -87,14 +87,12 @@ export async function runLegalGrowthSprint(opts?: {
     const urls = priorityDiscoveryUrls();
     const agentHops = conversionHopUrls();
     urls.push(...agentHops);
-    actions.push(`IndexNow hop ${agentHops.length} URL pro všech 16 agentů na /predplatne`);
-    if (offTrack) {
-      const slugs = await recentPublishedSlugs(12);
-      extraArticles = slugs.length;
+    actions.push(`IndexNow hop ${agentHops.length} URL pro všech 16 agentů (predplatne + brief + články)`);
+    const slugs = await recentPublishedSlugs(12);
+    extraArticles = slugs.length;
+    if (slugs.length) {
       urls.push(...articleDiscoveryUrls(slugs));
-      actions.push(`IndexNow + ${slugs.length} článků (tempo mimo cíl)`);
-    } else {
-      actions.push("IndexNow priorita URL");
+      actions.push(`IndexNow + ${slugs.length} článků k citaci (cíl = platící, ne crawler)`);
     }
     try {
       indexNow = await submitIndexNow(urls);

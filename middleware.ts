@@ -30,7 +30,15 @@ import {
   enforceLekarskaZonaMiddleware,
   isLekarskaZonaPath,
 } from "@/lib/academy/b2b/middleware-gate";
+import {
+  AI_REF_COOKIE,
+  AI_REF_MAX_AGE_SEC,
+  parseAiAgentFromSearch,
+  type AiAgentSlug,
+} from "@/lib/growth/ai-agent-program";
+import { readAiRefFromCookieHeader } from "@/lib/growth/ai-ref-cookie";
 import { detectAiCrawler } from "@/lib/growth/ai-crawler";
+import { detectAiReferrer } from "@/lib/growth/ai-referrer";
 import { requestCountry } from "@/lib/growth/request-country";
 import { logMonetizationEvent } from "@/lib/monetization/log-event";
 
@@ -58,6 +66,26 @@ function copyResponseCookies(from: NextResponse, to: NextResponse) {
   });
 }
 
+function resolveIncomingAiRef(
+  request: NextRequest
+): { agent: Exclude<AiAgentSlug, "other">; via: "query" | "referer" } | null {
+  const existing = readAiRefFromCookieHeader(request.headers.get("cookie"));
+  if (existing && existing !== "other") return null;
+  const fromQuery = parseAiAgentFromSearch(request.nextUrl.search);
+  if (fromQuery && fromQuery !== "other") return { agent: fromQuery, via: "query" };
+  const fromReferer = detectAiReferrer(request.headers.get("referer"));
+  if (fromReferer) return { agent: fromReferer, via: "referer" };
+  return null;
+}
+
+function stampAiRefCookie(response: NextResponse, agent: string) {
+  response.cookies.set(AI_REF_COOKIE, agent, {
+    path: "/",
+    maxAge: AI_REF_MAX_AGE_SEC,
+    sameSite: "lax",
+  });
+}
+
 function adminGateRedirect(request: NextRequest): NextResponse {
   const login = new URL("/admin/login", request.url);
   const redirect = NextResponse.redirect(login);
@@ -70,14 +98,12 @@ function adminGateRedirect(request: NextRequest): NextResponse {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const incoming = resolveIncomingAiRef(request);
+  const skipVisitLog =
+    pathname.startsWith("/api/") || pathname.startsWith("/admin") || pathname.startsWith("/_next");
 
   const crawler = detectAiCrawler(request.headers.get("user-agent"));
-  if (
-    crawler &&
-    !pathname.startsWith("/api/") &&
-    !pathname.startsWith("/admin") &&
-    !pathname.startsWith("/_next")
-  ) {
+  if (crawler && !skipVisitLog) {
     const country = requestCountry(request.headers);
     const { locale: pathLocale } = resolveLocalePath(pathname);
     await logMonetizationEvent("ai_agent_visit", {
@@ -87,17 +113,32 @@ export async function middleware(request: NextRequest) {
       via: "crawler",
       ...(country ? { country } : {}),
     });
+  } else if (incoming && !skipVisitLog) {
+    const country = requestCountry(request.headers);
+    const { locale: pathLocale } = resolveLocalePath(pathname);
+    await logMonetizationEvent("ai_agent_visit", {
+      agent: incoming.agent,
+      locale: pathLocale ?? "en",
+      path: pathname.slice(0, 180),
+      via: incoming.via,
+      ...(country ? { country } : {}),
+    });
   }
+
+  const outbound = (response: NextResponse) => {
+    if (incoming) stampAiRefCookie(response, incoming.agent);
+    return wrapWithSecurityHeaders(response, pathname);
+  };
 
   const securityBlock = await applyV30SecurityMiddleware(request);
   if (securityBlock) return securityBlock;
 
   if (requiresAdminGate(pathname) && !hasValidAdminGateCookie(request.cookies)) {
-    return adminGateRedirect(request);
+    return outbound(adminGateRedirect(request));
   }
 
   if (pathname === "/stav-systemu") {
-    return NextResponse.redirect(new URL("/admin/system", request.url));
+    return outbound(NextResponse.redirect(new URL("/admin/system", request.url)));
   }
 
   const { supabase, response } = createMiddlewareClient(request);
@@ -106,7 +147,7 @@ export async function middleware(request: NextRequest) {
   if (isLekarskaZonaPath(pathname)) {
     const gated = await enforceLekarskaZonaMiddleware(request, supabase, response);
     if (gated && gated !== response) {
-      return wrapWithSecurityHeaders(gated, pathname);
+      return outbound(gated);
     }
   }
 
@@ -117,7 +158,7 @@ export async function middleware(request: NextRequest) {
       url.pathname = alias;
       const redirect = NextResponse.redirect(url, 308);
       copyResponseCookies(response, redirect);
-      return wrapWithSecurityHeaders(redirect, pathname);
+      return outbound(redirect);
     }
 
     const { locale: pathLocale, pathname: stripped } = resolveLocalePath(pathname);
@@ -127,7 +168,7 @@ export async function middleware(request: NextRequest) {
         : "/lekari";
       const redirect = NextResponse.redirect(new URL(destPath, request.url), 308);
       copyResponseCookies(response, redirect);
-      return wrapWithSecurityHeaders(redirect, pathname);
+      return outbound(redirect);
     }
     if (pathLocale) {
       const url = request.nextUrl.clone();
@@ -144,10 +185,10 @@ export async function middleware(request: NextRequest) {
       });
       copyResponseCookies(response, rewrite);
       rewrite.cookies.set(LOCALE_COOKIE, normalizeLocale(pathLocale), LOCALE_COOKIE_OPTS);
-      return wrapWithSecurityHeaders(rewrite, pathname);
+      return outbound(rewrite);
     }
   } else {
-    return wrapWithSecurityHeaders(response, pathname);
+    return outbound(response);
   }
 
   // Typing medscopeglobal.com (or any unprefixed public URL) always follows
@@ -169,7 +210,7 @@ export async function middleware(request: NextRequest) {
     copyResponseCookies(response, redirect);
     redirect.headers.set("Vary", "Accept-Language, User-Agent, CF-IPCountry");
     redirect.headers.set("Cache-Control", "public, max-age=300");
-    return wrapWithSecurityHeaders(redirect, pathname);
+    return outbound(redirect);
   }
 
   const redirect = NextResponse.redirect(dest, 302);
@@ -177,7 +218,7 @@ export async function middleware(request: NextRequest) {
   redirect.headers.set("Vary", "Accept-Language, User-Agent, CF-IPCountry");
   redirect.headers.set("Cache-Control", "private, no-store, must-revalidate");
   redirect.cookies.set(LOCALE_COOKIE, normalizeLocale(target), LOCALE_COOKIE_OPTS);
-  return wrapWithSecurityHeaders(redirect, pathname);
+  return outbound(redirect);
 }
 
 export const config = {

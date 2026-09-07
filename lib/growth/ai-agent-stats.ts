@@ -24,19 +24,23 @@ export type AgentRow = {
   newsletters: number;
 };
 
-/** Admin label. Crawler/hop is pipeline. Win only when paid > 0. */
-export function agentPipelineStatus(row: Pick<AgentRow, "visits" | "checkouts" | "paid" | "newsletters">): string {
+/** Admin label. Crawler/hop/referer is pipeline. Win only when paid > 0. */
+export function agentPipelineStatus(
+  row: Pick<AgentRow, "visits" | "checkouts" | "paid" | "newsletters"> & { agent?: string }
+): string {
   if (row.paid > 0) return "úspěch — platí";
   if (row.checkouts > 0) return "košík, neplatí";
-  if (row.visits + row.newsletters > 0) return "crawler/hop čte — neplatí";
-  return "IndexNow pingá — čeká na první hop nebo crawler";
+  if (row.visits + row.newsletters > 0) return "crawler/hop/referer — neplatí";
+  if (row.agent === "other") return "organika bez ?ref= — až někdo zaplatí bez hopu";
+  return "IndexNow pingá — čeká na první hop, referer nebo crawler";
 }
 
 export const AI_AGENT_REMEDIATIONS = [
-  "Cron každou 5. minutu pingá IndexNow hop + path pro všech 16 hodnocených agentů na /predplatne. Rotace po 4 už nestačí.",
+  "Cron každou 5. minutu pingá IndexNow hop + path pro všech 16 hodnocených agentů na /predplatne, brief i články. Rotace po 4 nestačí.",
   "Crawler čtení (Meta / ChatGPT / Amazon) není výhra. Body a verdikt jen za Stripe active / ai_agent_paid.",
-  "Hop /r/ai?ref=agent a /r/ai/agent nastaví cookie ms_ai_ref a otevře roční Redakci. Organická platba bez ref jde do other.",
-  "llms.txt a /.well-known/ai.txt vypisují hop každého agenta. Cron nevolá API ChatGPT/Claude/Gemini.",
+  "Lidský klik z chatu (Referer chatgpt.com, claude.ai, gemini.google.com, perplexity.ai, …) nastaví cookie ms_ai_ref i bez ?ref= — dřív platba padala do other.",
+  "Hop /r/ai?ref=agent a /r/ai/agent nastaví cookie a otevře roční Redakci, newsstand nebo články. Organická platba bez ref/referer jde do other.",
+  "llms.txt a /.well-known/ai.txt vypisují hop každého agenta. Cron nevolá API ChatGPT/Claude/Gemini a nesmí sám GET /r/ai.",
   "Lidský upload IG/FB/WA/LI z /promo/klipy + /predplatne. Cron neposílá sítě.",
 ] as const;
 

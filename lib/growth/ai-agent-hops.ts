@@ -48,7 +48,8 @@ export function priorityAgentHopUrls(base = getSiteUrl()): string[] {
 
 /**
  * Every ranked agent, every pay-market locale, query + path hop.
- * IndexNow ping is not a visit and not a win — it only asks Bing/Yandex to fetch /predplatne.
+ * Extra query hops land on the newsstand and article hub (year-first pay).
+ * IndexNow ping is not a visit and not a win — it only asks Bing/Yandex to fetch.
  */
 export function conversionHopUrls(base = getSiteUrl()): string[] {
   const urls = new Set<string>();
@@ -56,6 +57,8 @@ export function conversionHopUrls(base = getSiteUrl()): string[] {
     for (const locale of CONVERSION_HOP_LOCALES) {
       urls.add(agentHopUrl(agent, locale, base));
       urls.add(agentHopPathUrl(agent, locale, base));
+      urls.add(agentHopUrl(agent, locale, base, "newsletter"));
+      urls.add(agentHopUrl(agent, locale, base, "articles"));
     }
   }
   return [...urls];
