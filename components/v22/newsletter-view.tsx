@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { NewsletterRow } from "@/lib/queries/v4c/newsletters";
 import { NewsletterHero } from "@/components/newsletter/Hero";
-import { V22_NEWSLETTER_HERO } from "@/lib/v22/newsletter";
+import { pickEditionCover, editionCoverAlt, isoWeekSeed } from "@/lib/brand/edition-covers";
 import { Button } from "@/components/ui/button";
 import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
@@ -20,8 +20,8 @@ export function V22NewsletterHub({ locale = "cs" }: { locale?: string }) {
       <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white">
         <div className="relative min-h-[380px] bg-[#021d33] sm:min-h-[420px]">
           <Image
-            src={V22_NEWSLETTER_HERO}
-            alt={copy.hubTitle}
+            src={pickEditionCover(locale, isoWeekSeed()).src}
+            alt={editionCoverAlt(locale)}
             fill
             className="object-cover opacity-35"
             sizes="100vw"

@@ -10,7 +10,7 @@ import {
   V23_ITEM_IMAGE_SECTIONS,
 } from "@/lib/v23/newsletter/images";
 import type { V23NewsletterLayout, V23NewsletterSection } from "@/lib/v23/newsletter/types";
-import { V23_NEWSLETTER_IMAGE } from "@/lib/v23/images";
+import { editionCoverAlt, isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
 import { isJsonLikeText, sanitizeNewsletterText } from "@/lib/v23/newsletter/sanitize";
 import { newsletterHeadline } from "@/lib/v23/newsletter/title";
 import { Button } from "@/components/ui/button";
@@ -172,8 +172,15 @@ export function V23NewsletterIssueView({
     layout?.intro && !(czechBody && looksLikeCzech(layout.intro))
       ? layout.intro
       : `${copy.hubDescription}${dateLabel ? ` — ${dateLabel}` : ""}`;
-  const heroUrl = layout?.heroImageUrl?.startsWith("http") ? layout.heroImageUrl : V23_NEWSLETTER_IMAGE;
-  const heroAlt = layout?.heroImageAlt ?? copy.hubTitle;
+  const storedHero = layout?.heroImageUrl ?? "";
+  const heroUrl = storedHero.startsWith("http")
+    ? storedHero
+    : storedHero.includes("/assets/magazine/editions/")
+      ? storedHero
+      : pickEditionCover(locale, isoWeekSeed()).src;
+  const heroAlt = storedHero.includes("/assets/magazine/editions/")
+    ? (layout?.heroImageAlt ?? editionCoverAlt(locale))
+    : editionCoverAlt(locale);
   const showHtmlFallback =
     !layout && issue.html_content && !isJsonLikeText(issue.html_content) && !issue.html_content.includes('"sections"');
 

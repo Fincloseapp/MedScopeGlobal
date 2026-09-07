@@ -74,6 +74,8 @@ import {
 import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { MAGAZINE, getOgLocale } from "@/lib/brand/magazine";
+import { MagazineTitleSpread } from "@/components/magazine/magazine-title-spread";
+import { pickEditionCover } from "@/lib/brand/edition-covers";
 import { isArticleTipUiEnabled, ARTICLE_TIP_COPY, tipLocale } from "@/lib/ecosystem/tip-copy";
 import { SITE } from "@/lib/config/site";
 import { getArticleChrome } from "@/lib/i18n/article-chrome";
@@ -251,6 +253,9 @@ export default async function ArticlePage({ params }: Props) {
     preferCurated: true,
   });
   const coverMeta = getArticleCoverLabel(article.title, category?.name);
+  const editionCover = pickEditionCover(locale, article.slug);
+  const useEditionTitle =
+    revenueSurface === "public" && !isStudentArticle && !isNovinkyArticle(article);
 
   const isV19Article = article.rubric_slug === V19_RUBRIC_SLUG;
   const v19Quiz = (article.quiz_json ?? {}) as Record<string, unknown>;
@@ -324,6 +329,7 @@ export default async function ArticlePage({ params }: Props) {
 
       <article className="article-reading-page">
         <div className="article-reading-shell">
+          {useEditionTitle ? <MagazineTitleSpread cover={editionCover} locale={locale} /> : null}
           <header className="article-reading-header">
             <p className="article-brand-kicker">{MAGAZINE.name}</p>
 
@@ -403,6 +409,7 @@ export default async function ArticlePage({ params }: Props) {
             </p>
           </header>
 
+          {useEditionTitle ? null : (
           <figure className="article-cover">
             {coverUrl ? (
               <Image
@@ -431,6 +438,7 @@ export default async function ArticlePage({ params }: Props) {
               </div>
             )}
           </figure>
+          )}
 
           <ArticleImageSupportNudge
             locale={supportLocale}

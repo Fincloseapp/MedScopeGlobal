@@ -1,4 +1,4 @@
-import { MAGAZINE } from "@/lib/brand/magazine";
+import { editionCoverAlt, pickEditionCover } from "@/lib/brand/edition-covers";
 import { MEDICAL_DISCLAIMER, type GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { localHealthHint } from "@/lib/editorial/locale-magazine-desks";
 import {
@@ -11,7 +11,7 @@ import { normalizeLocale } from "@/lib/i18n/config";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { resolveGlobalLocale } from "@/lib/i18n/locale-path";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
-import { attachSectionImages, heroNewsletterImage } from "@/lib/v23/newsletter/images";
+import { attachSectionImages } from "@/lib/v23/newsletter/images";
 import { newsletterHeadline } from "@/lib/v23/newsletter/title";
 import type { V23NewsletterItem, V23NewsletterLayout } from "@/lib/v23/newsletter/types";
 import type { V23NewsletterSources } from "@/lib/v23/newsletter/sources";
@@ -148,8 +148,8 @@ export function buildLocaleMagazineLayout(
   return {
     version: "v23.2.0",
     locale: resolved,
-    heroImageUrl: heroNewsletterImage(`${issueDate}-${resolved}`),
-    heroImageAlt: `${MAGAZINE.name} · ${copy.hubTitle}`,
+    heroImageUrl: pickEditionCover(resolved, `${issueDate}-${resolved}`).src,
+    heroImageAlt: editionCoverAlt(resolved),
     headline: newsletterHeadline(issueDate, resolved),
     intro: `${copy.briefIntro} ${hint} ${disclaimer}`.trim(),
     sections,

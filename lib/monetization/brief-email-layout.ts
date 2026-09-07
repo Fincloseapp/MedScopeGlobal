@@ -1,4 +1,10 @@
 import { MAGAZINE } from "@/lib/brand/magazine";
+import {
+  editionCoverAbsoluteUrl,
+  editionCoverAlt,
+  isoWeekSeed,
+  pickEditionCover,
+} from "@/lib/brand/edition-covers";
 import { SITE } from "@/lib/config/site";
 import { formatPublicDate } from "@/lib/i18n/format-date";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
@@ -31,6 +37,17 @@ const MUTED = "#64748b";
 const BODY = "#334155";
 const RULE = "#d5e4f0";
 
+export function editionHeroHtml(locale: string, seed?: string): string {
+  const cover = pickEditionCover(locale, seed ?? isoWeekSeed());
+  const src = editionCoverAbsoluteUrl(cover);
+  const alt = editionCoverAlt(locale);
+  return `<tr>
+          <td align="center" style="background:${NAVY};padding:0;line-height:0;">
+            <img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" width="600" style="display:block;width:100%;max-width:600px;height:auto;border:0;outline:none;" />
+          </td>
+        </tr>`;
+}
+
 export function emailShell(input: {
   locale: string;
   inner: string;
@@ -61,6 +78,7 @@ export function emailShell(input: {
             </a>
           </td>
         </tr>
+        ${editionHeroHtml(input.locale)}
         <tr>
           <td align="center" style="background:${NAVY};padding:0 28px 18px;">
             <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#9ec9ea;">${escapeHtml(kicker)}</p>

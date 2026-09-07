@@ -258,6 +258,12 @@ import {
   rotatingForeignWriterLocale,
 } from "../../lib/v25/config/public-writers";
 import { looksLikeCzech } from "../../lib/i18n/czech-detect";
+import {
+  EDITION_COVERS,
+  clustersForLocale,
+  editionCoverAlt,
+  pickEditionCover,
+} from "../../lib/brand/edition-covers";
 import { getKarieraHubCopy, JOB_FILTER_VALUES } from "../../lib/i18n/kariera-hub-copy";
 import { getKongresyHubCopy } from "../../lib/i18n/kongresy-hub-copy";
 import { getOrganizaceHubCopy } from "../../lib/i18n/organizace-hub-copy";
@@ -967,11 +973,28 @@ assert.ok(composeBriefSubject("cs", ["Světelný budík a spánek"]).startsWith(
 {
   const briefSrc = readFileSync(join(root, "lib/monetization/brief-email-layout.ts"), "utf8");
   assert.ok(briefSrc.includes("emailLockup") || briefSrc.includes("vialongevita-email-lockup"));
+  assert.ok(briefSrc.includes("editionHeroHtml"), "brief must open with a title-page portrait");
   assert.ok(briefSrc.includes("heroLabel"), "weekly brief must have a lead story, not a title dump");
   assert.ok(briefSrc.includes("welcomeExpect"), "welcome must set the weekly promise");
   assert.ok(briefSrc.includes("brandLine"), "every issue must close with a brand line");
 }
 file("public/assets/magazine/vialongevita-email-lockup.jpg");
+{
+  assert.equal(EDITION_COVERS.length, 10);
+  assert.ok(clustersForLocale("ja").includes("east-asia"));
+  assert.ok(clustersForLocale("fr").includes("africa") && clustersForLocale("fr").includes("mena"));
+  assert.ok(clustersForLocale("en").includes("south-asia"));
+  assert.equal(pickEditionCover("ja", "fixed").cluster, "east-asia");
+  assert.ok(["africa", "mena", "europe"].includes(pickEditionCover("fr", "fixed").cluster));
+  assert.ok(!looksLikeCzech(editionCoverAlt("fr")));
+  assert.ok(!looksLikeCzech(editionCoverAlt("en")));
+  assert.ok(editionCoverAlt("cs").includes("ViaLongeVita"));
+  for (const cover of EDITION_COVERS) {
+    assert.ok(existsSync(join(root, "public", cover.src.replace(/^\//, ""))), cover.src);
+  }
+  assert.ok(readFileSync(join(root, "app/(public)/article/[slug]/page.tsx"), "utf8").includes("MagazineTitleSpread"));
+  assert.ok(!GLOBAL_LOCALES.includes("ar" as (typeof GLOBAL_LOCALES)[number]));
+}
 assert.ok(
   !readFileSync(join(root, "lib/monetization/vialongevita-brief.ts"), "utf8").includes("escapeHtml(market)"),
   "brief must not show heureka-cz / amazon market labels"
