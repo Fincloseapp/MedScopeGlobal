@@ -3752,6 +3752,8 @@ console.log("✓ magazine desk byline and copy checks passed");
     const bannerSrc = readFileSync(join(root, "components/subscription/subscription-trial-banner.tsx"), "utf8");
     assert.ok(bannerSrc.includes("bannerKicker"), "subscribe banner chip must not repeat the command headline");
     assert.ok(bannerSrc.includes("bannerLead"), "subscribe banner must sell the benefit, not dump all four plans");
+    assert.ok(bannerSrc.includes("V27CheckoutButton"), "banner must start Stripe without scrolling to the cards");
+    assert.ok(bannerSrc.includes('subscriptionProductId("public", "month")'), "banner pay button must charge Editorial monthly now");
     assert.notEqual(getSubscribeCopy("cs").editorialBadge, getSubscribeCopy("cs").daysFree);
     assert.ok(!/platí hned/i.test(getSubscribeCopy("cs").bannerTitle));
     assert.ok(getSubscribeCopy("cs").bannerTitle.includes("jen za"));

@@ -13,6 +13,9 @@ type Props = {
   className?: string;
   locale?: string;
   gift?: boolean;
+  icon?: boolean;
+  busyLabel?: string;
+  errorClassName?: string;
 };
 
 export function V27CheckoutButton({
@@ -22,6 +25,9 @@ export function V27CheckoutButton({
   className,
   locale,
   gift = false,
+  icon,
+  busyLabel,
+  errorClassName,
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,24 +85,26 @@ export function V27CheckoutButton({
   }
 
   const isPrimary = !className?.includes("bg-white");
+  const showIcon = icon ?? isPrimary;
 
   return (
     <div>
       <Button
+        type="button"
         onClick={handleCheckout}
         disabled={loading}
         className={className ?? "w-full bg-[#005B96] hover:bg-[#004a7a]"}
       >
         {loading ? (
-          "Přesměrování na Stripe…"
+          busyLabel ?? "Přesměrování na Stripe…"
         ) : (
           <>
-            {isPrimary ? <CreditCard className="mr-2 h-4 w-4" aria-hidden /> : null}
+            {showIcon ? <CreditCard className="mr-2 h-4 w-4" aria-hidden /> : null}
             {label}
           </>
         )}
       </Button>
-      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+      {error && <p className={errorClassName ?? "mt-2 text-xs text-red-600"}>{error}</p>}
     </div>
   );
 }

@@ -36,6 +36,8 @@ export type SubscribeCopy = {
   bannerKicker: string;
   bannerTitle: string;
   bannerLead: string;
+  bannerPayCta: string;
+  bannerPayBusy: string;
   billedNow: string;
   startEditorialMonth: string;
   startEditorialYear: string;
@@ -115,6 +117,8 @@ const COPY: Record<string, SubscribeCopy> = {
     bannerTitle: "Zbytek článku máte hned — jen za {price}",
     bannerLead:
       "Měsíčně jen {price}. Roční přístup má dva měsíce v ceně. Kartou se text otevře teď — zrušíte kdykoli.",
+    bannerPayCta: "Zaplatit {price} a číst",
+    bannerPayBusy: "Otevírám platbu…",
     billedNow: "Otevře se hned",
     startEditorialMonth: "Číst měsíc",
     startEditorialYear: "Číst celý rok",
@@ -288,6 +292,8 @@ const COPY: Record<string, SubscribeCopy> = {
     bannerKicker: "ViaLongeVita Editorial",
     bannerTitle: "The rest of the article is yours now — just {price}",
     bannerLead: "Just {price} a month. The yearly plan includes two months. The text opens as soon as you pay — cancel anytime.",
+    bannerPayCta: "Pay {price} and read",
+    bannerPayBusy: "Opening payment…",
     billedNow: "Opens immediately",
     startEditorialMonth: "Read for a month",
     startEditorialYear: "Read for a year",
@@ -462,6 +468,8 @@ const COPY: Record<string, SubscribeCopy> = {
     bannerTitle: "Den Rest des Artikels haben Sie sofort — nur {price}",
     bannerLead:
       "Nur {price} im Monat. Im Jahresabo stecken zwei Monate. Der Text öffnet sich nach der Karte — jederzeit kündbar.",
+    bannerPayCta: "Für {price} lesen",
+    bannerPayBusy: "Zahlung wird geöffnet…",
     billedNow: "Sofort zugänglich",
     startEditorialMonth: "Einen Monat lesen",
     startEditorialYear: "Ein Jahr lesen",
@@ -636,6 +644,8 @@ const COPY: Record<string, SubscribeCopy> = {
     bannerTitle: "Le reste de l’article est à vous tout de suite — seulement {price}",
     bannerLead:
       "Seulement {price} par mois. L’annuel inclut deux mois. Le texte s’ouvre dès le paiement — résiliable à tout moment.",
+    bannerPayCta: "Payer {price} et lire",
+    bannerPayBusy: "Ouverture du paiement…",
     billedNow: "S’ouvre tout de suite",
     startEditorialMonth: "Lire un mois",
     startEditorialYear: "Lire toute l’année",
@@ -796,5 +806,6 @@ export function getSubscribeCopy(
   const price = editorialMonthlyBannerPrice(locale, region);
   localized.bannerTitle = localized.bannerTitle.replaceAll("{price}", price);
   localized.bannerLead = localized.bannerLead.replaceAll("{price}", price);
+  localized.bannerPayCta = localized.bannerPayCta.replaceAll("{price}", price);
   return JSON.parse(rewriteCzechInstitutions(JSON.stringify(localized), locale)) as SubscribeCopy;
 }
