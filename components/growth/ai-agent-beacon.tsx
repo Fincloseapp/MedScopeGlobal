@@ -13,6 +13,7 @@ export function AiAgentBeacon({ locale = "cs" }: { locale?: string }) {
     if (!agent) return;
     document.cookie = `${AI_REF_COOKIE}=${encodeURIComponent(agent)}; Path=/; Max-Age=${AI_REF_MAX_AGE_SEC}; SameSite=Lax`;
     if (!fromUrl) return;
+    if (existing === fromUrl) return;
     void fetch("/api/growth/ai-referral", {
       method: "POST",
       credentials: "same-origin",

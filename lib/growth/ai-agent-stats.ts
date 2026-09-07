@@ -175,13 +175,6 @@ async function loadAiAgentGrowthSnapshotUnsafe(): Promise<AiAgentGrowthSnapshot>
     const rows = data ?? [];
     paidOrders = rows.length;
     paidCzk = rows.reduce((sum, row) => sum + Number(row.amount_czk ?? 0), 0);
-    for (const row of rows) {
-      const meta = (row.metadata ?? {}) as Record<string, unknown>;
-      const agent = normalizeAiAgentSlug(String(meta.ai_ref ?? meta.utm_source ?? ""));
-      if (!agent) continue;
-      const item = boardMap.get(agent);
-      if (item) item.paid += 1;
-    }
   } catch {
     /* table may be missing */
   }

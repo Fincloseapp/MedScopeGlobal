@@ -277,6 +277,7 @@ import {
   parseAiAgentFromSearch,
   RANKED_AI_AGENT_SLUGS,
   agentHopUrl,
+  agentHopPathUrl,
 } from "../../lib/growth/ai-agent-program";
 import { detectAiCrawler } from "../../lib/growth/ai-crawler";
 import { rotatedRankedAgentHopUrls } from "../../lib/growth/ai-agent-hops";
@@ -2368,7 +2369,10 @@ assert.ok(
   assert.equal(RANKED_AI_AGENT_SLUGS.length, 16);
   assert.equal(RANKED_AI_AGENT_SLUGS[3], "perplexity");
   assert.ok(agentHopUrl("perplexity", "de").includes("/r/ai?ref=perplexity"));
+  assert.ok(agentHopPathUrl("perplexity", "de").includes("/r/ai/perplexity"));
   assert.equal(detectAiCrawler("PerplexityBot/1.0"), "perplexity");
+  assert.equal(detectAiCrawler("Mozilla/5.0 compatible; Google-CloudVertexBot/1.0"), "gemini");
+  assert.equal(detectAiCrawler("DuckAssistBot/1.0"), "duckassist");
   assert.equal(detectAiCrawler("Mozilla/5.0 (compatible; Googlebot/2.1)"), null);
   assert.equal(detectAiCrawler("bingbot/2.0"), null);
   assert.ok(machineBriefText("en").includes("/r/ai?ref=perplexity"));
@@ -2694,8 +2698,27 @@ assert.ok(
     assert.equal(requestCountry(new Headers({ "cf-ipcountry": "JP" })), "JP");
     assert.equal(requestCountry(new Headers({ "cf-ipcountry": "XX" })), null);
     assert.ok(
-      readFileSync(join(root, "app/r/ai/route.ts"), "utf8").includes("requestCountry"),
+      readFileSync(join(root, "lib/growth/ai-hop-handler.ts"), "utf8").includes("requestCountry"),
       "hops must attribute the visitor country into the locale contest"
+    );
+    assert.ok(existsSync(join(root, "app/r/ai/[agent]/route.ts")));
+    assert.ok(
+      readFileSync(join(root, "components/growth/ai-agent-beacon.tsx"), "utf8").includes(
+        "existing === fromUrl"
+      ),
+      "hop+beacon must not double-count the same visit"
+    );
+    assert.ok(
+      !readFileSync(join(root, "lib/growth/ai-agent-stats.ts"), "utf8").includes("if (item) item.paid += 1"),
+      "leaderboard paid must not double-count v27_orders and analytics"
+    );
+    assert.ok(
+      readFileSync(join(root, "lib/growth/arena/tick.ts"), "utf8").includes("rotatedRankedAgentHopUrls"),
+      "arena tick must IndexNow ranked agent hops, not only alfa/beta"
+    );
+    assert.ok(
+      readFileSync(join(root, "middleware.ts"), "utf8").includes("detectAiCrawler"),
+      "named assistant crawlers on public pages must score without inventing visits"
     );
     assert.ok(
       readFileSync(join(root, "lib/growth/arena/tick.ts"), "utf8").includes("scoreCountryMarkets"),

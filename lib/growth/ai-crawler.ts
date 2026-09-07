@@ -1,4 +1,5 @@
 import { type AiAgentSlug } from "@/lib/growth/ai-agent-program";
+import { requestCountry } from "@/lib/growth/request-country";
 import { logMonetizationEvent } from "@/lib/monetization/log-event";
 
 /**
@@ -8,7 +9,7 @@ import { logMonetizationEvent } from "@/lib/monetization/log-event";
 const CRAWLER_RULES: { test: RegExp; agent: Exclude<AiAgentSlug, "other"> }[] = [
   { test: /chatgpt-user|gptbot|oai-searchbot/i, agent: "chatgpt" },
   { test: /claude-user|claudebot|anthropic-ai|claude-searchbot/i, agent: "claude" },
-  { test: /google-extended|gemini-deep-research/i, agent: "gemini" },
+  { test: /google-extended|google-cloudvertexbot|gemini-deep-research/i, agent: "gemini" },
   { test: /perplexitybot|perplexity-user/i, agent: "perplexity" },
   { test: /copilot-user|microsoft-copilot/i, agent: "copilot" },
   { test: /grok-crawler|xai-crawler|xai-grok/i, agent: "grok" },
@@ -40,10 +41,12 @@ export async function logAiCrawlerVisit(
   if (!agent) return;
   const url = new URL(request.url);
   const edition = (locale ?? url.searchParams.get("lang") ?? "en").slice(0, 16);
+  const country = requestCountry(request.headers);
   await logMonetizationEvent("ai_agent_visit", {
     agent,
     locale: edition,
     path,
     via: "crawler",
+    ...(country ? { country } : {}),
   });
 }

@@ -28,8 +28,10 @@ export default async function AdminAiAgentsPage() {
       <div>
         <h1 className="font-display text-3xl font-bold text-medical-navy">AI agenti — růst a žebříček</h1>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-          Cíle programu jsou ambiciózní. Čísla níže jsou jen reálná předplatná a objednávky z databáze —
-          žádný vymyšlený dosah. Zdroj: {snap.dataSource}. Aktualizováno {new Date(snap.loadedAt).toLocaleString("cs-CZ")}.
+          Cron nevolá ChatGPT, Claude ani Gemini. Žebříček jen přiřazuje příchozí{" "}
+          <code>?ref=</code>, hop <code>/r/ai</code> a známý crawler UA. 0 checkout / 0 zaplaceno
+          znamená, že nikdo s cookie <code>ms_ai_ref</code> nedokončil Stripe — cron to nevymyslí.
+          Zdroj: {snap.dataSource}. Aktualizováno {new Date(snap.loadedAt).toLocaleString("cs-CZ")}.
         </p>
       </div>
 
@@ -105,10 +107,10 @@ export default async function AdminAiAgentsPage() {
       <section>
         <h2 className="mb-3 font-display text-xl font-semibold">Žebříček AI agentů</h2>
         <p className="mb-4 text-sm text-muted-foreground">
-          Skóre = zaplacené objednávky s <code>ai_ref</code> × 100 + checkout × 10 + newsletter × 5 +
-          návštěvy s <code>?ref=</code> nebo známým crawlerem asistenta na <code>/llms.txt</code>.
-          Agenti 4–17 (Perplexity až other) mají nulu, dokud někdo opravdu nepřijde s jejich
-          <code>?ref=</code> — cron si návštěvy nevymýšlí a neself-pinguje hop.
+          Skóre = <code>ai_agent_paid</code> × 100 + checkout × 10 + newsletter × 5 + návštěvy.
+          Stav „čeká na první ?ref=“ není rozbitý agent — zatím nula inbound hopů a žádný
+          GPTBot / PerplexityBot / Gemini na veřejné stránce. Cron každou 5. minutu posílá
+          IndexNow (Bing), neself-pinguje hop a nevolá API asistentů.
         </p>
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full text-sm">

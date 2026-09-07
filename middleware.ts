@@ -30,6 +30,9 @@ import {
   enforceLekarskaZonaMiddleware,
   isLekarskaZonaPath,
 } from "@/lib/academy/b2b/middleware-gate";
+import { detectAiCrawler } from "@/lib/growth/ai-crawler";
+import { requestCountry } from "@/lib/growth/request-country";
+import { logMonetizationEvent } from "@/lib/monetization/log-event";
 
 const LOCALE_COOKIE_OPTS = {
   path: "/",
@@ -67,6 +70,24 @@ function adminGateRedirect(request: NextRequest): NextResponse {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  const crawler = detectAiCrawler(request.headers.get("user-agent"));
+  if (
+    crawler &&
+    !pathname.startsWith("/api/") &&
+    !pathname.startsWith("/admin") &&
+    !pathname.startsWith("/_next")
+  ) {
+    const country = requestCountry(request.headers);
+    const { locale: pathLocale } = resolveLocalePath(pathname);
+    await logMonetizationEvent("ai_agent_visit", {
+      agent: crawler,
+      locale: pathLocale ?? "en",
+      path: pathname.slice(0, 180),
+      via: "crawler",
+      ...(country ? { country } : {}),
+    });
+  }
 
   const securityBlock = await applyV30SecurityMiddleware(request);
   if (securityBlock) return securityBlock;

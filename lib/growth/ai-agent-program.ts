@@ -380,6 +380,15 @@ export function agentHopUrl(agent: string, locale = "en", base = SITE.url): stri
   return url.toString();
 }
 
+/** Path hop — same target, easier for crawlers that skip query strings. */
+export function agentHopPathUrl(agent: string, locale = "en", base = SITE.url): string {
+  const origin = String(base).replace(/\/$/, "");
+  const slug = encodeURIComponent(String(agent).trim().toLowerCase());
+  const url = new URL(`${origin}/r/ai/${slug}`);
+  url.searchParams.set("locale", localeToPathSegment(locale));
+  return url.toString();
+}
+
 export function legalChannels(): { id: string; label: string }[] {
   return [
     { id: "cite", label: "Citace článků s locale URL (AEO / asistenti)" },

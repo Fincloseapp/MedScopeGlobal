@@ -428,11 +428,17 @@ export async function POST(request: Request) {
 
         const aiRef = session.metadata?.ai_ref;
         if (aiRef) {
+          const paidCountry = String(session.customer_details?.address?.country ?? "")
+            .trim()
+            .toUpperCase()
+            .replace(/[^A-Z]/g, "")
+            .slice(0, 2);
           await logMonetizationEvent("ai_agent_paid", {
             agent: aiRef,
             locale: session.metadata?.locale ?? "",
             productId: session.metadata?.product_id,
             sessionId: session.id,
+            ...(paidCountry.length === 2 ? { country: paidCountry } : {}),
           });
         }
 
