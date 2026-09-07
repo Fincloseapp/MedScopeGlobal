@@ -39,6 +39,8 @@ export function priorityDiscoveryUrls(base = getSiteUrl()): string[] {
     const prefix = `${origin}/${localeToPathSegment(locale)}`;
     urls.add(prefix);
     urls.add(`${prefix}/predplatne`);
+    urls.add(`${prefix}/verejnost/osveta`);
+    urls.add(`${prefix}/firmy/reklama/nova`);
     urls.add(`${prefix}/pro-ai`);
     urls.add(`${prefix}/newsletter`);
     urls.add(`${prefix}/novinky`);

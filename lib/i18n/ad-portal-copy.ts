@@ -1,0 +1,331 @@
+import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+
+export type AdPortalCopy = {
+  metaTitle: string;
+  metaDescription: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  steps: string[];
+  ctaLabel: string;
+  company: string;
+  contact: string;
+  email: string;
+  phone: string;
+  ico: string;
+  dic: string;
+  address: string;
+  format: string;
+  formatBanner: string;
+  formatSponsored: string;
+  formatNewsletter: string;
+  placement: string;
+  placeHome: string;
+  placeArticle: string;
+  placeCongress: string;
+  duration: string;
+  targetUrl: string;
+  visualUrl: string;
+  adText: string;
+  submit: string;
+  busy: string;
+  fail: string;
+  deny: string;
+  queued: string;
+  orderLink: string;
+  shareTitle: string;
+};
+
+const COPY: Record<ChromePack, AdPortalCopy> = {
+  cs: {
+    metaTitle: "Vložit reklamu — B2B portál",
+    metaDescription:
+      "Firma vloží vizuál a text. Tři autonomní editoři zkontrolují zákonnost, neškodnost a diplomatický tón. Po povolení platba a faktura.",
+    eyebrow: "B2B portál",
+    title: "Vložit reklamní vizuál a text",
+    description: "Podle návodu. Lékařská a studentská zóna zůstává bez reklamy.",
+    steps: [
+      "Vizuál: vlastní banner 1200×400 nebo 300×250, HTTPS URL, bez klamavé úpravy.",
+      "Text: pravdivý, bez zázračných zdravotních slibů, bez nenávisti a politické kampaně.",
+      "Tři autonomní editoři (právní, bezpečnost, diplomatický tón) běží hned. Admin potvrdí povoleno / nepovoleno.",
+      "Po povolení zaplatíte kartou (Stripe) nebo QR převodem s variabilním symbolem. Na obrazovce je náhled faktury; po platbě faktura odejde na e-mail firmy.",
+    ],
+    ctaLabel: "Ceník",
+    company: "Firma",
+    contact: "Kontaktní osoba",
+    email: "E-mail",
+    phone: "Telefon",
+    ico: "IČO",
+    dic: "DIČ",
+    address: "Fakturační adresa firmy",
+    format: "Formát",
+    formatBanner: "Banner",
+    formatSponsored: "Sponzorovaný článek",
+    formatNewsletter: "Zmínka v newsletteru",
+    placement: "Umístění",
+    placeHome: "Homepage",
+    placeArticle: "Veřejný článek",
+    placeCongress: "Kongresy",
+    duration: "Délka (dny)",
+    targetUrl: "Cílová URL",
+    visualUrl: "URL vizuálu (JPG/PNG/WEBP, banner 1200×400 nebo 300×250)",
+    adText: "Text reklamy",
+    submit: "Odeslat k editorial checku",
+    busy: "Odesílám…",
+    fail: "Odeslání selhalo.",
+    deny: "Tři autonomní editoři našli problém. Admin ještě potvrdí zákaz.",
+    queued: "Žádost je u tří editorů. Po povolení sem přijde platba a náhled faktury.",
+    orderLink: "Stav objednávky a náhled faktury",
+    shareTitle: "Inzerce na ViaLongeVita — self-serve B2B",
+  },
+  de: {
+    metaTitle: "Anzeige aufgeben — B2B-Portal",
+    metaDescription:
+      "Unternehmen lädt Motiv und Text. Drei autonome Redakteure prüfen Recht, Schaden und Ton. Nach Freigabe Zahlung und Rechnung.",
+    eyebrow: "B2B-Portal",
+    title: "Motiv und Anzeigentext einreichen",
+    description: "Nach der Anleitung. Arzt- und Studierendenflächen bleiben werbefrei.",
+    steps: [
+      "Motiv: eigenes Banner 1200×400 oder 300×250, HTTPS-URL, ohne irreführende Bearbeitung.",
+      "Text: wahr, ohne Wunderheilungsversprechen, ohne Hass und ohne Wahlkampf.",
+      "Drei autonome Redakteure (Recht, Sicherheit, Ton) laufen sofort. Admin bestätigt frei / abgelehnt.",
+      "Nach Freigabe zahlen Sie per Karte (Stripe) oder QR-Überweisung mit Symbol. Vorschau der Rechnung auf dem Schirm; nach Zahlung geht sie an die Firmen-E-Mail.",
+    ],
+    ctaLabel: "Preisliste",
+    company: "Unternehmen",
+    contact: "Ansprechperson",
+    email: "E-Mail",
+    phone: "Telefon",
+    ico: "Firmen-ID",
+    dic: "USt-IdNr.",
+    address: "Rechnungsadresse",
+    format: "Format",
+    formatBanner: "Banner",
+    formatSponsored: "Gesponserter Beitrag",
+    formatNewsletter: "Newsletter-Hinweis",
+    placement: "Platzierung",
+    placeHome: "Startseite",
+    placeArticle: "Öffentlicher Artikel",
+    placeCongress: "Kongresse",
+    duration: "Laufzeit (Tage)",
+    targetUrl: "Ziel-URL",
+    visualUrl: "Motiv-URL (JPG/PNG/WEBP, Banner 1200×400 oder 300×250)",
+    adText: "Anzeigentext",
+    submit: "Zur redaktionellen Prüfung senden",
+    busy: "Sende…",
+    fail: "Senden fehlgeschlagen.",
+    deny: "Die Redakteure haben ein Problem gefunden. Admin bestätigt die Ablehnung.",
+    queued: "Antrag bei drei Redakteuren. Nach Freigabe kommen Zahlung und Rechnungsvorschau.",
+    orderLink: "Bestellstatus und Rechnungsvorschau",
+    shareTitle: "Werbung auf ViaLongeVita — Self-Serve B2B",
+  },
+  fr: {
+    metaTitle: "Déposer une publicité — portail B2B",
+    metaDescription:
+      "L’entreprise dépose le visuel et le texte. Trois rédacteurs autonomes contrôlent le droit, le risque et le ton. Après accord : paiement et facture.",
+    eyebrow: "Portail B2B",
+    title: "Déposer le visuel et le texte",
+    description: "Suivez le guide. Les espaces médecins et étudiants restent sans publicité.",
+    steps: [
+      "Visuel : bannière 1200×400 ou 300×250, URL HTTPS, sans retouche trompeuse.",
+      "Texte : vrai, sans promesse miracle de santé, sans haine ni campagne politique.",
+      "Trois rédacteurs autonomes (droit, sécurité, ton) tournent tout de suite. L’admin confirme accepté / refusé.",
+      "Après accord, paiement par carte (Stripe) ou virement QR avec symbole. Aperçu de facture à l’écran ; après paiement, la facture part à l’e-mail de l’entreprise.",
+    ],
+    ctaLabel: "Tarifs",
+    company: "Entreprise",
+    contact: "Personne de contact",
+    email: "E-mail",
+    phone: "Téléphone",
+    ico: "N° d’entreprise",
+    dic: "N° TVA",
+    address: "Adresse de facturation",
+    format: "Format",
+    formatBanner: "Bannière",
+    formatSponsored: "Article sponsorisé",
+    formatNewsletter: "Mention newsletter",
+    placement: "Emplacement",
+    placeHome: "Page d’accueil",
+    placeArticle: "Article public",
+    placeCongress: "Congrès",
+    duration: "Durée (jours)",
+    targetUrl: "URL cible",
+    visualUrl: "URL du visuel (JPG/PNG/WEBP, bannière 1200×400 ou 300×250)",
+    adText: "Texte de la publicité",
+    submit: "Envoyer au contrôle éditorial",
+    busy: "Envoi…",
+    fail: "Échec de l’envoi.",
+    deny: "Les rédacteurs ont trouvé un problème. L’admin confirmera le refus.",
+    queued: "Demande chez trois rédacteurs. Après accord : paiement et aperçu de facture.",
+    orderLink: "État de la commande et aperçu de facture",
+    shareTitle: "Publicité sur ViaLongeVita — B2B en libre-service",
+  },
+  en: {
+    metaTitle: "Place an ad — B2B portal",
+    metaDescription:
+      "A company submits visual and copy. Three autonomous editors check law, harm and tone. After approval: payment and invoice.",
+    eyebrow: "B2B portal",
+    title: "Submit ad visual and copy",
+    description: "Follow the guide. Physician and student surfaces stay ad-free.",
+    steps: [
+      "Visual: your own 1200×400 or 300×250 banner, HTTPS URL, no misleading edit.",
+      "Copy: truthful, no miracle health claims, no hate and no political campaign.",
+      "Three autonomous editors (legal, safety, tone) run at once. Admin confirms allow / deny.",
+      "After approval, pay by card (Stripe) or QR transfer with a variable symbol. Invoice preview on screen; after payment the invoice goes to the company email.",
+    ],
+    ctaLabel: "Rate card",
+    company: "Company",
+    contact: "Contact person",
+    email: "Email",
+    phone: "Phone",
+    ico: "Company ID",
+    dic: "VAT ID",
+    address: "Billing address",
+    format: "Format",
+    formatBanner: "Banner",
+    formatSponsored: "Sponsored article",
+    formatNewsletter: "Newsletter mention",
+    placement: "Placement",
+    placeHome: "Homepage",
+    placeArticle: "Public article",
+    placeCongress: "Congresses",
+    duration: "Length (days)",
+    targetUrl: "Destination URL",
+    visualUrl: "Visual URL (JPG/PNG/WEBP, banner 1200×400 or 300×250)",
+    adText: "Ad copy",
+    submit: "Send for editorial review",
+    busy: "Sending…",
+    fail: "Could not send.",
+    deny: "The editors found a problem. Admin will still confirm the block.",
+    queued: "Request is with three editors. After approval you get payment and an invoice preview.",
+    orderLink: "Order status and invoice preview",
+    shareTitle: "Advertise on ViaLongeVita — self-serve B2B",
+  },
+  it: {
+    metaTitle: "Inserire un annuncio — portale B2B",
+    metaDescription:
+      "L’azienda carica visivo e testo. Tre redattori autonomi controllano diritto, rischio e tono. Dopo l’ok: pagamento e fattura.",
+    eyebrow: "Portale B2B",
+    title: "Inviare visivo e testo",
+    description: "Seguite la guida. Le aree medici e studenti restano senza annunci.",
+    steps: [
+      "Visivo: banner 1200×400 o 300×250, URL HTTPS, senza ritocco ingannevole.",
+      "Testo: vero, senza promesse miracolose di salute, senza odio né campagna politica.",
+      "Tre redattori autonomi (diritto, sicurezza, tono) partono subito. L’admin conferma sì / no.",
+      "Dopo l’ok pagate con carta (Stripe) o bonifico QR con simbolo. Anteprima fattura a schermo; dopo il pagamento va all’e-mail dell’azienda.",
+    ],
+    ctaLabel: "Listino",
+    company: "Azienda",
+    contact: "Referente",
+    email: "E-mail",
+    phone: "Telefono",
+    ico: "ID azienda",
+    dic: "P. IVA",
+    address: "Indirizzo di fatturazione",
+    format: "Formato",
+    formatBanner: "Banner",
+    formatSponsored: "Articolo sponsorizzato",
+    formatNewsletter: "Menzione newsletter",
+    placement: "Posizione",
+    placeHome: "Home",
+    placeArticle: "Articolo pubblico",
+    placeCongress: "Congressi",
+    duration: "Durata (giorni)",
+    targetUrl: "URL di destinazione",
+    visualUrl: "URL del visivo (JPG/PNG/WEBP, banner 1200×400 o 300×250)",
+    adText: "Testo dell’annuncio",
+    submit: "Invia al controllo editoriale",
+    busy: "Invio…",
+    fail: "Invio non riuscito.",
+    deny: "I redattori hanno trovato un problema. L’admin confermerà il blocco.",
+    queued: "Richiesta da tre redattori. Dopo l’ok: pagamento e anteprima fattura.",
+    orderLink: "Stato ordine e anteprima fattura",
+    shareTitle: "Annunci su ViaLongeVita — B2B self-serve",
+  },
+  es: {
+    metaTitle: "Publicar un anuncio — portal B2B",
+    metaDescription:
+      "La empresa envía visual y texto. Tres editores autónomos revisan ley, daño y tono. Tras el ok: pago y factura.",
+    eyebrow: "Portal B2B",
+    title: "Enviar visual y texto",
+    description: "Siga la guía. Las zonas de médicos y estudiantes siguen sin anuncios.",
+    steps: [
+      "Visual: banner 1200×400 o 300×250, URL HTTPS, sin retoque engañoso.",
+      "Texto: veraz, sin promesas milagro de salud, sin odio ni campaña política.",
+      "Tres editores autónomos (legal, seguridad, tono) corren al momento. El admin confirma sí / no.",
+      "Tras el ok pague con tarjeta (Stripe) o transferencia QR con símbolo. Vista previa de factura en pantalla; tras el pago va al correo de la empresa.",
+    ],
+    ctaLabel: "Tarifas",
+    company: "Empresa",
+    contact: "Persona de contacto",
+    email: "Correo",
+    phone: "Teléfono",
+    ico: "ID de empresa",
+    dic: "NIF / IVA",
+    address: "Dirección de facturación",
+    format: "Formato",
+    formatBanner: "Banner",
+    formatSponsored: "Artículo patrocinado",
+    formatNewsletter: "Mención en el boletín",
+    placement: "Ubicación",
+    placeHome: "Inicio",
+    placeArticle: "Artículo público",
+    placeCongress: "Congresos",
+    duration: "Duración (días)",
+    targetUrl: "URL de destino",
+    visualUrl: "URL del visual (JPG/PNG/WEBP, banner 1200×400 o 300×250)",
+    adText: "Texto del anuncio",
+    submit: "Enviar a revisión editorial",
+    busy: "Enviando…",
+    fail: "No se pudo enviar.",
+    deny: "Los editores hallaron un problema. El admin confirmará el bloqueo.",
+    queued: "Solicitud con tres editores. Tras el ok: pago y vista previa de factura.",
+    orderLink: "Estado del pedido y vista previa de factura",
+    shareTitle: "Anuncios en ViaLongeVita — B2B autoservicio",
+  },
+  "pt-BR": {
+    metaTitle: "Colocar um anúncio — portal B2B",
+    metaDescription:
+      "A empresa envia visual e texto. Três editores autónomos verificam lei, dano e tom. Após o ok: pagamento e fatura.",
+    eyebrow: "Portal B2B",
+    title: "Enviar visual e texto",
+    description: "Siga o guia. As áreas de médicos e estudantes ficam sem anúncios.",
+    steps: [
+      "Visual: banner 1200×400 ou 300×250, URL HTTPS, sem edição enganosa.",
+      "Texto: verdadeiro, sem promessas milagre de saúde, sem ódio nem campanha política.",
+      "Três editores autónomos (legal, segurança, tom) correm já. O admin confirma sim / não.",
+      "Após o ok pague com cartão (Stripe) ou transferência QR com símbolo. Pré-visualização da fatura no ecrã; após o pagamento vai para o e-mail da empresa.",
+    ],
+    ctaLabel: "Tabela de preços",
+    company: "Empresa",
+    contact: "Pessoa de contacto",
+    email: "E-mail",
+    phone: "Telefone",
+    ico: "ID da empresa",
+    dic: "NIF / IVA",
+    address: "Morada de faturação",
+    format: "Formato",
+    formatBanner: "Banner",
+    formatSponsored: "Artigo patrocinado",
+    formatNewsletter: "Menção na newsletter",
+    placement: "Posição",
+    placeHome: "Página inicial",
+    placeArticle: "Artigo público",
+    placeCongress: "Congressos",
+    duration: "Duração (dias)",
+    targetUrl: "URL de destino",
+    visualUrl: "URL do visual (JPG/PNG/WEBP, banner 1200×400 ou 300×250)",
+    adText: "Texto do anúncio",
+    submit: "Enviar para revisão editorial",
+    busy: "A enviar…",
+    fail: "Falha no envio.",
+    deny: "Os editores encontraram um problema. O admin confirmará o bloqueio.",
+    queued: "Pedido com três editores. Após o ok: pagamento e pré-visualização da fatura.",
+    orderLink: "Estado da encomenda e pré-visualização da fatura",
+    shareTitle: "Anúncios na ViaLongeVita — B2B self-serve",
+  },
+};
+
+export function getAdPortalCopy(locale?: string | null): AdPortalCopy {
+  return COPY[chromePack(locale)];
+}

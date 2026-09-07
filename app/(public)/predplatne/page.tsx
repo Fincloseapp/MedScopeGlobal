@@ -15,6 +15,8 @@ import { studentIntroCharge, studentMonthlyCharge } from "@/lib/studenti/pricing
 import { getSubscribeCopy } from "@/lib/i18n/subscribe-copy";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { SocialShareStrip } from "@/components/social/social-share-strip";
+import { getShareCopy } from "@/lib/i18n/share-copy";
 
 export const revalidate = 60;
 
@@ -62,6 +64,9 @@ export default async function PredplatnePage({
           {copy.title}
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">{copy.lead}</p>
+        <div className="mx-auto mt-5 flex justify-center">
+          <SocialShareStrip title={copy.title} path="/predplatne" locale={locale} />
+        </div>
       </div>
 
       <div className="mt-10">
@@ -311,8 +316,8 @@ export default async function PredplatnePage({
 
       <p className="mt-12 text-center text-sm text-muted-foreground">
         {copy.b2bNote}{" "}
-        <Link href={localizePublicHref("/firmy", locale)} className="text-[#005B96] underline">
-          /firmy
+        <Link href={localizePublicHref("/firmy/reklama/nova", locale)} className="text-[#005B96] underline">
+          {getShareCopy(locale).clipsAds}
         </Link>
         . {copy.contact}:{" "}
         <Link href={localizePublicHref("/kontakt", locale)} className="text-[#005B96] underline">

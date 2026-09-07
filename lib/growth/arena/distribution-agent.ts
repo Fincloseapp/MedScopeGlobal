@@ -2,9 +2,11 @@ import { getSiteUrl } from "@/lib/config/site-url";
 import { submitIndexNow } from "@/lib/seo/indexnow";
 import type { ArenaTeamSlug } from "@/lib/growth/arena/config";
 import { ARENA_DISCOVERY_LOCALES } from "@/lib/growth/arena/locales";
+import { AFRICA_DISCOVERY_LOCALES } from "@/lib/growth/africa-markets";
 import { arenaHopUrl } from "@/lib/growth/arena/refs";
 import { looksLikeSpam } from "@/lib/growth/arena/metrics";
 import type { ContentDraft } from "@/lib/growth/arena/content-agent";
+import { localeToPathSegment } from "@/lib/i18n/locale-path";
 
 export type DistributionResult = {
   team: ArenaTeamSlug;
@@ -42,6 +44,12 @@ export async function distributeTeamReach(input: {
     urls.add(arenaHopUrl({ team: input.team, section: "dokscope", locale, base: origin }));
   }
   urls.add(arenaHopUrl({ team: input.team, section: "mediprep", locale: "cs", base: origin }));
+  for (const locale of AFRICA_DISCOVERY_LOCALES) {
+    const prefix = `${origin}/${localeToPathSegment(locale)}`;
+    urls.add(`${prefix}/predplatne`);
+    urls.add(`${prefix}/verejnost/osveta`);
+    urls.add(`${prefix}/firmy/reklama/nova`);
+  }
   const list = [...urls].slice(0, Math.max(ARENA_DISCOVERY_LOCALES.length, input.quota));
   const ping = await submitIndexNow(list);
   return {

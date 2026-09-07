@@ -218,6 +218,7 @@ import {
 import { GLOBAL_LOCALES, localeFromCountry } from "../../lib/ecosystem/locales";
 import { africaCountryCodes, AFRICA_GEO_LOCALE_MAP } from "../../lib/growth/africa-markets";
 import { getShareCopy } from "../../lib/i18n/share-copy";
+import { getAdPortalCopy } from "../../lib/i18n/ad-portal-copy";
 import { buildShareIntents, isShareableVideoUrl, publicAbsoluteUrl } from "../../lib/social/share-intents";
 import { localeToPathSegment } from "../../lib/i18n/locale-path";
 import { ARENA_DISCOVERY_LOCALES } from "../../lib/growth/arena/locales";
@@ -2470,6 +2471,9 @@ assert.ok(
     );
     const urls = priorityDiscoveryUrls("https://medscopeglobal.com");
     assert.ok(urls.includes("https://medscopeglobal.com/de/predplatne"));
+    assert.ok(urls.includes("https://medscopeglobal.com/fr/verejnost/osveta"));
+    assert.ok(urls.includes("https://medscopeglobal.com/en/firmy/reklama/nova"));
+    assert.ok(urls.includes("https://medscopeglobal.com/pt/firmy/reklama/nova"));
     assert.ok(urls.includes("https://medscopeglobal.com/fr/pro-ai"));
     assert.ok(urls.includes("https://medscopeglobal.com/llms.txt"));
     assert.ok(urls.includes("https://medscopeglobal.com/jp/predplatne"));
@@ -2627,7 +2631,13 @@ assert.ok(
     assert.ok(!looksLikeCzech(getShareCopy("fr").clipsLead));
     assert.equal(getShareCopy("sk").native, "Share");
     assert.ok(readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("HomepageClipsStrip"));
+    assert.ok(readFileSync(join(root, "app/(public)/predplatne/page.tsx"), "utf8").includes("SocialShareStrip"));
+    assert.ok(readFileSync(join(root, "app/(public)/predplatne/page.tsx"), "utf8").includes("/firmy/reklama/nova"));
     assert.ok(readFileSync(join(root, "components/v271/homepage-sections.tsx"), "utf8").includes("/firmy/reklama/nova"));
+    assert.ok(readFileSync(join(root, "lib/growth/arena/distribution-agent.ts"), "utf8").includes("/verejnost/osveta"));
+    assert.ok(!looksLikeCzech(getAdPortalCopy("fr").title));
+    assert.ok(!looksLikeCzech(getAdPortalCopy("en").submit));
+    assert.ok(getAdPortalCopy("cs").submit.includes("Odeslat"));
     assert.ok(!readFileSync(join(root, "lib/growth/arena/distribution-agent.ts"), "utf8").includes("instagram.com/api"));
     assert.ok(!readFileSync(join(root, "lib/growth/arena/distribution-agent.ts"), "utf8").includes("graph.facebook.com"));
     assert.equal(parseEditionLocale("jp"), "ja");
@@ -4612,6 +4622,8 @@ console.log(
   assert.ok(
     !readFileSync(join(root, "app/(public)/firmy/reklama/nova/page.tsx"), "utf8").includes("Třešňová")
   );
+  assert.ok(readFileSync(join(root, "app/(public)/firmy/reklama/nova/page.tsx"), "utf8").includes("getAdPortalCopy"));
+  assert.ok(readFileSync(join(root, "components/firmy/ad-portal-form.tsx"), "utf8").includes("getAdPortalCopy"));
 }
 
 console.log("✓ editorial image pipeline checks passed");
