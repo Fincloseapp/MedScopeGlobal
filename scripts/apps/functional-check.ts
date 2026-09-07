@@ -260,7 +260,11 @@ import {
   machineBriefText,
   normalizeAiAgentSlug,
   parseAiAgentFromSearch,
+  RANKED_AI_AGENT_SLUGS,
+  agentHopUrl,
 } from "../../lib/growth/ai-agent-program";
+import { detectAiCrawler } from "../../lib/growth/ai-crawler";
+import { rotatedRankedAgentHopUrls } from "../../lib/growth/ai-agent-hops";
 import { aiAgentJsonLd } from "../../lib/growth/ai-agent-jsonld";
 import { evaluateGoalPace, evaluateVisibility } from "../../lib/growth/ai-agent-eval";
 import { renderLlmsTxt, renderWellKnownAiTxt } from "../../lib/seo/llms-txt";
@@ -2347,6 +2351,32 @@ assert.ok(
   assert.equal(normalizeAiAgentSlug("anthropic"), "claude");
   assert.equal(parseAiAgentFromSearch("?ref=claude"), "claude");
   assert.equal(parseAiAgentFromSearch("?utm_source=google&utm_medium=cpc"), null);
+  assert.equal(RANKED_AI_AGENT_SLUGS.length, 16);
+  assert.equal(RANKED_AI_AGENT_SLUGS[3], "perplexity");
+  assert.ok(agentHopUrl("perplexity", "de").includes("/r/ai?ref=perplexity"));
+  assert.equal(detectAiCrawler("PerplexityBot/1.0"), "perplexity");
+  assert.equal(detectAiCrawler("Mozilla/5.0 (compatible; Googlebot/2.1)"), null);
+  assert.equal(detectAiCrawler("bingbot/2.0"), null);
+  assert.ok(machineBriefText("en").includes("/r/ai?ref=perplexity"));
+  assert.ok(machineBriefText("en").includes("/r/ai?ref=grok"));
+  {
+    const start = Date.parse("2026-09-07T11:00:00.000Z");
+    const seen = new Set<string>();
+    for (let slot = 0; slot < 4; slot += 1) {
+      const hops = rotatedRankedAgentHopUrls(new Date(start + slot * 15 * 60 * 1000));
+      assert.equal(hops.length, 4 * GLOBAL_LOCALES.length);
+      for (const hop of hops) {
+        const ref = new URL(hop).searchParams.get("ref");
+        if (ref) seen.add(ref);
+      }
+    }
+    assert.equal(seen.size, 16, "IndexNow rotation must cover all ranked agents in one hour");
+    assert.ok(seen.has("perplexity"));
+    assert.ok(seen.has("cursor"));
+  }
+  assert.ok(
+    !readFileSync(join(root, "lib/growth/legal-sprint.ts"), "utf8").includes('fetch("https://medscopeglobal.com/r/ai')
+  );
   assert.equal(getAiAgentBrief("de").footerLabel, "Für KI-Agenten");
   assert.ok(getAiAgentBrief("cs").contest.includes("soutěž"));
   assert.ok(getAiAgentBrief("cs").goals.includes("170 000"));
@@ -2434,6 +2464,10 @@ assert.ok(
     assert.ok(urls.includes("https://medscopeglobal.com/cn/predplatne"));
     assert.ok(urls.includes("https://medscopeglobal.com/sk/predplatne"));
     assert.ok(urls.includes("https://medscopeglobal.com/en-uk/predplatne"));
+    assert.ok(
+      urls.some((url) => url.includes("/r/ai") && url.includes("ref=perplexity")),
+      "IndexNow must advertise hops for agents 4–16, not only chatgpt/claude/gemini"
+    );
     assert.equal(
       GLOBAL_LOCALES.every((row) =>
         urls.includes(`https://medscopeglobal.com/${localeToPathSegment(row.code)}/predplatne`)

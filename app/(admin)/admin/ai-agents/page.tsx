@@ -106,7 +106,9 @@ export default async function AdminAiAgentsPage() {
         <h2 className="mb-3 font-display text-xl font-semibold">Žebříček AI agentů</h2>
         <p className="mb-4 text-sm text-muted-foreground">
           Skóre = zaplacené objednávky s <code>ai_ref</code> × 100 + checkout × 10 + newsletter × 5 +
-          návštěvy s <code>?ref=</code>. Bez atribuce se agent nepočítá.
+          návštěvy s <code>?ref=</code> nebo známým crawlerem asistenta na <code>/llms.txt</code>.
+          Agenti 4–17 (Perplexity až other) mají nulu, dokud někdo opravdu nepřijde s jejich
+          <code>?ref=</code> — cron si návštěvy nevymýšlí a neself-pinguje hop.
         </p>
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full text-sm">
@@ -114,6 +116,7 @@ export default async function AdminAiAgentsPage() {
               <tr>
                 <th className="px-4 py-2 text-left">#</th>
                 <th className="px-4 py-2 text-left">Agent</th>
+                <th className="px-4 py-2 text-left">Stav</th>
                 <th className="px-4 py-2 text-right">Návštěvy</th>
                 <th className="px-4 py-2 text-right">Checkout</th>
                 <th className="px-4 py-2 text-right">Newsletter</th>
@@ -121,16 +124,22 @@ export default async function AdminAiAgentsPage() {
               </tr>
             </thead>
             <tbody>
-              {snap.leaderboard.map((row, index) => (
-                <tr key={row.agent} className="border-t">
-                  <td className="px-4 py-2">{index + 1}</td>
-                  <td className="px-4 py-2 font-medium">{row.agent}</td>
-                  <td className="px-4 py-2 text-right">{formatInt(row.visits)}</td>
-                  <td className="px-4 py-2 text-right">{formatInt(row.checkouts)}</td>
-                  <td className="px-4 py-2 text-right">{formatInt(row.newsletters)}</td>
-                  <td className="px-4 py-2 text-right">{formatInt(row.paid)}</td>
-                </tr>
-              ))}
+              {snap.leaderboard.map((row, index) => {
+                const hits = row.visits + row.checkouts + row.newsletters + row.paid;
+                return (
+                  <tr key={row.agent} className="border-t">
+                    <td className="px-4 py-2">{index + 1}</td>
+                    <td className="px-4 py-2 font-medium">{row.agent}</td>
+                    <td className="px-4 py-2 text-muted-foreground">
+                      {hits > 0 ? "atribuce běží" : "čeká na první ?ref= nebo crawler"}
+                    </td>
+                    <td className="px-4 py-2 text-right">{formatInt(row.visits)}</td>
+                    <td className="px-4 py-2 text-right">{formatInt(row.checkouts)}</td>
+                    <td className="px-4 py-2 text-right">{formatInt(row.newsletters)}</td>
+                    <td className="px-4 py-2 text-right">{formatInt(row.paid)}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

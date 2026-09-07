@@ -27,13 +27,21 @@ export async function loadArenaEvents(sinceIso: string): Promise<ArenaAnalyticsE
   const admin = tryCreateServiceRoleClient();
   if (!admin) return [];
   try {
-    const { data } = await admin
-      .from("analytics")
-      .select("event, payload")
-      .in("event", ["ai_agent_visit", "ai_agent_checkout", "ai_agent_newsletter", "ai_agent_paid"])
-      .gte("created_at", sinceIso)
-      .limit(4000);
-    return (data ?? []).map((row) => ({
+    const rows: { event: unknown; payload: unknown }[] = [];
+    const page = 1000;
+    for (let from = 0; from < 12_000; from += page) {
+      const { data, error } = await admin
+        .from("analytics")
+        .select("event, payload")
+        .in("event", ["ai_agent_visit", "ai_agent_checkout", "ai_agent_newsletter", "ai_agent_paid"])
+        .gte("created_at", sinceIso)
+        .order("created_at", { ascending: false })
+        .range(from, from + page - 1);
+      if (error || !data?.length) break;
+      rows.push(...data);
+      if (data.length < page) break;
+    }
+    return rows.map((row) => ({
       event: String(row.event),
       payload: (row.payload ?? {}) as Record<string, unknown>,
     }));

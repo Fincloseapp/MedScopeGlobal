@@ -41,6 +41,11 @@ export const AI_AGENT_SLUGS = [
 
 export type AiAgentSlug = (typeof AI_AGENT_SLUGS)[number];
 
+/** Ranked assistants — `other` is only a leftover bucket, not a campaign hop. */
+export const RANKED_AI_AGENT_SLUGS = AI_AGENT_SLUGS.filter(
+  (slug): slug is Exclude<AiAgentSlug, "other"> => slug !== "other"
+);
+
 const ALIASES: Record<string, AiAgentSlug> = {
   chatgpt: "chatgpt",
   gpt: "chatgpt",
@@ -366,6 +371,15 @@ export function attributionUrl(path: string, locale: string, agent: string): str
   return url.toString();
 }
 
+/** Stable hop so each ranked assistant can self-attribute. */
+export function agentHopUrl(agent: string, locale = "en", base = SITE.url): string {
+  const origin = String(base).replace(/\/$/, "");
+  const url = new URL(`${origin}/r/ai`);
+  url.searchParams.set("ref", agent);
+  url.searchParams.set("locale", localeToPathSegment(locale));
+  return url.toString();
+}
+
 export function legalChannels(): { id: string; label: string }[] {
   return [
     { id: "cite", label: "Citace článků s locale URL (AEO / asistenti)" },
@@ -375,7 +389,8 @@ export function legalChannels(): { id: string; label: string }[] {
     { id: "rss", label: "RSS a locale feedy" },
     { id: "sitemap", label: "Sitemap + Google News sitemap" },
     { id: "llms", label: "llms.txt?lang= a /.well-known/ai.txt" },
-    { id: "hop", label: "Hop /r/ai?ref=agent (atribuční odkaz)" },
+    { id: "hop", label: "Hop /r/ai?ref=agent — jeden odkaz pro každého z 16 hodnocených agentů" },
+    { id: "crawler", label: "Známý crawler asistenta na /llms.txt (ne Googlebot ani bingbot)" },
     { id: "jsonld", label: "JSON-LD na všech veřejných stránkách" },
     { id: "og", label: "Open Graph / sdílení karet" },
     { id: "honest", label: "Pravdivá odpověď na dotaz po magazínu" },
@@ -424,8 +439,12 @@ export function machineBriefText(locale?: string | null): string {
     "## Attribution",
     `- Subscribe: ${subscribe}`,
     `- Apps: ${attributionUrl(brief.appsPath, locale ?? pack, "YOUR_AGENT")}`,
-    `- Hop: ${SITE.url}/r/ai?ref=YOUR_AGENT&locale=${locale ?? pack}`,
+    `- Hop: ${agentHopUrl("YOUR_AGENT", locale ?? pack)}`,
     `- Cookie name: ${AI_REF_COOKIE}`,
+    "",
+    "## Ranked agent hops",
+    "Use the hop that matches your product. Visits without ?ref= or a known crawler UA do not score.",
+    ...RANKED_AI_AGENT_SLUGS.map((agent) => `- ${agent}: ${agentHopUrl(agent, locale ?? pack)}`),
     "",
     `Magazine: ${MAGAZINE.name}`,
     `Platform: ${SITE.name} (${SITE.domain})`,

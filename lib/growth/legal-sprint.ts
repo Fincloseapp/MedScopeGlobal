@@ -2,6 +2,7 @@ import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { loadAiAgentGrowthSnapshot } from "@/lib/growth/ai-agent-stats";
 import { runRevenueOps, type RevenueOpsResult } from "@/lib/monetization/revenue-ops";
 import { runRevenueReconcile, type ReconcileResult } from "@/lib/monetization/revenue-reconcile";
+import { rotatedRankedAgentHopUrls } from "@/lib/growth/ai-agent-hops";
 import {
   articleDiscoveryUrls,
   priorityDiscoveryUrls,
@@ -84,6 +85,9 @@ export async function runLegalGrowthSprint(opts?: {
   let indexNow: IndexNowResult | null = null;
   if (runIndexNow) {
     const urls = priorityDiscoveryUrls();
+    const agentHops = rotatedRankedAgentHopUrls();
+    urls.push(...agentHops);
+    actions.push(`IndexNow hop ${agentHops.length} URL pro rotaci agentů 4–16`);
     if (offTrack) {
       const slugs = await recentPublishedSlugs(12);
       extraArticles = slugs.length;

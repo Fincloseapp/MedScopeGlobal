@@ -61,6 +61,29 @@ function dayKey(iso: string): string {
   return iso.slice(0, 10);
 }
 
+const ANALYTICS_PAGE = 1000;
+const ANALYTICS_MAX = 20_000;
+
+async function loadAnalyticsEvents(
+  client: { from: (table: string) => any },
+  since: string
+): Promise<{ event: string; payload: unknown }[]> {
+  const rows: { event: string; payload: unknown }[] = [];
+  for (let from = 0; from < ANALYTICS_MAX; from += ANALYTICS_PAGE) {
+    const { data, error } = await client
+      .from("analytics")
+      .select("event, payload, created_at")
+      .in("event", ["ai_agent_visit", "ai_agent_checkout", "ai_agent_newsletter", "ai_agent_paid"])
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .range(from, from + ANALYTICS_PAGE - 1);
+    if (error || !data?.length) break;
+    rows.push(...data);
+    if (data.length < ANALYTICS_PAGE) break;
+  }
+  return rows;
+}
+
 async function countSafe(
   query: PromiseLike<{ count: number | null; error: { message: string } | null }>
 ): Promise<number> {
@@ -182,13 +205,8 @@ async function loadAiAgentGrowthSnapshotUnsafe(): Promise<AiAgentGrowthSnapshot>
   }
 
   try {
-    const { data } = await client
-      .from("analytics")
-      .select("event, payload, created_at")
-      .in("event", ["ai_agent_visit", "ai_agent_checkout", "ai_agent_newsletter", "ai_agent_paid"])
-      .gte("created_at", since)
-      .limit(4000);
-    for (const row of data ?? []) {
+    const rows = await loadAnalyticsEvents(client, since);
+    for (const row of rows) {
       const payload = (row.payload ?? {}) as Record<string, unknown>;
       const agent = normalizeAiAgentSlug(String(payload.agent ?? payload.ref ?? ""));
       if (!agent) continue;

@@ -1,6 +1,7 @@
 import { getSiteUrl } from "@/lib/config/site-url";
 import { localeToPathSegment } from "@/lib/i18n/locale-path";
 import { publicArticleSlug } from "@/lib/editorial/clinician-anonymize";
+import { priorityAgentHopUrls } from "@/lib/growth/ai-agent-hops";
 import { ARENA_DISCOVERY_LOCALES } from "@/lib/growth/arena/locales";
 
 /** Bing / IndexNow key — hosted at /{key}.txt (hex, 32 chars). */
@@ -42,6 +43,9 @@ export function priorityDiscoveryUrls(base = getSiteUrl()): string[] {
     urls.add(`${prefix}/newsletter`);
     urls.add(`${prefix}/novinky`);
     urls.add(`${origin}/llms.txt?lang=${localeToPathSegment(locale)}`);
+  }
+  for (const hop of priorityAgentHopUrls(origin)) {
+    urls.add(hop);
   }
   return [...urls];
 }

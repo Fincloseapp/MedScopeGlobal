@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { SITE } from "@/lib/config/site";
 import { attributionUrl, getAiAgentBrief } from "@/lib/growth/ai-agent-program";
+import { detectAiCrawler } from "@/lib/growth/ai-crawler";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { getServerLocale } from "@/lib/i18n/server-locale";
+import { logMonetizationEvent } from "@/lib/monetization/log-event";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -21,6 +24,16 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ProAiPage() {
   const locale = await getServerLocale();
   const brief = getAiAgentBrief(locale);
+  const headerList = await headers();
+  const crawler = detectAiCrawler(headerList.get("user-agent"));
+  if (crawler) {
+    await logMonetizationEvent("ai_agent_visit", {
+      agent: crawler,
+      locale,
+      path: "/pro-ai",
+      via: "crawler",
+    });
+  }
   const h = (path: string) => localizePublicHref(path, locale);
 
   return (
