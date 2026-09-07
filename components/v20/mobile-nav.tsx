@@ -19,7 +19,6 @@ import type { NavItem } from "@/lib/config/main-navigation";
 import { getHeaderUtilityLinks, headerUtilityAria } from "@/lib/config/main-navigation";
 import { getSurfaceCopy, isCzechSurface } from "@/lib/i18n/surface-copy";
 import { getMagazineListingCopy } from "@/lib/brand/magazine";
-import { getPortalChrome } from "@/lib/v271/portal";
 import { isStudentChromePath, studentNavCtaLabel } from "@/lib/studenti/pricing";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { normalizeLocale } from "@/lib/i18n/config";
@@ -48,7 +47,6 @@ export function V20MobileNav({
   const topCategories = categories.slice(0, 8);
   const navLocale = normalizeLocale(locale);
   const surface = getSurfaceCopy(navLocale);
-  const chrome = getPortalChrome(navLocale);
   const utilities = getHeaderUtilityLinks(navLocale);
 
   return (
@@ -210,11 +208,11 @@ export function V20MobileNav({
               href={
                 isStudentChromePath(pathname)
                   ? localizePublicHref("/predplatne#student", navLocale)
-                  : localizePublicHref("/predplatne?trial=1", navLocale)
+                  : localizePublicHref("/predplatne#public", navLocale)
               }
               onClick={() => setOpen(false)}
             >
-              {isStudentChromePath(pathname) ? studentNavCtaLabel(navLocale) : chrome.trialCta}
+              {isStudentChromePath(pathname) ? studentNavCtaLabel(navLocale) : surface.whyTrial}
             </Link>
           </Button>
           <Button asChild variant="outline" className="rounded-full touch-manipulation">

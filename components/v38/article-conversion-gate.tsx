@@ -14,11 +14,13 @@ type Props = {
   locale?: string | null;
 };
 
-function gateFooter(locale?: string | null) {
+function gateFooter(locale?: string | null, editorial = false) {
   const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
   if (primary === "de") {
     return {
-      trial: `${VIP_TRIAL_DAYS} Tage zum Testen — jederzeit kündbar`,
+      trial: editorial
+        ? "Sofortzahlung — jederzeit kündbar"
+        : `${VIP_TRIAL_DAYS} Tage zum Testen — jederzeit kündbar`,
       haveAccount: "Schon ein Konto?",
       signIn: "Anmelden",
       compare: "Tarife vergleichen",
@@ -26,7 +28,9 @@ function gateFooter(locale?: string | null) {
   }
   if (primary === "fr") {
     return {
-      trial: `${VIP_TRIAL_DAYS} jours d’essai — résiliable à tout moment`,
+      trial: editorial
+        ? "Paiement immédiat — résiliable à tout moment"
+        : `${VIP_TRIAL_DAYS} jours d’essai — résiliable à tout moment`,
       haveAccount: "Vous avez déjà un compte ?",
       signIn: "Se connecter",
       compare: "Comparer les formules",
@@ -34,14 +38,18 @@ function gateFooter(locale?: string | null) {
   }
   if (primary !== "cs") {
     return {
-      trial: `${VIP_TRIAL_DAYS}-day trial — cancel anytime`,
+      trial: editorial
+        ? "Billed now — cancel anytime"
+        : `${VIP_TRIAL_DAYS}-day trial — cancel anytime`,
       haveAccount: "Already have an account?",
       signIn: "Sign in",
       compare: "Compare plans",
     };
   }
   return {
-    trial: `${VIP_TRIAL_DAYS} dní zkušební verze — zrušíte kdykoli`,
+    trial: editorial
+      ? "Platba ihned — zrušíte kdykoli"
+      : `${VIP_TRIAL_DAYS} dní zkušební verze — zrušíte kdykoli`,
     haveAccount: "Již máte účet?",
     signIn: "Přihlásit se",
     compare: "Srovnání tarifů",
@@ -51,7 +59,7 @@ function gateFooter(locale?: string | null) {
 /** Paywall gate with content teaser — VIP or Redakce copy is passed in. */
 export function ArticleConversionGate({ copy, teaserHtml, title, locale }: Props) {
   const teaserText = teaserHtml ? getPaywallPreviewText(teaserHtml) : null;
-  const footer = gateFooter(locale);
+  const footer = gateFooter(locale, Boolean(copy.ctaHref?.includes("#public")));
 
   return (
     <div className="overflow-hidden rounded-2xl border border-[#005B96]/20 bg-gradient-to-b from-white to-[#f0f7ff] shadow-sm dark:from-slate-900 dark:to-[#005B96]/5">

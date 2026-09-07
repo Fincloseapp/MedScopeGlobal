@@ -31,6 +31,11 @@ export type SubscribeCopy = {
   bestForClinic: string;
   mostPopular: string;
   daysFree: string;
+  editorialBadge: string;
+  bannerTitle: string;
+  billedNow: string;
+  startEditorialMonth: string;
+  startEditorialYear: string;
   studentBadge: string;
   firstMonth: string;
   thenMonthly: string;
@@ -83,10 +88,10 @@ const COPY: Record<string, SubscribeCopy> = {
   cs: {
     metaTitle: "Předplatné | ViaLongeVita",
     metaDescription:
-      "Náhled článků o dlouhověkosti. Redakce 25 Kč (1 € / 1 $), 14 dní. OrdiZapis a lékař: 14 dní. Student LF: 1 test, 89 Kč, pak 149 Kč. Zrušení kdykoli. Platba kartou přes Stripe.",
+      "Náhled článků o dlouhověkosti. Redakce 25 Kč (1 € / 1 $) nebo 250 Kč/rok, platba ihned. OrdiZapis a lékař: 14 dní. Student LF: 1 test, 89 Kč, pak 149 Kč. Zrušení kdykoli. Platba kartou přes Stripe.",
     eyebrow: "Předplatné",
-    title: "Dlouhověkost srozumitelně — vyzkoušejte 14 dní",
-    lead: "Veřejnost: úvod článku zdarma, zbytek s tarifem Redakce (25 Kč, 14 dní). OrdiZapis a lékař: 14 dní zdarma. Student LF: 1 test zdarma, první měsíc 89 Kč, další 149 Kč. Zrušení kdykoli.",
+    title: "Dlouhověkost srozumitelně — tarif Redakce",
+    lead: "Veřejnost: úvod článku zdarma, zbytek s tarifem Redakce (25 Kč nebo 250 Kč/rok, platba ihned). OrdiZapis a lékař: 14 dní zdarma. Student LF: 1 test zdarma, první měsíc 89 Kč, další 149 Kč. Zrušení kdykoli.",
     trialFromCta: "Přicházíte z trial CTA — níže je zvýrazněný tarif",
     studentPlan: "Student LF",
     trialFromCtaRest: "(příprava na přijímačky i studium). Rodiče: účet založte na jméno studenta.",
@@ -98,10 +103,15 @@ const COPY: Record<string, SubscribeCopy> = {
     openApp: "Otevřít →",
     downloadApp: "Stáhnout na mobil",
     choosePlan: "Vyberte plán",
-    choosePlanLead: "Veřejnost, OrdiZapis a lékař: 14 dní zdarma. Student LF: 1 test zdarma, první měsíc 89 Kč, další 149 Kč. Zrušíte kdykoli. Po kliknutí přejdete na Stripe.",
+    choosePlanLead: "Redakce: platba ihned, 25 Kč/měsíc nebo 250 Kč/rok. OrdiZapis a lékař: 14 dní zdarma. Student LF: 1 test zdarma, první měsíc 89 Kč, další 149 Kč. Zrušíte kdykoli. Po kliknutí přejdete na Stripe.",
     bestForClinic: "Nejvýhodnější pro ordinaci",
     mostPopular: "Nejoblíbenější",
     daysFree: "14 dní zdarma",
+    editorialBadge: "Platba ihned",
+    bannerTitle: "Redakce se platí hned",
+    billedNow: "Platba ihned",
+    startEditorialMonth: "Předplatit měsíčně",
+    startEditorialYear: "Předplatit na rok",
     studentBadge: "1 test zdarma · 89 Kč",
     firstMonth: "první měsíc",
     thenMonthly: "pak",
@@ -120,12 +130,12 @@ const COPY: Record<string, SubscribeCopy> = {
     cancelAnytime: "zrušení kdykoli",
     supportTitle: "Nechcete předplatné hned? Stačí náhled",
     supportLead:
-      "Úvod článku zůstává čitelný. Zbytek textu otevírá tarif Redakce — 14 dní, pak 25 Kč (1 € / 1 $). Tip u článku je pořád dobrovolný.",
+      "Úvod článku zůstává čitelný. Zbytek textu otevírá tarif Redakce — 25 Kč měsíčně nebo 250 Kč za rok (1 € / 10 €). Tip u článku je pořád dobrovolný.",
     supportCta: "Otevřít články o dlouhověkosti",
     keepReading: "Číst náhled",
     comparisonTitle: "Srovnání tarifů",
     comparisonLead:
-      "Přehled funkcí podle cílové skupiny. Veřejnost, OrdiZapis a Lékař: 14denní zkušební verze. Student LF: 1 test zdarma, 89 Kč, pak 149 Kč. OrdiZapis (390 Kč) je samostatný nástroj pro zápisy; Lékař v praxi (490 Kč) přidává CME, Research Hub a klinický AI.",
+      "Přehled funkcí podle cílové skupiny. Redakce: platba ihned. OrdiZapis a Lékař: 14denní zkušební verze. Student LF: 1 test zdarma, 89 Kč, pak 149 Kč. OrdiZapis (390 Kč) je samostatný nástroj pro zápisy; Lékař v praxi (490 Kč) přidává CME, Research Hub a klinický AI.",
     featureCol: "Funkce",
     included: "Zahrnuto",
     notIncluded: "Nezahrnuto",
@@ -133,7 +143,7 @@ const COPY: Record<string, SubscribeCopy> = {
     faq: [
       {
         q: "Jak funguje 14denní zkušební verze?",
-        a: "Veřejnost, OrdiZapis a lékař: po zadání karty máte 14 dní zdarma, pak se spustí předplatné. Student LF nemá 14denní trial — 1 test zdarma, první měsíc 89 Kč, další měsíce 149 Kč. Zrušíte kdykoli před dalším inkasem.",
+        a: "OrdiZapis a lékař: po zadání karty máte 14 dní zdarma, pak se spustí předplatné. Tarif Redakce se platí hned — 25 Kč měsíčně nebo 250 Kč za rok. Student LF nemá 14denní trial — 1 test zdarma, první měsíc 89 Kč, další měsíce 149 Kč. Zrušíte kdykoli před dalším inkasem.",
       },
       {
         q: "Mohu předplatné kdykoli zrušit?",
@@ -165,12 +175,12 @@ const COPY: Record<string, SubscribeCopy> = {
     trust: [
       { title: "Platby přes Stripe", description: "Karta, Apple Pay a Google Pay. Bezpečná PCI-kompatibilní platba." },
       { title: "GDPR a ochrana dat", description: "Zpracování v souladu s EU nařízením. Vaše data neprodáváme." },
-      { title: "Zrušení kdykoli", description: "Předplatné spravujete v účtu. Po zkušební době bez skrytých poplatků." },
+      { title: "Zrušení kdykoli", description: "Předplatné spravujete v účtu. Redakce se platí hned; u OrdiZapisu a lékaře po 14 dnech. Bez skrytých poplatků." },
     ],
     privacy: "Zásady ochrany osobních údajů",
     terms: "Obchodní podmínky",
     noAccountTitle: "Ještě nemáte účet?",
-    noAccountLead: "Zaregistrujte se zdarma, poté se vraťte sem a aktivujte zkušební verzi vybraného tarifu.",
+    noAccountLead: "Zaregistrujte se zdarma, poté se vraťte sem a vyberte tarif. Redakce se účtuje ihned; OrdiZapis a lékař mají 14 dní.",
     createAccount: "Vytvořit účet zdarma",
     b2bNote: "B2B nabídka pro firmy na",
     contact: "kontakt",
@@ -240,19 +250,19 @@ const COPY: Record<string, SubscribeCopy> = {
       mediflow: "Veřejnost a longevity",
     },
     priceNoteByApp: {
-      medipacient: "14 dní zdarma, potom",
+      medipacient: "s tarifem Redakce, potom",
       mediprep: "1 test zdarma, první měsíc 89 Kč, potom 149 Kč",
       ordizapis: "14 dní zdarma, potom",
-      mediflow: "14 dní zdarma s předplatným Veřejnost",
+      mediflow: "s tarifem Redakce",
     },
   },
   en: {
     metaTitle: "Subscription | ViaLongeVita",
     metaDescription:
-      "Longevity articles open with a preview. Editorial plan 25 CZK / €1 / $1, 14 days. OrdiZapis and physician: 14 days. Student: 1 free test, intro month, then 149 CZK / €10. Cancel anytime. Card payment via Stripe.",
+      "Longevity articles open with a preview. Editorial plan 25 CZK / €1 / $1 or 250 CZK / €10 a year, billed now. OrdiZapis and physician: 14 days. Student: 1 free test, intro month, then 149 CZK / €10. Cancel anytime. Card payment via Stripe.",
     eyebrow: "Subscription",
-    title: "Longevity in plain language — try 14 days",
-    lead: "Public magazine: a preview, then the Editorial plan. OrdiZapis and physician: 14 days free. Student: 1 free test, intro month, then 149 CZK / €10. Cancel anytime.",
+    title: "Longevity in plain language — Editorial plan",
+    lead: "Public magazine: a preview, then the Editorial plan billed now. OrdiZapis and physician: 14 days free. Student: 1 free test, intro month, then 149 CZK / €10. Cancel anytime.",
     trialFromCta: "You came from a trial CTA — the highlighted plan below is",
     studentPlan: "Medical student",
     trialFromCtaRest: "(admissions prep and study). Parents: create the account in the student’s name.",
@@ -264,10 +274,15 @@ const COPY: Record<string, SubscribeCopy> = {
     openApp: "Open →",
     downloadApp: "Install on mobile",
     choosePlan: "Choose a plan",
-    choosePlanLead: "Public, OrdiZapis and physician: 14-day trial. Student LF: 1 free test, intro month, then 149 CZK / €10. Cancel anytime. Checkout opens Stripe.",
+    choosePlanLead: "Editorial: billed now, monthly or yearly. OrdiZapis and physician: 14-day trial. Student LF: 1 free test, intro month, then 149 CZK / €10. Cancel anytime. Checkout opens Stripe.",
     bestForClinic: "Best value for the clinic",
     mostPopular: "Most popular",
     daysFree: "14 days free",
+    editorialBadge: "Billed now",
+    bannerTitle: "Editorial is billed immediately",
+    billedNow: "Billed now",
+    startEditorialMonth: "Subscribe monthly",
+    startEditorialYear: "Subscribe yearly",
     studentBadge: "1 free test · intro month",
     firstMonth: "first month",
     thenMonthly: "then",
@@ -286,12 +301,12 @@ const COPY: Record<string, SubscribeCopy> = {
     cancelAnytime: "cancel anytime",
     supportTitle: "No plan yet — keep the preview",
     supportLead:
-      "The opening stays readable. The rest opens with the Editorial plan — 14 days, then 25 CZK / €1 / $1. Tips stay voluntary.",
+      "The opening stays readable. The rest opens with the Editorial plan — billed now at 25 CZK / €1 / $1 a month, or 250 CZK / €10 a year. Tips stay voluntary.",
     supportCta: "Open longevity articles",
     keepReading: "Read the preview",
     comparisonTitle: "Compare plans",
     comparisonLead:
-      "Features by audience. Public, OrdiZapis and Physician: 14-day trial. Student: 1 free test, intro month, then 149 CZK / €10. OrdiZapis (390 CZK) is the documentation app; Physician (490 CZK) adds CME, Research Hub and clinical AI.",
+      "Features by audience. Editorial: billed now. OrdiZapis and Physician: 14-day trial. Student: 1 free test, intro month, then 149 CZK / €10. OrdiZapis (390 CZK) is the documentation app; Physician (490 CZK) adds CME, Research Hub and clinical AI.",
     featureCol: "Feature",
     included: "Included",
     notIncluded: "Not included",
@@ -299,7 +314,7 @@ const COPY: Record<string, SubscribeCopy> = {
     faq: [
       {
         q: "How does the 14-day trial work?",
-        a: "Public, OrdiZapis and physician: after you enter a card via Stripe, the first 14 days are not billed. Student LF has no 14-day trial — 1 free test, an intro month, then 149 CZK / €10. Cancel anytime before the next charge.",
+        a: "OrdiZapis and physician: after you enter a card via Stripe, the first 14 days are not billed. Editorial is billed immediately — monthly or yearly. Student LF has no 14-day trial — 1 free test, an intro month, then 149 CZK / €10. Cancel anytime before the next charge.",
       },
       {
         q: "Can I cancel anytime?",
@@ -331,12 +346,12 @@ const COPY: Record<string, SubscribeCopy> = {
     trust: [
       { title: "Payments via Stripe", description: "Card, Apple Pay and Google Pay. PCI-compliant checkout." },
       { title: "GDPR and data protection", description: "Processed under EU rules. We do not sell your data." },
-      { title: "Cancel anytime", description: "Manage the subscription in your account. No hidden fees after the trial." },
+      { title: "Cancel anytime", description: "Manage the subscription in your account. Editorial is billed now; OrdiZapis and physician after 14 days. No hidden fees." },
     ],
     privacy: "Privacy policy",
     terms: "Terms",
     noAccountTitle: "No account yet?",
-    noAccountLead: "Create a free account, then come back here to start the trial for your plan.",
+    noAccountLead: "Create a free account, then come back here and pick a plan. Editorial is billed now; OrdiZapis and physician have 14 days.",
     createAccount: "Create a free account",
     b2bNote: "B2B offer for organisations at",
     contact: "contact",
@@ -406,19 +421,19 @@ const COPY: Record<string, SubscribeCopy> = {
       mediflow: "Public and longevity",
     },
     priceNoteByApp: {
-      medipacient: "14 days free, then",
+      medipacient: "with the Editorial plan, then",
       mediprep: "1 free test, intro month, then 149 CZK / €10",
       ordizapis: "14 days free, then",
-      mediflow: "14 days free with the Public plan",
+      mediflow: "with the Editorial plan",
     },
   },
   de: {
     metaTitle: "Abo | ViaLongeVita",
     metaDescription:
-      "Langlebigkeitsartikel beginnen mit einer Vorschau. Redaktion 1 €, 14 Tage. OrdiZapis und Arzt: 14 Tage. Studium: 1 Test frei, Einstiegsmonat 6 €, danach 10 €. Jederzeit kündbar. Zahlung per Stripe.",
+      "Langlebigkeitsartikel beginnen mit einer Vorschau. Redaktion 1 € oder 10 €/Jahr, sofort. OrdiZapis und Arzt: 14 Tage. Studium: 1 Test frei, Einstiegsmonat 6 €, danach 10 €. Jederzeit kündbar. Zahlung per Stripe.",
     eyebrow: "Abo",
-    title: "Langlebigkeit verständlich — 14 Tage testen",
-    lead: "Magazin: Artikelanfang offen, Rest mit Redaktionsabo. OrdiZapis und Arzt: 14 Tage kostenlos. Medizinstudium: 1 Test frei, Einstiegsmonat 6 €, danach 10 €. Jederzeit kündbar.",
+    title: "Langlebigkeit verständlich — Redaktionsabo",
+    lead: "Magazin: Artikelanfang offen, Rest mit Redaktionsabo — sofort berechnet. OrdiZapis und Arzt: 14 Tage kostenlos. Medizinstudium: 1 Test frei, Einstiegsmonat 6 €, danach 10 €. Jederzeit kündbar.",
     trialFromCta: "Sie kommen vom Test-CTA — hervorgehoben ist der Tarif",
     studentPlan: "Medizinstudium",
     trialFromCtaRest: "(Aufnahmeprüfung und Studium). Eltern: Konto auf den Namen der oder des Studierenden anlegen.",
@@ -430,10 +445,15 @@ const COPY: Record<string, SubscribeCopy> = {
     openApp: "Öffnen →",
     downloadApp: "Aufs Handy laden",
     choosePlan: "Tarif wählen",
-    choosePlanLead: "Öffentlichkeit, OrdiZapis und Arzt: 14 Tage kostenlos. Medizinstudium: 1 Test frei, erster Monat 6 €, danach 10 €. Jederzeit kündbar. Die Kasse öffnet Stripe.",
+    choosePlanLead: "Redaktion: sofort, monatlich oder jährlich. OrdiZapis und Arzt: 14 Tage kostenlos. Medizinstudium: 1 Test frei, erster Monat 6 €, danach 10 €. Jederzeit kündbar. Die Kasse öffnet Stripe.",
     bestForClinic: "Bestes Preis-Leistungs-Verhältnis für die Praxis",
     mostPopular: "Beliebtester Tarif",
     daysFree: "14 Tage kostenlos",
+    editorialBadge: "Sofortzahlung",
+    bannerTitle: "Redaktion wird sofort berechnet",
+    billedNow: "Sofortzahlung",
+    startEditorialMonth: "Monatlich abonnieren",
+    startEditorialYear: "Jährlich abonnieren",
     studentBadge: "1 Test frei · 6 €",
     firstMonth: "erster Monat",
     thenMonthly: "dann",
@@ -452,12 +472,12 @@ const COPY: Record<string, SubscribeCopy> = {
     cancelAnytime: "jederzeit kündbar",
     supportTitle: "Noch kein Abo — Vorschau weiterlesen",
     supportLead:
-      "Der Artikelanfang bleibt lesbar. Den Rest öffnet das Redaktionsabo — 14 Tage, dann 1 €. Ein Tipp am Artikel bleibt freiwillig.",
+      "Der Artikelanfang bleibt lesbar. Den Rest öffnet das Redaktionsabo — 1 € im Monat oder 10 € im Jahr, sofort. Ein Tipp am Artikel bleibt freiwillig.",
     supportCta: "Artikel zur Langlebigkeit öffnen",
     keepReading: "Vorschau lesen",
     comparisonTitle: "Tarifvergleich",
     comparisonLead:
-      "Funktionen nach Zielgruppe. Öffentlichkeit, OrdiZapis und Arzt: 14 Tage Test. Medizinstudium: 1 Test frei, 6 €, danach 10 €. OrdiZapis (390 CZK) ist die Dokumentations-App; Arzt in der Praxis (490 CZK) ergänzt CME, Research Hub und klinische KI.",
+      "Funktionen nach Zielgruppe. Redaktion: sofort. OrdiZapis und Arzt: 14 Tage Test. Medizinstudium: 1 Test frei, 6 €, danach 10 €. OrdiZapis (390 CZK) ist die Dokumentations-App; Arzt in der Praxis (490 CZK) ergänzt CME, Research Hub und klinische KI.",
     featureCol: "Funktion",
     included: "Enthalten",
     notIncluded: "Nicht enthalten",
@@ -465,7 +485,7 @@ const COPY: Record<string, SubscribeCopy> = {
     faq: [
       {
         q: "Wie funktioniert die 14-tägige Testphase?",
-        a: "Öffentlichkeit, OrdiZapis und Arzt: nach Karteneingabe bei Stripe sind die ersten 14 Tage unentgeltlich. Medizinstudium hat keinen 14-Tage-Test — 1 Test frei, Einstiegsmonat 6 €, danach 10 €. Kündigung vor der nächsten Abbuchung.",
+        a: "OrdiZapis und Arzt: nach Karteneingabe bei Stripe sind die ersten 14 Tage unentgeltlich. Die Redaktion wird sofort berechnet — monatlich oder jährlich. Medizinstudium hat keinen 14-Tage-Test — 1 Test frei, Einstiegsmonat 6 €, danach 10 €. Kündigung vor der nächsten Abbuchung.",
       },
       {
         q: "Kann ich jederzeit kündigen?",
@@ -497,12 +517,12 @@ const COPY: Record<string, SubscribeCopy> = {
     trust: [
       { title: "Zahlung über Stripe", description: "Karte, Apple Pay und Google Pay. PCI-konform." },
       { title: "DSGVO und Datenschutz", description: "Verarbeitung nach EU-Recht. Wir verkaufen Ihre Daten nicht." },
-      { title: "Jederzeit kündbar", description: "Abo im Konto verwalten. Keine versteckten Gebühren nach dem Test." },
+      { title: "Jederzeit kündbar", description: "Abo im Konto verwalten. Redaktion sofort; OrdiZapis und Arzt nach 14 Tagen. Keine versteckten Gebühren." },
     ],
     privacy: "Datenschutz",
     terms: "AGB",
     noAccountTitle: "Noch kein Konto?",
-    noAccountLead: "Kostenlos registrieren, dann hier den Testzeitraum des gewählten Tarifs starten.",
+    noAccountLead: "Kostenlos registrieren, dann hier den Tarif wählen. Redaktion wird sofort berechnet; OrdiZapis und Arzt haben 14 Tage.",
     createAccount: "Kostenloses Konto anlegen",
     b2bNote: "B2B-Angebot für Unternehmen unter",
     contact: "Kontakt",
@@ -572,19 +592,19 @@ const COPY: Record<string, SubscribeCopy> = {
       mediflow: "Öffentlichkeit und Langlebigkeit",
     },
     priceNoteByApp: {
-      medipacient: "14 Tage kostenlos, dann",
+      medipacient: "mit dem Redaktionsabo, dann",
       mediprep: "1 Test frei, Einstiegsmonat 6 €, danach 10 €",
       ordizapis: "14 Tage kostenlos, dann",
-      mediflow: "14 Tage kostenlos mit dem Öffentlichkeit-Tarif",
+      mediflow: "mit dem Redaktionsabo",
     },
   },
   fr: {
     metaTitle: "Abonnement | ViaLongeVita",
     metaDescription:
-      "Les articles longévité s’ouvrent par un aperçu. Rédaction 1 €, 14 jours. OrdiZapis et médecin : 14 jours. Étudiant : 1 test offert, premier mois 6 €, puis 10 €. Résiliation à tout moment. Paiement par carte via Stripe.",
+      "Les articles longévité s’ouvrent par un aperçu. Rédaction 1 € ou 10 €/an, paiement immédiat. OrdiZapis et médecin : 14 jours. Étudiant : 1 test offert, premier mois 6 €, puis 10 €. Résiliation à tout moment. Paiement par carte via Stripe.",
     eyebrow: "Abonnement",
-    title: "La longévité en clair — 14 jours d’essai",
-    lead: "Magazine : l’ouverture reste lisible, le reste avec l’abonnement Rédaction. OrdiZapis et médecin : 14 jours gratuits. Étudiant : 1 test offert, premier mois 6 €, puis 10 €. Résiliation à tout moment.",
+    title: "La longévité en clair — abonnement Rédaction",
+    lead: "Magazine : l’ouverture reste lisible, le reste avec l’abonnement Rédaction — facturé tout de suite. OrdiZapis et médecin : 14 jours gratuits. Étudiant : 1 test offert, premier mois 6 €, puis 10 €. Résiliation à tout moment.",
     trialFromCta: "Vous arrivez depuis un CTA d’essai — la formule mise en avant est",
     studentPlan: "Étudiant en médecine",
     trialFromCtaRest: "(préparation aux concours et études). Parents : créez le compte au nom de l’étudiant.",
@@ -596,10 +616,15 @@ const COPY: Record<string, SubscribeCopy> = {
     openApp: "Ouvrir →",
     downloadApp: "Installer sur mobile",
     choosePlan: "Choisir une formule",
-    choosePlanLead: "Grand public, OrdiZapis et médecin : 14 jours gratuits. Étudiant : 1 test offert, premier mois 6 €, puis 10 €. Résiliation à tout moment. Le paiement s’ouvre sur Stripe.",
+    choosePlanLead: "Rédaction : paiement immédiat, mensuel ou annuel. OrdiZapis et médecin : 14 jours gratuits. Étudiant : 1 test offert, premier mois 6 €, puis 10 €. Résiliation à tout moment. Le paiement s’ouvre sur Stripe.",
     bestForClinic: "Meilleur rapport pour le cabinet",
     mostPopular: "La plus populaire",
     daysFree: "14 jours gratuits",
+    editorialBadge: "Paiement immédiat",
+    bannerTitle: "La rédaction est facturée tout de suite",
+    billedNow: "Paiement immédiat",
+    startEditorialMonth: "S’abonner au mois",
+    startEditorialYear: "S’abonner à l’année",
     studentBadge: "1 test offert · 6 €",
     firstMonth: "premier mois",
     thenMonthly: "puis",
@@ -618,12 +643,12 @@ const COPY: Record<string, SubscribeCopy> = {
     cancelAnytime: "résiliation à tout moment",
     supportTitle: "Pas d’abonnement ? Lisez l’aperçu",
     supportLead:
-      "Le début de l’article reste lisible. Le reste s’ouvre avec l’abonnement Rédaction — 14 jours, puis 1 €. Le pourboire reste volontaire.",
+      "Le début de l’article reste lisible. Le reste s’ouvre avec l’abonnement Rédaction — 1 € par mois ou 10 € par an, tout de suite. Le pourboire reste volontaire.",
     supportCta: "Ouvrir les articles sur la longévité",
     keepReading: "Lire l’aperçu",
     comparisonTitle: "Comparer les formules",
     comparisonLead:
-      "Fonctions par public. Grand public, OrdiZapis et Médecin : 14 jours d’essai. Étudiant : 1 test offert, 6 €, puis 10 €. OrdiZapis (390 CZK) est l’appli de notes ; Médecin en exercice (490 CZK) ajoute FMC, Research Hub et IA clinique.",
+      "Fonctions par public. Rédaction : paiement immédiat. OrdiZapis et Médecin : 14 jours d’essai. Étudiant : 1 test offert, 6 €, puis 10 €. OrdiZapis (390 CZK) est l’appli de notes ; Médecin en exercice (490 CZK) ajoute FMC, Research Hub et IA clinique.",
     featureCol: "Fonction",
     included: "Inclus",
     notIncluded: "Non inclus",
@@ -631,7 +656,7 @@ const COPY: Record<string, SubscribeCopy> = {
     faq: [
       {
         q: "Comment fonctionne l’essai de 14 jours ?",
-        a: "Grand public, OrdiZapis et médecin : après saisie de carte via Stripe, les 14 premiers jours ne sont pas facturés. L’étudiant n’a pas d’essai 14 jours — 1 test offert, premier mois 6 €, puis 10 €. Résiliation avant le prochain prélèvement.",
+        a: "OrdiZapis et médecin : après saisie de carte via Stripe, les 14 premiers jours ne sont pas facturés. La rédaction est facturée tout de suite — au mois ou à l’année. L’étudiant n’a pas d’essai 14 jours — 1 test offert, premier mois 6 €, puis 10 €. Résiliation avant le prochain prélèvement.",
       },
       {
         q: "Puis-je résilier à tout moment ?",
@@ -663,12 +688,12 @@ const COPY: Record<string, SubscribeCopy> = {
     trust: [
       { title: "Paiement via Stripe", description: "Carte, Apple Pay et Google Pay. Conforme PCI." },
       { title: "RGPD et protection des données", description: "Traitement selon le droit de l’UE. Nous ne vendons pas vos données." },
-      { title: "Résiliation à tout moment", description: "Gérez l’abonnement dans le compte. Pas de frais cachés après l’essai." },
+      { title: "Résiliation à tout moment", description: "Gérez l’abonnement dans le compte. Rédaction tout de suite ; OrdiZapis et médecin après 14 jours. Pas de frais cachés." },
     ],
     privacy: "Politique de confidentialité",
     terms: "Conditions",
     noAccountTitle: "Pas encore de compte ?",
-    noAccountLead: "Créez un compte gratuit, puis revenez ici pour lancer l’essai de votre formule.",
+    noAccountLead: "Créez un compte gratuit, puis revenez ici et choisissez une formule. La rédaction est facturée tout de suite ; OrdiZapis et médecin ont 14 jours.",
     createAccount: "Créer un compte gratuit",
     b2bNote: "Offre B2B pour les organisations sur",
     contact: "contact",
@@ -738,10 +763,10 @@ const COPY: Record<string, SubscribeCopy> = {
       mediflow: "Grand public et longévité",
     },
     priceNoteByApp: {
-      medipacient: "14 jours gratuits, puis",
+      medipacient: "avec l’abonnement Rédaction, puis",
       mediprep: "1 test offert, premier mois 6 €, puis 10 €",
       ordizapis: "14 jours gratuits, puis",
-      mediflow: "14 jours gratuits avec la formule Grand public",
+      mediflow: "avec l’abonnement Rédaction",
     },
   },
 };

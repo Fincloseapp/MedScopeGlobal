@@ -20,8 +20,8 @@ import {
   headerUtilityAria,
 } from "@/lib/config/main-navigation";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
-import { getPortalChrome } from "@/lib/v271/portal";
 import { isStudentChromePath, studentNavCtaLabel } from "@/lib/studenti/pricing";
 
 /** Two-row sticky header: full utility strip + brand/primary IA, no hidden overflow. */
@@ -51,12 +51,12 @@ export function SiteHeader({
   const utilities = getHeaderUtilityLinks(navLocale);
   const studentChrome = studentSurface ?? isStudentChromePath(pathname);
   const subscribeHref = localizePublicHref(
-    studentChrome ? "/predplatne#student" : "/predplatne?trial=1",
+    studentChrome ? "/predplatne#student" : "/predplatne#public",
     navLocale
   );
   const subscribeLabel = studentChrome
     ? studentNavCtaLabel(navLocale)
-    : getPortalChrome(navLocale).trialCta;
+    : getSurfaceCopy(navLocale).whyTrial;
 
   return (
     <header className="site-header sticky top-0 z-50 w-full overflow-visible border-b border-black/[0.06] bg-white/[0.98] backdrop-blur supports-[padding:max(0px)]:pt-[env(safe-area-inset-top)] dark:border-white/[0.08] dark:bg-slate-950/[0.98]">

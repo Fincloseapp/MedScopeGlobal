@@ -7,7 +7,7 @@ export const SITE = {
   magazineName: MAGAZINE.name,
   tagline: "ViaLongeVita · MediFlow · MeDipacient · OrdiZapis",
   description:
-    "ViaLongeVita — globální magazín zdraví a dlouhověkosti na MedScopeGlobal.com. MediFlow, VIP protokoly, MeDipacient a OrdiZapis. Evidence-based obsah ve 19 jazycích. 14 dní zdarma.",
+    "ViaLongeVita — globální magazín zdraví a dlouhověkosti na MedScopeGlobal.com. MediFlow, VIP protokoly, MeDipacient a OrdiZapis. Evidence-based obsah ve 19 jazycích. OrdiZapis 14 dní zdarma. Magazín Redakce od 25 Kč.",
   domain: "medscopeglobal.com",
   url:
     process.env.NEXT_PUBLIC_SITE_URL ||

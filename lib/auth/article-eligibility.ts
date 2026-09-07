@@ -9,7 +9,7 @@ import { shouldHideFromPublicListing } from "@/lib/editorial/article-quality-aud
  * Two existing gates only:
  * - wire / Aktuality (`zpravy-*`, news rubric) stay fully open
  * - physician VIP (`vip_only` / min_access_level=physician) uses the VIP gate
- * - public magazine shows a teaser, then Redakce (25 Kč / €1 / $1, 14 days)
+ * - public magazine shows a teaser, then Redakce (25 Kč / €1 / $1, billed now)
  *
  * `fully_open` on native desk seeds does not bypass the magazine teaser.
  */

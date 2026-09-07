@@ -18,7 +18,7 @@ const PACK: Record<ChromePack, NotFoundCopy> = {
     home: "Domů",
     apps: "Aplikace",
     dashboard: "Dashboard",
-    trial: "14 dní zdarma",
+    trial: "Předplatné",
   },
   de: {
     code: "Fehler 404",
@@ -27,7 +27,7 @@ const PACK: Record<ChromePack, NotFoundCopy> = {
     home: "Start",
     apps: "Apps",
     dashboard: "Dashboard",
-    trial: "14 Tage kostenlos",
+    trial: "Abo",
   },
   fr: {
     code: "Erreur 404",
@@ -36,7 +36,7 @@ const PACK: Record<ChromePack, NotFoundCopy> = {
     home: "Accueil",
     apps: "Applis",
     dashboard: "Tableau de bord",
-    trial: "14 jours gratuits",
+    trial: "Abonnement",
   },
   en: {
     code: "Error 404",
@@ -45,7 +45,7 @@ const PACK: Record<ChromePack, NotFoundCopy> = {
     home: "Home",
     apps: "Apps",
     dashboard: "Dashboard",
-    trial: "14 days free",
+    trial: "Subscribe",
   },
   it: {
     code: "Errore 404",
@@ -54,7 +54,7 @@ const PACK: Record<ChromePack, NotFoundCopy> = {
     home: "Home",
     apps: "App",
     dashboard: "Dashboard",
-    trial: "14 giorni gratis",
+    trial: "Abbonamento",
   },
   es: {
     code: "Error 404",
@@ -63,7 +63,7 @@ const PACK: Record<ChromePack, NotFoundCopy> = {
     home: "Inicio",
     apps: "Apps",
     dashboard: "Panel",
-    trial: "14 días gratis",
+    trial: "Suscripción",
   },
   "pt-BR": {
     code: "Erro 404",
@@ -72,7 +72,7 @@ const PACK: Record<ChromePack, NotFoundCopy> = {
     home: "Início",
     apps: "Apps",
     dashboard: "Painel",
-    trial: "14 dias grátis",
+    trial: "Assinatura",
   },
 };
 

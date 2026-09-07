@@ -4,8 +4,7 @@ import { createServiceRoleClient } from "@/lib/supabase/service";
 import { createStripeClient, getStripeSecretKey } from "@/lib/stripe/client";
 import { resolveV27CheckoutItem, type V27CheckoutKind } from "@/lib/v27/stripe-products";
 import { convertCzkToCharge } from "@/lib/i18n/payment-currency";
-import { VIP_TRIAL_DAYS } from "@/lib/vip";
-import { isEditorialGrantProduct, isStudentGrantProduct } from "@/lib/v27/config";
+import { isEditorialGrantProduct, isStudentGrantProduct, subscriptionTrialDays } from "@/lib/v27/config";
 import { editorialAnnualCharge, editorialMonthlyCharge } from "@/lib/editorial/pricing";
 import { studentIntroCharge, studentMonthlyCharge } from "@/lib/studenti/pricing";
 
@@ -82,11 +81,14 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
   const intro = studentMonth ? studentIntroCharge(locale, region) : null;
   const recurringInterval = item.billingInterval === "year" ? "year" : "month";
   const student = isStudentGrantProduct(productId);
+  const trialDays = kind === "subscription" ? subscriptionTrialDays(productId) : 0;
   const description = student
     ? gift
       ? `MedScopeGlobal — ${item.name} · dárek: první měsíc ${intro?.formatted ?? charge.formatted}, další ${charge.formatted}`
       : `MedScopeGlobal — ${item.name} · 1 test zdarma, první měsíc ${intro?.formatted ?? charge.formatted}, další ${charge.formatted}`
-    : `MedScopeGlobal — ${item.name} · ${VIP_TRIAL_DAYS}denní zkušební verze`;
+    : trialDays > 0
+      ? `MedScopeGlobal — ${item.name} · ${trialDays}denní zkušební verze`
+      : `MedScopeGlobal — ${item.name} · platba ihned`;
 
   const discounts: Stripe.Checkout.SessionCreateParams.Discount[] = [];
   if (studentMonth && intro && intro.unitAmount < charge.unitAmount) {
@@ -146,11 +148,9 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
     ...(item.mode === "subscription"
       ? {
           subscription_data: {
-            ...(student
-              ? {}
-              : { trial_period_days: VIP_TRIAL_DAYS }),
+            ...(trialDays > 0 ? { trial_period_days: trialDays } : {}),
             metadata: {
-              v27_trial_days: student ? "0" : String(VIP_TRIAL_DAYS),
+              v27_trial_days: String(trialDays),
               product_id: productId,
               ...(userId ? { user_id: userId } : {}),
               ...(gift ? { gift: "1" } : {}),

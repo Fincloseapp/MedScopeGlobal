@@ -79,7 +79,7 @@ export function HomepageLongevityStrip({
             {copy.journal}
           </Link>
           <Link
-            href={localizePublicHref("/predplatne?trial=1", locale)}
+            href={localizePublicHref("/predplatne#public", locale)}
             className="inline-flex items-center rounded-full bg-[#005B96] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
           >
             {copy.softCta}

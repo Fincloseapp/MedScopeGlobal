@@ -98,7 +98,7 @@ export function VerejnostArticleExpandable({
               {chrome.openFullArticle}
             </Link>
             <Link
-              href={localizePublicHref("/predplatne?trial=1#public", uiLocale)}
+              href={localizePublicHref("/predplatne#public", uiLocale)}
               className="text-[#005B96] hover:underline"
             >
               {chrome.teaserCta} →

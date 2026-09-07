@@ -31,7 +31,7 @@ export const PAYOUT_CHANNELS: PayoutChannel[] = [
   {
     id: "stripe",
     title: "Stripe — předplatné a tipy",
-    whatEarns: "Veřejné předplatné, 14denní trial, dobrovolné tipy u článků.",
+    whatEarns: "Veřejné předplatné (Redakce ihned), 14denní trial OrdiZapisu a lékaře, dobrovolné tipy u článků.",
     whereYouSeeMoney: "https://dashboard.stripe.com/balance a Výplaty (Payouts).",
     payoutTo: "Firemní účet napojený ve Stripe (Al Synaptica / účet, který tam zadáte).",
     signupUrl: "https://dashboard.stripe.com/",

@@ -244,7 +244,7 @@ const menuCs: NavItem[] = [
     label: "Předplatné",
     href: "/predplatne",
     children: [
-      { label: "Prohlédnout tarify", href: "/predplatne", description: "14 dní zdarma · zrušení kdykoli" },
+      { label: "Prohlédnout tarify", href: "/predplatne", description: "Redakce od 25 Kč · OrdiZapis 14 dní" },
       { label: "Veřejnost", href: "/predplatne#public", description: "Články, prevence, MeDipacient" },
       { label: "Student LF", href: "/predplatne#student", description: "1 test zdarma · 89 Kč, další měsíc 149 Kč" },
       { label: "OrdiZapis", href: "/predplatne#dokumentace", description: "AI zápisy pro ordinaci" },

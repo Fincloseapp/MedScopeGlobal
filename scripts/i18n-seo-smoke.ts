@@ -322,7 +322,7 @@ assert.equal(getSurfaceCopy("fr").mainNav, "Navigation principale");
 assert.equal(getSurfaceCopy("fr").signIn, "Connexion");
 assert.equal(getSurfaceCopy("fr").register, "Inscription");
 assert.equal(getSurfaceCopy("de").signIn, "Anmelden");
-assert.equal(getSubscribeCopy("fr").title, "La longévité en clair — 14 jours d’essai");
+assert.equal(getSubscribeCopy("fr").title, "La longévité en clair — abonnement Rédaction");
 assert.ok(!getSubscribeCopy("fr").title.includes("Předplatné"));
 assert.ok(!getSubscribeCopy("cs").title.includes("Prémiový"));
 assert.ok(getSubscribeCopy("de").supportTitle.includes("weiterlesen"));
@@ -384,7 +384,7 @@ assert.ok(!getSurfaceCopy("cs").trending.some((item) => /VIP/i.test(item.label))
 assert.equal(getMarketingCopy("de").publicHub.topics["zivotni-styl"]?.label, "Lebensstil");
 assert.equal(getMarketingCopy("fr").publicHub.topics["zivotni-styl"]?.label, "Mode de vie");
 assert.ok(getHomepageLongevityCopy("cs").title.includes("kroky"));
-assert.ok(getHomepageLongevityCopy("fr").softCta.includes("14"));
+assert.ok(getHomepageLongevityCopy("fr").softCta.toLowerCase().includes("rédaction"));
 assert.ok(!getHomepageLongevityCopy("de").closer.includes("zdarma"));
 assert.equal(classifyCoverTopic({ title: "Mediterranean diet at home", slug: "mediterranean-diet" }), "food");
 assert.equal(classifyCoverTopic({ title: "Sommeil et rythme circadien", slug: "sommeil-rythme" }), "sleep");
@@ -539,7 +539,9 @@ assert.ok(!getRevenueCopy("de").bannerOfferDesc.includes("články"));
 assert.ok(!getMediaKitCopy("de").letterTitle.includes("tištěný"));
 assert.ok(!getMediaKitCopy("fr").formatsTitle.includes("Inzertní"));
 assert.ok(getMediaKitCopy("cs").digitalTitle.includes("digitál"));
+assert.ok(!getEditorialArticleGateCopy("fr").ctaHref.includes("trial=1"));
 assert.ok(getEditorialArticleGateCopy("fr").ctaHref.includes("#public"));
+assert.ok(!getEditorialArticleGateCopy("de").body.includes("14 Tage"));
 assert.ok(!getEditorialArticleGateCopy("de").headline.includes("VIP"));
 assert.equal(
   resolveArticleBodyLock(

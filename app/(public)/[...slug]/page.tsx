@@ -159,7 +159,7 @@ export default async function SectionRoutePage({
                 </Link>
               </Button>
               <Link
-                href="/predplatne?trial=1"
+                href="/predplatne#public"
                 className="inline-flex items-center rounded-full border border-[#8dc4ea] px-4 py-2 text-sm font-medium text-[#005B96] transition hover:bg-[#f4fbff]"
               >
                 Předplatné pro hlubší pokrytí

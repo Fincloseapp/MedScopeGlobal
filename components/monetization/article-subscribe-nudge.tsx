@@ -13,7 +13,7 @@ export async function ArticleSubscribeNudge({ locale = "cs" }: Props) {
   const copy = getRevenueCopy(locale);
   const region = await getServerRegion();
   const price = editorialMonthlyCharge(locale, region);
-  const href = localizePublicHref("/predplatne?trial=1#public", locale);
+  const href = localizePublicHref("/predplatne#public", locale);
 
   return (
     <section className="rounded-2xl border border-[#cfe1f3] bg-[#f7fbff] px-5 py-5">

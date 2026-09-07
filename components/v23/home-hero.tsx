@@ -45,8 +45,8 @@ export function V23HomeHero() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" className="rounded-full bg-white px-6 text-[#021d33] hover:bg-sky-50">
-                <Link href="/predplatne?trial=1" prefetch>
-                  Vyzkoušet 14 dní zdarma
+                <Link href="/predplatne#public" prefetch>
+                  Otevřít tarif Redakce
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

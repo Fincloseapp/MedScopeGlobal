@@ -175,7 +175,11 @@ export default async function PredplatnePage({
                   </span>
                 ) : null}
                 <span className="inline-flex w-fit rounded-full bg-[#005B96]/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#005B96]">
-                  {isStudent ? copy.studentBadge : copy.daysFree}
+                  {isStudent
+                    ? copy.studentBadge
+                    : plan.tier === "public"
+                      ? copy.editorialBadge
+                      : copy.daysFree}
                 </span>
                 <h3 className="mt-3 font-display text-xl font-semibold text-[#005B96]">
                   {localized.name}
@@ -216,32 +220,54 @@ export default async function PredplatnePage({
                   ))}
                 </ul>
                 <div className="mt-6 space-y-2">
-                  <V27CheckoutButton
-                    kind="subscription"
-                    productId={subscriptionProductId(plan.tier, "month")}
-                    locale={locale}
-                    label={
-                      isStudent
-                        ? `${copy.startStudentMonth}`
-                        : plan.tier === "dokumentace"
-                          ? `${copy.daysFree} — ${monthly.formatted}`
-                          : copy.startTrialMonth
-                    }
-                  />
-                  {isStudent ? null : (
-                    <V27CheckoutButton
-                      kind="subscription"
-                      productId={subscriptionProductId(plan.tier, "year")}
-                      locale={locale}
-                      label={`${copy.startTrialYear} (${annual.formatted})`}
-                      className="w-full border border-[#005B96]/30 bg-white text-[#005B96] hover:bg-[#005B96]/5"
-                    />
+                  {plan.tier === "public" ? (
+                    <>
+                      <V27CheckoutButton
+                        kind="subscription"
+                        productId={subscriptionProductId(plan.tier, "year")}
+                        locale={locale}
+                        label={`${copy.startEditorialYear} (${annual.formatted})`}
+                      />
+                      <V27CheckoutButton
+                        kind="subscription"
+                        productId={subscriptionProductId(plan.tier, "month")}
+                        locale={locale}
+                        label={`${copy.startEditorialMonth} — ${monthly.formatted}`}
+                        className="w-full border border-[#005B96]/30 bg-white text-[#005B96] hover:bg-[#005B96]/5"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <V27CheckoutButton
+                        kind="subscription"
+                        productId={subscriptionProductId(plan.tier, "month")}
+                        locale={locale}
+                        label={
+                          isStudent
+                            ? `${copy.startStudentMonth}`
+                            : plan.tier === "dokumentace"
+                              ? `${copy.daysFree} — ${monthly.formatted}`
+                              : copy.startTrialMonth
+                        }
+                      />
+                      {isStudent ? null : (
+                        <V27CheckoutButton
+                          kind="subscription"
+                          productId={subscriptionProductId(plan.tier, "year")}
+                          locale={locale}
+                          label={`${copy.startTrialYear} (${annual.formatted})`}
+                          className="w-full border border-[#005B96]/30 bg-white text-[#005B96] hover:bg-[#005B96]/5"
+                        />
+                      )}
+                    </>
                   )}
                 </div>
                 <p className="mt-3 text-center text-xs text-slate-500">
                   {isStudent
                     ? `${copy.afterStudentIntro} ${studentPrice.formatted} ${copy.perMonth} · ${copy.cancelAnytime}`
-                    : `${copy.afterTrial} ${monthly.formatted} ${copy.perMonth} · ${copy.cancelAnytime}`}
+                    : plan.tier === "public"
+                      ? `${copy.billedNow} · ${copy.cancelAnytime}`
+                      : `${copy.afterTrial} ${monthly.formatted} ${copy.perMonth} · ${copy.cancelAnytime}`}
                 </p>
               </div>
             );

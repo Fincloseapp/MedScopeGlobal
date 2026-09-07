@@ -108,7 +108,7 @@ export function V272WhyTrustBlock({ locale = "cs" }: { locale?: string }) {
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
-            href={localizePublicHref("/predplatne?trial=1", locale)}
+            href={localizePublicHref("/predplatne#public", locale)}
             className="rounded-full bg-[#005B96] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
           >
             {surface.whyTrial}
@@ -330,7 +330,7 @@ export function V272SubscriptionPlansBlock() {
         Plný přístup k prémiovému obsahu
       </h2>
       <p className="mt-1 text-sm text-slate-600">
-        Začněte 14denní zkušební období zdarma — veřejnost, studenti i lékaři bez jednorázových PDF.
+        Začněte tarifem Redakce hned — 25 Kč měsíčně nebo 250 Kč za rok. Studenti bez 14denního trialu. Lékaři a OrdiZapis: 14 dní zdarma.
       </p>
       <div className="mt-6 grid gap-5 lg:grid-cols-3">
         {V271_SUBSCRIPTION_PLANS.map((plan) => (
@@ -350,10 +350,10 @@ export function V272SubscriptionPlansBlock() {
             </ul>
             <div className="mt-4 space-y-2">
               <Link
-                href="/predplatne?trial=1"
+                href="/predplatne#public"
                 className="flex w-full items-center justify-center rounded-md bg-[#005B96] px-4 py-2 text-sm font-medium text-white hover:bg-[#004a7a]"
               >
-                Vyzkoušet 14 dní zdarma
+                Otevřít tarif Redakce
               </Link>
               <V27CheckoutButton
                 kind="subscription"
@@ -387,18 +387,18 @@ export function V272SubscriptionHeroBlock() {
           Předplatné MedScopeGlobal
         </p>
         <h2 className="mt-2 font-display text-3xl font-semibold">
-          14 dní zdarma · poté od 99 Kč / měsíc
+          Redakce od 25 Kč / měsíc · 250 Kč / rok
         </h2>
         <p className="mx-auto mt-3 max-w-2xl text-sm text-white/85">
-          Studenti 149 Kč · lékaři 490 Kč. Roční plány ušetří až 2 měsíce. Platba kartou, Apple Pay
+          Studenti 89 Kč, pak 149 Kč · lékaři 490 Kč s 14 dny. Roční Redakce 250 Kč. Platba kartou, Apple Pay
           a Google Pay přes Stripe.
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/predplatne?trial=1"
+            href="/predplatne#public"
             className="inline-flex rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-[#021d33] hover:bg-sky-50"
           >
-            Vyzkoušet 14 dní zdarma
+            Otevřít tarif Redakce
           </Link>
           <Link
             href="/predplatne"

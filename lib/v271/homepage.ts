@@ -6,12 +6,12 @@ export const V271_HERO = {
   eyebrow: MAGAZINE.heroEyebrow.cs,
   claim: MAGAZINE.heroClaim.cs,
   subtitle:
-    "Magazín ViaLongeVita, wellness deník MediFlow, VIP protokoly a aplikace MeDipacient a OrdiZapis. MeDiprep zůstává pro přípravu na LF. 14 dní zdarma.",
+    "Magazín ViaLongeVita, wellness deník MediFlow, VIP protokoly a aplikace MeDipacient a OrdiZapis. MeDiprep zůstává pro přípravu na LF. Redakce od 25 Kč. OrdiZapis 14 dní.",
 } as const;
 
 export const V271_HERO_CTAS = [
   { label: "Stáhnout aplikace", href: "/aplikace", primary: true },
-  { label: "14 dní zdarma", href: "/predplatne?trial=1", primary: false },
+  { label: "Tarif Redakce", href: "/predplatne#public", primary: false },
   { label: "Ukázkový dashboard", href: "/dashboard", primary: false },
 ] as const;
 
@@ -24,7 +24,7 @@ export const V271_HERO_APP_CHIPS = [
 export const V271_SOCIAL_PROOF_STATS = [
   { value: "PubMed", label: "SÚKL · EMA · WHO — citované zdroje" },
   { value: "ViaLongeVita", label: "magazín dlouhověkosti" },
-  { value: "14 dní", label: "zkušební přístup zdarma" },
+  { value: "14 dní", label: "OrdiZapis a lékař zdarma" },
   { value: "VIP", label: "protokoly napojené na MediFlow" },
 ] as const;
 
@@ -170,7 +170,7 @@ export const V271_FOOTER_TRUST = {
   proof: [
     { label: "Články ViaLongeVita", href: "/articles" },
     { label: "O redakci a zdrojích", href: "/o-nas" },
-    { label: "14 dní zdarma", href: "/predplatne?trial=1" },
+    { label: "OrdiZapis 14 dní", href: "/predplatne?trial=1#dokumentace" },
   ],
 } as const;
 

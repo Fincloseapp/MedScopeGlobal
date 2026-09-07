@@ -1,5 +1,7 @@
 /** MedScope v27 — audience IA, monetization, B2B */
 
+import { VIP_TRIAL_DAYS } from "@/lib/vip";
+
 export type V27Audience = "public" | "student" | "physician" | "b2b";
 
 export type V27SubscriptionTier = "public" | "student" | "physician" | "dokumentace";
@@ -177,6 +179,12 @@ export function isPhysicianGrantProduct(productId?: string | null): boolean {
 
 export function isEditorialGrantProduct(productId?: string | null): boolean {
   return Boolean(productId && parseSubscriptionProductId(productId)?.tier === "public");
+}
+
+/** Stripe trial: Redakce and Student charge now; OrdiZapis / physician keep 14 days. */
+export function subscriptionTrialDays(productId?: string | null): number {
+  if (isPhysicianGrantProduct(productId)) return VIP_TRIAL_DAYS;
+  return 0;
 }
 
 export function parseSubscriptionProductId(productId: string): {

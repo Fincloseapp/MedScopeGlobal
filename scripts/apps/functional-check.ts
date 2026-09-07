@@ -169,7 +169,7 @@ import {
   STUDENT_CLUB_FREE_RUNS,
 } from "../../lib/studenti/club";
 import { studentClubOpenFromProfile } from "../../lib/billing/student-entitlement";
-import { isEditorialGrantProduct, isPhysicianGrantProduct, isStudentGrantProduct, V27_SUBSCRIPTION_PLANS } from "../../lib/v27/config";
+import { isEditorialGrantProduct, isPhysicianGrantProduct, isStudentGrantProduct, subscriptionTrialDays, V27_SUBSCRIPTION_PLANS } from "../../lib/v27/config";
 import { studentIntroCharge, studentMonthlyCharge, STUDENT_FREE_TESTS, isStudentChromePath } from "../../lib/studenti/pricing";
 import {
   EDITORIAL_MONTHLY_CZK,
@@ -3691,6 +3691,32 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.equal(editorialAnnualCharge("de").unitAmount, 1000);
   assert.equal(isEditorialGrantProduct("public-month"), true);
   assert.equal(isEditorialGrantProduct("student-month"), false);
+  assert.equal(subscriptionTrialDays("public-month"), 0);
+  assert.equal(subscriptionTrialDays("public-year"), 0);
+  assert.equal(subscriptionTrialDays("student-month"), 0);
+  assert.equal(subscriptionTrialDays("dokumentace-month"), 14);
+  assert.equal(subscriptionTrialDays("physician-year"), 14);
+  assert.ok(
+    readFileSync(join(root, "lib/stripe/v27-checkout.ts"), "utf8").includes("subscriptionTrialDays"),
+    "Stripe checkout must set trial days per product, not a blanket 14-day trial"
+  );
+  assert.ok(
+    !readFileSync(join(root, "lib/stripe/v27-checkout.ts"), "utf8").includes(
+      "student ? {}"
+    ),
+    "Stripe checkout must not grant a 14-day trial to every non-student plan"
+  );
+  {
+    const predplatneSrc = readFileSync(join(root, "app/(public)/predplatne/page.tsx"), "utf8");
+    assert.ok(predplatneSrc.includes("startEditorialYear"), "public plan must lead with the annual Editorial CTA");
+    assert.ok(predplatneSrc.includes("editorialBadge"), "public plan must not reuse the 14-day badge");
+    const yearIdx = predplatneSrc.indexOf('subscriptionProductId(plan.tier, "year")');
+    const monthIdx = predplatneSrc.indexOf('subscriptionProductId(plan.tier, "month")');
+    assert.ok(yearIdx > -1 && monthIdx > -1 && yearIdx < monthIdx, "Editorial annual checkout button must render before monthly");
+  }
+  assert.ok(!getEditorialArticleGateCopy("cs").ctaHref.includes("trial=1"));
+  assert.ok(!getEditorialArticleGateCopy("de").body.includes("14 Tage"));
+  assert.ok(!getEditorialArticleGateCopy("fr").ctaLabel.includes("14"));
   assert.equal(
     resolveArticleBodyLock(
       { slug: "verejnost-zivotni-styl-demo", audience: "public" },

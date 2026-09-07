@@ -150,7 +150,7 @@ const COPY: Record<string, SurfaceCopy> = {
     stats: [
       { value: "PubMed", label: "SÚKL · EMA · WHO — citované zdroje" },
       { value: "ViaLongeVita", label: "magazín dlouhověkosti" },
-      { value: "14 dní", label: "zkušební přístup zdarma" },
+      { value: "14 dní", label: "OrdiZapis a lékař zdarma" },
       { value: "VIP", label: "protokoly napojené na MediFlow" },
     ],
     audiences: [
@@ -205,11 +205,11 @@ const COPY: Record<string, SurfaceCopy> = {
         description: "Kurzy a kvízy pro studenty i CME obsah pro praktiky.",
       },
       {
-        title: "14 dní na vyzkoušení",
-        description: "Plný přístup bez závazku. Platba až po uplynutí zkušební doby.",
+        title: "14 dní u OrdiZapisu",
+        description: "Lékaři a OrdiZapis: 14 dní zdarma. Tarif Redakce se platí hned — 25 Kč měsíčně nebo 250 Kč za rok.",
       },
     ],
-    whyTrial: "Vyzkoušet 14 dní zdarma",
+    whyTrial: "Otevřít tarif Redakce",
     whySubscribe: "Předplatit",
     b2bTitle: "Pro firmy a instituce",
     b2bDescription:
@@ -230,7 +230,7 @@ const COPY: Record<string, SurfaceCopy> = {
     register: "Registrace",
     downloadApps: "Stáhnout aplikace",
     siteDescription:
-      "ViaLongeVita — globální magazín zdraví a dlouhověkosti na MedScopeGlobal.com. MediFlow, VIP protokoly, MeDipacient a OrdiZapis. Evidence-based obsah ve 19 jazycích. 14 dní zdarma.",
+      "ViaLongeVita — globální magazín zdraví a dlouhověkosti na MedScopeGlobal.com. MediFlow, VIP protokoly, MeDipacient a OrdiZapis. Evidence-based obsah ve 19 jazycích. OrdiZapis 14 dní zdarma. Magazín Redakce od 25 Kč.",
     cookieTitle: "Cookies a soukromí",
     cookieBody: "Používáme cookies pro fungování webu, analytiku a marketing.",
     cookieNecessary: "Pouze nezbytné",
@@ -276,7 +276,7 @@ const COPY: Record<string, SurfaceCopy> = {
       proof: [
         { label: "Články ViaLongeVita", href: "/articles" },
         { label: "O redakci a zdrojích", href: "/o-nas" },
-        { label: "14 dní zdarma", href: "/predplatne?trial=1" },
+        { label: "OrdiZapis 14 dní", href: "/predplatne?trial=1#dokumentace" },
       ],
     },
   },
@@ -314,7 +314,7 @@ const COPY: Record<string, SurfaceCopy> = {
     stats: [
       { value: "PubMed", label: "FDA · EMA · WHO — cited sources" },
       { value: MAGAZINE.name, label: "longevity magazine" },
-      { value: "14 days", label: "free trial access" },
+      { value: "14 days", label: "OrdiZapis and physician free" },
       { value: "VIP", label: "protocols linked to MediFlow" },
     ],
     audiences: [
@@ -365,11 +365,11 @@ const COPY: Record<string, SurfaceCopy> = {
         description: "Courses and quizzes for learners, plus CME-style content for clinicians.",
       },
       {
-        title: "14 days to try",
-        description: "Full access with no commitment. Billing starts after the trial.",
+        title: "14 days on OrdiZapis",
+        description: "Physicians and OrdiZapis: 14 days free. Editorial is billed now — 25 CZK / €1 a month or 250 CZK / €10 a year.",
       },
     ],
-    whyTrial: "Start 14 days free",
+    whyTrial: "Open Editorial",
     whySubscribe: "Subscribe",
     b2bTitle: "For companies and institutions",
     b2bDescription: "Pharma, clinics, labs and universities — targeted campaigns and measurable partnerships.",
@@ -388,7 +388,7 @@ const COPY: Record<string, SurfaceCopy> = {
     signIn: "Sign in",
     register: "Register",
     downloadApps: "Get the apps",
-    siteDescription: `${MAGAZINE.name} — health and longevity magazine on MedScopeGlobal.com. MediFlow, VIP protocols, MeDipacient and OrdiZapis. Evidence-based content in 21 languages. 14 days free.`,
+    siteDescription: `${MAGAZINE.name} — health and longevity magazine on MedScopeGlobal.com. MediFlow, VIP protocols, MeDipacient and OrdiZapis. Evidence-based content in 21 languages. OrdiZapis 14 days free. Editorial from 25 CZK.`,
     cookieTitle: "Cookies and privacy",
     cookieBody: "We use cookies for the site to work, plus analytics and marketing.",
     cookieNecessary: "Necessary only",
@@ -433,7 +433,7 @@ const COPY: Record<string, SurfaceCopy> = {
       proof: [
         { label: `Articles · ${MAGAZINE.name}`, href: "/articles" },
         { label: "About the newsroom", href: "/o-nas" },
-        { label: "14 days free", href: "/predplatne?trial=1" },
+        { label: "OrdiZapis 14 days", href: "/predplatne?trial=1#dokumentace" },
       ],
     },
   },
@@ -471,7 +471,7 @@ const COPY: Record<string, SurfaceCopy> = {
     stats: [
       { value: "PubMed", label: "BfArM · EMA · WHO — zitierte Quellen" },
       { value: MAGAZINE.name, label: "Magazin für Langlebigkeit" },
-      { value: "14 Tage", label: "kostenlos testen" },
+      { value: "14 Tage", label: "OrdiZapis und Arzt kostenlos" },
       { value: "VIP", label: "Protokolle mit MediFlow" },
     ],
     audiences: [
@@ -522,11 +522,11 @@ const COPY: Record<string, SurfaceCopy> = {
         description: "Kurse und Quiz für Lernende sowie CME-nahe Inhalte für Kliniker.",
       },
       {
-        title: "14 Tage zum Testen",
-        description: "Voller Zugang ohne Bindung. Abrechnung nach der Testphase.",
+        title: "14 Tage bei OrdiZapis",
+        description: "Ärzte und OrdiZapis: 14 Tage kostenlos. Das Redaktionsabo wird sofort berechnet — 1 € im Monat oder 10 € im Jahr.",
       },
     ],
-    whyTrial: "14 Tage kostenlos testen",
+    whyTrial: "Redaktionsabo öffnen",
     whySubscribe: "Abonnieren",
     b2bTitle: "Für Unternehmen und Institutionen",
     b2bDescription: "Pharma, Kliniken, Labore und Universitäten — Kampagnen und Partnerschaften.",
@@ -545,7 +545,7 @@ const COPY: Record<string, SurfaceCopy> = {
     signIn: "Anmelden",
     register: "Registrieren",
     downloadApps: "Apps laden",
-    siteDescription: `${MAGAZINE.name} — Magazin für Gesundheit und Langlebigkeit auf MedScopeGlobal.com. MediFlow, VIP-Protokolle, MeDipacient und OrdiZapis. Evidenzbasierte Inhalte in 19 Sprachen. 14 Tage kostenlos.`,
+    siteDescription: `${MAGAZINE.name} — Magazin für Gesundheit und Langlebigkeit auf MedScopeGlobal.com. MediFlow, VIP-Protokolle, MeDipacient und OrdiZapis. Evidenzbasierte Inhalte in 19 Sprachen. OrdiZapis 14 Tage kostenlos. Redaktionsabo ab 1 €.`,
     cookieTitle: "Cookies und Datenschutz",
     cookieBody: "Wir verwenden Cookies für den Betrieb der Website sowie für Analyse und Marketing.",
     cookieNecessary: "Nur notwendige",
@@ -590,7 +590,7 @@ const COPY: Record<string, SurfaceCopy> = {
       proof: [
         { label: `Artikel · ${MAGAZINE.name}`, href: "/articles" },
         { label: "Über die Redaktion", href: "/o-nas" },
-        { label: "14 Tage kostenlos", href: "/predplatne?trial=1" },
+        { label: "OrdiZapis 14 Tage", href: "/predplatne?trial=1#dokumentace" },
       ],
     },
   },
@@ -628,7 +628,7 @@ const COPY: Record<string, SurfaceCopy> = {
     stats: [
       { value: "PubMed", label: "ANSM · EMA · OMS — sources citées" },
       { value: MAGAZINE.name, label: "magazine de longévité" },
-      { value: "14 jours", label: "essai gratuit" },
+      { value: "14 jours", label: "OrdiZapis et médecin offerts" },
       { value: "VIP", label: "protocoles liés à MediFlow" },
     ],
     audiences: [
@@ -679,11 +679,11 @@ const COPY: Record<string, SurfaceCopy> = {
         description: "Cours et quiz pour les apprenants, contenus de type FMC pour les cliniciens.",
       },
       {
-        title: "14 jours pour essayer",
-        description: "Accès complet sans engagement. Facturation après l’essai.",
+        title: "14 jours chez OrdiZapis",
+        description: "Médecins et OrdiZapis : 14 jours gratuits. L’abonnement Rédaction est facturé tout de suite — 1 € par mois ou 10 € par an.",
       },
     ],
-    whyTrial: "Essayer 14 jours gratuits",
+    whyTrial: "Ouvrir la rédaction",
     whySubscribe: "S’abonner",
     b2bTitle: "Pour les entreprises et institutions",
     b2bDescription: "Pharma, cliniques, laboratoires et universités — campagnes et partenariats.",
@@ -702,7 +702,7 @@ const COPY: Record<string, SurfaceCopy> = {
     signIn: "Connexion",
     register: "Inscription",
     downloadApps: "Télécharger les applis",
-    siteDescription: `${MAGAZINE.name} — magazine de santé et de longévité sur MedScopeGlobal.com. MediFlow, protocoles VIP, MeDipacient et OrdiZapis. Contenus fondés sur les preuves en 19 langues. 14 jours gratuits.`,
+    siteDescription: `${MAGAZINE.name} — magazine de santé et de longévité sur MedScopeGlobal.com. MediFlow, protocoles VIP, MeDipacient et OrdiZapis. Contenus fondés sur les preuves en 19 langues. OrdiZapis 14 jours gratuits. Rédaction dès 1 €.`,
     cookieTitle: "Cookies et confidentialité",
     cookieBody: "Nous utilisons des cookies pour le fonctionnement du site, l’analyse et le marketing.",
     cookieNecessary: "Essentiels seulement",
@@ -747,7 +747,7 @@ const COPY: Record<string, SurfaceCopy> = {
       proof: [
         { label: `Articles · ${MAGAZINE.name}`, href: "/articles" },
         { label: "À propos de la rédaction", href: "/o-nas" },
-        { label: "14 jours gratuits", href: "/predplatne?trial=1" },
+        { label: "OrdiZapis 14 jours", href: "/predplatne?trial=1#dokumentace" },
       ],
     },
   },
@@ -841,7 +841,7 @@ COPY.it = {
   whyEyebrow: "Perché MedScopeGlobal",
   whyTitle: "App sul telefono, contenuti quando servono",
   whyLead: "Installala sulla home, prova i dati di esempio e leggi la redazione con le fonti — dalla longevità alla visita.",
-  whyTrial: "Inizia 14 giorni gratis",
+  whyTrial: "Apri il piano Redazione",
   whySubscribe: "Abbonati",
   b2bTitle: "Per aziende e istituzioni",
   b2bDescription: "Pharma, cliniche, laboratori e università — campagne mirate e partnership misurabili.",
@@ -886,8 +886,8 @@ COPY.it = {
       description: "Corsi e quiz per chi studia, contenuti di tipo ECM per i clinici.",
     },
     {
-      title: "14 giorni per provare",
-      description: "Accesso completo senza vincolo. La fatturazione inizia dopo la prova.",
+      title: "14 giorni su OrdiZapis",
+      description: "Medici e OrdiZapis: 14 giorni gratis. Il piano Redazione si paga subito — 1 € al mese o 10 € all’anno.",
     },
   ],
   footer: {
@@ -928,7 +928,7 @@ COPY.es = {
   whyEyebrow: "Por qué MedScopeGlobal",
   whyTitle: "Apps en el móvil, contenido cuando lo necesitas",
   whyLead: "Instálala en la pantalla de inicio, prueba los datos de ejemplo y lee la redacción con fuentes — de la longevidad a la consulta.",
-  whyTrial: "Empieza 14 días gratis",
+  whyTrial: "Abrir el plan Redacción",
   whySubscribe: "Suscribirse",
   b2bTitle: "Para empresas e instituciones",
   b2bDescription: "Pharma, clínicas, laboratorios y universidades — campañas dirigidas y alianzas medibles.",

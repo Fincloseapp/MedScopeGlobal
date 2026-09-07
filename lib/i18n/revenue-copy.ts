@@ -67,9 +67,9 @@ const COPY: Record<Pack, RevenueCopy> = {
     subscribeKicker: "Volitelné předplatné",
     subscribeTitle: "Číst dál bez reklam",
     subscribeBody:
-      "14 dní zdarma, potom redakce za 25 Kč (v zahraničí 1 € nebo 1 $). Tipy v článcích zůstávají dobrovolné — toto není VIP členství.",
-    subscribeCta: "Vyzkoušet 14 dní",
-    subscribeHint: "Zrušíte kdykoli před koncem zkušební doby.",
+      "Tarif Redakce 25 Kč měsíčně nebo 250 Kč za rok (v zahraničí 1 € / 10 €), platba ihned. Tipy v článcích zůstávají dobrovolné — toto není VIP členství.",
+    subscribeCta: "Otevřít tarif Redakce",
+    subscribeHint: "Zrušíte kdykoli před dalším inkasem.",
     newsletterKicker: "ViaLongeVita",
     newsletterTitle: "ViaLongeVita do schránky",
     newsletterBody:
@@ -117,9 +117,9 @@ const COPY: Record<Pack, RevenueCopy> = {
     subscribeKicker: "Optionales Abo",
     subscribeTitle: "Weiterlesen ohne Werbung",
     subscribeBody:
-      "14 Tage kostenlos, danach die Redaktion für 25 Kč (1 € / 1 $). Trinkgelder in Artikeln bleiben freiwillig — kein VIP-Zwang.",
-    subscribeCta: "14 Tage testen",
-    subscribeHint: "Jederzeit vor Ende der Testphase kündbar.",
+      "Redaktionsabo 1 € im Monat oder 10 € im Jahr, sofort. Trinkgelder in Artikeln bleiben freiwillig — kein VIP-Zwang.",
+    subscribeCta: "Redaktionsabo öffnen",
+    subscribeHint: "Jederzeit vor der nächsten Abbuchung kündbar.",
     newsletterKicker: "ViaLongeVita",
     newsletterTitle: "ViaLongeVita in Ihrem Postfach",
     newsletterBody:
@@ -167,9 +167,9 @@ const COPY: Record<Pack, RevenueCopy> = {
     subscribeKicker: "Abonnement facultatif",
     subscribeTitle: "Lire sans publicité",
     subscribeBody:
-      "14 jours offerts, puis la rédaction à 25 Kč (1 € / 1 $). Les pourboires restent volontaires — ce n’est pas un club VIP.",
-    subscribeCta: "Essayer 14 jours",
-    subscribeHint: "Résiliable avant la fin de l’essai.",
+      "Abonnement Rédaction 1 € par mois ou 10 € par an, tout de suite. Les pourboires restent volontaires — ce n’est pas un club VIP.",
+    subscribeCta: "Ouvrir la rédaction",
+    subscribeHint: "Résiliable avant le prochain prélèvement.",
     newsletterKicker: "ViaLongeVita",
     newsletterTitle: "ViaLongeVita dans votre boîte",
     newsletterBody:
@@ -217,9 +217,9 @@ const COPY: Record<Pack, RevenueCopy> = {
     subscribeKicker: "Optional subscription",
     subscribeTitle: "Keep reading without ads",
     subscribeBody:
-      "14 days free, then the editorial plan (25 CZK / €1 / $1). Article tips stay voluntary — this is not a VIP club.",
-    subscribeCta: "Try 14 days",
-    subscribeHint: "Cancel any time before the trial ends.",
+      "Editorial plan 25 CZK / €1 / $1 a month, or 250 CZK / €10 a year, billed now. Article tips stay voluntary — this is not a VIP club.",
+    subscribeCta: "Open Editorial",
+    subscribeHint: "Cancel any time before the next charge.",
     newsletterKicker: "ViaLongeVita",
     newsletterTitle: "ViaLongeVita in your inbox",
     newsletterBody:
@@ -267,9 +267,9 @@ const COPY: Record<Pack, RevenueCopy> = {
     subscribeKicker: "Abbonamento facoltativo",
     subscribeTitle: "Continua a leggere senza pubblicità",
     subscribeBody:
-      "14 giorni gratis, poi il piano per i lettori. Le mance restano volontarie — non è un club VIP.",
-    subscribeCta: "Prova 14 giorni",
-    subscribeHint: "Disdici quando vuoi prima della fine della prova.",
+      "Piano Redazione 1 € al mese o 10 € all’anno, subito. Le mance restano volontarie — non è un club VIP.",
+    subscribeCta: "Apri il piano Redazione",
+    subscribeHint: "Disdici quando vuoi prima del prossimo addebito.",
     newsletterKicker: "ViaLongeVita",
     newsletterTitle: "ViaLongeVita nella tua casella",
     newsletterBody:
@@ -317,9 +317,9 @@ const COPY: Record<Pack, RevenueCopy> = {
     subscribeKicker: "Suscripción opcional",
     subscribeTitle: "Seguir leyendo sin anuncios",
     subscribeBody:
-      "14 días gratis, luego el plan para lectores. Las propinas siguen siendo voluntarias — no es un club VIP.",
-    subscribeCta: "Probar 14 días",
-    subscribeHint: "Cancela cuando quieras antes de que termine la prueba.",
+      "Plan Redacción 1 € al mes o 10 € al año, de inmediato. Las propinas siguen siendo voluntarias — no es un club VIP.",
+    subscribeCta: "Abrir el plan Redacción",
+    subscribeHint: "Cancela cuando quieras antes del siguiente cargo.",
     newsletterKicker: "ViaLongeVita",
     newsletterTitle: "ViaLongeVita en tu bandeja",
     newsletterBody:
@@ -367,9 +367,9 @@ const COPY: Record<Pack, RevenueCopy> = {
     subscribeKicker: "Assinatura opcional",
     subscribeTitle: "Continuar lendo sem anúncios",
     subscribeBody:
-      "14 dias grátis, depois o plano para leitores. Gorjetas continuam voluntárias — não é clube VIP.",
-    subscribeCta: "Experimentar 14 dias",
-    subscribeHint: "Cancele quando quiser antes do fim do teste.",
+      "Plano Editorial 1 € por mês ou 10 € por ano, já. Gorjetas continuam voluntárias — não é clube VIP.",
+    subscribeCta: "Abrir o plano Editorial",
+    subscribeHint: "Cancele quando quiser antes da próxima cobrança.",
     newsletterKicker: "ViaLongeVita",
     newsletterTitle: "ViaLongeVita na sua caixa",
     newsletterBody:

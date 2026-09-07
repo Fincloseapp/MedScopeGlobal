@@ -26,7 +26,7 @@ export default async function NotFound() {
           <Link href={localizePublicHref("/dashboard", locale)}>{copy.dashboard}</Link>
         </Button>
         <Button asChild variant="outline" className="rounded-full">
-          <Link href={localizePublicHref("/predplatne?trial=1", locale)}>{copy.trial}</Link>
+          <Link href={localizePublicHref("/predplatne", locale)}>{copy.trial}</Link>
         </Button>
       </div>
     </div>
