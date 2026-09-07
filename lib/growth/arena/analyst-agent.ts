@@ -1,15 +1,21 @@
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import {
   K_FACTOR_SHARE_THRESHOLD,
-  type ArenaSectionId,
   type ArenaTeamSlug,
 } from "@/lib/growth/arena/config";
-import { estimateKFactor, type ConversionWindow } from "@/lib/growth/arena/metrics";
-import { isArenaTeamSlug } from "@/lib/growth/arena/config";
+import { estimateKFactor } from "@/lib/growth/arena/metrics";
+import {
+  emptyWindow,
+  eventEditionLocale,
+  eventMatchesTeam,
+  windowFromEvents,
+  type ArenaAnalyticsEvent,
+} from "@/lib/growth/arena/markets";
 
 export type AnalystReport = {
   team: ArenaTeamSlug;
-  window: ConversionWindow;
+  locale: string | null;
+  window: ReturnType<typeof emptyWindow>;
   section3Users: number;
   kFactor: number;
   shareWorthy: boolean;
@@ -17,40 +23,35 @@ export type AnalystReport = {
   styleHint: string;
 };
 
-function emptyWindow(): ConversionWindow {
-  return { visits: 0, checkouts: 0, paid: 0, newsletters: 0 };
-}
-
-export async function loadTeamWindow(
-  team: ArenaTeamSlug,
-  sinceIso: string
-): Promise<ConversionWindow> {
+export async function loadArenaEvents(sinceIso: string): Promise<ArenaAnalyticsEvent[]> {
   const admin = tryCreateServiceRoleClient();
-  const window = emptyWindow();
-  if (!admin) return window;
+  if (!admin) return [];
   try {
     const { data } = await admin
       .from("analytics")
       .select("event, payload")
       .in("event", ["ai_agent_visit", "ai_agent_checkout", "ai_agent_newsletter", "ai_agent_paid"])
       .gte("created_at", sinceIso)
-      .limit(2000);
-    for (const row of data ?? []) {
-      const payload = (row.payload ?? {}) as Record<string, unknown>;
-      const agent = String(payload.agent ?? payload.ref ?? payload.team ?? "");
-      if (!agent.includes(team) && payload.team !== team) continue;
-      if (row.event === "ai_agent_visit") window.visits += 1;
-      if (row.event === "ai_agent_checkout") window.checkouts += 1;
-      if (row.event === "ai_agent_newsletter") window.newsletters += 1;
-      if (row.event === "ai_agent_paid") window.paid += 1;
-    }
+      .limit(4000);
+    return (data ?? []).map((row) => ({
+      event: String(row.event),
+      payload: (row.payload ?? {}) as Record<string, unknown>,
+    }));
   } catch {
-    /* analytics optional */
+    return [];
   }
-  return window;
 }
 
-export async function countSection3Users(team: ArenaTeamSlug): Promise<number> {
+export async function loadTeamWindow(
+  team: ArenaTeamSlug,
+  sinceIso: string,
+  locale?: string | null
+) {
+  const events = await loadArenaEvents(sinceIso);
+  return windowFromEvents(events, team, locale);
+}
+
+export async function countSection3Users(team: ArenaTeamSlug, locale?: string | null): Promise<number> {
   const admin = tryCreateServiceRoleClient();
   if (!admin) return 0;
   try {
@@ -62,9 +63,9 @@ export async function countSection3Users(team: ArenaTeamSlug): Promise<number> {
     let n = 0;
     for (const row of data ?? []) {
       const payload = (row.payload ?? {}) as Record<string, unknown>;
-      const agent = String(payload.agent ?? payload.team ?? "");
-      const section = String(payload.section ?? "vialongevita") as ArenaSectionId;
-      if ((agent.includes(team) || payload.team === team) && section === "vialongevita") n += 1;
+      if (!eventMatchesTeam(payload, team)) continue;
+      if (locale && eventEditionLocale(payload) !== locale) continue;
+      n += 1;
     }
     return n;
   } catch {
@@ -72,29 +73,37 @@ export async function countSection3Users(team: ArenaTeamSlug): Promise<number> {
   }
 }
 
-export async function runAnalyst(
+export function reportFromWindow(
   team: ArenaTeamSlug,
-  sinceIso: string
-): Promise<AnalystReport> {
-  const window = await loadTeamWindow(team, sinceIso);
+  window: ReturnType<typeof emptyWindow>,
+  section3Users: number,
+  locale?: string | null
+): AnalystReport {
   const kFactor = estimateKFactor(window);
-  const section3Users = await countSection3Users(team);
   const shareWorthy = kFactor >= K_FACTOR_SHARE_THRESHOLD;
   const styleHint =
     window.checkouts > window.visits * 0.2 ? "clinical-short" : "prevention-habit";
+  const edition = locale ? `mutace ${locale}` : "ViaLongeVita";
   return {
     team,
+    locale: locale ?? null,
     window,
     section3Users,
     kFactor,
     shareWorthy,
     styleHint,
     insight: shareWorthy
-      ? `Sekce ViaLongeVita: K=${kFactor} za okno (návštěvy ${window.visits}, checkout ${window.checkouts}, paid ${window.paid}). Content má držet styl ${styleHint}.`
+      ? `${edition}: K=${kFactor} (návštěvy ${window.visits}, checkout ${window.checkouts}, paid ${window.paid}). Styl ${styleHint}.`
       : null,
   };
 }
 
-export function isTeamEventAgent(agent: string, team: ArenaTeamSlug): boolean {
-  return agent === team || agent.startsWith(`${team}-`) || isArenaTeamSlug(agent) && agent === team;
+export async function runAnalyst(
+  team: ArenaTeamSlug,
+  sinceIso: string,
+  locale?: string | null
+): Promise<AnalystReport> {
+  const window = await loadTeamWindow(team, sinceIso, locale);
+  const section3Users = await countSection3Users(team, locale);
+  return reportFromWindow(team, window, section3Users, locale);
 }

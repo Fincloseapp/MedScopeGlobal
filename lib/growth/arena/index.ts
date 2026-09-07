@@ -5,4 +5,5 @@ export { scoreArenaWindow } from "@/lib/growth/arena/reward";
 export { decideEvolution, mutateStyle, allocateQuotas } from "@/lib/growth/arena/evolution";
 export { runArenaTick } from "@/lib/growth/arena/tick";
 export { loadArenaDashboard } from "@/lib/growth/arena/dashboard";
+export { arenaMarkets, countriesForLocale, parseEditionLocale, scoreLocaleMarkets } from "@/lib/growth/arena/markets";
 export { generateTeamDrafts, styleFromKnowledge } from "@/lib/growth/arena/content-agent";

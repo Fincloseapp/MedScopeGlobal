@@ -220,6 +220,12 @@ import { localeToPathSegment } from "../../lib/i18n/locale-path";
 import { ARENA_DISCOVERY_LOCALES } from "../../lib/growth/arena/locales";
 import { arenaPulsePaths } from "../../lib/growth/arena/worker-pulse";
 import {
+  arenaMarkets,
+  countriesForLocale,
+  parseEditionLocale,
+  scoreLocaleMarkets,
+} from "../../lib/growth/arena/markets";
+import {
   MAGAZINE_EDITORS_PER_LOCALE,
   MAGAZINE_WRITERS_PER_LOCALE,
   allLocaleMagazineDesks,
@@ -2542,6 +2548,38 @@ assert.ok(
     assert.ok(!arenaPulsePaths(new Date("2026-09-07T11:05:00.000Z")).includes("/api/cron/growth-sprint?light=1"));
     assert.ok(
       readFileSync(join(root, "app/api/cron/growth-sprint/route.ts"), "utf8").includes("includeRevenueOps")
+    );
+    assert.deepEqual(countriesForLocale("de").sort(), ["AT", "CH", "DE"]);
+    assert.ok(countriesForLocale("en-US").includes("US"));
+    assert.ok(countriesForLocale("en-US").includes("CA"));
+    assert.equal(parseEditionLocale("jp"), "ja");
+    assert.equal(parseEditionLocale("cn"), "zh-CN");
+    assert.equal(parseEditionLocale("en-us"), "en-US");
+    assert.equal(parseEditionLocale("xyz"), null);
+    assert.equal(arenaMarkets().length, GLOBAL_LOCALES.length);
+    const marketScores = scoreLocaleMarkets([
+      { event: "ai_agent_checkout", payload: { agent: "alfa", locale: "de" } },
+      { event: "ai_agent_paid", payload: { agent: "alfa", locale: "de" } },
+      { event: "ai_agent_visit", payload: { agent: "beta", locale: "jp" } },
+      { event: "ai_agent_checkout", payload: { agent: "beta", country: "JP" } },
+    ]);
+    const de = marketScores.find((row) => row.locale === "de");
+    const ja = marketScores.find((row) => row.locale === "ja");
+    const cs = marketScores.find((row) => row.locale === "cs");
+    assert.equal(de?.leader, "alfa");
+    assert.equal(de?.alfa.conversions, 2);
+    assert.equal(ja?.leader, "beta");
+    assert.equal(cs?.leader, "tie");
+    assert.ok(
+      readFileSync(join(root, "app/r/ai/route.ts"), "utf8").includes("cf-ipcountry"),
+      "hops must attribute the visitor country into the locale contest"
+    );
+    assert.ok(
+      readFileSync(join(root, "lib/growth/arena/tick.ts"), "utf8").includes("scoreLocaleMarkets"),
+      "each arena tick must score every language edition"
+    );
+    assert.ok(
+      !readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("Tým Alfa")
     );
   }
   assert.ok(

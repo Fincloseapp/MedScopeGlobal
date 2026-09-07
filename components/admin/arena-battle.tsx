@@ -112,6 +112,39 @@ export function ArenaBattle({ initial }: { initial: ArenaDashboard }) {
       </div>
 
       <section>
+        <h2 className="mb-2 font-display text-xl font-semibold">Souboj podle mutací a zemí</h2>
+        <p className="mb-2 text-xs text-muted-foreground">
+          Autonomně každých 5 minut. Země se počítají do jazykové edice (AT/CH → DE, CA → EN-US).
+        </p>
+        <div className="overflow-x-auto rounded-xl border">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="px-3 py-2 text-left">Mutace</th>
+                <th className="px-3 py-2 text-left">Země</th>
+                <th className="px-3 py-2 text-right">Alfa</th>
+                <th className="px-3 py-2 text-right">Beta</th>
+                <th className="px-3 py-2 text-left">Vede</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(dash.markets ?? []).map((row) => (
+                <tr key={row.locale} className="border-t">
+                  <td className="px-3 py-2 font-medium">
+                    {row.locale} · {row.label}
+                  </td>
+                  <td className="px-3 py-2 text-xs text-slate-600">{row.countries.join(", ") || "—"}</td>
+                  <td className="px-3 py-2 text-right">{row.alfa.conversions}</td>
+                  <td className="px-3 py-2 text-right">{row.beta.conversions}</td>
+                  <td className="px-3 py-2">{row.leader === "tie" ? "remíza" : row.leader}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
         <h2 className="mb-2 font-display text-xl font-semibold">Žebříček týmů</h2>
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full text-sm">

@@ -1,6 +1,7 @@
 import { K_FACTOR_WINDOW_MS, REACH_QUOTA_DEFAULT } from "@/lib/growth/arena/config";
 import { ARENA_DISCOVERY_LOCALES } from "@/lib/growth/arena/locales";
-import { runAnalyst } from "@/lib/growth/arena/analyst-agent";
+import { loadArenaEvents, reportFromWindow } from "@/lib/growth/arena/analyst-agent";
+import { scoreLocaleMarkets, windowFromEvents, type ArenaMarketScore } from "@/lib/growth/arena/markets";
 import { generateTeamDrafts } from "@/lib/growth/arena/content-agent";
 import { distributeTeamReach } from "@/lib/growth/arena/distribution-agent";
 import { decideEvolution, type TeamRuntime } from "@/lib/growth/arena/evolution";
@@ -23,6 +24,7 @@ export type ArenaTickResult = {
   ok: boolean;
   windowStart: string;
   teams: string[];
+  markets: ArenaMarketScore[];
   actions: string[];
   errors: string[];
 };
@@ -61,14 +63,19 @@ export async function runArenaTick(): Promise<ArenaTickResult> {
   const hourStart = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
   const hourConv: Record<string, number> = {};
+  const hourEvents = await loadArenaEvents(hourStart);
+  const tenEvents = await loadArenaEvents(windowStart);
+  const markets = scoreLocaleMarkets(hourEvents);
 
   for (const team of teams) {
     if (team.status !== "active") {
       hourConv[team.slug] = 0;
       continue;
     }
-    const ten = await runAnalyst(team.slug, windowStart);
-    const hour = await runAnalyst(team.slug, hourStart);
+    const tenWindow = windowFromEvents(tenEvents, team.slug);
+    const hourWindow = windowFromEvents(hourEvents, team.slug);
+    const ten = reportFromWindow(team.slug, tenWindow, 0);
+    const hour = reportFromWindow(team.slug, hourWindow, 0);
     hourConv[team.slug] = hour.window.paid + hour.window.checkouts;
 
     if (ten.shareWorthy && ten.insight) {
@@ -214,10 +221,90 @@ export async function runArenaTick(): Promise<ArenaTickResult> {
     actions.push(decision.detail);
   }
 
+  let decided = 0;
+  for (const market of markets) {
+    const alfaPts = scoreArenaWindow({
+      window: market.alfa,
+      actualK: market.alfa.kFactor,
+      section3Users: market.alfa.paid,
+      spam: false,
+      alreadyAwardedMilestone: true,
+    });
+    const betaPts = scoreArenaWindow({
+      window: market.beta,
+      actualK: market.beta.kFactor,
+      section3Users: market.beta.paid,
+      spam: false,
+      alreadyAwardedMilestone: true,
+    });
+    await writeMetric({
+      teamSlug: "alfa",
+      agentRole: "market",
+      section: `locale:${market.locale}`,
+      windowStart: hourStart,
+      windowMinutes: 60,
+      visits: market.alfa.visits,
+      checkouts: market.alfa.checkouts,
+      paid: market.alfa.paid,
+      newsletters: market.alfa.newsletters,
+      ctr: ctrOf(market.alfa),
+      kFactor: market.alfa.kFactor,
+      predictedK: null,
+      reachUsed: 1,
+      pointsDelta: alfaPts.teamPointsDelta,
+      spamFlag: false,
+    });
+    await writeMetric({
+      teamSlug: "beta",
+      agentRole: "market",
+      section: `locale:${market.locale}`,
+      windowStart: hourStart,
+      windowMinutes: 60,
+      visits: market.beta.visits,
+      checkouts: market.beta.checkouts,
+      paid: market.beta.paid,
+      newsletters: market.beta.newsletters,
+      ctr: ctrOf(market.beta),
+      kFactor: market.beta.kFactor,
+      predictedK: null,
+      reachUsed: 1,
+      pointsDelta: betaPts.teamPointsDelta,
+      spamFlag: false,
+    });
+    if (market.leader !== "tie") {
+      decided += 1;
+      const winner = market.leader === "alfa" ? market.alfa : market.beta;
+      const loser = market.leader === "alfa" ? market.beta : market.alfa;
+      await writeEvolution({
+        action: "market",
+        winnerSlug: market.leader,
+        loserSlug: market.leader === "alfa" ? "beta" : "alfa",
+        detail: `${market.locale} (${market.countries.join("/") || "—"}): ${market.leader} ${winner.conversions} > ${loser.conversions}`,
+      });
+    }
+    const localTenAlfa = reportFromWindow("alfa", windowFromEvents(tenEvents, "alfa", market.locale), 0, market.locale);
+    const localTenBeta = reportFromWindow("beta", windowFromEvents(tenEvents, "beta", market.locale), 0, market.locale);
+    for (const report of [localTenAlfa, localTenBeta]) {
+      if (report.shareWorthy && report.insight) {
+        await writeKnowledge({
+          teamSlug: report.team,
+          section: "vialongevita",
+          styleKey: report.styleHint,
+          kFactor: report.kFactor,
+          insight: report.insight,
+        });
+      }
+    }
+  }
+  actions.push(
+    `autonomní souboj ${markets.length} mutací · ${decided} rozhodnutých · země ${markets.flatMap((row) => row.countries).length}`
+  );
+
   return {
     ok: errors.length === 0,
     windowStart,
     teams: teams.map((row) => row.slug),
+    markets,
     actions,
     errors,
   };

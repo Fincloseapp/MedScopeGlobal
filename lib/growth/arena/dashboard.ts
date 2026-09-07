@@ -10,6 +10,8 @@ import {
   loadTeams,
 } from "@/lib/growth/arena/store";
 import { sectionsByPriority } from "@/lib/growth/arena/config";
+import { loadArenaEvents } from "@/lib/growth/arena/analyst-agent";
+import { scoreLocaleMarkets } from "@/lib/growth/arena/markets";
 
 export async function loadArenaDashboard() {
   await ensureArenaSeeded();
@@ -24,11 +26,13 @@ export async function loadArenaDashboard() {
   ]);
 
   const leaderboard = [...teams].sort((a, b) => b.teamPoints - a.teamPoints);
+  const hourStart = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const markets = scoreLocaleMarkets(await loadArenaEvents(hourStart));
 
   return {
     loadedAt: new Date().toISOString(),
     honesty:
-      "Závod běží. Cíl je maximalizovat reálná předplatná Redakce na všech jazykových mutacích. Kola pingají hop /predplatne + IndexNow; neposílají Reddit/X/TikTok. 170 000 / 500 000 je programový cíl, ne aktuální stav.",
+      "Závod běží autonomně ve všech zemích podle jazykové mutace (DE+AT+CH → /de, US+CA → /en-us). Alfa a Beta se utkávají na každé edici. IndexNow + hop /predplatne, žádný Reddit/X/TikTok. 170 000 / 500 000 je programový cíl, ne aktuální stav.",
     liveSubscribers: growth.subscribers.totalLive,
     goals: {
       near: AI_AGENT_GOAL_NEAR,
@@ -40,6 +44,7 @@ export async function loadArenaDashboard() {
     teams,
     members,
     leaderboard,
+    markets,
     knowledge,
     metrics,
     evolution,

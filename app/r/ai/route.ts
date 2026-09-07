@@ -29,11 +29,15 @@ export async function GET(request: Request) {
         : "/predplatne";
 
   if (agent) {
+    const country = (request.headers.get("cf-ipcountry") ?? request.headers.get("x-vercel-ip-country") ?? "")
+      .trim()
+      .toUpperCase();
     await logMonetizationEvent("ai_agent_visit", {
       agent,
       locale,
       path: dest,
       via: "hop",
+      ...(country && country !== "XX" ? { country } : {}),
       ...(arena
         ? { team: arena.team, section: arena.section, role: arena.role ?? "distribution" }
         : {}),
