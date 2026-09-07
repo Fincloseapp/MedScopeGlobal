@@ -15,6 +15,7 @@ import { createAdminReadClient } from "@/lib/auth/require-admin-access";
 import { ensureMissingEditorialCategories } from "@/lib/admin/ensure-taxonomy";
 import {
   loadStripeMoneySnapshot,
+  EMPTY_STRIPE_MONEY,
   type StripeMoneySnapshot,
 } from "@/lib/admin/stripe-snapshot";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
@@ -154,7 +155,7 @@ async function emptyOverview(): Promise<AdminOverview> {
     heurekaCzId: null,
     heurekaSkId: null,
     categoryRows: [],
-    stripeMoney: { configured: false, available: [], pending: [] },
+    stripeMoney: { ...EMPTY_STRIPE_MONEY },
     taxonomyInserted: 0,
     pulse: await loadEditorialPulse(),
   };

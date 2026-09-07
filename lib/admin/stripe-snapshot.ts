@@ -47,6 +47,16 @@ export type StripeMoneySnapshot = {
   error?: string;
 };
 
+export const EMPTY_STRIPE_MONEY: StripeMoneySnapshot = {
+  configured: false,
+  available: [],
+  pending: [],
+  instantAvailable: [],
+  payoutsEnabled: null,
+  payoutSchedule: null,
+  recentPayouts: [],
+};
+
 export function formatStripeMinor(amount: number, currency: string): string {
   const code = currency.toLowerCase();
   const value = ZERO_DECIMAL.has(code) ? amount : amount / 100;
@@ -62,15 +72,7 @@ function mapBalance(rows: { amount: number; currency: string }[]): StripeBalance
 
 export async function loadStripeMoneySnapshot(): Promise<StripeMoneySnapshot> {
   if (!getStripeSecretKey()) {
-    return {
-      configured: false,
-      available: [],
-      pending: [],
-      instantAvailable: [],
-      payoutsEnabled: null,
-      payoutSchedule: null,
-      recentPayouts: [],
-    };
+    return { ...EMPTY_STRIPE_MONEY };
   }
   try {
     const stripe = createStripeClient();
