@@ -51,7 +51,6 @@ export type FooterCopy = {
   terms: string;
   cookies: string;
   brand: string;
-  legalChecklist: string;
   contact: string;
   about: string;
   register: string;
@@ -261,7 +260,6 @@ const COPY: Record<string, SurfaceCopy> = {
       terms: "Podmínky",
       cookies: "Cookies",
       brand: "Značka a IP",
-      legalChecklist: "Právní checklist",
       contact: "Kontakt",
       about: "O nás",
       register: "Registrace",
@@ -418,7 +416,6 @@ const COPY: Record<string, SurfaceCopy> = {
       terms: "Terms",
       cookies: "Cookies",
       brand: "Brand and IP",
-      legalChecklist: "Legal checklist",
       contact: "Contact",
       about: "About",
       register: "Register",
@@ -575,7 +572,6 @@ const COPY: Record<string, SurfaceCopy> = {
       terms: "Bedingungen",
       cookies: "Cookies",
       brand: "Marke und IP",
-      legalChecklist: "Rechtliche Checkliste",
       contact: "Kontakt",
       about: "Über uns",
       register: "Registrieren",
@@ -732,7 +728,6 @@ const COPY: Record<string, SurfaceCopy> = {
       terms: "Conditions",
       cookies: "Cookies",
       brand: "Marque et PI",
-      legalChecklist: "Checklist juridique",
       contact: "Contact",
       about: "À propos",
       register: "Inscription",
