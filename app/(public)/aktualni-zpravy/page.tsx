@@ -12,6 +12,7 @@ import { assignUniqueListingCovers } from "@/lib/ecosystem/editorial/images/uniq
 import { isLongevityArticle, mergeAktualityListing, newsDesksForLocale } from "@/lib/v271/news-desks";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { aktualityChip } from "@/lib/i18n/aktuality-chrome";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { V27_EDITORIAL_COPY_LABEL } from "@/lib/v27/version";
 
@@ -64,7 +65,7 @@ export default async function AktualniZpravyPage() {
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {articles.map((a) => (
-          <V20ArticleCard key={a.slug} article={a} locale={locale} />
+          <V20ArticleCard key={a.slug} article={a} locale={locale} kicker={aktualityChip(locale)} />
         ))}
       </div>
 

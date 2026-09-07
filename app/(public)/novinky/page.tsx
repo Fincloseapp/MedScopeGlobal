@@ -9,6 +9,7 @@ import { getArticlesByMetadataSection } from "@/lib/queries/articles";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { newsDesksForLocale } from "@/lib/v271/news-desks";
+import { aktualityChip } from "@/lib/i18n/aktuality-chrome";
 import { novinkyTagsForLocale } from "@/lib/i18n/novinky-copy";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
@@ -85,7 +86,12 @@ export default async function NovinkyPage() {
       ) : magazineNews.length > 0 ? (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {magazineNews.map((article) => (
-            <V20ArticleCard key={article.slug} article={article} locale={locale} />
+            <V20ArticleCard
+              key={article.slug}
+              article={article}
+              locale={locale}
+              kicker={aktualityChip(locale)}
+            />
           ))}
         </div>
       ) : (

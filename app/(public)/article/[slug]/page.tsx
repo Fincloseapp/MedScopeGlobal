@@ -77,6 +77,8 @@ import { MAGAZINE, getOgLocale } from "@/lib/brand/magazine";
 import { isArticleTipUiEnabled, ARTICLE_TIP_COPY, tipLocale } from "@/lib/ecosystem/tip-copy";
 import { SITE } from "@/lib/config/site";
 import { getArticleChrome } from "@/lib/i18n/article-chrome";
+import { aktualityChip } from "@/lib/i18n/aktuality-chrome";
+import { isNovinkyArticle } from "@/lib/v271/news-desks";
 import { localeToPathSegment } from "@/lib/i18n/locale-path";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -325,7 +327,9 @@ export default async function ArticlePage({ params }: Props) {
           <header className="article-reading-header">
             <p className="article-brand-kicker">{MAGAZINE.name}</p>
 
-            {category ? (
+            {isNovinkyArticle(article) ? (
+              <p className="article-category-link">{aktualityChip(locale)}</p>
+            ) : category ? (
               <Link
                 href={`/category/${category.slug}`}
                 className="article-category-link"

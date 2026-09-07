@@ -25,6 +25,7 @@ import { VITASCOPE_DESK_LOGO } from "@/lib/brand/vitascope";
 import { ViaLongeVitaMark } from "@/components/brand/vialongevita-mark";
 import { BookOpen, Gift, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { aktualityChip } from "@/lib/i18n/aktuality-chrome";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
 
 function ServiceGlyph({ icon }: { icon?: string }) {
@@ -126,7 +127,7 @@ function DeskColumn({
         <Link href={buildLocalePath(locale, `/article/${lead.slug}`)} className="group mb-2 block">
           <NewsArticleThumb article={lead} large sizes="(max-width: 768px) 100vw, 40vw" />
           <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#005B96]">
-            {def.kicker}
+            {desk === "novinky" ? aktualityChip(locale) : def.kicker}
           </p>
           <h4 className="mt-0.5 font-display text-base font-semibold leading-snug text-[#021d33] group-hover:text-[#005B96]">
             {lead.title}

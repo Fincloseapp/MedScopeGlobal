@@ -207,6 +207,6 @@ async function loadHomepageDataOrFallback(locale: string) {
 
 export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
-  void ["v22-homepage-public-v23-76-open", locale, day, "medscope-ui-v23.76"];
+  void ["v22-homepage-public-v23-77-open", locale, day, "medscope-ui-v23.77"];
   return loadHomepageDataOrFallback(locale);
 }

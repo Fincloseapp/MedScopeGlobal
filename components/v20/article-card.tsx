@@ -7,18 +7,22 @@ import type { ArticleWithRelations } from "@/types/database";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { formatArticleDateLabel } from "@/lib/editorial/freshness";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { aktualityCategoryLabel } from "@/lib/i18n/aktuality-chrome";
 
 export function V20ArticleCard({
   article,
   locale,
+  kicker,
 }: {
   article: DisplayArticle | ArticleWithRelations;
   locale?: string;
+  kicker?: string;
 }) {
   const cat = article.categories;
   const uiLocale =
     locale ??
     ("displayLocale" in article && article.displayLocale ? article.displayLocale : "cs");
+  const categoryLabel = kicker ?? aktualityCategoryLabel(article, uiLocale, cat?.name);
   const authorLabel = listingByline(article, uiLocale);
   const meta = enrichArticleMeta({
     title: article.title,
@@ -39,11 +43,11 @@ export function V20ArticleCard({
           publicTopic={article.public_topic}
         />
         <div className="flex flex-1 flex-col p-4 sm:p-5">
-          {cat && (
+          {categoryLabel ? (
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
-              {cat.name}
+              {categoryLabel}
             </p>
-          )}
+          ) : null}
           <h3 className="mt-2 font-display text-lg font-semibold leading-snug text-[#021d33] sm:text-xl">
             {article.title}
           </h3>

@@ -240,6 +240,7 @@ import { getOdbornaHubCopy } from "../../lib/i18n/odborna-hub-copy";
 import { getLegalChromeCopy } from "../../lib/i18n/legal-chrome-copy";
 import { getInzerceCenikCopy } from "../../lib/i18n/inzerce-cenik-copy";
 import { getMediaKitCopy } from "../../lib/i18n/media-kit-copy";
+import { aktualityChip, aktualityCategoryLabel } from "../../lib/i18n/aktuality-chrome";
 import {
   isFreeNewsDeskArticle,
   resolveArticleBodyLock,
@@ -407,7 +408,7 @@ file("lib/v22/homepage-cache.ts");
       readFileSync(join(root, "lib/v271/news-desks.ts"), "utf8").includes("articlePageKey"),
     "homepage must assign each story to one slot"
   );
-  assert.ok(home.includes("v23-76-open"), "homepage cache key must bust when magazine teaser locks");
+  assert.ok(home.includes("v23-77-open"), "homepage cache key must bust when Aktuality chips localize");
   assert.ok(
     readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes('dynamic = "force-dynamic"'),
     "homepage must render Aktuality live, not from a 10-minute HTML cache"
@@ -910,7 +911,7 @@ assert.ok(
   "/articles must unique-cover the visible mixed feed, not only the raw DB pool"
 );
 assert.ok(
-  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.76"),
+  readFileSync(join(root, "next.config.mjs"), "utf8").includes("medscope-ui-v23.77"),
   "page cache tag must bust after the Plus desk stays pinned"
 );
 assert.ok(
@@ -1201,7 +1202,7 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
-    "v22-homepage-public-v23-76-open"
+    "v22-homepage-public-v23-77-open"
   ) &&
     readFileSync(join(root, "lib/v22/homepage-cache.ts"), "utf8").includes(
       "listAktualitySection"
@@ -3515,6 +3516,24 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.ok(getPaywallPreviewHtml("<p>alpha</p><p>bravo</p>", 8).includes("alpha"));
   assert.ok(!getMediaKitCopy("de").letterTitle.includes("Kč"));
   assert.ok(getMediaKitCopy("cs").formats.length === 4);
+  assert.equal(aktualityChip("cs"), "Zdravotnictví");
+  assert.equal(aktualityChip("de"), "Gesundheit");
+  assert.equal(aktualityChip("fr"), "Santé");
+  assert.equal(aktualityChip("en"), "Health");
+  assert.ok(!aktualityChip("de").includes("Interna"));
+  assert.equal(
+    aktualityCategoryLabel({ slug: "zpravy-rsv", categories: { name: "Interna" } }, "de"),
+    "Gesundheit"
+  );
+  assert.equal(
+    aktualityCategoryLabel({ slug: "verejnost-demo", categories: { name: "Lifestyle" } }, "de"),
+    "Lifestyle"
+  );
+  assert.ok(
+    readFileSync(join(root, "components/articles/news-article-card.tsx"), "utf8").includes(
+      "aktualityChip"
+    )
+  );
   {
     const csDesk = nativeDeskArticlesForLocale("cs");
     assert.ok(csDesk.some((article) => article.slug.includes("glp1-odmena-alkohol")));

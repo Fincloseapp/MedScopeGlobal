@@ -6,6 +6,7 @@ import { listingByline } from "@/lib/editorial/units";
 import { resolveWriterAgent } from "@/lib/editorial/writer-agents";
 import { resolveDisplayCover, resolveTopicFallbackCover } from "@/lib/v271/topic-covers";
 import { classifyNewsDesk, NEWS_DESKS, newsDesksForLocale, type NewsDeskDef, type NewsDeskId } from "@/lib/v271/news-desks";
+import { aktualityChip, isAktualityKickerArticle } from "@/lib/i18n/aktuality-chrome";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
@@ -30,6 +31,9 @@ function coverOf(article: DisplayArticle) {
 }
 
 function kickerOf(article: DisplayArticle, locale = "cs"): string {
+  if (isAktualityKickerArticle(article) || classifyNewsDesk(article) === "novinky") {
+    return aktualityChip(locale);
+  }
   const surface = getSurfaceCopy(locale);
   const agent = resolveWriterAgent(article);
   if (agent) return surface.writers[agent.deskId]?.topicLabel ?? agent.topicLabel;

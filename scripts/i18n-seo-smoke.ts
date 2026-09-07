@@ -68,6 +68,7 @@ import { getArticleChrome } from "../lib/i18n/article-chrome";
 import { getRevenueCopy } from "../lib/i18n/revenue-copy";
 import { getMediaKitCopy } from "../lib/i18n/media-kit-copy";
 import { getEditorialArticleGateCopy } from "../lib/v38/conversion-copy";
+import { aktualityChip } from "../lib/i18n/aktuality-chrome";
 import { resolveArticleBodyLock } from "../lib/auth/article-eligibility";
 import { getB2BLandingCopy } from "../lib/i18n/b2b-landing-copy";
 import { chromePack } from "../lib/i18n/chrome-pack";
@@ -539,6 +540,10 @@ assert.equal(
   ).locked,
   true
 );
+assert.equal(aktualityChip("de"), "Gesundheit");
+assert.equal(aktualityChip("it"), "Salute");
+assert.ok(!aktualityChip("fr").includes("Interna"));
+assert.ok(!aktualityChip("es").includes("Infekční"));
 assert.ok(!getRevenueCopy("de").priceListName.includes("Ceník"));
 assert.ok(getRevenueCopy("cs").priceListName.includes("Ceník"));
 assert.ok(!getB2BLandingCopy("de").formats.some((item) => /Kč|Sponzorovaný/.test(`${item.name} ${item.price}`)));
