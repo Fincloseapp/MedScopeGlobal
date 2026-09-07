@@ -349,6 +349,9 @@ export function legalChannels(): { id: string; label: string }[] {
     { id: "og", label: "Open Graph / sdílení karet" },
     { id: "honest", label: "Pravdivá odpověď na dotaz po magazínu" },
     { id: "page", label: "Veřejná stránka /pro-ai" },
+    { id: "indexnow", label: "IndexNow (Bing / Seznam / Yandex) — automatický ping" },
+    { id: "stripe-recovery", label: "Stripe recovery e-mail po vypršení checkoutu" },
+    { id: "reconcile", label: "Reconcilace pending objednávek + výplata available" },
   ];
 }
 

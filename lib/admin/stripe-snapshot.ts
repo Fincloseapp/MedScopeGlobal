@@ -28,10 +28,22 @@ export type StripeBalanceLine = {
   currency: string;
 };
 
+export type StripePayoutLine = {
+  id: string;
+  amount: number;
+  currency: string;
+  status: string;
+  arrivalDate: string | null;
+};
+
 export type StripeMoneySnapshot = {
   configured: boolean;
   available: StripeBalanceLine[];
   pending: StripeBalanceLine[];
+  instantAvailable: StripeBalanceLine[];
+  payoutsEnabled: boolean | null;
+  payoutSchedule: string | null;
+  recentPayouts: StripePayoutLine[];
   error?: string;
 };
 
@@ -44,22 +56,48 @@ export function formatStripeMinor(amount: number, currency: string): string {
   })} ${code.toUpperCase()}`;
 }
 
+function mapBalance(rows: { amount: number; currency: string }[]): StripeBalanceLine[] {
+  return rows.map((row) => ({ amount: row.amount, currency: row.currency }));
+}
+
 export async function loadStripeMoneySnapshot(): Promise<StripeMoneySnapshot> {
   if (!getStripeSecretKey()) {
-    return { configured: false, available: [], pending: [] };
+    return {
+      configured: false,
+      available: [],
+      pending: [],
+      instantAvailable: [],
+      payoutsEnabled: null,
+      payoutSchedule: null,
+      recentPayouts: [],
+    };
   }
   try {
     const stripe = createStripeClient();
-    const balance = await stripe.balance.retrieve();
+    const [balance, payouts, account] = await Promise.all([
+      stripe.balance.retrieve(),
+      stripe.payouts.list({ limit: 8 }),
+      stripe.accounts.retrieve().catch(() => null),
+    ]);
+    const schedule = account?.settings?.payouts?.schedule;
+    const scheduleLabel = schedule
+      ? `${schedule.interval ?? "unknown"}${schedule.delay_days != null ? ` · ${schedule.delay_days} dní` : ""}`
+      : null;
     return {
       configured: true,
-      available: balance.available.map((row) => ({
+      available: mapBalance(balance.available),
+      pending: mapBalance(balance.pending),
+      instantAvailable: mapBalance(balance.instant_available ?? []),
+      payoutsEnabled: account?.payouts_enabled ?? null,
+      payoutSchedule: scheduleLabel,
+      recentPayouts: payouts.data.map((row) => ({
+        id: row.id,
         amount: row.amount,
         currency: row.currency,
-      })),
-      pending: balance.pending.map((row) => ({
-        amount: row.amount,
-        currency: row.currency,
+        status: row.status,
+        arrivalDate: row.arrival_date
+          ? new Date(row.arrival_date * 1000).toISOString()
+          : null,
       })),
     };
   } catch (error) {
@@ -67,6 +105,10 @@ export async function loadStripeMoneySnapshot(): Promise<StripeMoneySnapshot> {
       configured: true,
       available: [],
       pending: [],
+      instantAvailable: [],
+      payoutsEnabled: null,
+      payoutSchedule: null,
+      recentPayouts: [],
       error: stripeClientErrorBody(error).error,
     };
   }

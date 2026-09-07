@@ -119,6 +119,18 @@ export async function POST(request: Request) {
     }, { status: result.ok ? 200 : 500 });
   }
 
+  if (task === "growth-sprint") {
+    const { runLegalGrowthSprint } = await import("@/lib/growth/legal-sprint");
+    const result = await runLegalGrowthSprint();
+    return NextResponse.json({
+      task,
+      status: result.ok ? "completed" : "error",
+      description: schedule.description,
+      cronEndpoint: "/api/cron/growth-sprint",
+      ...result,
+    }, { status: result.ok ? 200 : 207 });
+  }
+
   if (task === "generate-articles") {
     const result = await runGenerateArticlesCron();
     return NextResponse.json({
@@ -265,6 +277,7 @@ const CRON_ENDPOINT_BY_TASK: Partial<Record<string, string>> = {
   "generate-articles": "/api/cron/ecosystem-generate-articles",
   "syndicate-articles": "/api/cron/ecosystem-syndicate",
   "revenue-ops": "/api/cron/revenue-ops",
+  "growth-sprint": "/api/cron/growth-sprint",
 };
 
 export async function GET() {

@@ -106,6 +106,12 @@ export async function createV27CheckoutSession(body: V27CheckoutBody) {
     success_url: `${SITE.url}/checkout/uspesne?session_id={CHECKOUT_SESSION_ID}${gift ? "&gift=1" : ""}`,
     cancel_url: `${SITE.url}/predplatne?canceled=1`,
     payment_method_types: ["card"],
+    after_expiration: {
+      recovery: {
+        enabled: true,
+        allow_promotion_codes: true,
+      },
+    },
     metadata: {
       kind: `v27_${kind}`,
       product_id: productId,

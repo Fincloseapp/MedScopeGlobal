@@ -251,6 +251,15 @@ import {
 import { evaluateGoalPace, evaluateVisibility } from "../../lib/growth/ai-agent-eval";
 import { renderLlmsTxt, renderWellKnownAiTxt } from "../../lib/seo/llms-txt";
 import {
+  explainV27OrderStatus,
+  youWillReceiveLines,
+} from "../../lib/monetization/order-statuses";
+import {
+  INDEXNOW_KEY,
+  indexNowKeyPath,
+  priorityDiscoveryUrls,
+} from "../../lib/seo/indexnow";
+import {
   isFreeNewsDeskArticle,
   resolveArticleBodyLock,
 } from "../../lib/auth/article-eligibility";
@@ -873,6 +882,13 @@ file("lib/monetization/revenue-mix.ts");
 file("lib/monetization/apply-schema.ts");
 file("lib/monetization/revenue-ops.ts");
 file("app/api/cron/revenue-ops/route.ts");
+file("lib/monetization/order-statuses.ts");
+file("lib/monetization/revenue-reconcile.ts");
+file("lib/admin/revenue-dashboard.ts");
+file("lib/growth/legal-sprint.ts");
+file("lib/seo/indexnow.ts");
+file("app/api/cron/growth-sprint/route.ts");
+file("public/8f3c1a9b2e4d6f70a1c3e5b7d9f20468.txt");
 file("app/api/cron/vialongevita-brief/route.ts");
 file("app/api/newsletter/unsubscribe/route.ts");
 file("lib/monetization/affiliate-geo.ts");
@@ -2326,6 +2342,47 @@ assert.ok(
       "2026-09-07"
     );
     assert.equal(rising.visible, true);
+  }
+  {
+    const pending = explainV27OrderStatus("pending");
+    assert.equal(pending.money, "none");
+    assert.ok(pending.detail.includes("0 Kč"));
+    const paid = explainV27OrderStatus("paid");
+    assert.equal(paid.money, "in_stripe");
+    const receive = youWillReceiveLines({
+      available: [{ amount: 100, currency: "eur" }],
+      pending: [{ amount: 50, currency: "eur" }],
+      inTransit: [{ amount: 25, currency: "eur" }],
+    });
+    assert.equal(receive.length, 1);
+    assert.equal(receive[0]?.amount, 175);
+    assert.equal(INDEXNOW_KEY, "8f3c1a9b2e4d6f70a1c3e5b7d9f20468");
+    assert.equal(indexNowKeyPath(), `/${INDEXNOW_KEY}.txt`);
+    assert.ok(
+      readFileSync(join(root, "public/8f3c1a9b2e4d6f70a1c3e5b7d9f20468.txt"), "utf8").includes(
+        INDEXNOW_KEY
+      )
+    );
+    const urls = priorityDiscoveryUrls("https://medscopeglobal.com");
+    assert.ok(urls.includes("https://medscopeglobal.com/de/predplatne"));
+    assert.ok(urls.includes("https://medscopeglobal.com/fr/pro-ai"));
+    assert.ok(urls.includes("https://medscopeglobal.com/llms.txt"));
+    const revenuePage = readFileSync(join(root, "app/(admin)/admin/revenue/page.tsx"), "utf8");
+    assert.ok(revenuePage.includes("Stripe pending"));
+    assert.ok(revenuePage.includes("Kolik peněz dostanete"));
+    assert.ok(revenuePage.includes("runLegalGrowthSprint"));
+    assert.ok(
+      readFileSync(join(root, "lib/stripe/v27-checkout.ts"), "utf8").includes("after_expiration")
+    );
+    assert.ok(existsSync(join(root, "app/api/cron/growth-sprint/route.ts")));
+    assert.ok(
+      readFileSync(join(root, ".github/workflows/cloudflare-cron.yml"), "utf8").includes(
+        "/api/cron/growth-sprint"
+      )
+    );
+    assert.ok(
+      readFileSync(join(root, "lib/growth/ai-agent-program.ts"), "utf8").includes("indexnow")
+    );
   }
   assert.ok(
     !readFileSync(join(root, "app/(public)/pro-ai/page.tsx"), "utf8").includes("1 300")

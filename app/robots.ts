@@ -16,7 +16,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/_next/static/", "/ads.txt", "/llms.txt", "/.well-known/ai.txt", "/pro-ai", "/r/ai", "/news-sitemap.xml"],
+        allow: ["/", "/_next/static/", "/ads.txt", "/llms.txt", "/.well-known/ai.txt", "/pro-ai", "/r/ai", "/news-sitemap.xml", "/8f3c1a9b2e4d6f70a1c3e5b7d9f20468.txt"],
         disallow: PUBLIC_DISALLOW,
       },
       {
@@ -46,7 +46,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: [...AI_CRAWLER_NAMES],
-        allow: ["/", "/llms.txt", "/ads.txt", "/.well-known/ai.txt", "/pro-ai", "/r/ai"],
+        allow: ["/", "/llms.txt", "/ads.txt", "/.well-known/ai.txt", "/pro-ai", "/r/ai", "/8f3c1a9b2e4d6f70a1c3e5b7d9f20468.txt"],
         disallow: PUBLIC_DISALLOW,
       },
     ],

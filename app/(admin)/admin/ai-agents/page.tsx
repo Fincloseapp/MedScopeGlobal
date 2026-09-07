@@ -188,7 +188,7 @@ export default async function AdminAiAgentsPage() {
           </Link>
           {" · "}
           <Link href="/admin/revenue" className="font-medium text-[#005B96] hover:underline">
-            Tržby v27
+            Tržby a výplaty — pending vs. peníze na účet
           </Link>
         </p>
       </section>
