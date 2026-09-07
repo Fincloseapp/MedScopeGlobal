@@ -1,7 +1,7 @@
 import { chromePack } from "@/lib/i18n/chrome-pack";
 import { renderLlmsTxt } from "@/lib/seo/llms-txt";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export function GET(request: Request) {
   const lang = new URL(request.url).searchParams.get("lang");

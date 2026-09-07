@@ -1,6 +1,6 @@
 import { renderWellKnownAiTxt } from "@/lib/seo/llms-txt";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export function GET() {
   return new Response(renderWellKnownAiTxt(), {

@@ -2,15 +2,33 @@ import { NextResponse } from "next/server";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
 import { renderLlmsTxt } from "@/lib/seo/llms-txt";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
-const PACKS = new Set<ChromePack>(["cs", "de", "fr", "it", "es", "pt-BR", "en"]);
+const PACKS = ["cs", "de", "fr", "it", "es", "pt-BR", "en"] as const satisfies ChromePack[];
 
-export async function GET(_request: Request, context: { params: Promise<{ pack: string }> }) {
-  const { pack: raw } = await context.params;
-  const decoded = decodeURIComponent(raw ?? "en");
+export function generateStaticParams() {
+  return PACKS.map((pack) => ({ pack }));
+}
+
+async function packFromContext(context: {
+  params?: Promise<{ pack?: string }> | { pack?: string };
+}): Promise<string> {
+  try {
+    const raw = context.params;
+    const resolved = raw && typeof (raw as Promise<unknown>).then === "function" ? await raw : raw;
+    return String((resolved as { pack?: string } | undefined)?.pack ?? "en");
+  } catch {
+    return "en";
+  }
+}
+
+export async function GET(
+  _request: Request,
+  context: { params?: Promise<{ pack?: string }> | { pack?: string } }
+) {
+  const decoded = decodeURIComponent(await packFromContext(context));
   const pack = decoded === "pt-BR" ? "pt-BR" : chromePack(decoded);
-  if (!PACKS.has(pack)) {
+  if (!(PACKS as readonly string[]).includes(pack)) {
     return new NextResponse("Not found", { status: 404 });
   }
   return new Response(renderLlmsTxt(pack), {
