@@ -32,7 +32,7 @@ const START_HREFS = ["/verejnost/temata", "/verejnost/clanky", "/ai-asistent/ver
 const FEATURED_DESKS = [
   { slug: "pohyb", cover: "/assets/covers/movement.webp" },
   { slug: "joga", cover: "/assets/covers/calm.webp" },
-  { slug: "kosmetika", cover: "/assets/covers/seniors.webp" },
+  { slug: "kosmetika", cover: "/assets/covers/skincare.webp" },
 ] as const;
 
 export default async function VerejnostHubPage() {

@@ -202,7 +202,7 @@ const LIFESTYLE_TOPIC_PILLARS: readonly MagazineHubPillar[] = [
     slug: "kosmetika",
     label: "Kosmetika a pleť",
     description: "Dermokosmetika a fotoprotekce na úrovni důkazů.",
-    coverImage: "/assets/covers/seniors.webp",
+    coverImage: "/assets/covers/skincare.webp",
     href: "/verejnost/clanky?topic=kosmetika",
   },
 ];
@@ -543,8 +543,8 @@ const CLANKY_TOPIC_HUBS: Record<
       "Při akné, ekzému, pigmentacích nebo podezření na nádor kůže vyhledejte dermatologa. Text nenahrazuje vyšetření.",
     ],
     editorialIntroTitle: "Pleť podle důkazů, ne podle hype",
-    heroCoverImage: "/assets/covers/seniors.webp",
-    heroCoverAlt: "Péče o pleť — ilustrace rubriky",
+    heroCoverImage: "/assets/covers/skincare.webp",
+    heroCoverAlt: "Zralá žena v přirozeném světle — ilustrace péče o pleť",
     heroBadge: {
       label: "SPF · bariéra",
       description: "Dermokosmetika srozumitelně, bez zázračných slibů.",

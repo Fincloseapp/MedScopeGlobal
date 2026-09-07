@@ -195,6 +195,7 @@ import {
 import { hubTopicListingHref, topicLabelForSlug } from "../../lib/config/verejnost-topics";
 import { matchesLifestyleHub } from "../../lib/verejnost/lifestyle-topics";
 import { getClankyMagazineHub } from "../../lib/portal/magazine-section-hub";
+import { getPublicTopicImage } from "../../lib/verejnost/images";
 import { FIRMY_ROOM_SLUGS } from "../../lib/i18n/firmy-desk-copy";
 import { formatEditorialUnitDisplay, formatSyndicatedByline, publicEditorialByline } from "../../lib/editorial/units";
 import { filterArticlesForLocale } from "../../lib/i18n/filter-articles-for-locale";
@@ -3986,6 +3987,15 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.equal(matchesLifestyleHub({ excerpt: "marche quotidienne" }, "pohyb"), true);
   assert.equal(getClankyMagazineHub("pohyb").title, "Pohyb a cvičení");
   assert.equal(getClankyMagazineHub("kosmetika").id, "clanky-kosmetika");
+  assert.equal(getClankyMagazineHub("kosmetika").heroCoverImage, "/assets/covers/skincare.webp");
+  assert.equal(getClankyMagazineHub("dlouhovekost").heroCoverImage, "/assets/covers/seniors.webp");
+  assert.equal(getPublicTopicImage("kosmetika"), "/assets/covers/skincare.webp");
+  assert.ok(existsSync(join(root, "public/assets/covers/skincare.webp")));
+  assert.ok(
+    readFileSync(join(root, "app/(public)/verejnost/page.tsx"), "utf8").includes(
+      'slug: "kosmetika", cover: "/assets/covers/skincare.webp"'
+    )
+  );
   assert.ok(FIRMY_ROOM_SLUGS.includes("kosmetika"));
   assert.ok(
     readFileSync(join(root, "lib/editorial/magazine-desk-copy.ts"), "utf8").includes("slice(0, 480)")

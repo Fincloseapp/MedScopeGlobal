@@ -186,6 +186,7 @@ export function coverVisualFamily(url: string | null | undefined): string {
   if (path.includes("/sleep.webp")) return "sleep";
   if (path.includes("/walk.webp")) return "walk-outdoors";
   if (path.includes("/seniors.webp")) return "seniors-people";
+  if (path.includes("/skincare.webp")) return "skincare-portrait";
   if (path.includes("/vitals.webp") || path.includes("/tech.webp")) return "vitals-tech";
   return path;
 }
@@ -302,6 +303,7 @@ const LOCAL_COVER_TOPICS: Partial<
   "/assets/covers/movement-2.webp": ["movement", "walk", "seniors"],
   "/assets/covers/walk.webp": ["walk", "movement", "seniors", "calm"],
   "/assets/covers/seniors.webp": ["seniors", "movement"],
+  "/assets/covers/skincare.webp": ["seniors", "calm"],
   "/assets/covers/clinical.webp": ["clinical"],
   "/assets/covers/clinical-2.webp": ["clinical", "research", "vitals"],
   "/assets/covers/clinical-3.webp": ["clinical", "research"],

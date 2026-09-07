@@ -19,6 +19,7 @@ const TOPIC_IMAGES: Record<string, string> = {
   "prevence-backend": "/assets/covers/research.webp",
   "rozhovory-backend": "/assets/covers/clinical-3.webp",
   dlouhovekost: "/assets/covers/seniors.webp",
+  kosmetika: "/assets/covers/skincare.webp",
 };
 
 export function getPublicTopicImage(slug: string): string | null {
