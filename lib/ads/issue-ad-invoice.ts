@@ -1,4 +1,4 @@
-import { generateInvoice } from "@/lib/billing/invoice-generator";
+import { generateInvoiceHtml } from "@/lib/billing/invoice-generator";
 import { getLegalBankAccount, getLegalIban } from "@/lib/billing/spd-qr";
 import { sendEmail } from "@/lib/email/engine";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
@@ -6,7 +6,7 @@ import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 export function invoiceFromAdRequest(req: Record<string, unknown>) {
   const amount = Math.round(Number(req.price ?? 0));
   const vs = String(req.variable_symbol ?? req.id ?? "").replace(/\D/g, "").slice(0, 10);
-  return generateInvoice({
+  return generateInvoiceHtml({
     transactionId: vs ? `MSG-${vs}` : `MSG-${String(req.id).slice(0, 8)}`,
     customerEmail: String(req.email ?? ""),
     customerName: String(req.company ?? ""),

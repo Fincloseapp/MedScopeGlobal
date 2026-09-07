@@ -314,7 +314,6 @@ import {
   getLegalEntity,
   publicOrganizationAddress,
 } from "../../lib/config/legal-entity";
-import { generateInvoiceHtml } from "../../lib/billing/invoice-generator";
 import { getPaywallPreviewHtml } from "../../lib/monetization/paywall-preview";
 import {
   NEWSLETTER_PRIMARY_LOCALES,
