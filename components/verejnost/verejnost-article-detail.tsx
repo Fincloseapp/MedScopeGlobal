@@ -126,7 +126,7 @@ export function VerejnostArticleDetail({
 
             {!locked ? (
               <div className="mt-8">
-                <ArticleSubscribeNudge locale={uiLocale} />
+                <ArticleSubscribeNudge locale={uiLocale} returnPath={`/verejnost/clanky/${article.slug}`} />
               </div>
             ) : null}
 

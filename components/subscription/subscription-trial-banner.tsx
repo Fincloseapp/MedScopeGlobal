@@ -6,9 +6,11 @@ import { subscriptionProductId } from "@/lib/v27/config";
 export function SubscriptionTrialBanner({
   locale = "cs",
   region,
+  returnPath,
 }: {
   locale?: string;
   region?: string | null;
+  returnPath?: string;
 }) {
   const copy = getSubscribeCopy(locale, region);
   return (
@@ -32,6 +34,7 @@ export function SubscriptionTrialBanner({
             kind="subscription"
             productId={subscriptionProductId("public", "month")}
             locale={locale}
+            returnPath={returnPath}
             label={copy.bannerPayCta}
             busyLabel={copy.bannerPayBusy}
             icon

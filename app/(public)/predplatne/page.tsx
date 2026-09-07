@@ -20,8 +20,9 @@ import { SocialShareStrip } from "@/components/social/social-share-strip";
 import { getShareCopy } from "@/lib/i18n/share-copy";
 import { ViaLongeVitaMasthead } from "@/components/brand/vialongevita-mark";
 import { isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
+import { safeEditorialReturnPath } from "@/lib/editorial/return-path";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getServerLocale();
@@ -38,11 +39,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PredplatnePage({
   searchParams,
 }: {
-  searchParams: Promise<{ trial?: string; canceled?: string }>;
+  searchParams: Promise<{ trial?: string; canceled?: string; return?: string }>;
 }) {
-  const { trial, canceled } = await searchParams;
+  const { trial, canceled, return: returnRaw } = await searchParams;
   const highlightTrial = trial === "1";
   const showCanceled = canceled === "1";
+  const returnPath = safeEditorialReturnPath(returnRaw) ?? undefined;
   const locale = await getServerLocale();
   const region = await getServerRegion();
   const copy = getSubscribeCopy(locale, region);
@@ -71,9 +73,9 @@ export default async function PredplatnePage({
       </div>
 
       <div className="mt-10">
-        {showCanceled ? <SubscriptionCanceledBanner locale={locale} /> : null}
+        {showCanceled ? <SubscriptionCanceledBanner locale={locale} returnPath={returnPath} /> : null}
         <div className={showCanceled ? "mt-6" : undefined}>
-          <SubscriptionTrialBanner locale={locale} region={region} />
+          <SubscriptionTrialBanner locale={locale} region={region} returnPath={returnPath} />
         </div>
       </div>
 
@@ -235,12 +237,14 @@ export default async function PredplatnePage({
                         kind="subscription"
                         productId={subscriptionProductId(plan.tier, "year")}
                         locale={locale}
+                        returnPath={returnPath}
                         label={`${copy.startEditorialYear} (${annual.formatted})`}
                       />
                       <V27CheckoutButton
                         kind="subscription"
                         productId={subscriptionProductId(plan.tier, "month")}
                         locale={locale}
+                        returnPath={returnPath}
                         label={`${copy.startEditorialMonth} — ${monthly.formatted}`}
                         className="w-full border border-[#005B96]/30 bg-white text-[#005B96] hover:bg-[#005B96]/5"
                       />

@@ -7,10 +7,11 @@ import { getServerRegion } from "@/lib/i18n/server-locale";
 
 type Props = {
   locale?: string;
+  returnPath?: string;
 };
 
 /** Soft public-plan trial after a free article. Not a VIP / paywall gate. */
-export async function ArticleSubscribeNudge({ locale = "cs" }: Props) {
+export async function ArticleSubscribeNudge({ locale = "cs", returnPath }: Props) {
   const copy = getRevenueCopy(locale);
   const region = await getServerRegion();
   const price = editorialMonthlyCharge(locale, region);
@@ -28,7 +29,7 @@ export async function ArticleSubscribeNudge({ locale = "cs" }: Props) {
         {copy.subscribeBody} {price.formatted}.
       </p>
       <div className="mt-3 flex flex-col gap-3">
-        <EditorialPayButtons locale={locale} />
+        <EditorialPayButtons locale={locale} returnPath={returnPath} />
         <div className="flex flex-wrap items-center gap-3">
           <Link href={href} className="text-sm font-medium text-[#005B96] hover:underline">
             {copy.subscribeCta}

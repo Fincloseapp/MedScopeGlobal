@@ -566,7 +566,7 @@ export default async function ArticlePage({ params }: Props) {
           ) : null}
 
           {!locked && shouldShowPublicSubscribeNudge(revenueSurface, isVip) ? (
-            <ArticleSubscribeNudge locale={locale} />
+            <ArticleSubscribeNudge locale={locale} returnPath={`/article/${article.slug}`} />
           ) : null}
 
           {!locked ? (

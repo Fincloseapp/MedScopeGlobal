@@ -320,7 +320,7 @@ import {
   resolveArticleBodyLock,
 } from "../../lib/auth/article-eligibility";
 import { isEditorialCookieValid } from "../../lib/auth/editorial-cookie";
-import { safeEditorialReturnPath } from "../../lib/editorial/return-path";
+import { editorialCancelPath, safeEditorialReturnPath } from "../../lib/editorial/return-path";
 import { editorialCanceledCopy } from "../../lib/editorial/pay-labels";
 import { isApiRateLimitExempt } from "../../lib/v30/security/rate-limit";
 import { getEditorialArticleGateCopy } from "../../lib/v38/conversion-copy";
@@ -4222,6 +4222,10 @@ console.log("✓ magazine desk byline and copy checks passed");
     assert.ok(yearIdx > -1 && monthIdx > -1 && yearIdx < monthIdx, "Editorial annual checkout button must render before monthly");
     assert.ok(predplatneSrc.includes("SubscriptionCanceledBanner"));
     assert.ok(predplatneSrc.includes('canceled === "1"'));
+    assert.ok(predplatneSrc.includes('dynamic = "force-dynamic"'));
+    assert.ok(!predplatneSrc.includes("revalidate = 60"));
+    assert.ok(predplatneSrc.includes("safeEditorialReturnPath"));
+    assert.ok(predplatneSrc.includes("returnPath={returnPath}"));
     assert.ok(
       readFileSync(join(root, "components/subscription/subscription-canceled-banner.tsx"), "utf8").includes(
         "EditorialPayButtons"
@@ -4386,11 +4390,14 @@ console.log("✓ magazine desk byline and copy checks passed");
     assert.ok(!getAccountEmailCopy("fr").subscriptionSignInCta.includes("Redakci"));
     assert.ok(getAccountEmailCopy("sk").subscriptionSignInCta.includes("Editorial"));
     const checkoutSrc = readFileSync(join(root, "lib/stripe/v27-checkout.ts"), "utf8");
-    assert.ok(checkoutSrc.includes('localizePublicHref("/predplatne?canceled=1"'));
+    assert.ok(checkoutSrc.includes("editorialCancelPath"));
     assert.ok(checkoutSrc.includes("&product="));
     assert.ok(checkoutSrc.includes("/api/v27/claim-editorial?session_id={CHECKOUT_SESSION_ID}"));
     assert.ok(checkoutSrc.includes("returnPath"));
     assert.ok(checkoutSrc.includes("safeEditorialReturnPath"));
+    assert.equal(editorialCancelPath(null), "/predplatne?canceled=1");
+    assert.equal(editorialCancelPath("/article/foo"), "/predplatne?canceled=1&return=%2Farticle%2Ffoo");
+    assert.equal(editorialCancelPath("/lekari"), "/predplatne?canceled=1");
     assert.ok(
       readFileSync(join(root, "app/api/v27/checkout/route.ts"), "utf8").includes('aiRef ?? "other"')
     );
@@ -4413,6 +4420,26 @@ console.log("✓ magazine desk byline and copy checks passed");
     assert.ok(
       readFileSync(join(root, "components/subscription/editorial-pay-buttons.tsx"), "utf8").includes(
         "returnPath"
+      )
+    );
+    assert.ok(
+      readFileSync(join(root, "components/subscription/subscription-canceled-banner.tsx"), "utf8").includes(
+        "returnPath"
+      )
+    );
+    assert.ok(
+      readFileSync(join(root, "components/subscription/subscription-trial-banner.tsx"), "utf8").includes(
+        "returnPath"
+      )
+    );
+    assert.ok(
+      readFileSync(join(root, "components/monetization/article-subscribe-nudge.tsx"), "utf8").includes(
+        "returnPath"
+      )
+    );
+    assert.ok(
+      readFileSync(join(root, "app/(public)/article/[slug]/page.tsx"), "utf8").includes(
+        "returnPath={`/article/${article.slug}`}"
       )
     );
     assert.ok(

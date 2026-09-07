@@ -13,3 +13,10 @@ export function safeEditorialReturnPath(raw?: string | null): string | null {
   }
   return null;
 }
+
+/** Stripe cancel_url: keep the article so retry unlocks the same piece. */
+export function editorialCancelPath(returnPath?: string | null): string {
+  const ret = safeEditorialReturnPath(returnPath);
+  if (!ret) return "/predplatne?canceled=1";
+  return `/predplatne?canceled=1&return=${encodeURIComponent(ret)}`;
+}
