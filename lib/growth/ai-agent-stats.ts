@@ -24,6 +24,22 @@ export type AgentRow = {
   newsletters: number;
 };
 
+/** Admin label. Crawler/hop is pipeline. Win only when paid > 0. */
+export function agentPipelineStatus(row: Pick<AgentRow, "visits" | "checkouts" | "paid" | "newsletters">): string {
+  if (row.paid > 0) return "úspěch — platí";
+  if (row.checkouts > 0) return "košík, neplatí";
+  if (row.visits + row.newsletters > 0) return "crawler/hop čte — neplatí";
+  return "IndexNow pingá — čeká na první hop nebo crawler";
+}
+
+export const AI_AGENT_REMEDIATIONS = [
+  "Cron každou 5. minutu pingá IndexNow hop + path pro všech 16 hodnocených agentů na /predplatne. Rotace po 4 už nestačí.",
+  "Crawler čtení (Meta / ChatGPT / Amazon) není výhra. Body a verdikt jen za Stripe active / ai_agent_paid.",
+  "Hop /r/ai?ref=agent a /r/ai/agent nastaví cookie ms_ai_ref a otevře roční Redakci. Organická platba bez ref jde do other.",
+  "llms.txt a /.well-known/ai.txt vypisují hop každého agenta. Cron nevolá API ChatGPT/Claude/Gemini.",
+  "Lidský upload IG/FB/WA/LI z /promo/klipy + /predplatne. Cron neposílá sítě.",
+] as const;
+
 export type AiAgentGrowthSnapshot = {
   loadedAt: string;
   dataSource: "service-role" | "user-session" | "unavailable";

@@ -8,18 +8,18 @@ import { logMonetizationEvent } from "@/lib/monetization/log-event";
  */
 const CRAWLER_RULES: { test: RegExp; agent: Exclude<AiAgentSlug, "other"> }[] = [
   { test: /chatgpt-user|gptbot|oai-searchbot/i, agent: "chatgpt" },
-  { test: /claude-user|claudebot|anthropic-ai|claude-searchbot/i, agent: "claude" },
-  { test: /google-extended|google-cloudvertexbot|gemini-deep-research/i, agent: "gemini" },
+  { test: /claude-user|claudebot|anthropic-ai|claude-searchbot|claude-web/i, agent: "claude" },
+  { test: /google-extended|google-cloudvertexbot|gemini-deep-research|gemini-app/i, agent: "gemini" },
   { test: /perplexitybot|perplexity-user/i, agent: "perplexity" },
   { test: /copilot-user|microsoft-copilot/i, agent: "copilot" },
-  { test: /grok-crawler|xai-crawler|xai-grok/i, agent: "grok" },
+  { test: /grokbot|grok-crawler|xai-crawler|xai-grok/i, agent: "grok" },
   { test: /youbot|you-search/i, agent: "you" },
-  { test: /duckassist/i, agent: "duckassist" },
+  { test: /duckassistbot|duckassist/i, agent: "duckassist" },
   { test: /meta-externalagent|meta-externalfetcher/i, agent: "meta-ai" },
   { test: /applebot-extended/i, agent: "apple" },
   { test: /amazonbot/i, agent: "amazon" },
-  { test: /deepseekbot|deepseek-crawler/i, agent: "deepseek" },
-  { test: /mistralai-user|mistralai-crawler/i, agent: "mistral" },
+  { test: /deepseekbot|deepseek-crawler|deepseek/i, agent: "deepseek" },
+  { test: /mistralai-user|mistralai-crawler|mistralai/i, agent: "mistral" },
   { test: /cursor-crawler|cursorbot/i, agent: "cursor" },
 ];
 

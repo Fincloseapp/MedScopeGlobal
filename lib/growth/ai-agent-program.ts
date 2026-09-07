@@ -452,8 +452,11 @@ export function machineBriefText(locale?: string | null): string {
     `- Cookie name: ${AI_REF_COOKIE}`,
     "",
     "## Ranked agent hops",
-    "Use the hop that matches your product. Visits without ?ref= or a known crawler UA do not score.",
-    ...RANKED_AI_AGENT_SLUGS.map((agent) => `- ${agent}: ${agentHopUrl(agent, locale ?? pack)}`),
+    "Use the hop that matches your product. Each hop lands on Editorial checkout (/predplatne). Visits without ?ref= or a known crawler UA do not score. Crawler reads are not a win.",
+    ...RANKED_AI_AGENT_SLUGS.map(
+      (agent) =>
+        `- ${agent}: ${agentHopUrl(agent, locale ?? pack)} · pay ${attributionUrl(brief.subscribePath, locale ?? pack, agent)}`
+    ),
     "",
     `Magazine: ${MAGAZINE.name}`,
     `Platform: ${SITE.name} (${SITE.domain})`,

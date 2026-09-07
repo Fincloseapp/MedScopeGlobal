@@ -12,8 +12,10 @@ export const AI_CRAWLER_NAMES = [
   "anthropic-ai",
   "Claude-SearchBot",
   "Claude-User",
+  "Claude-Web",
   "Google-Extended",
   "Google-CloudVertexBot",
+  "Gemini-App",
   "PerplexityBot",
   "Perplexity-User",
   "Amazonbot",
@@ -23,10 +25,15 @@ export const AI_CRAWLER_NAMES = [
   "cohere-ai",
   "YouBot",
   "DuckAssistBot",
+  "GrokBot",
+  "xAI-Grok",
+  "DeepSeekBot",
+  "MistralAI-User",
+  "CursorBot",
   "meta-externalagent",
   "FacebookBot",
 ] as const;
 
 /** User-Agent match for middleware — do not geo-bounce these onto a random locale. */
 export const AI_CRAWLER_UA_RE =
-  /gptbot|chatgpt-user|oai-searchbot|claudebot|anthropic-ai|claude-searchbot|claude-user|google-extended|google-cloudvertexbot|perplexitybot|perplexity-user|amazonbot|applebot-extended|bytespider|ccbot|cohere-ai|youbot|duckassistbot|meta-externalagent|facebookbot/i;
+  /gptbot|chatgpt-user|oai-searchbot|claudebot|anthropic-ai|claude-searchbot|claude-user|claude-web|google-extended|google-cloudvertexbot|gemini-app|perplexitybot|perplexity-user|amazonbot|applebot-extended|bytespider|ccbot|cohere-ai|youbot|duckassistbot|grokbot|xai-grok|deepseekbot|mistralai-user|cursorbot|meta-externalagent|facebookbot/i;

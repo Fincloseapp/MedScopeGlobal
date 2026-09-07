@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { Bot, Trophy, TrendingUp, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { loadAiAgentGrowthSnapshot } from "@/lib/growth/ai-agent-stats";
+import {
+  AI_AGENT_REMEDIATIONS,
+  agentPipelineStatus,
+  loadAiAgentGrowthSnapshot,
+} from "@/lib/growth/ai-agent-stats";
 import { AI_AGENT_GOAL_NEAR, AI_AGENT_GOAL_SEP27 } from "@/lib/growth/ai-agent-program";
 
 export const dynamic = "force-dynamic";
@@ -121,8 +125,9 @@ export default async function AdminAiAgentsPage() {
         <h2 className="mb-3 font-display text-xl font-semibold">Žebříček AI agentů</h2>
         <p className="mb-4 text-sm text-muted-foreground">
           Pořadí: nejdřív <code>ai_agent_paid</code>, až potom košík a návštěvy. Návštěva
-          crawlera není úspěch. Cron každou 5. minutu posílá IndexNow, nevolá API asistentů.
-          Souboj Alfa/Beta se rozhoduje jen podle zaplacených předplatných — pravidla jsou na{" "}
+          crawlera není úspěch. Cron každou 5. minutu pingá IndexNow hop všech 16 agentů na
+          /predplatne — nevolá API asistentů. Souboj Alfa/Beta se rozhoduje jen podle
+          zaplacených předplatných — pravidla jsou na{" "}
           <Link href="/admin/ai-teams" className="font-medium text-[#005B96] hover:underline">
             Růstové aréně
           </Link>
@@ -143,14 +148,7 @@ export default async function AdminAiAgentsPage() {
             </thead>
             <tbody>
               {snap.leaderboard.map((row, index) => {
-                const status =
-                  row.paid > 0
-                    ? "úspěch — platí"
-                    : row.checkouts > 0
-                      ? "košík, neplatí"
-                      : row.visits + row.newsletters > 0
-                        ? "crawler čte — neplatí"
-                        : "čeká na první ?ref= nebo crawler";
+                const status = agentPipelineStatus(row);
                 return (
                   <tr key={row.agent} className="border-t">
                     <td className="px-4 py-2">{index + 1}</td>
@@ -168,6 +166,19 @@ export default async function AdminAiAgentsPage() {
             </tbody>
           </table>
         </div>
+      </section>
+
+      <section className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5">
+        <h2 className="font-display text-xl font-semibold">Náprava — cíl je zaplacené předplatné</h2>
+        <p className="mt-1 text-sm text-amber-950">
+          Tři crawleři čtou a neplatí. Ostatní neměli první hop. IndexNow teď pingá všech 16.
+          Výhra až někdo dokončí Stripe.
+        </p>
+        <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-slate-800">
+          {AI_AGENT_REMEDIATIONS.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ol>
       </section>
 
       <section>

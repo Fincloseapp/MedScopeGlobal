@@ -288,7 +288,8 @@ import {
   agentHopPathUrl,
 } from "../../lib/growth/ai-agent-program";
 import { detectAiCrawler } from "../../lib/growth/ai-crawler";
-import { rotatedRankedAgentHopUrls } from "../../lib/growth/ai-agent-hops";
+import { conversionHopUrls, rotatedRankedAgentHopUrls } from "../../lib/growth/ai-agent-hops";
+import { agentPipelineStatus } from "../../lib/growth/ai-agent-stats";
 import { aiAgentJsonLd } from "../../lib/growth/ai-agent-jsonld";
 import { evaluateGoalPace, evaluateVisibility } from "../../lib/growth/ai-agent-eval";
 import { renderLlmsTxt, renderWellKnownAiTxt } from "../../lib/seo/llms-txt";
@@ -2517,6 +2518,9 @@ assert.ok(
   assert.equal(detectAiCrawler("PerplexityBot/1.0"), "perplexity");
   assert.equal(detectAiCrawler("Mozilla/5.0 compatible; Google-CloudVertexBot/1.0"), "gemini");
   assert.equal(detectAiCrawler("DuckAssistBot/1.0"), "duckassist");
+  assert.equal(detectAiCrawler("Claude-Web/1.0"), "claude");
+  assert.equal(detectAiCrawler("GrokBot/1.0"), "grok");
+  assert.equal(detectAiCrawler("Gemini-App/1.0"), "gemini");
   assert.equal(detectAiCrawler("Mozilla/5.0 (compatible; Googlebot/2.1)"), null);
   assert.equal(detectAiCrawler("bingbot/2.0"), null);
   assert.ok(machineBriefText("en").includes("/r/ai?ref=perplexity"));
@@ -2536,6 +2540,28 @@ assert.ok(
     assert.ok(seen.has("perplexity"));
     assert.ok(seen.has("cursor"));
   }
+  {
+    const hops = conversionHopUrls("https://medscopeglobal.com");
+    const refs = new Set<string>();
+    for (const hop of hops) {
+      const url = new URL(hop);
+      const ref = url.searchParams.get("ref") ?? url.pathname.split("/").pop();
+      if (ref) refs.add(ref);
+    }
+    assert.equal(refs.size, 16, "every cron tick must ping all 16 ranked agents");
+    assert.ok(hops.some((url) => url.includes("/r/ai/claude")));
+    assert.ok(hops.some((url) => url.includes("ref=alfa")));
+    assert.ok(hops.some((url) => url.includes("locale=cs")));
+  }
+  assert.equal(agentPipelineStatus({ visits: 3646, checkouts: 0, newsletters: 0, paid: 0 }), "crawler/hop čte — neplatí");
+  assert.equal(agentPipelineStatus({ visits: 0, checkouts: 0, newsletters: 0, paid: 0 }), "IndexNow pingá — čeká na první hop nebo crawler");
+  assert.equal(agentPipelineStatus({ visits: 0, checkouts: 0, newsletters: 0, paid: 1 }), "úspěch — platí");
+  assert.ok(
+    readFileSync(join(root, "lib/growth/legal-sprint.ts"), "utf8").includes("conversionHopUrls")
+  );
+  assert.ok(
+    readFileSync(join(root, "app/(admin)/admin/ai-agents/page.tsx"), "utf8").includes("AI_AGENT_REMEDIATIONS")
+  );
   assert.ok(
     !readFileSync(join(root, "lib/growth/legal-sprint.ts"), "utf8").includes('fetch("https://medscopeglobal.com/r/ai')
   );
@@ -3021,8 +3047,8 @@ assert.ok(
       "leaderboard paid must not double-count v27_orders and analytics"
     );
     assert.ok(
-      readFileSync(join(root, "lib/growth/arena/tick.ts"), "utf8").includes("rotatedRankedAgentHopUrls"),
-      "arena tick must IndexNow ranked agent hops, not only alfa/beta"
+      readFileSync(join(root, "lib/growth/arena/tick.ts"), "utf8").includes("conversionHopUrls"),
+      "arena tick must IndexNow all 16 agent conversion hops, not only alfa/beta"
     );
     assert.ok(
       readFileSync(join(root, "middleware.ts"), "utf8").includes("detectAiCrawler"),

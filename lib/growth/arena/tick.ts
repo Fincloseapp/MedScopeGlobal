@@ -9,9 +9,7 @@ import {
 } from "@/lib/growth/arena/markets";
 import { generateTeamDrafts } from "@/lib/growth/arena/content-agent";
 import { distributeTeamReach } from "@/lib/growth/arena/distribution-agent";
-import { rotatedRankedAgentHopUrls } from "@/lib/growth/ai-agent-hops";
-import { RANKED_AI_AGENT_SLUGS, agentHopPathUrl } from "@/lib/growth/ai-agent-program";
-import { getSiteUrl } from "@/lib/config/site-url";
+import { conversionHopUrls } from "@/lib/growth/ai-agent-hops";
 import { submitIndexNow } from "@/lib/seo/indexnow";
 import { decideEvolution, type TeamRuntime } from "@/lib/growth/arena/evolution";
 import { ctrOf } from "@/lib/growth/arena/metrics";
@@ -175,12 +173,9 @@ export async function runArenaTick(): Promise<ArenaTickResult> {
     if (dist.error && dist.error !== "spam_blocked") errors.push(`${team.slug}: ${dist.error}`);
   }
 
-  const rankedHops = [
-    ...rotatedRankedAgentHopUrls(),
-    ...RANKED_AI_AGENT_SLUGS.map((agent) => agentHopPathUrl(agent, "en", getSiteUrl())),
-  ];
+  const rankedHops = conversionHopUrls();
   const rankedPing = await submitIndexNow(rankedHops);
-  actions.push(`IndexNow ranked hops ${rankedPing.submitted} · HTTP ${rankedPing.status}`);
+  actions.push(`IndexNow conversion hops ${rankedPing.submitted} · všech 16 agentů · HTTP ${rankedPing.status}`);
   if (rankedPing.error) errors.push(`ranked hops: ${rankedPing.error}`);
 
   const fresh = await loadTeams();
