@@ -32,9 +32,9 @@ export function aiAgentJsonLd(locale?: string | null) {
       },
       {
         "@type": "DigitalDocument",
-        name: `llms-${pack}.txt`,
+        name: `llms.txt?lang=${pack}`,
         encodingFormat: "text/plain",
-        url: `${SITE.url}/llms-${pack}.txt`,
+        url: `${SITE.url}/llms.txt?lang=${pack}`,
       },
       {
         "@type": "DigitalDocument",

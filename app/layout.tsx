@@ -123,7 +123,7 @@ export default async function RootLayout({
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="describedby" title="llms.txt" href={`${siteUrl}/llms.txt`} />
         <link rel="alternate" type="text/plain" title="ai.txt" href={`${siteUrl}/.well-known/ai.txt`} />
-        <link rel="alternate" type="text/plain" title="llms locale" href={`${siteUrl}/llms-${chromePack(locale)}.txt`} />
+        <link rel="alternate" type="text/plain" title="llms locale" href={`${siteUrl}/llms.txt?lang=${chromePack(locale)}`} />
         <GoogleTagHead />
         <AdSenseHead />
       </head>

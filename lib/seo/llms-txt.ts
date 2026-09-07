@@ -26,7 +26,7 @@ export function renderLlmsTxt(locale?: string | null): string {
     .join("\n");
 
   const localeBriefs = (["cs", "de", "fr", "it", "es", "pt-BR", "en"] as const)
-    .map((item) => `- ${item}: ${SITE.url}/llms-${item}.txt`)
+    .map((item) => `- ${item}: ${SITE.url}/llms.txt?lang=${item}`)
     .join("\n");
 
   return `# ${MAGAZINE.name}
