@@ -211,6 +211,10 @@ assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/cs/st
 assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/en-us/studenti"));
 assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/de/studenti/darkove"));
 assert.ok(!rootStatic.some((row) => row.url === "https://medscopeglobal.com/de/mediprep"));
+assert.ok(
+  !rootStatic.some((row) => row.url.includes("/pravni-checklist")),
+  "IP lawyer checklist is admin-only, not a sitemap document"
+);
 
 const feeds = allLocaleFeedUrls();
 assert.equal(feeds.length, GLOBAL_LOCALES.length);

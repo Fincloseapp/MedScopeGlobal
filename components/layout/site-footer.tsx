@@ -177,11 +177,6 @@ export async function SiteFooter({ locale = "cs" }: { locale?: string }) {
               </Link>
             </li>
             <li>
-              <Link href={href("/pravni-checklist")} className="hover:text-foreground">
-                {footer.legalChecklist}
-              </Link>
-            </li>
-            <li>
               <Link href={href("/kontakt")} className="hover:text-foreground">
                 {footer.contact}
               </Link>

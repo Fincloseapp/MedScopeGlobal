@@ -702,6 +702,7 @@ file("lib/monetization/payout-map.ts");
   assert.ok(hrefs.includes("/admin/revenue"));
   assert.ok(hrefs.includes("/admin/ai-agents"));
   assert.ok(hrefs.includes("/admin/ai-teams"));
+  assert.ok(hrefs.includes("/admin/pravni-checklist"));
   assert.ok(hrefs.includes("/admin/articles"));
   assert.equal(isAdminNavActive("/admin/ads-public", "/admin/ads"), false);
   assert.equal(isAdminNavActive("/admin/ads", "/admin/ads"), true);
@@ -1047,9 +1048,12 @@ assert.ok(
       "getLegalChromeCopy"
     ) &&
     readFileSync(join(root, "app/(public)/pravni-checklist/page.tsx"), "utf8").includes(
-      "getLegalChromeCopy"
+      "permanentRedirect"
+    ) &&
+    readFileSync(join(root, "app/(admin)/admin/pravni-checklist/page.tsx"), "utf8").includes(
+      "Brief pro IP advokáta"
     ),
-  "extra legal pages must localize chrome titles, not keep hardcoded Czech breadcrumbs"
+  "public checklist must leave the site; the lawyer brief lives in admin"
 );
 assert.equal(getKarieraHubCopy("fr").filters.specialty, "Spécialité");
 assert.equal(getKarieraHubCopy("fr").filters.all, "Tous");
@@ -2350,6 +2354,7 @@ assert.ok(
   {
     const footerSrc = readFileSync(join(root, "components/layout/site-footer.tsx"), "utf8");
     assert.ok(footerSrc.includes("/pro-ai"));
+    assert.ok(!footerSrc.includes("/pravni-checklist"), "lawyer checklist must not sit in the public footer");
     assert.ok(!footerSrc.includes('href="/llms.txt"'));
     assert.ok(!footerSrc.includes("170"));
     assert.ok(!footerSrc.includes("Alfa"));
@@ -3808,7 +3813,7 @@ console.log("✓ magazine desk byline and copy checks passed");
     assert.ok(!contactSrc.includes("Třešňová"), "contact JSON-LD must not print the street");
     assert.ok(contactSrc.includes("LegalSeatDisclosure"));
     assert.ok(contactSrc.includes("publicOrganizationAddress"));
-    for (const rel of ["gdpr/page.tsx", "privacy/page.tsx", "znacka/page.tsx", "pravni-checklist/page.tsx"]) {
+    for (const rel of ["gdpr/page.tsx", "privacy/page.tsx", "znacka/page.tsx"]) {
       const src = readFileSync(join(root, `app/(public)/${rel}`), "utf8");
       assert.ok(src.includes("LegalSeatDisclosure"), `${rel} must hide the seat behind disclosure`);
       assert.ok(!src.includes("sídlo: {entity.address}"), `${rel} must not inline the street`);

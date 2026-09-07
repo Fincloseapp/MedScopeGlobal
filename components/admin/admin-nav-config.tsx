@@ -21,6 +21,7 @@ import {
   FlaskConical,
   IdCard,
   Wallet,
+  Scale,
 } from "lucide-react";
 
 export type AdminNavItem = {
@@ -95,6 +96,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     label: "Systém",
     items: [
       { href: "/admin/brand", label: "Značka a logo", icon: Palette },
+      { href: "/admin/pravni-checklist", label: "Právní checklist", icon: Scale },
       { href: "/admin/autopilot", label: "Autopilot", icon: Bot },
       { href: "/admin/ingestion", label: "AI ingestion", icon: Bot },
       { href: "/admin/email-logs", label: "E-mailové logy", icon: Mail },

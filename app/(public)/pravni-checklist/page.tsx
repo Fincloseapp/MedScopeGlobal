@@ -1,102 +1,15 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { LegalPageLayout } from "@/components/legal/legal-page-layout";
-import { LegalSeatDisclosure } from "@/components/legal/legal-seat-disclosure";
-import { getLegalEntity } from "@/lib/config/legal-entity";
-import { getLegalChromeCopy } from "@/lib/i18n/legal-chrome-copy";
+import { permanentRedirect } from "next/navigation";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { getServerLocale } from "@/lib/i18n/server-locale";
-import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 
-export async function generateMetadata(): Promise<Metadata> {
+export const metadata: Metadata = {
+  title: "Právní checklist",
+  robots: { index: false, follow: false },
+};
+
+/** Internal lawyer brief — not a consumer document. Lives under /admin. */
+export default async function PravniChecklistPublicGonePage() {
   const locale = await getServerLocale();
-  const copy = getLegalChromeCopy(locale);
-  return await buildLocalizedPageMetadata({
-    title: copy.checklistTitle,
-    description: copy.checklistDescription,
-    path: "/pravni-checklist",
-    locale,
-  });
-}
-
-export default async function PravniChecklistPage() {
-  const locale = await getServerLocale();
-  const copy = getLegalChromeCopy(locale);
-  const entity = getLegalEntity();
-
-  return (
-    <LegalPageLayout
-      locale={locale}
-      title={copy.checklistTitle}
-      description={copy.checklistLead}
-    >
-      {copy.officialNote ? <p><em>{copy.officialNote}</em></p> : null}
-      <h2>1. Hotovo na medscopeglobal.com</h2>
-      <ul>
-        <li>
-          Identita provozovatele: {entity.name}, IČO {entity.ico} (sídlo dle obchodního rejstříku)
-        </li>
-        <li>
-          Podpora: {entity.supportEmail}
-          {entity.supportPhone ? ", " + entity.supportPhone : ""}
-        </li>
-        <li>
-          Stránka značky a distancing od Medscape/WebMD: <Link href="/znacka">/znacka</Link>
-        </li>
-        <li>
-          GDPR / podmínky: <Link href="/privacy">/privacy</Link>,{" "}
-          <Link href="/terms">/terms</Link>
-        </li>
-        <li>Faktury: správná firma + režim neplátce DPH</li>
-      </ul>
-
-      <h2>2. Brief pro IP advokáta (P0)</h2>
-      <p>Objednejte rešerši a přihlášku s těmito údaji:</p>
-      <ul>
-        <li>
-          <strong>Přihlašovatel:</strong> {entity.name}, IČO {entity.ico}
-          {entity.courtFile ? ", sp. zn. " + entity.courtFile : ""}
-        </li>
-        <li>
-          <strong>Sídlo:</strong> dle obchodního rejstříku (ARES)
-          <LegalSeatDisclosure entity={entity} locale={locale} />
-        </li>
-        <li>
-          <strong>Označení:</strong> slovní MedScopeGlobal (+ případně logo)
-        </li>
-        <li>
-          <strong>Doména / užívání:</strong> https://{entity.domain}
-        </li>
-        <li>
-          <strong>Úřady:</strong> ÚPV ČR (národní) + EUIPO (EUTM)
-        </li>
-        <li>
-          <strong>Třídy Nice:</strong> 9, 35, 38, 41, 42; třída 44 jen po konzultaci
-        </li>
-        <li>
-          <strong>Riziko:</strong> podobnost s Medscape / WebMD a dalšími MedScope označeními
-        </li>
-        <li>
-          <strong>Watch:</strong> monitoring nových přihlášek a podobných domén
-        </li>
-      </ul>
-
-      <h2>3. Provozní kroky (P1)</h2>
-      <ul>
-        <li>Registrar lock + 2FA u domény medscopeglobal.com</li>
-        <li>V marketingu vždy plný wordmark MedScopeGlobal</li>
-        <li>Evidence prvního užívání (screenshoty, faktury, tisk)</li>
-        <li>Smlouvy s autory/partnery: licence IP + NDA</li>
-      </ul>
-
-      <h2>4. Co web nemůže zajistit</h2>
-      <p>
-        Doména a právní texty nesuplují zápis ochranné známky a negarantují, že Medscape/WebMD
-        nepodají námitku. Cíl je silný titul a dobrá důkazní pozice.
-      </p>
-
-      <p>
-        Kontakt: <a href={"mailto:" + entity.legalEmail}>{entity.legalEmail}</a>
-      </p>
-    </LegalPageLayout>
-  );
+  permanentRedirect(localizePublicHref("/kontakt", locale));
 }

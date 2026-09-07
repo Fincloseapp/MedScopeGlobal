@@ -84,7 +84,6 @@ const CZECH_ONLY_PATHS: StaticSpec[] = [
   { path: "/medicina/priprava", changeFrequency: "monthly", priority: 0.5 },
   { path: "/medicina/studium", changeFrequency: "monthly", priority: 0.55 },
   { path: "/pro-koho/laik-student", changeFrequency: "monthly", priority: 0.65 },
-  { path: "/pravni-checklist", changeFrequency: "yearly", priority: 0.35 },
 ];
 
 function abs(base: string, locale: string, path: string): string {
