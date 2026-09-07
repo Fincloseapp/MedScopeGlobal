@@ -795,12 +795,189 @@ const COPY: Record<string, SubscribeCopy> = {
   },
 };
 
+type BannerOverlay = Pick<
+  SubscribeCopy,
+  | "bannerKicker"
+  | "bannerTitle"
+  | "bannerLead"
+  | "bannerPayCta"
+  | "bannerPayBusy"
+  | "billedNow"
+  | "cancelAnytime"
+>;
+
+/** Banner-only packs so editions without a full subscribe file still pay in their language. */
+export function subscribeBannerPack(locale?: string | null): string {
+  const normalized = normalizeLocale(locale ?? "cs");
+  if (normalized === "zh-CN" || normalized === "cn") return "zh-CN";
+  if (normalized === "pt-BR" || normalized === "pt") return "pt-BR";
+  if (normalized === "en-US" || normalized === "en-UK" || normalized === "en") return "en";
+  const primary = primaryArticleLocale(normalized);
+  if (primary === "zh") return "zh-CN";
+  if (primary === "en") return "en";
+  return primary;
+}
+
+const BANNER_OVERLAY: Record<string, BannerOverlay> = {
+  sk: {
+    bannerKicker: "Redakcia ViaLongeVita",
+    bannerTitle: "Zvyšok článku máte hneď — len za {price}",
+    bannerLead:
+      "Mesačne len {price}. Ročný prístup má dva mesiace v cene. Kartou sa text otvorí teraz — zrušíte kedykoľvek.",
+    bannerPayCta: "Zaplatiť {price} a čítať",
+    bannerPayBusy: "Otváram platbu…",
+    billedNow: "Otvorí sa hneď",
+    cancelAnytime: "zrušenie kedykoľvek",
+  },
+  pl: {
+    bannerKicker: "Redakcja ViaLongeVita",
+    bannerTitle: "Resztę artykułu masz od razu — tylko {price}",
+    bannerLead:
+      "Miesięcznie tylko {price}. Roczny dostęp zawiera dwa miesiące. Po płatności kartą tekst otworzy się od razu — rezygnacja w każdej chwili.",
+    bannerPayCta: "Zapłać {price} i czytaj",
+    bannerPayBusy: "Otwieram płatność…",
+    billedNow: "Otwiera się od razu",
+    cancelAnytime: "rezygnacja w każdej chwili",
+  },
+  it: {
+    bannerKicker: "Redazione ViaLongeVita",
+    bannerTitle: "Il resto dell’articolo è suo subito — solo {price}",
+    bannerLead:
+      "Solo {price} al mese. L’abbonamento annuale include due mesi. Il testo si apre appena paga — disdetta quando vuole.",
+    bannerPayCta: "Paga {price} e leggi",
+    bannerPayBusy: "Apertura del pagamento…",
+    billedNow: "Si apre subito",
+    cancelAnytime: "disdetta in qualsiasi momento",
+  },
+  es: {
+    bannerKicker: "Redacción ViaLongeVita",
+    bannerTitle: "El resto del artículo es suyo ahora — solo {price}",
+    bannerLead:
+      "Solo {price} al mes. El plan anual incluye dos meses. El texto se abre al pagar — cancele cuando quiera.",
+    bannerPayCta: "Pagar {price} y leer",
+    bannerPayBusy: "Abriendo el pago…",
+    billedNow: "Se abre al instante",
+    cancelAnytime: "cancele cuando quiera",
+  },
+  "pt-BR": {
+    bannerKicker: "Redação ViaLongeVita",
+    bannerTitle: "O resto do artigo é seu agora — só {price}",
+    bannerLead:
+      "Só {price} por mês. O plano anual inclui dois meses. O texto abre assim que pagar — cancele quando quiser.",
+    bannerPayCta: "Pagar {price} e ler",
+    bannerPayBusy: "Abrindo o pagamento…",
+    billedNow: "Abre imediatamente",
+    cancelAnytime: "cancele quando quiser",
+  },
+  ro: {
+    bannerKicker: "Redacția ViaLongeVita",
+    bannerTitle: "Restul articolului îl aveți imediat — doar {price}",
+    bannerLead:
+      "Lunar doar {price}. Planul anual include două luni. Textul se deschide imediat după plată — anulați oricând.",
+    bannerPayCta: "Plătiți {price} și citiți",
+    bannerPayBusy: "Deschid plata…",
+    billedNow: "Se deschide imediat",
+    cancelAnytime: "anulare oricând",
+  },
+  hu: {
+    bannerKicker: "ViaLongeVita szerkesztőség",
+    bannerTitle: "A cikk többi része azonnal az Öné — csak {price}",
+    bannerLead:
+      "Havonta csak {price}. Az éves csomagban két hónap benne van. A szöveg a fizetés után azonnal megnyílik — bármikor lemondható.",
+    bannerPayCta: "Fizessen {price} és olvasson",
+    bannerPayBusy: "Fizetés megnyitása…",
+    billedNow: "Azonnal megnyílik",
+    cancelAnytime: "bármikor lemondható",
+  },
+  ru: {
+    bannerKicker: "Редакция ViaLongeVita",
+    bannerTitle: "Остальной текст статьи сразу ваш — всего {price}",
+    bannerLead:
+      "Всего {price} в месяц. В годовой подписке два месяца в цене. Текст откроется сразу после оплаты — отмена в любой момент.",
+    bannerPayCta: "Оплатить {price} и читать",
+    bannerPayBusy: "Открываю оплату…",
+    billedNow: "Откроется сразу",
+    cancelAnytime: "отмена в любой момент",
+  },
+  uk: {
+    bannerKicker: "Редакція ViaLongeVita",
+    bannerTitle: "Решта статті ваша одразу — лише {price}",
+    bannerLead:
+      "Лише {price} на місяць. Річний доступ містить два місяці. Текст відкриється одразу після оплати — скасувати можна будь-коли.",
+    bannerPayCta: "Сплатити {price} і читати",
+    bannerPayBusy: "Відкриваю оплату…",
+    billedNow: "Відкриється одразу",
+    cancelAnytime: "скасування будь-коли",
+  },
+  be: {
+    bannerKicker: "Рэдакцыя ViaLongeVita",
+    bannerTitle: "Астатак артыкула ваш адразу — толькі {price}",
+    bannerLead:
+      "Толькі {price} у месяц. Гадавы доступ мае два месяцы ў цане. Тэкст адкрыецца адразу пасля аплаты — скасаваць можна ў любы час.",
+    bannerPayCta: "Аплаціць {price} і чытаць",
+    bannerPayBusy: "Адкрываю аплату…",
+    billedNow: "Адкрыецца адразу",
+    cancelAnytime: "скасаванне ў любы час",
+  },
+  "zh-CN": {
+    bannerKicker: "ViaLongeVita 编辑部",
+    bannerTitle: "文章全文现在就读 — 仅 {price}",
+    bannerLead: "每月仅 {price}。年付含两个月。付款后立即打开全文，可随时取消。",
+    bannerPayCta: "支付 {price} 并阅读",
+    bannerPayBusy: "正在打开支付…",
+    billedNow: "立即开通",
+    cancelAnytime: "随时可取消",
+  },
+  ja: {
+    bannerKicker: "ViaLongeVita 編集部",
+    bannerTitle: "記事の続きは今すぐ — わずか {price}",
+    bannerLead:
+      "月額わずか {price}。年額には2か月分が含まれます。支払うと本文が開きます。いつでも解約できます。",
+    bannerPayCta: "{price} で読む",
+    bannerPayBusy: "決済を開いています…",
+    billedNow: "すぐに開きます",
+    cancelAnytime: "いつでも解約可",
+  },
+  ko: {
+    bannerKicker: "ViaLongeVita 편집부",
+    bannerTitle: "기사 나머지는 바로 — 단 {price}",
+    bannerLead:
+      "월 {price}. 연간 요금제에 두 달이 포함됩니다. 결제하면 본문이 열립니다. 언제든 해지할 수 있습니다.",
+    bannerPayCta: "{price} 결제하고 읽기",
+    bannerPayBusy: "결제를 여는 중…",
+    billedNow: "바로 열립니다",
+    cancelAnytime: "언제든 해지",
+  },
+  vi: {
+    bannerKicker: "Tòa soạn ViaLongeVita",
+    bannerTitle: "Phần còn lại của bài viết là của bạn ngay — chỉ {price}",
+    bannerLead:
+      "Chỉ {price} mỗi tháng. Gói năm gồm hai tháng. Văn bản mở ngay khi thanh toán — hủy bất cứ lúc nào.",
+    bannerPayCta: "Thanh toán {price} và đọc",
+    bannerPayBusy: "Đang mở thanh toán…",
+    billedNow: "Mở ngay",
+    cancelAnytime: "hủy bất cứ lúc nào",
+  },
+  id: {
+    bannerKicker: "Redaksi ViaLongeVita",
+    bannerTitle: "Sisa artikel langsung milik Anda — hanya {price}",
+    bannerLead:
+      "Hanya {price} per bulan. Paket tahunan mencakup dua bulan. Teks terbuka setelah bayar — batal kapan saja.",
+    bannerPayCta: "Bayar {price} dan baca",
+    bannerPayBusy: "Membuka pembayaran…",
+    billedNow: "Langsung terbuka",
+    cancelAnytime: "batal kapan saja",
+  },
+};
+
 export function getSubscribeCopy(
   locale?: string | null,
   region?: string | null
 ): SubscribeCopy {
   const key = pack(locale);
   const localized = localizeListedCzkIn(COPY[key] ?? COPY.en, locale, region);
+  const overlay = BANNER_OVERLAY[subscribeBannerPack(locale)];
+  if (overlay) Object.assign(localized, overlay);
   localized.afterTrialUnit = localizeCurrencyToken(localized.afterTrialUnit, locale, region);
   localized.currencyLabel = localizeCurrencyToken(localized.currencyLabel, locale, region);
   const price = editorialMonthlyBannerPrice(locale, region);

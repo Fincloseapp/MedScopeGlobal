@@ -359,6 +359,28 @@ assert.ok(!getSubscribeCopy("en").parentsMore.includes("/studenti"));
 assert.ok(getSubscribeCopy("fr").afterTrialUnit.includes("mois"));
 assert.ok(!getSubscribeCopy("de").faqTitle.includes("Časté"));
 assert.equal(getSubscribeCopy("sk").eyebrow, "Subscription");
+assert.ok(getSubscribeCopy("sk").bannerPayCta.includes("Zaplatiť"));
+assert.ok(getSubscribeCopy("it").bannerPayCta.includes("Paga"));
+assert.ok(getSubscribeCopy("es").bannerPayCta.includes("Pagar"));
+assert.ok(getSubscribeCopy("pt-BR").bannerPayCta.includes("Pagar"));
+assert.ok(getSubscribeCopy("ja").bannerPayCta.includes("で読む"));
+{
+  const czechBannerLeak =
+    /[ěřů]|Zaplatit\s|jen za|Předplatné|Otevírám platbu|zrušení kdykoli|Zbytek článku/;
+  for (const { code } of GLOBAL_LOCALES) {
+    const copy = getSubscribeCopy(code);
+    assert.ok(!copy.bannerTitle.includes("{price}"), `${code} banner must fill {price}`);
+    assert.ok(!copy.bannerPayCta.includes("{price}"), `${code} pay CTA must fill {price}`);
+    assert.ok(/\d/.test(copy.bannerPayCta), `${code} pay CTA must show the local amount`);
+    if (code !== "cs") {
+      assert.ok(!copy.bannerPayCta.includes("Kč"), `${code} must not show Kč`);
+      assert.ok(
+        !czechBannerLeak.test(`${copy.bannerTitle} ${copy.bannerPayCta} ${copy.bannerLead}`),
+        `${code} subscribe banner leaked Czech`
+      );
+    }
+  }
+}
 assert.equal(localizePublicHref("/predplatne", "fr"), "/fr/predplatne");
 assert.equal(localizePublicHref("/predplatne?trial=1", "de"), "/de/predplatne?trial=1");
 assert.equal(localizePublicHref("/app/pacient", "fr"), "/app/pacient");

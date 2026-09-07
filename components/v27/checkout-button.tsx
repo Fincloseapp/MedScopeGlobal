@@ -5,6 +5,7 @@ import { CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { V27CheckoutKind } from "@/lib/v27/stripe-products";
 import { readAiRefFromDocumentCookie } from "@/lib/growth/ai-ref-cookie";
+import { getCheckoutButtonCopy, readerCheckoutError } from "@/lib/i18n/checkout-chrome";
 
 type Props = {
   kind: V27CheckoutKind;
@@ -31,6 +32,7 @@ export function V27CheckoutButton({
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const chrome = getCheckoutButtonCopy(locale);
 
   async function handleCheckout() {
     setLoading(true);
@@ -69,16 +71,17 @@ export function V27CheckoutButton({
         enabled?: boolean;
       };
       if (res.status === 503 && data.enabled === false) {
-        throw new Error("Stripe není nakonfigurován — nastavte STRIPE_SECRET_KEY na Workeru");
+        throw new Error(chrome.stripeMissing);
       }
-      if (!res.ok) throw new Error(data.error ?? "Checkout selhal");
+      if (!res.ok) throw new Error(readerCheckoutError(locale, data.error));
       if (data.url) {
         window.location.href = data.url;
       } else {
-        throw new Error("Stripe není nakonfigurován");
+        throw new Error(chrome.stripeMissing);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Chyba");
+      const raw = e instanceof Error ? e.message : chrome.generic;
+      setError(readerCheckoutError(locale, raw));
     } finally {
       setLoading(false);
     }
@@ -96,7 +99,7 @@ export function V27CheckoutButton({
         className={className ?? "w-full bg-[#005B96] hover:bg-[#004a7a]"}
       >
         {loading ? (
-          busyLabel ?? "Přesměrování na Stripe…"
+          busyLabel ?? chrome.busy
         ) : (
           <>
             {showIcon ? <CreditCard className="mr-2 h-4 w-4" aria-hidden /> : null}

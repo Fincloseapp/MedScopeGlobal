@@ -174,8 +174,10 @@ import { studentIntroCharge, studentMonthlyCharge, STUDENT_FREE_TESTS, isStudent
 import {
   EDITORIAL_MONTHLY_CZK,
   editorialAnnualCharge,
+  editorialMonthlyBannerPrice,
   editorialMonthlyCharge,
 } from "../../lib/editorial/pricing";
+import { getCheckoutButtonCopy, readerCheckoutError } from "../../lib/i18n/checkout-chrome";
 import { nativeDeskArticlesForLocale } from "../../lib/editorial/native-desk-articles";
 import { studentPublicHref } from "../../lib/studenti/href";
 import { facultiesForLocale, facultyCountryForLocale } from "../../lib/prijimacky/faculties-by-country";
@@ -3760,6 +3762,58 @@ console.log("✓ magazine desk byline and copy checks passed");
     assert.ok(/25/.test(getSubscribeCopy("cs").bannerTitle));
     assert.ok(getSubscribeCopy("de").bannerTitle.includes("nur"));
     assert.ok(getSubscribeCopy("fr").bannerTitle.includes("seulement"));
+    const czechBannerLeak =
+      /[ěřů]|Zaplatit\s|jen za|Předplatné|Otevírám platbu|zrušení kdykoli|Zbytek článku/;
+    const bannerCtaMark: Record<string, RegExp> = {
+      cs: /Zaplatit/,
+      sk: /Zaplatiť/,
+      pl: /Zapłać/,
+      de: /lesen/i,
+      fr: /Payer/i,
+      it: /Paga /,
+      es: /Pagar /,
+      pt: /Pagar /,
+      "pt-BR": /Pagar /,
+      ro: /Plăti/,
+      hu: /Fizessen/,
+      ru: /Оплатить/,
+      uk: /Сплатити/,
+      be: /Аплаціць/,
+      "zh-CN": /支付/,
+      ja: /で読む/,
+      ko: /결제하고/,
+      vi: /Thanh toán/,
+      id: /Bayar /,
+      en: /Pay /,
+      "en-US": /Pay /,
+      "en-UK": /Pay /,
+    };
+    for (const { code } of GLOBAL_LOCALES) {
+      const copy = getSubscribeCopy(code);
+      const price = editorialMonthlyBannerPrice(code);
+      assert.ok(price.length > 0, `${code} banner price must render`);
+      assert.ok(!copy.bannerTitle.includes("{price}"), `${code} bannerTitle must interpolate price`);
+      assert.ok(!copy.bannerPayCta.includes("{price}"), `${code} bannerPayCta must interpolate price`);
+      assert.ok(!copy.bannerLead.includes("{price}"), `${code} bannerLead must interpolate price`);
+      assert.ok(copy.bannerTitle.includes(price), `${code} title must show ${price}`);
+      assert.ok(copy.bannerPayCta.includes(price), `${code} pay CTA must show ${price}`);
+      assert.ok(/\d/.test(copy.bannerPayCta), `${code} pay CTA must include an amount`);
+      const mark = bannerCtaMark[code];
+      assert.ok(mark, `missing banner CTA mark for ${code}`);
+      assert.ok(mark.test(copy.bannerPayCta), `${code} pay CTA must be native: ${copy.bannerPayCta}`);
+      if (code === "cs") {
+        assert.ok(copy.bannerPayCta.includes("Kč"));
+      } else {
+        assert.ok(!copy.bannerPayCta.includes("Kč"), `${code} must not show Kč`);
+        assert.ok(!czechBannerLeak.test(`${copy.bannerTitle} ${copy.bannerPayCta} ${copy.bannerLead}`), `${code} banner leaked Czech`);
+      }
+    }
+    const checkoutBtn = readFileSync(join(root, "components/v27/checkout-button.tsx"), "utf8");
+    assert.ok(checkoutBtn.includes("getCheckoutButtonCopy"), "checkout errors must follow the page locale");
+    assert.ok(checkoutBtn.includes("readerCheckoutError"), "Czech Stripe errors must not leak on non-CS editions");
+    assert.ok(!getCheckoutButtonCopy("de").failed.includes("selhal"));
+    assert.ok(!getCheckoutButtonCopy("fr").stripeMissing.includes("není"));
+    assert.equal(readerCheckoutError("fr", "Stripe není nakonfigurován"), getCheckoutButtonCopy("fr").failed);
   }
   {
     const pricingSrc = readFileSync(join(root, "app/(public)/pricing/page.tsx"), "utf8");
