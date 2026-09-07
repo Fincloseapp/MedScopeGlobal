@@ -345,7 +345,11 @@ import { magazineCategoriesForLocale } from "../../lib/editorial/magazine-catego
 import { buildLocaleMagazineLayout } from "../../lib/v23/newsletter/locale-layout";
 import { classifyNewsletterIssues, mergeNewsletterIssues } from "../../lib/v23/newsletter/stand";
 import { generateNewsletterImage, resolveNewsletterItemImage } from "../../lib/v23/newsletter/generate-image";
-import { isUsableNewsletterImage, newsletterTopicCover } from "../../lib/v23/newsletter/topic-covers";
+import {
+  isUsableNewsletterImage,
+  newsletterTopicCover,
+  remapNewsletterHtmlImages,
+} from "../../lib/v23/newsletter/topic-covers";
 import { getNewsletterStandCopy } from "../../lib/i18n/newsletter-stand-copy";
 import type { LocaleMagazineSources } from "../../lib/v23/newsletter/locale-layout";
 import { SYNDICATION_RULES, getSyndicationTargets } from "../../lib/ecosystem/editorial/syndication";
@@ -2116,6 +2120,9 @@ assert.ok(
   assert.deepEqual(classified.upcoming.map((row) => row.slug), ["future"]);
   assert.deepEqual(classified.previous.map((row) => row.slug), ["old"]);
   assert.equal(getNewsletterStandCopy("cs").current, "Aktuální vydání");
+  assert.ok(getNewsletterStandCopy("cs").lead.includes("přehled"));
+  assert.ok(getNewsletterStandCopy("cs").lead.includes("brief"));
+  assert.ok(!getNewsletterStandCopy("en").lead.toLowerCase().includes("same form"));
   assert.ok(!getNewsletterStandCopy("fr").title.includes("aktuální"));
   assert.ok(!getNewsletterStandCopy("fr").lead.includes("Redakce"));
   assert.ok(!getNewsletterStandCopy("de").current.includes("Aktuální"));
@@ -2145,9 +2152,20 @@ assert.ok(
   assert.ok(issueView.includes("pickEditionCover(locale, issue.issue_date)"));
   assert.ok(!issueView.includes("isoWeekSeed"));
   assert.ok(issueView.includes("sm:grid-cols-2"));
+  assert.ok(issueView.includes("EditorialPayButtons"));
+  assert.ok(issueView.includes("remapNewsletterHtmlImages"));
+  assert.ok(issueView.includes('sectionId="doporucujeme"'));
+  const remapped = remapNewsletterHtmlImages(
+    '<img src="https://images.unsplash.com/photo-1584308664744-24d5c474f2ae" alt="Léky a SPC" />'
+  );
+  assert.ok(!remapped.includes("unsplash"));
+  assert.ok(remapped.includes("/assets/"));
   const briefLayout = readFileSync(join(root, "lib/monetization/brief-email-layout.ts"), "utf8");
   assert.ok(briefLayout.includes("newsletterTopicCover"));
   assert.ok(briefLayout.includes("articleCoverAbs"));
+  assert.ok(
+    readFileSync(join(root, "app/(public)/newsletter/page.tsx"), "utf8").includes("coverSeed={latest?.issue_date}")
+  );
 }
 assert.ok(
   readFileSync(join(root, "app/(public)/newsletter/[slug]/page.tsx"), "utf8").includes("getNewsletterForPublic"),
@@ -3571,6 +3589,34 @@ ${"<p>Další praktický odstavec o nákupním seznamu, týdenním plánu a mýt
   );
   assert.equal(classifyCoverTopic({ title: "Mediterranean plate without extremes", slug: "mediterranean-plate" }), "food");
   assert.equal(classifyCoverTopic({ title: "Longévité et healthspan au quotidien", slug: "longevite-healthspan" }), "seniors");
+  assert.equal(
+    classifyCoverTopic({ title: "Stárnutí pleti bez zázračných krémů", slug: "starnuti-pleti" }),
+    "skincare"
+  );
+  assert.equal(
+    classifyCoverTopic({ title: "Minerální SPF po čtyřicítce", slug: "mineralni-spf", publicTopic: "kosmetika" }),
+    "skincare"
+  );
+  assert.equal(
+    classifyCoverTopic({ title: "Dlouhověkost: chůze a síla", slug: "dlouhovekost-chuze" }),
+    "seniors"
+  );
+  const skinArticle = resolveArticleCoverUrl({
+    title: "Kosmetika a pleť: denní světlo a minerální filtr",
+    slug: "verejnost-zivotni-styl-kosmetika-plet",
+    publicTopic: "kosmetika",
+    coverImageUrl: "/assets/covers/seniors.webp",
+    preferCurated: true,
+  });
+  assert.ok(skinArticle?.includes("skincare.webp"), `kosmetika cover skincare, got ${skinArticle}`);
+  const longevityHero = resolveArticleCoverUrl({
+    title: "Dlouhověkost: chůze a síla",
+    slug: "verejnost-dlouhovekost-chuze",
+    publicTopic: "dlouhovekost",
+    coverImageUrl: "/assets/covers/seniors.webp",
+    preferCurated: true,
+  });
+  assert.ok(longevityHero?.includes("seniors.webp"), `dlouhovekost stays seniors, got ${longevityHero}`);
   assert.equal(
     classifyCoverTopic({
       title: "Rozhovor: jak pečovat o klidný podvečer",

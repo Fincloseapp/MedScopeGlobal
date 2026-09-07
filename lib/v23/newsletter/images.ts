@@ -23,12 +23,10 @@ export const V23_ITEM_IMAGE_SECTIONS = new Set([
   "doporucujeme",
 ]);
 
-function hashSeed(input: string): number {
-  return Math.abs(input.split("").reduce((a, c) => a + c.charCodeAt(0), 0) % 997);
-}
-
-export function heroNewsletterImage(seed: string): string {
-  return `${V23_NEWSLETTER_IMAGE.split("&sig=")[0]}&sig=${hashSeed(`hero-${seed}`)}`;
+export function heroNewsletterImage(_seed: string): string {
+  return isUsableNewsletterImage(V23_NEWSLETTER_IMAGE)
+    ? V23_NEWSLETTER_IMAGE
+    : NEWSLETTER_IMAGE_FALLBACK;
 }
 
 export function sectionImageUrl(sectionId: string, seed: string): string {
@@ -106,5 +104,10 @@ export function ensureLayoutImages(layout: V23NewsletterLayout, issueDate: strin
       : heroNewsletterImage(issueDate),
     heroImageAlt: layout.heroImageAlt ?? `${MAGAZINE.name} — ${MAGAZINE.positioning.en}`,
     sections,
+    recommended: attachItemImages(
+      "doporucujeme",
+      layout.recommended ?? [],
+      MAGAZINE.name
+    ),
   };
 }

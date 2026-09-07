@@ -11,7 +11,8 @@ import {
 import type { V23NewsletterLayout, V23NewsletterSection } from "@/lib/v23/newsletter/types";
 import { MagazineTitleSpread } from "@/components/magazine/magazine-title-spread";
 import { pickEditionCover } from "@/lib/brand/edition-covers";
-import { isUsableNewsletterImage } from "@/lib/v23/newsletter/topic-covers";
+import { isUsableNewsletterImage, remapNewsletterHtmlImages } from "@/lib/v23/newsletter/topic-covers";
+import { EditorialPayButtons } from "@/components/subscription/editorial-pay-buttons";
 import { isJsonLikeText, sanitizeNewsletterText } from "@/lib/v23/newsletter/sanitize";
 import { newsletterHeadline } from "@/lib/v23/newsletter/title";
 import { Button } from "@/components/ui/button";
@@ -90,6 +91,8 @@ function parseLayout(issue: NewsletterRow, locale = "cs"): V23NewsletterLayout |
         title: sanitizeNewsletterText(r.title),
         summary: sanitizeNewsletterText(r.summary),
         href: r.href,
+        imageUrl: r.imageUrl,
+        imageAlt: r.imageAlt,
       }))
       .filter((r) => r.title.length > 2),
   };
@@ -233,36 +236,43 @@ export function V23NewsletterIssueView({
         ) : showHtmlFallback ? (
           <div
             className="prose prose-slate mt-6 max-w-none prose-headings:font-display prose-headings:text-[#021d33]"
-            dangerouslySetInnerHTML={{ __html: issue.html_content! }}
+            dangerouslySetInnerHTML={{ __html: remapNewsletterHtmlImages(issue.html_content!) }}
           />
         ) : (
           <p className="mt-6 text-slate-600">{emptyLabel}</p>
         )}
 
         {layout?.recommended && layout.recommended.length > 0 ? (
-          <section className="mt-10 rounded-2xl border border-slate-200 bg-slate-50/50 p-6">
+          <section className="mt-10">
             <h2 className="font-display text-lg font-bold text-[#021d33]">{recommendedLabel}</h2>
-            <ul className="mt-4 space-y-3">
+            <ul className="mt-4 grid gap-4 sm:grid-cols-2">
               {layout.recommended.map((r, i) => (
-                <li key={`rec-${i}`} className="text-sm text-slate-700">
-                  {r.href ? (
-                    <Link
-                      href={r.href.startsWith("/") ? localizePublicHref(r.href, locale) : r.href}
-                      className="font-semibold text-[#005B96] hover:underline"
-                    >
-                      {r.title}
-                    </Link>
-                  ) : (
-                    <span className="font-semibold text-[#021d33]">{r.title}</span>
-                  )}
-                  <span className="text-slate-600"> — {r.summary}</span>
-                </li>
+                <NewsletterItemCard
+                  key={`rec-${i}`}
+                  item={r}
+                  sectionId="doporucujeme"
+                  sectionTitle={recommendedLabel}
+                  index={i}
+                  locale={locale}
+                />
               ))}
             </ul>
           </section>
         ) : null}
 
-        <div className="mt-10 rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50 to-white p-6">
+        <div className="mt-10 rounded-2xl border border-[#0b1f3a] bg-[#050b1d] p-6 text-white">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#d4af37]">
+            {copy.hubEyebrow}
+          </p>
+          <p className="mt-2 text-sm text-slate-300">{copy.hubDescription}</p>
+          <EditorialPayButtons
+            locale={locale}
+            className="mt-4 flex w-full max-w-sm flex-col gap-2"
+            returnPath={localizePublicHref("/articles", locale)}
+          />
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50 to-white p-6">
           <NewsletterCapture locale={locale} source="newsletter-issue-v23" />
         </div>
 

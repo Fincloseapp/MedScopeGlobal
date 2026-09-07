@@ -3,6 +3,7 @@ import type { NewsletterRow } from "@/lib/queries/v4c/newsletters";
 import { NewsletterHero } from "@/components/newsletter/Hero";
 import { MagazineTitleSpread } from "@/components/magazine/magazine-title-spread";
 import { pickEditionCover, isoWeekSeed } from "@/lib/brand/edition-covers";
+import { remapNewsletterHtmlImages } from "@/lib/v23/newsletter/topic-covers";
 import { Button } from "@/components/ui/button";
 import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
@@ -11,11 +12,17 @@ import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { formatPublicDate } from "@/lib/i18n/format-date";
 import { newsletterHeadline } from "@/lib/v23/newsletter/title";
 
-export function V22NewsletterHub({ locale = "cs" }: { locale?: string }) {
+export function V22NewsletterHub({
+  locale = "cs",
+  coverSeed,
+}: {
+  locale?: string;
+  coverSeed?: string | null;
+}) {
   const copy = getNewsletterCopy(locale);
   const latestHref = localizePublicHref("/newsletter/posledni", locale);
   const archiveHref = localizePublicHref("/newsletter/archiv", locale);
-  const cover = pickEditionCover(locale, isoWeekSeed());
+  const cover = pickEditionCover(locale, coverSeed || isoWeekSeed());
   return (
     <div className="space-y-8">
       <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
@@ -75,7 +82,7 @@ export function V22NewsletterIssue({
       </div>
       <div className="p-6 sm:p-8">
         {issue.html_content ? (
-          <div className="prose prose-slate max-w-none prose-headings:font-display prose-headings:text-[#021d33]" dangerouslySetInnerHTML={{ __html: issue.html_content }} />
+          <div className="prose prose-slate max-w-none prose-headings:font-display prose-headings:text-[#021d33]" dangerouslySetInnerHTML={{ __html: remapNewsletterHtmlImages(issue.html_content) }} />
         ) : (
           <p className="text-slate-600">{copy.hubDescription}</p>
         )}

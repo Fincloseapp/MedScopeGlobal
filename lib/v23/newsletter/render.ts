@@ -42,7 +42,12 @@ export function renderNewsletterHtml(layout: V23NewsletterLayout, locale = "cs")
     .join("\n");
 
   const recHtml = layout.recommended
-    .map((r) => `<li><strong>${escapeHtml(r.title)}</strong> — ${escapeHtml(r.summary)}</li>`)
+    .map((r) => {
+      const thumb = r.imageUrl
+        ? `<img src="${escapeHtml(r.imageUrl)}" alt="${escapeHtml(r.imageAlt ?? r.title)}" loading="lazy" width="120" height="80" class="nl-item-img" />`
+        : "";
+      return `<li class="nl-item">${thumb}<div class="nl-item-body"><strong>${escapeHtml(r.title)}</strong><p>${escapeHtml(r.summary)}</p></div></li>`;
+    })
     .join("");
 
   const copy = getNewsletterCopy(locale);

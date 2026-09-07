@@ -30,6 +30,20 @@ export function isUsableNewsletterImage(url?: string | null): boolean {
   return false;
 }
 
+/** Rewrite leftover Unsplash / denied stock in stored HTML so fallback markup stays local. */
+export function remapNewsletterHtmlImages(html: string): string {
+  return html.replace(/<img\b([^>]*?)>/gi, (full, attrs: string) => {
+    const src = /src=["']([^"']+)["']/i.exec(attrs)?.[1];
+    if (isUsableNewsletterImage(src)) return full;
+    const alt = /alt=["']([^"']*)["']/i.exec(attrs)?.[1] ?? "";
+    const url = newsletterTopicCover({ title: alt, seed: alt || src || "nl" });
+    if (/src=["'][^"']+["']/i.test(attrs)) {
+      return `<img${attrs.replace(/src=["'][^"']+["']/i, `src="${url}"`)}>`;
+    }
+    return `<img src="${url}"${attrs}>`;
+  });
+}
+
 export function newsletterVisualTopic(input: {
   sectionId?: string | null;
   title?: string | null;
@@ -38,7 +52,7 @@ export function newsletterVisualTopic(input: {
 }): CoverVisualTopic {
   const title = String(input.title ?? "");
   if (SKINCARE_RE.test(title) || SKINCARE_RE.test(String(input.excerpt ?? ""))) {
-    return "seniors";
+    return "skincare";
   }
   const classified = classifyCoverTopic({
     title,
@@ -46,6 +60,7 @@ export function newsletterVisualTopic(input: {
     excerpt: input.excerpt,
     publicTopic: input.publicTopic,
   });
+  if (classified === "skincare") return "skincare";
   if (classified !== "research" || !input.sectionId) return classified;
   return SECTION_TOPIC[input.sectionId] ?? classified;
 }

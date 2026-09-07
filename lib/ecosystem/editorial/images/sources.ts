@@ -103,6 +103,7 @@ export const LOCAL_PLACEHOLDER_ASSETS: Record<CoverVisualTopic, string> = {
   calm: "/assets/covers/calm.webp",
   movement: "/assets/covers/movement.webp",
   seniors: "/assets/covers/seniors.webp",
+  skincare: "/assets/covers/skincare.webp",
   clinical: "/assets/covers/clinical-3.webp",
   research: "/assets/covers/research.webp",
   tech: "/assets/covers/tech.webp",

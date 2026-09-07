@@ -29,7 +29,7 @@ const NAME = MAGAZINE.name;
 const EN: NewsletterStandCopy = {
   kicker: `${NAME} · newsstand`,
   title: "Weekly brief — current, archive and upcoming",
-  lead: "The same form as in your inbox: one lead piece and two shorter reads. The brief stays free. Editorial is the paid magazine. Advertising for companies is labeled.",
+  lead: "On the site you get the weekly digest. The inbox brief is shorter: one lead and two shorter reads. The brief stays free. Editorial is the paid magazine. Advertising for companies is labeled.",
   current: "Current issue",
   previous: "Previous issues",
   upcoming: "Upcoming",
@@ -53,7 +53,7 @@ const PACKS: Record<string, NewsletterStandCopy> = {
   cs: {
     kicker: `${NAME} · newsstand`,
     title: "Týdenní brief — aktuální, archiv i připravovaná",
-    lead: "Stejná forma jako v e-mailu: jedna hlavní stopa a dva kratší texty. Brief zůstává zdarma. Redakce je placený magazín. Reklama pro firmy je označená.",
+    lead: "Na webu je týdenní přehled. Do schránky chodí kratší brief — jedna hlavní stopa a dva kratší texty. Brief zůstává zdarma. Redakce je placený magazín. Reklama pro firmy je označená.",
     current: "Aktuální vydání",
     previous: "Předchozí vydání",
     upcoming: "Připravujeme",
@@ -74,7 +74,7 @@ const PACKS: Record<string, NewsletterStandCopy> = {
   sk: {
     kicker: `${NAME} · newsstand`,
     title: "Týždenný brief — aktuálne, archív aj pripravované",
-    lead: "Rovnaká forma ako v e-maile: jedna hlavná stopa a dva kratšie texty. Brief ostáva zadarmo. Redakcia je platený magazín. Reklama pre firmy je označená.",
+    lead: "Na webe je týždenný prehľad. Do schránky ide kratší brief — jedna hlavná stopa a dva kratšie texty. Brief ostáva zadarmo. Redakcia je platený magazín. Reklama pre firmy je označená.",
     current: "Aktuálne vydanie",
     previous: "Predchádzajúce vydania",
     upcoming: "Pripravujeme",
@@ -95,7 +95,7 @@ const PACKS: Record<string, NewsletterStandCopy> = {
   de: {
     kicker: `${NAME} · Newsstand`,
     title: "Wöchentlicher Brief — aktuell, Archiv und Vorschau",
-    lead: "Dieselbe Form wie im Postfach: ein Leittext und zwei kürzere. Der Brief bleibt kostenlos. Die Redaktion ist das bezahlte Magazin. Werbung für Firmen ist gekennzeichnet.",
+    lead: "Auf der Site der wöchentliche Überblick. Im Postfach ein kürzerer Brief: ein Leittext und zwei kürzere. Der Brief bleibt kostenlos. Die Redaktion ist das bezahlte Magazin. Werbung für Firmen ist gekennzeichnet.",
     current: "Aktuelle Ausgabe",
     previous: "Frühere Ausgaben",
     upcoming: "In Vorbereitung",
@@ -116,7 +116,7 @@ const PACKS: Record<string, NewsletterStandCopy> = {
   fr: {
     kicker: `${NAME} · kiosque`,
     title: "Brief hebdomadaire — en cours, archives et à paraître",
-    lead: "La même forme que dans la boîte mail : un texte principal et deux plus courts. Le brief reste gratuit. La rédaction est le magazine payant. La publicité pour les entreprises est signalée.",
+    lead: "Sur le site, le digest hebdomadaire. Dans la boîte mail, un brief plus court : un texte principal et deux plus courts. Le brief reste gratuit. La rédaction est le magazine payant. La publicité pour les entreprises est signalée.",
     current: "Numéro en cours",
     previous: "Numéros précédents",
     upcoming: "À paraître",

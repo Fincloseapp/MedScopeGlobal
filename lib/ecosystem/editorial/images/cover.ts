@@ -19,6 +19,7 @@ export type CoverVisualTopic =
   | "calm"
   | "movement"
   | "seniors"
+  | "skincare"
   | "clinical"
   | "research"
   | "tech"
@@ -37,6 +38,7 @@ const COVER_POOL: Record<CoverVisualTopic, readonly string[]> = {
   calm: ["/assets/covers/calm.webp", "/assets/covers/calm-2.webp"],
   movement: ["/assets/covers/movement.webp", "/assets/covers/movement-2.webp"],
   seniors: ["/assets/covers/seniors.webp", "/assets/covers/walk.webp"],
+  skincare: ["/assets/covers/skincare.webp"],
   clinical: [
     "/assets/covers/clinical.webp",
     "/assets/covers/clinical-2.webp",
@@ -143,6 +145,16 @@ export const VISUAL_TOPIC_KEYWORDS: Record<CoverVisualTopic, readonly string[]> 
     "longévité",
     "dlouhovek",
   ],
+  skincare: [
+    "kosmetik",
+    "pleť",
+    "plet",
+    "skincare",
+    "spf",
+    "retinoid",
+    "hautpflege",
+    "dermocosm",
+  ],
   clinical: ["klinick", "nemoc", "chorob", "lékař", "lekar", "hospital", "ordinac", "diagn"],
   research: [
     "studie",
@@ -218,6 +230,8 @@ export function mapCoverVisualTopicToEditorialTopic(
       return "lifestyle";
     case "seniors":
       return "seniors";
+    case "skincare":
+      return "lifestyle";
     case "clinical":
     case "vitals":
     case "tech":
@@ -303,7 +317,7 @@ const LOCAL_COVER_TOPICS: Partial<
   "/assets/covers/movement-2.webp": ["movement", "walk", "seniors"],
   "/assets/covers/walk.webp": ["walk", "movement", "seniors", "calm"],
   "/assets/covers/seniors.webp": ["seniors", "movement"],
-  "/assets/covers/skincare.webp": ["seniors", "calm"],
+  "/assets/covers/skincare.webp": ["skincare", "seniors", "calm"],
   "/assets/covers/clinical.webp": ["clinical"],
   "/assets/covers/clinical-2.webp": ["clinical", "research", "vitals"],
   "/assets/covers/clinical-3.webp": ["clinical", "research"],
@@ -339,6 +353,7 @@ const COVER_OVERFLOW: Record<CoverVisualTopic, readonly string[]> = {
     "/assets/covers/calm-2.webp",
     "/assets/covers/vitals.webp",
   ],
+  skincare: ["/assets/covers/calm.webp", "/assets/covers/seniors.webp"],
   clinical: [
     "/assets/covers/research-2.webp",
     "/assets/covers/science.webp",
@@ -368,6 +383,10 @@ const MOVEMENT_RE =
 
 const SENIORS_RE =
   /senior|st[aá][rř]nut|aging|ageing|menopauz|menopause|hormon|osteopor|hrt|d[uů]chod|kostn[ií]|[rř][ií]dnut[ií]\s+kost|longevity|healthspan|langleb|long[eé]vit|dlouhov[eě]k/i;
+
+/** Pleť / kosmetika — před seniors, ať „stárnutí pleti“ nevezme zahradní seniors.webp. */
+const SKINCARE_RE =
+  /kosmetik|hautpflege|skincare|dermocosm|soin de la peau|retinoid|\bspf\b|fotoprotek|lichtschutz|(?:^|[^a-z])ple[tť](?:i|í|ov)?\b/i;
 
 const INSTITUTIONAL_RE =
   /\bwho\b|world health|ema\b|fda\b|s[uú]kl|sukl|guideline|doporu[cč]en|recommendation|regulat|institu|diplomat|legal|\bz[aá]kon\b|\bdroit\b|\brecht\b|\bpolicy\b|politik/i;
@@ -434,6 +453,13 @@ export function classifyCoverTopic(input: {
   // 3) Clinical / kids / research before excerpt calm — “cukrovka… stres”, “školní… klid”.
   if (SLEEP_RE.test(titleSlug)) return "sleep";
   if (FOOD_RE.test(titleSlug) || topic.includes("strav")) return "food";
+  if (
+    SKINCARE_RE.test(titleSlug) ||
+    topic.includes("kosmetik") ||
+    topic.includes("skincare")
+  ) {
+    return "skincare";
+  }
   if (SENIORS_RE.test(titleSlug)) return "seniors";
   if (KIDS_RE.test(titleSlug)) return "walk";
   if (VITALS_RE.test(titleSlug)) return "vitals";
@@ -451,6 +477,9 @@ export function classifyCoverTopic(input: {
   if (CALM_RE.test(hay)) return "calm";
   if (FOOD_RE.test(hay)) return "food";
   if (MOVEMENT_RE.test(hay)) return "movement";
+  if (SKINCARE_RE.test(hay) || topic.includes("kosmetik") || topic.includes("skincare")) {
+    return "skincare";
+  }
   if (SENIORS_RE.test(hay)) return "seniors";
   if (KIDS_RE.test(hay)) return "walk";
   if (VITALS_RE.test(hay)) return "vitals";

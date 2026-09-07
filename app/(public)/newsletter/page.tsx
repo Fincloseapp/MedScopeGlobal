@@ -8,6 +8,7 @@ import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getV22LatestNewsletter } from "@/lib/v22/newsletter";
 
 export const revalidate = 120;
 
@@ -26,6 +27,7 @@ export default async function NewsletterPage() {
   const locale = await getServerLocale();
   const copy = getNewsletterCopy(locale);
   const archiveHref = localizePublicHref("/newsletter/archiv", locale);
+  const latest = await getV22LatestNewsletter(locale);
 
   return (
     <ModulePageShell
@@ -34,7 +36,7 @@ export default async function NewsletterPage() {
       description={copy.hubDescription}
       hideIntro
     >
-      <V22NewsletterHub locale={locale} />
+      <V22NewsletterHub locale={locale} coverSeed={latest?.issue_date} />
       <div className="mt-6 flex flex-wrap gap-2 text-sm">
         <Link href={archiveHref} className="rounded-full border border-primary/30 px-3 py-1 text-primary">
           {copy.hubArchive}
