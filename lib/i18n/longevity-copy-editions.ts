@@ -1,7 +1,19 @@
 import type { HomepageLongevityCopy } from "@/lib/i18n/homepage-longevity";
 
 export type LongevityEdition = Partial<
-  Pick<HomepageLongevityCopy, "closer" | "contributeHint" | "title" | "lead" | "readingTitle" | "allArticles" | "dailyTip" | "journal" | "eyebrow">
+  Pick<
+    HomepageLongevityCopy,
+    | "closer"
+    | "contributeHint"
+    | "title"
+    | "lead"
+    | "readingTitle"
+    | "allArticles"
+    | "dailyTip"
+    | "journal"
+    | "eyebrow"
+    | "steps"
+  >
 >;
 
 const EDITIONS: Record<string, LongevityEdition> = {
@@ -9,6 +21,26 @@ const EDITIONS: Record<string, LongevityEdition> = {
     eyebrow: "ViaLongeVita · dlhovekosť",
     title: "Tri pokojné kroky, ktoré redakcia opakuje",
     lead: "Nie sú to sľuby ani protokoly. Sú to návyky z textov, ktoré ViaLongeVita už publikuje — spánok, pohyb, ktorý vydržíte, a jedlo bez honu za zázrakom.",
+    steps: [
+      {
+        title: "Spánok, ktorý drží rytmus",
+        desc: "Rovnaký čas vstávania, tma v noci, bez extrémov. Healthspan začína regeneráciou — nie doplnkom.",
+        href: "/verejnost/clanky?topic=spanek",
+        cta: "Čítať o spánku",
+      },
+      {
+        title: "Pohyb, ktorý vydržíte",
+        desc: "Chôdza, schody, státie pri stole. Menej sedenia každý deň vydá viac ako jednorazový šport.",
+        href: "/verejnost/clanky?topic=zivotni-styl",
+        cta: "Tipy k pohybu",
+      },
+      {
+        title: "Jedlo bez honu za zázrakom",
+        desc: "Bielkoviny, zelenina, stredomorský tanier doma. Dlhovekosť je v návyku.",
+        href: "/verejnost/clanky?topic=vyziva",
+        cta: "Články o výžive",
+      },
+    ],
     readingTitle: "Z redakcie o dlhovekosti",
     allArticles: "Všetky články o dlhovekosti",
     dailyTip: "Dnešný tip",
@@ -21,6 +53,26 @@ const EDITIONS: Record<string, LongevityEdition> = {
     eyebrow: "ViaLongeVita · długowieczność",
     title: "Trzy spokojne kroki, które redakcja powtarza",
     lead: "To nie obietnice i nie protokoły. To nawyki z tekstów, które ViaLongeVita już publikuje — sen, ruch, który wytrzymasz, i jedzenie bez gonitwy za cudem.",
+    steps: [
+      {
+        title: "Sen, który trzyma rytm",
+        desc: "Ta sama pora wstawania, ciemność w nocy, bez ekstremów. Healthspan zaczyna się od regeneracji — nie od suplementu.",
+        href: "/verejnost/clanky?topic=spanek",
+        cta: "Czytaj o śnie",
+      },
+      {
+        title: "Ruch, który wytrzymasz",
+        desc: "Chodzenie, schody, stanie przy biurku. Mniej siedzenia codziennie znaczy więcej niż jednorazowy trening.",
+        href: "/verejnost/clanky?topic=zivotni-styl",
+        cta: "Wskazówki o ruchu",
+      },
+      {
+        title: "Jedzenie bez gonitwy za cudem",
+        desc: "Białko, warzywa, śródziemnomorski talerz w domu. Długowieczność jest w nawyku.",
+        href: "/verejnost/clanky?topic=vyziva",
+        cta: "Artykuły o żywieniu",
+      },
+    ],
     readingTitle: "Z redakcji o długowieczności",
     allArticles: "Wszystkie artykuły o długowieczności",
     dailyTip: "Dzisiejsza wskazówka",
@@ -33,6 +85,26 @@ const EDITIONS: Record<string, LongevityEdition> = {
     eyebrow: "ViaLongeVita · 長寿",
     title: "編集部が繰り返す、静かな三つの歩み",
     lead: "約束でもプロトコルでもありません。ViaLongeVitaがすでに出している習慣です — 睡眠、続けられる動き、奇跡を追わない食事。",
+    steps: [
+      {
+        title: "リズムを守る睡眠",
+        desc: "同じ起床時刻、夜は暗く、極端はなし。ヘルススパンは回復から始まります — サプリからではありません。",
+        href: "/verejnost/clanky?topic=spanek",
+        cta: "睡眠について読む",
+      },
+      {
+        title: "続けられる動き",
+        desc: "歩く、階段、デスクで立つ。毎日少し座らない方が、一度きりの運動より効きます。",
+        href: "/verejnost/clanky?topic=zivotni-styl",
+        cta: "動きのヒント",
+      },
+      {
+        title: "奇跡を追わない食事",
+        desc: "たんぱく質、野菜、家での地中海風の皿。長寿は習慣の中にあります。",
+        href: "/verejnost/clanky?topic=vyziva",
+        cta: "栄養の記事",
+      },
+    ],
     readingTitle: "長寿についての編集部から",
     allArticles: "長寿の記事をすべて",
     dailyTip: "今日のヒント",
@@ -45,6 +117,26 @@ const EDITIONS: Record<string, LongevityEdition> = {
     eyebrow: "ViaLongeVita · долголетие",
     title: "Три спокойных шага, которые повторяет редакция",
     lead: "Это не обещания и не протоколы. Привычки из текстов, которые ViaLongeVita уже публикует — сон, движение, которое выдержите, и еда без погони за чудом.",
+    steps: [
+      {
+        title: "Сон, который держит ритм",
+        desc: "Одно и то же время подъёма, темнота ночью, без крайностей. Healthspan начинается с восстановления — не с добавки.",
+        href: "/verejnost/clanky?topic=spanek",
+        cta: "Читать о сне",
+      },
+      {
+        title: "Движение, которое выдержите",
+        desc: "Ходьба, лестницы, стояние у стола. Меньше сидения каждый день важнее разовой тренировки.",
+        href: "/verejnost/clanky?topic=zivotni-styl",
+        cta: "Советы по движению",
+      },
+      {
+        title: "Еда без погони за чудом",
+        desc: "Белок, овощи, средиземноморская тарелка дома. Долголетие живёт в привычке.",
+        href: "/verejnost/clanky?topic=vyziva",
+        cta: "Статьи о питании",
+      },
+    ],
     readingTitle: "Из редакции о долголетии",
     allArticles: "Все статьи о долголетии",
     dailyTip: "Совет дня",

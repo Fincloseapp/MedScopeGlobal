@@ -472,6 +472,8 @@ assert.ok(!getHomepageLongevityCopy("sk").softCta.includes("Open Editorial"));
 assert.ok(!getHomepageLongevityCopy("sk").closer.includes("Editorial plan"));
 assert.ok(getHomepageLongevityCopy("sk").closer.includes("Redakcia"));
 assert.ok(!getHomepageLongevityCopy("ja").closer.includes("The opening stays readable"));
+assert.ok(!getHomepageLongevityCopy("sk").steps.some((step) => step.title.includes("Sleep that holds")));
+assert.equal(getHomepageLongevityCopy("ja").steps[0]?.title, "リズムを守る睡眠");
 assert.equal(getShareCopy("sk").clipsSubscribe, "Otvoriť tarif Redakcia");
 assert.equal(getShareCopy("ja").clipsSubscribe, "編集部プランを開く");
 assert.equal(getRevenueCopy("sk").subscribeCta, "Otvoriť tarif Redakcia");
