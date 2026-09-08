@@ -2168,7 +2168,7 @@ assert.ok(
 {
   const archiveSrc = readFileSync(join(root, "lib/queries/v4c/newsletters.ts"), "utf8");
   assert.ok(archiveSrc.includes("NEWSLETTER_INDEX_COLUMNS"));
-  assert.ok(archiveSrc.includes("admin ? \"*\" : NEWSLETTER_INDEX_COLUMNS"));
+  assert.ok(archiveSrc.includes(".select(\"*\")"));
   assert.ok(archiveSrc.includes(".limit(12)"));
   assert.ok(archiveSrc.includes("publicNewsletterClient"));
   assert.ok(archiveSrc.includes("getLatestNewsletterCard"));

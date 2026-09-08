@@ -34,11 +34,11 @@ async function publicNewsletterClient() {
   return tryCreateServiceRoleClient();
 }
 
-async function withBudget<T>(work: PromiseLike<T>, fallback: T, ms = 6000): Promise<T> {
+async function withBudget<T>(run: () => Promise<T>, fallback: T, ms = 6000): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     return await Promise.race([
-      Promise.resolve(work),
+      run(),
       new Promise<T>((resolve) => {
         timer = setTimeout(() => resolve(fallback), ms);
       }),
@@ -73,19 +73,18 @@ export function newsletterRowLocale(row: Pick<NewsletterRow, "slug" | "layout_js
 async function pickLatestIndexRow(locale?: string): Promise<NewsletterRow | null> {
   const supabase = await publicNewsletterClient();
   if (!supabase) return null;
-  const result = await withBudget(
-    supabase
+  const data = await withBudget(async () => {
+    const { data: rows } = await supabase
       .from("newsletters")
       .select(NEWSLETTER_INDEX_COLUMNS)
       .eq("published", true)
       .eq("admin_only", false)
       .order("issue_date", { ascending: false })
-      .limit(locale ? 48 : 1),
-    { data: null, error: { message: "timeout" } }
-  );
-  const data = "data" in result ? result.data : null;
-  if (!data?.length) return null;
-  const rows = (data as NewsletterRow[]).map((row) => asIndexRow(row));
+      .limit(locale ? 48 : 1);
+    return (rows ?? []) as NewsletterRow[];
+  }, []);
+  if (!data.length) return null;
+  const rows = data.map((row) => asIndexRow(row));
   if (!locale) return rows[0] ?? null;
   const resolved = resolveGlobalLocale(locale);
   const preferredSlug = newsletterIssueSlug(new Date().toISOString().slice(0, 10), resolved);
@@ -108,18 +107,17 @@ export async function getLatestNewsletter(locale?: string) {
   if (!picked) return null;
   const supabase = await publicNewsletterClient();
   if (!supabase) return picked;
-  const result = await withBudget(
-    supabase
+  const full = await withBudget(async () => {
+    const { data } = await supabase
       .from("newsletters")
       .select("*")
       .eq("slug", picked.slug)
       .eq("published", true)
       .eq("admin_only", false)
-      .maybeSingle(),
-    { data: null }
-  );
-  const full = "data" in result ? result.data : null;
-  return (full as NewsletterRow | null) ?? picked;
+      .maybeSingle();
+    return (data as NewsletterRow | null) ?? null;
+  }, null);
+  return full ?? picked;
 }
 
 export async function getNewsletterBySlug(slug: string) {
@@ -169,16 +167,21 @@ export async function getPendingNewsletterTopics() {
 export async function getNewsletterArchive(admin = false, locale?: string) {
   const supabase = admin ? createServiceRoleClient() : await publicNewsletterClient();
   if (!supabase) return [];
-  let q = supabase
-    .from("newsletters")
-    .select(admin ? "*" : NEWSLETTER_INDEX_COLUMNS)
-    .order("issue_date", { ascending: false });
-  if (!admin) {
-    q = q.eq("published", true).eq("admin_only", false).limit(12);
-  }
-  const result = await withBudget(q, { data: [], error: { message: "timeout" } });
-  const data = "data" in result ? result.data : [];
-  const rows = ((data ?? []) as NewsletterRow[]).map((row) => asIndexRow(row));
+  const data = await withBudget(async () => {
+    if (admin) {
+      const { data: rows } = await supabase.from("newsletters").select("*").order("issue_date", { ascending: false });
+      return (rows ?? []) as unknown as NewsletterRow[];
+    }
+    const { data: rows } = await supabase
+      .from("newsletters")
+      .select(NEWSLETTER_INDEX_COLUMNS)
+      .eq("published", true)
+      .eq("admin_only", false)
+      .order("issue_date", { ascending: false })
+      .limit(12);
+    return (rows ?? []) as unknown as NewsletterRow[];
+  }, []);
+  const rows = data.map((row) => asIndexRow(row));
   if (admin || !locale) return rows;
   const resolved = resolveGlobalLocale(locale);
   const matching = rows.filter((row) => newsletterRowLocale(row) === resolved);
