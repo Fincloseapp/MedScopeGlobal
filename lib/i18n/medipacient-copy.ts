@@ -3,7 +3,10 @@
  * Czech demo reports stay on /cs only — do not dump Czech diagnoses on other editions.
  */
 
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { medipacientEdition } from "@/lib/i18n/medipacient-editions";
 
 export type MedipacientStep = {
   n: string;
@@ -37,7 +40,7 @@ export type MedipacientCopy = {
   downloadPageBack: string;
 };
 
-type PackCopy = Omit<MedipacientCopy, "showDemoReports" | "premiumTitle" | "subscribeCta"> & {
+export type PackCopy = Omit<MedipacientCopy, "showDemoReports" | "premiumTitle" | "subscribeCta"> & {
   premiumTitle: string;
   subscribeCta: string;
 };
@@ -354,7 +357,9 @@ export function getMedipacientCopy(
   locale?: string | null,
   priced?: { premium: string }
 ): MedipacientCopy {
-  const raw = PACK[chromePack(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : medipacientEdition(primary);
+  const raw = edition ? { ...PACK[chromePack(locale)], ...edition } : PACK[chromePack(locale)];
   const premium = priced?.premium ?? "";
   return {
     ...raw,

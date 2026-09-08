@@ -572,6 +572,11 @@ assert.ok(!getVerejnostChrome("ja").interviewsLead.includes("plain language"));
 assert.ok(!getMediflowCopy("sk").metaTitle.includes("Your personal wellness"));
 assert.equal(getMediflowCopy("pl").startCta, "Otwórz MediFlow");
 assert.ok(!getMediflowCopy("ja").downloadPageSteps.join(" ").includes("Add to Home Screen"));
+assert.ok(!getLekyHubCopy("sk").title.includes("Medicines and pharmacotherapy"));
+assert.equal(getLekyHubCopy("pl").approved, "Zatwierdzone preparaty");
+assert.ok(!getMedipacientCopy("sk").title.includes("clearly at hand"));
+assert.ok(!getMedipacientCopy("sk").showDemoReports);
+assert.equal(getMedipacientCopy("ja").downloadCta.includes("MeDipacient"), true);
 assert.equal(getVerejnostChrome("sk").hubs.clanky.title, "Články pre všetkých");
 assert.ok(!getVerejnostChrome("ja").teaserContinue.includes("Editorial plan"));
 

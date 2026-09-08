@@ -1,4 +1,7 @@
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { lekyHubEdition } from "@/lib/i18n/leky-hub-editions";
 
 export type LekyHubCopy = {
   metaTitle: string;
@@ -160,5 +163,9 @@ const PACK: Record<ChromePack, LekyHubCopy> = {
 };
 
 export function getLekyHubCopy(locale?: string | null): LekyHubCopy {
-  return PACK[chromePack(locale)];
+  const base = PACK[chromePack(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : lekyHubEdition(primary);
+  if (!edition) return base;
+  return { ...base, ...edition, links: edition.links ?? base.links };
 }
