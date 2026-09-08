@@ -1,4 +1,7 @@
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { novinkyEdition } from "@/lib/i18n/novinky-editions";
 
 export type NovinkyTagId = "revmatologie" | "univerzity" | "vyzkum" | "kalendar";
 
@@ -213,7 +216,16 @@ const PACK: Record<ChromePack, NovinkyCopy> = {
 };
 
 export function getNovinkyCopy(locale?: string | null): NovinkyCopy {
-  return PACK[chromePack(locale)];
+  const base = PACK[chromePack(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : novinkyEdition(primary);
+  if (!edition?.tags) return base;
+  const tags = { ...base.tags };
+  for (const [key, overlay] of Object.entries(edition.tags)) {
+    const id = key as keyof NovinkyCopy["tags"];
+    if (tags[id] && overlay) tags[id] = { ...tags[id], ...overlay };
+  }
+  return { ...base, tags };
 }
 
 export function novinkyTagsForLocale(locale?: string | null) {

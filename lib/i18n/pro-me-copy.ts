@@ -1,4 +1,7 @@
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { proMeEdition } from "@/lib/i18n/pro-me-editions";
 
 export type ProMeAudience = "lekari" | "pacienti" | "vyzkum" | "legislativa";
 
@@ -285,5 +288,16 @@ const PACK: Record<ChromePack, ProMeCopy> = {
 };
 
 export function getProMeCopy(locale?: string | null): ProMeCopy {
-  return PACK[chromePack(locale)];
+  const base = PACK[chromePack(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : proMeEdition(primary);
+  if (!edition) return base;
+  const audiences = { ...base.audiences };
+  if (edition.audiences) {
+    for (const [key, overlay] of Object.entries(edition.audiences)) {
+      const id = key as keyof ProMeCopy["audiences"];
+      if (audiences[id] && overlay) audiences[id] = { ...audiences[id], ...overlay };
+    }
+  }
+  return { ...base, ...edition, audiences };
 }

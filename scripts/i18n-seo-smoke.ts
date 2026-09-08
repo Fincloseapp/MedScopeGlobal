@@ -18,6 +18,7 @@ import { normalizeLocale } from "../lib/i18n/config";
 import { getHomepageTitle, getMagazineListingCopy, getMagazineSearchCopy, getOgLocale } from "../lib/brand/magazine";
 import { getFirmyDeskCopy } from "../lib/i18n/firmy-desk-copy";
 import { getProMeCopy } from "../lib/i18n/pro-me-copy";
+import { getStudieHubCopy } from "../lib/i18n/studie-hub-copy";
 import { getOdborneHubCopy } from "../lib/i18n/odborne-hub-copy";
 import { getNotFoundCopy } from "../lib/i18n/not-found-copy";
 import { getLegalChromeCopy } from "../lib/i18n/legal-chrome-copy";
@@ -577,6 +578,10 @@ assert.equal(getLekyHubCopy("pl").approved, "Zatwierdzone preparaty");
 assert.ok(!getMedipacientCopy("sk").title.includes("clearly at hand"));
 assert.ok(!getMedipacientCopy("sk").showDemoReports);
 assert.equal(getMedipacientCopy("ja").downloadCta.includes("MeDipacient"), true);
+assert.ok(!getStudieHubCopy("sk").title.includes("rheumatology"));
+assert.equal(getProMeCopy("sk").title, "Pre mňa");
+assert.ok(!getProMeCopy("ja").audiences.lekari.description.includes("14 days free"));
+assert.equal(getNovinkyCopy("pl").tags.vyzkum.label, "Badania");
 assert.equal(getVerejnostChrome("sk").hubs.clanky.title, "Články pre všetkých");
 assert.ok(!getVerejnostChrome("ja").teaserContinue.includes("Editorial plan"));
 

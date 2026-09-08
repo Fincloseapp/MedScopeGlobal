@@ -1,4 +1,7 @@
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { studieHubEdition } from "@/lib/i18n/studie-hub-editions";
 
 export type StudieHubCopy = {
   metaTitle: string;
@@ -217,5 +220,8 @@ const PACK: Record<ChromePack, StudieHubCopy> = {
 };
 
 export function getStudieHubCopy(locale?: string | null): StudieHubCopy {
-  return PACK[chromePack(locale)];
+  const base = PACK[chromePack(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : studieHubEdition(primary);
+  return edition ? { ...base, ...edition } : base;
 }
