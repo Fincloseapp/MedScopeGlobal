@@ -567,6 +567,11 @@ assert.ok(!getArticleChrome("ja").related.includes("Related reading"));
 assert.equal(getInstallPwaCopy("sk").download, "Stiahnuť");
 assert.ok(!getInstallPwaCopy("pl").ios2.includes("Add to Home Screen"));
 assert.ok(!getInstallPwaCopy("ja").howTitle.includes("How to install"));
+assert.ok(!getVerejnostChrome("sk").topicFilterLead.includes("plain language"));
+assert.ok(!getVerejnostChrome("ja").interviewsLead.includes("plain language"));
+assert.ok(!getMediflowCopy("sk").metaTitle.includes("Your personal wellness"));
+assert.equal(getMediflowCopy("pl").startCta, "Otwórz MediFlow");
+assert.ok(!getMediflowCopy("ja").downloadPageSteps.join(" ").includes("Add to Home Screen"));
 assert.equal(getVerejnostChrome("sk").hubs.clanky.title, "Články pre všetkých");
 assert.ok(!getVerejnostChrome("ja").teaserContinue.includes("Editorial plan"));
 

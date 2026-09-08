@@ -3,7 +3,10 @@
  * VIP stays a secondary link — not a paid gate in the hero.
  */
 
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { mediflowEdition } from "@/lib/i18n/mediflow-editions";
 
 export type MediflowDiaryRow = { label: string; detail: string };
 export type MediflowPillar = { title: string; description: string };
@@ -392,5 +395,16 @@ const PACK: Record<ChromePack, MediflowCopy> = {
 };
 
 export function getMediflowCopy(locale?: string | null): MediflowCopy {
-  return PACK[chromePack(locale)];
+  const base = PACK[chromePack(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : mediflowEdition(primary);
+  if (!edition) return base;
+  return {
+    ...base,
+    ...edition,
+    diaryRows: edition.diaryRows ?? base.diaryRows,
+    mobileRows: edition.mobileRows ?? base.mobileRows,
+    pillars: edition.pillars ?? base.pillars,
+    downloadPageSteps: edition.downloadPageSteps ?? base.downloadPageSteps,
+  };
 }

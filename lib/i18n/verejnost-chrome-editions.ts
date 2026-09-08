@@ -14,6 +14,18 @@ export type VerejnostEdition = Partial<
     | "videoOverlayHeadline"
     | "videoOverlayCta"
     | "videoOverlayBody"
+    | "topicFilterLead"
+    | "allArticlesLead"
+    | "temataEyebrow"
+    | "temataTitle"
+    | "temataLead"
+    | "interviewsEyebrow"
+    | "interviewsTitle"
+    | "interviewsLead"
+    | "articlesNavTitle"
+    | "articlesNavDesc"
+    | "notMedicalAdvice"
+    | "emptyListing"
   >
 > & {
   hubs?: Partial<{
@@ -34,6 +46,18 @@ const EDITIONS: Record<string, VerejnostEdition> = {
     videoOverlayHeadline: "Pokračovať s tarifom Redakcia",
     videoOverlayCta: "Otvoriť tarif Redakcia",
     videoOverlayBody: "Začiatok lekcie ostáva otvorený. Magazín a ďalšie čítanie otvára Redakcia.",
+    topicFilterLead: "Články v tejto rubrike — zrozumiteľne, s redakčnou kontrolou.",
+    allArticlesLead: "Prehliadajte podľa témy alebo zobrazte všetky publikované články.",
+    temataEyebrow: "Katalóg",
+    temataTitle: "Všetky témy verejného zdravia",
+    temataLead: "Vyberte oblasť, ktorá vás zaujíma — každá téma má zrozumiteľné články pre každého.",
+    interviewsEyebrow: "Rozhovory",
+    interviewsTitle: "Rozhovory s odborníkmi",
+    interviewsLead: "Lekári, psychológovia a špecialisti vysvetľujú prevenciu zrozumiteľne.",
+    articlesNavTitle: "Najnovšie z verejného magazínu",
+    articlesNavDesc: "Dlhé texty z toho istého stola — zrozumiteľne, s redakčnou kontrolou a overiteľnými zdrojmi.",
+    notMedicalAdvice: "Tieto informácie nenahrádzajú lekársku starostlivosť · medscopeglobal.com",
+    emptyListing: "Verejné články tu čoskoro pribudnú — sledujte medscopeglobal.com.",
     hubs: {
       clanky: {
         title: "Články pre všetkých",
@@ -52,6 +76,13 @@ const EDITIONS: Record<string, VerejnostEdition> = {
     allArticles: "Wszystkie artykuły",
     videoOverlayHeadline: "Kontynuuj z planem Redakcja",
     videoOverlayCta: "Otwórz plan Redakcja",
+    topicFilterLead: "Artykuły w tej rubryce — jasnym językiem, z recenzją redakcyjną.",
+    temataTitle: "Wszystkie tematy zdrowia publicznego",
+    temataLead: "Wybierz obszar — każdy temat ma artykuły jasnym językiem.",
+    interviewsTitle: "Rozmowy z ekspertami",
+    interviewsLead: "Lekarze, psycholodzy i specjaliści wyjaśniają profilaktykę jasnym językiem.",
+    articlesNavDesc: "Długie teksty z tego samego biurka — jasnym językiem, recenzja redakcyjna.",
+    notMedicalAdvice: "Te informacje nie zastępują opieki lekarskiej · medscopeglobal.com",
     hubs: {
       clanky: {
         title: "Artykuły dla wszystkich",
@@ -69,6 +100,13 @@ const EDITIONS: Record<string, VerejnostEdition> = {
     allArticles: "すべての記事",
     videoOverlayHeadline: "編集部プランで続ける",
     videoOverlayCta: "編集部プランを開く",
+    topicFilterLead: "この欄の記事 — わかりやすく、編集審査済み。",
+    temataTitle: "公衆衛生のすべてのテーマ",
+    temataLead: "気になる分野を選ぶ — どのテーマもわかりやすい記事があります。",
+    interviewsTitle: "専門家インタビュー",
+    interviewsLead: "医師、心理士、専門家が予防をわかりやすく説明します。",
+    articlesNavDesc: "同じデスクの長文 — わかりやすく、編集審査、確認できる出典。",
+    notMedicalAdvice: "この情報は医療の代わりではありません · medscopeglobal.com",
     hubs: {
       clanky: {
         title: "すべての人向け記事",
