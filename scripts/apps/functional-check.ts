@@ -512,7 +512,7 @@ file("lib/v22/homepage-cache.ts");
   assert.ok(home.includes("toISOString().slice(0, 10)"), "homepage data cache must roll with the UTC day");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
   assert.ok(home.includes("courtesyBorrow: 2"), "non-CS homepage must not dump a Czech borrow pile");
-  assert.ok(home.includes("4_000"), "homepage must fail open before 12s Worker budget");
+  assert.ok(home.includes("1_500"), "homepage must fail open before the Worker budget");
   assert.ok(home.includes("Promise.all"), "magazine + aktuality must load in parallel");
   assert.ok(!home.includes('"content"'), "homepage cards must not pull full article HTML");
 }
@@ -838,7 +838,7 @@ file("lib/monetization/payout-map.ts");
   assert.ok(security.includes("isAdminGateOpen"));
   assert.ok(security.includes('redirect("/admin/login")'));
   assert.ok(!security.includes("requireAdmin()"));
-  assert.ok(security.includes("2_500"), "security dashboard must fail open after 2.5s");
+  assert.ok(security.includes("1_200"), "security dashboard must fail open after 1.2s");
   const serviceRole = readFileSync(join(root, "lib/supabase/service.ts"), "utf8");
   assert.ok(serviceRole.includes("SERVICE_ROLE_FETCH_MS"));
   assert.ok(serviceRole.includes("AbortController"), "service-role fetch must abort so Workers can finish");
@@ -1464,7 +1464,7 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "components/verejnost/daily-tip-banner.tsx"), "utf8").includes(
-    "1_500"
+    "600"
   ),
   "Veřejnost daily tip must not block the hub when osveta video/DB hangs"
 );

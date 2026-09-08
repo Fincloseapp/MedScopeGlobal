@@ -155,7 +155,9 @@ export async function getLatestArticles(
     const load = (async () => {
       const { data, error } = await supabase
         .from("articles")
-        .select(articleSelect)
+        .select(
+          "id, title, slug, excerpt, cover_image_url, published, published_at, created_at, locale, vip_only, audience, public_topic, rubric_slug, metadata, category_id, min_access_level, source_name, categories ( id, name, slug )"
+        )
         .eq("published", true)
         .order("published_at", { ascending: false, nullsFirst: false })
         .range(offset, offset + fetchLimit - 1);
@@ -164,7 +166,7 @@ export async function getLatestArticles(
         console.error("getLatestArticles", error);
         return demo();
       }
-      const rows = mapArticleList(data as Record<string, unknown>[] | null);
+      const rows = mapArticleList(data as unknown as Record<string, unknown>[] | null);
       const filtered = mergeNativeDeskFeed(
         filterMagazineListableArticles(
           filterForReader(rows, isVip, accessLevel, locale)
@@ -173,7 +175,7 @@ export async function getLatestArticles(
       );
       const prepared = await prepareArticlesForDisplay(filtered, locale, {
         mode: "card",
-        maxTranslate: Math.min(limit, 4),
+        maxTranslate: 0,
         maxLive: 0,
       });
       const slice = prepared.slice(0, limit);
@@ -183,7 +185,7 @@ export async function getLatestArticles(
     return await Promise.race([
       load,
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("latest-articles-timeout")), 3_000);
+        timer = setTimeout(() => reject(new Error("latest-articles-timeout")), 1_500);
       }),
     ]);
   } catch (error) {
@@ -620,7 +622,8 @@ export async function listWireZpravyCards(
 /** Same pool as `/aktualni-zpravy` — no invented titles. */
 export async function listAktualitySection(
   limit = 24,
-  locale: LocaleCode = "cs"
+  locale: LocaleCode = "cs",
+  opts?: { maxTranslate?: number }
 ): Promise<DisplayArticle[]> {
   const supabase = await createDataClient();
   if (!supabase) return [];
@@ -636,7 +639,7 @@ export async function listAktualitySection(
   );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
-    maxTranslate: Math.min(limit, 8),
+    maxTranslate: opts?.maxTranslate ?? 0,
     maxLive: 0,
   });
   return prepared.slice(0, limit);

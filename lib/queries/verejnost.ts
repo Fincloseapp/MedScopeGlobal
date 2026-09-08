@@ -36,6 +36,29 @@ const articleSelect = `
   users!author_id ( id, full_name, avatar_url )
 `;
 
+const publicCardSelect = [
+  "id",
+  "title",
+  "slug",
+  "excerpt",
+  "cover_image_url",
+  "published",
+  "published_at",
+  "created_at",
+  "updated_at",
+  "locale",
+  "vip_only",
+  "audience",
+  "public_topic",
+  "rubric_slug",
+  "metadata",
+  "category_id",
+  "author_id",
+  "min_access_level",
+  "source_name",
+  "categories ( id, name, slug )",
+].join(", ");
+
 export async function listPublicArticles(options?: {
   topic?: PublicTopic | null;
   limit?: number;
@@ -87,7 +110,7 @@ export async function listPublicArticles(options?: {
     const load = (async () => {
       let q = supabase
         .from("articles")
-        .select(articleSelect)
+        .select(publicCardSelect)
         .eq("published", true)
         .eq("audience", "public")
         .like("slug", "verejnost-%")
@@ -107,7 +130,7 @@ export async function listPublicArticles(options?: {
       const rows = mergeNativeDeskFeed(
         filterArticlesForLocale(
           filterMagazineListableArticles(
-            mapArticleList(data as Record<string, unknown>[] | null) as ArticleWithRelations[]
+            mapArticleList(data as unknown as Record<string, unknown>[] | null) as ArticleWithRelations[]
           ),
           locale
         ),
@@ -119,7 +142,8 @@ export async function listPublicArticles(options?: {
       const mode = options?.mode ?? "card";
       const prepared = await prepareArticlesForDisplay(rows.slice(0, limit), locale, {
         mode,
-        maxTranslate: Math.min(limit, 8),
+        maxTranslate: 0,
+        maxLive: 0,
       });
       const { resolveVerejnostCoverUrl } = await import("@/lib/verejnost/resolve-cover");
       const { assignUniqueListingCovers } = await import(
@@ -133,7 +157,7 @@ export async function listPublicArticles(options?: {
     return await Promise.race([
       load,
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("public-articles-timeout")), 4_000);
+        timer = setTimeout(() => reject(new Error("public-articles-timeout")), 1_500);
       }),
     ]);
   } catch (error) {

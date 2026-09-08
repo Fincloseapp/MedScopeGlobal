@@ -104,7 +104,7 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
   };
 
   const [aktuality, magazine] = await Promise.all([
-    listAktualitySection(16, localeKey),
+    listAktualitySection(16, localeKey, { maxTranslate: 0 }),
     fetchMagazine(),
   ]);
   const wire = rankAktualityByDate(
@@ -164,8 +164,8 @@ async function loadHomepageData(locale: string): Promise<{
   midAds: AdRow[];
   bottomAds: AdRow[];
 }> {
-  const articles = await loadArticlesPublic(locale);
-  const [topAds, midAds, bottomAds] = await Promise.all([
+  const [articles, topAds, midAds, bottomAds] = await Promise.all([
+    loadArticlesPublic(locale),
     loadAds("homepage_top", 1),
     loadAds("homepage_mid", 1),
     loadAds("homepage_bottom", 1),
@@ -195,7 +195,7 @@ async function loadHomepageDataOrFallback(locale: string) {
     return await Promise.race([
       loadHomepageData(locale),
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("homepage-timeout")), 4_000);
+        timer = setTimeout(() => reject(new Error("homepage-timeout")), 1_500);
       }),
     ]);
   } catch (error) {
@@ -206,8 +206,18 @@ async function loadHomepageDataOrFallback(locale: string) {
   }
 }
 
+const homepageMemory = new Map<
+  string,
+  { expires: number; value: Awaited<ReturnType<typeof loadHomepageDataOrFallback>> }
+>();
+
 export function getHomepageCachedData(locale = "cs") {
   const day = new Date().toISOString().slice(0, 10);
-  void ["v22-homepage-public-v23-78-open", locale, day, "medscope-ui-v23.78"];
-  return loadHomepageDataOrFallback(locale);
+  const key = ["v22-homepage-public-v23-78-open", locale, day, "medscope-ui-v23.78"].join(":");
+  const hit = homepageMemory.get(key);
+  if (hit && hit.expires > Date.now()) return Promise.resolve(hit.value);
+  return loadHomepageDataOrFallback(locale).then((value) => {
+    homepageMemory.set(key, { expires: Date.now() + 60_000, value });
+    return value;
+  });
 }

@@ -122,7 +122,7 @@ export async function loadEditorialPulse(): Promise<EditorialPulse> {
     return await Promise.race([
       loadEditorialPulseUnsafe(admin),
       new Promise<EditorialPulse>((resolve) => {
-        timer = setTimeout(() => resolve(emptyPulse()), 2_500); // editorial-pulse-timeout
+        timer = setTimeout(() => resolve(emptyPulse()), 1_200); // editorial-pulse-timeout
       }),
     ]);
   } finally {
@@ -158,7 +158,7 @@ export async function loadEditorialPulseUnsafe(
         .eq("published", true)
         .gte("published_at", since7d)
         .order("published_at", { ascending: false, nullsFirst: false })
-        .limit(2000),
+        .limit(300),
       admin
         .from("articles")
         .select("id", { count: "exact", head: true })

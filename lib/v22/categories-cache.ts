@@ -1,10 +1,8 @@
-import { unstable_cache } from "next/cache";
 import { MEDICAL_CATEGORIES } from "@/lib/config/categories-seed";
 import { localizeCategories } from "@/lib/i18n/category-label";
 import type { LocaleCode } from "@/lib/i18n/config";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { buildV20CategoryList } from "@/lib/v20/categories";
-import { V20_ARCHIVE_CUTOFF } from "@/lib/v20/content-rules";
 import type { Category } from "@/types/database";
 
 const MEDICAL_SLUGS = new Set<string>(MEDICAL_CATEGORIES.map((c) => c.slug));
@@ -24,7 +22,7 @@ async function loadCategoriesRaw(): Promise<Category[]> {
 
   const { data, error } = await supabase
     .from("categories")
-    .select("*")
+    .select("id, name, slug, description, created_at")
     .order("name", { ascending: true });
 
   if (error) {
@@ -37,64 +35,18 @@ async function loadCategoriesRaw(): Promise<Category[]> {
   return medical.length > 0 ? medical : rows;
 }
 
-async function loadArticleCountsBySlug(categories: Category[]): Promise<Record<string, number>> {
-  const counts: Record<string, number> = {};
-  for (const cat of categories) {
-    counts[cat.slug] = 0;
-  }
-
-  if (categories.length === 0) return counts;
-
-  const supabase = tryCreateServiceRoleClient();
-  if (!supabase) return counts;
-
-  const idToSlug = Object.fromEntries(categories.map((c) => [c.id, c.slug]));
-  const { data, error } = await supabase
-    .from("articles")
-    .select("category_id")
-    .eq("published", true)
-    .gte("published_at", V20_ARCHIVE_CUTOFF)
-    .in(
-      "category_id",
-      categories.map((c) => c.id)
-    );
-
-  if (error) {
-    console.error("loadArticleCountsBySlug", error);
-    return counts;
-  }
-
-  for (const row of data ?? []) {
-    const slug = idToSlug[row.category_id as string];
-    if (slug) counts[slug] = (counts[slug] ?? 0) + 1;
-  }
-
-  return counts;
-}
-
 async function loadPublicHeaderCategories(locale: LocaleCode): Promise<Category[]> {
   const raw = await loadCategoriesRaw();
   const localized = await localizeCategories(raw, locale);
   const dbNames = Object.fromEntries(localized.map((c) => [c.slug, c.name]));
-  const counts = await loadArticleCountsBySlug(raw);
-
-  let nonEmpty = buildV20CategoryList(counts, dbNames);
-  if (nonEmpty.length === 0) {
-    nonEmpty = buildV20CategoryList(
-      Object.fromEntries(localized.map((c) => [c.slug, 1])),
-      dbNames
-    ).map((item) => ({ ...item, count: counts[item.slug] ?? 0 }));
-  }
-
-  const activeSlugs = new Set(nonEmpty.map((c) => c.slug));
+  // Nav only needs names. Counting every published article blocked every public page.
+  const present = Object.fromEntries(localized.map((c) => [c.slug, 1]));
+  const nonEmpty = buildV20CategoryList(present, dbNames);
+  const activeSlugs = new Set(
+    (nonEmpty.length > 0 ? nonEmpty : localized).map((c) => c.slug)
+  );
   return localized.filter((c) => activeSlugs.has(c.slug));
 }
-
-const getPublicHeaderCategoriesCached = unstable_cache(
-  loadPublicHeaderCategories,
-  ["v22-public-header-categories"],
-  { revalidate: 120, tags: ["medscope-ui-v22.4", "v22-content", "categories"] }
-);
 
 function seedHeaderCategories(locale: LocaleCode): Category[] {
   const isCs = locale === "cs" || locale.toLowerCase().startsWith("cs");
@@ -108,15 +60,21 @@ function seedHeaderCategories(locale: LocaleCode): Category[] {
   })) as Category[];
 }
 
+const headerMemory = new Map<string, { expires: number; value: Category[] }>();
+
 export async function getPublicHeaderCategories(locale: LocaleCode = "cs") {
+  const cached = headerMemory.get(locale);
+  if (cached && cached.expires > Date.now()) return cached.value;
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
-    return await Promise.race([
-      getPublicHeaderCategoriesCached(locale),
+    const value = await Promise.race([
+      loadPublicHeaderCategories(locale),
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("header-categories-timeout")), 2_000);
+        timer = setTimeout(() => reject(new Error("header-categories-timeout")), 400);
       }),
     ]);
+    headerMemory.set(locale, { expires: Date.now() + 120_000, value });
+    return value;
   } catch (error) {
     console.error("getPublicHeaderCategories", error);
     return seedHeaderCategories(locale);

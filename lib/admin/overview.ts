@@ -149,7 +149,8 @@ export async function loadAdminCategoryRows(opts?: {
     const { data: articles } = await client
       .from("articles")
       .select("category_id, published")
-      .in("category_id", ids);
+      .in("category_id", ids)
+      .limit(1500);
     for (const article of articles ?? []) {
       const bucket = counts.get(article.category_id as string);
       if (!bucket) continue;
@@ -261,7 +262,7 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
         loadOverviewV27(client),
       ]),
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("admin-overview-timeout")), 5_000);
+        timer = setTimeout(() => reject(new Error("admin-overview-timeout")), 2_000);
       }),
     ]);
   } catch {

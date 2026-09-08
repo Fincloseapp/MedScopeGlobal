@@ -26,7 +26,7 @@ export default async function AdminNewsletterPage() {
         getNewsletterOpsSnapshot(),
       ]),
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("admin-newsletter-timeout")), 4_000);
+        timer = setTimeout(() => reject(new Error("admin-newsletter-timeout")), 1_500);
       }),
     ]);
   } catch {

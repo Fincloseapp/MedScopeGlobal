@@ -2,7 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { getServiceRoleKey } from "@/lib/env";
 
 /** Per-request abort so Cloudflare Workers can finish after Promise.race. */
-export const SERVICE_ROLE_FETCH_MS = 4_000;
+export const SERVICE_ROLE_FETCH_MS = 1_500;
 
 function resolveServiceUrl(): string {
   const url =

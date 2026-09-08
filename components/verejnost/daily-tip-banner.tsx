@@ -67,7 +67,7 @@ export async function DailyTipBanner() {
     return await Promise.race([
       renderDailyTipBanner(),
       new Promise<null>((resolve) => {
-        timer = setTimeout(() => resolve(null), 1_500);
+        timer = setTimeout(() => resolve(null), 600);
       }),
     ]);
   } catch (error) {

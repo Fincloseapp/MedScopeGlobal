@@ -33,7 +33,7 @@ export default async function AdminSecurityLogsPage() {
             ),
         ]),
         new Promise<[{ data: typeof emptyLogs.data }, { data: typeof emptyHealth.data }]>((resolve) => {
-          setTimeout(() => resolve([emptyLogs, emptyHealth]), 2_500);
+          setTimeout(() => resolve([emptyLogs, emptyHealth]), 1_200);
         }),
       ])
     : [emptyLogs, emptyHealth];

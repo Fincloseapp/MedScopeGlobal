@@ -56,7 +56,7 @@ function healthClass(published: number): string {
 }
 
 export default async function AdminCategoriesPage() {
-  const categories = await loadAdminCategoryRows();
+  const categories = await loadAdminCategoryRows({ skipEnsure: true });
   const missing = missingEditorialSlugs(categories.map((row) => row.slug));
   const desks = categories.filter((row) => categoryKindLabel(row.slug) === "Redakční desk");
   const specialties = categories.filter((row) => categoryKindLabel(row.slug) === "Lékařský obor");
@@ -104,8 +104,7 @@ export default async function AdminCategoriesPage() {
           <p className="font-medium">V databázi chybí {missing.length} kanonických kategorií.</p>
           <p className="mt-1 text-amber-800">{missing.join(", ")}</p>
           <p className="mt-1">
-            Chybějící řádky se doplní při otevření této stránky. Tlačítko nahoře sjednotí české
-            názvy a nic použitého nesmaže.
+            Chybějící řádky doplní tlačítko nahoře. Nic použitého se nesmaže.
           </p>
         </div>
       ) : (

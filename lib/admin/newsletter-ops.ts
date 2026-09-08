@@ -131,7 +131,7 @@ export async function getNewsletterOpsSnapshot(): Promise<NewsletterOpsSnapshot>
     const packed = await Promise.race([
       Promise.all([getPendingNewsletterTopics(), getNewsletterArchive(true)]),
       new Promise<never>((_, reject) => {
-        opsTimer = setTimeout(() => reject(new Error("newsletter-ops-timeout")), 2_500);
+        opsTimer = setTimeout(() => reject(new Error("newsletter-ops-timeout")), 1_200);
       }),
     ]);
     topics = packed[0];

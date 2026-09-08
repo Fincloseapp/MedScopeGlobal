@@ -70,7 +70,7 @@ function mapBalance(rows: { amount: number; currency: string }[]): StripeBalance
   return rows.map((row) => ({ amount: row.amount, currency: row.currency }));
 }
 
-const STRIPE_SNAPSHOT_MS = 4_000;
+const STRIPE_SNAPSHOT_MS = 1_500;
 
 async function withTimeout<T>(run: Promise<T>, fallback: T, ms: number): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;

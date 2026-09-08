@@ -97,7 +97,7 @@ export async function loadRevenueDashboard(
     return await Promise.race([
       loadRevenueDashboardUnsafe(sprint),
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("admin-revenue-timeout")), 4_000);
+        timer = setTimeout(() => reject(new Error("admin-revenue-timeout")), 1_500);
       }),
     ]);
   } catch {

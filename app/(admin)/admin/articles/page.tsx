@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { createAdminReadClient } from "@/lib/auth/require-admin-access";
 import { EditorialPulseStrip } from "@/components/admin/editorial-pulse-strip";
-import { loadEditorialPulse } from "@/lib/admin/editorial-pulse";
+import { emptyPulse, loadEditorialPulse } from "@/lib/admin/editorial-pulse";
 import type { Article } from "@/types/database";
 
 export const dynamic = "force-dynamic";
@@ -26,21 +26,48 @@ export default async function AdminArticlesPage() {
       </div>
     );
   }
-  const { data, error } = await supabase
-    .from("articles")
-    .select(
-      `
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let packed:
+    | [
+        { data: unknown; error: { message: string } | null },
+        Awaited<ReturnType<typeof loadEditorialPulse>>,
+      ]
+    | null = null;
+  try {
+    packed = await Promise.race([
+      Promise.all([
+        supabase
+          .from("articles")
+          .select(
+            `
       id, title, slug, published, published_at, locale, cover_image_url, created_at,
       categories ( name )
     `
-    )
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(200);
+          )
+          .order("published_at", { ascending: false, nullsFirst: false })
+          .limit(80),
+        loadEditorialPulse(),
+      ]),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("admin-articles-timeout")), 1_500);
+      }),
+    ]);
+  } catch {
+    packed = null;
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 
-  const pulse = await loadEditorialPulse();
+  const data = packed?.[0]?.data;
+  const error = packed?.[0]?.error;
+  const pulse = packed?.[1] ?? emptyPulse();
 
   if (error) {
-    throw error;
+    return (
+      <div className="rounded-xl border bg-amber-50 p-6 text-sm text-amber-900">
+        Články se teď nepodařilo načíst. Zkuste obnovit stránku.
+      </div>
+    );
   }
 
   const articles = (data ?? []) as unknown as (Article & {
