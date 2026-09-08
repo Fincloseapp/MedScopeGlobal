@@ -26,6 +26,20 @@ const EDITIONS: Record<string, PublicHubEdition> = {
     showAll: "Zobraziť všetko →",
     featuredEyebrow: "Rubriky",
     featuredTitle: "Pohyb, joga, spánok a kozmetika",
+    steps: [
+      { title: "Nájdite svoju tému", desc: "Prejdite kategórie podľa oblasti zdravia — prevencia, výživa, spánok.", cta: "Prehliadať témy" },
+      { title: "Prečítajte článok alebo tip", desc: "Redakčné články bez žargónu. Denný video tip s kvízom.", cta: "Zobraziť články" },
+      { title: "Opýtajte sa AI (voliteľne)", desc: "Zrozumiteľné odpovede o prevencii — nenahrádzajú lekára.", cta: "Opýtať sa AI" },
+    ],
+    topics: {
+      "pruvodce-nemocemi": { label: "Sprievodca chorobami", description: "Zrozumiteľné sprievodce bežnými aj závažnejšími ochoreniami." },
+      symptomy: { label: "Symptómy", description: "Čo môžu príznaky znamenať a kedy vyhľadať lekára." },
+      prevence: { label: "Prevencia", description: "Očkovanie, skríning a prevencia chronických chorôb." },
+      "zivotni-styl": { label: "Životný štýl", description: "Pohyb, návyky a každodenné rozhodnutia pre zdravie." },
+      vyziva: { label: "Výživa", description: "Vyvážená strava, vitamíny a stravovacie mýty." },
+      spanek: { label: "Spánok", description: "Hygiena spánku, poruchy spánku a regenerácia." },
+      dlouhovekost: { label: "Dlhovekosť", description: "Healthspan, prevencia starnutia, spánok, pohyb a biomarkery." },
+    },
     quick: [
       { href: "/verejnost/temata", label: "Nájdite svoju tému", desc: "Symptómy, prevencia, choroby — začnite tu" },
       { href: "/verejnost/clanky", label: "Články pre všetkých", desc: "Zrozumiteľné texty" },
@@ -53,6 +67,20 @@ const EDITIONS: Record<string, PublicHubEdition> = {
     linksTitle: "Co tu znajdziesz",
     latestTitle: "Najnowsze artykuły",
     featuredTitle: "Ruch, joga, sen i pielęgnacja",
+    steps: [
+      { title: "Znajdź swój temat", desc: "Przeglądaj kategorie zdrowia — profilaktyka, żywienie, sen.", cta: "Przeglądaj tematy" },
+      { title: "Przeczytaj artykuł lub wskazówkę", desc: "Teksty redakcyjne bez żargonu. Codzienny film z quizem.", cta: "Pokaż artykuły" },
+      { title: "Zapytaj AI (opcjonalnie)", desc: "Proste odpowiedzi o profilaktyce — nie zastępują lekarza.", cta: "Zapytaj AI" },
+    ],
+    topics: {
+      "pruvodce-nemocemi": { label: "Przewodnik po chorobach", description: "Proste przewodniki po częstych i poważniejszych schorzeniach." },
+      symptomy: { label: "Objawy", description: "Co mogą oznaczać objawy i kiedy iść do lekarza." },
+      prevence: { label: "Profilaktyka", description: "Szczepienia, badania przesiewowe i zapobieganie." },
+      "zivotni-styl": { label: "Styl życia", description: "Ruch, nawyki i codzienne decyzje dla zdrowia." },
+      vyziva: { label: "Żywienie", description: "Zbilansowana dieta, witaminy i mity żywieniowe." },
+      spanek: { label: "Sen", description: "Higiena snu, zaburzenia snu i regeneracja." },
+      dlouhovekost: { label: "Długowieczność", description: "Healthspan, sen, ruch i biomarkery." },
+    },
     quick: [
       { href: "/verejnost/temata", label: "Znajdź swój temat", desc: "Objawy, profilaktyka, choroby — zacznij tutaj" },
       { href: "/verejnost/clanky", label: "Artykuły dla wszystkich", desc: "Teksty prostym językiem" },
@@ -79,6 +107,20 @@ const EDITIONS: Record<string, PublicHubEdition> = {
     linksTitle: "ここで見つかること",
     latestTitle: "最新の記事",
     featuredTitle: "運動、ヨガ、睡眠、スキンケア",
+    steps: [
+      { title: "テーマを探す", desc: "予防、栄養、睡眠など健康の分野から選ぶ。", cta: "テーマを見る" },
+      { title: "記事かヒントを読む", desc: "専門用語のない編集記事。毎日の動画とクイズ。", cta: "記事を見る" },
+      { title: "AIに聞く（任意）", desc: "予防についてのわかりやすい答え — 医師の代わりではありません。", cta: "AIに聞く" },
+    ],
+    topics: {
+      "pruvodce-nemocemi": { label: "病気の案内", description: "よくある病気も重い病気も、わかりやすく。" },
+      symptomy: { label: "症状", description: "症状が意味すること、受診の目安。" },
+      prevence: { label: "予防", description: "ワクチン、検診、慢性疾患の予防。" },
+      "zivotni-styl": { label: "生活習慣", description: "動き、習慣、毎日の健康の判断。" },
+      vyziva: { label: "栄養", description: "バランスの取れた食事、ビタミン、食の誤解。" },
+      spanek: { label: "睡眠", description: "睡眠衛生、睡眠障害、回復。" },
+      dlouhovekost: { label: "長寿", description: "ヘルススパン、睡眠、動き、バイオマーカー。" },
+    },
     quick: [
       { href: "/verejnost/temata", label: "テーマを探す", desc: "症状、予防、病気 — ここから" },
       { href: "/verejnost/clanky", label: "すべての人向け記事", desc: "わかりやすい文章" },

@@ -995,7 +995,7 @@ export function getMarketingCopy(locale?: string | null): MarketingCopy {
         ...hub,
         quick: hub.quick ?? base.publicHub.quick,
         steps: hub.steps ?? base.publicHub.steps,
-        topics: hub.topics ?? base.publicHub.topics,
+        topics: { ...base.publicHub.topics, ...hub.topics },
       },
     },
     locale

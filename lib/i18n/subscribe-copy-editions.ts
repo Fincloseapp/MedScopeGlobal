@@ -34,6 +34,15 @@ export type SubscribeEdition = Partial<
     | "noAccountLead"
     | "createAccount"
     | "studentPlan"
+    | "featureCol"
+    | "included"
+    | "notIncluded"
+    | "faq"
+    | "trustTitle"
+    | "trust"
+    | "privacy"
+    | "terms"
+    | "comparisonRows"
   >
 > & {
   plans?: Partial<Record<keyof SubscribeCopy["plans"], { name?: string; features?: string[] }>>;
@@ -78,7 +87,16 @@ const EDITIONS: Record<string, SubscribeEdition> = {
     createAccount: "Vytvoriť bezplatný účet",
     studentPlan: "Študent LF",
     plans: {
-      public: { name: "Redakcia" },
+      public: {
+        name: "Redakcia",
+        features: [
+          "Aktuálne zdravotné texty vo vašom jazyku",
+          "Články o dlhovekosti, spánku, pohybe a strave",
+          "MeDipacient — správy v telefóne",
+          "AI asistent pre verejnosť",
+          "Články bez reklám",
+        ],
+      },
       physician: { name: "Lekár v praxi" },
       student: { name: "Študent LF" },
       dokumentace: {
@@ -103,6 +121,46 @@ const EDITIONS: Record<string, SubscribeEdition> = {
       ordizapis: "14 dní zadarmo, potom",
       mediflow: "s tarifom Redakcia",
     },
+    featureCol: "Funkcia",
+    included: "Zahrnuté",
+    notIncluded: "Nezahrnuté",
+    privacy: "Ochrana súkromia",
+    terms: "Podmienky",
+    trustTitle: "Bezpečná platba a súkromie",
+    trust: [
+      { title: "Platby cez Stripe", description: "Karta, Apple Pay a Google Pay. PCI-kompatibilný checkout." },
+      { title: "GDPR a ochrana dát", description: "Spracovanie podľa pravidiel EÚ. Vaše dáta nepredávame." },
+      { title: "Zrušenie kedykoľvek", description: "Predplatné spravujete v účte. Redakcia sa platí hneď. Bez skrytých poplatkov." },
+    ],
+    faq: [
+      {
+        q: "Ako funguje 14-dňová skúšobná verzia?",
+        a: "OrdiZapis a lekár: po zadaní karty máte 14 dní zadarmo. Tarif Redakcia sa platí hneď — 1 € mesačne alebo 10 € za rok. Zrušíte kedykoľvek pred ďalším inkasom.",
+      },
+      {
+        q: "Môžem predplatné kedykoľvek zrušiť?",
+        a: "Áno. Zrušenie v sekcii Účet alebo v Stripe zákazníckom portáli. Prístup ostane aktívny do konca zaplateného obdobia.",
+      },
+      {
+        q: "Aký tarif zvoliť?",
+        a: "Redakcia (1 €) — aktuálne zdravotné texty a prevencia. Študent LF — materiály a AI tutor. Lekár v praxi — guidelines, CME a klinický AI.",
+      },
+    ],
+    comparisonRows: [
+      "Články magazínu bez reklám",
+      "Verejný AI asistent",
+      "Prevencia a životný štýl",
+      "Kvízy a študijné plány",
+      "AI tutor pre študentov medicíny",
+      "Modelové otázky na prijímacky",
+      "Odborný stôl a guidelines",
+      "CME briefy a súhrny štúdií",
+      "Klinický AI asistent",
+      "OrdiZapis (AI zápisy)",
+      "Research Hub a diagnostické algoritmy",
+      "MedScope Academy (základné kurzy)",
+      "Prioritné upozornenia",
+    ],
   },
   pl: {
     metaTitle: "Prenumerata | ViaLongeVita",
@@ -164,6 +222,46 @@ const EDITIONS: Record<string, SubscribeEdition> = {
       ordizapis: "14 dni za darmo, potem",
       mediflow: "z planem Redakcja",
     },
+    featureCol: "Funkcja",
+    included: "Zawarte",
+    notIncluded: "Niezawarte",
+    privacy: "Prywatność",
+    terms: "Regulamin",
+    trustTitle: "Bezpieczna płatność i prywatność",
+    trust: [
+      { title: "Płatności przez Stripe", description: "Karta, Apple Pay i Google Pay. Checkout zgodny z PCI." },
+      { title: "RODO i ochrona danych", description: "Przetwarzanie według zasad UE. Nie sprzedajemy Twoich danych." },
+      { title: "Rezygnacja w każdej chwili", description: "Subskrypcją zarządzasz na koncie. Redakcja jest płatna od razu." },
+    ],
+    faq: [
+      {
+        q: "Jak działa 14-dniowy okres próbny?",
+        a: "OrdiZapis i lekarz: po podaniu karty masz 14 dni za darmo. Plan Redakcja jest płatny od razu — 1 € miesięcznie lub 10 € rocznie. Rezygnacja przed kolejną opłatą.",
+      },
+      {
+        q: "Czy mogę zrezygnować w każdej chwili?",
+        a: "Tak. Rezygnacja w koncie lub w portalu Stripe. Dostęp zostaje do końca opłaconego okresu.",
+      },
+      {
+        q: "Który plan wybrać?",
+        a: "Redakcja (1 €) — aktualne teksty o zdrowiu. Student medycyny — materiały i tutor AI. Lekarz praktykujący — wytyczne, CME i kliniczne AI.",
+      },
+    ],
+    comparisonRows: [
+      "Artykuły magazynu bez reklam",
+      "Publiczny asystent AI",
+      "Profilaktyka i styl życia",
+      "Quizy i plany nauki",
+      "Tutor AI dla studentów medycyny",
+      "Pytania modelowe na rekrutację",
+      "Biurko zawodowe i wytyczne",
+      "Briefy CME i streszczenia badań",
+      "Kliniczny asystent AI",
+      "OrdiZapis (notatki AI)",
+      "Research Hub i algorytmy",
+      "MedScope Academy (kursy podstawowe)",
+      "Priorytetowe powiadomienia",
+    ],
   },
   ja: {
     metaTitle: "購読 | ViaLongeVita",
@@ -225,6 +323,46 @@ const EDITIONS: Record<string, SubscribeEdition> = {
       ordizapis: "14日間無料、その後",
       mediflow: "編集部プランで",
     },
+    featureCol: "機能",
+    included: "含まれる",
+    notIncluded: "含まれない",
+    privacy: "プライバシー",
+    terms: "利用規約",
+    trustTitle: "安全な支払いとプライバシー",
+    trust: [
+      { title: "Stripeで支払い", description: "カード、Apple Pay、Google Pay。PCI準拠の決済。" },
+      { title: "GDPRとデータ保護", description: "EU規則に従い処理します。データを販売しません。" },
+      { title: "いつでも解約", description: "アカウントで購読を管理。編集部はすぐ課金。" },
+    ],
+    faq: [
+      {
+        q: "14日間の無料期間はどうなりますか？",
+        a: "OrdiZapisと医師：カード登録後14日は無料。編集部プランはすぐ課金 — 月1€または年10€。次回課金の前ならいつでも解約できます。",
+      },
+      {
+        q: "いつでも解約できますか？",
+        a: "はい。アカウントまたはStripeのカスタマーポータルから。支払済み期間の終わりまで使えます。",
+      },
+      {
+        q: "どのプランを選べばよいですか？",
+        a: "編集部（1€）— 健康と予防の記事。医学生 — 教材とAIチューター。開業医 — ガイドライン、CME、臨床AI。",
+      },
+    ],
+    comparisonRows: [
+      "広告なしの雑誌記事",
+      "一般向けAIアシスタント",
+      "予防と生活習慣",
+      "クイズと学習プラン",
+      "医学生向けAIチューター",
+      "入試のモデル問題",
+      "専門デスクとガイドライン",
+      "CMEブリーフと研究要約",
+      "臨床AIアシスタント",
+      "OrdiZapis（AI記録）",
+      "Research Hubと診断アルゴリズム",
+      "MedScope Academy（基本講座）",
+      "優先通知",
+    ],
   },
   ru: {
     metaTitle: "Подписка | ViaLongeVita",
