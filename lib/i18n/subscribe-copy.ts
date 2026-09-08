@@ -3,6 +3,7 @@ import { normalizeLocale } from "@/lib/i18n/config";
 import { localizeCurrencyToken, localizeListedCzkIn } from "@/lib/i18n/payment-currency";
 import { rewriteCzechInstitutions } from "@/lib/i18n/local-regulator";
 import { editorialMonthlyBannerPrice } from "@/lib/editorial/pricing";
+import { subscribeEdition } from "@/lib/i18n/subscribe-copy-editions";
 import type { V27SubscriptionTier } from "@/lib/v27/config";
 
 export type SubscribePlanCopy = {
@@ -977,7 +978,22 @@ export function getSubscribeCopy(
   const key = pack(locale);
   const localized = localizeListedCzkIn(COPY[key] ?? COPY.en, locale, region);
   const overlay = BANNER_OVERLAY[subscribeBannerPack(locale)];
+  const edition = subscribeEdition(subscribeBannerPack(locale));
   if (overlay) Object.assign(localized, overlay);
+  if (edition) {
+    const { plans, audienceByApp, priceNoteByApp, ...rest } = edition;
+    Object.assign(localized, rest);
+    if (audienceByApp) localized.audienceByApp = { ...localized.audienceByApp, ...audienceByApp };
+    if (priceNoteByApp) localized.priceNoteByApp = { ...localized.priceNoteByApp, ...priceNoteByApp };
+    if (plans) {
+      for (const [tier, pack] of Object.entries(plans)) {
+        const key = tier as keyof SubscribeCopy["plans"];
+        if (pack?.name && localized.plans[key]) {
+          localized.plans[key] = { ...localized.plans[key], name: pack.name };
+        }
+      }
+    }
+  }
   localized.afterTrialUnit = localizeCurrencyToken(localized.afterTrialUnit, locale, region);
   localized.currencyLabel = localizeCurrencyToken(localized.currencyLabel, locale, region);
   const price = editorialMonthlyBannerPrice(locale, region);

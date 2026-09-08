@@ -1,5 +1,6 @@
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { verejnostEdition } from "@/lib/i18n/verejnost-chrome-editions";
 
 type Pack = "cs" | "de" | "fr" | "en";
 
@@ -1068,5 +1069,18 @@ const FR: VerejnostChrome = {
 const PACKS: Record<Pack, VerejnostChrome> = { cs: CS, en: EN, de: DE, fr: FR };
 
 export function getVerejnostChrome(locale?: string | null): VerejnostChrome {
-  return PACKS[verejnostChromeLocale(locale)];
+  const base = PACKS[verejnostChromeLocale(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = verejnostEdition(primary);
+  if (!edition) return base;
+  const { hubs, ...rest } = edition;
+  return {
+    ...base,
+    ...rest,
+    hubs: {
+      ...base.hubs,
+      ...hubs,
+      clanky: { ...base.hubs.clanky, ...hubs?.clanky },
+    },
+  };
 }

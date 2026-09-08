@@ -1,6 +1,7 @@
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { localizeListedCzkIn } from "@/lib/i18n/payment-currency";
+import { marketingHubEdition } from "@/lib/i18n/marketing-hub-editions";
 import type { AppProductId } from "@/lib/apps/catalog";
 
 function pack(locale?: string | null): string {
@@ -983,5 +984,20 @@ const PACKS: Record<string, MarketingCopy> = { cs: CS, en: EN, de: DE, fr: FR };
 
 export function getMarketingCopy(locale?: string | null): MarketingCopy {
   const key = pack(locale);
-  return localizeListedCzkIn(PACKS[key] ?? PACKS.en, locale);
+  const base = PACKS[key] ?? PACKS.en;
+  const hub = key === "cs" ? undefined : marketingHubEdition(key);
+  if (!hub) return localizeListedCzkIn(base, locale);
+  return localizeListedCzkIn(
+    {
+      ...base,
+      publicHub: {
+        ...base.publicHub,
+        ...hub,
+        quick: hub.quick ?? base.publicHub.quick,
+        steps: hub.steps ?? base.publicHub.steps,
+        topics: hub.topics ?? base.publicHub.topics,
+      },
+    },
+    locale
+  );
 }

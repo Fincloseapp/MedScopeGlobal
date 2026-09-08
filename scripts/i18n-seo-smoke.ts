@@ -388,7 +388,12 @@ assert.ok(getSubscribeCopy("de").supportTitle.includes("weiterlesen"));
 assert.ok(!getSubscribeCopy("en").parentsMore.includes("/studenti"));
 assert.ok(getSubscribeCopy("fr").afterTrialUnit.includes("mois"));
 assert.ok(!getSubscribeCopy("de").faqTitle.includes("Časté"));
-assert.equal(getSubscribeCopy("sk").eyebrow, "Subscription");
+assert.equal(getSubscribeCopy("sk").eyebrow, "Predplatné");
+assert.ok(getSubscribeCopy("sk").title.includes("Redakcia"));
+assert.ok(!getSubscribeCopy("sk").title.includes("Editorial plan"));
+assert.ok(!getSubscribeCopy("ja").lead.includes("The opening is free"));
+assert.equal(getSubscribeCopy("sk").choosePlan, "Vyberte plán");
+assert.ok(!getSubscribeCopy("sk").supportLead.includes("The opening stays readable"));
 assert.ok(getSubscribeCopy("sk").bannerPayCta.includes("Zaplatiť"));
 assert.ok(getSubscribeCopy("it").bannerPayCta.includes("Paga"));
 assert.ok(getSubscribeCopy("es").bannerPayCta.includes("Pagar"));
@@ -499,7 +504,11 @@ assert.equal(
 assert.equal(getMarketingCopy("fr").apps.title, "Applis");
 assert.ok(!getMarketingCopy("fr").apps.trialCta.includes("zdarma"));
 assert.equal(getMarketingCopy("de").about.eyebrow, "Über uns");
-assert.equal(getMarketingCopy("sk").publicHub.title.includes("plain"), true);
+assert.ok(getMarketingCopy("sk").publicHub.title.includes("zrozumiteľne"));
+assert.ok(!getMarketingCopy("sk").publicHub.eyebrow.includes("For everyone"));
+assert.ok(!getMarketingCopy("ja").publicHub.quick.some((item) => item.label === "Articles for everyone"));
+assert.equal(getVerejnostChrome("sk").hubs.clanky.title, "Články pre všetkých");
+assert.ok(!getVerejnostChrome("ja").teaserContinue.includes("Editorial plan"));
 
 const frLekari = localizeV271Page(V271_LEKARI_PAGES.index, "lekari", "fr");
 assert.equal(frLekari.sectionLabel, "Médecins");
