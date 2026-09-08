@@ -30,11 +30,13 @@ const EDITIONS: Record<string, FirmyDeskEdition> = {
       partnerstvi: {
         title: "Partnerstvo",
         body: "Univerzitná a inštitucionálna spolupráca — nie affiliate a nie skrytá inzercia.",
+        metaTitle: "Partnerstvá firiem a inštitúcií",
         lead: "Partnerstvo je označené. Nie je to skrytá inzercia a nie je to vstup do lekárskej zóny.",
       },
       kampane: {
         title: "Kampane",
         body: "Segmentácia čitateľmi magazínu / verejnosť. Lekári a študenti majú vlastné plochy bez affiliate.",
+        metaTitle: "Kampane pre firmy",
         lead: "Kampane cielia magazín a verejnosť. Odborné plochy lekárov ostávajú bez affiliate.",
       },
       kosmetika: {

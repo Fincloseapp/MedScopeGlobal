@@ -3,7 +3,10 @@
  * List prices stay CZK internally; display goes through localizeListedCzkIn.
  */
 
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { b2bPublicEdition } from "@/lib/i18n/b2b-public-editions";
 import { localizeListedCzkIn } from "@/lib/i18n/payment-currency";
 
 export type B2bPublicTier = {
@@ -627,5 +630,17 @@ const PACK: Record<ChromePack, B2bPublicCopy> = {
 };
 
 export function getB2bPublicCopy(locale?: string | null): B2bPublicCopy {
-  return localizeListedCzkIn(PACK[chromePack(locale)], locale);
+  const base = localizeListedCzkIn(PACK[chromePack(locale)], locale);
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : b2bPublicEdition(primary);
+  if (!edition) return base;
+  return localizeListedCzkIn(
+    {
+      ...base,
+      ...edition,
+      whyItems: edition.whyItems ?? base.whyItems,
+      tiers: edition.tiers ?? base.tiers,
+    },
+    locale
+  );
 }

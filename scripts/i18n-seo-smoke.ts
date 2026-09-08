@@ -552,6 +552,10 @@ assert.ok(getVipProtocolsCopy("sk").startTrial.includes("14 dní"));
 assert.ok(!getVipProtocolsCopy("ja").activateVip.includes("14 days"));
 assert.ok(!getAdRequestCopy("sk").title.includes("Advertising request"));
 assert.equal(getAdRequestCopy("pl").submit, "Wyślij wniosek");
+assert.ok(!getB2bPublicCopy("sk").cenikTitle.includes("Pricing for companies"));
+assert.ok(!getB2bPublicCopy("ja").whyTitle.includes("Why advertise"));
+assert.equal(getB2bPublicCopy("pl").contactSales, "Kontakt do sprzedaży");
+assert.ok(!JSON.stringify(getFirmyDeskCopy("sk")).includes("For companies"));
 assert.equal(getVerejnostChrome("sk").hubs.clanky.title, "Články pre všetkých");
 assert.ok(!getVerejnostChrome("ja").teaserContinue.includes("Editorial plan"));
 
