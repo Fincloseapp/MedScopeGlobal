@@ -1,6 +1,8 @@
 import { MAGAZINE } from "@/lib/brand/magazine";
 import { SITE } from "@/lib/config/site";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
 import { localeToPathSegment } from "@/lib/i18n/locale-path";
 import { parseArenaRef } from "@/lib/growth/arena/refs";
 
@@ -324,8 +326,27 @@ const BRIEFS: Record<ChromePack, AiAgentBrief> = {
   },
 };
 
+const FOOTER_LABEL: Record<string, string> = {
+  sk: "Pre AI agentov",
+  pl: "Dla agentów AI",
+  ro: "Pentru agenți IA",
+  hu: "MI-ügynököknek",
+  ru: "Для ИИ-агентов",
+  uk: "Для агентів ШІ",
+  be: "Для агентаў ШІ",
+  zh: "面向 AI 代理",
+  ja: "AIエージェント向け",
+  ko: "AI 에이전트용",
+  vi: "Dành cho tác nhân AI",
+  id: "Untuk agen AI",
+};
+
 export function getAiAgentBrief(locale?: string | null): AiAgentBrief {
-  return BRIEFS[chromePack(locale)];
+  const base = BRIEFS[chromePack(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const footerLabel = FOOTER_LABEL[primary];
+  if (!footerLabel) return base;
+  return { ...base, footerLabel, pageTitle: footerLabel };
 }
 
 export function normalizeAiAgentSlug(raw?: string | null): AiAgentSlug | null {

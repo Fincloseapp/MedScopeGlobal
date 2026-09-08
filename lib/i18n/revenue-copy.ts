@@ -414,6 +414,7 @@ export function getRevenueCopy(locale?: string | null): RevenueCopy {
   const base = COPY[revenueCopyLocale(locale)];
   const nl = getNewsletterCopy(locale);
   const overlay = affiliateOverlay(locale);
+  const subscribe = subscribeOverlay(locale);
   const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
   const subscribeCta =
     revenueCopyLocale(locale) === "en" && primary !== "en" ? getSurfaceCopy(locale).whyTrial : base.subscribeCta;
@@ -421,6 +422,7 @@ export function getRevenueCopy(locale?: string | null): RevenueCopy {
     {
       ...base,
       ...overlay,
+      ...subscribe,
       subscribeCta,
       newsletterKicker: nl.kicker,
       newsletterTitle: nl.title,
@@ -435,6 +437,97 @@ export function getRevenueCopy(locale?: string | null): RevenueCopy {
     },
     locale
   );
+}
+
+function subscribeOverlay(
+  locale?: string | null
+): Partial<Pick<RevenueCopy, "subscribeKicker" | "subscribeTitle" | "subscribeHint">> {
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "en"));
+  if (primary === "sk") {
+    return {
+      subscribeKicker: "Voliteľné predplatné",
+      subscribeTitle: "Čítať ďalej bez reklám",
+      subscribeHint: "Zrušíte kedykoľvek pred ďalším inkasom.",
+    };
+  }
+  if (primary === "pl") {
+    return {
+      subscribeKicker: "Opcjonalna prenumerata",
+      subscribeTitle: "Czytaj dalej bez reklam",
+      subscribeHint: "Anulujesz w dowolnej chwili przed kolejną opłatą.",
+    };
+  }
+  if (primary === "ro") {
+    return {
+      subscribeKicker: "Abonament opțional",
+      subscribeTitle: "Citește mai departe fără reclame",
+      subscribeHint: "Poți anula oricând înainte de următoarea taxare.",
+    };
+  }
+  if (primary === "hu") {
+    return {
+      subscribeKicker: "Opcionális előfizetés",
+      subscribeTitle: "Olvasás tovább reklám nélkül",
+      subscribeHint: "A következő terhelés előtt bármikor lemondható.",
+    };
+  }
+  if (primary === "ru") {
+    return {
+      subscribeKicker: "Необязательная подписка",
+      subscribeTitle: "Читать дальше без рекламы",
+      subscribeHint: "Отменить можно в любой момент до следующего списания.",
+    };
+  }
+  if (primary === "uk") {
+    return {
+      subscribeKicker: "Необов’язкова передплата",
+      subscribeTitle: "Читати далі без реклами",
+      subscribeHint: "Скасувати можна будь-коли до наступного списання.",
+    };
+  }
+  if (primary === "be") {
+    return {
+      subscribeKicker: "Неабавязковая падпіска",
+      subscribeTitle: "Чытаць далей без рэкламы",
+      subscribeHint: "Скасаваць можна ў любы час да наступнага спісання.",
+    };
+  }
+  if (primary === "zh") {
+    return {
+      subscribeKicker: "可选订阅",
+      subscribeTitle: "无广告继续阅读",
+      subscribeHint: "可在下次扣费前随时取消。",
+    };
+  }
+  if (primary === "ja") {
+    return {
+      subscribeKicker: "任意の購読",
+      subscribeTitle: "広告なしで読み続ける",
+      subscribeHint: "次回課金の前ならいつでも解約できます。",
+    };
+  }
+  if (primary === "ko") {
+    return {
+      subscribeKicker: "선택 구독",
+      subscribeTitle: "광고 없이 계속 읽기",
+      subscribeHint: "다음 결제 전이면 언제든 해지할 수 있습니다.",
+    };
+  }
+  if (primary === "vi") {
+    return {
+      subscribeKicker: "Đăng ký tùy chọn",
+      subscribeTitle: "Đọc tiếp không quảng cáo",
+      subscribeHint: "Hủy bất cứ lúc nào trước lần tính phí tiếp theo.",
+    };
+  }
+  if (primary === "id") {
+    return {
+      subscribeKicker: "Langganan opsional",
+      subscribeTitle: "Lanjut membaca tanpa iklan",
+      subscribeHint: "Batalkan kapan saja sebelum tagihan berikutnya.",
+    };
+  }
+  return {};
 }
 
 function affiliateOverlay(

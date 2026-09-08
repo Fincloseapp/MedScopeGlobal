@@ -995,9 +995,12 @@ COPY["pt-BR"] = {
 
 export function getSurfaceCopy(locale?: string | null): SurfaceCopy {
   const key = pack(locale);
-  const copy = { ...(COPY[key] ?? COPY.en), ...(surfaceEdition(key) ?? {}) };
+  const edition = surfaceEdition(key) ?? {};
+  const { footer: footerOverlay, ...editionRest } = edition;
+  const copy = { ...(COPY[key] ?? COPY.en), ...editionRest };
   if (key === "cs") return copy;
   const sources = citedSourcesLine(locale);
+  const tagline = (footerOverlay?.tagline ?? copy.footer.tagline).replace(/\s*MeDiprep[^.]*\./gi, "").trim();
   return {
     ...copy,
     stats: copy.stats.map((item, index) =>
@@ -1014,7 +1017,8 @@ export function getSurfaceCopy(locale?: string | null): SurfaceCopy {
     audiences: copy.audiences.filter((item) => item.id !== "student"),
     footer: {
       ...copy.footer,
-      tagline: copy.footer.tagline.replace(/\s*MeDiprep[^.]*\./gi, "").trim(),
+      ...footerOverlay,
+      tagline,
       audiences: copy.footer.audiences.filter((item) => !item.href.startsWith("/studenti")),
     },
   };
