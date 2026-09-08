@@ -54,6 +54,7 @@ import {
 import { getSubscribeCopy } from "../lib/i18n/subscribe-copy";
 import { getNewsletterCopy } from "../lib/i18n/newsletter-copy";
 import { getMarketingCopy } from "../lib/i18n/marketing-copy";
+import { studentDashboardEdition } from "../lib/i18n/student-dashboard-editions";
 import { localizePublicHref, translateNavHref } from "../lib/i18n/nav-copy";
 import { localizeV271Page } from "../lib/i18n/hub-copy";
 import { getDesktopHeaderMenu, getHeaderUtilityLinks } from "../lib/config/main-navigation";
@@ -529,6 +530,13 @@ assert.ok(!getMarketingCopy("pl").about.audiences[0]?.desc.includes("plain langu
 assert.ok(!getSurfaceCopy("sk").siteDescription.includes("14 days free"));
 assert.ok(getSurfaceCopy("sk").siteDescription.includes("14 dní"));
 assert.ok(!getSurfaceCopy("ja").siteDescription.includes("Editorial from 25 CZK"));
+assert.equal(getMarketingCopy("sk").contact.eyebrow, "Kontakt");
+assert.ok(!getMarketingCopy("sk").contact.title.includes("Write to us"));
+assert.ok(!getMarketingCopy("ja").contact.privacy.includes("Privacy (GDPR)"));
+assert.equal(getMarketingCopy("sk").students.eyebrow, "MedScope · Študenti");
+assert.ok(!getMarketingCopy("pl").students.title.includes("path into medicine"));
+assert.ok(!studentDashboardEdition("sk")?.lead?.includes("Built from official"));
+assert.equal(studentDashboardEdition("ja")?.open, "デスクを開く");
 assert.equal(getVerejnostChrome("sk").hubs.clanky.title, "Články pre všetkých");
 assert.ok(!getVerejnostChrome("ja").teaserContinue.includes("Editorial plan"));
 

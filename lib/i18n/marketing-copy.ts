@@ -1006,6 +1006,8 @@ export function getMarketingCopy(locale?: string | null): MarketingCopy {
             audiences: appsAbout.about.audiences ?? base.about.audiences,
           }
         : base.about,
+      contact: appsAbout?.contact ? { ...base.contact, ...appsAbout.contact } : base.contact,
+      students: appsAbout?.students ? { ...base.students, ...appsAbout.students } : base.students,
       publicHub: hub
         ? {
             ...base.publicHub,

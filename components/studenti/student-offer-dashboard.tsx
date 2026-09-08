@@ -8,6 +8,9 @@ import { StudentSectionNav } from "@/components/studenti/student-section-nav";
 import { studentPublicHref } from "@/lib/studenti/href";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { chromePack } from "@/lib/i18n/chrome-pack";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { studentDashboardEdition } from "@/lib/i18n/student-dashboard-editions";
 import {
   facultiesForLocale,
   facultyCountryLabel,
@@ -287,7 +290,11 @@ function t(pack: Pack, rec: { cs: string; en: string; de: string; fr: string }) 
 export function StudentOfferDashboard({ locale }: { locale: string }) {
   const pack = packOf(locale);
   const cs = pack === "cs";
-  const copy = COPY[pack];
+  const edition = pack === "cs" ? undefined : studentDashboardEdition(primaryArticleLocale(normalizeLocale(locale)));
+  const { rooms: roomOverlay, ...editionCopy } = edition ?? {};
+  const copy = { ...COPY[pack], ...editionCopy };
+  const roomText = (item: (typeof ROOMS)[number], field: "title" | "body") =>
+    roomOverlay?.[item.href]?.[field] ?? t(pack, item[field]);
   const intro = studentIntroCharge(locale);
   const monthly = studentMonthlyCharge(locale);
   const faculties = facultiesForLocale(locale);
@@ -407,8 +414,8 @@ export function StudentOfferDashboard({ locale }: { locale: string }) {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#14110e] via-[#14110e]/35 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-6">
-                <p className="font-display text-3xl">{t(pack, item.title)}</p>
-                <p className="mt-2 max-w-md text-sm leading-6 text-[#ddd4c6]">{t(pack, item.body)}</p>
+                <p className="font-display text-3xl">{roomText(item, "title")}</p>
+                <p className="mt-2 max-w-md text-sm leading-6 text-[#ddd4c6]">{roomText(item, "body")}</p>
               </div>
             </Link>
           ))}
@@ -434,8 +441,8 @@ export function StudentOfferDashboard({ locale }: { locale: string }) {
                 <p className="font-mono text-[10px] tracking-[0.2em] text-[#8a6d32]">
                   {String(index + 3).padStart(2, "0")}
                 </p>
-                <p className="mt-1 font-display text-xl">{t(pack, item.title)}</p>
-                <p className="mt-1 text-sm leading-6 text-[#5c564c]">{t(pack, item.body)}</p>
+                <p className="mt-1 font-display text-xl">{roomText(item, "title")}</p>
+                <p className="mt-1 text-sm leading-6 text-[#5c564c]">{roomText(item, "body")}</p>
               </div>
             </Link>
           ))}
