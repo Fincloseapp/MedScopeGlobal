@@ -48,8 +48,8 @@ import {
   SaveToMediFlowButton,
   ArticleShareButton,
 } from "@/components/monetization/article-cta";
+import { AfterArticleRead } from "@/components/monetization/after-article-read";
 import { ArticleContribution } from "@/components/monetization/article-contribution";
-import { ArticleImageSupportNudge } from "@/components/monetization/article-image-support-nudge";
 import {
   getArticleHeroAltText,
   resolveArticleCoverUrl,
@@ -448,11 +448,6 @@ export default async function ArticlePage({ params }: Props) {
           </figure>
           )}
 
-          <ArticleImageSupportNudge
-            locale={supportLocale}
-            articleSlug={article.slug}
-          />
-
           {shouldShowDisplayAds(revenueSurface, isVip) ? (
             <GlobalAdSlot
               placement="below-title"
@@ -542,20 +537,22 @@ export default async function ArticlePage({ params }: Props) {
           ) : null}
 
           {showContribution ? (
-            <Suspense
-              fallback={
-                <section className="article-contribute scroll-mt-24">
-                  <p className="text-sm text-slate-500">{ARTICLE_TIP_COPY[tipLocale(locale)].loading}</p>
-                </section>
-              }
-            >
-              <ArticleContribution
-                articleSlug={article.slug}
-                articleTitle={article.title}
-                authorName={authorDisplay}
-                locale={supportLocale}
-              />
-            </Suspense>
+            <AfterArticleRead>
+              <Suspense
+                fallback={
+                  <section className="article-contribute scroll-mt-24">
+                    <p className="text-sm text-slate-500">{ARTICLE_TIP_COPY[tipLocale(locale)].loading}</p>
+                  </section>
+                }
+              >
+                <ArticleContribution
+                  articleSlug={article.slug}
+                  articleTitle={article.title}
+                  authorName={authorDisplay}
+                  locale={supportLocale}
+                />
+              </Suspense>
+            </AfterArticleRead>
           ) : null}
 
           {isStudentArticle && !locked ? (

@@ -209,6 +209,7 @@ export const VIP_CTA_COPY = {
   },
 } as const;
 
-export function isArticleTipUiEnabled(_locked?: boolean): boolean {
-  return true;
+/** Voluntary tip after the full article — never on a locked teaser. */
+export function isArticleTipUiEnabled(locked?: boolean): boolean {
+  return locked !== true;
 }

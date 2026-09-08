@@ -21,6 +21,7 @@ import {
   AD_INVENTORY,
   getClientAdConfig,
 } from "../../lib/ecosystem/monetization";
+import { isArticleTipUiEnabled } from "../../lib/ecosystem/tip-copy";
 import {
   classifyRevenueSurface,
   matchAffiliateProductIds,
@@ -3273,6 +3274,18 @@ assert.ok(
     "další čtenář"
   ),
   "Czech tip copy must frame a gift as helping the next reader"
+);
+assert.equal(isArticleTipUiEnabled(true), false, "locked teaser must not show Podpořit autora");
+assert.equal(isArticleTipUiEnabled(false), true, "full article may show the tip after the body");
+assert.ok(
+  readFileSync(join(root, "app/(public)/article/[slug]/page.tsx"), "utf8").includes("AfterArticleRead"),
+  "tip box waits until the article end is reached"
+);
+assert.ok(
+  !readFileSync(join(root, "app/(public)/article/[slug]/page.tsx"), "utf8").includes(
+    "ArticleImageSupportNudge"
+  ),
+  "hero must not pitch the tip before the read"
 );
 assert.ok(
   readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes(
