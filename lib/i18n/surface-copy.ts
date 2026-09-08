@@ -11,6 +11,7 @@ import {
   type WriterDeskId,
 } from "@/lib/editorial/writer-agents";
 import { surfaceEdition } from "@/lib/i18n/surface-copy-editions";
+import { surfaceHomeEdition } from "@/lib/i18n/surface-home-editions";
 
 function pack(locale?: string | null): string {
   const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
@@ -996,11 +997,14 @@ COPY["pt-BR"] = {
 export function getSurfaceCopy(locale?: string | null): SurfaceCopy {
   const key = pack(locale);
   const edition = surfaceEdition(key) ?? {};
+  const home = surfaceHomeEdition(key) ?? {};
   const { footer: footerOverlay, ...editionRest } = edition;
-  const copy = { ...(COPY[key] ?? COPY.en), ...editionRest };
+  const { footer: homeFooter, ...homeRest } = home;
+  const copy = { ...(COPY[key] ?? COPY.en), ...editionRest, ...homeRest };
   if (key === "cs") return copy;
   const sources = citedSourcesLine(locale);
-  const tagline = (footerOverlay?.tagline ?? copy.footer.tagline).replace(/\s*MeDiprep[^.]*\./gi, "").trim();
+  const mergedFooter = { ...copy.footer, ...footerOverlay, ...homeFooter };
+  const tagline = mergedFooter.tagline.replace(/\s*MeDiprep[^.]*\./gi, "").trim();
   return {
     ...copy,
     stats: copy.stats.map((item, index) =>
@@ -1016,10 +1020,12 @@ export function getSurfaceCopy(locale?: string | null): SurfaceCopy {
       .replace(/,\s+(or|oder|ou)\s/gi, " $1 "),
     audiences: copy.audiences.filter((item) => item.id !== "student"),
     footer: {
-      ...copy.footer,
-      ...footerOverlay,
+      ...mergedFooter,
       tagline,
-      audiences: copy.footer.audiences.filter((item) => !item.href.startsWith("/studenti")),
+      audiences: (homeFooter?.audiences ?? copy.footer.audiences).filter(
+        (item) => !item.href.startsWith("/studenti")
+      ),
+      proof: homeFooter?.proof ?? copy.footer.proof,
     },
   };
 }

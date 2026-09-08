@@ -415,6 +415,7 @@ export function getRevenueCopy(locale?: string | null): RevenueCopy {
   const nl = getNewsletterCopy(locale);
   const overlay = affiliateOverlay(locale);
   const subscribe = subscribeOverlay(locale);
+  const partner = partnerOverlay(locale);
   const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
   const subscribeCta =
     revenueCopyLocale(locale) === "en" && primary !== "en" ? getSurfaceCopy(locale).whyTrial : base.subscribeCta;
@@ -423,6 +424,7 @@ export function getRevenueCopy(locale?: string | null): RevenueCopy {
       ...base,
       ...overlay,
       ...subscribe,
+      ...partner,
       subscribeCta,
       newsletterKicker: nl.kicker,
       newsletterTitle: nl.title,
@@ -437,6 +439,125 @@ export function getRevenueCopy(locale?: string | null): RevenueCopy {
     },
     locale
   );
+}
+
+function partnerOverlay(
+  locale?: string | null
+): Partial<
+  Pick<
+    RevenueCopy,
+    | "partnerKicker"
+    | "partnerTitle"
+    | "partnerBody"
+    | "partnerCta"
+    | "subscribeBody"
+    | "mediaKitCta"
+    | "bannerName"
+    | "sponsoredName"
+  >
+> {
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "en"));
+  if (primary === "sk") {
+    return {
+      partnerKicker: "Inzercia",
+      partnerTitle: "Tento priestor je na rezerváciu",
+      partnerBody:
+        "Native banner u čitateľov dlhovekosti — od 5 000 Kč/mesiac. Sponzorovaný článok od 15 000 Kč, vždy označený.",
+      partnerCta: "Rezervovať inzerciu",
+      subscribeBody:
+        "Tarif Redakcia 1 € mesačne alebo 10 € za rok, platba hneď. Tipy v článkoch ostávajú dobrovoľné — toto nie je VIP klub.",
+      mediaKitCta: "Objednať kampaň",
+      bannerName: "Native banner",
+      sponsoredName: "Sponzorovaný článok",
+    };
+  }
+  if (primary === "pl") {
+    return {
+      partnerKicker: "Reklama",
+      partnerTitle: "To miejsce jest do rezerwacji",
+      partnerBody:
+        "Baner native wśród czytelników długowieczności — od 5 000 Kč/miesiąc. Artykuł sponsorowany od 15 000 Kč, zawsze oznaczony.",
+      partnerCta: "Zarezerwuj reklamę",
+      subscribeBody:
+        "Plan Redakcja 1 € miesięcznie lub 10 € rocznie, od razu. Napiwki w artykułach zostają dobrowolne — to nie klub VIP.",
+      mediaKitCta: "Zamów kampanię",
+      bannerName: "Baner native",
+      sponsoredName: "Artykuł sponsorowany",
+    };
+  }
+  if (primary === "ja") {
+    return {
+      partnerKicker: "広告",
+      partnerTitle: "この枠は予約できます",
+      partnerBody:
+        "長寿読者向けのネイティブバナー — 月5 000 Kčから。スポンサー記事は15 000 Kčから、必ず表示します。",
+      partnerCta: "広告枠を予約",
+      subscribeBody:
+        "編集部プランは月1€または年10€、すぐに課金。記事のチップは任意です — VIPクラブではありません。",
+      mediaKitCta: "キャンペーンを申し込む",
+      bannerName: "ネイティブバナー",
+      sponsoredName: "スポンサー記事",
+    };
+  }
+  if (primary === "ru") {
+    return {
+      partnerKicker: "Реклама",
+      partnerTitle: "Это место можно забронировать",
+      partnerBody:
+        "Нативный баннер у читателей долголетия — от 5 000 Kč/месяц. Спонсорская статья от 15 000 Kč, всегда помечена.",
+      partnerCta: "Забронировать рекламу",
+      subscribeBody:
+        "Тариф Редакция 1 € в месяц или 10 € в год, сразу. Чаевые в статьях остаются добровольными — это не VIP-клуб.",
+      mediaKitCta: "Заказать кампанию",
+      bannerName: "Нативный баннер",
+      sponsoredName: "Спонсорская статья",
+    };
+  }
+  if (primary === "zh") {
+    return {
+      partnerKicker: "广告",
+      partnerTitle: "此位置可预订",
+      partnerBody: "面向长寿读者的原生广告 — 每月 5 000 Kč 起。赞助文章 15 000 Kč 起，一律标注。",
+      partnerCta: "预订广告位",
+      subscribeBody: "编辑部方案每月 1€ 或每年 10€，立即计费。文中打赏仍属自愿 — 不是 VIP 俱乐部。",
+      mediaKitCta: "预订投放",
+      bannerName: "原生横幅",
+      sponsoredName: "赞助文章",
+    };
+  }
+  if (primary === "ro") {
+    return {
+      partnerKicker: "Publicitate",
+      partnerTitle: "Acest spațiu poate fi rezervat",
+      partnerCta: "Rezervă spațiul",
+      mediaKitCta: "Comandă o campanie",
+    };
+  }
+  if (primary === "hu") {
+    return {
+      partnerKicker: "Hirdetés",
+      partnerTitle: "Ez a hely foglalható",
+      partnerCta: "Hirdetés foglalása",
+      mediaKitCta: "Kampány megrendelése",
+    };
+  }
+  if (primary === "uk") {
+    return {
+      partnerKicker: "Реклама",
+      partnerTitle: "Це місце можна забронювати",
+      partnerCta: "Забронювати рекламу",
+      mediaKitCta: "Замовити кампанію",
+    };
+  }
+  if (primary === "ko") {
+    return {
+      partnerKicker: "광고",
+      partnerTitle: "이 자리는 예약할 수 있습니다",
+      partnerCta: "광고 자리 예약",
+      mediaKitCta: "캠페인 신청",
+    };
+  }
+  return {};
 }
 
 function subscribeOverlay(

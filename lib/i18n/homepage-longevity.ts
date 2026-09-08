@@ -1,6 +1,7 @@
 import { chromePack } from "@/lib/i18n/chrome-pack";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
+import { longevityEdition } from "@/lib/i18n/longevity-copy-editions";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 
 export type HomepageLongevityCopy = {
@@ -322,8 +323,9 @@ export function getHomepageLongevityCopy(locale?: string | null): HomepageLongev
   const key = pack(locale);
   const base = COPY[key] ?? COPY.en;
   const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = key === "en" && primary !== "en" ? longevityEdition(primary) : undefined;
   if (key === "en" && primary !== "en") {
-    return { ...base, softCta: getSurfaceCopy(locale).whyTrial };
+    return { ...base, ...edition, softCta: getSurfaceCopy(locale).whyTrial };
   }
   return base;
 }
