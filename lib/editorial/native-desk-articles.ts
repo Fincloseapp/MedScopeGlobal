@@ -7,22 +7,23 @@
 
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
+import type { NativeDeskSeed } from "@/lib/editorial/native-desk-seed-types";
+import { CS_PUBLIC_DESK } from "@/lib/editorial/cs-public-desk-seeds";
 import { PLUS_GLP1_REWARD } from "@/lib/editorial/plus-desk-seeds";
 import { assignEditorialUnits, publicEditorialByline } from "@/lib/editorial/units";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale, type LocaleCode } from "@/lib/i18n/config";
 import type { ArticleWithRelations } from "@/types/database";
 
-type NativeTopic = "dlouhovekost" | "zivotni-styl" | "prevence" | "novinky";
+type NativeSeed = NativeDeskSeed;
 
-type NativeSeed = {
-  slugTail: string;
-  title: string;
-  excerpt: string;
-  topic: NativeTopic;
-  keywords: string[];
-  sections: { h2: string; paras: string[]; list?: string[] }[];
-};
+function listingPublicTopic(
+  topic: NativeDeskSeed["topic"]
+): "zivotni-styl" | "nemoci" | "prevence" | "rozhovory" {
+  if (topic === "novinky") return "prevence";
+  if (topic === "dlouhovekost") return "zivotni-styl";
+  return topic;
+}
 
 function htmlFromSections(intro: string, sections: NativeSeed["sections"], closer: string): string {
   const body = sections
@@ -77,7 +78,7 @@ function buildRow(locale: string, seed: NativeSeed, index: number): ArticleWithR
       title: seed.title,
       slug,
       excerpt: seed.excerpt,
-      publicTopic: seed.topic === "novinky" ? "prevence" : seed.topic === "dlouhovekost" ? "zivotni-styl" : seed.topic,
+      publicTopic: listingPublicTopic(seed.topic),
       preferCurated: true,
     }),
     category_id: "native-desk",
@@ -88,7 +89,7 @@ function buildRow(locale: string, seed: NativeSeed, index: number): ArticleWithR
     rubric_slug: seed.topic === "novinky" ? "aktualni-zpravy" : "verejnost",
     min_access_level: "public",
     audience: "public",
-    public_topic: seed.topic === "novinky" || seed.topic === "dlouhovekost" ? "prevence" : seed.topic,
+    public_topic: listingPublicTopic(seed.topic),
     locale,
     source_name: "ViaLongeVita · Native desk",
     meta_description: seed.excerpt.slice(0, 160),
@@ -100,10 +101,16 @@ function buildRow(locale: string, seed: NativeSeed, index: number): ArticleWithR
       id: "native-desk",
       name:
         seed.topic === "dlouhovekost"
-          ? "Longevity"
+          ? "Dlouhověkost"
           : seed.topic === "novinky"
-            ? "News"
-            : "Public health",
+            ? "Novinky"
+            : seed.topic === "rozhovory"
+              ? "Rozhovory"
+              : seed.topic === "nemoci"
+                ? "Nemoci"
+                : seed.topic === "prevence"
+                  ? "Prevence"
+                  : "Životní styl",
       slug: seed.topic,
       description: null,
       created_at: published,
@@ -1075,11 +1082,11 @@ const EN: NativeSeed[] = EN_US.map((seed) => ({
 
 function withPlusDesk(locale: string, seeds: NativeSeed[]): NativeSeed[] {
   const plus = PLUS_GLP1_REWARD[locale];
-  return plus ? [plus, ...seeds] : seeds;
+  return plus ? [plus as NativeSeed, ...seeds] : seeds;
 }
 
 const PACKS: Record<string, NativeSeed[]> = {
-  cs: withPlusDesk("cs", []),
+  cs: withPlusDesk("cs", CS_PUBLIC_DESK),
   "en-US": withPlusDesk("en-US", EN_US),
   "en-UK": withPlusDesk("en-UK", EN_UK),
   en: withPlusDesk("en", EN),

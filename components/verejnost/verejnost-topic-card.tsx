@@ -6,11 +6,15 @@ export function VerejnostTopicCard({
   label,
   description,
   href,
+  count,
+  latestTitle,
 }: {
   slug: string;
   label: string;
   description: string;
   href: string;
+  count?: number;
+  latestTitle?: string;
 }) {
   return (
     <Link
@@ -24,6 +28,14 @@ export function VerejnostTopicCard({
           {label}
         </h3>
         <p className="mt-1 text-xs leading-relaxed text-slate-500">{description}</p>
+        {typeof count === "number" ? (
+          <p className="mt-2 text-[11px] font-medium uppercase tracking-wide text-[#005B96]">
+            {count} {count === 1 ? "článek" : count < 5 ? "články" : "článků"} v rubrice
+          </p>
+        ) : null}
+        {latestTitle ? (
+          <p className="mt-1 line-clamp-2 text-xs text-slate-600">{latestTitle}</p>
+        ) : null}
       </div>
     </Link>
   );

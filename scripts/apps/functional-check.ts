@@ -4181,7 +4181,15 @@ console.log("✓ magazine desk byline and copy checks passed");
     readFileSync(join(root, "lib/editorial/magazine-desk-copy.ts"), "utf8").includes("slice(0, 480)")
   );
   assert.ok(
-    readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes("ensureContent: false")
+    readFileSync(join(root, "app/(public)/verejnost/page.tsx"), "utf8").includes(
+      "listPublicArticles({ limit: 24, locale })"
+    ),
+    "Veřejnost hub must mix all public topics, not only životní styl"
+  );
+  assert.ok(
+    readFileSync(join(root, "lib/editorial/cs-public-desk-seeds.ts"), "utf8").includes(
+      "CS_PUBLIC_DESK"
+    )
   );
   assert.ok(
     readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes("resultsCount") &&
@@ -4899,7 +4907,24 @@ console.log("✓ magazine desk byline and copy checks passed");
   {
     const csDesk = nativeDeskArticlesForLocale("cs");
     assert.ok(csDesk.some((article) => article.slug.includes("glp1-odmena-alkohol")));
-    assert.ok(csDesk.every((article) => /GLP-1|odměna|alkohol/.test(`${article.title} ${article.excerpt}`)));
+    assert.ok(csDesk.length >= 10, "Czech public desk must fill Veřejnost hubs");
+    const csHay = csDesk.map((article) => `${article.title} ${article.excerpt} ${article.slug}`).join(" ");
+    assert.ok(/jóga|joga/i.test(csHay), "Czech desk must cover yoga");
+    assert.ok(/kosmetik/i.test(csHay), "Czech desk must cover skincare");
+    assert.ok(/spán/i.test(csHay), "Czech desk must cover sleep");
+    assert.ok(/pohyb|chůz/i.test(csHay), "Czech desk must cover movement");
+    assert.ok(/výživ/i.test(csHay), "Czech desk must cover nutrition");
+    assert.ok(csDesk.some((article) => article.public_topic === "prevence"));
+    assert.ok(csDesk.some((article) => article.public_topic === "nemoci"));
+    assert.ok(csDesk.some((article) => article.public_topic === "rozhovory"));
+    assert.ok(
+      csDesk.some(
+        (article) =>
+          String(article.metadata?.content_pillar ?? "") === "dlouhovekost" &&
+          article.public_topic === "zivotni-styl"
+      ),
+      "longevity native desk must list under životní styl + pillar"
+    );
     assert.ok(!csDesk.some((article) => article.slug.startsWith("zpravy-")));
     const usPlus = nativeDeskArticlesForLocale("en-US").find((article) =>
       article.slug.includes("glp1-reward-alcohol")

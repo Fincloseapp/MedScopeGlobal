@@ -42,8 +42,20 @@ function haystack(article: {
   slug?: string | null;
   public_topic?: string | null;
   category?: string | null;
+  metadata?: Record<string, unknown> | null;
 }): string {
-  return [article.title, article.excerpt, article.slug, article.public_topic, article.category]
+  const meta = article.metadata ?? {};
+  const keywords = Array.isArray(meta.keywords) ? meta.keywords.join(" ") : "";
+  const pillar = typeof meta.content_pillar === "string" ? meta.content_pillar : "";
+  return [
+    article.title,
+    article.excerpt,
+    article.slug,
+    article.public_topic,
+    article.category,
+    keywords,
+    pillar,
+  ]
     .map((value) => String(value ?? ""))
     .join(" ");
 }
@@ -55,6 +67,7 @@ export function matchesLifestyleHub(
     slug?: string | null;
     public_topic?: string | null;
     category?: string | null;
+    metadata?: Record<string, unknown> | null;
   },
   slug: LifestyleHubSlug
 ): boolean {

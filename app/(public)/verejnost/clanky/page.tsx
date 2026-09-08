@@ -77,13 +77,13 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
   const longevity = topic === "dlouhovekost";
   const lifestyleHub = isLifestyleHubSlug(topic);
   const page = Math.max(1, Number.parseInt(pageRaw ?? "1", 10) || 1);
-  const backendTopic = longevity || lifestyleHub || !topic
+  const backendTopic = longevity || lifestyleHub
     ? "zivotni-styl"
     : resolveBackendTopic(topic);
   const slimListing = Boolean(backendTopic && SLIM_BACKEND_TOPICS.has(backendTopic));
   const fetched = await listPublicArticles({
     limit: slimListing ? 24 : 48,
-    topic: backendTopic,
+    topic: backendTopic ?? undefined,
     ensureContent: false,
     mode: "card",
     locale,
@@ -98,10 +98,10 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
     if (lifestyleHub) return matchesLifestyleHub(article, topic);
     return true;
   });
-  if (lifestyleHub && filtered.length < PAGE_SIZE) {
+  if (lifestyleHub && filtered.length < 8) {
     const seen = new Set(filtered.map((article) => article.id));
     for (const article of listable) {
-      if (filtered.length >= PAGE_SIZE) break;
+      if (filtered.length >= 8) break;
       if (seen.has(article.id) || isLongevityArticle(article)) continue;
       seen.add(article.id);
       filtered.push(article);

@@ -5,7 +5,10 @@ import {
   MagazineSectionHub,
 } from "@/components/portal/magazine-section-hub";
 import { TEMATA_MAGAZINE_HUB } from "@/lib/portal/magazine-section-hub";
-import { hubTopicListingHref, VEREJNOST_HUB_TOPICS } from "@/lib/config/verejnost-topics";
+import { hubTopicListingHref, resolveBackendTopic, VEREJNOST_HUB_TOPICS } from "@/lib/config/verejnost-topics";
+import { listPublicArticles } from "@/lib/queries/verejnost";
+import { isLifestyleHubSlug, matchesLifestyleHub } from "@/lib/verejnost/lifestyle-topics";
+import { isLongevityArticle } from "@/lib/v271/news-desks";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getMarketingCopy } from "@/lib/i18n/marketing-copy";
@@ -33,6 +36,7 @@ export default async function VerejnostTemataPage() {
   const chrome = getVerejnostChrome(locale);
   const copy = getMarketingCopy(locale).publicHub;
   const topics = VEREJNOST_HUB_TOPICS;
+  const pool = await listPublicArticles({ limit: 48, locale, ensureContent: false, mode: "card" });
 
   return (
     <MagazineSectionHub config={TEMATA_MAGAZINE_HUB}>
@@ -45,6 +49,11 @@ export default async function VerejnostTemataPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {topics.map((t) => {
             const localized = copy.topics[t.slug];
+            const matches = pool.filter((article) => {
+              if (t.slug === "dlouhovekost") return isLongevityArticle(article);
+              if (isLifestyleHubSlug(t.slug)) return matchesLifestyleHub(article, t.slug);
+              return article.public_topic === resolveBackendTopic(t.slug);
+            });
             return (
               <VerejnostTopicCard
                 key={t.slug}
@@ -52,6 +61,8 @@ export default async function VerejnostTemataPage() {
                 label={localized?.label ?? t.label}
                 description={localized?.description ?? t.description}
                 href={localizePublicHref(hubTopicListingHref(t.slug, t.backendTopic), locale)}
+                count={matches.length}
+                latestTitle={matches[0]?.title}
               />
             );
           })}
