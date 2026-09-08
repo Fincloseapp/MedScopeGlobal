@@ -3,7 +3,7 @@ import { getSiteUrl } from "@/lib/config/site-url";
 import { GLOBAL_LOCALES, type GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { publicArticleSlug } from "@/lib/editorial/clinician-anonymize";
 import { localeArticleUrl } from "@/lib/seo/locale-sitemap";
-import { createClient } from "@/lib/supabase/server";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 const NEWS_WINDOW_MS = 48 * 60 * 60 * 1000;
 /** Google News allows 1 000 URLs per sitemap. Keep headroom for every edition. */
@@ -27,32 +27,40 @@ export function newsSitemapUrl(): string {
   return `${getSiteUrl()}/news-sitemap.xml`;
 }
 
-/** Google News sitemap — last 48 hours, every edition URL. */
+/** Google News sitemap — last 48 hours, one URL per story locale. */
 export async function renderNewsSitemapXml(): Promise<string> {
   const base = getSiteUrl();
   const nowMs = Date.now();
   const since = new Date(nowMs - NEWS_WINDOW_MS).toISOString();
   const until = new Date(nowMs).toISOString();
-  const maxArticles = Math.max(1, Math.floor(NEWS_SITEMAP_URL_CAP / GLOBAL_LOCALES.length));
-  let rows: { title: string; slug: string; publishedAt: string }[] = [];
+  const maxArticles = NEWS_SITEMAP_URL_CAP;
+  let rows: { title: string; slug: string; publishedAt: string; locale: GlobalLocaleCode }[] = [];
 
   try {
-    const supabase = await createClient();
+    const supabase = tryCreateServiceRoleClient();
     if (supabase) {
-      const { data } = await supabase
-        .from("articles")
-        .select("title, slug, published_at")
-        .eq("published", true)
-        .gte("published_at", since)
-        .lte("published_at", until)
-        .order("published_at", { ascending: false, nullsFirst: false })
-        .limit(maxArticles);
+      const { data } = await Promise.race([
+        supabase
+          .from("articles")
+          .select("title, slug, published_at, locale")
+          .eq("published", true)
+          .gte("published_at", since)
+          .lte("published_at", until)
+          .order("published_at", { ascending: false, nullsFirst: false })
+          .limit(maxArticles),
+        new Promise<{ data: null }>((resolve) => {
+          setTimeout(() => resolve({ data: null }), 2_500);
+        }),
+      ]);
       rows =
         data
           ?.map((article) => ({
             title: String(article.title ?? ""),
             slug: publicArticleSlug(String(article.slug ?? "")),
             publishedAt: String(article.published_at ?? ""),
+            locale: (GLOBAL_LOCALES.some((item) => item.code === article.locale)
+              ? (article.locale as GlobalLocaleCode)
+              : "cs") as GlobalLocaleCode,
           }))
           .filter((article) => {
             const publishedMs = Date.parse(article.publishedAt);
@@ -69,11 +77,10 @@ export async function renderNewsSitemapXml(): Promise<string> {
     console.error("news-sitemap fallback:", error);
   }
 
-  const urls = rows.flatMap((article) =>
-    GLOBAL_LOCALES.map((loc) => {
-      const locUrl = localeArticleUrl(base, loc.code, article.slug);
-      const lang = newsLanguage(loc.code);
-      return `  <url>
+  const urls = rows.map((article) => {
+    const locUrl = localeArticleUrl(base, article.locale, article.slug);
+    const lang = newsLanguage(article.locale);
+    return `  <url>
     <loc>${escapeXml(locUrl)}</loc>
     <news:news>
       <news:publication>
@@ -84,8 +91,7 @@ export async function renderNewsSitemapXml(): Promise<string> {
       <news:title>${escapeXml(article.title)}</news:title>
     </news:news>
   </url>`;
-    })
-  );
+  });
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"

@@ -23,7 +23,6 @@ const homepageCardSelect = [
   "title",
   "slug",
   "excerpt",
-  "content",
   "cover_image_url",
   "published",
   "published_at",
@@ -104,8 +103,10 @@ async function loadArticlesPublic(locale: string): Promise<DisplayArticle[]> {
     return (data ?? []) as unknown as Record<string, unknown>[];
   };
 
-  const aktuality = await listAktualitySection(48, localeKey);
-  const magazine = await fetchMagazine();
+  const [aktuality, magazine] = await Promise.all([
+    listAktualitySection(16, localeKey),
+    fetchMagazine(),
+  ]);
   const wire = rankAktualityByDate(
     aktuality.filter((article) => {
       const slug = String(article.slug ?? "");
@@ -194,7 +195,7 @@ async function loadHomepageDataOrFallback(locale: string) {
     return await Promise.race([
       loadHomepageData(locale),
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("homepage-timeout")), 12_000);
+        timer = setTimeout(() => reject(new Error("homepage-timeout")), 4_000);
       }),
     ]);
   } catch (error) {

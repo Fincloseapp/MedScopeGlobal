@@ -43,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const feed = `${SITE.url}/feed-${localeToPathSegment(locale)}.xml`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: {
       canonical,

@@ -164,7 +164,7 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
   const client = await createAdminReadClient();
   if (!client) return emptyOverview();
   const dataSource: AdminOverview["dataSource"] = "service-role";
-  const taxonomyInserted = await ensureMissingEditorialCategories();
+  const taxonomyInserted = 0;
 
   const [
     articlesTotal,

@@ -512,6 +512,9 @@ file("lib/v22/homepage-cache.ts");
   assert.ok(home.includes("toISOString().slice(0, 10)"), "homepage data cache must roll with the UTC day");
   assert.ok(home.includes("slice(0, 48)"), "non-CS homepage prepares a short feed");
   assert.ok(home.includes("courtesyBorrow: 2"), "non-CS homepage must not dump a Czech borrow pile");
+  assert.ok(home.includes("4_000"), "homepage must fail open before 12s Worker budget");
+  assert.ok(home.includes("Promise.all"), "magazine + aktuality must load in parallel");
+  assert.ok(!home.includes('"content"'), "homepage cards must not pull full article HTML");
 }
 {
   const hop = readFileSync(join(root, "app/relay/[...path]/route.ts"), "utf8");
@@ -2065,6 +2068,24 @@ assert.ok(
   readFileSync(join(root, "lib/seo/locale-sitemap.ts"), "utf8").includes('path: "/newsletter"'),
   "locale sitemaps must list the newsletter hub"
 );
+{
+  const localeMap = readFileSync(join(root, "lib/seo/locale-sitemap.ts"), "utf8");
+  assert.ok(localeMap.includes("tryCreateServiceRoleClient"));
+  assert.ok(localeMap.includes(".limit(400)"));
+  assert.ok(localeMap.includes('path: "/verejnost"'));
+  assert.ok(localeMap.includes('path: "/inzerce"'));
+  assert.ok(readFileSync(join(root, "lib/seo/root-sitemap.ts"), "utf8").includes("GLOBAL_LOCALES"));
+  assert.ok(
+    readFileSync(join(root, "app/(public)/verejnost/clanky/[slug]/page.tsx"), "utf8").includes(
+      "buildPageMetadata"
+    )
+  );
+  assert.ok(readFileSync(join(root, "lib/seo/metadata.ts"), "utf8").includes("absolute:"));
+  assert.ok(readFileSync(join(root, "middleware.ts"), "utf8").includes("void logMonetizationEvent"));
+  assert.ok(
+    readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes("article-by-slug-timeout")
+  );
+}
 assert.ok(
   readFileSync(join(root, "app/(public)/tip/page.tsx"), "utf8").includes('redirect("/articles")'),
   "/tip must not send readers to VIP protocols"
@@ -2590,6 +2611,10 @@ assert.ok(
 assert.ok(
   readFileSync(join(root, "lib/seo/news-sitemap.ts"), "utf8").includes('.lte("published_at"'),
   "Google News sitemap must drop future publication dates"
+);
+assert.ok(
+  readFileSync(join(root, "lib/seo/news-sitemap.ts"), "utf8").includes("tryCreateServiceRoleClient"),
+  "news sitemap must not hang on cookie Auth"
 );
 assert.ok(
   readFileSync(join(root, "app/robots.ts"), "utf8").includes("newsSitemapUrl()"),

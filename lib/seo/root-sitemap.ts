@@ -5,20 +5,11 @@
  */
 
 import type { MetadataRoute } from "next";
+import { GLOBAL_LOCALES } from "@/lib/ecosystem/locales";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
 import { LONGEVITY_PROTOCOLS } from "@/lib/ecosystem/longevity-protocols";
 
-export const ROOT_SITEMAP_EDITIONS = [
-  "cs",
-  "de",
-  "fr",
-  "it",
-  "es",
-  "pt-BR",
-  "en",
-  "en-US",
-  "en-UK",
-] as const;
+export const ROOT_SITEMAP_EDITIONS = GLOBAL_LOCALES.map((item) => item.code);
 
 type StaticSpec = {
   path: string;

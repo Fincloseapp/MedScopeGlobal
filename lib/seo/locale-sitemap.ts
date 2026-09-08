@@ -4,7 +4,7 @@ import { getSiteUrl } from "@/lib/config/site-url";
 import { publicArticleSlug } from "@/lib/editorial/clinician-anonymize";
 import { localeToPathSegment, localeToSitemapSlug, pathSegmentToLocale } from "@/lib/i18n/locale-path";
 import { LONGEVITY_PROTOCOLS } from "@/lib/ecosystem/longevity-protocols";
-import { createClient } from "@/lib/supabase/server";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 export type LocaleSitemapEntry = MetadataRoute.Sitemap[number] & {
   alternates?: { languages: Record<string, string> };
@@ -39,7 +39,9 @@ function staticRoutesForLocale(base: string, locale: GlobalLocaleCode): LocaleSi
     { path: "/", changeFrequency: "daily" as const, priority: 0.95 },
     { path: "/articles", changeFrequency: "daily" as const, priority: 0.95 },
     { path: "/novinky", changeFrequency: "hourly" as const, priority: 0.9 },
+    { path: "/verejnost", changeFrequency: "daily" as const, priority: 0.9 },
     { path: "/verejnost/clanky", changeFrequency: "daily" as const, priority: 0.9 },
+    { path: "/inzerce", changeFrequency: "weekly" as const, priority: 0.7 },
     { path: "/aplikace", changeFrequency: "weekly" as const, priority: 0.9 },
     { path: "/mediflow", changeFrequency: "weekly" as const, priority: 0.85 },
     { path: "/ordizaznam", changeFrequency: "weekly" as const, priority: 0.85 },
@@ -73,15 +75,27 @@ export async function buildLocaleSitemapEntries(
   const staticRoutes = staticRoutesForLocale(base, locale);
 
   try {
-    const supabase = await createClient();
+    const supabase = tryCreateServiceRoleClient();
     if (!supabase) {
       return staticRoutes;
     }
-    const { data: articles } = await supabase
+    let query = supabase
       .from("articles")
-      .select("slug, published_at, updated_at")
+      .select("slug, published_at, updated_at, locale")
       .eq("published", true)
-      .limit(5000);
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(400);
+    query =
+      locale === "cs"
+        ? query.or("locale.eq.cs,locale.is.null")
+        : query.eq("locale", locale);
+
+    const { data: articles } = await Promise.race([
+      query,
+      new Promise<{ data: null }>((resolve) => {
+        setTimeout(() => resolve({ data: null }), 2_500);
+      }),
+    ]);
 
     const storyUrls: LocaleSitemapEntry[] =
       articles?.map((article) => {

@@ -4,6 +4,8 @@ import { VerejnostArticleDetail } from "@/components/verejnost/verejnost-article
 import { resolveArticleBodyLock } from "@/lib/auth/article-eligibility";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getMarketingCopy } from "@/lib/i18n/marketing-copy";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 import { getEditorialArticleGateCopy } from "@/lib/v38/conversion-copy";
 import {
   getPublicArticleBySlug,
@@ -15,21 +17,25 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const article = await getPublicArticleBySlug(slug);
-  return {
-    title: article ? `${article.title} | Veřejné zdraví` : "Veřejné zdraví",
-    description: article?.excerpt ?? undefined,
-  };
+  const locale = await getServerLocale();
+  const hub = getMarketingCopy(locale).publicHub;
+  const article = await getPublicArticleBySlug(slug, locale);
+  return buildPageMetadata({
+    title: article ? article.title : hub.metaTitle,
+    description: article?.excerpt ?? hub.metaDescription,
+    path: `/verejnost/clanky/${slug}`,
+    locale,
+    image: article?.cover_image_url ?? undefined,
+  });
 }
 
 export const dynamic = "force-dynamic";
 
 export default async function VerejnostClanekDetailPage({ params }: Props) {
   const { slug } = await params;
-  const article = await getPublicArticleBySlug(slug);
-  if (!article) notFound();
-
   const locale = await getServerLocale();
+  const article = await getPublicArticleBySlug(slug, locale);
+  if (!article) notFound();
   const { isVip, accessLevel, hasEditorialAccess } = await getReaderContext();
   const { locked } = resolveArticleBodyLock(article, {
     isVip,

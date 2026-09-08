@@ -106,23 +106,23 @@ export async function middleware(request: NextRequest) {
   if (crawler && !skipVisitLog) {
     const country = requestCountry(request.headers);
     const { locale: pathLocale } = resolveLocalePath(pathname);
-    await logMonetizationEvent("ai_agent_visit", {
+    void logMonetizationEvent("ai_agent_visit", {
       agent: crawler,
       locale: pathLocale ?? "en",
       path: pathname.slice(0, 180),
       via: "crawler",
       ...(country ? { country } : {}),
-    });
+    }).catch(() => {});
   } else if (incoming && !skipVisitLog) {
     const country = requestCountry(request.headers);
     const { locale: pathLocale } = resolveLocalePath(pathname);
-    await logMonetizationEvent("ai_agent_visit", {
+    void logMonetizationEvent("ai_agent_visit", {
       agent: incoming.agent,
       locale: pathLocale ?? "en",
       path: pathname.slice(0, 180),
       via: incoming.via,
       ...(country ? { country } : {}),
-    });
+    }).catch(() => {});
   }
 
   const outbound = (response: NextResponse) => {

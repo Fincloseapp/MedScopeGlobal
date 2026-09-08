@@ -31,8 +31,10 @@ export function buildPageMetadata(params: {
   const ogImage = params.image ?? `${SITE.url}/og-default.png`;
   const ogLocale = getOgLocale(params.locale);
 
+  const branded =
+    params.title.includes(MAGAZINE.name) || params.title.includes(SITE.name);
   return {
-    title: params.title,
+    title: branded ? { absolute: params.title } : params.title,
     description: params.description,
     alternates: { canonical, languages },
     openGraph: {

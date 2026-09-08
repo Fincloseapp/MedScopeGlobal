@@ -149,7 +149,7 @@ export async function getLatestArticles(
   const supabase = await createDataClient();
   if (!supabase) return demo();
 
-  const fetchLimit = Math.min(Math.max(limit * 3, limit + 24), 200);
+  const fetchLimit = Math.min(Math.max(limit * 3, limit + 24), 80);
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     const load = (async () => {
@@ -403,12 +403,30 @@ export async function getArticleBySlug(
     const demo = getDemoMagazineArticleBySlug(dbSlug);
     return demo ? prepareArticleForDisplay(demo, locale, "full") : null;
   }
-  const { data, error } = await supabase
-    .from("articles")
-    .select(articleSelect)
-    .eq("slug", dbSlug)
-    .eq("published", true)
-    .maybeSingle();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let data: Record<string, unknown> | null = null;
+  let error: { message: string } | null = null;
+  try {
+    const result = await Promise.race([
+      supabase
+        .from("articles")
+        .select(articleSelect)
+        .eq("slug", dbSlug)
+        .eq("published", true)
+        .maybeSingle(),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("article-by-slug-timeout")), 3_000);
+      }),
+    ]);
+    data = (result.data as Record<string, unknown> | null) ?? null;
+    error = result.error;
+  } catch (err) {
+    console.error("getArticleBySlug", err);
+    const demo = getDemoMagazineArticleBySlug(dbSlug);
+    return demo ? prepareArticleForDisplay(demo, locale, "full") : null;
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 
   if (error) {
     console.error("getArticleBySlug", error);
@@ -610,11 +628,11 @@ export async function listAktualitySection(
   const freshFrom = new Date(Date.now() - AKTUALITY_FRESH_DAYS * 86_400_000).toISOString();
   const filtered = await fetchEnoughWireRows(
     supabase,
-    articleSelect,
+    wireCardSelect,
     freshFrom,
     limit,
     locale,
-    3
+    2
   );
   const prepared = await prepareArticlesForDisplay(filtered, locale, {
     mode: "card",
