@@ -10,6 +10,7 @@ import {
   type WriterAgent,
   type WriterDeskId,
 } from "@/lib/editorial/writer-agents";
+import { surfaceEdition } from "@/lib/i18n/surface-copy-editions";
 
 function pack(locale?: string | null): string {
   const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
@@ -994,7 +995,7 @@ COPY["pt-BR"] = {
 
 export function getSurfaceCopy(locale?: string | null): SurfaceCopy {
   const key = pack(locale);
-  const copy = COPY[key] ?? COPY.en;
+  const copy = { ...(COPY[key] ?? COPY.en), ...(surfaceEdition(key) ?? {}) };
   if (key === "cs") return copy;
   const sources = citedSourcesLine(locale);
   return {

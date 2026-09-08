@@ -3,7 +3,9 @@
 import { getMagazineCopy, MAGAZINE } from "@/lib/brand/magazine";
 import { chromePack } from "@/lib/i18n/chrome-pack";
 import { normalizeLocale, type LocaleCode } from "@/lib/i18n/config";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { localRegulatorShort } from "@/lib/i18n/local-regulator";
+import { portalChromeEdition } from "@/lib/i18n/portal-chrome-editions";
 
 /** Default Czech hero copy (legacy export — prefer getPortalPhilosophy(locale) on server). */
 export const PORTAL_PHILOSOPHY = {
@@ -305,9 +307,14 @@ const CHROME: Record<string, Omit<PortalChrome, "newsTabs" | "services">> = {
 
 export function getPortalChrome(locale?: LocaleCode | string): PortalChrome {
   const primary = chromePack(locale);
+  const editionKey = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = portalChromeEdition(editionKey);
+  const { newsTabs: editionTabs, ...editionChrome } = edition ?? {};
   const isCs = primary === "cs";
-  const base = CHROME[primary] ?? CHROME.en ?? CHROME.cs;
-  const tabLabels = isCs ? NEWS_TAB_LABELS.cs : NEWS_TAB_LABELS[primary] ?? NEWS_TAB_LABELS.en;
+  const base = { ...(CHROME[primary] ?? CHROME.en ?? CHROME.cs), ...editionChrome };
+  const tabLabels = isCs
+    ? NEWS_TAB_LABELS.cs
+    : editionTabs ?? NEWS_TAB_LABELS[editionKey] ?? NEWS_TAB_LABELS[primary] ?? NEWS_TAB_LABELS.en;
   const newsTabs = PORTAL_NEWS_TABS.map((tab, index) => ({
     href: tab.href,
     label: tabLabels?.[index] ?? tab.label,

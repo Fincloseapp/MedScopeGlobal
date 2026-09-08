@@ -1596,6 +1596,11 @@ assert.ok(
   assert.equal(getDesktopHeaderMenu("zh-CN")[0]?.children?.[0]?.label, "长寿");
   assert.ok(!getDesktopHeaderMenu("sk").some((item) => item.label === "Public"));
   assert.ok(!getDesktopHeaderMenu("ja").some((item) => item.label === "Public"));
+  assert.equal(getSurfaceCopy("sk").searchTab, "Hľadať");
+  assert.equal(getSurfaceCopy("ja").searchPlaceholder.includes("長寿"), true);
+  assert.equal(getSurfaceCopy("pl").whyTrial.includes("Redakcja"), true);
+  assert.ok(!getSurfaceCopy("sk").whyTrial.includes("Open Editorial"));
+  assert.ok(!getSurfaceCopy("ja").searchTab.includes("Search"));
   const headerNav = readFileSync(join(root, "components/layout/header-navigation.tsx"), "utf8");
   const mobileNav = readFileSync(join(root, "components/v20/mobile-nav.tsx"), "utf8");
   const dropdownStart = headerNav.indexOf('role="menu"');

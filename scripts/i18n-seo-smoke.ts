@@ -294,8 +294,10 @@ assert.equal(newsDesksForLocale("cs").find((d) => d.id === "dlouhovekost")?.labe
 assert.equal(getPortalChrome("de").newsTabs[0]?.label, "Nachrichten");
 assert.equal(getPortalChrome("fr").trialCta.includes("14"), true);
 assert.ok(getPortalChrome("de").footerLegal.includes("Langlebigkeit"));
-assert.equal(getPortalChrome("sk").forWhom, "Who it's for");
-assert.equal(getPortalChrome("ru").trialCta, "Try 14 days free");
+assert.equal(getPortalChrome("sk").forWhom, "Pre koho");
+assert.equal(getPortalChrome("sk").readMagazine, "Otvoriť magazín");
+assert.equal(getPortalChrome("ru").trialCta, "14 дней бесплатно");
+assert.equal(getPortalChrome("ja").readMagazine, "雑誌を開く");
 assert.equal(getPortalChrome("ja").news, "ViaLongeVita");
 
 assert.equal(getSurfaceCopy("cs").searchTab, "Hledat");
@@ -306,8 +308,11 @@ assert.ok(!getSurfaceCopy("fr").footer.audiences.some((item) => item.href.starts
 assert.ok(getSurfaceCopy("cs").searchNoResults.includes("MeDiprep"));
 assert.equal(getSurfaceCopy("fr").searchTab, "Rechercher");
 assert.equal(getSurfaceCopy("en-US").searchTab, "Search");
-assert.equal(getSurfaceCopy("ru").searchTab, "Search");
-assert.equal(getSurfaceCopy("ja").searchTab, "Search");
+assert.equal(getSurfaceCopy("ru").searchTab, "Поиск");
+assert.equal(getSurfaceCopy("ja").searchTab, "検索");
+assert.equal(getSurfaceCopy("sk").searchTab, "Hľadať");
+assert.equal(getSurfaceCopy("sk").whyTrial, "Otvoriť tarif Redakcia");
+assert.equal(getSurfaceCopy("ja").whyTrial, "編集部プランを開く");
 assert.equal(getSurfaceCopy("sk").writersTitle, "Editorial desks");
 assert.equal(writerDesksForLocale("cs").length, 5);
 assert.equal(writerAgentsForLocale("cs").length, 20);
