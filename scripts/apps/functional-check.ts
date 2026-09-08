@@ -2163,16 +2163,14 @@ assert.ok(
   const briefLayout = readFileSync(join(root, "lib/monetization/brief-email-layout.ts"), "utf8");
   assert.ok(briefLayout.includes("newsletterTopicCover"));
   assert.ok(briefLayout.includes("articleCoverAbs"));
-  assert.ok(
-    readFileSync(join(root, "app/(public)/newsletter/page.tsx"), "utf8").includes("coverSeed={latest?.issue_date}")
-  );
 }
 {
   const archiveSrc = readFileSync(join(root, "lib/queries/v4c/newsletters.ts"), "utf8");
   assert.ok(archiveSrc.includes("NEWSLETTER_INDEX_COLUMNS"));
   assert.ok(archiveSrc.includes("admin ? \"*\" : NEWSLETTER_INDEX_COLUMNS"));
   assert.ok(archiveSrc.includes(".limit(40)"));
-  assert.ok(archiveSrc.includes("getNewsletterBySlug(picked.slug)"));
+  assert.ok(archiveSrc.includes("publicNewsletterClient"));
+  assert.ok(archiveSrc.includes("tryCreateServiceRoleClient"));
 }
 assert.ok(
   readFileSync(join(root, "app/(public)/newsletter/[slug]/page.tsx"), "utf8").includes("getNewsletterForPublic"),

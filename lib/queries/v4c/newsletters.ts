@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { createServiceRoleClient, tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { resolveGlobalLocale } from "@/lib/i18n/locale-path";
 import {
   newsletterIssueSlug,
@@ -29,6 +29,10 @@ export const NEWSLETTER_ISR_SECONDS = 3600;
 export const NEWSLETTER_INDEX_COLUMNS =
   "id, title, slug, issue_date, published, admin_only, created_at";
 
+async function publicNewsletterClient() {
+  return tryCreateServiceRoleClient() ?? (await createClient());
+}
+
 function asIndexRow(row: Partial<NewsletterRow> & Pick<NewsletterRow, "id" | "slug" | "issue_date">): NewsletterRow {
   return {
     id: row.id,
@@ -52,7 +56,7 @@ export function newsletterRowLocale(row: Pick<NewsletterRow, "slug" | "layout_js
 }
 
 export async function getLatestNewsletter(locale?: string) {
-  const supabase = await createClient();
+  const supabase = await publicNewsletterClient();
   const { data, error } = await supabase
     .from("newsletters")
     .select(locale ? NEWSLETTER_INDEX_COLUMNS : "*")
@@ -72,12 +76,18 @@ export async function getLatestNewsletter(locale?: string) {
     rows[0] ??
     null;
   if (!picked) return null;
-  const full = await getNewsletterBySlug(picked.slug);
-  return full ?? picked;
+  const { data: full } = await supabase
+    .from("newsletters")
+    .select("*")
+    .eq("slug", picked.slug)
+    .eq("published", true)
+    .eq("admin_only", false)
+    .maybeSingle();
+  return (full as NewsletterRow | null) ?? picked;
 }
 
 export async function getNewsletterBySlug(slug: string) {
-  const supabase = await createClient();
+  const supabase = await publicNewsletterClient();
   const { data, error } = await supabase
     .from("newsletters")
     .select("*")
@@ -120,7 +130,7 @@ export async function getPendingNewsletterTopics() {
 }
 
 export async function getNewsletterArchive(admin = false, locale?: string) {
-  const supabase = admin ? createServiceRoleClient() : await createClient();
+  const supabase = admin ? createServiceRoleClient() : await publicNewsletterClient();
   let q = supabase
     .from("newsletters")
     .select(admin ? "*" : NEWSLETTER_INDEX_COLUMNS)
