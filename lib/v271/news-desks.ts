@@ -678,6 +678,188 @@ const DESK_COPY: Record<string, Record<NewsDeskId, DeskCopy>> = {
       blurb: "Redakčné čítanie s fotografiami a nezávislou kontrolou.",
     },
   },
+  ru: {
+    novinky: {
+      label: "Новости",
+      more: "Все обновления",
+      kicker: "Сейчас",
+      blurb: "Новости здоровья и долголетия — с контекстом, без сенсаций.",
+    },
+    verejnost: {
+      label: "Для всех",
+      more: "Статьи для всех",
+      kicker: "Общественное здоровье",
+      blurb: "Профилактика, болезни и образ жизни простым языком.",
+    },
+    dlouhovekost: {
+      label: "Долголетие",
+      more: "По теме",
+      kicker: "Healthspan",
+      blurb: "Сон, движение, питание, биомаркеры — доказательства против хайпа.",
+    },
+    clanky: {
+      label: "Журнал",
+      more: "Открыть журнал",
+      kicker: "Журнал",
+      blurb: "Редакционные тексты с фотографиями и независимой проверкой.",
+    },
+  },
+  uk: {
+    novinky: {
+      label: "Новини",
+      more: "Усі оновлення",
+      kicker: "Зараз",
+      blurb: "Новини здоров’я та довголіття — з контекстом, без сенсацій.",
+    },
+    verejnost: {
+      label: "Для всіх",
+      more: "Статті для всіх",
+      kicker: "Громадське здоров’я",
+      blurb: "Профілактика, хвороби та спосіб життя простою мовою.",
+    },
+    dlouhovekost: {
+      label: "Довголіття",
+      more: "За темою",
+      kicker: "Healthspan",
+      blurb: "Сон, рух, харчування, біомаркери — докази проти хайпу.",
+    },
+    clanky: {
+      label: "Журнал",
+      more: "Відкрити журнал",
+      kicker: "Журнал",
+      blurb: "Редакційні тексти з фото та незалежною перевіркою.",
+    },
+  },
+  ro: {
+    novinky: {
+      label: "Știri",
+      more: "Toate noutățile",
+      kicker: "Acum",
+      blurb: "Știri de sănătate și longevitate — cu context, fără senzațional.",
+    },
+    verejnost: {
+      label: "Public",
+      more: "Articole pentru toți",
+      kicker: "Sănătate publică",
+      blurb: "Prevenție, boli și stil de viață pe înțelesul tuturor.",
+    },
+    dlouhovekost: {
+      label: "Longevitate",
+      more: "Pe această temă",
+      kicker: "Healthspan",
+      blurb: "Somn, mișcare, nutriție, biomarkeri — dovezi, nu hype.",
+    },
+    clanky: {
+      label: "Revistă",
+      more: "Deschide revista",
+      kicker: "Revistă",
+      blurb: "Texte editoriale cu fotografii și verificare independentă.",
+    },
+  },
+  hu: {
+    novinky: {
+      label: "Hírek",
+      more: "Minden frissítés",
+      kicker: "Most",
+      blurb: "Egészségügyi hírek és hosszú élet — kontextussal, szenzáció nélkül.",
+    },
+    verejnost: {
+      label: "Mindenkinek",
+      more: "Cikkek mindenkinek",
+      kicker: "Népegészségügy",
+      blurb: "Megelőzés, betegségek és életmód közérthetően.",
+    },
+    dlouhovekost: {
+      label: "Hosszú élet",
+      more: "A témában",
+      kicker: "Healthspan",
+      blurb: "Alvás, mozgás, táplálkozás, biomarkerek — bizonyíték, nem hype.",
+    },
+    clanky: {
+      label: "Magazin",
+      more: "Magazin megnyitása",
+      kicker: "Magazin",
+      blurb: "Szerkesztőségi olvasnivaló fotókkal és független ellenőrzéssel.",
+    },
+  },
+  zh: {
+    novinky: {
+      label: "新闻",
+      more: "全部更新",
+      kicker: "此刻",
+      blurb: "健康与长寿快报——有背景，不耸动。",
+    },
+    verejnost: {
+      label: "大众",
+      more: "面向所有人的文章",
+      kicker: "公共卫生",
+      blurb: "用明白的话说预防、疾病与生活方式。",
+    },
+    dlouhovekost: {
+      label: "长寿",
+      more: "本主题",
+      kicker: "Healthspan",
+      blurb: "睡眠、运动、营养、生物标志物——证据对照炒作。",
+    },
+    clanky: {
+      label: "杂志",
+      more: "打开杂志",
+      kicker: "杂志",
+      blurb: "带摄影与独立审校的编辑阅读。",
+    },
+  },
+  ja: {
+    novinky: {
+      label: "ニュース",
+      more: "すべての更新",
+      kicker: "いま",
+      blurb: "健康ニュースと長寿の要点。文脈あり、煽りなし。",
+    },
+    verejnost: {
+      label: "一般向け",
+      more: "すべての人向け記事",
+      kicker: "公衆衛生",
+      blurb: "予防、病気、生活習慣をわかりやすく。",
+    },
+    dlouhovekost: {
+      label: "長寿",
+      more: "このテーマ",
+      kicker: "Healthspan",
+      blurb: "睡眠、運動、栄養、バイオマーカー — 根拠と誇張。",
+    },
+    clanky: {
+      label: "雑誌",
+      more: "雑誌を開く",
+      kicker: "雑誌",
+      blurb: "写真と独立した確認のある編集記事。",
+    },
+  },
+  ko: {
+    novinky: {
+      label: "뉴스",
+      more: "모든 업데이트",
+      kicker: "지금",
+      blurb: "건강 뉴스와 장수 브리핑 — 맥락 있게, 선정성 없이.",
+    },
+    verejnost: {
+      label: "일반",
+      more: "모두를 위한 기사",
+      kicker: "공중보건",
+      blurb: "예방, 질병, 생활습관을 쉽게.",
+    },
+    dlouhovekost: {
+      label: "장수",
+      more: "이 주제",
+      kicker: "Healthspan",
+      blurb: "수면, 운동, 영양, 바이오마커 — 근거 대 과장.",
+    },
+    clanky: {
+      label: "매거진",
+      more: "매거진 열기",
+      kicker: "매거진",
+      blurb: "사진과 독립 검토가 있는 편집 기사.",
+    },
+  },
 };
 
 const DESK_COPY_EN_US: Record<NewsDeskId, DeskCopy> = {
