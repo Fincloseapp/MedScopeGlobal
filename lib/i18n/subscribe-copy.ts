@@ -983,8 +983,16 @@ export function getSubscribeCopy(
   if (edition) {
     const { plans, audienceByApp, priceNoteByApp, ...rest } = edition;
     Object.assign(localized, rest);
-    if (audienceByApp) localized.audienceByApp = { ...localized.audienceByApp, ...audienceByApp };
-    if (priceNoteByApp) localized.priceNoteByApp = { ...localized.priceNoteByApp, ...priceNoteByApp };
+    if (audienceByApp) {
+      localized.audienceByApp = { ...localized.audienceByApp, ...Object.fromEntries(
+        Object.entries(audienceByApp).filter((entry): entry is [string, string] => Boolean(entry[1]))
+      ) };
+    }
+    if (priceNoteByApp) {
+      localized.priceNoteByApp = { ...localized.priceNoteByApp, ...Object.fromEntries(
+        Object.entries(priceNoteByApp).filter((entry): entry is [string, string] => Boolean(entry[1]))
+      ) };
+    }
     if (plans) {
       for (const [tier, pack] of Object.entries(plans)) {
         const key = tier as keyof SubscribeCopy["plans"];
