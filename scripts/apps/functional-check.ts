@@ -254,6 +254,8 @@ import { generateInvoiceHtml } from "../../lib/billing/invoice-generator";
 import { buildSpdString } from "../../lib/billing/spd-qr";
 import { briefChrome } from "../../lib/monetization/brief-marketing";
 import { translateNavHref } from "../../lib/i18n/nav-copy";
+import { getDesktopHeaderMenu } from "../../lib/config/main-navigation";
+import { menuAccountLinks } from "../../lib/i18n/menu-account";
 import {
   FOREIGN_WRITER_ROTATION,
   defaultPublicWriterLocales,
@@ -1571,6 +1573,51 @@ assert.ok(
     ),
   "top bar must show magazine, firms and every primary hub without a hidden scroll"
 );
+{
+  assert.equal(getDesktopHeaderMenu("cs")[0]?.children?.[0]?.label, "Dlouhověkost");
+  assert.equal(getDesktopHeaderMenu("de")[0]?.children?.[0]?.label, "Langlebigkeit");
+  assert.equal(getDesktopHeaderMenu("fr")[0]?.children?.[0]?.label, "Longévité");
+  assert.equal(menuAccountLinks("cs").signInLabel, "Přihlášení");
+  assert.equal(menuAccountLinks("cs").subscribeLabel, "Předplatné");
+  assert.equal(menuAccountLinks("de").signInLabel, "Anmelden");
+  assert.equal(menuAccountLinks("de").subscribeLabel, "Abo");
+  assert.equal(menuAccountLinks("fr").signInLabel, "Connexion");
+  assert.equal(menuAccountLinks("en").signInLabel, "Sign in");
+  assert.equal(menuAccountLinks("sk").signInLabel, "Prihlásenie");
+  assert.equal(menuAccountLinks("pl").subscribeLabel, "Prenumerata");
+  assert.equal(menuAccountLinks("ja").signInLabel, "ログイン");
+  assert.equal(menuAccountLinks("jp").subscribeLabel, "購読");
+  assert.equal(menuAccountLinks("zh-CN").subscribeLabel, "订阅");
+  const headerNav = readFileSync(join(root, "components/layout/header-navigation.tsx"), "utf8");
+  const mobileNav = readFileSync(join(root, "components/v20/mobile-nav.tsx"), "utf8");
+  const dropdownStart = headerNav.indexOf('role="menu"');
+  const stripInDropdown = headerNav.indexOf("MenuAccountStrip", dropdownStart);
+  const childrenInDropdown = headerNav.indexOf("{item.children", dropdownStart);
+  assert.ok(dropdownStart > 0 && stripInDropdown > dropdownStart, "desktop dropdowns must start with login + subscribe");
+  assert.ok(
+    stripInDropdown < childrenInDropdown,
+    "login + subscribe must render above the section links"
+  );
+  const mobileNavStart = mobileNav.indexOf("<nav ");
+  const mobileStrip = mobileNav.indexOf("MenuAccountStrip", mobileNavStart);
+  const mobileUtilities = mobileNav.indexOf("headerUtilityAria(", mobileNavStart);
+  assert.ok(mobileStrip > mobileNavStart, "mobile sheet must start with login + subscribe");
+  assert.ok(
+    mobileStrip < mobileUtilities,
+    "mobile account pair must sit above utility links"
+  );
+  for (const { code } of GLOBAL_LOCALES) {
+    const pair = menuAccountLinks(code);
+    assert.ok(pair.signInLabel.length > 1, `${code} sign-in label`);
+    assert.ok(pair.subscribeLabel.length > 1, `${code} subscribe label`);
+    assert.ok(pair.signInHref.includes("/login"), `${code} login href`);
+    assert.ok(pair.subscribeHref.includes("/predplatne"), `${code} subscribe href`);
+    if (code !== "cs") {
+      assert.ok(!pair.signInLabel.includes("Přihlášení"), `${code} must not use Czech sign-in`);
+      assert.ok(!pair.subscribeLabel.includes("Předplatné"), `${code} must not use Czech Předplatné`);
+    }
+  }
+}
 assert.ok(
   readFileSync(join(root, "lib/config/main-navigation.ts"), "utf8").includes(
     "1 test zdarma · 89 Kč, další měsíc 149 Kč"

@@ -22,6 +22,7 @@ import { getMagazineListingCopy } from "@/lib/brand/magazine";
 import { isStudentChromePath, studentNavCtaLabel } from "@/lib/studenti/pricing";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { NavSubscribeCta } from "@/components/v38/nav-subscribe-cta";
+import { MenuAccountStrip } from "@/components/layout/menu-account-strip";
 import { normalizeLocale } from "@/lib/i18n/config";
 
 export function V20MobileNav({
@@ -74,6 +75,13 @@ export function V20MobileNav({
         </SheetHeader>
 
         <nav className="mt-4 flex-1 space-y-2" aria-label={surface.menuOpen}>
+          <div className="rounded-xl border border-[#005B96]/20 bg-[#f4f9fc] p-3">
+            <MenuAccountStrip
+              locale={navLocale}
+              student={isStudentChromePath(pathname)}
+              onNavigate={() => setOpen(false)}
+            />
+          </div>
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#005B96]">
               {headerUtilityAria(navLocale)}
@@ -224,11 +232,6 @@ export function V20MobileNav({
           <Button asChild variant="outline" className="rounded-full touch-manipulation">
             <Link href={localizePublicHref("/aplikace", navLocale)} onClick={() => setOpen(false)}>
               {surface.downloadApps}
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="rounded-full touch-manipulation">
-            <Link href={localizePublicHref("/login", navLocale)} onClick={() => setOpen(false)}>
-              {surface.signIn}
             </Link>
           </Button>
         </div>

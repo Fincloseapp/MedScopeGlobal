@@ -7,6 +7,8 @@ import { useEffect, useRef, useState } from "react";
 import type { NavItem } from "@/lib/config/main-navigation";
 import { cn } from "@/lib/utils";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { MenuAccountStrip } from "@/components/layout/menu-account-strip";
+import { isStudentChromePath } from "@/lib/studenti/pricing";
 
 function pathOf(href: string) {
   return href.split("#")[0]?.split("?")[0] ?? href;
@@ -114,6 +116,12 @@ export function HeaderNavigation({ mainMenu, locale = "cs" }: { mainMenu: NavIte
                 role="menu"
                 className="absolute left-0 top-full z-[70] mt-0 min-w-[20rem] max-w-[min(36rem,calc(100vw-1.5rem))] rounded-xl border border-[#d9e8f4] bg-white p-3 shadow-xl dark:border-white/10 dark:bg-slate-950"
               >
+                <MenuAccountStrip
+                  locale={locale}
+                  student={isStudentChromePath(pathname)}
+                  onNavigate={() => setOpenLabel(null)}
+                  className="mb-3 grid grid-cols-2 gap-1.5"
+                />
                 <p className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#005B96]">
                   {item.label}
                 </p>
