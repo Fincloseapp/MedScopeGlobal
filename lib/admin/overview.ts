@@ -166,6 +166,61 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
   const dataSource: AdminOverview["dataSource"] = "service-role";
   const taxonomyInserted = 0;
 
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let packed:
+    | [
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        AdminCategoryRow[],
+        string | null,
+        string | null,
+        StripeMoneySnapshot,
+        EditorialPulse,
+      ]
+    | null = null;
+  try {
+    packed = await Promise.race([
+      Promise.all([
+        countSafe(client.from("articles").select("id", { count: "exact", head: true })),
+        countSafe(
+          client.from("articles").select("id", { count: "exact", head: true }).eq("published", true)
+        ),
+        countSafe(client.from("ads").select("id", { count: "exact", head: true })),
+        countSafe(client.from("ads").select("id", { count: "exact", head: true }).eq("active", true)),
+        countSafe(
+          client.from("vip_subscriptions").select("id", { count: "exact", head: true }).eq("active", true)
+        ),
+        countSafe(
+          client
+            .from("newsletter_subscribers")
+            .select("id", { count: "exact", head: true })
+            .eq("segment", "public")
+            .is("unsubscribed_at", null)
+        ),
+        countSafe(
+          client.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "active")
+        ),
+        loadAdminCategoryRows({ skipEnsure: true }),
+        getHeurekaPositionId("cz"),
+        getHeurekaPositionId("sk"),
+        loadStripeMoneySnapshot(),
+        loadEditorialPulse(),
+      ]),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("admin-overview-timeout")), 5_000);
+      }),
+    ]);
+  } catch {
+    return emptyOverview();
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+  if (!packed) return emptyOverview();
   const [
     articlesTotal,
     articlesPublished,
@@ -179,32 +234,7 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
     heurekaSkId,
     stripeMoney,
     pulse,
-  ] = await Promise.all([
-    countSafe(client.from("articles").select("id", { count: "exact", head: true })),
-    countSafe(
-      client.from("articles").select("id", { count: "exact", head: true }).eq("published", true)
-    ),
-    countSafe(client.from("ads").select("id", { count: "exact", head: true })),
-    countSafe(client.from("ads").select("id", { count: "exact", head: true }).eq("active", true)),
-    countSafe(
-      client.from("vip_subscriptions").select("id", { count: "exact", head: true }).eq("active", true)
-    ),
-    countSafe(
-      client
-        .from("newsletter_subscribers")
-        .select("id", { count: "exact", head: true })
-        .eq("segment", "public")
-        .is("unsubscribed_at", null)
-    ),
-    countSafe(
-      client.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "active")
-    ),
-    loadAdminCategoryRows({ skipEnsure: true }),
-    getHeurekaPositionId("cz"),
-    getHeurekaPositionId("sk"),
-    loadStripeMoneySnapshot(),
-    loadEditorialPulse(),
-  ]);
+  ] = packed;
 
   const since = new Date(Date.now() - 30 * 86_400_000).toISOString();
   let clickRows: AffiliateClickRow[] = [];

@@ -2085,6 +2085,9 @@ assert.ok(
   assert.ok(
     readFileSync(join(root, "lib/queries/articles.ts"), "utf8").includes("article-by-slug-timeout")
   );
+  assert.ok(
+    readFileSync(join(root, "lib/admin/overview.ts"), "utf8").includes("admin-overview-timeout")
+  );
 }
 assert.ok(
   readFileSync(join(root, "app/(public)/tip/page.tsx"), "utf8").includes('redirect("/articles")'),
