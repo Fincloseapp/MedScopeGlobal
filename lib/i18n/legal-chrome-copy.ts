@@ -1,4 +1,7 @@
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { legalChromeEdition } from "@/lib/i18n/legal-chrome-editions";
 
 export type LegalChromeCopy = {
   officialNote: string;
@@ -422,5 +425,13 @@ const PACK: Record<ChromePack, LegalChromeCopy> = {
 };
 
 export function getLegalChromeCopy(locale?: string | null): LegalChromeCopy {
-  return PACK[chromePack(locale)];
+  const base = PACK[chromePack(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : legalChromeEdition(primary);
+  if (!edition) return base;
+  return {
+    ...base,
+    ...edition,
+    faqs: edition.faqs ?? base.faqs,
+  };
 }

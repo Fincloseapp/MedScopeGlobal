@@ -1,4 +1,7 @@
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { notFoundEdition } from "@/lib/i18n/not-found-editions";
 
 export type NotFoundCopy = {
   code: string;
@@ -77,5 +80,8 @@ const PACK: Record<ChromePack, NotFoundCopy> = {
 };
 
 export function getNotFoundCopy(locale?: string | null): NotFoundCopy {
-  return PACK[chromePack(locale)];
+  const base = PACK[chromePack(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : notFoundEdition(primary);
+  return edition ? { ...base, ...edition } : base;
 }

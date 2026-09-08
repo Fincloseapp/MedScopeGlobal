@@ -1,0 +1,98 @@
+import type { LegalChromeCopy } from "@/lib/i18n/legal-chrome-copy";
+
+export type LegalChromeEdition = Partial<Omit<LegalChromeCopy, "faqs">> & {
+  faqs?: LegalChromeCopy["faqs"];
+};
+
+const EDITIONS: Record<string, LegalChromeEdition> = {
+  sk: {
+    officialNote: "Záväzný právny text ostáva v češtine. Názov stránky nasleduje túto edíciu.",
+    privacyTitle: "Ochrana súkromia",
+    privacyDescription: "Zásady ochrany osobných údajov, cookies, analytika, newsletter a AI spracovanie na MedScopeGlobal.",
+    privacyLead: "Informácie o spracovaní osobných údajov podľa nariadenia EÚ 2016/679 (GDPR).",
+    cookiesTitle: "Cookies a preferencie",
+    cookiesDescription: "Informácie o cookies a centrum preferencií MedScopeGlobal.",
+    cookiesLead: "Ako používame cookies a ako spravovať preferencie.",
+    termsTitle: "Obchodné podmienky",
+    termsDescription: "Obchodné podmienky MedScopeGlobal — predplatné, zodpovednosť, záruky a zrušenie.",
+    termsLead: "Platí pre všetkých používateľov platformy MedScopeGlobal.",
+    helpMetaTitle: "Pomoc",
+    helpMetaDescription: "Časté otázky k MedScopeGlobal — účet, predplatné, obsah, AI asistent a podpora.",
+    helpEyebrow: "Pomoc",
+    helpTitle: "Ako vám môžeme pomôcť",
+    helpLead: "Odpovede na najčastejšie otázky k účtu, predplatnému a obsahu.",
+    helpContactCta: "Kontaktovať podporu",
+    helpLinksTitle: "Užitočné odkazy",
+    helpAccount: "Môj účet",
+    faqs: [
+      { q: "Ako sa zaregistrujem?", a: "Registráciu spustíte na stránke Registrácia. Po potvrdení e-mailu získate prístup k verejnému obsahu." },
+      { q: "Ako funguje predplatné?", a: "Tarify a platby nájdete v sekcii Predplatné. Spravujete ho v účte; platby spracúva Stripe." },
+      { q: "Môžem používať obsah v praxi?", a: "Obsah slúži na vzdelávanie a informovanie. Nie je individuálna lekárska rada ani diagnóza." },
+      { q: "Ako kontaktovať podporu?", a: "Napíšte na info@medscopeglobal.com, volajte +420 736 532 952, alebo použite kontaktný formulár." },
+    ],
+    brandTitle: "Značka a duševné vlastníctvo",
+    brandLead: "Právne postavenie značky MedScopeGlobal, domény medscopeglobal.com a oddelenie od zahraničných medicínskych portálov.",
+    gdprTitle: "Ochrana osobných údajov (GDPR)",
+    gdprLead: "Informácie o spracovaní osobných údajov podľa nariadenia EÚ 2016/679.",
+    noticeTitle: "Právne oznámenie",
+    noticeDescription: "Právne oznámenie, licencie a pravidlá pre AI obsah MedScopeGlobal.",
+    noticeLead: "Licenčné podmienky, disclaimer a pravidlá pre obsah generovaný AI.",
+    checklistTitle: "Právny checklist",
+  },
+  pl: {
+    officialNote: "Wiążący tekst prawny pozostaje po czesku. Tytuł strony idzie za tą edycją.",
+    privacyTitle: "Prywatność",
+    privacyLead: "Informacje o przetwarzaniu danych osobowych zgodnie z RODO UE 2016/679.",
+    cookiesTitle: "Cookies i preferencje",
+    cookiesLead: "Jak używamy cookies i jak zarządzać preferencjami.",
+    termsTitle: "Regulamin",
+    termsLead: "Dotyczy wszystkich użytkowników platformy MedScopeGlobal.",
+    helpMetaTitle: "Pomoc",
+    helpEyebrow: "Pomoc",
+    helpTitle: "Jak możemy pomóc",
+    helpLead: "Odpowiedzi o koncie, prenumeracie i treściach MedScopeGlobal.",
+    helpContactCta: "Kontakt z wsparciem",
+    helpLinksTitle: "Przydatne linki",
+    helpAccount: "Moje konto",
+    faqs: [
+      { q: "Jak się zarejestrować?", a: "Rejestrację zaczniesz na stronie Rejestracja. Po potwierdzeniu e-maila otworzy się treść publiczna." },
+      { q: "Jak działa prenumerata?", a: "Plany i płatności są w Prenumeracie. Zarządzasz nią na koncie; płatności obsługuje Stripe." },
+      { q: "Czy mogę używać treści w praktyce?", a: "Treść służy informacji i edukacji. To nie indywidualna porada lekarska ani diagnoza." },
+      { q: "Jak skontaktować się z wsparciem?", a: "Napisz na info@medscopeglobal.com, zadzwoń +420 736 532 952 albo użyj formularza." },
+    ],
+    brandTitle: "Marka i własność intelektualna",
+    gdprTitle: "Ochrona danych (RODO)",
+    noticeTitle: "Nota prawna",
+    checklistTitle: "Checklista prawna",
+  },
+  ja: {
+    officialNote: "拘束力のある法文はチェコ語のままです。ページタイトルはこの版に従います。",
+    privacyTitle: "プライバシー",
+    privacyLead: "EU GDPR 2016/679 に基づく個人データの取り扱い。",
+    cookiesTitle: "Cookieと設定",
+    cookiesLead: "Cookieの使い方と設定の管理。",
+    termsTitle: "利用規約",
+    termsLead: "MedScopeGlobalプラットフォームの全ユーザーに適用されます。",
+    helpMetaTitle: "ヘルプ",
+    helpEyebrow: "ヘルプ",
+    helpTitle: "ご案内",
+    helpLead: "アカウント、購読、内容についてのよくある質問。",
+    helpContactCta: "サポートに連絡",
+    helpLinksTitle: "役立つリンク",
+    helpAccount: "マイアカウント",
+    faqs: [
+      { q: "登録するには？", a: "登録ページから始めます。メール確認後、一般コンテンツが開きます。" },
+      { q: "購読はどうなりますか？", a: "料金と支払いは購読ページにあります。アカウントで管理し、支払いはStripeです。" },
+      { q: "内容を診療に使えますか？", a: "内容は情報と教育のためです。個別の医療助言や診断ではありません。" },
+      { q: "サポートへの連絡は？", a: "info@medscopeglobal.com 、+420 736 532 952、またはお問い合わせフォーム。" },
+    ],
+    brandTitle: "ブランドと知的財産",
+    gdprTitle: "個人データ保護（GDPR）",
+    noticeTitle: "法的通知",
+    checklistTitle: "法務チェックリスト",
+  },
+};
+
+export function legalChromeEdition(primary: string): LegalChromeEdition | undefined {
+  return EDITIONS[primary];
+}
