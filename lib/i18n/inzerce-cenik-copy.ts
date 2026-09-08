@@ -1,4 +1,7 @@
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { inzerceCenikEdition } from "@/lib/i18n/inzerce-cenik-editions";
 
 export type InzerceCenikCopy = {
   metaTitle: string;
@@ -249,5 +252,15 @@ const PACK: Record<ChromePack, InzerceCenikCopy> = {
 };
 
 export function getInzerceCenikCopy(locale?: string | null): InzerceCenikCopy {
-  return PACK[chromePack(locale)];
+  const base = PACK[chromePack(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : inzerceCenikEdition(primary);
+  if (!edition) return base;
+  const catalog = { ...base.catalog };
+  if (edition.catalog) {
+    for (const [key, value] of Object.entries(edition.catalog)) {
+      if (value) catalog[key] = value;
+    }
+  }
+  return { ...base, ...edition, catalog };
 }

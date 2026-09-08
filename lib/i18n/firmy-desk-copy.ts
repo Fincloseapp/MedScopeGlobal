@@ -3,7 +3,10 @@
  * Prices stay CZK internally; display goes through localizeListedCzkIn.
  */
 
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { firmyDeskEdition } from "@/lib/i18n/firmy-desk-editions";
 import { localizeListedCzkIn } from "@/lib/i18n/payment-currency";
 
 export type FirmyRoomId = "reklama" | "partnerstvi" | "kampane" | "kosmetika";
@@ -390,7 +393,20 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
 };
 
 export function getFirmyDeskCopy(locale?: string | null): FirmyDeskCopy {
-  return localizeListedCzkIn(PACK[chromePack(locale)], locale);
+  const base = localizeListedCzkIn(PACK[chromePack(locale)], locale);
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : firmyDeskEdition(primary);
+  if (!edition) return base;
+  const rooms = { ...base.rooms };
+  if (edition.rooms) {
+    for (const [key, overlay] of Object.entries(edition.rooms)) {
+      const roomKey = key as keyof FirmyDeskCopy["rooms"];
+      if (rooms[roomKey] && overlay) {
+        rooms[roomKey] = { ...rooms[roomKey], ...overlay };
+      }
+    }
+  }
+  return localizeListedCzkIn({ ...base, ...edition, rooms }, locale);
 }
 
 export const FIRMY_ROOM_SLUGS: FirmyRoomId[] = ["reklama", "partnerstvi", "kampane", "kosmetika"];

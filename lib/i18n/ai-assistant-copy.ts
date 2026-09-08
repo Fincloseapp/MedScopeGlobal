@@ -1,4 +1,7 @@
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { aiAssistantEdition } from "@/lib/i18n/ai-assistant-editions";
 import { isCzechSurface } from "@/lib/i18n/surface-copy";
 
 export type AiAssistantCard = {
@@ -483,6 +486,16 @@ const PACK: Record<ChromePack, AiAssistantPageCopy> = {
 export function getAiAssistantCopy(locale?: string | null): AiAssistantCopy {
   const pack = chromePack(locale);
   const copy = { ...PACK[pack], ...CONSOLE[pack] };
-  if (isCzechSurface(locale)) return copy;
-  return { ...copy, cards: copy.cards.filter((card) => card.href !== "/ai-asistent/student") };
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : aiAssistantEdition(primary);
+  const merged = edition
+    ? {
+        ...copy,
+        ...edition,
+        cards: edition.cards ?? copy.cards,
+        publicExamples: edition.publicExamples ?? copy.publicExamples,
+      }
+    : copy;
+  if (isCzechSurface(locale)) return merged;
+  return { ...merged, cards: merged.cards.filter((card) => card.href !== "/ai-asistent/student") };
 }

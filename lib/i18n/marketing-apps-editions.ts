@@ -2,6 +2,10 @@ import type { MarketingCopy } from "@/lib/i18n/marketing-copy";
 
 /** Visible /aplikace + /o-nas chrome for editions that still fall back to the English pack. */
 export type MarketingAppsEdition = {
+  disclaimerTitle?: string;
+  disclaimerAria?: string;
+  disclaimerBanner?: string;
+  disclaimerInline?: string;
   apps?: Partial<Omit<MarketingCopy["apps"], "pitch">> & {
     pitch?: Partial<MarketingCopy["apps"]["pitch"]>;
   };
@@ -19,6 +23,12 @@ export type MarketingAppsEdition = {
 
 const EDITIONS: Record<string, MarketingAppsEdition> = {
   sk: {
+    disclaimerTitle: "Dôležité upozornenie",
+    disclaimerAria: "Dôležité upozornenie",
+    disclaimerBanner:
+      "Obsah verejnej sekcie slúži na vzdelávanie — nenahrádza lekársku starostlivosť ani diagnózu. Pri akútnych ťažkostiach kontaktujte praktického lekára alebo volajte tiesňovú linku.",
+    disclaimerInline:
+      "Informácie na MedScopeGlobal slúžia na vzdelávanie a orientáciu v zdraví. Nenahrádzajú vyšetrenie ani liečbu u lekára. V akútnych prípadoch volajte miestnu tiesňovú linku.",
     apps: {
       metaTitle: "Aplikácie MedScopeGlobal — MediFlow, MeDipacient, OrdiZapis",
       metaDescription:
@@ -126,6 +136,12 @@ const EDITIONS: Record<string, MarketingAppsEdition> = {
     },
   },
   pl: {
+    disclaimerTitle: "Ważna informacja",
+    disclaimerAria: "Ważna informacja",
+    disclaimerBanner:
+      "Treści sekcji publicznej służą edukacji — nie zastępują opieki lekarskiej ani diagnozy. Przy ostrych dolegliwościach skontaktuj się z lekarzem lub zadzwoń na pogotowie.",
+    disclaimerInline:
+      "Informacje na MedScopeGlobal służą edukacji i orientacji. Nie zastępują badania ani leczenia. W nagłych przypadkach zadzwoń na lokalne pogotowie.",
     apps: {
       metaTitle: "Aplikacje MedScopeGlobal — MediFlow, MeDipacient, OrdiZapis",
       metaDescription:
@@ -228,6 +244,12 @@ const EDITIONS: Record<string, MarketingAppsEdition> = {
     },
   },
   ja: {
+    disclaimerTitle: "重要な注意",
+    disclaimerAria: "重要な注意",
+    disclaimerBanner:
+      "公開セクションの内容は教育目的です — 医療や診断の代わりではありません。急な不調では医師に連絡するか、救急に電話してください。",
+    disclaimerInline:
+      "MedScopeGlobalの情報は教育と見当をつけるためのものです。診察や治療の代わりではありません。緊急時は地域の救急に電話してください。",
     apps: {
       metaTitle: "MedScopeGlobalのアプリ — MediFlow、MeDipacient、OrdiZapis",
       metaDescription:

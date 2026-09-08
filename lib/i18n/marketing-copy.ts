@@ -992,6 +992,10 @@ export function getMarketingCopy(locale?: string | null): MarketingCopy {
   return localizeListedCzkIn(
     {
       ...base,
+      ...(appsAbout?.disclaimerTitle ? { disclaimerTitle: appsAbout.disclaimerTitle } : {}),
+      ...(appsAbout?.disclaimerAria ? { disclaimerAria: appsAbout.disclaimerAria } : {}),
+      ...(appsAbout?.disclaimerBanner ? { disclaimerBanner: appsAbout.disclaimerBanner } : {}),
+      ...(appsAbout?.disclaimerInline ? { disclaimerInline: appsAbout.disclaimerInline } : {}),
       apps: appsAbout?.apps
         ? {
             ...base.apps,
