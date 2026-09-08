@@ -179,7 +179,7 @@ import {
   editorialMonthlyCharge,
 } from "../../lib/editorial/pricing";
 import { getCheckoutButtonCopy, readerCheckoutError } from "../../lib/i18n/checkout-chrome";
-import { nativeDeskArticlesForLocale } from "../../lib/editorial/native-desk-articles";
+import { nativeDeskArticlesForLocale, getNativeDeskArticleBySlug } from "../../lib/editorial/native-desk-articles";
 import { studentPublicHref } from "../../lib/studenti/href";
 import { facultiesForLocale, facultyCountryForLocale } from "../../lib/prijimacky/faculties-by-country";
 import {
@@ -4931,6 +4931,14 @@ console.log("✓ magazine desk byline and copy checks passed");
     assert.ok(yogaDesk.some((article) => /NCCIH|NIH/i.test(article.content ?? "")));
     assert.ok(sleepDesk.some((article) => /AASM|NZIP/i.test(article.content ?? "")));
     assert.ok(moveDesk.some((article) => /WHO|NZIP/i.test(article.content ?? "")));
+    const yogaBySlug = getNativeDeskArticleBySlug(
+      "verejnost-zivotni-styl-2026-09-03-cs-joga-mobilita-dech"
+    );
+    assert.ok(yogaBySlug && /NCCIH|NIH/i.test(yogaBySlug.content ?? ""));
+    assert.ok(
+      readFileSync(join(root, "lib/queries/ads.ts"), "utf8").includes("ADS_QUERY_MS"),
+      "article ads must fail open so native desk HTML can finish"
+    );
     assert.ok(
       !readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes(
         "filtered.length < 8"

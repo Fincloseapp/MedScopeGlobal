@@ -215,7 +215,13 @@ export default async function ArticlePage({ params }: Props) {
   let inlineAds: Awaited<ReturnType<typeof getActiveAds>> = [];
   let studentCampaigns: Awaited<ReturnType<typeof listStudentAdCampaignsForArticle>> = [];
 
-  if (!isVip) {
+  const nativeDesk = Boolean(
+    article.metadata &&
+      typeof article.metadata === "object" &&
+      (article.metadata as { native_desk?: boolean }).native_desk
+  );
+
+  if (!isVip && !nativeDesk) {
     if (isStudentArticle) {
       studentCampaigns = await listStudentAdCampaignsForArticle({
         med_track: articleMeta.med_track,

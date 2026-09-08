@@ -1116,16 +1116,44 @@ function seedsForLocale(locale: LocaleCode): { tag: string; seeds: NativeSeed[] 
   return { tag: "en", seeds: PACKS.en ?? EN };
 }
 
+const DESK_ROW_CACHE = new Map<string, { day: string; rows: ArticleWithRelations[] }>();
+
+function utcDayKey(now = new Date()): string {
+  return now.toISOString().slice(0, 10);
+}
+
+const NATIVE_SLUG_LOCALE_RE =
+  /^verejnost-(?:dlouhovekost|zivotni-styl|prevence|novinky|nemoci|rozhovory)-\d{4}-\d{2}-\d{2}-([a-z]{2}(?:-[a-z]{2})?)-/i;
+
+function packLocaleFromNativeSlug(slug: string): string | null {
+  const match = NATIVE_SLUG_LOCALE_RE.exec(slug);
+  if (!match) return null;
+  const raw = match[1].toLowerCase();
+  return Object.keys(PACKS).find((key) => key.toLowerCase() === raw) ?? null;
+}
+
 export function nativeDeskArticlesForLocale(locale?: string | null): ArticleWithRelations[] {
   const ui = normalizeLocale(locale ?? "cs");
   const pack = seedsForLocale(ui);
   if (!pack) return [];
-  return pack.seeds.map((seed, index) => buildRow(pack.tag === "en" ? "en" : pack.tag, seed, index));
+  const day = utcDayKey();
+  const cacheKey = `${ui}:${pack.tag}`;
+  const cached = DESK_ROW_CACHE.get(cacheKey);
+  if (cached?.day === day) return cached.rows;
+  const rows = pack.seeds.map((seed, index) =>
+    buildRow(pack.tag === "en" ? "en" : pack.tag, seed, index)
+  );
+  DESK_ROW_CACHE.set(cacheKey, { day, rows });
+  return rows;
 }
 
 export function getNativeDeskArticleBySlug(slug: string): ArticleWithRelations | null {
   const key = slug.trim().toLowerCase();
-  for (const locale of Object.keys(PACKS)) {
+  const hinted = packLocaleFromNativeSlug(key);
+  const order = hinted
+    ? [hinted, ...Object.keys(PACKS).filter((locale) => locale !== hinted)]
+    : Object.keys(PACKS);
+  for (const locale of order) {
     const rows = nativeDeskArticlesForLocale(locale as LocaleCode);
     const hit = rows.find((row) => row.slug.toLowerCase() === key);
     if (hit) return hit;
