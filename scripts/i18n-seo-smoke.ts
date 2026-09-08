@@ -441,6 +441,9 @@ assert.equal(getMarketingCopy("de").publicHub.topics["zivotni-styl"]?.label, "Le
 assert.equal(getMarketingCopy("fr").publicHub.topics["zivotni-styl"]?.label, "Mode de vie");
 assert.ok(getHomepageLongevityCopy("cs").title.includes("kroky"));
 assert.ok(getHomepageLongevityCopy("fr").softCta.toLowerCase().includes("rédaction"));
+assert.equal(getHomepageLongevityCopy("sk").softCta, "Otvoriť tarif Redakcia");
+assert.equal(getHomepageLongevityCopy("ja").softCta, "編集部プランを開く");
+assert.ok(!getHomepageLongevityCopy("sk").softCta.includes("Open Editorial"));
 assert.ok(!getHomepageLongevityCopy("de").closer.includes("zdarma"));
 assert.equal(classifyCoverTopic({ title: "Mediterranean diet at home", slug: "mediterranean-diet" }), "food");
 assert.equal(classifyCoverTopic({ title: "Sommeil et rythme circadien", slug: "sommeil-rythme" }), "sleep");

@@ -1,4 +1,7 @@
 import { chromePack } from "@/lib/i18n/chrome-pack";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 
 export type HomepageLongevityCopy = {
   eyebrow: string;
@@ -317,5 +320,10 @@ const COPY: Record<string, HomepageLongevityCopy> = {
 
 export function getHomepageLongevityCopy(locale?: string | null): HomepageLongevityCopy {
   const key = pack(locale);
-  return COPY[key] ?? COPY.en;
+  const base = COPY[key] ?? COPY.en;
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  if (key === "en" && primary !== "en") {
+    return { ...base, softCta: getSurfaceCopy(locale).whyTrial };
+  }
+  return base;
 }
