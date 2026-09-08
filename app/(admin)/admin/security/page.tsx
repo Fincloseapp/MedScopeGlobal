@@ -14,20 +14,29 @@ export default async function AdminSecurityLogsPage() {
   if (!(await isAdminGateOpen())) redirect("/admin/login");
 
   const admin = tryCreateServiceRoleClient();
+  const emptyLogs = {
+    data: [] as { id: string; timestamp: string; action: string; status: string; ip: string | null; user_id: string | null }[],
+  };
+  const emptyHealth = { data: [] as { id: string; created_at: string; subsystem: string; status: string; message: string }[] };
   const [{ data: logs }, { data: healthEvents }] = admin
-    ? await Promise.all([
-        admin.from("security_logs").select("*").order("timestamp", { ascending: false }).limit(50),
-        admin
-          .from("system_health_events")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(20)
-          .then(
-            (r) => r,
-            () => ({ data: [] as { id: string; created_at: string; subsystem: string; status: string; message: string }[] })
-          ),
+    ? await Promise.race([
+        Promise.all([
+          admin.from("security_logs").select("*").order("timestamp", { ascending: false }).limit(50),
+          admin
+            .from("system_health_events")
+            .select("*")
+            .order("created_at", { ascending: false })
+            .limit(20)
+            .then(
+              (r) => r,
+              () => emptyHealth
+            ),
+        ]),
+        new Promise<[{ data: typeof emptyLogs.data }, { data: typeof emptyHealth.data }]>((resolve) => {
+          setTimeout(() => resolve([emptyLogs, emptyHealth]), 2_500);
+        }),
       ])
-    : [{ data: [] as { id: string; timestamp: string; action: string; status: string; ip: string | null; user_id: string | null }[] }, { data: [] }];
+    : [emptyLogs, emptyHealth];
 
   const threat = getThreatDetectorStatus();
 

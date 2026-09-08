@@ -1,5 +1,5 @@
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
-import { loadStripeMoneySnapshot, type StripeMoneySnapshot } from "@/lib/admin/stripe-snapshot";
+import { EMPTY_STRIPE_MONEY, loadStripeMoneySnapshot, type StripeMoneySnapshot } from "@/lib/admin/stripe-snapshot";
 import { loadAiAgentGrowthSnapshot, type AiAgentGrowthSnapshot } from "@/lib/growth/ai-agent-stats";
 import {
   explainV27OrderStatus,
@@ -55,7 +55,59 @@ async function countEq(
   }
 }
 
+const EMPTY_GOAL = {
+  target: 0,
+  by: "",
+  remaining: 0,
+  daysLeft: 0,
+  dailyNeeded: 0,
+  onTrack: false,
+  label: "",
+};
+
+function emptyRevenueDashboard(sprint: LegalSprintResult | null): RevenueDashboard {
+  return {
+    loadedAt: new Date().toISOString(),
+    stripe: { ...EMPTY_STRIPE_MONEY },
+    youWillReceive: [],
+    growth: {
+      loadedAt: new Date().toISOString(),
+      dataSource: "unavailable",
+      subscribers: { active: 0, trialing: 0, totalLive: 0, newsletter: 0, vip: 0 },
+      revenue: { v27PaidOrders: 0, v27PaidCzk: 0 },
+      goals: { near: EMPTY_GOAL, sep27: EMPTY_GOAL },
+      pace: { last7: 0, dailyAvg7: 0 },
+      visibility: { visible: false, last3: 0, prev3: 0, label: "" },
+      daily: [],
+      leaderboard: [],
+      channels: [],
+    },
+    counts: { paid: 0, pending: 0, expired: 0, other: 0, paidCzk: 0, pendingCzk: 0 },
+    recent: [],
+    adsApproved: 0,
+    sprint,
+  };
+}
+
 export async function loadRevenueDashboard(
+  sprint: LegalSprintResult | null
+): Promise<RevenueDashboard> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      loadRevenueDashboardUnsafe(sprint),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("admin-revenue-timeout")), 4_000);
+      }),
+    ]);
+  } catch {
+    return emptyRevenueDashboard(sprint);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+async function loadRevenueDashboardUnsafe(
   sprint: LegalSprintResult | null
 ): Promise<RevenueDashboard> {
   const admin = tryCreateServiceRoleClient();

@@ -49,6 +49,41 @@ export type NewsletterOpsSnapshot = {
   writersRosterPerLocale: number;
 };
 
+export function emptyNewsletterOpsSnapshot(): NewsletterOpsSnapshot {
+  const pulse = {
+    subscribers: 0,
+    waitingFirstBrief: 0,
+    lastEmail: null,
+    todayLocales: [] as string[],
+    rotatingLocale: "",
+    expectedArticlesToday: 0,
+    writersProduced24h: 0,
+    writersRosterPerLocale: MAGAZINE_WRITERS_PER_LOCALE,
+    mailReady: mailReady(),
+    mailTransport: mailTransportLabel(),
+    byLocale: [] as EditorialPulse["byLocale"],
+  };
+  return {
+    subscribers: pulse.subscribers,
+    waitingFirstBrief: pulse.waitingFirstBrief,
+    byLocale: [],
+    pendingTopics: 0,
+    localeDesks: plannedLocaleDesks(),
+    issues: [],
+    latestPublishedSlug: null,
+    editionLocales: newsletterEditionLocales(),
+    editionsToday: 0,
+    mailReady: pulse.mailReady,
+    mailTransport: pulse.mailTransport,
+    lastEmail: pulse.lastEmail,
+    todayLocales: pulse.todayLocales,
+    rotatingLocale: pulse.rotatingLocale,
+    expectedArticlesToday: pulse.expectedArticlesToday,
+    writersProduced24h: pulse.writersProduced24h,
+    writersRosterPerLocale: pulse.writersRosterPerLocale,
+  };
+}
+
 function plannedLocaleDesks(): NewsletterLocaleDeskRow[] {
   return GLOBAL_LOCALES.map((item) => ({
     locale: item.code,
@@ -89,7 +124,23 @@ export async function getNewsletterOpsSnapshot(): Promise<NewsletterOpsSnapshot>
   const admin = tryCreateServiceRoleClient();
   if (!admin) return empty;
 
-  const [topics, issues] = await Promise.all([getPendingNewsletterTopics(), getNewsletterArchive(true)]);
+  let topics: Awaited<ReturnType<typeof getPendingNewsletterTopics>> = [];
+  let issues: Awaited<ReturnType<typeof getNewsletterArchive>> = [];
+  let opsTimer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const packed = await Promise.race([
+      Promise.all([getPendingNewsletterTopics(), getNewsletterArchive(true)]),
+      new Promise<never>((_, reject) => {
+        opsTimer = setTimeout(() => reject(new Error("newsletter-ops-timeout")), 2_500);
+      }),
+    ]);
+    topics = packed[0];
+    issues = packed[1];
+  } catch {
+    return empty;
+  } finally {
+    if (opsTimer) clearTimeout(opsTimer);
+  }
 
   const pulseByLocale = new Map(pulse.byLocale.map((row) => [row.locale, row]));
   const localeDesks = plannedLocaleDesks().map((desk) => {

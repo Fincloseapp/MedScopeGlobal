@@ -838,6 +838,10 @@ file("lib/monetization/payout-map.ts");
   assert.ok(security.includes("isAdminGateOpen"));
   assert.ok(security.includes('redirect("/admin/login")'));
   assert.ok(!security.includes("requireAdmin()"));
+  assert.ok(security.includes("2_500"), "security dashboard must fail open after 2.5s");
+  const serviceRole = readFileSync(join(root, "lib/supabase/service.ts"), "utf8");
+  assert.ok(serviceRole.includes("SERVICE_ROLE_FETCH_MS"));
+  assert.ok(serviceRole.includes("AbortController"), "service-role fetch must abort so Workers can finish");
   const academyDb = readFileSync(join(root, "lib/academy/db.ts"), "utf8");
   assert.ok(academyDb.includes("getAcademyCounts"));
   assert.ok(academyDb.includes("tryAdminClient()"));
@@ -2088,6 +2092,21 @@ assert.ok(
   assert.ok(
     readFileSync(join(root, "lib/admin/overview.ts"), "utf8").includes("admin-overview-timeout")
   );
+  assert.ok(readFileSync(join(root, "lib/admin/overview.ts"), "utf8").includes("emptyPulse()"));
+  assert.ok(
+    readFileSync(join(root, "lib/admin/editorial-pulse.ts"), "utf8").includes("loadEditorialPulseUnsafe")
+  );
+  assert.ok(
+    readFileSync(join(root, "lib/admin/editorial-pulse.ts"), "utf8").includes("editorial-pulse-timeout")
+  );
+  assert.ok(
+    readFileSync(join(root, "app/(admin)/admin/newsletter/page.tsx"), "utf8").includes(
+      "admin-newsletter-timeout"
+    )
+  );
+  assert.ok(
+    readFileSync(join(root, "lib/admin/revenue-dashboard.ts"), "utf8").includes("admin-revenue-timeout")
+  );
 }
 assert.ok(
   readFileSync(join(root, "app/(public)/tip/page.tsx"), "utf8").includes('redirect("/articles")'),
@@ -2824,7 +2843,8 @@ assert.ok(
     const revenuePage = readFileSync(join(root, "app/(admin)/admin/revenue/page.tsx"), "utf8");
     assert.ok(revenuePage.includes("Stripe pending"));
     assert.ok(revenuePage.includes("Kolik peněz dostanete"));
-    assert.ok(revenuePage.includes("runLegalGrowthSprint"));
+    assert.ok(!revenuePage.includes("runLegalGrowthSprint"));
+    assert.ok(revenuePage.includes("/api/cron/growth-sprint"));
     assert.ok(
       readFileSync(join(root, "lib/stripe/v27-checkout.ts"), "utf8").includes("after_expiration")
     );

@@ -1,19 +1,53 @@
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { NewsletterAdminPanel } from "@/components/admin/newsletter-admin-panel";
 import { NewsletterIssueTable, NewsletterOpsStrip } from "@/components/admin/newsletter-ops-strip";
-import { getNewsletterOpsSnapshot } from "@/lib/admin/newsletter-ops";
+import { emptyNewsletterOpsSnapshot, getNewsletterOpsSnapshot } from "@/lib/admin/newsletter-ops";
 import { getNewsletterDraftForAdmin, getPendingNewsletterTopics } from "@/lib/queries/v4c/newsletters";
 import { gatherNewsletterSources } from "@/lib/v23/newsletter/sources";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminNewsletterPage() {
-  const [draft, topics, sources, ops] = await Promise.all([
-    getNewsletterDraftForAdmin(),
-    getPendingNewsletterTopics(),
-    gatherNewsletterSources(),
-    getNewsletterOpsSnapshot(),
-  ]);
+  let packed:
+    | [
+        Awaited<ReturnType<typeof getNewsletterDraftForAdmin>>,
+        Awaited<ReturnType<typeof getPendingNewsletterTopics>>,
+        Awaited<ReturnType<typeof gatherNewsletterSources>>,
+        Awaited<ReturnType<typeof getNewsletterOpsSnapshot>>,
+      ]
+    | null = null;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    packed = await Promise.race([
+      Promise.all([
+        getNewsletterDraftForAdmin(),
+        getPendingNewsletterTopics(),
+        gatherNewsletterSources(),
+        getNewsletterOpsSnapshot(),
+      ]),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("admin-newsletter-timeout")), 4_000);
+      }),
+    ]);
+  } catch {
+    packed = null;
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+  const [draft, topics, sources, ops] = packed ?? [
+    null,
+    [],
+    {
+      studies: [],
+      articles: [],
+      legislation: [],
+      digitalHealth: [],
+      drugs: [],
+      universities: [],
+      pendingTopics: [],
+    },
+    emptyNewsletterOpsSnapshot(),
+  ];
 
   return (
     <div className="space-y-6">

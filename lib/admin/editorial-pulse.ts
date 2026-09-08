@@ -70,7 +70,7 @@ function writerIdFromMetadata(metadata: unknown): string | null {
   return typeof id === "string" && id.trim() ? id.trim() : null;
 }
 
-function emptyPulse(): EditorialPulse {
+export function emptyPulse(): EditorialPulse {
   const plan = describeDailyWriterPlan();
   return {
     loadedAt: new Date().toISOString(),
@@ -115,9 +115,25 @@ export function formatPulseDate(iso: string | null | undefined): string {
 }
 
 export async function loadEditorialPulse(): Promise<EditorialPulse> {
-  const pulse = emptyPulse();
   const admin = tryCreateServiceRoleClient();
-  if (!admin) return pulse;
+  if (!admin) return emptyPulse();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      loadEditorialPulseUnsafe(admin),
+      new Promise<EditorialPulse>((resolve) => {
+        timer = setTimeout(() => resolve(emptyPulse()), 2_500); // editorial-pulse-timeout
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+export async function loadEditorialPulseUnsafe(
+  admin: NonNullable<ReturnType<typeof tryCreateServiceRoleClient>>
+): Promise<EditorialPulse> {
+  const pulse = emptyPulse();
 
   const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const since7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();

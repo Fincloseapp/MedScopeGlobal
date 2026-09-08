@@ -10,7 +10,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatStripeMinor } from "@/lib/admin/stripe-snapshot";
 import { loadRevenueDashboard } from "@/lib/admin/revenue-dashboard";
-import { runLegalGrowthSprint } from "@/lib/growth/legal-sprint";
 import {
   STRIPE_AVAILABLE_EXPLAIN,
   STRIPE_PENDING_EXPLAIN,
@@ -39,13 +38,7 @@ function moneyList(
 }
 
 export default async function AdminRevenuePage() {
-  let sprint = null;
-  try {
-    sprint = await runLegalGrowthSprint({ indexNow: false });
-  } catch {
-    sprint = null;
-  }
-  const dash = await loadRevenueDashboard(sprint);
+  const dash = await loadRevenueDashboard(null);
   const live = dash.growth.subscribers.totalLive;
   const stripe = dash.stripe;
   const statusLegend = ["pending", "paid", "completed", "expired", "canceled", "refunded"] as const;
@@ -179,26 +172,15 @@ export default async function AdminRevenuePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Automatické akce při otevření této stránky</CardTitle>
+          <CardTitle className="text-base">Automatické akce</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
-          {dash.sprint ? (
-            <>
-              <p className="text-muted-foreground">{dash.sprint.honesty}</p>
-              <ul className="list-disc space-y-1 pl-5">
-                {dash.sprint.actions.length === 0 ? (
-                  <li>Žádná další akce nebyla potřeba.</li>
-                ) : (
-                  dash.sprint.actions.map((item) => <li key={item}>{item}</li>)
-                )}
-              </ul>
-              {dash.sprint.errors.length > 0 ? (
-                <p className="text-amber-800">Chyby: {dash.sprint.errors.slice(0, 4).join(" · ")}</p>
-              ) : null}
-            </>
-          ) : (
-            <p>Sprint se nepodařilo spustit — čísla níže jsou jen čtení.</p>
-          )}
+          <p className="text-muted-foreground">
+            Tato stránka jen čte čísla. Sprint (IndexNow, reconcilace, výplata) běží na cronu
+            {" "}
+            <code className="text-xs">/api/cron/growth-sprint</code>
+            , ne při každém otevření CMS.
+          </p>
         </CardContent>
       </Card>
 

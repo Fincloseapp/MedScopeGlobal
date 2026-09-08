@@ -18,7 +18,7 @@ import {
   EMPTY_STRIPE_MONEY,
   type StripeMoneySnapshot,
 } from "@/lib/admin/stripe-snapshot";
-import { loadEditorialPulse, type EditorialPulse } from "@/lib/admin/editorial-pulse";
+import { emptyPulse, loadEditorialPulse, type EditorialPulse } from "@/lib/admin/editorial-pulse";
 import type { Category } from "@/types/database";
 
 export type AdminCategoryRow = {
@@ -62,6 +62,51 @@ async function countSafe(query: PromiseLike<CountResult>): Promise<number> {
     return count ?? 0;
   } catch {
     return 0;
+  }
+}
+
+async function loadOverviewClicks(
+  client: NonNullable<Awaited<ReturnType<typeof createAdminReadClient>>>
+): Promise<AffiliateClickRow[]> {
+  const since = new Date(Date.now() - 30 * 86_400_000).toISOString();
+  try {
+    const { data } = await client
+      .from("analytics")
+      .select("payload, created_at")
+      .eq("event", "affiliate_click")
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(2000);
+    return ((data ?? []) as { payload?: { slug?: string; locale?: string; destination?: string }; created_at: string }[])
+      .map((row) => ({
+        slug: row.payload?.slug ?? null,
+        locale: row.payload?.locale ?? null,
+        destination: row.payload?.destination ?? null,
+        createdAt: row.created_at,
+      }));
+  } catch {
+    return [];
+  }
+}
+
+async function loadOverviewV27(
+  client: NonNullable<Awaited<ReturnType<typeof createAdminReadClient>>>
+): Promise<{ czk: number; orders: number }> {
+  try {
+    const { data } = await client
+      .from("v27_orders")
+      .select("amount_czk, status")
+      .in("status", ["paid", "completed"])
+      .limit(500);
+    let czk = 0;
+    let orders = 0;
+    for (const order of data ?? []) {
+      czk += Number(order.amount_czk ?? 0);
+      orders += 1;
+    }
+    return { czk, orders };
+  } catch {
+    return { czk: 0, orders: 0 };
   }
 }
 
@@ -156,7 +201,7 @@ async function emptyOverview(): Promise<AdminOverview> {
     categoryRows: [],
     stripeMoney: { ...EMPTY_STRIPE_MONEY },
     taxonomyInserted: 0,
-    pulse: await loadEditorialPulse(),
+    pulse: emptyPulse(),
   };
 }
 
@@ -181,6 +226,8 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
         string | null,
         StripeMoneySnapshot,
         EditorialPulse,
+        AffiliateClickRow[],
+        { czk: number; orders: number },
       ]
     | null = null;
   try {
@@ -210,6 +257,8 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
         getHeurekaPositionId("sk"),
         loadStripeMoneySnapshot(),
         loadEditorialPulse(),
+        loadOverviewClicks(client),
+        loadOverviewV27(client),
       ]),
       new Promise<never>((_, reject) => {
         timer = setTimeout(() => reject(new Error("admin-overview-timeout")), 5_000);
@@ -234,44 +283,11 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
     heurekaSkId,
     stripeMoney,
     pulse,
+    clickRows,
+    v27,
   ] = packed;
-
-  const since = new Date(Date.now() - 30 * 86_400_000).toISOString();
-  let clickRows: AffiliateClickRow[] = [];
-  try {
-    const { data } = await client
-      .from("analytics")
-      .select("payload, created_at")
-      .eq("event", "affiliate_click")
-      .gte("created_at", since)
-      .order("created_at", { ascending: false })
-      .limit(2000);
-    clickRows = ((data ?? []) as { payload?: { slug?: string; locale?: string; destination?: string }; created_at: string }[])
-      .map((row) => ({
-        slug: row.payload?.slug ?? null,
-        locale: row.payload?.locale ?? null,
-        destination: row.payload?.destination ?? null,
-        createdAt: row.created_at,
-      }));
-  } catch {
-    clickRows = [];
-  }
-
-  let v27PaidCzk = 0;
-  let v27PaidOrders = 0;
-  try {
-    const { data } = await client
-      .from("v27_orders")
-      .select("amount_czk, status")
-      .in("status", ["paid", "completed"])
-      .limit(500);
-    for (const order of data ?? []) {
-      v27PaidCzk += Number(order.amount_czk ?? 0);
-      v27PaidOrders += 1;
-    }
-  } catch {
-    v27PaidCzk = 0;
-  }
+  const v27PaidCzk = v27.czk;
+  const v27PaidOrders = v27.orders;
 
   const emptyDesks = categoryRows.filter(
     (row) => row.health === "editorial-empty" || row.health === "drafts-only"

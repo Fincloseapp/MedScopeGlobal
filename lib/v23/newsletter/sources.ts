@@ -164,13 +164,13 @@ async function withFallback<T>(run: Promise<T>, fallback: T, ms = 2_000): Promis
 
 export async function gatherNewsletterSources(): Promise<V23NewsletterSources> {
   const [studiesRaw, dhList, articles, legislation, drugs, universities, pendingTopics] = await Promise.all([
-    getV20LatestStudies(4),
+    withFallback(getV20LatestStudies(4), [], 2_000),
     withFallback(getV22DigitalHealthList(4), [], 2_000),
-    loadArticlesForNewsletter(4),
-    loadLegislation(3),
-    loadDrugNews(3),
-    loadUniversityNews(3),
-    loadPendingTopics(),
+    withFallback(loadArticlesForNewsletter(4), V23_FALLBACK_ARTICLES, 2_000),
+    withFallback(loadLegislation(3), V23_FALLBACK_LEGISLATION, 2_000),
+    withFallback(loadDrugNews(3), V23_FALLBACK_DRUGS, 2_000),
+    withFallback(loadUniversityNews(3), V23_FALLBACK_UNIVERSITIES, 2_000),
+    withFallback(loadPendingTopics(), [], 2_000),
   ]);
 
   const studies = studiesRaw.map((s) =>
