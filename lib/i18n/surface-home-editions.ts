@@ -23,6 +23,7 @@ export type SurfaceHomeEdition = Partial<
     | "cookieAcceptAll"
     | "trending"
     | "appTaglines"
+    | "siteDescription"
   >
 > & {
   footer?: Partial<Pick<SurfaceCopy["footer"], "audiences" | "proof" | "vip">>;
@@ -30,6 +31,7 @@ export type SurfaceHomeEdition = Partial<
 
 const EDITIONS: Record<string, SurfaceHomeEdition> = {
   sk: {
+    siteDescription: `${MAGAZINE.name} — magazín zdravia a dlhovekosti na MedScopeGlobal.com. MediFlow, VIP protokoly, MeDipacient a OrdiZapis. Obsah založený na dôkazoch v 21 jazykoch. OrdiZapis 14 dní zadarmo. Redakcia od 1 €.`,
     appTaglines: {
       mediflow: "Váš osobný wellness denník",
       medipacient: "Lekárske správy prehľadne po ruke",
@@ -92,6 +94,7 @@ const EDITIONS: Record<string, SurfaceHomeEdition> = {
     },
   },
   pl: {
+    siteDescription: `${MAGAZINE.name} — magazyn zdrowia i długowieczności na MedScopeGlobal.com. MediFlow, protokoły VIP, MeDipacient i OrdiZapis. Treści oparte na dowodach w 21 językach. OrdiZapis 14 dni za darmo. Redakcja od 1 €.`,
     appTaglines: {
       mediflow: "Twój osobisty dziennik wellness",
       medipacient: "Wyniki badań jasno pod ręką",
@@ -154,6 +157,7 @@ const EDITIONS: Record<string, SurfaceHomeEdition> = {
     },
   },
   ja: {
+    siteDescription: `${MAGAZINE.name} — MedScopeGlobal.comの健康と長寿の雑誌。MediFlow、VIPプロトコル、MeDipacient、OrdiZapis。根拠に基づく内容を21言語で。OrdiZapisは14日間無料。編集部は1€から。`,
     appTaglines: {
       mediflow: "あなた専用のウェルネス日記",
       medipacient: "検査結果をわかりやすく手元に",

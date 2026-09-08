@@ -400,6 +400,8 @@ assert.ok(!getSubscribeCopy("ja").priceNoteByApp.mediflow.includes("Editorial"))
 assert.ok(!getSurfaceCopy("ja").appTaglines.mediflow.includes("wellness journal"));
 assert.ok(!getSubscribeCopy("sk").faq[0]?.q.includes("How does the 14-day"));
 assert.equal(getSubscribeCopy("sk").featureCol, "Funkcia");
+assert.ok(!getSubscribeCopy("pl").plans.public.features.join(" ").includes("Current health desk"));
+assert.ok(!getSubscribeCopy("ja").plans.public.features.join(" ").includes("Current health desk"));
 assert.equal(getSubscribeCopy("ja").privacy, "プライバシー");
 assert.ok(!getSubscribeCopy("pl").comparisonRows[0]?.includes("Magazine articles without ads"));
 assert.ok(getSubscribeCopy("it").bannerPayCta.includes("Paga"));
@@ -516,6 +518,17 @@ assert.ok(!getMarketingCopy("sk").publicHub.eyebrow.includes("For everyone"));
 assert.ok(!getMarketingCopy("ja").publicHub.quick.some((item) => item.label === "Articles for everyone"));
 assert.equal(getMarketingCopy("sk").publicHub.topics["pruvodce-nemocemi"]?.label, "Sprievodca chorobami");
 assert.ok(!getMarketingCopy("ja").publicHub.steps[0]?.title.includes("Find your topic"));
+assert.equal(getMarketingCopy("sk").apps.trialCta, "14 dní zadarmo");
+assert.equal(getMarketingCopy("sk").apps.howItWorks, "Ako to funguje");
+assert.ok(!getMarketingCopy("sk").apps.lead.includes("reports and notes"));
+assert.ok(!getMarketingCopy("pl").apps.howItWorks.includes("How it works"));
+assert.ok(!getMarketingCopy("ja").apps.trialCta.includes("14 days"));
+assert.equal(getMarketingCopy("sk").about.eyebrow, "O nás");
+assert.ok(!getMarketingCopy("ja").about.title.includes("medical portal for Czechia"));
+assert.ok(!getMarketingCopy("pl").about.audiences[0]?.desc.includes("plain language"));
+assert.ok(!getSurfaceCopy("sk").siteDescription.includes("14 days free"));
+assert.ok(getSurfaceCopy("sk").siteDescription.includes("14 dní"));
+assert.ok(!getSurfaceCopy("ja").siteDescription.includes("Editorial from 25 CZK"));
 assert.equal(getVerejnostChrome("sk").hubs.clanky.title, "Články pre všetkých");
 assert.ok(!getVerejnostChrome("ja").teaserContinue.includes("Editorial plan"));
 

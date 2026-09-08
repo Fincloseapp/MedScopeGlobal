@@ -118,6 +118,7 @@ const EDITIONS: Record<string, SubscribeEdition> = {
     },
     priceNoteByApp: {
       medipacient: "s tarifom Redakcia, potom",
+      mediprep: "1 test zadarmo, úvodný mesiac, potom 10 €",
       ordizapis: "14 dní zadarmo, potom",
       mediflow: "s tarifom Redakcia",
     },
@@ -198,7 +199,16 @@ const EDITIONS: Record<string, SubscribeEdition> = {
     createAccount: "Załóż darmowe konto",
     studentPlan: "Student medycyny",
     plans: {
-      public: { name: "Redakcja" },
+      public: {
+        name: "Redakcja",
+        features: [
+          "Aktualne teksty o zdrowiu w Twoim języku",
+          "Artykuły o długowieczności, śnie, ruchu i jedzeniu",
+          "MeDipacient — wyniki w telefonie",
+          "Publiczny asystent AI",
+          "Artykuły bez reklam",
+        ],
+      },
       physician: { name: "Lekarz praktykujący" },
       student: { name: "Student medycyny" },
       dokumentace: {
@@ -219,6 +229,7 @@ const EDITIONS: Record<string, SubscribeEdition> = {
     },
     priceNoteByApp: {
       medipacient: "z planem Redakcja, potem",
+      mediprep: "1 darmowy test, miesiąc wprowadzający, potem 10 €",
       ordizapis: "14 dni za darmo, potem",
       mediflow: "z planem Redakcja",
     },
@@ -299,7 +310,16 @@ const EDITIONS: Record<string, SubscribeEdition> = {
     createAccount: "無料アカウントを作る",
     studentPlan: "医学生",
     plans: {
-      public: { name: "編集部" },
+      public: {
+        name: "編集部",
+        features: [
+          "あなたの言語での最新の健康記事",
+          "長寿、睡眠、動き、食事の記事",
+          "MeDipacient — スマホで検査結果",
+          "一般向けAIアシスタント",
+          "広告なしの記事",
+        ],
+      },
       physician: { name: "開業医" },
       student: { name: "医学生" },
       dokumentace: {
@@ -320,6 +340,7 @@ const EDITIONS: Record<string, SubscribeEdition> = {
     },
     priceNoteByApp: {
       medipacient: "編集部プランのあと",
+      mediprep: "無料テスト1回、導入月のあと10€",
       ordizapis: "14日間無料、その後",
       mediflow: "編集部プランで",
     },

@@ -2,6 +2,7 @@ import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { localizeListedCzkIn } from "@/lib/i18n/payment-currency";
 import { marketingHubEdition } from "@/lib/i18n/marketing-hub-editions";
+import { marketingAppsEdition } from "@/lib/i18n/marketing-apps-editions";
 import type { AppProductId } from "@/lib/apps/catalog";
 
 function pack(locale?: string | null): string {
@@ -986,17 +987,34 @@ export function getMarketingCopy(locale?: string | null): MarketingCopy {
   const key = pack(locale);
   const base = PACKS[key] ?? PACKS.en;
   const hub = key === "cs" ? undefined : marketingHubEdition(key);
-  if (!hub) return localizeListedCzkIn(base, locale);
+  const appsAbout = key === "cs" ? undefined : marketingAppsEdition(key);
+  if (!hub && !appsAbout) return localizeListedCzkIn(base, locale);
   return localizeListedCzkIn(
     {
       ...base,
-      publicHub: {
-        ...base.publicHub,
-        ...hub,
-        quick: hub.quick ?? base.publicHub.quick,
-        steps: hub.steps ?? base.publicHub.steps,
-        topics: { ...base.publicHub.topics, ...hub.topics },
-      },
+      apps: appsAbout?.apps
+        ? {
+            ...base.apps,
+            ...appsAbout.apps,
+            pitch: { ...base.apps.pitch, ...appsAbout.apps.pitch },
+          }
+        : base.apps,
+      about: appsAbout?.about
+        ? {
+            ...base.about,
+            ...appsAbout.about,
+            audiences: appsAbout.about.audiences ?? base.about.audiences,
+          }
+        : base.about,
+      publicHub: hub
+        ? {
+            ...base.publicHub,
+            ...hub,
+            quick: hub.quick ?? base.publicHub.quick,
+            steps: hub.steps ?? base.publicHub.steps,
+            topics: { ...base.publicHub.topics, ...hub.topics },
+          }
+        : base.publicHub,
     },
     locale
   );
