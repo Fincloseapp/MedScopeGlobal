@@ -1,7 +1,9 @@
 import type { NativeDeskSeed } from "@/lib/editorial/native-desk-seed-types";
+import { CS_YOGA_POHYB_SPANEK } from "@/lib/editorial/cs-desk-yoga-pohyb-spanek";
 
 /** Czech public magazine floor — every Veřejnost hub has longform desk copy today. */
 export const CS_PUBLIC_DESK: NativeDeskSeed[] = [
+  ...CS_YOGA_POHYB_SPANEK,
   {
     slugTail: "vyziva-stredomorsky-talir",
     title: "Výživa bez extrémů: středomořský talíř v české kuchyni",
@@ -34,88 +36,6 @@ export const CS_PUBLIC_DESK: NativeDeskSeed[] = [
         paras: [
           "Neplánovaný úbytek hmotnosti, zvracení, krev ve stolici, žloutenka nebo neschopnost jíst patří k praktickému lékaři, ne na diskuzní vlákno. Cukrovka, ledviny a poruchy příjmu potravy mají vlastní plán — redakce ho nepíše za ambulance.",
           "Text slouží ke vzdělávání. Nenahrazuje dietologa ani recept. ViaLongeVita nepíše nákupní seznam zázraků.",
-        ],
-      },
-    ],
-  },
-  {
-    slugTail: "spanek-rezim-hygiena",
-    title: "Spánek: režim, tma a kdy už k lékaři",
-    excerpt:
-      "Cirkadiánní rytmus drží vstávání víc než doplněk. Hygiena spánku, kofein a signály, které nepatří na internet.",
-    topic: "zivotni-styl",
-    keywords: ["spánek", "nespavost", "cirkadiánní", "melatonin", "hygiena spánku"],
-    sections: [
-      {
-        h2: "Nejdřív hodiny, pak doplněk",
-        paras: [
-          "Spánek opravuje imunitu, náladu i tlak. Neopraví ho video o „hacku“. Opraví ho přibližně stejný čas vstávání, tma v noci a světlo ráno — i o víkendu, aspoň přibližně.",
-          "Obrazovka hodinu před spaním, kofein po obědě a alkohol jako „usínací“ jsou nejčastější domácí sabotáže. Alkohol uspí rychleji a rozbije druhou polovinu noci.",
-        ],
-        list: [
-          "Ložnice chladnější, tmavší, tišší, než si myslíte, že potřebujete.",
-          "Kofein ukončit odpoledne, pokud špatně spíte.",
-          "Melatonin není bonbon; patří k lékaři, když nespavost trvá.",
-        ],
-      },
-      {
-        h2: "Kdy nespavost není „špatný týden“",
-        paras: [
-          "Když nespíte týdny, chrápete a budíte se dušní, usínáte za volantem nebo vás noční můry a bolest drží vzhůru, patří to praktickému lékaři. Apnoe se neřeší bylinou.",
-          "Deprese, úzkost a směnný provoz mají jiný plán než „vypněte Wi-Fi“. Redakce nestraší; říká, že spánek je zdravotní znak, ne lifestyle doplněk.",
-        ],
-      },
-    ],
-  },
-  {
-    slugTail: "pohyb-chuze-sila",
-    title: "Pohyb bez posilovny: chůze, schody a síla, která drží stáří",
-    excerpt:
-      "Sarkopenie začíná dřív, než si myslíte. Redakce drží chůzi většinu dnů a sílu, kterou unesete — ne heroický víkend.",
-    topic: "zivotni-styl",
-    keywords: ["pohyb", "chůze", "síla sval", "sarkopenie", "exercise", "fitness"],
-    sections: [
-      {
-        h2: "Kondice je týden, ne sobota",
-        paras: [
-          "Pohyb, který snižuje krevní tlak a drží sval, je opakovatelný. Deset tisíc kroků jako dogma padá. Platí: většina dnů se hýbete a dvakrát týdně zvednete něco těžšího než nákupní tašku.",
-          "Sedavé zaměstnání se neopraví jednou hodinou v posilovně. Schody, zastávka dřív, stání u telefonu — NEAT — mají větší týdenní součet, než vypadá.",
-        ],
-        list: [
-          "Chůze většinu dnů, i krátká smyčka.",
-          "Síla: dřep k židli, nošení nákupu, odporová guma.",
-          "Bolest na hrudi, náhlá dušnost nebo padání: 155, ne další série cviků.",
-        ],
-      },
-      {
-        h2: "Proč na síle záleží víc po padesátce",
-        paras: [
-          "Sval je zásobárna bílkovin a jistota, že vstanete z podlahy. Sarkopenie není vanity. Je to pád, zlomenina a ztráta samostatnosti.",
-          "Tréninkový plán na míru nepíšeme. Píšeme, že týden bez chůze a bez síly je rizikový faktor stejně jako kouření — pomalejší, ale stejně skutečný.",
-        ],
-      },
-    ],
-  },
-  {
-    slugTail: "joga-mobilita-dech",
-    title: "Jóga a mobilita: páteř, dech a klouby bez ezoteriky",
-    excerpt:
-      "Asana a pránájáma jako hygiena kloubů — ne zázračný lék. Kdy jóga pomáhá a kdy patří k fyzioterapeutovi.",
-    topic: "zivotni-styl",
-    keywords: ["jóga", "joga", "pilates", "mobilita", "asana", "vinyasa", "dech"],
-    sections: [
-      {
-        h2: "Co jóga umí a co neslibujeme",
-        paras: [
-          "Pravidelná mobilita páteře, kyčlí a ramen snižuje tuhost ze sedu. Dechové tempo umí ztlumit stresovou kaskádu. To je fyziologie, ne aura.",
-          "Jóga neléčí rakovinu, neuhasí autoimunitu a nahradí operaci ploténky jen v reklamě. Při horečce, čerstvé operaci, akutní bolesti břicha nebo závrati cvičení odložte.",
-        ],
-      },
-      {
-        h2: "Jak začít, aniž byste si ublížili",
-        paras: [
-          "Deset minut na podložce, kolena měkká, žádný rekord v ohybu. Yin nebo pomalé vinyasa u učitele, který se ptá na bolest, je bezpečnější než video na maximální rozsah.",
-          "Bolest vystřelující do nohy, náhlá slabost, únik moči nebo horečka s křížem patří k lékaři. ViaLongeVita nepíše sestavu místo rehabilitace.",
         ],
       },
     ],

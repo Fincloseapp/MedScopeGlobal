@@ -38,6 +38,13 @@ function htmlFromSections(intro: string, sections: NativeSeed["sections"], close
   return `<p>${intro}</p>${body}<p><em>${closer}</em></p>`;
 }
 
+function wordCountFromHtml(html: string): number {
+  return html
+    .replace(/<[^>]+>/g, " ")
+    .split(/\s+/)
+    .filter(Boolean).length;
+}
+
 /** Rolling UTC calendar day so native pins never freeze on a ship date. Slugs stay stable.
  *  Lead pin is 23:59 UTC so prepare/dedupe date-sort cannot hide it behind same-day magazine rows. */
 export function nativeDeskPinDate(index: number, now = new Date()): Date {
@@ -56,17 +63,22 @@ function publishedMs(article: { published_at?: string | null }): number {
 function buildRow(locale: string, seed: NativeSeed, index: number): ArticleWithRelations {
   const published = nativeDeskPinDate(index).toISOString();
   const slug = `verejnost-${seed.topic}-2026-09-03-${locale.toLowerCase()}-${seed.slugTail}`;
-  const content = htmlFromSections(seed.excerpt, seed.sections, seed.excerpt);
+  const content = htmlFromSections(
+    seed.excerpt,
+    seed.sections,
+    seed.closer ?? seed.excerpt
+  );
   const id = `native-desk-${locale}-${seed.slugTail}`;
+  const words = wordCountFromHtml(content);
   const metadata: Record<string, unknown> = {
     native_desk: true,
-    editorial_version: "27",
+    editorial_version: "28",
     section: seed.topic === "novinky" ? "novinky" : "verejnost",
     keywords: seed.keywords,
     content_pillar: seed.topic === "dlouhovekost" ? "dlouhovekost" : seed.topic,
     fully_open: true,
     editors_pick: true,
-    read_time_minutes: 6,
+    read_time_minutes: Math.max(6, Math.round(words / 180)),
   };
   return {
     id,

@@ -13,4 +13,6 @@ export type NativeDeskSeed = {
   topic: NativeDeskTopic;
   keywords: string[];
   sections: { h2: string; paras: string[]; list?: string[] }[];
+  /** Closing line; defaults to the excerpt. Use an education disclaimer on longform desks. */
+  closer?: string;
 };

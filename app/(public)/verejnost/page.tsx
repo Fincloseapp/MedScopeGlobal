@@ -32,6 +32,7 @@ const START_HREFS = ["/verejnost/temata", "/verejnost/clanky", "/ai-asistent/ver
 const FEATURED_DESKS = [
   { slug: "pohyb", cover: "/assets/covers/movement.webp" },
   { slug: "joga", cover: "/assets/covers/calm.webp" },
+  { slug: "spanek", cover: "/assets/covers/sleep.webp" },
   { slug: "kosmetika", cover: "/assets/covers/skincare.webp" },
 ] as const;
 
@@ -127,7 +128,7 @@ export default async function VerejnostHubPage() {
             {copy.featuredEyebrow}
           </p>
           <h2 className="font-display text-2xl font-bold text-[#021d33]">{copy.featuredTitle}</h2>
-          <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURED_DESKS.map((desk) => {
               const localized = copy.topics[desk.slug];
               return (

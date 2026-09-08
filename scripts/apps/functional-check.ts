@@ -357,6 +357,7 @@ import { APP_MARKETING_IMAGE, MARKETING_VISUALS } from "../../lib/brand/marketin
 import { getMagazineCopy } from "../../lib/brand/magazine";
 import {
   MAGAZINE_LISTING_MIN_WORDS,
+  countArticleWords,
   shouldHideFromPublicListing,
   filterMagazineListableArticles,
 } from "../../lib/editorial/article-quality-audit";
@@ -4914,6 +4915,28 @@ console.log("✓ magazine desk byline and copy checks passed");
     assert.ok(/spán/i.test(csHay), "Czech desk must cover sleep");
     assert.ok(/pohyb|chůz/i.test(csHay), "Czech desk must cover movement");
     assert.ok(/výživ/i.test(csHay), "Czech desk must cover nutrition");
+    const yogaDesk = csDesk.filter((article) => /joga|jóga/i.test(`${article.title} ${article.slug}`));
+    const sleepDesk = csDesk.filter((article) => /spanek-rezim|spanek-chrapani/i.test(article.slug));
+    const moveDesk = csDesk.filter((article) => /pohyb-chuze|pohyb-sila/i.test(article.slug));
+    assert.ok(yogaDesk.length >= 2, "yoga hub needs more than a stub");
+    assert.ok(sleepDesk.length >= 2, "sleep hub needs more than a stub");
+    assert.ok(moveDesk.length >= 2, "movement hub needs more than a stub");
+    for (const article of [...yogaDesk, ...sleepDesk, ...moveDesk]) {
+      assert.ok(
+        countArticleWords(article.content) >= MAGAZINE_LISTING_MIN_WORDS,
+        `${article.slug} must be magazine-length, got ${countArticleWords(article.content)}`
+      );
+      assert.ok(/Zdroje/i.test(article.content ?? ""), `${article.slug} must name sources`);
+    }
+    assert.ok(yogaDesk.some((article) => /NCCIH|NIH/i.test(article.content ?? "")));
+    assert.ok(sleepDesk.some((article) => /AASM|NZIP/i.test(article.content ?? "")));
+    assert.ok(moveDesk.some((article) => /WHO|NZIP/i.test(article.content ?? "")));
+    assert.ok(
+      !readFileSync(join(root, "app/(public)/verejnost/clanky/page.tsx"), "utf8").includes(
+        "filtered.length < 8"
+      ),
+      "lifestyle hubs must not pad with unrelated cards"
+    );
     assert.ok(csDesk.some((article) => article.public_topic === "prevence"));
     assert.ok(csDesk.some((article) => article.public_topic === "nemoci"));
     assert.ok(csDesk.some((article) => article.public_topic === "rozhovory"));

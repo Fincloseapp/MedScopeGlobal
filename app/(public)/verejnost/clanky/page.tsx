@@ -92,21 +92,12 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
   const listable = fetched.filter((article) =>
     isListableNewsArticle(article, new Date(), locale)
   );
-  let filtered = listable.filter((article) => {
+  const filtered = listable.filter((article) => {
     if (longevity) return isLongevityArticle(article);
     if (topic === "zivotni-styl") return !isLongevityArticle(article);
     if (lifestyleHub) return matchesLifestyleHub(article, topic);
     return true;
   });
-  if (lifestyleHub && filtered.length < 8) {
-    const seen = new Set(filtered.map((article) => article.id));
-    for (const article of listable) {
-      if (filtered.length >= 8) break;
-      if (seen.has(article.id) || isLongevityArticle(article)) continue;
-      seen.add(article.id);
-      filtered.push(article);
-    }
-  }
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);

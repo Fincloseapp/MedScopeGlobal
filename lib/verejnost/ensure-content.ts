@@ -1,8 +1,10 @@
 /**
  * Empty-DB seed only. Daily magazine fill is Cloudflare cron
  * `/api/cron/public-articles` (7×/day) plus the Czech native desk floor
- * in `lib/editorial/cs-public-desk-seeds.ts`. Public pages must not call
- * this on request (`ensureContent: false`).
+ * in `lib/editorial/cs-public-desk-seeds.ts` (yoga / movement / sleep longform
+ * in `lib/editorial/cs-desk-yoga-pohyb-spanek.ts`, sourced from WHO, NZIP,
+ * AASM and NIH/NCCIH). Public pages must not call this on request
+ * (`ensureContent: false`).
  */
 import { createDataClient } from "@/lib/supabase/data";
 import { seedPublicArticlesIfEmpty } from "@/lib/verejnost/seed-public-articles";
