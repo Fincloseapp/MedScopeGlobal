@@ -54,7 +54,7 @@ export default async function NewsletterPosledniPage() {
   return (
     <ModulePageShell eyebrow={copy.hubEyebrow} title={stand.title} description={stand.lead} hideIntro>
       <JsonLdScript data={ld} />
-      <NewsletterNewsstand archive={archive} latest={issue} locale={locale} />
+      <NewsletterNewsstand archive={archive} latest={issue} locale={locale} showIssueGrids={false} />
       <div id="vydani" className="mt-10 scroll-mt-24">
         <V23NewsletterIssueView issue={current} locale={locale} headingLevel="h2" />
       </div>

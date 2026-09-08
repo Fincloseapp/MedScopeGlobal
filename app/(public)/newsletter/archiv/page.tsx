@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { NewsletterNewsstand } from "@/components/v23/newsletter-newsstand";
 import { getNewsletterArchive } from "@/lib/queries/v4c/newsletters";
-import { getV22LatestNewsletter } from "@/lib/v22/newsletter";
+import { getLatestNewsletterCard } from "@/lib/queries/v4c/newsletters";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { getNewsletterStandCopy } from "@/lib/i18n/newsletter-stand-copy";
@@ -16,7 +16,7 @@ export default async function NewsletterArchivPage() {
   const stand = getNewsletterStandCopy(locale);
   const [archive, latest] = await Promise.all([
     getNewsletterArchive(false, locale),
-    getV22LatestNewsletter(locale),
+    getLatestNewsletterCard(locale),
   ]);
 
   return (

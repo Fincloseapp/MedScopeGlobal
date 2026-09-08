@@ -2168,9 +2168,16 @@ assert.ok(
   const archiveSrc = readFileSync(join(root, "lib/queries/v4c/newsletters.ts"), "utf8");
   assert.ok(archiveSrc.includes("NEWSLETTER_INDEX_COLUMNS"));
   assert.ok(archiveSrc.includes("admin ? \"*\" : NEWSLETTER_INDEX_COLUMNS"));
-  assert.ok(archiveSrc.includes(".limit(40)"));
+  assert.ok(archiveSrc.includes(".limit(12)"));
   assert.ok(archiveSrc.includes("publicNewsletterClient"));
+  assert.ok(archiveSrc.includes("getLatestNewsletterCard"));
   assert.ok(archiveSrc.includes("tryCreateServiceRoleClient"));
+  assert.ok(
+    readFileSync(join(root, "app/(public)/newsletter/archiv/page.tsx"), "utf8").includes("getLatestNewsletterCard")
+  );
+  assert.ok(
+    readFileSync(join(root, "app/(public)/newsletter/posledni/page.tsx"), "utf8").includes("showIssueGrids={false}")
+  );
 }
 assert.ok(
   readFileSync(join(root, "app/(public)/newsletter/[slug]/page.tsx"), "utf8").includes("getNewsletterForPublic"),

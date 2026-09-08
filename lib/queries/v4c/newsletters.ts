@@ -55,11 +55,11 @@ export function newsletterRowLocale(row: Pick<NewsletterRow, "slug" | "layout_js
   return parseNewsletterIssueSlug(row.slug).locale;
 }
 
-export async function getLatestNewsletter(locale?: string) {
+async function pickLatestIndexRow(locale?: string): Promise<NewsletterRow | null> {
   const supabase = await publicNewsletterClient();
   const { data, error } = await supabase
     .from("newsletters")
-    .select(locale ? NEWSLETTER_INDEX_COLUMNS : "*")
+    .select(NEWSLETTER_INDEX_COLUMNS)
     .eq("published", true)
     .eq("admin_only", false)
     .order("issue_date", { ascending: false })
@@ -69,13 +69,24 @@ export async function getLatestNewsletter(locale?: string) {
   if (!locale) return rows[0] ?? null;
   const resolved = resolveGlobalLocale(locale);
   const preferredSlug = newsletterIssueSlug(new Date().toISOString().slice(0, 10), resolved);
-  const picked =
+  return (
     rows.find((row) => row.slug === preferredSlug) ??
     rows.find((row) => newsletterRowLocale(row) === resolved) ??
     rows.find((row) => newsletterRowLocale(row) === "cs") ??
     rows[0] ??
-    null;
+    null
+  );
+}
+
+/** Index row only — newsstand cards must not pull html_content. */
+export async function getLatestNewsletterCard(locale?: string) {
+  return pickLatestIndexRow(locale);
+}
+
+export async function getLatestNewsletter(locale?: string) {
+  const picked = await pickLatestIndexRow(locale);
   if (!picked) return null;
+  const supabase = await publicNewsletterClient();
   const { data: full } = await supabase
     .from("newsletters")
     .select("*")
@@ -136,7 +147,7 @@ export async function getNewsletterArchive(admin = false, locale?: string) {
     .select(admin ? "*" : NEWSLETTER_INDEX_COLUMNS)
     .order("issue_date", { ascending: false });
   if (!admin) {
-    q = q.eq("published", true).eq("admin_only", false).limit(40);
+    q = q.eq("published", true).eq("admin_only", false).limit(12);
   }
   const { data, error } = await q;
   if (error) return [];

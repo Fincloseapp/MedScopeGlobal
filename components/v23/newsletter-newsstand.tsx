@@ -112,11 +112,13 @@ export function NewsletterNewsstand({
   latest,
   locale,
   showFeaturedIssue = true,
+  showIssueGrids = true,
 }: {
   archive: NewsletterRow[];
   latest?: NewsletterRow | null;
   locale: string;
   showFeaturedIssue?: boolean;
+  showIssueGrids?: boolean;
 }) {
   const stand = getNewsletterStandCopy(locale);
   const issues = mergeNewsletterIssues(archive, latest);
@@ -220,6 +222,8 @@ export function NewsletterNewsstand({
         </section>
       ) : null}
 
+      {showIssueGrids ? (
+        <>
       <section id="pripravujeme" className="scroll-mt-24">
         <h2 className="font-display text-2xl font-semibold text-[#021d33]">{stand.upcoming}</h2>
         {classified.upcoming.length === 0 ? (
@@ -249,6 +253,8 @@ export function NewsletterNewsstand({
           </div>
         )}
       </section>
+        </>
+      ) : null}
 
       <section className="grid gap-4 lg:grid-cols-3">
         <div id="odber" className="scroll-mt-24 rounded-2xl border border-[#cfe1f3] bg-[#f7fbff] p-5">
