@@ -3,6 +3,7 @@ import { normalizeLocale } from "@/lib/i18n/config";
 import { rewriteCzechInstitutions } from "@/lib/i18n/local-regulator";
 import { buildLocalePath, isLocaleRoutingExcluded } from "@/lib/i18n/locale-path";
 import { localizeListedCzk } from "@/lib/i18n/payment-currency";
+import { navEdition } from "@/lib/i18n/nav-copy-editions";
 
 type NavNode = {
   label: string;
@@ -423,7 +424,7 @@ export function localizePublicHref(href: string, locale: string): string {
 function stringsFor(locale: string): NavStrings {
   const key = pack(locale);
   if (key === "cs") return {};
-  return { ...NAV.en, ...(NAV[key] ?? {}) };
+  return { ...NAV.en, ...(navEdition(key) ?? {}), ...(NAV[key] ?? {}) };
 }
 
 export function translateNavHref(

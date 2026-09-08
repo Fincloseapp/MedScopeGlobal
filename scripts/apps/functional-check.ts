@@ -1588,6 +1588,14 @@ assert.ok(
   assert.equal(menuAccountLinks("ja").signInLabel, "ログイン");
   assert.equal(menuAccountLinks("jp").subscribeLabel, "購読");
   assert.equal(menuAccountLinks("zh-CN").subscribeLabel, "订阅");
+  assert.equal(menuAccountLinks("sk").registerLabel, "Registrácia");
+  assert.equal(menuAccountLinks("ja").registerLabel, "登録");
+  assert.equal(getDesktopHeaderMenu("sk")[0]?.children?.[0]?.label, "Dlhovekosť");
+  assert.equal(getDesktopHeaderMenu("pl")[0]?.children?.[0]?.label, "Długowieczność");
+  assert.equal(getDesktopHeaderMenu("ja")[0]?.children?.[0]?.label, "長寿");
+  assert.equal(getDesktopHeaderMenu("zh-CN")[0]?.children?.[0]?.label, "长寿");
+  assert.ok(!getDesktopHeaderMenu("sk").some((item) => item.label === "Public"));
+  assert.ok(!getDesktopHeaderMenu("ja").some((item) => item.label === "Public"));
   const headerNav = readFileSync(join(root, "components/layout/header-navigation.tsx"), "utf8");
   const mobileNav = readFileSync(join(root, "components/v20/mobile-nav.tsx"), "utf8");
   const dropdownStart = headerNav.indexOf('role="menu"');

@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { tryCreateClient } from "@/lib/supabase/client";
 import type { AppUser } from "@/types/database";
-import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
-import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { menuAccountLinks } from "@/lib/i18n/menu-account";
 
 interface Props {
   user: { id: string; email?: string | null } | null;
@@ -23,7 +22,7 @@ interface Props {
 }
 
 export function UserMenu({ user, profile, locale = "cs" }: Props) {
-  const surface = getSurfaceCopy(locale);
+  const account = menuAccountLinks(locale);
   async function signOut() {
     const supabase = tryCreateClient();
     if (supabase) await supabase.auth.signOut();
@@ -34,10 +33,10 @@ export function UserMenu({ user, profile, locale = "cs" }: Props) {
     return (
       <div className="hidden items-center gap-2 sm:flex">
         <Button variant="ghost" size="sm" asChild>
-          <Link href={localizePublicHref("/login", locale)}>{surface.signIn}</Link>
+          <Link href={account.signInHref}>{account.signInLabel}</Link>
         </Button>
         <Button size="sm" asChild>
-          <Link href={localizePublicHref("/signup", locale)}>{surface.register}</Link>
+          <Link href={account.registerHref}>{account.registerLabel}</Link>
         </Button>
       </div>
     );

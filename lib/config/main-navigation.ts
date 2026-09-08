@@ -448,11 +448,23 @@ export function getHeaderUtilityLinks(locale: LocaleCode): NavItem[] {
 
 export function headerUtilityAria(locale: LocaleCode): string {
   if (locale === "cs") return "Rychlé odkazy";
+  if (locale === "sk") return "Rýchle odkazy";
+  if (locale === "pl") return "Szybkie linki";
   if (locale === "de") return "Schnellzugriff";
   if (locale === "fr") return "Accès rapide";
   if (locale === "it") return "Collegamenti rapidi";
   if (locale === "es") return "Accesos rápidos";
   if (locale === "pt" || locale === "pt-BR") return "Atalhos";
+  if (locale === "ro") return "Linkuri rapide";
+  if (locale === "hu") return "Gyors linkek";
+  if (locale === "ru") return "Быстрые ссылки";
+  if (locale === "uk") return "Швидкі посилання";
+  if (locale === "be") return "Хуткія спасылкі";
+  if (locale === "zh-CN" || locale === "cn") return "快捷链接";
+  if (locale === "ja" || locale === "jp") return "クイックリンク";
+  if (locale === "ko" || locale === "kr") return "바로가기";
+  if (locale === "vi") return "Liên kết nhanh";
+  if (locale === "id") return "Tautan cepat";
   return "Quick links";
 }
 
