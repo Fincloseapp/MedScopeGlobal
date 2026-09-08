@@ -79,6 +79,7 @@ function IssueCard({
           fill
           className="object-cover object-top"
           sizes={featured ? "(max-width:768px) 100vw, 420px" : "(max-width:768px) 50vw, 280px"}
+          unoptimized={cover.src.startsWith("/assets/")}
         />
       </Link>
       <div className={`flex flex-col justify-center ${featured ? "p-6 sm:p-8" : "p-4"}`}>

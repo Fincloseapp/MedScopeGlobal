@@ -2063,6 +2063,7 @@ assert.ok(
 {
   const standSrc = readFileSync(join(root, "components/v23/newsletter-newsstand.tsx"), "utf8");
   assert.ok(standSrc.includes("EditorialPayButtons"));
+  assert.ok(standSrc.includes("unoptimized={cover.src.startsWith(\"/assets/\")}"));
   assert.ok(standSrc.includes("localizePublicHref(\"/articles\""));
   assert.ok(standSrc.includes("/firmy/reklama/nova"));
   assert.ok(standSrc.includes("Aktuální") === false);
