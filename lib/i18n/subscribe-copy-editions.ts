@@ -36,7 +36,7 @@ export type SubscribeEdition = Partial<
     | "studentPlan"
   >
 > & {
-  plans?: Partial<Record<keyof SubscribeCopy["plans"], { name: string }>>;
+  plans?: Partial<Record<keyof SubscribeCopy["plans"], { name?: string; features?: string[] }>>;
   audienceByApp?: Partial<SubscribeCopy["audienceByApp"]>;
   priceNoteByApp?: Partial<SubscribeCopy["priceNoteByApp"]>;
 };
@@ -77,7 +77,21 @@ const EDITIONS: Record<string, SubscribeEdition> = {
     noAccountLead: "Vytvorte si bezplatný účet, potom sa vráťte sem a vyberte plán.",
     createAccount: "Vytvoriť bezplatný účet",
     studentPlan: "Študent LF",
-    plans: { public: { name: "Redakcia" }, physician: { name: "Lekár v praxi" }, student: { name: "Študent LF" } },
+    plans: {
+      public: { name: "Redakcia" },
+      physician: { name: "Lekár v praxi" },
+      student: { name: "Študent LF" },
+      dokumentace: {
+        name: "OrdiZapis",
+        features: [
+          "OrdiZapis: nahrávka v mobile — diktát alebo konzultácia → zápis",
+          "Šablóny: ambulancia, SOAP, anamnéza…",
+          "História zápisov v účte — sync telefón ↔ web",
+          "Základné odborné briefy v aplikácii",
+          "14 dní zadarmo — len tento plán OrdiZapis",
+        ],
+      },
+    },
     audienceByApp: {
       medipacient: "Pacienti a rodiny",
       mediprep: "Uchádzači o medicínu",
@@ -125,11 +139,30 @@ const EDITIONS: Record<string, SubscribeEdition> = {
     noAccountLead: "Załóż darmowe konto, wróć tutaj i wybierz plan.",
     createAccount: "Załóż darmowe konto",
     studentPlan: "Student medycyny",
-    plans: { public: { name: "Redakcja" }, physician: { name: "Lekarz praktykujący" }, student: { name: "Student medycyny" } },
+    plans: {
+      public: { name: "Redakcja" },
+      physician: { name: "Lekarz praktykujący" },
+      student: { name: "Student medycyny" },
+      dokumentace: {
+        name: "OrdiZapis",
+        features: [
+          "OrdiZapis: nagranie w telefonie — dyktando lub wizyta → notatka",
+          "Szablony: poradnia, SOAP, wywiad…",
+          "Historia notatek na koncie — sync telefon ↔ web",
+          "Podstawowe briefy zawodowe w aplikacji",
+          "14 dni za darmo — tylko ten plan OrdiZapis",
+        ],
+      },
+    },
     audienceByApp: {
       medipacient: "Pacjenci i rodziny",
       ordizapis: "Lekarze i gabinety",
       mediflow: "Czytelnicy i długowieczność",
+    },
+    priceNoteByApp: {
+      medipacient: "z planem Redakcja, potem",
+      ordizapis: "14 dni za darmo, potem",
+      mediflow: "z planem Redakcja",
     },
   },
   ja: {
@@ -167,11 +200,30 @@ const EDITIONS: Record<string, SubscribeEdition> = {
     noAccountLead: "無料アカウントを作り、ここに戻ってプランを選んでください。",
     createAccount: "無料アカウントを作る",
     studentPlan: "医学生",
-    plans: { public: { name: "編集部" }, physician: { name: "開業医" }, student: { name: "医学生" } },
+    plans: {
+      public: { name: "編集部" },
+      physician: { name: "開業医" },
+      student: { name: "医学生" },
+      dokumentace: {
+        name: "OrdiZapis",
+        features: [
+          "OrdiZapis：スマホで録音 — 口述または診察 → 記録",
+          "テンプレート：外来、SOAP、問診…",
+          "アカウント内の記録履歴 — 電話 ↔ ウェブ同期",
+          "アプリ内の基本的な専門ブリーフ",
+          "14日間無料 — この OrdiZapis プランのみ",
+        ],
+      },
+    },
     audienceByApp: {
       medipacient: "患者と家族",
       ordizapis: "医師とクリニック",
       mediflow: "一般と長寿",
+    },
+    priceNoteByApp: {
+      medipacient: "編集部プランのあと",
+      ordizapis: "14日間無料、その後",
+      mediflow: "編集部プランで",
     },
   },
   ru: {

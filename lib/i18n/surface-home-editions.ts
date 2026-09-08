@@ -22,6 +22,7 @@ export type SurfaceHomeEdition = Partial<
     | "cookieNecessary"
     | "cookieAcceptAll"
     | "trending"
+    | "appTaglines"
   >
 > & {
   footer?: Partial<Pick<SurfaceCopy["footer"], "audiences" | "proof" | "vip">>;
@@ -29,6 +30,12 @@ export type SurfaceHomeEdition = Partial<
 
 const EDITIONS: Record<string, SurfaceHomeEdition> = {
   sk: {
+    appTaglines: {
+      mediflow: "Váš osobný wellness denník",
+      medipacient: "Lekárske správy prehľadne po ruke",
+      ordizapis: "Nahrajte v mobile — zápis píše OrdiZapis",
+      mediprep: "Nájdite medzery. Precvičte ich.",
+    },
     writersTitle: "Redakčné stoly",
     cookieTitle: "Cookies a súkromie",
     cookieNecessary: "Len nevyhnutné",
@@ -85,6 +92,12 @@ const EDITIONS: Record<string, SurfaceHomeEdition> = {
     },
   },
   pl: {
+    appTaglines: {
+      mediflow: "Twój osobisty dziennik wellness",
+      medipacient: "Wyniki badań jasno pod ręką",
+      ordizapis: "Nagraj w telefonie — OrdiZapis pisze notatkę",
+      mediprep: "Znajdź luki. Przećwicz je.",
+    },
     writersTitle: "Biurka redakcyjne",
     cookieTitle: "Cookies i prywatność",
     cookieNecessary: "Tylko niezbędne",
@@ -141,6 +154,12 @@ const EDITIONS: Record<string, SurfaceHomeEdition> = {
     },
   },
   ja: {
+    appTaglines: {
+      mediflow: "あなた専用のウェルネス日記",
+      medipacient: "検査結果をわかりやすく手元に",
+      ordizapis: "スマホで録音 — OrdiZapisが記録を書きます",
+      mediprep: "穴を見つけて、そこを鍛える。",
+    },
     writersTitle: "編集デスク",
     cookieTitle: "Cookieとプライバシー",
     cookieNecessary: "必須のみ",

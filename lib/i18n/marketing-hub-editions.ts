@@ -41,6 +41,8 @@ const EDITIONS: Record<string, PublicHubEdition> = {
   },
   pl: {
     metaTitle: "Zdrowie publiczne | MedScopeGlobal",
+    metaDescription:
+      "Przewodniki po chorobach, profilaktyka, żywienie, sen, stres i rozmowy z ekspertami — jasnym językiem.",
     eyebrow: "Dla wszystkich · Zdrowie publiczne",
     title: "Zdrowie jasnym językiem — bez żargonu",
     lead: "Przewodnik po profilaktyce, objawach, żywieniu, śnie, stresie i długowieczności. Treść edukacyjna dla wszystkich — nie zastępuje opieki lekarskiej.",
@@ -66,6 +68,7 @@ const EDITIONS: Record<string, PublicHubEdition> = {
   },
   ja: {
     metaTitle: "公衆衛生 | MedScopeGlobal",
+    metaDescription: "病気の案内、予防、栄養、睡眠、ストレス、専門家インタビュー — わかりやすい言葉で。",
     eyebrow: "すべての人へ · 公衆衛生",
     title: "健康をわかりやすく — 専門用語なし",
     lead: "予防、症状、栄養、睡眠、ストレス、長寿の案内。教育目的であり、医療の代わりではありません。",

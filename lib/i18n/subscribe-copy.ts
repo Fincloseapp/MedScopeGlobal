@@ -996,8 +996,12 @@ export function getSubscribeCopy(
     if (plans) {
       for (const [tier, pack] of Object.entries(plans)) {
         const key = tier as keyof SubscribeCopy["plans"];
-        if (pack?.name && localized.plans[key]) {
-          localized.plans[key] = { ...localized.plans[key], name: pack.name };
+        if (localized.plans[key] && (pack?.name || pack?.features)) {
+          localized.plans[key] = {
+            ...localized.plans[key],
+            ...(pack.name ? { name: pack.name } : {}),
+            ...(pack.features ? { features: pack.features } : {}),
+          };
         }
       }
     }
