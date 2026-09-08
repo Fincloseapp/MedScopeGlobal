@@ -30,7 +30,7 @@ export function AdminGateForm() {
   }
 
   return (
-    <form onSubmit={submit} className="mt-6 space-y-4">
+    <form onSubmit={submit} method="post" action="/admin/login" className="mt-6 space-y-4">
       <label htmlFor="admin-password" className="block text-sm font-medium text-[#021d33]">
         Heslo
       </label>
