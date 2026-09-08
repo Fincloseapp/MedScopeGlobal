@@ -562,6 +562,11 @@ assert.ok(!getNotFoundCopy("ja").title.includes("Page not found"));
 assert.ok(!getLegalChromeCopy("sk").termsTitle.includes("Terms of use"));
 assert.equal(getLegalChromeCopy("pl").privacyTitle, "Prywatność");
 assert.ok(!getLegalChromeCopy("ja").noticeTitle.includes("Legal notice"));
+assert.equal(getArticleChrome("sk").save, "Uložiť");
+assert.ok(!getArticleChrome("ja").related.includes("Related reading"));
+assert.equal(getInstallPwaCopy("sk").download, "Stiahnuť");
+assert.ok(!getInstallPwaCopy("pl").ios2.includes("Add to Home Screen"));
+assert.ok(!getInstallPwaCopy("ja").howTitle.includes("How to install"));
 assert.equal(getVerejnostChrome("sk").hubs.clanky.title, "Články pre všetkých");
 assert.ok(!getVerejnostChrome("ja").teaserContinue.includes("Editorial plan"));
 

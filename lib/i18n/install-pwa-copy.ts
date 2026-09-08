@@ -2,7 +2,10 @@
  * Install-to-home-screen button. Locales without a pack use English, never Czech.
  */
 
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { installPwaEdition } from "@/lib/i18n/install-pwa-editions";
 
 export type InstallPwaCopy = {
   download: string;
@@ -176,7 +179,9 @@ export function getInstallPwaCopy(
   locale?: string | null,
   vars?: { name?: string; path?: string }
 ): InstallPwaCopy {
-  const raw = PACK[chromePack(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : installPwaEdition(primary);
+  const raw = { ...PACK[chromePack(locale)], ...edition };
   const name = vars?.name ?? "";
   const path = vars?.path ?? "";
   return {

@@ -1,4 +1,7 @@
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { articleChromeEdition } from "@/lib/i18n/article-chrome-editions";
 
 type Pack = ChromePack;
 
@@ -6,7 +9,7 @@ export function articleChromeLocale(locale?: string | null): Pack {
   return chromePack(locale);
 }
 
-type ArticleChrome = {
+export type ArticleChrome = {
   save: string;
   saved: string;
   share: string;
@@ -115,5 +118,8 @@ const COPY: Record<Pack, ArticleChrome> = {
 };
 
 export function getArticleChrome(locale?: string | null): ArticleChrome {
-  return COPY[articleChromeLocale(locale)];
+  const base = COPY[articleChromeLocale(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : articleChromeEdition(primary);
+  return edition ? { ...base, ...edition } : base;
 }

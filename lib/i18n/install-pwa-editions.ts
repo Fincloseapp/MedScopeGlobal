@@ -1,0 +1,70 @@
+import type { InstallPwaCopy } from "@/lib/i18n/install-pwa-copy";
+
+export type InstallPwaEdition = Partial<InstallPwaCopy>;
+
+const EDITIONS: Record<string, InstallPwaEdition> = {
+  sk: {
+    download: "Stiahnuť",
+    downloadNamed: "Stiahnuť {name}",
+    installed: "Aplikácia nainštalovaná",
+    gated: "Stiahnutie po prihlásení",
+    howTitle: "Ako nainštalovať na mobil",
+    ios1: "Klepnite na Zdieľať v Safari",
+    ios2: "Zvoľte Pridať na plochu",
+    ios3: "Potvrďte Pridať — ikona {name} sa objaví na ploche",
+    android1: "V Chrome otvorte menu ⋮ vpravo hore",
+    android2: "Zvoľte Nainštalovať aplikáciu / Pridať na plochu",
+    android3: "Potvrďte inštaláciu — {name} sa otvorí ako aplikácia",
+    desktop1: "Chrome/Edge: ikona ⊕ v adresnom riadku, alebo menu → Inštalovať",
+    desktop2: "Alebo otvorte {name} a klepnite znova na Stiahnuť",
+    redirect: "Inštalácia prebieha z aplikácie — presmerúvame na {path}…",
+    hideTip: "Skryť tip",
+    hintIos: "iPhone: Zdieľať → Pridať na plochu",
+    hintAndroid: "Android: Chrome → Nainštalovať aplikáciu",
+    hintDesktop: "PC: Chrome/Edge → Nainštalovať aplikáciu",
+  },
+  pl: {
+    download: "Pobierz",
+    downloadNamed: "Pobierz {name}",
+    installed: "Aplikacja zainstalowana",
+    gated: "Pobranie po zalogowaniu",
+    howTitle: "Jak zainstalować na telefonie",
+    ios1: "W Safari stuknij Udostępnij",
+    ios2: "Wybierz Dodaj do ekranu początkowego",
+    ios3: "Potwierdź Dodaj — ikona {name} pojawi się na ekranie",
+    android1: "W Chrome otwórz menu ⋮ w prawym górnym rogu",
+    android2: "Wybierz Zainstaluj aplikację / Dodaj do ekranu głównego",
+    android3: "Potwierdź — {name} otworzy się jako aplikacja",
+    desktop1: "Chrome/Edge: ⊕ na pasku adresu albo menu → Zainstaluj",
+    desktop2: "Albo otwórz {name} i ponownie stuknij Pobierz",
+    redirect: "Instalacja idzie z aplikacji — przekierowanie do {path}…",
+    hideTip: "Ukryj wskazówkę",
+    hintIos: "iPhone: Udostępnij → Dodaj do ekranu początkowego",
+    hintAndroid: "Android: Chrome → Zainstaluj aplikację",
+    hintDesktop: "PC: Chrome/Edge → Zainstaluj aplikację",
+  },
+  ja: {
+    download: "ダウンロード",
+    downloadNamed: "{name}をダウンロード",
+    installed: "アプリをインストール済み",
+    gated: "ログイン後にダウンロード",
+    howTitle: "スマホへの入れ方",
+    ios1: "Safariで共有をタップ",
+    ios2: "ホーム画面に追加を選ぶ",
+    ios3: "追加を確認 — {name}のアイコンがホームに出ます",
+    android1: "Chrome右上の⋮メニューを開く",
+    android2: "アプリをインストール / ホーム画面に追加",
+    android3: "確認 — {name}がアプリとして開きます",
+    desktop1: "Chrome/Edge：アドレスバーの⊕、またはメニュー → インストール",
+    desktop2: "または{name}を開いて、もう一度ダウンロードをタップ",
+    redirect: "インストールはアプリから — {path}へ移動します…",
+    hideTip: "ヒントを隠す",
+    hintIos: "iPhone：共有 → ホーム画面に追加",
+    hintAndroid: "Android：Chrome → アプリをインストール",
+    hintDesktop: "PC：Chrome/Edge → アプリをインストール",
+  },
+};
+
+export function installPwaEdition(primary: string): InstallPwaEdition | undefined {
+  return EDITIONS[primary];
+}
