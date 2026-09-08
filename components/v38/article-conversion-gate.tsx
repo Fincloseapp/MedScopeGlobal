@@ -2,11 +2,14 @@ import Link from "next/link";
 import { Crown, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EditorialPayButtons } from "@/components/subscription/editorial-pay-buttons";
+import { ArticleMeterCta } from "@/components/monetization/article-meter-cta";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import type { StoredNudge } from "@/lib/v38/conversion-engine";
+import type { ArticleRemainder } from "@/lib/monetization/paywall-preview";
 import { getPaywallPreviewText } from "@/lib/monetization/paywall-preview";
+import { getArticleMeterCopy } from "@/lib/monetization/article-meter-copy";
 import { VIP_TRIAL_DAYS } from "@/lib/vip";
 
 type Props = {
@@ -15,6 +18,7 @@ type Props = {
   title?: string;
   locale?: string | null;
   returnPath?: string;
+  remainder?: ArticleRemainder | null;
 };
 
 function gateFooter(locale?: string | null, editorial = false) {
@@ -60,13 +64,27 @@ function gateFooter(locale?: string | null, editorial = false) {
 }
 
 /** Paywall gate with content teaser — VIP or Redakce copy is passed in. */
-export function ArticleConversionGate({ copy, teaserHtml, title, locale, returnPath }: Props) {
+export function ArticleConversionGate({
+  copy,
+  teaserHtml,
+  title,
+  locale,
+  returnPath,
+  remainder,
+}: Props) {
   const teaserText = teaserHtml ? getPaywallPreviewText(teaserHtml) : null;
   const editorial = Boolean(copy.ctaHref?.includes("#public"));
   const footer = gateFooter(locale, editorial);
   const loc = locale ?? "cs";
   const compareHref = localizePublicHref(copy.ctaHref || "/predplatne", loc);
   const accountHref = localizePublicHref("/account", loc);
+  const meter = remainder && remainder.remainingPct > 0 ? getArticleMeterCopy(loc) : null;
+  const leftover =
+    meter && remainder
+      ? remainder.headings.length > 0
+        ? remainder.headings
+        : [meter.leftoverFallback]
+      : [];
 
   return (
     <div className="overflow-hidden rounded-2xl border border-[#005B96]/20 bg-gradient-to-b from-white to-[#f0f7ff] shadow-sm dark:from-slate-900 dark:to-[#005B96]/5">
@@ -98,14 +116,41 @@ export function ArticleConversionGate({ copy, teaserHtml, title, locale, returnP
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#005B96]">
             {copy.eyebrow}
           </p>
-          <p className="font-display text-xl font-semibold text-[#021d33] dark:text-slate-100">
-            {copy.headline}
-          </p>
-          <p className="text-sm text-muted-foreground">{copy.body}</p>
+          {meter && remainder ? (
+            <p className="font-display text-2xl font-semibold tracking-tight text-[#021d33] dark:text-slate-100">
+              {meter.remaining(remainder.remainingPct)}
+            </p>
+          ) : (
+            <p className="font-display text-xl font-semibold text-[#021d33] dark:text-slate-100">
+              {copy.headline}
+            </p>
+          )}
+          {meter && leftover.length > 0 ? (
+            <div className="pt-1 text-left">
+              <p className="text-sm font-semibold text-[#021d33] dark:text-slate-100">
+                {meter.youWillRead}
+              </p>
+              <ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm leading-snug text-slate-600 dark:text-slate-300">
+                {leftover.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">{copy.body}</p>
+          )}
           <p className="text-sm font-medium text-emerald-700">{footer.trial}</p>
         </div>
         {editorial ? (
-          <EditorialPayButtons locale={loc} returnPath={returnPath} />
+          <div className="flex w-full max-w-sm flex-col gap-3">
+            {meter ? (
+              <div className="space-y-1.5">
+                <ArticleMeterCta locale={loc} returnPath={returnPath} />
+                <p className="text-xs text-slate-500">{meter.yearSecondary}</p>
+              </div>
+            ) : null}
+            <EditorialPayButtons locale={loc} returnPath={returnPath} />
+          </div>
         ) : (
           <Button asChild size="lg" className="bg-[#005B96] hover:bg-[#004a7a]">
             <Link href={compareHref}>

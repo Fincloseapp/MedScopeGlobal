@@ -335,7 +335,17 @@ import {
   getLegalEntity,
   publicOrganizationAddress,
 } from "../../lib/config/legal-entity";
-import { getPaywallPreviewHtml } from "../../lib/monetization/paywall-preview";
+import {
+  getArticleRemainder,
+  getPaywallPreviewHtml,
+} from "../../lib/monetization/paywall-preview";
+import {
+  articleSlugFromPathname,
+  decideArticleMeter,
+  parseArticleMeter,
+  serializeArticleMeter,
+} from "../../lib/monetization/article-meter";
+import { getArticleMeterCopy } from "../../lib/monetization/article-meter-copy";
 import {
   NEWSLETTER_PRIMARY_LOCALES,
   newsletterIssueSlug,
@@ -4691,6 +4701,85 @@ console.log("✓ magazine desk byline and copy checks passed");
     resolveArticleBodyLock({ vip_only: true }, { isVip: true, accessLevel: "physician" }).locked,
     false
   );
+  assert.equal(
+    resolveArticleBodyLock(
+      { slug: "verejnost-zivotni-styl-demo", audience: "public" },
+      { isVip: false, accessLevel: "public", hasEditorialAccess: false, magazineMeterUnlocked: true }
+    ).locked,
+    false,
+    "first/second meter open must unlock the magazine body"
+  );
+  {
+    const first = decideArticleMeter({ v: 1, opened: [] }, "desk-one");
+    assert.equal(first.unlocked, true, "first opened article is free");
+    assert.deepEqual(first.state.opened, ["desk-one"]);
+    const secondFree = decideArticleMeter(first.state, "desk-two", () => 0.1);
+    assert.equal(secondFree.unlocked, true, "second article can roll free");
+    assert.equal(secondFree.state.secondRoll, "free");
+    const secondLock = decideArticleMeter(first.state, "desk-two", () => 0.9);
+    assert.equal(secondLock.unlocked, false, "second article can roll lock");
+    assert.equal(
+      decideArticleMeter(secondLock.state, "desk-two", () => 0.1).unlocked,
+      false,
+      "second-article roll stays sticky"
+    );
+    const third = decideArticleMeter(secondFree.state, "desk-three");
+    assert.equal(third.unlocked, false, "third opened article always needs a subscription");
+    assert.equal(
+      decideArticleMeter(third.state, "desk-one").unlocked,
+      true,
+      "reopening the first free article stays free"
+    );
+    const roundTrip = parseArticleMeter(serializeArticleMeter(secondLock.state));
+    assert.deepEqual(roundTrip.opened, ["desk-one", "desk-two"]);
+    assert.equal(roundTrip.secondRoll, "lock");
+    assert.equal(articleSlugFromPathname("/cs/article/desk-one"), "desk-one");
+    assert.equal(articleSlugFromPathname("/de/verejnost/clanky/desk-one"), "desk-one");
+    assert.equal(articleSlugFromPathname("/cs/article/zpravy-who-rsv"), null);
+    const leftover = getArticleRemainder(
+      `<p>${"Úvodní odstavec magazínu. ".repeat(50)}</p><h2>Co se ještě dočtete</h2><p>Druhá půlka.</p><h2>Zdroje</h2><p>WHO</p>`
+    );
+    assert.ok(leftover.remainingPct >= 1 && leftover.remainingPct <= 99);
+    assert.ok(leftover.headings.includes("Co se ještě dočtete"));
+    assert.equal(getArticleMeterCopy("cs").continueReading, "Číst dál");
+    assert.ok(getArticleMeterCopy("cs").remaining(68).includes("68"));
+    for (const { code } of GLOBAL_LOCALES) {
+      const meter = getArticleMeterCopy(code);
+      const price = editorialMonthlyBannerPrice(code);
+      assert.ok(meter.continueReading.length > 1, `${code} read-on label`);
+      assert.ok(meter.youWillRead.length > 1, `${code} leftover label`);
+      assert.ok(meter.remaining(70).includes("70"), `${code} remaining %`);
+      assert.ok(price.length > 0, `${code} meter price`);
+      if (code !== "cs") {
+        assert.ok(!meter.continueReading.includes("Číst"), `${code} must not use Czech Číst dál`);
+        assert.ok(!meter.remaining(70).includes("Ještě"), `${code} remaining copy must not be Czech`);
+      }
+    }
+    assert.ok(editorialMonthlyBannerPrice("cs").includes("25"));
+    assert.match(editorialMonthlyBannerPrice("de"), /€|1/);
+    assert.match(editorialMonthlyBannerPrice("en-US"), /\$|1/);
+    assert.match(editorialMonthlyBannerPrice("en-UK"), /£|1/);
+    const gateSrc = readFileSync(join(root, "components/v38/article-conversion-gate.tsx"), "utf8");
+    assert.ok(gateSrc.includes("ArticleMeterCta"));
+    assert.ok(gateSrc.includes("remainingPct"));
+    assert.ok(gateSrc.includes("youWillRead"));
+    const ctaSrc = readFileSync(join(root, "components/monetization/article-meter-cta.tsx"), "utf8");
+    assert.ok(ctaSrc.includes("public-month"));
+    assert.ok(ctaSrc.includes("#ff2d2d"));
+    const mwSrc = readFileSync(join(root, "middleware.ts"), "utf8");
+    assert.ok(mwSrc.includes("stampArticleMeterRequest"));
+    assert.ok(mwSrc.includes("ARTICLE_METER_COOKIE"));
+    assert.ok(
+      readFileSync(join(root, "app/(public)/article/[slug]/page.tsx"), "utf8").includes(
+        "magazineMeterUnlocked"
+      )
+    );
+    assert.ok(
+      readFileSync(join(root, "app/(public)/verejnost/clanky/[slug]/page.tsx"), "utf8").includes(
+        "magazineMeterUnlocked"
+      )
+    );
+  }
   assert.ok(getEditorialArticleGateCopy("cs").ctaHref.includes("#public"));
   assert.ok(getEditorialArticleGateCopy("de").ctaHref.includes("predplatne"));
   assert.ok(!getEditorialArticleGateCopy("en").headline.includes("VIP"));

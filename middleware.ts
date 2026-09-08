@@ -41,6 +41,16 @@ import { detectAiCrawler } from "@/lib/growth/ai-crawler";
 import { detectAiReferrer } from "@/lib/growth/ai-referrer";
 import { requestCountry } from "@/lib/growth/request-country";
 import { logMonetizationEvent } from "@/lib/monetization/log-event";
+import {
+  ARTICLE_METER_COOKIE,
+  ARTICLE_METER_HEADER,
+  ARTICLE_METER_MAX_AGE_SEC,
+  articleSlugFromPathname,
+  decideArticleMeter,
+  overlayCookieHeader,
+  parseArticleMeter,
+  serializeArticleMeter,
+} from "@/lib/monetization/article-meter";
 
 const LOCALE_COOKIE_OPTS = {
   path: "/",
@@ -82,6 +92,30 @@ function stampAiRefCookie(response: NextResponse, agent: string) {
   response.cookies.set(AI_REF_COOKIE, agent, {
     path: "/",
     maxAge: AI_REF_MAX_AGE_SEC,
+    sameSite: "lax",
+  });
+}
+
+function stampArticleMeterRequest(request: NextRequest, pathname: string, requestHeaders: Headers) {
+  if (isSearchEngineBot(request.headers.get("user-agent"))) return null;
+  const slug = articleSlugFromPathname(pathname);
+  if (!slug) return null;
+  const incoming = request.cookies.get(ARTICLE_METER_COOKIE)?.value;
+  const decision = decideArticleMeter(parseArticleMeter(incoming), slug);
+  const serialized = serializeArticleMeter(decision.state);
+  requestHeaders.set(
+    "cookie",
+    overlayCookieHeader(requestHeaders.get("cookie"), ARTICLE_METER_COOKIE, serialized)
+  );
+  requestHeaders.set(ARTICLE_METER_HEADER, decision.unlocked ? "open" : "lock");
+  return serialized;
+}
+
+function stampArticleMeterResponse(response: NextResponse, serialized: string | null) {
+  if (!serialized) return;
+  response.cookies.set(ARTICLE_METER_COOKIE, serialized, {
+    path: "/",
+    maxAge: ARTICLE_METER_MAX_AGE_SEC,
     sameSite: "lax",
   });
 }
@@ -180,11 +214,13 @@ export async function middleware(request: NextRequest) {
       requestHeaders.set(PATHNAME_REQUEST_HEADER, pathname);
       requestHeaders.set("cookie", cookieHeaderWithLocale(request.headers.get("cookie"), pathLocale));
       if (product) requestHeaders.set("x-czech-faculty-product", product);
+      const meterCookie = stampArticleMeterRequest(request, pathname, requestHeaders);
       const rewrite = NextResponse.rewrite(url, {
         request: { headers: requestHeaders },
       });
       copyResponseCookies(response, rewrite);
       rewrite.cookies.set(LOCALE_COOKIE, normalizeLocale(pathLocale), LOCALE_COOKIE_OPTS);
+      stampArticleMeterResponse(rewrite, meterCookie);
       return outbound(rewrite);
     }
   } else {

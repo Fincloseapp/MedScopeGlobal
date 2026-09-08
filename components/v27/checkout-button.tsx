@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { V27CheckoutKind } from "@/lib/v27/stripe-products";
@@ -11,6 +11,7 @@ type Props = {
   kind: V27CheckoutKind;
   productId: string;
   label?: string;
+  labelNode?: ReactNode;
   className?: string;
   locale?: string;
   gift?: boolean;
@@ -24,6 +25,7 @@ export function V27CheckoutButton({
   kind,
   productId,
   label = "Přejít na Stripe pokladnu",
+  labelNode,
   className,
   locale,
   gift = false,
@@ -106,7 +108,7 @@ export function V27CheckoutButton({
         ) : (
           <>
             {showIcon ? <CreditCard className="mr-2 h-4 w-4" aria-hidden /> : null}
-            {label}
+            {labelNode ?? label}
           </>
         )}
       </Button>

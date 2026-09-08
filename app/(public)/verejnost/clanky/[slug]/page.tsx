@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
+import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { VerejnostArticleDetail } from "@/components/verejnost/verejnost-article-detail";
 import { resolveArticleBodyLock } from "@/lib/auth/article-eligibility";
 import { getReaderContext } from "@/lib/auth/reader-context";
 import { getServerLocale } from "@/lib/i18n/server-locale";
+import {
+  ARTICLE_METER_COOKIE,
+  ARTICLE_METER_HEADER,
+  resolveMagazineMeterUnlock,
+} from "@/lib/monetization/article-meter";
+import { isSearchEngineBot } from "@/lib/i18n/search-bots";
 import { getMarketingCopy } from "@/lib/i18n/marketing-copy";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { getEditorialArticleGateCopy } from "@/lib/v38/conversion-copy";
@@ -37,10 +44,19 @@ export default async function VerejnostClanekDetailPage({ params }: Props) {
   const article = await getPublicArticleBySlug(slug, locale);
   if (!article) notFound();
   const { isVip, accessLevel, hasEditorialAccess } = await getReaderContext();
+  const requestHeaders = await headers();
+  const jar = await cookies();
+  const magazineMeterUnlocked = resolveMagazineMeterUnlock({
+    cookie: jar.get(ARTICLE_METER_COOKIE)?.value,
+    header: requestHeaders.get(ARTICLE_METER_HEADER),
+    slug: article.slug,
+    isBot: isSearchEngineBot(requestHeaders.get("user-agent")),
+  });
   const { locked } = resolveArticleBodyLock(article, {
     isVip,
     accessLevel,
     hasEditorialAccess,
+    magazineMeterUnlocked,
   });
 
   const topic = (article.public_topic ?? null) as PublicTopic | null;

@@ -9,9 +9,10 @@ import { shouldHideFromPublicListing } from "@/lib/editorial/article-quality-aud
  * Two existing gates only:
  * - wire / Aktuality (`zpravy-*`, news rubric) stay fully open
  * - physician VIP (`vip_only` / min_access_level=physician) uses the VIP gate
- * - public magazine shows a teaser, then Redakce (25 Kč / €1 / $1, billed now)
+ * - public magazine is metered for guests (1st open free, 2nd random, 3rd+ Redakce)
  *
  * `fully_open` on native desk seeds does not bypass the magazine teaser.
+ * Pass `magazineMeterUnlocked` from the article-open cookie when the slug is free.
  */
 export type ArticleEligibilityFields = {
   vip_only?: boolean | null;
@@ -35,6 +36,8 @@ export type ArticleLockReader = {
   isVip: boolean;
   accessLevel: AccessLevelId | string;
   hasEditorialAccess?: boolean;
+  /** Guest allowance from `ms_article_meter` (1st free, 2nd random, 3rd+ locked). */
+  magazineMeterUnlocked?: boolean;
 };
 
 /** Medical / doctor articles already flagged for the existing eligibility gate. */
@@ -99,7 +102,7 @@ function readerHasEditorialAccess(reader: ArticleLockReader): boolean {
 
 /**
  * News stays open. Physician VIP keeps the existing lock.
- * Public magazine locks for guests; Redakce / student / physician / VIP unlock.
+ * Public magazine locks for guests unless the meter granted this open, or they already pay.
  */
 export function resolveArticleBodyLock(
   article: ArticleEligibilityFields,
@@ -119,7 +122,10 @@ export function resolveArticleBodyLock(
   }
 
   if (isPublicMagazineArticle(article)) {
-    return { locked: !readerHasEditorialAccess(reader), specialAccess: false };
+    if (readerHasEditorialAccess(reader) || reader.magazineMeterUnlocked) {
+      return { locked: false, specialAccess: false };
+    }
+    return { locked: true, specialAccess: false };
   }
 
   return { locked: false, specialAccess: false };

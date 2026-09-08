@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { cookies, headers } from "next/headers";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { ArticleBody } from "@/components/article/article-body";
@@ -25,6 +26,12 @@ import { matchesArticleLocale } from "@/lib/i18n/article-locale";
 import { articleJsonLdGlobal, buildGlobalHreflang } from "@/lib/ecosystem/seo";
 import { resolveArticleBodyLock } from "@/lib/auth/article-eligibility";
 import { getReaderContext } from "@/lib/auth/reader-context";
+import {
+  ARTICLE_METER_COOKIE,
+  ARTICLE_METER_HEADER,
+  resolveMagazineMeterUnlock,
+} from "@/lib/monetization/article-meter";
+import { isSearchEngineBot } from "@/lib/i18n/search-bots";
 import { getEditorialArticleGateCopy } from "@/lib/v38/conversion-copy";
 import { getActiveAds, getActiveAdsByPlacement } from "@/lib/queries/ads";
 import { AdPlacement } from "@/components/ads/ad-placement";
@@ -166,6 +173,14 @@ export default async function ArticlePage({ params }: Props) {
   if (!article) notFound();
 
   const { isVip, accessLevel, hasEditorialAccess } = await getReaderContext();
+  const requestHeaders = await headers();
+  const jar = await cookies();
+  const magazineMeterUnlocked = resolveMagazineMeterUnlock({
+    cookie: jar.get(ARTICLE_METER_COOKIE)?.value,
+    header: requestHeaders.get(ARTICLE_METER_HEADER),
+    slug: article.slug,
+    isBot: isSearchEngineBot(requestHeaders.get("user-agent")),
+  });
 
   const revenueArticle = {
     vip_only: article.vip_only,
@@ -184,6 +199,7 @@ export default async function ArticlePage({ params }: Props) {
     isVip,
     accessLevel,
     hasEditorialAccess,
+    magazineMeterUnlocked,
   });
 
   const articleGateCopy = !locked
