@@ -3,6 +3,7 @@ import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { localizeListedCzkIn } from "@/lib/i18n/payment-currency";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 
 type Pack = ChromePack;
 
@@ -413,10 +414,14 @@ export function getRevenueCopy(locale?: string | null): RevenueCopy {
   const base = COPY[revenueCopyLocale(locale)];
   const nl = getNewsletterCopy(locale);
   const overlay = affiliateOverlay(locale);
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const subscribeCta =
+    revenueCopyLocale(locale) === "en" && primary !== "en" ? getSurfaceCopy(locale).whyTrial : base.subscribeCta;
   return localizeListedCzkIn(
     {
       ...base,
       ...overlay,
+      subscribeCta,
       newsletterKicker: nl.kicker,
       newsletterTitle: nl.title,
       newsletterBody: nl.body,

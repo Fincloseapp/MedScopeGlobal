@@ -1,4 +1,7 @@
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 
 export type ShareCopy = {
   aria: string;
@@ -173,5 +176,11 @@ const COPY: Record<ChromePack, ShareCopy> = {
 };
 
 export function getShareCopy(locale?: string | null): ShareCopy {
-  return COPY[chromePack(locale)];
+  const key = chromePack(locale);
+  const base = COPY[key];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  if (key === "en" && primary !== "en") {
+    return { ...base, clipsSubscribe: getSurfaceCopy(locale).whyTrial };
+  }
+  return base;
 }

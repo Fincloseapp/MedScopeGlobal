@@ -66,6 +66,7 @@ import { b2bPricingForLocale } from "../lib/v271/b2b-pricing";
 import { formatPublicDate, intlLocaleFor } from "../lib/i18n/format-date";
 import { getArticleChrome } from "../lib/i18n/article-chrome";
 import { getRevenueCopy } from "../lib/i18n/revenue-copy";
+import { getShareCopy } from "../lib/i18n/share-copy";
 import { getAiAgentBrief } from "../lib/growth/ai-agent-program";
 import { aiAgentJsonLd } from "../lib/growth/ai-agent-jsonld";
 import { getMediaKitCopy } from "../lib/i18n/media-kit-copy";
@@ -444,6 +445,10 @@ assert.ok(getHomepageLongevityCopy("fr").softCta.toLowerCase().includes("rédact
 assert.equal(getHomepageLongevityCopy("sk").softCta, "Otvoriť tarif Redakcia");
 assert.equal(getHomepageLongevityCopy("ja").softCta, "編集部プランを開く");
 assert.ok(!getHomepageLongevityCopy("sk").softCta.includes("Open Editorial"));
+assert.equal(getShareCopy("sk").clipsSubscribe, "Otvoriť tarif Redakcia");
+assert.equal(getShareCopy("ja").clipsSubscribe, "編集部プランを開く");
+assert.equal(getRevenueCopy("sk").subscribeCta, "Otvoriť tarif Redakcia");
+assert.ok(!getRevenueCopy("ja").subscribeCta.includes("Open Editorial"));
 assert.ok(!getHomepageLongevityCopy("de").closer.includes("zdarma"));
 assert.equal(classifyCoverTopic({ title: "Mediterranean diet at home", slug: "mediterranean-diet" }), "food");
 assert.equal(classifyCoverTopic({ title: "Sommeil et rythme circadien", slug: "sommeil-rythme" }), "sleep");
