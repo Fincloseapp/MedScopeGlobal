@@ -2173,6 +2173,8 @@ assert.ok(
   assert.ok(archiveSrc.includes("publicNewsletterClient"));
   assert.ok(archiveSrc.includes("getLatestNewsletterCard"));
   assert.ok(archiveSrc.includes("tryCreateServiceRoleClient"));
+  assert.ok(archiveSrc.includes("withBudget"));
+  assert.ok(archiveSrc.includes("Cookie anon client"));
   assert.ok(
     readFileSync(join(root, "app/(public)/newsletter/archiv/page.tsx"), "utf8").includes("getLatestNewsletterCard")
   );

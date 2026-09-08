@@ -30,7 +30,22 @@ export const NEWSLETTER_INDEX_COLUMNS =
   "id, title, slug, issue_date, published, admin_only, created_at";
 
 async function publicNewsletterClient() {
-  return tryCreateServiceRoleClient() ?? (await createClient());
+  // Cookie anon client can sit on Auth getSession until the Worker 1102s.
+  return tryCreateServiceRoleClient();
+}
+
+async function withBudget<T>(work: PromiseLike<T>, fallback: T, ms = 6000): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      Promise.resolve(work),
+      new Promise<T>((resolve) => {
+        timer = setTimeout(() => resolve(fallback), ms);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 function asIndexRow(row: Partial<NewsletterRow> & Pick<NewsletterRow, "id" | "slug" | "issue_date">): NewsletterRow {
@@ -57,14 +72,19 @@ export function newsletterRowLocale(row: Pick<NewsletterRow, "slug" | "layout_js
 
 async function pickLatestIndexRow(locale?: string): Promise<NewsletterRow | null> {
   const supabase = await publicNewsletterClient();
-  const { data, error } = await supabase
-    .from("newsletters")
-    .select(NEWSLETTER_INDEX_COLUMNS)
-    .eq("published", true)
-    .eq("admin_only", false)
-    .order("issue_date", { ascending: false })
-    .limit(locale ? 48 : 1);
-  if (error || !data?.length) return null;
+  if (!supabase) return null;
+  const result = await withBudget(
+    supabase
+      .from("newsletters")
+      .select(NEWSLETTER_INDEX_COLUMNS)
+      .eq("published", true)
+      .eq("admin_only", false)
+      .order("issue_date", { ascending: false })
+      .limit(locale ? 48 : 1),
+    { data: null, error: { message: "timeout" } }
+  );
+  const data = "data" in result ? result.data : null;
+  if (!data?.length) return null;
   const rows = (data as NewsletterRow[]).map((row) => asIndexRow(row));
   if (!locale) return rows[0] ?? null;
   const resolved = resolveGlobalLocale(locale);
@@ -87,18 +107,24 @@ export async function getLatestNewsletter(locale?: string) {
   const picked = await pickLatestIndexRow(locale);
   if (!picked) return null;
   const supabase = await publicNewsletterClient();
-  const { data: full } = await supabase
-    .from("newsletters")
-    .select("*")
-    .eq("slug", picked.slug)
-    .eq("published", true)
-    .eq("admin_only", false)
-    .maybeSingle();
+  if (!supabase) return picked;
+  const result = await withBudget(
+    supabase
+      .from("newsletters")
+      .select("*")
+      .eq("slug", picked.slug)
+      .eq("published", true)
+      .eq("admin_only", false)
+      .maybeSingle(),
+    { data: null }
+  );
+  const full = "data" in result ? result.data : null;
   return (full as NewsletterRow | null) ?? picked;
 }
 
 export async function getNewsletterBySlug(slug: string) {
   const supabase = await publicNewsletterClient();
+  if (!supabase) return null;
   const { data, error } = await supabase
     .from("newsletters")
     .select("*")
@@ -142,6 +168,7 @@ export async function getPendingNewsletterTopics() {
 
 export async function getNewsletterArchive(admin = false, locale?: string) {
   const supabase = admin ? createServiceRoleClient() : await publicNewsletterClient();
+  if (!supabase) return [];
   let q = supabase
     .from("newsletters")
     .select(admin ? "*" : NEWSLETTER_INDEX_COLUMNS)
@@ -149,8 +176,8 @@ export async function getNewsletterArchive(admin = false, locale?: string) {
   if (!admin) {
     q = q.eq("published", true).eq("admin_only", false).limit(12);
   }
-  const { data, error } = await q;
-  if (error) return [];
+  const result = await withBudget(q, { data: [], error: { message: "timeout" } });
+  const data = "data" in result ? result.data : [];
   const rows = ((data ?? []) as NewsletterRow[]).map((row) => asIndexRow(row));
   if (admin || !locale) return rows;
   const resolved = resolveGlobalLocale(locale);
