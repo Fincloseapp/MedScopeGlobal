@@ -1,4 +1,4 @@
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { createServiceRoleClient, tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import type { EmailCategory, EmailProvider, EmailSendStatus } from "@/lib/email/types";
 import { logAdminEvent } from "@/lib/logging";
 import { applyEmailLogProviderSchema } from "@/lib/monetization/apply-schema";
@@ -44,7 +44,8 @@ export async function persistEmailLog(row: EmailLogRow): Promise<void> {
 }
 
 export async function listEmailLogs(limit = 100): Promise<EmailLogRow[]> {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return [];
   const { data, error } = await admin
     .from("email_logs")
     .select("*")
@@ -58,7 +59,8 @@ export async function listEmailLogs(limit = 100): Promise<EmailLogRow[]> {
 }
 
 export async function getEmailLog(id: string): Promise<EmailLogRow | null> {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return null;
   const { data, error } = await admin.from("email_logs").select("*").eq("id", id).maybeSingle();
   if (error || !data) return null;
   return data as EmailLogRow;

@@ -18,7 +18,6 @@ import {
   EMPTY_STRIPE_MONEY,
   type StripeMoneySnapshot,
 } from "@/lib/admin/stripe-snapshot";
-import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { loadEditorialPulse, type EditorialPulse } from "@/lib/admin/editorial-pulse";
 import type { Category } from "@/types/database";
 
@@ -164,7 +163,7 @@ async function emptyOverview(): Promise<AdminOverview> {
 export async function loadAdminOverview(): Promise<AdminOverview> {
   const client = await createAdminReadClient();
   if (!client) return emptyOverview();
-  const dataSource = tryCreateServiceRoleClient() ? "service-role" : "user-session";
+  const dataSource: AdminOverview["dataSource"] = "service-role";
   const taxonomyInserted = await ensureMissingEditorialCategories();
 
   const [

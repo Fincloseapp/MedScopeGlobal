@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { requireAdmin } from "@/lib/auth/admin";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { isAdminGateOpen } from "@/lib/auth/admin-gate";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { redirect } from "next/navigation";
 import { V46_UI_VERSION, V46_COMPOSITE_LABEL } from "@/lib/v46/version";
 import { getThreatDetectorStatus } from "@/lib/v46/security/threat-detector";
@@ -11,17 +11,23 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminSecurityLogsPage() {
-  const gate = await requireAdmin();
-  if (!gate.ok) redirect("/login?next=/admin/security");
+  if (!(await isAdminGateOpen())) redirect("/admin/login");
 
-  const admin = createServiceRoleClient();
-  const [{ data: logs }, { data: healthEvents }] = await Promise.all([
-    admin.from("security_logs").select("*").order("timestamp", { ascending: false }).limit(50),
-    admin.from("system_health_events").select("*").order("created_at", { ascending: false }).limit(20).then(
-      (r) => r,
-      () => ({ data: [] })
-    ),
-  ]);
+  const admin = tryCreateServiceRoleClient();
+  const [{ data: logs }, { data: healthEvents }] = admin
+    ? await Promise.all([
+        admin.from("security_logs").select("*").order("timestamp", { ascending: false }).limit(50),
+        admin
+          .from("system_health_events")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(20)
+          .then(
+            (r) => r,
+            () => ({ data: [] as { id: string; created_at: string; subsystem: string; status: string; message: string }[] })
+          ),
+      ])
+    : [{ data: [] as { id: string; timestamp: string; action: string; status: string; ip: string | null; user_id: string | null }[] }, { data: [] }];
 
   const threat = getThreatDetectorStatus();
 

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { adminReviewClkFormAction } from "@/lib/actions/clk-verification";
 import { readClkStore } from "@/lib/auth/clk-data-store";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -40,15 +40,17 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 async function loadRows(): Promise<{ source: string; rows: ClkRow[] }> {
-  const admin = createServiceRoleClient();
-  const { data, error } = await admin
-    .from("clk_verifications")
-    .select("*")
-    .order("updated_at", { ascending: false })
-    .limit(200);
+  const admin = tryCreateServiceRoleClient();
+  if (admin) {
+    const { data, error } = await admin
+      .from("clk_verifications")
+      .select("*")
+      .order("updated_at", { ascending: false })
+      .limit(200);
 
-  if (!error && data) {
-    return { source: "supabase", rows: data as ClkRow[] };
+    if (!error && data) {
+      return { source: "supabase", rows: data as ClkRow[] };
+    }
   }
 
   const fileStore = readClkStore();

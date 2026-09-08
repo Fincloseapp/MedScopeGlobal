@@ -1,6 +1,6 @@
 import { prepareArticlesForDisplay } from "@/lib/articles/prepare-for-display";
 import { mapArticleList } from "@/lib/db/map-article";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { filterActiveArticles, filterCzechContent } from "@/lib/v20/content-rules";
 import { getV20LatestStudies } from "@/lib/v20/studies/query";
 import { getV22DigitalHealthList } from "@/lib/v22/digital-health/query";
@@ -36,7 +36,8 @@ function toItem(title: string, summary: string, href: string, imageUrl?: string 
 }
 
 async function loadArticlesForNewsletter(limit = 4): Promise<V23NewsletterItem[]> {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return V23_FALLBACK_ARTICLES;
   const { data, error } = await admin
     .from("articles")
     .select(articleSelect)
@@ -66,7 +67,8 @@ async function loadArticlesForNewsletter(limit = 4): Promise<V23NewsletterItem[]
 }
 
 async function loadLegislation(limit = 3): Promise<V23NewsletterItem[]> {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return V23_FALLBACK_LEGISLATION;
   const { data, error } = await admin
     .from("legislation_items")
     .select("title, slug, summary, body, image_url")
@@ -88,7 +90,8 @@ async function loadLegislation(limit = 3): Promise<V23NewsletterItem[]> {
 }
 
 async function loadDrugNews(limit = 3): Promise<V23NewsletterItem[]> {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return V23_FALLBACK_DRUGS;
   const { data, error } = await admin
     .from("drug_news")
     .select("title, slug, summary, body, image_url")
@@ -110,7 +113,8 @@ async function loadDrugNews(limit = 3): Promise<V23NewsletterItem[]> {
 }
 
 async function loadUniversityNews(limit = 3): Promise<V23NewsletterItem[]> {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return V23_FALLBACK_UNIVERSITIES;
   const { data, error } = await admin
     .from("university_news")
     .select("title, slug, summary, body, image_url")
@@ -132,7 +136,8 @@ async function loadUniversityNews(limit = 3): Promise<V23NewsletterItem[]> {
 }
 
 async function loadPendingTopics(): Promise<string[]> {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return [];
   const { data, error } = await admin
     .from("newsletter_topics")
     .select("topic_text")
@@ -143,10 +148,24 @@ async function loadPendingTopics(): Promise<string[]> {
   return data.map((t) => sanitizeNewsletterText(t.topic_text)).filter(Boolean);
 }
 
+async function withFallback<T>(run: Promise<T>, fallback: T, ms = 2_000): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      run,
+      new Promise<T>((resolve) => {
+        timer = setTimeout(() => resolve(fallback), ms);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 export async function gatherNewsletterSources(): Promise<V23NewsletterSources> {
   const [studiesRaw, dhList, articles, legislation, drugs, universities, pendingTopics] = await Promise.all([
     getV20LatestStudies(4),
-    getV22DigitalHealthList(4),
+    withFallback(getV22DigitalHealthList(4), [], 2_000),
     loadArticlesForNewsletter(4),
     loadLegislation(3),
     loadDrugNews(3),

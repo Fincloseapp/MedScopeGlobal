@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireAdminAccess } from "@/lib/auth/require-admin-access";
 import { runIngestionPipeline } from "@/lib/ingestion/pipeline";
 import { isAiConfigured } from "@/lib/ingestion/ai";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { createServiceRoleClient, tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 export async function triggerIngestionNow() {
   const access = await requireAdminAccess();
@@ -25,7 +25,10 @@ export async function triggerIngestionNow() {
 export async function getIngestionStatus() {
   await requireAdminAccess();
 
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) {
+    return { aiEnabled: isAiConfigured(), schedule: null, runs: [] };
+  }
   const [schedule, lastRuns] = await Promise.all([
     admin.from("ingestion_schedule").select("*").eq("id", 1).maybeSingle(),
     admin

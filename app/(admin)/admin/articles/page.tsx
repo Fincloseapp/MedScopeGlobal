@@ -43,7 +43,7 @@ export default async function AdminArticlesPage() {
     throw error;
   }
 
-  const articles = (data ?? []) as (Article & {
+  const articles = (data ?? []) as unknown as (Article & {
     categories: { name: string } | null;
   })[];
 

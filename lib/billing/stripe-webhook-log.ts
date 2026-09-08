@@ -1,4 +1,4 @@
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { createServiceRoleClient, tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { logAdminEvent } from "@/lib/logging";
 
 export interface StripeWebhookLogInput {
@@ -28,7 +28,8 @@ export interface StripeWebhookLogRow {
 }
 
 export async function listStripeWebhookLogs(limit = 100): Promise<StripeWebhookLogRow[]> {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return [];
   const { data, error } = await admin
     .from("stripe_webhook_logs")
     .select("*")

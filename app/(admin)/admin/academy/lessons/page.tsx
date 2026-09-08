@@ -1,13 +1,14 @@
 import { AdminLessonForm } from "@/components/academy/admin-lesson-form";
 import { AdminLessonRow } from "@/components/academy/admin-lesson-row";
 import { listAllCoursesAdmin } from "@/lib/academy/db";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 export default async function AdminAcademyLessonsPage() {
   const [courses, lessons] = await Promise.all([
     listAllCoursesAdmin(),
     (async () => {
-      const admin = createServiceRoleClient();
+      const admin = tryCreateServiceRoleClient();
+      if (!admin) return [];
       const { data } = await admin
         .from("lessons")
         .select("id, title, slug, course_id, status, sort_order")

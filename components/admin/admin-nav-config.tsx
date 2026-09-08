@@ -97,6 +97,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     label: "Systém",
     items: [
       { href: "/admin/brand", label: "Značka a logo", icon: Palette },
+      { href: "/admin/security", label: "Bezpečnost", icon: ShieldCheck },
       { href: "/admin/pravni-checklist", label: "Právní checklist", icon: Scale },
       { href: "/admin/autopilot", label: "Autopilot", icon: Bot },
       { href: "/admin/ingestion", label: "AI ingestion", icon: Bot },

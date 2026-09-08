@@ -32,11 +32,9 @@ export async function getAuthorizedAdminClient() {
   return user;
 }
 
+/** Admin lists use service role only. Cookie anon Auth can hang the Worker. */
 export async function createAdminReadClient() {
-  const service = tryCreateServiceRoleClient();
-  if (service) return service;
-  const user = await createClient();
-  return user ?? null;
+  return tryCreateServiceRoleClient();
 }
 
 /** author_id for inserts when the operator is on the password gate only. */

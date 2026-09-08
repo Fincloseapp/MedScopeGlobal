@@ -1,10 +1,17 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { aggregateWatchEvents } from "@/lib/v36/video-analytics/analyzer";
 
 export default async function AdminVideoAnalyticsPage() {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) {
+    return (
+      <p className="text-sm text-slate-600">
+        Video analytics se načtou po obnovení Supabase service role.
+      </p>
+    );
+  }
   const { data: assets } = await admin
     .from("video_assets")
     .select("id, title, duration_seconds")

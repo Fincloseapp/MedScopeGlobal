@@ -1,13 +1,15 @@
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { AdminSimulationEditor } from "@/components/academy/admin-simulation-editor";
 
 export default async function AdminAcademySimulationsPage() {
-  const admin = createServiceRoleClient();
-  const { data: rows } = await admin
-    .from("clinical_simulations")
-    .select("*")
-    .order("updated_at", { ascending: false })
-    .limit(50);
+  const admin = tryCreateServiceRoleClient();
+  const { data: rows } = admin
+    ? await admin
+        .from("clinical_simulations")
+        .select("*")
+        .order("updated_at", { ascending: false })
+        .limit(50)
+    : { data: [] };
 
   return (
     <>

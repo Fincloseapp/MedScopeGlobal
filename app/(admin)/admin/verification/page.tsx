@@ -2,7 +2,7 @@ import {
   approveVerificationForm,
   rejectVerificationForm,
 } from "@/lib/actions/verification";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminReadClient } from "@/lib/auth/require-admin-access";
 import { verificationStatusLabel } from "@/lib/i18n/labels";
 import { normalizeLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
 import { cookies } from "next/headers";
@@ -20,7 +20,14 @@ export const metadata = { title: "Ověření profesí" };
 export default async function AdminVerificationPage() {
   const cookieStore = await cookies();
   const locale = normalizeLocale(cookieStore.get(LOCALE_COOKIE)?.value);
-  const supabase = await createClient();
+  const supabase = await createAdminReadClient();
+  if (!supabase) {
+    return (
+      <div className="rounded-xl border bg-amber-50 p-6 text-sm text-amber-900">
+        Databáze teď není napojená. Ověření se načtou po obnovení Supabase service role.
+      </div>
+    );
+  }
   const { data: rows } = await supabase
     .from("users")
     .select(

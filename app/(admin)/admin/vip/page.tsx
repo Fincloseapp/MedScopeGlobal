@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 async function upsertAction(formData: FormData) {
   "use server";
@@ -27,16 +27,18 @@ async function deactivateAction(formData: FormData) {
 }
 
 export default async function AdminVipPage() {
-  const admin = createServiceRoleClient();
-  const { data } = await admin
-    .from("vip_subscriptions")
-    .select(
-      `
+  const admin = tryCreateServiceRoleClient();
+  const { data } = admin
+    ? await admin
+        .from("vip_subscriptions")
+        .select(
+          `
       *,
       users!user_id ( email, full_name )
     `
-    )
-    .order("created_at", { ascending: false });
+        )
+        .order("created_at", { ascending: false })
+    : { data: [] };
 
   const rows =
     (data ?? []) as {

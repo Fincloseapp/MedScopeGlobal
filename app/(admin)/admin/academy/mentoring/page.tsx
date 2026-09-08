@@ -1,12 +1,14 @@
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 export default async function AdminAcademyMentoringPage() {
-  const admin = createServiceRoleClient();
-  const { data: sessions } = await admin
-    .from("mentoring_sessions")
-    .select("*")
-    .order("scheduled_at", { ascending: false })
-    .limit(50);
+  const admin = tryCreateServiceRoleClient();
+  const { data: sessions } = admin
+    ? await admin
+        .from("mentoring_sessions")
+        .select("*")
+        .order("scheduled_at", { ascending: false })
+        .limit(50)
+    : { data: [] };
 
   return (
     <>

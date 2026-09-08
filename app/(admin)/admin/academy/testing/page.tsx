@@ -1,5 +1,5 @@
 import { runSystemTest } from "@/lib/academy/db";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 export default async function AdminAcademyTestingPage() {
   let test: Awaited<ReturnType<typeof runSystemTest>> | null = null;
@@ -9,8 +9,10 @@ export default async function AdminAcademyTestingPage() {
     test = null;
   }
 
-  const admin = createServiceRoleClient();
-  const { data: tests } = await admin.from("system_tests").select("*").order("updated_at", { ascending: false }).limit(20);
+  const admin = tryCreateServiceRoleClient();
+  const { data: tests } = admin
+    ? await admin.from("system_tests").select("*").order("updated_at", { ascending: false }).limit(20)
+    : { data: [] };
 
   return (
     <>

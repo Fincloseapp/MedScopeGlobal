@@ -90,7 +90,8 @@ export async function listPublishedCourses(
 }
 
 export async function countPrepCourses(): Promise<number> {
-  const admin = adminClient();
+  const admin = tryAdminClient();
+  if (!admin) return 0;
   const { count, error } = await admin
     .from("courses")
     .select("*", { count: "exact", head: true })
@@ -106,7 +107,8 @@ export async function countPrepCourses(): Promise<number> {
 }
 
 export async function countPublishedCourses(): Promise<number> {
-  const admin = adminClient();
+  const admin = tryAdminClient();
+  if (!admin) return 0;
   const { count, error } = await admin
     .from("courses")
     .select("*", { count: "exact", head: true })
@@ -150,14 +152,18 @@ export async function getCourseVideoFlags(
 }
 
 export async function listAllCoursesAdmin(limit = 100): Promise<AcademyCourse[]> {
-  const admin = adminClient();
+  const admin = tryAdminClient();
+  if (!admin) return [];
   const { data, error } = await admin
     .from("courses")
     .select("*")
     .order("updated_at", { ascending: false })
     .limit(limit);
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error("[academy] listAllCoursesAdmin", error.message);
+    return [];
+  }
   return (data ?? []) as AcademyCourse[];
 }
 
@@ -320,7 +326,8 @@ export async function getLessonByIdOrSlug(
 }
 
 export async function countVideoLessons(): Promise<number> {
-  const admin = adminClient();
+  const admin = tryAdminClient();
+  if (!admin) return 0;
   const { count, error } = await admin
     .from("lessons")
     .select("*", { count: "exact", head: true })
@@ -335,7 +342,8 @@ export async function countVideoLessons(): Promise<number> {
 }
 
 export async function countClinicalSimulations(): Promise<number> {
-  const admin = adminClient();
+  const admin = tryAdminClient();
+  if (!admin) return 0;
   const { count, error } = await admin
     .from("clinical_simulations")
     .select("*", { count: "exact", head: true })
@@ -625,9 +633,13 @@ export async function updateUserProgress(
 }
 
 export async function getAcademyCounts(): Promise<Record<string, number>> {
-  const admin = adminClient();
   const tables = ["courses", "lessons", "quizzes", "ai_tasks", "user_progress", "certificates"] as const;
   const counts: Record<string, number> = {};
+  const admin = tryAdminClient();
+  if (!admin) {
+    for (const table of tables) counts[table] = 0;
+    return counts;
+  }
 
   await Promise.all(
     tables.map(async (table) => {
@@ -640,7 +652,6 @@ export async function getAcademyCounts(): Promise<Record<string, number>> {
 }
 
 export async function checkAcademyTables(): Promise<Record<string, boolean>> {
-  const admin = adminClient();
   const tables = [
     "courses",
     "lessons",
@@ -658,6 +669,11 @@ export async function checkAcademyTables(): Promise<Record<string, boolean>> {
     "marketing_events",
   ];
   const result: Record<string, boolean> = {};
+  const admin = tryAdminClient();
+  if (!admin) {
+    for (const table of tables) result[table] = false;
+    return result;
+  }
 
   for (const table of tables) {
     const { error } = await admin.from(table).select("id", { count: "exact", head: true });
@@ -873,14 +889,18 @@ export async function listAiScenarios(limit = 20) {
 }
 
 export async function listAiLogs(limit = 50) {
-  const admin = adminClient();
+  const admin = tryAdminClient();
+  if (!admin) return [];
   const { data, error } = await admin
     .from("ai_logs")
     .select("*")
     .order("created_at", { ascending: false })
     .limit(limit);
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error("[academy] listAiLogs", error.message);
+    return [];
+  }
   return data ?? [];
 }
 

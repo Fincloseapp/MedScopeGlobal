@@ -1,12 +1,14 @@
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 export default async function AdminAcademyAiExpertsPage() {
-  const admin = createServiceRoleClient();
-  const { data: reviews } = await admin
-    .from("ai_expert_reviews")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(50);
+  const admin = tryCreateServiceRoleClient();
+  const { data: reviews } = admin
+    ? await admin
+        .from("ai_expert_reviews")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50)
+    : { data: [] };
 
   return (
     <>

@@ -1,7 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 export async function getAutopilotRuns(limit = 30) {
-  const supabase = await createClient();
+  const supabase = tryCreateServiceRoleClient();
+  if (!supabase) return [];
   const { data } = await supabase
     .from("autopilot_runs")
     .select("*")
@@ -11,13 +12,15 @@ export async function getAutopilotRuns(limit = 30) {
 }
 
 export async function getAutopilotCronJobs() {
-  const supabase = await createClient();
+  const supabase = tryCreateServiceRoleClient();
+  if (!supabase) return [];
   const { data } = await supabase.from("autopilot_cron_jobs").select("*").order("slug");
   return data ?? [];
 }
 
 export async function getAutopilotSettings() {
-  const supabase = await createClient();
+  const supabase = tryCreateServiceRoleClient();
+  if (!supabase) return null;
   const { data } = await supabase
     .from("autopilot_settings")
     .select("*")

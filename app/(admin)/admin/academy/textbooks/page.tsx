@@ -1,14 +1,16 @@
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { AdminTextbookForm } from "@/components/academy/admin-textbook-form";
 import { AdminTextbookEditor } from "@/components/academy/admin-textbook-editor";
 
 export default async function AdminAcademyTextbooksPage() {
-  const admin = createServiceRoleClient();
-  const { data: rows } = await admin
-    .from("textbooks")
-    .select("*")
-    .order("updated_at", { ascending: false })
-    .limit(50);
+  const admin = tryCreateServiceRoleClient();
+  const { data: rows } = admin
+    ? await admin
+        .from("textbooks")
+        .select("*")
+        .order("updated_at", { ascending: false })
+        .limit(50)
+    : { data: [] };
 
   return (
     <>

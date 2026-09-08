@@ -1,13 +1,14 @@
 import { AdminQuizForm } from "@/components/academy/admin-quiz-form";
 import { AdminQuizRow } from "@/components/academy/admin-quiz-row";
 import { listAllCoursesAdmin } from "@/lib/academy/db";
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 export default async function AdminAcademyQuizzesPage() {
   const [courses, quizzes] = await Promise.all([
     listAllCoursesAdmin(),
     (async () => {
-      const admin = createServiceRoleClient();
+      const admin = tryCreateServiceRoleClient();
+      if (!admin) return [];
       const { data } = await admin
         .from("quizzes")
         .select("id, title, course_id, lesson_id, status, passing_score")

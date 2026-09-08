@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { createServiceRoleClient, tryCreateServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { resolveGlobalLocale } from "@/lib/i18n/locale-path";
 import {
   newsletterIssueSlug,
@@ -143,7 +143,8 @@ export async function getNewsletterForPublic(slug: string, locale: string) {
 }
 
 export async function getNewsletterDraftForAdmin() {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return null;
   const issueDate = new Date().toISOString().slice(0, 10);
   const { data } = await admin
     .from("newsletters")
@@ -154,7 +155,8 @@ export async function getNewsletterDraftForAdmin() {
 }
 
 export async function getPendingNewsletterTopics() {
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) return [];
   const { data, error } = await admin
     .from("newsletter_topics")
     .select("id, topic_text, created_at")
@@ -165,7 +167,7 @@ export async function getPendingNewsletterTopics() {
 }
 
 export async function getNewsletterArchive(admin = false, locale?: string) {
-  const supabase = admin ? createServiceRoleClient() : await publicNewsletterClient();
+  const supabase = admin ? tryCreateServiceRoleClient() : await publicNewsletterClient();
   if (!supabase) return [];
   const data = await withBudget(async () => {
     if (admin) {

@@ -758,6 +758,7 @@ file("lib/monetization/payout-map.ts");
   assert.ok(hrefs.includes("/admin/ai-agents"));
   assert.ok(hrefs.includes("/admin/ai-teams"));
   assert.ok(hrefs.includes("/admin/pravni-checklist"));
+  assert.ok(hrefs.includes("/admin/security"));
   assert.ok(hrefs.includes("/admin/articles"));
   assert.equal(isAdminNavActive("/admin/ads-public", "/admin/ads"), false);
   assert.equal(isAdminNavActive("/admin/ads", "/admin/ads"), true);
@@ -804,6 +805,42 @@ file("lib/monetization/payout-map.ts");
   assert.ok(nextConfig.includes("private, no-cache, no-store, must-revalidate"));
   if (prev === undefined) delete process.env.ADMIN_GATE_PASSWORD;
   else process.env.ADMIN_GATE_PASSWORD = prev;
+}
+
+{
+  const adminRead = readFileSync(join(root, "lib/auth/require-admin-access.ts"), "utf8");
+  assert.ok(adminRead.includes("Cookie anon Auth can hang"));
+  assert.ok(!adminRead.includes("return user ?? null"));
+  const stripeSnap = readFileSync(join(root, "lib/admin/stripe-snapshot.ts"), "utf8");
+  assert.ok(stripeSnap.includes("STRIPE_SNAPSHOT_MS"));
+  assert.ok(stripeSnap.includes("Stripe timeout"));
+  const webhookLog = readFileSync(join(root, "lib/billing/stripe-webhook-log.ts"), "utf8");
+  assert.ok(webhookLog.includes("tryCreateServiceRoleClient"));
+  assert.ok(webhookLog.includes("if (!admin) return []"));
+  const emailLog = readFileSync(join(root, "lib/email/log.ts"), "utf8");
+  assert.ok(emailLog.includes("tryCreateServiceRoleClient"));
+  assert.ok(emailLog.includes("if (!admin) return []"));
+  const nlAdmin = readFileSync(join(root, "lib/queries/v4c/newsletters.ts"), "utf8");
+  assert.ok(nlAdmin.includes("getNewsletterDraftForAdmin"));
+  assert.ok(nlAdmin.includes("if (!admin) return null"));
+  assert.ok(nlAdmin.includes("if (!admin) return []"));
+  const sources = readFileSync(join(root, "lib/v23/newsletter/sources.ts"), "utf8");
+  assert.ok(sources.includes("tryCreateServiceRoleClient"));
+  assert.ok(sources.includes("withFallback"));
+  assert.ok(!sources.includes("createServiceRoleClient()"));
+  const security = readFileSync(join(root, "app/(admin)/admin/security/page.tsx"), "utf8");
+  assert.ok(security.includes("isAdminGateOpen"));
+  assert.ok(security.includes('redirect("/admin/login")'));
+  assert.ok(!security.includes("requireAdmin()"));
+  const academyDb = readFileSync(join(root, "lib/academy/db.ts"), "utf8");
+  assert.ok(academyDb.includes("getAcademyCounts"));
+  assert.ok(academyDb.includes("tryAdminClient()"));
+  const ingest = readFileSync(join(root, "lib/actions/ingestion.ts"), "utf8");
+  assert.ok(ingest.includes("tryCreateServiceRoleClient"));
+  const media = readFileSync(join(root, "app/(admin)/admin/media/page.tsx"), "utf8");
+  assert.ok(media.includes("createAdminReadClient"));
+  const verify = readFileSync(join(root, "app/(admin)/admin/verification/page.tsx"), "utf8");
+  assert.ok(verify.includes("createAdminReadClient"));
 }
 
 assert.equal(slugifyCategory("Dlouhověkost"), "dlouhovekost");

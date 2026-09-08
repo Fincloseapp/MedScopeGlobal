@@ -70,10 +70,23 @@ function mapBalance(rows: { amount: number; currency: string }[]): StripeBalance
   return rows.map((row) => ({ amount: row.amount, currency: row.currency }));
 }
 
-export async function loadStripeMoneySnapshot(): Promise<StripeMoneySnapshot> {
-  if (!getStripeSecretKey()) {
-    return { ...EMPTY_STRIPE_MONEY };
+const STRIPE_SNAPSHOT_MS = 4_000;
+
+async function withTimeout<T>(run: Promise<T>, fallback: T, ms: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      run,
+      new Promise<T>((resolve) => {
+        timer = setTimeout(() => resolve(fallback), ms);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
   }
+}
+
+async function loadStripeMoneySnapshotUnsafe(): Promise<StripeMoneySnapshot> {
   try {
     const stripe = createStripeClient();
     const [balance, payouts, account] = await Promise.all([
@@ -114,4 +127,19 @@ export async function loadStripeMoneySnapshot(): Promise<StripeMoneySnapshot> {
       error: stripeClientErrorBody(error).error,
     };
   }
+}
+
+export async function loadStripeMoneySnapshot(): Promise<StripeMoneySnapshot> {
+  if (!getStripeSecretKey()) {
+    return { ...EMPTY_STRIPE_MONEY };
+  }
+  return withTimeout(
+    loadStripeMoneySnapshotUnsafe(),
+    {
+      ...EMPTY_STRIPE_MONEY,
+      configured: true,
+      error: "Stripe timeout",
+    },
+    STRIPE_SNAPSHOT_MS
+  );
 }

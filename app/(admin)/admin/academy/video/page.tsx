@@ -1,4 +1,4 @@
-import { createServiceRoleClient } from "@/lib/supabase/service";
+import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 
 import { AdminVideoForm } from "@/components/academy/admin-video-form";
 
@@ -34,7 +34,14 @@ const PLACEHOLDER_MP4 =
 
 export default async function AdminAcademyVideoPage() {
 
-  const admin = createServiceRoleClient();
+  const admin = tryCreateServiceRoleClient();
+  if (!admin) {
+    return (
+      <p className="text-sm text-slate-600">
+        Video knihovna se načte po obnovení Supabase service role.
+      </p>
+    );
+  }
 
   const [{ data: videos }, { data: lessons }] = await Promise.all([
 
