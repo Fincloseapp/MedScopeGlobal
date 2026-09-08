@@ -1,4 +1,7 @@
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { adRequestEdition } from "@/lib/i18n/ad-request-editions";
 
 export type AdRequestCopy = {
   metaTitle: string;
@@ -381,5 +384,15 @@ const PACK: Record<ChromePack, AdRequestCopy> = {
 };
 
 export function getAdRequestCopy(locale?: string | null): AdRequestCopy {
-  return PACK[chromePack(locale)];
+  const base = PACK[chromePack(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : adRequestEdition(primary);
+  if (!edition) return base;
+  const { types, durations, ...rest } = edition;
+  return {
+    ...base,
+    ...rest,
+    types: { ...base.types, ...Object.fromEntries(Object.entries(types ?? {}).filter((entry): entry is [string, string] => Boolean(entry[1]))) },
+    durations: { ...base.durations, ...Object.fromEntries(Object.entries(durations ?? {}).filter((entry): entry is [string, string] => Boolean(entry[1]))) },
+  };
 }

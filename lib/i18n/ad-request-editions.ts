@@ -1,0 +1,102 @@
+import type { AdRequestCopy } from "@/lib/i18n/ad-request-copy";
+
+export type AdRequestEdition = Partial<
+  Omit<AdRequestCopy, "types" | "positions" | "newsletterSlots" | "durations">
+> & {
+  types?: Partial<AdRequestCopy["types"]>;
+  durations?: Partial<AdRequestCopy["durations"]>;
+};
+
+const EDITIONS: Record<string, AdRequestEdition> = {
+  sk: {
+    metaTitle: "Formulár inzercie",
+    metaDescription: "Objednávka reklamy s automatickým nacenením a súhlasom GDPR.",
+    eyebrow: "Formulár",
+    title: "Objednávka reklamy",
+    lead: "Po odoslaní dostanete potvrdenie na info@medscopeglobal.com. Po schválení administrátorom dostanete platobný odkaz Stripe.",
+    thanks: "Ďakujeme. Žiadosť bola odoslaná na info@medscopeglobal.com. Po schválení dostanete platobný odkaz.",
+    company: "Názov firmy",
+    contact: "Kontaktná osoba",
+    ico: "IČO",
+    dic: "DIČ",
+    email: "E-mail",
+    phone: "Telefón",
+    type: "Typ reklamy",
+    position: "Pozícia na webe",
+    newsletterPosition: "Pozícia v newslettri",
+    duration: "Doba zobrazenia",
+    targetUrl: "URL cieľovej stránky",
+    bannerUrl: "URL banneru (po nahratí)",
+    adText: "Text reklamy",
+    includeNewsletter: "Zahrnúť newsletter",
+    quote: "Automatické nacenenie:",
+    gdpr: "Súhlasím so spracovaním údajov podľa",
+    terms: "Súhlasím s",
+    termsLink: "obchodnými podmienkami",
+    error: "Odoslanie sa nepodarilo alebo chýbajú súhlasy.",
+    submit: "Odoslať žiadosť",
+    sending: "Odosielam…",
+    types: {
+      banner: "Banner",
+      sponsored_article: "Sponzorovaný článok",
+      package: "Kombinovaný balíček",
+    },
+    durations: { "7": "7 dní", "14": "14 dní", "30": "30 dní", "60": "60 dní", "90": "90 dní" },
+  },
+  pl: {
+    metaTitle: "Formularz reklamy",
+    metaDescription: "Zamówienie reklamy z automatyczną wyceną i zgodą RODO.",
+    eyebrow: "Formularz",
+    title: "Zamówienie reklamy",
+    lead: "Po wysłaniu dostaniesz potwierdzenie na info@medscopeglobal.com. Po akceptacji — link płatności Stripe.",
+    thanks: "Dziękujemy. Wniosek wysłano na info@medscopeglobal.com. Po akceptacji dostaniesz link płatności.",
+    company: "Nazwa firmy",
+    contact: "Osoba kontaktowa",
+    email: "E-mail",
+    phone: "Telefon",
+    type: "Format reklamy",
+    position: "Miejsce na stronie",
+    duration: "Czas wyświetlania",
+    adText: "Tekst reklamy",
+    includeNewsletter: "Dołącz newsletter",
+    quote: "Automatyczna wycena:",
+    gdpr: "Zgadzam się na przetwarzanie danych zgodnie z",
+    terms: "Zgadzam się z",
+    termsLink: "regulaminem",
+    error: "Wysłanie nie powiodło się albo brakuje zgód.",
+    submit: "Wyślij wniosek",
+    sending: "Wysyłam…",
+    types: { sponsored_article: "Artykuł sponsorowany", package: "Pakiet łączony" },
+    durations: { "7": "7 dni", "14": "14 dni", "30": "30 dni", "60": "60 dni", "90": "90 dni" },
+  },
+  ja: {
+    metaTitle: "広告フォーム",
+    metaDescription: "自動見積もりとプライバシー同意付きの広告申し込み。",
+    eyebrow: "フォーム",
+    title: "広告の申し込み",
+    lead: "送信後、info@medscopeglobal.com に確認が届きます。承認後にStripeの支払いリンクが来ます。",
+    thanks: "ありがとうございます。申し込みを info@medscopeglobal.com に送りました。承認後に支払いリンクが届きます。",
+    company: "会社名",
+    contact: "担当者",
+    email: "メール",
+    phone: "電話",
+    type: "広告の形式",
+    position: "掲載位置",
+    duration: "表示期間",
+    adText: "広告文",
+    includeNewsletter: "ニュースレターを含める",
+    quote: "自動見積もり：",
+    gdpr: "次に従ってデータ処理に同意します",
+    terms: "次に同意します",
+    termsLink: "利用規約",
+    error: "送信に失敗したか、同意が不足しています。",
+    submit: "申し込みを送る",
+    sending: "送信中…",
+    types: { sponsored_article: "スポンサード記事", package: "組み合わせパッケージ" },
+    durations: { "7": "7日", "14": "14日", "30": "30日", "60": "60日", "90": "90日" },
+  },
+};
+
+export function adRequestEdition(primary: string): AdRequestEdition | undefined {
+  return EDITIONS[primary];
+}

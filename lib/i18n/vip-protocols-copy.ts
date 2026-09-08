@@ -1,6 +1,9 @@
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { MEDICAL_DISCLAIMER } from "@/lib/ecosystem/locales";
 import { VIP_PRICING } from "@/lib/ecosystem/monetization";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { vipProtocolsEdition } from "@/lib/i18n/vip-protocols-editions";
 
 export type VipProtocolsCopy = {
   eyebrow: string;
@@ -179,9 +182,8 @@ const PACK: Record<"cs" | "en" | "de" | "fr", Omit<VipProtocolsCopy, "trialCta" 
 };
 
 function pack(locale?: string | null): keyof typeof PACK {
-  if (locale === "cs") return "cs";
-  if (locale === "de") return "de";
-  if (locale === "fr") return "fr";
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  if (primary === "cs" || primary === "de" || primary === "fr") return primary;
   return "en";
 }
 
@@ -200,11 +202,19 @@ export function medicalDisclaimerFor(locale?: string | null) {
 }
 
 export function getVipProtocolsCopy(locale?: string | null): VipProtocolsCopy {
-  const { trialCtaBefore, vipLockBefore, vipLockAfter, ...base } = PACK[pack(locale)];
+  const packed = PACK[pack(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition = primary === "cs" ? undefined : vipProtocolsEdition(primary);
+  const { trialCtaBefore, vipLockBefore, vipLockAfter, ...base } = packed;
   const pricing = vipPricingFor(locale);
+  const before = edition?.trialCtaBefore ?? trialCtaBefore;
+  const lockBefore = edition?.vipLockBefore ?? vipLockBefore;
+  const lockAfter = edition?.vipLockAfter ?? vipLockAfter;
+  const { trialCtaBefore: _b, vipLockBefore: _lb, vipLockAfter: _la, ...editionRest } = edition ?? {};
   return {
     ...base,
-    trialCta: `${trialCtaBefore}${pricing.label}`,
-    vipLockBody: `${vipLockBefore}${pricing.label}${vipLockAfter}`,
+    ...editionRest,
+    trialCta: `${before}${pricing.label}`,
+    vipLockBody: `${lockBefore}${pricing.label}${lockAfter}`,
   };
 }
