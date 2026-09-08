@@ -11,6 +11,8 @@ import type { NativeDeskSeed } from "@/lib/editorial/native-desk-seed-types";
 import { CS_PUBLIC_DESK } from "@/lib/editorial/cs-public-desk-seeds";
 import { PLUS_GLP1_REWARD } from "@/lib/editorial/plus-desk-seeds";
 import { assignEditorialUnits, publicEditorialByline } from "@/lib/editorial/units";
+import { topicLabelForSlug } from "@/lib/config/verejnost-topics";
+import { aktualityChip } from "@/lib/i18n/aktuality-chrome";
 import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale, type LocaleCode } from "@/lib/i18n/config";
 import type { ArticleWithRelations } from "@/types/database";
@@ -112,17 +114,9 @@ function buildRow(locale: string, seed: NativeSeed, index: number): ArticleWithR
     categories: {
       id: "native-desk",
       name:
-        seed.topic === "dlouhovekost"
-          ? "Dlouhověkost"
-          : seed.topic === "novinky"
-            ? "Novinky"
-            : seed.topic === "rozhovory"
-              ? "Rozhovory"
-              : seed.topic === "nemoci"
-                ? "Nemoci"
-                : seed.topic === "prevence"
-                  ? "Prevence"
-                  : "Životní styl",
+        seed.topic === "novinky"
+          ? aktualityChip(locale)
+          : topicLabelForSlug(seed.topic, locale),
       slug: seed.topic,
       description: null,
       created_at: published,

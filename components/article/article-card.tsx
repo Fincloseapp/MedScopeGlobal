@@ -10,6 +10,8 @@ import type { ArticleWithRelations } from "@/types/database";
 import { resolveArticleCoverUrl } from "@/lib/ecosystem/editorial/images/cover";
 import { formatArticleDateLabel } from "@/lib/editorial/freshness";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { topicLabelForSlug } from "@/lib/config/verejnost-topics";
+import { aktualityChip } from "@/lib/i18n/aktuality-chrome";
 
 export function ArticleCard({
   article,
@@ -29,6 +31,13 @@ export function ArticleCard({
   const dateLabel = formatArticleDateLabel(article, editorialLocale);
   const coverMeta = getArticleCoverLabel(article.title, cat?.name);
   const coverStyles = getArticleCoverStyles(article.title, cat?.name);
+  const topicSlug = article.public_topic || cat?.slug || null;
+  const topicLabel =
+    topicSlug === "novinky" || topicSlug === "aktualni-zpravy"
+      ? aktualityChip(editorialLocale)
+      : topicSlug
+        ? topicLabelForSlug(topicSlug, editorialLocale)
+        : cat?.name ?? null;
   const coverUrl = resolveArticleCoverUrl({
     title: article.title,
     slug: article.slug,
@@ -63,7 +72,7 @@ export function ArticleCard({
               <div className="absolute inset-0 flex flex-col justify-between p-4 text-white">
                 <div className="flex items-center justify-between gap-3">
                   <span className="rounded-full border border-white/20 bg-white/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/85 backdrop-blur">
-                    {cat?.name ?? "Medical briefing"}
+                    {topicLabel ?? "Medical briefing"}
                   </span>
                   {article.vip_only && (
                     <Badge className="bg-[#005B96]/90 text-[10px] text-white" variant="vip">
@@ -85,7 +94,7 @@ export function ArticleCard({
           {coverUrl && (
             <div className="absolute left-3 top-3">
               <span className="rounded-full border border-white/20 bg-slate-950/55 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/85 backdrop-blur">
-                {cat?.name ?? "Medical briefing"}
+                {topicLabel ?? "Medical briefing"}
               </span>
             </div>
           )}
@@ -96,11 +105,11 @@ export function ArticleCard({
           )}
         </div>
         <CardContent className="pt-5">
-          {cat && (
+          {topicLabel ? (
             <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-primary">
-              {cat.name}
+              {topicLabel}
             </p>
-          )}
+          ) : null}
           <h3 className="mt-2 font-display text-xl font-semibold leading-snug text-medical-navy">
             {article.title}
           </h3>

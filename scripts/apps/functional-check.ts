@@ -4742,6 +4742,8 @@ console.log("✓ magazine desk byline and copy checks passed");
     assert.ok(leftover.remainingPct >= 1 && leftover.remainingPct <= 99);
     assert.ok(leftover.headings.includes("Co se ještě dočtete"));
     assert.equal(getArticleMeterCopy("cs").continueReading, "Číst dál");
+    assert.equal(getArticleMeterCopy("cs").youWillRead, "Co se dočtete dál");
+    assert.ok(getArticleMeterCopy("cs").remaining(80).includes("Zbývá vám ještě 80"));
     assert.ok(getArticleMeterCopy("cs").remaining(68).includes("68"));
     for (const { code } of GLOBAL_LOCALES) {
       const meter = getArticleMeterCopy(code);
@@ -4752,7 +4754,8 @@ console.log("✓ magazine desk byline and copy checks passed");
       assert.ok(price.length > 0, `${code} meter price`);
       if (code !== "cs") {
         assert.ok(!meter.continueReading.includes("Číst"), `${code} must not use Czech Číst dál`);
-        assert.ok(!meter.remaining(70).includes("Ještě"), `${code} remaining copy must not be Czech`);
+        assert.ok(!meter.remaining(70).includes("Zbývá vám"), `${code} remaining copy must not be Czech`);
+        assert.ok(!meter.youWillRead.includes("dočtete"), `${code} leftover label must not be Czech`);
       }
     }
     assert.ok(editorialMonthlyBannerPrice("cs").includes("25"));
@@ -5011,6 +5014,24 @@ console.log("✓ magazine desk byline and copy checks passed");
     const csDesk = nativeDeskArticlesForLocale("cs");
     assert.ok(csDesk.some((article) => article.slug.includes("glp1-odmena-alkohol")));
     assert.ok(csDesk.length >= 10, "Czech public desk must fill Veřejnost hubs");
+    const deDesk = nativeDeskArticlesForLocale("de");
+    assert.ok(
+      deDesk.every((article) => !/Životní|Dlouhověkost/.test(article.categories?.name ?? "")),
+      "German desk cards must not keep Czech topic chips"
+    );
+    assert.ok(
+      deDesk.some((article) => /Lebensstil|Langlebigkeit|Prävention/.test(article.categories?.name ?? "")),
+      "German desk cards must use German topic chips"
+    );
+    assert.ok(
+      readFileSync(join(root, "components/article/article-card.tsx"), "utf8").includes("topicLabelForSlug"),
+      "related cards must localize the topic chip"
+    );
+    assert.ok(
+      readFileSync(join(root, "components/subscription/editorial-pay-buttons.tsx"), "utf8").includes(
+        "hideMonth"
+      )
+    );
     const csHay = csDesk.map((article) => `${article.title} ${article.excerpt} ${article.slug}`).join(" ");
     assert.ok(/jóga|joga/i.test(csHay), "Czech desk must cover yoga");
     assert.ok(/kosmetik/i.test(csHay), "Czech desk must cover skincare");

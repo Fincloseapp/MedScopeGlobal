@@ -149,7 +149,7 @@ export function ArticleConversionGate({
                 <p className="text-xs text-slate-500">{meter.yearSecondary}</p>
               </div>
             ) : null}
-            <EditorialPayButtons locale={loc} returnPath={returnPath} />
+            <EditorialPayButtons locale={loc} returnPath={returnPath} hideMonth={Boolean(meter)} />
           </div>
         ) : (
           <Button asChild size="lg" className="bg-[#005B96] hover:bg-[#004a7a]">
