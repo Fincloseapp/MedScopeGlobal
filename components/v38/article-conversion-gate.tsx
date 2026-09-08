@@ -78,9 +78,9 @@ export function ArticleConversionGate({
   const loc = locale ?? "cs";
   const compareHref = localizePublicHref(copy.ctaHref || "/predplatne", loc);
   const accountHref = localizePublicHref("/account", loc);
-  const meter = remainder && remainder.remainingPct > 0 ? getArticleMeterCopy(loc) : null;
+  const meter = editorial ? getArticleMeterCopy(loc) : null;
   const leftover =
-    meter && remainder
+    meter && remainder && remainder.remainingPct > 0
       ? remainder.headings.length > 0
         ? remainder.headings
         : [meter.leftoverFallback]
@@ -116,7 +116,7 @@ export function ArticleConversionGate({
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#005B96]">
             {copy.eyebrow}
           </p>
-          {meter && remainder ? (
+          {meter && remainder && remainder.remainingPct > 0 ? (
             <p className="font-display text-2xl font-semibold tracking-tight text-[#021d33] dark:text-slate-100">
               {meter.remaining(remainder.remainingPct)}
             </p>
