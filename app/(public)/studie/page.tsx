@@ -9,8 +9,6 @@ import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { V20_STUDY_SOURCES } from "@/lib/v20/studies/sources";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 import { getStudieHubCopy } from "@/lib/i18n/studie-hub-copy";
-import { MagazineAdUnit } from "@/components/monetization/magazine-ad-unit";
-
 export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -68,8 +66,6 @@ export default async function StudiePage() {
           {copy.archive}
         </Link>
       </div>
-
-      <MagazineAdUnit locale={locale} className="mt-8" />
 
       {studies.length > 0 ? (
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

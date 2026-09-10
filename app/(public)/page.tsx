@@ -10,7 +10,6 @@ import { HomepagePromoTeasers } from "@/components/v271/homepage-promo-teasers";
 import { PortalHome } from "@/components/v271/portal-home";
 import { HomepageAffiliateShelf } from "@/components/monetization/affiliate-box";
 import { HomepageRevenueMix } from "@/components/monetization/homepage-revenue-mix";
-import { MagazineAdUnit } from "@/components/monetization/magazine-ad-unit";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { medicalWebPageJsonLd, webSiteJsonLd, softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { APP_PRODUCTS, appSeoDescription } from "@/lib/apps/catalog";
@@ -117,7 +116,6 @@ export default async function HomePage() {
 
       {/* Story: ViaLongeVita hero (brief + magazine) → news → apps. Affiliate after newsletter. */}
       <PortalHome articles={articles} copy={philosophy} locale={locale} deskArticles={homeLayout.desks} />
-      <MagazineAdUnit locale={locale} className="py-2 sm:px-6" />
       <HomepageLongevityStrip
         articles={homeLayout.longevityReading}
         locale={locale}

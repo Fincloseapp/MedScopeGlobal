@@ -3398,9 +3398,27 @@ assert.ok(
   "physician landing must stay AdSense-free"
 );
 const articlePageSrc = readFileSync(join(root, "app/(public)/article/[slug]/page.tsx"), "utf8");
+const homepageSrc = readFileSync(join(root, "app/(public)/page.tsx"), "utf8");
 assert.ok(
-  readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("MagazineAdUnit"),
-  "homepage /cs must render a real AdSense unit, not an empty placement"
+  !homepageSrc.includes("MagazineAdUnit") && !homepageSrc.includes("GlobalAdSlot"),
+  "homepage uses official Auto ads from AdSenseHead, not a manual listing unit"
+);
+assert.ok(
+  readFileSync(join(root, "app/layout.tsx"), "utf8").includes("AdSenseHead") &&
+    readFileSync(join(root, "components/monetization/adsense-head.tsx"), "utf8").includes(
+      "adsbygoogle.js?client="
+    ),
+  "public magazine Auto ads start from the official ?client= snippet in <head>"
+);
+assert.ok(
+  ![
+    "app/(public)/verejnost/page.tsx",
+    "app/(public)/verejnost/clanky/page.tsx",
+    "app/(public)/novinky/page.tsx",
+    "app/(public)/studie/page.tsx",
+    "components/articles/magazine-listing.tsx",
+  ].some((rel) => readFileSync(join(root, rel), "utf8").includes("MagazineAdUnit")),
+  "listing pages must not mount in-article units — Auto ads places those"
 );
 assert.ok(
   readFileSync(join(root, "components/monetization/magazine-ad-unit.tsx"), "utf8").includes(
@@ -3409,7 +3427,7 @@ assert.ok(
     readFileSync(join(root, "components/monetization/magazine-ad-unit.tsx"), "utf8").includes(
       "ADSENSE_SLOT_IN_ARTICLE"
     ),
-  "homepage magazine unit must use the owner AdSense slot"
+  "article magazine unit must use the owner AdSense slot"
 );
 assert.ok(
   readFileSync(join(root, "components/monetization/magazine-ad-unit.tsx"), "utf8").includes(

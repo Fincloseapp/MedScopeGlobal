@@ -25,9 +25,8 @@ import {
   isLifestyleHubSlug,
   matchesLifestyleHub,
 } from "@/lib/verejnost/lifestyle-topics";
-import { MagazineAdUnit } from "@/components/monetization/magazine-ad-unit";
 import { ArticleSubscribeNudge } from "@/components/monetization/article-subscribe-nudge";
-import { shouldShowDisplayAds, shouldShowPublicSubscribeNudge } from "@/lib/monetization/revenue-mix";
+import { shouldShowPublicSubscribeNudge } from "@/lib/monetization/revenue-mix";
 import { getPaywallPreviewHtml } from "@/lib/monetization/paywall-preview";
 import type { DisplayArticle } from "@/lib/articles/prepare-for-display";
 
@@ -151,12 +150,6 @@ export default async function VerejnostClankyPage({ searchParams }: Props) {
         <div className="mb-8">
           <ListingAffiliateBox locale={locale as GlobalLocaleCode} topic={topic} />
         </div>
-
-        {shouldShowDisplayAds("public", false) ? (
-          <div className="mb-8">
-            <MagazineAdUnit locale={locale} />
-          </div>
-        ) : null}
 
         <p className="mb-4 text-sm text-slate-500">
           {chrome.resultsCount.replace("{count}", String(filtered.length))}

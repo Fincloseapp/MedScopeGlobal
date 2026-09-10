@@ -5,8 +5,9 @@ import { ADSENSE_SLOT_IN_ARTICLE } from "@/lib/monetization/adsense";
 import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
 
 /**
- * Visible ViaLongeVita AdSense unit — owner slot 2911384114.
- * Use on the public magazine (homepage + articles), never on apps / students / admin.
+ * Owner in-article unit (slot 2911384114). Use inside article bodies only.
+ * Listing / homepage pages use official Auto ads from AdSenseHead — do not
+ * mount this there or the in-article slot is asked to fill as display.
  */
 export function MagazineAdUnit({
   locale = "cs",

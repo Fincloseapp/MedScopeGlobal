@@ -66,8 +66,8 @@ export function resolveAdSenseSlotId(
 }
 
 /**
- * Display ads belong on the public ViaLongeVita magazine — not on
- * physician, student, in-app, admin, or affiliate hops.
+ * Auto ads (official ?client= snippet) belong on the public ViaLongeVita
+ * magazine — not on physician, student, in-app, admin, or affiliate hops.
  */
 const BLOCKED_PREFIXES = [
   "/admin",
