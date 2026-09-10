@@ -70,7 +70,11 @@ function runLocaleGuards() {
 
 console.log("\n=== Pre-deploy gates ===\n");
 
-const isCI = process.env.GITHUB_ACTIONS === "true";
+const isCI =
+  process.env.GITHUB_ACTIONS === "true" ||
+  process.env.WORKERS_CI === "1" ||
+  process.env.CF_PAGES === "1" ||
+  Boolean(process.env.WORKERS_CI_BUILD_UUID);
 const hasCronSecret = (process.env.CRON_SECRET ?? "").length >= 16;
 const logoSource = MEDSCOPE_LOGO_SOURCE;
 const canSyncLogos = existsSync(logoSource);

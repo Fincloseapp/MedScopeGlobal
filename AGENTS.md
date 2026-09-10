@@ -97,7 +97,7 @@ Never commit secrets. Use Cursor Secrets, D: `.env.local`, or Cloudflare dashboa
   - Production branch: `main`
   - Root directory: `/`
   - Build command: `npm run cf:build`
-  - Deploy command: `npx opennextjs-cloudflare deploy`
+  - Deploy command: `npm run cf:workers-ci`
   - Or leave Build empty and set Deploy to: `npm run deploy`
 - **GitHub Actions** (`.github/workflows/cloudflare-deploy.yml`) needs secrets
   `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` (optional `CLOUDFLARE_ENV_JSON`).

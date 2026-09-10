@@ -5,8 +5,11 @@
   //   Production branch: main
   //   Root directory: /
   //   Build command: npm run cf:build
-  //   Deploy command: npx opennextjs-cloudflare deploy
+  //   Deploy command: npm run cf:workers-ci
   // Platform injects WORKERS_CI=1 and deploys with its own credentials.
+  "build": {
+    "command": "node scripts/cloudflare/ensure-opennext.mjs"
+  },
   "name": "medscopeglobal",
   "main": "cloudflare/entry.js",
   "triggers": {

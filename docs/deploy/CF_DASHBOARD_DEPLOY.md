@@ -20,7 +20,7 @@
 |--------------|-----------------|
 | Root directory | `/` |
 | Build command | `npm run cf:build` |
-| Deploy command | `npx opennextjs-cloudflare deploy` |
+| Deploy command | `npm run cf:workers-ci` |
 
 *(Alternativa: Build prázdné, Deploy = `npm run deploy`.)*
 

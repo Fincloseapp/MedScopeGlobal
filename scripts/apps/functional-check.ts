@@ -589,6 +589,13 @@ absent("scripts/run-vercel-build.mjs", "Next.js build must not go through a Verc
   );
   assert.equal(pkg.scripts?.["build:next"], "node scripts/run-cloudflare-build.mjs");
   assert.ok(pkg.scripts?.["cf:deploy"]?.includes("cloudflare"));
+  assert.equal(pkg.scripts?.["cf:workers-ci"], "node scripts/cloudflare/workers-ci.mjs");
+  assert.ok(
+    readFileSync(join(root, "scripts/run-predeploy-gates.mjs"), "utf8").includes(
+      "WORKERS_CI"
+    ),
+    "Workers Builds must be treated as CI so tsc does not OOM the OpenNext build"
+  );
 }
 file("public/assets/affiliate/magnesium.svg");
 file("public/assets/affiliate/omega-test.svg");

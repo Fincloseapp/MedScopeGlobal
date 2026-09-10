@@ -148,7 +148,7 @@ Writes `scripts/cloudflare/.env.cloudflare.json` — a JSON object of production
    - **Production branch:** `main`
    - **Root directory:** `/`
    - **Build command:** `npm run cf:build`
-   - **Deploy command:** `npx opennextjs-cloudflare deploy` *(or `npm run deploy`)*
+   - **Deploy command:** `npm run cf:workers-ci` *(builds if needed, then deploys)*
 
 **Path C — Local CLI deploy**
 

@@ -90,6 +90,7 @@
     "verify:d-drive": "node scripts/verify-d-drive-only.mjs",
     "build:next": "node scripts/run-cloudflare-build.mjs",
     "cf:build": "opennextjs-cloudflare build",
+    "cf:workers-ci": "node scripts/cloudflare/workers-ci.mjs",
     "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "cf:deploy": "node scripts/cloudflare/deploy.mjs",
     "cf:upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
