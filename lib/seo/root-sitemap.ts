@@ -52,6 +52,13 @@ const MAGAZINE_PATHS: StaticSpec[] = [
   { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
   { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
   { path: "/znacka", changeFrequency: "yearly", priority: 0.4 },
+  { path: "/exchange", changeFrequency: "weekly", priority: 0.88 },
+  { path: "/exchange/catalog", changeFrequency: "daily", priority: 0.86 },
+  { path: "/exchange/pricing", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/exchange/onboard", changeFrequency: "monthly", priority: 0.65 },
+  { path: "/exchange/legal", changeFrequency: "yearly", priority: 0.4 },
+  { path: "/exchange/legal/terms", changeFrequency: "yearly", priority: 0.35 },
+  { path: "/exchange/legal/privacy", changeFrequency: "yearly", priority: 0.35 },
   { path: "/o-nas", changeFrequency: "monthly", priority: 0.5 },
   { path: "/pro-ai", changeFrequency: "weekly", priority: 0.55 },
   ...LONGEVITY_PROTOCOLS.map((protocol) => ({

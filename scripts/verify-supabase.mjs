@@ -50,6 +50,8 @@ const recommendedTables = [
   ["autopilot_trends", "id"],
   ["autopilot_settings", "id"],
   ["autopilot_cron_jobs", "slug"],
+  ["exchange_listings", "id"],
+  ["exchange_organizations", "id"],
 ];
 
 /** Ecosystem migrations shipped 2026-08-25 — see supabase/migrations/20260825*.sql */

@@ -58,6 +58,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { href: "/admin/ai-agents", label: "AI agenti", icon: Trophy },
       { href: "/admin/ai-teams", label: "Týmy AI", icon: Swords },
       { href: "/admin/ads-requests", label: "Žádosti o reklamu", icon: Megaphone },
+      { href: "/admin/exchange", label: "B2B Exchange", icon: Megaphone },
     ],
   },
   {

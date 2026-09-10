@@ -3,6 +3,7 @@ import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V271B2BPricingTable } from "@/components/v271/b2b-pricing-table";
 import { SITE } from "@/lib/config/site";
 import { getB2bPublicCopy } from "@/lib/i18n/b2b-public-copy";
+import { getExchangeCopy } from "@/lib/i18n/exchange-copy";
 import { getFirmyDeskCopy, type FirmyRoomId } from "@/lib/i18n/firmy-desk-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
@@ -13,6 +14,7 @@ export async function FirmyDesk({ slug }: { slug?: FirmyRoomId }) {
   const region = await getServerRegion();
   const publicCopy = getB2bPublicCopy(locale);
   const desk = getFirmyDeskCopy(locale);
+  const copy = getExchangeCopy(locale);
   const room = slug ? desk.rooms[slug] : null;
   const formHref = localizePublicHref("/inzerce/formular", locale);
   const contactHref = localizePublicHref("/kontakt", locale);
@@ -71,6 +73,18 @@ export async function FirmyDesk({ slug }: { slug?: FirmyRoomId }) {
       ) : null}
 
       <V271B2BPricingTable compact locale={locale} />
+
+      <section className="mt-10 rounded-3xl border border-[#005B96]/20 bg-[#005B96]/5 px-5 py-6">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">B2B Exchange</p>
+        <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">MedScope B2B Exchange</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{copy.lead}</p>
+        <Link
+          href={localizePublicHref("/exchange", locale)}
+          className="mt-4 inline-block rounded-full bg-[#005B96] px-5 py-2 text-sm font-semibold text-white"
+        >
+          {copy.catalogCta} →
+        </Link>
+      </section>
 
       <section className="mt-10">
         <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">

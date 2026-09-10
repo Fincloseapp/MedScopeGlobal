@@ -50,6 +50,10 @@ function staticRoutesForLocale(base: string, locale: GlobalLocaleCode): LocaleSi
     { path: "/newsletter", changeFrequency: "weekly" as const, priority: 0.88 },
     { path: "/newsletter/posledni", changeFrequency: "weekly" as const, priority: 0.8 },
     { path: "/newsletter/dekujeme", changeFrequency: "monthly" as const, priority: 0.4 },
+    { path: "/exchange", changeFrequency: "weekly" as const, priority: 0.88 },
+    { path: "/exchange/catalog", changeFrequency: "daily" as const, priority: 0.86 },
+    { path: "/exchange/pricing", changeFrequency: "monthly" as const, priority: 0.7 },
+    { path: "/exchange/legal", changeFrequency: "yearly" as const, priority: 0.4 },
     { path: "/o-nas", changeFrequency: "monthly" as const, priority: 0.5 },
     { path: "/pro-ai", changeFrequency: "weekly" as const, priority: 0.55 },
     ...LONGEVITY_PROTOCOLS.map((protocol) => ({

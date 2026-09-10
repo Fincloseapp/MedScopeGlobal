@@ -1,0 +1,196 @@
+// MedScope B2B Exchange — typed contract.
+// Production DDL lives in supabase/migrations/20260910120000_b2b_exchange.sql.
+// This file is documentation + future Prisma client; it is not applied at build time.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ExchangeAvailabilityRegion {
+  EU
+  USA
+  Asia
+  Global
+}
+
+enum ExchangeListingKind {
+  product
+  service
+  demand
+}
+
+enum ExchangeListingStatus {
+  draft
+  pending_review
+  approved
+  rejected
+  archived
+}
+
+enum ExchangeOrgKind {
+  company
+  clinic
+  hospital
+  laboratory
+  university
+  research
+  telemedicine
+}
+
+enum ExchangeMemberRole {
+  owner
+  admin
+  company_admin
+  institution_admin
+  standard_user
+}
+
+enum ExchangePlan {
+  basic
+  pro
+  enterprise
+}
+
+enum ExchangeAdFormat {
+  banner
+  sponsored_article
+  newsletter
+}
+
+model ExchangeOrganization {
+  id                   String                         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug                 String                          @unique
+  legalName            String                         @map("legal_name")
+  tradeName            String                         @map("trade_name")
+  kind                 ExchangeOrgKind
+  registrationId       String                         @map("registration_id")
+  vatId                String?                        @map("vat_id")
+  countryCode          String                         @map("country_code")
+  website              String?
+  contactEmail         String                         @map("contact_email")
+  contactPhone         String?                       @map("contact_phone")
+  contactPerson        String                         @map("contact_person")
+  availabilityRegions  ExchangeAvailabilityRegion[]    @map("availability_regions")
+  verified             Boolean                        @default(false)
+  plan                 ExchangePlan                 @default(basic)
+  sourceLocale         String                         @default("en") @map("source_locale")
+  description          String
+  logoUrl              String?                       @map("logo_url")
+  createdAt            DateTime                        @default(now()) @map("created_at")
+  listings             ExchangeListing[]
+  memberships          ExchangeMembership[]
+  contacts             ExchangeContact[]
+  ads                  ExchangeAd[]
+  subscriptions        ExchangeSubscription[]
+
+  @@map("exchange_organizations")
+}
+
+model ExchangeMembership {
+  id             String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String             @map("organization_id") @db.Uuid
+  userId         String             @map("user_id") @db.Uuid
+  role           ExchangeMemberRole @default(standard_user)
+  createdAt      DateTime           @default(now()) @map("created_at")
+  organization   ExchangeOrganization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@map("exchange_memberships")
+}
+
+model ExchangeListing {
+  id                         String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug                       String                       @unique
+  kind                       ExchangeListingKind
+  status                      ExchangeListingStatus      @default(pending_review)
+  organizationId             String                       @map("organization_id") @db.Uuid
+  category                   String
+  sourceLocale               String                       @default("en") @map("source_locale")
+  title                      String
+  summary                    String
+  description                String
+  availabilityRegion        ExchangeAvailabilityRegion    @map("availability_region")
+  availabilityRegions       ExchangeAvailabilityRegion[]  @map("availability_regions")
+  certifications             String[]
+  certificationNotes         String?                      @map("certification_notes")
+  certificationNotApplicable  Boolean                       @default(false) @map("certification_not_applicable")
+  priceHint                  String?                      @map("price_hint")
+  currency                   String?
+  imageUrl                   String?                      @map("image_url")
+  documentationUrl           String?                      @map("documentation_url")
+  featured                   Boolean                       @default(false)
+  createdAt                  DateTime                     @default(now()) @map("created_at")
+  organization               ExchangeOrganization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  translations               ExchangeListingTranslation[]
+  contacts                   ExchangeContact[]
+
+  @@index([status, createdAt])
+  @@map("exchange_listings")
+}
+
+model ExchangeListingTranslation {
+  id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  listingId   String          @map("listing_id") @db.Uuid
+  locale      String
+  title       String
+  summary     String
+  description String
+  provider    String?
+  manualOverride Boolean     @default(false) @map("manual_override")
+  listing     ExchangeListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([listingId, locale])
+  @@map("exchange_listing_translations")
+}
+
+model ExchangeContact {
+  id                 String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  listingId          String                      @map("listing_id") @db.Uuid
+  organizationId     String?                     @map("organization_id") @db.Uuid
+  buyerOrganization  String                      @map("buyer_organization")
+  buyerName          String                      @map("buyer_name")
+  buyerEmail         String                      @map("buyer_email")
+  buyerPhone         String?                     @map("buyer_phone")
+  message            String
+  locale             String?
+  region             ExchangeAvailabilityRegion?
+  createdAt          DateTime                    @default(now()) @map("created_at")
+  listing            ExchangeListing             @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  organization        ExchangeOrganization?        @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@map("exchange_contacts")
+}
+
+model ExchangeAd {
+  id                   String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug                 String                       @unique
+  organizationId       String?                      @map("organization_id") @db.Uuid
+  format               ExchangeAdFormat
+  title                String
+  body                 String
+  targetUrl            String                       @map("target_url")
+  imageUrl             String?                      @map("image_url")
+  availabilityRegions  ExchangeAvailabilityRegion[]    @map("availability_regions")
+  active               Boolean                       @default(false)
+  impressions          Int                           @default(0)
+  clicks               Int                           @default(0)
+  organization          ExchangeOrganization?        @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@map("exchange_ads")
+}
+
+model ExchangeSubscription {
+  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId     String               @map("organization_id") @db.Uuid
+  plan               ExchangePlan
+  status             String               @default("pending")
+  successFeePercent  Decimal?            @map("success_fee_percent") @db.Decimal(5, 2)
+  organization        ExchangeOrganization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("exchange_subscriptions")
+}

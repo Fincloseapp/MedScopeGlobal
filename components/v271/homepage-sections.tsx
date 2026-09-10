@@ -240,6 +240,12 @@ export function V271B2bBlock({ locale = "cs" }: { locale?: string }) {
           >
             {revenue.mediaKitCta}
           </Link>
+          <Link
+            href={localizePublicHref("/exchange", locale)}
+            className="rounded-full border border-[#005B96] px-5 py-2.5 text-sm font-semibold text-[#005B96]"
+          >
+            B2B Exchange
+          </Link>
         </div>
         <dl className="mt-6 grid gap-3 sm:grid-cols-3">
           <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">

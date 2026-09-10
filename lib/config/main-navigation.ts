@@ -423,6 +423,11 @@ function firmyNav(): NavItem {
     label: "Firmy",
     href: "/firmy",
     children: [
+      {
+        label: "B2B Exchange",
+        href: "/exchange",
+        description: "Produkty, služby a poptávky — přímý kontakt, bez provize",
+      },
       { label: "Pro firmy", href: "/firmy", description: "Bannery a partnerství v magazínu" },
       { label: "Ceník", href: "/firmy/cenik", description: "Orientační ceny bez skrytých poplatků" },
       { label: "Reklama", href: "/firmy/reklama", description: "Bannery a newsletter — ne v lékařské zóně" },

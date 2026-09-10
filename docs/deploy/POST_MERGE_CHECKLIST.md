@@ -80,7 +80,9 @@ Apply **in this order** (ecosystem tables for MediFlow + editorial):
 |------:|------|---------|
 | 1 | `supabase/migrations/20260825120000_mediflow_ecosystem.sql` | MediFlow tables, RLS, donation index |
 | 2 | `supabase/migrations/20260825220000_editorial_redakce.sql` | `article_syndications`, `editorial_queue` |
-| 3 | `supabase/migrations/20260825230000_editorial_images.sql` | `article_image_suggestions`, `editorial_queue.task_type` |
+| 4 | `supabase/migrations/20260910120000_b2b_exchange.sql` | MedScope B2B Exchange (listings, orgs, contacts, ads, RLS) |
+
+Verify Exchange after apply: `pnpm db:verify` should list `exchange_listings` / `exchange_organizations` as recommended tables. Public catalogue degrades to demo listings until this file is applied.
 
 ### Option A — Supabase SQL Editor (prod-safe)
 
