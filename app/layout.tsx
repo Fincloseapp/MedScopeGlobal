@@ -122,8 +122,8 @@ export default async function RootLayout({
         <link rel="describedby" title="llms.txt" href={`${siteUrl}/llms.txt`} />
         <link rel="alternate" type="text/plain" title="ai.txt" href={`${siteUrl}/.well-known/ai.txt`} />
         <link rel="alternate" type="text/plain" title="llms locale" href={`${siteUrl}/llms.txt?lang=${chromePack(locale)}`} />
-        <GoogleTagHead />
         <AdSenseHead />
+        <GoogleTagHead />
       </head>
       <body
         className={`${inter.variable} ${display.variable} min-h-screen font-sans antialiased`}

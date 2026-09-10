@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 
 declare global {
   interface Window {
-    adsbygoogle?: unknown[];
+    adsbygoogle?: unknown[] & { loaded?: boolean };
   }
 }
 import { usePathname } from "next/navigation";
@@ -70,6 +70,7 @@ export function GlobalAdSlot({
   const style = PLACEMENT_STYLES[placement] ?? PLACEMENT_STYLES["in-content"];
   const numericSlot = resolveAdSenseSlotId(placement, slotId);
   const inArticle = layout === "in-article" || placement === "in-article";
+  const insRef = useRef<HTMLModElement>(null);
   const pushed = useRef(false);
   const allowed = adsAllowedOnPath(pathname);
 
@@ -77,21 +78,29 @@ export function GlobalAdSlot({
     if (!allowed || !config.enabled || provider !== "adsense" || !config.adsenseClientId || !numericSlot) {
       return;
     }
-    if (pushed.current) return;
+    const ins = insRef.current;
+    if (!ins) return;
     let cancelled = false;
-    const request = () => {
+    const fill = () => {
       if (cancelled || pushed.current) return;
+      if (ins.getAttribute("data-adsbygoogle-status")) {
+        pushed.current = true;
+        return;
+      }
       try {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
         pushed.current = true;
       } catch {
-        /* loader may still be fetching */
+        /* official loader may still be fetching */
       }
     };
-    request();
-    if (pushed.current) return;
-    const tick = window.setInterval(request, 400);
-    const stop = window.setTimeout(() => window.clearInterval(tick), 8000);
+    const script = document.querySelector<HTMLScriptElement>('script[src*="adsbygoogle.js"]');
+    if (script) {
+      script.addEventListener("load", fill, { once: true });
+    }
+    fill();
+    const tick = window.setInterval(fill, 500);
+    const stop = window.setTimeout(() => window.clearInterval(tick), 10000);
     return () => {
       cancelled = true;
       window.clearInterval(tick);
@@ -124,6 +133,7 @@ export function GlobalAdSlot({
         data-ad-provider="adsense"
       >
         <ins
+          ref={insRef}
           className="adsbygoogle"
           style={
             inArticle
