@@ -10,7 +10,7 @@ import {
  * Official Auto ads snippet in <head> — the exact tag Google issues:
  * <script async src="…/adsbygoogle.js?client=ca-pub-…" crossorigin="anonymous"></script>
  *
- * Do not add a second enable_page_level_ads push. The ?client= URL already
+ * Do not add a second page-level ads object. The ?client= URL already
  * starts Auto ads; the legacy push fights the in-article unit.
  */
 export async function AdSenseHead() {
