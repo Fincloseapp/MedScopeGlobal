@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { EXCHANGE_AD_PACKAGES, EXCHANGE_COMMISSION, EXCHANGE_PLANS_SPEC } from "@/lib/exchange/monetization";
-import { getExchangeCopy } from "@/lib/i18n/exchange-copy";
+import { chromePack } from "@/lib/i18n/chrome-pack";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
 import { getServerLocale, getServerRegion } from "@/lib/i18n/server-locale";
@@ -22,6 +22,16 @@ export default async function ExchangePricingPage() {
   const locale = await getServerLocale();
   const region = await getServerRegion();
   const copy = getExchangeCopy(locale);
+  const onRequest: Record<string, string> = {
+    cs: "Na míru",
+    de: "Auf Anfrage",
+    fr: "Sur devis",
+    it: "Su richiesta",
+    es: "A medida",
+    "pt-BR": "Sob consulta",
+    en: "On request",
+  };
+  const customPrice = onRequest[chromePack(locale)] ?? "On request";
   const plans = [
     { spec: EXCHANGE_PLANS_SPEC.basic, name: copy.planBasic, desc: copy.planBasicDesc },
     { spec: EXCHANGE_PLANS_SPEC.pro, name: copy.planPro, desc: copy.planProDesc },
@@ -35,9 +45,7 @@ export default async function ExchangePricingPage() {
           <article key={plan.spec.id} className="rounded-2xl border border-[#cfe1f3] bg-white p-5">
             <h2 className="font-display text-xl font-semibold text-[#021d33]">{plan.name}</h2>
             <p className="mt-2 text-2xl font-bold text-[#005B96]">
-              {plan.spec.monthlyCzk === 0
-                ? copy.planEnterprise
-                : formatCzkListPrice(plan.spec.monthlyCzk, locale, region)}
+              {plan.spec.monthlyCzk === 0 ? customPrice : formatCzkListPrice(plan.spec.monthlyCzk, locale, region)}
             </p>
             <p className="mt-2 text-sm text-slate-600">{plan.desc}</p>
             <Link
