@@ -16,45 +16,46 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Require Cloudflare secrets
+      - name: Choose deploy path
+        id: auth
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "::error::Deploy blocked: GitHub Actions secrets CLOUDFLARE_API_TOKEN and/or CLOUDFLARE_ACCOUNT_ID are empty."
-            echo ""
-            echo "Unblock (pick one):"
-            echo "  1) PC D: restore — in D:\\medscope.local run: pnpm auto:d"
-            echo "     (copies CF token + optional GH secrets sync from D: .env.local)"
-            echo "  2) GitHub → Settings → Secrets and variables → Actions"
-            echo "     Add CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID, then Re-run jobs"
-            echo "  3) Cloudflare dashboard → Workers Builds → medscopeglobal"
-            echo "     Build: npm run cf:build"
-            echo "     Deploy: npx opennextjs-cloudflare deploy"
-            echo "     (or empty Build + Deploy: npm run deploy)"
-            echo ""
-            echo "After deploy, verify:"
-            echo "  curl -sI https://medscopeglobal.com/assets/marketing/mediflow.webp"
-            exit 1
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "mode=token" >> "$GITHUB_OUTPUT"
+            echo "GitHub Actions will deploy with the stored API token."
+          else
+            echo "mode=workers-builds" >> "$GITHUB_OUTPUT"
+            echo "No CLOUDFLARE_API_TOKEN in GitHub secrets — that is expected."
+            echo "Production deploy is Cloudflare Workers Builds (platform auth, no token in GitHub)."
+            echo "Worker: medscopeglobal"
+            echo "Build: npm run cf:build"
+            echo "Deploy: npx opennextjs-cloudflare deploy"
+            echo "https://dash.cloudflare.com/?to=/:account/workers/services/view/medscopeglobal"
           fi
 
       - name: Enable corepack
+        if: steps.auth.outputs.mode == 'token'
         run: corepack enable
 
       - uses: pnpm/action-setup@v4
+        if: steps.auth.outputs.mode == 'token'
         with:
           version: 9.15.4
 
       - uses: actions/setup-node@v4
+        if: steps.auth.outputs.mode == 'token'
         with:
           node-version: "22"
           cache: pnpm
 
       - name: Install
+        if: steps.auth.outputs.mode == 'token'
         run: pnpm install --frozen-lockfile
 
       - name: Write Cloudflare secrets file
+        if: steps.auth.outputs.mode == 'token'
         env:
           CLOUDFLARE_ENV_JSON: ${{ secrets.CLOUDFLARE_ENV_JSON }}
         run: |
@@ -70,10 +71,12 @@ jobs:
           fi
 
       - name: Build + deploy OpenNext to Cloudflare Workers
+        if: steps.auth.outputs.mode == 'token'
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: pnpm run cf:deploy
 
       - name: Smoke
+        if: steps.auth.outputs.mode == 'token'
         run: node scripts/cloudflare/smoke-production.mjs

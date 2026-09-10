@@ -56,7 +56,10 @@ function assertProductionEnv() {
   }
 }
 
-const inWorkersBuilds = process.env.WORKERS_CI === "1" || process.env.CF_PAGES === "1";
+const inWorkersBuilds =
+  process.env.WORKERS_CI === "1" ||
+  process.env.CF_PAGES === "1" ||
+  Boolean(process.env.WORKERS_CI_BUILD_UUID);
 const token = process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || "";
 const accountId = process.env.CLOUDFLARE_ACCOUNT_ID || process.env.CF_ACCOUNT_ID || "";
 

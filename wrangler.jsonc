@@ -1,12 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  // Cloudflare Workers Builds / Create and deploy:
-  //   Project name: medscopeglobal
+  // Cloudflare Workers Builds — no API token in GitHub.
+  // Dashboard → Worker medscopeglobal → Settings → Builds → Connect GitHub
   //   Production branch: main
   //   Root directory: /
   //   Build command: npm run cf:build
   //   Deploy command: npx opennextjs-cloudflare deploy
-  //   (or Deploy only: npm run deploy)
+  // Platform injects WORKERS_CI=1 and deploys with its own credentials.
   "name": "medscopeglobal",
   "main": "cloudflare/entry.js",
   "triggers": {
