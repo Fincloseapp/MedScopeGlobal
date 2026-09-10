@@ -13,6 +13,7 @@ import { getMarketingCopy } from "@/lib/i18n/marketing-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { formatPublicDateTime } from "@/lib/i18n/format-date";
 import { ArticleSubscribeNudge } from "@/components/monetization/article-subscribe-nudge";
+import { MagazineAdUnit } from "@/components/monetization/magazine-ad-unit";
 import { shouldShowPublicSubscribeNudge } from "@/lib/monetization/revenue-mix";
 
 export const revalidate = 45;
@@ -156,6 +157,8 @@ export default async function VerejnostHubPage() {
             })}
           </div>
         </section>
+
+        <MagazineAdUnit locale={locale} className="mb-12" />
 
         <section className="mb-12">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">{copy.linksEyebrow}</p>

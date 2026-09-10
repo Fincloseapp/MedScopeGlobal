@@ -18,8 +18,8 @@ export function MagazineAdUnit({
   return (
     <div className={`mx-auto w-full max-w-3xl px-4 sm:px-0 ${className}`}>
       <GlobalAdSlot
-        placement="in-content"
-        layout="auto"
+        placement="in-article"
+        layout="in-article"
         slotId={ADSENSE_SLOT_IN_ARTICLE}
         locale={(locale as GlobalLocaleCode) ?? "cs"}
       />

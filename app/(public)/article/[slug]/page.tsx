@@ -464,13 +464,6 @@ export default async function ArticlePage({ params }: Props) {
           </figure>
           )}
 
-          {shouldShowDisplayAds(revenueSurface, isVip) ? (
-            <GlobalAdSlot
-              placement="below-title"
-              locale={(locale as GlobalLocaleCode) ?? "cs"}
-            />
-          ) : null}
-
           {studentBannerAds.length > 0 ? (
             <StudentAdBlocks campaigns={studentBannerAds} variant="banner" />
           ) : null}
@@ -599,13 +592,6 @@ export default async function ArticlePage({ params }: Props) {
 
           {!locked && shouldShowHousePartner(revenueSurface, isVip) ? (
             <HousePartnerSlot locale={locale} source="article-footer" className="my-8" />
-          ) : null}
-
-          {!locked && shouldShowDisplayAds(revenueSurface, isVip) ? (
-            <GlobalAdSlot
-              placement="footer"
-              locale={(locale as GlobalLocaleCode) ?? "cs"}
-            />
           ) : null}
 
           {related && related.length > 0 ? (

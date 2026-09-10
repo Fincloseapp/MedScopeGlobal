@@ -2492,8 +2492,11 @@ assert.equal(adsAllowedOnPath("/de"), true);
 assert.equal(adsAllowedOnPath("/en/article/sleep"), true);
 assert.equal(adsAllowedOnPath("/cs/newsletter"), true);
 assert.equal(adsAllowedOnPath("/verejnost/osveta"), true);
+assert.equal(adsAllowedOnPath("/studie"), true);
+assert.equal(adsAllowedOnPath("/cs/studie"), true);
 assert.equal(adsAllowedOnPath("/admin"), false);
 assert.equal(adsAllowedOnPath("/de/lekari/dokumentace"), false);
+assert.equal(adsAllowedOnPath("/cs/lekari/studie"), false);
 assert.equal(adsAllowedOnPath("/ordizaznam"), false);
 assert.equal(adsAllowedOnPath("/studenti"), false);
 assert.equal(adsAllowedOnPath("/go/vitamin-d3"), false);
@@ -2559,6 +2562,12 @@ assert.ok(
     "enable_page_level_ads"
   ),
   "legacy page-level ads push must not fight the official client= snippet"
+);
+assert.ok(
+  !readFileSync(join(root, "components/monetization/adsense-head.tsx"), "utf8").includes(
+    "enable_page_level_ads"
+  ),
+  "official ?client= snippet must be the only Auto ads start"
 );
 assert.ok(
   readFileSync(join(root, "lib/v30/security/headers.ts"), "utf8").includes(
@@ -3401,6 +3410,15 @@ assert.ok(
       "ADSENSE_SLOT_IN_ARTICLE"
     ),
   "homepage magazine unit must use the owner AdSense slot"
+);
+assert.ok(
+  readFileSync(join(root, "components/monetization/magazine-ad-unit.tsx"), "utf8").includes(
+    'layout="in-article"'
+  ) &&
+    readFileSync(join(root, "components/monetization/magazine-ad-unit.tsx"), "utf8").includes(
+      'placement="in-article"'
+    ),
+  "magazine unit must use the owner in-article layout, not display/auto"
 );
 assert.ok(
   articlePageSrc.includes("ADSENSE_SLOT_IN_ARTICLE"),

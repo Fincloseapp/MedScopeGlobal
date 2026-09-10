@@ -3,11 +3,9 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { MEDIFLOW } from "@/lib/apps/catalog";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
-import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
 import { getMediflowCopy } from "@/lib/i18n/mediflow-copy";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
-import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getServerLocale();
@@ -24,7 +22,6 @@ export default async function MediFlowMarketingPage() {
   const copy = getMediflowCopy(locale);
   const startHref = localizePublicHref("/app/mediflow", locale);
   const vipHref = localizePublicHref("/vip/protokoly", locale);
-  const adLocale = locale as GlobalLocaleCode;
 
   return (
     <div className="bg-[#071018] text-white">
@@ -126,10 +123,6 @@ export default async function MediFlowMarketingPage() {
           </ol>
         </div>
       </section>
-
-      <div className="mx-auto max-w-5xl px-4 py-2 sm:px-6">
-        <GlobalAdSlot placement="in-content" locale={adLocale} />
-      </div>
 
       <section className="px-4 py-14 text-center sm:px-6">
         <p className="text-sm text-white/55">{copy.disclaimer}</p>

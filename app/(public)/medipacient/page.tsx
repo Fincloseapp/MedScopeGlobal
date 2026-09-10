@@ -7,12 +7,10 @@ import { softwareApplicationJsonLd } from "@/lib/seo/json-ld";
 import { MEDIPACIENT } from "@/lib/apps/catalog";
 import { MEDIPACIENT_DEMO_REPORTS } from "@/lib/medipacient/demo-reports";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
-import { GlobalAdSlot } from "@/components/monetization/global-ad-slot";
 import { getMedipacientCopy } from "@/lib/i18n/medipacient-copy";
 import { getServerLocale, getServerRegion } from "@/lib/i18n/server-locale";
 import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
-import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getServerLocale();
@@ -40,7 +38,6 @@ export default async function MedipacientMarketingPage() {
   const appHref = localizePublicHref(MEDIPACIENT.appPath, locale);
   const downloadHref = localizePublicHref(MEDIPACIENT.downloadPath, locale);
   const subscribeHref = localizePublicHref("/predplatne#public", locale);
-  const adLocale = locale as GlobalLocaleCode;
 
   return (
     <div className="bg-[#fafcff]">
@@ -104,10 +101,6 @@ export default async function MedipacientMarketingPage() {
           ))}
         </div>
       </section>
-
-      <div className="mx-auto max-w-5xl px-4 py-2 sm:px-6">
-        <GlobalAdSlot placement="in-content" locale={adLocale} />
-      </div>
 
       <section className="mx-auto max-w-5xl px-4 pb-10 sm:px-6">
         <div className="rounded-3xl border border-[#cfe1f3] bg-white p-6 shadow-sm">

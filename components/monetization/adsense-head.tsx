@@ -7,8 +7,11 @@ import {
 } from "@/lib/monetization/adsense";
 
 /**
- * Official AdSense snippet in <head> — Google’s ownership checker looks for
- * this exact script tag, not a client-only preload.
+ * Official Auto ads snippet in <head> — the exact tag Google issues:
+ * <script async src="…/adsbygoogle.js?client=ca-pub-…" crossorigin="anonymous"></script>
+ *
+ * Do not add a second enable_page_level_ads push. The ?client= URL already
+ * starts Auto ads; the legacy push fights the in-article unit.
  */
 export async function AdSenseHead() {
   if (!isAdSenseEnabled()) return null;
@@ -18,17 +21,10 @@ export async function AdSenseHead() {
   if (path && !adsAllowedOnPath(path)) return null;
   const client = resolveAdSenseClientId();
   return (
-    <>
-      <script
-        async
-        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`}
-        crossOrigin="anonymous"
-      />
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `(window.adsbygoogle=window.adsbygoogle||[]).push({google_ad_client:"${client}",enable_page_level_ads:true,overlays:{bottom:true}});`,
-        }}
-      />
-    </>
+    <script
+      async
+      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`}
+      crossOrigin="anonymous"
+    />
   );
 }

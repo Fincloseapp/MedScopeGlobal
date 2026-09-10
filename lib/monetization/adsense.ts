@@ -87,7 +87,6 @@ const BLOCKED_PREFIXES = [
   "/academy",
   "/prijimacky",
   "/mediprep",
-  "/studie",
 ] as const;
 
 export function adsAllowedOnPath(pathname?: string | null): boolean {

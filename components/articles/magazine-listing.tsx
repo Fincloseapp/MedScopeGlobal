@@ -13,6 +13,7 @@ import { isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
 import { VITASCOPE_DESK_LOGO, VITASCOPE_TRACK_LOGO } from "@/lib/brand/vitascope";
 import { newsDesksForLocale, type NewsDeskId } from "@/lib/v271/news-desks";
 import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
+import { MagazineAdUnit } from "@/components/monetization/magazine-ad-unit";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { isCzechSurface } from "@/lib/i18n/surface-copy";
@@ -170,6 +171,8 @@ export function MagazineListing({
       ) : (
         <p className="mt-8 text-sm text-slate-500">{copy.empty}</p>
       )}
+
+      <MagazineAdUnit locale={locale} className="mt-8" />
 
       {rest.length > 0 ? (
         <div className="mt-8">

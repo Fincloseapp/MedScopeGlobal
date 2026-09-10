@@ -11,6 +11,7 @@ import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { newsDesksForLocale } from "@/lib/v271/news-desks";
 import { aktualityChip } from "@/lib/i18n/aktuality-chrome";
 import { novinkyTagsForLocale } from "@/lib/i18n/novinky-copy";
+import { MagazineAdUnit } from "@/components/monetization/magazine-ad-unit";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
@@ -68,6 +69,7 @@ export default async function NovinkyPage() {
           {newsDesk.more}
         </Link>
       </div>
+      <MagazineAdUnit locale={locale} className="mb-6" />
       {university.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2">
           {university.map((n) => (
