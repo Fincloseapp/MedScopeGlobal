@@ -3,16 +3,17 @@ import Link from "next/link";
 import { ArrowRight, Globe2 } from "lucide-react";
 import { ExchangeListingCard } from "@/components/exchange/listing-card";
 import { EXCHANGE_VISUAL } from "@/lib/brand/exchange-visuals";
-import { listExchangeListings } from "@/lib/exchange/catalog";
+import { filterDemoListings } from "@/lib/exchange/seed";
 import { AVAILABILITY_REGIONS, regionLabel } from "@/lib/exchange/regions";
 import { getExchangeCopy } from "@/lib/i18n/exchange-copy";
 import { getExchangeMarketing } from "@/lib/i18n/exchange-marketing";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
-export async function ExchangeHomepageBillboard({ locale }: { locale: string }) {
+/** Sync homepage strip — no data fetch, so it cannot stream below the magazine hero. */
+export function ExchangeHomepageBillboard({ locale }: { locale: string }) {
   const copy = getExchangeCopy(locale);
   const marketing = getExchangeMarketing(locale);
-  const { items } = await listExchangeListings({ limit: 3, locale });
+  const items = filterDemoListings({}).slice(0, 2);
   const catalog = localizePublicHref("/exchange/catalog", locale);
   const onboard = localizePublicHref("/exchange/onboard", locale);
   const home = localizePublicHref("/exchange", locale);
@@ -92,7 +93,7 @@ export async function ExchangeHomepageBillboard({ locale }: { locale: string }) 
             </Link>
           </div>
           <div className="grid gap-3">
-            {items.slice(0, 2).map((listing) => (
+            {items.map((listing) => (
               <ExchangeListingCard
                 key={listing.id}
                 listing={listing}
