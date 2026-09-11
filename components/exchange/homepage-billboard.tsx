@@ -62,7 +62,7 @@ export function ExchangeHomepageBillboard({ locale }: { locale: string }) {
           </p>
         </div>
 
-        <div className="mt-10 grid max-w-3xl gap-3 sm:grid-cols-2">
+        <div className="mt-10 grid max-w-xl gap-2.5">
           {items.map((listing) => (
             <FeaturedTeaser key={listing.id} listing={listing} locale={locale} copy={copy} />
           ))}

@@ -236,11 +236,10 @@ export function PortalHome({
   const publicApps = APP_PRODUCTS.filter((app) => isCzechSurface(locale) || app.id !== "mediprep");
   const publicServices = PORTAL_SERVICES.filter((svc) => isCzechSurface(locale) || svc.id !== "mediprep");
   return (
-    <div className="border-b border-slate-200 bg-[#e8eef3]">
-      <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5">
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-          <div className="grid bg-[#050b1d] md:min-h-[32rem] md:grid-cols-[minmax(0,1.15fr)_minmax(12rem,0.85fr)]">
-            <div className="flex items-center px-4 py-5 sm:px-8 sm:py-7">
+    <div className="border-b border-slate-200 bg-[#f4f1eb]">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+        <div className="grid overflow-hidden md:min-h-[28rem] md:grid-cols-[minmax(0,1.15fr)_minmax(12rem,0.85fr)]">
+            <div className="flex items-center bg-[#050b1d] px-5 py-6 sm:px-8 sm:py-8">
               <ViaLongeVitaMark variant="hero" locale={locale} priority />
             </div>
             <div className="relative aspect-[3/4] min-h-[280px] md:aspect-auto md:min-h-full">
@@ -254,12 +253,12 @@ export function PortalHome({
               />
             </div>
           </div>
-          <div className="px-4 py-4 sm:px-6 sm:py-5">
+          <div className="pt-6 sm:pt-7">
             <h1 className="font-display text-2xl font-bold text-[#021d33] sm:text-3xl">
               {philosophy.claim}
             </h1>
-            <p className="mt-1 max-w-3xl text-sm text-slate-600">{philosophy.subtitle}</p>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <p className="mt-2 max-w-3xl text-base leading-7 text-slate-600">{philosophy.subtitle}</p>
+            <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2">
               <Link
                 href={localizePublicHref("/newsletter", locale)}
                 className="inline-flex items-center justify-center rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
@@ -268,19 +267,18 @@ export function PortalHome({
               </Link>
               <Link
                 href={localizePublicHref("/articles", locale)}
-                className="inline-flex items-center justify-center rounded-full border border-[#005B96]/35 px-5 py-2.5 text-sm font-semibold text-[#005B96] hover:bg-[#e8f3fb]"
+                className="inline-flex items-center justify-center text-sm font-semibold text-[#005B96] underline-offset-4 hover:underline"
               >
                 {chrome.readMagazine}
               </Link>
             </div>
-            <div className="mt-3 max-w-xl">
+            <div className="mt-4 max-w-xl">
               <NewsletterCapture locale={locale} source="home-hero" variant="compact" />
             </div>
             <div className="mt-4">
               <PortalSearch copy={surface} />
             </div>
           </div>
-        </div>
 
         <nav aria-label={chrome.servicesNav} className="mt-5">
           <ul className="flex flex-wrap gap-2">
