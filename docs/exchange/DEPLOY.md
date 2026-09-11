@@ -7,6 +7,7 @@ Production remains **Cloudflare Workers (OpenNext)** on `medscopeglobal.com`. Do
 1. Apply SQL in order (see `docs/deploy/POST_MERGE_CHECKLIST.md` §2):
    - `supabase/migrations/20260910120000_b2b_exchange.sql`
    - `supabase/migrations/20260911120000_b2b_exchange_subscriptions.sql`
+   - After Worker deploy: `POST /api/cron/apply-exchange-migrations` with `Authorization: Bearer CRON_SECRET` (or a valid Cloudflare API token). Uses Worker `SUPABASE_ACCESS_TOKEN`.
 2. Merge to `main` → Workers Builds / `pnpm cf:deploy`.
 3. Smoke: `pnpm exec tsx scripts/exchange-check.ts` then `pnpm cf:smoke`.
 

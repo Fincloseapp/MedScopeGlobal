@@ -220,6 +220,9 @@ for (const file of [
   "docs/exchange/QA.md",
   "locales/exchange/cs.json",
   "locales/exchange/en.json",
+  "lib/exchange/embedded-migrations.ts",
+  "lib/exchange/apply-schema.ts",
+  "app/api/cron/apply-exchange-migrations/route.ts",
 ]) {
   assert.equal(existsSync(join(root, file)), true, `missing ${file}`);
 }
@@ -242,5 +245,14 @@ assert.ok(sql.includes("exchange_contacts"));
 const subSql = readFileSync(join(root, "supabase/migrations/20260911120000_b2b_exchange_subscriptions.sql"), "utf8");
 assert.ok(subSql.includes("exchange_inquiry_replies"));
 assert.ok(subSql.includes("subscription-only"));
+
+const embedded = readFileSync(join(root, "lib/exchange/embedded-migrations.ts"), "utf8");
+assert.ok(embedded.includes("exchange_listings"));
+assert.ok(embedded.includes("exchange_inquiry_replies"));
+assert.ok(
+  readFileSync(join(root, "app/api/cron/apply-exchange-migrations/route.ts"), "utf8").includes(
+    "applyExchangeSchema"
+  )
+);
 
 console.log("✓ exchange-check passed");

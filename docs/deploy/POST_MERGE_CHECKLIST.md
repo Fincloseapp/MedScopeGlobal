@@ -85,6 +85,17 @@ Apply **in this order** (ecosystem tables for MediFlow + editorial):
 
 Verify Exchange after apply: `pnpm db:verify` should list `exchange_listings` / `exchange_organizations` as recommended tables. Public catalogue degrades to demo listings until this file is applied.
 
+### Option C — Worker cron (no local Management API token)
+
+After the Exchange Worker is live:
+
+```bash
+curl -X POST https://medscopeglobal.com/api/cron/apply-exchange-migrations \
+  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"
+```
+
+Auth is `CRON_SECRET` or a verified Cloudflare API token. The Worker runs the embedded SQL with its `SUPABASE_ACCESS_TOKEN`.
+
 ### Option A — Supabase SQL Editor (prod-safe)
 
 Paste and run each file **1 → 2 → 3** in the [SQL Editor](https://supabase.com/dashboard). Idempotent (`IF NOT EXISTS`).
