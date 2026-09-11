@@ -32,7 +32,7 @@ import { aktualityChip } from "@/lib/i18n/aktuality-chrome";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
 
 function ServiceGlyph({ icon }: { icon?: string }) {
-  const cls = "h-5 w-5";
+  const cls = "h-4 w-4";
   switch (icon) {
     case "book":
       return <BookOpen className={cls} aria-hidden />;
@@ -282,47 +282,43 @@ export function PortalHome({
           </div>
         </div>
 
-        <nav aria-label={chrome.servicesNav} className="mt-3 rounded-lg border border-slate-200 bg-white px-2 py-3 shadow-sm sm:px-3">
-          <ul className="grid grid-cols-5 gap-1 sm:grid-cols-10">
+        <nav aria-label={chrome.servicesNav} className="mt-5">
+          <ul className="flex flex-wrap gap-2">
             {publicServices.map((svc) => {
               const openApp = isStandaloneAppHref(svc.href);
               const Item = openApp ? AppOpenLink : Link;
               const localized = chrome.services.find((item) => item.id === svc.id);
+              const exchange = svc.id === "exchange";
               return (
               <li key={svc.id}>
                 <Item
                   href={openApp ? svc.href : localizePublicHref(svc.href, locale)}
                   className={
-                    svc.id === "exchange"
-                      ? "flex flex-col items-center gap-1 rounded-md bg-[#021d33] px-1 py-1.5 text-center text-white ring-2 ring-[#c4a35a] hover:bg-[#032844]"
-                      : "flex flex-col items-center gap-1 rounded-md px-1 py-1.5 text-center hover:bg-slate-50"
+                    exchange
+                      ? "inline-flex items-center gap-2 rounded-full bg-[#021d33] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#032844]"
+                      : "inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium text-[#021d33] hover:bg-white/80"
                   }
                 >
                   {"image" in svc && svc.image ? (
                     <Image
                       src={svc.image}
                       alt=""
-                      width={40}
-                      height={40}
-                      className="h-10 w-10 rounded-[22%]"
+                      width={20}
+                      height={20}
+                      className="h-5 w-5 rounded-full object-cover"
                     />
                   ) : (
                     <span
                       className={
-                        svc.id === "exchange"
-                          ? "flex h-10 w-10 items-center justify-center rounded-[22%] bg-[#c4a35a] text-[#021d33]"
-                          : "flex h-10 w-10 items-center justify-center rounded-[22%] bg-[#e8f3fb] text-[#005B96]"
+                        exchange
+                          ? "text-[#c4a35a]"
+                          : "text-[#005B96]"
                       }
                     >
                       <ServiceGlyph icon={"icon" in svc ? svc.icon : undefined} />
                     </span>
                   )}
-                  <span className={svc.id === "exchange" ? "text-[11px] font-semibold leading-tight text-white" : "text-[11px] font-semibold leading-tight text-[#021d33]"}>
-                    {localized?.label ?? svc.label}
-                  </span>
-                  <span className={svc.id === "exchange" ? "hidden text-[10px] text-[#e8d5a3] sm:block" : "hidden text-[10px] text-slate-500 sm:block"}>
-                    {localized?.hint ?? svc.hint}
-                  </span>
+                  <span>{localized?.label ?? svc.label}</span>
                 </Item>
               </li>
               );

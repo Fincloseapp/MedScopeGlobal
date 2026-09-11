@@ -17,8 +17,8 @@ export function ExchangeOriginMark({
   return (
     <p
       className={cn(
-        "flex flex-wrap items-center gap-x-2.5 gap-y-1 text-base font-semibold leading-7",
-        onLight ? "text-[#021d33]" : "text-white"
+        "flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm font-medium leading-6 sm:text-[0.95rem]",
+        onLight ? "text-[#021d33]" : "text-[#f3e6c4]"
       )}
     >
       <span className="rounded-full bg-[#c4a35a] px-2.5 py-0.5 text-xs font-bold text-[#021d33]">
