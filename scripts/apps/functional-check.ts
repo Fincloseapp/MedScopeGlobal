@@ -2140,7 +2140,10 @@ assert.ok(
   "homepage must not show invented social-proof counts"
 );
 assert.ok(
-  readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes('aud.id !== "student"'),
+  readFileSync(join(root, "lib/i18n/homepage-pillars-copy.ts"), "utf8").includes("czechOnly") &&
+    readFileSync(join(root, "lib/i18n/homepage-pillars-copy.ts"), "utf8").includes(
+      "czech || !pillar.czechOnly"
+    ),
   "non-Czech homepage must hide the MeDiprep student audience"
 );
 assert.ok(
