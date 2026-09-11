@@ -216,6 +216,7 @@ for (const file of [
   "components/exchange/homepage-billboard.tsx",
   "components/exchange/marketplace-hero.tsx",
   "components/exchange/origin-mark.tsx",
+  "components/exchange/about-marketplace.tsx",
   "lib/brand/exchange-visuals.ts",
   "docs/exchange/DEPLOY.md",
   "docs/exchange/QA.md",
@@ -230,6 +231,7 @@ for (const file of [
   assert.equal(existsSync(join(root, file)), true, `missing ${file}`);
 }
 
+assert.ok(readFileSync(join(root, "app/(public)/o-nas/page.tsx"), "utf8").includes("ExchangeAboutMarketplace"));
 assert.ok(getExchangeMarketing("cs").ribbon.includes("B2B Tržiště"));
 assert.ok(getExchangeMarketing("cs").ribbon.includes("MedScopeGlobal.com"));
 assert.equal(getExchangeMarketing("cs").originLine, "Tržiště B2B od MedScopeGlobal.com");

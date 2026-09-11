@@ -520,6 +520,9 @@ assert.equal(
 );
 assert.equal(getMarketingCopy("fr").apps.title, "Applis");
 assert.ok(!getMarketingCopy("fr").apps.trialCta.includes("zdarma"));
+assert.ok(getMarketingCopy("cs").about.marketplaceLead.includes("MedScopeGlobal.com"));
+assert.ok(getMarketingCopy("cs").about.audiences.some((item) => item.href === "/exchange"));
+assert.ok(getMarketingCopy("en").about.title.toLowerCase().includes("marketplace"));
 assert.equal(getMarketingCopy("de").about.eyebrow, "Über uns");
 assert.ok(getMarketingCopy("sk").publicHub.title.includes("zrozumiteľne"));
 assert.ok(!getMarketingCopy("sk").publicHub.eyebrow.includes("For everyone"));

@@ -61,12 +61,24 @@ const EDITIONS: Record<string, MarketingAppsEdition> = {
       metaDescription:
         "MedScopeGlobal je český odborný medicínsky portál pre laikov, študentov medicíny, lekárov a výskumníkov.",
       eyebrow: "O nás",
-      title: "MedScopeGlobal — odborný medicínsky portál pre ČR",
+      title: "MedScopeGlobal.com — obsah, aplikácie a B2B trhovisko",
+      lead:
+        "Na MedScopeGlobal.com stoja vedľa seba odborný magazín ViaLongeVita, klinické aplikácie a B2B trhovisko pre firmy a inštitúcie.",
       cta: "Kontaktujte nás",
       home: "Domov",
       missionTitle: "Naša misia",
       mission:
-        "MedScopeGlobal prepája klinickú prax, vedecký výskum a vzdelávanie v medicíne. Kurátorský obsah, citácie zdrojov a odborné rubriky pomáhajú lekárom, študentom aj verejnosti orientovať sa v rýchlo sa meniacej medicíne.",
+        "MedScopeGlobal.com spája tri veci: redakčný obsah, nástroje pre prax a B2B trhovisko. Magazín a aplikácie slúžia čitateľom a klinikám. Trhovisko spája výrobcov, nemocnice a laboratóriá napriamo — bez provízie z obchodu.",
+      marketplaceTitle: "B2B trhovisko",
+      marketplaceLead:
+        "B2B trhovisko od MedScopeGlobal.com je určené výrobcom, nemocniciam, laboratóriám a telemedicínskym inštitúciám. Kupujúci dopytuje zadarmo. Kontakty vidí len platiaci inzerent.",
+      marketplaceProof: "Dopyty zadarmo. Kontakty v tarife Pro. 0 % z obchodu. Povinný región. CE / FDA / ISO.",
+      marketplaceCta: "Otvoriť trhovisko",
+      marketplacePoints: [
+        { title: "0 % z obchodu", body: "Kupujúci neplatí nič. Inzerent platí len predplatné." },
+        { title: "Len firmy a inštitúcie", body: "Žiadny výdaj liekov verejnosti. Žiadne zdravotné údaje pacientov." },
+        { title: "CE · FDA · ISO", body: "Pri produktoch je certifikácia povinná. Každá ponuka má región." },
+      ],
       forWhomTitle: "Pre koho sme tu",
       forWhom: "Vyberte sekciu podľa toho, kto ste — každá cesta má vlastný obsah a nástroje.",
       independenceTitle: "Nezávislosť značky",
@@ -85,6 +97,7 @@ const EDITIONS: Record<string, MarketingAppsEdition> = {
         { href: "/studenti", label: "Študenti", desc: "Anatómia, farmakológia a príprava na LF" },
         { href: "/lekari", label: "Lekári", desc: "Guidelines, štúdie a klinické briefy" },
         { href: "/studie", label: "Výskum", desc: "Prehľad štúdií a obsah založený na dôkazoch" },
+        { href: "/exchange", label: "Firmy a inštitúcie", desc: "B2B trhovisko od MedScopeGlobal.com — ponuky, dopyty, priamy kontakt" },
       ],
     },
     contact: {
@@ -198,6 +211,7 @@ const EDITIONS: Record<string, MarketingAppsEdition> = {
         { href: "/studenti", label: "Studenci", desc: "Anatomia, farmakologia i rekrutacja na wydział" },
         { href: "/lekari", label: "Lekarze", desc: "Wytyczne, badania i briefy kliniczne" },
         { href: "/studie", label: "Badania", desc: "Przeglądy badań i treści oparte na dowodach" },
+        { href: "/exchange", label: "Firmy i instytucje", desc: "Rynek B2B MedScopeGlobal.com — oferty, zapytania, kontakt bezpośredni" },
       ],
     },
     contact: {
@@ -306,6 +320,7 @@ const EDITIONS: Record<string, MarketingAppsEdition> = {
         { href: "/studenti", label: "学生", desc: "解剖、薬理、医学部入試" },
         { href: "/lekari", label: "医師", desc: "ガイドライン、研究、臨床ブリーフ" },
         { href: "/studie", label: "研究", desc: "研究概要と根拠に基づく内容" },
+        { href: "/exchange", label: "企業と機関", desc: "MedScopeGlobal.comのB2Bマーケット — 出品、照会、直接連絡" },
       ],
     },
     contact: {
@@ -379,6 +394,7 @@ const EDITIONS: Record<string, MarketingAppsEdition> = {
         { href: "/studenti", label: "Студенты", desc: "Анатомия, фармакология и поступление" },
         { href: "/lekari", label: "Врачи", desc: "Рекомендации, исследования и клинические брифы" },
         { href: "/studie", label: "Исследования", desc: "Обзоры исследований и доказательный контент" },
+        { href: "/exchange", label: "Компании и учреждения", desc: "B2B-маркет MedScopeGlobal.com — объявления, запросы, прямой контакт" },
       ],
     },
     contact: {
@@ -423,6 +439,7 @@ const EDITIONS: Record<string, MarketingAppsEdition> = {
         { href: "/studenti", label: "学生", desc: "解剖、药理与医学院入学" },
         { href: "/lekari", label: "医生", desc: "指南、研究与临床简报" },
         { href: "/studie", label: "研究", desc: "研究综述与循证内容" },
+        { href: "/exchange", label: "企业与机构", desc: "MedScopeGlobal.com B2B 市场 — 供应、询盘、直接联系" },
       ],
     },
     contact: {
