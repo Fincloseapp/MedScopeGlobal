@@ -33,6 +33,11 @@ export function ExchangeListingCard({
           : "border-[#cfe1f3] bg-white"
       )}
     >
+      {listing.imageUrl ? (
+        <div className={cn("relative mb-3 overflow-hidden", compact ? "h-28 rounded-lg" : "h-40 rounded-xl")}>
+          <img src={listing.imageUrl} alt="" className="h-full w-full object-cover" />
+        </div>
+      ) : null}
       <div
         className={cn(
           "flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em]",

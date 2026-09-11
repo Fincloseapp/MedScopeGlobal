@@ -46,6 +46,11 @@ export default async function ExchangeListingPage({ params }: { params: Promise<
   return (
     <ModulePageShell eyebrow={copy.eyebrow} title={listing.title} description={listing.summary}>
       <JsonLdScript data={listingJsonLd(listing, locale)} />
+      {listing.imageUrl ? (
+        <div className="relative mb-6 h-56 overflow-hidden rounded-2xl sm:h-72">
+          <img src={listing.imageUrl} alt="" className="h-full w-full object-cover" />
+        </div>
+      ) : null}
       <p className="text-sm text-slate-600">
         {listing.kind === "product" ? copy.kindProduct : listing.kind === "service" ? copy.kindService : copy.kindDemand}
         {" · "}

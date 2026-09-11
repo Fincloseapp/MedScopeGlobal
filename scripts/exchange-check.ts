@@ -206,9 +206,16 @@ for (const file of [
   "app/api/exchange/inquiries/route.ts",
   "app/api/exchange/inquiries/[id]/reply/route.ts",
   "app/api/exchange/ads/order/route.ts",
+  "public/assets/marketing/exchange/hero.webp",
+  "public/assets/marketing/exchange/manufacturers.webp",
+  "public/assets/marketing/exchange/hospitals.webp",
+  "public/assets/marketing/exchange/laboratories.webp",
+  "public/assets/marketing/exchange/diagnostics.webp",
+  "public/assets/marketing/exchange/telemedicine.webp",
+  "components/exchange/portal-spotlight.tsx",
   "components/exchange/homepage-billboard.tsx",
-  "components/exchange/header-ribbon.tsx",
   "components/exchange/marketplace-hero.tsx",
+  "lib/brand/exchange-visuals.ts",
   "docs/exchange/DEPLOY.md",
   "docs/exchange/QA.md",
   "locales/exchange/cs.json",
@@ -217,9 +224,14 @@ for (const file of [
   assert.equal(existsSync(join(root, file)), true, `missing ${file}`);
 }
 
-assert.ok(getExchangeMarketing("cs").ribbon.includes("B2B Exchange"));
-assert.equal(getExchangeMarketing("en").navCta, "Exchange");
+assert.ok(getExchangeMarketing("cs").ribbon.includes("B2B Tržiště"));
+assert.equal(getExchangeMarketing("en").navCta, "B2B Market");
+assert.equal(getExchangeMarketing("cs").audiences.length, 4);
 assert.ok(readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("ExchangeHomepageBillboard"));
+assert.ok(
+  readFileSync(join(root, "app/(public)/page.tsx"), "utf8").indexOf("<ExchangeHomepageBillboard") <
+    readFileSync(join(root, "app/(public)/page.tsx"), "utf8").indexOf("<PortalHome")
+);
 assert.ok(readFileSync(join(root, "components/layout/site-header.tsx"), "utf8").includes("ExchangeHeaderRibbon"));
 assert.ok(!readFileSync(join(root, "app/(public)/exchange/listing/[slug]/page.tsx"), "utf8").includes("mailto:"));
 

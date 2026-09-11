@@ -26,6 +26,7 @@ import { ViaLongeVitaMark } from "@/components/brand/vialongevita-mark";
 import { EditorialPayButtons } from "@/components/subscription/editorial-pay-buttons";
 import { editionCoverAlt, isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
 import { BookOpen, Gift, Globe2, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
+import { ExchangePortalSpotlight } from "@/components/exchange/portal-spotlight";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { aktualityChip } from "@/lib/i18n/aktuality-chrome";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
@@ -328,6 +329,8 @@ export function PortalHome({
             })}
           </ul>
         </nav>
+
+        <ExchangePortalSpotlight locale={locale} />
 
         {isCzechSurface(locale) ? <WriterAgentsStrip locale={locale} /> : null}
 

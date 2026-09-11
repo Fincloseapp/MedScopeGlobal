@@ -519,11 +519,11 @@ export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
       children: appsChildren,
     },
     {
-      label: "Exchange",
+      label: "B2B Tržiště",
       href: "/exchange",
       children: [
         {
-          label: "B2B Exchange",
+          label: "B2B Tržiště",
           href: "/exchange",
           description: "Zdravotnický marketplace — předplatné odemyká kontakty",
         },

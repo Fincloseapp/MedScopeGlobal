@@ -112,7 +112,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     ordizapis: "zápisy",
     academy: "vzdělávání",
     ai: "zeptat se",
-    exchange: "0 % kontakt",
+    exchange: "B2B",
     trial: "od 25 Kč",
     leky: "SÚKL",
     mediprep: "legacy",
@@ -200,7 +200,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
 const SERVICE_LABELS: Record<string, Record<string, string>> = {
   cs: {
     articles: "Články",
-    exchange: "Exchange",
+    exchange: "Tržiště",
     trial: "Redakce",
     leky: "Léky",
     academy: "Academy",

@@ -86,6 +86,18 @@ const nextConfig = {
       // MASTER_PROMPT ecosystem aliases (unprefixed; locale pages also redirect)
       { source: "/vip", destination: "/vip/protokoly", permanent: false },
       { source: "/vitascope", destination: "/", permanent: false },
+      { source: "/trziste", destination: "/exchange", permanent: false },
+      { source: "/marketplace", destination: "/exchange", permanent: false },
+      {
+        source: "/:locale(cs|sk|pl|de|fr|it|es|hu|en|en-us|en-uk|pt-br)/trziste",
+        destination: "/:locale/exchange",
+        permanent: false,
+      },
+      {
+        source: "/:locale(cs|sk|pl|de|fr|it|es|hu|en|en-us|en-uk|pt-br)/marketplace",
+        destination: "/:locale/exchange",
+        permanent: false,
+      },
       {
         source: "/article/verejnost-rozhovory-2026-07-03-cesta-zpet-k-zivotu-pribeh-mudr-novaka-po-infarktu",
         destination: "/article/verejnost-rozhovory-2026-07-03-cesta-zpet-k-zivotu-pribeh-lekare-po-infarktu",

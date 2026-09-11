@@ -105,8 +105,8 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     metaTitle: "MedScope B2B Exchange — zdravotnický marketplace bez provize za kontakt",
     metaDescription:
       "Globální B2B marketplace pro kliniky, laboratoře, univerzity a výrobce. Přímý kontakt, povinná regionální dostupnost EU/USA/Asie, bez plateb přes platformu.",
-    eyebrow: "B2B Exchange",
-    title: "Zdravotnický marketplace, který firmy chtějí používat",
+    eyebrow: "B2B Tržiště",
+    title: "B2B tržiště — zdravotnický marketplace, který firmy chtějí používat",
     lead: "Nabízejte produkty a služby klinikám, laboratořím a univerzitám. Kupující vás kontaktuje přímo. MedScopeGlobal nezpracovává platby, smlouvy ani dodání.",
     catalogCta: "Prohlédnout nabídky",
     onboardCta: "Registrovat firmu",
@@ -222,7 +222,7 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     metaTitle: "MedScope B2B Exchange — healthcare marketplace with free introductions",
     metaDescription:
       "Global B2B marketplace for clinics, labs, universities and manufacturers. Direct contact, mandatory EU/USA/Asia availability, no payments through the platform.",
-    eyebrow: "B2B Exchange",
+    eyebrow: "B2B Marketplace",
     title: "The healthcare marketplace firms will actually use",
     lead: "List products and services for clinics, laboratories and universities. Buyers contact you directly. MedScopeGlobal does not process payments, contracts or delivery.",
     catalogCta: "Browse listings",

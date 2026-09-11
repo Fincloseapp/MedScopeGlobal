@@ -116,8 +116,8 @@ export default async function HomePage() {
       ))}
 
       {/* Story: ViaLongeVita hero (brief + magazine) → news → apps. Affiliate after newsletter. */}
-      <PortalHome articles={articles} copy={philosophy} locale={locale} deskArticles={homeLayout.desks} />
       <ExchangeHomepageBillboard locale={locale} />
+      <PortalHome articles={articles} copy={philosophy} locale={locale} deskArticles={homeLayout.desks} />
       <HomepageLongevityStrip
         articles={homeLayout.longevityReading}
         locale={locale}

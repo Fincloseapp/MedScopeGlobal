@@ -1,3 +1,4 @@
+import { EXCHANGE_VISUAL } from "@/lib/brand/exchange-visuals";
 import type { AvailabilityRegion } from "@/lib/exchange/regions";
 import type {
   ExchangeAdPlacement,
@@ -99,6 +100,7 @@ export const DEMO_LISTINGS: ExchangeListing[] = [
     priceHint: "B2B on request",
     currency: "EUR",
     featured: true,
+    imageUrl: EXCHANGE_VISUAL.diagnostics,
     createdAt: now,
   },
   {
@@ -127,6 +129,7 @@ export const DEMO_LISTINGS: ExchangeListing[] = [
     certificationNotApplicable: false,
     priceHint: "Per panel / protocol",
     featured: true,
+    imageUrl: EXCHANGE_VISUAL.laboratories,
     createdAt: now,
   },
   {
@@ -153,6 +156,7 @@ export const DEMO_LISTINGS: ExchangeListing[] = [
     certifications: ["CE"],
     certificationNotApplicable: false,
     featured: false,
+    imageUrl: EXCHANGE_VISUAL.hospitals,
     createdAt: now,
   },
   {
@@ -179,6 +183,7 @@ export const DEMO_LISTINGS: ExchangeListing[] = [
     certifications: ["ISO"],
     certificationNotApplicable: false,
     featured: false,
+    imageUrl: EXCHANGE_VISUAL.telemedicine,
     createdAt: now,
   },
 ];

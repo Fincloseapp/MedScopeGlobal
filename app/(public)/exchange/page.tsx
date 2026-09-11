@@ -1,3 +1,4 @@
+import { SITE } from "@/lib/config/site";
 import Link from "next/link";
 import { ExchangeListingCard } from "@/components/exchange/listing-card";
 import { ExchangeMarketplaceHero } from "@/components/exchange/marketplace-hero";
@@ -20,6 +21,7 @@ export async function generateMetadata() {
     description: copy.metaDescription,
     path: "/exchange",
     locale,
+    image: `${SITE.url}/assets/marketing/exchange/hero.webp`,
   });
 }
 
@@ -42,6 +44,27 @@ export default async function ExchangeLandingPage() {
 
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <section>
+          <h2 className="font-display text-2xl font-semibold text-[#021d33]">{marketing.audiencesTitle}</h2>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            {marketing.audiences.map((item) => (
+              <Link
+                key={item.id}
+                href={catalog}
+                className="group overflow-hidden rounded-2xl border border-[#cfe1f3] bg-white shadow-[0_16px_40px_-28px_rgba(2,29,51,0.45)]"
+              >
+                <span className="relative block h-44">
+                  <img src={item.image} alt="" className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]" />
+                </span>
+                <span className="block p-5">
+                  <span className="font-display text-lg font-semibold text-[#021d33]">{item.title}</span>
+                  <span className="mt-2 block text-sm leading-6 text-slate-600">{item.body}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-14">
           <h2 className="font-display text-2xl font-semibold text-[#021d33]">{copy.promiseTitle}</h2>
           <div className="mt-5 grid gap-4 md:grid-cols-2">
             {copy.promises.map((item) => (

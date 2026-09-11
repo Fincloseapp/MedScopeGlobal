@@ -125,7 +125,7 @@ const NAV: Record<string, NavStrings> = {
     "/inzerce/formular": { label: "Ad order", description: "Form for companies" },
     "/ai/reklamy": { label: "AI ads", description: "Advertising assistant" },
     "/studijni-spoluprace": { label: "Study collaboration", description: "Study offers" },
-    "/exchange": { label: "Exchange", description: "Healthcare marketplace — subscription unlocks contacts" },
+    "/exchange": { label: "B2B Marketplace", description: "Healthcare marketplace — subscription unlocks contacts" },
     "/exchange/catalog": { label: "Exchange catalogue", description: "Filter by EU / USA / Asia / Global" },
     "/exchange/onboard": { label: "Register organisation", description: "B2B onboarding" },
     "/exchange/ads": { label: "Exchange ads", description: "Banners and newsletter by region" },

@@ -1,5 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Globe2, ShieldCheck } from "lucide-react";
+import { EXCHANGE_VISUAL } from "@/lib/brand/exchange-visuals";
 import { AVAILABILITY_REGIONS, regionLabel } from "@/lib/exchange/regions";
 import { getExchangeCopy } from "@/lib/i18n/exchange-copy";
 import { getExchangeMarketing } from "@/lib/i18n/exchange-marketing";
@@ -14,24 +16,25 @@ export function ExchangeMarketplaceHero({ locale }: { locale: string }) {
 
   return (
     <section className="relative overflow-hidden border-b border-[#0a2a44] bg-[#021d33] text-white">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-40"
-        style={{
-          background:
-            "radial-gradient(circle at 12% 10%, rgba(196,163,90,0.28), transparent 34%), radial-gradient(circle at 88% 80%, rgba(0,91,150,0.45), transparent 42%)",
-        }}
+      <Image
+        src={EXCHANGE_VISUAL.hero}
+        alt=""
+        fill
+        priority
+        className="object-cover object-center"
+        sizes="100vw"
       />
-      <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-        <p className="inline-flex items-center gap-2 rounded-full border border-[#c4a35a]/45 bg-[#c4a35a]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#e8d5a3]">
+      <div className="absolute inset-0 bg-gradient-to-r from-[#021d33] via-[#021d33]/88 to-[#021d33]/45" />
+      <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
+        <p className="inline-flex items-center gap-2 rounded-full border border-[#c4a35a]/45 bg-[#c4a35a]/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#e8d5a3]">
           <Globe2 className="h-3.5 w-3.5" aria-hidden />
-          MedScope · {copy.eyebrow}
+          MedScope · {marketing.marketplaceName}
         </p>
         <h1 className="mt-5 max-w-4xl font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
           {copy.title}
         </h1>
-        <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">{copy.lead}</p>
-        <p className="mt-3 flex max-w-3xl items-start gap-2 text-sm font-medium text-[#e8d5a3]">
+        <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-200">{copy.lead}</p>
+        <p className="mt-3 flex max-w-2xl items-start gap-2 text-sm font-medium text-[#e8d5a3]">
           <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           {marketing.proof}
         </p>
@@ -60,9 +63,9 @@ export function ExchangeMarketplaceHero({ locale }: { locale: string }) {
 
         <ul className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {marketing.stats.map((stat) => (
-            <li key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm">
+            <li key={stat.label} className="rounded-2xl border border-white/15 bg-[#021d33]/55 px-4 py-4 backdrop-blur-sm">
               <p className="font-display text-xl font-semibold text-white">{stat.value}</p>
-              <p className="mt-1 text-xs uppercase tracking-[0.14em] text-slate-400">{stat.label}</p>
+              <p className="mt-1 text-xs uppercase tracking-[0.14em] text-slate-300">{stat.label}</p>
             </li>
           ))}
         </ul>
@@ -72,7 +75,7 @@ export function ExchangeMarketplaceHero({ locale }: { locale: string }) {
             <Link
               key={region}
               href={`${catalog}?regions=${region}`}
-              className="rounded-full border border-white/20 px-3.5 py-1.5 text-xs font-semibold text-slate-200 hover:border-[#c4a35a] hover:text-[#e8d5a3]"
+              className="rounded-full border border-white/20 bg-[#021d33]/40 px-3.5 py-1.5 text-xs font-semibold text-slate-100 hover:border-[#c4a35a] hover:text-[#e8d5a3]"
             >
               {regionLabel(region, locale)}
             </Link>
