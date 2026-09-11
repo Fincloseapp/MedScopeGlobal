@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Globe2 } from "lucide-react";
 import { ExchangeListingCard } from "@/components/exchange/listing-card";
@@ -19,16 +18,13 @@ export function ExchangeHomepageBillboard({ locale }: { locale: string }) {
   const home = localizePublicHref("/exchange", locale);
 
   return (
-    <section className="relative overflow-hidden border-b border-[#0a2a44] bg-[#021d33] text-white">
-      <Image
+    <section className="relative min-h-[32rem] overflow-hidden border-b border-[#0a2a44] bg-[#021d33] text-white">
+      <img
         src={EXCHANGE_VISUAL.hero}
         alt=""
-        fill
-        priority
-        className="object-cover object-center opacity-45"
-        sizes="100vw"
+        className="absolute inset-0 h-full w-full object-cover object-center"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#021d33] via-[#021d33]/92 to-[#021d33]/70" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#021d33]/82 via-[#021d33]/62 to-[#021d33]/30" />
       <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)] lg:py-16">
         <div>
           <p className="inline-flex items-center gap-2 rounded-full border border-[#c4a35a]/50 bg-[#c4a35a]/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#e8d5a3]">

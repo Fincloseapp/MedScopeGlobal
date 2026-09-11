@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Globe2, ShieldCheck } from "lucide-react";
 import { EXCHANGE_VISUAL } from "@/lib/brand/exchange-visuals";
@@ -15,16 +14,13 @@ export function ExchangeMarketplaceHero({ locale }: { locale: string }) {
   const pricing = localizePublicHref("/exchange/pricing", locale);
 
   return (
-    <section className="relative overflow-hidden border-b border-[#0a2a44] bg-[#021d33] text-white">
-      <Image
+    <section className="relative min-h-[28rem] overflow-hidden border-b border-[#0a2a44] bg-[#021d33] text-white sm:min-h-[34rem]">
+      <img
         src={EXCHANGE_VISUAL.hero}
         alt=""
-        fill
-        priority
-        className="object-cover object-center"
-        sizes="100vw"
+        className="absolute inset-0 h-full w-full object-cover object-center"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#021d33] via-[#021d33]/88 to-[#021d33]/45" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#021d33]/80 via-[#021d33]/55 to-[#021d33]/20" />
       <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
         <p className="inline-flex items-center gap-2 rounded-full border border-[#c4a35a]/45 bg-[#c4a35a]/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#e8d5a3]">
           <Globe2 className="h-3.5 w-3.5" aria-hidden />
