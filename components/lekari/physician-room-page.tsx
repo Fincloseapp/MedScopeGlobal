@@ -12,6 +12,7 @@ import {
 } from "@/lib/i18n/physician-room-copy";
 import { localizeV271Page } from "@/lib/i18n/hub-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { CuratedGuidelinesList } from "@/components/lekari/curated-guidelines-list";
 import type { V271HubPage } from "@/lib/v271/routes";
 
