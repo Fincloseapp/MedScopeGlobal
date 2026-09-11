@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { isTemplateUniversityTitle, isJunkPublicCopy } from "@/lib/editorial/listing-junk";
 
 export type UniversityNewsRow = {
   id: string;
@@ -30,7 +31,9 @@ export async function getUniversityNewsList(tag?: string) {
     console.error("getUniversityNewsList", error);
     return [];
   }
-  return (data ?? []) as UniversityNewsRow[];
+  return ((data ?? []) as UniversityNewsRow[]).filter(
+    (row) => !isTemplateUniversityTitle(row.title) && !isJunkPublicCopy(row.title, row.summary, row.body)
+  );
 }
 
 export async function getUniversityNewsBySlug(slug: string) {

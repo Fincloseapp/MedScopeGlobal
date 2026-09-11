@@ -106,7 +106,7 @@ const PACK: Record<ChromePack, Pack> = {
     valueProps: [
       "Odborná sekce, guidelines a diagnostické algoritmy",
       "Kurátorované souhrny studií s DOI a PMID",
-      "Klinický AI asistent a Research Hub",
+      "Klinický AI asistent a doporučení s DOI",
       "OrdiZapis — nahrávání v mobilu → zápis",
       "CME přehledy a prioritní notifikace novinek",
     ],

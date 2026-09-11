@@ -111,8 +111,8 @@ export const MAGAZINE = {
     "pt-BR": "Ver a saúde com clareza. Viver por mais tempo.",
   },
   subtitle: {
-    en: "Longevity, wellness, and healthy lifestyle for everyone who wants to improve — MediFlow journal, VIP protocols, and MeDipacient · OrdiZapis on one platform. MeDiprep (LF prep) remains as a legacy app.",
-    cs: "Dlouhověkost, wellness a zdravý životní styl pro každého, kdo chce být lépe — deník MediFlow, VIP protokoly a MeDipacient · OrdiZapis na jedné platformě. MeDiprep (příprava na LF) zůstává jako legacy aplikace.",
+    en: "Longevity, wellness, and healthy lifestyle for everyone who wants to improve — MediFlow journal, VIP protocols, and MeDipacient · OrdiZapis on one platform. MeDiprep prepares Czech medical-school applicants.",
+    cs: "Dlouhověkost, wellness a zdravý životní styl pro každého, kdo chce být lépe — deník MediFlow, VIP protokoly a MeDipacient · OrdiZapis na jedné platformě. MeDiprep připravuje uchazeče na české LF.",
     sk: "Dlhovekosť, wellness a zdravý životný štýl — denník MediFlow, VIP protokoly a MeDipacient · OrdiZapis na jednej platforme.",
     de: "Langlebigkeit, Wellness und gesunder Lebensstil — MediFlow-Tagebuch, VIP-Protokolle und MeDipacient · OrdiZapis auf einer Plattform.",
     fr: "Longévité, bien-être et mode de vie sain — journal MediFlow, protocoles VIP et MeDipacient · OrdiZapis sur une seule plateforme.",

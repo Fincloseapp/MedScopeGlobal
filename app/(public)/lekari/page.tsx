@@ -1,4 +1,4 @@
-import { AccreditedCmeOverview } from "@/components/academy/b2b/accredited-cme-overview";
+import { CuratedGuidelinesList } from "@/components/lekari/curated-guidelines-list";
 import { OrdiZapisPromoBanner } from "@/components/lekari/ordizapis-promo-banner";
 import { PhysicianOfferDashboard } from "@/components/lekari/physician-offer-dashboard";
 import {
@@ -21,6 +21,7 @@ export default async function LekariHubPage() {
   return (
     <PhysicianOfferDashboard locale={locale}>
       <OrdiZapisPromoBanner variant="hub" />
+      <CuratedGuidelinesList />
       {czech ? (
         <div>
           <AccreditedCmeOverview variant="panel" />

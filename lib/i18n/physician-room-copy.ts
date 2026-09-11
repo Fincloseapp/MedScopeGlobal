@@ -49,18 +49,18 @@ const PACK: Record<ChromePack, RoomPack> = {
         method: [
           ["Identifikátor", "RCT a meta-analýza jen s DOI nebo PMID. Bez něj řádek neukazujeme."],
           ["Žádný slib praxe", "Shrnutí není návod k léčbě a nenahrazuje čtení primárního článku."],
-          ["Research Hub", "AI analýza je vedle — identifikátor studie zůstává vidět."],
+          ["Doporučení s DOI", "Identifikátor studie zůstává vidět — AI není náhrada guideline."],
         ],
         source: "Nevymýšlíme p-hodnoty, N ani závěr. Když řádek nemá zdroj, neprojde.",
       },
       "research-hub": {
-        lead: "PubMed a AI analýza jako pracovní stůl — identifikátor studie zůstává vidět. Nediagnostikuje.",
+        lead: "Tři aktuální ESC doporučení s DOI mimo revmatologii. PubMed AI je interní nástroj, ne veřejný slib.",
         method: [
-          ["PubMed na stole", "Vyhledávání a AI rozbor vedle sebe. PMID nebo DOI zůstává v záhlaví."],
+          ["ESC 2023–2024", "Hypertenze, ACS a fibrilace síní — European Heart Journal, otevřený DOI."],
           ["Ne diagnóza", "Nástroj neslibuje diferenciální diagnózu ani změnu terapie."],
-          ["Kontrola zdroje", "Když model něco tvrdí, ověřte to na primárním záznamu — ne v chatu."],
+          ["Kontrola zdroje", "Čtěte primární guideline. Magazín jen ukáže cestu k DOI."],
         ],
-        source: "AI je kontext k evidenci, ne recenzent a ne kolega ve službě.",
+        source: "Odkazy vedou na DOI. Magazín negeneruje klinická doporučení.",
       },
       "ai-asistent": {
         lead: "Klinický kontext k guidelines a studiím. Není to diagnóza, předpis ani náhrada kolegy.",
@@ -423,7 +423,7 @@ const DESTINATIONS: Record<ChromePack, Record<PhysicianRoomId, PhysicianRoomDest
     ],
     studie: [
       { href: "/studie", label: "Přehled studií", body: "Identifikátor v záhlaví. Bez vymyšlených p-hodnot." },
-      { href: "/lekari/research-hub", label: "Research Hub", body: "PubMed vedle AI. Nástroj nediagnostikuje." },
+      { href: "/lekari/guidelines", label: "Doporučení s DOI", body: "ESC hypertenze, ACS a fibrilace síní — primární text, ne AI." },
     ],
     "research-hub": [
       { href: "/lekari/studie", label: "Studie na desk", body: "Stejný účet, stejné pravidlo identifikátoru." },
@@ -445,7 +445,7 @@ const DESTINATIONS: Record<ChromePack, Record<PhysicianRoomId, PhysicianRoomDest
     ],
     studie: [
       { href: "/studie", label: "Study list", body: "Identifier in the header. No invented p-values." },
-      { href: "/lekari/research-hub", label: "Research Hub", body: "PubMed beside AI. The tool does not diagnose." },
+      { href: "/lekari/guidelines", label: "DOI guidelines", body: "ESC hypertension, ACS and atrial fibrillation — primary text, not AI." },
     ],
     "research-hub": [
       { href: "/lekari/studie", label: "Studies on the desk", body: "Same account, same identifier rule." },

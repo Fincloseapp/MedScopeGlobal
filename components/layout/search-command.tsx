@@ -12,9 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { tryCreateClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { mergedArticleSearch } from "@/utils/merged-article-search";
 import { sanitizeSearchInput } from "@/utils/search";
 
 import type { AccessLevelId } from "@/lib/config/access-levels";
@@ -23,8 +21,6 @@ import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
 
 export function SearchCommand({
-  isVip = false,
-  accessLevel = "public",
   locale = "cs",
 }: {
   isVip?: boolean;
@@ -40,23 +36,30 @@ export function SearchCommand({
   >([]);
   const [loading, setLoading] = useState(false);
 
-  const runSearch = useCallback(async (term: string) => {
-    const t = sanitizeSearchInput(term);
-    if (t.length < 2) {
-      setResults([]);
-      return;
-    }
-    setLoading(true);
-    const supabase = tryCreateClient();
-    if (!supabase) {
-      setLoading(false);
-      setResults([]);
-      return;
-    }
-    const rows = await mergedArticleSearch(supabase, term, 12, isVip, accessLevel);
-    setLoading(false);
-    setResults(rows);
-  }, [isVip, accessLevel]);
+  const runSearch = useCallback(
+    async (term: string) => {
+      const t = sanitizeSearchInput(term);
+      if (t.length < 2) {
+        setResults([]);
+        return;
+      }
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `/api/search?q=${encodeURIComponent(t)}&locale=${encodeURIComponent(locale)}`
+        );
+        const json = (await res.json()) as {
+          results?: { slug: string; title: string; excerpt: string | null }[];
+        };
+        setResults(json.results ?? []);
+      } catch {
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [locale]
+  );
 
   useEffect(() => {
     const id = setTimeout(() => {
@@ -125,7 +128,7 @@ export function SearchCommand({
           variant="secondary"
           className="w-full"
           onClick={() => {
-            router.push(`/search?q=${encodeURIComponent(q)}`);
+            router.push(buildLocalePath(locale, `/hledat?q=${encodeURIComponent(q)}`));
             setOpen(false);
           }}
         >

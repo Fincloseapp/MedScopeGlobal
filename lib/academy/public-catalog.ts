@@ -1,15 +1,13 @@
 /**
  * Public visibility of the Academy course catalog.
  *
- * When false (current default): homepage / main nav do not hard-push /academy/courses,
- * and /academy/courses shows a calm “připravujeme” soft landing instead of the weak grid.
- * Direct URLs and academy-internal links still resolve (200).
+ * When false (current default): public catalog stays hidden.
+ * /academy and /academy/courses redirect to /studenti. Homepage and main nav
+ * do not mention Academy. CME for rheumatologists stays at /academy/lekari.
  *
  * --- Re-enable when course quality is ready ---
  * 1. Set ACADEMY_COURSES_CATALOG_PROMO to true below.
- * 2. Ship / deploy. No other feature flag file is required.
- * Optional: restore nav labels “Kurzy” / “Příprava na přijímačky” that were removed from
- * main-navigation.ts while this was false (search for ACADEMY_COURSES_CATALOG_PROMO comments).
+ * 2. Restore homepage/nav links (search ACADEMY_COURSES_CATALOG_PROMO comments).
  */
 export const ACADEMY_COURSES_CATALOG_PROMO = false;
 

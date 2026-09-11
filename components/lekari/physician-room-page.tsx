@@ -12,7 +12,7 @@ import {
 } from "@/lib/i18n/physician-room-copy";
 import { localizeV271Page } from "@/lib/i18n/hub-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
-import { getServerLocale } from "@/lib/i18n/server-locale";
+import { CuratedGuidelinesList } from "@/components/lekari/curated-guidelines-list";
 import type { V271HubPage } from "@/lib/v271/routes";
 
 const ROOM_IMAGE: Record<PhysicianRoomId, string> = {
@@ -95,6 +95,8 @@ export async function PhysicianRoomPage({
           </div>
           <p className="mt-4 text-sm leading-6 text-slate-600">{room.source}</p>
         </section>
+
+        {slug === "guidelines" || slug === "research-hub" ? <CuratedGuidelinesList /> : null}
 
         <section>
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">

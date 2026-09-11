@@ -82,11 +82,11 @@ const PHYSICIAN: Record<ChromePack, HubOverlay> = {
   cs: {
     label: "Pro lékaře",
     shortLabel: "Lékaři",
-    description: "Guidelines, souhrny studií, diagnostické algoritmy, CME a Research Hub.",
+    description: "OrdiZapis, guidelines s DOI a souhrny studií. CME jen u akreditované revmatologie.",
     ctaPrimary: "Odborná sekce",
     ctaSecondary: "Dokumentace",
     enter: "Vstoupit",
-    topics: ["guidelines", "CME", "Research Hub", "diagnostika"],
+    topics: ["OrdiZapis", "guidelines", "DOI", "studie"],
   },
   de: {
     label: "Für Ärztinnen und Ärzte",

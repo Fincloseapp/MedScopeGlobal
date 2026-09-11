@@ -1,4 +1,6 @@
 /** Magazine listing minimum — aligns with audit THRESHOLD_MAGAZINE (800w). */
+import { isJunkPublicCopy } from "@/lib/editorial/listing-junk";
+
 export const MAGAZINE_LISTING_MIN_WORDS = 800;
 
 const SEED_STATIC_SLUG_RE =
@@ -11,6 +13,7 @@ type ListingArticle = {
   slug?: string | null;
   vip_only?: boolean | null;
   content?: string | null;
+  excerpt?: string | null;
   metadata?: unknown;
   rubric_slug?: string | null;
   source_name?: string | null;
@@ -95,6 +98,7 @@ export function shouldHideFromPublicListing(
 ): boolean {
   if (!article.slug?.trim() || !article.title?.trim()) return true;
   if (article.vip_only) return true;
+  if (isJunkPublicCopy(article.title, article.excerpt, article.content)) return true;
 
   const meta = metaRecord(article.metadata);
   if (meta.listing_fallback === true) return false;

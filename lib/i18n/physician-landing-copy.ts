@@ -49,7 +49,7 @@ const PACK: Record<ChromePack, PackCopy> = {
       { href: "/leky", label: "Léky a SÚKL", desc: "Schválené přípravky, EMA, interakce" },
       { href: "/legislativa", label: "Legislativa", desc: "Zdravotnická legislativa v ČR a EU" },
       { href: "/ai-medical/doctor", label: "Klinický AI", desc: "AI asistent pro lékaře v praxi" },
-      { href: "/studie/ai", label: "Research Hub", desc: "AI analýza studií a PubMed" },
+      { href: "/lekari/guidelines", label: "Doporučení s DOI", desc: "ESC hypertenze, ACS a fibrilace síní" },
     ],
     verifyTitle: "Ověření ČLK",
     verifyBody:

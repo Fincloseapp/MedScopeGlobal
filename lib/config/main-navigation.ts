@@ -12,14 +12,14 @@ const menuCs: NavItem[] = [
     label: "Aplikace",
     href: "/aplikace",
     children: [
-      { label: "Přehled aplikací", href: "/aplikace", description: "MediFlow, MeDipacient, OrdiZapis (+ MeDiprep legacy)" },
+      { label: "Přehled aplikací", href: "/aplikace", description: "MediFlow, MeDipacient, OrdiZapis, MeDiprep" },
       { label: "MediFlow", href: "/mediflow", description: "Wellness deník — články, symptomy, suplementy" },
       { label: "Otevřít MediFlow", href: "/app/mediflow", description: "Osobní longevity deník" },
       { label: "MeDipacient", href: "/medipacient", description: "Lékařské zprávy v telefonu i offline" },
       { label: "Otevřít MeDipacient", href: "/app/pacient", description: "Dashboard se zkušebními zprávami" },
       { label: "OrdiZapis", href: "/lekari/dokumentace", description: "AI zápisy pro ověřené lékaře" },
       { label: "Otevřít OrdiZapis", href: "/app/dokumentace", description: "Nahrávat v mobilu" },
-      { label: "MeDiprep (legacy)", href: "/mediprep", description: "Příprava na přijímačky LF — sekundární" },
+      { label: "MeDiprep", href: "/mediprep", description: "Příprava na přijímačky LF" },
       { label: "Otevřít MeDiprep", href: "/app/priprava", description: "Testy B/C/F, simulace fakult" },
       { label: "Můj dashboard", href: "/dashboard", description: "Všechny aplikace a ukázková data" },
     ],
@@ -94,7 +94,6 @@ const menuCs: NavItem[] = [
       { label: "Zkoušky", href: "/studenti/zkousky", description: "Orientace ke zkouškám LF" },
       { label: "Léky", href: "/studenti/leky", description: "SÚKL — ne kurz farmakologie" },
       { label: "Lékařské fakulty", href: "/studium/univerzity", description: "8 českých LF" },
-      { label: "MedScope Academy", href: "/academy", description: "Vzdělávání a CME" },
     ],
   },
   {
@@ -122,7 +121,7 @@ const menuCs: NavItem[] = [
     label: "Pro lékaře",
     href: "/lekari",
     children: [
-      { label: "Přehled pro lékaře", href: "/lekari", description: "Guidelines, CME, Research Hub" },
+      { label: "Přehled pro lékaře", href: "/lekari", description: "OrdiZapis a doporučení s DOI" },
       {
         label: "CME revmatologie",
         href: "/academy/lekari",
@@ -142,7 +141,7 @@ const menuCs: NavItem[] = [
       { label: "Guidelines", href: "/lekari/guidelines", description: "Klinická doporučení" },
       { label: "Přehledy", href: "/lekari/prehledy", description: "Medicínské briefy" },
       { label: "Studie", href: "/lekari/studie", description: "RCT, meta-analýzy" },
-      { label: "Research Hub", href: "/lekari/research-hub", description: "AI analýza studií" },
+      { label: "Doporučení s DOI", href: "/lekari/guidelines", description: "ESC hypertenze, ACS, fibrilace — mimo revmatologii" },
       { label: "AI asistent", href: "/lekari/ai-asistent", description: "Klinický AI" },
       { label: "Odborná sekce (ČLK)", href: "/odborna", description: "Ověřený obsah pro lékaře" },
       { label: "Léky", href: "/leky", description: "SÚKL, EMA, schválené přípravky" },
@@ -248,7 +247,7 @@ const menuCs: NavItem[] = [
       { label: "Veřejnost", href: "/predplatne#public", description: "Články, prevence, MeDipacient" },
       { label: "Student LF", href: "/predplatne#student", description: "1 test zdarma · 89 Kč, další měsíc 149 Kč" },
       { label: "OrdiZapis", href: "/predplatne#dokumentace", description: "AI zápisy pro ordinaci" },
-      { label: "Lékař v praxi", href: "/predplatne#physician", description: "CME a Research Hub" },
+      { label: "Lékař v praxi", href: "/predplatne#physician", description: "OrdiZapis a doporučení s DOI" },
     ],
   },
 ];
@@ -258,14 +257,14 @@ const menuEn: NavItem[] = [
     label: "Apps",
     href: "/aplikace",
     children: [
-      { label: "All apps", href: "/aplikace", description: "MediFlow, MeDipacient, OrdiZapis (+ MeDiprep legacy)" },
+      { label: "All apps", href: "/aplikace", description: "MediFlow, MeDipacient, OrdiZapis, MeDiprep" },
       { label: "MediFlow", href: "/mediflow", description: "Personal wellness journal" },
       { label: "Open MediFlow", href: "/app/mediflow", description: "Track symptoms and saved articles" },
       { label: "MeDipacient", href: "/medipacient", description: "Medical reports on your phone" },
       { label: "Open MeDipacient", href: "/app/pacient", description: "Dashboard with sample reports" },
       { label: "OrdiZapis", href: "/lekari/dokumentace", description: "AI notes for verified physicians" },
       { label: "Open OrdiZapis", href: "/app/dokumentace", description: "Record on mobile" },
-      { label: "MeDiprep (legacy)", href: "/mediprep", description: "CZ medical-school admissions prep — secondary" },
+      { label: "MeDiprep", href: "/mediprep", description: "CZ medical-school admissions prep" },
       { label: "Open MeDiprep", href: "/app/priprava", description: "B/C/F tests and faculty mocks" },
       { label: "My dashboard", href: "/dashboard", description: "All apps and sample data" },
     ],
@@ -396,7 +395,10 @@ function withoutCzechSchoolTrack(items: NavItem[]): NavItem[] {
 
 export function getMainMenu(locale: LocaleCode): NavItem[] {
   const tree = locale === "cs" ? menuCs : withoutCzechSchoolTrack(menuCs);
-  return localizeNavTree(tree, locale);
+  return localizeNavTree(
+    tree.filter((item) => item.href !== "/academy"),
+    locale
+  );
 }
 
 function magazineNav(): NavItem {
@@ -430,6 +432,7 @@ function firmyNav(): NavItem {
       { label: "Kampaně", href: "/firmy/kampane", description: "Segmentace magazín / veřejnost" },
       { label: "Kosmetické značky", href: "/firmy/kosmetika", description: "Prémiová dermokosmetika ve veřejné rubrice" },
       { label: "Poptávka", href: "/inzerce/formular", description: "Nabídka do 2 pracovních dnů" },
+      { label: "Tržiště výrobců", href: "/exchange", description: "Česko a EU — CE / IVDR, ne magazín" },
     ],
   };
 }
@@ -484,7 +487,7 @@ export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
     { label: "OrdiZapis", href: "/lekari/dokumentace", description: "AI zápisy pro lékaře" },
     { label: "Otevřít OrdiZapis", href: "/app/dokumentace", description: "Nahrávání v mobilu" },
     ...(locale === "cs"
-      ? [{ label: "MeDiprep (legacy)", href: "/mediprep", description: "Přijímačky LF — sekundární" }]
+      ? [{ label: "MeDiprep", href: "/mediprep", description: "Přijímačky LF" }]
       : []),
     { label: "Můj dashboard", href: "/dashboard", description: "Zprávy, deník a zápisy" },
   ];

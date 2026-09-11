@@ -57,12 +57,12 @@ const ROOMS: Room[] = [
     },
   },
   {
-    href: "/lekari/research-hub",
+    href: "/lekari/guidelines",
     image: PHOTO.decide,
-    title: { cs: "Research Hub", en: "Research Hub" },
+    title: { cs: "Doporučení s DOI", en: "Guidelines with DOI" },
     body: {
-      cs: "PubMed a AI analýza — ověřitelný identifikátor.",
-      en: "PubMed and AI analysis — a verifiable identifier.",
+      cs: "ESC hypertenze, ACS a fibrilace síní — primární text, ne AI hub.",
+      en: "ESC hypertension, ACS and AF — primary text, not an AI hub.",
     },
   },
   {

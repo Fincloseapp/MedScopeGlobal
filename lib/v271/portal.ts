@@ -22,7 +22,7 @@ export function getPortalPhilosophy(locale?: LocaleCode | string) {
 }
 
 export const PORTAL_SEARCH_TABS = [
-  { id: "search", label: "Hledat", action: "/search", queryParam: "q" },
+  { id: "search", label: "Hledat", action: "/hledat", queryParam: "q" },
   { id: "ai", label: "AI asistent", action: "/ai-asistent/verejnost", queryParam: null },
 ] as const;
 
@@ -64,15 +64,13 @@ export const PORTAL_SERVICES = [
     href: "/app/dokumentace",
     image: "/assets/ordizapis/icon-192.png",
   },
-  // hint soft while ACADEMY_COURSES_CATALOG_PROMO is false — restore "kurzy" when re-enabled
-  { id: "academy", label: "Academy", hint: "vzdělávání", href: "/academy", icon: "book" },
   { id: "ai", label: "AI", hint: "zeptat se", href: "/ai-asistent/verejnost", icon: "spark" },
   { id: "trial", label: "Redakce", hint: "od 25 Kč", href: "/predplatne#public", icon: "gift" },
   { id: "leky", label: "Léky", hint: "SÚKL", href: "/leky", icon: "pill" },
   {
     id: "mediprep",
     label: "MeDiprep",
-    hint: "legacy",
+    hint: "přijímačky",
     href: "/app/priprava",
     image: "/assets/mediprep/icon-192.png",
   },
@@ -113,7 +111,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     ai: "zeptat se",
     trial: "od 25 Kč",
     leky: "SÚKL",
-    mediprep: "legacy",
+    mediprep: "přijímačky",
   },
   en: {
     articles: MAGAZINE.name,
@@ -125,7 +123,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     ai: "ask AI",
     trial: "from 25 CZK",
     leky: "SÚKL",
-    mediprep: "legacy",
+    mediprep: "přijímačky",
   },
   de: {
     articles: MAGAZINE.name,
@@ -137,7 +135,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     ai: "fragen",
     trial: "ab 1 €",
     leky: "SÚKL",
-    mediprep: "Legacy",
+    mediprep: "Aufnahme",
   },
   fr: {
     articles: MAGAZINE.name,
@@ -149,7 +147,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     ai: "demander",
     trial: "dès 1 €",
     leky: "SÚKL",
-    mediprep: "legacy",
+    mediprep: "přijímačky",
   },
   it: {
     articles: MAGAZINE.name,
@@ -161,7 +159,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     ai: "chiedi",
     trial: "da 1 €",
     leky: "SÚKL",
-    mediprep: "legacy",
+    mediprep: "přijímačky",
   },
   es: {
     articles: MAGAZINE.name,
@@ -173,7 +171,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     ai: "preguntar",
     trial: "desde 1 €",
     leky: "SÚKL",
-    mediprep: "legacy",
+    mediprep: "přijímačky",
   },
   "pt-BR": {
     articles: MAGAZINE.name,
@@ -185,7 +183,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     ai: "perguntar",
     trial: "a partir de 1 €",
     leky: "SÚKL",
-    mediprep: "legado",
+    mediprep: "vestibular"
   },
 };
 

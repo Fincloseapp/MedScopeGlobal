@@ -230,7 +230,7 @@ export function V271B2bBlock({ locale = "cs" }: { locale?: string }) {
       <div className="rounded-3xl border border-[#005B96]/15 bg-[#005B96]/5 px-6 py-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">B2B</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">Inzerce</p>
             <h3 className="mt-1 font-display text-xl font-semibold text-[#021d33]">{surface.b2bTitle}</h3>
             <p className="mt-2 text-sm text-slate-600">{surface.b2bDescription}</p>
           </div>
@@ -519,7 +519,6 @@ export async function V272HomepageSections() {
       <V272AppsTrioBlock />
       <V272WhyTrustBlock />
       <V271AudienceSections />
-      <V272AcademyCtaBlock />
       <V271B2bBlock />
       <V272AktualniBlock />
       <V272SubscriptionPlansBlock />

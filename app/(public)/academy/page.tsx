@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ArrowRight, BookOpen, Brain, Trophy, Unlock, Video } from "lucide-react";
 import { AccreditedCmeOverview } from "@/components/academy/b2b/accredited-cme-overview";
 import { AcademyPageHeader } from "@/components/academy/page-header";
@@ -11,6 +12,9 @@ export const revalidate = 120;
 
 export default async function AcademyHubPage() {
   const promo = isAcademyCoursesCatalogPromoEnabled();
+  if (!promo) {
+    redirect("/studenti");
+  }
   const [courses, prepCourses, prepTotal] = promo
     ? await Promise.all([
         listPublishedCourses(6),

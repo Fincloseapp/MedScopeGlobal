@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { HomepageAds } from "@/components/home/homepage-ads";
-import { V272AcademyHomeSections } from "@/components/v271/academy-home-sections";
 import {
   V271B2bBlock,
   V272WhyTrustBlock,
@@ -126,7 +125,6 @@ export default async function HomePage() {
       {!isVip ? <HomepageAffiliateShelf locale={locale} /> : null}
       <HomepageAds topAds={topAds} midAds={midAds} bottomAds={bottomAds} />
       <V272WhyTrustBlock locale={locale} />
-      {isCzechSurface(locale) ? <V272AcademyHomeSections /> : null}
       <V271B2bBlock locale={locale} />
 
       <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6">

@@ -85,7 +85,7 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       {
         label: "Přípravné kurzy",
         href: "/app/priprava",
-        description: "MeDiprep — testy B/C/F (Academy katalog připravujeme)",
+        description: "MeDiprep — testy B/C/F podle požadavků českých LF",
       },
       {
         label: "Kvízy a studijní hry",
@@ -187,7 +187,7 @@ export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
       { label: "Guidelines", href: "/lekari/guidelines", description: "Klinická doporučení pro praxi" },
       { label: "Přehledy", href: "/lekari/prehledy", description: "Strukturované medicínské briefy" },
       { label: "Studie", href: "/lekari/studie", description: "RCT a meta-analýzy s DOI/PMID" },
-      { label: "Research Hub", href: "/lekari/research-hub", description: "PubMed a AI analýza výzkumu" },
+      { label: "Doporučení s DOI", href: "/lekari/guidelines", description: "ESC hypertenze, ACS a fibrilace síní" },
       { label: "AI asistent", href: "/lekari/ai-asistent", description: "Klinický AI pro praxi" },
       { label: "Odborná sekce (ČLK)", href: "/odborna", description: "Ověření evidenčním číslem ČLK" },
       { label: "Léky", href: "/leky", description: "SÚKL databáze a novinky" },
@@ -226,17 +226,17 @@ export const V271_LEKARI_PAGES: Record<string, V271HubPage> = {
     links: [
       { label: "Studie — přehled", href: "/studie" },
       { label: "PubMed", href: "/odborne/pubmed" },
-      { label: "Research Hub", href: "/lekari/research-hub" },
+      { label: "Doporučení s DOI", href: "/lekari/guidelines" },
     ],
   },
   "research-hub": {
     slug: "research-hub",
-    title: "Research Hub",
-    description: "AI analýza studií, PubMed a výzkumné přehledy.",
+    title: "Doporučení s DOI",
+    description: "ESC hypertenze, ACS a fibrilace síní — primární text mimo revmatologii.",
     links: [
-      { label: "Studie AI", href: "/studie/ai" },
-      { label: "AI Medical výzkum", href: "/ai-medical/research" },
-      { label: "Evidence", href: "/odborne/evidence" },
+      { label: "Guidelines", href: "/lekari/guidelines" },
+      { label: "Studie", href: "/studie" },
+      { label: "OrdiZapis", href: "/lekari/dokumentace" },
     ],
   },
   "ai-asistent": {

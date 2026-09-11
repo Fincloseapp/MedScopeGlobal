@@ -92,12 +92,6 @@ export default async function HledatPage({
           <p className="text-sm text-muted-foreground">{copy.empty(query)}</p>
         )}
 
-        {query.length >= 2 ? (
-          <div className="mb-8">
-            <ListingAffiliateBox locale={locale as GlobalLocaleCode} topic={query} />
-          </div>
-        ) : null}
-
         {results.map((article) => (
           <Link
             key={article.slug}
@@ -123,6 +117,12 @@ export default async function HledatPage({
             )}
           </Link>
         ))}
+
+        {query.length >= 2 && results.length > 0 ? (
+          <div className="pt-4">
+            <ListingAffiliateBox locale={locale as GlobalLocaleCode} topic={query} />
+          </div>
+        ) : null}
       </div>
     </div>
   );

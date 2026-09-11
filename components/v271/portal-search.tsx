@@ -23,7 +23,7 @@ export function PortalSearch({ copy }: { copy: SurfaceCopy }) {
       router.push("/ai-asistent/verejnost");
       return;
     }
-    router.push(query ? `/search?q=${encodeURIComponent(query)}` : "/search");
+    router.push(query ? `/hledat?q=${encodeURIComponent(query)}` : "/hledat");
   }
 
   return (

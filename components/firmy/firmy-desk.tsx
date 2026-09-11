@@ -72,6 +72,23 @@ export async function FirmyDesk({ slug }: { slug?: FirmyRoomId }) {
 
       <V271B2BPricingTable compact locale={locale} />
 
+      <section className="mt-10 rounded-2xl border border-[#021d33] bg-[#021d33] px-5 py-6 text-white">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e8d5a3]">
+          Výrobci · laboratoře
+        </p>
+        <h2 className="mt-2 font-display text-2xl font-semibold">Tržiště není inzerce v magazínu</h2>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-white/80">
+          Poptávky z Česka a EU, CE / IVDR / ISO. Čtenářská reklama zůstává výše — tržiště výrobců
+          je samostatná stránka.
+        </p>
+        <Link
+          href={localizePublicHref("/exchange", locale)}
+          className="mt-4 inline-flex rounded-full bg-[#c4a35a] px-5 py-2.5 text-sm font-semibold text-[#021d33] hover:bg-[#e8d5a3]"
+        >
+          Otevřít tržiště
+        </Link>
+      </section>
+
       <section className="mt-10">
         <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
           {desk.roomsKicker}

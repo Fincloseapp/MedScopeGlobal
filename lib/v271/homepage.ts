@@ -77,9 +77,9 @@ export const V271_WHY_TRUST = [
       "Veřejnost, lékaři a studenti mají vlastní sekce — magazín a wellness jsou v popředí, příprava na LF zůstává dostupná v sekci Studenti.",
   },
   {
-    title: "Academy s certifikáty",
+    title: "MeDiprep na přijímačky",
     description:
-      "Interaktivní kurzy, kvízy a gamifikace pro studenty i CME obsah pro praktiky — ne krátké placeholder lekce.",
+      "Testy biologie, chemie a fyziky podle požadavků českých LF. 1 test zdarma.",
   },
   {
     title: "14 dní na vyzkoušení",
@@ -103,18 +103,18 @@ export const V271_AUDIENCES = [
     id: "physician",
     label: "Lékaři",
     description:
-      "OrdiZapis napíše zápis z diktátu v telefonu. K tomu guidelines, studie a Research Hub.",
-    topics: ["guidelines", "OrdiZapis", "CME", "studie", "Research Hub"],
+      "OrdiZapis napíše zápis z diktátu v telefonu. K tomu doporučení s DOI — mimo revmatologii.",
+    topics: ["OrdiZapis", "guidelines", "DOI", "studie"],
     href: "/lekari",
     ctaPrimary: { label: "Stáhnout OrdiZapis", href: "/app/dokumentace" },
     ctaSecondary: { label: "Více o OrdiZapisu", href: "/lekari/dokumentace" },
   },
   {
     id: "student",
-    label: "Studenti (legacy)",
+    label: "Studenti",
     description:
-      "MeDiprep a Academy pro přípravu na LF — sekundární nabídka, primárně pro uchazeče o medicínu v ČR.",
-    topics: ["MeDiprep", "Academy", "přijímačky", "AI tutor"],
+      "MeDiprep: mezery, testy B/C/F a simulace českých LF. Jedna mapa od požadavků fakult k dennímu kvízu.",
+    topics: ["MeDiprep", "přijímačky", "kvízy", "fakulty"],
     href: "/studenti",
     ctaPrimary: { label: "MeDiprep", href: "/app/priprava" },
     ctaSecondary: { label: "Chci studovat medicínu", href: "/studenti/chci-studovat" },
@@ -133,11 +133,11 @@ export const V271_DOKUMENTACE_APP = {
 } as const;
 
 export const V271_B2B = {
-  title: "Pro firmy a instituce",
+  title: "Inzerce na ViaLongeVita",
   description:
-    "Pharma, kliniky, laboratoře a univerzity — cílená reklama, odborné kampaně a partnerství s měřitelným dopadem.",
+    "Bannery a sponzorované články v magazínu. Lékařská zóna bez reklam. Tržiště výrobců je na /exchange.",
   href: "/firmy",
-  cta: "B2B nabídka",
+  cta: "Ceník inzerce",
 } as const;
 
 export const V271_AKTUALNI = {
@@ -165,7 +165,7 @@ export const V271_FOOTER_TRUST = {
     { label: "Veřejnost — ViaLongeVita a MediFlow", href: "/verejnost" },
     { label: "VIP longevity protokoly", href: "/vip/protokoly" },
     { label: "Lékaři — OrdiZapis a guidelines", href: "/lekari/dokumentace" },
-    { label: "Studenti — MeDiprep a Academy", href: "/studenti" },
+    { label: "Studenti — MeDiprep", href: "/studenti" },
   ],
   proof: [
     { label: "Články ViaLongeVita", href: "/articles" },

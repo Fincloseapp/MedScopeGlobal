@@ -3,6 +3,7 @@ import { createServiceRoleClient } from "@/lib/supabase/service";
 import { extractWithAi, placeholderImageUrl, slugifyV4c } from "@/lib/v4c/ai-extract";
 import { CZ_UNIVERSITIES, LEGISLATION_SOURCES } from "@/lib/v4c/sources";
 import { V22_DIGITAL_HEALTH_SOURCES } from "@/lib/v22/digital-health/sources";
+import { isJunkPublicCopy } from "@/lib/editorial/listing-junk";
 
 export async function runV4cDailyIngest() {
   const admin = createServiceRoleClient();
@@ -131,19 +132,22 @@ export async function runV4cDailyIngest() {
   }
   results.digital_health = dhAdded;
 
-  // University news
+  // University news — skip template titles ("1. LF UK — výzkumná novinka")
   let uniAdded = 0;
   for (const uni of CZ_UNIVERSITIES.slice(0, 4)) {
-    const title = `${uni.name} — výzkumná novinka`;
-    const slug = slugifyV4c(`${uni.name}-${title}`);
     const ai = await extractWithAi("novinky", {
-      title,
-      raw: uni.url,
+      title: `Novinka z ${uni.name}`,
+      raw: `Stáhni konkrétní výzkumnou zprávu z ${uni.url}. Název musí popisovat výsledek studie, ne šablonu „výzkumná novinka“.`,
       sourceUrl: uni.url,
       sourceName: uni.name,
     });
+    const title = String((ai.title as string) ?? "").trim();
+    if (!title || /výzkumná novinka/i.test(title) || title === uni.name) {
+      continue;
+    }
+    const slug = slugifyV4c(`${uni.name}-${title}`);
     const { error } = await admin.from("university_news").insert({
-      title: (ai.title as string) ?? title,
+      title,
       slug,
       tag: "univerzity",
       region: "cz",
@@ -195,6 +199,7 @@ async function refreshHomepageCurated(admin: ReturnType<typeof createServiceRole
 
     for (const row of data ?? []) {
       const r = row as { id: string; title: string; summary?: string; image_url?: string; slug?: string };
+      if (isJunkPublicCopy(r.title, r.summary)) continue;
       const href =
         pick.table === "studies"
           ? `${pick.hrefPrefix}/${r.slug ?? r.id}`

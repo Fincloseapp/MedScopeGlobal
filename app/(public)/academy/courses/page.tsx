@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AcademyPageHeader } from "@/components/academy/page-header";
-import { AcademyCoursesSoftLanding } from "@/components/academy/courses-soft-landing";
+import { redirect } from "next/navigation";
 import { CourseCard } from "@/components/academy/course-card";
 import { FreePreviewBanner } from "@/components/academy/free-preview-banner";
 import { PrijimackyPrepHub } from "@/components/prijimacky/prep-hub";
@@ -23,13 +23,9 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
   if (!isAcademyCoursesCatalogPromoEnabled()) {
     return await buildLocalizedV20PageMetadata({
-      title: isPrep
-        ? "Příprava na přijímačky — MedScope Academy"
-        : "Kurzy — MedScope Academy",
-      description: isPrep
-        ? "Připravujeme kvalitnější přípravnou cestu pro uchazeče o LF."
-        : "Připravujeme vzdělávací katalog MedScope Academy.",
-      path: isPrep ? "/academy/courses?category=prijimacky" : "/academy/courses",
+      title: "Příprava na medicínu — MeDiprep",
+      description: "Testy B/C/F a mapa k přijímačkám na české lékařské fakulty.",
+      path: "/studenti",
     });
   }
 
@@ -58,7 +54,7 @@ export default async function AcademyCoursesPage({ searchParams }: Props) {
 
   // Soft gate: hide weak catalog until quality is ready (lib/academy/public-catalog.ts).
   if (!isAcademyCoursesCatalogPromoEnabled()) {
-    return <AcademyCoursesSoftLanding variant={isPrep ? "prep" : "catalog"} />;
+    redirect(isPrep ? "/studenti" : "/studenti");
   }
 
   const courses = await listPublishedCourses(100, {

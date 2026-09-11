@@ -138,7 +138,7 @@ export const MEDIFLOW: AppProduct = {
   },
 };
 
-/** Homepage / hub order — magazine-first ecosystem; MeDiprep legacy last */
+/** Homepage / hub order — magazine-first; MeDiprep last for Czech admissions */
 export const APP_PRODUCTS: AppProduct[] = [MEDIFLOW, MEDIPACIENT, ORDIZAPIS_APP, MEDIPREP];
 
 export function appById(id: LegacyAppProductId): AppProduct {

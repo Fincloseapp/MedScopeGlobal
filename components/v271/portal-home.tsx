@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import type { DisplayArticle } from "@/lib/queries/articles";
 import { APP_PRODUCTS, type AppProductId } from "@/lib/apps/catalog";
-import { V271_AUDIENCES } from "@/lib/v271/homepage";
 import {
   getPortalChrome,
   getPortalNewsNote,
@@ -18,6 +17,8 @@ import { formatArticleDateLabel } from "@/lib/editorial/freshness";
 import { NewsletterCapture } from "@/components/monetization/newsletter-capture";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { PortalSearch } from "@/components/v271/portal-search";
+import { HomepagePillars } from "@/components/v271/homepage-pillars";
+import { getHomepagePillarsCopy } from "@/lib/i18n/homepage-pillars-copy";
 import { WriterAgentsStrip } from "@/components/editorial/writer-agents-strip";
 import { AppOpenLink, isStandaloneAppHref } from "@/components/apps/app-origin-bar";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
@@ -232,6 +233,7 @@ export function PortalHome({
   const brief = getNewsletterCopy(locale);
   const publicApps = APP_PRODUCTS.filter((app) => isCzechSurface(locale) || app.id !== "mediprep");
   const publicServices = PORTAL_SERVICES.filter((svc) => isCzechSurface(locale) || svc.id !== "mediprep");
+  const pillars = getHomepagePillarsCopy(locale);
   return (
     <div className="border-b border-slate-200 bg-[#e8eef3]">
       <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5">
@@ -256,6 +258,17 @@ export function PortalHome({
               {philosophy.claim}
             </h1>
             <p className="mt-1 max-w-3xl text-sm text-slate-600">{philosophy.subtitle}</p>
+            <nav aria-label={pillars.jumpLabel} className="mt-3 flex flex-wrap gap-1.5">
+              {pillars.pillars.map((pillar) => (
+                <Link
+                  key={`hero-${pillar.id}`}
+                  href={localizePublicHref(pillar.href, locale)}
+                  className="rounded-full border border-slate-200 bg-[#f7fafc] px-3 py-1 text-[11px] font-semibold text-[#021d33] hover:border-[#005B96]/40 hover:bg-[#e8f3fb]"
+                >
+                  {pillar.title}
+                </Link>
+              ))}
+            </nav>
             <div className="mt-4 flex flex-wrap gap-2">
               <Link
                 href={localizePublicHref("/newsletter", locale)}
@@ -278,6 +291,8 @@ export function PortalHome({
             </div>
           </div>
         </div>
+
+        <HomepagePillars locale={locale} />
 
         <nav aria-label={chrome.servicesNav} className="mt-3 rounded-lg border border-slate-200 bg-white px-2 py-3 shadow-sm sm:px-3">
           <ul className="grid grid-cols-5 gap-1 sm:grid-cols-10">
@@ -371,44 +386,23 @@ export function PortalHome({
               </Link>
             </Box>
 
-            <Box title={chrome.forWhom} moreLabel={chrome.more}>
-              <ul className="space-y-2">
-                {(isCzechSurface(locale)
-                  ? V271_AUDIENCES
-                  : V271_AUDIENCES.filter((aud) => aud.id !== "student")
-                ).map((aud) => {
-                  const localized = surface.audiences.find((item) => item.id === aud.id);
-                  const label = localized?.label ?? aud.label;
-                  const description = localized?.description ?? aud.description;
-                  const ctaPrimary = localized?.ctaPrimary ?? aud.ctaPrimary.label;
-                  const ctaSecondary = localized?.ctaSecondary ?? aud.ctaSecondary.label;
-                  return (
-                  <li key={aud.id}>
-                    <Link href={localizePublicHref(aud.href, locale)} className="block rounded-md p-1.5 hover:bg-slate-50">
-                      <span className="text-sm font-semibold text-[#021d33]">{label}</span>
-                      <span className="mt-0.5 block text-xs leading-snug text-slate-500">{description}</span>
-                    </Link>
-                    <div className="mt-1 flex flex-wrap gap-1.5 px-1.5">
-                      {isStandaloneAppHref(aud.ctaPrimary.href) ? (
-                        <AppOpenLink
-                          href={aud.ctaPrimary.href}
-                          className="text-[11px] font-semibold text-[#005B96] hover:underline"
-                        >
-                          {ctaPrimary}
-                        </AppOpenLink>
-                      ) : (
-                        <Link href={localizePublicHref(aud.ctaPrimary.href, locale)} className="text-[11px] font-semibold text-[#005B96] hover:underline">
-                          {ctaPrimary}
-                        </Link>
-                      )}
-                      <span className="text-slate-300">·</span>
-                      <Link href={localizePublicHref(aud.ctaSecondary.href, locale)} className="text-[11px] text-slate-500 hover:underline">
-                        {ctaSecondary}
-                      </Link>
-                    </div>
+            <Box
+              title={chrome.forWhom}
+              href="#pro-koho"
+              moreLabel={chrome.more}
+            >
+              <ul className="space-y-1.5">
+                {pillars.pillars.map((pillar) => (
+                  <li key={pillar.id}>
+                    <a
+                      href={`#pillar-${pillar.id}`}
+                      className="block rounded-md px-1.5 py-1.5 hover:bg-slate-50"
+                    >
+                      <span className="text-sm font-semibold text-[#021d33]">{pillar.title}</span>
+                      <span className="mt-0.5 block text-xs leading-snug text-slate-500">{pillar.eyebrow}</span>
+                    </a>
                   </li>
-                  );
-                })}
+                ))}
               </ul>
             </Box>
           </div>

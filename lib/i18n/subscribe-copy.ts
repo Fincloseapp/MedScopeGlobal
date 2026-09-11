@@ -146,7 +146,7 @@ const COPY: Record<string, SubscribeCopy> = {
     keepReading: "Číst náhled",
     comparisonTitle: "Srovnání tarifů",
     comparisonLead:
-      "Přehled funkcí podle cílové skupiny. Redakce: platba ihned. OrdiZapis a Lékař: 14denní zkušební verze. Student LF: 1 test zdarma, 89 Kč, pak 149 Kč. OrdiZapis (390 Kč) je samostatný nástroj pro zápisy; Lékař v praxi (490 Kč) přidává CME, Research Hub a klinický AI.",
+      "Přehled funkcí podle cílové skupiny. Redakce: platba ihned. OrdiZapis a Lékař: 14denní zkušební verze. Student LF: 1 test zdarma, 89 Kč, pak 149 Kč. OrdiZapis (390 Kč) je samostatný nástroj pro zápisy; Lékař v praxi (490 Kč) přidává doporučení s DOI, CME revmatologii a klinický AI.",
     featureCol: "Funkce",
     included: "Zahrnuto",
     notIncluded: "Nezahrnuto",
@@ -232,10 +232,10 @@ const COPY: Record<string, SubscribeCopy> = {
         name: "Lékař v praxi",
         features: [
           "Vše z OrdiZapisu (AI zápisy) v ceně",
-          "Odborná sekce, guidelines a Research Hub",
-          "CME přehledy a souhrny studií",
+          "Odborná sekce a doporučení s DOI (ESC mimo revmatologii)",
+          "CME přehledy — jen akreditovaná revmatologie",
           "Klinický AI asistent",
-          "Navíc oproti OrdiZapis 390 Kč: CME + Research Hub + prioritní notifikace",
+          "Navíc oproti OrdiZapis 390 Kč: DOI guidelines + CME revmatologie + notifikace",
         ],
       },
     },
@@ -250,8 +250,8 @@ const COPY: Record<string, SubscribeCopy> = {
       "CME přehledy a souhrny studií",
       "Klinický AI asistent",
       "OrdiZapis (AI zápisy) — i standalone za 390 Kč",
-      "Research Hub a diagnostické algoritmy",
-      "MedScope Academy (základní kurzy)",
+      "Doporučení s DOI (ESC mimo revmatologii)",
+      "MeDiprep — testy B/C/F",
       "Prioritní notifikace novinek",
     ],
     audienceByApp: {

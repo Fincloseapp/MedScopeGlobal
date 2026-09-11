@@ -6,8 +6,6 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import type { LocaleCode } from "@/lib/i18n/config";
-import { createClient } from "@/lib/supabase/client";
-import { mergedArticleSearch } from "@/utils/merged-article-search";
 import { sanitizeSearchInput } from "@/utils/search";
 import { formatPublicDate } from "@/lib/i18n/format-date";
 
@@ -50,17 +48,17 @@ export function SearchClient({
           return;
         }
         setLoading(true);
-        const supabase = createClient();
-        const rows = await mergedArticleSearch(
-          supabase,
-          t,
-          48,
-          isVip,
-          accessLevel,
-          locale
-        );
-        setLoading(false);
-        setResults(rows);
+        try {
+          const res = await fetch(
+            `/api/search?q=${encodeURIComponent(t)}&locale=${encodeURIComponent(locale)}`
+          );
+          const json = (await res.json()) as { results?: typeof results };
+          setResults(json.results ?? []);
+        } catch {
+          setResults([]);
+        } finally {
+          setLoading(false);
+        }
       })();
     }, 220);
     return () => clearTimeout(id);

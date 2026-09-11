@@ -255,6 +255,7 @@ import { buildSpdString } from "../../lib/billing/spd-qr";
 import { briefChrome } from "../../lib/monetization/brief-marketing";
 import { translateNavHref } from "../../lib/i18n/nav-copy";
 import { getDesktopHeaderMenu } from "../../lib/config/main-navigation";
+import { foldSearchText, queryMatchesHaystack } from "../../lib/search/fold";
 import { menuAccountLinks } from "../../lib/i18n/menu-account";
 import {
   FOREIGN_WRITER_ROTATION,
@@ -2036,6 +2037,47 @@ assert.ok(
       "getMagazineSearchCopy"
     ),
   "archive and search chrome must follow the edition language"
+);
+assert.ok(
+  !readFileSync(join(root, "lib/v271/homepage.ts"), "utf8").includes("Studenti (legacy)") &&
+    !readFileSync(join(root, "lib/i18n/surface-copy.ts"), "utf8").includes("Students (legacy)"),
+  "MeDiprep must not be labeled legacy on the homepage"
+);
+assert.ok(
+  !readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("V272AcademyHomeSections"),
+  "homepage must not mount Academy until a catalog exists"
+);
+assert.ok(
+  readFileSync(join(root, "utils/merged-article-search.ts"), "utf8").includes(
+    "nativeDeskArticlesForLocale"
+  ),
+  "magazine search must index native desk articles (GLP-1, spánek, pohyb)"
+);
+assert.ok(
+  readFileSync(join(root, "lib/editorial/listing-junk.ts"), "utf8").includes("výzkumná novinka"),
+  "university template titles must be junk-filtered"
+);
+assert.ok(
+  readFileSync(join(root, "lib/lekari/curated-guidelines.ts"), "utf8").includes(
+    "10.1093/eurheartj/ehae178"
+  ),
+  "physician desk must show a real ESC hypertension DOI"
+);
+assert.ok(
+  readFileSync(join(root, "app/(public)/exchange/page.tsx"), "utf8").includes("Česko a Slovensko") ||
+    readFileSync(join(root, "lib/b2b/exchange-listings.ts"), "utf8").includes("Česko + EU"),
+  "manufacturer exchange must be Czech/EU listings, not Asia-Pacific demo"
+);
+assert.ok(
+  foldSearchText("spánek").includes("spanek") && queryMatchesHaystack("spánek", "Spánek a obnova"),
+  "search fold must match diacritic queries against desk sleep copy"
+);
+assert.ok(
+  readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8").includes("HomepagePillars") &&
+    readFileSync(join(root, "lib/i18n/homepage-pillars-copy.ts"), "utf8").includes('id: "marketplace"') &&
+    readFileSync(join(root, "lib/i18n/homepage-pillars-copy.ts"), "utf8").includes('id: "students"') &&
+    readFileSync(join(root, "lib/i18n/homepage-pillars-copy.ts"), "utf8").includes('id: "physicians"'),
+  "homepage must map ViaLongeVita, marketplace, students and physicians as four doors"
 );
 assert.ok(
   readFileSync(join(root, "app/feed/[locale]/route.ts"), "utf8").includes(
