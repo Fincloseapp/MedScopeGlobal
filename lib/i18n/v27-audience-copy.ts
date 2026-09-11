@@ -113,7 +113,7 @@ const PHYSICIAN: Record<ChromePack, HubOverlay> = {
     ctaPrimary: "Area professionale",
     ctaSecondary: "Documentazione",
     enter: "Entra",
-    topics: ["OrdiZapis", "linee guida", "DOI", "studi"],
+    topics: ["OrdiZapis", "linee guida", "DOI", "ECM"],
   },
   es: {
     label: "Para médicos",

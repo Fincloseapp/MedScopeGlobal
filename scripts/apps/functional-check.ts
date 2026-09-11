@@ -2096,8 +2096,12 @@ assert.ok(
   "physician nav chips must not advertise Research Hub"
 );
 assert.ok(
-  readFileSync(join(root, "components/firmy/firmy-desk.tsx"), "utf8").indexOf("Otevřít tržiště") <
-    readFileSync(join(root, "components/firmy/firmy-desk.tsx"), "utf8").indexOf("V271B2BPricingTable"),
+  readFileSync(join(root, "components/firmy/firmy-desk.tsx"), "utf8").indexOf(
+    "Tržiště není inzerce v magazínu"
+  ) <
+    readFileSync(join(root, "components/firmy/firmy-desk.tsx"), "utf8").indexOf(
+      "<V271B2BPricingTable"
+    ),
   "firmy desk must show the manufacturer exchange before the magazine rate card"
 );
 assert.ok(
