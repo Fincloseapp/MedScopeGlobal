@@ -7,6 +7,7 @@ Production remains **Cloudflare Workers (OpenNext)** on `medscopeglobal.com`. Do
 1. Apply SQL in order (see `docs/deploy/POST_MERGE_CHECKLIST.md` §2):
    - `supabase/migrations/20260910120000_b2b_exchange.sql`
    - `supabase/migrations/20260911120000_b2b_exchange_subscriptions.sql`
+   - `supabase/migrations/20260911130000_b2b_exchange_demo_seed.sql` (sample catalog; `ON CONFLICT DO NOTHING`)
    - Cloud agent / operator without a local Management API token: `pnpm db:edge-apply-exchange` then `curl http://127.0.0.1:8788/` (uses production Worker `SUPABASE_ACCESS_TOKEN`).
    - After Worker deploy: `POST /api/cron/apply-exchange-migrations` with `Authorization: Bearer CRON_SECRET` or a Cloudflare API token (user **or** account-owned). Uses Worker `SUPABASE_ACCESS_TOKEN`.
 2. Merge to `main` → Workers Builds / `pnpm cf:deploy`.

@@ -247,6 +247,9 @@ assert.ok(sql.includes("exchange_contacts"));
 const subSql = readFileSync(join(root, "supabase/migrations/20260911120000_b2b_exchange_subscriptions.sql"), "utf8");
 assert.ok(subSql.includes("exchange_inquiry_replies"));
 assert.ok(subSql.includes("subscription-only"));
+const seedSql = readFileSync(join(root, "supabase/migrations/20260911130000_b2b_exchange_demo_seed.sql"), "utf8");
+assert.ok(seedSql.includes("nordic-diagnostics"));
+assert.ok(seedSql.includes("ce-poc-immunoassay-analyzer"));
 
 const embedded = readFileSync(join(root, "lib/exchange/embedded-migrations.ts"), "utf8");
 assert.ok(embedded.includes("exchange_listings"));

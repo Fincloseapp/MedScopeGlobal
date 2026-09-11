@@ -7,6 +7,7 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const files = [
   "supabase/migrations/20260910120000_b2b_exchange.sql",
   "supabase/migrations/20260911120000_b2b_exchange_subscriptions.sql",
+  "supabase/migrations/20260911130000_b2b_exchange_demo_seed.sql",
 ];
 const parts = files.map((rel) => ({
   name: path.basename(rel),
