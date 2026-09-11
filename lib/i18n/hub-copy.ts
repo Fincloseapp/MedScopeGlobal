@@ -37,7 +37,7 @@ const EN: HubPack = {
     "/studenti/testy": {
       title: "Tests and practice",
       description:
-        "Admissions self-test, Academy quizzes and study games — with instant feedback. Not an official faculty exam.",
+        "Admissions self-test, MeDiprep quizzes and study games — with instant feedback. Not an official faculty exam.",
       ctaLabel: "Start the self-test",
     },
     "/studenti/chci-studovat": {
@@ -72,8 +72,8 @@ const EN: HubPack = {
       description: "RCTs, meta-analyses and Czech summaries with clinical impact.",
     },
     "/lekari/research-hub": {
-      title: "Research Hub",
-      description: "AI study analysis, PubMed and research briefs.",
+      title: "DOI guidelines",
+      description: "ESC hypertension, ACS and atrial fibrillation — primary text, not an AI hub.",
     },
     "/lekari/ai-asistent": {
       title: "AI assistant for physicians",
@@ -120,7 +120,7 @@ const DE: HubPack = {
     "/studenti/testy": {
       title: "Tests und Übung",
       description:
-        "Selbsttest zur Aufnahme, Academy-Quiz und Lernspiele — mit sofortigem Feedback. Keine offizielle Fakultätsprüfung.",
+        "Selbsttest zur Aufnahme, MeDiprep-Quiz und Lernspiele — mit sofortigem Feedback. Keine offizielle Fakultätsprüfung.",
       ctaLabel: "Selbsttest starten",
     },
     "/studenti/chci-studovat": {
@@ -155,8 +155,8 @@ const DE: HubPack = {
       description: "RCTs, Metaanalysen und tschechische Kurzfassungen mit klinischem Nutzen.",
     },
     "/lekari/research-hub": {
-      title: "Research Hub",
-      description: "KI-Studienanalyse, PubMed und Forschungsüberblicke.",
+      title: "DOI-Leitlinien",
+      description: "ESC Hypertonie, ACS und Vorhofflimmern — Primärtext, kein KI-Hub.",
     },
     "/lekari/ai-asistent": {
       title: "KI-Assistent für Ärztinnen und Ärzte",
@@ -203,7 +203,7 @@ const FR: HubPack = {
     "/studenti/testy": {
       title: "Tests et entraînement",
       description:
-        "Auto-test d’admission, quiz Academy et jeux d’étude — avec retour immédiat. Pas un examen officiel de faculté.",
+        "Auto-test d’admission, quiz MeDiprep et jeux d’étude — avec retour immédiat. Pas un examen officiel de faculté.",
       ctaLabel: "Lancer l’auto-test",
     },
     "/studenti/chci-studovat": {
@@ -238,8 +238,8 @@ const FR: HubPack = {
       description: "ECR, méta-analyses et synthèses tchèques avec impact clinique.",
     },
     "/lekari/research-hub": {
-      title: "Research Hub",
-      description: "Analyse IA des études, PubMed et brèves de recherche.",
+      title: "Recommandations DOI",
+      description: "ESC hypertension, SCA et fibrillation auriculaire — texte primaire, pas un hub IA.",
     },
     "/lekari/ai-asistent": {
       title: "Assistant IA pour médecins",

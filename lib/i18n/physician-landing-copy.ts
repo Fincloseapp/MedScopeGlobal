@@ -69,7 +69,7 @@ const PACK: Record<ChromePack, PackCopy> = {
       { href: "/leky", label: "Arzneimittel", desc: "Zulassung, EMA und Wechselwirkungen" },
       { href: "/legislativa", label: "Rechtlicher Rahmen", desc: "Gesundheitsrecht in der EU" },
       { href: "/ai-medical/doctor", label: "Klinische KI", desc: "Assistent für Ärztinnen und Ärzte" },
-      { href: "/studie/ai", label: "Research Hub", desc: "KI-Analyse von Studien und PubMed" },
+      { href: "/lekari/guidelines", label: "DOI-Leitlinien", desc: "ESC Hypertonie, ACS und Vorhofflimmern" },
     ],
     verifyTitle: "Beruflicher Zugang",
     verifyBody:
@@ -87,7 +87,7 @@ const PACK: Record<ChromePack, PackCopy> = {
       { href: "/leky", label: "Médicaments", desc: "Autorisation, EMA et interactions" },
       { href: "/legislativa", label: "Cadre juridique", desc: "Droit de la santé dans l’UE" },
       { href: "/ai-medical/doctor", label: "IA clinique", desc: "Assistant pour les médecins" },
-      { href: "/studie/ai", label: "Research Hub", desc: "Analyse IA des études et PubMed" },
+      { href: "/lekari/guidelines", label: "Recommandations DOI", desc: "ESC hypertension, SCA et fibrillation auriculaire" },
     ],
     verifyTitle: "Accès professionnel",
     verifyBody:
@@ -105,7 +105,7 @@ const PACK: Record<ChromePack, PackCopy> = {
       { href: "/leky", label: "Farmaci", desc: "Autorizzazione, EMA e interazioni" },
       { href: "/legislativa", label: "Quadro normativo", desc: "Diritto sanitario in UE" },
       { href: "/ai-medical/doctor", label: "IA clinica", desc: "Assistente per i medici" },
-      { href: "/studie/ai", label: "Research Hub", desc: "Analisi IA di studi e PubMed" },
+      { href: "/lekari/guidelines", label: "Raccomandazioni DOI", desc: "ESC ipertensione, SCA e fibrillazione atriale" },
     ],
     verifyTitle: "Accesso professionale",
     verifyBody:
@@ -123,7 +123,7 @@ const PACK: Record<ChromePack, PackCopy> = {
       { href: "/leky", label: "Medicamentos", desc: "Autorización, EMA e interacciones" },
       { href: "/legislativa", label: "Marco legal", desc: "Derecho sanitario en la UE" },
       { href: "/ai-medical/doctor", label: "IA clínica", desc: "Asistente para médicos" },
-      { href: "/studie/ai", label: "Research Hub", desc: "Análisis IA de estudios y PubMed" },
+      { href: "/lekari/guidelines", label: "Guías DOI", desc: "ESC hipertensión, SCA y fibrilación auricular" },
     ],
     verifyTitle: "Acceso profesional",
     verifyBody:
@@ -141,7 +141,7 @@ const PACK: Record<ChromePack, PackCopy> = {
       { href: "/leky", label: "Medicamentos", desc: "Autorização, ANVISA e interações" },
       { href: "/legislativa", label: "Quadro legal", desc: "Direito sanitário" },
       { href: "/ai-medical/doctor", label: "IA clínica", desc: "Assistente para médicos" },
-      { href: "/studie/ai", label: "Research Hub", desc: "Análise de IA de estudos e PubMed" },
+      { href: "/lekari/guidelines", label: "Guidelines DOI", desc: "ESC hipertensão, SCA e fibrilação atrial" },
     ],
     verifyTitle: "Acesso profissional",
     verifyBody:
@@ -159,7 +159,7 @@ const PACK: Record<ChromePack, PackCopy> = {
       { href: "/leky", label: "Medicines", desc: "Authorisation, regulator notes and interactions" },
       { href: "/legislativa", label: "Legal frame", desc: "Health-law context for this edition" },
       { href: "/ai-medical/doctor", label: "Clinical AI", desc: "Assistant for practising physicians" },
-      { href: "/studie/ai", label: "Research Hub", desc: "AI study analysis and PubMed" },
+      { href: "/lekari/guidelines", label: "DOI guidelines", desc: "ESC hypertension, ACS and atrial fibrillation" },
     ],
     verifyTitle: "Professional access",
     verifyBody:

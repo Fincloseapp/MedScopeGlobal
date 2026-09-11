@@ -104,18 +104,18 @@ const PACK: Record<ChromePack, RoomPack> = {
         method: [
           ["Identifier", "RCTs and meta-analyses only with a DOI or PMID. No identifier, no row."],
           ["No practice promise", "A summary is not a treatment guide and does not replace the primary paper."],
-          ["Research Hub", "AI analysis sits beside it — the study identifier stays visible."],
+          ["DOI guidelines", "AI analysis sits beside it — the study identifier stays visible."],
         ],
         source: "We do not invent p-values, N, or conclusions. A row without a source does not ship.",
       },
       "research-hub": {
-        lead: "PubMed and AI analysis as a workbench — the study identifier stays visible. It does not diagnose.",
+        lead: "Three current ESC guidelines with DOI outside rheumatology. PubMed AI is an internal tool, not a public promise.",
         method: [
-          ["PubMed on the desk", "Search and AI reading sit together. PMID or DOI stays in the header."],
+          ["ESC 2023–2024", "Hypertension, ACS and atrial fibrillation — European Heart Journal, open DOI."],
           ["Not a diagnosis", "The tool does not promise a differential or a therapy change."],
-          ["Check the source", "If the model claims a finding, verify it on the primary record — not in chat."],
+          ["Check the source", "Read the primary guideline. The magazine only shows the path to the DOI."],
         ],
-        source: "AI is context for evidence, not a reviewer and not a colleague on call.",
+        source: "Links go to the DOI. The magazine does not generate clinical recommendations.",
       },
       "ai-asistent": {
         lead: "Clinical context for guidelines and studies. Not a diagnosis, a prescription, or a colleague.",
@@ -159,7 +159,7 @@ const PACK: Record<ChromePack, RoomPack> = {
         method: [
           ["Identifikator", "RCTs und Metaanalysen nur mit DOI oder PMID. Ohne ID keine Zeile."],
           ["Kein Praxisversprechen", "Die Kurzfassung ist kein Therapiepfad."],
-          ["Research Hub", "KI-Analyse daneben — die Studien-ID bleibt sichtbar."],
+          ["DOI-Leitlinien", "KI-Analyse daneben — die Studien-ID bleibt sichtbar."],
         ],
         source: "Keine erfundenen p-Werte, N oder Schlüsse. Ohne Quelle keine Zeile.",
       },
@@ -214,7 +214,7 @@ const PACK: Record<ChromePack, RoomPack> = {
         method: [
           ["Identifiant", "ECR et méta-analyses seulement avec DOI ou PMID."],
           ["Pas de promesse clinique", "Le résumé n’est pas un guide de traitement."],
-          ["Research Hub", "L’analyse IA est à côté — l’identifiant reste visible."],
+          ["Recommandations DOI", "L’analyse IA est à côté — l’identifiant reste visible."],
         ],
         source: "Pas de p-values, de N ou de conclusions inventés.",
       },
@@ -269,7 +269,7 @@ const PACK: Record<ChromePack, RoomPack> = {
         method: [
           ["Identificatore", "RCT e meta-analisi solo con DOI o PMID."],
           ["Nessuna promessa clinica", "Il riassunto non è una guida al trattamento."],
-          ["Research Hub", "L’analisi IA sta accanto — l’identificatore resta visibile."],
+          ["Raccomandazioni DOI", "L’analisi IA sta accanto — l’identificatore resta visibile."],
         ],
         source: "Niente p-value, N o conclusioni inventati.",
       },
@@ -324,7 +324,7 @@ const PACK: Record<ChromePack, RoomPack> = {
         method: [
           ["Identificador", "ECA y metaanálisis solo con DOI o PMID."],
           ["Sin promesa clínica", "El resumen no es una guía de tratamiento."],
-          ["Research Hub", "El análisis IA está al lado — el identificador sigue visible."],
+          ["Guías DOI", "El análisis IA está al lado — el identificador sigue visible."],
         ],
         source: "No inventamos p-valores, N ni conclusiones.",
       },
@@ -379,7 +379,7 @@ const PACK: Record<ChromePack, RoomPack> = {
         method: [
           ["Identificador", "ECR e metanálises só com DOI ou PMID."],
           ["Sem promessa clínica", "O resumo não é um guia de tratamento."],
-          ["Research Hub", "A análise de IA fica ao lado — o identificador permanece visível."],
+          ["Guidelines DOI", "A análise de IA fica ao lado — o identificador permanece visível."],
         ],
         source: "Não inventamos p-valores, N nem conclusões.",
       },
@@ -467,7 +467,7 @@ const DESTINATIONS: Record<ChromePack, Record<PhysicianRoomId, PhysicianRoomDest
     ],
     studie: [
       { href: "/studie", label: "Studienliste", body: "Identifikator im Kopf. Keine erfundenen p-Werte." },
-      { href: "/lekari/research-hub", label: "Research Hub", body: "PubMed neben der KI. Das Werkzeug diagnostiziert nicht." },
+      { href: "/lekari/guidelines", label: "DOI-Leitlinien", body: "ESC Hypertonie, ACS und Vorhofflimmern — Primärtext, keine KI." },
     ],
     "research-hub": [
       { href: "/lekari/studie", label: "Studien auf dem Desk", body: "Dasselbe Konto, dieselbe Identifikatorregel." },
@@ -489,7 +489,7 @@ const DESTINATIONS: Record<ChromePack, Record<PhysicianRoomId, PhysicianRoomDest
     ],
     studie: [
       { href: "/studie", label: "Liste des études", body: "Identifiant en-tête. Pas de p-values inventées." },
-      { href: "/lekari/research-hub", label: "Research Hub", body: "PubMed à côté de l’IA. L’outil ne diagnostique pas." },
+      { href: "/lekari/guidelines", label: "Recommandations DOI", body: "ESC hypertension, SCA et fibrillation — texte primaire, pas d’IA." },
     ],
     "research-hub": [
       { href: "/lekari/studie", label: "Études sur le bureau", body: "Même compte, même règle d’identifiant." },
@@ -511,7 +511,7 @@ const DESTINATIONS: Record<ChromePack, Record<PhysicianRoomId, PhysicianRoomDest
     ],
     studie: [
       { href: "/studie", label: "Elenco studi", body: "Identificatore in intestazione. Niente p-value inventati." },
-      { href: "/lekari/research-hub", label: "Research Hub", body: "PubMed accanto all’IA. Lo strumento non diagnostica." },
+      { href: "/lekari/guidelines", label: "Raccomandazioni DOI", body: "ESC ipertensione, SCA e fibrillazione — testo primario, non IA." },
     ],
     "research-hub": [
       { href: "/lekari/studie", label: "Studi sul desk", body: "Stesso account, stessa regola dell’identificatore." },
@@ -533,7 +533,7 @@ const DESTINATIONS: Record<ChromePack, Record<PhysicianRoomId, PhysicianRoomDest
     ],
     studie: [
       { href: "/studie", label: "Lista de estudios", body: "Identificador en el encabezado. Sin p-valores inventados." },
-      { href: "/lekari/research-hub", label: "Research Hub", body: "PubMed junto a la IA. La herramienta no diagnostica." },
+      { href: "/lekari/guidelines", label: "Guías DOI", body: "ESC hipertensión, SCA y fibrilación — texto primario, no IA." },
     ],
     "research-hub": [
       { href: "/lekari/studie", label: "Estudios en el escritorio", body: "Misma cuenta, misma regla de identificador." },
@@ -555,7 +555,7 @@ const DESTINATIONS: Record<ChromePack, Record<PhysicianRoomId, PhysicianRoomDest
     ],
     studie: [
       { href: "/studie", label: "Lista de estudos", body: "Identificador no cabeçalho. Sem p-valores inventados." },
-      { href: "/lekari/research-hub", label: "Research Hub", body: "PubMed ao lado da IA. A ferramenta não diagnostica." },
+      { href: "/lekari/guidelines", label: "Guidelines DOI", body: "ESC hipertensão, SCA e fibrilação — texto primário, não IA." },
     ],
     "research-hub": [
       { href: "/lekari/studie", label: "Estudos no desk", body: "A mesma conta, a mesma regra de identificador." },

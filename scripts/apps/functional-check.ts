@@ -2080,6 +2080,33 @@ assert.ok(
   "homepage must map ViaLongeVita, marketplace, students and physicians as four doors"
 );
 assert.ok(
+  !getSubscribeCopy("cs").plans.student.features.some((line) => /Academy/i.test(line)) &&
+    getSubscribeCopy("cs").plans.student.features.some((line) => line.includes("MeDiprep")),
+  "CS student plan must sell MeDiprep, not an unready Academy catalog"
+);
+assert.ok(
+  !getSubscribeCopy("en").plans.physician.features.some((line) => /Research Hub/i.test(line)) &&
+    !getSubscribeCopy("de").comparisonLead.includes("Research Hub"),
+  "physician plan must not promise Research Hub"
+);
+assert.ok(
+  !readFileSync(join(root, "components/lekari/physician-section-nav.tsx"), "utf8").includes(
+    "Research Hub"
+  ),
+  "physician nav chips must not advertise Research Hub"
+);
+assert.ok(
+  readFileSync(join(root, "components/firmy/firmy-desk.tsx"), "utf8").indexOf("Otevřít tržiště") <
+    readFileSync(join(root, "components/firmy/firmy-desk.tsx"), "utf8").indexOf("V271B2BPricingTable"),
+  "firmy desk must show the manufacturer exchange before the magazine rate card"
+);
+assert.ok(
+  !readFileSync(join(root, "components/studenti/student-offer-dashboard.tsx"), "utf8").includes(
+    "/academy/courses"
+  ),
+  "student desk must not sell the unready Academy course catalog"
+);
+assert.ok(
   readFileSync(join(root, "app/feed/[locale]/route.ts"), "utf8").includes(
     "filterArticlesForLocale"
   ),

@@ -71,15 +71,15 @@ const ROOMS = [
     },
   },
   {
-    href: "/academy/courses?category=prijimacky",
-    csHref: "/cs/academy/courses?category=prijimacky",
+    href: "/studium/univerzity",
+    csHref: "/cs/studium/univerzity",
     image: PHOTO.anatomy,
-    title: { cs: "Academy", en: "Academy", de: "Academy", fr: "Academy" },
+    title: { cs: "Lékařské fakulty", en: "Medical faculties", de: "Medizinfakultäten", fr: "Facultés de médecine" },
     body: {
-      cs: "Biologie, chemie, fyzika — první lekce k nahlédnutí.",
-      en: "Biology, chemistry, physics — first lesson as a preview.",
-      de: "Biologie, Chemie, Physik — erste Lektion zum Einblick.",
-      fr: "Biologie, chimie, physique — première leçon en aperçu.",
+      cs: "Osm českých LF — oficiální weby, ne vymyšlené recenze.",
+      en: "Eight Czech faculties — official sites, no invented reviews.",
+      de: "Acht tschechische Fakultäten — offizielle Seiten, keine erfundenen Reviews.",
+      fr: "Huit facultés tchèques — sites officiels, pas d’avis inventés.",
     },
   },
   {

@@ -7,7 +7,6 @@ const ROOMS = [
   { href: "/lekari", fallback: "Desk" },
   { href: "/lekari/guidelines", fallback: "Guidelines" },
   { href: "/lekari/studie", fallback: "Studie" },
-  { href: "/lekari/research-hub", fallback: "Research Hub" },
   { href: "/lekari/ai-asistent", fallback: "AI asistent" },
   { href: "/lekari/dokumentace", fallback: "OrdiZapis" },
 ] as const;

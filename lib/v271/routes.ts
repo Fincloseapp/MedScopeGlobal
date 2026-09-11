@@ -41,7 +41,7 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       {
         label: "Testy a kvízy",
         href: "/studenti/testy",
-        description: "Academy kvízy, self-test a školní procvičení",
+        description: "MeDiprep, self-test a školní procvičení",
       },
       {
         label: "Kvízy a hry",
@@ -65,7 +65,7 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
     slug: "testy",
     title: "Testy a procvičení",
     description:
-      "Self-test přijímaček, Academy kvízy a studijní hry — s okamžitou zpětnou vazbou. Nejde o oficiální fakultní zkoušku.",
+      "Self-test přijímaček, MeDiprep a studijní hry — s okamžitou zpětnou vazbou. Nejde o oficiální fakultní zkoušku.",
     links: [
       {
         label: "Klub kvízů a žebříček",
@@ -74,13 +74,13 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       },
       {
         label: "Self-test přijímaček",
-        href: "/academy/prijimacky/self-test",
-        description: "Biologie, chemie, fyzika — rychlá kontrola úrovně",
+        href: "/app/priprava",
+        description: "Biologie, chemie, fyzika — rychlá kontrola úrovně v MeDiprep",
       },
       {
-        label: "Academy kvízy",
-        href: "/academy/quizzes",
-        description: "Kvízy vázané na kurzy — vysvětlení správných odpovědí",
+        label: "Kvízy a hry",
+        href: "/studenti/hry",
+        description: "Kvízy a studijní hry — vysvětlení správných odpovědí",
       },
       {
         label: "Přípravné kurzy",
@@ -99,8 +99,8 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
         description: "Neomezené procvičení — 89 Kč, pak 149 Kč",
       },
     ],
-    ctaHref: "/academy/prijimacky/self-test",
-    ctaLabel: "Spustit self-test",
+    ctaHref: "/app/priprava",
+    ctaLabel: "Otevřít MeDiprep",
   },
   "chci-studovat": {
     slug: "chci-studovat",
@@ -111,7 +111,7 @@ export const V271_STUDENTI_PAGES: Record<string, V271HubPage> = {
       { label: "MeDiprep — přijímačky", href: "/app/priprava", description: "Testy B/C/F a simulace fakult" },
       { label: "Přijímačky", href: "/studium/prijimacky" },
       { label: "Lékařské fakulty", href: "/studium/univerzity" },
-      { label: "Self-test Academy", href: "/academy/prijimacky/self-test" },
+      { label: "Testy a procvičení", href: "/studenti/testy" },
     ],
     ctaHref: "/app/priprava",
     ctaLabel: "Otevřít MeDiprep",

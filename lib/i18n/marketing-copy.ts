@@ -325,7 +325,7 @@ const CS: MarketingCopy = {
     applicantH2: "Chci na medicínu",
     applicantSub: "Uchazeč · gymnázium · příprava na přijímačky LF",
     applicantBody:
-      "Sem patří přípravné kurzy Academy, self-test a termíny fakult. Není to „kompletní doučování na míru“ — je to strukturovaná příprava, kterou si hned vyzkoušíte.",
+      "Sem patří MeDiprep (testy B/C/F), self-test a termíny fakult. Není to „kompletní doučování na míru“ — je to strukturovaná příprava, kterou si hned vyzkoušíte.",
     openPrep: "Otevřít přípravu na přijímačky",
     onLfH2: "Už studuji na LF",
     onLfSub: "1.–6. ročník · materiály, testy, opakování",
@@ -340,7 +340,7 @@ const CS: MarketingCopy = {
     parentsEyebrow: "Pro rodiče",
     parentsTitle: "Podpora přípravy — srozumitelně a bez přehánění",
     parentsBody:
-      "Předplatné Student LF (89 Kč první měsíc, pak 149 Kč) otevírá Academy a AI tutor. Nezaručuje přijetí na medicínu. Koupíte, pošlete odkaz — dítě aktivuje na svém účtu.",
+      "Předplatné Student LF (89 Kč první měsíc, pak 149 Kč) otevírá MeDiprep a AI tutor. Nezaručuje přijetí na medicínu. Koupíte, pošlete odkaz — dítě aktivuje na svém účtu.",
     parentBullets: [
       "1 test zdarma — bez karty",
       "První měsíc 89 Kč, další 149 Kč — zrušíte kdykoli",
@@ -353,7 +353,7 @@ const CS: MarketingCopy = {
     subLead:
       "Free vrstva stačí na ochutnávku. Předplatné je pro ty, kdo chtějí pravidelnou přípravu nebo studijní oporu během semestru.",
     subBenefits: [
-      "Všechny přípravné kurzy Academy (ne jen první lekce)",
+      "MeDiprep — testy B/C/F a simulace 8 českých LF (ne jen jeden test zdarma)",
       "AI tutor a studijní materiály bez omezení free vrstvy",
       "Kvízy, hry a procvičení — opakované použití během semestru",
       "1 test zdarma, první měsíc 89 Kč, pak 149 Kč (Student LF)",
@@ -363,8 +363,8 @@ const CS: MarketingCopy = {
     moreTitle: "Další užitečné sekce",
     moreLead: "Rozcestníky — vedou dál do obsahu MedScope, ne nahrazují celý předmět.",
     applicant: [
-      { href: "/studenti/chci-studovat", title: "Přípravné kurzy Academy", body: "Biologie, chemie, fyzika, fyziologie — lekce, slidy a kvízy. První lekce zdarma." },
-      { href: "/academy/prijimacky/self-test", title: "Self-test přijímaček", body: "Rychlý přehled silných a slabých míst — ideální první krok před kurzy." },
+      { href: "/mediprep", title: "MeDiprep — přijímačky", body: "Biologie, chemie, fyzika — testy podle 8 českých LF. 1 test zdarma." },
+      { href: "/studenti/testy", title: "Self-test přijímaček", body: "Rychlý přehled silných a slabých míst — ideální první krok před MeDiprep." },
       { href: "/studium/prijimacky", title: "Termíny a požadavky LF", body: "Přehled fakult a přijímacího řízení — ať víte, na co se připravovat." },
     ],
     onLf: [
@@ -380,7 +380,7 @@ const CS: MarketingCopy = {
     ],
     applicantSteps: [
       { title: "Self-test v MeDiprep (5–10 min)", body: "Zjistíte, kde jste a co dohnat — v aplikaci na ploše telefonu.", cta: "Otevřít MeDiprep" },
-      { title: "Jedna lekce zdarma", body: "Uvidíte styl videa, slidů a kvízů.", cta: "Otevřít kurzy" },
+      { title: "Jeden modelový test", body: "Uvidíte styl otázek B/C/F podle českých fakult.", cta: "Otevřít MeDiprep" },
       { title: "Koupit za 89 Kč", body: "Dnes 89 Kč, další měsíc 149 Kč. Zrušíte kdykoli.", cta: "Otevřít předplatné" },
     ],
     lfSteps: [
@@ -567,7 +567,7 @@ const EN: MarketingCopy = {
     applicantH2: "I want to study medicine",
     applicantSub: "Applicant · secondary school · faculty admissions prep",
     applicantBody:
-      "Academy prep courses, the self-test and faculty dates belong here. It is structured prep you can try immediately — not one-to-one tutoring.",
+      "MeDiprep tests, the self-test and faculty dates belong here. It is structured prep you can try immediately — not one-to-one tutoring.",
     openPrep: "Open admissions prep",
     onLfH2: "I already study at a faculty",
     onLfSub: "Years 1–6 · materials, tests, revision",
@@ -580,7 +580,7 @@ const EN: MarketingCopy = {
     parentsEyebrow: "For parents",
     parentsTitle: "Support prep — clearly, without hype",
     parentsBody:
-      "The Student LF plan (intro month, then 149 CZK / €10) opens Academy and the AI tutor. It does not guarantee admission. You pay, then forward the activation link.",
+      "The Student LF plan (intro month, then 149 CZK / €10) opens MeDiprep and the AI tutor. It does not guarantee admission. You pay, then forward the activation link.",
     parentBullets: [
       "1 free test — no card",
       "Intro month, then the regular month — cancel anytime",
@@ -592,7 +592,7 @@ const EN: MarketingCopy = {
     subTitle: "Student plan — intro month, then 149 CZK / €10",
     subLead: "The free layer is enough for a taste. The plan is for regular prep or semester support.",
     subBenefits: [
-      "All Academy prep courses (not just the first lesson)",
+      "MeDiprep — B/C/F tests and 8 Czech faculty mocks (not just one free test)",
       "AI tutor and study materials without the free-tier limits",
       "Quizzes, games and practice throughout the semester",
       "1 free test, intro month, then 149 CZK / €10 (Student LF)",
@@ -602,8 +602,8 @@ const EN: MarketingCopy = {
     moreTitle: "More useful sections",
     moreLead: "Signposts into MedScope content — they do not replace a full course.",
     applicant: [
-      { href: "/studenti/chci-studovat", title: "Academy prep courses", body: "Biology, chemistry, physics, physiology — lessons, slides and quizzes. First lesson free." },
-      { href: "/academy/prijimacky/self-test", title: "Admissions self-test", body: "A quick view of strengths and gaps — the first step before courses." },
+      { href: "/mediprep", title: "MeDiprep — admissions", body: "Biology, chemistry, physics — tests for 8 Czech faculties. 1 free test." },
+      { href: "/studenti/testy", title: "Admissions self-test", body: "A quick view of strengths and gaps — the first step before MeDiprep." },
       { href: "/studium/prijimacky", title: "Faculty dates and requirements", body: "Overview of faculties and admissions — so you know what to prepare for." },
     ],
     onLf: [
@@ -619,7 +619,7 @@ const EN: MarketingCopy = {
     ],
     applicantSteps: [
       { title: "Self-test in MeDiprep (5–10 min)", body: "See where you are and what to catch up — in the phone app.", cta: "Open MeDiprep" },
-      { title: "One free lesson", body: "See the style of video, slides and quizzes.", cta: "Open courses" },
+      { title: "One model test", body: "See the B/C/F question style used by Czech faculties.", cta: "Open MeDiprep" },
       { title: "Buy the intro month", body: "Intro price today, regular month after. Cancel anytime.", cta: "Open the plan" },
     ],
     lfSteps: [

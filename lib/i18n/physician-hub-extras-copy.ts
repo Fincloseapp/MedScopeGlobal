@@ -157,7 +157,7 @@ const PACK: Record<ChromePack, Pack> = {
     valueProps: [
       "Professional desk, guidelines and diagnostic pathways",
       "Curated study briefs with DOI and PMID",
-      "Clinical AI assistant and Research Hub",
+      "Clinical AI assistant and DOI guidelines",
       "OrdiZapis — record on mobile → note",
       "CME briefs and priority alerts",
     ],
@@ -208,7 +208,7 @@ const PACK: Record<ChromePack, Pack> = {
     valueProps: [
       "Fachbereich, Leitlinien und Diagnosewege",
       "Kuratierte Studienkurzberichte mit DOI und PMID",
-      "Klinische KI und Research Hub",
+      "Klinische KI und DOI-Leitlinien",
       "OrdiZapis — am Handy aufnehmen → Notiz",
       "CME-Überblicke und Prioritätsalarme",
     ],
@@ -259,7 +259,7 @@ const PACK: Record<ChromePack, Pack> = {
     valueProps: [
       "Espace pro, guidelines et chemins diagnostiques",
       "Briefs d’études avec DOI et PMID",
-      "IA clinique et Research Hub",
+      "IA clinique et recommandations DOI",
       "OrdiZapis — enregistrer sur mobile → note",
       "Briefs FMC et alertes prioritaires",
     ],
@@ -310,7 +310,7 @@ const PACK: Record<ChromePack, Pack> = {
     valueProps: [
       "Area professionale, linee guida e percorsi diagnostici",
       "Brief di studi con DOI e PMID",
-      "IA clinica e Research Hub",
+      "IA clinica e raccomandazioni DOI",
       "OrdiZapis — registra sul telefono → nota",
       "Brief ECM e avvisi prioritari",
     ],
@@ -361,7 +361,7 @@ const PACK: Record<ChromePack, Pack> = {
     valueProps: [
       "Área profesional, guías y vías diagnósticas",
       "Briefs de estudios con DOI y PMID",
-      "IA clínica y Research Hub",
+      "IA clínica y guías DOI",
       "OrdiZapis — grabar en el móvil → nota",
       "Briefs FMC y avisos prioritarios",
     ],
@@ -412,7 +412,7 @@ const PACK: Record<ChromePack, Pack> = {
     valueProps: [
       "Área profissional, guidelines e caminhos diagnósticos",
       "Briefs de estudos com DOI e PMID",
-      "IA clínica e Research Hub",
+      "IA clínica e guidelines DOI",
       "OrdiZapis — gravar no celular → nota",
       "Briefs e alertas prioritários",
     ],
