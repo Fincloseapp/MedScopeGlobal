@@ -1,5 +1,8 @@
-import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
 import { MAGAZINE } from "@/lib/brand/magazine";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
+import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { homepagePillarsEdition, type HomepagePillarsEdition } from "@/lib/i18n/homepage-pillars-editions";
 
 export type HomepagePillarId = "magazine" | "marketplace" | "students" | "physicians";
 
@@ -427,11 +430,29 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
   },
 };
 
-export function getHomepagePillarsCopy(locale?: string | null): HomepagePillarsCopy {
-  const pack = PACK[chromePack(locale)] ?? PACK.en;
-  const czech = chromePack(locale) === "cs";
+function applyEdition(pack: HomepagePillarsCopy, edition?: HomepagePillarsEdition): HomepagePillarsCopy {
+  if (!edition) return pack;
+  const overlay = edition.pillars;
   return {
     ...pack,
-    pillars: pack.pillars.filter((pillar) => czech || !pillar.czechOnly),
+    ...edition,
+    pillars: pack.pillars.map((pillar) => {
+      const extra = overlay?.[pillar.id];
+      return extra ? { ...pillar, ...extra, id: pillar.id, czechOnly: pillar.czechOnly } : pillar;
+    }),
+  };
+}
+
+export function getHomepagePillarsCopy(locale?: string | null): HomepagePillarsCopy {
+  const packKey = chromePack(locale);
+  const pack = PACK[packKey] ?? PACK.en;
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  const edition =
+    (packKey === "en" && primary !== "en") || primary === "pt" ? homepagePillarsEdition(primary) : undefined;
+  const merged = applyEdition(pack, edition);
+  const czech = packKey === "cs";
+  return {
+    ...merged,
+    pillars: merged.pillars.filter((pillar) => czech || !pillar.czechOnly),
   };
 }

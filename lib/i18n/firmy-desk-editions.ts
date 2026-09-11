@@ -12,6 +12,11 @@ const EDITIONS: Record<string, FirmyDeskEdition> = {
     eyebrow: "Firmy a partneri",
     title: "Inzercia na ViaLongeVita",
     lead: "Zdravotnícke firmy inzerujú v magazíne, nie v lekárskej zóne. Cenník je orientačný, ponuka do 2 pracovných dní.",
+    exchangeKicker: "Výrobcovia · laboratóriá",
+    exchangeTitle: "Trhovisko nie je inzercia v magazíne",
+    exchangeLead:
+      "Dopyty z Česka a EÚ, CE / IVDR / ISO. Čitateľská reklama je vyššie — trhovisko výrobcov je samostatná stránka.",
+    exchangeCta: "Otvoriť trhovisko",
     roomsKicker: "Formáty",
     roomsTitle: "Kam patrí ktorý dopyt",
     rooms: {
@@ -52,6 +57,11 @@ const EDITIONS: Record<string, FirmyDeskEdition> = {
     eyebrow: "Firmy i partnerzy",
     title: "Reklama na ViaLongeVita",
     lead: "Firmy zdrowotne reklamują się w magazynie, nie w strefie lekarskiej. Cennik jest orientacyjny; oferta w 2 dni robocze.",
+    exchangeKicker: "Producenci · laboratoria",
+    exchangeTitle: "Rynek nie jest reklamą w magazynie",
+    exchangeLead:
+      "Zapotrzebowanie z Czech i UE, CE / IVDR / ISO. Reklama dla czytelników jest wyżej — rynek producentów to osobna strona.",
+    exchangeCta: "Otwórz rynek",
     roomsKicker: "Formaty",
     roomsTitle: "Gdzie należy które zapytanie",
     rooms: {
@@ -68,6 +78,11 @@ const EDITIONS: Record<string, FirmyDeskEdition> = {
     eyebrow: "企業とパートナー",
     title: "ViaLongeVitaの広告",
     lead: "ヘルスケア企業は雑誌に出稿し、医師ゾーンには出ません。料金は目安。見積もりは2営業日以内。",
+    exchangeKicker: "製造者 · ラボ",
+    exchangeTitle: "マーケットは雑誌広告ではありません",
+    exchangeLead:
+      "チェコとEUの需要、CE / IVDR / ISO。読者向け広告は上にあります。製造者デスクは別ページです。",
+    exchangeCta: "マーケットを開く",
     roomsKicker: "フォーマット",
     roomsTitle: "どの問い合わせがどこか",
     rooms: {
@@ -77,6 +92,72 @@ const EDITIONS: Record<string, FirmyDeskEdition> = {
       kampane: { title: "キャンペーン", body: "雑誌読者と一般向け。医師と学生の面はアフィリエイトなし。" },
       kosmetika: { title: "化粧品ブランド", body: "スキンケア欄のプレミアムダーモコスメ — 表示付き提携。" },
     },
+  },
+  ro: {
+    exchangeKicker: "Producători · laboratoare",
+    exchangeTitle: "Piața nu este publicitate în revistă",
+    exchangeLead:
+      "Cerere din Cehia și UE, CE / IVDR / ISO. Publicitatea pentru cititori e mai sus — biroul producătorilor e o pagină separată.",
+    exchangeCta: "Deschide piața",
+  },
+  hu: {
+    exchangeKicker: "Gyártók · laborok",
+    exchangeTitle: "A piactér nem magazinreklám",
+    exchangeLead:
+      "Cseh és uniós kereslet, CE / IVDR / ISO. Az olvasói hirdetés fent van — a gyártói asztal külön oldal.",
+    exchangeCta: "Piactér megnyitása",
+  },
+  ru: {
+    exchangeKicker: "Производители · лаборатории",
+    exchangeTitle: "Рынок — это не реклама в журнале",
+    exchangeLead:
+      "Спрос из Чехии и ЕС, CE / IVDR / ISO. Реклама для читателей выше — стол производителей на отдельной странице.",
+    exchangeCta: "Открыть рынок",
+  },
+  uk: {
+    exchangeKicker: "Виробники · лабораторії",
+    exchangeTitle: "Ринок — це не реклама в журналі",
+    exchangeLead:
+      "Попит з Чехії та ЄС, CE / IVDR / ISO. Реклама для читачів вище — стіл виробників на окремій сторінці.",
+    exchangeCta: "Відкрити ринок",
+  },
+  be: {
+    exchangeKicker: "Вытворцы · лабараторыі",
+    exchangeTitle: "Рынак — гэта не рэклама ў часопісе",
+    exchangeLead:
+      "Попыт з Чэхіі і ЕС, CE / IVDR / ISO. Рэклама для чытачоў вышэй — стол вытворцаў на асобнай старонцы.",
+    exchangeCta: "Адкрыць рынак",
+  },
+  zh: {
+    exchangeKicker: "制造商 · 实验室",
+    exchangeTitle: "市场不是杂志广告",
+    exchangeLead: "捷克与欧盟需求，CE / IVDR / ISO。读者广告在上方 — 制造商工作台是单独页面。",
+    exchangeCta: "打开市场",
+  },
+  ko: {
+    exchangeKicker: "제조사 · 랩",
+    exchangeTitle: "마켓은 매거진 광고가 아닙니다",
+    exchangeLead: "체코·EU 수요, CE / IVDR / ISO. 독자 광고는 위에 있습니다. 제조사 데스크는 별도 페이지입니다.",
+    exchangeCta: "마켓 열기",
+  },
+  vi: {
+    exchangeKicker: "Nhà sản xuất · lab",
+    exchangeTitle: "Chợ không phải quảng cáo tạp chí",
+    exchangeLead: "Nhu cầu Czech và EU, CE / IVDR / ISO. Quảng cáo bạn đọc ở trên — bàn nhà sản xuất là trang riêng.",
+    exchangeCta: "Mở chợ",
+  },
+  id: {
+    exchangeKicker: "Produsen · lab",
+    exchangeTitle: "Pasar bukan iklan majalah",
+    exchangeLead: "Permintaan Ceko dan UE, CE / IVDR / ISO. Iklan pembaca ada di atas — meja produsen halaman terpisah.",
+    exchangeCta: "Buka pasar",
+  },
+  pt: {
+    exchangeKicker: "Fabricantes · laboratórios",
+    exchangeTitle: "O mercado não é publicidade na revista",
+    exchangeLead:
+      "Procura da Chéquia e da UE, CE / IVDR / ISO. A publicidade para leitores está acima — o desk de fabricantes é uma página à parte.",
+    exchangeCta: "Abrir o mercado",
   },
 };
 

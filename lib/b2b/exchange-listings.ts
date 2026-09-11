@@ -1,7 +1,11 @@
 /** Manufacturer catalog for /exchange — Czech / EU availability only. */
 
+import { MARKETPLACE_VISUALS } from "@/lib/brand/marketing-visuals";
+
+export type ExchangeListingId = "poc-cr-ce" | "lab-panels-eu" | "telemed-b2b-cz";
+
 export type ExchangeListing = {
-  id: string;
+  id: ExchangeListingId;
   region: "Česko" | "EU" | "Česko + EU";
   category: string;
   title: string;
@@ -9,6 +13,7 @@ export type ExchangeListing = {
   cert: string;
   summary: string;
   href: string;
+  image: string;
 };
 
 export const EXCHANGE_LISTINGS: ExchangeListing[] = [
@@ -22,6 +27,7 @@ export const EXCHANGE_LISTINGS: ExchangeListing[] = [
     summary:
       "Point-of-care imunoassay pro ambulance a laboratoře v Česku a na Slovensku. Kontakty až po ověření inzerenta — bez provize z obchodu.",
     href: "/exchange#poc-cr-ce",
+    image: MARKETPLACE_VISUALS.specialist,
   },
   {
     id: "lab-panels-eu",
@@ -33,6 +39,7 @@ export const EXCHANGE_LISTINGS: ExchangeListing[] = [
     summary:
       "Specializované panely pro nemocniční a smluvní laboratoře v Evropské unii. Sklady DE/CZ, certifikace CE / ISO 13485.",
     href: "/exchange#lab-panels-eu",
+    image: MARKETPLACE_VISUALS.workstation,
   },
   {
     id: "telemed-b2b-cz",
@@ -44,5 +51,6 @@ export const EXCHANGE_LISTINGS: ExchangeListing[] = [
     summary:
       "B2B napojení nemocnice / laboratoř / síť ambulancí. Žádná distanční péče koncovému pacientovi přes tržiště.",
     href: "/exchange#telemed-b2b-cz",
+    image: MARKETPLACE_VISUALS.specialist,
   },
 ];

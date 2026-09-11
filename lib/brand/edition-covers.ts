@@ -1,6 +1,8 @@
 import { MAGAZINE } from "@/lib/brand/magazine";
 import { SITE } from "@/lib/config/site";
+import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
+import { normalizeLocale } from "@/lib/i18n/config";
 
 /** Peaceful magazine editions only — no conflict-region travel covers. */
 export type EditionCluster = "europe" | "east-asia" | "south-asia" | "africa" | "atlantic";
@@ -35,6 +37,22 @@ const ALT: Record<ChromePack, string> = {
   "pt-BR": `Capa ${MAGAZINE.name}`,
 };
 
+const ALT_EDITIONS: Record<string, string> = {
+  sk: `Titulná strana ${MAGAZINE.name}`,
+  pl: `Okładka ${MAGAZINE.name}`,
+  ro: `Coperta ${MAGAZINE.name}`,
+  hu: `${MAGAZINE.name} címlap`,
+  ru: `Обложка ${MAGAZINE.name}`,
+  uk: `Обкладинка ${MAGAZINE.name}`,
+  be: `Вокладка ${MAGAZINE.name}`,
+  zh: `${MAGAZINE.name}封面`,
+  ja: `${MAGAZINE.name}の表紙`,
+  ko: `${MAGAZINE.name} 표지`,
+  vi: `Bìa ${MAGAZINE.name}`,
+  id: `Sampul ${MAGAZINE.name}`,
+  pt: `Capa ${MAGAZINE.name}`,
+};
+
 function hashSeed(input: string): number {
   let hash = 0;
   for (const char of input) {
@@ -65,7 +83,8 @@ export function pickEditionCover(locale?: string | null, seed = "week"): Edition
 }
 
 export function editionCoverAlt(locale?: string | null): string {
-  return ALT[chromePack(locale)];
+  const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
+  return ALT_EDITIONS[primary] ?? ALT[chromePack(locale)];
 }
 
 export function editionCoverAbsoluteUrl(cover: EditionCover, base = SITE.url): string {

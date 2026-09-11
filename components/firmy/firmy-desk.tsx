@@ -1,6 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V271B2BPricingTable } from "@/components/v271/b2b-pricing-table";
+import { MARKETPLACE_VISUALS } from "@/lib/brand/marketing-visuals";
 import { SITE } from "@/lib/config/site";
 import { getB2bPublicCopy } from "@/lib/i18n/b2b-public-copy";
 import { getFirmyDeskCopy, type FirmyRoomId } from "@/lib/i18n/firmy-desk-copy";
@@ -70,21 +72,32 @@ export async function FirmyDesk({ slug }: { slug?: FirmyRoomId }) {
         </p>
       ) : null}
 
-      <section className="mb-8 rounded-2xl border border-[#021d33] bg-[#021d33] px-5 py-5 text-white">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e8d5a3]">
-          Výrobci · laboratoře
-        </p>
-        <h2 className="mt-2 font-display text-2xl font-semibold">Tržiště není inzerce v magazínu</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-white/80">
-          Poptávky z Česka a EU, CE / IVDR / ISO. Čtenářská reklama je výše — tržiště výrobců je
-          samostatná stránka.
-        </p>
-        <Link
-          href={localizePublicHref("/exchange", locale)}
-          className="mt-4 inline-flex rounded-full bg-[#c4a35a] px-5 py-2.5 text-sm font-semibold text-[#021d33] hover:bg-[#e8d5a3]"
-        >
-          Otevřít tržiště
-        </Link>
+      <section
+        data-studio="firmy-exchange-teaser"
+        className="mb-8 overflow-hidden rounded-2xl border border-[#021d33] bg-[#021d33] text-white md:grid md:grid-cols-[minmax(12rem,18rem)_minmax(0,1fr)]"
+      >
+        <div className="relative min-h-[160px] bg-[#0b2a44]">
+          <Image
+            src={MARKETPLACE_VISUALS.workstation}
+            alt=""
+            fill
+            className="object-cover object-center"
+            sizes="(max-width:768px) 100vw, 288px"
+          />
+        </div>
+        <div className="px-5 py-5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e8d5a3]">
+            {desk.exchangeKicker}
+          </p>
+          <h2 className="mt-2 font-display text-2xl font-semibold">{desk.exchangeTitle}</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-white/80">{desk.exchangeLead}</p>
+          <Link
+            href={localizePublicHref("/exchange", locale)}
+            className="mt-4 inline-flex rounded-full bg-[#c4a35a] px-5 py-2.5 text-sm font-semibold text-[#021d33] hover:bg-[#e8d5a3]"
+          >
+            {desk.exchangeCta}
+          </Link>
+        </div>
       </section>
 
       <V271B2BPricingTable compact locale={locale} />
