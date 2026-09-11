@@ -1,5 +1,6 @@
 import { CuratedGuidelinesList } from "@/components/lekari/curated-guidelines-list";
 import { OrdiZapisPromoBanner } from "@/components/lekari/ordizapis-promo-banner";
+import { AccreditedCmeOverview } from "@/components/academy/b2b/accredited-cme-overview";
 import { PhysicianOfferDashboard } from "@/components/lekari/physician-offer-dashboard";
 import {
   V271LekariCredibilitySection,
