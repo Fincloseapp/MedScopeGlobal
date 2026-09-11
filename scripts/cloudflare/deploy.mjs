@@ -105,12 +105,21 @@ if (existsSync(".open-next")) {
   rmSync(".open-next", { recursive: true, force: true });
 }
 
-// Build without baking Cloudflare API credentials into next-env.mjs
+// Build without baking Cloudflare / Supabase operator credentials into next-env.mjs.
+// Worker secrets already hold the production values at runtime.
 const buildEnv = { ...process.env };
-delete buildEnv.CLOUDFLARE_API_TOKEN;
-delete buildEnv.CF_API_TOKEN;
-delete buildEnv.CLOUDFLARE_ACCOUNT_ID;
-delete buildEnv.CF_ACCOUNT_ID;
+for (const key of [
+  "CLOUDFLARE_API_TOKEN",
+  "CF_API_TOKEN",
+  "CLOUDFLARE_ACCOUNT_ID",
+  "CF_ACCOUNT_ID",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "SUPABASE_ACCESS_TOKEN",
+  "STRIPE_SECRET_KEY",
+  "STRIPE_WEBHOOK_SECRET",
+]) {
+  delete buildEnv[key];
+}
 run("npx", ["opennextjs-cloudflare", "build"], buildEnv);
 
 const deployEnv = {

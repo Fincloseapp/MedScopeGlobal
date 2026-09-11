@@ -94,7 +94,15 @@ curl -X POST https://medscopeglobal.com/api/cron/apply-exchange-migrations \
   -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"
 ```
 
-Auth is `CRON_SECRET` or a verified Cloudflare API token. The Worker runs the embedded SQL with its `SUPABASE_ACCESS_TOKEN`.
+Auth is `CRON_SECRET` or a verified Cloudflare API token (user **or** account-owned — `/user/tokens/verify` alone rejects account tokens). The Worker runs the embedded SQL with its `SUPABASE_ACCESS_TOKEN`.
+
+Without a live Exchange route yet, apply from this repo with production Worker secrets:
+
+```bash
+pnpm db:edge-apply-exchange
+# in another terminal:
+curl http://127.0.0.1:8788/
+```
 
 ### Option A — Supabase SQL Editor (prod-safe)
 

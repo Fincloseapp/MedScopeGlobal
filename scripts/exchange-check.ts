@@ -222,7 +222,9 @@ for (const file of [
   "locales/exchange/en.json",
   "lib/exchange/embedded-migrations.ts",
   "lib/exchange/apply-schema.ts",
+  "lib/v6/verify-cloudflare-token.ts",
   "app/api/cron/apply-exchange-migrations/route.ts",
+  "scripts/edge-apply-exchange.mjs",
 ]) {
   assert.equal(existsSync(join(root, file)), true, `missing ${file}`);
 }
@@ -252,6 +254,16 @@ assert.ok(embedded.includes("exchange_inquiry_replies"));
 assert.ok(
   readFileSync(join(root, "app/api/cron/apply-exchange-migrations/route.ts"), "utf8").includes(
     "applyExchangeSchema"
+  )
+);
+assert.ok(
+  readFileSync(join(root, "lib/v6/verify-cloudflare-token.ts"), "utf8").includes(
+    "accounts?per_page=1"
+  )
+);
+assert.ok(
+  readFileSync(join(root, "app/api/cron/apply-exchange-migrations/route.ts"), "utf8").includes(
+    "verifyCronOrCloudflareOperator"
   )
 );
 

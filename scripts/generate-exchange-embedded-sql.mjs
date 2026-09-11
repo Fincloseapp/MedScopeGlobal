@@ -21,3 +21,10 @@ const out =
 fs.mkdirSync(path.dirname(outPath), { recursive: true });
 fs.writeFileSync(outPath, out);
 console.log("wrote", outPath, "bytes=" + out.length);
+
+const edgePath = path.join(root, "scripts/edge-apply-exchange-data.mjs");
+fs.writeFileSync(
+  edgePath,
+  "export const MIGRATIONS = " + JSON.stringify(parts, null, 2) + ";\n"
+);
+console.log("wrote", edgePath);
