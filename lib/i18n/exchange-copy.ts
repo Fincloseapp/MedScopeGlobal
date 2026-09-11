@@ -102,12 +102,12 @@ export type ExchangeCopy = {
 
 const PACK: Record<ChromePack, ExchangeCopy> = {
   cs: {
-    metaTitle: "MedScope B2B Exchange — zdravotnický marketplace bez provize za kontakt",
+    metaTitle: "B2B Tržiště MedScopeGlobal.com — zdravotnické tržiště bez provize z obchodu",
     metaDescription:
-      "Globální B2B marketplace pro kliniky, laboratoře, univerzity a výrobce. Přímý kontakt, povinná regionální dostupnost EU/USA/Asie, bez plateb přes platformu.",
+      "Tržiště B2B od MedScopeGlobal.com pro kliniky, laboratoře, univerzity a výrobce. Přímý kontakt, povinná regionální dostupnost EU/USA/Asie, bez plateb přes platformu.",
     eyebrow: "B2B Tržiště",
-    title: "B2B tržiště — zdravotnický marketplace, který firmy chtějí používat",
-    lead: "Nabízejte produkty a služby klinikám, laboratořím a univerzitám. Kupující vás kontaktuje přímo. MedScopeGlobal nezpracovává platby, smlouvy ani dodání.",
+    title: "B2B Tržiště",
+    lead: "Tržiště B2B od MedScopeGlobal.com pro výrobce, nemocnice a laboratoře. Kupující poptává zdarma. Kontakty vidí jen platící inzerent — bez provize z obchodu.",
     catalogCta: "Prohlédnout nabídky",
     onboardCta: "Registrovat firmu",
     pricingCta: "Tarify a reklama",
@@ -139,7 +139,7 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     regionsLead: "Každá nabídka má EU, USA, Asii nebo Globálně. Filtry lze kombinovat. Globální nabídky se zobrazí ve všech regionech.",
     catalogTitle: "Katalog nabídek",
     catalogLead: "Filtrujte podle typu, kategorie a regionu. Kontaktujete inzerenta napřímo.",
-    catalogMetaTitle: "Katalog B2B Exchange — produkty, služby a poptávky",
+    catalogMetaTitle: "Katalog B2B Tržiště — MedScopeGlobal.com",
     catalogMetaDescription: "Zdravotnické B2B nabídky s filtrem EU / USA / Asie / Globálně. Přímý kontakt, bez plateb přes marketplace.",
     filterSearch: "Hledat",
     filterKind: "Typ",
@@ -219,12 +219,12 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     reject: "Zamítnout",
   },
   en: {
-    metaTitle: "MedScope B2B Exchange — healthcare marketplace with free introductions",
+    metaTitle: "B2B Marketplace MedScopeGlobal.com — healthcare marketplace with free introductions",
     metaDescription:
-      "Global B2B marketplace for clinics, labs, universities and manufacturers. Direct contact, mandatory EU/USA/Asia availability, no payments through the platform.",
+      "A B2B marketplace from MedScopeGlobal.com for clinics, labs, universities and manufacturers. Direct contact, mandatory EU/USA/Asia availability, no payments through the platform.",
     eyebrow: "B2B Marketplace",
-    title: "The healthcare marketplace firms will actually use",
-    lead: "List products and services for clinics, laboratories and universities. Buyers contact you directly. MedScopeGlobal does not process payments, contracts or delivery.",
+    title: "B2B Marketplace",
+    lead: "A B2B marketplace from MedScopeGlobal.com for manufacturers, hospitals and laboratories. Buyers inquire free. Contacts are for paying advertisers only — no deal commission.",
     catalogCta: "Browse listings",
     onboardCta: "Register your organisation",
     pricingCta: "Plans and ads",

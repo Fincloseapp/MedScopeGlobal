@@ -11,10 +11,10 @@ export function ExchangeHeaderRibbon({ locale }: { locale: string }) {
     <div className="exchange-header-ribbon border-b border-[#c4a35a]/40 bg-[#021d33] text-white">
       <Link
         href={href}
-        className="mx-auto flex max-w-[1680px] items-center justify-between gap-3 px-4 py-2 text-[12px] leading-5 sm:px-6 lg:px-6"
+        className="mx-auto flex max-w-[1680px] items-center justify-between gap-3 px-4 py-2.5 text-sm leading-6 sm:px-6 lg:px-6"
       >
-        <span className="min-w-0 truncate font-medium tracking-wide">
-          <span className="mr-2 inline-flex rounded-full bg-[#c4a35a] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#021d33]">
+        <span className="min-w-0 font-medium">
+          <span className="mr-2 inline-flex rounded-full bg-[#c4a35a] px-2 py-0.5 text-xs font-bold text-[#021d33]">
             B2B
           </span>
           {marketing.ribbon}

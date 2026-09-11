@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, Globe2, ShieldCheck } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { ExchangeOriginMark } from "@/components/exchange/origin-mark";
 import { EXCHANGE_VISUAL } from "@/lib/brand/exchange-visuals";
 import { AVAILABILITY_REGIONS, regionLabel } from "@/lib/exchange/regions";
 import { getExchangeCopy } from "@/lib/i18n/exchange-copy";
@@ -14,68 +15,63 @@ export function ExchangeMarketplaceHero({ locale }: { locale: string }) {
   const pricing = localizePublicHref("/exchange/pricing", locale);
 
   return (
-    <section className="relative min-h-[28rem] overflow-hidden border-b border-[#0a2a44] bg-[#021d33] text-white sm:min-h-[34rem]">
+    <section className="relative overflow-hidden border-b border-[#d5e4f2] bg-[#021d33]">
       <img
         src={EXCHANGE_VISUAL.hero}
         alt=""
         className="absolute inset-0 h-full w-full object-cover object-center"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#021d33]/80 via-[#021d33]/55 to-[#021d33]/20" />
-      <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-        <p className="inline-flex items-center gap-2 rounded-full border border-[#c4a35a]/45 bg-[#c4a35a]/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#e8d5a3]">
-          <Globe2 className="h-3.5 w-3.5" aria-hidden />
-          MedScope · {marketing.marketplaceName}
-        </p>
-        <h1 className="mt-5 max-w-4xl font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-          {copy.title}
-        </h1>
-        <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-200">{copy.lead}</p>
-        <p className="mt-3 flex max-w-2xl items-start gap-2 text-sm font-medium text-[#e8d5a3]">
-          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-          {marketing.proof}
-        </p>
+      <div className="absolute inset-0 bg-[#021d33]/30" />
+      <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+        <div className="max-w-3xl rounded-3xl bg-white p-6 text-[#021d33] shadow-[0_28px_60px_-32px_rgba(2,29,51,0.65)] sm:p-9">
+          <ExchangeOriginMark locale={locale} tone="onLight" />
+          <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]">
+            {copy.title}
+          </h1>
+          <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-700">{copy.lead}</p>
 
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            href={catalog}
-            className="inline-flex items-center rounded-full bg-[#c4a35a] px-6 py-3 text-sm font-semibold text-[#021d33] hover:bg-[#d4b56a]"
-          >
-            {copy.catalogCta}
-            <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
-          </Link>
-          <Link
-            href={onboard}
-            className="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#021d33] hover:bg-slate-100"
-          >
-            {copy.onboardCta}
-          </Link>
-          <Link
-            href={pricing}
-            className="inline-flex items-center rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10"
-          >
-            {copy.pricingCta}
-          </Link>
-        </div>
+          <ul className="mt-6 grid gap-2 text-sm leading-6 text-slate-700 sm:grid-cols-2">
+            {marketing.stats.map((stat) => (
+              <li key={stat.label} className="flex items-baseline gap-2 rounded-xl bg-[#f4f8fc] px-3 py-2.5">
+                <span className="shrink-0 font-semibold text-[#021d33]">{stat.value}</span>
+                <span>{stat.label}</span>
+              </li>
+            ))}
+          </ul>
 
-        <ul className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {marketing.stats.map((stat) => (
-            <li key={stat.label} className="rounded-2xl border border-white/15 bg-[#021d33]/55 px-4 py-4 backdrop-blur-sm">
-              <p className="font-display text-xl font-semibold text-white">{stat.value}</p>
-              <p className="mt-1 text-xs uppercase tracking-[0.14em] text-slate-300">{stat.label}</p>
-            </li>
-          ))}
-        </ul>
-
-        <div className="mt-8 flex flex-wrap gap-2">
-          {AVAILABILITY_REGIONS.map((region) => (
+          <div className="mt-7 flex flex-wrap gap-3">
             <Link
-              key={region}
-              href={`${catalog}?regions=${region}`}
-              className="rounded-full border border-white/20 bg-[#021d33]/40 px-3.5 py-1.5 text-xs font-semibold text-slate-100 hover:border-[#c4a35a] hover:text-[#e8d5a3]"
+              href={catalog}
+              className="inline-flex items-center rounded-full bg-[#005B96] px-6 py-3 text-sm font-semibold text-white hover:bg-[#004a7a]"
             >
-              {regionLabel(region, locale)}
+              {copy.catalogCta}
+              <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
             </Link>
-          ))}
+            <Link
+              href={onboard}
+              className="inline-flex items-center rounded-full border border-[#cfe1f3] bg-white px-6 py-3 text-sm font-semibold text-[#021d33] hover:border-[#005B96]"
+            >
+              {copy.onboardCta}
+            </Link>
+            <Link
+              href={pricing}
+              className="inline-flex items-center rounded-full border border-[#cfe1f3] bg-white px-6 py-3 text-sm font-semibold text-[#021d33] hover:border-[#005B96]"
+            >
+              {copy.pricingCta}
+            </Link>
+          </div>
+
+          <div className="mt-6 flex flex-wrap gap-2">
+            {AVAILABILITY_REGIONS.map((region) => (
+              <Link
+                key={region}
+                href={`${catalog}?regions=${region}`}
+                className="rounded-full border border-[#d7e6f4] bg-[#f7fbff] px-3.5 py-1.5 text-sm font-medium text-[#005B96] hover:border-[#005B96]"
+              >
+                {regionLabel(region, locale)}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -215,6 +215,7 @@ for (const file of [
   "components/exchange/portal-spotlight.tsx",
   "components/exchange/homepage-billboard.tsx",
   "components/exchange/marketplace-hero.tsx",
+  "components/exchange/origin-mark.tsx",
   "lib/brand/exchange-visuals.ts",
   "docs/exchange/DEPLOY.md",
   "docs/exchange/QA.md",
@@ -230,6 +231,12 @@ for (const file of [
 }
 
 assert.ok(getExchangeMarketing("cs").ribbon.includes("B2B Tržiště"));
+assert.ok(getExchangeMarketing("cs").ribbon.includes("MedScopeGlobal.com"));
+assert.equal(getExchangeMarketing("cs").originLine, "Tržiště B2B od MedScopeGlobal.com");
+assert.ok(getExchangeCopy("cs").lead.includes("MedScopeGlobal.com"));
+assert.ok(readFileSync(join(root, "components/exchange/origin-mark.tsx"), "utf8").includes("originLine"));
+assert.ok(readFileSync(join(root, "components/exchange/homepage-billboard.tsx"), "utf8").includes("bg-white"));
+assert.ok(readFileSync(join(root, "components/exchange/marketplace-hero.tsx"), "utf8").includes("bg-white"));
 assert.equal(getExchangeMarketing("en").navCta, "B2B Market");
 assert.equal(getExchangeMarketing("cs").audiences.length, 4);
 assert.ok(readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("ExchangeHomepageBillboard"));

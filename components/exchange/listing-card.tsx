@@ -40,30 +40,20 @@ export function ExchangeListingCard({
       ) : null}
       <div
         className={cn(
-          "flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em]",
+          "flex flex-wrap items-center gap-2 text-sm font-medium",
           dark ? "text-[#e8d5a3]" : "text-[#005B96]"
         )}
       >
         <span>{kindLabel}</span>
         <span aria-hidden>·</span>
         <span>{categoryLabel(listing.category, locale)}</span>
-        {listing.featured ? (
-          <span
-            className={cn(
-              "rounded-full px-2 py-0.5",
-              dark ? "bg-[#c4a35a] text-[#021d33]" : "bg-[#005B96]/10 text-[#005B96]"
-            )}
-          >
-            Featured
-          </span>
-        ) : null}
       </div>
-      <h3 className={cn("mt-3 font-display font-semibold", compact ? "text-base" : "text-lg", dark ? "text-white" : "text-[#021d33]")}>
+      <h3 className={cn("mt-3 font-display font-semibold leading-snug", compact ? "text-lg" : "text-xl", dark ? "text-white" : "text-[#021d33]")}>
         <Link href={href} className="hover:underline">
           {listing.title}
         </Link>
       </h3>
-      <p className={cn("mt-2 flex-1 leading-6", compact ? "line-clamp-2 text-sm" : "text-sm", dark ? "text-slate-300" : "text-slate-600")}>
+      <p className={cn("mt-2 flex-1 leading-7", compact ? "line-clamp-2 text-sm" : "text-[15px]", dark ? "text-slate-300" : "text-slate-700")}>
         {listing.summary}
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
@@ -91,7 +81,7 @@ export function ExchangeListingCard({
         ))}
       </div>
       {listing.organization ? (
-        <p className={cn("mt-3 text-xs", dark ? "text-slate-400" : "text-slate-500")}>
+        <p className={cn("mt-3 text-sm", dark ? "text-slate-400" : "text-slate-600")}>
           {listing.organization.tradeName}
           {listing.organization.verified ? ` · ${copy.verified}` : ""}
         </p>

@@ -424,9 +424,9 @@ function firmyNav(): NavItem {
     href: "/firmy",
     children: [
       {
-        label: "B2B Exchange",
+        label: "B2B Tržiště",
         href: "/exchange",
-        description: "Produkty, služby a poptávky — přímý kontakt, bez provize",
+        description: "Tržiště B2B od MedScopeGlobal.com — přímý kontakt, bez provize",
       },
       { label: "Pro firmy", href: "/firmy", description: "Bannery a partnerství v magazínu" },
       { label: "Ceník", href: "/firmy/cenik", description: "Orientační ceny bez skrytých poplatků" },

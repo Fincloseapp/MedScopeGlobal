@@ -57,7 +57,7 @@ export default async function ExchangeLandingPage() {
                 </span>
                 <span className="block p-5">
                   <span className="font-display text-lg font-semibold text-[#021d33]">{item.title}</span>
-                  <span className="mt-2 block text-sm leading-6 text-slate-600">{item.body}</span>
+                  <span className="mt-2 block text-[15px] leading-7 text-slate-700">{item.body}</span>
                 </span>
               </Link>
             ))}
@@ -70,7 +70,7 @@ export default async function ExchangeLandingPage() {
             {copy.promises.map((item) => (
               <div key={item.title} className="rounded-2xl border border-[#cfe1f3] bg-white p-5 shadow-[0_16px_40px_-28px_rgba(2,29,51,0.45)]">
                 <h3 className="font-display text-lg font-semibold text-[#021d33]">{item.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{item.body}</p>
+                <p className="mt-2 text-[15px] leading-7 text-slate-700">{item.body}</p>
               </div>
             ))}
           </div>
@@ -81,8 +81,8 @@ export default async function ExchangeLandingPage() {
           <ul className="mt-4 grid gap-3 md:grid-cols-2">
             {copy.barriers.map((item) => (
               <li key={item.fear} className="rounded-2xl border border-[#cfe1f3] bg-white p-4">
-                <p className="text-sm font-semibold text-slate-800">{item.fear}</p>
-                <p className="mt-1 text-sm text-[#005B96]">{item.flip}</p>
+                <p className="text-base font-semibold text-slate-800">{item.fear}</p>
+                <p className="mt-1 text-[15px] leading-7 text-slate-700">{item.flip}</p>
               </li>
             ))}
           </ul>
@@ -93,18 +93,18 @@ export default async function ExchangeLandingPage() {
           <ol className="mt-4 grid gap-3 md:grid-cols-5">
             {copy.howSteps.map((step, index) => (
               <li key={step.title} className="rounded-2xl border border-[#cfe1f3] bg-white p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#c4a35a]">0{index + 1}</p>
-                <p className="mt-2 font-semibold text-[#021d33]">{step.title}</p>
-                <p className="mt-1 text-sm text-slate-600">{step.body}</p>
+                <p className="text-sm font-semibold text-[#005B96]">{index + 1}.</p>
+                <p className="mt-2 text-base font-semibold text-[#021d33]">{step.title}</p>
+                <p className="mt-1 text-sm leading-6 text-slate-700">{step.body}</p>
               </li>
             ))}
           </ol>
         </section>
 
-        <section className="mt-14 rounded-3xl border border-[#021d33]/10 bg-[#021d33] px-6 py-8 text-white">
-          <h2 className="font-display text-2xl font-semibold">{copy.regionsTitle}</h2>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{copy.regionsLead}</p>
-          <p className="mt-3 text-sm text-[#e8d5a3]">{marketing.proof}</p>
+        <section className="mt-14 rounded-3xl border border-[#cfe1f3] bg-white px-6 py-8">
+          <h2 className="font-display text-2xl font-semibold text-[#021d33]">{copy.regionsTitle}</h2>
+          <p className="mt-2 max-w-3xl text-base leading-7 text-slate-700">{copy.regionsLead}</p>
+          <p className="mt-3 text-sm leading-6 text-slate-600">{marketing.proof}</p>
         </section>
 
         <section className="mt-14">

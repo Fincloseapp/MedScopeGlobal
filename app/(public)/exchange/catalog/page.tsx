@@ -5,6 +5,7 @@ import { listExchangeAds, listExchangeListings } from "@/lib/exchange/catalog";
 import { parseAvailabilityRegions } from "@/lib/exchange/regions";
 import type { ListingKind } from "@/lib/exchange/types";
 import { getExchangeCopy } from "@/lib/i18n/exchange-copy";
+import { getExchangeMarketing } from "@/lib/i18n/exchange-marketing";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
@@ -49,6 +50,12 @@ export default async function ExchangeCatalogPage({
 
   return (
     <ModulePageShell eyebrow={copy.eyebrow} title={copy.catalogTitle} description={copy.catalogLead}>
+      <p className="mb-6 text-base font-semibold leading-7 text-[#021d33]">
+        <span className="mr-2 inline-flex rounded-full bg-[#c4a35a] px-2.5 py-0.5 text-xs font-bold text-[#021d33]">
+          B2B
+        </span>
+        {getExchangeMarketing(locale).originLine}
+      </p>
       <div className="mb-6 flex flex-wrap gap-3">
         <Link
           href={localizePublicHref("/exchange/onboard", locale)}
