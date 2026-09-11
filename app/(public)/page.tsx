@@ -7,6 +7,7 @@ import {
 } from "@/components/v271/homepage-sections";
 import { HomepageLongevityStrip } from "@/components/v271/homepage-longevity-strip";
 import { HomepagePromoTeasers } from "@/components/v271/homepage-promo-teasers";
+import { ExchangeHomepageBillboard } from "@/components/exchange/homepage-billboard";
 import { PortalHome } from "@/components/v271/portal-home";
 import { HomepageAffiliateShelf } from "@/components/monetization/affiliate-box";
 import { HomepageRevenueMix } from "@/components/monetization/homepage-revenue-mix";
@@ -116,6 +117,7 @@ export default async function HomePage() {
 
       {/* Story: ViaLongeVita hero (brief + magazine) → news → apps. Affiliate after newsletter. */}
       <PortalHome articles={articles} copy={philosophy} locale={locale} deskArticles={homeLayout.desks} />
+      <ExchangeHomepageBillboard locale={locale} />
       <HomepageLongevityStrip
         articles={homeLayout.longevityReading}
         locale={locale}

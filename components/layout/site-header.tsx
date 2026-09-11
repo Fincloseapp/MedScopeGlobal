@@ -11,6 +11,8 @@ import { V20MobileNav } from "@/components/v20/mobile-nav";
 import { HeaderLogo } from "@/components/layout/header-logo";
 import { HeaderNavigation } from "@/components/layout/header-navigation";
 import { LocaleSwitcher } from "@/components/layout/locale-switcher";
+import { ExchangeHeaderRibbon } from "@/components/exchange/header-ribbon";
+import { ExchangeNavCta } from "@/components/exchange/nav-cta";
 import { NavSubscribeCta } from "@/components/v38/nav-subscribe-cta";
 import type { AccessLevelId } from "@/lib/config/access-levels";
 import {
@@ -57,20 +59,14 @@ export function SiteHeader({
   const subscribeLabel = studentChrome
     ? studentNavCtaLabel(navLocale)
     : getSurfaceCopy(navLocale).whyTrial;
+  const onAppSurface = (pathname ?? "").includes("/app/");
 
   return (
     <header className="site-header sticky top-0 z-50 w-full overflow-visible border-b border-black/[0.06] bg-white/[0.98] backdrop-blur supports-[padding:max(0px)]:pt-[env(safe-area-inset-top)] dark:border-white/[0.08] dark:bg-slate-950/[0.98]">
+      {onAppSurface ? null : <ExchangeHeaderRibbon locale={navLocale} />}
       <div className="mx-auto grid h-[4.5rem] max-w-[1680px] grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 md:hidden">
         <div className="flex justify-start">
-          {!isVip ? (
-            <NavSubscribeCta
-              compact
-              className="max-[360px]:px-2 max-[360px]:text-[10px]"
-              label={subscribeLabel}
-              href={subscribeHref}
-              locale={navLocale}
-            />
-          ) : null}
+          <ExchangeNavCta compact locale={navLocale} className="max-[360px]:px-2 max-[360px]:text-[10px]" />
         </div>
         <HeaderLogo centered locale={navLocale} className="max-w-[min(52vw,180px)] shrink-0" />
         <div className="flex justify-end">
@@ -98,6 +94,7 @@ export function SiteHeader({
 
           <div className="ml-auto flex shrink-0 items-center gap-1 lg:gap-1.5">
             <LocaleSwitcher currentLocale={locale} compact />
+            <ExchangeNavCta compact locale={navLocale} />
             {!isVip ? (
               <NavSubscribeCta compact label={subscribeLabel} href={subscribeHref} locale={navLocale} />
             ) : null}

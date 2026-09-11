@@ -88,9 +88,13 @@ export function HeaderNavigation({ mainMenu, locale = "cs" }: { mainMenu: NavIte
               href={item.href}
               className={cn(
                 "inline-flex items-center whitespace-nowrap px-2.5 py-2 text-[13px] font-semibold tracking-[0.01em] transition-colors xl:px-3 xl:text-sm",
-                active
-                  ? "text-[#005B96] underline decoration-[#005B96]/40 underline-offset-4"
-                  : "text-[#021d33] hover:text-[#005B96] dark:text-slate-100"
+                pathOf(item.href).includes("/exchange")
+                  ? active
+                    ? "rounded-full bg-[#021d33] text-[#e8d5a3]"
+                    : "rounded-full bg-[#f7efd8] text-[#021d33] hover:bg-[#efe2bc]"
+                  : active
+                    ? "text-[#005B96] underline decoration-[#005B96]/40 underline-offset-4"
+                    : "text-[#021d33] hover:text-[#005B96] dark:text-slate-100"
               )}
             >
               {item.label}

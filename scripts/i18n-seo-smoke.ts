@@ -439,20 +439,20 @@ assert.equal(localizePublicHref("/app/pacient", "fr"), "/app/pacient");
 
 const csHeader = getDesktopHeaderMenu("cs");
 const frHeader = getDesktopHeaderMenu("fr");
-assert.equal(csHeader.length, 7);
-assert.equal(frHeader.length, 6);
+assert.equal(csHeader.length, 8);
+assert.equal(frHeader.length, 7);
 assert.deepEqual(
   csHeader.map((item) => item.href.replace(/^\/cs(?=\/)/, "")),
-  ["/verejnost", "/studenti", "/lekari", "/articles", "/aplikace", "/firmy", "/predplatne"]
+  ["/verejnost", "/studenti", "/lekari", "/articles", "/aplikace", "/exchange", "/firmy", "/predplatne"]
 );
 assert.deepEqual(
   frHeader.map((item) => item.href),
-  ["/fr/verejnost", "/fr/lekari", "/fr/articles", "/fr/aplikace", "/fr/firmy", "/fr/predplatne"]
+  ["/fr/verejnost", "/fr/lekari", "/fr/articles", "/fr/aplikace", "/fr/exchange", "/fr/firmy", "/fr/predplatne"]
 );
 assert.equal(frHeader[0]?.label, "Grand public");
-assert.equal(frHeader[5]?.label, "Abonnement");
+assert.equal(frHeader[6]?.label, "Abonnement");
 assert.equal(frHeader[2]?.label, "Magazine");
-assert.equal(frHeader[4]?.label, "Entreprises");
+assert.equal(frHeader[5]?.label, "Entreprises");
 assert.equal(getDesktopHeaderMenu("de")[1]?.label, "Ärzte");
 assert.ok(!getDesktopHeaderMenu("de").some((item) => item.href.includes("/studenti")));
 assert.equal(csHeader[0]?.children?.[0]?.href.includes("dlouhovekost"), true);
@@ -843,6 +843,8 @@ assert.ok(!looksLikeCzech(getFirmyDeskCopy("fr").title));
 assert.ok(!looksLikeCzech(getFirmyDeskCopy("de").rooms.reklama.lead));
 assert.ok(getExchangeCopy("cs").title.includes("marketplace"));
 assert.ok(getExchangeCopy("en").metaTitle.includes("B2B Exchange"));
+assert.equal(getPortalChrome("cs").services[0]?.id, "exchange");
+assert.ok(csHeader.some((item) => item.href.includes("/exchange")));
 assert.ok(!looksLikeCzech(getExchangeCopy("de").catalogCta));
 assert.equal(getProMeCopy("cs").audiences.lekari.href, "/lekari");
 assert.ok(!looksLikeCzech(getProMeCopy("fr").title));

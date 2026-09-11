@@ -8,6 +8,7 @@ import { getExchangeCopy } from "@/lib/i18n/exchange-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
+import Link from "next/link";
 
 export const revalidate = 60;
 
@@ -48,6 +49,20 @@ export default async function ExchangeCatalogPage({
 
   return (
     <ModulePageShell eyebrow={copy.eyebrow} title={copy.catalogTitle} description={copy.catalogLead}>
+      <div className="mb-6 flex flex-wrap gap-3">
+        <Link
+          href={localizePublicHref("/exchange/onboard", locale)}
+          className="rounded-full bg-[#021d33] px-5 py-2 text-sm font-semibold text-white hover:bg-[#032844]"
+        >
+          {copy.onboardCta}
+        </Link>
+        <Link
+          href={localizePublicHref("/exchange", locale)}
+          className="rounded-full border border-[#c4a35a] px-5 py-2 text-sm font-semibold text-[#021d33]"
+        >
+          {copy.eyebrow}
+        </Link>
+      </div>
       <ExchangeCatalogFilters
         locale={locale}
         copy={copy}

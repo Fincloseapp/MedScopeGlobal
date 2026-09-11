@@ -518,6 +518,22 @@ export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
       href: "/aplikace",
       children: appsChildren,
     },
+    {
+      label: "Exchange",
+      href: "/exchange",
+      children: [
+        {
+          label: "B2B Exchange",
+          href: "/exchange",
+          description: "Zdravotnický marketplace — přímý kontakt, bez provize",
+        },
+        { label: "Katalog nabídek", href: "/exchange/catalog", description: "Produkty, služby a poptávky · EU / USA / Asie" },
+        { label: "Registrovat firmu", href: "/exchange/onboard", description: "Onboarding institucí a výrobců" },
+        { label: "Ceník Exchange", href: "/exchange/pricing", description: "Tarify a reklama — kontakt zůstává zdarma" },
+        { label: "Reklama", href: "/exchange/ads", description: "Bannery a newsletter podle regionu" },
+        { label: "Odborný obsah", href: "/exchange/content", description: "Legislativa a klinické analýzy" },
+      ],
+    },
     firmyNav(),
     predplatne ?? { label: "Předplatné", href: "/predplatne" },
   ];

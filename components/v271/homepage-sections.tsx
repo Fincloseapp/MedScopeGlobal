@@ -19,6 +19,8 @@ import { APP_PRODUCTS } from "@/lib/apps/catalog";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { AppOpenLink } from "@/components/apps/app-origin-bar";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { getExchangeCopy } from "@/lib/i18n/exchange-copy";
+import { getExchangeMarketing } from "@/lib/i18n/exchange-marketing";
 import { getRevenueCopy } from "@/lib/i18n/revenue-copy";
 import { formatCzkListPrice, localizeListedCzk } from "@/lib/i18n/payment-currency";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
@@ -222,48 +224,57 @@ export function V271AudienceSections() {
 }
 
 export function V271B2bBlock({ locale = "cs" }: { locale?: string }) {
+  const copy = getExchangeCopy(locale);
+  const marketing = getExchangeMarketing(locale);
   const surface = getSurfaceCopy(locale);
   const revenue = getRevenueCopy(locale);
   const formHref = localizePublicHref("/firmy/reklama/nova", locale);
+  const exchangeHref = localizePublicHref("/exchange", locale);
+  const catalogHref = localizePublicHref("/exchange/catalog", locale);
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <div className="rounded-3xl border border-[#005B96]/15 bg-[#005B96]/5 px-6 py-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">B2B</p>
-            <h3 className="mt-1 font-display text-xl font-semibold text-[#021d33]">{surface.b2bTitle}</h3>
-            <p className="mt-2 text-sm text-slate-600">{surface.b2bDescription}</p>
+      <div className="overflow-hidden rounded-3xl border border-[#021d33]/15 bg-[#021d33] px-6 py-8 text-white">
+        <div className="flex flex-wrap items-start justify-between gap-6">
+          <div className="max-w-2xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#e8d5a3]">{copy.eyebrow}</p>
+            <h3 className="mt-2 font-display text-2xl font-semibold">{copy.title}</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-300">{copy.lead}</p>
+            <p className="mt-2 text-sm text-[#e8d5a3]">{marketing.proof}</p>
           </div>
-          <Link
-            href={formHref}
-            className="rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
-          >
-            {revenue.mediaKitCta}
-          </Link>
-          <Link
-            href={localizePublicHref("/exchange", locale)}
-            className="rounded-full border border-[#005B96] px-5 py-2.5 text-sm font-semibold text-[#005B96]"
-          >
-            B2B Exchange
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href={catalogHref}
+              className="rounded-full bg-[#c4a35a] px-5 py-2.5 text-sm font-semibold text-[#021d33] hover:bg-[#d4b56a]"
+            >
+              {copy.catalogCta}
+            </Link>
+            <Link
+              href={exchangeHref}
+              className="rounded-full border border-white/25 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
+            >
+              {copy.onboardCta}
+            </Link>
+          </div>
         </div>
         <dl className="mt-6 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
-            <dt className="text-xs text-slate-500">{revenue.bannerName}</dt>
-            <dd className="font-display text-lg font-semibold text-[#021d33]">
+          <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+            <dt className="text-xs text-slate-400">{revenue.bannerName}</dt>
+            <dd className="font-display text-lg font-semibold">
               {localizeListedCzk("5 000 Kč", locale)}
             </dd>
           </div>
-          <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
-            <dt className="text-xs text-slate-500">{revenue.sponsoredName}</dt>
-            <dd className="font-display text-lg font-semibold text-[#021d33]">
+          <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+            <dt className="text-xs text-slate-400">{revenue.sponsoredName}</dt>
+            <dd className="font-display text-lg font-semibold">
               {localizeListedCzk("15 000 Kč", locale)}
             </dd>
           </div>
-          <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
-            <dt className="text-xs text-slate-500">{revenue.newsletterName}</dt>
-            <dd className="font-display text-lg font-semibold text-[#021d33]">
-              {localizeListedCzk("3 500 Kč", locale)}
+          <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+            <dt className="text-xs text-slate-400">{surface.b2bTitle}</dt>
+            <dd className="font-display text-lg font-semibold">
+              <Link href={formHref} className="hover:text-[#e8d5a3]">
+                {revenue.mediaKitCta}
+              </Link>
             </dd>
           </div>
         </dl>

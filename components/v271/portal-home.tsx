@@ -25,7 +25,7 @@ import { VITASCOPE_DESK_LOGO } from "@/lib/brand/vitascope";
 import { ViaLongeVitaMark } from "@/components/brand/vialongevita-mark";
 import { EditorialPayButtons } from "@/components/subscription/editorial-pay-buttons";
 import { editionCoverAlt, isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
-import { BookOpen, Gift, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
+import { BookOpen, Gift, Globe2, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { aktualityChip } from "@/lib/i18n/aktuality-chrome";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
@@ -39,6 +39,8 @@ function ServiceGlyph({ icon }: { icon?: string }) {
       return <Newspaper className={cls} aria-hidden />;
     case "spark":
       return <Sparkles className={cls} aria-hidden />;
+    case "globe":
+      return <Globe2 className={cls} aria-hidden />;
     case "gift":
       return <Gift className={cls} aria-hidden />;
     case "pill":
@@ -289,7 +291,11 @@ export function PortalHome({
               <li key={svc.id}>
                 <Item
                   href={openApp ? svc.href : localizePublicHref(svc.href, locale)}
-                  className="flex flex-col items-center gap-1 rounded-md px-1 py-1.5 text-center hover:bg-slate-50"
+                  className={
+                    svc.id === "exchange"
+                      ? "flex flex-col items-center gap-1 rounded-md bg-[#021d33] px-1 py-1.5 text-center text-white ring-2 ring-[#c4a35a] hover:bg-[#032844]"
+                      : "flex flex-col items-center gap-1 rounded-md px-1 py-1.5 text-center hover:bg-slate-50"
+                  }
                 >
                   {"image" in svc && svc.image ? (
                     <Image
@@ -300,12 +306,22 @@ export function PortalHome({
                       className="h-10 w-10 rounded-[22%]"
                     />
                   ) : (
-                    <span className="flex h-10 w-10 items-center justify-center rounded-[22%] bg-[#e8f3fb] text-[#005B96]">
+                    <span
+                      className={
+                        svc.id === "exchange"
+                          ? "flex h-10 w-10 items-center justify-center rounded-[22%] bg-[#c4a35a] text-[#021d33]"
+                          : "flex h-10 w-10 items-center justify-center rounded-[22%] bg-[#e8f3fb] text-[#005B96]"
+                      }
+                    >
                       <ServiceGlyph icon={"icon" in svc ? svc.icon : undefined} />
                     </span>
                   )}
-                  <span className="text-[11px] font-semibold leading-tight text-[#021d33]">{localized?.label ?? svc.label}</span>
-                  <span className="hidden text-[10px] text-slate-500 sm:block">{localized?.hint ?? svc.hint}</span>
+                  <span className={svc.id === "exchange" ? "text-[11px] font-semibold leading-tight text-white" : "text-[11px] font-semibold leading-tight text-[#021d33]"}>
+                    {localized?.label ?? svc.label}
+                  </span>
+                  <span className={svc.id === "exchange" ? "hidden text-[10px] text-[#e8d5a3] sm:block" : "hidden text-[10px] text-slate-500 sm:block"}>
+                    {localized?.hint ?? svc.hint}
+                  </span>
                 </Item>
               </li>
               );

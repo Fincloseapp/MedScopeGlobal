@@ -48,6 +48,26 @@ export async function FirmyDesk({ slug }: { slug?: FirmyRoomId }) {
         ) : null}
       </nav>
 
+      <section className="mb-8 overflow-hidden rounded-3xl border border-[#021d33]/15 bg-[#021d33] px-6 py-8 text-white">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#e8d5a3]">{copy.eyebrow}</p>
+        <h2 className="mt-2 font-display text-2xl font-semibold">{copy.title}</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{copy.lead}</p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Link
+            href={localizePublicHref("/exchange/catalog", locale)}
+            className="inline-block rounded-full bg-[#c4a35a] px-5 py-2 text-sm font-semibold text-[#021d33]"
+          >
+            {copy.catalogCta} →
+          </Link>
+          <Link
+            href={localizePublicHref("/exchange/onboard", locale)}
+            className="inline-block rounded-full border border-white/25 px-5 py-2 text-sm font-semibold text-white"
+          >
+            {copy.onboardCta}
+          </Link>
+        </div>
+      </section>
+
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { value: banner, label: publicCopy.bannerMonth, desc: publicCopy.bannerDesc },
@@ -73,18 +93,6 @@ export async function FirmyDesk({ slug }: { slug?: FirmyRoomId }) {
       ) : null}
 
       <V271B2BPricingTable compact locale={locale} />
-
-      <section className="mt-10 rounded-3xl border border-[#005B96]/20 bg-[#005B96]/5 px-5 py-6">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">B2B Exchange</p>
-        <h2 className="mt-2 font-display text-2xl font-semibold text-[#021d33]">MedScope B2B Exchange</h2>
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{copy.lead}</p>
-        <Link
-          href={localizePublicHref("/exchange", locale)}
-          className="mt-4 inline-block rounded-full bg-[#005B96] px-5 py-2 text-sm font-semibold text-white"
-        >
-          {copy.catalogCta} →
-        </Link>
-      </section>
 
       <section className="mt-10">
         <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">

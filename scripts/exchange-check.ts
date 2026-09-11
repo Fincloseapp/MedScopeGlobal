@@ -20,6 +20,7 @@ import { EXCHANGE_COMMISSION, clampSuccessFeePercent } from "../lib/exchange/mon
 import { canApproveListings, effectiveExchangeRole, EXCHANGE_ROLES } from "../lib/exchange/roles";
 import { filterDemoListings, DEMO_LISTINGS } from "../lib/exchange/seed";
 import { getExchangeCopy } from "../lib/i18n/exchange-copy";
+import { getExchangeMarketing } from "../lib/i18n/exchange-marketing";
 import { getExchangeLegalDoc, listExchangeLegalDocs } from "../lib/exchange/legal-docs";
 import { slugifyExchange } from "../lib/exchange/slug";
 import { listingJsonLd } from "../lib/exchange/jsonld";
@@ -154,9 +155,17 @@ for (const file of [
   "prisma/schema.prisma",
   "app/(public)/exchange/page.tsx",
   "app/api/exchange/health/route.ts",
+  "components/exchange/homepage-billboard.tsx",
+  "components/exchange/header-ribbon.tsx",
+  "components/exchange/marketplace-hero.tsx",
 ]) {
   assert.equal(existsSync(join(root, file)), true, `missing ${file}`);
 }
+
+assert.ok(getExchangeMarketing("cs").ribbon.includes("B2B Exchange"));
+assert.equal(getExchangeMarketing("en").navCta, "Exchange");
+assert.ok(readFileSync(join(root, "app/(public)/page.tsx"), "utf8").includes("ExchangeHomepageBillboard"));
+assert.ok(readFileSync(join(root, "components/layout/site-header.tsx"), "utf8").includes("ExchangeHeaderRibbon"));
 
 const sql = readFileSync(join(root, "supabase/migrations/20260910120000_b2b_exchange.sql"), "utf8");
 assert.ok(sql.includes("availability_region"));

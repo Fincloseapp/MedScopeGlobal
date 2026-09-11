@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { EXCHANGE_AD_PACKAGES, EXCHANGE_COMMISSION, EXCHANGE_PLANS_SPEC } from "@/lib/exchange/monetization";
 import { chromePack } from "@/lib/i18n/chrome-pack";
+import { getExchangeCopy } from "@/lib/i18n/exchange-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
 import { getServerLocale, getServerRegion } from "@/lib/i18n/server-locale";
