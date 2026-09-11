@@ -6,6 +6,8 @@ import { FreePreviewBanner } from "@/components/academy/free-preview-banner";
 import { PrijimackyPrepHub } from "@/components/prijimacky/prep-hub";
 import { isAcademyCoursesCatalogPromoEnabled } from "@/lib/academy/public-catalog";
 import { getCourseVideoFlags, listPublishedCourses } from "@/lib/academy/db";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 import { buildLocalizedV20PageMetadata } from "@/lib/v20/seo";
 
 export const revalidate = 120;
@@ -54,7 +56,8 @@ export default async function AcademyCoursesPage({ searchParams }: Props) {
 
   // Soft gate: hide weak catalog until quality is ready (lib/academy/public-catalog.ts).
   if (!isAcademyCoursesCatalogPromoEnabled()) {
-    redirect(isPrep ? "/studenti" : "/studenti");
+    const locale = await getServerLocale();
+    redirect(localizePublicHref("/studenti", locale));
   }
 
   const courses = await listPublishedCourses(100, {

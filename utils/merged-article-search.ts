@@ -102,6 +102,9 @@ export async function mergedArticleSearch(
 
   return uniqueHits([...fromDesk, ...fromDb])
     .sort((a, b) => {
+      const titleA = queryMatchesHaystack(t, a.title) ? 1 : 0;
+      const titleB = queryMatchesHaystack(t, b.title) ? 1 : 0;
+      if (titleB !== titleA) return titleB - titleA;
       const da = a.published_at ? new Date(a.published_at).getTime() : 0;
       const db = b.published_at ? new Date(b.published_at).getTime() : 0;
       return db - da;

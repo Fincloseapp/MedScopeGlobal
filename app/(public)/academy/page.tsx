@@ -7,13 +7,16 @@ import { CourseCard } from "@/components/academy/course-card";
 import { FreePreviewBanner } from "@/components/academy/free-preview-banner";
 import { isAcademyCoursesCatalogPromoEnabled } from "@/lib/academy/public-catalog";
 import { getCourseVideoFlags, countPrepCourses, listPublishedCourses } from "@/lib/academy/db";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 
 export const revalidate = 120;
 
 export default async function AcademyHubPage() {
   const promo = isAcademyCoursesCatalogPromoEnabled();
   if (!promo) {
-    redirect("/studenti");
+    const locale = await getServerLocale();
+    redirect(localizePublicHref("/studenti", locale));
   }
   const [courses, prepCourses, prepTotal] = promo
     ? await Promise.all([

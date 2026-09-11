@@ -29,7 +29,7 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
   cs: {
     kicker: "MedScopeGlobal.com",
     title: "Čtyři vstupy. Jedna platforma.",
-    lead: "Magazín ViaLongeVita, tržiště výrobců, MeDiprep pro uchazeče o LF a OrdiZapis pro ambulanci. Vyberte, kým jste — zbytek chrome vás tam nenechá bloudit.",
+    lead: "Magazín ViaLongeVita, tržiště výrobců, MeDiprep pro uchazeče o LF a OrdiZapis pro ambulanci. Vyberte, kým jste.",
     jumpLabel: "Rychlá orientace",
     pillars: [
       {
