@@ -30,9 +30,9 @@ export default async function ExchangePage() {
     <div className="bg-[#f4f7fa]">
       <header className="overflow-hidden border-b border-slate-200 bg-[#021d33] text-white">
         <div className="mx-auto grid max-w-6xl md:grid-cols-[minmax(0,1.05fr)_minmax(16rem,0.95fr)]">
-          <div className="px-4 py-12 sm:px-6 sm:py-16">
+          <div className="flex flex-col justify-center px-4 py-10 sm:px-8 sm:py-14">
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e8d5a3]">{copy.kicker}</p>
-            <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">{copy.title}</h1>
+            <h1 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">{copy.title}</h1>
             <p className="mt-4 max-w-xl text-lg leading-relaxed text-white/80">
               {copy.leadBefore}{" "}
               <Link href={firmyHref} className="font-semibold text-[#e8d5a3] hover:underline">
