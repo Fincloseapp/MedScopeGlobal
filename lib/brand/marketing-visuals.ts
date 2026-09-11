@@ -23,6 +23,12 @@ function withVersion(src: string): string {
   return `${src}${sep}v=${MARKETING_ASSET_V}`;
 }
 
+/** Czech/EU manufacturer marketplace — existing B2B photography, not stock. */
+export const MARKETPLACE_VISUALS = {
+  workstation: "/assets/medscopeglobal-research-workstation.png",
+  specialist: "/assets/medscopeglobal-digital-health-specialist.png",
+} as const;
+
 export const APP_MARKETING_IMAGE: Record<
   "medipacient" | "mediprep" | "ordizapis" | "mediflow" | "mediktor",
   string

@@ -19,6 +19,10 @@ export type FirmyDeskCopy = {
   lead: string;
   roomsKicker: string;
   roomsTitle: string;
+  exchangeKicker: string;
+  exchangeTitle: string;
+  exchangeLead: string;
+  exchangeCta: string;
   rooms: Record<
     FirmyRoomId | "cenik",
     { href: string; title: string; body: string; metaTitle: string; metaDescription: string; lead: string }
@@ -33,6 +37,11 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
     eyebrow: "Firmy a partneři",
     title: "Inzerce na ViaLongeVita",
     lead: "Zdravotnické firmy inzerují v magazínu, ne v lékařské zóně. Ceník je orientační, nabídka do 2 pracovních dnů.",
+    exchangeKicker: "Výrobci · laboratoře",
+    exchangeTitle: "Tržiště není inzerce v magazínu",
+    exchangeLead:
+      "Poptávky z Česka a EU, CE / IVDR / ISO. Čtenářská reklama je výše — tržiště výrobců je samostatná stránka.",
+    exchangeCta: "Otevřít tržiště",
     roomsKicker: "Formáty",
     roomsTitle: "Kam patří která poptávka",
     rooms: {
@@ -85,6 +94,11 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
     eyebrow: "Unternehmen und Partner",
     title: "Werbung auf ViaLongeVita",
     lead: "Gesundheitsfirmen werben im Magazin, nicht in der Arztzone. Preise sind Richtwerte, Angebot in 2 Arbeitstagen.",
+    exchangeKicker: "Hersteller · Labore",
+    exchangeTitle: "Der Marktplatz ist keine Magazinwerbung",
+    exchangeLead:
+      "Nachfrage aus Tschechien und der EU, CE / IVDR / ISO. Leserwerbung steht oben — der Herstellerdesk ist eine eigene Seite.",
+    exchangeCta: "Marktplatz öffnen",
     roomsKicker: "Formate",
     roomsTitle: "Welche Anfrage wohin gehört",
     rooms: {
@@ -137,6 +151,11 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
     eyebrow: "Entreprises et partenaires",
     title: "Publicité sur ViaLongeVita",
     lead: "Les entreprises de santé annoncent dans le magazine, pas dans l’espace médecins. Tarifs indicatifs, devis sous 2 jours ouvrés.",
+    exchangeKicker: "Fabricants · laboratoires",
+    exchangeTitle: "La place de marché n’est pas de la publicité magazine",
+    exchangeLead:
+      "Demandes en Tchéquie et dans l’UE, CE / IVDR / ISO. La publicité lecteurs est ci-dessus — le bureau fabricants est une page séparée.",
+    exchangeCta: "Ouvrir la place de marché",
     roomsKicker: "Formats",
     roomsTitle: "Où adresser chaque demande",
     rooms: {
@@ -189,6 +208,11 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
     eyebrow: "Aziende e partner",
     title: "Pubblicità su ViaLongeVita",
     lead: "Le aziende sanitarie annunciano nel magazine, non nella zona medici. Prezzi orientativi, offerta in 2 giorni lavorativi.",
+    exchangeKicker: "Produttori · laboratori",
+    exchangeTitle: "Il mercato non è pubblicità sul magazine",
+    exchangeLead:
+      "Domanda da Cechia e UE, CE / IVDR / ISO. La pubblicità per i lettori è sopra — il desk produttori è una pagina a parte.",
+    exchangeCta: "Apri il mercato",
     roomsKicker: "Formati",
     roomsTitle: "Dove va ogni richiesta",
     rooms: {
@@ -241,6 +265,11 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
     eyebrow: "Empresas y partners",
     title: "Publicidad en ViaLongeVita",
     lead: "Las empresas de salud anuncian en la revista, no en la zona médica. Precios orientativos, oferta en 2 días laborables.",
+    exchangeKicker: "Fabricantes · laboratorios",
+    exchangeTitle: "El mercado no es publicidad en la revista",
+    exchangeLead:
+      "Demanda de Chequia y la UE, CE / IVDR / ISO. La publicidad para lectores está arriba — el escritorio de fabricantes es una página aparte.",
+    exchangeCta: "Abrir el mercado",
     roomsKicker: "Formatos",
     roomsTitle: "Adónde va cada solicitud",
     rooms: {
@@ -293,6 +322,11 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
     eyebrow: "Empresas e parceiros",
     title: "Publicidade na ViaLongeVita",
     lead: "Empresas de saúde anunciam na revista, não na zona médica. Preços indicativos, proposta em 2 dias úteis.",
+    exchangeKicker: "Fabricantes · laboratórios",
+    exchangeTitle: "O mercado não é publicidade na revista",
+    exchangeLead:
+      "Demanda da Chéquia e da UE, CE / IVDR / ISO. A publicidade para leitores está acima — o desk de fabricantes é uma página à parte.",
+    exchangeCta: "Abrir o mercado",
     roomsKicker: "Formatos",
     roomsTitle: "Para onde vai cada pedido",
     rooms: {
@@ -345,6 +379,11 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
     eyebrow: "Companies and partners",
     title: "Advertising on ViaLongeVita",
     lead: "Health companies advertise in the magazine, not in the physician zone. List prices are indicative; a quote arrives within 2 working days.",
+    exchangeKicker: "Manufacturers · labs",
+    exchangeTitle: "The marketplace is not magazine advertising",
+    exchangeLead:
+      "Czech and EU demand, CE / IVDR / ISO. Reader ads sit above — the manufacturer desk is a separate page.",
+    exchangeCta: "Open the marketplace",
     roomsKicker: "Formats",
     roomsTitle: "Where each enquiry belongs",
     rooms: {

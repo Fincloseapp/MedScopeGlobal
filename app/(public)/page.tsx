@@ -27,6 +27,12 @@ import {
   getOgLocale,
   MAGAZINE,
 } from "@/lib/brand/magazine";
+import {
+  editionCoverAbsoluteUrl,
+  editionCoverAlt,
+  isoWeekSeed,
+  pickEditionCover,
+} from "@/lib/brand/edition-covers";
 import { SITE } from "@/lib/config/site";
 import { publicationJsonLd } from "@/lib/seo/json-ld";
 
@@ -39,6 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = getHomepageTitle(locale);
   const description = getHomepageDescription(locale);
   const feed = `${SITE.url}/feed-${localeToPathSegment(locale)}.xml`;
+  const cover = pickEditionCover(locale, isoWeekSeed());
 
   return {
     title: { absolute: title },
@@ -57,10 +64,10 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       images: [
         {
-          url: `${SITE.url}${MAGAZINE.emailLockup}`,
-          width: 1200,
-          height: 340,
-          alt: MAGAZINE.name,
+          url: editionCoverAbsoluteUrl(cover),
+          width: 1100,
+          height: 1650,
+          alt: editionCoverAlt(locale),
         },
       ],
     },
@@ -68,7 +75,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title,
       description,
-      images: [`${SITE.url}${MAGAZINE.emailLockup}`],
+      images: [editionCoverAbsoluteUrl(cover)],
     },
   };
 }

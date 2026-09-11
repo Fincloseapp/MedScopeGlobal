@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { BookOpen, GraduationCap, Stethoscope, Store } from "lucide-react";
 import { AppOpenLink, isStandaloneAppHref } from "@/components/apps/app-origin-bar";
-import { ViaLongeVitaMark } from "@/components/brand/vialongevita-mark";
-import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
+import { MAGAZINE } from "@/lib/brand/magazine";
+import { editionCoverAlt, isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
+import { APP_MARKETING_IMAGE, MARKETPLACE_VISUALS } from "@/lib/brand/marketing-visuals";
 import {
   getHomepagePillarsCopy,
   type HomepagePillar,
@@ -14,45 +14,61 @@ import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { cn } from "@/lib/utils";
 
 const TONE: Record<HomepagePillarId, string> = {
-  magazine: "border-[#cfe1f3] bg-gradient-to-b from-[#f4f9fd] to-white",
+  magazine: "border-[#cfe1f3] bg-white",
   marketplace: "border-[#021d33] bg-[#021d33] text-white",
-  students: "border-[#c9e4d4] bg-gradient-to-b from-[#f3faf6] to-white",
-  physicians: "border-[#c5d4ea] bg-gradient-to-b from-[#eef3fb] to-white",
+  students: "border-[#c9e4d4] bg-white",
+  physicians: "border-[#c5d4ea] bg-white",
 };
 
-function PillarGlyph({ id, marketplace }: { id: HomepagePillarId; marketplace?: boolean }) {
-  const cls = marketplace ? "h-5 w-5 text-[#e8d5a3]" : "h-5 w-5 text-[#005B96]";
-  switch (id) {
-    case "magazine":
-      return <BookOpen className={cls} aria-hidden />;
-    case "marketplace":
-      return <Store className={cls} aria-hidden />;
-    case "students":
-      return <GraduationCap className={cls} aria-hidden />;
-    default:
-      return <Stethoscope className={cls} aria-hidden />;
-  }
-}
-
-function PillarVisual({ pillar }: { pillar: HomepagePillar }) {
+function PillarVisual({ pillar, locale }: { pillar: HomepagePillar; locale: string }) {
   if (pillar.id === "magazine") {
+    const cover = pickEditionCover(locale, `${isoWeekSeed()}:pillar`);
     return (
-      <div className="mb-3">
-        <ViaLongeVitaMark variant="compact" />
-      </div>
-    );
-  }
-  if (pillar.id === "students" || pillar.id === "physicians") {
-    const src = pillar.id === "students" ? APP_MARKETING_IMAGE.mediprep : APP_MARKETING_IMAGE.ordizapis;
-    return (
-      <span className="relative mb-3 block h-16 w-full overflow-hidden rounded-lg bg-slate-100">
-        <Image src={src} alt="" fill className="object-cover object-top" sizes="280px" />
+      <span className="relative block aspect-[16/10] w-full overflow-hidden bg-[#050b1d]">
+        <Image
+          src={cover.src}
+          alt={editionCoverAlt(locale)}
+          fill
+          className="object-cover object-top"
+          sizes="(max-width:640px) 100vw, (max-width:1280px) 50vw, 280px"
+        />
+        <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#050b1d] via-[#050b1d]/55 to-transparent px-3 pb-3 pt-10">
+          <Image
+            src={MAGAZINE.emailLockup}
+            alt=""
+            width={240}
+            height={68}
+            className="h-7 w-auto object-contain object-left"
+          />
+        </span>
       </span>
     );
   }
+
+  if (pillar.id === "marketplace") {
+    return (
+      <span className="relative block aspect-[16/10] w-full overflow-hidden bg-[#021d33]">
+        <Image
+          src={MARKETPLACE_VISUALS.workstation}
+          alt=""
+          fill
+          className="object-cover object-center"
+          sizes="(max-width:640px) 100vw, (max-width:1280px) 50vw, 280px"
+        />
+        <span className="absolute inset-0 bg-gradient-to-t from-[#021d33] via-[#021d33]/25 to-transparent" />
+      </span>
+    );
+  }
+
+  const src = pillar.id === "students" ? APP_MARKETING_IMAGE.mediprep : APP_MARKETING_IMAGE.ordizapis;
   return (
-    <span className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1a2b44]">
-      <PillarGlyph id={pillar.id} marketplace />
+    <span
+      className={cn(
+        "relative block aspect-[16/10] w-full overflow-hidden",
+        pillar.id === "students" ? "bg-[#eef8f2]" : "bg-[#eef3fb]"
+      )}
+    >
+      <Image src={src} alt="" fill className="object-contain object-center p-3" sizes="280px" />
     </span>
   );
 }
@@ -119,48 +135,50 @@ export function HomepagePillars({ locale = "cs" }: { locale?: string }) {
           const market = pillar.id === "marketplace";
           return (
             <li key={pillar.id} id={`pillar-${pillar.id}`}>
-              <article className={cn("flex h-full flex-col rounded-2xl border p-5", TONE[pillar.id])}>
-                <PillarVisual pillar={pillar} />
-                <p
-                  className={cn(
-                    "text-[10px] font-semibold uppercase tracking-[0.22em]",
-                    market ? "text-[#e8d5a3]" : "text-[#005B96]"
-                  )}
-                >
-                  {pillar.eyebrow}
-                </p>
-                <h3 className={cn("mt-1 font-display text-xl font-bold", market ? "text-white" : "text-[#021d33]")}>
-                  {pillar.title}
-                </h3>
-                <p className={cn("mt-2 flex-1 text-sm leading-relaxed", market ? "text-white/80" : "text-slate-600")}>
-                  {pillar.lead}
-                </p>
-                <p className={cn("mt-3 text-xs font-medium", market ? "text-[#e8d5a3]" : "text-slate-500")}>
-                  {pillar.product}
-                </p>
-                <div className="mt-4 flex flex-wrap items-center gap-2">
-                  <PillarCta
-                    href={pillar.ctaHref}
-                    locale={locale}
+              <article className={cn("flex h-full flex-col overflow-hidden rounded-2xl border shadow-sm", TONE[pillar.id])}>
+                <PillarVisual pillar={pillar} locale={locale} />
+                <div className="flex flex-1 flex-col p-5">
+                  <p
                     className={cn(
-                      "inline-flex rounded-full px-4 py-2 text-sm font-semibold",
-                      market
-                        ? "bg-[#c4a35a] text-[#021d33] hover:bg-[#e8d5a3]"
-                        : "bg-[#005B96] text-white hover:bg-[#004a7a]"
+                      "text-[10px] font-semibold uppercase tracking-[0.22em]",
+                      market ? "text-[#e8d5a3]" : "text-[#005B96]"
                     )}
                   >
-                    {pillar.cta}
-                  </PillarCta>
-                  <PillarCta
-                    href={pillar.secondaryHref}
-                    locale={locale}
-                    className={cn(
-                      "text-sm font-medium underline-offset-2 hover:underline",
-                      market ? "text-white/80" : "text-[#005B96]"
-                    )}
-                  >
-                    {pillar.secondary}
-                  </PillarCta>
+                    {pillar.eyebrow}
+                  </p>
+                  <h3 className={cn("mt-1 font-display text-xl font-bold", market ? "text-white" : "text-[#021d33]")}>
+                    {pillar.title}
+                  </h3>
+                  <p className={cn("mt-2 flex-1 text-sm leading-relaxed", market ? "text-white/80" : "text-slate-600")}>
+                    {pillar.lead}
+                  </p>
+                  <p className={cn("mt-3 text-xs font-medium", market ? "text-[#e8d5a3]" : "text-slate-500")}>
+                    {pillar.product}
+                  </p>
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <PillarCta
+                      href={pillar.ctaHref}
+                      locale={locale}
+                      className={cn(
+                        "inline-flex rounded-full px-4 py-2 text-sm font-semibold",
+                        market
+                          ? "bg-[#c4a35a] text-[#021d33] hover:bg-[#e8d5a3]"
+                          : "bg-[#005B96] text-white hover:bg-[#004a7a]"
+                      )}
+                    >
+                      {pillar.cta}
+                    </PillarCta>
+                    <PillarCta
+                      href={pillar.secondaryHref}
+                      locale={locale}
+                      className={cn(
+                        "text-sm font-medium underline-offset-2 hover:underline",
+                        market ? "text-white/80" : "text-[#005B96]"
+                      )}
+                    >
+                      {pillar.secondary}
+                    </PillarCta>
+                  </div>
                 </div>
               </article>
             </li>

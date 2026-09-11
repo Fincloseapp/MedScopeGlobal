@@ -332,6 +332,8 @@ import { editorialCanceledCopy } from "../../lib/editorial/pay-labels";
 import { isApiRateLimitExempt } from "../../lib/v30/security/rate-limit";
 import { getEditorialArticleGateCopy } from "../../lib/v38/conversion-copy";
 import { getSubscribeCopy } from "../../lib/i18n/subscribe-copy";
+import { getHomepagePillarsCopy } from "../../lib/i18n/homepage-pillars-copy";
+import { getExchangeCopy } from "../../lib/i18n/exchange-copy";
 import {
   aresSubjectUrl,
   formatLegalEntityLine,
@@ -2097,12 +2099,32 @@ assert.ok(
 );
 assert.ok(
   readFileSync(join(root, "components/firmy/firmy-desk.tsx"), "utf8").indexOf(
-    "Tržiště není inzerce v magazínu"
+    'data-studio="firmy-exchange-teaser"'
   ) <
     readFileSync(join(root, "components/firmy/firmy-desk.tsx"), "utf8").indexOf(
       "<V271B2BPricingTable"
     ),
   "firmy desk must show the manufacturer exchange before the magazine rate card"
+);
+assert.ok(
+  readFileSync(join(root, "components/v271/homepage-pillars.tsx"), "utf8").includes("pickEditionCover") &&
+    readFileSync(join(root, "components/v271/homepage-pillars.tsx"), "utf8").includes(
+      "MARKETPLACE_VISUALS.workstation"
+    ),
+  "homepage four-door cards must use ViaLongeVita edition photography and the B2B workstation"
+);
+assert.ok(
+  readFileSync(join(root, "lib/i18n/homepage-pillars-editions.ts"), "utf8").includes("sk:") &&
+    readFileSync(join(root, "lib/i18n/homepage-pillars-editions.ts"), "utf8").includes("ja:") &&
+    getHomepagePillarsCopy("sk").title.includes("Štyri") &&
+    getHomepagePillarsCopy("ja").title.includes("入口"),
+  "homepage four-door copy must have native editions beyond chrome packs"
+);
+assert.ok(
+  getExchangeCopy("de").title.includes("Marktplatz") &&
+    getExchangeCopy("sk").registerCta.includes("Registrovať") &&
+    !getExchangeCopy("ja").title.includes("Tržiště"),
+  "manufacturer exchange chrome must follow the edition language"
 );
 assert.ok(
   !readFileSync(join(root, "components/studenti/student-offer-dashboard.tsx"), "utf8").includes(
