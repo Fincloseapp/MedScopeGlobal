@@ -17,7 +17,11 @@ export async function GET(request: Request) {
     country,
     locales: EXCHANGE_TARGET_LOCALES,
     roles: EXCHANGE_ROLES,
+    revenueModel: EXCHANGE_COMMISSION.revenueModel,
+    dealCommissionPercent: EXCHANGE_COMMISSION.dealCommissionPercent,
+    successFeePercent: EXCHANGE_COMMISSION.successFeePercent,
     contactCommissionPercent: EXCHANGE_COMMISSION.contactFeePercent,
     processesPayments: EXCHANGE_COMMISSION.processesPayments,
+    plans: ["basic", "pro", "enterprise"],
   });
 }

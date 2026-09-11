@@ -55,6 +55,8 @@ const MAGAZINE_PATHS: StaticSpec[] = [
   { path: "/exchange", changeFrequency: "weekly", priority: 0.88 },
   { path: "/exchange/catalog", changeFrequency: "daily", priority: 0.86 },
   { path: "/exchange/pricing", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/exchange/ads", changeFrequency: "monthly", priority: 0.55 },
+  { path: "/exchange/content", changeFrequency: "weekly", priority: 0.6 },
   { path: "/exchange/onboard", changeFrequency: "monthly", priority: 0.65 },
   { path: "/exchange/legal", changeFrequency: "yearly", priority: 0.4 },
   { path: "/exchange/legal/terms", changeFrequency: "yearly", priority: 0.35 },

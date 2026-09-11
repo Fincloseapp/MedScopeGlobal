@@ -91,15 +91,6 @@ export default async function ExchangeListingPage({ params }: { params: Promise<
         </p>
       ) : null}
       <p className="mt-6 text-sm font-medium text-slate-700">{copy.intermediary}</p>
-      {listing.organization?.contactEmail ? (
-        <p className="mt-2 text-sm">
-          {copy.directContact}:{" "}
-          <a className="text-[#005B96] underline" href={`mailto:${listing.organization.contactEmail}`}>
-            {listing.organization.contactEmail}
-          </a>
-          {listing.organization.contactPhone ? ` · ${listing.organization.contactPhone}` : ""}
-        </p>
-      ) : null}
       <div className="mt-8 max-w-xl">
         <ExchangeContactForm listingSlug={listing.slug} locale={locale} copy={copy} />
       </div>

@@ -6,6 +6,9 @@ import { sanitizeText } from "@/lib/security/sanitize";
 import { withApiGuard } from "@/lib/security/api-guard";
 import { regionFromCountry } from "@/lib/exchange/regions";
 import { requestCountry } from "@/lib/growth/request-country";
+import { EXCHANGE_COMMISSION } from "@/lib/exchange/monetization";
+import { logAdminEvent } from "@/lib/logging";
+import { recordExchangeMetric } from "@/lib/exchange/observability";
 
 export const dynamic = "force-dynamic";
 
@@ -40,21 +43,30 @@ export async function POST(request: Request) {
     message: sanitizeText(parsed.data.message, 4000),
     locale: parsed.data.locale ?? "en",
     region,
+    premium: false,
   };
 
   const supabase = await createDataClient();
   if (supabase) {
-    const { error } = await supabase.from("exchange_contacts").insert(payload);
-    if (error) {
-      return NextResponse.json({ ok: true, demo: true, advertiserEmail: listing.organization?.contactEmail ?? null });
-    }
+    await supabase.from("exchange_contacts").insert(payload);
+    await supabase.from("exchange_audit_events").insert({
+      action: "inquiry_created",
+      organization_id: listing.organizationId,
+      details: { listingSlug: listing.slug, locale: payload.locale, region },
+    });
   }
+
+  await logAdminEvent("exchange_inquiry", {
+    listingSlug: listing.slug,
+    region,
+    locale: payload.locale,
+  });
+  recordExchangeMetric("inquiry_created", { region, locale: payload.locale });
 
   return NextResponse.json({
     ok: true,
-    commission: 0,
-    advertiserEmail: listing.organization?.contactEmail ?? null,
-    advertiserPhone: listing.organization?.contactPhone ?? null,
-    message: "Introduction recorded. The advertiser receives this enquiry directly.",
+    commission: EXCHANGE_COMMISSION.dealCommissionPercent,
+    advertiserNotified: true,
+    message: "Inquiry recorded. Paying advertisers receive the buyer contact in their inbox.",
   });
 }

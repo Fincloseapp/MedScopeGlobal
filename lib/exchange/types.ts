@@ -52,6 +52,9 @@ export type ExchangeOrganization = {
   sourceLocale: string;
   description: string;
   logoUrl?: string | null;
+  micrositeEnabled?: boolean;
+  apiImportEnabled?: boolean;
+  adCredits?: number;
   createdAt: string;
 };
 
@@ -63,7 +66,7 @@ export type ExchangeListing = {
   organizationId: string;
   organization?: Pick<
     ExchangeOrganization,
-    "slug" | "legalName" | "tradeName" | "kind" | "verified" | "contactEmail" | "contactPhone" | "website"
+    "slug" | "legalName" | "tradeName" | "kind" | "verified" | "website"
   >;
   category: string;
   sourceLocale: string;

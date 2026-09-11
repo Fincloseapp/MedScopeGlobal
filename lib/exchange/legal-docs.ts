@@ -14,8 +14,8 @@ export type ExchangeLegalDoc = {
   sections: LegalSection[];
 };
 
-const VERSION = "2026-09-10";
-const UPDATED = "2026-09-10";
+const VERSION = "2026-09-11";
+const UPDATED = "2026-09-11";
 
 function entityLine() {
   const e = getLegalEntity();
@@ -59,8 +59,8 @@ const CS: Record<LegalDocId, Omit<ExchangeLegalDoc, "id" | "href">> = {
       {
         heading: "5. Poplatky",
         body: [
-          "Zprostředkování kontaktu je bez provize. Předplatné (Basic / Pro / Enterprise) a reklamní balíčky se řídí ceníkem /exchange/pricing.",
-          "Volitelný success fee 5–12 % u tarifu Enterprise je možný pouze při dobrovolném vykázání uzavřeného obchodu a fakturuje se odděleně. Není podmínkou kontaktu.",
+          "Jediným zdrojem příjmu platformy je předplatné inzerenta (Basic zdarma, Pro a Enterprise placené) a reklamní balíčky pro platící inzerenty. Ceník: /exchange/pricing.",
+          "Z obchodu mezi kupujícím a inzerentem se nebere žádná provize ani success fee. Platforma je hrazena i tehdy, když inzerent poptávku neuzavře. Kupující poptává zdarma a bez registrace. Kontakty kupujících vidí pouze platící inzerenti.",
         ],
       },
       {
@@ -221,8 +221,8 @@ const EN: Record<LegalDocId, Omit<ExchangeLegalDoc, "id" | "href">> = {
       {
         heading: "5. Fees",
         body: [
-          "Introductions carry no commission. Subscriptions (Basic / Pro / Enterprise) and advertising packs follow /exchange/pricing.",
-          "An optional 5–12% success fee on Enterprise applies only if the organisation voluntarily reports a closed deal, invoiced separately. It is not a condition of contact.",
+          "The only platform revenue is the advertiser subscription (Basic free, Pro and Enterprise paid) and advertising packs for paying advertisers. Pricing: /exchange/pricing.",
+          "There is no deal commission and no success fee. The platform is paid even if the advertiser never closes a deal. Buyers send inquiries free and without registration. Buyer contacts are visible only to paying advertisers.",
         ],
       },
       {

@@ -1,5 +1,6 @@
 // MedScope B2B Exchange — typed contract.
-// Production DDL lives in supabase/migrations/20260910120000_b2b_exchange.sql.
+// Production DDL lives in supabase/migrations/20260910120000_b2b_exchange.sql
+// and supabase/migrations/20260911120000_b2b_exchange_subscriptions.sql.
 // This file is documentation + future Prisma client; it is not applied at build time.
 
 generator client {
@@ -81,12 +82,16 @@ model ExchangeOrganization {
   sourceLocale         String                         @default("en") @map("source_locale")
   description          String
   logoUrl              String?                       @map("logo_url")
+  micrositeEnabled     Boolean                        @default(false) @map("microsite_enabled")
+  apiImportEnabled     Boolean                        @default(false) @map("api_import_enabled")
+  adCredits            Int                            @default(0) @map("ad_credits")
   createdAt            DateTime                        @default(now()) @map("created_at")
   listings             ExchangeListing[]
   memberships          ExchangeMembership[]
   contacts             ExchangeContact[]
   ads                  ExchangeAd[]
   subscriptions        ExchangeSubscription[]
+  inquiryReplies       ExchangeInquiryReply[]
 
   @@map("exchange_organizations")
 }
@@ -159,9 +164,12 @@ model ExchangeContact {
   message            String
   locale             String?
   region             ExchangeAvailabilityRegion?
+  premium            Boolean                     @default(false)
+  repliedAt          DateTime?                   @map("replied_at")
   createdAt          DateTime                    @default(now()) @map("created_at")
   listing            ExchangeListing             @relation(fields: [listingId], references: [id], onDelete: Cascade)
   organization        ExchangeOrganization?        @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  replies            ExchangeInquiryReply[]
 
   @@map("exchange_contacts")
 }
@@ -184,13 +192,40 @@ model ExchangeAd {
   @@map("exchange_ads")
 }
 
+model ExchangeInquiryReply {
+  id               String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contactId        String           @map("contact_id") @db.Uuid
+  organizationId   String?          @map("organization_id") @db.Uuid
+  body             String
+  createdAt        DateTime         @default(now()) @map("created_at")
+  contact          ExchangeContact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  organization     ExchangeOrganization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@map("exchange_inquiry_replies")
+}
+
+model ExchangeAuditEvent {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  action           String
+  organizationId   String?   @map("organization_id") @db.Uuid
+  userId           String?   @map("user_id") @db.Uuid
+  plan             String?
+  details          Json?
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  @@map("exchange_audit_events")
+}
+
 model ExchangeSubscription {
-  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  organizationId     String               @map("organization_id") @db.Uuid
-  plan               ExchangePlan
-  status             String               @default("pending")
-  successFeePercent  Decimal?            @map("success_fee_percent") @db.Decimal(5, 2)
-  organization        ExchangeOrganization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  id                     String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId         String               @map("organization_id") @db.Uuid
+  plan                   ExchangePlan
+  status                 String               @default("pending")
+  startsAt               DateTime?            @map("starts_at")
+  endsAt                 DateTime?            @map("ends_at")
+  stripeSubscriptionId   String?              @map("stripe_subscription_id")
+  adCredits              Int                  @default(0) @map("ad_credits")
+  organization            ExchangeOrganization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@map("exchange_subscriptions")
 }

@@ -51,11 +51,10 @@ export default async function ExchangeCompanyPage({ params }: { params: Promise<
           </span>
         ))}
       </div>
-      {organization.contactEmail ? (
+      {organization.website ? (
         <p className="mt-4 text-sm">
-          {copy.directContact}:{" "}
-          <a className="text-[#005B96] underline" href={`mailto:${organization.contactEmail}`}>
-            {organization.contactEmail}
+          <a className="text-[#005B96] underline" href={organization.website} rel="noopener noreferrer">
+            {organization.website.replace(/^https?:\/\//, "")}
           </a>
         </p>
       ) : null}

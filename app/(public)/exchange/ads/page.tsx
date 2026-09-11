@@ -4,6 +4,7 @@ import { listExchangeAds } from "@/lib/exchange/catalog";
 import { EXCHANGE_AD_PACKAGES } from "@/lib/exchange/monetization";
 import { regionLabel } from "@/lib/exchange/regions";
 import { getExchangeCopy } from "@/lib/i18n/exchange-copy";
+import { getExchangeSubCopy } from "@/lib/i18n/exchange-subscription-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
 import { getServerLocale, getServerRegion } from "@/lib/i18n/server-locale";
@@ -24,10 +25,12 @@ export default async function ExchangeAdsPage() {
   const locale = await getServerLocale();
   const region = await getServerRegion();
   const copy = getExchangeCopy(locale);
+  const sub = getExchangeSubCopy(locale);
   const ads = await listExchangeAds();
 
   return (
     <ModulePageShell eyebrow={copy.eyebrow} title={copy.adsTitle} description={copy.adsLead}>
+      <p className="mb-6 text-sm font-medium text-amber-900">{sub.adsPaidOnly}</p>
       <div className="grid gap-4 md:grid-cols-3">
         {Object.values(EXCHANGE_AD_PACKAGES).map((pack) => (
           <article key={pack.id} className="rounded-2xl border border-[#cfe1f3] bg-white p-5">
@@ -50,10 +53,10 @@ export default async function ExchangeAdsPage() {
         ))}
       </ul>
       <Link
-        href={localizePublicHref("/inzerce/formular", locale)}
+        href={localizePublicHref("/exchange/pricing", locale)}
         className="mt-8 inline-block rounded-full bg-[#005B96] px-5 py-2 text-sm font-semibold text-white"
       >
-        {copy.onboardCta}
+        {sub.upgradeCta}
       </Link>
     </ModulePageShell>
   );

@@ -17,14 +17,14 @@ const PACK: Record<ChromePack, Omit<ExchangeMarketing, "stats">> = {
     ribbon: "MedScope B2B Exchange — zdravotnický marketplace · přímý kontakt bez provize",
     ribbonCta: "Vstoupit",
     navCta: "Exchange",
-    proof: "Přímý kontakt. Žádná provize. Povinný region. Certifikace CE / FDA / ISO.",
+    proof: "Poptávky zdarma pro kupující. Kontakty jen pro platící inzerenty. Povinný region. CE / FDA / ISO.",
     featured: "Aktuální nabídky",
   },
   en: {
     ribbon: "MedScope B2B Exchange — healthcare marketplace · direct contact, no intro fee",
     ribbonCta: "Open",
     navCta: "Exchange",
-    proof: "Direct contact. No introduction fee. Mandatory region. CE / FDA / ISO on products.",
+    proof: "Free buyer inquiries. Contacts for paying advertisers only. Mandatory region. CE / FDA / ISO on products.",
     featured: "Featured listings",
   },
   de: {
@@ -65,8 +65,8 @@ const PACK: Record<ChromePack, Omit<ExchangeMarketing, "stats">> = {
 };
 
 const STAT_LABELS: Record<ChromePack, [string, string, string, string]> = {
-  cs: ["provize za kontakt", "povinný region", "pouze B2B", "u produktů"],
-  en: ["introduction fee", "mandatory region", "B2B only", "on products"],
+  cs: ["provize z obchodu", "povinný region", "pouze B2B", "u produktů"],
+  en: ["deal commission", "mandatory region", "B2B only", "on products"],
   de: ["Kontaktprovision", "Pflichtregion", "nur B2B", "bei Produkten"],
   fr: ["commission de contact", "région obligatoire", "B2B uniquement", "sur les produits"],
   it: ["commissione di contatto", "regione obbligatoria", "solo B2B", "sui prodotti"],

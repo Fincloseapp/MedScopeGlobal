@@ -17,6 +17,7 @@ import type {
   ExchangeOrganization,
   ListingKind,
 } from "@/lib/exchange/types";
+import { publicListing, publicListings, publicOrganization } from "@/lib/exchange/public-surface";
 
 export type ListingQuery = {
   q?: string;
@@ -42,8 +43,6 @@ function mapListing(row: Record<string, unknown>, org?: Record<string, unknown> 
           tradeName: String(org.trade_name ?? org.tradeName ?? ""),
           kind: org.kind as ExchangeOrganization["kind"],
           verified: Boolean(org.verified),
-          contactEmail: String(org.contact_email ?? ""),
-          contactPhone: (org.contact_phone as string | null) ?? null,
           website: (org.website as string | null) ?? null,
         }
       : undefined,
@@ -86,6 +85,9 @@ function mapOrg(row: Record<string, unknown>): ExchangeOrganization {
     sourceLocale: String(row.source_locale ?? "en"),
     description: String(row.description ?? ""),
     logoUrl: (row.logo_url as string | null) ?? null,
+    micrositeEnabled: Boolean(row.microsite_enabled),
+    apiImportEnabled: Boolean(row.api_import_enabled),
+    adCredits: Number(row.ad_credits ?? 0),
     createdAt: String(row.created_at ?? new Date().toISOString()),
   };
 }
@@ -122,13 +124,13 @@ export async function listExchangeListings(query: ListingQuery = {}): Promise<{
             `${item.title} ${item.summary} ${item.organization?.tradeName ?? ""}`.toLowerCase().includes(needle)
           );
         }
-        if (items.length > 0) return { items, source: "db" };
+        if (items.length > 0) return { items: publicListings(items), source: "db" };
       }
     } catch {
       // degrade to demo
     }
   }
-  return { items: filterDemoListings(query).slice(0, limit), source: "demo" };
+  return { items: publicListings(filterDemoListings(query).slice(0, limit)), source: "demo" };
 }
 
 export async function getExchangeListing(slug: string): Promise<{
@@ -146,7 +148,7 @@ export async function getExchangeListing(slug: string): Promise<{
       if (!error && data) {
         const rec = data as Record<string, unknown>;
         return {
-          listing: mapListing(rec, rec.exchange_organizations as Record<string, unknown> | null),
+          listing: publicListing(mapListing(rec, rec.exchange_organizations as Record<string, unknown> | null)),
           source: "db",
         };
       }
@@ -154,7 +156,8 @@ export async function getExchangeListing(slug: string): Promise<{
       // demo
     }
   }
-  return { listing: demoListingBySlug(slug) ?? null, source: "demo" };
+  const demo = demoListingBySlug(slug);
+  return { listing: demo ? publicListing(demo) : null, source: "demo" };
 }
 
 export async function getExchangeOrganization(slug: string): Promise<{
@@ -178,8 +181,8 @@ export async function getExchangeOrganization(slug: string): Promise<{
           .eq("organization_id", org.id)
           .eq("status", "approved");
         return {
-          organization: org,
-          listings: (listingRows ?? []).map((row) => mapListing(row as Record<string, unknown>)),
+          organization: publicOrganization(org),
+          listings: publicListings((listingRows ?? []).map((row) => mapListing(row as Record<string, unknown>))),
           source: "db",
         };
       }
@@ -189,8 +192,8 @@ export async function getExchangeOrganization(slug: string): Promise<{
   }
   const organization = demoOrganizationBySlug(slug) ?? null;
   return {
-    organization,
-    listings: organization ? demoListingsForOrg(organization.id) : [],
+    organization: organization ? publicOrganization(organization) : null,
+    listings: organization ? publicListings(demoListingsForOrg(organization.id)) : [],
     source: "demo",
   };
 }
@@ -236,5 +239,5 @@ export function listExchangeContent(locale?: string): ExchangeExpertContent[] {
 }
 
 export function listDemoOrganizations(): ExchangeOrganization[] {
-  return DEMO_ORGANIZATIONS;
+  return DEMO_ORGANIZATIONS.map(publicOrganization);
 }

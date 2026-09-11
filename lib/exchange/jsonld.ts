@@ -45,8 +45,6 @@ export function companyJsonLd(org: ExchangeOrganization, locale: string) {
     name: org.tradeName,
     legalName: org.legalName,
     url: `${SITE.url}/${locale.split("-")[0]}/exchange/companies/${org.slug}`,
-    email: org.contactEmail,
-    telephone: org.contactPhone ?? undefined,
     address: { "@type": "PostalAddress", addressCountry: org.countryCode },
     areaServed: org.availabilityRegions,
   };
