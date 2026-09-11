@@ -3,6 +3,7 @@ import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { V271B2BPricingTable } from "@/components/v271/b2b-pricing-table";
 import { SITE } from "@/lib/config/site";
 import { getB2bPublicCopy } from "@/lib/i18n/b2b-public-copy";
+import { getExchangeCopy } from "@/lib/i18n/exchange-copy";
 import { getFirmyDeskCopy, type FirmyRoomId } from "@/lib/i18n/firmy-desk-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
@@ -13,6 +14,7 @@ export async function FirmyDesk({ slug }: { slug?: FirmyRoomId }) {
   const region = await getServerRegion();
   const publicCopy = getB2bPublicCopy(locale);
   const desk = getFirmyDeskCopy(locale);
+  const copy = getExchangeCopy(locale);
   const room = slug ? desk.rooms[slug] : null;
   const formHref = localizePublicHref("/inzerce/formular", locale);
   const contactHref = localizePublicHref("/kontakt", locale);
@@ -45,6 +47,26 @@ export async function FirmyDesk({ slug }: { slug?: FirmyRoomId }) {
           </>
         ) : null}
       </nav>
+
+      <section className="mb-8 overflow-hidden rounded-3xl border border-[#021d33]/15 bg-[#021d33] px-6 py-8 text-white">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#e8d5a3]">{copy.eyebrow}</p>
+        <h2 className="mt-2 font-display text-2xl font-semibold">{copy.title}</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{copy.lead}</p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Link
+            href={localizePublicHref("/exchange/catalog", locale)}
+            className="inline-block rounded-full bg-[#c4a35a] px-5 py-2 text-sm font-semibold text-[#021d33]"
+          >
+            {copy.catalogCta} →
+          </Link>
+          <Link
+            href={localizePublicHref("/exchange/onboard", locale)}
+            className="inline-block rounded-full border border-white/25 px-5 py-2 text-sm font-semibold text-white"
+          >
+            {copy.onboardCta}
+          </Link>
+        </div>
+      </section>
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[

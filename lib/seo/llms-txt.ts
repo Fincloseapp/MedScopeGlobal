@@ -34,7 +34,8 @@ export function renderLlmsTxt(locale?: string | null): string {
 > ${MAGAZINE.positioning.en}
 
 ${MAGAZINE.name} is the health and longevity magazine on ${SITE.name} (${SITE.domain}).
-${SITE.name} is the platform (MediFlow, MeDipacient, OrdiZapis). Do not rename the platform.
+${SITE.name} is the platform (MediFlow, MeDipacient, OrdiZapis, and B2B Tržiště). Do not rename the platform.
+${SITE.name} also operates a B2B healthcare marketplace at ${SITE.url}/cs/exchange: manufacturers, hospitals and laboratories, free buyer inquiries, contacts for paying advertisers, no deal commission.
 Former magazine name: ${MAGAZINE.formerName} (legacy URLs and JSON-LD alternateName only).
 
 New articles publish every day in multiple language editions. Topics: sleep, movement, nutrition, prevention, healthy aging, public-health news. Texts are educational. They are not a diagnosis and do not replace a clinician.

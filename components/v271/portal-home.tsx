@@ -25,13 +25,14 @@ import { VITASCOPE_DESK_LOGO } from "@/lib/brand/vitascope";
 import { ViaLongeVitaMark } from "@/components/brand/vialongevita-mark";
 import { EditorialPayButtons } from "@/components/subscription/editorial-pay-buttons";
 import { editionCoverAlt, isoWeekSeed, pickEditionCover } from "@/lib/brand/edition-covers";
-import { BookOpen, Gift, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
+import { BookOpen, Gift, Globe2, GraduationCap, LayoutGrid, Newspaper, Pill, Sparkles } from "lucide-react";
+import { ExchangePortalSpotlight } from "@/components/exchange/portal-spotlight";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { aktualityChip } from "@/lib/i18n/aktuality-chrome";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
 
 function ServiceGlyph({ icon }: { icon?: string }) {
-  const cls = "h-5 w-5";
+  const cls = "h-4 w-4";
   switch (icon) {
     case "book":
       return <BookOpen className={cls} aria-hidden />;
@@ -39,6 +40,8 @@ function ServiceGlyph({ icon }: { icon?: string }) {
       return <Newspaper className={cls} aria-hidden />;
     case "spark":
       return <Sparkles className={cls} aria-hidden />;
+    case "globe":
+      return <Globe2 className={cls} aria-hidden />;
     case "gift":
       return <Gift className={cls} aria-hidden />;
     case "pill":
@@ -233,11 +236,10 @@ export function PortalHome({
   const publicApps = APP_PRODUCTS.filter((app) => isCzechSurface(locale) || app.id !== "mediprep");
   const publicServices = PORTAL_SERVICES.filter((svc) => isCzechSurface(locale) || svc.id !== "mediprep");
   return (
-    <div className="border-b border-slate-200 bg-[#e8eef3]">
-      <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5">
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-          <div className="grid bg-[#050b1d] md:min-h-[32rem] md:grid-cols-[minmax(0,1.15fr)_minmax(12rem,0.85fr)]">
-            <div className="flex items-center px-4 py-5 sm:px-8 sm:py-7">
+    <div className="border-b border-slate-200 bg-[#f4f1eb]">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+        <div className="grid overflow-hidden md:min-h-[28rem] md:grid-cols-[minmax(0,1.15fr)_minmax(12rem,0.85fr)]">
+            <div className="flex items-center bg-[#050b1d] px-5 py-6 sm:px-8 sm:py-8">
               <ViaLongeVitaMark variant="hero" locale={locale} priority />
             </div>
             <div className="relative aspect-[3/4] min-h-[280px] md:aspect-auto md:min-h-full">
@@ -251,12 +253,12 @@ export function PortalHome({
               />
             </div>
           </div>
-          <div className="px-4 py-4 sm:px-6 sm:py-5">
+          <div className="pt-6 sm:pt-7">
             <h1 className="font-display text-2xl font-bold text-[#021d33] sm:text-3xl">
               {philosophy.claim}
             </h1>
-            <p className="mt-1 max-w-3xl text-sm text-slate-600">{philosophy.subtitle}</p>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <p className="mt-2 max-w-3xl text-base leading-7 text-slate-600">{philosophy.subtitle}</p>
+            <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2">
               <Link
                 href={localizePublicHref("/newsletter", locale)}
                 className="inline-flex items-center justify-center rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
@@ -265,53 +267,64 @@ export function PortalHome({
               </Link>
               <Link
                 href={localizePublicHref("/articles", locale)}
-                className="inline-flex items-center justify-center rounded-full border border-[#005B96]/35 px-5 py-2.5 text-sm font-semibold text-[#005B96] hover:bg-[#e8f3fb]"
+                className="inline-flex items-center justify-center text-sm font-semibold text-[#005B96] underline-offset-4 hover:underline"
               >
                 {chrome.readMagazine}
               </Link>
             </div>
-            <div className="mt-3 max-w-xl">
+            <div className="mt-4 max-w-xl">
               <NewsletterCapture locale={locale} source="home-hero" variant="compact" />
             </div>
             <div className="mt-4">
               <PortalSearch copy={surface} />
             </div>
           </div>
-        </div>
 
-        <nav aria-label={chrome.servicesNav} className="mt-3 rounded-lg border border-slate-200 bg-white px-2 py-3 shadow-sm sm:px-3">
-          <ul className="grid grid-cols-5 gap-1 sm:grid-cols-10">
+        <nav aria-label={chrome.servicesNav} className="mt-5">
+          <ul className="flex flex-wrap gap-2">
             {publicServices.map((svc) => {
               const openApp = isStandaloneAppHref(svc.href);
               const Item = openApp ? AppOpenLink : Link;
               const localized = chrome.services.find((item) => item.id === svc.id);
+              const exchange = svc.id === "exchange";
               return (
               <li key={svc.id}>
                 <Item
                   href={openApp ? svc.href : localizePublicHref(svc.href, locale)}
-                  className="flex flex-col items-center gap-1 rounded-md px-1 py-1.5 text-center hover:bg-slate-50"
+                  className={
+                    exchange
+                      ? "inline-flex items-center gap-2 rounded-full bg-[#021d33] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#032844]"
+                      : "inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium text-[#021d33] hover:bg-white/80"
+                  }
                 >
                   {"image" in svc && svc.image ? (
                     <Image
                       src={svc.image}
                       alt=""
-                      width={40}
-                      height={40}
-                      className="h-10 w-10 rounded-[22%]"
+                      width={20}
+                      height={20}
+                      className="h-5 w-5 rounded-full object-cover"
                     />
                   ) : (
-                    <span className="flex h-10 w-10 items-center justify-center rounded-[22%] bg-[#e8f3fb] text-[#005B96]">
+                    <span
+                      className={
+                        exchange
+                          ? "text-[#c4a35a]"
+                          : "text-[#005B96]"
+                      }
+                    >
                       <ServiceGlyph icon={"icon" in svc ? svc.icon : undefined} />
                     </span>
                   )}
-                  <span className="text-[11px] font-semibold leading-tight text-[#021d33]">{localized?.label ?? svc.label}</span>
-                  <span className="hidden text-[10px] text-slate-500 sm:block">{localized?.hint ?? svc.hint}</span>
+                  <span>{localized?.label ?? svc.label}</span>
                 </Item>
               </li>
               );
             })}
           </ul>
         </nav>
+
+        <ExchangePortalSpotlight locale={locale} />
 
         {isCzechSurface(locale) ? <WriterAgentsStrip locale={locale} /> : null}
 

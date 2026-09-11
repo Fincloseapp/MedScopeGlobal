@@ -39,10 +39,16 @@ export type MarketingCopy = {
     metaDescription: string;
     eyebrow: string;
     title: string;
+    lead: string;
     cta: string;
     home: string;
     missionTitle: string;
     mission: string;
+    marketplaceTitle: string;
+    marketplaceLead: string;
+    marketplaceProof: string;
+    marketplaceCta: string;
+    marketplacePoints: { title: string; body: string }[];
     forWhomTitle: string;
     forWhom: string;
     independenceTitle: string;
@@ -201,16 +207,28 @@ const CS: MarketingCopy = {
     },
   },
   about: {
-    metaTitle: "O nás | MedScopeGlobal",
+    metaTitle: "O nás | MedScopeGlobal.com — magazín a B2B Tržiště",
     metaDescription:
-      "MedScopeGlobal je český odborný medicínský portál pro laiky, studenty medicíny, lékaře a výzkumníky.",
+      "MedScopeGlobal.com provozuje magazín ViaLongeVita, klinické aplikace a B2B Tržiště pro výrobce, nemocnice a laboratoře. Přímý kontakt, bez provize z obchodu.",
     eyebrow: "O nás",
-    title: "MedScopeGlobal — odborný medicínský portál pro ČR",
+    title: "MedScopeGlobal.com — obsah, aplikace a B2B Tržiště",
+    lead:
+      "Na MedScopeGlobal.com stojí vedle sebe odborný magazín ViaLongeVita, klinické aplikace a B2B Tržiště pro firmy a instituce.",
     cta: "Kontaktujte nás",
     home: "Domů",
     missionTitle: "Naše mise",
     mission:
-      "MedScopeGlobal propojuje klinickou praxi, vědecký výzkum a vzdělávání v medicíně. Kurátorský obsah, citace zdrojů a odborné rubriky pomáhají lékařům, studentům i veřejnosti orientovat se v rychle se měnící medicíně.",
+      "MedScopeGlobal.com spojuje tři věci: redakční obsah, nástroje pro praxi a tržiště B2B. Magazín a aplikace slouží čtenářům a klinikám. B2B Tržiště spojuje výrobce, nemocnice a laboratoře napřímo — bez provize z uzavřeného obchodu.",
+    marketplaceTitle: "B2B Tržiště",
+    marketplaceLead:
+      "Tržiště B2B od MedScopeGlobal.com je určené výrobcům, nemocnicím, laboratořím a telemedicínským institucím. Kupující poptává zdarma. Kontakty vidí jen platící inzerent. Smlouva vzniká mimo platformu.",
+    marketplaceProof: "Poptávky zdarma. Kontakty v tarifu Pro. 0 % z obchodu. Povinný region. CE / FDA / ISO u produktů.",
+    marketplaceCta: "Otevřít tržiště",
+    marketplacePoints: [
+      { title: "0 % z obchodu", body: "Kupující neplatí nic. Inzerent platí jen předplatné — i když se obchod neuzavře." },
+      { title: "Jen firmy a instituce", body: "Žádný výdej léků veřejnosti. Žádné zdravotní údaje pacientů na tržišti." },
+      { title: "CE · FDA · ISO", body: "U produktů je certifikace povinná. Každá nabídka má region EU, USA, Asie nebo globálně." },
+    ],
     forWhomTitle: "Pro koho jsme tu",
     forWhom: "Vyberte sekci podle toho, kdo jste — každá cesta má vlastní obsah a nástroje.",
     independenceTitle: "Nezávislost značky",
@@ -229,6 +247,7 @@ const CS: MarketingCopy = {
       { href: "/studenti", label: "Studenti", desc: "Anatomie, farmakologie a příprava na LF" },
       { href: "/lekari", label: "Lékaři", desc: "Guidelines, studie a klinické briefy" },
       { href: "/studie", label: "Výzkum", desc: "Přehled studií a evidence-based obsah" },
+      { href: "/exchange", label: "Firmy a instituce", desc: "B2B Tržiště od MedScopeGlobal.com — nabídky, poptávky, přímý kontakt" },
     ],
   },
   publicHub: {
@@ -456,16 +475,28 @@ const EN: MarketingCopy = {
     },
   },
   about: {
-    metaTitle: "About | MedScopeGlobal",
+    metaTitle: "About | MedScopeGlobal.com — magazine and B2B marketplace",
     metaDescription:
-      "MedScopeGlobal is a Czech medical portal for the public, medical students, physicians and researchers.",
+      "MedScopeGlobal.com runs the ViaLongeVita magazine, clinical apps and a B2B marketplace for manufacturers, hospitals and laboratories. Direct contact, no deal commission.",
     eyebrow: "About",
-    title: "MedScopeGlobal — a medical portal for Czechia",
+    title: "MedScopeGlobal.com — content, apps and a B2B marketplace",
+    lead:
+      "On MedScopeGlobal.com the ViaLongeVita magazine, clinical apps and a B2B marketplace for companies and institutions sit side by side.",
     cta: "Contact us",
     home: "Home",
     missionTitle: "Our mission",
     mission:
-      "MedScopeGlobal connects clinical practice, research and medical education. Curated content, citations and professional desks help physicians, students and the public navigate fast-changing medicine.",
+      "MedScopeGlobal.com connects three things: editorial content, tools for practice, and a B2B marketplace. The magazine and apps serve readers and clinics. The marketplace introduces manufacturers, hospitals and laboratories directly — with no commission on the deal.",
+    marketplaceTitle: "B2B Marketplace",
+    marketplaceLead:
+      "The B2B marketplace from MedScopeGlobal.com is for manufacturers, hospitals, laboratories and telemedicine institutions. Buyers inquire free. Contacts are for paying advertisers only. Contracts stay off-platform.",
+    marketplaceProof: "Free inquiries. Contacts on Pro. 0% on the deal. Mandatory region. CE / FDA / ISO on products.",
+    marketplaceCta: "Open the marketplace",
+    marketplacePoints: [
+      { title: "0% on the deal", body: "Buyers pay nothing. Advertisers pay only a subscription — even if no deal closes." },
+      { title: "Companies and institutions only", body: "No public drug sales. No patient health data on the marketplace." },
+      { title: "CE · FDA · ISO", body: "Certification is mandatory on products. Every listing has EU, USA, Asia or Global." },
+    ],
     forWhomTitle: "Who we serve",
     forWhom: "Pick the section that matches you — each path has its own content and tools.",
     independenceTitle: "Brand independence",
@@ -484,6 +515,7 @@ const EN: MarketingCopy = {
       { href: "/studenti", label: "Students", desc: "Anatomy, pharmacology and faculty admissions" },
       { href: "/lekari", label: "Physicians", desc: "Guidelines, studies and clinical briefs" },
       { href: "/studie", label: "Research", desc: "Study overviews and evidence-based content" },
+      { href: "/exchange", label: "Companies and institutions", desc: "B2B marketplace from MedScopeGlobal.com — listings, RFPs, direct contact" },
     ],
   },
   publicHub: {
@@ -698,14 +730,28 @@ const DE: MarketingCopy = {
   },
   about: {
     ...EN.about,
-    metaTitle: "Über uns | MedScopeGlobal",
+    metaTitle: "Über uns | MedScopeGlobal.com — Magazin und B2B-Marktplatz",
     metaDescription:
-      "MedScopeGlobal ist ein tschechisches medizinisches Portal für die Öffentlichkeit, Medizinstudierende, Ärztinnen und Ärzte sowie Forschung.",
+      "MedScopeGlobal.com betreibt das Magazin ViaLongeVita, klinische Apps und einen B2B-Marktplatz für Hersteller, Kliniken und Labore. Direktkontakt, keine Dealprovision.",
     eyebrow: "Über uns",
-    title: "MedScopeGlobal — medizinisches Portal für Tschechien",
+    title: "MedScopeGlobal.com — Inhalte, Apps und B2B-Marktplatz",
+    lead:
+      "Auf MedScopeGlobal.com stehen das Magazin ViaLongeVita, klinische Apps und ein B2B-Marktplatz für Firmen und Institutionen nebeneinander.",
     cta: "Kontaktieren Sie uns",
     home: "Start",
     missionTitle: "Unsere Mission",
+    mission:
+      "MedScopeGlobal.com verbindet drei Dinge: redaktionelle Inhalte, Werkzeuge für die Praxis und einen B2B-Marktplatz. Magazin und Apps dienen Lesern und Kliniken. Der Marktplatz bringt Hersteller, Krankenhäuser und Labore direkt zusammen — ohne Provision auf das Geschäft.",
+    marketplaceTitle: "B2B-Marktplatz",
+    marketplaceLead:
+      "Der B2B-Marktplatz von MedScopeGlobal.com ist für Hersteller, Kliniken, Labore und Telemedizin-Institutionen. Käufer fragen kostenlos an. Kontakte nur für zahlende Inserenten. Verträge bleiben außerhalb der Plattform.",
+    marketplaceProof: "Anfragen gratis. Kontakte ab Pro. 0 % auf das Geschäft. Pflichtregion. CE / FDA / ISO bei Produkten.",
+    marketplaceCta: "Marktplatz öffnen",
+    marketplacePoints: [
+      { title: "0 % auf das Geschäft", body: "Käufer zahlen nichts. Inserenten zahlen nur das Abo — auch ohne Abschluss." },
+      { title: "Nur Firmen und Institutionen", body: "Kein öffentlicher Arzneimittelverkauf. Keine Patientendaten auf dem Marktplatz." },
+      { title: "CE · FDA · ISO", body: "Zertifizierung ist bei Produkten Pflicht. Jedes Inserat hat EU, USA, Asien oder Global." },
+    ],
     forWhomTitle: "Für wen wir da sind",
     independenceTitle: "Unabhängigkeit der Marke",
     brandLink: "Marke und geistiges Eigentum",
@@ -719,6 +765,7 @@ const DE: MarketingCopy = {
       { href: "/studenti", label: "Studierende", desc: "Anatomie, Pharmakologie und Aufnahmeprüfung" },
       { href: "/lekari", label: "Ärzte", desc: "Leitlinien, Studien und klinische Briefs" },
       { href: "/studie", label: "Forschung", desc: "Studienüberblicke und evidenzbasierte Inhalte" },
+      { href: "/exchange", label: "Firmen und Institutionen", desc: "B2B-Marktplatz von MedScopeGlobal.com — Angebote, Anfragen, Direktkontakt" },
     ],
   },
   publicHub: {
@@ -858,14 +905,28 @@ const FR: MarketingCopy = {
   },
   about: {
     ...EN.about,
-    metaTitle: "À propos | MedScopeGlobal",
+    metaTitle: "À propos | MedScopeGlobal.com — magazine et place B2B",
     metaDescription:
-      "MedScopeGlobal est un portail médical tchèque pour le grand public, les étudiants en médecine, les médecins et la recherche.",
+      "MedScopeGlobal.com édite le magazine ViaLongeVita, des applis cliniques et une place B2B pour fabricants, hôpitaux et laboratoires. Contact direct, sans commission d’affaire.",
     eyebrow: "À propos",
-    title: "MedScopeGlobal — portail médical pour la Tchéquie",
+    title: "MedScopeGlobal.com — contenus, applis et place B2B",
+    lead:
+      "Sur MedScopeGlobal.com coexistent le magazine ViaLongeVita, des applis cliniques et une place B2B pour entreprises et institutions.",
     cta: "Nous contacter",
     home: "Accueil",
     missionTitle: "Notre mission",
+    mission:
+      "MedScopeGlobal.com relie trois choses : des contenus éditoriaux, des outils pour la pratique, et une place B2B. Le magazine et les applis servent lecteurs et cliniques. La place met en relation fabricants, hôpitaux et laboratoires — sans commission sur l’affaire.",
+    marketplaceTitle: "Place de marché B2B",
+    marketplaceLead:
+      "La place B2B de MedScopeGlobal.com s’adresse aux fabricants, hôpitaux, laboratoires et institutions de télémédecine. L’acheteur demande gratuitement. Les contacts sont réservés aux annonceurs payants. Les contrats restent hors plateforme.",
+    marketplaceProof: "Demandes gratuites. Contacts dès Pro. 0 % sur l’affaire. Région obligatoire. CE / FDA / ISO sur les produits.",
+    marketplaceCta: "Ouvrir la place",
+    marketplacePoints: [
+      { title: "0 % sur l’affaire", body: "L’acheteur ne paie rien. L’annonceur paie uniquement l’abonnement — même sans closing." },
+      { title: "Entreprises et institutions seulement", body: "Pas de vente de médicaments au public. Pas de données patients sur la place." },
+      { title: "CE · FDA · ISO", body: "La certification est obligatoire sur les produits. Chaque offre a UE, USA, Asie ou Global." },
+    ],
     forWhomTitle: "Pour qui nous sommes là",
     independenceTitle: "Indépendance de la marque",
     brandLink: "Marque et propriété intellectuelle",
@@ -879,6 +940,7 @@ const FR: MarketingCopy = {
       { href: "/studenti", label: "Étudiants", desc: "Anatomie, pharmacologie et concours" },
       { href: "/lekari", label: "Médecins", desc: "Guidelines, études et brèves cliniques" },
       { href: "/studie", label: "Recherche", desc: "Aperçus d’études et contenus fondés sur les preuves" },
+      { href: "/exchange", label: "Entreprises et institutions", desc: "Place B2B de MedScopeGlobal.com — offres, demandes, contact direct" },
     ],
   },
   publicHub: {

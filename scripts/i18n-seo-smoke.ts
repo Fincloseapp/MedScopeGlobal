@@ -79,6 +79,7 @@ import { getEditorialArticleGateCopy } from "../lib/v38/conversion-copy";
 import { aktualityChip } from "../lib/i18n/aktuality-chrome";
 import { resolveArticleBodyLock } from "../lib/auth/article-eligibility";
 import { getB2BLandingCopy } from "../lib/i18n/b2b-landing-copy";
+import { getExchangeCopy } from "../lib/i18n/exchange-copy";
 import { chromePack } from "../lib/i18n/chrome-pack";
 import { getV27AudienceGridCopy, getV27AudienceHubCopy } from "../lib/i18n/v27-audience-copy";
 import { mergeNativeDeskFeed, nativeDeskArticlesForLocale, nativeDeskPinDate, relatedNativeDeskArticles } from "../lib/editorial/native-desk-articles";
@@ -204,6 +205,8 @@ assert.ok(sitemaps.some((u) => u.endsWith("/sitemap-en-us.xml")));
 assert.ok(sitemaps.some((u) => u.endsWith("/sitemap-de.xml")));
 
 const rootStatic = buildRootSitemapStaticEntries("https://medscopeglobal.com");
+assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/cs/exchange"));
+assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/en/exchange/catalog"));
 assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/en-us/articles"));
 assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/it/predplatne"));
 assert.ok(rootStatic.some((row) => row.url === "https://medscopeglobal.com/de/pro-ai"));
@@ -436,20 +439,20 @@ assert.equal(localizePublicHref("/app/pacient", "fr"), "/app/pacient");
 
 const csHeader = getDesktopHeaderMenu("cs");
 const frHeader = getDesktopHeaderMenu("fr");
-assert.equal(csHeader.length, 7);
-assert.equal(frHeader.length, 6);
+assert.equal(csHeader.length, 8);
+assert.equal(frHeader.length, 7);
 assert.deepEqual(
   csHeader.map((item) => item.href.replace(/^\/cs(?=\/)/, "")),
-  ["/verejnost", "/studenti", "/lekari", "/articles", "/aplikace", "/firmy", "/predplatne"]
+  ["/verejnost", "/studenti", "/lekari", "/articles", "/aplikace", "/exchange", "/firmy", "/predplatne"]
 );
 assert.deepEqual(
   frHeader.map((item) => item.href),
-  ["/fr/verejnost", "/fr/lekari", "/fr/articles", "/fr/aplikace", "/fr/firmy", "/fr/predplatne"]
+  ["/fr/verejnost", "/fr/lekari", "/fr/articles", "/fr/aplikace", "/fr/exchange", "/fr/firmy", "/fr/predplatne"]
 );
 assert.equal(frHeader[0]?.label, "Grand public");
-assert.equal(frHeader[5]?.label, "Abonnement");
+assert.equal(frHeader[6]?.label, "Abonnement");
 assert.equal(frHeader[2]?.label, "Magazine");
-assert.equal(frHeader[4]?.label, "Entreprises");
+assert.equal(frHeader[5]?.label, "Entreprises");
 assert.equal(getDesktopHeaderMenu("de")[1]?.label, "Ärzte");
 assert.ok(!getDesktopHeaderMenu("de").some((item) => item.href.includes("/studenti")));
 assert.equal(csHeader[0]?.children?.[0]?.href.includes("dlouhovekost"), true);
@@ -517,6 +520,9 @@ assert.equal(
 );
 assert.equal(getMarketingCopy("fr").apps.title, "Applis");
 assert.ok(!getMarketingCopy("fr").apps.trialCta.includes("zdarma"));
+assert.ok(getMarketingCopy("cs").about.marketplaceLead.includes("MedScopeGlobal.com"));
+assert.ok(getMarketingCopy("cs").about.audiences.some((item) => item.href === "/exchange"));
+assert.ok(getMarketingCopy("en").about.title.toLowerCase().includes("marketplace"));
 assert.equal(getMarketingCopy("de").about.eyebrow, "Über uns");
 assert.ok(getMarketingCopy("sk").publicHub.title.includes("zrozumiteľne"));
 assert.ok(!getMarketingCopy("sk").publicHub.eyebrow.includes("For everyone"));
@@ -838,6 +844,13 @@ assert.ok(!looksLikeCzech(getMagazineSearchCopy("de").empty("glucose")));
 assert.equal(getFirmyDeskCopy("cs").title, "Inzerce na ViaLongeVita");
 assert.ok(!looksLikeCzech(getFirmyDeskCopy("fr").title));
 assert.ok(!looksLikeCzech(getFirmyDeskCopy("de").rooms.reklama.lead));
+assert.ok(getExchangeCopy("cs").title.includes("B2B"));
+assert.ok(getExchangeCopy("cs").title.includes("Tržiště"));
+assert.ok(getExchangeCopy("cs").lead.includes("MedScopeGlobal.com"));
+assert.ok(getExchangeCopy("en").metaTitle.includes("B2B Marketplace"));
+assert.equal(getPortalChrome("cs").services[0]?.id, "exchange");
+assert.ok(csHeader.some((item) => item.href.includes("/exchange")));
+assert.ok(!looksLikeCzech(getExchangeCopy("de").catalogCta));
 assert.equal(getProMeCopy("cs").audiences.lekari.href, "/lekari");
 assert.ok(!looksLikeCzech(getProMeCopy("fr").title));
 assert.ok(!looksLikeCzech(getOdborneHubCopy("fr").briefyTitle));

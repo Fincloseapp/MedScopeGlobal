@@ -32,7 +32,7 @@ export function ModulePageShell({
             {showBrandLogo ? (
               <MedScopeLogo href={homeHref} preset="header" className="mb-4" />
             ) : null}
-            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">{eyebrow}</p>
+            <p className="text-sm font-semibold text-[#005B96]">{eyebrow}</p>
             <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-[#021d33]">{title}</h1>
             <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-600">{description}</p>
             {ctaHref && ctaLabel ? (

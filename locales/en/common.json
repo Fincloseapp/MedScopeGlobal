@@ -160,5 +160,12 @@
     "localeArticles": "Articles and UI follow your device language. Foreign-language items are translated when displayed.",
     "localeDevice": "Site language follows your phone or computer primary language. Use the header switcher to override.",
     "translatedArticle": "This article was automatically translated into your selected language."
+  },
+  "exchange": {
+    "title": "MedScope B2B Exchange",
+    "catalog": "Listing catalogue",
+    "onboard": "Register organisation",
+    "region": "Regional availability",
+    "contact": "Contact advertiser"
   }
 }

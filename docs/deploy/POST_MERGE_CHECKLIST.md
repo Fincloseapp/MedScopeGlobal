@@ -80,7 +80,30 @@ Apply **in this order** (ecosystem tables for MediFlow + editorial):
 |------:|------|---------|
 | 1 | `supabase/migrations/20260825120000_mediflow_ecosystem.sql` | MediFlow tables, RLS, donation index |
 | 2 | `supabase/migrations/20260825220000_editorial_redakce.sql` | `article_syndications`, `editorial_queue` |
-| 3 | `supabase/migrations/20260825230000_editorial_images.sql` | `article_image_suggestions`, `editorial_queue.task_type` |
+| 4 | `supabase/migrations/20260910120000_b2b_exchange.sql` | MedScope B2B Exchange (listings, orgs, contacts, ads, RLS) |
+| 5 | `supabase/migrations/20260911120000_b2b_exchange_subscriptions.sql` | Subscription-only revenue: inquiry replies, audit events, microsite/API flags |
+| 6 | `supabase/migrations/20260911130000_b2b_exchange_demo_seed.sql` | Sample catalog (idempotent) so production is not an empty marketplace |
+
+Verify Exchange after apply: `pnpm db:verify` should list `exchange_listings` / `exchange_organizations` as recommended tables. Public catalogue degrades to demo listings until this file is applied.
+
+### Option C — Worker cron (no local Management API token)
+
+After the Exchange Worker is live:
+
+```bash
+curl -X POST https://medscopeglobal.com/api/cron/apply-exchange-migrations \
+  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"
+```
+
+Auth is `CRON_SECRET` or a verified Cloudflare API token (user **or** account-owned — `/user/tokens/verify` alone rejects account tokens). The Worker runs the embedded SQL with its `SUPABASE_ACCESS_TOKEN`.
+
+Without a live Exchange route yet, apply from this repo with production Worker secrets:
+
+```bash
+pnpm db:edge-apply-exchange
+# in another terminal:
+curl http://127.0.0.1:8788/
+```
 
 ### Option A — Supabase SQL Editor (prod-safe)
 

@@ -423,6 +423,11 @@ function firmyNav(): NavItem {
     label: "Firmy",
     href: "/firmy",
     children: [
+      {
+        label: "B2B Tržiště",
+        href: "/exchange",
+        description: "Tržiště B2B od MedScopeGlobal.com — přímý kontakt, bez provize",
+      },
       { label: "Pro firmy", href: "/firmy", description: "Bannery a partnerství v magazínu" },
       { label: "Ceník", href: "/firmy/cenik", description: "Orientační ceny bez skrytých poplatků" },
       { label: "Reklama", href: "/firmy/reklama", description: "Bannery a newsletter — ne v lékařské zóně" },
@@ -512,6 +517,24 @@ export function getDesktopHeaderMenu(locale: LocaleCode): NavItem[] {
       label: "Aplikace",
       href: "/aplikace",
       children: appsChildren,
+    },
+    {
+      label: "B2B Tržiště",
+      href: "/exchange",
+      children: [
+        {
+          label: "B2B Tržiště",
+          href: "/exchange",
+          description: "Zdravotnický marketplace — předplatné odemyká kontakty",
+        },
+        { label: "Katalog nabídek", href: "/exchange/catalog", description: "Produkty, služby a poptávky · EU / USA / Asie" },
+        { label: "Registrovat firmu", href: "/exchange/onboard", description: "Onboarding institucí a výrobců" },
+        { label: "Ceník Exchange", href: "/exchange/pricing", description: "Basic zdarma · Pro odemkne poptávky" },
+        { label: "Firemní dashboard", href: "/exchange/dashboard", description: "Nabídky, poptávky, předplatné" },
+        { label: "Poptávky", href: "/exchange/inquiries", description: "Kontakty až v tarifu Pro" },
+        { label: "Reklama", href: "/exchange/ads", description: "Bannery jen pro platící inzerenty" },
+        { label: "Odborný obsah", href: "/exchange/content", description: "Legislativa a klinické analýzy" },
+      ],
     },
     firmyNav(),
     predplatne ?? { label: "Předplatné", href: "/predplatne" },

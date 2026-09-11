@@ -35,6 +35,7 @@ export const PORTAL_TRENDING = [
 ] as const;
 
 export const PORTAL_SERVICES = [
+  { id: "exchange", label: "Exchange", hint: "marketplace", href: "/exchange", icon: "globe" },
   { id: "articles", label: "Články", hint: MAGAZINE.name, href: "/articles", icon: "news" },
   {
     id: "mediflow",
@@ -111,6 +112,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     ordizapis: "zápisy",
     academy: "vzdělávání",
     ai: "zeptat se",
+    exchange: "B2B",
     trial: "od 25 Kč",
     leky: "SÚKL",
     mediprep: "legacy",
@@ -123,6 +125,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     ordizapis: "notes",
     academy: "learning",
     ai: "ask AI",
+    exchange: "0% intro",
     trial: "from 25 CZK",
     leky: "SÚKL",
     mediprep: "legacy",
@@ -135,6 +138,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     ordizapis: "Notizen",
     academy: "Bildung",
     ai: "fragen",
+    exchange: "0% Kontakt",
     trial: "ab 1 €",
     leky: "SÚKL",
     mediprep: "Legacy",
@@ -147,6 +151,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     ordizapis: "notes",
     academy: "formation",
     ai: "demander",
+    exchange: "0 % contact",
     trial: "dès 1 €",
     leky: "SÚKL",
     mediprep: "legacy",
@@ -159,6 +164,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     ordizapis: "note",
     academy: "formazione",
     ai: "chiedi",
+    exchange: "0% contatto",
     trial: "da 1 €",
     leky: "SÚKL",
     mediprep: "legacy",
@@ -171,6 +177,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     ordizapis: "notas",
     academy: "formación",
     ai: "preguntar",
+    exchange: "0% contacto",
     trial: "desde 1 €",
     leky: "SÚKL",
     mediprep: "legacy",
@@ -183,6 +190,7 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
     ordizapis: "notas",
     academy: "formação",
     ai: "perguntar",
+    exchange: "0% contato",
     trial: "a partir de 1 €",
     leky: "SÚKL",
     mediprep: "legado",
@@ -192,18 +200,19 @@ const SERVICE_HINTS: Record<string, Record<string, string>> = {
 const SERVICE_LABELS: Record<string, Record<string, string>> = {
   cs: {
     articles: "Články",
+    exchange: "Tržiště",
     trial: "Redakce",
     leky: "Léky",
     academy: "Academy",
     ai: "AI",
     vip: "Dlouhověkost",
   },
-  en: { articles: "Articles", trial: "Editorial", leky: "Medicines", academy: "Academy", ai: "AI", vip: "Longevity" },
-  de: { articles: "Artikel", trial: "Redaktion", leky: "Arznei", academy: "Academy", ai: "KI", vip: "Langlebigkeit" },
-  fr: { articles: "Articles", trial: "Rédaction", leky: "Médicaments", academy: "Academy", ai: "IA", vip: "Longévité" },
-  it: { articles: "Articoli", trial: "Redazione", leky: "Farmaci", academy: "Academy", ai: "IA", vip: "Longevità" },
-  es: { articles: "Artículos", trial: "Redacción", leky: "Medicamentos", academy: "Academy", ai: "IA", vip: "Longevidad" },
-  "pt-BR": { articles: "Artigos", trial: "Editorial", leky: "Medicamentos", academy: "Academy", ai: "IA", vip: "Longevidade" },
+  en: { articles: "Articles", exchange: "Exchange", trial: "Editorial", leky: "Medicines", academy: "Academy", ai: "AI", vip: "Longevity" },
+  de: { articles: "Artikel", exchange: "Exchange", trial: "Redaktion", leky: "Arznei", academy: "Academy", ai: "KI", vip: "Langlebigkeit" },
+  fr: { articles: "Articles", exchange: "Exchange", trial: "Rédaction", leky: "Médicaments", academy: "Academy", ai: "IA", vip: "Longévité" },
+  it: { articles: "Articoli", exchange: "Exchange", trial: "Redazione", leky: "Farmaci", academy: "Academy", ai: "IA", vip: "Longevità" },
+  es: { articles: "Artículos", exchange: "Exchange", trial: "Redacción", leky: "Medicamentos", academy: "Academy", ai: "IA", vip: "Longevidad" },
+  "pt-BR": { articles: "Artigos", exchange: "Exchange", trial: "Editorial", leky: "Medicamentos", academy: "Academy", ai: "IA", vip: "Longevidade" },
 };
 
 const NEWS_TAB_LABELS: Record<string, string[]> = {

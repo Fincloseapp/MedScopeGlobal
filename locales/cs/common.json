@@ -163,5 +163,12 @@
     "localeArticles": "Články a rozhraní odpovídají jazyku vašeho zařízení. Cizojazyčné texty se při zobrazení přeloží.",
     "localeDevice": "Jazyk stránky se řídí primárním jazykem telefonu nebo počítače. Přepínačem v hlavičce ho můžete změnit.",
     "translatedArticle": "Článek byl automaticky přeložen do zvoleného jazyka."
+  },
+  "exchange": {
+    "title": "MedScope B2B Exchange",
+    "catalog": "Katalog nabídek",
+    "onboard": "Registrovat firmu",
+    "region": "Regionální dostupnost",
+    "contact": "Kontaktovat inzerenta"
   }
 }

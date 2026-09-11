@@ -19,8 +19,11 @@ import { APP_PRODUCTS } from "@/lib/apps/catalog";
 import { APP_MARKETING_IMAGE } from "@/lib/brand/marketing-visuals";
 import { AppOpenLink } from "@/components/apps/app-origin-bar";
 import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
+import { getExchangeCopy } from "@/lib/i18n/exchange-copy";
+import { getExchangeMarketing } from "@/lib/i18n/exchange-marketing";
+import { ExchangeOriginMark } from "@/components/exchange/origin-mark";
 import { getRevenueCopy } from "@/lib/i18n/revenue-copy";
-import { formatCzkListPrice, localizeListedCzk } from "@/lib/i18n/payment-currency";
+import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { getDokumentaceCopy } from "@/lib/i18n/dokumentace-copy";
 import { getServerLocale } from "@/lib/i18n/server-locale";
@@ -222,45 +225,37 @@ export function V271AudienceSections() {
 }
 
 export function V271B2bBlock({ locale = "cs" }: { locale?: string }) {
-  const surface = getSurfaceCopy(locale);
+  const copy = getExchangeCopy(locale);
+  const marketing = getExchangeMarketing(locale);
   const revenue = getRevenueCopy(locale);
   const formHref = localizePublicHref("/firmy/reklama/nova", locale);
+  const exchangeHref = localizePublicHref("/exchange", locale);
+  const catalogHref = localizePublicHref("/exchange/catalog", locale);
   return (
-    <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <div className="rounded-3xl border border-[#005B96]/15 bg-[#005B96]/5 px-6 py-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">B2B</p>
-            <h3 className="mt-1 font-display text-xl font-semibold text-[#021d33]">{surface.b2bTitle}</h3>
-            <p className="mt-2 text-sm text-slate-600">{surface.b2bDescription}</p>
+    <section className="relative overflow-hidden">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <div className="max-w-2xl">
+            <ExchangeOriginMark locale={locale} tone="onLight" />
+            <h3 className="mt-3 font-display text-2xl font-semibold text-[#021d33]">{copy.title}</h3>
+            <p className="mt-2 text-base leading-7 text-slate-700">{copy.lead}</p>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{marketing.proof}</p>
           </div>
-          <Link
-            href={formHref}
-            className="rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
-          >
-            {revenue.mediaKitCta}
-          </Link>
+          <div className="flex flex-wrap gap-x-5 gap-y-3">
+            <Link
+              href={catalogHref}
+              className="inline-flex items-center rounded-full bg-[#021d33] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#032844]"
+            >
+              {copy.catalogCta}
+            </Link>
+            <Link href={exchangeHref} className="text-sm font-semibold text-[#005B96] underline-offset-4 hover:underline">
+              {copy.onboardCta}
+            </Link>
+            <Link href={formHref} className="text-sm font-medium text-slate-500 underline-offset-4 hover:underline">
+              {revenue.mediaKitCta}
+            </Link>
+          </div>
         </div>
-        <dl className="mt-6 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
-            <dt className="text-xs text-slate-500">{revenue.bannerName}</dt>
-            <dd className="font-display text-lg font-semibold text-[#021d33]">
-              {localizeListedCzk("5 000 Kč", locale)}
-            </dd>
-          </div>
-          <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
-            <dt className="text-xs text-slate-500">{revenue.sponsoredName}</dt>
-            <dd className="font-display text-lg font-semibold text-[#021d33]">
-              {localizeListedCzk("15 000 Kč", locale)}
-            </dd>
-          </div>
-          <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
-            <dt className="text-xs text-slate-500">{revenue.newsletterName}</dt>
-            <dd className="font-display text-lg font-semibold text-[#021d33]">
-              {localizeListedCzk("3 500 Kč", locale)}
-            </dd>
-          </div>
-        </dl>
       </div>
     </section>
   );

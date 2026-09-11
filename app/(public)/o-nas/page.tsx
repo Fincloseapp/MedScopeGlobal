@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
+import { ExchangeAboutMarketplace } from "@/components/exchange/about-marketplace";
 import { PublicTrustDisclaimer } from "@/components/verejnost/public-trust-disclaimer";
-import { SITE } from "@/lib/config/site";
 import { buildLocalizedPageMetadata } from "@/lib/seo/metadata";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { getMarketingCopy } from "@/lib/i18n/marketing-copy";
-import { getSurfaceCopy } from "@/lib/i18n/surface-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -23,15 +22,14 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ONasPage() {
   const locale = await getServerLocale();
   const copy = getMarketingCopy(locale).about;
-  const surface = getSurfaceCopy(locale);
 
   return (
     <ModulePageShell
       eyebrow={copy.eyebrow}
       title={copy.title}
-      description={surface.siteDescription || SITE.description}
-      ctaHref={localizePublicHref("/kontakt", locale)}
-      ctaLabel={copy.cta}
+      description={copy.lead}
+      ctaHref={localizePublicHref("/exchange", locale)}
+      ctaLabel={copy.marketplaceCta}
       homeHref={localizePublicHref("/", locale)}
     >
       <nav className="mb-6 text-sm text-muted-foreground">
@@ -44,6 +42,8 @@ export default async function ONasPage() {
 
       <PublicTrustDisclaimer className="mb-8" />
 
+      <ExchangeAboutMarketplace locale={locale} />
+
       <div className="prose prose-slate max-w-none">
         <h2>{copy.missionTitle}</h2>
         <p>{copy.mission}</p>
@@ -52,18 +52,19 @@ export default async function ONasPage() {
         <p>{copy.forWhom}</p>
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+      <ul className="mt-6 divide-y divide-slate-200 border-y border-slate-200">
         {copy.audiences.map((item) => (
-          <Link
-            key={item.href}
-            href={localizePublicHref(item.href, locale)}
-            className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-[#005B96]/40 hover:shadow-sm"
-          >
-            <p className="font-semibold text-[#021d33]">{item.label}</p>
-            <p className="mt-1 text-sm text-slate-500">{item.desc}</p>
-          </Link>
+          <li key={item.href}>
+            <Link
+              href={localizePublicHref(item.href, locale)}
+              className="flex flex-col gap-1 py-4 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6"
+            >
+              <span className="font-semibold text-[#021d33]">{item.label}</span>
+              <span className="max-w-xl text-sm leading-6 text-slate-600 sm:text-right">{item.desc}</span>
+            </Link>
+          </li>
         ))}
-      </div>
+      </ul>
 
       <div className="prose prose-slate mt-10 max-w-none">
         <h2>{copy.independenceTitle}</h2>
