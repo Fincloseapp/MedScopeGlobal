@@ -252,6 +252,23 @@ import { runAdEditorBoard } from "../../lib/ads/ad-editors";
 import { makeAdVariableSymbol } from "../../lib/ads/variable-symbol";
 import { generateInvoiceHtml } from "../../lib/billing/invoice-generator";
 import { buildSpdString } from "../../lib/billing/spd-qr";
+import {
+  SALES_PACKAGES,
+  salesPackageById,
+  formatSalesCzk,
+} from "../../lib/sales/packages";
+import { SALES_ICP_SEEDS, icpRequiresProfessionalOnly } from "../../lib/sales/icp";
+import {
+  evaluateOutreachGate,
+  isPersonalMailbox,
+  isRoleBasedEmail,
+  unsubscribeToken,
+  verifyUnsubscribeToken,
+} from "../../lib/sales/legal";
+import { slugifyCompany, nextInvoiceNumber, salesVariableSymbol } from "../../lib/sales/ids";
+import { SALES_DEPARTMENT_SQL } from "../../lib/sales/apply-schema";
+import { salesOfferEmail } from "../../lib/sales/copy";
+import { inquirySlaDue } from "../../lib/sales/fulfillment";
 import { briefChrome } from "../../lib/monetization/brief-marketing";
 import { translateNavHref } from "../../lib/i18n/nav-copy";
 import { getDesktopHeaderMenu } from "../../lib/config/main-navigation";
@@ -785,6 +802,7 @@ file("lib/monetization/payout-map.ts");
   assert.ok(hrefs.includes("/admin/ai-agents"));
   assert.ok(hrefs.includes("/admin/ai-teams"));
   assert.ok(hrefs.includes("/admin/pravni-checklist"));
+  assert.ok(hrefs.includes("/admin/sales"));
   assert.ok(hrefs.includes("/admin/security"));
   assert.ok(hrefs.includes("/admin/articles"));
   assert.equal(isAdminNavActive("/admin/ads-public", "/admin/ads"), false);
@@ -5779,6 +5797,96 @@ console.log(
   );
   assert.ok(readFileSync(join(root, "app/(public)/firmy/reklama/nova/page.tsx"), "utf8").includes("getAdPortalCopy"));
   assert.ok(readFileSync(join(root, "components/firmy/ad-portal-form.tsx"), "utf8").includes("getAdPortalCopy"));
+}
+
+{
+  assert.equal(SALES_PACKAGES.length, 5);
+  assert.equal(salesPackageById("start")?.priceCzkMonth, 4900);
+  assert.equal(salesPackageById("partner")?.slaHours, 8);
+  assert.ok(salesPackageById("magazine")?.highlighted);
+  assert.ok(formatSalesCzk(19900).includes("19"));
+  assert.ok(SALES_ICP_SEEDS.length >= 20);
+  assert.ok(SALES_ICP_SEEDS.every((row) => row.website.startsWith("https://")));
+  assert.equal(icpRequiresProfessionalOnly("pharma_rx"), true);
+  assert.equal(icpRequiresProfessionalOnly("clinic"), false);
+  assert.equal(isPersonalMailbox("info@firma.cz"), false);
+  assert.equal(isPersonalMailbox("jan@seznam.cz"), true);
+  assert.equal(isRoleBasedEmail("marketing@euc.cz"), true);
+  assert.equal(isRoleBasedEmail("jan.novak@euc.cz"), false);
+  const inbound = evaluateOutreachGate({
+    email: "obchod@firma.cz",
+    legalBasis: "inquiry",
+    stage: "offered",
+    outreachCount: 0,
+    lastContactedAt: null,
+    suppressedAt: null,
+    approvedOutreachAt: null,
+  });
+  assert.equal(inbound.autoSend, true);
+  const cold = evaluateOutreachGate({
+    email: "marketing@firma.cz",
+    legalBasis: "legitimate_interest",
+    stage: "qualified",
+    outreachCount: 0,
+    lastContactedAt: null,
+    suppressedAt: null,
+    approvedOutreachAt: null,
+  });
+  assert.equal(cold.allow, true);
+  assert.equal(cold.autoSend, false);
+  const guessed = evaluateOutreachGate({
+    email: "ahoj@firma.cz",
+    legalBasis: "unverified_guess",
+    stage: "identified",
+    outreachCount: 0,
+    lastContactedAt: null,
+    suppressedAt: null,
+    approvedOutreachAt: null,
+  });
+  assert.equal(guessed.allow, false);
+  const gmail = evaluateOutreachGate({
+    email: "jan@gmail.com",
+    legalBasis: "legitimate_interest",
+    stage: "qualified",
+    outreachCount: 0,
+    lastContactedAt: null,
+    suppressedAt: null,
+    approvedOutreachAt: null,
+  });
+  assert.equal(gmail.allow, false);
+  const token = unsubscribeToken("obchod@firma.cz", "secret");
+  assert.equal(verifyUnsubscribeToken("obchod@firma.cz", token, "secret"), true);
+  assert.equal(verifyUnsubscribeToken("obchod@firma.cz", "nope", "secret"), false);
+  assert.equal(slugifyCompany("Canadian Medical"), "canadian-medical");
+  assert.match(nextInvoiceNumber(3, new Date("2026-09-13T00:00:00Z")), /^MSG-SAL-202609-0003$/);
+  assert.match(salesVariableSymbol("abc-1234", new Date("2026-09-13T00:00:00Z")), /^\d{10}$/);
+  const letter = salesOfferEmail({
+    company: "EUC",
+    package: salesPackageById("start")!,
+    unsubscribeUrl: "https://medscopeglobal.com/api/sales/unsubscribe?email=x&token=y",
+  });
+  assert.ok(letter.html.includes("odhlásit"));
+  assert.ok(letter.html.includes("480") || letter.text.includes("Odhlášení"));
+  assert.ok(inquirySlaDue(24)?.length);
+  assert.ok(SALES_DEPARTMENT_SQL.includes("sales_prospects"));
+  assert.ok(SALES_DEPARTMENT_SQL.includes("enable row level security"));
+  const files = [
+    "app/(admin)/admin/sales/page.tsx",
+    "app/(public)/inzerce/pausal/page.tsx",
+    "app/(public)/inzerce/podminky/page.tsx",
+    "app/(public)/partneri/page.tsx",
+    "app/api/cron/sales-department/route.ts",
+    "app/api/sales/order/route.ts",
+    "docs/sales/AUTONOMOUS_SALES_DEPARTMENT.md",
+    "supabase/migrations/20260913220000_sales_department.sql",
+  ];
+  for (const rel of files) {
+    assert.ok(existsSync(join(root, rel)), rel);
+  }
+  const webhook = readFileSync(join(root, "app/api/stripe/webhook/route.ts"), "utf8");
+  assert.ok(webhook.includes("sales_retainer"));
+  const cronYml = readFileSync(join(root, ".github/workflows/cloudflare-cron.yml"), "utf8");
+  assert.ok(cronYml.includes("/api/cron/sales-department"));
 }
 
 console.log("✓ editorial image pipeline checks passed");
