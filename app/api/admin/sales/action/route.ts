@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { isAdminGateOpen } from "@/lib/auth/admin-gate";
 import { requireAdminAccess } from "@/lib/auth/require-admin-access";
 import { sanitizeText } from "@/lib/security/sanitize";
 import { runSalesDepartmentTick } from "@/lib/sales/runner";
@@ -46,7 +47,9 @@ const schema = z.object({
 
 export async function POST(request: Request) {
   try {
-    await requireAdminAccess();
+    if (!(await isAdminGateOpen())) {
+      await requireAdminAccess();
+    }
   } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
