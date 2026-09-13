@@ -48,6 +48,11 @@ export default async function TermsPage() {
         zpracovává Stripe. Předplatné se automaticky obnovuje, pokud jej nezrušíte v sekci Účet
         nejpozději 24 hodin před koncem fakturačního období.
       </p>
+      <p>
+        Firemní inzerce a měsíční paušály se řídí zvláštními{" "}
+        <Link href="/inzerce/podminky">podmínkami inzerce</Link>. Objednávka paušálu:{" "}
+        <Link href="/inzerce/pausal">/inzerce/pausal</Link>.
+      </p>
       <ul>
         <li>Zkušební období: 7 dní (pokud je nabízeno)</li>
         <li>Měna: CZK</li>

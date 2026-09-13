@@ -97,6 +97,29 @@ export default async function InzercePage() {
         </div>
       </div>
 
+      <section className="mb-10 rounded-2xl border border-[#021d33] bg-[#021d33] px-5 py-6 text-white">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e8d5a3]">Měsíční paušál</p>
+        <h2 className="mt-2 font-display text-2xl font-semibold">Autonomní inzerce od 4 900 Kč / měsíc</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-white/80">
+          Firma zaplatí paušál, dostane fakturu a podle tarifu plochy, adresář i předání poptávek.
+          Podmínky inzerce a označení reklamy jsou součástí objednávky.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link
+            href={localizePublicHref("/inzerce/pausal", locale)}
+            className="inline-flex rounded-full bg-[#c4a35a] px-5 py-2.5 text-sm font-semibold text-[#021d33]"
+          >
+            Objednat paušál
+          </Link>
+          <Link
+            href={localizePublicHref("/inzerce/podminky", locale)}
+            className="inline-flex rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white"
+          >
+            Podmínky inzerce
+          </Link>
+        </div>
+      </section>
+
       <section className="mb-10 rounded-2xl border border-[#cfe1f3] bg-white px-5 py-6 sm:px-7">
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">
           {kit.letterEyebrow}

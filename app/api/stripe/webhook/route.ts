@@ -4,6 +4,7 @@ import { createServiceRoleClient } from "@/lib/supabase/service";
 import { logSecurityEvent } from "@/lib/security/security-log";
 import { getClientIp } from "@/lib/security/client-ip";
 import { activateAdFromCheckout } from "@/lib/ads/activate-from-payment";
+import { applySalesStripeFailure, applySalesStripePayment } from "@/lib/sales/billing";
 import { persistStripeWebhookLog } from "@/lib/billing/stripe-webhook-log";
 import { logMonetizationEvent } from "@/lib/monetization/log-event";
 import { notifySubscriptionConfirmed } from "@/lib/notifications/engine";
@@ -38,6 +39,22 @@ const HANDLED_EVENTS = new Set([
   "account.updated",
   "v2.core.account.updated",
 ]);
+
+function salesContractIdFromStripeInvoice(invoice: Stripe.Invoice): string | null {
+  const meta = invoice.metadata ?? {};
+  if (meta.kind === "sales_retainer" && meta.contract_id) return meta.contract_id;
+  const parent = invoice as Stripe.Invoice & {
+    subscription?: string | { id?: string; metadata?: Record<string, string> } | null;
+    parent?: { subscription_details?: { metadata?: Record<string, string> } };
+  };
+  const fromParent = parent.parent?.subscription_details?.metadata;
+  if (fromParent?.kind === "sales_retainer" && fromParent.contract_id) return fromParent.contract_id;
+  if (parent.subscription && typeof parent.subscription === "object") {
+    const subMeta = parent.subscription.metadata ?? {};
+    if (subMeta.kind === "sales_retainer" && subMeta.contract_id) return subMeta.contract_id;
+  }
+  return null;
+}
 
 /** Normalize event object for Stripe snapshot (v1) and thin (v2) account payloads */
 function resolveEventObject(event: Stripe.Event): unknown {
@@ -391,6 +408,21 @@ export async function POST(request: Request) {
         });
       }
 
+      if (session.metadata?.kind === "sales_retainer" && session.metadata.contract_id) {
+        const result = await applySalesStripePayment({
+          contractId: session.metadata.contract_id,
+          sessionId: session.id,
+          subscriptionId: typeof session.subscription === "string" ? session.subscription : session.subscription?.id,
+          customerId: typeof session.customer === "string" ? session.customer : session.customer?.id,
+        });
+        await logSecurityEvent({
+          ip,
+          action: "stripe:sales_retainer_checkout",
+          status: result.ok ? "ok" : "error",
+          details: { contractId: session.metadata.contract_id, sessionId: session.id, result },
+        });
+      }
+
       if (session.metadata?.type === "donation" && session.id) {
         await admin
           .from("v27_orders")
@@ -621,7 +653,25 @@ export async function POST(request: Request) {
     if (event.type === "invoice.paid" || event.type === "invoice.payment_succeeded") {
       const invoice = event.data.object as Stripe.Invoice;
       const customerEmail = invoice.customer_email ?? undefined;
-      if (customerEmail) {
+      const salesContractId = salesContractIdFromStripeInvoice(invoice);
+      if (salesContractId) {
+        const invoiceRow = invoice as Stripe.Invoice & {
+          subscription?: string | { id?: string } | null;
+        };
+        const sub = invoiceRow.subscription;
+        const result = await applySalesStripePayment({
+          contractId: salesContractId,
+          subscriptionId: typeof sub === "string" ? sub : sub && typeof sub === "object" ? sub.id : null,
+          customerId: typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id,
+          stripeInvoiceId: invoice.id,
+        });
+        await logSecurityEvent({
+          ip,
+          action: "stripe:sales_retainer_invoice_paid",
+          status: result.ok ? "ok" : "error",
+          details: { contractId: salesContractId, invoiceId: invoice.id, result },
+        });
+      } else if (customerEmail) {
         await logSecurityEvent({
           ip,
           action: "stripe:invoice_paid",
@@ -633,11 +683,15 @@ export async function POST(request: Request) {
 
     if (event.type === "invoice.payment_failed") {
       const invoice = event.data.object as Stripe.Invoice;
+      const salesContractId = salesContractIdFromStripeInvoice(invoice);
+      if (salesContractId) {
+        await applySalesStripeFailure(salesContractId);
+      }
       await logSecurityEvent({
         ip,
         action: "stripe:invoice_payment_failed",
         status: "warning",
-        details: { invoiceId: invoice.id, customer: invoice.customer },
+        details: { invoiceId: invoice.id, customer: invoice.customer, salesContractId },
       });
     }
 
