@@ -144,4 +144,9 @@ skládá živé paušály + schválené listingy přes server.
 - Prohlížeč: `/` (čtyři karty hned nahoře), `/exchange` (nabídky + poptávky + oddělení od magazínu),
   `/admin/sales` (pět kontrolorů).
 
-E-mail na ostrém účtu se v cloud VM **neodesílá**, dokud není reálný transport — to je záměr, ne chyba UI.
+## 10. Jak vydělat dnes
+
+1. Veřejný nákup: `/inzerce/pausal` — IČO + adresa, karta Stripe (hostující checkout i bez databáze) nebo převod.
+2. Webhook `/api/stripe/webhook` s `kind=sales_retainer` (i `pending=1`) spáruje platbu se smlouvou, jakmile je SQL.
+3. Doplňte `LEGAL_ENTITY_IBAN` pro QR/převod a e-mailový transport, ať faktura opravdu odejde.
+4. Bez service role objednávka **nespadne** — jde e-mail na inzerenta i `ads@` a Stripe session, pokud je klíč.

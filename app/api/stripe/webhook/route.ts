@@ -421,6 +421,20 @@ export async function POST(request: Request) {
           status: result.ok ? "ok" : "error",
           details: { contractId: session.metadata.contract_id, sessionId: session.id, result },
         });
+      } else if (session.metadata?.kind === "sales_retainer" && session.metadata.pending === "1") {
+        const { fulfillPendingRetainerFromStripe } = await import("@/lib/sales/pay");
+        const result = await fulfillPendingRetainerFromStripe({
+          sessionId: session.id,
+          subscriptionId: typeof session.subscription === "string" ? session.subscription : session.subscription?.id,
+          customerId: typeof session.customer === "string" ? session.customer : session.customer?.id,
+          metadata: session.metadata as Record<string, string>,
+        });
+        await logSecurityEvent({
+          ip,
+          action: "stripe:sales_retainer_pending",
+          status: result.ok ? "ok" : "error",
+          details: { sessionId: session.id, result },
+        });
       }
 
       if (session.metadata?.type === "donation" && session.id) {

@@ -270,6 +270,7 @@ import { SALES_DEPARTMENT_SQL } from "../../lib/sales/apply-schema";
 import { salesOfferEmail } from "../../lib/sales/copy";
 import { inquirySlaDue } from "../../lib/sales/fulfillment";
 import { evaluateSalesControl, salesControlWorst } from "../../lib/sales/control";
+import { normalizeCzechIco, salesPayInstructions } from "../../lib/sales/pay";
 import { MARKETPLACE_DESK_SQL } from "../../lib/marketplace/schema";
 import { classifyMarketplaceKind, classifyMarketplaceMessage } from "../../lib/marketplace/auto-reply";
 import { SAMPLE_DEMANDS } from "../../lib/marketplace/board";
@@ -5948,6 +5949,18 @@ console.log(
   assert.ok(webhook.includes("sales_retainer"));
   const cronYml = readFileSync(join(root, ".github/workflows/cloudflare-cron.yml"), "utf8");
   assert.ok(cronYml.includes("/api/cron/sales-department"));
+  assert.equal(normalizeCzechIco("12345678"), "12345678");
+  assert.equal(normalizeCzechIco("123"), null);
+  assert.equal(salesPayInstructions().sellerIco, "06024963");
+  assert.ok(readFileSync(join(root, "lib/sales/pay.ts"), "utf8").includes("createGuestRetainerCheckout"));
+  assert.ok(readFileSync(join(root, "app/api/stripe/webhook/route.ts"), "utf8").includes("pending === \"1\""));
+  assert.ok(readFileSync(join(root, "app/(public)/inzerce/pausal/page.tsx"), "utf8").includes("salesPayInstructions"));
+  assert.ok(
+    readFileSync(join(root, "components/marketplace/marketplace-desk.tsx"), "utf8").includes(
+      "Objednat paušál od 4 900 Kč"
+    )
+  );
+  assert.ok(readFileSync(join(root, ".env.example"), "utf8").includes("LEGAL_ENTITY_IBAN"));
   const blockedMail = evaluateSalesControl({
     mailReady: false,
     unrepliedListings: 0,

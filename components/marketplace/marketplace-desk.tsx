@@ -30,7 +30,9 @@ function Card({ item }: { item: MarketplacePublicCard }) {
           {item.companyLabel} · {item.cert}
         </p>
         <p className="mt-3 text-sm leading-6 text-slate-700">{item.summary}</p>
-        {item.contactHidden ? (
+        {item.sample ? (
+          <p className="mt-3 text-xs text-slate-500">Ukázka — živé kontakty až po paušálu inzerenta.</p>
+        ) : item.contactHidden ? (
           <p className="mt-3 text-xs text-slate-500">Kontakt až po paušálu inzerenta — bez provize z obchodu.</p>
         ) : null}
         {item.href ? (
@@ -82,8 +84,14 @@ export function MarketplaceDesk({
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
-              href="#nabidky"
+              href={pausalHref}
               className="rounded-full bg-[#c4a35a] px-5 py-2.5 text-sm font-semibold text-[#021d33] hover:bg-[#e8d5a3]"
+            >
+              Objednat paušál od 4 900 Kč
+            </Link>
+            <Link
+              href="#nabidky"
+              className="rounded-full border border-white/40 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
             >
               Nabídky inzerentů
             </Link>
@@ -126,6 +134,20 @@ export function MarketplaceDesk({
             <p className="mt-2 text-sm leading-6 text-slate-600">{item.body}</p>
           </div>
         ))}
+      </div>
+
+      <div className="mx-auto max-w-6xl px-4 pb-4 sm:px-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#021d33] bg-white px-5 py-4">
+          <p className="text-sm text-slate-700">
+            Chcete kontakty z poptávek dnes? Paušál od <strong>4 900 Kč / měsíc</strong>, karta nebo převod.
+          </p>
+          <Link
+            href={pausalHref}
+            className="rounded-full bg-[#005B96] px-4 py-2 text-sm font-semibold text-white hover:bg-[#004a7a]"
+          >
+            Objednat paušál
+          </Link>
+        </div>
       </div>
 
       <div className="mx-auto grid max-w-6xl gap-8 px-4 pb-12 sm:px-6 lg:grid-cols-2">
