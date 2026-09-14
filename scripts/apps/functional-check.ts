@@ -270,6 +270,7 @@ import { SALES_DEPARTMENT_SQL } from "../../lib/sales/apply-schema";
 import { salesOfferEmail } from "../../lib/sales/copy";
 import { inquirySlaDue } from "../../lib/sales/fulfillment";
 import { evaluateSalesControl, salesControlWorst } from "../../lib/sales/control";
+import { scoreOfferToDemand, buildMarketplaceLoopModel } from "../../lib/sales/marketplace-loop";
 import { normalizeCzechIco, salesPayInstructions } from "../../lib/sales/pay";
 import { MARKETPLACE_DESK_SQL } from "../../lib/marketplace/schema";
 import { classifyMarketplaceKind, classifyMarketplaceMessage } from "../../lib/marketplace/auto-reply";
@@ -2129,15 +2130,15 @@ assert.ok(
   assert.equal(getHomepagePillarsCopy("cs").title, "Čtyři části. Jedno prostředí.");
   const marketCs = getHomepagePillarsCopy("cs").pillars.find((item) => item.id === "marketplace");
   assert.ok(marketCs);
-  assert.equal(marketCs.ctaHref, "/inzerce/pausal");
-  assert.equal(marketCs.cta, "Objednat paušál");
-  assert.equal(marketCs.secondaryHref, "/exchange");
-  assert.ok(marketCs.lead.includes("Nejde o bannery"));
+  assert.equal(marketCs.ctaHref, "/exchange");
+  assert.equal(marketCs.cta, "Vstoupit na tržiště");
+  assert.equal(marketCs.secondaryHref, "/inzerce/pausal");
+  assert.ok(marketCs.lead.includes("Osoby sem nepatří"));
   assert.ok(getExchangeCopy("cs").kicker.includes("ne magazín"));
   assert.ok(getExchangeCopy("cs").title.includes("zpracovává tady"));
   assert.equal(getHomepagePillarsCopy("cs").kicker, "Přehled prostředí");
-  assert.equal(getHomepagePillarsCopy("de").pillars.find((item) => item.id === "marketplace")?.cta, "Pauschale bestellen");
-  assert.equal(getHomepagePillarsCopy("de").pillars.find((item) => item.id === "marketplace")?.secondary, "Marktplatz öffnen");
+  assert.equal(getHomepagePillarsCopy("de").pillars.find((item) => item.id === "marketplace")?.cta, "Marktplatz öffnen");
+  assert.equal(getHomepagePillarsCopy("de").pillars.find((item) => item.id === "marketplace")?.secondary, "Pauschale bestellen");
   assert.equal(getExchangeCopy("en").adsCta, "Advertiser guide");
   assert.equal(getExchangeCopy("sk").adsCta, "Návod pre inzerentov");
   assert.ok(
@@ -6003,6 +6004,19 @@ console.log(
   assert.equal(delayed.find((item) => item.id === "intake")?.status, "warn");
   assert.ok(readFileSync(join(root, "lib/sales/runner.ts"), "utf8").includes("evaluateSalesControl"));
   assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes("Koordinátoři a kontroloři"));
+  assert.ok(readFileSync(join(root, "components/v271/homepage-pillars.tsx"), "utf8").includes('data-studio="audience-split"'));
+  assert.ok(readFileSync(join(root, "components/marketplace/marketplace-intake-form.tsx"), "utf8").includes("Firemní formulář tržiště"));
+  assert.ok(!readFileSync(join(root, "components/marketplace/marketplace-intake-form.tsx"), "utf8").includes("contactName"));
+  assert.ok(!readFileSync(join(root, "components/marketplace/marketplace-intake-form.tsx"), "utf8").includes("Telefon"));
+  assert.ok(existsSync(join(root, "app/api/marketplace/choose/route.ts")));
+  const loop = buildMarketplaceLoopModel();
+  assert.equal(loop.evaluation.percent, 100);
+  assert.equal(loop.evaluation.autonomous, true);
+  assert.equal(loop.evaluation.subscriberReady, true);
+  assert.equal(loop.evaluation.buyerFoundSupplier, true);
+  assert.equal(loop.evaluation.supplierNotified, true);
+  assert.equal(loop.ok, true);
+  assert.ok(scoreOfferToDemand({ title: loop.supplier.offerTitle, summary: loop.supplier.offerSummary }, { title: loop.buyer.offerTitle, summary: loop.buyer.offerSummary }) >= 0.15);
 }
 
 console.log("✓ editorial image pipeline checks passed");

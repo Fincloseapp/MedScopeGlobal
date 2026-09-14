@@ -13,9 +13,10 @@ const schema = z.object({
   category: z.string().max(80).optional(),
   region: z.string().max(80).optional(),
   cert: z.string().max(80).optional(),
-  contactName: z.string().min(2).max(120),
+  contactName: z.string().max(120).optional(),
   contactEmail: z.string().email(),
   phone: z.string().max(40).optional(),
+  termsAccepted: z.boolean().optional(),
 });
 
 export async function POST(request: Request) {
@@ -31,9 +32,14 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: "Neplatný formulář." }, { status: 400 });
   }
+  if (body.termsAccepted === false) {
+    return NextResponse.json({ error: "Potřebujeme souhlas se zpracováním firemního e-mailu." }, { status: 400 });
+  }
 
+  const { termsAccepted: _terms, ...intake } = body;
   const result = await ingestMarketplaceIntake({
-    ...body,
+    ...intake,
+    contactName: body.contactName || body.company,
     source: "form",
   });
   if (!result.ok) {

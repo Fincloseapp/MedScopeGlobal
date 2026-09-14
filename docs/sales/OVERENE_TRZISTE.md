@@ -18,8 +18,8 @@ Po otevření `/` (česky `/cs`) je **první blok** mapa prostředí
 | Studenti | `/studenti`, `/app/priprava` | MeDiprep | Inzerce firem |
 | Lékaři | `/lekari`, `/app/dokumentace` | OrdiZapis | Tržiště |
 
-Karta tržiště na homepage: eyebrow *Samostatná část · B2B výnos*, zlaté CTA **Objednat paušál** → `/inzerce/pausal`,
-sekundární **Otevřít tržiště** → `/exchange`. Návod zůstává na `/exchange/navod`.
+Karta tržiště na homepage: eyebrow *Samostatná část · jen firmy*, zlaté CTA **Vstoupit na tržiště** → `/exchange`,
+sekundární **Objednat paušál** → `/inzerce/pausal`. Nad kartami jsou dva vstupy: magazín (osoby) vs tržiště (firmy).
 
 Spodní B2B blok homepage (`V271B2bBlock`) má dva sloupce: tmavé **tržiště** vs. světlý **magazín · jiná část** (`/firmy`).
 
@@ -147,8 +147,25 @@ skládá živé paušály + schválené listingy přes server.
 ## 10. Jak vydělat dnes
 
 1. Veřejný nákup: `/inzerce/pausal` — IČO + adresa, karta Stripe (hostující checkout i bez databáze) nebo převod.
-   Z homepage zlaté tlačítko **Objednat paušál**, z `/exchange` **Objednat paušál od 4 900 Kč**, z `/inzerce` karta **Zaplatit paušál**.
+   Z homepage **Vstoupit na tržiště** i **Objednat paušál**, z `/exchange` **Objednat paušál od 4 900 Kč**, z `/inzerce` karta **Zaplatit paušál**.
 2. Webhook `/api/stripe/webhook` s `kind=sales_retainer` (i `pending=1`) spáruje platbu se smlouvou, jakmile je SQL.
 3. Doplňte `LEGAL_ENTITY_IBAN` pro QR/převod a e-mailový transport, ať faktura opravdu odejde.
 4. Bez service role objednávka **nespadne** — jde e-mail na inzerenta i `ads@` a Stripe session, pokud je klíč.
 5. Produkce: SQL `sales_*` + `marketplace_*`, reálné `NEXT_PUBLIC_SUPABASE_URL`, směrování `inzerce@` na inbound webhook.
+
+## 11. Autonomní smyčka dodavatel ↔ poptávající
+
+Funkce `runMarketplaceLoopModel()` (`lib/sales/marketplace-loop.ts`) bez lidského zásahu:
+
+1. obchod vybere dodavatele;
+2. diplomaticky ho osloví (vložte nabídku, staňte se předplatitelem);
+3. firma vloží inzerát s nabídkou služeb;
+4. stane se předplatitelem tržiště;
+5. obchod vybere poptávající firmu a řekne, že tržiště má dodavatele;
+6. firma vloží poptávku;
+7. poptávající si vybere nabízející firmu;
+8. nabízející je oslovena **přes tržiště**.
+
+Dashboard `/admin/sales` záložka **Smyčka**. Model používá schránky `.invalid` (RFC 2606), nikoho zvenku neoslovuje.
+Živý matching poptávek na nabídky běží v `runSalesDepartmentTick` (`advanceLiveMarketplaceMatching`).
+Veřejný výběr dodavatele: `POST /api/marketplace/choose`.

@@ -7,9 +7,10 @@ export const dynamic = "force-dynamic";
 
 const schema = z.object({
   company: z.string().min(2).max(200),
-  contactName: z.string().min(2).max(120),
+  contactName: z.string().max(120).optional(),
   contactEmail: z.string().email(),
   message: z.string().min(8).max(4000),
+  termsAccepted: z.boolean().optional(),
 });
 
 export async function POST(request: Request) {
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
     company: body.company,
     title: `Dotaz inzerenta — ${body.company}`,
     summary: body.message,
-    contactName: body.contactName,
+    contactName: body.contactName || body.company,
     contactEmail: body.contactEmail,
     source: "form",
   });
@@ -41,6 +42,6 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ok: true,
     autoReplied: result.autoReplied,
-    message: "Odpověď jde na e-mail. Můžete také napsat na inzerce@medscopeglobal.com.",
+    message: "Odpověď jde na váš firemní e-mail. Obchodní oddělení naváže samo.",
   });
 }

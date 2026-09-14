@@ -7,11 +7,12 @@ import type { SalesSnapshot } from "@/lib/sales/types";
 import { formatSalesCzk } from "@/lib/sales/packages";
 import { salesControlWorst } from "@/lib/sales/control";
 
-type Tab = "prehled" | "trziste" | "pipeline" | "inzerenti" | "outreach" | "faktury" | "poptavky" | "pravni";
+type Tab = "prehled" | "trziste" | "smycka" | "pipeline" | "inzerenti" | "outreach" | "faktury" | "poptavky" | "pravni";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "prehled", label: "Přehled" },
   { id: "trziste", label: "Tržiště" },
+  { id: "smycka", label: "Smyčka" },
   { id: "pipeline", label: "Pipeline" },
   { id: "inzerenti", label: "Inzerenti" },
   { id: "outreach", label: "Oslovení" },
@@ -124,6 +125,9 @@ export function SalesDesk() {
         <div className="flex flex-wrap gap-2">
           <Button disabled={busy !== null} onClick={() => void act("run_tick")}>
             {busy === "run_tick" ? "Běží…" : "Spustit autonomní běh"}
+          </Button>
+          <Button disabled={busy !== null} variant="outline" onClick={() => void act("run_marketplace_loop")}>
+            {busy === "run_marketplace_loop" ? "Smyčka…" : "Modelový test smyčky"}
           </Button>
           <Button variant="outline" asChild>
             <Link href="/exchange">Veřejné tržiště</Link>
@@ -456,6 +460,59 @@ export function SalesDesk() {
             </tbody>
           </table>
         </div>
+      ) : null}
+
+      {tab === "smycka" && data ? (
+        <section className="space-y-4">
+          <p className="text-sm text-slate-600">
+            Modelový běh interně vybere dodavatele, vloží nabídku, udělá z něj předplatitele tržiště, vybere
+            poptávající firmu, ta si dodavatele vybere a oslovení jde přes tržiště. Bez lidského schválení.
+            Používá schránky <code>.invalid</code> — nikoho zvenku neoslovuje.
+          </p>
+          {data.loop ? (
+            <div
+              className={`rounded-2xl border px-4 py-4 ${
+                data.loop.evaluation.autonomous && data.loop.evaluation.percent === 100
+                  ? "border-emerald-200 bg-emerald-50"
+                  : "border-amber-200 bg-amber-50"
+              }`}
+            >
+              <p className="text-sm font-semibold text-[#021d33]">
+                {data.loop.evaluation.percent} % · {data.loop.evaluation.summary}
+              </p>
+              <p className="mt-1 text-xs text-slate-600">
+                Předplatitel: {data.loop.evaluation.subscriberReady ? "ano" : "ne"} · dodavatel nalezen:{" "}
+                {data.loop.evaluation.buyerFoundSupplier ? "ano" : "ne"} · osloven přes tržiště:{" "}
+                {data.loop.evaluation.supplierNotified ? "ano" : "ne"} · záznamy uložené:{" "}
+                {data.loop.persisted ? "ano" : "paměť (bez DB)"}
+              </p>
+            </div>
+          ) : (
+            <p className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
+              Zatím žádný modelový běh. Spusťte „Modelový test smyčky“.
+            </p>
+          )}
+          <div className="overflow-x-auto rounded-2xl border bg-white">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
+                <tr>
+                  <th className="px-3 py-2">Krok</th>
+                  <th className="px-3 py-2">Stav</th>
+                  <th className="px-3 py-2">Záznam</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(data.loop?.steps ?? []).map((row) => (
+                  <tr key={row.id} className="border-t align-top">
+                    <td className="px-3 py-2 font-medium">{row.label}</td>
+                    <td className="px-3 py-2">{row.ok ? (row.autonomous ? "autonomně" : "ručně") : "chybí"}</td>
+                    <td className="px-3 py-2 text-xs text-slate-600">{row.detail}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
       ) : null}
 
       {tab === "trziste" && data ? (

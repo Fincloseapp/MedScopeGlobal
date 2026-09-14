@@ -18,6 +18,7 @@ import { listMarketplaceListings, marketplaceDb } from "@/lib/marketplace/store"
 import { marketplaceAdminNotifyEmail, marketplaceInboxEmail } from "@/lib/marketplace/config";
 import { mailReady, mailTransportLabel } from "@/lib/monetization/vialongevita-brief";
 import { evaluateSalesControl } from "@/lib/sales/control";
+import { lastMarketplaceLoop } from "@/lib/sales/marketplace-loop";
 
 function mailHealth(): SalesSnapshot["marketplace"]["mail"] {
   return {
@@ -84,6 +85,7 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
         mail: mailHealth(),
         control: controlFromRows(mailHealth(), [], [], [], [], 0),
       },
+      loop: lastMarketplaceLoop(),
       legal,
     };
   }
@@ -193,6 +195,7 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
         kpis.pendingPayment
       ),
     },
+    loop: lastMarketplaceLoop(),
     legal,
   };
 }

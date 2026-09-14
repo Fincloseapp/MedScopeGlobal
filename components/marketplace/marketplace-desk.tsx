@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MarketplaceIntakeForm } from "@/components/marketplace/marketplace-intake-form";
 import { MarketplaceTutorialPlayer } from "@/components/marketplace/marketplace-tutorial-player";
+import { ChooseOfferForm } from "@/components/marketplace/choose-offer-form";
 import type { MarketplaceBoard, MarketplacePublicCard } from "@/lib/marketplace/types";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 
@@ -35,11 +36,12 @@ function Card({ item }: { item: MarketplacePublicCard }) {
         ) : item.contactHidden ? (
           <p className="mt-3 text-xs text-slate-500">Kontakt až po paušálu inzerenta — bez provize z obchodu.</p>
         ) : null}
-        {item.href ? (
+        {item.href && item.sample ? (
           <Link href={item.href} className="mt-3 inline-flex text-sm font-semibold text-[#005B96] hover:underline">
             {item.kind === "offer" ? "Otevřít nabídku" : "Zobrazit poptávku"} →
           </Link>
         ) : null}
+        {item.kind === "offer" && !item.sample ? <ChooseOfferForm offerId={item.id} offerTitle={item.title} /> : null}
       </div>
     </article>
   );
@@ -117,16 +119,16 @@ export function MarketplaceDesk({
       <div className="mx-auto grid max-w-6xl gap-4 px-4 py-8 sm:px-6 md:grid-cols-3">
         {[
           {
-            title: "Vidíte poptávky hned",
-            body: "Nemocnice a laboratoře poptávají zdarma. E-mail z poptávky dostane platící inzerent — ne veřejnost.",
+            title: "Jen firmy",
+            body: "Tržiště je B2B. Osoby a předplatitelé magazínu jdou do ViaLongeVita — jiná část.",
           },
           {
-            title: "Výnos zůstává v tržišti",
-            body: "Paušál od 4 900 Kč / měsíc platí plochy a předání poptávek tady. Nejde o banner v článku magazínu.",
+            title: "Jednoduchý formulář",
+            body: "Firma, jeden pracovní e-mail, nabídka nebo poptávka. Bez telefonu a bez dalších schránek.",
           },
           {
-            title: "Odpověď i v noci",
-            body: `Formulář nebo ${board.inbox}. Automatická odpověď na cenu, podmínky a fakturu, obchodní oddělení naváže.`,
+            title: "Oslovení přes tržiště",
+            body: "Poptávající si vybere dodavatele. Kontakt nejde na veřejnou desku — předá ho obchodní oddělení.",
           },
         ].map((item) => (
           <div key={item.title} className="rounded-2xl border border-[#cfe1f3] bg-white p-5">

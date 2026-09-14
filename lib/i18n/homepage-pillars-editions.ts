@@ -26,8 +26,8 @@ const EDITIONS: Record<string, HomepagePillarsEdition> = {
         eyebrow: "Samostatná časť · B2B výnos",
         title: "Trhovisko",
         lead: "Ponuky inzerentov a dopyty nemocníc sa platia tu. Nie bannery v magazíne — tie sú na /firmy.",
-        cta: "Objednať paušál",
-        secondary: "Otvoriť trhovisko",
+        cta: "Otvoriť trhovisko",
+        secondary: "Objednať paušál",
       },
       students: {
         eyebrow: "Uchádzači o medicínu",

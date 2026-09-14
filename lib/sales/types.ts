@@ -241,6 +241,7 @@ export type SalesTickResult = {
   fulfilled: number;
   inquiriesForwarded: number;
   paused: number;
+  matched?: number;
   errors: string[];
   startedAt: string;
   finishedAt: string;
@@ -300,6 +301,7 @@ export type SalesSnapshot = {
     };
     control: SalesControlFinding[];
   };
+  loop?: import("@/lib/sales/marketplace-loop").MarketplaceLoopResult | null;
   legal: {
     coldAutoSend: boolean;
     maxTouches: number;

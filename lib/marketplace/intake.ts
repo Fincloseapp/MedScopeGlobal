@@ -37,7 +37,7 @@ export async function ingestMarketplaceIntake(input: MarketplaceIntakeInput): Pr
     category: input.category ? sanitizeText(input.category, 80) : null,
     region: input.region ? sanitizeText(input.region, 80) : "Česko + EU",
     cert: input.cert ? sanitizeText(input.cert, 80) : null,
-    contact_name: sanitizeText(input.contactName, 120),
+    contact_name: sanitizeText(input.contactName || input.company, 120),
     contact_email: email,
     phone: input.phone ? sanitizeText(input.phone, 40) : null,
     source: input.source,

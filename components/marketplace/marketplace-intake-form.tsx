@@ -4,13 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { getTurnstileSiteKeyClient, useCaptchaToken } from "@/components/security/use-captcha";
 
-type Kind = "offer" | "demand" | "question";
-
-const KINDS: { id: Kind; label: string; hint: string }[] = [
-  { id: "offer", label: "Chci inzerovat nabídku", hint: "Výrobek nebo služba na tržiště. Kontakty z poptávek po paušálu." },
-  { id: "demand", label: "Zadat poptávku", hint: "Nemocnice, laboratoř, síť ambulancí — zdarma, bez provize." },
-  { id: "question", label: "Zeptat se", hint: "Cena, paušál, podmínky. Odpověď jde na e-mail hned." },
-];
+type Kind = "offer" | "demand";
 
 export function MarketplaceIntakeForm({ defaultKind = "offer" }: { defaultKind?: Kind }) {
   const [kind, setKind] = useState<Kind>(defaultKind);
@@ -36,28 +30,15 @@ export function MarketplaceIntakeForm({ defaultKind = "offer" }: { defaultKind?:
       company: String(form.get("company") ?? ""),
       title: String(form.get("title") ?? ""),
       summary: String(form.get("summary") ?? ""),
-      category: String(form.get("category") ?? "") || undefined,
-      region: String(form.get("region") ?? "") || undefined,
-      contactName: String(form.get("contactName") ?? ""),
       contactEmail: String(form.get("contactEmail") ?? ""),
-      phone: String(form.get("phone") ?? "") || undefined,
+      termsAccepted: form.get("terms") === "on",
+      captchaToken: captchaToken || undefined,
     };
-    const path = kind === "question" ? "/api/marketplace/question" : "/api/marketplace/listing";
-    const body =
-      kind === "question"
-        ? {
-            company: payload.company,
-            contactName: payload.contactName,
-            contactEmail: payload.contactEmail,
-            message: payload.summary,
-            captchaToken: captchaToken || undefined,
-          }
-        : { ...payload, captchaToken: captchaToken || undefined };
     try {
-      const res = await fetch(path, {
+      const res = await fetch("/api/marketplace/listing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify(payload),
       });
       const json = (await res.json()) as { message?: string; error?: string };
       setOk(res.ok);
@@ -65,24 +46,26 @@ export function MarketplaceIntakeForm({ defaultKind = "offer" }: { defaultKind?:
       if (res.ok) e.currentTarget.reset();
     } catch {
       setOk(false);
-      setMessage("Síťová chyba. Napište na inzerce@medscopeglobal.com.");
+      setMessage("Síťová chyba. Obchodní oddělení záznam doplní z dalšího běhu.");
     }
     setBusy(false);
   }
 
   return (
     <div id="formular" className="rounded-2xl border border-[#cfe1f3] bg-white p-5 shadow-sm">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">Příjem inzerce</p>
-      <h2 className="mt-1 font-display text-2xl font-semibold text-[#021d33]">Formulář nebo e-mail</h2>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">Jen firmy</p>
+      <h2 className="mt-1 font-display text-2xl font-semibold text-[#021d33]">Firemní formulář tržiště</h2>
       <p className="mt-2 text-sm text-slate-600">
-        Stejný tok: uložíme, odpovíme automaticky a obchodní oddělení naváže. E-mail{" "}
-        <a className="font-semibold text-[#005B96] underline" href="mailto:inzerce@medscopeglobal.com">
-          inzerce@medscopeglobal.com
-        </a>
-        .
+        Firma, jeden pracovní e-mail, nabídka nebo poptávka. Bez telefonu, bez jména osoby, bez další schránky.
+        Magazín a předplatné čtenářů sem nepatří.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
-        {KINDS.map((item) => (
+        {(
+          [
+            { id: "offer" as const, label: "Nabídka služeb" },
+            { id: "demand" as const, label: "Poptávka firmy" },
+          ] as const
+        ).map((item) => (
           <button
             key={item.id}
             type="button"
@@ -95,46 +78,39 @@ export function MarketplaceIntakeForm({ defaultKind = "offer" }: { defaultKind?:
           </button>
         ))}
       </div>
-      <p className="mt-2 text-xs text-slate-500">{KINDS.find((item) => item.id === kind)?.hint}</p>
-      <form onSubmit={(e) => void onSubmit(e)} className="mt-4 grid gap-3 sm:grid-cols-2">
-        <input required name="company" placeholder="Firma / instituce" className="rounded-lg border px-3 py-2 text-sm" />
-        <input required name="contactName" placeholder="Kontaktní osoba" className="rounded-lg border px-3 py-2 text-sm" />
-        <input required type="email" name="contactEmail" placeholder="E-mail" className="rounded-lg border px-3 py-2 text-sm" />
-        <input name="phone" placeholder="Telefon (nepovinné)" className="rounded-lg border px-3 py-2 text-sm" />
-        {kind !== "question" ? (
-          <>
-            <input
-              required
-              name="title"
-              placeholder={kind === "demand" ? "Co poptáváte" : "Název nabídky"}
-              className="rounded-lg border px-3 py-2 text-sm sm:col-span-2"
-            />
-            <input name="category" placeholder="Kategorie (POC, laboratoř, B2B…)" className="rounded-lg border px-3 py-2 text-sm" />
-            <input name="region" placeholder="Region (Česko, EU…)" className="rounded-lg border px-3 py-2 text-sm" />
-          </>
-        ) : null}
-        <textarea
-          required
-          name="summary"
-          rows={4}
-          placeholder={
-            kind === "question"
-              ? "Dotaz k paušálu, tržišti nebo podmínkám"
-              : kind === "demand"
-                ? "Popis poptávky — bez e-mailu na veřejné desce"
-                : "Popis nabídky pro kupující"
-          }
-          className="rounded-lg border px-3 py-2 text-sm sm:col-span-2"
-        />
-        <div className="sm:col-span-2 space-y-3">
+      <form onSubmit={(e) => void onSubmit(e)} className="mt-4 grid gap-3">
+        <label className="block text-sm">
+          <span className="mb-1 block font-medium text-[#021d33]">Firma</span>
+          <input required name="company" placeholder="Název společnosti" className="w-full rounded-lg border px-3 py-2 text-sm" />
+        </label>
+        <label className="block text-sm">
+          <span className="mb-1 block font-medium text-[#021d33]">Pracovní e-mail</span>
+          <input required type="email" name="contactEmail" placeholder="obchod@firma.cz" className="w-full rounded-lg border px-3 py-2 text-sm" />
+        </label>
+        <label className="block text-sm">
+          <span className="mb-1 block font-medium text-[#021d33]">
+            {kind === "demand" ? "Co poptáváte" : "Název nabídky"}
+          </span>
+          <input required name="title" className="w-full rounded-lg border px-3 py-2 text-sm" />
+        </label>
+        <label className="block text-sm">
+          <span className="mb-1 block font-medium text-[#021d33]">Stručný popis</span>
+          <textarea required name="summary" rows={4} className="w-full rounded-lg border px-3 py-2 text-sm" />
+        </label>
+        <label className="flex items-start gap-2 text-xs text-slate-600">
+          <input type="checkbox" name="terms" required className="mt-1" />
+          <span>
+            Jsem firma. Souhlasím se zpracováním tohoto e-mailu pro obsluhu tržiště (GDPR čl. 6 odst. 1 písm. b).
+            Inzerce bude označená. Osobní údaje třetích osob sem nevkládám.
+          </span>
+        </label>
+        <div className="space-y-3">
           {widget}
           <Button type="submit" disabled={busy || (captchaRequired && !captchaToken)} className="rounded-full bg-[#005B96]">
-            {busy ? "Odesílám…" : "Odeslat"}
+            {busy ? "Odesílám…" : kind === "demand" ? "Zadat poptávku" : "Zveřejnit nabídku"}
           </Button>
         </div>
-        {message ? (
-          <p className={`text-sm sm:col-span-2 ${ok ? "text-emerald-800" : "text-amber-800"}`}>{message}</p>
-        ) : null}
+        {message ? <p className={`text-sm ${ok ? "text-emerald-800" : "text-amber-800"}`}>{message}</p> : null}
       </form>
     </div>
   );

@@ -1,6 +1,6 @@
 export type MarketplaceKind = "offer" | "demand" | "question";
 export type MarketplaceStatus = "visible" | "answered" | "rejected";
-export type MarketplaceSource = "form" | "email" | "paid" | "sample" | "catalog";
+export type MarketplaceSource = "form" | "email" | "paid" | "sample" | "catalog" | "loop";
 
 export type MarketplaceListing = {
   id: string;
@@ -72,8 +72,8 @@ export type MarketplaceIntakeInput = {
   category?: string;
   region?: string;
   cert?: string;
-  contactName: string;
+  contactName?: string;
   contactEmail: string;
   phone?: string;
-  source: "form" | "email";
+  source: "form" | "email" | "loop";
 };

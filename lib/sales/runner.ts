@@ -67,6 +67,7 @@ function emptyTick(partial: Partial<SalesTickResult> & { startedAt: string }): S
     fulfilled: 0,
     inquiriesForwarded: 0,
     paused: 0,
+    matched: 0,
     errors: [],
     finishedAt: new Date().toISOString(),
     control: idleControl(),
@@ -98,6 +99,7 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
   let fulfilled = 0;
   let inquiriesForwarded = 0;
   let paused = 0;
+  let matched = 0;
 
   try {
     for (const seed of SALES_ICP_SEEDS) {
@@ -343,6 +345,13 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
     }
 
     try {
+      const { advanceLiveMarketplaceMatching } = await import("@/lib/sales/marketplace-loop");
+      matched = (await advanceLiveMarketplaceMatching()).matched;
+    } catch {
+      /* matching is best-effort */
+    }
+
+    try {
       const liveListings = await listMarketplaceListings(db, 80);
       for (const listing of liveListings) {
         if (listing.status !== "visible" || listing.kind === "question") continue;
@@ -412,6 +421,7 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
     fulfilled,
     inquiriesForwarded,
     paused,
+    matched,
     errors,
     startedAt,
     finishedAt,

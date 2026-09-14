@@ -118,6 +118,42 @@ export function HomepagePillars({ locale = "cs" }: { locale?: string }) {
       </h2>
       <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-600">{copy.lead}</p>
 
+      {locale === "cs" || locale.startsWith("cs-") ? (() => {
+        const magazine = copy.pillars.find((item) => item.id === "magazine");
+        const market = copy.pillars.find((item) => item.id === "marketplace");
+        if (!magazine || !market) return null;
+        return (
+          <div className="mt-4 grid gap-2 sm:grid-cols-2" data-studio="audience-split">
+            <PillarCta
+              href={magazine.ctaHref}
+              locale={locale}
+              className="rounded-2xl border border-[#cfe1f3] bg-[#f7fbff] px-4 py-3 text-left hover:border-[#005B96]/40"
+            >
+              <span className="block text-[10px] font-semibold uppercase tracking-[0.22em] text-[#005B96]">
+                Pro osoby
+              </span>
+              <span className="mt-1 block font-display text-lg font-bold text-[#021d33]">Magazín a předplatné</span>
+              <span className="mt-1 block text-sm text-slate-600">
+                Čtenáři a předplatitelé. Firmy oslovující čtenáře jdou sem, ne na tržiště.
+              </span>
+            </PillarCta>
+            <PillarCta
+              href={market.ctaHref}
+              locale={locale}
+              className="rounded-2xl border border-[#021d33] bg-[#021d33] px-4 py-3 text-left text-white hover:bg-[#03263f]"
+            >
+              <span className="block text-[10px] font-semibold uppercase tracking-[0.22em] text-[#e8d5a3]">
+                Pro firmy
+              </span>
+              <span className="mt-1 block font-display text-lg font-bold">Vstoupit na tržiště</span>
+              <span className="mt-1 block text-sm text-white/80">
+                Nabídky, poptávky a paušál mezi společnostmi. Jeden formulář, jeden e-mail.
+              </span>
+            </PillarCta>
+          </div>
+        );
+      })() : null}
+
       <nav aria-label={copy.jumpLabel} className="mt-4 flex flex-wrap gap-1.5">
         {copy.pillars.map((pillar) => (
           <a

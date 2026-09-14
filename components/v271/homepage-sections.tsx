@@ -222,7 +222,6 @@ export function V271AudienceSections() {
 }
 
 export function V271B2bBlock({ locale = "cs" }: { locale?: string }) {
-  const surface = getSurfaceCopy(locale);
   const revenue = getRevenueCopy(locale);
   const formHref = localizePublicHref("/firmy/reklama/nova", locale);
   const exchangeHref = localizePublicHref("/exchange", locale);
@@ -232,29 +231,30 @@ export function V271B2bBlock({ locale = "cs" }: { locale?: string }) {
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-3xl border border-[#021d33] bg-[#021d33] px-6 py-8 text-white">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e8d5a3]">
-            Samostatná část · tržiště
+            Tržiště · jen firmy
           </p>
-          <h3 className="mt-1 font-display text-xl font-semibold">B2B inzerce se zpracovává v tržišti</h3>
+          <h3 className="mt-1 font-display text-xl font-semibold">B2B nabídky a poptávky</h3>
           <p className="mt-2 text-sm text-white/75">
-            Nabídky, poptávky a paušál od 4 900 Kč / měsíc. Nejde o banner v článku. Kontakty z poptávek
-            dostane platící inzerent.
+            Společnosti vkládají nabídku nebo poptávku jedním formulářem. Osoby a předplatitelé sem nepatří.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Link
-              href={pausalHref}
+              href={exchangeHref}
               className="rounded-full bg-[#c4a35a] px-5 py-2.5 text-sm font-semibold text-[#021d33] hover:bg-[#e8d5a3]"
             >
-              Objednat paušál od 4 900 Kč
+              Vstoupit na tržiště
             </Link>
-            <Link href={exchangeHref} className="rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white">
-              Otevřít tržiště
+            <Link href={pausalHref} className="rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white">
+              Paušál od 4 900 Kč
             </Link>
           </div>
         </div>
         <div className="rounded-3xl border border-[#005B96]/15 bg-[#005B96]/5 px-6 py-8">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">Magazín · jiná část</p>
-          <h3 className="mt-1 font-display text-xl font-semibold text-[#021d33]">{surface.b2bTitle}</h3>
-          <p className="mt-2 text-sm text-slate-600">{surface.b2bDescription}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">Magazín · čtenáři</p>
+          <h3 className="mt-1 font-display text-xl font-semibold text-[#021d33]">Předplatitelé a inzerce u čtenářů</h3>
+          <p className="mt-2 text-sm text-slate-600">
+            Osoby čtou a předplácejí ViaLongeVita. Firmy, které chtějí oslovit čtenáře, kupují kampaň tady — ne paušál tržiště.
+          </p>
           <Link
             href={formHref}
             className="mt-5 inline-flex rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
