@@ -108,6 +108,9 @@ export function SalesDesk() {
             schválení, inbound se posílá sám.
           </p>
           {generated ? <p className="mt-1 text-xs text-slate-500">Stav k {generated}</p> : null}
+          {!data && !error ? (
+            <p className="mt-2 text-sm text-slate-500">Načítám koordinátory a pipeline…</p>
+          ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
           <Button disabled={busy !== null} onClick={() => void act("run_tick")}>
