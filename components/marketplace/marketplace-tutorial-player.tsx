@@ -13,7 +13,7 @@ const SLIDES: { title: string; body: string }[] = [
   },
   {
     title: "3 · Přidaná hodnota paušálu",
-    body: "Platící inzerent dostane kontakty z poptávek e-mailem, profil /partneri a plochy v magazínu. Bez provize z obchodu. Od 4 900 Kč / měsíc.",
+    body: "Platící inzerent dostane kontakty z poptávek e-mailem a profil /partneri. Jednorázové bannery v článcích jsou na /firmy — jiný produkt. Bez provize z obchodu. Od 4 900 Kč / měsíc.",
   },
   {
     title: "4 · Poptávka je zdarma",

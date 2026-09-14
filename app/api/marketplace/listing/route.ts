@@ -19,7 +19,10 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
-  const guard = await withApiGuard(request, { requireCaptcha: false, action: "marketplace_listing" });
+  const guard = await withApiGuard(request, {
+    requireCaptcha: Boolean(process.env.TURNSTILE_SECRET_KEY),
+    action: "marketplace_listing",
+  });
   if (!guard.ok) return guard.response;
 
   let body: z.infer<typeof schema>;

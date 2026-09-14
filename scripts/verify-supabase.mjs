@@ -79,6 +79,13 @@ const ecosystemMigrations = [
       ["sales_inquiries", "id"],
     ],
   },
+  {
+    file: "20260914070000_marketplace_desk.sql",
+    tables: [
+      ["marketplace_listings", "id"],
+      ["marketplace_messages", "id"],
+    ],
+  },
 ];
 
 let ok = true;

@@ -107,7 +107,8 @@ Diplomatický editor odmítá agresivní / urážlivý tón. Magazín do tohoto 
 1. Přihlášení `/admin/login` (brána).
 2. `/admin` — banner **Obchodní oddělení a tržiště**.
 3. Sidebar Peníze → první položka **Obchodní oddělení** → `/admin/sales`.
-4. Karty kontrolorů + záložka **Tržiště** (příjem, mail health, listings).
+4. Karty kontrolorů nahoře na `/admin/sales`. Záložka **Tržiště** ukáže stav schránky a tabulku příjmu
+   (prázdný stav, pokud ještě není service role / SQL).
 5. Odkazy na veřejné `/exchange` a `/inzerce/pausal`.
 
 Bez `SUPABASE_SERVICE_ROLE_KEY` dashboard ukáže ceník, právní pravidla a stav mailu, pipeline je prázdná.
@@ -120,10 +121,17 @@ Bez `SUPABASE_SERVICE_ROLE_KEY` dashboard ukáže ceník, právní pravidla a st
 2. `pnpm db:verify` → tabulky `sales_*`, `marketplace_listings`, `marketplace_messages`.
 3. Worker / `.env`: e-mailový transport (Cloudflare Email Sending, SendGrid nebo SMTP).
    Bez něj kontroloři hlásí **blok** na příjmu — formulář se uloží, mail se jen zaloguje a tick to zkusí znovu.
-4. Směrování schránky `inzerce@medscopeglobal.com` → `POST /api/marketplace/inbound-email`.
-5. Cron už volá `/api/cron/sales-department`.
+4. Směrování schránky `inzerce@medscopeglobal.com` → `POST /api/marketplace/inbound-email`
+   s `Authorization: Bearer …` nebo `?secret=` (`MARKETPLACE_INBOUND_SECRET`, jinak SendGrid / `CRON_SECRET`).
+   **Bez klíče endpoint vrací 401** — nenechávejte ho otevřený.
+5. Cron už volá `/api/cron/sales-department`. Schema se z ticku aplikuje jen pokud existuje
+   `SUPABASE_ACCESS_TOKEN`; v produkci SQL vždy nahrajte ručně, apply-schema je záloha.
 6. Stripe webhook umí `kind=sales_retainer`.
 7. Volitelně `SALES_AUTO_OUTBOUND=true` jen pokud chcete samovolné LIA maily na role adresy.
+8. Formulář tržiště zapne Turnstile, jakmile je `TURNSTILE_SECRET_KEY` (+ public site key).
+
+Tabulky `marketplace_*` mají RLS bez anon policy — čte/píše je jen service role. Veřejná deska
+skládá živé paušály + schválené listingy přes server.
 
 ## 9. Lokálně ověřené (tento branch)
 

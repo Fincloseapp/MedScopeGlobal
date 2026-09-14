@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { getTurnstileSiteKeyClient, useCaptchaToken } from "@/components/security/use-captcha";
 
 type Kind = "offer" | "demand" | "question";
 
@@ -16,11 +17,19 @@ export function MarketplaceIntakeForm({ defaultKind = "offer" }: { defaultKind?:
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
+  const siteKey = getTurnstileSiteKeyClient();
+  const { token: captchaToken, widget, required: captchaRequired } = useCaptchaToken(siteKey);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setBusy(true);
     setMessage(null);
+    if (captchaRequired && !captchaToken) {
+      setOk(false);
+      setMessage("Potvrďte CAPTCHA a odešlete znovu.");
+      setBusy(false);
+      return;
+    }
     const form = new FormData(e.currentTarget);
     const payload = {
       kind,
@@ -41,8 +50,9 @@ export function MarketplaceIntakeForm({ defaultKind = "offer" }: { defaultKind?:
             contactName: payload.contactName,
             contactEmail: payload.contactEmail,
             message: payload.summary,
+            captchaToken: captchaToken || undefined,
           }
-        : payload;
+        : { ...payload, captchaToken: captchaToken || undefined };
     try {
       const res = await fetch(path, {
         method: "POST",
@@ -116,8 +126,9 @@ export function MarketplaceIntakeForm({ defaultKind = "offer" }: { defaultKind?:
           }
           className="rounded-lg border px-3 py-2 text-sm sm:col-span-2"
         />
-        <div className="sm:col-span-2">
-          <Button type="submit" disabled={busy} className="rounded-full bg-[#005B96]">
+        <div className="sm:col-span-2 space-y-3">
+          {widget}
+          <Button type="submit" disabled={busy || (captchaRequired && !captchaToken)} className="rounded-full bg-[#005B96]">
             {busy ? "Odesílám…" : "Odeslat"}
           </Button>
         </div>

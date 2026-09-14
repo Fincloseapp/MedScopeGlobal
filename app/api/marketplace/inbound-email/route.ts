@@ -40,11 +40,10 @@ function parseRfc822(raw: string): { from: string; name?: string; subject: strin
 
 export async function POST(request: Request) {
   const secret = marketplaceInboundSecret();
-  if (secret) {
-    const auth = request.headers.get("authorization");
-    const qs = new URL(request.url).searchParams.get("secret");
-    if (auth !== `Bearer ${secret}` && qs !== secret) return unauthorized();
-  }
+  if (!secret) return unauthorized();
+  const auth = request.headers.get("authorization");
+  const qs = new URL(request.url).searchParams.get("secret");
+  if (auth !== `Bearer ${secret}` && qs !== secret) return unauthorized();
 
   const contentType = request.headers.get("content-type") ?? "";
   let from = "";

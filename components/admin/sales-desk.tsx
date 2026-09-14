@@ -80,12 +80,21 @@ export function SalesDesk() {
 
   async function act(action: string, extra?: Record<string, string>) {
     setBusy(action + (extra?.id ?? ""));
-    await fetch("/api/admin/sales/action", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action, ...extra }),
-    });
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/sales/action", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, ...extra }),
+      });
+      if (!res.ok) {
+        const json = (await res.json().catch(() => ({}))) as { error?: string };
+        setError(json.error || "Akce obchodního oddělení se nepovedla.");
+      }
+    } catch {
+      setError("Síťová chyba při akci obchodního oddělení.");
+    }
     await load();
     setBusy(null);
   }
@@ -140,7 +149,7 @@ export function SalesDesk() {
           {data.marketplace.mail.resend ? " · Resend je navíc k dispozici" : ""}.
         </p>
       ) : null}
-      {data?.marketplace?.control?.length ? (
+      {data ? (
         <section className="space-y-2">
           <div className="flex flex-wrap items-end justify-between gap-2">
             <div>
@@ -154,16 +163,19 @@ export function SalesDesk() {
             <p className="text-xs text-slate-500">
               Stav:{" "}
               <strong className="text-[#021d33]">
-                {salesControlWorst(data.marketplace.control) === "block"
+                {salesControlWorst(data.marketplace?.control ?? []) === "block"
                   ? "blok — zásah hned"
-                  : salesControlWorst(data.marketplace.control) === "warn"
+                  : salesControlWorst(data.marketplace?.control ?? []) === "warn"
                     ? "varování — fronta běží"
-                    : "v pořádku"}
+                    : (data.marketplace?.control?.length ?? 0) > 0
+                      ? "v pořádku"
+                      : "nenačteno"}
               </strong>
             </p>
           </div>
+          {(data.marketplace?.control?.length ?? 0) > 0 ? (
           <div className="grid gap-2 md:grid-cols-5">
-            {data.marketplace.control.map((item) => (
+            {(data.marketplace?.control ?? []).map((item) => (
               <div
                 key={item.id}
                 className={`rounded-2xl border px-3 py-3 ${
@@ -180,6 +192,11 @@ export function SalesDesk() {
               </div>
             ))}
           </div>
+          ) : (
+            <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              Kontroloři se nenačetli. Obnovte stránku nebo spusťte autonomní běh.
+            </p>
+          )}
         </section>
       ) : null}
       {error ? <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{error}</p> : null}
@@ -445,9 +462,19 @@ export function SalesDesk() {
         <section className="space-y-4">
           <p className="text-sm text-slate-600">
             Příjem z <Link className="text-[#005B96] underline" href="/exchange#formular">formuláře</Link> a
-            inbound webhooku <code>/api/marketplace/inbound-email</code>. Veřejný návod:{" "}
+            inbound webhooku <code>/api/marketplace/inbound-email</code> (Bearer / ?secret, bez klíče 401).
+            Veřejný návod:{" "}
             <Link className="text-[#005B96] underline" href="/exchange/navod">/exchange/navod</Link>.
+            Magazínové bannery sem nepatří — ty jsou na{" "}
+            <Link className="text-[#005B96] underline" href="/firmy">/firmy</Link>.
           </p>
+          {data.marketplace?.mail ? (
+            <p className="text-sm text-slate-600">
+              Schránka <strong>{data.marketplace.mail.inbox}</strong> · transport{" "}
+              <strong>{data.marketplace.mail.transport}</strong>
+              {data.marketplace.mail.ready ? " (odesílání zapnuté)" : " (bez transportu se maily jen logují)"}.
+            </p>
+          ) : null}
           <div className="overflow-x-auto rounded-2xl border bg-white">
             <table className="w-full text-sm">
               <thead className="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
@@ -460,20 +487,29 @@ export function SalesDesk() {
                 </tr>
               </thead>
               <tbody>
-                {(data.marketplace?.listings ?? []).map((row) => (
-                  <tr key={row.id} className="border-t align-top">
-                    <td className="px-3 py-2">{row.kind}</td>
-                    <td className="px-3 py-2">
-                      {row.company}
-                      <p className="text-xs text-slate-500">{row.contact_email ?? "—"}</p>
-                    </td>
-                    <td className="px-3 py-2">{row.title}</td>
-                    <td className="px-3 py-2">{row.source}</td>
-                    <td className="px-3 py-2 text-xs">
-                      {row.auto_replied_at ? new Date(row.auto_replied_at).toLocaleString("cs-CZ") : "čeká"}
+                {(data.marketplace?.listings ?? []).length === 0 ? (
+                  <tr>
+                    <td className="px-3 py-6 text-sm text-slate-500" colSpan={5}>
+                      Zatím žádný příjem. Po migraci <code>marketplace_listings</code> sem padnou formulář i
+                      inzerce@. Bez service role tabulka zůstane prázdná — veřejná deska ukáže ukázky.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  (data.marketplace?.listings ?? []).map((row) => (
+                    <tr key={row.id} className="border-t align-top">
+                      <td className="px-3 py-2">{row.kind}</td>
+                      <td className="px-3 py-2">
+                        {row.company}
+                        <p className="text-xs text-slate-500">{row.contact_email ?? "—"}</p>
+                      </td>
+                      <td className="px-3 py-2">{row.title}</td>
+                      <td className="px-3 py-2">{row.source}</td>
+                      <td className="px-3 py-2 text-xs">
+                        {row.auto_replied_at ? new Date(row.auto_replied_at).toLocaleString("cs-CZ") : "čeká"}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -527,7 +563,8 @@ export function SalesDesk() {
           </ul>
           <p>
             Dokumentace: <Link className="text-[#005B96] underline" href="/inzerce/podminky">veřejné podmínky</Link>
-            . Interní popis v <code>docs/sales/AUTONOMOUS_SALES_DEPARTMENT.md</code>.
+            . Interní postup: <code>docs/sales/OVERENE_TRZISTE.md</code> a{" "}
+            <code>docs/sales/AUTONOMOUS_SALES_DEPARTMENT.md</code>.
           </p>
         </section>
       ) : null}

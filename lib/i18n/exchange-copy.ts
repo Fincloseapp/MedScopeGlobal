@@ -83,7 +83,7 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     firmyLinkLabel: "/firmy",
     leadAfter: ".",
     registerCta: "Register a company",
-    adsCta: "Magazine advertising",
+    adsCta: "Advertiser guide",
     regions: "Regions: Czechia · EU. Certification: CE / IVDR / ISO.",
     heroAlt: "Laboratory workstation — MedScopeGlobal manufacturer marketplace",
     listings: {
@@ -126,7 +126,7 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     firmyLinkLabel: "/firmy",
     leadAfter: ".",
     registerCta: "Firma registrieren",
-    adsCta: "Magazinwerbung",
+    adsCta: "Anleitung für Inserenten",
     regions: "Regionen: Tschechien · EU. Zertifizierung: CE / IVDR / ISO.",
     heroAlt: "Laborarbeitsplatz — MedScopeGlobal-Herstellermarktplatz",
     listings: {
@@ -169,7 +169,7 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     firmyLinkLabel: "/firmy",
     leadAfter: ".",
     registerCta: "Enregistrer une entreprise",
-    adsCta: "Publicité magazine",
+    adsCta: "Guide annonceurs",
     regions: "Régions : Tchéquie · UE. Certification : CE / IVDR / ISO.",
     heroAlt: "Poste de laboratoire — place de marché MedScopeGlobal",
     listings: {
@@ -212,7 +212,7 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     firmyLinkLabel: "/firmy",
     leadAfter: ".",
     registerCta: "Registra l’azienda",
-    adsCta: "Pubblicità sul magazine",
+    adsCta: "Guida inserzionisti",
     regions: "Regioni: Cechia · UE. Certificazione: CE / IVDR / ISO.",
     heroAlt: "Postazione di laboratorio — mercato produttori MedScopeGlobal",
     listings: {
@@ -255,7 +255,7 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     firmyLinkLabel: "/firmy",
     leadAfter: ".",
     registerCta: "Registrar empresa",
-    adsCta: "Publicidad en la revista",
+    adsCta: "Guía para anunciantes",
     regions: "Regiones: Chequia · UE. Certificación: CE / IVDR / ISO.",
     heroAlt: "Estación de laboratorio — mercado de fabricantes MedScopeGlobal",
     listings: {
@@ -298,7 +298,7 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     firmyLinkLabel: "/firmy",
     leadAfter: ".",
     registerCta: "Registrar empresa",
-    adsCta: "Publicidade na revista",
+    adsCta: "Guia para anunciantes",
     regions: "Regiões: Chéquia · UE. Certificação: CE / IVDR / ISO.",
     heroAlt: "Estação de laboratório — mercado de fabricantes MedScopeGlobal",
     listings: {

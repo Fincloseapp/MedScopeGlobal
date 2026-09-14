@@ -35,7 +35,7 @@ const STEPS = [
   },
   {
     title: "Paušál spustí plnění",
-    body: "Od 4 900 Kč / měsíc: profil /partneri, plochy v magazínu, předání poptávek. Bez provize z uzavřeného obchodu.",
+    body: "Od 4 900 Kč / měsíc: profil /partneri, předání poptávek a plochy, které paušál zahrnuje. Jednorázové bannery v článcích jsou jiný produkt na /firmy — nepatří sem.",
   },
 ];
 

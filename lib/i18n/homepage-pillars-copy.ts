@@ -170,7 +170,7 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
         href: "/exchange",
         cta: "Marktplatz öffnen",
         ctaHref: "/exchange",
-        secondary: "Magazinwerbung",
+        secondary: "Anleitung und Pauschale",
         secondaryHref: "/exchange/navod",
       },
       {
@@ -227,7 +227,7 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
         href: "/exchange",
         cta: "Ouvrir la place de marché",
         ctaHref: "/exchange",
-        secondary: "Publicité magazine",
+        secondary: "Guide et forfait",
         secondaryHref: "/exchange/navod",
       },
       {
@@ -284,7 +284,7 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
         href: "/exchange",
         cta: "Apri il mercato",
         ctaHref: "/exchange",
-        secondary: "Pubblicità magazine",
+        secondary: "Guida e forfait",
         secondaryHref: "/exchange/navod",
       },
       {
@@ -341,7 +341,7 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
         href: "/exchange",
         cta: "Abrir el mercado",
         ctaHref: "/exchange",
-        secondary: "Publicidad en revista",
+        secondary: "Guía y cuota",
         secondaryHref: "/exchange/navod",
       },
       {
@@ -398,7 +398,7 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
         href: "/exchange",
         cta: "Abrir o mercado",
         ctaHref: "/exchange",
-        secondary: "Publicidade na revista",
+        secondary: "Guia e mensalidade",
         secondaryHref: "/exchange/navod",
       },
       {

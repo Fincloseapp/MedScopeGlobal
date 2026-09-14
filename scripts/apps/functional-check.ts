@@ -2133,6 +2133,19 @@ assert.ok(
   assert.ok(getExchangeCopy("cs").kicker.includes("ne magazín"));
   assert.ok(getExchangeCopy("cs").title.includes("zpracovává tady"));
   assert.equal(getHomepagePillarsCopy("cs").kicker, "Přehled prostředí");
+  assert.equal(getHomepagePillarsCopy("de").pillars.find((item) => item.id === "marketplace")?.secondary, "Anleitung und Pauschale");
+  assert.equal(getExchangeCopy("en").adsCta, "Advertiser guide");
+  assert.equal(getExchangeCopy("sk").adsCta, "Návod pre inzerentov");
+  assert.ok(
+    readFileSync(join(root, "app/api/marketplace/inbound-email/route.ts"), "utf8").includes(
+      "if (!secret) return unauthorized()"
+    ),
+    "inbound email must fail closed without a secret"
+  );
+  assert.ok(
+    readFileSync(join(root, "app/api/marketplace/listing/route.ts"), "utf8").includes("TURNSTILE_SECRET_KEY"),
+    "marketplace listing must require captcha when Turnstile is configured"
+  );
 }
 assert.ok(
   !getSubscribeCopy("cs").plans.student.features.some((line) => /Academy/i.test(line)) &&

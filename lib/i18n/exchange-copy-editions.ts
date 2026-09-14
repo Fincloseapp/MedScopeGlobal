@@ -14,7 +14,7 @@ const EDITIONS: Record<string, ExchangeEdition> = {
     leadBefore:
       "Kupujúci z Česka a EÚ dopytuje zadarmo. Kontakty vidí len platiaci inzerent — bez provízie z obchodu. Magazín ViaLongeVita sem nepatrí: čitateľská inzercia je na",
     registerCta: "Registrovať firmu",
-    adsCta: "Inzercia v magazíne",
+    adsCta: "Návod pre inzerentov",
     regions: "Regióny: Česko · EÚ. Certifikácia: CE / IVDR / ISO.",
     heroAlt: "Laboratórna stanica — trhovisko výrobcov MedScopeGlobal",
     listings: {
@@ -49,7 +49,7 @@ const EDITIONS: Record<string, ExchangeEdition> = {
     leadBefore:
       "Kupujący w Czechach i UE zgłaszają zapotrzebowanie za darmo. Kontakty widzą tylko płatni reklamodawcy — bez prowizji. Magazyn ViaLongeVita tu nie należy: reklama dla czytelników jest na",
     registerCta: "Zarejestruj firmę",
-    adsCta: "Reklama w magazynie",
+    adsCta: "Poradnik reklamodawcy",
     regions: "Regiony: Czechy · UE. Certyfikacja: CE / IVDR / ISO.",
     heroAlt: "Stanowisko laboratoryjne — rynek producentów MedScopeGlobal",
     listings: {
@@ -75,7 +75,7 @@ const EDITIONS: Record<string, ExchangeEdition> = {
     leadBefore:
       "Cumpărătorii din Cehia și UE publică gratuit. Contactele le văd doar advertiserii plătitori. ViaLongeVita nu aparține aici: publicitatea pentru cititori e pe",
     registerCta: "Înregistrează firma",
-    adsCta: "Publicitate în revistă",
+    adsCta: "Ghid pentru advertiseri",
     regions: "Regiuni: Cehia · UE. Certificare: CE / IVDR / ISO.",
     heroAlt: "Stație de laborator — piața producătorilor MedScopeGlobal",
   },
@@ -85,7 +85,7 @@ const EDITIONS: Record<string, ExchangeEdition> = {
     leadBefore:
       "A cseh és uniós vevők ingyen hirdetnek keresletet. A kapcsolatokat csak fizető hirdetők látják. A ViaLongeVita ide nem tartozik: az olvasói hirdetés itt van:",
     registerCta: "Cég regisztrálása",
-    adsCta: "Hirdetés a magazinban",
+    adsCta: "Útmutató hirdetőknek",
     regions: "Régiók: Csehország · EU. Tanúsítás: CE / IVDR / ISO.",
     heroAlt: "Laborállomás — MedScopeGlobal gyártói piactér",
   },
@@ -95,7 +95,7 @@ const EDITIONS: Record<string, ExchangeEdition> = {
     leadBefore:
       "Покупатели в Чехии и ЕС размещают спрос бесплатно. Контакты видят только платящие рекламодатели. ViaLongeVita сюда не относится: реклама для читателей — на",
     registerCta: "Зарегистрировать компанию",
-    adsCta: "Реклама в журнале",
+    adsCta: "Инструкция для рекламодателей",
     regions: "Регионы: Чехия · ЕС. Сертификация: CE / IVDR / ISO.",
     heroAlt: "Лабораторная станция — рынок производителей MedScopeGlobal",
   },
@@ -105,7 +105,7 @@ const EDITIONS: Record<string, ExchangeEdition> = {
     leadBefore:
       "Покупці в Чехії та ЄС публікують попит безкоштовно. Контакти бачать лише платні рекламодавці. ViaLongeVita сюди не входить: реклама для читачів на",
     registerCta: "Зареєструвати компанію",
-    adsCta: "Реклама в журналі",
+    adsCta: "Інструкція для рекламодавців",
     regions: "Регіони: Чехія · ЄС. Сертифікація: CE / IVDR / ISO.",
     heroAlt: "Лабораторна станція — ринок виробників MedScopeGlobal",
   },
@@ -115,7 +115,7 @@ const EDITIONS: Record<string, ExchangeEdition> = {
     leadBefore:
       "Пакупнікі ў Чэхіі і ЕС публікуюць попыт бясплатна. Кантакты бачаць толькі платныя рэкламадаўцы. ViaLongeVita сюды не належыць: рэклама для чытачоў на",
     registerCta: "Зарэгістраваць кампанію",
-    adsCta: "Рэклама ў часопісе",
+    adsCta: "Інструкцыя для рэкламадаўцаў",
     regions: "Рэгіёны: Чэхія · ЕС. Сертыфікацыя: CE / IVDR / ISO.",
     heroAlt: "Лабараторная станцыя — рынак вытворцаў MedScopeGlobal",
   },
@@ -125,7 +125,7 @@ const EDITIONS: Record<string, ExchangeEdition> = {
     leadBefore:
       "捷克与欧盟买家免费发布需求。只有付费广告主能看到联系方式。ViaLongeVita 不属于这里：读者广告在",
     registerCta: "注册公司",
-    adsCta: "杂志广告",
+    adsCta: "广告主指南",
     regions: "地区：捷克 · 欧盟。认证：CE / IVDR / ISO。",
     heroAlt: "实验室工位 — MedScopeGlobal 制造商市场",
   },
@@ -135,7 +135,7 @@ const EDITIONS: Record<string, ExchangeEdition> = {
     leadBefore:
       "チェコとEUの買い手は無料で需要を出します。連絡先は有料広告主だけが見られます。ViaLongeVitaはここではありません。読者向け広告は",
     registerCta: "会社を登録",
-    adsCta: "雑誌広告",
+    adsCta: "出稿ガイド",
     regions: "地域：チェコ · EU。認証：CE / IVDR / ISO。",
     heroAlt: "ラボワークステーション — MedScopeGlobal製造者マーケット",
   },
@@ -145,7 +145,7 @@ const EDITIONS: Record<string, ExchangeEdition> = {
     leadBefore:
       "체코와 EU 구매자는 무료로 수요를 올립니다. 연락처는 유료 광고주만 봅니다. ViaLongeVita는 여기가 아닙니다. 독자 광고는",
     registerCta: "회사 등록",
-    adsCta: "매거진 광고",
+    adsCta: "광고주 안내",
     regions: "지역: 체코 · EU. 인증: CE / IVDR / ISO.",
     heroAlt: "실험실 워크스테이션 — MedScopeGlobal 제조사 마켓",
   },
@@ -155,7 +155,7 @@ const EDITIONS: Record<string, ExchangeEdition> = {
     leadBefore:
       "Người mua ở Czech và EU đăng nhu cầu miễn phí. Chỉ nhà quảng cáo trả phí thấy liên hệ. ViaLongeVita không thuộc đây: quảng cáo bạn đọc ở",
     registerCta: "Đăng ký công ty",
-    adsCta: "Quảng cáo tạp chí",
+    adsCta: "Hướng dẫn nhà quảng cáo",
     regions: "Khu vực: Czech · EU. Chứng nhận: CE / IVDR / ISO.",
     heroAlt: "Trạm thí nghiệm — chợ nhà sản xuất MedScopeGlobal",
   },
@@ -165,7 +165,7 @@ const EDITIONS: Record<string, ExchangeEdition> = {
     leadBefore:
       "Pembeli di Ceko dan UE memasang permintaan gratis. Kontak hanya terlihat pengiklan berbayar. ViaLongeVita tidak di sini: iklan pembaca ada di",
     registerCta: "Daftarkan perusahaan",
-    adsCta: "Iklan majalah",
+    adsCta: "Panduan pengiklan",
     regions: "Wilayah: Ceko · UE. Sertifikasi: CE / IVDR / ISO.",
     heroAlt: "Stasiun laboratorium — pasar produsen MedScopeGlobal",
   },
@@ -175,7 +175,7 @@ const EDITIONS: Record<string, ExchangeEdition> = {
     leadBefore:
       "Compradores na Chéquia e na UE publicam de graça. Só anunciantes pagantes veem contactos. A ViaLongeVita não entra aqui: a publicidade para leitores fica em",
     registerCta: "Registar empresa",
-    adsCta: "Publicidade na revista",
+    adsCta: "Guia para anunciantes",
     regions: "Regiões: Chéquia · UE. Certificação: CE / IVDR / ISO.",
     heroAlt: "Estação de laboratório — mercado de fabricantes MedScopeGlobal",
   },
