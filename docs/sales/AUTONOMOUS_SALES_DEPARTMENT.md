@@ -15,6 +15,9 @@ Veřejné vstupy:
 | `/inzerenti/portal?token=` | Portál inzerenta: stav, faktury, poptávky |
 
 Jednorázové kampaně zůstávají na `/inzerce/formular` (stávající `ads_requests`).
+Tržiště pro inzerenty a kupující: [`/exchange`](https://medscopeglobal.com/exchange)
+(nabídky + poptávky + formulář). Návod: [`/exchange/navod`](https://medscopeglobal.com/exchange/navod).
+Příjem e-mailem: `inzerce@medscopeglobal.com` → `/api/marketplace/inbound-email`.
 
 ## Tok A–Z
 
@@ -78,4 +81,9 @@ SALES_MAX_EMAILS_PER_RUN=12
 | `lib/sales/packages.ts` | ceník |
 | `app/(admin)/admin/sales/page.tsx` | dashboard |
 
-Dashboard záložky: přehled (MRR, zaplacené měsíce), pipeline, inzerenti, fronta e-mailů ke schválení, faktury, poptávky, právní stav.
+Dashboard záložky: přehled, **tržiště** (příjem nabídek/poptávek + stav odesílání e-mailu),
+pipeline, inzerenti, fronta e-mailů ke schválení, faktury, poptávky, právní stav.
+
+E-mail inzerce jde přes `sendEmail` (Cloudflare Email Sending → SendGrid → SMTP), ne jen Resend.
+Bez transportního klíče se zpráva zaloguje a cron ji zkusí znovu. Autoodpovědi pokrývají cenu,
+zveřejnění, poptávky, podmínky, fakturu a termíny.

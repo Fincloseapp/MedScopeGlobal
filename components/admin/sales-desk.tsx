@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import type { SalesSnapshot } from "@/lib/sales/types";
 import { formatSalesCzk } from "@/lib/sales/packages";
 
-type Tab = "prehled" | "pipeline" | "inzerenti" | "outreach" | "faktury" | "poptavky" | "pravni";
+type Tab = "prehled" | "trziste" | "pipeline" | "inzerenti" | "outreach" | "faktury" | "poptavky" | "pravni";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "prehled", label: "Přehled" },
+  { id: "trziste", label: "Tržiště" },
   { id: "pipeline", label: "Pipeline" },
   { id: "inzerenti", label: "Inzerenti" },
   { id: "outreach", label: "Oslovení" },
@@ -71,6 +72,9 @@ export function SalesDesk() {
 
   useEffect(() => {
     void load();
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get("tab");
+    if (requested && TABS.some((item) => item.id === requested)) setTab(requested as Tab);
   }, [load]);
 
   async function act(action: string, extra?: Record<string, string>) {
@@ -98,8 +102,9 @@ export function SalesDesk() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">Admin · Peníze</p>
           <h1 className="mt-1 font-display text-3xl font-bold text-[#021d33]">Obchodní oddělení</h1>
           <p className="mt-2 max-w-3xl text-sm text-slate-600">
-            Autonomní prodej paušální inzerce: vyhledání firem, právně čisté oslovení, nabídka, faktura,
-            Stripe, plnění ploch a předání poptávek. Studený e-mail jde ke schválení, inbound se posílá sám.
+            Autonomní prodej paušální inzerce a tržiště: nabídky, poptávky, formulář i e-mail
+            inzerce@medscopeglobal.com, automatické odpovědi, faktura a plnění. Studený e-mail jde ke
+            schválení, inbound se posílá sám.
           </p>
           {generated ? <p className="mt-1 text-xs text-slate-500">Stav k {generated}</p> : null}
         </div>
@@ -108,11 +113,29 @@ export function SalesDesk() {
             {busy === "run_tick" ? "Běží…" : "Spustit autonomní běh"}
           </Button>
           <Button variant="outline" asChild>
+            <Link href="/exchange">Veřejné tržiště</Link>
+          </Button>
+          <Button variant="outline" asChild>
             <Link href="/inzerce/pausal">Veřejný paušál</Link>
           </Button>
         </div>
       </div>
 
+      {data?.marketplace?.mail ? (
+        <p
+          className={`rounded-xl border px-4 py-3 text-sm ${
+            data.marketplace.mail.ready
+              ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+              : "border-amber-200 bg-amber-50 text-amber-900"
+          }`}
+        >
+          E-mail tržiště: schránka <strong>{data.marketplace.mail.inbox}</strong> · notifikace admina{" "}
+          <strong>{data.marketplace.mail.adminNotify}</strong> · transport{" "}
+          <strong>{data.marketplace.mail.transport}</strong>
+          {data.marketplace.mail.ready ? " (odesílání zapnuté)" : " — chybí Cloudflare / SendGrid / SMTP, maily se jen logují"}
+          {data.marketplace.mail.resend ? " · Resend je navíc k dispozici" : ""}.
+        </p>
+      ) : null}
       {error ? <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{error}</p> : null}
       {data && !data.db ? (
         <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
@@ -370,6 +393,45 @@ export function SalesDesk() {
             </tbody>
           </table>
         </div>
+      ) : null}
+
+      {tab === "trziste" && data ? (
+        <section className="space-y-4">
+          <p className="text-sm text-slate-600">
+            Příjem z <Link className="text-[#005B96] underline" href="/exchange#formular">formuláře</Link> a
+            inbound webhooku <code>/api/marketplace/inbound-email</code>. Veřejný návod:{" "}
+            <Link className="text-[#005B96] underline" href="/exchange/navod">/exchange/navod</Link>.
+          </p>
+          <div className="overflow-x-auto rounded-2xl border bg-white">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
+                <tr>
+                  <th className="px-3 py-2">Typ</th>
+                  <th className="px-3 py-2">Firma</th>
+                  <th className="px-3 py-2">Titulek</th>
+                  <th className="px-3 py-2">Zdroj</th>
+                  <th className="px-3 py-2">Auto-odpověď</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(data.marketplace?.listings ?? []).map((row) => (
+                  <tr key={row.id} className="border-t align-top">
+                    <td className="px-3 py-2">{row.kind}</td>
+                    <td className="px-3 py-2">
+                      {row.company}
+                      <p className="text-xs text-slate-500">{row.contact_email ?? "—"}</p>
+                    </td>
+                    <td className="px-3 py-2">{row.title}</td>
+                    <td className="px-3 py-2">{row.source}</td>
+                    <td className="px-3 py-2 text-xs">
+                      {row.auto_replied_at ? new Date(row.auto_replied_at).toLocaleString("cs-CZ") : "čeká"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
       ) : null}
 
       {tab === "poptavky" && data ? (

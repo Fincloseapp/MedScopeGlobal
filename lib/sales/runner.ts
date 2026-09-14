@@ -1,5 +1,9 @@
 import { sendEmail } from "@/lib/email/engine";
 import { applySalesDepartmentSchema } from "@/lib/sales/apply-schema";
+import { applyMarketplaceDeskSchema } from "@/lib/marketplace/schema";
+import { listMarketplaceListings, updateMarketplaceListing } from "@/lib/marketplace/store";
+import { sendMarketplaceAck, sendMarketplaceAutoReply } from "@/lib/marketplace/mail";
+import { classifyMarketplaceMessage } from "@/lib/marketplace/auto-reply";
 import { salesDunningEmail, salesPortalUrl } from "@/lib/sales/copy";
 import { icpNeedsHumanReview, SALES_ICP_SEEDS } from "@/lib/sales/icp";
 import { addMonthsIso, dateOnly, randomToken, slugifyCompany } from "@/lib/sales/ids";
@@ -57,6 +61,7 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
   const startedAt = new Date().toISOString();
   const errors: string[] = [];
   const schema = await applySalesDepartmentSchema();
+  await applyMarketplaceDeskSchema();
   const db = salesDb(null);
   if (!db) {
     return emptyTick({
@@ -96,6 +101,26 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
         source: "icp",
       });
       if (row) seeded += 1;
+    }
+
+    try {
+      const pending = await listMarketplaceListings(db, 80);
+      for (const listing of pending) {
+        if (listing.auto_replied_at || !listing.contact_email) continue;
+        const topic = classifyMarketplaceMessage(`${listing.title} ${listing.summary}`);
+        const replied =
+          listing.kind === "question"
+            ? await sendMarketplaceAutoReply({ to: listing.contact_email, topic, listing })
+            : await sendMarketplaceAck(listing);
+        if (replied.ok) {
+          await updateMarketplaceListing(db, listing.id, {
+            auto_replied_at: new Date().toISOString(),
+            reply_topic: topic,
+          });
+        }
+      }
+    } catch {
+      /* marketplace tables may not exist yet */
     }
 
     const { data: requests } = await db

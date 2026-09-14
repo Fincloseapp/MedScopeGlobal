@@ -45,6 +45,8 @@ function staticRoutesForLocale(base: string, locale: GlobalLocaleCode): LocaleSi
     { path: "/inzerce/pausal", changeFrequency: "weekly" as const, priority: 0.72 },
     { path: "/inzerce/podminky", changeFrequency: "monthly" as const, priority: 0.4 },
     { path: "/partneri", changeFrequency: "weekly" as const, priority: 0.55 },
+    { path: "/exchange", changeFrequency: "weekly" as const, priority: 0.7 },
+    { path: "/exchange/navod", changeFrequency: "monthly" as const, priority: 0.5 },
     { path: "/aplikace", changeFrequency: "weekly" as const, priority: 0.9 },
     { path: "/mediflow", changeFrequency: "weekly" as const, priority: 0.85 },
     { path: "/ordizaznam", changeFrequency: "weekly" as const, priority: 0.85 },

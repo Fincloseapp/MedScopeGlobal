@@ -276,6 +276,26 @@ export type SalesSnapshot = {
   invoices: Array<SalesInvoice & { company: string }>;
   inquiries: Array<SalesInquiry & { advertiser: string }>;
   runs: SalesRun[];
+  marketplace: {
+    listings: Array<{
+      id: string;
+      kind: string;
+      status: string;
+      company: string;
+      title: string;
+      source: string;
+      contact_email: string | null;
+      auto_replied_at: string | null;
+      created_at: string;
+    }>;
+    mail: {
+      ready: boolean;
+      transport: "cloudflare" | "sendgrid" | "smtp" | "none";
+      resend: boolean;
+      inbox: string;
+      adminNotify: string;
+    };
+  };
   legal: {
     coldAutoSend: boolean;
     maxTouches: number;

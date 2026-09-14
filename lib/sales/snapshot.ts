@@ -13,6 +13,20 @@ import {
 } from "@/lib/sales/store";
 import { SALES_STAGES, type SalesSnapshot, type SalesStage } from "@/lib/sales/types";
 import { startOfMonthIso } from "@/lib/sales/ids";
+import { applyMarketplaceDeskSchema } from "@/lib/marketplace/schema";
+import { listMarketplaceListings, marketplaceDb } from "@/lib/marketplace/store";
+import { marketplaceAdminNotifyEmail, marketplaceInboxEmail } from "@/lib/marketplace/config";
+import { mailReady, mailTransportLabel } from "@/lib/monetization/vialongevita-brief";
+
+function mailHealth(): SalesSnapshot["marketplace"]["mail"] {
+  return {
+    ready: mailReady(),
+    transport: mailTransportLabel(),
+    resend: Boolean(process.env.RESEND_API_KEY?.trim()),
+    inbox: marketplaceInboxEmail(),
+    adminNotify: marketplaceAdminNotifyEmail(),
+  };
+}
 
 export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
   const generatedAt = new Date().toISOString();
@@ -41,6 +55,7 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
       invoices: [],
       inquiries: [],
       runs: [],
+      marketplace: { listings: [], mail: mailHealth() },
       legal,
     };
   }
@@ -95,6 +110,10 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
     outreachNeedsApproval: outreach.filter((o) => o.status === "needs_approval").length,
   };
 
+  await applyMarketplaceDeskSchema();
+  const marketDb = marketplaceDb() ?? db;
+  const listings = await listMarketplaceListings(marketDb, 80);
+
   return {
     generatedAt,
     db: true,
@@ -124,6 +143,20 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
       advertiser: i.company_name,
     })),
     runs,
+    marketplace: {
+      listings: listings.map((row) => ({
+        id: row.id,
+        kind: row.kind,
+        status: row.status,
+        company: row.company,
+        title: row.title,
+        source: row.source,
+        contact_email: row.contact_email,
+        auto_replied_at: row.auto_replied_at,
+        created_at: row.created_at,
+      })),
+      mail: mailHealth(),
+    },
     legal,
   };
 }

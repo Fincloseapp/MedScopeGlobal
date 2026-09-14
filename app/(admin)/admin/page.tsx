@@ -71,7 +71,7 @@ export default async function AdminDashboardPage() {
       label: "Aktivní reklamy",
       value: overview.ads.active,
       hint: `${overview.ads.total} řádků v katalogu`,
-      href: "/admin/ads-requests",
+      href: "/admin/sales",
       icon: Megaphone,
     },
     {
@@ -98,6 +98,23 @@ export default async function AdminDashboardPage() {
         <h1 className="mt-1 font-display text-3xl font-bold text-medical-navy">
           Přehled provozu
         </h1>
+        <Link
+          href="/admin/sales"
+          className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#021d33] bg-[#021d33] px-5 py-4 text-white hover:bg-[#03263f]"
+        >
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#e8d5a3]">
+              Peníze · první položka v menu
+            </p>
+            <p className="mt-1 font-display text-xl font-semibold">Obchodní oddělení a tržiště</p>
+            <p className="mt-1 text-sm text-white/75">
+              Paušály, nabídky inzerentů, poptávky, e-mail inzerce@ a autonomní odpovědi.
+            </p>
+          </div>
+          <span className="rounded-full bg-[#c4a35a] px-4 py-2 text-sm font-semibold text-[#021d33]">
+            Otevřít
+          </span>
+        </Link>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
           {overview.dataSource === "unavailable"
             ? "Databáze teď není napojená — čísla se doplní, jakmile poběží Supabase service role."

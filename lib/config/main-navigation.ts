@@ -432,7 +432,8 @@ function firmyNav(): NavItem {
       { label: "Kampaně", href: "/firmy/kampane", description: "Segmentace magazín / veřejnost" },
       { label: "Kosmetické značky", href: "/firmy/kosmetika", description: "Prémiová dermokosmetika ve veřejné rubrice" },
       { label: "Poptávka", href: "/inzerce/formular", description: "Nabídka do 2 pracovních dnů" },
-      { label: "Tržiště výrobců", href: "/exchange", description: "Česko a EU — CE / IVDR, ne magazín" },
+      { label: "Tržiště výrobců", href: "/exchange", description: "Nabídky inzerentů a poptávky — Česko a EU" },
+      { label: "Návod pro inzerenty", href: "/exchange/navod", description: "Jak zveřejnit nabídku a vidět poptávky" },
     ],
   };
 }

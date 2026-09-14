@@ -269,6 +269,9 @@ import { slugifyCompany, nextInvoiceNumber, salesVariableSymbol } from "../../li
 import { SALES_DEPARTMENT_SQL } from "../../lib/sales/apply-schema";
 import { salesOfferEmail } from "../../lib/sales/copy";
 import { inquirySlaDue } from "../../lib/sales/fulfillment";
+import { MARKETPLACE_DESK_SQL } from "../../lib/marketplace/schema";
+import { classifyMarketplaceKind, classifyMarketplaceMessage } from "../../lib/marketplace/auto-reply";
+import { SAMPLE_DEMANDS } from "../../lib/marketplace/board";
 import { briefChrome } from "../../lib/monetization/brief-marketing";
 import { translateNavHref } from "../../lib/i18n/nav-copy";
 import { getDesktopHeaderMenu } from "../../lib/config/main-navigation";
@@ -803,6 +806,11 @@ file("lib/monetization/payout-map.ts");
   assert.ok(hrefs.includes("/admin/ai-teams"));
   assert.ok(hrefs.includes("/admin/pravni-checklist"));
   assert.ok(hrefs.includes("/admin/sales"));
+  assert.equal(
+    ADMIN_NAV_GROUPS.find((group) => group.id === "penize")?.items[0]?.href,
+    "/admin/sales",
+    "Obchodní oddělení must be first under Peníze"
+  );
   assert.ok(hrefs.includes("/admin/security"));
   assert.ok(hrefs.includes("/admin/articles"));
   assert.equal(isAdminNavActive("/admin/ads-public", "/admin/ads"), false);
@@ -2087,6 +2095,11 @@ assert.ok(
   readFileSync(join(root, "app/(public)/exchange/page.tsx"), "utf8").includes("Česko a Slovensko") ||
     readFileSync(join(root, "lib/b2b/exchange-listings.ts"), "utf8").includes("Česko + EU"),
   "manufacturer exchange must be Czech/EU listings, not Asia-Pacific demo"
+);
+assert.ok(
+  readFileSync(join(root, "components/marketplace/marketplace-desk.tsx"), "utf8").includes('id="nabidky"') &&
+    readFileSync(join(root, "components/marketplace/marketplace-desk.tsx"), "utf8").includes('id="poptavky"'),
+  "exchange desk must show advertiser offers and institutional demand side by side"
 );
 assert.ok(
   foldSearchText("spánek").includes("spanek") && queryMatchesHaystack("spánek", "Spánek a obnova"),
@@ -5877,12 +5890,23 @@ console.log(
     "app/(public)/partneri/page.tsx",
     "app/api/cron/sales-department/route.ts",
     "app/api/sales/order/route.ts",
+    "app/api/marketplace/listing/route.ts",
+    "app/api/marketplace/inbound-email/route.ts",
+    "app/(public)/exchange/navod/page.tsx",
     "docs/sales/AUTONOMOUS_SALES_DEPARTMENT.md",
     "supabase/migrations/20260913220000_sales_department.sql",
+    "supabase/migrations/20260914070000_marketplace_desk.sql",
   ];
   for (const rel of files) {
     assert.ok(existsSync(join(root, rel)), rel);
   }
+  assert.ok(MARKETPLACE_DESK_SQL.includes("marketplace_listings"));
+  assert.equal(classifyMarketplaceKind("Hledáme CE-IVDR analyzátor"), "demand");
+  assert.equal(classifyMarketplaceKind("Chci inzerovat nabídku v katalogu"), "offer");
+  assert.equal(classifyMarketplaceMessage("Kolik stojí paušál?"), "price");
+  assert.ok(SAMPLE_DEMANDS.length >= 3);
+  assert.ok(readFileSync(join(root, "lib/services/ads-mail.ts"), "utf8").includes("sendAdOfferViaEngine"));
+  assert.ok(readFileSync(join(root, "lib/services/ads-mail.ts"), "utf8").includes("sendAdRequestAckToAdvertiser"));
   const webhook = readFileSync(join(root, "app/api/stripe/webhook/route.ts"), "utf8");
   assert.ok(webhook.includes("sales_retainer"));
   const cronYml = readFileSync(join(root, ".github/workflows/cloudflare-cron.yml"), "utf8");

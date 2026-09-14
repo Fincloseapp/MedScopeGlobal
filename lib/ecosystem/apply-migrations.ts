@@ -89,8 +89,17 @@ export async function applyEcosystemMigrations(): Promise<ApplyEcosystemMigratio
     error: sales.error,
   });
 
+  const { applyMarketplaceDeskSchema } = await import("@/lib/marketplace/schema");
+  const market = await applyMarketplaceDeskSchema();
+  results.push({
+    name: "20260914070000_marketplace_desk.sql",
+    ok: market.ok,
+    skipped: market.skipped,
+    error: market.error,
+  });
+
   return {
-    ok: revenue.ok && settings.ok && sales.ok,
+    ok: revenue.ok && settings.ok && sales.ok && market.ok,
     projectRef,
     results,
     timestamp: new Date().toISOString(),
