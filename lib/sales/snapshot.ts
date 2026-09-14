@@ -17,6 +17,7 @@ import { applyMarketplaceDeskSchema } from "@/lib/marketplace/schema";
 import { listMarketplaceListings, marketplaceDb } from "@/lib/marketplace/store";
 import { marketplaceAdminNotifyEmail, marketplaceInboxEmail } from "@/lib/marketplace/config";
 import { mailReady, mailTransportLabel } from "@/lib/monetization/vialongevita-brief";
+import { evaluateSalesControl } from "@/lib/sales/control";
 
 function mailHealth(): SalesSnapshot["marketplace"]["mail"] {
   return {
@@ -26,6 +27,29 @@ function mailHealth(): SalesSnapshot["marketplace"]["mail"] {
     inbox: marketplaceInboxEmail(),
     adminNotify: marketplaceAdminNotifyEmail(),
   };
+}
+
+function controlFromRows(
+  mail: SalesSnapshot["marketplace"]["mail"],
+  listings: SalesSnapshot["marketplace"]["listings"],
+  inquiries: { status: string; sla_due_at: string | null }[],
+  invoices: { status: string }[],
+  outreach: { status: string }[],
+  pendingPayment: number
+) {
+  const now = Date.now();
+  return evaluateSalesControl({
+    mailReady: mail.ready,
+    unrepliedListings: listings.filter((row) => !row.auto_replied_at).length,
+    outreachNeedsApproval: outreach.filter((row) => row.status === "needs_approval").length,
+    inquiriesReceived: inquiries.filter((row) => row.status === "received").length,
+    inquiriesOverdue: inquiries.filter(
+      (row) => row.status === "overdue" || (row.sla_due_at && new Date(row.sla_due_at).getTime() < now && row.status !== "forwarded")
+    ).length,
+    invoicesOverdue: invoices.filter((row) => row.status === "overdue").length,
+    pendingPayment,
+    skippedLegal: outreach.filter((row) => row.status === "skipped_legal").length,
+  });
 }
 
 export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
@@ -55,7 +79,11 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
       invoices: [],
       inquiries: [],
       runs: [],
-      marketplace: { listings: [], mail: mailHealth() },
+      marketplace: {
+        listings: [],
+        mail: mailHealth(),
+        control: controlFromRows(mailHealth(), [], [], [], [], 0),
+      },
       legal,
     };
   }
@@ -156,6 +184,14 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
         created_at: row.created_at,
       })),
       mail: mailHealth(),
+      control: controlFromRows(
+        mailHealth(),
+        listings,
+        inquiries,
+        invoices,
+        outreach,
+        kpis.pendingPayment
+      ),
     },
     legal,
   };

@@ -13,6 +13,7 @@ import { slugifyCompany } from "@/lib/sales/ids";
 import { fulfillInquiry, inquirySlaDue } from "@/lib/sales/fulfillment";
 import { findProspectByEmail, insertInquiry, insertProspect, listContracts, listProspects, updateProspect } from "@/lib/sales/store";
 import { salesPackageById } from "@/lib/sales/packages";
+import { runAdEditorBoard } from "@/lib/ads/ad-editors";
 
 export type MarketplaceIntakeResult = {
   ok: boolean;
@@ -43,6 +44,18 @@ export async function ingestMarketplaceIntake(input: MarketplaceIntakeInput): Pr
     published_at: input.kind === "question" ? null : new Date().toISOString(),
   });
   if (!listing) return { ok: false, autoReplied: false, error: "save_failed" };
+
+  if (listing.kind !== "question") {
+    const board = runAdEditorBoard({
+      company: listing.company,
+      adText: `${listing.title}\n${listing.summary}`,
+    });
+    if (board.recommendation === "deny") {
+      await updateMarketplaceListing(db, listing.id, { status: "rejected", reply_topic: "blocked_legal" });
+      listing.status = "rejected";
+      listing.reply_topic = "blocked_legal";
+    }
+  }
 
   await insertMarketplaceMessage(db, {
     listing_id: listing.id,

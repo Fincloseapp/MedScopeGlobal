@@ -84,6 +84,10 @@ SALES_MAX_EMAILS_PER_RUN=12
 Dashboard záložky: přehled, **tržiště** (příjem nabídek/poptávek + stav odesílání e-mailu),
 pipeline, inzerenti, fronta e-mailů ke schválení, faktury, poptávky, právní stav.
 
+Pět kontrolorů (`lib/sales/control.ts`) běží na konci každého ticku a v snapshotu dashboardu:
+příjem, právní, diplomatický, plnění, výnos. Ověřený popis prostředí a postupu:
+[`OVERENE_TRZISTE.md`](./OVERENE_TRZISTE.md).
+
 E-mail inzerce jde přes `sendEmail` (Cloudflare Email Sending → SendGrid → SMTP), ne jen Resend.
 Bez transportního klíče se zpráva zaloguje a cron ji zkusí znovu. Autoodpovědi pokrývají cenu,
 zveřejnění, poptávky, podmínky, fakturu a termíny.

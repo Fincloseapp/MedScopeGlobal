@@ -269,6 +269,7 @@ import { slugifyCompany, nextInvoiceNumber, salesVariableSymbol } from "../../li
 import { SALES_DEPARTMENT_SQL } from "../../lib/sales/apply-schema";
 import { salesOfferEmail } from "../../lib/sales/copy";
 import { inquirySlaDue } from "../../lib/sales/fulfillment";
+import { evaluateSalesControl, salesControlWorst } from "../../lib/sales/control";
 import { MARKETPLACE_DESK_SQL } from "../../lib/marketplace/schema";
 import { classifyMarketplaceKind, classifyMarketplaceMessage } from "../../lib/marketplace/auto-reply";
 import { SAMPLE_DEMANDS } from "../../lib/marketplace/board";
@@ -2112,6 +2113,27 @@ assert.ok(
     readFileSync(join(root, "lib/i18n/homepage-pillars-copy.ts"), "utf8").includes('id: "physicians"'),
   "homepage must map ViaLongeVita, marketplace, students and physicians as four doors"
 );
+{
+  const portalHomeSrc = readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8");
+  assert.ok(
+    portalHomeSrc.indexOf("<HomepagePillars") < portalHomeSrc.indexOf('ViaLongeVitaMark variant="hero"'),
+    "homepage must open on the four-part environment map before the magazine hero"
+  );
+  assert.ok(
+    readFileSync(join(root, "components/v271/homepage-pillars.tsx"), "utf8").includes(
+      'data-studio="environment-map"'
+    ),
+    "environment map must be marked on the first homepage section"
+  );
+  assert.equal(getHomepagePillarsCopy("cs").title, "Čtyři části. Jedno prostředí.");
+  const marketCs = getHomepagePillarsCopy("cs").pillars.find((item) => item.id === "marketplace");
+  assert.ok(marketCs);
+  assert.equal(marketCs.secondaryHref, "/exchange/navod");
+  assert.ok(marketCs.lead.includes("Nejde o bannery"));
+  assert.ok(getExchangeCopy("cs").kicker.includes("ne magazín"));
+  assert.ok(getExchangeCopy("cs").title.includes("zpracovává tady"));
+  assert.equal(getHomepagePillarsCopy("cs").kicker, "Přehled prostředí");
+}
 assert.ok(
   !getSubscribeCopy("cs").plans.student.features.some((line) => /Academy/i.test(line)) &&
     getSubscribeCopy("cs").plans.student.features.some((line) => line.includes("MeDiprep")),
@@ -5894,6 +5916,8 @@ console.log(
     "app/api/marketplace/inbound-email/route.ts",
     "app/(public)/exchange/navod/page.tsx",
     "docs/sales/AUTONOMOUS_SALES_DEPARTMENT.md",
+    "docs/sales/OVERENE_TRZISTE.md",
+    "lib/sales/control.ts",
     "supabase/migrations/20260913220000_sales_department.sql",
     "supabase/migrations/20260914070000_marketplace_desk.sql",
   ];
@@ -5911,6 +5935,45 @@ console.log(
   assert.ok(webhook.includes("sales_retainer"));
   const cronYml = readFileSync(join(root, ".github/workflows/cloudflare-cron.yml"), "utf8");
   assert.ok(cronYml.includes("/api/cron/sales-department"));
+  const blockedMail = evaluateSalesControl({
+    mailReady: false,
+    unrepliedListings: 0,
+    outreachNeedsApproval: 0,
+    inquiriesReceived: 0,
+    inquiriesOverdue: 0,
+    invoicesOverdue: 0,
+    pendingPayment: 0,
+    skippedLegal: 0,
+  });
+  assert.equal(salesControlWorst(blockedMail), "block");
+  assert.equal(blockedMail.find((item) => item.id === "intake")?.status, "block");
+  const healthy = evaluateSalesControl({
+    mailReady: true,
+    unrepliedListings: 0,
+    outreachNeedsApproval: 0,
+    inquiriesReceived: 0,
+    inquiriesOverdue: 0,
+    invoicesOverdue: 0,
+    pendingPayment: 0,
+    skippedLegal: 0,
+  });
+  assert.equal(salesControlWorst(healthy), "ok");
+  const delayed = evaluateSalesControl({
+    mailReady: true,
+    unrepliedListings: 2,
+    outreachNeedsApproval: 1,
+    inquiriesReceived: 1,
+    inquiriesOverdue: 1,
+    invoicesOverdue: 1,
+    pendingPayment: 1,
+    skippedLegal: 1,
+  });
+  assert.equal(salesControlWorst(delayed), "block");
+  assert.equal(delayed.find((item) => item.id === "fulfillment")?.status, "block");
+  assert.equal(delayed.find((item) => item.id === "revenue")?.status, "block");
+  assert.equal(delayed.find((item) => item.id === "intake")?.status, "warn");
+  assert.ok(readFileSync(join(root, "lib/sales/runner.ts"), "utf8").includes("evaluateSalesControl"));
+  assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes("Koordinátoři a kontroloři"));
 }
 
 console.log("✓ editorial image pipeline checks passed");

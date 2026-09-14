@@ -108,9 +108,9 @@ export function HomepagePillars({ locale = "cs" }: { locale?: string }) {
   return (
     <section
       id="pro-koho"
-      data-studio="homepage-pillars"
+      data-studio="environment-map"
       aria-labelledby="homepage-pillars-title"
-      className="mt-3 rounded-lg border border-slate-200 bg-white px-4 py-5 shadow-sm sm:px-6 sm:py-6"
+      className="rounded-lg border border-slate-200 bg-white px-4 py-5 shadow-sm sm:px-6 sm:py-6"
     >
       <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">{copy.kicker}</p>
       <h2 id="homepage-pillars-title" className="mt-1 font-display text-2xl font-bold text-[#021d33] sm:text-3xl">

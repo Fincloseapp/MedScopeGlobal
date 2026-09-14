@@ -48,6 +48,7 @@ export function MarketplaceDesk({
   locale,
   title,
   lead,
+  kicker,
   firmyHref,
   firmyLinkLabel,
 }: {
@@ -55,6 +56,7 @@ export function MarketplaceDesk({
   locale: string;
   title: string;
   lead: string;
+  kicker: string;
   firmyHref: string;
   firmyLinkLabel: string;
 }) {
@@ -68,7 +70,7 @@ export function MarketplaceDesk({
       <header className="border-b border-slate-200 bg-[#021d33] text-white">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-8 sm:py-14">
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e8d5a3]">
-            Tržiště · nabídky inzerentů · poptávky institucí
+            {kicker}
           </p>
           <h1 className="mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/80">
@@ -111,8 +113,8 @@ export function MarketplaceDesk({
             body: "Nemocnice a laboratoře poptávají zdarma. E-mail z poptávky dostane platící inzerent — ne veřejnost.",
           },
           {
-            title: "Žádná provize z obchodu",
-            body: "Platíte paušál od 4 900 Kč / měsíc. Uzavřený obchod je váš. Magazín a tržiště jedním tarifem.",
+            title: "Výnos zůstává v tržišti",
+            body: "Paušál od 4 900 Kč / měsíc platí plochy a předání poptávek tady. Nejde o banner v článku magazínu.",
           },
           {
             title: "Odpověď i v noci",
@@ -158,9 +160,9 @@ export function MarketplaceDesk({
             <Link href={pausalHref} className="font-semibold text-[#005B96] underline">
               Objednat paušál
             </Link>
-            . Jednorázová kampaň v magazínu:{" "}
+            . Jednorázové bannery v magazínu jsou jiná část:{" "}
             <Link href={formHref} className="font-semibold text-[#005B96] underline">
-              formulář inzerce
+              /firmy
             </Link>
             .
           </p>

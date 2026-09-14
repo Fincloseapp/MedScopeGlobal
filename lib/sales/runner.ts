@@ -1,10 +1,12 @@
 import { sendEmail } from "@/lib/email/engine";
+import { runAdEditorBoard } from "@/lib/ads/ad-editors";
 import { applySalesDepartmentSchema } from "@/lib/sales/apply-schema";
 import { applyMarketplaceDeskSchema } from "@/lib/marketplace/schema";
 import { listMarketplaceListings, updateMarketplaceListing } from "@/lib/marketplace/store";
 import { sendMarketplaceAck, sendMarketplaceAutoReply } from "@/lib/marketplace/mail";
 import { classifyMarketplaceMessage } from "@/lib/marketplace/auto-reply";
 import { salesDunningEmail, salesPortalUrl } from "@/lib/sales/copy";
+import { evaluateSalesControl } from "@/lib/sales/control";
 import { icpNeedsHumanReview, SALES_ICP_SEEDS } from "@/lib/sales/icp";
 import { addMonthsIso, dateOnly, randomToken, slugifyCompany } from "@/lib/sales/ids";
 import { salesMaxEmailsPerRun } from "@/lib/sales/legal";
@@ -35,6 +37,20 @@ import {
   updateProspect,
 } from "@/lib/sales/store";
 import type { SalesProspect, SalesTickResult } from "@/lib/sales/types";
+import { mailReady } from "@/lib/monetization/vialongevita-brief";
+
+function idleControl(skippedLegal = 0) {
+  return evaluateSalesControl({
+    mailReady: mailReady(),
+    unrepliedListings: 0,
+    outreachNeedsApproval: 0,
+    inquiriesReceived: 0,
+    inquiriesOverdue: 0,
+    invoicesOverdue: 0,
+    pendingPayment: 0,
+    skippedLegal,
+  });
+}
 
 function emptyTick(partial: Partial<SalesTickResult> & { startedAt: string }): SalesTickResult {
   return {
@@ -53,6 +69,7 @@ function emptyTick(partial: Partial<SalesTickResult> & { startedAt: string }): S
     paused: 0,
     errors: [],
     finishedAt: new Date().toISOString(),
+    control: idleControl(),
     ...partial,
   };
 }
@@ -324,11 +341,63 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
         await updateInquiry(db, inquiry.id, { status: "overdue" });
       }
     }
+
+    try {
+      const liveListings = await listMarketplaceListings(db, 80);
+      for (const listing of liveListings) {
+        if (listing.status !== "visible" || listing.kind === "question") continue;
+        const board = runAdEditorBoard({
+          company: listing.company,
+          adText: `${listing.title}\n${listing.summary}`,
+        });
+        if (board.recommendation === "deny") {
+          await updateMarketplaceListing(db, listing.id, {
+            status: "rejected",
+            reply_topic: "blocked_legal",
+          });
+        }
+      }
+    } catch {
+      /* marketplace editorial is best-effort */
+    }
   } catch (err) {
     errors.push(err instanceof Error ? err.message : String(err));
   }
 
   const finishedAt = new Date().toISOString();
+  let control = evaluateSalesControl({
+    mailReady: mailReady(),
+    unrepliedListings: 0,
+    outreachNeedsApproval: 0,
+    inquiriesReceived: 0,
+    inquiriesOverdue: 0,
+    invoicesOverdue: 0,
+    pendingPayment: 0,
+    skippedLegal,
+  });
+  try {
+    const [listingsNow, inquiriesNow, invoicesNow, outreachNow, contractsNow] = await Promise.all([
+      listMarketplaceListings(db, 80),
+      listInquiries(db, 120),
+      listInvoices(db, 120),
+      listOutreach(db, 200),
+      listContracts(db, 200),
+    ]);
+    control = evaluateSalesControl({
+      mailReady: mailReady(),
+      unrepliedListings: listingsNow.filter((row) => !row.auto_replied_at).length,
+      outreachNeedsApproval: outreachNow.filter((row) => row.status === "needs_approval").length,
+      inquiriesReceived: inquiriesNow.filter((row) => row.status === "received").length,
+      inquiriesOverdue: inquiriesNow.filter((row) => row.status === "overdue").length,
+      invoicesOverdue: invoicesNow.filter((row) => row.status === "overdue").length,
+      pendingPayment: contractsNow.filter((row) => row.status === "pending_payment").length,
+      skippedLegal: outreachNow.filter((row) => row.status === "skipped_legal").length,
+    });
+    await insertEvent(db, "sales_control", { findings: control });
+  } catch {
+    /* control snapshot is best-effort */
+  }
+
   const summary: SalesTickResult = {
     ok: errors.length === 0,
     schemaOk: schema.ok,
@@ -346,6 +415,7 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
     errors,
     startedAt,
     finishedAt,
+    control,
   };
 
   await insertRun(db, {

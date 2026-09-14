@@ -27,6 +27,7 @@ export default async function ExchangePage() {
       locale={locale}
       title={copy.title}
       lead={copy.leadBefore}
+      kicker={copy.kicker}
       firmyHref={localizePublicHref("/firmy", locale)}
       firmyLinkLabel={copy.firmyLinkLabel}
     />

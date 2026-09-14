@@ -23,11 +23,11 @@ const EDITIONS: Record<string, HomepagePillarsEdition> = {
         secondary: "Hľadať v redakcii",
       },
       marketplace: {
-        eyebrow: "Výrobcovia a laboratóriá",
+        eyebrow: "Samostatná časť · B2B výnos",
         title: "Trhovisko",
-        lead: "Dopyty z Česka a EÚ, CE / IVDR / ISO. Inzercia u čitateľov je zvlášť — v magazíne na /firmy.",
+        lead: "Ponuky inzerentov a dopyty nemocníc sa platia tu. Nie bannery v magazíne — tie sú na /firmy.",
         cta: "Otvoriť trhovisko",
-        secondary: "Inzercia v magazíne",
+        secondary: "Návod a paušál",
       },
       students: {
         eyebrow: "Uchádzači o medicínu",
@@ -61,7 +61,7 @@ const EDITIONS: Record<string, HomepagePillarsEdition> = {
         title: "Rynek",
         lead: "Zapotrzebowanie z Czech i UE, CE / IVDR / ISO. Reklama dla czytelników zostaje w magazynie na /firmy.",
         cta: "Otwórz rynek",
-        secondary: "Reklama w magazynie",
+        secondary: "Przewodnik i ryczałt",
       },
       students: {
         eyebrow: "Kandydaci na medycynę",

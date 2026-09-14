@@ -30,10 +30,10 @@ export type HomepagePillarsCopy = {
 
 const PACK: Record<ChromePack, HomepagePillarsCopy> = {
   cs: {
-    kicker: "MedScopeGlobal.com",
-    title: "Čtyři vstupy. Jedna platforma.",
-    lead: "Magazín ViaLongeVita, tržiště výrobců, MeDiprep pro uchazeče o LF a OrdiZapis pro ambulanci. Vyberte, kým jste.",
-    jumpLabel: "Rychlá orientace",
+    kicker: "Přehled prostředí",
+    title: "Čtyři části. Jedno prostředí.",
+    lead: "Hned vyberte část: magazín ViaLongeVita, samostatné B2B tržiště, MeDiprep, OrdiZapis. Tržiště zpracovává inzerci u sebe — ne v článcích.",
+    jumpLabel: "Přehled prostředí",
     pillars: [
       {
         id: "magazine",
@@ -49,15 +49,15 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
       },
       {
         id: "marketplace",
-        eyebrow: "Výrobci a laboratoře",
+        eyebrow: "Samostatná část · B2B výnos",
         title: "Tržiště",
-        lead: "Poptávky z Česka a EU, CE / IVDR / ISO. Inzerce u čtenářů je zvlášť — v magazínu na /firmy.",
-        product: "MedScopeGlobal B2B",
+        lead: "Nabídky inzerentů a poptávky nemocnic se platí a doručují tady. Nejde o bannery v magazínu — to je jiná část na /firmy.",
+        product: "Paušál od 4 900 Kč · bez provize z obchodu",
         href: "/exchange",
         cta: "Otevřít tržiště",
         ctaHref: "/exchange",
-        secondary: "Inzerce v magazínu",
-        secondaryHref: "/firmy",
+        secondary: "Návod a paušál",
+        secondaryHref: "/exchange/navod",
       },
       {
         id: "students",
@@ -88,9 +88,9 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
   },
   en: {
     kicker: "MedScopeGlobal.com",
-    title: "Four doors. One platform.",
-    lead: `${MAGAZINE.name} for readers, a manufacturer marketplace, and OrdiZapis for the clinic. Pick who you are — the rest of the site follows.`,
-    jumpLabel: "Find your door",
+    title: "Four parts. One environment.",
+    lead: `${MAGAZINE.name} for readers, a separate B2B marketplace, and OrdiZapis for the clinic. Marketplace ads stay on the marketplace — not in magazine articles.`,
+    jumpLabel: "Environment map",
     pillars: [
       {
         id: "magazine",
@@ -106,15 +106,15 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
       },
       {
         id: "marketplace",
-        eyebrow: "Manufacturers and labs",
+        eyebrow: "Separate unit · B2B revenue",
         title: "Marketplace",
-        lead: "Czech and EU demand, CE / IVDR / ISO. Reader advertising stays in the magazine on /firmy.",
-        product: "MedScopeGlobal B2B",
+        lead: "Advertiser offers and hospital demand are billed and fulfilled here. Not magazine banners — those stay on /firmy.",
+        product: "Retainer from 4 900 Kč · no trade commission",
         href: "/exchange",
         cta: "Open the marketplace",
         ctaHref: "/exchange",
-        secondary: "Magazine ads",
-        secondaryHref: "/firmy",
+        secondary: "Guide and retainer",
+        secondaryHref: "/exchange/navod",
       },
       {
         id: "students",
@@ -171,7 +171,7 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
         cta: "Marktplatz öffnen",
         ctaHref: "/exchange",
         secondary: "Magazinwerbung",
-        secondaryHref: "/firmy",
+        secondaryHref: "/exchange/navod",
       },
       {
         id: "students",
@@ -228,7 +228,7 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
         cta: "Ouvrir la place de marché",
         ctaHref: "/exchange",
         secondary: "Publicité magazine",
-        secondaryHref: "/firmy",
+        secondaryHref: "/exchange/navod",
       },
       {
         id: "students",
@@ -285,7 +285,7 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
         cta: "Apri il mercato",
         ctaHref: "/exchange",
         secondary: "Pubblicità magazine",
-        secondaryHref: "/firmy",
+        secondaryHref: "/exchange/navod",
       },
       {
         id: "students",
@@ -342,7 +342,7 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
         cta: "Abrir el mercado",
         ctaHref: "/exchange",
         secondary: "Publicidad en revista",
-        secondaryHref: "/firmy",
+        secondaryHref: "/exchange/navod",
       },
       {
         id: "students",
@@ -399,7 +399,7 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
         cta: "Abrir o mercado",
         ctaHref: "/exchange",
         secondary: "Publicidade na revista",
-        secondaryHref: "/firmy",
+        secondaryHref: "/exchange/navod",
       },
       {
         id: "students",

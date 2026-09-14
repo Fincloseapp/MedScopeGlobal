@@ -549,7 +549,7 @@ assert.ok(!getFirmyDeskCopy("sk").title.includes("Advertising on"));
 assert.equal(getFirmyDeskCopy("pl").eyebrow, "Firmy i partnerzy");
 assert.equal(getFirmyDeskCopy("sk").exchangeTitle, "Trhovisko nie je inzercia v magazíne");
 assert.ok(!getFirmyDeskCopy("ja").exchangeTitle.includes("magazine advertising"));
-assert.equal(getHomepagePillarsCopy("sk").title, "Štyri vstupy. Jedna platforma.");
+assert.equal(getFirmyDeskCopy("cs").exchangeTitle, "Tržiště není inzerce v magazínu");
 assert.ok(getHomepagePillarsCopy("ja").pillars.some((item) => item.id === "marketplace" && item.title === "マーケット"));
 assert.ok(!getHomepagePillarsCopy("de").pillars.some((item) => item.czechOnly));
 assert.equal(getExchangeCopy("cs").listings["poc-cr-ce"].region, "Česko + EU");

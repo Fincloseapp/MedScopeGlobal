@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import type { SalesSnapshot } from "@/lib/sales/types";
 import { formatSalesCzk } from "@/lib/sales/packages";
+import { salesControlWorst } from "@/lib/sales/control";
 
 type Tab = "prehled" | "trziste" | "pipeline" | "inzerenti" | "outreach" | "faktury" | "poptavky" | "pravni";
 
@@ -135,6 +136,48 @@ export function SalesDesk() {
           {data.marketplace.mail.ready ? " (odesílání zapnuté)" : " — chybí Cloudflare / SendGrid / SMTP, maily se jen logují"}
           {data.marketplace.mail.resend ? " · Resend je navíc k dispozici" : ""}.
         </p>
+      ) : null}
+      {data?.marketplace?.control?.length ? (
+        <section className="space-y-2">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">
+                Kontrola bez prodlevy
+              </p>
+              <h2 className="font-display text-lg font-semibold text-[#021d33]">
+                Koordinátoři a kontroloři obchodního oddělení
+              </h2>
+            </div>
+            <p className="text-xs text-slate-500">
+              Stav:{" "}
+              <strong className="text-[#021d33]">
+                {salesControlWorst(data.marketplace.control) === "block"
+                  ? "blok — zásah hned"
+                  : salesControlWorst(data.marketplace.control) === "warn"
+                    ? "varování — fronta běží"
+                    : "v pořádku"}
+              </strong>
+            </p>
+          </div>
+          <div className="grid gap-2 md:grid-cols-5">
+            {data.marketplace.control.map((item) => (
+              <div
+                key={item.id}
+                className={`rounded-2xl border px-3 py-3 ${
+                  item.status === "block"
+                    ? "border-red-200 bg-red-50"
+                    : item.status === "warn"
+                      ? "border-amber-200 bg-amber-50"
+                      : "border-emerald-200 bg-emerald-50"
+                }`}
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{item.label}</p>
+                <p className="mt-1 text-sm font-semibold text-[#021d33]">{item.title}</p>
+                <p className="mt-1 text-xs text-slate-600">{item.detail}</p>
+              </div>
+            ))}
+          </div>
+        </section>
       ) : null}
       {error ? <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{error}</p> : null}
       {data && !data.db ? (

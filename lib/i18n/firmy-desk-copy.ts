@@ -38,7 +38,7 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
     title: "Inzerce na ViaLongeVita",
     lead: "Zdravotnické firmy inzerují v magazínu, ne v lékařské zóně. Ceník je orientační, nabídka do 2 pracovních dnů.",
     exchangeKicker: "Výrobci · laboratoře",
-    exchangeTitle: "Tržiště: nabídky inzerentů a poptávky institucí",
+    exchangeTitle: "Tržiště není inzerce v magazínu",
     exchangeLead:
       "Kupující vidí nabídky hned. Inzerent vidí poptávky hned. Kontakty až po paušálu — bez provize. Čtenářská reklama v magazínu je výše.",
     exchangeCta: "Otevřít tržiště",
@@ -380,7 +380,7 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
     title: "Advertising on ViaLongeVita",
     lead: "Health companies advertise in the magazine, not in the physician zone. List prices are indicative; a quote arrives within 2 working days.",
     exchangeKicker: "Manufacturers · labs",
-    exchangeTitle: "Marketplace: advertiser offers and institutional demand",
+    exchangeTitle: "The marketplace is not magazine advertising",
     exchangeLead:
       "Buyers see offers immediately. Advertisers see demand immediately. Contacts after a retainer — no trade commission. Reader ads sit above.",
     exchangeCta: "Open the marketplace",

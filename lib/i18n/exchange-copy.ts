@@ -34,13 +34,13 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     metaTitle: "B2B Tržiště — výrobci a laboratoře v Česku a EU",
     metaDescription:
       "Poptávky zdarma pro nemocnice a laboratoře. Kontakty vidí platící inzerent. Česko a EU, CE / IVDR / ISO.",
-    kicker: "MedScopeGlobal.com · B2B",
-    title: "Tržiště pro výrobce, nemocnice a laboratoře",
-    leadBefore: `Kupující z Česka a EU poptává zdarma. Kontakty vidí jen platící inzerent — bez provize z obchodu. Magazín ${MAGAZINE.name} sem nepatří: čtenářská inzerce je na`,
+    kicker: "Samostatná část MedScopeGlobal · ne magazín",
+    title: "Tržiště — B2B inzerce se zpracovává tady",
+    leadBefore: `Toto není ${MAGAZINE.name}. Nabídky, poptávky a paušály běží v tržišti a vydělávají tady. Čtenářské bannery zůstávají na`,
     firmyLinkLabel: "/firmy",
     leadAfter: ".",
-    registerCta: "Registrovat firmu",
-    adsCta: "Inzerce v magazínu",
+    registerCta: "Zadat nabídku",
+    adsCta: "Návod pro inzerenty",
     regions: "Regiony: Česko · EU. Certifikace: CE / IVDR / ISO.",
     heroAlt: "Laboratorní stanice — tržiště výrobců MedScopeGlobal",
     listings: {

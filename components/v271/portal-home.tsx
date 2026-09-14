@@ -237,7 +237,9 @@ export function PortalHome({
   return (
     <div className="border-b border-slate-200 bg-[#e8eef3]">
       <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5">
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <HomepagePillars locale={locale} />
+
+        <div className="mt-3 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
           <div className="grid bg-[#050b1d] md:min-h-[32rem] md:grid-cols-[minmax(0,1.15fr)_minmax(12rem,0.85fr)]">
             <div className="flex items-center px-4 py-5 sm:px-8 sm:py-7">
               <ViaLongeVitaMark variant="hero" locale={locale} priority />
@@ -291,8 +293,6 @@ export function PortalHome({
             </div>
           </div>
         </div>
-
-        <HomepagePillars locale={locale} />
 
         <nav aria-label={chrome.servicesNav} className="mt-3 rounded-lg border border-slate-200 bg-white px-2 py-3 shadow-sm sm:px-3">
           <ul className="grid grid-cols-5 gap-1 sm:grid-cols-10">

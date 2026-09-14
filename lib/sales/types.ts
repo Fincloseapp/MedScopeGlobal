@@ -1,5 +1,7 @@
 /** Autonomous B2B sales department — shared types. */
 
+import type { SalesControlFinding } from "@/lib/sales/control";
+
 export const SALES_STAGES = [
   "identified",
   "qualified",
@@ -242,6 +244,7 @@ export type SalesTickResult = {
   errors: string[];
   startedAt: string;
   finishedAt: string;
+  control: SalesControlFinding[];
 };
 
 export type SalesSnapshot = {
@@ -295,6 +298,7 @@ export type SalesSnapshot = {
       inbox: string;
       adminNotify: string;
     };
+    control: SalesControlFinding[];
   };
   legal: {
     coldAutoSend: boolean;
