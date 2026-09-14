@@ -5,6 +5,7 @@ import { PausalOrderForm } from "@/components/sales/pausal-order-form";
 import { formatSalesCzk, SALES_PACKAGES } from "@/lib/sales/packages";
 import { salesPayInstructions } from "@/lib/sales/pay";
 import { aresSubjectUrl } from "@/lib/config/legal-entity";
+import { SITE } from "@/lib/config/site";
 
 export const metadata: Metadata = {
   title: "Měsíční paušál inzerce na tržišti",
@@ -22,13 +23,37 @@ export default async function InzercePausalPage({
   const paid = query.paid === "1";
   const cancelled = query.cancelled === "1";
 
+  const origin = SITE.url.replace(/\/$/, "");
+  const offers = SALES_PACKAGES.map((pkg) => ({
+    "@type": "Offer",
+    name: pkg.name,
+    price: pkg.priceCzkMonth,
+    priceCurrency: "CZK",
+    availability: "https://schema.org/InStock",
+    url: `${origin}/inzerce/pausal`,
+  }));
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: "Měsíční paušál inzerce na tržišti MedScopeGlobal",
+            description: metadata.description,
+            brand: { "@type": "Brand", name: "MedScopeGlobal" },
+            offers,
+          }),
+        }}
+      />
     <ModulePageShell
       eyebrow="Tržiště · paušál"
       title="Plaťte paušál. Inzerce se zpracuje v tržišti."
       description="Od 4 900 Kč měsíčně: profil, předání poptávek, faktura. Nejde o jednorázový banner v článku — ten zůstává na /firmy. Neplátce DPH."
-      ctaHref="/inzerce/podminky"
-      ctaLabel="Podmínky inzerce"
+      ctaHref="#objednat"
+      ctaLabel="K objednávce a platbě"
     >
       {paid ? (
         <p className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
@@ -84,7 +109,9 @@ export default async function InzercePausalPage({
           </div>
         ))}
       </div>
-      <h2 className="mb-4 font-display text-2xl font-semibold text-[#021d33]">Objednat paušál</h2>
+      <h2 id="objednat" className="mb-4 scroll-mt-24 font-display text-2xl font-semibold text-[#021d33]">
+        Objednat paušál
+      </h2>
       <PausalOrderForm defaultPackage="start" pay={pay} />
       <p className="mt-6 text-sm text-slate-600">
         Jednorázový banner v magazínu je jiný produkt:{" "}
@@ -98,5 +125,6 @@ export default async function InzercePausalPage({
         .
       </p>
     </ModulePageShell>
+    </>
   );
 }

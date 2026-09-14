@@ -125,13 +125,34 @@ export function PausalOrderForm({
           </label>
         ))}
       </div>
-      <input required name="company" placeholder="Firma" className="w-full rounded-lg border px-3 py-2 text-sm" />
-      <input required name="contactName" placeholder="Kontaktní osoba" className="w-full rounded-lg border px-3 py-2 text-sm" />
-      <input required type="email" name="email" placeholder="Firemní e-mail" className="w-full rounded-lg border px-3 py-2 text-sm" />
-      <input required name="ico" inputMode="numeric" pattern="[0-9]{8}" placeholder="IČO (8 číslic)" className="w-full rounded-lg border px-3 py-2 text-sm" />
-      <input required name="address" placeholder="Fakturační adresa" className="w-full rounded-lg border px-3 py-2 text-sm" />
-      <input name="website" placeholder="Web (https://…)" className="w-full rounded-lg border px-3 py-2 text-sm" />
-      <textarea name="offerText" placeholder="Krátký popis nabídky, kterou chcete inzerovat na tržišti" className="w-full rounded-lg border px-3 py-2 text-sm" rows={3} />
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#021d33]">Firma</span>
+        <input required name="company" placeholder="např. Firma s.r.o." className="w-full rounded-lg border px-3 py-2 text-sm" />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#021d33]">Kontaktní osoba</span>
+        <input required name="contactName" placeholder="Jméno a příjmení" className="w-full rounded-lg border px-3 py-2 text-sm" />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#021d33]">Firemní e-mail</span>
+        <input required type="email" name="email" placeholder="firma@domena.cz" className="w-full rounded-lg border px-3 py-2 text-sm" />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#021d33]">IČO (8 číslic)</span>
+        <input required name="ico" inputMode="numeric" pattern="[0-9]{8}" placeholder="8 číslic" className="w-full rounded-lg border px-3 py-2 text-sm" />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#021d33]">Fakturační adresa</span>
+        <input required name="address" placeholder="Ulice, město, PSČ" className="w-full rounded-lg border px-3 py-2 text-sm" />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#021d33]">Web (volitelně)</span>
+        <input name="website" placeholder="https://…" className="w-full rounded-lg border px-3 py-2 text-sm" />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#021d33]">Krátký popis nabídky</span>
+        <textarea name="offerText" placeholder="Co chcete na tržišti inzerovat" className="w-full rounded-lg border px-3 py-2 text-sm" rows={3} />
+      </label>
       <label className="flex items-start gap-2 text-xs text-slate-600">
         <input type="checkbox" name="terms" required className="mt-1" />
         <span>

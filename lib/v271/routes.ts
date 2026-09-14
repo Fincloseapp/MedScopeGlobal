@@ -266,8 +266,8 @@ export const V271_FIRMY_PAGES: Record<string, V271HubPage> = {
       { label: "Kampaně", href: "/firmy/kampane", description: "Segmentace lékaři / studenti" },
       { label: "Formulář inzerce", href: "/inzerce/formular", description: "Poptávka do 2 dnů" },
     ],
-    ctaHref: "/inzerce/formular",
-    ctaLabel: "Kontaktovat obchod",
+    ctaHref: "/inzerce/pausal",
+    ctaLabel: "Objednat paušál",
   },
   cenik: {
     slug: "cenik",

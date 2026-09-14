@@ -63,6 +63,8 @@ export default async function InzercePage() {
   const priceById = Object.fromEntries(LONGEVITY_MEDIA_KIT.map((item) => [item.id, item.priceCzk]));
   const formHref = localizePublicHref("/inzerce/formular", locale);
   const cenikHref = localizePublicHref("/inzerce/cenik", locale);
+  const pausalHref = localizePublicHref("/inzerce/pausal", locale);
+  const exchangeHref = localizePublicHref("/exchange", locale);
 
   const intervalLabel = (interval: (typeof LONGEVITY_MEDIA_KIT)[number]["interval"]) => {
     if (interval === "month") return cenik.perMonth;
@@ -75,9 +77,42 @@ export default async function InzercePage() {
       eyebrow={copy.mediaKitEyebrow}
       title={copy.mediaKitTitle}
       description={copy.mediaKitLead}
-      ctaHref={formHref}
-      ctaLabel={copy.mediaKitCta}
+      ctaHref={pausalHref}
+      ctaLabel="Objednat paušál od 4 900 Kč"
     >
+      <div className="mb-8 grid gap-3 md:grid-cols-2">
+        <article className="rounded-2xl border border-[#021d33] bg-[#021d33] px-5 py-5 text-white">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e8d5a3]">
+            Tržiště · vydělává dnes
+          </p>
+          <h2 className="mt-2 font-display text-xl font-semibold">Měsíční paušál — karta Stripe</h2>
+          <p className="mt-2 text-sm leading-6 text-white/80">
+            Od 4 900 Kč / měsíc. Nabídky, poptávky a faktura se zpracují v tržišti. Nejde o banner v článku.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href={pausalHref}
+              className="inline-flex rounded-full bg-[#c4a35a] px-5 py-2.5 text-sm font-semibold text-[#021d33]"
+            >
+              Zaplatit paušál
+            </Link>
+            <Link href={exchangeHref} className="inline-flex text-sm font-semibold text-[#e8d5a3] hover:underline">
+              Otevřít tržiště →
+            </Link>
+          </div>
+        </article>
+        <article className="rounded-2xl border border-[#cfe1f3] bg-white px-5 py-5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">Magazín · jiný produkt</p>
+          <h2 className="mt-2 font-display text-xl font-semibold text-[#021d33]">Jednorázová kampaň u čtenářů</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Native banner od 5 000 Kč, sponzorovaný článek od 15 000 Kč. Vždy označená reklama. Není to paušál tržiště.
+          </p>
+          <Link href={formHref} className="mt-4 inline-flex text-sm font-semibold text-[#005B96] hover:underline">
+            {copy.mediaKitCta} →
+          </Link>
+        </article>
+      </div>
+
       <div className="mb-8 grid gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-[#cfe1f3] bg-white px-4 py-4">
           <p className="text-xs uppercase tracking-wider text-slate-500">{copy.mediaKitReach}</p>
@@ -96,29 +131,6 @@ export default async function InzercePage() {
           </p>
         </div>
       </div>
-
-      <section className="mb-10 rounded-2xl border border-[#021d33] bg-[#021d33] px-5 py-6 text-white">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e8d5a3]">Měsíční paušál</p>
-        <h2 className="mt-2 font-display text-2xl font-semibold">Autonomní inzerce od 4 900 Kč / měsíc</h2>
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-white/80">
-          Firma zaplatí paušál, dostane fakturu a podle tarifu plochy, adresář i předání poptávek.
-          Podmínky inzerce a označení reklamy jsou součástí objednávky.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <Link
-            href={localizePublicHref("/inzerce/pausal", locale)}
-            className="inline-flex rounded-full bg-[#c4a35a] px-5 py-2.5 text-sm font-semibold text-[#021d33]"
-          >
-            Objednat paušál
-          </Link>
-          <Link
-            href={localizePublicHref("/inzerce/podminky", locale)}
-            className="inline-flex rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white"
-          >
-            Podmínky inzerce
-          </Link>
-        </div>
-      </section>
 
       <section className="mb-10 rounded-2xl border border-[#cfe1f3] bg-white px-5 py-6 sm:px-7">
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">

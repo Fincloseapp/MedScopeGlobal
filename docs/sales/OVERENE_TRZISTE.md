@@ -18,8 +18,8 @@ Po otevření `/` (česky `/cs`) je **první blok** mapa prostředí
 | Studenti | `/studenti`, `/app/priprava` | MeDiprep | Inzerce firem |
 | Lékaři | `/lekari`, `/app/dokumentace` | OrdiZapis | Tržiště |
 
-Karta tržiště na homepage: eyebrow *Samostatná část · B2B výnos*, CTA **Otevřít tržiště** → `/exchange`,
-sekundární **Návod a paušál** → `/exchange/navod`.
+Karta tržiště na homepage: eyebrow *Samostatná část · B2B výnos*, zlaté CTA **Objednat paušál** → `/inzerce/pausal`,
+sekundární **Otevřít tržiště** → `/exchange`. Návod zůstává na `/exchange/navod`.
 
 Spodní B2B blok homepage (`V271B2bBlock`) má dva sloupce: tmavé **tržiště** vs. světlý **magazín · jiná část** (`/firmy`).
 
@@ -147,6 +147,8 @@ skládá živé paušály + schválené listingy přes server.
 ## 10. Jak vydělat dnes
 
 1. Veřejný nákup: `/inzerce/pausal` — IČO + adresa, karta Stripe (hostující checkout i bez databáze) nebo převod.
+   Z homepage zlaté tlačítko **Objednat paušál**, z `/exchange` **Objednat paušál od 4 900 Kč**, z `/inzerce` karta **Zaplatit paušál**.
 2. Webhook `/api/stripe/webhook` s `kind=sales_retainer` (i `pending=1`) spáruje platbu se smlouvou, jakmile je SQL.
 3. Doplňte `LEGAL_ENTITY_IBAN` pro QR/převod a e-mailový transport, ať faktura opravdu odejde.
 4. Bez service role objednávka **nespadne** — jde e-mail na inzerenta i `ads@` a Stripe session, pokud je klíč.
+5. Produkce: SQL `sales_*` + `marketplace_*`, reálné `NEXT_PUBLIC_SUPABASE_URL`, směrování `inzerce@` na inbound webhook.

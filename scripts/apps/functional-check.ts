@@ -2129,12 +2129,15 @@ assert.ok(
   assert.equal(getHomepagePillarsCopy("cs").title, "Čtyři části. Jedno prostředí.");
   const marketCs = getHomepagePillarsCopy("cs").pillars.find((item) => item.id === "marketplace");
   assert.ok(marketCs);
-  assert.equal(marketCs.secondaryHref, "/exchange/navod");
+  assert.equal(marketCs.ctaHref, "/inzerce/pausal");
+  assert.equal(marketCs.cta, "Objednat paušál");
+  assert.equal(marketCs.secondaryHref, "/exchange");
   assert.ok(marketCs.lead.includes("Nejde o bannery"));
   assert.ok(getExchangeCopy("cs").kicker.includes("ne magazín"));
   assert.ok(getExchangeCopy("cs").title.includes("zpracovává tady"));
   assert.equal(getHomepagePillarsCopy("cs").kicker, "Přehled prostředí");
-  assert.equal(getHomepagePillarsCopy("de").pillars.find((item) => item.id === "marketplace")?.secondary, "Anleitung und Pauschale");
+  assert.equal(getHomepagePillarsCopy("de").pillars.find((item) => item.id === "marketplace")?.cta, "Pauschale bestellen");
+  assert.equal(getHomepagePillarsCopy("de").pillars.find((item) => item.id === "marketplace")?.secondary, "Marktplatz öffnen");
   assert.equal(getExchangeCopy("en").adsCta, "Advertiser guide");
   assert.equal(getExchangeCopy("sk").adsCta, "Návod pre inzerentov");
   assert.ok(
@@ -5956,9 +5959,9 @@ console.log(
   assert.ok(readFileSync(join(root, "app/api/stripe/webhook/route.ts"), "utf8").includes("pending === \"1\""));
   assert.ok(readFileSync(join(root, "app/(public)/inzerce/pausal/page.tsx"), "utf8").includes("salesPayInstructions"));
   assert.ok(
-    readFileSync(join(root, "components/marketplace/marketplace-desk.tsx"), "utf8").includes(
-      "Objednat paušál od 4 900 Kč"
-    )
+    readFileSync(join(root, "app/(public)/inzerce/page.tsx"), "utf8").includes("Zaplatit paušál") &&
+      readFileSync(join(root, "app/(public)/inzerce/page.tsx"), "utf8").includes("Magazín · jiný produkt"),
+    "inzerce hub must split marketplace retainer from magazine campaigns"
   );
   assert.ok(readFileSync(join(root, ".env.example"), "utf8").includes("LEGAL_ENTITY_IBAN"));
   const blockedMail = evaluateSalesControl({

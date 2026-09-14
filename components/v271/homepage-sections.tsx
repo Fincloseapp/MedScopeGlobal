@@ -241,13 +241,13 @@ export function V271B2bBlock({ locale = "cs" }: { locale?: string }) {
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Link
-              href={exchangeHref}
+              href={pausalHref}
               className="rounded-full bg-[#c4a35a] px-5 py-2.5 text-sm font-semibold text-[#021d33] hover:bg-[#e8d5a3]"
             >
-              Otevřít tržiště
+              Objednat paušál od 4 900 Kč
             </Link>
-            <Link href={pausalHref} className="rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white">
-              Objednat paušál
+            <Link href={exchangeHref} className="rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white">
+              Otevřít tržiště
             </Link>
           </div>
         </div>

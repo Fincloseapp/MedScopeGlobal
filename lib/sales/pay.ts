@@ -56,6 +56,12 @@ export async function createGuestRetainerCheckout(input: {
   const stripe = createStripeClient(key);
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
+    locale: "cs",
+    billing_address_collection: "required",
+    tax_id_collection: { enabled: true },
+    custom_text: {
+      submit: { message: "Měsíční paušál tržiště MedScopeGlobal. Neplátce DPH." },
+    },
     success_url: `${origin}/inzerce/pausal?paid=1&pending=${encodeURIComponent(pendingId)}`,
     cancel_url: `${origin}/inzerce/pausal?cancelled=1`,
     customer_email: input.email,

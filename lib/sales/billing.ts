@@ -203,6 +203,12 @@ export async function createRetainerCheckoutUrl(contract: SalesContract, prospec
   const origin = SITE.url.replace(/\/$/, "");
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
+    locale: "cs",
+    billing_address_collection: "required",
+    tax_id_collection: { enabled: true },
+    custom_text: {
+      submit: { message: "Měsíční paušál tržiště MedScopeGlobal. Neplátce DPH." },
+    },
     success_url: `${origin}/inzerenti/portal?token=${encodeURIComponent(contract.portal_token)}&paid=1`,
     cancel_url: `${origin}/inzerce/pausal?cancelled=1`,
     customer_email: prospect.email ?? undefined,
