@@ -190,6 +190,24 @@ export function formatCzkListPrice(
   return convertCzkToCharge(czkMajor, locale, region).formatted;
 }
 
+/** Start retainer list amounts (same as sales packages). Used by copy tokens. */
+export const LIST_START_MONTH_CZK = 450;
+export const LIST_START_YEAR_CZK = 4500;
+export const LIST_START_EFFECTIVE_CZK = 375;
+
+/** Replace __MONTH__ / __YEAR__ / __EFFECTIVE__ with the edition currency. */
+export function fillListedPriceTokens(
+  text: string,
+  locale?: string | null,
+  region?: string | null
+): string {
+  if (!text || !text.includes("__")) return text;
+  return text
+    .replaceAll("__MONTH__", formatCzkListPrice(LIST_START_MONTH_CZK, locale, region))
+    .replaceAll("__YEAR__", formatCzkListPrice(LIST_START_YEAR_CZK, locale, region))
+    .replaceAll("__EFFECTIVE__", formatCzkListPrice(LIST_START_EFFECTIVE_CZK, locale, region));
+}
+
 /** Editorial CZK list prices that appear in public copy. Largest first. */
 const LISTED_CZK_AMOUNTS = [
   15000, 8000, 5990, 5000, 4900, 4500, 3900, 3500, 3490, 1790, 1788, 1490, 890, 490, 450, 390, 375, 250, 149, 99, 89, 25,
@@ -215,9 +233,10 @@ export function localizeListedCzk(
   region?: string | null
 ): string {
   if (!text) return text;
-  if (paymentTiersForUser(locale, region).currency === "czk") return text;
+  let out = fillListedPriceTokens(text, locale, region);
+  if (paymentTiersForUser(locale, region).currency === "czk") return out;
 
-  let out = text.replace(
+  out = out.replace(
     /99\s*\/\s*149\s*\/\s*390\s*\/\s*490(?:\s*(?:Kč|CZK))?/g,
     () =>
       [99, 149, 390, 490]

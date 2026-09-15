@@ -66,7 +66,7 @@ import { localizeV271Page } from "../lib/i18n/hub-copy";
 import { getDesktopHeaderMenu, getHeaderUtilityLinks } from "../lib/config/main-navigation";
 import { V271_LEKARI_PAGES } from "../lib/v271/routes";
 import { looksLikeCzech } from "../lib/i18n/czech-detect";
-import { convertCzkToCharge, localizeListedCzk, paymentTiersForUser } from "../lib/i18n/payment-currency";
+import { convertCzkToCharge, fillListedPriceTokens, localizeListedCzk, paymentTiersForUser } from "../lib/i18n/payment-currency";
 import { getMarketplaceUiCopy } from "../lib/i18n/marketplace-ui-copy";
 import { editorialMonthlyCharge } from "../lib/editorial/pricing";
 import { studentIntroCharge, studentMonthlyCharge } from "../lib/studenti/pricing";
@@ -653,7 +653,24 @@ assert.equal(paymentTiersForUser("pt-BR").currency, "usd");
 assert.ok(!getMarketplaceUiCopy("de").pausalBanner.includes("Kč"));
 assert.ok(!getMarketplaceUiCopy("en").orderPausalFrom.includes("CZK"));
 assert.ok(getMarketplaceUiCopy("cs").orderPausalFrom.includes("Kč"));
+assert.ok(/€/.test(getMarketplaceUiCopy("de").orderPausalFrom));
+assert.ok(!getMarketplaceUiCopy("de").orderPausalFrom.includes("450"));
+assert.ok(/\$|USD/.test(getMarketplaceUiCopy("en-US").orderPausalFrom));
+assert.ok(/€/.test(getHomepagePillarsCopy("de").pillars.find((p) => p.id === "marketplace")?.product ?? ""));
+assert.ok(/€/.test(fillListedPriceTokens("Die Pauschale beträgt __MONTH__.", "de")));
+assert.ok(!fillListedPriceTokens("Die Pauschale beträgt __MONTH__.", "de").includes("Kč"));
 assert.ok(!getHomepagePillarsCopy("fr").pillars.some((p) => /Kč|CZK/.test(p.product)));
+for (const loc of ["de", "fr", "it", "es", "sk", "pl", "en", "en-US", "ja", "pt-BR"] as const) {
+  const dumped = JSON.stringify(getMarketplaceUiCopy(loc));
+  assert.ok(!/Kč|\bCZK\b/.test(dumped), `marketplace ${loc} still has CZK`);
+  const product = getHomepagePillarsCopy(loc).pillars.find((p) => p.id === "marketplace")?.product ?? "";
+  assert.ok(!/Kč|\bCZK\b/.test(product), `homepage ${loc} still has CZK`);
+  assert.ok(!JSON.stringify(getFirmyDeskCopy(loc)).includes("Kč"), `firmy ${loc} still has Kč`);
+  assert.ok(
+    !getB2BLandingCopy(loc).formats.some((row) => /Kč|\bCZK\b/.test(row.price)),
+    `b2b landing ${loc} still has CZK`
+  );
+}
 assert.ok(getPortalChrome("cs").news.includes("ViaLongeVita"));
 assert.ok(getPortalChrome("de").news.includes("ViaLongeVita"));
 assert.ok(getHomepageLongevityCopy("de").eyebrow.includes("ViaLongeVita"));

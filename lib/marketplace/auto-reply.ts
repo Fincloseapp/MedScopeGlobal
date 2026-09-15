@@ -1,5 +1,5 @@
 import { campaignPublicUrl } from "@/lib/sales/campaign-copy";
-import { formatSalesCzk, salesPriceListPlain, salesFromPriceLabel, salesYearlyEffectiveMonthCzk, salesEntryMonthlyCzk } from "@/lib/sales/packages";
+import { salesPriceListPlain } from "@/lib/sales/packages";
 import { localizeListedCzk } from "@/lib/i18n/payment-currency";
 import { marketplaceUiLang, type MarketplaceUiLang } from "@/lib/i18n/marketplace-ui-locale";
 
@@ -97,7 +97,7 @@ const CS: ReplyPack = {
   },
   general: {
     subject: "Tržiště MedScopeGlobal — nabídky, poptávky a paušál",
-    lead: `Tržiště spojuje nabídky výrobců s poptávkami nemocnic a laboratoří. Inzerent vidí poptávky a dostane kontakty e-mailem. Kupující vidí nabídky hned. Paušál ${salesFromPriceLabel()} / měsíc, roční ${formatSalesCzk(salesYearlyEffectiveMonthCzk(salesEntryMonthlyCzk()))} / měs. (2 měsíce zdarma), bez provize z obchodu.`,
+    lead: "Tržiště spojuje nabídky výrobců s poptávkami nemocnic a laboratoří. Inzerent vidí poptávky a dostane kontakty e-mailem. Kupující vidí nabídky hned. Paušál od __MONTH__ / měsíc, roční __EFFECTIVE__ / měs. (2 měsíce zdarma), bez provize z obchodu.",
   },
 };
 
@@ -132,7 +132,7 @@ const EN: ReplyPack = {
   },
   general: {
     subject: "MedScopeGlobal marketplace — offers, demand and retainer",
-    lead: `The marketplace matches manufacturer offers with hospital and lab demand. Advertisers see demand and receive contacts by email. Buyers see offers immediately. Retainer from ${salesFromPriceLabel("en")} / month, yearly ${formatSalesCzk(salesYearlyEffectiveMonthCzk(salesEntryMonthlyCzk()))} / month (two months free), no trade commission.`,
+    lead: "The marketplace matches manufacturer offers with hospital and lab demand. Advertisers see demand and receive contacts by email. Buyers see offers immediately. Retainer from __MONTH__ / month, yearly __EFFECTIVE__ / month (two months free), no trade commission.",
   },
 };
 

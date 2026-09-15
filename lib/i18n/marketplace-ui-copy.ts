@@ -107,7 +107,7 @@ export type MarketplaceUiCopy = {
 };
 
 const CS: MarketplaceUiCopy = {
-  orderPausalFrom: "Objednat paušál od 450 Kč",
+  orderPausalFrom: "Objednat paušál od __MONTH__",
   offersNav: "Nabídky inzerentů",
   demandsNav: "Poptávky",
   inquireNav: "Inzerovat / zeptat se",
@@ -117,7 +117,7 @@ const CS: MarketplaceUiCopy = {
     { title: "Jednoduchý formulář", body: "Firma, jeden pracovní e-mail, nabídka nebo poptávka. Bez telefonu a bez dalších schránek." },
     { title: "Oslovení přes tržiště", body: "Poptávající si vybere dodavatele. Kontakt nejde na veřejnou desku — předá ho obchodní oddělení." },
   ],
-  pausalBanner: "Chcete kontakty z poptávek dnes? Paušál od 450 Kč / měsíc, roční 375 Kč / měs. (2 měsíce zdarma). Karta nebo převod.",
+  pausalBanner: "Chcete kontakty z poptávek dnes? Paušál od __MONTH__ / měsíc, roční __EFFECTIVE__ / měs. (2 měsíce zdarma). Karta nebo převod.",
   orderPausal: "Objednat paušál",
   forBuyers: "Pro kupující",
   offersHeading: "Nabídky inzerentů",
@@ -167,7 +167,7 @@ const CS: MarketplaceUiCopy = {
   slides: [
     { title: "1 · Dvě desky, jeden účel", body: "Vlevo nabídky inzerentů. Vpravo poptávky nemocnic a laboratoří. Kupující vidí zboží hned. Inzerent vidí poptávky hned." },
     { title: "2 · Zadejte nabídku", body: "Formulář na tržišti nebo e-mail inzerce@medscopeglobal.com. Nabídka se objeví okamžitě. Automatická odpověď potvrdí příjem." },
-    { title: "3 · Přidaná hodnota paušálu", body: "Platící inzerent dostane kontakty z poptávek e-mailem a profil partnerů. Jednorázové bannery v článcích jsou jiný produkt. Bez provize z obchodu. Od 450 Kč / měsíc, roční 375 Kč / měs." },
+    { title: "3 · Přidaná hodnota paušálu", body: "Platící inzerent dostane kontakty z poptávek e-mailem a profil partnerů. Jednorázové bannery v článcích jsou jiný produkt. Bez provize z obchodu. Od __MONTH__ / měsíc, roční __EFFECTIVE__ / měs." },
     { title: "4 · Poptávka je zdarma", body: "Nemocnice a laboratoře poptávají bez poplatku. E-mail na desce není. Inzerent s paušálem ho dostane podle SLA tarifu." },
     { title: "5 · Dotazy jdou samy", body: "Otázky na cenu, fakturu, zákon o reklamě nebo termíny odpovídá obchodní oddělení automaticky." },
     { title: "6 · Co udělat teď", body: "Objednejte paušál, nebo pošlete nabídku. Návod a ceník jsou v odkazech výše." },
@@ -183,7 +183,7 @@ const CS: MarketplaceUiCopy = {
     { title: "Pošlete formulář nebo e-mail", body: "Stejný příjem: formulář na tržišti nebo inzerce@medscopeglobal.com. Automatická odpověď potvrdí, že zpráva dorazila." },
     { title: "Nabídka je hned na desce", body: "Kupující ji vidí ve sloupci nabídek. Kontakt z vaší strany zůstane skrytý, dokud není paušál aktivní." },
     { title: "Poptávky vidíte bez čekání", body: "Sloupec poptávek ukazuje, co instituce hledají. Celý e-mail poptávajícího dostanete po paušálu, podle SLA tarifu." },
-    { title: "Paušál spustí plnění", body: "Od 450 Kč / měsíc (roční 375 Kč / měs., 2 měsíce zdarma): profil partnerů, předání poptávek a plochy paušálu. Jednorázové bannery v článcích jsou jiný produkt." },
+    { title: "Paušál spustí plnění", body: "Od __MONTH__ / měsíc (roční __EFFECTIVE__ / měs., 2 měsíce zdarma): profil partnerů, předání poptávek a plochy paušálu. Jednorázové bannery v článcích jsou jiný produkt." },
   ],
   navodBack: "Zpět na tržiště",
   badgeSample: "Ukázka",
@@ -219,11 +219,11 @@ const CS: MarketplaceUiCopy = {
   ackDemandSubject: "Poptávka na tržišti MedScopeGlobal",
   ackOfferSubject: "Nabídka na tržišti MedScopeGlobal",
   ackDemandHtml: "poptávku jsme zveřejnili na tržišti. Inzerenti s aktivním paušálem dostanou kontakt e-mailem. Vy nic neplatíte.",
-  ackOfferHtml: "nabídku jsme přijali. Na tržišti je vidět hned. Kontakty z poptávek dostanete po paušálu — od 450 Kč / měsíc, roční 375 Kč / měs. (2 měsíce zdarma).",
+  ackOfferHtml: "nabídku jsme přijali. Na tržišti je vidět hned. Kontakty z poptávek dostanete po paušálu — od __MONTH__ / měsíc, roční __EFFECTIVE__ / měs. (2 měsíce zdarma).",
 };
 
 const EN: MarketplaceUiCopy = {
-  orderPausalFrom: "Order the retainer from 450 CZK",
+  orderPausalFrom: "Order the retainer from __MONTH__",
   offersNav: "Advertiser offers",
   demandsNav: "Demand",
   inquireNav: "List / ask",
@@ -233,7 +233,7 @@ const EN: MarketplaceUiCopy = {
     { title: "Simple form", body: "Company, one work email, an offer or a request. No phone numbers and no extra mailboxes." },
     { title: "Contact via the marketplace", body: "The buyer picks a supplier. The contact is not public — sales forwards it." },
   ],
-  pausalBanner: "Need demand contacts today? Start retainer from 450 CZK / month, yearly 375 CZK / month (two months free). Card or transfer.",
+  pausalBanner: "Need demand contacts today? Start retainer from __MONTH__ / month, yearly __EFFECTIVE__ / month (two months free). Card or transfer.",
   orderPausal: "Order retainer",
   forBuyers: "For buyers",
   offersHeading: "Advertiser offers",
@@ -283,7 +283,7 @@ const EN: MarketplaceUiCopy = {
   slides: [
     { title: "1 · Two boards, one purpose", body: "Offers on the left. Hospital and lab demand on the right. Buyers see goods immediately. Advertisers see demand immediately." },
     { title: "2 · Post an offer", body: "Use the marketplace form or email inzerce@medscopeglobal.com. The offer appears at once. An automatic reply confirms receipt." },
-    { title: "3 · What the retainer adds", body: "Paying advertisers receive demand contacts by email and a partner profile. Article banners are a different product. No trade commission. From 450 CZK / month, yearly 375 CZK / month." },
+    { title: "3 · What the retainer adds", body: "Paying advertisers receive demand contacts by email and a partner profile. Article banners are a different product. No trade commission. From __MONTH__ / month, yearly __EFFECTIVE__ / month." },
     { title: "4 · Demand is free", body: "Hospitals and labs post demand at no charge. The email is not on the board. A retainer advertiser receives it under the plan SLA." },
     { title: "5 · Questions are answered automatically", body: "Price, invoice, advertising law and timing questions are answered by sales automatically." },
     { title: "6 · What to do now", body: "Order the retainer or send an offer. The guide and price list are in the links above." },
@@ -299,7 +299,7 @@ const EN: MarketplaceUiCopy = {
     { title: "Send the form or an email", body: "Same intake: the marketplace form or inzerce@medscopeglobal.com. An automatic reply confirms arrival." },
     { title: "The offer is on the board immediately", body: "Buyers see it in the offers column. Your contact stays hidden until the retainer is active." },
     { title: "See demand without waiting", body: "The demand column shows what institutions need. You receive the requester email after the retainer, under the plan SLA." },
-    { title: "The retainer starts fulfilment", body: "From 450 CZK / month (yearly 375 CZK / month, two months free): partner profile, demand forwarding and the surfaces in the plan. One-off article banners are a different product." },
+    { title: "The retainer starts fulfilment", body: "From __MONTH__ / month (yearly __EFFECTIVE__ / month, two months free): partner profile, demand forwarding and the surfaces in the plan. One-off article banners are a different product." },
   ],
   navodBack: "Back to the marketplace",
   badgeSample: "Sample",
@@ -335,7 +335,7 @@ const EN: MarketplaceUiCopy = {
   ackDemandSubject: "Demand on the MedScopeGlobal marketplace",
   ackOfferSubject: "Offer on the MedScopeGlobal marketplace",
   ackDemandHtml: "we published your request on the marketplace. Advertisers with an active retainer receive the contact by email. You pay nothing.",
-  ackOfferHtml: "we accepted your offer. It is visible on the marketplace immediately. Demand contacts arrive after the retainer — from 450 CZK / month, yearly 375 CZK / month (two months free).",
+  ackOfferHtml: "we accepted your offer. It is visible on the marketplace immediately. Demand contacts arrive after the retainer — from __MONTH__ / month, yearly __EFFECTIVE__ / month (two months free).",
 };
 
 function overlay(base: MarketplaceUiCopy, patch: Partial<MarketplaceUiCopy>): MarketplaceUiCopy {
@@ -350,7 +350,7 @@ function overlay(base: MarketplaceUiCopy, patch: Partial<MarketplaceUiCopy>): Ma
 }
 
 const SK = overlay(CS, {
-  orderPausalFrom: "Objednať paušál od 450 Kč",
+  orderPausalFrom: "Objednať paušál od __MONTH__",
   offersNav: "Ponuky inzerentov",
   demandsNav: "Dopyty",
   inquireNav: "Inzerovať / spýtať sa",
@@ -360,7 +360,7 @@ const SK = overlay(CS, {
     { title: "Jednoduchý formulár", body: "Firma, jeden pracovný e-mail, ponuka alebo dopyt. Bez telefónu a bez ďalších schránok." },
     { title: "Oslovenie cez trhovisko", body: "Dopytujúci si vyberie dodávateľa. Kontakt nejde na verejnú tabuľu — odovzdá ho obchodné oddelenie." },
   ],
-  pausalBanner: "Chcete kontakty z dopytov dnes? Paušál od 450 Kč / mesiac, ročný 375 Kč / mes. (2 mesiace zadarmo).",
+  pausalBanner: "Chcete kontakty z dopytov dnes? Paušál od __MONTH__ / mesiac, ročný __EFFECTIVE__ / mes. (2 mesiace zadarmo).",
   orderPausal: "Objednať paušál",
   forBuyers: "Pre kupujúcich",
   offersHeading: "Ponuky inzerentov",
@@ -429,11 +429,11 @@ const SK = overlay(CS, {
   ackDemandSubject: "Dopyt na trhovisku MedScopeGlobal",
   ackOfferSubject: "Ponuka na trhovisku MedScopeGlobal",
   ackDemandHtml: "dopyt sme zverejnili na trhovisku. Inzerenti s aktívnym paušálom dostanú kontakt e-mailom. Vy nič neplatíte.",
-  ackOfferHtml: "ponuku sme prijali. Na trhovisku je viditeľná hneď. Kontakty z dopytov dostanete po paušáli — od 450 Kč / mesiac.",
+  ackOfferHtml: "ponuku sme prijali. Na trhovisku je viditeľná hneď. Kontakty z dopytov dostanete po paušáli — od __MONTH__ / mesiac.",
 });
 
 const DE = overlay(EN, {
-  orderPausalFrom: "Pauschale ab 450 Kč bestellen",
+  orderPausalFrom: "Pauschale ab __MONTH__ bestellen",
   offersNav: "Angebote",
   demandsNav: "Gesuche",
   inquireNav: "Inserieren / fragen",
@@ -443,7 +443,7 @@ const DE = overlay(EN, {
     { title: "Einfaches Formular", body: "Firma, eine geschäftliche E-Mail, Angebot oder Gesuch. Kein Telefon, kein Extra-Postfach." },
     { title: "Ansprache über den Marktplatz", body: "Der Nachfrager wählt den Lieferanten. Der Kontakt ist nicht öffentlich — der Vertrieb leitet weiter." },
   ],
-  pausalBanner: "Kontakte aus Gesuchen heute? Pauschale ab 450 Kč / Monat, jährlich 375 Kč / Monat (2 Monate gratis).",
+  pausalBanner: "Kontakte aus Gesuchen heute? Pauschale ab __MONTH__ / Monat, jährlich __EFFECTIVE__ / Monat (2 Monate gratis).",
   orderPausal: "Pauschale bestellen",
   forBuyers: "Für Käufer",
   offersHeading: "Angebote der Inserenten",
@@ -518,7 +518,7 @@ const DE = overlay(EN, {
   ackDemandSubject: "Gesuch auf dem MedScopeGlobal-Marktplatz",
   ackOfferSubject: "Angebot auf dem MedScopeGlobal-Marktplatz",
   ackDemandHtml: "wir haben Ihr Gesuch veröffentlicht. Zahlende Inserenten erhalten den Kontakt per E-Mail. Sie zahlen nichts.",
-  ackOfferHtml: "wir haben Ihr Angebot angenommen. Es ist sofort sichtbar. Kontakte nach der Pauschale — ab 450 Kč / Monat.",
+  ackOfferHtml: "wir haben Ihr Angebot angenommen. Es ist sofort sichtbar. Kontakte nach der Pauschale — ab __MONTH__ / Monat.",
 });
 
 const PACK: Record<MarketplaceUiLang, MarketplaceUiCopy> = {
@@ -527,7 +527,7 @@ const PACK: Record<MarketplaceUiLang, MarketplaceUiCopy> = {
   sk: SK,
   de: DE,
   pl: overlay(EN, {
-    orderPausalFrom: "Zamów ryczałt od 450 Kč",
+    orderPausalFrom: "Zamów ryczałt od __MONTH__",
     offersNav: "Oferty reklamodawców",
     demandsNav: "Zapotrzebowanie",
     inquireNav: "Dodaj / pytaj",
@@ -537,7 +537,7 @@ const PACK: Record<MarketplaceUiLang, MarketplaceUiCopy> = {
       { title: "Prosty formularz", body: "Firma, jeden służbowy e-mail, oferta lub zapytanie. Bez telefonu i dodatkowych skrzynek." },
       { title: "Kontakt przez rynek", body: "Kupujący wybiera dostawcę. Kontakt nie jest publiczny — przekazuje go dział sprzedaży." },
     ],
-    pausalBanner: "Kontakty z zapytań dziś? Ryczałt od 450 Kč / miesiąc, roczny 375 Kč / mies. (2 miesiące gratis).",
+    pausalBanner: "Kontakty z zapytań dziś? Ryczałt od __MONTH__ / miesiąc, roczny __EFFECTIVE__ / mies. (2 miesiące gratis).",
     orderPausal: "Zamów ryczałt",
     forBuyers: "Dla kupujących",
     offersHeading: "Oferty reklamodawców",
@@ -601,10 +601,10 @@ const PACK: Record<MarketplaceUiLang, MarketplaceUiCopy> = {
     ackDemandSubject: "Zapytanie na rynku MedScopeGlobal",
     ackOfferSubject: "Oferta na rynku MedScopeGlobal",
     ackDemandHtml: "opublikowaliśmy zapytanie. Płatni reklamodawcy dostaną kontakt e-mailem. Nic nie płacicie.",
-    ackOfferHtml: "przyjęliśmy ofertę. Jest od razu widoczna. Kontakty po ryczałcie — od 450 Kč / miesiąc.",
+    ackOfferHtml: "przyjęliśmy ofertę. Jest od razu widoczna. Kontakty po ryczałcie — od __MONTH__ / miesiąc.",
   }),
   fr: overlay(EN, {
-    orderPausalFrom: "Commander le forfait dès 450 Kč",
+    orderPausalFrom: "Commander le forfait dès __MONTH__",
     offersNav: "Offres",
     demandsNav: "Demandes",
     inquireNav: "Publier / demander",
@@ -614,7 +614,7 @@ const PACK: Record<MarketplaceUiLang, MarketplaceUiCopy> = {
       { title: "Formulaire simple", body: "Société, un e-mail professionnel, offre ou demande. Pas de téléphone ni de boîte supplémentaire." },
       { title: "Contact via la place de marché", body: "L’acheteur choisit le fournisseur. Le contact n’est pas public — le commercial le transmet." },
     ],
-    pausalBanner: "Contacts des demandes aujourd’hui ? Forfait dès 450 Kč / mois, annuel 375 Kč / mois (2 mois offerts).",
+    pausalBanner: "Contacts des demandes aujourd’hui ? Forfait dès __MONTH__ / mois, annuel __EFFECTIVE__ / mois (2 mois offerts).",
     orderPausal: "Commander le forfait",
     forBuyers: "Pour les acheteurs",
     offersHeading: "Offres des annonceurs",
@@ -678,10 +678,10 @@ const PACK: Record<MarketplaceUiLang, MarketplaceUiCopy> = {
     ackDemandSubject: "Demande sur la place de marché MedScopeGlobal",
     ackOfferSubject: "Offre sur la place de marché MedScopeGlobal",
     ackDemandHtml: "nous avons publié votre demande. Les annonceurs au forfait reçoivent le contact par e-mail. Vous ne payez rien.",
-    ackOfferHtml: "nous avons accepté votre offre. Elle est visible tout de suite. Contacts après le forfait — dès 450 Kč / mois.",
+    ackOfferHtml: "nous avons accepté votre offre. Elle est visible tout de suite. Contacts après le forfait — dès __MONTH__ / mois.",
   }),
   it: overlay(EN, {
-    orderPausalFrom: "Ordina il pacchetto da 450 Kč",
+    orderPausalFrom: "Ordina il pacchetto da __MONTH__",
     offersNav: "Offerte",
     demandsNav: "Richieste",
     inquireNav: "Pubblica / chiedi",
@@ -691,7 +691,7 @@ const PACK: Record<MarketplaceUiLang, MarketplaceUiCopy> = {
       { title: "Modulo semplice", body: "Azienda, una e-mail di lavoro, offerta o richiesta. Niente telefono né altre caselle." },
       { title: "Contatto tramite marketplace", body: "L’acquirente sceglie il fornitore. Il contatto non è pubblico — lo inoltra il commerciale." },
     ],
-    pausalBanner: "Contatti dalle richieste oggi? Pacchetto da 450 Kč / mese, annuale 375 Kč / mese (2 mesi omaggio).",
+    pausalBanner: "Contatti dalle richieste oggi? Pacchetto da __MONTH__ / mese, annuale __EFFECTIVE__ / mese (2 mesi omaggio).",
     orderPausal: "Ordina il pacchetto",
     forBuyers: "Per gli acquirenti",
     offersHeading: "Offerte degli inserzionisti",
@@ -755,10 +755,10 @@ const PACK: Record<MarketplaceUiLang, MarketplaceUiCopy> = {
     ackDemandSubject: "Richiesta sul marketplace MedScopeGlobal",
     ackOfferSubject: "Offerta sul marketplace MedScopeGlobal",
     ackDemandHtml: "abbiamo pubblicato la richiesta. Gli inserzionisti con pacchetto ricevono il contatto via e-mail. Non pagate nulla.",
-    ackOfferHtml: "abbiamo accettato l’offerta. È visibile subito. Contatti dopo il pacchetto — da 450 Kč / mese.",
+    ackOfferHtml: "abbiamo accettato l’offerta. È visibile subito. Contatti dopo il pacchetto — da __MONTH__ / mese.",
   }),
   es: overlay(EN, {
-    orderPausalFrom: "Pedir el plan desde 450 Kč",
+    orderPausalFrom: "Pedir el plan desde __MONTH__",
     offersNav: "Ofertas",
     demandsNav: "Demandas",
     inquireNav: "Publicar / preguntar",
@@ -768,7 +768,7 @@ const PACK: Record<MarketplaceUiLang, MarketplaceUiCopy> = {
       { title: "Formulario simple", body: "Empresa, un correo de trabajo, oferta o demanda. Sin teléfono ni buzones extra." },
       { title: "Contacto por el mercado", body: "El comprador elige al proveedor. El contacto no es público — lo transmite ventas." },
     ],
-    pausalBanner: "¿Contactos de demandas hoy? Plan desde 450 Kč / mes, anual 375 Kč / mes (2 meses gratis).",
+    pausalBanner: "¿Contactos de demandas hoy? Plan desde __MONTH__ / mes, anual __EFFECTIVE__ / mes (2 meses gratis).",
     orderPausal: "Pedir el plan",
     forBuyers: "Para compradores",
     offersHeading: "Ofertas de anunciantes",
@@ -832,10 +832,10 @@ const PACK: Record<MarketplaceUiLang, MarketplaceUiCopy> = {
     ackDemandSubject: "Demanda en el mercado MedScopeGlobal",
     ackOfferSubject: "Oferta en el mercado MedScopeGlobal",
     ackDemandHtml: "hemos publicado su demanda. Los anunciantes con plan reciben el contacto por correo. Usted no paga.",
-    ackOfferHtml: "hemos aceptado su oferta. Es visible de inmediato. Contactos tras el plan — desde 450 Kč / mes.",
+    ackOfferHtml: "hemos aceptado su oferta. Es visible de inmediato. Contactos tras el plan — desde __MONTH__ / mes.",
   }),
   pt: overlay(EN, {
-    orderPausalFrom: "Encomendar o plano a partir de 450 Kč",
+    orderPausalFrom: "Encomendar o plano a partir de __MONTH__",
     offersNav: "Ofertas",
     demandsNav: "Pedidos",
     inquireNav: "Publicar / perguntar",
@@ -845,7 +845,7 @@ const PACK: Record<MarketplaceUiLang, MarketplaceUiCopy> = {
       { title: "Formulário simples", body: "Empresa, um e-mail profissional, oferta ou pedido. Sem telefone nem caixas extra." },
       { title: "Contacto pelo mercado", body: "O comprador escolhe o fornecedor. O contacto não é público — as vendas reencaminham." },
     ],
-    pausalBanner: "Contactos dos pedidos hoje? Plano a partir de 450 Kč / mês, anual 375 Kč / mês (2 meses grátis).",
+    pausalBanner: "Contactos dos pedidos hoje? Plano a partir de __MONTH__ / mês, anual __EFFECTIVE__ / mês (2 meses grátis).",
     orderPausal: "Encomendar o plano",
     forBuyers: "Para compradores",
     offersHeading: "Ofertas de anunciantes",
@@ -909,10 +909,10 @@ const PACK: Record<MarketplaceUiLang, MarketplaceUiCopy> = {
     ackDemandSubject: "Pedido no mercado MedScopeGlobal",
     ackOfferSubject: "Oferta no mercado MedScopeGlobal",
     ackDemandHtml: "publicámos o pedido. Anunciantes com plano recebem o contacto por e-mail. Não paga nada.",
-    ackOfferHtml: "aceitámos a oferta. Está visível de imediato. Contactos após o plano — a partir de 450 Kč / mês.",
+    ackOfferHtml: "aceitámos a oferta. Está visível de imediato. Contactos após o plano — a partir de __MONTH__ / mês.",
   }),
   "pt-BR": overlay(EN, {
-    orderPausalFrom: "Contratar o plano a partir de 450 Kč",
+    orderPausalFrom: "Contratar o plano a partir de __MONTH__",
     offersNav: "Ofertas",
     demandsNav: "Demandas",
     inquireNav: "Publicar / perguntar",
@@ -922,7 +922,7 @@ const PACK: Record<MarketplaceUiLang, MarketplaceUiCopy> = {
       { title: "Formulário simples", body: "Empresa, um e-mail profissional, oferta ou demanda. Sem telefone nem caixas extras." },
       { title: "Contato pelo marketplace", body: "O comprador escolhe o fornecedor. O contato não é público — o comercial encaminha." },
     ],
-    pausalBanner: "Contatos das demandas hoje? Plano a partir de 450 Kč / mês, anual 375 Kč / mês (2 meses grátis).",
+    pausalBanner: "Contatos das demandas hoje? Plano a partir de __MONTH__ / mês, anual __EFFECTIVE__ / mês (2 meses grátis).",
     orderPausal: "Contratar o plano",
     forBuyers: "Para compradores",
     offersHeading: "Ofertas de anunciantes",
@@ -986,7 +986,7 @@ const PACK: Record<MarketplaceUiLang, MarketplaceUiCopy> = {
     ackDemandSubject: "Demanda no marketplace MedScopeGlobal",
     ackOfferSubject: "Oferta no marketplace MedScopeGlobal",
     ackDemandHtml: "publicamos a demanda. Anunciantes com plano recebem o contato por e-mail. Vocês não pagam nada.",
-    ackOfferHtml: "aceitamos a oferta. Está visível imediatamente. Contatos após o plano — a partir de 450 Kč / mês.",
+    ackOfferHtml: "aceitamos a oferta. Está visível imediatamente. Contatos após o plano — a partir de __MONTH__ / mês.",
   }),
 };
 

@@ -79,7 +79,7 @@ export default async function InzercePage() {
       title={copy.mediaKitTitle}
       description={copy.mediaKitLead}
       ctaHref={pausalHref}
-      ctaLabel={localizeListedCzk("Objednat paušál od 450 Kč", locale)}
+      ctaLabel={getMarketplaceUiCopy(locale).orderPausalFrom}
     >
       <div className="mb-8 grid gap-3 md:grid-cols-2">
         <article className="rounded-2xl border border-[#021d33] bg-[#021d33] px-5 py-5 text-white">
