@@ -86,6 +86,7 @@ import {
   isAdminLoginPath,
   isValidAdminGateCookie,
   requiresAdminGate,
+  safeAdminNextPath,
 } from "../../lib/auth/admin-gate-config";
 import { shouldBlockBot } from "../../lib/v30/security/bot-shield";
 import { isStripeSessionQuery, scanQueryString } from "../../lib/v30/security/waf";
@@ -252,6 +253,40 @@ import { runAdEditorBoard } from "../../lib/ads/ad-editors";
 import { makeAdVariableSymbol } from "../../lib/ads/variable-symbol";
 import { generateInvoiceHtml } from "../../lib/billing/invoice-generator";
 import { buildSpdString } from "../../lib/billing/spd-qr";
+import {
+  SALES_PACKAGES,
+  SALES_YEARLY_BILLED_MONTHS,
+  salesPackageById,
+  formatSalesCzk,
+  salesYearlyCzk,
+  salesYearlyEffectiveMonthCzk,
+  salesStripeLine,
+} from "../../lib/sales/packages";
+import { SALES_ICP_SEEDS, icpRequiresProfessionalOnly } from "../../lib/sales/icp";
+import {
+  evaluateOutreachGate,
+  isPersonalMailbox,
+  isRoleBasedEmail,
+  salesMaxEmailsPerRun,
+  unsubscribeToken,
+  verifyUnsubscribeToken,
+} from "../../lib/sales/legal";
+import { slugifyCompany, nextInvoiceNumber, salesVariableSymbol } from "../../lib/sales/ids";
+import { SALES_DEPARTMENT_SQL } from "../../lib/sales/apply-schema";
+import { salesOfferEmail } from "../../lib/sales/copy";
+import { inquirySlaDue } from "../../lib/sales/fulfillment";
+import { evaluateSalesControl, salesControlWorst } from "../../lib/sales/control";
+import { scoreOfferToDemand, buildMarketplaceLoopModel } from "../../lib/sales/marketplace-loop";
+import { normalizeCzechIco, salesPayInstructions } from "../../lib/sales/pay";
+import { MARKETPLACE_DESK_SQL } from "../../lib/marketplace/schema";
+import { classifyMarketplaceKind, classifyMarketplaceMessage, marketplaceReplyCopy } from "../../lib/marketplace/auto-reply";
+import { SAMPLE_DEMANDS } from "../../lib/marketplace/board";
+import { getMarketplaceUiCopy } from "../../lib/i18n/marketplace-ui-copy";
+import { marketplaceUiLang } from "../../lib/i18n/marketplace-ui-locale";
+import { buildCampaignSnapshot } from "../../lib/sales/campaign";
+import { CAMPAIGN_ROSTER, isCampaignEmailSendable } from "../../lib/sales/campaign-roster";
+import { campaignMarketplaceEmail, campaignMarketplaceUrl } from "../../lib/sales/campaign-copy";
+import { CAMPAIGN_DEADLINE_ISO, CAMPAIGN_TARGET_MAX, CAMPAIGN_TARGET_MIN } from "../../lib/sales/campaign-goal";
 import { briefChrome } from "../../lib/monetization/brief-marketing";
 import { translateNavHref } from "../../lib/i18n/nav-copy";
 import { getDesktopHeaderMenu } from "../../lib/config/main-navigation";
@@ -338,6 +373,7 @@ import {
   aresSubjectUrl,
   formatLegalEntityLine,
   getLegalEntity,
+  publicBrandSignature,
   publicOrganizationAddress,
 } from "../../lib/config/legal-entity";
 import {
@@ -348,6 +384,7 @@ import {
   articleSlugFromPathname,
   decideArticleMeter,
   parseArticleMeter,
+  resolveMagazineMeterUnlock,
   serializeArticleMeter,
 } from "../../lib/monetization/article-meter";
 import { getArticleMeterCopy } from "../../lib/monetization/article-meter-copy";
@@ -359,6 +396,14 @@ import {
 } from "../../lib/v23/newsletter/locale-editions";
 import { magazineCategoriesForLocale } from "../../lib/editorial/magazine-category-copy";
 import { buildLocaleMagazineLayout } from "../../lib/v23/newsletter/locale-layout";
+import { renderNewsletterHtml } from "../../lib/v23/newsletter/render";
+import { fallbackNewsletterRow } from "../../lib/v22/newsletter";
+import {
+  absoluteNewsletterHref,
+  newsletterArticleUnlockToken,
+  verifyNewsletterArticleUnlock,
+  withNewsletterArticleUnlock,
+} from "../../lib/monetization/newsletter-article-unlock";
 import { classifyNewsletterIssues, mergeNewsletterIssues } from "../../lib/v23/newsletter/stand";
 import { generateNewsletterImage, resolveNewsletterItemImage } from "../../lib/v23/newsletter/generate-image";
 import {
@@ -785,6 +830,12 @@ file("lib/monetization/payout-map.ts");
   assert.ok(hrefs.includes("/admin/ai-agents"));
   assert.ok(hrefs.includes("/admin/ai-teams"));
   assert.ok(hrefs.includes("/admin/pravni-checklist"));
+  assert.ok(hrefs.includes("/admin/sales"));
+  assert.equal(
+    ADMIN_NAV_GROUPS.find((group) => group.id === "penize")?.items[0]?.href,
+    "/admin/sales",
+    "Obchodní oddělení must be first under Peníze"
+  );
   assert.ok(hrefs.includes("/admin/security"));
   assert.ok(hrefs.includes("/admin/articles"));
   assert.equal(isAdminNavActive("/admin/ads-public", "/admin/ads"), false);
@@ -805,9 +856,20 @@ file("lib/monetization/payout-map.ts");
   assert.equal(requiresAdminGate("/admin"), true);
   assert.equal(requiresAdminGate("/admin/categories"), true);
   assert.equal(requiresAdminGate("/admin/articles/new"), true);
+  assert.equal(requiresAdminGate("/admin/sales"), true);
+  assert.equal(requiresAdminGate("/cs/admin/sales"), true);
   assert.equal(requiresAdminGate("/admin/login"), false);
+  assert.equal(requiresAdminGate("/cs/admin/login"), false);
   assert.equal(isAdminLoginPath("/admin/login"), true);
+  assert.equal(isAdminLoginPath("/cs/admin/login"), true);
   assert.equal(isAdminLoginPath("/admin"), false);
+  assert.equal(safeAdminNextPath("/admin/sales"), "/admin/sales");
+  assert.equal(safeAdminNextPath("/cs/admin/sales"), "/admin/sales");
+  assert.equal(safeAdminNextPath("/cs/admin/login"), "/admin");
+  assert.equal(safeAdminNextPath("/exchange"), "/admin");
+  assert.equal(safeAdminNextPath("//evil.example/admin"), "/admin");
+  assert.equal(safeAdminNextPath("https://evil.example/admin/sales"), "/admin/sales");
+  assert.equal(safeAdminNextPath("https://evil.example/exchange"), "/admin");
   assert.equal(hasValidAdminGateCookie({ get: () => undefined }), false);
   assert.equal(
     hasValidAdminGateCookie({
@@ -825,11 +887,15 @@ file("lib/monetization/payout-map.ts");
   assert.equal(hasValidAdminGateCookie({ get: () => ({ value: "x" }) }), false);
   assert.equal(ADMIN_GATE_COOKIE, "ms_admin_session");
   assert.equal(shouldBlockBot("curl/8.0", "/admin/login"), false);
+  assert.equal(shouldBlockBot("curl/8.0", "/cs/admin/login"), false);
   assert.equal(shouldBlockBot("curl/8.0", "/admin"), true);
+  assert.equal(shouldBlockBot("curl/8.0", "/cs/admin/sales"), true);
   assert.equal(shouldBlockBot("Mozilla/5.0 (Windows NT 10.0) Chrome/120.0.0.0", "/admin"), false);
   const nextConfig = readFileSync(join(root, "next.config.mjs"), "utf8");
   assert.ok(nextConfig.includes('source: "/admin"'));
   assert.ok(nextConfig.includes("private, no-cache, no-store, must-revalidate"));
+  assert.ok(nextConfig.includes("/admin/:path*"));
+  assert.ok(nextConfig.includes('destination: "/admin/:path*"'));
   if (prev === undefined) delete process.env.ADMIN_GATE_PASSWORD;
   else process.env.ADMIN_GATE_PASSWORD = prev;
 }
@@ -858,6 +924,12 @@ file("lib/monetization/payout-map.ts");
   const gateForm = readFileSync(join(root, "components/v21/admin-gate-form.tsx"), "utf8");
   assert.ok(gateForm.includes('method="post"'));
   assert.ok(gateForm.includes('action="/admin/login"'));
+  assert.ok(gateForm.includes("router.push(next)"));
+  const loginPage = readFileSync(join(root, "app/(public)/admin/login/page.tsx"), "utf8");
+  assert.ok(loginPage.includes("safeAdminNextPath"));
+  const mw = readFileSync(join(root, "middleware.ts"), "utf8");
+  assert.ok(mw.includes("localePrefixedAdminCanonical"));
+  assert.ok(mw.includes('searchParams.set("next"'));
   const security = readFileSync(join(root, "app/(admin)/admin/security/page.tsx"), "utf8");
   assert.ok(security.includes("isAdminGateOpen"));
   assert.ok(security.includes('redirect("/admin/login")'));
@@ -2071,6 +2143,11 @@ assert.ok(
   "manufacturer exchange must be Czech/EU listings, not Asia-Pacific demo"
 );
 assert.ok(
+  readFileSync(join(root, "components/marketplace/marketplace-desk.tsx"), "utf8").includes('id="nabidky"') &&
+    readFileSync(join(root, "components/marketplace/marketplace-desk.tsx"), "utf8").includes('id="poptavky"'),
+  "exchange desk must show advertiser offers and institutional demand side by side"
+);
+assert.ok(
   foldSearchText("spánek").includes("spanek") && queryMatchesHaystack("spánek", "Spánek a obnova"),
   "search fold must match diacritic queries against desk sleep copy"
 );
@@ -2081,6 +2158,43 @@ assert.ok(
     readFileSync(join(root, "lib/i18n/homepage-pillars-copy.ts"), "utf8").includes('id: "physicians"'),
   "homepage must map ViaLongeVita, marketplace, students and physicians as four doors"
 );
+{
+  const portalHomeSrc = readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8");
+  assert.ok(
+    portalHomeSrc.indexOf("<HomepagePillars") < portalHomeSrc.indexOf('ViaLongeVitaMark variant="hero"'),
+    "homepage must open on the four-part environment map before the magazine hero"
+  );
+  assert.ok(
+    readFileSync(join(root, "components/v271/homepage-pillars.tsx"), "utf8").includes(
+      'data-studio="environment-map"'
+    ),
+    "environment map must be marked on the first homepage section"
+  );
+  assert.equal(getHomepagePillarsCopy("cs").title, "Čtyři části. Jedno prostředí.");
+  const marketCs = getHomepagePillarsCopy("cs").pillars.find((item) => item.id === "marketplace");
+  assert.ok(marketCs);
+  assert.equal(marketCs.ctaHref, "/exchange");
+  assert.equal(marketCs.cta, "Vstoupit na tržiště");
+  assert.equal(marketCs.secondaryHref, "/inzerce/pausal");
+  assert.ok(marketCs.lead.includes("Osoby sem nepatří"));
+  assert.ok(getExchangeCopy("cs").kicker.includes("ne magazín"));
+  assert.ok(getExchangeCopy("cs").title.includes("zpracovává tady"));
+  assert.equal(getHomepagePillarsCopy("cs").kicker, "Přehled prostředí");
+  assert.equal(getHomepagePillarsCopy("de").pillars.find((item) => item.id === "marketplace")?.cta, "Marktplatz öffnen");
+  assert.equal(getHomepagePillarsCopy("de").pillars.find((item) => item.id === "marketplace")?.secondary, "Pauschale bestellen");
+  assert.equal(getExchangeCopy("en").adsCta, "Advertiser guide");
+  assert.equal(getExchangeCopy("sk").adsCta, "Návod pre inzerentov");
+  assert.ok(
+    readFileSync(join(root, "app/api/marketplace/inbound-email/route.ts"), "utf8").includes(
+      "if (!secret) return unauthorized()"
+    ),
+    "inbound email must fail closed without a secret"
+  );
+  assert.ok(
+    readFileSync(join(root, "app/api/marketplace/listing/route.ts"), "utf8").includes("TURNSTILE_SECRET_KEY"),
+    "marketplace listing must require captcha when Turnstile is configured"
+  );
+}
 assert.ok(
   !getSubscribeCopy("cs").plans.student.features.some((line) => /Academy/i.test(line)) &&
     getSubscribeCopy("cs").plans.student.features.some((line) => line.includes("MeDiprep")),
@@ -2123,8 +2237,10 @@ assert.ok(
 assert.ok(
   getExchangeCopy("de").title.includes("Marktplatz") &&
     getExchangeCopy("sk").registerCta.includes("Registrovať") &&
-    !getExchangeCopy("ja").title.includes("Tržiště"),
-  "manufacturer exchange chrome must follow the edition language"
+    getExchangeCopy("ja").title === getExchangeCopy("en").title &&
+    getExchangeCopy("zh-CN").title === getExchangeCopy("en").title &&
+    getExchangeCopy("ro").title === getExchangeCopy("en").title,
+  "manufacturer exchange chrome must follow native marketplace languages; smaller locales stay English"
 );
 assert.ok(
   !readFileSync(join(root, "components/studenti/student-offer-dashboard.tsx"), "utf8").includes(
@@ -2508,7 +2624,7 @@ assert.equal(newsletterIssueSlug("2026-09-03", "zh-CN"), "2026-09-03-cn");
 assert.equal(parseNewsletterIssueSlug("2026-09-03").locale, "cs");
 assert.equal(parseNewsletterIssueSlug("2026-09-03-pt-br").locale, "pt-BR");
 assert.equal(parseNewsletterIssueSlug("2026-09-03-jp").locale, "ja");
-assert.deepEqual(publicNewsletterSlugCandidates("2026-09-03", "de"), ["2026-09-03-de", "2026-09-03"]);
+assert.deepEqual(publicNewsletterSlugCandidates("2026-09-03", "de"), ["2026-09-03-de"]);
 assert.ok(NEWSLETTER_PRIMARY_LOCALES.includes("pt"));
 assert.ok(NEWSLETTER_PRIMARY_LOCALES.includes("pt-BR"));
 assert.equal(NEWSLETTER_PRIMARY_LOCALES.length, PRIMARY_EDITORIAL_LOCALES.length);
@@ -2541,6 +2657,56 @@ assert.equal(NEWSLETTER_PRIMARY_LOCALES.length, PRIMARY_EDITORIAL_LOCALES.length
   const deLayout = buildLocaleMagazineLayout({ ...empty, locale: "de" }, "2026-09-03", "de");
   assert.ok(!looksLikeCzech(deLayout.intro));
   assert.ok(deLayout.sections.some((sec) => /Lebensstil|Schlaf|Prävention|Langlebigkeit/i.test(sec.title)));
+  const deFallback = fallbackNewsletterRow("de");
+  assert.equal((deFallback.layout_json as { locale?: string } | null)?.locale, "de");
+  assert.ok(!looksLikeCzech(deFallback.title));
+  const html = renderNewsletterHtml(deLayout, "de");
+  assert.ok(html.includes("https://medscopeglobal.com/de/"));
+  assert.ok(!html.includes('href="/newsletter"'));
+  const htmlArticle = renderNewsletterHtml(
+    {
+      ...deLayout,
+      sections: deLayout.sections.map((sec, index) =>
+        index === 0
+          ? { ...sec, items: [{ title: "Schlaf", summary: "Kurz", href: "/article/schlaf-de" }] }
+          : sec
+      ),
+    },
+    "de"
+  );
+  assert.ok(htmlArticle.includes("from=nl"));
+  assert.ok(htmlArticle.includes("/de/article/schlaf-de"));
+}
+{
+  const token = newsletterArticleUnlockToken("sleep-and-longevity");
+  assert.equal(verifyNewsletterArticleUnlock("sleep-and-longevity", token), true);
+  assert.equal(verifyNewsletterArticleUnlock("sleep-and-longevity", "deadbeef"), false);
+  assert.equal(
+    resolveMagazineMeterUnlock({
+      slug: "sleep-and-longevity",
+      cookie: "1:alpha,beta,gamma",
+    }),
+    false
+  );
+  assert.equal(verifyNewsletterArticleUnlock("sleep-and-longevity", token), true);
+  assert.ok(
+    !readFileSync(join(root, "lib/monetization/article-meter.ts"), "utf8").includes("newsletter-article-unlock"),
+    "article-meter must not import node:crypto unlock (Edge middleware)"
+  );
+  assert.ok(
+    !readFileSync(join(root, "components/v23/newsletter-issue-view.tsx"), "utf8").includes("newsletter-article-unlock"),
+    "newsletter issue view is in the admin client bundle — no node:crypto"
+  );
+  assert.ok(
+    readFileSync(join(root, "app/(public)/newsletter/[slug]/page.tsx"), "utf8").includes("signNewsletterIssueLinks")
+  );
+  assert.ok(
+    readFileSync(join(root, "app/(public)/newsletter/posledni/page.tsx"), "utf8").includes("signNewsletterIssueLinks")
+  );
+  assert.ok(absoluteNewsletterHref("/article/sleep-and-longevity", "fr").includes("/fr/article/"));
+  assert.ok(publicBrandSignature("de").startsWith("MedScopeGlobal"));
+  assert.ok(publicBrandSignature("en").includes("operated by"));
+  assert.ok(!publicBrandSignature("fr").startsWith("Al Synaptica"));
 }
 assert.ok(
   readFileSync(join(root, "app/(admin)/admin/page.tsx"), "utf8").includes("Odběratelé briefu")
@@ -5779,6 +5945,282 @@ console.log(
   );
   assert.ok(readFileSync(join(root, "app/(public)/firmy/reklama/nova/page.tsx"), "utf8").includes("getAdPortalCopy"));
   assert.ok(readFileSync(join(root, "components/firmy/ad-portal-form.tsx"), "utf8").includes("getAdPortalCopy"));
+}
+
+{
+  assert.equal(SALES_PACKAGES.length, 5);
+  assert.equal(SALES_YEARLY_BILLED_MONTHS, 10);
+  assert.equal(salesPackageById("start")?.priceCzkMonth, 450);
+  assert.equal(salesPackageById("visible")?.priceCzkMonth, 890);
+  assert.equal(salesPackageById("magazine")?.priceCzkMonth, 1790);
+  assert.equal(salesPackageById("clinical")?.priceCzkMonth, 3490);
+  assert.equal(salesPackageById("partner")?.priceCzkMonth, 5990);
+  assert.equal(salesYearlyCzk(450), 4500);
+  assert.equal(salesYearlyEffectiveMonthCzk(450), 375);
+  assert.equal(salesStripeLine(450, "month").unitAmount, 45000);
+  assert.equal(salesStripeLine(450, "year").unitAmount, 450000);
+  assert.equal(salesStripeLine(450, "year").recurring.interval, "year");
+  assert.equal(salesPackageById("partner")?.slaHours, 8);
+  assert.ok(salesPackageById("magazine")?.highlighted);
+  assert.ok(formatSalesCzk(1790).includes("790"));
+  assert.ok(SALES_ICP_SEEDS.length >= 20);
+  assert.ok(SALES_ICP_SEEDS.every((row) => row.website.startsWith("https://")));
+  assert.equal(icpRequiresProfessionalOnly("pharma_rx"), true);
+  assert.equal(icpRequiresProfessionalOnly("clinic"), false);
+  assert.equal(isPersonalMailbox("info@firma.cz"), false);
+  assert.equal(isPersonalMailbox("jan@seznam.cz"), true);
+  assert.equal(isRoleBasedEmail("marketing@euc.cz"), true);
+  assert.equal(isRoleBasedEmail("jan.novak@euc.cz"), false);
+  const inbound = evaluateOutreachGate({
+    email: "obchod@firma.cz",
+    legalBasis: "inquiry",
+    stage: "offered",
+    outreachCount: 0,
+    lastContactedAt: null,
+    suppressedAt: null,
+    approvedOutreachAt: null,
+  });
+  assert.equal(inbound.autoSend, true);
+  const cold = evaluateOutreachGate({
+    email: "marketing@firma.cz",
+    legalBasis: "legitimate_interest",
+    stage: "qualified",
+    outreachCount: 0,
+    lastContactedAt: null,
+    suppressedAt: null,
+    approvedOutreachAt: null,
+  });
+  assert.equal(cold.allow, true);
+  assert.equal(cold.autoSend, false);
+  const campaignGate = evaluateOutreachGate({
+    email: "marketing@firma.cz",
+    legalBasis: "legitimate_interest",
+    stage: "qualified",
+    outreachCount: 0,
+    lastContactedAt: null,
+    suppressedAt: null,
+    approvedOutreachAt: null,
+    campaignAuto: true,
+  });
+  assert.equal(campaignGate.allow, true);
+  assert.equal(campaignGate.autoSend, true);
+  const guessed = evaluateOutreachGate({
+    email: "ahoj@firma.cz",
+    legalBasis: "unverified_guess",
+    stage: "identified",
+    outreachCount: 0,
+    lastContactedAt: null,
+    suppressedAt: null,
+    approvedOutreachAt: null,
+  });
+  assert.equal(guessed.allow, false);
+  const gmail = evaluateOutreachGate({
+    email: "jan@gmail.com",
+    legalBasis: "legitimate_interest",
+    stage: "qualified",
+    outreachCount: 0,
+    lastContactedAt: null,
+    suppressedAt: null,
+    approvedOutreachAt: null,
+  });
+  assert.equal(gmail.allow, false);
+  const token = unsubscribeToken("obchod@firma.cz", "secret");
+  assert.equal(verifyUnsubscribeToken("obchod@firma.cz", token, "secret"), true);
+  assert.equal(verifyUnsubscribeToken("obchod@firma.cz", "nope", "secret"), false);
+  assert.equal(slugifyCompany("Canadian Medical"), "canadian-medical");
+  assert.match(nextInvoiceNumber(3, new Date("2026-09-13T00:00:00Z")), /^MSG-SAL-202609-0003$/);
+  assert.match(salesVariableSymbol("abc-1234", new Date("2026-09-13T00:00:00Z")), /^\d{10}$/);
+  const letter = salesOfferEmail({
+    company: "EUC",
+    package: salesPackageById("start")!,
+    unsubscribeUrl: "https://medscopeglobal.com/api/sales/unsubscribe?email=x&token=y",
+  });
+  assert.ok(letter.html.includes("odhlásit"));
+  assert.ok(letter.html.includes("480") || letter.text.includes("Odhlášení"));
+  assert.ok(inquirySlaDue(24)?.length);
+  assert.ok(SALES_DEPARTMENT_SQL.includes("sales_prospects"));
+  assert.ok(SALES_DEPARTMENT_SQL.includes("enable row level security"));
+  const files = [
+    "app/(admin)/admin/sales/page.tsx",
+    "app/(public)/inzerce/pausal/page.tsx",
+    "app/(public)/inzerce/podminky/page.tsx",
+    "app/(public)/partneri/page.tsx",
+    "app/api/cron/sales-department/route.ts",
+    "app/api/sales/order/route.ts",
+    "app/api/marketplace/listing/route.ts",
+    "app/api/marketplace/inbound-email/route.ts",
+    "app/(public)/exchange/navod/page.tsx",
+    "docs/sales/AUTONOMOUS_SALES_DEPARTMENT.md",
+    "docs/sales/OVERENE_TRZISTE.md",
+    "lib/sales/control.ts",
+    "supabase/migrations/20260913220000_sales_department.sql",
+    "supabase/migrations/20260914070000_marketplace_desk.sql",
+  ];
+  for (const rel of files) {
+    assert.ok(existsSync(join(root, rel)), rel);
+  }
+  assert.ok(MARKETPLACE_DESK_SQL.includes("marketplace_listings"));
+  assert.equal(classifyMarketplaceKind("Hledáme CE-IVDR analyzátor"), "demand");
+  assert.equal(classifyMarketplaceKind("Chci inzerovat nabídku v katalogu"), "offer");
+  assert.equal(classifyMarketplaceKind("We are looking for a CE-IVDR analyser"), "demand");
+  assert.equal(classifyMarketplaceKind("We want to advertise our offer in the catalogue"), "offer");
+  assert.equal(classifyMarketplaceMessage("Kolik stojí paušál?"), "price");
+  assert.equal(classifyMarketplaceMessage("What is the monthly retainer price?"), "price");
+  assert.ok(SAMPLE_DEMANDS.length >= 3);
+  assert.equal(marketplaceUiLang("ja"), "en");
+  assert.equal(marketplaceUiLang("zh-CN"), "en");
+  assert.equal(marketplaceUiLang("ro"), "en");
+  assert.equal(marketplaceUiLang("hu"), "en");
+  assert.equal(marketplaceUiLang("de"), "de");
+  assert.equal(marketplaceUiLang("sk"), "sk");
+  assert.equal(getMarketplaceUiCopy("ja").formTitle, getMarketplaceUiCopy("en").formTitle);
+  assert.ok(getMarketplaceUiCopy("de").formTitle.includes("Marktplatz"));
+  assert.ok(!getMarketplaceUiCopy("de").pausalBanner.includes("Kč"));
+  assert.ok(!getMarketplaceUiCopy("en").orderPausalFrom.includes("CZK"));
+  assert.ok(getMarketplaceUiCopy("cs").orderPausalFrom.includes("Kč"));
+  assert.ok(marketplaceReplyCopy("price", "en").subject.toLowerCase().includes("price"));
+  assert.ok(marketplaceReplyCopy("price", "cs").subject.includes("Ceník"));
+  assert.equal(salesMaxEmailsPerRun(), 500);
+  assert.ok(CAMPAIGN_ROSTER.length >= 500, `roster ${CAMPAIGN_ROSTER.length}`);
+  assert.ok(readFileSync(join(root, "lib/services/ads-mail.ts"), "utf8").includes("sendAdOfferViaEngine"));
+  assert.ok(readFileSync(join(root, "lib/services/ads-mail.ts"), "utf8").includes("sendAdRequestAckToAdvertiser"));
+  const webhook = readFileSync(join(root, "app/api/stripe/webhook/route.ts"), "utf8");
+  assert.ok(webhook.includes("sales_retainer"));
+  const cronYml = readFileSync(join(root, ".github/workflows/cloudflare-cron.yml"), "utf8");
+  assert.ok(cronYml.includes("/api/cron/sales-department"));
+  assert.equal(normalizeCzechIco("12345678"), "12345678");
+  assert.equal(normalizeCzechIco("123"), null);
+  assert.equal(salesPayInstructions().sellerIco, "06024963");
+  assert.ok(salesPayInstructions().sellerName.includes("MedScopeGlobal"));
+  assert.ok(!salesPayInstructions().sellerName.includes("Synaptica"));
+  assert.ok(readFileSync(join(root, "lib/sales/pay.ts"), "utf8").includes("createGuestRetainerCheckout"));
+  assert.ok(readFileSync(join(root, "app/api/stripe/webhook/route.ts"), "utf8").includes("pending === \"1\""));
+  assert.ok(readFileSync(join(root, "app/(public)/inzerce/pausal/page.tsx"), "utf8").includes("salesPayInstructions"));
+  assert.ok(readFileSync(join(root, "app/(public)/inzerce/pausal/page.tsx"), "utf8").includes("2 měsíce zdarma"));
+  assert.ok(readFileSync(join(root, "components/sales/pausal-order-form.tsx"), "utf8").includes("billingInterval"));
+  assert.ok(marketplaceReplyCopy("price").text.includes("450"));
+  assert.ok(
+    readFileSync(join(root, "app/(public)/inzerce/page.tsx"), "utf8").includes("getMarketplaceUiCopy") &&
+      readFileSync(join(root, "app/(public)/inzerce/page.tsx"), "utf8").includes("Magazín · jiný produkt"),
+    "inzerce hub must split marketplace retainer from magazine campaigns"
+  );
+  assert.ok(readFileSync(join(root, ".env.example"), "utf8").includes("SALES_CAMPAIGN_AUTO"));
+  const campaign = buildCampaignSnapshot();
+  assert.equal(campaign.monthCzk, 450);
+  assert.equal(campaign.yearCzk, 4500);
+  assert.equal(campaign.yearEffectiveCzk, 375);
+  assert.equal(campaign.deadlineAt, CAMPAIGN_DEADLINE_ISO);
+  assert.equal(campaign.byLocale.length, GLOBAL_LOCALES.length);
+  assert.ok(campaign.sendableTotal >= GLOBAL_LOCALES.length);
+  assert.ok(CAMPAIGN_ROSTER.length === campaign.sendableTotal);
+  const emails = new Set<string>();
+  for (const row of CAMPAIGN_ROSTER) {
+    assert.ok(isCampaignEmailSendable(row.email, row.website), row.email);
+    assert.equal(isPersonalMailbox(row.email), false);
+    assert.equal(isRoleBasedEmail(row.email), true);
+    assert.ok(!emails.has(row.email), `duplicate ${row.email}`);
+    emails.add(row.email);
+  }
+  for (const locale of GLOBAL_LOCALES) {
+    const slice = campaign.byLocale.find((row) => row.locale === locale.code);
+    assert.ok(slice, locale.code);
+    assert.ok(slice!.sendableCount >= 1, `no sendable emails for ${locale.code}`);
+    assert.equal(slice!.targetMin, CAMPAIGN_TARGET_MIN);
+    assert.equal(slice!.targetMax, CAMPAIGN_TARGET_MAX);
+    assert.ok(slice!.marketplaceUrl.includes("medscopeglobal.com"));
+    assert.ok(slice!.marketplaceUrl.includes("/exchange") || slice!.marketplaceUrl.endsWith("/exchange"));
+    const letter = campaignMarketplaceEmail({
+      company: "TestCo",
+      locale: locale.code,
+      unsubscribeUrl: "https://medscopeglobal.com/api/sales/unsubscribe?email=x&token=y",
+    });
+    assert.ok(letter.html.includes(campaignMarketplaceUrl(locale.code)));
+    assert.ok(letter.html.includes("MedScopeGlobal"));
+    assert.ok(!letter.html.includes("obchodního oddělení MedScopeGlobal (Al Synaptica"));
+    if (locale.code === "cs") {
+      assert.ok(letter.html.includes("450") || letter.text.includes("450"));
+      assert.ok(/Kč|CZK/.test(letter.html + letter.text));
+    } else {
+      assert.ok(!/\bKč\b|\bCZK\b/.test(letter.html + letter.text), locale.code);
+      assert.ok(/€|EUR|\$|USD/.test(letter.html + letter.text), locale.code);
+    }
+    assert.ok(letter.html.includes("/api/sales/unsubscribe"));
+    if (marketplaceUiLang(locale.code) === "en") {
+      assert.ok(letter.subject.includes("marketplace"), locale.code);
+    }
+    if (locale.code === "de") {
+      assert.ok(letter.subject.includes("Marktplatz"));
+      assert.ok(letter.text.includes("€") || letter.html.includes("€"));
+      assert.ok(!letter.text.includes("450 Kč"));
+      assert.ok(!letter.text.includes("4 500 Kč"));
+    }
+  }
+  assert.ok(!readFileSync(join(root, "lib/sales/campaign-copy.ts"), "utf8").includes("450 Kč"));
+  assert.ok(!readFileSync(join(root, "lib/i18n/marketplace-ui-copy.ts"), "utf8").includes("450 Kč"));
+  assert.ok(!readFileSync(join(root, "lib/i18n/marketplace-ui-copy.ts"), "utf8").includes("450 CZK"));
+  const dePreview = campaign.byLocale.find((row) => row.locale === "de");
+  assert.ok(dePreview);
+  assert.ok(!/Kč|\bCZK\b/.test(dePreview!.copyText));
+  assert.ok(/€/.test(dePreview!.copyText));
+  assert.ok(!dePreview!.copyText.includes("450 Kč"));
+  assert.ok(readFileSync(join(root, "app/api/marketplace/listing/route.ts"), "utf8").includes("getMarketplaceUiCopy"));
+  assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes("Kampaň"));
+  assert.ok(readFileSync(join(root, "lib/sales/runner.ts"), "utf8").includes("seedCampaignProspects"));
+  assert.ok(readFileSync(join(root, "lib/sales/runner.ts"), "utf8").includes("alreadyLoopedToday"));
+  assert.ok(readFileSync(join(root, ".env.example"), "utf8").includes("LEGAL_ENTITY_IBAN"));
+  const blockedMail = evaluateSalesControl({
+    mailReady: false,
+    unrepliedListings: 0,
+    outreachNeedsApproval: 0,
+    inquiriesReceived: 0,
+    inquiriesOverdue: 0,
+    invoicesOverdue: 0,
+    pendingPayment: 0,
+    skippedLegal: 0,
+  });
+  assert.equal(salesControlWorst(blockedMail), "block");
+  assert.equal(blockedMail.find((item) => item.id === "intake")?.status, "block");
+  const healthy = evaluateSalesControl({
+    mailReady: true,
+    unrepliedListings: 0,
+    outreachNeedsApproval: 0,
+    inquiriesReceived: 0,
+    inquiriesOverdue: 0,
+    invoicesOverdue: 0,
+    pendingPayment: 0,
+    skippedLegal: 0,
+  });
+  assert.equal(salesControlWorst(healthy), "ok");
+  const delayed = evaluateSalesControl({
+    mailReady: true,
+    unrepliedListings: 2,
+    outreachNeedsApproval: 1,
+    inquiriesReceived: 1,
+    inquiriesOverdue: 1,
+    invoicesOverdue: 1,
+    pendingPayment: 1,
+    skippedLegal: 1,
+  });
+  assert.equal(salesControlWorst(delayed), "block");
+  assert.equal(delayed.find((item) => item.id === "fulfillment")?.status, "block");
+  assert.equal(delayed.find((item) => item.id === "revenue")?.status, "block");
+  assert.equal(delayed.find((item) => item.id === "intake")?.status, "warn");
+  assert.ok(readFileSync(join(root, "lib/sales/runner.ts"), "utf8").includes("evaluateSalesControl"));
+  assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes("Koordinátoři a kontroloři"));
+  assert.ok(readFileSync(join(root, "components/v271/homepage-pillars.tsx"), "utf8").includes('data-studio="audience-split"'));
+  assert.ok(readFileSync(join(root, "components/marketplace/marketplace-intake-form.tsx"), "utf8").includes("getMarketplaceUiCopy"));
+  assert.ok(readFileSync(join(root, "lib/i18n/marketplace-ui-copy.ts"), "utf8").includes("Firemní formulář tržiště"));
+  assert.ok(!readFileSync(join(root, "components/marketplace/marketplace-intake-form.tsx"), "utf8").includes("contactName"));
+  assert.ok(!readFileSync(join(root, "components/marketplace/marketplace-intake-form.tsx"), "utf8").includes("Telefon"));
+  assert.ok(existsSync(join(root, "app/api/marketplace/choose/route.ts")));
+  const loop = buildMarketplaceLoopModel();
+  assert.equal(loop.evaluation.percent, 100);
+  assert.equal(loop.evaluation.autonomous, true);
+  assert.equal(loop.evaluation.subscriberReady, true);
+  assert.equal(loop.evaluation.buyerFoundSupplier, true);
+  assert.equal(loop.evaluation.supplierNotified, true);
+  assert.equal(loop.ok, true);
+  assert.ok(scoreOfferToDemand({ title: loop.supplier.offerTitle, summary: loop.supplier.offerSummary }, { title: loop.buyer.offerTitle, summary: loop.buyer.offerSummary }) >= 0.15);
 }
 
 console.log("✓ editorial image pipeline checks passed");

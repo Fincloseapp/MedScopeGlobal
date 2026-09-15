@@ -71,8 +71,20 @@ const ecosystemMigrations = [
     ],
   },
   {
-    file: "20260825230000_editorial_images.sql",
-    tables: [["article_image_suggestions", "id"]],
+    file: "20260913220000_sales_department.sql",
+    tables: [
+      ["sales_prospects", "id"],
+      ["sales_contracts", "id"],
+      ["sales_invoices", "id"],
+      ["sales_inquiries", "id"],
+    ],
+  },
+  {
+    file: "20260914070000_marketplace_desk.sql",
+    tables: [
+      ["marketplace_listings", "id"],
+      ["marketplace_messages", "id"],
+    ],
   },
 ];
 

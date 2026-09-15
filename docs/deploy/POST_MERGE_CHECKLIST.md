@@ -95,7 +95,8 @@ pnpm db:migrate
 pnpm db:verify
 ```
 
-Expect ✓ for `mediflow_*`, `article_syndications`, `editorial_queue`, `article_image_suggestions`.
+Expect ✓ for `mediflow_*`, `article_syndications`, `editorial_queue`, `article_image_suggestions`,
+and after this branch `sales_prospects` / `sales_contracts` (see `docs/sales/AUTONOMOUS_SALES_DEPARTMENT.md`).
 
 ### Option C — Production cron route (Worker has `SUPABASE_ACCESS_TOKEN`)
 

@@ -16,6 +16,7 @@ import {
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { getNewsletterStandCopy } from "@/lib/i18n/newsletter-stand-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { signNewsletterIssueLinks } from "@/lib/monetization/newsletter-article-unlock";
 import { classifyNewsletterIssues, mergeNewsletterIssues } from "@/lib/v23/newsletter/stand";
 
 export const revalidate = 3600;
@@ -56,7 +57,7 @@ export default async function NewsletterPosledniPage() {
       <JsonLdScript data={ld} />
       <NewsletterNewsstand archive={archive} latest={issue} locale={locale} showIssueGrids={false} />
       <div id="vydani" className="mt-10 scroll-mt-24">
-        <V23NewsletterIssueView issue={current} locale={locale} headingLevel="h2" />
+        <V23NewsletterIssueView issue={signNewsletterIssueLinks(current)} locale={locale} headingLevel="h2" />
       </div>
       <Link
         href={localizePublicHref("/newsletter", locale)}

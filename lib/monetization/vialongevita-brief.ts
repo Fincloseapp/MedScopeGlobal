@@ -17,6 +17,7 @@ import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { getDefaultFromEmail } from "@/lib/email/from";
 import { isCloudflareEmailConfigured } from "@/lib/email/cloudflare-sending";
 import { looksLikeCzech } from "@/lib/i18n/czech-detect";
+import { absoluteNewsletterHref } from "@/lib/monetization/newsletter-article-unlock";
 import {
   affiliateRowHtml,
   briefInnerHtml,
@@ -94,7 +95,7 @@ function articleHref(locale: string, slug: string): string {
   if (slug.startsWith("__pillar")) {
     return `${SITE.url}${buildLocalePath(locale, "/verejnost/clanky")}`;
   }
-  return `${SITE.url}${buildLocalePath(locale, `/article/${slug}`)}`;
+  return absoluteNewsletterHref(`/article/${slug}`, locale);
 }
 
 function pillarBriefArticles(locale: string): BriefArticle[] {

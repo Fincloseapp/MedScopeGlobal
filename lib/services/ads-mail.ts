@@ -1,5 +1,7 @@
 import { SITE } from "@/lib/config/site";
-import { sendContactEmail, getContactRecipient } from "@/lib/services/contact-mail";
+import { sendAdOfferViaEngine } from "@/lib/marketplace/mail";
+import { marketplaceInboxEmail } from "@/lib/marketplace/config";
+import { getContactRecipient } from "@/lib/services/contact-mail";
 import type { AdsRequestRow } from "@/types/database";
 
 function formatRequest(req: AdsRequestRow) {
@@ -14,16 +16,36 @@ function formatRequest(req: AdsRequestRow) {
 }
 
 export async function sendAdRequestNotification(req: AdsRequestRow) {
-  const recipient = getContactRecipient("general");
+  const recipient = getContactRecipient("partner");
   const subject = `[MedScopeGlobal] Nová žádost o inzerci — ${req.company}`;
-
-  return sendContactEmail({
-    kind: "partner",
-    recipient,
+  return sendAdOfferViaEngine({
+    to: recipient,
+    company: req.company,
     subject,
-    html: `<h2>Nová žádost o reklamu</h2>${formatRequest(req)}`,
+    html: `<h2>Nová žádost o reklamu</h2>${formatRequest(req)}
+      <p><a href="${SITE.url.replace(/\/$/, "")}/admin/sales?tab=trziste">Obchodní oddělení</a>
+      · <a href="${SITE.url.replace(/\/$/, "")}/admin/ads-requests">Žádosti o reklamu</a></p>`,
     text: `Nová žádost o reklamu od ${req.company} (${req.email})`,
-    payload: { requestId: req.id, company: req.company },
+    metadata: { requestId: req.id, company: req.company },
+  });
+}
+
+export async function sendAdRequestAckToAdvertiser(req: AdsRequestRow) {
+  const origin = SITE.url.replace(/\/$/, "");
+  return sendAdOfferViaEngine({
+    to: req.email,
+    company: req.company,
+    subject: `Přijali jsme poptávku inzerce — ${req.company}`,
+    html: `<p>Dobrý den, ${req.company},</p>
+      <p>žádost o inzerci evidujeme. Vedle jednorázové kampaně můžete dát nabídku na
+      <a href="${origin}/exchange">tržiště</a> a objednat
+      <a href="${origin}/inzerce/pausal">měsíční paušál od 450 Kč</a> — poptávky z nemocnic
+      dostanete e-mailem, bez provize z obchodu.</p>
+      <p>Návod: <a href="${origin}/exchange/navod">${origin}/exchange/navod</a></p>
+      <p>Odpovězte na tento e-mail s jakýmkoli dotazem — odpovíme automaticky
+      (${marketplaceInboxEmail()}).</p>`,
+    text: `Přijali jsme poptávku inzerce. Tržiště: ${origin}/exchange · paušál: ${origin}/inzerce/pausal`,
+    metadata: { requestId: req.id, kind: "ads_request_ack" },
   });
 }
 
@@ -36,27 +58,27 @@ export async function sendAdApprovalEmail(req: AdsRequestRow, approveUrl: string
     <p><a href="${orderUrl}">Náhled faktury a platba</a></p>
     <p>Nebo rovnou Stripe: <a href="${approveUrl}">Zaplatit kartou</a></p>
     <p>Cena: ${req.price ?? "dle nabídky"} Kč</p>
+    <p>Tržiště a poptávky: <a href="${SITE.url.replace(/\/$/, "")}/exchange">/exchange</a></p>
   `;
-
-  return sendContactEmail({
-    kind: "partner",
-    recipient: req.email,
+  return sendAdOfferViaEngine({
+    to: req.email,
+    company: req.company,
     subject,
     html,
     text: `Reklama schválena. Platba: ${orderUrl} · VS ${req.variable_symbol ?? ""}`,
-    payload: { requestId: req.id },
+    metadata: { requestId: req.id },
   });
 }
 
 export async function sendAdApprovalLinkToAdmin(req: AdsRequestRow, approveUrl: string) {
   const recipient = getContactRecipient("partner");
-  return sendContactEmail({
-    kind: "partner",
-    recipient,
+  return sendAdOfferViaEngine({
+    to: recipient,
+    company: req.company,
     subject: `[Admin] Schválit reklamu — ${req.company}`,
     html: `<p>Žádost čeká na schválení.</p><p><a href="${approveUrl}">Schválit a odeslat platební odkaz</a></p>${formatRequest(req)}`,
     text: `Schválit reklamu: ${approveUrl}`,
-    payload: { requestId: req.id },
+    metadata: { requestId: req.id },
   });
 }
 
@@ -78,12 +100,12 @@ export function buildCompanyOrderUrl(requestId: string, token?: string | null): 
 }
 
 export async function sendAdDeniedEmail(req: AdsRequestRow, reason: string) {
-  return sendContactEmail({
-    kind: "partner",
-    recipient: req.email,
+  return sendAdOfferViaEngine({
+    to: req.email,
+    company: req.company,
     subject: `Inzerce neschválena — ${req.company}`,
     html: `<p>Vaše kreativa nebyla schválena třemi editory MedScopeGlobal.</p><p>${reason || "Obsah nesplnil právní, bezpečnostní nebo diplomatická pravidla."}</p>`,
     text: `Inzerce neschválena. ${reason}`,
-    payload: { requestId: req.id, decision: "denied" },
+    metadata: { requestId: req.id, decision: "denied" },
   });
 }

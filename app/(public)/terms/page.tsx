@@ -31,9 +31,9 @@ export default async function TermsPage() {
       {copy.officialNote ? <p><em>{copy.officialNote}</em></p> : null}
       <h2>1. Úvodní ustanovení</h2>
       <p>
-        Tyto obchodní podmínky upravují vztah mezi provozovatelem ({entity.name}
-        {entity.ico ? `, IČO ${entity.ico}` : ""}) platformy MedScopeGlobal na doméně{" "}
-        {entity.domain} a uživateli online služby pro odborný medicínský obsah. Používáním
+        Tyto obchodní podmínky upravují vztah mezi MedScopeGlobal ({entity.domain}),
+        který provozuje {entity.name}
+        {entity.ico ? `, IČO ${entity.ico}` : ""}, a uživateli online služby. Používáním
         služby souhlasíte s těmito podmínkami.
       </p>
       <p>
@@ -47,6 +47,11 @@ export default async function TermsPage() {
         Premium a VIP předplatné se účtuje měsíčně nebo ročně dle zvoleného tarifu. Platby
         zpracovává Stripe. Předplatné se automaticky obnovuje, pokud jej nezrušíte v sekci Účet
         nejpozději 24 hodin před koncem fakturačního období.
+      </p>
+      <p>
+        Firemní inzerce a měsíční paušály se řídí zvláštními{" "}
+        <Link href="/inzerce/podminky">podmínkami inzerce</Link>. Objednávka paušálu:{" "}
+        <Link href="/inzerce/pausal">/inzerce/pausal</Link>.
       </p>
       <ul>
         <li>Zkušební období: 7 dní (pokud je nabízeno)</li>

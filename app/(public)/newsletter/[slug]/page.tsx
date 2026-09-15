@@ -17,6 +17,7 @@ import { ListingAffiliateBox } from "@/components/monetization/affiliate-box";
 import type { GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
+import { signNewsletterIssueLinks } from "@/lib/monetization/newsletter-article-unlock";
 
 export const revalidate = 3600;
 
@@ -56,7 +57,7 @@ export default async function NewsletterIssuePage({ params }: Props) {
   return (
     <ModulePageShell eyebrow={copy.hubEyebrow} title={pageTitle} description={description} hideIntro>
       <JsonLdScript data={ld} />
-      <V23NewsletterIssueView issue={issue} locale={locale} />
+      <V23NewsletterIssueView issue={signNewsletterIssueLinks(issue)} locale={locale} />
       <div className="mt-8">
         <ListingAffiliateBox locale={locale as GlobalLocaleCode} />
       </div>

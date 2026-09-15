@@ -7,6 +7,7 @@ import { createServiceRoleClient } from "@/lib/supabase/service";
 import {
   buildApprovalUrl,
   sendAdApprovalLinkToAdmin,
+  sendAdRequestAckToAdvertiser,
   sendAdRequestNotification,
 } from "@/lib/services/ads-mail";
 import { calculateAdPrice } from "@/lib/ads/pricing";
@@ -119,6 +120,7 @@ export async function POST(request: Request) {
   await Promise.all([
     sendAdRequestNotification(req),
     sendAdApprovalLinkToAdmin(req, approveUrl),
+    sendAdRequestAckToAdvertiser(req),
   ]);
 
   if (req.id && req.variable_symbol !== makeAdVariableSymbol(req.id)) {

@@ -49,6 +49,16 @@ export default function AdminPravniChecklistPage() {
             </Link>
           </li>
           <li>Faktury: správná firma + režim neplátce DPH</li>
+          <li>
+            Inzerce:{" "}
+            <Link href="/inzerce/podminky" className="text-[#005B96] underline">
+              /inzerce/podminky
+            </Link>{" "}
+            · dashboard{" "}
+            <Link href="/admin/sales" className="text-[#005B96] underline">
+              /admin/sales
+            </Link>
+          </li>
         </ul>
       </section>
 

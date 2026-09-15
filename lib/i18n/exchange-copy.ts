@@ -3,6 +3,7 @@ import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { exchangeEdition, type ExchangeEdition } from "@/lib/i18n/exchange-copy-editions";
+import { marketplaceUiLang } from "@/lib/i18n/marketplace-ui-locale";
 import type { ExchangeListingId } from "@/lib/b2b/exchange-listings";
 
 export type ExchangeListingCopy = {
@@ -34,13 +35,13 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     metaTitle: "B2B Tržiště — výrobci a laboratoře v Česku a EU",
     metaDescription:
       "Poptávky zdarma pro nemocnice a laboratoře. Kontakty vidí platící inzerent. Česko a EU, CE / IVDR / ISO.",
-    kicker: "MedScopeGlobal.com · B2B",
-    title: "Tržiště pro výrobce, nemocnice a laboratoře",
-    leadBefore: `Kupující z Česka a EU poptává zdarma. Kontakty vidí jen platící inzerent — bez provize z obchodu. Magazín ${MAGAZINE.name} sem nepatří: čtenářská inzerce je na`,
+    kicker: "Samostatná část MedScopeGlobal · ne magazín",
+    title: "Tržiště — B2B inzerce se zpracovává tady",
+    leadBefore: `Toto není ${MAGAZINE.name}. Nabídky, poptávky a paušály běží v tržišti a vydělávají tady. Čtenářské bannery zůstávají na`,
     firmyLinkLabel: "/firmy",
     leadAfter: ".",
-    registerCta: "Registrovat firmu",
-    adsCta: "Inzerce v magazínu",
+    registerCta: "Zadat nabídku",
+    adsCta: "Návod pro inzerenty",
     regions: "Regiony: Česko · EU. Certifikace: CE / IVDR / ISO.",
     heroAlt: "Laboratorní stanice — tržiště výrobců MedScopeGlobal",
     listings: {
@@ -83,7 +84,7 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     firmyLinkLabel: "/firmy",
     leadAfter: ".",
     registerCta: "Register a company",
-    adsCta: "Magazine advertising",
+    adsCta: "Advertiser guide",
     regions: "Regions: Czechia · EU. Certification: CE / IVDR / ISO.",
     heroAlt: "Laboratory workstation — MedScopeGlobal manufacturer marketplace",
     listings: {
@@ -126,7 +127,7 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     firmyLinkLabel: "/firmy",
     leadAfter: ".",
     registerCta: "Firma registrieren",
-    adsCta: "Magazinwerbung",
+    adsCta: "Anleitung für Inserenten",
     regions: "Regionen: Tschechien · EU. Zertifizierung: CE / IVDR / ISO.",
     heroAlt: "Laborarbeitsplatz — MedScopeGlobal-Herstellermarktplatz",
     listings: {
@@ -169,7 +170,7 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     firmyLinkLabel: "/firmy",
     leadAfter: ".",
     registerCta: "Enregistrer une entreprise",
-    adsCta: "Publicité magazine",
+    adsCta: "Guide annonceurs",
     regions: "Régions : Tchéquie · UE. Certification : CE / IVDR / ISO.",
     heroAlt: "Poste de laboratoire — place de marché MedScopeGlobal",
     listings: {
@@ -212,7 +213,7 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     firmyLinkLabel: "/firmy",
     leadAfter: ".",
     registerCta: "Registra l’azienda",
-    adsCta: "Pubblicità sul magazine",
+    adsCta: "Guida inserzionisti",
     regions: "Regioni: Cechia · UE. Certificazione: CE / IVDR / ISO.",
     heroAlt: "Postazione di laboratorio — mercato produttori MedScopeGlobal",
     listings: {
@@ -255,7 +256,7 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     firmyLinkLabel: "/firmy",
     leadAfter: ".",
     registerCta: "Registrar empresa",
-    adsCta: "Publicidad en la revista",
+    adsCta: "Guía para anunciantes",
     regions: "Regiones: Chequia · UE. Certificación: CE / IVDR / ISO.",
     heroAlt: "Estación de laboratorio — mercado de fabricantes MedScopeGlobal",
     listings: {
@@ -298,7 +299,7 @@ const PACK: Record<ChromePack, ExchangeCopy> = {
     firmyLinkLabel: "/firmy",
     leadAfter: ".",
     registerCta: "Registrar empresa",
-    adsCta: "Publicidade na revista",
+    adsCta: "Guia para anunciantes",
     regions: "Regiões: Chéquia · UE. Certificação: CE / IVDR / ISO.",
     heroAlt: "Estação de laboratório — mercado de fabricantes MedScopeGlobal",
     listings: {
@@ -349,7 +350,10 @@ export function getExchangeCopy(locale?: string | null): ExchangeCopy {
   const packKey = chromePack(locale);
   const pack = PACK[packKey] ?? PACK.en;
   const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
-  const edition =
-    (packKey === "en" && primary !== "en") || primary === "pt" ? exchangeEdition(primary) : undefined;
+  const lang = marketplaceUiLang(locale);
+  /** Native marketplace languages keep editions; international and smaller locales stay English. */
+  const useEdition =
+    lang !== "en" && ((packKey === "en" && primary !== "en") || primary === "pt");
+  const edition = useEdition ? exchangeEdition(primary) : undefined;
   return applyEdition(pack, edition);
 }
