@@ -1,3 +1,4 @@
+import { localizeListedCzkIn } from "@/lib/i18n/payment-currency";
 import { marketplaceUiLang, type MarketplaceUiLang } from "@/lib/i18n/marketplace-ui-locale";
 
 export type MarketplaceSampleDemand = {
@@ -990,5 +991,5 @@ const PACK: Record<MarketplaceUiLang, MarketplaceUiCopy> = {
 };
 
 export function getMarketplaceUiCopy(locale?: string | null): MarketplaceUiCopy {
-  return PACK[marketplaceUiLang(locale)];
+  return localizeListedCzkIn(PACK[marketplaceUiLang(locale)], locale);
 }

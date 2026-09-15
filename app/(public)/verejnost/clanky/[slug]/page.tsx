@@ -20,7 +20,10 @@ import {
   type PublicTopic,
 } from "@/lib/queries/verejnost";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ from?: string; t?: string }>;
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -38,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export const dynamic = "force-dynamic";
 
-export default async function VerejnostClanekDetailPage({ params }: Props) {
+export default async function VerejnostClanekDetailPage({ params, searchParams }: Props) {
   const { slug } = await params;
   const locale = await getServerLocale();
   const article = await getPublicArticleBySlug(slug, locale);
@@ -46,11 +49,14 @@ export default async function VerejnostClanekDetailPage({ params }: Props) {
   const { isVip, accessLevel, hasEditorialAccess } = await getReaderContext();
   const requestHeaders = await headers();
   const jar = await cookies();
+  const query = searchParams ? await searchParams : {};
   const magazineMeterUnlocked = resolveMagazineMeterUnlock({
     cookie: jar.get(ARTICLE_METER_COOKIE)?.value,
     header: requestHeaders.get(ARTICLE_METER_HEADER),
     slug: article.slug,
     isBot: isSearchEngineBot(requestHeaders.get("user-agent")),
+    from: query.from,
+    newsletterToken: query.t,
   });
   const { locked } = resolveArticleBodyLock(article, {
     isVip,

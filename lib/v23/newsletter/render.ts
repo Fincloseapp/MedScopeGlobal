@@ -3,6 +3,7 @@ import { SITE } from "@/lib/config/site";
 import { pickAffiliateProducts } from "@/lib/monetization/affiliate-mix";
 import { affiliateGoPath } from "@/lib/monetization/affiliate-geo";
 import { getNewsletterCopy } from "@/lib/i18n/newsletter-copy";
+import { absoluteNewsletterHref } from "@/lib/monetization/newsletter-article-unlock";
 import type { V23NewsletterLayout } from "@/lib/v23/newsletter/types";
 
 function escapeHtml(s: string): string {
@@ -23,9 +24,8 @@ export function renderNewsletterHtml(layout: V23NewsletterLayout, locale = "cs")
           const thumb = item.imageUrl
             ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.imageAlt ?? item.title)}" loading="lazy" width="120" height="80" class="nl-item-img" />`
             : "";
-          const body = item.href
-            ? `<a href="${escapeHtml(item.href)}"><strong>${title}</strong></a><p>${summary}</p>`
-            : `<strong>${title}</strong><p>${summary}</p>`;
+          const href = absoluteNewsletterHref(item.href, locale);
+          const body = `<a href="${escapeHtml(href)}"><strong>${title}</strong></a><p>${summary}</p>`;
           return `<li class="nl-item">${thumb}<div class="nl-item-body">${body}</div></li>`;
         })
         .join("");
@@ -46,7 +46,8 @@ export function renderNewsletterHtml(layout: V23NewsletterLayout, locale = "cs")
       const thumb = r.imageUrl
         ? `<img src="${escapeHtml(r.imageUrl)}" alt="${escapeHtml(r.imageAlt ?? r.title)}" loading="lazy" width="120" height="80" class="nl-item-img" />`
         : "";
-      return `<li class="nl-item">${thumb}<div class="nl-item-body"><strong>${escapeHtml(r.title)}</strong><p>${escapeHtml(r.summary)}</p></div></li>`;
+      const href = absoluteNewsletterHref(r.href, locale);
+      return `<li class="nl-item">${thumb}<div class="nl-item-body"><a href="${escapeHtml(href)}"><strong>${escapeHtml(r.title)}</strong></a><p>${escapeHtml(r.summary)}</p></div></li>`;
     })
     .join("");
 
@@ -72,7 +73,7 @@ export function renderNewsletterHtml(layout: V23NewsletterLayout, locale = "cs")
   <section class="nl-section nl-cta">
     <h2>${escapeHtml(copy.hubLatest)}</h2>
     <ul>${recHtml}</ul>
-    <p><a href="/newsletter" class="nl-cta-link">${escapeHtml(copy.cta)} →</a></p>
+    <p><a href="${escapeHtml(absoluteNewsletterHref("/newsletter", locale))}" class="nl-cta-link">${escapeHtml(copy.cta)} →</a></p>
   </section>
   <section class="nl-section">
     <h2>${escapeHtml(copy.briefAffiliateKicker)}</h2>
@@ -91,6 +92,6 @@ export function renderNewsletterPdfText(layout: V23NewsletterLayout, locale = "c
     }
     lines.push("");
   }
-  lines.push(`${copy.cta}: https://www.medscopeglobal.com/newsletter`);
+  lines.push(`${copy.cta}: ${absoluteNewsletterHref("/newsletter", locale)}`);
   return lines.join("\n");
 }

@@ -373,6 +373,7 @@ import {
   aresSubjectUrl,
   formatLegalEntityLine,
   getLegalEntity,
+  publicBrandSignature,
   publicOrganizationAddress,
 } from "../../lib/config/legal-entity";
 import {
@@ -383,6 +384,7 @@ import {
   articleSlugFromPathname,
   decideArticleMeter,
   parseArticleMeter,
+  resolveMagazineMeterUnlock,
   serializeArticleMeter,
 } from "../../lib/monetization/article-meter";
 import { getArticleMeterCopy } from "../../lib/monetization/article-meter-copy";
@@ -394,6 +396,14 @@ import {
 } from "../../lib/v23/newsletter/locale-editions";
 import { magazineCategoriesForLocale } from "../../lib/editorial/magazine-category-copy";
 import { buildLocaleMagazineLayout } from "../../lib/v23/newsletter/locale-layout";
+import { renderNewsletterHtml } from "../../lib/v23/newsletter/render";
+import { fallbackNewsletterRow } from "../../lib/v22/newsletter";
+import {
+  absoluteNewsletterHref,
+  newsletterArticleUnlockToken,
+  verifyNewsletterArticleUnlock,
+  withNewsletterArticleUnlock,
+} from "../../lib/monetization/newsletter-article-unlock";
 import { classifyNewsletterIssues, mergeNewsletterIssues } from "../../lib/v23/newsletter/stand";
 import { generateNewsletterImage, resolveNewsletterItemImage } from "../../lib/v23/newsletter/generate-image";
 import {
@@ -2614,7 +2624,7 @@ assert.equal(newsletterIssueSlug("2026-09-03", "zh-CN"), "2026-09-03-cn");
 assert.equal(parseNewsletterIssueSlug("2026-09-03").locale, "cs");
 assert.equal(parseNewsletterIssueSlug("2026-09-03-pt-br").locale, "pt-BR");
 assert.equal(parseNewsletterIssueSlug("2026-09-03-jp").locale, "ja");
-assert.deepEqual(publicNewsletterSlugCandidates("2026-09-03", "de"), ["2026-09-03-de", "2026-09-03"]);
+assert.deepEqual(publicNewsletterSlugCandidates("2026-09-03", "de"), ["2026-09-03-de"]);
 assert.ok(NEWSLETTER_PRIMARY_LOCALES.includes("pt"));
 assert.ok(NEWSLETTER_PRIMARY_LOCALES.includes("pt-BR"));
 assert.equal(NEWSLETTER_PRIMARY_LOCALES.length, PRIMARY_EDITORIAL_LOCALES.length);
@@ -2647,6 +2657,61 @@ assert.equal(NEWSLETTER_PRIMARY_LOCALES.length, PRIMARY_EDITORIAL_LOCALES.length
   const deLayout = buildLocaleMagazineLayout({ ...empty, locale: "de" }, "2026-09-03", "de");
   assert.ok(!looksLikeCzech(deLayout.intro));
   assert.ok(deLayout.sections.some((sec) => /Lebensstil|Schlaf|Prävention|Langlebigkeit/i.test(sec.title)));
+  const deFallback = fallbackNewsletterRow("de");
+  assert.equal((deFallback.layout_json as { locale?: string } | null)?.locale, "de");
+  assert.ok(!looksLikeCzech(deFallback.title));
+  const html = renderNewsletterHtml(deLayout, "de");
+  assert.ok(html.includes("https://medscopeglobal.com/de/"));
+  assert.ok(!html.includes('href="/newsletter"'));
+  const htmlArticle = renderNewsletterHtml(
+    {
+      ...deLayout,
+      sections: deLayout.sections.map((sec, index) =>
+        index === 0
+          ? { ...sec, items: [{ title: "Schlaf", summary: "Kurz", href: "/article/schlaf-de" }] }
+          : sec
+      ),
+    },
+    "de"
+  );
+  assert.ok(htmlArticle.includes("from=nl"));
+  assert.ok(htmlArticle.includes("/de/article/schlaf-de"));
+}
+{
+  const token = newsletterArticleUnlockToken("sleep-and-longevity");
+  assert.equal(verifyNewsletterArticleUnlock("sleep-and-longevity", token), true);
+  assert.equal(verifyNewsletterArticleUnlock("sleep-and-longevity", "deadbeef"), false);
+  assert.equal(
+    resolveMagazineMeterUnlock({
+      slug: "sleep-and-longevity",
+      from: "nl",
+      newsletterToken: token,
+    }),
+    true
+  );
+  assert.equal(
+    resolveMagazineMeterUnlock({
+      slug: "sleep-and-longevity",
+      cookie: "1:alpha,beta,gamma",
+      from: "nl",
+      newsletterToken: "not-a-valid-unlock-token-xx",
+    }),
+    false
+  );
+  assert.equal(
+    resolveMagazineMeterUnlock({
+      slug: "sleep-and-longevity",
+      cookie: "1:alpha,beta,gamma",
+      from: "nl",
+      newsletterToken: token,
+    }),
+    true
+  );
+  assert.ok(withNewsletterArticleUnlock("/de/article/sleep-and-longevity").includes("from=nl"));
+  assert.ok(absoluteNewsletterHref("/article/sleep-and-longevity", "fr").includes("/fr/article/"));
+  assert.ok(publicBrandSignature("de").startsWith("MedScopeGlobal"));
+  assert.ok(publicBrandSignature("en").includes("operated by"));
+  assert.ok(!publicBrandSignature("fr").startsWith("Al Synaptica"));
 }
 assert.ok(
   readFileSync(join(root, "app/(admin)/admin/page.tsx"), "utf8").includes("Odběratelé briefu")
@@ -6015,6 +6080,9 @@ console.log(
   assert.equal(marketplaceUiLang("sk"), "sk");
   assert.equal(getMarketplaceUiCopy("ja").formTitle, getMarketplaceUiCopy("en").formTitle);
   assert.ok(getMarketplaceUiCopy("de").formTitle.includes("Marktplatz"));
+  assert.ok(!getMarketplaceUiCopy("de").pausalBanner.includes("Kč"));
+  assert.ok(!getMarketplaceUiCopy("en").orderPausalFrom.includes("CZK"));
+  assert.ok(getMarketplaceUiCopy("cs").orderPausalFrom.includes("Kč"));
   assert.ok(marketplaceReplyCopy("price", "en").subject.toLowerCase().includes("price"));
   assert.ok(marketplaceReplyCopy("price", "cs").subject.includes("Ceník"));
   assert.equal(salesMaxEmailsPerRun(), 500);
@@ -6028,6 +6096,8 @@ console.log(
   assert.equal(normalizeCzechIco("12345678"), "12345678");
   assert.equal(normalizeCzechIco("123"), null);
   assert.equal(salesPayInstructions().sellerIco, "06024963");
+  assert.ok(salesPayInstructions().sellerName.includes("MedScopeGlobal"));
+  assert.ok(!salesPayInstructions().sellerName.includes("Synaptica"));
   assert.ok(readFileSync(join(root, "lib/sales/pay.ts"), "utf8").includes("createGuestRetainerCheckout"));
   assert.ok(readFileSync(join(root, "app/api/stripe/webhook/route.ts"), "utf8").includes("pending === \"1\""));
   assert.ok(readFileSync(join(root, "app/(public)/inzerce/pausal/page.tsx"), "utf8").includes("salesPayInstructions"));
@@ -6035,7 +6105,7 @@ console.log(
   assert.ok(readFileSync(join(root, "components/sales/pausal-order-form.tsx"), "utf8").includes("billingInterval"));
   assert.ok(marketplaceReplyCopy("price").text.includes("450"));
   assert.ok(
-    readFileSync(join(root, "app/(public)/inzerce/page.tsx"), "utf8").includes("Zaplatit paušál") &&
+    readFileSync(join(root, "app/(public)/inzerce/page.tsx"), "utf8").includes("getMarketplaceUiCopy") &&
       readFileSync(join(root, "app/(public)/inzerce/page.tsx"), "utf8").includes("Magazín · jiný produkt"),
     "inzerce hub must split marketplace retainer from magazine campaigns"
   );
@@ -6070,7 +6140,15 @@ console.log(
       unsubscribeUrl: "https://medscopeglobal.com/api/sales/unsubscribe?email=x&token=y",
     });
     assert.ok(letter.html.includes(campaignMarketplaceUrl(locale.code)));
-    assert.ok(letter.html.includes("450") || letter.text.includes("450"));
+    assert.ok(letter.html.includes("MedScopeGlobal"));
+    assert.ok(!letter.html.includes("obchodního oddělení MedScopeGlobal (Al Synaptica"));
+    if (locale.code === "cs") {
+      assert.ok(letter.html.includes("450") || letter.text.includes("450"));
+      assert.ok(/Kč|CZK/.test(letter.html + letter.text));
+    } else {
+      assert.ok(!/\bKč\b|\bCZK\b/.test(letter.html + letter.text), locale.code);
+      assert.ok(/€|EUR|\$|USD/.test(letter.html + letter.text), locale.code);
+    }
     assert.ok(letter.html.includes("/api/sales/unsubscribe"));
     if (marketplaceUiLang(locale.code) === "en") {
       assert.ok(letter.subject.includes("marketplace"), locale.code);

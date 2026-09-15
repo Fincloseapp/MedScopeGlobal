@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   SALES_PACKAGES,
-  formatSalesCzk,
+  formatSalesPrice,
   salesEntryMonthlyCzk,
   salesYearlyCzk,
   salesYearlyEffectiveMonthCzk,
@@ -17,9 +17,11 @@ import type { SalesPayInstructions } from "@/lib/sales/pay";
 export function PausalOrderForm({
   defaultPackage,
   pay,
+  locale = "cs",
 }: {
   defaultPackage?: SalesPackageId;
   pay: SalesPayInstructions;
+  locale?: string;
 }) {
   const [packageId, setPackageId] = useState<SalesPackageId>(defaultPackage ?? "start");
   const [billingInterval, setBillingInterval] = useState<SalesBillingInterval>("month");
@@ -49,6 +51,7 @@ export function PausalOrderForm({
       packageId,
       billingInterval,
       termsAccepted: form.get("terms") === "on",
+      locale,
     };
     const res = await fetch("/api/sales/order", {
       method: "POST",
@@ -93,7 +96,7 @@ export function PausalOrderForm({
             {pay.bankAccount ? <p>Účet: {pay.bankAccount}</p> : null}
             {pay.iban ? <p>IBAN: {pay.iban}</p> : null}
             {done.variableSymbol ? <p>VS: {done.variableSymbol}</p> : null}
-            <p className="mt-1 text-xs text-slate-500">{pay.sellerName} · IČO {pay.sellerIco} · neplátce DPH</p>
+            <p className="mt-1 text-xs text-slate-500">{pay.sellerName} · {pay.sellerLegalName} · IČO {pay.sellerIco} · neplátce DPH</p>
           </div>
         ) : (
           <p className="mt-3 text-slate-600">
@@ -129,7 +132,7 @@ export function PausalOrderForm({
             onChange={() => setBillingInterval("month")}
           />
           <strong>Měsíčně</strong>
-          <p className="mt-1 text-xs text-slate-600">Platba každý měsíc. Start {formatSalesCzk(salesEntryMonthlyCzk())}.</p>
+          <p className="mt-1 text-xs text-slate-600">Platba každý měsíc. Start {formatSalesPrice(salesEntryMonthlyCzk(), locale)}.</p>
         </label>
         <label
           className={`cursor-pointer rounded-xl border p-3 text-sm ${
@@ -145,7 +148,7 @@ export function PausalOrderForm({
           />
           <strong>Ročně · 2 měsíce zdarma</strong>
           <p className="mt-1 text-xs text-slate-600">
-            Start {formatSalesCzk(salesYearlyCzk(salesEntryMonthlyCzk()))} / rok · {formatSalesCzk(salesYearlyEffectiveMonthCzk(salesEntryMonthlyCzk()))} / měs.
+            Start {formatSalesPrice(salesYearlyCzk(salesEntryMonthlyCzk()), locale)} / rok · {formatSalesPrice(salesYearlyEffectiveMonthCzk(salesEntryMonthlyCzk()), locale)} / měs.
           </p>
         </label>
       </div>
@@ -153,8 +156,8 @@ export function PausalOrderForm({
         {SALES_PACKAGES.map((pkg) => {
           const shown =
             billingInterval === "year"
-              ? `${formatSalesCzk(salesYearlyEffectiveMonthCzk(pkg.priceCzkMonth))}/měs. · ${formatSalesCzk(salesYearlyCzk(pkg.priceCzkMonth))}/rok`
-              : `${formatSalesCzk(pkg.priceCzkMonth)}/měs.`;
+              ? `${formatSalesPrice(salesYearlyEffectiveMonthCzk(pkg.priceCzkMonth), locale)}/měs. · ${formatSalesPrice(salesYearlyCzk(pkg.priceCzkMonth), locale)}/rok`
+              : `${formatSalesPrice(pkg.priceCzkMonth, locale)}/měs.`;
           return (
           <label
             key={pkg.id}
@@ -216,7 +219,7 @@ export function PausalOrderForm({
       </Button>
       <p className="text-xs text-slate-500">
         {pay.stripeReady
-          ? "Po odeslání otevřeme Stripe Checkout (měsíční nebo roční předplatné v Kč)."
+          ? `Po odeslání otevřeme Stripe Checkout (měsíční nebo roční předplatné, ${formatSalesPrice(salesEntryMonthlyCzk(), locale)} Start).`
           : `Platbu kartou dopíšeme — objednávka mezitím jde na ${pay.inbox}.`}
       </p>
     </form>

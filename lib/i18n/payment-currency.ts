@@ -52,33 +52,39 @@ const BY_REGION: Partial<Record<RegionCode, PaymentTiers>> = {
   INDIA: { amounts: [10000, 25000, 49000], currency: "inr", symbol: "₹", minAmount: 100 },
 };
 
+/** European B2B pages quote EUR (incl. SK/PL/RO/HU, which are not all eurozone). */
+const PUBLIC_EUR_PRIMARY = new Set([
+  "sk",
+  "de",
+  "fr",
+  "it",
+  "es",
+  "nl",
+  "pt",
+  "pl",
+  "ro",
+  "hu",
+  ...EUROZONE,
+]);
+
 /**
- * Stripe / UI currency from the visitor's language edition.
- * Czech page is always CZK; eurozone editions EUR; en-US USD; en-UK GBP.
- * Region cookie only fills gaps for generic English — it never overrides /cs or /fr.
+ * Public list / charge currency from the visitor's language edition.
+ * Czech stays CZK. European editions EUR. Every other non-Czech edition USD.
+ * Region cookie never overrides /cs or /fr.
  */
 export function paymentTiersForUser(
   locale: string | null | undefined,
   region?: string | null
 ): PaymentTiers {
   const normalized = normalizeLocale(locale);
-  const exact = BY_LOCALE[normalized];
-  if (exact) return exact;
-
   const primary = primaryArticleLocale(normalized);
-  if (BY_LOCALE[primary]) return BY_LOCALE[primary]!;
-  if (EUROZONE.has(primary)) return EUR;
 
-  const listed = GLOBAL_LOCALES.find((item) => item.code === normalized || item.code === primary);
-  if (listed?.currency === "CZK") return CZK;
-  if (listed?.currency === "EUR") return EUR;
-  if (listed?.currency === "USD") return USD;
+  if (normalized === "cs" || primary === "cs") return CZK;
 
-  if (region && region in BY_REGION && BY_REGION[region as RegionCode]) {
-    const regional = BY_REGION[region as RegionCode];
-    if (regional) return regional;
-  }
+  if (PUBLIC_EUR_PRIMARY.has(primary) && primary !== "be") return EUR;
+  if (EUROZONE.has(primary) && primary !== "be") return EUR;
 
+  void region;
   return USD;
 }
 
@@ -185,7 +191,9 @@ export function formatCzkListPrice(
 }
 
 /** Editorial CZK list prices that appear in public copy. Largest first. */
-const LISTED_CZK_AMOUNTS = [15000, 8000, 5000, 4900, 3900, 3500, 1788, 1490, 490, 390, 250, 149, 99, 89, 25] as const;
+const LISTED_CZK_AMOUNTS = [
+  15000, 8000, 5990, 5000, 4900, 4500, 3900, 3500, 3490, 1790, 1788, 1490, 890, 490, 450, 390, 375, 250, 149, 99, 89, 25,
+] as const;
 
 function listedAmountPattern(czk: number): string {
   const raw = String(czk);

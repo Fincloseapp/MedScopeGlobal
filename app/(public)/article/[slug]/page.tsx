@@ -92,7 +92,10 @@ import { localeToPathSegment } from "@/lib/i18n/locale-path";
 
 export const dynamic = "force-dynamic";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ from?: string; t?: string }>;
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -165,7 +168,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function ArticlePage({ params }: Props) {
+export default async function ArticlePage({ params, searchParams }: Props) {
   const { slug } = await params;
   const locale = await getServerLocale();
   const dict = await getDictionary(locale);
@@ -175,11 +178,14 @@ export default async function ArticlePage({ params }: Props) {
   const { isVip, accessLevel, hasEditorialAccess } = await getReaderContext();
   const requestHeaders = await headers();
   const jar = await cookies();
+  const query = searchParams ? await searchParams : {};
   const magazineMeterUnlocked = resolveMagazineMeterUnlock({
     cookie: jar.get(ARTICLE_METER_COOKIE)?.value,
     header: requestHeaders.get(ARTICLE_METER_HEADER),
     slug: article.slug,
     isBot: isSearchEngineBot(requestHeaders.get("user-agent")),
+    from: query.from,
+    newsletterToken: query.t,
   });
 
   const revenueArticle = {

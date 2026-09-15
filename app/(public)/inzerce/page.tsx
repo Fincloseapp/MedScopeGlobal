@@ -9,6 +9,7 @@ import { formatCzkListPrice, localizeListedCzk } from "@/lib/i18n/payment-curren
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { getInzerceCenikCopy } from "@/lib/i18n/inzerce-cenik-copy";
+import { getMarketplaceUiCopy } from "@/lib/i18n/marketplace-ui-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getServerLocale();
@@ -78,7 +79,7 @@ export default async function InzercePage() {
       title={copy.mediaKitTitle}
       description={copy.mediaKitLead}
       ctaHref={pausalHref}
-      ctaLabel="Objednat paušál od 450 Kč"
+      ctaLabel={localizeListedCzk("Objednat paušál od 450 Kč", locale)}
     >
       <div className="mb-8 grid gap-3 md:grid-cols-2">
         <article className="rounded-2xl border border-[#021d33] bg-[#021d33] px-5 py-5 text-white">
@@ -87,14 +88,14 @@ export default async function InzercePage() {
           </p>
           <h2 className="mt-2 font-display text-xl font-semibold">Měsíční paušál — karta Stripe</h2>
           <p className="mt-2 text-sm leading-6 text-white/80">
-            Od 450 Kč / měsíc, roční 375 Kč / měs. (2 měsíce zdarma). Nabídky, poptávky a faktura se zpracují v tržišti. Nejde o banner v článku.
+            {getMarketplaceUiCopy(locale).pausalBanner}
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link
               href={pausalHref}
               className="inline-flex rounded-full bg-[#c4a35a] px-5 py-2.5 text-sm font-semibold text-[#021d33]"
             >
-              Zaplatit paušál
+              {getMarketplaceUiCopy(locale).orderPausal}
             </Link>
             <Link href={exchangeHref} className="inline-flex text-sm font-semibold text-[#e8d5a3] hover:underline">
               Otevřít tržiště →
@@ -105,7 +106,10 @@ export default async function InzercePage() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#005B96]">Magazín · jiný produkt</p>
           <h2 className="mt-2 font-display text-xl font-semibold text-[#021d33]">Jednorázová kampaň u čtenářů</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Native banner od 5 000 Kč, sponzorovaný článek od 15 000 Kč. Vždy označená reklama. Není to paušál tržiště.
+            {localizeListedCzk(
+              "Native banner od 5 000 Kč, sponzorovaný článek od 15 000 Kč. Vždy označená reklama. Není to paušál tržiště.",
+              locale
+            )}
           </p>
           <Link href={formHref} className="mt-4 inline-flex text-sm font-semibold text-[#005B96] hover:underline">
             {copy.mediaKitCta} →

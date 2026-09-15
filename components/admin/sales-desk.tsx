@@ -116,7 +116,9 @@ export function SalesDesk() {
           <h1 className="mt-1 font-display text-3xl font-bold text-[#021d33]">Obchodní oddělení</h1>
           <p className="mt-2 max-w-3xl text-sm text-slate-600">
             Autonomní prodej paušální inzerce a tržiště. Paušál Start 450 Kč / měsíc, roční 4 500 Kč
-            (2 měsíce zdarma, 375 Kč / měs.). Kampaň posílá jen platné firemní role-schránky, denně
+            (2 měsíce zdarma, 375 Kč / měs.). Veřejné mutace uvádějí cenu v EUR nebo USD. Odesílatel
+            je MedScopeGlobal (medscopeglobal.com); Al Synaptica Research Institute s.r.o. je provozovatel
+            v patičce, ne v záhlaví nabídky. Kampaň posílá jen platné firemní role-schránky, denně
             spouští smyčku tržiště a vede k cíli 500 inzerentů Start v každé jazykové mutaci
             do 18. 9. 2026 14:00.
           </p>

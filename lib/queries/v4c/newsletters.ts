@@ -91,8 +91,6 @@ async function pickLatestIndexRow(locale?: string): Promise<NewsletterRow | null
   return (
     rows.find((row) => row.slug === preferredSlug) ??
     rows.find((row) => newsletterRowLocale(row) === resolved) ??
-    rows.find((row) => newsletterRowLocale(row) === "cs") ??
-    rows[0] ??
     null
   );
 }
@@ -187,6 +185,5 @@ export async function getNewsletterArchive(admin = false, locale?: string) {
   if (admin || !locale) return rows;
   const resolved = resolveGlobalLocale(locale);
   const matching = rows.filter((row) => newsletterRowLocale(row) === resolved);
-  if (matching.length) return matching;
-  return rows.filter((row) => newsletterRowLocale(row) === "cs");
+  return matching;
 }
