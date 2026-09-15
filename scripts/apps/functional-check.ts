@@ -2689,7 +2689,10 @@ assert.equal(NEWSLETTER_PRIMARY_LOCALES.length, PRIMARY_EDITORIAL_LOCALES.length
     false
   );
   assert.equal(verifyNewsletterArticleUnlock("sleep-and-longevity", token), true);
-  assert.ok(withNewsletterArticleUnlock("/de/article/sleep-and-longevity").includes("from=nl"));
+  assert.ok(
+    !readFileSync(join(root, "lib/monetization/article-meter.ts"), "utf8").includes("newsletter-article-unlock"),
+    "article-meter must stay Edge-safe for middleware"
+  );
   assert.ok(absoluteNewsletterHref("/article/sleep-and-longevity", "fr").includes("/fr/article/"));
   assert.ok(publicBrandSignature("de").startsWith("MedScopeGlobal"));
   assert.ok(publicBrandSignature("en").includes("operated by"));
