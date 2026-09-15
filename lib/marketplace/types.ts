@@ -76,4 +76,5 @@ export type MarketplaceIntakeInput = {
   contactEmail: string;
   phone?: string;
   source: "form" | "email" | "loop";
+  locale?: string | null;
 };

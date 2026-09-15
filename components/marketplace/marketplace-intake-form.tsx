@@ -3,10 +3,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { getTurnstileSiteKeyClient, useCaptchaToken } from "@/components/security/use-captcha";
+import { getMarketplaceUiCopy } from "@/lib/i18n/marketplace-ui-copy";
 
 type Kind = "offer" | "demand";
 
-export function MarketplaceIntakeForm({ defaultKind = "offer" }: { defaultKind?: Kind }) {
+export function MarketplaceIntakeForm({
+  defaultKind = "offer",
+  locale = "cs",
+}: {
+  defaultKind?: Kind;
+  locale?: string;
+}) {
+  const copy = getMarketplaceUiCopy(locale);
   const [kind, setKind] = useState<Kind>(defaultKind);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -20,13 +28,14 @@ export function MarketplaceIntakeForm({ defaultKind = "offer" }: { defaultKind?:
     setMessage(null);
     if (captchaRequired && !captchaToken) {
       setOk(false);
-      setMessage("Potvrďte CAPTCHA a odešlete znovu.");
+      setMessage(copy.captcha);
       setBusy(false);
       return;
     }
     const form = new FormData(e.currentTarget);
     const payload = {
       kind,
+      locale,
       company: String(form.get("company") ?? ""),
       title: String(form.get("title") ?? ""),
       summary: String(form.get("summary") ?? ""),
@@ -42,28 +51,25 @@ export function MarketplaceIntakeForm({ defaultKind = "offer" }: { defaultKind?:
       });
       const json = (await res.json()) as { message?: string; error?: string };
       setOk(res.ok);
-      setMessage(json.message ?? json.error ?? (res.ok ? "Odesláno." : "Odeslání selhalo."));
+      setMessage(json.message ?? json.error ?? (res.ok ? copy.sent : copy.failed));
       if (res.ok) e.currentTarget.reset();
     } catch {
       setOk(false);
-      setMessage("Síťová chyba. Obchodní oddělení záznam doplní z dalšího běhu.");
+      setMessage(copy.network);
     }
     setBusy(false);
   }
 
   return (
     <div id="formular" className="rounded-2xl border border-[#cfe1f3] bg-white p-5 shadow-sm">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">Jen firmy</p>
-      <h2 className="mt-1 font-display text-2xl font-semibold text-[#021d33]">Firemní formulář tržiště</h2>
-      <p className="mt-2 text-sm text-slate-600">
-        Firma, jeden pracovní e-mail, nabídka nebo poptávka. Bez telefonu, bez jména osoby, bez další schránky.
-        Magazín a předplatné čtenářů sem nepatří.
-      </p>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">{copy.formKicker}</p>
+      <h2 className="mt-1 font-display text-2xl font-semibold text-[#021d33]">{copy.formTitle}</h2>
+      <p className="mt-2 text-sm text-slate-600">{copy.formLead}</p>
       <div className="mt-4 flex flex-wrap gap-2">
         {(
           [
-            { id: "offer" as const, label: "Nabídka služeb" },
-            { id: "demand" as const, label: "Poptávka firmy" },
+            { id: "offer" as const, label: copy.kindOffer },
+            { id: "demand" as const, label: copy.kindDemand },
           ] as const
         ).map((item) => (
           <button
@@ -80,34 +86,31 @@ export function MarketplaceIntakeForm({ defaultKind = "offer" }: { defaultKind?:
       </div>
       <form onSubmit={(e) => void onSubmit(e)} className="mt-4 grid gap-3">
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-[#021d33]">Firma</span>
-          <input required name="company" placeholder="Název společnosti" className="w-full rounded-lg border px-3 py-2 text-sm" />
+          <span className="mb-1 block font-medium text-[#021d33]">{copy.company}</span>
+          <input required name="company" placeholder={copy.companyPh} className="w-full rounded-lg border px-3 py-2 text-sm" />
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-[#021d33]">Pracovní e-mail</span>
-          <input required type="email" name="contactEmail" placeholder="obchod@firma.cz" className="w-full rounded-lg border px-3 py-2 text-sm" />
+          <span className="mb-1 block font-medium text-[#021d33]">{copy.workEmail}</span>
+          <input required type="email" name="contactEmail" placeholder={copy.emailPh} className="w-full rounded-lg border px-3 py-2 text-sm" />
         </label>
         <label className="block text-sm">
           <span className="mb-1 block font-medium text-[#021d33]">
-            {kind === "demand" ? "Co poptáváte" : "Název nabídky"}
+            {kind === "demand" ? copy.demandTitle : copy.offerTitle}
           </span>
           <input required name="title" className="w-full rounded-lg border px-3 py-2 text-sm" />
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-[#021d33]">Stručný popis</span>
+          <span className="mb-1 block font-medium text-[#021d33]">{copy.summary}</span>
           <textarea required name="summary" rows={4} className="w-full rounded-lg border px-3 py-2 text-sm" />
         </label>
         <label className="flex items-start gap-2 text-xs text-slate-600">
           <input type="checkbox" name="terms" required className="mt-1" />
-          <span>
-            Jsem firma. Souhlasím se zpracováním tohoto e-mailu pro obsluhu tržiště (GDPR čl. 6 odst. 1 písm. b).
-            Inzerce bude označená. Osobní údaje třetích osob sem nevkládám.
-          </span>
+          <span>{copy.gdpr}</span>
         </label>
         <div className="space-y-3">
           {widget}
           <Button type="submit" disabled={busy || (captchaRequired && !captchaToken)} className="rounded-full bg-[#005B96]">
-            {busy ? "Odesílám…" : kind === "demand" ? "Zadat poptávku" : "Zveřejnit nabídku"}
+            {busy ? copy.submitting : kind === "demand" ? copy.submitDemand : copy.submitOffer}
           </Button>
         </div>
         {message ? <p className={`text-sm ${ok ? "text-emerald-800" : "text-amber-800"}`}>{message}</p> : null}

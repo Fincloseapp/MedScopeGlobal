@@ -117,7 +117,7 @@ export function SalesDesk() {
           <p className="mt-2 max-w-3xl text-sm text-slate-600">
             Autonomní prodej paušální inzerce a tržiště. Paušál Start 450 Kč / měsíc, roční 4 500 Kč
             (2 měsíce zdarma, 375 Kč / měs.). Kampaň posílá jen platné firemní role-schránky, denně
-            spouští smyčku tržiště a vede k cíli 250–500 inzerentů Start v každé jazykové mutaci
+            spouští smyčku tržiště a vede k cíli 500 inzerentů Start v každé jazykové mutaci
             do 18. 9. 2026 14:00.
           </p>
           {generated ? <p className="mt-1 text-xs text-slate-500">Stav k {generated}</p> : null}
@@ -242,7 +242,7 @@ export function SalesDesk() {
             },
             {
               label: "Cíl inzerentů Start / mutace",
-              value: `${data.campaign.byLocale[0]?.targetMin ?? 250}–${data.campaign.byLocale[0]?.targetMax ?? 500}`,
+              value: String(data.campaign.byLocale[0]?.targetMax ?? 500),
               hint: `Termín ${data.campaign.deadlineLabel}`,
             },
             {
@@ -325,7 +325,7 @@ export function SalesDesk() {
                       <th className="px-3 py-2">Tržiště</th>
                       <th className="px-3 py-2">Platné adresy</th>
                       <th className="px-3 py-2">Start inzerenti</th>
-                      <th className="px-3 py-2">Chybí do 250</th>
+                      <th className="px-3 py-2">Chybí do 500</th>
                     </tr>
                   </thead>
                   <tbody>

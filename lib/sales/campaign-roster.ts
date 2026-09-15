@@ -1,5 +1,6 @@
 import { GLOBAL_LOCALES, getLocaleConfig, type GlobalLocaleCode } from "@/lib/ecosystem/locales";
 import { hostnameFromWebsite, SALES_ICP_SEEDS } from "@/lib/sales/icp";
+import { CAMPAIGN_ROSTER_EXTRA } from "@/lib/sales/campaign-roster-extra";
 import {
   domainMatchesWebsite,
   isPersonalMailbox,
@@ -330,7 +331,7 @@ function uniqueSendable(rows: CampaignSeed[]): CampaignSeed[] {
 }
 
 export const CAMPAIGN_ROSTER: CampaignSeed[] = uniqueSendable(
-  [...rawFromIcp(), ...EXTRA].map(toSeed).filter((row): row is CampaignSeed => Boolean(row))
+  [...rawFromIcp(), ...EXTRA, ...CAMPAIGN_ROSTER_EXTRA].map(toSeed).filter((row): row is CampaignSeed => Boolean(row))
 );
 
 export function campaignSeedsForLocale(locale: string): CampaignSeed[] {

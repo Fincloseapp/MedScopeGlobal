@@ -12,6 +12,7 @@ export const chooseOfferSchema = z.object({
   email: z.string().email(),
   message: z.string().min(8).max(2000),
   termsAccepted: z.boolean(),
+  locale: z.string().max(16).optional(),
 });
 
 export async function chooseMarketplaceOffer(input: z.infer<typeof chooseOfferSchema>): Promise<{
@@ -23,7 +24,7 @@ export async function chooseMarketplaceOffer(input: z.infer<typeof chooseOfferSc
   const db = marketplaceDb();
   if (!db) return { ok: false, error: "database_unavailable" };
 
-  const offers = await listVisibleMarketplaceListings(db, "offer", 80);
+  const offers = await listVisibleMarketplaceListings(db, "offer", 200);
   const offer = offers.find((row) => row.id === input.offerId);
   if (!offer) return { ok: false, error: "offer_not_found" };
 
@@ -52,8 +53,8 @@ export async function chooseMarketplaceOffer(input: z.infer<typeof chooseOfferSc
     topic: "match",
   });
 
-  const prospects = await listProspects(db, 200);
-  const contracts = (await listContracts(db, 80)).filter((row) => row.status === "active");
+  const prospects = await listProspects(db, 800);
+  const contracts = (await listContracts(db, 500)).filter((row) => row.status === "active");
   const supplier = prospects.find((row) => row.email && offer.contact_email && row.email === offer.contact_email);
   const contract = supplier ? contracts.find((row) => row.prospect_id === supplier.id) : null;
   if (contract) {

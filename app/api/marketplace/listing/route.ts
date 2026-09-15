@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { withApiGuard } from "@/lib/security/api-guard";
+import { getMarketplaceUiCopy } from "@/lib/i18n/marketplace-ui-copy";
 import { ingestMarketplaceIntake } from "@/lib/marketplace/intake";
 
 export const dynamic = "force-dynamic";
 
 const schema = z.object({
   kind: z.enum(["offer", "demand", "question"]),
+  locale: z.string().max(16).optional(),
   company: z.string().min(2).max(200),
   title: z.string().min(4).max(180),
   summary: z.string().min(8).max(4000),
@@ -26,34 +28,47 @@ export async function POST(request: Request) {
   });
   if (!guard.ok) return guard.response;
 
-  let body: z.infer<typeof schema>;
+  let raw: unknown;
   try {
-    body = schema.parse(await request.json());
+    raw = await request.json();
   } catch {
-    return NextResponse.json({ error: "Neplatný formulář." }, { status: 400 });
-  }
-  if (body.termsAccepted === false) {
-    return NextResponse.json({ error: "Potřebujeme souhlas se zpracováním firemního e-mailu." }, { status: 400 });
+    return NextResponse.json({ error: getMarketplaceUiCopy().apiInvalid }, { status: 400 });
   }
 
-  const { termsAccepted: _terms, ...intake } = body;
+  const hintedLocale =
+    raw && typeof raw === "object" && "locale" in raw && typeof (raw as { locale?: unknown }).locale === "string"
+      ? (raw as { locale: string }).locale
+      : undefined;
+  const copy = getMarketplaceUiCopy(hintedLocale);
+
+  let body: z.infer<typeof schema>;
+  try {
+    body = schema.parse(raw);
+  } catch {
+    return NextResponse.json({ error: copy.apiInvalid }, { status: 400 });
+  }
+  if (body.termsAccepted === false) {
+    return NextResponse.json({ error: copy.apiTerms }, { status: 400 });
+  }
+
+  const { termsAccepted: _terms, locale, ...intake } = body;
   const result = await ingestMarketplaceIntake({
     ...intake,
+    locale,
     contactName: body.contactName || body.company,
     source: "form",
   });
   if (!result.ok) {
     return NextResponse.json(
-      { error: result.error === "database_unavailable" ? "Služba je dočasně nedostupná." : "Uložení selhalo." },
+      { error: result.error === "database_unavailable" ? copy.apiUnavailable : copy.apiSaveFailed },
       { status: result.error === "database_unavailable" ? 503 : 500 }
     );
   }
 
   const messages: Record<string, string> = {
-    offer:
-      "Nabídka je na tržišti. Na e-mail jde potvrzení a ceník paušálu — kontakty z poptávek dostanete po aktivaci.",
-    demand: "Poptávka je zveřejněná. Inzerenti s paušálem dostanou kontakt e-mailem. Vy nic neplatíte.",
-    question: "Dotaz jsme přijali. Automatická odpověď jde na váš e-mail, obchodní oddělení naváže podle potřeby.",
+    offer: copy.apiOfferOk,
+    demand: copy.apiDemandOk,
+    question: copy.apiQuestionOk,
   };
 
   return NextResponse.json({

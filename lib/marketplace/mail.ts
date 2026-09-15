@@ -1,14 +1,31 @@
 import { sendEmail } from "@/lib/email/engine";
+import { getMarketplaceUiCopy } from "@/lib/i18n/marketplace-ui-copy";
+import { marketplaceUiLang } from "@/lib/i18n/marketplace-ui-locale";
 import { marketplaceAdminNotifyEmail, marketplaceInboxEmail } from "@/lib/marketplace/config";
 import { marketplaceReplyCopy, type MarketplaceReplyTopic } from "@/lib/marketplace/auto-reply";
 import type { MarketplaceListing } from "@/lib/marketplace/types";
+import { campaignPublicUrl } from "@/lib/sales/campaign-copy";
+
+function helloLine(locale: string | null | undefined, company: string): string {
+  const lang = marketplaceUiLang(locale);
+  if (lang === "cs") return `Dobrý den, ${company},`;
+  if (lang === "sk") return `Dobrý deň, ${company},`;
+  if (lang === "de") return `Guten Tag, ${company},`;
+  if (lang === "fr") return `Bonjour, ${company},`;
+  if (lang === "it") return `Buongiorno, ${company},`;
+  if (lang === "es") return `Hola, ${company},`;
+  if (lang === "pl") return `Dzień dobry, ${company},`;
+  if (lang === "pt" || lang === "pt-BR") return `Olá, ${company},`;
+  return `Dear ${company},`;
+}
 
 export async function sendMarketplaceAutoReply(input: {
   to: string;
   topic: MarketplaceReplyTopic;
   listing?: MarketplaceListing | null;
+  locale?: string | null;
 }): Promise<{ ok: boolean; error?: string }> {
-  const letter = marketplaceReplyCopy(input.topic);
+  const letter = marketplaceReplyCopy(input.topic, input.locale);
   const sent = await sendEmail({
     to: input.to,
     replyTo: marketplaceInboxEmail(),
@@ -20,28 +37,36 @@ export async function sendMarketplaceAutoReply(input: {
       kind: "marketplace_auto_reply",
       topic: input.topic,
       listingId: input.listing?.id ?? null,
+      locale: input.locale ?? null,
     },
   });
   return { ok: sent.ok, error: sent.error };
 }
 
-export async function sendMarketplaceAck(listing: MarketplaceListing): Promise<{ ok: boolean; error?: string }> {
+export async function sendMarketplaceAck(
+  listing: MarketplaceListing,
+  locale?: string | null
+): Promise<{ ok: boolean; error?: string }> {
   if (!listing.contact_email) return { ok: false, error: "missing_email" };
+  const copy = getMarketplaceUiCopy(locale);
+  const loc = locale?.trim() || "cs";
   const isDemand = listing.kind === "demand";
-  const subject = isDemand
-    ? `Poptávka na tržišti MedScopeGlobal — ${listing.title}`
-    : `Nabídka na tržišti MedScopeGlobal — ${listing.title}`;
+  const subject = `${isDemand ? copy.ackDemandSubject : copy.ackOfferSubject} — ${listing.title}`;
+  const market = campaignPublicUrl(loc, "/exchange");
+  const pausal = campaignPublicUrl(loc, "/inzerce/pausal");
+  const navod = campaignPublicUrl(loc, "/exchange/navod");
   const html = isDemand
-    ? `<p>Dobrý den, ${listing.company},</p>
-       <p>poptávku <strong>${listing.title}</strong> jsme zveřejnili na tržišti. Inzerenti s aktivním paušálem dostanou kontakt e-mailem. Vy nic neplatíte.</p>
-       <p><a href="https://medscopeglobal.com/exchange#poptavky">Otevřít poptávky</a></p>
+    ? `<p>${helloLine(locale, listing.company)}</p>
+       <p>${copy.ackDemandHtml}</p>
+       <p><strong>${listing.title}</strong></p>
+       <p><a href="${market}">${copy.demandsHeading}</a></p>
        <p>MedScopeGlobal · inzerce@medscopeglobal.com</p>`
-    : `<p>Dobrý den, ${listing.company},</p>
-       <p>nabídku <strong>${listing.title}</strong> jsme přijali. Na tržišti je vidět hned. Kontakty z poptávek dostanete, jakmile je paušál aktivní — od 450 Kč / měsíc, roční 375 Kč / měs. (2 měsíce zdarma), bez provize z obchodu.</p>
-       <p><a href="https://medscopeglobal.com/inzerce/pausal">Objednat paušál</a> ·
-          <a href="https://medscopeglobal.com/exchange/navod">Návod</a> ·
-          <a href="https://medscopeglobal.com/exchange">Tržiště</a></p>
-       <p>Na tento e-mail můžete odpovědět s jakýmkoli dotazem — odpovíme automaticky.</p>
+    : `<p>${helloLine(locale, listing.company)}</p>
+       <p>${copy.ackOfferHtml}</p>
+       <p><strong>${listing.title}</strong></p>
+       <p><a href="${pausal}">${copy.orderPausal}</a> ·
+          <a href="${navod}">${copy.guideNav}</a> ·
+          <a href="${market}">${copy.offersHeading}</a></p>
        <p>MedScopeGlobal · inzerce@medscopeglobal.com</p>`;
   const sent = await sendEmail({
     to: listing.contact_email,
@@ -50,7 +75,7 @@ export async function sendMarketplaceAck(listing: MarketplaceListing): Promise<{
     html,
     text: subject,
     category: "transactional",
-    metadata: { kind: "marketplace_ack", listingId: listing.id, listingKind: listing.kind },
+    metadata: { kind: "marketplace_ack", listingId: listing.id, listingKind: listing.kind, locale: loc },
   });
   return { ok: sent.ok, error: sent.error };
 }

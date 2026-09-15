@@ -1,4 +1,5 @@
 import { sanitizeText } from "@/lib/security/sanitize";
+import { getMarketplaceUiCopy } from "@/lib/i18n/marketplace-ui-copy";
 import { classifyMarketplaceKind, classifyMarketplaceMessage } from "@/lib/marketplace/auto-reply";
 import { applyMarketplaceDeskSchema } from "@/lib/marketplace/schema";
 import {
@@ -28,6 +29,7 @@ export async function ingestMarketplaceIntake(input: MarketplaceIntakeInput): Pr
   if (!db) return { ok: false, autoReplied: false, error: "database_unavailable" };
 
   const email = input.contactEmail.trim().toLowerCase();
+  const ui = getMarketplaceUiCopy(input.locale);
   const listing = await insertMarketplaceListing(db, {
     kind: input.kind,
     status: input.kind === "question" ? "answered" : "visible",
@@ -35,7 +37,7 @@ export async function ingestMarketplaceIntake(input: MarketplaceIntakeInput): Pr
     title: sanitizeText(input.title, 180),
     summary: sanitizeText(input.summary, 4000),
     category: input.category ? sanitizeText(input.category, 80) : null,
-    region: input.region ? sanitizeText(input.region, 80) : "Česko + EU",
+    region: input.region ? sanitizeText(input.region, 80) : ui.regionDefault,
     cert: input.cert ? sanitizeText(input.cert, 80) : null,
     contact_name: sanitizeText(input.contactName || input.company, 120),
     contact_email: email,
@@ -97,8 +99,8 @@ export async function ingestMarketplaceIntake(input: MarketplaceIntakeInput): Pr
   const topic = classifyMarketplaceMessage(`${listing.title} ${listing.summary}`);
   const ack =
     input.kind === "question"
-      ? await sendMarketplaceAutoReply({ to: email, topic, listing })
-      : await sendMarketplaceAck(listing);
+      ? await sendMarketplaceAutoReply({ to: email, topic, listing, locale: input.locale })
+      : await sendMarketplaceAck(listing, input.locale);
 
   if (ack.ok) {
     await updateMarketplaceListing(db, listing.id, {
@@ -123,8 +125,8 @@ export async function ingestMarketplaceIntake(input: MarketplaceIntakeInput): Pr
 async function broadcastDemandToAdvertisers(listing: MarketplaceListing): Promise<void> {
   const db = marketplaceDb();
   if (!db || !listing.contact_email) return;
-  const contracts = (await listContracts(db, 80)).filter((c) => c.status === "active").slice(0, 20);
-  const prospects = await listProspects(db, 200);
+  const contracts = (await listContracts(db, 500)).filter((c) => c.status === "active").slice(0, 500);
+  const prospects = await listProspects(db, 800);
   const byId = new Map(prospects.map((p) => [p.id, p]));
   for (const contract of contracts) {
     const prospect = byId.get(contract.prospect_id) ?? null;
