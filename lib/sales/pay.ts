@@ -4,7 +4,8 @@ import { getLegalEntity } from "@/lib/config/legal-entity";
 import { SITE } from "@/lib/config/site";
 import { marketplaceAdminNotifyEmail, marketplaceInboxEmail } from "@/lib/marketplace/config";
 import { createStripeClient, getStripeSecretKey } from "@/lib/stripe/client";
-import { formatSalesCzk, salesPackageById } from "@/lib/sales/packages";
+import { formatSalesCzk, salesChargeCzk, salesPackageById, salesStripeLine } from "@/lib/sales/packages";
+import type { SalesBillingInterval } from "@/lib/sales/types";
 import { randomToken, salesVariableSymbol } from "@/lib/sales/ids";
 
 export type SalesPayInstructions = {
@@ -47,6 +48,7 @@ export async function createGuestRetainerCheckout(input: {
   address?: string;
   packageId: string;
   offerText?: string;
+  billingInterval?: SalesBillingInterval;
 }): Promise<{ url: string; pendingId: string } | null> {
   const key = getStripeSecretKey();
   const pkg = salesPackageById(input.packageId);
@@ -54,13 +56,15 @@ export async function createGuestRetainerCheckout(input: {
   const pendingId = randomToken(12);
   const origin = SITE.url.replace(/\/$/, "");
   const stripe = createStripeClient(key);
+  const interval: SalesBillingInterval = input.billingInterval === "year" ? "year" : "month";
+  const line = salesStripeLine(pkg.priceCzkMonth, interval);
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     locale: "cs",
     billing_address_collection: "required",
     tax_id_collection: { enabled: true },
     custom_text: {
-      submit: { message: "Měsíční paušál tržiště MedScopeGlobal. Neplátce DPH." },
+      submit: { message: `${line.description}. Neplátce DPH.` },
     },
     success_url: `${origin}/inzerce/pausal?paid=1&pending=${encodeURIComponent(pendingId)}`,
     cancel_url: `${origin}/inzerce/pausal?cancelled=1`,
@@ -75,6 +79,7 @@ export async function createGuestRetainerCheckout(input: {
       ico: (input.ico ?? "").slice(0, 20),
       address: (input.address ?? "").slice(0, 200),
       package_id: input.packageId,
+      billing_interval: interval,
       offer_text: (input.offerText ?? "").slice(0, 200),
     },
     subscription_data: {
@@ -83,6 +88,7 @@ export async function createGuestRetainerCheckout(input: {
         pending: "1",
         pending_id: pendingId,
         package_id: input.packageId,
+        billing_interval: interval,
       },
     },
     line_items: [
@@ -90,11 +96,11 @@ export async function createGuestRetainerCheckout(input: {
         quantity: 1,
         price_data: {
           currency: "czk",
-          recurring: { interval: "month" },
-          unit_amount: Math.round(pkg.priceCzkMonth * 100),
+          recurring: line.recurring,
+          unit_amount: line.unitAmount,
           product_data: {
             name: `MedScopeGlobal inzerce — ${pkg.name}`,
-            description: `Měsíční paušál ${input.company}`,
+            description: `${line.description} · ${input.company}`,
           },
         },
       },
@@ -115,10 +121,13 @@ export async function notifyPausalOrder(input: {
   invoiceNumber?: string;
   guest?: boolean;
   skipBuyer?: boolean;
+  billingInterval?: SalesBillingInterval;
 }): Promise<void> {
   const pkg = salesPackageById(input.packageId);
   const pay = salesPayInstructions();
-  const amount = pkg ? formatSalesCzk(pkg.priceCzkMonth) : "";
+  const interval: SalesBillingInterval = input.billingInterval === "year" ? "year" : "month";
+  const amount = pkg ? formatSalesCzk(salesChargeCzk(pkg.priceCzkMonth, interval)) : "";
+  const period = interval === "year" ? "/ rok (2 měsíce zdarma)" : "/ měsíc";
   const vs = input.variableSymbol ? `VS ${input.variableSymbol}` : "";
   const bank = [pay.iban ? `IBAN ${pay.iban}` : null, pay.bankAccount ? `účet ${pay.bankAccount}` : null]
     .filter(Boolean)
@@ -133,7 +142,7 @@ export async function notifyPausalOrder(input: {
     await sendEmail({
       to: input.email,
       subject: `Objednávka paušálu ${pkg?.name ?? ""} — MedScopeGlobal`,
-      html: `<p>Dobrý den,</p><p>přijali jsme objednávku paušálu <strong>${pkg?.name ?? ""}</strong> pro ${input.company} (${amount} / měsíc, neplátce DPH).</p><p>${payLine}</p><p>Tržiště zpracuje inzerci u sebe — ne jako jednorázový banner v článku. Podmínky: ${SITE.url.replace(/\/$/, "")}/inzerce/podminky</p>`,
+      html: `<p>Dobrý den,</p><p>přijali jsme objednávku paušálu <strong>${pkg?.name ?? ""}</strong> pro ${input.company} (${amount} ${period}, neplátce DPH).</p><p>${payLine}</p><p>Tržiště zpracuje inzerci u sebe — ne jako jednorázový banner v článku. Podmínky: ${SITE.url.replace(/\/$/, "")}/inzerce/podminky</p>`,
       text: `Objednávka ${pkg?.name ?? ""} ${amount}. ${payLine}`,
       category: "transactional",
       metadata: { kind: "sales_order_ack", guest: String(Boolean(input.guest)) },

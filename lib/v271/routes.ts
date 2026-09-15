@@ -260,7 +260,7 @@ export const V271_FIRMY_PAGES: Record<string, V271HubPage> = {
       "Pharma, kliniky, laboratoře a univerzity — banner od 5 000 Kč/měs., sponzorovaný článek 15 000 Kč, enterprise na míru.",
     links: [
       { label: "Ceník", href: "/firmy/cenik", description: "Banner 5 000 Kč · článek 15 000 Kč" },
-      { label: "Měsíční paušál", href: "/inzerce/pausal", description: "Od 4 900 Kč / měsíc s fakturou" },
+      { label: "Měsíční paušál", href: "/inzerce/pausal", description: "Od 450 Kč / měsíc, roční 2 měsíce zdarma" },
       { label: "Reklama", href: "/firmy/reklama", description: "Bannery a newsletter sloty" },
       { label: "Partnerství", href: "/firmy/partnerstvi", description: "Univerzitní spolupráce" },
       { label: "Kampaně", href: "/firmy/kampane", description: "Segmentace lékaři / studenti" },

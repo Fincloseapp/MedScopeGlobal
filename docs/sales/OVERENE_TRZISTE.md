@@ -25,7 +25,7 @@ Spodní B2B blok homepage (`V271B2bBlock`) má dva sloupce: tmavé **tržiště*
 
 ## 2. Co tržiště vydělává
 
-Výnos je **měsíční paušál inzerenta** (Start 4 900 Kč → Partner 69 900 Kč), ne provize z obchodu
+Výnos je **paušál inzerenta** (Start 450 Kč / měsíc, roční 375 Kč / měs. se 2 měsíci zdarma → Partner 5 990 Kč), ne provize z obchodu
 a ne jednorázový banner v článku.
 
 Platící inzerent dostane:
@@ -149,7 +149,7 @@ skládá živé paušály + schválené listingy přes server.
 ## 10. Jak vydělat dnes
 
 1. Veřejný nákup: `/inzerce/pausal` — IČO + adresa, karta Stripe (hostující checkout i bez databáze) nebo převod.
-   Z homepage **Vstoupit na tržiště** i **Objednat paušál**, z `/exchange` **Objednat paušál od 4 900 Kč**, z `/inzerce` karta **Zaplatit paušál**.
+   Z homepage **Vstoupit na tržiště** i **Objednat paušál**, z `/exchange` **Objednat paušál od 450 Kč**, z `/inzerce` karta **Zaplatit paušál**.
 2. Webhook `/api/stripe/webhook` s `kind=sales_retainer` (i `pending=1`) spáruje platbu se smlouvou, jakmile je SQL.
 3. Doplňte `LEGAL_ENTITY_IBAN` pro QR/převod a e-mailový transport, ať faktura opravdu odejde.
 4. Bez service role objednávka **nespadne** — jde e-mail na inzerenta i `ads@` a Stripe session, pokud je klíč.

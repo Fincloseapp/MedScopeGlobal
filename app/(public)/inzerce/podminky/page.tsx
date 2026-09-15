@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
 import { getLegalEntity } from "@/lib/config/legal-entity";
-import { SALES_PACKAGES, formatSalesCzk } from "@/lib/sales/packages";
+import { SALES_PACKAGES, formatSalesCzk, salesYearlyCzk } from "@/lib/sales/packages";
 
 export const metadata: Metadata = {
   title: "Podmínky inzerce",
@@ -44,7 +44,7 @@ export default async function InzercePodminkyPage({
       <ul>
         {SALES_PACKAGES.map((pkg) => (
           <li key={pkg.id}>
-            {pkg.name} — {formatSalesCzk(pkg.priceCzkMonth)} / měsíc
+            {pkg.name} — {formatSalesCzk(pkg.priceCzkMonth)} / měsíc, nebo {formatSalesCzk(salesYearlyCzk(pkg.priceCzkMonth))} / rok (2 měsíce zdarma)
           </li>
         ))}
       </ul>
@@ -53,7 +53,7 @@ export default async function InzercePodminkyPage({
       <p>
         Objednávka na <Link href="/inzerce/pausal">/inzerce/pausal</Link> je nabídka k uzavření smlouvy o
         poskytování reklamní služby. Smlouva vzniká úhradou první faktury nebo aktivací Stripe předplatného.
-        Paušál se obnovuje na další měsíc, dokud jej inzerent neskončí e-mailem na {entity.supportEmail}{" "}
+        Paušál se obnovuje na další období (měsíc nebo rok), dokud jej inzerent neskončí e-mailem na {entity.supportEmail}{" "}
         nejméně 14 dní před koncem období, nebo zrušením Stripe předplatného.
       </p>
 

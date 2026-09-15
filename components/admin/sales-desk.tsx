@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import type { SalesSnapshot } from "@/lib/sales/types";
-import { formatSalesCzk } from "@/lib/sales/packages";
+import { formatSalesCzk, salesYearlyCzk, salesYearlyEffectiveMonthCzk } from "@/lib/sales/packages";
 import { salesControlWorst } from "@/lib/sales/control";
 
 type Tab = "prehled" | "trziste" | "smycka" | "pipeline" | "inzerenti" | "outreach" | "faktury" | "poptavky" | "pravni";
@@ -268,6 +268,9 @@ export function SalesDesk() {
               <div key={pkg.id} className="rounded-2xl border border-[#d9e8f4] bg-white p-4">
                 <p className="font-semibold text-[#021d33]">
                   {pkg.name} · {formatSalesCzk(pkg.priceCzkMonth)} / měsíc
+                  <span className="block text-xs font-normal text-slate-500">
+                    roční {formatSalesCzk(salesYearlyEffectiveMonthCzk(pkg.priceCzkMonth))} / měs. · {formatSalesCzk(salesYearlyCzk(pkg.priceCzkMonth))} / rok
+                  </span>
                 </p>
                 <p className="mt-1 text-sm text-slate-600">{pkg.tagline}</p>
               </div>

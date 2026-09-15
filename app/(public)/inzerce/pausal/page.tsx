@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ModulePageShell } from "@/components/b2b/module-page-shell";
 import { PausalOrderForm } from "@/components/sales/pausal-order-form";
-import { formatSalesCzk, SALES_PACKAGES } from "@/lib/sales/packages";
+import { formatSalesCzk, SALES_PACKAGES, salesFromPriceLabel, salesYearlyCzk, salesYearlyEffectiveMonthCzk } from "@/lib/sales/packages";
 import { salesPayInstructions } from "@/lib/sales/pay";
 import { aresSubjectUrl } from "@/lib/config/legal-entity";
 import { SITE } from "@/lib/config/site";
@@ -10,7 +10,7 @@ import { SITE } from "@/lib/config/site";
 export const metadata: Metadata = {
   title: "Měsíční paušál inzerce na tržišti",
   description:
-    "Plaťte paušál od 4 900 Kč / měsíc. Tržiště zpracuje inzerci, fakturu a poptávky. Karta Stripe nebo převod.",
+    `Plaťte paušál ${salesFromPriceLabel()} / měsíc. Roční předplatné má 2 měsíce zdarma. Tržiště zpracuje inzerci, fakturu a poptávky. Karta Stripe nebo převod.`,
 };
 
 export default async function InzercePausalPage({
@@ -51,7 +51,7 @@ export default async function InzercePausalPage({
     <ModulePageShell
       eyebrow="Tržiště · paušál"
       title="Plaťte paušál. Inzerce se zpracuje v tržišti."
-      description="Od 4 900 Kč měsíčně: profil, předání poptávek, faktura. Nejde o jednorázový banner v článku — ten zůstává na /firmy. Neplátce DPH."
+      description={`${salesFromPriceLabel()} měsíčně, nebo ${formatSalesCzk(salesYearlyEffectiveMonthCzk(SALES_PACKAGES[0]!.priceCzkMonth))} / měs. při roční platbě (2 měsíce zdarma). Nejde o jednorázový banner v článku — ten zůstává na /firmy. Neplátce DPH.`}
       ctaHref="#objednat"
       ctaLabel="K objednávce a platbě"
     >
@@ -84,7 +84,7 @@ export default async function InzercePausalPage({
           · neplátce DPH
         </p>
         <p className="mt-2 text-sm text-white/75">
-          {pay.stripeReady ? "Dnes: karta Stripe (měsíční předplatné)." : "Karta Stripe se dopisuje."}{" "}
+          {pay.stripeReady ? "Dnes: karta Stripe (měsíčně nebo ročně, 2 měsíce zdarma)." : "Karta Stripe se dopisuje."}{" "}
           {pay.iban ? `Převod IBAN ${pay.iban}.` : "Převod po doplnění IBAN v prostředí, nebo e-mailem na schránku tržiště."}{" "}
           Schránka {pay.inbox}
           {pay.supportPhone ? ` · ${pay.supportPhone}` : ""}.
@@ -100,6 +100,10 @@ export default async function InzercePausalPage({
             <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">{pkg.name}</p>
             <p className="mt-2 font-display text-3xl font-bold text-[#021d33]">{formatSalesCzk(pkg.priceCzkMonth)}</p>
             <p className="text-xs text-slate-500">měsíčně · neplátce DPH</p>
+            <p className="mt-1 text-sm font-semibold text-[#005B96]">
+              Ročně {formatSalesCzk(salesYearlyEffectiveMonthCzk(pkg.priceCzkMonth))} / měs. · {formatSalesCzk(salesYearlyCzk(pkg.priceCzkMonth))} / rok
+            </p>
+            <p className="text-[11px] text-slate-500">2 měsíce zdarma při roční platbě</p>
             <p className="mt-2 text-sm text-slate-600">{pkg.tagline}</p>
             <ul className="mt-3 space-y-1 text-sm text-slate-700">
               {pkg.features.map((item) => (

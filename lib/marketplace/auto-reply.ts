@@ -1,3 +1,5 @@
+import { formatSalesCzk, salesPriceListPlain, salesFromPriceLabel, salesYearlyEffectiveMonthCzk, salesEntryMonthlyCzk } from "@/lib/sales/packages";
+
 export type MarketplaceReplyTopic =
   | "price"
   | "publish"
@@ -36,8 +38,7 @@ export function marketplaceReplyCopy(topic: MarketplaceReplyTopic): { subject: s
   const bodies: Record<MarketplaceReplyTopic, { subject: string; lead: string }> = {
     price: {
       subject: "Ceník inzerce na tržišti MedScopeGlobal",
-      lead:
-        "Měsíční paušál začíná na 4 900 Kč (Start). Viditelnost 9 900 Kč, Magazín 19 900 Kč, Klinický 39 900 Kč, Partner 69 900 Kč. Nejsme plátci DPH. Provizi z obchodu nebereme — platíte jen paušál za plochy a předání poptávek.",
+      lead: salesPriceListPlain(),
     },
     publish: {
       subject: "Jak zveřejnit nabídku na tržišti MedScopeGlobal",
@@ -67,7 +68,7 @@ export function marketplaceReplyCopy(topic: MarketplaceReplyTopic): { subject: s
     general: {
       subject: "Tržiště MedScopeGlobal — nabídky, poptávky a paušál",
       lead:
-        "Tržiště spojuje nabídky výrobců s poptávkami nemocnic a laboratoří. Inzerent vidí poptávky a dostane kontakty e-mailem. Kupující vidí nabídky hned. Paušál od 4 900 Kč / měsíc, bez provize z obchodu.",
+        `Tržiště spojuje nabídky výrobců s poptávkami nemocnic a laboratoří. Inzerent vidí poptávky a dostane kontakty e-mailem. Kupující vidí nabídky hned. Paušál ${salesFromPriceLabel()} / měsíc, roční ${formatSalesCzk(salesYearlyEffectiveMonthCzk(salesEntryMonthlyCzk()))} / měs. (2 měsíce zdarma), bez provize z obchodu.`,
     },
   };
   const item = bodies[topic];

@@ -255,8 +255,12 @@ import { generateInvoiceHtml } from "../../lib/billing/invoice-generator";
 import { buildSpdString } from "../../lib/billing/spd-qr";
 import {
   SALES_PACKAGES,
+  SALES_YEARLY_BILLED_MONTHS,
   salesPackageById,
   formatSalesCzk,
+  salesYearlyCzk,
+  salesYearlyEffectiveMonthCzk,
+  salesStripeLine,
 } from "../../lib/sales/packages";
 import { SALES_ICP_SEEDS, icpRequiresProfessionalOnly } from "../../lib/sales/icp";
 import {
@@ -274,7 +278,7 @@ import { evaluateSalesControl, salesControlWorst } from "../../lib/sales/control
 import { scoreOfferToDemand, buildMarketplaceLoopModel } from "../../lib/sales/marketplace-loop";
 import { normalizeCzechIco, salesPayInstructions } from "../../lib/sales/pay";
 import { MARKETPLACE_DESK_SQL } from "../../lib/marketplace/schema";
-import { classifyMarketplaceKind, classifyMarketplaceMessage } from "../../lib/marketplace/auto-reply";
+import { classifyMarketplaceKind, classifyMarketplaceMessage, marketplaceReplyCopy } from "../../lib/marketplace/auto-reply";
 import { SAMPLE_DEMANDS } from "../../lib/marketplace/board";
 import { briefChrome } from "../../lib/monetization/brief-marketing";
 import { translateNavHref } from "../../lib/i18n/nav-copy";
@@ -5876,10 +5880,20 @@ console.log(
 
 {
   assert.equal(SALES_PACKAGES.length, 5);
-  assert.equal(salesPackageById("start")?.priceCzkMonth, 4900);
+  assert.equal(SALES_YEARLY_BILLED_MONTHS, 10);
+  assert.equal(salesPackageById("start")?.priceCzkMonth, 450);
+  assert.equal(salesPackageById("visible")?.priceCzkMonth, 890);
+  assert.equal(salesPackageById("magazine")?.priceCzkMonth, 1790);
+  assert.equal(salesPackageById("clinical")?.priceCzkMonth, 3490);
+  assert.equal(salesPackageById("partner")?.priceCzkMonth, 5990);
+  assert.equal(salesYearlyCzk(450), 4500);
+  assert.equal(salesYearlyEffectiveMonthCzk(450), 375);
+  assert.equal(salesStripeLine(450, "month").unitAmount, 45000);
+  assert.equal(salesStripeLine(450, "year").unitAmount, 450000);
+  assert.equal(salesStripeLine(450, "year").recurring.interval, "year");
   assert.equal(salesPackageById("partner")?.slaHours, 8);
   assert.ok(salesPackageById("magazine")?.highlighted);
-  assert.ok(formatSalesCzk(19900).includes("19"));
+  assert.ok(formatSalesCzk(1790).includes("790"));
   assert.ok(SALES_ICP_SEEDS.length >= 20);
   assert.ok(SALES_ICP_SEEDS.every((row) => row.website.startsWith("https://")));
   assert.equal(icpRequiresProfessionalOnly("pharma_rx"), true);
@@ -5981,6 +5995,9 @@ console.log(
   assert.ok(readFileSync(join(root, "lib/sales/pay.ts"), "utf8").includes("createGuestRetainerCheckout"));
   assert.ok(readFileSync(join(root, "app/api/stripe/webhook/route.ts"), "utf8").includes("pending === \"1\""));
   assert.ok(readFileSync(join(root, "app/(public)/inzerce/pausal/page.tsx"), "utf8").includes("salesPayInstructions"));
+  assert.ok(readFileSync(join(root, "app/(public)/inzerce/pausal/page.tsx"), "utf8").includes("2 měsíce zdarma"));
+  assert.ok(readFileSync(join(root, "components/sales/pausal-order-form.tsx"), "utf8").includes("billingInterval"));
+  assert.ok(marketplaceReplyCopy("price").text.includes("450"));
   assert.ok(
     readFileSync(join(root, "app/(public)/inzerce/page.tsx"), "utf8").includes("Zaplatit paušál") &&
       readFileSync(join(root, "app/(public)/inzerce/page.tsx"), "utf8").includes("Magazín · jiný produkt"),

@@ -32,15 +32,17 @@ Příjem e-mailem: `inzerce@medscopeglobal.com` → `/api/marketplace/inbound-em
 9. **Obnova / dunning** — 7 dní před koncem nová faktura (převod); Stripe strhává sám. Po splatnosti + 3 dny paušál pozastaví plochy.
 10. **Audit** — `sales_runs`, `sales_events`, e-mailové logy, Stripe webhook `kind=sales_retainer`.
 
-## Tarify (Kč / měsíc, bez DPH — provozovatel je neplátce)
+## Tarify (Kč, bez DPH — provozovatel je neplátce)
 
-| ID | Název | Kč | Plnění |
-|----|-------|----|--------|
-| start | Start | 4 900 | adresář, landing, poptávky SLA 72 h |
-| visible | Viditelnost | 9 900 | + sidebar článků, SLA 48 h |
-| magazine | Magazín | 19 900 | + homepage mid, newsletter patička, report, SLA 24 h |
-| clinical | Klinický | 39 900 | + homepage top, inline, newsletter střed, zmínka, SLA 12 h |
-| partner | Partner | 69 900 | + newsletter hlavička, digitální zdraví, SLA 8 h |
+Měsíční platba, nebo roční předplatné = 10 měsíců (2 měsíce zdarma).
+
+| ID | Název | / měsíc | / rok | efektivně / měs. | Plnění |
+|----|-------|---------|-------|------------------|--------|
+| start | Start | 450 | 4 500 | 375 | adresář, landing, poptávky SLA 72 h |
+| visible | Viditelnost | 890 | 8 900 | 742 | + sidebar článků, SLA 48 h |
+| magazine | Magazín | 1 790 | 17 900 | 1 492 | + homepage mid, newsletter patička, report, SLA 24 h |
+| clinical | Klinický | 3 490 | 34 900 | 2 908 | + homepage top, inline, newsletter střed, zmínka, SLA 12 h |
+| partner | Partner | 5 990 | 59 900 | 4 992 | + newsletter hlavička, digitální zdraví, SLA 8 h |
 
 ## Právní brány (nesmí se vypnout v kódu)
 

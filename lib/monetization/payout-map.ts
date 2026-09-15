@@ -97,7 +97,7 @@ export const PAYOUT_CHANNELS: PayoutChannel[] = [
   {
     id: "b2b",
     title: "Vlastní inzerce (B2B)",
-    whatEarns: "Měsíční paušál inzerce od 4 900 Kč (Start) až Partner 69 900 Kč, plus jednorázové kampaně.",
+    whatEarns: "Měsíční paušál inzerce od 450 Kč (Start) až Partner 5 990 Kč, plus jednorázové kampaně. Roční = 2 měsíce zdarma.",
     whereYouSeeMoney: "Faktura inzerentovi + Stripe subscription. Dashboard /admin/sales, objednávka /inzerce/pausal.",
     payoutTo: "Firemní účet Al Synaptica Research Institute s.r.o. — žádný affiliate účet.",
     signupUrl: "https://medscopeglobal.com/inzerce/pausal",

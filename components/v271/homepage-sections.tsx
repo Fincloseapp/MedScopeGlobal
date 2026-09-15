@@ -245,7 +245,7 @@ export function V271B2bBlock({ locale = "cs" }: { locale?: string }) {
               Vstoupit na tržiště
             </Link>
             <Link href={pausalHref} className="rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white">
-              Paušál od 4 900 Kč
+              Paušál od 450 Kč
             </Link>
           </div>
         </div>

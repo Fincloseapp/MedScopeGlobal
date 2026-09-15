@@ -10,6 +10,7 @@
  */
 
 import { addMonthsIso, randomToken, slugifyCompany } from "@/lib/sales/ids";
+import { salesEntryMonthlyCzk } from "@/lib/sales/packages";
 import { salesDb } from "@/lib/sales/store";
 import type { SalesLegalBasis } from "@/lib/sales/types";
 
@@ -258,7 +259,7 @@ async function persistLoop(result: MarketplaceLoopResult): Promise<boolean> {
         prospect_id: supplier.id,
         package_id: "start",
         status: "active",
-        monthly_czk: 4900,
+        monthly_czk: salesEntryMonthlyCzk(),
         period_start: start.toISOString(),
         period_end: addMonthsIso(start, 1),
         offer_text: result.supplier.offerTitle,
@@ -266,7 +267,7 @@ async function persistLoop(result: MarketplaceLoopResult): Promise<boolean> {
         portal_token: randomToken(12),
         terms_accepted_at: nowIso(),
         paid_months: 1,
-        paid_total_czk: 4900,
+        paid_total_czk: salesEntryMonthlyCzk(),
         last_paid_at: nowIso(),
       });
     }
@@ -376,7 +377,7 @@ export function buildMarketplaceLoopModel(): MarketplaceLoopResult {
     makeStep(
       "convert_subscriber",
       true,
-      `${MODEL_SUPPLIER.company} je předplatitel paušálu Start 4 900 Kč — profil na tržišti, předání poptávek.`
+      `${MODEL_SUPPLIER.company} je předplatitel paušálu Start ${salesEntryMonthlyCzk()} Kč — profil na tržišti, předání poptávek.`
     ),
     makeStep(
       "select_buyer",

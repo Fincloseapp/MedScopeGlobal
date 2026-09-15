@@ -89,7 +89,7 @@ export function MarketplaceDesk({
               href={pausalHref}
               className="rounded-full bg-[#c4a35a] px-5 py-2.5 text-sm font-semibold text-[#021d33] hover:bg-[#e8d5a3]"
             >
-              Objednat paušál od 4 900 Kč
+              Objednat paušál od 450 Kč
             </Link>
             <Link
               href="#nabidky"
@@ -141,7 +141,7 @@ export function MarketplaceDesk({
       <div className="mx-auto max-w-6xl px-4 pb-4 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#021d33] bg-white px-5 py-4">
           <p className="text-sm text-slate-700">
-            Chcete kontakty z poptávek dnes? Paušál od <strong>4 900 Kč / měsíc</strong>, karta nebo převod.
+            Chcete kontakty z poptávek dnes? Paušál od <strong>450 Kč / měsíc</strong>, roční 375 Kč / měs. (2 měsíce zdarma). Karta nebo převod.
           </p>
           <Link
             href={pausalHref}

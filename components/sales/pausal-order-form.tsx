@@ -3,7 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { SALES_PACKAGES, formatSalesCzk, type SalesPackageId } from "@/lib/sales/packages";
+import {
+  SALES_PACKAGES,
+  formatSalesCzk,
+  salesEntryMonthlyCzk,
+  salesYearlyCzk,
+  salesYearlyEffectiveMonthCzk,
+  type SalesBillingInterval,
+  type SalesPackageId,
+} from "@/lib/sales/packages";
 import type { SalesPayInstructions } from "@/lib/sales/pay";
 
 export function PausalOrderForm({
@@ -14,6 +22,7 @@ export function PausalOrderForm({
   pay: SalesPayInstructions;
 }) {
   const [packageId, setPackageId] = useState<SalesPackageId>(defaultPackage ?? "start");
+  const [billingInterval, setBillingInterval] = useState<SalesBillingInterval>("month");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<{
@@ -38,6 +47,7 @@ export function PausalOrderForm({
       website: String(form.get("website") ?? "") || undefined,
       offerText: String(form.get("offerText") ?? "") || undefined,
       packageId,
+      billingInterval,
       termsAccepted: form.get("terms") === "on",
     };
     const res = await fetch("/api/sales/order", {
@@ -106,7 +116,46 @@ export function PausalOrderForm({
   return (
     <form onSubmit={(e) => void onSubmit(e)} className="space-y-4 rounded-2xl border border-[#cfe1f3] bg-white p-5">
       <div className="grid gap-2 sm:grid-cols-2">
-        {SALES_PACKAGES.map((pkg) => (
+        <label
+          className={`cursor-pointer rounded-xl border p-3 text-sm ${
+            billingInterval === "month" ? "border-[#005B96] bg-[#f3f9ff]" : "border-slate-200"
+          }`}
+        >
+          <input
+            type="radio"
+            name="billing"
+            className="mr-2"
+            checked={billingInterval === "month"}
+            onChange={() => setBillingInterval("month")}
+          />
+          <strong>Měsíčně</strong>
+          <p className="mt-1 text-xs text-slate-600">Platba každý měsíc. Start {formatSalesCzk(salesEntryMonthlyCzk())}.</p>
+        </label>
+        <label
+          className={`cursor-pointer rounded-xl border p-3 text-sm ${
+            billingInterval === "year" ? "border-[#005B96] bg-[#f3f9ff]" : "border-slate-200"
+          }`}
+        >
+          <input
+            type="radio"
+            name="billing"
+            className="mr-2"
+            checked={billingInterval === "year"}
+            onChange={() => setBillingInterval("year")}
+          />
+          <strong>Ročně · 2 měsíce zdarma</strong>
+          <p className="mt-1 text-xs text-slate-600">
+            Start {formatSalesCzk(salesYearlyCzk(salesEntryMonthlyCzk()))} / rok · {formatSalesCzk(salesYearlyEffectiveMonthCzk(salesEntryMonthlyCzk()))} / měs.
+          </p>
+        </label>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {SALES_PACKAGES.map((pkg) => {
+          const shown =
+            billingInterval === "year"
+              ? `${formatSalesCzk(salesYearlyEffectiveMonthCzk(pkg.priceCzkMonth))}/měs. · ${formatSalesCzk(salesYearlyCzk(pkg.priceCzkMonth))}/rok`
+              : `${formatSalesCzk(pkg.priceCzkMonth)}/měs.`;
+          return (
           <label
             key={pkg.id}
             className={`cursor-pointer rounded-xl border p-3 text-sm ${
@@ -120,10 +169,11 @@ export function PausalOrderForm({
               checked={packageId === pkg.id}
               onChange={() => setPackageId(pkg.id)}
             />
-            <strong>{pkg.name}</strong> · {formatSalesCzk(pkg.priceCzkMonth)}/měs.
+            <strong>{pkg.name}</strong> · {shown}
             <p className="mt-1 text-xs text-slate-600">{pkg.tagline}</p>
           </label>
-        ))}
+          );
+        })}
       </div>
       <label className="block text-sm">
         <span className="mb-1 block font-medium text-[#021d33]">Firma</span>
@@ -157,7 +207,7 @@ export function PausalOrderForm({
         <input type="checkbox" name="terms" required className="mt-1" />
         <span>
           Souhlasím s <Link href="/inzerce/podminky" className="text-[#005B96] underline">podmínkami inzerce</Link> a
-          vystavením měsíční faktury. Paušál se obnovuje, dokud jej neskončíte.
+          vystavením faktury. Paušál se obnovuje (měsíčně nebo ročně), dokud jej neskončíte.
         </span>
       </label>
       {error ? <p className="text-sm text-red-700">{error}</p> : null}
@@ -166,7 +216,7 @@ export function PausalOrderForm({
       </Button>
       <p className="text-xs text-slate-500">
         {pay.stripeReady
-          ? "Po odeslání otevřeme Stripe Checkout (měsíční předplatné v Kč)."
+          ? "Po odeslání otevřeme Stripe Checkout (měsíční nebo roční předplatné v Kč)."
           : `Platbu kartou dopíšeme — objednávka mezitím jde na ${pay.inbox}.`}
       </p>
     </form>

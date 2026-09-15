@@ -97,6 +97,9 @@ export type SalesIcpSector =
 
 export type SalesPackageId = "start" | "visible" | "magazine" | "clinical" | "partner";
 
+/** Měsíční karta vs roční předplatné (2 měsíce zdarma). */
+export type SalesBillingInterval = "month" | "year";
+
 export type SalesPackage = {
   id: SalesPackageId;
   name: string;

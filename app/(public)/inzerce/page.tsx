@@ -78,7 +78,7 @@ export default async function InzercePage() {
       title={copy.mediaKitTitle}
       description={copy.mediaKitLead}
       ctaHref={pausalHref}
-      ctaLabel="Objednat paušál od 4 900 Kč"
+      ctaLabel="Objednat paušál od 450 Kč"
     >
       <div className="mb-8 grid gap-3 md:grid-cols-2">
         <article className="rounded-2xl border border-[#021d33] bg-[#021d33] px-5 py-5 text-white">
@@ -87,7 +87,7 @@ export default async function InzercePage() {
           </p>
           <h2 className="mt-2 font-display text-xl font-semibold">Měsíční paušál — karta Stripe</h2>
           <p className="mt-2 text-sm leading-6 text-white/80">
-            Od 4 900 Kč / měsíc. Nabídky, poptávky a faktura se zpracují v tržišti. Nejde o banner v článku.
+            Od 450 Kč / měsíc, roční 375 Kč / měs. (2 měsíce zdarma). Nabídky, poptávky a faktura se zpracují v tržišti. Nejde o banner v článku.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link

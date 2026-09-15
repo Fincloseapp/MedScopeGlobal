@@ -39,7 +39,7 @@ export async function sendAdRequestAckToAdvertiser(req: AdsRequestRow) {
     html: `<p>Dobrý den, ${req.company},</p>
       <p>žádost o inzerci evidujeme. Vedle jednorázové kampaně můžete dát nabídku na
       <a href="${origin}/exchange">tržiště</a> a objednat
-      <a href="${origin}/inzerce/pausal">měsíční paušál od 4 900 Kč</a> — poptávky z nemocnic
+      <a href="${origin}/inzerce/pausal">měsíční paušál od 450 Kč</a> — poptávky z nemocnic
       dostanete e-mailem, bez provize z obchodu.</p>
       <p>Návod: <a href="${origin}/exchange/navod">${origin}/exchange/navod</a></p>
       <p>Odpovězte na tento e-mail s jakýmkoli dotazem — odpovíme automaticky

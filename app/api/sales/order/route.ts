@@ -20,6 +20,7 @@ const schema = z.object({
   website: z.string().max(240).optional(),
   offerText: z.string().max(2000).optional(),
   packageId: z.string().min(2).max(40),
+  billingInterval: z.enum(["month", "year"]).optional(),
   termsAccepted: z.boolean(),
 });
 
@@ -51,6 +52,7 @@ export async function POST(request: Request) {
     website: body.website ? sanitizeText(body.website, 240) : undefined,
     offerText: body.offerText ? sanitizeText(body.offerText, 2000) : undefined,
     packageId: body.packageId,
+    billingInterval: body.billingInterval,
     termsAccepted: true,
   });
 

@@ -45,7 +45,7 @@ export function salesOfferEmail(input: {
 }) {
   const entity = getLegalEntity();
   const pkg = input.package;
-  const subject = `Nabídka měsíční inzerce MedScopeGlobal — ${pkg.name} (${formatSalesCzk(pkg.priceCzkMonth)} / měsíc)`;
+  const subject = `Nabídka inzerce MedScopeGlobal — ${pkg.name} (${formatSalesCzk(pkg.priceCzkMonth)} / měsíc)`;
   const pay = input.checkoutUrl
     ? `<p><a href="${input.checkoutUrl}">Objednat a zaplatit paušál kartou (Stripe)</a></p>`
     : `<p>Platbu kartou připravíme po odsouhlasení. Můžete odpovědět na tento e-mail.</p>`;
@@ -66,7 +66,7 @@ export function salesOfferEmail(input: {
       Nabízíme měsíční paušál inzerce na medscopeglobal.com — bez skryté reklamy,
       s označením inzerce a s předáním poptávek podle zaplaceného tarifu.
     </p>
-    <p><strong>${pkg.name}</strong> — ${formatSalesCzk(pkg.priceCzkMonth)} měsíčně (neplátce DPH).</p>
+    <p><strong>${pkg.name}</strong> — ${formatSalesCzk(pkg.priceCzkMonth)} měsíčně, nebo roční předplatné se 2 měsíci zdarma (neplátce DPH).</p>
     <ul>${pkg.features.map((f) => `<li>${f}</li>`).join("")}</ul>
     ${pay}
     ${vs}

@@ -37,7 +37,7 @@ export async function sendMarketplaceAck(listing: MarketplaceListing): Promise<{
        <p><a href="https://medscopeglobal.com/exchange#poptavky">Otevřít poptávky</a></p>
        <p>MedScopeGlobal · inzerce@medscopeglobal.com</p>`
     : `<p>Dobrý den, ${listing.company},</p>
-       <p>nabídku <strong>${listing.title}</strong> jsme přijali. Na tržišti je vidět hned. Kontakty z poptávek dostanete, jakmile je paušál aktivní — od 4 900 Kč / měsíc, bez provize z obchodu.</p>
+       <p>nabídku <strong>${listing.title}</strong> jsme přijali. Na tržišti je vidět hned. Kontakty z poptávek dostanete, jakmile je paušál aktivní — od 450 Kč / měsíc, roční 375 Kč / měs. (2 měsíce zdarma), bez provize z obchodu.</p>
        <p><a href="https://medscopeglobal.com/inzerce/pausal">Objednat paušál</a> ·
           <a href="https://medscopeglobal.com/exchange/navod">Návod</a> ·
           <a href="https://medscopeglobal.com/exchange">Tržiště</a></p>
