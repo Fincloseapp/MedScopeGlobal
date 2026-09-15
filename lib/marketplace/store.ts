@@ -49,7 +49,7 @@ export async function listMarketplaceListings(
 export async function listVisibleMarketplaceListings(
   db: SalesClient,
   kind: "offer" | "demand",
-  limit = 40
+  limit = 200
 ): Promise<MarketplaceListing[]> {
   const { data } = await db
     .from("marketplace_listings")

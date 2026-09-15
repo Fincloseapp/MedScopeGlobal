@@ -140,7 +140,7 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
     }
 
     try {
-      const pending = await listMarketplaceListings(db, 80);
+      const pending = await listMarketplaceListings(db, 200);
       for (const listing of pending) {
         if (listing.auto_replied_at || !listing.contact_email) continue;
         const topic = classifyMarketplaceMessage(`${listing.title} ${listing.summary}`);

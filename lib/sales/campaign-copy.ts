@@ -1,6 +1,7 @@
 import { getLegalEntity } from "@/lib/config/legal-entity";
 import { SITE } from "@/lib/config/site";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
+import { marketplaceUiLang } from "@/lib/i18n/marketplace-ui-locale";
 import {
   formatSalesCzk,
   salesEntryMonthlyCzk,
@@ -302,10 +303,8 @@ const PACKS: Record<string, Pack> = {
 };
 
 function packFor(locale: string): Pack {
-  if (PACKS[locale]) return PACKS[locale]!;
-  if (locale.startsWith("en")) return PACKS.en!;
-  if (locale.startsWith("pt")) return PACKS.pt!;
-  return PACKS.en!;
+  const lang = marketplaceUiLang(locale);
+  return PACKS[lang] ?? PACKS.en!;
 }
 
 export function campaignMarketplaceEmail(input: {

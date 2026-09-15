@@ -71,7 +71,7 @@ export type SalesCampaignSnapshot = {
 };
 
 const HONESTY =
-  "Cíl 250–500 platících inzerentů Start v každé jazykové mutaci je konverzní cíl, ne počet odeslaných mailů. " +
+  "Cíl 500 platících inzerentů Start v každé jazykové mutaci je konverzní cíl, ne počet odeslaných mailů. " +
   "Seznam níž jsou jen platné firemní role-schránky na oficiální doméně webu (info@ / marketing@ / media@ …). " +
   "Osobní mailboxy a hádání jmen se neposílají. Peníze na účtu jdou přes Stripe paušál / převod. " +
   `Termín nastavení komunikace a první úhrady: ${CAMPAIGN_DEADLINE_LABEL}.`;

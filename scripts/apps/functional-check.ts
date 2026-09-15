@@ -267,6 +267,7 @@ import {
   evaluateOutreachGate,
   isPersonalMailbox,
   isRoleBasedEmail,
+  salesMaxEmailsPerRun,
   unsubscribeToken,
   verifyUnsubscribeToken,
 } from "../../lib/sales/legal";
@@ -280,6 +281,8 @@ import { normalizeCzechIco, salesPayInstructions } from "../../lib/sales/pay";
 import { MARKETPLACE_DESK_SQL } from "../../lib/marketplace/schema";
 import { classifyMarketplaceKind, classifyMarketplaceMessage, marketplaceReplyCopy } from "../../lib/marketplace/auto-reply";
 import { SAMPLE_DEMANDS } from "../../lib/marketplace/board";
+import { getMarketplaceUiCopy } from "../../lib/i18n/marketplace-ui-copy";
+import { marketplaceUiLang } from "../../lib/i18n/marketplace-ui-locale";
 import { buildCampaignSnapshot } from "../../lib/sales/campaign";
 import { CAMPAIGN_ROSTER, isCampaignEmailSendable } from "../../lib/sales/campaign-roster";
 import { campaignMarketplaceEmail, campaignMarketplaceUrl } from "../../lib/sales/campaign-copy";
@@ -2224,8 +2227,10 @@ assert.ok(
 assert.ok(
   getExchangeCopy("de").title.includes("Marktplatz") &&
     getExchangeCopy("sk").registerCta.includes("Registrovať") &&
-    !getExchangeCopy("ja").title.includes("Tržiště"),
-  "manufacturer exchange chrome must follow the edition language"
+    getExchangeCopy("ja").title === getExchangeCopy("en").title &&
+    getExchangeCopy("zh-CN").title === getExchangeCopy("en").title &&
+    getExchangeCopy("ro").title === getExchangeCopy("en").title,
+  "manufacturer exchange chrome must follow native marketplace languages; smaller locales stay English"
 );
 assert.ok(
   !readFileSync(join(root, "components/studenti/student-offer-dashboard.tsx"), "utf8").includes(
@@ -5997,8 +6002,23 @@ console.log(
   assert.ok(MARKETPLACE_DESK_SQL.includes("marketplace_listings"));
   assert.equal(classifyMarketplaceKind("Hledáme CE-IVDR analyzátor"), "demand");
   assert.equal(classifyMarketplaceKind("Chci inzerovat nabídku v katalogu"), "offer");
+  assert.equal(classifyMarketplaceKind("We are looking for a CE-IVDR analyser"), "demand");
+  assert.equal(classifyMarketplaceKind("We want to advertise our offer in the catalogue"), "offer");
   assert.equal(classifyMarketplaceMessage("Kolik stojí paušál?"), "price");
+  assert.equal(classifyMarketplaceMessage("What is the monthly retainer price?"), "price");
   assert.ok(SAMPLE_DEMANDS.length >= 3);
+  assert.equal(marketplaceUiLang("ja"), "en");
+  assert.equal(marketplaceUiLang("zh-CN"), "en");
+  assert.equal(marketplaceUiLang("ro"), "en");
+  assert.equal(marketplaceUiLang("hu"), "en");
+  assert.equal(marketplaceUiLang("de"), "de");
+  assert.equal(marketplaceUiLang("sk"), "sk");
+  assert.equal(getMarketplaceUiCopy("ja").formTitle, getMarketplaceUiCopy("en").formTitle);
+  assert.ok(getMarketplaceUiCopy("de").formTitle.includes("Marktplatz"));
+  assert.ok(marketplaceReplyCopy("price", "en").subject.toLowerCase().includes("price"));
+  assert.ok(marketplaceReplyCopy("price", "cs").subject.includes("Ceník"));
+  assert.equal(salesMaxEmailsPerRun(), 500);
+  assert.ok(CAMPAIGN_ROSTER.length >= 500, `roster ${CAMPAIGN_ROSTER.length}`);
   assert.ok(readFileSync(join(root, "lib/services/ads-mail.ts"), "utf8").includes("sendAdOfferViaEngine"));
   assert.ok(readFileSync(join(root, "lib/services/ads-mail.ts"), "utf8").includes("sendAdRequestAckToAdvertiser"));
   const webhook = readFileSync(join(root, "app/api/stripe/webhook/route.ts"), "utf8");
@@ -6052,7 +6072,15 @@ console.log(
     assert.ok(letter.html.includes(campaignMarketplaceUrl(locale.code)));
     assert.ok(letter.html.includes("450") || letter.text.includes("450"));
     assert.ok(letter.html.includes("/api/sales/unsubscribe"));
+    if (marketplaceUiLang(locale.code) === "en") {
+      assert.ok(letter.subject.includes("marketplace"), locale.code);
+    }
+    if (locale.code === "de") {
+      assert.ok(letter.subject.includes("Marktplatz"));
+    }
   }
+  assert.ok(readFileSync(join(root, "lib/sales/outreach.ts"), "utf8").includes("listOutreach(db, 800)"));
+  assert.ok(readFileSync(join(root, "app/api/marketplace/listing/route.ts"), "utf8").includes("getMarketplaceUiCopy"));
   assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes("Kampaň"));
   assert.ok(readFileSync(join(root, "lib/sales/runner.ts"), "utf8").includes("seedCampaignProspects"));
   assert.ok(readFileSync(join(root, "lib/sales/runner.ts"), "utf8").includes("alreadyLoopedToday"));
@@ -6097,7 +6125,8 @@ console.log(
   assert.ok(readFileSync(join(root, "lib/sales/runner.ts"), "utf8").includes("evaluateSalesControl"));
   assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes("Koordinátoři a kontroloři"));
   assert.ok(readFileSync(join(root, "components/v271/homepage-pillars.tsx"), "utf8").includes('data-studio="audience-split"'));
-  assert.ok(readFileSync(join(root, "components/marketplace/marketplace-intake-form.tsx"), "utf8").includes("Firemní formulář tržiště"));
+  assert.ok(readFileSync(join(root, "components/marketplace/marketplace-intake-form.tsx"), "utf8").includes("getMarketplaceUiCopy"));
+  assert.ok(readFileSync(join(root, "lib/i18n/marketplace-ui-copy.ts"), "utf8").includes("Firemní formulář tržiště"));
   assert.ok(!readFileSync(join(root, "components/marketplace/marketplace-intake-form.tsx"), "utf8").includes("contactName"));
   assert.ok(!readFileSync(join(root, "components/marketplace/marketplace-intake-form.tsx"), "utf8").includes("Telefon"));
   assert.ok(existsSync(join(root, "app/api/marketplace/choose/route.ts")));

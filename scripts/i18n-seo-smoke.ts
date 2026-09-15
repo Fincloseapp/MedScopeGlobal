@@ -558,6 +558,8 @@ assert.ok(!getHomepagePillarsCopy("de").pillars.some((item) => item.czechOnly));
 assert.equal(getExchangeCopy("cs").listings["poc-cr-ce"].region, "Česko + EU");
 assert.ok(getExchangeCopy("pl").title.includes("Rynek"));
 assert.ok(!getExchangeCopy("zh-CN").title.includes("Tržiště"));
+assert.equal(getExchangeCopy("ja").title, getExchangeCopy("en").title);
+assert.equal(getExchangeCopy("hu").adsCta, getExchangeCopy("en").adsCta);
 assert.ok(!getAiAssistantCopy("sk").publicTitle.includes("plain answers"));
 assert.ok(!getAiAssistantCopy("ja").publicCta.includes("Find your topic"));
 assert.ok(!getInzerceCenikCopy("sk").title.includes("Advertising rates") && !getInzerceCenikCopy("sk").eyebrow.includes("Pricing"));

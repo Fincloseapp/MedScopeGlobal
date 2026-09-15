@@ -1,5 +1,7 @@
 import { EXCHANGE_LISTINGS } from "@/lib/b2b/exchange-listings";
 import { getExchangeCopy } from "@/lib/i18n/exchange-copy";
+import { getMarketplaceUiCopy } from "@/lib/i18n/marketplace-ui-copy";
+import { localizePublicHref } from "@/lib/i18n/nav-copy";
 import { marketplaceInboxEmail } from "@/lib/marketplace/config";
 import { applyMarketplaceDeskSchema } from "@/lib/marketplace/schema";
 import { listVisibleMarketplaceListings, marketplaceDb } from "@/lib/marketplace/store";
@@ -7,53 +9,30 @@ import type { MarketplaceBoard, MarketplacePublicCard } from "@/lib/marketplace/
 import { listPublicPartners } from "@/lib/sales/snapshot";
 import { salesPackageById } from "@/lib/sales/packages";
 
-export const SAMPLE_DEMANDS: MarketplacePublicCard[] = [
-  {
-    id: "demand-poc-cz",
+export function sampleDemandCards(locale?: string | null): MarketplacePublicCard[] {
+  const copy = getMarketplaceUiCopy(locale);
+  return copy.sampleDemands.map((row) => ({
+    id: row.id,
     kind: "demand",
-    title: "Nemocnice v Česku poptává CE-IVDR POC analyzátor",
-    summary:
-      "Lůžkové zařízení hledá point-of-care imunoassay pro ambulance. Kontakty uvidí platící inzerent — poptávka je zdarma.",
-    category: "Diagnostika · POC",
-    region: "Česko",
-    cert: "CE / IVDR",
-    companyLabel: "Nemocnice · Česko",
-    badge: "Poptávka",
+    title: row.title,
+    summary: row.summary,
+    category: row.category,
+    region: row.region,
+    cert: row.cert,
+    companyLabel: row.companyLabel,
+    badge: copy.badgeDemand,
     contactHidden: true,
     sample: true,
-  },
-  {
-    id: "demand-lab-eu",
-    kind: "demand",
-    title: "Smluvní laboratoř EU hledá imunologické panely",
-    summary:
-      "Laboratoř se skladem v DE/CZ poptává CE / ISO 13485 panely. Bez provize z obchodu — inzerent platí jen paušál.",
-    category: "Laboratoř",
-    region: "EU",
-    cert: "CE / ISO 13485",
-    companyLabel: "Laboratoř · EU",
-    badge: "Poptávka",
-    contactHidden: true,
-    sample: true,
-  },
-  {
-    id: "demand-telemed-cz",
-    kind: "demand",
-    title: "Síť ambulancí poptává B2B telemedicínský kanál",
-    summary:
-      "Institucionální napojení nemocnice / laboratoř / ambulance. Žádná distanční péče koncovému pacientovi.",
-    category: "Telemedicína B2B",
-    region: "Česko",
-    cert: "GDPR",
-    companyLabel: "Síť ambulancí · Česko",
-    badge: "Poptávka",
-    contactHidden: true,
-    sample: true,
-  },
-];
+  }));
+}
+
+/** Czech sample cards — kept for tests and fallbacks. */
+export const SAMPLE_DEMANDS: MarketplacePublicCard[] = sampleDemandCards("cs");
 
 export async function loadMarketplaceBoard(locale?: string | null): Promise<MarketplaceBoard> {
   const copy = getExchangeCopy(locale);
+  const ui = getMarketplaceUiCopy(locale);
+  const lang = locale ?? "cs";
   const offers: MarketplacePublicCard[] = [];
 
   const partners = await listPublicPartners();
@@ -62,13 +41,13 @@ export async function loadMarketplaceBoard(locale?: string | null): Promise<Mark
       id: `paid-${row.slug}`,
       kind: "offer",
       title: row.offer || salesPackageById(row.packageId)?.tagline || row.company,
-      summary: `${row.company} — označená inzerce s aktivním paušálem. Poptávku odešlete přímo z profilu.`,
-      category: "Aktivní inzerent",
-      region: "Česko + EU",
-      cert: "Paušál",
+      summary: ui.paidSummary.replace("{company}", row.company),
+      category: ui.badgeLive,
+      region: ui.regionDefault,
+      cert: ui.badgePaid,
       companyLabel: row.company,
-      badge: "Živá inzerce",
-      href: `/partneri/${row.slug}`,
+      badge: ui.badgeLive,
+      href: localizePublicHref(`/partneri/${row.slug}`, lang),
       contactHidden: false,
     });
   }
@@ -84,12 +63,12 @@ export async function loadMarketplaceBoard(locale?: string | null): Promise<Mark
         kind: "offer",
         title: row.title,
         summary: row.summary,
-        category: row.category || "Nabídka",
-        region: row.region || "Česko + EU",
-        cert: row.cert || "Ověření po paušálu",
+        category: row.category || ui.categoryOffer,
+        region: row.region || ui.regionDefault,
+        cert: row.cert || ui.certAfter,
         companyLabel: row.company,
-        badge: "Nová nabídka",
-        href: "/inzerce/pausal",
+        badge: ui.badgeNewOffer,
+        href: localizePublicHref("/inzerce/pausal", lang),
         contactHidden: true,
       });
     }
@@ -106,8 +85,8 @@ export async function loadMarketplaceBoard(locale?: string | null): Promise<Mark
       region: loc.region,
       cert: loc.cert,
       companyLabel: loc.maker,
-      badge: "Ukázka",
-      href: `/exchange#${item.id}`,
+      badge: ui.badgeSample,
+      href: localizePublicHref(`/exchange#${item.id}`, lang),
       image: item.image,
       contactHidden: true,
       sample: true,
@@ -123,25 +102,29 @@ export async function loadMarketplaceBoard(locale?: string | null): Promise<Mark
         kind: "demand",
         title: row.title,
         summary: row.summary,
-        category: row.category || "Poptávka",
-        region: row.region || "Česko + EU",
-        cert: row.cert || "Kontakt po paušálu",
-        companyLabel: anonymizeCompany(row.company, row.region),
-        badge: "Poptávka",
+        category: row.category || ui.categoryDemand,
+        region: row.region || ui.regionDefault,
+        cert: row.cert || ui.contactAfter,
+        companyLabel: anonymizeCompany(row.company, row.region, ui),
+        badge: ui.badgeDemand,
         contactHidden: true,
       });
     }
   }
-  if (demands.length === 0) demands.push(...SAMPLE_DEMANDS);
+  if (demands.length === 0) demands.push(...sampleDemandCards(locale));
 
   return { offers, demands, inbox: marketplaceInboxEmail() };
 }
 
-function anonymizeCompany(company: string, region: string | null): string {
-  const regionLabel = region?.trim() || "Česko + EU";
-  if (/nemocnic/i.test(company)) return `Nemocnice · ${regionLabel}`;
-  if (/laborato/i.test(company)) return `Laboratoř · ${regionLabel}`;
-  if (/ambulanc|klinik|ordinac/i.test(company)) return `Ambulance · ${regionLabel}`;
-  if (/výrob|vyrob|distrib/i.test(company)) return `Výrobce · ${regionLabel}`;
-  return `Instituce · ${regionLabel}`;
+function anonymizeCompany(
+  company: string,
+  region: string | null,
+  ui: ReturnType<typeof getMarketplaceUiCopy>
+): string {
+  const regionLabel = region?.trim() || ui.regionDefault;
+  if (/nemocnic|hospital|spital|klinikum/i.test(company)) return `${ui.hospital} · ${regionLabel}`;
+  if (/laborato|laborator|laboratory|\blab\b/i.test(company)) return `${ui.lab} · ${regionLabel}`;
+  if (/ambulanc|klinik|ordinac|clinic|praxis|cabinet/i.test(company)) return `${ui.clinic} · ${regionLabel}`;
+  if (/výrob|vyrob|distrib|manufacturer|maker|producer/i.test(company)) return `${ui.maker} · ${regionLabel}`;
+  return `${ui.institution} · ${regionLabel}`;
 }

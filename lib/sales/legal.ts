@@ -16,8 +16,8 @@ export function salesMaxTouches(): number {
 }
 
 export function salesMaxEmailsPerRun(): number {
-  const n = Number(process.env.SALES_MAX_EMAILS_PER_RUN ?? 24);
-  return Number.isFinite(n) && n > 0 ? Math.min(40, Math.floor(n)) : 24;
+  const n = Number(process.env.SALES_MAX_EMAILS_PER_RUN ?? 500);
+  return Number.isFinite(n) && n > 0 ? Math.min(500, Math.floor(n)) : 500;
 }
 
 /** Cold B2B auto-send is off unless operators explicitly enable it. */

@@ -106,7 +106,7 @@ export async function sendQueuedOutreach(
   cap: number
 ): Promise<{ sent: number; skippedLegal: number; failed: number }> {
   const entity = getLegalEntity();
-  const rows = await listOutreach(db, 80);
+  const rows = await listOutreach(db, 800);
   const pending = rows.filter((row) => row.status === "queued" || row.status === "approved");
   const prospects = await listProspects(db, 800);
   const byId = new Map(prospects.map((p) => [p.id, p]));

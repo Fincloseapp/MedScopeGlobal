@@ -1,48 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getMarketplaceUiCopy } from "@/lib/i18n/marketplace-ui-copy";
 
-const SLIDES: { title: string; body: string }[] = [
-  {
-    title: "1 · Dvě desky, jeden účel",
-    body: "Vlevo nabídky inzerentů. Vpravo poptávky nemocnic a laboratoří. Kupující vidí zboží hned. Inzerent vidí poptávky hned.",
-  },
-  {
-    title: "2 · Zadejte nabídku",
-    body: "Formulář na tržišti nebo e-mail inzerce@medscopeglobal.com. Nabídka se objeví okamžitě. Automatická odpověď potvrdí příjem.",
-  },
-  {
-    title: "3 · Přidaná hodnota paušálu",
-    body: "Platící inzerent dostane kontakty z poptávek e-mailem a profil /partneri. Jednorázové bannery v článcích jsou na /firmy — jiný produkt. Bez provize z obchodu. Od 450 Kč / měsíc, roční 375 Kč / měs.",
-  },
-  {
-    title: "4 · Poptávka je zdarma",
-    body: "Nemocnice a laboratoře poptávají bez poplatku. E-mail na desce není. Inzerent s paušálem ho dostane podle SLA tarifu.",
-  },
-  {
-    title: "5 · Dotazy jdou samy",
-    body: "Otázky na cenu, fakturu, zákon o reklamě nebo termíny odpovídá obchodní oddělení automaticky. Můžete odpovědět na e-mail.",
-  },
-  {
-    title: "6 · Co udělat teď",
-    body: "Objednejte paušál, nebo pošlete nabídku. Návod znovu: /exchange/navod. Ceník: /inzerce/pausal.",
-  },
-];
-
-export function MarketplaceTutorialPlayer() {
+export function MarketplaceTutorialPlayer({ locale = "cs" }: { locale?: string }) {
+  const copy = getMarketplaceUiCopy(locale);
+  const slides = copy.slides;
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
 
   useEffect(() => {
     if (!playing) return;
     const timer = window.setInterval(() => {
-      setIndex((current) => (current + 1) % SLIDES.length);
+      setIndex((current) => (current + 1) % slides.length);
     }, 5200);
     return () => window.clearInterval(timer);
-  }, [playing]);
+  }, [playing, slides.length]);
 
-  const slide = SLIDES[index];
-  const progress = ((index + 1) / SLIDES.length) * 100;
+  const slide = slides[index];
+  const progress = ((index + 1) / slides.length) * 100;
 
   return (
     <div
@@ -51,7 +27,7 @@ export function MarketplaceTutorialPlayer() {
     >
       <div className="relative min-h-[220px] px-5 py-8 sm:px-8">
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e8d5a3]">
-          Krátké video instrukce · {index + 1}/{SLIDES.length}
+          {copy.tutorialKicker} · {index + 1}/{slides.length}
         </p>
         <h3 className="mt-3 font-display text-2xl font-semibold">{slide.title}</h3>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-white/80">{slide.body}</p>
@@ -65,21 +41,21 @@ export function MarketplaceTutorialPlayer() {
           onClick={() => setPlaying((value) => !value)}
           className="rounded-full bg-[#c4a35a] px-4 py-1.5 text-sm font-semibold text-[#021d33]"
         >
-          {playing ? "Pauza" : "Přehrát"}
+          {playing ? copy.tutorialPause : copy.tutorialPlay}
         </button>
         <button
           type="button"
-          onClick={() => setIndex((current) => (current - 1 + SLIDES.length) % SLIDES.length)}
+          onClick={() => setIndex((current) => (current - 1 + slides.length) % slides.length)}
           className="rounded-full border border-white/30 px-3 py-1.5 text-sm"
         >
-          Předchozí
+          {copy.tutorialPrev}
         </button>
         <button
           type="button"
-          onClick={() => setIndex((current) => (current + 1) % SLIDES.length)}
+          onClick={() => setIndex((current) => (current + 1) % slides.length)}
           className="rounded-full border border-white/30 px-3 py-1.5 text-sm"
         >
-          Další
+          {copy.tutorialNext}
         </button>
       </div>
     </div>

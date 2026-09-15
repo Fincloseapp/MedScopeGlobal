@@ -3,6 +3,7 @@ import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { exchangeEdition, type ExchangeEdition } from "@/lib/i18n/exchange-copy-editions";
+import { marketplaceUiLang } from "@/lib/i18n/marketplace-ui-locale";
 import type { ExchangeListingId } from "@/lib/b2b/exchange-listings";
 
 export type ExchangeListingCopy = {
@@ -349,7 +350,10 @@ export function getExchangeCopy(locale?: string | null): ExchangeCopy {
   const packKey = chromePack(locale);
   const pack = PACK[packKey] ?? PACK.en;
   const primary = primaryArticleLocale(normalizeLocale(locale ?? "cs"));
-  const edition =
-    (packKey === "en" && primary !== "en") || primary === "pt" ? exchangeEdition(primary) : undefined;
+  const lang = marketplaceUiLang(locale);
+  /** Native marketplace languages keep editions; international and smaller locales stay English. */
+  const useEdition =
+    lang !== "en" && ((packKey === "en" && primary !== "en") || primary === "pt");
+  const edition = useEdition ? exchangeEdition(primary) : undefined;
   return applyEdition(pack, edition);
 }
