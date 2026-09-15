@@ -9,7 +9,9 @@ import {
 } from "@/lib/sales/packages";
 
 function baseUrl(): string {
-  return SITE.url.replace(/\/$/, "");
+  const raw = (process.env.NEXT_PUBLIC_SITE_URL || SITE.url).replace(/\/$/, "");
+  if (!raw || /localhost|127\.0\.0\.1/i.test(raw)) return "https://medscopeglobal.com";
+  return raw;
 }
 
 export function campaignPublicUrl(locale: string, pathname: string): string {
