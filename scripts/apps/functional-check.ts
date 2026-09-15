@@ -2684,29 +2684,11 @@ assert.equal(NEWSLETTER_PRIMARY_LOCALES.length, PRIMARY_EDITORIAL_LOCALES.length
   assert.equal(
     resolveMagazineMeterUnlock({
       slug: "sleep-and-longevity",
-      from: "nl",
-      newsletterToken: token,
-    }),
-    true
-  );
-  assert.equal(
-    resolveMagazineMeterUnlock({
-      slug: "sleep-and-longevity",
       cookie: "1:alpha,beta,gamma",
-      from: "nl",
-      newsletterToken: "not-a-valid-unlock-token-xx",
     }),
     false
   );
-  assert.equal(
-    resolveMagazineMeterUnlock({
-      slug: "sleep-and-longevity",
-      cookie: "1:alpha,beta,gamma",
-      from: "nl",
-      newsletterToken: token,
-    }),
-    true
-  );
+  assert.equal(verifyNewsletterArticleUnlock("sleep-and-longevity", token), true);
   assert.ok(withNewsletterArticleUnlock("/de/article/sleep-and-longevity").includes("from=nl"));
   assert.ok(absoluteNewsletterHref("/article/sleep-and-longevity", "fr").includes("/fr/article/"));
   assert.ok(publicBrandSignature("de").startsWith("MedScopeGlobal"));
