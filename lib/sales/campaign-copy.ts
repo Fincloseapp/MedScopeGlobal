@@ -1,6 +1,6 @@
 import { getLegalEntity, publicBrandSignature } from "@/lib/config/legal-entity";
 import { SITE } from "@/lib/config/site";
-import { formatCzkListPrice } from "@/lib/i18n/payment-currency";
+import { fillListedPriceTokens, formatCzkListPrice } from "@/lib/i18n/payment-currency";
 import { buildLocalePath } from "@/lib/i18n/locale-path";
 import { marketplaceUiLang } from "@/lib/i18n/marketplace-ui-locale";
 import {
@@ -55,11 +55,7 @@ function priceVars(locale: string) {
 }
 
 function fillPrice(template: string, locale: string): string {
-  const p = priceVars(locale);
-  return template
-    .replaceAll("__MONTH__", p.month)
-    .replaceAll("__YEAR__", p.year)
-    .replaceAll("__EFFECTIVE__", p.effective);
+  return fillListedPriceTokens(template, locale);
 }
 
 function priceLine(locale = "cs"): string {

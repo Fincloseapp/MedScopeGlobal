@@ -6140,9 +6140,19 @@ console.log(
     }
     if (locale.code === "de") {
       assert.ok(letter.subject.includes("Marktplatz"));
+      assert.ok(letter.text.includes("€") || letter.html.includes("€"));
+      assert.ok(!letter.text.includes("450 Kč"));
+      assert.ok(!letter.text.includes("4 500 Kč"));
     }
   }
-  assert.ok(readFileSync(join(root, "lib/sales/outreach.ts"), "utf8").includes("listOutreach(db, 800)"));
+  assert.ok(!readFileSync(join(root, "lib/sales/campaign-copy.ts"), "utf8").includes("450 Kč"));
+  assert.ok(!readFileSync(join(root, "lib/i18n/marketplace-ui-copy.ts"), "utf8").includes("450 Kč"));
+  assert.ok(!readFileSync(join(root, "lib/i18n/marketplace-ui-copy.ts"), "utf8").includes("450 CZK"));
+  const dePreview = campaign.byLocale.find((row) => row.locale === "de");
+  assert.ok(dePreview);
+  assert.ok(!/Kč|\bCZK\b/.test(dePreview!.copyText));
+  assert.ok(/€/.test(dePreview!.copyText));
+  assert.ok(!dePreview!.copyText.includes("450 Kč"));
   assert.ok(readFileSync(join(root, "app/api/marketplace/listing/route.ts"), "utf8").includes("getMarketplaceUiCopy"));
   assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes("Kampaň"));
   assert.ok(readFileSync(join(root, "lib/sales/runner.ts"), "utf8").includes("seedCampaignProspects"));
