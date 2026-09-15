@@ -197,13 +197,17 @@ export async function publishNewsletterEditions(options?: {
   ];
 
   for (const locale of ordered) {
-    const result = await persistEdition({
-      issueDate,
-      locale,
-      published,
-      admin_only: !published,
-    });
-    editions.push(result);
+    try {
+      const result = await persistEdition({
+        issueDate,
+        locale,
+        published,
+        admin_only: !published,
+      });
+      editions.push(result);
+    } catch (err) {
+      console.error("newsletter edition failed", locale, err);
+    }
   }
 
   if (published && ordered.some((item) => resolveGlobalLocale(item) === "cs")) {

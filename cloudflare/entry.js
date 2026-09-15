@@ -3,9 +3,17 @@ import worker from "../.open-next/worker.js";
 export { DOQueueHandler, DOShardedTagCache, BucketCachePurge } from "../.open-next/worker.js";
 
 function pulsePaths() {
+  const now = new Date();
   const paths = ["/api/cron/agent-arena"];
-  if (new Date().getUTCMinutes() % 15 === 0) {
+  if (now.getUTCMinutes() % 15 === 0) {
     paths.push("/api/cron/growth-sprint?light=1");
+  }
+  if (now.getUTCHours() === 6 && now.getUTCMinutes() < 5) {
+    paths.push("/api/cron/sales-department");
+    if (now.getUTCDay() === 1) {
+      paths.push("/api/cron/newsletter-generate");
+      paths.push("/api/cron/vialongevita-brief");
+    }
   }
   return paths;
 }

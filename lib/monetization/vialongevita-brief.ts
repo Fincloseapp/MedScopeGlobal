@@ -30,7 +30,7 @@ import { briefChrome } from "@/lib/monetization/brief-marketing";
 export type { BriefArticle };
 
 const FROM_NAME = MAGAZINE.name;
-const WEEK_MS = 6 * 24 * 60 * 60 * 1000;
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const BATCH_CAP = 80;
 
 export type BriefSendResult = {
@@ -378,7 +378,7 @@ export async function sendViaLongeVitaWeeklyBrief(options?: {
 
   const articleCache = new Map<string, BriefArticle[]>();
   for (const row of due.slice(0, limit)) {
-    const locale = (row.locale ?? "en").trim() || "en";
+    const locale = resolveEmailLocale(row.locale);
     locales[locale] = (locales[locale] ?? 0) + 1;
     if (!articleCache.has(locale)) {
       articleCache.set(locale, await loadBriefArticles(locale));
