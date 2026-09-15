@@ -23,8 +23,10 @@ import {
   isCzechFacultyLocale,
 } from "@/lib/i18n/czech-faculty-only-copy";
 import {
+  canonicalAdminPathname,
   hasValidAdminGateCookie,
   requiresAdminGate,
+  safeAdminNextPath,
 } from "@/lib/auth/admin-gate-config";
 import {
   enforceLekarskaZonaMiddleware,
@@ -122,6 +124,10 @@ function stampArticleMeterResponse(response: NextResponse, serialized: string | 
 
 function adminGateRedirect(request: NextRequest): NextResponse {
   const login = new URL("/admin/login", request.url);
+  const next = safeAdminNextPath(request.nextUrl.pathname);
+  if (next !== "/admin") {
+    login.searchParams.set("next", next);
+  }
   const redirect = NextResponse.redirect(login);
   redirect.headers.set(
     "Cache-Control",
@@ -130,11 +136,20 @@ function adminGateRedirect(request: NextRequest): NextResponse {
   return redirect;
 }
 
+/** `/cs/admin/sales` must not skip the gate or 404 via locale rewrite. */
+function localePrefixedAdminCanonical(pathname: string): string | null {
+  const { locale } = resolveLocalePath(pathname);
+  if (!locale) return null;
+  return canonicalAdminPathname(pathname);
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const incoming = resolveIncomingAiRef(request);
   const skipVisitLog =
-    pathname.startsWith("/api/") || pathname.startsWith("/admin") || pathname.startsWith("/_next");
+    pathname.startsWith("/api/") ||
+    Boolean(canonicalAdminPathname(pathname)) ||
+    pathname.startsWith("/_next");
 
   const crawler = detectAiCrawler(request.headers.get("user-agent"));
   if (crawler && !skipVisitLog) {
@@ -166,6 +181,13 @@ export async function middleware(request: NextRequest) {
 
   const securityBlock = await applyV30SecurityMiddleware(request);
   if (securityBlock) return securityBlock;
+
+  const localeAdmin = localePrefixedAdminCanonical(pathname);
+  if (localeAdmin) {
+    const url = request.nextUrl.clone();
+    url.pathname = localeAdmin;
+    return outbound(NextResponse.redirect(url, 308));
+  }
 
   if (requiresAdminGate(pathname) && !hasValidAdminGateCookie(request.cookies)) {
     return outbound(adminGateRedirect(request));
@@ -224,6 +246,13 @@ export async function middleware(request: NextRequest) {
       return outbound(rewrite);
     }
   } else {
+    if (canonicalAdminPathname(pathname)) {
+      const requestHeaders = new Headers(request.headers);
+      requestHeaders.set(PATHNAME_REQUEST_HEADER, pathname);
+      const next = NextResponse.next({ request: { headers: requestHeaders } });
+      copyResponseCookies(response, next);
+      return outbound(next);
+    }
     return outbound(response);
   }
 

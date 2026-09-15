@@ -2,6 +2,8 @@
  * v30 bot shield — User-Agent heuristics for sensitive routes.
  */
 
+import { canonicalAdminPathname, isAdminLoginPath } from "@/lib/auth/admin-gate-config";
+
 const BLOCKED_USER_AGENTS = [
   /scrapy/i,
   /curl/i,
@@ -37,10 +39,12 @@ export function shouldBlockBot(
   pathname: string
 ): boolean {
   // Login must stay reachable so the operator can type the password.
-  if (pathname === "/admin/login" || pathname.startsWith("/admin/login/")) {
+  if (isAdminLoginPath(pathname)) {
     return false;
   }
-  const sensitive = SENSITIVE_PREFIXES.some((p) => pathname.startsWith(p));
+  const sensitive =
+    SENSITIVE_PREFIXES.some((p) => pathname.startsWith(p)) ||
+    Boolean(canonicalAdminPathname(pathname));
   if (!sensitive) return false;
   // Block only obvious automation — browsers with a real UA always pass.
   if (!userAgent || userAgent.trim().length < 8) return true;

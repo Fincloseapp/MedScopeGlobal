@@ -1,4 +1,5 @@
 import type { NextResponse } from "next/server";
+import { canonicalAdminPathname } from "@/lib/auth/admin-gate-config";
 import { resolveLocalePath } from "@/lib/i18n/locale-path";
 
 const CSP = [
@@ -42,7 +43,7 @@ export const V30_SECURITY_HEADERS: Record<string, string> = {
 function isPrivateAdminPath(pathname?: string): boolean {
   if (!pathname) return false;
   return (
-    pathname.startsWith("/admin") ||
+    Boolean(canonicalAdminPathname(pathname)) ||
     pathname.startsWith("/api/admin") ||
     pathname === "/api/v21/admin-gate"
   );

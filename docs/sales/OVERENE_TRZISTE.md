@@ -104,7 +104,9 @@ Diplomatický editor odmítá agresivní / urážlivý tón. Magazín do tohoto 
 
 ## 7. Admin — kde to řídíte
 
-1. Přihlášení `/admin/login` (brána).
+1. Přihlášení `/admin/login` (brána). Adresa `/admin/sales` bez cookie jde na
+   `/admin/login?next=/admin/sales` a po hesle vás vrátí na obchodní oddělení.
+   Locale prefix (`/cs/admin/sales`) se 308 přesměruje na `/admin/sales`.
 2. `/admin` — banner **Obchodní oddělení a tržiště**.
 3. Sidebar Peníze → první položka **Obchodní oddělení** → `/admin/sales`.
 4. Karty kontrolorů nahoře na `/admin/sales`. Záložka **Tržiště** ukáže stav schránky a tabulku příjmu

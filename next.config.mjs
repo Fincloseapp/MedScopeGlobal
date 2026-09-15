@@ -131,6 +131,18 @@ const nextConfig = {
       { source: "/pro-me/lekari", destination: "/lekari", permanent: true },
       { source: "/:locale/pro-me/lekari", destination: "/:locale/lekari", permanent: true },
 
+      // Admin is never under a locale prefix — that 404s and skips the password gate.
+      {
+        source: "/:locale(cs|sk|pl|de|fr|it|es|pt|pt-br|pt-pt|ro|hu|ru|uk|be|cn|zh-cn|jp|ja|kr|ko|vi|id|en|en-us|en-uk|en-gb)/admin",
+        destination: "/admin",
+        permanent: true,
+      },
+      {
+        source: "/:locale(cs|sk|pl|de|fr|it|es|pt|pt-br|pt-pt|ro|hu|ru|uk|be|cn|zh-cn|jp|ja|kr|ko|vi|id|en|en-us|en-uk|en-gb)/admin/:path*",
+        destination: "/admin/:path*",
+        permanent: true,
+      },
+
       { source: "/pro-firmy", destination: "/firmy", permanent: true },
 
       { source: "/odbornici", destination: "/odborna", permanent: true },

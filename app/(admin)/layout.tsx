@@ -1,11 +1,14 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { MedScopeLogo } from "@/components/brand/medscope-logo";
 import { AdminMobileNav } from "@/components/admin/admin-mobile-nav";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
-import { isAdminGateOpen } from "@/lib/auth/admin-gate";
 import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import { Button } from "@/components/ui/button";
+import { isAdminGateOpen } from "@/lib/auth/admin-gate";
+import { safeAdminNextPath } from "@/lib/auth/admin-gate-config";
+import { PATHNAME_REQUEST_HEADER } from "@/lib/i18n/config";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +19,14 @@ export default async function AdminLayout({
 }) {
   const gateOpen = await isAdminGateOpen();
   if (!gateOpen) {
-    redirect("/admin/login");
+    const headerList = await headers();
+    const requested =
+      headerList.get(PATHNAME_REQUEST_HEADER) ||
+      headerList.get("x-invoke-path") ||
+      headerList.get("next-url") ||
+      "";
+    const next = safeAdminNextPath(requested);
+    redirect(next === "/admin" ? "/admin/login" : `/admin/login?next=${encodeURIComponent(next)}`);
   }
 
   return (

@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import {
+  canonicalAdminPathname,
   hasValidAdminGateCookie,
   isAdminLoginPath,
 } from "@/lib/auth/admin-gate-config";
@@ -29,7 +30,7 @@ export function canAccessAdminSurface(request: NextRequest): boolean {
   const { pathname } = request.nextUrl;
   if (isAdminLoginPath(pathname)) return true;
   if (hasValidAdminGateCookie(request.cookies)) return true;
-  if (pathname.startsWith("/admin")) return true;
+  if (canonicalAdminPathname(pathname)) return true;
   return isAdminIpAllowed(request);
 }
 

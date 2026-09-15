@@ -86,6 +86,7 @@ import {
   isAdminLoginPath,
   isValidAdminGateCookie,
   requiresAdminGate,
+  safeAdminNextPath,
 } from "../../lib/auth/admin-gate-config";
 import { shouldBlockBot } from "../../lib/v30/security/bot-shield";
 import { isStripeSessionQuery, scanQueryString } from "../../lib/v30/security/waf";
@@ -834,9 +835,20 @@ file("lib/monetization/payout-map.ts");
   assert.equal(requiresAdminGate("/admin"), true);
   assert.equal(requiresAdminGate("/admin/categories"), true);
   assert.equal(requiresAdminGate("/admin/articles/new"), true);
+  assert.equal(requiresAdminGate("/admin/sales"), true);
+  assert.equal(requiresAdminGate("/cs/admin/sales"), true);
   assert.equal(requiresAdminGate("/admin/login"), false);
+  assert.equal(requiresAdminGate("/cs/admin/login"), false);
   assert.equal(isAdminLoginPath("/admin/login"), true);
+  assert.equal(isAdminLoginPath("/cs/admin/login"), true);
   assert.equal(isAdminLoginPath("/admin"), false);
+  assert.equal(safeAdminNextPath("/admin/sales"), "/admin/sales");
+  assert.equal(safeAdminNextPath("/cs/admin/sales"), "/admin/sales");
+  assert.equal(safeAdminNextPath("/cs/admin/login"), "/admin");
+  assert.equal(safeAdminNextPath("/exchange"), "/admin");
+  assert.equal(safeAdminNextPath("//evil.example/admin"), "/admin");
+  assert.equal(safeAdminNextPath("https://evil.example/admin/sales"), "/admin/sales");
+  assert.equal(safeAdminNextPath("https://evil.example/exchange"), "/admin");
   assert.equal(hasValidAdminGateCookie({ get: () => undefined }), false);
   assert.equal(
     hasValidAdminGateCookie({
@@ -854,11 +866,15 @@ file("lib/monetization/payout-map.ts");
   assert.equal(hasValidAdminGateCookie({ get: () => ({ value: "x" }) }), false);
   assert.equal(ADMIN_GATE_COOKIE, "ms_admin_session");
   assert.equal(shouldBlockBot("curl/8.0", "/admin/login"), false);
+  assert.equal(shouldBlockBot("curl/8.0", "/cs/admin/login"), false);
   assert.equal(shouldBlockBot("curl/8.0", "/admin"), true);
+  assert.equal(shouldBlockBot("curl/8.0", "/cs/admin/sales"), true);
   assert.equal(shouldBlockBot("Mozilla/5.0 (Windows NT 10.0) Chrome/120.0.0.0", "/admin"), false);
   const nextConfig = readFileSync(join(root, "next.config.mjs"), "utf8");
   assert.ok(nextConfig.includes('source: "/admin"'));
   assert.ok(nextConfig.includes("private, no-cache, no-store, must-revalidate"));
+  assert.ok(nextConfig.includes("/admin/:path*"));
+  assert.ok(nextConfig.includes('destination: "/admin/:path*"'));
   if (prev === undefined) delete process.env.ADMIN_GATE_PASSWORD;
   else process.env.ADMIN_GATE_PASSWORD = prev;
 }
@@ -887,6 +903,12 @@ file("lib/monetization/payout-map.ts");
   const gateForm = readFileSync(join(root, "components/v21/admin-gate-form.tsx"), "utf8");
   assert.ok(gateForm.includes('method="post"'));
   assert.ok(gateForm.includes('action="/admin/login"'));
+  assert.ok(gateForm.includes("router.push(next)"));
+  const loginPage = readFileSync(join(root, "app/(public)/admin/login/page.tsx"), "utf8");
+  assert.ok(loginPage.includes("safeAdminNextPath"));
+  const mw = readFileSync(join(root, "middleware.ts"), "utf8");
+  assert.ok(mw.includes("localePrefixedAdminCanonical"));
+  assert.ok(mw.includes('searchParams.set("next"'));
   const security = readFileSync(join(root, "app/(admin)/admin/security/page.tsx"), "utf8");
   assert.ok(security.includes("isAdminGateOpen"));
   assert.ok(security.includes('redirect("/admin/login")'));
