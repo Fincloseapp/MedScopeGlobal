@@ -2691,7 +2691,17 @@ assert.equal(NEWSLETTER_PRIMARY_LOCALES.length, PRIMARY_EDITORIAL_LOCALES.length
   assert.equal(verifyNewsletterArticleUnlock("sleep-and-longevity", token), true);
   assert.ok(
     !readFileSync(join(root, "lib/monetization/article-meter.ts"), "utf8").includes("newsletter-article-unlock"),
-    "article-meter must stay Edge-safe for middleware"
+    "article-meter must not import node:crypto unlock (Edge middleware)"
+  );
+  assert.ok(
+    !readFileSync(join(root, "components/v23/newsletter-issue-view.tsx"), "utf8").includes("newsletter-article-unlock"),
+    "newsletter issue view is in the admin client bundle — no node:crypto"
+  );
+  assert.ok(
+    readFileSync(join(root, "app/(public)/newsletter/[slug]/page.tsx"), "utf8").includes("signNewsletterIssueLinks")
+  );
+  assert.ok(
+    readFileSync(join(root, "app/(public)/newsletter/posledni/page.tsx"), "utf8").includes("signNewsletterIssueLinks")
   );
   assert.ok(absoluteNewsletterHref("/article/sleep-and-longevity", "fr").includes("/fr/article/"));
   assert.ok(publicBrandSignature("de").startsWith("MedScopeGlobal"));

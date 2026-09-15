@@ -95,5 +95,20 @@ export function absoluteNewsletterHref(href: string | undefined | null, locale: 
   }
   const localized = localizePublicHref(trimmed.startsWith("/") ? trimmed : `/${trimmed}`, locale);
   const abs = localized.startsWith("http") ? localized : `${origin}${localized}`;
-  return withNewsletterArticleUnlock(abs);
+    return withNewsletterArticleUnlock(abs);
+}
+
+export function signNewsletterIssueLinks<T extends { layout_json?: unknown }>(issue: T): T {
+  const layout = issue.layout_json;
+  if (!layout || typeof layout !== "object") return issue;
+  const copy = structuredClone(layout) as {
+    sections?: Array<{ items?: Array<{ href?: string | null }> }>;
+  };
+  if (!Array.isArray(copy.sections)) return issue;
+  for (const section of copy.sections) {
+    for (const item of section.items ?? []) {
+      if (item.href) item.href = withNewsletterArticleUnlock(item.href);
+    }
+  }
+  return { ...issue, layout_json: copy };
 }
