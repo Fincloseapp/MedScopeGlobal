@@ -7,10 +7,11 @@ import type { SalesSnapshot } from "@/lib/sales/types";
 import { formatSalesCzk, salesYearlyCzk, salesYearlyEffectiveMonthCzk } from "@/lib/sales/packages";
 import { salesControlWorst } from "@/lib/sales/control";
 
-type Tab = "prehled" | "trziste" | "smycka" | "pipeline" | "inzerenti" | "outreach" | "faktury" | "poptavky" | "pravni";
+type Tab = "prehled" | "kampan" | "trziste" | "smycka" | "pipeline" | "inzerenti" | "outreach" | "faktury" | "poptavky" | "pravni";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "prehled", label: "Přehled" },
+  { id: "kampan", label: "Kampaň" },
   { id: "trziste", label: "Tržiště" },
   { id: "smycka", label: "Smyčka" },
   { id: "pipeline", label: "Pipeline" },
@@ -61,6 +62,7 @@ export function SalesDesk() {
   const [error, setError] = useState<string | null>(null);
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
+  const [copyLocale, setCopyLocale] = useState("cs");
 
   const load = useCallback(async () => {
     setError(null);
@@ -113,9 +115,10 @@ export function SalesDesk() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">Admin · Peníze</p>
           <h1 className="mt-1 font-display text-3xl font-bold text-[#021d33]">Obchodní oddělení</h1>
           <p className="mt-2 max-w-3xl text-sm text-slate-600">
-            Autonomní prodej paušální inzerce a tržiště: nabídky, poptávky, formulář i e-mail
-            inzerce@medscopeglobal.com, automatické odpovědi, faktura a plnění. Studený e-mail jde ke
-            schválení, inbound se posílá sám.
+            Autonomní prodej paušální inzerce a tržiště. Paušál Start 450 Kč / měsíc, roční 4 500 Kč
+            (2 měsíce zdarma, 375 Kč / měs.). Kampaň posílá jen platné firemní role-schránky, denně
+            spouští smyčku tržiště a vede k cíli 250–500 inzerentů Start v každé jazykové mutaci
+            do 18. 9. 2026 14:00.
           </p>
           {generated ? <p className="mt-1 text-xs text-slate-500">Stav k {generated}</p> : null}
           {!data && !error ? (
@@ -224,6 +227,38 @@ export function SalesDesk() {
           </div>
         ))}
       </div>
+      {data?.campaign ? (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            {
+              label: "Paušál Start",
+              value: `${formatSalesCzk(data.campaign.monthCzk)} / měs.`,
+              hint: `roční ${formatSalesCzk(data.campaign.yearCzk)} · ${formatSalesCzk(data.campaign.yearEffectiveCzk)} / měs.`,
+            },
+            {
+              label: "Platné adresy kampaně",
+              value: String(data.campaign.sendableTotal),
+              hint: `${data.campaign.localesCovered} jazykových mutací · max ${data.campaign.maxEmailsPerRun} e-mailů / běh`,
+            },
+            {
+              label: "Cíl inzerentů Start / mutace",
+              value: `${data.campaign.byLocale[0]?.targetMin ?? 250}–${data.campaign.byLocale[0]?.targetMax ?? 500}`,
+              hint: `Termín ${data.campaign.deadlineLabel}`,
+            },
+            {
+              label: "Autonomie",
+              value: data.campaign.autoCampaignSend ? "odesílání zapnuto" : "čeká schválení",
+              hint: data.campaign.autoLoopDaily ? "smyčka každý den v cronu" : "smyčka ručně",
+            },
+          ].map((card) => (
+            <div key={card.label} className="rounded-2xl border border-[#d9e8f4] bg-white p-4">
+              <p className="text-xs uppercase tracking-wider text-slate-500">{card.label}</p>
+              <p className="mt-1 font-display text-xl font-semibold text-[#021d33]">{card.value}</p>
+              <p className="mt-1 text-xs text-slate-500">{card.hint}</p>
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       <div className="flex flex-wrap gap-2">
         {TABS.map((item) => (
@@ -276,11 +311,133 @@ export function SalesDesk() {
               </div>
             ))}
           </div>
+          {data.campaign ? (
+            <div className="space-y-3 rounded-2xl border border-[#d9e8f4] bg-white p-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">
+                Maximalizace inzerentů · kampaň tržiště
+              </p>
+              <p className="text-sm text-slate-600">{data.campaign.honesty}</p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
+                    <tr>
+                      <th className="px-3 py-2">Mutace</th>
+                      <th className="px-3 py-2">Tržiště</th>
+                      <th className="px-3 py-2">Platné adresy</th>
+                      <th className="px-3 py-2">Start inzerenti</th>
+                      <th className="px-3 py-2">Chybí do 250</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.campaign.byLocale.map((row) => (
+                      <tr key={row.locale} className="border-t">
+                        <td className="px-3 py-2">
+                          {row.label}
+                          <p className="text-xs text-slate-500">{row.locale}</p>
+                        </td>
+                        <td className="px-3 py-2 text-xs">
+                          <a className="text-[#005B96] underline" href={row.marketplaceUrl}>
+                            {row.marketplaceUrl.replace("https://", "")}
+                          </a>
+                        </td>
+                        <td className="px-3 py-2">{row.sendableCount}</td>
+                        <td className="px-3 py-2">{row.startAdvertisers}</td>
+                        <td className="px-3 py-2">{row.gapMin}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : null}
           {data.runs[0] ? (
             <p className="text-xs text-slate-500">
               Poslední běh: {data.runs[0].ok ? "OK" : "chyba"} · {JSON.stringify(data.runs[0].summary)}
             </p>
           ) : null}
+        </section>
+      ) : null}
+
+      {tab === "kampan" && data?.campaign ? (
+        <section className="space-y-4">
+          <p className="text-sm text-slate-600">{data.campaign.honesty}</p>
+          <p className="text-sm text-slate-600">
+            Odesílá se autonomně při cronu <code>/api/cron/sales-department</code> (každý den i několikrát denně).
+            Paušál Start {formatSalesCzk(data.campaign.monthCzk)} / měsíc, roční {formatSalesCzk(data.campaign.yearCzk)}{" "}
+            ({formatSalesCzk(data.campaign.yearEffectiveCzk)} / měs.). Auto-odeslání kampaně:{" "}
+            <strong>{data.campaign.autoCampaignSend ? "zapnuto" : "vypnuto"}</strong>.
+          </p>
+          <div>
+            <label className="text-xs uppercase tracking-wider text-slate-500" htmlFor="campaign-copy-locale">
+              Textace, která se posílá
+            </label>
+            <select
+              id="campaign-copy-locale"
+              className="mt-1 block rounded-lg border px-3 py-2 text-sm"
+              value={copyLocale}
+              onChange={(e) => setCopyLocale(e.target.value)}
+            >
+              {data.campaign.byLocale.map((row) => (
+                <option key={row.locale} value={row.locale}>
+                  {row.label} ({row.locale})
+                </option>
+              ))}
+            </select>
+          </div>
+          {(() => {
+            const preview = data.campaign.byLocale.find((row) => row.locale === copyLocale) ?? data.campaign.byLocale[0];
+            if (!preview) return null;
+            return (
+              <div className="space-y-3 rounded-2xl border bg-white p-4">
+                <p className="text-sm font-semibold text-[#021d33]">{preview.copySubject}</p>
+                <p className="text-xs text-slate-500">
+                  Tržiště:{" "}
+                  <a className="text-[#005B96] underline" href={preview.marketplaceUrl}>
+                    {preview.marketplaceUrl}
+                  </a>
+                  {" · "}
+                  Paušál:{" "}
+                  <a className="text-[#005B96] underline" href={preview.pausalUrl}>
+                    {preview.pausalUrl}
+                  </a>
+                </p>
+                <pre className="whitespace-pre-wrap rounded-xl bg-slate-50 p-3 text-xs text-slate-700">{preview.copyText}</pre>
+                <div
+                  className="prose prose-sm max-w-none rounded-xl border border-slate-100 p-3 text-sm"
+                  dangerouslySetInnerHTML={{ __html: preview.copyHtml }}
+                />
+              </div>
+            );
+          })()}
+          <div className="overflow-x-auto rounded-2xl border bg-white">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
+                <tr>
+                  <th className="px-3 py-2">Země / mutace</th>
+                  <th className="px-3 py-2">Firma</th>
+                  <th className="px-3 py-2">Platný e-mail</th>
+                  <th className="px-3 py-2">Web</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.campaign.emails.map((row) => (
+                  <tr key={`${row.locale}-${row.email}`} className="border-t align-top">
+                    <td className="px-3 py-2">
+                      {row.localeLabel}
+                      <p className="text-xs text-slate-500">{row.country}</p>
+                    </td>
+                    <td className="px-3 py-2">{row.company}</td>
+                    <td className="px-3 py-2 font-mono text-xs">{row.email}</td>
+                    <td className="px-3 py-2 text-xs">
+                      <a className="text-[#005B96] underline" href={row.website}>
+                        {row.website.replace(/^https:\/\/(www\.)?/, "")}
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       ) : null}
 
@@ -470,7 +627,8 @@ export function SalesDesk() {
           <p className="text-sm text-slate-600">
             Modelový běh interně vybere dodavatele, vloží nabídku, udělá z něj předplatitele tržiště, vybere
             poptávající firmu, ta si dodavatele vybere a oslovení jde přes tržiště. Bez lidského schválení.
-            Používá schránky <code>.invalid</code> — nikoho zvenku neoslovuje.
+            Používá schránky <code>.invalid</code> — nikoho zvenku neoslovuje. Cron ji spouští automaticky
+            jednou denně (Europe/Prague) uvnitř <code>/api/cron/sales-department</code>.
           </p>
           {data.loop ? (
             <div
@@ -608,8 +766,9 @@ export function SalesDesk() {
       {tab === "pravni" && data ? (
         <section className="space-y-3 rounded-2xl border bg-white p-5 text-sm text-slate-700">
           <p>
-            Studené B2B oslovení je ve výchozím stavu <strong>ke schválení</strong>. Automaticky se posílají
-            jen odpovědi na poptávku, souhlas a stávající zákazníci.
+            Studené B2B oslovení bez ověřené role-schránky je ke schválení. Kampaň tržiště posílá
+            autonomně jen <strong>platné firemní role@oficiální-doména</strong> (LIA). Inbound poptávky
+            a zákazníci se posílají sami.
           </p>
           <ul className="list-disc space-y-1 pl-5">
             <li>SÚKL / zákon o léčivech: Rx jen na odborné ploše (tarif Klinický / Partner).</li>
@@ -617,8 +776,9 @@ export function SalesDesk() {
             <li>GDPR + 480/2004 Sb.: odhlášení jedním klikem, zákaz osobních mailboxů u LIA.</li>
             <li>Faktury: {data.legal.termsPath} · neplátce DPH dle ARES.</li>
             <li>
-              Cold auto-send: {data.legal.coldAutoSend ? "zapnuto (SALES_AUTO_OUTBOUND)" : "vypnuto"} · max{" "}
-              {data.legal.maxTouches} kontaktů · {data.legal.maxEmailsPerRun} e-mailů / běh.
+              Cold auto-send: {data.legal.coldAutoSend ? "zapnuto (SALES_AUTO_OUTBOUND)" : "vypnuto"} · kampaň
+              auto-send: {data.legal.campaignAutoSend ? "zapnuto" : "vypnuto"} · max {data.legal.maxTouches}{" "}
+              kontaktů · {data.legal.maxEmailsPerRun} e-mailů / běh.
             </li>
           </ul>
           <p>

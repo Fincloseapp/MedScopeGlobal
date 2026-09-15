@@ -280,6 +280,10 @@ import { normalizeCzechIco, salesPayInstructions } from "../../lib/sales/pay";
 import { MARKETPLACE_DESK_SQL } from "../../lib/marketplace/schema";
 import { classifyMarketplaceKind, classifyMarketplaceMessage, marketplaceReplyCopy } from "../../lib/marketplace/auto-reply";
 import { SAMPLE_DEMANDS } from "../../lib/marketplace/board";
+import { buildCampaignSnapshot } from "../../lib/sales/campaign";
+import { CAMPAIGN_ROSTER, isCampaignEmailSendable } from "../../lib/sales/campaign-roster";
+import { campaignMarketplaceEmail, campaignMarketplaceUrl } from "../../lib/sales/campaign-copy";
+import { CAMPAIGN_DEADLINE_ISO, CAMPAIGN_TARGET_MAX, CAMPAIGN_TARGET_MIN } from "../../lib/sales/campaign-goal";
 import { briefChrome } from "../../lib/monetization/brief-marketing";
 import { translateNavHref } from "../../lib/i18n/nav-copy";
 import { getDesktopHeaderMenu } from "../../lib/config/main-navigation";
@@ -5923,6 +5927,18 @@ console.log(
   });
   assert.equal(cold.allow, true);
   assert.equal(cold.autoSend, false);
+  const campaignGate = evaluateOutreachGate({
+    email: "marketing@firma.cz",
+    legalBasis: "legitimate_interest",
+    stage: "qualified",
+    outreachCount: 0,
+    lastContactedAt: null,
+    suppressedAt: null,
+    approvedOutreachAt: null,
+    campaignAuto: true,
+  });
+  assert.equal(campaignGate.allow, true);
+  assert.equal(campaignGate.autoSend, true);
   const guessed = evaluateOutreachGate({
     email: "ahoj@firma.cz",
     legalBasis: "unverified_guess",
@@ -6003,6 +6019,43 @@ console.log(
       readFileSync(join(root, "app/(public)/inzerce/page.tsx"), "utf8").includes("Magazín · jiný produkt"),
     "inzerce hub must split marketplace retainer from magazine campaigns"
   );
+  assert.ok(readFileSync(join(root, ".env.example"), "utf8").includes("SALES_CAMPAIGN_AUTO"));
+  const campaign = buildCampaignSnapshot();
+  assert.equal(campaign.monthCzk, 450);
+  assert.equal(campaign.yearCzk, 4500);
+  assert.equal(campaign.yearEffectiveCzk, 375);
+  assert.equal(campaign.deadlineAt, CAMPAIGN_DEADLINE_ISO);
+  assert.equal(campaign.byLocale.length, GLOBAL_LOCALES.length);
+  assert.ok(campaign.sendableTotal >= GLOBAL_LOCALES.length);
+  assert.ok(CAMPAIGN_ROSTER.length === campaign.sendableTotal);
+  const emails = new Set<string>();
+  for (const row of CAMPAIGN_ROSTER) {
+    assert.ok(isCampaignEmailSendable(row.email, row.website), row.email);
+    assert.equal(isPersonalMailbox(row.email), false);
+    assert.equal(isRoleBasedEmail(row.email), true);
+    assert.ok(!emails.has(row.email), `duplicate ${row.email}`);
+    emails.add(row.email);
+  }
+  for (const locale of GLOBAL_LOCALES) {
+    const slice = campaign.byLocale.find((row) => row.locale === locale.code);
+    assert.ok(slice, locale.code);
+    assert.ok(slice!.sendableCount >= 1, `no sendable emails for ${locale.code}`);
+    assert.equal(slice!.targetMin, CAMPAIGN_TARGET_MIN);
+    assert.equal(slice!.targetMax, CAMPAIGN_TARGET_MAX);
+    assert.ok(slice!.marketplaceUrl.includes("medscopeglobal.com"));
+    assert.ok(slice!.marketplaceUrl.includes("/exchange") || slice!.marketplaceUrl.endsWith("/exchange"));
+    const letter = campaignMarketplaceEmail({
+      company: "TestCo",
+      locale: locale.code,
+      unsubscribeUrl: "https://medscopeglobal.com/api/sales/unsubscribe?email=x&token=y",
+    });
+    assert.ok(letter.html.includes(campaignMarketplaceUrl(locale.code)));
+    assert.ok(letter.html.includes("450") || letter.text.includes("450"));
+    assert.ok(letter.html.includes("/api/sales/unsubscribe"));
+  }
+  assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes("Kampaň"));
+  assert.ok(readFileSync(join(root, "lib/sales/runner.ts"), "utf8").includes("seedCampaignProspects"));
+  assert.ok(readFileSync(join(root, "lib/sales/runner.ts"), "utf8").includes("alreadyLoopedToday"));
   assert.ok(readFileSync(join(root, ".env.example"), "utf8").includes("LEGAL_ENTITY_IBAN"));
   const blockedMail = evaluateSalesControl({
     mailReady: false,

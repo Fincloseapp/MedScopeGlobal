@@ -29,6 +29,7 @@ import {
   listInvoices,
   listOutreach,
   listProspects,
+  listRuns,
   listSuppressions,
   salesDb,
   updateContract,
@@ -37,6 +38,7 @@ import {
   updateProspect,
 } from "@/lib/sales/store";
 import type { SalesProspect, SalesTickResult } from "@/lib/sales/types";
+import { alreadyLoopedToday, seedCampaignProspects } from "@/lib/sales/campaign";
 import { mailReady } from "@/lib/monetization/vialongevita-brief";
 
 function idleControl(skippedLegal = 0) {
@@ -68,6 +70,9 @@ function emptyTick(partial: Partial<SalesTickResult> & { startedAt: string }): S
     inquiriesForwarded: 0,
     paused: 0,
     matched: 0,
+    loopDaily: false,
+    campaignSeeded: 0,
+    campaignUpdated: 0,
     errors: [],
     finishedAt: new Date().toISOString(),
     control: idleControl(),
@@ -100,6 +105,9 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
   let inquiriesForwarded = 0;
   let paused = 0;
   let matched = 0;
+  let loopDaily = false;
+  let campaignSeeded = 0;
+  let campaignUpdated = 0;
 
   try {
     for (const seed of SALES_ICP_SEEDS) {
@@ -120,6 +128,15 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
         source: "icp",
       });
       if (row) seeded += 1;
+    }
+
+    try {
+      const campaign = await seedCampaignProspects(db);
+      campaignSeeded = campaign.seeded;
+      campaignUpdated = campaign.updated;
+      seeded += campaign.seeded;
+    } catch (err) {
+      errors.push(err instanceof Error ? `campaign_seed: ${err.message}` : "campaign_seed");
     }
 
     try {
@@ -213,15 +230,15 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
     }
 
     const suppressed = await listSuppressions(db);
-    const prospects = await listProspects(db, 400);
+    const prospects = await listProspects(db, 800);
     for (const prospect of prospects) {
       if (prospect.email && suppressed.has(prospect.email) && !prospect.suppressed_at) {
         await updateProspect(db, prospect.id, { suppressed_at: new Date().toISOString(), stage: "suppressed" });
       }
     }
 
-    const fresh = await listProspects(db, 400);
-    const outreachRows = await listOutreach(db, 400);
+    const fresh = await listProspects(db, 800);
+    const outreachRows = await listOutreach(db, 800);
     const alreadyQueued = new Set(
       outreachRows
         .filter((row) => ["queued", "needs_approval", "approved", "sent"].includes(row.status))
@@ -345,8 +362,13 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
     }
 
     try {
-      const { advanceLiveMarketplaceMatching } = await import("@/lib/sales/marketplace-loop");
+      const { advanceLiveMarketplaceMatching, runMarketplaceLoopModel } = await import("@/lib/sales/marketplace-loop");
       matched = (await advanceLiveMarketplaceMatching()).matched;
+      const runsToday = await listRuns(db, 40);
+      if (!alreadyLoopedToday(runsToday)) {
+        const loop = await runMarketplaceLoopModel({ persist: true });
+        loopDaily = Boolean(loop.persisted);
+      }
     } catch {
       /* matching is best-effort */
     }
@@ -422,6 +444,9 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
     inquiriesForwarded,
     paused,
     matched,
+    loopDaily,
+    campaignSeeded,
+    campaignUpdated,
     errors,
     startedAt,
     finishedAt,
