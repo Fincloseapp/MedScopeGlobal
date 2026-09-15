@@ -1,5 +1,6 @@
 import { campaignPublicUrl } from "@/lib/sales/campaign-copy";
 import { formatSalesCzk, salesPriceListPlain, salesFromPriceLabel, salesYearlyEffectiveMonthCzk, salesEntryMonthlyCzk } from "@/lib/sales/packages";
+import { localizeListedCzk } from "@/lib/i18n/payment-currency";
 import { marketplaceUiLang, type MarketplaceUiLang } from "@/lib/i18n/marketplace-ui-locale";
 
 export type MarketplaceReplyTopic =
@@ -131,7 +132,7 @@ const EN: ReplyPack = {
   },
   general: {
     subject: "MedScopeGlobal marketplace — offers, demand and retainer",
-    lead: `The marketplace matches manufacturer offers with hospital and lab demand. Advertisers see demand and receive contacts by email. Buyers see offers immediately. Retainer from ${salesFromPriceLabel()} / month, yearly ${formatSalesCzk(salesYearlyEffectiveMonthCzk(salesEntryMonthlyCzk()))} / month (two months free), no trade commission.`,
+    lead: `The marketplace matches manufacturer offers with hospital and lab demand. Advertisers see demand and receive contacts by email. Buyers see offers immediately. Retainer from ${salesFromPriceLabel("en")} / month, yearly ${formatSalesCzk(salesYearlyEffectiveMonthCzk(salesEntryMonthlyCzk()))} / month (two months free), no trade commission.`,
   },
 };
 
@@ -386,6 +387,7 @@ export function marketplaceReplyCopy(
   const pack = PACK[lang] ?? EN;
   const item = pack[topic];
   const loc = locale?.trim() || "cs";
+  const lead = localizeListedCzk(topic === "price" ? salesPriceListPlain(loc) : item.lead, loc);
   const market = campaignPublicUrl(loc, "/exchange");
   const navod = campaignPublicUrl(loc, "/exchange/navod");
   const pausal = campaignPublicUrl(loc, "/inzerce/pausal");
@@ -399,7 +401,7 @@ export function marketplaceReplyCopy(
     </ul>
     <p>${pack.replyNote}</p>
   `;
-  const html = `<p>${pack.hello}</p><p>${item.lead}</p>${links}<p>${pack.signoff}</p>`;
-  const text = `${item.lead}\n\n${market}\n${navod}\n${pausal}`;
+  const html = `<p>${pack.hello}</p><p>${lead}</p>${links}<p>${pack.signoff}</p>`;
+  const text = `${lead}\n\n${market}\n${navod}\n${pausal}`;
   return { subject: item.subject, html, text };
 }

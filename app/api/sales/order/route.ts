@@ -22,6 +22,7 @@ const schema = z.object({
   packageId: z.string().min(2).max(40),
   billingInterval: z.enum(["month", "year"]).optional(),
   termsAccepted: z.boolean(),
+  locale: z.string().max(16).optional(),
 });
 
 export async function POST(request: Request) {
@@ -54,6 +55,7 @@ export async function POST(request: Request) {
     packageId: body.packageId,
     billingInterval: body.billingInterval,
     termsAccepted: true,
+    locale: body.locale,
   });
 
   if (!result.ok) {

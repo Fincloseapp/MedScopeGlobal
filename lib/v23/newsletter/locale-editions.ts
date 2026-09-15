@@ -40,11 +40,12 @@ export function parseNewsletterIssueSlug(slug: string): NewsletterSlugParts {
 export function newsletterSlugCandidates(issueDate: string, locale: string): string[] {
   const preferred = newsletterIssueSlug(issueDate, locale);
   const dated = issueDate;
-  return preferred === dated ? [dated] : [preferred, dated];
+  return preferred === dated ? [dated] : [preferred];
 }
 
 export function publicNewsletterSlugCandidates(requestedSlug: string, pageLocale: string): string[] {
   const parsed = parseNewsletterIssueSlug(requestedSlug);
+  const resolved = resolveGlobalLocale(pageLocale);
   const out: string[] = [];
   const push = (value: string) => {
     if (value && !out.includes(value)) out.push(value);
@@ -52,10 +53,10 @@ export function publicNewsletterSlugCandidates(requestedSlug: string, pageLocale
   if (parsed.segment) {
     push(requestedSlug);
   }
-  for (const slug of newsletterSlugCandidates(parsed.issueDate, pageLocale)) {
+  for (const slug of newsletterSlugCandidates(parsed.issueDate, resolved)) {
     push(slug);
   }
-  if (!parsed.segment) {
+  if (!parsed.segment && resolved === "cs") {
     push(requestedSlug);
   }
   return out;

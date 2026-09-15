@@ -28,6 +28,7 @@ export type CreatePausalOrderInput = {
   termsAccepted: boolean;
   allowGuest?: boolean;
   billingInterval?: SalesBillingInterval;
+  locale?: string | null;
 };
 
 export async function createPausalOrder(input: CreatePausalOrderInput): Promise<{
@@ -64,6 +65,7 @@ export async function createPausalOrder(input: CreatePausalOrderInput): Promise<
         packageId: pkg.id,
         offerText: input.offerText,
         billingInterval,
+        locale: input.locale,
       });
       checkoutUrl = guest?.url ?? null;
     } catch (err) {

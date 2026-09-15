@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
-import { getLegalEntity } from "@/lib/config/legal-entity";
-import { SALES_PACKAGES, formatSalesCzk, salesYearlyCzk } from "@/lib/sales/packages";
+import { getLegalEntity, publicBrandSignature } from "@/lib/config/legal-entity";
+import { SALES_PACKAGES, formatSalesPrice, salesYearlyCzk } from "@/lib/sales/packages";
+import { getServerLocale } from "@/lib/i18n/server-locale";
 
 export const metadata: Metadata = {
   title: "Podmínky inzerce",
@@ -15,6 +16,7 @@ export default async function InzercePodminkyPage({
   searchParams: Promise<{ unsubscribed?: string }>;
 }) {
   const entity = getLegalEntity();
+  const locale = await getServerLocale();
   const query = await searchParams;
   return (
     <LegalPageLayout
@@ -29,9 +31,9 @@ export default async function InzercePodminkyPage({
 
       <h2>1. Provozovatel</h2>
       <p>
-        Inzerci na medscopeglobal.com prodává {entity.name}
-        {entity.ico ? `, IČO ${entity.ico}` : ""}
-        {entity.address ? `, ${entity.address}` : ""}. Kontakt: {entity.supportEmail}
+        Inzerci na medscopeglobal.com prodává MedScopeGlobal. {publicBrandSignature(locale)}.
+        {entity.ico ? ` IČO ${entity.ico}.` : ""}
+        {entity.address ? ` ${entity.address}.` : ""} Kontakt: {entity.supportEmail}
         {entity.supportPhone ? `, ${entity.supportPhone}` : ""}. Režim DPH:{" "}
         {entity.dic ? `plátce, DIČ ${entity.dic}` : "neplátce DPH dle ARES"}.
       </p>
@@ -44,7 +46,7 @@ export default async function InzercePodminkyPage({
       <ul>
         {SALES_PACKAGES.map((pkg) => (
           <li key={pkg.id}>
-            {pkg.name} — {formatSalesCzk(pkg.priceCzkMonth)} / měsíc, nebo {formatSalesCzk(salesYearlyCzk(pkg.priceCzkMonth))} / rok (2 měsíce zdarma)
+            {pkg.name} — {formatSalesPrice(pkg.priceCzkMonth, locale)} / měsíc, nebo {formatSalesPrice(salesYearlyCzk(pkg.priceCzkMonth), locale)} / rok (2 měsíce zdarma)
           </li>
         ))}
       </ul>

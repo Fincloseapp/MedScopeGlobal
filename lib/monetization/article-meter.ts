@@ -1,4 +1,5 @@
 import { resolveLocalePath } from "@/lib/i18n/locale-path";
+import { verifyNewsletterArticleUnlock } from "@/lib/monetization/newsletter-article-unlock";
 
 export const ARTICLE_METER_COOKIE = "ms_article_meter";
 export const ARTICLE_METER_HEADER = "x-ms-article-meter";
@@ -156,7 +157,12 @@ export function resolveMagazineMeterUnlock(input: {
   header?: string | null;
   slug: string;
   isBot?: boolean;
+  from?: string | null;
+  newsletterToken?: string | null;
 }): boolean {
+  if (input.from === "nl" && verifyNewsletterArticleUnlock(input.slug, input.newsletterToken)) {
+    return true;
+  }
   if (input.isBot) return false;
   if (input.header === "open") return true;
   if (input.header === "lock") return false;

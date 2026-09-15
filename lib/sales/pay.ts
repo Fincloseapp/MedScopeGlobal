@@ -1,6 +1,6 @@
 import { sendEmail } from "@/lib/email/engine";
 import { getLegalBankAccount, getLegalIban } from "@/lib/billing/spd-qr";
-import { getLegalEntity } from "@/lib/config/legal-entity";
+import { getLegalEntity, publicBrandLine } from "@/lib/config/legal-entity";
 import { SITE } from "@/lib/config/site";
 import { marketplaceAdminNotifyEmail, marketplaceInboxEmail } from "@/lib/marketplace/config";
 import { createStripeClient, getStripeSecretKey } from "@/lib/stripe/client";
@@ -10,6 +10,7 @@ import { randomToken, salesVariableSymbol } from "@/lib/sales/ids";
 
 export type SalesPayInstructions = {
   sellerName: string;
+  sellerLegalName: string;
   sellerIco: string | null;
   sellerAddress: string | null;
   iban: string | null;
@@ -23,7 +24,8 @@ export type SalesPayInstructions = {
 export function salesPayInstructions(): SalesPayInstructions {
   const entity = getLegalEntity();
   return {
-    sellerName: entity.name,
+    sellerName: publicBrandLine(entity),
+    sellerLegalName: entity.name,
     sellerIco: entity.ico,
     sellerAddress: entity.address,
     iban: getLegalIban(),
@@ -49,6 +51,7 @@ export async function createGuestRetainerCheckout(input: {
   packageId: string;
   offerText?: string;
   billingInterval?: SalesBillingInterval;
+  locale?: string | null;
 }): Promise<{ url: string; pendingId: string } | null> {
   const key = getStripeSecretKey();
   const pkg = salesPackageById(input.packageId);
@@ -57,14 +60,30 @@ export async function createGuestRetainerCheckout(input: {
   const origin = SITE.url.replace(/\/$/, "");
   const stripe = createStripeClient(key);
   const interval: SalesBillingInterval = input.billingInterval === "year" ? "year" : "month";
-  const line = salesStripeLine(pkg.priceCzkMonth, interval);
+  const line = salesStripeLine(pkg.priceCzkMonth, interval, input.locale);
+  const stripeLocale =
+    !input.locale || input.locale === "cs"
+      ? "cs"
+      : input.locale.startsWith("de")
+        ? "de"
+        : input.locale.startsWith("fr")
+          ? "fr"
+          : input.locale.startsWith("it")
+            ? "it"
+            : input.locale.startsWith("es")
+              ? "es"
+              : input.locale.startsWith("pl")
+                ? "pl"
+                : input.locale.startsWith("pt")
+                  ? "pt"
+                  : "en";
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
-    locale: "cs",
+    locale: stripeLocale,
     billing_address_collection: "required",
     tax_id_collection: { enabled: true },
     custom_text: {
-      submit: { message: `${line.description}. Neplátce DPH.` },
+      submit: { message: `${line.description}.` },
     },
     success_url: `${origin}/inzerce/pausal?paid=1&pending=${encodeURIComponent(pendingId)}`,
     cancel_url: `${origin}/inzerce/pausal?cancelled=1`,
@@ -95,7 +114,7 @@ export async function createGuestRetainerCheckout(input: {
       {
         quantity: 1,
         price_data: {
-          currency: "czk",
+          currency: line.currency,
           recurring: line.recurring,
           unit_amount: line.unitAmount,
           product_data: {

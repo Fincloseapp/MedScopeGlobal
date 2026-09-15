@@ -1,3 +1,4 @@
+import { convertCzkToCharge, formatCzkListPrice } from "@/lib/i18n/payment-currency";
 import type { SalesBillingInterval, SalesPackage, SalesPackageId } from "@/lib/sales/types";
 
 export type { SalesPackageId, SalesBillingInterval };
@@ -141,6 +142,12 @@ export function formatSalesCzk(amount: number): string {
   return `${Math.round(amount).toLocaleString("cs-CZ")} Kč`;
 }
 
+/** Public price for the visitor's edition — CZK on /cs, EUR or USD elsewhere. */
+export function formatSalesPrice(amountCzk: number, locale?: string | null): string {
+  if (!locale || locale === "cs") return formatSalesCzk(amountCzk);
+  return formatCzkListPrice(amountCzk, locale);
+}
+
 export function salesEntryMonthlyCzk(): number {
   return SALES_PACKAGES[0]?.priceCzkMonth ?? 450;
 }
@@ -157,38 +164,62 @@ export function salesChargeCzk(monthlyCzk: number, interval: SalesBillingInterva
   return interval === "year" ? salesYearlyCzk(monthlyCzk) : monthlyCzk;
 }
 
-export function salesFromPriceLabel(): string {
-  return `od ${formatSalesCzk(salesEntryMonthlyCzk())}`;
+export function salesFromPriceLabel(locale?: string | null): string {
+  const prefix = !locale || locale === "cs" ? "od" : "from";
+  return `${prefix} ${formatSalesPrice(salesEntryMonthlyCzk(), locale)}`;
 }
 
-export function salesPriceListPlain(): string {
+export function salesPriceListPlain(locale?: string | null): string {
   const start = salesEntryMonthlyCzk();
-  const ladder = SALES_PACKAGES.map((pkg) => `${pkg.name} ${formatSalesCzk(pkg.priceCzkMonth)}`).join(", ");
+  const money = (amount: number) => formatSalesPrice(amount, locale);
+  const ladder = SALES_PACKAGES.map((pkg) => `${pkg.name} ${money(pkg.priceCzkMonth)}`).join(", ");
+  if (!locale || locale === "cs") {
+    return (
+      `Měsíční paušál: ${ladder}. Roční předplatné je 10 měsíců (2 měsíce zdarma) — ` +
+      `Start ${money(salesYearlyCzk(start))} / rok, tedy ${money(salesYearlyEffectiveMonthCzk(start))} / měs. ` +
+      `Nejsme plátci DPH. Provizi z obchodu nebereme — platíte jen paušál za plochy a předání poptávek.`
+    );
+  }
   return (
-    `Měsíční paušál: ${ladder}. Roční předplatné je 10 měsíců (2 měsíce zdarma) — ` +
-    `Start ${formatSalesCzk(salesYearlyCzk(start))} / rok, tedy ${formatSalesCzk(salesYearlyEffectiveMonthCzk(start))} / měs. ` +
-    `Nejsme plátci DPH. Provizi z obchodu nebereme — platíte jen paušál za plochy a předání poptávek.`
+    `Monthly retainer: ${ladder}. Annual billing is 10 months (two months free) — ` +
+    `Start ${money(salesYearlyCzk(start))} / year, ${money(salesYearlyEffectiveMonthCzk(start))} / month. ` +
+    `We are not VAT-registered in Czechia. No trade commission — you pay only the retainer.`
   );
 }
 
-export function salesStripeLine(monthlyCzk: number, interval: SalesBillingInterval): {
+export function salesStripeLine(
+  monthlyCzk: number,
+  interval: SalesBillingInterval,
+  locale?: string | null
+): {
   unitAmount: number;
+  currency: string;
   recurring: { interval: "month" | "year" };
   description: string;
 } {
+  const chargeCzk = interval === "year" ? salesYearlyCzk(monthlyCzk) : monthlyCzk;
+  const charge = convertCzkToCharge(chargeCzk, locale);
   if (interval === "year") {
-    const year = salesYearlyCzk(monthlyCzk);
-    const effective = salesYearlyEffectiveMonthCzk(monthlyCzk);
+    const year = formatSalesPrice(salesYearlyCzk(monthlyCzk), locale);
+    const effective = formatSalesPrice(salesYearlyEffectiveMonthCzk(monthlyCzk), locale);
     return {
-      unitAmount: Math.round(year * 100),
+      unitAmount: charge.unitAmount,
+      currency: charge.currency,
       recurring: { interval: "year" },
-      description: `Roční paušál ${formatSalesCzk(year)} (2 měsíce zdarma, ${formatSalesCzk(effective)} / měs.)`,
+      description:
+        !locale || locale === "cs"
+          ? `Roční paušál ${year} (2 měsíce zdarma, ${effective} / měs.)`
+          : `Annual retainer ${year} (two months free, ${effective} / month)`,
     };
   }
   return {
-    unitAmount: Math.round(monthlyCzk * 100),
+    unitAmount: charge.unitAmount,
+    currency: charge.currency,
     recurring: { interval: "month" },
-    description: `Měsíční paušál ${formatSalesCzk(monthlyCzk)}`,
+    description:
+      !locale || locale === "cs"
+        ? `Měsíční paušál ${formatSalesPrice(monthlyCzk, locale)}`
+        : `Monthly retainer ${formatSalesPrice(monthlyCzk, locale)}`,
   };
 }
 

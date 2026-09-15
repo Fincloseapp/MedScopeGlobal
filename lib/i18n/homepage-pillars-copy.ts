@@ -3,6 +3,7 @@ import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { homepagePillarsEdition, type HomepagePillarsEdition } from "@/lib/i18n/homepage-pillars-editions";
+import { localizeListedCzkIn } from "@/lib/i18n/payment-currency";
 
 export type HomepagePillarId = "magazine" | "marketplace" | "students" | "physicians";
 
@@ -451,8 +452,11 @@ export function getHomepagePillarsCopy(locale?: string | null): HomepagePillarsC
     (packKey === "en" && primary !== "en") || primary === "pt" ? homepagePillarsEdition(primary) : undefined;
   const merged = applyEdition(pack, edition);
   const czech = packKey === "cs";
-  return {
-    ...merged,
-    pillars: merged.pillars.filter((pillar) => czech || !pillar.czechOnly),
-  };
+  return localizeListedCzkIn(
+    {
+      ...merged,
+      pillars: merged.pillars.filter((pillar) => czech || !pillar.czechOnly),
+    },
+    locale
+  );
 }
