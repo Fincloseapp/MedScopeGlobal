@@ -1,6 +1,7 @@
 import { applySalesDepartmentSchema } from "@/lib/sales/apply-schema";
 import { SALES_ICP_SEEDS } from "@/lib/sales/icp";
-import { salesColdAutoSendEnabled, salesMaxEmailsPerRun, salesMaxTouches } from "@/lib/sales/legal";
+import { salesCampaignAutoSendEnabled, salesColdAutoSendEnabled, salesMaxEmailsPerRun, salesMaxTouches } from "@/lib/sales/legal";
+import { buildCampaignSnapshot } from "@/lib/sales/campaign";
 import { SALES_PACKAGES } from "@/lib/sales/packages";
 import {
   listContracts,
@@ -59,12 +60,14 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
   const db = salesDb();
   const legal = {
     coldAutoSend: salesColdAutoSendEnabled(),
+    campaignAutoSend: salesCampaignAutoSendEnabled(),
     maxTouches: salesMaxTouches(),
     maxEmailsPerRun: salesMaxEmailsPerRun(),
     termsPath: "/inzerce/podminky",
     privacyPath: "/privacy",
     unsubscribePath: "/api/sales/unsubscribe",
   };
+  const campaignEmpty = buildCampaignSnapshot();
 
   if (!db) {
     return {
@@ -86,14 +89,15 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
         control: controlFromRows(mailHealth(), [], [], [], [], 0),
       },
       loop: lastMarketplaceLoop(),
+      campaign: campaignEmpty,
       legal,
     };
   }
 
   const [prospects, contracts, outreach, invoices, inquiries, runs] = await Promise.all([
-    listProspects(db),
-    listContracts(db),
-    listOutreach(db),
+    listProspects(db, 800),
+    listContracts(db, 400),
+    listOutreach(db, 400),
     listInvoices(db),
     listInquiries(db),
     listRuns(db),
@@ -196,6 +200,7 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
       ),
     },
     loop: lastMarketplaceLoop(),
+    campaign: buildCampaignSnapshot({ contracts, prospects }),
     legal,
   };
 }
