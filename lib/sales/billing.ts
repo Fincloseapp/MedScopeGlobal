@@ -4,7 +4,8 @@ import { sendEmail } from "@/lib/email/engine";
 import { SITE } from "@/lib/config/site";
 import { createStripeClient, getStripeSecretKey } from "@/lib/stripe/client";
 import { salesInvoiceEmailIntro, salesPortalUrl } from "@/lib/sales/copy";
-import { salesPackageById } from "@/lib/sales/packages";
+import { salesPackageById, salesStripeLine } from "@/lib/sales/packages";
+import type { SalesBillingInterval, SalesContract, SalesInvoice, SalesProspect } from "@/lib/sales/types";
 import { dateOnly, nextInvoiceNumber, salesVariableSymbol } from "@/lib/sales/ids";
 import {
   countInvoicesThisMonth,
@@ -13,7 +14,6 @@ import {
   updateInvoice,
   type SalesClient,
 } from "@/lib/sales/store";
-import type { SalesContract, SalesInvoice, SalesProspect } from "@/lib/sales/types";
 
 export function buildSalesInvoiceDocument(input: {
   invoice: Pick<SalesInvoice, "number" | "variable_symbol" | "amount_czk" | "period_start" | "period_end">;
@@ -46,7 +46,8 @@ export async function issueRetainerInvoice(
   contract: SalesContract,
   prospect: SalesProspect,
   periodStart: Date,
-  periodEnd: Date
+  periodEnd: Date,
+  amountCzk?: number
 ): Promise<SalesInvoice | null> {
   const seq = (await countInvoicesThisMonth(db)) + 1;
   const number = nextInvoiceNumber(seq, periodStart);
@@ -59,7 +60,7 @@ export async function issueRetainerInvoice(
     number,
     variable_symbol: vs,
     status: "issued",
-    amount_czk: contract.monthly_czk,
+    amount_czk: amountCzk ?? contract.monthly_czk,
     period_start: dateOnly(periodStart),
     period_end: dateOnly(periodEnd),
     due_at: due.toISOString(),
@@ -195,14 +196,25 @@ export async function applySalesStripeFailure(contractId: string): Promise<void>
   await updateContract(db, contract.id, { status: "past_due", grace_until: grace.toISOString() });
 }
 
-export async function createRetainerCheckoutUrl(contract: SalesContract, prospect: SalesProspect): Promise<string | null> {
+export async function createRetainerCheckoutUrl(
+  contract: SalesContract,
+  prospect: SalesProspect,
+  billingInterval: SalesBillingInterval = "month"
+): Promise<string | null> {
   const key = getStripeSecretKey();
   if (!key) return null;
   const pkg = salesPackageById(contract.package_id);
   const stripe = createStripeClient(key);
   const origin = SITE.url.replace(/\/$/, "");
+  const line = salesStripeLine(contract.monthly_czk, billingInterval);
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
+    locale: "cs",
+    billing_address_collection: "required",
+    tax_id_collection: { enabled: true },
+    custom_text: {
+      submit: { message: `${line.description}. Neplátce DPH.` },
+    },
     success_url: `${origin}/inzerenti/portal?token=${encodeURIComponent(contract.portal_token)}&paid=1`,
     cancel_url: `${origin}/inzerce/pausal?cancelled=1`,
     customer_email: prospect.email ?? undefined,
@@ -211,11 +223,13 @@ export async function createRetainerCheckoutUrl(contract: SalesContract, prospec
       contract_id: contract.id,
       prospect_id: prospect.id,
       package_id: contract.package_id,
+      billing_interval: billingInterval,
     },
     subscription_data: {
       metadata: {
         kind: "sales_retainer",
         contract_id: contract.id,
+        billing_interval: billingInterval,
       },
     },
     line_items: [
@@ -223,11 +237,11 @@ export async function createRetainerCheckoutUrl(contract: SalesContract, prospec
         quantity: 1,
         price_data: {
           currency: "czk",
-          recurring: { interval: "month" },
-          unit_amount: Math.round(contract.monthly_czk * 100),
+          recurring: line.recurring,
+          unit_amount: line.unitAmount,
           product_data: {
             name: `MedScopeGlobal inzerce — ${pkg?.name ?? contract.package_id}`,
-            description: `Měsíční paušál ${prospect.company}`,
+            description: `${line.description} · ${prospect.company}`,
           },
         },
       },

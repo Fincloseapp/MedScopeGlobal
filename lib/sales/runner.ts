@@ -1,6 +1,12 @@
 import { sendEmail } from "@/lib/email/engine";
+import { runAdEditorBoard } from "@/lib/ads/ad-editors";
 import { applySalesDepartmentSchema } from "@/lib/sales/apply-schema";
+import { applyMarketplaceDeskSchema } from "@/lib/marketplace/schema";
+import { listMarketplaceListings, updateMarketplaceListing } from "@/lib/marketplace/store";
+import { sendMarketplaceAck, sendMarketplaceAutoReply } from "@/lib/marketplace/mail";
+import { classifyMarketplaceMessage } from "@/lib/marketplace/auto-reply";
 import { salesDunningEmail, salesPortalUrl } from "@/lib/sales/copy";
+import { evaluateSalesControl } from "@/lib/sales/control";
 import { icpNeedsHumanReview, SALES_ICP_SEEDS } from "@/lib/sales/icp";
 import { addMonthsIso, dateOnly, randomToken, slugifyCompany } from "@/lib/sales/ids";
 import { salesMaxEmailsPerRun } from "@/lib/sales/legal";
@@ -23,6 +29,7 @@ import {
   listInvoices,
   listOutreach,
   listProspects,
+  listRuns,
   listSuppressions,
   salesDb,
   updateContract,
@@ -31,6 +38,21 @@ import {
   updateProspect,
 } from "@/lib/sales/store";
 import type { SalesProspect, SalesTickResult } from "@/lib/sales/types";
+import { alreadyLoopedToday, seedCampaignProspects } from "@/lib/sales/campaign";
+import { mailReady } from "@/lib/monetization/vialongevita-brief";
+
+function idleControl(skippedLegal = 0) {
+  return evaluateSalesControl({
+    mailReady: mailReady(),
+    unrepliedListings: 0,
+    outreachNeedsApproval: 0,
+    inquiriesReceived: 0,
+    inquiriesOverdue: 0,
+    invoicesOverdue: 0,
+    pendingPayment: 0,
+    skippedLegal,
+  });
+}
 
 function emptyTick(partial: Partial<SalesTickResult> & { startedAt: string }): SalesTickResult {
   return {
@@ -47,8 +69,13 @@ function emptyTick(partial: Partial<SalesTickResult> & { startedAt: string }): S
     fulfilled: 0,
     inquiriesForwarded: 0,
     paused: 0,
+    matched: 0,
+    loopDaily: false,
+    campaignSeeded: 0,
+    campaignUpdated: 0,
     errors: [],
     finishedAt: new Date().toISOString(),
+    control: idleControl(),
     ...partial,
   };
 }
@@ -57,6 +84,7 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
   const startedAt = new Date().toISOString();
   const errors: string[] = [];
   const schema = await applySalesDepartmentSchema();
+  await applyMarketplaceDeskSchema();
   const db = salesDb(null);
   if (!db) {
     return emptyTick({
@@ -76,6 +104,10 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
   let fulfilled = 0;
   let inquiriesForwarded = 0;
   let paused = 0;
+  let matched = 0;
+  let loopDaily = false;
+  let campaignSeeded = 0;
+  let campaignUpdated = 0;
 
   try {
     for (const seed of SALES_ICP_SEEDS) {
@@ -96,6 +128,35 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
         source: "icp",
       });
       if (row) seeded += 1;
+    }
+
+    try {
+      const campaign = await seedCampaignProspects(db);
+      campaignSeeded = campaign.seeded;
+      campaignUpdated = campaign.updated;
+      seeded += campaign.seeded;
+    } catch (err) {
+      errors.push(err instanceof Error ? `campaign_seed: ${err.message}` : "campaign_seed");
+    }
+
+    try {
+      const pending = await listMarketplaceListings(db, 200);
+      for (const listing of pending) {
+        if (listing.auto_replied_at || !listing.contact_email) continue;
+        const topic = classifyMarketplaceMessage(`${listing.title} ${listing.summary}`);
+        const replied =
+          listing.kind === "question"
+            ? await sendMarketplaceAutoReply({ to: listing.contact_email, topic, listing })
+            : await sendMarketplaceAck(listing);
+        if (replied.ok) {
+          await updateMarketplaceListing(db, listing.id, {
+            auto_replied_at: new Date().toISOString(),
+            reply_topic: topic,
+          });
+        }
+      }
+    } catch {
+      /* marketplace tables may not exist yet */
     }
 
     const { data: requests } = await db
@@ -169,15 +230,15 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
     }
 
     const suppressed = await listSuppressions(db);
-    const prospects = await listProspects(db, 400);
+    const prospects = await listProspects(db, 800);
     for (const prospect of prospects) {
       if (prospect.email && suppressed.has(prospect.email) && !prospect.suppressed_at) {
         await updateProspect(db, prospect.id, { suppressed_at: new Date().toISOString(), stage: "suppressed" });
       }
     }
 
-    const fresh = await listProspects(db, 400);
-    const outreachRows = await listOutreach(db, 400);
+    const fresh = await listProspects(db, 800);
+    const outreachRows = await listOutreach(db, 800);
     const alreadyQueued = new Set(
       outreachRows
         .filter((row) => ["queued", "needs_approval", "approved", "sent"].includes(row.status))
@@ -299,11 +360,75 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
         await updateInquiry(db, inquiry.id, { status: "overdue" });
       }
     }
+
+    try {
+      const { advanceLiveMarketplaceMatching, runMarketplaceLoopModel } = await import("@/lib/sales/marketplace-loop");
+      matched = (await advanceLiveMarketplaceMatching()).matched;
+      const runsToday = await listRuns(db, 40);
+      if (!alreadyLoopedToday(runsToday)) {
+        const loop = await runMarketplaceLoopModel({ persist: true });
+        loopDaily = Boolean(loop.persisted);
+      }
+    } catch {
+      /* matching is best-effort */
+    }
+
+    try {
+      const liveListings = await listMarketplaceListings(db, 80);
+      for (const listing of liveListings) {
+        if (listing.status !== "visible" || listing.kind === "question") continue;
+        const board = runAdEditorBoard({
+          company: listing.company,
+          adText: `${listing.title}\n${listing.summary}`,
+        });
+        if (board.recommendation === "deny") {
+          await updateMarketplaceListing(db, listing.id, {
+            status: "rejected",
+            reply_topic: "blocked_legal",
+          });
+        }
+      }
+    } catch {
+      /* marketplace editorial is best-effort */
+    }
   } catch (err) {
     errors.push(err instanceof Error ? err.message : String(err));
   }
 
   const finishedAt = new Date().toISOString();
+  let control = evaluateSalesControl({
+    mailReady: mailReady(),
+    unrepliedListings: 0,
+    outreachNeedsApproval: 0,
+    inquiriesReceived: 0,
+    inquiriesOverdue: 0,
+    invoicesOverdue: 0,
+    pendingPayment: 0,
+    skippedLegal,
+  });
+  try {
+    const [listingsNow, inquiriesNow, invoicesNow, outreachNow, contractsNow] = await Promise.all([
+      listMarketplaceListings(db, 80),
+      listInquiries(db, 120),
+      listInvoices(db, 120),
+      listOutreach(db, 200),
+      listContracts(db, 200),
+    ]);
+    control = evaluateSalesControl({
+      mailReady: mailReady(),
+      unrepliedListings: listingsNow.filter((row) => !row.auto_replied_at).length,
+      outreachNeedsApproval: outreachNow.filter((row) => row.status === "needs_approval").length,
+      inquiriesReceived: inquiriesNow.filter((row) => row.status === "received").length,
+      inquiriesOverdue: inquiriesNow.filter((row) => row.status === "overdue").length,
+      invoicesOverdue: invoicesNow.filter((row) => row.status === "overdue").length,
+      pendingPayment: contractsNow.filter((row) => row.status === "pending_payment").length,
+      skippedLegal: outreachNow.filter((row) => row.status === "skipped_legal").length,
+    });
+    await insertEvent(db, "sales_control", { findings: control });
+  } catch {
+    /* control snapshot is best-effort */
+  }
+
   const summary: SalesTickResult = {
     ok: errors.length === 0,
     schemaOk: schema.ok,
@@ -318,9 +443,14 @@ export async function runSalesDepartmentTick(): Promise<SalesTickResult> {
     fulfilled,
     inquiriesForwarded,
     paused,
+    matched,
+    loopDaily,
+    campaignSeeded,
+    campaignUpdated,
     errors,
     startedAt,
     finishedAt,
+    control,
   };
 
   await insertRun(db, {

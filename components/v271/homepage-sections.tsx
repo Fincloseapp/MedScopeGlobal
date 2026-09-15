@@ -222,45 +222,66 @@ export function V271AudienceSections() {
 }
 
 export function V271B2bBlock({ locale = "cs" }: { locale?: string }) {
-  const surface = getSurfaceCopy(locale);
   const revenue = getRevenueCopy(locale);
   const formHref = localizePublicHref("/firmy/reklama/nova", locale);
+  const exchangeHref = localizePublicHref("/exchange", locale);
+  const pausalHref = localizePublicHref("/inzerce/pausal", locale);
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <div className="rounded-3xl border border-[#005B96]/15 bg-[#005B96]/5 px-6 py-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">Inzerce</p>
-            <h3 className="mt-1 font-display text-xl font-semibold text-[#021d33]">{surface.b2bTitle}</h3>
-            <p className="mt-2 text-sm text-slate-600">{surface.b2bDescription}</p>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-3xl border border-[#021d33] bg-[#021d33] px-6 py-8 text-white">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e8d5a3]">
+            Tržiště · jen firmy
+          </p>
+          <h3 className="mt-1 font-display text-xl font-semibold">B2B nabídky a poptávky</h3>
+          <p className="mt-2 text-sm text-white/75">
+            Společnosti vkládají nabídku nebo poptávku jedním formulářem. Osoby a předplatitelé sem nepatří.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Link
+              href={exchangeHref}
+              className="rounded-full bg-[#c4a35a] px-5 py-2.5 text-sm font-semibold text-[#021d33] hover:bg-[#e8d5a3]"
+            >
+              Vstoupit na tržiště
+            </Link>
+            <Link href={pausalHref} className="rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white">
+              Paušál od {formatCzkListPrice(450, locale)}
+            </Link>
           </div>
+        </div>
+        <div className="rounded-3xl border border-[#005B96]/15 bg-[#005B96]/5 px-6 py-8">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#005B96]">Magazín · čtenáři</p>
+          <h3 className="mt-1 font-display text-xl font-semibold text-[#021d33]">Předplatitelé a inzerce u čtenářů</h3>
+          <p className="mt-2 text-sm text-slate-600">
+            Osoby čtou a předplácejí ViaLongeVita. Firmy, které chtějí oslovit čtenáře, kupují kampaň tady — ne paušál tržiště.
+          </p>
           <Link
             href={formHref}
-            className="rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
+            className="mt-5 inline-flex rounded-full bg-[#005B96] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004a7a]"
           >
             {revenue.mediaKitCta}
           </Link>
+          <dl className="mt-6 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
+              <dt className="text-xs text-slate-500">{revenue.bannerName}</dt>
+              <dd className="font-display text-lg font-semibold text-[#021d33]">
+                {localizeListedCzk("5 000 Kč", locale)}
+              </dd>
+            </div>
+            <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
+              <dt className="text-xs text-slate-500">{revenue.sponsoredName}</dt>
+              <dd className="font-display text-lg font-semibold text-[#021d33]">
+                {localizeListedCzk("15 000 Kč", locale)}
+              </dd>
+            </div>
+            <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
+              <dt className="text-xs text-slate-500">{revenue.newsletterName}</dt>
+              <dd className="font-display text-lg font-semibold text-[#021d33]">
+                {localizeListedCzk("3 500 Kč", locale)}
+              </dd>
+            </div>
+          </dl>
         </div>
-        <dl className="mt-6 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
-            <dt className="text-xs text-slate-500">{revenue.bannerName}</dt>
-            <dd className="font-display text-lg font-semibold text-[#021d33]">
-              {localizeListedCzk("5 000 Kč", locale)}
-            </dd>
-          </div>
-          <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
-            <dt className="text-xs text-slate-500">{revenue.sponsoredName}</dt>
-            <dd className="font-display text-lg font-semibold text-[#021d33]">
-              {localizeListedCzk("15 000 Kč", locale)}
-            </dd>
-          </div>
-          <div className="rounded-xl border border-[#005B96]/15 bg-white px-4 py-3">
-            <dt className="text-xs text-slate-500">{revenue.newsletterName}</dt>
-            <dd className="font-display text-lg font-semibold text-[#021d33]">
-              {localizeListedCzk("3 500 Kč", locale)}
-            </dd>
-          </div>
-        </dl>
       </div>
     </section>
   );
@@ -462,13 +483,16 @@ export function V272AppsTrioBlock() {
               className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white shadow-sm"
             >
               <div className="relative aspect-[16/9] bg-slate-100">
-                <Image
-                  src={APP_MARKETING_IMAGE[app.id]}
-                  alt=""
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
+                <AppOpenLink href={app.appPath} className="absolute inset-0 block">
+                  <Image
+                    src={APP_MARKETING_IMAGE[app.id]}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                  <span className="sr-only">{app.shortName} — otevřít</span>
+                </AppOpenLink>
               </div>
               <div className="flex flex-1 flex-col p-5">
               <Image

@@ -40,7 +40,7 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
     exchangeKicker: "Výrobci · laboratoře",
     exchangeTitle: "Tržiště není inzerce v magazínu",
     exchangeLead:
-      "Poptávky z Česka a EU, CE / IVDR / ISO. Čtenářská reklama je výše — tržiště výrobců je samostatná stránka.",
+      "Kupující vidí nabídky hned. Inzerent vidí poptávky hned. Kontakty až po paušálu — bez provize. Čtenářská reklama v magazínu je výše.",
     exchangeCta: "Otevřít tržiště",
     roomsKicker: "Formáty",
     roomsTitle: "Kam patří která poptávka",
@@ -382,7 +382,7 @@ const PACK: Record<ChromePack, FirmyDeskCopy> = {
     exchangeKicker: "Manufacturers · labs",
     exchangeTitle: "The marketplace is not magazine advertising",
     exchangeLead:
-      "Czech and EU demand, CE / IVDR / ISO. Reader ads sit above — the manufacturer desk is a separate page.",
+      "Buyers see offers immediately. Advertisers see demand immediately. Contacts after a retainer — no trade commission. Reader ads sit above.",
     exchangeCta: "Open the marketplace",
     roomsKicker: "Formats",
     roomsTitle: "Where each enquiry belongs",

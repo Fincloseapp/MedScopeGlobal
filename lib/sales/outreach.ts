@@ -1,8 +1,14 @@
 import { sendEmail } from "@/lib/email/engine";
 import { getLegalEntity } from "@/lib/config/legal-entity";
 import { salesPackageById } from "@/lib/sales/packages";
+import { campaignMarketplaceEmail, campaignSourceLocale, isCampaignProspect } from "@/lib/sales/campaign";
 import { salesOfferEmail, salesUnsubscribeUrl } from "@/lib/sales/copy";
-import { evaluateOutreachGate, unsubscribeToken } from "@/lib/sales/legal";
+import {
+  domainMatchesWebsite,
+  evaluateOutreachGate,
+  salesCampaignAutoSendEnabled,
+  unsubscribeToken,
+} from "@/lib/sales/legal";
 import {
   insertOutreach,
   listOutreach,
@@ -21,18 +27,27 @@ export function buildOfferForProspect(
   const email = prospect.email;
   if (!email) return null;
   const token = unsubscribeToken(email);
+  const unsubscribeUrl = salesUnsubscribeUrl(email, token);
+  if (isCampaignProspect(prospect)) {
+    return campaignMarketplaceEmail({
+      company: prospect.company,
+      locale: campaignSourceLocale(prospect.source),
+      unsubscribeUrl,
+    });
+  }
   return salesOfferEmail({
     company: prospect.company,
     package: pkg,
     checkoutUrl: extras?.checkoutUrl,
     portalUrl: extras?.portalUrl,
-    unsubscribeUrl: salesUnsubscribeUrl(email, token),
+    unsubscribeUrl,
     variableSymbol: extras?.vs,
     invoiceNumber: extras?.invoiceNumber,
   });
 }
 
 export function recommendedPackageId(prospect: SalesProspect): SalesPackage["id"] {
+  if (isCampaignProspect(prospect)) return "start";
   if (prospect.sector === "pharma_rx") return "clinical";
   if (prospect.sector === "congress" || prospect.sector === "medtech") return "magazine";
   if (prospect.sector === "clinic" || prospect.sector === "pharmacy") return "visible";
@@ -45,6 +60,11 @@ export async function queueOfferIfNeeded(
   suppressed: Set<string>,
   pkg?: SalesPackage | null
 ): Promise<{ queued: boolean; needsApproval: boolean; reason: string }> {
+  const campaignAuto =
+    isCampaignProspect(prospect) &&
+    salesCampaignAutoSendEnabled() &&
+    Boolean(prospect.email) &&
+    domainMatchesWebsite(prospect.email!, prospect.website);
   const gate = evaluateOutreachGate({
     email: prospect.email,
     legalBasis: prospect.legal_basis,
@@ -54,6 +74,7 @@ export async function queueOfferIfNeeded(
     suppressedAt: prospect.suppressed_at,
     approvedOutreachAt: prospect.approved_outreach_at,
     suppressed: prospect.email ? suppressed.has(prospect.email) : false,
+    campaignAuto,
   });
   if (!gate.allow) return { queued: false, needsApproval: false, reason: gate.reason };
 
@@ -66,7 +87,7 @@ export async function queueOfferIfNeeded(
   const row = await insertOutreach(db, {
     prospect_id: prospect.id,
     status,
-    template: "offer",
+    template: isCampaignProspect(prospect) ? "marketplace_campaign" : "offer",
     subject: letter.subject,
     body_html: letter.html,
     legal_basis: gate.legalBasis,
@@ -85,9 +106,9 @@ export async function sendQueuedOutreach(
   cap: number
 ): Promise<{ sent: number; skippedLegal: number; failed: number }> {
   const entity = getLegalEntity();
-  const rows = await listOutreach(db, 80);
+  const rows = await listOutreach(db, 800);
   const pending = rows.filter((row) => row.status === "queued" || row.status === "approved");
-  const prospects = await listProspects(db, 400);
+  const prospects = await listProspects(db, 800);
   const byId = new Map(prospects.map((p) => [p.id, p]));
   let sent = 0;
   let skippedLegal = 0;
@@ -106,6 +127,10 @@ export async function sendQueuedOutreach(
       skippedLegal += 1;
       continue;
     }
+    const campaignAuto =
+      isCampaignProspect(prospect) &&
+      salesCampaignAutoSendEnabled() &&
+      domainMatchesWebsite(prospect.email, prospect.website);
     const gate = evaluateOutreachGate({
       email: prospect.email,
       legalBasis: prospect.legal_basis,
@@ -115,6 +140,7 @@ export async function sendQueuedOutreach(
       suppressedAt: prospect.suppressed_at,
       approvedOutreachAt: prospect.approved_outreach_at || (row.status === "approved" ? new Date().toISOString() : null),
       suppressed: false,
+      campaignAuto,
     });
     if (!gate.allow || !gate.autoSend) {
       await updateOutreach(db, row.id, {

@@ -14,7 +14,9 @@ export async function GET(request: Request) {
   }
 
   try {
-    const result = await generateNewsletterIssue();
+    const url = new URL(request.url);
+    const force = url.searchParams.get("force") === "1";
+    const result = await generateNewsletterIssue({ force });
     return NextResponse.json({ ok: true, ...result });
   } catch (e) {
     return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });

@@ -1,4 +1,4 @@
-import { getLegalEntity } from "@/lib/config/legal-entity";
+import { getLegalEntity, publicBrandSignature } from "@/lib/config/legal-entity";
 import { SITE } from "@/lib/config/site";
 import { formatSalesCzk } from "@/lib/sales/packages";
 import type { SalesPackage } from "@/lib/sales/types";
@@ -45,7 +45,7 @@ export function salesOfferEmail(input: {
 }) {
   const entity = getLegalEntity();
   const pkg = input.package;
-  const subject = `Nabídka měsíční inzerce MedScopeGlobal — ${pkg.name} (${formatSalesCzk(pkg.priceCzkMonth)} / měsíc)`;
+  const subject = `Nabídka inzerce MedScopeGlobal — ${pkg.name} (${formatSalesCzk(pkg.priceCzkMonth)} / měsíc)`;
   const pay = input.checkoutUrl
     ? `<p><a href="${input.checkoutUrl}">Objednat a zaplatit paušál kartou (Stripe)</a></p>`
     : `<p>Platbu kartou připravíme po odsouhlasení. Můžete odpovědět na tento e-mail.</p>`;
@@ -62,11 +62,11 @@ export function salesOfferEmail(input: {
     <p>Dobrý den, ${input.company},</p>
     <p>
       ozýváme se z obchodního oddělení <strong>${entity.tradeName}</strong>
-      (${entity.name}${entity.ico ? `, IČO ${entity.ico}` : ""}).
+      ({entity.domain}).
       Nabízíme měsíční paušál inzerce na medscopeglobal.com — bez skryté reklamy,
       s označením inzerce a s předáním poptávek podle zaplaceného tarifu.
     </p>
-    <p><strong>${pkg.name}</strong> — ${formatSalesCzk(pkg.priceCzkMonth)} měsíčně (neplátce DPH).</p>
+    <p><strong>${pkg.name}</strong> — ${formatSalesCzk(pkg.priceCzkMonth)} měsíčně, nebo roční předplatné se 2 měsíci zdarma (neplátce DPH).</p>
     <ul>${pkg.features.map((f) => `<li>${f}</li>`).join("")}</ul>
     ${pay}
     ${vs}
@@ -80,7 +80,7 @@ export function salesOfferEmail(input: {
       odhlaste se jedním kliknutím:
       <a href="${input.unsubscribeUrl}">odhlásit obchodní nabídky</a>.
     </p>
-    <p>${entity.name}<br>${entity.supportEmail}${entity.supportPhone ? `<br>${entity.supportPhone}` : ""}</p>
+    <p>${publicBrandSignature("cs", entity)}<br>${entity.supportEmail}${entity.supportPhone ? `<br>${entity.supportPhone}` : ""}</p>
   `;
   const text = [
     `Nabídka ${pkg.name} — ${formatSalesCzk(pkg.priceCzkMonth)} / měsíc.`,

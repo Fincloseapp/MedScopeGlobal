@@ -5,7 +5,7 @@ import type { SalesLegalBasis, SalesProspect } from "@/lib/sales/types";
 const PERSONAL_MAILBOX = /@(gmail|googlemail|seznam|email\.cz|outlook|hotmail|icloud|yahoo|protonmail|zoznam)\./i;
 
 const ROLE_LOCAL_PART =
-  /^(info|marketing|obchod|sales|inzerce|reklama|media|pr|press|tisk|partnerstvi|partnerství|kontakt|office|hello|advertising)@/i;
+  /^(info|marketing|obchod|sales|inzerce|reklama|media|pr|press|presse|tisk|partnerstvi|partnerství|partners|kontakt|contact|office|hello|advertising|comercial|vendas|commerciale|kommunikation|vertrieb|partenariats|comunicacao|comunicação|contato|biuro|partnerschaft)@/i;
 
 const MAX_TOUCHES_DEFAULT = 3;
 const MIN_DAYS_BETWEEN = 7;
@@ -16,13 +16,24 @@ export function salesMaxTouches(): number {
 }
 
 export function salesMaxEmailsPerRun(): number {
-  const n = Number(process.env.SALES_MAX_EMAILS_PER_RUN ?? 12);
-  return Number.isFinite(n) && n > 0 ? Math.min(40, Math.floor(n)) : 12;
+  const n = Number(process.env.SALES_MAX_EMAILS_PER_RUN ?? 500);
+  return Number.isFinite(n) && n > 0 ? Math.min(500, Math.floor(n)) : 500;
 }
 
 /** Cold B2B auto-send is off unless operators explicitly enable it. */
 export function salesColdAutoSendEnabled(): boolean {
   return /^(1|true|yes)$/i.test(process.env.SALES_AUTO_OUTBOUND ?? "");
+}
+
+/**
+ * Marketplace campaign: role inbox on the company's official domain.
+ * Default on (opt out with SALES_CAMPAIGN_AUTO=false). Still fail-closed
+ * for personal mailboxes and unverified guesses.
+ */
+export function salesCampaignAutoSendEnabled(): boolean {
+  const value = process.env.SALES_CAMPAIGN_AUTO;
+  if (value == null || value.trim() === "") return true;
+  return /^(1|true|yes)$/i.test(value);
 }
 
 export function isPersonalMailbox(email: string | null | undefined): boolean {
@@ -58,6 +69,8 @@ export function evaluateOutreachGate(input: {
   approvedOutreachAt: string | null;
   now?: Date;
   suppressed?: boolean;
+  /** Role@official-domain campaign row — may auto-send without SALES_AUTO_OUTBOUND. */
+  campaignAuto?: boolean;
 }): OutreachGate {
   const now = input.now ?? new Date();
   const basis = input.legalBasis;
@@ -102,8 +115,13 @@ export function evaluateOutreachGate(input: {
         legalBasis: basis,
       };
     }
-    if (input.approvedOutreachAt || salesColdAutoSendEnabled()) {
-      return { allow: true, autoSend: true, reason: "b2b_legitimate_interest", legalBasis: basis };
+    if (input.approvedOutreachAt || salesColdAutoSendEnabled() || input.campaignAuto) {
+      return {
+        allow: true,
+        autoSend: true,
+        reason: input.campaignAuto ? "b2b_campaign_role" : "b2b_legitimate_interest",
+        legalBasis: basis,
+      };
     }
     return {
       allow: true,

@@ -2,8 +2,17 @@
 
 export function arenaPulsePaths(at = new Date()): string[] {
   const paths = ["/api/cron/agent-arena"];
-  if (at.getUTCMinutes() % 15 === 0) {
+  const minute = at.getUTCMinutes();
+  const hour = at.getUTCHours();
+  if (minute % 15 === 0) {
     paths.push("/api/cron/growth-sprint?light=1");
+  }
+  if (hour === 6 && minute < 5) {
+    paths.push("/api/cron/sales-department");
+    if (at.getUTCDay() === 1) {
+      paths.push("/api/cron/newsletter-generate");
+      paths.push("/api/cron/vialongevita-brief");
+    }
   }
   return paths;
 }

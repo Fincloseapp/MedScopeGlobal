@@ -3,10 +3,28 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { SALES_PACKAGES, formatSalesCzk, type SalesPackageId } from "@/lib/sales/packages";
+import {
+  SALES_PACKAGES,
+  formatSalesPrice,
+  salesEntryMonthlyCzk,
+  salesYearlyCzk,
+  salesYearlyEffectiveMonthCzk,
+  type SalesBillingInterval,
+  type SalesPackageId,
+} from "@/lib/sales/packages";
+import type { SalesPayInstructions } from "@/lib/sales/pay";
 
-export function PausalOrderForm({ defaultPackage }: { defaultPackage?: SalesPackageId }) {
-  const [packageId, setPackageId] = useState<SalesPackageId>(defaultPackage ?? "magazine");
+export function PausalOrderForm({
+  defaultPackage,
+  pay,
+  locale = "cs",
+}: {
+  defaultPackage?: SalesPackageId;
+  pay: SalesPayInstructions;
+  locale?: string;
+}) {
+  const [packageId, setPackageId] = useState<SalesPackageId>(defaultPackage ?? "start");
+  const [billingInterval, setBillingInterval] = useState<SalesBillingInterval>("month");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<{
@@ -14,6 +32,7 @@ export function PausalOrderForm({ defaultPackage }: { defaultPackage?: SalesPack
     portalUrl: string | null;
     invoiceNumber?: string;
     variableSymbol?: string;
+    mode?: string;
   } | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -25,12 +44,14 @@ export function PausalOrderForm({ defaultPackage }: { defaultPackage?: SalesPack
       company: String(form.get("company") ?? ""),
       contactName: String(form.get("contactName") ?? ""),
       email: String(form.get("email") ?? ""),
-      ico: String(form.get("ico") ?? "") || undefined,
-      address: String(form.get("address") ?? "") || undefined,
+      ico: String(form.get("ico") ?? ""),
+      address: String(form.get("address") ?? ""),
       website: String(form.get("website") ?? "") || undefined,
       offerText: String(form.get("offerText") ?? "") || undefined,
       packageId,
+      billingInterval,
       termsAccepted: form.get("terms") === "on",
+      locale,
     };
     const res = await fetch("/api/sales/order", {
       method: "POST",
@@ -43,6 +64,7 @@ export function PausalOrderForm({ defaultPackage }: { defaultPackage?: SalesPack
       portalUrl?: string | null;
       invoiceNumber?: string;
       variableSymbol?: string;
+      mode?: string;
     };
     setBusy(false);
     if (!res.ok) {
@@ -54,6 +76,7 @@ export function PausalOrderForm({ defaultPackage }: { defaultPackage?: SalesPack
       portalUrl: json.portalUrl ?? null,
       invoiceNumber: json.invoiceNumber,
       variableSymbol: json.variableSymbol,
+      mode: json.mode,
     });
     if (json.checkoutUrl) window.location.href = json.checkoutUrl;
   }
@@ -61,11 +84,29 @@ export function PausalOrderForm({ defaultPackage }: { defaultPackage?: SalesPack
   if (done && !done.checkoutUrl) {
     return (
       <div className="rounded-2xl border border-[#cfe1f3] bg-white p-5 text-sm">
-        <p className="font-semibold text-[#021d33]">Objednávka je přijatá.</p>
+        <p className="font-semibold text-[#021d33]">Objednávka je přijatá — můžeme fakturovat.</p>
         <p className="mt-2 text-slate-600">
-          Faktura {done.invoiceNumber ?? ""} {done.variableSymbol ? `· VS ${done.variableSymbol}` : ""} byla
-          odeslána na e-mail. Stripe karta nyní není k dispozici — uhraďte převodem.
+          {done.invoiceNumber ? `Faktura ${done.invoiceNumber}. ` : ""}
+          {done.variableSymbol ? `Variabilní symbol ${done.variableSymbol}. ` : ""}
+          Potvrzení jde na e-mail.
         </p>
+        {pay.iban || pay.bankAccount ? (
+          <div className="mt-3 rounded-xl border border-slate-200 bg-[#f7fafc] px-4 py-3">
+            <p className="font-medium text-[#021d33]">Převod</p>
+            {pay.bankAccount ? <p>Účet: {pay.bankAccount}</p> : null}
+            {pay.iban ? <p>IBAN: {pay.iban}</p> : null}
+            {done.variableSymbol ? <p>VS: {done.variableSymbol}</p> : null}
+            <p className="mt-1 text-xs text-slate-500">{pay.sellerName} · {pay.sellerLegalName} · IČO {pay.sellerIco} · neplátce DPH</p>
+          </div>
+        ) : (
+          <p className="mt-3 text-slate-600">
+            Kartu Stripe teď nelze otevřít. Napište na{" "}
+            <a className="font-semibold text-[#005B96] underline" href={`mailto:${pay.inbox}`}>
+              {pay.inbox}
+            </a>{" "}
+            — připravíme platbu tentýž den.
+          </p>
+        )}
         {done.portalUrl ? (
           <Button asChild className="mt-4">
             <Link href={done.portalUrl}>Otevřít portál inzerenta</Link>
@@ -78,7 +119,46 @@ export function PausalOrderForm({ defaultPackage }: { defaultPackage?: SalesPack
   return (
     <form onSubmit={(e) => void onSubmit(e)} className="space-y-4 rounded-2xl border border-[#cfe1f3] bg-white p-5">
       <div className="grid gap-2 sm:grid-cols-2">
-        {SALES_PACKAGES.map((pkg) => (
+        <label
+          className={`cursor-pointer rounded-xl border p-3 text-sm ${
+            billingInterval === "month" ? "border-[#005B96] bg-[#f3f9ff]" : "border-slate-200"
+          }`}
+        >
+          <input
+            type="radio"
+            name="billing"
+            className="mr-2"
+            checked={billingInterval === "month"}
+            onChange={() => setBillingInterval("month")}
+          />
+          <strong>Měsíčně</strong>
+          <p className="mt-1 text-xs text-slate-600">Platba každý měsíc. Start {formatSalesPrice(salesEntryMonthlyCzk(), locale)}.</p>
+        </label>
+        <label
+          className={`cursor-pointer rounded-xl border p-3 text-sm ${
+            billingInterval === "year" ? "border-[#005B96] bg-[#f3f9ff]" : "border-slate-200"
+          }`}
+        >
+          <input
+            type="radio"
+            name="billing"
+            className="mr-2"
+            checked={billingInterval === "year"}
+            onChange={() => setBillingInterval("year")}
+          />
+          <strong>Ročně · 2 měsíce zdarma</strong>
+          <p className="mt-1 text-xs text-slate-600">
+            Start {formatSalesPrice(salesYearlyCzk(salesEntryMonthlyCzk()), locale)} / rok · {formatSalesPrice(salesYearlyEffectiveMonthCzk(salesEntryMonthlyCzk()), locale)} / měs.
+          </p>
+        </label>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {SALES_PACKAGES.map((pkg) => {
+          const shown =
+            billingInterval === "year"
+              ? `${formatSalesPrice(salesYearlyEffectiveMonthCzk(pkg.priceCzkMonth), locale)}/měs. · ${formatSalesPrice(salesYearlyCzk(pkg.priceCzkMonth), locale)}/rok`
+              : `${formatSalesPrice(pkg.priceCzkMonth, locale)}/měs.`;
+          return (
           <label
             key={pkg.id}
             className={`cursor-pointer rounded-xl border p-3 text-sm ${
@@ -92,29 +172,56 @@ export function PausalOrderForm({ defaultPackage }: { defaultPackage?: SalesPack
               checked={packageId === pkg.id}
               onChange={() => setPackageId(pkg.id)}
             />
-            <strong>{pkg.name}</strong> · {formatSalesCzk(pkg.priceCzkMonth)}/měs.
+            <strong>{pkg.name}</strong> · {shown}
             <p className="mt-1 text-xs text-slate-600">{pkg.tagline}</p>
           </label>
-        ))}
+          );
+        })}
       </div>
-      <input required name="company" placeholder="Firma" className="w-full rounded-lg border px-3 py-2 text-sm" />
-      <input required name="contactName" placeholder="Kontaktní osoba" className="w-full rounded-lg border px-3 py-2 text-sm" />
-      <input required type="email" name="email" placeholder="Firemní e-mail" className="w-full rounded-lg border px-3 py-2 text-sm" />
-      <input name="ico" placeholder="IČO" className="w-full rounded-lg border px-3 py-2 text-sm" />
-      <input name="address" placeholder="Fakturační adresa" className="w-full rounded-lg border px-3 py-2 text-sm" />
-      <input name="website" placeholder="Web (https://…)" className="w-full rounded-lg border px-3 py-2 text-sm" />
-      <textarea name="offerText" placeholder="Krátký popis nabídky, kterou chcete inzerovat" className="w-full rounded-lg border px-3 py-2 text-sm" rows={3} />
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#021d33]">Firma</span>
+        <input required name="company" placeholder="např. Firma s.r.o." className="w-full rounded-lg border px-3 py-2 text-sm" />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#021d33]">Kontaktní osoba</span>
+        <input required name="contactName" placeholder="Jméno a příjmení" className="w-full rounded-lg border px-3 py-2 text-sm" />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#021d33]">Firemní e-mail</span>
+        <input required type="email" name="email" placeholder="firma@domena.cz" className="w-full rounded-lg border px-3 py-2 text-sm" />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#021d33]">IČO (8 číslic)</span>
+        <input required name="ico" inputMode="numeric" pattern="[0-9]{8}" placeholder="8 číslic" className="w-full rounded-lg border px-3 py-2 text-sm" />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#021d33]">Fakturační adresa</span>
+        <input required name="address" placeholder="Ulice, město, PSČ" className="w-full rounded-lg border px-3 py-2 text-sm" />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#021d33]">Web (volitelně)</span>
+        <input name="website" placeholder="https://…" className="w-full rounded-lg border px-3 py-2 text-sm" />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#021d33]">Krátký popis nabídky</span>
+        <textarea name="offerText" placeholder="Co chcete na tržišti inzerovat" className="w-full rounded-lg border px-3 py-2 text-sm" rows={3} />
+      </label>
       <label className="flex items-start gap-2 text-xs text-slate-600">
         <input type="checkbox" name="terms" required className="mt-1" />
         <span>
           Souhlasím s <Link href="/inzerce/podminky" className="text-[#005B96] underline">podmínkami inzerce</Link> a
-          vystavením měsíční faktury. Paušál se obnovuje, dokud jej neskončíte.
+          vystavením faktury. Paušál se obnovuje (měsíčně nebo ročně), dokud jej neskončíte.
         </span>
       </label>
       {error ? <p className="text-sm text-red-700">{error}</p> : null}
       <Button type="submit" disabled={busy} className="rounded-full bg-[#005B96]">
-        {busy ? "Odesílám…" : "Objednat paušál a získat fakturu"}
+        {busy ? "Odesílám…" : pay.stripeReady ? "Objednat a zaplatit kartou" : "Objednat paušál"}
       </Button>
+      <p className="text-xs text-slate-500">
+        {pay.stripeReady
+          ? `Po odeslání otevřeme Stripe Checkout (měsíční nebo roční předplatné, ${formatSalesPrice(salesEntryMonthlyCzk(), locale)} Start).`
+          : `Platbu kartou dopíšeme — objednávka mezitím jde na ${pay.inbox}.`}
+      </p>
     </form>
   );
 }

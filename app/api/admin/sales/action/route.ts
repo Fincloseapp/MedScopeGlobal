@@ -36,6 +36,7 @@ const schema = z.object({
     "send_invoice",
     "add_prospect",
     "suppress",
+    "run_marketplace_loop",
   ]),
   id: z.string().optional(),
   company: z.string().max(200).optional(),
@@ -63,6 +64,12 @@ export async function POST(request: Request) {
 
   if (body.action === "run_tick") {
     const result = await runSalesDepartmentTick();
+    return NextResponse.json(result);
+  }
+
+  if (body.action === "run_marketplace_loop") {
+    const { runMarketplaceLoopModel } = await import("@/lib/sales/marketplace-loop");
+    const result = await runMarketplaceLoopModel({ persist: true });
     return NextResponse.json(result);
   }
 

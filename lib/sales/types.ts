@@ -1,5 +1,7 @@
 /** Autonomous B2B sales department — shared types. */
 
+import type { SalesControlFinding } from "@/lib/sales/control";
+
 export const SALES_STAGES = [
   "identified",
   "qualified",
@@ -94,6 +96,9 @@ export type SalesIcpSector =
   | "publisher";
 
 export type SalesPackageId = "start" | "visible" | "magazine" | "clinical" | "partner";
+
+/** Měsíční karta vs roční předplatné (2 měsíce zdarma). */
+export type SalesBillingInterval = "month" | "year";
 
 export type SalesPackage = {
   id: SalesPackageId;
@@ -239,15 +244,21 @@ export type SalesTickResult = {
   fulfilled: number;
   inquiriesForwarded: number;
   paused: number;
+  matched?: number;
+  loopDaily?: boolean;
+  campaignSeeded?: number;
+  campaignUpdated?: number;
   errors: string[];
   startedAt: string;
   finishedAt: string;
+  control: SalesControlFinding[];
 };
 
 export type SalesSnapshot = {
   generatedAt: string;
   db: boolean;
   schemaOk: boolean;
+  error?: string;
   kpis: {
     prospects: number;
     inPipeline: number;
@@ -276,8 +287,32 @@ export type SalesSnapshot = {
   invoices: Array<SalesInvoice & { company: string }>;
   inquiries: Array<SalesInquiry & { advertiser: string }>;
   runs: SalesRun[];
+  marketplace: {
+    listings: Array<{
+      id: string;
+      kind: string;
+      status: string;
+      company: string;
+      title: string;
+      source: string;
+      contact_email: string | null;
+      auto_replied_at: string | null;
+      created_at: string;
+    }>;
+    mail: {
+      ready: boolean;
+      transport: "cloudflare" | "sendgrid" | "smtp" | "none";
+      resend: boolean;
+      inbox: string;
+      adminNotify: string;
+    };
+    control: SalesControlFinding[];
+  };
+  loop?: import("@/lib/sales/marketplace-loop").MarketplaceLoopResult | null;
+  campaign?: import("@/lib/sales/campaign").SalesCampaignSnapshot;
   legal: {
     coldAutoSend: boolean;
+    campaignAutoSend: boolean;
     maxTouches: number;
     maxEmailsPerRun: number;
     termsPath: string;

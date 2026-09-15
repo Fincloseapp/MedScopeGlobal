@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getClientIp } from "@/lib/security/client-ip";
 import { applySecurityMiddleware } from "@/lib/security/middleware-security";
+import { canonicalAdminPathname } from "@/lib/auth/admin-gate-config";
 import { shouldBlockBot } from "@/lib/v30/security/bot-shield";
 import { writeAuditLog } from "@/lib/v30/security/audit-log";
 import { checkApiRateLimit, isApiRateLimitExempt } from "@/lib/v30/security/rate-limit";
@@ -57,7 +58,7 @@ export async function applyV30SecurityMiddleware(
   // /admin is unlocked only by password cookie (`David`). Do not IP-block the
   // login form or the dashboard — that would hide the password prompt.
   if (
-    (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) &&
+    (Boolean(canonicalAdminPathname(pathname)) || pathname.startsWith("/api/admin")) &&
     !canAccessAdminSurface(request)
   ) {
     void writeAuditLog({

@@ -51,6 +51,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     id: "penize",
     label: "Peníze",
     items: [
+      { href: "/admin/sales", label: "Obchodní oddělení", icon: Briefcase },
       { href: "/admin/vydelky", label: "Výdělky", icon: Wallet },
       { href: "/admin/revenue", label: "Tržby v27", icon: TrendingUp },
       { href: "/admin/stripe-webhook-logs", label: "Stripe webhooky", icon: ShieldCheck },
@@ -59,7 +60,6 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { href: "/admin/ai-agents", label: "AI agenti", icon: Trophy },
       { href: "/admin/ai-teams", label: "Týmy AI", icon: Swords },
       { href: "/admin/ads-requests", label: "Žádosti o reklamu", icon: Megaphone },
-      { href: "/admin/sales", label: "Obchodní oddělení", icon: Briefcase },
     ],
   },
   {

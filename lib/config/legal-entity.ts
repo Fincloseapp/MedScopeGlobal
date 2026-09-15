@@ -106,3 +106,34 @@ export function formatLegalEntityLine(entity: LegalEntityConfig = getLegalEntity
 export function publicOrganizationAddress(): { "@type": "PostalAddress"; addressCountry: "CZ" } {
   return { "@type": "PostalAddress", addressCountry: "CZ" };
 }
+
+/** Customer-facing brand, never the registered company name. */
+export function publicBrandLine(entity: LegalEntityConfig = getLegalEntity()): string {
+  return `${entity.tradeName} · ${entity.domain}`;
+}
+
+/** Diplomatic operator line — Synaptica stays underneath MedScopeGlobal. */
+export function publicOperatorCaption(
+  locale?: string | null,
+  entity: LegalEntityConfig = getLegalEntity()
+): string {
+  const primary = String(locale ?? "cs").toLowerCase();
+  if (primary.startsWith("cs") || primary.startsWith("sk")) return `provozuje ${entity.name}`;
+  if (primary.startsWith("de")) return `betrieben von ${entity.name}`;
+  if (primary.startsWith("pl")) return `prowadzi ${entity.name}`;
+  if (primary.startsWith("fr")) return `exploité par ${entity.name}`;
+  if (primary.startsWith("it")) return `gestito da ${entity.name}`;
+  if (primary.startsWith("es") || primary.startsWith("pt")) return `operado por ${entity.name}`;
+  if (primary.startsWith("hu")) return `üzemeltető: ${entity.name}`;
+  if (primary.startsWith("ro")) return `operat de ${entity.name}`;
+  return `operated by ${entity.name}`;
+}
+
+/** MedScopeGlobal first; registered operator only as a subordinate clause. */
+export function publicBrandSignature(
+  locale?: string | null,
+  entity: LegalEntityConfig = getLegalEntity()
+): string {
+  const ico = entity.ico ? `, IČO ${entity.ico}` : "";
+  return `${publicBrandLine(entity)} — ${publicOperatorCaption(locale, entity)}${ico}`;
+}

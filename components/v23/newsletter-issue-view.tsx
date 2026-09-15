@@ -24,6 +24,8 @@ import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { looksLikeCzech } from "@/lib/i18n/czech-detect";
 import { MAGAZINE } from "@/lib/brand/magazine";
+import { parseNewsletterIssueSlug } from "@/lib/v23/newsletter/locale-editions";
+import { resolveGlobalLocale } from "@/lib/i18n/locale-path";
 
 function resolveItemImage(
   sectionId: string,
@@ -112,7 +114,10 @@ function NewsletterItemCard({
   locale: string;
 }) {
   const img = resolveItemImage(sectionId, sectionTitle, item, index);
-  const href = item.href?.startsWith("/") ? localizePublicHref(item.href, locale) : item.href;
+  const hrefRaw = item.href?.startsWith("/")
+    ? localizePublicHref(item.href, locale)
+    : item.href || localizePublicHref("/articles", locale);
+  const href = hrefRaw;
 
   return (
     <li className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition hover:border-sky-100 hover:shadow-md">
@@ -128,13 +133,9 @@ function NewsletterItemCard({
         />
       </div>
       <div className="p-4">
-        {href ? (
-          <Link href={href} className="font-semibold text-[#005B96] hover:underline">
-            {item.title}
-          </Link>
-        ) : (
-          <p className="font-semibold text-[#021d33]">{item.title}</p>
-        )}
+        <Link href={href} className="font-semibold text-[#005B96] hover:underline">
+          {item.title}
+        </Link>
         <p className="mt-1 text-sm leading-relaxed text-slate-600">{item.summary}</p>
       </div>
     </li>
@@ -164,17 +165,19 @@ export function V23NewsletterIssueView({
         : primary === "fr"
           ? "Ce numéro sera bientôt complété."
           : "This issue will be filled in shortly.";
-  const czechBody = primary !== "cs";
-  const languageNote =
-    primary === "de"
+  const issueLocale = layout?.locale
+    ? resolveGlobalLocale(layout.locale)
+    : parseNewsletterIssueSlug(issue.slug).locale;
+  const czechIssueOnForeignPage = primary !== "cs" && issueLocale === "cs";
+  const languageNote = czechIssueOnForeignPage
+    ? primary === "de"
       ? "Diese medizinische Ausgabe erscheint auf Tschechisch. Der ViaLongeVita-Brief in Ihrem Postfach kommt in Ihrer Sprache."
       : primary === "fr"
         ? "Ce digest médical est publié en tchèque. Le brief ViaLongeVita arrive dans votre langue."
-        : primary === "cs"
-          ? null
-          : "This medical digest is published in Czech. The ViaLongeVita brief in your inbox is in your language.";
+        : "This medical digest is published in Czech. The ViaLongeVita brief in your inbox is in your language."
+    : null;
   const subhead =
-    layout?.intro && !(czechBody && looksLikeCzech(layout.intro))
+    layout?.intro && !(czechIssueOnForeignPage && looksLikeCzech(layout.intro))
       ? layout.intro
       : `${copy.hubDescription}${dateLabel ? ` — ${dateLabel}` : ""}`;
   const showHtmlFallback =

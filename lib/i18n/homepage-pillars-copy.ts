@@ -3,6 +3,7 @@ import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { chromePack, type ChromePack } from "@/lib/i18n/chrome-pack";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { homepagePillarsEdition, type HomepagePillarsEdition } from "@/lib/i18n/homepage-pillars-editions";
+import { localizeListedCzkIn } from "@/lib/i18n/payment-currency";
 
 export type HomepagePillarId = "magazine" | "marketplace" | "students" | "physicians";
 
@@ -30,34 +31,34 @@ export type HomepagePillarsCopy = {
 
 const PACK: Record<ChromePack, HomepagePillarsCopy> = {
   cs: {
-    kicker: "MedScopeGlobal.com",
-    title: "Čtyři vstupy. Jedna platforma.",
-    lead: "Magazín ViaLongeVita, tržiště výrobců, MeDiprep pro uchazeče o LF a OrdiZapis pro ambulanci. Vyberte, kým jste.",
-    jumpLabel: "Rychlá orientace",
+    kicker: "Přehled prostředí",
+    title: "Čtyři části. Jedno prostředí.",
+    lead: "Magazín je pro čtenáře a předplatitele. Tržiště je jen pro společnosti a firmy. Osoby na tržiště nepatří.",
+    jumpLabel: "Přehled prostředí",
     pillars: [
       {
         id: "magazine",
         eyebrow: "Čtenáři",
         title: MAGAZINE.name,
-        lead: "Magazín zdraví a dlouhověkosti. Spánek, pohyb, výživa a GLP-1 — redakce s citacemi, ne clickbait.",
-        product: "MediFlow · MeDipacient",
+        lead: "Magazín zdraví pro čtenáře a předplatitele. Firmy, které chtějí oslovit čtenáře, inzerují tady — ne na tržišti.",
+        product: "Předplatné osob · inzerce u čtenářů",
         href: "/articles",
         cta: "Číst magazín",
         ctaHref: "/articles",
-        secondary: "Hledat v redakci",
-        secondaryHref: "/hledat",
+        secondary: "Předplatné",
+        secondaryHref: "/predplatne",
       },
       {
         id: "marketplace",
-        eyebrow: "Výrobci a laboratoře",
+        eyebrow: "Samostatná část · jen firmy",
         title: "Tržiště",
-        lead: "Poptávky z Česka a EU, CE / IVDR / ISO. Inzerce u čtenářů je zvlášť — v magazínu na /firmy.",
-        product: "MedScopeGlobal B2B",
+        lead: "Společnosti nabízejí a poptávají služby. Osoby sem nepatří — tržiště není magazín ani předplatné čtenářů.",
+        product: "B2B paušál od __MONTH__ · roční __EFFECTIVE__ / měs.",
         href: "/exchange",
-        cta: "Otevřít tržiště",
+        cta: "Vstoupit na tržiště",
         ctaHref: "/exchange",
-        secondary: "Inzerce v magazínu",
-        secondaryHref: "/firmy",
+        secondary: "Objednat paušál",
+        secondaryHref: "/inzerce/pausal",
       },
       {
         id: "students",
@@ -88,9 +89,9 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
   },
   en: {
     kicker: "MedScopeGlobal.com",
-    title: "Four doors. One platform.",
-    lead: `${MAGAZINE.name} for readers, a manufacturer marketplace, and OrdiZapis for the clinic. Pick who you are — the rest of the site follows.`,
-    jumpLabel: "Find your door",
+    title: "Four parts. One environment.",
+    lead: `${MAGAZINE.name} for readers, a separate B2B marketplace, and OrdiZapis for the clinic. Marketplace ads stay on the marketplace — not in magazine articles.`,
+    jumpLabel: "Environment map",
     pillars: [
       {
         id: "magazine",
@@ -106,15 +107,15 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
       },
       {
         id: "marketplace",
-        eyebrow: "Manufacturers and labs",
+        eyebrow: "Separate unit · B2B revenue",
         title: "Marketplace",
-        lead: "Czech and EU demand, CE / IVDR / ISO. Reader advertising stays in the magazine on /firmy.",
-        product: "MedScopeGlobal B2B",
+        lead: "Advertiser offers and hospital demand are billed and fulfilled here. Not magazine banners — those stay on /firmy.",
+        product: "Retainer from __MONTH__ · yearly __EFFECTIVE__ / mo.",
         href: "/exchange",
         cta: "Open the marketplace",
         ctaHref: "/exchange",
-        secondary: "Magazine ads",
-        secondaryHref: "/firmy",
+        secondary: "Order retainer",
+        secondaryHref: "/inzerce/pausal",
       },
       {
         id: "students",
@@ -166,12 +167,12 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
         eyebrow: "Hersteller und Labore",
         title: "Marktplatz",
         lead: "Nachfrage aus Tschechien und der EU, CE / IVDR / ISO. Leserwerbung bleibt im Magazin unter /firmy.",
-        product: "MedScopeGlobal B2B",
+        product: "Pauschale ab __MONTH__ · jährlich __EFFECTIVE__ / Monat",
         href: "/exchange",
         cta: "Marktplatz öffnen",
         ctaHref: "/exchange",
-        secondary: "Magazinwerbung",
-        secondaryHref: "/firmy",
+        secondary: "Pauschale bestellen",
+        secondaryHref: "/inzerce/pausal",
       },
       {
         id: "students",
@@ -223,12 +224,12 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
         eyebrow: "Fabricants et laboratoires",
         title: "Place de marché",
         lead: "Demandes en Tchéquie et dans l’UE, CE / IVDR / ISO. La publicité lecteurs reste dans le magazine, sur /firmy.",
-        product: "MedScopeGlobal B2B",
+        product: "Forfait dès __MONTH__ · annuel __EFFECTIVE__ / mois",
         href: "/exchange",
-        cta: "Ouvrir la place de marché",
-        ctaHref: "/exchange",
-        secondary: "Publicité magazine",
-        secondaryHref: "/firmy",
+        cta: "Commander le forfait",
+        ctaHref: "/inzerce/pausal",
+        secondary: "Ouvrir la place de marché",
+        secondaryHref: "/exchange",
       },
       {
         id: "students",
@@ -280,12 +281,12 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
         eyebrow: "Produttori e laboratori",
         title: "Mercato",
         lead: "Domanda da Cechia e UE, CE / IVDR / ISO. La pubblicità per i lettori resta nel magazine su /firmy.",
-        product: "MedScopeGlobal B2B",
+        product: "Pacchetto da __MONTH__ · annuale __EFFECTIVE__ / mese",
         href: "/exchange",
-        cta: "Apri il mercato",
-        ctaHref: "/exchange",
-        secondary: "Pubblicità magazine",
-        secondaryHref: "/firmy",
+        cta: "Ordina il forfait",
+        ctaHref: "/inzerce/pausal",
+        secondary: "Apri il mercato",
+        secondaryHref: "/exchange",
       },
       {
         id: "students",
@@ -337,12 +338,12 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
         eyebrow: "Fabricantes y laboratorios",
         title: "Mercado",
         lead: "Demanda de Chequia y la UE, CE / IVDR / ISO. La publicidad para lectores sigue en la revista, en /firmy.",
-        product: "MedScopeGlobal B2B",
+        product: "Plan desde __MONTH__ · anual __EFFECTIVE__ / mes",
         href: "/exchange",
-        cta: "Abrir el mercado",
-        ctaHref: "/exchange",
-        secondary: "Publicidad en revista",
-        secondaryHref: "/firmy",
+        cta: "Contratar la cuota",
+        ctaHref: "/inzerce/pausal",
+        secondary: "Abrir el mercado",
+        secondaryHref: "/exchange",
       },
       {
         id: "students",
@@ -394,12 +395,12 @@ const PACK: Record<ChromePack, HomepagePillarsCopy> = {
         eyebrow: "Fabricantes e laboratórios",
         title: "Mercado",
         lead: "Demanda da Chéquia e da UE, CE / IVDR / ISO. A publicidade para leitores fica na revista, em /firmy.",
-        product: "MedScopeGlobal B2B",
+        product: "Plano a partir de __MONTH__ · anual __EFFECTIVE__ / mês",
         href: "/exchange",
-        cta: "Abrir o mercado",
-        ctaHref: "/exchange",
-        secondary: "Publicidade na revista",
-        secondaryHref: "/firmy",
+        cta: "Contratar mensalidade",
+        ctaHref: "/inzerce/pausal",
+        secondary: "Abrir o mercado",
+        secondaryHref: "/exchange",
       },
       {
         id: "students",
@@ -451,8 +452,11 @@ export function getHomepagePillarsCopy(locale?: string | null): HomepagePillarsC
     (packKey === "en" && primary !== "en") || primary === "pt" ? homepagePillarsEdition(primary) : undefined;
   const merged = applyEdition(pack, edition);
   const czech = packKey === "cs";
-  return {
-    ...merged,
-    pillars: merged.pillars.filter((pillar) => czech || !pillar.czechOnly),
-  };
+  return localizeListedCzkIn(
+    {
+      ...merged,
+      pillars: merged.pillars.filter((pillar) => czech || !pillar.czechOnly),
+    },
+    locale
+  );
 }

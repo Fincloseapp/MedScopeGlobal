@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function AdminGateForm() {
+export function AdminGateForm({ next = "/admin" }: { next?: string }) {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -25,12 +25,13 @@ export function AdminGateForm() {
       setError("Neplatné heslo.");
       return;
     }
-    router.push("/admin");
+    router.push(next);
     router.refresh();
   }
 
   return (
     <form onSubmit={submit} method="post" action="/admin/login" className="mt-6 space-y-4">
+      <input type="hidden" name="next" value={next} />
       <label htmlFor="admin-password" className="block text-sm font-medium text-[#021d33]">
         Heslo
       </label>

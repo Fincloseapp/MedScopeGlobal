@@ -237,12 +237,17 @@ export function PortalHome({
   return (
     <div className="border-b border-slate-200 bg-[#e8eef3]">
       <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5">
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <HomepagePillars locale={locale} />
+
+        <div className="mt-3 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
           <div className="grid bg-[#050b1d] md:min-h-[32rem] md:grid-cols-[minmax(0,1.15fr)_minmax(12rem,0.85fr)]">
             <div className="flex items-center px-4 py-5 sm:px-8 sm:py-7">
               <ViaLongeVitaMark variant="hero" locale={locale} priority />
             </div>
-            <div className="relative aspect-[3/4] min-h-[280px] md:aspect-auto md:min-h-full">
+            <Link
+              href={localizePublicHref("/articles", locale)}
+              className="relative aspect-[3/4] min-h-[280px] md:aspect-auto md:min-h-full"
+            >
               <Image
                 src={pickEditionCover(locale, isoWeekSeed()).src}
                 alt={editionCoverAlt(locale)}
@@ -251,7 +256,8 @@ export function PortalHome({
                 className="object-cover object-top"
                 sizes="(max-width:768px) 100vw, 360px"
               />
-            </div>
+              <span className="sr-only">{chrome.readMagazine}</span>
+            </Link>
           </div>
           <div className="px-4 py-4 sm:px-6 sm:py-5">
             <h1 className="font-display text-2xl font-bold text-[#021d33] sm:text-3xl">
@@ -291,8 +297,6 @@ export function PortalHome({
             </div>
           </div>
         </div>
-
-        <HomepagePillars locale={locale} />
 
         <nav aria-label={chrome.servicesNav} className="mt-3 rounded-lg border border-slate-200 bg-white px-2 py-3 shadow-sm sm:px-3">
           <ul className="grid grid-cols-5 gap-1 sm:grid-cols-10">

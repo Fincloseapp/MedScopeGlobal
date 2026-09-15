@@ -17,6 +17,7 @@ import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { getDefaultFromEmail } from "@/lib/email/from";
 import { isCloudflareEmailConfigured } from "@/lib/email/cloudflare-sending";
 import { looksLikeCzech } from "@/lib/i18n/czech-detect";
+import { absoluteNewsletterHref } from "@/lib/monetization/newsletter-article-unlock";
 import {
   affiliateRowHtml,
   briefInnerHtml,
@@ -29,7 +30,7 @@ import { briefChrome } from "@/lib/monetization/brief-marketing";
 export type { BriefArticle };
 
 const FROM_NAME = MAGAZINE.name;
-const WEEK_MS = 6 * 24 * 60 * 60 * 1000;
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const BATCH_CAP = 80;
 
 export type BriefSendResult = {
@@ -94,7 +95,7 @@ function articleHref(locale: string, slug: string): string {
   if (slug.startsWith("__pillar")) {
     return `${SITE.url}${buildLocalePath(locale, "/verejnost/clanky")}`;
   }
-  return `${SITE.url}${buildLocalePath(locale, `/article/${slug}`)}`;
+  return absoluteNewsletterHref(`/article/${slug}`, locale);
 }
 
 function pillarBriefArticles(locale: string): BriefArticle[] {
@@ -377,7 +378,7 @@ export async function sendViaLongeVitaWeeklyBrief(options?: {
 
   const articleCache = new Map<string, BriefArticle[]>();
   for (const row of due.slice(0, limit)) {
-    const locale = (row.locale ?? "en").trim() || "en";
+    const locale = resolveEmailLocale(row.locale);
     locales[locale] = (locales[locale] ?? 0) + 1;
     if (!articleCache.has(locale)) {
       articleCache.set(locale, await loadBriefArticles(locale));

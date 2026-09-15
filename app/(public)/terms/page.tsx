@@ -31,9 +31,9 @@ export default async function TermsPage() {
       {copy.officialNote ? <p><em>{copy.officialNote}</em></p> : null}
       <h2>1. Úvodní ustanovení</h2>
       <p>
-        Tyto obchodní podmínky upravují vztah mezi provozovatelem ({entity.name}
-        {entity.ico ? `, IČO ${entity.ico}` : ""}) platformy MedScopeGlobal na doméně{" "}
-        {entity.domain} a uživateli online služby pro odborný medicínský obsah. Používáním
+        Tyto obchodní podmínky upravují vztah mezi MedScopeGlobal ({entity.domain}),
+        který provozuje {entity.name}
+        {entity.ico ? `, IČO ${entity.ico}` : ""}, a uživateli online služby. Používáním
         služby souhlasíte s těmito podmínkami.
       </p>
       <p>

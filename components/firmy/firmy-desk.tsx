@@ -67,7 +67,7 @@ export async function FirmyDesk({ slug }: { slug?: FirmyRoomId }) {
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e8d5a3]">Paušál</p>
         <h2 className="mt-2 font-display text-2xl font-semibold">Měsíční inzerce s fakturou a předáním poptávek</h2>
         <p className="mt-2 max-w-2xl text-sm text-white/80">
-          Start od 4 900 Kč / měsíc. Obchodní oddělení běží v administraci — od oslovení po plnění.
+          Start od 450 Kč / měsíc, roční 375 Kč / měs. Obchodní oddělení běží v administraci — od oslovení po plnění.
         </p>
         <Link
           href={localizePublicHref("/inzerce/pausal", locale)}

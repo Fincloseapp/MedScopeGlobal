@@ -1,13 +1,20 @@
-import type { SalesPackage, SalesPackageId } from "@/lib/sales/types";
+import { convertCzkToCharge, formatCzkListPrice } from "@/lib/i18n/payment-currency";
+import type { SalesBillingInterval, SalesPackage, SalesPackageId } from "@/lib/sales/types";
 
-export type { SalesPackageId };
+export type { SalesPackageId, SalesBillingInterval };
+
+/**
+ * Roční předplatné = 10 zaplacených měsíců (2 měsíce zdarma).
+ * Start 450 Kč / měs. → 4 500 Kč / rok → 375 Kč / měs. při roční platbě.
+ */
+export const SALES_YEARLY_BILLED_MONTHS = 10;
 
 export const SALES_PACKAGES: SalesPackage[] = [
   {
     id: "start",
     name: "Start",
     tagline: "Vstupní paušál — adresář partnerů a předání poptávek.",
-    priceCzkMonth: 4900,
+    priceCzkMonth: 450,
     audience: "both",
     placements: [],
     newsletter: null,
@@ -22,14 +29,14 @@ export const SALES_PACKAGES: SalesPackage[] = [
       "Vlastní landing s formulářem poptávky",
       "Předání poptávek e-mailem (SLA 72 h)",
       "Označená inzerce dle zákona o reklamě",
-      "Elektronická faktura každý měsíc",
+      "Elektronická faktura",
     ],
   },
   {
     id: "visible",
     name: "Viditelnost",
     tagline: "Profil + rotace v odborné a čtenářské sekci.",
-    priceCzkMonth: 9900,
+    priceCzkMonth: 890,
     audience: "both",
     placements: ["article_sidebar"],
     newsletter: null,
@@ -49,8 +56,8 @@ export const SALES_PACKAGES: SalesPackage[] = [
   {
     id: "magazine",
     name: "Magazín",
-    tagline: "Měsíční paušál s bannerem a newsletterem.",
-    priceCzkMonth: 19900,
+    tagline: "Paušál s bannerem a newsletterem — nejčastější volba.",
+    priceCzkMonth: 1790,
     highlighted: true,
     audience: "public",
     placements: ["article_sidebar", "homepage_mid"],
@@ -73,7 +80,7 @@ export const SALES_PACKAGES: SalesPackage[] = [
     id: "clinical",
     name: "Klinický",
     tagline: "Prioritní plochy + odborná audience.",
-    priceCzkMonth: 39900,
+    priceCzkMonth: 3490,
     audience: "both",
     placements: ["homepage_top", "homepage_mid", "article_inline", "article_sidebar"],
     newsletter: "mid",
@@ -96,7 +103,7 @@ export const SALES_PACKAGES: SalesPackage[] = [
     id: "partner",
     name: "Partner",
     tagline: "Nejvyšší paušál — maximální splnění objednávky.",
-    priceCzkMonth: 69900,
+    priceCzkMonth: 5990,
     audience: "both",
     placements: [
       "homepage_top",
@@ -133,6 +140,87 @@ export function isSalesPackageId(id: string): id is SalesPackageId {
 
 export function formatSalesCzk(amount: number): string {
   return `${Math.round(amount).toLocaleString("cs-CZ")} Kč`;
+}
+
+/** Public price for the visitor's edition — CZK on /cs, EUR or USD elsewhere. */
+export function formatSalesPrice(amountCzk: number, locale?: string | null): string {
+  if (!locale || locale === "cs") return formatSalesCzk(amountCzk);
+  return formatCzkListPrice(amountCzk, locale);
+}
+
+export function salesEntryMonthlyCzk(): number {
+  return SALES_PACKAGES[0]?.priceCzkMonth ?? 450;
+}
+
+export function salesYearlyCzk(monthlyCzk: number): number {
+  return monthlyCzk * SALES_YEARLY_BILLED_MONTHS;
+}
+
+export function salesYearlyEffectiveMonthCzk(monthlyCzk: number): number {
+  return Math.round(salesYearlyCzk(monthlyCzk) / 12);
+}
+
+export function salesChargeCzk(monthlyCzk: number, interval: SalesBillingInterval): number {
+  return interval === "year" ? salesYearlyCzk(monthlyCzk) : monthlyCzk;
+}
+
+export function salesFromPriceLabel(locale?: string | null): string {
+  const prefix = !locale || locale === "cs" ? "od" : "from";
+  return `${prefix} ${formatSalesPrice(salesEntryMonthlyCzk(), locale)}`;
+}
+
+export function salesPriceListPlain(locale?: string | null): string {
+  const start = salesEntryMonthlyCzk();
+  const money = (amount: number) => formatSalesPrice(amount, locale);
+  const ladder = SALES_PACKAGES.map((pkg) => `${pkg.name} ${money(pkg.priceCzkMonth)}`).join(", ");
+  if (!locale || locale === "cs") {
+    return (
+      `Měsíční paušál: ${ladder}. Roční předplatné je 10 měsíců (2 měsíce zdarma) — ` +
+      `Start ${money(salesYearlyCzk(start))} / rok, tedy ${money(salesYearlyEffectiveMonthCzk(start))} / měs. ` +
+      `Nejsme plátci DPH. Provizi z obchodu nebereme — platíte jen paušál za plochy a předání poptávek.`
+    );
+  }
+  return (
+    `Monthly retainer: ${ladder}. Annual billing is 10 months (two months free) — ` +
+    `Start ${money(salesYearlyCzk(start))} / year, ${money(salesYearlyEffectiveMonthCzk(start))} / month. ` +
+    `We are not VAT-registered in Czechia. No trade commission — you pay only the retainer.`
+  );
+}
+
+export function salesStripeLine(
+  monthlyCzk: number,
+  interval: SalesBillingInterval,
+  locale?: string | null
+): {
+  unitAmount: number;
+  currency: string;
+  recurring: { interval: "month" | "year" };
+  description: string;
+} {
+  const chargeCzk = interval === "year" ? salesYearlyCzk(monthlyCzk) : monthlyCzk;
+  const charge = convertCzkToCharge(chargeCzk, locale);
+  if (interval === "year") {
+    const year = formatSalesPrice(salesYearlyCzk(monthlyCzk), locale);
+    const effective = formatSalesPrice(salesYearlyEffectiveMonthCzk(monthlyCzk), locale);
+    return {
+      unitAmount: charge.unitAmount,
+      currency: charge.currency,
+      recurring: { interval: "year" },
+      description:
+        !locale || locale === "cs"
+          ? `Roční paušál ${year} (2 měsíce zdarma, ${effective} / měs.)`
+          : `Annual retainer ${year} (two months free, ${effective} / month)`,
+    };
+  }
+  return {
+    unitAmount: charge.unitAmount,
+    currency: charge.currency,
+    recurring: { interval: "month" },
+    description:
+      !locale || locale === "cs"
+        ? `Měsíční paušál ${formatSalesPrice(monthlyCzk, locale)}`
+        : `Monthly retainer ${formatSalesPrice(monthlyCzk, locale)}`,
+  };
 }
 
 export function packagePlacementLabel(placement: string): string {
