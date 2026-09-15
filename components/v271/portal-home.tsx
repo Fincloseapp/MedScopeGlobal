@@ -244,7 +244,10 @@ export function PortalHome({
             <div className="flex items-center px-4 py-5 sm:px-8 sm:py-7">
               <ViaLongeVitaMark variant="hero" locale={locale} priority />
             </div>
-            <div className="relative aspect-[3/4] min-h-[280px] md:aspect-auto md:min-h-full">
+            <Link
+              href={localizePublicHref("/articles", locale)}
+              className="relative aspect-[3/4] min-h-[280px] md:aspect-auto md:min-h-full"
+            >
               <Image
                 src={pickEditionCover(locale, isoWeekSeed()).src}
                 alt={editionCoverAlt(locale)}
@@ -253,7 +256,8 @@ export function PortalHome({
                 className="object-cover object-top"
                 sizes="(max-width:768px) 100vw, 360px"
               />
-            </div>
+              <span className="sr-only">{chrome.readMagazine}</span>
+            </Link>
           </div>
           <div className="px-4 py-4 sm:px-6 sm:py-5">
             <h1 className="font-display text-2xl font-bold text-[#021d33] sm:text-3xl">

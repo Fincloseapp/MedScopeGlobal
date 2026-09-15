@@ -228,6 +228,7 @@ import { buildShareIntents, isShareableVideoUrl, publicAbsoluteUrl } from "../..
 import { localeToPathSegment } from "../../lib/i18n/locale-path";
 import { ARENA_DISCOVERY_LOCALES } from "../../lib/growth/arena/locales";
 import { arenaPulsePaths } from "../../lib/growth/arena/worker-pulse";
+import { isoWeekMondayUtcYmd } from "../../lib/v4c/newsletter-generate";
 import {
   arenaMarkets,
   countriesForLocale,
@@ -3434,6 +3435,29 @@ assert.ok(
     assert.ok(arenaPulsePaths(new Date("2026-09-07T11:05:00.000Z")).includes("/api/cron/agent-arena"));
     assert.ok(arenaPulsePaths(new Date("2026-09-07T11:00:00.000Z")).includes("/api/cron/growth-sprint?light=1"));
     assert.ok(!arenaPulsePaths(new Date("2026-09-07T11:05:00.000Z")).includes("/api/cron/growth-sprint?light=1"));
+    const mondayDawn = new Date("2026-09-14T06:00:00.000Z");
+    assert.equal(mondayDawn.getUTCDay(), 1);
+    assert.ok(arenaPulsePaths(mondayDawn).includes("/api/cron/sales-department"));
+    assert.ok(arenaPulsePaths(mondayDawn).includes("/api/cron/newsletter-generate"));
+    assert.ok(arenaPulsePaths(mondayDawn).includes("/api/cron/vialongevita-brief"));
+    const tuesdayDawn = new Date("2026-09-15T06:00:00.000Z");
+    assert.ok(arenaPulsePaths(tuesdayDawn).includes("/api/cron/sales-department"));
+    assert.ok(!arenaPulsePaths(tuesdayDawn).includes("/api/cron/newsletter-generate"));
+    assert.ok(!arenaPulsePaths(tuesdayDawn).includes("/api/cron/vialongevita-brief"));
+    assert.equal(isoWeekMondayUtcYmd(new Date("2026-09-15T12:00:00.000Z")), "2026-09-14");
+    assert.equal(isoWeekMondayUtcYmd(new Date("2026-09-14T00:00:00.000Z")), "2026-09-14");
+    assert.equal(isoWeekMondayUtcYmd(new Date("2026-09-13T23:00:00.000Z")), "2026-09-07");
+    assert.ok(
+      readFileSync(join(root, "lib/v4c/newsletter-generate.ts"), "utf8").includes("already_this_week")
+    );
+    assert.ok(readFileSync(join(root, "lib/monetization/vialongevita-brief.ts"), "utf8").includes("7 * 24"));
+    assert.ok(
+      readFileSync(join(root, "lib/monetization/vialongevita-brief.ts"), "utf8").includes(
+        "resolveEmailLocale(row.locale)"
+      )
+    );
+    assert.ok(readFileSync(join(root, "cloudflare/entry.js"), "utf8").includes("/api/cron/newsletter-generate"));
+    assert.ok(readFileSync(join(root, "lib/v23/newsletter/engine.ts"), "utf8").includes("newsletter edition failed"));
     assert.ok(
       readFileSync(join(root, "app/api/cron/growth-sprint/route.ts"), "utf8").includes("includeRevenueOps")
     );
@@ -6165,6 +6189,26 @@ console.log(
   assert.ok(!dePreview!.copyText.includes("450 Kč"));
   assert.ok(readFileSync(join(root, "app/api/marketplace/listing/route.ts"), "utf8").includes("getMarketplaceUiCopy"));
   assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes("Kampaň"));
+  assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes('role="tablist"'));
+  assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes("aria-pressed"));
+  assert.ok(!readFileSync(join(root, "lib/sales/snapshot.ts"), "utf8").includes("applySalesDepartmentSchema"));
+  assert.ok(readFileSync(join(root, "lib/sales/snapshot.ts"), "utf8").includes("fallbackSalesSnapshot"));
+  assert.ok(readFileSync(join(root, "app/api/admin/sales/route.ts"), "utf8").includes("fallbackSalesSnapshot"));
+  assert.ok(readFileSync(join(root, "app/api/admin/sales/route.ts"), "utf8").includes("sales_snapshot_timeout"));
+  assert.ok(campaign.emails.length <= 80);
+  assert.ok(campaign.sendableTotal >= campaign.emails.length);
+  const pillarsSrc = readFileSync(join(root, "components/v271/homepage-pillars.tsx"), "utf8");
+  assert.ok(pillarsSrc.includes("<PillarVisual"));
+  assert.ok(pillarsSrc.includes("<PillarCta href={pillar.ctaHref}"));
+  assert.ok(
+    pillarsSrc.indexOf("<PillarCta href={pillar.ctaHref}") < pillarsSrc.indexOf("<PillarVisual")
+  );
+  const appsTrio = readFileSync(join(root, "components/v271/homepage-sections.tsx"), "utf8");
+  assert.ok(appsTrio.includes("<AppOpenLink href={app.appPath}"));
+  assert.ok(appsTrio.includes("sr-only"));
+  const portalHome = readFileSync(join(root, "components/v271/portal-home.tsx"), "utf8");
+  assert.ok(portalHome.includes('href={localizePublicHref("/articles", locale)}'));
+  assert.ok(portalHome.includes("pickEditionCover"));
   assert.ok(readFileSync(join(root, "lib/sales/runner.ts"), "utf8").includes("seedCampaignProspects"));
   assert.ok(readFileSync(join(root, "lib/sales/runner.ts"), "utf8").includes("alreadyLoopedToday"));
   assert.ok(readFileSync(join(root, ".env.example"), "utf8").includes("LEGAL_ENTITY_IBAN"));

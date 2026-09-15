@@ -483,13 +483,16 @@ export function V272AppsTrioBlock() {
               className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white shadow-sm"
             >
               <div className="relative aspect-[16/9] bg-slate-100">
-                <Image
-                  src={APP_MARKETING_IMAGE[app.id]}
-                  alt=""
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
+                <AppOpenLink href={app.appPath} className="absolute inset-0 block">
+                  <Image
+                    src={APP_MARKETING_IMAGE[app.id]}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                  <span className="sr-only">{app.shortName} — otevřít</span>
+                </AppOpenLink>
               </div>
               <div className="flex flex-1 flex-col p-5">
               <Image

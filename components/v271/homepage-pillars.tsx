@@ -172,7 +172,10 @@ export function HomepagePillars({ locale = "cs" }: { locale?: string }) {
           return (
             <li key={pillar.id} id={`pillar-${pillar.id}`}>
               <article className={cn("flex h-full flex-col overflow-hidden rounded-2xl border shadow-sm", TONE[pillar.id])}>
-                <PillarVisual pillar={pillar} locale={locale} />
+                <PillarCta href={pillar.ctaHref} locale={locale} className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#005B96]">
+                  <PillarVisual pillar={pillar} locale={locale} />
+                  <span className="sr-only">{pillar.cta}</span>
+                </PillarCta>
                 <div className="flex flex-1 flex-col p-5">
                   <p
                     className={cn(
