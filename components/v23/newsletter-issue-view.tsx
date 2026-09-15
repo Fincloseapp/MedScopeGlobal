@@ -24,7 +24,6 @@ import { primaryArticleLocale } from "@/lib/i18n/article-locale";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { looksLikeCzech } from "@/lib/i18n/czech-detect";
 import { MAGAZINE } from "@/lib/brand/magazine";
-import { withNewsletterArticleUnlock } from "@/lib/monetization/newsletter-article-unlock";
 import { parseNewsletterIssueSlug } from "@/lib/v23/newsletter/locale-editions";
 import { resolveGlobalLocale } from "@/lib/i18n/locale-path";
 
@@ -118,7 +117,7 @@ function NewsletterItemCard({
   const hrefRaw = item.href?.startsWith("/")
     ? localizePublicHref(item.href, locale)
     : item.href || localizePublicHref("/articles", locale);
-  const href = withNewsletterArticleUnlock(hrefRaw);
+  const href = hrefRaw;
 
   return (
     <li className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition hover:border-sky-100 hover:shadow-md">
