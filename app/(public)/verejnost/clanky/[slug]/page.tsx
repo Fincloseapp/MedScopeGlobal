@@ -14,6 +14,7 @@ import { isSearchEngineBot } from "@/lib/i18n/search-bots";
 import { getMarketingCopy } from "@/lib/i18n/marketing-copy";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { getEditorialArticleGateCopy } from "@/lib/v38/conversion-copy";
+import { verifyNewsletterArticleUnlock } from "@/lib/monetization/newsletter-article-unlock";
 import {
   getPublicArticleBySlug,
   listPublicAdCampaigns,
@@ -50,14 +51,14 @@ export default async function VerejnostClanekDetailPage({ params, searchParams }
   const requestHeaders = await headers();
   const jar = await cookies();
   const query = searchParams ? await searchParams : {};
-  const magazineMeterUnlocked = resolveMagazineMeterUnlock({
-    cookie: jar.get(ARTICLE_METER_COOKIE)?.value,
-    header: requestHeaders.get(ARTICLE_METER_HEADER),
-    slug: article.slug,
-    isBot: isSearchEngineBot(requestHeaders.get("user-agent")),
-    from: query.from,
-    newsletterToken: query.t,
-  });
+  const magazineMeterUnlocked =
+    (query.from === "nl" && verifyNewsletterArticleUnlock(article.slug, query.t)) ||
+    resolveMagazineMeterUnlock({
+      cookie: jar.get(ARTICLE_METER_COOKIE)?.value,
+      header: requestHeaders.get(ARTICLE_METER_HEADER),
+      slug: article.slug,
+      isBot: isSearchEngineBot(requestHeaders.get("user-agent")),
+    });
   const { locked } = resolveArticleBodyLock(article, {
     isVip,
     accessLevel,
