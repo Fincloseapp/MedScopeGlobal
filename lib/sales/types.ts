@@ -258,6 +258,7 @@ export type SalesSnapshot = {
   generatedAt: string;
   db: boolean;
   schemaOk: boolean;
+  error?: string;
   kpis: {
     prospects: number;
     inPipeline: number;

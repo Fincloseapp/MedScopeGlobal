@@ -159,7 +159,7 @@ export function buildCampaignSnapshot(input?: {
     sendableTotal: emails.length,
     localesCovered: byLocale.filter((row) => row.sendableCount > 0).length,
     startAdvertisersTotal: [...countryToStart.values()].reduce((sum, n) => sum + n, 0),
-    emails,
+    emails: emails.slice(0, 80),
     byLocale,
     honesty: HONESTY,
   };

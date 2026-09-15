@@ -1,4 +1,3 @@
-import { applySalesDepartmentSchema } from "@/lib/sales/apply-schema";
 import { SALES_ICP_SEEDS } from "@/lib/sales/icp";
 import { salesCampaignAutoSendEnabled, salesColdAutoSendEnabled, salesMaxEmailsPerRun, salesMaxTouches } from "@/lib/sales/legal";
 import { buildCampaignSnapshot } from "@/lib/sales/campaign";
@@ -14,7 +13,6 @@ import {
 } from "@/lib/sales/store";
 import { SALES_STAGES, type SalesSnapshot, type SalesStage } from "@/lib/sales/types";
 import { startOfMonthIso } from "@/lib/sales/ids";
-import { applyMarketplaceDeskSchema } from "@/lib/marketplace/schema";
 import { listMarketplaceListings, marketplaceDb } from "@/lib/marketplace/store";
 import { marketplaceAdminNotifyEmail, marketplaceInboxEmail } from "@/lib/marketplace/config";
 import { mailReady, mailTransportLabel } from "@/lib/monetization/vialongevita-brief";
@@ -56,8 +54,6 @@ function controlFromRows(
 
 export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
   const generatedAt = new Date().toISOString();
-  const schema = await applySalesDepartmentSchema();
-  const db = salesDb();
   const legal = {
     coldAutoSend: salesColdAutoSendEnabled(),
     campaignAutoSend: salesCampaignAutoSendEnabled(),
@@ -68,40 +64,66 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
     unsubscribePath: "/api/sales/unsubscribe",
   };
   const campaignEmpty = buildCampaignSnapshot();
+  const mail = mailHealth();
 
-  if (!db) {
-    return {
-      generatedAt,
-      db: false,
-      schemaOk: schema.ok,
-      kpis: emptyKpis(),
-      byStage: SALES_STAGES.map((stage) => ({ stage, count: 0 })),
-      packages: SALES_PACKAGES,
-      prospects: [],
-      contracts: [],
-      outreach: [],
-      invoices: [],
-      inquiries: [],
-      runs: [],
-      marketplace: {
-        listings: [],
-        mail: mailHealth(),
-        control: controlFromRows(mailHealth(), [], [], [], [], 0),
-      },
-      loop: lastMarketplaceLoop(),
-      campaign: campaignEmpty,
-      legal,
-    };
+  const empty = (extra?: Partial<SalesSnapshot>): SalesSnapshot => ({
+    generatedAt,
+    db: false,
+    schemaOk: true,
+    kpis: emptyKpis(),
+    byStage: SALES_STAGES.map((stage) => ({ stage, count: 0 })),
+    packages: SALES_PACKAGES,
+    prospects: [],
+    contracts: [],
+    outreach: [],
+    invoices: [],
+    inquiries: [],
+    runs: [],
+    marketplace: {
+      listings: [],
+      mail,
+      control: controlFromRows(mail, [], [], [], [], 0),
+    },
+    loop: lastMarketplaceLoop(),
+    campaign: campaignEmpty,
+    legal,
+    ...extra,
+  });
+
+  let db: ReturnType<typeof salesDb>;
+  try {
+    db = salesDb();
+  } catch (err) {
+    return empty({ error: err instanceof Error ? err.message : "sales_db_failed" });
   }
 
-  const [prospects, contracts, outreach, invoices, inquiries, runs] = await Promise.all([
-    listProspects(db, 800),
-    listContracts(db, 400),
-    listOutreach(db, 400),
-    listInvoices(db),
-    listInquiries(db),
-    listRuns(db),
-  ]);
+  if (!db) {
+    return empty({ schemaOk: false });
+  }
+
+  let prospects: Awaited<ReturnType<typeof listProspects>> = [];
+  let contracts: Awaited<ReturnType<typeof listContracts>> = [];
+  let outreach: Awaited<ReturnType<typeof listOutreach>> = [];
+  let invoices: Awaited<ReturnType<typeof listInvoices>> = [];
+  let inquiries: Awaited<ReturnType<typeof listInquiries>> = [];
+  let runs: Awaited<ReturnType<typeof listRuns>> = [];
+  try {
+    [prospects, contracts, outreach, invoices, inquiries, runs] = await Promise.all([
+      listProspects(db, 200),
+      listContracts(db, 200),
+      listOutreach(db, 80),
+      listInvoices(db),
+      listInquiries(db),
+      listRuns(db),
+    ]);
+  } catch (err) {
+    return empty({
+      db: true,
+      schemaOk: false,
+      error: err instanceof Error ? err.message : "sales_lists_failed",
+      campaign: campaignEmpty,
+    });
+  }
 
   const prospectName = new Map(prospects.map((p) => [p.id, p]));
   const month = startOfMonthIso();
@@ -144,14 +166,18 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
     outreachNeedsApproval: outreach.filter((o) => o.status === "needs_approval").length,
   };
 
-  await applyMarketplaceDeskSchema();
-  const marketDb = marketplaceDb() ?? db;
-  const listings = await listMarketplaceListings(marketDb, 80);
+  let listings: Awaited<ReturnType<typeof listMarketplaceListings>> = [];
+  try {
+    const marketDb = marketplaceDb() ?? db;
+    listings = await listMarketplaceListings(marketDb, 80);
+  } catch {
+    listings = [];
+  }
 
   return {
     generatedAt,
     db: true,
-    schemaOk: schema.ok,
+    schemaOk: true,
     kpis,
     byStage: SALES_STAGES.map((stage) => ({ stage, count: byStageMap.get(stage) ?? 0 })),
     packages: SALES_PACKAGES,
@@ -218,6 +244,41 @@ function emptyKpis(): SalesSnapshot["kpis"] {
     forwardedThisMonth: 0,
     outreachQueued: 0,
     outreachNeedsApproval: 0,
+  };
+}
+
+export function fallbackSalesSnapshot(error?: string): SalesSnapshot {
+  const mail = mailHealth();
+  return {
+    generatedAt: new Date().toISOString(),
+    db: false,
+    schemaOk: false,
+    error,
+    kpis: emptyKpis(),
+    byStage: SALES_STAGES.map((stage) => ({ stage, count: 0 })),
+    packages: SALES_PACKAGES,
+    prospects: [],
+    contracts: [],
+    outreach: [],
+    invoices: [],
+    inquiries: [],
+    runs: [],
+    marketplace: {
+      listings: [],
+      mail,
+      control: controlFromRows(mail, [], [], [], [], 0),
+    },
+    loop: lastMarketplaceLoop(),
+    campaign: buildCampaignSnapshot(),
+    legal: {
+      coldAutoSend: salesColdAutoSendEnabled(),
+      campaignAutoSend: salesCampaignAutoSendEnabled(),
+      maxTouches: salesMaxTouches(),
+      maxEmailsPerRun: salesMaxEmailsPerRun(),
+      termsPath: "/inzerce/podminky",
+      privacyPath: "/privacy",
+      unsubscribePath: "/api/sales/unsubscribe",
+    },
   };
 }
 

@@ -66,12 +66,29 @@ export function SalesDesk() {
 
   const load = useCallback(async () => {
     setError(null);
-    const res = await fetch("/api/admin/sales", { credentials: "same-origin" });
-    if (!res.ok) {
-      setError("Nepodařilo se načíst obchodní oddělení.");
-      return;
+    const ctrl = new AbortController();
+    const timer = window.setTimeout(() => ctrl.abort(), 12_000);
+    try {
+      const res = await fetch("/api/admin/sales", { credentials: "same-origin", signal: ctrl.signal });
+      const json = (await res.json().catch(() => ({}))) as SalesSnapshot & { error?: string };
+      if (res.ok || (json.packages && json.campaign)) {
+        setData(json);
+      }
+      if (!res.ok) {
+        setError(json.error || `Nepodařilo se načíst obchodní oddělení (${res.status}).`);
+        return;
+      }
+      if (json.error) setError(json.error);
+    } catch (err) {
+      const aborted = err instanceof DOMException && err.name === "AbortError";
+      setError(
+        aborted
+          ? "Načítání obchodního oddělení trvalo příliš dlouho. Záložky jdou otevřít, data se doplní po obnovení."
+          : "Nepodařilo se načíst obchodní oddělení."
+      );
+    } finally {
+      window.clearTimeout(timer);
     }
-    setData((await res.json()) as SalesSnapshot);
   }, []);
 
   useEffect(() => {
@@ -262,12 +279,23 @@ export function SalesDesk() {
         </div>
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Obchodní oddělení">
         {TABS.map((item) => (
           <button
             key={item.id}
             type="button"
-            onClick={() => setTab(item.id)}
+            role="tab"
+            id={`sales-tab-${item.id}`}
+            aria-selected={tab === item.id}
+            aria-pressed={tab === item.id}
+            onClick={() => {
+              setTab(item.id);
+              if (typeof window !== "undefined") {
+                const url = new URL(window.location.href);
+                url.searchParams.set("tab", item.id);
+                window.history.replaceState(null, "", `${url.pathname}${url.search}`);
+              }
+            }}
             className={`rounded-full px-3 py-1.5 text-sm ${
               tab === item.id ? "bg-[#005B96] text-white" : "border border-slate-200 bg-white text-slate-700"
             }`}
@@ -278,8 +306,12 @@ export function SalesDesk() {
         ))}
       </div>
 
-      {tab === "prehled" && data ? (
-        <section className="space-y-4">
+      {tab === "prehled" ? (
+        <section className="space-y-4" role="tabpanel" aria-labelledby="sales-tab-prehled">
+          <h2 className="font-display text-lg font-semibold text-[#021d33]">Přehled</h2>
+          {!data ? (
+            <p className="text-sm text-slate-600">{error ?? "Načítám přehled pipeline a ceník…"}</p>
+          ) : null}
           <div className="overflow-x-auto rounded-2xl border bg-white">
             <table className="w-full text-sm">
               <thead className="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
@@ -289,7 +321,7 @@ export function SalesDesk() {
                 </tr>
               </thead>
               <tbody>
-                {data.byStage
+                {(data?.byStage ?? [])
                   .filter((row) => row.count > 0)
                   .map((row) => (
                     <tr key={row.stage} className="border-t">
@@ -301,7 +333,7 @@ export function SalesDesk() {
             </table>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
-            {data.packages.map((pkg) => (
+            {(data?.packages ?? []).map((pkg) => (
               <div key={pkg.id} className="rounded-2xl border border-[#d9e8f4] bg-white p-4">
                 <p className="font-semibold text-[#021d33]">
                   {pkg.name} · {formatSalesCzk(pkg.priceCzkMonth)} / měsíc
@@ -313,7 +345,7 @@ export function SalesDesk() {
               </div>
             ))}
           </div>
-          {data.campaign ? (
+          {data?.campaign ? (
             <div className="space-y-3 rounded-2xl border border-[#d9e8f4] bg-white p-4">
               <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">
                 Maximalizace inzerentů · kampaň tržiště
@@ -352,7 +384,7 @@ export function SalesDesk() {
               </div>
             </div>
           ) : null}
-          {data.runs[0] ? (
+          {data?.runs[0] ? (
             <p className="text-xs text-slate-500">
               Poslední běh: {data.runs[0].ok ? "OK" : "chyba"} · {JSON.stringify(data.runs[0].summary)}
             </p>
@@ -360,8 +392,13 @@ export function SalesDesk() {
         </section>
       ) : null}
 
-      {tab === "kampan" && data?.campaign ? (
-        <section className="space-y-4">
+      {tab === "kampan" ? (
+        <section className="space-y-4" role="tabpanel" aria-labelledby="sales-tab-kampan">
+          <h2 className="font-display text-lg font-semibold text-[#021d33]">Kampaň</h2>
+          {!data?.campaign ? (
+            <p className="text-sm text-slate-600">{error ?? "Načítám kampaň a platné role-schránky…"}</p>
+          ) : (
+            <>
           <p className="text-sm text-slate-600">{data.campaign.honesty}</p>
           <p className="text-sm text-slate-600">
             Odesílá se autonomně při cronu <code>/api/cron/sales-department</code> (každý den i několikrát denně).
@@ -440,11 +477,15 @@ export function SalesDesk() {
               </tbody>
             </table>
           </div>
+            </>
+          )}
         </section>
       ) : null}
 
-      {tab === "pipeline" && data ? (
-        <section className="space-y-4">
+      {tab === "pipeline" ? (
+        <section className="space-y-4" role="tabpanel" aria-labelledby="sales-tab-pipeline">
+          <h2 className="font-display text-lg font-semibold text-[#021d33]">Pipeline</h2>
+          {!data ? <p className="text-sm text-slate-600">{error ?? "Načítám pipeline…"}</p> : null}
           <form
             className="flex flex-wrap gap-2 rounded-2xl border bg-white p-4"
             onSubmit={(e) => {
@@ -481,7 +522,7 @@ export function SalesDesk() {
                 </tr>
               </thead>
               <tbody>
-                {data.prospects.map((row) => (
+                {(data?.prospects ?? []).map((row) => (
                   <tr key={row.id} className="border-t align-top">
                     <td className="px-3 py-2">
                       <p className="font-medium">{row.company}</p>
@@ -498,7 +539,10 @@ export function SalesDesk() {
         </section>
       ) : null}
 
-      {tab === "inzerenti" && data ? (
+      {tab === "inzerenti" ? (
+        <section className="space-y-4" role="tabpanel" aria-labelledby="sales-tab-inzerenti">
+          <h2 className="font-display text-lg font-semibold text-[#021d33]">Inzerenti</h2>
+          {!data ? <p className="text-sm text-slate-600">{error ?? "Načítám inzerenty…"}</p> : null}
         <div className="overflow-x-auto rounded-2xl border bg-white">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
@@ -511,7 +555,7 @@ export function SalesDesk() {
               </tr>
             </thead>
             <tbody>
-              {data.contracts.map((row) => (
+              {(data?.contracts ?? []).map((row) => (
                 <tr key={row.id} className="border-t align-top">
                   <td className="px-3 py-2">
                     <p className="font-medium">{row.company}</p>
@@ -542,9 +586,13 @@ export function SalesDesk() {
             </tbody>
           </table>
         </div>
+        </section>
       ) : null}
 
-      {tab === "outreach" && data ? (
+      {tab === "outreach" ? (
+        <section className="space-y-4" role="tabpanel" aria-labelledby="sales-tab-outreach">
+          <h2 className="font-display text-lg font-semibold text-[#021d33]">Oslovení</h2>
+          {!data ? <p className="text-sm text-slate-600">{error ?? "Načítám oslovení…"}</p> : null}
         <div className="overflow-x-auto rounded-2xl border bg-white">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
@@ -556,7 +604,7 @@ export function SalesDesk() {
               </tr>
             </thead>
             <tbody>
-              {data.outreach.map((row) => (
+              {(data?.outreach ?? []).map((row) => (
                 <tr key={row.id} className="border-t align-top">
                   <td className="px-3 py-2">
                     <p className="font-medium">{row.company}</p>
@@ -581,9 +629,13 @@ export function SalesDesk() {
             </tbody>
           </table>
         </div>
+        </section>
       ) : null}
 
-      {tab === "faktury" && data ? (
+      {tab === "faktury" ? (
+        <section className="space-y-4" role="tabpanel" aria-labelledby="sales-tab-faktury">
+          <h2 className="font-display text-lg font-semibold text-[#021d33]">Faktury</h2>
+          {!data ? <p className="text-sm text-slate-600">{error ?? "Načítám faktury…"}</p> : null}
         <div className="overflow-x-auto rounded-2xl border bg-white">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
@@ -596,7 +648,7 @@ export function SalesDesk() {
               </tr>
             </thead>
             <tbody>
-              {data.invoices.map((row) => (
+              {(data?.invoices ?? []).map((row) => (
                 <tr key={row.id} className="border-t">
                   <td className="px-3 py-2">
                     {row.number}
@@ -622,17 +674,19 @@ export function SalesDesk() {
             </tbody>
           </table>
         </div>
+        </section>
       ) : null}
 
-      {tab === "smycka" && data ? (
-        <section className="space-y-4">
+      {tab === "smycka" ? (
+        <section className="space-y-4" role="tabpanel" aria-labelledby="sales-tab-smycka">
+          <h2 className="font-display text-lg font-semibold text-[#021d33]">Smyčka</h2>
           <p className="text-sm text-slate-600">
             Modelový běh interně vybere dodavatele, vloží nabídku, udělá z něj předplatitele tržiště, vybere
             poptávající firmu, ta si dodavatele vybere a oslovení jde přes tržiště. Bez lidského schválení.
             Používá schránky <code>.invalid</code> — nikoho zvenku neoslovuje. Cron ji spouští automaticky
             jednou denně (Europe/Prague) uvnitř <code>/api/cron/sales-department</code>.
           </p>
-          {data.loop ? (
+          {data?.loop ? (
             <div
               className={`rounded-2xl border px-4 py-4 ${
                 data.loop.evaluation.autonomous && data.loop.evaluation.percent === 100
@@ -652,7 +706,7 @@ export function SalesDesk() {
             </div>
           ) : (
             <p className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
-              Zatím žádný modelový běh. Spusťte „Modelový test smyčky“.
+              {error ?? "Zatím žádný modelový běh. Spusťte „Modelový test smyčky“."}
             </p>
           )}
           <div className="overflow-x-auto rounded-2xl border bg-white">
@@ -665,7 +719,7 @@ export function SalesDesk() {
                 </tr>
               </thead>
               <tbody>
-                {(data.loop?.steps ?? []).map((row) => (
+                {(data?.loop?.steps ?? []).map((row) => (
                   <tr key={row.id} className="border-t align-top">
                     <td className="px-3 py-2 font-medium">{row.label}</td>
                     <td className="px-3 py-2">{row.ok ? (row.autonomous ? "autonomně" : "ručně") : "chybí"}</td>
@@ -678,8 +732,9 @@ export function SalesDesk() {
         </section>
       ) : null}
 
-      {tab === "trziste" && data ? (
-        <section className="space-y-4">
+      {tab === "trziste" ? (
+        <section className="space-y-4" role="tabpanel" aria-labelledby="sales-tab-trziste">
+          <h2 className="font-display text-lg font-semibold text-[#021d33]">Tržiště</h2>
           <p className="text-sm text-slate-600">
             Příjem z <Link className="text-[#005B96] underline" href="/exchange#formular">formuláře</Link> a
             inbound webhooku <code>/api/marketplace/inbound-email</code> (Bearer / ?secret, bez klíče 401).
@@ -688,7 +743,7 @@ export function SalesDesk() {
             Magazínové bannery sem nepatří — ty jsou na{" "}
             <Link className="text-[#005B96] underline" href="/firmy">/firmy</Link>.
           </p>
-          {data.marketplace?.mail ? (
+          {data?.marketplace?.mail ? (
             <p className="text-sm text-slate-600">
               Schránka <strong>{data.marketplace.mail.inbox}</strong> · transport{" "}
               <strong>{data.marketplace.mail.transport}</strong>
@@ -707,7 +762,7 @@ export function SalesDesk() {
                 </tr>
               </thead>
               <tbody>
-                {(data.marketplace?.listings ?? []).length === 0 ? (
+                {(data?.marketplace?.listings ?? []).length === 0 ? (
                   <tr>
                     <td className="px-3 py-6 text-sm text-slate-500" colSpan={5}>
                       Zatím žádný příjem. Po migraci <code>marketplace_listings</code> sem padnou formulář i
@@ -715,7 +770,7 @@ export function SalesDesk() {
                     </td>
                   </tr>
                 ) : (
-                  (data.marketplace?.listings ?? []).map((row) => (
+                  (data?.marketplace?.listings ?? []).map((row) => (
                     <tr key={row.id} className="border-t align-top">
                       <td className="px-3 py-2">{row.kind}</td>
                       <td className="px-3 py-2">
@@ -736,7 +791,10 @@ export function SalesDesk() {
         </section>
       ) : null}
 
-      {tab === "poptavky" && data ? (
+      {tab === "poptavky" ? (
+        <section className="space-y-4" role="tabpanel" aria-labelledby="sales-tab-poptavky">
+          <h2 className="font-display text-lg font-semibold text-[#021d33]">Poptávky</h2>
+          {!data ? <p className="text-sm text-slate-600">{error ?? "Načítám poptávky…"}</p> : null}
         <div className="overflow-x-auto rounded-2xl border bg-white">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
@@ -748,7 +806,7 @@ export function SalesDesk() {
               </tr>
             </thead>
             <tbody>
-              {data.inquiries.map((row) => (
+              {(data?.inquiries ?? []).map((row) => (
                 <tr key={row.id} className="border-t align-top">
                   <td className="px-3 py-2">{row.advertiser}</td>
                   <td className="px-3 py-2 text-xs">
@@ -757,16 +815,18 @@ export function SalesDesk() {
                     {row.sender_email}
                   </td>
                   <td className="px-3 py-2">{statusCs(row.status)}</td>
-                  <td className="px-3 py-2 text-xs text-slate-600">{row.message.slice(0, 180)}</td>
+                  <td className="px-3 py-2 text-xs text-slate-600">{(row.message ?? "").slice(0, 180)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        </section>
       ) : null}
 
-      {tab === "pravni" && data ? (
-        <section className="space-y-3 rounded-2xl border bg-white p-5 text-sm text-slate-700">
+      {tab === "pravni" ? (
+        <section className="space-y-3 rounded-2xl border bg-white p-5 text-sm text-slate-700" role="tabpanel" aria-labelledby="sales-tab-pravni">
+          <h2 className="font-display text-lg font-semibold text-[#021d33]">Právní</h2>
           <p>
             Studené B2B oslovení bez ověřené role-schránky je ke schválení. Kampaň tržiště posílá
             autonomně jen <strong>platné firemní role@oficiální-doména</strong> (LIA). Inbound poptávky
@@ -776,11 +836,11 @@ export function SalesDesk() {
             <li>SÚKL / zákon o léčivech: Rx jen na odborné ploše (tarif Klinický / Partner).</li>
             <li>Zákon o reklamě: každá plocha je označená jako inzerce.</li>
             <li>GDPR + 480/2004 Sb.: odhlášení jedním klikem, zákaz osobních mailboxů u LIA.</li>
-            <li>Faktury: {data.legal.termsPath} · neplátce DPH dle ARES.</li>
+            <li>Faktury: {data?.legal?.termsPath ?? "/inzerce/podminky"} · neplátce DPH dle ARES.</li>
             <li>
-              Cold auto-send: {data.legal.coldAutoSend ? "zapnuto (SALES_AUTO_OUTBOUND)" : "vypnuto"} · kampaň
-              auto-send: {data.legal.campaignAutoSend ? "zapnuto" : "vypnuto"} · max {data.legal.maxTouches}{" "}
-              kontaktů · {data.legal.maxEmailsPerRun} e-mailů / běh.
+              Cold auto-send: {data?.legal?.coldAutoSend ? "zapnuto (SALES_AUTO_OUTBOUND)" : "vypnuto"} · kampaň
+              auto-send: {data?.legal?.campaignAutoSend ? "zapnuto" : "vypnuto"} · max {data?.legal?.maxTouches ?? 3}{" "}
+              kontaktů · {data?.legal?.maxEmailsPerRun ?? 500} e-mailů / běh.
             </li>
           </ul>
           <p>
