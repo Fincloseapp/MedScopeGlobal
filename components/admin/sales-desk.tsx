@@ -60,6 +60,7 @@ export function SalesDesk() {
   const [tab, setTab] = useState<Tab>("prehled");
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [copyLocale, setCopyLocale] = useState("cs");
@@ -101,6 +102,7 @@ export function SalesDesk() {
   async function act(action: string, extra?: Record<string, string>) {
     setBusy(action + (extra?.id ?? ""));
     setError(null);
+    setNotice(null);
     try {
       const res = await fetch("/api/admin/sales/action", {
         method: "POST",
@@ -108,9 +110,22 @@ export function SalesDesk() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action, ...extra }),
       });
+      const json = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        sent?: number;
+        queued?: number;
+        skippedLegal?: number;
+        errors?: string[];
+        ok?: boolean;
+      };
       if (!res.ok) {
-        const json = (await res.json().catch(() => ({}))) as { error?: string };
         setError(json.error || "Akce obchodního oddělení se nepovedla.");
+      } else if (action === "run_tick") {
+        setNotice(
+          `Běh dokončen: odesláno ${json.sent ?? 0} e-mailů, zařazeno ${json.queued ?? 0}, přeskočeno ${json.skippedLegal ?? 0}${
+            json.errors?.length ? ` · chyby: ${json.errors.slice(0, 3).join("; ")}` : ""
+          }. Peníze to samo nepřinese — cíl je zaplacené předplatné.`
+        );
       }
     } catch {
       setError("Síťová chyba při akci obchodního oddělení.");
@@ -132,13 +147,11 @@ export function SalesDesk() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#005B96]">Admin · Peníze</p>
           <h1 className="mt-1 font-display text-3xl font-bold text-[#021d33]">Obchodní oddělení</h1>
           <p className="mt-2 max-w-3xl text-sm text-slate-600">
-            Autonomní prodej paušální inzerce a tržiště. Paušál Start 450 Kč / měsíc, roční 4 500 Kč
-            (2 měsíce zdarma, 375 Kč / měs.). Veřejné mutace uvádějí cenu v EUR nebo USD. Odesílatel
-            je MedScopeGlobal (medscopeglobal.com); Al Synaptica Research Institute s.r.o. je provozovatel
-            v patičce, ne v záhlaví nabídky. Kampaň posílá jen platné firemní role-schránky, denně
-            spouští smyčku tržiště a vede k cíli 500 inzerentů Start v každé jazykové mutaci
-            do 18. 9. 2026 14:00.
+            Cíl je zaplacené předplatné a paušál inzerce. Autonomní kampaň posílá jen platné firemní
+            role-schránky. Paušál Start 450 Kč / měsíc, roční 4 500 Kč (2 měsíce zdarma). Veřejné mutace
+            uvádějí cenu v EUR nebo USD.
           </p>
+          {data?.honesty ? <p className="mt-2 max-w-3xl text-sm text-slate-700">{data.honesty}</p> : null}
           {generated ? <p className="mt-1 text-xs text-slate-500">Stav k {generated}</p> : null}
           {!data && !error ? (
             <p className="mt-2 text-sm text-slate-500">Načítám koordinátory a pipeline…</p>
@@ -146,7 +159,7 @@ export function SalesDesk() {
         </div>
         <div className="flex flex-wrap gap-2">
           <Button disabled={busy !== null} onClick={() => void act("run_tick")}>
-            {busy === "run_tick" ? "Běží…" : "Spustit autonomní běh"}
+            {busy === "run_tick" ? "Běží…" : "Odeslat kampaň teď"}
           </Button>
           <Button disabled={busy !== null} variant="outline" onClick={() => void act("run_marketplace_loop")}>
             {busy === "run_marketplace_loop" ? "Smyčka…" : "Modelový test smyčky"}
@@ -226,6 +239,7 @@ export function SalesDesk() {
         </section>
       ) : null}
       {error ? <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{error}</p> : null}
+      {notice ? <p className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800">{notice}</p> : null}
       {data && !data.db ? (
         <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           Databáze zatím není připojená (chybí service role). Dashboard ukazuje ceník a právní pravidla.
@@ -233,16 +247,40 @@ export function SalesDesk() {
         </p>
       ) : null}
 
+      {kpis ? (
+        <p
+          className={`rounded-xl border px-4 py-3 text-sm ${
+            (kpis.subscriberPaidCzk ?? 0) > 0 || (kpis.mrrCzk ?? 0) > 0
+              ? "border-emerald-200 bg-emerald-50 text-emerald-950"
+              : "border-red-200 bg-red-50 text-red-950"
+          }`}
+        >
+          <strong>Cíl peněz od předplatitelů: {(kpis.subscriberPaidCzk ?? 0) > 0 ? "částečně" : "nesplněno"}.</strong>{" "}
+          Předplatné {formatSalesCzk(kpis.subscriberPaidCzk ?? 0)} ({kpis.subscriberPaying ?? 0} platících). Inzerce{" "}
+          {formatSalesCzk(kpis.mrrCzk ?? 0)} MRR. Odesláno {kpis.outreachSent ?? 0} e-mailů, odpovědí{" "}
+          {kpis.outreachReplied ?? 0}. 170 000 do 10. 9. 2026 se nestalo.
+        </p>
+      ) : null}
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "Aktivní inzerenti", value: kpis?.activeAdvertisers ?? 0 },
+          {
+            label: "Peníze od předplatitelů",
+            value: formatSalesCzk(kpis?.subscriberPaidCzk ?? 0),
+            hint: `platící ${kpis?.subscriberPaying ?? 0} · živá ${kpis?.subscriberLive ?? 0} · objednávky ${kpis?.subscriberPaidOrders ?? 0}`,
+          },
+          {
+            label: "Odeslané e-maily",
+            value: String(kpis?.outreachSent ?? 0),
+            hint: `fronta ${kpis?.outreachQueued ?? 0} · odpovědi ${kpis?.outreachReplied ?? 0} · selhalo ${kpis?.outreachFailed ?? 0}`,
+          },
+          { label: "Aktivní inzerenti", value: String(kpis?.activeAdvertisers ?? 0) },
           { label: "MRR paušálů", value: formatSalesCzk(kpis?.mrrCzk ?? 0) },
-          { label: "Zaplaceno tento měsíc", value: formatSalesCzk(kpis?.paidThisMonthCzk ?? 0) },
-          { label: "Poptávky / předáno", value: `${kpis?.inquiriesThisMonth ?? 0} / ${kpis?.forwardedThisMonth ?? 0}` },
         ].map((card) => (
           <div key={card.label} className="rounded-2xl border border-[#d9e8f4] bg-white p-4">
             <p className="text-xs uppercase tracking-wider text-slate-500">{card.label}</p>
             <p className="mt-1 font-display text-2xl font-semibold text-[#021d33]">{card.value}</p>
+            {"hint" in card && card.hint ? <p className="mt-1 text-xs text-slate-500">{card.hint}</p> : null}
           </div>
         ))}
       </div>
@@ -321,14 +359,23 @@ export function SalesDesk() {
                 </tr>
               </thead>
               <tbody>
-                {(data?.byStage ?? [])
-                  .filter((row) => row.count > 0)
-                  .map((row) => (
-                    <tr key={row.stage} className="border-t">
-                      <td className="px-3 py-2">{statusCs(row.stage)}</td>
-                      <td className="px-3 py-2">{row.count}</td>
-                    </tr>
-                  ))}
+                {(data?.byStage ?? []).filter((row) => row.count > 0).length === 0 ? (
+                  <tr>
+                    <td className="px-3 py-3 text-slate-600" colSpan={2}>
+                      Pipeline je prázdná — 0 kontaktů ve stavech, 0 odeslaných e-mailů, 0 odpovědí. Nic se
+                      nestalo, dokud cron nebo „Odeslat kampaň teď“ neuloží běh.
+                    </td>
+                  </tr>
+                ) : (
+                  (data?.byStage ?? [])
+                    .filter((row) => row.count > 0)
+                    .map((row) => (
+                      <tr key={row.stage} className="border-t">
+                        <td className="px-3 py-2">{statusCs(row.stage)}</td>
+                        <td className="px-3 py-2">{row.count}</td>
+                      </tr>
+                    ))
+                )}
               </tbody>
             </table>
           </div>
@@ -401,11 +448,16 @@ export function SalesDesk() {
             <>
           <p className="text-sm text-slate-600">{data.campaign.honesty}</p>
           <p className="text-sm text-slate-600">
-            Odesílá se autonomně při cronu <code>/api/cron/sales-department</code> (každý den i několikrát denně).
+            Odesílá se při cronu <code>/api/cron/sales-department</code> a tlačítkem „Odeslat kampaň teď“.
             Paušál Start {formatSalesCzk(data.campaign.monthCzk)} / měsíc, roční {formatSalesCzk(data.campaign.yearCzk)}{" "}
             ({formatSalesCzk(data.campaign.yearEffectiveCzk)} / měs.). Auto-odeslání kampaně:{" "}
-            <strong>{data.campaign.autoCampaignSend ? "zapnuto" : "vypnuto"}</strong>.
+            <strong>{data.campaign.autoCampaignSend ? "zapnuto" : "vypnuto"}</strong>. Skutečně odesláno:{" "}
+            <strong>{kpis?.outreachSent ?? 0}</strong> z {data.campaign.sendableTotal} platných adres. Odpovědí:{" "}
+            <strong>{kpis?.outreachReplied ?? 0}</strong>.
           </p>
+          <Button disabled={busy !== null} onClick={() => void act("run_tick")}>
+            {busy === "run_tick" ? "Běží…" : "Odeslat kampaň teď"}
+          </Button>
           <div>
             <label className="text-xs uppercase tracking-wider text-slate-500" htmlFor="campaign-copy-locale">
               Textace, která se posílá

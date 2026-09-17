@@ -271,7 +271,15 @@ export type SalesSnapshot = {
     forwardedThisMonth: number;
     outreachQueued: number;
     outreachNeedsApproval: number;
+    outreachSent: number;
+    outreachReplied: number;
+    outreachFailed: number;
+    subscriberPaying: number;
+    subscriberLive: number;
+    subscriberPaidCzk: number;
+    subscriberPaidOrders: number;
   };
+  honesty: string;
   byStage: { stage: SalesStage; count: number }[];
   packages: SalesPackage[];
   prospects: SalesProspect[];
