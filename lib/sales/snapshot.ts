@@ -18,6 +18,8 @@ import { marketplaceAdminNotifyEmail, marketplaceInboxEmail } from "@/lib/market
 import { mailReady, mailTransportLabel } from "@/lib/monetization/vialongevita-brief";
 import { evaluateSalesControl } from "@/lib/sales/control";
 import { lastMarketplaceLoop } from "@/lib/sales/marketplace-loop";
+import { loadSubscriberMoney } from "@/lib/growth/ai-agent-stats";
+import { CAMPAIGN_DEADLINE_LABEL } from "@/lib/sales/campaign-goal";
 
 function mailHealth(): SalesSnapshot["marketplace"]["mail"] {
   return {
@@ -66,29 +68,33 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
   const campaignEmpty = buildCampaignSnapshot();
   const mail = mailHealth();
 
-  const empty = (extra?: Partial<SalesSnapshot>): SalesSnapshot => ({
-    generatedAt,
-    db: false,
-    schemaOk: true,
-    kpis: emptyKpis(),
-    byStage: SALES_STAGES.map((stage) => ({ stage, count: 0 })),
-    packages: SALES_PACKAGES,
-    prospects: [],
-    contracts: [],
-    outreach: [],
-    invoices: [],
-    inquiries: [],
-    runs: [],
-    marketplace: {
-      listings: [],
-      mail,
-      control: controlFromRows(mail, [], [], [], [], 0),
-    },
-    loop: lastMarketplaceLoop(),
-    campaign: campaignEmpty,
-    legal,
-    ...extra,
-  });
+  const empty = (extra?: Partial<SalesSnapshot>): SalesSnapshot => {
+    const kpis = extra?.kpis ?? emptyKpis();
+    return {
+      generatedAt,
+      db: false,
+      schemaOk: true,
+      kpis,
+      byStage: SALES_STAGES.map((stage) => ({ stage, count: 0 })),
+      packages: SALES_PACKAGES,
+      prospects: [],
+      contracts: [],
+      outreach: [],
+      invoices: [],
+      inquiries: [],
+      runs: [],
+      marketplace: {
+        listings: [],
+        mail,
+        control: controlFromRows(mail, [], [], [], [], 0),
+      },
+      loop: lastMarketplaceLoop(),
+      campaign: campaignEmpty,
+      legal,
+      honesty: extra?.honesty ?? salesHonesty({ kpis, mail, campaignAutoSend: legal.campaignAutoSend }),
+      ...extra,
+    };
+  };
 
   let db: ReturnType<typeof salesDb>;
   try {
@@ -107,14 +113,16 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
   let invoices: Awaited<ReturnType<typeof listInvoices>> = [];
   let inquiries: Awaited<ReturnType<typeof listInquiries>> = [];
   let runs: Awaited<ReturnType<typeof listRuns>> = [];
+  let subscriberMoney = { paying: 0, live: 0, paidOrders: 0, paidCzk: 0 };
   try {
-    [prospects, contracts, outreach, invoices, inquiries, runs] = await Promise.all([
+    [prospects, contracts, outreach, invoices, inquiries, runs, subscriberMoney] = await Promise.all([
       listProspects(db, 200),
       listContracts(db, 200),
-      listOutreach(db, 80),
+      listOutreach(db, 400),
       listInvoices(db),
       listInquiries(db),
       listRuns(db),
+      loadSubscriberMoneySafe(),
     ]);
   } catch (err) {
     return empty({
@@ -164,6 +172,13 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
     forwardedThisMonth: inquiries.filter((i) => i.forwarded_at && i.forwarded_at >= month).length,
     outreachQueued: outreach.filter((o) => o.status === "queued").length,
     outreachNeedsApproval: outreach.filter((o) => o.status === "needs_approval").length,
+    outreachSent: outreach.filter((o) => o.status === "sent").length,
+    outreachReplied: outreach.filter((o) => o.status === "replied").length,
+    outreachFailed: outreach.filter((o) => o.status === "failed").length,
+    subscriberPaying: subscriberMoney.paying,
+    subscriberLive: subscriberMoney.live,
+    subscriberPaidCzk: subscriberMoney.paidCzk,
+    subscriberPaidOrders: subscriberMoney.paidOrders,
   };
 
   let listings: Awaited<ReturnType<typeof listMarketplaceListings>> = [];
@@ -228,6 +243,7 @@ export async function loadSalesSnapshot(): Promise<SalesSnapshot> {
     loop: lastMarketplaceLoop(),
     campaign: buildCampaignSnapshot({ contracts, prospects }),
     legal,
+    honesty: salesHonesty({ kpis, mail: mailHealth(), campaignAutoSend: legal.campaignAutoSend }),
   };
 }
 
@@ -244,7 +260,51 @@ function emptyKpis(): SalesSnapshot["kpis"] {
     forwardedThisMonth: 0,
     outreachQueued: 0,
     outreachNeedsApproval: 0,
+    outreachSent: 0,
+    outreachReplied: 0,
+    outreachFailed: 0,
+    subscriberPaying: 0,
+    subscriberLive: 0,
+    subscriberPaidCzk: 0,
+    subscriberPaidOrders: 0,
   };
+}
+
+function salesHonesty(input: {
+  kpis: SalesSnapshot["kpis"];
+  mail: SalesSnapshot["marketplace"]["mail"];
+  campaignAutoSend: boolean;
+}): string {
+  const k = input.kpis;
+  const mailLine = input.mail.ready
+    ? `Transport ${input.mail.transport} je zapnutý.`
+    : "Mail není nastavený — odeslání se zaloguje a nikomu nedorazí.";
+  return [
+    `Cíl je zaplacené předplatné (170 000 do 10. 9. 2026 — nesplněno) a paušál inzerentů Start (500 / mutace do ${CAMPAIGN_DEADLINE_LABEL}).`,
+    `Peníze od předplatitelů teď: ${k.subscriberPaidCzk.toLocaleString("cs-CZ")} Kč (${k.subscriberPaying.toLocaleString("cs-CZ")} platících, ${k.subscriberLive.toLocaleString("cs-CZ")} živých vč. trial, ${k.subscriberPaidOrders.toLocaleString("cs-CZ")} objednávek v27).`,
+    `Peníze od inzerentů: ${k.mrrCzk.toLocaleString("cs-CZ")} Kč MRR · tento měsíc zaplaceno ${k.paidThisMonthCzk.toLocaleString("cs-CZ")} Kč.`,
+    `Kampaň: odesláno ${k.outreachSent.toLocaleString("cs-CZ")} e-mailů, ve frontě ${k.outreachQueued.toLocaleString("cs-CZ")}, odpovědí ${k.outreachReplied.toLocaleString("cs-CZ")}, selhalo ${k.outreachFailed.toLocaleString("cs-CZ")}.`,
+    mailLine,
+    input.campaignAutoSend ? "Auto-odeslání kampaně je zapnuté." : "Auto-odeslání kampaně je vypnuté.",
+  ].join(" ");
+}
+
+async function loadSubscriberMoneySafe(): Promise<{
+  paying: number;
+  live: number;
+  paidOrders: number;
+  paidCzk: number;
+}> {
+  try {
+    return await Promise.race([
+      loadSubscriberMoney(),
+      new Promise<{ paying: number; live: number; paidOrders: number; paidCzk: number }>((resolve) => {
+        setTimeout(() => resolve({ paying: 0, live: 0, paidOrders: 0, paidCzk: 0 }), 3_000);
+      }),
+    ]);
+  } catch {
+    return { paying: 0, live: 0, paidOrders: 0, paidCzk: 0 };
+  }
 }
 
 export function fallbackSalesSnapshot(error?: string): SalesSnapshot {
@@ -279,6 +339,11 @@ export function fallbackSalesSnapshot(error?: string): SalesSnapshot {
       privacyPath: "/privacy",
       unsubscribePath: "/api/sales/unsubscribe",
     },
+    honesty: salesHonesty({
+      kpis: emptyKpis(),
+      mail,
+      campaignAutoSend: salesCampaignAutoSendEnabled(),
+    }),
   };
 }
 
