@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Bot, Trophy, TrendingUp, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { agentPipelineStatus } from "@/lib/growth/ai-agent-stats";
 import type { AiOpsSnapshot, OpsAgent } from "@/lib/growth/ai-ops";
 
 type Tab = "oddeleni" | "zebricek" | "cile";
@@ -15,6 +14,20 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "zebricek", label: "Žebříček asistentů" },
   { id: "cile", label: "Cíle" },
 ];
+
+function agentPipelineStatus(row: {
+  visits: number;
+  checkouts: number;
+  paid: number;
+  newsletters: number;
+  agent?: string;
+}): string {
+  if (row.paid > 0) return "úspěch — platí";
+  if (row.checkouts > 0) return "košík, neplatí";
+  if (row.visits + row.newsletters > 0) return "crawler/hop/referer — neplatí";
+  if (row.agent === "other") return "organika bez ?ref= — až někdo zaplatí bez hopu";
+  return "IndexNow pingá — čeká na první hop, referer nebo crawler";
+}
 
 function formatInt(value: number): string {
   return value.toLocaleString("cs-CZ");
@@ -31,6 +44,7 @@ function pct(part: number, whole: number): string {
 
 function statusClass(status: OpsAgent["status"]): string {
   if (status === "done") return "border-emerald-200 bg-emerald-50 text-emerald-900";
+  if (status === "work") return "border-sky-200 bg-sky-50 text-sky-900";
   if (status === "running") return "border-sky-200 bg-sky-50 text-sky-900";
   if (status === "blocked") return "border-red-200 bg-red-50 text-red-900";
   return "border-amber-200 bg-amber-50 text-amber-900";
@@ -113,7 +127,19 @@ export function AiAgentsDesk({ initial }: { initial: AiOpsSnapshot }) {
         )}
       </p>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <Card className={snap.v27PaidCzk > 0 ? "border-emerald-200" : "border-red-200"}>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Peníze od předplatitelů</CardTitle>
+            <Trophy className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{formatCzk(snap.v27PaidCzk)}</p>
+            <p className="text-xs text-muted-foreground">
+              {formatInt(snap.v27PaidOrders)} zaplacených objednávek v27 · cíl 10. 9. nesplněn
+            </p>
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Živá předplatná</CardTitle>
@@ -134,7 +160,7 @@ export function AiAgentsDesk({ initial }: { initial: AiOpsSnapshot }) {
           <CardContent>
             <p className="text-2xl font-bold">{formatInt(snap.articles7d)}</p>
             <p className="text-xs text-muted-foreground">
-              24 h {formatInt(snap.articles24h)} · celkem {formatInt(snap.articlesPublished)}
+              24 h {formatInt(snap.articles24h)} · celkem {formatInt(snap.articlesPublished)} · práce, ne platba
             </p>
           </CardContent>
         </Card>
@@ -153,12 +179,14 @@ export function AiAgentsDesk({ initial }: { initial: AiOpsSnapshot }) {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Zaplacené objednávky v27</CardTitle>
+            <CardTitle className="text-sm font-medium">Obchodní e-maily</CardTitle>
             <Trophy className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{formatInt(snap.v27PaidOrders)}</p>
-            <p className="text-xs text-muted-foreground">{formatCzk(snap.v27PaidCzk)}</p>
+            <p className="text-2xl font-bold">{formatInt(snap.outreachSent)}</p>
+            <p className="text-xs text-muted-foreground">
+              odesláno · odpovědí {formatInt(snap.outreachReplied)}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -296,11 +324,14 @@ export function AiAgentsDesk({ initial }: { initial: AiOpsSnapshot }) {
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <p className="font-medium text-[#021d33]">{snap.growth.visibility.label}</p>
-              <p className={near.onTrack ? "text-emerald-800" : "text-amber-800"}>
-                Cíl 10. 9. (170 000): {near.onTrack ? "na cestě" : "nesplněno / mimo tempo"} — {near.label} · {pct(snap.liveSubscribers, near.target)}
+              <p className={near.onTrack ? "text-emerald-800" : "text-red-800"}>
+                Cíl 10. 9. (170 000 předplatitelů): {near.onTrack ? "splněn / na cestě" : "NESPLNĚNO"} — {near.label} · {pct(snap.liveSubscribers, near.target)}
               </p>
               <p className={sep27.onTrack ? "text-emerald-800" : "text-amber-800"}>
                 Cíl 27. 9. (500 000): {sep27.onTrack ? "na cestě" : "mimo tempo"} — {sep27.label} · {pct(snap.liveSubscribers, sep27.target)}
+              </p>
+              <p className="text-slate-700">
+                Peníze od předplatitelů: {formatCzk(snap.v27PaidCzk)} · platící {formatInt(snap.payingSubscribers)}.
               </p>
             </CardContent>
           </Card>

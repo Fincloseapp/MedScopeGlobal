@@ -10,12 +10,12 @@ import {
   type AiAgentGrowthSnapshot,
 } from "@/lib/growth/ai-agent-stats";
 import { lastMarketplaceLoop } from "@/lib/sales/marketplace-loop";
-import { listRuns, salesDb } from "@/lib/sales/store";
+import { listOutreach, listRuns, salesDb } from "@/lib/sales/store";
 import { listMarketplaceListings, marketplaceDb } from "@/lib/marketplace/store";
 import { tryCreateServiceRoleClient } from "@/lib/supabase/service";
 import { mailReady, mailTransportLabel } from "@/lib/monetization/vialongevita-brief";
 
-export type OpsAgentStatus = "done" | "running" | "blocked" | "empty";
+export type OpsAgentStatus = "done" | "work" | "running" | "blocked" | "empty";
 
 export type OpsAgent = {
   id: string;
@@ -49,6 +49,8 @@ export type AiOpsSnapshot = {
   marketplaceListings: number;
   lastSalesRunAt: string | null;
   lastSalesRunOk: boolean | null;
+  outreachSent: number;
+  outreachReplied: number;
   mailReady: boolean;
   mailTransport: string;
   honesty: string;
@@ -59,14 +61,16 @@ export type AiOpsSnapshot = {
   growth: AiAgentGrowthSnapshot;
 };
 
-function statusFromCount(count: number, blocked: boolean): OpsAgentStatus {
+function statusFromWork(count: number, blocked: boolean, money: number): OpsAgentStatus {
   if (blocked) return "blocked";
-  if (count > 0) return "done";
+  if (money > 0) return "done";
+  if (count > 0) return "work";
   return "empty";
 }
 
 function statusLabel(status: OpsAgentStatus): string {
-  if (status === "done") return "splněno";
+  if (status === "done") return "peníze přišly";
+  if (status === "work") return "práce hotová, 0 Kč";
   if (status === "running") return "běží";
   if (status === "blocked") return "blokováno";
   return "zatím nic";
@@ -138,6 +142,8 @@ export function emptyOps(error?: string): AiOpsSnapshot {
     marketplaceListings: 0,
     lastSalesRunAt: null,
     lastSalesRunOk: null,
+    outreachSent: 0,
+    outreachReplied: 0,
   });
 }
 
@@ -150,14 +156,20 @@ async function loadAiOpsSnapshotUnsafe(): Promise<AiOpsSnapshot> {
 
   let lastSalesRunAt: string | null = null;
   let lastSalesRunOk: boolean | null = null;
+  let outreachSent = 0;
+  let outreachReplied = 0;
   try {
     const db = salesDb(4_000);
     if (db) {
-      const runs = await listRuns(db, 1);
+      const [runs, outreach] = await Promise.all([listRuns(db, 1), listOutreach(db, 400)]);
       if (runs[0]) {
         lastSalesRunAt = runs[0].finished_at ?? runs[0].started_at;
         lastSalesRunOk = runs[0].ok;
+        const summarySent = Number(runs[0].summary?.sent ?? 0);
+        if (Number.isFinite(summarySent) && summarySent > outreachSent) outreachSent = summarySent;
       }
+      outreachSent = outreach.filter((row) => row.status === "sent").length;
+      outreachReplied = outreach.filter((row) => row.status === "replied").length;
     }
   } catch {
     /* sales tables may be missing */
@@ -181,6 +193,8 @@ async function loadAiOpsSnapshotUnsafe(): Promise<AiOpsSnapshot> {
     marketplaceListings,
     lastSalesRunAt,
     lastSalesRunOk,
+    outreachSent,
+    outreachReplied,
   });
 }
 
@@ -192,6 +206,8 @@ function buildOps(input: {
   marketplaceListings: number;
   lastSalesRunAt: string | null;
   lastSalesRunOk: boolean | null;
+  outreachSent: number;
+  outreachReplied: number;
 }): AiOpsSnapshot {
   const now = new Date();
   const nearMissed = now.getTime() > Date.parse("2026-09-10T23:59:59.000Z");
@@ -204,28 +220,38 @@ function buildOps(input: {
   const loop = lastMarketplaceLoop();
 
   const editorialCount = pulse?.last7d ?? 0;
+  const paidCzk = growth.revenue.v27PaidCzk;
   const editorialStatus: OpsAgentStatus =
-    pulse && pulse.last24h > 0 ? "running" : statusFromCount(editorialCount, false);
+    pulse && pulse.last24h > 0 ? "running" : statusFromWork(editorialCount, false, 0);
 
   const newsletterCount = input.newsletterIssuesThisWeek;
   const briefWaiting = pulse?.waitingFirstBrief ?? 0;
+  const newsletterStatus = statusFromWork(newsletterCount, !mailOk, 0);
 
+  const salesMoney = 0;
+  const salesWork = input.outreachSent + (input.lastSalesRunAt ? 1 : 0);
   const salesStatus: OpsAgentStatus =
-    input.lastSalesRunOk === false ? "blocked" : input.lastSalesRunAt ? "done" : "empty";
+    input.lastSalesRunOk === false || !mailOk
+      ? "blocked"
+      : statusFromWork(salesWork, false, salesMoney);
 
-  const marketStatus: OpsAgentStatus = loop?.evaluation.autonomous
-    ? "done"
-    : statusFromCount(input.marketplaceListings, false);
+  const marketStatus: OpsAgentStatus = statusFromWork(
+    input.marketplaceListings + (loop?.evaluation.percent ?? 0),
+    false,
+    0
+  );
 
   const paidExternal = growth.leaderboard.reduce((sum, row) => sum + row.paid, 0);
   const visitsExternal = growth.leaderboard.reduce((sum, row) => sum + row.visits, 0);
+  const arenaStatus: OpsAgentStatus = paidExternal > 0 ? "done" : visitsExternal > 0 ? "work" : "empty";
+  const growthStatus: OpsAgentStatus = paidCzk > 0 ? "done" : "empty";
 
   const agents: OpsAgent[] = [
     {
       id: "editorial",
       name: "Redakce",
-      job: "Články v jazykových mutacích",
-      completed: `${editorialCount.toLocaleString("cs-CZ")} publikovaných za 7 dní · ${pulse?.last24h ?? 0} za 24 h`,
+      job: "Články v jazykových mutacích — práce, ne předplatné",
+      completed: `${editorialCount.toLocaleString("cs-CZ")} publikovaných za 7 dní · ${pulse?.last24h ?? 0} za 24 h · peníze od předplatitelů to nesplnilo`,
       count: editorialCount,
       status: editorialStatus,
       statusLabel: statusLabel(editorialStatus),
@@ -238,21 +264,23 @@ function buildOps(input: {
       job: "Týdenní vydání + brief podle locale",
       completed: `${newsletterCount.toLocaleString("cs-CZ")} vydání tento týden · čeká na první brief ${briefWaiting.toLocaleString("cs-CZ")}`,
       count: newsletterCount,
-      status: statusFromCount(newsletterCount, !mailOk),
-      statusLabel: mailOk ? statusLabel(statusFromCount(newsletterCount, false)) : "mail není nastavený",
+      status: newsletterStatus,
+      statusLabel: mailOk ? statusLabel(newsletterStatus) : "mail není nastavený — nikomu nedorazí",
       href: "/admin/newsletter",
       action: "run_newsletter",
     },
     {
       id: "sales",
       name: "Obchod",
-      job: "Paušál Start, kampaň, faktury",
-      completed: input.lastSalesRunAt
-        ? `poslední běh ${new Date(input.lastSalesRunAt).toLocaleString("cs-CZ")}${input.lastSalesRunOk === false ? " — chyba" : ""}`
-        : "zatím žádný uložený běh",
-      count: input.lastSalesRunAt ? 1 : 0,
+      job: "Odeslat kampaň a dostat peníze od předplatitelů / inzerentů",
+      completed: `odesláno ${input.outreachSent.toLocaleString("cs-CZ")} e-mailů · odpovědí ${input.outreachReplied.toLocaleString("cs-CZ")} · ${
+        input.lastSalesRunAt
+          ? `poslední běh ${new Date(input.lastSalesRunAt).toLocaleString("cs-CZ")}${input.lastSalesRunOk === false ? " — chyba" : ""}`
+          : "zatím žádný uložený běh"
+      }`,
+      count: input.outreachSent,
       status: salesStatus,
-      statusLabel: statusLabel(salesStatus),
+      statusLabel: !mailOk ? "mail není nastavený" : statusLabel(salesStatus),
       href: "/admin/sales",
       action: "run_sales",
     },
@@ -260,7 +288,7 @@ function buildOps(input: {
       id: "marketplace",
       name: "Tržiště",
       job: "Nabídky, poptávky, modelová smyčka",
-      completed: `${input.marketplaceListings.toLocaleString("cs-CZ")} záznamů · smyčka ${loop?.evaluation.percent ?? 0} %`,
+      completed: `${input.marketplaceListings.toLocaleString("cs-CZ")} záznamů · smyčka ${loop?.evaluation.percent ?? 0} % (model ≠ platba)`,
       count: input.marketplaceListings,
       status: marketStatus,
       statusLabel: statusLabel(marketStatus),
@@ -271,27 +299,28 @@ function buildOps(input: {
       id: "arena",
       name: "Aréna Alfa / Beta",
       job: "Interní souboj — výhra jen zaplacené předplatné",
-      completed: `Alfa/Beta zaplaceno 7 dní je ve Růstové aréně. Hopů/návštěv celkem ${visitsExternal.toLocaleString("cs-CZ")}.`,
+      completed: `zaplaceno z hopu ${paidExternal.toLocaleString("cs-CZ")} · návštěv ${visitsExternal.toLocaleString("cs-CZ")} (návštěva není výhra)`,
       count: paidExternal,
-      status: paidExternal > 0 ? "done" : visitsExternal > 0 ? "running" : "empty",
-      statusLabel: paidExternal > 0 ? "splněno" : visitsExternal > 0 ? "pipeline, neplatí" : "zatím nic",
+      status: arenaStatus,
+      statusLabel: paidExternal > 0 ? "peníze přišly" : visitsExternal > 0 ? "pipeline, neplatí" : "zatím nic",
       href: "/admin/ai-teams",
       action: "run_arena",
     },
     {
       id: "growth",
       name: "SEO / IndexNow",
-      job: "Legální discovery, reconcilace Stripe",
-      completed: "Cron growth-sprint + Worker každých 15 min (light)",
-      count: 0,
-      status: "running",
-      statusLabel: "naplánováno",
-      href: "/admin/system",
+      job: "Legální discovery — výhra jen Stripe platba",
+      completed: `cron běží · zaplacené v27 ${paidCzk.toLocaleString("cs-CZ")} Kč · platící ${paying.toLocaleString("cs-CZ")}`,
+      count: paying,
+      status: growthStatus,
+      statusLabel: statusLabel(growthStatus),
+      href: "/admin/revenue",
       action: "run_growth",
     },
   ];
 
-  const doneCount = agents.filter((row) => row.status === "done" || row.count > 0).length;
+  const workCount = agents.filter((row) => row.status === "work" || row.status === "running" || row.count > 0).length;
+  const moneyCount = agents.filter((row) => row.status === "done").length;
 
   return {
     loadedAt: now.toISOString(),
@@ -309,15 +338,17 @@ function buildOps(input: {
     lastEmailAt: pulse?.lastEmail?.sent_at ?? null,
     lastEmailStatus: pulse?.lastEmail?.status ?? null,
     v27PaidOrders: growth.revenue.v27PaidOrders,
-    v27PaidCzk: growth.revenue.v27PaidCzk,
+    v27PaidCzk: paidCzk,
     marketplaceListings: input.marketplaceListings,
     lastSalesRunAt: input.lastSalesRunAt,
     lastSalesRunOk: input.lastSalesRunOk,
+    outreachSent: input.outreachSent,
+    outreachReplied: input.outreachReplied,
     mailReady: mailOk,
     mailTransport: mailTransportLabel(),
     honesty: nearMissed
-      ? `Cíl 170 000 předplatitelů do 10. 9. 2026 je nesplněný. Živá předplatná teď: ${live.toLocaleString("cs-CZ")} (z toho platící ${paying.toLocaleString("cs-CZ")}). ChatGPT/Claude/Gemini se nevolají z cronu — žebříček počítá jen hop/crawler/Stripe. Splněné je to, co oddělení opravdu dokončilo: ${doneCount} z ${agents.length} agentů má záznam práce.`
-      : `Cíl 170 000 do 10. 9. 2026 ještě běží. Stav: ${live.toLocaleString("cs-CZ")} živých. Neslibujeme čísla, která nejsou v databázi.`,
+      ? `Cíl 170 000 předplatitelů do 10. 9. 2026 je nesplněný. Peníze od předplatitelů teď: ${paidCzk.toLocaleString("cs-CZ")} Kč (${paying.toLocaleString("cs-CZ")} platících, ${live.toLocaleString("cs-CZ")} živých vč. trial). ChatGPT/Claude/Gemini se z cronu nevolají. Oddělení mají záznam práce u ${workCount} z ${agents.length}; peníze přišly u ${moneyCount} z ${agents.length}. Odeslané obchodní e-maily: ${input.outreachSent.toLocaleString("cs-CZ")}, odpovědi: ${input.outreachReplied.toLocaleString("cs-CZ")}.`
+      : `Cíl 170 000 do 10. 9. 2026 ještě běží. Peníze od předplatitelů: ${paidCzk.toLocaleString("cs-CZ")} Kč. Neslibujeme čísla, která nejsou v databázi.`,
     agents,
     leaderboard: growth.leaderboard,
     remediations: AI_AGENT_REMEDIATIONS,

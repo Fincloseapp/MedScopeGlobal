@@ -140,6 +140,42 @@ export async function countPayingSubscriptions(): Promise<number> {
   return active;
 }
 
+/** Lightweight money heads — no analytics crawler. 0 when DB is missing. */
+export async function loadSubscriberMoney(): Promise<{
+  paying: number;
+  live: number;
+  paidOrders: number;
+  paidCzk: number;
+}> {
+  const service = tryCreateServiceRoleClient({ timeoutMs: 4_000 });
+  const session = service ? null : await createAdminReadClient().catch(() => null);
+  const client = service ?? session;
+  if (!client) return { paying: 0, live: 0, paidOrders: 0, paidCzk: 0 };
+  try {
+    const [active, trialing] = await Promise.all([
+      countSafe(client.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "active")),
+      countSafe(client.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "trialing")),
+    ]);
+    let paidOrders = 0;
+    let paidCzk = 0;
+    try {
+      const { data } = await client
+        .from("v27_orders")
+        .select("amount_czk, status")
+        .in("status", ["paid", "completed"])
+        .limit(2000);
+      const rows = data ?? [];
+      paidOrders = rows.length;
+      paidCzk = rows.reduce((sum, row) => sum + Number(row.amount_czk ?? 0), 0);
+    } catch {
+      /* v27_orders may be missing */
+    }
+    return { paying: active, live: active + trialing, paidOrders, paidCzk };
+  } catch {
+    return { paying: 0, live: 0, paidOrders: 0, paidCzk: 0 };
+  }
+}
+
 export async function loadAiAgentGrowthSnapshot(): Promise<AiAgentGrowthSnapshot> {
   try {
     return await loadAiAgentGrowthSnapshotUnsafe();

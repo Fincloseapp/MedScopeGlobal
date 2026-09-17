@@ -3093,6 +3093,10 @@ assert.ok(
   );
   assert.ok(existsSync(join(root, "app/api/admin/ai-ops/route.ts")));
   assert.ok(readFileSync(join(root, "app/api/admin/ai-ops/route.ts"), "utf8").includes("run_editorial"));
+  assert.ok(readFileSync(join(root, "lib/growth/ai-ops.ts"), "utf8").includes("Peníze od předplatitelů"));
+  assert.ok(readFileSync(join(root, "components/admin/ai-agents-desk.tsx"), "utf8").includes("Peníze od předplatitelů"));
+  assert.ok(readFileSync(join(root, "components/admin/ai-agents-desk.tsx"), "utf8").includes("práce hotová, 0 Kč") === false);
+  assert.ok(readFileSync(join(root, "lib/growth/ai-ops.ts"), "utf8").includes("práce hotová, 0 Kč"));
   assert.ok(
     !readFileSync(join(root, "lib/growth/legal-sprint.ts"), "utf8").includes('fetch("https://medscopeglobal.com/r/ai')
   );
@@ -6194,6 +6198,9 @@ console.log(
   assert.ok(!dePreview!.copyText.includes("450 Kč"));
   assert.ok(readFileSync(join(root, "app/api/marketplace/listing/route.ts"), "utf8").includes("getMarketplaceUiCopy"));
   assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes("Kampaň"));
+  assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes("Odeslat kampaň teď"));
+  assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes("Peníze od předplatitelů"));
+  assert.ok(readFileSync(join(root, "lib/sales/snapshot.ts"), "utf8").includes("subscriberPaidCzk"));
   assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes('role="tablist"'));
   assert.ok(readFileSync(join(root, "components/admin/sales-desk.tsx"), "utf8").includes("aria-pressed"));
   assert.ok(!readFileSync(join(root, "lib/sales/snapshot.ts"), "utf8").includes("applySalesDepartmentSchema"));
