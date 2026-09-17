@@ -3086,8 +3086,13 @@ assert.ok(
     readFileSync(join(root, "lib/growth/legal-sprint.ts"), "utf8").includes("conversionHopUrls")
   );
   assert.ok(
-    readFileSync(join(root, "app/(admin)/admin/ai-agents/page.tsx"), "utf8").includes("AI_AGENT_REMEDIATIONS")
+    readFileSync(join(root, "lib/growth/ai-ops.ts"), "utf8").includes("AI_AGENT_REMEDIATIONS")
   );
+  assert.ok(
+    readFileSync(join(root, "components/admin/ai-agents-desk.tsx"), "utf8").includes("dokončená práce")
+  );
+  assert.ok(existsSync(join(root, "app/api/admin/ai-ops/route.ts")));
+  assert.ok(readFileSync(join(root, "app/api/admin/ai-ops/route.ts"), "utf8").includes("run_editorial"));
   assert.ok(
     !readFileSync(join(root, "lib/growth/legal-sprint.ts"), "utf8").includes('fetch("https://medscopeglobal.com/r/ai')
   );
