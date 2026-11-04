@@ -12,14 +12,17 @@
   },
   "name": "medscopeglobal",
   "main": "cloudflare/entry.js",
+  // Hourly, not */5: Workers Free is 100k requests/day (Error 1027 when exceeded).
   "triggers": {
-    "crons": ["*/5 * * * *"]
+    "crons": ["0 * * * *"]
   },
   "compatibility_date": "2026-08-10",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
+    // Do not set run_worker_first: true — static /_next/static and /assets
+    // must stay free (they do not count toward the Workers request quota).
   },
   "services": [
     {

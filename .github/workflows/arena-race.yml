@@ -2,7 +2,7 @@ name: Arena race pulse
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "0 * * * *"
   workflow_dispatch:
 
 jobs:

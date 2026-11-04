@@ -3263,7 +3263,7 @@ assert.ok(
       )
     );
     const wrangler = readFileSync(join(root, "wrangler.jsonc"), "utf8");
-    assert.ok(wrangler.includes('"*/5 * * * *"'), "Worker must tick the race every 5 minutes");
+    assert.ok(wrangler.includes('"0 * * * *"'), "Worker ticks the race hourly (Workers Free 100k/day)");
     assert.ok(wrangler.includes("cloudflare/entry.js"), "Worker entry must expose scheduled()");
     assert.ok(arenaPulsePaths(new Date("2026-09-07T11:05:00.000Z")).includes("/api/cron/agent-arena"));
     assert.ok(arenaPulsePaths(new Date("2026-09-07T11:00:00.000Z")).includes("/api/cron/growth-sprint?light=1"));
@@ -5418,12 +5418,12 @@ console.log("✓ magazine desk byline and copy checks passed");
   assert.equal(isProfessionalAktualityTitle("Epidemiologická zpráva — USA"), false);
   const merged = mergeAktualityListing(
     [
-      { id: "who-1", title: "WHO: nová doporučení k očkování seniorů", published_at: "2026-09-01T12:00:00.000Z" },
-      { id: "stub-1", title: "Zdravotní zpráva — Zahraniční zdravotnická zpráva", published_at: "2026-09-01T13:00:00.000Z" },
+      { id: "who-1", title: "WHO: nová doporučení k očkování seniorů", published_at: "2026-11-03T12:00:00.000Z" },
+      { id: "stub-1", title: "Zdravotní zpráva — Zahraniční zdravotnická zpráva", published_at: "2026-11-03T13:00:00.000Z" },
     ],
     [
-      { id: "long-1", title: "Kognitivní rezerva: pohyb, lidé a učení", published_at: "2026-08-01T12:00:00.000Z" },
-      { id: "who-1", title: "WHO: nová doporučení k očkování seniorů", published_at: "2026-09-01T12:00:00.000Z" },
+      { id: "long-1", title: "Kognitivní rezerva: pohyb, lidé a učení", published_at: "2026-10-20T12:00:00.000Z" },
+      { id: "who-1", title: "WHO: nová doporučení k očkování seniorů", published_at: "2026-11-03T12:00:00.000Z" },
     ],
     8
   );

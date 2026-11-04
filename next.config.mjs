@@ -541,6 +541,10 @@ const nextConfig = {
 
   images: {
 
+    // Serve original URLs so /_next/image does not consume Workers Free
+    // 100k/day quota (Error 1027). Static /assets stay on Assets (free).
+    unoptimized: true,
+
     remotePatterns: [
 
       ...supabasePatterns,

@@ -52,4 +52,4 @@ export const V25_NAV_ROUTES = [
   "/inzerce",
 ] as const;
 
-export const V25_NAV_MONITOR_INTERVAL_MS = 5 * 60 * 1000;
+export const V25_NAV_MONITOR_INTERVAL_MS = 6 * 60 * 60 * 1000;
