@@ -64,3 +64,8 @@ curl -s -o /dev/null -w "%{http_code}\n" \
 
 Tables: `mediflow_notes`, `mediflow_symptoms`, `mediflow_supplements`, `mediflow_saved_articles`,
 `article_syndications`, `editorial_queue`, `article_image_suggestions`.
+
+Sales department (monthly retainers) is a later migration:
+`supabase/migrations/20260913220000_sales_department.sql` — also applied from
+`/api/cron/apply-ecosystem-migrations` and `/api/cron/sales-department`.
+See `docs/sales/AUTONOMOUS_SALES_DEPARTMENT.md`.

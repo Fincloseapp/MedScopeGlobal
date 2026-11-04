@@ -80,8 +80,17 @@ export async function applyEcosystemMigrations(): Promise<ApplyEcosystemMigratio
     error: settings.error,
   });
 
+  const { applySalesDepartmentSchema } = await import("@/lib/sales/apply-schema");
+  const sales = await applySalesDepartmentSchema();
+  results.push({
+    name: "20260913220000_sales_department.sql",
+    ok: sales.ok,
+    skipped: sales.skipped,
+    error: sales.error,
+  });
+
   return {
-    ok: revenue.ok && settings.ok,
+    ok: revenue.ok && settings.ok && sales.ok,
     projectRef,
     results,
     timestamp: new Date().toISOString(),

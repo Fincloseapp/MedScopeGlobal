@@ -128,6 +128,7 @@ default — enable only with consent + explicit product decision.
 - [ ] Affiliate tags live in `/go/*` destinations
 - [ ] Mediavine application filed when traffic qualifies
 - [ ] VIP + Tringelt CTAs visible on unlocked articles
+- [ ] Direct B2B retainers: `/admin/sales` live, SQL `20260913220000_sales_department.sql` applied
 - [ ] No dashed “Ad preview” boxes in production (`ADS_SHOW_PLACEHOLDERS` unset)
 
 ---

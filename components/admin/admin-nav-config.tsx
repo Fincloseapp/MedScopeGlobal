@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   Bell,
   Bot,
+  Briefcase,
   Crown,
   Mail,
   Palette,
@@ -58,6 +59,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { href: "/admin/ai-agents", label: "AI agenti", icon: Trophy },
       { href: "/admin/ai-teams", label: "Týmy AI", icon: Swords },
       { href: "/admin/ads-requests", label: "Žádosti o reklamu", icon: Megaphone },
+      { href: "/admin/sales", label: "Obchodní oddělení", icon: Briefcase },
     ],
   },
   {

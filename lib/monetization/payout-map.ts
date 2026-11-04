@@ -97,10 +97,10 @@ export const PAYOUT_CHANNELS: PayoutChannel[] = [
   {
     id: "b2b",
     title: "Vlastní inzerce (B2B)",
-    whatEarns: "Banner od 5 000 Kč/měsíc, sponzorovaný článek od 15 000 Kč, mention v briefu.",
-    whereYouSeeMoney: "Faktura, kterou vystavíte inzerentovi. Formulář je /inzerce/formular.",
+    whatEarns: "Měsíční paušál inzerce od 4 900 Kč (Start) až Partner 69 900 Kč, plus jednorázové kampaně.",
+    whereYouSeeMoney: "Faktura inzerentovi + Stripe subscription. Dashboard /admin/sales, objednávka /inzerce/pausal.",
     payoutTo: "Firemní účet Al Synaptica Research Institute s.r.o. — žádný affiliate účet.",
-    signupUrl: "https://medscopeglobal.com/inzerce",
+    signupUrl: "https://medscopeglobal.com/inzerce/pausal",
     signupLabel: "Otevřít mediakit",
     envVars: [],
     priority: 1,
